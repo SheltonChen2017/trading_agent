@@ -1,0 +1,24 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pip install -q pandas numpy scikit-learn)",
+      "Bash(python tests/test_backtest.py)",
+      "Bash(python tests/test_scanner.py)",
+      "Bash(python -m pip install -q joblib)",
+      "Bash(python tests/test_model.py)",
+      "Bash(python tests/test_risk.py)",
+      "Bash(python -c \"import pytest; print\\(pytest.__version__\\)\")",
+      "Bash(python tests/test_alpaca_broker.py)",
+      "Bash(python scripts/run_backtest.py)",
+      "Bash(python scripts/train_model.py)",
+      "Bash(python scripts/run_agent.py)",
+      "Bash(python -c ' *)",
+      "Bash(gh auth *)",
+      "Bash(python -c \"import yfinance\")",
+      "Bash(python -c \"import yfinance as yf; d = yf.download\\('AAPL', period='5d', progress=False\\); print\\(d.tail\\(\\)\\)\")",
+      "Bash(python -m pip install -q yfinance)",
+      "Bash(python \"C:\\\\Users\\\\SHELTO~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedAgent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_data_test.py\")",
+      "Bash(python scripts/run_baseline_comparison.py)"
+    ]
+  }
+}

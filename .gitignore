@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Trained model artifacts — regenerate with scripts/train_model.py, don't commit binaries
+*.joblib
+
+# Never commit credentials
+.env
+.env.*

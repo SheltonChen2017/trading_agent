@@ -74,8 +74,24 @@ def test_ignores_normal_noise():
     assert result.empty, "a quiet, noise-only series should not trigger any signal"
 
 
+def test_handles_ticker_with_shorter_history_than_as_of_date():
+    # Mixing a long-history ticker with a "recent IPO" ticker whose index
+    # doesn't cover an earlier as_of date shouldn't crash — the short
+    # ticker should just be skipped for dates before it existed.
+    days = 60
+    long_df = _flat_series_with_shock(days, shock_index=days - 1, shock_return=-0.08)
+    short_df = long_df.iloc[-10:].copy()
+    as_of = long_df.index[30]  # predates short_df's entire history
+
+    result = scan_dips_and_ups({"LONG": long_df, "SHORT": short_df}, as_of=as_of)
+    assert isinstance(result, pd.DataFrame)
+    if not result.empty:
+        assert "SHORT" not in result["ticker"].values
+
+
 if __name__ == "__main__":
     test_flags_injected_dip()
     test_flags_injected_up()
     test_ignores_normal_noise()
+    test_handles_ticker_with_shorter_history_than_as_of_date()
     print("All scanner tests passed.")

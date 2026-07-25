@@ -26,13 +26,71 @@ UNIVERSE = [
     "DIS", "NFLX",
     # Utilities (low-volatility contrast to the rest of the universe)
     "DUK", "NEE",
+    # Rare earth minerals / critical materials (thin sector — few large,
+    # liquid, US-listed pure plays exist)
+    "MP", "REMX",
+    # Fintech (V/MA also live in "financials" — deliberate overlap)
+    "PYPL", "XYZ",
+    # Confirmed by user 2026-07: SpaceX's real, current ticker post-IPO
+    "SPCX",
 ]
+
+# Reference benchmarks — NOT part of UNIVERSE, never scanned for dip/up
+# signals. Used only to check whether a basket's signals beat the broad
+# market over the exact same days, a stricter bar than beating just the
+# stock's own history (see backtest/engine.compare_signal_to_market_index).
+MARKET_BENCHMARK_TICKERS = ["SPY", "QQQ"]  # S&P 500 / Nasdaq-100 ETFs
 
 # --- Data -----------------------------------------------------------
 # ~2 trading years, so the backtest has real depth (previously 252 days /
 # ~1 year) and comfortably reaches back before mid-2025.
 LOOKBACK_DAYS = 504
 ROLLING_WINDOW = 20          # window for rolling mean/std used in z-scores
+
+# --- Baskets -----------------------------------------------------------
+# Overlapping themed groupings of UNIVERSE tickers — a stock can (and often
+# should) appear in more than one basket, e.g. TSLA is both a consumer/auto
+# name and an AI-narrative name. These are curated by known sector/theme,
+# NOT trained on anything — see baskets.py for the one basket that's
+# computed empirically instead (HIGH_VOLATILITY_BASKET_SIZE below).
+#
+# Per-basket ML model training is intentionally NOT built yet: splitting
+# the universe into smaller groups shrinks an already-thin per-signal
+# sample size (see backtest results — ~48% model accuracy pooled across
+# all 43 tickers). Basket-level backtest/baseline stats are useful now;
+# training a separate model per basket should wait until there's enough
+# real signal per basket to trust the result.
+BASKETS = {
+    # User-requested categories
+    "tech": [
+        "AAPL", "MSFT", "GOOGL", "META", "AMZN", "NVDA", "AMD", "INTC",
+        "QCOM", "TXN", "ORCL", "CRM", "ADBE", "CSCO", "IBM", "NFLX",
+    ],
+    "semiconductors": ["NVDA", "AMD", "INTC", "QCOM", "TXN"],
+    "ai_related": ["NVDA", "MSFT", "GOOGL", "META", "AMD", "ORCL", "CRM", "TSLA", "SPCX"],
+    "unstable": ["TSLA", "SPCX"],  # curated per user's own examples; cross-check against
+                                    # baskets.compute_high_volatility_basket(), which is
+                                    # computed from real realized volatility, not picked by hand
+    "rare_earth_minerals": ["MP", "REMX"],
+    "fintech": ["V", "MA", "PYPL", "XYZ"],
+    # Original sector groupings, kept for the broader universe backtests
+    "mega_cap_tech": ["AAPL", "MSFT", "GOOGL", "META", "AMZN", "NVDA"],
+    "software": ["MSFT", "ORCL", "CRM", "ADBE", "IBM"],
+    "consumer_staples": ["KO", "PEP", "WMT", "COST"],
+    "consumer_discretionary": ["AMZN", "NKE", "MCD", "SBUX", "HD", "TSLA", "DIS", "NFLX"],
+    "healthcare": ["JNJ", "PFE", "UNH", "LLY", "ABBV"],
+    "financials": ["JPM", "BAC", "WFC", "GS", "V", "MA"],
+    "energy": ["XOM", "CVX"],
+    "industrials": ["BA", "CAT"],
+    "communication_media": ["DIS", "NFLX", "GOOGL", "META"],
+    "utilities": ["DUK", "NEE"],
+}
+
+# Size of the "high_volatility" basket, computed empirically from realized
+# daily-return std over the lookback window (see baskets.py) rather than a
+# hand-picked list — an objective stand-in for what the user called an
+# "unstable" basket.
+HIGH_VOLATILITY_BASKET_SIZE = 8
 
 # --- Signal thresholds -----------------------------------------------------------
 # A z-score of 2.0 means "2 standard deviations from its own recent norm" —

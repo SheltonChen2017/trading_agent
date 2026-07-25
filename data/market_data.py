@@ -39,7 +39,11 @@ def fetch_historical(tickers: list[str], lookback_days: int = 252) -> dict[str, 
 
     for ticker in tickers:
         try:
-            df = raw[ticker].copy() if len(tickers) > 1 else raw.copy()
+            # yfinance returns MultiIndex (ticker, field) columns with
+            # group_by="ticker" regardless of how many tickers were
+            # requested — including a single-ticker request — so always
+            # index by ticker when that's the shape we got back.
+            df = raw[ticker].copy() if isinstance(raw.columns, pd.MultiIndex) else raw.copy()
             df.columns = [c.lower() for c in df.columns]
             df = df.dropna(subset=["close"])
             data[ticker] = df.tail(lookback_days)

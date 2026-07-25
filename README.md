@@ -14,7 +14,8 @@ backtest-of-the-full-strategy would use.
 
 ```
 trading_agent/
-├── config.py                    # universe, thresholds, risk params — the one place to tune things
+├── config.py                    # universe, baskets, thresholds, risk params — the one place to tune things
+├── baskets.py                    # overlapping themed groupings (semiconductors, ai_related, ...) + per-basket reports
 ├── data/
 │   └── market_data.py            # fetch_historical() [yfinance] and generate_synthetic() [offline dev]
 ├── signals/
@@ -31,7 +32,8 @@ trading_agent/
 │   ├── run_scan_demo.py           # scanner only, synthetic data
 │   ├── run_backtest.py            # walk-forward backtest + summary
 │   ├── run_backtest_horizons.py   # backtest swept across several hold periods (1 day .. 1 month)
-│   ├── run_baseline_comparison.py # flagged signals vs. "hold any day" baseline, per horizon
+│   ├── run_baseline_comparison.py # flagged signals vs. "hold any day" baseline (pooled + per-ticker)
+│   ├── run_basket_report.py       # backtest/baseline results broken out by themed basket
 │   ├── train_model.py             # backtest -> train -> evaluate -> save model
 │   └── run_agent.py               # full pipeline: scan -> score -> size -> (optional) execute
 └── tests/
@@ -39,7 +41,8 @@ trading_agent/
     ├── test_backtest.py
     ├── test_model.py
     ├── test_risk.py
-    └── test_alpaca_broker.py
+    ├── test_alpaca_broker.py
+    └── test_baskets.py
 ```
 
 ## Run it
@@ -104,7 +107,52 @@ setting:
   ones — the control group a flagged signal's return needs to beat. A
   rising `edge_vs_baseline_pct` over a test window can otherwise look
   like "the signal works" when it's really just the whole universe
-  drifting upward during that period.
+  drifting upward during that period. `compare_signal_to_baseline()`
+  pools every stock's baseline together, which is simple but can be
+  confounded if flagged signals cluster on naturally higher/lower-drift
+  stocks than the universe average; `compare_signal_to_baseline_per_ticker()`
+  matches each signal only against its own stock's baseline instead,
+  removing that confound — trust the per-ticker version over the pooled
+  one when they disagree.
+
+**Baskets** — `config.BASKETS` groups the universe into overlapping
+themes: `tech`, `semiconductors`, `ai_related`, `unstable` (curated:
+`TSLA`, `SPCX`), `rare_earth_minerals` (`MP`, `REMX`), `fintech` (`V`,
+`MA`, `PYPL`, `XYZ`), plus the original sector groupings
+(`mega_cap_tech`, `consumer_discretionary`, `healthcare`, `financials`,
+etc.). A ticker can belong to more than one basket on purpose — TSLA is
+both `ai_related` and `consumer_discretionary` and `unstable`.
+`baskets.compute_high_volatility_basket()` adds one basket computed
+empirically from realized daily-return std, as a cross-check against the
+hand-curated `unstable` list rather than a replacement for it.
+`baskets.summarize_by_basket()`, `compare_baskets_to_baseline()`, and
+`compare_baskets_to_market_index()` restrict the backtest/baseline/market
+comparisons to each basket's tickers and report results side by side.
+**Per-basket ML model training is deliberately not built yet** —
+splitting the universe into smaller groups shrinks an already-thin
+per-signal sample further, and the pooled 43-ticker model's own
+walk-forward accuracy (~48%, close to coin-flip) is a reason for caution
+about fragmenting the data more, not a green light to do it per basket.
+Basket-level backtest stats are there to see which themes look more
+promising before that investment is worth making. With 13 baskets × 2
+directions tested at once, watch for the **multiple comparisons
+problem**: testing that many combinations means a couple will look
+unusually good or bad by pure chance even with zero real edge anywhere —
+treat any single standout basket with extra skepticism, not less.
+
+`SPCX` (confirmed by the user, 2026-07, to be a real recent IPO — flagged
+here rather than assumed, since it postdates this project's knowledge
+cutoff) has only ~1 month of trading history as of this writing, far
+short of `ROLLING_WINDOW`/backtest depth — any basket result involving it
+is not yet meaningful and should be revisited once it has more history.
+
+`config.MARKET_BENCHMARK_TICKERS` (`SPY`, `QQQ`) are reference series,
+never scanned for signals — `compare_signal_to_market_index()` /
+`compare_baskets_to_market_index()` match each flagged signal to what the
+benchmark itself returned starting that *exact* date, the strictest of
+the three baselines this project computes: beat your own history → beat
+your own ticker's typical day → beat the whole market on that specific
+day.
 
 **ML model** — `ml/model.py` trains a `RandomForestClassifier` on
 backtest output to predict the probability a new signal is a winner,

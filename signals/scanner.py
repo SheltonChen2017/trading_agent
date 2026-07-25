@@ -62,6 +62,8 @@ def scan_dips_and_ups(
     for ticker, df in data.items():
         if len(df) < ROLLING_WINDOW + 1:
             continue  # not enough history to compute a stable rolling stat
+        if as_of is not None and as_of not in df.index:
+            continue  # ticker didn't exist yet (e.g. a recent IPO) as of this date
 
         features = compute_features(df)
         row = features.loc[as_of] if as_of is not None else features.iloc[-1]

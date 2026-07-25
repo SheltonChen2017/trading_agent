@@ -275,3 +275,199 @@ def compare_signal_to_baseline(
             )
 
     return pd.DataFrame(rows)
+
+
+PER_TICKER_COMPARISON_COLUMNS = [
+    "hold_days", "horizon", "direction", "signal_count",
+    "signal_mean_return_pct", "mean_own_ticker_baseline_pct",
+    "mean_edge_vs_own_ticker_pct", "pct_signals_beating_own_ticker_baseline",
+]
+
+
+def compare_signal_to_baseline_per_ticker(
+    data: dict[str, pd.DataFrame],
+    hold_days_options: list[int] = HORIZON_SWEEP_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+) -> pd.DataFrame:
+    """
+    Like compare_signal_to_baseline(), but each flagged signal is matched
+    against ITS OWN ticker's any-day baseline, not the whole universe
+    pooled together.
+
+    Pooling risks a stock-composition confound: if flagged signals cluster
+    on naturally higher- (or lower-) drift stocks, a pooled baseline that
+    also mixes in every other name's typical day can make the signal look
+    better or worse than it really is, for reasons that have nothing to do
+    with the signal's timing. Matching each signal only to its own stock's
+    baseline isolates that timing effect — "did buying THIS stock on its
+    flagged day beat buying THIS SAME stock on an arbitrary day?" — which
+    is the more rigorous comparison.
+
+    Returns one row per (hold_days, direction) with:
+      - signal_mean_return_pct: average return of the flagged signals
+      - mean_own_ticker_baseline_pct: average, across those same signals,
+        of EACH one's own ticker's any-day baseline return
+      - mean_edge_vs_own_ticker_pct: mean of each signal's OWN edge
+        (its return minus its own ticker's baseline) — the primary number
+      - pct_signals_beating_own_ticker_baseline: what fraction of
+        individual signals beat their own ticker's baseline (useful
+        alongside the mean, which one outlier stock could otherwise skew)
+    """
+    rows = []
+    for hold_days in hold_days_options:
+        results = run_backtest(
+            data,
+            hold_days=hold_days,
+            slippage_pct=slippage_pct,
+            return_z_threshold=return_z_threshold,
+            volume_z_threshold=volume_z_threshold,
+        )
+        baseline = run_baseline_forward_returns(data, hold_days=hold_days, slippage_pct=slippage_pct)
+        baseline_mean_by_ticker = (
+            baseline.groupby("ticker")["net_return_pct"].mean() if not baseline.empty else pd.Series(dtype=float)
+        )
+
+        if not results.empty:
+            results = results.copy()
+            results["own_ticker_baseline_pct"] = results["ticker"].map(baseline_mean_by_ticker)
+            results["edge_vs_own_ticker_pct"] = results["net_return_pct"] - results["own_ticker_baseline_pct"]
+
+        for direction in ("dip", "up"):
+            subset = results[results["direction"] == direction] if not results.empty else pd.DataFrame()
+
+            if subset.empty:
+                rows.append(
+                    {
+                        "hold_days": hold_days,
+                        "horizon": HORIZON_LABELS.get(hold_days, f"{hold_days}d"),
+                        "direction": direction,
+                        "signal_count": 0,
+                        "signal_mean_return_pct": None,
+                        "mean_own_ticker_baseline_pct": None,
+                        "mean_edge_vs_own_ticker_pct": None,
+                        "pct_signals_beating_own_ticker_baseline": None,
+                    }
+                )
+                continue
+
+            rows.append(
+                {
+                    "hold_days": hold_days,
+                    "horizon": HORIZON_LABELS.get(hold_days, f"{hold_days}d"),
+                    "direction": direction,
+                    "signal_count": len(subset),
+                    "signal_mean_return_pct": round(subset["net_return_pct"].mean(), 3),
+                    "mean_own_ticker_baseline_pct": round(subset["own_ticker_baseline_pct"].mean(), 3),
+                    "mean_edge_vs_own_ticker_pct": round(subset["edge_vs_own_ticker_pct"].mean(), 3),
+                    "pct_signals_beating_own_ticker_baseline": round(
+                        (subset["edge_vs_own_ticker_pct"] > 0).mean() * 100, 1
+                    ),
+                }
+            )
+
+    if not rows:
+        return pd.DataFrame(columns=PER_TICKER_COMPARISON_COLUMNS)
+
+    return pd.DataFrame(rows)[PER_TICKER_COMPARISON_COLUMNS]
+
+
+MARKET_COMPARISON_COLUMNS = [
+    "hold_days", "horizon", "direction", "signal_count",
+    "signal_mean_return_pct", "mean_market_return_pct",
+    "mean_edge_vs_market_pct", "pct_signals_beating_market",
+]
+
+
+def compute_benchmark_forward_returns(
+    benchmark_df: pd.DataFrame,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+) -> pd.Series:
+    """
+    Forward return of a single reference series (e.g. SPY, QQQ) over
+    `hold_days`, indexed by date — the same math as
+    run_baseline_forward_returns(), applied to one benchmark instead of a
+    universe of stocks. Used to check whether a signal beat the broad
+    market on the EXACT SAME days it fired, the strictest baseline of the
+    three this project computes (own history -> own ticker's baseline ->
+    the whole market on that specific date).
+    """
+    forward_close = benchmark_df["close"].shift(-hold_days)
+    raw_return_pct = (forward_close - benchmark_df["close"]) / benchmark_df["close"] * 100
+    net_return_pct = raw_return_pct - 2 * slippage_pct * 100
+    return net_return_pct.dropna()
+
+
+def compare_signal_to_market_index(
+    data: dict[str, pd.DataFrame],
+    benchmark_df: pd.DataFrame,
+    hold_days_options: list[int] = HORIZON_SWEEP_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+) -> pd.DataFrame:
+    """
+    For each hold period, match every flagged signal to what the market
+    benchmark (e.g. SPY) itself returned starting that EXACT same date,
+    not just the benchmark's average over the whole test window. This
+    answers "did this signal beat just buying the index that same day?" —
+    a stricter, date-matched version of compare_signal_to_baseline().
+    Signals whose date falls outside the benchmark's own history (e.g. a
+    ticker with a longer lookback than the benchmark data provided) are
+    dropped rather than silently miscounted.
+    """
+    rows = []
+    for hold_days in hold_days_options:
+        results = run_backtest(
+            data,
+            hold_days=hold_days,
+            slippage_pct=slippage_pct,
+            return_z_threshold=return_z_threshold,
+            volume_z_threshold=volume_z_threshold,
+        )
+        benchmark_returns = compute_benchmark_forward_returns(benchmark_df, hold_days=hold_days, slippage_pct=slippage_pct)
+
+        if not results.empty:
+            results = results.copy()
+            results["market_return_pct"] = results["date"].map(benchmark_returns)
+            results["edge_vs_market_pct"] = results["net_return_pct"] - results["market_return_pct"]
+
+        for direction in ("dip", "up"):
+            subset = results[results["direction"] == direction] if not results.empty else pd.DataFrame()
+            if not subset.empty:
+                subset = subset.dropna(subset=["market_return_pct"])
+
+            if subset.empty:
+                rows.append(
+                    {
+                        "hold_days": hold_days,
+                        "horizon": HORIZON_LABELS.get(hold_days, f"{hold_days}d"),
+                        "direction": direction,
+                        "signal_count": 0,
+                        "signal_mean_return_pct": None,
+                        "mean_market_return_pct": None,
+                        "mean_edge_vs_market_pct": None,
+                        "pct_signals_beating_market": None,
+                    }
+                )
+                continue
+
+            rows.append(
+                {
+                    "hold_days": hold_days,
+                    "horizon": HORIZON_LABELS.get(hold_days, f"{hold_days}d"),
+                    "direction": direction,
+                    "signal_count": len(subset),
+                    "signal_mean_return_pct": round(subset["net_return_pct"].mean(), 3),
+                    "mean_market_return_pct": round(subset["market_return_pct"].mean(), 3),
+                    "mean_edge_vs_market_pct": round(subset["edge_vs_market_pct"].mean(), 3),
+                    "pct_signals_beating_market": round((subset["edge_vs_market_pct"] > 0).mean() * 100, 1),
+                }
+            )
+
+    if not rows:
+        return pd.DataFrame(columns=MARKET_COMPARISON_COLUMNS)
+
+    return pd.DataFrame(rows)[MARKET_COMPARISON_COLUMNS]

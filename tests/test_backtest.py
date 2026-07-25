@@ -16,6 +16,9 @@ import pandas as pd
 
 from backtest.engine import (
     compare_signal_to_baseline,
+    compare_signal_to_baseline_per_ticker,
+    compare_signal_to_market_index,
+    compute_benchmark_forward_returns,
     run_backtest,
     run_baseline_forward_returns,
     run_multi_horizon_backtest,
@@ -200,6 +203,39 @@ def test_compare_signal_to_baseline_edge_matches_independently_computed_means():
     assert dip_row["edge_vs_baseline_pct"] == round(expected_signal_mean - expected_baseline_mean, 3)
 
 
+def test_compare_signal_to_baseline_per_ticker_isolates_own_stock_not_pooled():
+    hold_days = 5
+    # A: quiet noise (own-baseline drift ~0%) + one dip shock that bounces back.
+    df_a = _series_with_shock_and_known_forward_move(
+        days=60, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    # B: a separate stock with strong drift and negligible noise, so it never
+    # fires a signal itself but pulls the POOLED baseline up a lot if included.
+    days_b = 60
+    rng_b = np.random.default_rng(9)
+    returns_b = rng_b.normal(loc=0.01, scale=0.0005, size=days_b)
+    close_b = 100 * np.cumprod(1 + returns_b)
+    dates_b = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days_b + 5)[-days_b:]
+    df_b = pd.DataFrame(
+        {"open": close_b, "high": close_b, "low": close_b, "close": close_b, "volume": np.full(days_b, 1_000_000.0)},
+        index=dates_b,
+    )
+    data = {"A": df_a, "B": df_b}
+
+    per_ticker = compare_signal_to_baseline_per_ticker(data, hold_days_options=[hold_days], slippage_pct=0.0)
+    pooled = compare_signal_to_baseline(data, hold_days_options=[hold_days], slippage_pct=0.0)
+    a_only_baseline = run_baseline_forward_returns({"A": df_a}, hold_days=hold_days, slippage_pct=0.0)
+
+    dip_row = per_ticker[(per_ticker["hold_days"] == hold_days) & (per_ticker["direction"] == "dip")].iloc[0]
+    pooled_dip_row = pooled[(pooled["hold_days"] == hold_days) & (pooled["direction"] == "dip")].iloc[0]
+
+    assert dip_row["signal_count"] == 1
+    # Per-ticker baseline should match A's OWN any-day baseline almost exactly...
+    assert abs(dip_row["mean_own_ticker_baseline_pct"] - a_only_baseline["net_return_pct"].mean()) < 0.01
+    # ...and should clearly differ from the pooled baseline, which B's much higher drift dilutes.
+    assert abs(dip_row["mean_own_ticker_baseline_pct"] - pooled_dip_row["baseline_mean_return_pct"]) > 1.0
+
+
 def test_compare_signal_to_baseline_handles_no_signals():
     hold_days = 5
     rng = np.random.default_rng(2)
@@ -215,6 +251,78 @@ def test_compare_signal_to_baseline_handles_no_signals():
     assert comparison["signal_mean_return_pct"].isna().all()
 
 
+def test_compare_signal_to_baseline_per_ticker_handles_no_signals():
+    hold_days = 5
+    rng = np.random.default_rng(2)
+    days = 40
+    close = 100 * np.cumprod(1 + rng.normal(0, 0.001, size=days))  # quiet, nothing to flag
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close, "low": close, "close": close, "volume": np.full(days, 1_000_000.0)},
+        index=dates,
+    )
+    comparison = compare_signal_to_baseline_per_ticker({"TEST": df}, hold_days_options=[hold_days])
+    assert (comparison["signal_count"] == 0).all()
+    assert comparison["signal_mean_return_pct"].isna().all()
+    assert comparison["mean_edge_vs_own_ticker_pct"].isna().all()
+
+
+def test_compute_benchmark_forward_returns_matches_hand_computed_value():
+    days = 30
+    hold_days = 5
+    returns = np.full(days, 0.004)
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    benchmark_df = pd.DataFrame({"close": close}, index=dates)
+
+    forward = compute_benchmark_forward_returns(benchmark_df, hold_days=hold_days, slippage_pct=0.0)
+    expected = (1.004**hold_days - 1) * 100
+
+    assert not forward.empty
+    assert forward.round(2).unique().tolist() == [round(expected, 2)]
+
+
+def test_compare_signal_to_market_index_edge_matches_hand_computed_difference():
+    hold_days = 5
+    days = 60
+    df = _series_with_shock_and_known_forward_move(
+        days=days, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    data = {"TEST": df}
+
+    # Benchmark shares df's exact date index with a known, constant daily return.
+    benchmark_daily_return = 0.002
+    benchmark_close = 100 * np.cumprod(np.full(days, 1 + benchmark_daily_return))
+    benchmark_df = pd.DataFrame({"close": benchmark_close}, index=df.index)
+
+    comparison = compare_signal_to_market_index(data, benchmark_df, hold_days_options=[hold_days], slippage_pct=0.0)
+    dip_row = comparison[(comparison["hold_days"] == hold_days) & (comparison["direction"] == "dip")].iloc[0]
+
+    expected_market_return = round(((1 + benchmark_daily_return) ** hold_days - 1) * 100, 3)
+    assert dip_row["signal_count"] == 1
+    assert abs(dip_row["mean_market_return_pct"] - expected_market_return) < 0.01
+    assert dip_row["mean_edge_vs_market_pct"] == round(
+        dip_row["signal_mean_return_pct"] - dip_row["mean_market_return_pct"], 3
+    )
+
+
+def test_compare_signal_to_market_index_drops_signals_outside_benchmark_history():
+    hold_days = 5
+    days = 60
+    df = _series_with_shock_and_known_forward_move(
+        days=days, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    data = {"TEST": df}
+    # Benchmark covers a completely different, non-overlapping date range.
+    other_dates = pd.bdate_range(end=pd.Timestamp.today().normalize() - pd.Timedelta(days=365), periods=days)
+    benchmark_df = pd.DataFrame({"close": np.full(days, 100.0)}, index=other_dates)
+
+    comparison = compare_signal_to_market_index(data, benchmark_df, hold_days_options=[hold_days])
+    dip_row = comparison[(comparison["hold_days"] == hold_days) & (comparison["direction"] == "dip")].iloc[0]
+    assert dip_row["signal_count"] == 0
+    assert dip_row["signal_mean_return_pct"] is None
+
+
 if __name__ == "__main__":
     test_scores_a_winning_dip_reversion()
     test_scores_a_losing_up_fade()
@@ -228,4 +336,9 @@ if __name__ == "__main__":
     test_baseline_forward_returns_empty_when_no_forward_history()
     test_compare_signal_to_baseline_edge_matches_independently_computed_means()
     test_compare_signal_to_baseline_handles_no_signals()
+    test_compare_signal_to_baseline_per_ticker_isolates_own_stock_not_pooled()
+    test_compare_signal_to_baseline_per_ticker_handles_no_signals()
+    test_compute_benchmark_forward_returns_matches_hand_computed_value()
+    test_compare_signal_to_market_index_edge_matches_hand_computed_difference()
+    test_compare_signal_to_market_index_drops_signals_outside_benchmark_history()
     print("All backtest tests passed.")

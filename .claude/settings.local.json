@@ -47,7 +47,10 @@
       "Bash(python tests/test_analyst.py)",
       "Bash(grep -n \"five alternatives\\\\|None of these five\\\\|scan_fundamentals\\\\`\\)\" README.md)",
       "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_analyst_check.py\")",
-      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_deep_history_check.py\")"
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_deep_history_check.py\")",
+      "Bash(python tests/test_regime.py)",
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_regime_momentum_check.py\")",
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_momentum_by_date_check.py\")"
     ]
   }
 }

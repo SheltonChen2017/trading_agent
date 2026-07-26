@@ -796,6 +796,58 @@ def bootstrap_edge_significance(edge_values: pd.Series, n_bootstrap: int = 2000,
     }
 
 
+def bootstrap_edge_significance_by_date(
+    edge_values: pd.Series, dates: pd.Series, n_bootstrap: int = 2000, seed: int = 0
+) -> dict:
+    """
+    Like bootstrap_edge_significance(), but resamples whole TRADING DAYS
+    at a time (a block/cluster bootstrap), not individual signal rows.
+
+    Signals fired on the same date are often driven by the same
+    market-wide move (correlated) — a broad market correction can flag
+    dozens of tickers at once. Treating each one as an independent draw,
+    the way bootstrap_edge_significance() does, understates the true
+    uncertainty: what looks like hundreds of independent observations may
+    really be a handful of distinct EVENTS, each replicated across many
+    correlated tickers. This resamples by date instead, preserving
+    within-day correlation, which is the standard fix for this and gives
+    a more honest (typically wider) confidence interval.
+
+    `edge_values` and `dates` must be aligned (same order/index). Returns
+    {n, n_dates, mean, ci_low, ci_high, p_value} — `n_dates` (the number
+    of distinct trading days signals fired on) is worth checking directly:
+    a small n_dates relative to n is a sign the naive row-level bootstrap
+    would have been especially misleading for this subset.
+    """
+    df = pd.DataFrame({"edge": pd.Series(edge_values).to_numpy(), "date": pd.Series(dates).to_numpy()})
+    df = df.dropna(subset=["edge"])
+    unique_dates = df["date"].unique()
+
+    if len(df) < 5 or len(unique_dates) < 5:
+        return {"n": len(df), "n_dates": len(unique_dates), "mean": None, "ci_low": None, "ci_high": None, "p_value": None}
+
+    grouped = {d: g["edge"].to_numpy() for d, g in df.groupby("date")}
+    rng = np.random.default_rng(seed)
+    boot_means = np.empty(n_bootstrap)
+    for i in range(n_bootstrap):
+        sampled_dates = rng.choice(unique_dates, size=len(unique_dates), replace=True)
+        pooled = np.concatenate([grouped[d] for d in sampled_dates])
+        boot_means[i] = pooled.mean()
+
+    mean = df["edge"].mean()
+    ci_low, ci_high = np.percentile(boot_means, [2.5, 97.5])
+    p_value = min(1.0, 2 * min((boot_means <= 0).mean(), (boot_means >= 0).mean()))
+
+    return {
+        "n": len(df),
+        "n_dates": int(len(unique_dates)),
+        "mean": round(float(mean), 3),
+        "ci_low": round(float(ci_low), 3),
+        "ci_high": round(float(ci_high), 3),
+        "p_value": round(float(p_value), 4),
+    }
+
+
 def bonferroni_threshold(n_tests: int, alpha: float = 0.05) -> float:
     """
     The Bonferroni-corrected significance threshold for `n_tests`
@@ -892,3 +944,75 @@ def out_of_sample_significance(
     if not rows:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS)
     return pd.DataFrame(rows)[OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS]
+
+
+OUT_OF_SAMPLE_SIGNIFICANCE_BY_DATE_COLUMNS = [
+    "period", "direction", "n", "n_dates", "mean_edge_pct", "ci_low", "ci_high",
+    "p_value", "bonferroni_threshold", "significant",
+]
+
+
+def out_of_sample_significance_by_date(
+    data: dict[str, pd.DataFrame],
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+    n_bootstrap: int = 2000,
+    n_tests: int = 2,
+) -> pd.DataFrame:
+    """
+    Cross-sectional-correlation-aware version of out_of_sample_significance():
+    same discovery/confirmation split, but bootstraps significance via
+    bootstrap_edge_significance_by_date() (resampling whole trading days,
+    not individual signal rows) instead of the plain row-level bootstrap.
+
+    Use this — not out_of_sample_significance() — whenever a signal can
+    fire on many tickers on the same date (true of every signal in this
+    project), since same-day signals are typically correlated (driven by
+    the same market-wide move) and the plain bootstrap can understate
+    uncertainty as a result. Check the `n_dates` column directly: a small
+    n_dates relative to `n` is a sign the plain row-level bootstrap would
+    have been especially misleading for that cell.
+
+    Only the CONFIRMATION row's `significant` flag is evidence the edge
+    is real — same caveat as out_of_sample_significance().
+    """
+    detailed = _signals_with_own_ticker_baseline(
+        data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+    )
+    if detailed.empty:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_BY_DATE_COLUMNS)
+
+    split_date = _discovery_split_date(data, discovery_frac)
+    discovery, confirmation = _split_by_date(detailed, split_date)
+    threshold = bonferroni_threshold(n_tests, alpha=0.05)
+
+    rows = []
+    for period, subset in zip(OUT_OF_SAMPLE_PERIODS, (discovery, confirmation)):
+        for direction in ("dip", "up"):
+            d = subset[subset["direction"] == direction] if not subset.empty else pd.DataFrame()
+            if d.empty:
+                continue
+            stats = bootstrap_edge_significance_by_date(d["edge_vs_own_ticker_pct"], d["date"], n_bootstrap=n_bootstrap)
+            rows.append(
+                {
+                    "period": period,
+                    "direction": direction,
+                    "n": stats["n"],
+                    "n_dates": stats["n_dates"],
+                    "mean_edge_pct": stats["mean"],
+                    "ci_low": stats["ci_low"],
+                    "ci_high": stats["ci_high"],
+                    "p_value": stats["p_value"],
+                    "bonferroni_threshold": round(threshold, 6),
+                    "significant": stats["p_value"] is not None and stats["p_value"] < threshold,
+                }
+            )
+
+    if not rows:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_BY_DATE_COLUMNS)
+    return pd.DataFrame(rows)[OUT_OF_SAMPLE_SIGNIFICANCE_BY_DATE_COLUMNS]

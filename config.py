@@ -199,6 +199,18 @@ FUNDAMENTALS_GROWTH_THRESHOLD_PCT = 20.0  # YoY EPS growth/decline beyond this f
 # company's own numbers or the stock's own trading behavior.
 ANALYST_MIN_NET_ACTIONS = 1  # net upgrade/downgrade excess required to fire a signal
 
+# Market regime classifier (signals/regime.py) — momentum showed a real,
+# statistically significant sign-flip between two multi-year eras of the
+# ~7-year test window (2026-07 finding), consistent with the documented
+# "momentum crashes" phenomenon (elevated market volatility -> momentum
+# reversal risk). Trailing window for the market's own realized
+# volatility; the high/low-vol THRESHOLD is deliberately not a fixed
+# config constant — it's calibrated from discovery-period data only (see
+# signals/regime.py's calibrate_threshold_from_discovery()) so the
+# confirmation period's regime classification stays honestly
+# out-of-sample.
+REGIME_VOLATILITY_LOOKBACK_DAYS = 60
+
 # --- Risk (used by the risk manager / backtester) -----------------------------------------------------------
 MAX_POSITION_PCT = 0.05      # never risk more than 5% of capital on one name
 STOP_LOSS_PCT = 0.03         # exit if a position moves 3% against you

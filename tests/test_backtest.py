@@ -17,6 +17,7 @@ import pandas as pd
 from backtest.engine import (
     bonferroni_threshold,
     bootstrap_edge_significance,
+    bootstrap_edge_significance_by_date,
     compare_signal_to_baseline,
     compare_signal_to_baseline_per_ticker,
     compare_signal_to_market_index,
@@ -25,6 +26,7 @@ from backtest.engine import (
     out_of_sample_baseline_comparison,
     out_of_sample_market_comparison,
     out_of_sample_significance,
+    out_of_sample_significance_by_date,
     run_backtest,
     run_baseline_forward_returns,
     run_multi_horizon_backtest,
@@ -585,6 +587,68 @@ def test_out_of_sample_significance_n_tests_changes_threshold():
     assert loose.iloc[0]["bonferroni_threshold"] > strict.iloc[0]["bonferroni_threshold"]
 
 
+def test_bootstrap_edge_significance_by_date_accounts_for_clustering():
+    # 5 distinct dates, each with 100 near-identical correlated
+    # observations (simulating "one market-wide event, many correlated
+    # tickers firing the same day"). The TRUE degrees of freedom is 5
+    # (the dates), not 500 (the rows) -- a plain row-level bootstrap
+    # can't see that distinction and produces an artificially tight CI;
+    # the by-date bootstrap should produce a visibly wider one.
+    rng = np.random.default_rng(1)
+    date_effects = rng.normal(loc=0.5, scale=2.0, size=5)
+    dates, edges = [], []
+    for i, effect in enumerate(date_effects):
+        for _ in range(100):
+            dates.append(pd.Timestamp("2024-01-01") + pd.Timedelta(days=i))
+            edges.append(effect + rng.normal(0, 0.01))  # tiny within-date noise
+    edges = pd.Series(edges)
+    dates = pd.Series(dates)
+
+    row_level = bootstrap_edge_significance(edges)
+    by_date = bootstrap_edge_significance_by_date(edges, dates)
+
+    assert by_date["n_dates"] == 5
+    assert by_date["n"] == 500
+    row_width = row_level["ci_high"] - row_level["ci_low"]
+    by_date_width = by_date["ci_high"] - by_date["ci_low"]
+    assert by_date_width > row_width, "the by-date bootstrap should give a wider, more honest CI than the row-level one"
+
+
+def test_bootstrap_edge_significance_by_date_handles_too_few_dates():
+    edges = pd.Series([1.0, 2.0, 1.5])
+    dates = pd.Series([pd.Timestamp("2024-01-01")] * 3)
+    result = bootstrap_edge_significance_by_date(edges, dates)
+    assert result["n_dates"] == 1
+    assert result["mean"] is None
+    assert result["p_value"] is None
+
+
+def test_out_of_sample_significance_by_date_reports_n_dates():
+    hold_days = 5
+    days = 300
+    rng = np.random.default_rng(2)
+    returns = rng.normal(loc=0.0, scale=0.002, size=days)
+    volume = np.full(days, 1_000_000.0)
+    for idx in range(30, 150, 15):
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+        for i in range(1, 6):
+            returns[idx + i] = 0.02
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+    data = {"A": df, "B": df}
+
+    result = out_of_sample_significance_by_date(data, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0, n_tests=2)
+    assert not result.empty
+    assert "n_dates" in result.columns
+    discovery_dip = result[(result["period"] == "discovery") & (result["direction"] == "dip")].iloc[0]
+    assert discovery_dip["n_dates"] <= discovery_dip["n"]  # 2 identical tickers -> half as many distinct dates as rows
+
+
 if __name__ == "__main__":
     test_scores_a_winning_dip_reversion()
     test_scores_a_losing_up_fade()
@@ -617,4 +681,7 @@ if __name__ == "__main__":
     test_out_of_sample_significance_flags_discovery_only_effect_correctly()
     test_out_of_sample_significance_handles_no_signals()
     test_out_of_sample_significance_n_tests_changes_threshold()
+    test_bootstrap_edge_significance_by_date_accounts_for_clustering()
+    test_bootstrap_edge_significance_by_date_handles_too_few_dates()
+    test_out_of_sample_significance_by_date_reports_n_dates()
     print("All backtest tests passed.")

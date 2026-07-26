@@ -11,27 +11,38 @@ unchanged — same scanner code the backtester replays date-by-date, same
 sizing logic the live agent and any future backtest-of-the-full-strategy
 would use.
 
-**Status (2026-07): 6 signals tested, 46 basket/direction/signal cells,
-0 confirmed.** Under out-of-sample validation and Bonferroni-corrected
-significance testing against real data: the original scanner scored
-0/32 significant cells (the best-looking result, `unstable` "dip",
-inverted sign between discovery and confirmation: +6.5% mean return
-became -3.2%); momentum, relative/cross-sectional, 52-week breakout, and
-PEAD scored 0/8 between them (momentum's "up" leg — the academically
-well-supported half — went from +0.33 edge in discovery to -0.18 in
-confirmation, despite a 7,040-signal sample); fundamentals/earnings-growth
-scored 0/2, both directions flipping from ~55% win rate in discovery to
-~38% in confirmation; analyst rating changes (upgrades/downgrades — a
-genuinely different data category, institutional opinion rather than
-price/volume or company fundamentals) scored 0/2 on the correct
-confirmation-only check — its "dip" leg looked significant when
-significance was computed on the POOLED discovery+confirmation sample
-(p=0.014), but failed once tested on confirmation data alone (p=0.656).
-That near-miss led directly to `out_of_sample_significance()` /
-`basket_out_of_sample_significance()` (see "Statistical significance"
-below), which now makes pooled-vs-honest significance an explicit,
-impossible-to-conflate choice rather than an easy mistake. See "Known
-pitfalls" and the basket/out-of-sample sections below for the full story.
+**Status (2026-07): 6 signals tested, 2 lookback windows (~2yr then
+~7yr), 1 near-finding, 0 confirmed.** Under out-of-sample validation plus
+two rounds of statistical hardening, real data has ruled out every
+signal built so far — including one that, for a while, looked like the
+first genuinely real result in the project:
+
+- The original scanner scored 0/32 significant basket/direction cells
+  (best-looking result, `unstable` "dip", inverted sign between discovery
+  and confirmation: +6.5% mean return became -3.2%).
+- Relative/cross-sectional, 52-week breakout, PEAD, fundamentals, and
+  analyst rating changes scored 0/2 each — `analyst` "dip" was a notable
+  near-miss (POOLED significance said `significant=True`, p=0.014;
+  confirmation-only revealed p=0.656). That near-miss is what led to
+  building `out_of_sample_significance()` — pooled vs. confirmation-only
+  is now an explicit, impossible-to-conflate choice.
+- **Momentum "up"** was, briefly, the exception: after extending the
+  lookback from ~2 to ~7 years (`LOOKBACK_DAYS`, see "Switching to real
+  data"), it was significant in BOTH discovery (p=0.000, edge -0.15%)
+  and confirmation (p=0.000, edge +0.25%) independently — opposite
+  signs, but neither was noise-level. A market-volatility regime filter
+  (`signals/regime.py`) was built to test whether this sign-flip was
+  explained by "momentum crashes" (a documented phenomenon), but didn't
+  cleanly confirm that story. Re-testing with a **block bootstrap by
+  trading day** (`out_of_sample_significance_by_date()` /
+  `bootstrap_edge_significance_by_date()`, see "Statistical significance"
+  below) — built specifically because momentum flags ~19-20 correlated
+  tickers every single day, so 17,506/14,000 "signal rows" were really
+  only 912/700 independent trading days — made the significance
+  evaporate entirely (p=0.247 discovery, p=0.075 confirmation). This is
+  now the second statistical trap this project has caught and fixed for
+  real (pooled-vs-confirmation-only was the first); see "Known pitfalls"
+  and the basket/out-of-sample sections below for the full story.
 
 ## Structure
 
@@ -50,7 +61,8 @@ trading_agent/
 │   ├── breakout.py                 # scan_52_week_breakout() — new N-day high/low + volume
 │   ├── pead.py                     # scan_pead() — post-earnings-announcement drift (event-driven, needs earnings_data)
 │   ├── fundamentals.py             # scan_fundamentals() — YoY reported-EPS growth (event-driven, needs earnings_data)
-│   └── analyst.py                  # scan_analyst_actions() — net analyst upgrades/downgrades (event-driven, needs analyst_data)
+│   ├── analyst.py                  # scan_analyst_actions() — net analyst upgrades/downgrades (event-driven, needs analyst_data)
+│   └── regime.py                   # compute_trailing_market_volatility() + classify_regime() — market regime classification
 ├── backtest/
 │   └── engine.py                  # run_backtest() etc. — pluggable via scan_fn/scan_kwargs, defaults to scan_dips_and_ups
 ├── ml/
@@ -83,7 +95,8 @@ trading_agent/
     ├── test_breakout.py
     ├── test_pead.py
     ├── test_fundamentals.py
-    └── test_analyst.py
+    ├── test_analyst.py
+    └── test_regime.py
 ```
 
 ## Run it
@@ -321,6 +334,37 @@ comfortably spanning zero) — pooling let the discovery period's expected
 good look drag a misleading p-value out of an honestly-noisy holdout.
 Run via `scripts/run_significance_check.py`, which shows both and labels
 which one to trust.
+
+**Row-level vs. by-date significance — the second trap, also confirmed
+for real.** `bootstrap_edge_significance()` treats every signal row as an
+independent draw, but signals on the same date are usually correlated —
+a signal that flags many tickers at once (e.g. `momentum`, which flags a
+fixed quintile of the universe every trading day) can look like hundreds
+of independent observations when it's really a handful of distinct days.
+`bootstrap_edge_significance_by_date()` / `out_of_sample_significance_by_date()`
+fix this by resampling whole trading days (a block/cluster bootstrap)
+instead of individual rows, and report `n_dates` alongside `n` so the gap
+is visible directly. This caught `momentum` "up": the row-level bootstrap
+showed p=0.000 significant in BOTH discovery and confirmation (opposite
+signs) — the first result all project to pass confirmation-only
+significance — but the 17,506/14,000-row samples were really only
+912/700 distinct trading days; re-tested by-date, both periods' p-values
+rose to 0.247/0.075 and the finding evaporated. **Always prefer
+`out_of_sample_significance_by_date()` over the row-level
+`out_of_sample_significance()` for any new confirmatory claim** — a
+p-value of 0.000 is not automatically trustworthy in this project's data
+until `n` vs. `n_dates` has been checked.
+
+`signals/regime.py` adds market-regime classification
+(`compute_trailing_market_volatility()` / `classify_regime()`), built to
+test whether momentum's discovery/confirmation sign-flip was explained by
+the documented "momentum crashes" phenomenon (elevated volatility ->
+reversal risk). `calibrate_threshold_from_discovery()` fits the high/
+low-vol threshold from discovery-period data only, so confirmation stays
+honestly out-of-sample. The regime-conditioned test didn't cleanly
+confirm the hypothesis (the "significant" regime flipped between periods
+rather than being consistent) — worth knowing the tool exists and what
+it found, even though that specific investigation didn't pan out.
 
 **ML model** — `ml/model.py` trains a `RandomForestClassifier` on
 backtest output to predict the probability a new signal is a winner,

@@ -11,18 +11,27 @@ unchanged — same scanner code the backtester replays date-by-date, same
 sizing logic the live agent and any future backtest-of-the-full-strategy
 would use.
 
-**Status (2026-07): the original scanner (below) does not hold up.**
-Under out-of-sample validation and Bonferroni-corrected significance
-testing against real data, 0 of 32 basket/direction cells were
-statistically distinguishable from noise, and the single best-looking
-result (`unstable` basket, "dip") completely inverted sign between the
-discovery and confirmation periods (+6.5% mean return became -3.2%). See
-"Known pitfalls" and the basket/out-of-sample sections below for the
-full story. Four alternative signals with better academic track records
-(momentum, relative/cross-sectional, 52-week breakout, PEAD) have since
-been added on the same rigor toolkit — see "Additional signals" below.
-None of them are proven yet either; they still need the same testing
-before being trusted.
+**Status (2026-07): 6 signals tested, 46 basket/direction/signal cells,
+0 confirmed.** Under out-of-sample validation and Bonferroni-corrected
+significance testing against real data: the original scanner scored
+0/32 significant cells (the best-looking result, `unstable` "dip",
+inverted sign between discovery and confirmation: +6.5% mean return
+became -3.2%); momentum, relative/cross-sectional, 52-week breakout, and
+PEAD scored 0/8 between them (momentum's "up" leg — the academically
+well-supported half — went from +0.33 edge in discovery to -0.18 in
+confirmation, despite a 7,040-signal sample); fundamentals/earnings-growth
+scored 0/2, both directions flipping from ~55% win rate in discovery to
+~38% in confirmation; analyst rating changes (upgrades/downgrades — a
+genuinely different data category, institutional opinion rather than
+price/volume or company fundamentals) scored 0/2 on the correct
+confirmation-only check — its "dip" leg looked significant when
+significance was computed on the POOLED discovery+confirmation sample
+(p=0.014), but failed once tested on confirmation data alone (p=0.656).
+That near-miss led directly to `out_of_sample_significance()` /
+`basket_out_of_sample_significance()` (see "Statistical significance"
+below), which now makes pooled-vs-honest significance an explicit,
+impossible-to-conflate choice rather than an easy mistake. See "Known
+pitfalls" and the basket/out-of-sample sections below for the full story.
 
 ## Structure
 
@@ -32,13 +41,16 @@ trading_agent/
 ├── baskets.py                    # overlapping themed groupings (semiconductors, ai_related, ...) + per-basket reports
 ├── data/
 │   ├── market_data.py             # fetch_historical() [yfinance] and generate_synthetic() [offline dev]
-│   └── earnings_data.py           # fetch_earnings_surprises() [yfinance] — for the PEAD signal
+│   ├── earnings_data.py           # fetch_earnings_history() + match_effective_date() [yfinance] — for PEAD & fundamentals
+│   └── analyst_data.py            # fetch_analyst_actions() [yfinance] — for the analyst rating-change signal
 ├── signals/
 │   ├── scanner.py                  # compute_features() + scan_dips_and_ups() — the ORIGINAL signal, does not hold up (see above)
 │   ├── momentum.py                 # scan_momentum() — cross-sectional 12-1 month momentum
 │   ├── relative.py                 # scan_relative_dips_and_ups() — same-day move ranked vs. the universe, not own history
 │   ├── breakout.py                 # scan_52_week_breakout() — new N-day high/low + volume
-│   └── pead.py                     # scan_pead() — post-earnings-announcement drift (event-driven, needs earnings_data)
+│   ├── pead.py                     # scan_pead() — post-earnings-announcement drift (event-driven, needs earnings_data)
+│   ├── fundamentals.py             # scan_fundamentals() — YoY reported-EPS growth (event-driven, needs earnings_data)
+│   └── analyst.py                  # scan_analyst_actions() — net analyst upgrades/downgrades (event-driven, needs analyst_data)
 ├── backtest/
 │   └── engine.py                  # run_backtest() etc. — pluggable via scan_fn/scan_kwargs, defaults to scan_dips_and_ups
 ├── ml/
@@ -69,7 +81,9 @@ trading_agent/
     ├── test_momentum.py
     ├── test_relative.py
     ├── test_breakout.py
-    └── test_pead.py
+    ├── test_pead.py
+    ├── test_fundamentals.py
+    └── test_analyst.py
 ```
 
 ## Run it
@@ -116,7 +130,7 @@ calls for every historical date, so there's one code path and no drift
 between what's validated and what's run.
 
 **Additional signals (2026-07)** — the original scanner didn't survive
-out-of-sample testing (see status note above), so four alternatives with
+out-of-sample testing (see status note above), so six alternatives with
 better academic track records were added, all sharing the exact same
 output column contract as `scan_dips_and_ups()` (`ticker, date, close,
 return_pct, return_zscore, volume_zscore, direction`) so every backtest/
@@ -150,7 +164,7 @@ works with any of them unchanged — pass `scan_fn=<the new function>`
   surprise should hit if the surprise exceeds
   `PEAD_SURPRISE_THRESHOLD_PCT`. Arguably the most robust anomaly in the
   literature, but **event-driven, not daily** — needs
-  `data/earnings_data.fetch_earnings_surprises()` (real tickers only, no
+  `data/earnings_data.fetch_earnings_history()` (real tickers only, no
   synthetic equivalent) and has a second required argument
   (`earnings_data`), so bind it first: `scan_fn=partial(scan_pead,
   earnings_data=earnings)`. yfinance's free earnings calendar goes back
@@ -159,16 +173,43 @@ works with any of them unchanged — pass `scan_fn=<the new function>`
   sample than the daily signals, so treat PEAD results with even more
   small-sample caution than the rest of this project. Earnings timestamps
   at/after market close are shifted to the next trading day
-  (`effective_date`), with weekend/holiday spillover handled so a single
-  event fires exactly once, not on every subsequent day.
+  (`effective_date`), with weekend/holiday spillover handled via
+  `data/earnings_data.match_effective_date()` so a single event fires
+  exactly once, not on every subsequent day.
+- **`signals/fundamentals.py`** (`scan_fundamentals`) — the first
+  non-price/volume signal: flags a stock on its earnings date when YoY
+  reported EPS growth (this quarter vs. the same quarter one year, i.e.
+  4 reports, earlier) exceeds `FUNDAMENTALS_GROWTH_THRESHOLD_PCT`. Built
+  from `data/earnings_data.py`'s point-in-time `reported_eps` history
+  (each figure indexed by its actual disclosure date), deliberately NOT
+  from yfinance's live `Ticker.info` snapshot — that only has today's
+  numbers with no real history, so using it on past backtest dates would
+  be textbook look-ahead bias. Same event-driven usage pattern and
+  data-thinness caveat as PEAD, plus needs 4 prior quarters of history
+  per ticker before its first signal can even fire, shrinking the
+  usable window further still.
+- **`signals/analyst.py`** (`scan_analyst_actions`) — the second
+  non-price/volume signal, and a genuinely different data category from
+  every other signal here (institutional analyst OPINION — upgrades/
+  downgrades/price targets — not the stock's own trading behavior or the
+  company's own reported numbers). Flags a stock on a day where net
+  analyst upgrades minus downgrades (`data/analyst_data.py`, aggregated
+  per ticker per day so multiple same-day firm actions don't each fire
+  separately) reaches `ANALYST_MIN_NET_ACTIONS`. Event-driven like PEAD/
+  fundamentals, but noticeably denser — analyst actions happen far more
+  often per large-cap than earnings (multiple per month, not per
+  quarter), so this has a much bigger real sample than the other two
+  event-driven signals despite the same data-recency/thinness framing.
 
-None of these four are proven — they're recommendations with better
+None of these six are proven — they're recommendations with better
 starting evidence than the original scanner, not validated replacements.
 Run `scripts/run_new_signals_report.py` (synthetic data, momentum/
 relative/breakout) to sanity-check the plumbing, then point any of them
 at real data and run them through the SAME out-of-sample +
-`basket_significance()` toolkit that ruled out the original scanner
-before trusting anything they find.
+`basket_out_of_sample_significance()` toolkit that ruled out the
+original scanner before trusting anything they find — not
+`basket_significance()` alone (see "Statistical significance" below for
+why that distinction matters).
 
 **Backtest** — `run_backtest()` walks every date in the universe, calls
 the live scanner as-of that date, and measures each flagged signal's
@@ -266,8 +307,20 @@ not a parametric t-test, since trade returns are often skewed/fat-tailed).
 basket/direction cells are being tested at once — with N cells tested
 simultaneously, use alpha/N instead of alpha, since some cells are
 expected to look "significant" by chance alone otherwise.
-`baskets.basket_significance()` applies both together, per basket/
-direction. Run via `scripts/run_significance_check.py`.
+
+**Pooled vs. out-of-sample significance — use the right one.**
+`baskets.basket_significance()` bootstraps the POOLED sample (discovery +
+confirmation together) and is exploratory only. `out_of_sample_significance()`
+/ `baskets.basket_out_of_sample_significance()` bootstrap discovery and
+confirmation SEPARATELY — only a `period == "confirmation"` row with
+`significant=True` is real evidence. This distinction isn't theoretical:
+the `analyst` "dip" signal's pooled check said `significant=True`
+(p=0.014) purely because of a strong discovery-period effect, while the
+honest confirmation-only check said `significant=False` (p=0.656, CI
+comfortably spanning zero) — pooling let the discovery period's expected
+good look drag a misleading p-value out of an honestly-noisy holdout.
+Run via `scripts/run_significance_check.py`, which shows both and labels
+which one to trust.
 
 **ML model** — `ml/model.py` trains a `RandomForestClassifier` on
 backtest output to predict the probability a new signal is a winner,

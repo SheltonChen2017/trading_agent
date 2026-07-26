@@ -24,6 +24,7 @@ from backtest.engine import (
     out_of_sample_backtest,
     out_of_sample_baseline_comparison,
     out_of_sample_market_comparison,
+    out_of_sample_significance,
     run_backtest,
     run_baseline_forward_returns,
     run_multi_horizon_backtest,
@@ -513,6 +514,77 @@ def test_run_backtest_uses_custom_scan_fn():
     assert (custom_results["direction"] == "up").all()
 
 
+def test_out_of_sample_significance_flags_discovery_only_effect_correctly():
+    # Reproduces the exact real-world trap this function exists to catch:
+    # a strong, consistent effect concentrated in the discovery period,
+    # and pure noise (no consistent effect) in the confirmation period.
+    # Pooling the two would look "significant"; splitting them correctly
+    # should show discovery significant and confirmation NOT significant.
+    days = 300
+    rng = np.random.default_rng(2)
+    returns = rng.normal(loc=0.0, scale=0.002, size=days)
+    volume = np.full(days, 1_000_000.0)
+
+    # Discovery-period shocks (well within the first 60% of 300 days):
+    # strong, consistent, low-noise bounce every time.
+    for idx in range(30, 150, 15):
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+        for i in range(1, 6):
+            returns[idx + i] = 0.02
+
+    # Confirmation-period shocks (within the last 40%): bounce direction
+    # is random noise, no consistent effect.
+    rng2 = np.random.default_rng(99)
+    for idx in range(200, 280, 15):
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+        for i in range(1, 6):
+            returns[idx + i] = rng2.normal(0, 0.03)
+
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+    data = {"A": df, "B": df}
+
+    result = out_of_sample_significance(data, discovery_frac=0.6, hold_days=5, slippage_pct=0.0, n_tests=2)
+
+    dip_discovery = result[(result["period"] == "discovery") & (result["direction"] == "dip")].iloc[0]
+    dip_confirmation = result[(result["period"] == "confirmation") & (result["direction"] == "dip")].iloc[0]
+
+    assert dip_discovery["mean_edge_pct"] > 0
+    assert bool(dip_discovery["significant"]) is True
+    assert bool(dip_confirmation["significant"]) is False
+
+
+def test_out_of_sample_significance_handles_no_signals():
+    days = 60
+    rng = np.random.default_rng(3)
+    close = 100 * np.cumprod(1 + rng.normal(0, 0.001, size=days))
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close, "low": close, "close": close, "volume": np.full(days, 1_000_000.0)},
+        index=dates,
+    )
+    result = out_of_sample_significance({"TEST": df})
+    assert result.empty
+
+
+def test_out_of_sample_significance_n_tests_changes_threshold():
+    hold_days = 5
+    df = _series_with_shock_and_known_forward_move(
+        days=60, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    data = {"TEST": df}
+    loose = out_of_sample_significance(data, hold_days=hold_days, slippage_pct=0.0, n_tests=1)
+    strict = out_of_sample_significance(data, hold_days=hold_days, slippage_pct=0.0, n_tests=100)
+
+    assert loose.iloc[0]["bonferroni_threshold"] > strict.iloc[0]["bonferroni_threshold"]
+
+
 if __name__ == "__main__":
     test_scores_a_winning_dip_reversion()
     test_scores_a_losing_up_fade()
@@ -542,4 +614,7 @@ if __name__ == "__main__":
     test_bootstrap_edge_significance_handles_tiny_sample()
     test_bonferroni_threshold_scales_with_test_count()
     test_run_backtest_uses_custom_scan_fn()
+    test_out_of_sample_significance_flags_discovery_only_effect_correctly()
+    test_out_of_sample_significance_handles_no_signals()
+    test_out_of_sample_significance_n_tests_changes_threshold()
     print("All backtest tests passed.")

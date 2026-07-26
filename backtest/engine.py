@@ -803,7 +803,92 @@ def bonferroni_threshold(n_tests: int, alpha: float = 0.05) -> float:
     "is p < alpha/n_tests". Conservative (some real effects will be missed),
     but appropriate here given how many basket/direction/horizon cells
     tend to get scanned at once looking for a candidate.
+
+    CAUTION: `bootstrap_edge_significance()` run on a POOLED sample (all
+    signals across the full date range) is only ever exploratory, not
+    confirmatory — pooling mixes the discovery period (which is expected
+    to look good, since it's the data any pattern was found in) with the
+    confirmation period (the honest test), and a strong discovery-period
+    effect can drag a misleading "significant" p-value out of an
+    honestly-noisy confirmation period. This happened for real in this
+    project (`analyst` "dip": pooled p=0.014, looked significant;
+    confirmation-only p=0.656, not even close). Use
+    `out_of_sample_significance()` below for any claim that a signal's
+    edge is actually real — it computes significance SEPARATELY per
+    period and makes clear only the confirmation row counts as evidence.
     """
     if n_tests <= 0:
         return alpha
     return alpha / n_tests
+
+
+OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS = [
+    "period", "direction", "n", "mean_edge_pct", "ci_low", "ci_high",
+    "p_value", "bonferroni_threshold", "significant",
+]
+
+
+def out_of_sample_significance(
+    data: dict[str, pd.DataFrame],
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+    n_bootstrap: int = 2000,
+    n_tests: int = 2,
+) -> pd.DataFrame:
+    """
+    THE correct way to test whether a signal's edge is statistically
+    real: bootstraps significance SEPARATELY for the discovery period and
+    the confirmation (holdout) period, rather than pooling both together
+    (see the CAUTION in bonferroni_threshold()'s docstring for why
+    pooling is a trap — it already fooled a check in this project once).
+
+    Only the CONFIRMATION row's `significant` flag is evidence the edge
+    is real. The DISCOVERY row is informational only (how good did it
+    look before checking) — never cite discovery-period significance on
+    its own as confirmatory.
+
+    `n_tests` sets the Bonferroni correction denominator — default 2 (one
+    signal's dip + up). Override with the total cell count when this is
+    being called across multiple baskets/signals at once (see
+    `baskets.basket_out_of_sample_significance()`), so the correction
+    reflects everything actually being tested simultaneously.
+    """
+    detailed = _signals_with_own_ticker_baseline(
+        data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+    )
+    if detailed.empty:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS)
+
+    split_date = _discovery_split_date(data, discovery_frac)
+    discovery, confirmation = _split_by_date(detailed, split_date)
+    threshold = bonferroni_threshold(n_tests, alpha=0.05)
+
+    rows = []
+    for period, subset in zip(OUT_OF_SAMPLE_PERIODS, (discovery, confirmation)):
+        for direction in ("dip", "up"):
+            d = subset[subset["direction"] == direction] if not subset.empty else pd.DataFrame()
+            if d.empty:
+                continue
+            stats = bootstrap_edge_significance(d["edge_vs_own_ticker_pct"], n_bootstrap=n_bootstrap)
+            rows.append(
+                {
+                    "period": period,
+                    "direction": direction,
+                    "n": stats["n"],
+                    "mean_edge_pct": stats["mean"],
+                    "ci_low": stats["ci_low"],
+                    "ci_high": stats["ci_high"],
+                    "p_value": stats["p_value"],
+                    "bonferroni_threshold": round(threshold, 6),
+                    "significant": stats["p_value"] is not None and stats["p_value"] < threshold,
+                }
+            )
+
+    if not rows:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS)
+    return pd.DataFrame(rows)[OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS]

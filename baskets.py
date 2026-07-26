@@ -32,6 +32,7 @@ from backtest.engine import (
     MARKET_COMPARISON_COLUMNS,
     OUT_OF_SAMPLE_BASELINE_COLUMNS,
     OUT_OF_SAMPLE_MARKET_COLUMNS,
+    OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS,
     PER_TICKER_COMPARISON_COLUMNS,
     SUMMARY_COLUMNS,
     _signals_with_own_ticker_baseline,
@@ -42,6 +43,7 @@ from backtest.engine import (
     out_of_sample_backtest,
     out_of_sample_baseline_comparison,
     out_of_sample_market_comparison,
+    out_of_sample_significance,
     run_backtest,
     summarize_backtest,
 )
@@ -389,6 +391,15 @@ def basket_significance(
     — a much stricter bar than the uncorrected 0.05 usually used for a
     single test, appropriate here since many cells are being scanned
     simultaneously looking for a candidate.
+
+    EXPLORATORY ONLY — do not treat `significant=True` here as
+    confirmatory evidence of real edge. This bootstraps the POOLED sample
+    (discovery + confirmation together), and a strong discovery-period
+    effect can drag a misleading "significant" p-value out of an
+    honestly-noisy confirmation period (this happened for real in this
+    project — see `bonferroni_threshold()`'s docstring). Use
+    `basket_out_of_sample_significance()` below for any claim that a
+    basket's edge is actually real.
     """
     names = basket_names if basket_names is not None else all_basket_names()
     n_tests = len(names) * 2  # 2 directions per basket
@@ -428,3 +439,59 @@ def basket_significance(
     if not rows:
         return pd.DataFrame(columns=columns)
     return pd.DataFrame(rows)[columns]
+
+
+def basket_out_of_sample_significance(
+    data: dict[str, pd.DataFrame],
+    basket_names: list[str] | None = None,
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    n_bootstrap: int = 2000,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """
+    THE function to use for a confirmatory "is this basket's edge real"
+    claim — per-basket version of out_of_sample_significance(). Unlike
+    basket_significance() (which pools discovery+confirmation and can be
+    misled by a strong discovery-period effect), this bootstraps
+    significance SEPARATELY per period. Only trust a basket/direction's
+    `period == "confirmation"` row as evidence; the `"discovery"` row is
+    informational only.
+
+    The Bonferroni correction accounts for every basket x direction cell
+    tested at once (`len(basket_names) * 2`), same convention as
+    basket_significance().
+    """
+    names = basket_names if basket_names is not None else all_basket_names()
+    n_tests = len(names) * 2  # 2 directions per basket
+
+    rows = []
+    for basket_name in names:
+        basket_data = _basket_data(data, basket_name)
+        if not basket_data:
+            continue
+        result = out_of_sample_significance(
+            basket_data,
+            discovery_frac=discovery_frac,
+            hold_days=hold_days,
+            slippage_pct=slippage_pct,
+            return_z_threshold=return_z_threshold,
+            volume_z_threshold=volume_z_threshold,
+            scan_fn=scan_fn,
+            scan_kwargs=scan_kwargs,
+            n_bootstrap=n_bootstrap,
+            n_tests=n_tests,
+        )
+        if result.empty:
+            continue
+        result.insert(0, "basket", basket_name)
+        rows.append(result)
+
+    columns = ["basket"] + OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS
+    if not rows:
+        return pd.DataFrame(columns=columns)
+    return pd.concat(rows, ignore_index=True)[columns]

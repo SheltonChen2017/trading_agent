@@ -12,6 +12,7 @@ import pandas as pd
 
 from baskets import (
     all_basket_names,
+    basket_out_of_sample_significance,
     basket_significance,
     baskets_for_ticker,
     compare_baskets_to_baseline,
@@ -220,6 +221,17 @@ def test_basket_significance_bonferroni_threshold_scales_with_basket_count():
     assert many_baskets["bonferroni_threshold"].iloc[0] < one_basket["bonferroni_threshold"].iloc[0]
 
 
+def test_basket_out_of_sample_significance_tags_basket_and_period():
+    df = _flat_series_with_two_shocks(days=100, early_index=20, late_index=80, shock_return=-0.08)
+    data = {"NVDA": df, "AMD": df}
+
+    result = basket_out_of_sample_significance(data, basket_names=["semiconductors"], discovery_frac=0.6)
+    assert not result.empty
+    assert (result["basket"] == "semiconductors").all()
+    assert set(result["period"]) <= {"discovery", "confirmation"}
+    assert "significant" in result.columns
+
+
 if __name__ == "__main__":
     test_get_basket_tickers_returns_known_basket()
     test_get_basket_tickers_raises_on_unknown_basket()
@@ -237,4 +249,5 @@ if __name__ == "__main__":
     test_out_of_sample_market_by_basket_tags_basket_and_period()
     test_basket_significance_flags_clear_edge_as_significant()
     test_basket_significance_bonferroni_threshold_scales_with_basket_count()
+    test_basket_out_of_sample_significance_tags_basket_and_period()
     print("All basket tests passed.")

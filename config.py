@@ -66,9 +66,15 @@ UNIVERSE = [
 MARKET_BENCHMARK_TICKERS = ["SPY", "QQQ"]  # S&P 500 / Nasdaq-100 ETFs
 
 # --- Data -----------------------------------------------------------
-# ~2 trading years, so the backtest has real depth (previously 252 days /
-# ~1 year) and comfortably reaches back before mid-2025.
-LOOKBACK_DAYS = 504
+# ~7 trading years (2026-07 expansion from 504 days / ~2 years), so the
+# backtest spans multiple market regimes (2020 COVID crash, 2022 bear
+# market, 2023-2026 bull run) instead of one mostly-continuous stretch —
+# every signal tested at 2 years failed out-of-sample validation, and a
+# too-short/too-narrow window was a live hypothesis for why. Tickers with
+# less real history (recent IPOs) are simply scored on however much they
+# have — the pipeline already handles mismatched history lengths per
+# ticker (see signals/scanner.py's as_of-in-index guard).
+LOOKBACK_DAYS = 1764
 ROLLING_WINDOW = 20          # window for rolling mean/std used in z-scores
 
 # --- Baskets -----------------------------------------------------------
@@ -179,6 +185,19 @@ BREAKOUT_LOOKBACK_DAYS = 252   # ~52 weeks
 # Post-earnings announcement drift (signals/pead.py) — see
 # data/earnings_data.py for the real data-thinness limitation.
 PEAD_SURPRISE_THRESHOLD_PCT = 5.0
+
+# Fundamentals / earnings-growth signal (signals/fundamentals.py) — YoY
+# reported EPS growth, computed point-in-time from actual earnings
+# report dates (data/earnings_data.py), not today's live snapshot
+# fundamentals (which have no history and would be look-ahead bias if
+# applied to past dates). Event-driven, same data-thinness caveat as PEAD.
+FUNDAMENTALS_GROWTH_THRESHOLD_PCT = 20.0  # YoY EPS growth/decline beyond this fires a signal
+
+# Analyst rating-change signal (signals/analyst.py) — net upgrades minus
+# downgrades from institutional analysts (data/analyst_data.py), a
+# genuinely different data category: third-party OPINION, not the
+# company's own numbers or the stock's own trading behavior.
+ANALYST_MIN_NET_ACTIONS = 1  # net upgrade/downgrade excess required to fire a signal
 
 # --- Risk (used by the risk manager / backtester) -----------------------------------------------------------
 MAX_POSITION_PCT = 0.05      # never risk more than 5% of capital on one name

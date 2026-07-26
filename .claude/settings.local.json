@@ -40,7 +40,14 @@
       "Bash(python scripts/run_new_signals_report.py)",
       "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_new_signals_check.py\")",
       "Bash(git add *)",
-      "Bash(git commit -m ' *)"
+      "Bash(git commit -m ' *)",
+      "Bash(python tests/test_fundamentals.py)",
+      "Bash(grep -n \"Additional signals\\\\|signals/pead.py\\\\`\\\\|scan_pead\\\\|PEAD_SURPRISE\" README.md)",
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_fundamentals_check.py\")",
+      "Bash(python tests/test_analyst.py)",
+      "Bash(grep -n \"five alternatives\\\\|None of these five\\\\|scan_fundamentals\\\\`\\)\" README.md)",
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_analyst_check.py\")",
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_deep_history_check.py\")"
     ]
   }
 }

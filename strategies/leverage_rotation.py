@@ -6,17 +6,24 @@ same-index counterpart ("leveraged", e.g. TQQQ vs. QQQ/QQQM) based on the
 leveraged fund's own daily % move — which is just the underlying index's
 move amplified, so it's a clean proxy for "the market moved."
 
-Rule: when the leveraged fund's day-over-day move exceeds +threshold_pct,
-trim a fixed dollar amount off the leveraged position and buy the same
-into stable (bank the amplified gain). When it drops below -threshold_pct,
-sell the fixed amount from stable and buy the beaten-down leveraged fund
-(re-lever after the amplified drop). Trades are capped at whatever's
-actually held — never goes negative.
+Rule: when the leveraged fund's day-over-day CLOSE-TO-CLOSE move exceeds
++threshold_pct, trim a fixed dollar amount off the leveraged position and
+buy the same into stable (bank the amplified gain). When it drops below
+-threshold_pct, sell the fixed amount from stable and buy the beaten-down
+leveraged fund (re-lever after the amplified drop). Trades are capped at
+whatever's actually held — never goes negative.
 
-This is a mechanical, rules-based version of a strategy the user
-previously ran by feel/mood. It does NOT model transaction costs or
-taxes (frequent trims would realize capital gains, often short-term, in
-a real taxable account) — treat all results here as pre-tax, pre-cost.
+Decision and execution are DELIBERATELY on different days: the move is
+only fully known once day t's close prints, so the trade executes at day
+t+1's open, not day t's own close (you can't retroactively trade at a
+close you needed to complete in order to make the decision — flagged by
+independent code review, 2026-07, after the original same-close version
+shipped). A trade decided on the LAST available date has no next day to
+execute on and is simply dropped, matching the real constraint.
+
+This does NOT model transaction costs or taxes (frequent trims would
+realize capital gains, often short-term, in a real taxable account) —
+treat all results here as pre-tax, pre-cost.
 """
 from __future__ import annotations
 
@@ -26,44 +33,61 @@ import pandas as pd
 def simulate_leverage_rotation(
     stable_close: pd.Series,
     leveraged_close: pd.Series,
+    stable_open: pd.Series,
+    leveraged_open: pd.Series,
     initial_stable: float = 5000.0,
     initial_leveraged: float = 5000.0,
     threshold_pct: float = 2.0,
     trade_size: float = 500.0,
 ) -> dict:
-    """Simulate the rotation rule day by day. Returns a dict with the daily
-    portfolio value series, final value, total return, number of trades,
-    and the trade log."""
+    """Simulate the rotation rule day by day. Decisions use CLOSE-to-close
+    moves; trades execute at the FOLLOWING day's open (see module
+    docstring). Returns a dict with the daily portfolio value series
+    (marked to market at each day's close), final value, total return,
+    number of trades, and the trade log."""
     dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     stable_close = stable_close.reindex(dates)
     leveraged_close = leveraged_close.reindex(dates)
+    stable_open = stable_open.reindex(dates)
+    leveraged_open = leveraged_open.reindex(dates)
 
     stable_shares = initial_stable / stable_close.iloc[0]
     leveraged_shares = initial_leveraged / leveraged_close.iloc[0]
 
     portfolio_values = []
     trade_log = []
-    prev_lev_price = leveraged_close.iloc[0]
+    prev_lev_close = leveraged_close.iloc[0]
+    pending_action = None  # decided on the PRIOR day, executed today at today's open
 
     for i, date in enumerate(dates):
-        lev_price = leveraged_close.loc[date]
-        stable_price = stable_close.loc[date]
+        stable_open_price = stable_open.loc[date]
+        lev_open_price = leveraged_open.loc[date]
+
+        if pending_action is not None:
+            action = pending_action
+            if action == "trim_leveraged":
+                sell_value = min(trade_size, leveraged_shares * lev_open_price)
+                leveraged_shares -= sell_value / lev_open_price
+                stable_shares += sell_value / stable_open_price
+            else:  # buy_leveraged_dip
+                sell_value = min(trade_size, stable_shares * stable_open_price)
+                stable_shares -= sell_value / stable_open_price
+                leveraged_shares += sell_value / lev_open_price
+            trade_log.append({"date": date, "action": action, "value": sell_value})
+            pending_action = None
+
+        lev_close_price = leveraged_close.loc[date]
+        stable_close_price = stable_close.loc[date]
 
         if i > 0:
-            daily_move_pct = (lev_price / prev_lev_price - 1) * 100
+            daily_move_pct = (lev_close_price / prev_lev_close - 1) * 100
             if daily_move_pct > threshold_pct:
-                sell_value = min(trade_size, leveraged_shares * lev_price)
-                leveraged_shares -= sell_value / lev_price
-                stable_shares += sell_value / stable_price
-                trade_log.append({"date": date, "action": "trim_leveraged", "value": sell_value})
+                pending_action = "trim_leveraged"
             elif daily_move_pct < -threshold_pct:
-                sell_value = min(trade_size, stable_shares * stable_price)
-                stable_shares -= sell_value / stable_price
-                leveraged_shares += sell_value / lev_price
-                trade_log.append({"date": date, "action": "buy_leveraged_dip", "value": sell_value})
+                pending_action = "buy_leveraged_dip"
 
-        portfolio_values.append(stable_shares * stable_price + leveraged_shares * lev_price)
-        prev_lev_price = lev_price
+        portfolio_values.append(stable_shares * stable_close_price + leveraged_shares * lev_close_price)
+        prev_lev_close = lev_close_price
 
     series = pd.Series(portfolio_values, index=dates)
     return {

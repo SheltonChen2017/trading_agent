@@ -59,7 +59,8 @@
       "Bash(python scripts/run_regime_rotation_walkforward.py)",
       "Bash(python scripts/run_regime_rotation_sensitivity.py)",
       "Bash(python scripts/run_regime_rotation_cross_pair.py)",
-      "Bash(python scripts/run_momentum_block_significance.py)"
+      "Bash(python scripts/run_momentum_block_significance.py)",
+      "Bash(python scripts/run_regime_rotation_second_tech_pair.py)"
     ]
   }
 }

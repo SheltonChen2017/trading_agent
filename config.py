@@ -230,6 +230,18 @@ FUNDAMENTALS_GROWTH_THRESHOLD_PCT = 20.0  # YoY EPS growth/decline beyond this f
 # company's own numbers or the stock's own trading behavior.
 ANALYST_MIN_NET_ACTIONS = 1  # net upgrade/downgrade excess required to fire a signal
 
+# Analyst PRICE TARGET consensus signal (signals/analyst_target.py,
+# data/price_target_data.py) — genuinely different from the rating-
+# direction signal above: uses the actual DOLLAR price targets analysts
+# publish, aggregated into a point-in-time trimmed consensus (drop the
+# highest and lowest active target, then mean/median the rest), and
+# flags a stock when its current price diverges meaningfully from that
+# consensus. User-proposed signal, 2026-07.
+ANALYST_TARGET_GAP_THRESHOLD_PCT = 15.0  # |consensus - price| / price beyond this fires a signal
+ANALYST_TARGET_MIN_ANALYSTS = 5          # minimum still-active price targets required to trust the trimmed mean/median
+ANALYST_TARGET_STALENESS_DAYS = 365      # a firm's price target older than this is treated as no longer representing their current view
+ANALYST_TARGET_METHOD = "median"         # "median" or "mean" of the trimmed set
+
 # Market regime classifier (signals/regime.py) — momentum showed a real,
 # statistically significant sign-flip between two multi-year eras of the
 # ~7-year test window (2026-07 finding), consistent with the documented

@@ -71,7 +71,17 @@
       "Bash(python tests/test_execution_gate.py)",
       "PowerShell(if \\($env:APCA_API_KEY_ID\\) { \"APCA_API_KEY_ID is set\" } else { \"APCA_API_KEY_ID NOT visible in this session\" })",
       "PowerShell(if \\($env:APCA_API_SECRET_KEY\\) { \"APCA_API_SECRET_KEY is set\" } else { \"APCA_API_SECRET_KEY NOT visible in this session\" })",
-      "Bash(python *)"
+      "Bash(python *)",
+      "Bash(curl -s \"https://gamma-api.polymarket.com/events?limit=5&order=volume&ascending=false&closed=false\")",
+      "Bash(curl -s \"https://gamma-api.polymarket.com/events?limit=8&order=volume&ascending=false&closed=false&tag_id=100196\" -o /tmp/out.json)",
+      "Bash(curl -s \"https://gamma-api.polymarket.com/events?limit=100&closed=false&order=volume24hr&ascending=false\")",
+      "Bash(python3 -c ' *)",
+      "Bash(curl -s \"https://gamma-api.polymarket.com/markets?condition_ids=0x8bf1c1536ecb1c08fe13c6b71e8ab1f58bf3461c4cb79f5f1679f869a06aef86\")",
+      "Bash(curl -s \"https://clob.polymarket.com/prices-history?market=111604417349377875799825956621596386269673370070912696668140891647145772186047&interval=max&fidelity=1440\")",
+      "Bash(curl -s \"https://gamma-api.polymarket.com/events?limit=20&closed=false&order=volume&ascending=false&search=nvidia\" -o /tmp/nvda1.json)",
+      "Bash(curl -s \"https://gamma-api.polymarket.com/public-search?q=nvidia\")",
+      "Bash(curl -s \"https://gamma-api.polymarket.com/public-search?q=nvidia&events_status=active\")",
+      "Bash(curl -s \"https://gamma-api.polymarket.com/public-search?q=NVDA%20stock\")"
     ]
   }
 }

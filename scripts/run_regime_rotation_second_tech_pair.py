@@ -42,6 +42,15 @@ VOL_LOOKBACK_DAYS = 60
 REBALANCE_CHECK_DAYS = 21
 BAND_PCT = 5.0
 
+# Taxable brokerage account assumption, per user: every realized gain
+# taxed at a conservative short-term/ordinary-income rate (37%), since
+# rebalances can be spaced only months apart. cost_pct is a rough
+# bid-ask-spread/commission estimate for liquid ETFs (5 basis points
+# round-trip) -- major brokers charge $0 commission on ETF trades today,
+# so spread is the dominant real cost here.
+TAX_RATE = 0.37
+COST_PCT = 0.0005
+
 
 def main():
     print(f"Fetching real historical data for {STABLE_TICKER}/{LEVERAGED_TICKER} over {LOOKBACK_DAYS} trading days...")
@@ -72,48 +81,64 @@ def main():
     discovery_stable_open = stable_open.reindex(discovery_dates)
     discovery_leveraged_open = leveraged_open.reindex(discovery_dates)
 
-    print("=== Grid search on DISCOVERY period only ===")
-    grid_df = grid_search_state_weights(
-        discovery_stable_close, discovery_leveraged_close, discovery_stable_open, discovery_leveraged_open,
-        vol_threshold_pct=vol_threshold, trend_lookback_days=TREND_LOOKBACK_DAYS, vol_lookback_days=VOL_LOOKBACK_DAYS,
-        rebalance_check_days=REBALANCE_CHECK_DAYS, band_pct=BAND_PCT,
+    stable_conf = stable_close.reindex(dates[dates >= confirmation_start])
+    leveraged_conf = leveraged_close.reindex(dates[dates >= confirmation_start])
+    baseline_5050 = buy_and_hold(stable_conf, leveraged_conf, 0.5, 0.5)  # buy-and-hold never sells -> no tax exposure either way
+
+    rows = []
+    for label, tax_rate, cost_pct in (("pre-tax/cost", 0.0, 0.0), ("after-tax/cost", TAX_RATE, COST_PCT)):
+        print(f"=== Grid search on DISCOVERY period only ({label}) ===")
+        grid_df = grid_search_state_weights(
+            discovery_stable_close, discovery_leveraged_close, discovery_stable_open, discovery_leveraged_open,
+            vol_threshold_pct=vol_threshold, trend_lookback_days=TREND_LOOKBACK_DAYS, vol_lookback_days=VOL_LOOKBACK_DAYS,
+            rebalance_check_days=REBALANCE_CHECK_DAYS, band_pct=BAND_PCT, tax_rate=tax_rate, cost_pct=cost_pct,
+        )
+        print(grid_df.to_string(index=False))
+
+        best = grid_df.iloc[0]
+        best_weights = build_state_weights(best["low_vol_lev_weight"], best["high_vol_lev_weight"])
+        print(f"Best by Calmar ratio on discovery: uptrend_low_vol={best['low_vol_lev_weight']:.0%}, "
+              f"uptrend_high_vol={best['high_vol_lev_weight']:.0%}\n")
+
+        regime_result = simulate_regime_rotation(
+            stable_close, leveraged_close, stable_open, leveraged_open, vol_threshold_pct=vol_threshold,
+            state_weights=best_weights, trend_lookback_days=TREND_LOOKBACK_DAYS,
+            vol_lookback_days=VOL_LOOKBACK_DAYS, rebalance_check_days=REBALANCE_CHECK_DAYS,
+            band_pct=BAND_PCT, start_date=confirmation_start, tax_rate=tax_rate, cost_pct=cost_pct,
+        )
+        regime_series = regime_result["series"]
+        rows.append({
+            "scenario": label,
+            "weights": f"{best['low_vol_lev_weight']:.0%}/{best['high_vol_lev_weight']:.0%}",
+            "n_trades": regime_result["n_trades"],
+            "cagr_pct": round(cagr_pct(regime_series), 2),
+            "max_drawdown_pct": round(max_drawdown_pct(regime_series), 1),
+            "total_tax_paid": round(regime_result["total_tax_paid"], 0),
+            "total_cost_paid": round(regime_result["total_cost_paid"], 0),
+        })
+
+    rows.append({
+        "scenario": "buy & hold 50/50 (no rebalance, no tax exposure)", "weights": "-", "n_trades": 0,
+        "cagr_pct": round(cagr_pct(baseline_5050["series"]), 2),
+        "max_drawdown_pct": round(baseline_5050["max_drawdown_pct"], 1),
+        "total_tax_paid": 0, "total_cost_paid": 0,
+    })
+
+    print("=== Confirmation-period comparison: pre-tax vs. after-tax/cost vs. buy-and-hold ===")
+    print(pd.DataFrame(rows).to_string(index=False))
+
+    after_tax_row = rows[1]
+    baseline_row = rows[2]
+    beats_both_after_tax = (
+        after_tax_row["cagr_pct"] > baseline_row["cagr_pct"]
+        and after_tax_row["max_drawdown_pct"] > baseline_row["max_drawdown_pct"]
     )
-    print(grid_df.to_string(index=False))
-
-    best = grid_df.iloc[0]
-    best_weights = build_state_weights(best["low_vol_lev_weight"], best["high_vol_lev_weight"])
-    print(f"\nBest by Calmar ratio on discovery: uptrend_low_vol={best['low_vol_lev_weight']:.0%}, "
-          f"uptrend_high_vol={best['high_vol_lev_weight']:.0%}\n")
-
-    print("=== Applying that SAME combo to the CONFIRMATION period ===")
-    regime_result = simulate_regime_rotation(
-        stable_close, leveraged_close, stable_open, leveraged_open, vol_threshold_pct=vol_threshold,
-        state_weights=best_weights, trend_lookback_days=TREND_LOOKBACK_DAYS,
-        vol_lookback_days=VOL_LOOKBACK_DAYS, rebalance_check_days=REBALANCE_CHECK_DAYS,
-        band_pct=BAND_PCT, start_date=confirmation_start,
+    print(f"\nBeats 50/50 buy-and-hold on BOTH CAGR and drawdown, AFTER tax/cost: {beats_both_after_tax}")
+    print(
+        f"(Assumes a taxable brokerage account, every realized gain taxed at {TAX_RATE:.0%} "
+        f"short-term/ordinary-income rate, {COST_PCT:.2%} round-trip cost per trade. "
+        "Buy-and-hold pays no tax at all since it never sells.)"
     )
-    regime_series = regime_result["series"]
-
-    stable_conf = stable_close.reindex(regime_series.index)
-    leveraged_conf = leveraged_close.reindex(regime_series.index)
-    baseline_5050 = buy_and_hold(stable_conf, leveraged_conf, 0.5, 0.5)
-
-    comparison = pd.DataFrame([
-        {"strategy": f"tuned regime rotation ({best['low_vol_lev_weight']:.0%}/{best['high_vol_lev_weight']:.0%})",
-         "n_trades": regime_result["n_trades"],
-         "cagr_pct": round(cagr_pct(regime_series), 2),
-         "max_drawdown_pct": round(max_drawdown_pct(regime_series), 1)},
-        {"strategy": "buy & hold 50/50 (no rebalance)", "n_trades": 0,
-         "cagr_pct": round(cagr_pct(baseline_5050["series"]), 2),
-         "max_drawdown_pct": round(baseline_5050["max_drawdown_pct"], 1)},
-    ])
-    print(comparison.to_string(index=False))
-
-    beats_both = (
-        cagr_pct(regime_series) > cagr_pct(baseline_5050["series"])
-        and max_drawdown_pct(regime_series) > baseline_5050["max_drawdown_pct"]
-    )
-    print(f"\nBeats 50/50 buy-and-hold on BOTH CAGR and drawdown: {beats_both}")
 
 
 if __name__ == "__main__":

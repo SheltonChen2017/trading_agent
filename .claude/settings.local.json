@@ -60,7 +60,18 @@
       "Bash(python scripts/run_regime_rotation_sensitivity.py)",
       "Bash(python scripts/run_regime_rotation_cross_pair.py)",
       "Bash(python scripts/run_momentum_block_significance.py)",
-      "Bash(python scripts/run_regime_rotation_second_tech_pair.py)"
+      "Bash(python scripts/run_regime_rotation_second_tech_pair.py)",
+      "Bash(python scripts/run_regime_rotation_walkforward_soxx_soxl.py)",
+      "Bash(python scripts/run_regime_rotation_sensitivity_soxx_soxl.py)",
+      "Bash(python tests/test_assistant_context_builder.py)",
+      "Bash(python scripts/run_morning_briefing.py)",
+      "Bash(pip show *)",
+      "Bash(python tests/test_assistant_explanations.py)",
+      "Bash(python tests/test_assistant_risk_copilot.py)",
+      "Bash(python tests/test_execution_gate.py)",
+      "PowerShell(if \\($env:APCA_API_KEY_ID\\) { \"APCA_API_KEY_ID is set\" } else { \"APCA_API_KEY_ID NOT visible in this session\" })",
+      "PowerShell(if \\($env:APCA_API_SECRET_KEY\\) { \"APCA_API_SECRET_KEY is set\" } else { \"APCA_API_SECRET_KEY NOT visible in this session\" })",
+      "Bash(python *)"
     ]
   }
 }

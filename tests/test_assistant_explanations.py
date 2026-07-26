@@ -1,0 +1,103 @@
+"""
+Sanity tests for assistant/explanations.py. Run with:
+python tests/test_assistant_explanations.py
+"""
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+import numpy as np
+import pandas as pd
+
+import assistant.explanations as explanations
+from assistant.context_builder import build_portfolio_snapshot
+from assistant.explanations import explain_ticker
+from assistant.schemas import MarketRegime
+
+_FIXED_REGIME = MarketRegime(
+    benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
+    trailing_volatility_pct=1.0, as_of="2026-01-01",
+)
+
+
+def _dip_series(days: int = 60) -> pd.DataFrame:
+    """Quiet history, then a sharp dip with a volume spike on the LAST
+    day, so scan_dips_and_ups fires when `as_of` defaults to the latest
+    date."""
+    rng = np.random.default_rng(0)
+    returns = rng.normal(0.0, 0.002, size=days)
+    returns[-1] = -0.08
+    volume = np.full(days, 1_000_000.0)
+    volume[-1] = 4_000_000.0
+
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days)
+    return pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+
+
+def test_explain_ticker_reports_a_triggered_signal():
+    original_fetch = explanations.fetch_historical
+    try:
+        explanations.fetch_historical = lambda tickers, lookback_days=300: {"AAA": _dip_series()}
+        result = explain_ticker("AAA", market_regime=_FIXED_REGIME)
+        assert result["ticker"] == "AAA"
+        assert result["market_regime"]["trend"] == "uptrend"
+        rules_fired = {t["rule"] for t in result["triggered_today"]}
+        assert "z-score dip/up scanner" in rules_fired
+        dip_entry = next(t for t in result["triggered_today"] if t["rule"] == "z-score dip/up scanner")
+        assert dip_entry["direction"] == "dip"
+    finally:
+        explanations.fetch_historical = original_fetch
+
+
+def test_explain_ticker_includes_historical_evidence_for_ticker_specific_findings():
+    original_fetch = explanations.fetch_historical
+    try:
+        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        result = explain_ticker("SOXX", market_regime=_FIXED_REGIME)
+        labels = {e["label"] for e in result["historical_evidence"]}
+        assert any("SOXX/SOXL" in label for label in labels)
+        # project-wide findings (no ticker restriction) should always appear too
+        assert any(e["claim"] == "Beats a random-day baseline out-of-sample" for e in result["historical_evidence"])
+    finally:
+        explanations.fetch_historical = original_fetch
+
+
+def test_explain_ticker_reports_currently_held_status():
+    original_fetch = explanations.fetch_historical
+    try:
+        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        snapshot = build_portfolio_snapshot(
+            [{"ticker": "AAA", "shares": 10, "entry_price": 100.0, "current_price": 110.0}], cash=0.0,
+        )
+        held = explain_ticker("AAA", portfolio=snapshot, market_regime=_FIXED_REGIME)
+        not_held = explain_ticker("ZZZ", portfolio=snapshot, market_regime=_FIXED_REGIME)
+        never_checked = explain_ticker("AAA", portfolio=None, market_regime=_FIXED_REGIME)
+
+        assert held["currently_held"]["shares"] == 10
+        assert not_held["currently_held"] is None
+        assert never_checked["currently_held"] == "not_checked"
+    finally:
+        explanations.fetch_historical = original_fetch
+
+
+def test_explain_ticker_handles_missing_data_gracefully():
+    original_fetch = explanations.fetch_historical
+    try:
+        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        result = explain_ticker("NODATA", market_regime=_FIXED_REGIME)
+        assert result["triggered_today"] == []
+    finally:
+        explanations.fetch_historical = original_fetch
+
+
+if __name__ == "__main__":
+    test_explain_ticker_reports_a_triggered_signal()
+    test_explain_ticker_includes_historical_evidence_for_ticker_specific_findings()
+    test_explain_ticker_reports_currently_held_status()
+    test_explain_ticker_handles_missing_data_gracefully()
+    print("All assistant explanations tests passed.")

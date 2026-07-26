@@ -65,6 +65,37 @@ UNIVERSE = [
 # stock's own history (see backtest/engine.compare_signal_to_market_index).
 MARKET_BENCHMARK_TICKERS = ["SPY", "QQQ"]  # S&P 500 / Nasdaq-100 ETFs
 
+# Leveraged ETFs — used by assistant/context_builder.py to flag leveraged
+# exposure as its own risk category (separate from plain sector/basket
+# exposure, since a leveraged position carries daily-rebalancing decay
+# risk a same-dollar unleveraged position doesn't). Not exhaustive —
+# extend as needed.
+LEVERAGED_ETF_TICKERS = [
+    "TQQQ", "SQQQ", "QLD", "QID",           # Nasdaq-100 3x/2x, bull/bear
+    "SOXL", "SOXS",                          # Semiconductors 3x
+    "UPRO", "SPXU", "SSO", "SDS",            # S&P 500 3x/2x, bull/bear
+    "TNA", "TZA",                             # Russell 2000 3x
+]
+
+# Leveraged ETF -> its unleveraged same-index counterpart — used by
+# assistant/risk_copilot.py to flag "hidden duplication" (e.g. holding
+# both QQQ and TQQQ is really just a bigger, undiversified Nasdaq-100 bet,
+# not two separate positions). Only mapped for pairs this project has
+# actually researched (see project_leverage_rotation_strategy) — extend
+# as needed rather than guessing at others.
+LEVERAGED_ETF_UNDERLYING = {
+    "TQQQ": "QQQ",
+    "SQQQ": "QQQ",
+    "QLD": "QQQ",
+    "QID": "QQQ",
+    "SOXL": "SOXX",
+    "SOXS": "SOXX",
+    "UPRO": "SPY",
+    "SPXU": "SPY",
+    "SSO": "SPY",
+    "SDS": "SPY",
+}
+
 # --- Data -----------------------------------------------------------
 # ~7 trading years (2026-07 expansion from 504 days / ~2 years), so the
 # backtest spans multiple market regimes (2020 COVID crash, 2022 bear

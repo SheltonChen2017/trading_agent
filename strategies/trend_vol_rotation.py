@@ -83,6 +83,8 @@ def simulate_regime_rotation(
     initial_total: float = 10_000.0,
     fallback_weights: tuple[float, float] = (0.5, 0.5),
     start_date: pd.Timestamp | None = None,
+    cost_pct: float = 0.0,
+    tax_rate: float = 0.0,
 ) -> dict:
     """
     Simulate the trend+volatility-regime allocation. `stable_close` and
@@ -95,7 +97,15 @@ def simulate_regime_rotation(
     Rebalance decisions are classified using each check date's own CLOSE;
     execution happens at the FOLLOWING trading day's open (see module
     docstring). The portfolio value series is marked to market at each
-    day's CLOSE throughout.
+    day's CLOSE throughout, net of any tax/cost already paid.
+
+    Optionally models transaction costs and taxes: `cost_pct` (bid-ask
+    spread/commission, as a fraction of the dollar value of whichever leg
+    is trimmed at each rebalance) and `tax_rate` (applied to REALIZED
+    gains only on the trimmed leg, via a running average cost basis —
+    every gain treated as short-term/ordinary-income, no benefit assumed
+    for losses; both conservative simplifications). Both default to 0.0
+    for backward compatibility.
     """
     state_weights = state_weights or DEFAULT_STATE_WEIGHTS
     all_dates = stable_close.index.intersection(leveraged_close.index).sort_values()
@@ -112,11 +122,15 @@ def simulate_regime_rotation(
     stable_w0, lev_w0 = fallback_weights
     stable_shares = (initial_total * stable_w0) / stable_close.loc[sim_dates[0]]
     leveraged_shares = (initial_total * lev_w0) / leveraged_close.loc[sim_dates[0]]
+    stable_cost_basis = stable_close.loc[sim_dates[0]]
+    leveraged_cost_basis = leveraged_close.loc[sim_dates[0]]
 
     portfolio_values = []
     trade_log = []
     current_state = None
     pending_rebalance = None  # (state, target_stable_w, target_lev_w) decided on the prior check day
+    total_tax_paid = 0.0
+    total_cost_paid = 0.0
 
     for i, date in enumerate(sim_dates):
         stable_open_price = stable_open.loc[date]
@@ -127,11 +141,47 @@ def simulate_regime_rotation(
         if pending_rebalance is not None:
             state, target_stable_w, target_lev_w = pending_rebalance
             total_value = stable_shares * stable_open_price + leveraged_shares * lev_open_price
-            stable_shares = (total_value * target_stable_w) / stable_open_price
-            leveraged_shares = (total_value * target_lev_w) / lev_open_price
+            target_stable_value = total_value * target_stable_w
+            target_lev_value = total_value * target_lev_w
+            current_stable_value = stable_shares * stable_open_price
+            current_lev_value = leveraged_shares * lev_open_price
+
+            tax_owed = 0.0
+            cost_owed = 0.0
+            if target_stable_value < current_stable_value:  # trimming stable
+                sell_value = current_stable_value - target_stable_value
+                shares_sold = sell_value / stable_open_price
+                realized_gain = (stable_open_price - stable_cost_basis) * shares_sold
+                tax_owed += tax_rate * max(0.0, realized_gain)
+                cost_owed += cost_pct * sell_value
+            if target_lev_value < current_lev_value:  # trimming leveraged
+                sell_value = current_lev_value - target_lev_value
+                shares_sold = sell_value / lev_open_price
+                realized_gain = (lev_open_price - leveraged_cost_basis) * shares_sold
+                tax_owed += tax_rate * max(0.0, realized_gain)
+                cost_owed += cost_pct * sell_value
+
+            net_total_value = total_value - tax_owed - cost_owed
+            new_stable_shares = (net_total_value * target_stable_w) / stable_open_price
+            new_leveraged_shares = (net_total_value * target_lev_w) / lev_open_price
+
+            if new_stable_shares > stable_shares:  # topping up stable -> update its cost basis
+                shares_bought = new_stable_shares - stable_shares
+                new_total_cost = stable_cost_basis * stable_shares + stable_open_price * shares_bought
+                stable_cost_basis = new_total_cost / new_stable_shares if new_stable_shares > 0 else stable_open_price
+            if new_leveraged_shares > leveraged_shares:  # topping up leveraged -> update its cost basis
+                shares_bought = new_leveraged_shares - leveraged_shares
+                new_total_cost = leveraged_cost_basis * leveraged_shares + lev_open_price * shares_bought
+                leveraged_cost_basis = new_total_cost / new_leveraged_shares if new_leveraged_shares > 0 else lev_open_price
+
+            stable_shares = new_stable_shares
+            leveraged_shares = new_leveraged_shares
+            total_tax_paid += tax_owed
+            total_cost_paid += cost_owed
             trade_log.append({
                 "date": date, "state": state,
                 "target_stable_w": target_stable_w, "target_lev_w": target_lev_w,
+                "tax_paid": tax_owed, "cost_paid": cost_owed,
             })
             pending_rebalance = None
 
@@ -163,6 +213,8 @@ def simulate_regime_rotation(
         "total_return_pct": float((series.iloc[-1] / series.iloc[0] - 1) * 100),
         "n_trades": len(trade_log),
         "trade_log": trade_log,
+        "total_tax_paid": total_tax_paid,
+        "total_cost_paid": total_cost_paid,
     }
 
 

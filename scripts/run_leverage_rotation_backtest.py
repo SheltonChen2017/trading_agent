@@ -46,16 +46,16 @@ THRESHOLD_GRID = [1.0, 2.0, 3.0]
 TRADE_SIZE_GRID = [250.0, 500.0, 1000.0]
 
 
-def _split(stable: pd.Series, leveraged: pd.Series, frac: float):
-    dates = stable.index.intersection(leveraged.index).sort_values()
+def _split(*series: pd.Series, frac: float):
+    dates = series[0].index
+    for s in series[1:]:
+        dates = dates.intersection(s.index)
+    dates = dates.sort_values()
     split_idx = int(len(dates) * frac)
     split_date = dates[split_idx]
     discovery_dates = dates[dates < split_date]
     confirmation_dates = dates[dates >= split_date]
-    return (
-        stable.reindex(discovery_dates), leveraged.reindex(discovery_dates),
-        stable.reindex(confirmation_dates), leveraged.reindex(confirmation_dates),
-    )
+    return tuple(s.reindex(discovery_dates) for s in series) + tuple(s.reindex(confirmation_dates) for s in series)
 
 
 def main():
@@ -67,18 +67,24 @@ def main():
 
     stable_close = data[STABLE_TICKER]["close"]
     leveraged_close = data[LEVERAGED_TICKER]["close"]
+    stable_open = data[STABLE_TICKER]["open"]
+    leveraged_open = data[LEVERAGED_TICKER]["open"]
     print(f"Got {len(stable_close)} days of {STABLE_TICKER}, {len(leveraged_close)} days of {LEVERAGED_TICKER}.\n")
 
-    stable_disc, lev_disc, stable_conf, lev_conf = _split(stable_close, leveraged_close, DISCOVERY_FRAC)
-    print(f"Discovery period:    {stable_disc.index[0].date()} to {stable_disc.index[-1].date()} ({len(stable_disc)} days)")
-    print(f"Confirmation period: {stable_conf.index[0].date()} to {stable_conf.index[-1].date()} ({len(stable_conf)} days)\n")
+    (stable_close_disc, leveraged_close_disc, stable_open_disc, leveraged_open_disc,
+     stable_close_conf, leveraged_close_conf, stable_open_conf, leveraged_open_conf) = _split(
+        stable_close, leveraged_close, stable_open, leveraged_open, frac=DISCOVERY_FRAC,
+    )
+    print(f"Discovery period:    {stable_close_disc.index[0].date()} to {stable_close_disc.index[-1].date()} ({len(stable_close_disc)} days)")
+    print(f"Confirmation period: {stable_close_conf.index[0].date()} to {stable_close_conf.index[-1].date()} ({len(stable_close_conf)} days)\n")
 
     print("=== Grid search on DISCOVERY period only ===")
     rows = []
     for threshold in THRESHOLD_GRID:
         for trade_size in TRADE_SIZE_GRID:
             result = simulate_leverage_rotation(
-                stable_disc, lev_disc, threshold_pct=threshold, trade_size=trade_size,
+                stable_close_disc, leveraged_close_disc, stable_open_disc, leveraged_open_disc,
+                threshold_pct=threshold, trade_size=trade_size,
             )
             calmar = (
                 cagr_pct(result["series"]) / abs(result["max_drawdown_pct"])
@@ -102,11 +108,12 @@ def main():
 
     print("=== Applying that SAME combo to the CONFIRMATION period (never used to pick it) ===")
     strategy_conf = simulate_leverage_rotation(
-        stable_conf, lev_conf, threshold_pct=best_threshold, trade_size=best_trade_size,
+        stable_close_conf, leveraged_close_conf, stable_open_conf, leveraged_open_conf,
+        threshold_pct=best_threshold, trade_size=best_trade_size,
     )
-    baseline_5050 = buy_and_hold(stable_conf, lev_conf, 0.5, 0.5)
-    baseline_stable = buy_and_hold(stable_conf, lev_conf, 1.0, 0.0)
-    baseline_leveraged = buy_and_hold(stable_conf, lev_conf, 0.0, 1.0)
+    baseline_5050 = buy_and_hold(stable_close_conf, leveraged_close_conf, 0.5, 0.5)
+    baseline_stable = buy_and_hold(stable_close_conf, leveraged_close_conf, 1.0, 0.0)
+    baseline_leveraged = buy_and_hold(stable_close_conf, leveraged_close_conf, 0.0, 1.0)
 
     comparison = pd.DataFrame([
         {"strategy": f"rotation ({best_threshold}%/${best_trade_size:.0f})",

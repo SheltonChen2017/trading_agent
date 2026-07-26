@@ -52,6 +52,8 @@ def main():
     data = fetch_historical([STABLE_TICKER, LEVERAGED_TICKER], lookback_days=LOOKBACK_DAYS)
     stable_close = data[STABLE_TICKER]["close"]
     leveraged_close = data[LEVERAGED_TICKER]["close"]
+    stable_open = data[STABLE_TICKER]["open"]
+    leveraged_open = data[LEVERAGED_TICKER]["open"]
     dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     print(f"Got {len(dates)} overlapping trading days ({dates[0].date()} to {dates[-1].date()}).\n")
 
@@ -71,12 +73,14 @@ def main():
         vol_threshold = calibrate_threshold_from_discovery(benchmark_df, discovery_end, lookback_days=VOL_LOOKBACK_DAYS)
 
         discovery_dates = dates[dates <= discovery_end]
-        discovery_stable = stable_close.reindex(discovery_dates)
-        discovery_leveraged = leveraged_close.reindex(discovery_dates)
+        discovery_stable_close = stable_close.reindex(discovery_dates)
+        discovery_leveraged_close = leveraged_close.reindex(discovery_dates)
+        discovery_stable_open = stable_open.reindex(discovery_dates)
+        discovery_leveraged_open = leveraged_open.reindex(discovery_dates)
 
         grid_df = grid_search_state_weights(
-            discovery_stable, discovery_leveraged, vol_threshold_pct=vol_threshold,
-            trend_lookback_days=TREND_LOOKBACK_DAYS, vol_lookback_days=VOL_LOOKBACK_DAYS,
+            discovery_stable_close, discovery_leveraged_close, discovery_stable_open, discovery_leveraged_open,
+            vol_threshold_pct=vol_threshold, trend_lookback_days=TREND_LOOKBACK_DAYS, vol_lookback_days=VOL_LOOKBACK_DAYS,
             rebalance_check_days=REBALANCE_CHECK_DAYS, band_pct=BAND_PCT,
         )
         best = grid_df.iloc[0]
@@ -86,7 +90,7 @@ def main():
         # Pass the FULL series (not just confirm slice) so trend/vol lookback
         # has access to pre-fold history; start_date restricts what's traded.
         regime_result = simulate_regime_rotation(
-            stable_close, leveraged_close, vol_threshold_pct=vol_threshold,
+            stable_close, leveraged_close, stable_open, leveraged_open, vol_threshold_pct=vol_threshold,
             state_weights=best_weights, trend_lookback_days=TREND_LOOKBACK_DAYS,
             vol_lookback_days=VOL_LOOKBACK_DAYS, rebalance_check_days=REBALANCE_CHECK_DAYS,
             band_pct=BAND_PCT, start_date=confirm_start,

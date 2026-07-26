@@ -23,68 +23,88 @@ def _series(prices: list[float]) -> pd.Series:
 
 
 def test_trade_fires_on_up_move_above_threshold():
-    stable = _series([100, 101, 101, 101])
-    leveraged = _series([100, 110, 110, 110])  # +10% day 1, then flat
+    stable_close = _series([100, 101, 101, 101])
+    leveraged_close = _series([100, 110, 110, 110])  # +10% day 1, then flat
 
     result = simulate_leverage_rotation(
-        stable, leveraged, initial_stable=5000, initial_leveraged=5000,
-        threshold_pct=2.0, trade_size=500,
+        stable_close, leveraged_close, stable_close, leveraged_close,
+        initial_stable=5000, initial_leveraged=5000, threshold_pct=2.0, trade_size=500,
     )
     assert result["n_trades"] == 1
     assert result["trade_log"][0]["action"] == "trim_leveraged"
 
 
 def test_trade_fires_on_down_move_below_threshold():
-    stable = _series([100, 99, 99, 99])
-    leveraged = _series([100, 85, 85, 85])  # -15% day 1
+    stable_close = _series([100, 99, 99, 99])
+    leveraged_close = _series([100, 85, 85, 85])  # -15% day 1
 
     result = simulate_leverage_rotation(
-        stable, leveraged, initial_stable=5000, initial_leveraged=5000,
-        threshold_pct=2.0, trade_size=500,
+        stable_close, leveraged_close, stable_close, leveraged_close,
+        initial_stable=5000, initial_leveraged=5000, threshold_pct=2.0, trade_size=500,
     )
     assert result["n_trades"] == 1
     assert result["trade_log"][0]["action"] == "buy_leveraged_dip"
 
 
 def test_no_trade_when_move_within_threshold():
-    stable = _series([100, 100.5, 101, 101.5])
-    leveraged = _series([100, 101, 102, 103])  # 1%/day moves, threshold is 2%
+    stable_close = _series([100, 100.5, 101, 101.5])
+    leveraged_close = _series([100, 101, 102, 103])  # 1%/day moves, threshold is 2%
 
     result = simulate_leverage_rotation(
-        stable, leveraged, initial_stable=5000, initial_leveraged=5000,
-        threshold_pct=2.0, trade_size=500,
+        stable_close, leveraged_close, stable_close, leveraged_close,
+        initial_stable=5000, initial_leveraged=5000, threshold_pct=2.0, trade_size=500,
     )
     assert result["n_trades"] == 0
 
 
-def test_trade_does_not_change_total_value_on_the_day_it_fires():
-    # A trade is just a same-day reallocation at that day's prices, so
-    # total portfolio value right after the trade must equal the
-    # no-trade total for that same day.
-    stable = _series([100, 101, 101])
-    leveraged = _series([100, 110, 110])
+def test_trade_executes_at_next_day_open_not_decision_day_close():
+    # Regression test for a real look-ahead bug: the decision to trade is
+    # only knowable once day 1's close prints (a +10% move), but the
+    # trade must execute at day 2's OPEN, not day 1's own close. Make
+    # day 2's open deliberately far from day 1's close so a same-close
+    # bug would produce a visibly different (and wrong) result.
+    stable_close = _series([100, 101, 101, 101])
+    leveraged_close = _series([100, 110, 110, 110])
+    stable_open = _series([100, 101, 200, 200])      # day 2 open deliberately != day 1 close (101)
+    leveraged_open = _series([100, 110, 300, 300])    # day 2 open deliberately != day 1 close (110)
 
     result = simulate_leverage_rotation(
-        stable, leveraged, initial_stable=5000, initial_leveraged=5000,
-        threshold_pct=2.0, trade_size=500,
+        stable_close, leveraged_close, stable_open, leveraged_open,
+        initial_stable=5000, initial_leveraged=5000, threshold_pct=2.0, trade_size=500,
     )
-    expected_day1_value = 50 * 101 + 50 * 110  # pre-trade share counts at day-1 prices
-    assert abs(result["series"].iloc[1] - expected_day1_value) < 0.01
+    assert result["n_trades"] == 1
+    assert result["trade_log"][0]["date"] == leveraged_close.index[2]  # executes on day 2, not day 1
+
+    # Hand-computed expected value using day-2 OPEN prices (200/300) for
+    # the trade, then marked to market at day-2 CLOSE (101/110).
+    expected_leveraged_shares = 50 - 500 / 300
+    expected_stable_shares = 50 + 500 / 200
+    expected_day2_value = expected_stable_shares * 101 + expected_leveraged_shares * 110
+    assert abs(result["series"].iloc[2] - expected_day2_value) < 0.01
+
+    # A same-close bug would instead have traded at day-1's close (101/110),
+    # giving a visibly different value -- confirm we do NOT match that.
+    buggy_leveraged_shares = 50 - 500 / 110
+    buggy_stable_shares = 50 + 500 / 101
+    buggy_day2_value = buggy_stable_shares * 101 + buggy_leveraged_shares * 110
+    assert abs(result["series"].iloc[2] - buggy_day2_value) > 1.0
 
 
 def test_trade_size_capped_at_available_holding():
-    stable = _series([100, 200, 200])  # stable moons, tiny holding to sell from later
-    leveraged = _series([100, 90, 60])  # then leveraged craters hard
+    stable_close = _series([100, 200, 200, 200])  # stable moons, tiny holding to sell from later
+    leveraged_close = _series([100, 90, 60, 60])  # then leveraged craters hard
 
     result = simulate_leverage_rotation(
-        stable, leveraged, initial_stable=100, initial_leveraged=5000,
-        threshold_pct=2.0, trade_size=500,
+        stable_close, leveraged_close, stable_close, leveraged_close,
+        initial_stable=100, initial_leveraged=5000, threshold_pct=2.0, trade_size=500,
     )
-    # day 2: leveraged drops another ~33% -> triggers buy_leveraged_dip,
-    # but stable only has ~$200 to sell from, far less than trade_size=500
+    # Day 1's -10% move triggers a dip-buy executed day 2, fully draining
+    # the small stable holding (capped well under $500); day 2's further
+    # -33% move triggers a second dip-buy executed day 3, but stable is
+    # now empty, so that one is capped at ~$0.
     assert result["n_trades"] == 2
     second_trade = result["trade_log"][1]
-    assert second_trade["value"] <= 200.01  # capped, not the full $500
+    assert second_trade["value"] <= 0.01
 
 
 def test_buy_and_hold_matches_static_weights():
@@ -113,7 +133,7 @@ if __name__ == "__main__":
     test_trade_fires_on_up_move_above_threshold()
     test_trade_fires_on_down_move_below_threshold()
     test_no_trade_when_move_within_threshold()
-    test_trade_does_not_change_total_value_on_the_day_it_fires()
+    test_trade_executes_at_next_day_open_not_decision_day_close()
     test_trade_size_capped_at_available_holding()
     test_buy_and_hold_matches_static_weights()
     test_max_drawdown_pct_on_known_series()

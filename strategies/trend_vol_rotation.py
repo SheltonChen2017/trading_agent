@@ -27,6 +27,16 @@ exposure in the "goldilocks" uptrend+low_vol state, fully defensive in
 any downtrend state). Rebalancing only happens on the schedule and only
 if actual weights have drifted from target beyond a band, to keep
 turnover low.
+
+Classification and rebalance EXECUTION are deliberately on different
+days: the trend/vol state on a check date needs that date's own
+completed close, so the rebalance trade executes at the FOLLOWING
+trading day's open, not the check date's own close (you can't
+retroactively trade at a close you needed to complete in order to
+classify the regime — flagged by independent code review, 2026-07, after
+the original same-close version shipped). A rebalance decided on the
+LAST available date has no next day to execute on and is dropped,
+matching the real constraint.
 """
 from __future__ import annotations
 
@@ -62,6 +72,8 @@ DEFAULT_STATE_WEIGHTS: dict[str, tuple[float, float]] = {
 def simulate_regime_rotation(
     stable_close: pd.Series,
     leveraged_close: pd.Series,
+    stable_open: pd.Series,
+    leveraged_open: pd.Series,
     vol_threshold_pct: float,
     state_weights: dict[str, tuple[float, float]] | None = None,
     trend_lookback_days: int = 200,
@@ -79,11 +91,18 @@ def simulate_regime_rotation(
     through) — earlier rows are still used for trend/volatility lookback,
     so classification isn't starved of history right at the start of a
     confirmation period.
+
+    Rebalance decisions are classified using each check date's own CLOSE;
+    execution happens at the FOLLOWING trading day's open (see module
+    docstring). The portfolio value series is marked to market at each
+    day's CLOSE throughout.
     """
     state_weights = state_weights or DEFAULT_STATE_WEIGHTS
     all_dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     stable_close = stable_close.reindex(all_dates)
     leveraged_close = leveraged_close.reindex(all_dates)
+    stable_open = stable_open.reindex(all_dates)
+    leveraged_open = leveraged_open.reindex(all_dates)
     benchmark_df = pd.DataFrame({"close": stable_close})
 
     sim_dates = all_dates[all_dates >= start_date] if start_date is not None else all_dates
@@ -97,10 +116,24 @@ def simulate_regime_rotation(
     portfolio_values = []
     trade_log = []
     current_state = None
+    pending_rebalance = None  # (state, target_stable_w, target_lev_w) decided on the prior check day
 
     for i, date in enumerate(sim_dates):
-        stable_price = stable_close.loc[date]
-        lev_price = leveraged_close.loc[date]
+        stable_open_price = stable_open.loc[date]
+        lev_open_price = leveraged_open.loc[date]
+        stable_close_price = stable_close.loc[date]
+        lev_close_price = leveraged_close.loc[date]
+
+        if pending_rebalance is not None:
+            state, target_stable_w, target_lev_w = pending_rebalance
+            total_value = stable_shares * stable_open_price + leveraged_shares * lev_open_price
+            stable_shares = (total_value * target_stable_w) / stable_open_price
+            leveraged_shares = (total_value * target_lev_w) / lev_open_price
+            trade_log.append({
+                "date": date, "state": state,
+                "target_stable_w": target_stable_w, "target_lev_w": target_lev_w,
+            })
+            pending_rebalance = None
 
         if i % rebalance_check_days == 0:
             trend = classify_trend(stable_close, date, trend_lookback_days)
@@ -113,20 +146,15 @@ def simulate_regime_rotation(
                 state = f"{trend}_{vol_regime}"
                 target_stable_w, target_lev_w = state_weights.get(state, fallback_weights)
 
-            total_value = stable_shares * stable_price + leveraged_shares * lev_price
-            current_lev_w = (leveraged_shares * lev_price) / total_value if total_value else 0.0
+            total_value = stable_shares * stable_close_price + leveraged_shares * lev_close_price
+            current_lev_w = (leveraged_shares * lev_close_price) / total_value if total_value else 0.0
             drift_pct = abs(current_lev_w - target_lev_w) * 100
 
             if state != current_state or drift_pct > band_pct:
-                stable_shares = (total_value * target_stable_w) / stable_price
-                leveraged_shares = (total_value * target_lev_w) / lev_price
-                trade_log.append({
-                    "date": date, "state": state,
-                    "target_stable_w": target_stable_w, "target_lev_w": target_lev_w,
-                })
+                pending_rebalance = (state, target_stable_w, target_lev_w)
             current_state = state
 
-        portfolio_values.append(stable_shares * stable_price + leveraged_shares * lev_price)
+        portfolio_values.append(stable_shares * stable_close_price + leveraged_shares * lev_close_price)
 
     series = pd.Series(portfolio_values, index=sim_dates)
     return {
@@ -155,6 +183,8 @@ def build_state_weights(low_vol_lev_weight: float, high_vol_lev_weight: float) -
 def grid_search_state_weights(
     stable_close: pd.Series,
     leveraged_close: pd.Series,
+    stable_open: pd.Series,
+    leveraged_open: pd.Series,
     vol_threshold_pct: float,
     low_vol_weights: tuple[float, ...] = (0.5, 0.7, 0.85, 1.0),
     high_vol_weights: tuple[float, ...] = (0.2, 0.4, 0.6),
@@ -176,7 +206,7 @@ def grid_search_state_weights(
                 continue
             state_weights = build_state_weights(low, high)
             result = simulate_regime_rotation(
-                stable_close, leveraged_close, vol_threshold_pct=vol_threshold_pct,
+                stable_close, leveraged_close, stable_open, leveraged_open, vol_threshold_pct=vol_threshold_pct,
                 state_weights=state_weights, **simulate_kwargs,
             )
             series = result["series"]

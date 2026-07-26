@@ -31,9 +31,9 @@ LEVERAGED_TICKER = "TQQQ"
 LOOKBACK_DAYS = 4200
 DISCOVERY_FRAC = 0.6
 
-# Winning combo from run_regime_rotation_grid_search.py
+# Winning combo from run_regime_rotation_grid_search.py (corrected next-open timing)
 LOW_VOL_LEV_WEIGHT = 0.85
-HIGH_VOL_LEV_WEIGHT = 0.6
+HIGH_VOL_LEV_WEIGHT = 0.4
 
 DEFAULT_TREND_LOOKBACK = 200
 DEFAULT_VOL_LOOKBACK = 60
@@ -50,6 +50,8 @@ def main():
     data = fetch_historical([STABLE_TICKER, LEVERAGED_TICKER], lookback_days=LOOKBACK_DAYS)
     stable_close = data[STABLE_TICKER]["close"]
     leveraged_close = data[LEVERAGED_TICKER]["close"]
+    stable_open = data[STABLE_TICKER]["open"]
+    leveraged_open = data[LEVERAGED_TICKER]["open"]
     dates = stable_close.index.intersection(leveraged_close.index).sort_values()
 
     split_idx = int(len(dates) * DISCOVERY_FRAC)
@@ -65,7 +67,7 @@ def main():
         # (still discovery-only, no confirmation data used)
         vol_threshold = calibrate_threshold_from_discovery(benchmark_df, discovery_end, lookback_days=vol_lb)
         result = simulate_regime_rotation(
-            stable_close, leveraged_close, vol_threshold_pct=vol_threshold,
+            stable_close, leveraged_close, stable_open, leveraged_open, vol_threshold_pct=vol_threshold,
             state_weights=weights, trend_lookback_days=trend_lb, vol_lookback_days=vol_lb,
             rebalance_check_days=rebal_days, band_pct=BAND_PCT, start_date=confirmation_start,
         )

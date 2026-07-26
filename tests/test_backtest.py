@@ -846,6 +846,42 @@ def test_out_of_sample_significance_by_block_reports_both_weightings():
     assert set(result["weighting"].unique()) == {"trade_weighted", "equal_date_weighted"}
 
 
+def test_out_of_sample_significance_by_block_marks_exactly_one_primary_row_per_cell():
+    # Regression test for a real multiple-testing gap: reporting 2
+    # weightings x 3 block lengths per (period, direction) cell, all
+    # under the same Bonferroni threshold, invites picking whichever
+    # variant happens to look significant. Exactly one pre-specified row
+    # per cell (equal_date_weighted, middle/2x-hold_days block length)
+    # should be marked primary -- the only one meant to count as evidence.
+    hold_days = 5
+    days = 300
+    rng = np.random.default_rng(2)
+    returns = rng.normal(loc=0.0, scale=0.002, size=days)
+    volume = np.full(days, 1_000_000.0)
+    for idx in range(30, 150, 15):
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+        for i in range(1, 6):
+            returns[idx + i] = 0.02
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+    data = {"A": df, "B": df}
+
+    result = out_of_sample_significance_by_block(
+        data, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0, n_tests=2,
+    )
+    assert "primary" in result.columns
+    for (period, direction), group in result.groupby(["period", "direction"]):
+        primary_rows = group[group["primary"]]
+        assert len(primary_rows) == 1, (period, direction)
+        assert primary_rows.iloc[0]["weighting"] == "equal_date_weighted"
+        assert primary_rows.iloc[0]["block_length"] == hold_days * 2
+
+
 def test_out_of_sample_significance_by_block_tests_multiple_block_lengths():
     hold_days = 5
     days = 300
@@ -943,6 +979,7 @@ if __name__ == "__main__":
     test_bootstrap_daily_edge_significance_disagrees_with_trade_weighted_when_breadth_drives_it()
     test_bootstrap_daily_edge_significance_by_block_handles_too_few_dates()
     test_out_of_sample_significance_by_block_reports_both_weightings()
+    test_out_of_sample_significance_by_block_marks_exactly_one_primary_row_per_cell()
     test_out_of_sample_significance_by_block_tests_multiple_block_lengths()
     test_out_of_sample_significance_by_date_reports_n_dates()
     print("All backtest tests passed.")

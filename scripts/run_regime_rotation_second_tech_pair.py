@@ -1,16 +1,21 @@
 """
-Cross-pair generalization check for the trend+volatility regime rotation
-strategy. Everything so far (grid search, walk-forward, sensitivity) used
-QQQ/TQQQ — if the "beats 50/50 buy-and-hold" result only shows up on that
-one specific pair, that's a sign the earlier grid search curve-fit noise
-in QQQ/TQQQ's particular history rather than finding a real structural
-effect of leveraged-ETF decay + trend-following.
+Second tech-heavy generalization check for the trend+volatility regime
+rotation strategy. The SPY/UPRO cross-pair test (run_regime_rotation_
+cross_pair.py) failed -- the QQQ/TQQQ-tuned architecture, independently
+grid-searched and confirmed on SPY/UPRO's own data, underperformed plain
+50/50 buy-and-hold on both CAGR and drawdown there.
 
-This runs the EXACT same procedure (discovery-only vol threshold
-calibration, discovery-only state-weight grid search, confirm unchanged
-on holdout) on SPY/UPRO (S&P 500 / 3x S&P 500) instead. UPRO inception is
-2009-06-25, close to TQQQ's 2010-02-11, so the two backtests cover
-similar-length, similar-era history.
+Two live hypotheses for why QQQ/TQQQ worked but SPY/UPRO didn't:
+  (a) something specific to QQQ/Nasdaq-100's own price history
+  (b) tech-concentration -> higher realized volatility swings -> this
+      design happens to exploit THAT, not leverage rotation in general
+
+This tests (b) directly: SOXX (1x semiconductor index) / SOXL (3x
+semiconductor, Direxion) -- a DIFFERENT, even more concentrated
+tech-adjacent index than QQQ. If this pair ALSO beats its own 50/50
+buy-and-hold baseline out-of-sample, that's real evidence for (b). If it
+fails the same way SPY/UPRO did, that weakens (b) and points back toward
+"QQQ/TQQQ-specific, not yet understood why" as the more honest read.
 """
 import sys
 from pathlib import Path
@@ -28,8 +33,8 @@ from strategies.trend_vol_rotation import (
     simulate_regime_rotation,
 )
 
-STABLE_TICKER = "SPY"
-LEVERAGED_TICKER = "UPRO"
+STABLE_TICKER = "SOXX"
+LEVERAGED_TICKER = "SOXL"
 LOOKBACK_DAYS = 4200
 DISCOVERY_FRAC = 0.6
 TREND_LOOKBACK_DAYS = 200
@@ -103,6 +108,12 @@ def main():
          "max_drawdown_pct": round(baseline_5050["max_drawdown_pct"], 1)},
     ])
     print(comparison.to_string(index=False))
+
+    beats_both = (
+        cagr_pct(regime_series) > cagr_pct(baseline_5050["series"])
+        and max_drawdown_pct(regime_series) > baseline_5050["max_drawdown_pct"]
+    )
+    print(f"\nBeats 50/50 buy-and-hold on BOTH CAGR and drawdown: {beats_both}")
 
 
 if __name__ == "__main__":

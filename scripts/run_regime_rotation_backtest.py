@@ -41,6 +41,8 @@ def main():
 
     stable_close = data[STABLE_TICKER]["close"]
     leveraged_close = data[LEVERAGED_TICKER]["close"]
+    stable_open = data[STABLE_TICKER]["open"]
+    leveraged_open = data[LEVERAGED_TICKER]["open"]
     dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     print(f"Got {len(dates)} overlapping trading days.\n")
 
@@ -56,7 +58,7 @@ def main():
 
     # --- Confirmation-period result for the regime strategy ---
     regime_result = simulate_regime_rotation(
-        stable_close, leveraged_close,
+        stable_close, leveraged_close, stable_open, leveraged_open,
         vol_threshold_pct=vol_threshold,
         state_weights=DEFAULT_STATE_WEIGHTS,
         trend_lookback_days=TREND_LOOKBACK_DAYS,

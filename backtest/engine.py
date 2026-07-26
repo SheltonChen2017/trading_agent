@@ -1260,7 +1260,7 @@ def out_of_sample_significance_by_date(
 
 
 OUT_OF_SAMPLE_SIGNIFICANCE_BY_BLOCK_COLUMNS = [
-    "period", "direction", "weighting", "block_length", "n", "n_dates", "mean_edge_pct", "ci_low", "ci_high",
+    "period", "direction", "weighting", "block_length", "primary", "n", "n_dates", "mean_edge_pct", "ci_low", "ci_high",
     "p_value", "bonferroni_threshold", "significant",
 ]
 
@@ -1303,8 +1303,27 @@ def out_of_sample_significance_by_block(
     driving the trade-weighted result, not a real per-day edge — check
     both before trusting either alone.
 
-    Only the CONFIRMATION rows' `significant` flags are evidence the edge
-    is real — same caveat as out_of_sample_significance().
+    MULTIPLE-TESTING CAUTION: this reports up to 2 weightings x N block
+    lengths per (period, direction) cell, all under the SAME Bonferroni
+    threshold (from `n_tests`, which counts basket/signal/direction cells,
+    NOT weighting/block-length variants). Every row still gets its own
+    `significant` flag, but treating "any row passed" as evidence is a
+    researcher-degrees-of-freedom trap (flagged by independent code
+    review, 2026-07) — with enough variants inspected, one is likely to
+    look significant by chance even with zero real edge. The `primary`
+    column marks exactly ONE pre-specified row per (period, direction) —
+    `equal_date_weighted` at the middle default block length (2x
+    hold_days) — as the only row that counts as actual evidence; every
+    other row is a sensitivity/robustness check only, not an independent
+    test to cherry-pick from. Only the CONFIRMATION period's primary row's
+    `significant` flag is evidence the edge is real — same "confirmation
+    only" caveat as out_of_sample_significance().
+
+    Also note: the underlying p-value is a percentile-bootstrap
+    approximation (is 0 outside the resampled distribution's tails), not
+    a null-centered hypothesis test — treat it as a useful, honest
+    approximation alongside the confidence interval, not as an exact
+    p-value in the classical sense.
     """
     discovery, confirmation = _out_of_sample_own_ticker_detail(
         data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
@@ -1314,6 +1333,7 @@ def out_of_sample_significance_by_block(
 
     if block_lengths is None:
         block_lengths = (hold_days, hold_days * 2, hold_days * 3)
+    primary_block_length = block_lengths[min(1, len(block_lengths) - 1)]  # 2x hold_days by default
 
     threshold = bonferroni_threshold(n_tests, alpha=0.05)
 
@@ -1334,12 +1354,14 @@ def out_of_sample_significance_by_block(
                     ("trade_weighted", trade_weighted_stats),
                     ("equal_date_weighted", daily_weighted_stats),
                 ):
+                    is_primary = weighting == "equal_date_weighted" and block_length == primary_block_length
                     rows.append(
                         {
                             "period": period,
                             "direction": direction,
                             "weighting": weighting,
                             "block_length": block_length,
+                            "primary": is_primary,
                             "n": stats["n"],
                             "n_dates": stats["n_dates"],
                             "mean_edge_pct": stats["mean"],

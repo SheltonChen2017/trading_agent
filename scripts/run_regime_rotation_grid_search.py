@@ -41,6 +41,8 @@ def main():
     data = fetch_historical([STABLE_TICKER, LEVERAGED_TICKER], lookback_days=LOOKBACK_DAYS)
     stable_close = data[STABLE_TICKER]["close"]
     leveraged_close = data[LEVERAGED_TICKER]["close"]
+    stable_open = data[STABLE_TICKER]["open"]
+    leveraged_open = data[LEVERAGED_TICKER]["open"]
     dates = stable_close.index.intersection(leveraged_close.index).sort_values()
     print(f"Got {len(dates)} overlapping trading days.\n")
 
@@ -51,13 +53,16 @@ def main():
     benchmark_df = pd.DataFrame({"close": stable_close.reindex(dates)})
     vol_threshold = calibrate_threshold_from_discovery(benchmark_df, discovery_end, lookback_days=VOL_LOOKBACK_DAYS)
 
-    discovery_stable = stable_close.reindex(dates[dates <= discovery_end])
-    discovery_leveraged = leveraged_close.reindex(dates[dates <= discovery_end])
+    discovery_dates = dates[dates <= discovery_end]
+    discovery_stable_close = stable_close.reindex(discovery_dates)
+    discovery_leveraged_close = leveraged_close.reindex(discovery_dates)
+    discovery_stable_open = stable_open.reindex(discovery_dates)
+    discovery_leveraged_open = leveraged_open.reindex(discovery_dates)
 
     print("=== Grid search on DISCOVERY period only ===")
     grid_df = grid_search_state_weights(
-        discovery_stable, discovery_leveraged, vol_threshold_pct=vol_threshold,
-        trend_lookback_days=TREND_LOOKBACK_DAYS, vol_lookback_days=VOL_LOOKBACK_DAYS,
+        discovery_stable_close, discovery_leveraged_close, discovery_stable_open, discovery_leveraged_open,
+        vol_threshold_pct=vol_threshold, trend_lookback_days=TREND_LOOKBACK_DAYS, vol_lookback_days=VOL_LOOKBACK_DAYS,
         rebalance_check_days=REBALANCE_CHECK_DAYS, band_pct=BAND_PCT,
     )
     print(grid_df.to_string(index=False))
@@ -70,7 +75,7 @@ def main():
     print("=== Applying that SAME combo to the CONFIRMATION period ===")
     best_weights = build_state_weights(best_low, best_high)
     regime_result = simulate_regime_rotation(
-        stable_close, leveraged_close, vol_threshold_pct=vol_threshold,
+        stable_close, leveraged_close, stable_open, leveraged_open, vol_threshold_pct=vol_threshold,
         state_weights=best_weights, trend_lookback_days=TREND_LOOKBACK_DAYS,
         vol_lookback_days=VOL_LOOKBACK_DAYS, rebalance_check_days=REBALANCE_CHECK_DAYS,
         band_pct=BAND_PCT, start_date=confirmation_start,
@@ -86,8 +91,6 @@ def main():
          "n_trades": regime_result["n_trades"],
          "cagr_pct": round(cagr_pct(regime_series), 2),
          "max_drawdown_pct": round(max_drawdown_pct(regime_series), 1)},
-        {"strategy": "hand-picked default (70%/40%) from earlier run", "n_trades": 19,
-         "cagr_pct": 25.54, "max_drawdown_pct": -59.2},
         {"strategy": "buy & hold 50/50 (no rebalance)", "n_trades": 0,
          "cagr_pct": round(cagr_pct(baseline_5050["series"]), 2),
          "max_drawdown_pct": round(baseline_5050["max_drawdown_pct"], 1)},

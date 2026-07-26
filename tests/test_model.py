@@ -163,6 +163,29 @@ def test_build_features_with_benchmark_adds_regime_column():
     assert len(X) == len(y)
 
 
+def test_build_features_with_benchmark_gaps_keeps_features_aligned_with_labels():
+    # Regression test: build_features() used to drop rows missing the
+    # regime feature, then re-slice `ordered` using X's POST-reset index
+    # (0..n-1), which silently grabbed the first n labels instead of the
+    # labels actually belonging to the surviving rows whenever the drops
+    # weren't a trailing block. Punch two non-contiguous holes (start AND
+    # middle) so a leading-block-only fix wouldn't be enough to pass this.
+    results = _learnable_backtest_results(n=100)
+    benchmark_df = _constant_drift_benchmark("2022-11-01", periods=250, daily_return=0.001)
+
+    gap_dates = list(results["date"].iloc[0:10]) + list(results["date"].iloc[50:60])
+    benchmark_df = benchmark_df.drop(index=[d for d in gap_dates if d in benchmark_df.index])
+
+    X, y = build_features(results, benchmark_df=benchmark_df)
+
+    assert len(X) == 80
+    assert not X["market_trend_pct"].isna().any()
+    # win was defined as (return_zscore > 0) when the fixture was built —
+    # if features and labels were shuffled relative to each other, this
+    # invariant would break for the retained rows.
+    assert ((X["return_zscore"] > 0).astype(int) == y).all()
+
+
 def test_score_signals_rejects_mismatched_regime_usage():
     results = _learnable_backtest_results()
     benchmark_df = _constant_drift_benchmark("2022-11-01", periods=200, daily_return=0.001)
@@ -231,6 +254,7 @@ if __name__ == "__main__":
     test_compute_trailing_market_trend_none_without_enough_history()
     test_compute_trailing_market_trend_none_when_date_missing()
     test_build_features_with_benchmark_adds_regime_column()
+    test_build_features_with_benchmark_gaps_keeps_features_aligned_with_labels()
     test_score_signals_rejects_mismatched_regime_usage()
     test_score_signals_with_matching_benchmark_scores_correctly()
     print("All model tests passed.")

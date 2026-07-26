@@ -50,7 +50,16 @@
       "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_deep_history_check.py\")",
       "Bash(python tests/test_regime.py)",
       "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_regime_momentum_check.py\")",
-      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_momentum_by_date_check.py\")"
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_momentum_by_date_check.py\")",
+      "Bash(python tests/test_leverage_rotation.py)",
+      "Bash(python scripts/run_leverage_rotation_backtest.py)",
+      "Bash(python tests/test_trend_vol_rotation.py)",
+      "Bash(python scripts/run_regime_rotation_backtest.py)",
+      "Bash(python scripts/run_regime_rotation_grid_search.py)",
+      "Bash(python scripts/run_regime_rotation_walkforward.py)",
+      "Bash(python scripts/run_regime_rotation_sensitivity.py)",
+      "Bash(python scripts/run_regime_rotation_cross_pair.py)",
+      "Bash(python scripts/run_momentum_block_significance.py)"
     ]
   }
 }

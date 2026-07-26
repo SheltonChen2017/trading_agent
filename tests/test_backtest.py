@@ -16,7 +16,9 @@ import pandas as pd
 
 from backtest.engine import (
     bonferroni_threshold,
+    bootstrap_daily_edge_significance_by_block,
     bootstrap_edge_significance,
+    bootstrap_edge_significance_by_block,
     bootstrap_edge_significance_by_date,
     compare_signal_to_baseline,
     compare_signal_to_baseline_per_ticker,
@@ -26,6 +28,7 @@ from backtest.engine import (
     out_of_sample_baseline_comparison,
     out_of_sample_market_comparison,
     out_of_sample_significance,
+    out_of_sample_significance_by_block,
     out_of_sample_significance_by_date,
     run_backtest,
     run_baseline_forward_returns,
@@ -98,6 +101,51 @@ def test_slippage_reduces_net_return():
     with_slip = run_backtest({"TEST": df}, hold_days=hold_days, slippage_pct=0.01)
 
     assert with_slip.iloc[0]["net_return_pct"] < no_slip.iloc[0]["net_return_pct"]
+
+
+def test_next_open_entry_timing_uses_next_day_open_and_later_exit():
+    hold_days = 3
+    shock_index = 40
+    df = _series_with_shock_and_known_forward_move(
+        days=60, shock_index=shock_index, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    df = df.copy()
+    df["open"] = df["close"] + 5.0  # deliberately distinct from close so a same_close bug would be detectable
+
+    results = run_backtest({"TEST": df}, hold_days=hold_days, slippage_pct=0.0, entry_timing="next_open")
+    assert not results.empty
+    row = results.iloc[0]
+
+    expected_entry_price = round(float(df["open"].iloc[shock_index + 1]), 2)
+    expected_exit_price = round(float(df["open"].iloc[shock_index + 1 + hold_days]), 2)
+    assert abs(row["entry_price"] - expected_entry_price) < 0.01
+    assert abs(row["exit_price"] - expected_exit_price) < 0.01
+
+
+def test_next_open_needs_one_more_forward_day_than_same_close():
+    hold_days = 5
+    shock_index = 40
+    days = shock_index + hold_days + 1  # exactly enough forward data for same_close, one short for next_open
+    df = _series_with_shock_and_known_forward_move(
+        days=days, shock_index=shock_index, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+
+    same_close_results = run_backtest({"TEST": df}, hold_days=hold_days, slippage_pct=0.0, entry_timing="same_close")
+    next_open_results = run_backtest({"TEST": df}, hold_days=hold_days, slippage_pct=0.0, entry_timing="next_open")
+
+    assert not same_close_results.empty
+    assert next_open_results.empty
+
+
+def test_run_backtest_rejects_invalid_entry_timing():
+    df = _series_with_shock_and_known_forward_move(
+        days=60, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=5
+    )
+    try:
+        run_backtest({"TEST": df}, hold_days=5, entry_timing="bogus")
+        assert False, "expected ValueError for invalid entry_timing"
+    except ValueError:
+        pass
 
 
 def test_summarize_groups_by_direction():
@@ -399,6 +447,59 @@ def test_out_of_sample_baseline_comparison_splits_signals_by_period():
     assert result.loc[result["period"] == "confirmation", "signal_count"].sum() == 1
 
 
+def test_out_of_sample_baseline_comparison_uses_period_specific_baseline():
+    # Regression test: the own-ticker baseline used to be computed ONCE
+    # over the FULL window and reused for both periods, letting a
+    # discovery-period signal's edge be measured against a baseline that
+    # already reflects the confirmation period's own (different) typical
+    # return. Build a ticker with a clearly different background drift in
+    # each period (positive in discovery, negative in confirmation) and
+    # confirm the discovery row's implied baseline matches ONLY the
+    # discovery period's own average forward return, not the full window.
+    hold_days = 5
+    days = 200
+    regime_change_idx = 121  # exactly at the discovery_frac=0.6 split boundary for 200 dates
+    rng = np.random.default_rng(4)
+    returns = np.concatenate([
+        rng.normal(loc=0.004, scale=0.0005, size=regime_change_idx),
+        rng.normal(loc=-0.004, scale=0.0005, size=days - regime_change_idx),
+    ])
+    volume = np.full(days, 1_000_000.0)
+    shock_idx = 20  # well within the discovery (positive-drift) region
+    returns[shock_idx] = -0.08
+    volume[shock_idx] = 4_000_000.0
+
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+    data = {"TEST": df}
+
+    result = out_of_sample_baseline_comparison(data, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0)
+    discovery_row = result[(result["period"] == "discovery") & (result["direction"] == "dip")]
+    assert len(discovery_row) == 1
+
+    backtest_results = run_backtest(data, hold_days=hold_days, slippage_pct=0.0)
+    signal_return = backtest_results.loc[backtest_results["direction"] == "dip", "net_return_pct"].iloc[0]
+    implied_baseline_used = signal_return - discovery_row["mean_edge_vs_own_ticker_pct"].iloc[0]
+
+    split_date = dates[regime_change_idx - 1]
+    discovery_baseline = run_baseline_forward_returns(
+        {"TEST": df[df.index <= split_date]}, hold_days=hold_days, slippage_pct=0.0
+    )
+    full_baseline = run_baseline_forward_returns(data, hold_days=hold_days, slippage_pct=0.0)
+    expected_discovery_baseline = discovery_baseline["net_return_pct"].mean()
+    full_baseline_mean = full_baseline["net_return_pct"].mean()
+
+    # The two regimes must differ enough for this test to actually
+    # distinguish the fix from the old (leaky) behavior.
+    assert abs(expected_discovery_baseline - full_baseline_mean) > 0.5
+    assert abs(implied_baseline_used - expected_discovery_baseline) < 0.05
+    assert abs(implied_baseline_used - full_baseline_mean) > 0.3
+
+
 def test_out_of_sample_baseline_comparison_handles_no_signals():
     days = 60
     rng = np.random.default_rng(3)
@@ -522,14 +623,25 @@ def test_out_of_sample_significance_flags_discovery_only_effect_correctly():
     # and pure noise (no consistent effect) in the confirmation period.
     # Pooling the two would look "significant"; splitting them correctly
     # should show discovery significant and confirmation NOT significant.
-    days = 300
+    #
+    # Shocks are spaced widely (every 30 days) with plenty of quiet
+    # background days between them: since the own-ticker baseline is
+    # now computed separately PER PERIOD (see _out_of_sample_own_ticker_
+    # detail()), a baseline window starting just before a shock overlaps
+    # that shock's own return — tightly-packed shocks with too little
+    # quiet background data let this overlap dominate a period's small
+    # baseline sample and manufacture a spurious "significant" result
+    # that has nothing to do with the signal itself. Enough quiet days
+    # dilutes that contamination back to negligible, which is what a
+    # real backtest with hundreds of tickers/dates would also look like.
+    days = 600
     rng = np.random.default_rng(2)
     returns = rng.normal(loc=0.0, scale=0.002, size=days)
     volume = np.full(days, 1_000_000.0)
 
-    # Discovery-period shocks (well within the first 60% of 300 days):
+    # Discovery-period shocks (well within the first 60% of 600 days):
     # strong, consistent, low-noise bounce every time.
-    for idx in range(30, 150, 15):
+    for idx in range(30, 300, 30):
         returns[idx] = -0.08
         volume[idx] = 4_000_000.0
         for i in range(1, 6):
@@ -538,7 +650,7 @@ def test_out_of_sample_significance_flags_discovery_only_effect_correctly():
     # Confirmation-period shocks (within the last 40%): bounce direction
     # is random noise, no consistent effect.
     rng2 = np.random.default_rng(99)
-    for idx in range(200, 280, 15):
+    for idx in range(400, 580, 30):
         returns[idx] = -0.08
         volume[idx] = 4_000_000.0
         for i in range(1, 6):
@@ -623,6 +735,145 @@ def test_bootstrap_edge_significance_by_date_handles_too_few_dates():
     assert result["p_value"] is None
 
 
+def test_bootstrap_edge_significance_by_block_catches_serial_dependence_by_date_missed():
+    # 10 persistent "regimes" of 20 consecutive days each, every regime
+    # sharing a random offset (serial correlation across nearby dates,
+    # e.g. a persisting market regime or slow-turnover signal membership),
+    # plus shared within-day noise (cross-sectional correlation) and small
+    # per-ticker noise on top. The regime offsets average to ~0 by
+    # construction -- there is NO true edge here, only correlated noise.
+    # The true degrees of freedom is ~10 (the regimes), not 200 (the
+    # dates) or 2000 (the rows).
+    rng = np.random.default_rng(7)
+    n_regimes, regime_len, tickers_per_day = 10, 20, 10
+    regime_offsets = rng.normal(loc=0.0, scale=3.0, size=n_regimes)
+
+    dates, edges = [], []
+    day = 0
+    for r in range(n_regimes):
+        for _ in range(regime_len):
+            date = pd.Timestamp("2024-01-01") + pd.Timedelta(days=day)
+            day += 1
+            day_noise = rng.normal(0, 0.3)
+            for _ in range(tickers_per_day):
+                edges.append(regime_offsets[r] + day_noise + rng.normal(0, 0.05))
+                dates.append(date)
+    edges, dates = pd.Series(edges), pd.Series(dates)
+
+    by_date = bootstrap_edge_significance_by_date(edges, dates)
+    by_block = bootstrap_edge_significance_by_block(edges, dates, block_length=regime_len)
+
+    assert by_date["n_dates"] == n_regimes * regime_len
+    by_date_width = by_date["ci_high"] - by_date["ci_low"]
+    by_block_width = by_block["ci_high"] - by_block["ci_low"]
+    assert by_block_width > by_date_width * 2, (
+        "block bootstrap should give a MUCH wider CI once block length matches the true regime length"
+    )
+    # The by-date bootstrap alone falsely flags this pure-noise series as
+    # significant; block bootstrap should correctly fail to reject the null.
+    assert by_date["p_value"] < 0.01
+    assert by_block["p_value"] > 0.05
+
+
+def test_bootstrap_edge_significance_by_block_handles_too_few_dates():
+    edges = pd.Series([1.0, 2.0, 1.5, 2.5, 1.2])
+    dates = pd.Series(pd.bdate_range("2024-01-01", periods=5))
+    result = bootstrap_edge_significance_by_block(edges, dates, block_length=10)
+    assert result["mean"] is None
+    assert result["p_value"] is None
+
+
+def test_bootstrap_daily_edge_significance_disagrees_with_trade_weighted_when_breadth_drives_it():
+    # 10 "broad" dates (20 tickers each, edge +1.0) and 10 "narrow" dates
+    # (1 ticker each, edge -5.0). Trade-weighted mean is dominated by the
+    # broad dates (200 rows vs. 10) and comes out POSITIVE; equal-date
+    # weighting treats each of the 20 dates the same regardless of
+    # breadth and comes out NEGATIVE -- exactly the disagreement pattern
+    # that signals "breadth is driving the trade-weighted result."
+    dates, edges = [], []
+    for i in range(10):
+        date = pd.Timestamp("2024-01-01") + pd.Timedelta(days=i)
+        for _ in range(20):
+            dates.append(date)
+            edges.append(1.0)
+    for i in range(10, 20):
+        date = pd.Timestamp("2024-01-01") + pd.Timedelta(days=i)
+        dates.append(date)
+        edges.append(-5.0)
+    edges, dates = pd.Series(edges), pd.Series(dates)
+
+    trade_weighted = bootstrap_edge_significance_by_block(edges, dates, block_length=1)
+    daily_weighted = bootstrap_daily_edge_significance_by_block(edges, dates, block_length=1)
+
+    assert trade_weighted["mean"] > 0
+    assert daily_weighted["mean"] < 0
+    assert daily_weighted["n_dates"] == trade_weighted["n_dates"] == 20
+    assert daily_weighted["n"] == trade_weighted["n"] == 210
+
+
+def test_bootstrap_daily_edge_significance_by_block_handles_too_few_dates():
+    edges = pd.Series([1.0, 2.0, 1.5, 2.5, 1.2])
+    dates = pd.Series(pd.bdate_range("2024-01-01", periods=5))
+    result = bootstrap_daily_edge_significance_by_block(edges, dates, block_length=10)
+    assert result["mean"] is None
+    assert result["p_value"] is None
+
+
+def test_out_of_sample_significance_by_block_reports_both_weightings():
+    hold_days = 5
+    days = 300
+    rng = np.random.default_rng(2)
+    returns = rng.normal(loc=0.0, scale=0.002, size=days)
+    volume = np.full(days, 1_000_000.0)
+    for idx in range(30, 150, 15):
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+        for i in range(1, 6):
+            returns[idx + i] = 0.02
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+    data = {"A": df, "B": df}
+
+    result = out_of_sample_significance_by_block(
+        data, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0, n_tests=2,
+    )
+    assert not result.empty
+    assert "weighting" in result.columns
+    assert set(result["weighting"].unique()) == {"trade_weighted", "equal_date_weighted"}
+
+
+def test_out_of_sample_significance_by_block_tests_multiple_block_lengths():
+    hold_days = 5
+    days = 300
+    rng = np.random.default_rng(2)
+    returns = rng.normal(loc=0.0, scale=0.002, size=days)
+    volume = np.full(days, 1_000_000.0)
+    for idx in range(30, 150, 15):
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+        for i in range(1, 6):
+            returns[idx + i] = 0.02
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+    data = {"A": df, "B": df}
+
+    result = out_of_sample_significance_by_block(
+        data, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0, n_tests=2,
+    )
+    assert not result.empty
+    assert "block_length" in result.columns
+    tested_lengths = set(result["block_length"].unique())
+    assert tested_lengths == {hold_days, hold_days * 2, hold_days * 3}
+
+
 def test_out_of_sample_significance_by_date_reports_n_dates():
     hold_days = 5
     days = 300
@@ -653,6 +904,9 @@ if __name__ == "__main__":
     test_scores_a_winning_dip_reversion()
     test_scores_a_losing_up_fade()
     test_slippage_reduces_net_return()
+    test_next_open_entry_timing_uses_next_day_open_and_later_exit()
+    test_next_open_needs_one_more_forward_day_than_same_close()
+    test_run_backtest_rejects_invalid_entry_timing()
     test_summarize_groups_by_direction()
     test_empty_data_returns_empty_frame()
     test_multi_horizon_backtest_runs_each_hold_period_separately()
@@ -670,6 +924,7 @@ if __name__ == "__main__":
     test_out_of_sample_backtest_splits_signals_by_period()
     test_out_of_sample_backtest_handles_no_signals()
     test_out_of_sample_baseline_comparison_splits_signals_by_period()
+    test_out_of_sample_baseline_comparison_uses_period_specific_baseline()
     test_out_of_sample_baseline_comparison_handles_no_signals()
     test_out_of_sample_market_comparison_splits_signals_by_period()
     test_out_of_sample_market_comparison_handles_no_signals()
@@ -683,5 +938,11 @@ if __name__ == "__main__":
     test_out_of_sample_significance_n_tests_changes_threshold()
     test_bootstrap_edge_significance_by_date_accounts_for_clustering()
     test_bootstrap_edge_significance_by_date_handles_too_few_dates()
+    test_bootstrap_edge_significance_by_block_catches_serial_dependence_by_date_missed()
+    test_bootstrap_edge_significance_by_block_handles_too_few_dates()
+    test_bootstrap_daily_edge_significance_disagrees_with_trade_weighted_when_breadth_drives_it()
+    test_bootstrap_daily_edge_significance_by_block_handles_too_few_dates()
+    test_out_of_sample_significance_by_block_reports_both_weightings()
+    test_out_of_sample_significance_by_block_tests_multiple_block_lengths()
     test_out_of_sample_significance_by_date_reports_n_dates()
     print("All backtest tests passed.")

@@ -72,6 +72,7 @@ def run_backtest(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "same_close",
 ) -> pd.DataFrame:
     """
     Walk every date in the universe, run the live scanner as-of that date,
@@ -81,17 +82,39 @@ def run_backtest(
     evaluate, with columns: RESULT_COLUMNS (see above). `net_return_pct`
     already has simulated slippage deducted; `win` is True when
     net_return_pct > 0 under the "go long the signal" hypothesis.
+
+    `entry_timing`:
+      - "same_close" (default, backward-compatible): enter AND exit at
+        the signal date's own close — the timing used by every existing
+        result in this project so far. NOT realistically executable for
+        signals that need that day's own completed close/volume to
+        compute (true of every signal here) — you can't know the
+        finalized signal early enough to also transact at that exact
+        close, short of a market-on-close order submitted blind to the
+        final print.
+      - "next_open": enter at the NEXT trading day's open, exit at the
+        open `hold_days` trading days after that — signal known after
+        day t's close -> act at day t+1's open, a conservative,
+        actually-executable assumption. Flagged by independent code
+        review (2026-07); not yet used to re-validate any of this
+        project's existing findings — see [[project_execution_realism_gaps]]
+        in memory before comparing "next_open" results to prior
+        "same_close" ones as if they were the same claim.
     """
+    if entry_timing not in ("same_close", "next_open"):
+        raise ValueError(f"entry_timing must be 'same_close' or 'next_open', got {entry_timing!r}")
+
     kwargs = _resolve_scan_kwargs(scan_fn, scan_kwargs, return_z_threshold, volume_z_threshold)
     all_dates = sorted(set().union(*(df.index for df in data.values())))
     # Skip the front of history where no ticker has enough trailing data
-    # yet, and the tail where no ticker has `hold_days` of forward data —
-    # cheap early exit, scan_fn would just return empty anyway. This is a
+    # yet, and the tail where no ticker has enough forward data — cheap
+    # early exit, scan_fn would just return empty anyway. This is a
     # heuristic sized for the default scanner (ROLLING_WINDOW) — a slower
     # signal (e.g. momentum, 52-week breakout) needing more history simply
     # returns empty for the earlier dates in this range too; correctness
     # isn't affected, just a few wasted no-op scan calls.
-    usable_dates = all_dates[ROLLING_WINDOW : len(all_dates) - hold_days] if hold_days > 0 else all_dates[ROLLING_WINDOW:]
+    tail_buffer = hold_days + 1 if entry_timing == "next_open" else hold_days
+    usable_dates = all_dates[ROLLING_WINDOW : len(all_dates) - tail_buffer] if tail_buffer > 0 else all_dates[ROLLING_WINDOW:]
 
     rows = []
     for as_of in usable_dates:
@@ -104,11 +127,17 @@ def run_backtest(
             if as_of not in df.index:
                 continue
             idx = df.index.get_loc(as_of)
-            if idx + hold_days >= len(df):
+
+            if entry_timing == "same_close":
+                entry_idx, exit_idx, entry_col, exit_col = idx, idx + hold_days, "close", "close"
+            else:  # next_open
+                entry_idx, exit_idx, entry_col, exit_col = idx + 1, idx + 1 + hold_days, "open", "open"
+
+            if exit_idx >= len(df):
                 continue  # not enough forward history to score this one yet
 
-            entry_price = float(df["close"].iloc[idx])
-            exit_price = float(df["close"].iloc[idx + hold_days])
+            entry_price = float(df[entry_col].iloc[entry_idx])
+            exit_price = float(df[exit_col].iloc[exit_idx])
             raw_return_pct = (exit_price - entry_price) / entry_price * 100
             # Round-trip slippage: paid once entering, once exiting.
             net_return_pct = raw_return_pct - 2 * slippage_pct * 100
@@ -358,6 +387,71 @@ def _signals_with_own_ticker_baseline(
         results["edge_vs_own_ticker_pct"] = results["net_return_pct"] - results["own_ticker_baseline_pct"]
 
     return results
+
+
+def _split_data_by_date(data: dict[str, pd.DataFrame], split_date) -> tuple[dict, dict]:
+    """Slice each ticker's own price history at `split_date`: discovery
+    keeps rows on/before it, confirmation keeps rows after."""
+    discovery = {ticker: df[df.index <= split_date] for ticker, df in data.items()}
+    confirmation = {ticker: df[df.index > split_date] for ticker, df in data.items()}
+    return discovery, confirmation
+
+
+def _out_of_sample_own_ticker_detail(
+    data: dict[str, pd.DataFrame],
+    discovery_frac: float,
+    hold_days: int,
+    slippage_pct: float,
+    return_z_threshold: float,
+    volume_z_threshold: float,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Per-signal detail (run_backtest() output + own-ticker baseline edge),
+    already split into (discovery, confirmation) — with the baseline
+    computed SEPARATELY from each period's own price history, unlike
+    _signals_with_own_ticker_baseline() (which computes one baseline over
+    the FULL window and is fine for compare_signal_to_baseline_per_ticker(),
+    where no period separation is being claimed).
+
+    Reusing one full-window baseline for both periods would let a
+    discovery-period signal's edge be measured against a baseline that
+    already reflects the confirmation period's own returns (and vice
+    versa) — not trading look-ahead (this is a comparison statistic, not a
+    model feature), but it blurs the discovery/confirmation separation
+    every out_of_sample_* function exists to enforce, and can distort the
+    estimated edge if a ticker's typical return shifts between regimes.
+    The signals themselves (entry/exit prices, dates) are unaffected —
+    only which baseline mean gets subtracted changes.
+    """
+    results = run_backtest(
+        data, hold_days=hold_days, slippage_pct=slippage_pct,
+        return_z_threshold=return_z_threshold, volume_z_threshold=volume_z_threshold,
+        scan_fn=scan_fn, scan_kwargs=scan_kwargs,
+    )
+    if results.empty:
+        return results, results
+
+    split_date = _discovery_split_date(data, discovery_frac)
+    discovery_data, confirmation_data = _split_data_by_date(data, split_date)
+    discovery_results, confirmation_results = _split_by_date(results, split_date)
+
+    out = []
+    for period_results, period_data in ((discovery_results, discovery_data), (confirmation_results, confirmation_data)):
+        if period_results.empty:
+            out.append(period_results)
+            continue
+        baseline = run_baseline_forward_returns(period_data, hold_days=hold_days, slippage_pct=slippage_pct)
+        baseline_mean_by_ticker = (
+            baseline.groupby("ticker")["net_return_pct"].mean() if not baseline.empty else pd.Series(dtype=float)
+        )
+        period_results = period_results.copy()
+        period_results["own_ticker_baseline_pct"] = period_results["ticker"].map(baseline_mean_by_ticker)
+        period_results["edge_vs_own_ticker_pct"] = period_results["net_return_pct"] - period_results["own_ticker_baseline_pct"]
+        out.append(period_results)
+
+    return tuple(out)
 
 
 def compare_signal_to_baseline_per_ticker(
@@ -671,16 +765,16 @@ def out_of_sample_baseline_comparison(
     """
     Out-of-sample version of compare_signal_to_baseline_per_ticker(): the
     per-ticker-matched edge, split into a discovery period and a
-    confirmation (holdout) period never used to find anything.
+    confirmation (holdout) period never used to find anything — including
+    the baseline itself, computed SEPARATELY per period (see
+    _out_of_sample_own_ticker_detail()).
     """
-    detailed = _signals_with_own_ticker_baseline(
-        data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+    discovery, confirmation = _out_of_sample_own_ticker_detail(
+        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
     )
-    if detailed.empty:
+    if discovery.empty and confirmation.empty:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_BASELINE_COLUMNS)
 
-    split_date = _discovery_split_date(data, discovery_frac)
-    discovery, confirmation = _split_by_date(detailed, split_date)
     rows = []
     for period, subset in zip(OUT_OF_SAMPLE_PERIODS, (discovery, confirmation)):
         for direction in ("dip", "up"):
@@ -848,6 +942,138 @@ def bootstrap_edge_significance_by_date(
     }
 
 
+def bootstrap_edge_significance_by_block(
+    edge_values: pd.Series, dates: pd.Series, block_length: int, n_bootstrap: int = 2000, seed: int = 0
+) -> dict:
+    """
+    Like bootstrap_edge_significance_by_date(), but resamples BLOCKS of
+    `block_length` consecutive trading dates instead of independent
+    single dates — accounts for SERIAL dependence across nearby dates,
+    which by-date resampling alone still misses. Adjacent trading days
+    aren't independent when hold_days > 1 (their forward-return windows
+    overlap), when market regimes persist for stretches, or when a
+    cross-sectional signal (e.g. momentum) has slow turnover and keeps
+    flagging the same tickers for weeks. By-date resampling fixes the
+    WITHIN-day correlation (see bootstrap_edge_significance_by_date) but
+    still treats each day as an independent draw, which understates
+    uncertainty when nearby days are themselves correlated.
+
+    Uses a circular moving-block bootstrap: unique dates are treated as a
+    ring (wrapping from the last date back to the first) so every date
+    has an equal chance of starting a block, avoiding under-representing
+    dates near the edges of the sample.
+
+    There's no universally correct `block_length` — it should be at least
+    the signal's hold_days (the most direct source of serial dependence,
+    from overlapping return windows), but the right value also depends on
+    how persistent the signal's own membership/regime is. Test several
+    (see out_of_sample_significance_by_block(), which does this for you)
+    rather than trusting one arbitrary choice — a real effect should hold
+    up across nearby block lengths.
+    """
+    df = pd.DataFrame({"edge": pd.Series(edge_values).to_numpy(), "date": pd.Series(dates).to_numpy()})
+    df = df.dropna(subset=["edge"])
+    unique_dates = np.sort(df["date"].unique())
+    n_dates = len(unique_dates)
+
+    if len(df) < 5 or n_dates < max(5, block_length):
+        return {
+            "n": len(df), "n_dates": n_dates, "block_length": block_length,
+            "mean": None, "ci_low": None, "ci_high": None, "p_value": None,
+        }
+
+    grouped = {d: g["edge"].to_numpy() for d, g in df.groupby("date")}
+    n_blocks_needed = int(np.ceil(n_dates / block_length))
+
+    rng = np.random.default_rng(seed)
+    boot_means = np.empty(n_bootstrap)
+    for i in range(n_bootstrap):
+        block_starts = rng.integers(0, n_dates, size=n_blocks_needed)
+        sampled_dates = []
+        for start in block_starts:
+            sampled_dates.extend(unique_dates[(start + np.arange(block_length)) % n_dates])
+        sampled_dates = sampled_dates[:n_dates]  # trim so every bootstrap draw is the same total size
+        pooled = np.concatenate([grouped[d] for d in sampled_dates])
+        boot_means[i] = pooled.mean()
+
+    mean = df["edge"].mean()
+    ci_low, ci_high = np.percentile(boot_means, [2.5, 97.5])
+    p_value = min(1.0, 2 * min((boot_means <= 0).mean(), (boot_means >= 0).mean()))
+
+    return {
+        "n": len(df),
+        "n_dates": int(n_dates),
+        "block_length": block_length,
+        "mean": round(float(mean), 3),
+        "ci_low": round(float(ci_low), 3),
+        "ci_high": round(float(ci_high), 3),
+        "p_value": round(float(p_value), 4),
+    }
+
+
+def bootstrap_daily_edge_significance_by_block(
+    edge_values: pd.Series, dates: pd.Series, block_length: int, n_bootstrap: int = 2000, seed: int = 0
+) -> dict:
+    """
+    Equal-DATE-weighted counterpart to bootstrap_edge_significance_by_block().
+
+    bootstrap_edge_significance_by_block() (and the by-date/row-level
+    versions) pool every signal ROW together, so a date with 25 flagged
+    tickers has 25x the influence on the mean edge as a date with 1 —
+    appropriate if the estimand is "expected return per individual trade,
+    assuming every signal is traded independently at equal notional," but
+    NOT if the real constraint is a fixed daily capital/risk budget (that
+    date's 25 signals compete for the same capital; they don't each get
+    their own separate allocation). This instead first collapses to ONE
+    equal-weighted observation per date (the date's own mean edge), then
+    block-bootstraps THAT daily series — every trading decision date
+    counts once, regardless of how many tickers it flagged that day.
+
+    Compare this against bootstrap_edge_significance_by_block() on the
+    same data: if they disagree substantially, signal BREADTH (how many
+    tickers fire per date) is driving the trade-weighted result, not a
+    real per-day edge.
+    """
+    df = pd.DataFrame({"edge": pd.Series(edge_values).to_numpy(), "date": pd.Series(dates).to_numpy()})
+    df = df.dropna(subset=["edge"])
+    daily = df.groupby("date")["edge"].mean().sort_index()
+    unique_dates = daily.index.to_numpy()
+    n_dates = len(unique_dates)
+
+    if len(df) < 5 or n_dates < max(5, block_length):
+        return {
+            "n": len(df), "n_dates": n_dates, "block_length": block_length,
+            "mean": None, "ci_low": None, "ci_high": None, "p_value": None,
+        }
+
+    values = daily.to_numpy()
+    n_blocks_needed = int(np.ceil(n_dates / block_length))
+
+    rng = np.random.default_rng(seed)
+    boot_means = np.empty(n_bootstrap)
+    for i in range(n_bootstrap):
+        block_starts = rng.integers(0, n_dates, size=n_blocks_needed)
+        sampled = []
+        for start in block_starts:
+            sampled.extend(values[(start + np.arange(block_length)) % n_dates])
+        sampled = sampled[:n_dates]
+        boot_means[i] = np.mean(sampled)
+
+    mean = float(values.mean())
+    ci_low, ci_high = np.percentile(boot_means, [2.5, 97.5])
+    p_value = min(1.0, 2 * min((boot_means <= 0).mean(), (boot_means >= 0).mean()))
+
+    return {
+        "n": len(df),
+        "n_dates": int(n_dates),
+        "block_length": block_length,
+        "mean": round(mean, 3),
+        "ci_low": round(float(ci_low), 3),
+        "ci_high": round(float(ci_high), 3),
+        "p_value": round(float(p_value), 4),
+    }
+
+
 def bonferroni_threshold(n_tests: int, alpha: float = 0.05) -> float:
     """
     The Bonferroni-corrected significance threshold for `n_tests`
@@ -868,6 +1094,25 @@ def bonferroni_threshold(n_tests: int, alpha: float = 0.05) -> float:
     `out_of_sample_significance()` below for any claim that a signal's
     edge is actually real — it computes significance SEPARATELY per
     period and makes clear only the confirmation row counts as evidence.
+
+    SECOND CAUTION: `bootstrap_edge_significance()` and
+    `out_of_sample_significance()` both resample individual signal ROWS,
+    treating same-date signals as independent draws even though they're
+    typically correlated (driven by the same market-wide move) — use
+    `bootstrap_edge_significance_by_date()` / `out_of_sample_significance_
+    by_date()` instead (caught via `momentum`: row-level bootstrap said
+    p=0.000 significant in both periods; by-date revealed the 17,506/
+    14,000-row samples were really only ~912/700 independent trading days,
+    and significance evaporated).
+
+    THIRD CAUTION: by-date resampling still treats each TRADING DAY as
+    independent of every other day, which misses SERIAL dependence across
+    nearby dates — real when hold_days > 1 (overlapping return windows),
+    when market regimes persist, or when a signal has slow turnover (e.g.
+    momentum keeps flagging the same tickers for weeks). Use
+    `bootstrap_edge_significance_by_block()` / `out_of_sample_significance_
+    by_block()` for the most rigorous check available — it block-
+    resamples consecutive dates instead of independent ones.
     """
     if n_tests <= 0:
         return alpha
@@ -910,14 +1155,12 @@ def out_of_sample_significance(
     `baskets.basket_out_of_sample_significance()`), so the correction
     reflects everything actually being tested simultaneously.
     """
-    detailed = _signals_with_own_ticker_baseline(
-        data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+    discovery, confirmation = _out_of_sample_own_ticker_detail(
+        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
     )
-    if detailed.empty:
+    if discovery.empty and confirmation.empty:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS)
 
-    split_date = _discovery_split_date(data, discovery_frac)
-    discovery, confirmation = _split_by_date(detailed, split_date)
     threshold = bonferroni_threshold(n_tests, alpha=0.05)
 
     rows = []
@@ -981,14 +1224,12 @@ def out_of_sample_significance_by_date(
     Only the CONFIRMATION row's `significant` flag is evidence the edge
     is real — same caveat as out_of_sample_significance().
     """
-    detailed = _signals_with_own_ticker_baseline(
-        data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+    discovery, confirmation = _out_of_sample_own_ticker_detail(
+        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
     )
-    if detailed.empty:
+    if discovery.empty and confirmation.empty:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_BY_DATE_COLUMNS)
 
-    split_date = _discovery_split_date(data, discovery_frac)
-    discovery, confirmation = _split_by_date(detailed, split_date)
     threshold = bonferroni_threshold(n_tests, alpha=0.05)
 
     rows = []
@@ -1016,3 +1257,100 @@ def out_of_sample_significance_by_date(
     if not rows:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_BY_DATE_COLUMNS)
     return pd.DataFrame(rows)[OUT_OF_SAMPLE_SIGNIFICANCE_BY_DATE_COLUMNS]
+
+
+OUT_OF_SAMPLE_SIGNIFICANCE_BY_BLOCK_COLUMNS = [
+    "period", "direction", "weighting", "block_length", "n", "n_dates", "mean_edge_pct", "ci_low", "ci_high",
+    "p_value", "bonferroni_threshold", "significant",
+]
+
+
+def out_of_sample_significance_by_block(
+    data: dict[str, pd.DataFrame],
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+    block_lengths: tuple[int, ...] | None = None,
+    n_bootstrap: int = 2000,
+    n_tests: int = 2,
+) -> pd.DataFrame:
+    """
+    Serial-dependence-aware version of out_of_sample_significance_by_date():
+    same discovery/confirmation split, but resamples BLOCKS of consecutive
+    trading dates (bootstrap_edge_significance_by_block()) instead of
+    independent single dates — see the THIRD CAUTION in
+    bonferroni_threshold()'s docstring for why by-date resampling alone
+    still isn't enough when hold_days > 1 or the signal has slow turnover.
+
+    Tests several block lengths by default (hold_days, 2x, 3x) rather
+    than trusting one arbitrary choice — pass `block_lengths` to override.
+    A real effect should hold up across nearby block lengths, the same
+    way a real edge should hold up across nearby hold-period choices.
+
+    Reports BOTH weightings per (period, direction, block_length):
+    `weighting="trade_weighted"` (every signal row counts once, so a date
+    with 25 flagged tickers has 25x the influence of a 1-ticker date —
+    the right estimand if every signal is traded independently at equal
+    notional) and `weighting="equal_date_weighted"` (every trading date
+    counts once regardless of how many tickers it flagged — the right
+    estimand under a fixed daily capital/risk budget, where a date's
+    signals compete for the same allocation rather than each getting
+    their own). If the two disagree substantially, signal BREADTH is
+    driving the trade-weighted result, not a real per-day edge — check
+    both before trusting either alone.
+
+    Only the CONFIRMATION rows' `significant` flags are evidence the edge
+    is real — same caveat as out_of_sample_significance().
+    """
+    discovery, confirmation = _out_of_sample_own_ticker_detail(
+        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+    )
+    if discovery.empty and confirmation.empty:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_BY_BLOCK_COLUMNS)
+
+    if block_lengths is None:
+        block_lengths = (hold_days, hold_days * 2, hold_days * 3)
+
+    threshold = bonferroni_threshold(n_tests, alpha=0.05)
+
+    rows = []
+    for period, subset in zip(OUT_OF_SAMPLE_PERIODS, (discovery, confirmation)):
+        for direction in ("dip", "up"):
+            d = subset[subset["direction"] == direction] if not subset.empty else pd.DataFrame()
+            if d.empty:
+                continue
+            for block_length in block_lengths:
+                trade_weighted_stats = bootstrap_edge_significance_by_block(
+                    d["edge_vs_own_ticker_pct"], d["date"], block_length=block_length, n_bootstrap=n_bootstrap
+                )
+                daily_weighted_stats = bootstrap_daily_edge_significance_by_block(
+                    d["edge_vs_own_ticker_pct"], d["date"], block_length=block_length, n_bootstrap=n_bootstrap
+                )
+                for weighting, stats in (
+                    ("trade_weighted", trade_weighted_stats),
+                    ("equal_date_weighted", daily_weighted_stats),
+                ):
+                    rows.append(
+                        {
+                            "period": period,
+                            "direction": direction,
+                            "weighting": weighting,
+                            "block_length": block_length,
+                            "n": stats["n"],
+                            "n_dates": stats["n_dates"],
+                            "mean_edge_pct": stats["mean"],
+                            "ci_low": stats["ci_low"],
+                            "ci_high": stats["ci_high"],
+                            "p_value": stats["p_value"],
+                            "bonferroni_threshold": round(threshold, 6),
+                            "significant": stats["p_value"] is not None and stats["p_value"] < threshold,
+                        }
+                    )
+
+    if not rows:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_BY_BLOCK_COLUMNS)
+    return pd.DataFrame(rows)[OUT_OF_SAMPLE_SIGNIFICANCE_BY_BLOCK_COLUMNS]

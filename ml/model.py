@@ -87,8 +87,9 @@ def build_features(
         X[REGIME_FEATURE_COLUMN] = ordered["date"].apply(
             lambda d: compute_trailing_market_trend(benchmark_df, d, regime_lookback_days)
         )
-        X = X.dropna(subset=[REGIME_FEATURE_COLUMN]).reset_index(drop=True)
-        ordered = ordered.loc[X.index].reset_index(drop=True) if len(X) != len(ordered) else ordered
+        valid_mask = X[REGIME_FEATURE_COLUMN].notna()
+        X = X.loc[valid_mask].reset_index(drop=True)
+        ordered = ordered.loc[valid_mask].reset_index(drop=True)
 
     y = ordered["win"].astype(int)
     return X, y

@@ -15,10 +15,15 @@ import numpy as np
 import pandas as pd
 
 from backtest.engine import (
+    bonferroni_threshold,
+    bootstrap_edge_significance,
     compare_signal_to_baseline,
     compare_signal_to_baseline_per_ticker,
     compare_signal_to_market_index,
     compute_benchmark_forward_returns,
+    out_of_sample_backtest,
+    out_of_sample_baseline_comparison,
+    out_of_sample_market_comparison,
     run_backtest,
     run_baseline_forward_returns,
     run_multi_horizon_backtest,
@@ -323,6 +328,191 @@ def test_compare_signal_to_market_index_drops_signals_outside_benchmark_history(
     assert dip_row["signal_mean_return_pct"] is None
 
 
+def _series_with_two_shocks(
+    days: int, early_index: int, late_index: int, shock_return: float, forward_daily_return: float, hold_days: int
+) -> pd.DataFrame:
+    """Quiet series with two deliberate shocks (each followed by a known
+    drift) at different points in time, for testing date-based splitting."""
+    rng = np.random.default_rng(0)
+    returns = rng.normal(loc=0.0, scale=0.002, size=days)
+    volume = np.full(days, 1_000_000.0)
+    for idx in (early_index, late_index):
+        returns[idx] = shock_return
+        volume[idx] = 4_000_000.0
+        for i in range(1, hold_days + 1):
+            if idx + i < days:
+                returns[idx + i] = forward_daily_return
+
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    return pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+
+
+def test_out_of_sample_backtest_splits_signals_by_period():
+    hold_days = 5
+    days = 100
+    # Early shock at day 20 should land in "discovery"; late shock at day
+    # 80 should land in "confirmation" under a 0.6 discovery_frac split.
+    df = _series_with_two_shocks(
+        days=days, early_index=20, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    result = out_of_sample_backtest({"TEST": df}, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0)
+
+    assert set(result["period"]) == {"discovery", "confirmation"}
+    discovery_count = result.loc[result["period"] == "discovery", "count"].sum()
+    confirmation_count = result.loc[result["period"] == "confirmation", "count"].sum()
+    assert discovery_count == 1
+    assert confirmation_count == 1
+
+
+def test_out_of_sample_backtest_handles_no_signals():
+    days = 60
+    rng = np.random.default_rng(3)
+    close = 100 * np.cumprod(1 + rng.normal(0, 0.001, size=days))
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close, "low": close, "close": close, "volume": np.full(days, 1_000_000.0)},
+        index=dates,
+    )
+    result = out_of_sample_backtest({"TEST": df})
+    assert result.empty
+
+
+def test_out_of_sample_baseline_comparison_splits_signals_by_period():
+    hold_days = 5
+    days = 100
+    df = _series_with_two_shocks(
+        days=days, early_index=20, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    result = out_of_sample_baseline_comparison(
+        {"TEST": df}, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0
+    )
+
+    assert set(result["period"]) == {"discovery", "confirmation"}
+    assert result.loc[result["period"] == "discovery", "signal_count"].sum() == 1
+    assert result.loc[result["period"] == "confirmation", "signal_count"].sum() == 1
+
+
+def test_out_of_sample_baseline_comparison_handles_no_signals():
+    days = 60
+    rng = np.random.default_rng(3)
+    close = 100 * np.cumprod(1 + rng.normal(0, 0.001, size=days))
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close, "low": close, "close": close, "volume": np.full(days, 1_000_000.0)},
+        index=dates,
+    )
+    result = out_of_sample_baseline_comparison({"TEST": df})
+    assert result.empty
+
+
+def test_out_of_sample_market_comparison_splits_signals_by_period():
+    hold_days = 5
+    days = 100
+    df = _series_with_two_shocks(
+        days=days, early_index=20, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(days, 1.001))}, index=df.index)
+
+    result = out_of_sample_market_comparison(
+        {"TEST": df}, benchmark_df, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0
+    )
+
+    assert set(result["period"]) == {"discovery", "confirmation"}
+    assert result.loc[result["period"] == "discovery", "signal_count"].sum() == 1
+    assert result.loc[result["period"] == "confirmation", "signal_count"].sum() == 1
+
+
+def test_out_of_sample_market_comparison_handles_no_signals():
+    days = 60
+    rng = np.random.default_rng(3)
+    close = 100 * np.cumprod(1 + rng.normal(0, 0.001, size=days))
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close, "low": close, "close": close, "volume": np.full(days, 1_000_000.0)},
+        index=dates,
+    )
+    benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(days, 1.001))}, index=df.index)
+    result = out_of_sample_market_comparison({"TEST": df}, benchmark_df)
+    assert result.empty
+
+
+def test_bootstrap_edge_significance_detects_clear_positive_edge():
+    rng = np.random.default_rng(42)
+    values = pd.Series(rng.normal(loc=2.0, scale=0.5, size=50))
+    result = bootstrap_edge_significance(values, n_bootstrap=1000, seed=0)
+
+    assert result["n"] == 50
+    assert result["mean"] > 1.5
+    assert result["ci_low"] > 0, "a clearly positive edge should have a CI that excludes zero"
+    assert result["p_value"] < 0.05
+
+
+def test_bootstrap_edge_significance_does_not_flag_pure_noise():
+    rng = np.random.default_rng(42)
+    values = pd.Series(rng.normal(loc=0.0, scale=1.0, size=50))
+    result = bootstrap_edge_significance(values, n_bootstrap=1000, seed=0)
+
+    assert result["p_value"] > 0.1, "a zero-mean noise sample shouldn't look statistically significant"
+
+
+def test_bootstrap_edge_significance_handles_tiny_sample():
+    result = bootstrap_edge_significance(pd.Series([1.0, 2.0, 3.0]))
+    assert result["n"] == 3
+    assert result["mean"] is None
+    assert result["p_value"] is None
+
+
+def test_bonferroni_threshold_scales_with_test_count():
+    assert bonferroni_threshold(10, alpha=0.05) == 0.005
+    assert bonferroni_threshold(1, alpha=0.05) == 0.05
+    assert bonferroni_threshold(0, alpha=0.05) == 0.05
+
+
+def _flag_every_day_as_up(data, as_of=None, **_ignored):
+    """A trivial custom scan function (matching scan_dips_and_ups's output
+    contract) used only to prove run_backtest()'s scan_fn plumbing
+    actually invokes what it's given, instead of always calling the
+    default scanner regardless of what's passed."""
+    rows = []
+    for ticker, df in data.items():
+        row = df.loc[as_of] if as_of is not None else df.iloc[-1]
+        rows.append(
+            {
+                "ticker": ticker,
+                "date": row.name,
+                "close": row["close"],
+                "return_pct": 0.0,
+                "return_zscore": 9.0,
+                "volume_zscore": 9.0,
+                "direction": "up",
+            }
+        )
+    return pd.DataFrame(rows)
+
+
+def test_run_backtest_uses_custom_scan_fn():
+    days = 40
+    rng = np.random.default_rng(5)
+    close = 100 * np.cumprod(1 + rng.normal(0, 0.001, size=days))  # quiet -- default scanner would flag nothing
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close, "low": close, "close": close, "volume": np.full(days, 1_000_000.0)},
+        index=dates,
+    )
+    data = {"TEST": df}
+
+    default_results = run_backtest(data, hold_days=1, slippage_pct=0.0)
+    assert default_results.empty, "the default scanner shouldn't flag anything on this quiet series"
+
+    custom_results = run_backtest(data, hold_days=1, slippage_pct=0.0, scan_fn=_flag_every_day_as_up, scan_kwargs={})
+    assert not custom_results.empty, "the custom scan_fn should have flagged every usable day"
+    assert (custom_results["direction"] == "up").all()
+
+
 if __name__ == "__main__":
     test_scores_a_winning_dip_reversion()
     test_scores_a_losing_up_fade()
@@ -341,4 +531,15 @@ if __name__ == "__main__":
     test_compute_benchmark_forward_returns_matches_hand_computed_value()
     test_compare_signal_to_market_index_edge_matches_hand_computed_difference()
     test_compare_signal_to_market_index_drops_signals_outside_benchmark_history()
+    test_out_of_sample_backtest_splits_signals_by_period()
+    test_out_of_sample_backtest_handles_no_signals()
+    test_out_of_sample_baseline_comparison_splits_signals_by_period()
+    test_out_of_sample_baseline_comparison_handles_no_signals()
+    test_out_of_sample_market_comparison_splits_signals_by_period()
+    test_out_of_sample_market_comparison_handles_no_signals()
+    test_bootstrap_edge_significance_detects_clear_positive_edge()
+    test_bootstrap_edge_significance_does_not_flag_pure_noise()
+    test_bootstrap_edge_significance_handles_tiny_sample()
+    test_bonferroni_threshold_scales_with_test_count()
+    test_run_backtest_uses_custom_scan_fn()
     print("All backtest tests passed.")

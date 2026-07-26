@@ -16,17 +16,32 @@ here is basket-level backtest/baseline reporting (backtest/engine.py's
 per-basket functions) — enough to see whether any basket's signals look
 more promising than others, without pretending a model trained on a
 handful of per-basket signals is trustworthy.
+
+Every function below accepts an optional `scan_fn`/`scan_kwargs` pair
+(default: the original z-score dip/up scanner) so any signal module
+(signals/momentum.py, relative.py, breakout.py, pead.py) can be reported
+on per-basket using this exact same rigor toolkit.
 """
 from __future__ import annotations
+
+from typing import Callable
 
 import pandas as pd
 
 from backtest.engine import (
     MARKET_COMPARISON_COLUMNS,
+    OUT_OF_SAMPLE_BASELINE_COLUMNS,
+    OUT_OF_SAMPLE_MARKET_COLUMNS,
     PER_TICKER_COMPARISON_COLUMNS,
     SUMMARY_COLUMNS,
+    _signals_with_own_ticker_baseline,
+    bonferroni_threshold,
+    bootstrap_edge_significance,
     compare_signal_to_baseline_per_ticker,
     compare_signal_to_market_index,
+    out_of_sample_backtest,
+    out_of_sample_baseline_comparison,
+    out_of_sample_market_comparison,
     run_backtest,
     summarize_backtest,
 )
@@ -38,6 +53,7 @@ from config import (
     SLIPPAGE_PCT,
     VOLUME_Z_THRESHOLD,
 )
+from signals.scanner import scan_dips_and_ups
 
 
 def get_basket_tickers(basket_name: str) -> list[str]:
@@ -93,6 +109,8 @@ def summarize_by_basket(
     slippage_pct: float = SLIPPAGE_PCT,
     return_z_threshold: float = RETURN_Z_THRESHOLD,
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
 ) -> pd.DataFrame:
     """
     Quick per-basket overview: restrict `data` to each basket's tickers,
@@ -116,6 +134,8 @@ def summarize_by_basket(
             slippage_pct=slippage_pct,
             return_z_threshold=return_z_threshold,
             volume_z_threshold=volume_z_threshold,
+            scan_fn=scan_fn,
+            scan_kwargs=scan_kwargs,
         )
         summary = summarize_backtest(results)
         if summary.empty:
@@ -136,6 +156,8 @@ def compare_baskets_to_baseline(
     slippage_pct: float = SLIPPAGE_PCT,
     return_z_threshold: float = RETURN_Z_THRESHOLD,
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
 ) -> pd.DataFrame:
     """
     Per-basket version of compare_signal_to_baseline_per_ticker(): within
@@ -160,6 +182,8 @@ def compare_baskets_to_baseline(
             slippage_pct=slippage_pct,
             return_z_threshold=return_z_threshold,
             volume_z_threshold=volume_z_threshold,
+            scan_fn=scan_fn,
+            scan_kwargs=scan_kwargs,
         )
         if comparison.empty:
             continue
@@ -180,6 +204,8 @@ def compare_baskets_to_market_index(
     slippage_pct: float = SLIPPAGE_PCT,
     return_z_threshold: float = RETURN_Z_THRESHOLD,
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
 ) -> pd.DataFrame:
     """
     Per-basket version of compare_signal_to_market_index(): within each
@@ -202,6 +228,8 @@ def compare_baskets_to_market_index(
             slippage_pct=slippage_pct,
             return_z_threshold=return_z_threshold,
             volume_z_threshold=volume_z_threshold,
+            scan_fn=scan_fn,
+            scan_kwargs=scan_kwargs,
         )
         if comparison.empty:
             continue
@@ -212,3 +240,191 @@ def compare_baskets_to_market_index(
     if not rows:
         return pd.DataFrame(columns=columns)
     return pd.concat(rows, ignore_index=True)[columns]
+
+
+# --- Out-of-sample validation, per basket ---------------------------------
+# Every basket-level function above can be (and has been) rerun on the
+# SAME historical window while hunting for a promising basket/direction —
+# these split each basket's signals into a discovery period and a later
+# confirmation (holdout) period never used to identify anything. A
+# candidate basket should look similarly good in both, not just in
+# discovery (see backtest/engine.py's out-of-sample section).
+
+def out_of_sample_backtest_by_basket(
+    data: dict[str, pd.DataFrame],
+    basket_names: list[str] | None = None,
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """Per-basket version of out_of_sample_backtest()."""
+    rows = []
+    for basket_name in (basket_names if basket_names is not None else all_basket_names()):
+        basket_data = _basket_data(data, basket_name)
+        if not basket_data:
+            continue
+        result = out_of_sample_backtest(
+            basket_data,
+            discovery_frac=discovery_frac,
+            hold_days=hold_days,
+            slippage_pct=slippage_pct,
+            return_z_threshold=return_z_threshold,
+            volume_z_threshold=volume_z_threshold,
+            scan_fn=scan_fn,
+            scan_kwargs=scan_kwargs,
+        )
+        if result.empty:
+            continue
+        result.insert(0, "basket", basket_name)
+        rows.append(result)
+
+    columns = ["basket", "period"] + SUMMARY_COLUMNS
+    if not rows:
+        return pd.DataFrame(columns=columns)
+    return pd.concat(rows, ignore_index=True)[columns]
+
+
+def out_of_sample_baseline_by_basket(
+    data: dict[str, pd.DataFrame],
+    basket_names: list[str] | None = None,
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """Per-basket version of out_of_sample_baseline_comparison()."""
+    rows = []
+    for basket_name in (basket_names if basket_names is not None else all_basket_names()):
+        basket_data = _basket_data(data, basket_name)
+        if not basket_data:
+            continue
+        result = out_of_sample_baseline_comparison(
+            basket_data,
+            discovery_frac=discovery_frac,
+            hold_days=hold_days,
+            slippage_pct=slippage_pct,
+            return_z_threshold=return_z_threshold,
+            volume_z_threshold=volume_z_threshold,
+            scan_fn=scan_fn,
+            scan_kwargs=scan_kwargs,
+        )
+        if result.empty:
+            continue
+        result.insert(0, "basket", basket_name)
+        rows.append(result)
+
+    columns = ["basket"] + OUT_OF_SAMPLE_BASELINE_COLUMNS
+    if not rows:
+        return pd.DataFrame(columns=columns)
+    return pd.concat(rows, ignore_index=True)[columns]
+
+
+def out_of_sample_market_by_basket(
+    data: dict[str, pd.DataFrame],
+    benchmark_df: pd.DataFrame,
+    basket_names: list[str] | None = None,
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """Per-basket version of out_of_sample_market_comparison()."""
+    rows = []
+    for basket_name in (basket_names if basket_names is not None else all_basket_names()):
+        basket_data = _basket_data(data, basket_name)
+        if not basket_data:
+            continue
+        result = out_of_sample_market_comparison(
+            basket_data,
+            benchmark_df,
+            discovery_frac=discovery_frac,
+            hold_days=hold_days,
+            slippage_pct=slippage_pct,
+            return_z_threshold=return_z_threshold,
+            volume_z_threshold=volume_z_threshold,
+            scan_fn=scan_fn,
+            scan_kwargs=scan_kwargs,
+        )
+        if result.empty:
+            continue
+        result.insert(0, "basket", basket_name)
+        rows.append(result)
+
+    columns = ["basket"] + OUT_OF_SAMPLE_MARKET_COLUMNS
+    if not rows:
+        return pd.DataFrame(columns=columns)
+    return pd.concat(rows, ignore_index=True)[columns]
+
+
+# --- Statistical significance, per basket ---------------------------------
+
+def basket_significance(
+    data: dict[str, pd.DataFrame],
+    basket_names: list[str] | None = None,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    n_bootstrap: int = 2000,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """
+    For each basket/direction, bootstrap the per-ticker-baseline edge
+    (edge_vs_own_ticker_pct) to get a mean, 95% CI, and p-value, then flag
+    whether it survives a Bonferroni-corrected significance threshold
+    given how many basket/direction cells were tested at once (every
+    basket in `basket_names`, times 2 directions). A basket/direction only
+    gets `significant=True` if its p-value beats that corrected threshold
+    — a much stricter bar than the uncorrected 0.05 usually used for a
+    single test, appropriate here since many cells are being scanned
+    simultaneously looking for a candidate.
+    """
+    names = basket_names if basket_names is not None else all_basket_names()
+    n_tests = len(names) * 2  # 2 directions per basket
+    threshold = bonferroni_threshold(n_tests, alpha=0.05)
+
+    rows = []
+    for basket_name in names:
+        basket_data = _basket_data(data, basket_name)
+        if not basket_data:
+            continue
+        detailed = _signals_with_own_ticker_baseline(
+            basket_data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+        )
+        if detailed.empty:
+            continue
+
+        for direction in ("dip", "up"):
+            subset = detailed[detailed["direction"] == direction]
+            if subset.empty:
+                continue
+            stats = bootstrap_edge_significance(subset["edge_vs_own_ticker_pct"], n_bootstrap=n_bootstrap)
+            rows.append(
+                {
+                    "basket": basket_name,
+                    "direction": direction,
+                    "n": stats["n"],
+                    "mean_edge_pct": stats["mean"],
+                    "ci_low": stats["ci_low"],
+                    "ci_high": stats["ci_high"],
+                    "p_value": stats["p_value"],
+                    "bonferroni_threshold": round(threshold, 6),
+                    "significant": stats["p_value"] is not None and stats["p_value"] < threshold,
+                }
+            )
+
+    columns = ["basket", "direction", "n", "mean_edge_pct", "ci_low", "ci_high", "p_value", "bonferroni_threshold", "significant"]
+    if not rows:
+        return pd.DataFrame(columns=columns)
+    return pd.DataFrame(rows)[columns]

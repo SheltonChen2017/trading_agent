@@ -18,6 +18,7 @@ import pandas as pd
 
 from ml.model import (
     build_features,
+    compute_trailing_market_trend,
     load_model,
     save_model,
     score_signals,
@@ -124,6 +125,101 @@ def test_score_signals_on_empty_input():
     assert "win_probability" in scored.columns
 
 
+def _constant_drift_benchmark(start: str, periods: int, daily_return: float) -> pd.DataFrame:
+    dates = pd.bdate_range(start, periods=periods)
+    close = 100 * np.cumprod(np.full(periods, 1 + daily_return))
+    return pd.DataFrame({"close": close}, index=dates)
+
+
+def test_compute_trailing_market_trend_matches_hand_computed_value():
+    benchmark_df = _constant_drift_benchmark("2022-11-01", periods=100, daily_return=0.002)
+    as_of = benchmark_df.index[50]
+    trend = compute_trailing_market_trend(benchmark_df, as_of, lookback_days=20)
+
+    expected = (1.002**20 - 1) * 100
+    assert trend is not None
+    assert abs(trend - expected) < 0.01
+
+
+def test_compute_trailing_market_trend_none_without_enough_history():
+    benchmark_df = _constant_drift_benchmark("2022-11-01", periods=100, daily_return=0.002)
+    as_of = benchmark_df.index[5]  # fewer than 20 trading days of history before it
+    assert compute_trailing_market_trend(benchmark_df, as_of, lookback_days=20) is None
+
+
+def test_compute_trailing_market_trend_none_when_date_missing():
+    benchmark_df = _constant_drift_benchmark("2022-11-01", periods=100, daily_return=0.002)
+    missing_date = pd.Timestamp("1999-01-01")
+    assert compute_trailing_market_trend(benchmark_df, missing_date) is None
+
+
+def test_build_features_with_benchmark_adds_regime_column():
+    results = _learnable_backtest_results()
+    benchmark_df = _constant_drift_benchmark("2022-11-01", periods=200, daily_return=0.001)
+
+    X, y = build_features(results, benchmark_df=benchmark_df)
+    assert "market_trend_pct" in X.columns
+    assert not X["market_trend_pct"].isna().any()
+    assert len(X) == len(y)
+
+
+def test_score_signals_rejects_mismatched_regime_usage():
+    results = _learnable_backtest_results()
+    benchmark_df = _constant_drift_benchmark("2022-11-01", periods=200, daily_return=0.001)
+
+    X_with_regime, y = build_features(results, benchmark_df=benchmark_df)
+    model_with_regime = train_final_model(X_with_regime, y)
+
+    X_without_regime, y2 = build_features(results)
+    model_without_regime = train_final_model(X_without_regime, y2)
+
+    signals = pd.DataFrame(
+        {
+            "ticker": ["AAA"],
+            "date": [results["date"].iloc[-1]],
+            "close": [100.0],
+            "return_pct": [3.0],
+            "return_zscore": [2.5],
+            "volume_zscore": [2.0],
+            "direction": ["up"],
+        }
+    )
+
+    try:
+        score_signals(model_with_regime, signals)  # no benchmark_df passed
+        assert False, "expected ValueError: model trained with regime feature needs benchmark_df"
+    except ValueError:
+        pass
+
+    try:
+        score_signals(model_without_regime, signals, benchmark_df=benchmark_df)
+        assert False, "expected ValueError: model trained without regime feature shouldn't take benchmark_df"
+    except ValueError:
+        pass
+
+
+def test_score_signals_with_matching_benchmark_scores_correctly():
+    results = _learnable_backtest_results()
+    benchmark_df = _constant_drift_benchmark("2022-11-01", periods=200, daily_return=0.001)
+    X, y = build_features(results, benchmark_df=benchmark_df)
+    model = train_final_model(X, y)
+
+    signals = pd.DataFrame(
+        {
+            "ticker": ["AAA"],
+            "date": [results["date"].iloc[-1]],
+            "close": [100.0],
+            "return_pct": [3.0],
+            "return_zscore": [2.5],
+            "volume_zscore": [2.0],
+            "direction": ["up"],
+        }
+    )
+    scored = score_signals(model, signals, benchmark_df=benchmark_df)
+    assert "win_probability" in scored.columns
+    assert len(scored) == 1
+
+
 if __name__ == "__main__":
     test_build_features_shapes_and_columns()
     test_walk_forward_evaluate_learns_the_pattern()
@@ -131,4 +227,10 @@ if __name__ == "__main__":
     test_save_and_load_roundtrip_predicts_identically()
     test_score_signals_attaches_win_probability()
     test_score_signals_on_empty_input()
+    test_compute_trailing_market_trend_matches_hand_computed_value()
+    test_compute_trailing_market_trend_none_without_enough_history()
+    test_compute_trailing_market_trend_none_when_date_missing()
+    test_build_features_with_benchmark_adds_regime_column()
+    test_score_signals_rejects_mismatched_regime_usage()
+    test_score_signals_with_matching_benchmark_scores_correctly()
     print("All model tests passed.")

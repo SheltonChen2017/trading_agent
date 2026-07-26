@@ -1,14 +1,28 @@
 # Trading agent — data, signal, backtest, ML, risk, and paper execution
 
-An ML-driven trading agent built as one continuous pipeline: a data layer,
-a scanner that flags statistically unusual daily moves ("dips" and "ups")
-confirmed by volume, a walk-forward backtester that scores those signals'
-real forward returns, an ML model that learns a win probability for new
-signals, a risk manager that turns that into position sizes and
-stop-losses, and an Alpaca paper-trading execution layer. Every stage
-reuses the one before it unchanged — same scanner code the backtester
-replays date-by-date, same sizing logic the live agent and any future
-backtest-of-the-full-strategy would use.
+An ML-driven trading agent built as one continuous pipeline: a data
+layer, one or more **pluggable signal scanners**, a walk-forward
+backtester that scores those signals' real forward returns (plus
+out-of-sample validation and statistical significance testing), an ML
+model that learns a win probability for new signals, a risk manager that
+turns that into position sizes and stop-losses, and an Alpaca
+paper-trading execution layer. Every stage reuses the one before it
+unchanged — same scanner code the backtester replays date-by-date, same
+sizing logic the live agent and any future backtest-of-the-full-strategy
+would use.
+
+**Status (2026-07): the original scanner (below) does not hold up.**
+Under out-of-sample validation and Bonferroni-corrected significance
+testing against real data, 0 of 32 basket/direction cells were
+statistically distinguishable from noise, and the single best-looking
+result (`unstable` basket, "dip") completely inverted sign between the
+discovery and confirmation periods (+6.5% mean return became -3.2%). See
+"Known pitfalls" and the basket/out-of-sample sections below for the
+full story. Four alternative signals with better academic track records
+(momentum, relative/cross-sectional, 52-week breakout, PEAD) have since
+been added on the same rigor toolkit — see "Additional signals" below.
+None of them are proven yet either; they still need the same testing
+before being trusted.
 
 ## Structure
 
@@ -17,11 +31,16 @@ trading_agent/
 ├── config.py                    # universe, baskets, thresholds, risk params — the one place to tune things
 ├── baskets.py                    # overlapping themed groupings (semiconductors, ai_related, ...) + per-basket reports
 ├── data/
-│   └── market_data.py            # fetch_historical() [yfinance] and generate_synthetic() [offline dev]
+│   ├── market_data.py             # fetch_historical() [yfinance] and generate_synthetic() [offline dev]
+│   └── earnings_data.py           # fetch_earnings_surprises() [yfinance] — for the PEAD signal
 ├── signals/
-│   └── scanner.py                 # compute_features() + scan_dips_and_ups()
+│   ├── scanner.py                  # compute_features() + scan_dips_and_ups() — the ORIGINAL signal, does not hold up (see above)
+│   ├── momentum.py                 # scan_momentum() — cross-sectional 12-1 month momentum
+│   ├── relative.py                 # scan_relative_dips_and_ups() — same-day move ranked vs. the universe, not own history
+│   ├── breakout.py                 # scan_52_week_breakout() — new N-day high/low + volume
+│   └── pead.py                     # scan_pead() — post-earnings-announcement drift (event-driven, needs earnings_data)
 ├── backtest/
-│   └── engine.py                  # run_backtest() + summarize_backtest() — walk-forward signal scoring
+│   └── engine.py                  # run_backtest() etc. — pluggable via scan_fn/scan_kwargs, defaults to scan_dips_and_ups
 ├── ml/
 │   └── model.py                   # build_features(), walk_forward_evaluate(), train/save/load, score_signals()
 ├── risk/
@@ -29,20 +48,28 @@ trading_agent/
 ├── execution/
 │   └── alpaca_broker.py           # Alpaca paper/live trading — dormant until API keys are set
 ├── scripts/
-│   ├── run_scan_demo.py           # scanner only, synthetic data
-│   ├── run_backtest.py            # walk-forward backtest + summary
-│   ├── run_backtest_horizons.py   # backtest swept across several hold periods (1 day .. 1 month)
-│   ├── run_baseline_comparison.py # flagged signals vs. "hold any day" baseline (pooled + per-ticker)
-│   ├── run_basket_report.py       # backtest/baseline results broken out by themed basket
-│   ├── train_model.py             # backtest -> train -> evaluate -> save model
-│   └── run_agent.py               # full pipeline: scan -> score -> size -> (optional) execute
+│   ├── run_scan_demo.py               # scanner only, synthetic data
+│   ├── run_backtest.py                # walk-forward backtest + summary
+│   ├── run_backtest_horizons.py       # backtest swept across several hold periods (1 day .. 1 month)
+│   ├── run_baseline_comparison.py     # flagged signals vs. "hold any day" baseline (pooled + per-ticker)
+│   ├── run_basket_report.py           # backtest/baseline/market results broken out by themed basket
+│   ├── run_candidate_horizon_sweep.py # multi-horizon sweep scoped to the current candidate baskets
+│   ├── run_out_of_sample_check.py     # discovery vs. confirmation (holdout) check for candidate baskets
+│   ├── run_significance_check.py      # bootstrap significance + multiple-comparisons correction, all baskets
+│   ├── run_new_signals_report.py      # backtest + out-of-sample check for momentum/relative/breakout
+│   ├── train_model.py                 # backtest -> train -> evaluate -> save model
+│   └── run_agent.py                   # full pipeline: scan -> score -> size -> (optional) execute
 └── tests/
     ├── test_scanner.py
     ├── test_backtest.py
     ├── test_model.py
     ├── test_risk.py
     ├── test_alpaca_broker.py
-    └── test_baskets.py
+    ├── test_baskets.py
+    ├── test_momentum.py
+    ├── test_relative.py
+    ├── test_breakout.py
+    └── test_pead.py
 ```
 
 ## Run it
@@ -88,6 +115,61 @@ date — the same function that scans "today" live is what the backtester
 calls for every historical date, so there's one code path and no drift
 between what's validated and what's run.
 
+**Additional signals (2026-07)** — the original scanner didn't survive
+out-of-sample testing (see status note above), so four alternatives with
+better academic track records were added, all sharing the exact same
+output column contract as `scan_dips_and_ups()` (`ticker, date, close,
+return_pct, return_zscore, volume_zscore, direction`) so every backtest/
+baseline/market/out-of-sample/significance tool in `backtest/engine.py`
+works with any of them unchanged — pass `scan_fn=<the new function>`
+(and `scan_kwargs` for its parameters) instead of relying on the default:
+
+- **`signals/momentum.py`** (`scan_momentum`) — cross-sectional "12-1
+  month" momentum (Jegadeesh & Titman 1993): ranks the whole universe by
+  trailing return, skipping the most recent month, and flags the top
+  decile as `"up"` (long continuation). The most replicated anomaly in
+  academic finance. The `"dip"` leg (bottom decile) is included only for
+  symmetry with this project's dip/up structure — academically that's
+  usually the *short* leg, not a long candidate, so treat `"dip"` signals
+  from this scanner with extra skepticism. `return_zscore` here is a
+  **cross-sectional** z-score (vs. the universe that day), not vs. the
+  stock's own history; `volume_zscore` is left `NaN` (momentum isn't
+  volume-gated).
+- **`signals/relative.py`** (`scan_relative_dips_and_ups`) — the direct
+  fix for what broke the original scanner: flags a stock when today's
+  move is unusual **relative to the rest of the universe that same day**
+  (cross-sectional z-score), not relative to its own history, so a
+  market-wide move can't by itself flag everything the way the original
+  design could.
+- **`signals/breakout.py`** (`scan_52_week_breakout`) — new
+  `BREAKOUT_LOOKBACK_DAYS`-day high/low with volume confirmation. The
+  `"up"` (new-high continuation) leg is the better-supported half; `"dip"`
+  (new-low continuation) is weaker evidence, included for symmetry.
+- **`signals/pead.py`** (`scan_pead`) — Post-Earnings-Announcement Drift
+  (Bernard & Thomas 1989): flags a stock on the trading day its earnings
+  surprise should hit if the surprise exceeds
+  `PEAD_SURPRISE_THRESHOLD_PCT`. Arguably the most robust anomaly in the
+  literature, but **event-driven, not daily** — needs
+  `data/earnings_data.fetch_earnings_surprises()` (real tickers only, no
+  synthetic equivalent) and has a second required argument
+  (`earnings_data`), so bind it first: `scan_fn=partial(scan_pead,
+  earnings_data=earnings)`. yfinance's free earnings calendar goes back
+  further than expected in practice (~2020+ for large caps, ~24 quarters)
+  but that's still only ~4 events/ticker/year — a much smaller, noisier
+  sample than the daily signals, so treat PEAD results with even more
+  small-sample caution than the rest of this project. Earnings timestamps
+  at/after market close are shifted to the next trading day
+  (`effective_date`), with weekend/holiday spillover handled so a single
+  event fires exactly once, not on every subsequent day.
+
+None of these four are proven — they're recommendations with better
+starting evidence than the original scanner, not validated replacements.
+Run `scripts/run_new_signals_report.py` (synthetic data, momentum/
+relative/breakout) to sanity-check the plumbing, then point any of them
+at real data and run them through the SAME out-of-sample +
+`basket_significance()` toolkit that ruled out the original scanner
+before trusting anything they find.
+
 **Backtest** — `run_backtest()` walks every date in the universe, calls
 the live scanner as-of that date, and measures each flagged signal's
 actual close-to-close return over `BACKTEST_HOLD_DAYS`, minus simulated
@@ -115,13 +197,16 @@ setting:
   removing that confound — trust the per-ticker version over the pooled
   one when they disagree.
 
-**Baskets** — `config.BASKETS` groups the universe into overlapping
-themes: `tech`, `semiconductors`, `ai_related`, `unstable` (curated:
-`TSLA`, `SPCX`), `rare_earth_minerals` (`MP`, `REMX`), `fintech` (`V`,
-`MA`, `PYPL`, `XYZ`), plus the original sector groupings
-(`mega_cap_tech`, `consumer_discretionary`, `healthcare`, `financials`,
-etc.). A ticker can belong to more than one basket on purpose — TSLA is
-both `ai_related` and `consumer_discretionary` and `unstable`.
+**Baskets** — `config.BASKETS` groups the 104-ticker universe (expanded
+2026-07 from 48 specifically to thicken thin baskets) into 16 overlapping
+themes: `tech` (25), `semiconductors` (9), `ai_related` (12), `unstable`
+(6: `TSLA`, `SPCX`, `PLTR`, `COIN`, `MSTR`, `RIVN`), `rare_earth_minerals`
+(5: `MP`, `REMX`, `TMC`, `UUUU`, `LAC`), `fintech` (9), plus the original
+sector groupings (`mega_cap_tech`, `consumer_discretionary`, `healthcare`,
+`financials`, `energy`, `industrials`, `communication_media`,
+`utilities`, `software`, `consumer_staples`), all similarly widened. A
+ticker can belong to more than one basket on purpose — TSLA is both
+`ai_related` and `consumer_discretionary` and `unstable`.
 `baskets.compute_high_volatility_basket()` adds one basket computed
 empirically from realized daily-return std, as a cross-check against the
 hand-curated `unstable` list rather than a replacement for it.
@@ -134,11 +219,16 @@ per-signal sample further, and the pooled 43-ticker model's own
 walk-forward accuracy (~48%, close to coin-flip) is a reason for caution
 about fragmenting the data more, not a green light to do it per basket.
 Basket-level backtest stats are there to see which themes look more
-promising before that investment is worth making. With 13 baskets × 2
+promising before that investment is worth making. With 16 baskets × 2
 directions tested at once, watch for the **multiple comparisons
 problem**: testing that many combinations means a couple will look
 unusually good or bad by pure chance even with zero real edge anywhere —
-treat any single standout basket with extra skepticism, not less.
+treat any single standout basket with extra skepticism, not less. This
+project's own history proves the point: `rare_earth_minerals` "up"
+looked like the best result in the whole project at 16 signals (2
+tickers), then weakened sharply once the basket was widened to 5 tickers
+and 58 signals — exactly the small-sample-luck failure mode the rest of
+this section warns about.
 
 `SPCX` (confirmed by the user, 2026-07, to be a real recent IPO — flagged
 here rather than assumed, since it postdates this project's knowledge
@@ -154,13 +244,45 @@ the three baselines this project computes: beat your own history → beat
 your own ticker's typical day → beat the whole market on that specific
 day.
 
+**Out-of-sample validation (discovery vs. confirmation)** — every
+comparison above can be, and has been, rerun on the same historical
+window while hunting for a promising basket, which risks mistaking noise
+for a finding (see the `rare_earth_minerals` example above).
+`out_of_sample_backtest()` / `out_of_sample_baseline_comparison()` /
+`out_of_sample_market_comparison()` (and their per-basket versions in
+`baskets.py`) split signals by calendar date — using the FULL universe's
+date range, not the sparse signal dates, so a handful of signals can't
+skew where the split lands — into an earlier **discovery** period and a
+later **confirmation** (holdout) period never used to identify anything.
+A real edge should look similarly positive in both; one that's strong in
+discovery and weak/flipped in confirmation was very likely noise. Run via
+`scripts/run_out_of_sample_check.py`.
+
+**Statistical significance** — a mean edge alone doesn't say whether it's
+distinguishable from noise. `bootstrap_edge_significance()` bootstraps a
+95% confidence interval and p-value for an edge distribution (resampling,
+not a parametric t-test, since trade returns are often skewed/fat-tailed).
+`bonferroni_threshold()` corrects that significance bar for how many
+basket/direction cells are being tested at once — with N cells tested
+simultaneously, use alpha/N instead of alpha, since some cells are
+expected to look "significant" by chance alone otherwise.
+`baskets.basket_significance()` applies both together, per basket/
+direction. Run via `scripts/run_significance_check.py`.
+
 **ML model** — `ml/model.py` trains a `RandomForestClassifier` on
 backtest output to predict the probability a new signal is a winner,
 using features known at signal time (`return_zscore`, `volume_zscore`,
-direction). Evaluation is **walk-forward** (`TimeSeriesSplit`), not a
-random split — training only ever precedes its test fold chronologically.
+direction, and optionally a **market-regime feature** —
+`compute_trailing_market_trend()` computes the benchmark's own trailing
+return as of each signal's date, purely backward-looking so it can't leak
+future information; pass `benchmark_df` to `build_features()`/
+`score_signals()` to include it — omit it to keep the original 3-feature
+model). Evaluation is **walk-forward** (`TimeSeriesSplit`), not a random
+split — training only ever precedes its test fold chronologically.
 `score_signals()` attaches a `win_probability` column to fresh scanner
-output.
+output; it raises a clear error if the benchmark_df usage doesn't match
+what the model was trained with, rather than silently scoring on the
+wrong feature set.
 
 **Risk manager** — `size_position()` sizes a single signal at
 `MAX_POSITION_PCT` of equity, scaled down by the model's `win_probability`

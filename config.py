@@ -28,11 +28,35 @@ UNIVERSE = [
     "DUK", "NEE",
     # Rare earth minerals / critical materials (thin sector — few large,
     # liquid, US-listed pure plays exist)
-    "MP", "REMX",
+    "MP", "REMX", "TMC", "UUUU", "LAC",
     # Fintech (V/MA also live in "financials" — deliberate overlap)
-    "PYPL", "XYZ",
+    "PYPL", "XYZ", "COIN", "SOFI", "AFRM", "INTU", "FISV",
     # Confirmed by user 2026-07: SpaceX's real, current ticker post-IPO
     "SPCX",
+    # 2026-07 basket expansion — added to thicken thin baskets (previously
+    # 2-6 tickers each) so per-basket backtest stats are less noise-prone.
+    # Additional semiconductors
+    "AVGO", "MU", "AMAT", "LRCX",
+    # Additional AI-narrative / high-beta names
+    "PLTR", "MSTR", "RIVN",
+    # Additional software
+    "NOW", "WDAY", "PANW", "SNOW",
+    # Additional energy
+    "COP", "SLB", "OXY", "PSX", "MPC",
+    # Additional industrials
+    "HON", "GE", "LMT", "UPS", "DE",
+    # Additional utilities
+    "SO", "D", "AEP", "EXC",
+    # Additional communication/media
+    "CMCSA", "T", "VZ", "WBD",
+    # Additional consumer staples
+    "PG", "CL", "MDLZ", "KHC",
+    # Additional consumer discretionary
+    "LOW", "TGT", "BKNG", "ABNB", "UBER",
+    # Additional healthcare
+    "MRK", "TMO", "ABT", "CVS", "BMY",
+    # Additional financials
+    "MS", "C", "AXP", "SCHW", "BLK",
 ]
 
 # Reference benchmarks — NOT part of UNIVERSE, never scanned for dip/up
@@ -65,25 +89,33 @@ BASKETS = {
     "tech": [
         "AAPL", "MSFT", "GOOGL", "META", "AMZN", "NVDA", "AMD", "INTC",
         "QCOM", "TXN", "ORCL", "CRM", "ADBE", "CSCO", "IBM", "NFLX",
+        "AVGO", "MU", "AMAT", "LRCX", "PLTR", "NOW", "WDAY", "PANW", "SNOW",
     ],
-    "semiconductors": ["NVDA", "AMD", "INTC", "QCOM", "TXN"],
-    "ai_related": ["NVDA", "MSFT", "GOOGL", "META", "AMD", "ORCL", "CRM", "TSLA", "SPCX"],
-    "unstable": ["TSLA", "SPCX"],  # curated per user's own examples; cross-check against
+    "semiconductors": ["NVDA", "AMD", "INTC", "QCOM", "TXN", "AVGO", "MU", "AMAT", "LRCX"],
+    "ai_related": [
+        "NVDA", "MSFT", "GOOGL", "META", "AMD", "ORCL", "CRM", "TSLA", "SPCX",
+        "PLTR", "AMZN", "IBM",
+    ],
+    "unstable": ["TSLA", "SPCX", "PLTR", "COIN", "MSTR", "RIVN"],  # curated per user's own
+                                    # examples; cross-check against
                                     # baskets.compute_high_volatility_basket(), which is
                                     # computed from real realized volatility, not picked by hand
-    "rare_earth_minerals": ["MP", "REMX"],
-    "fintech": ["V", "MA", "PYPL", "XYZ"],
-    # Original sector groupings, kept for the broader universe backtests
-    "mega_cap_tech": ["AAPL", "MSFT", "GOOGL", "META", "AMZN", "NVDA"],
-    "software": ["MSFT", "ORCL", "CRM", "ADBE", "IBM"],
-    "consumer_staples": ["KO", "PEP", "WMT", "COST"],
-    "consumer_discretionary": ["AMZN", "NKE", "MCD", "SBUX", "HD", "TSLA", "DIS", "NFLX"],
-    "healthcare": ["JNJ", "PFE", "UNH", "LLY", "ABBV"],
-    "financials": ["JPM", "BAC", "WFC", "GS", "V", "MA"],
-    "energy": ["XOM", "CVX"],
-    "industrials": ["BA", "CAT"],
-    "communication_media": ["DIS", "NFLX", "GOOGL", "META"],
-    "utilities": ["DUK", "NEE"],
+    "rare_earth_minerals": ["MP", "REMX", "TMC", "UUUU", "LAC"],
+    "fintech": ["V", "MA", "PYPL", "XYZ", "COIN", "SOFI", "AFRM", "INTU", "FISV"],
+    # Original sector groupings, expanded alongside the user-requested ones
+    "mega_cap_tech": ["AAPL", "MSFT", "GOOGL", "META", "AMZN", "NVDA", "AVGO"],
+    "software": ["MSFT", "ORCL", "CRM", "ADBE", "IBM", "NOW", "WDAY", "PANW", "SNOW"],
+    "consumer_staples": ["KO", "PEP", "WMT", "COST", "PG", "CL", "MDLZ", "KHC"],
+    "consumer_discretionary": [
+        "AMZN", "NKE", "MCD", "SBUX", "HD", "TSLA", "DIS", "NFLX",
+        "LOW", "TGT", "BKNG", "ABNB", "UBER",
+    ],
+    "healthcare": ["JNJ", "PFE", "UNH", "LLY", "ABBV", "MRK", "TMO", "ABT", "CVS", "BMY"],
+    "financials": ["JPM", "BAC", "WFC", "GS", "V", "MA", "MS", "C", "AXP", "SCHW", "BLK"],
+    "energy": ["XOM", "CVX", "COP", "SLB", "OXY", "PSX", "MPC"],
+    "industrials": ["BA", "CAT", "HON", "GE", "LMT", "UPS", "DE"],
+    "communication_media": ["DIS", "NFLX", "GOOGL", "META", "CMCSA", "T", "VZ", "WBD"],
+    "utilities": ["DUK", "NEE", "SO", "D", "AEP", "EXC"],
 }
 
 # Size of the "high_volatility" basket, computed empirically from realized
@@ -111,6 +143,42 @@ HORIZON_LABELS = {1: "1 day", 3: "3 days", 5: "1 week", 10: "2 weeks", 21: "1 mo
 # --- ML model -----------------------------------------------------------
 MODEL_PATH = "ml/model.joblib"   # where the trained classifier is persisted
 MIN_WIN_PROBABILITY = 0.5        # signals scored below this by the model are not sized/traded
+# Trailing window (in trading days) used for the optional market-regime
+# feature — "was the broad market trending up or down heading into this
+# signal?" Purely backward-looking (as-of the signal's own date), so it's
+# safe to use as a feature without introducing look-ahead bias.
+REGIME_LOOKBACK_DAYS = 20
+
+# --- Additional signals (2026-07 signal diversification) ----------------
+# The original dip/up scanner (signals/scanner.py) didn't hold up under
+# out-of-sample validation or corrected significance testing (see README).
+# These four alternative signals plug into the same backtest/baseline/
+# market/out-of-sample/significance toolkit via run_backtest()'s
+# scan_fn/scan_kwargs — none of them are proven either; they're
+# recommendations with better academic track records, still needing the
+# same rigorous testing before being trusted.
+
+# Cross-sectional momentum (signals/momentum.py) — rank the universe by
+# trailing return, skipping the most recent month to avoid short-term
+# reversal contamination (the classic "12-1 month" construction).
+MOMENTUM_LOOKBACK_DAYS = 126   # ~6 trading months
+MOMENTUM_SKIP_DAYS = 21        # skip the most recent ~month
+MOMENTUM_TOP_PCT = 0.2         # long the top 20% by trailing momentum
+MOMENTUM_BOTTOM_PCT = 0.2      # "dip" leg — NOT the well-evidenced half of the
+                               # momentum trade (academically usually a short);
+                               # included only for symmetry with dip/up structure
+
+# Relative/cross-sectional dip-up scanner (signals/relative.py) — same-day
+# return ranked against the WHOLE UNIVERSE that day, not vs. the stock's
+# own history, so a market-wide move can't by itself flag everything.
+RELATIVE_Z_THRESHOLD = 2.0
+
+# 52-week high/low breakout (signals/breakout.py)
+BREAKOUT_LOOKBACK_DAYS = 252   # ~52 weeks
+
+# Post-earnings announcement drift (signals/pead.py) — see
+# data/earnings_data.py for the real data-thinness limitation.
+PEAD_SURPRISE_THRESHOLD_PCT = 5.0
 
 # --- Risk (used by the risk manager / backtester) -----------------------------------------------------------
 MAX_POSITION_PCT = 0.05      # never risk more than 5% of capital on one name

@@ -22,7 +22,25 @@
       "Bash(python tests/test_baskets.py)",
       "Bash(python scripts/run_basket_report.py)",
       "Bash(python \"C:\\\\Users\\\\SHELTO~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedAgent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_basket_report.py\")",
-      "Bash(python \"C:\\\\Users\\\\SHELTO~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedAgent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_basket_report_v2.py\")"
+      "Bash(python \"C:\\\\Users\\\\SHELTO~1\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedAgent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_basket_report_v2.py\")",
+      "Read(//c/git/customizedAgent/trading_agent/.claude/**)",
+      "Read(//c/git/customizedAgent/trading_agent/**)",
+      "Bash(python -m pip show numpy pandas yfinance scikit-learn joblib alpaca-py)",
+      "Bash(python -m pip install -q -r requirements.txt)",
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_basket_report_v3.py\")",
+      "Bash(python scripts/run_candidate_horizon_sweep.py)",
+      "Bash(python scripts/run_out_of_sample_check.py)",
+      "Bash(python scripts/run_significance_check.py)",
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_rigor_check.py\")",
+      "Bash(python -m pip install -q lxml)",
+      "Bash(python tests/test_momentum.py)",
+      "Bash(python tests/test_relative.py)",
+      "Bash(python tests/test_breakout.py)",
+      "Bash(python tests/test_pead.py)",
+      "Bash(python scripts/run_new_signals_report.py)",
+      "Bash(python \"C:\\\\Users\\\\shelt\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\C--git-customizedagent-trading-agent\\\\8ddd0ff8-aa7d-4f43-98e7-34daccb2f413\\\\scratchpad\\\\real_new_signals_check.py\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

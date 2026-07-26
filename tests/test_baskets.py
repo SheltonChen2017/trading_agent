@@ -12,11 +12,15 @@ import pandas as pd
 
 from baskets import (
     all_basket_names,
+    basket_significance,
     baskets_for_ticker,
     compare_baskets_to_baseline,
     compare_baskets_to_market_index,
     compute_high_volatility_basket,
     get_basket_tickers,
+    out_of_sample_backtest_by_basket,
+    out_of_sample_baseline_by_basket,
+    out_of_sample_market_by_basket,
     summarize_by_basket,
 )
 from config import BASKETS
@@ -29,6 +33,23 @@ def _flat_series_with_shock(days: int, shock_index: int, shock_return: float, ba
     close = 100 * np.cumprod(1 + returns)
     volume = np.full(days, 1_000_000.0)
     volume[shock_index] = 4_000_000.0
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    return pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+
+
+def _flat_series_with_two_shocks(
+    days: int, early_index: int, late_index: int, shock_return: float, base_volatility: float = 0.002
+) -> pd.DataFrame:
+    rng = np.random.default_rng(0)
+    returns = rng.normal(loc=0.0, scale=base_volatility, size=days)
+    volume = np.full(days, 1_000_000.0)
+    for idx in (early_index, late_index):
+        returns[idx] = shock_return
+        volume[idx] = 4_000_000.0
+    close = 100 * np.cumprod(1 + returns)
     dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
     return pd.DataFrame(
         {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
@@ -128,6 +149,77 @@ def test_compare_baskets_to_market_index_tags_basket_column():
     assert "mean_edge_vs_market_pct" in comparison.columns
 
 
+def test_out_of_sample_backtest_by_basket_tags_basket_and_period():
+    df = _flat_series_with_two_shocks(days=100, early_index=20, late_index=80, shock_return=-0.08)
+    data = {"NVDA": df, "AMD": df}
+
+    result = out_of_sample_backtest_by_basket(data, basket_names=["semiconductors"], discovery_frac=0.6)
+    assert not result.empty
+    assert (result["basket"] == "semiconductors").all()
+    assert set(result["period"]) == {"discovery", "confirmation"}
+
+
+def test_out_of_sample_baseline_by_basket_tags_basket_and_period():
+    df = _flat_series_with_two_shocks(days=100, early_index=20, late_index=80, shock_return=-0.08)
+    data = {"NVDA": df, "AMD": df}
+
+    result = out_of_sample_baseline_by_basket(data, basket_names=["semiconductors"], discovery_frac=0.6)
+    assert not result.empty
+    assert (result["basket"] == "semiconductors").all()
+    assert set(result["period"]) == {"discovery", "confirmation"}
+
+
+def test_out_of_sample_market_by_basket_tags_basket_and_period():
+    df = _flat_series_with_two_shocks(days=100, early_index=20, late_index=80, shock_return=-0.08)
+    data = {"NVDA": df, "AMD": df}
+    benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(100, 1.001))}, index=df.index)
+
+    result = out_of_sample_market_by_basket(data, benchmark_df, basket_names=["semiconductors"], discovery_frac=0.6)
+    assert not result.empty
+    assert (result["basket"] == "semiconductors").all()
+    assert set(result["period"]) == {"discovery", "confirmation"}
+
+
+def test_basket_significance_flags_clear_edge_as_significant():
+    # Many small, consistent, deliberately-planted shocks with a strong,
+    # low-noise forward bounce -> a clearly non-zero edge that should
+    # survive even a Bonferroni-corrected threshold.
+    days = 300
+    rng = np.random.default_rng(1)
+    returns = rng.normal(loc=0.0, scale=0.002, size=days)
+    volume = np.full(days, 1_000_000.0)
+    shock_indices = range(25, days - 10, 15)
+    for idx in shock_indices:
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+        for i in range(1, 6):
+            returns[idx + i] = 0.02  # strong, consistent bounce every time
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+    data = {"NVDA": df, "AMD": df}
+
+    result = basket_significance(data, basket_names=["semiconductors"])
+    dip_row = result[result["direction"] == "dip"].iloc[0]
+    assert dip_row["mean_edge_pct"] > 0
+    assert dip_row["ci_low"] > 0
+    assert bool(dip_row["significant"]) is True
+
+
+def test_basket_significance_bonferroni_threshold_scales_with_basket_count():
+    df = _flat_series_with_shock(days=60, shock_index=40, shock_return=-0.08)
+    data = {"NVDA": df, "AMD": df}
+
+    one_basket = basket_significance(data, basket_names=["semiconductors"])
+    many_baskets = basket_significance(data, basket_names=["semiconductors", "ai_related", "unstable"])
+
+    # More simultaneously-tested baskets -> a stricter (smaller) threshold.
+    assert many_baskets["bonferroni_threshold"].iloc[0] < one_basket["bonferroni_threshold"].iloc[0]
+
+
 if __name__ == "__main__":
     test_get_basket_tickers_returns_known_basket()
     test_get_basket_tickers_raises_on_unknown_basket()
@@ -140,4 +232,9 @@ if __name__ == "__main__":
     test_summarize_by_basket_skips_baskets_with_no_data_overlap()
     test_compare_baskets_to_baseline_tags_basket_column()
     test_compare_baskets_to_market_index_tags_basket_column()
+    test_out_of_sample_backtest_by_basket_tags_basket_and_period()
+    test_out_of_sample_baseline_by_basket_tags_basket_and_period()
+    test_out_of_sample_market_by_basket_tags_basket_and_period()
+    test_basket_significance_flags_clear_edge_as_significant()
+    test_basket_significance_bonferroni_threshold_scales_with_basket_count()
     print("All basket tests passed.")

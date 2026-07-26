@@ -16,6 +16,9 @@ isn't modeled here.
 """
 from __future__ import annotations
 
+from typing import Callable
+
+import numpy as np
 import pandas as pd
 
 from config import (
@@ -34,6 +37,32 @@ RESULT_COLUMNS = [
     "entry_price", "exit_price", "raw_return_pct", "net_return_pct", "win",
 ]
 
+# Every function below defaults to scan_dips_and_ups (the original z-score
+# dip/up scanner) for 100% backward compatibility. Pass a different
+# `scan_fn` (see signals/momentum.py, relative.py, breakout.py, pead.py)
+# plus `scan_kwargs` with whatever parameters THAT function needs — any
+# scan function is usable here as long as it returns a DataFrame with the
+# same column contract as scan_dips_and_ups (ticker, date, close,
+# return_pct, return_zscore, volume_zscore, direction), which is what lets
+# a brand-new signal reuse every backtest/baseline/market/out-of-sample/
+# significance tool in this file completely unchanged.
+# return_z_threshold/volume_z_threshold are only meaningful for the
+# default scanner and are ignored when a custom scan_fn+scan_kwargs pair
+# is supplied.
+
+
+def _resolve_scan_kwargs(
+    scan_fn: Callable,
+    scan_kwargs: dict | None,
+    return_z_threshold: float,
+    volume_z_threshold: float,
+) -> dict:
+    if scan_kwargs is not None:
+        return scan_kwargs
+    if scan_fn is scan_dips_and_ups:
+        return {"return_z_threshold": return_z_threshold, "volume_z_threshold": volume_z_threshold}
+    return {}
+
 
 def run_backtest(
     data: dict[str, pd.DataFrame],
@@ -41,6 +70,8 @@ def run_backtest(
     slippage_pct: float = SLIPPAGE_PCT,
     return_z_threshold: float = RETURN_Z_THRESHOLD,
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
 ) -> pd.DataFrame:
     """
     Walk every date in the universe, run the live scanner as-of that date,
@@ -51,20 +82,20 @@ def run_backtest(
     already has simulated slippage deducted; `win` is True when
     net_return_pct > 0 under the "go long the signal" hypothesis.
     """
+    kwargs = _resolve_scan_kwargs(scan_fn, scan_kwargs, return_z_threshold, volume_z_threshold)
     all_dates = sorted(set().union(*(df.index for df in data.values())))
     # Skip the front of history where no ticker has enough trailing data
     # yet, and the tail where no ticker has `hold_days` of forward data —
-    # cheap early exit, scan_dips_and_ups would just return empty anyway.
+    # cheap early exit, scan_fn would just return empty anyway. This is a
+    # heuristic sized for the default scanner (ROLLING_WINDOW) — a slower
+    # signal (e.g. momentum, 52-week breakout) needing more history simply
+    # returns empty for the earlier dates in this range too; correctness
+    # isn't affected, just a few wasted no-op scan calls.
     usable_dates = all_dates[ROLLING_WINDOW : len(all_dates) - hold_days] if hold_days > 0 else all_dates[ROLLING_WINDOW:]
 
     rows = []
     for as_of in usable_dates:
-        signals = scan_dips_and_ups(
-            data,
-            return_z_threshold=return_z_threshold,
-            volume_z_threshold=volume_z_threshold,
-            as_of=as_of,
-        )
+        signals = scan_fn(data, as_of=as_of, **kwargs)
         if signals.empty:
             continue
 
@@ -142,6 +173,8 @@ def run_multi_horizon_backtest(
     slippage_pct: float = SLIPPAGE_PCT,
     return_z_threshold: float = RETURN_Z_THRESHOLD,
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
 ) -> dict[int, pd.DataFrame]:
     """
     Run run_backtest() once per hold period in `hold_days_options`, so you
@@ -156,6 +189,8 @@ def run_multi_horizon_backtest(
             slippage_pct=slippage_pct,
             return_z_threshold=return_z_threshold,
             volume_z_threshold=volume_z_threshold,
+            scan_fn=scan_fn,
+            scan_kwargs=scan_kwargs,
         )
         for hold_days in hold_days_options
     }
@@ -230,6 +265,8 @@ def compare_signal_to_baseline(
     slippage_pct: float = SLIPPAGE_PCT,
     return_z_threshold: float = RETURN_Z_THRESHOLD,
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
 ) -> pd.DataFrame:
     """
     For each hold period, compare the flagged signals' returns against the
@@ -247,6 +284,8 @@ def compare_signal_to_baseline(
             slippage_pct=slippage_pct,
             return_z_threshold=return_z_threshold,
             volume_z_threshold=volume_z_threshold,
+            scan_fn=scan_fn,
+            scan_kwargs=scan_kwargs,
         )
         baseline = run_baseline_forward_returns(data, hold_days=hold_days, slippage_pct=slippage_pct)
         baseline_stats = _return_stats(baseline["net_return_pct"])
@@ -284,12 +323,51 @@ PER_TICKER_COMPARISON_COLUMNS = [
 ]
 
 
+def _signals_with_own_ticker_baseline(
+    data: dict[str, pd.DataFrame],
+    hold_days: int,
+    slippage_pct: float,
+    return_z_threshold: float,
+    volume_z_threshold: float,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """
+    Per-signal detail shared by compare_signal_to_baseline_per_ticker()
+    and out_of_sample_baseline_comparison(): run_backtest()'s output
+    annotated with each signal's own ticker's any-day baseline return and
+    the edge over it (own_ticker_baseline_pct, edge_vs_own_ticker_pct).
+    """
+    results = run_backtest(
+        data,
+        hold_days=hold_days,
+        slippage_pct=slippage_pct,
+        return_z_threshold=return_z_threshold,
+        volume_z_threshold=volume_z_threshold,
+        scan_fn=scan_fn,
+        scan_kwargs=scan_kwargs,
+    )
+    baseline = run_baseline_forward_returns(data, hold_days=hold_days, slippage_pct=slippage_pct)
+    baseline_mean_by_ticker = (
+        baseline.groupby("ticker")["net_return_pct"].mean() if not baseline.empty else pd.Series(dtype=float)
+    )
+
+    if not results.empty:
+        results = results.copy()
+        results["own_ticker_baseline_pct"] = results["ticker"].map(baseline_mean_by_ticker)
+        results["edge_vs_own_ticker_pct"] = results["net_return_pct"] - results["own_ticker_baseline_pct"]
+
+    return results
+
+
 def compare_signal_to_baseline_per_ticker(
     data: dict[str, pd.DataFrame],
     hold_days_options: list[int] = HORIZON_SWEEP_DAYS,
     slippage_pct: float = SLIPPAGE_PCT,
     return_z_threshold: float = RETURN_Z_THRESHOLD,
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
 ) -> pd.DataFrame:
     """
     Like compare_signal_to_baseline(), but each flagged signal is matched
@@ -317,22 +395,9 @@ def compare_signal_to_baseline_per_ticker(
     """
     rows = []
     for hold_days in hold_days_options:
-        results = run_backtest(
-            data,
-            hold_days=hold_days,
-            slippage_pct=slippage_pct,
-            return_z_threshold=return_z_threshold,
-            volume_z_threshold=volume_z_threshold,
+        results = _signals_with_own_ticker_baseline(
+            data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
         )
-        baseline = run_baseline_forward_returns(data, hold_days=hold_days, slippage_pct=slippage_pct)
-        baseline_mean_by_ticker = (
-            baseline.groupby("ticker")["net_return_pct"].mean() if not baseline.empty else pd.Series(dtype=float)
-        )
-
-        if not results.empty:
-            results = results.copy()
-            results["own_ticker_baseline_pct"] = results["ticker"].map(baseline_mean_by_ticker)
-            results["edge_vs_own_ticker_pct"] = results["net_return_pct"] - results["own_ticker_baseline_pct"]
 
         for direction in ("dip", "up"):
             subset = results[results["direction"] == direction] if not results.empty else pd.DataFrame()
@@ -400,6 +465,43 @@ def compute_benchmark_forward_returns(
     return net_return_pct.dropna()
 
 
+def _signals_with_market_edge(
+    data: dict[str, pd.DataFrame],
+    benchmark_df: pd.DataFrame,
+    hold_days: int,
+    slippage_pct: float,
+    return_z_threshold: float,
+    volume_z_threshold: float,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """
+    Per-signal detail shared by compare_signal_to_market_index() and
+    out_of_sample_market_comparison(): run_backtest()'s output annotated
+    with what the benchmark returned starting that EXACT signal date
+    (market_return_pct, edge_vs_market_pct). Signals whose date falls
+    outside the benchmark's own history are dropped, not miscounted.
+    """
+    results = run_backtest(
+        data,
+        hold_days=hold_days,
+        slippage_pct=slippage_pct,
+        return_z_threshold=return_z_threshold,
+        volume_z_threshold=volume_z_threshold,
+        scan_fn=scan_fn,
+        scan_kwargs=scan_kwargs,
+    )
+    benchmark_returns = compute_benchmark_forward_returns(benchmark_df, hold_days=hold_days, slippage_pct=slippage_pct)
+
+    if not results.empty:
+        results = results.copy()
+        results["market_return_pct"] = results["date"].map(benchmark_returns)
+        results["edge_vs_market_pct"] = results["net_return_pct"] - results["market_return_pct"]
+        results = results.dropna(subset=["market_return_pct"])
+
+    return results
+
+
 def compare_signal_to_market_index(
     data: dict[str, pd.DataFrame],
     benchmark_df: pd.DataFrame,
@@ -407,6 +509,8 @@ def compare_signal_to_market_index(
     slippage_pct: float = SLIPPAGE_PCT,
     return_z_threshold: float = RETURN_Z_THRESHOLD,
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
 ) -> pd.DataFrame:
     """
     For each hold period, match every flagged signal to what the market
@@ -420,24 +524,12 @@ def compare_signal_to_market_index(
     """
     rows = []
     for hold_days in hold_days_options:
-        results = run_backtest(
-            data,
-            hold_days=hold_days,
-            slippage_pct=slippage_pct,
-            return_z_threshold=return_z_threshold,
-            volume_z_threshold=volume_z_threshold,
+        results = _signals_with_market_edge(
+            data, benchmark_df, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
         )
-        benchmark_returns = compute_benchmark_forward_returns(benchmark_df, hold_days=hold_days, slippage_pct=slippage_pct)
-
-        if not results.empty:
-            results = results.copy()
-            results["market_return_pct"] = results["date"].map(benchmark_returns)
-            results["edge_vs_market_pct"] = results["net_return_pct"] - results["market_return_pct"]
 
         for direction in ("dip", "up"):
             subset = results[results["direction"] == direction] if not results.empty else pd.DataFrame()
-            if not subset.empty:
-                subset = subset.dropna(subset=["market_return_pct"])
 
             if subset.empty:
                 rows.append(
@@ -471,3 +563,247 @@ def compare_signal_to_market_index(
         return pd.DataFrame(columns=MARKET_COMPARISON_COLUMNS)
 
     return pd.DataFrame(rows)[MARKET_COMPARISON_COLUMNS]
+
+
+# --- Out-of-sample validation --------------------------------------------
+# Everything above can be (and has been) run repeatedly on the SAME
+# historical window while hunting for an interesting basket/direction/
+# horizon combination — which means a "finding" might just be that
+# window's noise, not real edge (see README's multiple-comparisons note).
+# The functions below split signals in time into an earlier DISCOVERY
+# period and a later CONFIRMATION (holdout) period that was never used to
+# identify anything, and report both separately. A real edge should look
+# similar in both; one that's strong in discovery and weak/flipped in
+# confirmation was very likely noise.
+#
+# Note this only ever uses TRAILING data at every point (rolling stats,
+# backtest scoring) — splitting the already-computed signals by date
+# afterward doesn't introduce any look-ahead; it's just partitioning
+# results that were already computed causally.
+
+OUT_OF_SAMPLE_PERIODS = ["discovery", "confirmation"]
+
+
+def _discovery_split_date(data: dict[str, pd.DataFrame], discovery_frac: float):
+    """
+    The calendar date marking the boundary between the discovery period
+    (the earlier `discovery_frac` of the full date range) and the
+    confirmation/holdout period — computed from the FULL universe's date
+    range, not from where signals happen to fall. Signals are sparse and
+    clustered, so deriving the split from signal dates instead would let a
+    handful of them skew where the boundary actually lands.
+    """
+    all_dates = sorted(set().union(*(df.index for df in data.values())))
+    split_idx = max(0, min(len(all_dates) - 1, int(len(all_dates) * discovery_frac)))
+    return all_dates[split_idx]
+
+
+def _split_by_date(df: pd.DataFrame, split_date) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """Split a results-like DataFrame (must have a `date` column) into
+    signals on/before `split_date` (discovery) and after (confirmation)."""
+    if df.empty:
+        return df, df
+    discovery = df[df["date"] <= split_date]
+    confirmation = df[df["date"] > split_date]
+    return discovery, confirmation
+
+
+def out_of_sample_backtest(
+    data: dict[str, pd.DataFrame],
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """
+    Out-of-sample version of summarize_backtest(): splits run_backtest()'s
+    signals by date into a discovery period (the earlier `discovery_frac`
+    of the date range) and a confirmation/holdout period, and reports win
+    rate / mean return separately for each, by direction.
+    """
+    results = run_backtest(
+        data,
+        hold_days=hold_days,
+        slippage_pct=slippage_pct,
+        return_z_threshold=return_z_threshold,
+        volume_z_threshold=volume_z_threshold,
+        scan_fn=scan_fn,
+        scan_kwargs=scan_kwargs,
+    )
+    columns = ["period"] + SUMMARY_COLUMNS
+    if results.empty:
+        return pd.DataFrame(columns=columns)
+
+    split_date = _discovery_split_date(data, discovery_frac)
+    discovery, confirmation = _split_by_date(results, split_date)
+    rows = []
+    for period, subset in zip(OUT_OF_SAMPLE_PERIODS, (discovery, confirmation)):
+        summary = summarize_backtest(subset)
+        if summary.empty:
+            continue
+        summary.insert(0, "period", period)
+        rows.append(summary)
+
+    if not rows:
+        return pd.DataFrame(columns=columns)
+    return pd.concat(rows, ignore_index=True)[columns]
+
+
+OUT_OF_SAMPLE_BASELINE_COLUMNS = [
+    "period", "direction", "signal_count",
+    "mean_edge_vs_own_ticker_pct", "pct_signals_beating_own_ticker_baseline",
+]
+
+
+def out_of_sample_baseline_comparison(
+    data: dict[str, pd.DataFrame],
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """
+    Out-of-sample version of compare_signal_to_baseline_per_ticker(): the
+    per-ticker-matched edge, split into a discovery period and a
+    confirmation (holdout) period never used to find anything.
+    """
+    detailed = _signals_with_own_ticker_baseline(
+        data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+    )
+    if detailed.empty:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_BASELINE_COLUMNS)
+
+    split_date = _discovery_split_date(data, discovery_frac)
+    discovery, confirmation = _split_by_date(detailed, split_date)
+    rows = []
+    for period, subset in zip(OUT_OF_SAMPLE_PERIODS, (discovery, confirmation)):
+        for direction in ("dip", "up"):
+            d = subset[subset["direction"] == direction] if not subset.empty else pd.DataFrame()
+            if d.empty:
+                continue
+            rows.append(
+                {
+                    "period": period,
+                    "direction": direction,
+                    "signal_count": len(d),
+                    "mean_edge_vs_own_ticker_pct": round(d["edge_vs_own_ticker_pct"].mean(), 3),
+                    "pct_signals_beating_own_ticker_baseline": round((d["edge_vs_own_ticker_pct"] > 0).mean() * 100, 1),
+                }
+            )
+
+    if not rows:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_BASELINE_COLUMNS)
+    return pd.DataFrame(rows)[OUT_OF_SAMPLE_BASELINE_COLUMNS]
+
+
+OUT_OF_SAMPLE_MARKET_COLUMNS = [
+    "period", "direction", "signal_count",
+    "mean_edge_vs_market_pct", "pct_signals_beating_market",
+]
+
+
+def out_of_sample_market_comparison(
+    data: dict[str, pd.DataFrame],
+    benchmark_df: pd.DataFrame,
+    discovery_frac: float = 0.6,
+    hold_days: int = BACKTEST_HOLD_DAYS,
+    slippage_pct: float = SLIPPAGE_PCT,
+    return_z_threshold: float = RETURN_Z_THRESHOLD,
+    volume_z_threshold: float = VOLUME_Z_THRESHOLD,
+    scan_fn: Callable = scan_dips_and_ups,
+    scan_kwargs: dict | None = None,
+) -> pd.DataFrame:
+    """
+    Out-of-sample version of compare_signal_to_market_index(): the
+    market-matched edge, split into a discovery period and a confirmation
+    (holdout) period never used to find anything.
+    """
+    detailed = _signals_with_market_edge(
+        data, benchmark_df, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+    )
+    if detailed.empty:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_MARKET_COLUMNS)
+
+    split_date = _discovery_split_date(data, discovery_frac)
+    discovery, confirmation = _split_by_date(detailed, split_date)
+    rows = []
+    for period, subset in zip(OUT_OF_SAMPLE_PERIODS, (discovery, confirmation)):
+        for direction in ("dip", "up"):
+            d = subset[subset["direction"] == direction] if not subset.empty else pd.DataFrame()
+            if d.empty:
+                continue
+            rows.append(
+                {
+                    "period": period,
+                    "direction": direction,
+                    "signal_count": len(d),
+                    "mean_edge_vs_market_pct": round(d["edge_vs_market_pct"].mean(), 3),
+                    "pct_signals_beating_market": round((d["edge_vs_market_pct"] > 0).mean() * 100, 1),
+                }
+            )
+
+    if not rows:
+        return pd.DataFrame(columns=OUT_OF_SAMPLE_MARKET_COLUMNS)
+    return pd.DataFrame(rows)[OUT_OF_SAMPLE_MARKET_COLUMNS]
+
+
+# --- Statistical significance ---------------------------------------------
+# All the comparison functions above report a MEAN edge, but a mean alone
+# doesn't say whether that edge is distinguishable from noise. These
+# functions estimate that directly, via bootstrap resampling (not a
+# parametric t-test) since trade-return distributions are often skewed/
+# fat-tailed rather than normal, and correct for how many things were
+# tested at once — with N basket/direction cells tested simultaneously, a
+# couple are expected to look "significant" by chance alone even with zero
+# real edge anywhere unless the threshold accounts for that.
+
+def bootstrap_edge_significance(edge_values: pd.Series, n_bootstrap: int = 2000, seed: int = 0) -> dict:
+    """
+    Bootstrap the mean of `edge_values` (e.g. a basket/direction's
+    edge_vs_own_ticker_pct or edge_vs_market_pct values) to estimate a 95%
+    confidence interval and a two-sided p-value against the null
+    hypothesis that the true mean edge is zero.
+
+    Returns {n, mean, ci_low, ci_high, p_value}. p_value/CI are None when
+    there are too few observations (<5) to bootstrap meaningfully.
+    """
+    values = pd.Series(edge_values).dropna().to_numpy()
+    if len(values) < 5:
+        return {"n": len(values), "mean": None, "ci_low": None, "ci_high": None, "p_value": None}
+
+    rng = np.random.default_rng(seed)
+    boot_means = np.array(
+        [rng.choice(values, size=len(values), replace=True).mean() for _ in range(n_bootstrap)]
+    )
+    mean = values.mean()
+    ci_low, ci_high = np.percentile(boot_means, [2.5, 97.5])
+    # Two-sided p-value: how much of the bootstrap distribution sits on
+    # the opposite side of zero from the observed mean, doubled.
+    p_value = min(1.0, 2 * min((boot_means <= 0).mean(), (boot_means >= 0).mean()))
+
+    return {
+        "n": len(values),
+        "mean": round(float(mean), 3),
+        "ci_low": round(float(ci_low), 3),
+        "ci_high": round(float(ci_high), 3),
+        "p_value": round(float(p_value), 4),
+    }
+
+
+def bonferroni_threshold(n_tests: int, alpha: float = 0.05) -> float:
+    """
+    The Bonferroni-corrected significance threshold for `n_tests`
+    simultaneous comparisons: instead of asking "is p < 0.05", ask
+    "is p < alpha/n_tests". Conservative (some real effects will be missed),
+    but appropriate here given how many basket/direction/horizon cells
+    tend to get scanned at once looking for a candidate.
+    """
+    if n_tests <= 0:
+        return alpha
+    return alpha / n_tests

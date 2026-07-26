@@ -4,3 +4,4 @@ yfinance
 scikit-learn
 joblib
 alpaca-py
+lxml

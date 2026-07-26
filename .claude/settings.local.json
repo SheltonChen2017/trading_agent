@@ -81,7 +81,8 @@
       "Bash(curl -s \"https://gamma-api.polymarket.com/events?limit=20&closed=false&order=volume&ascending=false&search=nvidia\" -o /tmp/nvda1.json)",
       "Bash(curl -s \"https://gamma-api.polymarket.com/public-search?q=nvidia\")",
       "Bash(curl -s \"https://gamma-api.polymarket.com/public-search?q=nvidia&events_status=active\")",
-      "Bash(curl -s \"https://gamma-api.polymarket.com/public-search?q=NVDA%20stock\")"
+      "Bash(curl -s \"https://gamma-api.polymarket.com/public-search?q=NVDA%20stock\")",
+      "Bash(gh repo *)"
     ]
   }
 }

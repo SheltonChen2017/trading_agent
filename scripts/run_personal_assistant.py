@@ -77,7 +77,7 @@ def command_propose(args, store: AssistantStore) -> None:
     packet = _packet(include_events=not args.no_events)
     store.save_decision_packet(packet)
     proposals = generate_risk_reduction_proposals(packet, policy)
-    if args.strategy_proposals:
+    if args.strategy_proposals or policy.enable_strategy_proposals:
         try:
             proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy)
         except Exception as exc:
@@ -155,9 +155,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--strategy-proposals",
         action="store_true",
         help=(
-            "Also check the SOXX/SOXL wide-rebalance-band strategy (evidence_status="
+            "Also check the SOXX/SOXL wide-rebalance-band strategy for this run (evidence_status="
             "promising_unconfirmed_strategy, not confirmed -- see assistant/strategy_proposals.py). "
-            "Off by default; only produces a proposal if you already hold both SOXX and SOXL."
+            "Only produces a proposal if you already hold both SOXX and SOXL. Set "
+            "'enable_strategy_proposals': true in your policy file instead to make this durable "
+            "across runs rather than passing this flag every time."
         ),
     )
     propose.set_defaults(handler=command_propose)

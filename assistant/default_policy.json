@@ -14,5 +14,6 @@
   "allowed_sides": ["buy", "sell"],
   "allowed_order_types": ["market", "limit"],
   "allow_new_positions": false,
+  "enable_strategy_proposals": false,
   "notes": "Paper trading only. Every order requires explicit user approval. New positions are disabled until a strategy clears the research promotion process."
 }

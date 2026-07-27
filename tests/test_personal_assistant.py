@@ -69,6 +69,7 @@ def test_default_policy_loads_and_validates():
     policy = load_policy()
     assert policy.execution_mode == "paper"
     assert policy.allow_new_positions is False
+    assert policy.enable_strategy_proposals is False
 
 
 def test_policy_rejects_invalid_percentages():

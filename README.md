@@ -160,7 +160,9 @@ The default versioned policy is
 - price freshness and slippage;
 - earnings blackout window;
 - allowed sides and order types;
-- whether new positions may be opened.
+- whether new positions may be opened;
+- whether validated strategy proposals (currently just the SOXX/SOXL
+  wide-rebalance-band strategy) are checked by default on `propose`.
 
 The checked-in default is deliberately restrictive:
 
@@ -173,7 +175,8 @@ The checked-in default is deliberately restrictive:
   "max_leveraged_etf_pct": 0.20,
   "min_cash_reserve_pct": 0.10,
   "max_order_value": 5000.0,
-  "allow_new_positions": false
+  "allow_new_positions": false,
+  "enable_strategy_proposals": false
 }
 ```
 

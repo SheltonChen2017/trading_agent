@@ -34,6 +34,7 @@ class TradingPolicy:
     allowed_sides: tuple[str, ...] = ("buy", "sell")
     allowed_order_types: tuple[str, ...] = ("market", "limit")
     allow_new_positions: bool = False
+    enable_strategy_proposals: bool = False
     notes: str = ""
 
     def validate(self) -> None:

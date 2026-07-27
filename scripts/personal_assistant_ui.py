@@ -30,6 +30,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import streamlit as st
 
+from assistant.allocation_proposals import generate_allocation_buy_proposals
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
 from assistant.execution_service import execute_approved_paper_proposal
 from assistant.explanations import explain_ticker
@@ -73,6 +74,62 @@ def _load_packet(policy_path: str, include_events: bool):
         policy=policy,
     )
     return policy, packet
+
+
+def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str) -> None:
+    """One proposal card with the typed-confirmation approve flow.
+    Shared by the Propose & Approve tab and the Watchlist tab's
+    allocation-buy feature -- identical safety flow everywhere a
+    proposal can be approved: type the exact "APPROVE <id>" phrase, or
+    the submit button stays disabled."""
+    intent = proposal["intent"]
+    with st.container(border=True):
+        st.subheader(f"{intent['side'].upper()} {intent['shares']} {intent['ticker']}")
+        st.caption(f"{proposal['proposal_id']} -- evidence_status: {proposal['evidence_status']}")
+        st.write(f"Reference price: ${proposal['reference_price']:,.2f}")
+        for reason in proposal["reasons"]:
+            st.write(f"- {reason}")
+        impact = proposal["expected_impact"]
+        st.write(
+            f"Position weight: {impact['position_weight_before_pct']:.1f}% -> "
+            f"{impact['position_weight_after_pct']:.1f}%"
+        )
+        with st.expander("Uncertainties / caveats"):
+            for uncertainty in proposal["uncertainties"]:
+                st.write(f"- {uncertainty}")
+
+        required_phrase = f"APPROVE {proposal['proposal_id']}"
+        st.write(f"To submit this order, type the exact phrase below: `{required_phrase}`")
+        typed = st.text_input(
+            "Confirmation phrase", key=f"confirm_{proposal['proposal_id']}", label_visibility="collapsed"
+        )
+        submit_disabled = typed != required_phrase
+        if st.button(
+            "Submit paper order",
+            key=f"submit_{proposal['proposal_id']}",
+            disabled=submit_disabled,
+        ):
+            if not is_configured():
+                st.error("Alpaca paper credentials are required for approval execution.")
+            else:
+                try:
+                    approve_policy = load_policy(policy_path)
+                    portfolio = build_portfolio_snapshot_from_alpaca()
+                    order = execute_approved_paper_proposal(
+                        proposal["proposal_id"],
+                        typed,
+                        portfolio,
+                        approve_policy,
+                        store,
+                        now_et=_now_eastern(),
+                        kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                    )
+                    st.success(
+                        f"Submitted paper order {order['order_id']}: "
+                        f"{order['side'].upper()} {order['shares']} {order['ticker']} [{order['status']}]"
+                    )
+                except Exception as exc:
+                    st.error(f"Order not submitted: {exc}")
 
 
 st.title("Personal Trading Assistant")
@@ -258,21 +315,58 @@ with tab_watchlist:
 
     watchlist_results = st.session_state.get("watchlist_results", {})
 
-    if len(watchlist_results) > 1:
-        vols = {t: r.get("own_vol") for t, r in watchlist_results.items() if "error" not in r}
-        if vols:
-            st.subheader("Suggested combination weighting (inverse-volatility)")
-            weights = inverse_volatility_weights(vols)
-            st.dataframe(
-                [{"Ticker": t, "Suggested %": w} for t, w in sorted(weights.items(), key=lambda kv: -kv[1])],
-                use_container_width=True,
-                hide_index=True,
+    vols = {t: r.get("own_vol") for t, r in watchlist_results.items() if "error" not in r}
+    weights = inverse_volatility_weights(vols) if vols else {}
+
+    if len(watchlist_results) > 1 and weights:
+        st.subheader("Suggested combination weighting (inverse-volatility)")
+        st.dataframe(
+            [{"Ticker": t, "Suggested %": w} for t, w in sorted(weights.items(), key=lambda kv: -kv[1])],
+            use_container_width=True,
+            hide_index=True,
+        )
+        st.caption(
+            "Weights inversely proportional to each ticker's own trailing volatility -- "
+            "sizes the choppier name smaller, same principle as strategies/vol_target_rotation.py. "
+            "A risk heuristic, not an optimization for expected return."
+        )
+
+    if weights:
+        st.subheader("Buy with recommended allocation (paper trading)")
+        alloc_policy, alloc_packet = _load_packet(policy_path, include_events=False)
+        available_cash = alloc_packet.portfolio.cash
+        if not alloc_policy.allow_new_positions:
+            st.warning(
+                "Your active policy has allow_new_positions=false (the default). You can still generate "
+                "proposals below, but approving them will be blocked until you set "
+                '"allow_new_positions": true in your policy file.'
             )
-            st.caption(
-                "Weights inversely proportional to each ticker's own trailing volatility -- "
-                "sizes the choppier name smaller, same principle as strategies/vol_target_rotation.py. "
-                "A risk heuristic, not an optimization for expected return."
+        st.caption(f"Available cash: ${available_cash:,.2f}. This only sizes the split -- it is not a recommendation to buy these specific stocks.")
+        dollar_amount = st.number_input(
+            "Amount to invest",
+            min_value=0.0,
+            max_value=float(available_cash),
+            value=0.0,
+            step=50.0,
+            key="allocation_dollar_amount",
+            help="Capped at your current available cash.",
+        )
+        if st.button("Buy with recommended allocation", type="primary", disabled=dollar_amount <= 0):
+            prices = {t: r.get("current_price") for t, r in watchlist_results.items() if "error" not in r}
+            alloc_proposals = generate_allocation_buy_proposals(
+                alloc_packet, alloc_policy, weights, prices, dollar_amount,
             )
+            for p in alloc_proposals:
+                store.save_proposal(p.to_dict())
+            st.session_state["allocation_proposals"] = [p.to_dict() for p in alloc_proposals]
+            if not alloc_proposals:
+                st.warning(
+                    "No proposals generated -- the amount may be too small to buy at least 1 share of any "
+                    "cart ticker at its current price."
+                )
+
+        for proposal in st.session_state.get("allocation_proposals", []):
+            _render_proposal_approval(proposal, store, policy_path)
 
     for ticker, result in watchlist_results.items():
         with st.container(border=True):
@@ -395,54 +489,7 @@ with tab_propose:
         st.write(f"Checked at {last_checked_at} -- {len(proposals)} proposal(s):")
 
     for proposal in proposals or []:
-        intent = proposal["intent"]
-        with st.container(border=True):
-            st.subheader(f"{intent['side'].upper()} {intent['shares']} {intent['ticker']}")
-            st.caption(f"{proposal['proposal_id']} -- evidence_status: {proposal['evidence_status']}")
-            st.write(f"Reference price: ${proposal['reference_price']:,.2f}")
-            for reason in proposal["reasons"]:
-                st.write(f"- {reason}")
-            impact = proposal["expected_impact"]
-            st.write(
-                f"Position weight: {impact['position_weight_before_pct']:.1f}% -> "
-                f"{impact['position_weight_after_pct']:.1f}%"
-            )
-            with st.expander("Uncertainties / caveats"):
-                for uncertainty in proposal["uncertainties"]:
-                    st.write(f"- {uncertainty}")
-
-            required_phrase = f"APPROVE {proposal['proposal_id']}"
-            st.write(f"To submit this order, type the exact phrase below: `{required_phrase}`")
-            typed = st.text_input(
-                "Confirmation phrase", key=f"confirm_{proposal['proposal_id']}", label_visibility="collapsed"
-            )
-            submit_disabled = typed != required_phrase
-            if st.button(
-                "Submit paper order",
-                key=f"submit_{proposal['proposal_id']}",
-                disabled=submit_disabled,
-            ):
-                if not is_configured():
-                    st.error("Alpaca paper credentials are required for approval execution.")
-                else:
-                    try:
-                        approve_policy = load_policy(policy_path)
-                        portfolio = build_portfolio_snapshot_from_alpaca()
-                        order = execute_approved_paper_proposal(
-                            proposal["proposal_id"],
-                            typed,
-                            portfolio,
-                            approve_policy,
-                            store,
-                            now_et=_now_eastern(),
-                            kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
-                        )
-                        st.success(
-                            f"Submitted paper order {order['order_id']}: "
-                            f"{order['side'].upper()} {order['shares']} {order['ticker']} [{order['status']}]"
-                        )
-                    except Exception as exc:
-                        st.error(f"Order not submitted: {exc}")
+        _render_proposal_approval(proposal, store, policy_path)
 
 with tab_history:
     status_filter = st.selectbox("Status filter", ["(any)", "proposed", "executed", "expired", "rejected"])

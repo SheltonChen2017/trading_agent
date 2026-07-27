@@ -801,6 +801,138 @@ def test_pending_buy_value_lookup_failure_does_not_block_a_sell_approval():
         restore()
 
 
+def test_pending_buy_value_by_ticker_uses_notional_without_requiring_shares():
+    # Regression test (GPT review, 2026-07-27): Alpaca lets a buy order be
+    # submitted as a dollar amount instead of a share count (shares=None,
+    # notional=<dollar value>). The function used to check `shares` before
+    # `notional`, so a valid notional value was never read and the order
+    # was skipped entirely. ticker/notional are now checked first; a quote
+    # lookup should never even be attempted when notional is available.
+    from assistant.execution_service import _pending_buy_value_by_ticker
+
+    class _FakeBroker:
+        @staticmethod
+        def get_latest_quote(ticker):
+            raise AssertionError(f"quote lookup should not be called when notional is available (ticker={ticker})")
+
+    open_orders = [{"side": "buy", "ticker": "NVDA", "shares": None, "notional": 4000.0}]
+    assert _pending_buy_value_by_ticker(open_orders, _FakeBroker()) == {"NVDA": 4000.0}
+
+
+def test_pending_buy_value_by_ticker_share_based_quote_fallback_still_works():
+    # Existing share-based / quote-fallback behavior is unchanged by the
+    # notional fix above.
+    from assistant.execution_service import _pending_buy_value_by_ticker
+
+    class _FakeBroker:
+        @staticmethod
+        def get_latest_quote(ticker):
+            return {"ticker": ticker, "price": 25.0}
+
+    open_orders = [{"side": "buy", "ticker": "AMD", "shares": 10, "notional": None, "limit_price": None}]
+    assert _pending_buy_value_by_ticker(open_orders, _FakeBroker()) == {"AMD": 250.0}
+
+
+def test_pending_buy_value_by_ticker_limit_price_still_works_without_notional():
+    # Existing limit-order behavior is unchanged: shares * limit_price,
+    # no quote lookup needed.
+    from assistant.execution_service import _pending_buy_value_by_ticker
+
+    class _FakeBroker:
+        @staticmethod
+        def get_latest_quote(ticker):
+            raise AssertionError("quote lookup should not be called when limit_price is available")
+
+    open_orders = [{"side": "buy", "ticker": "AMD", "shares": 10, "notional": None, "limit_price": 30.0}]
+    assert _pending_buy_value_by_ticker(open_orders, _FakeBroker()) == {"AMD": 300.0}
+
+
+def test_pending_buy_value_by_ticker_still_ignores_sell_orders():
+    # Existing sell-side behavior is unchanged: a sell order (notional or
+    # otherwise) never contributes to pending BUY exposure.
+    from assistant.execution_service import _pending_buy_value_by_ticker
+
+    class _FakeBroker:
+        @staticmethod
+        def get_latest_quote(ticker):
+            raise AssertionError("should not be called for a sell order")
+
+    open_orders = [{"side": "sell", "ticker": "AMD", "shares": None, "notional": 4000.0}]
+    assert _pending_buy_value_by_ticker(open_orders, _FakeBroker()) == {}
+
+
+def test_notional_only_pending_order_blocks_a_duplicate_proposal_on_the_same_ticker_and_side():
+    # Regression test (GPT review, 2026-07-27): a notional-only open order
+    # (shares=None) used to be excluded from recent_intents because the
+    # loop required `shares` truthy -- duplicate identity only depends on
+    # ticker+side, never shares, so this should still block a new proposal
+    # for the same ticker/side.
+    from assistant.proposals import TradeProposal, _stable_id
+    from risk.execution_gate import TradeIntent
+
+    snapshot = build_portfolio_snapshot(
+        [{"ticker": "TQQQ", "shares": 100, "entry_price": 50.0, "current_price": 50.0}],
+        cash=5_000.0,
+        open_orders=[
+            {
+                "order_id": "o1", "ticker": "TQQQ", "side": "sell", "shares": None, "notional": 500.0,
+                "type": "market", "status": "new", "submitted_at": None, "limit_price": None,
+            },
+        ],
+    )
+    packet = DecisionPacket(
+        generated_at="2026-07-26T12:00:00+00:00",
+        portfolio=snapshot,
+        risk=build_risk_exposure(snapshot),
+        regime=MarketRegime(
+            benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
+            trailing_volatility_pct=1.0, as_of="2026-07-25",
+        ),
+        signals=[], upcoming_events=[], warnings=[], policy_version="test",
+    )
+    policy = _policy()
+
+    intent = TradeIntent(ticker="TQQQ", side="sell", shares=10)
+    proposal_id = _stable_id(packet, policy, intent)
+    proposal = TradeProposal(
+        proposal_id=proposal_id,
+        created_at=packet.generated_at,
+        expires_at="2026-12-31T00:00:00+00:00",
+        status="proposed",
+        idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
+        policy_version=policy.version,
+        intent=intent,
+        reference_price=50.0,
+        price_timestamp=packet.generated_at,
+        reasons=["test"],
+        evidence_status="test",
+        expected_impact={
+            "trade_value": 500.0, "position_weight_before_pct": 0, "position_weight_after_pct": 0,
+            "cash_before": 0, "cash_after": 0, "invested_pct_after": 0,
+        },
+        alternatives=[],
+        uncertainties=[],
+    ).to_dict()
+
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal)
+            try:
+                execute_approved_paper_proposal(
+                    proposal_id, f"APPROVE {proposal_id}", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected the notional-only pending order to be detected as a duplicate"
+            except ProposalExecutionError as exc:
+                assert "duplicate" in str(exc).lower()
+            assert len(captured) == 0
+            assert store.get_proposal(proposal_id)["status"] == "blocked"
+    finally:
+        restore()
+
+
 def test_limit_order_routes_to_submit_limit_order_not_market():
     packet = _packet()
     policy = _policy()

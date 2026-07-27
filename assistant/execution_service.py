@@ -222,6 +222,14 @@ def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict
     market buy order (no price on the order itself) falls back to one
     live quote per such order.
 
+    A notional-only order (Alpaca lets you submit a dollar amount instead
+    of a share count -- `shares` is None, `notional` is the real dollar
+    value) used to be skipped entirely, because `shares` was checked
+    before `notional` -- so a valid notional value was never read (GPT
+    review, 2026-07-27). `ticker`/`notional` are now checked first;
+    `shares` is only required for the two branches that actually need it
+    (shares * limit_price, shares * quote price).
+
     Deliberately does NOT swallow a quote-fetch failure here -- an earlier
     version caught it and silently dropped that order's value to zero,
     which undercounts real exposure exactly like the bug this function
@@ -234,14 +242,16 @@ def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict
     for order in open_orders:
         if str(order.get("side", "")).lower() != "buy":
             continue
-        shares = order.get("shares")
         ticker = order.get("ticker")
-        if not shares or not ticker:
+        if not ticker:
             continue
         notional = order.get("notional")
         if notional:
             value = float(notional)
         else:
+            shares = order.get("shares")
+            if not shares:
+                continue
             limit_price = order.get("limit_price")
             if limit_price:
                 value = float(shares) * float(limit_price)
@@ -355,12 +365,21 @@ def execute_approved_paper_proposal(
         recent_intents = [_intent_from_dict(raw) for raw in store.recent_executed_intents()]
         for order in current_portfolio.open_orders:
             side = str(order.get("side", "")).lower()
-            if side in ("buy", "sell") and order.get("shares"):
+            # Duplicate identity (see validate_trade_intent()'s duplicate
+            # check) only depends on ticker + side, never shares -- so a
+            # notional-only order (shares=None, a real dollar amount in
+            # notional) shouldn't be excluded just because it has no share
+            # count. `shares` here is a required TradeIntent field but is
+            # otherwise unused by the duplicate check; 1 is a harmless
+            # placeholder when the real order has none (GPT review,
+            # 2026-07-27: notional-only orders were invisible to duplicate
+            # detection).
+            if side in ("buy", "sell") and order.get("ticker"):
                 recent_intents.append(
                     TradeIntent(
                         ticker=order["ticker"],
                         side=side,
-                        shares=int(float(order["shares"])),
+                        shares=int(float(order["shares"])) if order.get("shares") else 1,
                     )
                 )
 

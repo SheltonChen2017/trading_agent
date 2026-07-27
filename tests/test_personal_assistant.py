@@ -99,6 +99,28 @@ def test_store_does_not_reset_an_executed_proposal():
         assert store.get_proposal(proposal["proposal_id"])["status"] == "executed"
 
 
+def test_list_broker_orders_attaches_originating_intent():
+    proposal = generate_risk_reduction_proposals(_packet(), _policy())[0].to_dict()
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal)
+        store.record_broker_order(
+            proposal["proposal_id"],
+            {"order_id": "paper-order-1", "ticker": proposal["intent"]["ticker"], "shares": proposal["intent"]["shares"], "side": "sell", "status": "accepted"},
+        )
+        orders = store.list_broker_orders()
+        assert len(orders) == 1
+        assert orders[0]["order_id"] == "paper-order-1"
+        assert orders[0]["intent"]["ticker"] == proposal["intent"]["ticker"]
+        assert orders[0]["evidence_status"] == proposal["evidence_status"]
+
+
+def test_list_broker_orders_empty_when_none_recorded():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        assert store.list_broker_orders() == []
+
+
 def test_execution_authorization_is_bound_to_exact_intent():
     intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
     authorization = authorize_trade_intent(intent, ValidationResult(True, []))

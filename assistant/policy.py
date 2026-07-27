@@ -30,6 +30,7 @@ class TradingPolicy:
     max_order_value: float = 5_000.0
     max_stale_price_minutes: float = 15.0
     max_slippage_pct: float = 1.0
+    max_spread_pct: float = 0.5
     earnings_blackout_days: int = 2
     require_earnings_data: bool = False
     allowed_sides: tuple[str, ...] = ("buy", "sell")
@@ -37,6 +38,9 @@ class TradingPolicy:
     allow_new_positions: bool = False
     enable_strategy_proposals: bool = False
     notes: str = ""
+
+    SUPPORTED_SIDES = ("buy", "sell")
+    SUPPORTED_ORDER_TYPES = ("market", "limit")
 
     def validate(self) -> None:
         percentage_fields = (
@@ -56,6 +60,32 @@ class TradingPolicy:
             raise ValueError("max_order_value must be positive.")
         if self.max_stale_price_minutes <= 0:
             raise ValueError("max_stale_price_minutes must be positive.")
+        if self.max_slippage_pct < 0:
+            raise ValueError("max_slippage_pct cannot be negative.")
+        if self.max_spread_pct < 0:
+            raise ValueError("max_spread_pct cannot be negative.")
+        if self.earnings_blackout_days < 0:
+            raise ValueError("earnings_blackout_days cannot be negative.")
+        if not self.allowed_sides:
+            raise ValueError("allowed_sides cannot be empty.")
+        unsupported_sides = set(self.allowed_sides) - set(self.SUPPORTED_SIDES)
+        if unsupported_sides:
+            raise ValueError(f"Unsupported allowed_sides: {sorted(unsupported_sides)}.")
+        if not self.allowed_order_types:
+            raise ValueError("allowed_order_types cannot be empty.")
+        unsupported_order_types = set(self.allowed_order_types) - set(self.SUPPORTED_ORDER_TYPES)
+        if unsupported_order_types:
+            raise ValueError(
+                f"Unsupported/unimplemented allowed_order_types: {sorted(unsupported_order_types)}."
+            )
+        for field_name in (
+            "require_earnings_data",
+            "allow_new_positions",
+            "enable_strategy_proposals",
+        ):
+            value = getattr(self, field_name)
+            if not isinstance(value, bool):
+                raise ValueError(f"{field_name} must be a boolean, got {value!r}.")
 
     def to_dict(self) -> dict:
         result = dataclasses.asdict(self)

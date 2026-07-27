@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from assistant.proposal_status import EXECUTED, UNRESOLVED_BROKER_STATE_STATUSES
 from assistant.schemas import DecisionPacket
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "trading_assistant.db"
@@ -260,12 +261,24 @@ class AssistantStore:
         limit: int = 100,
         max_age_minutes: int = 60,
     ) -> list[dict[str, Any]]:
-        proposals = self.list_proposals(status="executed", limit=limit)
+        """Intents from recently-executed proposals, PLUS every intent
+        whose broker submission outcome is still unresolved (status in
+        UNRESOLVED_BROKER_STATE_STATUSES) regardless of age. A submission
+        that hit an ambiguous error might still have reached the broker --
+        until that's reconciled, the duplicate-order check must keep
+        treating it as if the order exists, or a regenerated proposal for
+        the same ticker/side could submit a second real order."""
+        proposals = self.list_proposals(status=EXECUTED, limit=limit)
         cutoff = datetime.now(timezone.utc).timestamp() - max_age_minutes * 60
-        return [
+        intents = [
             p["intent"]
             for p in proposals
             if "intent" in p
             and p.get("executed_at")
             and datetime.fromisoformat(p["executed_at"]).timestamp() >= cutoff
         ]
+        for status in UNRESOLVED_BROKER_STATE_STATUSES:
+            intents.extend(
+                p["intent"] for p in self.list_proposals(status=status, limit=limit) if "intent" in p
+            )
+        return intents

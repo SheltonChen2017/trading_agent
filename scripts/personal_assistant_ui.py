@@ -36,6 +36,7 @@ from assistant.execution_service import execute_approved_paper_proposal
 from assistant.explanations import explain_ticker
 from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
 from assistant.policy import DEFAULT_POLICY_PATH, load_policy
+from assistant.proposal_status import STATUSES
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.stock_lookup import historical_hold_period_range, inverse_volatility_weights, latest_price_targets_by_firm
@@ -618,7 +619,7 @@ with tab_history:
 
     with proposals_col:
         st.subheader("Proposals")
-        status_filter = st.selectbox("Status filter", ["(any)", "proposed", "executed", "expired", "rejected", "blocked", "approved"])
+        status_filter = st.selectbox("Status filter", ["(any)"] + list(STATUSES))
         proposal_limit = st.slider("Max rows", 5, 100, 20, key="proposal_history_limit")
         stored = store.list_proposals(status=None if status_filter == "(any)" else status_filter, limit=proposal_limit)
         if not stored:

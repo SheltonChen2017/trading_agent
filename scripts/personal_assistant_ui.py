@@ -150,7 +150,9 @@ with st.sidebar:
 
 store = _store()
 
-tab_briefing, tab_watchlist, tab_propose, tab_history = st.tabs(["Briefing", "Watchlist", "Propose & Approve", "History"])
+tab_briefing, tab_watchlist, tab_selling, tab_propose, tab_history = st.tabs(
+    ["Briefing", "Watchlist", "Selling", "Propose & Approve", "History"]
+)
 
 with tab_briefing:
     if st.button("Refresh briefing", key="refresh_briefing"):
@@ -459,6 +461,63 @@ with tab_watchlist:
                         st.write(f"**[{e['status']}]** {e['label']} -- {e['claim']}")
                         st.caption(e["detail"])
             st.caption(explanation["note"])
+
+with tab_selling:
+    st.caption(
+        "\"Recommended to sell\" here means one thing specifically: this position currently "
+        "breaks one of your policy's risk limits (too concentrated, too much leveraged-ETF "
+        "exposure, etc.), computed the same deterministic way as the Propose & Approve tab. "
+        "It is NOT a price prediction -- this project has confirmed zero signals as real edge "
+        "for predicting which stocks will go down, so nothing here claims to know that."
+    )
+
+    policy, packet = _load_packet(policy_path, include_events=False)
+
+    if not packet.portfolio.positions:
+        st.info("No positions held -- nothing to evaluate for selling.")
+    else:
+        st.subheader("Current holdings")
+        st.caption(
+            "Entry price is a single WEIGHTED-AVERAGE cost basis across every buy of that ticker -- "
+            "this is what Alpaca itself reports (avg_entry_price), not a per-lot breakdown. If you bought "
+            "the same stock at different prices on different days, you will see one blended number here, "
+            "not separate rows per purchase. This project does not yet track individual tax lots."
+        )
+        st.dataframe(
+            [
+                {
+                    "Ticker": p.ticker,
+                    "Shares": p.shares,
+                    "Avg cost basis": p.entry_price,
+                    "Current price": p.current_price,
+                    "Unrealized P&L %": p.unrealized_pnl_pct,
+                    "Market value": p.market_value,
+                    "% of portfolio": round(p.market_value / packet.portfolio.total_equity * 100, 1) if packet.portfolio.total_equity else 0.0,
+                }
+                for p in packet.portfolio.positions
+            ],
+            use_container_width=True,
+            hide_index=True,
+        )
+
+        st.subheader("Recommended sells (policy-breach based)")
+        if st.button("Check for recommended sells", type="primary"):
+            sell_proposals = generate_risk_reduction_proposals(packet, policy)
+            for p in sell_proposals:
+                store.save_proposal(p.to_dict())
+            st.session_state["sell_proposals"] = [p.to_dict() for p in sell_proposals]
+            st.session_state["sell_checked_at"] = datetime.now().strftime("%H:%M:%S")
+
+        sell_checked_at = st.session_state.get("sell_checked_at")
+        sell_proposals = st.session_state.get("sell_proposals")
+        if sell_proposals is None:
+            st.info("Click \"Check for recommended sells\" above.")
+        elif not sell_proposals:
+            st.success(f"Checked at {sell_checked_at} -- no positions currently breach your policy limits.")
+        else:
+            st.write(f"Checked at {sell_checked_at} -- {len(sell_proposals)} recommended sell(s):")
+            for proposal in sell_proposals:
+                _render_proposal_approval(proposal, store, policy_path)
 
 with tab_propose:
     policy, packet = _load_packet(policy_path, include_events)

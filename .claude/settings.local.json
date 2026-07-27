@@ -120,7 +120,9 @@
       "Bash(taskkill //F //PID 6608)",
       "Bash(taskkill //F //PID 31020)",
       "Bash(taskkill //F //PID 11696)",
-      "Bash(taskkill //F //PID 5692)"
+      "Bash(taskkill //F //PID 5692)",
+      "Bash(taskkill //F //PID 23692)",
+      "Bash(taskkill //F //PID 34380)"
     ]
   }
 }

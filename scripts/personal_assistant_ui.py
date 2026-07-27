@@ -341,16 +341,22 @@ with tab_watchlist:
                 "proposals below, but approving them will be blocked until you set "
                 '"allow_new_positions": true in your policy file.'
             )
-        st.caption(f"Available cash: ${available_cash:,.2f}. This only sizes the split -- it is not a recommendation to buy these specific stocks.")
-        dollar_amount = st.number_input(
-            "Amount to invest",
-            min_value=0.0,
-            max_value=float(available_cash),
-            value=0.0,
-            step=50.0,
-            key="allocation_dollar_amount",
-            help="Capped at your current available cash.",
-        )
+        st.caption("This only sizes the split across your cart -- it is not a recommendation to buy these specific stocks.")
+        amount_col, balance_col = st.columns(2)
+        with amount_col:
+            dollar_amount = st.number_input(
+                "Amount to invest",
+                min_value=0.0,
+                max_value=float(available_cash),
+                value=0.0,
+                step=50.0,
+                key="allocation_dollar_amount",
+                help="Capped at your current available cash, pulled live from Alpaca.",
+            )
+        with balance_col:
+            st.metric("Remaining balance after this purchase", f"${available_cash - dollar_amount:,.2f}")
+            st.caption("Estimate before share rounding -- shares are rounded DOWN, so actual remaining cash will be at or above this.")
+        st.caption(f"Available cash right now (live from Alpaca): ${available_cash:,.2f}")
         if st.button("Buy with recommended allocation", type="primary", disabled=dollar_amount <= 0):
             prices = {t: r.get("current_price") for t, r in watchlist_results.items() if "error" not in r}
             alloc_proposals = generate_allocation_buy_proposals(

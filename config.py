@@ -177,7 +177,7 @@ BACKTEST_HOLD_DAYS = 5        # trading days to hold a flagged signal before mea
 # treat the constant as one-way/per-leg -- see tests/test_slippage_parity.py
 # for a regression guard against the two drifting apart again (a prior
 # version's comment here called this a "round-trip cost", which read as
-# contradicting the *2 in engine.py; Codex review, 2026-07-30).
+# contradicting the *2 in engine.py; Codex review, 2026-07-27).
 SLIPPAGE_PCT = 0.0015
 
 # Hold periods (in trading days) swept by run_multi_horizon_backtest() so a

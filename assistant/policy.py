@@ -78,7 +78,7 @@ class TradingPolicy:
         # all `float`, not `int`, so this rejects them along with negative
         # values in one check -- a bare `< 0` comparison silently passed
         # NaN (NaN < 0 is False) and would have disabled the earnings
-        # blackout check entirely (Codex review, 2026-07-30). bool is
+        # blackout check entirely (Codex review, 2026-07-27). bool is
         # excluded even though it's technically an int subclass, so
         # True/False can't silently pass as 1/0.
         if (

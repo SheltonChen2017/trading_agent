@@ -59,17 +59,25 @@ class TradeIntent:
     rationale: str = ""
 
 
-@dataclasses.dataclass
+@dataclasses.dataclass(frozen=True)
 class ValidationResult:
     approved: bool
     violations: list[str]
     # HMAC (keyed by this module's process-local secret) over the exact
-    # intent this result was computed for. Only validate_trade_intent()
-    # can produce a proof that verifies -- unlike a plain content hash,
-    # this can't be recomputed by code that merely knows the intent's
-    # public fields, so a hand-constructed ValidationResult (with an
-    # arbitrary or even correctly-hashed fingerprint) is rejected by
-    # authorize_trade_intent() below (Codex review, 2026-07-27).
+    # intent this result was computed for AND the approved/rejected
+    # outcome. Only validate_trade_intent() can produce a proof that
+    # verifies -- unlike a plain content hash, this can't be recomputed by
+    # code that merely knows the intent's public fields, so a
+    # hand-constructed ValidationResult (with an arbitrary or even
+    # correctly-hashed fingerprint) is rejected by authorize_trade_intent()
+    # below (Codex review, 2026-07-27). Signing `approved` too (not just
+    # intent identity) matters because this dataclass would otherwise be
+    # mutable: a REJECTED result still got a validly-signed proof for its
+    # intent, so flipping `.approved` to True and reusing that proof would
+    # have passed authorize_trade_intent() -- frozen=True blocks the plain
+    # in-place mutation, and signing the outcome blocks reusing the proof
+    # on any *other* ValidationResult (e.g. via dataclasses.replace()) too
+    # (GPT review, 2026-07-27).
     validation_proof: str | None = None
 
 
@@ -103,12 +111,28 @@ def intent_fingerprint(intent: TradeIntent) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def _validation_proof(intent: TradeIntent) -> str:
-    return _sign(f"validated:{intent_fingerprint(intent)}")
+def _validation_proof(intent: TradeIntent, approved: bool) -> str:
+    # `approved` is part of the signed payload -- NOT just intent identity
+    # -- so a REJECTED validation's proof can never be reused as if it were
+    # an approval. ValidationResult is a plain (mutable) dataclass;
+    # signing intent identity alone meant a caller could take a rejected
+    # result (which still got a validly-signed proof for its intent),
+    # flip `.approved = True`, and authorize_trade_intent() would accept
+    # it -- the proof didn't actually encode the outcome (GPT review,
+    # 2026-07-27).
+    return _sign(f"validated:{approved}:{intent_fingerprint(intent)}")
 
 
-def _authorization_proof(intent: TradeIntent) -> str:
-    return _sign(f"authorized:{intent_fingerprint(intent)}")
+def _authorization_proof(intent: TradeIntent, expires_at: str) -> str:
+    # `expires_at` is part of the signed payload -- NOT just intent
+    # identity -- so the expiry itself can't be extended after the fact.
+    # ExecutionAuthorization is frozen, but dataclasses.replace() (or any
+    # code building a new instance) can copy an existing, validly-signed
+    # `proof` onto an object with a LATER `expires_at`; since the prior
+    # version's proof didn't cover expires_at, that forged object would
+    # still verify, defeating "short-lived" entirely (GPT review,
+    # 2026-07-27).
+    return _sign(f"authorized:{intent_fingerprint(intent)}:{expires_at}")
 
 
 def authorize_trade_intent(
@@ -119,7 +143,7 @@ def authorize_trade_intent(
     if not validation.approved:
         raise ValueError("Cannot authorize a trade intent that failed validation.")
     if validation.validation_proof is None or not hmac.compare_digest(
-        validation.validation_proof, _validation_proof(intent)
+        validation.validation_proof, _validation_proof(intent, True)
     ):
         raise ValueError(
             "This ValidationResult was not produced by validate_trade_intent(intent, ...) "
@@ -127,12 +151,13 @@ def authorize_trade_intent(
             "or mismatched ValidationResult cannot be signed correctly."
         )
     now = datetime.now(timezone.utc)
+    expires_at = (now + timedelta(seconds=ttl_seconds)).isoformat()
     return ExecutionAuthorization(
         token=secrets.token_urlsafe(32),
         intent_fingerprint=intent_fingerprint(intent),
-        proof=_authorization_proof(intent),
+        proof=_authorization_proof(intent, expires_at),
         approved_at=now.isoformat(),
-        expires_at=(now + timedelta(seconds=ttl_seconds)).isoformat(),
+        expires_at=expires_at,
     )
 
 
@@ -143,12 +168,12 @@ def verify_execution_authorization(
 ) -> None:
     if authorization is None:
         raise PermissionError("Broker submission requires a short-lived execution-gate authorization.")
+    if not hmac.compare_digest(authorization.proof, _authorization_proof(intent, authorization.expires_at)):
+        raise PermissionError("Execution-gate authorization does not match this trade intent.")
     current = now or datetime.now(timezone.utc)
     expires = datetime.fromisoformat(authorization.expires_at)
     if current > expires:
         raise PermissionError("Execution-gate authorization has expired.")
-    if not hmac.compare_digest(authorization.proof, _authorization_proof(intent)):
-        raise PermissionError("Execution-gate authorization does not match this trade intent.")
 
 
 def validate_trade_intent(
@@ -212,7 +237,7 @@ def validate_trade_intent(
         return ValidationResult(
             approved=False,
             violations=["Kill switch is active — no trades are permitted."],
-            validation_proof=_validation_proof(intent),
+            validation_proof=_validation_proof(intent, False),
         )
 
     if intent.shares <= 0:
@@ -231,7 +256,24 @@ def validate_trade_intent(
         )
 
     if intent.side == "buy":
-        pending_by_ticker = {t.upper(): v for t, v in (pending_buy_value_by_ticker or {}).items()}
+        # A NaN/negative pending value must fail closed, not silently
+        # corrupt the arithmetic below: NaN propagates through every sum
+        # it touches, and `x > cap` for a NaN `x` is always False in
+        # Python -- exactly the "silently disables the check" failure
+        # mode already fixed elsewhere in this module for reference_price/
+        # limit_price/bid/ask, but missed here when
+        # pending_buy_value_by_ticker was added (GPT review, 2026-07-27).
+        pending_by_ticker: dict[str, float] = {}
+        for raw_ticker, raw_value in (pending_buy_value_by_ticker or {}).items():
+            if not math.isfinite(raw_value) or raw_value < 0:
+                violations.append(
+                    f"pending_buy_value_by_ticker[{raw_ticker!r}] must be a non-negative, finite "
+                    f"number, got {raw_value} -- refusing to compute exposure with a corrupted "
+                    "pending-order value."
+                )
+                continue
+            key = raw_ticker.upper()
+            pending_by_ticker[key] = pending_by_ticker.get(key, 0.0) + raw_value
         total_pending_buy_value = sum(pending_by_ticker.values())
 
         existing_position_value = sum(
@@ -391,10 +433,11 @@ def validate_trade_intent(
             f"{earnings_blackout_days}-day earnings blackout window."
         )
 
+    approved = len(violations) == 0
     return ValidationResult(
-        approved=len(violations) == 0,
+        approved=approved,
         violations=violations,
-        validation_proof=_validation_proof(intent),
+        validation_proof=_validation_proof(intent, approved),
     )
 
 

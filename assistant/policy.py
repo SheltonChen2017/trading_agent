@@ -74,8 +74,21 @@ class TradingPolicy:
             raise ValueError(f"max_slippage_pct must be a non-negative, finite number, got {self.max_slippage_pct}.")
         if not math.isfinite(self.max_spread_pct) or self.max_spread_pct < 0:
             raise ValueError(f"max_spread_pct must be a non-negative, finite number, got {self.max_spread_pct}.")
-        if self.earnings_blackout_days < 0:
-            raise ValueError("earnings_blackout_days cannot be negative.")
+        # isinstance(x, int), not a `< 0` comparison alone: NaN/inf/1.5 are
+        # all `float`, not `int`, so this rejects them along with negative
+        # values in one check -- a bare `< 0` comparison silently passed
+        # NaN (NaN < 0 is False) and would have disabled the earnings
+        # blackout check entirely (Codex review, 2026-07-30). bool is
+        # excluded even though it's technically an int subclass, so
+        # True/False can't silently pass as 1/0.
+        if (
+            not isinstance(self.earnings_blackout_days, int)
+            or isinstance(self.earnings_blackout_days, bool)
+            or self.earnings_blackout_days < 0
+        ):
+            raise ValueError(
+                f"earnings_blackout_days must be a non-negative integer, got {self.earnings_blackout_days!r}."
+            )
         if not self.allowed_sides:
             raise ValueError("allowed_sides cannot be empty.")
         unsupported_sides = set(self.allowed_sides) - set(self.SUPPORTED_SIDES)

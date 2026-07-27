@@ -194,6 +194,37 @@ def test_force_close_cleanup_still_fully_realizes_the_equity_curve():
     assert result["final_cash"] == result["final_equity"]
 
 
+def test_next_open_signal_date_equity_is_not_distorted_by_the_overnight_gap():
+    # Regression test (Codex review, 2026-07-30): a prior version computed
+    # shares using TOMORROW's open (the real next_open entry price) but
+    # started marking that position to market on the SIGNAL date using
+    # TODAY's close -- across a large overnight gap this wildly misstated
+    # signal-date equity (reproduced: a 50% gap down doubled reported
+    # equity from $10,000 to $20,000). Signal-date equity should stay flat
+    # (the reserved dollar amount, not yet exposed to price risk) instead.
+    days = 60
+    df = _flat_series(days, seed=5)
+    flag_idx = 30
+    flag_date = df.index[flag_idx]
+    # Force a large overnight gap: today's close is high, tomorrow's open
+    # crashes 50% below it.
+    df.loc[df.index[flag_idx], "close"] = 100.0
+    df.loc[df.index[flag_idx + 1], "open"] = 50.0
+    scan_fn = _flag_once("A", flag_date)
+
+    result = simulate_portfolio(
+        {"A": df}, scan_fn=scan_fn, hold_days=5, entry_timing="next_open",
+        slippage_pct=0.0, initial_cash=10_000.0, position_size_pct=0.5, max_concurrent_positions=5,
+    )
+    curve = result["equity_curve"]
+    signal_date_equity = curve.loc[flag_date]
+    assert abs(signal_date_equity - 10_000.0) < 1.0  # flat: reserved, not yet entered
+
+    trade = result["trade_log"].iloc[0]
+    assert abs(trade["entry_price"] - 50.0) < 0.01  # entered at the REAL (gapped) open
+    assert abs(trade["shares"] - 100.0) < 0.1  # $5,000 reserved / $50 real entry price
+
+
 def test_equity_curve_is_marked_to_market_daily():
     days = 60
     df = _flat_series(days, seed=0)
@@ -219,5 +250,6 @@ if __name__ == "__main__":
     test_stops_opening_new_positions_once_cash_exhausted()
     test_real_forward_data_is_used_for_the_exit_not_force_closed_early()
     test_force_close_cleanup_still_fully_realizes_the_equity_curve()
+    test_next_open_signal_date_equity_is_not_distorted_by_the_overnight_gap()
     test_equity_curve_is_marked_to_market_daily()
     print("All portfolio_simulator tests passed.")

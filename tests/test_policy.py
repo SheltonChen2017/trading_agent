@@ -48,6 +48,19 @@ def test_negative_earnings_blackout_days_rejected():
         assert "earnings_blackout_days" in str(exc)
 
 
+def test_non_integer_earnings_blackout_days_rejected():
+    # Regression test (Codex review, 2026-07-30): `< 0` alone silently
+    # passes NaN (NaN < 0 is False) and doesn't reject infinity or a
+    # fractional value either -- all three should be rejected outright
+    # since this field is meant to be a whole number of days.
+    for bad_value in (float("nan"), float("inf"), 1.5):
+        try:
+            _valid_policy(earnings_blackout_days=bad_value).validate()
+            assert False, f"expected earnings_blackout_days={bad_value} to be rejected"
+        except ValueError as exc:
+            assert "earnings_blackout_days" in str(exc)
+
+
 def test_empty_allowed_sides_rejected():
     try:
         _valid_policy(allowed_sides=()).validate()
@@ -122,6 +135,7 @@ if __name__ == "__main__":
     test_negative_max_slippage_pct_rejected()
     test_negative_max_spread_pct_rejected()
     test_negative_earnings_blackout_days_rejected()
+    test_non_integer_earnings_blackout_days_rejected()
     test_empty_allowed_sides_rejected()
     test_unsupported_allowed_side_rejected()
     test_empty_allowed_order_types_rejected()

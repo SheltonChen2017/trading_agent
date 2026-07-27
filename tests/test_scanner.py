@@ -112,6 +112,42 @@ def test_compute_features_diff_mode_handles_a_zero_crossing_correctly():
     assert abs(last_pct_change_return - (-2.0)) < 1e-9  # the bug this replaces: -200%, backwards direction
 
 
+def test_rolling_stats_exclude_the_current_row_from_its_own_baseline():
+    # Regression test (Codex review, 2026-07-30): rolling(window) INCLUDES
+    # the current row by default -- without an explicit shift, a big move
+    # dilutes/inflates the very mean/std it's then compared against,
+    # systematically understating its own z-score. Confirms the shock
+    # row's z-score matches a baseline computed from the PRECEDING window
+    # only (excluding the shock itself), not the window including it.
+    days = 30
+    window = 20
+    rng = np.random.default_rng(2)
+    returns = rng.normal(loc=0.0, scale=0.005, size=days)
+    shock_index = days - 1
+    returns[shock_index] = 0.20  # a huge +20% one-day return
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days)
+    df = pd.DataFrame(
+        {"open": close, "high": close, "low": close, "close": close, "volume": 1_000_000.0}, index=dates
+    )
+
+    features = compute_features(df, window=window)
+    return_pct = features["return_pct"]
+    shock_return = return_pct.iloc[shock_index]
+
+    # Window ending the day BEFORE the shock -- excludes it entirely.
+    excluding_shock = return_pct.iloc[shock_index - window : shock_index]
+    expected_zscore = (shock_return - excluding_shock.mean()) / excluding_shock.std()
+    actual_zscore = features["return_zscore"].iloc[shock_index]
+    assert abs(actual_zscore - expected_zscore) < 1e-9
+
+    # The buggy (self-included) baseline gives a meaningfully different
+    # answer -- confirms this isn't accidentally passing either way.
+    including_shock = return_pct.iloc[shock_index - window + 1 : shock_index + 1]
+    contaminated_zscore = (shock_return - including_shock.mean()) / including_shock.std()
+    assert abs(actual_zscore - contaminated_zscore) > 0.01
+
+
 def test_compute_features_rejects_unsupported_return_mode():
     dates = pd.bdate_range("2026-01-01", periods=25)
     df = pd.DataFrame(
@@ -130,5 +166,6 @@ if __name__ == "__main__":
     test_ignores_normal_noise()
     test_handles_ticker_with_shorter_history_than_as_of_date()
     test_compute_features_diff_mode_handles_a_zero_crossing_correctly()
+    test_rolling_stats_exclude_the_current_row_from_its_own_baseline()
     test_compute_features_rejects_unsupported_return_mode()
     print("All scanner tests passed.")

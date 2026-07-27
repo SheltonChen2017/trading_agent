@@ -65,6 +65,40 @@ def test_buying_power_constrains_cash_even_when_raw_cash_looks_sufficient():
     assert any("exceeds available cash" in v for v in result.violations)
 
 
+def test_pending_buy_value_counts_toward_total_exposure():
+    # Regression test (Codex review, 2026-07-30): a pending (not-yet-
+    # filled) buy order doesn't show up in portfolio.positions, so the
+    # total-exposure check was blind to it -- a $4,000 pending buy plus a
+    # new $5,000 buy on a $10,000 account both "fit" under a 50% cap
+    # (0% + 50% each), even though both fills together create 90%
+    # exposure. Reproduced here and fixed via pending_buy_value_by_ticker.
+    snapshot = _snapshot(cash=10_000.0)  # total equity = 10,000, no filled positions yet
+    intent = TradeIntent(ticker="KO", side="buy", shares=83)  # ~$4,980 < $5,000 cap check on its own
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY,
+        max_position_pct=1.0, max_total_exposure_pct=0.50,
+        pending_buy_value_by_ticker={"NVDA": 4_000.0},
+    )
+    assert any("total-exposure limit" in v for v in result.violations)
+
+
+def test_pending_buy_value_on_the_same_ticker_counts_toward_position_limit():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=10)  # $600, well under 5% alone
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY,
+        pending_buy_value_by_ticker={"KO": 9_000.0},  # already 90% committed on KO via a pending order
+    )
+    assert any("per-position limit" in v for v in result.violations)
+
+
+def test_no_pending_buy_value_leaves_exposure_checks_unaffected():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=5)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is True
+
+
 def test_max_total_exposure_exceeded():
     snapshot = _snapshot(
         positions=[{"ticker": "AAA", "shares": 90, "entry_price": 100.0, "current_price": 100.0}],  # $9000 already invested

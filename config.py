@@ -169,7 +169,16 @@ VOLUME_Z_THRESHOLD = 1.5     # require above-average volume to filter out noise
 
 # --- Backtest -----------------------------------------------------------
 BACKTEST_HOLD_DAYS = 5        # trading days to hold a flagged signal before measuring outcome
-SLIPPAGE_PCT = 0.0015         # simulated round-trip cost (entry+exit slippage/spread), subtracted from returns
+# ONE-WAY (per-leg) slippage/spread cost, as a fraction (0.0015 = 0.15%).
+# Applied once entering and once exiting -- ~2x this for a full round trip.
+# backtest/engine.py applies it as `raw_return_pct - 2 * SLIPPAGE_PCT * 100`
+# (a percentage-point subtraction); backtest/portfolio_simulator.py applies
+# it as a per-leg price haircut, `price * (1 +/- SLIPPAGE_PCT)`. Both
+# treat the constant as one-way/per-leg -- see tests/test_slippage_parity.py
+# for a regression guard against the two drifting apart again (a prior
+# version's comment here called this a "round-trip cost", which read as
+# contradicting the *2 in engine.py; Codex review, 2026-07-30).
+SLIPPAGE_PCT = 0.0015
 
 # Hold periods (in trading days) swept by run_multi_horizon_backtest() so a
 # signal's apparent edge (or lack of it) can be checked across several exit

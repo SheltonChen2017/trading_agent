@@ -151,7 +151,7 @@ def test_compare_baskets_to_market_index_tags_basket_column():
 
 
 def test_out_of_sample_backtest_by_basket_tags_basket_and_period():
-    df = _flat_series_with_two_shocks(days=100, early_index=20, late_index=80, shock_return=-0.08)
+    df = _flat_series_with_two_shocks(days=100, early_index=25, late_index=80, shock_return=-0.08)
     data = {"NVDA": df, "AMD": df}
 
     result = out_of_sample_backtest_by_basket(data, basket_names=["semiconductors"], discovery_frac=0.6)
@@ -161,7 +161,7 @@ def test_out_of_sample_backtest_by_basket_tags_basket_and_period():
 
 
 def test_out_of_sample_baseline_by_basket_tags_basket_and_period():
-    df = _flat_series_with_two_shocks(days=100, early_index=20, late_index=80, shock_return=-0.08)
+    df = _flat_series_with_two_shocks(days=100, early_index=25, late_index=80, shock_return=-0.08)
     data = {"NVDA": df, "AMD": df}
 
     result = out_of_sample_baseline_by_basket(data, basket_names=["semiconductors"], discovery_frac=0.6)
@@ -171,7 +171,7 @@ def test_out_of_sample_baseline_by_basket_tags_basket_and_period():
 
 
 def test_out_of_sample_market_by_basket_tags_basket_and_period():
-    df = _flat_series_with_two_shocks(days=100, early_index=20, late_index=80, shock_return=-0.08)
+    df = _flat_series_with_two_shocks(days=100, early_index=25, late_index=80, shock_return=-0.08)
     data = {"NVDA": df, "AMD": df}
     benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(100, 1.001))}, index=df.index)
 
@@ -222,7 +222,7 @@ def test_basket_significance_bonferroni_threshold_scales_with_basket_count():
 
 
 def test_basket_out_of_sample_significance_tags_basket_and_period():
-    df = _flat_series_with_two_shocks(days=100, early_index=20, late_index=80, shock_return=-0.08)
+    df = _flat_series_with_two_shocks(days=100, early_index=25, late_index=80, shock_return=-0.08)
     data = {"NVDA": df, "AMD": df}
 
     result = basket_out_of_sample_significance(data, basket_names=["semiconductors"], discovery_frac=0.6)

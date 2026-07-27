@@ -4,7 +4,7 @@ import os
 import sqlite3
 import sys
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -20,6 +20,7 @@ from risk.execution_gate import (
     TradeIntent,
     ValidationResult,
     authorize_trade_intent,
+    validate_trade_intent,
     verify_execution_authorization,
 )
 
@@ -143,12 +144,13 @@ def test_claim_proposal_returns_none_for_unknown_id():
 
 
 def test_execution_authorization_is_bound_to_exact_intent():
-    from risk.execution_gate import intent_fingerprint
-
     intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
-    authorization = authorize_trade_intent(
-        intent, ValidationResult(True, [], validated_intent_fingerprint=intent_fingerprint(intent))
+    portfolio = build_portfolio_snapshot(
+        [{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 100.0}], cash=1000.0,
     )
+    validation = validate_trade_intent(intent, portfolio, reference_price=100.0)
+    assert validation.approved
+    authorization = authorize_trade_intent(intent, validation)
     verify_execution_authorization(intent, authorization)
     try:
         verify_execution_authorization(
@@ -165,17 +167,59 @@ def test_authorize_trade_intent_rejects_a_validation_result_for_a_different_inte
     # actually have been produced by validating THIS intent -- otherwise
     # nothing stops pairing an approved result from a small, validated
     # trade with a different, never-validated (e.g. oversized) intent.
-    from risk.execution_gate import intent_fingerprint
-
-    small_intent = TradeIntent(ticker="AAPL", side="buy", shares=1)
-    big_intent = TradeIntent(ticker="AAPL", side="buy", shares=1000)
-    validation_for_small_trade = ValidationResult(
-        True, [], validated_intent_fingerprint=intent_fingerprint(small_intent)
+    small_intent = TradeIntent(ticker="AAPL", side="sell", shares=1)
+    big_intent = TradeIntent(ticker="AAPL", side="sell", shares=1000)
+    portfolio = build_portfolio_snapshot(
+        [{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 100.0}], cash=1000.0,
     )
+    validation_for_small_trade = validate_trade_intent(small_intent, portfolio, reference_price=100.0)
+    assert validation_for_small_trade.approved
     try:
         authorize_trade_intent(big_intent, validation_for_small_trade)
         assert False, "expected a mismatched (intent, validation) pair to be rejected"
     except ValueError:
+        pass
+
+
+def test_hand_constructed_validation_result_cannot_forge_authorization():
+    # Regression test (Codex review, 2026-07-30): the fingerprint alone is
+    # a PUBLIC hash of the intent's own fields -- any code that imports
+    # TradeIntent can compute it, so a hand-built ValidationResult with a
+    # correctly-computed fingerprint used to pass authorize_trade_intent()
+    # without ever calling validate_trade_intent(). Now the proof is an
+    # HMAC keyed by a process-local secret, which can't be reproduced from
+    # the intent's public fields alone.
+    from risk.execution_gate import intent_fingerprint
+
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=1)
+    forged = ValidationResult(True, [], validation_proof=intent_fingerprint(intent))
+    try:
+        authorize_trade_intent(intent, forged)
+        assert False, "expected a hand-constructed ValidationResult to be rejected"
+    except ValueError:
+        pass
+
+
+def test_hand_constructed_execution_authorization_cannot_forge_verification():
+    # Same forgery attempt one level up: directly constructing an
+    # ExecutionAuthorization (instead of going through
+    # authorize_trade_intent()) with a guessed/public-hash `proof` must
+    # not verify either (Codex review, 2026-07-30).
+    from risk.execution_gate import ExecutionAuthorization, intent_fingerprint
+
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=1)
+    now = datetime.now(timezone.utc)
+    forged = ExecutionAuthorization(
+        token="fake",
+        intent_fingerprint=intent_fingerprint(intent),
+        proof=intent_fingerprint(intent),
+        approved_at=now.isoformat(),
+        expires_at=(now + timedelta(seconds=120)).isoformat(),
+    )
+    try:
+        verify_execution_authorization(intent, forged)
+        assert False, "expected a hand-constructed ExecutionAuthorization to be rejected"
+    except PermissionError:
         pass
 
 

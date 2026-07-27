@@ -27,16 +27,24 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import pandas as pd
 import streamlit as st
 
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
 from assistant.execution_service import execute_approved_paper_proposal
+from assistant.explanations import explain_ticker
+from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
 from assistant.policy import DEFAULT_POLICY_PATH, load_policy
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
+from assistant.stock_lookup import historical_hold_period_range, inverse_volatility_weights, latest_price_targets_by_firm
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
+from config import LEVERAGED_ETF_TICKERS, UNIVERSE
+from data.market_data import fetch_historical
 from execution.alpaca_broker import is_configured
+from signals.regime import compute_trailing_market_volatility
+from strategies.trend_vol_rotation import classify_trend
 
 st.set_page_config(page_title="Personal Trading Assistant", layout="wide")
 
@@ -85,21 +93,46 @@ with st.sidebar:
 
 store = _store()
 
-tab_briefing, tab_propose, tab_history = st.tabs(["Briefing", "Propose & Approve", "History"])
+tab_briefing, tab_watchlist, tab_propose, tab_history = st.tabs(["Briefing", "Watchlist", "Propose & Approve", "History"])
 
 with tab_briefing:
     if st.button("Refresh briefing", key="refresh_briefing"):
         st.cache_data.clear()
+        st.toast("Refreshed against the live account.", icon="\U0001F503")
     policy, packet = _load_packet(policy_path, include_events)
     store.save_decision_packet(packet)
 
-    col1, col2, col3 = st.columns(3)
+    st.caption(
+        f"Source: **{packet.portfolio.source}** ({packet.portfolio.account_mode}) -- "
+        f"generated {packet.generated_at} -- portfolio as of {packet.data_freshness.get('portfolio_as_of', '?')}, "
+        f"regime as of {packet.data_freshness.get('market_regime_as_of', '?')}, "
+        f"research registry v{packet.data_freshness.get('research_registry_version', '?')}"
+    )
+
+    col1, col2, col3, col4 = st.columns(4)
     col1.metric("Total equity", f"${packet.portfolio.total_equity:,.2f}")
-    col2.metric("Cash", f"${packet.portfolio.cash:,.2f}")
+    col2.metric("Cash", f"${packet.portfolio.cash:,.2f} ({packet.risk.cash_pct}%)")
     col3.metric("Positions", packet.analytics["position_count"])
+    col4.metric("Open orders", packet.analytics["open_order_count"])
 
     st.subheader(f"Market regime ({packet.regime.benchmark_ticker})")
-    st.write(f"Trend: **{packet.regime.trend or 'unavailable'}** / Volatility: **{packet.regime.volatility_regime or 'unavailable'}**")
+    st.write(f"Trend: **{packet.regime.trend or 'unavailable'}** / Volatility: **{packet.regime.volatility_regime or 'unavailable'}**"
+             + (f" (trailing {packet.regime.trailing_volatility_pct}% daily std, as of {packet.regime.as_of})" if packet.regime.trailing_volatility_pct is not None else ""))
+
+    st.subheader("Risk exposure")
+    risk_col1, risk_col2, risk_col3 = st.columns(3)
+    risk_col1.metric("Largest single position", f"{packet.risk.largest_single_position_pct}%")
+    risk_col2.metric("Leveraged ETF exposure", f"{packet.risk.leveraged_etf_exposure_pct}%")
+    risk_col3.metric("Invested", f"{packet.analytics['invested_pct']:.1f}%")
+    if packet.risk.basket_exposure_pct:
+        st.write("Basket exposure (overlapping, doesn't sum to 100%):")
+        st.dataframe(
+            [{"Basket": b, "% of equity": pct} for b, pct in sorted(packet.risk.basket_exposure_pct.items(), key=lambda kv: -kv[1])],
+            use_container_width=True,
+            hide_index=True,
+        )
+    else:
+        st.caption("No basket exposure -- no positions held.")
 
     if packet.warnings:
         st.subheader("Warnings")
@@ -121,13 +154,187 @@ with tab_briefing:
                 for p in packet.portfolio.positions
             ],
             use_container_width=True,
+            hide_index=True,
         )
+        st.caption(f"Unrealized P&L: ${packet.analytics['unrealized_pnl']:,.2f}")
+    else:
+        st.subheader("Positions")
+        st.caption("No positions held.")
+
+    if packet.portfolio.open_orders:
+        st.subheader("Open orders")
+        st.dataframe(packet.portfolio.open_orders, use_container_width=True, hide_index=True)
+
+    if packet.upcoming_events:
+        st.subheader("Upcoming events")
+        for event in sorted(packet.upcoming_events, key=lambda e: e.event_date or "~"):
+            if event.event_date:
+                st.write(f"**{event.ticker}**: {event.event_type} on {event.event_date} ({event.days_away} day(s)) [{event.status.value}]")
+            else:
+                st.caption(f"{event.ticker}: {event.event_type} date unavailable [{event.status.value}]")
 
     if packet.signals:
-        st.subheader("Research evidence relevant to your holdings")
+        status_counts: dict[str, int] = {}
+        for finding in packet.signals:
+            status_counts[finding.status.value] = status_counts.get(finding.status.value, 0) + 1
+        st.subheader(f"Research evidence relevant to your holdings ({len(packet.signals)} findings)")
+        st.caption(" / ".join(f"{count} {status}" for status, count in sorted(status_counts.items())))
         for finding in packet.signals:
             st.write(f"**[{finding.status.value}]** {finding.label} -- {finding.claim}")
             st.caption(finding.detail)
+
+with tab_watchlist:
+    st.caption(
+        "Add tickers to your cart, then check them for: own trend/volatility, "
+        "recent analyst price targets by firm, recent news, a REAL historical "
+        "best/worst hold-period return range, and this project's own "
+        "evidence-labeled signal history. **No probability-of-return number "
+        "is shown anywhere.** This project has confirmed zero signals as real "
+        "edge after rigorous out-of-sample testing (see the Briefing tab's "
+        "evidence summary) -- a bare probability would either be fabricated "
+        "or would dress up an already-rejected backtest as more confident "
+        "than it is. When 2+ tickers are checked together, an inverse-"
+        "volatility weight suggestion is shown -- a risk-sizing heuristic "
+        "from historical data, not a return forecast."
+    )
+
+    common_options = sorted(set(UNIVERSE) | set(LEVERAGED_ETF_TICKERS) | {"QQQ", "SPY", "SOXX"})
+    picked = st.multiselect("Pick from common tickers", options=common_options, key="watchlist_picked")
+    typed = st.text_input(
+        "Or type any other ticker(s), comma-separated (e.g. NVDL, QQQM)", key="watchlist_typed"
+    )
+    typed_tickers = [t.strip().upper() for t in typed.split(",") if t.strip()]
+    cart = list(dict.fromkeys(picked + typed_tickers))
+
+    if cart:
+        st.write(f"**Cart:** {', '.join(cart)}")
+
+    ai_news_available = is_ai_summary_configured()
+    want_ai_summary = st.checkbox(
+        "Summarize news with Claude (real API call, small real cost per ticker)",
+        value=False,
+        disabled=not ai_news_available,
+        help=(
+            "Requires ANTHROPIC_API_KEY to be set. Off by default -- headlines "
+            "are shown either way; this only adds an AI-written summary of them."
+            if ai_news_available
+            else "ANTHROPIC_API_KEY is not set -- showing raw headlines only."
+        ),
+    )
+
+    if st.button("Check cart", type="primary", disabled=not cart):
+        _, watchlist_packet = _load_packet(policy_path, include_events=False)
+        results = {}
+        for ticker in cart:
+            try:
+                data = fetch_historical([ticker], lookback_days=300)
+                own_trend, own_vol = None, None
+                if ticker in data and not data[ticker].empty:
+                    close = data[ticker]["close"]
+                    as_of = close.index[-1]
+                    own_trend = classify_trend(close, as_of, lookback_days=200)
+                    own_vol = compute_trailing_market_volatility(pd.DataFrame({"close": close}), as_of, lookback_days=20)
+                explanation = explain_ticker(ticker, portfolio=watchlist_packet.portfolio, market_regime=watchlist_packet.regime)
+                price_targets = latest_price_targets_by_firm(ticker)
+                hold_range = historical_hold_period_range(ticker, data, hold_days=20)
+                news = fetch_recent_news(ticker)
+                news_summary = summarize_news_for_ticker(ticker, news) if want_ai_summary else None
+                results[ticker] = {
+                    "own_trend": own_trend,
+                    "own_vol": own_vol,
+                    "explanation": explanation,
+                    "price_targets": price_targets,
+                    "hold_range": hold_range,
+                    "news": news,
+                    "news_summary": news_summary,
+                }
+            except Exception as exc:
+                results[ticker] = {"error": str(exc)}
+        st.session_state["watchlist_results"] = results
+
+    watchlist_results = st.session_state.get("watchlist_results", {})
+
+    if len(watchlist_results) > 1:
+        vols = {t: r.get("own_vol") for t, r in watchlist_results.items() if "error" not in r}
+        if vols:
+            st.subheader("Suggested combination weighting (inverse-volatility)")
+            weights = inverse_volatility_weights(vols)
+            st.dataframe(
+                [{"Ticker": t, "Suggested %": w} for t, w in sorted(weights.items(), key=lambda kv: -kv[1])],
+                use_container_width=True,
+                hide_index=True,
+            )
+            st.caption(
+                "Weights inversely proportional to each ticker's own trailing volatility -- "
+                "sizes the choppier name smaller, same principle as strategies/vol_target_rotation.py. "
+                "A risk heuristic, not an optimization for expected return."
+            )
+
+    for ticker, result in watchlist_results.items():
+        with st.container(border=True):
+            st.subheader(ticker)
+            if "error" in result:
+                st.error(f"Could not look up {ticker}: {result['error']}")
+                continue
+
+            trend_str = result["own_trend"] or "unavailable (not enough history)"
+            vol_str = f"{result['own_vol']:.2f}% trailing daily std" if result["own_vol"] is not None else "unavailable"
+            st.write(f"Own trend (200-day): **{trend_str}** -- Own volatility (20-day): **{vol_str}**")
+
+            explanation = result["explanation"]
+            if explanation["currently_held"] not in (None, "not_checked"):
+                held = explanation["currently_held"]
+                st.info(f"Currently held: {held['shares']} shares, ${held['market_value']:,.2f} ({held['unrealized_pnl_pct']:+.1f}%)")
+
+            if result["price_targets"]:
+                st.write("Recent analyst price targets by firm:")
+                st.dataframe(
+                    [{"Firm": p["firm"], "Target": p["price_target"], "As of": p["as_of"]} for p in result["price_targets"]],
+                    use_container_width=True,
+                    hide_index=True,
+                )
+            else:
+                st.caption("No recent analyst price-target data available.")
+
+            hold_range = result["hold_range"]
+            if hold_range:
+                st.write(
+                    f"Historical {hold_range['hold_days']}-day hold range (n={hold_range['n_periods']} periods): "
+                    f"**{hold_range['worst_pct']:+.1f}%** worst -- **{hold_range['median_pct']:+.1f}%** median -- "
+                    f"**{hold_range['best_pct']:+.1f}%** best"
+                )
+                st.caption(
+                    "Real historical range from this ticker's own price history -- every day used as a "
+                    "starting point, not just favorable ones. Not a prediction of future performance."
+                )
+            else:
+                st.caption("Not enough history to compute a hold-period range.")
+
+            if result["news"]:
+                st.write("Recent news:")
+                if result["news_summary"]:
+                    st.info(result["news_summary"])
+                    st.caption("AI-generated summary of the headlines below -- not a price prediction or recommendation.")
+                elif want_ai_summary and not ai_news_available:
+                    st.caption("AI summary skipped -- ANTHROPIC_API_KEY not set.")
+                for item in result["news"]:
+                    st.write(f"- [{item['title']}]({item['url']}) -- {item['provider']}, {item['published']}")
+            else:
+                st.caption("No recent news found.")
+
+            if explanation["triggered_today"]:
+                st.write("Signals firing today:")
+                for trig in explanation["triggered_today"]:
+                    st.write(f"- **{trig['rule']}** ({trig['direction']}): return z={trig['return_zscore']}, volume z={trig['volume_zscore']}")
+            else:
+                st.caption("No predefined per-ticker signal fires on this today.")
+
+            if explanation["historical_evidence"]:
+                st.write("Recommended course of action, based on this project's own evidence:")
+                for e in explanation["historical_evidence"]:
+                    st.write(f"**[{e['status']}]** {e['label']} -- {e['claim']}")
+                    st.caption(e["detail"])
+            st.caption(explanation["note"])
 
 with tab_propose:
     policy, packet = _load_packet(policy_path, include_events)
@@ -148,12 +355,22 @@ with tab_propose:
         for proposal in proposals:
             store.save_proposal(proposal.to_dict())
         st.session_state["current_proposals"] = [p.to_dict() for p in proposals]
+        st.session_state["last_checked_at"] = datetime.now().strftime("%H:%M:%S")
 
-    proposals = st.session_state.get("current_proposals", [])
-    if not proposals:
-        st.info("No proposals yet -- click \"Check for proposals\" above.")
+    last_checked_at = st.session_state.get("last_checked_at")
+    proposals = st.session_state.get("current_proposals")
+    if proposals is None:
+        st.info("Click \"Check for proposals\" above to see if anything needs your attention.")
+    elif not proposals:
+        st.success(
+            f"Checked at {last_checked_at} -- no policy breaches"
+            + (" and no strategy rebalance needed" if check_strategy else "")
+            + " right now."
+        )
+    else:
+        st.write(f"Checked at {last_checked_at} -- {len(proposals)} proposal(s):")
 
-    for proposal in proposals:
+    for proposal in proposals or []:
         intent = proposal["intent"]
         with st.container(border=True):
             st.subheader(f"{intent['side'].upper()} {intent['shares']} {intent['ticker']}")

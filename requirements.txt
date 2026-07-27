@@ -6,3 +6,5 @@ joblib
 alpaca-py
 lxml
 pytest
+streamlit
+anthropic

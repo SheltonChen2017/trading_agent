@@ -251,22 +251,35 @@ def run_baseline_forward_returns(
     data: dict[str, pd.DataFrame],
     hold_days: int = BACKTEST_HOLD_DAYS,
     slippage_pct: float = SLIPPAGE_PCT,
+    entry_timing: str = "same_close",
 ) -> pd.DataFrame:
     """
     The control group for run_backtest(): for EVERY date (not just flagged
-    signal dates), compute the same close-to-close forward return over
-    `hold_days`, minus slippage. This answers "what would holding this
-    stock for the same period have returned on an arbitrary day" — the
-    baseline a flagged signal's return needs to beat. Without this, an
-    apparent edge over a rising test window can just be the whole universe
-    drifting upward, not anything the scanner detected.
+    signal dates), compute the same forward return over `hold_days`, minus
+    slippage. This answers "what would holding this stock for the same
+    period have returned on an arbitrary day" — the baseline a flagged
+    signal's return needs to beat. Without this, an apparent edge over a
+    rising test window can just be the whole universe drifting upward, not
+    anything the scanner detected.
+
+    `entry_timing` must match whatever was passed to run_backtest() for the
+    signal side of the comparison, or the two aren't measuring the same
+    thing: "same_close" compares close-to-close over `hold_days`; "next_open"
+    shifts both legs forward one day and compares open-to-open, matching
+    run_backtest()'s next-day-open execution assumption (see its docstring).
     """
+    if entry_timing not in ("same_close", "next_open"):
+        raise ValueError(f"entry_timing must be 'same_close' or 'next_open', got {entry_timing!r}")
+
     frames = []
     for ticker, df in data.items():
+        if entry_timing == "same_close":
+            entry_price, forward_price = df["close"], df["close"].shift(-hold_days)
+        else:  # next_open
+            entry_price, forward_price = df["open"].shift(-1), df["open"].shift(-(1 + hold_days))
         if len(df) <= hold_days:
             continue
-        forward_close = df["close"].shift(-hold_days)
-        raw_return_pct = (forward_close - df["close"]) / df["close"] * 100
+        raw_return_pct = (forward_price - entry_price) / entry_price * 100
         net_return_pct = raw_return_pct - 2 * slippage_pct * 100
         frame = pd.DataFrame({"ticker": ticker, "date": df.index, "net_return_pct": net_return_pct})
         frames.append(frame.dropna(subset=["net_return_pct"]))
@@ -360,6 +373,7 @@ def _signals_with_own_ticker_baseline(
     volume_z_threshold: float,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "same_close",
 ) -> pd.DataFrame:
     """
     Per-signal detail shared by compare_signal_to_baseline_per_ticker()
@@ -375,8 +389,9 @@ def _signals_with_own_ticker_baseline(
         volume_z_threshold=volume_z_threshold,
         scan_fn=scan_fn,
         scan_kwargs=scan_kwargs,
+        entry_timing=entry_timing,
     )
-    baseline = run_baseline_forward_returns(data, hold_days=hold_days, slippage_pct=slippage_pct)
+    baseline = run_baseline_forward_returns(data, hold_days=hold_days, slippage_pct=slippage_pct, entry_timing=entry_timing)
     baseline_mean_by_ticker = (
         baseline.groupby("ticker")["net_return_pct"].mean() if not baseline.empty else pd.Series(dtype=float)
     )
@@ -406,6 +421,7 @@ def _out_of_sample_own_ticker_detail(
     volume_z_threshold: float,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "same_close",
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Per-signal detail (run_backtest() output + own-ticker baseline edge),
@@ -428,7 +444,7 @@ def _out_of_sample_own_ticker_detail(
     results = run_backtest(
         data, hold_days=hold_days, slippage_pct=slippage_pct,
         return_z_threshold=return_z_threshold, volume_z_threshold=volume_z_threshold,
-        scan_fn=scan_fn, scan_kwargs=scan_kwargs,
+        scan_fn=scan_fn, scan_kwargs=scan_kwargs, entry_timing=entry_timing,
     )
     if results.empty:
         return results, results
@@ -442,7 +458,7 @@ def _out_of_sample_own_ticker_detail(
         if period_results.empty:
             out.append(period_results)
             continue
-        baseline = run_baseline_forward_returns(period_data, hold_days=hold_days, slippage_pct=slippage_pct)
+        baseline = run_baseline_forward_returns(period_data, hold_days=hold_days, slippage_pct=slippage_pct, entry_timing=entry_timing)
         baseline_mean_by_ticker = (
             baseline.groupby("ticker")["net_return_pct"].mean() if not baseline.empty else pd.Series(dtype=float)
         )
@@ -1136,6 +1152,7 @@ def out_of_sample_significance(
     scan_kwargs: dict | None = None,
     n_bootstrap: int = 2000,
     n_tests: int = 2,
+    entry_timing: str = "same_close",
 ) -> pd.DataFrame:
     """
     THE correct way to test whether a signal's edge is statistically
@@ -1156,7 +1173,8 @@ def out_of_sample_significance(
     reflects everything actually being tested simultaneously.
     """
     discovery, confirmation = _out_of_sample_own_ticker_detail(
-        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs,
+        entry_timing=entry_timing,
     )
     if discovery.empty and confirmation.empty:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_COLUMNS)
@@ -1206,6 +1224,7 @@ def out_of_sample_significance_by_date(
     scan_kwargs: dict | None = None,
     n_bootstrap: int = 2000,
     n_tests: int = 2,
+    entry_timing: str = "same_close",
 ) -> pd.DataFrame:
     """
     Cross-sectional-correlation-aware version of out_of_sample_significance():
@@ -1225,7 +1244,8 @@ def out_of_sample_significance_by_date(
     is real — same caveat as out_of_sample_significance().
     """
     discovery, confirmation = _out_of_sample_own_ticker_detail(
-        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs,
+        entry_timing=entry_timing,
     )
     if discovery.empty and confirmation.empty:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_BY_DATE_COLUMNS)
@@ -1277,6 +1297,7 @@ def out_of_sample_significance_by_block(
     block_lengths: tuple[int, ...] | None = None,
     n_bootstrap: int = 2000,
     n_tests: int = 2,
+    entry_timing: str = "same_close",
 ) -> pd.DataFrame:
     """
     Serial-dependence-aware version of out_of_sample_significance_by_date():
@@ -1326,7 +1347,8 @@ def out_of_sample_significance_by_block(
     p-value in the classical sense.
     """
     discovery, confirmation = _out_of_sample_own_ticker_detail(
-        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs,
+        entry_timing=entry_timing,
     )
     if discovery.empty and confirmation.empty:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_SIGNIFICANCE_BY_BLOCK_COLUMNS)

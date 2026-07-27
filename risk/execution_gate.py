@@ -16,7 +16,10 @@ numbers already provided by the caller — no LLM involved.
 from __future__ import annotations
 
 import dataclasses
-from datetime import datetime
+import hashlib
+import json
+import secrets
+from datetime import datetime, timedelta, timezone
 from typing import Literal
 
 from config import BASKETS, LEVERAGED_ETF_TICKERS, MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
@@ -28,7 +31,7 @@ class TradeIntent:
     ticker: str
     side: Literal["buy", "sell"]
     shares: int
-    order_type: Literal["market", "limit"] = "market"
+    order_type: Literal["market", "limit", "stop"] = "market"
     limit_price: float | None = None
     rationale: str = ""
 
@@ -37,6 +40,62 @@ class TradeIntent:
 class ValidationResult:
     approved: bool
     violations: list[str]
+
+
+@dataclasses.dataclass(frozen=True)
+class ExecutionAuthorization:
+    """Short-lived proof that a specific typed intent cleared the gate."""
+
+    token: str
+    intent_fingerprint: str
+    approved_at: str
+    expires_at: str
+
+
+def intent_fingerprint(intent: TradeIntent) -> str:
+    payload = json.dumps(
+        {
+            "ticker": intent.ticker.upper(),
+            "side": intent.side,
+            "shares": intent.shares,
+            "order_type": intent.order_type,
+            "limit_price": intent.limit_price,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+    return hashlib.sha256(payload.encode("utf-8")).hexdigest()
+
+
+def authorize_trade_intent(
+    intent: TradeIntent,
+    validation: ValidationResult,
+    ttl_seconds: int = 120,
+) -> ExecutionAuthorization:
+    if not validation.approved:
+        raise ValueError("Cannot authorize a trade intent that failed validation.")
+    now = datetime.now(timezone.utc)
+    return ExecutionAuthorization(
+        token=secrets.token_urlsafe(32),
+        intent_fingerprint=intent_fingerprint(intent),
+        approved_at=now.isoformat(),
+        expires_at=(now + timedelta(seconds=ttl_seconds)).isoformat(),
+    )
+
+
+def verify_execution_authorization(
+    intent: TradeIntent,
+    authorization: ExecutionAuthorization | None,
+    now: datetime | None = None,
+) -> None:
+    if authorization is None:
+        raise PermissionError("Broker submission requires a short-lived execution-gate authorization.")
+    current = now or datetime.now(timezone.utc)
+    expires = datetime.fromisoformat(authorization.expires_at)
+    if current > expires:
+        raise PermissionError("Execution-gate authorization has expired.")
+    if authorization.intent_fingerprint != intent_fingerprint(intent):
+        raise PermissionError("Execution-gate authorization does not match this trade intent.")
 
 
 def validate_trade_intent(
@@ -56,6 +115,8 @@ def validate_trade_intent(
     max_stale_price_minutes: float = 15.0,
     max_slippage_pct: float = 1.0,
     earnings_blackout_days: int = 2,
+    max_order_value: float | None = None,
+    min_cash_reserve_pct: float = 0.0,
 ) -> ValidationResult:
     """
     Validates one TradeIntent against every configured limit. Returns
@@ -77,8 +138,18 @@ def validate_trade_intent(
 
     if intent.shares <= 0:
         violations.append(f"shares must be positive, got {intent.shares}.")
+    if intent.side not in ("buy", "sell"):
+        violations.append(f"side must be 'buy' or 'sell', got {intent.side!r}.")
+    if intent.order_type not in ("market", "limit", "stop"):
+        violations.append(f"Unsupported order type: {intent.order_type!r}.")
 
     trade_value = intent.shares * reference_price
+    if reference_price <= 0:
+        violations.append(f"reference_price must be positive, got {reference_price}.")
+    if max_order_value is not None and trade_value > max_order_value:
+        violations.append(
+            f"Trade value ${trade_value:,.2f} exceeds the ${max_order_value:,.2f} maximum order value."
+        )
 
     if intent.side == "buy":
         existing_position_value = sum(
@@ -93,6 +164,12 @@ def validate_trade_intent(
 
         if trade_value > portfolio.cash:
             violations.append(f"Trade value ${trade_value:,.2f} exceeds available cash ${portfolio.cash:,.2f}.")
+        minimum_cash = portfolio.total_equity * min_cash_reserve_pct
+        if portfolio.cash - trade_value < minimum_cash:
+            violations.append(
+                f"Cash after trade would be ${portfolio.cash - trade_value:,.2f}, below the "
+                f"${minimum_cash:,.2f} minimum cash reserve."
+            )
 
         existing_invested = portfolio.total_equity - portfolio.cash
         new_invested_pct = (existing_invested + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
@@ -123,9 +200,23 @@ def validate_trade_intent(
                     f"Leveraged ETF exposure would be {new_leveraged_pct:.1f}% of equity, exceeding the "
                     f"{max_leveraged_etf_pct:.1f}% leveraged-ETF limit."
                 )
+    else:
+        held_shares = sum(
+            p.shares for p in portfolio.positions if p.ticker.upper() == intent.ticker.upper()
+        )
+        if intent.shares > held_shares:
+            violations.append(
+                f"Sell quantity {intent.shares} exceeds the {held_shares:g} shares currently held."
+            )
 
     if price_timestamp is not None and now is not None:
-        age_minutes = (now - price_timestamp).total_seconds() / 60
+        comparable_price_timestamp = price_timestamp
+        comparable_now = now
+        if comparable_price_timestamp.tzinfo is None and comparable_now.tzinfo is not None:
+            comparable_price_timestamp = comparable_price_timestamp.replace(tzinfo=comparable_now.tzinfo)
+        elif comparable_price_timestamp.tzinfo is not None and comparable_now.tzinfo is None:
+            comparable_price_timestamp = comparable_price_timestamp.replace(tzinfo=None)
+        age_minutes = (comparable_now - comparable_price_timestamp).total_seconds() / 60
         if age_minutes > max_stale_price_minutes:
             violations.append(f"Reference price is {age_minutes:.1f} minutes old, exceeding the {max_stale_price_minutes:.1f}-minute staleness limit.")
 
@@ -149,7 +240,12 @@ def validate_trade_intent(
                 f"${reference_price:.2f}, exceeding the {max_slippage_pct:.1f}% max-slippage limit."
             )
 
-    if earnings_days_away is not None and earnings_days_away <= earnings_blackout_days:
+    # Symmetric window: blocks both the run-up to earnings and the days right
+    # after, since a caller could someday pass a negative "days since" value.
+    if (
+        earnings_days_away is not None
+        and abs(earnings_days_away) <= earnings_blackout_days
+    ):
         violations.append(
             f"{intent.ticker} has earnings in {earnings_days_away} day(s), within the "
             f"{earnings_blackout_days}-day earnings blackout window."

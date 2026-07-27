@@ -32,75 +32,28 @@ from assistant.schemas import (
     SignalEvidence,
     UpcomingEvent,
 )
+from assistant.policy import TradingPolicy, load_policy
+from assistant.portfolio_analytics import compute_portfolio_analytics
+from assistant.research_registry import load_research_findings, registry_version
 
-# This project's own research findings, current as of 2026-07 — see
-# memory: project_signal_findings.md, project_leverage_rotation_strategy.md.
-# Kept as a static registry for now (Phase 1); a real implementation would
-# read this from the trading journal / experiment database once built
-# (see assistant/audit_log.py and the Phase 3 "research memory" plan).
-KNOWN_FINDINGS: list[SignalEvidence] = [
-    SignalEvidence(
-        label="Original z-score dip/up scanner",
-        claim="Beats a random-day baseline out-of-sample",
-        status=EvidenceStatus.REJECTED,
-        detail="0/32 basket x direction cells significant at 2yr or 7yr lookback, across the full 104-ticker universe.",
-        source="memory: project_signal_findings",
-        relevant_tickers=[],
-    ),
-    SignalEvidence(
-        label="Cross-sectional momentum (12-1 month)",
-        claim="Beats a random-day baseline out-of-sample",
-        status=EvidenceStatus.REJECTED,
-        detail="Looked real under row-level bootstrap (p=0.000 both periods) but evaporated under block bootstrap "
-        "accounting for serial dependence (p=0.25-0.37) — the ~19-20 tickers it flags per day were far fewer "
-        "independent observations than they appeared.",
-        source="memory: project_signal_findings, project_rigor_toolkit",
-        relevant_tickers=[],
-    ),
-    SignalEvidence(
-        label="Relative scanner, 52-week breakout, PEAD, fundamentals, analyst-rating signals",
-        claim="Beats a random-day baseline out-of-sample",
-        status=EvidenceStatus.REJECTED,
-        detail="0/2 significant cells each, after confirmation-only + by-date/by-block significance testing.",
-        source="memory: project_signal_findings",
-        relevant_tickers=[],
-    ),
-    SignalEvidence(
-        label="QQQ/TQQQ trend+volatility regime rotation",
-        claim="Beats 50/50 buy-and-hold on both CAGR and drawdown",
-        status=EvidenceStatus.REJECTED,
-        detail="Passed under a since-fixed same-close look-ahead bug; under corrected next-day-open execution, "
-        "walk-forward wins dropped from 2/3 to 1/3 folds and the main confirmation no longer beats baseline on CAGR.",
-        source="memory: project_leverage_rotation_strategy",
-        relevant_tickers=["QQQ", "QQQM", "TQQQ"],
-    ),
-    SignalEvidence(
-        label="SOXX/SOXL trend+volatility regime rotation — return",
-        claim="Beats 50/50 buy-and-hold on CAGR",
-        status=EvidenceStatus.REJECTED,
-        detail="41.6% CAGR pre-tax (beat baseline's 36.3%), but only 33.9% after modeling a 37% short-term "
-        "capital-gains tax in a taxable account — now LOSES to baseline. ~$9,577 paid in taxes on ~21 trades over 6.5yr.",
-        source="memory: project_leverage_rotation_strategy",
-        relevant_tickers=["SOXX", "SOXL"],
-    ),
-    SignalEvidence(
-        label="SOXX/SOXL trend+volatility regime rotation — drawdown",
-        claim="Reduces max drawdown vs. 50/50 buy-and-hold",
-        status=EvidenceStatus.CONFIRMED,
-        detail="Consistently -50% to -54% max drawdown vs. baseline's -74%, across the original confirmation, "
-        "walk-forward (2/3 folds), full parameter-sensitivity sweep, AND after tax/cost modeling. The one durable "
-        "result in this project so far — a smoother ride, not higher returns.",
-        source="memory: project_leverage_rotation_strategy",
-        relevant_tickers=["SOXX", "SOXL"],
-    ),
-]
+# Backward-compatible import used by explanations.py and existing tests.
+# The source of truth is now assistant/research_findings.json.
+KNOWN_FINDINGS: list[SignalEvidence] = load_research_findings()
 
 
 def _classify_leveraged(ticker: str) -> bool:
     return ticker.upper() in LEVERAGED_ETF_TICKERS
 
 
-def build_portfolio_snapshot(positions: list[dict], cash: float) -> PortfolioSnapshot:
+def build_portfolio_snapshot(
+    positions: list[dict],
+    cash: float,
+    *,
+    buying_power: float | None = None,
+    source: str = "manual",
+    account_mode: str = "manual",
+    open_orders: list[dict] | None = None,
+) -> PortfolioSnapshot:
     """
     `positions` is a list of dicts: {ticker, shares, entry_price, current_price}.
     See build_portfolio_snapshot_from_alpaca() for pulling this shape
@@ -128,6 +81,10 @@ def build_portfolio_snapshot(positions: list[dict], cash: float) -> PortfolioSna
         cash=round(cash, 2),
         total_equity=round(total_equity, 2),
         as_of=datetime.now(timezone.utc).date().isoformat(),
+        buying_power=round(buying_power, 2) if buying_power is not None else None,
+        source=source,
+        account_mode=account_mode,
+        open_orders=open_orders or [],
     )
 
 
@@ -142,9 +99,16 @@ def build_portfolio_snapshot_from_alpaca() -> PortfolioSnapshot:
     build_decision_packet()'s use_live_alpaca handling) rather than
     relying on this exception for control flow.
     """
-    from execution.alpaca_broker import get_account, get_open_positions
+    from execution.alpaca_broker import get_account, get_open_orders, get_open_positions
 
     account = get_account()
+    try:
+        open_orders = get_open_orders()
+    except Exception:
+        # Positions/cash are still useful if the broker's order endpoint is
+        # temporarily unavailable. The packet's freshness/source metadata
+        # makes the partial snapshot explicit to downstream callers.
+        open_orders = []
     positions = [
         {
             "ticker": p["ticker"],
@@ -154,7 +118,14 @@ def build_portfolio_snapshot_from_alpaca() -> PortfolioSnapshot:
         }
         for p in get_open_positions()
     ]
-    return build_portfolio_snapshot(positions, cash=account["cash"])
+    return build_portfolio_snapshot(
+        positions,
+        cash=account["cash"],
+        buying_power=account["buying_power"],
+        source="alpaca",
+        account_mode="paper" if account["paper"] else "live",
+        open_orders=open_orders,
+    )
 
 
 def build_risk_exposure(snapshot: PortfolioSnapshot, concentration_threshold_pct: float = 40.0) -> RiskExposure:
@@ -249,10 +220,24 @@ def get_relevant_signal_evidence(portfolio_tickers: list[str]) -> list[SignalEvi
     ]
 
 
-def get_upcoming_events(tickers: list[str]) -> list[UpcomingEvent]:
-    """No live earnings/macro-event calendar is wired up yet — every
-    entry is honestly UNAVAILABLE rather than guessed or omitted
-    silently. Wire up a real calendar feed to fill this in for real."""
+def get_upcoming_events(tickers: list[str], fetch_live: bool = False) -> list[UpcomingEvent]:
+    """Return upcoming earnings or explicit UNAVAILABLE records."""
+    if fetch_live and tickers:
+        from data.event_data import fetch_upcoming_earnings
+
+        raw = fetch_upcoming_earnings(tickers)
+        return [
+            UpcomingEvent(
+                ticker=t,
+                event_type="earnings",
+                days_away=raw[t]["days_away"],
+                status=EvidenceStatus.EXPLORATORY if raw[t]["available"] else EvidenceStatus.UNAVAILABLE,
+                event_date=raw[t]["event_date"],
+                source=raw[t]["source"],
+                fetched_at=raw[t]["fetched_at"],
+            )
+            for t in tickers
+        ]
     return [
         UpcomingEvent(ticker=t, event_type="earnings", days_away=None, status=EvidenceStatus.UNAVAILABLE)
         for t in tickers
@@ -264,6 +249,8 @@ def build_decision_packet(
     cash: float | None = None,
     benchmark_ticker: str = "QQQ",
     use_live_alpaca: bool = False,
+    include_live_events: bool = False,
+    policy: TradingPolicy | None = None,
 ) -> DecisionPacket:
     """
     Assembles the full read-only decision packet. This is the one
@@ -296,7 +283,9 @@ def build_decision_packet(
     regime = build_market_regime(benchmark_ticker)
     tickers = [p.ticker for p in snapshot.positions]
     signals = get_relevant_signal_evidence(tickers)
-    events = get_upcoming_events(tickers)
+    events = get_upcoming_events(tickers, fetch_live=include_live_events)
+    active_policy = policy or load_policy()
+    analytics = compute_portfolio_analytics(snapshot)
 
     warnings = list(risk.concentration_warnings) + extra_warnings
     if regime.trend is None or regime.volatility_regime is None:
@@ -310,4 +299,11 @@ def build_decision_packet(
         signals=signals,
         upcoming_events=events,
         warnings=warnings,
+        policy_version=active_policy.version,
+        analytics=analytics,
+        data_freshness={
+            "portfolio_as_of": snapshot.as_of,
+            "market_regime_as_of": regime.as_of,
+            "research_registry_version": registry_version(),
+        },
     )

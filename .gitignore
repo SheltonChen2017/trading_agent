@@ -9,3 +9,8 @@ __pycache__/
 # Never commit credentials
 .env
 .env.*
+
+# Personal assistant runtime state
+data/trading_assistant.db
+data/trading_assistant.db-shm
+data/trading_assistant.db-wal

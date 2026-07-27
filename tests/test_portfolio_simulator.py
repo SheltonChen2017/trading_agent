@@ -141,19 +141,48 @@ def test_stops_opening_new_positions_once_cash_exhausted():
     assert result["trade_log"]["position_value"].sum() <= 100.0 + 1e-6 or result["n_trades"] <= 2
 
 
-def test_force_closes_open_positions_at_end_of_data():
-    # Flag a signal near the tail of the USABLE date range (not the very
-    # end of the raw data): run_backtest()-style tail trimming guarantees
-    # its exit index is in-bounds within the ticker's own data (so it's
-    # accepted, not skipped), but its exit DATE falls after the last date
-    # this simulation actually iterates over -- so the day-by-day "close
-    # when exit_date is reached" check can never fire, and the position
-    # must be force-closed in the end-of-run cleanup instead.
+def test_real_forward_data_is_used_for_the_exit_not_force_closed_early():
+    # Regression test (Codex review, 2026-07-27): a prior version bounded
+    # the close/mark-to-market loop by the SAME tail-truncated window used
+    # to gate new entries, so a signal flagged near the tail of that
+    # truncated window force-closed at the truncation point even though
+    # its real planned exit date -- and the real price on it -- existed
+    # later in the actual data. Flagging 15 days from the true end of an
+    # 80-day series with hold_days=10 (same_close tail_buffer=10) used to
+    # force-close on day 69 instead of the real, later exit on day 75.
     days = 80
     df = _flat_series(days, seed=3)
     hold_days = 10
-    dates = df.index
-    flag_date = dates[-15]
+    flag_date = df.index[-15]
+    scan_fn = _flag_once("A", flag_date)
+
+    result = simulate_portfolio(
+        {"A": df}, scan_fn=scan_fn, hold_days=hold_days, entry_timing="same_close",
+        slippage_pct=0.0, initial_cash=10_000.0, position_size_pct=0.5, max_concurrent_positions=5,
+    )
+    assert result["n_trades"] == 1
+    trade = result["trade_log"].iloc[0]
+
+    flag_idx = df.index.get_loc(flag_date)
+    expected_exit_date = df.index[flag_idx + hold_days]
+    expected_exit_price = float(df["close"].iloc[flag_idx + hold_days])
+
+    assert bool(trade["forced_close"]) is False
+    assert trade["exit_date"] == expected_exit_date
+    assert abs(trade["exit_price"] - expected_exit_price) < 0.01
+    assert result["final_cash"] == result["final_equity"]  # nothing left open
+
+
+def test_force_close_cleanup_still_fully_realizes_the_equity_curve():
+    # The force-close cleanup is now a defensive fallback rather than a
+    # normally-reachable path (see simulate_portfolio()'s docstring) --
+    # this just confirms the end-of-run bookkeeping (final_cash ==
+    # final_equity, no dangling open positions) holds when every flagged
+    # signal is allowed to run to its real, in-bounds exit.
+    days = 60
+    df = _flat_series(days, seed=4)
+    hold_days = 5
+    flag_date = df.index[30]
     scan_fn = _flag_once("A", flag_date)
 
     result = simulate_portfolio(
@@ -161,8 +190,8 @@ def test_force_closes_open_positions_at_end_of_data():
         initial_cash=10_000.0, position_size_pct=0.5, max_concurrent_positions=5,
     )
     assert result["n_trades"] == 1
-    assert bool(result["trade_log"].iloc[0]["forced_close"]) is True
-    assert result["final_cash"] == result["final_equity"]  # nothing left open
+    assert bool(result["trade_log"].iloc[0]["forced_close"]) is False
+    assert result["final_cash"] == result["final_equity"]
 
 
 def test_equity_curve_is_marked_to_market_daily():
@@ -188,6 +217,7 @@ if __name__ == "__main__":
     test_single_trade_matches_hand_computed_shares_and_pnl()
     test_respects_max_concurrent_positions()
     test_stops_opening_new_positions_once_cash_exhausted()
-    test_force_closes_open_positions_at_end_of_data()
+    test_real_forward_data_is_used_for_the_exit_not_force_closed_early()
+    test_force_close_cleanup_still_fully_realizes_the_equity_curve()
     test_equity_curve_is_marked_to_market_daily()
     print("All portfolio_simulator tests passed.")

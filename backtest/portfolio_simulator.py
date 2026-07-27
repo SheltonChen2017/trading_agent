@@ -31,13 +31,27 @@ project_execution_realism_gaps):
     time) capped by whatever cash is actually left -- no volatility-based
     or Kelly-style sizing.
   - Exit is purely hold_days-based, exactly like run_backtest() -- there is
-    NO intraday stop-loss execution modeled here yet. A position that's
-    still open at the very end of the data is force-closed at the last
-    available price so the equity curve and trade log are always fully
-    realized.
+    NO intraday stop-loss execution modeled here yet. A position is only
+    ever entered when its planned exit index already falls inside that
+    ticker's own available data, so every entered position's real exit
+    date is guaranteed to be reachable by the simulation clock; the
+    post-loop "force-close anything still open" cleanup below is
+    therefore a defensive fallback (kept for degenerate/malformed input),
+    not something a normal, fully-populated backtest run should ever
+    trigger. (A prior version bounded the simulation clock itself by the
+    same tail-truncated window used to gate NEW entries, which forced
+    already-open positions closed early at that truncation point even
+    though their real planned exit date -- and its real price -- existed
+    later in the actual data. Fixed by running the close/mark-to-market
+    loop over the full date range and only gating new-signal evaluation
+    by the truncated window. Codex review, 2026-07-27.)
   - Slippage is applied as a price haircut on both legs (buy slightly
     above, sell slightly below the quoted price), the dollar-accounting
     equivalent of run_backtest()'s "round-trip slippage" convention.
+    `slippage_pct` is a FRACTION (e.g. config.SLIPPAGE_PCT = 0.0015 means
+    0.15% per leg), matching how backtest/engine.py treats the same
+    constant -- a prior version divided by 100 again here, applying
+    slippage 100x too small (Codex review, 2026-07-27).
 
 Has NOT yet been used to re-run any of this project's existing REJECTED
 findings -- everything in research_findings.json still reflects the
@@ -119,9 +133,20 @@ def simulate_portfolio(
     kwargs = _resolve_scan_kwargs(scan_fn, scan_kwargs, return_z_threshold, volume_z_threshold)
     all_dates = sorted(set().union(*(df.index for df in data.values())))
     tail_buffer = hold_days + 1 if entry_timing == "next_open" else hold_days
-    usable_dates = all_dates[ROLLING_WINDOW : len(all_dates) - tail_buffer] if tail_buffer > 0 else all_dates[ROLLING_WINDOW:]
-    if not usable_dates:
+    # `simulation_dates` is the FULL clock the loop runs over -- closing
+    # positions, marking to market, and force-closing at the true end of
+    # data. `scannable_dates` is the (smaller, tail-truncated) subset on
+    # which NEW signals are even considered, so a fresh entry always has
+    # `tail_buffer` days of room ahead. A prior version used the truncated
+    # range for BOTH purposes, which force-closed already-open positions
+    # at the truncated cutoff even when their real planned exit date (and
+    # its price) existed later in the actual data (Codex review,
+    # 2026-07-27, reproduced: a Feb 23 planned exit force-closed on Feb 18).
+    simulation_dates = all_dates[ROLLING_WINDOW:]
+    if not simulation_dates:
         return _empty_result(initial_cash)
+    scan_cutoff = len(all_dates) - tail_buffer if tail_buffer > 0 else len(all_dates)
+    scannable_dates = set(all_dates[ROLLING_WINDOW:scan_cutoff]) if scan_cutoff > ROLLING_WINDOW else set()
 
     cash = initial_cash
     open_positions: dict[str, dict] = {}  # ticker -> position dict
@@ -146,7 +171,7 @@ def simulate_portfolio(
 
     def _close_position(ticker: str, pos: dict, exit_date, exit_price: float, forced: bool) -> None:
         nonlocal cash
-        net_exit_price = exit_price * (1 - slippage_pct / 100)
+        net_exit_price = exit_price * (1 - slippage_pct)
         proceeds = pos["shares"] * net_exit_price
         cash += proceeds
         net_return_pct = (net_exit_price - pos["net_entry_price"]) / pos["net_entry_price"] * 100
@@ -166,69 +191,73 @@ def simulate_portfolio(
             }
         )
 
-    for as_of in usable_dates:
-        # 1. Close any positions whose exit date has arrived.
+    for as_of in simulation_dates:
+        # 1. Close any positions whose exit date has arrived. Runs over
+        #    the FULL simulation clock, not just scannable_dates, so a
+        #    position's real planned exit date is always honored.
         for ticker in [t for t, pos in open_positions.items() if pos["exit_date"] <= as_of]:
             pos = open_positions.pop(ticker)
             df = data[ticker]
             exit_price = pos["planned_exit_price"] if pos["exit_date"] in df.index else pos["last_known_price"]
             _close_position(ticker, pos, pos["exit_date"], exit_price, forced=False)
 
-        # 2. Evaluate new signals.
-        signals = scan_fn(data, as_of=as_of, **kwargs)
-        if not signals.empty:
-            if direction_filter is not None:
-                signals = signals[signals["direction"].isin(direction_filter)]
-            for _, sig in signals.iterrows():
-                n_signals_seen += 1
-                ticker = sig["ticker"]
-                if ticker in open_positions:
-                    continue
-                df = data[ticker]
-                if as_of not in df.index:
-                    continue
-                idx = df.index.get_loc(as_of)
-                if entry_timing == "same_close":
-                    entry_idx, exit_idx, entry_col, exit_col = idx, idx + hold_days, "close", "close"
-                else:
-                    entry_idx, exit_idx, entry_col, exit_col = idx + 1, idx + 1 + hold_days, "open", "open"
-                if exit_idx >= len(df):
-                    continue  # not enough forward history to ever close this one
+        # 2. Evaluate new signals -- only on scannable_dates, so a fresh
+        #    entry always has tail_buffer days of room ahead to exit.
+        if as_of in scannable_dates:
+            signals = scan_fn(data, as_of=as_of, **kwargs)
+            if not signals.empty:
+                if direction_filter is not None:
+                    signals = signals[signals["direction"].isin(direction_filter)]
+                for _, sig in signals.iterrows():
+                    n_signals_seen += 1
+                    ticker = sig["ticker"]
+                    if ticker in open_positions:
+                        continue
+                    df = data[ticker]
+                    if as_of not in df.index:
+                        continue
+                    idx = df.index.get_loc(as_of)
+                    if entry_timing == "same_close":
+                        entry_idx, exit_idx, entry_col, exit_col = idx, idx + hold_days, "close", "close"
+                    else:
+                        entry_idx, exit_idx, entry_col, exit_col = idx + 1, idx + 1 + hold_days, "open", "open"
+                    if exit_idx >= len(df):
+                        continue  # not enough forward history to ever close this one
 
-                if len(open_positions) >= max_concurrent_positions:
-                    n_skipped_capacity += 1
-                    continue
+                    if len(open_positions) >= max_concurrent_positions:
+                        n_skipped_capacity += 1
+                        continue
 
-                current_equity = _mark_to_market(as_of)
-                position_value = min(current_equity * position_size_pct, cash)
-                if position_value <= 0:
-                    n_skipped_cash += 1
-                    continue
+                    current_equity = _mark_to_market(as_of)
+                    position_value = min(current_equity * position_size_pct, cash)
+                    if position_value <= 0:
+                        n_skipped_cash += 1
+                        continue
 
-                raw_entry_price = float(df[entry_col].iloc[entry_idx])
-                net_entry_price = raw_entry_price * (1 + slippage_pct / 100)
-                shares = position_value / net_entry_price
-                if shares <= 0:
-                    continue
+                    raw_entry_price = float(df[entry_col].iloc[entry_idx])
+                    net_entry_price = raw_entry_price * (1 + slippage_pct)
+                    shares = position_value / net_entry_price
+                    if shares <= 0:
+                        continue
 
-                cash -= shares * net_entry_price
-                open_positions[ticker] = {
-                    "direction": sig["direction"],
-                    "signal_date": as_of,
-                    "entry_date": df.index[entry_idx],
-                    "net_entry_price": net_entry_price,
-                    "shares": shares,
-                    "position_value": position_value,
-                    "exit_date": df.index[exit_idx],
-                    "planned_exit_price": float(df[exit_col].iloc[exit_idx]),
-                    "last_known_price": raw_entry_price,
-                }
+                    cash -= shares * net_entry_price
+                    open_positions[ticker] = {
+                        "direction": sig["direction"],
+                        "signal_date": as_of,
+                        "entry_date": df.index[entry_idx],
+                        "net_entry_price": net_entry_price,
+                        "shares": shares,
+                        "position_value": position_value,
+                        "exit_date": df.index[exit_idx],
+                        "planned_exit_price": float(df[exit_col].iloc[exit_idx]),
+                        "last_known_price": raw_entry_price,
+                    }
 
         equity_dates.append(as_of)
         equity_values.append(_mark_to_market(as_of))
 
     # Force-close anything still open at the end so the curve/log are fully realized.
-    last_date = usable_dates[-1]
+    last_date = simulation_dates[-1]
     for ticker, pos in list(open_positions.items()):
         _close_position(ticker, pos, last_date, pos["last_known_price"], forced=True)
     open_positions.clear()

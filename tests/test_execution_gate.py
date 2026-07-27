@@ -50,6 +50,21 @@ def test_insufficient_cash_flagged():
     assert any("exceeds available cash" in v for v in result.violations)
 
 
+def test_buying_power_constrains_cash_even_when_raw_cash_looks_sufficient():
+    # Regression test (Codex review, 2026-07-27): portfolio.cash alone
+    # ignores pending/open orders that the broker has already reserved
+    # funds against -- portfolio.buying_power reflects that hold and must
+    # be the binding constraint when it's tighter than raw cash.
+    snapshot = build_portfolio_snapshot(
+        [], cash=10_000.0, buying_power=1_000.0, source="alpaca", account_mode="paper",
+    )
+    intent = TradeIntent(ticker="KO", side="buy", shares=25)  # $1,500 > $1,000 buying power, < $10,000 cash
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY, max_position_pct=1.0,
+    )
+    assert any("exceeds available cash" in v for v in result.violations)
+
+
 def test_max_total_exposure_exceeded():
     snapshot = _snapshot(
         positions=[{"ticker": "AAA", "shares": 90, "entry_price": 100.0, "current_price": 100.0}],  # $9000 already invested
@@ -220,6 +235,7 @@ if __name__ == "__main__":
     test_kill_switch_blocks_everything_else()
     test_max_position_size_exceeded()
     test_insufficient_cash_flagged()
+    test_buying_power_constrains_cash_even_when_raw_cash_looks_sufficient()
     test_max_total_exposure_exceeded()
     test_basket_concentration_exceeded()
     test_leveraged_etf_exposure_exceeded()

@@ -20,16 +20,28 @@ import pandas as pd
 from config import RETURN_Z_THRESHOLD, ROLLING_WINDOW, VOLUME_Z_THRESHOLD
 
 
-def compute_features(df: pd.DataFrame, window: int = ROLLING_WINDOW) -> pd.DataFrame:
+def compute_features(df: pd.DataFrame, window: int = ROLLING_WINDOW, return_mode: str = "pct_change") -> pd.DataFrame:
     """
     Add return, rolling z-score, and volume z-score columns to a single
     ticker's OHLCV DataFrame. Uses only trailing data at each row (rolling
     windows naturally exclude the current-and-future rows from their own
     mean/std by shifting), so it's safe to call on the full history and
     then just read off the last row.
+
+    `return_mode="pct_change"` (default) is correct for any `close` series
+    that's a genuine price (always positive) -- every per-ticker signal,
+    plus the VIX and credit-spread macro proxies. `return_mode="diff"`
+    must be used instead for a series that can be zero or cross zero (the
+    yield-curve short-minus-long spread proxy in data/macro_data.py): a
+    percent change is undefined/sign-reversing across a zero crossing
+    (e.g. -0.1 -> +0.1 computes as -200%, which looks like a collapse in
+    stress when inversion actually just got worse) (Codex review,
+    2026-07-27).
     """
+    if return_mode not in ("pct_change", "diff"):
+        raise ValueError(f"return_mode must be 'pct_change' or 'diff', got {return_mode!r}.")
     out = df.copy()
-    out["return_pct"] = out["close"].pct_change()
+    out["return_pct"] = out["close"].pct_change() if return_mode == "pct_change" else out["close"].diff()
 
     rolling_mean = out["return_pct"].rolling(window).mean()
     rolling_std = out["return_pct"].rolling(window).std()

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import math
 from pathlib import Path
 from typing import Literal
 
@@ -52,18 +53,27 @@ class TradingPolicy:
         )
         for field_name in percentage_fields:
             value = getattr(self, field_name)
-            if not 0 <= value <= 1:
-                raise ValueError(f"{field_name} must be between 0 and 1, got {value}.")
+            if not (math.isfinite(value) and 0 <= value <= 1):
+                raise ValueError(f"{field_name} must be a finite number between 0 and 1, got {value}.")
         if self.max_position_pct > self.max_total_exposure_pct:
             raise ValueError("max_position_pct cannot exceed max_total_exposure_pct.")
-        if self.max_order_value <= 0:
-            raise ValueError("max_order_value must be positive.")
-        if self.max_stale_price_minutes <= 0:
-            raise ValueError("max_stale_price_minutes must be positive.")
-        if self.max_slippage_pct < 0:
-            raise ValueError("max_slippage_pct cannot be negative.")
-        if self.max_spread_pct < 0:
-            raise ValueError("max_spread_pct cannot be negative.")
+        # Every one of these feeds a plain `>`/`<` comparison in
+        # risk/execution_gate.py -- a NaN there evaluates False no matter
+        # what it's compared against, which would silently disable that
+        # cap entirely rather than reject the trade (Codex review,
+        # 2026-07-27). json.loads() also accepts a literal `NaN` in a
+        # policy file by default, so this is reachable from a malformed
+        # config, not just a caller bug.
+        if not math.isfinite(self.max_order_value) or self.max_order_value <= 0:
+            raise ValueError(f"max_order_value must be a positive, finite number, got {self.max_order_value}.")
+        if not math.isfinite(self.max_stale_price_minutes) or self.max_stale_price_minutes <= 0:
+            raise ValueError(
+                f"max_stale_price_minutes must be a positive, finite number, got {self.max_stale_price_minutes}."
+            )
+        if not math.isfinite(self.max_slippage_pct) or self.max_slippage_pct < 0:
+            raise ValueError(f"max_slippage_pct must be a non-negative, finite number, got {self.max_slippage_pct}.")
+        if not math.isfinite(self.max_spread_pct) or self.max_spread_pct < 0:
+            raise ValueError(f"max_spread_pct must be a non-negative, finite number, got {self.max_spread_pct}.")
         if self.earnings_blackout_days < 0:
             raise ValueError("earnings_blackout_days cannot be negative.")
         if not self.allowed_sides:

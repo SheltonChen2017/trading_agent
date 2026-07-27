@@ -27,6 +27,7 @@ import os
 import pandas as pd
 
 from config import PAPER_TRADING
+from risk.execution_gate import ExecutionAuthorization, TradeIntent, verify_execution_authorization
 
 
 class AlpacaNotConfigured(RuntimeError):
@@ -80,7 +81,37 @@ def get_open_positions() -> list[dict]:
     ]
 
 
-def submit_market_order(ticker: str, shares: int, side: str = "buy") -> dict:
+def get_open_orders() -> list[dict]:
+    """Return currently open broker orders in a JSON-friendly shape."""
+    client = _get_client()
+    try:
+        orders = client.get_orders()
+    except TypeError:
+        from alpaca.trading.requests import GetOrdersRequest
+
+        orders = client.get_orders(filter=GetOrdersRequest())
+    return [
+        {
+            "order_id": str(order.id),
+            "ticker": order.symbol,
+            "shares": float(order.qty) if order.qty is not None else None,
+            "side": getattr(order.side, "value", str(order.side)),
+            "type": getattr(order.type, "value", str(order.type)),
+            "status": getattr(order.status, "value", str(order.status)),
+            "submitted_at": order.submitted_at.isoformat() if order.submitted_at else None,
+        }
+        for order in orders
+    ]
+
+
+def submit_market_order(
+    ticker: str,
+    shares: int,
+    side: str = "buy",
+    *,
+    authorization: ExecutionAuthorization | None = None,
+    idempotency_key: str | None = None,
+) -> dict:
     """Submit a day market order. Refuses to run against a live (non-paper)
     account unless CONFIRM_LIVE_TRADING=I_UNDERSTAND is set — flipping
     PAPER_TRADING alone is not sufficient."""
@@ -92,6 +123,10 @@ def submit_market_order(ticker: str, shares: int, side: str = "buy") -> dict:
         )
     if shares <= 0:
         raise ValueError(f"shares must be positive, got {shares}")
+    if side not in ("buy", "sell"):
+        raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
+    intent = TradeIntent(ticker=ticker, shares=shares, side=side)
+    verify_execution_authorization(intent, authorization)
 
     client = _get_client()
     from alpaca.trading.enums import OrderSide, TimeInForce
@@ -103,12 +138,19 @@ def submit_market_order(ticker: str, shares: int, side: str = "buy") -> dict:
             qty=shares,
             side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
             time_in_force=TimeInForce.DAY,
+            client_order_id=idempotency_key,
         )
     )
     return {"order_id": str(order.id), "ticker": ticker, "shares": shares, "side": side, "status": str(order.status)}
 
 
-def submit_stop_loss_order(ticker: str, shares: int, stop_price: float) -> dict:
+def submit_stop_loss_order(
+    ticker: str,
+    shares: int,
+    stop_price: float,
+    *,
+    authorization: ExecutionAuthorization | None = None,
+) -> dict:
     """Submit a GTC stop order to exit a long position — the execution-side
     counterpart of risk.manager's computed stop_loss_price."""
     if not PAPER_TRADING and os.environ.get("CONFIRM_LIVE_TRADING") != "I_UNDERSTAND":
@@ -116,6 +158,19 @@ def submit_stop_loss_order(ticker: str, shares: int, stop_price: float) -> dict:
             "config.PAPER_TRADING is False (live trading) but CONFIRM_LIVE_TRADING "
             "is not set to 'I_UNDERSTAND'. Refusing to submit a live order."
         )
+
+    if shares <= 0:
+        raise ValueError(f"shares must be positive, got {shares}")
+    verify_execution_authorization(
+        TradeIntent(
+            ticker=ticker,
+            shares=shares,
+            side="sell",
+            order_type="stop",
+            limit_price=round(stop_price, 2),
+        ),
+        authorization,
+    )
 
     client = _get_client()
     from alpaca.trading.enums import OrderSide, TimeInForce
@@ -133,7 +188,10 @@ def submit_stop_loss_order(ticker: str, shares: int, stop_price: float) -> dict:
     return {"order_id": str(order.id), "ticker": ticker, "shares": shares, "stop_price": stop_price, "status": str(order.status)}
 
 
-def execute_allocation(sized: pd.DataFrame) -> list[dict]:
+def execute_allocation(
+    sized: pd.DataFrame,
+    authorizations: dict[str, ExecutionAuthorization] | None = None,
+) -> list[dict]:
     """
     Take risk.manager.allocate()'s output and submit a market buy + a GTC
     stop-loss for every row with shares > 0. Rows with 0 shares (filtered
@@ -144,10 +202,22 @@ def execute_allocation(sized: pd.DataFrame) -> list[dict]:
     the sized-but-unexecuted signals instead of crashing.
     """
     results = []
+    authorizations = authorizations or {}
     for _, row in sized.iterrows():
         if row["shares"] <= 0:
             continue
-        buy = submit_market_order(row["ticker"], int(row["shares"]), side="buy")
-        stop = submit_stop_loss_order(row["ticker"], int(row["shares"]), float(row["stop_loss_price"]))
+        ticker = str(row["ticker"])
+        buy = submit_market_order(
+            ticker,
+            int(row["shares"]),
+            side="buy",
+            authorization=authorizations.get(ticker),
+        )
+        stop = submit_stop_loss_order(
+            ticker,
+            int(row["shares"]),
+            float(row["stop_loss_price"]),
+            authorization=authorizations.get(f"{ticker}:stop"),
+        )
         results.append({"ticker": row["ticker"], "buy_order": buy, "stop_order": stop})
     return results

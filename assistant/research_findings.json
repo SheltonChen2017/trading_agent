@@ -1,0 +1,94 @@
+{
+  "version": "1.0.0",
+  "updated_at": "2026-07-26",
+  "findings": [
+    {
+      "label": "Original z-score dip/up scanner",
+      "claim": "Beats a random-day baseline out-of-sample",
+      "status": "rejected",
+      "detail": "0/32 basket x direction cells significant at 2-year or 7-year lookback across the full 104-ticker universe.",
+      "source": "README: signal findings",
+      "relevant_tickers": []
+    },
+    {
+      "label": "Cross-sectional momentum (12-1 month)",
+      "claim": "Beats a random-day baseline out-of-sample",
+      "status": "rejected",
+      "detail": "The row-level result disappeared after block bootstrap accounted for cross-sectional and serial dependence.",
+      "source": "scripts/run_momentum_block_significance.py",
+      "relevant_tickers": []
+    },
+    {
+      "label": "Relative, breakout, PEAD, fundamentals, and analyst-rating signals",
+      "claim": "Beats a random-day baseline out-of-sample",
+      "status": "rejected",
+      "detail": "No tested direction survived confirmation-only, dependence-aware significance testing.",
+      "source": "README: signal findings",
+      "relevant_tickers": []
+    },
+    {
+      "label": "Analyst price-target consensus gap",
+      "claim": "Beats a random-day baseline out-of-sample",
+      "status": "rejected",
+      "detail": "0/2 confirmation-period primary cells significant. The 'dip' leg fired on ~69 tickers/day on average (structural optimism bias in sell-side targets); the 'up' leg showed a discovery-to-confirmation sign flip.",
+      "source": "signals/analyst_target.py",
+      "relevant_tickers": []
+    },
+    {
+      "label": "Cross-asset macro signals (VIX spike, credit spread, yield curve)",
+      "claim": "Beats a random-day baseline out-of-sample",
+      "status": "rejected",
+      "detail": "0/2 confirmation-period primary cells significant for all three signals. Credit spread's 'up' leg looked strongly significant in discovery (p<0.001) but flipped to a small non-significant edge in confirmation.",
+      "source": "scripts/run_macro_signals_significance_check.py",
+      "relevant_tickers": []
+    },
+    {
+      "label": "QQQ/TQQQ trend+volatility regime rotation",
+      "claim": "Beats 50/50 buy-and-hold on both CAGR and drawdown",
+      "status": "rejected",
+      "detail": "The apparent result depended on a corrected same-close look-ahead bug and did not survive the main confirmation on CAGR.",
+      "source": "strategies/trend_vol_rotation.py",
+      "relevant_tickers": ["QQQ", "QQQM", "TQQQ"]
+    },
+    {
+      "label": "SOXX/SOXL trend+volatility regime rotation — return",
+      "claim": "Beats 50/50 buy-and-hold on after-tax CAGR",
+      "status": "rejected",
+      "detail": "The pre-tax return advantage disappeared after the modeled short-term capital-gains tax.",
+      "source": "strategies/trend_vol_rotation.py",
+      "relevant_tickers": ["SOXX", "SOXL"]
+    },
+    {
+      "label": "SOXX/SOXL trend+volatility regime rotation — drawdown",
+      "claim": "Reduces maximum drawdown versus 50/50 buy-and-hold",
+      "status": "confirmed",
+      "detail": "Maximum drawdown remained materially lower across confirmation, walk-forward, sensitivity, and tax/cost checks. This is a risk result, not a confirmed excess-return result.",
+      "source": "strategies/trend_vol_rotation.py",
+      "relevant_tickers": ["SOXX", "SOXL"]
+    },
+    {
+      "label": "Kelly-criterion sizing with one-way profit ratchet",
+      "claim": "Improves risk-adjusted return over plain inverse-volatility targeting",
+      "status": "rejected",
+      "detail": "Looked like a breakthrough on a single discovery/confirmation split but failed walk-forward validation. Structural flaw: the one-way ratchet can never re-lever once trimmed, so it structurally misses upside in an extended bull market. Kelly sizing itself (signed mean/variance) is a genuine improvement over inverse-vol targeting; the ratchet is the part that broke.",
+      "source": "strategies/kelly_rotation.py; scripts/run_kelly_ratchet_walkforward_soxx_soxl.py",
+      "relevant_tickers": ["SOXX", "SOXL"]
+    },
+    {
+      "label": "Wide rebalance band vs. tight/continuous vol-targeting",
+      "claim": "Reduces tax/turnover cost without giving up performance",
+      "status": "confirmed",
+      "detail": "~89% less tax/turnover for essentially the same performance as continuous vol-targeting.",
+      "source": "strategies/vol_target_rotation.py; scripts/run_idea_comparison_soxx_soxl.py",
+      "relevant_tickers": ["SOXX", "SOXL"]
+    },
+    {
+      "label": "Volatility-targeted leveraged-ETF rotation — 3-pair validation",
+      "claim": "The vol-targeting rotation mechanism generalizes beyond SOXX/SOXL",
+      "status": "promising_unconfirmed",
+      "detail": "Same continuous inverse-vol-targeted weighting tested on SPY/UPRO and NVDA/NVDL in addition to SOXX/SOXL, at the user's request, as production candidates. Backtested/designed only -- not yet in live/paper trading.",
+      "source": "scripts/run_vol_target_rotation_spy_upro.py; scripts/run_vol_target_rotation_nvda_nvdl.py; scripts/run_vol_target_rotation_soxx_soxl.py",
+      "relevant_tickers": ["SOXX", "SOXL", "SPY", "UPRO", "NVDA", "NVDL"]
+    }
+  ]
+}

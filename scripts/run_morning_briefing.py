@@ -22,6 +22,7 @@ from assistant.audit_log import append_decision_packet
 from assistant.context_builder import build_decision_packet
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.schemas import EvidenceStatus
+from assistant.storage import AssistantStore
 from execution.alpaca_broker import is_configured
 
 
@@ -31,8 +32,14 @@ def _print_section(title: str):
 
 def main():
     live = is_configured()
-    packet = build_decision_packet(SAMPLE_POSITIONS, SAMPLE_CASH, use_live_alpaca=live)
+    packet = build_decision_packet(
+        SAMPLE_POSITIONS,
+        SAMPLE_CASH,
+        use_live_alpaca=live,
+        include_live_events=True,
+    )
     append_decision_packet(packet)
+    AssistantStore().save_decision_packet(packet)
 
     print(f"Morning briefing — generated {packet.generated_at}")
     if live:
@@ -49,6 +56,7 @@ def main():
     _print_section("Portfolio")
     p = packet.portfolio
     print(f"Total equity: ${p.total_equity:,.2f} (cash: ${p.cash:,.2f}, {packet.risk.cash_pct}%)")
+    print(f"Source: {p.source} ({p.account_mode}); open orders: {len(p.open_orders)}")
     for pos in p.positions:
         print(f"  {pos.ticker:6s} {pos.shares:>8.1f} sh  ${pos.market_value:>10,.2f}  "
               f"({pos.unrealized_pnl_pct:+.1f}% unrealized){'  [leveraged]' if pos.is_leveraged_etf else ''}")
@@ -80,18 +88,18 @@ def main():
         print(f"    {s.detail}")
 
     _print_section("Upcoming events")
-    if all(e.status == EvidenceStatus.UNAVAILABLE for e in packet.upcoming_events):
-        print("No live earnings/macro-event calendar wired up yet — status UNAVAILABLE for all held tickers.")
-    else:
-        for e in packet.upcoming_events:
-            print(f"  {e.ticker}: {e.event_type} in {e.days_away} days [{e.status.value}]")
+    for e in packet.upcoming_events:
+        if e.event_date:
+            print(f"  {e.ticker}: {e.event_type} on {e.event_date} ({e.days_away} days) [{e.status.value}]")
+        else:
+            print(f"  {e.ticker}: {e.event_type} date unavailable [{e.status.value}]")
 
     if packet.warnings:
         _print_section("Warnings")
         for w in packet.warnings:
             print(f"  ! {w}")
 
-    print("\nLogged to assistant/decision_log.jsonl")
+    print("\nLogged to assistant/decision_log.jsonl and data/trading_assistant.db")
 
 
 if __name__ == "__main__":

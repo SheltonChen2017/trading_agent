@@ -1,435 +1,393 @@
-# Trading agent — data, signal, backtest, ML, risk, and paper execution
+# Personal trading assistant
 
-An ML-driven trading agent built as one continuous pipeline: a data
-layer, one or more **pluggable signal scanners**, a walk-forward
-backtester that scores those signals' real forward returns (plus
-out-of-sample validation and statistical significance testing), an ML
-model that learns a win probability for new signals, a risk manager that
-turns that into position sizes and stop-losses, and an Alpaca
-paper-trading execution layer. Every stage reuses the one before it
-unchanged — same scanner code the backtester replays date-by-date, same
-sizing logic the live agent and any future backtest-of-the-full-strategy
-would use.
+A safety-first personal trading assistant and quantitative research
+workbench. It combines portfolio awareness, deterministic risk analysis,
+versioned research evidence, structured trade proposals, explicit approval,
+and Alpaca paper execution.
 
-**Status (2026-07): 6 signals tested, 2 lookback windows (~2yr then
-~7yr), 1 near-finding, 0 confirmed.** Under out-of-sample validation plus
-two rounds of statistical hardening, real data has ruled out every
-signal built so far — including one that, for a while, looked like the
-first genuinely real result in the project:
+The project does **not** claim to have discovered reliable stock-selection
+alpha. Its production workflow therefore generates exposure-reducing
+proposals from policy breaches; rejected or exploratory signals cannot create
+buy orders.
 
-- The original scanner scored 0/32 significant basket/direction cells
-  (best-looking result, `unstable` "dip", inverted sign between discovery
-  and confirmation: +6.5% mean return became -3.2%).
-- Relative/cross-sectional, 52-week breakout, PEAD, fundamentals, and
-  analyst rating changes scored 0/2 each — `analyst` "dip" was a notable
-  near-miss (POOLED significance said `significant=True`, p=0.014;
-  confirmation-only revealed p=0.656). That near-miss is what led to
-  building `out_of_sample_significance()` — pooled vs. confirmation-only
-  is now an explicit, impossible-to-conflate choice.
-- **Momentum "up"** was, briefly, the exception: after extending the
-  lookback from ~2 to ~7 years (`LOOKBACK_DAYS`, see "Switching to real
-  data"), it was significant in BOTH discovery (p=0.000, edge -0.15%)
-  and confirmation (p=0.000, edge +0.25%) independently — opposite
-  signs, but neither was noise-level. A market-volatility regime filter
-  (`signals/regime.py`) was built to test whether this sign-flip was
-  explained by "momentum crashes" (a documented phenomenon), but didn't
-  cleanly confirm that story. Re-testing with a **block bootstrap by
-  trading day** (`out_of_sample_significance_by_date()` /
-  `bootstrap_edge_significance_by_date()`, see "Statistical significance"
-  below) — built specifically because momentum flags ~19-20 correlated
-  tickers every single day, so 17,506/14,000 "signal rows" were really
-  only 912/700 independent trading days — made the significance
-  evaporate entirely (p=0.247 discovery, p=0.075 confirmation). This is
-  now the second statistical trap this project has caught and fixed for
-  real (pooled-vs-confirmation-only was the first); see "Known pitfalls"
-  and the basket/out-of-sample sections below for the full story.
+## What it does
 
-## Structure
+- Reads positions, cash, buying power, and open orders from Alpaca, or uses an
+  explicit sample/manual portfolio when Alpaca is not configured.
+- Builds a versioned `DecisionPacket` containing portfolio state, exposure,
+  market regime, upcoming earnings, research evidence, warnings, analytics,
+  and data-freshness metadata.
+- Produces morning briefings and persists them to SQLite.
+- Answers deterministic portfolio-risk questions such as concentration,
+  leveraged/unleveraged duplication, and benchmark stress impact.
+- Generates typed, short-lived risk-reduction proposals with reasons,
+  uncertainties, alternatives, and before/after portfolio previews.
+- Requires an exact user approval phrase and reruns every risk check against a
+  fresh broker snapshot before submission.
+- Submits approved orders to Alpaca **paper trading only** and journals the
+  resulting proposal and broker order.
+- Preserves the existing signal, backtest, statistical-validation, ML, and
+  leveraged-ETF research toolkit.
 
-```
-trading_agent/
-├── config.py                    # universe, baskets, thresholds, risk params — the one place to tune things
-├── baskets.py                    # overlapping themed groupings (semiconductors, ai_related, ...) + per-basket reports
-├── data/
-│   ├── market_data.py             # fetch_historical() [yfinance] and generate_synthetic() [offline dev]
-│   ├── earnings_data.py           # fetch_earnings_history() + match_effective_date() [yfinance] — for PEAD & fundamentals
-│   └── analyst_data.py            # fetch_analyst_actions() [yfinance] — for the analyst rating-change signal
-├── signals/
-│   ├── scanner.py                  # compute_features() + scan_dips_and_ups() — the ORIGINAL signal, does not hold up (see above)
-│   ├── momentum.py                 # scan_momentum() — cross-sectional 12-1 month momentum
-│   ├── relative.py                 # scan_relative_dips_and_ups() — same-day move ranked vs. the universe, not own history
-│   ├── breakout.py                 # scan_52_week_breakout() — new N-day high/low + volume
-│   ├── pead.py                     # scan_pead() — post-earnings-announcement drift (event-driven, needs earnings_data)
-│   ├── fundamentals.py             # scan_fundamentals() — YoY reported-EPS growth (event-driven, needs earnings_data)
-│   ├── analyst.py                  # scan_analyst_actions() — net analyst upgrades/downgrades (event-driven, needs analyst_data)
-│   └── regime.py                   # compute_trailing_market_volatility() + classify_regime() — market regime classification
-├── backtest/
-│   └── engine.py                  # run_backtest() etc. — pluggable via scan_fn/scan_kwargs, defaults to scan_dips_and_ups
-├── ml/
-│   └── model.py                   # build_features(), walk_forward_evaluate(), train/save/load, score_signals()
-├── risk/
-│   └── manager.py                 # size_position(), allocate(), check_stop_loss()
-├── execution/
-│   └── alpaca_broker.py           # Alpaca paper/live trading — dormant until API keys are set
-├── scripts/
-│   ├── run_scan_demo.py               # scanner only, synthetic data
-│   ├── run_backtest.py                # walk-forward backtest + summary
-│   ├── run_backtest_horizons.py       # backtest swept across several hold periods (1 day .. 1 month)
-│   ├── run_baseline_comparison.py     # flagged signals vs. "hold any day" baseline (pooled + per-ticker)
-│   ├── run_basket_report.py           # backtest/baseline/market results broken out by themed basket
-│   ├── run_candidate_horizon_sweep.py # multi-horizon sweep scoped to the current candidate baskets
-│   ├── run_out_of_sample_check.py     # discovery vs. confirmation (holdout) check for candidate baskets
-│   ├── run_significance_check.py      # bootstrap significance + multiple-comparisons correction, all baskets
-│   ├── run_new_signals_report.py      # backtest + out-of-sample check for momentum/relative/breakout
-│   ├── train_model.py                 # backtest -> train -> evaluate -> save model
-│   └── run_agent.py                   # full pipeline: scan -> score -> size -> (optional) execute
-└── tests/
-    ├── test_scanner.py
-    ├── test_backtest.py
-    ├── test_model.py
-    ├── test_risk.py
-    ├── test_alpaca_broker.py
-    ├── test_baskets.py
-    ├── test_momentum.py
-    ├── test_relative.py
-    ├── test_breakout.py
-    ├── test_pead.py
-    ├── test_fundamentals.py
-    ├── test_analyst.py
-    └── test_regime.py
+## Safety model
+
+The assistant is deliberately split into layers:
+
+```text
+broker / market / event data
+            |
+            v
+versioned DecisionPacket
+            |
+            v
+deterministic analytics and policy
+            |
+            v
+typed TradeProposal
+            |
+            v
+exact user approval
+            |
+            v
+execution gate revalidation
+            |
+            v
+short-lived intent-bound authorization
+            |
+            v
+Alpaca paper broker
+            |
+            v
+SQLite journal and reconciliation record
 ```
 
-## Run it
+Important guarantees:
+
+- The explanation layer never computes financial quantities from prose.
+- Broker order functions reject calls without a short-lived execution-gate
+  authorization tied to the exact ticker, side, quantity, and order type.
+- Proposals are single-use and expire after 15 minutes by default.
+- Repeated proposal generation cannot reset an executed proposal.
+- Open broker orders and recently executed intents are checked for duplicates.
+- Buys are checked against cash reserve, position, total-exposure, basket,
+  leverage, order-value, stale-price, trading-hours, slippage, and earnings
+  rules.
+- Sells cannot exceed the shares currently held.
+- `TRADING_ASSISTANT_KILL_SWITCH=1` blocks proposal execution.
+- The personal-assistant execution service refuses to run if
+  `config.PAPER_TRADING` is `False`.
+- Live-trading support is intentionally not exposed by the assistant CLI.
+
+## Current research status
+
+The research registry lives in
+`assistant/research_findings.json` and is loaded at runtime. Claims are
+versioned and labeled independently:
+
+- The original z-score scanner, momentum, relative, breakout, PEAD,
+  fundamentals, and analyst-rating hypotheses did not survive the full
+  confirmation and dependence-aware testing process.
+- Analyst price-target and cross-asset macro signals are exploratory; they are
+  implemented but have no registered production edge.
+- QQQ/TQQQ regime rotation did not reliably beat its baseline after correcting
+  execution timing.
+- SOXX/SOXL trend/volatility rotation has a confirmed **drawdown-reduction**
+  result, not a confirmed after-tax excess-return result.
+
+Research status is never converted automatically into production authority.
+Promotion remains an explicit, auditable decision.
+
+## Installation
+
+Python 3.10 or newer is recommended.
 
 ```bash
-pip install -r requirements.txt
+python -m venv .venv
 
-python scripts/run_scan_demo.py     # scanner only
-python scripts/run_backtest.py      # walk-forward backtest + win-rate summary
-python scripts/train_model.py       # trains and saves ml/model.joblib
-python scripts/run_agent.py         # full pipeline, synthetic data, prints sized signals
+# Windows PowerShell
+.\.venv\Scripts\Activate.ps1
 
-python -m pytest tests/ -v          # or: for f in tests/test_*.py; do python "$f"; done
+# macOS/Linux
+source .venv/bin/activate
+
+python -m pip install -r requirements.txt
+python -m pytest tests -q
 ```
 
-Everything above uses `generate_synthetic()` by default, so it runs with
-zero setup and no internet access.
+The current dependency set is:
 
-## Switching to real data
+- pandas / numpy
+- yfinance
+- scikit-learn / joblib
+- alpaca-py
+- lxml
+
+## Configure Alpaca paper trading
+
+Create Alpaca paper credentials and provide them as environment variables.
+Never commit credentials.
+
+```powershell
+$env:APCA_API_KEY_ID = "..."
+$env:APCA_API_SECRET_KEY = "..."
+```
 
 ```bash
-pip install yfinance   # already in requirements.txt
+export APCA_API_KEY_ID="..."
+export APCA_API_SECRET_KEY="..."
 ```
 
-In any script above, swap:
+Keep this setting unchanged:
 
 ```python
-from data.market_data import generate_synthetic          # remove
-from data.market_data import fetch_historical             # add
-
-data = generate_synthetic(UNIVERSE, days=LOOKBACK_DAYS)    # remove
-data = fetch_historical(UNIVERSE, lookback_days=LOOKBACK_DAYS)  # add
+# config.py
+PAPER_TRADING = True
 ```
 
-## How each stage works
+Without credentials, briefings and proposals use
+`assistant/sample_portfolio.py` and clearly identify the source as `manual`.
 
-**Scanner** — Each stock's daily return and volume are scored against
-*that stock's own* trailing rolling mean/std (a z-score), not a flat
-percentage cutoff, so "a big move" means the same thing for a volatile
-small-cap and a slow-moving utility. A move only counts when confirmed by
-above-average volume. `scan_dips_and_ups()` takes an optional `as_of`
-date — the same function that scans "today" live is what the backtester
-calls for every historical date, so there's one code path and no drift
-between what's validated and what's run.
+## Personal policy
 
-**Additional signals (2026-07)** — the original scanner didn't survive
-out-of-sample testing (see status note above), so six alternatives with
-better academic track records were added, all sharing the exact same
-output column contract as `scan_dips_and_ups()` (`ticker, date, close,
-return_pct, return_zscore, volume_zscore, direction`) so every backtest/
-baseline/market/out-of-sample/significance tool in `backtest/engine.py`
-works with any of them unchanged — pass `scan_fn=<the new function>`
-(and `scan_kwargs` for its parameters) instead of relying on the default:
+The default versioned policy is
+`assistant/default_policy.json`. It controls:
 
-- **`signals/momentum.py`** (`scan_momentum`) — cross-sectional "12-1
-  month" momentum (Jegadeesh & Titman 1993): ranks the whole universe by
-  trailing return, skipping the most recent month, and flags the top
-  decile as `"up"` (long continuation). The most replicated anomaly in
-  academic finance. The `"dip"` leg (bottom decile) is included only for
-  symmetry with this project's dip/up structure — academically that's
-  usually the *short* leg, not a long candidate, so treat `"dip"` signals
-  from this scanner with extra skepticism. `return_zscore` here is a
-  **cross-sectional** z-score (vs. the universe that day), not vs. the
-  stock's own history; `volume_zscore` is left `NaN` (momentum isn't
-  volume-gated).
-- **`signals/relative.py`** (`scan_relative_dips_and_ups`) — the direct
-  fix for what broke the original scanner: flags a stock when today's
-  move is unusual **relative to the rest of the universe that same day**
-  (cross-sectional z-score), not relative to its own history, so a
-  market-wide move can't by itself flag everything the way the original
-  design could.
-- **`signals/breakout.py`** (`scan_52_week_breakout`) — new
-  `BREAKOUT_LOOKBACK_DAYS`-day high/low with volume confirmation. The
-  `"up"` (new-high continuation) leg is the better-supported half; `"dip"`
-  (new-low continuation) is weaker evidence, included for symmetry.
-- **`signals/pead.py`** (`scan_pead`) — Post-Earnings-Announcement Drift
-  (Bernard & Thomas 1989): flags a stock on the trading day its earnings
-  surprise should hit if the surprise exceeds
-  `PEAD_SURPRISE_THRESHOLD_PCT`. Arguably the most robust anomaly in the
-  literature, but **event-driven, not daily** — needs
-  `data/earnings_data.fetch_earnings_history()` (real tickers only, no
-  synthetic equivalent) and has a second required argument
-  (`earnings_data`), so bind it first: `scan_fn=partial(scan_pead,
-  earnings_data=earnings)`. yfinance's free earnings calendar goes back
-  further than expected in practice (~2020+ for large caps, ~24 quarters)
-  but that's still only ~4 events/ticker/year — a much smaller, noisier
-  sample than the daily signals, so treat PEAD results with even more
-  small-sample caution than the rest of this project. Earnings timestamps
-  at/after market close are shifted to the next trading day
-  (`effective_date`), with weekend/holiday spillover handled via
-  `data/earnings_data.match_effective_date()` so a single event fires
-  exactly once, not on every subsequent day.
-- **`signals/fundamentals.py`** (`scan_fundamentals`) — the first
-  non-price/volume signal: flags a stock on its earnings date when YoY
-  reported EPS growth (this quarter vs. the same quarter one year, i.e.
-  4 reports, earlier) exceeds `FUNDAMENTALS_GROWTH_THRESHOLD_PCT`. Built
-  from `data/earnings_data.py`'s point-in-time `reported_eps` history
-  (each figure indexed by its actual disclosure date), deliberately NOT
-  from yfinance's live `Ticker.info` snapshot — that only has today's
-  numbers with no real history, so using it on past backtest dates would
-  be textbook look-ahead bias. Same event-driven usage pattern and
-  data-thinness caveat as PEAD, plus needs 4 prior quarters of history
-  per ticker before its first signal can even fire, shrinking the
-  usable window further still.
-- **`signals/analyst.py`** (`scan_analyst_actions`) — the second
-  non-price/volume signal, and a genuinely different data category from
-  every other signal here (institutional analyst OPINION — upgrades/
-  downgrades/price targets — not the stock's own trading behavior or the
-  company's own reported numbers). Flags a stock on a day where net
-  analyst upgrades minus downgrades (`data/analyst_data.py`, aggregated
-  per ticker per day so multiple same-day firm actions don't each fire
-  separately) reaches `ANALYST_MIN_NET_ACTIONS`. Event-driven like PEAD/
-  fundamentals, but noticeably denser — analyst actions happen far more
-  often per large-cap than earnings (multiple per month, not per
-  quarter), so this has a much bigger real sample than the other two
-  event-driven signals despite the same data-recency/thinness framing.
+- read-only versus paper execution;
+- user-approval requirement;
+- per-position, total, basket, and leveraged-ETF exposure;
+- minimum cash reserve;
+- maximum order value;
+- price freshness and slippage;
+- earnings blackout window;
+- allowed sides and order types;
+- whether new positions may be opened.
 
-None of these six are proven — they're recommendations with better
-starting evidence than the original scanner, not validated replacements.
-Run `scripts/run_new_signals_report.py` (synthetic data, momentum/
-relative/breakout) to sanity-check the plumbing, then point any of them
-at real data and run them through the SAME out-of-sample +
-`basket_out_of_sample_significance()` toolkit that ruled out the
-original scanner before trusting anything they find — not
-`basket_significance()` alone (see "Statistical significance" below for
-why that distinction matters).
+The checked-in default is deliberately restrictive:
 
-**Backtest** — `run_backtest()` walks every date in the universe, calls
-the live scanner as-of that date, and measures each flagged signal's
-actual close-to-close return over `BACKTEST_HOLD_DAYS`, minus simulated
-round-trip slippage (`SLIPPAGE_PCT`). The tested hypothesis is "go long
-every flagged signal" (dip = bet on reversion, up = bet on continuation);
-shorting isn't modeled. `summarize_backtest()` reports win rate and mean
-return by direction.
+```json
+{
+  "execution_mode": "paper",
+  "max_position_pct": 0.05,
+  "max_total_exposure_pct": 0.50,
+  "max_basket_pct": 0.40,
+  "max_leveraged_etf_pct": 0.20,
+  "min_cash_reserve_pct": 0.10,
+  "max_order_value": 5000.0,
+  "allow_new_positions": false
+}
+```
 
-Two extensions guard against fooling yourself with one arbitrarily chosen
-setting:
-- `run_multi_horizon_backtest()` / `summarize_multi_horizon()` sweep
-  several hold periods (`HORIZON_SWEEP_DAYS` in config.py — 1 day, 3
-  days, 1 week, 2 weeks, 1 month by default) so an apparent edge (or lack
-  of one) can be checked across exit timings instead of just one.
-- `run_baseline_forward_returns()` / `compare_signal_to_baseline()`
-  compute the same forward return for *every* date, not just flagged
-  ones — the control group a flagged signal's return needs to beat. A
-  rising `edge_vs_baseline_pct` over a test window can otherwise look
-  like "the signal works" when it's really just the whole universe
-  drifting upward during that period. `compare_signal_to_baseline()`
-  pools every stock's baseline together, which is simple but can be
-  confounded if flagged signals cluster on naturally higher/lower-drift
-  stocks than the universe average; `compare_signal_to_baseline_per_ticker()`
-  matches each signal only against its own stock's baseline instead,
-  removing that confound — trust the per-ticker version over the pooled
-  one when they disagree.
+Create a separate policy file for personal changes and pass it using
+`--policy`. Increment its version whenever behavior changes.
 
-**Baskets** — `config.BASKETS` groups the 104-ticker universe (expanded
-2026-07 from 48 specifically to thicken thin baskets) into 16 overlapping
-themes: `tech` (25), `semiconductors` (9), `ai_related` (12), `unstable`
-(6: `TSLA`, `SPCX`, `PLTR`, `COIN`, `MSTR`, `RIVN`), `rare_earth_minerals`
-(5: `MP`, `REMX`, `TMC`, `UUUU`, `LAC`), `fintech` (9), plus the original
-sector groupings (`mega_cap_tech`, `consumer_discretionary`, `healthcare`,
-`financials`, `energy`, `industrials`, `communication_media`,
-`utilities`, `software`, `consumer_staples`), all similarly widened. A
-ticker can belong to more than one basket on purpose — TSLA is both
-`ai_related` and `consumer_discretionary` and `unstable`.
-`baskets.compute_high_volatility_basket()` adds one basket computed
-empirically from realized daily-return std, as a cross-check against the
-hand-curated `unstable` list rather than a replacement for it.
-`baskets.summarize_by_basket()`, `compare_baskets_to_baseline()`, and
-`compare_baskets_to_market_index()` restrict the backtest/baseline/market
-comparisons to each basket's tickers and report results side by side.
-**Per-basket ML model training is deliberately not built yet** —
-splitting the universe into smaller groups shrinks an already-thin
-per-signal sample further, and the pooled 43-ticker model's own
-walk-forward accuracy (~48%, close to coin-flip) is a reason for caution
-about fragmenting the data more, not a green light to do it per basket.
-Basket-level backtest stats are there to see which themes look more
-promising before that investment is worth making. With 16 baskets × 2
-directions tested at once, watch for the **multiple comparisons
-problem**: testing that many combinations means a couple will look
-unusually good or bad by pure chance even with zero real edge anywhere —
-treat any single standout basket with extra skepticism, not less. This
-project's own history proves the point: `rare_earth_minerals` "up"
-looked like the best result in the whole project at 16 signals (2
-tickers), then weakened sharply once the basket was widened to 5 tickers
-and 58 signals — exactly the small-sample-luck failure mode the rest of
-this section warns about.
+## Use the assistant
 
-`SPCX` (confirmed by the user, 2026-07, to be a real recent IPO — flagged
-here rather than assumed, since it postdates this project's knowledge
-cutoff) has only ~1 month of trading history as of this writing, far
-short of `ROLLING_WINDOW`/backtest depth — any basket result involving it
-is not yet meaningful and should be revisited once it has more history.
+### Build a briefing
 
-`config.MARKET_BENCHMARK_TICKERS` (`SPY`, `QQQ`) are reference series,
-never scanned for signals — `compare_signal_to_market_index()` /
-`compare_baskets_to_market_index()` match each flagged signal to what the
-benchmark itself returned starting that *exact* date, the strictest of
-the three baselines this project computes: beat your own history → beat
-your own ticker's typical day → beat the whole market on that specific
-day.
+```bash
+python scripts/run_personal_assistant.py briefing
+```
 
-**Out-of-sample validation (discovery vs. confirmation)** — every
-comparison above can be, and has been, rerun on the same historical
-window while hunting for a promising basket, which risks mistaking noise
-for a finding (see the `rare_earth_minerals` example above).
-`out_of_sample_backtest()` / `out_of_sample_baseline_comparison()` /
-`out_of_sample_market_comparison()` (and their per-basket versions in
-`baskets.py`) split signals by calendar date — using the FULL universe's
-date range, not the sparse signal dates, so a handful of signals can't
-skew where the split lands — into an earlier **discovery** period and a
-later **confirmation** (holdout) period never used to identify anything.
-A real edge should look similarly positive in both; one that's strong in
-discovery and weak/flipped in confirmation was very likely noise. Run via
-`scripts/run_out_of_sample_check.py`.
+This retrieves the portfolio, market regime, open orders, research registry,
+and upcoming earnings, then stores the packet in
+`data/trading_assistant.db`.
 
-**Statistical significance** — a mean edge alone doesn't say whether it's
-distinguishable from noise. `bootstrap_edge_significance()` bootstraps a
-95% confidence interval and p-value for an edge distribution (resampling,
-not a parametric t-test, since trade returns are often skewed/fat-tailed).
-`bonferroni_threshold()` corrects that significance bar for how many
-basket/direction cells are being tested at once — with N cells tested
-simultaneously, use alpha/N instead of alpha, since some cells are
-expected to look "significant" by chance alone otherwise.
+Skip live earnings lookup when working offline:
 
-**Pooled vs. out-of-sample significance — use the right one.**
-`baskets.basket_significance()` bootstraps the POOLED sample (discovery +
-confirmation together) and is exploratory only. `out_of_sample_significance()`
-/ `baskets.basket_out_of_sample_significance()` bootstrap discovery and
-confirmation SEPARATELY — only a `period == "confirmation"` row with
-`significant=True` is real evidence. This distinction isn't theoretical:
-the `analyst` "dip" signal's pooled check said `significant=True`
-(p=0.014) purely because of a strong discovery-period effect, while the
-honest confirmation-only check said `significant=False` (p=0.656, CI
-comfortably spanning zero) — pooling let the discovery period's expected
-good look drag a misleading p-value out of an honestly-noisy holdout.
-Run via `scripts/run_significance_check.py`, which shows both and labels
-which one to trust.
+```bash
+python scripts/run_personal_assistant.py briefing --no-events
+```
 
-**Row-level vs. by-date significance — the second trap, also confirmed
-for real.** `bootstrap_edge_significance()` treats every signal row as an
-independent draw, but signals on the same date are usually correlated —
-a signal that flags many tickers at once (e.g. `momentum`, which flags a
-fixed quintile of the universe every trading day) can look like hundreds
-of independent observations when it's really a handful of distinct days.
-`bootstrap_edge_significance_by_date()` / `out_of_sample_significance_by_date()`
-fix this by resampling whole trading days (a block/cluster bootstrap)
-instead of individual rows, and report `n_dates` alongside `n` so the gap
-is visible directly. This caught `momentum` "up": the row-level bootstrap
-showed p=0.000 significant in BOTH discovery and confirmation (opposite
-signs) — the first result all project to pass confirmation-only
-significance — but the 17,506/14,000-row samples were really only
-912/700 distinct trading days; re-tested by-date, both periods' p-values
-rose to 0.247/0.075 and the finding evaporated. **Always prefer
-`out_of_sample_significance_by_date()` over the row-level
-`out_of_sample_significance()` for any new confirmatory claim** — a
-p-value of 0.000 is not automatically trustworthy in this project's data
-until `n` vs. `n_dates` has been checked.
+The older formatted briefing remains available:
 
-`signals/regime.py` adds market-regime classification
-(`compute_trailing_market_volatility()` / `classify_regime()`), built to
-test whether momentum's discovery/confirmation sign-flip was explained by
-the documented "momentum crashes" phenomenon (elevated volatility ->
-reversal risk). `calibrate_threshold_from_discovery()` fits the high/
-low-vol threshold from discovery-period data only, so confirmation stays
-honestly out-of-sample. The regime-conditioned test didn't cleanly
-confirm the hypothesis (the "significant" regime flipped between periods
-rather than being consistent) — worth knowing the tool exists and what
-it found, even though that specific investigation didn't pan out.
+```bash
+python scripts/run_morning_briefing.py
+```
 
-**ML model** — `ml/model.py` trains a `RandomForestClassifier` on
-backtest output to predict the probability a new signal is a winner,
-using features known at signal time (`return_zscore`, `volume_zscore`,
-direction, and optionally a **market-regime feature** —
-`compute_trailing_market_trend()` computes the benchmark's own trailing
-return as of each signal's date, purely backward-looking so it can't leak
-future information; pass `benchmark_df` to `build_features()`/
-`score_signals()` to include it — omit it to keep the original 3-feature
-model). Evaluation is **walk-forward** (`TimeSeriesSplit`), not a random
-split — training only ever precedes its test fold chronologically.
-`score_signals()` attaches a `win_probability` column to fresh scanner
-output; it raises a clear error if the benchmark_df usage doesn't match
-what the model was trained with, rather than silently scoring on the
-wrong feature set.
+It writes both the compatibility JSONL journal and SQLite.
 
-**Risk manager** — `size_position()` sizes a single signal at
-`MAX_POSITION_PCT` of equity, scaled down by the model's `win_probability`
-(zero size at or below `MIN_WIN_PROBABILITY`, full size at 100%
-confidence). `allocate()` sizes a whole batch of signals and trims lowest
-confidence first if the total would exceed `MAX_TOTAL_EXPOSURE_PCT` of
-equity. `check_stop_loss()` flags when a live position should exit.
+### Generate proposals
 
-**Execution** — `execution/alpaca_broker.py` is dormant until
-`APCA_API_KEY_ID` / `APCA_API_SECRET_KEY` are set as environment
-variables (never hardcode them). `config.PAPER_TRADING` (default `True`)
-selects paper vs live; submitting a live order additionally requires
-`CONFIRM_LIVE_TRADING=I_UNDERSTAND` as an explicit second safety check.
-`scripts/run_agent.py` runs the whole pipeline and only calls execution if
-credentials are present — otherwise it just prints what would be sized
-and traded.
+```bash
+python scripts/run_personal_assistant.py propose
+```
 
-## Which broker?
+Only deterministic exposure reductions are generated. A proposal resembles:
 
-**Alpaca** is what this repo targets: free paper trading (no funding
-required), a documented REST API with an official Python SDK
-(`alpaca-py`), and nearly identical paper/live endpoints so the code
-barely changes when you flip to live. Sign up at alpaca.markets to get
-API keys.
+```text
+tp_0123456789abcdef: SELL 10 SOXL at reference $55.00
+  - Leveraged-ETF exposure exceeds the 20.0% policy limit.
+  Preview: position 12.4% -> 9.8%
+  Approval phrase: "APPROVE tp_0123456789abcdef"
+```
 
-Not supported, and not planned:
-- **Fidelity / Schwab retail / Robinhood** — no supported public API for
-  retail algorithmic trading (Robinhood only has an unofficial,
-  reverse-engineered client with fragile auth and no guarantees).
-- **Interactive Brokers** — has a real API (TWS/IBKR), but needs a
-  running Gateway/TWS app and heavier setup; worth revisiting only if
-  Alpaca's asset coverage becomes a limiter.
+Generating a proposal does not place or approve an order.
 
-## Known pitfalls to keep front of mind
+### Review proposal state
 
-- **Look-ahead bias**: rolling windows and the backtester only use
-  trailing/already-realized data — keep it that way as you add features.
-- **Walk-forward, not one train/test split**: both the backtest's
-  forward-return scoring and the ML model's evaluation are time-ordered,
-  since markets change regime.
-- **Backtest-live gap**: `SLIPPAGE_PCT` simulates round-trip cost, but
-  it's a flat estimate — real slippage varies with liquidity and order
-  size.
-- **Synthetic data has no real edge, by design**: `generate_synthetic()`
-  is a random walk with injected shocks uncorrelated with future returns.
-  A ~50% backtest win rate / ~50% model accuracy on synthetic data is the
-  *correct* result — it confirms the pipeline isn't manufacturing fake
-  alpha out of noise. Only real historical data can show genuine edge.
-- **Survivorship bias**: if your universe only includes tickers that
-  still exist today, delisted/failed names are silently excluded.
-- **PDT rule**: US accounts under $25k get restricted after 4+ day trades
-  in 5 business days — relevant if the scanner finds same-day-exit
-  opportunities.
+```bash
+python scripts/run_personal_assistant.py list
+python scripts/run_personal_assistant.py list --status proposed
+```
+
+Proposal states include `proposed`, `approved`, `blocked`, `expired`,
+`submission_failed`, and `executed`.
+
+### Approve one paper order
+
+Run this during standard US market hours with a fresh proposal:
+
+```bash
+python scripts/run_personal_assistant.py approve tp_0123456789abcdef \
+  --confirm "APPROVE tp_0123456789abcdef"
+```
+
+Immediately before submission the service:
+
+1. verifies the proposal is still `proposed`, unexpired, and uses the active
+   policy version;
+2. confirms Alpaca is configured for paper trading;
+3. refreshes positions, cash, buying power, prices, and open orders;
+4. checks duplicates and every execution-gate rule;
+5. creates a short-lived authorization bound to that exact intent;
+6. submits the paper order with an idempotent client order ID;
+7. records the order and marks the proposal executed.
+
+To stop all approvals without changing code:
+
+```powershell
+$env:TRADING_ASSISTANT_KILL_SWITCH = "1"
+```
+
+## Persistence
+
+`assistant/storage.py` manages `data/trading_assistant.db` with these logical
+records:
+
+- versioned decision packets;
+- immutable proposal identity and current status;
+- broker-order submissions linked to proposals.
+
+The database and its WAL files are gitignored because they contain personal
+account state. The research registry and default policy are committed because
+they define behavior and evidence, not private runtime data.
+
+## Main packages
+
+```text
+assistant/
+  context_builder.py       portfolio + regime + evidence DecisionPacket
+  policy.py                validated, versioned personal policy
+  portfolio_analytics.py   deterministic portfolio metrics and previews
+  research_registry.py     file-backed evidence claims
+  proposals.py             exposure-reducing typed proposals
+  execution_service.py     approval, revalidation, paper submission
+  storage.py               SQLite state and idempotency
+  risk_copilot.py          concentration, duplication, stress analysis
+  explanations.py          "why was this ticker flagged?"
+
+data/
+  market_data.py           historical and synthetic price data
+  event_data.py            upcoming earnings with availability metadata
+  earnings_data.py         point-in-time earnings history
+  analyst_data.py          analyst actions
+  price_target_data.py     point-in-time price-target consensus
+  macro_data.py            credit-spread and yield-curve proxies
+
+risk/
+  manager.py               sizing and stop calculations for research
+  execution_gate.py        typed validation and short-lived authorization
+
+execution/
+  alpaca_broker.py         authorized broker reads and paper/live endpoint
+
+signals/                   pluggable research signals
+backtest/engine.py         walk-forward and dependence-aware testing
+strategies/                leveraged-ETF rotation research
+ml/model.py                walk-forward-evaluated signal classifier
+```
+
+## Research workflow
+
+The signal API returns:
+
+```text
+ticker, date, close, return_pct, return_zscore,
+volume_zscore, direction
+```
+
+This lets every signal reuse the same:
+
+- forward-return backtest;
+- own-ticker and market baselines;
+- discovery/confirmation split;
+- by-date and moving-block bootstrap;
+- equal-date and trade weighting;
+- multiple-comparison correction.
+
+The most rigorous available check is
+`out_of_sample_significance_by_block()`. Only the pre-specified primary row
+in the confirmation period counts as evidence. Sensitivity variants are not
+independent chances to declare success.
+
+Useful research commands:
+
+```bash
+python scripts/run_backtest.py
+python scripts/run_backtest_horizons.py
+python scripts/run_baseline_comparison.py
+python scripts/run_out_of_sample_check.py
+python scripts/run_significance_check.py
+python scripts/run_macro_signals_significance_check.py
+python scripts/run_analyst_target_significance_check.py
+```
+
+The leveraged-ETF strategies enforce next-day-open execution after using a
+day's close to classify state. Tax and transaction-cost modeling are
+available in their simulators.
+
+## Legacy agent behavior
+
+`scripts/run_agent.py` is now a research-only synthetic-data demo:
+
+- it cannot submit orders;
+- it refuses to size signals when the model artifact is missing;
+- it does not treat an absent model as full confidence;
+- it identifies the original scanner as research rather than a production
+  strategy.
+
+Production paper orders belong exclusively to the proposal and approval
+workflow.
+
+## Tests
+
+```bash
+python -m pytest tests -q
+```
+
+The suite covers scanners, backtests, research statistics, strategies, ML,
+risk sizing, assistant schemas, context building, explanations, stress
+analysis, execution limits, policy validation, SQLite idempotency, proposal
+generation, authorization binding, and approved paper submission with a
+mocked broker.
+
+Broker tests do not contact Alpaca. Real-data research scripts do require
+network access.
+
+## Remaining limitations
+
+- The CLI is functional, but there is not yet a browser dashboard or
+  conversational API.
+- Earnings come from a free best-effort data source; unavailable values remain
+  explicitly unavailable.
+- Tax-lot selection, wash-sale handling, dividends, and realized-tax estimates
+  are not yet integrated into proposals.
+- SQLite stores submitted broker state, but continuous fill/partial-fill
+  reconciliation and alerting are future work.
+- Market data used in research is not an institutional production feed.
+- Survivorship bias, delistings, liquidity, and borrow constraints remain
+  important research limitations.
+- No strategy is authorized to open new positions under the default policy.
+
+These limitations should be resolved incrementally without weakening the
+execution boundary or silently promoting exploratory research.

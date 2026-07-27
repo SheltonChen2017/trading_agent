@@ -5,3 +5,4 @@ scikit-learn
 joblib
 alpaca-py
 lxml
+pytest

@@ -1,12 +1,11 @@
 """
-End-to-end run: scan for today's signals -> score with the trained model
-(if one exists) -> size positions with the risk manager -> execute on
-Alpaca paper trading (only if APCA_API_KEY_ID/APCA_API_SECRET_KEY are set).
+Legacy research demo: scan synthetic data -> score with a trained model
+-> print hypothetical position sizes. It cannot submit orders.
 
 Uses synthetic data by default — see README for switching to real data.
-Safe to run with no setup at all: without a trained model it sizes at
-full confidence, and without Alpaca credentials it just prints what WOULD
-be sized/traded instead of executing.
+An absent model causes a safe refusal rather than being interpreted as
+full confidence. Use scripts/run_personal_assistant.py for the approved,
+policy-bound paper workflow.
 """
 import sys
 from pathlib import Path
@@ -18,7 +17,6 @@ from data.market_data import generate_synthetic  # swap for fetch_historical for
 from signals.scanner import scan_dips_and_ups
 from ml.model import load_model, score_signals
 from risk.manager import allocate
-from execution.alpaca_broker import AlpacaNotConfigured, execute_allocation, get_account, is_configured
 
 
 def main():
@@ -37,37 +35,20 @@ def main():
         signals = score_signals(model, signals)
         print(f"Scored with model at {MODEL_PATH}.")
     except FileNotFoundError:
-        print(f"No trained model found at {MODEL_PATH} (run scripts/train_model.py first) — sizing at full confidence.")
-
-    account_equity = INITIAL_CAPITAL
-    if is_configured():
-        try:
-            account = get_account()
-            account_equity = account["equity"]
-            print(f"Connected to Alpaca ({'paper' if account['paper'] else 'LIVE'}) — equity=${account_equity:,.2f}")
-        except AlpacaNotConfigured:
-            pass
-
-    sized = allocate(signals, account_equity=account_equity)
-    print("\nSized signals:")
-    print(sized.to_string(index=False))
-
-    tradeable = sized[sized["shares"] > 0]
-    if tradeable.empty:
-        print("\nNothing sized above zero shares — no orders to place.")
-        return
-
-    if not is_configured():
         print(
-            "\nAPCA_API_KEY_ID/APCA_API_SECRET_KEY not set — not executing. "
-            "Sign up free at https://alpaca.markets to enable paper trading."
+            f"No trained model found at {MODEL_PATH}. Refusing to interpret "
+            "unscored signals as full confidence."
         )
         return
 
-    print("\nSubmitting orders to Alpaca...")
-    results = execute_allocation(tradeable)
-    for r in results:
-        print(f"  {r['ticker']}: buy={r['buy_order']['status']} stop={r['stop_order']['status']}")
+    sized = allocate(signals, account_equity=INITIAL_CAPITAL)
+    print("\nSized signals:")
+    print(sized.to_string(index=False))
+
+    print(
+        "\nResearch output only — execution is disabled for this rejected "
+        "scanner. Use scripts/run_personal_assistant.py for gated proposals."
+    )
 
 
 if __name__ == "__main__":

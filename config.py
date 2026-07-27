@@ -242,6 +242,32 @@ ANALYST_TARGET_MIN_ANALYSTS = 5          # minimum still-active price targets re
 ANALYST_TARGET_STALENESS_DAYS = 365      # a firm's price target older than this is treated as no longer representing their current view
 ANALYST_TARGET_METHOD = "median"         # "median" or "mean" of the trimmed set
 
+# Cross-asset MACRO signals (signals/vix_spike.py, signals/credit_spread.py,
+# signals/yield_curve.py; data/macro_data.py) — genuinely different data
+# category from every other signal in this project: market-wide
+# conditions (volatility, credit risk appetite, rate expectations), not
+# any ticker's own price/volume/fundamentals/analyst data. All three
+# share the same mechanism: build a "fear proxy" series constructed so
+# that a RISE always means increasing macro stress, then flag the ENTIRE
+# universe simultaneously when that proxy's own daily return z-score
+# spikes beyond a threshold ("dip" = stress spike, expect a broad bounce)
+# or collapses ("up" = stress easing sharply, included for symmetry).
+# User-directed, 2026-07.
+VIX_TICKER = "^VIX"
+VIX_SPIKE_Z_THRESHOLD = 2.0
+
+CREDIT_SPREAD_HY_TICKER = "HYG"   # iShares high-yield corporate bond ETF
+CREDIT_SPREAD_IG_TICKER = "LQD"   # iShares investment-grade corporate bond ETF
+CREDIT_SPREAD_Z_THRESHOLD = 2.0   # proxy = LQD/HYG ratio (rises when high-yield underperforms -- "flight to quality")
+
+# Yield curve slope proxy: short (^IRX, 13-week T-bill) vs long (^TNX,
+# 10-year) -- the same short/long pairing the NY Fed's own recession-
+# probability model uses, chosen because a direct 2-year yield ticker
+# isn't reliably available via this project's free data source.
+YIELD_CURVE_SHORT_TICKER = "^IRX"
+YIELD_CURVE_LONG_TICKER = "^TNX"
+YIELD_CURVE_Z_THRESHOLD = 2.0      # proxy = short - long (rises as the curve flattens/inverts further)
+
 # Market regime classifier (signals/regime.py) — momentum showed a real,
 # statistically significant sign-flip between two multi-year eras of the
 # ~7-year test window (2026-07 finding), consistent with the documented

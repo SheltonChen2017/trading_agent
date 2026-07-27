@@ -62,6 +62,10 @@ class PortfolioSnapshot:
     cash: float
     total_equity: float
     as_of: str  # ISO date string
+    buying_power: float | None = None
+    source: str = "manual"
+    account_mode: str = "manual"
+    open_orders: list[dict] = dataclasses.field(default_factory=list)
 
 
 @dataclasses.dataclass
@@ -98,6 +102,9 @@ class UpcomingEvent:
     event_type: str
     days_away: int | None
     status: EvidenceStatus  # usually UNAVAILABLE until a real calendar feed is wired up
+    event_date: str | None = None
+    source: str | None = None
+    fetched_at: str | None = None
 
 
 @dataclasses.dataclass
@@ -109,6 +116,10 @@ class DecisionPacket:
     signals: list[SignalEvidence]
     upcoming_events: list[UpcomingEvent]
     warnings: list[str]
+    schema_version: str = "2.0"
+    policy_version: str = ""
+    analytics: dict = dataclasses.field(default_factory=dict)
+    data_freshness: dict[str, str] = dataclasses.field(default_factory=dict)
 
     def to_dict(self) -> dict:
         return _to_dict(self)

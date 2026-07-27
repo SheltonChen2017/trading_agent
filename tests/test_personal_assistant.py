@@ -663,8 +663,14 @@ def test_ambiguous_submission_failure_marks_submission_unknown_when_unconfirmabl
     def failing_submit(ticker, shares, side="buy", *, authorization=None, idempotency_key=None):
         raise TimeoutError("simulated network timeout, broker outcome unknown")
 
+    def failing_lookup(client_order_id):
+        # The lookup ITSELF fails (network/auth/etc.) -- still can't
+        # confirm presence or absence. Distinct from returning None,
+        # which now means the broker CONFIRMS the order doesn't exist.
+        raise ConnectionError("simulated network failure during reconciliation lookup")
+
     broker.submit_market_order = failing_submit
-    broker.find_order_by_client_id = lambda client_order_id: None  # lookup can't confirm either way
+    broker.find_order_by_client_id = failing_lookup
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
@@ -694,6 +700,143 @@ def test_ambiguous_submission_failure_marks_submission_unknown_when_unconfirmabl
             )
     finally:
         restore()
+
+
+def test_ambiguous_submission_failure_marks_submission_failed_when_broker_confirms_absent():
+    """A confirmed-absent lookup (broker's own 404) after a submission
+    error means the order genuinely never went through -- this should
+    resolve straight to 'submission_failed', not sit in the more
+    conservative 'submission_unknown'."""
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+
+    def failing_submit(ticker, shares, side="buy", *, authorization=None, idempotency_key=None):
+        raise TimeoutError("simulated network timeout")
+
+    broker.submit_market_order = failing_submit
+    broker.find_order_by_client_id = lambda client_order_id: None  # confirmed absent (broker's own 404)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected a confirmed-absent lookup to raise"
+            except ProposalExecutionError as exc:
+                assert "confirms no such order exists" in str(exc)
+            assert store.get_proposal(proposal.proposal_id)["status"] == "submission_failed"
+    finally:
+        restore()
+
+
+def test_reconcile_submission_resolves_stuck_proposal_to_executed():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    broker.find_order_by_client_id = lambda client_order_id: {
+        "order_id": "reconciled-2",
+        "ticker": proposal.intent.ticker,
+        "shares": proposal.intent.shares,
+        "side": proposal.intent.side,
+        "status": "accepted",
+    }
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submission_unknown")
+
+            order = reconcile_submission(proposal.proposal_id, store)
+            assert order["order_id"] == "reconciled-2"
+            record = store.get_proposal(proposal.proposal_id)
+            assert record["status"] == "executed"
+            assert "reconciled_at" in record
+    finally:
+        restore()
+
+
+def test_reconcile_submission_refuses_a_mismatched_order():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]  # a SELL
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    broker.find_order_by_client_id = lambda client_order_id: {
+        "order_id": "wrong-order",
+        "ticker": "AAPL",  # does not match the proposal's ticker
+        "shares": 999,
+        "side": "buy",
+        "status": "accepted",
+    }
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            proposal_dict = proposal.to_dict()
+            store.save_proposal(proposal_dict)
+            store.update_proposal_status(proposal.proposal_id, "submission_unknown")
+
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, "expected a mismatched order to be refused"
+            except ProposalExecutionError as exc:
+                assert "MISMATCHED" in str(exc)
+            record = store.get_proposal(proposal.proposal_id)
+            assert record["status"] == "submission_unknown"  # not silently trusted/executed
+    finally:
+        restore()
+
+
+def test_reconcile_submission_marks_submission_failed_when_broker_confirms_absent():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    broker.find_order_by_client_id = lambda client_order_id: None
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submitting")
+
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, "expected a confirmed-absent order to raise"
+            except ProposalExecutionError as exc:
+                assert "never accepted" in str(exc)
+            assert store.get_proposal(proposal.proposal_id)["status"] == "submission_failed"
+    finally:
+        restore()
+
+
+def test_reconcile_submission_rejects_a_non_reconcilable_status():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    from assistant.execution_service import reconcile_submission
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())  # status is "proposed", not reconcilable
+        try:
+            reconcile_submission(proposal.proposal_id, store)
+            assert False, "expected reconciliation of a 'proposed' proposal to be rejected"
+        except ProposalExecutionError as exc:
+            assert "not reconcilable" in str(exc)
 
 
 def test_record_broker_order_failure_after_acceptance_still_marks_executed():

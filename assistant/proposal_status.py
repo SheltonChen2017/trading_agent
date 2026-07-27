@@ -19,6 +19,7 @@ APPROVED = "approved"
 SUBMITTING = "submitting"
 SUBMISSION_UNKNOWN = "submission_unknown"
 SUBMISSION_FAILED = "submission_failed"
+RECONCILING = "reconciling"
 EXECUTED = "executed"
 EXPIRED = "expired"
 
@@ -31,6 +32,7 @@ STATUSES: tuple[str, ...] = (
     APPROVED,
     SUBMITTING,
     SUBMISSION_UNKNOWN,
+    RECONCILING,
     SUBMISSION_FAILED,
     EXECUTED,
     EXPIRED,
@@ -40,4 +42,4 @@ STATUSES: tuple[str, ...] = (
 # proposal hasn't reached a clean terminal state -- used to widen the
 # duplicate-order check so a regenerated proposal for the same
 # ticker/side is blocked until an unresolved submission is reconciled.
-UNRESOLVED_BROKER_STATE_STATUSES: tuple[str, ...] = (SUBMITTING, SUBMISSION_UNKNOWN)
+UNRESOLVED_BROKER_STATE_STATUSES: tuple[str, ...] = (SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING)

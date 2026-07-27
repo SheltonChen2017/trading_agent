@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
-from assistant.execution_service import execute_approved_paper_proposal
+from assistant.execution_service import execute_approved_paper_proposal, reconcile_submission
 from assistant.policy import load_policy
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
@@ -137,6 +137,16 @@ def command_approve(args, store: AssistantStore) -> None:
     )
 
 
+def command_reconcile(args, store: AssistantStore) -> None:
+    if not is_configured():
+        raise SystemExit("Alpaca paper credentials are required for reconciliation.")
+    order = reconcile_submission(args.proposal_id, store)
+    print(
+        f"Reconciled {args.proposal_id}: found broker order {order['order_id']} "
+        f"[{order.get('status', 'unknown')}] and marked executed."
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Personal trading assistant")
     parser.add_argument(
@@ -173,6 +183,17 @@ def build_parser() -> argparse.ArgumentParser:
     approve.add_argument("proposal_id")
     approve.add_argument("--confirm", required=True)
     approve.set_defaults(handler=command_approve)
+
+    reconcile = commands.add_parser(
+        "reconcile",
+        help=(
+            "Resolve a proposal stuck in 'submitting' or 'submission_unknown' (e.g. after a network "
+            "timeout during approval) by re-querying the broker for the same idempotency key. "
+            "Re-running 'approve' cannot do this -- the proposal is no longer 'proposed'."
+        ),
+    )
+    reconcile.add_argument("proposal_id")
+    reconcile.set_defaults(handler=command_reconcile)
     return parser
 
 

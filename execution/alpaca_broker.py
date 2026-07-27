@@ -86,10 +86,13 @@ def get_latest_quote(ticker: str) -> dict:
     measure actual price staleness at approval time, instead of asserting
     freshness by comparing "now" against "now" (a real bug this fixes: a
     quote fetched over a weekend can be date(s) old even though nothing
-    about the code path would have noticed). Mid price when both sides
-    are quoted; falls back to whichever single side is nonzero (a wide
-    or one-sided book, common outside market hours, still yields SOME
-    reference price rather than crashing)."""
+    about the code path would have noticed). Returns bid/ask separately
+    (not just a collapsed mid price) so the execution gate can check
+    spread width -- a market order has no limit price to compare against,
+    so a wide/thin quote otherwise passes validation with zero protection.
+    Mid price when both sides are quoted; falls back to whichever single
+    side is nonzero (a wide or one-sided book, common outside market
+    hours, still yields SOME reference price rather than crashing)."""
     if not is_configured():
         raise AlpacaNotConfigured(
             "APCA_API_KEY_ID / APCA_API_SECRET_KEY are not set. Sign up for free "
@@ -109,7 +112,38 @@ def get_latest_quote(ticker: str) -> dict:
         price = (bid + ask) / 2
     else:
         price = ask if ask > 0 else bid
-    return {"ticker": ticker, "price": price, "timestamp": quote.timestamp}
+    return {"ticker": ticker, "price": price, "bid": bid, "ask": ask, "timestamp": quote.timestamp}
+
+
+def find_order_by_client_id(client_order_id: str) -> dict | None:
+    """Look up a previously-submitted order by the client_order_id we sent
+    (== our idempotency_key). Used for reconciliation after an ambiguous
+    submission failure (e.g. a network timeout): Alpaca may have accepted
+    the order even though we never saw a successful response, and this is
+    the only way to find out. Returns None when the broker genuinely has
+    no such order (never submitted) OR when the lookup itself fails (still
+    can't be confirmed) -- callers must treat both the same way: "not
+    confirmed", not "confirmed absent"."""
+    if not is_configured():
+        raise AlpacaNotConfigured(
+            "APCA_API_KEY_ID / APCA_API_SECRET_KEY are not set. Sign up for free "
+            "paper trading keys at https://alpaca.markets, then set both as "
+            "environment variables before calling any execution function."
+        )
+    client = _get_client()
+    try:
+        order = client.get_order_by_client_id(client_order_id)
+    except Exception:
+        return None
+    if order is None:
+        return None
+    return {
+        "order_id": str(order.id),
+        "ticker": order.symbol,
+        "shares": float(order.qty) if order.qty is not None else None,
+        "side": getattr(order.side, "value", str(order.side)),
+        "status": getattr(order.status, "value", str(order.status)),
+    }
 
 
 def get_open_orders() -> list[dict]:
@@ -173,6 +207,57 @@ def submit_market_order(
         )
     )
     return {"order_id": str(order.id), "ticker": ticker, "shares": shares, "side": side, "status": str(order.status)}
+
+
+def submit_limit_order(
+    ticker: str,
+    shares: int,
+    limit_price: float,
+    side: str = "buy",
+    *,
+    authorization: ExecutionAuthorization | None = None,
+    idempotency_key: str | None = None,
+) -> dict:
+    """Submit a day limit order. Same live-trading confirmation gate and
+    authorization check as submit_market_order -- kept as a separate
+    function (not folded into submit_market_order) so a caller can never
+    accidentally reconstruct a market-order intent for authorization
+    purposes when the approved intent was actually a limit order."""
+    if not PAPER_TRADING and os.environ.get("CONFIRM_LIVE_TRADING") != "I_UNDERSTAND":
+        raise LiveTradingNotConfirmed(
+            "config.PAPER_TRADING is False (live trading) but CONFIRM_LIVE_TRADING "
+            "is not set to 'I_UNDERSTAND'. Refusing to submit a live order as a "
+            "safety check — set that env var only once you truly mean to trade live."
+        )
+    if shares <= 0:
+        raise ValueError(f"shares must be positive, got {shares}")
+    if side not in ("buy", "sell"):
+        raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
+    intent = TradeIntent(ticker=ticker, shares=shares, side=side, order_type="limit", limit_price=limit_price)
+    verify_execution_authorization(intent, authorization)
+
+    client = _get_client()
+    from alpaca.trading.enums import OrderSide, TimeInForce
+    from alpaca.trading.requests import LimitOrderRequest
+
+    order = client.submit_order(
+        LimitOrderRequest(
+            symbol=ticker,
+            qty=shares,
+            side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
+            time_in_force=TimeInForce.DAY,
+            limit_price=limit_price,
+            client_order_id=idempotency_key,
+        )
+    )
+    return {
+        "order_id": str(order.id),
+        "ticker": ticker,
+        "shares": shares,
+        "side": side,
+        "limit_price": limit_price,
+        "status": str(order.status),
+    }
 
 
 def submit_stop_loss_order(

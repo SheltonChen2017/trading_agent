@@ -21,9 +21,15 @@ import json
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Literal
+from zoneinfo import ZoneInfo
+
+import pandas_market_calendars as mcal
 
 from config import BASKETS, LEVERAGED_ETF_TICKERS, MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
 from assistant.schemas import PortfolioSnapshot
+
+_EASTERN = ZoneInfo("America/New_York")
+_NYSE_CALENDAR = mcal.get_calendar("NYSE")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -108,12 +114,15 @@ def validate_trade_intent(
     recent_intents: list[TradeIntent] | None = None,
     kill_switch_active: bool = False,
     earnings_days_away: int | None = None,
+    bid_price: float | None = None,
+    ask_price: float | None = None,
     max_position_pct: float = MAX_POSITION_PCT,
     max_total_exposure_pct: float = MAX_TOTAL_EXPOSURE_PCT,
     max_basket_pct: float = 40.0,
     max_leveraged_etf_pct: float = 20.0,
     max_stale_price_minutes: float = 15.0,
     max_slippage_pct: float = 1.0,
+    max_spread_pct: float = 0.5,
     earnings_blackout_days: int = 2,
     max_order_value: float | None = None,
     min_cash_reserve_pct: float = 0.0,
@@ -129,7 +138,13 @@ def validate_trade_intent(
     Buying vs. selling: exposure/concentration checks (position size,
     total exposure, basket, leveraged-ETF) only apply to BUYS, since a
     sell reduces exposure. Stale-price, trading-hours, duplicate-order,
-    slippage, earnings, and the kill switch apply to both sides.
+    spread, slippage, earnings, and the kill switch apply to both sides.
+
+    `bid_price`/`ask_price`: when both are supplied (a market order can
+    now be checked, not just a limit order against its limit price), a
+    wide bid/ask spread blocks the trade under max_spread_pct -- a market
+    order has no protection against a wide/fresh-but-stale-looking quote
+    otherwise, since it never compares against anything.
     """
     violations: list[str] = []
 
@@ -221,10 +236,19 @@ def validate_trade_intent(
             violations.append(f"Reference price is {age_minutes:.1f} minutes old, exceeding the {max_stale_price_minutes:.1f}-minute staleness limit.")
 
     if now is not None:
-        if now.weekday() >= 5:
-            violations.append(f"{now.date()} is a weekend — markets are closed.")
-        elif not (_time_ge(now, 9, 30) and _time_lt(now, 16, 0)):
-            violations.append(f"{now.time()} is outside standard market hours (9:30-16:00 ET).")
+        comparable_now = _as_naive_eastern(now)
+        session = _trading_session_window(comparable_now)
+        if session is None:
+            reason = "a weekend" if comparable_now.weekday() >= 5 else "an exchange holiday"
+            violations.append(f"{comparable_now.date()} is {reason} — markets are closed.")
+        else:
+            session_open, session_close = session
+            if not (session_open <= comparable_now < session_close):
+                violations.append(
+                    f"{comparable_now.time()} on {comparable_now.date()} is outside today's trading "
+                    f"session ({session_open.time()}-{session_close.time()} ET, accounting for "
+                    "exchange holidays and early closes)."
+                )
 
     if recent_intents:
         for prior in recent_intents:
@@ -238,6 +262,16 @@ def validate_trade_intent(
             violations.append(
                 f"Limit price ${intent.limit_price:.2f} is {slippage_pct:.1f}% away from the reference price "
                 f"${reference_price:.2f}, exceeding the {max_slippage_pct:.1f}% max-slippage limit."
+            )
+
+    if bid_price is not None and ask_price is not None and bid_price > 0 and ask_price > 0:
+        mid = (bid_price + ask_price) / 2
+        spread_pct = (ask_price - bid_price) / mid * 100
+        if spread_pct > max_spread_pct:
+            violations.append(
+                f"Bid/ask spread is {spread_pct:.2f}% (bid ${bid_price:.2f} / ask ${ask_price:.2f}), "
+                f"exceeding the {max_spread_pct:.2f}% max-spread limit -- a market order here could fill "
+                "well away from the reference price."
             )
 
     # Symmetric window: blocks both the run-up to earnings and the days right
@@ -254,9 +288,29 @@ def validate_trade_intent(
     return ValidationResult(approved=len(violations) == 0, violations=violations)
 
 
-def _time_ge(dt: datetime, hour: int, minute: int) -> bool:
-    return (dt.hour, dt.minute) >= (hour, minute)
+def _as_naive_eastern(dt: datetime) -> datetime:
+    """Per this module's long-standing contract ("`now` is assumed to
+    already be in the exchange's local time (ET) -- no timezone
+    conversion is performed here"), the wall-clock hour/minute/date on
+    `dt` ARE the Eastern Time to use, regardless of any tzinfo attached --
+    tzinfo is stripped, never converted through. (Production callers
+    already pass a genuinely Eastern-zoned or naive-ET datetime; this
+    preserves that contract for tz-aware values instead of silently
+    reinterpreting their wall-clock time in a different zone.)"""
+    return dt.replace(tzinfo=None)
 
 
-def _time_lt(dt: datetime, hour: int, minute: int) -> bool:
-    return (dt.hour, dt.minute) < (hour, minute)
+def _trading_session_window(naive_eastern_dt: datetime) -> tuple[datetime, datetime] | None:
+    """Real NYSE trading-session bounds (naive Eastern Time) for this
+    calendar date, honoring exchange holidays and early closes (e.g. the
+    day after Thanksgiving, Christmas Eve) via pandas_market_calendars --
+    replaces a prior check that only knew "weekday + 9:30-16:00", which
+    would incorrectly approve a trade on a market holiday. Returns None
+    if the market is closed all day (weekend or full holiday)."""
+    date_str = naive_eastern_dt.date().isoformat()
+    schedule = _NYSE_CALENDAR.schedule(start_date=date_str, end_date=date_str)
+    if schedule.empty:
+        return None
+    session_open = schedule.iloc[0]["market_open"].tz_convert(_EASTERN).to_pydatetime().replace(tzinfo=None)
+    session_close = schedule.iloc[0]["market_close"].tz_convert(_EASTERN).to_pydatetime().replace(tzinfo=None)
+    return session_open, session_close

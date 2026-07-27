@@ -1,5 +1,7 @@
 """Tests for policy, persistence, proposals, and gated paper execution."""
 import dataclasses
+import os
+import sqlite3
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -163,8 +165,11 @@ def test_broker_rejects_direct_order_without_gate_authorization():
         pass
 
 
-def _mock_execution_dependencies(quote_price=50.0, quote_timestamp=None, earnings_available=False):
-    """Patches broker.is_configured/get_latest_quote/submit_market_order and
+def _mock_execution_dependencies(
+    quote_price=50.0, quote_timestamp=None, earnings_available=False, bid=None, ask=None,
+):
+    """Patches broker.is_configured/get_latest_quote/submit_market_order/
+    submit_limit_order/find_order_by_client_id and
     data.event_data.fetch_upcoming_earnings so execute_approved_paper_proposal()
     tests never hit the network. Returns (captured_orders, restore_fn)."""
     import data.event_data as event_data
@@ -175,13 +180,24 @@ def _mock_execution_dependencies(quote_price=50.0, quote_timestamp=None, earning
         "is_configured": broker.is_configured,
         "get_latest_quote": getattr(broker, "get_latest_quote", None),
         "submit_market_order": broker.submit_market_order,
+        "submit_limit_order": broker.submit_limit_order,
+        "find_order_by_client_id": broker.find_order_by_client_id,
         "PAPER_TRADING": broker.PAPER_TRADING,
         "fetch_upcoming_earnings": event_data.fetch_upcoming_earnings,
     }
 
     broker.PAPER_TRADING = True
     broker.is_configured = lambda: True
-    broker.get_latest_quote = lambda ticker: {"ticker": ticker, "price": quote_price, "timestamp": quote_timestamp}
+
+    def fake_quote(ticker):
+        quote = {"ticker": ticker, "price": quote_price, "timestamp": quote_timestamp}
+        if bid is not None:
+            quote["bid"] = bid
+        if ask is not None:
+            quote["ask"] = ask
+        return quote
+
+    broker.get_latest_quote = fake_quote
     event_data.fetch_upcoming_earnings = lambda tickers, as_of=None: {
         t: {"ticker": t, "available": earnings_available, "days_away": 1 if earnings_available else None}
         for t in tickers
@@ -192,11 +208,23 @@ def _mock_execution_dependencies(quote_price=50.0, quote_timestamp=None, earning
         captured.append((ticker, shares, side, idempotency_key))
         return {"order_id": "paper-1", "ticker": ticker, "shares": shares, "side": side, "status": "accepted"}
 
+    def fake_submit_limit(ticker, shares, limit_price, side="buy", *, authorization=None, idempotency_key=None):
+        assert authorization is not None
+        captured.append((ticker, shares, side, idempotency_key, limit_price))
+        return {
+            "order_id": "paper-limit-1", "ticker": ticker, "shares": shares, "side": side,
+            "limit_price": limit_price, "status": "accepted",
+        }
+
     broker.submit_market_order = fake_submit
+    broker.submit_limit_order = fake_submit_limit
+    broker.find_order_by_client_id = lambda client_order_id: None
 
     def restore():
         broker.is_configured = originals["is_configured"]
         broker.submit_market_order = originals["submit_market_order"]
+        broker.submit_limit_order = originals["submit_limit_order"]
+        broker.find_order_by_client_id = originals["find_order_by_client_id"]
         broker.PAPER_TRADING = originals["PAPER_TRADING"]
         event_data.fetch_upcoming_earnings = originals["fetch_upcoming_earnings"]
         if originals["get_latest_quote"] is not None:
@@ -481,4 +509,225 @@ def test_unexpected_exception_during_validation_marks_validation_failed_not_stuc
             assert status == "validation_failed", status
     finally:
         execution_service.validate_trade_intent = original_validate
+        restore()
+
+
+def test_core_service_enforces_kill_switch_env_var_even_without_the_argument():
+    """A caller that forgets to pass kill_switch_active must not silently
+    bypass TRADING_ASSISTANT_KILL_SWITCH -- the service itself must also
+    read it, not only the CLI/UI callers."""
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    os.environ["TRADING_ASSISTANT_KILL_SWITCH"] = "1"
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                    # kill_switch_active deliberately NOT passed
+                )
+                assert False, "expected the kill switch env var to block this proposal on its own"
+            except ProposalExecutionError as exc:
+                assert "kill switch" in str(exc).lower()
+            assert len(captured) == 0
+    finally:
+        os.environ.pop("TRADING_ASSISTANT_KILL_SWITCH", None)
+        restore()
+
+
+def test_wide_spread_blocks_a_market_order():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    # bid/ask 10% apart, well over the default 0.5% max_spread_pct.
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal.reference_price, bid=proposal.reference_price * 0.95, ask=proposal.reference_price * 1.05,
+    )
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected a wide bid/ask spread to block this market order"
+            except ProposalExecutionError as exc:
+                assert "spread" in str(exc).lower()
+            assert len(captured) == 0
+            assert store.get_proposal(proposal.proposal_id)["status"] == "blocked"
+    finally:
+        restore()
+
+
+def test_limit_order_routes_to_submit_limit_order_not_market():
+    packet = _packet()
+    policy = _policy()
+    from assistant.proposals import TradeProposal, _stable_id
+    from risk.execution_gate import TradeIntent
+
+    intent = TradeIntent(ticker="TQQQ", side="sell", shares=10, order_type="limit", limit_price=49.5)
+    proposal_id = _stable_id(packet, policy, intent)
+    limit_proposal = TradeProposal(
+        proposal_id=proposal_id,
+        created_at=packet.generated_at,
+        expires_at="2026-12-31T00:00:00+00:00",
+        status="proposed",
+        idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
+        policy_version=policy.version,
+        intent=intent,
+        reference_price=50.0,
+        price_timestamp=packet.generated_at,
+        reasons=["test limit sell"],
+        evidence_status="test",
+        expected_impact={"trade_value": 495.0, "position_weight_before_pct": 0, "position_weight_after_pct": 0, "cash_before": 0, "cash_after": 0, "invested_pct_after": 0},
+        alternatives=[],
+        uncertainties=[],
+    ).to_dict()
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(limit_proposal)
+            order = execute_approved_paper_proposal(
+                proposal_id,
+                f"APPROVE {proposal_id}",
+                packet.portfolio,
+                policy,
+                store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert order["order_id"] == "paper-limit-1"
+            assert order["limit_price"] == 49.5
+            assert len(captured) == 1
+            assert captured[0][:3] == ("TQQQ", 10, "sell")
+            assert captured[0][4] == 49.5  # limit_price reached submit_limit_order
+            assert store.get_proposal(proposal_id)["status"] == "executed"
+    finally:
+        restore()
+
+
+def test_ambiguous_submission_failure_reconciles_to_executed_when_broker_actually_accepted():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+
+    def failing_submit(ticker, shares, side="buy", *, authorization=None, idempotency_key=None):
+        raise TimeoutError("simulated network timeout after the broker may have accepted the order")
+
+    broker.submit_market_order = failing_submit
+    broker.find_order_by_client_id = lambda client_order_id: {
+        "order_id": "reconciled-1", "ticker": "TQQQ", "shares": 10, "side": "sell", "status": "accepted",
+    }
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            order = execute_approved_paper_proposal(
+                proposal.proposal_id,
+                f"APPROVE {proposal.proposal_id}",
+                packet.portfolio,
+                policy,
+                store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert order["order_id"] == "reconciled-1"
+            record = store.get_proposal(proposal.proposal_id)
+            assert record["status"] == "executed"
+            assert "reconciled_after_error" in record
+    finally:
+        restore()
+
+
+def test_ambiguous_submission_failure_marks_submission_unknown_when_unconfirmable():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+
+    def failing_submit(ticker, shares, side="buy", *, authorization=None, idempotency_key=None):
+        raise TimeoutError("simulated network timeout, broker outcome unknown")
+
+    broker.submit_market_order = failing_submit
+    broker.find_order_by_client_id = lambda client_order_id: None  # lookup can't confirm either way
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected an unconfirmable ambiguous failure to raise"
+            except ProposalExecutionError as exc:
+                assert "submission_unknown" in str(exc)
+
+            record = store.get_proposal(proposal.proposal_id)
+            assert record["status"] == "submission_unknown"
+
+            # A regenerated equivalent proposal must be treated as a
+            # duplicate-order risk until this is reconciled -- the same
+            # ticker/side intent should now show up as "recent".
+            recent = store.recent_executed_intents()
+            assert any(
+                i["ticker"] == proposal.intent.ticker and i["side"] == proposal.intent.side for i in recent
+            )
+    finally:
+        restore()
+
+
+def test_record_broker_order_failure_after_acceptance_still_marks_executed():
+    """The broker DID accept the order (a normal response came back) --
+    a local journaling failure must not be reported as a lost/failed
+    order; the fact that it executed must be preserved."""
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+
+            def failing_record(proposal_id, order):
+                raise sqlite3.OperationalError("simulated local disk/db failure")
+
+            original_record = store.record_broker_order
+            store.record_broker_order = failing_record
+            try:
+                order = execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert order["order_id"] == "paper-1"
+            finally:
+                store.record_broker_order = original_record
+            record = store.get_proposal(proposal.proposal_id)
+            assert record["status"] == "executed"
+            assert "local recording failed" in record.get("error", "")
+    finally:
         restore()

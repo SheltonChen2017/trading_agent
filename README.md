@@ -70,13 +70,25 @@ Important guarantees:
 - Repeated proposal generation cannot reset an executed proposal.
 - Open broker orders and recently executed intents are checked for duplicates.
 - Buys are checked against cash reserve, position, total-exposure, basket,
-  leverage, order-value, stale-price, trading-hours, slippage, and earnings
-  rules.
+  leverage, order-value, stale-price, trading-hours, spread, slippage, and
+  earnings rules.
+- Trading-hours checks use a real NYSE calendar (`pandas_market_calendars`),
+  including holidays and early closes -- not just a weekday + fixed
+  9:30-16:00 window, which would incorrectly approve a trade on a market
+  holiday.
+- A wide bid/ask spread blocks a trade (`max_spread_pct`) even for market
+  orders, which have no limit price of their own to compare against.
 - Sells cannot exceed the shares currently held.
-- `TRADING_ASSISTANT_KILL_SWITCH=1` blocks proposal execution.
+- `TRADING_ASSISTANT_KILL_SWITCH=1` blocks proposal execution -- enforced
+  inside the execution service itself (not only by callers that remember to
+  read the env var and pass it in), so it can't be silently bypassed.
 - The personal-assistant execution service refuses to run if
   `config.PAPER_TRADING` is `False`.
 - Live-trading support is intentionally not exposed by the assistant CLI.
+- If a broker submission fails ambiguously (e.g. a network timeout after the
+  order may have already been accepted), the service reconciles by looking
+  the order up under its own idempotency key before concluding anything --
+  see "Submission reconciliation" below.
 
 ## Current research status
 
@@ -114,6 +126,12 @@ python -m pip install -r requirements.txt
 python -m pytest tests -q
 ```
 
+Dependencies in `requirements.txt` are version-pinned (exact versions, not
+ranges) so a fresh install always reproduces the environment this project was
+actually tested against, instead of silently picking up a newer release that
+could change behavior. Bump pins deliberately and re-run the full test suite,
+rather than leaving them unpinned.
+
 The current dependency set is:
 
 - pandas / numpy
@@ -121,6 +139,16 @@ The current dependency set is:
 - scikit-learn / joblib
 - alpaca-py
 - lxml
+- pandas_market_calendars (real NYSE trading-hours/holiday calendar)
+
+### Continuous integration
+
+`.github/workflows/tests.yml` runs `python -m pytest tests/` automatically on
+every push and pull request to `main` via GitHub Actions -- the full suite
+(deterministic/synthetic data and mocked broker calls only, no network or
+credentials required) so a regression can't be merged without the CI check
+failing first, instead of relying on a human remembering to run `pytest`
+locally before every merge.
 
 ## Configure Alpaca paper trading
 
@@ -157,9 +185,12 @@ The default versioned policy is
 - per-position, total, basket, and leveraged-ETF exposure;
 - minimum cash reserve;
 - maximum order value;
-- price freshness and slippage;
+- price freshness, spread, and slippage;
 - earnings blackout window;
-- allowed sides and order types;
+- allowed sides and order types (market and limit are both routed correctly
+  to the matching broker call; anything else is rejected at policy-load time
+  by `TradingPolicy.validate()`, which also rejects empty/negative/
+  wrong-typed fields instead of failing silently later);
 - whether new positions may be opened;
 - whether validated strategy proposals (currently just the SOXX/SOXL
   wide-rebalance-band strategy) are checked by default on `propose`;
@@ -179,6 +210,7 @@ The checked-in default is deliberately restrictive:
   "max_leveraged_etf_pct": 0.20,
   "min_cash_reserve_pct": 0.10,
   "max_order_value": 5000.0,
+  "max_spread_pct": 0.5,
   "allow_new_positions": false,
   "enable_strategy_proposals": false,
   "require_earnings_data": false
@@ -238,8 +270,11 @@ python scripts/run_personal_assistant.py list
 python scripts/run_personal_assistant.py list --status proposed
 ```
 
-Proposal states include `proposed`, `approved`, `blocked`, `expired`,
-`submission_failed`, and `executed`.
+Proposal states (`assistant/proposal_status.py` is the single source of
+truth used by the service, the UI's History filter, and tests -- so these
+can't drift out of sync with each other again): `proposed`, `validating`,
+`blocked`, `validation_failed`, `approved`, `submitting`,
+`submission_unknown`, `submission_failed`, `executed`, `expired`.
 
 ### Approve one paper order
 
@@ -266,6 +301,30 @@ To stop all approvals without changing code:
 ```powershell
 $env:TRADING_ASSISTANT_KILL_SWITCH = "1"
 ```
+
+### Submission reconciliation
+
+An exception while submitting an order to Alpaca does not prove the broker
+rejected it -- a network timeout, for instance, can lose the response after
+the order was actually accepted. Treating that as a plain failure risks a
+later retry submitting a genuine duplicate real order. On any submission
+exception, the service:
+
+1. looks the order up at the broker by the same idempotency key
+   (`client_order_id`) it originally submitted;
+2. if found, journals it and marks the proposal `executed`, same as a normal
+   success (`reconciled_after_error` records what the original error was);
+3. if the lookup itself can't confirm either way, marks the proposal
+   `submission_unknown` -- a distinct, non-terminal status. Proposals in
+   `submitting` or `submission_unknown` are treated as live duplicate-order
+   risk by the duplicate check, so a regenerated proposal for the same
+   ticker/side is blocked until a human checks the Alpaca account directly
+   and reconciles it.
+
+Separately, if the broker call succeeds but the local SQLite journal write
+afterward fails, the proposal is still marked `executed` (the order really
+was accepted) with the local failure recorded in its `error` field --
+never silently reported as failed when a real order exists.
 
 ## Browser UI (optional)
 

@@ -45,12 +45,71 @@ introduced, plus two smaller gaps --
      forever. Added a catch-all that marks a distinct "validation_failed"
      status and re-raises -- never silently swallowed, never auto-reset
      to "proposed".
+
+2026-07-28 update (independent GPT review, verified against this code
+before acting) -- closed the remaining execution-safety gaps:
+  9. Submission reconciliation: an exception during broker.submit_*_order
+     no longer assumes rejection. Alpaca might have accepted the order
+     and only the response was lost (a network timeout, for example) --
+     in that case treating it as "submission_failed" would let a later
+     retry submit a genuine duplicate real order. Now, on any submission
+     exception, this module queries the broker BY THE SAME idempotency
+     key (client_order_id) via broker.find_order_by_client_id(). If found,
+     the order is journaled and the proposal is marked "executed" same as
+     a normal success. If the lookup itself can't confirm either way, the
+     proposal is marked "submission_unknown" (a distinct, non-terminal
+     status) instead of "submission_failed" -- and AssistantStore.
+     recent_executed_intents() now also treats "submitting"/
+     "submission_unknown" proposals as live duplicate-order risk, so a
+     regenerated proposal for the same ticker/side is blocked until a
+     human reconciles the unknown proposal against the actual Alpaca
+     account. A "submitting" status is written just before the broker
+     call for the same reason -- so even a crash between the call and the
+     response leaves a non-terminal, duplicate-blocking status behind
+     instead of nothing. record_broker_order() failing AFTER a confirmed
+     broker acceptance is also handled separately: the proposal is still
+     marked "executed" (the order really was accepted) with the local
+     journaling failure recorded in its `error` field, rather than losing
+     the fact that a real order exists.
+ 10. The kill switch was only enforced by callers reading
+     TRADING_ASSISTANT_KILL_SWITCH and passing kill_switch_active=True --
+     a caller that forgot to pass it silently bypassed the switch. Now
+     this function itself also reads the environment variable and ORs it
+     in, so the kill switch is an invariant of the execution service
+     itself, not a presentation-layer convention every caller must
+     remember to honor.
+ 11. Market orders (the only order type any built-in proposal generator
+     creates) had no protection against a wide bid/ask spread -- the
+     existing max_slippage_pct check only fired for limit orders compared
+     against their own limit price. broker.get_latest_quote() now returns
+     bid/ask separately (not just a collapsed mid), and validate_trade_
+     intent() gained a bid/ask spread check (TradingPolicy.max_spread_pct)
+     that applies to every order type.
+ 12. Approved intents with order_type="limit" were always submitted via
+     submit_market_order() regardless -- broker-side authorization would
+     actually reject the mismatch (the reconstructed intent used inside
+     submit_market_order never matches a limit-order authorization's
+     fingerprint), so this was a dormant bug rather than a live one (no
+     generator in this repo creates limit intents yet), but it made the
+     policy's allowed_order_types=["market","limit"] advertise unsupported
+     behavior. This module now routes by intent.order_type to the correct
+     broker function.
 """
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 
 from assistant.policy import TradingPolicy
+from assistant.proposal_status import (
+    APPROVED,
+    BLOCKED,
+    EXECUTED,
+    SUBMISSION_UNKNOWN,
+    SUBMITTING,
+    VALIDATING,
+    VALIDATION_FAILED,
+)
 from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
 from risk.execution_gate import (
@@ -108,6 +167,11 @@ def execute_approved_paper_proposal(
     are single-use, short-lived, and currently restricted to Alpaca paper
     accounts regardless of the global broker configuration.
     """
+    # Enforce the environment kill switch here too, not only in callers --
+    # a caller that forgets to pass kill_switch_active must not silently
+    # bypass it. This makes the switch an invariant of the service itself.
+    kill_switch_active = kill_switch_active or os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1"
+
     proposal = store.get_proposal(proposal_id)
     if proposal is None:
         raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
@@ -130,7 +194,7 @@ def execute_approved_paper_proposal(
     # expiry window (or race an in-flight claim into "expired" out from
     # under it).
     claimed = store.claim_proposal(
-        proposal_id, expected_status="proposed", new_status="validating", not_expired_after=now_utc.isoformat()
+        proposal_id, expected_status="proposed", new_status=VALIDATING, not_expired_after=now_utc.isoformat()
     )
     if claimed is None:
         current = store.get_proposal(proposal_id)
@@ -186,6 +250,8 @@ def execute_approved_paper_proposal(
             quote = broker.get_latest_quote(intent.ticker)
             reference_price = quote["price"]
             price_timestamp = quote["timestamp"]
+            bid_price = quote.get("bid")
+            ask_price = quote.get("ask")
         except Exception as exc:
             raise ProposalExecutionError(
                 f"Could not fetch a live quote for {intent.ticker} to check price freshness: {exc}"
@@ -216,12 +282,15 @@ def execute_approved_paper_proposal(
             recent_intents=recent_intents,
             kill_switch_active=kill_switch_active,
             earnings_days_away=resolved_earnings_days_away,
+            bid_price=bid_price,
+            ask_price=ask_price,
             max_position_pct=policy.max_position_pct,
             max_total_exposure_pct=policy.max_total_exposure_pct,
             max_basket_pct=policy.max_basket_pct * 100,
             max_leveraged_etf_pct=policy.max_leveraged_etf_pct * 100,
             max_stale_price_minutes=policy.max_stale_price_minutes,
             max_slippage_pct=policy.max_slippage_pct,
+            max_spread_pct=policy.max_spread_pct,
             earnings_blackout_days=policy.earnings_blackout_days,
             max_order_value=policy.max_order_value,
             min_cash_reserve_pct=policy.min_cash_reserve_pct,
@@ -232,7 +301,7 @@ def execute_approved_paper_proposal(
             )
     except ProposalExecutionError as exc:
         violations = validation.violations if validation is not None and not validation.approved else [str(exc)]
-        store.update_proposal_status(proposal_id, "blocked", violations=violations)
+        store.update_proposal_status(proposal_id, BLOCKED, violations=violations)
         raise
     except Exception as exc:
         # Something genuinely unexpected (not a validation/policy
@@ -240,32 +309,85 @@ def execute_approved_paper_proposal(
         # "validating" forever with no record of why. Distinct status
         # from "blocked" so this is visibly different from an ordinary
         # policy rejection in the History tab / store.
-        store.update_proposal_status(proposal_id, "validation_failed", error=str(exc))
+        store.update_proposal_status(proposal_id, VALIDATION_FAILED, error=str(exc))
         raise
 
     authorization = authorize_trade_intent(intent, validation)
     store.update_proposal_status(
         proposal_id,
-        "approved",
+        APPROVED,
         approved_at=now_utc.isoformat(),
         violations=[],
     )
+
+    # "submitting" is written BEFORE the broker call (not just around it)
+    # so that even a crash between sending the request and receiving a
+    # response leaves a non-terminal status behind, one that the
+    # duplicate-order check treats as unresolved broker state rather than
+    # silently vanishing back to nothing.
+    store.update_proposal_status(proposal_id, SUBMITTING)
+    submit = broker.submit_limit_order if intent.order_type == "limit" else broker.submit_market_order
+    submit_kwargs = (
+        {"limit_price": intent.limit_price} if intent.order_type == "limit" else {}
+    )
     try:
-        order = broker.submit_market_order(
+        order = submit(
             intent.ticker,
             intent.shares,
             side=intent.side,
             authorization=authorization,
             idempotency_key=proposal["idempotency_key"],
+            **submit_kwargs,
         )
     except Exception as exc:
-        store.update_proposal_status(proposal_id, "submission_failed", error=str(exc))
-        raise
+        # An exception here does NOT prove the broker rejected the order --
+        # a network timeout, for example, can lose the response after the
+        # order was actually accepted. Reconcile by looking the order up
+        # under the same idempotency key (client_order_id) before
+        # concluding anything.
+        reconciled = None
+        try:
+            reconciled = broker.find_order_by_client_id(proposal["idempotency_key"])
+        except Exception:
+            reconciled = None
+        if reconciled is not None:
+            store.record_broker_order(proposal_id, reconciled)
+            store.update_proposal_status(
+                proposal_id,
+                EXECUTED,
+                executed_at=datetime.now(timezone.utc).isoformat(),
+                broker_order=reconciled,
+                reconciled_after_error=str(exc),
+            )
+            return reconciled
+        store.update_proposal_status(proposal_id, SUBMISSION_UNKNOWN, error=str(exc))
+        raise ProposalExecutionError(
+            f"Could not confirm whether the order for {proposal_id} was accepted by the broker "
+            f"after an error ({exc}). Status is 'submission_unknown' -- check your Alpaca account "
+            "directly before approving an equivalent proposal; this ticker/side is treated as a "
+            "duplicate-order risk until reconciled."
+        ) from exc
 
-    store.record_broker_order(proposal_id, order)
+    try:
+        store.record_broker_order(proposal_id, order)
+    except Exception as exc:
+        # The broker DID accept the order (we got a normal response) --
+        # the failure is only in our local journal write. Do not report
+        # this as a submission failure; that would misrepresent an order
+        # that genuinely exists. Keep the order info in `error` so it can
+        # be reconciled/re-journaled manually.
+        store.update_proposal_status(
+            proposal_id,
+            EXECUTED,
+            executed_at=datetime.now(timezone.utc).isoformat(),
+            broker_order=order,
+            error=f"Order was accepted by the broker but local recording failed: {exc}",
+        )
+        return order
+
     store.update_proposal_status(
         proposal_id,
-        "executed",
+        EXECUTED,
         executed_at=datetime.now(timezone.utc).isoformat(),
         broker_order=order,
     )

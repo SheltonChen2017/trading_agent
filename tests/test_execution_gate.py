@@ -115,7 +115,32 @@ def test_outside_trading_hours_flagged():
 
     after_hours = datetime(2026, 7, 27, 20, 0)  # Monday 8pm
     result2 = validate_trade_intent(intent, snapshot, reference_price=60.0, now=after_hours)
-    assert any("outside standard market hours" in v for v in result2.violations)
+    assert any("outside today's trading session" in v for v in result2.violations)
+
+
+def test_market_holiday_flagged_even_on_a_weekday():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    thanksgiving_2026 = datetime(2026, 11, 26, 10, 0)  # a Thursday, but NYSE is closed
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=thanksgiving_2026)
+    assert any("exchange holiday" in v for v in result.violations)
+
+
+def test_early_close_flagged_after_1pm_the_day_after_thanksgiving():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    # NYSE closes at 13:00 ET the day after Thanksgiving, not the usual 16:00.
+    day_after_thanksgiving_afternoon = datetime(2026, 11, 27, 14, 0)
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=day_after_thanksgiving_afternoon,
+    )
+    assert any("outside today's trading session" in v for v in result.violations)
+
+    day_after_thanksgiving_morning = datetime(2026, 11, 27, 10, 0)
+    result_ok = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=day_after_thanksgiving_morning,
+    )
+    assert not any("trading session" in v or "exchange holiday" in v for v in result_ok.violations)
 
 
 def test_duplicate_order_detected():
@@ -159,6 +184,8 @@ if __name__ == "__main__":
     test_sell_side_skips_exposure_checks()
     test_stale_price_flagged()
     test_outside_trading_hours_flagged()
+    test_market_holiday_flagged_even_on_a_weekday()
+    test_early_close_flagged_after_1pm_the_day_after_thanksgiving()
     test_duplicate_order_detected()
     test_max_slippage_on_limit_order()
     test_earnings_blackout_flagged()

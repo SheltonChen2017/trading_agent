@@ -329,11 +329,24 @@ with tab_watchlist:
             else:
                 st.caption("No predefined per-ticker signal fires on this today.")
 
-            if explanation["historical_evidence"]:
-                st.write("Recommended course of action, based on this project's own evidence:")
-                for e in explanation["historical_evidence"]:
+            st.write("Recommended course of action:")
+            ticker_specific = [e for e in explanation["historical_evidence"] if e["ticker_specific"]]
+            project_wide = [e for e in explanation["historical_evidence"] if not e["ticker_specific"]]
+            if ticker_specific:
+                for e in ticker_specific:
                     st.write(f"**[{e['status']}]** {e['label']} -- {e['claim']}")
                     st.caption(e["detail"])
+            else:
+                st.info(
+                    f"No {ticker}-specific research exists in this project. None of the tested signals have "
+                    "validated edge for individual-stock picks -- see the general track record below for what's "
+                    "actually been tried."
+                )
+            if project_wide:
+                with st.expander(f"General signal-testing track record ({len(project_wide)} findings -- same for every stock, not specific to {ticker})"):
+                    for e in project_wide:
+                        st.write(f"**[{e['status']}]** {e['label']} -- {e['claim']}")
+                        st.caption(e["detail"])
             st.caption(explanation["note"])
 
 with tab_propose:

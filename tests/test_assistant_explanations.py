@@ -67,6 +67,24 @@ def test_explain_ticker_includes_historical_evidence_for_ticker_specific_finding
         explanations.fetch_historical = original_fetch
 
 
+def test_explain_ticker_flags_ticker_specific_vs_project_wide_findings():
+    # A caller (e.g. the Watchlist UI) needs to tell "this finding is
+    # specifically about SOXX" apart from "this is a generic project-wide
+    # result that shows up for every ticker" -- otherwise every stock's
+    # evidence list looks identical and useless.
+    original_fetch = explanations.fetch_historical
+    try:
+        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        result = explain_ticker("SOXX", market_regime=_FIXED_REGIME)
+        by_label = {e["label"]: e["ticker_specific"] for e in result["historical_evidence"]}
+        soxx_specific = next(v for k, v in by_label.items() if "SOXX/SOXL" in k)
+        assert soxx_specific is True
+        project_wide = next(v for k, v in by_label.items() if "z-score dip/up scanner" in k)
+        assert project_wide is False
+    finally:
+        explanations.fetch_historical = original_fetch
+
+
 def test_explain_ticker_reports_currently_held_status():
     original_fetch = explanations.fetch_historical
     try:

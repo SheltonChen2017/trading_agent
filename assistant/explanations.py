@@ -76,7 +76,10 @@ def explain_ticker(
         "ticker": ticker,
         "triggered_today": triggered,
         "historical_evidence": [
-            {"label": e.label, "claim": e.claim, "status": e.status.value, "detail": e.detail, "source": e.source}
+            {
+                "label": e.label, "claim": e.claim, "status": e.status.value, "detail": e.detail, "source": e.source,
+                "ticker_specific": bool(e.relevant_tickers),
+            }
             for e in relevant_findings
         ],
         "currently_held": (

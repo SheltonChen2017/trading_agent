@@ -6,6 +6,7 @@ hand-edited policy file silently misbehave rather than fail loudly at
 load time.
 """
 import dataclasses
+import math
 import sys
 from pathlib import Path
 
@@ -79,6 +80,34 @@ def test_unsupported_allowed_order_type_rejected():
         assert "allowed_order_types" in str(exc)
 
 
+def test_non_finite_numeric_fields_rejected():
+    # Regression test (Codex review, 2026-07-27): a naive `<= 0` / `< 0`
+    # check silently PASSES a NaN (NaN <= 0 is False in Python), which
+    # would then make every downstream `>`/`<` comparison in
+    # risk/execution_gate.py evaluate False no matter what -- silently
+    # disabling that cap instead of rejecting the policy. json.loads()
+    # accepts a literal NaN/Infinity by default, so this is reachable from
+    # a malformed policy file, not just a caller bug.
+    numeric_fields = (
+        "max_order_value",
+        "max_stale_price_minutes",
+        "max_slippage_pct",
+        "max_spread_pct",
+        "max_position_pct",
+        "max_total_exposure_pct",
+        "max_basket_pct",
+        "max_leveraged_etf_pct",
+        "min_cash_reserve_pct",
+    )
+    for field_name in numeric_fields:
+        for bad_value in (float("nan"), float("inf")):
+            try:
+                _valid_policy(**{field_name: bad_value}).validate()
+                assert False, f"expected {field_name}={bad_value} to be rejected"
+            except ValueError as exc:
+                assert field_name in str(exc), (field_name, bad_value, str(exc))
+
+
 def test_non_boolean_flag_fields_rejected():
     for field_name in ("require_earnings_data", "allow_new_positions", "enable_strategy_proposals"):
         try:
@@ -97,5 +126,6 @@ if __name__ == "__main__":
     test_unsupported_allowed_side_rejected()
     test_empty_allowed_order_types_rejected()
     test_unsupported_allowed_order_type_rejected()
+    test_non_finite_numeric_fields_rejected()
     test_non_boolean_flag_fields_rejected()
     print("All policy validation tests passed.")

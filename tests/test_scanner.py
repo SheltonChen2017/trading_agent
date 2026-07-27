@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import numpy as np
 import pandas as pd
 
-from signals.scanner import scan_dips_and_ups
+from signals.scanner import compute_features, scan_dips_and_ups
 
 
 def _flat_series_with_shock(days: int, shock_index: int, shock_return: float) -> pd.DataFrame:
@@ -89,9 +89,46 @@ def test_handles_ticker_with_shorter_history_than_as_of_date():
         assert "SHORT" not in result["ticker"].values
 
 
+def test_compute_features_diff_mode_handles_a_zero_crossing_correctly():
+    # Regression test (Codex review, 2026-07-27): pct_change() is
+    # undefined/sign-reversing across a zero crossing -- e.g. -0.1 -> 0.1
+    # computes as -200%, which reads as a huge COLLAPSE even though the
+    # series only just crossed zero from below. return_mode="diff" must
+    # be used instead for a signed series that can cross zero (the
+    # yield-curve short-minus-long spread proxy), so a genuine rise
+    # through zero still reads as a genuine, correctly-signed rise.
+    dates = pd.bdate_range("2026-01-01", periods=25)
+    values = [-0.1] * 24 + [0.1]  # flat until the last day, which crosses zero upward
+    df = pd.DataFrame(
+        {"open": values, "high": values, "low": values, "close": values, "volume": 0.0}, index=dates
+    )
+
+    diff_features = compute_features(df, window=20, return_mode="diff")
+    last_diff_return = diff_features["return_pct"].iloc[-1]
+    assert abs(last_diff_return - 0.2) < 1e-9  # a genuine +0.2 rise
+
+    pct_change_features = compute_features(df, window=20, return_mode="pct_change")
+    last_pct_change_return = pct_change_features["return_pct"].iloc[-1]
+    assert abs(last_pct_change_return - (-2.0)) < 1e-9  # the bug this replaces: -200%, backwards direction
+
+
+def test_compute_features_rejects_unsupported_return_mode():
+    dates = pd.bdate_range("2026-01-01", periods=25)
+    df = pd.DataFrame(
+        {"open": 1.0, "high": 1.0, "low": 1.0, "close": 1.0, "volume": 0.0}, index=dates
+    )
+    try:
+        compute_features(df, return_mode="bogus")
+        assert False, "expected an unsupported return_mode to be rejected"
+    except ValueError:
+        pass
+
+
 if __name__ == "__main__":
     test_flags_injected_dip()
     test_flags_injected_up()
     test_ignores_normal_noise()
     test_handles_ticker_with_shorter_history_than_as_of_date()
+    test_compute_features_diff_mode_handles_a_zero_crossing_correctly()
+    test_compute_features_rejects_unsupported_return_mode()
     print("All scanner tests passed.")

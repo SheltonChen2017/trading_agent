@@ -14,3 +14,12 @@ __pycache__/
 data/trading_assistant.db
 data/trading_assistant.db-shm
 data/trading_assistant.db-wal
+assistant/decision_log.jsonl
+
+# Claude Code session transcripts and machine-local permissions -- these
+# were committed by accident (Codex review, 2026-07-27: a 17MB session
+# transcript and machine-specific settings.local.json were tracked). Never
+# commit either; they belong outside the repo / in a personal, untracked
+# config layer.
+*.jsonl
+.claude/settings.local.json

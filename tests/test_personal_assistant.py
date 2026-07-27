@@ -143,8 +143,12 @@ def test_claim_proposal_returns_none_for_unknown_id():
 
 
 def test_execution_authorization_is_bound_to_exact_intent():
+    from risk.execution_gate import intent_fingerprint
+
     intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
-    authorization = authorize_trade_intent(intent, ValidationResult(True, []))
+    authorization = authorize_trade_intent(
+        intent, ValidationResult(True, [], validated_intent_fingerprint=intent_fingerprint(intent))
+    )
     verify_execution_authorization(intent, authorization)
     try:
         verify_execution_authorization(
@@ -153,6 +157,25 @@ def test_execution_authorization_is_bound_to_exact_intent():
         )
         assert False, "expected mismatched quantity to fail"
     except PermissionError:
+        pass
+
+
+def test_authorize_trade_intent_rejects_a_validation_result_for_a_different_intent():
+    # Regression test (Codex review, 2026-07-27): a ValidationResult must
+    # actually have been produced by validating THIS intent -- otherwise
+    # nothing stops pairing an approved result from a small, validated
+    # trade with a different, never-validated (e.g. oversized) intent.
+    from risk.execution_gate import intent_fingerprint
+
+    small_intent = TradeIntent(ticker="AAPL", side="buy", shares=1)
+    big_intent = TradeIntent(ticker="AAPL", side="buy", shares=1000)
+    validation_for_small_trade = ValidationResult(
+        True, [], validated_intent_fingerprint=intent_fingerprint(small_intent)
+    )
+    try:
+        authorize_trade_intent(big_intent, validation_for_small_trade)
+        assert False, "expected a mismatched (intent, validation) pair to be rejected"
+    except ValueError:
         pass
 
 

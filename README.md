@@ -134,6 +134,16 @@ actually tested against, instead of silently picking up a newer release that
 could change behavior. Bump pins deliberately and re-run the full test suite,
 rather than leaving them unpinned.
 
+**Windows note:** `streamlit`'s wheel unpacks a deeply nested `static/`
+directory; on a Microsoft Store Python install (or any install path that's
+already long), this can exceed Windows' default 260-character path limit and
+leave `pip install` failing partway through with streamlit partially removed.
+If that happens, either enable long paths
+(`git config --system core.longpaths true` plus the Windows policy setting at
+`HKLM\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled`), or create
+your virtualenv at a short path (e.g. `C:\venv\ta` instead of a deeply nested
+project directory) before installing.
+
 The current dependency set is:
 
 - pandas / numpy

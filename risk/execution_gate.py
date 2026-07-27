@@ -47,6 +47,13 @@ class TradeIntent:
 class ValidationResult:
     approved: bool
     violations: list[str]
+    # Content-hash of the exact intent this result was computed for. Lets
+    # authorize_trade_intent() refuse to authorize any intent whose
+    # fingerprint doesn't match -- otherwise nothing stops a caller from
+    # pairing an approved ValidationResult from one (e.g. small) intent
+    # with a different, never-validated intent and getting a valid
+    # authorization for it (Codex review, 2026-07-27).
+    validated_intent_fingerprint: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -81,6 +88,13 @@ def authorize_trade_intent(
 ) -> ExecutionAuthorization:
     if not validation.approved:
         raise ValueError("Cannot authorize a trade intent that failed validation.")
+    if validation.validated_intent_fingerprint != intent_fingerprint(intent):
+        raise ValueError(
+            "This ValidationResult was not produced by validating this exact trade "
+            "intent -- refusing to authorize. (A validation result must come from "
+            "validate_trade_intent(intent, ...) called with the SAME intent being "
+            "authorized here.)"
+        )
     now = datetime.now(timezone.utc)
     return ExecutionAuthorization(
         token=secrets.token_urlsafe(32),
@@ -150,7 +164,11 @@ def validate_trade_intent(
     violations: list[str] = []
 
     if kill_switch_active:
-        return ValidationResult(approved=False, violations=["Kill switch is active — no trades are permitted."])
+        return ValidationResult(
+            approved=False,
+            violations=["Kill switch is active — no trades are permitted."],
+            validated_intent_fingerprint=intent_fingerprint(intent),
+        )
 
     if intent.shares <= 0:
         violations.append(f"shares must be positive, got {intent.shares}.")
@@ -178,12 +196,22 @@ def validate_trade_intent(
                 f"{max_position_pct * 100:.1f}% per-position limit."
             )
 
-        if trade_value > portfolio.cash:
-            violations.append(f"Trade value ${trade_value:,.2f} exceeds available cash ${portfolio.cash:,.2f}.")
+        # portfolio.cash alone ignores pending/open orders reserving that
+        # same cash (e.g. two proposals approved back-to-back, or an
+        # unrelated pending buy on another ticker) -- portfolio.buying_power,
+        # when the broker supplies it, already nets those holds out, so it's
+        # the tighter and more honest ceiling whenever it's available
+        # (Codex review, 2026-07-27: reproduced a $5,000 approval against
+        # $1,000 of real buying power sitting behind a $9,000 pending buy).
+        available_capital = portfolio.cash
+        if portfolio.buying_power is not None:
+            available_capital = min(available_capital, portfolio.buying_power)
+        if trade_value > available_capital:
+            violations.append(f"Trade value ${trade_value:,.2f} exceeds available cash ${available_capital:,.2f}.")
         minimum_cash = portfolio.total_equity * min_cash_reserve_pct
-        if portfolio.cash - trade_value < minimum_cash:
+        if available_capital - trade_value < minimum_cash:
             violations.append(
-                f"Cash after trade would be ${portfolio.cash - trade_value:,.2f}, below the "
+                f"Cash after trade would be ${available_capital - trade_value:,.2f}, below the "
                 f"${minimum_cash:,.2f} minimum cash reserve."
             )
 
@@ -313,7 +341,11 @@ def validate_trade_intent(
             f"{earnings_blackout_days}-day earnings blackout window."
         )
 
-    return ValidationResult(approved=len(violations) == 0, violations=violations)
+    return ValidationResult(
+        approved=len(violations) == 0,
+        violations=violations,
+        validated_intent_fingerprint=intent_fingerprint(intent),
+    )
 
 
 def _as_naive_eastern(dt: datetime) -> datetime:

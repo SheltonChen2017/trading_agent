@@ -58,7 +58,12 @@ def scan_yield_curve(
     if as_of is None or as_of not in curve_data.index:
         return pd.DataFrame(columns=RESULT_COLUMNS)
 
-    features = compute_features(curve_data)
+    # return_mode="diff": the short-minus-long spread can be zero or
+    # negative (curve inverted), where a pct_change is undefined or
+    # sign-reversing across the zero crossing (see compute_features()'s
+    # docstring) -- a first difference is the correct "how much did
+    # stress move today" measure for a signed spread series.
+    features = compute_features(curve_data, return_mode="diff")
     zscore = features.loc[as_of, "return_zscore"]
     if pd.isna(zscore) or abs(zscore) < z_threshold:
         return pd.DataFrame(columns=RESULT_COLUMNS)

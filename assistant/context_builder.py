@@ -53,6 +53,7 @@ def build_portfolio_snapshot(
     source: str = "manual",
     account_mode: str = "manual",
     open_orders: list[dict] | None = None,
+    open_orders_available: bool = True,
 ) -> PortfolioSnapshot:
     """
     `positions` is a list of dicts: {ticker, shares, entry_price, current_price}.
@@ -85,6 +86,7 @@ def build_portfolio_snapshot(
         source=source,
         account_mode=account_mode,
         open_orders=open_orders or [],
+        open_orders_available=open_orders_available,
     )
 
 
@@ -104,11 +106,16 @@ def build_portfolio_snapshot_from_alpaca() -> PortfolioSnapshot:
     account = get_account()
     try:
         open_orders = get_open_orders()
+        open_orders_available = True
     except Exception:
-        # Positions/cash are still useful if the broker's order endpoint is
-        # temporarily unavailable. The packet's freshness/source metadata
-        # makes the partial snapshot explicit to downstream callers.
+        # Positions/cash are still useful for a READ-ONLY briefing if the
+        # broker's order endpoint is temporarily unavailable -- but the
+        # duplicate-order safety check at approval time cannot be trusted
+        # against an empty list it can't tell apart from "genuinely no open
+        # orders". open_orders_available=False lets execute_approved_paper_proposal()
+        # fail closed instead of silently treating "unknown" as "none".
         open_orders = []
+        open_orders_available = False
     positions = [
         {
             "ticker": p["ticker"],
@@ -125,6 +132,7 @@ def build_portfolio_snapshot_from_alpaca() -> PortfolioSnapshot:
         source="alpaca",
         account_mode="paper" if account["paper"] else "live",
         open_orders=open_orders,
+        open_orders_available=open_orders_available,
     )
 
 

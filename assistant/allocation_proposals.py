@@ -41,8 +41,11 @@ EVIDENCE_STATUS = "user_directed_allocation"
 
 
 def _stable_id(packet: DecisionPacket, policy: TradingPolicy, intent: TradeIntent, salt: str) -> str:
+    # See assistant/proposals.py's _stable_id for why generated_at (a full
+    # timestamp) is used instead of portfolio.as_of (just a date) -- a
+    # same-day regeneration must not collide with a stale/expired row.
     raw = (
-        f"watchlist_allocation|{salt}|{packet.portfolio.as_of}|{policy.version}|{intent.ticker.upper()}|"
+        f"watchlist_allocation|{salt}|{packet.generated_at}|{policy.version}|{intent.ticker.upper()}|"
         f"{intent.side}|{intent.shares}"
     )
     return "tp_" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]

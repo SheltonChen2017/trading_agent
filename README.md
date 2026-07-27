@@ -162,7 +162,11 @@ The default versioned policy is
 - allowed sides and order types;
 - whether new positions may be opened;
 - whether validated strategy proposals (currently just the SOXX/SOXL
-  wide-rebalance-band strategy) are checked by default on `propose`.
+  wide-rebalance-band strategy) are checked by default on `propose`;
+- whether a BUY is blocked when live earnings-date data can't be
+  resolved at approval time (`require_earnings_data`; risk-reducing
+  SELLs are always exempt, since blocking a concentration-reducing sale
+  would increase risk, not reduce it).
 
 The checked-in default is deliberately restrictive:
 
@@ -176,7 +180,8 @@ The checked-in default is deliberately restrictive:
   "min_cash_reserve_pct": 0.10,
   "max_order_value": 5000.0,
   "allow_new_positions": false,
-  "enable_strategy_proposals": false
+  "enable_strategy_proposals": false,
+  "require_earnings_data": false
 }
 ```
 

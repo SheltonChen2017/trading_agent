@@ -66,6 +66,7 @@ class PortfolioSnapshot:
     source: str = "manual"
     account_mode: str = "manual"
     open_orders: list[dict] = dataclasses.field(default_factory=list)
+    open_orders_available: bool = True
 
 
 @dataclasses.dataclass

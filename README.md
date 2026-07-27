@@ -262,6 +262,23 @@ To stop all approvals without changing code:
 $env:TRADING_ASSISTANT_KILL_SWITCH = "1"
 ```
 
+## Browser UI (optional)
+
+`scripts/personal_assistant_ui.py` is a Streamlit front end over the exact
+same functions the CLI above uses -- no separate logic, just a different way
+to view/click through briefing, proposals, and approval instead of typing
+commands. Run it with:
+
+```bash
+python -m streamlit run scripts/personal_assistant_ui.py
+```
+
+then open the local URL it prints (defaults to `http://localhost:8501`).
+The same safety property as the CLI is preserved: each proposal has a text
+box requiring you to type the exact `APPROVE <proposal_id>` phrase before
+the submit button becomes clickable -- there is no one-click "approve"
+button that could submit an order by accident.
+
 ## Persistence
 
 `assistant/storage.py` manages `data/trading_assistant.db` with these logical

@@ -389,7 +389,31 @@ network access.
   reconciliation and alerting are future work.
 - Market data used in research is not an institutional production feed.
 - Survivorship bias, delistings, liquidity, and borrow constraints remain
-  important research limitations.
+  important research limitations. Quantified 2026-07-26: `config.UNIVERSE`
+  is confirmed survivorship-biased -- of the three regional banks that
+  failed/were seized during this project's own 7-year lookback window
+  (SIVB, SBNY, FRC, all Mar-May 2023), none are in the universe. SIVB and
+  FRC return no data at all via yfinance ("possibly delisted"); SBNY is
+  worse -- that ticker symbol was silently REUSED by an unrelated company
+  starting Aug 2024, so fetching "SBNY" today returns a different
+  company's ~1.9 years of history with no error, not an absence. Any
+  future universe expansion should sanity-check a new ticker's listing
+  date/company identity (see the `real-data-check` skill), not just that
+  `fetch_historical` returned something. Separately, 11/104 current
+  UNIVERSE tickers (PLTR, SNOW, ABNB, COIN, SOFI, AFRM, RIVN, TMC, LAC,
+  MP, and SPCX at only 28 days) have under 90% of the 1764-day lookback,
+  diluting their contribution to any 7-year backtest.
+  Practical impact on this project's findings: LOW for the "0 signals
+  confirmed" conclusions, since each signal's edge is measured against
+  that same ticker's own baseline return, and survivorship bias inflates
+  both sides roughly equally -- if anything this makes the rejections
+  more credible, not less. HIGHER for any absolute return number (e.g.
+  buy-and-hold CAGR baselines, portfolio-simulator equity curves), which
+  are computed on a "survivors only" universe and likely run somewhat
+  optimistic. The "dip" signal specifically never saw a real
+  bought-the-dip-and-it-went-to-zero case, since bankrupt names aren't in
+  the universe at all -- its measured downside tail is understated
+  (low-stakes since it's already rejected).
 - No strategy is authorized to open new positions under the default policy.
 
 These limitations should be resolved incrementally without weakening the

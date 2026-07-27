@@ -228,12 +228,14 @@ with tab_watchlist:
         for ticker in cart:
             try:
                 data = fetch_historical([ticker], lookback_days=300)
-                own_trend, own_vol = None, None
+                own_trend, own_vol, current_price, price_as_of = None, None, None, None
                 if ticker in data and not data[ticker].empty:
                     close = data[ticker]["close"]
                     as_of = close.index[-1]
                     own_trend = classify_trend(close, as_of, lookback_days=200)
                     own_vol = compute_trailing_market_volatility(pd.DataFrame({"close": close}), as_of, lookback_days=20)
+                    current_price = float(close.iloc[-1])
+                    price_as_of = str(as_of.date())
                 explanation = explain_ticker(ticker, portfolio=watchlist_packet.portfolio, market_regime=watchlist_packet.regime)
                 price_targets = latest_price_targets_by_firm(ticker)
                 hold_range = historical_hold_period_range(ticker, data, hold_days=20)
@@ -242,6 +244,8 @@ with tab_watchlist:
                 results[ticker] = {
                     "own_trend": own_trend,
                     "own_vol": own_vol,
+                    "current_price": current_price,
+                    "price_as_of": price_as_of,
                     "explanation": explanation,
                     "price_targets": price_targets,
                     "hold_range": hold_range,
@@ -279,6 +283,9 @@ with tab_watchlist:
 
             trend_str = result["own_trend"] or "unavailable (not enough history)"
             vol_str = f"{result['own_vol']:.2f}% trailing daily std" if result["own_vol"] is not None else "unavailable"
+            current_price = result.get("current_price")
+            if current_price is not None:
+                st.metric("Current price", f"${current_price:,.2f}", help=f"Last close, as of {result['price_as_of']}")
             st.write(f"Own trend (200-day): **{trend_str}** -- Own volatility (20-day): **{vol_str}**")
 
             explanation = result["explanation"]
@@ -287,12 +294,16 @@ with tab_watchlist:
                 st.info(f"Currently held: {held['shares']} shares, ${held['market_value']:,.2f} ({held['unrealized_pnl_pct']:+.1f}%)")
 
             if result["price_targets"]:
-                st.write("Recent analyst price targets by firm:")
-                st.dataframe(
-                    [{"Firm": p["firm"], "Target": p["price_target"], "As of": p["as_of"]} for p in result["price_targets"]],
-                    use_container_width=True,
-                    hide_index=True,
-                )
+                st.write("Recent analyst price targets by firm, vs. current price:")
+                rows = []
+                for p in result["price_targets"]:
+                    row = {"Firm": p["firm"], "Target": p["price_target"], "As of": p["as_of"]}
+                    if current_price:
+                        row["vs. current"] = f"{(p['price_target'] / current_price - 1) * 100:+.1f}%"
+                    rows.append(row)
+                st.dataframe(rows, use_container_width=True, hide_index=True)
+                if not current_price:
+                    st.caption("Current price unavailable -- can't compute vs.-current comparison.")
             else:
                 st.caption("No recent analyst price-target data available.")
 

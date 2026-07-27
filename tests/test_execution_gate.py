@@ -158,6 +158,48 @@ def test_max_slippage_on_limit_order():
     assert any("max-slippage limit" in v for v in result.violations)
 
 
+def test_one_sided_quote_fails_closed():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY, bid_price=0.0, ask_price=60.5,
+    )
+    assert any("one-sided or invalid" in v for v in result.violations)
+
+    result2 = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY, bid_price=60.0, ask_price=0.0,
+    )
+    assert any("one-sided or invalid" in v for v in result2.violations)
+
+
+def test_crossed_quote_fails_closed():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY, bid_price=61.0, ask_price=60.0,
+    )
+    assert any("crossed" in v for v in result.violations)
+
+
+def test_missing_bid_or_ask_does_not_run_the_spread_check():
+    # Opt-in: callers that never supply a live quote (most tests, and any
+    # non-execution caller of this pure gate function) must not be forced
+    # into a spread violation just because bid/ask were never passed.
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is True
+
+
+def test_malformed_limit_price_rejected():
+    snapshot = _snapshot(cash=10_000.0)
+    for bad_limit_price in (None, 0, -5.0, float("nan"), float("inf")):
+        intent = TradeIntent(ticker="KO", side="buy", shares=1, order_type="limit", limit_price=bad_limit_price)
+        result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+        assert result.approved is False, f"expected limit_price={bad_limit_price} to be rejected"
+        assert any("positive, finite limit price" in v for v in result.violations), result.violations
+
+
 def test_earnings_blackout_flagged():
     snapshot = _snapshot(cash=10_000.0)
     intent = TradeIntent(ticker="KO", side="buy", shares=1)
@@ -187,6 +229,10 @@ if __name__ == "__main__":
     test_market_holiday_flagged_even_on_a_weekday()
     test_early_close_flagged_after_1pm_the_day_after_thanksgiving()
     test_duplicate_order_detected()
+    test_one_sided_quote_fails_closed()
+    test_crossed_quote_fails_closed()
+    test_missing_bid_or_ask_does_not_run_the_spread_check()
+    test_malformed_limit_price_rejected()
     test_max_slippage_on_limit_order()
     test_earnings_blackout_flagged()
     print("All execution gate tests passed.")

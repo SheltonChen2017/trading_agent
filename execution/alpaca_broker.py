@@ -120,10 +120,17 @@ def find_order_by_client_id(client_order_id: str) -> dict | None:
     (== our idempotency_key). Used for reconciliation after an ambiguous
     submission failure (e.g. a network timeout): Alpaca may have accepted
     the order even though we never saw a successful response, and this is
-    the only way to find out. Returns None when the broker genuinely has
-    no such order (never submitted) OR when the lookup itself fails (still
-    can't be confirmed) -- callers must treat both the same way: "not
-    confirmed", not "confirmed absent"."""
+    the only way to find out.
+
+    Returns the order dict when found. Returns None ONLY when Alpaca
+    definitively confirms no such order exists (HTTP 404) -- a genuine
+    confirmed absence. Any other failure (network, auth, 5xx, etc.)
+    PROPAGATES rather than being swallowed into None -- a prior version
+    caught every exception and returned None for all of them, which made
+    "the order definitely doesn't exist" indistinguishable from "I
+    couldn't check." Callers need that distinction: only a confirmed
+    absence justifies concluding the order was never accepted; anything
+    else must stay unresolved."""
     if not is_configured():
         raise AlpacaNotConfigured(
             "APCA_API_KEY_ID / APCA_API_SECRET_KEY are not set. Sign up for free "
@@ -133,8 +140,10 @@ def find_order_by_client_id(client_order_id: str) -> dict | None:
     client = _get_client()
     try:
         order = client.get_order_by_client_id(client_order_id)
-    except Exception:
-        return None
+    except Exception as exc:
+        if getattr(exc, "status_code", None) == 404:
+            return None
+        raise
     if order is None:
         return None
     return {

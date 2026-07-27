@@ -18,6 +18,7 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import json
+import math
 import secrets
 from datetime import datetime, timedelta, timezone
 from typing import Literal
@@ -159,8 +160,8 @@ def validate_trade_intent(
         violations.append(f"Unsupported order type: {intent.order_type!r}.")
 
     trade_value = intent.shares * reference_price
-    if reference_price <= 0:
-        violations.append(f"reference_price must be positive, got {reference_price}.")
+    if not math.isfinite(reference_price) or reference_price <= 0:
+        violations.append(f"reference_price must be a positive, finite number, got {reference_price}.")
     if max_order_value is not None and trade_value > max_order_value:
         violations.append(
             f"Trade value ${trade_value:,.2f} exceeds the ${max_order_value:,.2f} maximum order value."
@@ -256,23 +257,50 @@ def validate_trade_intent(
                 violations.append(f"Duplicate order detected: a {intent.side} order for {intent.ticker} was already submitted.")
                 break
 
-    if intent.order_type == "limit" and intent.limit_price is not None and reference_price:
-        slippage_pct = abs(intent.limit_price - reference_price) / reference_price * 100
-        if slippage_pct > max_slippage_pct:
-            violations.append(
-                f"Limit price ${intent.limit_price:.2f} is {slippage_pct:.1f}% away from the reference price "
-                f"${reference_price:.2f}, exceeding the {max_slippage_pct:.1f}% max-slippage limit."
-            )
+    if intent.order_type == "limit":
+        if intent.limit_price is None or not math.isfinite(intent.limit_price) or intent.limit_price <= 0:
+            violations.append("Limit orders require a positive, finite limit price.")
+        elif reference_price:
+            slippage_pct = abs(intent.limit_price - reference_price) / reference_price * 100
+            if slippage_pct > max_slippage_pct:
+                violations.append(
+                    f"Limit price ${intent.limit_price:.2f} is {slippage_pct:.1f}% away from the reference price "
+                    f"${reference_price:.2f}, exceeding the {max_slippage_pct:.1f}% max-slippage limit."
+                )
 
-    if bid_price is not None and ask_price is not None and bid_price > 0 and ask_price > 0:
-        mid = (bid_price + ask_price) / 2
-        spread_pct = (ask_price - bid_price) / mid * 100
-        if spread_pct > max_spread_pct:
+    # Bid/ask is opt-in (many callers/tests validate without a live quote
+    # at all, e.g. anything upstream of a broker call) -- but once BOTH
+    # sides are supplied, a bad quote must fail closed, not be silently
+    # skipped. A prior version only ran this check when both sides were
+    # already known to be positive, which let a one-sided quote (bid=0 or
+    # ask=0, common outside market hours) or a crossed quote (ask < bid,
+    # a data anomaly) pass with zero protection -- exactly the situations
+    # where a market order is most likely to fill badly.
+    if bid_price is not None and ask_price is not None:
+        if (
+            not math.isfinite(bid_price)
+            or not math.isfinite(ask_price)
+            or bid_price <= 0
+            or ask_price <= 0
+        ):
             violations.append(
-                f"Bid/ask spread is {spread_pct:.2f}% (bid ${bid_price:.2f} / ask ${ask_price:.2f}), "
-                f"exceeding the {max_spread_pct:.2f}% max-spread limit -- a market order here could fill "
-                "well away from the reference price."
+                f"Bid/ask quote is one-sided or invalid (bid=${bid_price:.2f}, ask=${ask_price:.2f}) -- "
+                "refusing to trade without a complete two-sided quote."
             )
+        elif ask_price < bid_price:
+            violations.append(
+                f"Bid/ask quote is crossed (bid=${bid_price:.2f} > ask=${ask_price:.2f}) -- this indicates "
+                "a stale or corrupted quote, not a tradeable market."
+            )
+        else:
+            mid = (bid_price + ask_price) / 2
+            spread_pct = (ask_price - bid_price) / mid * 100
+            if spread_pct > max_spread_pct:
+                violations.append(
+                    f"Bid/ask spread is {spread_pct:.2f}% (bid ${bid_price:.2f} / ask ${ask_price:.2f}), "
+                    f"exceeding the {max_spread_pct:.2f}% max-spread limit -- a market order here could fill "
+                    "well away from the reference price."
+                )
 
     # Symmetric window: blocks both the run-up to earnings and the days right
     # after, since a caller could someday pass a negative "days since" value.

@@ -138,22 +138,25 @@ class AssistantStore:
         self,
         proposal_id: str,
         *,
-        expected_status: str = "proposed",
+        expected_status: str | tuple[str, ...] = "proposed",
         new_status: str = "validating",
         not_expired_after: str | None = None,
     ) -> dict[str, Any] | None:
         """
-        Atomically flips status from `expected_status` to `new_status` in
-        one `UPDATE ... WHERE status = ?` statement, so two concurrent
+        Atomically flips status from `expected_status` (a single status,
+        or a tuple of statuses any of which is acceptable -- e.g.
+        reconciliation may claim from either "submitting" or
+        "submission_unknown") to `new_status` in one
+        `UPDATE ... WHERE status IN (...)` statement, so two concurrent
         callers can never both believe they claimed the same proposal --
         SQLite serializes writers against the same database file, and
         exactly one UPDATE affects a row. Returns the claimed proposal
         (with its embedded "status" updated to `new_status`) on success,
-        or None if the row didn't exist, wasn't in `expected_status`
-        (already claimed by someone else, already terminal, etc.), or
-        (when `not_expired_after` is given) its `expires_at` is already
-        past that timestamp -- callers MUST treat None as "stop, do not
-        proceed."
+        or None if the row didn't exist, wasn't in one of the
+        `expected_status` values (already claimed by someone else,
+        already terminal, etc.), or (when `not_expired_after` is given)
+        its `expires_at` is already past that timestamp -- callers MUST
+        treat None as "stop, do not proceed."
 
         `not_expired_after` (an ISO-8601 UTC timestamp string, lexically
         comparable the same way every timestamp in this table is stored)
@@ -172,9 +175,11 @@ class AssistantStore:
         already-executed proposal's status if approval was invoked again
         past its expiry.
         """
+        expected_statuses = (expected_status,) if isinstance(expected_status, str) else tuple(expected_status)
         now = datetime.now(timezone.utc).isoformat()
-        query = "UPDATE trade_proposals SET status = ?, updated_at = ? WHERE proposal_id = ? AND status = ?"
-        params: list[Any] = [new_status, now, proposal_id, expected_status]
+        placeholders = ",".join("?" for _ in expected_statuses)
+        query = f"UPDATE trade_proposals SET status = ?, updated_at = ? WHERE proposal_id = ? AND status IN ({placeholders})"
+        params: list[Any] = [new_status, now, proposal_id, *expected_statuses]
         if not_expired_after is not None:
             query += " AND expires_at >= ?"
             params.append(not_expired_after)

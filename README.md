@@ -77,7 +77,9 @@ Important guarantees:
   9:30-16:00 window, which would incorrectly approve a trade on a market
   holiday.
 - A wide bid/ask spread blocks a trade (`max_spread_pct`) even for market
-  orders, which have no limit price of their own to compare against.
+  orders, which have no limit price of their own to compare against. A
+  one-sided or crossed quote fails closed rather than silently skipping the
+  check, and a limit order requires a positive, finite `limit_price`.
 - Sells cannot exceed the shares currently held.
 - `TRADING_ASSISTANT_KILL_SWITCH=1` blocks proposal execution -- enforced
   inside the execution service itself (not only by callers that remember to
@@ -274,7 +276,8 @@ Proposal states (`assistant/proposal_status.py` is the single source of
 truth used by the service, the UI's History filter, and tests -- so these
 can't drift out of sync with each other again): `proposed`, `validating`,
 `blocked`, `validation_failed`, `approved`, `submitting`,
-`submission_unknown`, `submission_failed`, `executed`, `expired`.
+`submission_unknown`, `reconciling`, `submission_failed`, `executed`,
+`expired`.
 
 ### Approve one paper order
 
@@ -325,6 +328,29 @@ Separately, if the broker call succeeds but the local SQLite journal write
 afterward fails, the proposal is still marked `executed` (the order really
 was accepted) with the local failure recorded in its `error` field --
 never silently reported as failed when a real order exists.
+
+The broker lookup itself distinguishes a *confirmed* absence (the broker's
+own HTTP 404 -- genuinely no such order) from an *unconfirmed* one (the
+lookup itself failed, e.g. a network error) -- only a confirmed absence
+resolves straight to `submission_failed`; an unconfirmed one stays
+`submission_unknown`.
+
+### Resolving a stuck `submitting` / `submission_unknown` proposal
+
+Re-running `approve` cannot help here -- the proposal is no longer
+`proposed`. Reconcile it directly:
+
+```bash
+python scripts/run_personal_assistant.py reconcile tp_0123456789abcdef
+```
+
+(Also available as a "Reconcile" button in the browser UI's History tab,
+shown automatically whenever a proposal has an unresolved broker
+submission.) This re-queries Alpaca by the same idempotency key and
+cross-checks the ticker/side against the proposal's own intent before
+trusting it -- a mismatched order is left unresolved rather than silently
+accepted. Every outcome (executed, submission_failed, or still
+submission_unknown) is timestamped in `reconciled_at` as an audit trail.
 
 ## Browser UI (optional)
 
@@ -460,8 +486,7 @@ network access.
 
 ## Remaining limitations
 
-- The CLI is functional, but there is not yet a browser dashboard or
-  conversational API.
+- There is a CLI and a browser UI (Streamlit), but no conversational API.
 - Earnings come from a free best-effort data source; unavailable values remain
   explicitly unavailable.
 - Tax-lot selection, wash-sale handling, dividends, and realized-tax estimates

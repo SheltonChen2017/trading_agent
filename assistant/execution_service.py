@@ -94,6 +94,41 @@ before acting) -- closed the remaining execution-safety gaps:
      policy's allowed_order_types=["market","limit"] advertise unsupported
      behavior. This module now routes by intent.order_type to the correct
      broker function.
+
+2026-07-29 update (third independent GPT review, verified against this
+code before acting) -- closed the remaining gaps in the round-2 fixes:
+ 13. broker.find_order_by_client_id() used to catch every exception and
+     return None, making "the order definitely doesn't exist" (a genuine
+     404) indistinguishable from "the lookup itself failed" (network/
+     auth/5xx). Now it only returns None on a confirmed HTTP 404 and lets
+     any other exception propagate. This module's own submission-error
+     handling (and the new reconcile_submission() below) both now use
+     _lookup_order_outcome() to get a real three-way answer: found /
+     confirmed-absent / unconfirmed -- a confirmed-absent result after a
+     submission error now correctly resolves straight to
+     "submission_failed" (the broker is telling us it was never
+     accepted) instead of the more conservative "submission_unknown".
+ 14. There was no way to ever resolve a proposal stuck in "submitting"
+     or "submission_unknown" -- re-running approval can't help (the
+     proposal is no longer "proposed"), so short of hand-editing SQLite
+     it could block that ticker/side's duplicate check forever. Added
+     reconcile_submission(), exposed as
+     `python scripts/run_personal_assistant.py reconcile <proposal_id>`,
+     which atomically claims the proposal, re-queries the broker by the
+     same idempotency key, cross-checks the returned order's ticker/side
+     against the proposal's own intent before trusting it (a mismatch is
+     left unresolved rather than silently accepted), and only then
+     transitions to a terminal state -- recording `reconciled_at` on
+     every outcome as an audit trail.
+ 15. A limit intent with limit_price=None/0/negative/non-finite could
+     pass validate_trade_intent() (only the slippage check, which is
+     skipped when limit_price is None, guarded it) and reach
+     submit_limit_order(), where it would fail at the broker and could
+     land in "submission_unknown" for no good reason. The gate now
+     requires a positive, finite limit_price whenever order_type ==
+     "limit", and separately rejects non-finite reference prices and
+     one-sided/crossed bid-ask quotes instead of silently skipping the
+     spread check on them (see risk/execution_gate.py).
 """
 from __future__ import annotations
 
@@ -105,6 +140,8 @@ from assistant.proposal_status import (
     APPROVED,
     BLOCKED,
     EXECUTED,
+    RECONCILING,
+    SUBMISSION_FAILED,
     SUBMISSION_UNKNOWN,
     SUBMITTING,
     VALIDATING,
@@ -117,6 +154,12 @@ from risk.execution_gate import (
     authorize_trade_intent,
     validate_trade_intent,
 )
+
+# Sentinel: the broker lookup itself failed (network/auth/5xx/etc.), so
+# presence or absence of the order still can't be determined. Distinct
+# from `None`, which _lookup_order_outcome() reserves for a CONFIRMED
+# absence (the broker's own 404).
+_LOOKUP_UNCONFIRMED = object()
 
 
 class ProposalExecutionError(RuntimeError):
@@ -132,6 +175,19 @@ def _intent_from_dict(raw: dict) -> TradeIntent:
         limit_price=raw.get("limit_price"),
         rationale=raw.get("rationale", ""),
     )
+
+
+def _lookup_order_outcome(broker_module, idempotency_key: str):
+    """Classifies a broker order lookup into exactly one of three
+    outcomes: the order dict (found), None (the broker CONFIRMS no such
+    order exists), or _LOOKUP_UNCONFIRMED (the lookup itself failed --
+    still don't know). Callers must branch on all three; treating
+    "confirmed absent" and "unconfirmed" the same way was the bug in the
+    previous round of fixes."""
+    try:
+        return broker_module.find_order_by_client_id(idempotency_key)
+    except Exception:
+        return _LOOKUP_UNCONFIRMED
 
 
 def _resolve_earnings_days_away(ticker: str, override: int | None) -> int | None:
@@ -344,28 +400,34 @@ def execute_approved_paper_proposal(
         # a network timeout, for example, can lose the response after the
         # order was actually accepted. Reconcile by looking the order up
         # under the same idempotency key (client_order_id) before
-        # concluding anything.
-        reconciled = None
-        try:
-            reconciled = broker.find_order_by_client_id(proposal["idempotency_key"])
-        except Exception:
-            reconciled = None
-        if reconciled is not None:
-            store.record_broker_order(proposal_id, reconciled)
+        # concluding anything -- and treat "confirmed absent" differently
+        # from "still don't know" (see _lookup_order_outcome).
+        outcome = _lookup_order_outcome(broker, proposal["idempotency_key"])
+        if isinstance(outcome, dict):
+            store.record_broker_order(proposal_id, outcome)
             store.update_proposal_status(
                 proposal_id,
                 EXECUTED,
                 executed_at=datetime.now(timezone.utc).isoformat(),
-                broker_order=reconciled,
+                broker_order=outcome,
                 reconciled_after_error=str(exc),
             )
-            return reconciled
+            return outcome
+        if outcome is None:
+            # Confirmed absent: the broker itself says this order was
+            # never accepted, so it's safe to call it a real failure
+            # rather than leaving it in limbo as "submission_unknown".
+            store.update_proposal_status(proposal_id, SUBMISSION_FAILED, error=str(exc))
+            raise ProposalExecutionError(
+                f"Order submission failed for {proposal_id}, and the broker confirms no such order "
+                f"exists ({exc})."
+            ) from exc
         store.update_proposal_status(proposal_id, SUBMISSION_UNKNOWN, error=str(exc))
         raise ProposalExecutionError(
             f"Could not confirm whether the order for {proposal_id} was accepted by the broker "
-            f"after an error ({exc}). Status is 'submission_unknown' -- check your Alpaca account "
-            "directly before approving an equivalent proposal; this ticker/side is treated as a "
-            "duplicate-order risk until reconciled."
+            f"after an error ({exc}). Status is 'submission_unknown' -- run "
+            f"`reconcile_submission({proposal_id!r}, store)` (CLI: `reconcile {proposal_id}`) once "
+            "connectivity is restored; this ticker/side is treated as a duplicate-order risk until then."
         ) from exc
 
     try:
@@ -392,3 +454,103 @@ def execute_approved_paper_proposal(
         broker_order=order,
     )
     return order
+
+
+def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
+    """
+    Manually resolve a proposal stuck in "submitting" or
+    "submission_unknown" -- the only two states a submission-time
+    reconciliation attempt can leave behind when it couldn't confirm the
+    broker's outcome. Re-running execute_approved_paper_proposal() cannot
+    help here: the proposal is no longer "proposed", so it would just be
+    rejected as unclaimable. This is the sole path forward short of
+    hand-editing the database.
+
+    Re-queries the broker for the same idempotency key (client_order_id)
+    and, since a look-alike order under the right key should never
+    legitimately have the wrong ticker/side, cross-checks the result
+    against the proposal's own stored intent before trusting it -- a
+    mismatch is left unresolved (still "submission_unknown") rather than
+    silently journaled, since blindly trusting it could misattribute
+    someone else's order.
+
+    Outcomes (every one records `reconciled_at` as an audit trail):
+      - Order found and matches the proposal's intent: journaled, marked
+        "executed".
+      - Order found but does NOT match (ticker/side mismatch -- should
+        never happen with unique idempotency keys, but this is exactly
+        the kind of anomaly that must not be auto-resolved): stays
+        "submission_unknown" with the mismatch recorded; raises.
+      - Broker confirms (HTTP 404) no such order exists: marked
+        "submission_failed" -- it genuinely never went through.
+      - The lookup itself still can't confirm either way (network/auth/
+        etc.): returned to "submission_unknown", unchanged, safe to
+        retry again later.
+    """
+    proposal = store.get_proposal(proposal_id)
+    if proposal is None:
+        raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
+
+    claimed = store.claim_proposal(
+        proposal_id, expected_status=(SUBMITTING, SUBMISSION_UNKNOWN), new_status=RECONCILING
+    )
+    if claimed is None:
+        current_status = proposal["status"]
+        raise ProposalExecutionError(
+            f"Proposal {proposal_id} is not reconcilable (status={current_status!r}) -- reconciliation "
+            "only applies to proposals stuck in 'submitting' or 'submission_unknown'."
+        )
+
+    import execution.alpaca_broker as broker
+
+    stored_intent = _intent_from_dict(proposal["intent"])
+    outcome = _lookup_order_outcome(broker, proposal["idempotency_key"])
+    reconciled_at = datetime.now(timezone.utc).isoformat()
+
+    if isinstance(outcome, dict):
+        ticker_matches = str(outcome.get("ticker", "")).upper() == stored_intent.ticker.upper()
+        side_matches = outcome.get("side") == stored_intent.side
+        if not (ticker_matches and side_matches):
+            store.update_proposal_status(
+                proposal_id,
+                SUBMISSION_UNKNOWN,
+                reconciled_at=reconciled_at,
+                error=(
+                    f"Reconciliation found an order under this idempotency key that does NOT match the "
+                    f"proposal's intent ({stored_intent.side} {stored_intent.shares} {stored_intent.ticker} "
+                    f"expected; broker returned {outcome}) -- refusing to auto-resolve. Investigate manually."
+                ),
+            )
+            raise ProposalExecutionError(
+                f"Reconciliation for {proposal_id} found a MISMATCHED order -- left as "
+                "'submission_unknown' for manual investigation, not auto-resolved."
+            )
+        store.record_broker_order(proposal_id, outcome)
+        store.update_proposal_status(
+            proposal_id, EXECUTED, executed_at=reconciled_at, broker_order=outcome, reconciled_at=reconciled_at,
+        )
+        return outcome
+
+    if outcome is None:
+        store.update_proposal_status(
+            proposal_id,
+            SUBMISSION_FAILED,
+            reconciled_at=reconciled_at,
+            error="Reconciliation: the broker confirms no order exists for this idempotency key.",
+        )
+        raise ProposalExecutionError(
+            f"Reconciliation for {proposal_id}: the broker confirms this order was never accepted -- "
+            "marked 'submission_failed'."
+        )
+
+    # outcome is _LOOKUP_UNCONFIRMED
+    store.update_proposal_status(
+        proposal_id,
+        SUBMISSION_UNKNOWN,
+        reconciled_at=reconciled_at,
+        error="Reconciliation attempted but the broker lookup itself failed -- still unresolved.",
+    )
+    raise ProposalExecutionError(
+        f"Reconciliation for {proposal_id} could not confirm the broker's outcome (the lookup itself "
+        "failed) -- still 'submission_unknown'. Try again once connectivity is restored."
+    )

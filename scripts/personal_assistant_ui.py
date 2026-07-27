@@ -32,11 +32,11 @@ import streamlit as st
 
 from assistant.allocation_proposals import generate_allocation_buy_proposals
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
-from assistant.execution_service import execute_approved_paper_proposal
+from assistant.execution_service import execute_approved_paper_proposal, reconcile_submission
 from assistant.explanations import explain_ticker
 from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
 from assistant.policy import DEFAULT_POLICY_PATH, load_policy
-from assistant.proposal_status import STATUSES
+from assistant.proposal_status import STATUSES, UNRESOLVED_BROKER_STATE_STATUSES
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.stock_lookup import historical_hold_period_range, inverse_volatility_weights, latest_price_targets_by_firm
@@ -641,6 +641,25 @@ with tab_history:
                 use_container_width=True,
                 hide_index=True,
             )
+
+        unresolved = [p for p in stored if p["status"] in UNRESOLVED_BROKER_STATE_STATUSES]
+        if unresolved:
+            st.warning(
+                f"{len(unresolved)} proposal(s) have an unresolved broker submission -- their outcome "
+                "couldn't be confirmed at approval time. Reconcile against your actual Alpaca account "
+                "before approving an equivalent trade."
+            )
+            for p in unresolved:
+                intent = p["intent"]
+                if st.button(
+                    f"Reconcile {p['proposal_id']} ({intent['side'].upper()} {intent['shares']} {intent['ticker']}, currently {p['status']})",
+                    key=f"reconcile_{p['proposal_id']}",
+                ):
+                    try:
+                        order = reconcile_submission(p["proposal_id"], store)
+                        st.success(f"Reconciled: found broker order {order['order_id']} -- marked executed.")
+                    except Exception as exc:
+                        st.error(f"Reconciliation result: {exc}")
 
     with orders_col:
         st.subheader("Orders")

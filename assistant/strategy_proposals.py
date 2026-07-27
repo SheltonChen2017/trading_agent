@@ -86,8 +86,11 @@ EVIDENCE_STATUS = "promising_unconfirmed_strategy"
 
 
 def _stable_id(packet: DecisionPacket, policy: TradingPolicy, intent: TradeIntent) -> str:
+    # See assistant/proposals.py's _stable_id for why generated_at (a full
+    # timestamp) is used instead of portfolio.as_of (just a date) -- a
+    # same-day regeneration must not collide with a stale/expired row.
     raw = (
-        f"soxx_soxl_rebalance|{packet.portfolio.as_of}|{policy.version}|{intent.ticker.upper()}|"
+        f"soxx_soxl_rebalance|{packet.generated_at}|{policy.version}|{intent.ticker.upper()}|"
         f"{intent.side}|{intent.shares}"
     )
     return "tp_" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]

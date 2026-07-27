@@ -81,6 +81,37 @@ def get_open_positions() -> list[dict]:
     ]
 
 
+def get_latest_quote(ticker: str) -> dict:
+    """Real-time bid/ask quote with the broker's OWN timestamp -- used to
+    measure actual price staleness at approval time, instead of asserting
+    freshness by comparing "now" against "now" (a real bug this fixes: a
+    quote fetched over a weekend can be date(s) old even though nothing
+    about the code path would have noticed). Mid price when both sides
+    are quoted; falls back to whichever single side is nonzero (a wide
+    or one-sided book, common outside market hours, still yields SOME
+    reference price rather than crashing)."""
+    if not is_configured():
+        raise AlpacaNotConfigured(
+            "APCA_API_KEY_ID / APCA_API_SECRET_KEY are not set. Sign up for free "
+            "paper trading keys at https://alpaca.markets, then set both as "
+            "environment variables before calling any execution function."
+        )
+    from alpaca.data.historical import StockHistoricalDataClient
+    from alpaca.data.requests import StockLatestQuoteRequest
+
+    key = os.environ["APCA_API_KEY_ID"]
+    secret = os.environ["APCA_API_SECRET_KEY"]
+    client = StockHistoricalDataClient(key, secret)
+    quotes = client.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=[ticker]))
+    quote = quotes[ticker]
+    bid, ask = float(quote.bid_price), float(quote.ask_price)
+    if bid > 0 and ask > 0:
+        price = (bid + ask) / 2
+    else:
+        price = ask if ask > 0 else bid
+    return {"ticker": ticker, "price": price, "timestamp": quote.timestamp}
+
+
 def get_open_orders() -> list[dict]:
     """Return currently open broker orders in a JSON-friendly shape."""
     client = _get_client()

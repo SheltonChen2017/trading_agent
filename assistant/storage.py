@@ -133,6 +133,43 @@ class AssistantStore:
             )
         return proposal
 
+    def claim_proposal(
+        self, proposal_id: str, *, expected_status: str = "proposed", new_status: str = "validating"
+    ) -> dict[str, Any] | None:
+        """
+        Atomically flips status from `expected_status` to `new_status` in
+        one `UPDATE ... WHERE status = ?` statement, so two concurrent
+        callers can never both believe they claimed the same proposal --
+        SQLite serializes writers against the same database file, and
+        exactly one UPDATE affects a row. Returns the claimed proposal
+        (with its embedded "status" updated to `new_status`) on success,
+        or None if the row didn't exist or wasn't in `expected_status`
+        (already claimed by someone else, already terminal, etc.) --
+        callers MUST treat None as "stop, do not proceed."
+
+        This replaces the previous pattern of a plain get_proposal() read
+        followed by a much-later update_proposal_status() write, which
+        left a real window where two concurrent approvals could both pass
+        the initial status check before either one wrote back.
+        """
+        now = datetime.now(timezone.utc).isoformat()
+        with self._connect() as connection:
+            cursor = connection.execute(
+                "UPDATE trade_proposals SET status = ?, updated_at = ? WHERE proposal_id = ? AND status = ?",
+                (new_status, now, proposal_id, expected_status),
+            )
+            if cursor.rowcount != 1:
+                return None
+            row = connection.execute(
+                "SELECT payload_json FROM trade_proposals WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        proposal = json.loads(row["payload_json"])
+        proposal["status"] = new_status
+        return proposal
+
     def list_proposals(self, status: str | None = None, limit: int = 100) -> list[dict[str, Any]]:
         query = "SELECT payload_json, status FROM trade_proposals"
         params: list[Any] = []

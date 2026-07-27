@@ -35,8 +35,13 @@ class TradeProposal:
 
 
 def _stable_id(packet: DecisionPacket, policy: TradingPolicy, intent: TradeIntent) -> str:
+    # packet.generated_at (a full timestamp, not just portfolio.as_of's
+    # date) so a regenerated proposal for the SAME intent later the same
+    # day gets a NEW id instead of colliding with an old, possibly-expired
+    # row -- save_proposal()'s ON CONFLICT DO NOTHING previously made a
+    # same-day regeneration a silent no-op against the stale row.
     raw = (
-        f"{packet.portfolio.as_of}|{policy.version}|{intent.ticker.upper()}|"
+        f"{packet.generated_at}|{policy.version}|{intent.ticker.upper()}|"
         f"{intent.side}|{intent.shares}|{intent.order_type}|{intent.limit_price}"
     )
     return "tp_" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]

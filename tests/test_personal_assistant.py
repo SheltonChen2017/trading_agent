@@ -1,14 +1,15 @@
 """Tests for policy, persistence, proposals, and gated paper execution."""
+import dataclasses
 import sys
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import execution.alpaca_broker as broker
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
-from assistant.execution_service import execute_approved_paper_proposal
+from assistant.execution_service import ProposalExecutionError, execute_approved_paper_proposal
 from assistant.policy import TradingPolicy, load_policy
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.schemas import DecisionPacket, MarketRegime
@@ -121,6 +122,24 @@ def test_list_broker_orders_empty_when_none_recorded():
         assert store.list_broker_orders() == []
 
 
+def test_claim_proposal_is_atomic_only_one_winner():
+    proposal = generate_risk_reduction_proposals(_packet(), _policy())[0].to_dict()
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal)
+        first = store.claim_proposal(proposal["proposal_id"])
+        second = store.claim_proposal(proposal["proposal_id"])
+        assert first is not None
+        assert first["status"] == "validating"
+        assert second is None  # the second "concurrent" caller must not also win
+
+
+def test_claim_proposal_returns_none_for_unknown_id():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        assert store.claim_proposal("tp_does_not_exist") is None
+
+
 def test_execution_authorization_is_bound_to_exact_intent():
     intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
     authorization = authorize_trade_intent(intent, ValidationResult(True, []))
@@ -144,30 +163,56 @@ def test_broker_rejects_direct_order_without_gate_authorization():
         pass
 
 
+def _mock_execution_dependencies(quote_price=50.0, quote_timestamp=None, earnings_available=False):
+    """Patches broker.is_configured/get_latest_quote/submit_market_order and
+    data.event_data.fetch_upcoming_earnings so execute_approved_paper_proposal()
+    tests never hit the network. Returns (captured_orders, restore_fn)."""
+    import data.event_data as event_data
+
+    quote_timestamp = quote_timestamp or datetime(2026, 7, 27, 9, 59, tzinfo=timezone.utc)
+    captured = []
+    originals = {
+        "is_configured": broker.is_configured,
+        "get_latest_quote": getattr(broker, "get_latest_quote", None),
+        "submit_market_order": broker.submit_market_order,
+        "PAPER_TRADING": broker.PAPER_TRADING,
+        "fetch_upcoming_earnings": event_data.fetch_upcoming_earnings,
+    }
+
+    broker.PAPER_TRADING = True
+    broker.is_configured = lambda: True
+    broker.get_latest_quote = lambda ticker: {"ticker": ticker, "price": quote_price, "timestamp": quote_timestamp}
+    event_data.fetch_upcoming_earnings = lambda tickers, as_of=None: {
+        t: {"ticker": t, "available": earnings_available, "days_away": 1 if earnings_available else None}
+        for t in tickers
+    }
+
+    def fake_submit(ticker, shares, side="buy", *, authorization=None, idempotency_key=None):
+        assert authorization is not None
+        captured.append((ticker, shares, side, idempotency_key))
+        return {"order_id": "paper-1", "ticker": ticker, "shares": shares, "side": side, "status": "accepted"}
+
+    broker.submit_market_order = fake_submit
+
+    def restore():
+        broker.is_configured = originals["is_configured"]
+        broker.submit_market_order = originals["submit_market_order"]
+        broker.PAPER_TRADING = originals["PAPER_TRADING"]
+        event_data.fetch_upcoming_earnings = originals["fetch_upcoming_earnings"]
+        if originals["get_latest_quote"] is not None:
+            broker.get_latest_quote = originals["get_latest_quote"]
+        else:
+            del broker.get_latest_quote
+
+    return captured, restore
+
+
 def test_approved_proposal_is_revalidated_and_submitted_once():
     packet = _packet()
     policy = _policy()
     proposal = generate_risk_reduction_proposals(packet, policy)[0]
-    original_is_configured = broker.is_configured
-    original_submit = broker.submit_market_order
-    original_paper = broker.PAPER_TRADING
-    captured = []
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
     try:
-        broker.PAPER_TRADING = True
-        broker.is_configured = lambda: True
-
-        def fake_submit(ticker, shares, side="buy", *, authorization=None, idempotency_key=None):
-            assert authorization is not None
-            captured.append((ticker, shares, side, idempotency_key))
-            return {
-                "order_id": "paper-1",
-                "ticker": ticker,
-                "shares": shares,
-                "side": side,
-                "status": "accepted",
-            }
-
-        broker.submit_market_order = fake_submit
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
@@ -177,12 +222,115 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
                 packet.portfolio,
                 policy,
                 store,
-                now_et=datetime(2026, 7, 27, 10, 0),
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
             )
             assert order["order_id"] == "paper-1"
             assert store.get_proposal(proposal.proposal_id)["status"] == "executed"
             assert len(captured) == 1
     finally:
-        broker.is_configured = original_is_configured
-        broker.submit_market_order = original_submit
-        broker.PAPER_TRADING = original_paper
+        restore()
+
+
+def test_approval_fails_closed_when_open_orders_unavailable():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    unreliable_portfolio = dataclasses.replace(packet.portfolio, open_orders_available=False)
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    unreliable_portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected approval to fail closed when open orders can't be verified"
+            except ProposalExecutionError as exc:
+                assert "open orders" in str(exc)
+            assert len(captured) == 0
+            assert store.get_proposal(proposal.proposal_id)["status"] == "blocked"
+    finally:
+        restore()
+
+
+def test_approval_blocked_when_earnings_are_near():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price, earnings_available=True)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected the earnings blackout to block this proposal"
+            except ProposalExecutionError as exc:
+                assert "earnings" in str(exc).lower()
+            assert len(captured) == 0
+    finally:
+        restore()
+
+
+def test_approval_blocked_when_quote_is_stale():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    stale_timestamp = datetime(2026, 7, 20, 9, 0, tzinfo=timezone.utc)  # days old, not minutes
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal.reference_price, quote_timestamp=stale_timestamp
+    )
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected a stale quote to block this proposal"
+            except ProposalExecutionError as exc:
+                assert "stale" in str(exc).lower() or "minute" in str(exc).lower()
+            assert len(captured) == 0
+    finally:
+        restore()
+
+
+def test_regenerating_a_proposal_same_day_produces_a_new_id_not_a_collision():
+    policy = _policy()
+    # _packet()'s generated_at is a fixed literal; simulate two separate
+    # `propose` invocations (same portfolio.as_of date, different
+    # generated_at timestamps) the way _load_packet() actually would.
+    packet_a = _packet()
+    packet_b = dataclasses.replace(packet_a, generated_at="2026-07-26T15:00:00+00:00")
+    first = generate_risk_reduction_proposals(packet_a, policy)[0]
+    second = generate_risk_reduction_proposals(packet_b, policy)[0]
+    assert first.proposal_id != second.proposal_id
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(first.to_dict())
+        store.update_proposal_status(first.proposal_id, "expired")
+        store.save_proposal(second.to_dict())
+        # The regenerated proposal must be saved fresh as "proposed", not
+        # silently no-op'd against the first (now-expired) row.
+        assert store.get_proposal(second.proposal_id)["status"] == "proposed"
+        assert store.get_proposal(first.proposal_id)["status"] == "expired"

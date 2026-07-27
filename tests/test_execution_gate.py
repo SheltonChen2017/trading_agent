@@ -66,7 +66,7 @@ def test_buying_power_constrains_cash_even_when_raw_cash_looks_sufficient():
 
 
 def test_pending_buy_value_counts_toward_total_exposure():
-    # Regression test (Codex review, 2026-07-30): a pending (not-yet-
+    # Regression test (Codex review, 2026-07-27): a pending (not-yet-
     # filled) buy order doesn't show up in portfolio.positions, so the
     # total-exposure check was blind to it -- a $4,000 pending buy plus a
     # new $5,000 buy on a $10,000 account both "fit" under a 50% cap
@@ -90,6 +90,24 @@ def test_pending_buy_value_on_the_same_ticker_counts_toward_position_limit():
         pending_buy_value_by_ticker={"KO": 9_000.0},  # already 90% committed on KO via a pending order
     )
     assert any("per-position limit" in v for v in result.violations)
+
+
+def test_non_finite_pending_buy_value_fails_closed_instead_of_disabling_checks():
+    # Regression test (GPT review, 2026-07-27): a NaN pending value
+    # propagates through every sum it touches, and `x > cap` for a NaN x
+    # is always False in Python -- so a corrupted pending value used to
+    # silently disable the total-exposure check entirely rather than
+    # being rejected, the same failure mode already fixed elsewhere in
+    # this module for reference_price/limit_price/bid/ask.
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    for bad_value in (float("nan"), float("inf"), -100.0):
+        result = validate_trade_intent(
+            intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY,
+            pending_buy_value_by_ticker={"NVDA": bad_value},
+        )
+        assert result.approved is False, f"expected pending value {bad_value} to be rejected"
+        assert any("pending_buy_value_by_ticker" in v for v in result.violations), result.violations
 
 
 def test_no_pending_buy_value_leaves_exposure_checks_unaffected():
@@ -270,6 +288,10 @@ if __name__ == "__main__":
     test_max_position_size_exceeded()
     test_insufficient_cash_flagged()
     test_buying_power_constrains_cash_even_when_raw_cash_looks_sufficient()
+    test_pending_buy_value_counts_toward_total_exposure()
+    test_pending_buy_value_on_the_same_ticker_counts_toward_position_limit()
+    test_no_pending_buy_value_leaves_exposure_checks_unaffected()
+    test_non_finite_pending_buy_value_fails_closed_instead_of_disabling_checks()
     test_max_total_exposure_exceeded()
     test_basket_concentration_exceeded()
     test_leveraged_etf_exposure_exceeded()

@@ -182,7 +182,7 @@ def test_authorize_trade_intent_rejects_a_validation_result_for_a_different_inte
 
 
 def test_hand_constructed_validation_result_cannot_forge_authorization():
-    # Regression test (Codex review, 2026-07-30): the fingerprint alone is
+    # Regression test (Codex review, 2026-07-27): the fingerprint alone is
     # a PUBLIC hash of the intent's own fields -- any code that imports
     # TradeIntent can compute it, so a hand-built ValidationResult with a
     # correctly-computed fingerprint used to pass authorize_trade_intent()
@@ -204,7 +204,7 @@ def test_hand_constructed_execution_authorization_cannot_forge_verification():
     # Same forgery attempt one level up: directly constructing an
     # ExecutionAuthorization (instead of going through
     # authorize_trade_intent()) with a guessed/public-hash `proof` must
-    # not verify either (Codex review, 2026-07-30).
+    # not verify either (Codex review, 2026-07-27).
     from risk.execution_gate import ExecutionAuthorization, intent_fingerprint
 
     intent = TradeIntent(ticker="AAPL", side="buy", shares=1)
@@ -219,6 +219,51 @@ def test_hand_constructed_execution_authorization_cannot_forge_verification():
     try:
         verify_execution_authorization(intent, forged)
         assert False, "expected a hand-constructed ExecutionAuthorization to be rejected"
+    except PermissionError:
+        pass
+
+
+def test_rejected_validation_proof_cannot_be_reused_as_an_approval():
+    # Regression test (GPT review, 2026-07-27): the proof used to sign
+    # only the intent's identity, not the approved/rejected OUTCOME -- so
+    # a REJECTED validation still got a validly-signed proof for its
+    # intent, and since ValidationResult was a plain mutable dataclass, a
+    # caller could flip `.approved` to True (or build a fresh copy with
+    # the same proof) and authorize_trade_intent() would accept it. Now
+    # the outcome is part of the signed payload, so a proof signed for
+    # approved=False can never verify against approved=True.
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=100_000)  # absurdly oversized -> guaranteed rejection
+    portfolio = build_portfolio_snapshot([], cash=1_000.0)
+    rejected = validate_trade_intent(intent, portfolio, reference_price=100.0)
+    assert rejected.approved is False
+    assert rejected.validation_proof is not None
+
+    forged_approval = ValidationResult(True, [], validation_proof=rejected.validation_proof)
+    try:
+        authorize_trade_intent(intent, forged_approval)
+        assert False, "expected a rejected validation's proof to be unusable as an approval"
+    except ValueError:
+        pass
+
+
+def test_execution_authorization_expiry_cannot_be_extended_by_replacing_the_object():
+    # Regression test (GPT review, 2026-07-27): the proof used to sign
+    # only intent identity, not `expires_at` -- so a valid, correctly-
+    # signed authorization's proof could be copied onto a new
+    # ExecutionAuthorization object with a LATER expires_at (e.g. via
+    # dataclasses.replace()) and still verify, defeating "short-lived"
+    # entirely. Now expires_at is part of the signed payload.
+    intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
+    portfolio = build_portfolio_snapshot(
+        [{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 100.0}], cash=1000.0,
+    )
+    validation = validate_trade_intent(intent, portfolio, reference_price=100.0)
+    authorization = authorize_trade_intent(intent, validation, ttl_seconds=1)
+    far_future = (datetime.now(timezone.utc) + timedelta(days=365)).isoformat()
+    extended = dataclasses.replace(authorization, expires_at=far_future)
+    try:
+        verify_execution_authorization(intent, extended)
+        assert False, "expected an authorization with a tampered expires_at to fail verification"
     except PermissionError:
         pass
 
@@ -637,6 +682,121 @@ def test_wide_spread_blocks_a_market_order():
                 assert "spread" in str(exc).lower()
             assert len(captured) == 0
             assert store.get_proposal(proposal.proposal_id)["status"] == "blocked"
+    finally:
+        restore()
+
+
+def _buy_proposal_with_a_pending_order_on_another_ticker(side: str):
+    """Shared setup for the pending-buy-value fail-closed tests: TQQQ
+    already held (so a buy on it isn't blocked by allow_new_positions),
+    plus one pending market BUY order on NVDA with no notional/limit_price
+    -- forces _pending_buy_value_by_ticker() down the live-quote fallback
+    path for NVDA specifically."""
+    from assistant.proposals import TradeProposal, _stable_id
+    from risk.execution_gate import TradeIntent
+
+    snapshot = build_portfolio_snapshot(
+        [{"ticker": "TQQQ", "shares": 100, "entry_price": 50.0, "current_price": 50.0}],
+        cash=10_000.0,
+        open_orders=[
+            {
+                "order_id": "o1", "ticker": "NVDA", "shares": 10, "side": "buy", "type": "market",
+                "status": "new", "submitted_at": None, "limit_price": None, "notional": None,
+            },
+        ],
+    )
+    packet = DecisionPacket(
+        generated_at="2026-07-26T12:00:00+00:00",
+        portfolio=snapshot,
+        risk=build_risk_exposure(snapshot),
+        regime=MarketRegime(
+            benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
+            trailing_volatility_pct=1.0, as_of="2026-07-25",
+        ),
+        signals=[], upcoming_events=[], warnings=[], policy_version="test",
+    )
+    policy = dataclasses.replace(_policy(), allow_new_positions=True)
+
+    intent = TradeIntent(ticker="TQQQ", side=side, shares=1)
+    proposal_id = _stable_id(packet, policy, intent)
+    proposal = TradeProposal(
+        proposal_id=proposal_id,
+        created_at=packet.generated_at,
+        expires_at="2026-12-31T00:00:00+00:00",
+        status="proposed",
+        idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
+        policy_version=policy.version,
+        intent=intent,
+        reference_price=50.0,
+        price_timestamp=packet.generated_at,
+        reasons=["test"],
+        evidence_status="test",
+        expected_impact={
+            "trade_value": 50.0, "position_weight_before_pct": 0, "position_weight_after_pct": 0,
+            "cash_before": 0, "cash_after": 0, "invested_pct_after": 0,
+        },
+        alternatives=[],
+        uncertainties=[],
+    ).to_dict()
+    return packet, policy, proposal_id, proposal
+
+
+def test_pending_buy_value_lookup_failure_blocks_a_buy_approval():
+    # Regression test (GPT review, 2026-07-27): an earlier version
+    # silently dropped a pending order's value to zero when its price
+    # couldn't be determined (e.g. a plain market order needing a live
+    # quote that fails), undercounting exposure exactly like the bug this
+    # mechanism exists to fix. A buy must fail closed instead.
+    packet, policy, proposal_id, proposal = _buy_proposal_with_a_pending_order_on_another_ticker("buy")
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    original_get_latest_quote = broker.get_latest_quote
+
+    def flaky_quote(ticker):
+        if ticker == "NVDA":
+            raise ConnectionError("simulated quote outage")
+        return original_get_latest_quote(ticker)
+
+    broker.get_latest_quote = flaky_quote
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal)
+            try:
+                execute_approved_paper_proposal(
+                    proposal_id, f"APPROVE {proposal_id}", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected the pending-order quote failure to block this buy"
+            except ProposalExecutionError as exc:
+                assert "pending buy" in str(exc).lower()
+            assert len(captured) == 0
+    finally:
+        restore()
+
+
+def test_pending_buy_value_lookup_failure_does_not_block_a_sell_approval():
+    # A risk-reducing sell never consults pending_buy_value_by_ticker, so
+    # an unrelated pending buy's quote failure shouldn't block it.
+    packet, policy, proposal_id, proposal = _buy_proposal_with_a_pending_order_on_another_ticker("sell")
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    original_get_latest_quote = broker.get_latest_quote
+
+    def flaky_quote(ticker):
+        if ticker == "NVDA":
+            raise ConnectionError("simulated quote outage")
+        return original_get_latest_quote(ticker)
+
+    broker.get_latest_quote = flaky_quote
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal)
+            order = execute_approved_paper_proposal(
+                proposal_id, f"APPROVE {proposal_id}", packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert order["order_id"] == "paper-1"
+            assert len(captured) == 1
     finally:
         restore()
 

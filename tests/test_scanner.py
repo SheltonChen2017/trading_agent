@@ -113,7 +113,7 @@ def test_compute_features_diff_mode_handles_a_zero_crossing_correctly():
 
 
 def test_rolling_stats_exclude_the_current_row_from_its_own_baseline():
-    # Regression test (Codex review, 2026-07-30): rolling(window) INCLUDES
+    # Regression test (Codex review, 2026-07-27): rolling(window) INCLUDES
     # the current row by default -- without an explicit shift, a big move
     # dilutes/inflates the very mean/std it's then compared against,
     # systematically understating its own z-score. Confirms the shock

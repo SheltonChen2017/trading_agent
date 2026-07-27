@@ -130,7 +130,7 @@ code before acting) -- closed the remaining gaps in the round-2 fixes:
      one-sided/crossed bid-ask quotes instead of silently skipping the
      spread check on them (see risk/execution_gate.py).
 
-2026-07-30 update (fourth independent GPT review, verified against this
+2026-07-27 update (fourth independent GPT review, verified against this
 code before acting):
  16. Pending (not-yet-filled) BUY orders were invisible to every
      exposure/concentration check (per-position, total, basket,
@@ -141,6 +141,16 @@ code before acting):
      market-type pending order) and feeds it into validate_trade_intent()
      via the new pending_buy_value_by_ticker parameter (see
      risk/execution_gate.py).
+
+2026-07-27 update (fifth independent GPT review, verified against this
+code before acting):
+ 17. _pending_buy_value_by_ticker()'s live-quote fallback used to catch
+     any lookup failure and silently drop that order's value to zero --
+     undercounting exposure exactly like fix #16 above was meant to
+     prevent, just one step removed. The fallback now lets the exception
+     propagate, and this module fails the approval closed (for a BUY
+     only -- a risk-reducing sell never consults this value) rather than
+     silently proceeding with an undercounted exposure figure.
 """
 from __future__ import annotations
 
@@ -210,10 +220,16 @@ def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict
     (Codex review, 2026-07-27). Prefers exact values already on the order
     (notional, or shares * limit_price for a limit order); for a plain
     market buy order (no price on the order itself) falls back to one
-    live quote per such order. If even that fails, the order is honestly
-    skipped (undercounts exposure rather than guessing) -- same "honestly
-    unavailable, never guessed" discipline this module already uses for
-    earnings data."""
+    live quote per such order.
+
+    Deliberately does NOT swallow a quote-fetch failure here -- an earlier
+    version caught it and silently dropped that order's value to zero,
+    which undercounts real exposure exactly like the bug this function
+    exists to fix, just one step removed (GPT review, 2026-07-27). The
+    caller is responsible for treating a raised exception as "exposure
+    can't be verified right now" and failing the approval closed, the
+    same way current_portfolio.open_orders_available already does for the
+    duplicate-order check."""
     totals: dict[str, float] = {}
     for order in open_orders:
         if str(order.get("side", "")).lower() != "buy":
@@ -230,11 +246,8 @@ def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict
             if limit_price:
                 value = float(shares) * float(limit_price)
             else:
-                try:
-                    quote = broker_module.get_latest_quote(ticker)
-                    value = float(shares) * float(quote["price"])
-                except Exception:
-                    continue
+                quote = broker_module.get_latest_quote(ticker)
+                value = float(shares) * float(quote["price"])
         totals[ticker.upper()] = totals.get(ticker.upper(), 0.0) + value
     return totals
 
@@ -362,6 +375,22 @@ def execute_approved_paper_proposal(
                 f"Could not fetch a live quote for {intent.ticker} to check price freshness: {exc}"
             )
 
+        # Only buys actually use pending_buy_value_by_ticker (see
+        # validate_trade_intent()) -- a risk-reducing sell shouldn't be
+        # blocked just because an unrelated pending buy's price couldn't
+        # be fetched. For a buy, though, fail closed: an undercounted (or
+        # silently zeroed) pending value would defeat the whole point of
+        # this check (GPT review, 2026-07-27).
+        pending_buy_value_by_ticker: dict[str, float] = {}
+        if intent.side == "buy":
+            try:
+                pending_buy_value_by_ticker = _pending_buy_value_by_ticker(current_portfolio.open_orders, broker)
+            except Exception as exc:
+                raise ProposalExecutionError(
+                    f"Could not determine the dollar value of a pending buy order needed to check "
+                    f"exposure/concentration limits: {exc}"
+                )
+
         resolved_earnings_days_away = _resolve_earnings_days_away(intent.ticker, earnings_days_away)
         if policy.require_earnings_data and intent.side == "buy" and resolved_earnings_days_away is None:
             # A risk-REDUCING sell is exempt: refusing it because earnings
@@ -399,7 +428,7 @@ def execute_approved_paper_proposal(
             earnings_blackout_days=policy.earnings_blackout_days,
             max_order_value=policy.max_order_value,
             min_cash_reserve_pct=policy.min_cash_reserve_pct,
-            pending_buy_value_by_ticker=_pending_buy_value_by_ticker(current_portfolio.open_orders, broker),
+            pending_buy_value_by_ticker=pending_buy_value_by_ticker,
         )
         if not validation.approved:
             raise ProposalExecutionError(

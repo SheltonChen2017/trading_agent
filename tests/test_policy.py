@@ -49,7 +49,7 @@ def test_negative_earnings_blackout_days_rejected():
 
 
 def test_non_integer_earnings_blackout_days_rejected():
-    # Regression test (Codex review, 2026-07-30): `< 0` alone silently
+    # Regression test (Codex review, 2026-07-27): `< 0` alone silently
     # passes NaN (NaN < 0 is False) and doesn't reject infinity or a
     # fractional value either -- all three should be rejected outright
     # since this field is meant to be a whole number of days.

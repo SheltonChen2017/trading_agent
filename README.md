@@ -122,7 +122,7 @@ versioned and labeled independently:
 Research status is never converted automatically into production authority.
 Promotion remains an explicit, auditable decision.
 
-**2026-07-30 correction**: `signals/scanner.py`'s rolling z-score baseline
+**2026-07-27 correction**: `signals/scanner.py`'s rolling z-score baseline
 used to include the current row in its own rolling mean/std (pandas'
 `rolling()` includes the current row by default; the code was not actually
 shifting despite documentation claiming it did). This dilutes/inflates a big

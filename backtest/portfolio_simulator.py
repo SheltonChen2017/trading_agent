@@ -31,7 +31,7 @@ project_execution_realism_gaps):
     prior version computed shares and started marking to market on the
     SIGNAL date itself, using tomorrow's open price but today's close for
     valuation -- across a large overnight gap this could wildly misstate
-    signal-date equity. Codex review, 2026-07-30.)
+    signal-date equity. Codex review, 2026-07-27.)
   - One open position per ticker at a time; a repeat signal on an already-
     held ticker is skipped, not pyramided.
   - Equal-weight sizing (position_size_pct of CURRENT equity at signal
@@ -160,7 +160,7 @@ def simulate_portfolio(
     # next_open signals reserve a DOLLAR AMOUNT here at signal time but
     # don't become real shares (or start being marked to market) until the
     # actual entry_date arrives -- see the loop below for why (Codex
-    # review, 2026-07-30).
+    # review, 2026-07-27).
     pending_entries: dict[str, dict] = {}  # ticker -> pending-entry dict
     trade_log: list[dict] = []
     equity_dates: list = []
@@ -216,7 +216,7 @@ def simulate_portfolio(
         #    date itself, valuing shares bought at TOMORROW's open using
         #    TODAY's close -- across a large overnight gap this could
         #    wildly misstate signal-date equity, e.g. a 50% gap down
-        #    doubling reported equity. Codex review, 2026-07-30.)
+        #    doubling reported equity. Codex review, 2026-07-27.)
         for ticker in [t for t, pe in pending_entries.items() if pe["entry_date"] <= as_of]:
             pe = pending_entries.pop(ticker)
             df = data[ticker]

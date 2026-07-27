@@ -28,7 +28,7 @@ def compute_features(df: pd.DataFrame, window: int = ROLLING_WINDOW, return_mode
     from its own baseline (pandas' rolling() includes the current row by
     default; without the shift, a big move dilutes/inflates the very
     mean/std it's then compared against, systematically understating its
-    own z-score -- Codex review, 2026-07-30, caught this in the module
+    own z-score -- Codex review, 2026-07-27, caught this in the module
     that had been claiming, incorrectly, to already exclude the current
     row). Safe to call on the full history and then just read off the
     last row.

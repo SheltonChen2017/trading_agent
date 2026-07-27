@@ -195,7 +195,7 @@ def test_force_close_cleanup_still_fully_realizes_the_equity_curve():
 
 
 def test_next_open_signal_date_equity_is_not_distorted_by_the_overnight_gap():
-    # Regression test (Codex review, 2026-07-30): a prior version computed
+    # Regression test (Codex review, 2026-07-27): a prior version computed
     # shares using TOMORROW's open (the real next_open entry price) but
     # started marking that position to market on the SIGNAL date using
     # TODAY's close -- across a large overnight gap this wildly misstated

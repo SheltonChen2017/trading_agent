@@ -41,7 +41,7 @@ from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.stock_lookup import historical_hold_period_range, inverse_volatility_weights, latest_price_targets_by_firm
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
-from config import LEVERAGED_ETF_TICKERS, UNIVERSE
+from config import LEVERAGED_ETF_TICKERS, PAPER_TRADING, UNIVERSE
 from data.market_data import fetch_historical
 from execution.alpaca_broker import is_configured
 from signals.regime import compute_trailing_market_volatility
@@ -132,12 +132,27 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                     st.error(f"Order not submitted: {exc}")
 
 
-st.title("Personal Trading Assistant")
-st.caption(
-    "Click-around front end over the same deterministic code the CLI uses. "
-    "Nothing here computes financial numbers itself -- it only displays what "
-    "assistant/*.py already computed."
-)
+title_col, badge_col = st.columns([4, 1])
+with title_col:
+    st.title("Personal Trading Assistant")
+    st.caption(
+        "Click-around front end over the same deterministic code the CLI uses. "
+        "Nothing here computes financial numbers itself -- it only displays what "
+        "assistant/*.py already computed."
+    )
+with badge_col:
+    live_confirmed = os.environ.get("CONFIRM_LIVE_TRADING") == "I_UNDERSTAND"
+    if PAPER_TRADING:
+        st.success("\U0001F4C4 PAPER MONEY")
+    elif live_confirmed:
+        st.error("\U0001F4B0 LIVE MONEY")
+    else:
+        st.error("LIVE mode, unconfirmed")
+    st.caption(
+        "Read-only status. Switching to live trading can't be done from this app -- "
+        "it requires editing config.py and setting CONFIRM_LIVE_TRADING yourself, outside the UI, "
+        "on purpose: no single click here can ever enable real-money trading."
+    )
 
 with st.sidebar:
     st.header("Settings")
@@ -219,6 +234,42 @@ with tab_briefing:
     else:
         st.subheader("Positions")
         st.caption("No positions held.")
+
+    if packet.portfolio.positions:
+        st.subheader("Holdings analysis")
+        st.caption(
+            "Per-position trend/volatility and this project's own evidence-labeled findings for each "
+            "ticker you actually hold -- not a price prediction, just what's known and what currently "
+            "applies to your account."
+        )
+        for position in packet.portfolio.positions:
+            with st.container(border=True):
+                st.write(f"**{position.ticker}** -- {position.shares:g} sh, ${position.market_value:,.2f} ({position.unrealized_pnl_pct:+.1f}% unrealized)")
+                try:
+                    ticker_data = fetch_historical([position.ticker], lookback_days=300)
+                    trend, vol = None, None
+                    if position.ticker in ticker_data and not ticker_data[position.ticker].empty:
+                        close = ticker_data[position.ticker]["close"]
+                        as_of = close.index[-1]
+                        trend = classify_trend(close, as_of, lookback_days=200)
+                        vol = compute_trailing_market_volatility(pd.DataFrame({"close": close}), as_of, lookback_days=20)
+                    trend_str = trend or "unavailable"
+                    vol_str = f"{vol:.2f}% trailing daily std" if vol is not None else "unavailable"
+                    st.write(f"Trend (200-day): **{trend_str}** -- Volatility (20-day): **{vol_str}**")
+                except Exception as exc:
+                    st.caption(f"Could not fetch trend/volatility: {exc}")
+
+                explanation = explain_ticker(position.ticker, portfolio=packet.portfolio, market_regime=packet.regime)
+                ticker_specific = [e for e in explanation["historical_evidence"] if e["ticker_specific"]]
+                if ticker_specific:
+                    for e in ticker_specific:
+                        st.write(f"**[{e['status']}]** {e['label']} -- {e['claim']}")
+                else:
+                    st.caption(f"No {position.ticker}-specific research exists in this project.")
+                if explanation["triggered_today"]:
+                    for trig in explanation["triggered_today"]:
+                        st.caption(f"Signal firing today: {trig['rule']} ({trig['direction']})")
+        st.caption("For price targets, news, and the full history/best-worst range for any holding, look it up in the Watchlist tab.")
 
     if packet.portfolio.open_orders:
         st.subheader("Open orders")
@@ -305,6 +356,7 @@ with tab_watchlist:
                     "own_vol": own_vol,
                     "current_price": current_price,
                     "price_as_of": price_as_of,
+                    "price_history": data[ticker]["close"] if ticker in data and not data[ticker].empty else None,
                     "explanation": explanation,
                     "price_targets": price_targets,
                     "hold_range": hold_range,
@@ -389,6 +441,11 @@ with tab_watchlist:
             if current_price is not None:
                 st.metric("Current price", f"${current_price:,.2f}", help=f"Last close, as of {result['price_as_of']}")
             st.write(f"Own trend (200-day): **{trend_str}** -- Own volatility (20-day): **{vol_str}**")
+
+            price_history = result.get("price_history")
+            if price_history is not None and not price_history.empty:
+                st.line_chart(price_history, height=220, use_container_width=True)
+                st.caption(f"Close price, last {len(price_history)} trading days ({price_history.index[0].date()} to {price_history.index[-1].date()}).")
 
             explanation = result["explanation"]
             if explanation["currently_held"] not in (None, "not_checked"):
@@ -557,23 +614,53 @@ with tab_propose:
         _render_proposal_approval(proposal, store, policy_path)
 
 with tab_history:
-    status_filter = st.selectbox("Status filter", ["(any)", "proposed", "executed", "expired", "rejected"])
-    limit = st.slider("Max rows", 5, 100, 20)
-    stored = store.list_proposals(status=None if status_filter == "(any)" else status_filter, limit=limit)
-    if not stored:
-        st.info("No proposals found in history.")
-    else:
-        st.dataframe(
-            [
-                {
-                    "Proposal ID": p["proposal_id"],
-                    "Status": p["status"],
-                    "Side": p["intent"]["side"],
-                    "Shares": p["intent"]["shares"],
-                    "Ticker": p["intent"]["ticker"],
-                    "Expires": p["expires_at"],
-                }
-                for p in stored
-            ],
-            use_container_width=True,
-        )
+    proposals_col, orders_col = st.columns(2)
+
+    with proposals_col:
+        st.subheader("Proposals")
+        status_filter = st.selectbox("Status filter", ["(any)", "proposed", "executed", "expired", "rejected", "blocked", "approved"])
+        proposal_limit = st.slider("Max rows", 5, 100, 20, key="proposal_history_limit")
+        stored = store.list_proposals(status=None if status_filter == "(any)" else status_filter, limit=proposal_limit)
+        if not stored:
+            st.info("No proposals found in history.")
+        else:
+            st.dataframe(
+                [
+                    {
+                        "Proposal ID": p["proposal_id"],
+                        "Status": p["status"],
+                        "Side": p["intent"]["side"],
+                        "Shares": p["intent"]["shares"],
+                        "Ticker": p["intent"]["ticker"],
+                        "Evidence": p.get("evidence_status", ""),
+                        "Expires": p["expires_at"],
+                    }
+                    for p in stored
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+
+    with orders_col:
+        st.subheader("Orders")
+        order_limit = st.slider("Max rows", 5, 100, 20, key="order_history_limit")
+        orders = store.list_broker_orders(limit=order_limit)
+        if not orders:
+            st.info("No orders submitted yet.")
+        else:
+            st.dataframe(
+                [
+                    {
+                        "Order ID": o["order_id"],
+                        "Broker status": o.get("status", o.get("order_status", "")),
+                        "Side": (o.get("intent") or {}).get("side", o.get("side", "")),
+                        "Shares": (o.get("intent") or {}).get("shares", o.get("shares", "")),
+                        "Ticker": (o.get("intent") or {}).get("ticker", o.get("ticker", "")),
+                        "Evidence": o.get("evidence_status", ""),
+                        "Submitted": o["submitted_at"],
+                    }
+                    for o in orders
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )

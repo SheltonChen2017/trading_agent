@@ -168,6 +168,35 @@ class AssistantStore:
                 ),
             )
 
+    def list_broker_orders(self, limit: int = 100) -> list[dict[str, Any]]:
+        """Past submitted orders, most recent first, with the originating
+        proposal's intent (ticker/side/shares) attached when available."""
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT bo.order_id, bo.proposal_id, bo.submitted_at, bo.status, bo.payload_json,
+                       tp.payload_json AS proposal_payload_json
+                FROM broker_orders bo
+                LEFT JOIN trade_proposals tp ON tp.proposal_id = bo.proposal_id
+                ORDER BY bo.submitted_at DESC
+                LIMIT ?
+                """,
+                (limit,),
+            ).fetchall()
+        orders = []
+        for row in rows:
+            order = json.loads(row["payload_json"])
+            order["proposal_id"] = row["proposal_id"]
+            order["submitted_at"] = row["submitted_at"]
+            order["order_status"] = row["status"]
+            order["intent"] = None
+            if row["proposal_payload_json"]:
+                proposal = json.loads(row["proposal_payload_json"])
+                order["intent"] = proposal.get("intent")
+                order["evidence_status"] = proposal.get("evidence_status")
+            orders.append(order)
+        return orders
+
     def recent_executed_intents(
         self,
         limit: int = 100,

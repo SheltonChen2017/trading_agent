@@ -72,6 +72,17 @@ Important guarantees:
 - Buys are checked against cash reserve, position, total-exposure, basket,
   leverage, order-value, stale-price, trading-hours, spread, slippage, and
   earnings rules.
+- The cash-reserve check uses the tighter of raw cash and the broker's
+  reported buying power (which already nets out reserved/pending-order
+  funds). The position, total-exposure, basket, and leveraged-ETF checks
+  also account for currently pending (not-yet-filled) buy orders, not just
+  already-filled positions -- otherwise two proposals approved back-to-back
+  (or an unrelated pending order) could each look individually fine while
+  together exceeding a cap.
+- A short-lived authorization is an HMAC signed with a process-local secret,
+  not just a plain content hash of the trade's ticker/side/quantity/order
+  type -- a plain hash can be recomputed by any code that imports the intent
+  type, so it was never actually proof that the execution gate ran.
 - Trading-hours checks use a real NYSE calendar (`pandas_market_calendars`),
   including holidays and early closes -- not just a weekday + fixed
   9:30-16:00 window, which would incorrectly approve a trade on a market
@@ -110,6 +121,18 @@ versioned and labeled independently:
 
 Research status is never converted automatically into production authority.
 Promotion remains an explicit, auditable decision.
+
+**2026-07-30 correction**: `signals/scanner.py`'s rolling z-score baseline
+used to include the current row in its own rolling mean/std (pandas'
+`rolling()` includes the current row by default; the code was not actually
+shifting despite documentation claiming it did). This dilutes/inflates a big
+move's own baseline, systematically understating its z-score, and affects
+every signal that routes through `compute_features()` -- the core dip/up
+scanner plus the VIX/credit-spread/yield-curve macro proxies. Fixed by
+shifting the rolling window by one row. This changes exactly which dates get
+flagged as signals; the existing REJECTED verdicts above have not yet been
+re-run against the corrected scanner, so treat them as needing
+re-confirmation rather than as re-validated.
 
 ## Installation
 

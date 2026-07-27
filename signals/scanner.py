@@ -23,10 +23,15 @@ from config import RETURN_Z_THRESHOLD, ROLLING_WINDOW, VOLUME_Z_THRESHOLD
 def compute_features(df: pd.DataFrame, window: int = ROLLING_WINDOW, return_mode: str = "pct_change") -> pd.DataFrame:
     """
     Add return, rolling z-score, and volume z-score columns to a single
-    ticker's OHLCV DataFrame. Uses only trailing data at each row (rolling
-    windows naturally exclude the current-and-future rows from their own
-    mean/std by shifting), so it's safe to call on the full history and
-    then just read off the last row.
+    ticker's OHLCV DataFrame. Uses only trailing data at each row -- the
+    rolling mean/std are shifted by 1 so a row's own value is EXCLUDED
+    from its own baseline (pandas' rolling() includes the current row by
+    default; without the shift, a big move dilutes/inflates the very
+    mean/std it's then compared against, systematically understating its
+    own z-score -- Codex review, 2026-07-30, caught this in the module
+    that had been claiming, incorrectly, to already exclude the current
+    row). Safe to call on the full history and then just read off the
+    last row.
 
     `return_mode="pct_change"` (default) is correct for any `close` series
     that's a genuine price (always positive) -- every per-ticker signal,
@@ -43,12 +48,12 @@ def compute_features(df: pd.DataFrame, window: int = ROLLING_WINDOW, return_mode
     out = df.copy()
     out["return_pct"] = out["close"].pct_change() if return_mode == "pct_change" else out["close"].diff()
 
-    rolling_mean = out["return_pct"].rolling(window).mean()
-    rolling_std = out["return_pct"].rolling(window).std()
+    rolling_mean = out["return_pct"].shift(1).rolling(window).mean()
+    rolling_std = out["return_pct"].shift(1).rolling(window).std()
     out["return_zscore"] = (out["return_pct"] - rolling_mean) / rolling_std
 
-    vol_mean = out["volume"].rolling(window).mean()
-    vol_std = out["volume"].rolling(window).std()
+    vol_mean = out["volume"].shift(1).rolling(window).mean()
+    vol_std = out["volume"].shift(1).rolling(window).std()
     out["volume_zscore"] = (out["volume"] - vol_mean) / vol_std
 
     return out

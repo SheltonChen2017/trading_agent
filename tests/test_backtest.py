@@ -444,7 +444,7 @@ def test_out_of_sample_backtest_splits_signals_by_period():
     # Early shock at day 20 should land in "discovery"; late shock at day
     # 80 should land in "confirmation" under a 0.6 discovery_frac split.
     df = _series_with_two_shocks(
-        days=days, early_index=20, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+        days=days, early_index=25, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
     )
     result = out_of_sample_backtest({"TEST": df}, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0)
 
@@ -472,7 +472,7 @@ def test_out_of_sample_baseline_comparison_splits_signals_by_period():
     hold_days = 5
     days = 100
     df = _series_with_two_shocks(
-        days=days, early_index=20, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+        days=days, early_index=25, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
     )
     result = out_of_sample_baseline_comparison(
         {"TEST": df}, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0
@@ -501,7 +501,7 @@ def test_out_of_sample_baseline_comparison_uses_period_specific_baseline():
         rng.normal(loc=-0.004, scale=0.0005, size=days - regime_change_idx),
     ])
     volume = np.full(days, 1_000_000.0)
-    shock_idx = 20  # well within the discovery (positive-drift) region
+    shock_idx = 25  # well within the discovery (positive-drift) region
     returns[shock_idx] = -0.08
     volume[shock_idx] = 4_000_000.0
 
@@ -553,7 +553,7 @@ def test_out_of_sample_market_comparison_splits_signals_by_period():
     hold_days = 5
     days = 100
     df = _series_with_two_shocks(
-        days=days, early_index=20, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+        days=days, early_index=25, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
     )
     benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(days, 1.001))}, index=df.index)
 

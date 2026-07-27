@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import hmac
 import json
 import math
 import secrets
@@ -31,6 +32,21 @@ from assistant.schemas import PortfolioSnapshot
 
 _EASTERN = ZoneInfo("America/New_York")
 _NYSE_CALENDAR = mcal.get_calendar("NYSE")
+
+# Process-local secret, generated once at import time. intent_fingerprint()
+# below is a PLAIN hash of public TradeIntent fields -- any code that can
+# import TradeIntent can compute the same hash, so it was never actually a
+# proof that validate_trade_intent()/authorize_trade_intent() ran (Codex
+# review, 2026-07-27: hand-constructing a ValidationResult or
+# ExecutionAuthorization with a correctly-computed fingerprint passed
+# verification). _sign() below mixes in this secret via HMAC, so a proof can
+# only be produced by code that already holds _GATE_SECRET -- i.e. this
+# module itself -- not by anything that merely knows the intent's fields.
+_GATE_SECRET = secrets.token_bytes(32)
+
+
+def _sign(payload: str) -> str:
+    return hmac.new(_GATE_SECRET, payload.encode("utf-8"), hashlib.sha256).hexdigest()
 
 
 @dataclasses.dataclass(frozen=True)
@@ -47,13 +63,14 @@ class TradeIntent:
 class ValidationResult:
     approved: bool
     violations: list[str]
-    # Content-hash of the exact intent this result was computed for. Lets
-    # authorize_trade_intent() refuse to authorize any intent whose
-    # fingerprint doesn't match -- otherwise nothing stops a caller from
-    # pairing an approved ValidationResult from one (e.g. small) intent
-    # with a different, never-validated intent and getting a valid
-    # authorization for it (Codex review, 2026-07-27).
-    validated_intent_fingerprint: str | None = None
+    # HMAC (keyed by this module's process-local secret) over the exact
+    # intent this result was computed for. Only validate_trade_intent()
+    # can produce a proof that verifies -- unlike a plain content hash,
+    # this can't be recomputed by code that merely knows the intent's
+    # public fields, so a hand-constructed ValidationResult (with an
+    # arbitrary or even correctly-hashed fingerprint) is rejected by
+    # authorize_trade_intent() below (Codex review, 2026-07-27).
+    validation_proof: str | None = None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -61,12 +78,17 @@ class ExecutionAuthorization:
     """Short-lived proof that a specific typed intent cleared the gate."""
 
     token: str
-    intent_fingerprint: str
+    intent_fingerprint: str  # informational/for logging -- NOT the security check, see `proof`
+    proof: str  # HMAC-signed; only authorize_trade_intent() can produce a valid one
     approved_at: str
     expires_at: str
 
 
 def intent_fingerprint(intent: TradeIntent) -> str:
+    """Plain content hash -- useful for logging/display/dedup, but NOT a
+    secret (any code with a TradeIntent can compute this itself). Do not
+    use this alone as a security check; see _sign()/_validation_proof()/
+    _authorization_proof()."""
     payload = json.dumps(
         {
             "ticker": intent.ticker.upper(),
@@ -81,6 +103,14 @@ def intent_fingerprint(intent: TradeIntent) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
+def _validation_proof(intent: TradeIntent) -> str:
+    return _sign(f"validated:{intent_fingerprint(intent)}")
+
+
+def _authorization_proof(intent: TradeIntent) -> str:
+    return _sign(f"authorized:{intent_fingerprint(intent)}")
+
+
 def authorize_trade_intent(
     intent: TradeIntent,
     validation: ValidationResult,
@@ -88,17 +118,19 @@ def authorize_trade_intent(
 ) -> ExecutionAuthorization:
     if not validation.approved:
         raise ValueError("Cannot authorize a trade intent that failed validation.")
-    if validation.validated_intent_fingerprint != intent_fingerprint(intent):
+    if validation.validation_proof is None or not hmac.compare_digest(
+        validation.validation_proof, _validation_proof(intent)
+    ):
         raise ValueError(
-            "This ValidationResult was not produced by validating this exact trade "
-            "intent -- refusing to authorize. (A validation result must come from "
-            "validate_trade_intent(intent, ...) called with the SAME intent being "
-            "authorized here.)"
+            "This ValidationResult was not produced by validate_trade_intent(intent, ...) "
+            "called with this exact trade intent -- refusing to authorize. A hand-constructed "
+            "or mismatched ValidationResult cannot be signed correctly."
         )
     now = datetime.now(timezone.utc)
     return ExecutionAuthorization(
         token=secrets.token_urlsafe(32),
         intent_fingerprint=intent_fingerprint(intent),
+        proof=_authorization_proof(intent),
         approved_at=now.isoformat(),
         expires_at=(now + timedelta(seconds=ttl_seconds)).isoformat(),
     )
@@ -115,7 +147,7 @@ def verify_execution_authorization(
     expires = datetime.fromisoformat(authorization.expires_at)
     if current > expires:
         raise PermissionError("Execution-gate authorization has expired.")
-    if authorization.intent_fingerprint != intent_fingerprint(intent):
+    if not hmac.compare_digest(authorization.proof, _authorization_proof(intent)):
         raise PermissionError("Execution-gate authorization does not match this trade intent.")
 
 
@@ -141,6 +173,7 @@ def validate_trade_intent(
     earnings_blackout_days: int = 2,
     max_order_value: float | None = None,
     min_cash_reserve_pct: float = 0.0,
+    pending_buy_value_by_ticker: dict[str, float] | None = None,
 ) -> ValidationResult:
     """
     Validates one TradeIntent against every configured limit. Returns
@@ -160,6 +193,18 @@ def validate_trade_intent(
     wide bid/ask spread blocks the trade under max_spread_pct -- a market
     order has no protection against a wide/fresh-but-stale-looking quote
     otherwise, since it never compares against anything.
+
+    `pending_buy_value_by_ticker`: estimated dollar value of currently
+    pending (not-yet-filled) BUY orders, keyed by ticker. portfolio.cash/
+    buying_power already covers whether there's enough MONEY for this
+    trade, but the per-position, total-exposure, basket, and leveraged-ETF
+    checks below only look at `portfolio.positions` -- a pending buy that
+    hasn't filled yet doesn't show up there either, so without this a
+    pending buy on this (or a same-basket/leveraged) ticker is invisible
+    to every exposure/concentration cap, not just the cash check (Codex
+    review, 2026-07-27: reproduced a $4,000 pending buy + a new $5,000 buy
+    both passing a 50% exposure cap on a $10,000 account, even though both
+    fills together create 90% exposure).
     """
     violations: list[str] = []
 
@@ -167,7 +212,7 @@ def validate_trade_intent(
         return ValidationResult(
             approved=False,
             violations=["Kill switch is active — no trades are permitted."],
-            validated_intent_fingerprint=intent_fingerprint(intent),
+            validation_proof=_validation_proof(intent),
         )
 
     if intent.shares <= 0:
@@ -186,9 +231,12 @@ def validate_trade_intent(
         )
 
     if intent.side == "buy":
+        pending_by_ticker = {t.upper(): v for t, v in (pending_buy_value_by_ticker or {}).items()}
+        total_pending_buy_value = sum(pending_by_ticker.values())
+
         existing_position_value = sum(
             p.market_value for p in portfolio.positions if p.ticker.upper() == intent.ticker.upper()
-        )
+        ) + pending_by_ticker.get(intent.ticker.upper(), 0.0)
         new_position_pct = (existing_position_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
         if new_position_pct > max_position_pct * 100:
             violations.append(
@@ -215,7 +263,7 @@ def validate_trade_intent(
                 f"${minimum_cash:,.2f} minimum cash reserve."
             )
 
-        existing_invested = portfolio.total_equity - portfolio.cash
+        existing_invested = portfolio.total_equity - portfolio.cash + total_pending_buy_value
         new_invested_pct = (existing_invested + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
         if new_invested_pct > max_total_exposure_pct * 100:
             violations.append(
@@ -226,7 +274,9 @@ def validate_trade_intent(
         for basket_name, basket_tickers in BASKETS.items():
             if intent.ticker.upper() not in basket_tickers and intent.ticker not in basket_tickers:
                 continue
-            existing_basket_value = sum(p.market_value for p in portfolio.positions if p.ticker in basket_tickers)
+            existing_basket_value = sum(
+                p.market_value for p in portfolio.positions if p.ticker in basket_tickers
+            ) + sum(v for t, v in pending_by_ticker.items() if t in basket_tickers)
             new_basket_pct = (existing_basket_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
             if new_basket_pct > max_basket_pct:
                 violations.append(
@@ -237,7 +287,7 @@ def validate_trade_intent(
         if intent.ticker.upper() in LEVERAGED_ETF_TICKERS:
             existing_leveraged_value = sum(
                 p.market_value for p in portfolio.positions if p.is_leveraged_etf
-            )
+            ) + sum(v for t, v in pending_by_ticker.items() if t in LEVERAGED_ETF_TICKERS)
             new_leveraged_pct = (existing_leveraged_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
             if new_leveraged_pct > max_leveraged_etf_pct:
                 violations.append(
@@ -344,7 +394,7 @@ def validate_trade_intent(
     return ValidationResult(
         approved=len(violations) == 0,
         violations=violations,
-        validated_intent_fingerprint=intent_fingerprint(intent),
+        validation_proof=_validation_proof(intent),
     )
 
 

@@ -173,6 +173,13 @@ def get_open_orders() -> list[dict]:
             "type": getattr(order.type, "value", str(order.type)),
             "status": getattr(order.status, "value", str(order.status)),
             "submitted_at": order.submitted_at.isoformat() if order.submitted_at else None,
+            # Lets a caller estimate a pending order's dollar value without
+            # an extra live quote for limit/notional orders (see
+            # assistant/execution_service.py's _pending_buy_value_by_ticker,
+            # Codex review, 2026-07-27: pending buys were invisible to
+            # every exposure/concentration cap, not just the cash check).
+            "limit_price": float(order.limit_price) if getattr(order, "limit_price", None) is not None else None,
+            "notional": float(order.notional) if getattr(order, "notional", None) is not None else None,
         }
         for order in orders
     ]

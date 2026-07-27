@@ -129,6 +129,18 @@ code before acting) -- closed the remaining gaps in the round-2 fixes:
      "limit", and separately rejects non-finite reference prices and
      one-sided/crossed bid-ask quotes instead of silently skipping the
      spread check on them (see risk/execution_gate.py).
+
+2026-07-30 update (fourth independent GPT review, verified against this
+code before acting):
+ 16. Pending (not-yet-filled) BUY orders were invisible to every
+     exposure/concentration check (per-position, total, basket,
+     leveraged-ETF) -- those only look at portfolio.positions, which a
+     pending order doesn't appear in yet. _pending_buy_value_by_ticker()
+     below estimates each pending buy's dollar value (from the order's
+     own notional/limit_price, falling back to one live quote per
+     market-type pending order) and feeds it into validate_trade_intent()
+     via the new pending_buy_value_by_ticker parameter (see
+     risk/execution_gate.py).
 """
 from __future__ import annotations
 
@@ -188,6 +200,43 @@ def _lookup_order_outcome(broker_module, idempotency_key: str):
         return broker_module.find_order_by_client_id(idempotency_key)
     except Exception:
         return _LOOKUP_UNCONFIRMED
+
+
+def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict[str, float]:
+    """Estimated dollar value of currently pending (not-yet-filled) BUY
+    orders, keyed by ticker -- fed into validate_trade_intent()'s
+    exposure/concentration checks, which otherwise only see FILLED
+    positions and are blind to money already committed by a pending order
+    (Codex review, 2026-07-27). Prefers exact values already on the order
+    (notional, or shares * limit_price for a limit order); for a plain
+    market buy order (no price on the order itself) falls back to one
+    live quote per such order. If even that fails, the order is honestly
+    skipped (undercounts exposure rather than guessing) -- same "honestly
+    unavailable, never guessed" discipline this module already uses for
+    earnings data."""
+    totals: dict[str, float] = {}
+    for order in open_orders:
+        if str(order.get("side", "")).lower() != "buy":
+            continue
+        shares = order.get("shares")
+        ticker = order.get("ticker")
+        if not shares or not ticker:
+            continue
+        notional = order.get("notional")
+        if notional:
+            value = float(notional)
+        else:
+            limit_price = order.get("limit_price")
+            if limit_price:
+                value = float(shares) * float(limit_price)
+            else:
+                try:
+                    quote = broker_module.get_latest_quote(ticker)
+                    value = float(shares) * float(quote["price"])
+                except Exception:
+                    continue
+        totals[ticker.upper()] = totals.get(ticker.upper(), 0.0) + value
+    return totals
 
 
 def _resolve_earnings_days_away(ticker: str, override: int | None) -> int | None:
@@ -350,6 +399,7 @@ def execute_approved_paper_proposal(
             earnings_blackout_days=policy.earnings_blackout_days,
             max_order_value=policy.max_order_value,
             min_cash_reserve_pct=policy.min_cash_reserve_pct,
+            pending_buy_value_by_ticker=_pending_buy_value_by_ticker(current_portfolio.open_orders, broker),
         )
         if not validation.approved:
             raise ProposalExecutionError(

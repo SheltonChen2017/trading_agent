@@ -24,7 +24,14 @@ project_execution_realism_gaps):
     trading day's open, under entry_timing="next_open"). This is a
     conservative simplification -- it can only UNDER-count how much
     cash/capacity is actually available on the real entry day, never
-    over-count and accidentally overspend.
+    over-count and accidentally overspend. Under next_open, the reserved
+    dollar amount is carried at face value (no price exposure) until the
+    real entry_date arrives, at which point it's converted into actual
+    shares at the real entry price and starts being marked to market. (A
+    prior version computed shares and started marking to market on the
+    SIGNAL date itself, using tomorrow's open price but today's close for
+    valuation -- across a large overnight gap this could wildly misstate
+    signal-date equity. Codex review, 2026-07-30.)
   - One open position per ticker at a time; a repeat signal on an already-
     held ticker is skipped, not pyramided.
   - Equal-weight sizing (position_size_pct of CURRENT equity at signal
@@ -150,6 +157,11 @@ def simulate_portfolio(
 
     cash = initial_cash
     open_positions: dict[str, dict] = {}  # ticker -> position dict
+    # next_open signals reserve a DOLLAR AMOUNT here at signal time but
+    # don't become real shares (or start being marked to market) until the
+    # actual entry_date arrives -- see the loop below for why (Codex
+    # review, 2026-07-30).
+    pending_entries: dict[str, dict] = {}  # ticker -> pending-entry dict
     trade_log: list[dict] = []
     equity_dates: list = []
     equity_values: list[float] = []
@@ -167,6 +179,11 @@ def simulate_portfolio(
                 price = pos["last_known_price"]
             pos["last_known_price"] = price
             value += pos["shares"] * price
+        # Money already committed to a pending (not-yet-entered) next_open
+        # signal is still worth its reserved face value until the real
+        # entry happens -- it hasn't been exposed to price risk yet.
+        for pe in pending_entries.values():
+            value += pe["reserved_value"]
         return value
 
     def _close_position(ticker: str, pos: dict, exit_date, exit_price: float, forced: bool) -> None:
@@ -192,7 +209,33 @@ def simulate_portfolio(
         )
 
     for as_of in simulation_dates:
-        # 1. Close any positions whose exit date has arrived. Runs over
+        # 1. Promote any pending next_open entries whose entry_date has
+        #    arrived into real open positions -- this is the first real
+        #    price exposure they get. (A prior version opened the
+        #    position and started marking it to market on the SIGNAL
+        #    date itself, valuing shares bought at TOMORROW's open using
+        #    TODAY's close -- across a large overnight gap this could
+        #    wildly misstate signal-date equity, e.g. a 50% gap down
+        #    doubling reported equity. Codex review, 2026-07-30.)
+        for ticker in [t for t, pe in pending_entries.items() if pe["entry_date"] <= as_of]:
+            pe = pending_entries.pop(ticker)
+            df = data[ticker]
+            raw_entry_price = float(df[pe["entry_col"]].iloc[pe["entry_idx"]])
+            net_entry_price = raw_entry_price * (1 + slippage_pct)
+            shares = pe["reserved_value"] / net_entry_price
+            open_positions[ticker] = {
+                "direction": pe["direction"],
+                "signal_date": pe["signal_date"],
+                "entry_date": pe["entry_date"],
+                "net_entry_price": net_entry_price,
+                "shares": shares,
+                "position_value": pe["reserved_value"],
+                "exit_date": pe["exit_date"],
+                "planned_exit_price": float(df[pe["exit_col"]].iloc[pe["exit_idx"]]),
+                "last_known_price": raw_entry_price,
+            }
+
+        # 2. Close any positions whose exit date has arrived. Runs over
         #    the FULL simulation clock, not just scannable_dates, so a
         #    position's real planned exit date is always honored.
         for ticker in [t for t, pos in open_positions.items() if pos["exit_date"] <= as_of]:
@@ -201,7 +244,7 @@ def simulate_portfolio(
             exit_price = pos["planned_exit_price"] if pos["exit_date"] in df.index else pos["last_known_price"]
             _close_position(ticker, pos, pos["exit_date"], exit_price, forced=False)
 
-        # 2. Evaluate new signals -- only on scannable_dates, so a fresh
+        # 3. Evaluate new signals -- only on scannable_dates, so a fresh
         #    entry always has tail_buffer days of room ahead to exit.
         if as_of in scannable_dates:
             signals = scan_fn(data, as_of=as_of, **kwargs)
@@ -211,7 +254,7 @@ def simulate_portfolio(
                 for _, sig in signals.iterrows():
                     n_signals_seen += 1
                     ticker = sig["ticker"]
-                    if ticker in open_positions:
+                    if ticker in open_positions or ticker in pending_entries:
                         continue
                     df = data[ticker]
                     if as_of not in df.index:
@@ -224,7 +267,7 @@ def simulate_portfolio(
                     if exit_idx >= len(df):
                         continue  # not enough forward history to ever close this one
 
-                    if len(open_positions) >= max_concurrent_positions:
+                    if len(open_positions) + len(pending_entries) >= max_concurrent_positions:
                         n_skipped_capacity += 1
                         continue
 
@@ -234,24 +277,42 @@ def simulate_portfolio(
                         n_skipped_cash += 1
                         continue
 
-                    raw_entry_price = float(df[entry_col].iloc[entry_idx])
-                    net_entry_price = raw_entry_price * (1 + slippage_pct)
-                    shares = position_value / net_entry_price
-                    if shares <= 0:
-                        continue
-
-                    cash -= shares * net_entry_price
-                    open_positions[ticker] = {
-                        "direction": sig["direction"],
-                        "signal_date": as_of,
-                        "entry_date": df.index[entry_idx],
-                        "net_entry_price": net_entry_price,
-                        "shares": shares,
-                        "position_value": position_value,
-                        "exit_date": df.index[exit_idx],
-                        "planned_exit_price": float(df[exit_col].iloc[exit_idx]),
-                        "last_known_price": raw_entry_price,
-                    }
+                    if entry_timing == "same_close":
+                        raw_entry_price = float(df[entry_col].iloc[entry_idx])
+                        net_entry_price = raw_entry_price * (1 + slippage_pct)
+                        shares = position_value / net_entry_price
+                        if shares <= 0:
+                            continue
+                        cash -= shares * net_entry_price
+                        open_positions[ticker] = {
+                            "direction": sig["direction"],
+                            "signal_date": as_of,
+                            "entry_date": df.index[entry_idx],
+                            "net_entry_price": net_entry_price,
+                            "shares": shares,
+                            "position_value": position_value,
+                            "exit_date": df.index[exit_idx],
+                            "planned_exit_price": float(df[exit_col].iloc[exit_idx]),
+                            "last_known_price": raw_entry_price,
+                        }
+                    else:
+                        # next_open: reserve the dollar amount now (cash/
+                        # capacity committed at signal time, matching this
+                        # module's documented scope), but defer computing
+                        # shares -- and marking this position to market --
+                        # until the real entry_date arrives (see step 1).
+                        cash -= position_value
+                        pending_entries[ticker] = {
+                            "direction": sig["direction"],
+                            "signal_date": as_of,
+                            "entry_date": df.index[entry_idx],
+                            "exit_date": df.index[exit_idx],
+                            "entry_col": entry_col,
+                            "exit_col": exit_col,
+                            "entry_idx": entry_idx,
+                            "exit_idx": exit_idx,
+                            "reserved_value": position_value,
+                        }
 
         equity_dates.append(as_of)
         equity_values.append(_mark_to_market(as_of))
@@ -261,6 +322,13 @@ def simulate_portfolio(
     for ticker, pos in list(open_positions.items()):
         _close_position(ticker, pos, last_date, pos["last_known_price"], forced=True)
     open_positions.clear()
+    # Defensive: return reserved cash for any pending entry that was never
+    # promoted. Shouldn't happen given the exit_idx bounds check above
+    # (entry_date is always reachable by simulation_dates), but avoids
+    # silently losing money if it ever does.
+    for pe in pending_entries.values():
+        cash += pe["reserved_value"]
+    pending_entries.clear()
     if equity_values:
         equity_values[-1] = cash
 

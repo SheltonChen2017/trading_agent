@@ -83,7 +83,8 @@
       "Bash(curl -s \"https://gamma-api.polymarket.com/public-search?q=nvidia&events_status=active\")",
       "Bash(curl -s \"https://gamma-api.polymarket.com/public-search?q=NVDA%20stock\")",
       "Bash(gh repo *)",
-      "Bash(echo \"exit code: $?\")"
+      "Bash(echo \"exit code: $?\")",
+      "Bash(echo \"exit:$?\")"
     ]
   }
 }

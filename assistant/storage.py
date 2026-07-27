@@ -134,7 +134,12 @@ class AssistantStore:
         return proposal
 
     def claim_proposal(
-        self, proposal_id: str, *, expected_status: str = "proposed", new_status: str = "validating"
+        self,
+        proposal_id: str,
+        *,
+        expected_status: str = "proposed",
+        new_status: str = "validating",
+        not_expired_after: str | None = None,
     ) -> dict[str, Any] | None:
         """
         Atomically flips status from `expected_status` to `new_status` in
@@ -143,21 +148,37 @@ class AssistantStore:
         SQLite serializes writers against the same database file, and
         exactly one UPDATE affects a row. Returns the claimed proposal
         (with its embedded "status" updated to `new_status`) on success,
-        or None if the row didn't exist or wasn't in `expected_status`
-        (already claimed by someone else, already terminal, etc.) --
-        callers MUST treat None as "stop, do not proceed."
+        or None if the row didn't exist, wasn't in `expected_status`
+        (already claimed by someone else, already terminal, etc.), or
+        (when `not_expired_after` is given) its `expires_at` is already
+        past that timestamp -- callers MUST treat None as "stop, do not
+        proceed."
+
+        `not_expired_after` (an ISO-8601 UTC timestamp string, lexically
+        comparable the same way every timestamp in this table is stored)
+        adds `AND expires_at >= ?` to the guard. Pass it when claiming
+        for validation so an already-expired-but-still-"proposed" row can
+        never be claimed; omit it when the caller's OWN intent is to
+        transition an expired row to "expired" -- that call still only
+        succeeds if the row is presently `expected_status`, so it can
+        never clobber "executed"/"approved"/"validating"/"submission_failed".
 
         This replaces the previous pattern of a plain get_proposal() read
         followed by a much-later update_proposal_status() write, which
         left a real window where two concurrent approvals could both pass
-        the initial status check before either one wrote back.
+        the initial status check before either one wrote back -- and,
+        separately, an unconditional expiry write that could stomp an
+        already-executed proposal's status if approval was invoked again
+        past its expiry.
         """
         now = datetime.now(timezone.utc).isoformat()
+        query = "UPDATE trade_proposals SET status = ?, updated_at = ? WHERE proposal_id = ? AND status = ?"
+        params: list[Any] = [new_status, now, proposal_id, expected_status]
+        if not_expired_after is not None:
+            query += " AND expires_at >= ?"
+            params.append(not_expired_after)
         with self._connect() as connection:
-            cursor = connection.execute(
-                "UPDATE trade_proposals SET status = ?, updated_at = ? WHERE proposal_id = ? AND status = ?",
-                (new_status, now, proposal_id, expected_status),
-            )
+            cursor = connection.execute(query, params)
             if cursor.rowcount != 1:
                 return None
             row = connection.execute(

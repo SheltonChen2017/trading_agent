@@ -21,6 +21,30 @@ and what it actually enforced --
      to "now", so the check compared now against itself and could never
      fail regardless of how stale the actual quote was. Now fetches a
      real quote + its own timestamp via execution.alpaca_broker.get_latest_quote().
+
+2026-07-27 follow-up (second independent review of the above fix, again
+verified before acting): found one real regression the first pass
+introduced, plus two smaller gaps --
+  6. The expiry check ran BEFORE the atomic claim and used an
+     unconditional status write, so re-invoking approval on an
+     already-executed proposal after its expiry window had passed could
+     silently flip its status back to "expired" -- and could race an
+     in-flight claim. Fixed: expiry is now folded into the same atomic
+     conditional UPDATE as the claim (AssistantStore.claim_proposal()'s
+     `not_expired_after`), and the fallback "mark expired" write is
+     itself conditioned on the row still being "proposed" at that
+     moment, so it can never clobber a terminal/in-flight status.
+  7. Missing earnings data silently skipped the blackout check with no
+     way to require otherwise. Added TradingPolicy.require_earnings_data
+     (default False, preserving the existing "honestly unavailable,
+     never guessed" behavior) -- when enabled, a BUY is blocked if
+     earnings data can't be resolved; risk-reducing SELLs are exempt.
+  8. Only ProposalExecutionError was caught around the validation stage,
+     so a genuinely unexpected exception (a bug, a malformed stored
+     intent, etc.) left the claimed proposal stranded in "validating"
+     forever. Added a catch-all that marks a distinct "validation_failed"
+     status and re-raises -- never silently swallowed, never auto-reset
+     to "proposed".
 """
 from __future__ import annotations
 
@@ -95,15 +119,28 @@ def execute_approved_paper_proposal(
         raise ProposalExecutionError("Proposal policy version does not match the active policy.")
 
     now_utc = datetime.now(timezone.utc)
-    if now_utc > datetime.fromisoformat(proposal["expires_at"]):
-        store.update_proposal_status(proposal_id, "expired")
-        raise ProposalExecutionError("Proposal has expired; generate a fresh one.")
 
-    # Atomic claim: proposed -> validating. If this returns None, someone
-    # else already claimed it (concurrent approval), it's not in
-    # "proposed" status, or it no longer exists -- stop unconditionally.
-    claimed = store.claim_proposal(proposal_id, expected_status="proposed", new_status="validating")
+    # Atomic claim: proposed -> validating, ONLY if not already expired.
+    # Both the claim and the expiry write below are conditioned on the
+    # row still being "proposed" at the moment they run, so neither can
+    # ever clobber an "executed"/"approved"/"validating"/"submission_failed"
+    # status -- a prior version checked expiry with an unconditional write
+    # before claiming, which could silently flip an already-executed
+    # proposal back to "expired" if approval was invoked again past its
+    # expiry window (or race an in-flight claim into "expired" out from
+    # under it).
+    claimed = store.claim_proposal(
+        proposal_id, expected_status="proposed", new_status="validating", not_expired_after=now_utc.isoformat()
+    )
     if claimed is None:
+        current = store.get_proposal(proposal_id)
+        if (
+            current is not None
+            and current["status"] == "proposed"
+            and now_utc > datetime.fromisoformat(current["expires_at"])
+        ):
+            store.claim_proposal(proposal_id, expected_status="proposed", new_status="expired")
+            raise ProposalExecutionError("Proposal has expired; generate a fresh one.")
         raise ProposalExecutionError(
             f"Proposal {proposal_id} could not be claimed (already being processed, "
             "already executed, or not in a 'proposed' state)."
@@ -155,6 +192,20 @@ def execute_approved_paper_proposal(
             )
 
         resolved_earnings_days_away = _resolve_earnings_days_away(intent.ticker, earnings_days_away)
+        if policy.require_earnings_data and intent.side == "buy" and resolved_earnings_days_away is None:
+            # A risk-REDUCING sell is exempt: refusing it because earnings
+            # data is unavailable would block the very thing that lowers
+            # risk. Only opt-in (require_earnings_data=true, off by
+            # default) and only for buys. Note: "unavailable" here also
+            # covers a ticker whose last known earnings date has simply
+            # passed with nothing new scheduled yet, not only a genuine
+            # fetch failure -- data/event_data.py doesn't distinguish the
+            # two, so this errs toward over-blocking, not under-blocking.
+            raise ProposalExecutionError(
+                f"Earnings-date data for {intent.ticker} is unavailable and your policy requires it "
+                "for buys (require_earnings_data=true) -- refusing to approve rather than silently "
+                "skip the earnings blackout check."
+            )
 
         validation = validate_trade_intent(
             intent,
@@ -182,6 +233,14 @@ def execute_approved_paper_proposal(
     except ProposalExecutionError as exc:
         violations = validation.violations if validation is not None and not validation.approved else [str(exc)]
         store.update_proposal_status(proposal_id, "blocked", violations=violations)
+        raise
+    except Exception as exc:
+        # Something genuinely unexpected (not a validation/policy
+        # rejection) -- do not leave the claimed proposal stranded in
+        # "validating" forever with no record of why. Distinct status
+        # from "blocked" so this is visibly different from an ordinary
+        # policy rejection in the History tab / store.
+        store.update_proposal_status(proposal_id, "validation_failed", error=str(exc))
         raise
 
     authorization = authorize_trade_intent(intent, validation)

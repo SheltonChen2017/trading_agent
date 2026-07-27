@@ -334,3 +334,151 @@ def test_regenerating_a_proposal_same_day_produces_a_new_id_not_a_collision():
         # silently no-op'd against the first (now-expired) row.
         assert store.get_proposal(second.proposal_id)["status"] == "proposed"
         assert store.get_proposal(first.proposal_id)["status"] == "expired"
+
+
+def _buy_proposal_dict(packet, policy, ticker: str, shares: int) -> dict:
+    """Hand-built buy TradeProposal dict -- generate_risk_reduction_proposals()
+    only ever produces sells, so tests that need a buy (e.g. for
+    require_earnings_data, which only applies to buys) build one directly."""
+    from assistant.proposals import TradeProposal, _stable_id
+    from risk.execution_gate import TradeIntent
+
+    intent = TradeIntent(ticker=ticker, side="buy", shares=shares, order_type="market")
+    proposal_id = _stable_id(packet, policy, intent)
+    return TradeProposal(
+        proposal_id=proposal_id,
+        created_at=packet.generated_at,
+        expires_at="2026-12-31T00:00:00+00:00",
+        status="proposed",
+        idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
+        policy_version=policy.version,
+        intent=intent,
+        reference_price=50.0,
+        price_timestamp=packet.generated_at,
+        reasons=["test buy"],
+        evidence_status="test",
+        expected_impact={"trade_value": shares * 50.0, "position_weight_before_pct": 0, "position_weight_after_pct": 0, "cash_before": 0, "cash_after": 0, "invested_pct_after": 0},
+        alternatives=[],
+        uncertainties=[],
+    ).to_dict()
+
+
+def test_expired_approval_attempt_cannot_alter_an_executed_proposal():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            execute_approved_paper_proposal(
+                proposal.proposal_id,
+                f"APPROVE {proposal.proposal_id}",
+                packet.portfolio,
+                policy,
+                store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert store.get_proposal(proposal.proposal_id)["status"] == "executed"
+
+            # Re-invoke approval for the SAME (now executed) proposal_id,
+            # far past its expires_at -- must not flip status back to
+            # "expired" and must not submit a second order.
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 12, 31, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected re-approval of an executed proposal to be rejected"
+            except ProposalExecutionError:
+                pass
+            assert store.get_proposal(proposal.proposal_id)["status"] == "executed"
+            assert len(captured) == 1  # still only the one real submission
+    finally:
+        restore()
+
+
+def test_require_earnings_data_blocks_buy_when_unavailable_but_not_sell():
+    packet = _packet()
+    policy = dataclasses.replace(_policy(), require_earnings_data=True)
+    buy_proposal = _buy_proposal_dict(packet, policy, "TQQQ", 10)  # TQQQ already held in _packet()
+    captured, restore = _mock_execution_dependencies(quote_price=50.0, earnings_available=False)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(buy_proposal)
+            try:
+                execute_approved_paper_proposal(
+                    buy_proposal["proposal_id"],
+                    f"APPROVE {buy_proposal['proposal_id']}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected the buy to be blocked when earnings data is unavailable"
+            except ProposalExecutionError as exc:
+                assert "earnings" in str(exc).lower()
+            assert len(captured) == 0
+
+        # A risk-reducing SELL must NOT be blocked by the same policy --
+        # blocking a concentration-reducing sale would increase risk.
+        sell_proposal = generate_risk_reduction_proposals(packet, policy)[0]
+        captured2, restore2 = None, None
+        with tempfile.TemporaryDirectory() as temp2:
+            store2 = AssistantStore(Path(temp2) / "assistant.db")
+            store2.save_proposal(sell_proposal.to_dict())
+            order = execute_approved_paper_proposal(
+                sell_proposal.proposal_id,
+                f"APPROVE {sell_proposal.proposal_id}",
+                packet.portfolio,
+                policy,
+                store2,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert order["order_id"] == "paper-1"
+    finally:
+        restore()
+
+
+def test_unexpected_exception_during_validation_marks_validation_failed_not_stuck():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    import assistant.execution_service as execution_service
+
+    original_validate = execution_service.validate_trade_intent
+
+    def broken_validate(*args, **kwargs):
+        raise ValueError("simulated unexpected bug")
+
+    execution_service.validate_trade_intent = broken_validate
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id,
+                    f"APPROVE {proposal.proposal_id}",
+                    packet.portfolio,
+                    policy,
+                    store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected the unexpected exception to propagate"
+            except ValueError:
+                pass
+            # Must NOT be stuck in "validating" forever, and must NOT be
+            # silently reset to "proposed" either.
+            status = store.get_proposal(proposal.proposal_id)["status"]
+            assert status == "validation_failed", status
+    finally:
+        execution_service.validate_trade_intent = original_validate
+        restore()

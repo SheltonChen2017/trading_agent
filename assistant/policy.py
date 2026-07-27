@@ -31,6 +31,7 @@ class TradingPolicy:
     max_stale_price_minutes: float = 15.0
     max_slippage_pct: float = 1.0
     earnings_blackout_days: int = 2
+    require_earnings_data: bool = False
     allowed_sides: tuple[str, ...] = ("buy", "sell")
     allowed_order_types: tuple[str, ...] = ("market", "limit")
     allow_new_positions: bool = False

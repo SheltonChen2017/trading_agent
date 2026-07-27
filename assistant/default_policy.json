@@ -11,6 +11,7 @@
   "max_stale_price_minutes": 15.0,
   "max_slippage_pct": 1.0,
   "earnings_blackout_days": 2,
+  "require_earnings_data": false,
   "allowed_sides": ["buy", "sell"],
   "allowed_order_types": ["market", "limit"],
   "allow_new_positions": false,

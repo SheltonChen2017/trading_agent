@@ -235,6 +235,42 @@ def test_baseline_forward_returns_empty_when_no_forward_history():
     assert baseline.empty
 
 
+def test_baseline_forward_returns_next_open_uses_next_day_open():
+    # Same discipline as run_backtest()'s next_open: today's signal is only
+    # known after today's close, so the baseline must be measured the same
+    # realistic way — enter at tomorrow's open, exit hold_days of opens later.
+    days = 30
+    hold_days = 5
+    returns = np.full(days, 0.005)
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close + 5.0, "high": close + 5.0, "low": close, "close": close, "volume": np.full(days, 1_000_000.0)},
+        index=dates,
+    )
+
+    baseline = run_baseline_forward_returns({"TEST": df}, hold_days=hold_days, slippage_pct=0.0, entry_timing="next_open")
+    assert not baseline.empty
+
+    first_row = baseline.iloc[0]
+    entry_idx = df.index.get_loc(first_row["date"]) + 1
+    expected_entry = df["open"].iloc[entry_idx]
+    expected_exit = df["open"].iloc[entry_idx + hold_days]
+    expected_return = (expected_exit - expected_entry) / expected_entry * 100
+    assert abs(first_row["net_return_pct"] - round(expected_return, 6)) < 0.01
+
+
+def test_baseline_forward_returns_rejects_invalid_entry_timing():
+    df = _series_with_shock_and_known_forward_move(
+        days=30, shock_index=10, shock_return=0.001, forward_daily_return=0.0, hold_days=5
+    )
+    try:
+        run_baseline_forward_returns({"TEST": df}, hold_days=5, entry_timing="bogus")
+        assert False, "expected ValueError for invalid entry_timing"
+    except ValueError:
+        pass
+
+
 def test_compare_signal_to_baseline_edge_matches_independently_computed_means():
     # edge_vs_baseline_pct should be exactly signal_mean - baseline_mean,
     # where each mean is independently verifiable from run_backtest() and
@@ -844,6 +880,44 @@ def test_out_of_sample_significance_by_block_reports_both_weightings():
     assert not result.empty
     assert "weighting" in result.columns
     assert set(result["weighting"].unique()) == {"trade_weighted", "equal_date_weighted"}
+
+
+def test_out_of_sample_significance_by_block_honors_next_open_entry_timing():
+    # Plumbing check: entry_timing must actually reach run_backtest() (via
+    # _out_of_sample_own_ticker_detail()) through this call chain, not get
+    # silently dropped. An invalid value should fail the same way it does
+    # when passed directly to run_backtest() -- if it didn't propagate,
+    # this would silently succeed instead.
+    hold_days = 5
+    days = 300
+    rng = np.random.default_rng(2)
+    returns = rng.normal(loc=0.0, scale=0.002, size=days)
+    volume = np.full(days, 1_000_000.0)
+    for idx in range(30, days - 10, 15):
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+        for i in range(1, 6):
+            returns[idx + i] = 0.02
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close + 3.0, "high": close * 1.001 + 3.0, "low": close * 0.999, "close": close, "volume": volume},
+        index=dates,
+    )
+    data = {"A": df, "B": df}
+
+    result = out_of_sample_significance_by_block(
+        data, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0, n_tests=2, entry_timing="next_open",
+    )
+    assert not result.empty  # runs cleanly under next_open, not just the same_close default
+
+    try:
+        out_of_sample_significance_by_block(
+            data, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0, n_tests=2, entry_timing="bogus",
+        )
+        assert False, "expected ValueError for invalid entry_timing to propagate through the call chain"
+    except ValueError:
+        pass
 
 
 def test_out_of_sample_significance_by_block_marks_exactly_one_primary_row_per_cell():

@@ -38,8 +38,16 @@
       "label": "Cross-asset macro signals (VIX spike, credit spread, yield curve)",
       "claim": "Beats a random-day baseline out-of-sample",
       "status": "rejected",
-      "detail": "0/2 confirmation-period primary cells significant for all three signals. Credit spread's 'up' leg looked strongly significant in discovery (p<0.001) but flipped to a small non-significant edge in confirmation.",
-      "source": "scripts/run_macro_signals_significance_check.py",
+      "detail": "0/2 confirmation-period primary cells significant for all three signals under same_close (unrealistic) entry timing. Credit spread's 'up' leg looked strongly significant in discovery (p<0.001) but flipped to a small non-significant edge in confirmation. Re-checked 2026-07-26 under realistic next_open entry timing: VIX and yield curve unchanged (still rejected); credit spread's DIP leg flipped from non-significant (p=0.128) to significant (p=0.0, mean edge +1.39%) in confirmation. NOT elevated to confirmed/promising -- testing both timings without pre-registering which one counts is an uncorrected extra look (same multiple-testing risk this project's own by-block docstring warns about for weighting/block-length variants). Treat as an unconfirmed anomaly pending a dedicated, properly-scoped re-test (block-length sensitivity, trade_weighted comparison, and ideally a fresh discovery/confirmation split with next_open pre-registered as the only timing tested) before trusting it.",
+      "source": "scripts/run_macro_signals_significance_check.py; scripts/run_execution_timing_revalidation.py",
+      "relevant_tickers": []
+    },
+    {
+      "label": "Momentum (12-1 month) and analyst price-target gap under realistic next_open timing",
+      "claim": "Beats a random-day baseline out-of-sample",
+      "status": "rejected",
+      "detail": "Re-checked 2026-07-26 under next_open entry timing (previously only tested under same_close): both remain 0/2 confirmation-period primary cells significant, materially unchanged from the same_close result. Closes the entry-price look-ahead gap from memory:project_execution_realism_gaps for these two signals.",
+      "source": "scripts/run_execution_timing_revalidation.py",
       "relevant_tickers": []
     },
     {

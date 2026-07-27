@@ -15,6 +15,7 @@ from assistant.policy import load_policy
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.storage import AssistantStore
+from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
 from execution.alpaca_broker import is_configured
 
 
@@ -76,6 +77,11 @@ def command_propose(args, store: AssistantStore) -> None:
     packet = _packet(include_events=not args.no_events)
     store.save_decision_packet(packet)
     proposals = generate_risk_reduction_proposals(packet, policy)
+    if args.strategy_proposals:
+        try:
+            proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy)
+        except Exception as exc:
+            print(f"  ! SOXX/SOXL strategy proposal check failed ({exc}); showing risk-reduction proposals only.")
     if not proposals:
         print("No deterministic risk-policy breaches require a trade proposal.")
         return
@@ -83,7 +89,7 @@ def command_propose(args, store: AssistantStore) -> None:
         store.save_proposal(proposal.to_dict())
         intent = proposal.intent
         print(
-            f"{proposal.proposal_id}: {intent.side.upper()} {intent.shares} {intent.ticker} "
+            f"{proposal.proposal_id} [{proposal.evidence_status}]: {intent.side.upper()} {intent.shares} {intent.ticker} "
             f"at reference ${proposal.reference_price:,.2f}"
         )
         for reason in proposal.reasons:
@@ -92,6 +98,8 @@ def command_propose(args, store: AssistantStore) -> None:
             f"  Preview: position {proposal.expected_impact['position_weight_before_pct']:.1f}% "
             f"-> {proposal.expected_impact['position_weight_after_pct']:.1f}%"
         )
+        for uncertainty in proposal.uncertainties:
+            print(f"  ? {uncertainty}")
         print(f'  Approval phrase: "APPROVE {proposal.proposal_id}"')
 
 
@@ -143,6 +151,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     propose = commands.add_parser("propose")
     propose.add_argument("--no-events", action="store_true")
+    propose.add_argument(
+        "--strategy-proposals",
+        action="store_true",
+        help=(
+            "Also check the SOXX/SOXL wide-rebalance-band strategy (evidence_status="
+            "promising_unconfirmed_strategy, not confirmed -- see assistant/strategy_proposals.py). "
+            "Off by default; only produces a proposal if you already hold both SOXX and SOXL."
+        ),
+    )
     propose.set_defaults(handler=command_propose)
 
     list_parser = commands.add_parser("list")

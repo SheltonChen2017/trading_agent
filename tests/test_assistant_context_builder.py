@@ -200,15 +200,18 @@ def test_audit_log_round_trips_decision_packets():
         assert entries[0]["portfolio"]["positions"][0]["ticker"] == "AAA"
 
 
-# --- AssistantStore.save_decision_packet() deduplication + retention
-# (GPT review, 2026-07-31): the UI layer now caches packets via
-# st.cache_data, so a page reload, a new browser tab, or a second
-# session had no server-side way to recognize "this is the same cached
-# packet I already saved" -- deduplication needed to live in storage
-# (keyed by generated_at, which build_decision_packet() sets exactly
-# once per real build), not only in UI session state.
+# --- AssistantStore.save_decision_packet() identity, deduplication,
+# and retention. Identity is (generated_at, payload_hash), NOT
+# generated_at alone (GPT review, 2026-08-01): the UI's cached base
+# packet and that same packet enriched with live events via
+# dataclasses.replace(base_packet, upcoming_events=events) share
+# generated_at but serialize to different payloads -- a generated_at-
+# only unique key silently discarded whichever variant was saved
+# second. payload_hash disambiguates those while generated_at still
+# collapses genuinely IDENTICAL re-saves (e.g. a second browser tab)
+# into one row rather than only living in UI session state.
 
-def _decision_packet(generated_at: str, cash: float = 50.0):
+def _decision_packet(generated_at: str, cash: float = 50.0, upcoming_events: list | None = None):
     from assistant.schemas import DecisionPacket, MarketRegime
 
     positions = [{"ticker": "AAA", "shares": 1, "entry_price": 10.0, "current_price": 11.0}]
@@ -218,7 +221,7 @@ def _decision_packet(generated_at: str, cash: float = 50.0):
         generated_at=generated_at, portfolio=snapshot, risk=risk,
         regime=MarketRegime(benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
                              trailing_volatility_pct=1.0, as_of="2026-01-01"),
-        signals=[], upcoming_events=[], warnings=[],
+        signals=[], upcoming_events=upcoming_events or [], warnings=[],
     )
 
 
@@ -248,40 +251,170 @@ def test_save_decision_packet_two_sessions_saving_the_same_packet_produce_one_ro
         assert count == 1
 
 
-def test_save_decision_packet_two_different_packets_produce_two_rows():
+def test_save_decision_packet_two_different_timestamps_remain_separate():
     from assistant.storage import AssistantStore
 
     with tempfile.TemporaryDirectory() as tmp:
         store = AssistantStore(Path(tmp) / "assistant.db")
+        # Identical payload content aside from generated_at -- these
+        # still hash the same modulo the timestamp field itself, but
+        # remain two distinct historical observations.
         id_a = store.save_decision_packet(_decision_packet("2026-07-31T10:00:00+00:00"))
         id_b = store.save_decision_packet(_decision_packet("2026-07-31T10:00:15+00:00"))
         assert id_a != id_b
 
+        conn = sqlite3.connect(store.path)
+        try:
+            count = conn.execute("SELECT COUNT(*) FROM decision_packets").fetchone()[0]
+        finally:
+            conn.close()
+        assert count == 2
 
-def test_save_decision_packet_duplicate_insert_does_not_overwrite_the_original_payload():
+
+def test_save_decision_packet_different_portfolio_content_at_same_timestamp_produces_two_rows():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        same_timestamp = "2026-07-31T10:00:00+00:00"
+        id_a = store.save_decision_packet(_decision_packet(same_timestamp, cash=1000.0))
+        id_b = store.save_decision_packet(_decision_packet(same_timestamp, cash=2000.0))
+        assert id_a != id_b  # different payload_hash despite the shared timestamp
+
+        conn = sqlite3.connect(store.path)
+        try:
+            count = conn.execute(
+                "SELECT COUNT(*) FROM decision_packets WHERE generated_at = ?", (same_timestamp,)
+            ).fetchone()[0]
+        finally:
+            conn.close()
+        assert count == 2
+
+
+def test_save_decision_packet_event_enrichment_receives_a_distinct_identity():
+    # This is the exact collision GPT reproduced: dataclasses.replace()
+    # preserves generated_at while changing upcoming_events, and the
+    # UI's Briefing tab can persist whichever variant -- base or
+    # event-enriched -- happens to be the one it sees on a given rerun.
+    import dataclasses
+
+    from assistant.schemas import UpcomingEvent
+    from assistant.storage import AssistantStore
+
+    base = _decision_packet("2026-07-31T10:00:00+00:00", upcoming_events=[])
+    event = UpcomingEvent(
+        ticker="AAA", event_type="earnings", event_date="2026-08-05", days_away=5,
+        status=EvidenceStatus.UNAVAILABLE,
+    )
+    enriched = dataclasses.replace(base, upcoming_events=[event])
+    assert base.generated_at == enriched.generated_at  # the exact precondition for the collision
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        base_id = store.save_decision_packet(base)
+        enriched_id = store.save_decision_packet(enriched)
+        assert base_id != enriched_id
+
+        conn = sqlite3.connect(store.path)
+        try:
+            count = conn.execute(
+                "SELECT COUNT(*) FROM decision_packets WHERE generated_at = ?", (base.generated_at,)
+            ).fetchone()[0]
+        finally:
+            conn.close()
+        assert count == 2  # both the base snapshot and the enriched view survive, regardless of order
+
+
+def test_save_decision_packet_exact_duplicate_insert_does_not_overwrite_the_original_payload():
     from assistant.storage import AssistantStore
 
     with tempfile.TemporaryDirectory() as tmp:
         db_path = Path(tmp) / "assistant.db"
         store = AssistantStore(db_path)
         original = _decision_packet("2026-07-31T10:00:00+00:00", cash=50.0)
-        store.save_decision_packet(original)
-        # A packet sharing the SAME generated_at but (hypothetically)
-        # different content must never overwrite the original row --
-        # generated_at identity wins, the original payload is preserved.
-        changed = _decision_packet("2026-07-31T10:00:00+00:00", cash=99_999.0)
-        store.save_decision_packet(changed)
+        first_id = store.save_decision_packet(original)
+        # The EXACT same object/content saved again -- not a different
+        # payload sharing a timestamp, which is covered separately above.
+        second_id = store.save_decision_packet(original)
+        assert first_id == second_id
 
         conn = sqlite3.connect(db_path)
         conn.row_factory = sqlite3.Row
         try:
-            row = conn.execute(
+            rows = conn.execute(
                 "SELECT payload_json FROM decision_packets WHERE generated_at = ?", (original.generated_at,)
-            ).fetchone()
+            ).fetchall()
         finally:
             conn.close()
-        stored_cash = json.loads(row["payload_json"])["portfolio"]["cash"]
-        assert stored_cash == 50.0  # the ORIGINAL payload, not the later duplicate
+        assert len(rows) == 1
+        stored_cash = json.loads(rows[0]["payload_json"])["portfolio"]["cash"]
+        assert stored_cash == 50.0
+
+
+def test_migration_preserves_distinct_payloads_sharing_a_generated_at():
+    # Regression guard for the migration's dedup step itself: a
+    # pre-existing (pre-payload_hash-column) database could contain a
+    # genuine base/enriched collision under the OLD generated_at-only
+    # scheme -- the migration must collapse only the exact duplicate
+    # pair, never the differing third row.
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        db_path = Path(tmp) / "assistant.db"
+        conn = sqlite3.connect(db_path)
+        try:
+            conn.execute(
+                "CREATE TABLE decision_packets (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                "generated_at TEXT NOT NULL, schema_version TEXT NOT NULL, payload_json TEXT NOT NULL)"
+            )
+            same_timestamp = "2026-07-31T10:00:00+00:00"
+            for payload in ('{"a": 1}', '{"a": 1}', '{"a": 2}'):  # rows 1&2 identical, row 3 differs
+                conn.execute(
+                    "INSERT INTO decision_packets(generated_at, schema_version, payload_json) VALUES (?, ?, ?)",
+                    (same_timestamp, "2.0", payload),
+                )
+            conn.commit()
+        finally:
+            conn.close()
+
+        store = AssistantStore(db_path)  # migration runs here
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        try:
+            rows = conn.execute("SELECT payload_json FROM decision_packets").fetchall()
+        finally:
+            conn.close()
+        assert len(rows) == 2  # the exact duplicate collapsed; the distinct payload survived
+        assert {r["payload_json"] for r in rows} == {'{"a": 1}', '{"a": 2}'}
+
+
+def test_prune_decision_packets_older_than_deletes_both_base_and_enriched_variants():
+    import dataclasses
+
+    from assistant.schemas import UpcomingEvent
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        old_base = _decision_packet("2020-01-01T00:00:00+00:00", upcoming_events=[])
+        old_enriched = dataclasses.replace(
+            old_base, upcoming_events=[UpcomingEvent(
+                ticker="AAA", event_type="earnings", event_date="2020-01-05", days_away=4,
+                status=EvidenceStatus.UNAVAILABLE,
+            )]
+        )
+        store.save_decision_packet(old_base)
+        store.save_decision_packet(old_enriched)
+
+        deleted = store.prune_decision_packets_older_than(days=30)
+        assert deleted == 2
+
+        conn = sqlite3.connect(store.path)
+        try:
+            count = conn.execute("SELECT COUNT(*) FROM decision_packets").fetchone()[0]
+        finally:
+            conn.close()
+        assert count == 0
 
 
 def test_prune_decision_packets_older_than_deletes_only_old_rows():
@@ -448,8 +581,12 @@ if __name__ == "__main__":
     test_decision_packet_to_dict_reaches_nested_signal_authority_fields()
     test_audit_log_round_trips_decision_packets()
     test_save_decision_packet_two_sessions_saving_the_same_packet_produce_one_row()
-    test_save_decision_packet_two_different_packets_produce_two_rows()
-    test_save_decision_packet_duplicate_insert_does_not_overwrite_the_original_payload()
+    test_save_decision_packet_two_different_timestamps_remain_separate()
+    test_save_decision_packet_different_portfolio_content_at_same_timestamp_produces_two_rows()
+    test_save_decision_packet_event_enrichment_receives_a_distinct_identity()
+    test_save_decision_packet_exact_duplicate_insert_does_not_overwrite_the_original_payload()
+    test_migration_preserves_distinct_payloads_sharing_a_generated_at()
+    test_prune_decision_packets_older_than_deletes_both_base_and_enriched_variants()
     test_prune_decision_packets_older_than_deletes_only_old_rows()
     test_prune_decision_packets_rejects_non_positive_days()
     test_prune_decision_packets_never_touches_proposals_or_broker_orders()

@@ -391,6 +391,65 @@ def test_load_packet_no_events_never_calls_the_live_events_function():
         st.cache_data.clear()
 
 
+# --- Briefing tab persistence audit fidelity (GPT review, 2026-08-01):
+# scripts/personal_assistant_ui.py:712-721 saves whatever _load_packet()
+# returns -- base or event-enriched, depending on that session's
+# "Fetch live earnings events" checkbox -- keyed only by
+# packet.generated_at, which dataclasses.replace() preserves across
+# enrichment. Confirms the actual save call site's output is no longer
+# insertion-order-dependent now that AssistantStore keys on
+# (generated_at, payload_hash).
+
+def _row_count_for(db_path, generated_at: str) -> int:
+    import sqlite3
+
+    conn = sqlite3.connect(db_path)
+    try:
+        return conn.execute(
+            "SELECT COUNT(*) FROM decision_packets WHERE generated_at = ?", (generated_at,)
+        ).fetchone()[0]
+    finally:
+        conn.close()
+
+
+def test_briefing_tab_persists_both_base_and_enriched_variants_regardless_of_order():
+    import tempfile
+
+    from assistant.storage import AssistantStore
+
+    build_calls = []
+    original_build = ui.build_decision_packet
+    original_get_events = ui.get_upcoming_events
+    ui.build_decision_packet = _fake_packet_builder(build_calls)
+    ui.get_upcoming_events = lambda tickers, fetch_live=False: ["FAKE_EVENT"]
+    st.cache_data.clear()
+    try:
+        _, base_packet = _load_packet(str(DEFAULT_POLICY_PATH), False)
+        _, enriched_packet = _load_packet(str(DEFAULT_POLICY_PATH), True)
+        assert base_packet.generated_at == enriched_packet.generated_at  # the exact collision precondition
+
+        # Order A: a non-event session saves first, an event-enabled
+        # session saves second.
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "assistant.db"
+            store = AssistantStore(db_path)
+            store.save_decision_packet(base_packet)
+            store.save_decision_packet(enriched_packet)
+            assert _row_count_for(db_path, base_packet.generated_at) == 2
+
+        # Order B: reversed -- must not matter which variant arrives first.
+        with tempfile.TemporaryDirectory() as tmp:
+            db_path = Path(tmp) / "assistant.db"
+            store = AssistantStore(db_path)
+            store.save_decision_packet(enriched_packet)
+            store.save_decision_packet(base_packet)
+            assert _row_count_for(db_path, base_packet.generated_at) == 2
+    finally:
+        ui.build_decision_packet = original_build
+        ui.get_upcoming_events = original_get_events
+        st.cache_data.clear()
+
+
 if __name__ == "__main__":
     test_proposal_status_category_covers_every_real_status()
     test_proposal_status_category_unknown_status_is_never_approvable()
@@ -420,4 +479,5 @@ if __name__ == "__main__":
     test_clear_confirmation_state_handles_first_render_with_no_prior_digest()
     test_load_packet_shares_the_same_base_snapshot_regardless_of_include_events()
     test_load_packet_no_events_never_calls_the_live_events_function()
+    test_briefing_tab_persists_both_base_and_enriched_variants_regardless_of_order()
     print("All personal_assistant_ui tests passed.")

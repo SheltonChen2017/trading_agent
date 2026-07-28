@@ -92,6 +92,29 @@ Important guarantees:
   one-sided or crossed quote fails closed rather than silently skipping the
   check, and a limit order requires a positive, finite `limit_price`.
 - Sells cannot exceed the shares currently held.
+- Share quantities are validated strictly: only a real positive `int` is
+  accepted (not `bool`, not any `float` -- whole-numbered, fractional, `NaN`,
+  or infinite -- all of which would otherwise defeat a plain `shares <= 0`
+  comparison). Enforced at the execution gate, at the broker submission
+  functions independently (defense in depth), and when reconstructing a
+  trade intent from stored proposal data (a malformed value fails closed
+  instead of being silently truncated).
+- A concentration-cap or earnings-blackout block (never a data-integrity or
+  hard-safety violation) can be knowingly overridden: the CLI's `approve
+  --override` flag or the UI's typed `OVERRIDE ...` phrase. Every other
+  violation (stale price, closed market, a bad quote, a duplicate order, the
+  kill switch, insufficient cash, invalid share quantities) can never be
+  overridden, even if it co-occurs with an overridable one.
+- Submitting a batch of allocation proposals together (the Watchlist tab's
+  "submit all") reserves each earlier leg's planned notional exactly once
+  against later legs' cash, buying-power, and exposure/concentration checks
+  -- never double-counted and never silently dropped -- and remains fully
+  read-only until the user explicitly confirms the batch.
+- A batch that finished with a leg blocked on an override-eligible violation
+  re-syncs that leg from its underlying proposal (never re-submits) the next
+  time it's viewed or resumed, so resolving it through that proposal's own
+  override control is reflected instead of the batch showing a stale
+  "blocked" status forever.
 - `TRADING_ASSISTANT_KILL_SWITCH=1` blocks proposal execution -- enforced
   inside the execution service itself (not only by callers that remember to
   read the env var and pass it in), so it can't be silently bypassed.
@@ -105,22 +128,68 @@ Important guarantees:
 
 ## Current research status
 
-The research registry lives in
-`assistant/research_findings.json` and is loaded at runtime. Claims are
-versioned and labeled independently:
+The research registry lives in `assistant/research_findings.json` and is
+loaded at runtime (`assistant/research_registry.py`). Every claim is
+versioned, labeled independently by `EvidenceStatus`
+(`confirmed` / `promising_unconfirmed` / `exploratory` / `rejected` /
+`unavailable`), and attached to the *specific* claim it covers -- a single
+strategy can carry a confirmed claim and a rejected claim at the same time
+(see SOXX/SOXL below).
 
-- The original z-score scanner, momentum, relative, breakout, PEAD,
-  fundamentals, and analyst-rating hypotheses did not survive the full
-  confirmation and dependence-aware testing process.
-- Analyst price-target and cross-asset macro signals are exploratory; they are
-  implemented but have no registered production edge.
-- QQQ/TQQQ regime rotation did not reliably beat its baseline after correcting
-  execution timing.
-- SOXX/SOXL trend/volatility rotation has a confirmed **drawdown-reduction**
-  result, not a confirmed after-tax excess-return result.
+As of the current registry (`research_findings.json` version 1.1.0):
 
-Research status is never converted automatically into production authority.
-Promotion remains an explicit, auditable decision.
+- **Rejected** (did not survive full confirmation and dependence-aware
+  testing): the original z-score scanner; cross-sectional momentum (12-1
+  month), including re-checked under realistic `next_open` entry timing;
+  relative, breakout, PEAD, fundamentals, and analyst-rating signals;
+  analyst price-target consensus gap; cross-asset macro signals (VIX spike,
+  credit spread, yield curve); QQQ/TQQQ regime rotation; SOXX/SOXL rotation's
+  **excess-return** claim (the pre-tax edge disappeared once realistic
+  short-term capital-gains tax was modeled); and Kelly-criterion sizing with
+  a one-way profit ratchet (looked like a breakthrough on one
+  discovery/confirmation split, then failed walk-forward validation -- it
+  can never re-lever once trimmed, so it structurally misses upside in an
+  extended bull market).
+- **Confirmed**: SOXX/SOXL trend/volatility rotation's **drawdown-reduction**
+  claim (materially lower max drawdown across confirmation, walk-forward,
+  sensitivity, and tax/cost checks -- a risk result, not an excess-return
+  one); and a wide (15%) rebalance band vs. tight/continuous vol-targeting
+  (~89% less tax/turnover for essentially the same performance).
+- **Promising, unconfirmed**: the vol-targeting rotation mechanism tested on
+  2 additional pairs (SPY/UPRO, NVDA/NVDL) beyond SOXX/SOXL -- designed and
+  backtested only, not yet in live/paper trading. NVDL has substantially
+  less real history than the other two pairs; see the underfilled-dataset
+  warning below.
+- A handful of additional signal modules exist in `signals/` (idiosyncratic
+  volatility, variance risk premium, residual momentum, overnight-gap
+  reversal) that are frozen/pre-registered per `config.py` but do not yet
+  have a corresponding entry in the versioned registry -- treat them as
+  implemented-but-not-yet-formally-verdicted, not as validated.
+
+**One credit-spread anomaly, explicitly not promoted**: re-checked 2026-07-26
+under realistic `next_open` (rather than same-close) entry timing, the
+credit-spread "dip" leg flipped from non-significant to significant in
+confirmation. This is **not** elevated to confirmed/promising -- testing both
+timings without pre-registering which one counts is an uncorrected extra
+look, the same multiple-testing risk this project's own tooling warns about
+elsewhere. Treat it as an unconfirmed anomaly pending a dedicated, properly
+pre-registered re-test.
+
+**Research status is never converted automatically into production
+authority; promotion remains an explicit, auditable decision.** Concretely:
+a `confirmed`/`promising_unconfirmed` finding also carries a `provenance`
+record (actual data date range/row count, entry timing, when it was
+fetched, and a `reproduced_after_data_loader_fix` flag) and is rejected at
+load time if that provenance is missing. `is_production_authoritative()`
+checks that flag, not just the status string -- **as of this writing, none
+of the confirmed/promising findings above have been re-verified since the
+`fetch_historical` lookback-days data-loader fix** (only their data coverage
+has been freshly re-checked), so every runtime consumer (CLI briefing,
+Streamlit UI) displays them with an explicit
+`-- UNREPRODUCED, NOT CURRENTLY PRODUCTION-AUTHORITATIVE` qualifier rather
+than a bare `[confirmed]`. A dataset-underfill warning (e.g. NVDL's ~907
+rows vs. the 1764 requested) is surfaced the same way, wherever that
+finding is shown.
 
 **2026-07-27 correction**: `signals/scanner.py`'s rolling z-score baseline
 used to include the current row in its own rolling mean/std (pandas'
@@ -131,7 +200,7 @@ every signal that routes through `compute_features()` -- the core dip/up
 scanner plus the VIX/credit-spread/yield-curve macro proxies. Fixed by
 shifting the rolling window by one row. This changes exactly which dates get
 flagged as signals; the existing REJECTED verdicts above have not yet been
-re-run against the corrected scanner, so treat them as needing
+re-run end-to-end against the corrected scanner, so treat them as needing
 re-confirmation rather than as re-validated.
 
 ## Installation
@@ -265,7 +334,37 @@ without bumping its version, the fingerprint mismatch still blocks
 approval and tells you to regenerate the proposal, instead of silently
 approving a trade against stale risk limits.
 
-## Use the assistant
+## How to use
+
+There are two front ends over the exact same underlying functions --
+neither computes anything the other doesn't; pick whichever fits how you
+work:
+
+- **CLI** (`scripts/run_personal_assistant.py`) -- scriptable, good for
+  quick checks or automation.
+- **Browser UI** (`scripts/personal_assistant_ui.py`, Streamlit) -- click-
+  around, better for browsing research/news per ticker and for the
+  Watchlist's multi-ticker allocation-split workflow.
+
+### Quickstart
+
+1. Install dependencies and (optionally) set Alpaca paper credentials --
+   see [Installation](#installation) and
+   [Configure Alpaca paper trading](#configure-alpaca-paper-trading) above.
+   Without credentials, everything below still works against the sample
+   portfolio in `assistant/sample_portfolio.py`.
+2. Get a briefing: `python scripts/run_personal_assistant.py briefing`
+3. Check for anything that needs attention:
+   `python scripts/run_personal_assistant.py propose`
+4. If a proposal was generated, review it, then approve it explicitly:
+   `python scripts/run_personal_assistant.py approve <proposal_id> --confirm approve`
+5. Or skip 2-4 and run `python -m streamlit run scripts/personal_assistant_ui.py`
+   for the same workflow in a browser, plus the Watchlist tab's cart-lookup
+   and multi-ticker allocation-split features (CLI-only otherwise).
+
+Nothing above places a real order until you type the exact confirmation
+phrase for a specific proposal ID -- generating a briefing or a proposal is
+always read-only.
 
 ### Build a briefing
 
@@ -297,13 +396,26 @@ It writes both the compatibility JSONL journal and SQLite.
 python scripts/run_personal_assistant.py propose
 ```
 
-Only deterministic exposure reductions are generated. A proposal resembles:
+By default only deterministic exposure-reducing sells are generated. Add
+`--strategy-proposals` to also check the SOXX/SOXL wide-rebalance-band
+strategy (`evidence_status=promising_unconfirmed_strategy`, never
+`confirmed` -- see `assistant/strategy_proposals.py`; only produces a
+proposal if you already hold both SOXX and SOXL). Set
+`"enable_strategy_proposals": true` in your policy file instead to make
+this durable across runs rather than passing the flag every time.
+
+```bash
+python scripts/run_personal_assistant.py propose --strategy-proposals
+```
+
+A proposal resembles:
 
 ```text
-tp_0123456789abcdef: SELL 10 SOXL at reference $55.00
+tp_0123456789abcdef [deterministic_risk_policy]: SELL 10 SOXL at reference $55.00
   - Leveraged-ETF exposure exceeds the 20.0% policy limit.
   Preview: position 12.4% -> 9.8%
-  Approval phrase: "APPROVE tp_0123456789abcdef"
+  ? <uncertainties/caveats specific to this proposal>
+  Approve with: approve tp_0123456789abcdef --confirm approve
 ```
 
 Generating a proposal does not place or approve an order.
@@ -318,29 +430,41 @@ python scripts/run_personal_assistant.py list --status proposed
 Proposal states (`assistant/proposal_status.py` is the single source of
 truth used by the service, the UI's History filter, and tests -- so these
 can't drift out of sync with each other again): `proposed`, `validating`,
-`blocked`, `validation_failed`, `approved`, `submitting`,
-`submission_unknown`, `reconciling`, `submission_failed`, `executed`,
-`expired`.
+`override_available`, `blocked`, `validation_failed`, `approved`,
+`submitting`, `submission_unknown`, `reconciling`, `submission_failed`,
+`executed`, `expired`.
 
 ### Approve one paper order
 
-Run this during standard US market hours with a fresh proposal:
+Run this during standard US market hours with a fresh proposal. The
+confirmation phrase is exactly `approve` (case-insensitive) -- it no longer
+needs to repeat the proposal ID, since that's already the positional
+argument you're passing:
 
 ```bash
-python scripts/run_personal_assistant.py approve tp_0123456789abcdef \
-  --confirm "APPROVE tp_0123456789abcdef"
+python scripts/run_personal_assistant.py approve tp_0123456789abcdef --confirm approve
 ```
 
 Immediately before submission the service:
 
 1. verifies the proposal is still `proposed`, unexpired, and uses the active
-   policy version;
+   policy version and fingerprint;
 2. confirms Alpaca is configured for paper trading;
 3. refreshes positions, cash, buying power, prices, and open orders;
 4. checks duplicates and every execution-gate rule;
 5. creates a short-lived authorization bound to that exact intent;
 6. submits the paper order with an idempotent client order ID;
 7. records the order and marks the proposal executed.
+
+If the proposal is blocked ONLY by an override-eligible violation (a
+concentration cap or the earnings blackout window -- never a data-integrity
+or hard-safety issue), the CLI tells you so and leaves the proposal in a
+distinct `override_available` status. Re-run with `--override` to knowingly
+proceed anyway:
+
+```bash
+python scripts/run_personal_assistant.py approve tp_0123456789abcdef --confirm approve --override
+```
 
 To stop all approvals without changing code:
 
@@ -395,7 +519,29 @@ trusting it -- a mismatched order is left unresolved rather than silently
 accepted. Every outcome (executed, submission_failed, or still
 submission_unknown) is timestamped in `reconciled_at` as an audit trail.
 
-## Browser UI (optional)
+### Recovering a stranded reconciliation
+
+If the process crashes mid-reconciliation (no in-process handler survives
+that), a proposal can be left stuck in `reconciling` with no normal way to
+retry it -- `reconcile` only claims from `submitting`/`submission_unknown`.
+Recover it first, then reconcile as usual:
+
+```bash
+python scripts/run_personal_assistant.py recover-stale tp_0123456789abcdef
+python scripts/run_personal_assistant.py reconcile tp_0123456789abcdef
+```
+
+Only recovers a proposal that has genuinely sat in `reconciling` for at
+least `--stale-after-seconds` (default 300); a recent claim is presumed to
+be an actually in-flight reconciliation and is left untouched. This window
+must be a positive whole number of seconds -- zero, negative, or fractional
+values are rejected (both by the CLI's argument parser and, authoritatively,
+by the service itself), since a non-positive window would let a genuinely
+active reconciliation be reclaimed immediately. There is no button for this
+in the browser UI (CLI-only) since it's an intentionally rare crash-recovery
+path, not a routine action.
+
+### Browser UI
 
 `scripts/personal_assistant_ui.py` is a Streamlit front end over the exact
 same functions the CLI above uses -- no separate logic, just a different way
@@ -408,9 +554,44 @@ python -m streamlit run scripts/personal_assistant_ui.py
 
 then open the local URL it prints (defaults to `http://localhost:8501`).
 The same safety property as the CLI is preserved: each proposal has a text
-box requiring you to type the exact `APPROVE <proposal_id>` phrase before
-the submit button becomes clickable -- there is no one-click "approve"
-button that could submit an order by accident.
+box requiring you to type the exact `approve` phrase before the submit
+button becomes clickable -- there is no one-click "approve" button that
+could submit an order by accident. An override-eligible block adds a second,
+separate text box requiring an exact `OVERRIDE <SIDE> <SHARES> <TICKER>`
+phrase naming that specific order.
+
+Five tabs, all reading/writing the same SQLite store and policy file:
+
+- **Briefing** -- portfolio totals, market regime, risk exposure, open
+  positions with per-position trend/volatility and evidence-labeled
+  research, open orders, upcoming earnings, and warnings. Click "Refresh
+  briefing" to re-pull from Alpaca.
+- **Watchlist** -- add tickers to a cart (pick from the universe or type any
+  other symbol), then "Check cart" for each ticker's own trend/volatility,
+  recent analyst price targets, recent news (optionally summarized by Claude
+  if `ANTHROPIC_API_KEY` is set), a real historical best/worst hold-period
+  return range, and this project's evidence-labeled signal history --
+  **no probability-of-return number is ever shown**. With 2+ tickers
+  checked, an inverse-volatility purchase split appears (a risk-sizing
+  heuristic, not a stock pick), with a "max weight per ticker" cap slider.
+  Enter a dollar amount to see the actual whole-share plan -- including
+  existing holdings and known pending buys -- then either create individual
+  proposals per ticker (each needs its own typed `approve`), or generate the
+  whole split and submit it as one preflighted, sequential, resumable batch
+  (typed confirmation: `I approve this transaction`). A batch is
+  all-or-nothing at the start (any leg failing preflight submits none of
+  them) but not atomic once started -- some legs can fill while a later one
+  is blocked; safe to reload and resume, never resubmits an already-filled
+  leg.
+- **Selling** -- current holdings plus a "Check for recommended sells"
+  button; a recommendation here means a policy-limit breach (concentration,
+  leveraged-ETF exposure, etc.), the same deterministic check as `propose`,
+  never a price prediction.
+- **Propose & Approve** -- the same risk-reduction (and optionally SOXX/SOXL
+  strategy) proposals as the CLI's `propose`/`approve`, in card form.
+- **History** -- filterable proposal and broker-order tables, plus a
+  "Reconcile" button that appears automatically on any proposal with an
+  unresolved broker submission.
 
 ## Persistence
 
@@ -429,15 +610,24 @@ they define behavior and evidence, not private runtime data.
 
 ```text
 assistant/
+  schemas.py               typed DecisionPacket/PortfolioSnapshot/SignalEvidence structures
   context_builder.py       portfolio + regime + evidence DecisionPacket
   policy.py                validated, versioned personal policy
   portfolio_analytics.py   deterministic portfolio metrics and previews
-  research_registry.py     file-backed evidence claims
+  research_registry.py     file-backed evidence claims + provenance/authority checks
   proposals.py             exposure-reducing typed proposals
+  strategy_proposals.py    SOXX/SOXL wide-rebalance-band strategy proposals
+  allocation_proposals.py  user-directed, inverse-volatility-weighted buy proposals
+  allocation_batch.py      resumable, cumulative-preflight batch submission
   execution_service.py     approval, revalidation, paper submission
+  proposal_status.py       single source of truth for proposal status strings
   storage.py               SQLite state and idempotency
+  audit_log.py             legacy JSONL decision-packet journal
   risk_copilot.py          concentration, duplication, stress analysis
   explanations.py          "why was this ticker flagged?"
+  stock_lookup.py          own-ticker trend/volatility, price targets, hold-period ranges
+  news_summary.py          recent news, optional Claude-summarized (ANTHROPIC_API_KEY)
+  sample_portfolio.py      manual fallback portfolio when Alpaca isn't configured
 
 data/
   market_data.py           historical and synthetic price data
@@ -454,10 +644,17 @@ risk/
 execution/
   alpaca_broker.py         authorized broker reads and paper/live endpoint
 
-signals/                   pluggable research signals
-backtest/engine.py         walk-forward and dependence-aware testing
-strategies/                leveraged-ETF rotation research
+signals/                   pluggable research signals (scanner, momentum, relative,
+                            breakout, PEAD, fundamentals, analyst/analyst_target,
+                            vix_spike/credit_spread/yield_curve, regime, idio_vol,
+                            variance_risk_premium, residual_momentum, overnight_gap)
+backtest/
+  engine.py                walk-forward and dependence-aware testing
+  portfolio_simulator.py   tax/slippage-aware equity-curve simulator
+strategies/                leveraged-ETF rotation research (trend_vol_rotation.py,
+                            vol_target_rotation.py, kelly_rotation.py, leverage_rotation.py)
 ml/model.py                walk-forward-evaluated signal classifier
+baskets.py, config.py      overlapping ticker baskets and every other tunable knob
 ```
 
 ## Research workflow
@@ -493,11 +690,32 @@ python scripts/run_out_of_sample_check.py
 python scripts/run_significance_check.py
 python scripts/run_macro_signals_significance_check.py
 python scripts/run_analyst_target_significance_check.py
+python scripts/run_momentum_block_significance.py
+python scripts/run_execution_timing_revalidation.py
+python scripts/run_basket_report.py
+python scripts/train_model.py
 ```
+
+`scripts/` also holds the leveraged-ETF rotation research line: regime-
+rotation backtests/walk-forward/sensitivity/grid-search
+(`run_regime_rotation_*.py`), per-pair vol-target rotation backtests
+(`run_vol_target_rotation_backtest.py`, `_soxx_soxl.py`, `_spy_upro.py`,
+`_nvda_nvdl.py`), the Kelly-ratchet walk-forward check
+(`run_kelly_ratchet_walkforward_soxx_soxl.py`), the leverage-rotation
+backtest (`run_leverage_rotation_backtest.py`), and a head-to-head idea
+comparison (`run_idea_comparison_soxx_soxl.py`) -- these are the scripts
+behind the confirmed/rejected claims in
+[Current research status](#current-research-status) above. Use the
+`real-data-check` project skill (or its equivalent checklist) before
+trusting any real-data run: verify a new ticker resolves and has adequate
+history, run in the background (these take minutes against real data), and
+apply the project's standing statistical caveats (small-sample skepticism,
+multiple-hold-period checks, baseline comparison, multiple-testing
+correction) before reporting a result.
 
 The leveraged-ETF strategies enforce next-day-open execution after using a
 day's close to classify state. Tax and transaction-cost modeling are
-available in their simulators.
+available in their simulators (`backtest/portfolio_simulator.py`).
 
 ## Legacy agent behavior
 
@@ -520,9 +738,11 @@ python -m pytest tests -q
 
 The suite covers scanners, backtests, research statistics, strategies, ML,
 risk sizing, assistant schemas, context building, explanations, stress
-analysis, execution limits, policy validation, SQLite idempotency, proposal
-generation, authorization binding, and approved paper submission with a
-mocked broker.
+analysis, execution limits (including strict share-quantity validation),
+policy validation, SQLite idempotency, proposal generation, allocation
+batch preflight/execution, research-registry provenance/authority
+enforcement, CLI argument validation, authorization binding, and approved
+paper submission with a mocked broker.
 
 Broker tests do not contact Alpaca. Real-data research scripts do require
 network access.

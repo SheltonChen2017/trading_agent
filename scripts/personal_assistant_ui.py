@@ -948,8 +948,14 @@ with tab_watchlist:
             project_wide = [e for e in explanation["historical_evidence"] if not e["ticker_specific"]]
             if ticker_specific:
                 for e in ticker_specific:
-                    st.write(f"**[{e['status']}]** {e['label']} -- {e['claim']}")
+                    # display_status (GPT review, 2026-07-29): never show
+                    # a bare "[confirmed]" for a finding that hasn't been
+                    # re-verified since the fetch_historical lookback-days
+                    # fix -- see e['production_authoritative'].
+                    st.write(f"**[{e['display_status']}]** {e['label']} -- {e['claim']}")
                     st.caption(e["detail"])
+                    if e.get("dataset_warning"):
+                        st.warning(e["dataset_warning"])
             else:
                 st.info(
                     f"No {ticker}-specific research exists in this project. None of the tested signals have "
@@ -959,8 +965,10 @@ with tab_watchlist:
             if project_wide:
                 with st.expander(f"General signal-testing track record ({len(project_wide)} findings -- same for every stock, not specific to {ticker})"):
                     for e in project_wide:
-                        st.write(f"**[{e['status']}]** {e['label']} -- {e['claim']}")
+                        st.write(f"**[{e['display_status']}]** {e['label']} -- {e['claim']}")
                         st.caption(e["detail"])
+                        if e.get("dataset_warning"):
+                            st.warning(e["dataset_warning"])
             st.caption(explanation["note"])
 
 with tab_selling:

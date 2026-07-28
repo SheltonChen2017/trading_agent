@@ -165,6 +165,21 @@ code before acting):
      regardless of whether version was bumped, and fails closed (rather
      than being grandfathered in) for any proposal that predates
      fingerprint binding entirely.
+
+2026-07-28 feature (user-requested, after confirming scope): a policy
+block on a concentration cap (position/total-exposure/basket/leveraged-
+ETF) or the earnings blackout window can now be knowingly overridden --
+these are risk-preference/business-calendar calls, not data-integrity
+problems, and the broker itself would still accept the order. Stale
+price, closed market, a bad bid/ask quote, a duplicate order, the kill
+switch, insufficient cash, and any invalid intent can NEVER be
+overridden, even if they co-occur with an overridable violation --
+risk.execution_gate.authorize_overridden_trade_intent() independently
+re-verifies this itself rather than trusting the caller. The simplified
+confirmation phrase (below) also applies: `confirmation` is just
+"approve" now, not "APPROVE <proposal_id>" -- the proposal_id is already
+the caller-supplied parameter, so the exact phrase no longer needs to
+re-encode which proposal is being approved.
 """
 from __future__ import annotations
 
@@ -176,6 +191,7 @@ from assistant.proposal_status import (
     APPROVED,
     BLOCKED,
     EXECUTED,
+    POLICY_OVERRIDE_AVAILABLE,
     RECONCILING,
     SUBMISSION_FAILED,
     SUBMISSION_UNKNOWN,
@@ -187,6 +203,7 @@ from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
 from risk.execution_gate import (
     TradeIntent,
+    authorize_overridden_trade_intent,
     authorize_trade_intent,
     validate_trade_intent,
 )
@@ -200,6 +217,21 @@ _LOOKUP_UNCONFIRMED = object()
 
 class ProposalExecutionError(RuntimeError):
     pass
+
+
+class PolicyOverridableBlockError(ProposalExecutionError):
+    """Raised instead of a plain ProposalExecutionError when EVERY
+    violation on the rejected validation is override-eligible (see
+    risk.execution_gate.ValidationResult.overridable_violations) -- the
+    proposal is left in POLICY_OVERRIDE_AVAILABLE (not BLOCKED, which is
+    terminal) so a caller can re-invoke with override_policy_violations=
+    True to proceed. `overridable_violations` is always the complete
+    violations list here, since a mix of overridable and non-overridable
+    violations always raises the plain ProposalExecutionError instead."""
+
+    def __init__(self, message: str, overridable_violations: list[str]):
+        super().__init__(message)
+        self.overridable_violations = overridable_violations
 
 
 def _intent_from_dict(raw: dict) -> TradeIntent:
@@ -301,13 +333,29 @@ def execute_approved_paper_proposal(
     now_et: datetime,
     kill_switch_active: bool = False,
     earnings_days_away: int | None = None,
+    override_policy_violations: bool = False,
 ) -> dict:
     """
     Revalidate and submit one proposal.
 
-    The exact confirmation phrase is `APPROVE <proposal_id>`. Proposals
-    are single-use, short-lived, and currently restricted to Alpaca paper
-    accounts regardless of the global broker configuration.
+    The exact confirmation phrase is "approve" (case-insensitive). This
+    is deliberately no longer "APPROVE <proposal_id>": the proposal_id is
+    already a separate, caller-supplied parameter, so the confirmation
+    phrase doesn't need to re-encode which proposal is being approved --
+    that's chosen by which proposal_id the caller passes in, not by what
+    gets typed (2026-07-28, user-requested simplification).
+
+    `override_policy_violations`: if the ONLY reason this proposal would
+    be blocked is one or more override-eligible violations (concentration
+    caps or the earnings blackout -- see risk.execution_gate.
+    ValidationResult.overridable_violations), passing True proceeds
+    anyway instead of raising PolicyOverridableBlockError. Any other
+    violation (stale price, closed market, a bad quote, a duplicate
+    order, the kill switch, insufficient cash) still blocks regardless of
+    this flag -- see authorize_overridden_trade_intent()'s docstring.
+
+    Proposals are single-use, short-lived, and currently restricted to
+    Alpaca paper accounts regardless of the global broker configuration.
     """
     # Enforce the environment kill switch here too, not only in callers --
     # a caller that forgets to pass kill_switch_active must not silently
@@ -317,8 +365,8 @@ def execute_approved_paper_proposal(
     proposal = store.get_proposal(proposal_id)
     if proposal is None:
         raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
-    if confirmation != f"APPROVE {proposal_id}":
-        raise ProposalExecutionError("Explicit approval phrase did not match.")
+    if confirmation.strip().lower() != "approve":
+        raise ProposalExecutionError('Explicit approval phrase did not match -- type "approve".')
     if policy.execution_mode != "paper":
         raise ProposalExecutionError("The active policy does not permit paper execution.")
     if proposal["policy_version"] != policy.version:
@@ -349,21 +397,31 @@ def execute_approved_paper_proposal(
     # proposal back to "expired" if approval was invoked again past its
     # expiry window (or race an in-flight claim into "expired" out from
     # under it).
+    # Also claimable from POLICY_OVERRIDE_AVAILABLE: that status means a
+    # PRIOR call found only override-eligible violations and is waiting on
+    # a human decision, not a terminal rejection -- re-invoking (with
+    # override_policy_violations=True to actually proceed past them, or
+    # without it to just re-check) must be able to pick it back up.
     claimed = store.claim_proposal(
-        proposal_id, expected_status="proposed", new_status=VALIDATING, not_expired_after=now_utc.isoformat()
+        proposal_id,
+        expected_status=("proposed", POLICY_OVERRIDE_AVAILABLE),
+        new_status=VALIDATING,
+        not_expired_after=now_utc.isoformat(),
     )
     if claimed is None:
         current = store.get_proposal(proposal_id)
         if (
             current is not None
-            and current["status"] == "proposed"
+            and current["status"] in ("proposed", POLICY_OVERRIDE_AVAILABLE)
             and now_utc > datetime.fromisoformat(current["expires_at"])
         ):
-            store.claim_proposal(proposal_id, expected_status="proposed", new_status="expired")
+            store.claim_proposal(
+                proposal_id, expected_status=("proposed", POLICY_OVERRIDE_AVAILABLE), new_status="expired"
+            )
             raise ProposalExecutionError("Proposal has expired; generate a fresh one.")
         raise ProposalExecutionError(
             f"Proposal {proposal_id} could not be claimed (already being processed, "
-            "already executed, or not in a 'proposed' state)."
+            "already executed, or not in a 'proposed' or 'override_available' state)."
         )
 
     import execution.alpaca_broker as broker
@@ -478,9 +536,35 @@ def execute_approved_paper_proposal(
             pending_buy_value_by_ticker=pending_buy_value_by_ticker,
         )
         if not validation.approved:
-            raise ProposalExecutionError(
-                "Execution gate blocked the proposal: " + "; ".join(validation.violations)
-            )
+            blocking = [v for v in validation.violations if v not in validation.overridable_violations]
+            if blocking or not validation.overridable_violations:
+                # At least one violation isn't override-eligible (or there
+                # are no violations at all, which shouldn't happen for a
+                # rejection) -- this is a hard block regardless of
+                # override_policy_violations.
+                raise ProposalExecutionError(
+                    "Execution gate blocked the proposal: " + "; ".join(validation.violations)
+                )
+            if not override_policy_violations:
+                # Every violation is override-eligible, but the caller
+                # hasn't confirmed the override yet -- leave this proposal
+                # in a distinct, non-terminal, re-claimable status rather
+                # than BLOCKED (which is terminal) so a follow-up call
+                # with override_policy_violations=True can pick it back up.
+                store.update_proposal_status(
+                    proposal_id, POLICY_OVERRIDE_AVAILABLE, violations=validation.violations
+                )
+                raise PolicyOverridableBlockError(
+                    "Execution gate blocked this proposal, but every violation is override-eligible "
+                    "(a risk-preference or earnings-calendar call, not unreliable data): "
+                    + "; ".join(validation.violations),
+                    overridable_violations=list(validation.violations),
+                )
+            # override_policy_violations=True and every violation is
+            # override-eligible: fall through to authorize_overridden_
+            # trade_intent() below instead of the normal approved path.
+    except PolicyOverridableBlockError:
+        raise
     except ProposalExecutionError as exc:
         violations = validation.violations if validation is not None and not validation.approved else [str(exc)]
         store.update_proposal_status(proposal_id, BLOCKED, violations=violations)
@@ -494,13 +578,28 @@ def execute_approved_paper_proposal(
         store.update_proposal_status(proposal_id, VALIDATION_FAILED, error=str(exc))
         raise
 
-    authorization = authorize_trade_intent(intent, validation)
-    store.update_proposal_status(
-        proposal_id,
-        APPROVED,
-        approved_at=now_utc.isoformat(),
-        violations=[],
-    )
+    if validation.approved:
+        authorization = authorize_trade_intent(intent, validation)
+        store.update_proposal_status(
+            proposal_id,
+            APPROVED,
+            approved_at=now_utc.isoformat(),
+            violations=[],
+        )
+    else:
+        # Only reachable when override_policy_violations=True and every
+        # violation was override-eligible (the branch above already
+        # raised for anything else). Audit trail: the overridden
+        # violations are recorded on the proposal rather than silently
+        # disappearing into an ordinary approval.
+        authorization = authorize_overridden_trade_intent(intent, validation)
+        store.update_proposal_status(
+            proposal_id,
+            APPROVED,
+            approved_at=now_utc.isoformat(),
+            violations=[],
+            policy_override={"overridden_violations": validation.violations, "overridden_at": now_utc.isoformat()},
+        )
 
     # "submitting" is written BEFORE the broker call (not just around it)
     # so that even a crash between sending the request and receiving a

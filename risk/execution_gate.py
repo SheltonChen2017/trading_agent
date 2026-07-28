@@ -63,6 +63,16 @@ class TradeIntent:
 class ValidationResult:
     approved: bool
     violations: list[str]
+    # Subset of `violations` that are a deliberate risk-preference or
+    # business-calendar call (position/total-exposure/basket/leveraged-ETF
+    # concentration caps, and the earnings blackout window) rather than a
+    # hard safety/data-integrity issue -- these are the only violations
+    # authorize_overridden_trade_intent() below will ever let a human
+    # knowingly proceed past (2026-07 feature). Everything else (stale
+    # price, closed market, a bad bid/ask quote, a duplicate order, the
+    # kill switch, insufficient cash, an invalid intent) can never be
+    # overridden regardless of what else appears in `violations`.
+    overridable_violations: list[str] = dataclasses.field(default_factory=list)
     # HMAC (keyed by this module's process-local secret) over the exact
     # intent this result was computed for AND the approved/rejected
     # outcome. Only validate_trade_intent() can produce a proof that
@@ -161,6 +171,62 @@ def authorize_trade_intent(
     )
 
 
+def authorize_overridden_trade_intent(
+    intent: TradeIntent,
+    validation: ValidationResult,
+    ttl_seconds: int = 120,
+) -> ExecutionAuthorization:
+    """
+    A second, narrowly-scoped path to a real ExecutionAuthorization for a
+    trade validate_trade_intent() REJECTED, used only when every single
+    violation is a deliberate risk-preference/business-calendar call
+    (currently: per-position/total-exposure/basket/leveraged-ETF
+    concentration caps, and the earnings blackout window) that a human
+    can knowingly accept -- never for a violation reflecting unreliable
+    data or a hard safety invariant (stale price, closed market, a bad
+    bid/ask quote, a duplicate order, the kill switch, insufficient cash,
+    an invalid intent). Those always require authorize_trade_intent()'s
+    ordinary approved=True path, and can NEVER be overridden here even if
+    they co-occur with an overridable violation (2026-07 feature,
+    requested to let a user consciously accept e.g. a known earnings-date
+    block when the broker itself would still take the order).
+
+    Independently re-verifies eligibility inside this module rather than
+    trusting the caller's claim: the same HMAC-signed validation_proof
+    mechanism authorize_trade_intent() uses to prove a ValidationResult
+    wasn't hand-constructed is checked here too (against approved=False,
+    since that's what a genuine rejection looks like), and every
+    violation on the result must appear in its own overridable_violations
+    list -- if even one doesn't, this raises exactly like a normal
+    rejection would.
+    """
+    if validation.approved:
+        raise ValueError("Use authorize_trade_intent() for an already-approved validation.")
+    if validation.validation_proof is None or not hmac.compare_digest(
+        validation.validation_proof, _validation_proof(intent, False)
+    ):
+        raise ValueError(
+            "This ValidationResult was not produced by validate_trade_intent(intent, ...) called with "
+            "this exact trade intent -- refusing to authorize an override."
+        )
+    if not validation.violations or any(
+        v not in validation.overridable_violations for v in validation.violations
+    ):
+        raise ValueError(
+            "At least one violation is not override-eligible (only concentration-cap and "
+            "earnings-blackout violations can be overridden) -- refusing to authorize."
+        )
+    now = datetime.now(timezone.utc)
+    expires_at = (now + timedelta(seconds=ttl_seconds)).isoformat()
+    return ExecutionAuthorization(
+        token=secrets.token_urlsafe(32),
+        intent_fingerprint=intent_fingerprint(intent),
+        proof=_authorization_proof(intent, expires_at),
+        approved_at=now.isoformat(),
+        expires_at=expires_at,
+    )
+
+
 def verify_execution_authorization(
     intent: TradeIntent,
     authorization: ExecutionAuthorization | None,
@@ -232,6 +298,12 @@ def validate_trade_intent(
     fills together create 90% exposure).
     """
     violations: list[str] = []
+    overridable_violations: list[str] = []
+
+    def _violate(message: str, overridable: bool = False) -> None:
+        violations.append(message)
+        if overridable:
+            overridable_violations.append(message)
 
     if kill_switch_active:
         return ValidationResult(
@@ -281,9 +353,10 @@ def validate_trade_intent(
         ) + pending_by_ticker.get(intent.ticker.upper(), 0.0)
         new_position_pct = (existing_position_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
         if new_position_pct > max_position_pct * 100:
-            violations.append(
+            _violate(
                 f"Position size would be {new_position_pct:.1f}% of equity, exceeding the "
-                f"{max_position_pct * 100:.1f}% per-position limit."
+                f"{max_position_pct * 100:.1f}% per-position limit.",
+                overridable=True,
             )
 
         # portfolio.cash alone ignores pending/open orders reserving that
@@ -308,9 +381,10 @@ def validate_trade_intent(
         existing_invested = portfolio.total_equity - portfolio.cash + total_pending_buy_value
         new_invested_pct = (existing_invested + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
         if new_invested_pct > max_total_exposure_pct * 100:
-            violations.append(
+            _violate(
                 f"Total invested exposure would be {new_invested_pct:.1f}% of equity, exceeding the "
-                f"{max_total_exposure_pct * 100:.1f}% total-exposure limit."
+                f"{max_total_exposure_pct * 100:.1f}% total-exposure limit.",
+                overridable=True,
             )
 
         for basket_name, basket_tickers in BASKETS.items():
@@ -321,9 +395,10 @@ def validate_trade_intent(
             ) + sum(v for t, v in pending_by_ticker.items() if t in basket_tickers)
             new_basket_pct = (existing_basket_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
             if new_basket_pct > max_basket_pct:
-                violations.append(
+                _violate(
                     f"'{basket_name}' exposure would be {new_basket_pct:.1f}% of equity, exceeding the "
-                    f"{max_basket_pct:.1f}% basket concentration limit."
+                    f"{max_basket_pct:.1f}% basket concentration limit.",
+                    overridable=True,
                 )
 
         if intent.ticker.upper() in LEVERAGED_ETF_TICKERS:
@@ -332,9 +407,10 @@ def validate_trade_intent(
             ) + sum(v for t, v in pending_by_ticker.items() if t in LEVERAGED_ETF_TICKERS)
             new_leveraged_pct = (existing_leveraged_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
             if new_leveraged_pct > max_leveraged_etf_pct:
-                violations.append(
+                _violate(
                     f"Leveraged ETF exposure would be {new_leveraged_pct:.1f}% of equity, exceeding the "
-                    f"{max_leveraged_etf_pct:.1f}% leveraged-ETF limit."
+                    f"{max_leveraged_etf_pct:.1f}% leveraged-ETF limit.",
+                    overridable=True,
                 )
     else:
         held_shares = sum(
@@ -428,15 +504,17 @@ def validate_trade_intent(
         earnings_days_away is not None
         and abs(earnings_days_away) <= earnings_blackout_days
     ):
-        violations.append(
+        _violate(
             f"{intent.ticker} has earnings in {earnings_days_away} day(s), within the "
-            f"{earnings_blackout_days}-day earnings blackout window."
+            f"{earnings_blackout_days}-day earnings blackout window.",
+            overridable=True,
         )
 
     approved = len(violations) == 0
     return ValidationResult(
         approved=approved,
         violations=violations,
+        overridable_violations=overridable_violations,
         validation_proof=_validation_proof(intent, approved),
     )
 

@@ -11,8 +11,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import execution.alpaca_broker as broker
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
-from assistant.execution_service import ProposalExecutionError, execute_approved_paper_proposal
+from assistant.execution_service import (
+    PolicyOverridableBlockError,
+    ProposalExecutionError,
+    execute_approved_paper_proposal,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint, load_policy
+from assistant.proposal_status import POLICY_OVERRIDE_AVAILABLE
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.schemas import DecisionPacket, MarketRegime
 from assistant.storage import AssistantStore
@@ -358,7 +363,7 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
             store.save_proposal(proposal.to_dict())
             order = execute_approved_paper_proposal(
                 proposal.proposal_id,
-                f"APPROVE {proposal.proposal_id}",
+                "approve",
                 packet.portfolio,
                 policy,
                 store,
@@ -390,7 +395,7 @@ def test_approval_rejects_a_policy_with_the_same_version_but_different_content()
             store.save_proposal(proposal.to_dict())
             try:
                 execute_approved_paper_proposal(
-                    proposal.proposal_id, f"APPROVE {proposal.proposal_id}", packet.portfolio,
+                    proposal.proposal_id, "approve", packet.portfolio,
                     edited_policy, store, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
                 assert False, "expected a fingerprint mismatch to block approval despite matching version"
@@ -413,7 +418,7 @@ def test_approval_rejects_when_allow_new_positions_changed():
             store.save_proposal(proposal.to_dict())
             try:
                 execute_approved_paper_proposal(
-                    proposal.proposal_id, f"APPROVE {proposal.proposal_id}", packet.portfolio,
+                    proposal.proposal_id, "approve", packet.portfolio,
                     edited_policy, store, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
                 assert False, "expected a changed allow_new_positions to invalidate the proposal"
@@ -438,7 +443,7 @@ def test_approval_accepts_when_only_notes_changed():
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
             order = execute_approved_paper_proposal(
-                proposal.proposal_id, f"APPROVE {proposal.proposal_id}", packet.portfolio,
+                proposal.proposal_id, "approve", packet.portfolio,
                 edited_policy, store, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
             )
             assert order["order_id"] == "paper-1"
@@ -463,7 +468,7 @@ def test_approval_rejects_a_proposal_missing_policy_fingerprint():
             store.save_proposal(proposal_dict)
             try:
                 execute_approved_paper_proposal(
-                    proposal_dict["proposal_id"], f"APPROVE {proposal_dict['proposal_id']}", packet.portfolio,
+                    proposal_dict["proposal_id"], "approve", packet.portfolio,
                     policy, store, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
                 assert False, "expected a proposal missing policy_fingerprint to fail closed"
@@ -487,7 +492,7 @@ def test_approval_fails_closed_when_open_orders_unavailable():
             try:
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     unreliable_portfolio,
                     policy,
                     store,
@@ -514,7 +519,7 @@ def test_approval_blocked_when_earnings_are_near():
             try:
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,
@@ -523,6 +528,125 @@ def test_approval_blocked_when_earnings_are_near():
                 assert False, "expected the earnings blackout to block this proposal"
             except ProposalExecutionError as exc:
                 assert "earnings" in str(exc).lower()
+            assert len(captured) == 0
+    finally:
+        restore()
+
+
+def test_earnings_only_block_raises_overridable_error_and_leaves_proposal_re_claimable():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price, earnings_available=True)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected an overridable earnings-blackout block"
+            except PolicyOverridableBlockError as exc:
+                assert any("earnings" in v.lower() for v in exc.overridable_violations)
+            assert len(captured) == 0
+            assert store.get_proposal(proposal.proposal_id)["status"] == POLICY_OVERRIDE_AVAILABLE
+    finally:
+        restore()
+
+
+def test_override_flag_proceeds_past_an_earnings_only_block_and_records_it():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price, earnings_available=True)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            order = execute_approved_paper_proposal(
+                proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                override_policy_violations=True,
+            )
+            assert order["status"] == "accepted"
+            assert len(captured) == 1
+            stored = store.get_proposal(proposal.proposal_id)
+            assert stored["status"] == "executed"
+            assert "policy_override" in stored
+            assert any("earnings" in v.lower() for v in stored["policy_override"]["overridden_violations"])
+    finally:
+        restore()
+
+
+def test_override_flag_does_not_bypass_a_non_overridable_violation_alongside_it():
+    # Stale quote (non-overridable) + earnings blackout (overridable) together
+    # -- override_policy_violations=True must still block on the stale quote.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    stale_timestamp = datetime(2026, 7, 20, 9, 0, tzinfo=timezone.utc)
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal.reference_price, quote_timestamp=stale_timestamp, earnings_available=True,
+    )
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                )
+                assert False, "expected the stale-quote violation to still block despite override=True"
+            except PolicyOverridableBlockError:
+                assert False, "a non-overridable violation must raise plain ProposalExecutionError, not the overridable variant"
+            except ProposalExecutionError as exc:
+                assert "staleness" in str(exc).lower()
+            assert len(captured) == 0
+            assert store.get_proposal(proposal.proposal_id)["status"] == "blocked"
+    finally:
+        restore()
+
+
+def test_confirmation_phrase_is_case_insensitive_and_whitespace_tolerant():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            order = execute_approved_paper_proposal(
+                proposal.proposal_id, "  Approve  ", packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert order["status"] == "accepted"
+            assert len(captured) == 1
+    finally:
+        restore()
+
+
+def test_confirmation_phrase_rejects_the_old_approve_plus_id_format():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, f"APPROVE {proposal.proposal_id}", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "the old 'APPROVE <id>' phrase should no longer be accepted"
+            except ProposalExecutionError as exc:
+                assert "approve" in str(exc).lower()
             assert len(captured) == 0
     finally:
         restore()
@@ -543,7 +667,7 @@ def test_approval_blocked_when_quote_is_stale():
             try:
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,
@@ -618,7 +742,7 @@ def test_expired_approval_attempt_cannot_alter_an_executed_proposal():
             store.save_proposal(proposal.to_dict())
             execute_approved_paper_proposal(
                 proposal.proposal_id,
-                f"APPROVE {proposal.proposal_id}",
+                "approve",
                 packet.portfolio,
                 policy,
                 store,
@@ -632,7 +756,7 @@ def test_expired_approval_attempt_cannot_alter_an_executed_proposal():
             try:
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,
@@ -659,7 +783,7 @@ def test_require_earnings_data_blocks_buy_when_unavailable_but_not_sell():
             try:
                 execute_approved_paper_proposal(
                     buy_proposal["proposal_id"],
-                    f"APPROVE {buy_proposal['proposal_id']}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,
@@ -679,7 +803,7 @@ def test_require_earnings_data_blocks_buy_when_unavailable_but_not_sell():
             store2.save_proposal(sell_proposal.to_dict())
             order = execute_approved_paper_proposal(
                 sell_proposal.proposal_id,
-                f"APPROVE {sell_proposal.proposal_id}",
+                "approve",
                 packet.portfolio,
                 policy,
                 store2,
@@ -710,7 +834,7 @@ def test_unexpected_exception_during_validation_marks_validation_failed_not_stuc
             try:
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,
@@ -744,7 +868,7 @@ def test_core_service_enforces_kill_switch_env_var_even_without_the_argument():
             try:
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,
@@ -775,7 +899,7 @@ def test_wide_spread_blocks_a_market_order():
             try:
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,
@@ -868,7 +992,7 @@ def test_pending_buy_value_lookup_failure_blocks_a_buy_approval():
             store.save_proposal(proposal)
             try:
                 execute_approved_paper_proposal(
-                    proposal_id, f"APPROVE {proposal_id}", packet.portfolio, policy, store,
+                    proposal_id, "approve", packet.portfolio, policy, store,
                     now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
                 assert False, "expected the pending-order quote failure to block this buy"
@@ -897,7 +1021,7 @@ def test_pending_buy_value_lookup_failure_does_not_block_a_sell_approval():
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal)
             order = execute_approved_paper_proposal(
-                proposal_id, f"APPROVE {proposal_id}", packet.portfolio, policy, store,
+                proposal_id, "approve", packet.portfolio, policy, store,
                 now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
             )
             assert order["order_id"] == "paper-1"
@@ -1027,7 +1151,7 @@ def test_notional_only_pending_order_blocks_a_duplicate_proposal_on_the_same_tic
             store.save_proposal(proposal)
             try:
                 execute_approved_paper_proposal(
-                    proposal_id, f"APPROVE {proposal_id}", packet.portfolio, policy, store,
+                    proposal_id, "approve", packet.portfolio, policy, store,
                     now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
                 assert False, "expected the notional-only pending order to be detected as a duplicate"
@@ -1071,7 +1195,7 @@ def test_limit_order_routes_to_submit_limit_order_not_market():
             store.save_proposal(limit_proposal)
             order = execute_approved_paper_proposal(
                 proposal_id,
-                f"APPROVE {proposal_id}",
+                "approve",
                 packet.portfolio,
                 policy,
                 store,
@@ -1106,7 +1230,7 @@ def test_ambiguous_submission_failure_reconciles_to_executed_when_broker_actuall
             store.save_proposal(proposal.to_dict())
             order = execute_approved_paper_proposal(
                 proposal.proposal_id,
-                f"APPROVE {proposal.proposal_id}",
+                "approve",
                 packet.portfolio,
                 policy,
                 store,
@@ -1144,7 +1268,7 @@ def test_ambiguous_submission_failure_marks_submission_unknown_when_unconfirmabl
             try:
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,
@@ -1190,7 +1314,7 @@ def test_ambiguous_submission_failure_marks_submission_failed_when_broker_confir
             try:
                 execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,
@@ -1326,7 +1450,7 @@ def test_record_broker_order_failure_after_acceptance_still_marks_executed():
             try:
                 order = execute_approved_paper_proposal(
                     proposal.proposal_id,
-                    f"APPROVE {proposal.proposal_id}",
+                    "approve",
                     packet.portfolio,
                     policy,
                     store,

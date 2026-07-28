@@ -39,7 +39,11 @@ from assistant.allocation_proposals import (
     generate_allocation_buy_proposals,
 )
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
-from assistant.execution_service import execute_approved_paper_proposal, reconcile_submission
+from assistant.execution_service import (
+    PolicyOverridableBlockError,
+    execute_approved_paper_proposal,
+    reconcile_submission,
+)
 from assistant.explanations import explain_ticker
 from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
@@ -55,6 +59,7 @@ from assistant.stock_lookup import (
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
 from config import LEVERAGED_ETF_TICKERS, PAPER_TRADING, UNIVERSE
+from data.event_data import fetch_upcoming_earnings
 from data.market_data import fetch_historical
 from execution.alpaca_broker import is_configured
 from strategies.trend_vol_rotation import classify_trend
@@ -92,12 +97,14 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
     """One proposal card with the typed-confirmation approve flow.
     Shared by the Propose & Approve tab and the Watchlist tab's
     allocation-buy feature -- identical safety flow everywhere a
-    proposal can be approved: type the exact "APPROVE <id>" phrase, or
+    proposal can be approved: type the exact "approve" phrase, or
     the submit button stays disabled."""
     intent = proposal["intent"]
+    proposal_id = proposal["proposal_id"]
+    override_key = f"override_available_{proposal_id}"
     with st.container(border=True):
         st.subheader(f"{intent['side'].upper()} {intent['shares']} {intent['ticker']}")
-        st.caption(f"{proposal['proposal_id']} -- evidence_status: {proposal['evidence_status']}")
+        st.caption(f"{proposal_id} -- evidence_status: {proposal['evidence_status']}")
         st.write(f"Reference price: ${proposal['reference_price']:,.2f}")
         for reason in proposal["reasons"]:
             st.write(f"- {reason}")
@@ -110,15 +117,14 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
             for uncertainty in proposal["uncertainties"]:
                 st.write(f"- {uncertainty}")
 
-        required_phrase = f"APPROVE {proposal['proposal_id']}"
-        st.write(f"To submit this order, type the exact phrase below: `{required_phrase}`")
+        st.write("To submit this order, type the exact phrase below: `approve`")
         typed = st.text_input(
-            "Confirmation phrase", key=f"confirm_{proposal['proposal_id']}", label_visibility="collapsed"
+            "Confirmation phrase", key=f"confirm_{proposal_id}", label_visibility="collapsed"
         )
-        submit_disabled = typed != required_phrase
+        submit_disabled = typed.strip().lower() != "approve"
         if st.button(
             "Submit paper order",
-            key=f"submit_{proposal['proposal_id']}",
+            key=f"submit_{proposal_id}",
             disabled=submit_disabled,
         ):
             if not is_configured():
@@ -128,7 +134,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                     approve_policy = load_policy(policy_path)
                     portfolio = build_portfolio_snapshot_from_alpaca()
                     order = execute_approved_paper_proposal(
-                        proposal["proposal_id"],
+                        proposal_id,
                         typed,
                         portfolio,
                         approve_policy,
@@ -136,12 +142,48 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                         now_et=_now_eastern(),
                         kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
                     )
+                    st.session_state.pop(override_key, None)
                     st.success(
                         f"Submitted paper order {order['order_id']}: "
                         f"{order['side'].upper()} {order['shares']} {order['ticker']} [{order['status']}]"
                     )
+                except PolicyOverridableBlockError as exc:
+                    st.session_state[override_key] = list(exc.overridable_violations)
                 except Exception as exc:
+                    st.session_state.pop(override_key, None)
                     st.error(f"Order not submitted: {exc}")
+
+        if st.session_state.get(override_key):
+            st.warning(
+                "Blocked only by risk-preference/earnings-calendar checks, not unreliable data -- "
+                "the broker itself would still accept this order:\n"
+                + "\n".join(f"- {v}" for v in st.session_state[override_key])
+            )
+            if st.button("Override and submit anyway", key=f"override_submit_{proposal_id}"):
+                if not is_configured():
+                    st.error("Alpaca paper credentials are required for approval execution.")
+                else:
+                    try:
+                        approve_policy = load_policy(policy_path)
+                        portfolio = build_portfolio_snapshot_from_alpaca()
+                        order = execute_approved_paper_proposal(
+                            proposal_id,
+                            "approve",
+                            portfolio,
+                            approve_policy,
+                            store,
+                            now_et=_now_eastern(),
+                            kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                            override_policy_violations=True,
+                        )
+                        st.session_state.pop(override_key, None)
+                        st.success(
+                            f"Submitted paper order {order['order_id']} (policy override applied): "
+                            f"{order['side'].upper()} {order['shares']} {order['ticker']} [{order['status']}]"
+                        )
+                    except Exception as exc:
+                        st.session_state.pop(override_key, None)
+                        st.error(f"Order not submitted: {exc}")
 
 
 def _allocation_input_signature(
@@ -377,6 +419,10 @@ with tab_watchlist:
 
     if st.button("Check cart", type="primary", disabled=not cart):
         _, watchlist_packet = _load_packet(policy_path, include_events=False)
+        try:
+            earnings_by_ticker = fetch_upcoming_earnings(cart)
+        except Exception:
+            earnings_by_ticker = {}
         results = {}
         for ticker in cart:
             try:
@@ -405,6 +451,7 @@ with tab_watchlist:
                     "hold_range": hold_range,
                     "news": news,
                     "news_summary": news_summary,
+                    "earnings": earnings_by_ticker.get(ticker, {"available": False}),
                 }
             except Exception as exc:
                 results[ticker] = {"error": str(exc)}
@@ -593,6 +640,46 @@ with tab_watchlist:
                     "cart ticker at its current price."
                 )
 
+        if st.session_state.get("allocation_proposals"):
+            st.subheader("Execute transaction per the suggested allocation")
+            st.caption(
+                "Submits every proposal above in one pass, spending the predetermined amount across the "
+                "split shown -- rechecks available cash fresh before each ticker so an earlier fill in "
+                "this same batch can't cause the next one to overspend. A ticker blocked only by an "
+                "override-eligible check (a concentration cap or the earnings blackout) still shows up as "
+                "a per-ticker failure here -- use that ticker's own card below to override it individually "
+                "if you want to proceed with just that one."
+            )
+            bulk_typed = st.text_input(
+                'Type the exact phrase below to execute all: "I approve this transaction"',
+                key="allocation_bulk_confirm",
+            )
+            if st.button(
+                "Execute all proposals in this split",
+                type="primary",
+                disabled=bulk_typed.strip() != "I approve this transaction",
+            ):
+                if not is_configured():
+                    st.error("Alpaca paper credentials are required for approval execution.")
+                else:
+                    approve_policy = load_policy(policy_path)
+                    for p in st.session_state.get("allocation_proposals", []):
+                        ticker = p["intent"]["ticker"]
+                        try:
+                            portfolio = build_portfolio_snapshot_from_alpaca()
+                            order = execute_approved_paper_proposal(
+                                p["proposal_id"],
+                                "approve",
+                                portfolio,
+                                approve_policy,
+                                store,
+                                now_et=_now_eastern(),
+                                kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                            )
+                            st.success(f"{ticker}: submitted order {order['order_id']} [{order['status']}]")
+                        except Exception as exc:
+                            st.error(f"{ticker}: not submitted -- {exc}")
+
         for proposal in st.session_state.get("allocation_proposals", []):
             _render_proposal_approval(proposal, store, policy_path)
 
@@ -609,6 +696,15 @@ with tab_watchlist:
             if current_price is not None:
                 st.metric("Current price", f"${current_price:,.2f}", help=f"Last close, as of {result['price_as_of']}")
             st.write(f"Own trend (200-day): **{trend_str}** -- Own volatility (20d/60d blend): **{vol_str}**")
+
+            earnings = result.get("earnings") or {"available": False}
+            if earnings.get("available"):
+                st.write(
+                    f"Next earnings: **{earnings['event_date']}** ({earnings['days_away']:+d} day(s)) -- "
+                    "trading blocked within your policy's earnings-blackout window either side of this date."
+                )
+            else:
+                st.caption("Next earnings date: unavailable.")
 
             price_history = result.get("price_history")
             if price_history is not None and not price_history.empty:

@@ -216,6 +216,129 @@ def test_execution_authorization_cannot_be_replayed_after_first_use():
         assert "already been consumed" in str(exc)
 
 
+# --- token bound into the HMAC proof (GPT review, 2026-07-31, reproduced):
+# _authorization_proof() previously signed only intent+expires_at, so the
+# replay-protection token itself was entirely UNSIGNED --
+# dataclasses.replace(authorization, token="anything") kept the exact
+# same valid proof, letting a copy with a fresh, never-consumed token
+# bypass the one-time-use check while keeping a valid intent+expiry
+# binding.
+
+def _fresh_authorization():
+    intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
+    portfolio = build_portfolio_snapshot(
+        [{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 100.0}], cash=1000.0,
+    )
+    validation = validate_trade_intent(intent, portfolio, reference_price=100.0)
+    assert validation.approved
+    return intent, authorize_trade_intent(intent, validation)
+
+
+def test_replacing_only_the_token_invalidates_the_proof():
+    intent, authorization = _fresh_authorization()
+    replacement = dataclasses.replace(authorization, token="replacement-token-not-bound-by-proof")
+    try:
+        verify_execution_authorization(intent, replacement)
+        assert False, "expected a swapped token to invalidate the proof"
+    except PermissionError as exc:
+        assert "does not match" in str(exc)
+
+
+def test_replacing_only_expires_at_invalidates_the_proof():
+    intent, authorization = _fresh_authorization()
+    far_future = (datetime.now(timezone.utc) + timedelta(days=365)).isoformat()
+    replacement = dataclasses.replace(authorization, expires_at=far_future)
+    try:
+        verify_execution_authorization(intent, replacement)
+        assert False, "expected a swapped expires_at to invalidate the proof"
+    except PermissionError as exc:
+        assert "does not match" in str(exc)
+
+
+def test_replacing_the_intent_invalidates_the_proof():
+    intent, authorization = _fresh_authorization()
+    different_intent = TradeIntent(ticker="AAPL", side="sell", shares=3)
+    try:
+        verify_execution_authorization(different_intent, authorization)
+        assert False, "expected a different intent to invalidate the proof"
+    except PermissionError as exc:
+        assert "does not match" in str(exc)
+
+
+def test_empty_token_is_rejected():
+    intent, authorization = _fresh_authorization()
+    tokenless = dataclasses.replace(authorization, token="")
+    try:
+        verify_execution_authorization(intent, tokenless)
+        assert False, "expected an empty token to be rejected"
+    except PermissionError as exc:
+        assert "empty or missing token" in str(exc)
+
+
+def test_two_independently_issued_authorizations_have_different_tokens_and_proofs():
+    intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
+    portfolio = build_portfolio_snapshot(
+        [{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 100.0}], cash=1000.0,
+    )
+    validation = validate_trade_intent(intent, portfolio, reference_price=100.0)
+    first = authorize_trade_intent(intent, validation)
+    second = authorize_trade_intent(intent, validation)
+    assert first.token != second.token
+    assert first.proof != second.proof
+
+
+def test_consuming_one_independently_issued_authorization_does_not_consume_the_other():
+    intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
+    portfolio = build_portfolio_snapshot(
+        [{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 100.0}], cash=1000.0,
+    )
+    validation = validate_trade_intent(intent, portfolio, reference_price=100.0)
+    first = authorize_trade_intent(intent, validation)
+    second = authorize_trade_intent(intent, validation)
+    verify_execution_authorization(intent, first)  # consumes `first` only
+    verify_execution_authorization(intent, second)  # must still succeed independently
+    try:
+        verify_execution_authorization(intent, second)  # NOW replaying `second` must fail
+        assert False, "expected a replay of the second authorization to be rejected"
+    except PermissionError as exc:
+        assert "already been consumed" in str(exc)
+
+
+def test_expired_consumed_tokens_are_pruned_without_re_enabling_the_original():
+    from risk.execution_gate import _consumed_authorization_tokens
+
+    intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
+    portfolio = build_portfolio_snapshot(
+        [{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 100.0}], cash=1000.0,
+    )
+    validation = validate_trade_intent(intent, portfolio, reference_price=100.0)
+    authorization = authorize_trade_intent(intent, validation, ttl_seconds=1)
+    now = datetime.now(timezone.utc)
+    verify_execution_authorization(intent, authorization, now=now)  # consumes it while still valid
+    assert authorization.token in _consumed_authorization_tokens
+
+    # The original, now-expired authorization must stay rejected (on the
+    # expiry check itself, well before any pruning pass) no matter how
+    # much time has passed -- never re-enabled just because its entry
+    # might later be pruned from the bookkeeping dict.
+    much_later = now + timedelta(seconds=10)
+    try:
+        verify_execution_authorization(intent, authorization, now=much_later)
+        assert False, "expected an expired authorization to remain rejected"
+    except PermissionError as exc:
+        assert "expired" in str(exc).lower()
+
+    # A separate, freshly-issued (still-valid) authorization verified at
+    # that same later time triggers the pruning pass as a side effect --
+    # confirms the bookkeeping dict actually shrinks rather than growing
+    # unboundedly, without needing the original to become executable.
+    fresh_validation = validate_trade_intent(intent, portfolio, reference_price=100.0)
+    fresh_authorization = authorize_trade_intent(intent, fresh_validation, ttl_seconds=120)
+    verify_execution_authorization(intent, fresh_authorization, now=much_later)
+    assert authorization.token not in _consumed_authorization_tokens
+    assert fresh_authorization.token in _consumed_authorization_tokens
+
+
 def test_authorize_trade_intent_rejects_a_validation_result_for_a_different_intent():
     # Regression test (Codex review, 2026-07-27): a ValidationResult must
     # actually have been produced by validating THIS intent -- otherwise

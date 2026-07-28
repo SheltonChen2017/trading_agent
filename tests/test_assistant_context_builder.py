@@ -2,8 +2,11 @@
 Sanity tests for assistant/context_builder.py and schemas.py. Run with:
 python tests/test_assistant_context_builder.py
 """
+import json
+import sqlite3
 import sys
 import tempfile
+from datetime import datetime, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -197,6 +200,187 @@ def test_audit_log_round_trips_decision_packets():
         assert entries[0]["portfolio"]["positions"][0]["ticker"] == "AAA"
 
 
+# --- AssistantStore.save_decision_packet() deduplication + retention
+# (GPT review, 2026-07-31): the UI layer now caches packets via
+# st.cache_data, so a page reload, a new browser tab, or a second
+# session had no server-side way to recognize "this is the same cached
+# packet I already saved" -- deduplication needed to live in storage
+# (keyed by generated_at, which build_decision_packet() sets exactly
+# once per real build), not only in UI session state.
+
+def _decision_packet(generated_at: str, cash: float = 50.0):
+    from assistant.schemas import DecisionPacket, MarketRegime
+
+    positions = [{"ticker": "AAA", "shares": 1, "entry_price": 10.0, "current_price": 11.0}]
+    snapshot = build_portfolio_snapshot(positions, cash=cash)
+    risk = build_risk_exposure(snapshot)
+    return DecisionPacket(
+        generated_at=generated_at, portfolio=snapshot, risk=risk,
+        regime=MarketRegime(benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
+                             trailing_volatility_pct=1.0, as_of="2026-01-01"),
+        signals=[], upcoming_events=[], warnings=[],
+    )
+
+
+def test_save_decision_packet_two_sessions_saving_the_same_packet_produce_one_row():
+    from assistant.storage import AssistantStore
+
+    packet = _decision_packet("2026-07-31T10:00:00+00:00")
+    with tempfile.TemporaryDirectory() as tmp:
+        db_path = Path(tmp) / "assistant.db"
+        # Two separate AssistantStore instances stand in for two
+        # independent browser-like sessions saving the exact same
+        # st.cache_data-cached packet -- neither has any shared in-memory
+        # state with the other.
+        session_a = AssistantStore(db_path)
+        session_b = AssistantStore(db_path)
+        id_a = session_a.save_decision_packet(packet)
+        id_b = session_b.save_decision_packet(packet)
+        assert id_a == id_b  # same row, not a new duplicate
+
+        conn = sqlite3.connect(db_path)
+        try:
+            count = conn.execute(
+                "SELECT COUNT(*) FROM decision_packets WHERE generated_at = ?", (packet.generated_at,)
+            ).fetchone()[0]
+        finally:
+            conn.close()
+        assert count == 1
+
+
+def test_save_decision_packet_two_different_packets_produce_two_rows():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        id_a = store.save_decision_packet(_decision_packet("2026-07-31T10:00:00+00:00"))
+        id_b = store.save_decision_packet(_decision_packet("2026-07-31T10:00:15+00:00"))
+        assert id_a != id_b
+
+
+def test_save_decision_packet_duplicate_insert_does_not_overwrite_the_original_payload():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        db_path = Path(tmp) / "assistant.db"
+        store = AssistantStore(db_path)
+        original = _decision_packet("2026-07-31T10:00:00+00:00", cash=50.0)
+        store.save_decision_packet(original)
+        # A packet sharing the SAME generated_at but (hypothetically)
+        # different content must never overwrite the original row --
+        # generated_at identity wins, the original payload is preserved.
+        changed = _decision_packet("2026-07-31T10:00:00+00:00", cash=99_999.0)
+        store.save_decision_packet(changed)
+
+        conn = sqlite3.connect(db_path)
+        conn.row_factory = sqlite3.Row
+        try:
+            row = conn.execute(
+                "SELECT payload_json FROM decision_packets WHERE generated_at = ?", (original.generated_at,)
+            ).fetchone()
+        finally:
+            conn.close()
+        stored_cash = json.loads(row["payload_json"])["portfolio"]["cash"]
+        assert stored_cash == 50.0  # the ORIGINAL payload, not the later duplicate
+
+
+def test_prune_decision_packets_older_than_deletes_only_old_rows():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        old_packet = _decision_packet("2020-01-01T00:00:00+00:00")
+        recent_packet = _decision_packet(datetime.now(timezone.utc).isoformat())
+        store.save_decision_packet(old_packet)
+        store.save_decision_packet(recent_packet)
+
+        deleted = store.prune_decision_packets_older_than(days=30)
+        assert deleted == 1
+
+        conn = sqlite3.connect(store.path)
+        try:
+            remaining = [
+                r[0] for r in conn.execute("SELECT generated_at FROM decision_packets").fetchall()
+            ]
+        finally:
+            conn.close()
+        assert old_packet.generated_at not in remaining
+        assert recent_packet.generated_at in remaining
+
+
+def test_prune_decision_packets_rejects_non_positive_days():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        for bad_days in (0, -5):
+            try:
+                store.prune_decision_packets_older_than(days=bad_days)
+                assert False, f"expected days={bad_days} to raise"
+            except ValueError:
+                pass
+
+
+def test_prune_decision_packets_never_touches_proposals_or_broker_orders():
+    # No FK relationship from trade_proposals/broker_orders to
+    # decision_packets exists in this schema -- pruning must only ever
+    # affect the decision_packets table.
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        store.save_decision_packet(_decision_packet("2020-01-01T00:00:00+00:00"))
+        store.save_proposal(
+            {
+                "proposal_id": "tp_test", "created_at": "2020-01-01T00:00:00+00:00",
+                "expires_at": "2099-01-01T00:00:00+00:00", "status": "proposed",
+                "idempotency_key": "idem-test",
+                "intent": {"ticker": "AAA", "side": "sell", "shares": 1},
+            }
+        )
+        store.prune_decision_packets_older_than(days=1)
+        assert store.get_proposal("tp_test") is not None
+
+
+def test_pruning_a_pre_existing_db_with_duplicate_generated_at_rows_does_not_crash():
+    # Regression guard for the migration itself: a pre-existing database
+    # (from before this fix) could already contain duplicate generated_at
+    # rows -- CREATE UNIQUE INDEX would fail outright on those. Confirms
+    # _initialize()'s deduplication-before-indexing runs safely by
+    # manually inserting duplicates through a raw connection (bypassing
+    # save_decision_packet()'s own dedup logic) before AssistantStore
+    # ever creates the unique index, then re-opening the store.
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        db_path = Path(tmp) / "assistant.db"
+        conn = sqlite3.connect(db_path)
+        try:
+            conn.execute(
+                "CREATE TABLE decision_packets (id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                "generated_at TEXT NOT NULL, schema_version TEXT NOT NULL, payload_json TEXT NOT NULL)"
+            )
+            conn.execute(
+                "INSERT INTO decision_packets(generated_at, schema_version, payload_json) VALUES (?, ?, ?)",
+                ("2026-07-31T10:00:00+00:00", "2.0", "{}"),
+            )
+            conn.execute(
+                "INSERT INTO decision_packets(generated_at, schema_version, payload_json) VALUES (?, ?, ?)",
+                ("2026-07-31T10:00:00+00:00", "2.0", "{}"),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+        store = AssistantStore(db_path)  # must not raise despite the pre-existing duplicate
+        conn = sqlite3.connect(db_path)
+        try:
+            count = conn.execute("SELECT COUNT(*) FROM decision_packets").fetchone()[0]
+        finally:
+            conn.close()
+        assert count == 1
+
+
 def test_build_portfolio_snapshot_from_alpaca_uses_broker_data():
     original_get_account = broker.get_account
     original_get_positions = broker.get_open_positions
@@ -263,6 +447,13 @@ if __name__ == "__main__":
     test_decision_packet_to_dict_is_json_serializable()
     test_decision_packet_to_dict_reaches_nested_signal_authority_fields()
     test_audit_log_round_trips_decision_packets()
+    test_save_decision_packet_two_sessions_saving_the_same_packet_produce_one_row()
+    test_save_decision_packet_two_different_packets_produce_two_rows()
+    test_save_decision_packet_duplicate_insert_does_not_overwrite_the_original_payload()
+    test_prune_decision_packets_older_than_deletes_only_old_rows()
+    test_prune_decision_packets_rejects_non_positive_days()
+    test_prune_decision_packets_never_touches_proposals_or_broker_orders()
+    test_pruning_a_pre_existing_db_with_duplicate_generated_at_rows_does_not_crash()
     test_build_portfolio_snapshot_from_alpaca_uses_broker_data()
     test_build_decision_packet_falls_back_when_alpaca_not_configured()
     test_build_decision_packet_uses_live_alpaca_when_configured()

@@ -18,6 +18,7 @@ from data.market_data import fetch_historical
 from signals.breakout import scan_52_week_breakout
 from signals.scanner import scan_dips_and_ups
 from assistant.context_builder import KNOWN_FINDINGS, build_market_regime
+from assistant.research_registry import underfilled_dataset_warning
 from assistant.schemas import MarketRegime, PortfolioSnapshot
 
 PER_TICKER_SCAN_FNS = {
@@ -79,6 +80,15 @@ def explain_ticker(
             {
                 "label": e.label, "claim": e.claim, "status": e.status.value, "detail": e.detail, "source": e.source,
                 "ticker_specific": bool(e.relevant_tickers),
+                # display_status/production_authoritative (GPT review,
+                # 2026-07-29): a confirmed/promising finding not yet
+                # re-verified since the fetch_historical lookback-days
+                # fix must never be shown as an unqualified "confirmed"
+                # result -- callers must use display_status, not status,
+                # for anything user-facing.
+                "display_status": e.display_status,
+                "production_authoritative": e.production_authoritative,
+                "dataset_warning": underfilled_dataset_warning(e.provenance) if e.provenance is not None else None,
             }
             for e in relevant_findings
         ],

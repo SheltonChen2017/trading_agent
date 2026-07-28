@@ -20,8 +20,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.audit_log import append_decision_packet
 from assistant.context_builder import build_decision_packet
+from assistant.research_registry import underfilled_dataset_warning
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
-from assistant.schemas import EvidenceStatus
 from assistant.storage import AssistantStore
 from execution.alpaca_broker import is_configured
 
@@ -76,16 +76,18 @@ def main():
 
     _print_section("Relevant research evidence")
     for s in packet.signals:
-        marker = {
-            EvidenceStatus.CONFIRMED: "[CONFIRMED]",
-            EvidenceStatus.PROMISING_UNCONFIRMED: "[PROMISING/UNCONFIRMED]",
-            EvidenceStatus.EXPLORATORY: "[EXPLORATORY]",
-            EvidenceStatus.REJECTED: "[REJECTED]",
-            EvidenceStatus.UNAVAILABLE: "[UNAVAILABLE]",
-        }[s.status]
-        print(f"{marker} {s.label}")
+        # display_status appends an explicit, hard-to-miss qualifier for
+        # any confirmed/promising finding that hasn't been re-verified
+        # since the fetch_historical lookback-days fix -- never prints a
+        # bare "[CONFIRMED]" for a finding that isn't currently
+        # production-authoritative (GPT review, 2026-07-29).
+        print(f"[{s.display_status.upper()}] {s.label}")
         print(f"    Claim: {s.claim}")
         print(f"    {s.detail}")
+        if s.provenance is not None:
+            warning = underfilled_dataset_warning(s.provenance)
+            if warning:
+                print(f"    ! {warning}")
 
     _print_section("Upcoming events")
     for e in packet.upcoming_events:

@@ -27,7 +27,25 @@ import os
 import pandas as pd
 
 from config import PAPER_TRADING
-from risk.execution_gate import ExecutionAuthorization, TradeIntent, verify_execution_authorization
+from risk.execution_gate import (
+    ExecutionAuthorization,
+    TradeIntent,
+    is_valid_share_quantity,
+    verify_execution_authorization,
+)
+
+
+def _require_valid_shares(shares: object) -> None:
+    """Defense in depth (GPT review, 2026-07-29): this module is the last
+    line of defense before a real broker call, and must not rely solely
+    on validate_trade_intent() having already run correctly -- a plain
+    `shares <= 0` check does not reject NaN (every ordered comparison
+    against NaN is False in Python), so a NaN share count previously
+    reached client.submit_order() with zero protection here."""
+    if not is_valid_share_quantity(shares):
+        raise ValueError(
+            f"shares must be a positive whole number (int), got {shares!r} ({type(shares).__name__})."
+        )
 
 
 class AlpacaNotConfigured(RuntimeError):
@@ -216,8 +234,7 @@ def submit_market_order(
             "is not set to 'I_UNDERSTAND'. Refusing to submit a live order as a "
             "safety check — set that env var only once you truly mean to trade live."
         )
-    if shares <= 0:
-        raise ValueError(f"shares must be positive, got {shares}")
+    _require_valid_shares(shares)
     if side not in ("buy", "sell"):
         raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
     intent = TradeIntent(ticker=ticker, shares=shares, side=side)
@@ -259,8 +276,7 @@ def submit_limit_order(
             "is not set to 'I_UNDERSTAND'. Refusing to submit a live order as a "
             "safety check — set that env var only once you truly mean to trade live."
         )
-    if shares <= 0:
-        raise ValueError(f"shares must be positive, got {shares}")
+    _require_valid_shares(shares)
     if side not in ("buy", "sell"):
         raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
     intent = TradeIntent(ticker=ticker, shares=shares, side=side, order_type="limit", limit_price=limit_price)
@@ -305,8 +321,7 @@ def submit_stop_loss_order(
             "is not set to 'I_UNDERSTAND'. Refusing to submit a live order."
         )
 
-    if shares <= 0:
-        raise ValueError(f"shares must be positive, got {shares}")
+    _require_valid_shares(shares)
     verify_execution_authorization(
         TradeIntent(
             ticker=ticker,

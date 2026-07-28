@@ -252,11 +252,37 @@ class PolicyOverridableBlockError(ProposalExecutionError):
         self.overridable_violations = overridable_violations
 
 
+def _shares_from_stored_value(raw_shares: object) -> int:
+    """Converts a stored proposal's `shares` field to an int WITHOUT ever
+    silently truncating a malformed value -- a bare `int(raw["shares"])`
+    used to turn a corrupted or hand-edited row's `shares: 1.9` into `1`
+    with no error at all (GPT review, 2026-07-29: `int()` truncates
+    toward zero rather than rejecting a non-whole value). Raises
+    ValueError (caught by this module's callers, which already treat a
+    malformed stored intent as a hard, fail-closed error) for anything
+    that isn't a real whole-share quantity: a bool, a non-finite float, a
+    fractional float, or a non-numeric value."""
+    if isinstance(raw_shares, bool):
+        raise ValueError(f"Stored shares value is a bool ({raw_shares!r}), not a share quantity.")
+    if isinstance(raw_shares, int):
+        return raw_shares
+    if isinstance(raw_shares, float):
+        if not math.isfinite(raw_shares):
+            raise ValueError(f"Stored shares value is not finite: {raw_shares!r}.")
+        if not raw_shares.is_integer():
+            raise ValueError(
+                f"Stored shares value {raw_shares!r} is fractional, not a whole share count -- refusing "
+                "to silently truncate it."
+            )
+        return int(raw_shares)
+    raise ValueError(f"Stored shares value {raw_shares!r} ({type(raw_shares).__name__}) is not numeric.")
+
+
 def _intent_from_dict(raw: dict) -> TradeIntent:
     return TradeIntent(
         ticker=raw["ticker"],
         side=raw["side"],
-        shares=int(raw["shares"]),
+        shares=_shares_from_stored_value(raw["shares"]),
         order_type=raw.get("order_type", "market"),
         limit_price=raw.get("limit_price"),
         rationale=raw.get("rationale", ""),
@@ -575,7 +601,19 @@ def validate_proposal_for_execution(
                 error="Opening new positions is disabled by policy.",
             )
 
-    recent_intents = [_intent_from_dict(raw) for raw in store.recent_executed_intents()]
+    try:
+        recent_intents = [_intent_from_dict(raw) for raw in store.recent_executed_intents()]
+    except Exception as exc:
+        # A malformed HISTORICAL row (e.g. a hand-edited or corrupted
+        # shares value now caught by _shares_from_stored_value()) must
+        # fail this proposal closed the same way a malformed CURRENT
+        # intent already does above, not raise uncaught out of this
+        # read-only function (preflight_allocation_batch() calls this
+        # directly, with no surrounding try/except of its own).
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=intent, validation=None,
+            error=f"Could not check recent order history for duplicates: malformed stored intent: {exc}",
+        )
     for order in current_portfolio.open_orders:
         side = str(order.get("side", "")).lower()
         # See execute_approved_paper_proposal()'s own duplicate-check
@@ -1134,7 +1172,22 @@ def recover_stale_reconciliation(
     worker could have claimed the newly-retryable proposal, resolved it
     to "executed", and had that second write silently overwrite it back
     to "submission_unknown" (2026-07-29, GPT review).
+
+    `stale_after_seconds` must be a positive int -- a zero or negative
+    value makes `cutoff` equal to or later than "now", so a reconciliation
+    claimed moments (or never) ago would already compare as older than
+    the cutoff, defeating this function's entire concurrency guarantee
+    (GPT review, 2026-07-29, independently reproduced: the CLI exposed
+    this raw via --stale-after-seconds with no validation at either
+    layer). Validated FIRST, before any read or mutation of proposal
+    state, so a bad value can never even attempt a reclaim.
     """
+    if isinstance(stale_after_seconds, bool) or not isinstance(stale_after_seconds, int) or stale_after_seconds <= 0:
+        raise ValueError(
+            f"stale_after_seconds must be a positive int, got {stale_after_seconds!r} "
+            f"({type(stale_after_seconds).__name__}) -- zero, negative, non-integer, and bool values are "
+            "never valid: they would let a genuinely in-flight reconciliation be reclaimed immediately."
+        )
     cutoff = (datetime.now(timezone.utc) - timedelta(seconds=stale_after_seconds)).isoformat()
     recovered_at = datetime.now(timezone.utc).isoformat()
     recovered = store.reclaim_stale_status(

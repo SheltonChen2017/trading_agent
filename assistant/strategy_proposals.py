@@ -64,6 +64,7 @@ from data.market_data import fetch_historical
 from signals.regime import compute_trailing_market_volatility
 from strategies.trend_vol_rotation import classify_trend
 from strategies.vol_target_rotation import compute_target_leveraged_weight
+from assistant.context_builder import KNOWN_FINDINGS
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.proposals import TradeProposal
@@ -73,6 +74,31 @@ from risk.execution_gate import TradeIntent
 STABLE_TICKER = "SOXX"
 LEVERAGED_TICKER = "SOXL"
 LOOKBACK_DAYS_FOR_SIGNAL = 300  # comfortably covers trend_lookback_days=200 plus warmup
+
+# The two CONFIRMED findings this module's mechanism (wide-band rotation)
+# actually relies on -- see assistant/research_findings.json. Checked live
+# at proposal-generation time (GPT review, 2026-07-29: "any proposal-
+# generation decision that relies on one of these findings must check
+# current authority explicitly") rather than trusted from the module
+# docstring's prose alone, which can go stale silently.
+_RELIED_UPON_FINDING_LABELS = (
+    "SOXX/SOXL trend+volatility regime rotation — drawdown",
+    "Wide rebalance band vs. tight/continuous vol-targeting",
+)
+
+
+def _non_authoritative_relied_upon_findings() -> list[str]:
+    """Labels of any relied-upon finding that is NOT currently
+    production-authoritative (unreproduced since the fetch_historical
+    lookback-days fix). This module intentionally still generates
+    proposals despite that -- EVIDENCE_STATUS is always the unconfirmed-
+    strategy tag below, never "confirmed" -- but the reliance must be an
+    explicit, checked fact, not an assumption."""
+    by_label = {f.label: f for f in KNOWN_FINDINGS}
+    return [
+        label for label in _RELIED_UPON_FINDING_LABELS
+        if label in by_label and not by_label[label].production_authoritative
+    ]
 
 PRODUCTION_PARAMS = {
     "target_vol_pct": 0.5,
@@ -188,6 +214,31 @@ def generate_soxx_soxl_rebalance_proposals(
     if shares <= 0:
         return []
 
+    non_authoritative = _non_authoritative_relied_upon_findings()
+    uncertainties = [
+        "PRODUCTION_PARAMS (target_vol_pct=0.5, max_leveraged_weight=0.6) were selected via "
+        "full-history grid search, not an out-of-sample confirmation split -- these specific "
+        "numbers are unconfirmed even though the wide-band mechanism itself is confirmed research.",
+        "This strategy has NOT been shown to beat SOXX/SOXL buy-and-hold on CAGR in any tested "
+        "configuration -- it is a risk-shape (drawdown/tax) trade, not an alpha claim.",
+        "Single-leg proposal: only SOXL is adjusted this pass. SOXX's own weight will look "
+        "correspondingly off-target until cash/proceeds settle and a later `propose` run rebalances it.",
+        "Market orders can fill away from the displayed reference price.",
+    ]
+    if non_authoritative:
+        # Explicit, checked-at-generation-time disclosure (GPT review,
+        # 2026-07-29) -- this module still generates proposals despite
+        # relying on findings that haven't been re-verified since the
+        # fetch_historical lookback-days fix; EVIDENCE_STATUS is always
+        # "promising_unconfirmed_strategy" (never "confirmed"), so this
+        # never overclaims, but the reliance itself must be surfaced,
+        # not just assumed from the module docstring.
+        uncertainties.append(
+            "This strategy relies on research findings that are NOT currently production-authoritative "
+            "(unreproduced since the fetch_historical lookback-days fix): "
+            + "; ".join(non_authoritative) + "."
+        )
+
     intent = TradeIntent(
         ticker=LEVERAGED_TICKER,
         side=side,
@@ -218,15 +269,6 @@ def generate_soxx_soxl_rebalance_proposals(
                 "Rebalance manually to a different target than this strategy's frozen production parameters.",
                 "Re-run the grid search on updated history before trusting these exact parameters again.",
             ],
-            uncertainties=[
-                "PRODUCTION_PARAMS (target_vol_pct=0.5, max_leveraged_weight=0.6) were selected via "
-                "full-history grid search, not an out-of-sample confirmation split -- these specific "
-                "numbers are unconfirmed even though the wide-band mechanism itself is confirmed research.",
-                "This strategy has NOT been shown to beat SOXX/SOXL buy-and-hold on CAGR in any tested "
-                "configuration -- it is a risk-shape (drawdown/tax) trade, not an alpha claim.",
-                "Single-leg proposal: only SOXL is adjusted this pass. SOXX's own weight will look "
-                "correspondingly off-target until cash/proceeds settle and a later `propose` run rebalances it.",
-                "Market orders can fill away from the displayed reference price.",
-            ],
+            uncertainties=uncertainties,
         )
     ]

@@ -2,13 +2,16 @@
 Sanity tests for risk/execution_gate.py. Run with:
 python tests/test_execution_gate.py
 """
+import dataclasses
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_portfolio_snapshot
+from assistant.schemas import PortfolioPosition
 from risk.execution_gate import (
     TradeIntent,
     authorize_overridden_trade_intent,
@@ -494,6 +497,228 @@ def test_reordered_violation_codes_produce_the_same_proof():
     assert proof_a == proof_b
 
 
+# --- Portfolio numeric-integrity checks (GPT review, 2026-07-29): NaN or
+# infinity anywhere in the PortfolioSnapshot must fail closed, never
+# silently defeat a comparison ("NaN > limit" is always False).
+
+def test_nan_cash_blocks():
+    snapshot = _snapshot(cash=10_000.0)
+    corrupted = dataclasses.replace(snapshot, cash=float("nan"))
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, corrupted, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("portfolio.cash must be finite" in v for v in result.violations)
+    assert not result.overridable
+
+
+def test_infinite_cash_blocks():
+    snapshot = _snapshot(cash=10_000.0)
+    corrupted = dataclasses.replace(snapshot, cash=float("inf"))
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, corrupted, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("portfolio.cash must be finite" in v for v in result.violations)
+
+
+def test_negative_cash_blocks():
+    snapshot = _snapshot(cash=10_000.0)
+    corrupted = dataclasses.replace(snapshot, cash=-500.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, corrupted, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("must be non-negative" in v for v in result.violations)
+
+
+def test_nan_total_equity_blocks():
+    snapshot = _snapshot(cash=10_000.0)
+    corrupted = dataclasses.replace(snapshot, total_equity=float("nan"))
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, corrupted, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("portfolio.total_equity must be finite" in v for v in result.violations)
+    assert not result.overridable
+
+
+def test_zero_or_negative_total_equity_blocks_a_buy():
+    snapshot = _snapshot(cash=10_000.0)
+    corrupted = dataclasses.replace(snapshot, total_equity=0.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, corrupted, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("must be positive to size a buy" in v for v in result.violations)
+
+
+def test_nan_buying_power_blocks():
+    snapshot = build_portfolio_snapshot([], cash=10_000.0, buying_power=float("nan"))
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("portfolio.buying_power must be finite" in v for v in result.violations)
+
+
+def test_infinite_buying_power_blocks():
+    snapshot = build_portfolio_snapshot([], cash=10_000.0, buying_power=float("inf"))
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("portfolio.buying_power must be finite" in v for v in result.violations)
+
+
+def _snapshot_with_position(position):
+    from assistant.schemas import PortfolioSnapshot
+    from datetime import datetime as _dt, timezone as _tz
+
+    return PortfolioSnapshot(
+        positions=[position], cash=5_000.0, total_equity=5_000.0 + position.market_value,
+        as_of=_dt.now(_tz.utc).date().isoformat(),
+    )
+
+
+def test_nan_position_shares_blocks():
+    snapshot = _snapshot_with_position(
+        PortfolioPosition(ticker="KO", shares=float("nan"), entry_price=50.0, current_price=55.0,
+                          market_value=550.0, unrealized_pnl_pct=10.0, is_leveraged_etf=False)
+    )
+    intent = TradeIntent(ticker="AMD", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("non-finite data" in v and "KO" in v for v in result.violations)
+    assert not result.overridable
+
+
+def test_nan_position_price_blocks():
+    snapshot = _snapshot_with_position(
+        PortfolioPosition(ticker="KO", shares=10.0, entry_price=50.0, current_price=float("nan"),
+                          market_value=550.0, unrealized_pnl_pct=10.0, is_leveraged_etf=False)
+    )
+    intent = TradeIntent(ticker="AMD", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("non-finite data" in v and "KO" in v for v in result.violations)
+
+
+def test_nan_position_market_value_blocks():
+    snapshot = _snapshot_with_position(
+        PortfolioPosition(ticker="KO", shares=10.0, entry_price=50.0, current_price=55.0,
+                          market_value=float("nan"), unrealized_pnl_pct=10.0, is_leveraged_etf=False)
+    )
+    intent = TradeIntent(ticker="AMD", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("non-finite data" in v and "KO" in v for v in result.violations)
+
+
+def test_infinite_position_values_block():
+    snapshot = _snapshot_with_position(
+        PortfolioPosition(ticker="KO", shares=10.0, entry_price=50.0, current_price=55.0,
+                          market_value=float("inf"), unrealized_pnl_pct=10.0, is_leveraged_etf=False)
+    )
+    intent = TradeIntent(ticker="AMD", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("non-finite data" in v and "KO" in v for v in result.violations)
+
+
+def test_negative_shares_and_non_positive_price_block():
+    snapshot = _snapshot_with_position(
+        PortfolioPosition(ticker="KO", shares=-5.0, entry_price=0.0, current_price=-1.0,
+                          market_value=-550.0, unrealized_pnl_pct=10.0, is_leveraged_etf=False)
+    )
+    intent = TradeIntent(ticker="AMD", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("negative shares" in v for v in result.violations)
+    assert any("negative market_value" in v for v in result.violations)
+    assert any("non-positive price" in v for v in result.violations)
+
+
+def test_portfolio_integrity_violations_are_never_overridable():
+    snapshot = _snapshot(cash=10_000.0)
+    corrupted = dataclasses.replace(snapshot, cash=float("nan"))
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, corrupted, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert not result.overridable
+    try:
+        authorize_overridden_trade_intent(intent, result)
+        assert False, "a portfolio-integrity violation must never be overridable"
+    except ValueError as exc:
+        assert "not override-eligible" in str(exc)
+
+
+# --- Future/invalid quote timestamp checks (GPT review, 2026-07-29)
+
+def test_quote_timestamp_within_clock_skew_tolerance_passes():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    now = _MARKET_HOURS_WEEKDAY
+    slightly_future = now + timedelta(seconds=30)  # within the 60s tolerance
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=now, price_timestamp=slightly_future,
+    )
+    assert not any("FUTURE" in v.upper() for v in result.violations)
+
+
+def test_quote_timestamp_several_minutes_in_the_future_blocks():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    now = _MARKET_HOURS_WEEKDAY
+    future = now + timedelta(minutes=5)
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=now, price_timestamp=future,
+    )
+    assert result.approved is False
+    assert any("FUTURE" in v.upper() for v in result.violations)
+    assert not result.overridable
+
+
+def test_future_price_timestamp_cannot_be_overridden():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    now = _MARKET_HOURS_WEEKDAY
+    future = now + timedelta(minutes=10)
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=now, price_timestamp=future,
+    )
+    assert result.approved is False
+    try:
+        authorize_overridden_trade_intent(intent, result)
+        assert False, "a future price timestamp must never be overridable"
+    except ValueError as exc:
+        assert "not override-eligible" in str(exc)
+
+
+def test_aware_utc_quote_timestamp_versus_naive_et_now_computes_correct_age():
+    # now is naive (assumed ET, per this module's contract); price_timestamp
+    # is AWARE UTC, genuinely 10 minutes old in real elapsed time. Eastern
+    # is UTC-4 (summer) -- a blind tzinfo-relabeling bug would produce a
+    # wildly wrong age (off by ~4 hours) instead of ~10 minutes.
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    now_et_naive = datetime(2026, 7, 27, 14, 0)  # 2:00pm ET, naive
+    now_utc_equivalent = datetime(2026, 7, 27, 18, 0, tzinfo=timezone.utc)  # 2:00pm ET == 18:00 UTC (summer)
+    price_timestamp_utc = now_utc_equivalent - timedelta(minutes=10)
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=now_et_naive, price_timestamp=price_timestamp_utc,
+        max_stale_price_minutes=15.0,
+    )
+    # ~10 minutes old -- under the 15-minute limit -- must NOT be flagged stale.
+    assert not any("staleness limit" in v for v in result.violations)
+
+
+def test_naive_price_timestamp_with_aware_now_is_treated_as_eastern():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    now_aware_et = datetime(2026, 7, 27, 14, 0, tzinfo=ZoneInfo("America/New_York"))
+    naive_price_timestamp = datetime(2026, 7, 27, 13, 50)  # naive, assumed ET, 10 minutes before now
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=now_aware_et, price_timestamp=naive_price_timestamp,
+        max_stale_price_minutes=15.0,
+    )
+    assert not any("staleness limit" in v for v in result.violations)
+    assert not any("FUTURE" in v.upper() for v in result.violations)
+
+
 if __name__ == "__main__":
     test_clean_trade_is_approved()
     test_kill_switch_blocks_everything_else()
@@ -531,4 +756,22 @@ if __name__ == "__main__":
     test_release_blocker_a_genuine_duplicate_order_rejection_cannot_be_relabeled_overridable()
     test_validation_result_collections_are_immutable_tuples()
     test_reordered_violation_codes_produce_the_same_proof()
+    test_nan_cash_blocks()
+    test_infinite_cash_blocks()
+    test_negative_cash_blocks()
+    test_nan_total_equity_blocks()
+    test_zero_or_negative_total_equity_blocks_a_buy()
+    test_nan_buying_power_blocks()
+    test_infinite_buying_power_blocks()
+    test_nan_position_shares_blocks()
+    test_nan_position_price_blocks()
+    test_nan_position_market_value_blocks()
+    test_infinite_position_values_block()
+    test_negative_shares_and_non_positive_price_block()
+    test_portfolio_integrity_violations_are_never_overridable()
+    test_quote_timestamp_within_clock_skew_tolerance_passes()
+    test_quote_timestamp_several_minutes_in_the_future_blocks()
+    test_future_price_timestamp_cannot_be_overridden()
+    test_aware_utc_quote_timestamp_versus_naive_et_now_computes_correct_age()
+    test_naive_price_timestamp_with_aware_now_is_treated_as_eastern()
     print("All execution gate tests passed.")

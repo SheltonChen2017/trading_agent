@@ -211,6 +211,7 @@ class AssistantStore:
         expected_status: str,
         new_status: str,
         stale_before: str,
+        extra_updates: dict[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         """
         Like claim_proposal(), but the guard is staleness (`updated_at <
@@ -221,6 +222,23 @@ class AssistantStore:
         (every status transition, including claim_proposal(), rewrites
         it), so no separate "started_at" column is needed.
 
+        `extra_updates` (e.g. `recovered_at`/`error` audit fields) is
+        merged into the JSON payload and written in the SAME conditional
+        UPDATE as the status transition -- NOT as a separate, later write.
+        A prior version wrote the status transition here and left the
+        caller (recover_stale_reconciliation()) to persist audit metadata
+        via a separate, unconditional update_proposal_status() call
+        afterward; in the gap between the two writes, a different worker
+        could claim the now-retryable proposal, resolve it to a genuinely
+        terminal state (e.g. "executed"), and have that second
+        unconditional write silently stomp it back to `new_status`
+        (2026-07-29, GPT review). The final UPDATE below re-verifies
+        `status = expected_status AND updated_at < stale_before` at write
+        time (not just at an earlier read), so if anything changed the
+        row in between, this call safely returns None instead of
+        overwriting whatever the row became -- the same principle
+        claim_proposal() already relies on for its own atomicity.
+
         Atomic and safe against a concurrent recovery attempt or a
         genuinely still-in-flight (recent) claim for the same reason
         claim_proposal() is: exactly one `UPDATE ... WHERE status = ? AND
@@ -230,22 +248,27 @@ class AssistantStore:
         """
         now = datetime.now(timezone.utc).isoformat()
         with self._connect() as connection:
+            row = connection.execute(
+                "SELECT payload_json FROM trade_proposals WHERE proposal_id = ? AND status = ? AND updated_at < ?",
+                (proposal_id, expected_status, stale_before),
+            ).fetchone()
+            if row is None:
+                return None
+            payload = json.loads(row["payload_json"])
+            payload.update(extra_updates or {})
+            payload["status"] = new_status
             cursor = connection.execute(
-                "UPDATE trade_proposals SET status = ?, updated_at = ? "
+                "UPDATE trade_proposals SET status = ?, payload_json = ?, updated_at = ? "
                 "WHERE proposal_id = ? AND status = ? AND updated_at < ?",
-                (new_status, now, proposal_id, expected_status, stale_before),
+                (new_status, json.dumps(payload, sort_keys=True), now, proposal_id, expected_status, stale_before),
             )
             if cursor.rowcount != 1:
+                # Something changed the row between our read and this
+                # write (a concurrent recovery attempt, or a genuine
+                # resolution reaching a different terminal state) --
+                # never overwrite whatever it became.
                 return None
-            row = connection.execute(
-                "SELECT payload_json FROM trade_proposals WHERE proposal_id = ?",
-                (proposal_id,),
-            ).fetchone()
-        if row is None:
-            return None
-        proposal = json.loads(row["payload_json"])
-        proposal["status"] = new_status
-        return proposal
+        return payload
 
     def list_proposals(self, status: str | None = None, limit: int = 100) -> list[dict[str, Any]]:
         query = "SELECT payload_json, status FROM trade_proposals"

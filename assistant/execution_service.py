@@ -198,6 +198,7 @@ acting):
 """
 from __future__ import annotations
 
+import dataclasses
 import math
 import os
 from datetime import datetime, timedelta, timezone
@@ -219,6 +220,7 @@ from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
 from risk.execution_gate import (
     TradeIntent,
+    ValidationResult,
     authorize_overridden_trade_intent,
     authorize_trade_intent,
     validate_trade_intent,
@@ -394,6 +396,252 @@ def _resolve_earnings_days_away(ticker: str, override: int | None) -> int | None
         return None
 
 
+@dataclasses.dataclass(frozen=True)
+class ProposalValidationOutcome:
+    """
+    Pure, side-effect-free result of checking whether a proposal is
+    currently eligible to execute -- never claims, never writes proposal
+    status, never submits, never authorizes. Used by BOTH
+    execute_approved_paper_proposal() (immediately after its own atomic
+    claim) and preflight_allocation_batch() (read-only, no claim at all)
+    (2026-07-29, GPT review): these two had started to drift, since
+    preflight only duplicated PART of the real execution path's checks
+    (missing policy version/fingerprint, execution_mode, paper mode,
+    open_orders_available, allowed sides/types, allow_new_positions,
+    require_earnings_data) -- this function is now the single source of
+    truth both consume, so they can no longer disagree.
+
+    Deliberately does NOT check whether the proposal's CURRENT status is
+    claimable ("proposed"/"override_available") -- that's inherently a
+    claim-time race the caller must still resolve atomically via
+    store.claim_proposal() (the real execution path) or a plain read
+    filtered by status (preflight, which must never mutate anything);
+    this function only answers "would every OTHER check pass right now."
+    """
+    proposal: dict | None
+    intent: TradeIntent | None
+    validation: ValidationResult | None
+    # Non-None iff a hard service-level failure occurred before
+    # validate_trade_intent() could even run (unknown proposal, expired,
+    # policy mismatch, disallowed side, quote fetch failure, ...) --
+    # `validation` is then also None. Never override-eligible.
+    error: str | None
+    # The live quote price actually used (None iff `error` is set before a
+    # quote could be fetched). Exposed so a caller simulating a SEQUENCE
+    # of proposals (assistant.allocation_batch's cumulative preflight) can
+    # compute this leg's planned notional to reserve against the next
+    # leg's projected portfolio, without re-fetching the same quote.
+    reference_price: float | None = None
+
+    @property
+    def approved(self) -> bool:
+        if self.error is not None:
+            return False
+        return self.validation is not None and self.validation.approved
+
+    @property
+    def overridable(self) -> bool:
+        if self.error is not None:
+            return False
+        return self.validation is not None and self.validation.overridable
+
+    @property
+    def violation_messages(self) -> list[str]:
+        if self.error is not None:
+            return [self.error]
+        if self.validation is not None:
+            return list(self.validation.violations)
+        return []
+
+
+def validate_proposal_for_execution(
+    proposal_id: str,
+    current_portfolio: PortfolioSnapshot,
+    policy: TradingPolicy,
+    store: AssistantStore,
+    *,
+    now_et: datetime,
+    kill_switch_active: bool = False,
+    earnings_days_away: int | None = None,
+    proposal: dict | None = None,
+    extra_pending_buy_value_by_ticker: dict[str, float] | None = None,
+) -> ProposalValidationOutcome:
+    """
+    Checks, in the same order execute_approved_paper_proposal() always
+    has: existence, expiration, policy version/fingerprint, execution
+    mode, paper-broker mode/configuration, open-order availability, side/
+    order-type/new-position policy rules, quote freshness inputs, pending
+    -order exposure, the earnings-data requirement, and finally
+    validate_trade_intent() itself. Pass an already-fetched `proposal`
+    dict when the caller has just claimed/read one (avoids a redundant
+    re-fetch); otherwise it's loaded fresh via store.get_proposal().
+
+    `extra_pending_buy_value_by_ticker`: additional simulated pending-buy
+    value to add on top of whatever's derived from
+    current_portfolio.open_orders -- lets a caller simulating a SEQUENCE
+    of proposals (assistant.allocation_batch's cumulative preflight)
+    reserve earlier legs' planned notional against later legs' exposure/
+    concentration checks, without this function needing to know anything
+    about batches itself. None/empty for the real single-proposal
+    execution path (unaffected, backward compatible).
+    """
+    if proposal is None:
+        proposal = store.get_proposal(proposal_id)
+    if proposal is None:
+        return ProposalValidationOutcome(
+            proposal=None, intent=None, validation=None, error=f"Unknown proposal: {proposal_id}"
+        )
+
+    now_utc = datetime.now(timezone.utc)
+    if now_utc > datetime.fromisoformat(proposal["expires_at"]):
+        return ProposalValidationOutcome(proposal=proposal, intent=None, validation=None, error="Proposal has expired.")
+    if policy.execution_mode != "paper":
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=None, validation=None,
+            error="The active policy does not permit paper execution.",
+        )
+    if proposal["policy_version"] != policy.version:
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=None, validation=None,
+            error="Proposal policy version does not match the active policy.",
+        )
+    if proposal.get("policy_fingerprint") != compute_policy_fingerprint(policy):
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=None, validation=None,
+            error=(
+                "Proposal's policy fingerprint does not match the active policy's current content -- the "
+                "policy may have been edited without a version bump (or this proposal predates fingerprint "
+                "binding). Regenerate the proposal against the current policy."
+            ),
+        )
+
+    import execution.alpaca_broker as broker
+
+    if not broker.PAPER_TRADING:
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=None, validation=None,
+            error="This workflow refuses live trading; PAPER_TRADING must remain True.",
+        )
+    if not broker.is_configured():
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=None, validation=None, error="Alpaca paper credentials are not configured.",
+        )
+    if not current_portfolio.open_orders_available:
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=None, validation=None,
+            error=(
+                "Cannot verify open orders right now (the broker's order endpoint failed) -- refusing to "
+                "approve since the duplicate-order check would be unreliable. Try again shortly."
+            ),
+        )
+
+    try:
+        intent = _intent_from_dict(proposal["intent"])
+    except Exception as exc:
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=None, validation=None, error=f"Malformed stored intent: {exc}",
+        )
+
+    if intent.side not in policy.allowed_sides:
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=intent, validation=None,
+            error=f"Side '{intent.side}' is not allowed by policy.",
+        )
+    if intent.order_type not in policy.allowed_order_types:
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=intent, validation=None,
+            error=f"Order type '{intent.order_type}' is not allowed by policy.",
+        )
+    if intent.side == "buy" and not policy.allow_new_positions:
+        held = {p.ticker.upper() for p in current_portfolio.positions}
+        if intent.ticker.upper() not in held:
+            return ProposalValidationOutcome(
+                proposal=proposal, intent=intent, validation=None,
+                error="Opening new positions is disabled by policy.",
+            )
+
+    recent_intents = [_intent_from_dict(raw) for raw in store.recent_executed_intents()]
+    for order in current_portfolio.open_orders:
+        side = str(order.get("side", "")).lower()
+        # See execute_approved_paper_proposal()'s own duplicate-check
+        # comment: identity depends only on ticker+side, never shares.
+        if side in ("buy", "sell") and order.get("ticker"):
+            recent_intents.append(
+                TradeIntent(
+                    ticker=order["ticker"], side=side,
+                    shares=int(float(order["shares"])) if order.get("shares") else 1,
+                )
+            )
+
+    try:
+        quote = broker.get_latest_quote(intent.ticker)
+        reference_price = quote["price"]
+        price_timestamp = quote["timestamp"]
+        bid_price = quote.get("bid")
+        ask_price = quote.get("ask")
+    except Exception as exc:
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=intent, validation=None,
+            error=f"Could not fetch a live quote for {intent.ticker} to check price freshness: {exc}",
+        )
+
+    pending_buy_value_by_ticker: dict[str, float] = {}
+    if intent.side == "buy":
+        try:
+            pending_buy_value_by_ticker = dict(_pending_buy_value_by_ticker(current_portfolio.open_orders, broker))
+        except Exception as exc:
+            return ProposalValidationOutcome(
+                proposal=proposal, intent=intent, validation=None,
+                error=(
+                    f"Could not determine the dollar value of a pending buy order needed to check "
+                    f"exposure/concentration limits: {exc}"
+                ),
+                reference_price=reference_price,
+            )
+        for ticker, extra_value in (extra_pending_buy_value_by_ticker or {}).items():
+            key = ticker.upper()
+            pending_buy_value_by_ticker[key] = pending_buy_value_by_ticker.get(key, 0.0) + extra_value
+
+    resolved_earnings_days_away = _resolve_earnings_days_away(intent.ticker, earnings_days_away)
+    if policy.require_earnings_data and intent.side == "buy" and resolved_earnings_days_away is None:
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=intent, validation=None,
+            error=(
+                f"Earnings-date data for {intent.ticker} is unavailable and your policy requires it "
+                "for buys (require_earnings_data=true) -- refusing to approve rather than silently "
+                "skip the earnings blackout check."
+            ),
+            reference_price=reference_price,
+        )
+
+    validation = validate_trade_intent(
+        intent,
+        current_portfolio,
+        reference_price,
+        price_timestamp=price_timestamp,
+        now=now_et,
+        recent_intents=recent_intents,
+        kill_switch_active=kill_switch_active,
+        earnings_days_away=resolved_earnings_days_away,
+        bid_price=bid_price,
+        ask_price=ask_price,
+        max_position_pct=policy.max_position_pct,
+        max_total_exposure_pct=policy.max_total_exposure_pct,
+        max_basket_pct=policy.max_basket_pct * 100,
+        max_leveraged_etf_pct=policy.max_leveraged_etf_pct * 100,
+        max_stale_price_minutes=policy.max_stale_price_minutes,
+        max_slippage_pct=policy.max_slippage_pct,
+        max_spread_pct=policy.max_spread_pct,
+        earnings_blackout_days=policy.earnings_blackout_days,
+        max_order_value=policy.max_order_value,
+        min_cash_reserve_pct=policy.min_cash_reserve_pct,
+        pending_buy_value_by_ticker=pending_buy_value_by_ticker,
+    )
+    return ProposalValidationOutcome(
+        proposal=proposal, intent=intent, validation=validation, error=None, reference_price=reference_price,
+    )
+
+
 def execute_approved_paper_proposal(
     proposal_id: str,
     confirmation: str,
@@ -498,114 +746,27 @@ def execute_approved_paper_proposal(
     import execution.alpaca_broker as broker
 
     validation = None
+    intent = None
     try:
-        if not broker.PAPER_TRADING:
-            raise ProposalExecutionError("This workflow refuses live trading; PAPER_TRADING must remain True.")
-        if not broker.is_configured():
-            raise ProposalExecutionError("Alpaca paper credentials are not configured.")
-        if not current_portfolio.open_orders_available:
-            raise ProposalExecutionError(
-                "Cannot verify open orders right now (the broker's order endpoint failed) -- "
-                "refusing to approve since the duplicate-order check would be unreliable. Try again shortly."
-            )
-
-        intent = _intent_from_dict(proposal["intent"])
-        if intent.side not in policy.allowed_sides:
-            raise ProposalExecutionError(f"Side '{intent.side}' is not allowed by policy.")
-        if intent.order_type not in policy.allowed_order_types:
-            raise ProposalExecutionError(f"Order type '{intent.order_type}' is not allowed by policy.")
-        if intent.side == "buy" and not policy.allow_new_positions:
-            held = {p.ticker.upper() for p in current_portfolio.positions}
-            if intent.ticker.upper() not in held:
-                raise ProposalExecutionError("Opening new positions is disabled by policy.")
-
-        recent_intents = [_intent_from_dict(raw) for raw in store.recent_executed_intents()]
-        for order in current_portfolio.open_orders:
-            side = str(order.get("side", "")).lower()
-            # Duplicate identity (see validate_trade_intent()'s duplicate
-            # check) only depends on ticker + side, never shares -- so a
-            # notional-only order (shares=None, a real dollar amount in
-            # notional) shouldn't be excluded just because it has no share
-            # count. `shares` here is a required TradeIntent field but is
-            # otherwise unused by the duplicate check; 1 is a harmless
-            # placeholder when the real order has none (GPT review,
-            # 2026-07-27: notional-only orders were invisible to duplicate
-            # detection).
-            if side in ("buy", "sell") and order.get("ticker"):
-                recent_intents.append(
-                    TradeIntent(
-                        ticker=order["ticker"],
-                        side=side,
-                        shares=int(float(order["shares"])) if order.get("shares") else 1,
-                    )
-                )
-
-        try:
-            quote = broker.get_latest_quote(intent.ticker)
-            reference_price = quote["price"]
-            price_timestamp = quote["timestamp"]
-            bid_price = quote.get("bid")
-            ask_price = quote.get("ask")
-        except Exception as exc:
-            raise ProposalExecutionError(
-                f"Could not fetch a live quote for {intent.ticker} to check price freshness: {exc}"
-            )
-
-        # Only buys actually use pending_buy_value_by_ticker (see
-        # validate_trade_intent()) -- a risk-reducing sell shouldn't be
-        # blocked just because an unrelated pending buy's price couldn't
-        # be fetched. For a buy, though, fail closed: an undercounted (or
-        # silently zeroed) pending value would defeat the whole point of
-        # this check (GPT review, 2026-07-27).
-        pending_buy_value_by_ticker: dict[str, float] = {}
-        if intent.side == "buy":
-            try:
-                pending_buy_value_by_ticker = _pending_buy_value_by_ticker(current_portfolio.open_orders, broker)
-            except Exception as exc:
-                raise ProposalExecutionError(
-                    f"Could not determine the dollar value of a pending buy order needed to check "
-                    f"exposure/concentration limits: {exc}"
-                )
-
-        resolved_earnings_days_away = _resolve_earnings_days_away(intent.ticker, earnings_days_away)
-        if policy.require_earnings_data and intent.side == "buy" and resolved_earnings_days_away is None:
-            # A risk-REDUCING sell is exempt: refusing it because earnings
-            # data is unavailable would block the very thing that lowers
-            # risk. Only opt-in (require_earnings_data=true, off by
-            # default) and only for buys. Note: "unavailable" here also
-            # covers a ticker whose last known earnings date has simply
-            # passed with nothing new scheduled yet, not only a genuine
-            # fetch failure -- data/event_data.py doesn't distinguish the
-            # two, so this errs toward over-blocking, not under-blocking.
-            raise ProposalExecutionError(
-                f"Earnings-date data for {intent.ticker} is unavailable and your policy requires it "
-                "for buys (require_earnings_data=true) -- refusing to approve rather than silently "
-                "skip the earnings blackout check."
-            )
-
-        validation = validate_trade_intent(
-            intent,
+        validation_outcome = validate_proposal_for_execution(
+            proposal_id,
             current_portfolio,
-            reference_price,
-            price_timestamp=price_timestamp,
-            now=now_et,
-            recent_intents=recent_intents,
+            policy,
+            store,
+            now_et=now_et,
             kill_switch_active=kill_switch_active,
-            earnings_days_away=resolved_earnings_days_away,
-            bid_price=bid_price,
-            ask_price=ask_price,
-            max_position_pct=policy.max_position_pct,
-            max_total_exposure_pct=policy.max_total_exposure_pct,
-            max_basket_pct=policy.max_basket_pct * 100,
-            max_leveraged_etf_pct=policy.max_leveraged_etf_pct * 100,
-            max_stale_price_minutes=policy.max_stale_price_minutes,
-            max_slippage_pct=policy.max_slippage_pct,
-            max_spread_pct=policy.max_spread_pct,
-            earnings_blackout_days=policy.earnings_blackout_days,
-            max_order_value=policy.max_order_value,
-            min_cash_reserve_pct=policy.min_cash_reserve_pct,
-            pending_buy_value_by_ticker=pending_buy_value_by_ticker,
+            earnings_days_away=earnings_days_away,
+            proposal=proposal,
         )
+        if validation_outcome.error is not None:
+            # Every check up through validate_trade_intent() lives in
+            # validate_proposal_for_execution() now (2026-07-29, GPT
+            # review) -- shared with preflight_allocation_batch() so the
+            # two can never drift again the way they had (preflight was
+            # missing several of these checks).
+            raise ProposalExecutionError(validation_outcome.error)
+        intent = validation_outcome.intent
+        validation = validation_outcome.validation
         if not validation.approved:
             if not validation.overridable:
                 # At least one violation isn't override-eligible (or there
@@ -946,10 +1107,32 @@ def recover_stale_reconciliation(
     Recovers to "submission_unknown" (never "submission_failed" -- a
     stranded local process proves nothing about what the broker actually
     did), leaving the proposal retryable via reconcile_submission().
+
+    The status transition AND the audit metadata (`recovered_at`,
+    `error`) are written in ONE atomic conditional UPDATE via
+    store.reclaim_stale_status()'s `extra_updates` -- not via a separate,
+    later write. A prior version wrote the status here and then called
+    update_proposal_status() (unconditional on current status) afterward
+    to add the audit fields; in the gap between those two writes, another
+    worker could have claimed the newly-retryable proposal, resolved it
+    to "executed", and had that second write silently overwrite it back
+    to "submission_unknown" (2026-07-29, GPT review).
     """
     cutoff = (datetime.now(timezone.utc) - timedelta(seconds=stale_after_seconds)).isoformat()
+    recovered_at = datetime.now(timezone.utc).isoformat()
     recovered = store.reclaim_stale_status(
-        proposal_id, expected_status=RECONCILING, new_status=SUBMISSION_UNKNOWN, stale_before=cutoff,
+        proposal_id,
+        expected_status=RECONCILING,
+        new_status=SUBMISSION_UNKNOWN,
+        stale_before=cutoff,
+        extra_updates={
+            "recovered_at": recovered_at,
+            "error": (
+                f"Recovered from a stale 'reconciling' status (no update for at least "
+                f"{stale_after_seconds}s, most likely a process crash mid-reconciliation) -- marked "
+                "'submission_unknown' so it can be reconciled again."
+            ),
+        },
     )
     if recovered is None:
         current = store.get_proposal(proposal_id)
@@ -960,14 +1143,4 @@ def recover_stale_reconciliation(
             f"-- either it's not in 'reconciling', or it was claimed less than {stale_after_seconds}s ago "
             "and is presumed to be a genuinely in-flight reconciliation, not stranded."
         )
-    recovered_at = datetime.now(timezone.utc).isoformat()
-    return store.update_proposal_status(
-        proposal_id,
-        SUBMISSION_UNKNOWN,
-        recovered_at=recovered_at,
-        error=(
-            f"Recovered from a stale 'reconciling' status (no update for at least "
-            f"{stale_after_seconds}s, most likely a process crash mid-reconciliation) -- marked "
-            "'submission_unknown' so it can be reconciled again."
-        ),
-    )
+    return recovered

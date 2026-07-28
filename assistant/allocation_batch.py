@@ -13,21 +13,33 @@ persisted record, made a page refresh mid-batch lose track of which legs
 had already been attempted, risking a double-submission on blind retry.
 
 Two-phase by design:
-  1. preflight_allocation_batch() -- a read-only dry run against a single
-     shared fresh portfolio snapshot. If ANY leg fails preflight, the
-     caller should refuse to create/start the batch at all ("submit
-     none" -- GPT review).
+  1. preflight_allocation_batch() -- a read-only dry run against a
+     PROJECTED, cumulatively-reserved portfolio state: each leg's check
+     includes every EARLIER leg's planned notional already reserved
+     against cash/buying-power and pending exposure, using the shared
+     assistant.execution_service.validate_proposal_for_execution() (the
+     same checks the real execution path enforces -- policy version/
+     fingerprint, execution mode, paper mode, open-orders availability,
+     allowed sides/types, allow_new_positions, earnings requirement, and
+     validate_trade_intent() itself) so preflight can no longer approve a
+     batch the real execution path would reject for a reason preflight
+     never checked (2026-07-29, GPT review). If ANY leg fails, the caller
+     should refuse to create/start the batch at all ("submit none").
   2. execute_allocation_batch() -- the actual sequential submission,
      against a batch record persisted via AssistantStore.create_
      allocation_batch()/update_allocation_batch(). Safe to call again
-     after a UI refresh or process restart: already-"submitted"/"failed"
-     legs are skipped (idempotent no-op), and a leg left "unknown" from a
-     prior attempt STOPS the batch again (never blindly retried -- an
-     ambiguous broker outcome must be resolved via
-     assistant.execution_service.reconcile_submission()/
-     recover_stale_reconciliation() first, since continuing past it could
-     double-submit or compute exposure/concentration checks against a
-     stale assumption about what already filled).
+     after a UI refresh or process restart: the PROPOSAL's own status is
+     always treated as authoritative and re-synced onto the batch leg
+     before deciding anything (2026-07-29, GPT review: a leg that had
+     gone LEG_UNKNOWN used to stay that way forever even after the
+     underlying proposal was reconciled to a terminal state, so a batch
+     could never resume after the exact recovery step the UI told the
+     user to perform; a crash between the proposal becoming "executed"
+     and the batch leg being updated used to cause a duplicate-submission
+     attempt on retry). A leg left "unknown" from a prior attempt STOPS
+     the batch again (never blindly retried -- an ambiguous broker
+     outcome must be resolved via assistant.execution_service.
+     reconcile_submission()/recover_stale_reconciliation() first).
 
 Deliberately does NOT support a batch-level policy override: each leg
 that's blocked only by an override-eligible violation still requires its
@@ -41,6 +53,7 @@ allow bulk policy overrides").
 """
 from __future__ import annotations
 
+import dataclasses
 import uuid
 from datetime import datetime, timezone
 
@@ -48,15 +61,14 @@ from assistant.context_builder import build_portfolio_snapshot_from_alpaca
 from assistant.execution_service import (
     PolicyOverridableBlockError,
     ProposalExecutionError,
-    _intent_from_dict,
-    _pending_buy_value_by_ticker,
-    _resolve_earnings_days_away,
     execute_approved_paper_proposal,
+    validate_proposal_for_execution,
 )
 from assistant.policy import TradingPolicy
+from assistant.proposal_status import POLICY_OVERRIDE_AVAILABLE
 from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
-from risk.execution_gate import ValidationResult, validate_trade_intent
+from risk.execution_gate import ValidationResult
 
 # Leg states. "submitted"/"failed" are terminal for that leg (a failed
 # leg does not block the rest of the batch -- each proposal is
@@ -75,9 +87,74 @@ BATCH_COMPLETED = "completed"
 BATCH_STOPPED = "stopped"
 BATCH_STOPPED_UNKNOWN = "stopped_unknown"
 
+# Proposal statuses that map directly to a terminal-for-this-leg batch
+# state, independent of anything the batch itself has recorded. "proposed"
+# is handled separately (it means "eligible to attempt," not terminal).
+# "validating"/"approved" are deliberately NOT here -- see
+# _sync_leg_from_proposal()'s docstring.
+_TERMINAL_FAILURE_STATUSES = frozenset({"submission_failed", "blocked", "validation_failed", "expired"})
+_UNKNOWN_STATUSES = frozenset({"submitting", "submission_unknown", "reconciling"})
+
 
 def new_batch_id() -> str:
     return "batch_" + uuid.uuid4().hex[:16]
+
+
+def _sync_leg_from_proposal(leg: dict, proposal: dict | None) -> dict:
+    """
+    The proposal record is the authoritative source of execution truth;
+    a batch leg is a resumable orchestration PROJECTION of it, never the
+    other way around. Called before deciding what to do with any
+    nonterminal leg, so a leg's stale in-memory state can never override
+    what the proposal has since become (e.g. after a human ran
+    reconcile_submission() on it, or after a crash left the proposal
+    "executed" while the leg was never updated).
+
+    Statuses "validating"/"approved" are treated the same as an
+    unresolved broker state (mapped to LEG_UNKNOWN, stopping the batch)
+    rather than assumed retryable -- these mean a PRIOR attempt is (or
+    recently was) actively in progress; blindly resubmitting risks a
+    duplicate order, so this stops for investigation rather than
+    guessing (GPT review, 2026-07-29).
+    """
+    if proposal is None:
+        return {
+            **leg,
+            "state": LEG_FAILED,
+            "error": "Proposal record missing entirely -- failing closed.",
+        }
+
+    status = proposal["status"]
+    if status == "executed":
+        new_state = LEG_SUBMITTED
+    elif status in _TERMINAL_FAILURE_STATUSES:
+        new_state = LEG_FAILED
+    elif status == POLICY_OVERRIDE_AVAILABLE:
+        new_state = LEG_BLOCKED_OVERRIDABLE
+    elif status in _UNKNOWN_STATUSES:
+        new_state = LEG_UNKNOWN
+    elif status == "proposed":
+        new_state = LEG_UNATTEMPTED
+    elif status in ("validating", "approved"):
+        new_state = LEG_UNKNOWN
+    else:
+        new_state = leg.get("state", LEG_UNATTEMPTED)
+
+    synced = dict(leg)
+    synced["state"] = new_state
+    synced["proposal_status_seen"] = status
+    if new_state == LEG_SUBMITTED and not synced.get("order"):
+        broker_order = proposal.get("broker_order")
+        if broker_order:
+            synced["order"] = broker_order
+    proposal_error = proposal.get("error")
+    if proposal_error and proposal_error != synced.get("error"):
+        history = list(synced.get("error_history") or [])
+        if synced.get("error"):
+            history.append(synced["error"])
+        synced["error_history"] = history
+        synced["error"] = proposal_error
+    return synced
 
 
 def preflight_allocation_batch(
@@ -90,72 +167,68 @@ def preflight_allocation_batch(
 ) -> dict[str, ValidationResult]:
     """
     Revalidates every proposal in a prospective batch WITHOUT claiming or
-    submitting anything -- a true read-only dry run against ONE shared
-    fresh portfolio snapshot (the same snapshot for every leg, since this
-    runs before any leg has actually filled). The caller MUST refuse to
-    create/start the batch if any result.approved is False ("if any
-    proposal fails preflight, default to submitting none" -- GPT review,
-    2026-07-28).
+    submitting anything -- a read-only, CUMULATIVE dry run: each leg's
+    check reserves every earlier (passing) leg's planned notional against
+    cash/buying-power and pending exposure before validating the next
+    leg, so two individually-safe proposals that would collectively
+    exceed a cap correctly fail preflight together (GPT review, 2026-07-
+    29 -- previously each leg was checked independently against the SAME
+    starting snapshot, so preflight could approve a batch that execution
+    would then partially reject).
 
-    Deliberately duplicates a subset of execute_approved_paper_proposal()'s
-    own pre-submission checks (quote fetch, pending-buy-value, earnings)
-    rather than reusing that function directly: it claims and mutates
-    proposal state as an inseparable part of validating, so it cannot be
-    called for a side-effect-free dry run without risking exactly the
-    kind of regression this project's execution-safety layer has spent
-    many review rounds hardening against. Keeping this preflight small,
-    read-only, and isolated in its own function is the deliberately safer
-    trade-off over refactoring that hardened core path.
+    The caller MUST refuse to create/start the batch if any result is
+    not approved ("if any proposal fails preflight, default to submitting
+    none"). Proposal order is deterministic: exactly the order of
+    `proposal_ids` as given by the caller (the UI passes them in the
+    order the allocation split was generated).
+
+    Reserved effect is modeled as pending buy value (not a fake filled
+    position), fed into validate_proposal_for_execution()'s
+    `extra_pending_buy_value_by_ticker` -- the same shared validation the
+    real execution path uses, so preflight and execution can no longer
+    drift (2026-07-29, GPT review).
     """
-    import execution.alpaca_broker as broker
-
     results: dict[str, ValidationResult] = {}
-    recent_intents = [_intent_from_dict(raw) for raw in store.recent_executed_intents()]
+    reserved_cash = 0.0
+    reserved_pending_by_ticker: dict[str, float] = {}
 
     for proposal_id in proposal_ids:
-        proposal = store.get_proposal(proposal_id)
-        if proposal is None:
+        projected_cash = current_portfolio.cash - reserved_cash
+        projected_buying_power = (
+            current_portfolio.buying_power - reserved_cash
+            if current_portfolio.buying_power is not None
+            else None
+        )
+        projected_portfolio = dataclasses.replace(
+            current_portfolio, cash=projected_cash, buying_power=projected_buying_power,
+        )
+        outcome = validate_proposal_for_execution(
+            proposal_id,
+            projected_portfolio,
+            policy,
+            store,
+            now_et=now_et,
+            kill_switch_active=kill_switch_active,
+            extra_pending_buy_value_by_ticker=dict(reserved_pending_by_ticker),
+        )
+        if outcome.error is not None:
             results[proposal_id] = ValidationResult(
-                approved=False, violations=(f"Unknown proposal: {proposal_id}",),
-                violation_codes=("unknown_proposal",),
+                approved=False, violations=(outcome.error,), violation_codes=("preflight_error",),
             )
             continue
-        try:
-            intent = _intent_from_dict(proposal["intent"])
-            quote = broker.get_latest_quote(intent.ticker)
-            pending_buy_value_by_ticker = {}
-            if intent.side == "buy":
-                pending_buy_value_by_ticker = _pending_buy_value_by_ticker(current_portfolio.open_orders, broker)
-            resolved_earnings_days_away = _resolve_earnings_days_away(intent.ticker, None)
-            validation = validate_trade_intent(
-                intent,
-                current_portfolio,
-                quote["price"],
-                price_timestamp=quote["timestamp"],
-                now=now_et,
-                recent_intents=recent_intents,
-                kill_switch_active=kill_switch_active,
-                earnings_days_away=resolved_earnings_days_away,
-                bid_price=quote.get("bid"),
-                ask_price=quote.get("ask"),
-                max_position_pct=policy.max_position_pct,
-                max_total_exposure_pct=policy.max_total_exposure_pct,
-                max_basket_pct=policy.max_basket_pct * 100,
-                max_leveraged_etf_pct=policy.max_leveraged_etf_pct * 100,
-                max_stale_price_minutes=policy.max_stale_price_minutes,
-                max_slippage_pct=policy.max_slippage_pct,
-                max_spread_pct=policy.max_spread_pct,
-                earnings_blackout_days=policy.earnings_blackout_days,
-                max_order_value=policy.max_order_value,
-                min_cash_reserve_pct=policy.min_cash_reserve_pct,
-                pending_buy_value_by_ticker=pending_buy_value_by_ticker,
-            )
-            results[proposal_id] = validation
-        except Exception as exc:
-            results[proposal_id] = ValidationResult(
-                approved=False, violations=(f"Preflight check failed: {exc}",),
-                violation_codes=("preflight_error",),
-            )
+        results[proposal_id] = outcome.validation
+        if (
+            outcome.validation is not None
+            and outcome.validation.approved
+            and outcome.intent is not None
+            and outcome.reference_price is not None
+            and outcome.intent.side == "buy"
+        ):
+            planned_notional = outcome.intent.shares * outcome.reference_price
+            reserved_cash += planned_notional
+            key = outcome.intent.ticker.upper()
+            reserved_pending_by_ticker[key] = reserved_pending_by_ticker.get(key, 0.0) + planned_notional
+
     return results
 
 
@@ -168,24 +241,27 @@ def execute_allocation_batch(
     kill_switch_active: bool = False,
 ) -> dict:
     """
-    Submits every unattempted leg of a persisted batch, in order,
-    re-fetching the live portfolio before each leg so an earlier fill in
-    this same batch is reflected in the next leg's cash/exposure checks.
+    Submits every eligible leg of a persisted batch, in order, re-fetching
+    the live portfolio before each leg so an earlier fill in this same
+    batch is reflected in the next leg's cash/exposure checks.
 
     Resumable and idempotent: safe to call again (e.g. after a UI refresh
-    or process restart) -- a leg already "submitted" or "failed" is
-    skipped; a batch already "completed" is a no-op that just returns the
-    stored record. A leg that comes back "submission_unknown" STOPS the
-    whole batch (status "stopped_unknown") rather than being retried or
-    having later legs attempted past it -- resolve it via
-    assistant.execution_service.reconcile_submission() (or
-    recover_stale_reconciliation() if it's also stuck in "reconciling"),
-    then call this function again to continue. A leg blocked only by an
-    override-eligible policy violation is recorded as
-    "blocked_overridable" and does NOT stop the batch (it's terminal for
-    that leg, not ambiguous) -- resolve it individually via the
-    proposal's own approval card, then regenerate/re-run the batch for
-    any remaining unattempted legs.
+    or process restart) -- before touching any nonterminal leg, its state
+    is re-derived from the PROPOSAL's own current status via
+    _sync_leg_from_proposal(), never trusted from stale batch metadata
+    alone. A leg whose proposal is "executed" is recognized as already
+    submitted (no second broker call); a leg reconciled to "submission_
+    failed"/"blocked"/"expired" is recognized as failed and does not
+    block the rest of the batch; a leg still "submitting"/"submission_
+    unknown"/"reconciling" (or "validating"/"approved", an uncertain
+    in-progress state after a restart) stops the whole batch again until
+    a human resolves it via assistant.execution_service.
+    reconcile_submission() (or recover_stale_reconciliation() if it's
+    also stuck) -- resolve it, then call this function again to continue.
+    A leg blocked only by an override-eligible policy violation is
+    recorded as "blocked_overridable" and does NOT stop the batch (it's
+    terminal for that leg, not ambiguous) -- resolve it individually via
+    the proposal's own approval card.
     """
     batch = store.get_allocation_batch(batch_id)
     if batch is None:
@@ -195,14 +271,18 @@ def execute_allocation_batch(
 
     legs = batch["legs"]
     for proposal_id in batch["proposal_ids"]:
-        leg = legs.get(proposal_id, {"state": LEG_UNATTEMPTED})
+        leg = legs.get(proposal_id, {"state": LEG_UNATTEMPTED, "order": None, "error": None})
+        current_proposal = store.get_proposal(proposal_id)
+        leg = _sync_leg_from_proposal(leg, current_proposal)
+        legs[proposal_id] = leg
+
         if leg["state"] in (LEG_SUBMITTED, LEG_FAILED, LEG_BLOCKED_OVERRIDABLE):
             continue
         if leg["state"] == LEG_UNKNOWN:
-            # An ambiguous leg from a prior attempt blocks further
-            # progress until a human resolves it.
             return store.update_allocation_batch(batch_id, status=BATCH_STOPPED_UNKNOWN, legs=legs)
 
+        # leg["state"] == LEG_UNATTEMPTED and the proposal is genuinely
+        # still "proposed" -- eligible to attempt.
         portfolio = build_portfolio_snapshot_from_alpaca()
         try:
             order = execute_approved_paper_proposal(

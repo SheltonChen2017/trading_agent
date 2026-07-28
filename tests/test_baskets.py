@@ -144,10 +144,13 @@ def test_compare_baskets_to_market_index_tags_basket_column():
     data = {"NVDA": dip_df, "AMD": dip_df}
     benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(60, 1.002))}, index=dip_df.index)
 
-    comparison = compare_baskets_to_market_index(data, benchmark_df, basket_names=["semiconductors"])
+    comparison = compare_baskets_to_market_index(
+        data, benchmark_df, basket_names=["semiconductors"], entry_timing="same_close",
+    )
     assert not comparison.empty
     assert (comparison["basket"] == "semiconductors").all()
     assert "mean_edge_vs_market_pct" in comparison.columns
+    assert (comparison["entry_timing"] == "same_close").all()
 
 
 def test_out_of_sample_backtest_by_basket_tags_basket_and_period():
@@ -175,10 +178,35 @@ def test_out_of_sample_market_by_basket_tags_basket_and_period():
     data = {"NVDA": df, "AMD": df}
     benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(100, 1.001))}, index=df.index)
 
-    result = out_of_sample_market_by_basket(data, benchmark_df, basket_names=["semiconductors"], discovery_frac=0.6)
+    result = out_of_sample_market_by_basket(
+        data, benchmark_df, basket_names=["semiconductors"], discovery_frac=0.6, entry_timing="same_close",
+    )
     assert not result.empty
     assert (result["basket"] == "semiconductors").all()
     assert set(result["period"]) == {"discovery", "confirmation"}
+    assert (result["entry_timing"] == "same_close").all()
+
+
+def test_out_of_sample_backtest_by_basket_reports_entry_timing():
+    df = _flat_series_with_two_shocks(days=100, early_index=25, late_index=80, shock_return=-0.08)
+    data = {"NVDA": df, "AMD": df}
+
+    result = out_of_sample_backtest_by_basket(
+        data, basket_names=["semiconductors"], discovery_frac=0.6, entry_timing="same_close",
+    )
+    assert not result.empty
+    assert (result["entry_timing"] == "same_close").all()
+
+
+def test_out_of_sample_baseline_by_basket_reports_entry_timing():
+    df = _flat_series_with_two_shocks(days=100, early_index=25, late_index=80, shock_return=-0.08)
+    data = {"NVDA": df, "AMD": df}
+
+    result = out_of_sample_baseline_by_basket(
+        data, basket_names=["semiconductors"], discovery_frac=0.6, entry_timing="same_close",
+    )
+    assert not result.empty
+    assert (result["entry_timing"] == "same_close").all()
 
 
 def test_basket_significance_flags_clear_edge_as_significant():
@@ -247,6 +275,8 @@ if __name__ == "__main__":
     test_out_of_sample_backtest_by_basket_tags_basket_and_period()
     test_out_of_sample_baseline_by_basket_tags_basket_and_period()
     test_out_of_sample_market_by_basket_tags_basket_and_period()
+    test_out_of_sample_backtest_by_basket_reports_entry_timing()
+    test_out_of_sample_baseline_by_basket_reports_entry_timing()
     test_basket_significance_flags_clear_edge_as_significant()
     test_basket_significance_bonferroni_threshold_scales_with_basket_count()
     test_basket_out_of_sample_significance_tags_basket_and_period()

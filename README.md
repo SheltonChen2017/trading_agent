@@ -167,11 +167,14 @@ As of the current registry (`research_findings.json` version 1.1.0):
   backtested only, not yet in live/paper trading. NVDL has substantially
   less real history than the other two pairs; see the underfilled-dataset
   warning below.
-- A handful of additional signal modules exist in `signals/` (idiosyncratic
-  volatility, variance risk premium, residual momentum, overnight-gap
-  reversal) that are frozen/pre-registered per `config.py` but do not yet
-  have a corresponding entry in the versioned registry -- treat them as
-  implemented-but-not-yet-formally-verdicted, not as validated.
+- **Rejected**: four additional signals tried on external (ChatGPT)
+  recommendation -- idiosyncratic volatility, variance risk premium,
+  residual momentum, overnight-gap reversal -- all rejected under the same
+  out-of-sample + confirmation-only + block-bootstrap rigor bar, with a
+  pre-registered shared Bonferroni correction across the family. See
+  `assistant/research_findings.json` for per-signal detail. The
+  implementations were removed from the codebase after this verdict was
+  recorded -- git history (commit 8605f0e) retains them.
 
 **One credit-spread anomaly, explicitly not promoted**: re-checked 2026-07-26
 under realistic `next_open` (rather than same-close) entry timing, the

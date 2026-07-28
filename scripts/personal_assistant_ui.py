@@ -8,12 +8,14 @@ generate_soxx_soxl_rebalance_proposals, execute_approved_paper_proposal).
 No financial logic lives here -- every number and every safety check is
 still computed by the same deterministic code the CLI uses.
 
-Safety note: the CLI's core protection is that you must TYPE the exact
-phrase "APPROVE <proposal_id>" before an order can be submitted -- this
-prevents a stray click from ever placing a real (paper) trade. This UI
-preserves that same friction: each proposal has a text box you must type
-the exact phrase into, not a one-click "Approve" button. The Submit
-button stays disabled until the typed text matches exactly.
+Safety note: every proposal still requires deliberate typed confirmation.
+The user must type the exact phrase "approve" in the specific proposal card
+before its submit button is enabled -- this prevents a stray click from
+ever placing a real (paper) trade. The proposal identity is bound by that
+card and by the proposal content digest; typed confirmation is cleared if
+the displayed proposal, policy, portfolio, or quote context changes. A
+policy override requires the separate order-specific phrase
+"OVERRIDE <SIDE> <SHARES> <TICKER>".
 
 Run with:
     streamlit run scripts/personal_assistant_ui.py

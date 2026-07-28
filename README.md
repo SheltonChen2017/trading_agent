@@ -92,13 +92,16 @@ Important guarantees:
   one-sided or crossed quote fails closed rather than silently skipping the
   check, and a limit order requires a positive, finite `limit_price`.
 - Sells cannot exceed the shares currently held.
-- Share quantities are validated strictly: only a real positive `int` is
-  accepted (not `bool`, not any `float` -- whole-numbered, fractional, `NaN`,
-  or infinite -- all of which would otherwise defeat a plain `shares <= 0`
-  comparison). Enforced at the execution gate, at the broker submission
-  functions independently (defense in depth), and when reconstructing a
-  trade intent from stored proposal data (a malformed value fails closed
-  instead of being silently truncated).
+- Share quantities are validated strictly at the authorization and broker
+  boundaries: only a real positive `int` is accepted (not `bool`, `float`,
+  `NaN`, infinity, a string, zero, or a negative value -- all of which would
+  otherwise defeat a plain `shares <= 0` comparison). Enforced independently
+  at both `validate_trade_intent()` and the broker submission functions
+  (defense in depth). When reconstructing stored JSON proposal data, a
+  finite, whole-valued float such as `10.0` may be normalized to the
+  equivalent integer `10` (supporting numerically-equivalent JSON
+  representations); a fractional or non-finite value (`10.5`, `NaN`,
+  infinity) is still rejected rather than silently truncated.
 - A concentration-cap or earnings-blackout block (never a data-integrity or
   hard-safety violation) can be knowingly overridden: the CLI's `approve
   --override` flag or the UI's typed `OVERRIDE ...` phrase. Every other
@@ -351,16 +354,19 @@ work:
 1. Install dependencies and (optionally) set Alpaca paper credentials --
    see [Installation](#installation) and
    [Configure Alpaca paper trading](#configure-alpaca-paper-trading) above.
-   Without credentials, everything below still works against the sample
-   portfolio in `assistant/sample_portfolio.py`.
+   Without credentials, the briefing and proposal-generation steps still
+   work against `assistant/sample_portfolio.py`, but approval, submission,
+   and broker reconciliation require Alpaca paper credentials.
 2. Get a briefing: `python scripts/run_personal_assistant.py briefing`
 3. Check for anything that needs attention:
    `python scripts/run_personal_assistant.py propose`
-4. If a proposal was generated, review it, then approve it explicitly:
+4. If a proposal was generated, review it, then approve it explicitly
+   (requires Alpaca paper credentials):
    `python scripts/run_personal_assistant.py approve <proposal_id> --confirm approve`
-5. Or skip 2-4 and run `python -m streamlit run scripts/personal_assistant_ui.py`
-   for the same workflow in a browser, plus the Watchlist tab's cart-lookup
-   and multi-ticker allocation-split features (CLI-only otherwise).
+5. Or run the Streamlit UI for the same briefing/proposal/approval workflow,
+   plus the UI-only Watchlist cart and multi-ticker allocation-split
+   features (no CLI equivalent exists for those):
+   `python -m streamlit run scripts/personal_assistant_ui.py`
 
 Nothing above places a real order until you type the exact confirmation
 phrase for a specific proposal ID -- generating a briefing or a proposal is

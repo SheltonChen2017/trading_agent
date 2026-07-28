@@ -253,7 +253,17 @@ The checked-in default is deliberately restrictive:
 ```
 
 Create a separate policy file for personal changes and pass it using
-`--policy`. Increment its version whenever behavior changes.
+`--policy`. Copy `assistant/my_policy.example.json` to
+`assistant/my_policy.json` (gitignored, so your own risk-tolerance edits
+never get committed or conflict with a repo update) and edit that copy.
+
+Every proposal is bound to the policy that generated it by both a
+human-readable `policy_version` string AND a `policy_fingerprint` --
+a SHA256 hash over every policy field except `notes` (free text, not
+behavior-affecting). Approval checks both: if you edit your policy file
+without bumping its version, the fingerprint mismatch still blocks
+approval and tells you to regenerate the proposal, instead of silently
+approving a trade against stale risk limits.
 
 ## Use the assistant
 

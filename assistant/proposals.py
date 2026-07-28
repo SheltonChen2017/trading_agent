@@ -5,7 +5,7 @@ import dataclasses
 import hashlib
 from datetime import datetime, timedelta, timezone
 
-from assistant.policy import TradingPolicy
+from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.schemas import DecisionPacket, PortfolioPosition
 from config import BASKETS
@@ -20,6 +20,7 @@ class TradeProposal:
     status: str
     idempotency_key: str
     policy_version: str
+    policy_fingerprint: str
     intent: TradeIntent
     reference_price: float
     price_timestamp: str
@@ -158,6 +159,7 @@ def generate_risk_reduction_proposals(
                 status="proposed",
                 idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
                 policy_version=policy.version,
+                policy_fingerprint=compute_policy_fingerprint(policy),
                 intent=intent,
                 reference_price=position.current_price,
                 price_timestamp=now.isoformat(),

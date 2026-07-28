@@ -12,7 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from assistant.policy import TradingPolicy
+from assistant.policy import TradingPolicy, compute_policy_fingerprint
 
 
 def _valid_policy(**overrides) -> TradingPolicy:
@@ -22,6 +22,51 @@ def _valid_policy(**overrides) -> TradingPolicy:
 
 def test_default_policy_is_valid():
     _valid_policy().validate()  # must not raise
+
+
+def test_policy_fingerprint_same_content_same_fingerprint():
+    a = _valid_policy()
+    b = _valid_policy()
+    assert compute_policy_fingerprint(a) == compute_policy_fingerprint(b)
+
+
+def test_policy_fingerprint_changes_with_any_risk_limit():
+    # Regression test (GPT review, 2026-07-28): approval previously only
+    # compared `version` strings -- two policies with the SAME version
+    # but different limits were interchangeable. The fingerprint must
+    # change even though `version` doesn't.
+    base = _valid_policy(version="1.0.0")
+    edited = dataclasses.replace(base, max_position_pct=base.max_position_pct / 2)
+    assert base.version == edited.version
+    assert compute_policy_fingerprint(base) != compute_policy_fingerprint(edited)
+
+
+def test_policy_fingerprint_changes_with_allow_new_positions():
+    base = _valid_policy(version="1.0.0", allow_new_positions=False)
+    edited = dataclasses.replace(base, allow_new_positions=True)
+    assert base.version == edited.version
+    assert compute_policy_fingerprint(base) != compute_policy_fingerprint(edited)
+
+
+def test_policy_fingerprint_ignores_notes_only_changes():
+    # `notes` is free-text/explanatory, not behavior-affecting -- changing
+    # ONLY it should not invalidate an otherwise-identical policy.
+    base = _valid_policy(notes="original notes")
+    edited = dataclasses.replace(base, notes="completely different notes")
+    assert compute_policy_fingerprint(base) == compute_policy_fingerprint(edited)
+
+
+def test_default_and_personal_starter_policies_have_distinct_identity():
+    # GPT review, 2026-07-28: give the personal starter policy an identity
+    # distinct from the default so the two are never accidentally
+    # interchangeable, even though they start with identical limits.
+    from assistant.policy import DEFAULT_POLICY_PATH, load_policy
+
+    default_policy = load_policy(DEFAULT_POLICY_PATH)
+    personal_policy = load_policy(DEFAULT_POLICY_PATH.parent / "my_policy.example.json")
+    assert default_policy.name != personal_policy.name
+    assert default_policy.version != personal_policy.version
+    assert compute_policy_fingerprint(default_policy) != compute_policy_fingerprint(personal_policy)
 
 
 def test_negative_max_slippage_pct_rejected():
@@ -132,6 +177,11 @@ def test_non_boolean_flag_fields_rejected():
 
 if __name__ == "__main__":
     test_default_policy_is_valid()
+    test_policy_fingerprint_same_content_same_fingerprint()
+    test_policy_fingerprint_changes_with_any_risk_limit()
+    test_policy_fingerprint_changes_with_allow_new_positions()
+    test_policy_fingerprint_ignores_notes_only_changes()
+    test_default_and_personal_starter_policies_have_distinct_identity()
     test_negative_max_slippage_pct_rejected()
     test_negative_max_spread_pct_rejected()
     test_negative_earnings_blackout_days_rejected()

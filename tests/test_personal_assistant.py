@@ -12,7 +12,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import execution.alpaca_broker as broker
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.execution_service import ProposalExecutionError, execute_approved_paper_proposal
-from assistant.policy import TradingPolicy, load_policy
+from assistant.policy import TradingPolicy, compute_policy_fingerprint, load_policy
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.schemas import DecisionPacket, MarketRegime
 from assistant.storage import AssistantStore
@@ -371,6 +371,109 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
         restore()
 
 
+def test_approval_rejects_a_policy_with_the_same_version_but_different_content():
+    # Regression test (GPT review, 2026-07-28): approval used to compare
+    # only the `policy_version` string. Two policy files (e.g. a
+    # hand-edited personal one copied from the default) can share the
+    # same version yet have materially different risk limits -- this
+    # must be rejected via the fingerprint even though the version string
+    # matches.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    edited_policy = dataclasses.replace(policy, max_position_pct=policy.max_position_pct / 2)
+    assert edited_policy.version == policy.version  # same version string...
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, f"APPROVE {proposal.proposal_id}", packet.portfolio,
+                    edited_policy, store, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected a fingerprint mismatch to block approval despite matching version"
+            except ProposalExecutionError as exc:
+                assert "fingerprint" in str(exc).lower()
+            assert len(captured) == 0
+    finally:
+        restore()
+
+
+def test_approval_rejects_when_allow_new_positions_changed():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    edited_policy = dataclasses.replace(policy, allow_new_positions=not policy.allow_new_positions)
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, f"APPROVE {proposal.proposal_id}", packet.portfolio,
+                    edited_policy, store, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected a changed allow_new_positions to invalidate the proposal"
+            except ProposalExecutionError as exc:
+                assert "fingerprint" in str(exc).lower()
+            assert len(captured) == 0
+    finally:
+        restore()
+
+
+def test_approval_accepts_when_only_notes_changed():
+    # `notes` is free-text/explanatory, not behavior-affecting -- the
+    # fingerprint deliberately ignores it, so a notes-only edit should
+    # NOT invalidate an outstanding proposal.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    edited_policy = dataclasses.replace(policy, notes="a completely different note")
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            order = execute_approved_paper_proposal(
+                proposal.proposal_id, f"APPROVE {proposal.proposal_id}", packet.portfolio,
+                edited_policy, store, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert order["order_id"] == "paper-1"
+            assert len(captured) == 1
+    finally:
+        restore()
+
+
+def test_approval_rejects_a_proposal_missing_policy_fingerprint():
+    # Regression test (GPT review, 2026-07-28): a proposal predating
+    # fingerprint binding (e.g. an old row already in the SQLite store)
+    # has no `policy_fingerprint` key at all -- this must fail closed,
+    # not be silently grandfathered in.
+    packet = _packet()
+    policy = _policy()
+    proposal_dict = generate_risk_reduction_proposals(packet, policy)[0].to_dict()
+    del proposal_dict["policy_fingerprint"]
+    captured, restore = _mock_execution_dependencies(quote_price=proposal_dict["reference_price"])
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal_dict)
+            try:
+                execute_approved_paper_proposal(
+                    proposal_dict["proposal_id"], f"APPROVE {proposal_dict['proposal_id']}", packet.portfolio,
+                    policy, store, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected a proposal missing policy_fingerprint to fail closed"
+            except ProposalExecutionError as exc:
+                assert "fingerprint" in str(exc).lower()
+            assert len(captured) == 0
+    finally:
+        restore()
+
+
 def test_approval_fails_closed_when_open_orders_unavailable():
     packet = _packet()
     policy = _policy()
@@ -492,6 +595,7 @@ def _buy_proposal_dict(packet, policy, ticker: str, shares: int) -> dict:
         status="proposed",
         idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
         policy_version=policy.version,
+        policy_fingerprint=compute_policy_fingerprint(policy),
         intent=intent,
         reference_price=50.0,
         price_timestamp=packet.generated_at,
@@ -726,6 +830,7 @@ def _buy_proposal_with_a_pending_order_on_another_ticker(side: str):
         status="proposed",
         idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
         policy_version=policy.version,
+        policy_fingerprint=compute_policy_fingerprint(policy),
         intent=intent,
         reference_price=50.0,
         price_timestamp=packet.generated_at,
@@ -901,6 +1006,7 @@ def test_notional_only_pending_order_blocks_a_duplicate_proposal_on_the_same_tic
         status="proposed",
         idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
         policy_version=policy.version,
+        policy_fingerprint=compute_policy_fingerprint(policy),
         intent=intent,
         reference_price=50.0,
         price_timestamp=packet.generated_at,
@@ -948,6 +1054,7 @@ def test_limit_order_routes_to_submit_limit_order_not_market():
         status="proposed",
         idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
         policy_version=policy.version,
+        policy_fingerprint=compute_policy_fingerprint(policy),
         intent=intent,
         reference_price=50.0,
         price_timestamp=packet.generated_at,

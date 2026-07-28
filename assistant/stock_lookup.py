@@ -14,6 +14,8 @@ heuristic (inverse-vol weighting) -- never a forecast.
 """
 from __future__ import annotations
 
+import math
+
 import pandas as pd
 
 from backtest.engine import run_baseline_forward_returns
@@ -110,14 +112,25 @@ def inverse_volatility_weights(
 
     `max_weight_pct`: if set, no single ticker's weight can exceed this
     -- an unusually calm ticker's raw inverse-vol share can otherwise
-    dominate the split with no limit (GPT review, 2026-07-27). Excess
-    above the cap is redistributed proportionally across the other,
-    not-yet-capped tickers (an iterative waterfall, since redistributing
-    can itself push another ticker over the cap). If the cap is
-    infeasible for this many tickers (e.g. max_weight_pct * count < 100),
-    every ticker ends up AT the cap and the weights won't sum to 100 --
-    documented behavior, not a silent bug.
+    dominate the split with no limit (GPT review, 2026-07-27). Must be
+    finite and in (0, 100]. Excess above the cap is redistributed
+    proportionally across tickers not YET capped (an iterative
+    waterfall, since redistributing can itself push another ticker over
+    the cap -- a prior version recomputed "over the cap" fresh every pass
+    instead of permanently excluding already-capped tickers, so a ticker
+    capped in an early pass could receive MORE excess in a later pass and
+    end up back over the cap; reproduced examples included a 40% cap
+    letting a ticker reach 56-73%. GPT review, 2026-07-28). Raises
+    ValueError if the cap is infeasible for how many tickers actually
+    have a nonzero weight (e.g. a 40% cap with only 2 eligible tickers
+    can allocate at most 80% -- the caller must raise the cap, add more
+    eligible tickers, or accept leaving cash unallocated some other way).
     """
+    if max_weight_pct is not None and (
+        not math.isfinite(max_weight_pct) or max_weight_pct <= 0 or max_weight_pct > 100
+    ):
+        raise ValueError(f"max_weight_pct must be a finite number in (0, 100], got {max_weight_pct}.")
+
     inverse = {t: (1.0 / v if v and v > 0 else 0.0) for t, v in volatilities.items()}
     total = sum(inverse.values())
     if total <= 0:
@@ -127,24 +140,44 @@ def inverse_volatility_weights(
         weights = {t: v / total * 100 for t, v in inverse.items()}
 
     if max_weight_pct is not None:
+        n_eligible = sum(1 for w in weights.values() if w > 0)
+        if n_eligible > 0 and max_weight_pct * n_eligible < 100 - 1e-6:
+            raise ValueError(
+                f"max_weight_pct={max_weight_pct} is infeasible for {n_eligible} eligible ticker(s) -- "
+                f"the minimum feasible cap here is {100 / n_eligible:.2f}%. Raise the cap, add more "
+                "eligible tickers, or accept an incomplete allocation some other way."
+            )
         weights = _cap_and_redistribute(weights, max_weight_pct)
 
     return {t: round(w, 1) for t, w in weights.items()}
 
 
 def _cap_and_redistribute(weights: dict[str, float], max_weight_pct: float) -> dict[str, float]:
+    """Caller (inverse_volatility_weights) has already validated the cap
+    is feasible for these weights -- this function assumes that and
+    enforces it via a hard postcondition assert, so a future change
+    can't silently reintroduce the class of bug this replaced."""
     weights = dict(weights)
-    for _ in range(len(weights) + 1):  # bounded: at most one ticker newly capped per pass
-        over = {t: w for t, w in weights.items() if w > max_weight_pct}
-        if not over:
+    tolerance = 1e-9
+    frozen: set[str] = set()  # tickers pinned at the cap -- NEVER eligible for more redistribution again
+
+    for _ in range(len(weights) + 1):  # bounded: at least one NEW ticker gets frozen per non-terminal pass
+        newly_over = {t for t, w in weights.items() if t not in frozen and w > max_weight_pct + tolerance}
+        if not newly_over:
             break
-        excess = sum(w - max_weight_pct for w in over.values())
-        for t in over:
+        excess = 0.0
+        for t in newly_over:
+            excess += weights[t] - max_weight_pct
             weights[t] = max_weight_pct
-        under = {t: w for t, w in weights.items() if t not in over}
-        under_total = sum(under.values())
-        if under_total <= 0:
-            break  # every ticker is capped or zero -- can't redistribute further
-        for t in under:
-            weights[t] += excess * (weights[t] / under_total)
+        frozen |= newly_over
+
+        eligible = [t for t in weights if t not in frozen]
+        eligible_total = sum(weights[t] for t in eligible)
+        if eligible_total <= 0:
+            break  # every remaining ticker is frozen or zero -- can't redistribute further
+        for t in eligible:
+            weights[t] += excess * (weights[t] / eligible_total)
+
+    for t, w in weights.items():
+        assert w <= max_weight_pct + 1e-6, f"cap postcondition violated for {t!r}: {w} > {max_weight_pct}"
     return weights

@@ -23,3 +23,9 @@ assistant/decision_log.jsonl
 # config layer.
 *.jsonl
 .claude/settings.local.json
+
+# Your real personal policy -- copy assistant/my_policy.example.json to
+# this path and edit it. Gitignored so your own risk-tolerance edits are
+# never accidentally committed or conflict with a repo update (GPT
+# review, 2026-07-28).
+assistant/my_policy.json

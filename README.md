@@ -658,8 +658,7 @@ execution/
 
 signals/                   pluggable research signals (scanner, momentum, relative,
                             breakout, PEAD, fundamentals, analyst/analyst_target,
-                            vix_spike/credit_spread/yield_curve, regime, idio_vol,
-                            variance_risk_premium, residual_momentum, overnight_gap)
+                            vix_spike/credit_spread/yield_curve, regime)
 backtest/
   engine.py                walk-forward and dependence-aware testing
   portfolio_simulator.py   tax/slippage-aware equity-curve simulator

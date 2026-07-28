@@ -89,8 +89,8 @@ def _print_briefing(packet) -> None:
         # authoritative -- historical `status` is preserved, only the
         # user-facing label is qualified. This CLI briefing was the last
         # remaining consumer still reading the raw `status` value
-        # directly (run_morning_briefing.py and the Streamlit UI were
-        # already corrected).
+        # directly (the Streamlit UI and the now-removed legacy
+        # run_morning_briefing.py were already corrected).
         print(f"  [{finding.display_status}] {finding.label}: {finding.claim}")
         if finding.provenance is not None:
             dataset_warning = underfilled_dataset_warning(finding.provenance)

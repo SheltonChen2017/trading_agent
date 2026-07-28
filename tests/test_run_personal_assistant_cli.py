@@ -55,8 +55,9 @@ def test_recover_stale_rejects_non_integer():
 
 # --- _print_briefing() user-facing evidence display (GPT review,
 # 2026-07-30): this CLI briefing was the last remaining consumer still
-# printing the raw `status` value directly -- run_morning_briefing.py and
-# the Streamlit UI were already corrected to use display_status.
+# printing the raw `status` value directly -- the Streamlit UI and the
+# now-removed legacy run_morning_briefing.py were already corrected to
+# use display_status.
 
 def _packet_with_unreproduced_confirmed_finding(underfilled: bool = False):
     from assistant.portfolio_analytics import compute_portfolio_analytics

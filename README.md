@@ -395,14 +395,6 @@ Skip live earnings lookup when working offline:
 python scripts/run_personal_assistant.py briefing --no-events
 ```
 
-The older formatted briefing remains available:
-
-```bash
-python scripts/run_morning_briefing.py
-```
-
-It writes both the compatibility JSONL journal and SQLite.
-
 ### Generate proposals
 
 ```bash
@@ -635,8 +627,7 @@ assistant/
   execution_service.py     approval, revalidation, paper submission
   proposal_status.py       single source of truth for proposal status strings
   storage.py               SQLite state and idempotency
-  audit_log.py             legacy JSONL decision-packet journal
-  risk_copilot.py          concentration, duplication, stress analysis
+  risk_copilot.py          concentration, duplication, stress analysis (Briefing tab + `risk-check` CLI)
   explanations.py          "why was this ticker flagged?"
   stock_lookup.py          own-ticker trend/volatility, price targets, hold-period ranges
   news_summary.py          recent news, optional Claude-summarized (ANTHROPIC_API_KEY)

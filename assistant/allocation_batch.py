@@ -53,7 +53,6 @@ allow bulk policy overrides").
 """
 from __future__ import annotations
 
-import dataclasses
 import uuid
 from datetime import datetime, timezone
 
@@ -168,48 +167,64 @@ def preflight_allocation_batch(
     """
     Revalidates every proposal in a prospective batch WITHOUT claiming or
     submitting anything -- a read-only, CUMULATIVE dry run: each leg's
-    check reserves every earlier (passing) leg's planned notional against
-    cash/buying-power and pending exposure before validating the next
-    leg, so two individually-safe proposals that would collectively
-    exceed a cap correctly fail preflight together (GPT review, 2026-07-
-    29 -- previously each leg was checked independently against the SAME
-    starting snapshot, so preflight could approve a batch that execution
-    would then partially reject).
+    check reserves every earlier (passing) leg's planned notional before
+    validating the next leg, so two individually-safe proposals that
+    would collectively exceed a cap correctly fail preflight together
+    (GPT review, 2026-07-29 -- previously each leg was checked
+    independently against the SAME starting snapshot, so preflight could
+    approve a batch that execution would then partially reject).
+
+    Accounting invariant (GPT review, 2026-07-29 follow-up -- a second
+    bug in the FIRST fix for the above): each existing position, real
+    pending order, and simulated earlier batch leg must contribute
+    EXACTLY ONCE to projected exposure. The original fix reserved earlier
+    legs' notional in two places at once -- reduced `cash` on a
+    `dataclasses.replace()`'d portfolio (affecting the cash-availability
+    checks) AND `extra_pending_buy_value_by_ticker` (affecting the
+    exposure/concentration checks) -- but validate_trade_intent()'s
+    `existing_invested` is derived from `total_equity - cash`, so the
+    SAME reservation was ALSO counted there via the shrunk cash figure,
+    double-counting every earlier leg (e.g. two $4,000 buys against a
+    $10,000/80%-exposure-cap account: real cumulative exposure is exactly
+    80%, but the double-counted math reported 120% and rejected a batch
+    that should have passed). Fixed by never mutating `current_portfolio`
+    at all: it's passed to validate_proposal_for_execution() UNCHANGED
+    (so `existing_invested` always derives from the real, unreserved
+    cash/equity), while reserved cash is instead passed via
+    `available_cash_override`/`available_buying_power_override` --
+    parameters validate_trade_intent() consults ONLY for the cash-
+    availability checks (INSUFFICIENT_CASH, MIN_CASH_RESERVE), never for
+    exposure. `extra_pending_buy_value_by_ticker` remains the sole place
+    a reservation enters exposure math, so it's counted there once and
+    never again via cash.
 
     The caller MUST refuse to create/start the batch if any result is
     not approved ("if any proposal fails preflight, default to submitting
     none"). Proposal order is deterministic: exactly the order of
     `proposal_ids` as given by the caller (the UI passes them in the
     order the allocation split was generated).
-
-    Reserved effect is modeled as pending buy value (not a fake filled
-    position), fed into validate_proposal_for_execution()'s
-    `extra_pending_buy_value_by_ticker` -- the same shared validation the
-    real execution path uses, so preflight and execution can no longer
-    drift (2026-07-29, GPT review).
     """
     results: dict[str, ValidationResult] = {}
     reserved_cash = 0.0
     reserved_pending_by_ticker: dict[str, float] = {}
 
     for proposal_id in proposal_ids:
-        projected_cash = current_portfolio.cash - reserved_cash
-        projected_buying_power = (
+        available_cash_override = current_portfolio.cash - reserved_cash
+        available_buying_power_override = (
             current_portfolio.buying_power - reserved_cash
             if current_portfolio.buying_power is not None
             else None
         )
-        projected_portfolio = dataclasses.replace(
-            current_portfolio, cash=projected_cash, buying_power=projected_buying_power,
-        )
         outcome = validate_proposal_for_execution(
             proposal_id,
-            projected_portfolio,
+            current_portfolio,
             policy,
             store,
             now_et=now_et,
             kill_switch_active=kill_switch_active,
             extra_pending_buy_value_by_ticker=dict(reserved_pending_by_ticker),
+            available_cash_override=available_cash_override,
+            available_buying_power_override=available_buying_power_override,
         )
         if outcome.error is not None:
             results[proposal_id] = ValidationResult(

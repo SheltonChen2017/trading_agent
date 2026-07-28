@@ -3,6 +3,7 @@ Tests for assistant/allocation_batch.py -- the sequential, resumable
 batch executor behind the Watchlist "submit all proposals in this split"
 action (GPT review, 2026-07-28).
 """
+import dataclasses
 import sys
 import tempfile
 from datetime import datetime, timezone
@@ -24,7 +25,7 @@ from assistant.allocation_batch import (
 )
 from assistant.allocation_proposals import generate_allocation_buy_proposals
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
-from assistant.execution_service import execute_approved_paper_proposal
+from assistant.execution_service import execute_approved_paper_proposal, validate_proposal_for_execution
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposals import TradeProposal, _stable_id
 from assistant.schemas import DecisionPacket, MarketRegime
@@ -315,6 +316,395 @@ def test_cumulative_preflight_fails_on_collective_same_ticker_position_cap():
             assert results[proposals[0].proposal_id].approved
             assert not results[proposals[1].proposal_id].approved
             assert any("per-position limit" in v for v in results[proposals[1].proposal_id].violations)
+    finally:
+        restore()
+
+
+# --- Cumulative preflight accounting fix (GPT review, 2026-07-29
+# follow-up): the tests above already demonstrate that a cumulative
+# check EXISTS for each constraint, but were written against numbers
+# where the double-counting bug and the correct accounting happen to
+# agree (both reject). The tests below specifically target the
+# accounting itself -- exact-boundary cases that the double-counting
+# bug got WRONG (incorrectly rejecting a genuinely safe batch) and that
+# only the corrected single-counted arithmetic gets right.
+
+def test_cumulative_preflight_test_a_exact_exposure_cap_is_allowed():
+    # $10,000 account, 80% total-exposure cap, two $4,000 buys. Real
+    # cumulative exposure is exactly 80% -- must be allowed (inclusive
+    # boundary). The double-counting bug computed 120% here and wrongly
+    # rejected the second leg.
+    packet = _packet(cash=10_000.0)
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=0.8, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
+        allow_new_positions=True,
+    )
+    proposals = [
+        _buy_proposal(packet, policy, "AAA", 100, 40.0),  # $4,000
+        _buy_proposal(packet, policy, "BBB", 100, 40.0),  # $4,000
+    ]
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            results = preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, packet.portfolio,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert results[proposals[0].proposal_id].approved
+            assert results[proposals[1].proposal_id].approved, results[proposals[1].proposal_id].violations
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_b_genuinely_excessive_exposure_is_rejected():
+    # Same account/cap as test A, but the second leg is $4,120 (103
+    # shares at the mocked $40 quote) -- real cumulative exposure is
+    # 81.2%, genuinely over the 80% cap. Note: _mock_execution_dependencies
+    # fixes the LIVE quote price used by validation regardless of the
+    # `price` field passed to _buy_proposal (that field only affects the
+    # proposal's own metadata/stable id) -- so dollar targets here are
+    # hit via share count against the fixed $40 mock, not via price.
+    packet = _packet(cash=10_000.0)
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=0.8, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
+        allow_new_positions=True,
+    )
+    proposals = [
+        _buy_proposal(packet, policy, "AAA", 100, 40.0),  # $4,000
+        _buy_proposal(packet, policy, "BBB", 103, 40.0),  # $4,120
+    ]
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            results = preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, packet.portfolio,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert results[proposals[0].proposal_id].approved
+            assert not results[proposals[1].proposal_id].approved
+            assert any("total-exposure" in v for v in results[proposals[1].proposal_id].violations)
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_c_min_cash_reserve_boundary_is_inclusive_and_cumulative():
+    # $10,000 account, 20% min cash reserve ($2,000). Two $4,000 buys
+    # leave exactly $2,000 -- must be allowed (inclusive boundary).
+    packet = _packet(cash=10_000.0)
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=1.0, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.2, max_order_value=50_000.0,
+        allow_new_positions=True,
+    )
+    proposals = [
+        _buy_proposal(packet, policy, "AAA", 100, 40.0),  # $4,000
+        _buy_proposal(packet, policy, "BBB", 100, 40.0),  # $4,000 -- leaves exactly $2,000
+    ]
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            results = preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, packet.portfolio,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert results[proposals[0].proposal_id].approved
+            assert results[proposals[1].proposal_id].approved, results[proposals[1].proposal_id].violations
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_c_min_cash_reserve_fails_just_above_the_boundary():
+    # Same setup, but the second leg is $4,040 (slightly more than
+    # $4,000) -- only $1,960 would remain, below the $2,000 reserve.
+    packet = _packet(cash=10_000.0)
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=1.0, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.2, max_order_value=50_000.0,
+        allow_new_positions=True,
+    )
+    proposals = [
+        _buy_proposal(packet, policy, "AAA", 100, 40.0),   # $4,000
+        _buy_proposal(packet, policy, "BBB", 101, 40.0),   # $4,040
+    ]
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            results = preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, packet.portfolio,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert results[proposals[0].proposal_id].approved
+            assert not results[proposals[1].proposal_id].approved
+            assert any("minimum cash reserve" in v for v in results[proposals[1].proposal_id].violations)
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_d_same_ticker_concentration_boundary_is_inclusive():
+    # $10,000 account, 80% per-position cap on the SAME ticker across two
+    # separate proposals. Combined value equals the cap exactly -- must
+    # be allowed.
+    packet = _packet(cash=10_000.0)
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=0.8, max_total_exposure_pct=1.0, max_basket_pct=1.0, max_leveraged_etf_pct=1.0,
+        min_cash_reserve_pct=0.0, max_order_value=50_000.0, allow_new_positions=True,
+    )
+    proposals = [
+        _buy_proposal(packet, policy, "AAA", 100, 40.0),  # $4,000
+        _buy_proposal(packet, policy, "AAA", 100, 40.0000001),  # $4,000 (distinct id via price)
+    ]
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            results = preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, packet.portfolio,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert results[proposals[0].proposal_id].approved
+            assert results[proposals[1].proposal_id].approved, results[proposals[1].proposal_id].violations
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_e_basket_exposure_boundary_is_inclusive():
+    # NVDA and AMD are both in config.BASKETS["semiconductors"]. Combined
+    # value equals the 80% basket cap exactly -- must be allowed.
+    packet = _packet(cash=10_000.0)
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=1.0, max_basket_pct=0.8, max_leveraged_etf_pct=1.0,
+        min_cash_reserve_pct=0.0, max_order_value=50_000.0, allow_new_positions=True,
+    )
+    proposals = [
+        _buy_proposal(packet, policy, "NVDA", 100, 40.0),  # $4,000
+        _buy_proposal(packet, policy, "AMD", 100, 40.0),   # $4,000
+    ]
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            results = preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, packet.portfolio,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert results[proposals[0].proposal_id].approved
+            assert results[proposals[1].proposal_id].approved, results[proposals[1].proposal_id].violations
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_e_leveraged_etf_exposure_boundary_is_inclusive():
+    # TQQQ and SOXL are both in config.LEVERAGED_ETF_TICKERS. Combined
+    # value equals the 80% leveraged-ETF cap exactly -- must be allowed.
+    packet = _packet(cash=10_000.0)
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=1.0, max_basket_pct=1.0, max_leveraged_etf_pct=0.8,
+        min_cash_reserve_pct=0.0, max_order_value=50_000.0, allow_new_positions=True,
+    )
+    proposals = [
+        _buy_proposal(packet, policy, "TQQQ", 100, 40.0),  # $4,000
+        _buy_proposal(packet, policy, "SOXL", 100, 40.0),  # $4,000
+    ]
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            results = preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, packet.portfolio,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert results[proposals[0].proposal_id].approved
+            assert results[proposals[1].proposal_id].approved, results[proposals[1].proposal_id].violations
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_f_real_pending_order_plus_simulated_legs_each_count_once():
+    # A REAL pending buy already sitting in current_portfolio.open_orders
+    # ($2,000 on CCC), plus two simulated batch legs of $3,000 each on
+    # different tickers, against an 80% total-exposure cap on a $10,000
+    # account: real cumulative exposure is exactly ($2,000 + $3,000 +
+    # $3,000) / $10,000 = 80% -- must be allowed. Getting this wrong in
+    # either direction (undercounting the real pending order, or
+    # double-counting either simulated leg) would flip this result.
+    packet_no_orders = _packet(cash=10_000.0)
+    portfolio_with_pending = dataclasses.replace(
+        packet_no_orders.portfolio,
+        open_orders=[{"ticker": "CCC", "side": "buy", "notional": 2000.0}],
+    )
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=0.8, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
+        allow_new_positions=True,
+    )
+    proposals = [
+        _buy_proposal(packet_no_orders, policy, "AAA", 75, 40.0),  # $3,000
+        _buy_proposal(packet_no_orders, policy, "BBB", 75, 40.0),  # $3,000
+    ]
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            results = preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, portfolio_with_pending,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert results[proposals[0].proposal_id].approved, results[proposals[0].proposal_id].violations
+            assert results[proposals[1].proposal_id].approved, results[proposals[1].proposal_id].violations
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_f_real_pending_order_plus_simulated_legs_rejects_when_over():
+    # Same setup, but the second simulated leg is $3,120 (78 shares at
+    # the mocked $40 quote) instead of $3,000 -- real cumulative exposure
+    # is 81.2%, genuinely over the cap.
+    packet_no_orders = _packet(cash=10_000.0)
+    portfolio_with_pending = dataclasses.replace(
+        packet_no_orders.portfolio,
+        open_orders=[{"ticker": "CCC", "side": "buy", "notional": 2000.0}],
+    )
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=0.8, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
+        allow_new_positions=True,
+    )
+    proposals = [
+        _buy_proposal(packet_no_orders, policy, "AAA", 75, 40.0),  # $3,000
+        _buy_proposal(packet_no_orders, policy, "BBB", 78, 40.0),  # $3,120
+    ]
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            results = preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, portfolio_with_pending,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert results[proposals[0].proposal_id].approved
+            assert not results[proposals[1].proposal_id].approved
+            assert any("total-exposure" in v for v in results[proposals[1].proposal_id].violations)
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_g_no_state_mutation():
+    # Preflight must be perfectly read-only: proposal records byte-for-
+    # byte unchanged, no allocation batch persisted, no broker calls.
+    packet = _packet(cash=10_000.0)
+    policy = _policy()
+    proposals = _two_leg_proposals(packet, policy)
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            before = {p.proposal_id: dict(store.get_proposal(p.proposal_id)) for p in proposals}
+
+            preflight_allocation_batch(
+                [p.proposal_id for p in proposals], store, policy, packet.portfolio,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+
+            assert len(captured) == 0  # no submit_market_order/submit_limit_order calls
+            for p in proposals:
+                after = dict(store.get_proposal(p.proposal_id))
+                assert after == before[p.proposal_id]  # byte-for-byte unchanged, not just status
+            # preflight never takes/creates a batch_id, so nothing could
+            # have been persisted under any id -- confirm a fresh one is
+            # still unknown to the store.
+            assert store.get_allocation_batch(new_batch_id()) is None
+    finally:
+        restore()
+
+
+def test_cumulative_preflight_test_h_single_execution_unaffected_by_new_override_params():
+    # execute_approved_paper_proposal() never passes available_cash_
+    # override/available_buying_power_override to validate_proposal_for_
+    # execution() -- the single-proposal path is structurally unaffected
+    # by this fix. Confirmed two ways: (1) calling
+    # validate_proposal_for_execution() with the new params explicitly
+    # set to the real portfolio's own cash/buying_power produces the
+    # identical result as calling it with no overrides at all (a real-
+    # value override is a no-op); (2) execute_approved_paper_proposal()
+    # itself still executes normally with no overrides in play.
+    packet = _packet(cash=10_000.0)
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=0.5, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
+        allow_new_positions=True,
+    )
+    proposal = _buy_proposal(packet, policy, "AAA", 100, 40.0)  # $4,000 of $10,000 = 40% < 50% cap
+    _, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+
+            baseline = validate_proposal_for_execution(
+                proposal.proposal_id, packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            with_real_value_override = validate_proposal_for_execution(
+                proposal.proposal_id, packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                available_cash_override=packet.portfolio.cash,
+                available_buying_power_override=packet.portfolio.buying_power,
+            )
+            assert baseline.approved
+            assert with_real_value_override.approved
+            assert baseline.validation.violations == with_real_value_override.validation.violations
+    finally:
+        restore()
+
+    execution_proposal = _buy_proposal(packet, policy, "BBB", 100, 40.0)
+    captured, restore = _mock_execution_dependencies(quote_price=40.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(execution_proposal.to_dict())
+            order = execute_approved_paper_proposal(
+                execution_proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert order is not None
+            assert store.get_proposal(execution_proposal.proposal_id)["status"] == "executed"
+            assert len(captured) == 1
     finally:
         restore()
 

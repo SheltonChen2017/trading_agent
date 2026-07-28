@@ -107,6 +107,7 @@ class ViolationCode(str, enum.Enum):
     INVALID_BUYING_POWER = "invalid_buying_power"
     INVALID_POSITION_DATA = "invalid_position_data"
     FUTURE_PRICE_TIMESTAMP = "future_price_timestamp"
+    INVALID_AVAILABLE_CAPITAL_OVERRIDE = "invalid_available_capital_override"
 
 
 # The ONLY violation codes authorize_overridden_trade_intent() will ever
@@ -373,6 +374,8 @@ def validate_trade_intent(
     max_order_value: float | None = None,
     min_cash_reserve_pct: float = 0.0,
     pending_buy_value_by_ticker: dict[str, float] | None = None,
+    available_cash_override: float | None = None,
+    available_buying_power_override: float | None = None,
 ) -> ValidationResult:
     """
     Validates one TradeIntent against every configured limit. Returns
@@ -404,6 +407,38 @@ def validate_trade_intent(
     review, 2026-07-27: reproduced a $4,000 pending buy + a new $5,000 buy
     both passing a 50% exposure cap on a $10,000 account, even though both
     fills together create 90% exposure).
+
+    `available_cash_override`/`available_buying_power_override` (GPT
+    review, 2026-07-29): let a caller simulating a SEQUENCE of proposals
+    (assistant.allocation_batch's cumulative preflight) tell the CASH
+    checks (INSUFFICIENT_CASH, MIN_CASH_RESERVE) that less capital is
+    really available than `portfolio.cash`/`portfolio.buying_power` show,
+    without touching what the EXPOSURE checks (position/total/basket/
+    leveraged-ETF) compute existing invested value from. A prior version
+    had the caller pass a `dataclasses.replace()`'d portfolio with cash
+    already reduced by earlier legs' reserved notional -- but
+    `existing_invested` below is derived from `portfolio.total_equity -
+    portfolio.cash`, so that same reservation got counted there TOO (via
+    the shrunk cash figure) in addition to `pending_buy_value_by_ticker`
+    (via `extra_pending_buy_value_by_ticker`), double-counting every
+    earlier leg and inflating projected exposure past what the batch
+    would actually produce -- a fail-closed bug (rejected some genuinely
+    safe batches), but wrong all the same.
+
+    Accounting invariant this function now preserves: each existing
+    position, real pending order, and simulated earlier batch leg
+    contributes exactly once to projected exposure. `portfolio.cash`/
+    `portfolio.total_equity` are ALWAYS the real, unreserved account
+    figures for the exposure-side arithmetic (`existing_invested`);
+    `pending_buy_value_by_ticker` (real open orders plus any caller-
+    supplied `extra_pending_buy_value_by_ticker`) is the ONLY place a
+    not-yet-filled dollar amount enters exposure math. The overrides here
+    affect ONLY the cash/buying-power availability checks, never
+    exposure -- so a reservation that reduces available cash for the
+    next leg does not also inflate that leg's total/position/basket/
+    leveraged-ETF exposure a second time. None (the default) for both
+    overrides reproduces the exact single-proposal-execution behavior
+    from before this parameter existed.
     """
     violations: list[str] = []
     violation_codes: list[str] = []
@@ -543,6 +578,24 @@ def validate_trade_intent(
                 f"{max_position_pct * 100:.1f}% per-position limit.",
             )
 
+        # Overrides must be finite or they're ignored (falling back to the
+        # real portfolio figures) -- a non-finite override still records a
+        # hard, non-overridable violation below, so this fallback never
+        # papers over the bad input; it just keeps the arithmetic sane
+        # while `approved` is already guaranteed False.
+        if available_cash_override is not None and not math.isfinite(available_cash_override):
+            _violate(
+                ViolationCode.INVALID_AVAILABLE_CAPITAL_OVERRIDE,
+                f"available_cash_override must be finite, got {available_cash_override}.",
+            )
+            available_cash_override = None
+        if available_buying_power_override is not None and not math.isfinite(available_buying_power_override):
+            _violate(
+                ViolationCode.INVALID_AVAILABLE_CAPITAL_OVERRIDE,
+                f"available_buying_power_override must be finite, got {available_buying_power_override}.",
+            )
+            available_buying_power_override = None
+
         # portfolio.cash alone ignores pending/open orders reserving that
         # same cash (e.g. two proposals approved back-to-back, or an
         # unrelated pending buy on another ticker) -- portfolio.buying_power,
@@ -550,9 +603,18 @@ def validate_trade_intent(
         # the tighter and more honest ceiling whenever it's available
         # (Codex review, 2026-07-27: reproduced a $5,000 approval against
         # $1,000 of real buying power sitting behind a $9,000 pending buy).
-        available_capital = portfolio.cash
-        if portfolio.buying_power is not None:
-            available_capital = min(available_capital, portfolio.buying_power)
+        # `available_cash_override`/`available_buying_power_override` (see
+        # docstring) let a caller simulating earlier reserved batch legs
+        # tighten these WITHOUT touching portfolio.cash/buying_power
+        # themselves, since those two also feed `existing_invested` below
+        # and must stay at their real, unreserved values there.
+        available_capital = available_cash_override if available_cash_override is not None else portfolio.cash
+        effective_buying_power = (
+            available_buying_power_override if available_buying_power_override is not None
+            else portfolio.buying_power
+        )
+        if effective_buying_power is not None:
+            available_capital = min(available_capital, effective_buying_power)
         if trade_value > available_capital:
             _violate(
                 ViolationCode.INSUFFICIENT_CASH,
@@ -566,6 +628,12 @@ def validate_trade_intent(
                 f"${minimum_cash:,.2f} minimum cash reserve.",
             )
 
+        # Deliberately portfolio.cash (the REAL, unreserved figure), never
+        # available_capital above -- existing_invested must derive from
+        # the account's actual state, with pending/simulated buys entering
+        # ONLY via total_pending_buy_value, or an earlier reserved leg
+        # would be counted twice: once here (via a shrunk cash figure)
+        # and again via total_pending_buy_value (see docstring).
         existing_invested = portfolio.total_equity - portfolio.cash + total_pending_buy_value
         new_invested_pct = (existing_invested + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
         if new_invested_pct > max_total_exposure_pct * 100:

@@ -465,6 +465,8 @@ def validate_proposal_for_execution(
     earnings_days_away: int | None = None,
     proposal: dict | None = None,
     extra_pending_buy_value_by_ticker: dict[str, float] | None = None,
+    available_cash_override: float | None = None,
+    available_buying_power_override: float | None = None,
 ) -> ProposalValidationOutcome:
     """
     Checks, in the same order execute_approved_paper_proposal() always
@@ -484,6 +486,19 @@ def validate_proposal_for_execution(
     concentration checks, without this function needing to know anything
     about batches itself. None/empty for the real single-proposal
     execution path (unaffected, backward compatible).
+
+    `available_cash_override`/`available_buying_power_override`: passed
+    straight through to validate_trade_intent() (see its docstring) --
+    lets the SAME caller tighten cash/buying-power availability to
+    reflect earlier reserved legs WITHOUT touching `current_portfolio.
+    cash`/`buying_power` themselves, since those two also feed the
+    exposure-side arithmetic there and must stay at their real,
+    unreserved values to avoid double-counting a reservation (GPT review,
+    2026-07-29: passing a `dataclasses.replace()`'d portfolio with cash
+    already reduced counted each earlier leg twice -- once via the
+    shrunk cash figure, once via `extra_pending_buy_value_by_ticker`).
+    None (the default) for both preserves exact single-proposal-execution
+    behavior.
     """
     if proposal is None:
         proposal = store.get_proposal(proposal_id)
@@ -636,6 +651,8 @@ def validate_proposal_for_execution(
         max_order_value=policy.max_order_value,
         min_cash_reserve_pct=policy.min_cash_reserve_pct,
         pending_buy_value_by_ticker=pending_buy_value_by_ticker,
+        available_cash_override=available_cash_override,
+        available_buying_power_override=available_buying_power_override,
     )
     return ProposalValidationOutcome(
         proposal=proposal, intent=intent, validation=validation, error=None, reference_price=reference_price,

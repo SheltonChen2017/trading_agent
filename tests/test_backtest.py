@@ -137,6 +137,57 @@ def test_next_open_needs_one_more_forward_day_than_same_close():
     assert next_open_results.empty
 
 
+def test_same_day_open_to_close_entry_timing_uses_todays_open_and_close():
+    # signals/overnight_gap.py needs a same-day round trip (entry at
+    # today's own open, exit at today's own close) -- distinct from
+    # both same_close (close-to-close) and next_open (tomorrow's open
+    # forward). hold_days is irrelevant here since entry and exit are
+    # always the same row.
+    df = _series_with_shock_and_known_forward_move(
+        days=60, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=5
+    )
+    df = df.copy()
+    df["open"] = df["close"] - 3.0  # deliberately distinct from close so a same_close/next_open bug is detectable
+
+    results = run_backtest({"TEST": df}, hold_days=999, slippage_pct=0.0, entry_timing="same_day_open_to_close")
+    assert not results.empty
+    row = results.iloc[0]
+
+    expected_entry_price = round(float(df["open"].iloc[40]), 2)
+    expected_exit_price = round(float(df["close"].iloc[40]), 2)
+    assert abs(row["entry_price"] - expected_entry_price) < 0.01
+    assert abs(row["exit_price"] - expected_exit_price) < 0.01
+
+
+def test_same_day_open_to_close_needs_no_forward_history():
+    # Unlike same_close/next_open, this mode never looks past the signal's
+    # own row -- a shock on the very LAST available day should still score.
+    days = 41
+    df = _series_with_shock_and_known_forward_move(
+        days=days, shock_index=days - 1, shock_return=-0.08, forward_daily_return=0.0, hold_days=5
+    )
+    results = run_backtest({"TEST": df}, hold_days=5, slippage_pct=0.0, entry_timing="same_day_open_to_close")
+    assert not results.empty
+
+
+def test_baseline_forward_returns_same_day_open_to_close_uses_todays_open_and_close():
+    days = 30
+    returns = np.full(days, 0.005)
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    df = pd.DataFrame(
+        {"open": close - 2.0, "high": close, "low": close, "close": close, "volume": np.full(days, 1_000_000.0)},
+        index=dates,
+    )
+
+    baseline = run_baseline_forward_returns(
+        {"TEST": df}, hold_days=999, slippage_pct=0.0, entry_timing="same_day_open_to_close"
+    )
+    assert not baseline.empty
+    expected = ((close - (close - 2.0)) / (close - 2.0) * 100)
+    assert abs(baseline["net_return_pct"].iloc[0] - expected[0]) < 0.01
+
+
 def test_run_backtest_rejects_invalid_entry_timing():
     df = _series_with_shock_and_known_forward_move(
         days=60, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=5
@@ -1016,6 +1067,9 @@ if __name__ == "__main__":
     test_slippage_reduces_net_return()
     test_next_open_entry_timing_uses_next_day_open_and_later_exit()
     test_next_open_needs_one_more_forward_day_than_same_close()
+    test_same_day_open_to_close_entry_timing_uses_todays_open_and_close()
+    test_same_day_open_to_close_needs_no_forward_history()
+    test_baseline_forward_returns_same_day_open_to_close_uses_todays_open_and_close()
     test_run_backtest_rejects_invalid_entry_timing()
     test_summarize_groups_by_direction()
     test_empty_data_returns_empty_frame()

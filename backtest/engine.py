@@ -100,9 +100,16 @@ def run_backtest(
         project's existing findings — see [[project_execution_realism_gaps]]
         in memory before comparing "next_open" results to prior
         "same_close" ones as if they were the same claim.
+      - "same_day_open_to_close": enter at TODAY's own open, exit at
+        TODAY's own close (e.g. signals/overnight_gap.py -- a signal
+        known at the open, like an overnight-gap reversal, rather than
+        after that day's own close). `hold_days` is IGNORED in this mode
+        (entry and exit are always the same row) -- pass any value.
     """
-    if entry_timing not in ("same_close", "next_open"):
-        raise ValueError(f"entry_timing must be 'same_close' or 'next_open', got {entry_timing!r}")
+    if entry_timing not in ("same_close", "next_open", "same_day_open_to_close"):
+        raise ValueError(
+            f"entry_timing must be 'same_close', 'next_open', or 'same_day_open_to_close', got {entry_timing!r}"
+        )
 
     kwargs = _resolve_scan_kwargs(scan_fn, scan_kwargs, return_z_threshold, volume_z_threshold)
     all_dates = sorted(set().union(*(df.index for df in data.values())))
@@ -113,7 +120,12 @@ def run_backtest(
     # signal (e.g. momentum, 52-week breakout) needing more history simply
     # returns empty for the earlier dates in this range too; correctness
     # isn't affected, just a few wasted no-op scan calls.
-    tail_buffer = hold_days + 1 if entry_timing == "next_open" else hold_days
+    if entry_timing == "next_open":
+        tail_buffer = hold_days + 1
+    elif entry_timing == "same_day_open_to_close":
+        tail_buffer = 0  # exit is the SAME row as entry -- no forward data needed at all
+    else:
+        tail_buffer = hold_days
     usable_dates = all_dates[ROLLING_WINDOW : len(all_dates) - tail_buffer] if tail_buffer > 0 else all_dates[ROLLING_WINDOW:]
 
     rows = []
@@ -130,6 +142,8 @@ def run_backtest(
 
             if entry_timing == "same_close":
                 entry_idx, exit_idx, entry_col, exit_col = idx, idx + hold_days, "close", "close"
+            elif entry_timing == "same_day_open_to_close":
+                entry_idx, exit_idx, entry_col, exit_col = idx, idx, "open", "close"
             else:  # next_open
                 entry_idx, exit_idx, entry_col, exit_col = idx + 1, idx + 1 + hold_days, "open", "open"
 
@@ -266,18 +280,24 @@ def run_baseline_forward_returns(
     signal side of the comparison, or the two aren't measuring the same
     thing: "same_close" compares close-to-close over `hold_days`; "next_open"
     shifts both legs forward one day and compares open-to-open, matching
-    run_backtest()'s next-day-open execution assumption (see its docstring).
+    run_backtest()'s next-day-open execution assumption (see its docstring);
+    "same_day_open_to_close" compares open-to-close on the SAME day
+    (`hold_days` is ignored in this mode).
     """
-    if entry_timing not in ("same_close", "next_open"):
-        raise ValueError(f"entry_timing must be 'same_close' or 'next_open', got {entry_timing!r}")
+    if entry_timing not in ("same_close", "next_open", "same_day_open_to_close"):
+        raise ValueError(
+            f"entry_timing must be 'same_close', 'next_open', or 'same_day_open_to_close', got {entry_timing!r}"
+        )
 
     frames = []
     for ticker, df in data.items():
         if entry_timing == "same_close":
             entry_price, forward_price = df["close"], df["close"].shift(-hold_days)
+        elif entry_timing == "same_day_open_to_close":
+            entry_price, forward_price = df["open"], df["close"]
         else:  # next_open
             entry_price, forward_price = df["open"].shift(-1), df["open"].shift(-(1 + hold_days))
-        if len(df) <= hold_days:
+        if entry_timing != "same_day_open_to_close" and len(df) <= hold_days:
             continue
         raw_return_pct = (forward_price - entry_price) / entry_price * 100
         net_return_pct = raw_return_pct - 2 * slippage_pct * 100

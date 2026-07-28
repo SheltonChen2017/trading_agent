@@ -289,6 +289,85 @@ YIELD_CURVE_Z_THRESHOLD = 2.0      # proxy = short - long (rises as the curve fl
 # out-of-sample.
 REGIME_VOLATILITY_LOOKBACK_DAYS = 60
 
+# --- Idiosyncratic-volatility / residual-return signals (2026-07-27,
+# ChatGPT-recommended, deliberately DIFFERENT information than the
+# already-rejected z-score/momentum/breakout family -- see signals/idio_vol.py
+# and memory: project_signal_findings.md) -----------------------------------
+# Regresses each stock against a broad benchmark (QQQ) over a trailing
+# window to strip out market-wide movement before measuring volatility or
+# momentum -- published research (Ang, Hodrick, Xing, Zhang 2006, NBER)
+# found high idiosyncratic volatility predicts LOWER subsequent returns.
+# Frozen/pre-registered BEFORE running against real data: benchmark,
+# lookback window, rebalance cadence, and top/bottom fraction below are
+# not to be re-tuned after seeing a result.
+IDIO_VOL_BENCHMARK_TICKER = "QQQ"
+IDIO_VOL_LOOKBACK_DAYS = 90       # trailing window for the rolling beta/residual estimate
+IDIO_VOL_TOP_PCT = 0.2            # highest residual-vol quintile ("dip" -- expected underperformance, symmetry only)
+IDIO_VOL_BOTTOM_PCT = 0.2         # lowest residual-vol quintile ("up" -- the well-evidenced, expected-outperformance leg)
+IDIO_VOL_HOLD_DAYS = 21           # ~1 trading month forward, matching the monthly rebalance cadence
+
+# --- Variance-risk-premium regime signal (2026-07-27, ChatGPT-recommended
+# -- see signals/variance_risk_premium.py) -----------------------------------
+# variance_risk_premium ~= VIX^2 - annualized realized benchmark variance.
+# Federal Reserve research found implied-minus-realized variance carries
+# predictive information for aggregate market returns, particularly at
+# multi-month horizons. This is a PORTFOLIO-EXPOSURE signal (tests the
+# benchmark's OWN forward return, not stock selection) -- fires on a
+# single tradable ticker (QQQ), not cross-sectionally across a universe.
+# Frozen/pre-registered BEFORE running against real data.
+VRP_BENCHMARK_TICKER = "QQQ"
+VRP_REALIZED_VARIANCE_WINDOW_DAYS = 21    # ~1 month, matching VIX's own ~30-calendar-day implied horizon
+VRP_PERCENTILE_WINDOW_DAYS = 504          # ~2 years of trailing history used to rank the current VRP level
+VRP_TOP_PCT = 1 / 3                       # top tercile ("up" -- high premium, expected stronger subsequent returns)
+VRP_BOTTOM_PCT = 1 / 3                    # bottom tercile ("dip" -- low/negative premium, included for symmetry)
+VRP_HOLD_DAYS = 42                        # ~2 months forward, the middle of the recommended 1-3 month range
+# This signal only needs QQQ + VIX -- not the 104-ticker UNIVERSE, which
+# is capped at LOOKBACK_DAYS=1764 (~7yr) by recent IPOs and the project's
+# survivorship-bias-documented universe. QQQ/VIX both have decades of
+# real, continuous history on the free data source, so this signal uses
+# its own, much longer lookback -- the first real-data run at 1764 days
+# was underpowered (only 9-13 confirmation-period observations per
+# direction after the 2yr percentile burn-in ate most of the sample),
+# not evidence of rejection. ~26 years reaches close to QQQ's actual
+# inception (March 1999).
+VRP_LOOKBACK_DAYS = 6500
+
+# --- Residual momentum signal (2026-07-27, ChatGPT-recommended -- "one
+# final momentum-family test" given standard 12-1 momentum was already
+# rejected in this project, see signals/momentum.py and
+# memory: project_signal_findings.md) -- see signals/residual_momentum.py.
+# Same rolling-beta/residual machinery as signals/idio_vol.py
+# (signals/residual_returns.py), applied to CUMULATIVE residual return
+# instead of residual volatility, ranked cross-sectionally instead of
+# time-series-regime-ranked. Uses the classic academic "12-1" formation
+# window (not this project's own, non-standard 6-1 MOMENTUM_LOOKBACK_DAYS=126),
+# since the source recommendation is explicit about "months 12 through 2"
+# and the whole point is an apples-to-apples residual-vs-total comparison
+# against the standard construction, not a different lookback choice too.
+# Frozen/pre-registered BEFORE running against real data.
+RESIDUAL_MOMENTUM_BENCHMARK_TICKER = "QQQ"
+RESIDUAL_MOMENTUM_BETA_WINDOW_DAYS = 231   # ~11 months -- also used as the residual-return formation window
+RESIDUAL_MOMENTUM_SKIP_DAYS = 21           # ~1 month, skip the most recent month (short-term reversal contamination)
+RESIDUAL_MOMENTUM_TOP_PCT = 0.2
+RESIDUAL_MOMENTUM_BOTTOM_PCT = 0.2
+RESIDUAL_MOMENTUM_HOLD_DAYS = 21           # ~1 month forward, matching the monthly rebalance cadence
+
+# --- Overnight-gap reversal signal (2026-07-27, ChatGPT-recommended --
+# see signals/overnight_gap.py) -- the ONLY signal in this family needing
+# a genuinely new execution mode (same-day open-to-close, see
+# backtest/engine.py's "same_day_open_to_close" entry_timing), since this
+# is the well-documented overnight-return / intraday-reversal anomaly:
+# unusually negative overnight gaps (today's open vs yesterday's close)
+# tend to partially reverse UPWARD between the open and close.
+# Frozen/pre-registered BEFORE running against real data.
+OVERNIGHT_GAP_ROLLING_WINDOW = 20    # trailing window for the gap's own rolling mean/std (matches ROLLING_WINDOW)
+OVERNIGHT_GAP_Z_THRESHOLD = 2.0      # matches RETURN_Z_THRESHOLD's convention for the original scanner
+# hold_days is not meaningful for this signal (entry_timing=
+# "same_day_open_to_close" always enters/exits the SAME row) -- 0 is a
+# documented placeholder, not a real hold period.
+OVERNIGHT_GAP_HOLD_DAYS = 0
+OVERNIGHT_GAP_EARNINGS_EXCLUSION_DAYS = 1   # exclude a gap within +/-1 trading day of a known earnings date
+
 # --- Risk (used by the risk manager / backtester) -----------------------------------------------------------
 MAX_POSITION_PCT = 0.05      # never risk more than 5% of capital on one name
 STOP_LOSS_PCT = 0.03         # exit if a position moves 3% against you

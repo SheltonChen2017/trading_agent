@@ -7,6 +7,7 @@ without creating deployment or credential overhead for one user.
 """
 from __future__ import annotations
 
+import hashlib
 import json
 import os
 import sqlite3
@@ -19,6 +20,10 @@ from assistant.proposal_status import EXECUTED, UNRESOLVED_BROKER_STATE_STATUSES
 from assistant.schemas import DecisionPacket
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "trading_assistant.db"
+
+
+def _hash_payload(payload_json: str) -> str:
+    return hashlib.sha256(payload_json.encode("utf-8")).hexdigest()
 
 
 def configured_db_path() -> Path:
@@ -53,7 +58,8 @@ class AssistantStore:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     generated_at TEXT NOT NULL,
                     schema_version TEXT NOT NULL,
-                    payload_json TEXT NOT NULL
+                    payload_json TEXT NOT NULL,
+                    payload_hash TEXT NOT NULL DEFAULT ''
                 );
                 CREATE TABLE IF NOT EXISTS trade_proposals (
                     proposal_id TEXT PRIMARY KEY,
@@ -82,50 +88,75 @@ class AssistantStore:
                     ON trade_proposals(status, created_at);
                 """
             )
-            # Deduplicate any pre-existing rows sharing a generated_at
-            # (from before this fix -- e.g. the UI re-saving the same
-            # st.cache_data-cached packet from a second browser tab or a
-            # page reload, which had no server-side identity/uniqueness
-            # to catch it) BEFORE creating the unique index below --
-            # CREATE UNIQUE INDEX fails outright on a table that already
-            # contains duplicates (GPT review, 2026-07-31). No-op (0 rows
-            # affected) once already deduplicated, so safe to run on
-            # every AssistantStore() construction.
+            self._migrate_decision_packet_identity(connection)
+
+    def _migrate_decision_packet_identity(self, connection: sqlite3.Connection) -> None:
+        """`generated_at` alone conflates different serialized payloads
+        that happen to share a build timestamp -- e.g. the UI's cached
+        base packet vs. that same packet enriched with live events via
+        `dataclasses.replace(base_packet, upcoming_events=events)`, which
+        preserves `generated_at` unchanged (GPT review, 2026-08-01: the
+        prior generated_at-only unique index silently discarded whichever
+        of the two variants was saved second -- an insertion-order-
+        dependent loss of the actual audit record). Backfills
+        `payload_hash` for any pre-existing row from before this column
+        existed, collapses only EXACT (generated_at, payload_hash)
+        duplicates -- never a different payload sharing a timestamp --
+        then enforces the composite identity via a unique index. No-op
+        once already migrated, so safe on every AssistantStore()
+        construction."""
+        columns = {row["name"] for row in connection.execute("PRAGMA table_info(decision_packets)")}
+        if "payload_hash" not in columns:
+            connection.execute("ALTER TABLE decision_packets ADD COLUMN payload_hash TEXT NOT NULL DEFAULT ''")
+        unhashed = connection.execute(
+            "SELECT id, payload_json FROM decision_packets WHERE payload_hash = ''"
+        ).fetchall()
+        for row in unhashed:
             connection.execute(
-                """
-                DELETE FROM decision_packets
-                WHERE id NOT IN (SELECT MIN(id) FROM decision_packets GROUP BY generated_at)
-                """
+                "UPDATE decision_packets SET payload_hash = ? WHERE id = ?",
+                (_hash_payload(row["payload_json"]), row["id"]),
             )
-            connection.execute(
-                "CREATE UNIQUE INDEX IF NOT EXISTS idx_decision_packets_generated_at "
-                "ON decision_packets(generated_at)"
+        connection.execute("DROP INDEX IF EXISTS idx_decision_packets_generated_at")
+        connection.execute(
+            """
+            DELETE FROM decision_packets
+            WHERE id NOT IN (
+                SELECT MIN(id) FROM decision_packets GROUP BY generated_at, payload_hash
             )
+            """
+        )
+        connection.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_decision_packets_identity "
+            "ON decision_packets(generated_at, payload_hash)"
+        )
 
     def save_decision_packet(self, packet: DecisionPacket) -> int:
-        """Persists one decision packet, keyed by `generated_at` -- an
-        ISO timestamp set exactly once per real build_decision_packet()
-        call, so two saves sharing it really are the same underlying
-        packet. Idempotent: saving the same packet.generated_at twice is
-        a safe no-op that returns the ORIGINAL row's id, never a new
-        duplicate row (GPT review, 2026-07-31: this used to insert an
-        unconditional new row every call -- since the UI layer now caches
-        packets via st.cache_data, a page reload, a new browser tab, or a
-        second session had no server-side way to recognize "this is the
-        same cached packet I already saved" and would insert it again;
-        deduplication needed to live in storage, not only in UI session
-        state, which starts fresh for every new session)."""
+        """Persists one decision packet, keyed by (`generated_at`,
+        `payload_hash`) -- NOT `generated_at` alone. `generated_at` marks
+        when the base account snapshot was built, but `dataclasses.replace()`
+        can attach post-build enrichment (e.g. live events) onto a packet
+        while preserving its original `generated_at`, producing a genuinely
+        different serialized payload under the same timestamp (GPT review,
+        2026-08-01: a generated_at-only unique key silently discarded
+        whichever variant -- base or event-enriched -- was saved second,
+        an insertion-order-dependent loss of the actual audit record).
+        `payload_hash` disambiguates those cases while `generated_at` still
+        collapses only genuinely IDENTICAL payloads saved more than once
+        (e.g. from a second browser tab or a page reload) into one row,
+        returning the ORIGINAL row's id rather than inserting a duplicate."""
         payload = json.dumps(packet.to_dict(), sort_keys=True)
+        payload_hash = _hash_payload(payload)
         with self._connect() as connection:
             cursor = connection.execute(
-                "INSERT INTO decision_packets(generated_at, schema_version, payload_json) VALUES (?, ?, ?) "
-                "ON CONFLICT(generated_at) DO NOTHING",
-                (packet.generated_at, packet.schema_version, payload),
+                "INSERT INTO decision_packets(generated_at, schema_version, payload_json, payload_hash) "
+                "VALUES (?, ?, ?, ?) ON CONFLICT(generated_at, payload_hash) DO NOTHING",
+                (packet.generated_at, packet.schema_version, payload, payload_hash),
             )
             if cursor.rowcount == 1:
                 return int(cursor.lastrowid)
             existing = connection.execute(
-                "SELECT id FROM decision_packets WHERE generated_at = ?", (packet.generated_at,)
+                "SELECT id FROM decision_packets WHERE generated_at = ? AND payload_hash = ?",
+                (packet.generated_at, payload_hash),
             ).fetchone()
             return int(existing["id"])
 

@@ -115,23 +115,83 @@ def generate_risk_reduction_proposals(
         )
         leveraged_excess -= reduction
 
-    for basket_name, pct in packet.risk.basket_exposure_pct.items():
-        if pct <= policy.max_basket_pct * 100:
+    # Iterates config.BASKETS directly and computes each basket's EXACT
+    # market value here, rather than reading packet.risk.basket_exposure_pct
+    # (a value ALREADY rounded to 1 decimal place by build_risk_exposure()
+    # for display purposes) -- a true exposure just above the boundary
+    # (e.g. 40.04%) could round down to exactly the limit (40.0%) and
+    # silently evade proposal generation entirely (GPT review, 2026-07-31).
+    max_basket_value = snapshot.total_equity * policy.max_basket_pct
+    for basket_name, basket_tickers in BASKETS.items():
+        basket_value = sum(p.market_value for p in snapshot.positions if p.ticker in basket_tickers)
+        if basket_value <= max_basket_value:
             continue
         basket_positions = sorted(
-            (position_by_ticker[t] for t in BASKETS[basket_name] if t in position_by_ticker),
+            (position_by_ticker[t] for t in basket_tickers if t in position_by_ticker),
             key=lambda p: p.market_value,
             reverse=True,
         )
         if not basket_positions:
             continue
-        excess = snapshot.total_equity * (pct / 100 - policy.max_basket_pct)
+        excess = basket_value - max_basket_value
         _add_reduction(
             reductions,
             basket_positions[0],
             excess,
             f"'{basket_name}' exposure exceeds the {policy.max_basket_pct * 100:.1f}% policy limit.",
         )
+
+    # Total-exposure remediation: policy.max_total_exposure_pct applies
+    # across the WHOLE portfolio, unlike the per-position/basket/
+    # leveraged checks above, and previously had NO remediation at all --
+    # a diversified portfolio could be well over this cap with every
+    # individual position, basket, and leveraged-ETF check passing, and
+    # this generator would silently propose nothing even though the
+    # execution gate's own MAX_TOTAL_EXPOSURE_PCT check exists specifically
+    # to block further buys in exactly this situation (GPT review,
+    # 2026-07-31, independently reproduced with a diversified 90%-invested
+    # portfolio against a 50% total-exposure cap).
+    #
+    # `_add_reduction()` merges reductions per ticker by taking the MAX of
+    # every reason's requested share count (selling once satisfies however
+    # many reasons wanted at least that much) -- so to correctly determine
+    # how much MORE reduction is needed here (on top of whatever position/
+    # leveraged/basket checks already planned for each ticker), this
+    # computes each ticker's absolute planned-dollars-so-far, adds the
+    # incremental amount needed to close the remaining gap, and passes
+    # that new (larger) ABSOLUTE target back through _add_reduction() --
+    # never just the marginal amount, which _add_reduction()'s max-merge
+    # would otherwise silently ignore in favor of a larger existing plan.
+    def _planned_dollars(ticker: str) -> float:
+        entry = reductions.get(ticker)
+        if entry is None:
+            return 0.0
+        return entry["shares"] * entry["position"].current_price
+
+    invested_value = sum(p.market_value for p in snapshot.positions)
+    max_total_exposure_value = snapshot.total_equity * policy.max_total_exposure_pct
+    already_closed = sum(_planned_dollars(p.ticker) for p in snapshot.positions)
+    remaining_gap = (invested_value - max_total_exposure_value) - already_closed
+    if remaining_gap > 0:
+        for position in sorted(
+            snapshot.positions,
+            key=lambda p: p.market_value - _planned_dollars(p.ticker),
+            reverse=True,
+        ):
+            if remaining_gap <= 0:
+                break
+            planned_so_far = _planned_dollars(position.ticker)
+            remaining_value = position.market_value - planned_so_far
+            if remaining_value <= 0 or position.current_price <= 0:
+                continue
+            incremental = min(remaining_value, remaining_gap)
+            _add_reduction(
+                reductions,
+                position,
+                planned_so_far + incremental,
+                f"Total invested exposure exceeds the {policy.max_total_exposure_pct * 100:.1f}% policy limit.",
+            )
+            remaining_gap -= incremental
 
     now = datetime.now(timezone.utc)
     proposals = []

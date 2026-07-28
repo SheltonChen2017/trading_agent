@@ -131,6 +131,37 @@ def test_proposes_sell_when_overweight_leveraged():
     assert any("buy-and-hold" in u for u in proposal.uncertainties)
 
 
+def test_sell_proposal_is_capped_by_max_order_value():
+    # GPT review, 2026-07-31: the sell branch used to size against the
+    # FULL excess with no max_order_value cap at all, unlike the buy
+    # branch -- since the execution gate's MAX_ORDER_VALUE check applies
+    # to sells too, an uncapped sell proposal for a large excess would
+    # always be rejected at approval time and (being fully deterministic)
+    # regenerate identically forever.
+    market_data = _market_data()
+    target, _ = _expected_target(market_data)
+    overweight = min(target + 0.30, 0.95)
+    combined = 1_000_000.0  # large account -> large dollar excess
+    leveraged_value = combined * overweight
+    stable_value = combined - leveraged_value
+    leveraged_price = 20.0
+    tiny_max_order_value = 1_000.0  # far smaller than the real dollar excess
+    packet = _packet(
+        [
+            {"ticker": STABLE_TICKER, "shares": stable_value / 50.0, "entry_price": 50.0, "current_price": 50.0},
+            {"ticker": LEVERAGED_TICKER, "shares": leveraged_value / leveraged_price, "entry_price": leveraged_price, "current_price": leveraged_price},
+        ]
+    )
+    policy = _policy(max_order_value=tiny_max_order_value)
+    proposals = generate_soxx_soxl_rebalance_proposals(packet, policy, market_data=market_data)
+    assert len(proposals) == 1
+    proposal = proposals[0]
+    assert proposal.intent.side == "sell"
+    assert proposal.intent.shares > 0
+    notional = proposal.intent.shares * proposal.reference_price
+    assert notional <= tiny_max_order_value + 1e-6, "sell notional must respect policy.max_order_value"
+
+
 def test_proposes_buy_when_underweight_leveraged():
     market_data = _market_data()
     target, _ = _expected_target(market_data)
@@ -316,11 +347,91 @@ def test_renamed_label_no_longer_resolves_raises():
         strategy_proposals.KNOWN_FINDINGS = original
 
 
+def test_relied_upon_finding_reclassified_to_rejected_raises_not_silently_accepted():
+    # GPT review, 2026-07-31, independently reproduced: SignalEvidence.
+    # production_authoritative intentionally returns True for a REJECTED
+    # finding (rejected/exploratory/unavailable make no positive claim
+    # worth distrusting -- correct for display), which the OLD dependency
+    # checker relied on exclusively. Setting both relied-upon findings to
+    # "rejected" made the old checker report (missing=[], non_
+    # authoritative=[]) -- indistinguishable from "every dependency is
+    # fine". The dependency checker must require the SPECIFIC status
+    # (CONFIRMED) this strategy actually depends on, not just "some
+    # status that isn't obviously distrustful".
+    packet, market_data = _overweight_packet_and_market_data()
+    rejected_findings = [
+        SignalEvidence(
+            label=label, claim="...", status=EvidenceStatus.REJECTED, detail="...", source="test",
+            relevant_tickers=["SOXX", "SOXL"], provenance=None,
+        )
+        for label in strategy_proposals._RELIED_UPON_FINDING_LABELS
+    ]
+    original = strategy_proposals.KNOWN_FINDINGS
+    strategy_proposals.KNOWN_FINDINGS = rejected_findings
+    try:
+        broken, non_authoritative = strategy_proposals._relied_upon_findings_status()
+        assert sorted(broken) == sorted(strategy_proposals._RELIED_UPON_FINDING_LABELS)
+        assert non_authoritative == []  # not "non-authoritative" -- BROKEN, a stronger failure
+        try:
+            generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data)
+            assert False, "expected a rejected relied-upon finding to raise, not be silently accepted"
+        except strategy_proposals.MissingResearchDependencyError as exc:
+            for label in strategy_proposals._RELIED_UPON_FINDING_LABELS:
+                assert label in str(exc)
+    finally:
+        strategy_proposals.KNOWN_FINDINGS = original
+
+
+def test_relied_upon_finding_exploratory_status_also_raises():
+    packet, market_data = _overweight_packet_and_market_data()
+    exploratory_findings = [
+        SignalEvidence(
+            label=label, claim="...", status=EvidenceStatus.EXPLORATORY, detail="...", source="test",
+            relevant_tickers=["SOXX", "SOXL"], provenance=None,
+        )
+        for label in strategy_proposals._RELIED_UPON_FINDING_LABELS
+    ]
+    original = strategy_proposals.KNOWN_FINDINGS
+    strategy_proposals.KNOWN_FINDINGS = exploratory_findings
+    try:
+        try:
+            generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data)
+            assert False, "expected an exploratory-status relied-upon finding to raise"
+        except strategy_proposals.MissingResearchDependencyError:
+            pass
+    finally:
+        strategy_proposals.KNOWN_FINDINGS = original
+
+
+def test_relied_upon_finding_confirmed_and_reproduced_is_not_broken_or_non_authoritative():
+    prov_reproduced = FindingProvenance(
+        actual_start_date="2019-07-22", actual_end_date="2026-07-28", actual_row_count=1764,
+        entry_timing="next_open", data_fetched_at="2026-07-28T00:00:00+00:00",
+        reproduced_after_data_loader_fix=True,
+    )
+    confirmed_findings = [
+        SignalEvidence(
+            label=label, claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+            relevant_tickers=["SOXX", "SOXL"], provenance=prov_reproduced,
+        )
+        for label in strategy_proposals._RELIED_UPON_FINDING_LABELS
+    ]
+    original = strategy_proposals.KNOWN_FINDINGS
+    strategy_proposals.KNOWN_FINDINGS = confirmed_findings
+    try:
+        broken, non_authoritative = strategy_proposals._relied_upon_findings_status()
+        assert broken == []
+        assert non_authoritative == []
+    finally:
+        strategy_proposals.KNOWN_FINDINGS = original
+
+
 if __name__ == "__main__":
     test_returns_nothing_when_leveraged_leg_not_held()
     test_returns_nothing_when_stable_leg_not_held()
     test_returns_nothing_when_within_band()
     test_proposes_sell_when_overweight_leveraged()
+    test_sell_proposal_is_capped_by_max_order_value()
     test_proposes_buy_when_underweight_leveraged()
     test_evidence_status_is_never_confirmed()
     test_discloses_non_authoritative_relied_upon_findings_against_the_real_registry()
@@ -328,4 +439,7 @@ if __name__ == "__main__":
     test_one_required_finding_missing_raises_and_generates_no_proposal()
     test_entire_registry_empty_raises_and_generates_no_proposal()
     test_renamed_label_no_longer_resolves_raises()
+    test_relied_upon_finding_reclassified_to_rejected_raises_not_silently_accepted()
+    test_relied_upon_finding_exploratory_status_also_raises()
+    test_relied_upon_finding_confirmed_and_reproduced_is_not_broken_or_non_authoritative()
     print("All strategy_proposals tests passed.")

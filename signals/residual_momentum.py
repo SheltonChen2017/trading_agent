@@ -55,16 +55,10 @@ from config import (
     RESIDUAL_MOMENTUM_SKIP_DAYS,
     RESIDUAL_MOMENTUM_TOP_PCT,
 )
+from signals.calendar_utils import is_month_end_trading_day
 from signals.residual_returns import compute_residual_returns
 
 RESULT_COLUMNS = ["ticker", "date", "close", "return_pct", "return_zscore", "volume_zscore", "direction"]
-
-
-def _is_month_end(date_index: pd.DatetimeIndex, as_of: pd.Timestamp) -> bool:
-    idx = date_index.get_loc(as_of)
-    if idx == len(date_index) - 1:
-        return True
-    return date_index[idx + 1].month != as_of.month
 
 
 def scan_residual_momentum(
@@ -87,7 +81,7 @@ def scan_residual_momentum(
     empty = pd.DataFrame(columns=RESULT_COLUMNS)
     if as_of is None or as_of not in benchmark_df.index:
         return empty
-    if not _is_month_end(benchmark_df.index, as_of):
+    if not is_month_end_trading_day(benchmark_df.index, as_of):
         return empty
 
     residual_momentum: dict[str, float] = {}

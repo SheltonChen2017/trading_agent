@@ -52,7 +52,7 @@ def test_submit_market_order_rejects_bad_share_count():
     os.environ["APCA_API_SECRET_KEY"] = "test-secret"
     broker.PAPER_TRADING = True
     try:
-        broker.submit_market_order("AAPL", 0)
+        broker.submit_market_order("AAPL", 0, idempotency_key="test-key")
         assert False, "expected ValueError for zero shares"
     except ValueError:
         pass
@@ -69,7 +69,7 @@ def test_submit_market_order_rejects_nan_shares():
     os.environ["APCA_API_SECRET_KEY"] = "test-secret"
     broker.PAPER_TRADING = True
     try:
-        broker.submit_market_order("AAPL", float("nan"))
+        broker.submit_market_order("AAPL", float("nan"), idempotency_key="test-key")
         assert False, "expected ValueError for NaN shares"
     except ValueError:
         pass
@@ -83,7 +83,7 @@ def test_submit_market_order_rejects_infinite_shares():
     os.environ["APCA_API_SECRET_KEY"] = "test-secret"
     broker.PAPER_TRADING = True
     try:
-        broker.submit_market_order("AAPL", float("inf"))
+        broker.submit_market_order("AAPL", float("inf"), idempotency_key="test-key")
         assert False, "expected ValueError for infinite shares"
     except ValueError:
         pass
@@ -97,7 +97,7 @@ def test_submit_market_order_rejects_fractional_shares():
     os.environ["APCA_API_SECRET_KEY"] = "test-secret"
     broker.PAPER_TRADING = True
     try:
-        broker.submit_market_order("AAPL", 1.5)
+        broker.submit_market_order("AAPL", 1.5, idempotency_key="test-key")
         assert False, "expected ValueError for fractional shares"
     except ValueError:
         pass
@@ -111,7 +111,7 @@ def test_submit_market_order_rejects_bool_shares():
     os.environ["APCA_API_SECRET_KEY"] = "test-secret"
     broker.PAPER_TRADING = True
     try:
-        broker.submit_market_order("AAPL", True)
+        broker.submit_market_order("AAPL", True, idempotency_key="test-key")
         assert False, "expected ValueError for bool shares"
     except ValueError:
         pass
@@ -125,7 +125,7 @@ def test_submit_limit_order_rejects_nan_shares():
     os.environ["APCA_API_SECRET_KEY"] = "test-secret"
     broker.PAPER_TRADING = True
     try:
-        broker.submit_limit_order("AAPL", float("nan"), 150.0)
+        broker.submit_limit_order("AAPL", float("nan"), 150.0, idempotency_key="test-key")
         assert False, "expected ValueError for NaN shares"
     except ValueError:
         pass
@@ -139,7 +139,7 @@ def test_submit_stop_loss_order_rejects_nan_shares():
     os.environ["APCA_API_SECRET_KEY"] = "test-secret"
     broker.PAPER_TRADING = True
     try:
-        broker.submit_stop_loss_order("AAPL", float("nan"), 95.0)
+        broker.submit_stop_loss_order("AAPL", float("nan"), 95.0, idempotency_key="test-key")
         assert False, "expected ValueError for NaN shares"
     except ValueError:
         pass
@@ -153,12 +153,107 @@ def test_submit_market_order_refuses_live_without_confirmation():
     os.environ["APCA_API_SECRET_KEY"] = "test-secret"
     broker.PAPER_TRADING = False
     try:
-        broker.submit_market_order("AAPL", 10)
+        broker.submit_market_order("AAPL", 10, idempotency_key="test-key")
         assert False, "expected LiveTradingNotConfirmed"
     except broker.LiveTradingNotConfirmed:
         pass
     finally:
         broker.PAPER_TRADING = True
+        _clear_alpaca_env()
+
+
+# --- idempotency_key required (GPT review, 2026-07-31): a broker call
+# with no idempotency key at all has ZERO duplicate-order protection, not
+# just "less than ideal" protection -- every real caller in this
+# project's production paths already supplies one; this only forces any
+# future direct caller to supply one too.
+
+def test_submit_market_order_requires_idempotency_key():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        try:
+            broker.submit_market_order("AAPL", 10)
+            assert False, "expected a missing idempotency_key to raise"
+        except TypeError:
+            pass  # Python's own required-keyword-argument enforcement
+        try:
+            broker.submit_market_order("AAPL", 10, idempotency_key="")
+            assert False, "expected an empty idempotency_key to raise"
+        except ValueError:
+            pass
+    finally:
+        _clear_alpaca_env()
+
+
+def test_submit_limit_order_requires_idempotency_key():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        try:
+            broker.submit_limit_order("AAPL", 10, 150.0, idempotency_key="")
+            assert False, "expected an empty idempotency_key to raise"
+        except ValueError:
+            pass
+    finally:
+        _clear_alpaca_env()
+
+
+def test_submit_stop_loss_order_requires_idempotency_key():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        try:
+            broker.submit_stop_loss_order("AAPL", 10, 95.0)
+            assert False, "expected a missing idempotency_key to raise"
+        except TypeError:
+            pass
+        try:
+            broker.submit_stop_loss_order("AAPL", 10, 95.0, idempotency_key="")
+            assert False, "expected an empty idempotency_key to raise"
+        except ValueError:
+            pass
+    finally:
+        _clear_alpaca_env()
+
+
+# --- stop_price validation (GPT review, 2026-07-31): submit_stop_loss_
+# order() was the one submit function with no validation at all on its
+# own price-like argument.
+
+def test_submit_stop_loss_order_rejects_nan_stop_price():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        broker.submit_stop_loss_order("AAPL", 10, float("nan"), idempotency_key="test-key")
+        assert False, "expected ValueError for NaN stop_price"
+    except ValueError:
+        pass
+    finally:
+        _clear_alpaca_env()
+
+
+def test_submit_stop_loss_order_rejects_zero_or_negative_stop_price():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        for bad_price in (0.0, -5.0, float("inf")):
+            try:
+                broker.submit_stop_loss_order("AAPL", 10, bad_price, idempotency_key="test-key")
+                assert False, f"expected ValueError for stop_price={bad_price}"
+            except ValueError:
+                pass
+    finally:
         _clear_alpaca_env()
 
 
@@ -258,6 +353,38 @@ def test_find_order_by_client_id_market_order_has_no_limit_price():
         _clear_alpaca_env()
 
 
+def test_submit_stop_loss_order_wires_idempotency_key_to_client_order_id():
+    # GPT review, 2026-07-31: submit_stop_loss_order() previously had no
+    # idempotency_key parameter at all, so a stop order was never even
+    # SENT with a client_order_id -- confirm it now actually reaches the
+    # broker request object, not just that the parameter is accepted.
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    captured_requests = []
+
+    def _fake_submit_order(request):
+        captured_requests.append(request)
+        return _FakeOrder("order-3", "AAPL", 10, "sell", "stop")
+
+    fake_client = type("FakeClient", (), {"submit_order": staticmethod(_fake_submit_order)})()
+    original_get_client = broker._get_client
+    original_verify = broker.verify_execution_authorization
+    broker._get_client = lambda: fake_client
+    broker.verify_execution_authorization = lambda *args, **kwargs: None
+    try:
+        order = broker.submit_stop_loss_order("AAPL", 10, 95.0, idempotency_key="idem-stop-1")
+        assert order["order_id"] == "order-3"
+        assert len(captured_requests) == 1
+        assert captured_requests[0].client_order_id == "idem-stop-1"
+    finally:
+        broker._get_client = original_get_client
+        broker.verify_execution_authorization = original_verify
+        broker.PAPER_TRADING = True
+        _clear_alpaca_env()
+
+
 if __name__ == "__main__":
     test_is_configured_false_without_env_vars()
     test_is_configured_true_with_both_env_vars()
@@ -270,7 +397,13 @@ if __name__ == "__main__":
     test_submit_limit_order_rejects_nan_shares()
     test_submit_stop_loss_order_rejects_nan_shares()
     test_submit_market_order_refuses_live_without_confirmation()
+    test_submit_market_order_requires_idempotency_key()
+    test_submit_limit_order_requires_idempotency_key()
+    test_submit_stop_loss_order_requires_idempotency_key()
+    test_submit_stop_loss_order_rejects_nan_stop_price()
+    test_submit_stop_loss_order_rejects_zero_or_negative_stop_price()
     test_execute_allocation_skips_zero_share_rows()
     test_find_order_by_client_id_returns_the_complete_material_identity()
     test_find_order_by_client_id_market_order_has_no_limit_price()
+    test_submit_stop_loss_order_wires_idempotency_key_to_client_order_id()
     print("All Alpaca broker tests passed.")

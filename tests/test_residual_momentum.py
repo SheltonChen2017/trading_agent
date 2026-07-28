@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import numpy as np
 import pandas as pd
 
+from signals.calendar_utils import is_month_end_trading_day
 from signals.residual_momentum import scan_residual_momentum
 
 BETA_WINDOW = 50  # small, for fast/manageable tests -- production default is 231
@@ -43,8 +44,14 @@ def _benchmark_and_universe(days: int = 150, seed: int = 0):
 
 
 def _last_month_end(date_index: pd.DatetimeIndex, min_idx: int) -> pd.Timestamp:
+    # Uses the REAL NYSE-calendar check (signals.calendar_utils.
+    # is_month_end_trading_day), matching the fix in scan_residual_
+    # momentum() itself (GPT review, 2026-07-31) -- a helper duplicating
+    # the old "last row, or next row is a different month" logic would
+    # validate the fixed code against a date only the OLD, buggy
+    # definition would call month-end.
     for i in range(len(date_index) - 1, min_idx, -1):
-        if i == len(date_index) - 1 or date_index[i + 1].month != date_index[i].month:
+        if is_month_end_trading_day(date_index, date_index[i]):
             return date_index[i]
     raise AssertionError("no month-end date found")
 

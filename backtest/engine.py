@@ -111,6 +111,22 @@ def run_backtest(
         (entry and exit are always the same row) -- pass any value. Use
         this explicitly for a signal that's genuinely known at the open;
         do not rely on the general "next_open" default for it.
+
+        UNRESOLVED REALISM GAP (GPT review, 2026-07-31, same class of
+        issue as "same_close" above, not yet fixed): the signal is
+        computed FROM this same row's `open` column, then this backtest
+        also enters AT that exact `open` price -- the official opening
+        print cannot both reveal the signal (so you know to act on it)
+        AND remain available to transact at via an order submitted after
+        seeing it. A real overnight-gap strategy would need either
+        intraday/post-open execution data (this project only has daily
+        OHLC) to model the first ACTUALLY-executable post-open price, or
+        a genuine pre-open indicative-price/market-on-open process (this
+        project has no pre-market/indicative-price feed either). Treat
+        any "same_day_open_to_close" result as a look-ahead-optimistic
+        upper bound, not an executable one, until one of those is built
+        -- do not promote a finding resting only on this timing to
+        confirmed/production-authoritative.
     """
     if entry_timing not in ("same_close", "next_open", "same_day_open_to_close"):
         raise ValueError(
@@ -302,7 +318,8 @@ def run_baseline_forward_returns(
     shifts both legs forward one day and compares open-to-open, matching
     run_backtest()'s next-day-open execution assumption (see its docstring);
     "same_day_open_to_close" compares open-to-close on the SAME day
-    (`hold_days` is ignored in this mode).
+    (`hold_days` is ignored in this mode) -- see run_backtest()'s
+    docstring for this mode's unresolved look-ahead realism gap.
     """
     if entry_timing not in ("same_close", "next_open", "same_day_open_to_close"):
         raise ValueError(

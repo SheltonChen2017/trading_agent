@@ -68,61 +68,83 @@ from assistant.context_builder import KNOWN_FINDINGS
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.proposals import TradeProposal
-from assistant.schemas import DecisionPacket
+from assistant.schemas import DecisionPacket, EvidenceStatus
 from risk.execution_gate import TradeIntent
 
 STABLE_TICKER = "SOXX"
 LEVERAGED_TICKER = "SOXL"
 LOOKBACK_DAYS_FOR_SIGNAL = 300  # comfortably covers trend_lookback_days=200 plus warmup
 
-# The two CONFIRMED findings this module's mechanism (wide-band rotation)
-# actually relies on -- see assistant/research_findings.json. Checked live
-# at proposal-generation time (GPT review, 2026-07-29: "any proposal-
-# generation decision that relies on one of these findings must check
-# current authority explicitly") rather than trusted from the module
-# docstring's prose alone, which can go stale silently.
-_RELIED_UPON_FINDING_LABELS = (
-    "SOXX/SOXL trend+volatility regime rotation — drawdown",
-    "Wide rebalance band vs. tight/continuous vol-targeting",
-)
+# The two findings this module's mechanism (wide-band rotation) actually
+# relies on, mapped to the SPECIFIC status this strategy depends on --
+# see assistant/research_findings.json. Checked live at proposal-
+# generation time (GPT review, 2026-07-29: "any proposal-generation
+# decision that relies on one of these findings must check current
+# authority explicitly") rather than trusted from the module docstring's
+# prose alone, which can go stale silently.
+#
+# Requiring an EXPLICIT expected status (not just "present and
+# authoritative") matters (GPT review, 2026-07-31, independently
+# reproduced): SignalEvidence.production_authoritative intentionally
+# returns True for REJECTED/EXPLORATORY/UNAVAILABLE findings, since those
+# statuses make no positive claim worth distrusting -- correct for
+# DISPLAY, but wrong for a STRATEGY DEPENDENCY. Setting both of these
+# findings' status to "rejected" in the registry used to leave the old
+# missing/non-authoritative check reporting (missing=[],
+# non_authoritative=[]) -- indistinguishable from "every dependency is
+# fine" -- because it never actually checked the value of `status`.
+_RELIED_UPON_FINDINGS: dict[str, EvidenceStatus] = {
+    "SOXX/SOXL trend+volatility regime rotation — drawdown": EvidenceStatus.CONFIRMED,
+    "Wide rebalance band vs. tight/continuous vol-targeting": EvidenceStatus.CONFIRMED,
+}
+_RELIED_UPON_FINDING_LABELS = tuple(_RELIED_UPON_FINDINGS)
 
 
 class MissingResearchDependencyError(RuntimeError):
     """Raised when a finding this module's proposal generation relies on
-    has NO matching entry in the research registry at all -- an
-    accidental registry deletion, a label rename, a partial/malformed
-    migration, a stale hard-coded label, or a future refactor that
-    changes the evidence identity. Deliberately distinct from (and a
-    STRONGER integrity failure than) a present-but-unreproduced finding,
-    which still generates a proposal with an explicit uncertainty
-    disclosure instead (GPT review, 2026-07-30, independently
-    reproduced: the previous helper's `label in by_label and not ...`
-    condition silently excluded a missing label from its result --
-    setting KNOWN_FINDINGS = [] made it return [], indistinguishable
-    from "everything is authoritative"). Missing evidence must never be
-    interpreted as trusted evidence, so this fails closed -- no proposal
-    is generated -- rather than silently proceeding. Both CLI callers
-    (scripts/run_personal_assistant.py's command_propose) and the UI's
-    Propose & Approve tab already catch and prominently display an
-    exception from this function, so raising here surfaces the
-    integrity failure instead of looking identical to an ordinary
-    "nothing needs rebalancing" result."""
+    has NO matching entry in the research registry at all, OR no longer
+    carries the SPECIFIC status this strategy depends on (see
+    _RELIED_UPON_FINDINGS) -- an accidental registry deletion, a label
+    rename, a partial/malformed migration, a stale hard-coded label, a
+    future refactor that changes the evidence identity, or the finding
+    being reclassified to rejected/exploratory/unavailable. Deliberately
+    distinct from (and a STRONGER integrity failure than) a present-
+    with-the-expected-status-but-unreproduced finding, which still
+    generates a proposal with an explicit uncertainty disclosure instead
+    (GPT review, 2026-07-30/31, independently reproduced twice: first
+    that a missing label was silently indistinguishable from
+    "authoritative", then that a REJECTED finding was too, since
+    production_authoritative alone doesn't check `status`). Missing or
+    wrong-status evidence must never be interpreted as trusted evidence,
+    so this fails closed -- no proposal is generated -- rather than
+    silently proceeding. Both CLI callers (scripts/run_personal_assistant.py's
+    command_propose) and the UI's Propose & Approve tab already catch and
+    prominently display an exception from this function, so raising here
+    surfaces the integrity failure instead of looking identical to an
+    ordinary "nothing needs rebalancing" result."""
 
 
 def _relied_upon_findings_status() -> tuple[list[str], list[str]]:
-    """Returns (missing_labels, non_authoritative_present_labels) for
-    _RELIED_UPON_FINDING_LABELS against the current KNOWN_FINDINGS
-    registry -- kept as two separate lists rather than one, since a
-    MISSING finding (no matching registry entry at all) is a stronger
-    integrity failure than one that's merely present-but-unreproduced
-    (see MissingResearchDependencyError)."""
+    """Returns (broken_labels, non_authoritative_present_labels) for
+    _RELIED_UPON_FINDINGS against the current KNOWN_FINDINGS registry.
+    `broken_labels` covers BOTH a missing registry entry AND one present
+    with the WRONG status (not the specific status this strategy
+    requires) -- both are the SAME, stronger integrity failure (see
+    MissingResearchDependencyError), unlike a present-with-the-expected-
+    status-but-unreproduced finding, which is the softer
+    `non_authoritative_present` case and still allows a proposal with an
+    explicit disclosure."""
     by_label = {f.label: f for f in KNOWN_FINDINGS}
-    missing = [label for label in _RELIED_UPON_FINDING_LABELS if label not in by_label]
-    non_authoritative_present = [
-        label for label in _RELIED_UPON_FINDING_LABELS
-        if label in by_label and not by_label[label].production_authoritative
-    ]
-    return missing, non_authoritative_present
+    broken = []
+    non_authoritative_present = []
+    for label, expected_status in _RELIED_UPON_FINDINGS.items():
+        finding = by_label.get(label)
+        if finding is None or finding.status != expected_status:
+            broken.append(label)
+            continue
+        if not finding.production_authoritative:
+            non_authoritative_present.append(label)
+    return broken, non_authoritative_present
 
 PRODUCTION_PARAMS = {
     "target_vol_pct": 0.5,
@@ -183,15 +205,18 @@ def generate_soxx_soxl_rebalance_proposals(
 
     Raises MissingResearchDependencyError (fails closed, no proposal) if
     a finding this strategy relies on has no matching entry in the
-    research registry at all -- see that error's docstring.
+    research registry at all, OR is present but no longer carries the
+    specific status this strategy requires (e.g. reclassified to
+    rejected/exploratory/unavailable) -- see that error's docstring.
     """
-    missing_findings, _ = _relied_upon_findings_status()
-    if missing_findings:
+    broken_dependencies, _ = _relied_upon_findings_status()
+    if broken_dependencies:
         raise MissingResearchDependencyError(
             "Cannot verify this strategy's research dependencies -- the following relied-upon "
-            f"finding(s) have no matching entry in the research registry at all: "
-            f"{', '.join(missing_findings)}. Refusing to generate a proposal until this is "
-            "resolved (an accidental deletion, a label rename, or a malformed migration)."
+            "finding(s) are missing from the research registry entirely, or no longer carry the "
+            f"CONFIRMED status this strategy requires: {', '.join(broken_dependencies)}. Refusing to "
+            "generate a proposal until this is resolved (an accidental deletion, a label rename, a "
+            "malformed migration, or a genuine reclassification of the underlying research)."
         )
 
     snapshot = packet.portfolio
@@ -229,12 +254,25 @@ def generate_soxx_soxl_rebalance_proposals(
 
     if leveraged_position.market_value > target_leveraged_value:
         excess_value = leveraged_position.market_value - target_leveraged_value
-        shares = min(int(leveraged_position.shares), int(excess_value / leveraged_position.current_price))
+        # Capped at max_order_shares exactly like the buy branch below --
+        # the execution gate's MAX_ORDER_VALUE check applies to sells
+        # too, not just buys, so an uncapped sell proposal for a large
+        # excess would always be rejected at approval time, and since
+        # this generator is fully deterministic, regenerating would
+        # produce the identical unexecutable proposal every time (GPT
+        # review, 2026-07-31). Sized against the policy's per-order cap
+        # -- may only partially close the gap in one pass, same as the
+        # buy branch already discloses.
+        max_order_shares = int(policy.max_order_value / leveraged_position.current_price)
+        shares = min(
+            int(leveraged_position.shares), max_order_shares, int(excess_value / leveraged_position.current_price)
+        )
         side = "sell"
         reason = (
             f"{LEVERAGED_TICKER} is {current_leveraged_weight * 100:.1f}% of the SOXX+SOXL allocation, "
             f"{drift_pct:.1f} points outside the {PRODUCTION_PARAMS['band_pct']:.0f}% band around the "
-            f"{target_leveraged_weight * 100:.1f}% target ({label})."
+            f"{target_leveraged_weight * 100:.1f}% target ({label}). Sized against the policy's max order "
+            "value -- may only partially close the gap in one pass."
         )
     else:
         shortfall_value = target_leveraged_value - leveraged_position.market_value

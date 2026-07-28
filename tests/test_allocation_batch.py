@@ -1214,6 +1214,82 @@ def test_completed_batch_with_no_underlying_change_is_idempotent():
         restore()
 
 
+# --- now_provider() per-leg freshness (GPT review, 2026-07-31):
+# execute_allocation_batch() already re-fetches the live PORTFOLIO before
+# each leg so an earlier fill is reflected, but used to reuse a SINGLE
+# now_et for every leg's staleness/future-timestamp/trading-session
+# check -- a slow batch could compare a later leg's fresh quote against
+# an increasingly stale now_et.
+
+def test_now_provider_is_called_fresh_for_each_leg():
+    # A provider returning a weekend (market-closed) timestamp for the
+    # FIRST call and a normal market-hours timestamp for the SECOND
+    # produces a leg-1 failure (market closed) and a leg-2 success --
+    # impossible if only one now_et were evaluated once for the whole
+    # batch (either both legs would fail, or both would succeed).
+    packet = _packet(cash=10_000.0)
+    policy = _policy()
+    proposals = _two_leg_proposals(packet, policy)
+    captured, restore = _mock_batch_execution(packet, quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            batch_id = new_batch_id()
+            store.create_allocation_batch(batch_id, [p.proposal_id for p in proposals], intended_total_notional=2000.0)
+
+            call_times = iter([
+                datetime(2026, 7, 25, 10, 0, tzinfo=timezone.utc),  # a Saturday -- market closed
+                # The following Monday, close enough to the mocked quote's
+                # own fixed timestamp (9:59 AM ET, from _mock_execution_
+                # dependencies' default) to also pass the staleness check.
+                datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            ])
+            result = execute_allocation_batch(batch_id, store, policy, now_provider=lambda: next(call_times))
+            first_id, second_id = [p.proposal_id for p in proposals]
+            legs = result["legs"]
+            assert legs[first_id]["state"] == LEG_FAILED
+            assert "closed" in legs[first_id]["error"].lower()
+            assert legs[second_id]["state"] == LEG_SUBMITTED
+            assert len(captured) == 1  # only the (successful) second leg reached the broker
+    finally:
+        restore()
+
+
+def test_now_et_alone_is_wrapped_into_a_provider_preserving_old_behavior():
+    # Backward compatibility: passing only now_et (no now_provider) must
+    # behave EXACTLY as before -- the same fixed timestamp for every leg.
+    packet = _packet(cash=10_000.0)
+    policy = _policy()
+    proposals = _two_leg_proposals(packet, policy)
+    _, restore = _mock_batch_execution(packet, quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            batch_id = new_batch_id()
+            store.create_allocation_batch(batch_id, [p.proposal_id for p in proposals], intended_total_notional=2000.0)
+            result = execute_allocation_batch(
+                batch_id, store, policy, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert result["status"] == BATCH_COMPLETED
+            assert all(leg["state"] == LEG_SUBMITTED for leg in result["legs"].values())
+    finally:
+        restore()
+
+
+def test_execute_allocation_batch_requires_now_et_or_now_provider():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        try:
+            execute_allocation_batch("batch_does_not_exist", store, _policy())
+            assert False, "expected a TypeError when neither now_et nor now_provider is given"
+        except TypeError as exc:
+            assert "now_et" in str(exc) or "now_provider" in str(exc)
+
+
 if __name__ == "__main__":
     test_preflight_passes_when_every_leg_is_clean()
     test_preflight_failure_means_caller_submits_none()
@@ -1225,4 +1301,7 @@ if __name__ == "__main__":
     test_fresh_portfolio_state_blocks_a_later_leg_no_longer_safe()
     test_completed_batch_resyncs_a_blocked_overridable_leg_once_individually_overridden()
     test_completed_batch_with_no_underlying_change_is_idempotent()
+    test_now_provider_is_called_fresh_for_each_leg()
+    test_now_et_alone_is_wrapped_into_a_provider_preserving_old_behavior()
+    test_execute_allocation_batch_requires_now_et_or_now_provider()
     print("All allocation_batch tests passed.")

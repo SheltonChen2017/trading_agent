@@ -36,6 +36,8 @@ from __future__ import annotations
 
 import pandas as pd
 
+from backtest.risk_metrics import max_drawdown_pct as _canonical_max_drawdown_pct
+
 
 def simulate_leverage_rotation(
     stable_close: pd.Series,
@@ -165,9 +167,11 @@ def buy_and_hold(
 
 
 def max_drawdown_pct(series: pd.Series) -> float:
-    running_max = series.cummax()
-    drawdown = (series - running_max) / running_max
-    return float(drawdown.min() * 100)
+    """Delegates to backtest.risk_metrics.max_drawdown_pct() -- the
+    canonical implementation (docs/ARCHITECTURE_DEBT.md) -- kept as a
+    thin re-export here so the ~15 dependent scripts/strategies that
+    import this name don't need any changes."""
+    return _canonical_max_drawdown_pct(series)
 
 
 def cagr_pct(series: pd.Series, trading_days_per_year: int = 252) -> float:

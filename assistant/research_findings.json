@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.2.0",
   "updated_at": "2026-07-28",
   "findings": [
     {
@@ -56,7 +56,11 @@
       "status": "rejected",
       "detail": "The apparent result depended on a corrected same-close look-ahead bug and did not survive the main confirmation on CAGR.",
       "source": "strategies/trend_vol_rotation.py",
-      "relevant_tickers": ["QQQ", "QQQM", "TQQQ"]
+      "relevant_tickers": [
+        "QQQ",
+        "QQQM",
+        "TQQQ"
+      ]
     },
     {
       "label": "SOXX/SOXL trend+volatility regime rotation — return",
@@ -64,7 +68,10 @@
       "status": "rejected",
       "detail": "The pre-tax return advantage disappeared after the modeled short-term capital-gains tax.",
       "source": "strategies/trend_vol_rotation.py",
-      "relevant_tickers": ["SOXX", "SOXL"]
+      "relevant_tickers": [
+        "SOXX",
+        "SOXL"
+      ]
     },
     {
       "label": "SOXX/SOXL trend+volatility regime rotation — drawdown",
@@ -72,7 +79,10 @@
       "status": "confirmed",
       "detail": "Maximum drawdown remained materially lower across confirmation, walk-forward, sensitivity, and tax/cost checks. This is a risk result, not a confirmed excess-return result.",
       "source": "strategies/trend_vol_rotation.py",
-      "relevant_tickers": ["SOXX", "SOXL"],
+      "relevant_tickers": [
+        "SOXX",
+        "SOXL"
+      ],
       "provenance": {
         "actual_start_date": "2019-07-22",
         "actual_end_date": "2026-07-28",
@@ -90,7 +100,10 @@
       "status": "rejected",
       "detail": "Looked like a breakthrough on a single discovery/confirmation split but failed walk-forward validation. Structural flaw: the one-way ratchet can never re-lever once trimmed, so it structurally misses upside in an extended bull market. Kelly sizing itself (signed mean/variance) is a genuine improvement over inverse-vol targeting; the ratchet is the part that broke.",
       "source": "strategies/kelly_rotation.py; scripts/run_kelly_ratchet_walkforward_soxx_soxl.py",
-      "relevant_tickers": ["SOXX", "SOXL"]
+      "relevant_tickers": [
+        "SOXX",
+        "SOXL"
+      ]
     },
     {
       "label": "Wide rebalance band vs. tight/continuous vol-targeting",
@@ -98,7 +111,10 @@
       "status": "confirmed",
       "detail": "~89% less tax/turnover for essentially the same performance as continuous vol-targeting.",
       "source": "strategies/vol_target_rotation.py; scripts/run_idea_comparison_soxx_soxl.py",
-      "relevant_tickers": ["SOXX", "SOXL"],
+      "relevant_tickers": [
+        "SOXX",
+        "SOXL"
+      ],
       "provenance": {
         "actual_start_date": "2019-07-22",
         "actual_end_date": "2026-07-28",
@@ -116,7 +132,14 @@
       "status": "promising_unconfirmed",
       "detail": "Same continuous inverse-vol-targeted weighting tested on SPY/UPRO and NVDA/NVDL in addition to SOXX/SOXL, at the user's request, as production candidates. Backtested/designed only -- not yet in live/paper trading. NVDL has substantially less real history than the other two pairs (see provenance: 907 rows vs. the 1764 requested) -- the NVDA/NVDL leg of this result is based on a materially shorter, less statistically meaningful window than SOXX/SOXL or SPY/UPRO.",
       "source": "scripts/run_vol_target_rotation_spy_upro.py; scripts/run_vol_target_rotation_nvda_nvdl.py; scripts/run_vol_target_rotation_soxx_soxl.py",
-      "relevant_tickers": ["SOXX", "SOXL", "SPY", "UPRO", "NVDA", "NVDL"],
+      "relevant_tickers": [
+        "SOXX",
+        "SOXL",
+        "SPY",
+        "UPRO",
+        "NVDA",
+        "NVDL"
+      ],
       "provenance": {
         "actual_start_date": "2022-12-13",
         "actual_end_date": "2026-07-28",
@@ -127,6 +150,19 @@
         "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
         "reproduced_after_data_loader_fix": false
       }
+    },
+    {
+      "label": "Defensive-carry sleeve (TLT/IEF/SHY/GLD) blended into an equal-weight UNIVERSE portfolio",
+      "claim": "Reduces combined-portfolio drawdown/expected-shortfall vs. an equal-weight UNIVERSE baseline without giving up more upside than downside, relative to SPY",
+      "status": "exploratory",
+      "detail": "scripts/run_defensive_carry_probe.py, single 2019-07-22 to 2026-07-28 lookback window (1762-1763 sessions), no walk-forward or out-of-sample split yet. Carry-basket correlation to the UNIVERSE baseline was 0.041 and to SPY was 0.009 (near-zero, as expected for Treasuries/gold vs. equities); per-ticker vs SPY: TLT -0.121, IEF -0.078, SHY -0.009, GLD 0.134. The UNIVERSE-only baseline itself runs hot relative to SPY (downside_capture_pct 118.2, upside_capture_pct 120.8 -- this project's universe is semiconductor/tech-heavy). Blending in the carry basket monotonically reduced both max_drawdown_pct (-35.1% at 0% carry -> -26.7% at 30% carry) and expected_shortfall_pct_95 (-3.50% -> -2.70%) as the carry weight increased from 0% to 30%, while narrowing both capture ratios toward 100% (downside_capture_pct 118.2 -> 92.4%, upside_capture_pct 120.8 -> 95.1%). At the 30%-carry weight, downside capture (92.4%) was slightly BELOW upside capture (95.1%) -- a mildly asymmetric, favorable result on this single window -- but this is one lookback window with no significance testing, no walk-forward confirmation, and 3 candidate weights tested alongside the 0% baseline (a small multiple-comparisons surface). Not a recommendation and not a live/paper allocation change.",
+      "source": "scripts/run_defensive_carry_probe.py",
+      "relevant_tickers": [
+        "TLT",
+        "IEF",
+        "SHY",
+        "GLD"
+      ]
     }
   ]
 }

@@ -277,6 +277,22 @@ YIELD_CURVE_SHORT_TICKER = "^IRX"
 YIELD_CURVE_LONG_TICKER = "^TNX"
 YIELD_CURVE_Z_THRESHOLD = 2.0      # proxy = short - long (rises as the curve flattens/inverts further)
 
+# --- Defensive-carry research probe (docs/MANDATE.md, 2026-07-28) ------
+# Candidate holdings for a defensive-carry sleeve. Deliberately NOT part
+# of UNIVERSE/BASKETS -- the dip/up z-score scanner's mean-reversion/
+# momentum hypothesis doesn't map onto bond/gold ETF behavior the way it
+# does onto individual equities, and UNIVERSE membership implies "scanned
+# for signals" (see MARKET_BENCHMARK_TICKERS above for the same
+# not-scanned convention). Verified 2026-07-28 via the real-data-check
+# skill: all four resolve via fetch_historical, are confirmed real/liquid
+# ETFs via yf.Ticker().info (TLT/IEF/SHY = iShares Treasury ETFs, GLD =
+# SPDR Gold Shares -- large AUM, real daily volume), and have 1763-1764
+# of LOOKBACK_DAYS=1764 trading days of history (no underfill concern).
+# Exploratory probe only -- see scripts/run_defensive_carry_probe.py and
+# the corresponding `exploratory`-status entry in research_findings.json.
+# Presence in this list is NOT an allocation authorization.
+DEFENSIVE_CARRY_TICKERS = ["TLT", "IEF", "SHY", "GLD"]
+
 # Market regime classifier (signals/regime.py) — momentum showed a real,
 # statistically significant sign-flip between two multi-year eras of the
 # ~7-year test window (2026-07 finding), consistent with the documented

@@ -131,6 +131,10 @@ Important guarantees:
 
 ## Current research status
 
+See `docs/MANDATE.md` for this project's numeric risk/return targets and
+sleeve-scope decisions (which research directions are in-flight vs.
+explicitly shelved).
+
 The research registry lives in `assistant/research_findings.json` and is
 loaded at runtime (`assistant/research_registry.py`). Every claim is
 versioned, labeled independently by `EvidenceStatus`
@@ -755,6 +759,9 @@ network access.
 
 ## Remaining limitations
 
+- See `docs/ARCHITECTURE_DEBT.md` for known structural gaps (the execution
+  kernel's mixed concerns, risk-check scatter across several files) that
+  have been consciously deferred rather than fixed, and why.
 - There is a CLI and a browser UI (Streamlit), but no conversational API.
 - Earnings come from a free best-effort data source; unavailable values remain
   explicitly unavailable.

@@ -12,6 +12,30 @@ validate_trade_intent() is pure validation: it never submits an order
 itself (that's still execution/alpaca_broker.py's job) and never talks
 to a network. Every check here is a plain deterministic calculation on
 numbers already provided by the caller — no LLM involved.
+
+This module IS the deterministic risk governor referenced in
+docs/MANDATE.md (2026-07-28) -- the single place validate_trade_intent()'s
+rule set (kill switch, per-position/total-exposure/basket/leveraged-ETF
+concentration caps, price-staleness and overnight-gap checks, NYSE
+calendar/trading-session checks, duplicate-order detection, earnings
+blackout) is defined and enforced as one pure, network-free function, with
+an HMAC-signed proof/anti-forgery layer wrapped around its output so a
+caller can't hand-construct or mutate a passing result.
+
+Known scatter points (architectural debt, not yet consolidated here --
+see docs/ARCHITECTURE_DEBT.md for the full reasoning on why a
+consolidation wasn't attempted alongside this labeling pass):
+  - assistant/execution_service.py's _pending_buy_value_by_ticker() --
+    pending-order exposure estimation, computed independently of this
+    module's exposure checks.
+  - assistant/allocation_batch.py's preflight_allocation_batch() --
+    cumulative cross-leg reservation math for a multi-proposal batch,
+    also computed independently and fed back in via override params.
+  - assistant/proposals.py's generate_risk_reduction_proposals() -- a
+    simpler, proposal-GENERATION-only concentration check (decides what
+    to *suggest*), not gated through validate_trade_intent() (which
+    decides what to *permit*) -- by design, but a real second source of
+    concentration-limit logic worth knowing about.
 """
 from __future__ import annotations
 

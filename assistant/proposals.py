@@ -77,6 +77,18 @@ def generate_risk_reduction_proposals(
     No rejected or exploratory alpha signal can create a buy proposal. The
     current milestone deliberately limits automation to deterministic risk
     policy breaches.
+
+    The max_position_value/leveraged_excess checks below are a SIMPLER,
+    PROPOSAL-GENERATION-ONLY concentration check -- they decide what to
+    *suggest*, not what to *permit*. They are NOT gated through
+    risk/execution_gate.py's validate_trade_intent() (which decides what
+    to *permit* at submission time and is the real risk governor -- see
+    that module's "Known scatter points" note and
+    docs/ARCHITECTURE_DEBT.md). By design: any proposal generated here
+    still passes through the real gate before it can ever execute, so this
+    duplication can under- or over-suggest relative to what the gate would
+    actually allow without being unsafe -- but it is a second source of
+    concentration-limit logic worth knowing about.
     """
     snapshot = packet.portfolio
     if snapshot.total_equity <= 0:

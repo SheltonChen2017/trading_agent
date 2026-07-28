@@ -78,6 +78,7 @@ from assistant.proposal_status import (
 )
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.research_registry import summarize_evidence_authority, underfilled_dataset_warning
+from assistant.risk_copilot import check_concentration, estimate_stress_impact, find_correlated_clusters
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.stock_lookup import (
     compute_blended_volatility,
@@ -752,6 +753,29 @@ with tab_briefing:
         )
     else:
         st.caption("No basket exposure -- no positions held.")
+
+    st.caption(check_concentration(packet.risk))
+    for cluster_warning in find_correlated_clusters(packet.portfolio):
+        st.warning(cluster_warning)
+    with st.expander("Stress test"):
+        stress_col1, stress_col2 = st.columns(2)
+        stress_benchmark = stress_col1.text_input("Benchmark ticker", value="SPY", key="stress_benchmark")
+        stress_move_pct = stress_col2.number_input("Hypothetical move (%)", value=-10.0, step=1.0, key="stress_move_pct")
+        if st.button("Estimate impact", key="run_stress_test"):
+            # Live fetch_historical() call for OLS beta -- explicitly
+            # button-gated, not run on every rerun, matching this tab's
+            # existing "no expensive work on every Streamlit rerun"
+            # convention (see the packet-save guard above).
+            stress_result = estimate_stress_impact(packet.portfolio, stress_benchmark, stress_move_pct)
+            if stress_result.get("warning"):
+                st.warning(stress_result["warning"])
+            if stress_result["total_estimated_impact"] is not None:
+                st.metric(
+                    f"Estimated impact of a {stress_move_pct}% move in {stress_benchmark}",
+                    f"${stress_result['total_estimated_impact']:,.2f}",
+                )
+            if stress_result["position_impacts"]:
+                st.dataframe(stress_result["position_impacts"], use_container_width=True, hide_index=True)
 
     if packet.warnings:
         st.subheader("Warnings")

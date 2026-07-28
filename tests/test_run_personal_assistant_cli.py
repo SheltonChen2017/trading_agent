@@ -16,7 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.schemas import DecisionPacket, FindingProvenance, MarketRegime, EvidenceStatus, SignalEvidence
-from scripts.run_personal_assistant import _print_briefing, build_parser
+from scripts.run_personal_assistant import _print_briefing, build_parser, command_risk_check
 
 
 def test_recover_stale_accepts_a_positive_stale_after_seconds():
@@ -109,6 +109,54 @@ def test_print_briefing_surfaces_underfilled_dataset_warning():
     assert "1764" in out
 
 
+# --- risk-check subcommand (assistant/risk_copilot.py wiring)
+
+def test_risk_check_parses_basket_only():
+    args = build_parser().parse_args(["risk-check", "--basket", "tech"])
+    assert args.basket == "tech"
+    assert args.benchmark is None
+    assert args.move_pct is None
+
+
+def test_risk_check_parses_benchmark_and_move_pct_together():
+    args = build_parser().parse_args(["risk-check", "--benchmark", "SPY", "--move-pct", "-10"])
+    assert args.benchmark == "SPY"
+    assert args.move_pct == -10.0
+
+
+def test_risk_check_defaults_to_no_args():
+    args = build_parser().parse_args(["risk-check"])
+    assert args.basket is None
+    assert args.benchmark is None
+    assert args.move_pct is None
+
+
+class _StubArgs:
+    def __init__(self, basket=None, benchmark=None, move_pct=None):
+        self.basket = basket
+        self.benchmark = benchmark
+        self.move_pct = move_pct
+
+
+def test_command_risk_check_rejects_benchmark_without_move_pct():
+    # Must raise BEFORE building a packet (no network/store access needed
+    # to catch this) -- passing store=None would crash on any attempt to
+    # proceed past the validation guard.
+    try:
+        command_risk_check(_StubArgs(benchmark="SPY", move_pct=None), store=None)
+        assert False, "expected SystemExit"
+    except SystemExit:
+        pass
+
+
+def test_command_risk_check_rejects_move_pct_without_benchmark():
+    try:
+        command_risk_check(_StubArgs(benchmark=None, move_pct=-10.0), store=None)
+        assert False, "expected SystemExit"
+    except SystemExit:
+        pass
+
+
 if __name__ == "__main__":
     test_recover_stale_accepts_a_positive_stale_after_seconds()
     test_recover_stale_defaults_to_300()
@@ -117,4 +165,9 @@ if __name__ == "__main__":
     test_recover_stale_rejects_non_integer()
     test_print_briefing_never_shows_a_bare_confirmed_for_an_unreproduced_finding()
     test_print_briefing_surfaces_underfilled_dataset_warning()
+    test_risk_check_parses_basket_only()
+    test_risk_check_parses_benchmark_and_move_pct_together()
+    test_risk_check_defaults_to_no_args()
+    test_command_risk_check_rejects_benchmark_without_move_pct()
+    test_command_risk_check_rejects_move_pct_without_benchmark()
     print("All run_personal_assistant CLI tests passed.")

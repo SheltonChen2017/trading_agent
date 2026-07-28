@@ -41,6 +41,7 @@ from __future__ import annotations
 import pandas as pd
 
 from config import IDIO_VOL_BOTTOM_PCT, IDIO_VOL_LOOKBACK_DAYS, IDIO_VOL_TOP_PCT
+from signals.calendar_utils import is_month_end_trading_day
 from signals.residual_returns import compute_residual_returns
 
 RESULT_COLUMNS = ["ticker", "date", "close", "return_pct", "return_zscore", "volume_zscore", "direction"]
@@ -58,13 +59,6 @@ def compute_residual_volatility(
     """
     residuals = compute_residual_returns(stock_close, benchmark_close, beta_window=window)
     return residuals.rolling(window).std()
-
-
-def _is_month_end(date_index: pd.DatetimeIndex, as_of: pd.Timestamp) -> bool:
-    idx = date_index.get_loc(as_of)
-    if idx == len(date_index) - 1:
-        return True  # last available date in this history -- treat as a rebalance point
-    return date_index[idx + 1].month != as_of.month
 
 
 def scan_idio_vol(
@@ -85,7 +79,7 @@ def scan_idio_vol(
     """
     if as_of is None or as_of not in benchmark_df.index:
         return pd.DataFrame(columns=RESULT_COLUMNS)
-    if not _is_month_end(benchmark_df.index, as_of):
+    if not is_month_end_trading_day(benchmark_df.index, as_of):
         return pd.DataFrame(columns=RESULT_COLUMNS)
 
     residual_vols: dict[str, float] = {}

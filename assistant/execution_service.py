@@ -931,6 +931,36 @@ def execute_approved_paper_proposal(
                         "violation_codes": sorted(validation.violation_codes),
                         "violations": sorted(validation.violations),
                         "review_digest": current_digest,
+                        # KNOWN LIMITATION (GPT review, 2026-07-31, not
+                        # fixed -- dormant/architectural, not currently
+                        # exploitable through either real caller): this
+                        # timestamp is recorded the moment the SERVICE
+                        # computes the block, not necessarily the moment
+                        # a human actually saw it rendered on a screen.
+                        # The two-call digest-match convention proves the
+                        # SECOND call's violations exactly match what was
+                        # stored on a PRIOR call, but does not
+                        # cryptographically prove a human visually
+                        # reviewed them in between -- a hypothetical
+                        # future programmatic caller invoking this
+                        # function twice in a tight loop with identical
+                        # conditions would satisfy the digest match
+                        # without any human ever seeing the first block.
+                        # Both real callers today (the CLI, which
+                        # requires a separate `approve ... --override`
+                        # process re-invocation, and the UI, which
+                        # requires clicking a button and then typing a
+                        # distinct order-specific phrase into a text box)
+                        # already require a genuine human action between
+                        # the two calls, so this isn't currently
+                        # exploitable -- but a fully rigorous fix would
+                        # replace this convention with a signed, single-
+                        # use challenge token returned to the caller after
+                        # presentation and required back verbatim on the
+                        # override call, rather than relying on that
+                        # assumption. Revisit before exposing this
+                        # override path through any new (e.g.
+                        # programmatic/API) caller.
                         "presented_at": now_utc.isoformat(),
                     },
                 )

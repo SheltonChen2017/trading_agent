@@ -22,7 +22,9 @@ on purpose.
 """
 from __future__ import annotations
 
+import math
 import os
+import uuid
 
 import pandas as pd
 
@@ -223,11 +225,22 @@ def submit_market_order(
     side: str = "buy",
     *,
     authorization: ExecutionAuthorization | None = None,
-    idempotency_key: str | None = None,
+    idempotency_key: str,
 ) -> dict:
     """Submit a day market order. Refuses to run against a live (non-paper)
     account unless CONFIRM_LIVE_TRADING=I_UNDERSTAND is set — flipping
-    PAPER_TRADING alone is not sufficient."""
+    PAPER_TRADING alone is not sufficient.
+
+    `idempotency_key` is REQUIRED, not optional (GPT review, 2026-07-31):
+    it's what lets a caller safely retry after an ambiguous submission
+    error (see assistant/execution_service.py's reconciliation logic) --
+    a broker call with no idempotency key at all has zero duplicate-order
+    protection, not just "less than ideal" protection. Every real caller
+    in this project's production paths (assistant/execution_service.py)
+    already supplies one; this only forces any FUTURE direct caller to
+    supply one too, rather than silently defaulting to none."""
+    if not idempotency_key:
+        raise ValueError("idempotency_key is required and must be non-empty -- it is the only duplicate-order protection at the broker layer.")
     if not PAPER_TRADING and os.environ.get("CONFIRM_LIVE_TRADING") != "I_UNDERSTAND":
         raise LiveTradingNotConfirmed(
             "config.PAPER_TRADING is False (live trading) but CONFIRM_LIVE_TRADING "
@@ -263,13 +276,18 @@ def submit_limit_order(
     side: str = "buy",
     *,
     authorization: ExecutionAuthorization | None = None,
-    idempotency_key: str | None = None,
+    idempotency_key: str,
 ) -> dict:
     """Submit a day limit order. Same live-trading confirmation gate and
     authorization check as submit_market_order -- kept as a separate
     function (not folded into submit_market_order) so a caller can never
     accidentally reconstruct a market-order intent for authorization
-    purposes when the approved intent was actually a limit order."""
+    purposes when the approved intent was actually a limit order.
+
+    `idempotency_key` is REQUIRED -- see submit_market_order()'s
+    docstring (GPT review, 2026-07-31)."""
+    if not idempotency_key:
+        raise ValueError("idempotency_key is required and must be non-empty -- it is the only duplicate-order protection at the broker layer.")
     if not PAPER_TRADING and os.environ.get("CONFIRM_LIVE_TRADING") != "I_UNDERSTAND":
         raise LiveTradingNotConfirmed(
             "config.PAPER_TRADING is False (live trading) but CONFIRM_LIVE_TRADING "
@@ -312,14 +330,30 @@ def submit_stop_loss_order(
     stop_price: float,
     *,
     authorization: ExecutionAuthorization | None = None,
+    idempotency_key: str,
 ) -> dict:
     """Submit a GTC stop order to exit a long position — the execution-side
-    counterpart of risk.manager's computed stop_loss_price."""
+    counterpart of risk.manager's computed stop_loss_price.
+
+    `idempotency_key` is REQUIRED and now actually wired through to the
+    broker as `client_order_id` -- previously this function had no
+    idempotency parameter at all, so a stop order had ZERO duplicate-
+    order protection, not just "optional" protection like the other two
+    submit functions (GPT review, 2026-07-31).
+
+    `stop_price` must be a positive, finite number -- NaN/infinity/zero/
+    negative are rejected rather than silently reaching the broker
+    request (GPT review, 2026-07-31: this was the one submit function
+    with no validation at all on its own price-like argument)."""
     if not PAPER_TRADING and os.environ.get("CONFIRM_LIVE_TRADING") != "I_UNDERSTAND":
         raise LiveTradingNotConfirmed(
             "config.PAPER_TRADING is False (live trading) but CONFIRM_LIVE_TRADING "
             "is not set to 'I_UNDERSTAND'. Refusing to submit a live order."
         )
+    if not idempotency_key:
+        raise ValueError("idempotency_key is required and must be non-empty -- it is the only duplicate-order protection at the broker layer.")
+    if not math.isfinite(stop_price) or stop_price <= 0:
+        raise ValueError(f"stop_price must be a positive, finite number, got {stop_price!r}.")
 
     _require_valid_shares(shares)
     verify_execution_authorization(
@@ -344,6 +378,7 @@ def submit_stop_loss_order(
             side=OrderSide.SELL,
             time_in_force=TimeInForce.GTC,
             stop_price=round(stop_price, 2),
+            client_order_id=idempotency_key,
         )
     )
     return {"order_id": str(order.id), "ticker": ticker, "shares": shares, "stop_price": stop_price, "status": str(order.status)}
@@ -368,17 +403,24 @@ def execute_allocation(
         if row["shares"] <= 0:
             continue
         ticker = str(row["ticker"])
+        # idempotency_key is now required on every submit function (GPT
+        # review, 2026-07-31) -- this legacy path (not called from any
+        # production script; see README's "Legacy agent behavior") has no
+        # natural stable key of its own, so a fresh one is generated per
+        # call, which is still strictly better than none at all.
         buy = submit_market_order(
             ticker,
             int(row["shares"]),
             side="buy",
             authorization=authorizations.get(ticker),
+            idempotency_key=uuid.uuid4().hex,
         )
         stop = submit_stop_loss_order(
             ticker,
             int(row["shares"]),
             float(row["stop_loss_price"]),
             authorization=authorizations.get(f"{ticker}:stop"),
+            idempotency_key=uuid.uuid4().hex,
         )
         results.append({"ticker": row["ticker"], "buy_order": buy, "stop_order": stop})
     return results

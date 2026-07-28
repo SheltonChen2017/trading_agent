@@ -20,12 +20,14 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
+from assistant.proposal_status import STATUSES
 from assistant.schemas import DecisionPacket, MarketRegime
 from scripts.personal_assistant_ui import (
     _allocation_input_signature,
     _clear_confirmation_state_if_digest_changed,
     _portfolio_context_payload,
     _proposal_content_digest,
+    _proposal_status_category,
 )
 
 
@@ -172,9 +174,29 @@ def _digest(proposal, packet, policy=None):
     )
 
 
-def test_portfolio_context_payload_changes_when_current_price_or_market_value_changes():
+def test_portfolio_context_payload_unaffected_by_current_price_or_market_value_alone():
+    # GPT review, 2026-07-31: current_price/market_value move continuously
+    # with live quotes during market hours even with zero real account
+    # change -- binding to them exactly made a typed confirmation
+    # intermittently or continuously impossible to complete. Same shares,
+    # same (banded) cash -- only current_price/market_value differ -- must
+    # NOT change the payload.
     packet_a = _packet([{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 150.0}])
     packet_b = _packet([{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 175.0}])
+    assert _portfolio_context_payload(packet_a.portfolio) == _portfolio_context_payload(packet_b.portfolio)
+
+
+def test_portfolio_context_payload_bands_small_cash_fluctuations_away():
+    # A few dollars of noise (well under the $100 band) must not
+    # invalidate confirmation -- this is the whole point of banding.
+    packet_a = _packet([], cash=10_000.0)
+    packet_b = _packet([], cash=10_030.0)
+    assert _portfolio_context_payload(packet_a.portfolio) == _portfolio_context_payload(packet_b.portfolio)
+
+
+def test_portfolio_context_payload_still_invalidates_across_a_cash_band_boundary():
+    packet_a = _packet([], cash=10_000.0)
+    packet_b = _packet([], cash=10_200.0)  # a real $200 change -- crosses the $100 band
     assert _portfolio_context_payload(packet_a.portfolio) != _portfolio_context_payload(packet_b.portfolio)
 
 
@@ -268,7 +290,41 @@ def test_clear_confirmation_state_handles_first_render_with_no_prior_digest():
     assert session_state["content_digest_tp_1"] == "first-digest"
 
 
+# --- _proposal_status_category() (GPT review, 2026-07-31): a stale
+# st.session_state proposal snapshot kept showing approval controls even
+# after the underlying proposal was already executed/blocked/expired
+# elsewhere -- this is the pure routing logic behind reloading the
+# authoritative record and gating approval controls by status.
+
+def test_proposal_status_category_covers_every_real_status():
+    # Every status this project's own STATUSES tuple actually emits must
+    # route somewhere sensible -- never silently fall through unclassified.
+    expected = {
+        "proposed": "approvable",
+        "override_available": "approvable",
+        "validating": "in_progress",
+        "approved": "in_progress",
+        "blocked": "failed",
+        "validation_failed": "failed",
+        "submission_failed": "failed",
+        "expired": "failed",
+        "executed": "executed",
+        "submitting": "unresolved",
+        "submission_unknown": "unresolved",
+        "reconciling": "unresolved",
+    }
+    assert set(expected) == set(STATUSES), "test fixture is out of sync with assistant.proposal_status.STATUSES"
+    for status in STATUSES:
+        assert _proposal_status_category(status) == expected[status], status
+
+
+def test_proposal_status_category_unknown_status_is_never_approvable():
+    assert _proposal_status_category("some_future_status") != "approvable"
+
+
 if __name__ == "__main__":
+    test_proposal_status_category_covers_every_real_status()
+    test_proposal_status_category_unknown_status_is_never_approvable()
     test_unchanged_snapshot_produces_a_stable_signature()
     test_changing_cash_invalidates_the_signature()
     test_changing_a_held_position_invalidates_the_signature()
@@ -281,7 +337,9 @@ if __name__ == "__main__":
     test_open_orders_available_flag_invalidates_the_signature()
     test_policy_change_still_invalidates_the_signature()
     test_price_change_still_invalidates_the_signature()
-    test_portfolio_context_payload_changes_when_current_price_or_market_value_changes()
+    test_portfolio_context_payload_unaffected_by_current_price_or_market_value_alone()
+    test_portfolio_context_payload_bands_small_cash_fluctuations_away()
+    test_portfolio_context_payload_still_invalidates_across_a_cash_band_boundary()
     test_portfolio_context_payload_stable_across_reordered_positions_and_orders()
     test_proposal_digest_changes_when_portfolio_context_changes()
     test_proposal_digest_stable_when_nothing_changes()

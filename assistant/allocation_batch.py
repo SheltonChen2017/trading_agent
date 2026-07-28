@@ -55,6 +55,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime, timezone
+from typing import Callable
 
 from assistant.context_builder import build_portfolio_snapshot_from_alpaca
 from assistant.execution_service import (
@@ -271,7 +272,8 @@ def execute_allocation_batch(
     store: AssistantStore,
     policy: TradingPolicy,
     *,
-    now_et: datetime,
+    now_et: datetime | None = None,
+    now_provider: Callable[[], datetime] | None = None,
     kill_switch_active: bool = False,
 ) -> dict:
     """
@@ -296,7 +298,32 @@ def execute_allocation_batch(
     recorded as "blocked_overridable" and does NOT stop the batch (it's
     terminal for that leg, not ambiguous) -- resolve it individually via
     the proposal's own approval card.
+
+    `now_provider`, when given, is called FRESH for every leg attempted
+    in this batch, rather than one timestamp being reused across the
+    whole batch (GPT review, 2026-07-31, independently reproduced: this
+    function already re-fetches the live PORTFOLIO before each leg
+    specifically so an earlier fill is reflected, but reused the exact
+    same `now_et` for every leg's staleness/future-timestamp/trading-
+    session check -- a slow batch spanning several broker round-trips
+    could compare a genuinely fresh quote against an increasingly stale
+    `now_et`, either wrongly flagging it as impossibly "in the future" or
+    evaluating a later leg against the wrong trading-session boundary).
+    `now_et` (a single fixed timestamp, the prior interface) is still
+    accepted for backward compatibility and test determinism -- when
+    `now_provider` is omitted, it's wrapped into a provider that returns
+    that exact fixed value every time, preserving the previous single-
+    timestamp-for-the-whole-batch behavior exactly. Pass `now_provider`
+    explicitly (a real per-call clock function in production, or a fake/
+    advancing clock in tests) to get genuinely fresh per-leg timestamps.
+    Exactly one of `now_et`/`now_provider` must be supplied.
     """
+    if now_provider is None:
+        if now_et is None:
+            raise TypeError("execute_allocation_batch() requires either now_et or now_provider.")
+        fixed_now_et = now_et
+        now_provider = lambda: fixed_now_et  # noqa: E731 -- trivial, deliberately local
+
     batch = store.get_allocation_batch(batch_id)
     if batch is None:
         raise ProposalExecutionError(f"Unknown batch: {batch_id}")
@@ -362,12 +389,14 @@ def execute_allocation_batch(
             return store.update_allocation_batch(batch_id, status=BATCH_STOPPED_UNKNOWN, legs=legs)
 
         # leg["state"] == LEG_UNATTEMPTED and the proposal is genuinely
-        # still "proposed" -- eligible to attempt.
+        # still "proposed" -- eligible to attempt. now_provider() is
+        # called FRESH for THIS leg specifically (see docstring) -- never
+        # a single timestamp reused across the whole batch.
         portfolio = build_portfolio_snapshot_from_alpaca()
         try:
             order = execute_approved_paper_proposal(
                 proposal_id, "approve", portfolio, policy, store,
-                now_et=now_et, kill_switch_active=kill_switch_active,
+                now_et=now_provider(), kill_switch_active=kill_switch_active,
             )
             legs[proposal_id] = {"state": LEG_SUBMITTED, "order": order, "error": None}
         except PolicyOverridableBlockError as exc:

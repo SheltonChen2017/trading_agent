@@ -46,6 +46,7 @@ from config import (
     VRP_REALIZED_VARIANCE_WINDOW_DAYS,
     VRP_TOP_PCT,
 )
+from signals.calendar_utils import is_month_end_trading_day
 
 RESULT_COLUMNS = ["ticker", "date", "close", "return_pct", "return_zscore", "volume_zscore", "direction"]
 
@@ -70,13 +71,6 @@ def compute_variance_risk_premium(
     realized_daily_var = benchmark_returns.rolling(realized_window).var()
     annualized_realized_var_pct2 = realized_daily_var * _TRADING_DAYS_PER_YEAR * 100**2
     return aligned_vix**2 - annualized_realized_var_pct2
-
-
-def _is_month_end(date_index: pd.DatetimeIndex, as_of: pd.Timestamp) -> bool:
-    idx = date_index.get_loc(as_of)
-    if idx == len(date_index) - 1:
-        return True
-    return date_index[idx + 1].month != as_of.month
 
 
 def scan_variance_risk_premium(
@@ -110,7 +104,7 @@ def scan_variance_risk_premium(
 
     if as_of is None or as_of not in benchmark_df.index:
         return empty
-    if not _is_month_end(benchmark_df.index, as_of):
+    if not is_month_end_trading_day(benchmark_df.index, as_of):
         return empty
 
     vrp_series = compute_variance_risk_premium(vix_df["close"], benchmark_df["close"], realized_window)

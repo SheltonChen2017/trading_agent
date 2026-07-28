@@ -192,6 +192,30 @@ def test_execution_authorization_is_bound_to_exact_intent():
         pass
 
 
+def test_execution_authorization_cannot_be_replayed_after_first_use():
+    # GPT review, 2026-07-31, reproduced: ExecutionAuthorization.token is
+    # generated (implying single-use, per its own docstring) but
+    # verify_execution_authorization() never actually checked it -- the
+    # SAME authorization object could be replayed against a broker
+    # submission as many times as wanted within its TTL window. Now the
+    # FIRST verification consumes the token; a second verification of the
+    # exact same (valid, unexpired, correctly-bound) authorization must
+    # fail.
+    intent = TradeIntent(ticker="AAPL", side="sell", shares=2)
+    portfolio = build_portfolio_snapshot(
+        [{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 100.0}], cash=1000.0,
+    )
+    validation = validate_trade_intent(intent, portfolio, reference_price=100.0)
+    assert validation.approved
+    authorization = authorize_trade_intent(intent, validation)
+    verify_execution_authorization(intent, authorization)  # first use succeeds
+    try:
+        verify_execution_authorization(intent, authorization)  # replay of the SAME authorization
+        assert False, "expected a replayed execution authorization to be rejected"
+    except PermissionError as exc:
+        assert "already been consumed" in str(exc)
+
+
 def test_authorize_trade_intent_rejects_a_validation_result_for_a_different_intent():
     # Regression test (Codex review, 2026-07-27): a ValidationResult must
     # actually have been produced by validating THIS intent -- otherwise
@@ -301,7 +325,7 @@ def test_execution_authorization_expiry_cannot_be_extended_by_replacing_the_obje
 def test_broker_rejects_direct_order_without_gate_authorization():
     broker.PAPER_TRADING = True
     try:
-        broker.submit_market_order("AAPL", 1, side="buy")
+        broker.submit_market_order("AAPL", 1, side="buy", idempotency_key="test-key")
         assert False, "expected direct broker submission to fail"
     except PermissionError:
         pass

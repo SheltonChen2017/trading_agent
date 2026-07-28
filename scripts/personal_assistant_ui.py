@@ -64,7 +64,17 @@ from assistant.execution_service import (
 from assistant.explanations import explain_ticker
 from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
-from assistant.proposal_status import STATUSES, UNRESOLVED_BROKER_STATE_STATUSES
+from assistant.proposal_status import (
+    BLOCKED,
+    EXECUTED,
+    EXPIRED,
+    POLICY_OVERRIDE_AVAILABLE,
+    PROPOSED,
+    STATUSES,
+    SUBMISSION_FAILED,
+    UNRESOLVED_BROKER_STATE_STATUSES,
+    VALIDATION_FAILED,
+)
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.research_registry import summarize_evidence_authority, underfilled_dataset_warning
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
@@ -99,7 +109,29 @@ def _store() -> AssistantStore:
     return AssistantStore()
 
 
+_PACKET_CACHE_TTL_SECONDS = 15
+
+
+@st.cache_data(ttl=_PACKET_CACHE_TTL_SECONDS)
 def _load_packet(policy_path: str, include_events: bool):
+    """Builds one DecisionPacket (live Alpaca account/quotes/open-orders
+    fetch + market-regime computation) for the given (policy_path,
+    include_events) pair.
+
+    Cached (GPT review, 2026-07-31, independently reproduced: this was
+    NOT actually decorated with @st.cache_data despite the Briefing tab's
+    "Refresh briefing" button already calling `st.cache_data.clear()` as
+    if it were -- Streamlit reruns the ENTIRE script top-to-bottom on
+    every widget interaction anywhere in the app, and every tab's body
+    executes regardless of which tab is visually active, so a single
+    keystroke in an unrelated tab triggered up to 5 uncached calls to
+    this function -- each a real Alpaca account/quote/open-order fetch
+    plus a market-data fetch for the regime calculation -- per rerun).
+    A short TTL (not an unbounded cache) keeps the account/regime view
+    honestly close to real-time for a manually-driven UI, while
+    collapsing the redundant same-instant calls a single rerun makes.
+    "Refresh briefing" still forces an immediate live re-fetch via
+    `st.cache_data.clear()`."""
     policy = load_policy(policy_path)
     packet = build_decision_packet(
         SAMPLE_POSITIONS,
@@ -111,33 +143,63 @@ def _load_packet(policy_path: str, include_events: bool):
     return policy, packet
 
 
+# Coarse rounding granularity for cash/equity/buying_power in the
+# portfolio-context payload (GPT review, 2026-07-31) -- see
+# _portfolio_context_payload()'s docstring for why these are banded
+# rather than bound exactly.
+_CASH_BAND_SIZE = 100.0
+
+
+def _banded(value: float) -> float:
+    return round(value / _CASH_BAND_SIZE) * _CASH_BAND_SIZE
+
+
 def _portfolio_context_payload(portfolio) -> dict:
-    """Normalized, JSON-ready snapshot of the MATERIAL portfolio state a
+    """Normalized, JSON-ready snapshot of the STABLE portfolio facts a
     displayed proposal card's summary/impact was computed against --
-    cash/equity/buying_power/open-order availability, plus normalized,
-    SORTED positions and open orders (sorted so merely re-fetching the
-    same holdings/orders in a different order can never spuriously
-    invalidate an otherwise-unchanged signature). Shared by BOTH
-    _proposal_content_digest() (ordinary Selling/Propose & Approve/
-    per-ticker Watchlist cards) and _allocation_input_signature() (the
-    Watchlist's multi-ticker allocation split), so the same material-
-    state definition protects every proposal card in the app (GPT
-    review, 2026-07-30: this normalization used to exist only inside the
-    allocation-specific helper -- ordinary proposal cards had NO
-    portfolio-state binding at all, so a typed "approve"/override could
-    remain armed, and displayed impact/violations could go stale, after
-    cash/positions/buying_power/open orders changed underneath an
-    unchanged card)."""
+    open-order availability, plus normalized, SORTED position share
+    counts and open orders (sorted so merely re-fetching the same
+    holdings/orders in a different order can never spuriously invalidate
+    an otherwise-unchanged signature), and cash/equity/buying_power
+    rounded to a coarse $100 band. Shared by BOTH _proposal_content_
+    digest() (ordinary Selling/Propose & Approve/per-ticker Watchlist
+    cards) and _allocation_input_signature() (the Watchlist's
+    multi-ticker allocation split), so the same material-state
+    definition protects every proposal card in the app.
+
+    Deliberately does NOT include each position's `current_price`,
+    `market_value`, or `total_equity` -- and deliberately BANDS `cash`/
+    `buying_power` rather than binding them exactly (GPT review,
+    2026-07-31, independently reproduced: an earlier version bound
+    current_price/market_value/total_equity exactly, but those move
+    continuously with live Alpaca quotes during market hours even with
+    zero real account change -- every Streamlit rerun, INCLUDING the
+    rerun triggered by typing into the confirmation box itself, refetches
+    a live portfolio snapshot, so a single price tick between a keystroke
+    and the Submit click could silently wipe an already-typed
+    confirmation, making approval intermittently or continuously
+    impossible during active trading hours).
+
+    `total_equity` is dropped ENTIRELY, not just banded: this project's
+    own build_portfolio_snapshot() always computes it as `cash +
+    sum(shares * current_price)`, so it is DEFINITIONALLY the most
+    price-sensitive figure here -- banding alone doesn't fully insulate
+    it (a big enough, or accumulated, price move still crosses a band),
+    and it carries no information beyond cash + position shares (both
+    already tracked here) plus live marks (which this binding must
+    ignore). Position `shares` and open-order identity are kept EXACT
+    since those only change on a genuine account event (a fill, a
+    manually-placed order), never on a quote tick alone -- this still
+    catches the case this binding exists for (a real fill or a manually-
+    placed order changing the account underneath an unchanged card)
+    without being sensitive to pure mark-to-market noise. `cash` (settled
+    cash, not marked-to-market) and `buying_power` (which CAN be
+    equity-derived for a margin account) are banded to a coarse $100
+    granularity as extra insurance -- coarse enough that ordinary noise
+    rarely crosses a boundary, while a real fill or transfer (this
+    project's default max_order_value is $5,000) almost always does."""
     positions_payload = sorted(
-        (
-            {
-                "ticker": p.ticker,
-                "shares": p.shares,
-                "current_price": p.current_price,
-                "market_value": p.market_value,
-            }
-            for p in portfolio.positions
-        ),
+        ({"ticker": p.ticker, "shares": p.shares} for p in portfolio.positions),
         key=lambda d: d["ticker"],
     )
     open_orders_payload = sorted(
@@ -156,9 +218,8 @@ def _portfolio_context_payload(portfolio) -> dict:
         key=lambda d: (d["order_id"] or "", d["ticker"] or "", d["side"] or ""),
     )
     return {
-        "cash": round(portfolio.cash, 2),
-        "total_equity": round(portfolio.total_equity, 2),
-        "buying_power": round(portfolio.buying_power, 2) if portfolio.buying_power is not None else None,
+        "cash_band": _banded(portfolio.cash),
+        "buying_power_band": _banded(portfolio.buying_power) if portfolio.buying_power is not None else None,
         "open_orders_available": portfolio.open_orders_available,
         "positions": positions_payload,
         "open_orders": open_orders_payload,
@@ -229,6 +290,64 @@ def _clear_confirmation_state_if_digest_changed(session_state, proposal_id: str,
     return True
 
 
+def _proposal_status_category(status: str) -> str:
+    """Pure categorization of a proposal status into how it should be
+    rendered -- factored out so this routing is unit-testable without a
+    live Streamlit session (GPT review, 2026-07-31; most of this UI's
+    prior test coverage only exercised pure helper functions, never
+    whether the actual approval workflow behaved correctly against a
+    changed/terminal proposal). One of:
+      "approvable" -- proposed / override_available: show approval controls.
+      "executed"   -- terminal success: show the stored broker order.
+      "failed"     -- terminal failure: show the stored violations/error.
+      "unresolved" -- broker outcome not yet confirmed (submitting/
+                      submission_unknown/reconciling): point at Reconcile.
+      "in_progress"-- claimed by an approval attempt elsewhere (validating/
+                      approved): never approval controls, but not terminal.
+    """
+    if status in (PROPOSED, POLICY_OVERRIDE_AVAILABLE):
+        return "approvable"
+    if status == EXECUTED:
+        return "executed"
+    if status in (BLOCKED, VALIDATION_FAILED, SUBMISSION_FAILED, EXPIRED):
+        return "failed"
+    if status in UNRESOLVED_BROKER_STATE_STATUSES:
+        return "unresolved"
+    return "in_progress"  # VALIDATING / APPROVED
+
+
+def _render_terminal_or_inflight_status(proposal: dict, status: str) -> None:
+    """Renders the STORED outcome for a proposal that is no longer
+    approvable (terminal) or is already claimed/in-flight from a prior
+    approval attempt -- never approval controls (GPT review, 2026-07-31):
+    a card rendered from a stale st.session_state snapshot used to keep
+    showing approval controls even after the underlying proposal had
+    already been executed/blocked/expired elsewhere."""
+    category = _proposal_status_category(status)
+    if category == "executed":
+        order = proposal.get("broker_order") or {}
+        msg = (
+            f"Executed at {proposal.get('executed_at', '?')} -- broker order "
+            f"{order.get('order_id', '?')} [{order.get('status', 'unknown')}]"
+        )
+        if proposal.get("policy_override"):
+            msg += " (submitted via policy override)"
+        st.success(msg)
+    elif category == "failed":
+        detail = "; ".join(proposal.get("violations") or []) or proposal.get("error") or "no detail recorded"
+        st.error(f"{status.replace('_', ' ').title()}: {detail}")
+    elif category == "unresolved":
+        st.warning(
+            f"Status: {status} -- this proposal's broker outcome is not yet confirmed. Resolve it via "
+            "the History tab's Reconcile action (or `recover-stale` on the CLI if it's stuck in "
+            "'reconciling') before approving an equivalent trade."
+        )
+    else:
+        # in_progress: VALIDATING / APPROVED -- an approval attempt is
+        # (or very recently was) actively claiming this proposal elsewhere.
+        st.info(f"Status: {status} -- an approval attempt is currently in progress for this proposal.")
+
+
 def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str, portfolio) -> None:
     """One proposal card with the typed-confirmation approve flow.
     Shared by the Selling, Propose & Approve, and Watchlist tabs --
@@ -243,17 +362,72 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
     only to bind the confirmation/override UI state to the material
     account state the displayed summary/impact reflects (GPT review,
     2026-07-30) -- NOT re-fetched or revalidated here; submission below
-    always fetches its own fresh snapshot independently."""
-    intent = proposal["intent"]
+    always fetches its own fresh snapshot independently.
+
+    Reloads the AUTHORITATIVE record from `store` by proposal_id before
+    doing anything else (GPT review, 2026-07-31): the `proposal` dict
+    passed in is often a stale snapshot cached in st.session_state from
+    whenever it was generated or last rendered -- without this reload, an
+    already-executed, blocked, or expired proposal kept showing live
+    approval controls (and a stale confirm phrase was never cleared after
+    a successful submission, since nothing ever re-checked status).
+    Approval controls are shown ONLY for `proposed`/`override_available`;
+    every other status renders its stored outcome instead."""
     proposal_id = proposal["proposal_id"]
+    reloaded = store.get_proposal(proposal_id)
+    if reloaded is None:
+        st.warning(f"{proposal_id}: no longer found in storage -- it may have been removed.")
+        return
+    proposal = reloaded
+    status = proposal["status"]
+    intent = proposal["intent"]
     override_key = f"override_available_{proposal_id}"
     override_confirm_key = f"override_confirm_{proposal_id}"
+    digest_key = f"content_digest_{proposal_id}"
+    stale_key = f"stale_{proposal_id}"
+
+    if _proposal_status_category(status) != "approvable":
+        # Terminal or in-flight -- clear any lingering confirmation state
+        # for this card (it can never silently re-arm if this proposal_id
+        # somehow reappears in an approvable status later) and show the
+        # stored outcome instead of approval controls.
+        st.session_state.pop(f"confirm_{proposal_id}", None)
+        st.session_state.pop(override_key, None)
+        st.session_state.pop(override_confirm_key, None)
+        st.session_state.pop(digest_key, None)
+        st.session_state.pop(stale_key, None)
+        with st.container(border=True):
+            st.subheader(f"{intent['side'].upper()} {intent['shares']} {intent['ticker']}")
+            st.caption(f"{proposal_id} -- evidence_status: {proposal.get('evidence_status', '')}")
+            _render_terminal_or_inflight_status(proposal, status)
+        return
 
     display_policy = load_policy(policy_path)
     policy_fingerprint = compute_policy_fingerprint(display_policy)
     portfolio_context = _portfolio_context_payload(portfolio)
     current_digest = _proposal_content_digest(proposal, policy_fingerprint, portfolio_context)
+    previous_digest = st.session_state.get(digest_key)
     _clear_confirmation_state_if_digest_changed(st.session_state, proposal_id, current_digest)
+    # A genuine change from a PREVIOUSLY stored digest (not the very
+    # first render, which also has no prior digest) marks this card
+    # persistently stale -- it stays stale across reruns even if the
+    # digest happens to re-match later, until the caller actually
+    # regenerates this proposal (producing a new proposal_id), rather
+    # than silently un-invalidating on the next quiet rerun (GPT review,
+    # 2026-07-31: "invalidate or regenerate the displayed proposal
+    # instead of merely clearing its phrase" -- the reasons/expected
+    # impact below are computed once at generation time and never
+    # recomputed, so they can go stale exactly when the digest does).
+    if previous_digest is not None and previous_digest != current_digest:
+        st.session_state[stale_key] = True
+    is_stale = st.session_state.get(stale_key, False)
+    if is_stale:
+        st.warning(
+            "This proposal's content, policy, or portfolio context has changed since it was last "
+            "displayed -- the reasons/expected-impact below were computed against the OLD context and "
+            "may no longer be accurate. Approval is disabled for this card; regenerate it (use this "
+            "tab's Check/refresh button) to get a current, actionable proposal."
+        )
 
     estimated_notional = intent["shares"] * proposal["reference_price"]
     override_phrase = f"OVERRIDE {intent['side'].upper()} {intent['shares']} {intent['ticker'].upper()}"
@@ -291,7 +465,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
         typed = st.text_input(
             "Confirmation phrase", key=f"confirm_{proposal_id}", label_visibility="collapsed"
         )
-        submit_disabled = typed.strip().lower() != "approve"
+        submit_disabled = typed.strip().lower() != "approve" or is_stale
         if st.button(
             "Submit paper order",
             key=f"submit_{proposal_id}",
@@ -330,7 +504,22 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                     st.session_state.pop(override_confirm_key, None)
                     st.error(f"Order not submitted: {exc}")
 
+        conditions_changed_key = f"override_conditions_changed_{proposal_id}"
         if st.session_state.get(override_key):
+            if st.session_state.pop(conditions_changed_key, False):
+                # Rendered on the FRESH rerun triggered right after the
+                # exception handler below updated override_key -- shown
+                # here, immediately above the (now current) violation
+                # list, rather than "above" pointing at content that was
+                # already drawn with the OLD list on the same script pass
+                # (GPT review, 2026-07-31: a later override submission
+                # replaced the list in session state AFTER this warning
+                # block had already rendered once with the stale one).
+                st.error(
+                    "The override conditions changed since your previous review. No order was "
+                    "submitted. Review the current violations below and type the override phrase "
+                    "again if you still accept them."
+                )
             st.warning(
                 "Blocked only by risk-preference/earnings-calendar checks, not unreliable data -- "
                 "the broker itself would still accept this order:\n"
@@ -346,7 +535,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
             if st.button(
                 "Override and submit anyway",
                 key=f"override_submit_{proposal_id}",
-                disabled=override_typed.strip() != override_phrase,
+                disabled=override_typed.strip() != override_phrase or is_stale,
             ):
                 if not is_configured():
                     st.error("Alpaca paper credentials are required for approval execution.")
@@ -382,13 +571,19 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                         st.session_state[override_key] = list(exc.overridable_violations)
                         st.session_state.pop(override_confirm_key, None)
                         if exc.conditions_changed:
-                            st.error(
-                                "The override conditions changed since your previous review. No order "
-                                "was submitted. Review the updated violations above and type the "
-                                "override phrase again if you still accept them."
-                            )
-                        else:
-                            st.error(f"Order not submitted: {exc}")
+                            # Rerun IMMEDIATELY rather than calling
+                            # st.error() here: the violation-list warning
+                            # block above this button already rendered
+                            # ONCE this script pass, using the list as it
+                            # stood BEFORE this click -- an error message
+                            # printed here would sit next to that STALE
+                            # list, not the fresh one just stored above
+                            # (GPT review, 2026-07-31). The flag is picked
+                            # up and shown right above the now-current
+                            # list on the rerun this triggers.
+                            st.session_state[conditions_changed_key] = True
+                            st.rerun()
+                        st.error(f"Order not submitted: {exc}")
                     except Exception as exc:
                         st.session_state.pop(override_key, None)
                         st.session_state.pop(override_confirm_key, None)
@@ -483,7 +678,16 @@ with tab_briefing:
         st.cache_data.clear()
         st.toast("Refreshed against the live account.", icon="\U0001F503")
     policy, packet = _load_packet(policy_path, include_events)
-    store.save_decision_packet(packet)
+    # Persist one row per genuinely NEW packet (a fresh live fetch --
+    # packet.generated_at changes only when _load_packet()'s cache
+    # actually re-executes), not one row per Streamlit rerun -- every
+    # widget interaction anywhere in the app reruns this tab's body too,
+    # and unconditionally saving here previously inserted a duplicate
+    # decision packet into an unbounded table on every single click
+    # (GPT review, 2026-07-31).
+    if st.session_state.get("last_saved_packet_generated_at") != packet.generated_at:
+        store.save_decision_packet(packet)
+        st.session_state["last_saved_packet_generated_at"] = packet.generated_at
 
     st.caption(
         f"Source: **{packet.portfolio.source}** ({packet.portfolio.account_mode}) -- "
@@ -796,16 +1000,33 @@ with tab_watchlist:
 
         amount_col, balance_col = st.columns(2)
         with amount_col:
+            # Clamp BEFORE the widget is created, same pattern as the
+            # max-weight slider above -- Streamlit raises if a widget's
+            # stored session_state value falls outside the min/max it's
+            # about to be created with. Without this, a previously
+            # entered amount that now exceeds a since-reduced cash
+            # balance (or a margin account briefly reporting negative
+            # cash, which would otherwise make max_value < min_value=0)
+            # could break this widget entirely (GPT review, 2026-07-31).
+            safe_max_cash = max(available_cash, 0.0)
+            stored_amount = st.session_state.get("allocation_dollar_amount")
+            if stored_amount is not None:
+                clamped = min(max(stored_amount, 0.0), safe_max_cash)
+                if clamped != stored_amount:
+                    st.session_state["allocation_dollar_amount"] = clamped
             dollar_amount = st.number_input(
                 "Amount to invest",
                 min_value=0.0,
-                max_value=float(available_cash),
+                max_value=safe_max_cash,
                 value=0.0,
                 step=50.0,
                 key="allocation_dollar_amount",
                 help="Capped at your current available cash, pulled live from Alpaca.",
+                disabled=available_cash <= 0,
             )
         st.caption(f"Available cash right now (live from Alpaca): ${available_cash:,.2f}")
+        if available_cash <= 0:
+            st.caption("No available cash to allocate right now -- allocation is disabled.")
 
         plan = (
             build_allocation_plan(
@@ -948,7 +1169,14 @@ with tab_watchlist:
             if active_batch_id:
                 approve_policy = load_policy(policy_path)
                 batch = execute_allocation_batch(
-                    active_batch_id, store, approve_policy, now_et=_now_eastern(),
+                    active_batch_id, store, approve_policy,
+                    # now_provider=_now_eastern (the function itself, not
+                    # a single evaluated-once value) so each leg this
+                    # batch attempts gets a genuinely fresh Eastern
+                    # timestamp -- a slow batch could otherwise compare a
+                    # later leg's fresh quote against an increasingly
+                    # stale now_et (GPT review, 2026-07-31).
+                    now_provider=_now_eastern,
                     kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
                 )
                 st.write(f"Batch `{active_batch_id}` -- status: **{batch['status']}**")

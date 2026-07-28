@@ -34,6 +34,20 @@ edge -- this signal's backtest should always be checked with a realistic
 (not zero) slippage_pct, and cost sensitivity is essential before trusting
 any positive result here more than for other signals.
 
+UNRESOLVED LOOK-AHEAD REALISM GAP (GPT review, 2026-07-31, not yet
+fixed): `gap_pct` is computed FROM today's own `open` column, and
+backtest/engine.py's "same_day_open_to_close" mode also enters AT that
+exact `open` price -- the official opening print cannot both reveal the
+signal (so you know to act on it) and remain available to transact at
+via an order submitted after seeing it. Fixing this properly needs
+either intraday/post-open execution data (this project only fetches
+daily OHLC) to model the first genuinely executable post-open price, or
+a real pre-open indicative-price/market-on-open process (no pre-market
+feed exists here either). Treat any backtest result from this signal as
+a look-ahead-optimistic upper bound, not an executable one, and do not
+promote it to confirmed/production-authoritative on the strength of this
+timing mode alone.
+
 PRE-REGISTERED before running against real data (do not re-tune after
 seeing a result -- see config.py):
   - rolling window: 20 trading days (OVERNIGHT_GAP_ROLLING_WINDOW),

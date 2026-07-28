@@ -9,7 +9,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_portfolio_snapshot
-from risk.execution_gate import TradeIntent, validate_trade_intent
+from risk.execution_gate import (
+    TradeIntent,
+    authorize_overridden_trade_intent,
+    authorize_trade_intent,
+    validate_trade_intent,
+)
 
 _MARKET_HOURS_WEEKDAY = datetime(2026, 7, 27, 10, 0)  # a Monday, 10:00am
 
@@ -282,6 +287,122 @@ def test_earnings_blackout_flagged():
     assert not any("earnings blackout" in v for v in result_ok.violations)
 
 
+def test_concentration_and_earnings_violations_are_overridable():
+    # A human can knowingly accept a concentration cap or an earnings-date
+    # block (the broker itself would still take the order) -- these are
+    # risk-preference/business-calendar calls, not data-integrity issues.
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=100)  # over the 5% default position cap
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY,
+        earnings_days_away=1, earnings_blackout_days=2,
+    )
+    assert result.approved is False
+    assert any("per-position limit" in v for v in result.overridable_violations)
+    assert any("earnings blackout" in v for v in result.overridable_violations)
+    assert set(result.overridable_violations) == set(result.violations)
+
+
+def test_hard_safety_violations_are_never_overridable():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, kill_switch_active=True)
+    assert result.overridable_violations == []
+
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY,
+        price_timestamp=datetime(2026, 7, 20, 9, 0), max_stale_price_minutes=15.0,
+    )
+    assert any("staleness" in v for v in result.violations)
+    assert result.overridable_violations == []
+
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=datetime(2026, 7, 25, 10, 0),  # a Saturday
+    )
+    assert any("weekend" in v for v in result.violations)
+    assert result.overridable_violations == []
+
+
+def test_mixed_overridable_and_non_overridable_violations_keeps_both_lists_distinct():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=100)  # over position cap (overridable)
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, kill_switch_active=True,  # kill switch (never overridable)
+    )
+    # Kill switch short-circuits everything else -- only its own violation appears at all.
+    assert result.violations == ["Kill switch is active — no trades are permitted."]
+    assert result.overridable_violations == []
+
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=datetime(2026, 7, 25, 10, 0),  # weekend (non-overridable)
+    )
+    assert any("per-position limit" in v for v in result.violations)  # overridable
+    assert any("weekend" in v for v in result.violations)  # not overridable
+    blocking = [v for v in result.violations if v not in result.overridable_violations]
+    assert any("weekend" in v for v in blocking)
+    assert not any("per-position limit" in v for v in blocking)
+
+
+def test_authorize_overridden_trade_intent_succeeds_when_every_violation_is_overridable():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=100)
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY,
+        earnings_days_away=1, earnings_blackout_days=2,
+    )
+    assert result.approved is False
+    authorization = authorize_overridden_trade_intent(intent, result)
+    assert authorization.proof
+
+
+def test_authorize_overridden_trade_intent_rejects_a_mixed_result():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=100)
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=datetime(2026, 7, 25, 10, 0),  # weekend + over position cap
+    )
+    assert result.approved is False
+    try:
+        authorize_overridden_trade_intent(intent, result)
+        assert False, "a non-overridable violation must never be authorizable via the override path"
+    except ValueError as exc:
+        assert "not override-eligible" in str(exc)
+
+
+def test_authorize_overridden_trade_intent_rejects_an_already_approved_result():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is True
+    try:
+        authorize_overridden_trade_intent(intent, result)
+        assert False, "an approved result should go through authorize_trade_intent(), not the override path"
+    except ValueError as exc:
+        assert "already-approved" in str(exc)
+
+
+def test_authorize_overridden_trade_intent_rejects_a_forged_result():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=100)
+    real_result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY,
+        earnings_days_away=1, earnings_blackout_days=2,
+    )
+    import dataclasses as dc
+
+    forged = dc.replace(real_result, overridable_violations=list(real_result.violations))
+    # Same content, but constructed rather than produced by validate_trade_intent() for THIS
+    # exact call -- dataclasses.replace() copies the old (still-valid-looking) proof forward,
+    # so this specifically checks the proof is tied to the intent+approved outcome, not
+    # merely to matching violations/overridable_violations lists.
+    other_intent = TradeIntent(ticker="AMD", side="buy", shares=100)
+    try:
+        authorize_overridden_trade_intent(other_intent, forged)
+        assert False, "a proof computed for a different intent must not verify"
+    except ValueError as exc:
+        assert "was not produced by validate_trade_intent" in str(exc)
+
+
 if __name__ == "__main__":
     test_clean_trade_is_approved()
     test_kill_switch_blocks_everything_else()
@@ -307,4 +428,11 @@ if __name__ == "__main__":
     test_malformed_limit_price_rejected()
     test_max_slippage_on_limit_order()
     test_earnings_blackout_flagged()
+    test_concentration_and_earnings_violations_are_overridable()
+    test_hard_safety_violations_are_never_overridable()
+    test_mixed_overridable_and_non_overridable_violations_keeps_both_lists_distinct()
+    test_authorize_overridden_trade_intent_succeeds_when_every_violation_is_overridable()
+    test_authorize_overridden_trade_intent_rejects_a_mixed_result()
+    test_authorize_overridden_trade_intent_rejects_an_already_approved_result()
+    test_authorize_overridden_trade_intent_rejects_a_forged_result()
     print("All execution gate tests passed.")

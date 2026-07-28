@@ -13,6 +13,7 @@ from __future__ import annotations
 
 PROPOSED = "proposed"
 VALIDATING = "validating"
+POLICY_OVERRIDE_AVAILABLE = "override_available"
 BLOCKED = "blocked"
 VALIDATION_FAILED = "validation_failed"
 APPROVED = "approved"
@@ -27,6 +28,7 @@ EXPIRED = "expired"
 STATUSES: tuple[str, ...] = (
     PROPOSED,
     VALIDATING,
+    POLICY_OVERRIDE_AVAILABLE,
     BLOCKED,
     VALIDATION_FAILED,
     APPROVED,

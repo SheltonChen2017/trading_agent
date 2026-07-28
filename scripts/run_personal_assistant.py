@@ -10,7 +10,11 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
-from assistant.execution_service import execute_approved_paper_proposal, reconcile_submission
+from assistant.execution_service import (
+    PolicyOverridableBlockError,
+    execute_approved_paper_proposal,
+    reconcile_submission,
+)
 from assistant.policy import load_policy
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
@@ -100,7 +104,7 @@ def command_propose(args, store: AssistantStore) -> None:
         )
         for uncertainty in proposal.uncertainties:
             print(f"  ? {uncertainty}")
-        print(f'  Approval phrase: "APPROVE {proposal.proposal_id}"')
+        print(f'  Approve with: approve {proposal.proposal_id} --confirm approve')
 
 
 def command_list(args, store: AssistantStore) -> None:
@@ -122,15 +126,22 @@ def command_approve(args, store: AssistantStore) -> None:
         raise SystemExit("Alpaca paper credentials are required for approval execution.")
     policy = load_policy(args.policy)
     portfolio = build_portfolio_snapshot_from_alpaca()
-    order = execute_approved_paper_proposal(
-        args.proposal_id,
-        args.confirm,
-        portfolio,
-        policy,
-        store,
-        now_et=_now_eastern(),
-        kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
-    )
+    try:
+        order = execute_approved_paper_proposal(
+            args.proposal_id,
+            args.confirm,
+            portfolio,
+            policy,
+            store,
+            now_et=_now_eastern(),
+            kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+            override_policy_violations=args.override,
+        )
+    except PolicyOverridableBlockError as exc:
+        raise SystemExit(
+            f"{exc}\n\nEvery violation above is override-eligible (a risk-preference or "
+            f"earnings-calendar call, not unreliable data). Re-run with --override to proceed anyway."
+        )
     print(
         f"Submitted paper order {order['order_id']}: "
         f"{order['side'].upper()} {order['shares']} {order['ticker']} [{order['status']}]"
@@ -181,7 +192,17 @@ def build_parser() -> argparse.ArgumentParser:
 
     approve = commands.add_parser("approve")
     approve.add_argument("proposal_id")
-    approve.add_argument("--confirm", required=True)
+    approve.add_argument("--confirm", required=True, help='Must be exactly "approve" (case-insensitive).')
+    approve.add_argument(
+        "--override",
+        action="store_true",
+        help=(
+            "Proceed even if the execution gate blocked this on an override-eligible violation "
+            "(a concentration cap or the earnings blackout window). Has no effect if any other "
+            "violation (stale price, closed market, a bad quote, a duplicate order, the kill "
+            "switch, insufficient cash) is also present -- those can never be overridden."
+        ),
+    )
     approve.set_defaults(handler=command_approve)
 
     reconcile = commands.add_parser(

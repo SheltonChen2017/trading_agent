@@ -33,6 +33,12 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import streamlit as st
 
+from assistant.allocation_batch import (
+    BATCH_STOPPED_UNKNOWN,
+    execute_allocation_batch,
+    new_batch_id,
+    preflight_allocation_batch,
+)
 from assistant.allocation_proposals import (
     build_allocation_plan,
     estimate_pending_buy_value_by_ticker,
@@ -93,19 +99,78 @@ def _load_packet(policy_path: str, include_events: bool):
     return policy, packet
 
 
+def _proposal_content_digest(proposal: dict, policy_fingerprint: str) -> str:
+    """Fingerprint over exactly what's displayed in this proposal's
+    confirmation summary, plus the active policy's fingerprint. Compared
+    against a stored digest so a typed confirmation/override that was
+    started against ONE version of this card (a different proposal, a
+    stale render, or a policy that's since changed) is cleared rather
+    than silently carried over onto different displayed content (GPT
+    review, 2026-07-28: "do not retain an override-ready UI state after
+    proposal content, policy, portfolio, or quote context changes")."""
+    intent = proposal["intent"]
+    payload = {
+        "proposal_id": proposal["proposal_id"],
+        "ticker": intent["ticker"],
+        "side": intent["side"],
+        "shares": intent["shares"],
+        "order_type": intent.get("order_type"),
+        "limit_price": intent.get("limit_price"),
+        "reference_price": proposal["reference_price"],
+        "expires_at": proposal["expires_at"],
+        "policy_fingerprint": policy_fingerprint,
+    }
+    serialized = json.dumps(payload, sort_keys=True, default=str)
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
+
+
 def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str) -> None:
     """One proposal card with the typed-confirmation approve flow.
     Shared by the Propose & Approve tab and the Watchlist tab's
     allocation-buy feature -- identical safety flow everywhere a
     proposal can be approved: type the exact "approve" phrase, or
-    the submit button stays disabled."""
+    the submit button stays disabled. The confirmation phrase is
+    intentionally simple (2026-07-28) -- what protects against
+    approving the WRONG visible proposal or stale UI state is the
+    immutable summary below and the content-digest binding, not
+    phrase complexity (GPT review, 2026-07-28)."""
     intent = proposal["intent"]
     proposal_id = proposal["proposal_id"]
     override_key = f"override_available_{proposal_id}"
+    digest_key = f"content_digest_{proposal_id}"
+
+    display_policy = load_policy(policy_path)
+    policy_fingerprint = compute_policy_fingerprint(display_policy)
+    current_digest = _proposal_content_digest(proposal, policy_fingerprint)
+    if st.session_state.get(digest_key) != current_digest:
+        # Displayed content or the active policy changed since any prior
+        # typed confirmation/override for this card -- clear both rather
+        # than let a stale confirmation silently apply to new content.
+        st.session_state[f"confirm_{proposal_id}"] = ""
+        st.session_state.pop(override_key, None)
+        st.session_state[digest_key] = current_digest
+
+    estimated_notional = intent["shares"] * proposal["reference_price"]
+    override_phrase = f"OVERRIDE {intent['side'].upper()} {intent['shares']} {intent['ticker'].upper()}"
+
     with st.container(border=True):
         st.subheader(f"{intent['side'].upper()} {intent['shares']} {intent['ticker']}")
         st.caption(f"{proposal_id} -- evidence_status: {proposal['evidence_status']}")
-        st.write(f"Reference price: ${proposal['reference_price']:,.2f}")
+
+        with st.container(border=True):
+            st.write("**Confirm before submitting -- this summary reflects exactly what will be sent:**")
+            summary_col1, summary_col2 = st.columns(2)
+            with summary_col1:
+                st.write(f"Ticker: **{intent['ticker']}** -- Side: **{intent['side'].upper()}**")
+                st.write(f"Shares: **{intent['shares']}** -- Order type: **{intent.get('order_type', 'market')}**")
+                if intent.get("order_type") == "limit":
+                    st.write(f"Limit price: **${intent.get('limit_price'):,.2f}**")
+                st.write(f"Estimated notional: **${estimated_notional:,.2f}**")
+            with summary_col2:
+                st.write(f"Reference price: ${proposal['reference_price']:,.2f}")
+                st.write(f"Policy: {display_policy.name} v{display_policy.version} ({policy_fingerprint[:8]})")
+                st.write(f"Expires: {proposal['expires_at']}")
+
         for reason in proposal["reasons"]:
             st.write(f"- {reason}")
         impact = proposal["expected_impact"]
@@ -131,13 +196,12 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                 st.error("Alpaca paper credentials are required for approval execution.")
             else:
                 try:
-                    approve_policy = load_policy(policy_path)
                     portfolio = build_portfolio_snapshot_from_alpaca()
                     order = execute_approved_paper_proposal(
                         proposal_id,
                         typed,
                         portfolio,
-                        approve_policy,
+                        display_policy,
                         store,
                         now_et=_now_eastern(),
                         kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
@@ -159,18 +223,28 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                 "the broker itself would still accept this order:\n"
                 + "\n".join(f"- {v}" for v in st.session_state[override_key])
             )
-            if st.button("Override and submit anyway", key=f"override_submit_{proposal_id}"):
+            st.write(
+                f"To override and submit anyway, type the exact phrase below: `{override_phrase}` "
+                "(identifies this specific order so you can't accidentally override a different one)."
+            )
+            override_typed = st.text_input(
+                "Override phrase", key=f"override_confirm_{proposal_id}", label_visibility="collapsed"
+            )
+            if st.button(
+                "Override and submit anyway",
+                key=f"override_submit_{proposal_id}",
+                disabled=override_typed.strip() != override_phrase,
+            ):
                 if not is_configured():
                     st.error("Alpaca paper credentials are required for approval execution.")
                 else:
                     try:
-                        approve_policy = load_policy(policy_path)
                         portfolio = build_portfolio_snapshot_from_alpaca()
                         order = execute_approved_paper_proposal(
                             proposal_id,
                             "approve",
                             portfolio,
-                            approve_policy,
+                            display_policy,
                             store,
                             now_et=_now_eastern(),
                             kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
@@ -641,21 +715,34 @@ with tab_watchlist:
                 )
 
         if st.session_state.get("allocation_proposals"):
-            st.subheader("Execute transaction per the suggested allocation")
+            st.subheader("Submit all proposals in this split (one at a time, not atomic)")
             st.caption(
-                "Submits every proposal above in one pass, spending the predetermined amount across the "
-                "split shown -- rechecks available cash fresh before each ticker so an earlier fill in "
-                "this same batch can't cause the next one to overspend. A ticker blocked only by an "
-                "override-eligible check (a concentration cap or the earnings blackout) still shows up as "
-                "a per-ticker failure here -- use that ticker's own card below to override it individually "
-                "if you want to proceed with just that one."
+                "Submits every proposal above SEQUENTIALLY, one order at a time -- this is NOT a single "
+                "atomic transaction. Paper (and real) broker orders can't be rolled back once submitted, "
+                "so this can legitimately end with some legs filled and others not (e.g. 3 of 5 submitted, "
+                "a 4th blocked, a 5th never attempted). Every proposal is preflight-checked first; if ANY "
+                "of them fails, nothing is submitted. Rechecks available cash fresh before each ticker so "
+                "an earlier fill in this same run can't cause the next one to overspend. Safe to click "
+                "again after a page refresh -- already-submitted legs are never resubmitted. This does NOT "
+                "override any policy block -- a ticker blocked only by an override-eligible check (a "
+                "concentration cap or the earnings blackout) stops that leg here; use that ticker's own "
+                "card below to override it individually if you want to proceed with just that one."
             )
+            current_proposal_ids = [p["proposal_id"] for p in st.session_state["allocation_proposals"]]
+            batch_key = "allocation_batch_id"
+            if (
+                st.session_state.get(batch_key + "_for_signature") != current_signature
+                or st.session_state.get(batch_key) is None
+            ):
+                st.session_state[batch_key] = None
+                st.session_state[batch_key + "_for_signature"] = current_signature
+
             bulk_typed = st.text_input(
-                'Type the exact phrase below to execute all: "I approve this transaction"',
+                'Type the exact phrase below to submit all: "I approve this transaction"',
                 key="allocation_bulk_confirm",
             )
             if st.button(
-                "Execute all proposals in this split",
+                "Submit all proposals in this split",
                 type="primary",
                 disabled=bulk_typed.strip() != "I approve this transaction",
             ):
@@ -663,22 +750,57 @@ with tab_watchlist:
                     st.error("Alpaca paper credentials are required for approval execution.")
                 else:
                     approve_policy = load_policy(policy_path)
-                    for p in st.session_state.get("allocation_proposals", []):
-                        ticker = p["intent"]["ticker"]
-                        try:
-                            portfolio = build_portfolio_snapshot_from_alpaca()
-                            order = execute_approved_paper_proposal(
-                                p["proposal_id"],
-                                "approve",
-                                portfolio,
-                                approve_policy,
-                                store,
-                                now_et=_now_eastern(),
-                                kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                    preflight = preflight_allocation_batch(
+                        current_proposal_ids, store, approve_policy, alloc_packet.portfolio,
+                        now_et=_now_eastern(),
+                        kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                    )
+                    failed_preflight = {pid: v for pid, v in preflight.items() if not v.approved}
+                    if failed_preflight:
+                        st.error(
+                            "Preflight failed for one or more proposals -- submitting NONE of them "
+                            "(all-or-nothing at the start, since a partial submission with a known-bad "
+                            "leg still ahead is worse than not starting):"
+                        )
+                        for pid, validation in failed_preflight.items():
+                            ticker = next(
+                                (p["intent"]["ticker"] for p in st.session_state["allocation_proposals"] if p["proposal_id"] == pid),
+                                pid,
                             )
-                            st.success(f"{ticker}: submitted order {order['order_id']} [{order['status']}]")
-                        except Exception as exc:
-                            st.error(f"{ticker}: not submitted -- {exc}")
+                            st.write(f"- {ticker}: " + "; ".join(validation.violations))
+                    else:
+                        batch_id = new_batch_id()
+                        store.create_allocation_batch(batch_id, current_proposal_ids, intended_total_notional=dollar_amount)
+                        st.session_state[batch_key] = batch_id
+
+            active_batch_id = st.session_state.get(batch_key)
+            if active_batch_id:
+                approve_policy = load_policy(policy_path)
+                batch = execute_allocation_batch(
+                    active_batch_id, store, approve_policy, now_et=_now_eastern(),
+                    kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                )
+                st.write(f"Batch `{active_batch_id}` -- status: **{batch['status']}**")
+                if batch["status"] == BATCH_STOPPED_UNKNOWN:
+                    st.warning(
+                        "Stopped: a leg's broker outcome is unresolved (submission_unknown). Resolve it "
+                        f"via `reconcile {{proposal_id}}` (CLI) before this batch can continue -- it will "
+                        "pick back up from here once that leg is resolved."
+                    )
+                leg_rows = []
+                for pid in current_proposal_ids:
+                    leg = batch["legs"].get(pid, {"state": "unattempted", "order": None, "error": None})
+                    ticker = next(
+                        (p["intent"]["ticker"] for p in st.session_state["allocation_proposals"] if p["proposal_id"] == pid),
+                        pid,
+                    )
+                    leg_rows.append({
+                        "Ticker": ticker,
+                        "State": leg["state"],
+                        "Order ID": (leg.get("order") or {}).get("order_id", ""),
+                        "Detail": leg.get("error") or "",
+                    })
+                st.dataframe(leg_rows, use_container_width=True, hide_index=True)
 
         for proposal in st.session_state.get("allocation_proposals", []):
             _render_proposal_approval(proposal, store, policy_path)

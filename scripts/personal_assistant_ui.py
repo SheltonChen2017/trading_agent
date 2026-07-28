@@ -39,13 +39,17 @@ from assistant.policy import DEFAULT_POLICY_PATH, load_policy
 from assistant.proposal_status import STATUSES, UNRESOLVED_BROKER_STATE_STATUSES
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
-from assistant.stock_lookup import historical_hold_period_range, inverse_volatility_weights, latest_price_targets_by_firm
+from assistant.stock_lookup import (
+    compute_blended_volatility,
+    historical_hold_period_range,
+    inverse_volatility_weights,
+    latest_price_targets_by_firm,
+)
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
 from config import LEVERAGED_ETF_TICKERS, PAPER_TRADING, UNIVERSE
 from data.market_data import fetch_historical
 from execution.alpaca_broker import is_configured
-from signals.regime import compute_trailing_market_volatility
 from strategies.trend_vol_rotation import classify_trend
 
 st.set_page_config(page_title="Personal Trading Assistant", layout="wide")
@@ -253,10 +257,10 @@ with tab_briefing:
                         close = ticker_data[position.ticker]["close"]
                         as_of = close.index[-1]
                         trend = classify_trend(close, as_of, lookback_days=200)
-                        vol = compute_trailing_market_volatility(pd.DataFrame({"close": close}), as_of, lookback_days=20)
+                        vol = compute_blended_volatility(close, as_of)
                     trend_str = trend or "unavailable"
                     vol_str = f"{vol:.2f}% trailing daily std" if vol is not None else "unavailable"
-                    st.write(f"Trend (200-day): **{trend_str}** -- Volatility (20-day): **{vol_str}**")
+                    st.write(f"Trend (200-day): **{trend_str}** -- Volatility (20d/60d blend): **{vol_str}**")
                 except Exception as exc:
                     st.caption(f"Could not fetch trend/volatility: {exc}")
 
@@ -304,9 +308,9 @@ with tab_watchlist:
         "edge after rigorous out-of-sample testing (see the Briefing tab's "
         "evidence summary) -- a bare probability would either be fabricated "
         "or would dress up an already-rejected backtest as more confident "
-        "than it is. When 2+ tickers are checked together, an inverse-"
-        "volatility weight suggestion is shown -- a risk-sizing heuristic "
-        "from historical data, not a return forecast."
+        "than it is. When 2+ tickers are checked together, an inverse-volatility "
+        "purchase split is shown -- a risk-sizing heuristic for splitting new money "
+        "across tickers you've already picked, from historical data, not a return forecast."
     )
 
     common_options = sorted(set(UNIVERSE) | set(LEVERAGED_ETF_TICKERS) | {"QQQ", "SPY", "SOXX"})
@@ -344,7 +348,7 @@ with tab_watchlist:
                     close = data[ticker]["close"]
                     as_of = close.index[-1]
                     own_trend = classify_trend(close, as_of, lookback_days=200)
-                    own_vol = compute_trailing_market_volatility(pd.DataFrame({"close": close}), as_of, lookback_days=20)
+                    own_vol = compute_blended_volatility(close, as_of)
                     current_price = float(close.iloc[-1])
                     price_as_of = str(as_of.date())
                 explanation = explain_ticker(ticker, portfolio=watchlist_packet.portfolio, market_regime=watchlist_packet.regime)
@@ -371,19 +375,36 @@ with tab_watchlist:
     watchlist_results = st.session_state.get("watchlist_results", {})
 
     vols = {t: r.get("own_vol") for t, r in watchlist_results.items() if "error" not in r}
-    weights = inverse_volatility_weights(vols) if vols else {}
+    max_weight_pct = 100.0
+    if len(watchlist_results) > 1 and vols:
+        max_weight_pct = st.slider(
+            "Max weight per ticker in the split (%)",
+            min_value=10.0,
+            max_value=100.0,
+            value=100.0,
+            step=5.0,
+            key="allocation_max_weight_pct",
+            help=(
+                "100% = no cap (an unusually calm ticker can otherwise take most of the split). "
+                "Lowering this redistributes the excess above the cap to the other tickers in your cart."
+            ),
+        )
+    weights = inverse_volatility_weights(vols, max_weight_pct=max_weight_pct) if vols else {}
 
     if len(watchlist_results) > 1 and weights:
-        st.subheader("Suggested combination weighting (inverse-volatility)")
+        st.subheader("Inverse-volatility purchase split")
         st.dataframe(
             [{"Ticker": t, "Suggested %": w} for t, w in sorted(weights.items(), key=lambda kv: -kv[1])],
             use_container_width=True,
             hide_index=True,
         )
         st.caption(
-            "Weights inversely proportional to each ticker's own trailing volatility -- "
-            "sizes the choppier name smaller, same principle as strategies/vol_target_rotation.py. "
-            "A risk heuristic, not an optimization for expected return."
+            "Splits a NEW cash contribution across your cart, weighted inversely to each ticker's own "
+            "trailing volatility (blended 20d/60d) -- sizes the choppier name smaller, same principle as "
+            "strategies/vol_target_rotation.py. A risk-sizing heuristic for splitting money you've already "
+            "decided to spend on these tickers -- not a recommendation of which stocks to buy, and not an "
+            "optimized portfolio allocation (it ignores correlation between your picks and your existing "
+            "holdings elsewhere in the account)."
         )
 
     if weights:
@@ -412,6 +433,30 @@ with tab_watchlist:
             st.metric("Remaining balance after this purchase", f"${available_cash - dollar_amount:,.2f}")
             st.caption("Estimate before share rounding -- shares are rounded DOWN, so actual remaining cash will be at or above this.")
         st.caption(f"Available cash right now (live from Alpaca): ${available_cash:,.2f}")
+
+        if dollar_amount > 0:
+            held_value_by_ticker = {p.ticker.upper(): p.market_value for p in alloc_packet.portfolio.positions}
+            total_equity = alloc_packet.portfolio.total_equity
+            projected_rows = []
+            for t, w in sorted(weights.items(), key=lambda kv: -kv[1]):
+                existing_value = held_value_by_ticker.get(t.upper(), 0.0)
+                new_dollars = dollar_amount * w / 100
+                projected_value = existing_value + new_dollars
+                projected_pct = (projected_value / total_equity * 100) if total_equity else 0.0
+                projected_rows.append(
+                    {
+                        "Ticker": t,
+                        "Existing value": f"${existing_value:,.2f}",
+                        "New $ (this split)": f"${new_dollars:,.2f}",
+                        "Projected total % of portfolio": round(projected_pct, 1),
+                    }
+                )
+            st.write(
+                "**Projected final weight if you approve this split** (includes what you already hold -- "
+                "this is where you'd catch adding to an already-large position):"
+            )
+            st.dataframe(projected_rows, use_container_width=True, hide_index=True)
+
         if st.button("Buy with recommended allocation", type="primary", disabled=dollar_amount <= 0):
             prices = {t: r.get("current_price") for t, r in watchlist_results.items() if "error" not in r}
             alloc_proposals = generate_allocation_buy_proposals(
@@ -441,7 +486,7 @@ with tab_watchlist:
             current_price = result.get("current_price")
             if current_price is not None:
                 st.metric("Current price", f"${current_price:,.2f}", help=f"Last close, as of {result['price_as_of']}")
-            st.write(f"Own trend (200-day): **{trend_str}** -- Own volatility (20-day): **{vol_str}**")
+            st.write(f"Own trend (200-day): **{trend_str}** -- Own volatility (20d/60d blend): **{vol_str}**")
 
             price_history = result.get("price_history")
             if price_history is not None and not price_history.empty:

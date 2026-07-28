@@ -1,8 +1,9 @@
 """
-Proposal generator for the Watchlist "Buy with recommended allocation"
-feature: splits a user-specified dollar amount across a user-picked cart
-of tickers according to inverse-volatility weights, and produces one
-buy TradeProposal per ticker.
+Allocation planning and proposal generation for the Watchlist "Create
+purchase proposals using this split" feature: splits a user-specified
+dollar amount across a user-picked cart of tickers according to
+inverse-volatility weights, and produces one buy TradeProposal per
+ticker that can actually afford at least 1 share.
 
 Distinct from assistant/strategy_proposals.py: this is NOT based on any
 validated research finding. The tickers are entirely user-picked -- this
@@ -24,20 +25,162 @@ module produces.
 Every proposal still goes through the identical TradeProposal ->
 "APPROVE <id>" -> execution_gate pipeline as every other proposal type
 in this project -- nothing here submits an order directly.
+
+build_allocation_plan() is the SINGLE shared source of truth for what an
+allocation split actually produces -- both the UI preview and
+generate_allocation_buy_proposals() consume it, so the preview can never
+show something different from what actually gets proposed (GPT review,
+2026-07-28: a prior version had the preview compute
+`dollar_amount * weight_pct` directly, while proposal generation
+independently floored to whole shares and skipped tickers that couldn't
+afford 1 share -- e.g. a $50 allocation to a $200 stock showed as "+$50"
+in the preview even though zero shares, and zero proposals, actually
+resulted. The preview also ignored pending buy orders already in the
+portfolio snapshot, understating the real eventual position.)
 """
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import math
 from datetime import datetime, timedelta, timezone
 
-from assistant.policy import TradingPolicy
+from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.proposals import TradeProposal
 from assistant.schemas import DecisionPacket
 from risk.execution_gate import TradeIntent
 
 EVIDENCE_STATUS = "user_directed_allocation"
+
+
+@dataclasses.dataclass
+class AllocationPlanEntry:
+    ticker: str
+    weight_pct: float
+    target_dollars: float
+    reference_price: float
+    shares: int
+    planned_notional: float
+    unallocated_dollars: float
+    existing_market_value: float
+    pending_buy_value: float
+    pending_value_unknown: bool
+    projected_market_value: float
+    projected_pct_of_equity: float
+    position_limit_pct: float
+    distance_to_limit_pct: float  # positive = room left under the policy limit; negative = already over it
+    skipped: bool
+    skip_reason: str | None
+
+
+def estimate_pending_buy_value_by_ticker(open_orders: list[dict]) -> tuple[dict[str, float], set[str]]:
+    """
+    Estimated dollar value of currently pending (not-yet-filled) BUY
+    orders, keyed by ticker, for the allocation PREVIEW -- deliberately
+    does NOT make a live quote call (unlike
+    assistant.execution_service._pending_buy_value_by_ticker(), which is
+    allowed to since it gates real order submission). A UI preview
+    refreshing on every rerun shouldn't fire a network call per pending
+    order; instead, a pending order whose value can't be determined from
+    the order itself (a plain market order with no notional or limit
+    price) is reported back in the second return value so the caller can
+    show the projection as incomplete rather than silently treating it
+    as zero (GPT review, 2026-07-28).
+    """
+    totals: dict[str, float] = {}
+    unknown: set[str] = set()
+    for order in open_orders:
+        if str(order.get("side", "")).lower() != "buy":
+            continue
+        ticker = order.get("ticker")
+        if not ticker:
+            continue
+        ticker = ticker.upper()
+        notional = order.get("notional")
+        if notional:
+            totals[ticker] = totals.get(ticker, 0.0) + float(notional)
+            continue
+        shares = order.get("shares")
+        limit_price = order.get("limit_price")
+        if shares and limit_price:
+            totals[ticker] = totals.get(ticker, 0.0) + float(shares) * float(limit_price)
+            continue
+        unknown.add(ticker)
+    return totals, unknown
+
+
+def build_allocation_plan(
+    packet: DecisionPacket,
+    policy: TradingPolicy,
+    weights_pct: dict[str, float],
+    prices: dict[str, float],
+    dollar_amount: float,
+    pending_buy_value_by_ticker: dict[str, float] | None = None,
+    pending_value_unknown_tickers: set[str] | None = None,
+) -> list[AllocationPlanEntry]:
+    """
+    Computes, per ticker, EXACTLY what generate_allocation_buy_proposals()
+    will do with it -- whole shares via floor(), same as proposal
+    generation -- plus context needed to judge the plan: existing
+    holdings, pending buy orders (or an explicit "unknown" flag if a
+    pending order's value can't be determined), the projected final
+    position, and the applicable policy position limit.
+    """
+    snapshot = packet.portfolio
+    held_value_by_ticker = {p.ticker.upper(): p.market_value for p in snapshot.positions}
+    total_equity = snapshot.total_equity
+    pending_buy_value_by_ticker = pending_buy_value_by_ticker or {}
+    pending_value_unknown_tickers = pending_value_unknown_tickers or set()
+    limit_pct = policy.max_position_pct * 100
+
+    entries: list[AllocationPlanEntry] = []
+    for ticker, weight_pct in weights_pct.items():
+        ticker_upper = ticker.upper()
+        existing_value = held_value_by_ticker.get(ticker_upper, 0.0)
+        pending_value = pending_buy_value_by_ticker.get(ticker_upper, 0.0)
+        pending_unknown = ticker_upper in pending_value_unknown_tickers
+        target_dollars = dollar_amount * weight_pct / 100
+        price = prices.get(ticker)
+
+        if not price or price <= 0:
+            projected_value = existing_value + pending_value
+            projected_pct = (projected_value / total_equity * 100) if total_equity else 0.0
+            entries.append(
+                AllocationPlanEntry(
+                    ticker=ticker, weight_pct=weight_pct, target_dollars=target_dollars,
+                    reference_price=0.0, shares=0, planned_notional=0.0, unallocated_dollars=target_dollars,
+                    existing_market_value=existing_value, pending_buy_value=pending_value,
+                    pending_value_unknown=pending_unknown, projected_market_value=projected_value,
+                    projected_pct_of_equity=projected_pct, position_limit_pct=limit_pct,
+                    distance_to_limit_pct=limit_pct - projected_pct,
+                    skipped=True, skip_reason="No current price available.",
+                )
+            )
+            continue
+
+        shares = math.floor(target_dollars / price)
+        planned_notional = shares * price
+        unallocated = target_dollars - planned_notional
+        skipped = shares <= 0
+        skip_reason = (
+            f"${target_dollars:,.2f} allocation can't buy 1 share at ${price:,.2f}." if skipped else None
+        )
+
+        projected_value = existing_value + pending_value + planned_notional
+        projected_pct = (projected_value / total_equity * 100) if total_equity else 0.0
+
+        entries.append(
+            AllocationPlanEntry(
+                ticker=ticker, weight_pct=weight_pct, target_dollars=target_dollars, reference_price=price,
+                shares=shares, planned_notional=planned_notional, unallocated_dollars=unallocated,
+                existing_market_value=existing_value, pending_buy_value=pending_value,
+                pending_value_unknown=pending_unknown, projected_market_value=projected_value,
+                projected_pct_of_equity=projected_pct, position_limit_pct=limit_pct,
+                distance_to_limit_pct=limit_pct - projected_pct, skipped=skipped, skip_reason=skip_reason,
+            )
+        )
+    return entries
 
 
 def _stable_id(packet: DecisionPacket, policy: TradingPolicy, intent: TradeIntent, salt: str) -> str:
@@ -58,13 +201,14 @@ def generate_allocation_buy_proposals(
     prices: dict[str, float],
     dollar_amount: float,
     ttl_minutes: int = 15,
+    pending_buy_value_by_ticker: dict[str, float] | None = None,
+    pending_value_unknown_tickers: set[str] | None = None,
 ) -> list[TradeProposal]:
     """
-    One buy proposal per ticker in `weights_pct`, sized at
-    dollar_amount * weight_pct / 100 / price, rounded DOWN to whole
-    shares (fractional shares aren't supported by TradeIntent). Skips
-    any ticker whose allocated dollar amount can't buy at least 1 share,
-    or that has no known price.
+    One buy proposal per ticker in `weights_pct` that can afford at least
+    1 share, generated from build_allocation_plan() -- the SAME plan a
+    caller should preview before calling this, so what gets proposed
+    always exactly matches what was shown.
 
     Does not check `dollar_amount` against available cash itself -- the
     caller (UI) should bound the input against the account balance, and
@@ -74,25 +218,26 @@ def generate_allocation_buy_proposals(
     if dollar_amount <= 0 or not weights_pct:
         return []
 
+    plan = build_allocation_plan(
+        packet, policy, weights_pct, prices, dollar_amount,
+        pending_buy_value_by_ticker=pending_buy_value_by_ticker,
+        pending_value_unknown_tickers=pending_value_unknown_tickers,
+    )
+
     now = datetime.now(timezone.utc)
     proposals = []
-    for ticker, weight_pct in weights_pct.items():
-        price = prices.get(ticker)
-        if not price or price <= 0:
-            continue
-        allocated_dollars = dollar_amount * weight_pct / 100
-        shares = math.floor(allocated_dollars / price)
-        if shares <= 0:
+    for entry in plan:
+        if entry.skipped or entry.shares <= 0:
             continue
 
         intent = TradeIntent(
-            ticker=ticker,
+            ticker=entry.ticker,
             side="buy",
-            shares=shares,
+            shares=entry.shares,
             order_type="market",
             rationale=(
-                f"User-directed allocation: {weight_pct:.1f}% of ${dollar_amount:,.2f} "
-                f"(inverse-volatility weighted) -> {shares} shares at ~${price:,.2f}."
+                f"User-directed allocation: {entry.weight_pct:.1f}% of ${dollar_amount:,.2f} "
+                f"(inverse-volatility weighted) -> {entry.shares} shares at ~${entry.reference_price:,.2f}."
             ),
         )
         proposal_id = _stable_id(packet, policy, intent, salt=f"{dollar_amount}")
@@ -104,15 +249,18 @@ def generate_allocation_buy_proposals(
                 status="proposed",
                 idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
                 policy_version=policy.version,
+                policy_fingerprint=compute_policy_fingerprint(policy),
                 intent=intent,
-                reference_price=price,
+                reference_price=entry.reference_price,
                 price_timestamp=now.isoformat(),
                 reasons=[
                     f"You chose to allocate ${dollar_amount:,.2f} across your Watchlist cart; "
-                    f"{ticker} received {weight_pct:.1f}% by inverse-volatility weighting."
+                    f"{entry.ticker} received {entry.weight_pct:.1f}% by inverse-volatility weighting."
                 ],
                 evidence_status=EVIDENCE_STATUS,
-                expected_impact=preview_trade_impact(packet.portfolio, ticker, "buy", shares, price),
+                expected_impact=preview_trade_impact(
+                    packet.portfolio, entry.ticker, "buy", entry.shares, entry.reference_price
+                ),
                 alternatives=[
                     "Take no action -- nothing is bought until you type the approval phrase for each ticker.",
                     "Adjust the dollar amount or the cart and check again before approving.",

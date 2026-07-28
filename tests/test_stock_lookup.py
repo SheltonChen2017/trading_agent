@@ -92,12 +92,72 @@ def test_inverse_volatility_weights_no_cap_when_max_weight_pct_is_none():
     assert uncapped == capped_high  # cap far above the natural split changes nothing
 
 
-def test_inverse_volatility_weights_cap_below_natural_split_caps_every_ticker_at_it():
-    # An infeasible cap (max_weight_pct * n_tickers < 100) can't be fully
-    # satisfied -- every ticker ends up AT the cap, weights won't sum to
-    # 100. Documented behavior, not a silent bug.
-    weights = inverse_volatility_weights({"A": 1.0, "B": 1.0, "C": 1.0}, max_weight_pct=20.0)
-    assert all(w == 20.0 for w in weights.values())
+def test_inverse_volatility_weights_infeasible_cap_raises():
+    # Regression test (GPT review, 2026-07-28): an infeasible cap
+    # (max_weight_pct * n_eligible < 100) used to silently return weights
+    # that don't sum to 100 -- now it fails closed with a clear error
+    # instead, so a caller can't mistake a partial allocation for a
+    # complete one.
+    try:
+        inverse_volatility_weights({"A": 1.0, "B": 1.0, "C": 1.0}, max_weight_pct=20.0)
+        assert False, "expected an infeasible cap (20% x 3 tickers = 60% < 100%) to raise"
+    except ValueError as exc:
+        assert "infeasible" in str(exc).lower()
+
+
+def test_inverse_volatility_weights_cap_exactly_at_feasibility_boundary_succeeds():
+    # 3 tickers, cap = 100/3 (rounded up slightly to stay feasible under
+    # floating point) -- should succeed, not raise, and land at an even
+    # split.
+    weights = inverse_volatility_weights({"A": 1.0, "B": 1.0, "C": 1.0}, max_weight_pct=100 / 3)
+    assert max(weights.values()) <= 100 / 3 + 0.1
+    assert abs(sum(weights.values()) - 100.0) < 0.2
+
+
+def test_inverse_volatility_weights_rejects_invalid_cap_values():
+    for bad_cap in (0, -10.0, 101.0, float("nan"), float("inf")):
+        try:
+            inverse_volatility_weights({"A": 1.0, "B": 2.0}, max_weight_pct=bad_cap)
+            assert False, f"expected max_weight_pct={bad_cap} to be rejected"
+        except ValueError:
+            pass
+
+
+def test_inverse_volatility_weights_multi_pass_three_ticker_cap_never_exceeds_cap():
+    # Regression test (GPT review, 2026-07-28, P1): reproduced with the
+    # BUGGY implementation -- a ticker capped in pass 1 was not
+    # permanently excluded from later redistribution, so it could end up
+    # OVER the cap again (reproduced: 40% cap -> one ticker at 60%). This
+    # case requires TWO capping passes (two of the three tickers end up
+    # at the cap) to exercise the actual defect, not just a single-pass
+    # cap.
+    weights = inverse_volatility_weights({"A": 1.0, "B": 2.0, "C": 100.0}, max_weight_pct=40.0)
+    assert max(weights.values()) <= 40.0 + 1e-6
+    assert abs(sum(weights.values()) - 100.0) < 0.1
+    # Confirm this genuinely required multiple tickers to hit the cap
+    # (i.e. it's actually exercising the multi-pass path, not a no-op).
+    assert sum(1 for w in weights.values() if w == 40.0) >= 2
+
+
+def test_inverse_volatility_weights_multi_pass_five_ticker_20pct_cap_never_exceeds_cap():
+    # Regression test (GPT review, 2026-07-28, P1): reproduced 73.4% on a
+    # feasible 20% cap with 5 tickers under the buggy implementation.
+    weights = inverse_volatility_weights(
+        {"A": 1.0, "B": 1.0, "C": 1.0, "D": 1.0, "E": 1000.0}, max_weight_pct=20.0
+    )
+    assert max(weights.values()) <= 20.0 + 1e-6
+    assert abs(sum(weights.values()) - 100.0) < 0.1
+
+
+def test_inverse_volatility_weights_another_multi_pass_40pct_case():
+    # Regression test (GPT review, 2026-07-28, P1): reproduced 41.8% on a
+    # 40% cap under the buggy implementation, with several tickers
+    # reaching the cap across different passes.
+    weights = inverse_volatility_weights(
+        {"A": 1.0, "B": 3.0, "C": 3.0, "D": 50.0}, max_weight_pct=40.0
+    )
+    assert max(weights.values()) <= 40.0 + 1e-6
+    assert abs(sum(weights.values()) - 100.0) < 0.1
 
 
 def test_compute_blended_volatility_between_short_and_medium_estimates():
@@ -176,7 +236,12 @@ if __name__ == "__main__":
     test_inverse_volatility_weights_empty_input()
     test_inverse_volatility_weights_max_weight_cap_redistributes_excess()
     test_inverse_volatility_weights_no_cap_when_max_weight_pct_is_none()
-    test_inverse_volatility_weights_cap_below_natural_split_caps_every_ticker_at_it()
+    test_inverse_volatility_weights_infeasible_cap_raises()
+    test_inverse_volatility_weights_cap_exactly_at_feasibility_boundary_succeeds()
+    test_inverse_volatility_weights_rejects_invalid_cap_values()
+    test_inverse_volatility_weights_multi_pass_three_ticker_cap_never_exceeds_cap()
+    test_inverse_volatility_weights_multi_pass_five_ticker_20pct_cap_never_exceeds_cap()
+    test_inverse_volatility_weights_another_multi_pass_40pct_case()
     test_compute_blended_volatility_between_short_and_medium_estimates()
     test_compute_blended_volatility_falls_back_to_single_window_if_only_one_available()
     test_compute_blended_volatility_none_when_insufficient_history()

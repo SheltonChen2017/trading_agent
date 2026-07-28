@@ -64,7 +64,7 @@ from data.market_data import fetch_historical
 from signals.regime import compute_trailing_market_volatility
 from strategies.trend_vol_rotation import classify_trend
 from strategies.vol_target_rotation import compute_target_leveraged_weight
-from assistant.policy import TradingPolicy
+from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.proposals import TradeProposal
 from assistant.schemas import DecisionPacket
@@ -204,6 +204,7 @@ def generate_soxx_soxl_rebalance_proposals(
             status="proposed",
             idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
             policy_version=policy.version,
+            policy_fingerprint=compute_policy_fingerprint(policy),
             intent=intent,
             reference_price=leveraged_position.current_price,
             price_timestamp=now.isoformat(),

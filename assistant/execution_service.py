@@ -151,13 +151,27 @@ code before acting):
      propagate, and this module fails the approval closed (for a BUY
      only -- a risk-reducing sell never consults this value) rather than
      silently proceeding with an undercounted exposure figure.
+
+2026-07-28 update (sixth independent GPT review, verified against this
+code before acting):
+ 18. Approval only compared proposal["policy_version"] to policy.version
+     as a plain string -- two policy files (e.g. a hand-edited personal
+     one copied from the default) could share the same version yet have
+     materially different limits, making them silently interchangeable.
+     Now also requires proposal["policy_fingerprint"] (a hash over every
+     behavior-affecting policy field, see assistant/policy.py's
+     compute_policy_fingerprint()) to match the active policy's CURRENT
+     fingerprint -- catches an edited-but-not-rebumped policy file
+     regardless of whether version was bumped, and fails closed (rather
+     than being grandfathered in) for any proposal that predates
+     fingerprint binding entirely.
 """
 from __future__ import annotations
 
 import os
 from datetime import datetime, timezone
 
-from assistant.policy import TradingPolicy
+from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
     APPROVED,
     BLOCKED,
@@ -309,6 +323,20 @@ def execute_approved_paper_proposal(
         raise ProposalExecutionError("The active policy does not permit paper execution.")
     if proposal["policy_version"] != policy.version:
         raise ProposalExecutionError("Proposal policy version does not match the active policy.")
+    # A manually-maintained version string alone can't catch an edited-
+    # but-not-rebumped policy file: two policy files (e.g. a personal one
+    # copied from the default) can share the same version yet have
+    # materially different limits (GPT review, 2026-07-28). The
+    # fingerprint covers every behavior-affecting field, so it changes
+    # even when version doesn't. A proposal predating fingerprinting
+    # (missing the field entirely) fails closed here rather than being
+    # grandfathered in -- regenerate it instead.
+    if proposal.get("policy_fingerprint") != compute_policy_fingerprint(policy):
+        raise ProposalExecutionError(
+            "Proposal's policy fingerprint does not match the active policy's current content -- the "
+            "policy may have been edited without a version bump (or this proposal predates fingerprint "
+            "binding). Regenerate the proposal against the current policy."
+        )
 
     now_utc = datetime.now(timezone.utc)
 

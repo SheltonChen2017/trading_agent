@@ -20,6 +20,9 @@ Run with:
 """
 from __future__ import annotations
 
+import hashlib
+import json
+import math
 import os
 import sys
 from datetime import datetime, timedelta, timezone
@@ -30,12 +33,16 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import pandas as pd
 import streamlit as st
 
-from assistant.allocation_proposals import generate_allocation_buy_proposals
+from assistant.allocation_proposals import (
+    build_allocation_plan,
+    estimate_pending_buy_value_by_ticker,
+    generate_allocation_buy_proposals,
+)
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
 from assistant.execution_service import execute_approved_paper_proposal, reconcile_submission
 from assistant.explanations import explain_ticker
 from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
-from assistant.policy import DEFAULT_POLICY_PATH, load_policy
+from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
 from assistant.proposal_status import STATUSES, UNRESOLVED_BROKER_STATE_STATUSES
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
@@ -135,6 +142,37 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                     )
                 except Exception as exc:
                     st.error(f"Order not submitted: {exc}")
+
+
+def _allocation_input_signature(
+    weights: dict,
+    dollar_amount: float,
+    prices: dict,
+    price_as_of_by_ticker: dict,
+    max_weight_pct: float,
+    policy,
+    packet,
+) -> str:
+    """Deterministic fingerprint over everything that determines an
+    allocation plan -- cart/weights, dollar amount, prices (and their
+    as-of timestamps, so a stale-but-unchanged price doesn't mask a
+    refresh), the cap, and the active policy's identity. Compared
+    against the signature stored alongside a generated batch of
+    proposals so a changed input can be caught and the stale cards
+    cleared, instead of leaving them rendered and approvable against
+    inputs the user has since changed (GPT review, 2026-07-28)."""
+    payload = {
+        "weights": {t: weights[t] for t in sorted(weights)},
+        "dollar_amount": round(dollar_amount, 2),
+        "prices": {t: prices.get(t) for t in sorted(weights)},
+        "price_as_of": {t: str(price_as_of_by_ticker.get(t)) for t in sorted(weights)},
+        "max_weight_pct": max_weight_pct,
+        "policy_version": policy.version,
+        "policy_fingerprint": compute_policy_fingerprint(policy),
+        "portfolio_as_of": packet.portfolio.as_of,
+    }
+    serialized = json.dumps(payload, sort_keys=True, default=str)
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 title_col, badge_col = st.columns([4, 1])
@@ -375,21 +413,54 @@ with tab_watchlist:
     watchlist_results = st.session_state.get("watchlist_results", {})
 
     vols = {t: r.get("own_vol") for t, r in watchlist_results.items() if "error" not in r}
+    prices = {t: r.get("current_price") for t, r in watchlist_results.items() if "error" not in r}
+    price_as_of_by_ticker = {t: r.get("price_as_of") for t, r in watchlist_results.items() if "error" not in r}
+
+    # "Eligible" = has usable volatility data (gets a nonzero inverse-vol
+    # weight) AND a valid positive price (a proposal could actually be
+    # generated for it). Used to bound the cap slider to a value that's
+    # always mathematically feasible -- previously the slider allowed any
+    # 10-100% cap regardless of cart size, e.g. a 10% cap with only 2
+    # eligible tickers can never actually be satisfied (GPT review,
+    # 2026-07-28).
+    uncapped_weights_preview = inverse_volatility_weights(vols) if vols else {}
+    eligible_tickers = [
+        t for t, w in uncapped_weights_preview.items()
+        if w > 0 and prices.get(t) is not None and prices[t] > 0
+    ]
+    n_eligible = len(eligible_tickers)
+
     max_weight_pct = 100.0
     if len(watchlist_results) > 1 and vols:
+        min_feasible_cap = math.ceil(100 / n_eligible) if n_eligible > 0 else 10.0
+        slider_min = min(100.0, max(10.0, float(min_feasible_cap)))
+        # Clamp an out-of-range stored slider value BEFORE the widget is
+        # created (e.g. the cart shrank since the last rerun) -- Streamlit
+        # raises if a widget's stored session_state value falls outside
+        # the min/max it's about to be created with.
+        stored = st.session_state.get("allocation_max_weight_pct")
+        if stored is not None and stored < slider_min:
+            st.session_state["allocation_max_weight_pct"] = slider_min
         max_weight_pct = st.slider(
             "Max weight per ticker in the split (%)",
-            min_value=10.0,
+            min_value=slider_min,
             max_value=100.0,
             value=100.0,
             step=5.0,
             key="allocation_max_weight_pct",
             help=(
                 "100% = no cap (an unusually calm ticker can otherwise take most of the split). "
-                "Lowering this redistributes the excess above the cap to the other tickers in your cart."
+                "Lowering this redistributes the excess above the cap to the other tickers in your cart. "
+                f"Minimum is {slider_min:.0f}% here -- below that, your {n_eligible} eligible cart "
+                "ticker(s) couldn't absorb the full split even divided evenly."
             ),
         )
-    weights = inverse_volatility_weights(vols, max_weight_pct=max_weight_pct) if vols else {}
+
+    try:
+        weights = inverse_volatility_weights(vols, max_weight_pct=max_weight_pct) if vols else {}
+    except ValueError as exc:
+        st.error(f"Could not compute the purchase split: {exc}")
+        weights = {}
 
     if len(watchlist_results) > 1 and weights:
         st.subheader("Inverse-volatility purchase split")
@@ -408,7 +479,7 @@ with tab_watchlist:
         )
 
     if weights:
-        st.subheader("Buy with recommended allocation (paper trading)")
+        st.subheader("Create purchase proposals using this split")
         alloc_policy, alloc_packet = _load_packet(policy_path, include_events=False)
         available_cash = alloc_packet.portfolio.cash
         if not alloc_policy.allow_new_positions:
@@ -418,6 +489,19 @@ with tab_watchlist:
                 '"allow_new_positions": true in your policy file.'
             )
         st.caption("This only sizes the split across your cart -- it is not a recommendation to buy these specific stocks.")
+
+        pending_value_by_ticker, pending_unknown_tickers = estimate_pending_buy_value_by_ticker(
+            alloc_packet.portfolio.open_orders
+        )
+        cart_pending_unknown = pending_unknown_tickers & {t.upper() for t in weights}
+        if cart_pending_unknown:
+            st.warning(
+                f"Pending buy order value for {', '.join(sorted(cart_pending_unknown))} couldn't be "
+                "determined from the order itself (a plain market order with no notional/limit price yet) "
+                "-- the projection below is INCOMPLETE for these tickers; their real final position may be "
+                "larger than shown."
+            )
+
         amount_col, balance_col = st.columns(2)
         with amount_col:
             dollar_amount = st.number_input(
@@ -429,42 +513,80 @@ with tab_watchlist:
                 key="allocation_dollar_amount",
                 help="Capped at your current available cash, pulled live from Alpaca.",
             )
-        with balance_col:
-            st.metric("Remaining balance after this purchase", f"${available_cash - dollar_amount:,.2f}")
-            st.caption("Estimate before share rounding -- shares are rounded DOWN, so actual remaining cash will be at or above this.")
         st.caption(f"Available cash right now (live from Alpaca): ${available_cash:,.2f}")
 
-        if dollar_amount > 0:
-            held_value_by_ticker = {p.ticker.upper(): p.market_value for p in alloc_packet.portfolio.positions}
-            total_equity = alloc_packet.portfolio.total_equity
-            projected_rows = []
-            for t, w in sorted(weights.items(), key=lambda kv: -kv[1]):
-                existing_value = held_value_by_ticker.get(t.upper(), 0.0)
-                new_dollars = dollar_amount * w / 100
-                projected_value = existing_value + new_dollars
-                projected_pct = (projected_value / total_equity * 100) if total_equity else 0.0
-                projected_rows.append(
-                    {
-                        "Ticker": t,
-                        "Existing value": f"${existing_value:,.2f}",
-                        "New $ (this split)": f"${new_dollars:,.2f}",
-                        "Projected total % of portfolio": round(projected_pct, 1),
-                    }
-                )
-            st.write(
-                "**Projected final weight if you approve this split** (includes what you already hold -- "
-                "this is where you'd catch adding to an already-large position):"
+        plan = (
+            build_allocation_plan(
+                alloc_packet, alloc_policy, weights, prices, dollar_amount,
+                pending_buy_value_by_ticker=pending_value_by_ticker,
+                pending_value_unknown_tickers=pending_unknown_tickers,
             )
-            st.dataframe(projected_rows, use_container_width=True, hide_index=True)
+            if dollar_amount > 0
+            else []
+        )
+        planned_spend = sum(e.planned_notional for e in plan)
 
-        if st.button("Buy with recommended allocation", type="primary", disabled=dollar_amount <= 0):
-            prices = {t: r.get("current_price") for t, r in watchlist_results.items() if "error" not in r}
+        with balance_col:
+            st.metric("Remaining balance after this purchase", f"${available_cash - planned_spend:,.2f}")
+            st.caption(
+                "Reflects the actual whole-share plan below (rounding down, and any tickers skipped for "
+                "not affording 1 share, both leave a bit more cash than a raw percentage split would)."
+            )
+
+        if plan:
+            unallocated = dollar_amount - planned_spend
+            st.write(
+                f"Requested: **${dollar_amount:,.2f}** -- Planned spend: **${planned_spend:,.2f}** -- "
+                f"Unallocated: **${unallocated:,.2f}** (cap headroom, and/or share-rounding, and/or "
+                "tickers too expensive to buy even 1 share of at this amount)."
+            )
+            plan_rows = [
+                {
+                    "Ticker": e.ticker,
+                    "Weight %": e.weight_pct,
+                    "Shares": e.shares,
+                    "Planned $": f"${e.planned_notional:,.2f}",
+                    "Existing value": f"${e.existing_market_value:,.2f}",
+                    "Pending buys": "unknown" if e.pending_value_unknown else f"${e.pending_buy_value:,.2f}",
+                    "Projected total %": round(e.projected_pct_of_equity, 1),
+                    "Policy limit %": round(e.position_limit_pct, 1),
+                    "Status": f"SKIPPED: {e.skip_reason}" if e.skipped else "OK",
+                }
+                for e in plan
+            ]
+            st.write(
+                "**Projected final weight if you approve this split** (matches the ACTUAL whole-share plan "
+                "that would be proposed -- includes existing holdings and known pending buy orders; this is "
+                "where you'd catch adding to an already-large position, or a price too high to get even 1 "
+                "share at this amount):"
+            )
+            st.dataframe(plan_rows, use_container_width=True, hide_index=True)
+
+        current_signature = _allocation_input_signature(
+            weights, dollar_amount, prices, price_as_of_by_ticker, max_weight_pct, alloc_policy, alloc_packet,
+        )
+        if (
+            st.session_state.get("allocation_proposals")
+            and st.session_state.get("allocation_proposals_signature") != current_signature
+        ):
+            st.warning(
+                "Your cart, weights, cap, dollar amount, prices, or policy changed since these proposals "
+                "were generated, so they no longer match what's shown above -- regenerate to get current, "
+                "actionable proposals."
+            )
+            st.session_state["allocation_proposals"] = []
+            st.session_state["allocation_proposals_signature"] = None
+
+        if st.button("Create purchase proposals using this split", type="primary", disabled=dollar_amount <= 0):
             alloc_proposals = generate_allocation_buy_proposals(
                 alloc_packet, alloc_policy, weights, prices, dollar_amount,
+                pending_buy_value_by_ticker=pending_value_by_ticker,
+                pending_value_unknown_tickers=pending_unknown_tickers,
             )
             for p in alloc_proposals:
                 store.save_proposal(p.to_dict())
             st.session_state["allocation_proposals"] = [p.to_dict() for p in alloc_proposals]
+            st.session_state["allocation_proposals_signature"] = current_signature
             if not alloc_proposals:
                 st.warning(
                     "No proposals generated -- the amount may be too small to buy at least 1 share of any "

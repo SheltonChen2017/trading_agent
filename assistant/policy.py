@@ -8,6 +8,7 @@ trade, but only this policy plus risk.execution_gate can authorize it.
 from __future__ import annotations
 
 import dataclasses
+import hashlib
 import json
 import math
 from pathlib import Path
@@ -115,6 +116,22 @@ class TradingPolicy:
         result["allowed_sides"] = list(self.allowed_sides)
         result["allowed_order_types"] = list(self.allowed_order_types)
         return result
+
+
+def compute_policy_fingerprint(policy: TradingPolicy) -> str:
+    """Deterministic fingerprint over every policy field except `notes`
+    (free-text/explanatory, not behavior-affecting). Proposals bind to
+    this in ADDITION to `version` -- a manually-maintained version string
+    alone can't catch an edited-but-not-rebumped policy file (GPT review,
+    2026-07-28): two policy files (e.g. a personal one copied from the
+    default) can share the same version string yet have materially
+    different limits, and approval previously only compared that string.
+    Any change to a behavior-affecting field changes this fingerprint
+    regardless of whether `version` was bumped, so approval fails closed
+    on drift instead of depending on a human remembering to bump it."""
+    payload = {k: v for k, v in policy.to_dict().items() if k != "notes"}
+    serialized = json.dumps(payload, sort_keys=True, default=str)
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 def load_policy(path: str | Path = DEFAULT_POLICY_PATH) -> TradingPolicy:

@@ -180,11 +180,27 @@ confirmation phrase (below) also applies: `confirmation` is just
 "approve" now, not "APPROVE <proposal_id>" -- the proposal_id is already
 the caller-supplied parameter, so the exact phrase no longer needs to
 re-encode which proposal is being approved.
+
+2026-07-28 update (seventh independent GPT review, verified before
+acting):
+ 19. Reconciliation (both the submission-error path below and
+     reconcile_submission()) only checked ticker+side before trusting a
+     broker order found under the expected idempotency key -- so an
+     order under that key for BUY 1 AAPL could reconcile a proposal for
+     BUY 100 AAPL, or a market order could be mistaken for a limit
+     order. execution.alpaca_broker.find_order_by_client_id() now also
+     returns order type, limit price, and time_in_force;
+     _order_matches_intent() below compares the COMPLETE material
+     identity (ticker, side, shares, order type, limit price for limit
+     orders) and fails closed on any missing field -- a mismatch is
+     never auto-resolved as a match, and numerically-equivalent share
+     counts (e.g. 10 vs 10.0) are treated as equal.
 """
 from __future__ import annotations
 
+import math
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
@@ -256,6 +272,61 @@ def _lookup_order_outcome(broker_module, idempotency_key: str):
         return broker_module.find_order_by_client_id(idempotency_key)
     except Exception:
         return _LOOKUP_UNCONFIRMED
+
+
+def _order_matches_intent(order: dict, intent: TradeIntent) -> tuple[bool, str]:
+    """Verifies the COMPLETE material identity of a broker order (as
+    returned by execution.alpaca_broker.find_order_by_client_id()) against
+    the TradeIntent it's being reconciled against: ticker, side, shares,
+    order type, and (for limit orders) limit price. A missing material
+    field fails closed -- treated as a mismatch, never assumed to match
+    (GPT review, 2026-07-28: a prior version compared only ticker+side, so
+    an order under the expected idempotency key for BUY 1 AAPL could
+    reconcile a proposal for BUY 100 AAPL, or a market order could be
+    mistaken for a limit order). Returns (matches, detail); `detail`
+    explains the first mismatch found, for an audit message -- empty
+    string when matches is True.
+
+    Share counts use a numeric (not string) comparison so numerically-
+    equivalent representations (10 vs 10.0) count as equal; a fractional
+    share count is still rejected since this workflow only ever submits
+    whole-share orders.
+    """
+    if str(order.get("ticker", "")).upper() != intent.ticker.upper():
+        return False, f"ticker: expected {intent.ticker.upper()!r}, got {order.get('ticker')!r}"
+    if order.get("side") != intent.side:
+        return False, f"side: expected {intent.side!r}, got {order.get('side')!r}"
+
+    order_shares = order.get("shares")
+    if order_shares is None:
+        return False, "shares: missing from broker response"
+    try:
+        order_shares_value = float(order_shares)
+    except (TypeError, ValueError):
+        return False, f"shares: not numeric ({order_shares!r})"
+    if not math.isclose(order_shares_value, float(intent.shares), rel_tol=0.0, abs_tol=1e-9):
+        return False, f"shares: expected {intent.shares}, got {order_shares_value}"
+
+    order_type = order.get("type")
+    if order_type is None:
+        return False, "order type: missing from broker response"
+    if str(order_type).lower() != str(intent.order_type).lower():
+        return False, f"order type: expected {intent.order_type!r}, got {order_type!r}"
+
+    if intent.order_type == "limit":
+        order_limit_price = order.get("limit_price")
+        if order_limit_price is None:
+            return False, "limit_price: missing from broker response for a limit order"
+        try:
+            order_limit_price_value = float(order_limit_price)
+        except (TypeError, ValueError):
+            return False, f"limit_price: not numeric ({order_limit_price!r})"
+        if intent.limit_price is None or not math.isclose(
+            order_limit_price_value, float(intent.limit_price), rel_tol=0.0, abs_tol=0.005
+        ):
+            return False, f"limit_price: expected {intent.limit_price}, got {order_limit_price_value}"
+
+    return True, ""
 
 
 def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict[str, float]:
@@ -536,12 +607,15 @@ def execute_approved_paper_proposal(
             pending_buy_value_by_ticker=pending_buy_value_by_ticker,
         )
         if not validation.approved:
-            blocking = [v for v in validation.violations if v not in validation.overridable_violations]
-            if blocking or not validation.overridable_violations:
+            if not validation.overridable:
                 # At least one violation isn't override-eligible (or there
                 # are no violations at all, which shouldn't happen for a
                 # rejection) -- this is a hard block regardless of
-                # override_policy_violations.
+                # override_policy_violations. `.overridable` is computed
+                # fresh from validation.violation_codes (which
+                # validation_proof cryptographically binds) against the
+                # fixed OVERRIDABLE_VIOLATION_CODES constant -- there is
+                # no separate mutable field here to trust or mistrust.
                 raise ProposalExecutionError(
                     "Execution gate blocked the proposal: " + "; ".join(validation.violations)
                 )
@@ -552,7 +626,7 @@ def execute_approved_paper_proposal(
                 # than BLOCKED (which is terminal) so a follow-up call
                 # with override_policy_violations=True can pick it back up.
                 store.update_proposal_status(
-                    proposal_id, POLICY_OVERRIDE_AVAILABLE, violations=validation.violations
+                    proposal_id, POLICY_OVERRIDE_AVAILABLE, violations=list(validation.violations)
                 )
                 raise PolicyOverridableBlockError(
                     "Execution gate blocked this proposal, but every violation is override-eligible "
@@ -566,7 +640,7 @@ def execute_approved_paper_proposal(
     except PolicyOverridableBlockError:
         raise
     except ProposalExecutionError as exc:
-        violations = validation.violations if validation is not None and not validation.approved else [str(exc)]
+        violations = list(validation.violations) if validation is not None and not validation.approved else [str(exc)]
         store.update_proposal_status(proposal_id, BLOCKED, violations=violations)
         raise
     except Exception as exc:
@@ -598,7 +672,10 @@ def execute_approved_paper_proposal(
             APPROVED,
             approved_at=now_utc.isoformat(),
             violations=[],
-            policy_override={"overridden_violations": validation.violations, "overridden_at": now_utc.isoformat()},
+            policy_override={
+                "overridden_violations": list(validation.violations),
+                "overridden_at": now_utc.isoformat(),
+            },
         )
 
     # "submitting" is written BEFORE the broker call (not just around it)
@@ -629,6 +706,26 @@ def execute_approved_paper_proposal(
         # from "still don't know" (see _lookup_order_outcome).
         outcome = _lookup_order_outcome(broker, proposal["idempotency_key"])
         if isinstance(outcome, dict):
+            matches, mismatch_detail = _order_matches_intent(outcome, intent)
+            if not matches:
+                # An order exists under our exact idempotency key but does
+                # NOT match what we submitted -- never auto-resolve this;
+                # it's exactly the anomaly duplicate-order protection
+                # exists to catch (GPT review, 2026-07-28).
+                store.update_proposal_status(
+                    proposal_id,
+                    SUBMISSION_UNKNOWN,
+                    error=(
+                        f"Order submission raised ({exc}), and the order found under this idempotency "
+                        f"key does NOT match the intent (mismatch: {mismatch_detail}) -- refusing to "
+                        "auto-resolve. Investigate manually, then use reconcile_submission()."
+                    ),
+                )
+                raise ProposalExecutionError(
+                    f"Order submission failed for {proposal_id}, and a MISMATCHED order was found "
+                    f"under this idempotency key ({mismatch_detail}) -- left as 'submission_unknown' "
+                    "for manual investigation, not auto-resolved."
+                ) from exc
             store.record_broker_order(proposal_id, outcome)
             store.update_proposal_status(
                 proposal_id,
@@ -711,6 +808,19 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
       - The lookup itself still can't confirm either way (network/auth/
         etc.): returned to "submission_unknown", unchanged, safe to
         retry again later.
+      - Anything genuinely unexpected after the claim (a malformed
+        stored intent, the broker-order journal write failing, an
+        unexpected database error, ...): falls back to
+        "submission_unknown" too (2026-07-28, GPT review) -- previously
+        the proposal was left stranded in "reconciling" with no way to
+        retry, since only "submitting"/"submission_unknown" are
+        re-claimable. Never converted to "submission_failed": that
+        status means the broker CONFIRMED absence, which an unexpected
+        local error never establishes. If even that recovery write
+        itself fails, this raises a distinct RuntimeError rather than
+        silently leaving the proposal claimed with no record of why --
+        see recover_stale_reconciliation() below for the crash-recovery
+        path this can't cover (no in-process handler survives a crash).
     """
     proposal = store.get_proposal(proposal_id)
     if proposal is None:
@@ -726,56 +836,138 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
             "only applies to proposals stuck in 'submitting' or 'submission_unknown'."
         )
 
-    import execution.alpaca_broker as broker
+    try:
+        import execution.alpaca_broker as broker
 
-    stored_intent = _intent_from_dict(proposal["intent"])
-    outcome = _lookup_order_outcome(broker, proposal["idempotency_key"])
-    reconciled_at = datetime.now(timezone.utc).isoformat()
+        stored_intent = _intent_from_dict(proposal["intent"])
+        outcome = _lookup_order_outcome(broker, proposal["idempotency_key"])
+        reconciled_at = datetime.now(timezone.utc).isoformat()
 
-    if isinstance(outcome, dict):
-        ticker_matches = str(outcome.get("ticker", "")).upper() == stored_intent.ticker.upper()
-        side_matches = outcome.get("side") == stored_intent.side
-        if not (ticker_matches and side_matches):
+        if isinstance(outcome, dict):
+            matches, mismatch_detail = _order_matches_intent(outcome, stored_intent)
+            if not matches:
+                expected_desc = f"{stored_intent.side} {stored_intent.shares} {stored_intent.ticker} {stored_intent.order_type}"
+                if stored_intent.order_type == "limit":
+                    expected_desc += f" @ {stored_intent.limit_price}"
+                store.update_proposal_status(
+                    proposal_id,
+                    SUBMISSION_UNKNOWN,
+                    reconciled_at=reconciled_at,
+                    error=(
+                        f"Reconciliation found an order under this idempotency key that does NOT match the "
+                        f"proposal's intent (mismatch: {mismatch_detail}; expected {expected_desc}; broker "
+                        f"returned {outcome}) -- refusing to auto-resolve. Investigate manually."
+                    ),
+                )
+                raise ProposalExecutionError(
+                    f"Reconciliation for {proposal_id} found a MISMATCHED order ({mismatch_detail}) -- left "
+                    "as 'submission_unknown' for manual investigation, not auto-resolved."
+                )
+            store.record_broker_order(proposal_id, outcome)
+            store.update_proposal_status(
+                proposal_id, EXECUTED, executed_at=reconciled_at, broker_order=outcome, reconciled_at=reconciled_at,
+            )
+            return outcome
+
+        if outcome is None:
+            store.update_proposal_status(
+                proposal_id,
+                SUBMISSION_FAILED,
+                reconciled_at=reconciled_at,
+                error="Reconciliation: the broker confirms no order exists for this idempotency key.",
+            )
+            raise ProposalExecutionError(
+                f"Reconciliation for {proposal_id}: the broker confirms this order was never accepted -- "
+                "marked 'submission_failed'."
+            )
+
+        # outcome is _LOOKUP_UNCONFIRMED
+        store.update_proposal_status(
+            proposal_id,
+            SUBMISSION_UNKNOWN,
+            reconciled_at=reconciled_at,
+            error="Reconciliation attempted but the broker lookup itself failed -- still unresolved.",
+        )
+        raise ProposalExecutionError(
+            f"Reconciliation for {proposal_id} could not confirm the broker's outcome (the lookup itself "
+            "failed) -- still 'submission_unknown'. Try again once connectivity is restored."
+        )
+    except ProposalExecutionError:
+        raise
+    except Exception as exc:
+        # Genuinely unexpected: a malformed stored intent, the broker-
+        # order journal write failing, an unexpected database error, etc.
+        # Never leave the proposal stranded in "reconciling" (unretriable
+        # via the normal interface), and never claim "submission_failed"
+        # -- that status specifically means the broker CONFIRMED absence,
+        # which an unexpected local error never establishes.
+        try:
             store.update_proposal_status(
                 proposal_id,
                 SUBMISSION_UNKNOWN,
-                reconciled_at=reconciled_at,
-                error=(
-                    f"Reconciliation found an order under this idempotency key that does NOT match the "
-                    f"proposal's intent ({stored_intent.side} {stored_intent.shares} {stored_intent.ticker} "
-                    f"expected; broker returned {outcome}) -- refusing to auto-resolve. Investigate manually."
-                ),
+                reconciled_at=datetime.now(timezone.utc).isoformat(),
+                error=f"Unexpected error during reconciliation: {exc}",
             )
-            raise ProposalExecutionError(
-                f"Reconciliation for {proposal_id} found a MISMATCHED order -- left as "
-                "'submission_unknown' for manual investigation, not auto-resolved."
-            )
-        store.record_broker_order(proposal_id, outcome)
-        store.update_proposal_status(
-            proposal_id, EXECUTED, executed_at=reconciled_at, broker_order=outcome, reconciled_at=reconciled_at,
-        )
-        return outcome
-
-    if outcome is None:
-        store.update_proposal_status(
-            proposal_id,
-            SUBMISSION_FAILED,
-            reconciled_at=reconciled_at,
-            error="Reconciliation: the broker confirms no order exists for this idempotency key.",
-        )
+        except Exception as write_exc:
+            raise RuntimeError(
+                f"CRITICAL: reconciliation for {proposal_id} failed unexpectedly ({exc!r}), and recording "
+                f"that failure ALSO failed ({write_exc!r}) -- this proposal is likely stranded in "
+                "'reconciling'. The broker outcome is NOT known; do not assume success or failure. Manual "
+                "database intervention, or recover_stale_reconciliation() once it's old enough, will be "
+                "needed."
+            ) from exc
         raise ProposalExecutionError(
-            f"Reconciliation for {proposal_id}: the broker confirms this order was never accepted -- "
-            "marked 'submission_failed'."
-        )
+            f"Reconciliation for {proposal_id} failed unexpectedly ({exc}) -- marked 'submission_unknown' "
+            "rather than left stranded in 'reconciling'. The broker outcome is not known; retry once the "
+            "underlying issue is fixed."
+        ) from exc
 
-    # outcome is _LOOKUP_UNCONFIRMED
-    store.update_proposal_status(
+
+def recover_stale_reconciliation(
+    proposal_id: str, store: AssistantStore, stale_after_seconds: int = 300,
+) -> dict:
+    """
+    Recovers a proposal stranded in "reconciling" after a crash left no
+    in-process handler to run reconcile_submission()'s own recovery logic
+    (an ordinary exception inside that function already falls back to
+    "submission_unknown" itself -- see its docstring; this function only
+    matters when the PROCESS died mid-reconciliation, before any handler
+    could run at all).
+
+    Only recovers a proposal that has been sitting in "reconciling" since
+    before `stale_after_seconds` ago (measured against `updated_at`, which
+    every status transition -- including the claim into "reconciling" --
+    rewrites) -- a recent claim is presumed to be a genuinely in-flight
+    attempt, not stranded, and is left untouched. Uses the same atomic
+    conditional-UPDATE pattern as claim_proposal(), so two concurrent
+    recovery attempts (or a recovery racing a real in-flight
+    reconciliation) can never both "win" (2026-07-28, GPT review).
+
+    Recovers to "submission_unknown" (never "submission_failed" -- a
+    stranded local process proves nothing about what the broker actually
+    did), leaving the proposal retryable via reconcile_submission().
+    """
+    cutoff = (datetime.now(timezone.utc) - timedelta(seconds=stale_after_seconds)).isoformat()
+    recovered = store.reclaim_stale_status(
+        proposal_id, expected_status=RECONCILING, new_status=SUBMISSION_UNKNOWN, stale_before=cutoff,
+    )
+    if recovered is None:
+        current = store.get_proposal(proposal_id)
+        if current is None:
+            raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
+        raise ProposalExecutionError(
+            f"Proposal {proposal_id} is not a stale 'reconciling' proposal (status={current['status']!r}) "
+            f"-- either it's not in 'reconciling', or it was claimed less than {stale_after_seconds}s ago "
+            "and is presumed to be a genuinely in-flight reconciliation, not stranded."
+        )
+    recovered_at = datetime.now(timezone.utc).isoformat()
+    return store.update_proposal_status(
         proposal_id,
         SUBMISSION_UNKNOWN,
-        reconciled_at=reconciled_at,
-        error="Reconciliation attempted but the broker lookup itself failed -- still unresolved.",
-    )
-    raise ProposalExecutionError(
-        f"Reconciliation for {proposal_id} could not confirm the broker's outcome (the lookup itself "
-        "failed) -- still 'submission_unknown'. Try again once connectivity is restored."
+        recovered_at=recovered_at,
+        error=(
+            f"Recovered from a stale 'reconciling' status (no update for at least "
+            f"{stale_after_seconds}s, most likely a process crash mid-reconciliation) -- marked "
+            "'submission_unknown' so it can be reconciled again."
+        ),
     )

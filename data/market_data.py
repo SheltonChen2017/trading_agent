@@ -12,6 +12,48 @@ from __future__ import annotations
 
 import numpy as np
 import pandas as pd
+import pandas_market_calendars as mcal
+
+_NYSE_CALENDAR = mcal.get_calendar("NYSE")
+_REQUIRED_OHLCV_COLUMNS = {"open", "high", "low", "close", "volume"}
+
+
+def _trading_session_start_date(lookback_days: int, end_date: pd.Timestamp | None = None) -> str:
+    """
+    Returns the calendar start date (YYYY-MM-DD) such that the NYSE
+    calendar's real trading sessions from that date through `end_date`
+    (default: today) include AT LEAST `lookback_days` sessions.
+
+    fetch_historical() used to request yfinance's `period=f"{N+10}d"`,
+    which is CALENDAR days, not trading sessions -- a requested 252-
+    session lookback silently returned only ~180-190 actual bars (2026-
+    07-28, GPT review), and every consumer (signals, regime calculation,
+    risk analytics, Watchlist analytics, strategy research) had no way to
+    know it got less history than asked for. Deriving the start date from
+    the REAL NYSE calendar instead means the request always spans enough
+    actual sessions for a ticker with that much real history.
+    """
+    end = end_date if end_date is not None else pd.Timestamp.today().normalize()
+    # NYSE trading days run roughly 5/7 of calendar days, minus ~9
+    # holidays/year -- 1.6x plus a flat margin comfortably covers that
+    # even through a holiday-heavy stretch (e.g. Nov-Jan).
+    calendar_buffer_days = int(lookback_days * 1.6) + 30
+    candidate_start = end - pd.Timedelta(days=calendar_buffer_days)
+    schedule = _NYSE_CALENDAR.schedule(
+        start_date=candidate_start.date().isoformat(), end_date=end.date().isoformat()
+    )
+    if len(schedule) < lookback_days:
+        # A very long lookback or an unusually holiday-dense window --
+        # widen further rather than silently under-filling.
+        calendar_buffer_days = int(lookback_days * 2.5) + 60
+        candidate_start = end - pd.Timedelta(days=calendar_buffer_days)
+        schedule = _NYSE_CALENDAR.schedule(
+            start_date=candidate_start.date().isoformat(), end_date=end.date().isoformat()
+        )
+    sessions = schedule.index
+    if len(sessions) >= lookback_days:
+        return sessions[-lookback_days].date().isoformat()
+    return candidate_start.date().isoformat()
 
 
 def fetch_historical(tickers: list[str], lookback_days: int = 252) -> dict[str, pd.DataFrame]:
@@ -19,18 +61,24 @@ def fetch_historical(tickers: list[str], lookback_days: int = 252) -> dict[str, 
     Fetch daily OHLCV bars for each ticker using yfinance.
 
     Returns a dict mapping ticker -> DataFrame with columns
-    [open, high, low, close, volume], indexed by date.
+    [open, high, low, close, volume], indexed by date, sorted ascending
+    with no duplicate dates, trimmed to at most `lookback_days` real
+    trading sessions. A ticker with genuinely less history than
+    `lookback_days` (e.g. a recent IPO) legitimately returns fewer rows --
+    that's an honest reflection of what exists, not a bug; callers that
+    need a strict minimum should check `len(data[ticker])` themselves
+    (see the real-data-check project skill).
 
     Requires `pip install yfinance` and internet access.
     """
     import yfinance as yf  # imported lazily so this module still loads without the package
 
-    period = f"{lookback_days + 10}d"  # small buffer for weekends/holidays
+    start_date = _trading_session_start_date(lookback_days)
     data: dict[str, pd.DataFrame] = {}
 
     raw = yf.download(
         tickers=tickers,
-        period=period,
+        start=start_date,
         interval="1d",
         group_by="ticker",
         auto_adjust=True,
@@ -45,7 +93,14 @@ def fetch_historical(tickers: list[str], lookback_days: int = 252) -> dict[str, 
             # index by ticker when that's the shape we got back.
             df = raw[ticker].copy() if isinstance(raw.columns, pd.MultiIndex) else raw.copy()
             df.columns = [c.lower() for c in df.columns]
+            if not _REQUIRED_OHLCV_COLUMNS.issubset(df.columns):
+                continue
             df = df.dropna(subset=["close"])
+            # Defensive: a provider response should already be sorted and
+            # unique, but never trust that silently -- a duplicated or
+            # out-of-order index would corrupt every rolling-window
+            # calculation downstream (scanner z-scores, volatility, trend).
+            df = df[~df.index.duplicated(keep="last")].sort_index()
             data[ticker] = df.tail(lookback_days)
         except (KeyError, TypeError):
             # Ticker delisted, typo'd, or no data returned — skip rather than crash the whole scan

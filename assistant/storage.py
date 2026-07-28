@@ -71,6 +71,13 @@ class AssistantStore:
                     status TEXT NOT NULL,
                     payload_json TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS allocation_batches (
+                    batch_id TEXT PRIMARY KEY,
+                    created_at TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    updated_at TEXT NOT NULL
+                );
                 CREATE INDEX IF NOT EXISTS idx_proposals_status
                     ON trade_proposals(status, created_at);
                 """
@@ -197,6 +204,49 @@ class AssistantStore:
         proposal["status"] = new_status
         return proposal
 
+    def reclaim_stale_status(
+        self,
+        proposal_id: str,
+        *,
+        expected_status: str,
+        new_status: str,
+        stale_before: str,
+    ) -> dict[str, Any] | None:
+        """
+        Like claim_proposal(), but the guard is staleness (`updated_at <
+        stale_before`) instead of expiry -- recovers a proposal stranded
+        in a non-terminal status (e.g. "reconciling") after a crash left
+        no in-process handler to run the normal recovery logic. `updated_at`
+        already reflects the moment the proposal entered `expected_status`
+        (every status transition, including claim_proposal(), rewrites
+        it), so no separate "started_at" column is needed.
+
+        Atomic and safe against a concurrent recovery attempt or a
+        genuinely still-in-flight (recent) claim for the same reason
+        claim_proposal() is: exactly one `UPDATE ... WHERE status = ? AND
+        updated_at < ?` can affect the row, so a proposal claimed only
+        moments ago (not actually stranded) is correctly left alone
+        (2026-07-28, GPT review).
+        """
+        now = datetime.now(timezone.utc).isoformat()
+        with self._connect() as connection:
+            cursor = connection.execute(
+                "UPDATE trade_proposals SET status = ?, updated_at = ? "
+                "WHERE proposal_id = ? AND status = ? AND updated_at < ?",
+                (new_status, now, proposal_id, expected_status, stale_before),
+            )
+            if cursor.rowcount != 1:
+                return None
+            row = connection.execute(
+                "SELECT payload_json FROM trade_proposals WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        proposal = json.loads(row["payload_json"])
+        proposal["status"] = new_status
+        return proposal
+
     def list_proposals(self, status: str | None = None, limit: int = 100) -> list[dict[str, Any]]:
         query = "SELECT payload_json, status FROM trade_proposals"
         params: list[Any] = []
@@ -260,6 +310,65 @@ class AssistantStore:
                 order["evidence_status"] = proposal.get("evidence_status")
             orders.append(order)
         return orders
+
+    def create_allocation_batch(
+        self, batch_id: str, proposal_ids: list[str], intended_total_notional: float,
+    ) -> dict[str, Any]:
+        """
+        Persists a NEW batch record for a Watchlist allocation split's
+        "execute all proposals in this split" action -- GPT review,
+        2026-07-28: submitting N proposals sequentially with no
+        persisted record of the batch made a UI refresh or process
+        restart lose track of which legs had already been attempted,
+        risking a double-submission on blind retry. `legs` tracks each
+        proposal's own state (unattempted/submitted/failed/unknown/
+        blocked_overridable) so execute_allocation_batch() can resume
+        idempotently from exactly where it left off.
+        """
+        now = datetime.now(timezone.utc).isoformat()
+        payload = {
+            "batch_id": batch_id,
+            "created_at": now,
+            "approved_at": None,
+            "intended_total_notional": intended_total_notional,
+            "proposal_ids": list(proposal_ids),
+            "legs": {pid: {"state": "unattempted", "order": None, "error": None} for pid in proposal_ids},
+        }
+        with self._connect() as connection:
+            connection.execute(
+                "INSERT INTO allocation_batches(batch_id, created_at, status, payload_json, updated_at) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (batch_id, now, "created", json.dumps(payload, sort_keys=True), now),
+            )
+        payload["status"] = "created"
+        return payload
+
+    def get_allocation_batch(self, batch_id: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT payload_json, status FROM allocation_batches WHERE batch_id = ?",
+                (batch_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        batch = json.loads(row["payload_json"])
+        batch["status"] = row["status"]
+        return batch
+
+    def update_allocation_batch(self, batch_id: str, status: str | None = None, **updates: Any) -> dict[str, Any]:
+        batch = self.get_allocation_batch(batch_id)
+        if batch is None:
+            raise KeyError(f"Unknown batch_id: {batch_id}")
+        batch.update(updates)
+        if status is not None:
+            batch["status"] = status
+        now = datetime.now(timezone.utc).isoformat()
+        with self._connect() as connection:
+            connection.execute(
+                "UPDATE allocation_batches SET status = ?, payload_json = ?, updated_at = ? WHERE batch_id = ?",
+                (batch["status"], json.dumps(batch, sort_keys=True), now, batch_id),
+            )
+        return batch
 
     def recent_executed_intents(
         self,

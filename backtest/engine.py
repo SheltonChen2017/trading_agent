@@ -72,7 +72,7 @@ def run_backtest(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
-    entry_timing: str = "same_close",
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Walk every date in the universe, run the live scanner as-of that date,
@@ -84,27 +84,33 @@ def run_backtest(
     net_return_pct > 0 under the "go long the signal" hypothesis.
 
     `entry_timing`:
-      - "same_close" (default, backward-compatible): enter AND exit at
-        the signal date's own close — the timing used by every existing
-        result in this project so far. NOT realistically executable for
-        signals that need that day's own completed close/volume to
-        compute (true of every signal here) — you can't know the
-        finalized signal early enough to also transact at that exact
-        close, short of a market-on-close order submitted blind to the
-        final print.
-      - "next_open": enter at the NEXT trading day's open, exit at the
-        open `hold_days` trading days after that — signal known after
-        day t's close -> act at day t+1's open, a conservative,
-        actually-executable assumption. Flagged by independent code
-        review (2026-07); not yet used to re-validate any of this
-        project's existing findings — see [[project_execution_realism_gaps]]
-        in memory before comparing "next_open" results to prior
-        "same_close" ones as if they were the same claim.
+      - "next_open" (default since 2026-07-28, GPT review): enter at the
+        NEXT trading day's open, exit at the open `hold_days` trading
+        days after that — signal known after day t's close -> act at day
+        t+1's open, a conservative, actually-executable assumption. This
+        used to be opt-in with "same_close" as the default, which made it
+        easy for new research to silently use an unrealistic entry
+        timing; now the reverse is true.
+      - "same_close": enter AND exit at the signal date's own close — the
+        timing used by every finding registered before 2026-07 (now
+        legacy). NOT realistically executable for signals that need that
+        day's own completed close/volume to compute (true of every
+        signal here) — you can't know the finalized signal early enough
+        to also transact at that exact close, short of a market-on-close
+        order submitted blind to the final print. Only pass this
+        explicitly to reproduce a pre-existing legacy result; do not use
+        it for new research. Any "confirmed" finding still resting only
+        on "same_close" evidence has NOT been revalidated under
+        executable timing — see [[project_execution_realism_gaps]] in
+        memory, and do not treat a "same_close"-only result as equivalent
+        to a "next_open" one when comparing conclusions.
       - "same_day_open_to_close": enter at TODAY's own open, exit at
         TODAY's own close (e.g. signals/overnight_gap.py -- a signal
         known at the open, like an overnight-gap reversal, rather than
         after that day's own close). `hold_days` is IGNORED in this mode
-        (entry and exit are always the same row) -- pass any value.
+        (entry and exit are always the same row) -- pass any value. Use
+        this explicitly for a signal that's genuinely known at the open;
+        do not rely on the general "next_open" default for it.
     """
     if entry_timing not in ("same_close", "next_open", "same_day_open_to_close"):
         raise ValueError(
@@ -265,7 +271,7 @@ def run_baseline_forward_returns(
     data: dict[str, pd.DataFrame],
     hold_days: int = BACKTEST_HOLD_DAYS,
     slippage_pct: float = SLIPPAGE_PCT,
-    entry_timing: str = "same_close",
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     The control group for run_backtest(): for EVERY date (not just flagged
@@ -393,7 +399,7 @@ def _signals_with_own_ticker_baseline(
     volume_z_threshold: float,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
-    entry_timing: str = "same_close",
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Per-signal detail shared by compare_signal_to_baseline_per_ticker()
@@ -441,7 +447,7 @@ def _out_of_sample_own_ticker_detail(
     volume_z_threshold: float,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
-    entry_timing: str = "same_close",
+    entry_timing: str = "next_open",
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """
     Per-signal detail (run_backtest() output + own-ticker baseline edge),
@@ -1172,7 +1178,7 @@ def out_of_sample_significance(
     scan_kwargs: dict | None = None,
     n_bootstrap: int = 2000,
     n_tests: int = 2,
-    entry_timing: str = "same_close",
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     THE correct way to test whether a signal's edge is statistically
@@ -1244,7 +1250,7 @@ def out_of_sample_significance_by_date(
     scan_kwargs: dict | None = None,
     n_bootstrap: int = 2000,
     n_tests: int = 2,
-    entry_timing: str = "same_close",
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Cross-sectional-correlation-aware version of out_of_sample_significance():
@@ -1317,7 +1323,7 @@ def out_of_sample_significance_by_block(
     block_lengths: tuple[int, ...] | None = None,
     n_bootstrap: int = 2000,
     n_tests: int = 2,
-    entry_timing: str = "same_close",
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Serial-dependence-aware version of out_of_sample_significance_by_date():

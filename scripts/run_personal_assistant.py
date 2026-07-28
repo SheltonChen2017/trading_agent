@@ -14,6 +14,7 @@ from assistant.execution_service import (
     PolicyOverridableBlockError,
     execute_approved_paper_proposal,
     reconcile_submission,
+    recover_stale_reconciliation,
 )
 from assistant.policy import load_policy
 from assistant.proposals import generate_risk_reduction_proposals
@@ -158,6 +159,14 @@ def command_reconcile(args, store: AssistantStore) -> None:
     )
 
 
+def command_recover_stale(args, store: AssistantStore) -> None:
+    recovered = recover_stale_reconciliation(args.proposal_id, store, stale_after_seconds=args.stale_after_seconds)
+    print(
+        f"Recovered {args.proposal_id} from a stale 'reconciling' status -> "
+        f"{recovered['status']}. Run `reconcile {args.proposal_id}` to resolve it."
+    )
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Personal trading assistant")
     parser.add_argument(
@@ -215,6 +224,19 @@ def build_parser() -> argparse.ArgumentParser:
     )
     reconcile.add_argument("proposal_id")
     reconcile.set_defaults(handler=command_reconcile)
+
+    recover_stale = commands.add_parser(
+        "recover-stale",
+        help=(
+            "Resolve a proposal stranded in 'reconciling' after a process crash left no in-process "
+            "handler to run -- only affects a proposal that hasn't been touched in --stale-after-seconds "
+            "(default 300); a recent claim is presumed genuinely in-flight and left alone. Recovers to "
+            "'submission_unknown', then re-run 'reconcile' to resolve it."
+        ),
+    )
+    recover_stale.add_argument("proposal_id")
+    recover_stale.add_argument("--stale-after-seconds", type=int, default=300)
+    recover_stale.set_defaults(handler=command_recover_stale)
     return parser
 
 

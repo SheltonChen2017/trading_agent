@@ -197,7 +197,7 @@ def test_hand_constructed_validation_result_cannot_forge_authorization():
     from risk.execution_gate import intent_fingerprint
 
     intent = TradeIntent(ticker="AAPL", side="buy", shares=1)
-    forged = ValidationResult(True, [], validation_proof=intent_fingerprint(intent))
+    forged = ValidationResult(True, (), validation_proof=intent_fingerprint(intent))
     try:
         authorize_trade_intent(intent, forged)
         assert False, "expected a hand-constructed ValidationResult to be rejected"
@@ -243,7 +243,7 @@ def test_rejected_validation_proof_cannot_be_reused_as_an_approval():
     assert rejected.approved is False
     assert rejected.validation_proof is not None
 
-    forged_approval = ValidationResult(True, [], validation_proof=rejected.validation_proof)
+    forged_approval = ValidationResult(True, (), validation_proof=rejected.validation_proof)
     try:
         authorize_trade_intent(intent, forged_approval)
         assert False, "expected a rejected validation's proof to be unusable as an approval"
@@ -1222,7 +1222,9 @@ def test_ambiguous_submission_failure_reconciles_to_executed_when_broker_actuall
 
     broker.submit_market_order = failing_submit
     broker.find_order_by_client_id = lambda client_order_id: {
-        "order_id": "reconciled-1", "ticker": "TQQQ", "shares": 10, "side": "sell", "status": "accepted",
+        "order_id": "reconciled-1", "ticker": proposal.intent.ticker, "shares": proposal.intent.shares,
+        "side": proposal.intent.side, "type": proposal.intent.order_type,
+        "limit_price": proposal.intent.limit_price, "status": "accepted",
     }
     try:
         with tempfile.TemporaryDirectory() as temp:
@@ -1340,6 +1342,8 @@ def test_reconcile_submission_resolves_stuck_proposal_to_executed():
         "ticker": proposal.intent.ticker,
         "shares": proposal.intent.shares,
         "side": proposal.intent.side,
+        "type": proposal.intent.order_type,
+        "limit_price": proposal.intent.limit_price,
         "status": "accepted",
     }
     try:
@@ -1389,6 +1393,168 @@ def test_reconcile_submission_refuses_a_mismatched_order():
         restore()
 
 
+def _reconcile_mismatch_case(order_overrides: dict, expected_mismatch_substring: str):
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]  # a market SELL
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    order = {
+        "order_id": "candidate-order",
+        "ticker": proposal.intent.ticker,
+        "shares": proposal.intent.shares,
+        "side": proposal.intent.side,
+        "type": proposal.intent.order_type,
+        "limit_price": proposal.intent.limit_price,
+        "status": "accepted",
+    }
+    order.update(order_overrides)
+    broker.find_order_by_client_id = lambda client_order_id: order
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submission_unknown")
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, f"expected a mismatch on {order_overrides!r} to be refused"
+            except ProposalExecutionError as exc:
+                assert "MISMATCHED" in str(exc)
+            record = store.get_proposal(proposal.proposal_id)
+            assert record["status"] == "submission_unknown"
+            assert expected_mismatch_substring in record["error"]
+    finally:
+        restore()
+
+
+def test_reconcile_submission_refuses_mismatched_quantity():
+    _reconcile_mismatch_case({"shares": 1}, "shares:")
+
+
+def test_reconcile_submission_refuses_mismatched_order_type():
+    _reconcile_mismatch_case({"type": "limit", "limit_price": 50.0}, "order type:")
+
+
+def test_reconcile_submission_refuses_mismatched_side():
+    _reconcile_mismatch_case({"side": "buy"}, "side:")
+
+
+def test_reconcile_submission_refuses_missing_quantity():
+    _reconcile_mismatch_case({"shares": None}, "shares:")
+
+
+def test_reconcile_submission_refuses_missing_order_type():
+    _reconcile_mismatch_case({"type": None}, "order type:")
+
+
+def test_reconcile_submission_accepts_numerically_equivalent_share_counts():
+    # 10 and 10.0 must be treated as equal -- only the actual quantity
+    # matters, not whether the broker returned an int or a float.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    broker.find_order_by_client_id = lambda client_order_id: {
+        "order_id": "candidate-order",
+        "ticker": proposal.intent.ticker,
+        "shares": float(proposal.intent.shares),  # equivalent, not identical, representation
+        "side": proposal.intent.side,
+        "type": proposal.intent.order_type,
+        "limit_price": proposal.intent.limit_price,
+        "status": "accepted",
+    }
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submission_unknown")
+            order = reconcile_submission(proposal.proposal_id, store)
+            assert order["order_id"] == "candidate-order"
+            assert store.get_proposal(proposal.proposal_id)["status"] == "executed"
+    finally:
+        restore()
+
+
+def test_reconcile_submission_refuses_mismatched_limit_price():
+    packet = _packet()
+    policy = _policy()
+    from assistant.proposals import TradeProposal, _stable_id
+    from assistant.execution_service import reconcile_submission
+    from risk.execution_gate import TradeIntent
+
+    intent = TradeIntent(ticker="TQQQ", side="sell", shares=10, order_type="limit", limit_price=49.5)
+    proposal_id = _stable_id(packet, policy, intent)
+    limit_proposal = TradeProposal(
+        proposal_id=proposal_id, created_at=packet.generated_at, expires_at="2026-12-31T00:00:00+00:00",
+        status="proposed", idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
+        policy_version=policy.version, policy_fingerprint=compute_policy_fingerprint(policy),
+        intent=intent, reference_price=50.0, price_timestamp=packet.generated_at,
+        reasons=["test limit sell"], evidence_status="test",
+        expected_impact={"trade_value": 495.0, "position_weight_before_pct": 0, "position_weight_after_pct": 0, "cash_before": 0, "cash_after": 0, "invested_pct_after": 0},
+        alternatives=[], uncertainties=[],
+    ).to_dict()
+    _, restore = _mock_execution_dependencies(quote_price=50.0)
+    broker.find_order_by_client_id = lambda client_order_id: {
+        "order_id": "candidate-order", "ticker": "TQQQ", "shares": 10, "side": "sell",
+        "type": "limit", "limit_price": 45.0,  # does NOT match the proposal's 49.5
+        "status": "accepted",
+    }
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(limit_proposal)
+            store.update_proposal_status(proposal_id, "submission_unknown")
+            try:
+                reconcile_submission(proposal_id, store)
+                assert False, "expected a mismatched limit price to be refused"
+            except ProposalExecutionError as exc:
+                assert "MISMATCHED" in str(exc)
+            record = store.get_proposal(proposal_id)
+            assert record["status"] == "submission_unknown"
+            assert "limit_price:" in record["error"]
+    finally:
+        restore()
+
+
+def test_reconcile_submission_accepts_a_correctly_matching_limit_order():
+    packet = _packet()
+    policy = _policy()
+    from assistant.proposals import TradeProposal, _stable_id
+    from assistant.execution_service import reconcile_submission
+    from risk.execution_gate import TradeIntent
+
+    intent = TradeIntent(ticker="TQQQ", side="sell", shares=10, order_type="limit", limit_price=49.5)
+    proposal_id = _stable_id(packet, policy, intent)
+    limit_proposal = TradeProposal(
+        proposal_id=proposal_id, created_at=packet.generated_at, expires_at="2026-12-31T00:00:00+00:00",
+        status="proposed", idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
+        policy_version=policy.version, policy_fingerprint=compute_policy_fingerprint(policy),
+        intent=intent, reference_price=50.0, price_timestamp=packet.generated_at,
+        reasons=["test limit sell"], evidence_status="test",
+        expected_impact={"trade_value": 495.0, "position_weight_before_pct": 0, "position_weight_after_pct": 0, "cash_before": 0, "cash_after": 0, "invested_pct_after": 0},
+        alternatives=[], uncertainties=[],
+    ).to_dict()
+    _, restore = _mock_execution_dependencies(quote_price=50.0)
+    broker.find_order_by_client_id = lambda client_order_id: {
+        "order_id": "candidate-order", "ticker": "TQQQ", "shares": 10, "side": "sell",
+        "type": "limit", "limit_price": 49.5,
+        "status": "accepted",
+    }
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(limit_proposal)
+            store.update_proposal_status(proposal_id, "submission_unknown")
+            order = reconcile_submission(proposal_id, store)
+            assert order["order_id"] == "candidate-order"
+            assert store.get_proposal(proposal_id)["status"] == "executed"
+    finally:
+        restore()
+
+
 def test_reconcile_submission_marks_submission_failed_when_broker_confirms_absent():
     packet = _packet()
     policy = _policy()
@@ -1411,6 +1577,255 @@ def test_reconcile_submission_marks_submission_failed_when_broker_confirms_absen
             assert store.get_proposal(proposal.proposal_id)["status"] == "submission_failed"
     finally:
         restore()
+
+
+def test_reconcile_submission_recovers_from_a_malformed_stored_intent():
+    # GPT review, 2026-07-28: _intent_from_dict() raising (a corrupted
+    # stored intent) used to leave the proposal stranded in "reconciling"
+    # -- there was no catch-all around the post-claim logic.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            proposal_dict = proposal.to_dict()
+            store.save_proposal(proposal_dict)
+            store.update_proposal_status(proposal.proposal_id, "submitting")
+            # Corrupt the stored intent so _intent_from_dict() raises (missing "shares").
+            corrupted_intent = dict(proposal_dict["intent"])
+            del corrupted_intent["shares"]
+            store.update_proposal_status(proposal.proposal_id, "submitting", intent=corrupted_intent)
+
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, "expected the malformed intent to raise"
+            except ProposalExecutionError as exc:
+                assert "unexpectedly" in str(exc)
+            record = store.get_proposal(proposal.proposal_id)
+            assert record["status"] == "submission_unknown"  # retryable, not stranded
+            assert "Unexpected error" in record["error"]
+    finally:
+        restore()
+
+
+def test_reconcile_submission_recovers_when_broker_lookup_itself_raises():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    def failing_lookup(client_order_id):
+        raise ConnectionError("simulated network failure")
+
+    broker.find_order_by_client_id = failing_lookup
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submitting")
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, "expected the unconfirmed lookup to raise"
+            except ProposalExecutionError as exc:
+                assert "could not confirm" in str(exc).lower()
+            assert store.get_proposal(proposal.proposal_id)["status"] == "submission_unknown"
+    finally:
+        restore()
+
+
+def test_reconcile_submission_recovers_when_record_broker_order_fails():
+    # GPT review, 2026-07-28: unlike execute_approved_paper_proposal()'s
+    # OWN record_broker_order failure handling (which marks EXECUTED,
+    # since a fresh submission response just came back), reconciliation's
+    # equivalent failure must leave the proposal RETRYABLE
+    # (submission_unknown) rather than assume success without ever having
+    # journaled the order.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    broker.find_order_by_client_id = lambda client_order_id: {
+        "order_id": "candidate-order", "ticker": proposal.intent.ticker, "shares": proposal.intent.shares,
+        "side": proposal.intent.side, "type": proposal.intent.order_type,
+        "limit_price": proposal.intent.limit_price, "status": "accepted",
+    }
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submitting")
+
+            original_record = store.record_broker_order
+
+            def failing_record(pid, order):
+                raise sqlite3.OperationalError("simulated disk write failure")
+
+            store.record_broker_order = failing_record
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, "expected the journal-write failure to raise"
+            except ProposalExecutionError as exc:
+                assert "unexpectedly" in str(exc)
+            store.record_broker_order = original_record
+            record = store.get_proposal(proposal.proposal_id)
+            assert record["status"] == "submission_unknown"
+    finally:
+        restore()
+
+
+def test_reconcile_submission_recovers_when_the_final_executed_write_fails():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    broker.find_order_by_client_id = lambda client_order_id: {
+        "order_id": "candidate-order", "ticker": proposal.intent.ticker, "shares": proposal.intent.shares,
+        "side": proposal.intent.side, "type": proposal.intent.order_type,
+        "limit_price": proposal.intent.limit_price, "status": "accepted",
+    }
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submitting")
+
+            original_update = store.update_proposal_status
+
+            def flaky_update(pid, status, **updates):
+                if status == "executed":
+                    raise sqlite3.OperationalError("simulated write failure on the executed transition")
+                return original_update(pid, status, **updates)
+
+            store.update_proposal_status = flaky_update
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, "expected the executed-status write failure to raise"
+            except ProposalExecutionError as exc:
+                assert "unexpectedly" in str(exc)
+            store.update_proposal_status = original_update
+            record = store.get_proposal(proposal.proposal_id)
+            # Retryable, not stranded -- and NOT falsely "executed" despite
+            # record_broker_order() having already succeeded.
+            assert record["status"] == "submission_unknown"
+    finally:
+        restore()
+
+
+def test_reconcile_submission_raises_critical_when_even_the_recovery_write_fails():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    def failing_lookup(client_order_id):
+        raise ConnectionError("simulated network failure")
+
+    broker.find_order_by_client_id = failing_lookup
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submitting")
+
+            def always_failing_update(pid, status, **updates):
+                raise sqlite3.OperationalError("database is locked")
+
+            store.update_proposal_status = always_failing_update
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, "expected a CRITICAL RuntimeError"
+            except RuntimeError as exc:
+                assert "CRITICAL" in str(exc)
+    finally:
+        restore()
+
+
+def test_recover_stale_reconciliation_resolves_a_crash_stranded_proposal():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    from assistant.execution_service import recover_stale_reconciliation
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        store.update_proposal_status(proposal.proposal_id, "submitting")
+        claimed = store.claim_proposal(
+            proposal.proposal_id, expected_status=("submitting", "submission_unknown"), new_status="reconciling",
+        )
+        assert claimed is not None
+        # Backdate updated_at to simulate a crash long ago -- no public API
+        # sets this directly, since only the store itself should normally
+        # touch it.
+        old_timestamp = (datetime.now(timezone.utc) - timedelta(seconds=1000)).isoformat()
+        conn = sqlite3.connect(store.path)
+        try:
+            conn.execute(
+                "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
+                (old_timestamp, proposal.proposal_id),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+        recovered = recover_stale_reconciliation(proposal.proposal_id, store, stale_after_seconds=300)
+        assert recovered["status"] == "submission_unknown"
+        record = store.get_proposal(proposal.proposal_id)
+        assert record["status"] == "submission_unknown"
+        assert "stale" in record["error"].lower()
+
+
+def test_recover_stale_reconciliation_leaves_a_recent_in_flight_claim_alone():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    from assistant.execution_service import recover_stale_reconciliation
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        store.update_proposal_status(proposal.proposal_id, "submitting")
+        claimed = store.claim_proposal(
+            proposal.proposal_id, expected_status=("submitting", "submission_unknown"), new_status="reconciling",
+        )
+        assert claimed is not None
+        # No backdating -- this claim is "recent," so recovery must not touch it.
+        try:
+            recover_stale_reconciliation(proposal.proposal_id, store, stale_after_seconds=300)
+            assert False, "expected recovery to refuse a recent, presumably in-flight claim"
+        except ProposalExecutionError as exc:
+            assert "not a stale" in str(exc)
+        assert store.get_proposal(proposal.proposal_id)["status"] == "reconciling"
+
+
+def test_concurrent_reconciliation_claims_only_one_wins():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        store.update_proposal_status(proposal.proposal_id, "submission_unknown")
+
+        first = store.claim_proposal(
+            proposal.proposal_id, expected_status=("submitting", "submission_unknown"), new_status="reconciling",
+        )
+        second = store.claim_proposal(
+            proposal.proposal_id, expected_status=("submitting", "submission_unknown"), new_status="reconciling",
+        )
+        assert first is not None
+        assert second is None  # the second "concurrent" caller must not also win
 
 
 def test_reconcile_submission_rejects_a_non_reconcilable_status():

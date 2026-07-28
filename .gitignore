@@ -3,7 +3,7 @@ __pycache__/
 *.pyo
 .pytest_cache/
 
-# Trained model artifacts — regenerate with scripts/train_model.py, don't commit binaries
+# Trained model artifacts -- don't commit binaries
 *.joblib
 
 # Never commit credentials

@@ -648,7 +648,6 @@ data/
   macro_data.py            credit-spread and yield-curve proxies
 
 risk/
-  manager.py               sizing and stop calculations for research
   execution_gate.py        typed validation and short-lived authorization
 
 execution/
@@ -663,7 +662,6 @@ backtest/
   portfolio_simulator.py   tax/slippage-aware equity-curve simulator
 strategies/                leveraged-ETF rotation research (trend_vol_rotation.py,
                             vol_target_rotation.py, kelly_rotation.py, leverage_rotation.py)
-ml/model.py                walk-forward-evaluated signal classifier
 baskets.py, config.py      overlapping ticker baskets and every other tunable knob
 ```
 
@@ -703,7 +701,6 @@ python scripts/run_analyst_target_significance_check.py
 python scripts/run_momentum_block_significance.py
 python scripts/run_execution_timing_revalidation.py
 python scripts/run_basket_report.py
-python scripts/train_model.py
 ```
 
 `scripts/` also holds the leveraged-ETF rotation research line: regime-
@@ -727,27 +724,14 @@ The leveraged-ETF strategies enforce next-day-open execution after using a
 day's close to classify state. Tax and transaction-cost modeling are
 available in their simulators (`backtest/portfolio_simulator.py`).
 
-## Legacy agent behavior
-
-`scripts/run_agent.py` is now a research-only synthetic-data demo:
-
-- it cannot submit orders;
-- it refuses to size signals when the model artifact is missing;
-- it does not treat an absent model as full confidence;
-- it identifies the original scanner as research rather than a production
-  strategy.
-
-Production paper orders belong exclusively to the proposal and approval
-workflow.
-
 ## Tests
 
 ```bash
 python -m pytest tests -q
 ```
 
-The suite covers scanners, backtests, research statistics, strategies, ML,
-risk sizing, assistant schemas, context building, explanations, stress
+The suite covers scanners, backtests, research statistics, strategies,
+assistant schemas, context building, explanations, stress
 analysis, execution limits (including strict share-quantity validation),
 policy validation, SQLite idempotency, proposal generation, allocation
 batch preflight/execution, research-registry provenance/authority

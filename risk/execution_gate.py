@@ -1,11 +1,14 @@
 """
-Expanded deterministic execution gate — the "never let the LLM bypass
-these limits" layer from the assistant design (2026-07). Extends
-risk/manager.py (which already does per-position sizing, stop-loss
-pricing, and total-exposure capping) with the checks GPT's design review
-specifically called for: sector/basket limits, leveraged-ETF limits,
-stale-price checks, trading-hours checks, duplicate-order detection, max
-slippage, earnings restrictions, and a kill switch.
+Deterministic execution gate — the "never let the LLM bypass these
+limits" layer from the assistant design (2026-07). Per-position sizing,
+stop-loss pricing, and total-exposure capping, plus the checks GPT's
+design review specifically called for: sector/basket limits, leveraged-
+ETF limits, stale-price checks, trading-hours checks, duplicate-order
+detection, max slippage, earnings restrictions, and a kill switch. (This
+module previously described itself as "extending risk/manager.py" — that
+module was part of an earlier, disconnected ML/signal-sizing research
+path with no import relationship to this one; it was removed 2026-08-01,
+see docs/ARCHITECTURE_DEBT.md.)
 
 A TradeIntent is a typed, frozen data structure — not free-form text.
 validate_trade_intent() is pure validation: it never submits an order

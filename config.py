@@ -186,15 +186,6 @@ SLIPPAGE_PCT = 0.0015
 HORIZON_SWEEP_DAYS = [1, 3, 5, 10, 21]   # ~1 day, 3 days, 1 week, 2 weeks, 1 month
 HORIZON_LABELS = {1: "1 day", 3: "3 days", 5: "1 week", 10: "2 weeks", 21: "1 month"}
 
-# --- ML model -----------------------------------------------------------
-MODEL_PATH = "ml/model.joblib"   # where the trained classifier is persisted
-MIN_WIN_PROBABILITY = 0.5        # signals scored below this by the model are not sized/traded
-# Trailing window (in trading days) used for the optional market-regime
-# feature — "was the broad market trending up or down heading into this
-# signal?" Purely backward-looking (as-of the signal's own date), so it's
-# safe to use as a feature without introducing look-ahead bias.
-REGIME_LOOKBACK_DAYS = 20
-
 # --- Additional signals (2026-07 signal diversification) ----------------
 # The original dip/up scanner (signals/scanner.py) didn't hold up under
 # out-of-sample validation or corrected significance testing (see README).
@@ -384,11 +375,9 @@ OVERNIGHT_GAP_Z_THRESHOLD = 2.0      # matches RETURN_Z_THRESHOLD's convention f
 OVERNIGHT_GAP_HOLD_DAYS = 0
 OVERNIGHT_GAP_EARNINGS_EXCLUSION_DAYS = 1   # exclude a gap within +/-1 trading day of a known earnings date
 
-# --- Risk (used by the risk manager / backtester) -----------------------------------------------------------
+# --- Risk (default policy caps, enforced by risk/execution_gate.py) -----
 MAX_POSITION_PCT = 0.05      # never risk more than 5% of capital on one name
-STOP_LOSS_PCT = 0.03         # exit if a position moves 3% against you
 MAX_TOTAL_EXPOSURE_PCT = 0.50  # never have more than 50% of capital deployed across all open positions at once
-INITIAL_CAPITAL = 100_000     # default account equity used by backtest/demo sizing when no live account is connected
 
 # --- Execution -----------------------------------------------------------
 PAPER_TRADING = True         # hard default — flip only after you mean it

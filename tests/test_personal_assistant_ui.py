@@ -19,9 +19,14 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
-from assistant.policy import TradingPolicy
+from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.schemas import DecisionPacket, MarketRegime
-from scripts.personal_assistant_ui import _allocation_input_signature
+from scripts.personal_assistant_ui import (
+    _allocation_input_signature,
+    _clear_confirmation_state_if_digest_changed,
+    _portfolio_context_payload,
+    _proposal_content_digest,
+)
 
 
 def _policy(version: str = "test", max_order_value: float = 5_000.0) -> TradingPolicy:
@@ -144,6 +149,125 @@ def test_price_change_still_invalidates_the_signature():
     assert sig_a != sig_b
 
 
+# --- _portfolio_context_payload() / _proposal_content_digest() (GPT
+# review, 2026-07-30): ordinary Selling/Propose & Approve/Watchlist
+# proposal cards had NO portfolio-state binding at all -- a typed
+# "approve" or override could remain armed, and displayed impact/
+# violations could go stale, after cash/positions/buying_power/open
+# orders changed underneath an unchanged card.
+
+def _proposal(reference_price=150.0, shares=10, ticker="AAPL", side="buy", expires_at="2026-07-30T00:00:00+00:00"):
+    return {
+        "proposal_id": "tp_test",
+        "intent": {"ticker": ticker, "side": side, "shares": shares, "order_type": "market", "limit_price": None},
+        "reference_price": reference_price,
+        "expires_at": expires_at,
+    }
+
+
+def _digest(proposal, packet, policy=None):
+    policy = policy or _policy()
+    return _proposal_content_digest(
+        proposal, compute_policy_fingerprint(policy), _portfolio_context_payload(packet.portfolio),
+    )
+
+
+def test_portfolio_context_payload_changes_when_current_price_or_market_value_changes():
+    packet_a = _packet([{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 150.0}])
+    packet_b = _packet([{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 175.0}])
+    assert _portfolio_context_payload(packet_a.portfolio) != _portfolio_context_payload(packet_b.portfolio)
+
+
+def test_portfolio_context_payload_stable_across_reordered_positions_and_orders():
+    positions = [
+        {"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 150.0},
+        {"ticker": "MSFT", "shares": 5, "entry_price": 200.0, "current_price": 300.0},
+    ]
+    orders = [
+        {"order_id": "o1", "ticker": "AAPL", "side": "buy", "shares": 5, "type": "market"},
+        {"order_id": "o2", "ticker": "MSFT", "side": "sell", "shares": 3, "type": "market"},
+    ]
+    packet_a = _packet(positions, open_orders=orders)
+    packet_b = _packet(list(reversed(positions)), open_orders=list(reversed(orders)))
+    assert _portfolio_context_payload(packet_a.portfolio) == _portfolio_context_payload(packet_b.portfolio)
+
+
+def test_proposal_digest_changes_when_portfolio_context_changes():
+    proposal = _proposal()
+    packet_a = _packet([], cash=5_000.0)
+    packet_b = _packet([], cash=6_000.0)
+    assert _digest(proposal, packet_a) != _digest(proposal, packet_b)
+
+
+def test_proposal_digest_stable_when_nothing_changes():
+    proposal = _proposal()
+    packet = _packet([{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 150.0}])
+    assert _digest(proposal, packet) == _digest(proposal, packet)
+
+
+def test_proposal_digest_changes_with_policy_change():
+    proposal = _proposal()
+    packet = _packet([])
+    policy_a = _policy(version="v1")
+    policy_b = _policy(version="v1", max_order_value=1.0)  # same version, different fingerprint content
+    assert _digest(proposal, packet, policy=policy_a) != _digest(proposal, packet, policy=policy_b)
+
+
+def test_proposal_digest_changes_with_reference_price_change():
+    packet = _packet([])
+    proposal_a = _proposal(reference_price=150.0)
+    proposal_b = _proposal(reference_price=151.0)
+    assert _digest(proposal_a, packet) != _digest(proposal_b, packet)
+
+
+def test_proposal_digest_changes_with_intent_shares_change():
+    packet = _packet([])
+    proposal_a = _proposal(shares=10)
+    proposal_b = _proposal(shares=20)
+    assert _digest(proposal_a, packet) != _digest(proposal_b, packet)
+
+
+# --- _clear_confirmation_state_if_digest_changed() (GPT review,
+# 2026-07-30): must clear BOTH the ordinary typed confirmation AND any
+# previously typed override phrase -- the override phrase specifically
+# was never cleared before, which could leave the override button
+# immediately re-enabled if the banner reappeared for the same intent.
+
+def test_clear_confirmation_state_clears_confirm_and_override_phrase_on_change():
+    session_state = {
+        "confirm_tp_1": "approve",
+        "override_available_tp_1": ["some violation"],
+        "override_confirm_tp_1": "OVERRIDE BUY 10 AAPL",
+        "content_digest_tp_1": "old-digest",
+    }
+    changed = _clear_confirmation_state_if_digest_changed(session_state, "tp_1", "new-digest")
+    assert changed is True
+    assert session_state["confirm_tp_1"] == ""
+    assert "override_available_tp_1" not in session_state
+    assert "override_confirm_tp_1" not in session_state
+    assert session_state["content_digest_tp_1"] == "new-digest"
+
+
+def test_clear_confirmation_state_no_op_when_digest_unchanged():
+    session_state = {
+        "confirm_tp_1": "approve",
+        "override_confirm_tp_1": "OVERRIDE BUY 10 AAPL",
+        "content_digest_tp_1": "same-digest",
+    }
+    changed = _clear_confirmation_state_if_digest_changed(session_state, "tp_1", "same-digest")
+    assert changed is False
+    assert session_state["confirm_tp_1"] == "approve"  # untouched
+    assert session_state["override_confirm_tp_1"] == "OVERRIDE BUY 10 AAPL"  # untouched
+
+
+def test_clear_confirmation_state_handles_first_render_with_no_prior_digest():
+    session_state = {}
+    changed = _clear_confirmation_state_if_digest_changed(session_state, "tp_1", "first-digest")
+    assert changed is True
+    assert session_state["confirm_tp_1"] == ""
+    assert session_state["content_digest_tp_1"] == "first-digest"
+
+
 if __name__ == "__main__":
     test_unchanged_snapshot_produces_a_stable_signature()
     test_changing_cash_invalidates_the_signature()
@@ -157,4 +281,14 @@ if __name__ == "__main__":
     test_open_orders_available_flag_invalidates_the_signature()
     test_policy_change_still_invalidates_the_signature()
     test_price_change_still_invalidates_the_signature()
+    test_portfolio_context_payload_changes_when_current_price_or_market_value_changes()
+    test_portfolio_context_payload_stable_across_reordered_positions_and_orders()
+    test_proposal_digest_changes_when_portfolio_context_changes()
+    test_proposal_digest_stable_when_nothing_changes()
+    test_proposal_digest_changes_with_policy_change()
+    test_proposal_digest_changes_with_reference_price_change()
+    test_proposal_digest_changes_with_intent_shares_change()
+    test_clear_confirmation_state_clears_confirm_and_override_phrase_on_change()
+    test_clear_confirmation_state_no_op_when_digest_unchanged()
+    test_clear_confirmation_state_handles_first_render_with_no_prior_digest()
     print("All personal_assistant_ui tests passed.")

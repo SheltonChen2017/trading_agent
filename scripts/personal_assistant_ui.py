@@ -12,10 +12,19 @@ Safety note: every proposal still requires deliberate typed confirmation.
 The user must type the exact phrase "approve" in the specific proposal card
 before its submit button is enabled -- this prevents a stray click from
 ever placing a real (paper) trade. The proposal identity is bound by that
-card and by the proposal content digest; typed confirmation is cleared if
-the displayed proposal, policy, portfolio, or quote context changes. A
-policy override requires the separate order-specific phrase
-"OVERRIDE <SIDE> <SHARES> <TICKER>".
+card and by the proposal content digest, which covers the displayed
+proposal content, the active policy, and the material portfolio state
+(cash, positions, buying power, open orders) as of this render; typed
+confirmation (and any typed override phrase) is cleared whenever any of
+that changes. The digest is bound to the proposal's displayed reference
+price, not a freshly-refetched live quote -- the execution service
+independently re-fetches and revalidates a fresh quote at submission time
+regardless of what was displayed. A policy override additionally requires
+the separate order-specific phrase "OVERRIDE <SIDE> <SHARES> <TICKER>", and
+is only authorized if the violations at submission time exactly match what
+was shown when the override was first offered -- a changed violation set
+(new severity, a new violation, or a different one) forces a fresh review
+instead of silently authorizing against different conditions.
 
 Run with:
     streamlit run scripts/personal_assistant_ui.py
@@ -102,15 +111,84 @@ def _load_packet(policy_path: str, include_events: bool):
     return policy, packet
 
 
-def _proposal_content_digest(proposal: dict, policy_fingerprint: str) -> str:
+def _portfolio_context_payload(portfolio) -> dict:
+    """Normalized, JSON-ready snapshot of the MATERIAL portfolio state a
+    displayed proposal card's summary/impact was computed against --
+    cash/equity/buying_power/open-order availability, plus normalized,
+    SORTED positions and open orders (sorted so merely re-fetching the
+    same holdings/orders in a different order can never spuriously
+    invalidate an otherwise-unchanged signature). Shared by BOTH
+    _proposal_content_digest() (ordinary Selling/Propose & Approve/
+    per-ticker Watchlist cards) and _allocation_input_signature() (the
+    Watchlist's multi-ticker allocation split), so the same material-
+    state definition protects every proposal card in the app (GPT
+    review, 2026-07-30: this normalization used to exist only inside the
+    allocation-specific helper -- ordinary proposal cards had NO
+    portfolio-state binding at all, so a typed "approve"/override could
+    remain armed, and displayed impact/violations could go stale, after
+    cash/positions/buying_power/open orders changed underneath an
+    unchanged card)."""
+    positions_payload = sorted(
+        (
+            {
+                "ticker": p.ticker,
+                "shares": p.shares,
+                "current_price": p.current_price,
+                "market_value": p.market_value,
+            }
+            for p in portfolio.positions
+        ),
+        key=lambda d: d["ticker"],
+    )
+    open_orders_payload = sorted(
+        (
+            {
+                "order_id": order.get("order_id"),
+                "ticker": order.get("ticker"),
+                "side": order.get("side"),
+                "shares": order.get("shares"),
+                "notional": order.get("notional"),
+                "type": order.get("type"),
+                "limit_price": order.get("limit_price"),
+            }
+            for order in portfolio.open_orders
+        ),
+        key=lambda d: (d["order_id"] or "", d["ticker"] or "", d["side"] or ""),
+    )
+    return {
+        "cash": round(portfolio.cash, 2),
+        "total_equity": round(portfolio.total_equity, 2),
+        "buying_power": round(portfolio.buying_power, 2) if portfolio.buying_power is not None else None,
+        "open_orders_available": portfolio.open_orders_available,
+        "positions": positions_payload,
+        "open_orders": open_orders_payload,
+        "portfolio_as_of": portfolio.as_of,
+    }
+
+
+def _proposal_content_digest(proposal: dict, policy_fingerprint: str, portfolio_context: dict) -> str:
     """Fingerprint over exactly what's displayed in this proposal's
-    confirmation summary, plus the active policy's fingerprint. Compared
-    against a stored digest so a typed confirmation/override that was
-    started against ONE version of this card (a different proposal, a
-    stale render, or a policy that's since changed) is cleared rather
-    than silently carried over onto different displayed content (GPT
-    review, 2026-07-28: "do not retain an override-ready UI state after
-    proposal content, policy, portfolio, or quote context changes")."""
+    confirmation summary, the active policy's fingerprint, AND the
+    material portfolio state (see _portfolio_context_payload()) the
+    displayed summary/impact was computed against. Compared against a
+    stored digest so a typed confirmation/override that was started
+    against ONE version of this card (a different proposal, a stale
+    render, a policy that's since changed, or a portfolio that's since
+    changed) is cleared rather than silently carried over onto different
+    displayed content (GPT review, 2026-07-28 and 2026-07-30: "do not
+    retain an override-ready UI state after proposal content, policy,
+    portfolio, or quote context changes" -- portfolio state was the one
+    piece of that claim not actually implemented for ordinary proposal
+    cards until now).
+
+    Deliberately bound to the proposal's own STORED `reference_price`
+    (what's actually displayed), not a freshly-refetched live quote --
+    this UI only fetches a fresh quote at submit time, inside
+    execute_approved_paper_proposal() itself, which independently
+    revalidates price/staleness/spread against that fresh quote
+    regardless of what this digest matched. Claiming a live quote change
+    clears confirmation here would be dishonest given the UI never
+    observes that change before submission."""
     intent = proposal["intent"]
     payload = {
         "proposal_id": proposal["proposal_id"],
@@ -122,36 +200,60 @@ def _proposal_content_digest(proposal: dict, policy_fingerprint: str) -> str:
         "reference_price": proposal["reference_price"],
         "expires_at": proposal["expires_at"],
         "policy_fingerprint": policy_fingerprint,
+        "portfolio_context": portfolio_context,
     }
     serialized = json.dumps(payload, sort_keys=True, default=str)
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
-def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str) -> None:
+def _clear_confirmation_state_if_digest_changed(session_state, proposal_id: str, current_digest: str) -> bool:
+    """Pure invalidation logic, factored out of _render_proposal_approval()
+    so it can be unit-tested without a live Streamlit session (GPT
+    review, 2026-07-30) -- `session_state` is any dict-like object
+    supporting `.get`/`__setitem__`/`.pop` (a plain dict in tests; Streamlit's
+    real `st.session_state` in the app). Clears the typed confirmation
+    phrase, any override-available banner, AND any previously typed
+    override phrase whenever the content/policy/portfolio digest for this
+    proposal card has changed since it was last set -- the typed override
+    phrase specifically was never cleared before, which could leave the
+    override button immediately re-enabled if the override banner
+    reappeared for the same intent with new violations. Returns True iff
+    it actually cleared anything (the digest had changed)."""
+    digest_key = f"content_digest_{proposal_id}"
+    if session_state.get(digest_key) == current_digest:
+        return False
+    session_state[f"confirm_{proposal_id}"] = ""
+    session_state.pop(f"override_available_{proposal_id}", None)
+    session_state.pop(f"override_confirm_{proposal_id}", None)
+    session_state[digest_key] = current_digest
+    return True
+
+
+def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str, portfolio) -> None:
     """One proposal card with the typed-confirmation approve flow.
-    Shared by the Propose & Approve tab and the Watchlist tab's
-    allocation-buy feature -- identical safety flow everywhere a
-    proposal can be approved: type the exact "approve" phrase, or
-    the submit button stays disabled. The confirmation phrase is
-    intentionally simple (2026-07-28) -- what protects against
-    approving the WRONG visible proposal or stale UI state is the
-    immutable summary below and the content-digest binding, not
-    phrase complexity (GPT review, 2026-07-28)."""
+    Shared by the Selling, Propose & Approve, and Watchlist tabs --
+    identical safety flow everywhere a proposal can be approved: type the
+    exact "approve" phrase, or the submit button stays disabled. The
+    confirmation phrase is intentionally simple (2026-07-28) -- what
+    protects against approving the WRONG visible proposal or stale UI
+    state is the immutable summary below and the content-digest binding,
+    not phrase complexity (GPT review, 2026-07-28).
+
+    `portfolio`: the CURRENT portfolio snapshot (as of this render), used
+    only to bind the confirmation/override UI state to the material
+    account state the displayed summary/impact reflects (GPT review,
+    2026-07-30) -- NOT re-fetched or revalidated here; submission below
+    always fetches its own fresh snapshot independently."""
     intent = proposal["intent"]
     proposal_id = proposal["proposal_id"]
     override_key = f"override_available_{proposal_id}"
-    digest_key = f"content_digest_{proposal_id}"
+    override_confirm_key = f"override_confirm_{proposal_id}"
 
     display_policy = load_policy(policy_path)
     policy_fingerprint = compute_policy_fingerprint(display_policy)
-    current_digest = _proposal_content_digest(proposal, policy_fingerprint)
-    if st.session_state.get(digest_key) != current_digest:
-        # Displayed content or the active policy changed since any prior
-        # typed confirmation/override for this card -- clear both rather
-        # than let a stale confirmation silently apply to new content.
-        st.session_state[f"confirm_{proposal_id}"] = ""
-        st.session_state.pop(override_key, None)
-        st.session_state[digest_key] = current_digest
+    portfolio_context = _portfolio_context_payload(portfolio)
+    current_digest = _proposal_content_digest(proposal, policy_fingerprint, portfolio_context)
+    _clear_confirmation_state_if_digest_changed(st.session_state, proposal_id, current_digest)
 
     estimated_notional = intent["shares"] * proposal["reference_price"]
     override_phrase = f"OVERRIDE {intent['side'].upper()} {intent['shares']} {intent['ticker'].upper()}"
@@ -210,14 +312,22 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                         kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
                     )
                     st.session_state.pop(override_key, None)
+                    st.session_state.pop(override_confirm_key, None)
                     st.success(
                         f"Submitted paper order {order['order_id']}: "
                         f"{order['side'].upper()} {order['shares']} {order['ticker']} [{order['status']}]"
                     )
                 except PolicyOverridableBlockError as exc:
+                    # Replace the displayed violation list with whatever
+                    # is current, and clear any previously typed override
+                    # phrase -- a stale phrase must not silently re-arm
+                    # the override button against a NEW violation set
+                    # (GPT review, 2026-07-30).
                     st.session_state[override_key] = list(exc.overridable_violations)
+                    st.session_state.pop(override_confirm_key, None)
                 except Exception as exc:
                     st.session_state.pop(override_key, None)
+                    st.session_state.pop(override_confirm_key, None)
                     st.error(f"Order not submitted: {exc}")
 
         if st.session_state.get(override_key):
@@ -231,7 +341,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                 "(identifies this specific order so you can't accidentally override a different one)."
             )
             override_typed = st.text_input(
-                "Override phrase", key=f"override_confirm_{proposal_id}", label_visibility="collapsed"
+                "Override phrase", key=override_confirm_key, label_visibility="collapsed"
             )
             if st.button(
                 "Override and submit anyway",
@@ -254,12 +364,34 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                             override_policy_violations=True,
                         )
                         st.session_state.pop(override_key, None)
+                        st.session_state.pop(override_confirm_key, None)
                         st.success(
                             f"Submitted paper order {order['order_id']} (policy override applied): "
                             f"{order['side'].upper()} {order['shares']} {order['ticker']} [{order['status']}]"
                         )
+                    except PolicyOverridableBlockError as exc:
+                        # The reviewed-override binding in
+                        # execute_approved_paper_proposal() rejected this
+                        # attempt: either this was somehow the first
+                        # presentation, or (far more likely here, since an
+                        # override was just explicitly typed) the
+                        # violations changed since the last time this was
+                        # reviewed. Never submit -- replace the displayed
+                        # violations and clear the typed phrase so the
+                        # user must explicitly re-review and re-type it.
+                        st.session_state[override_key] = list(exc.overridable_violations)
+                        st.session_state.pop(override_confirm_key, None)
+                        if exc.conditions_changed:
+                            st.error(
+                                "The override conditions changed since your previous review. No order "
+                                "was submitted. Review the updated violations above and type the "
+                                "override phrase again if you still accept them."
+                            )
+                        else:
+                            st.error(f"Order not submitted: {exc}")
                     except Exception as exc:
                         st.session_state.pop(override_key, None)
+                        st.session_state.pop(override_confirm_key, None)
                         st.error(f"Order not submitted: {exc}")
 
 
@@ -288,39 +420,13 @@ def _allocation_input_signature(
     manually-placed order, a deposit) without moving that date at all,
     leaving a stale allocation card's confirmation/override state fully
     intact against a portfolio that no longer matches what's displayed
-    (GPT review, 2026-07-29). Now hashes the actual material fields:
-    cash/equity/buying_power, open-order availability, and normalized,
-    SORTED positions/open-orders (sorted so merely re-fetching the same
-    holdings/orders in a different order can never spuriously invalidate
-    an otherwise-unchanged signature)."""
-    portfolio = packet.portfolio
-    positions_payload = sorted(
-        (
-            {
-                "ticker": p.ticker,
-                "shares": p.shares,
-                "current_price": p.current_price,
-                "market_value": p.market_value,
-            }
-            for p in portfolio.positions
-        ),
-        key=lambda d: d["ticker"],
-    )
-    open_orders_payload = sorted(
-        (
-            {
-                "order_id": order.get("order_id"),
-                "ticker": order.get("ticker"),
-                "side": order.get("side"),
-                "shares": order.get("shares"),
-                "notional": order.get("notional"),
-                "type": order.get("type"),
-                "limit_price": order.get("limit_price"),
-            }
-            for order in portfolio.open_orders
-        ),
-        key=lambda d: (d["order_id"] or "", d["ticker"] or "", d["side"] or ""),
-    )
+    (GPT review, 2026-07-29). Now reuses _portfolio_context_payload()
+    (GPT review, 2026-07-30) -- the same material-state definition every
+    other proposal card in the app is bound to -- for the actual material
+    fields: cash/equity/buying_power, open-order availability, and
+    normalized, SORTED positions/open-orders (sorted so merely
+    re-fetching the same holdings/orders in a different order can never
+    spuriously invalidate an otherwise-unchanged signature)."""
     payload = {
         "weights": {t: weights[t] for t in sorted(weights)},
         "dollar_amount": round(dollar_amount, 2),
@@ -329,13 +435,7 @@ def _allocation_input_signature(
         "max_weight_pct": max_weight_pct,
         "policy_version": policy.version,
         "policy_fingerprint": compute_policy_fingerprint(policy),
-        "portfolio_as_of": portfolio.as_of,
-        "cash": round(portfolio.cash, 2),
-        "total_equity": round(portfolio.total_equity, 2),
-        "buying_power": round(portfolio.buying_power, 2) if portfolio.buying_power is not None else None,
-        "open_orders_available": portfolio.open_orders_available,
-        "positions": positions_payload,
-        "open_orders": open_orders_payload,
+        "portfolio_context": _portfolio_context_payload(packet.portfolio),
     }
     serialized = json.dumps(payload, sort_keys=True, default=str)
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
@@ -874,7 +974,7 @@ with tab_watchlist:
                 st.dataframe(leg_rows, use_container_width=True, hide_index=True)
 
         for proposal in st.session_state.get("allocation_proposals", []):
-            _render_proposal_approval(proposal, store, policy_path)
+            _render_proposal_approval(proposal, store, policy_path, alloc_packet.portfolio)
 
     for ticker, result in watchlist_results.items():
         with st.container(border=True):
@@ -1039,7 +1139,7 @@ with tab_selling:
         else:
             st.write(f"Checked at {sell_checked_at} -- {len(sell_proposals)} recommended sell(s):")
             for proposal in sell_proposals:
-                _render_proposal_approval(proposal, store, policy_path)
+                _render_proposal_approval(proposal, store, policy_path, packet.portfolio)
 
 with tab_propose:
     policy, packet = _load_packet(policy_path, include_events)
@@ -1076,7 +1176,7 @@ with tab_propose:
         st.write(f"Checked at {last_checked_at} -- {len(proposals)} proposal(s):")
 
     for proposal in proposals or []:
-        _render_proposal_approval(proposal, store, policy_path)
+        _render_proposal_approval(proposal, store, policy_path, packet.portfolio)
 
 with tab_history:
     proposals_col, orders_col = st.columns(2)

@@ -166,6 +166,17 @@ def command_approve(args, store: AssistantStore) -> None:
             override_policy_violations=args.override,
         )
     except PolicyOverridableBlockError as exc:
+        if exc.conditions_changed:
+            # GPT review, 2026-07-30: the caller already passed
+            # --override, but the freshly revalidated violations no
+            # longer match what was reviewed the last time this proposal
+            # was blocked -- never silently authorize against a
+            # different set than what was actually reviewed.
+            raise SystemExit(
+                f"{exc}\n\nThe override conditions changed since your previous review. No order was "
+                "submitted. Review the updated violations above and rerun with --override again if you "
+                "still accept them."
+            )
         raise SystemExit(
             f"{exc}\n\nEvery violation above is override-eligible (a risk-preference or "
             f"earnings-calendar call, not unreliable data). Re-run with --override to proceed anyway."

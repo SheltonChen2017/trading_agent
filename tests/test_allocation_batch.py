@@ -1141,6 +1141,8 @@ def test_completed_batch_resyncs_a_blocked_overridable_leg_once_individually_ove
             assert first_result["status"] == BATCH_COMPLETED
             assert first_result["legs"][proposal.proposal_id]["state"] == LEG_BLOCKED_OVERRIDABLE
             assert len(captured) == 0  # never actually submitted by the batch
+            old_block_message = first_result["legs"][proposal.proposal_id]["error"]
+            assert old_block_message  # non-empty -- this is the message we expect cleared later
 
             # Resolve it through the proposal's OWN individual override
             # control -- exactly what the batch/UI tells the user to do
@@ -1164,6 +1166,14 @@ def test_completed_batch_resyncs_a_blocked_overridable_leg_once_individually_ove
             assert leg["order"] is not None
             assert leg["order"]["order_id"] == order["order_id"]
             assert len(captured) == 1  # NOT resubmitted by the resync
+            # GPT review, 2026-07-30: the stale "blocked by cap"-style
+            # message from the earlier blocked_overridable attempt must
+            # be CLEARED now that the authoritative proposal is a clean
+            # "executed" with no active error of its own -- never left
+            # showing next to a successfully submitted order -- but
+            # preserved in error_history for auditability.
+            assert leg["error"] is None
+            assert old_block_message in leg["error_history"]
 
             # Idempotent: nothing changed underneath -- calling again
             # must not alter or re-write anything further.

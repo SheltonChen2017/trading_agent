@@ -33,9 +33,26 @@ class EvidenceStatus(str, Enum):
 
 def _to_dict(obj):
     """Recursively convert dataclasses (including nested ones, lists,
-    dicts, and Enums) into plain JSON-serializable structures."""
+    dicts, and Enums) into plain JSON-serializable structures.
+
+    Deliberately does NOT call `dataclasses.asdict(obj)` -- `asdict()`
+    recursively converts every NESTED dataclass into a plain dict all in
+    one call, so by the time this function's own
+    `isinstance(obj, SignalEvidence)` check below ran on a value pulled
+    back out of that pre-built dict, a `SignalEvidence` nested inside
+    e.g. a `DecisionPacket` had ALREADY been flattened to a plain dict --
+    the check never fired for anything but a bare, top-level
+    `SignalEvidence` (GPT review, 2026-07-30, independently reproduced:
+    `_to_dict(finding)` on its own worked, but
+    `packet.to_dict()["signals"][0]` was missing
+    `production_authoritative`/`display_status` entirely, which silently
+    broke SQLite/JSONL persistence and any consumer reading a serialized
+    packet). Walking `dataclasses.fields(obj)` one at a time and
+    recursing through THIS function for each field's value instead means
+    a nested `SignalEvidence` is still a real `SignalEvidence` instance
+    -- not yet a dict -- when this function inspects it."""
     if dataclasses.is_dataclass(obj):
-        result = {k: _to_dict(v) for k, v in dataclasses.asdict(obj).items()}
+        result = {f.name: _to_dict(getattr(obj, f.name)) for f in dataclasses.fields(obj)}
         if isinstance(obj, SignalEvidence):
             # Computed, never stored -- can't drift out of sync with
             # status/provenance the way a manually-set field could (GPT

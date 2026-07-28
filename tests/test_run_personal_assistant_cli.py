@@ -1,10 +1,11 @@
 """
-Tests for scripts/run_personal_assistant.py's argument parser -- focused
-on --stale-after-seconds (GPT review, 2026-07-29: the CLI accepted zero
-or negative values with no validation at all, which would let a user
-reclaim a genuinely active reconciliation immediately). The service-level
-check in assistant.execution_service.recover_stale_reconciliation() is
-the authoritative guard; this is only a usability check at the CLI layer.
+Tests for scripts/run_personal_assistant.py's argument parser (focused on
+--stale-after-seconds -- GPT review, 2026-07-29: the CLI accepted zero or
+negative values with no validation at all, which would let a user reclaim
+a genuinely active reconciliation immediately; the service-level check in
+assistant.execution_service.recover_stale_reconciliation() is the
+authoritative guard, this is only a usability check at the CLI layer) and
+_print_briefing()'s user-facing evidence display (GPT review, 2026-07-30).
 
 Run with: python -m pytest tests/test_run_personal_assistant_cli.py
 """
@@ -13,7 +14,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from scripts.run_personal_assistant import build_parser
+from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
+from assistant.schemas import DecisionPacket, FindingProvenance, MarketRegime, EvidenceStatus, SignalEvidence
+from scripts.run_personal_assistant import _print_briefing, build_parser
 
 
 def test_recover_stale_accepts_a_positive_stale_after_seconds():
@@ -50,10 +53,68 @@ def test_recover_stale_rejects_non_integer():
         assert exc.code != 0
 
 
+# --- _print_briefing() user-facing evidence display (GPT review,
+# 2026-07-30): this CLI briefing was the last remaining consumer still
+# printing the raw `status` value directly -- run_morning_briefing.py and
+# the Streamlit UI were already corrected to use display_status.
+
+def _packet_with_unreproduced_confirmed_finding(underfilled: bool = False):
+    from assistant.portfolio_analytics import compute_portfolio_analytics
+
+    snapshot = build_portfolio_snapshot([], cash=10_000.0)
+    provenance_kwargs = dict(
+        actual_start_date="2019-07-22", actual_end_date="2026-07-28", actual_row_count=1764,
+        entry_timing="next_open", data_fetched_at="2026-07-28T00:00:00+00:00",
+        reproduced_after_data_loader_fix=False,
+    )
+    if underfilled:
+        provenance_kwargs["requested_lookback_sessions"] = 1764
+        provenance_kwargs["actual_lookback_sessions"] = 907
+    finding = SignalEvidence(
+        label="Test finding", claim="Beats a baseline", status=EvidenceStatus.CONFIRMED,
+        detail="...", source="test", relevant_tickers=[],
+        provenance=FindingProvenance(**provenance_kwargs),
+    )
+    packet = DecisionPacket(
+        generated_at="2026-01-01T00:00:00Z", portfolio=snapshot, risk=build_risk_exposure(snapshot),
+        regime=MarketRegime(benchmark_ticker="QQQ", trend=None, volatility_regime=None,
+                             trailing_volatility_pct=None, as_of="2026-01-01"),
+        signals=[finding], upcoming_events=[], warnings=[],
+        analytics=compute_portfolio_analytics(snapshot),
+    )
+    return packet
+
+
+def _captured_stdout(fn, *args, **kwargs) -> str:
+    import contextlib
+    import io
+
+    buffer = io.StringIO()
+    with contextlib.redirect_stdout(buffer):
+        fn(*args, **kwargs)
+    return buffer.getvalue()
+
+
+def test_print_briefing_never_shows_a_bare_confirmed_for_an_unreproduced_finding():
+    packet = _packet_with_unreproduced_confirmed_finding()
+    out = _captured_stdout(_print_briefing, packet)
+    assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in out
+    assert "[confirmed]" not in out
+
+
+def test_print_briefing_surfaces_underfilled_dataset_warning():
+    packet = _packet_with_unreproduced_confirmed_finding(underfilled=True)
+    out = _captured_stdout(_print_briefing, packet)
+    assert "907" in out
+    assert "1764" in out
+
+
 if __name__ == "__main__":
     test_recover_stale_accepts_a_positive_stale_after_seconds()
     test_recover_stale_defaults_to_300()
     test_recover_stale_rejects_zero()
     test_recover_stale_rejects_negative()
     test_recover_stale_rejects_non_integer()
+    test_print_briefing_never_shows_a_bare_confirmed_for_an_unreproduced_finding()
+    test_print_briefing_surfaces_underfilled_dataset_warning()
     print("All run_personal_assistant CLI tests passed.")

@@ -153,6 +153,25 @@ def _sync_leg_from_proposal(leg: dict, proposal: dict | None) -> dict:
             history.append(synced["error"])
         synced["error_history"] = history
         synced["error"] = proposal_error
+    elif not proposal_error and new_state == LEG_SUBMITTED and synced.get("error"):
+        # The authoritative proposal has no CURRENT error (a clean
+        # "executed"), but the leg still carries a stale message from an
+        # earlier attempt (e.g. "blocked by cap" from a prior
+        # blocked_overridable state, before it was resolved via that
+        # proposal's own individual override control) -- that message
+        # must not keep showing next to a now-successful order (GPT
+        # review, 2026-07-30, reproduced: the Streamlit batch table's
+        # Detail column kept showing the old block reason alongside a
+        # successfully submitted order_id). Preserved in error_history
+        # for auditability, never silently discarded. Does NOT run when
+        # the proposal itself still has an active error (e.g. "broker
+        # accepted the order but local journal recording failed") --
+        # that case is handled by the branch above instead, which keeps
+        # it as the current error rather than clearing it.
+        history = list(synced.get("error_history") or [])
+        history.append(synced["error"])
+        synced["error_history"] = history
+        synced["error"] = None
     return synced
 
 

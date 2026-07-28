@@ -93,6 +93,34 @@ def is_production_authoritative(finding: SignalEvidence) -> bool:
     return finding.production_authoritative
 
 
+def summarize_evidence_authority(findings: list[SignalEvidence]) -> dict:
+    """Pure, UI-agnostic summary of a set of findings' historical
+    verdicts AND current production authority, kept as two SEPARATE
+    tallies rather than one aggregate (GPT review, 2026-07-30: the
+    Streamlit briefing's evidence summary aggregated by raw `status`
+    (e.g. "2 confirmed / 1 rejected") right above individual rows that
+    correctly used `display_status` -- so the summary could claim
+    "2 confirmed" even when both of those findings were explicitly not
+    production-authoritative, directly contradicting the rows below it).
+
+    Returns:
+      {"verdict_counts": {status_value: count, ...},   # historical, by `status` -- never destroyed
+       "non_authoritative_count": int,                   # NOT production_authoritative
+       "non_authoritative_labels": [str, ...]}            # which findings, for detail/audit
+    """
+    verdict_counts: dict[str, int] = {}
+    non_authoritative_labels: list[str] = []
+    for finding in findings:
+        verdict_counts[finding.status.value] = verdict_counts.get(finding.status.value, 0) + 1
+        if not finding.production_authoritative:
+            non_authoritative_labels.append(finding.label)
+    return {
+        "verdict_counts": verdict_counts,
+        "non_authoritative_count": len(non_authoritative_labels),
+        "non_authoritative_labels": non_authoritative_labels,
+    }
+
+
 def underfilled_dataset_warning(provenance: FindingProvenance) -> str | None:
     """Returns a human-readable warning if the dataset actually used was
     materially shorter than what was requested (e.g. a recent-IPO ticker

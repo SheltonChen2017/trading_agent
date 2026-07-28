@@ -87,18 +87,42 @@ _RELIED_UPON_FINDING_LABELS = (
 )
 
 
-def _non_authoritative_relied_upon_findings() -> list[str]:
-    """Labels of any relied-upon finding that is NOT currently
-    production-authoritative (unreproduced since the fetch_historical
-    lookback-days fix). This module intentionally still generates
-    proposals despite that -- EVIDENCE_STATUS is always the unconfirmed-
-    strategy tag below, never "confirmed" -- but the reliance must be an
-    explicit, checked fact, not an assumption."""
+class MissingResearchDependencyError(RuntimeError):
+    """Raised when a finding this module's proposal generation relies on
+    has NO matching entry in the research registry at all -- an
+    accidental registry deletion, a label rename, a partial/malformed
+    migration, a stale hard-coded label, or a future refactor that
+    changes the evidence identity. Deliberately distinct from (and a
+    STRONGER integrity failure than) a present-but-unreproduced finding,
+    which still generates a proposal with an explicit uncertainty
+    disclosure instead (GPT review, 2026-07-30, independently
+    reproduced: the previous helper's `label in by_label and not ...`
+    condition silently excluded a missing label from its result --
+    setting KNOWN_FINDINGS = [] made it return [], indistinguishable
+    from "everything is authoritative"). Missing evidence must never be
+    interpreted as trusted evidence, so this fails closed -- no proposal
+    is generated -- rather than silently proceeding. Both CLI callers
+    (scripts/run_personal_assistant.py's command_propose) and the UI's
+    Propose & Approve tab already catch and prominently display an
+    exception from this function, so raising here surfaces the
+    integrity failure instead of looking identical to an ordinary
+    "nothing needs rebalancing" result."""
+
+
+def _relied_upon_findings_status() -> tuple[list[str], list[str]]:
+    """Returns (missing_labels, non_authoritative_present_labels) for
+    _RELIED_UPON_FINDING_LABELS against the current KNOWN_FINDINGS
+    registry -- kept as two separate lists rather than one, since a
+    MISSING finding (no matching registry entry at all) is a stronger
+    integrity failure than one that's merely present-but-unreproduced
+    (see MissingResearchDependencyError)."""
     by_label = {f.label: f for f in KNOWN_FINDINGS}
-    return [
+    missing = [label for label in _RELIED_UPON_FINDING_LABELS if label not in by_label]
+    non_authoritative_present = [
         label for label in _RELIED_UPON_FINDING_LABELS
         if label in by_label and not by_label[label].production_authoritative
     ]
+    return missing, non_authoritative_present
 
 PRODUCTION_PARAMS = {
     "target_vol_pct": 0.5,
@@ -156,7 +180,20 @@ def generate_soxx_soxl_rebalance_proposals(
 
     `market_data` lets a caller/test inject price history instead of
     hitting the network; production callers can omit it.
+
+    Raises MissingResearchDependencyError (fails closed, no proposal) if
+    a finding this strategy relies on has no matching entry in the
+    research registry at all -- see that error's docstring.
     """
+    missing_findings, _ = _relied_upon_findings_status()
+    if missing_findings:
+        raise MissingResearchDependencyError(
+            "Cannot verify this strategy's research dependencies -- the following relied-upon "
+            f"finding(s) have no matching entry in the research registry at all: "
+            f"{', '.join(missing_findings)}. Refusing to generate a proposal until this is "
+            "resolved (an accidental deletion, a label rename, or a malformed migration)."
+        )
+
     snapshot = packet.portfolio
     position_by_ticker = {p.ticker.upper(): p for p in snapshot.positions}
     stable_position = position_by_ticker.get(STABLE_TICKER)
@@ -214,7 +251,10 @@ def generate_soxx_soxl_rebalance_proposals(
     if shares <= 0:
         return []
 
-    non_authoritative = _non_authoritative_relied_upon_findings()
+    # Missing findings already raised above -- only "present but
+    # unreproduced" reaches here, which still generates a proposal with
+    # this explicit disclosure rather than being blocked.
+    _, non_authoritative = _relied_upon_findings_status()
     uncertainties = [
         "PRODUCTION_PARAMS (target_vol_pct=0.5, max_leveraged_weight=0.6) were selected via "
         "full-history grid search, not an out-of-sample confirmation split -- these specific "

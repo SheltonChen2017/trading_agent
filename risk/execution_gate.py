@@ -34,6 +34,13 @@ from assistant.schemas import PortfolioSnapshot
 _EASTERN = ZoneInfo("America/New_York")
 _NYSE_CALENDAR = mcal.get_calendar("NYSE")
 
+# A quote timestamp further in the future than this is treated as
+# impossible/corrupted data, not merely "very fresh" -- small enough to
+# tolerate ordinary clock skew between this process and the broker/data
+# provider, not so large that a genuinely bad timestamp (e.g. a bug that
+# adds hours instead of subtracting) would slip through as "fresh."
+_FUTURE_TIMESTAMP_TOLERANCE_MINUTES = 1.0
+
 # Process-local secret, generated once at import time. intent_fingerprint()
 # below is a PLAIN hash of public TradeIntent fields -- any code that can
 # import TradeIntent can compute the same hash, so it was never actually a
@@ -95,6 +102,11 @@ class ViolationCode(str, enum.Enum):
     INVALID_QUOTE = "invalid_quote"
     MAX_SPREAD = "max_spread"
     EARNINGS_BLACKOUT = "earnings_blackout"
+    INVALID_PORTFOLIO_CASH = "invalid_portfolio_cash"
+    INVALID_PORTFOLIO_EQUITY = "invalid_portfolio_equity"
+    INVALID_BUYING_POWER = "invalid_buying_power"
+    INVALID_POSITION_DATA = "invalid_position_data"
+    FUTURE_PRICE_TIMESTAMP = "future_price_timestamp"
 
 
 # The ONLY violation codes authorize_overridden_trade_intent() will ever
@@ -409,6 +421,76 @@ def validate_trade_intent(
             validation_proof=_validation_proof(intent, False, codes),
         )
 
+    # Portfolio numeric integrity -- checked BEFORE any of the
+    # exposure/cash arithmetic below touches these fields (GPT review,
+    # 2026-07-29). Policy values and reference_price were already
+    # validated for finiteness elsewhere, but a corrupted broker/manual
+    # PortfolioSnapshot (NaN or infinity in cash, equity, buying power, or
+    # any position's numbers) was NOT -- and NaN silently defeats every
+    # comparison it touches (`NaN > limit` is always False in Python), so
+    # a cash check, an exposure cap, or a basket/leveraged-ETF sum could
+    # all silently fail OPEN instead of blocking. These are always hard,
+    # non-overridable violations -- never a risk-preference call.
+    if not math.isfinite(portfolio.cash):
+        _violate(ViolationCode.INVALID_PORTFOLIO_CASH, f"portfolio.cash must be finite, got {portfolio.cash}.")
+    elif portfolio.cash < 0:
+        _violate(
+            ViolationCode.INVALID_PORTFOLIO_CASH,
+            f"portfolio.cash must be non-negative (this project does not model margin/short cash "
+            f"balances), got {portfolio.cash}.",
+        )
+    if not math.isfinite(portfolio.total_equity):
+        _violate(
+            ViolationCode.INVALID_PORTFOLIO_EQUITY,
+            f"portfolio.total_equity must be finite, got {portfolio.total_equity}.",
+        )
+    elif intent.side == "buy" and portfolio.total_equity <= 0:
+        _violate(
+            ViolationCode.INVALID_PORTFOLIO_EQUITY,
+            f"portfolio.total_equity must be positive to size a buy against it, got {portfolio.total_equity}.",
+        )
+    if portfolio.buying_power is not None and not math.isfinite(portfolio.buying_power):
+        _violate(
+            ViolationCode.INVALID_BUYING_POWER,
+            f"portfolio.buying_power must be finite when present, got {portfolio.buying_power}.",
+        )
+    for position in portfolio.positions:
+        bad_fields = [
+            (name, value)
+            for name, value in (
+                ("shares", position.shares),
+                ("entry_price", position.entry_price),
+                ("current_price", position.current_price),
+                ("market_value", position.market_value),
+            )
+            if not math.isfinite(value)
+        ]
+        if bad_fields:
+            detail = ", ".join(f"{name}={value}" for name, value in bad_fields)
+            _violate(
+                ViolationCode.INVALID_POSITION_DATA,
+                f"Position {position.ticker} has non-finite data ({detail}) -- refusing to compute "
+                "exposure with corrupted position data.",
+            )
+            continue
+        if position.shares < 0:
+            _violate(
+                ViolationCode.INVALID_POSITION_DATA,
+                f"Position {position.ticker} has negative shares ({position.shares}) -- this project "
+                "does not model short positions.",
+            )
+        if position.market_value < 0:
+            _violate(
+                ViolationCode.INVALID_POSITION_DATA,
+                f"Position {position.ticker} has negative market_value ({position.market_value}).",
+            )
+        if position.current_price <= 0 or position.entry_price <= 0:
+            _violate(
+                ViolationCode.INVALID_POSITION_DATA,
+                f"Position {position.ticker} has a non-positive price (entry_price="
+                f"{position.entry_price}, current_price={position.current_price}).",
+            )
+
     if intent.shares <= 0:
         _violate(ViolationCode.INVALID_SHARES, f"shares must be positive, got {intent.shares}.")
     if intent.side not in ("buy", "sell"):
@@ -529,17 +611,46 @@ def validate_trade_intent(
             )
 
     if price_timestamp is not None and now is not None:
-        comparable_price_timestamp = price_timestamp
-        comparable_now = now
-        if comparable_price_timestamp.tzinfo is None and comparable_now.tzinfo is not None:
-            comparable_price_timestamp = comparable_price_timestamp.replace(tzinfo=comparable_now.tzinfo)
-        elif comparable_price_timestamp.tzinfo is not None and comparable_now.tzinfo is None:
-            comparable_price_timestamp = comparable_price_timestamp.replace(tzinfo=None)
+        # Both aware: subtraction across aware datetimes is correct
+        # regardless of which zones they're each in -- no conversion
+        # needed. Both naive: per this module's established contract
+        # (_as_naive_eastern()'s docstring), a naive datetime is assumed
+        # to already be Eastern Time, so nothing to convert either.
+        # Mixed: the naive one is assumed ET (the same contract) and the
+        # AWARE one is genuinely CONVERTED into Eastern via astimezone()
+        # -- not just relabeled. A prior version used .replace(tzinfo=...)
+        # on whichever side needed it, which silently REINTERPRETS a
+        # timestamp's existing wall-clock numbers as if they were already
+        # in the other zone (e.g. a genuinely UTC quote timestamp treated
+        # as if it were already ET) instead of converting the instant it
+        # actually represents -- a ~4-5 hour error whenever the two
+        # differ (GPT review, 2026-07-29).
+        if price_timestamp.tzinfo is not None and now.tzinfo is None:
+            comparable_price_timestamp = price_timestamp.astimezone(_EASTERN).replace(tzinfo=None)
+            comparable_now = now
+        elif price_timestamp.tzinfo is None and now.tzinfo is not None:
+            comparable_price_timestamp = price_timestamp.replace(tzinfo=_EASTERN)
+            comparable_now = now
+        else:
+            comparable_price_timestamp = price_timestamp
+            comparable_now = now
         age_minutes = (comparable_now - comparable_price_timestamp).total_seconds() / 60
         if age_minutes > max_stale_price_minutes:
             _violate(
                 ViolationCode.STALE_PRICE,
                 f"Reference price is {age_minutes:.1f} minutes old, exceeding the {max_stale_price_minutes:.1f}-minute staleness limit.",
+            )
+        elif age_minutes < -_FUTURE_TIMESTAMP_TOLERANCE_MINUTES:
+            # A negative age (price_timestamp AFTER now) beyond a small
+            # clock-skew tolerance means the timestamp is impossible, not
+            # merely "very fresh" -- only the staleness check existed
+            # before, so a quote timestamp minutes or hours in the future
+            # passed with zero protection (GPT review, 2026-07-29).
+            _violate(
+                ViolationCode.FUTURE_PRICE_TIMESTAMP,
+                f"Reference price timestamp is {abs(age_minutes):.1f} minutes in the FUTURE, exceeding the "
+                f"{_FUTURE_TIMESTAMP_TOLERANCE_MINUTES:.1f}-minute clock-skew tolerance -- refusing to trust "
+                "an impossible timestamp.",
             )
 
     if now is not None:

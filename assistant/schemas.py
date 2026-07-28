@@ -88,6 +88,38 @@ class MarketRegime:
 
 
 @dataclasses.dataclass
+class FindingProvenance:
+    """Reproducibility metadata for a research claim (GPT review finding
+    #8, 2026-07-29): a CONFIRMED or PROMISING_UNCONFIRMED status on its
+    own doesn't say what data actually produced it, or whether that data
+    predates a since-fixed data-loader bug -- this is that record.
+    Required fields (see REQUIRED_PROVENANCE_FIELDS in research_registry.py)
+    are enforced at load time for confirmed/promising findings; the rest
+    are best-effort and may be None when genuinely unknown."""
+
+    actual_start_date: str | None = None
+    actual_end_date: str | None = None
+    actual_row_count: int | None = None
+    requested_lookback_sessions: int | None = None
+    actual_lookback_sessions: int | None = None
+    entry_timing: str | None = None
+    hold_days: int | None = None
+    slippage_pct: float | None = None
+    discovery_frac: float | None = None
+    bootstrap_method: str | None = None
+    block_length_days: int | None = None
+    multiple_testing_denominator: int | None = None
+    data_fetched_at: str | None = None
+    parameter_hash: str | None = None
+    code_commit_hash: str | None = None
+    # Honest reproduction flag -- False means this finding has NOT been
+    # re-verified since the fetch_historical lookback-days bug fix
+    # (commit 9f0ebc1) and must not be treated as current production
+    # authority regardless of its status label.
+    reproduced_after_data_loader_fix: bool = False
+
+
+@dataclasses.dataclass
 class SignalEvidence:
     label: str            # short human name, e.g. "SOXX/SOXL regime rotation -- drawdown reduction"
     claim: str             # the SPECIFIC claim this status applies to
@@ -95,6 +127,7 @@ class SignalEvidence:
     detail: str             # 1-2 sentence summary of the actual finding/numbers
     source: str              # file/memory reference for where this came from
     relevant_tickers: list[str]
+    provenance: FindingProvenance | None = None
 
 
 @dataclasses.dataclass

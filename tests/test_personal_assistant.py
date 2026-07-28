@@ -15,6 +15,7 @@ from assistant.execution_service import (
     PolicyOverridableBlockError,
     ProposalExecutionError,
     execute_approved_paper_proposal,
+    validate_proposal_for_execution,
 )
 from assistant.policy import TradingPolicy, compute_policy_fingerprint, load_policy
 from assistant.proposal_status import POLICY_OVERRIDE_AVAILABLE
@@ -1808,6 +1809,116 @@ def test_recover_stale_reconciliation_leaves_a_recent_in_flight_claim_alone():
         assert store.get_proposal(proposal.proposal_id)["status"] == "reconciling"
 
 
+def _backdate_updated_at(store, proposal_id, seconds_ago):
+    old_timestamp = (datetime.now(timezone.utc) - timedelta(seconds=seconds_ago)).isoformat()
+    conn = sqlite3.connect(store.path)
+    try:
+        conn.execute("UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?", (old_timestamp, proposal_id))
+        conn.commit()
+    finally:
+        conn.close()
+
+
+def test_reclaim_stale_status_writes_status_and_payload_in_one_atomic_call():
+    # GPT review, 2026-07-29: reclaim_stale_status() used to only write
+    # the status/updated_at COLUMNS, leaving the caller
+    # (recover_stale_reconciliation()) to persist audit metadata
+    # (recovered_at/error) via a SEPARATE, unconditional write afterward
+    # -- the exact gap that made the race possible. Now both land
+    # together in the SAME conditional UPDATE.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        store.update_proposal_status(proposal.proposal_id, "submitting")
+        store.claim_proposal(
+            proposal.proposal_id, expected_status=("submitting", "submission_unknown"), new_status="reconciling",
+        )
+        _backdate_updated_at(store, proposal.proposal_id, 1000)
+        cutoff = (datetime.now(timezone.utc) - timedelta(seconds=300)).isoformat()
+
+        recovered = store.reclaim_stale_status(
+            proposal.proposal_id, expected_status="reconciling", new_status="submission_unknown",
+            stale_before=cutoff, extra_updates={"recovered_at": "2026-07-29T00:00:00+00:00", "error": "test-error"},
+        )
+        assert recovered is not None
+        assert recovered["status"] == "submission_unknown"
+        assert recovered["recovered_at"] == "2026-07-29T00:00:00+00:00"
+        assert recovered["error"] == "test-error"
+        # Persisted, not just returned in-memory.
+        stored = store.get_proposal(proposal.proposal_id)
+        assert stored["status"] == "submission_unknown"
+        assert stored["recovered_at"] == "2026-07-29T00:00:00+00:00"
+        assert stored["error"] == "test-error"
+
+
+def test_two_concurrent_stale_recovery_attempts_only_one_succeeds():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        store.update_proposal_status(proposal.proposal_id, "submitting")
+        store.claim_proposal(
+            proposal.proposal_id, expected_status=("submitting", "submission_unknown"), new_status="reconciling",
+        )
+        _backdate_updated_at(store, proposal.proposal_id, 1000)
+        cutoff = (datetime.now(timezone.utc) - timedelta(seconds=300)).isoformat()
+
+        first = store.reclaim_stale_status(
+            proposal.proposal_id, expected_status="reconciling", new_status="submission_unknown",
+            stale_before=cutoff, extra_updates={"recovered_at": "attempt-A"},
+        )
+        second = store.reclaim_stale_status(
+            proposal.proposal_id, expected_status="reconciling", new_status="submission_unknown",
+            stale_before=cutoff, extra_updates={"recovered_at": "attempt-B"},
+        )
+        assert first is not None
+        assert second is None  # the row was no longer "reconciling" by the time this ran
+        assert store.get_proposal(proposal.proposal_id)["recovered_at"] == "attempt-A"
+
+
+def test_recover_stale_reconciliation_never_touches_an_already_resolved_proposal():
+    # The release-blocking regression this fix closes: an EXECUTED
+    # proposal (a real terminal state reached by a different worker)
+    # must never be overwritten back to "submission_unknown" by a stale-
+    # recovery attempt, even one that started against genuinely stale
+    # "reconciling" metadata.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    from assistant.execution_service import recover_stale_reconciliation
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        store.update_proposal_status(proposal.proposal_id, "submitting")
+        store.claim_proposal(
+            proposal.proposal_id, expected_status=("submitting", "submission_unknown"), new_status="reconciling",
+        )
+        _backdate_updated_at(store, proposal.proposal_id, 1000)
+
+        # A different worker resolves it for real in the meantime.
+        store.update_proposal_status(
+            proposal.proposal_id, "executed",
+            executed_at=datetime.now(timezone.utc).isoformat(),
+            broker_order={"order_id": "real-order"},
+        )
+        assert store.get_proposal(proposal.proposal_id)["status"] == "executed"
+
+        try:
+            recover_stale_reconciliation(proposal.proposal_id, store, stale_after_seconds=300)
+            assert False, "expected recovery to refuse an already-resolved (executed) proposal"
+        except ProposalExecutionError as exc:
+            assert "not a stale" in str(exc)
+        record = store.get_proposal(proposal.proposal_id)
+        assert record["status"] == "executed"  # untouched
+        assert record["broker_order"]["order_id"] == "real-order"
+
+
 def test_concurrent_reconciliation_claims_only_one_wins():
     packet = _packet()
     policy = _policy()
@@ -1842,6 +1953,235 @@ def test_reconcile_submission_rejects_a_non_reconcilable_status():
             assert False, "expected reconciliation of a 'proposed' proposal to be rejected"
         except ProposalExecutionError as exc:
             assert "not reconcilable" in str(exc)
+
+
+# --- validate_proposal_for_execution() -- the pure, side-effect-free
+# validation shared by execute_approved_paper_proposal() and
+# preflight_allocation_batch() (GPT review, 2026-07-29: preflight used to
+# duplicate only PART of this, so it could approve a batch the real
+# execution path would then reject for a reason preflight never checked).
+
+def test_validate_proposal_for_execution_rejects_expired_proposal():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    proposal_dict = proposal.to_dict()
+    proposal_dict["expires_at"] = "2020-01-01T00:00:00+00:00"
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal_dict)
+        outcome = validate_proposal_for_execution(
+            proposal.proposal_id, packet.portfolio, policy, store,
+            now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+        )
+        assert not outcome.approved
+        assert "expired" in outcome.error.lower()
+
+
+def test_validate_proposal_for_execution_rejects_policy_version_mismatch():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    other_policy = dataclasses.replace(policy, version="different-version")
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        outcome = validate_proposal_for_execution(
+            proposal.proposal_id, packet.portfolio, other_policy, store,
+            now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+        )
+        assert not outcome.approved
+        assert "policy version" in outcome.error.lower()
+
+
+def test_validate_proposal_for_execution_rejects_policy_fingerprint_mismatch():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    # Same version, DIFFERENT content -- the fingerprint must catch this
+    # even though the version string alone would not.
+    edited_policy = dataclasses.replace(policy, max_position_pct=0.01)
+    edited_policy = dataclasses.replace(edited_policy, version=policy.version)
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        outcome = validate_proposal_for_execution(
+            proposal.proposal_id, packet.portfolio, edited_policy, store,
+            now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+        )
+        assert not outcome.approved
+        assert "fingerprint" in outcome.error.lower()
+
+
+def test_validate_proposal_for_execution_rejects_read_only_execution_mode():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    read_only_policy = dataclasses.replace(policy, execution_mode="read_only")
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        outcome = validate_proposal_for_execution(
+            proposal.proposal_id, packet.portfolio, read_only_policy, store,
+            now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+        )
+        assert not outcome.approved
+        assert "paper execution" in outcome.error.lower()
+
+
+def test_validate_proposal_for_execution_rejects_disallowed_side():
+    # dataclasses.replace() on allowed_sides also changes the policy's
+    # fingerprint, so the proposal's STORED fingerprint must be
+    # recomputed against the modified policy for this test to actually
+    # reach the allowed_sides check rather than failing earlier on a
+    # fingerprint mismatch.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    assert proposal.intent.side == "sell"
+    no_sell_policy = dataclasses.replace(policy, allowed_sides=("buy",))
+    proposal_dict = proposal.to_dict()
+    proposal_dict["policy_fingerprint"] = compute_policy_fingerprint(no_sell_policy)
+    # Mock broker.is_configured() etc. explicitly: relying on the ambient
+    # environment's real credential state is fragile -- a DIFFERENT test
+    # file (test_alpaca_broker.py) deliberately clears the real
+    # APCA_API_KEY_ID/SECRET env vars as part of its own tests and never
+    # restores them, which would otherwise make this test order-dependent
+    # on suite-wide execution order.
+    _, restore = _mock_execution_dependencies(quote_price=10.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal_dict)
+            outcome = validate_proposal_for_execution(
+                proposal.proposal_id, packet.portfolio, no_sell_policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert not outcome.approved
+            assert "not allowed by policy" in outcome.error.lower()
+    finally:
+        restore()
+
+
+def test_validate_proposal_for_execution_rejects_disallowed_order_type():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    no_market_policy = dataclasses.replace(policy, allowed_order_types=("limit",))
+    proposal_dict = proposal.to_dict()
+    proposal_dict["policy_fingerprint"] = compute_policy_fingerprint(no_market_policy)
+    _, restore = _mock_execution_dependencies(quote_price=10.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal_dict)
+            outcome = validate_proposal_for_execution(
+                proposal.proposal_id, packet.portfolio, no_market_policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert not outcome.approved
+            assert "order type" in outcome.error.lower()
+    finally:
+        restore()
+
+
+def test_validate_proposal_for_execution_rejects_new_position_when_disallowed():
+    from assistant.proposals import TradeProposal, _stable_id
+    from risk.execution_gate import TradeIntent
+
+    packet = _packet()
+    policy = _policy()  # allow_new_positions=False by default
+    intent = TradeIntent(ticker="NEWCO", side="buy", shares=1)
+    proposal_id = _stable_id(packet, policy, intent)
+    proposal_dict = TradeProposal(
+        proposal_id=proposal_id, created_at=packet.generated_at, expires_at="2026-12-31T00:00:00+00:00",
+        status="proposed", idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
+        policy_version=policy.version, policy_fingerprint=compute_policy_fingerprint(policy),
+        intent=intent, reference_price=10.0, price_timestamp=packet.generated_at,
+        reasons=["test"], evidence_status="test",
+        expected_impact={"trade_value": 10.0, "position_weight_before_pct": 0, "position_weight_after_pct": 0, "cash_before": 0, "cash_after": 0, "invested_pct_after": 0},
+        alternatives=[], uncertainties=[],
+    ).to_dict()
+    _, restore = _mock_execution_dependencies(quote_price=10.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal_dict)
+            outcome = validate_proposal_for_execution(
+                proposal_id, packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert not outcome.approved
+            assert "new positions is disabled" in outcome.error.lower()
+    finally:
+        restore()
+
+
+def test_validate_proposal_for_execution_rejects_missing_earnings_data_when_required():
+    packet = _packet()
+    policy = dataclasses.replace(_policy(), allow_new_positions=True, require_earnings_data=True)
+    from assistant.proposals import TradeProposal, _stable_id
+    from risk.execution_gate import TradeIntent
+
+    intent = TradeIntent(ticker="ZZZZNOPE", side="buy", shares=1)
+    proposal_id = _stable_id(packet, policy, intent)
+    proposal_dict = TradeProposal(
+        proposal_id=proposal_id, created_at=packet.generated_at, expires_at="2026-12-31T00:00:00+00:00",
+        status="proposed", idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
+        policy_version=policy.version, policy_fingerprint=compute_policy_fingerprint(policy),
+        intent=intent, reference_price=10.0, price_timestamp=packet.generated_at,
+        reasons=["test"], evidence_status="test",
+        expected_impact={"trade_value": 10.0, "position_weight_before_pct": 0, "position_weight_after_pct": 0, "cash_before": 0, "cash_after": 0, "invested_pct_after": 0},
+        alternatives=[], uncertainties=[],
+    ).to_dict()
+    # Mock the quote fetch (so the check under test is actually reached,
+    # not masked by an unrelated "can't fetch a quote for this fake
+    # ticker" failure) and leave earnings unavailable (the default).
+    _, restore = _mock_execution_dependencies(quote_price=10.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal_dict)
+            outcome = validate_proposal_for_execution(
+                proposal_id, packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert not outcome.approved
+            assert "earnings-date data" in outcome.error.lower()
+    finally:
+        restore()
+
+
+def test_validate_proposal_for_execution_agrees_with_batch_preflight():
+    # Parity check: given the SAME state and inputs, batch preflight and
+    # this shared validation must produce the same pass/fail decision --
+    # they now literally share the same underlying function, but this
+    # guards against a future regression reintroducing drift.
+    from assistant.allocation_batch import preflight_allocation_batch
+
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            direct_outcome = validate_proposal_for_execution(
+                proposal.proposal_id, packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            batch_results = preflight_allocation_batch(
+                [proposal.proposal_id], store, policy, packet.portfolio,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert direct_outcome.approved == batch_results[proposal.proposal_id].approved
+            assert direct_outcome.validation is not None
+            assert list(direct_outcome.validation.violation_codes) == list(
+                batch_results[proposal.proposal_id].violation_codes
+            )
+    finally:
+        restore()
 
 
 def test_record_broker_order_failure_after_acceptance_still_marks_executed():

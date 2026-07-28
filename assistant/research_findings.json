@@ -1,6 +1,6 @@
 {
-  "version": "1.0.0",
-  "updated_at": "2026-07-26",
+  "version": "1.1.0",
+  "updated_at": "2026-07-28",
   "findings": [
     {
       "label": "Original z-score dip/up scanner",
@@ -72,7 +72,17 @@
       "status": "confirmed",
       "detail": "Maximum drawdown remained materially lower across confirmation, walk-forward, sensitivity, and tax/cost checks. This is a risk result, not a confirmed excess-return result.",
       "source": "strategies/trend_vol_rotation.py",
-      "relevant_tickers": ["SOXX", "SOXL"]
+      "relevant_tickers": ["SOXX", "SOXL"],
+      "provenance": {
+        "actual_start_date": "2019-07-22",
+        "actual_end_date": "2026-07-28",
+        "actual_row_count": 1764,
+        "requested_lookback_sessions": 1764,
+        "actual_lookback_sessions": 1764,
+        "entry_timing": "next_open",
+        "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
+        "reproduced_after_data_loader_fix": false
+      }
     },
     {
       "label": "Kelly-criterion sizing with one-way profit ratchet",
@@ -88,15 +98,35 @@
       "status": "confirmed",
       "detail": "~89% less tax/turnover for essentially the same performance as continuous vol-targeting.",
       "source": "strategies/vol_target_rotation.py; scripts/run_idea_comparison_soxx_soxl.py",
-      "relevant_tickers": ["SOXX", "SOXL"]
+      "relevant_tickers": ["SOXX", "SOXL"],
+      "provenance": {
+        "actual_start_date": "2019-07-22",
+        "actual_end_date": "2026-07-28",
+        "actual_row_count": 1764,
+        "requested_lookback_sessions": 1764,
+        "actual_lookback_sessions": 1764,
+        "entry_timing": "next_open",
+        "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
+        "reproduced_after_data_loader_fix": false
+      }
     },
     {
       "label": "Volatility-targeted leveraged-ETF rotation — 3-pair validation",
       "claim": "The vol-targeting rotation mechanism generalizes beyond SOXX/SOXL",
       "status": "promising_unconfirmed",
-      "detail": "Same continuous inverse-vol-targeted weighting tested on SPY/UPRO and NVDA/NVDL in addition to SOXX/SOXL, at the user's request, as production candidates. Backtested/designed only -- not yet in live/paper trading.",
+      "detail": "Same continuous inverse-vol-targeted weighting tested on SPY/UPRO and NVDA/NVDL in addition to SOXX/SOXL, at the user's request, as production candidates. Backtested/designed only -- not yet in live/paper trading. NVDL has substantially less real history than the other two pairs (see provenance: 907 rows vs. the 1764 requested) -- the NVDA/NVDL leg of this result is based on a materially shorter, less statistically meaningful window than SOXX/SOXL or SPY/UPRO.",
       "source": "scripts/run_vol_target_rotation_spy_upro.py; scripts/run_vol_target_rotation_nvda_nvdl.py; scripts/run_vol_target_rotation_soxx_soxl.py",
-      "relevant_tickers": ["SOXX", "SOXL", "SPY", "UPRO", "NVDA", "NVDL"]
+      "relevant_tickers": ["SOXX", "SOXL", "SPY", "UPRO", "NVDA", "NVDL"],
+      "provenance": {
+        "actual_start_date": "2022-12-13",
+        "actual_end_date": "2026-07-28",
+        "actual_row_count": 907,
+        "requested_lookback_sessions": 1764,
+        "actual_lookback_sessions": 907,
+        "entry_timing": "next_open",
+        "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
+        "reproduced_after_data_loader_fix": false
+      }
     }
   ]
 }

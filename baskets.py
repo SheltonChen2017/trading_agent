@@ -208,6 +208,7 @@ def compare_baskets_to_market_index(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Per-basket version of compare_signal_to_market_index(): within each
@@ -232,6 +233,7 @@ def compare_baskets_to_market_index(
             volume_z_threshold=volume_z_threshold,
             scan_fn=scan_fn,
             scan_kwargs=scan_kwargs,
+            entry_timing=entry_timing,
         )
         if comparison.empty:
             continue
@@ -262,6 +264,7 @@ def out_of_sample_backtest_by_basket(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """Per-basket version of out_of_sample_backtest()."""
     rows = []
@@ -278,13 +281,14 @@ def out_of_sample_backtest_by_basket(
             volume_z_threshold=volume_z_threshold,
             scan_fn=scan_fn,
             scan_kwargs=scan_kwargs,
+            entry_timing=entry_timing,
         )
         if result.empty:
             continue
         result.insert(0, "basket", basket_name)
         rows.append(result)
 
-    columns = ["basket", "period"] + SUMMARY_COLUMNS
+    columns = ["basket", "period", "entry_timing"] + SUMMARY_COLUMNS
     if not rows:
         return pd.DataFrame(columns=columns)
     return pd.concat(rows, ignore_index=True)[columns]
@@ -300,6 +304,7 @@ def out_of_sample_baseline_by_basket(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """Per-basket version of out_of_sample_baseline_comparison()."""
     rows = []
@@ -316,6 +321,7 @@ def out_of_sample_baseline_by_basket(
             volume_z_threshold=volume_z_threshold,
             scan_fn=scan_fn,
             scan_kwargs=scan_kwargs,
+            entry_timing=entry_timing,
         )
         if result.empty:
             continue
@@ -339,6 +345,7 @@ def out_of_sample_market_by_basket(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """Per-basket version of out_of_sample_market_comparison()."""
     rows = []
@@ -356,6 +363,7 @@ def out_of_sample_market_by_basket(
             volume_z_threshold=volume_z_threshold,
             scan_fn=scan_fn,
             scan_kwargs=scan_kwargs,
+            entry_timing=entry_timing,
         )
         if result.empty:
             continue

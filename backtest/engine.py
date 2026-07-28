@@ -224,6 +224,7 @@ def run_multi_horizon_backtest(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> dict[int, pd.DataFrame]:
     """
     Run run_backtest() once per hold period in `hold_days_options`, so you
@@ -240,23 +241,36 @@ def run_multi_horizon_backtest(
             volume_z_threshold=volume_z_threshold,
             scan_fn=scan_fn,
             scan_kwargs=scan_kwargs,
+            entry_timing=entry_timing,
         )
         for hold_days in hold_days_options
     }
 
 
-def summarize_multi_horizon(results_by_horizon: dict[int, pd.DataFrame]) -> pd.DataFrame:
+def summarize_multi_horizon(
+    results_by_horizon: dict[int, pd.DataFrame], entry_timing: str | None = None,
+) -> pd.DataFrame:
     """
     Combine summarize_backtest() across every horizon in
     run_multi_horizon_backtest()'s output into one table, with
     `hold_days`/`horizon` columns so results can be compared side by side.
+
+    `entry_timing`: this function only processes already-computed
+    results, so it can't know what timing was used to generate them --
+    pass whatever was given to run_multi_horizon_backtest() to stamp it
+    into the output for audit purposes (GPT review, 2026-07-29: report
+    metadata should make timing assumptions auditable, not just correct).
+    Omitted (None) leaves the column out entirely, for callers that don't
+    need it.
     """
-    columns = ["hold_days", "horizon"] + SUMMARY_COLUMNS
+    columns = ["hold_days", "horizon"] + (["entry_timing"] if entry_timing is not None else []) + SUMMARY_COLUMNS
     rows = []
     for hold_days, results in results_by_horizon.items():
         summary = summarize_backtest(results)
         if summary.empty:
             continue
+        if entry_timing is not None:
+            summary.insert(0, "entry_timing", entry_timing)
         summary.insert(0, "horizon", HORIZON_LABELS.get(hold_days, f"{hold_days}d"))
         summary.insert(0, "hold_days", hold_days)
         rows.append(summary)
@@ -335,6 +349,7 @@ def compare_signal_to_baseline(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     For each hold period, compare the flagged signals' returns against the
@@ -354,8 +369,11 @@ def compare_signal_to_baseline(
             volume_z_threshold=volume_z_threshold,
             scan_fn=scan_fn,
             scan_kwargs=scan_kwargs,
+            entry_timing=entry_timing,
         )
-        baseline = run_baseline_forward_returns(data, hold_days=hold_days, slippage_pct=slippage_pct)
+        baseline = run_baseline_forward_returns(
+            data, hold_days=hold_days, slippage_pct=slippage_pct, entry_timing=entry_timing,
+        )
         baseline_stats = _return_stats(baseline["net_return_pct"])
 
         for direction in ("dip", "up"):
@@ -371,6 +389,7 @@ def compare_signal_to_baseline(
                     "hold_days": hold_days,
                     "horizon": HORIZON_LABELS.get(hold_days, f"{hold_days}d"),
                     "direction": direction,
+                    "entry_timing": entry_timing,
                     "signal_count": signal_stats["count"],
                     "signal_win_rate_pct": signal_stats["win_rate_pct"],
                     "signal_mean_return_pct": signal_stats["mean_net_return_pct"],
@@ -385,7 +404,7 @@ def compare_signal_to_baseline(
 
 
 PER_TICKER_COMPARISON_COLUMNS = [
-    "hold_days", "horizon", "direction", "signal_count",
+    "hold_days", "horizon", "direction", "entry_timing", "signal_count",
     "signal_mean_return_pct", "mean_own_ticker_baseline_pct",
     "mean_edge_vs_own_ticker_pct", "pct_signals_beating_own_ticker_baseline",
 ]
@@ -504,6 +523,7 @@ def compare_signal_to_baseline_per_ticker(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Like compare_signal_to_baseline(), but each flagged signal is matched
@@ -532,7 +552,8 @@ def compare_signal_to_baseline_per_ticker(
     rows = []
     for hold_days in hold_days_options:
         results = _signals_with_own_ticker_baseline(
-            data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+            data, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs,
+            entry_timing=entry_timing,
         )
 
         for direction in ("dip", "up"):
@@ -544,6 +565,7 @@ def compare_signal_to_baseline_per_ticker(
                         "hold_days": hold_days,
                         "horizon": HORIZON_LABELS.get(hold_days, f"{hold_days}d"),
                         "direction": direction,
+                        "entry_timing": entry_timing,
                         "signal_count": 0,
                         "signal_mean_return_pct": None,
                         "mean_own_ticker_baseline_pct": None,
@@ -558,6 +580,7 @@ def compare_signal_to_baseline_per_ticker(
                     "hold_days": hold_days,
                     "horizon": HORIZON_LABELS.get(hold_days, f"{hold_days}d"),
                     "direction": direction,
+                    "entry_timing": entry_timing,
                     "signal_count": len(subset),
                     "signal_mean_return_pct": round(subset["net_return_pct"].mean(), 3),
                     "mean_own_ticker_baseline_pct": round(subset["own_ticker_baseline_pct"].mean(), 3),
@@ -575,7 +598,7 @@ def compare_signal_to_baseline_per_ticker(
 
 
 MARKET_COMPARISON_COLUMNS = [
-    "hold_days", "horizon", "direction", "signal_count",
+    "hold_days", "horizon", "direction", "entry_timing", "signal_count",
     "signal_mean_return_pct", "mean_market_return_pct",
     "mean_edge_vs_market_pct", "pct_signals_beating_market",
 ]
@@ -585,18 +608,42 @@ def compute_benchmark_forward_returns(
     benchmark_df: pd.DataFrame,
     hold_days: int = BACKTEST_HOLD_DAYS,
     slippage_pct: float = SLIPPAGE_PCT,
+    entry_timing: str = "next_open",
 ) -> pd.Series:
     """
     Forward return of a single reference series (e.g. SPY, QQQ) over
-    `hold_days`, indexed by date — the same math as
+    `hold_days`, indexed by the ORIGINAL signal date -- the same math as
     run_baseline_forward_returns(), applied to one benchmark instead of a
     universe of stocks. Used to check whether a signal beat the broad
     market on the EXACT SAME days it fired, the strictest baseline of the
     three this project computes (own history -> own ticker's baseline ->
     the whole market on that specific date).
+
+    `entry_timing` MUST match whatever was passed to run_backtest() for
+    the signal side of the comparison -- this used to always compute a
+    same-close-to-close return regardless of what timing the signal
+    itself used, so a next_open signal (enter next day's open, exit
+    `hold_days` opens later) was compared against a same-close-to-close
+    benchmark return indexed by the signal date -- different entry
+    price, different exit price, and a shifted holding window entirely
+    (GPT review, 2026-07-29). Mirrors run_baseline_forward_returns()'s
+    three modes exactly; the returned Series stays indexed by the
+    ORIGINAL row date in every mode so it still maps onto signal rows by
+    that date regardless of when the benchmark leg itself actually
+    starts/ends.
     """
-    forward_close = benchmark_df["close"].shift(-hold_days)
-    raw_return_pct = (forward_close - benchmark_df["close"]) / benchmark_df["close"] * 100
+    if entry_timing not in ("same_close", "next_open", "same_day_open_to_close"):
+        raise ValueError(
+            f"entry_timing must be 'same_close', 'next_open', or 'same_day_open_to_close', got {entry_timing!r}"
+        )
+
+    if entry_timing == "same_close":
+        entry_price, forward_price = benchmark_df["close"], benchmark_df["close"].shift(-hold_days)
+    elif entry_timing == "same_day_open_to_close":
+        entry_price, forward_price = benchmark_df["open"], benchmark_df["close"]
+    else:  # next_open
+        entry_price, forward_price = benchmark_df["open"].shift(-1), benchmark_df["open"].shift(-(1 + hold_days))
+    raw_return_pct = (forward_price - entry_price) / entry_price * 100
     net_return_pct = raw_return_pct - 2 * slippage_pct * 100
     return net_return_pct.dropna()
 
@@ -610,6 +657,7 @@ def _signals_with_market_edge(
     volume_z_threshold: float,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Per-signal detail shared by compare_signal_to_market_index() and
@@ -617,6 +665,11 @@ def _signals_with_market_edge(
     with what the benchmark returned starting that EXACT signal date
     (market_return_pct, edge_vs_market_pct). Signals whose date falls
     outside the benchmark's own history are dropped, not miscounted.
+
+    `entry_timing` is passed to BOTH run_backtest() (the signal leg) and
+    compute_benchmark_forward_returns() (the benchmark leg) -- they must
+    always match (GPT review, 2026-07-29; see compute_benchmark_forward_
+    returns()'s docstring for what went wrong when they didn't).
     """
     results = run_backtest(
         data,
@@ -626,8 +679,11 @@ def _signals_with_market_edge(
         volume_z_threshold=volume_z_threshold,
         scan_fn=scan_fn,
         scan_kwargs=scan_kwargs,
+        entry_timing=entry_timing,
     )
-    benchmark_returns = compute_benchmark_forward_returns(benchmark_df, hold_days=hold_days, slippage_pct=slippage_pct)
+    benchmark_returns = compute_benchmark_forward_returns(
+        benchmark_df, hold_days=hold_days, slippage_pct=slippage_pct, entry_timing=entry_timing,
+    )
 
     if not results.empty:
         results = results.copy()
@@ -647,6 +703,7 @@ def compare_signal_to_market_index(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     For each hold period, match every flagged signal to what the market
@@ -661,7 +718,8 @@ def compare_signal_to_market_index(
     rows = []
     for hold_days in hold_days_options:
         results = _signals_with_market_edge(
-            data, benchmark_df, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+            data, benchmark_df, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs,
+            entry_timing=entry_timing,
         )
 
         for direction in ("dip", "up"):
@@ -673,6 +731,7 @@ def compare_signal_to_market_index(
                         "hold_days": hold_days,
                         "horizon": HORIZON_LABELS.get(hold_days, f"{hold_days}d"),
                         "direction": direction,
+                        "entry_timing": entry_timing,
                         "signal_count": 0,
                         "signal_mean_return_pct": None,
                         "mean_market_return_pct": None,
@@ -687,6 +746,7 @@ def compare_signal_to_market_index(
                     "hold_days": hold_days,
                     "horizon": HORIZON_LABELS.get(hold_days, f"{hold_days}d"),
                     "direction": direction,
+                    "entry_timing": entry_timing,
                     "signal_count": len(subset),
                     "signal_mean_return_pct": round(subset["net_return_pct"].mean(), 3),
                     "mean_market_return_pct": round(subset["market_return_pct"].mean(), 3),
@@ -753,6 +813,7 @@ def out_of_sample_backtest(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Out-of-sample version of summarize_backtest(): splits run_backtest()'s
@@ -768,8 +829,9 @@ def out_of_sample_backtest(
         volume_z_threshold=volume_z_threshold,
         scan_fn=scan_fn,
         scan_kwargs=scan_kwargs,
+        entry_timing=entry_timing,
     )
-    columns = ["period"] + SUMMARY_COLUMNS
+    columns = ["period", "entry_timing"] + SUMMARY_COLUMNS
     if results.empty:
         return pd.DataFrame(columns=columns)
 
@@ -780,6 +842,7 @@ def out_of_sample_backtest(
         summary = summarize_backtest(subset)
         if summary.empty:
             continue
+        summary.insert(0, "entry_timing", entry_timing)
         summary.insert(0, "period", period)
         rows.append(summary)
 
@@ -789,7 +852,7 @@ def out_of_sample_backtest(
 
 
 OUT_OF_SAMPLE_BASELINE_COLUMNS = [
-    "period", "direction", "signal_count",
+    "period", "direction", "entry_timing", "signal_count",
     "mean_edge_vs_own_ticker_pct", "pct_signals_beating_own_ticker_baseline",
 ]
 
@@ -803,6 +866,7 @@ def out_of_sample_baseline_comparison(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Out-of-sample version of compare_signal_to_baseline_per_ticker(): the
@@ -812,7 +876,8 @@ def out_of_sample_baseline_comparison(
     _out_of_sample_own_ticker_detail()).
     """
     discovery, confirmation = _out_of_sample_own_ticker_detail(
-        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+        data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs,
+        entry_timing=entry_timing,
     )
     if discovery.empty and confirmation.empty:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_BASELINE_COLUMNS)
@@ -827,6 +892,7 @@ def out_of_sample_baseline_comparison(
                 {
                     "period": period,
                     "direction": direction,
+                    "entry_timing": entry_timing,
                     "signal_count": len(d),
                     "mean_edge_vs_own_ticker_pct": round(d["edge_vs_own_ticker_pct"].mean(), 3),
                     "pct_signals_beating_own_ticker_baseline": round((d["edge_vs_own_ticker_pct"] > 0).mean() * 100, 1),
@@ -839,7 +905,7 @@ def out_of_sample_baseline_comparison(
 
 
 OUT_OF_SAMPLE_MARKET_COLUMNS = [
-    "period", "direction", "signal_count",
+    "period", "direction", "entry_timing", "signal_count",
     "mean_edge_vs_market_pct", "pct_signals_beating_market",
 ]
 
@@ -854,6 +920,7 @@ def out_of_sample_market_comparison(
     volume_z_threshold: float = VOLUME_Z_THRESHOLD,
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
+    entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
     Out-of-sample version of compare_signal_to_market_index(): the
@@ -861,7 +928,8 @@ def out_of_sample_market_comparison(
     (holdout) period never used to find anything.
     """
     detailed = _signals_with_market_edge(
-        data, benchmark_df, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs
+        data, benchmark_df, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs,
+        entry_timing=entry_timing,
     )
     if detailed.empty:
         return pd.DataFrame(columns=OUT_OF_SAMPLE_MARKET_COLUMNS)
@@ -878,6 +946,7 @@ def out_of_sample_market_comparison(
                 {
                     "period": period,
                     "direction": direction,
+                    "entry_timing": entry_timing,
                     "signal_count": len(d),
                     "mean_edge_vs_market_pct": round(d["edge_vs_market_pct"].mean(), 3),
                     "pct_signals_beating_market": round((d["edge_vs_market_pct"] > 0).mean() * 100, 1),

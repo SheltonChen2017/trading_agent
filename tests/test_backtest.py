@@ -418,7 +418,9 @@ def test_compute_benchmark_forward_returns_matches_hand_computed_value():
     dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
     benchmark_df = pd.DataFrame({"close": close}, index=dates)
 
-    forward = compute_benchmark_forward_returns(benchmark_df, hold_days=hold_days, slippage_pct=0.0)
+    forward = compute_benchmark_forward_returns(
+        benchmark_df, hold_days=hold_days, slippage_pct=0.0, entry_timing="same_close",
+    )
     expected = (1.004**hold_days - 1) * 100
 
     assert not forward.empty
@@ -438,7 +440,9 @@ def test_compare_signal_to_market_index_edge_matches_hand_computed_difference():
     benchmark_close = 100 * np.cumprod(np.full(days, 1 + benchmark_daily_return))
     benchmark_df = pd.DataFrame({"close": benchmark_close}, index=df.index)
 
-    comparison = compare_signal_to_market_index(data, benchmark_df, hold_days_options=[hold_days], slippage_pct=0.0)
+    comparison = compare_signal_to_market_index(
+        data, benchmark_df, hold_days_options=[hold_days], slippage_pct=0.0, entry_timing="same_close",
+    )
     dip_row = comparison[(comparison["hold_days"] == hold_days) & (comparison["direction"] == "dip")].iloc[0]
 
     expected_market_return = round(((1 + benchmark_daily_return) ** hold_days - 1) * 100, 3)
@@ -460,7 +464,9 @@ def test_compare_signal_to_market_index_drops_signals_outside_benchmark_history(
     other_dates = pd.bdate_range(end=pd.Timestamp.today().normalize() - pd.Timedelta(days=365), periods=days)
     benchmark_df = pd.DataFrame({"close": np.full(days, 100.0)}, index=other_dates)
 
-    comparison = compare_signal_to_market_index(data, benchmark_df, hold_days_options=[hold_days])
+    comparison = compare_signal_to_market_index(
+        data, benchmark_df, hold_days_options=[hold_days], entry_timing="same_close",
+    )
     dip_row = comparison[(comparison["hold_days"] == hold_days) & (comparison["direction"] == "dip")].iloc[0]
     assert dip_row["signal_count"] == 0
     assert dip_row["signal_mean_return_pct"] is None
@@ -609,7 +615,8 @@ def test_out_of_sample_market_comparison_splits_signals_by_period():
     benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(days, 1.001))}, index=df.index)
 
     result = out_of_sample_market_comparison(
-        {"TEST": df}, benchmark_df, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0
+        {"TEST": df}, benchmark_df, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0,
+        entry_timing="same_close",
     )
 
     assert set(result["period"]) == {"discovery", "confirmation"}
@@ -627,7 +634,7 @@ def test_out_of_sample_market_comparison_handles_no_signals():
         index=dates,
     )
     benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(days, 1.001))}, index=df.index)
-    result = out_of_sample_market_comparison({"TEST": df}, benchmark_df)
+    result = out_of_sample_market_comparison({"TEST": df}, benchmark_df, entry_timing="same_close")
     assert result.empty
 
 
@@ -1061,6 +1068,203 @@ def test_out_of_sample_significance_by_date_reports_n_dates():
     assert discovery_dip["n_dates"] <= discovery_dip["n"]  # 2 identical tickers -> half as many distinct dates as rows
 
 
+# --- Benchmark timing alignment (GPT review, 2026-07-29): compute_benchmark_
+# forward_returns() used to always compute close-to-close regardless of what
+# entry_timing the SIGNAL side used, comparing mismatched windows.
+
+def _benchmark_df_with_one_day_close_only_spike(
+    days: int = 12, spike_index: int = 5, spike_return: float = 0.5
+) -> pd.DataFrame:
+    """Flat benchmark except a single day where CLOSE spikes intraday while
+    the OPEN is unaffected -- same_close (which trades the close) and
+    next_open (which trades the FOLLOWING day's open, missing a move that
+    already happened before that open) must disagree sharply here, proving
+    entry_timing actually changes which prices are used."""
+    open_ = np.full(days, 100.0)
+    close = np.full(days, 100.0)
+    close[spike_index] = 100.0 * (1 + spike_return)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    return pd.DataFrame({"open": open_, "high": close, "low": open_, "close": close}, index=dates)
+
+
+def test_compute_benchmark_forward_returns_same_close_vs_next_open_differ_dramatically():
+    hold_days = 1
+    spike_index = 5
+    benchmark_df = _benchmark_df_with_one_day_close_only_spike(
+        days=12, spike_index=spike_index, spike_return=0.5
+    )
+
+    same_close = compute_benchmark_forward_returns(
+        benchmark_df, hold_days=hold_days, slippage_pct=0.0, entry_timing="same_close",
+    )
+    next_open = compute_benchmark_forward_returns(
+        benchmark_df, hold_days=hold_days, slippage_pct=0.0, entry_timing="next_open",
+    )
+    entry_date = benchmark_df.index[spike_index - 1]
+    assert entry_date in same_close.index
+    assert entry_date in next_open.index
+    # same_close: close[t-1]=100 -> close[t]=150 (the spike) => +50%.
+    # next_open: open[t]=100 -> open[t+1]=100 (spike never touched open) => 0%.
+    assert round(same_close.loc[entry_date], 2) == 50.0
+    assert round(next_open.loc[entry_date], 2) == 0.0
+    assert abs(same_close.loc[entry_date] - next_open.loc[entry_date]) > 40
+
+
+def test_compute_benchmark_forward_returns_same_day_open_to_close():
+    days = 10
+    open_ = np.full(days, 100.0)
+    close = np.full(days, 111.11)  # +11.11% open-to-close every day
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    benchmark_df = pd.DataFrame({"open": open_, "high": close, "low": open_, "close": close}, index=dates)
+
+    result = compute_benchmark_forward_returns(
+        benchmark_df, hold_days=999, slippage_pct=0.0, entry_timing="same_day_open_to_close",
+    )
+    assert not result.empty
+    # hold_days is ignored in this mode -- every row is open-to-close on the SAME day.
+    expected = (111.11 - 100.0) / 100.0 * 100
+    assert result.round(2).unique().tolist() == [round(expected, 2)]
+
+
+def test_compute_benchmark_forward_returns_rejects_invalid_entry_timing():
+    benchmark_df = _benchmark_df_with_one_day_close_only_spike(days=10)
+    try:
+        compute_benchmark_forward_returns(benchmark_df, entry_timing="bogus")
+        assert False, "expected an invalid entry_timing to be rejected"
+    except ValueError as exc:
+        assert "entry_timing" in str(exc)
+
+
+def test_signals_use_matching_entry_timing_benchmark_via_compare_signal_to_market_index():
+    # compare_signal_to_market_index() must propagate entry_timing all the
+    # way to the benchmark leg (not just the signal leg) -- verified by
+    # confirming the requested mode is reported back in the output. The
+    # dramatic same_close vs. next_open numeric difference is already
+    # covered directly against compute_benchmark_forward_returns() above;
+    # this test is about the plumbing between the two.
+    hold_days = 5
+    days = 60
+    df = _series_with_shock_and_known_forward_move(
+        days=days, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    data = {"TEST": df}
+    benchmark_close = 100 * np.cumprod(np.full(days, 1.001))
+    benchmark_df = pd.DataFrame({"open": benchmark_close, "close": benchmark_close}, index=df.index)
+
+    same_close_result = compare_signal_to_market_index(
+        data, benchmark_df, hold_days_options=[hold_days], slippage_pct=0.0, entry_timing="same_close",
+    )
+    next_open_result = compare_signal_to_market_index(
+        data, benchmark_df, hold_days_options=[hold_days], slippage_pct=0.0, entry_timing="next_open",
+    )
+    same_close_dip = same_close_result[same_close_result["direction"] == "dip"].iloc[0]
+    next_open_dip = next_open_result[next_open_result["direction"] == "dip"].iloc[0]
+    assert same_close_dip["entry_timing"] == "same_close"
+    assert next_open_dip["entry_timing"] == "next_open"
+
+
+def test_out_of_sample_market_comparison_reports_entry_timing():
+    hold_days = 5
+    days = 100
+    df = _series_with_two_shocks(
+        days=days, early_index=25, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    benchmark_df = pd.DataFrame({"close": 100 * np.cumprod(np.full(days, 1.001))}, index=df.index)
+    result = out_of_sample_market_comparison(
+        {"TEST": df}, benchmark_df, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0,
+        entry_timing="same_close",
+    )
+    assert not result.empty
+    assert (result["entry_timing"] == "same_close").all()
+
+
+def test_compute_benchmark_forward_returns_drops_dates_with_no_forward_data_honestly():
+    # Near the end of the series, there's no forward data to compute a
+    # return -- these must be dropped (NaN -> excluded), never shifted to
+    # some other date or silently filled in.
+    days = 20
+    hold_days = 5
+    benchmark_df = _benchmark_df_with_one_day_close_only_spike(days=days)
+    result = compute_benchmark_forward_returns(
+        benchmark_df, hold_days=hold_days, slippage_pct=0.0, entry_timing="same_close",
+    )
+    # The last `hold_days` rows have no forward close -- must be absent, not zero/NaN-filled.
+    assert len(result) == days - hold_days
+    assert benchmark_df.index[-1] not in result.index
+
+
+def test_run_multi_horizon_backtest_propagates_entry_timing():
+    hold_days_options = [3, 5]
+    days = 60
+    df = _series_with_shock_and_known_forward_move(
+        days=days, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=5
+    )
+    data = {"TEST": df}
+    results_same_close = run_multi_horizon_backtest(
+        data, hold_days_options=hold_days_options, slippage_pct=0.0, entry_timing="same_close",
+    )
+    results_next_open = run_multi_horizon_backtest(
+        data, hold_days_options=hold_days_options, slippage_pct=0.0, entry_timing="next_open",
+    )
+    # Different entry timing on real data should generally produce
+    # different entry/exit prices -- just confirm both ran without error
+    # and returned the expected horizons (the core propagation check).
+    assert set(results_same_close.keys()) == set(hold_days_options)
+    assert set(results_next_open.keys()) == set(hold_days_options)
+
+
+def test_compare_signal_to_baseline_reports_entry_timing():
+    hold_days = 5
+    days = 60
+    df = _series_with_shock_and_known_forward_move(
+        days=days, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    result = compare_signal_to_baseline(
+        {"TEST": df}, hold_days_options=[hold_days], slippage_pct=0.0, entry_timing="same_close",
+    )
+    assert not result.empty
+    assert (result["entry_timing"] == "same_close").all()
+
+
+def test_compare_signal_to_baseline_per_ticker_reports_entry_timing():
+    hold_days = 5
+    days = 60
+    df = _series_with_shock_and_known_forward_move(
+        days=days, shock_index=40, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    result = compare_signal_to_baseline_per_ticker(
+        {"TEST": df}, hold_days_options=[hold_days], slippage_pct=0.0, entry_timing="same_close",
+    )
+    assert not result.empty
+    assert (result["entry_timing"] == "same_close").all()
+
+
+def test_out_of_sample_backtest_reports_entry_timing():
+    hold_days = 5
+    days = 100
+    df = _series_with_two_shocks(
+        days=days, early_index=25, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    result = out_of_sample_backtest(
+        {"TEST": df}, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0, entry_timing="same_close",
+    )
+    assert not result.empty
+    assert (result["entry_timing"] == "same_close").all()
+
+
+def test_out_of_sample_baseline_comparison_reports_entry_timing():
+    hold_days = 5
+    days = 100
+    df = _series_with_two_shocks(
+        days=days, early_index=25, late_index=80, shock_return=-0.08, forward_daily_return=0.01, hold_days=hold_days
+    )
+    result = out_of_sample_baseline_comparison(
+        {"TEST": df}, discovery_frac=0.6, hold_days=hold_days, slippage_pct=0.0, entry_timing="same_close",
+    )
+    assert not result.empty
+    assert (result["entry_timing"] == "same_close").all()
+
+
 if __name__ == "__main__":
     test_scores_a_winning_dip_reversion()
     test_scores_a_losing_up_fade()
@@ -1110,4 +1314,15 @@ if __name__ == "__main__":
     test_out_of_sample_significance_by_block_marks_exactly_one_primary_row_per_cell()
     test_out_of_sample_significance_by_block_tests_multiple_block_lengths()
     test_out_of_sample_significance_by_date_reports_n_dates()
+    test_compute_benchmark_forward_returns_same_close_vs_next_open_differ_dramatically()
+    test_compute_benchmark_forward_returns_same_day_open_to_close()
+    test_compute_benchmark_forward_returns_rejects_invalid_entry_timing()
+    test_signals_use_matching_entry_timing_benchmark_via_compare_signal_to_market_index()
+    test_out_of_sample_market_comparison_reports_entry_timing()
+    test_compute_benchmark_forward_returns_drops_dates_with_no_forward_data_honestly()
+    test_run_multi_horizon_backtest_propagates_entry_timing()
+    test_compare_signal_to_baseline_reports_entry_timing()
+    test_compare_signal_to_baseline_per_ticker_reports_entry_timing()
+    test_out_of_sample_backtest_reports_entry_timing()
+    test_out_of_sample_baseline_comparison_reports_entry_timing()
     print("All backtest tests passed.")

@@ -12,6 +12,7 @@ import pandas as pd
 
 import assistant.stock_lookup as stock_lookup
 from assistant.stock_lookup import (
+    compute_blended_volatility,
     historical_hold_period_range,
     inverse_volatility_weights,
     latest_price_targets_by_firm,
@@ -71,6 +72,76 @@ def test_inverse_volatility_weights_empty_input():
     assert inverse_volatility_weights({}) == {}
 
 
+def test_inverse_volatility_weights_max_weight_cap_redistributes_excess():
+    # Regression test (GPT review, 2026-07-27): an unusually calm ticker's
+    # raw inverse-vol share can otherwise dominate the split with no
+    # limit. CALM (vol=1.0) vs two WILD tickers (vol=4.0 each) would
+    # normally give CALM ~66.7%; capped at 40%, the excess should be
+    # redistributed to the two WILD tickers proportionally (equally,
+    # since they're identical).
+    weights = inverse_volatility_weights({"CALM": 1.0, "WILD1": 4.0, "WILD2": 4.0}, max_weight_pct=40.0)
+    assert weights["CALM"] == 40.0
+    assert abs(sum(weights.values()) - 100.0) < 0.01
+    assert abs(weights["WILD1"] - weights["WILD2"]) < 0.01
+    assert weights["WILD1"] > 25.0  # each got a share of CALM's redistributed excess
+
+
+def test_inverse_volatility_weights_no_cap_when_max_weight_pct_is_none():
+    uncapped = inverse_volatility_weights({"CALM": 1.0, "WILD": 4.0})
+    capped_high = inverse_volatility_weights({"CALM": 1.0, "WILD": 4.0}, max_weight_pct=99.0)
+    assert uncapped == capped_high  # cap far above the natural split changes nothing
+
+
+def test_inverse_volatility_weights_cap_below_natural_split_caps_every_ticker_at_it():
+    # An infeasible cap (max_weight_pct * n_tickers < 100) can't be fully
+    # satisfied -- every ticker ends up AT the cap, weights won't sum to
+    # 100. Documented behavior, not a silent bug.
+    weights = inverse_volatility_weights({"A": 1.0, "B": 1.0, "C": 1.0}, max_weight_pct=20.0)
+    assert all(w == 20.0 for w in weights.values())
+
+
+def test_compute_blended_volatility_between_short_and_medium_estimates():
+    rng = np.random.default_rng(0)
+    days = 120
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days)
+    # Quiet for the first 100 days, then a choppier last 20 -- short-term
+    # (20d) vol should be noticeably higher than medium-term (60d), and
+    # the blend should land strictly between the two.
+    returns = np.concatenate([rng.normal(0, 0.002, days - 20), rng.normal(0, 0.02, 20)])
+    close = pd.Series(100 * np.cumprod(1 + returns), index=dates)
+    as_of = dates[-1]
+
+    from signals.regime import compute_trailing_market_volatility
+
+    short_vol = compute_trailing_market_volatility(pd.DataFrame({"close": close}), as_of, lookback_days=20)
+    medium_vol = compute_trailing_market_volatility(pd.DataFrame({"close": close}), as_of, lookback_days=60)
+    blended = compute_blended_volatility(close, as_of, short_days=20, medium_days=60, short_weight=0.5)
+
+    assert short_vol > medium_vol  # the injected shock made the recent window choppier
+    assert medium_vol < blended < short_vol
+
+
+def test_compute_blended_volatility_falls_back_to_single_window_if_only_one_available():
+    days = 25  # enough for a 20-day window, not enough for 60-day
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days)
+    rng = np.random.default_rng(1)
+    close = pd.Series(100 * np.cumprod(1 + rng.normal(0, 0.005, days)), index=dates)
+    as_of = dates[-1]
+
+    from signals.regime import compute_trailing_market_volatility
+
+    short_vol = compute_trailing_market_volatility(pd.DataFrame({"close": close}), as_of, lookback_days=20)
+    blended = compute_blended_volatility(close, as_of, short_days=20, medium_days=60)
+    assert blended == short_vol
+
+
+def test_compute_blended_volatility_none_when_insufficient_history():
+    days = 5
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days)
+    close = pd.Series(np.full(days, 100.0), index=dates)
+    assert compute_blended_volatility(close, dates[-1], short_days=20, medium_days=60) is None
+
+
 def test_latest_price_targets_by_firm_groups_and_sorts_by_recency(monkeypatch):
     dates = pd.to_datetime(["2026-01-01", "2026-03-01", "2026-02-01"])
     history = pd.DataFrame(
@@ -103,4 +174,10 @@ if __name__ == "__main__":
     test_inverse_volatility_weights_favors_lower_vol()
     test_inverse_volatility_weights_equal_when_all_unknown()
     test_inverse_volatility_weights_empty_input()
+    test_inverse_volatility_weights_max_weight_cap_redistributes_excess()
+    test_inverse_volatility_weights_no_cap_when_max_weight_pct_is_none()
+    test_inverse_volatility_weights_cap_below_natural_split_caps_every_ticker_at_it()
+    test_compute_blended_volatility_between_short_and_medium_estimates()
+    test_compute_blended_volatility_falls_back_to_single_window_if_only_one_available()
+    test_compute_blended_volatility_none_when_insufficient_history()
     print("All stock_lookup tests passed (run via pytest for the monkeypatch-based tests).")

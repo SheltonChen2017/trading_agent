@@ -400,7 +400,9 @@ def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict
     orders, keyed by ticker -- fed into validate_trade_intent()'s
     exposure/concentration checks, which otherwise only see FILLED
     positions and are blind to money already committed by a pending order
-    (Codex review, 2026-07-27). Prefers exact values already on the order
+    (Codex review, 2026-07-27). Risk-adjacent but intentionally NOT in
+    risk/execution_gate.py -- see that module's "Known scatter points"
+    note and docs/ARCHITECTURE_DEBT.md. Prefers exact values already on the order
     (notional, or shares * limit_price for a limit order); for a plain
     market buy order (no price on the order itself) falls back to one
     live quote per such order.

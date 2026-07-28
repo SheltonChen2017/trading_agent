@@ -194,6 +194,10 @@ def preflight_allocation_batch(
     independently against the SAME starting snapshot, so preflight could
     approve a batch that execution would then partially reject).
 
+    This cross-leg reservation math is risk-adjacent but intentionally NOT
+    in risk/execution_gate.py -- see that module's "Known scatter points"
+    note and docs/ARCHITECTURE_DEBT.md.
+
     Accounting invariant (GPT review, 2026-07-29 follow-up -- a second
     bug in the FIRST fix for the above): each existing position, real
     pending order, and simulated earlier batch leg must contribute

@@ -16,6 +16,7 @@ numbers already provided by the caller — no LLM involved.
 from __future__ import annotations
 
 import dataclasses
+import enum
 import hashlib
 import hmac
 import json
@@ -59,36 +60,115 @@ class TradeIntent:
     rationale: str = ""
 
 
+class ViolationCode(str, enum.Enum):
+    """Stable, machine-checkable identity for each violation type -- the
+    security-relevant data authorize_overridden_trade_intent() below
+    actually trusts. Human-readable message TEXT (ValidationResult.
+    violations) is display-only and never used to decide override
+    eligibility (2026-07-28, GPT review: a prior version derived
+    eligibility from a separately-stored, unsigned `overridable_violations`
+    list of plain message strings -- dataclasses.replace() could swap a
+    hard rejection's content for override-eligible-looking text while
+    keeping a validly-signed proof, since the proof never covered that
+    field at all)."""
+
+    KILL_SWITCH = "kill_switch"
+    INVALID_SHARES = "invalid_shares"
+    INVALID_SIDE = "invalid_side"
+    INVALID_ORDER_TYPE = "invalid_order_type"
+    INVALID_REFERENCE_PRICE = "invalid_reference_price"
+    MAX_ORDER_VALUE = "max_order_value"
+    INVALID_PENDING_VALUE = "invalid_pending_value"
+    MAX_POSITION_PCT = "max_position_pct"
+    INSUFFICIENT_CASH = "insufficient_cash"
+    MIN_CASH_RESERVE = "min_cash_reserve"
+    MAX_TOTAL_EXPOSURE_PCT = "max_total_exposure_pct"
+    MAX_BASKET_PCT = "max_basket_pct"
+    MAX_LEVERAGED_ETF_PCT = "max_leveraged_etf_pct"
+    SELL_EXCEEDS_HELD = "sell_exceeds_held"
+    STALE_PRICE = "stale_price"
+    MARKET_CLOSED = "market_closed"
+    OUTSIDE_TRADING_SESSION = "outside_trading_session"
+    DUPLICATE_ORDER = "duplicate_order"
+    INVALID_LIMIT_PRICE = "invalid_limit_price"
+    MAX_SLIPPAGE = "max_slippage"
+    INVALID_QUOTE = "invalid_quote"
+    MAX_SPREAD = "max_spread"
+    EARNINGS_BLACKOUT = "earnings_blackout"
+
+
+# The ONLY violation codes authorize_overridden_trade_intent() will ever
+# let a human knowingly proceed past: deliberate risk-preference or
+# business-calendar calls, not data-integrity/safety issues. This is a
+# fixed module-level constant, not per-result instance data -- there is
+# nothing here for a caller to mutate or replace (2026-07-28, GPT review).
+OVERRIDABLE_VIOLATION_CODES: frozenset[ViolationCode] = frozenset(
+    {
+        ViolationCode.MAX_POSITION_PCT,
+        ViolationCode.MAX_TOTAL_EXPOSURE_PCT,
+        ViolationCode.MAX_BASKET_PCT,
+        ViolationCode.MAX_LEVERAGED_ETF_PCT,
+        ViolationCode.EARNINGS_BLACKOUT,
+    }
+)
+
+
 @dataclasses.dataclass(frozen=True)
 class ValidationResult:
     approved: bool
-    violations: list[str]
-    # Subset of `violations` that are a deliberate risk-preference or
-    # business-calendar call (position/total-exposure/basket/leveraged-ETF
-    # concentration caps, and the earnings blackout window) rather than a
-    # hard safety/data-integrity issue -- these are the only violations
-    # authorize_overridden_trade_intent() below will ever let a human
-    # knowingly proceed past (2026-07 feature). Everything else (stale
-    # price, closed market, a bad bid/ask quote, a duplicate order, the
-    # kill switch, insufficient cash, an invalid intent) can never be
-    # overridden regardless of what else appears in `violations`.
-    overridable_violations: list[str] = dataclasses.field(default_factory=list)
+    # Human-readable messages -- display only. Same order and length as
+    # `violation_codes` below; NOT itself security-relevant (see
+    # ViolationCode's docstring).
+    violations: tuple[str, ...]
+    # Stable codes, one per entry in `violations`, in the same order --
+    # THIS is what validation_proof signs and what override eligibility is
+    # computed from. Tuple (immutable), unlike the prior list-based
+    # design.
+    violation_codes: tuple[str, ...] = ()
     # HMAC (keyed by this module's process-local secret) over the exact
-    # intent this result was computed for AND the approved/rejected
-    # outcome. Only validate_trade_intent() can produce a proof that
-    # verifies -- unlike a plain content hash, this can't be recomputed by
-    # code that merely knows the intent's public fields, so a
-    # hand-constructed ValidationResult (with an arbitrary or even
-    # correctly-hashed fingerprint) is rejected by authorize_trade_intent()
-    # below (Codex review, 2026-07-27). Signing `approved` too (not just
-    # intent identity) matters because this dataclass would otherwise be
-    # mutable: a REJECTED result still got a validly-signed proof for its
-    # intent, so flipping `.approved` to True and reusing that proof would
-    # have passed authorize_trade_intent() -- frozen=True blocks the plain
+    # intent this result was computed for, the approved/rejected outcome,
+    # AND the full (canonically ordered) violation_codes. Only
+    # validate_trade_intent() can produce a proof that verifies -- unlike
+    # a plain content hash, this can't be recomputed by code that merely
+    # knows the intent's public fields, so a hand-constructed
+    # ValidationResult (with an arbitrary or even correctly-hashed
+    # fingerprint) is rejected by authorize_trade_intent() below (Codex
+    # review, 2026-07-27). Signing `approved` too (not just intent
+    # identity) matters because this dataclass would otherwise be mutable:
+    # a REJECTED result still got a validly-signed proof for its intent,
+    # so flipping `.approved` to True and reusing that proof would have
+    # passed authorize_trade_intent() -- frozen=True blocks the plain
     # in-place mutation, and signing the outcome blocks reusing the proof
     # on any *other* ValidationResult (e.g. via dataclasses.replace()) too
-    # (GPT review, 2026-07-27).
+    # (GPT review, 2026-07-27). Signing violation_codes too (2026-07-28,
+    # GPT review) closes the remaining hole: without it, a genuine hard
+    # rejection's violation content could be swapped for override-eligible
+    # -looking codes via dataclasses.replace() while the proof (which
+    # never covered that field) kept verifying.
     validation_proof: str | None = None
+
+    @property
+    def overridable(self) -> bool:
+        """True iff there's at least one violation and EVERY one of them
+        is override-eligible. Always computed fresh from violation_codes
+        (which validation_proof cryptographically binds) against the
+        fixed OVERRIDABLE_VIOLATION_CODES constant -- never stored as
+        separate, independently mutable instance data, so there is
+        nothing here to forge."""
+        return bool(self.violation_codes) and all(
+            code in OVERRIDABLE_VIOLATION_CODES for code in self.violation_codes
+        )
+
+    @property
+    def blocking_violations(self) -> tuple[str, ...]:
+        """Human-readable messages for violations that are NOT
+        override-eligible. Non-empty here means an override can never
+        apply, regardless of what else is present alongside them."""
+        return tuple(
+            message
+            for message, code in zip(self.violations, self.violation_codes)
+            if code not in OVERRIDABLE_VIOLATION_CODES
+        )
 
 
 @dataclasses.dataclass(frozen=True)
@@ -121,7 +201,9 @@ def intent_fingerprint(intent: TradeIntent) -> str:
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
 
 
-def _validation_proof(intent: TradeIntent, approved: bool) -> str:
+def _validation_proof(
+    intent: TradeIntent, approved: bool, violation_codes: tuple[str, ...] = ()
+) -> str:
     # `approved` is part of the signed payload -- NOT just intent identity
     # -- so a REJECTED validation's proof can never be reused as if it were
     # an approval. ValidationResult is a plain (mutable) dataclass;
@@ -130,7 +212,20 @@ def _validation_proof(intent: TradeIntent, approved: bool) -> str:
     # flip `.approved = True`, and authorize_trade_intent() would accept
     # it -- the proof didn't actually encode the outcome (GPT review,
     # 2026-07-27).
-    return _sign(f"validated:{approved}:{intent_fingerprint(intent)}")
+    #
+    # `violation_codes` is ALSO part of the signed payload (2026-07-28,
+    # GPT review): without this, a genuine rejected result's violation
+    # content could be swapped via dataclasses.replace() for
+    # override-eligible-looking codes while keeping the same (still
+    # "valid") proof, since the proof never covered that field at all --
+    # authorize_overridden_trade_intent() would then wrongly authorize a
+    # hard rejection (insufficient cash, stale price, a duplicate order,
+    # ...) as if every violation were a deliberate risk-preference call.
+    # Sorted before joining so that two otherwise-identical code sets in a
+    # different order (not semantically meaningful) still produce the
+    # same signature.
+    canonical_codes = ":".join(sorted(violation_codes))
+    return _sign(f"validated:{approved}:{intent_fingerprint(intent)}:{canonical_codes}")
 
 
 def _authorization_proof(intent: TradeIntent, expires_at: str) -> str:
@@ -153,7 +248,7 @@ def authorize_trade_intent(
     if not validation.approved:
         raise ValueError("Cannot authorize a trade intent that failed validation.")
     if validation.validation_proof is None or not hmac.compare_digest(
-        validation.validation_proof, _validation_proof(intent, True)
+        validation.validation_proof, _validation_proof(intent, True, validation.violation_codes)
     ):
         raise ValueError(
             "This ValidationResult was not produced by validate_trade_intent(intent, ...) "
@@ -194,24 +289,25 @@ def authorize_overridden_trade_intent(
     Independently re-verifies eligibility inside this module rather than
     trusting the caller's claim: the same HMAC-signed validation_proof
     mechanism authorize_trade_intent() uses to prove a ValidationResult
-    wasn't hand-constructed is checked here too (against approved=False,
-    since that's what a genuine rejection looks like), and every
-    violation on the result must appear in its own overridable_violations
-    list -- if even one doesn't, this raises exactly like a normal
-    rejection would.
+    wasn't hand-constructed is checked here too (against approved=False
+    AND this exact violation_codes tuple, since that's what a genuine
+    rejection looks like -- see _validation_proof()'s docstring on why
+    violation_codes had to become part of the signed payload, 2026-07-28
+    GPT review), and `.overridable` (computed fresh from those
+    proof-bound codes against the fixed OVERRIDABLE_VIOLATION_CODES
+    constant) must be True -- if even one violation code isn't
+    override-eligible, this raises exactly like a normal rejection would.
     """
     if validation.approved:
         raise ValueError("Use authorize_trade_intent() for an already-approved validation.")
     if validation.validation_proof is None or not hmac.compare_digest(
-        validation.validation_proof, _validation_proof(intent, False)
+        validation.validation_proof, _validation_proof(intent, False, validation.violation_codes)
     ):
         raise ValueError(
             "This ValidationResult was not produced by validate_trade_intent(intent, ...) called with "
-            "this exact trade intent -- refusing to authorize an override."
+            "this exact trade intent and violation set -- refusing to authorize an override."
         )
-    if not validation.violations or any(
-        v not in validation.overridable_violations for v in validation.violations
-    ):
+    if not validation.overridable:
         raise ValueError(
             "At least one violation is not override-eligible (only concentration-cap and "
             "earnings-blackout violations can be overridden) -- refusing to authorize."
@@ -298,33 +394,38 @@ def validate_trade_intent(
     fills together create 90% exposure).
     """
     violations: list[str] = []
-    overridable_violations: list[str] = []
+    violation_codes: list[str] = []
 
-    def _violate(message: str, overridable: bool = False) -> None:
+    def _violate(code: ViolationCode, message: str) -> None:
         violations.append(message)
-        if overridable:
-            overridable_violations.append(message)
+        violation_codes.append(code.value)
 
     if kill_switch_active:
+        codes = (ViolationCode.KILL_SWITCH.value,)
         return ValidationResult(
             approved=False,
-            violations=["Kill switch is active — no trades are permitted."],
-            validation_proof=_validation_proof(intent, False),
+            violations=("Kill switch is active — no trades are permitted.",),
+            violation_codes=codes,
+            validation_proof=_validation_proof(intent, False, codes),
         )
 
     if intent.shares <= 0:
-        violations.append(f"shares must be positive, got {intent.shares}.")
+        _violate(ViolationCode.INVALID_SHARES, f"shares must be positive, got {intent.shares}.")
     if intent.side not in ("buy", "sell"):
-        violations.append(f"side must be 'buy' or 'sell', got {intent.side!r}.")
+        _violate(ViolationCode.INVALID_SIDE, f"side must be 'buy' or 'sell', got {intent.side!r}.")
     if intent.order_type not in ("market", "limit", "stop"):
-        violations.append(f"Unsupported order type: {intent.order_type!r}.")
+        _violate(ViolationCode.INVALID_ORDER_TYPE, f"Unsupported order type: {intent.order_type!r}.")
 
     trade_value = intent.shares * reference_price
     if not math.isfinite(reference_price) or reference_price <= 0:
-        violations.append(f"reference_price must be a positive, finite number, got {reference_price}.")
+        _violate(
+            ViolationCode.INVALID_REFERENCE_PRICE,
+            f"reference_price must be a positive, finite number, got {reference_price}.",
+        )
     if max_order_value is not None and trade_value > max_order_value:
-        violations.append(
-            f"Trade value ${trade_value:,.2f} exceeds the ${max_order_value:,.2f} maximum order value."
+        _violate(
+            ViolationCode.MAX_ORDER_VALUE,
+            f"Trade value ${trade_value:,.2f} exceeds the ${max_order_value:,.2f} maximum order value.",
         )
 
     if intent.side == "buy":
@@ -338,10 +439,11 @@ def validate_trade_intent(
         pending_by_ticker: dict[str, float] = {}
         for raw_ticker, raw_value in (pending_buy_value_by_ticker or {}).items():
             if not math.isfinite(raw_value) or raw_value < 0:
-                violations.append(
+                _violate(
+                    ViolationCode.INVALID_PENDING_VALUE,
                     f"pending_buy_value_by_ticker[{raw_ticker!r}] must be a non-negative, finite "
                     f"number, got {raw_value} -- refusing to compute exposure with a corrupted "
-                    "pending-order value."
+                    "pending-order value.",
                 )
                 continue
             key = raw_ticker.upper()
@@ -354,9 +456,9 @@ def validate_trade_intent(
         new_position_pct = (existing_position_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
         if new_position_pct > max_position_pct * 100:
             _violate(
+                ViolationCode.MAX_POSITION_PCT,
                 f"Position size would be {new_position_pct:.1f}% of equity, exceeding the "
                 f"{max_position_pct * 100:.1f}% per-position limit.",
-                overridable=True,
             )
 
         # portfolio.cash alone ignores pending/open orders reserving that
@@ -370,21 +472,25 @@ def validate_trade_intent(
         if portfolio.buying_power is not None:
             available_capital = min(available_capital, portfolio.buying_power)
         if trade_value > available_capital:
-            violations.append(f"Trade value ${trade_value:,.2f} exceeds available cash ${available_capital:,.2f}.")
+            _violate(
+                ViolationCode.INSUFFICIENT_CASH,
+                f"Trade value ${trade_value:,.2f} exceeds available cash ${available_capital:,.2f}.",
+            )
         minimum_cash = portfolio.total_equity * min_cash_reserve_pct
         if available_capital - trade_value < minimum_cash:
-            violations.append(
+            _violate(
+                ViolationCode.MIN_CASH_RESERVE,
                 f"Cash after trade would be ${available_capital - trade_value:,.2f}, below the "
-                f"${minimum_cash:,.2f} minimum cash reserve."
+                f"${minimum_cash:,.2f} minimum cash reserve.",
             )
 
         existing_invested = portfolio.total_equity - portfolio.cash + total_pending_buy_value
         new_invested_pct = (existing_invested + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
         if new_invested_pct > max_total_exposure_pct * 100:
             _violate(
+                ViolationCode.MAX_TOTAL_EXPOSURE_PCT,
                 f"Total invested exposure would be {new_invested_pct:.1f}% of equity, exceeding the "
                 f"{max_total_exposure_pct * 100:.1f}% total-exposure limit.",
-                overridable=True,
             )
 
         for basket_name, basket_tickers in BASKETS.items():
@@ -396,9 +502,9 @@ def validate_trade_intent(
             new_basket_pct = (existing_basket_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
             if new_basket_pct > max_basket_pct:
                 _violate(
+                    ViolationCode.MAX_BASKET_PCT,
                     f"'{basket_name}' exposure would be {new_basket_pct:.1f}% of equity, exceeding the "
                     f"{max_basket_pct:.1f}% basket concentration limit.",
-                    overridable=True,
                 )
 
         if intent.ticker.upper() in LEVERAGED_ETF_TICKERS:
@@ -408,17 +514,18 @@ def validate_trade_intent(
             new_leveraged_pct = (existing_leveraged_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
             if new_leveraged_pct > max_leveraged_etf_pct:
                 _violate(
+                    ViolationCode.MAX_LEVERAGED_ETF_PCT,
                     f"Leveraged ETF exposure would be {new_leveraged_pct:.1f}% of equity, exceeding the "
                     f"{max_leveraged_etf_pct:.1f}% leveraged-ETF limit.",
-                    overridable=True,
                 )
     else:
         held_shares = sum(
             p.shares for p in portfolio.positions if p.ticker.upper() == intent.ticker.upper()
         )
         if intent.shares > held_shares:
-            violations.append(
-                f"Sell quantity {intent.shares} exceeds the {held_shares:g} shares currently held."
+            _violate(
+                ViolationCode.SELL_EXCEEDS_HELD,
+                f"Sell quantity {intent.shares} exceeds the {held_shares:g} shares currently held.",
             )
 
     if price_timestamp is not None and now is not None:
@@ -430,38 +537,46 @@ def validate_trade_intent(
             comparable_price_timestamp = comparable_price_timestamp.replace(tzinfo=None)
         age_minutes = (comparable_now - comparable_price_timestamp).total_seconds() / 60
         if age_minutes > max_stale_price_minutes:
-            violations.append(f"Reference price is {age_minutes:.1f} minutes old, exceeding the {max_stale_price_minutes:.1f}-minute staleness limit.")
+            _violate(
+                ViolationCode.STALE_PRICE,
+                f"Reference price is {age_minutes:.1f} minutes old, exceeding the {max_stale_price_minutes:.1f}-minute staleness limit.",
+            )
 
     if now is not None:
         comparable_now = _as_naive_eastern(now)
         session = _trading_session_window(comparable_now)
         if session is None:
             reason = "a weekend" if comparable_now.weekday() >= 5 else "an exchange holiday"
-            violations.append(f"{comparable_now.date()} is {reason} — markets are closed.")
+            _violate(ViolationCode.MARKET_CLOSED, f"{comparable_now.date()} is {reason} — markets are closed.")
         else:
             session_open, session_close = session
             if not (session_open <= comparable_now < session_close):
-                violations.append(
+                _violate(
+                    ViolationCode.OUTSIDE_TRADING_SESSION,
                     f"{comparable_now.time()} on {comparable_now.date()} is outside today's trading "
                     f"session ({session_open.time()}-{session_close.time()} ET, accounting for "
-                    "exchange holidays and early closes)."
+                    "exchange holidays and early closes).",
                 )
 
     if recent_intents:
         for prior in recent_intents:
             if prior.ticker.upper() == intent.ticker.upper() and prior.side == intent.side:
-                violations.append(f"Duplicate order detected: a {intent.side} order for {intent.ticker} was already submitted.")
+                _violate(
+                    ViolationCode.DUPLICATE_ORDER,
+                    f"Duplicate order detected: a {intent.side} order for {intent.ticker} was already submitted.",
+                )
                 break
 
     if intent.order_type == "limit":
         if intent.limit_price is None or not math.isfinite(intent.limit_price) or intent.limit_price <= 0:
-            violations.append("Limit orders require a positive, finite limit price.")
+            _violate(ViolationCode.INVALID_LIMIT_PRICE, "Limit orders require a positive, finite limit price.")
         elif reference_price:
             slippage_pct = abs(intent.limit_price - reference_price) / reference_price * 100
             if slippage_pct > max_slippage_pct:
-                violations.append(
+                _violate(
+                    ViolationCode.MAX_SLIPPAGE,
                     f"Limit price ${intent.limit_price:.2f} is {slippage_pct:.1f}% away from the reference price "
-                    f"${reference_price:.2f}, exceeding the {max_slippage_pct:.1f}% max-slippage limit."
+                    f"${reference_price:.2f}, exceeding the {max_slippage_pct:.1f}% max-slippage limit.",
                 )
 
     # Bid/ask is opt-in (many callers/tests validate without a live quote
@@ -479,23 +594,26 @@ def validate_trade_intent(
             or bid_price <= 0
             or ask_price <= 0
         ):
-            violations.append(
+            _violate(
+                ViolationCode.INVALID_QUOTE,
                 f"Bid/ask quote is one-sided or invalid (bid=${bid_price:.2f}, ask=${ask_price:.2f}) -- "
-                "refusing to trade without a complete two-sided quote."
+                "refusing to trade without a complete two-sided quote.",
             )
         elif ask_price < bid_price:
-            violations.append(
+            _violate(
+                ViolationCode.INVALID_QUOTE,
                 f"Bid/ask quote is crossed (bid=${bid_price:.2f} > ask=${ask_price:.2f}) -- this indicates "
-                "a stale or corrupted quote, not a tradeable market."
+                "a stale or corrupted quote, not a tradeable market.",
             )
         else:
             mid = (bid_price + ask_price) / 2
             spread_pct = (ask_price - bid_price) / mid * 100
             if spread_pct > max_spread_pct:
-                violations.append(
+                _violate(
+                    ViolationCode.MAX_SPREAD,
                     f"Bid/ask spread is {spread_pct:.2f}% (bid ${bid_price:.2f} / ask ${ask_price:.2f}), "
                     f"exceeding the {max_spread_pct:.2f}% max-spread limit -- a market order here could fill "
-                    "well away from the reference price."
+                    "well away from the reference price.",
                 )
 
     # Symmetric window: blocks both the run-up to earnings and the days right
@@ -505,17 +623,19 @@ def validate_trade_intent(
         and abs(earnings_days_away) <= earnings_blackout_days
     ):
         _violate(
+            ViolationCode.EARNINGS_BLACKOUT,
             f"{intent.ticker} has earnings in {earnings_days_away} day(s), within the "
             f"{earnings_blackout_days}-day earnings blackout window.",
-            overridable=True,
         )
 
     approved = len(violations) == 0
+    violations_t = tuple(violations)
+    codes_t = tuple(violation_codes)
     return ValidationResult(
         approved=approved,
-        violations=violations,
-        overridable_violations=overridable_violations,
-        validation_proof=_validation_proof(intent, approved),
+        violations=violations_t,
+        violation_codes=codes_t,
+        validation_proof=_validation_proof(intent, approved, codes_t),
     )
 
 

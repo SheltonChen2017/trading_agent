@@ -146,11 +146,25 @@ def find_order_by_client_id(client_order_id: str) -> dict | None:
         raise
     if order is None:
         return None
+    # Normalized representation used by assistant/execution_service.py's
+    # reconcile_submission() to verify the COMPLETE material order
+    # identity (ticker, side, shares, order type, limit price), not just
+    # ticker+side -- a prior version returned only ticker/shares/side/
+    # status, so an order under the expected client_order_id for BUY 1
+    # AAPL could reconcile a proposal for BUY 100 AAPL, or a market order
+    # could be mistaken for a limit order, purely because reconciliation
+    # never had the fields to tell them apart (GPT review, 2026-07-28).
     return {
         "order_id": str(order.id),
+        "client_order_id": getattr(order, "client_order_id", None),
         "ticker": order.symbol,
         "shares": float(order.qty) if order.qty is not None else None,
         "side": getattr(order.side, "value", str(order.side)),
+        "type": getattr(order.type, "value", str(order.type)),
+        "limit_price": float(order.limit_price) if getattr(order, "limit_price", None) is not None else None,
+        "time_in_force": getattr(order, "time_in_force", None) and getattr(
+            order.time_in_force, "value", str(order.time_in_force)
+        ),
         "status": getattr(order.status, "value", str(order.status)),
     }
 

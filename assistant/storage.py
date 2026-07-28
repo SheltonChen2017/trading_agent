@@ -197,6 +197,49 @@ class AssistantStore:
         proposal["status"] = new_status
         return proposal
 
+    def reclaim_stale_status(
+        self,
+        proposal_id: str,
+        *,
+        expected_status: str,
+        new_status: str,
+        stale_before: str,
+    ) -> dict[str, Any] | None:
+        """
+        Like claim_proposal(), but the guard is staleness (`updated_at <
+        stale_before`) instead of expiry -- recovers a proposal stranded
+        in a non-terminal status (e.g. "reconciling") after a crash left
+        no in-process handler to run the normal recovery logic. `updated_at`
+        already reflects the moment the proposal entered `expected_status`
+        (every status transition, including claim_proposal(), rewrites
+        it), so no separate "started_at" column is needed.
+
+        Atomic and safe against a concurrent recovery attempt or a
+        genuinely still-in-flight (recent) claim for the same reason
+        claim_proposal() is: exactly one `UPDATE ... WHERE status = ? AND
+        updated_at < ?` can affect the row, so a proposal claimed only
+        moments ago (not actually stranded) is correctly left alone
+        (2026-07-28, GPT review).
+        """
+        now = datetime.now(timezone.utc).isoformat()
+        with self._connect() as connection:
+            cursor = connection.execute(
+                "UPDATE trade_proposals SET status = ?, updated_at = ? "
+                "WHERE proposal_id = ? AND status = ? AND updated_at < ?",
+                (new_status, now, proposal_id, expected_status, stale_before),
+            )
+            if cursor.rowcount != 1:
+                return None
+            row = connection.execute(
+                "SELECT payload_json FROM trade_proposals WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        proposal = json.loads(row["payload_json"])
+        proposal["status"] = new_status
+        return proposal
+
     def list_proposals(self, status: str | None = None, limit: int = 100) -> list[dict[str, Any]]:
         query = "SELECT payload_json, status FROM trade_proposals"
         params: list[Any] = []

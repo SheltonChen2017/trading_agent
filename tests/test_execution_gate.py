@@ -28,7 +28,7 @@ def test_clean_trade_is_approved():
     intent = TradeIntent(ticker="KO", side="buy", shares=5)  # $300 = 3% of equity, under every default cap
     result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
     assert result.approved is True
-    assert result.violations == []
+    assert result.violations == ()
 
 
 def test_kill_switch_blocks_everything_else():
@@ -36,7 +36,7 @@ def test_kill_switch_blocks_everything_else():
     intent = TradeIntent(ticker="KO", side="buy", shares=10)
     result = validate_trade_intent(intent, snapshot, reference_price=60.0, kill_switch_active=True)
     assert result.approved is False
-    assert result.violations == ["Kill switch is active — no trades are permitted."]
+    assert result.violations == ("Kill switch is active — no trades are permitted.",)
 
 
 def test_max_position_size_exceeded():
@@ -298,29 +298,28 @@ def test_concentration_and_earnings_violations_are_overridable():
         earnings_days_away=1, earnings_blackout_days=2,
     )
     assert result.approved is False
-    assert any("per-position limit" in v for v in result.overridable_violations)
-    assert any("earnings blackout" in v for v in result.overridable_violations)
-    assert set(result.overridable_violations) == set(result.violations)
+    assert result.overridable is True
+    assert result.blocking_violations == ()
 
 
 def test_hard_safety_violations_are_never_overridable():
     snapshot = _snapshot(cash=10_000.0)
     intent = TradeIntent(ticker="KO", side="buy", shares=1)
     result = validate_trade_intent(intent, snapshot, reference_price=60.0, kill_switch_active=True)
-    assert result.overridable_violations == []
+    assert result.overridable is False
 
     result = validate_trade_intent(
         intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY,
         price_timestamp=datetime(2026, 7, 20, 9, 0), max_stale_price_minutes=15.0,
     )
     assert any("staleness" in v for v in result.violations)
-    assert result.overridable_violations == []
+    assert result.overridable is False
 
     result = validate_trade_intent(
         intent, snapshot, reference_price=60.0, now=datetime(2026, 7, 25, 10, 0),  # a Saturday
     )
     assert any("weekend" in v for v in result.violations)
-    assert result.overridable_violations == []
+    assert result.overridable is False
 
 
 def test_mixed_overridable_and_non_overridable_violations_keeps_both_lists_distinct():
@@ -330,17 +329,17 @@ def test_mixed_overridable_and_non_overridable_violations_keeps_both_lists_disti
         intent, snapshot, reference_price=60.0, kill_switch_active=True,  # kill switch (never overridable)
     )
     # Kill switch short-circuits everything else -- only its own violation appears at all.
-    assert result.violations == ["Kill switch is active — no trades are permitted."]
-    assert result.overridable_violations == []
+    assert result.violations == ("Kill switch is active — no trades are permitted.",)
+    assert result.overridable is False
 
     result = validate_trade_intent(
         intent, snapshot, reference_price=60.0, now=datetime(2026, 7, 25, 10, 0),  # weekend (non-overridable)
     )
     assert any("per-position limit" in v for v in result.violations)  # overridable
     assert any("weekend" in v for v in result.violations)  # not overridable
-    blocking = [v for v in result.violations if v not in result.overridable_violations]
-    assert any("weekend" in v for v in blocking)
-    assert not any("per-position limit" in v for v in blocking)
+    assert result.overridable is False
+    assert any("weekend" in v for v in result.blocking_violations)
+    assert not any("per-position limit" in v for v in result.blocking_violations)
 
 
 def test_authorize_overridden_trade_intent_succeeds_when_every_violation_is_overridable():
@@ -390,17 +389,109 @@ def test_authorize_overridden_trade_intent_rejects_a_forged_result():
     )
     import dataclasses as dc
 
-    forged = dc.replace(real_result, overridable_violations=list(real_result.violations))
+    forged = dc.replace(real_result, violation_codes=real_result.violation_codes)
     # Same content, but constructed rather than produced by validate_trade_intent() for THIS
     # exact call -- dataclasses.replace() copies the old (still-valid-looking) proof forward,
     # so this specifically checks the proof is tied to the intent+approved outcome, not
-    # merely to matching violations/overridable_violations lists.
+    # merely to matching violation content.
     other_intent = TradeIntent(ticker="AMD", side="buy", shares=100)
     try:
         authorize_overridden_trade_intent(other_intent, forged)
         assert False, "a proof computed for a different intent must not verify"
     except ValueError as exc:
         assert "was not produced by validate_trade_intent" in str(exc)
+
+
+def test_release_blocker_a_genuine_insufficient_cash_rejection_cannot_be_relabeled_overridable():
+    # GPT review, 2026-07-28: the release blocker. A REAL hard rejection
+    # (insufficient cash -- never overridable) must not become
+    # authorizable by relabeling its violation_codes to something
+    # override-eligible via dataclasses.replace() on the SAME intent --
+    # the proof must reject this, since it now covers violation_codes.
+    import dataclasses as dc
+
+    snapshot = _snapshot(cash=100.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=10)  # $600 > $100 cash
+    real_result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY, max_position_pct=1.0,
+    )
+    assert real_result.approved is False
+    assert real_result.overridable is False  # insufficient_cash is a hard, non-overridable violation
+
+    forged = dc.replace(real_result, violation_codes=("max_position_pct",))
+    assert forged.overridable is True  # the relabeled codes LOOK overridable...
+    try:
+        authorize_overridden_trade_intent(intent, forged)
+        assert False, "relabeling violation_codes on a genuine hard rejection must not authorize it"
+    except ValueError as exc:
+        assert "was not produced by validate_trade_intent" in str(exc)
+
+
+def test_release_blocker_a_genuine_stale_price_rejection_cannot_be_relabeled_overridable():
+    import dataclasses as dc
+
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    real_result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY,
+        price_timestamp=datetime(2026, 7, 20, 9, 0), max_stale_price_minutes=15.0,
+    )
+    assert real_result.approved is False
+    assert real_result.overridable is False
+
+    forged = dc.replace(real_result, violation_codes=("earnings_blackout",))
+    assert forged.overridable is True
+    try:
+        authorize_overridden_trade_intent(intent, forged)
+        assert False, "relabeling a stale-price rejection's codes must not authorize it"
+    except ValueError as exc:
+        assert "was not produced by validate_trade_intent" in str(exc)
+
+
+def test_release_blocker_a_genuine_duplicate_order_rejection_cannot_be_relabeled_overridable():
+    import dataclasses as dc
+
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    prior = TradeIntent(ticker="KO", side="buy", shares=1)
+    real_result = validate_trade_intent(
+        intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY, recent_intents=[prior],
+    )
+    assert real_result.approved is False
+    assert real_result.overridable is False
+
+    forged = dc.replace(real_result, violation_codes=("max_basket_pct",))
+    assert forged.overridable is True
+    try:
+        authorize_overridden_trade_intent(intent, forged)
+        assert False, "relabeling a duplicate-order rejection's codes must not authorize it"
+    except ValueError as exc:
+        assert "was not produced by validate_trade_intent" in str(exc)
+
+
+def test_validation_result_collections_are_immutable_tuples():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="KO", side="buy", shares=1)
+    result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
+    assert isinstance(result.violations, tuple)
+    assert isinstance(result.violation_codes, tuple)
+    try:
+        result.violations.append("injected")  # type: ignore[attr-defined]
+        assert False, "tuples must not support .append()"
+    except AttributeError:
+        pass
+
+
+def test_reordered_violation_codes_produce_the_same_proof():
+    # Order of violation_codes is not semantically meaningful -- the
+    # signature must be canonical (sorted) so a reordered-but-otherwise-
+    # identical codes tuple still verifies.
+    from risk.execution_gate import _validation_proof
+
+    intent = TradeIntent(ticker="KO", side="buy", shares=100)
+    proof_a = _validation_proof(intent, False, ("max_basket_pct", "max_position_pct"))
+    proof_b = _validation_proof(intent, False, ("max_position_pct", "max_basket_pct"))
+    assert proof_a == proof_b
 
 
 if __name__ == "__main__":
@@ -435,4 +526,9 @@ if __name__ == "__main__":
     test_authorize_overridden_trade_intent_rejects_a_mixed_result()
     test_authorize_overridden_trade_intent_rejects_an_already_approved_result()
     test_authorize_overridden_trade_intent_rejects_a_forged_result()
+    test_release_blocker_a_genuine_insufficient_cash_rejection_cannot_be_relabeled_overridable()
+    test_release_blocker_a_genuine_stale_price_rejection_cannot_be_relabeled_overridable()
+    test_release_blocker_a_genuine_duplicate_order_rejection_cannot_be_relabeled_overridable()
+    test_validation_result_collections_are_immutable_tuples()
+    test_reordered_violation_codes_produce_the_same_proof()
     print("All execution gate tests passed.")

@@ -88,6 +88,89 @@ def test_execute_allocation_skips_zero_share_rows():
     assert results == []
 
 
+class _FakeEnumValue:
+    """Mimics alpaca-py's enum-like order fields (order.side.value, etc.)
+    without importing the real package -- this test file deliberately
+    never imports `alpaca` (see module docstring)."""
+
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        return self.value
+
+
+class _FakeOrder:
+    def __init__(
+        self, order_id, symbol, qty, side, order_type, limit_price=None,
+        time_in_force=None, status="accepted", client_order_id=None,
+    ):
+        self.id = order_id
+        self.symbol = symbol
+        self.qty = qty
+        self.side = _FakeEnumValue(side)
+        self.type = _FakeEnumValue(order_type)
+        self.limit_price = limit_price
+        self.time_in_force = _FakeEnumValue(time_in_force) if time_in_force else None
+        self.status = _FakeEnumValue(status)
+        self.client_order_id = client_order_id
+
+
+def test_find_order_by_client_id_returns_the_complete_material_identity():
+    # GPT review, 2026-07-28: a prior version returned only order_id/
+    # ticker/shares/side/status -- reconciliation had no way to verify
+    # order TYPE or limit price, so a market order could be mistaken for
+    # a limit order (or vice versa) purely because the lookup never
+    # returned the fields needed to tell them apart.
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    fake_client = type("FakeClient", (), {
+        "get_order_by_client_id": staticmethod(
+            lambda client_order_id: _FakeOrder(
+                "order-1", "AAPL", 10, "buy", "limit", limit_price=150.25,
+                time_in_force="day", client_order_id=client_order_id,
+            )
+        ),
+    })()
+    original_get_client = broker._get_client
+    broker._get_client = lambda: fake_client
+    try:
+        result = broker.find_order_by_client_id("idem-1")
+        assert result["order_id"] == "order-1"
+        assert result["client_order_id"] == "idem-1"
+        assert result["ticker"] == "AAPL"
+        assert result["shares"] == 10.0
+        assert result["side"] == "buy"
+        assert result["type"] == "limit"
+        assert result["limit_price"] == 150.25
+        assert result["time_in_force"] == "day"
+        assert result["status"] == "accepted"
+    finally:
+        broker._get_client = original_get_client
+        _clear_alpaca_env()
+
+
+def test_find_order_by_client_id_market_order_has_no_limit_price():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    fake_client = type("FakeClient", (), {
+        "get_order_by_client_id": staticmethod(
+            lambda client_order_id: _FakeOrder("order-2", "TQQQ", 5, "sell", "market")
+        ),
+    })()
+    original_get_client = broker._get_client
+    broker._get_client = lambda: fake_client
+    try:
+        result = broker.find_order_by_client_id("idem-2")
+        assert result["type"] == "market"
+        assert result["limit_price"] is None
+    finally:
+        broker._get_client = original_get_client
+        _clear_alpaca_env()
+
+
 if __name__ == "__main__":
     test_is_configured_false_without_env_vars()
     test_is_configured_true_with_both_env_vars()
@@ -95,4 +178,6 @@ if __name__ == "__main__":
     test_submit_market_order_rejects_bad_share_count()
     test_submit_market_order_refuses_live_without_confirmation()
     test_execute_allocation_skips_zero_share_rows()
+    test_find_order_by_client_id_returns_the_complete_material_identity()
+    test_find_order_by_client_id_market_order_has_no_limit_price()
     print("All Alpaca broker tests passed.")

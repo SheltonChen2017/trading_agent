@@ -60,6 +60,93 @@ def test_submit_market_order_rejects_bad_share_count():
         _clear_alpaca_env()
 
 
+def test_submit_market_order_rejects_nan_shares():
+    # GPT review, 2026-07-29: `shares <= 0` does not reject NaN (every
+    # ordered comparison against NaN is False in Python), so this used to
+    # reach client.submit_order() with zero protection at this layer.
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        broker.submit_market_order("AAPL", float("nan"))
+        assert False, "expected ValueError for NaN shares"
+    except ValueError:
+        pass
+    finally:
+        _clear_alpaca_env()
+
+
+def test_submit_market_order_rejects_infinite_shares():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        broker.submit_market_order("AAPL", float("inf"))
+        assert False, "expected ValueError for infinite shares"
+    except ValueError:
+        pass
+    finally:
+        _clear_alpaca_env()
+
+
+def test_submit_market_order_rejects_fractional_shares():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        broker.submit_market_order("AAPL", 1.5)
+        assert False, "expected ValueError for fractional shares"
+    except ValueError:
+        pass
+    finally:
+        _clear_alpaca_env()
+
+
+def test_submit_market_order_rejects_bool_shares():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        broker.submit_market_order("AAPL", True)
+        assert False, "expected ValueError for bool shares"
+    except ValueError:
+        pass
+    finally:
+        _clear_alpaca_env()
+
+
+def test_submit_limit_order_rejects_nan_shares():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        broker.submit_limit_order("AAPL", float("nan"), 150.0)
+        assert False, "expected ValueError for NaN shares"
+    except ValueError:
+        pass
+    finally:
+        _clear_alpaca_env()
+
+
+def test_submit_stop_loss_order_rejects_nan_shares():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        broker.submit_stop_loss_order("AAPL", float("nan"), 95.0)
+        assert False, "expected ValueError for NaN shares"
+    except ValueError:
+        pass
+    finally:
+        _clear_alpaca_env()
+
+
 def test_submit_market_order_refuses_live_without_confirmation():
     _clear_alpaca_env()
     os.environ["APCA_API_KEY_ID"] = "test-key"
@@ -176,6 +263,12 @@ if __name__ == "__main__":
     test_is_configured_true_with_both_env_vars()
     test_get_account_raises_when_not_configured()
     test_submit_market_order_rejects_bad_share_count()
+    test_submit_market_order_rejects_nan_shares()
+    test_submit_market_order_rejects_infinite_shares()
+    test_submit_market_order_rejects_fractional_shares()
+    test_submit_market_order_rejects_bool_shares()
+    test_submit_limit_order_rejects_nan_shares()
+    test_submit_stop_loss_order_rejects_nan_shares()
     test_submit_market_order_refuses_live_without_confirmation()
     test_execute_allocation_skips_zero_share_rows()
     test_find_order_by_client_id_returns_the_complete_material_identity()

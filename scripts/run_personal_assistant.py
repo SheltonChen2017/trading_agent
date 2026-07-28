@@ -24,6 +24,21 @@ from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
 from execution.alpaca_broker import is_configured
 
 
+def _positive_int(value: str) -> int:
+    """argparse `type=` for --stale-after-seconds -- a usability guard
+    only; assistant.execution_service.recover_stale_reconciliation()
+    itself independently validates and is the authoritative check (GPT
+    review, 2026-07-29: zero/negative values here would let a genuinely
+    in-flight reconciliation be reclaimed immediately)."""
+    try:
+        parsed = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(f"must be a positive integer, got {value!r}")
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError(f"must be a positive integer, got {parsed}")
+    return parsed
+
+
 def _now_eastern() -> datetime:
     try:
         from zoneinfo import ZoneInfo
@@ -235,7 +250,7 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     recover_stale.add_argument("proposal_id")
-    recover_stale.add_argument("--stale-after-seconds", type=int, default=300)
+    recover_stale.add_argument("--stale-after-seconds", type=_positive_int, default=300)
     recover_stale.set_defaults(handler=command_recover_stale)
     return parser
 

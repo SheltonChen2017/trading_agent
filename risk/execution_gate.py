@@ -67,6 +67,30 @@ class TradeIntent:
     rationale: str = ""
 
 
+def is_valid_share_quantity(value: object) -> bool:
+    """True iff `value` is a positive whole-share quantity: a real `int`
+    (not `bool` -- Python's `bool` subclasses `int`, so `True`/`False`
+    would otherwise pass an `isinstance(value, int)` check and silently
+    behave as 1/0 share(s)), not any `float` (whole-valued, fractional,
+    NaN, or +/-infinity), and not a string or any other type.
+
+    This project's execution workflow only ever submits whole-share
+    orders, so this is deliberately strict rather than "numeric and
+    positive": `intent.shares <= 0` alone does NOT reject NaN (every
+    ordered comparison against NaN is False in Python), so a NaN share
+    quantity used to sail through validate_trade_intent() approved, with
+    trade_value = NaN silently defeating every downstream dollar-value
+    comparison it touched (max-order-value, cash, position-size,
+    total-exposure, basket, leveraged-ETF) rather than being rejected
+    (GPT review, 2026-07-29, independently reproduced). Reused by
+    validate_trade_intent() (the authorization boundary) AND
+    execution/alpaca_broker.py's submit_*_order() functions (the last
+    line of defense before a real broker call, independent of whether
+    validate_trade_intent() ran at all) so the two checks can never
+    silently drift apart."""
+    return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
 class ViolationCode(str, enum.Enum):
     """Stable, machine-checkable identity for each violation type -- the
     security-relevant data authorize_overridden_trade_intent() below
@@ -526,14 +550,35 @@ def validate_trade_intent(
                 f"{position.entry_price}, current_price={position.current_price}).",
             )
 
-    if intent.shares <= 0:
-        _violate(ViolationCode.INVALID_SHARES, f"shares must be positive, got {intent.shares}.")
+    # Strict, not just "positive": rejects NaN, +/-infinity, fractional
+    # floats, bool, strings, and any other non-int type -- `shares <= 0`
+    # alone does not reject NaN (every ordered comparison against NaN is
+    # False in Python), so a NaN quantity used to pass this check, make
+    # trade_value NaN, and silently defeat every downstream dollar-value
+    # comparison in this function too (GPT review, 2026-07-29).
+    shares_valid = is_valid_share_quantity(intent.shares)
+    if not shares_valid:
+        _violate(
+            ViolationCode.INVALID_SHARES,
+            f"shares must be a positive whole number (int), got {intent.shares!r} "
+            f"({type(intent.shares).__name__}) -- NaN, infinity, fractional, boolean, "
+            "and non-numeric values are never valid share quantities.",
+        )
     if intent.side not in ("buy", "sell"):
         _violate(ViolationCode.INVALID_SIDE, f"side must be 'buy' or 'sell', got {intent.side!r}.")
     if intent.order_type not in ("market", "limit", "stop"):
         _violate(ViolationCode.INVALID_ORDER_TYPE, f"Unsupported order type: {intent.order_type!r}.")
 
-    trade_value = intent.shares * reference_price
+    # A rejected/invalid shares value must not be allowed to poison every
+    # dollar-value comparison below (NaN propagates through arithmetic,
+    # and a non-numeric type like a string would raise instead) -- `0` is
+    # substituted ONLY for this function's own arithmetic; `approved` is
+    # already guaranteed False from the violation just recorded above, so
+    # this substitution can never mask the rejection, only keep the rest
+    # of the checks running instead of crashing.
+    safe_shares = intent.shares if shares_valid else 0
+
+    trade_value = safe_shares * reference_price
     if not math.isfinite(reference_price) or reference_price <= 0:
         _violate(
             ViolationCode.INVALID_REFERENCE_PRICE,
@@ -672,10 +717,10 @@ def validate_trade_intent(
         held_shares = sum(
             p.shares for p in portfolio.positions if p.ticker.upper() == intent.ticker.upper()
         )
-        if intent.shares > held_shares:
+        if safe_shares > held_shares:
             _violate(
                 ViolationCode.SELL_EXCEEDS_HELD,
-                f"Sell quantity {intent.shares} exceeds the {held_shares:g} shares currently held.",
+                f"Sell quantity {intent.shares!r} exceeds the {held_shares:g} shares currently held.",
             )
 
     if price_timestamp is not None and now is not None:

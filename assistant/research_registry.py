@@ -81,10 +81,16 @@ def is_production_authoritative(finding: SignalEvidence) -> bool:
     that has never been re-verified since the fetch_historical
     lookback-days fix (commit 9f0ebc1) is NOT production-authoritative,
     regardless of its status string -- callers deciding whether to act
-    on a finding must check this, not just `status`."""
-    if finding.status not in _STATUSES_REQUIRING_PROVENANCE:
-        return True  # rejected/exploratory/unavailable findings make no production claim to trust
-    return finding.provenance is not None and finding.provenance.reproduced_after_data_loader_fix
+    on a finding must check this, not just `status`.
+
+    Kept here for backward compatibility (existing callers/tests import
+    this function directly) -- delegates to SignalEvidence.
+    production_authoritative, which is now the single source of truth
+    for this logic and the form every runtime display consumer (CLI
+    briefing, Streamlit UI) actually reads (GPT review, 2026-07-29: this
+    function existed but was previously referenced only by this module's
+    own tests, never by a runtime consumer)."""
+    return finding.production_authoritative
 
 
 def underfilled_dataset_warning(provenance: FindingProvenance) -> str | None:

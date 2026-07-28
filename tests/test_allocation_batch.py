@@ -1108,6 +1108,102 @@ def test_fresh_portfolio_state_blocks_a_later_leg_no_longer_safe():
         restore()
 
 
+# --- Completed-batch resync (GPT review, 2026-07-29): execute_allocation_
+# batch() used to return a BATCH_COMPLETED batch immediately without
+# re-syncing any leg -- so a leg the UI told the user to resolve via that
+# proposal's own individual override control kept showing
+# "blocked_overridable" forever, even after the proposal became "executed".
+
+def test_completed_batch_resyncs_a_blocked_overridable_leg_once_individually_overridden():
+    packet = _packet(cash=10_000.0)
+    tiny_cap_policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=0.001, max_total_exposure_pct=1.0, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
+        allow_new_positions=True,
+    )
+    proposals = generate_allocation_buy_proposals(
+        packet, tiny_cap_policy, weights_pct={"AAA": 100.0}, prices={"AAA": 50.0}, dollar_amount=2000.0,
+    )
+    assert len(proposals) == 1
+    proposal = proposals[0]
+    captured, restore = _mock_batch_execution(packet, quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            batch_id = new_batch_id()
+            store.create_allocation_batch(batch_id, [proposal.proposal_id], intended_total_notional=2000.0)
+
+            first_result = execute_allocation_batch(
+                batch_id, store, tiny_cap_policy, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert first_result["status"] == BATCH_COMPLETED
+            assert first_result["legs"][proposal.proposal_id]["state"] == LEG_BLOCKED_OVERRIDABLE
+            assert len(captured) == 0  # never actually submitted by the batch
+
+            # Resolve it through the proposal's OWN individual override
+            # control -- exactly what the batch/UI tells the user to do
+            # for a blocked_overridable leg.
+            import assistant.allocation_batch as batch_module
+
+            portfolio = batch_module.build_portfolio_snapshot_from_alpaca()
+            order = execute_approved_paper_proposal(
+                proposal.proposal_id, "approve", portfolio, tiny_cap_policy, store,
+                now_et=datetime(2026, 7, 27, 10, 5, tzinfo=timezone.utc),
+                override_policy_violations=True,
+            )
+            assert len(captured) == 1
+
+            second_result = execute_allocation_batch(
+                batch_id, store, tiny_cap_policy, now_et=datetime(2026, 7, 27, 10, 10, tzinfo=timezone.utc),
+            )
+            assert second_result["status"] == BATCH_COMPLETED
+            leg = second_result["legs"][proposal.proposal_id]
+            assert leg["state"] == LEG_SUBMITTED
+            assert leg["order"] is not None
+            assert leg["order"]["order_id"] == order["order_id"]
+            assert len(captured) == 1  # NOT resubmitted by the resync
+
+            # Idempotent: nothing changed underneath -- calling again
+            # must not alter or re-write anything further.
+            third_result = execute_allocation_batch(
+                batch_id, store, tiny_cap_policy, now_et=datetime(2026, 7, 27, 10, 15, tzinfo=timezone.utc),
+            )
+            assert third_result["status"] == BATCH_COMPLETED
+            assert third_result["legs"][proposal.proposal_id]["state"] == LEG_SUBMITTED
+            assert len(captured) == 1
+    finally:
+        restore()
+
+
+def test_completed_batch_with_no_underlying_change_is_idempotent():
+    packet = _packet(cash=10_000.0)
+    policy = _policy()
+    proposals = _two_leg_proposals(packet, policy)
+    captured, restore = _mock_batch_execution(packet, quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            batch_id = new_batch_id()
+            store.create_allocation_batch(batch_id, [p.proposal_id for p in proposals], intended_total_notional=2000.0)
+            first_result = execute_allocation_batch(
+                batch_id, store, policy, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert first_result["status"] == BATCH_COMPLETED
+            assert len(captured) == 2
+
+            second_result = execute_allocation_batch(
+                batch_id, store, policy, now_et=datetime(2026, 7, 27, 10, 5, tzinfo=timezone.utc),
+            )
+            assert second_result == first_result  # byte-for-byte unchanged, nothing re-persisted
+            assert len(captured) == 2  # nothing re-submitted
+    finally:
+        restore()
+
+
 if __name__ == "__main__":
     test_preflight_passes_when_every_leg_is_clean()
     test_preflight_failure_means_caller_submits_none()
@@ -1117,4 +1213,6 @@ if __name__ == "__main__":
     test_resuming_after_process_restart_only_attempts_remaining_legs()
     test_retrying_a_completed_batch_does_not_duplicate_orders()
     test_fresh_portfolio_state_blocks_a_later_leg_no_longer_safe()
+    test_completed_batch_resyncs_a_blocked_overridable_leg_once_individually_overridden()
+    test_completed_batch_with_no_underlying_change_is_idempotent()
     print("All allocation_batch tests passed.")

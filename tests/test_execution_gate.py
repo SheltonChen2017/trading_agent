@@ -706,6 +706,112 @@ def test_aware_utc_quote_timestamp_versus_naive_et_now_computes_correct_age():
     assert not any("staleness limit" in v for v in result.violations)
 
 
+# --- Invalid share-quantity checks (GPT review, 2026-07-29: NaN shares
+# used to bypass validate_trade_intent() entirely -- `shares <= 0` does
+# not reject NaN, so trade_value became NaN and every downstream
+# dollar-value comparison silently failed to trigger, approving the trade)
+
+def test_nan_shares_rejected_and_not_approved():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=float("nan"))
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("shares must be a positive whole number" in v for v in result.violations)
+    assert not result.overridable
+    try:
+        authorize_trade_intent(intent, result)
+        assert False, "a NaN-shares rejection must never be authorizable"
+    except ValueError:
+        pass
+
+
+def test_positive_infinity_shares_rejected():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=float("inf"))
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("shares must be a positive whole number" in v for v in result.violations)
+
+
+def test_negative_infinity_shares_rejected():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=float("-inf"))
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("shares must be a positive whole number" in v for v in result.violations)
+
+
+def test_fractional_shares_rejected():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=1.5)
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("shares must be a positive whole number" in v for v in result.violations)
+
+
+def test_bool_true_shares_rejected_despite_being_an_int_subclass():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=True)
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("shares must be a positive whole number" in v for v in result.violations)
+
+
+def test_bool_false_shares_rejected():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=False)
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("shares must be a positive whole number" in v for v in result.violations)
+
+
+def test_string_shares_rejected_without_crashing():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares="10")
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("shares must be a positive whole number" in v for v in result.violations)
+
+
+def test_zero_shares_rejected():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=0)
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("shares must be a positive whole number" in v for v in result.violations)
+
+
+def test_negative_int_shares_rejected():
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=-5)
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is False
+    assert any("shares must be a positive whole number" in v for v in result.violations)
+
+
+def test_valid_positive_int_shares_still_approved():
+    # Regression guard: the new strict check must not reject the ordinary case.
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=5)
+    result = validate_trade_intent(intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY)
+    assert result.approved is True
+    assert result.violations == ()
+
+
+def test_nan_shares_does_not_crash_other_checks():
+    # NaN shares must fail closed via INVALID_SHARES, not silently
+    # disable every OTHER check by poisoning trade_value with NaN.
+    snapshot = _snapshot(cash=10_000.0)
+    intent = TradeIntent(ticker="AAPL", side="buy", shares=float("nan"))
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=100.0, now=_MARKET_HOURS_WEEKDAY, kill_switch_active=True,
+    )
+    assert result.approved is False
+    # Kill switch short-circuits before shares are even checked, so this
+    # just confirms no exception was raised computing NaN * price.
+    assert result.violations == ("Kill switch is active — no trades are permitted.",)
+
+
 def test_naive_price_timestamp_with_aware_now_is_treated_as_eastern():
     snapshot = _snapshot(cash=10_000.0)
     intent = TradeIntent(ticker="KO", side="buy", shares=1)
@@ -773,5 +879,16 @@ if __name__ == "__main__":
     test_quote_timestamp_several_minutes_in_the_future_blocks()
     test_future_price_timestamp_cannot_be_overridden()
     test_aware_utc_quote_timestamp_versus_naive_et_now_computes_correct_age()
+    test_nan_shares_rejected_and_not_approved()
+    test_positive_infinity_shares_rejected()
+    test_negative_infinity_shares_rejected()
+    test_fractional_shares_rejected()
+    test_bool_true_shares_rejected_despite_being_an_int_subclass()
+    test_bool_false_shares_rejected()
+    test_string_shares_rejected_without_crashing()
+    test_zero_shares_rejected()
+    test_negative_int_shares_rejected()
+    test_valid_positive_int_shares_still_approved()
+    test_nan_shares_does_not_crash_other_checks()
     test_naive_price_timestamp_with_aware_now_is_treated_as_eastern()
     print("All execution gate tests passed.")

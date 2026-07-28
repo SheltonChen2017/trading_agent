@@ -13,7 +13,8 @@ import pandas as pd
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import TradingPolicy
-from assistant.schemas import DecisionPacket, MarketRegime
+from assistant.schemas import DecisionPacket, EvidenceStatus, FindingProvenance, MarketRegime, SignalEvidence
+import assistant.strategy_proposals as strategy_proposals
 from assistant.strategy_proposals import (
     LEVERAGED_TICKER,
     PRODUCTION_PARAMS,
@@ -178,6 +179,67 @@ def test_evidence_status_is_never_confirmed():
         assert proposal.evidence_status != "confirmed"
 
 
+# --- Research-authority disclosure (GPT review, 2026-07-29): this
+# module relies on 2 CONFIRMED findings for its wide-band mechanism --
+# reliance on their current production authority must be an explicit,
+# checked fact surfaced in `uncertainties`, not just docstring prose.
+
+def _overweight_packet_and_market_data():
+    market_data = _market_data()
+    target, _ = _expected_target(market_data)
+    overweight = min(target + 0.30, 0.95)
+    combined = 10_000.0
+    leveraged_value = combined * overweight
+    stable_value = combined - leveraged_value
+    packet = _packet(
+        [
+            {"ticker": STABLE_TICKER, "shares": stable_value / 50.0, "entry_price": 50.0, "current_price": 50.0},
+            {"ticker": LEVERAGED_TICKER, "shares": leveraged_value / 20.0, "entry_price": 20.0, "current_price": 20.0},
+        ]
+    )
+    return packet, market_data
+
+
+def test_discloses_non_authoritative_relied_upon_findings_against_the_real_registry():
+    # Current honest state of the real registry (research_findings.json):
+    # both relied-upon findings have reproduced_after_data_loader_fix=false
+    # -- the disclosure must therefore be present.
+    packet, market_data = _overweight_packet_and_market_data()
+    proposals = generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data)
+    assert proposals
+    for proposal in proposals:
+        assert any(
+            "NOT currently production-authoritative" in u for u in proposal.uncertainties
+        )
+
+
+def test_disclosure_absent_once_relied_upon_findings_are_reproduced():
+    packet, market_data = _overweight_packet_and_market_data()
+    authoritative_findings = [
+        SignalEvidence(
+            label=label, claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+            relevant_tickers=["SOXX", "SOXL"],
+            provenance=FindingProvenance(
+                actual_start_date="2019-07-22", actual_end_date="2026-07-28", actual_row_count=1764,
+                entry_timing="next_open", data_fetched_at="2026-07-28T00:00:00+00:00",
+                reproduced_after_data_loader_fix=True,
+            ),
+        )
+        for label in strategy_proposals._RELIED_UPON_FINDING_LABELS
+    ]
+    original = strategy_proposals.KNOWN_FINDINGS
+    strategy_proposals.KNOWN_FINDINGS = authoritative_findings
+    try:
+        proposals = generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data)
+        assert proposals
+        for proposal in proposals:
+            assert not any(
+                "NOT currently production-authoritative" in u for u in proposal.uncertainties
+            )
+    finally:
+        strategy_proposals.KNOWN_FINDINGS = original
+
+
 if __name__ == "__main__":
     test_returns_nothing_when_leveraged_leg_not_held()
     test_returns_nothing_when_stable_leg_not_held()
@@ -185,4 +247,6 @@ if __name__ == "__main__":
     test_proposes_sell_when_overweight_leveraged()
     test_proposes_buy_when_underweight_leveraged()
     test_evidence_status_is_never_confirmed()
+    test_discloses_non_authoritative_relied_upon_findings_against_the_real_registry()
+    test_disclosure_absent_once_relied_upon_findings_are_reproduced()
     print("All strategy_proposals tests passed.")

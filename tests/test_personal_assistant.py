@@ -14,6 +14,7 @@ from assistant.context_builder import build_portfolio_snapshot, build_risk_expos
 from assistant.execution_service import (
     PolicyOverridableBlockError,
     ProposalExecutionError,
+    _shares_from_stored_value,
     execute_approved_paper_proposal,
     validate_proposal_for_execution,
 )
@@ -1613,6 +1614,86 @@ def test_reconcile_submission_recovers_from_a_malformed_stored_intent():
         restore()
 
 
+# --- _shares_from_stored_value() -- GPT review, 2026-07-29: a bare
+# int(raw["shares"]) used to silently truncate a corrupted/hand-edited
+# fractional stored value (e.g. 1.9 -> 1) instead of failing closed.
+
+def test_shares_from_stored_value_accepts_a_plain_int():
+    assert _shares_from_stored_value(10) == 10
+
+
+def test_shares_from_stored_value_accepts_a_whole_valued_float():
+    assert _shares_from_stored_value(10.0) == 10
+
+
+def test_shares_from_stored_value_rejects_a_fractional_float():
+    try:
+        _shares_from_stored_value(1.9)
+        assert False, "expected a fractional stored shares value to raise"
+    except ValueError as exc:
+        assert "fractional" in str(exc)
+
+
+def test_shares_from_stored_value_rejects_nan():
+    try:
+        _shares_from_stored_value(float("nan"))
+        assert False, "expected a NaN stored shares value to raise"
+    except ValueError as exc:
+        assert "not finite" in str(exc)
+
+
+def test_shares_from_stored_value_rejects_infinity():
+    try:
+        _shares_from_stored_value(float("inf"))
+        assert False, "expected an infinite stored shares value to raise"
+    except ValueError as exc:
+        assert "not finite" in str(exc)
+
+
+def test_shares_from_stored_value_rejects_bool():
+    try:
+        _shares_from_stored_value(True)
+        assert False, "expected a bool stored shares value to raise"
+    except ValueError as exc:
+        assert "bool" in str(exc)
+
+
+def test_shares_from_stored_value_rejects_a_non_numeric_string():
+    try:
+        _shares_from_stored_value("10")
+        assert False, "expected a string stored shares value to raise"
+    except ValueError as exc:
+        assert "not numeric" in str(exc)
+
+
+def test_validate_proposal_for_execution_fails_closed_on_fractional_stored_shares():
+    # Integration-level check that a corrupted stored proposal (shares:
+    # 1.9) is rejected as a malformed intent by validate_proposal_for_
+    # execution(), not silently coerced to 1 share and validated as if
+    # nothing were wrong.
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            proposal_dict = proposal.to_dict()
+            corrupted_intent = dict(proposal_dict["intent"])
+            corrupted_intent["shares"] = 1.9
+            proposal_dict["intent"] = corrupted_intent
+            store.save_proposal(proposal_dict)
+            outcome = validate_proposal_for_execution(
+                proposal.proposal_id, packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert not outcome.approved
+            assert "malformed stored intent" in outcome.error.lower()
+            assert "fractional" in outcome.error.lower()
+    finally:
+        restore()
+
+
 def test_reconcile_submission_recovers_when_broker_lookup_itself_raises():
     packet = _packet()
     policy = _policy()
@@ -1784,6 +1865,79 @@ def test_recover_stale_reconciliation_resolves_a_crash_stranded_proposal():
         record = store.get_proposal(proposal.proposal_id)
         assert record["status"] == "submission_unknown"
         assert "stale" in record["error"].lower()
+
+
+# --- stale_after_seconds validation (GPT review, 2026-07-29): a zero or
+# negative window makes `cutoff` >= "now", so a reconciliation claimed
+# moments ago (or never) would already compare as stale, defeating the
+# entire concurrency guard the CLI exposed with no validation at all.
+
+def test_recover_stale_reconciliation_rejects_zero_with_no_mutation():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    from assistant.execution_service import recover_stale_reconciliation
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        store.update_proposal_status(proposal.proposal_id, "submitting")
+        store.claim_proposal(
+            proposal.proposal_id, expected_status=("submitting", "submission_unknown"), new_status="reconciling",
+        )
+        try:
+            recover_stale_reconciliation(proposal.proposal_id, store, stale_after_seconds=0)
+            assert False, "expected a zero stale_after_seconds to raise"
+        except ValueError as exc:
+            assert "positive int" in str(exc)
+        record = store.get_proposal(proposal.proposal_id)
+        assert record["status"] == "reconciling"  # untouched
+
+
+def test_recover_stale_reconciliation_rejects_negative_with_no_mutation():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    from assistant.execution_service import recover_stale_reconciliation
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(proposal.to_dict())
+        store.update_proposal_status(proposal.proposal_id, "submitting")
+        store.claim_proposal(
+            proposal.proposal_id, expected_status=("submitting", "submission_unknown"), new_status="reconciling",
+        )
+        try:
+            recover_stale_reconciliation(proposal.proposal_id, store, stale_after_seconds=-300)
+            assert False, "expected a negative stale_after_seconds to raise"
+        except ValueError as exc:
+            assert "positive int" in str(exc)
+        record = store.get_proposal(proposal.proposal_id)
+        assert record["status"] == "reconciling"  # untouched
+
+
+def test_recover_stale_reconciliation_rejects_bool_stale_after_seconds():
+    from assistant.execution_service import recover_stale_reconciliation
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        try:
+            recover_stale_reconciliation("tp_does_not_exist", store, stale_after_seconds=True)
+            assert False, "expected a bool stale_after_seconds to raise"
+        except ValueError as exc:
+            assert "positive int" in str(exc)
+
+
+def test_recover_stale_reconciliation_rejects_fractional_stale_after_seconds():
+    from assistant.execution_service import recover_stale_reconciliation
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        try:
+            recover_stale_reconciliation("tp_does_not_exist", store, stale_after_seconds=300.5)
+            assert False, "expected a fractional stale_after_seconds to raise"
+        except ValueError as exc:
+            assert "positive int" in str(exc)
 
 
 def test_recover_stale_reconciliation_leaves_a_recent_in_flight_claim_alone():

@@ -282,7 +282,53 @@ def execute_allocation_batch(
     if batch is None:
         raise ProposalExecutionError(f"Unknown batch: {batch_id}")
     if batch["status"] == BATCH_COMPLETED:
-        return batch
+        # A "completed" batch is a resumable PROJECTION, never assumed
+        # frozen -- a leg left "blocked_overridable" here can still be
+        # resolved later via that proposal's OWN individual override
+        # control (the UI tells the user to do exactly this), and this
+        # module's stated invariant is that the proposal record is
+        # always authoritative over the batch leg, not the other way
+        # around. Re-sync every leg from its proposal before returning,
+        # so a batch the UI displays as "completed" doesn't keep showing
+        # a leg as blocked forever after the underlying proposal has
+        # since been executed via that path (GPT review, 2026-07-29).
+        # Never calls execute_approved_paper_proposal() here -- this is
+        # a read/display refresh only, never a broker submission.
+        legs = batch["legs"]
+        changed = False
+        for proposal_id in batch["proposal_ids"]:
+            leg = legs.get(proposal_id, {"state": LEG_UNATTEMPTED, "order": None, "error": None})
+            current_proposal = store.get_proposal(proposal_id)
+            synced = _sync_leg_from_proposal(leg, current_proposal)
+            # Compare only the fields that matter for correctness/display
+            # (state, order, error) -- _sync_leg_from_proposal() also
+            # always adds bookkeeping metadata (proposal_status_seen,
+            # error_history) that a leg written by the normal execution
+            # path below never had to begin with, which would otherwise
+            # make EVERY completed batch look "changed" on its very first
+            # resync even when nothing meaningful happened.
+            if (
+                synced.get("state") != leg.get("state")
+                or synced.get("order") != leg.get("order")
+                or synced.get("error") != leg.get("error")
+            ):
+                changed = True
+                legs[proposal_id] = synced
+        if not changed:
+            return batch  # idempotent: nothing to persist, no-op read
+        all_terminal = all(
+            legs.get(pid, {"state": LEG_UNATTEMPTED})["state"] in (LEG_SUBMITTED, LEG_FAILED, LEG_BLOCKED_OVERRIDABLE)
+            for pid in batch["proposal_ids"]
+        )
+        # Still all terminal (the common case: a blocked_overridable leg
+        # became submitted) -- stays "completed", just with fresh leg
+        # data. If a resync instead produced an unresolved state
+        # (LEG_UNKNOWN, e.g. a leg's proposal is mid-flight via its
+        # individual override control right now), the batch must
+        # honestly stop reporting "completed" the same way the main
+        # execution loop below would.
+        final_status = BATCH_COMPLETED if all_terminal else BATCH_STOPPED_UNKNOWN
+        return store.update_allocation_batch(batch_id, status=final_status, legs=legs)
 
     legs = batch["legs"]
     for proposal_id in batch["proposal_ids"]:

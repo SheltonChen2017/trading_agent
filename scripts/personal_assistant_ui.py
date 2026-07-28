@@ -55,6 +55,7 @@ from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, 
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
 from assistant.proposal_status import STATUSES, UNRESOLVED_BROKER_STATE_STATUSES
 from assistant.proposals import generate_risk_reduction_proposals
+from assistant.research_registry import underfilled_dataset_warning
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.stock_lookup import (
     compute_blended_volatility,
@@ -272,11 +273,52 @@ def _allocation_input_signature(
     """Deterministic fingerprint over everything that determines an
     allocation plan -- cart/weights, dollar amount, prices (and their
     as-of timestamps, so a stale-but-unchanged price doesn't mask a
-    refresh), the cap, and the active policy's identity. Compared
-    against the signature stored alongside a generated batch of
+    refresh), the cap, the active policy's identity, AND the material
+    portfolio state the displayed plan/impact is computed against.
+    Compared against the signature stored alongside a generated batch of
     proposals so a changed input can be caught and the stale cards
     cleared, instead of leaving them rendered and approvable against
-    inputs the user has since changed (GPT review, 2026-07-28)."""
+    inputs the user has since changed (GPT review, 2026-07-28).
+
+    `packet.portfolio.as_of` alone (a plain ISO date) used to be the
+    ONLY portfolio-derived input here -- positions, cash, equity, buying
+    power, and open orders could all change intraday (a fill, a
+    manually-placed order, a deposit) without moving that date at all,
+    leaving a stale allocation card's confirmation/override state fully
+    intact against a portfolio that no longer matches what's displayed
+    (GPT review, 2026-07-29). Now hashes the actual material fields:
+    cash/equity/buying_power, open-order availability, and normalized,
+    SORTED positions/open-orders (sorted so merely re-fetching the same
+    holdings/orders in a different order can never spuriously invalidate
+    an otherwise-unchanged signature)."""
+    portfolio = packet.portfolio
+    positions_payload = sorted(
+        (
+            {
+                "ticker": p.ticker,
+                "shares": p.shares,
+                "current_price": p.current_price,
+                "market_value": p.market_value,
+            }
+            for p in portfolio.positions
+        ),
+        key=lambda d: d["ticker"],
+    )
+    open_orders_payload = sorted(
+        (
+            {
+                "order_id": order.get("order_id"),
+                "ticker": order.get("ticker"),
+                "side": order.get("side"),
+                "shares": order.get("shares"),
+                "notional": order.get("notional"),
+                "type": order.get("type"),
+                "limit_price": order.get("limit_price"),
+            }
+            for order in portfolio.open_orders
+        ),
+        key=lambda d: (d["order_id"] or "", d["ticker"] or "", d["side"] or ""),
+    )
     payload = {
         "weights": {t: weights[t] for t in sorted(weights)},
         "dollar_amount": round(dollar_amount, 2),
@@ -285,7 +327,13 @@ def _allocation_input_signature(
         "max_weight_pct": max_weight_pct,
         "policy_version": policy.version,
         "policy_fingerprint": compute_policy_fingerprint(policy),
-        "portfolio_as_of": packet.portfolio.as_of,
+        "portfolio_as_of": portfolio.as_of,
+        "cash": round(portfolio.cash, 2),
+        "total_equity": round(portfolio.total_equity, 2),
+        "buying_power": round(portfolio.buying_power, 2) if portfolio.buying_power is not None else None,
+        "open_orders_available": portfolio.open_orders_available,
+        "positions": positions_payload,
+        "open_orders": open_orders_payload,
     }
     serialized = json.dumps(payload, sort_keys=True, default=str)
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
@@ -422,7 +470,9 @@ with tab_briefing:
                 ticker_specific = [e for e in explanation["historical_evidence"] if e["ticker_specific"]]
                 if ticker_specific:
                     for e in ticker_specific:
-                        st.write(f"**[{e['status']}]** {e['label']} -- {e['claim']}")
+                        st.write(f"**[{e['display_status']}]** {e['label']} -- {e['claim']}")
+                        if e.get("dataset_warning"):
+                            st.warning(e["dataset_warning"])
                 else:
                     st.caption(f"No {position.ticker}-specific research exists in this project.")
                 if explanation["triggered_today"]:
@@ -449,8 +499,16 @@ with tab_briefing:
         st.subheader(f"Research evidence relevant to your holdings ({len(packet.signals)} findings)")
         st.caption(" / ".join(f"{count} {status}" for status, count in sorted(status_counts.items())))
         for finding in packet.signals:
-            st.write(f"**[{finding.status.value}]** {finding.label} -- {finding.claim}")
+            # display_status appends an explicit qualifier for a
+            # confirmed/promising finding that isn't currently
+            # production-authoritative -- never shown as a bare
+            # "[confirmed]" in that case (GPT review, 2026-07-29).
+            st.write(f"**[{finding.display_status}]** {finding.label} -- {finding.claim}")
             st.caption(finding.detail)
+            if finding.provenance is not None:
+                dataset_warning = underfilled_dataset_warning(finding.provenance)
+                if dataset_warning:
+                    st.warning(dataset_warning)
 
 with tab_watchlist:
     st.caption(

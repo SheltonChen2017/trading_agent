@@ -103,6 +103,27 @@ def test_explain_ticker_reports_currently_held_status():
         explanations.fetch_historical = original_fetch
 
 
+def test_explain_ticker_flags_non_authoritative_confirmed_findings_with_display_status():
+    # GPT review, 2026-07-29: a confirmed/promising finding that hasn't
+    # been re-verified since the fetch_historical lookback-days fix must
+    # be visibly distinguishable, not shown as an unqualified "confirmed".
+    original_fetch = explanations.fetch_historical
+    try:
+        explanations.fetch_historical = lambda tickers, lookback_days=300: {}
+        result = explain_ticker("SOXX", market_regime=_FIXED_REGIME)
+        soxx_drawdown = next(
+            e for e in result["historical_evidence"] if "SOXX/SOXL" in e["label"] and e["status"] == "confirmed"
+        )
+        # Historical status label must be preserved, not destroyed...
+        assert soxx_drawdown["status"] == "confirmed"
+        # ...but display_status/production_authoritative must reflect the
+        # real (currently unreproduced) authority state of the real registry.
+        assert soxx_drawdown["production_authoritative"] is False
+        assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in soxx_drawdown["display_status"]
+    finally:
+        explanations.fetch_historical = original_fetch
+
+
 def test_explain_ticker_handles_missing_data_gracefully():
     original_fetch = explanations.fetch_historical
     try:
@@ -117,5 +138,6 @@ if __name__ == "__main__":
     test_explain_ticker_reports_a_triggered_signal()
     test_explain_ticker_includes_historical_evidence_for_ticker_specific_findings()
     test_explain_ticker_reports_currently_held_status()
+    test_explain_ticker_flags_non_authoritative_confirmed_findings_with_display_status()
     test_explain_ticker_handles_missing_data_gracefully()
     print("All assistant explanations tests passed.")

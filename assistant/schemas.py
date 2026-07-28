@@ -35,7 +35,18 @@ def _to_dict(obj):
     """Recursively convert dataclasses (including nested ones, lists,
     dicts, and Enums) into plain JSON-serializable structures."""
     if dataclasses.is_dataclass(obj):
-        return {k: _to_dict(v) for k, v in dataclasses.asdict(obj).items()}
+        result = {k: _to_dict(v) for k, v in dataclasses.asdict(obj).items()}
+        if isinstance(obj, SignalEvidence):
+            # Computed, never stored -- can't drift out of sync with
+            # status/provenance the way a manually-set field could (GPT
+            # review, 2026-07-29: production authority was computed by
+            # research_registry.is_production_authoritative() but never
+            # actually reached any serialized/displayed output). Added
+            # here, not just as in-memory properties, so every JSON
+            # consumer (audit log, UI, briefing) gets it automatically.
+            result["production_authoritative"] = obj.production_authoritative
+            result["display_status"] = obj.display_status
+        return result
     if isinstance(obj, Enum):
         return obj.value
     if isinstance(obj, (list, tuple)):
@@ -119,6 +130,15 @@ class FindingProvenance:
     reproduced_after_data_loader_fix: bool = False
 
 
+# Statuses strong enough that a reader might treat them as
+# production-actionable without checking anything else -- kept in sync
+# with assistant/research_registry.py's _STATUSES_REQUIRING_PROVENANCE
+# (that module imports EvidenceStatus from here, so the reverse import
+# would be circular; this is the single logical definition, duplicated
+# only as this one frozenset).
+_STATUSES_REQUIRING_PROVENANCE = frozenset({EvidenceStatus.CONFIRMED, EvidenceStatus.PROMISING_UNCONFIRMED})
+
+
 @dataclasses.dataclass
 class SignalEvidence:
     label: str            # short human name, e.g. "SOXX/SOXL regime rotation -- drawdown reduction"
@@ -128,6 +148,44 @@ class SignalEvidence:
     source: str              # file/memory reference for where this came from
     relevant_tickers: list[str]
     provenance: FindingProvenance | None = None
+
+    @property
+    def production_authoritative(self) -> bool:
+        """Whether THIS finding's status can currently be trusted as
+        production evidence, as opposed to a label carried over from a
+        prior (possibly superseded) data-loader methodology. A confirmed
+        or promising_unconfirmed finding that has never been re-verified
+        since the fetch_historical lookback-days fix (commit 9f0ebc1) is
+        NOT production-authoritative regardless of its status string --
+        callers deciding whether to ACT ON or DISPLAY a finding must
+        check this, not just `status` (GPT review, 2026-07-29: this
+        exact logic already existed as
+        assistant.research_registry.is_production_authoritative(), but
+        was consulted only by that module's own tests -- every runtime
+        consumer, including the CLI briefing and the Streamlit UI, kept
+        showing a bare "[CONFIRMED]" with no qualification). Computed
+        fresh from `status`/`provenance` every time, never stored, so it
+        can never go stale independently of them. Statuses that make no
+        strong positive claim (rejected/exploratory/unavailable) are
+        always authoritative -- there is nothing here to distrust."""
+        if self.status not in _STATUSES_REQUIRING_PROVENANCE:
+            return True
+        return self.provenance is not None and self.provenance.reproduced_after_data_loader_fix
+
+    @property
+    def display_status(self) -> str:
+        """Status string safe to show a user WITHOUT destroying the
+        historical status label (GPT review, 2026-07-29: "prefer
+        preserving the historical status while exposing an explicit
+        current-authority field or prominent warning, rather than
+        destroying historical provenance"). A confirmed/promising
+        finding that is not `production_authoritative` gets an explicit,
+        hard-to-miss qualifier appended so it can never be displayed as
+        an unqualified "confirmed" result; anything else (including a
+        production-authoritative confirmed finding) is unchanged."""
+        if self.production_authoritative:
+            return self.status.value
+        return f"{self.status.value} -- UNREPRODUCED, NOT CURRENTLY PRODUCTION-AUTHORITATIVE"
 
 
 @dataclasses.dataclass

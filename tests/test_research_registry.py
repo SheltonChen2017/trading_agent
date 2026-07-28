@@ -237,6 +237,57 @@ def test_default_registry_none_of_the_confirmed_findings_are_currently_productio
     assert all(not is_production_authoritative(f) for f in strong_findings)
 
 
+def test_display_status_unqualified_when_production_authoritative():
+    prov = FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": True})
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+        relevant_tickers=[], provenance=prov,
+    )
+    assert finding.production_authoritative is True
+    assert finding.display_status == "confirmed"
+
+
+def test_display_status_qualified_when_not_production_authoritative():
+    # GPT review, 2026-07-29: a confirmed/promising finding that is not
+    # production_authoritative must never display as a bare "confirmed" --
+    # the historical status label is preserved, but an explicit qualifier
+    # is appended so a runtime consumer (CLI briefing, Streamlit UI)
+    # cannot show it unqualified.
+    prov = FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": False})
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+        relevant_tickers=[], provenance=prov,
+    )
+    assert finding.production_authoritative is False
+    assert finding.display_status.startswith("confirmed")
+    assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in finding.display_status
+
+
+def test_display_status_unqualified_for_rejected_regardless_of_provenance():
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.REJECTED, detail="...", source="test",
+        relevant_tickers=[], provenance=None,
+    )
+    assert finding.production_authoritative is True
+    assert finding.display_status == "rejected"
+
+
+def test_to_dict_serializes_computed_authority_fields():
+    # GPT review, 2026-07-29: production authority must reach every JSON
+    # consumer (audit log, UI, briefing), not just be computable in memory.
+    prov = FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": False})
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+        relevant_tickers=[], provenance=prov,
+    )
+    from assistant.schemas import _to_dict
+
+    serialized = _to_dict(finding)
+    assert serialized["production_authoritative"] is False
+    assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in serialized["display_status"]
+    assert serialized["status"] == "confirmed"  # historical label preserved, not destroyed
+
+
 def test_default_registry_flags_the_known_underfilled_nvdl_dataset():
     # Regression pin for the real underfilled-dataset case found while
     # implementing finding #8: NVDA/NVDL has substantially less history
@@ -263,5 +314,9 @@ if __name__ == "__main__":
     test_rejected_finding_is_always_production_authoritative_regardless_of_provenance()
     test_default_registry_loads_without_error_and_confirmed_findings_all_have_provenance()
     test_default_registry_none_of_the_confirmed_findings_are_currently_production_authoritative()
+    test_display_status_unqualified_when_production_authoritative()
+    test_display_status_qualified_when_not_production_authoritative()
+    test_display_status_unqualified_for_rejected_regardless_of_provenance()
+    test_to_dict_serializes_computed_authority_fields()
     test_default_registry_flags_the_known_underfilled_nvdl_dataset()
     print("All research registry tests passed.")

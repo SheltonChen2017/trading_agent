@@ -18,6 +18,7 @@ from assistant.execution_service import (
 )
 from assistant.policy import load_policy
 from assistant.proposals import generate_risk_reduction_proposals
+from assistant.research_registry import underfilled_dataset_warning
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
@@ -82,7 +83,18 @@ def _print_briefing(packet) -> None:
     ):
         print(f"  {event.ticker}: {event.event_type} {event.event_date} ({event.days_away} day(s))")
     for finding in packet.signals:
-        print(f"  [{finding.status.value}] {finding.label}: {finding.claim}")
+        # display_status (GPT review, 2026-07-30): never print a bare
+        # "[confirmed]" for a finding that isn't currently production-
+        # authoritative -- historical `status` is preserved, only the
+        # user-facing label is qualified. This CLI briefing was the last
+        # remaining consumer still reading the raw `status` value
+        # directly (run_morning_briefing.py and the Streamlit UI were
+        # already corrected).
+        print(f"  [{finding.display_status}] {finding.label}: {finding.claim}")
+        if finding.provenance is not None:
+            dataset_warning = underfilled_dataset_warning(finding.provenance)
+            if dataset_warning:
+                print(f"    ! {dataset_warning}")
 
 
 def command_briefing(args, store: AssistantStore) -> None:

@@ -15,6 +15,7 @@ from assistant.research_registry import (
     REQUIRED_PROVENANCE_FIELDS,
     is_production_authoritative,
     load_research_findings,
+    summarize_evidence_authority,
     underfilled_dataset_warning,
 )
 from assistant.schemas import EvidenceStatus, FindingProvenance, SignalEvidence
@@ -288,6 +289,70 @@ def test_to_dict_serializes_computed_authority_fields():
     assert serialized["status"] == "confirmed"  # historical label preserved, not destroyed
 
 
+def _reproduced_provenance() -> FindingProvenance:
+    return FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": True})
+
+
+def _unreproduced_provenance() -> FindingProvenance:
+    return FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": False})
+
+
+def test_summarize_evidence_authority_separates_historical_verdicts_from_current_authority():
+    # GPT review, 2026-07-30: the Streamlit evidence summary used to
+    # aggregate by raw `status` (e.g. "2 confirmed / 1 rejected") even
+    # when both confirmed findings were explicitly NOT production-
+    # authoritative -- directly contradicting the individual rows below
+    # it, which correctly used display_status. This helper must never
+    # let that happen: the historical verdict tally and the
+    # current-authority tally are reported SEPARATELY.
+    findings = [
+        SignalEvidence(
+            label="Confirmed and reproduced", claim="...", status=EvidenceStatus.CONFIRMED,
+            detail="...", source="test", relevant_tickers=[], provenance=_reproduced_provenance(),
+        ),
+        SignalEvidence(
+            label="Confirmed but unreproduced", claim="...", status=EvidenceStatus.CONFIRMED,
+            detail="...", source="test", relevant_tickers=[], provenance=_unreproduced_provenance(),
+        ),
+        SignalEvidence(
+            label="Promising but unreproduced", claim="...", status=EvidenceStatus.PROMISING_UNCONFIRMED,
+            detail="...", source="test", relevant_tickers=[], provenance=_unreproduced_provenance(),
+        ),
+        SignalEvidence(
+            label="Rejected", claim="...", status=EvidenceStatus.REJECTED,
+            detail="...", source="test", relevant_tickers=[], provenance=None,
+        ),
+    ]
+    summary = summarize_evidence_authority(findings)
+
+    # Historical verdict tally is untouched/never destroyed.
+    assert summary["verdict_counts"] == {"confirmed": 2, "promising_unconfirmed": 1, "rejected": 1}
+
+    # Current authority tally: 2 of the 4 (the unreproduced confirmed AND
+    # the unreproduced promising) are NOT production-authoritative. The
+    # reproduced confirmed and the rejected finding both count as
+    # authoritative (a rejected verdict makes no positive claim to
+    # distrust).
+    assert summary["non_authoritative_count"] == 2
+    assert set(summary["non_authoritative_labels"]) == {"Confirmed but unreproduced", "Promising but unreproduced"}
+
+
+def test_summarize_evidence_authority_all_reproduced_has_zero_non_authoritative():
+    findings = [
+        SignalEvidence(
+            label="Confirmed and reproduced", claim="...", status=EvidenceStatus.CONFIRMED,
+            detail="...", source="test", relevant_tickers=[], provenance=_reproduced_provenance(),
+        ),
+        SignalEvidence(
+            label="Rejected", claim="...", status=EvidenceStatus.REJECTED,
+            detail="...", source="test", relevant_tickers=[], provenance=None,
+        ),
+    ]
+    summary = summarize_evidence_authority(findings)
+    assert summary["non_authoritative_count"] == 0
+    assert summary["non_authoritative_labels"] == []
+
+
 def test_default_registry_flags_the_known_underfilled_nvdl_dataset():
     # Regression pin for the real underfilled-dataset case found while
     # implementing finding #8: NVDA/NVDL has substantially less history
@@ -318,5 +383,7 @@ if __name__ == "__main__":
     test_display_status_qualified_when_not_production_authoritative()
     test_display_status_unqualified_for_rejected_regardless_of_provenance()
     test_to_dict_serializes_computed_authority_fields()
+    test_summarize_evidence_authority_separates_historical_verdicts_from_current_authority()
+    test_summarize_evidence_authority_all_reproduced_has_zero_non_authoritative()
     test_default_registry_flags_the_known_underfilled_nvdl_dataset()
     print("All research registry tests passed.")

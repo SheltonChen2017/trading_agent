@@ -113,6 +113,70 @@ def test_decision_packet_to_dict_is_json_serializable():
     assert "AAA" in serialized
 
 
+def test_decision_packet_to_dict_reaches_nested_signal_authority_fields():
+    # GPT review, 2026-07-30: _to_dict() used to call dataclasses.asdict(obj),
+    # which recursively flattens EVERY nested dataclass (including a
+    # SignalEvidence nested inside signals=[...]) into a plain dict before
+    # this function's own isinstance(obj, SignalEvidence) check could ever
+    # run on it -- so production_authoritative/display_status were present
+    # on a bare _to_dict(finding) call but silently MISSING from
+    # packet.to_dict()["signals"][0]. Reproduced directly here against a
+    # real DecisionPacket (not just a bare SignalEvidence).
+    from assistant.schemas import DecisionPacket, FindingProvenance, MarketRegime, SignalEvidence
+
+    unreproduced_confirmed = SignalEvidence(
+        label="Test finding", claim="Beats a baseline", status=EvidenceStatus.CONFIRMED,
+        detail="...", source="test", relevant_tickers=[],
+        provenance=FindingProvenance(
+            actual_start_date="2019-07-22", actual_end_date="2026-07-28", actual_row_count=1764,
+            entry_timing="next_open", data_fetched_at="2026-07-28T00:00:00+00:00",
+            reproduced_after_data_loader_fix=False,
+        ),
+    )
+    positions = [{"ticker": "AAA", "shares": 1, "entry_price": 10.0, "current_price": 11.0}]
+    snapshot = build_portfolio_snapshot(positions, cash=50.0)
+    risk = build_risk_exposure(snapshot)
+    packet = DecisionPacket(
+        generated_at="2026-01-01T00:00:00Z", portfolio=snapshot, risk=risk,
+        regime=MarketRegime(benchmark_ticker="QQQ", trend=None, volatility_regime=None,
+                             trailing_volatility_pct=None, as_of="2026-01-01"),
+        signals=[unreproduced_confirmed], upcoming_events=[], warnings=[],
+    )
+
+    serialized = packet.to_dict()
+    signal = serialized["signals"][0]
+    assert signal["status"] == "confirmed"  # historical verdict preserved, not destroyed
+    assert signal["production_authoritative"] is False
+    assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in signal["display_status"]
+
+    # Round-trip through the JSONL audit log.
+    with tempfile.TemporaryDirectory() as tmp:
+        log_path = Path(tmp) / "log.jsonl"
+        append_decision_packet(packet, log_path=log_path)
+        entries = read_decision_log(log_path=log_path)
+        logged_signal = entries[0]["signals"][0]
+        assert logged_signal["production_authoritative"] is False
+        assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in logged_signal["display_status"]
+
+    # Round-trip through SQLite (AssistantStore.save_decision_packet()).
+    import json
+    import sqlite3
+
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        store.save_decision_packet(packet)
+        conn = sqlite3.connect(store.path)
+        try:
+            row = conn.execute("SELECT payload_json FROM decision_packets ORDER BY id DESC LIMIT 1").fetchone()
+        finally:
+            conn.close()
+        stored_signal = json.loads(row[0])["signals"][0]
+        assert stored_signal["production_authoritative"] is False
+        assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in stored_signal["display_status"]
+
+
 def test_audit_log_round_trips_decision_packets():
     from assistant.schemas import DecisionPacket, MarketRegime
     positions = [{"ticker": "AAA", "shares": 1, "entry_price": 10.0, "current_price": 11.0}]
@@ -197,6 +261,7 @@ if __name__ == "__main__":
     test_get_relevant_signal_evidence_includes_project_wide_and_ticker_specific()
     test_get_upcoming_events_are_unavailable_without_a_calendar_feed()
     test_decision_packet_to_dict_is_json_serializable()
+    test_decision_packet_to_dict_reaches_nested_signal_authority_fields()
     test_audit_log_round_trips_decision_packets()
     test_build_portfolio_snapshot_from_alpaca_uses_broker_data()
     test_build_decision_packet_falls_back_when_alpaca_not_configured()

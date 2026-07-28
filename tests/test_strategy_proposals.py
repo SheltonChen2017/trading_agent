@@ -240,6 +240,82 @@ def test_disclosure_absent_once_relied_upon_findings_are_reproduced():
         strategy_proposals.KNOWN_FINDINGS = original
 
 
+# --- Missing research dependency (GPT review, 2026-07-30): a MISSING
+# finding (no matching registry entry at all) must be treated as a
+# STRONGER integrity failure than a present-but-unreproduced one --
+# never silently indistinguishable from "everything is authoritative".
+
+def test_one_required_finding_missing_raises_and_generates_no_proposal():
+    packet, market_data = _overweight_packet_and_market_data()
+    remaining_label = strategy_proposals._RELIED_UPON_FINDING_LABELS[1]
+    findings_with_one_missing = [
+        SignalEvidence(
+            label=remaining_label, claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+            relevant_tickers=["SOXX", "SOXL"],
+            provenance=FindingProvenance(
+                actual_start_date="2019-07-22", actual_end_date="2026-07-28", actual_row_count=1764,
+                entry_timing="next_open", data_fetched_at="2026-07-28T00:00:00+00:00",
+                reproduced_after_data_loader_fix=True,
+            ),
+        )
+    ]
+    original = strategy_proposals.KNOWN_FINDINGS
+    strategy_proposals.KNOWN_FINDINGS = findings_with_one_missing
+    try:
+        try:
+            generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data)
+            assert False, "expected a missing relied-upon finding to raise"
+        except strategy_proposals.MissingResearchDependencyError as exc:
+            missing_label = strategy_proposals._RELIED_UPON_FINDING_LABELS[0]
+            assert missing_label in str(exc)
+    finally:
+        strategy_proposals.KNOWN_FINDINGS = original
+
+
+def test_entire_registry_empty_raises_and_generates_no_proposal():
+    packet, market_data = _overweight_packet_and_market_data()
+    original = strategy_proposals.KNOWN_FINDINGS
+    strategy_proposals.KNOWN_FINDINGS = []
+    try:
+        try:
+            generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data)
+            assert False, "expected an empty registry to raise, not silently produce a proposal"
+        except strategy_proposals.MissingResearchDependencyError as exc:
+            for label in strategy_proposals._RELIED_UPON_FINDING_LABELS:
+                assert label in str(exc)
+    finally:
+        strategy_proposals.KNOWN_FINDINGS = original
+
+
+def test_renamed_label_no_longer_resolves_raises():
+    # A label rename (e.g. a registry migration that reworded a finding's
+    # label) must be treated exactly like a deletion -- the hard-coded
+    # dependency in _RELIED_UPON_FINDING_LABELS no longer matches anything.
+    packet, market_data = _overweight_packet_and_market_data()
+    renamed_findings = [
+        SignalEvidence(
+            label=label + " (renamed)", claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+            relevant_tickers=["SOXX", "SOXL"],
+            provenance=FindingProvenance(
+                actual_start_date="2019-07-22", actual_end_date="2026-07-28", actual_row_count=1764,
+                entry_timing="next_open", data_fetched_at="2026-07-28T00:00:00+00:00",
+                reproduced_after_data_loader_fix=True,
+            ),
+        )
+        for label in strategy_proposals._RELIED_UPON_FINDING_LABELS
+    ]
+    original = strategy_proposals.KNOWN_FINDINGS
+    strategy_proposals.KNOWN_FINDINGS = renamed_findings
+    try:
+        try:
+            generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data)
+            assert False, "expected renamed labels to no longer resolve and raise"
+        except strategy_proposals.MissingResearchDependencyError:
+            pass
+    finally:
+        strategy_proposals.KNOWN_FINDINGS = original
+
+
 if __name__ == "__main__":
     test_returns_nothing_when_leveraged_leg_not_held()
     test_returns_nothing_when_stable_leg_not_held()
@@ -249,4 +325,7 @@ if __name__ == "__main__":
     test_evidence_status_is_never_confirmed()
     test_discloses_non_authoritative_relied_upon_findings_against_the_real_registry()
     test_disclosure_absent_once_relied_upon_findings_are_reproduced()
+    test_one_required_finding_missing_raises_and_generates_no_proposal()
+    test_entire_registry_empty_raises_and_generates_no_proposal()
+    test_renamed_label_no_longer_resolves_raises()
     print("All strategy_proposals tests passed.")

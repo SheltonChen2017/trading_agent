@@ -55,7 +55,7 @@ from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, 
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
 from assistant.proposal_status import STATUSES, UNRESOLVED_BROKER_STATE_STATUSES
 from assistant.proposals import generate_risk_reduction_proposals
-from assistant.research_registry import underfilled_dataset_warning
+from assistant.research_registry import summarize_evidence_authority, underfilled_dataset_warning
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.stock_lookup import (
     compute_blended_volatility,
@@ -493,11 +493,22 @@ with tab_briefing:
                 st.caption(f"{event.ticker}: {event.event_type} date unavailable [{event.status.value}]")
 
     if packet.signals:
-        status_counts: dict[str, int] = {}
-        for finding in packet.signals:
-            status_counts[finding.status.value] = status_counts.get(finding.status.value, 0) + 1
+        # Historical verdicts and current authority are reported as TWO
+        # separate tallies, never one aggregate (GPT review, 2026-07-30):
+        # aggregating by raw `status` could print "2 confirmed" right
+        # above rows that correctly show those same 2 findings as
+        # non-authoritative -- contradicting itself.
+        evidence_summary = summarize_evidence_authority(packet.signals)
         st.subheader(f"Research evidence relevant to your holdings ({len(packet.signals)} findings)")
-        st.caption(" / ".join(f"{count} {status}" for status, count in sorted(status_counts.items())))
+        st.caption(
+            "Historical verdicts: "
+            + " / ".join(f"{count} {status}" for status, count in sorted(evidence_summary["verdict_counts"].items()))
+        )
+        if evidence_summary["non_authoritative_count"]:
+            st.caption(
+                f"Current authority: {evidence_summary['non_authoritative_count']} "
+                "unreproduced/non-authoritative (see the qualifier on each row below)"
+            )
         for finding in packet.signals:
             # display_status appends an explicit qualifier for a
             # confirmed/promising finding that isn't currently

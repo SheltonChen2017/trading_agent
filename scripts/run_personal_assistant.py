@@ -205,6 +205,14 @@ def command_recover_stale(args, store: AssistantStore) -> None:
     )
 
 
+def command_prune_packets(args, store: AssistantStore) -> None:
+    # Explicit, opt-in cleanup (GPT review, 2026-07-31) -- decision
+    # packets have no retention policy otherwise; this never runs
+    # automatically, only when the user deliberately invokes it.
+    deleted = store.prune_decision_packets_older_than(args.older_than_days)
+    print(f"Deleted {deleted} decision packet(s) older than {args.older_than_days} day(s) from {store.path}.")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Personal trading assistant")
     parser.add_argument(
@@ -275,6 +283,17 @@ def build_parser() -> argparse.ArgumentParser:
     recover_stale.add_argument("proposal_id")
     recover_stale.add_argument("--stale-after-seconds", type=_positive_int, default=300)
     recover_stale.set_defaults(handler=command_recover_stale)
+
+    prune_packets = commands.add_parser(
+        "prune-packets",
+        help=(
+            "Explicit, opt-in cleanup for the decision_packets table -- deletes packets older than "
+            "--older-than-days. Never runs automatically; decision packets otherwise have no retention "
+            "policy and the table grows with every distinct briefing/UI refresh."
+        ),
+    )
+    prune_packets.add_argument("--older-than-days", type=_positive_int, required=True)
+    prune_packets.set_defaults(handler=command_prune_packets)
     return parser
 
 

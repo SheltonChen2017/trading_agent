@@ -31,6 +31,7 @@ Run with:
 """
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import json
 import math
@@ -55,7 +56,7 @@ from assistant.allocation_proposals import (
     estimate_pending_buy_value_by_ticker,
     generate_allocation_buy_proposals,
 )
-from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
+from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca, get_upcoming_events
 from assistant.execution_service import (
     PolicyOverridableBlockError,
     execute_approved_paper_proposal,
@@ -113,34 +114,65 @@ _PACKET_CACHE_TTL_SECONDS = 15
 
 
 @st.cache_data(ttl=_PACKET_CACHE_TTL_SECONDS)
-def _load_packet(policy_path: str, include_events: bool):
-    """Builds one DecisionPacket (live Alpaca account/quotes/open-orders
-    fetch + market-regime computation) for the given (policy_path,
-    include_events) pair.
+def _load_base_packet(policy_path: str):
+    """Builds the ONE shared account/positions/open-orders/market-regime
+    snapshot for this cache window -- NEVER includes live earnings events
+    (see _load_packet() below for that).
 
-    Cached (GPT review, 2026-07-31, independently reproduced: this was
-    NOT actually decorated with @st.cache_data despite the Briefing tab's
-    "Refresh briefing" button already calling `st.cache_data.clear()` as
-    if it were -- Streamlit reruns the ENTIRE script top-to-bottom on
-    every widget interaction anywhere in the app, and every tab's body
-    executes regardless of which tab is visually active, so a single
-    keystroke in an unrelated tab triggered up to 5 uncached calls to
-    this function -- each a real Alpaca account/quote/open-order fetch
-    plus a market-data fetch for the regime calculation -- per rerun).
-    A short TTL (not an unbounded cache) keeps the account/regime view
-    honestly close to real-time for a manually-driven UI, while
-    collapsing the redundant same-instant calls a single rerun makes.
-    "Refresh briefing" still forces an immediate live re-fetch via
-    `st.cache_data.clear()`."""
+    Cached (GPT review, 2026-07-31, independently reproduced twice: first
+    that this wasn't decorated with @st.cache_data at all despite the
+    Briefing tab's "Refresh briefing" button already calling
+    `st.cache_data.clear()` as if it were; second, after adding caching,
+    that `include_events` was still part of the cache key, so a tab
+    wanting live events and a tab that didn't were separately-cached,
+    separately-fetched calls -- meaning two tabs in the SAME rerun could
+    still see two DIFFERENT account/position/open-order snapshots from
+    two different instants). Splitting the cache key down to JUST
+    `policy_path` (event enrichment is layered on afterward by
+    _load_packet(), never re-fetching this base snapshot) guarantees
+    every tab shares the exact same portfolio/account/regime view for
+    the whole cache window, regardless of whether that tab also wants
+    events. A short TTL (not an unbounded cache) keeps the account/
+    regime view honestly close to real-time for a manually-driven UI,
+    while collapsing the redundant same-instant duplicate fetches a
+    single rerun makes. "Refresh briefing" still forces an immediate
+    live re-fetch via `st.cache_data.clear()`."""
     policy = load_policy(policy_path)
     packet = build_decision_packet(
         SAMPLE_POSITIONS,
         SAMPLE_CASH,
         use_live_alpaca=is_configured(),
-        include_live_events=include_events,
+        include_live_events=False,
         policy=policy,
     )
     return policy, packet
+
+
+@st.cache_data(ttl=_PACKET_CACHE_TTL_SECONDS)
+def _load_live_events_for_tickers(tickers: tuple[str, ...]) -> list:
+    """Optional live-earnings enrichment ONLY -- never rebuilds the
+    portfolio/account/regime snapshot (GPT review, 2026-07-31). Cached
+    separately (and much more cheaply -- this is a single earnings-
+    calendar lookup, not an account/quote/regime fetch) so requesting
+    events never triggers a second account fetch."""
+    return get_upcoming_events(list(tickers), fetch_live=True)
+
+
+def _load_packet(policy_path: str, include_events: bool):
+    """Returns (policy, packet) -- `packet` is always derived from the
+    SAME cached base packet (see _load_base_packet()) for this cache
+    window, with live earnings events layered on top ONLY if requested.
+    Every call site keeps its existing (policy_path, include_events)
+    signature; the base account/regime snapshot is simply never rebuilt
+    just because a different tab's `include_events` differs (GPT review,
+    2026-07-31)."""
+    policy, base_packet = _load_base_packet(policy_path)
+    if not include_events:
+        return policy, base_packet
+    tickers = tuple(p.ticker for p in base_packet.portfolio.positions)
+    events = _load_live_events_for_tickers(tickers)
+    enriched = dataclasses.replace(base_packet, upcoming_events=events)
+    return policy, enriched
 
 
 # Coarse rounding granularity for cash/equity/buying_power in the

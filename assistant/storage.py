@@ -11,7 +11,7 @@ import json
 import os
 import sqlite3
 from contextlib import contextmanager
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -82,15 +82,74 @@ class AssistantStore:
                     ON trade_proposals(status, created_at);
                 """
             )
+            # Deduplicate any pre-existing rows sharing a generated_at
+            # (from before this fix -- e.g. the UI re-saving the same
+            # st.cache_data-cached packet from a second browser tab or a
+            # page reload, which had no server-side identity/uniqueness
+            # to catch it) BEFORE creating the unique index below --
+            # CREATE UNIQUE INDEX fails outright on a table that already
+            # contains duplicates (GPT review, 2026-07-31). No-op (0 rows
+            # affected) once already deduplicated, so safe to run on
+            # every AssistantStore() construction.
+            connection.execute(
+                """
+                DELETE FROM decision_packets
+                WHERE id NOT IN (SELECT MIN(id) FROM decision_packets GROUP BY generated_at)
+                """
+            )
+            connection.execute(
+                "CREATE UNIQUE INDEX IF NOT EXISTS idx_decision_packets_generated_at "
+                "ON decision_packets(generated_at)"
+            )
 
     def save_decision_packet(self, packet: DecisionPacket) -> int:
+        """Persists one decision packet, keyed by `generated_at` -- an
+        ISO timestamp set exactly once per real build_decision_packet()
+        call, so two saves sharing it really are the same underlying
+        packet. Idempotent: saving the same packet.generated_at twice is
+        a safe no-op that returns the ORIGINAL row's id, never a new
+        duplicate row (GPT review, 2026-07-31: this used to insert an
+        unconditional new row every call -- since the UI layer now caches
+        packets via st.cache_data, a page reload, a new browser tab, or a
+        second session had no server-side way to recognize "this is the
+        same cached packet I already saved" and would insert it again;
+        deduplication needed to live in storage, not only in UI session
+        state, which starts fresh for every new session)."""
         payload = json.dumps(packet.to_dict(), sort_keys=True)
         with self._connect() as connection:
             cursor = connection.execute(
-                "INSERT INTO decision_packets(generated_at, schema_version, payload_json) VALUES (?, ?, ?)",
+                "INSERT INTO decision_packets(generated_at, schema_version, payload_json) VALUES (?, ?, ?) "
+                "ON CONFLICT(generated_at) DO NOTHING",
                 (packet.generated_at, packet.schema_version, payload),
             )
-            return int(cursor.lastrowid)
+            if cursor.rowcount == 1:
+                return int(cursor.lastrowid)
+            existing = connection.execute(
+                "SELECT id FROM decision_packets WHERE generated_at = ?", (packet.generated_at,)
+            ).fetchone()
+            return int(existing["id"])
+
+    def prune_decision_packets_older_than(self, days: int) -> int:
+        """Explicit, opt-in retention cleanup -- deletes decision packets
+        whose `generated_at` is older than `days` ago. NEVER runs
+        automatically or silently (GPT review, 2026-07-31: decision
+        packets had no retention policy at all, so the table grows
+        unboundedly even after deduplication above) -- exposed as
+        `python scripts/run_personal_assistant.py prune-packets
+        --older-than-days N`, a command the user must explicitly invoke.
+
+        No foreign-key relationship from trade_proposals/broker_orders/
+        allocation_batches to decision_packets currently exists in this
+        schema, so pruning is safe project-wide as of this writing; if a
+        reference from proposals to decision packets is ever introduced,
+        this function must be updated to exclude referenced packets.
+        Returns the number of rows deleted."""
+        if days <= 0:
+            raise ValueError(f"days must be positive, got {days!r}.")
+        cutoff = (datetime.now(timezone.utc) - timedelta(days=days)).isoformat()
+        with self._connect() as connection:
+            cursor = connection.execute("DELETE FROM decision_packets WHERE generated_at < ?", (cutoff,))
+            return cursor.rowcount
 
     def save_proposal(self, proposal: dict[str, Any]) -> None:
         now = datetime.now(timezone.utc).isoformat()

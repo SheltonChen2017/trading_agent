@@ -265,7 +265,7 @@ def _validation_proof(
     return _sign(f"validated:{approved}:{intent_fingerprint(intent)}:{canonical_codes}")
 
 
-def _authorization_proof(intent: TradeIntent, expires_at: str) -> str:
+def _authorization_proof(intent: TradeIntent, token: str, expires_at: str) -> str:
     # `expires_at` is part of the signed payload -- NOT just intent
     # identity -- so the expiry itself can't be extended after the fact.
     # ExecutionAuthorization is frozen, but dataclasses.replace() (or any
@@ -274,7 +274,17 @@ def _authorization_proof(intent: TradeIntent, expires_at: str) -> str:
     # version's proof didn't cover expires_at, that forged object would
     # still verify, defeating "short-lived" entirely (GPT review,
     # 2026-07-27).
-    return _sign(f"authorized:{intent_fingerprint(intent)}:{expires_at}")
+    #
+    # `token` is ALSO part of the signed payload (GPT review, 2026-07-31,
+    # independently reproduced): the one-time-use replay check below keys
+    # off `authorization.token`, but the token itself used to be entirely
+    # UNSIGNED -- `dataclasses.replace(authorization, token="anything")`
+    # kept the exact same valid proof (since proof never covered token at
+    # all), producing an object with a fresh, never-consumed token but
+    # the SAME valid intent+expiry binding, completely bypassing replay
+    # detection. Binding token into the proof means swapping it invalidates
+    # the proof, exactly like swapping expires_at or the intent already did.
+    return _sign(f"authorized:{intent_fingerprint(intent)}:{token}:{expires_at}")
 
 
 def authorize_trade_intent(
@@ -293,11 +303,12 @@ def authorize_trade_intent(
             "or mismatched ValidationResult cannot be signed correctly."
         )
     now = datetime.now(timezone.utc)
+    token = secrets.token_urlsafe(32)
     expires_at = (now + timedelta(seconds=ttl_seconds)).isoformat()
     return ExecutionAuthorization(
-        token=secrets.token_urlsafe(32),
+        token=token,
         intent_fingerprint=intent_fingerprint(intent),
-        proof=_authorization_proof(intent, expires_at),
+        proof=_authorization_proof(intent, token, expires_at),
         approved_at=now.isoformat(),
         expires_at=expires_at,
     )
@@ -350,15 +361,15 @@ def authorize_overridden_trade_intent(
             "earnings-blackout violations can be overridden) -- refusing to authorize."
         )
     now = datetime.now(timezone.utc)
+    token = secrets.token_urlsafe(32)
     expires_at = (now + timedelta(seconds=ttl_seconds)).isoformat()
     return ExecutionAuthorization(
-        token=secrets.token_urlsafe(32),
+        token=token,
         intent_fingerprint=intent_fingerprint(intent),
-        proof=_authorization_proof(intent, expires_at),
+        proof=_authorization_proof(intent, token, expires_at),
         approved_at=now.isoformat(),
         expires_at=expires_at,
     )
-
 
 
 # token -> expires_at (ISO string), for the one-time-use check below.
@@ -395,7 +406,16 @@ def verify_execution_authorization(
 ) -> None:
     if authorization is None:
         raise PermissionError("Broker submission requires a short-lived execution-gate authorization.")
-    if not hmac.compare_digest(authorization.proof, _authorization_proof(intent, authorization.expires_at)):
+    # Rejected explicitly, before the proof check -- an empty/malformed
+    # token could otherwise reach the consumption check below with a
+    # falsy dict key, and this makes the requirement unambiguous rather
+    # than relying on the proof mismatch to catch it incidentally (GPT
+    # review, 2026-07-31).
+    if not authorization.token:
+        raise PermissionError("Execution-gate authorization has an empty or missing token.")
+    if not hmac.compare_digest(
+        authorization.proof, _authorization_proof(intent, authorization.token, authorization.expires_at)
+    ):
         raise PermissionError("Execution-gate authorization does not match this trade intent.")
     current = now or datetime.now(timezone.utc)
     expires = datetime.fromisoformat(authorization.expires_at)

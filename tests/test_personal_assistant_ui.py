@@ -18,13 +18,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import streamlit as st
+
+import scripts.personal_assistant_ui as ui
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
-from assistant.policy import TradingPolicy, compute_policy_fingerprint
+from assistant.policy import DEFAULT_POLICY_PATH, TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import STATUSES
 from assistant.schemas import DecisionPacket, MarketRegime
 from scripts.personal_assistant_ui import (
     _allocation_input_signature,
     _clear_confirmation_state_if_digest_changed,
+    _load_packet,
     _portfolio_context_payload,
     _proposal_content_digest,
     _proposal_status_category,
@@ -322,6 +326,71 @@ def test_proposal_status_category_unknown_status_is_never_approvable():
     assert _proposal_status_category("some_future_status") != "approvable"
 
 
+# --- _load_packet() / _load_base_packet() / _load_live_events_for_tickers()
+# (GPT review, 2026-07-31): `include_events` used to be part of the cache
+# key for the single monolithic packet-loading function, so a tab
+# wanting live events and a tab that didn't were separately-cached,
+# separately-fetched calls -- two tabs in the SAME rerun could see two
+# DIFFERENT account/position/open-order snapshots from two different
+# instants. Mocks ui.build_decision_packet/ui.get_upcoming_events
+# entirely so this test never touches the network (build_decision_packet
+# always fetches real market-regime data regardless of Alpaca
+# configuration).
+
+def _fake_packet_builder(calls):
+    def _build(*args, **kwargs):
+        calls.append(kwargs.get("include_live_events"))
+        snapshot = build_portfolio_snapshot([], cash=1234.0)
+        return DecisionPacket(
+            generated_at="fixed-generated-at", portfolio=snapshot, risk=build_risk_exposure(snapshot),
+            regime=MarketRegime(benchmark_ticker="QQQ", trend=None, volatility_regime=None,
+                                 trailing_volatility_pct=None, as_of="2026-07-31"),
+            signals=[], upcoming_events=[], warnings=[], policy_version="test",
+        )
+    return _build
+
+
+def test_load_packet_shares_the_same_base_snapshot_regardless_of_include_events():
+    build_calls = []
+    original_build = ui.build_decision_packet
+    original_get_events = ui.get_upcoming_events
+    ui.build_decision_packet = _fake_packet_builder(build_calls)
+    ui.get_upcoming_events = lambda tickers, fetch_live=False: ["FAKE_EVENT"]
+    st.cache_data.clear()
+    try:
+        policy_a, packet_a = _load_packet(str(DEFAULT_POLICY_PATH), False)
+        policy_b, packet_b = _load_packet(str(DEFAULT_POLICY_PATH), True)
+        # The base builder is called through the cache with
+        # include_live_events=False EVERY time, and only ONCE total --
+        # requesting events on the second call must not trigger a second
+        # base-snapshot build.
+        assert build_calls == [False]
+        assert packet_a.generated_at == packet_b.generated_at == "fixed-generated-at"
+        assert packet_a.portfolio.cash == packet_b.portfolio.cash == 1234.0
+        assert packet_a.upcoming_events == []
+        assert packet_b.upcoming_events == ["FAKE_EVENT"]
+    finally:
+        ui.build_decision_packet = original_build
+        ui.get_upcoming_events = original_get_events
+        st.cache_data.clear()
+
+
+def test_load_packet_no_events_never_calls_the_live_events_function():
+    events_calls = []
+    original_build = ui.build_decision_packet
+    original_get_events = ui.get_upcoming_events
+    ui.build_decision_packet = _fake_packet_builder([])
+    ui.get_upcoming_events = lambda tickers, fetch_live=False: (events_calls.append(tickers), [])[1]
+    st.cache_data.clear()
+    try:
+        _load_packet(str(DEFAULT_POLICY_PATH), False)
+        assert events_calls == []
+    finally:
+        ui.build_decision_packet = original_build
+        ui.get_upcoming_events = original_get_events
+        st.cache_data.clear()
+
+
 if __name__ == "__main__":
     test_proposal_status_category_covers_every_real_status()
     test_proposal_status_category_unknown_status_is_never_approvable()
@@ -349,4 +418,6 @@ if __name__ == "__main__":
     test_clear_confirmation_state_clears_confirm_and_override_phrase_on_change()
     test_clear_confirmation_state_no_op_when_digest_unchanged()
     test_clear_confirmation_state_handles_first_render_with_no_prior_digest()
+    test_load_packet_shares_the_same_base_snapshot_regardless_of_include_events()
+    test_load_packet_no_events_never_calls_the_live_events_function()
     print("All personal_assistant_ui tests passed.")

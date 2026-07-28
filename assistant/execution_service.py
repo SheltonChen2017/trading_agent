@@ -199,6 +199,8 @@ acting):
 from __future__ import annotations
 
 import dataclasses
+import hashlib
+import json
 import math
 import os
 from datetime import datetime, timedelta, timezone
@@ -223,6 +225,7 @@ from risk.execution_gate import (
     ValidationResult,
     authorize_overridden_trade_intent,
     authorize_trade_intent,
+    intent_fingerprint,
     validate_trade_intent,
 )
 
@@ -245,11 +248,46 @@ class PolicyOverridableBlockError(ProposalExecutionError):
     terminal) so a caller can re-invoke with override_policy_violations=
     True to proceed. `overridable_violations` is always the complete
     violations list here, since a mix of overridable and non-overridable
-    violations always raises the plain ProposalExecutionError instead."""
+    violations always raises the plain ProposalExecutionError instead.
 
-    def __init__(self, message: str, overridable_violations: list[str]):
+    `conditions_changed` (GPT review, 2026-07-30): True only when the
+    caller DID pass override_policy_violations=True, a PRIOR reviewed-
+    override record existed for this proposal, and the current
+    violations no longer match that prior record -- i.e. the human's
+    earlier review no longer describes what would actually be overridden
+    right now. False for an ordinary first-time presentation (nothing to
+    compare against yet) and for a plain non-override check. Callers
+    (CLI, UI) should show a distinctly different message in this case --
+    "the conditions changed, review again" rather than "every violation
+    is override-eligible, rerun with --override"."""
+
+    def __init__(self, message: str, overridable_violations: list[str], conditions_changed: bool = False):
         super().__init__(message)
         self.overridable_violations = overridable_violations
+        self.conditions_changed = conditions_changed
+
+
+def _review_digest(intent: TradeIntent, violation_codes: tuple[str, ...], violations: tuple[str, ...]) -> str:
+    """Fingerprint over the EXACT trade intent plus the EXACT set of
+    override-eligible violations (both stable codes AND human-readable
+    messages, each canonically sorted so no ordering artifact can ever
+    cause a spurious mismatch) that a human has been shown before
+    requesting an override (GPT review, 2026-07-30: `override_policy_
+    violations=True` used to be treated as blanket permission to accept
+    WHATEVER override-eligible conditions happened to exist at the later
+    execution instant, not specifically the ones actually reviewed).
+    Hashing the messages too, not just the codes, matters: the same code
+    (e.g. max_position_pct) can represent materially different severity
+    as the underlying numbers change -- a position slightly over the cap
+    is not the same reviewed risk as one dramatically over it, and the
+    human-readable message is what carries that number."""
+    payload = {
+        "intent_fingerprint": intent_fingerprint(intent),
+        "violation_codes": sorted(violation_codes),
+        "violations": sorted(violations),
+    }
+    serialized = json.dumps(payload, sort_keys=True)
+    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
 def _shares_from_stored_value(raw_shares: object) -> int:
@@ -722,11 +760,36 @@ def execute_approved_paper_proposal(
     `override_policy_violations`: if the ONLY reason this proposal would
     be blocked is one or more override-eligible violations (concentration
     caps or the earnings blackout -- see risk.execution_gate.
-    ValidationResult.overridable_violations), passing True proceeds
-    anyway instead of raising PolicyOverridableBlockError. Any other
+    ValidationResult.overridable_violations), passing True proceeds --
+    but ONLY if the CURRENT violations (revalidated fresh against
+    `current_portfolio`/live quote, right now) exactly match a
+    PREVIOUSLY-STORED reviewed-override record for this proposal (GPT
+    review, 2026-07-30: passing True used to be treated as blanket
+    permission to accept whatever override-eligible conditions happened
+    to exist at the later execution instant, not specifically the ones a
+    human actually reviewed -- a position-cap violation could become
+    materially more severe, a basket/leveraged-ETF/earnings violation
+    could newly appear, or one override-eligible violation could be
+    replaced by another, all between an initial PolicyOverridableBlockError
+    and a later `override_policy_violations=True` call, with nothing
+    checking that the human saw the SAME set before accepting it).
+
+    Concretely: every time this proposal is blocked ONLY by override-
+    eligible violations, the service stores a reviewed-override record
+    (the trade intent's fingerprint plus canonically-ordered violation
+    codes/messages) and raises PolicyOverridableBlockError -- REGARDLESS
+    of whether the caller already passed `override_policy_violations=
+    True`. Only a SECOND call, with that flag set, whose freshly
+    revalidated violations produce the exact same digest as the stored
+    record, actually proceeds to authorization. A digest mismatch (first
+    presentation, or the reviewed conditions changed) always re-stores
+    the new record and raises again -- `PolicyOverridableBlockError.
+    conditions_changed` distinguishes "changed since a prior review" from
+    "first presentation" for caller messaging. Any non-overridable
     violation (stale price, closed market, a bad quote, a duplicate
-    order, the kill switch, insufficient cash) still blocks regardless of
-    this flag -- see authorize_overridden_trade_intent()'s docstring.
+    order, the kill switch, insufficient cash, invalid quantities) still
+    hard-blocks regardless of any of this -- see
+    authorize_overridden_trade_intent()'s docstring.
 
     Proposals are single-use, short-lived, and currently restricted to
     Alpaca paper accounts regardless of the global broker configuration.
@@ -835,24 +898,54 @@ def execute_approved_paper_proposal(
                 raise ProposalExecutionError(
                     "Execution gate blocked the proposal: " + "; ".join(validation.violations)
                 )
-            if not override_policy_violations:
-                # Every violation is override-eligible, but the caller
-                # hasn't confirmed the override yet -- leave this proposal
-                # in a distinct, non-terminal, re-claimable status rather
-                # than BLOCKED (which is terminal) so a follow-up call
-                # with override_policy_violations=True can pick it back up.
+            # Reviewed-override binding (GPT review, 2026-07-30): a
+            # digest match against the LAST reviewed-override record
+            # stored on this proposal is required, in addition to
+            # override_policy_violations=True, before proceeding --
+            # otherwise this always (re-)stores the current violations as
+            # the new record to review and raises, never silently
+            # escalating to an authorization based on conditions the
+            # human hasn't specifically seen and accepted. `proposal`
+            # here is the snapshot fetched BEFORE this call's atomic
+            # claim, so `reviewed_override` reflects whatever a PRIOR
+            # call stored -- claim_proposal() never touches payload_json.
+            current_digest = _review_digest(intent, validation.violation_codes, validation.violations)
+            previous_reviewed = proposal.get("reviewed_override")
+            reviewed_matches = (
+                override_policy_violations
+                and previous_reviewed is not None
+                and previous_reviewed.get("review_digest") == current_digest
+            )
+            if not reviewed_matches:
+                conditions_changed = (
+                    override_policy_violations
+                    and previous_reviewed is not None
+                    and previous_reviewed.get("review_digest") != current_digest
+                )
                 store.update_proposal_status(
-                    proposal_id, POLICY_OVERRIDE_AVAILABLE, violations=list(validation.violations)
+                    proposal_id,
+                    POLICY_OVERRIDE_AVAILABLE,
+                    violations=list(validation.violations),
+                    reviewed_override={
+                        "intent_fingerprint": intent_fingerprint(intent),
+                        "violation_codes": sorted(validation.violation_codes),
+                        "violations": sorted(validation.violations),
+                        "review_digest": current_digest,
+                        "presented_at": now_utc.isoformat(),
+                    },
                 )
                 raise PolicyOverridableBlockError(
                     "Execution gate blocked this proposal, but every violation is override-eligible "
                     "(a risk-preference or earnings-calendar call, not unreliable data): "
                     + "; ".join(validation.violations),
                     overridable_violations=list(validation.violations),
+                    conditions_changed=conditions_changed,
                 )
-            # override_policy_violations=True and every violation is
-            # override-eligible: fall through to authorize_overridden_
-            # trade_intent() below instead of the normal approved path.
+            # override_policy_violations=True, every violation is
+            # override-eligible, AND the current violations exactly match
+            # what was previously reviewed: fall through to
+            # authorize_overridden_trade_intent() below instead of the
+            # normal approved path.
     except PolicyOverridableBlockError:
         raise
     except ProposalExecutionError as exc:

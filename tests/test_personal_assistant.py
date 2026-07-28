@@ -10,6 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import execution.alpaca_broker as broker
+from assistant.allocation_proposals import generate_allocation_buy_proposals
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.execution_service import (
     PolicyOverridableBlockError,
@@ -59,6 +60,28 @@ def _packet():
         upcoming_events=[],
         warnings=[],
         policy_version="test",
+    )
+
+
+def _packet_with_cash(cash: float) -> DecisionPacket:
+    # Like _packet(), but with adjustable cash (and therefore total
+    # equity) -- used to produce the SAME violation code with a
+    # materially DIFFERENT projected-exposure message (bigger account ->
+    # same dollar buy is a smaller percentage), without touching anything
+    # else about the scenario.
+    snapshot = build_portfolio_snapshot(
+        [{"ticker": "TQQQ", "shares": 100, "entry_price": 50.0, "current_price": 50.0}],
+        cash=cash,
+    )
+    return DecisionPacket(
+        generated_at="2026-07-26T12:00:00+00:00",
+        portfolio=snapshot,
+        risk=build_risk_exposure(snapshot),
+        regime=MarketRegime(
+            benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
+            trailing_volatility_pct=1.0, as_of="2026-07-25",
+        ),
+        signals=[], upcoming_events=[], warnings=[], policy_version="test",
     )
 
 
@@ -559,6 +582,13 @@ def test_earnings_only_block_raises_overridable_error_and_leaves_proposal_re_cla
 
 
 def test_override_flag_proceeds_past_an_earnings_only_block_and_records_it():
+    # GPT review, 2026-07-30: a DIRECT override_policy_violations=True call
+    # on a proposal that has never been shown to a human before must not
+    # authorize immediately -- it must first become the review/
+    # presentation step (storing a reviewed-override record and raising
+    # PolicyOverridableBlockError), exactly like an ordinary discovery
+    # call would. Only a SECOND call, once the human has (at least
+    # notionally) seen that exact violation set, actually proceeds.
     packet = _packet()
     policy = _policy()
     proposal = generate_risk_reduction_proposals(packet, policy)[0]
@@ -567,9 +597,22 @@ def test_override_flag_proceeds_past_an_earnings_only_block_and_records_it():
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                )
+                assert False, "expected the first override attempt to require a review step first"
+            except PolicyOverridableBlockError:
+                pass
+            assert len(captured) == 0
+
+            # Second call: same portfolio/quote, so the freshly revalidated
+            # violations exactly match what was just reviewed -- proceeds.
             order = execute_approved_paper_proposal(
                 proposal.proposal_id, "approve", packet.portfolio, policy, store,
-                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                now_et=datetime(2026, 7, 27, 10, 5, tzinfo=timezone.utc),
                 override_policy_violations=True,
             )
             assert order["status"] == "accepted"
@@ -609,6 +652,249 @@ def test_override_flag_does_not_bypass_a_non_overridable_violation_alongside_it(
                 assert "staleness" in str(exc).lower()
             assert len(captured) == 0
             assert store.get_proposal(proposal.proposal_id)["status"] == "blocked"
+    finally:
+        restore()
+
+
+# --- Reviewed-override binding (GPT review, 2026-07-30): override_
+# policy_violations=True must only authorize against violations a human
+# has ALREADY been shown once via a prior PolicyOverridableBlockError --
+# never blanket permission to accept whatever override-eligible
+# conditions happen to exist at the later execution instant.
+
+def _tiny_cap_policy() -> TradingPolicy:
+    # max_position_pct=0.001 (0.1%) guarantees a deterministic, SINGLE
+    # override-eligible MAX_POSITION_PCT violation for any meaningful buy
+    # -- allow_new_positions=True since these proposals open a first
+    # position in a ticker ("AAA") not already held.
+    return TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=0.001, max_total_exposure_pct=1.0, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
+        allow_new_positions=True,
+    )
+
+
+def _position_cap_buy_proposal(packet, policy, dollar_amount=2000.0, price=50.0):
+    proposals = generate_allocation_buy_proposals(
+        packet, policy, weights_pct={"AAA": 100.0}, prices={"AAA": price}, dollar_amount=dollar_amount,
+    )
+    assert len(proposals) == 1
+    return proposals[0]
+
+
+def test_direct_override_from_proposed_requires_a_review_step_first():
+    packet = _packet()
+    policy = _tiny_cap_policy()
+    proposal = _position_cap_buy_proposal(packet, policy)
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                )
+                assert False, "expected a direct override from 'proposed' to require review first"
+            except PolicyOverridableBlockError as exc:
+                assert exc.conditions_changed is False  # nothing to compare against yet, not a "change"
+            assert len(captured) == 0  # never actually submitted
+            record = store.get_proposal(proposal.proposal_id)
+            assert record["status"] == POLICY_OVERRIDE_AVAILABLE
+            reviewed = record["reviewed_override"]
+            assert reviewed["violation_codes"] == ["max_position_pct"]
+            assert reviewed["review_digest"]
+            assert reviewed["presented_at"]
+    finally:
+        restore()
+
+
+def test_unchanged_retry_succeeds_with_exactly_one_broker_submission():
+    packet = _packet()
+    policy = _tiny_cap_policy()
+    proposal = _position_cap_buy_proposal(packet, policy)
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                )
+                assert False, "expected the first attempt to establish the review"
+            except PolicyOverridableBlockError:
+                pass
+
+            # Same portfolio, quote, intent, and (therefore) violations.
+            order = execute_approved_paper_proposal(
+                proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 5, tzinfo=timezone.utc),
+                override_policy_violations=True,
+            )
+            assert order["status"] == "accepted"
+            assert len(captured) == 1
+    finally:
+        restore()
+
+
+def test_new_violation_appearing_before_retry_requires_fresh_review():
+    packet = _packet()
+    policy = _tiny_cap_policy()
+    proposal = _position_cap_buy_proposal(packet, policy)
+    captured, restore = _mock_execution_dependencies(quote_price=50.0, earnings_available=False)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            # First attempt: position-cap violation only (no earnings
+            # data resolved, so no blackout check fires).
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                )
+                assert False, "expected the first attempt to establish the review"
+            except PolicyOverridableBlockError:
+                pass
+            first_reviewed = store.get_proposal(proposal.proposal_id)["reviewed_override"]
+            assert first_reviewed["violation_codes"] == ["max_position_pct"]
+
+            # Second attempt: an earnings-blackout violation now ALSO
+            # applies (earnings_days_away=1 is within the default 2-day
+            # window) -- an override attempt must NOT submit, since the
+            # human never reviewed this new, larger violation set.
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 5, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                    earnings_days_away=1,
+                )
+                assert False, "expected a newly-appeared violation to require fresh review"
+            except PolicyOverridableBlockError as exc:
+                assert exc.conditions_changed is True
+                assert any("earnings" in v.lower() for v in exc.overridable_violations)
+            assert len(captured) == 0  # never submitted
+
+            second_reviewed = store.get_proposal(proposal.proposal_id)["reviewed_override"]
+            assert sorted(second_reviewed["violation_codes"]) == ["earnings_blackout", "max_position_pct"]
+            assert second_reviewed["review_digest"] != first_reviewed["review_digest"]
+            assert store.get_proposal(proposal.proposal_id)["status"] == POLICY_OVERRIDE_AVAILABLE
+    finally:
+        restore()
+
+
+def test_same_code_but_materially_different_severity_requires_fresh_review():
+    policy = _tiny_cap_policy()
+    small_account_packet = _packet_with_cash(5_000.0)
+    proposal = _position_cap_buy_proposal(small_account_packet, policy)
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", small_account_packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                )
+                assert False, "expected the first attempt to establish the review"
+            except PolicyOverridableBlockError:
+                pass
+            first_reviewed = store.get_proposal(proposal.proposal_id)["reviewed_override"]
+            assert first_reviewed["violation_codes"] == ["max_position_pct"]
+
+            # A much bigger account (materially different existing
+            # equity) makes the SAME $2,000 buy a much smaller percentage
+            # of the account -- same violation CODE (max_position_pct,
+            # still over the 0.1% cap), but a materially different
+            # projected-exposure MESSAGE.
+            big_account_packet = _packet_with_cash(500_000.0)
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", big_account_packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 5, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                )
+                assert False, "expected a materially different exposure message to require fresh review"
+            except PolicyOverridableBlockError as exc:
+                assert exc.conditions_changed is True
+            assert len(captured) == 0
+
+            second_reviewed = store.get_proposal(proposal.proposal_id)["reviewed_override"]
+            assert second_reviewed["violation_codes"] == ["max_position_pct"]  # same code
+            assert second_reviewed["violations"] != first_reviewed["violations"]  # different message
+            assert second_reviewed["review_digest"] != first_reviewed["review_digest"]
+    finally:
+        restore()
+
+
+def test_kill_switch_still_hard_blocks_regardless_of_override_flag():
+    # Non-overridable regression guard: the reviewed-override binding
+    # must never affect the "at least one violation isn't override-
+    # eligible" branch, which is completely untouched by this feature.
+    packet = _packet()
+    policy = _tiny_cap_policy()
+    proposal = _position_cap_buy_proposal(packet, policy)
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                    kill_switch_active=True,
+                )
+                assert False, "expected the kill switch to hard-block regardless of override_policy_violations"
+            except PolicyOverridableBlockError:
+                assert False, "the kill switch must never be treated as override-eligible"
+            except ProposalExecutionError as exc:
+                assert "kill switch" in str(exc).lower()
+            assert len(captured) == 0
+            assert store.get_proposal(proposal.proposal_id)["status"] == "blocked"
+    finally:
+        restore()
+
+
+def test_audit_record_matches_the_reviewed_set_after_a_successful_retry():
+    packet = _packet()
+    policy = _tiny_cap_policy()
+    proposal = _position_cap_buy_proposal(packet, policy)
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                    override_policy_violations=True,
+                )
+                assert False, "expected the first attempt to establish the review"
+            except PolicyOverridableBlockError:
+                pass
+            reviewed = store.get_proposal(proposal.proposal_id)["reviewed_override"]
+
+            execute_approved_paper_proposal(
+                proposal.proposal_id, "approve", packet.portfolio, policy, store,
+                now_et=datetime(2026, 7, 27, 10, 5, tzinfo=timezone.utc),
+                override_policy_violations=True,
+            )
+            stored = store.get_proposal(proposal.proposal_id)
+            assert stored["status"] == "executed"
+            assert sorted(stored["policy_override"]["overridden_violations"]) == sorted(reviewed["violations"])
     finally:
         restore()
 

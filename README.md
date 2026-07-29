@@ -248,15 +248,40 @@ actually tested against, instead of silently picking up a newer release that
 could change behavior. Bump pins deliberately and re-run the full test suite,
 rather than leaving them unpinned.
 
-**Windows note:** `streamlit`'s wheel unpacks a deeply nested `static/`
-directory; on a Microsoft Store Python install (or any install path that's
-already long), this can exceed Windows' default 260-character path limit and
-leave `pip install` failing partway through with streamlit partially removed.
-If that happens, either enable long paths
-(`git config --system core.longpaths true` plus the Windows policy setting at
-`HKLM\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled`), or create
-your virtualenv at a short path (e.g. `C:\venv\ta` instead of a deeply nested
-project directory) before installing.
+**Windows note (confirmed the hard way, 2026-07-29 — read this BEFORE
+installing):** `streamlit`'s wheel unpacks deeply nested asset directories; on
+a Microsoft Store Python install (or any already-long install path) this
+exceeds Windows' default 260-character path limit and leaves `pip install`
+failing partway through with streamlit partially removed — a broken mixed
+install that then also breaks `pytest` collection, since
+`tests/test_personal_assistant_ui.py` imports streamlit.
+
+Measured on this machine: `LongPathsEnabled=0`, and streamlit 1.60.0's
+`streamlit/.agents/skills/developing-with-streamlit/assets/templates/apps/dashboard-seattle-weather/streamlit_app.py`
+lands at exactly **260** characters under the Store-Python site-packages
+prefix (144 chars). Do NOT try to repair it with `--ignore-installed`; that
+writes the new version over the old one and produces `ImportError: cannot
+import name 'calc_md5'`.
+
+Two working remedies:
+
+- **Short-path virtualenv (no admin needed, verified):** `python -m venv
+  C:\venvs\ta` gives a 29-character prefix, bringing that same path to ~145
+  characters. `C:\venvs\ta\Scripts\python.exe -m pip install -r
+  requirements.txt` then installs the pinned set cleanly (`pip check` clean,
+  928 tests pass, dashboard serves HTTP 200).
+- **Enable long paths (needs elevation):** set
+  `HKLM\SYSTEM\CurrentControlSet\Control\FileSystem\LongPathsEnabled` to `1`
+  in an admin shell, then install normally.
+
+Beware a trap when downgrading as a workaround: `streamlit==1.52.2` requires
+`pandas<3`, so installing it silently **downgrades the pinned pandas 3.0.5 to
+2.3.x** (and protobuf/cachetools with it). `pip check` will then report
+"no broken requirements" while the environment no longer matches
+`requirements.txt` at all — check actual versions, not just `pip check`.
+
+Also note streamlit 1.60.0 no longer uses **tornado** (it ships
+starlette/uvicorn); a missing `tornado` is only a problem for older pins.
 
 The current dependency set is:
 

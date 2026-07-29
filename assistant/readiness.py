@@ -149,13 +149,26 @@ def transaction_readiness(
     usage = store.get_execution_budget_usage(trading_day)
     checks.append(
         _check(
+            # `<` on BOTH axes, derived from what
+            # storage.reserve_execution_budget() actually enforces: it refuses
+            # when `count + 1 > max_daily_orders` and when
+            # `existing_notional + notional > max_daily_notional`. So another
+            # order fits only if the count is strictly below its cap -- and,
+            # because that same function rejects `notional <= 0`, the smallest
+            # possible next order still has positive notional, which means
+            # exact notional equality also leaves no room. `<=` reported
+            # ready=True at 1/1 orders and a fully-consumed notional budget
+            # while submission would have been refused (GPT review,
+            # 2026-07-29).
             "daily_submission_budget",
-            usage["submitted_order_count"] <= policy.max_daily_order_count
-            and usage["submitted_notional"] <= policy.max_daily_submitted_notional,
+            usage["submitted_order_count"] < policy.max_daily_order_count
+            and usage["submitted_notional"] < policy.max_daily_submitted_notional,
             (
-                f"{usage['submitted_order_count']}/{policy.max_daily_order_count} orders, "
+                f"{usage['submitted_order_count']}/{policy.max_daily_order_count} orders "
+                f"(room for {max(0, policy.max_daily_order_count - usage['submitted_order_count'])} more), "
                 f"${usage['submitted_notional']:,.2f}/"
-                f"${policy.max_daily_submitted_notional:,.2f} submitted notional."
+                f"${policy.max_daily_submitted_notional:,.2f} submitted notional "
+                f"(${max(0.0, policy.max_daily_submitted_notional - usage['submitted_notional']):,.2f} remaining)."
             ),
         )
     )

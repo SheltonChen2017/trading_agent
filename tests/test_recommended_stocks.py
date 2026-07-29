@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from assistant import recommended_stocks
+from assistant import recommended_stocks, similarity_evidence
 from assistant.schemas import EvidenceStatus
 
 
@@ -99,6 +99,74 @@ def test_build_recommended_tickers_labels_are_honest(monkeypatch):
     for r in recommended:
         assert "most bought" not in r.detail.lower()
         assert "buy signal" not in r.detail.lower()
+
+
+def test_build_recommended_tickers_excludes_held_tickers_from_most_active_lane(monkeypatch):
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers") as mock_active, \
+         patch("assistant.recommended_stocks.suggest_similar_tickers", return_value=None) as mock_suggest, \
+         patch("assistant.recommended_stocks.verify_tickers") as mock_verify:
+        mock_active.return_value = [{"ticker": "AAPL", "name": "Apple", "volume": 1000}, {"ticker": "MSFT", "name": "Microsoft", "volume": 2000}]
+        mock_verify.return_value = ([{"ticker": "MSFT", "longName": "Microsoft", "sector": "", "quoteType": "EQUITY", "exchange": "NMS"}], [])
+        recommended, _ = recommended_stocks.build_recommended_tickers(held_tickers=["AAPL"])
+    assert not any(r.ticker == "AAPL" for r in recommended)
+    # AAPL must never even reach verify_tickers -- excluded before the network call.
+    verified_input = mock_verify.call_args[0][0]
+    assert "AAPL" not in verified_input
+    mock_suggest.assert_called_once_with(["AAPL"], store=None)
+
+
+def test_build_recommended_tickers_skips_ai_suggested_lane_when_no_holdings(monkeypatch):
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[]), \
+         patch("assistant.recommended_stocks.suggest_similar_tickers") as mock_suggest:
+        recommended, _ = recommended_stocks.build_recommended_tickers(held_tickers=None)
+    mock_suggest.assert_not_called()
+    assert not any(r.reason_category == "ai_suggested" for r in recommended)
+
+
+_NO_EVIDENCE = similarity_evidence.SimilarityEvidence(
+    source_tickers=(), candidate_ticker="", shared_sectors=(), shared_industries=(),
+    return_correlation_pct=None, lookback_days=126, data_start=None, data_end=None,
+)
+
+
+def test_build_recommended_tickers_uses_held_tickers_as_similarity_basis(monkeypatch):
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[]), \
+         patch("assistant.recommended_stocks.suggest_similar_tickers") as mock_suggest, \
+         patch("assistant.recommended_stocks.verify_tickers", return_value=([], [])), \
+         patch("assistant.recommended_stocks.compute_similarity_evidence", return_value=_NO_EVIDENCE):
+        mock_suggest.return_value = [{"ticker": "JPM", "reason": "Similar bank exposure"}]
+        recommended, _ = recommended_stocks.build_recommended_tickers(held_tickers=["BAC", "WFC"])
+    mock_suggest.assert_called_once_with(["BAC", "WFC"], store=None)
+    assert any(r.ticker == "JPM" and r.reason_category == "ai_suggested" for r in recommended)
+
+
+def test_build_recommended_tickers_excludes_held_from_ai_suggestions(monkeypatch):
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[]), \
+         patch("assistant.recommended_stocks.suggest_similar_tickers") as mock_suggest, \
+         patch("assistant.recommended_stocks.verify_tickers", return_value=([], [])), \
+         patch("assistant.recommended_stocks.compute_similarity_evidence", return_value=_NO_EVIDENCE):
+        mock_suggest.return_value = [{"ticker": "BAC", "reason": "You already hold this"}, {"ticker": "JPM", "reason": "Similar"}]
+        recommended, _ = recommended_stocks.build_recommended_tickers(held_tickers=["BAC"])
+    assert not any(r.ticker == "BAC" for r in recommended)
+
+
+def test_similarity_detail_pairs_llm_reason_with_measured_evidence(monkeypatch):
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    evidence = dataclasses.replace(_NO_EVIDENCE, return_correlation_pct=90.0, shared_industries=("NVDA",))
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[]), \
+         patch("assistant.recommended_stocks.suggest_similar_tickers") as mock_suggest, \
+         patch("assistant.recommended_stocks.verify_tickers", return_value=([], [])), \
+         patch("assistant.recommended_stocks.compute_similarity_evidence", return_value=evidence):
+        mock_suggest.return_value = [{"ticker": "AMD", "reason": "A close semiconductor peer"}]
+        recommended, _ = recommended_stocks.build_recommended_tickers(held_tickers=["NVDA"])
+    amd = next(r for r in recommended if r.ticker == "AMD")
+    assert "A close semiconductor peer" in amd.detail
+    assert "measured" in amd.detail
+    assert "90%" in amd.detail
 
 
 def test_recommended_ticker_never_reuses_signal_evidence_status():

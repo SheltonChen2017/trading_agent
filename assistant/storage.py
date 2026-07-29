@@ -89,8 +89,22 @@ class AssistantStore:
                     last_evaluated_at TEXT NOT NULL,
                     last_result_json TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS ai_runs (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    called_at TEXT NOT NULL,
+                    function_name TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    prompt_version TEXT NOT NULL,
+                    input_hash TEXT NOT NULL,
+                    latency_ms REAL NOT NULL,
+                    success INTEGER NOT NULL,
+                    response_json TEXT,
+                    error TEXT
+                );
                 CREATE INDEX IF NOT EXISTS idx_proposals_status
                     ON trade_proposals(status, created_at);
+                CREATE INDEX IF NOT EXISTS idx_ai_runs_function_called_at
+                    ON ai_runs(function_name, called_at);
                 """
             )
             self._migrate_decision_packet_identity(connection)
@@ -546,3 +560,70 @@ class AssistantStore:
             "last_evaluated_at": row["last_evaluated_at"],
             "last_result": json.loads(row["last_result_json"]),
         }
+
+    def record_ai_run(
+        self,
+        function_name: str,
+        model: str,
+        prompt_version: str,
+        input_hash: str,
+        latency_ms: float,
+        success: bool,
+        response: Any = None,
+        error: str | None = None,
+        called_at: str | None = None,
+    ) -> None:
+        """Append-only audit log for every LLM call this project makes
+        (independent review: AI runs were not persisted anywhere -- no
+        model, prompt version, input hash, latency, or response was
+        recorded, making the AI layer unauditable after the fact). Every
+        row is a genuinely new call, never an update -- unlike
+        record_strategy_evaluation(), this IS meant to accumulate as a log,
+        not just track "most recent". `input_hash` is a hash of the
+        prompt's actual inputs (never the API key or any secret), so two
+        identical calls are visibly identical without storing raw PII/
+        portfolio data twice if the caller chooses to hash rather than
+        store the full input."""
+        with self._connect() as connection:
+            connection.execute(
+                "INSERT INTO ai_runs(called_at, function_name, model, prompt_version, input_hash, "
+                "latency_ms, success, response_json, error) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                (
+                    called_at or datetime.now(timezone.utc).isoformat(),
+                    function_name,
+                    model,
+                    prompt_version,
+                    input_hash,
+                    latency_ms,
+                    1 if success else 0,
+                    json.dumps(response, sort_keys=True, default=str) if response is not None else None,
+                    error,
+                ),
+            )
+
+    def list_ai_runs(self, function_name: str | None = None, limit: int = 50) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            if function_name is not None:
+                rows = connection.execute(
+                    "SELECT * FROM ai_runs WHERE function_name = ? ORDER BY id DESC LIMIT ?",
+                    (function_name, limit),
+                ).fetchall()
+            else:
+                rows = connection.execute(
+                    "SELECT * FROM ai_runs ORDER BY id DESC LIMIT ?", (limit,)
+                ).fetchall()
+        return [
+            {
+                "id": row["id"],
+                "called_at": row["called_at"],
+                "function_name": row["function_name"],
+                "model": row["model"],
+                "prompt_version": row["prompt_version"],
+                "input_hash": row["input_hash"],
+                "latency_ms": row["latency_ms"],
+                "success": bool(row["success"]),
+                "response": json.loads(row["response_json"]) if row["response_json"] is not None else None,
+                "error": row["error"],
+            }
+            for row in rows
+        ]

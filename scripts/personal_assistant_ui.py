@@ -63,9 +63,15 @@ from assistant.execution_service import (
     reconcile_submission,
 )
 from assistant.explanations import explain_ticker
-from assistant.ai_advisor import is_ai_advisor_configured, review_allocation_plan, suggest_similar_tickers
+from assistant.ai_advisor import (
+    curate_recommended_tickers,
+    is_ai_advisor_configured,
+    review_allocation_plan,
+    suggest_similar_tickers,
+)
 from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
 from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calendar_configured
+from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.ticker_verification import partition_by_universe, verify_tickers
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
 from assistant.proposal_status import (
@@ -173,7 +179,7 @@ def _load_live_events_for_tickers(tickers: tuple[str, ...]) -> list:
 
 
 @st.cache_data(ttl=_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS)
-def _load_recommended_tickers():
+def _load_recommended_tickers(held_tickers: tuple[str, ...]):
     """Composes yf.screen (most-actives) + Finnhub (IPO calendar, if
     configured) + a Claude ticker-suggestion call + a verification pass over
     every candidate -- genuinely expensive to run on every Briefing rerun
@@ -181,8 +187,20 @@ def _load_recommended_tickers():
     gets its OWN, much longer TTL than the account/regime packet cache. Use
     `_load_recommended_tickers.clear()` (this function's own cache, not the
     blanket `st.cache_data.clear()` the "Refresh briefing" button uses) so
-    refreshing recommendations doesn't also force an account re-fetch."""
-    return build_recommended_tickers()
+    refreshing recommendations doesn't also force an account re-fetch.
+
+    `held_tickers` is part of the cache key (a tuple, not a list, so it's
+    hashable) -- this is deliberate: a fresh set of positions must recompute
+    recommendations rather than reusing a stale exclusion/similarity basis.
+
+    Bundles the curation call (curate_recommended_tickers) into this SAME
+    cached function rather than calling it separately per rerun -- it's a
+    third Claude call layered on top of the other two data sources, and
+    firing it on every widget interaction anywhere in this tab would be a
+    real, avoidable cost."""
+    recommended, dropped = build_recommended_tickers(list(held_tickers), store=store)
+    curated_note = curate_recommended_tickers(recommended, store=store) if recommended else None
+    return recommended, dropped, curated_note
 
 
 def _load_packet(policy_path: str, include_events: bool):
@@ -929,7 +947,8 @@ with tab_briefing:
     )
     if st.button("Refresh recommended stocks", key="refresh_recommended"):
         _load_recommended_tickers.clear()
-    recommended_tickers, dropped_candidates = _load_recommended_tickers()
+    held_tickers_tuple = tuple(sorted({p.ticker.upper() for p in packet.portfolio.positions}))
+    recommended_tickers, dropped_candidates, curated_note = _load_recommended_tickers(held_tickers_tuple)
     if dropped_candidates:
         st.caption(
             f"{len(dropped_candidates)} candidate ticker(s) could not be verified against real market data "
@@ -938,12 +957,14 @@ with tab_briefing:
     for category, label in [
         ("most_active", "Most actively traded today"),
         ("recent_ipo", "Recent IPOs"),
-        ("ai_suggested", "AI-suggested (Claude)"),
+        ("ai_suggested", "Similar to what you currently hold (Claude)"),
     ]:
         items = [r for r in recommended_tickers if r.reason_category == category]
         if not items:
             if category == "recent_ipo" and not is_ipo_calendar_configured():
                 st.caption("IPO calendar unavailable -- FINNHUB_API_KEY is not set. Sign up for a free Finnhub account and set this env var to enable it.")
+            elif category == "ai_suggested" and not held_tickers_tuple:
+                st.caption("No current holdings to base similarity suggestions on.")
             continue
         with st.expander(f"{label} ({len(items)})"):
             st.dataframe(
@@ -951,6 +972,9 @@ with tab_briefing:
                 use_container_width=True,
                 hide_index=True,
             )
+
+    if curated_note:
+        st.info(curated_note)
 
 with tab_watchlist:
     st.caption(
@@ -1057,15 +1081,26 @@ with tab_watchlist:
         st.session_state["watchlist_results"] = results
 
         if want_similar_suggestions:
-            raw_suggestions = suggest_similar_tickers(cart)
+            raw_suggestions = suggest_similar_tickers(cart, store=store)
             if raw_suggestions:
                 from_universe, wildcard = partition_by_universe(raw_suggestions, universe=UNIVERSE)
                 verified, dropped = verify_tickers([c["ticker"] for c in wildcard]) if wildcard else ([], [])
+                all_candidate_tickers = [c["ticker"].upper() for c in from_universe] + [v["ticker"] for v in verified]
+                # Measured evidence sits ALONGSIDE the LLM's stated reason, never
+                # replacing it -- a real, resolvable ticker can still carry a
+                # FALSE similarity claim (independent review: e.g. CAT mislabeled
+                # as a semiconductor peer of NVDA passes ticker-existence
+                # verification cleanly, since that only proves the symbol
+                # resolves, not that the stated relationship is true).
+                evidence_by_ticker = {
+                    t: format_evidence_summary(compute_similarity_evidence(cart, t)) for t in all_candidate_tickers
+                }
                 st.session_state["watchlist_ai_suggestions"] = {
                     "from_universe": from_universe,
                     "verified": verified,
                     "dropped": dropped,
                     "reason_by_ticker": {c["ticker"].upper(): c["reason"] for c in raw_suggestions},
+                    "evidence_by_ticker": evidence_by_ticker,
                 }
             else:
                 st.session_state["watchlist_ai_suggestions"] = None
@@ -1078,17 +1113,35 @@ with tab_watchlist:
     if ai_suggestions:
         with st.expander(f"Similar tickers to {', '.join(cart)} (Claude)", expanded=False):
             reason_by_ticker = ai_suggestions["reason_by_ticker"]
+            evidence_by_ticker = ai_suggestions.get("evidence_by_ticker", {})
             if ai_suggestions["from_universe"]:
                 st.write("**From your tracked universe:**")
                 st.dataframe(
-                    [{"Ticker": c["ticker"], "Reason": c["reason"]} for c in ai_suggestions["from_universe"]],
+                    [
+                        {
+                            "Ticker": c["ticker"], "Claude's reason": c["reason"],
+                            "Measured similarity": evidence_by_ticker.get(c["ticker"].upper(), ""),
+                        }
+                        for c in ai_suggestions["from_universe"]
+                    ],
                     use_container_width=True, hide_index=True,
                 )
             if ai_suggestions["verified"]:
                 st.write("**Other suggestions (verified against real market data):**")
                 st.dataframe(
-                    [{"Ticker": v["ticker"], "Reason": reason_by_ticker.get(v["ticker"], "")} for v in ai_suggestions["verified"]],
+                    [
+                        {
+                            "Ticker": v["ticker"], "Claude's reason": reason_by_ticker.get(v["ticker"], ""),
+                            "Measured similarity": evidence_by_ticker.get(v["ticker"], ""),
+                        }
+                        for v in ai_suggestions["verified"]
+                    ],
                     use_container_width=True, hide_index=True,
+                )
+                st.caption(
+                    "\"Measured similarity\" is computed from real price history and sector/industry "
+                    "metadata -- it may or may not agree with Claude's stated reason. Trust the measured "
+                    "column over the prose when they conflict."
                 )
             if ai_suggestions["dropped"]:
                 st.caption(
@@ -1167,7 +1220,7 @@ with tab_watchlist:
         if check_cart_clicked and want_allocation_review:
             baskets_by_ticker = {t: [name for name, tickers in BASKETS.items() if t in tickers] for t in weights}
             st.session_state["watchlist_ai_review"] = review_allocation_plan(
-                list(weights.keys()), weights, vols, baskets_by_ticker
+                list(weights.keys()), weights, vols, baskets_by_ticker, store=store
             )
         elif not want_allocation_review:
             st.session_state["watchlist_ai_review"] = None
@@ -1175,8 +1228,23 @@ with tab_watchlist:
         ai_review = st.session_state.get("watchlist_ai_review")
         if ai_review:
             with st.expander("AI review of this split (Claude)", expanded=False):
-                st.write(ai_review)
-                st.caption("Advisory commentary only -- does not change the weights shown above.")
+                st.write(ai_review.summary)
+                if ai_review.observations:
+                    st.dataframe(
+                        [
+                            {
+                                "Severity": o.severity, "Type": o.type,
+                                "Tickers": ", ".join(o.tickers), "Claim": o.claim,
+                            }
+                            for o in ai_review.observations
+                        ],
+                        use_container_width=True, hide_index=True,
+                    )
+                st.caption(
+                    "Advisory commentary only -- does not change the weights shown above. Every number "
+                    "above is checked against the actual computed split; any claim carrying a number that "
+                    "didn't match was dropped before display."
+                )
 
     if weights:
         st.subheader("Create purchase proposals using this split")

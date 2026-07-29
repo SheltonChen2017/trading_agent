@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import sys
 from datetime import datetime, timedelta, timezone
@@ -17,6 +18,8 @@ from assistant.execution_service import (
     recover_stale_reconciliation,
 )
 from assistant.policy import load_policy
+from assistant.order_reconciler import monitor_orders, reconcile_nonterminal_orders
+from assistant.readiness import transaction_readiness
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.research_registry import underfilled_dataset_warning
 from assistant.risk_copilot import (
@@ -233,9 +236,10 @@ def command_reconcile(args, store: AssistantStore) -> None:
     if not is_configured():
         raise SystemExit("Alpaca paper credentials are required for reconciliation.")
     order = reconcile_submission(args.proposal_id, store)
+    proposal = store.get_proposal(args.proposal_id)
     print(
         f"Reconciled {args.proposal_id}: found broker order {order['order_id']} "
-        f"[{order.get('status', 'unknown')}] and marked executed."
+        f"[{order.get('status', 'unknown')}]; proposal is now {proposal['status']}."
     )
 
 
@@ -255,6 +259,54 @@ def command_prune_packets(args, store: AssistantStore) -> None:
     print(f"Deleted {deleted} decision packet(s) older than {args.older_than_days} day(s) from {store.path}.")
 
 
+def command_sync_orders(args, store: AssistantStore) -> None:
+    policy = load_policy(args.policy)
+    result = reconcile_nonterminal_orders(
+        store,
+        cancel_stale=args.cancel_stale,
+        max_order_age_minutes=policy.max_order_age_minutes,
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+def command_monitor_orders(args, store: AssistantStore) -> None:
+    policy = load_policy(args.policy)
+    print("Running startup reconciliation, then listening for Alpaca trade updates.")
+    monitor_orders(
+        store,
+        cancel_stale=args.cancel_stale,
+        max_order_age_minutes=policy.max_order_age_minutes,
+        poll_interval_seconds=args.poll_seconds,
+    )
+
+
+def command_readiness(args, store: AssistantStore) -> None:
+    policy = load_policy(args.policy)
+    report = transaction_readiness(store, policy, check_broker=not args.offline)
+    print(json.dumps(report, indent=2, sort_keys=True))
+    if not report["ready"]:
+        raise SystemExit(2)
+
+
+def command_kill_switch(args, store: AssistantStore) -> None:
+    if args.state == "status":
+        print(json.dumps(store.get_kill_switch(), indent=2, sort_keys=True))
+        return
+    active = args.state == "on"
+    reason = args.reason or ("Manually activated from CLI." if active else "Manually cleared from CLI.")
+    store.set_kill_switch(active, reason=reason)
+    print(json.dumps(store.get_kill_switch(), indent=2, sort_keys=True))
+
+
+def command_backup_db(args, store: AssistantStore) -> None:
+    destination = args.destination
+    if destination is None:
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        destination = store.path.parent / "backups" / f"trading_assistant-{timestamp}.db"
+    target = store.backup_to(destination)
+    print(f"Database backup created: {target}")
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Personal trading assistant")
     parser.add_argument(
@@ -272,7 +324,7 @@ def build_parser() -> argparse.ArgumentParser:
         help=(
             "Deterministic concentration/duplication/stress-test answers (assistant/risk_copilot.py) "
             "against the current portfolio -- e.g. 'am I overexposed to tech' or 'what happens if SPY "
-            "falls 10%'. --benchmark and --move-pct must be given together to run the stress test."
+            "falls 10%%'. --benchmark and --move-pct must be given together to run the stress test."
         ),
     )
     risk_check.add_argument("--basket", default=None, help="Basket name to check concentration for.")
@@ -350,6 +402,57 @@ def build_parser() -> argparse.ArgumentParser:
     )
     prune_packets.add_argument("--older-than-days", type=_positive_int, required=True)
     prune_packets.set_defaults(handler=command_prune_packets)
+
+    sync_orders = commands.add_parser(
+        "sync-orders",
+        help="Poll Alpaca once and reconcile every nonterminal assistant order.",
+    )
+    sync_orders.add_argument(
+        "--cancel-stale",
+        action="store_true",
+        help="Request cancellation for accepted/partially-filled orders older than the policy cap.",
+    )
+    sync_orders.set_defaults(handler=command_sync_orders)
+
+    monitor = commands.add_parser(
+        "monitor-orders",
+        help="Run startup reconciliation, then continuously consume Alpaca trade updates.",
+    )
+    monitor.add_argument(
+        "--cancel-stale",
+        action="store_true",
+        help="Request stale-order cancellation during startup reconciliation.",
+    )
+    monitor.add_argument(
+        "--poll-seconds",
+        type=_positive_int,
+        default=30,
+        help="Polling fallback interval while the trade-update stream runs (default: 30).",
+    )
+    monitor.set_defaults(handler=command_monitor_orders)
+
+    readiness = commands.add_parser(
+        "readiness",
+        help="Check policy, SQLite integrity, reconciliation freshness, budgets, and broker state.",
+    )
+    readiness.add_argument(
+        "--offline",
+        action="store_true",
+        help="Skip the live broker-account check; all local checks still run.",
+    )
+    readiness.set_defaults(handler=command_readiness)
+
+    kill_switch = commands.add_parser(
+        "kill-switch",
+        help="Persistently enable, disable, or inspect the execution kill switch.",
+    )
+    kill_switch.add_argument("state", choices=("on", "off", "status"))
+    kill_switch.add_argument("--reason")
+    kill_switch.set_defaults(handler=command_kill_switch)
+
+    backup = commands.add_parser("backup-db", help="Create a consistent SQLite backup.")
+    backup.add_argument("destination", nargs="?", type=Path)
+    backup.set_defaults(handler=command_backup_db)
     return parser
 
 

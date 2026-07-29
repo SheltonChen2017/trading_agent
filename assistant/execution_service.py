@@ -55,8 +55,8 @@ before acting) -- closed the remaining execution-safety gaps:
      retry submit a genuine duplicate real order. Now, on any submission
      exception, this module queries the broker BY THE SAME idempotency
      key (client_order_id) via broker.find_order_by_client_id(). If found,
-     the order is journaled and the proposal is marked "executed" same as
-     a normal success. If the lookup itself can't confirm either way, the
+     the order is journaled in its real broker lifecycle state (acceptance
+     is not treated as a fill). If the lookup itself can't confirm either way, the
      proposal is marked "submission_unknown" (a distinct, non-terminal
      status) instead of "submission_failed" -- and AssistantStore.
      recent_executed_intents() now also treats "submitting"/
@@ -66,9 +66,9 @@ before acting) -- closed the remaining execution-safety gaps:
      account. A "submitting" status is written just before the broker
      call for the same reason -- so even a crash between the call and the
      response leaves a non-terminal, duplicate-blocking status behind
-     instead of nothing. record_broker_order() failing AFTER a confirmed
-     broker acceptance is also handled separately: the proposal is still
-     marked "executed" (the order really was accepted) with the local
+     instead of nothing. A local lifecycle-projection failure AFTER a
+     confirmed broker acceptance is also handled separately: the proposal still
+     preserves the working broker order (without claiming it filled) with the local
      journaling failure recorded in its `error` field, rather than losing
      the fact that a real order exists.
  10. The kill switch was only enforced by callers reading
@@ -205,14 +205,16 @@ import math
 import os
 from datetime import datetime, timedelta, timezone
 
+from assistant.order_lifecycle import (
+    journal_broker_order_update,
+    proposal_status_for_order,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
     APPROVED,
     BLOCKED,
-    EXECUTED,
     POLICY_OVERRIDE_AVAILABLE,
     RECONCILING,
-    SUBMISSION_FAILED,
     SUBMISSION_UNKNOWN,
     SUBMITTING,
     VALIDATING,
@@ -566,6 +568,20 @@ def validate_proposal_for_execution(
     None (the default) for both preserves exact single-proposal-execution
     behavior.
     """
+    try:
+        persistent_kill_switch = store.get_kill_switch()
+    except Exception as exc:
+        return ProposalValidationOutcome(
+            proposal=proposal,
+            intent=None,
+            validation=None,
+            error=f"Could not verify the persistent kill switch: {exc}",
+        )
+    kill_switch_active = (
+        kill_switch_active
+        or os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1"
+        or bool(persistent_kill_switch.get("active"))
+    )
     if proposal is None:
         proposal = store.get_proposal(proposal_id)
     if proposal is None:
@@ -607,12 +623,30 @@ def validate_proposal_for_execution(
         return ProposalValidationOutcome(
             proposal=proposal, intent=None, validation=None, error="Alpaca paper credentials are not configured.",
         )
+    if kill_switch_active:
+        reason = str(persistent_kill_switch.get("reason") or "active")
+        return ProposalValidationOutcome(
+            proposal=proposal,
+            intent=None,
+            validation=None,
+            error=f"The execution kill switch is active ({reason}).",
+        )
     if not current_portfolio.open_orders_available:
         return ProposalValidationOutcome(
             proposal=proposal, intent=None, validation=None,
             error=(
                 "Cannot verify open orders right now (the broker's order endpoint failed) -- refusing to "
                 "approve since the duplicate-order check would be unreliable. Try again shortly."
+            ),
+        )
+    if len(current_portfolio.open_orders) >= policy.max_open_orders:
+        return ProposalValidationOutcome(
+            proposal=proposal,
+            intent=None,
+            validation=None,
+            error=(
+                f"Open-order cap reached: {len(current_portfolio.open_orders)} active order(s), "
+                f"policy maximum {policy.max_open_orders}."
             ),
         )
 
@@ -640,6 +674,16 @@ def validate_proposal_for_execution(
                 proposal=proposal, intent=intent, validation=None,
                 error="Opening new positions is disabled by policy.",
             )
+
+    try:
+        broker.assert_account_and_asset_ready(intent.ticker)
+    except Exception as exc:
+        return ProposalValidationOutcome(
+            proposal=proposal,
+            intent=intent,
+            validation=None,
+            error=f"Broker account/asset preflight failed: {exc}",
+        )
 
     try:
         recent_intents = [_intent_from_dict(raw) for raw in store.recent_executed_intents()]
@@ -799,7 +843,17 @@ def execute_approved_paper_proposal(
     # Enforce the environment kill switch here too, not only in callers --
     # a caller that forgets to pass kill_switch_active must not silently
     # bypass it. This makes the switch an invariant of the service itself.
-    kill_switch_active = kill_switch_active or os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1"
+    try:
+        persistent_kill_switch = store.get_kill_switch()
+    except Exception as exc:
+        raise ProposalExecutionError(
+            f"Could not verify the persistent kill switch; refusing execution: {exc}"
+        ) from exc
+    kill_switch_active = (
+        kill_switch_active
+        or os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1"
+        or bool(persistent_kill_switch.get("active"))
+    )
 
     proposal = store.get_proposal(proposal_id)
     if proposal is None:
@@ -867,6 +921,7 @@ def execute_approved_paper_proposal(
 
     validation = None
     intent = None
+    reference_price = None
     try:
         validation_outcome = validate_proposal_for_execution(
             proposal_id,
@@ -887,6 +942,7 @@ def execute_approved_paper_proposal(
             raise ProposalExecutionError(validation_outcome.error)
         intent = validation_outcome.intent
         validation = validation_outcome.validation
+        reference_price = validation_outcome.reference_price
         if not validation.approved:
             if not validation.overridable:
                 # At least one violation isn't override-eligible (or there
@@ -1019,12 +1075,30 @@ def execute_approved_paper_proposal(
             },
         )
 
-    # "submitting" is written BEFORE the broker call (not just around it)
-    # so that even a crash between sending the request and receiving a
-    # response leaves a non-terminal status behind, one that the
-    # duplicate-order check treats as unresolved broker state rather than
-    # silently vanishing back to nothing.
+    # Enter a reconcilable state before the last local operations preceding
+    # submission. If the process dies after this write, startup polling can
+    # safely prove broker absence instead of leaving an "approved" proposal
+    # with a stranded reservation and no recovery path.
     store.update_proposal_status(proposal_id, SUBMITTING)
+
+    budget_price = (
+        max(float(reference_price), float(intent.limit_price))
+        if intent.order_type == "limit"
+        else reference_price
+    )
+    try:
+        store.reserve_execution_budget(
+            proposal_id,
+            trading_day=now_et.date().isoformat(),
+            notional=float(intent.shares * budget_price),
+            max_daily_notional=policy.max_daily_submitted_notional,
+            max_daily_orders=policy.max_daily_order_count,
+        )
+    except Exception as exc:
+        message = f"Persistent daily execution budget blocked submission: {exc}"
+        store.update_proposal_status(proposal_id, BLOCKED, violations=[message])
+        raise ProposalExecutionError(message) from exc
+
     submit = broker.submit_limit_order if intent.order_type == "limit" else broker.submit_market_order
     submit_kwargs = (
         {"limit_price": intent.limit_price} if intent.order_type == "limit" else {}
@@ -1053,39 +1127,59 @@ def execute_approved_paper_proposal(
                 # NOT match what we submitted -- never auto-resolve this;
                 # it's exactly the anomaly duplicate-order protection
                 # exists to catch (GPT review, 2026-07-28).
-                store.update_proposal_status(
-                    proposal_id,
-                    SUBMISSION_UNKNOWN,
-                    error=(
-                        f"Order submission raised ({exc}), and the order found under this idempotency "
-                        f"key does NOT match the intent (mismatch: {mismatch_detail}) -- refusing to "
-                        "auto-resolve. Investigate manually, then use reconcile_submission()."
-                    ),
+                reason = (
+                    f"Order submission raised ({exc}), and the order found under this idempotency "
+                    f"key does NOT match the intent (mismatch: {mismatch_detail}) -- refusing to "
+                    "auto-resolve. Persistent kill switch activated; investigate manually."
                 )
+                store.update_proposal_status_if_current(
+                    proposal_id,
+                    expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
+                    new_status=SUBMISSION_UNKNOWN,
+                    error=reason,
+                )
+                store.set_kill_switch(True, reason=reason)
                 raise ProposalExecutionError(
                     f"Order submission failed for {proposal_id}, and a MISMATCHED order was found "
                     f"under this idempotency key ({mismatch_detail}) -- left as 'submission_unknown' "
                     "for manual investigation, not auto-resolved."
                 ) from exc
-            store.record_broker_order(proposal_id, outcome)
-            store.update_proposal_status(
+            journal_broker_order_update(
+                store,
                 proposal_id,
-                EXECUTED,
-                executed_at=datetime.now(timezone.utc).isoformat(),
-                broker_order=outcome,
-                reconciled_after_error=str(exc),
+                outcome,
+                event_type="submission_reconciled",
+                clear_error=True,
+                extra_updates={"reconciled_after_error": str(exc)},
             )
             return outcome
         if outcome is None:
             # Confirmed absent: the broker itself says this order was
             # never accepted, so it's safe to call it a real failure
             # rather than leaving it in limbo as "submission_unknown".
-            store.update_proposal_status(proposal_id, SUBMISSION_FAILED, error=str(exc))
+            transitioned = store.mark_submission_failed_and_release(
+                proposal_id,
+                expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
+                error=str(exc),
+            )
+            if transitioned is None:
+                current = store.get_proposal(proposal_id)
+                if current is not None and current.get("broker_order"):
+                    return current["broker_order"]
             raise ProposalExecutionError(
                 f"Order submission failed for {proposal_id}, and the broker confirms no such order "
                 f"exists ({exc})."
             ) from exc
-        store.update_proposal_status(proposal_id, SUBMISSION_UNKNOWN, error=str(exc))
+        unresolved = store.update_proposal_status_if_current(
+            proposal_id,
+            expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
+            new_status=SUBMISSION_UNKNOWN,
+            error=str(exc),
+        )
+        if unresolved is None:
+            current = store.get_proposal(proposal_id)
+            if current is not None and current.get("broker_order"):
+                return current["broker_order"]
         raise ProposalExecutionError(
             f"Could not confirm whether the order for {proposal_id} was accepted by the broker "
             f"after an error ({exc}). Status is 'submission_unknown' -- run "
@@ -1094,28 +1188,28 @@ def execute_approved_paper_proposal(
         ) from exc
 
     try:
-        store.record_broker_order(proposal_id, order)
+        journal_broker_order_update(
+            store,
+            proposal_id,
+            order,
+            event_type="submission_response",
+        )
     except Exception as exc:
         # The broker DID accept the order (we got a normal response) --
         # the failure is only in our local journal write. Do not report
         # this as a submission failure; that would misrepresent an order
         # that genuinely exists. Keep the order info in `error` so it can
         # be reconciled/re-journaled manually.
-        store.update_proposal_status(
+        store.update_proposal_status_if_current(
             proposal_id,
-            EXECUTED,
-            executed_at=datetime.now(timezone.utc).isoformat(),
+            expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
+            new_status=proposal_status_for_order(order),
             broker_order=order,
+            broker_status=str(order.get("status", "unknown")),
             error=f"Order was accepted by the broker but local recording failed: {exc}",
         )
         return order
 
-    store.update_proposal_status(
-        proposal_id,
-        EXECUTED,
-        executed_at=datetime.now(timezone.utc).isoformat(),
-        broker_order=order,
-    )
     return order
 
 
@@ -1138,8 +1232,8 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
     someone else's order.
 
     Outcomes (every one records `reconciled_at` as an audit trail):
-      - Order found and matches the proposal's intent: journaled, marked
-        "executed".
+      - Order found and matches the proposal's intent: journaled in the
+        broker's actual accepted/partial/filled/terminal state.
       - Order found but does NOT match (ticker/side mismatch -- should
         never happen with unique idempotency keys, but this is exactly
         the kind of anomaly that must not be auto-resolved): stays
@@ -1190,45 +1284,62 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
                 expected_desc = f"{stored_intent.side} {stored_intent.shares} {stored_intent.ticker} {stored_intent.order_type}"
                 if stored_intent.order_type == "limit":
                     expected_desc += f" @ {stored_intent.limit_price}"
-                store.update_proposal_status(
-                    proposal_id,
-                    SUBMISSION_UNKNOWN,
-                    reconciled_at=reconciled_at,
-                    error=(
-                        f"Reconciliation found an order under this idempotency key that does NOT match the "
-                        f"proposal's intent (mismatch: {mismatch_detail}; expected {expected_desc}; broker "
-                        f"returned {outcome}) -- refusing to auto-resolve. Investigate manually."
-                    ),
+                reason = (
+                    f"Reconciliation found an order under this idempotency key that does NOT match the "
+                    f"proposal's intent (mismatch: {mismatch_detail}; expected {expected_desc}; broker "
+                    f"returned {outcome}) -- persistent kill switch activated; investigate manually."
                 )
+                store.update_proposal_status_if_current(
+                    proposal_id,
+                    expected_statuses=(RECONCILING,),
+                    new_status=SUBMISSION_UNKNOWN,
+                    reconciled_at=reconciled_at,
+                    error=reason,
+                )
+                store.set_kill_switch(True, reason=reason)
                 raise ProposalExecutionError(
                     f"Reconciliation for {proposal_id} found a MISMATCHED order ({mismatch_detail}) -- left "
                     "as 'submission_unknown' for manual investigation, not auto-resolved."
                 )
-            store.record_broker_order(proposal_id, outcome)
-            store.update_proposal_status(
-                proposal_id, EXECUTED, executed_at=reconciled_at, broker_order=outcome, reconciled_at=reconciled_at,
+            journal_broker_order_update(
+                store,
+                proposal_id,
+                outcome,
+                event_type="manual_reconciliation",
+                event_at=reconciled_at,
+                clear_error=True,
+                extra_updates={"reconciled_at": reconciled_at},
             )
             return outcome
 
         if outcome is None:
-            store.update_proposal_status(
+            transitioned = store.mark_submission_failed_and_release(
                 proposal_id,
-                SUBMISSION_FAILED,
+                expected_statuses=(RECONCILING,),
                 reconciled_at=reconciled_at,
                 error="Reconciliation: the broker confirms no order exists for this idempotency key.",
             )
+            if transitioned is None:
+                current = store.get_proposal(proposal_id)
+                if current is not None and current.get("broker_order"):
+                    return current["broker_order"]
             raise ProposalExecutionError(
                 f"Reconciliation for {proposal_id}: the broker confirms this order was never accepted -- "
                 "marked 'submission_failed'."
             )
 
         # outcome is _LOOKUP_UNCONFIRMED
-        store.update_proposal_status(
+        unresolved = store.update_proposal_status_if_current(
             proposal_id,
-            SUBMISSION_UNKNOWN,
+            expected_statuses=(RECONCILING,),
+            new_status=SUBMISSION_UNKNOWN,
             reconciled_at=reconciled_at,
             error="Reconciliation attempted but the broker lookup itself failed -- still unresolved.",
         )
+        if unresolved is None:
+            current = store.get_proposal(proposal_id)
+            if current is not None and current.get("broker_order"):
+                return current["broker_order"]
         raise ProposalExecutionError(
             f"Reconciliation for {proposal_id} could not confirm the broker's outcome (the lookup itself "
             "failed) -- still 'submission_unknown'. Try again once connectivity is restored."
@@ -1243,12 +1354,17 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
         # -- that status specifically means the broker CONFIRMED absence,
         # which an unexpected local error never establishes.
         try:
-            store.update_proposal_status(
+            recovered = store.update_proposal_status_if_current(
                 proposal_id,
-                SUBMISSION_UNKNOWN,
+                expected_statuses=(RECONCILING,),
+                new_status=SUBMISSION_UNKNOWN,
                 reconciled_at=datetime.now(timezone.utc).isoformat(),
                 error=f"Unexpected error during reconciliation: {exc}",
             )
+            if recovered is None:
+                current = store.get_proposal(proposal_id)
+                if current is not None and current.get("broker_order"):
+                    return current["broker_order"]
         except Exception as write_exc:
             raise RuntimeError(
                 f"CRITICAL: reconciliation for {proposal_id} failed unexpectedly ({exc!r}), and recording "

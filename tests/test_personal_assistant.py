@@ -134,13 +134,26 @@ def test_store_does_not_reset_an_executed_proposal():
 
 
 def test_list_broker_orders_attaches_originating_intent():
+    from assistant.order_lifecycle import journal_broker_order_update
+
     proposal = generate_risk_reduction_proposals(_packet(), _policy())[0].to_dict()
     with tempfile.TemporaryDirectory() as temp:
         store = AssistantStore(Path(temp) / "assistant.db")
         store.save_proposal(proposal)
-        store.record_broker_order(
+        store.update_proposal_status(proposal["proposal_id"], "submitting")
+        journal_broker_order_update(
+            store,
             proposal["proposal_id"],
-            {"order_id": "paper-order-1", "ticker": proposal["intent"]["ticker"], "shares": proposal["intent"]["shares"], "side": "sell", "status": "accepted"},
+            {
+                "order_id": "paper-order-1",
+                "ticker": proposal["intent"]["ticker"],
+                "shares": proposal["intent"]["shares"],
+                "side": "sell",
+                "type": "market",
+                "limit_price": None,
+                "status": "accepted",
+            },
+            external_event_id="paper-order-1-accepted",
         )
         orders = store.list_broker_orders()
         assert len(orders) == 1
@@ -471,6 +484,7 @@ def _mock_execution_dependencies(
         "submit_market_order": broker.submit_market_order,
         "submit_limit_order": broker.submit_limit_order,
         "find_order_by_client_id": broker.find_order_by_client_id,
+        "assert_account_and_asset_ready": broker.assert_account_and_asset_ready,
         "PAPER_TRADING": broker.PAPER_TRADING,
         "fetch_upcoming_earnings": event_data.fetch_upcoming_earnings,
     }
@@ -487,6 +501,10 @@ def _mock_execution_dependencies(
         return quote
 
     broker.get_latest_quote = fake_quote
+    broker.assert_account_and_asset_ready = lambda ticker: {
+        "account": {"paper": True, "status": "ACTIVE"},
+        "asset": {"ticker": ticker, "status": "active", "tradable": True},
+    }
     event_data.fetch_upcoming_earnings = lambda tickers, as_of=None: {
         t: {"ticker": t, "available": earnings_available, "days_away": 1 if earnings_available else None}
         for t in tickers
@@ -514,6 +532,7 @@ def _mock_execution_dependencies(
         broker.submit_market_order = originals["submit_market_order"]
         broker.submit_limit_order = originals["submit_limit_order"]
         broker.find_order_by_client_id = originals["find_order_by_client_id"]
+        broker.assert_account_and_asset_ready = originals["assert_account_and_asset_ready"]
         broker.PAPER_TRADING = originals["PAPER_TRADING"]
         event_data.fetch_upcoming_earnings = originals["fetch_upcoming_earnings"]
         if originals["get_latest_quote"] is not None:
@@ -542,7 +561,7 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
                 now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
             )
             assert order["order_id"] == "paper-1"
-            assert store.get_proposal(proposal.proposal_id)["status"] == "executed"
+            assert store.get_proposal(proposal.proposal_id)["status"] == "broker_accepted"
             assert len(captured) == 1
     finally:
         restore()
@@ -765,7 +784,7 @@ def test_override_flag_proceeds_past_an_earnings_only_block_and_records_it():
             assert order["status"] == "accepted"
             assert len(captured) == 1
             stored = store.get_proposal(proposal.proposal_id)
-            assert stored["status"] == "executed"
+            assert stored["status"] == "broker_accepted"
             assert "policy_override" in stored
             assert any("earnings" in v.lower() for v in stored["policy_override"]["overridden_violations"])
     finally:
@@ -1040,7 +1059,7 @@ def test_audit_record_matches_the_reviewed_set_after_a_successful_retry():
                 override_policy_violations=True,
             )
             stored = store.get_proposal(proposal.proposal_id)
-            assert stored["status"] == "executed"
+            assert stored["status"] == "broker_accepted"
             assert sorted(stored["policy_override"]["overridden_violations"]) == sorted(reviewed["violations"])
     finally:
         restore()
@@ -1183,7 +1202,7 @@ def test_expired_approval_attempt_cannot_alter_an_executed_proposal():
                 store,
                 now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
             )
-            assert store.get_proposal(proposal.proposal_id)["status"] == "executed"
+            assert store.get_proposal(proposal.proposal_id)["status"] == "broker_accepted"
 
             # Re-invoke approval for the SAME (now executed) proposal_id,
             # far past its expires_at -- must not flip status back to
@@ -1200,7 +1219,7 @@ def test_expired_approval_attempt_cannot_alter_an_executed_proposal():
                 assert False, "expected re-approval of an executed proposal to be rejected"
             except ProposalExecutionError:
                 pass
-            assert store.get_proposal(proposal.proposal_id)["status"] == "executed"
+            assert store.get_proposal(proposal.proposal_id)["status"] == "broker_accepted"
             assert len(captured) == 1  # still only the one real submission
     finally:
         restore()
@@ -1641,7 +1660,7 @@ def test_limit_order_routes_to_submit_limit_order_not_market():
             assert len(captured) == 1
             assert captured[0][:3] == ("TQQQ", 10, "sell")
             assert captured[0][4] == 49.5  # limit_price reached submit_limit_order
-            assert store.get_proposal(proposal_id)["status"] == "executed"
+            assert store.get_proposal(proposal_id)["status"] == "broker_accepted"
     finally:
         restore()
 
@@ -1675,7 +1694,7 @@ def test_ambiguous_submission_failure_reconciles_to_executed_when_broker_actuall
             )
             assert order["order_id"] == "reconciled-1"
             record = store.get_proposal(proposal.proposal_id)
-            assert record["status"] == "executed"
+            assert record["status"] == "broker_accepted"
             assert "reconciled_after_error" in record
     finally:
         restore()
@@ -1790,7 +1809,7 @@ def test_reconcile_submission_resolves_stuck_proposal_to_executed():
             order = reconcile_submission(proposal.proposal_id, store)
             assert order["order_id"] == "reconciled-2"
             record = store.get_proposal(proposal.proposal_id)
-            assert record["status"] == "executed"
+            assert record["status"] == "broker_accepted"
             assert "reconciled_at" in record
     finally:
         restore()
@@ -1908,7 +1927,7 @@ def test_reconcile_submission_accepts_numerically_equivalent_share_counts():
             store.update_proposal_status(proposal.proposal_id, "submission_unknown")
             order = reconcile_submission(proposal.proposal_id, store)
             assert order["order_id"] == "candidate-order"
-            assert store.get_proposal(proposal.proposal_id)["status"] == "executed"
+            assert store.get_proposal(proposal.proposal_id)["status"] == "broker_accepted"
     finally:
         restore()
 
@@ -1985,7 +2004,7 @@ def test_reconcile_submission_accepts_a_correctly_matching_limit_order():
             store.update_proposal_status(proposal_id, "submission_unknown")
             order = reconcile_submission(proposal_id, store)
             assert order["order_id"] == "candidate-order"
-            assert store.get_proposal(proposal_id)["status"] == "executed"
+            assert store.get_proposal(proposal_id)["status"] == "broker_accepted"
     finally:
         restore()
 
@@ -2153,10 +2172,10 @@ def test_reconcile_submission_recovers_when_broker_lookup_itself_raises():
         restore()
 
 
-def test_reconcile_submission_recovers_when_record_broker_order_fails():
+def test_reconcile_submission_recovers_when_atomic_journal_fails():
     # GPT review, 2026-07-28: unlike execute_approved_paper_proposal()'s
-    # OWN record_broker_order failure handling (which marks EXECUTED,
-    # since a fresh submission response just came back), reconciliation's
+    # own local-journal failure handling preserves a fresh broker response,
+    # while reconciliation's
     # equivalent failure must leave the proposal RETRYABLE
     # (submission_unknown) rather than assume success without ever having
     # journaled the order.
@@ -2177,25 +2196,25 @@ def test_reconcile_submission_recovers_when_record_broker_order_fails():
             store.save_proposal(proposal.to_dict())
             store.update_proposal_status(proposal.proposal_id, "submitting")
 
-            original_record = store.record_broker_order
+            original_record = store.project_broker_order_event
 
-            def failing_record(pid, order):
+            def failing_record(*args, **kwargs):
                 raise sqlite3.OperationalError("simulated disk write failure")
 
-            store.record_broker_order = failing_record
+            store.project_broker_order_event = failing_record
             try:
                 reconcile_submission(proposal.proposal_id, store)
                 assert False, "expected the journal-write failure to raise"
             except ProposalExecutionError as exc:
                 assert "unexpectedly" in str(exc)
-            store.record_broker_order = original_record
+            store.project_broker_order_event = original_record
             record = store.get_proposal(proposal.proposal_id)
             assert record["status"] == "submission_unknown"
     finally:
         restore()
 
 
-def test_reconcile_submission_recovers_when_the_final_executed_write_fails():
+def test_reconcile_submission_recovers_when_the_atomic_projection_fails():
     packet = _packet()
     policy = _policy()
     proposal = generate_risk_reduction_proposals(packet, policy)[0]
@@ -2213,23 +2232,20 @@ def test_reconcile_submission_recovers_when_the_final_executed_write_fails():
             store.save_proposal(proposal.to_dict())
             store.update_proposal_status(proposal.proposal_id, "submitting")
 
-            original_update = store.update_proposal_status
+            original_projection = store.project_broker_order_event
 
-            def flaky_update(pid, status, **updates):
-                if status == "executed":
-                    raise sqlite3.OperationalError("simulated write failure on the executed transition")
-                return original_update(pid, status, **updates)
+            def failing_projection(*args, **kwargs):
+                raise sqlite3.OperationalError("simulated atomic projection failure")
 
-            store.update_proposal_status = flaky_update
+            store.project_broker_order_event = failing_projection
             try:
                 reconcile_submission(proposal.proposal_id, store)
-                assert False, "expected the executed-status write failure to raise"
+                assert False, "expected the broker-state projection failure to raise"
             except ProposalExecutionError as exc:
                 assert "unexpectedly" in str(exc)
-            store.update_proposal_status = original_update
+            store.project_broker_order_event = original_projection
             record = store.get_proposal(proposal.proposal_id)
-            # Retryable, not stranded -- and NOT falsely "executed" despite
-            # record_broker_order() having already succeeded.
+            # Retryable, not stranded, and never falsely projected as filled.
             assert record["status"] == "submission_unknown"
     finally:
         restore()
@@ -2255,7 +2271,11 @@ def test_reconcile_submission_raises_critical_when_even_the_recovery_write_fails
             def always_failing_update(pid, status, **updates):
                 raise sqlite3.OperationalError("database is locked")
 
+            def always_failing_conditional(*args, **kwargs):
+                raise sqlite3.OperationalError("database is locked")
+
             store.update_proposal_status = always_failing_update
+            store.update_proposal_status_if_current = always_failing_conditional
             try:
                 reconcile_submission(proposal.proposal_id, store)
                 assert False, "expected a CRITICAL RuntimeError"
@@ -2771,7 +2791,7 @@ def test_validate_proposal_for_execution_agrees_with_batch_preflight():
         restore()
 
 
-def test_record_broker_order_failure_after_acceptance_still_marks_executed():
+def test_atomic_journal_failure_after_acceptance_still_marks_accepted():
     """The broker DID accept the order (a normal response came back) --
     a local journaling failure must not be reported as a lost/failed
     order; the fact that it executed must be preserved."""
@@ -2787,8 +2807,8 @@ def test_record_broker_order_failure_after_acceptance_still_marks_executed():
             def failing_record(proposal_id, order):
                 raise sqlite3.OperationalError("simulated local disk/db failure")
 
-            original_record = store.record_broker_order
-            store.record_broker_order = failing_record
+            original_record = store.project_broker_order_event
+            store.project_broker_order_event = failing_record
             try:
                 order = execute_approved_paper_proposal(
                     proposal.proposal_id,
@@ -2800,9 +2820,9 @@ def test_record_broker_order_failure_after_acceptance_still_marks_executed():
                 )
                 assert order["order_id"] == "paper-1"
             finally:
-                store.record_broker_order = original_record
+                store.project_broker_order_event = original_record
             record = store.get_proposal(proposal.proposal_id)
-            assert record["status"] == "executed"
+            assert record["status"] == "broker_accepted"
             assert "local recording failed" in record.get("error", "")
     finally:
         restore()

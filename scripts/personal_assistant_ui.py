@@ -75,9 +75,14 @@ from assistant.similarity_evidence import compute_similarity_evidence, format_ev
 from assistant.ticker_verification import partition_by_universe, verify_tickers
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
 from assistant.proposal_status import (
+    ACTIVE_BROKER_ORDER_STATUSES,
     BLOCKED,
-    EXECUTED,
+    BROKER_EXPIRED,
+    BROKER_REJECTED,
+    CANCELED,
     EXPIRED,
+    FILLED,
+    MANUAL_RECONCILIATION_STATUSES,
     POLICY_OVERRIDE_AVAILABLE,
     PROPOSED,
     STATUSES,
@@ -375,7 +380,8 @@ def _proposal_status_category(status: str) -> str:
     whether the actual approval workflow behaved correctly against a
     changed/terminal proposal). One of:
       "approvable" -- proposed / override_available: show approval controls.
-      "executed"   -- terminal success: show the stored broker order.
+      "filled"     -- terminal success: show the stored broker fill.
+      "working"    -- broker accepted/partial/cancel-pending order.
       "failed"     -- terminal failure: show the stored violations/error.
       "unresolved" -- broker outcome not yet confirmed (submitting/
                       submission_unknown/reconciling): point at Reconcile.
@@ -384,9 +390,19 @@ def _proposal_status_category(status: str) -> str:
     """
     if status in (PROPOSED, POLICY_OVERRIDE_AVAILABLE):
         return "approvable"
-    if status == EXECUTED:
-        return "executed"
-    if status in (BLOCKED, VALIDATION_FAILED, SUBMISSION_FAILED, EXPIRED):
+    if status == FILLED:
+        return "filled"
+    if status in ACTIVE_BROKER_ORDER_STATUSES:
+        return "working"
+    if status in (
+        BLOCKED,
+        VALIDATION_FAILED,
+        SUBMISSION_FAILED,
+        EXPIRED,
+        CANCELED,
+        BROKER_REJECTED,
+        BROKER_EXPIRED,
+    ):
         return "failed"
     if status in UNRESOLVED_BROKER_STATE_STATUSES:
         return "unresolved"
@@ -401,15 +417,22 @@ def _render_terminal_or_inflight_status(proposal: dict, status: str) -> None:
     showing approval controls even after the underlying proposal had
     already been executed/blocked/expired elsewhere."""
     category = _proposal_status_category(status)
-    if category == "executed":
+    if category == "filled":
         order = proposal.get("broker_order") or {}
         msg = (
-            f"Executed at {proposal.get('executed_at', '?')} -- broker order "
+            f"Filled at {proposal.get('filled_at', '?')} -- broker order "
             f"{order.get('order_id', '?')} [{order.get('status', 'unknown')}]"
         )
         if proposal.get("policy_override"):
             msg += " (submitted via policy override)"
         st.success(msg)
+    elif category == "working":
+        order = proposal.get("broker_order") or {}
+        st.info(
+            f"Broker order {order.get('order_id', '?')} is {status.replace('_', ' ')}; "
+            f"filled {order.get('filled_qty', 0)}/{order.get('shares', '?')} shares. "
+            "Keep `monitor-orders` running (with periodic polling fallback) until terminal."
+        )
     elif category == "failed":
         detail = "; ".join(proposal.get("violations") or []) or proposal.get("error") or "no detail recorded"
         st.error(f"{status.replace('_', ' ').title()}: {detail}")
@@ -1729,7 +1752,7 @@ with tab_history:
                 hide_index=True,
             )
 
-        unresolved = [p for p in stored if p["status"] in UNRESOLVED_BROKER_STATE_STATUSES]
+        unresolved = [p for p in stored if p["status"] in MANUAL_RECONCILIATION_STATUSES]
         if unresolved:
             st.warning(
                 f"{len(unresolved)} proposal(s) have an unresolved broker submission -- their outcome "
@@ -1744,7 +1767,11 @@ with tab_history:
                 ):
                     try:
                         order = reconcile_submission(p["proposal_id"], store)
-                        st.success(f"Reconciled: found broker order {order['order_id']} -- marked executed.")
+                        refreshed = store.get_proposal(p["proposal_id"])
+                        st.success(
+                            f"Reconciled: found broker order {order['order_id']} -- "
+                            f"proposal is now {refreshed['status']}."
+                        )
                     except Exception as exc:
                         st.error(f"Reconciliation result: {exc}")
 

@@ -270,6 +270,72 @@ def test_find_order_by_client_id_market_order_has_no_limit_price():
         _clear_alpaca_env()
 
 
+def test_account_and_asset_preflight_rejects_a_broker_trading_block():
+    account = type("Account", (), {
+        "id": "paper-account",
+        "status": _FakeEnumValue("ACTIVE"),
+        "equity": "10000",
+        "cash": "5000",
+        "buying_power": "5000",
+        "trading_blocked": True,
+        "account_blocked": False,
+        "trade_suspended_by_user": False,
+        "transfers_blocked": False,
+    })()
+    fake_client = type("FakeClient", (), {"get_account": staticmethod(lambda: account)})()
+    original_get_client = broker._get_client
+    original_paper = broker.PAPER_TRADING
+    broker._get_client = lambda: fake_client
+    broker.PAPER_TRADING = True
+    try:
+        try:
+            broker.assert_account_and_asset_ready("AAPL")
+            assert False, "expected broker-side trading block to fail preflight"
+        except broker.BrokerPreflightError as exc:
+            assert "trading_blocked" in str(exc)
+    finally:
+        broker._get_client = original_get_client
+        broker.PAPER_TRADING = original_paper
+
+
+def test_account_and_asset_preflight_rejects_an_untradable_asset():
+    account = type("Account", (), {
+        "id": "paper-account",
+        "status": _FakeEnumValue("ACTIVE"),
+        "equity": "10000",
+        "cash": "5000",
+        "buying_power": "5000",
+        "trading_blocked": False,
+        "account_blocked": False,
+        "trade_suspended_by_user": False,
+        "transfers_blocked": False,
+    })()
+    asset = type("Asset", (), {
+        "symbol": "AAPL",
+        "status": _FakeEnumValue("active"),
+        "asset_class": _FakeEnumValue("us_equity"),
+        "tradable": False,
+        "fractionable": True,
+    })()
+    fake_client = type("FakeClient", (), {
+        "get_account": staticmethod(lambda: account),
+        "get_asset": staticmethod(lambda ticker: asset),
+    })()
+    original_get_client = broker._get_client
+    original_paper = broker.PAPER_TRADING
+    broker._get_client = lambda: fake_client
+    broker.PAPER_TRADING = True
+    try:
+        try:
+            broker.assert_account_and_asset_ready("AAPL")
+            assert False, "expected untradable asset to fail preflight"
+        except broker.BrokerPreflightError as exc:
+            assert "not broker-tradable" in str(exc)
+    finally:
+        broker._get_client = original_get_client
+        broker.PAPER_TRADING = original_paper
+
+
 if __name__ == "__main__":
     test_is_configured_false_without_env_vars()
     test_is_configured_true_with_both_env_vars()
@@ -285,4 +351,6 @@ if __name__ == "__main__":
     test_submit_limit_order_requires_idempotency_key()
     test_find_order_by_client_id_returns_the_complete_material_identity()
     test_find_order_by_client_id_market_order_has_no_limit_price()
+    test_account_and_asset_preflight_rejects_a_broker_trading_block()
+    test_account_and_asset_preflight_rejects_an_untradable_asset()
     print("All Alpaca broker tests passed.")

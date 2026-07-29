@@ -703,7 +703,7 @@ def test_cumulative_preflight_test_h_single_execution_unaffected_by_new_override
                 now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
             )
             assert order is not None
-            assert store.get_proposal(execution_proposal.proposal_id)["status"] == "executed"
+            assert store.get_proposal(execution_proposal.proposal_id)["status"] == "broker_accepted"
             assert len(captured) == 1
     finally:
         restore()

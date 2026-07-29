@@ -147,7 +147,7 @@ def command_propose(args, store: AssistantStore) -> None:
     proposals = generate_risk_reduction_proposals(packet, policy)
     if args.strategy_proposals or policy.enable_strategy_proposals:
         try:
-            proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy)
+            proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy, store=store)
         except Exception as exc:
             print(f"  ! SOXX/SOXL strategy proposal check failed ({exc}); showing risk-reduction proposals only.")
     if not proposals:

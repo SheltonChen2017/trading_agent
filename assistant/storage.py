@@ -84,6 +84,11 @@ class AssistantStore:
                     payload_json TEXT NOT NULL,
                     updated_at TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS strategy_evaluations (
+                    strategy_key TEXT PRIMARY KEY,
+                    last_evaluated_at TEXT NOT NULL,
+                    last_result_json TEXT NOT NULL
+                );
                 CREATE INDEX IF NOT EXISTS idx_proposals_status
                     ON trade_proposals(status, created_at);
                 """
@@ -509,3 +514,35 @@ class AssistantStore:
                 p["intent"] for p in self.list_proposals(status=status, limit=limit) if "intent" in p
             )
         return intents
+
+    def record_strategy_evaluation(self, strategy_key: str, evaluated_at: str, result: dict[str, Any]) -> None:
+        """Persists "this strategy was checked at this time, with this
+        outcome" -- pure bookkeeping, no enforcement (docs/
+        ALLOCATION_SERVICE_DESIGN.md, 2026-08-01). Closes a gap
+        assistant/strategy_proposals.py's generate_soxx_soxl_rebalance_
+        proposals() already documented: its backtest assumed a fixed
+        ~21-trading-day check counter, but the live version had no
+        equivalent memory of when it was last evaluated. Overwrites the
+        previous row for the same strategy_key -- only the most recent
+        evaluation is kept, this is not an audit log."""
+        with self._connect() as connection:
+            connection.execute(
+                "INSERT INTO strategy_evaluations(strategy_key, last_evaluated_at, last_result_json) "
+                "VALUES (?, ?, ?) ON CONFLICT(strategy_key) DO UPDATE SET "
+                "last_evaluated_at = excluded.last_evaluated_at, last_result_json = excluded.last_result_json",
+                (strategy_key, evaluated_at, json.dumps(result, sort_keys=True)),
+            )
+
+    def get_last_strategy_evaluation(self, strategy_key: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT last_evaluated_at, last_result_json FROM strategy_evaluations WHERE strategy_key = ?",
+                (strategy_key,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {
+            "strategy_key": strategy_key,
+            "last_evaluated_at": row["last_evaluated_at"],
+            "last_result": json.loads(row["last_result_json"]),
+        }

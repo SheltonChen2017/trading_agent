@@ -446,6 +446,44 @@ def test_prune_decision_packets_never_touches_proposals_or_broker_orders():
         assert store.get_proposal("tp_test") is not None
 
 
+# --- strategy_evaluations table (docs/ALLOCATION_SERVICE_DESIGN.md,
+# 2026-08-01): persisted "last evaluated" bookkeeping for strategy
+# proposal generators, closing a gap assistant/strategy_proposals.py's
+# generate_soxx_soxl_rebalance_proposals() already documented.
+
+def test_record_and_get_strategy_evaluation_round_trips():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        assert store.get_last_strategy_evaluation("soxx_soxl_rebalance") is None
+        store.record_strategy_evaluation(
+            "soxx_soxl_rebalance", "2026-08-01T10:00:00+00:00", {"fired": True, "proposal_count": 1},
+        )
+        result = store.get_last_strategy_evaluation("soxx_soxl_rebalance")
+        assert result["last_evaluated_at"] == "2026-08-01T10:00:00+00:00"
+        assert result["last_result"] == {"fired": True, "proposal_count": 1}
+
+
+def test_record_strategy_evaluation_overwrites_the_previous_row():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        store.record_strategy_evaluation("soxx_soxl_rebalance", "2026-08-01T10:00:00+00:00", {"fired": False})
+        store.record_strategy_evaluation("soxx_soxl_rebalance", "2026-08-01T11:00:00+00:00", {"fired": True})
+        result = store.get_last_strategy_evaluation("soxx_soxl_rebalance")
+        assert result["last_evaluated_at"] == "2026-08-01T11:00:00+00:00"
+        assert result["last_result"] == {"fired": True}
+
+        conn = sqlite3.connect(store.path)
+        try:
+            count = conn.execute("SELECT COUNT(*) FROM strategy_evaluations").fetchone()[0]
+        finally:
+            conn.close()
+        assert count == 1  # overwritten, not a second row
+
+
 def test_pruning_a_pre_existing_db_with_duplicate_generated_at_rows_does_not_crash():
     # Regression guard for the migration itself: a pre-existing database
     # (from before this fix) could already contain duplicate generated_at
@@ -556,6 +594,8 @@ if __name__ == "__main__":
     test_prune_decision_packets_older_than_deletes_only_old_rows()
     test_prune_decision_packets_rejects_non_positive_days()
     test_prune_decision_packets_never_touches_proposals_or_broker_orders()
+    test_record_and_get_strategy_evaluation_round_trips()
+    test_record_strategy_evaluation_overwrites_the_previous_row()
     test_pruning_a_pre_existing_db_with_duplicate_generated_at_rows_does_not_crash()
     test_build_portfolio_snapshot_from_alpaca_uses_broker_data()
     test_build_decision_packet_falls_back_when_alpaca_not_configured()

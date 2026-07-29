@@ -1445,7 +1445,7 @@ with tab_propose:
         proposals = generate_risk_reduction_proposals(packet, policy)
         if check_strategy:
             try:
-                proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy)
+                proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy, store=store)
             except Exception as exc:
                 st.error(f"SOXX/SOXL strategy proposal check failed ({exc}); showing risk-reduction proposals only.")
         for proposal in proposals:

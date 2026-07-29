@@ -69,6 +69,7 @@ from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.proposals import TradeProposal
 from assistant.schemas import DecisionPacket, EvidenceStatus
+from assistant.storage import AssistantStore
 from risk.execution_gate import TradeIntent
 
 STABLE_TICKER = "SOXX"
@@ -193,6 +194,7 @@ def generate_soxx_soxl_rebalance_proposals(
     policy: TradingPolicy,
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
+    store: AssistantStore | None = None,
 ) -> list[TradeProposal]:
     """
     At most one proposal: rebalance SOXX/SOXL toward the target leveraged
@@ -203,12 +205,38 @@ def generate_soxx_soxl_rebalance_proposals(
     `market_data` lets a caller/test inject price history instead of
     hitting the network; production callers can omit it.
 
+    `store`, if given, records this evaluation via
+    AssistantStore.record_strategy_evaluation() -- closing a gap this
+    module previously only documented: the backtest assumed a fixed
+    ~21-trading-day check counter, but the live version had no equivalent
+    memory of when it was last evaluated (docs/ALLOCATION_SERVICE_DESIGN.md,
+    2026-08-01). Recorded on every NORMAL return (proposal or empty list)
+    but NOT when MissingResearchDependencyError is raised below -- a
+    refused evaluation is a distinct case, deliberately not conflated with
+    "evaluated, no drift" here; no enforcement reads this data yet.
+
     Raises MissingResearchDependencyError (fails closed, no proposal) if
     a finding this strategy relies on has no matching entry in the
     research registry at all, OR is present but no longer carries the
     specific status this strategy requires (e.g. reclassified to
     rejected/exploratory/unavailable) -- see that error's docstring.
     """
+    proposals = _generate_soxx_soxl_rebalance_proposals(packet, policy, ttl_minutes, market_data)
+    if store is not None:
+        store.record_strategy_evaluation(
+            "soxx_soxl_rebalance",
+            datetime.now(timezone.utc).isoformat(),
+            {"fired": bool(proposals), "proposal_count": len(proposals)},
+        )
+    return proposals
+
+
+def _generate_soxx_soxl_rebalance_proposals(
+    packet: DecisionPacket,
+    policy: TradingPolicy,
+    ttl_minutes: int = 15,
+    market_data: dict[str, pd.DataFrame] | None = None,
+) -> list[TradeProposal]:
     broken_dependencies, _ = _relied_upon_findings_status()
     if broken_dependencies:
         raise MissingResearchDependencyError(

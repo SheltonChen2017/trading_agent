@@ -34,6 +34,28 @@ silently reintroducing exactly the class of bug those 19 rounds closed.
 This needs its own dedicated, carefully-reviewed session, not a subtask
 squeezed alongside unrelated documentation/metrics work.
 
+**Partially addressed 2026-07-29** by the transaction-ready order
+lifecycle work (commit 84da938), which did get its own dedicated session
+and extracted three genuinely separable concerns out of what would
+otherwise have been further `execution_service.py` growth:
+`assistant/order_lifecycle.py` (broker-status → proposal-state mapping
+and event projection), `assistant/order_reconciler.py` (startup polling,
+trade-update stream, stale-order cancellation), and
+`assistant/readiness.py` (operational preflight). The atomic
+state-transition primitives moved into `assistant/storage.py`
+(`project_broker_order_event`, `reserve_execution_budget`,
+`mark_submission_failed_and_release`), which keeps each
+multi-row transition inside a single `BEGIN IMMEDIATE` transaction rather
+than spreading it across service-layer calls — the specific failure mode
+this entry warned about.
+
+**Still open**: `execution_service.py` remains ~1,450 lines and still
+mixes validation, the approval/submission state machine, duplicate-order
+and pending-exposure estimation, and earnings-data resolution;
+`allocation_batch.py` still owns cross-leg reservation math separately
+from the storage-level budget reservation added above. The remaining
+split is smaller than it was, but not done.
+
 ## 2. Risk-check scatter
 
 The core risk-governor rule engine (`risk/execution_gate.py`'s

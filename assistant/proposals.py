@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import math
 from datetime import datetime, timedelta, timezone
 
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
@@ -54,7 +55,17 @@ def _add_reduction(
     dollar_reduction: float,
     reason: str,
 ) -> None:
-    if dollar_reduction <= 0 or position.current_price <= 0:
+    # math.isfinite, not just `<= 0`: a NaN price defeats every ordered
+    # comparison, and int(x / NaN) then raises ValueError -- crashing
+    # proposal GENERATION before risk/execution_gate.py's own
+    # INVALID_POSITION_DATA check ever gets to reject the position
+    # (independent review, 2026-07-29).
+    if (
+        not math.isfinite(dollar_reduction)
+        or dollar_reduction <= 0
+        or not math.isfinite(position.current_price)
+        or position.current_price <= 0
+    ):
         return
     shares = min(int(position.shares), max(1, int(dollar_reduction / position.current_price)))
     entry = reductions.setdefault(
@@ -194,7 +205,13 @@ def generate_risk_reduction_proposals(
                 break
             planned_so_far = _planned_dollars(position.ticker)
             remaining_value = position.market_value - planned_so_far
-            if remaining_value <= 0 or position.current_price <= 0:
+            # Same NaN reasoning as _add_reduction() above.
+            if (
+                not math.isfinite(remaining_value)
+                or remaining_value <= 0
+                or not math.isfinite(position.current_price)
+                or position.current_price <= 0
+            ):
                 continue
             incremental = min(remaining_value, remaining_gap)
             _add_reduction(

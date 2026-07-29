@@ -156,3 +156,18 @@ if __name__ == "__main__":
     test_zero_tax_and_cost_are_backward_compatible()
     test_grid_search_kelly_produces_expected_columns()
     print("All Kelly rotation tests passed.")
+
+
+def test_unknown_kelly_inputs_never_produce_maximum_leverage():
+    # Independent review, 2026-07-29, reproduced: NaN defeats `<= 0`, so
+    # min(max_leveraged_weight, NaN) returned max_leveraged_weight --
+    # unknown mean/variance produced the MAXIMUM leveraged weight. Same
+    # class as vol_target_rotation.compute_target_leveraged_weight().
+    assert compute_kelly_leveraged_weight(float("nan"), 0.0004, 0.5, 0.6) == 0.0
+    assert compute_kelly_leveraged_weight(0.001, float("nan"), 0.5, 0.6) == 0.0
+    assert compute_kelly_leveraged_weight(None, 0.0004, 0.5, 0.6) == 0.0
+    assert compute_kelly_leveraged_weight(0.001, None, 0.5, 0.6) == 0.0
+    assert compute_kelly_leveraged_weight(0.001, float("inf"), 0.5, 0.6) == 0.0
+    assert compute_kelly_leveraged_weight(0.001, 0.0, 0.5, 0.6) == 0.0
+    # Ordinary sizing unchanged.
+    assert compute_kelly_leveraged_weight(0.0001, 0.0004, 0.5, 0.6) == 0.125

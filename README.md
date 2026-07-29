@@ -145,7 +145,7 @@ versioned, labeled independently by `EvidenceStatus`
 strategy can carry a confirmed claim and a rejected claim at the same time
 (see SOXX/SOXL below).
 
-As of the current registry (`research_findings.json` version 1.1.0):
+As of the current registry (`research_findings.json` version 1.3.0):
 
 - **Rejected** (did not survive full confirmation and dependence-aware
   testing): the original z-score scanner; cross-sectional momentum (12-1
@@ -177,6 +177,16 @@ As of the current registry (`research_findings.json` version 1.1.0):
   `assistant/research_findings.json` for per-signal detail. The
   implementations were removed from the codebase after this verdict was
   recorded -- git history (commit 8605f0e) retains them.
+- **Exploratory** (first-pass only, explicitly not confirmed): a
+  defensive-carry sleeve (`config.DEFENSIVE_CARRY_TICKERS` --
+  TLT/IEF/SHY/GLD, deliberately kept OUT of `UNIVERSE`/`BASKETS` so the
+  dip/up scanner never treats them as signal candidates). Blending them
+  into an equal-weight `UNIVERSE` portfolio monotonically reduced max
+  drawdown and expected shortfall as the carry weight rose from 0% to 30%,
+  with downside capture narrowing slightly faster than upside capture. That
+  is a **single lookback window with no walk-forward or out-of-sample
+  split**, across three candidate weights -- suggestive, not evidence. See
+  `scripts/run_defensive_carry_probe.py`. Not a live or paper allocation.
 
 **One credit-spread anomaly, explicitly not promoted**: re-checked 2026-07-26
 under realistic `next_open` (rather than same-close) entry timing, the
@@ -692,6 +702,10 @@ assistant/
   explanations.py          "why was this ticker flagged?"
   stock_lookup.py          own-ticker trend/volatility, price targets, hold-period ranges
   news_summary.py          recent news, optional Claude-summarized (ANTHROPIC_API_KEY)
+  ai_advisor.py            optional LLM notes, output-validated so it can never advise an allocation
+  ticker_verification.py   confirms a ticker is real/liquid before it enters a cart
+  similarity_evidence.py   deterministic co-movement evidence behind "similar tickers"
+  recommended_stocks.py    not-currently-held candidates surfaced in the Briefing tab (exploration only)
   sample_portfolio.py      manual fallback portfolio when Alpaca isn't configured
 
 data/
@@ -855,6 +869,21 @@ network access.
   bought-the-dip-and-it-went-to-zero case, since bankrupt names aren't in
   the universe at all -- its measured downside tail is understated
   (low-stakes since it's already rejected).
+- **No embargo between the discovery and confirmation periods** (found
+  2026-07-29). The split boundary itself is clean -- `backtest/engine.py`'s
+  `_split_by_date()` puts a date in exactly one side -- but a signal firing
+  ON the split date has its forward return measured over the following
+  `hold_days`, which land inside the confirmation period. So the last
+  ~`hold_days` of discovery and the first ~`hold_days` of confirmation
+  share overlapping return windows and are not fully independent. Standard
+  walk-forward practice embargoes `hold_days` around the split. Practical
+  impact on current findings: LOW -- the overlap is roughly `hold_days`
+  dates out of a several-hundred-date confirmation period, and it biases
+  the two periods toward AGREEING, so it cannot manufacture a rejection;
+  every finding recorded so far is a rejection or a risk-shape result. It
+  is deliberately not "fixed" retroactively, since changing the split
+  would shift every number in the versioned research registry. Add an
+  embargo before trusting any future confirmation reporting a positive edge.
 - No strategy is authorized to open new positions under the default policy.
 
 These limitations should be resolved incrementally without weakening the

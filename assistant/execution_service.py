@@ -1099,10 +1099,30 @@ def execute_approved_paper_proposal(
         store.update_proposal_status(proposal_id, BLOCKED, violations=[message])
         raise ProposalExecutionError(message) from exc
 
-    submit = broker.submit_limit_order if intent.order_type == "limit" else broker.submit_market_order
-    submit_kwargs = (
-        {"limit_price": intent.limit_price} if intent.order_type == "limit" else {}
-    )
+    # Dispatch explicitly rather than "limit, else market". Two upstream
+    # layers already prevent anything else reaching here (policy.validate()
+    # rejects an allowed_order_types outside SUPPORTED_ORDER_TYPES, and the
+    # allowed_order_types check above blocks the proposal), but
+    # risk/execution_gate.py's validate_trade_intent() DOES still approve
+    # order_type="stop" -- it is a lower layer with no view of policy. Under
+    # the old else-branch such an intent would have been silently submitted
+    # as a MARKET order, i.e. an unbounded-price order where a stop was
+    # intended. Fail closed instead, so adding a new order type can never
+    # silently degrade into a market order (independent review, 2026-07-29).
+    if intent.order_type == "limit":
+        submit = broker.submit_limit_order
+        submit_kwargs = {"limit_price": intent.limit_price}
+    elif intent.order_type == "market":
+        submit = broker.submit_market_order
+        submit_kwargs = {}
+    else:
+        message = (
+            f"No broker submission path implements order_type={intent.order_type!r}; refusing to "
+            "submit rather than silently downgrading it to a market order."
+        )
+        store.update_proposal_status(proposal_id, BLOCKED, violations=[message])
+        store.release_execution_reservation(proposal_id)
+        raise ProposalExecutionError(message)
     try:
         order = submit(
             intent.ticker,

@@ -567,6 +567,44 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
         restore()
 
 
+def test_unsupported_order_type_is_refused_not_downgraded_to_a_market_order():
+    # Independent review, 2026-07-29: the submit dispatch used to read
+    # "limit, else market", so ANY other order type would have been
+    # submitted as an unbounded-price MARKET order. risk/execution_gate.py
+    # still approves order_type="stop" (it has no view of policy), and
+    # policy.allowed_order_types is only enforced one layer up -- so the
+    # dispatch itself must fail closed rather than silently downgrade.
+    # A policy permitting "stop" is constructed directly here (policy.validate()
+    # would reject it) precisely to reach the dispatch.
+    packet = _packet()
+    permissive_policy = dataclasses.replace(
+        _policy(), allowed_order_types=("market", "limit", "stop")
+    )
+    proposal = generate_risk_reduction_proposals(packet, permissive_policy)[0]
+    stored = proposal.to_dict()
+    stored["intent"] = {**stored["intent"], "order_type": "stop", "limit_price": 90.0}
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(stored)
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio,
+                    permissive_policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected an unsupported order type to be refused"
+            except ProposalExecutionError as exc:
+                assert "order_type" in str(exc)
+            # The critical property: no order reached the broker at all.
+            assert captured == []
+            refreshed = store.get_proposal(proposal.proposal_id)
+            assert refreshed["status"] == "blocked"
+    finally:
+        restore()
+
+
 def test_approval_rejects_a_policy_with_the_same_version_but_different_content():
     # Regression test (GPT review, 2026-07-28): approval used to compare
     # only the `policy_version` string. Two policy files (e.g. a
@@ -2826,3 +2864,90 @@ def test_atomic_journal_failure_after_acceptance_still_marks_accepted():
             assert "local recording failed" in record.get("error", "")
     finally:
         restore()
+
+
+# --- Proposal-generation guards (mutation testing, 2026-07-29: each guard
+# exercised below could be deleted without failing any test, even though
+# they decide whether a real sell proposal is generated).
+
+def _basket_packet(aapl_market_value: float, cash: float, equity_check: float | None = None):
+    """Portfolio holding only AAPL (a member of BASKETS['tech']) at an exact
+    market value, so the basket-limit boundary can be hit precisely."""
+    shares = 100
+    price = aapl_market_value / shares
+    snapshot = build_portfolio_snapshot(
+        [{"ticker": "AAPL", "shares": shares, "entry_price": price, "current_price": price}], cash=cash,
+    )
+    if equity_check is not None:
+        assert abs(snapshot.total_equity - equity_check) < 1e-6, snapshot.total_equity
+    return DecisionPacket(
+        generated_at="2026-07-29T12:00:00+00:00", portfolio=snapshot,
+        risk=build_risk_exposure(snapshot),
+        regime=MarketRegime(benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
+                            trailing_volatility_pct=1.0, as_of="2026-07-29"),
+        signals=[], upcoming_events=[], warnings=[], policy_version="test",
+    )
+
+
+def _basket_only_policy(max_basket_pct=0.40, max_order_value=50_000.0):
+    # Every OTHER cap is opened up so only the basket check can fire.
+    return TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=1.0, max_basket_pct=max_basket_pct,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=max_order_value,
+    )
+
+
+def test_basket_exposure_exactly_at_the_limit_generates_no_proposal():
+    # Boundary: `<=` means AT the limit is compliant. This also protects the
+    # exact-value (non-rounded) basket math -- a rounded 40.0% would tie here
+    # and silently evade generation.
+    packet = _basket_packet(aapl_market_value=4_000.0, cash=6_000.0, equity_check=10_000.0)
+    assert generate_risk_reduction_proposals(packet, _basket_only_policy(0.40)) == []
+
+
+def test_basket_exposure_just_over_the_limit_generates_a_proposal():
+    packet = _basket_packet(aapl_market_value=4_001.0, cash=5_999.0, equity_check=10_000.0)
+    proposals = generate_risk_reduction_proposals(packet, _basket_only_policy(0.40))
+    assert len(proposals) == 1
+    assert proposals[0].intent.ticker == "AAPL"
+    assert proposals[0].intent.side == "sell"
+    assert any("exposure exceeds" in r for r in proposals[0].reasons)
+
+
+def test_zero_equity_portfolio_generates_no_proposals():
+    snapshot = build_portfolio_snapshot([], cash=0.0)
+    packet = DecisionPacket(
+        generated_at="2026-07-29T12:00:00+00:00", portfolio=snapshot,
+        risk=build_risk_exposure(snapshot),
+        regime=MarketRegime(benchmark_ticker="QQQ", trend=None, volatility_regime=None,
+                            trailing_volatility_pct=None, as_of="2026-07-29"),
+        signals=[], upcoming_events=[], warnings=[], policy_version="test",
+    )
+    assert generate_risk_reduction_proposals(packet, _basket_only_policy()) == []
+
+
+def test_max_order_value_below_one_share_generates_no_proposal():
+    # A breach exists, but the per-order cap can't afford even one share --
+    # a 0-share proposal would be unexecutable forever.
+    packet = _basket_packet(aapl_market_value=8_000.0, cash=2_000.0, equity_check=10_000.0)
+    policy = _basket_only_policy(max_basket_pct=0.40, max_order_value=1.0)  # share price is $80
+    assert generate_risk_reduction_proposals(packet, policy) == []
+
+
+def test_allocation_proposals_refuse_a_non_positive_dollar_amount():
+    packet = _basket_packet(aapl_market_value=1_000.0, cash=9_000.0, equity_check=10_000.0)
+    policy = _basket_only_policy()
+    for amount in (0.0, -100.0):
+        assert generate_allocation_buy_proposals(
+            packet, policy, {"AAPL": 100.0}, {"AAPL": 10.0}, amount
+        ) == []
+    assert generate_allocation_buy_proposals(packet, policy, {}, {"AAPL": 10.0}, 1_000.0) == []
+
+
+def test_build_risk_exposure_reports_zero_equity_rather_than_dividing_by_it():
+    snapshot = build_portfolio_snapshot([], cash=0.0)
+    risk = build_risk_exposure(snapshot)
+    assert risk.basket_exposure_pct == {}
+    assert risk.leveraged_etf_exposure_pct == 0.0
+    assert any("zero or negative total equity" in w for w in risk.concentration_warnings)

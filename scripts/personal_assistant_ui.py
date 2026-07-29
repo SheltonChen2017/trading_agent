@@ -183,6 +183,59 @@ def _load_live_events_for_tickers(tickers: tuple[str, ...]) -> list:
     return get_upcoming_events(list(tickers), fetch_live=True)
 
 
+_HOLDING_ANALYSIS_CACHE_TTL_SECONDS = 300
+
+
+@st.cache_data(ttl=_HOLDING_ANALYSIS_CACHE_TTL_SECONDS)
+def _load_holding_analysis(ticker: str, regime_fields: tuple):
+    """Per-holding trend/volatility + this project's own evidence for ONE
+    ticker, as rendered by the Briefing tab's "Holdings analysis" panel.
+
+    Cached for the same reason _load_recommended_tickers() is: this panel
+    renders for EVERY held position, and the Briefing tab re-runs on every
+    widget interaction anywhere in the app. Uncached, a 10-position
+    portfolio cost ~20 yfinance round-trips per keystroke (two per
+    position: one here for trend/volatility, and a second inside
+    explain_ticker()). The history is now fetched ONCE and passed into
+    explain_ticker(), and the whole result is cached per ticker.
+
+    `regime_fields` is MarketRegime's primitive fields as a tuple rather
+    than the dataclass itself, because MarketRegime isn't hashable and
+    st.cache_data keys on arguments. Passing it through (instead of
+    letting explain_ticker() default to None) is what stops explain_ticker
+    from fetching benchmark data to rebuild a regime we already have.
+
+    Returns a plain dict; `currently_held` is deliberately NOT requested
+    here (the panel reads shares/market value straight off the position it
+    is already iterating), so do not start reading that field from this
+    cached result -- it would be "not_checked".
+    """
+    from assistant.schemas import MarketRegime
+
+    benchmark_ticker, trend, volatility_regime, trailing_volatility_pct, as_of = regime_fields
+    regime = MarketRegime(
+        benchmark_ticker=benchmark_ticker, trend=trend, volatility_regime=volatility_regime,
+        trailing_volatility_pct=trailing_volatility_pct, as_of=as_of,
+    )
+    history = fetch_historical([ticker], lookback_days=300)
+    own_trend = own_vol = None
+    if ticker in history and not history[ticker].empty:
+        close = history[ticker]["close"]
+        as_of_date = close.index[-1]
+        own_trend = classify_trend(close, as_of_date, lookback_days=200)
+        own_vol = compute_blended_volatility(close, as_of_date)
+    explanation = explain_ticker(ticker, market_regime=regime, data=history)
+    return {"trend": own_trend, "volatility": own_vol, "explanation": explanation}
+
+
+def _regime_fields(regime) -> tuple:
+    """MarketRegime as a hashable tuple, for use as a cache key."""
+    return (
+        regime.benchmark_ticker, regime.trend, regime.volatility_regime,
+        regime.trailing_volatility_pct, regime.as_of,
+    )
+
+
 @st.cache_data(ttl=_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS)
 def _load_recommended_tickers(held_tickers: tuple[str, ...]):
     """Composes yf.screen (most-actives) + Finnhub (IPO calendar, if
@@ -891,21 +944,21 @@ with tab_briefing:
         for position in packet.portfolio.positions:
             with st.container(border=True):
                 st.write(f"**{position.ticker}** -- {position.shares:g} sh, ${position.market_value:,.2f} ({position.unrealized_pnl_pct:+.1f}% unrealized)")
+                # One cached call per ticker for BOTH the trend/volatility
+                # figures and the evidence lookup -- see
+                # _load_holding_analysis() for why this must not re-fetch on
+                # every rerun.
                 try:
-                    ticker_data = fetch_historical([position.ticker], lookback_days=300)
-                    trend, vol = None, None
-                    if position.ticker in ticker_data and not ticker_data[position.ticker].empty:
-                        close = ticker_data[position.ticker]["close"]
-                        as_of = close.index[-1]
-                        trend = classify_trend(close, as_of, lookback_days=200)
-                        vol = compute_blended_volatility(close, as_of)
-                    trend_str = trend or "unavailable"
-                    vol_str = f"{vol:.2f}% trailing daily std" if vol is not None else "unavailable"
-                    st.write(f"Trend (200-day): **{trend_str}** -- Volatility (20d/60d blend): **{vol_str}**")
+                    analysis = _load_holding_analysis(position.ticker, _regime_fields(packet.regime))
                 except Exception as exc:
-                    st.caption(f"Could not fetch trend/volatility: {exc}")
+                    st.caption(f"Could not load trend/volatility/evidence: {exc}")
+                    continue
+                trend_str = analysis["trend"] or "unavailable"
+                vol = analysis["volatility"]
+                vol_str = f"{vol:.2f}% trailing daily std" if vol is not None else "unavailable"
+                st.write(f"Trend (200-day): **{trend_str}** -- Volatility (20d/60d blend): **{vol_str}**")
 
-                explanation = explain_ticker(position.ticker, portfolio=packet.portfolio, market_regime=packet.regime)
+                explanation = analysis["explanation"]
                 ticker_specific = [e for e in explanation["historical_evidence"] if e["ticker_specific"]]
                 if ticker_specific:
                     for e in ticker_specific:
@@ -1086,7 +1139,14 @@ with tab_watchlist:
                     own_vol = compute_blended_volatility(close, as_of)
                     current_price = float(close.iloc[-1])
                     price_as_of = str(as_of.date())
-                explanation = explain_ticker(ticker, portfolio=watchlist_packet.portfolio, market_regime=watchlist_packet.regime)
+                # `data=data` reuses the history fetched just above rather
+                # than making explain_ticker() fetch the same bars again --
+                # halves the yfinance round-trips for a multi-ticker cart
+                # check (independent review, 2026-07-29).
+                explanation = explain_ticker(
+                    ticker, portfolio=watchlist_packet.portfolio,
+                    market_regime=watchlist_packet.regime, data=data,
+                )
                 price_targets = latest_price_targets_by_firm(ticker)
                 hold_range = historical_hold_period_range(ticker, data, hold_days=20)
                 news = fetch_recent_news(ticker)

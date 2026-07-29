@@ -141,3 +141,30 @@ if __name__ == "__main__":
     test_explain_ticker_flags_non_authoritative_confirmed_findings_with_display_status()
     test_explain_ticker_handles_missing_data_gracefully()
     print("All assistant explanations tests passed.")
+
+
+def test_pre_fetched_data_is_used_and_no_redundant_fetch_happens():
+    # The Streamlit Briefing tab already fetches each holding's history for
+    # its own trend/volatility figures; without the `data` parameter
+    # explain_ticker() fetched the SAME history again, costing two yfinance
+    # round-trips per held position on every rerun (independent review,
+    # 2026-07-29).
+    fetch_calls = []
+    original_fetch = explanations.fetch_historical
+    explanations.fetch_historical = lambda tickers, lookback_days=300: (
+        fetch_calls.append(tickers) or {"AAA": _dip_series()}
+    )
+    try:
+        supplied = {"AAA": _dip_series()}
+        fetch_calls.clear()
+        result = explain_ticker("AAA", market_regime=_FIXED_REGIME, data=supplied)
+        assert fetch_calls == [], "explain_ticker must not fetch when data is supplied"
+        assert result["ticker"] == "AAA"
+        assert "historical_evidence" in result and "triggered_today" in result
+
+        # Without `data` it still fetches, exactly as before.
+        fetch_calls.clear()
+        explain_ticker("AAA", market_regime=_FIXED_REGIME)
+        assert len(fetch_calls) == 1
+    finally:
+        explanations.fetch_historical = original_fetch

@@ -1,6 +1,7 @@
 """Tests for assistant/ai_advisor.py. Run with:
 python tests/test_ai_advisor.py"""
 import json
+import re
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
@@ -675,6 +676,69 @@ def test_allows_company_business_facts_using_advisory_looking_verbs(summary):
         raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
     )
     assert result is not None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        # Independent adversarial probe, 2026-07-29: every one of these
+        # carried a concrete allocation recommendation and passed all six
+        # existing guardrail layers -- advisability adjectives and
+        # size-change synonyms the denylists simply didn't enumerate.
+        "NVDA warrants a bigger slice of the portfolio.",
+        "It may be prudent to scale back NVDA.",
+        "Scaling into AMD is sensible.",
+        "A tilt toward AMD is advisable.",
+        "You might want to offload some NVDA.",
+        "NVDA looks like a candidate for downsizing.",
+        "Dial back NVDA.",
+        "Take some profits in NVDA.",
+        "Divest part of the AMD position.",
+        "Paring NVDA is worth considering.",
+    ],
+)
+def test_rejects_advisability_and_size_synonym_bypasses_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "claim,tickers",
+    [
+        ("NVDA warrants a larger share of the split.", ["NVDA"]),
+        ("Offload part of the AMD leg.", ["AMD"]),
+        ("Dial back NVDA.", ["NVDA"]),
+    ],
+)
+def test_rejects_advisability_bypasses_in_observation_claim(claim, tickers):
+    assert _obs_reject(claim, tickers)
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        # The widened lists must not start blocking neutral description.
+        # "scaled" here is a fact about the business, not a proposed
+        # portfolio change, and carries no advisability marker.
+        "NVDA has scaled its manufacturing operations.",
+        "The split has differing characteristics.",
+        "AMD reported a sensible-sounding restructuring plan.",
+    ],
+)
+def test_allows_descriptive_text_after_widening_the_denylists(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is not None
+
+
+def test_size_change_verb_group_never_matches_the_empty_string():
+    # A stray "||" while widening this alternation would make every
+    # consumer of the group match anywhere, silently blocking all output.
+    assert "||" not in ai_advisor._SIZE_CHANGE_VERBS
+    assert not re.compile(ai_advisor._SIZE_CHANGE_VERBS).fullmatch("")
 
 
 def test_review_allocation_plan_returns_none_on_api_exception(monkeypatch):

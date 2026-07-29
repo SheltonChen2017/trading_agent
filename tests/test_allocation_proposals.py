@@ -235,3 +235,26 @@ if __name__ == "__main__":
     test_plan_reflects_pending_buy_value_in_projection()
     test_plan_flags_pending_value_unknown_tickers()
     print("All allocation_proposals tests passed.")
+
+
+def test_build_allocation_plan_skips_a_nan_price_instead_of_crashing():
+    # Independent review, 2026-07-29, reproduced: every other bad price
+    # (0, negative, None, inf) degraded to a skipped entry, but NaN passed
+    # both `not price` (NaN is truthy) and `price <= 0` (NaN comparisons
+    # are always False), then math.floor(target/NaN) raised ValueError and
+    # took down the whole Watchlist tab. NaN is reachable --
+    # get_latest_quote() builds its price from bare float(bid/ask).
+    packet = _packet(cash=10_000.0)
+    policy = _policy()
+    plan = build_allocation_plan(packet, policy, {"AAA": 100.0}, {"AAA": float("nan")}, 1_000.0)
+    assert len(plan) == 1
+    assert plan[0].shares == 0
+    assert plan[0].skipped is True
+
+
+def test_build_allocation_plan_skips_infinite_price_too():
+    packet = _packet(cash=10_000.0)
+    policy = _policy()
+    plan = build_allocation_plan(packet, policy, {"AAA": 100.0}, {"AAA": float("inf")}, 1_000.0)
+    assert plan[0].shares == 0
+    assert plan[0].skipped is True

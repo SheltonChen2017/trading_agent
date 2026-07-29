@@ -764,7 +764,26 @@ def _discovery_split_date(data: dict[str, pd.DataFrame], discovery_frac: float):
 
 def _split_by_date(df: pd.DataFrame, split_date) -> tuple[pd.DataFrame, pd.DataFrame]:
     """Split a results-like DataFrame (must have a `date` column) into
-    signals on/before `split_date` (discovery) and after (confirmation)."""
+    signals on/before `split_date` (discovery) and after (confirmation).
+
+    KNOWN LIMITATION -- no embargo (independent review, 2026-07-29). The
+    boundary itself is clean (`<=` vs `>`, so no row lands in both), but a
+    signal firing ON `split_date` has its forward return measured over the
+    following `hold_days`, which fall INSIDE the confirmation period. The
+    last ~`hold_days` of discovery and the first ~`hold_days` of
+    confirmation therefore share overlapping return windows, so the two
+    sets are not perfectly independent. Standard walk-forward practice
+    embargoes `hold_days` around the split to remove this.
+
+    Deliberately NOT changed here: doing so would shift every number in
+    `assistant/research_findings.json` (a versioned evidence record), which
+    is a research-methodology decision, not a bug fix. The practical
+    magnitude is small -- roughly `hold_days` dates out of a several-hundred
+    date confirmation period -- and it biases toward discovery and
+    confirmation AGREEING, so it cannot manufacture a rejection. Every
+    finding recorded so far is a rejection or a risk-shape result, so no
+    current verdict depends on it. Add an embargo before trusting any
+    FUTURE confirmation that reports a positive edge."""
     if df.empty:
         return df, df
     discovery = df[df["date"] <= split_date]

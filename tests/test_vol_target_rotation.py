@@ -156,3 +156,19 @@ if __name__ == "__main__":
     test_zero_tax_and_cost_are_backward_compatible()
     test_grid_search_vol_target_produces_expected_columns()
     print("All vol target rotation tests passed.")
+
+
+def test_unknown_volatility_never_produces_maximum_leverage():
+    # Independent review, 2026-07-29, reproduced: NaN defeats `<= 0`, so
+    # min(max_leveraged_weight, target/NaN) returned max_leveraged_weight --
+    # UNKNOWN volatility produced the MAXIMUM leveraged weight, inverting
+    # this function's whole purpose. None and inf were already correct;
+    # only NaN failed, and it failed toward more leverage.
+    assert compute_target_leveraged_weight(float("nan"), 0.5, 0.6) == 0.0
+    assert compute_target_leveraged_weight(None, 0.5, 0.6) == 0.0
+    assert compute_target_leveraged_weight(float("inf"), 0.5, 0.6) == 0.0
+    assert compute_target_leveraged_weight(0.0, 0.5, 0.6) == 0.0
+    assert compute_target_leveraged_weight(-1.0, 0.5, 0.6) == 0.0
+    # Ordinary sizing is unchanged: higher realized vol -> smaller weight.
+    assert compute_target_leveraged_weight(1.0, 0.5, 0.6) == 0.5
+    assert compute_target_leveraged_weight(5.0, 0.5, 0.6) == 0.1

@@ -14,6 +14,7 @@ or care which source was used.
 """
 from __future__ import annotations
 
+import math
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -74,11 +75,55 @@ def build_portfolio_snapshot(
     the same ticker must report the same current_price (they describe the
     same instant); inconsistent prices raise ValueError rather than being
     silently combined, since there's no principled way to pick one.
+
+    `cash`, `buying_power`, and every position number must be finite --
+    see the per-row check below for why a single NaN is a silent,
+    portfolio-wide failure rather than a local one.
     """
+    # cash/buying_power are validated alongside the position rows for the
+    # same reason: total_equity = cash + sum(market_value), so a NaN in
+    # EITHER makes total_equity NaN and silently defeats every downstream
+    # `>`/`<=` exposure comparison. (Independent review, 2026-07-29: the
+    # first version of this guard covered only the position rows, which
+    # left NaN cash producing exactly the failure it was meant to stop --
+    # check_policy_compliance() reported zero violations for a corrupt
+    # portfolio.)
+    if not isinstance(cash, (int, float)) or isinstance(cash, bool) or not math.isfinite(cash):
+        raise ValueError(
+            f"Portfolio cash must be a finite number, got {cash!r}. Refusing to build a snapshot whose "
+            "total_equity would be NaN -- every exposure check downstream would silently pass."
+        )
+    if buying_power is not None and (
+        not isinstance(buying_power, (int, float))
+        or isinstance(buying_power, bool)
+        or not math.isfinite(buying_power)
+    ):
+        raise ValueError(
+            f"Portfolio buying_power must be a finite number or None, got {buying_power!r}."
+        )
+
     grouped: dict[str, dict] = {}
     order: list[str] = []
     for p in positions:
         ticker = p["ticker"].strip().upper()
+        # Reject non-finite position numbers at the BOUNDARY rather than
+        # letting them propagate (independent review, 2026-07-29). A single
+        # NaN current_price makes market_value NaN, which makes
+        # total_equity NaN, which then silently defeats every downstream
+        # `>`/`<=` comparison: generate_risk_reduction_proposals() returned
+        # ZERO proposals for an over-concentrated portfolio (NaN comparisons
+        # are always False) and reported nothing wrong. A loud failure here
+        # is the only honest outcome -- the snapshot is genuinely unusable,
+        # and this function already raises ValueError for the adjacent
+        # inconsistent-duplicate-price case.
+        for field in ("shares", "entry_price", "current_price"):
+            value = p[field]
+            if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value):
+                raise ValueError(
+                    f"Position {ticker!r} has a non-finite/invalid {field}: {value!r}. Refusing to build "
+                    "a portfolio snapshot from unusable data -- every exposure and proposal check "
+                    "downstream would silently evaluate to False against NaN."
+                )
         if ticker not in grouped:
             grouped[ticker] = {"shares": 0.0, "cost": 0.0, "current_price": p["current_price"]}
             order.append(ticker)

@@ -32,6 +32,8 @@ BAND_PCT = 5.0
 TAX_RATE = 0.37
 COST_PCT = 0.0005
 
+# Cumulative fraction cutoffs of the full date range: fold N's discovery is
+# [0, CUTOFFS[N]) and its confirmation is [CUTOFFS[N], CUTOFFS[N+1]).
 CUTOFFS = [0.4, 0.6, 0.8, 1.0]
 
 

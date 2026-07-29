@@ -16,6 +16,7 @@ from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from zoneinfo import ZoneInfo
 
 from assistant.proposal_status import (
     FILLED,
@@ -24,6 +25,9 @@ from assistant.proposal_status import (
 from assistant.schemas import DecisionPacket
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "trading_assistant.db"
+# Trading days in this project are Eastern-market days (see
+# get_execution_budget_usage), not UTC days.
+_EASTERN = ZoneInfo("America/New_York")
 
 
 def _hash_payload(payload_json: str) -> str:
@@ -757,23 +761,66 @@ class AssistantStore:
             connection.close()
 
     def get_execution_budget_usage(self, trading_day: str) -> dict[str, Any]:
+        """Usage for one EASTERN trading day.
+
+        `trading_day` is an Eastern-market date (that is how callers build
+        it -- see assistant/readiness.py and the reservation write in
+        assistant/execution_service.py), but `broker_order_events.event_at`
+        is an absolute timestamp, normally UTC. Comparing the two by string
+        prefix mis-attributed any fill after 8:00pm Eastern to the NEXT
+        trading day, because that instant is already past midnight UTC
+        (independent review, 2026-07-29, reproduced with an extended-hours
+        fill). Fills are therefore bucketed by converting each event's real
+        instant to Eastern, which is also DST-correct -- a fixed UTC offset
+        would drift by an hour twice a year.
+        """
         with self._connect() as connection:
             reserved = connection.execute(
                 "SELECT COUNT(*) AS order_count, COALESCE(SUM(reserved_notional), 0) AS notional "
                 "FROM execution_reservations WHERE trading_day = ?",
                 (trading_day,),
             ).fetchone()
-            filled = connection.execute(
-                "SELECT COALESCE(SUM(ABS(fill_qty * fill_price)), 0) AS notional "
-                "FROM broker_order_events WHERE substr(event_at, 1, 10) = ? "
+            # Pre-filter to the 3 UTC dates that can possibly contain the
+            # Eastern day (yesterday/today/tomorrow) so this stays an
+            # indexed-ish scan rather than reading the whole journal.
+            candidate_dates = [trading_day]
+            try:
+                day = datetime.fromisoformat(trading_day).date()
+                candidate_dates = [
+                    (day - timedelta(days=1)).isoformat(),
+                    day.isoformat(),
+                    (day + timedelta(days=1)).isoformat(),
+                ]
+            except ValueError:
+                pass
+            placeholders = ",".join("?" for _ in candidate_dates)
+            rows = connection.execute(
+                f"SELECT event_at, fill_qty, fill_price FROM broker_order_events "
+                f"WHERE substr(event_at, 1, 10) IN ({placeholders}) "
                 "AND fill_qty IS NOT NULL AND fill_price IS NOT NULL",
-                (trading_day,),
-            ).fetchone()
+                candidate_dates,
+            ).fetchall()
+
+        filled_notional = 0.0
+        for row in rows:
+            try:
+                parsed = datetime.fromisoformat(str(row["event_at"]).replace("Z", "+00:00"))
+            except ValueError:
+                continue
+            if parsed.tzinfo is None:
+                parsed = parsed.replace(tzinfo=timezone.utc)
+            if parsed.astimezone(_EASTERN).date().isoformat() != trading_day:
+                continue
+            try:
+                filled_notional += abs(float(row["fill_qty"]) * float(row["fill_price"]))
+            except (TypeError, ValueError):
+                continue
+
         return {
             "trading_day": trading_day,
             "submitted_order_count": int(reserved["order_count"]),
             "submitted_notional": float(reserved["notional"]),
-            "filled_notional": float(filled["notional"]),
+            "filled_notional": filled_notional,
         }
 
     def release_execution_reservation(self, proposal_id: str) -> bool:

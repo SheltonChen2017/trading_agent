@@ -336,6 +336,220 @@ def test_account_and_asset_preflight_rejects_an_untradable_asset():
         broker.PAPER_TRADING = original_paper
 
 
+
+# --- Preflight and live-trading guards (mutation testing, 2026-07-29:
+# every guard below survived deletion against the whole suite -- including
+# the two TRADING_ASSISTANT_LIVE_ACCOUNT_ID checks, which are this repo's
+# strongest protection against sending an order to the wrong REAL account).
+
+def _account(status="ACTIVE", account_id="acct-1", **overrides):
+    base = {
+        "account_id": account_id, "status": status, "equity": 1000.0, "cash": 1000.0,
+        "buying_power": 1000.0, "trading_blocked": False, "account_blocked": False,
+        "trade_suspended_by_user": False, "transfers_blocked": False, "paper": True,
+    }
+    base.update(overrides)
+    return base
+
+
+def _with_fake_account(account, asset=None):
+    """Patch get_account/get_asset and return a restore callable."""
+    originals = (broker.get_account, broker.get_asset)
+    broker.get_account = lambda: account
+    broker.get_asset = lambda ticker: asset or {
+        "ticker": ticker.upper(), "status": "active", "asset_class": "us_equity",
+        "tradable": True, "fractionable": True,
+    }
+
+    def restore():
+        broker.get_account, broker.get_asset = originals
+
+    return restore
+
+
+def test_preflight_rejects_a_non_active_account_status():
+    restore = _with_fake_account(_account(status="ONBOARDING"))
+    try:
+        broker.assert_account_and_asset_ready("AAPL")
+        assert False, "expected a non-ACTIVE account status to be refused"
+    except broker.BrokerPreflightError as exc:
+        assert "ACTIVE" in str(exc)
+    finally:
+        restore()
+
+
+def test_preflight_rejects_a_blocked_account():
+    restore = _with_fake_account(_account(trading_blocked=True))
+    try:
+        broker.assert_account_and_asset_ready("AAPL")
+        assert False, "expected a trading-blocked account to be refused"
+    except broker.BrokerPreflightError as exc:
+        assert "trading_blocked" in str(exc)
+    finally:
+        restore()
+
+
+def test_preflight_rejects_a_non_tradable_asset():
+    restore = _with_fake_account(
+        _account(),
+        asset={"ticker": "AAPL", "status": "inactive", "asset_class": "us_equity",
+               "tradable": False, "fractionable": True},
+    )
+    try:
+        broker.assert_account_and_asset_ready("AAPL")
+        assert False, "expected a non-tradable asset to be refused"
+    except broker.BrokerPreflightError as exc:
+        assert "not broker-tradable" in str(exc)
+    finally:
+        restore()
+
+
+def test_live_preflight_requires_the_expected_account_id_env_var():
+    os.environ.pop("TRADING_ASSISTANT_LIVE_ACCOUNT_ID", None)
+    restore = _with_fake_account(_account())
+    original_paper = broker.PAPER_TRADING
+    broker.PAPER_TRADING = False
+    try:
+        broker.assert_account_and_asset_ready("AAPL")
+        assert False, "live execution must require TRADING_ASSISTANT_LIVE_ACCOUNT_ID"
+    except broker.LiveTradingNotConfirmed as exc:
+        # Must be the MISSING-var message specifically, not the mismatch
+        # one. Both mention the env var, so asserting only on the var name
+        # let the missing-var guard be deleted without failing this test
+        # (the mismatch branch below would then raise instead, since
+        # None != the account id) -- caught by mutation testing.
+        assert "requires TRADING_ASSISTANT_LIVE_ACCOUNT_ID" in str(exc)
+        assert "does not match" not in str(exc)
+    finally:
+        broker.PAPER_TRADING = original_paper
+        restore()
+
+
+def test_live_preflight_rejects_a_mismatched_account_id():
+    restore = _with_fake_account(_account(account_id="the-real-account"))
+    original_paper = broker.PAPER_TRADING
+    broker.PAPER_TRADING = False
+    os.environ["TRADING_ASSISTANT_LIVE_ACCOUNT_ID"] = "some-other-account"
+    try:
+        broker.assert_account_and_asset_ready("AAPL")
+        assert False, "a mismatched live account ID must be refused"
+    except broker.LiveTradingNotConfirmed as exc:
+        assert "does not match" in str(exc)
+    finally:
+        broker.PAPER_TRADING = original_paper
+        os.environ.pop("TRADING_ASSISTANT_LIVE_ACCOUNT_ID", None)
+        restore()
+
+
+def test_live_preflight_accepts_the_matching_account_id():
+    restore = _with_fake_account(_account(account_id="the-real-account"))
+    original_paper = broker.PAPER_TRADING
+    broker.PAPER_TRADING = False
+    os.environ["TRADING_ASSISTANT_LIVE_ACCOUNT_ID"] = "the-real-account"
+    try:
+        result = broker.assert_account_and_asset_ready("AAPL")
+        assert result["account"]["account_id"] == "the-real-account"
+    finally:
+        broker.PAPER_TRADING = original_paper
+        os.environ.pop("TRADING_ASSISTANT_LIVE_ACCOUNT_ID", None)
+        restore()
+
+
+def test_submit_limit_order_refuses_live_without_confirmation():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    original_paper = broker.PAPER_TRADING
+    broker.PAPER_TRADING = False
+    try:
+        broker.submit_limit_order("AAPL", 10, 150.0, idempotency_key="k")
+        assert False, "expected LiveTradingNotConfirmed for a live limit order"
+    except broker.LiveTradingNotConfirmed:
+        pass
+    finally:
+        broker.PAPER_TRADING = original_paper
+        _clear_alpaca_env()
+
+
+def test_submit_orders_reject_an_invalid_side():
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    broker.PAPER_TRADING = True
+    try:
+        for call in (
+            lambda: broker.submit_market_order("AAPL", 10, side="short", idempotency_key="k"),
+            lambda: broker.submit_limit_order("AAPL", 10, 150.0, side="short", idempotency_key="k"),
+        ):
+            try:
+                call()
+                assert False, "expected an invalid side to be rejected"
+            except ValueError as exc:
+                assert "side must be" in str(exc)
+    finally:
+        _clear_alpaca_env()
+
+
+def test_find_order_by_client_id_distinguishes_404_from_other_errors():
+    # The documented contract: None means the broker CONFIRMED absence
+    # (404). Any other failure must propagate, so "definitely not there"
+    # is never confused with "couldn't check".
+    _clear_alpaca_env()
+    os.environ["APCA_API_KEY_ID"] = "test-key"
+    os.environ["APCA_API_SECRET_KEY"] = "test-secret"
+    original_get_client = broker._get_client
+
+    class _Err(Exception):
+        def __init__(self, code):
+            super().__init__(f"status {code}")
+            self.status_code = code
+
+    try:
+        def client_raising(code):
+            return type("FakeClient", (), {
+                "get_order_by_client_id": staticmethod(lambda client_order_id: (_ for _ in ()).throw(_Err(code)))
+            })()
+
+        broker._get_client = lambda: client_raising(404)
+        assert broker.find_order_by_client_id("idem-1") is None
+
+        broker._get_client = lambda: client_raising(500)
+        try:
+            broker.find_order_by_client_id("idem-1")
+            assert False, "a 500 must propagate, not be reported as confirmed absence"
+        except _Err:
+            pass
+    finally:
+        broker._get_client = original_get_client
+        _clear_alpaca_env()
+
+
+
+def test_functions_requiring_credentials_refuse_when_unconfigured():
+    # The module's stated posture is "dormant by design" -- every network
+    # entry point must refuse before constructing a client. Mutation
+    # testing, 2026-07-29: these three guards were all deletable without
+    # failing a test.
+    _clear_alpaca_env()
+    for call in (
+        lambda: broker.get_latest_quote("AAPL"),
+        lambda: broker.find_order_by_client_id("idem-1"),
+        lambda: broker.run_trade_update_stream(lambda update: None),
+    ):
+        try:
+            call()
+            assert False, "expected AlpacaNotConfigured when credentials are absent"
+        except broker.AlpacaNotConfigured:
+            pass
+
+
+def test_optional_float_passes_none_through_untouched():
+    assert broker._optional_float(None) is None
+    assert broker._optional_float("2.5") == 2.5
+    assert broker._optional_float(float("nan")) is None
+    assert broker._optional_float(float("inf")) is None
+
+
 if __name__ == "__main__":
     test_is_configured_false_without_env_vars()
     test_is_configured_true_with_both_env_vars()

@@ -563,6 +563,87 @@ def test_record_strategy_evaluation_overwrites_the_previous_row():
         assert count == 1  # overwritten, not a second row
 
 
+# --- ai_runs table (independent review: AI runs were not persisted
+# anywhere -- no model, prompt version, input hash, latency, or response
+# was recorded, making the AI advisory layer unauditable after the fact).
+# Unlike strategy_evaluations, this IS meant to accumulate as a log.
+
+def test_record_and_list_ai_run_round_trips():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        assert store.list_ai_runs() == []
+        store.record_ai_run(
+            function_name="review_allocation_plan", model="claude-opus-5", prompt_version="v1",
+            input_hash="abc123", latency_ms=42.5, success=True, response={"summary": "ok"},
+        )
+        runs = store.list_ai_runs()
+        assert len(runs) == 1
+        run = runs[0]
+        assert run["function_name"] == "review_allocation_plan"
+        assert run["model"] == "claude-opus-5"
+        assert run["prompt_version"] == "v1"
+        assert run["input_hash"] == "abc123"
+        assert run["latency_ms"] == 42.5
+        assert run["success"] is True
+        assert run["response"] == {"summary": "ok"}
+        assert run["error"] is None
+
+
+def test_record_ai_run_persists_failures_with_error_and_no_response():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        store.record_ai_run(
+            function_name="suggest_similar_tickers", model="claude-opus-5", prompt_version="v1",
+            input_hash="def456", latency_ms=10.0, success=False, error="API error",
+        )
+        run = store.list_ai_runs()[0]
+        assert run["success"] is False
+        assert run["error"] == "API error"
+        assert run["response"] is None
+
+
+def test_ai_runs_accumulate_rather_than_overwrite():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        for i in range(3):
+            store.record_ai_run(
+                function_name="suggest_similar_tickers", model="claude-opus-5", prompt_version="v1",
+                input_hash=f"hash{i}", latency_ms=1.0, success=True,
+            )
+        assert len(store.list_ai_runs()) == 3
+
+
+def test_list_ai_runs_filters_by_function_name():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        store.record_ai_run(function_name="review_allocation_plan", model="claude-opus-5", prompt_version="v1", input_hash="a", latency_ms=1.0, success=True)
+        store.record_ai_run(function_name="suggest_similar_tickers", model="claude-opus-5", prompt_version="v1", input_hash="b", latency_ms=1.0, success=True)
+        runs = store.list_ai_runs(function_name="review_allocation_plan")
+        assert len(runs) == 1
+        assert runs[0]["function_name"] == "review_allocation_plan"
+
+
+def test_list_ai_runs_respects_limit_and_newest_first():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        for i in range(5):
+            store.record_ai_run(function_name="suggest_similar_tickers", model="claude-opus-5", prompt_version="v1", input_hash=str(i), latency_ms=1.0, success=True)
+        runs = store.list_ai_runs(limit=2)
+        assert len(runs) == 2
+        assert runs[0]["input_hash"] == "4"  # newest first
+        assert runs[1]["input_hash"] == "3"
+
+
 def test_pruning_a_pre_existing_db_with_duplicate_generated_at_rows_does_not_crash():
     # Regression guard for the migration itself: a pre-existing database
     # (from before this fix) could already contain duplicate generated_at
@@ -681,6 +762,11 @@ if __name__ == "__main__":
     test_prune_decision_packets_never_touches_proposals_or_broker_orders()
     test_record_and_get_strategy_evaluation_round_trips()
     test_record_strategy_evaluation_overwrites_the_previous_row()
+    test_record_and_list_ai_run_round_trips()
+    test_record_ai_run_persists_failures_with_error_and_no_response()
+    test_ai_runs_accumulate_rather_than_overwrite()
+    test_list_ai_runs_filters_by_function_name()
+    test_list_ai_runs_respects_limit_and_newest_first()
     test_pruning_a_pre_existing_db_with_duplicate_generated_at_rows_does_not_crash()
     test_build_portfolio_snapshot_from_alpaca_uses_broker_data()
     test_build_decision_packet_falls_back_when_alpaca_not_configured()

@@ -23,6 +23,8 @@ from typing import Literal
 
 import config
 from assistant.ai_advisor import suggest_similar_tickers
+from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
+from assistant.storage import AssistantStore
 from assistant.ticker_verification import partition_by_universe, verify_tickers
 
 _FINNHUB_IPO_CALENDAR_URL = "https://finnhub.io/api/v1/calendar/ipo"
@@ -103,18 +105,31 @@ def fetch_recent_ipos(count: int = 10, lookback_days: int = 30) -> list[dict]:
         return []
 
 
-def build_recommended_tickers(cart_context: list[str] | None = None) -> tuple[list[RecommendedTicker], list[str]]:
+def build_recommended_tickers(
+    held_tickers: list[str] | None = None, store: AssistantStore | None = None
+) -> tuple[list[RecommendedTicker], list[str]]:
     """Composes most-actives + IPO calendar + assistant.ai_advisor.suggest_similar_tickers()
-    (unscoped if cart_context is None) through the SAME two-tier partition +
-    verify_tickers() pipeline as the Watchlist's similar-stocks feature --
-    most-actives and IPO-calendar results get identical scrutiny to AI
-    suggestions. Returns (recommended, dropped_labels) for one combined
-    "N could not be verified" caption."""
+    through the SAME two-tier partition + verify_tickers() pipeline as the
+    Watchlist's similar-stocks feature -- most-actives and IPO-calendar
+    results get identical scrutiny to AI suggestions. Returns (recommended,
+    dropped_labels) for one combined "N could not be verified" caption.
+
+    `held_tickers` -- the account's ACTUAL current positions -- is used two
+    ways: (1) every lane excludes them, so "not held" in the UI is an
+    enforced property, not just a label; (2) it's the basis for the
+    "ai_suggested" lane ("similar to what you actually hold"). If
+    `held_tickers` is empty/None, the ai_suggested lane is skipped entirely
+    rather than falling back to an arbitrary fixed basket (independent
+    review, 2026-07-28: a prior version silently substituted
+    config.UNIVERSE[:5] here, which could make the Briefing appear
+    personalized to a user's holdings when it was actually just always
+    suggesting tickers similar to a fixed mega-cap-tech basket)."""
     now = datetime.now(timezone.utc).isoformat()
+    held_set = {t.upper() for t in (held_tickers or [])}
     recommended: list[RecommendedTicker] = []
     dropped: list[str] = []
 
-    most_active_candidates = fetch_most_active_tickers()
+    most_active_candidates = [c for c in fetch_most_active_tickers() if c["ticker"].upper() not in held_set]
     verified, batch_dropped = verify_tickers([c["ticker"] for c in most_active_candidates])
     dropped.extend(batch_dropped)
     detail_by_ticker = {c["ticker"]: c for c in most_active_candidates}
@@ -124,7 +139,7 @@ def build_recommended_tickers(cart_context: list[str] | None = None) -> tuple[li
         detail = f"{v.get('longName') or c.get('name') or v['ticker']} -- trading volume today: {volume:,}" if volume else f"{v.get('longName') or v['ticker']}"
         recommended.append(RecommendedTicker(ticker=v["ticker"], reason_category="most_active", detail=detail, fetched_at=now))
 
-    ipo_candidates = fetch_recent_ipos()
+    ipo_candidates = [c for c in fetch_recent_ipos() if c["ticker"].upper() not in held_set]
     verified, batch_dropped = verify_tickers([c["ticker"] for c in ipo_candidates])
     dropped.extend(batch_dropped)
     ipo_detail_by_ticker = {c["ticker"]: c for c in ipo_candidates}
@@ -133,23 +148,42 @@ def build_recommended_tickers(cart_context: list[str] | None = None) -> tuple[li
         detail = f"{v.get('longName') or c.get('name') or v['ticker']} -- IPO date: {c.get('date', 'unknown')}"
         recommended.append(RecommendedTicker(ticker=v["ticker"], reason_category="recent_ipo", detail=detail, fetched_at=now))
 
-    raw_suggestions = suggest_similar_tickers(cart_context or list(config.UNIVERSE[:5]))
-    if raw_suggestions:
-        from_universe, wildcard = partition_by_universe(raw_suggestions, universe=config.UNIVERSE)
-        reason_by_ticker = {c["ticker"].upper(): c["reason"] for c in raw_suggestions}
-        for c in from_universe:
-            recommended.append(
-                RecommendedTicker(ticker=c["ticker"].upper(), reason_category="ai_suggested", detail=c["reason"], fetched_at=now)
-            )
-        if wildcard:
-            verified, batch_dropped = verify_tickers([c["ticker"] for c in wildcard])
-            dropped.extend(batch_dropped)
-            for v in verified:
+    if held_set:
+        held_list = sorted(held_set)
+        raw_suggestions = suggest_similar_tickers(held_list, store=store)
+        if raw_suggestions:
+            raw_suggestions = [c for c in raw_suggestions if c.get("ticker", "").upper() not in held_set]
+            from_universe, wildcard = partition_by_universe(raw_suggestions, universe=config.UNIVERSE)
+            reason_by_ticker = {c["ticker"].upper(): c["reason"] for c in raw_suggestions}
+            for c in from_universe:
+                ticker = c["ticker"].upper()
                 recommended.append(
                     RecommendedTicker(
-                        ticker=v["ticker"], reason_category="ai_suggested",
-                        detail=reason_by_ticker.get(v["ticker"], ""), fetched_at=now,
+                        ticker=ticker, reason_category="ai_suggested",
+                        detail=_similarity_detail(held_list, ticker, c["reason"]), fetched_at=now,
                     )
                 )
+            if wildcard:
+                verified, batch_dropped = verify_tickers([c["ticker"] for c in wildcard])
+                dropped.extend(batch_dropped)
+                for v in verified:
+                    recommended.append(
+                        RecommendedTicker(
+                            ticker=v["ticker"], reason_category="ai_suggested",
+                            detail=_similarity_detail(held_list, v["ticker"], reason_by_ticker.get(v["ticker"], "")),
+                            fetched_at=now,
+                        )
+                    )
 
     return recommended, dropped
+
+
+def _similarity_detail(held_tickers: list[str], candidate: str, llm_reason: str) -> str:
+    """Pairs the LLM's stated reason with REAL, measured similarity evidence
+    (correlation + sector/industry overlap) so a false claim -- a real,
+    resolvable ticker with a wrong "why it's similar" story, e.g. CAT
+    mislabeled as a semiconductor peer of NVDA -- is visibly checkable
+    rather than silently trusted (independent review: ticker-existence
+    verification alone cannot catch this)."""
+    evidence = compute_similarity_evidence(held_tickers, candidate)
+    return f"{llm_reason} [measured: {format_evidence_summary(evidence)}]"

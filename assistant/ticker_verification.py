@@ -17,28 +17,59 @@ precedent for holding a ticker list that isn't itself an authorization).
 """
 from __future__ import annotations
 
+import dataclasses
+
 from data.market_data import fetch_historical
 
 _SANITY_INFO_FIELDS = ("longName", "quoteType", "exchange")
 
 
-def verify_tickers(candidates: list[str], max_checks: int = 10) -> tuple[list[dict], list[str]]:
+@dataclasses.dataclass(frozen=True)
+class SecurityEligibilityPolicy:
+    """What counts as a legitimate, tradeable-enough candidate to show a
+    user -- deliberately stricter than "the symbol resolves to something"
+    (independent review: the prior verify_tickers() accepted a candidate if
+    even ONE weak info field was present, which let an ETF, an OTC/foreign
+    listing, a warrant/preferred share, or a barely-liquid or barely-listed
+    ticker all pass under the "recommended stock" framing)."""
+
+    allowed_quote_types: tuple[str, ...] = ("EQUITY",)
+    minimum_history_sessions: int = 60  # ~3 trading months -- long enough that a handful of stale/synthetic bars can't pass
+    minimum_price: float = 5.0
+    minimum_median_dollar_volume: float = 1_000_000.0
+    require_company_name: bool = True
+
+
+DEFAULT_ELIGIBILITY_POLICY = SecurityEligibilityPolicy()
+
+_FETCH_LOOKBACK_DAYS = 90  # comfortably covers DEFAULT_ELIGIBILITY_POLICY.minimum_history_sessions with buffer
+
+
+def verify_tickers(
+    candidates: list[str], max_checks: int = 10, policy: SecurityEligibilityPolicy = DEFAULT_ELIGIBILITY_POLICY
+) -> tuple[list[dict], list[str]]:
     """
     Returns (verified, dropped).
 
     `verified` is a list of {"ticker", "longName", "sector", "quoteType",
-    "exchange"} dicts for candidates that BOTH resolve via
-    fetch_historical(lookback_days=10) AND pass a per-ticker
-    yf.Ticker(t).info sanity check (at least one of longName/quoteType/
-    exchange present and truthy).
+    "exchange", "history_sessions", "last_price", "median_dollar_volume"}
+    dicts for candidates that resolve via fetch_historical AND pass EVERY
+    check in `policy`: quote type is in `policy.allowed_quote_types` (an ETF,
+    warrant, preferred share, or fund is REJECTED under the default policy,
+    which only allows "EQUITY" -- this is a "recommended STOCKS" feature),
+    at least `policy.minimum_history_sessions` real trading sessions exist,
+    the last close is at least `policy.minimum_price`, the trailing median
+    dollar volume (close * volume, a liquidity proxy) is at least
+    `policy.minimum_median_dollar_volume`, and (if `policy.require_company_name`)
+    a real company name is present.
 
-    `dropped` is every candidate that failed either check. One bad ticker
+    `dropped` is every candidate that failed fetch_historical, failed any
+    eligibility check above, or was beyond `max_checks`. One bad ticker
     never aborts the batch -- each candidate is checked independently.
 
     Capped at `max_checks` candidates (a cost/latency bound: this runs
     synchronously inside a UI action, and .info has no batched form --
-    it's one network call per ticker). Candidates beyond the cap are
-    treated as dropped too, since they were never actually checked.
+    it's one network call per ticker).
     """
     truncated = candidates[:max_checks]
     if not truncated:
@@ -49,25 +80,50 @@ def verify_tickers(candidates: list[str], max_checks: int = 10) -> tuple[list[di
     dropped: list[str] = []
 
     try:
-        history = fetch_historical(normalized, lookback_days=10)
+        history = fetch_historical(normalized, lookback_days=_FETCH_LOOKBACK_DAYS)
     except Exception:
         history = {}
 
     for ticker in normalized:
-        if ticker not in history or history[ticker].empty:
+        hist = history.get(ticker)
+        if hist is None or hist.empty:
             dropped.append(ticker)
             continue
+
         info = _safe_ticker_info(ticker)
         if not info or not any(info.get(field) for field in _SANITY_INFO_FIELDS):
             dropped.append(ticker)
             continue
+
+        history_sessions = len(hist)
+        last_price = float(hist["close"].iloc[-1])
+        median_dollar_volume = (
+            float((hist["close"] * hist["volume"]).median()) if "volume" in hist.columns else 0.0
+        )
+        quote_type = info.get("quoteType", "")
+        company_name = info.get("longName", "")
+
+        eligible = (
+            quote_type in policy.allowed_quote_types
+            and history_sessions >= policy.minimum_history_sessions
+            and last_price >= policy.minimum_price
+            and median_dollar_volume >= policy.minimum_median_dollar_volume
+            and (not policy.require_company_name or bool(company_name))
+        )
+        if not eligible:
+            dropped.append(ticker)
+            continue
+
         verified.append(
             {
                 "ticker": ticker,
-                "longName": info.get("longName", ""),
+                "longName": company_name,
                 "sector": info.get("sector", ""),
-                "quoteType": info.get("quoteType", ""),
+                "quoteType": quote_type,
                 "exchange": info.get("exchange", ""),
+                "history_sessions": history_sessions,
+                "last_price": last_price,
+                "median_dollar_volume": median_dollar_volume,
             }
         )
 

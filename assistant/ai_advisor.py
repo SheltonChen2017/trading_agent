@@ -418,6 +418,39 @@ def _contains_action_language(text: str, allowed_tickers: set[str]) -> bool:
     )
 
 
+def _reject_ungrounded_prose(text: str, allowed_tickers: set[str]) -> str | None:
+    """
+    Deterministic guard for the free-text (non-allocation) AI surfaces:
+    recommended-stock curation, similar-ticker reasons, news summaries.
+
+    Returns a short reason string when `text` must NOT be shown, or None when
+    it is safe. These surfaces were previously PROMPT-guarded only -- the
+    system prompt asks the model not to give recommendations or invent facts,
+    but nothing checked the output, unlike review_allocation_plan() which runs
+    the full denylist (GPT review, 2026-07-29). They cannot execute a trade,
+    but they can still display ungrounded financial advice, which is exactly
+    what this module exists to prevent.
+
+    Reuses the SAME two checks the allocation path already relies on rather
+    than inventing a second, weaker rulebook: the action/advice-language
+    denylist, and the unknown-ticker check (any ticker outside the verified
+    candidate set is by definition ungrounded, since these callers only ever
+    pass already-verified tickers). Deliberately fails CLOSED -- callers all
+    treat None as "show the deterministic content instead", so suppressing a
+    borderline-but-harmless sentence costs a nicety, while showing a
+    borderline-but-harmful one is the failure this project cares about.
+
+    NOTE (see memory: project_ai_advice_guardrail): the denylist is a regex
+    surface and has leaked before. This closes the "no check at all" gap; it
+    does not make these surfaces as trustworthy as deterministic output.
+    """
+    if _contains_action_language(text, allowed_tickers):
+        return "contains trade-action/advice language"
+    if _mentions_unknown_ticker(text, allowed_tickers):
+        return "mentions a ticker outside the verified candidate set"
+    return None
+
+
 SUGGESTION_SCHEMA = {
     "type": "object",
     "properties": {
@@ -601,8 +634,28 @@ def suggest_similar_tickers(
             _record_run(store, "suggest_similar_tickers", _SUGGEST_SIMILAR_PROMPT_VERSION, input_hash, start, error="no text block in response")
             return None
         suggestions = json.loads(text)["suggestions"][:max_suggestions]
-        _record_run(store, "suggest_similar_tickers", _SUGGEST_SIMILAR_PROMPT_VERSION, input_hash, start, response=suggestions)
-        return suggestions
+        # Each suggestion's `reason` is free-form model prose and was
+        # previously unchecked, same gap as curate_recommended_tickers. A
+        # suggestion whose reason fails the guard is dropped ENTIRELY rather
+        # than shown with the reason stripped -- a bare ticker with no stated
+        # rationale invites the user to assume one, which is worse than
+        # showing nothing. The suggested ticker itself is added to the allowed
+        # set because it is legitimately the subject of its own reason (it is
+        # separately verified against real market data downstream).
+        cart_upper = {str(t).upper() for t in cart_tickers}
+        kept = []
+        for suggestion in suggestions:
+            allowed = cart_upper | {str(suggestion.get("ticker", "")).upper()}
+            rejection = _reject_ungrounded_prose(str(suggestion.get("reason", "")), allowed)
+            if rejection is None:
+                kept.append(suggestion)
+        _record_run(
+            store, "suggest_similar_tickers", _SUGGEST_SIMILAR_PROMPT_VERSION, input_hash, start,
+            response=kept,
+            error=None if len(kept) == len(suggestions)
+            else f"output guard suppressed {len(suggestions) - len(kept)} of {len(suggestions)} suggestion(s)",
+        )
+        return kept
     except Exception as exc:
         _record_run(store, "suggest_similar_tickers", _SUGGEST_SIMILAR_PROMPT_VERSION, input_hash, start, error=str(exc))
         return None
@@ -639,6 +692,14 @@ def curate_recommended_tickers(candidates: list, store: AssistantStore | None = 
             messages=[{"role": "user", "content": "Candidates:\n" + "\n".join(lines)}],
         )
         text = next((block.text for block in response.content if block.type == "text"), None)
+        if text:
+            rejection = _reject_ungrounded_prose(text, {str(c.ticker).upper() for c in candidates})
+            if rejection:
+                _record_run(
+                    store, "curate_recommended_tickers", _CURATE_RECOMMENDED_PROMPT_VERSION,
+                    input_hash, start, error=f"suppressed by output guard: {rejection}",
+                )
+                return None
         _record_run(store, "curate_recommended_tickers", _CURATE_RECOMMENDED_PROMPT_VERSION, input_hash, start, response=text, error=None if text else "no text block in response")
         return text
     except Exception as exc:

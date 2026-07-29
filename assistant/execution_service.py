@@ -432,19 +432,51 @@ def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict
         ticker = order.get("ticker")
         if not ticker:
             continue
+        # Only the UNFILLED remainder is still pending. The filled portion of
+        # a partially-filled buy is already sitting in portfolio.positions, so
+        # counting the original quantity here double-counts it and can block
+        # unrelated purchases that are actually within policy (GPT review,
+        # 2026-07-29).
+        #
+        # A non-finite/absent filled_qty is treated as 0 -- i.e. the FULL order
+        # stays counted. That is the conservative direction (it overstates
+        # pending exposure and blocks more, rather than understating it and
+        # permitting more), matching this function's fail-closed contract for
+        # quote failures described above.
+        raw_filled = order.get("filled_qty")
+        try:
+            filled_qty = float(raw_filled) if raw_filled else 0.0
+        except (TypeError, ValueError):
+            filled_qty = 0.0
+        if not math.isfinite(filled_qty) or filled_qty < 0:
+            filled_qty = 0.0
+
         notional = order.get("notional")
         if notional:
             value = float(notional)
+            # A notional order carries no share count, so net out the filled
+            # dollars directly. Without a usable fill price the full notional
+            # stays counted (again, the conservative direction).
+            raw_fill_price = order.get("filled_avg_price")
+            try:
+                fill_price = float(raw_fill_price) if raw_fill_price else 0.0
+            except (TypeError, ValueError):
+                fill_price = 0.0
+            if math.isfinite(fill_price) and fill_price > 0:
+                value = max(0.0, value - filled_qty * fill_price)
         else:
             shares = order.get("shares")
             if not shares:
                 continue
+            remaining_shares = float(shares) - filled_qty
+            if not math.isfinite(remaining_shares) or remaining_shares <= 0:
+                continue
             limit_price = order.get("limit_price")
             if limit_price:
-                value = float(shares) * float(limit_price)
+                value = remaining_shares * float(limit_price)
             else:
                 quote = broker_module.get_latest_quote(ticker)
-                value = float(shares) * float(quote["price"])
+                value = remaining_shares * float(quote["price"])
         totals[ticker.upper()] = totals.get(ticker.upper(), 0.0) + value
     return totals
 

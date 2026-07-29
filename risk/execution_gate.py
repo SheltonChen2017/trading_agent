@@ -458,6 +458,44 @@ def verify_execution_authorization(
     _consumed_authorization_tokens[authorization.token] = authorization.expires_at
 
 
+def worst_case_fill_price(intent: TradeIntent, reference_price: float) -> float:
+    """
+    The most expensive price `intent` could actually fill at -- what every
+    dollar-denominated risk check should be priced against, rather than the
+    current quote.
+
+    A BUY limit order can fill anywhere up to its limit price, so pricing its
+    risk at the quote understates every dollar cap whenever limit_price >
+    reference_price. validate_trade_intent()'s max-slippage check bounds how
+    far apart the two may be, but a bounded overrun is still an overrun: a
+    $5,000 max-order-value cap approved a $4,990 quoted notional whose
+    permitted fill was $5,039 (GPT review, 2026-07-29). This affects
+    max_order_value, available cash, the cash reserve, and concentration.
+
+    Buys only, deliberately. A SELL limit fills at its limit price or BETTER
+    (higher), so the quote never understates a sell's risk -- and pricing
+    sells at a worst case could newly block an exposure-REDUCING order, the
+    one direction this gate must never obstruct.
+
+    Shared by validate_trade_intent() and allocation_batch's
+    preflight_allocation_batch() (which reserves cash per approved leg) so the
+    two cannot drift apart -- they underestimated identically before this
+    existed. Falls back to `reference_price` unchanged for market orders, for
+    a missing/non-finite limit price, and whenever the limit is at or below
+    the quote; a non-finite reference_price is returned as-is so the caller's
+    own INVALID_REFERENCE_PRICE check still fires rather than being masked.
+    """
+    if (
+        intent.order_type != "limit"
+        or intent.side != "buy"
+        or intent.limit_price is None
+        or not math.isfinite(intent.limit_price)
+        or not math.isfinite(reference_price)
+    ):
+        return reference_price
+    return max(reference_price, intent.limit_price)
+
+
 def validate_trade_intent(
     intent: TradeIntent,
     portfolio: PortfolioSnapshot,
@@ -661,7 +699,7 @@ def validate_trade_intent(
     # of the checks running instead of crashing.
     safe_shares = intent.shares if shares_valid else 0
 
-    trade_value = safe_shares * reference_price
+    trade_value = safe_shares * worst_case_fill_price(intent, reference_price)
     if not math.isfinite(reference_price) or reference_price <= 0:
         _violate(
             ViolationCode.INVALID_REFERENCE_PRICE,

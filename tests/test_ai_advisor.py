@@ -1036,3 +1036,40 @@ if __name__ == "__main__":
     test_suggest_similar_tickers_returns_none_on_api_exception(mp)
     test_curate_recommended_tickers_returns_none_when_no_candidates(mp)
     print("All ai_advisor tests passed (except the tmp_path-fixture persistence tests -- run via pytest for those).")
+
+
+def test_free_text_surfaces_reject_trade_action_language():
+    """curate_recommended_tickers / similar-ticker reasons / news summaries were
+    PROMPT-guarded only -- nothing checked their output, unlike the allocation
+    path (GPT review, 2026-07-29). They cannot trade, but could display
+    ungrounded financial advice."""
+    from assistant.ai_advisor import _reject_ungrounded_prose
+
+    allowed = {"NVDA", "AMD"}
+    for advice in (
+        "You should buy NVDA now.",
+        "Consider trimming AMD.",
+        "It would be prudent to increase your NVDA position.",
+        "Take profits on NVDA.",
+    ):
+        assert _reject_ungrounded_prose(advice, allowed) is not None, advice
+
+
+def test_free_text_surfaces_reject_tickers_outside_the_verified_set():
+    from assistant.ai_advisor import _reject_ungrounded_prose
+
+    rejection = _reject_ungrounded_prose(
+        "NVDA and TSLA both design their own silicon.", {"NVDA", "AMD"}
+    )
+    assert rejection is not None
+    assert "outside the verified" in rejection
+
+
+def test_free_text_surfaces_allow_grounded_descriptive_prose():
+    """The guard must not be so broad that it suppresses everything -- that
+    would make the feature useless rather than safe."""
+    from assistant.ai_advisor import _reject_ungrounded_prose
+
+    assert _reject_ungrounded_prose(
+        "NVDA and AMD both operate in the semiconductor category.", {"NVDA", "AMD"}
+    ) is None

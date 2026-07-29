@@ -1,6 +1,7 @@
 """Broker order reconciliation via startup polling and trade-update stream."""
 from __future__ import annotations
 
+import inspect
 from datetime import datetime, timedelta, timezone
 from threading import Event, Thread
 from typing import Any
@@ -22,6 +23,29 @@ from assistant.proposal_status import (
 )
 from assistant.storage import AssistantStore
 
+_STREAM_SHUTDOWN_POLL_SECONDS = 0.1
+
+
+def _stream_stop_kwargs(broker_module: Any, stop: Event) -> dict[str, Any]:
+    """
+    Pass `stop_event` to run_trade_update_stream() only if that broker
+    implementation accepts it.
+
+    Running the stream on its own daemon thread already guarantees
+    monitor_orders() returns promptly, but the underlying socket would be left
+    open until process exit. A broker that accepts `stop_event` can tear the
+    stream down properly instead. Signature-checked rather than try/except
+    TypeError, so a genuine TypeError raised INSIDE the stream is never
+    mistaken for an unsupported-parameter signal -- and so the test fakes that
+    take only `callback` keep working unchanged.
+    """
+    try:
+        parameters = inspect.signature(broker_module.run_trade_update_stream).parameters
+    except (TypeError, ValueError):
+        return {}
+    return {"stop_event": stop} if "stop_event" in parameters else {}
+
+
 RECONCILABLE_STATUSES = (
     SUBMITTING,
     SUBMISSION_UNKNOWN,
@@ -40,7 +64,26 @@ def _proposal_for_update(store: AssistantStore, order: dict[str, Any]) -> dict[s
         if proposal is not None:
             return proposal
     order_id = order.get("order_id")
-    return store.get_proposal_by_broker_order_id(str(order_id)) if order_id else None
+    if order_id:
+        proposal = store.get_proposal_by_broker_order_id(str(order_id))
+        if proposal is not None:
+            return proposal
+
+    # Replacement chain: a replaced order is terminal for its own id and the
+    # replacement arrives with a NEW order id (and usually a new
+    # client_order_id), so neither lookup above can find the proposal it
+    # supersedes -- the update was silently dropped while the proposal sat
+    # waiting, and the replacement could fill untracked (GPT review,
+    # 2026-07-29). `replaces` holds the ORIGINAL broker order id, which is the
+    # id the proposal was stored under.
+    #
+    # Matching here is safe rather than presumptuous: apply_broker_update()
+    # still runs _order_matches_intent() on the replacement, so an equivalent
+    # replacement is tracked normally and one whose ticker/side/quantity was
+    # altered out-of-band trips the identity-mismatch kill switch instead of
+    # being quietly accepted.
+    replaces = order.get("replaces")
+    return store.get_proposal_by_broker_order_id(str(replaces)) if replaces else None
 
 
 def apply_broker_update(
@@ -298,15 +341,32 @@ def monitor_orders(
                 "trade_stream_state",
                 {"running": True, "started_at": started_at, "last_error": None},
             )
-            try:
-                broker_module.run_trade_update_stream(
-                    lambda update: handle_trade_update(store, update)
-                )
-                if stop.is_set():
-                    break
-                error = "Trade-update stream returned unexpectedly."
-            except Exception as exc:
-                error = str(exc)
+            # The stream runs on its OWN thread so `stop` can interrupt this
+            # function promptly. Previously run_trade_update_stream() was
+            # called directly here, and since it blocks until the stream ends,
+            # stop_event could not interrupt a HEALTHY stream at all -- a
+            # shutdown requested at 0.05s did not return until the stream
+            # happened to end at 0.65s, and a real connected stream would have
+            # blocked graceful programmatic shutdown indefinitely (GPT review,
+            # 2026-07-29).
+            stream_error: list[str | None] = [None]
+
+            def consume_stream() -> None:
+                try:
+                    broker_module.run_trade_update_stream(
+                        lambda update: handle_trade_update(store, update),
+                        **_stream_stop_kwargs(broker_module, stop),
+                    )
+                except Exception as exc:  # surfaced on the main thread below
+                    stream_error[0] = str(exc)
+
+            streamer = Thread(target=consume_stream, name="trade-update-stream", daemon=True)
+            streamer.start()
+            while streamer.is_alive() and not stop.is_set():
+                streamer.join(timeout=_STREAM_SHUTDOWN_POLL_SECONDS)
+            if stop.is_set():
+                break
+            error = stream_error[0] or "Trade-update stream returned unexpectedly."
             store.set_system_state(
                 "trade_stream_state",
                 {

@@ -568,3 +568,52 @@ if __name__ == "__main__":
     test_account_and_asset_preflight_rejects_a_broker_trading_block()
     test_account_and_asset_preflight_rejects_an_untradable_asset()
     print("All Alpaca broker tests passed.")
+
+
+def test_normalize_order_captures_the_replacement_chain():
+    """Dropping replaced_by/replaces/replaced_at meant a replacement order
+    could not be traced back to the proposal it superseded, so the replacement
+    could fill while the proposal sat cancel-pending (GPT review, 2026-07-29)."""
+    from types import SimpleNamespace
+
+    from execution.alpaca_broker import _normalize_order
+
+    order = SimpleNamespace(
+        id="order-2",
+        client_order_id="client-2",
+        symbol="AAPL",
+        qty=10,
+        side="buy",
+        type="limit",
+        limit_price=100.0,
+        notional=None,
+        time_in_force="day",
+        status="accepted",
+        filled_qty=0,
+        filled_avg_price=None,
+        submitted_at=None,
+        updated_at=None,
+        filled_at=None,
+        canceled_at=None,
+        expired_at=None,
+        failed_at=None,
+        replaced_by=None,
+        replaces="order-1",
+        replaced_at=None,
+    )
+    normalized = _normalize_order(order)
+    assert normalized["replaces"] == "order-1"
+    assert normalized["replaced_by"] is None
+    assert normalized["replaced_at"] is None
+
+
+def test_normalize_order_tolerates_a_broker_object_without_chain_fields():
+    """Older/partial order objects must not start raising AttributeError."""
+    from types import SimpleNamespace
+
+    from execution.alpaca_broker import _normalize_order
+
+    minimal = SimpleNamespace(id="order-9", symbol="AAPL", qty=1, status="new")
+    normalized = _normalize_order(minimal)
+    assert normalized["replaces"] is None
+    assert normalized["replaced_by"] is None

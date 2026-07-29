@@ -4,7 +4,7 @@ Click-around Streamlit front end for the personal trading assistant.
 This is ONLY a different presentation layer over
 scripts/run_personal_assistant.py's exact same underlying functions
 (build_decision_packet, generate_risk_reduction_proposals,
-generate_soxx_soxl_rebalance_proposals, execute_approved_paper_proposal).
+generate_leveraged_pair_rebalance_proposals, execute_approved_paper_proposal).
 No financial logic lives here -- every number and every safety check is
 still computed by the same deterministic code the CLI uses.
 
@@ -63,7 +63,10 @@ from assistant.execution_service import (
     reconcile_submission,
 )
 from assistant.explanations import explain_ticker
+from assistant.ai_advisor import is_ai_advisor_configured, review_allocation_plan, suggest_similar_tickers
 from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
+from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calendar_configured
+from assistant.ticker_verification import partition_by_universe, verify_tickers
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
 from assistant.proposal_status import (
     BLOCKED,
@@ -92,8 +95,12 @@ from assistant.stock_lookup import (
     latest_price_targets_by_firm,
 )
 from assistant.storage import AssistantStore
-from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
-from config import LEVERAGED_ETF_TICKERS, PAPER_TRADING, UNIVERSE
+from assistant.strategy_proposals import (
+    CONFIGURED_LEVERAGED_PAIRS,
+    MissingResearchDependencyError,
+    generate_leveraged_pair_rebalance_proposals,
+)
+from config import BASKETS, LEVERAGED_ETF_TICKERS, PAPER_TRADING, UNIVERSE
 from data.event_data import fetch_upcoming_earnings
 from data.market_data import fetch_historical
 from execution.alpaca_broker import is_configured
@@ -117,6 +124,7 @@ def _store() -> AssistantStore:
 
 
 _PACKET_CACHE_TTL_SECONDS = 15
+_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS = 900
 
 
 @st.cache_data(ttl=_PACKET_CACHE_TTL_SECONDS)
@@ -162,6 +170,19 @@ def _load_live_events_for_tickers(tickers: tuple[str, ...]) -> list:
     calendar lookup, not an account/quote/regime fetch) so requesting
     events never triggers a second account fetch."""
     return get_upcoming_events(list(tickers), fetch_live=True)
+
+
+@st.cache_data(ttl=_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS)
+def _load_recommended_tickers():
+    """Composes yf.screen (most-actives) + Finnhub (IPO calendar, if
+    configured) + a Claude ticker-suggestion call + a verification pass over
+    every candidate -- genuinely expensive to run on every Briefing rerun
+    (which happens on every widget interaction anywhere in this tab), so this
+    gets its OWN, much longer TTL than the account/regime packet cache. Use
+    `_load_recommended_tickers.clear()` (this function's own cache, not the
+    blanket `st.cache_data.clear()` the "Refresh briefing" button uses) so
+    refreshing recommendations doesn't also force an account re-fetch."""
+    return build_recommended_tickers()
 
 
 def _load_packet(policy_path: str, include_events: bool):
@@ -898,6 +919,39 @@ with tab_briefing:
                 if dataset_warning:
                     st.warning(dataset_warning)
 
+    st.divider()
+    st.subheader("Recommended stocks to explore (not held, not a proposal)")
+    st.caption(
+        "Purely informational/exploratory -- these are NOT held positions and NOT trade proposals. "
+        "Presence here is NOT an allocation authorization (same convention as config.DEFENSIVE_CARRY_TICKERS). "
+        "\"Most actively traded\" reflects trading VOLUME and price movement, NOT buy-vs-sell order flow -- "
+        "no legitimate retail-accessible data source provides true order imbalance."
+    )
+    if st.button("Refresh recommended stocks", key="refresh_recommended"):
+        _load_recommended_tickers.clear()
+    recommended_tickers, dropped_candidates = _load_recommended_tickers()
+    if dropped_candidates:
+        st.caption(
+            f"{len(dropped_candidates)} candidate ticker(s) could not be verified against real market data "
+            "and were omitted."
+        )
+    for category, label in [
+        ("most_active", "Most actively traded today"),
+        ("recent_ipo", "Recent IPOs"),
+        ("ai_suggested", "AI-suggested (Claude)"),
+    ]:
+        items = [r for r in recommended_tickers if r.reason_category == category]
+        if not items:
+            if category == "recent_ipo" and not is_ipo_calendar_configured():
+                st.caption("IPO calendar unavailable -- FINNHUB_API_KEY is not set. Sign up for a free Finnhub account and set this env var to enable it.")
+            continue
+        with st.expander(f"{label} ({len(items)})"):
+            st.dataframe(
+                [{"Ticker": r.ticker, "Detail": r.detail} for r in items],
+                use_container_width=True,
+                hide_index=True,
+            )
+
 with tab_watchlist:
     st.caption(
         "Add tickers to your cart, then check them for: own trend/volatility, "
@@ -936,8 +990,33 @@ with tab_watchlist:
             else "ANTHROPIC_API_KEY is not set -- showing raw headlines only."
         ),
     )
+    ai_advisor_available = is_ai_advisor_configured()
+    want_similar_suggestions = st.checkbox(
+        "Suggest similar tickers with Claude (real API call, small real cost)",
+        value=False,
+        disabled=not ai_advisor_available,
+        help=(
+            "Prefers tickers already in this project's tracked universe (shown "
+            "directly); any additional suggestion is verified against real market "
+            "data before being shown."
+            if ai_advisor_available
+            else "ANTHROPIC_API_KEY is not set."
+        ),
+    )
+    want_allocation_review = st.checkbox(
+        "Get an AI review of the purchase split with Claude (real API call, small real cost)",
+        value=False,
+        disabled=not ai_advisor_available,
+        help=(
+            "Advisory commentary only -- never changes the computed weights below. "
+            "Requires 2+ tickers checked together."
+            if ai_advisor_available
+            else "ANTHROPIC_API_KEY is not set."
+        ),
+    )
 
-    if st.button("Check cart", type="primary", disabled=not cart):
+    check_cart_clicked = st.button("Check cart", type="primary", disabled=not cart)
+    if check_cart_clicked:
         _, watchlist_packet = _load_packet(policy_path, include_events=False)
         try:
             earnings_by_ticker = fetch_upcoming_earnings(cart)
@@ -977,7 +1056,47 @@ with tab_watchlist:
                 results[ticker] = {"error": str(exc)}
         st.session_state["watchlist_results"] = results
 
+        if want_similar_suggestions:
+            raw_suggestions = suggest_similar_tickers(cart)
+            if raw_suggestions:
+                from_universe, wildcard = partition_by_universe(raw_suggestions, universe=UNIVERSE)
+                verified, dropped = verify_tickers([c["ticker"] for c in wildcard]) if wildcard else ([], [])
+                st.session_state["watchlist_ai_suggestions"] = {
+                    "from_universe": from_universe,
+                    "verified": verified,
+                    "dropped": dropped,
+                    "reason_by_ticker": {c["ticker"].upper(): c["reason"] for c in raw_suggestions},
+                }
+            else:
+                st.session_state["watchlist_ai_suggestions"] = None
+        else:
+            st.session_state["watchlist_ai_suggestions"] = None
+
     watchlist_results = st.session_state.get("watchlist_results", {})
+
+    ai_suggestions = st.session_state.get("watchlist_ai_suggestions")
+    if ai_suggestions:
+        with st.expander(f"Similar tickers to {', '.join(cart)} (Claude)", expanded=False):
+            reason_by_ticker = ai_suggestions["reason_by_ticker"]
+            if ai_suggestions["from_universe"]:
+                st.write("**From your tracked universe:**")
+                st.dataframe(
+                    [{"Ticker": c["ticker"], "Reason": c["reason"]} for c in ai_suggestions["from_universe"]],
+                    use_container_width=True, hide_index=True,
+                )
+            if ai_suggestions["verified"]:
+                st.write("**Other suggestions (verified against real market data):**")
+                st.dataframe(
+                    [{"Ticker": v["ticker"], "Reason": reason_by_ticker.get(v["ticker"], "")} for v in ai_suggestions["verified"]],
+                    use_container_width=True, hide_index=True,
+                )
+            if ai_suggestions["dropped"]:
+                st.caption(
+                    f"{len(ai_suggestions['dropped'])} suggestion(s) could not be verified against real "
+                    "market data and were omitted."
+                )
+            if not ai_suggestions["from_universe"] and not ai_suggestions["verified"]:
+                st.caption("Claude returned no suggestions that passed verification.")
 
     vols = {t: r.get("own_vol") for t, r in watchlist_results.items() if "error" not in r}
     prices = {t: r.get("current_price") for t, r in watchlist_results.items() if "error" not in r}
@@ -1044,6 +1163,20 @@ with tab_watchlist:
             "optimized portfolio allocation (it ignores correlation between your picks and your existing "
             "holdings elsewhere in the account)."
         )
+
+        if check_cart_clicked and want_allocation_review:
+            baskets_by_ticker = {t: [name for name, tickers in BASKETS.items() if t in tickers] for t in weights}
+            st.session_state["watchlist_ai_review"] = review_allocation_plan(
+                list(weights.keys()), weights, vols, baskets_by_ticker
+            )
+        elif not want_allocation_review:
+            st.session_state["watchlist_ai_review"] = None
+
+        ai_review = st.session_state.get("watchlist_ai_review")
+        if ai_review:
+            with st.expander("AI review of this split (Claude)", expanded=False):
+                st.write(ai_review)
+                st.caption("Advisory commentary only -- does not change the weights shown above.")
 
     if weights:
         st.subheader("Create purchase proposals using this split")
@@ -1443,19 +1576,27 @@ with tab_selling:
 with tab_propose:
     policy, packet = _load_packet(policy_path, include_events)
 
+    pair_labels = ", ".join(f"{p.stable_ticker}/{p.leveraged_ticker}" for p in CONFIGURED_LEVERAGED_PAIRS)
     check_strategy = st.checkbox(
-        "Also check SOXX/SOXL strategy proposals",
+        f"Also check leveraged-pair rebalance strategies ({pair_labels})",
         value=policy.enable_strategy_proposals,
-        help="evidence_status=promising_unconfirmed_strategy, not confirmed -- see assistant/strategy_proposals.py",
+        help="Each pair's evidence_status is shown per-proposal -- none are 'confirmed' -- "
+        "see assistant/strategy_proposals.py",
     )
 
     if st.button("Check for proposals", type="primary"):
         proposals = generate_risk_reduction_proposals(packet, policy)
         if check_strategy:
-            try:
-                proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy, store=store)
-            except Exception as exc:
-                st.error(f"SOXX/SOXL strategy proposal check failed ({exc}); showing risk-reduction proposals only.")
+            for pair_config in CONFIGURED_LEVERAGED_PAIRS:
+                try:
+                    proposals = proposals + generate_leveraged_pair_rebalance_proposals(
+                        packet, policy, pair_config, store=store
+                    )
+                except MissingResearchDependencyError as exc:
+                    st.error(
+                        f"{pair_config.stable_ticker}/{pair_config.leveraged_ticker} strategy check failed "
+                        f"({exc}); skipping this pair."
+                    )
         for proposal in proposals:
             store.save_proposal(proposal.to_dict())
         st.session_state["current_proposals"] = [p.to_dict() for p in proposals]

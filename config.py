@@ -75,6 +75,7 @@ LEVERAGED_ETF_TICKERS = [
     "SOXL", "SOXS",                          # Semiconductors 3x
     "UPRO", "SPXU", "SSO", "SDS",            # S&P 500 3x/2x, bull/bear
     "TNA", "TZA",                             # Russell 2000 3x
+    "NVDL",                                   # NVDA 2x bull (no inverse counterpart tracked here)
 ]
 
 # Leveraged ETF -> its unleveraged same-index counterpart — used by
@@ -94,6 +95,7 @@ LEVERAGED_ETF_UNDERLYING = {
     "SPXU": "SPY",
     "SSO": "SPY",
     "SDS": "SPY",
+    "NVDL": "NVDA",
 }
 
 # Inverse (bear) leveraged ETFs among the tickers above -- these move

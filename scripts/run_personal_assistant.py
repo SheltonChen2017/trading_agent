@@ -27,7 +27,7 @@ from assistant.risk_copilot import (
 )
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.storage import AssistantStore
-from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
+from assistant.strategy_proposals import CONFIGURED_LEVERAGED_PAIRS, generate_leveraged_pair_rebalance_proposals
 from execution.alpaca_broker import is_configured
 
 
@@ -146,10 +146,16 @@ def command_propose(args, store: AssistantStore) -> None:
     store.save_decision_packet(packet)
     proposals = generate_risk_reduction_proposals(packet, policy)
     if args.strategy_proposals or policy.enable_strategy_proposals:
-        try:
-            proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy, store=store)
-        except Exception as exc:
-            print(f"  ! SOXX/SOXL strategy proposal check failed ({exc}); showing risk-reduction proposals only.")
+        for pair_config in CONFIGURED_LEVERAGED_PAIRS:
+            try:
+                proposals = proposals + generate_leveraged_pair_rebalance_proposals(
+                    packet, policy, pair_config, store=store
+                )
+            except Exception as exc:
+                print(
+                    f"  ! {pair_config.stable_ticker}/{pair_config.leveraged_ticker} strategy proposal "
+                    f"check failed ({exc}); skipping this pair."
+                )
     if not proposals:
         print("No deterministic risk-policy breaches require a trade proposal.")
         return
@@ -280,9 +286,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--strategy-proposals",
         action="store_true",
         help=(
-            "Also check the SOXX/SOXL wide-rebalance-band strategy for this run (evidence_status="
-            "promising_unconfirmed_strategy, not confirmed -- see assistant/strategy_proposals.py). "
-            "Only produces a proposal if you already hold both SOXX and SOXL. Set "
+            "Also check the configured leveraged-pair rebalance strategies for this run "
+            "(see assistant.strategy_proposals.CONFIGURED_LEVERAGED_PAIRS; none carry a "
+            "'confirmed' evidence_status -- see assistant/strategy_proposals.py). Only produces a "
+            "proposal for a pair if you already hold both of its tickers. Set "
             "'enable_strategy_proposals': true in your policy file instead to make this durable "
             "across runs rather than passing this flag every time."
         ),

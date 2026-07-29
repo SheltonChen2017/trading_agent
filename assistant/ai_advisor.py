@@ -30,7 +30,7 @@ import config
 from assistant.storage import AssistantStore
 
 _MODEL = "claude-opus-5"
-_REVIEW_ALLOCATION_PROMPT_VERSION = "review_allocation_plan.v3"
+_REVIEW_ALLOCATION_PROMPT_VERSION = "review_allocation_plan.v4"
 _SUGGEST_SIMILAR_PROMPT_VERSION = "suggest_similar_tickers.v1"
 _CURATE_RECOMMENDED_PROMPT_VERSION = "curate_recommended_tickers.v1"
 
@@ -54,84 +54,133 @@ _SAFE_ACRONYMS = frozenset({"ETF", "USD", "AI", "CEO", "CFO", "SEC", "IPO", "NYS
 # target volatility is elevated.", "NVDA has increased volatility." all
 # matched and were wrongly dropped. Action language is now split into tiers
 # instead of one blanket word list:
-#   1. Unambiguous transactional verbs (buy/sell/rebalance/replace) -- these
-#      are never used descriptively in an allocation-review context, so a
-#      bare word match is safe.
-#   2. Advice/recommendation markers (should, consider, prefer, deserve, ...)
-#      -- these only ever appear when the model is giving advice, not
-#      describing a fact.
+#   1. Unambiguous transactional verbs (buy/sell/purchase/exit/liquidate/
+#      replace/rebalance/rotate/overweight/underweight) -- these are never
+#      used descriptively in an allocation-review context, so a bare word
+#      match is safe regardless of context.
+#   2. Advice/recommendation markers (should, consider, prefer, deserve,
+#      recommend, "better to", "makes sense to", ...) -- these only ever
+#      appear when the model is giving advice, not describing a fact.
 #   3. Modal/passive constructions ("we can increase NVDA", "AMD could be
-#      reduced") -- fourth pass: these carry no noun/comparative/percentage
-#      trigger at all, so tier 4 below never saw them; the modal+verb
-#      combination alone is inherently advisory regardless of what follows.
-#   4. Context-sensitive verbs (allocate/increase/reduce/target) -- these ARE
-#      used descriptively ("increased volatility", "reduced diversification",
-#      "the volatility target"), so they're only rejected when they appear
-#      near an actual allocation-change object (a position/weight/exposure
-#      noun, a comparative like "more"/"larger", or a percentage) -- i.e. an
-#      actual proposed change, not a description of the current state.
-#   5. A context-sensitive verb directly governing one of the ALLOWED
-#      tickers as its object ("Increase NVDA.", "Target NVDA at 60%.") --
-#      fourth pass: tier 4's trigger nouns don't include ticker symbols, so a
-#      bare "Increase NVDA." carried no recognized trigger at all. This is
-#      ticker-scoped and uses a SHORT (~15-char) forward window specifically
-#      to distinguish "reduce AMD" (AMD is the direct object) from "AMD has
-#      reduced correlation with NVDA over the sampled period" (NVDA is many
-#      characters away, inside an unrelated prepositional phrase) --
-#      widening this window to tier 4's 40 chars would reject that second,
-#      legitimate sentence. Ticker matching is deliberately NOT case-folded
-#      (unlike the verb match) for the same reason _mentions_unknown_ticker
-#      matches original-case text: a genuine ticker mention is written in
-#      real caps, so this only fires on an actual ticker mention, not an
-#      incidental lowercase word that happens to share letters with one.
-_UNAMBIGUOUS_ACTION_PATTERN = re.compile(
-    r"\b(buy|buying|bought|sell|selling|sold|"
-    r"rebalance|rebalancing|rebalanced|replace|replacing|replaced)\b",
-    re.IGNORECASE,
+#      reduced", "we could gradually add NVDA") -- these carry no noun/
+#      comparative/percentage/ticker trigger immediately adjacent, so tiers
+#      4/5 below never see them; the modal+verb combination alone is
+#      inherently advisory. A generous window after the modal word tolerates
+#      an intervening adverb or "be".
+#   4. Context-sensitive size-change verbs (allocate/increase/reduce/target/
+#      add/raise/boost/grow/enlarge/trim/cut/lower/decrease/remove/drop/
+#      shift/move) -- these ARE used descriptively ("increased volatility",
+#      "reduced diversification", "the volatility target", "NVDA raised its
+#      revenue guidance"), so they're only rejected when they appear near an
+#      actual allocation-change object (a position/weight/exposure/holding/
+#      stake/capital/funds noun, a comparative like "more"/"larger", or a
+#      percentage) -- i.e. an actual proposed change, not a description of
+#      the current state or of the underlying company's own business.
+#   5. One of those same size-change verbs directly governing one of the
+#      ALLOWED tickers as its object ("Increase NVDA.", "Target NVDA at
+#      60%.", lowercase "Increase nvda.") -- tier 4's trigger nouns don't
+#      include ticker symbols, so a bare "Increase NVDA." carries no
+#      recognized trigger at all. This is ticker-scoped and uses a SHORT
+#      (~20-char) forward window specifically to distinguish "reduce AMD"
+#      (AMD is the direct object) from "AMD has reduced correlation with
+#      NVDA over the sampled period" (NVDA is many characters away, inside
+#      an unrelated prepositional phrase) -- widening this window to tier
+#      4's 40 chars would reject that second, legitimate sentence. Ticker
+#      matching here is case-INSENSITIVE for ordinary multi-character
+#      tickers (LLM output doesn't reliably preserve ticker capitalization --
+#      "Increase nvda." must be rejected exactly like "Increase NVDA."), but
+#      a ticker of length <=2 (this project's own UNIVERSE has several: V,
+#      D, T, C, SO, GS, ...) is ambiguous with ordinary short words and only
+#      counts if written in genuine uppercase or with a $ prefix -- see
+#      _find_scoped_ticker_mention.
+_UNAMBIGUOUS_ACTION_VERBS = (
+    r"buy|buying|bought|sell|selling|sold|purchase|purchasing|purchased|"
+    r"exit|exiting|exited|liquidate|liquidating|liquidated|"
+    r"rebalance|rebalancing|rebalanced|replace|replacing|replaced|"
+    r"rotate|rotating|rotated|"
+    r"overweight|overweighting|overweighted|underweight|underweighting|underweighted"
 )
+_UNAMBIGUOUS_ACTION_PATTERN = re.compile(r"\b(" + _UNAMBIGUOUS_ACTION_VERBS + r")\b", re.IGNORECASE)
 _ADVICE_PATTERN = re.compile(
-    r"\b(should|ought\s+to|consider(?:ing)?|prefer(?:red|s|ring)?|"
-    r"favor(?:ed|s|ing)?|deserv(?:e|es|ed|ing)|recommend(?:ed|s|ing)?)\b",
+    r"\b(should|ought\s+to|consider(?:ing)?|prefer(?:red|s|ring|able)?|"
+    r"favor(?:ed|s|ing)?|deserv(?:e|es|ed|ing)|recommend(?:ed|s|ing)?|"
+    r"better\s+to|makes?\s+sense\s+to|would\s+be\s+better|"
+    r"could\s+improve\s+the\s+portfolio\s+by)\b",
     re.IGNORECASE,
 )
-_ALLOCATION_ACTION_VERBS = (
+_SIZE_CHANGE_VERBS = (
     r"allocate|allocating|allocated|increase|increasing|increased|"
-    r"reduce|reducing|reduced|target|targeting|targeted"
+    r"reduce|reducing|reduced|target|targeting|targeted|"
+    r"add|adding|added|raise|raising|raised|boost|boosting|boosted|"
+    r"grow|growing|grew|grown|enlarge|enlarging|enlarged|"
+    r"trim|trimming|trimmed|cut|cutting|lower|lowering|lowered|"
+    r"decrease|decreasing|decreased|remove|removing|removed|"
+    r"drop|dropping|dropped|shift|shifting|shifted|move|moving|moved"
 )
 _MODAL_ACTION_PATTERN = re.compile(
-    r"\b(?:can|could|would|might|may)\s+(?:be\s+)?(?:" + _ALLOCATION_ACTION_VERBS +
-    r"|rebalance|rebalanced|replace|replaced|buy|bought|sell|sold)\b",
+    r"\b(?:can|could|would|might|may)\b.{0,40}?\b(?:" + _SIZE_CHANGE_VERBS +
+    r"|" + _UNAMBIGUOUS_ACTION_VERBS + r")\b",
     re.IGNORECASE,
 )
 _ALLOCATION_CHANGE_TRIGGER = (
-    r"\b(?:position|weight|share|exposure|holding|allocation|"
+    r"\b(?:positions?|holdings?|weight|allocation|exposure|shares?|stake|"
+    r"capital|funds|amount invested|portfolio percentage|"
     r"more|less|additional|greater|smaller|larger)\b"
     r"|\d+(?:\.\d+)?\s*%"  # no trailing \b -- "%" is not a word char, so a
     # \b right after it never matches (the reported boundary bug)
 )
 _ALLOCATION_ACTION_PATTERN = re.compile(
-    r"\b(?:" + _ALLOCATION_ACTION_VERBS + r")\b"
+    r"\b(?:" + _SIZE_CHANGE_VERBS + r")\b"
     r".{0,40}?(?:" + _ALLOCATION_CHANGE_TRIGGER + r")",
     re.IGNORECASE,
 )
 _EXPOSURE_ADVICE_PATTERN = re.compile(
     r"\b(?:more|less|additional|greater|smaller|larger)\s+"
-    r"(?:exposure|weight|allocation|position|share)\b"
+    r"(?:exposure|weight|allocation|position|share|stake)\b"
     r"|better mix"
     r"|benefit(?:s|ed|ting)?\s+from",
     re.IGNORECASE,
 )
+_AMBIGUOUS_TICKER_MAX_LEN = 2
+_TICKER_TOKEN_SCAN_PATTERN = re.compile(r"\$?[A-Za-z]{1,10}\b")
 
 
-def _build_ticker_directed_action_pattern(allowed_tickers: set[str]) -> re.Pattern | None:
-    tickers = sorted({t for t in allowed_tickers if t})
-    if not tickers:
-        return None
-    ticker_alt = "|".join(re.escape(t) for t in tickers)
-    return re.compile(
-        r"(?i:\b(?:" + _ALLOCATION_ACTION_VERBS + r")\b)"
-        r".{0,15}?\b(?:" + ticker_alt + r")\b"
-    )
+def _find_scoped_ticker_mention(text: str, allowed_tickers: set[str]) -> bool:
+    """True if `text` mentions one of `allowed_tickers` as a complete
+    token, matched case-insensitively for ordinary tickers. A ticker of
+    length <= _AMBIGUOUS_TICKER_MAX_LEN (e.g. "V", "T", "C", "SO", "GS" --
+    all real entries in this project's own UNIVERSE) collides with common
+    short English words, so it only counts when written in genuine
+    uppercase or with a leading "$" -- lowercase/mixed-case "so" or "it"
+    must never be treated as a ticker mention."""
+    for match in _TICKER_TOKEN_SCAN_PATTERN.finditer(text):
+        raw = match.group(0)
+        has_dollar = raw.startswith("$")
+        token = raw[1:] if has_dollar else raw
+        upper = token.upper()
+        if upper not in allowed_tickers:
+            continue
+        if len(upper) <= _AMBIGUOUS_TICKER_MAX_LEN and not has_dollar and token != upper:
+            continue
+        return True
+    return False
+
+
+def _ticker_directed_action_detected(text: str, allowed_tickers: set[str]) -> bool:
+    """True if a size-change verb directly governs one of `allowed_tickers`
+    within a short forward window ("Increase NVDA.", "Reduce amd.", "Raise
+    Nvda."). The short window (~20 chars, enough for a short filler phrase
+    like "the ", "our ", "more to ") is what distinguishes a direct object
+    from an unrelated later mention, e.g. "AMD has reduced correlation with
+    NVDA over the sampled period" -- NVDA there is well outside this window
+    and inside an unrelated prepositional phrase."""
+    if not allowed_tickers:
+        return False
+    for match in re.finditer(r"\b(?:" + _SIZE_CHANGE_VERBS + r")\b", text, re.IGNORECASE):
+        window = text[match.end():match.end() + 20]
+        if _find_scoped_ticker_mention(window, allowed_tickers):
+            return True
+    return False
 _MAX_SUMMARY_LENGTH = 500
 _MAX_CLAIM_LENGTH = 300
 
@@ -306,31 +355,33 @@ def _validate_allocation_review(
 
 
 def _contains_action_language(text: str, allowed_tickers: set[str]) -> bool:
-    """Rejects buy/sell/replace/rebalance language outright (never used
-    descriptively here), advice/recommendation markers (should/consider/
-    prefer/deserve/...), modal/passive constructions ("we can increase NVDA",
-    "AMD could be reduced"), allocate/increase/reduce/target when they appear
-    near an actual change-object (a position/weight/exposure noun, a
-    comparative like "more"/"larger", or a percentage), AND allocate/
-    increase/reduce/target when one of `allowed_tickers` appears as its
-    direct object within a short window ("Increase NVDA.", "Target NVDA at
-    60%.") -- so "Sell NVDA and replace it with cash" is still caught with
-    no number present, "We can increase NVDA." is caught with no trigger
-    noun present, "Increase NVDA." is caught with no ticker-independent
-    trigger at all, while "NVDA has increased volatility" and "AMD has
-    reduced correlation with NVDA over the sampled period" are not (the
-    ticker there is far enough from the verb, inside an unrelated
-    prepositional phrase, that the short direct-object window excludes it)."""
-    if (
+    """Rejects buy/sell/purchase/exit/liquidate/replace/rebalance/rotate/
+    over-or-underweight language outright (never used descriptively here),
+    advice/recommendation markers (should/consider/prefer/deserve/"better
+    to"/"makes sense to"/...), modal/passive constructions ("we can increase
+    NVDA", "AMD could be reduced", "we could gradually add NVDA"), a size-
+    change verb (allocate/increase/reduce/target/add/raise/boost/trim/cut/
+    lower/...) when it appears near an actual change-object (a position/
+    weight/exposure/holding/stake/capital/funds noun, a comparative like
+    "more"/"larger", or a percentage), AND a size-change verb when one of
+    `allowed_tickers` appears as its direct object within a short window,
+    matched case-insensitively ("Increase NVDA.", "Increase nvda.", "Target
+    NVDA at 60%.") -- so "Sell NVDA and replace it with cash" is still
+    caught with no number present, "We can increase NVDA." is caught with no
+    trigger noun present, "Raise NVDA." / "Trim AMD." / "Increase nvda." are
+    caught with no ticker-independent trigger at all, while "NVDA has
+    increased volatility", "AMD has reduced correlation with NVDA over the
+    sampled period", and "NVDA raised its revenue guidance" are not (the
+    ticker/verb ordering or distance there means the ticker is never the
+    verb's direct object within the short window)."""
+    return bool(
         _UNAMBIGUOUS_ACTION_PATTERN.search(text)
         or _ADVICE_PATTERN.search(text)
         or _MODAL_ACTION_PATTERN.search(text)
         or _ALLOCATION_ACTION_PATTERN.search(text)
         or _EXPOSURE_ADVICE_PATTERN.search(text)
-    ):
-        return True
-    ticker_pattern = _build_ticker_directed_action_pattern(allowed_tickers)
-    return bool(ticker_pattern and ticker_pattern.search(text))
+        or _ticker_directed_action_detected(text, allowed_tickers)
+    )
 
 
 SUGGESTION_SCHEMA = {

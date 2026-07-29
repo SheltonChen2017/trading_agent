@@ -518,6 +518,165 @@ def test_allows_descriptive_change_verbs_in_observations(claim, tickers):
     assert len(result.observations) == 1
 
 
+# --- Lowercase-ticker and action-synonym bypass (independent review, sixth
+# pass): the ticker-directed check matched ONLY exact-case tickers, so
+# "Increase nvda." bypassed it entirely (lowercase "nvda" isn't caught by
+# the unknown-ticker scanner either, since that only looks at uppercase-
+# shaped tokens -- correctly, since ordinary lowercase words shouldn't be
+# treated as tickers). And _SIZE_CHANGE_VERBS only covered allocate/
+# increase/reduce/target -- ordinary synonyms (add/raise/boost/trim/cut/
+# lower/shift/move/...) and intervening portfolio-object phrases (stake,
+# "amount invested", capital, funds, holding) were never recognized as
+# advisory triggers at all.
+
+def _obs_reject(claim, tickers):
+    raw = {
+        "summary": "The computed split has been reviewed.",
+        "observations": [
+            {"type": "concentration", "severity": "medium", "claim": claim, "tickers": tickers}
+        ],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    )
+    return result is None or len(result.observations) == 0
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "Increase nvda.",
+        "Reduce amd.",
+        "Raise Nvda.",
+        "Trim aMd.",
+    ],
+)
+def test_rejects_lowercase_or_mixed_case_ticker_instructions_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "claim,tickers",
+    [
+        ("Increase nvda.", ["NVDA"]),
+        ("Reduce amd.", ["AMD"]),
+        ("Raise Nvda.", ["NVDA"]),
+        ("Trim aMd.", ["AMD"]),
+    ],
+)
+def test_rejects_lowercase_or_mixed_case_ticker_instructions_in_observation_claim(claim, tickers):
+    assert _obs_reject(claim, tickers)
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "Raise NVDA.",
+        "Boost NVDA.",
+        "Add NVDA.",
+        "Trim AMD.",
+        "Cut AMD.",
+        "Lower AMD.",
+        "Exit AMD.",
+        "Overweight NVDA.",
+        "Underweight AMD.",
+        "Shift capital to NVDA.",
+        "Move exposure from AMD to NVDA.",
+        "Rotate from AMD into NVDA.",
+    ],
+)
+def test_rejects_action_synonyms_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "Increase our stake in NVDA.",
+        "Reduce the amount invested in AMD.",
+        "Raise the portfolio's NVDA holding.",
+        "Lower the current allocation assigned to AMD.",
+        "Move a portion of the available capital to NVDA.",
+    ],
+)
+def test_rejects_intervening_portfolio_object_phrases_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "We can raise NVDA.",
+        "NVDA could be boosted.",
+        "AMD may be trimmed.",
+        "The AMD holding might be lowered.",
+        "We could gradually add NVDA.",
+    ],
+)
+def test_rejects_modal_and_passive_action_synonyms_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "This allocation is concentrated in semiconductors.",
+        "The volatility target is based on trailing data.",
+        "The allocation has reduced diversification.",
+    ],
+)
+def test_allows_descriptive_allocation_language_sixth_pass(summary):
+    raw = {"summary": summary, "observations": []}
+    result = ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    )
+    assert result is not None
+
+
+@pytest.mark.parametrize(
+    "claim,tickers",
+    [
+        ("NVDA has increased volatility relative to its recent behavior.", ["NVDA"]),
+        ("AMD has reduced correlation with NVDA over the sampled period.", ["AMD", "NVDA"]),
+    ],
+)
+def test_allows_descriptive_change_verbs_sixth_pass(claim, tickers):
+    assert not _obs_reject(claim, tickers)
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "NVDA raised its revenue guidance.",
+        "AMD cut operating expenses.",
+        "NVDA added a new product category.",
+        "AMD lowered its reported debt.",
+    ],
+)
+def test_allows_company_business_facts_using_advisory_looking_verbs(summary):
+    # These verbs (raised/cut/added/lowered) are only advisory when they
+    # govern a ticker/portfolio-object as a proposed CHANGE TARGET -- here
+    # the ticker is the grammatical SUBJECT of a fact about the underlying
+    # business, not the object of a proposed portfolio action.
+    raw = {"summary": summary, "observations": []}
+    result = ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    )
+    assert result is not None
+
+
 def test_review_allocation_plan_returns_none_on_api_exception(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     with patch("anthropic.Anthropic") as mock_anthropic_cls:
@@ -763,6 +922,48 @@ if __name__ == "__main__":
         ("AMD has reduced correlation with NVDA over the sampled period.", ["AMD", "NVDA"]),
     ]:
         test_allows_descriptive_change_verbs_in_observations(_claim, _tickers)
+    for _summary in ["Increase nvda.", "Reduce amd.", "Raise Nvda.", "Trim aMd."]:
+        test_rejects_lowercase_or_mixed_case_ticker_instructions_in_summary(_summary)
+    for _claim, _tickers in [
+        ("Increase nvda.", ["NVDA"]),
+        ("Reduce amd.", ["AMD"]),
+        ("Raise Nvda.", ["NVDA"]),
+        ("Trim aMd.", ["AMD"]),
+    ]:
+        test_rejects_lowercase_or_mixed_case_ticker_instructions_in_observation_claim(_claim, _tickers)
+    for _summary in [
+        "Raise NVDA.", "Boost NVDA.", "Add NVDA.", "Trim AMD.", "Cut AMD.", "Lower AMD.",
+        "Exit AMD.", "Overweight NVDA.", "Underweight AMD.", "Shift capital to NVDA.",
+        "Move exposure from AMD to NVDA.", "Rotate from AMD into NVDA.",
+    ]:
+        test_rejects_action_synonyms_in_summary(_summary)
+    for _summary in [
+        "Increase our stake in NVDA.", "Reduce the amount invested in AMD.",
+        "Raise the portfolio's NVDA holding.", "Lower the current allocation assigned to AMD.",
+        "Move a portion of the available capital to NVDA.",
+    ]:
+        test_rejects_intervening_portfolio_object_phrases_in_summary(_summary)
+    for _summary in [
+        "We can raise NVDA.", "NVDA could be boosted.", "AMD may be trimmed.",
+        "The AMD holding might be lowered.", "We could gradually add NVDA.",
+    ]:
+        test_rejects_modal_and_passive_action_synonyms_in_summary(_summary)
+    for _summary in [
+        "This allocation is concentrated in semiconductors.",
+        "The volatility target is based on trailing data.",
+        "The allocation has reduced diversification.",
+    ]:
+        test_allows_descriptive_allocation_language_sixth_pass(_summary)
+    for _claim, _tickers in [
+        ("NVDA has increased volatility relative to its recent behavior.", ["NVDA"]),
+        ("AMD has reduced correlation with NVDA over the sampled period.", ["AMD", "NVDA"]),
+    ]:
+        test_allows_descriptive_change_verbs_sixth_pass(_claim, _tickers)
+    for _summary in [
+        "NVDA raised its revenue guidance.", "AMD cut operating expenses.",
+        "NVDA added a new product category.", "AMD lowered its reported debt.",
+    ]:
+        test_allows_company_business_facts_using_advisory_looking_verbs(_summary)
     test_review_allocation_plan_returns_none_on_api_exception(mp)
     test_suggest_similar_tickers_returns_none_when_unconfigured(mp)
     test_suggest_similar_tickers_returns_parsed_list_on_success(mp)

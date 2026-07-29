@@ -11,7 +11,7 @@ from assistant.execution_service import (
     _intent_from_dict,
     _order_matches_intent,
 )
-from assistant.order_lifecycle import journal_broker_order_update
+from assistant.order_lifecycle import is_replaced_order, journal_broker_order_update
 from assistant.proposal_status import (
     BROKER_ACCEPTED,
     CANCEL_PENDING,
@@ -24,6 +24,76 @@ from assistant.proposal_status import (
 from assistant.storage import AssistantStore
 
 _STREAM_SHUTDOWN_POLL_SECONDS = 0.1
+
+# Bounded so a broker reporting a pathological chain can never spin here.
+_MAX_REPLACEMENT_CHAIN_DEPTH = 10
+
+
+def _resolve_replacement_chain(
+    order: dict[str, Any], broker_module: Any
+) -> tuple[dict[str, Any] | None, list[str], str | None]:
+    """
+    Follow `replaced_by` from `order` to the order that is authoritative NOW.
+
+    Returns `(authoritative_order, chain_of_order_ids, error)`. When `error` is
+    non-None the caller MUST treat the proposal as unresolved
+    (submission_unknown) -- never project from the stale replaced order and
+    never interpret a failed lookup as confirmed absence.
+
+    Why this exists separately from _proposal_for_update(): that function
+    handles the LIVE direction (a replacement event arrives, find the proposal
+    it supersedes via `replaces`). This handles the POLLING direction (we hold
+    a proposal, its order comes back `replaced`, find where it went via
+    `replaced_by`). Fixing only the live path left the replacement untracked
+    whenever its trade-update was missed -- an app restart, a stream
+    disconnect, or a replacement made before monitoring started -- which is
+    precisely the durable case reconciliation exists for (GPT review,
+    2026-07-29, reproduced with a fake broker: proposal ended
+    submission_unknown, stored order still order-1, zero get_order_by_id
+    calls).
+
+    Cycle- and depth-guarded: a broker that reported A -> B -> A, or an
+    unbounded chain, would otherwise loop forever. Identity validation is NOT
+    done here -- the caller routes the resolved order through
+    apply_broker_update(), which runs _order_matches_intent() and trips the
+    persistent kill switch on a mismatch, so an out-of-band replacement whose
+    ticker/side/quantity was altered can never be silently accepted.
+    """
+    chain: list[str] = []
+    visited: set[str] = set()
+    current = order
+
+    while is_replaced_order(current):
+        current_id = str(current.get("order_id") or "")
+        if current_id and current_id in visited:
+            return None, chain, f"replacement chain revisits order {current_id} (cycle)"
+        if current_id:
+            visited.add(current_id)
+
+        replaced_by = current.get("replaced_by")
+        if not replaced_by:
+            return None, chain, (
+                "order is marked replaced but the broker reported no replaced_by, "
+                "so the replacement cannot be located"
+            )
+        if len(chain) >= _MAX_REPLACEMENT_CHAIN_DEPTH:
+            return None, chain, (
+                f"replacement chain exceeded {_MAX_REPLACEMENT_CHAIN_DEPTH} hops "
+                f"(stopped at {replaced_by})"
+            )
+        chain.append(str(replaced_by))
+
+        try:
+            nxt = broker_module.get_order_by_id(str(replaced_by))
+        except Exception as exc:
+            return None, chain, f"replacement order {replaced_by} lookup failed: {exc}"
+        if nxt is None:
+            return None, chain, (
+                f"replacement order {replaced_by} could not be found at the broker"
+            )
+        current = nxt
+
+    return current, chain, None
 
 
 def _stream_stop_kwargs(broker_module: Any, stop: Event) -> dict[str, Any]:
@@ -134,8 +204,19 @@ def apply_broker_update(
     )
 
 
-def handle_trade_update(store: AssistantStore, update: dict[str, Any]) -> dict[str, Any] | None:
-    """Process one normalized Alpaca trade-update message."""
+def handle_trade_update(
+    store: AssistantStore, update: dict[str, Any], *, broker_module: Any = None
+) -> dict[str, Any] | None:
+    """Process one normalized Alpaca trade-update message.
+
+    `broker_module` is optional. When supplied, a `replaced` event resolves
+    through the replacement chain exactly as polling does, so the live and
+    polling paths project the same proposal state from the same authoritative
+    order instead of the live path parking it at submission_unknown. Without
+    it (older callers, tests with a callback-only fake) the event is handled
+    as before -- the backward `replaces` match in _proposal_for_update() still
+    attaches a replacement event to the right proposal either way.
+    """
     order = update["order"]
     proposal = _proposal_for_update(store, order)
     if proposal is None:
@@ -146,10 +227,30 @@ def handle_trade_update(store: AssistantStore, update: dict[str, Any]) -> dict[s
             {"at": datetime.now(timezone.utc).isoformat(), "unmanaged_order": True},
         )
         return None
+
+    projected = order
+    if broker_module is not None and is_replaced_order(order):
+        authoritative, chain, chain_error = _resolve_replacement_chain(order, broker_module)
+        if chain_error is not None:
+            # Unresolved is unresolved on this path too: park it for a human
+            # rather than projecting from the stale replaced order.
+            store.update_proposal_status_if_current(
+                proposal["proposal_id"],
+                expected_statuses=RECONCILABLE_STATUSES,
+                new_status=SUBMISSION_UNKNOWN,
+                error=(
+                    f"Replacement chain could not be resolved for {proposal['proposal_id']}: "
+                    f"{chain_error}. Manual investigation is required."
+                ),
+            )
+            return None
+        projected = authoritative
+        update = dict(update, replacement_chain=chain)
+
     result = apply_broker_update(
         store,
         proposal,
-        order,
+        projected,
         event_type=str(update.get("event") or order.get("status") or "trade_update"),
         event_at=update.get("event_at"),
         external_event_id=update.get("event_id"),
@@ -264,13 +365,37 @@ def reconcile_nonterminal_orders(
                         ),
                     )
                 continue
+            # An order that came back `replaced` is terminal for its own id;
+            # the live state lives on the replacement. Follow the chain before
+            # projecting anything, or a replacement whose stream event was
+            # missed stays untracked even after it fills.
+            authoritative, chain, chain_error = _resolve_replacement_chain(order, broker_module)
+            if chain_error is not None:
+                reason = (
+                    f"Replacement chain could not be resolved for {proposal_id}: {chain_error}. "
+                    "Manual investigation is required."
+                )
+                store.update_proposal_status_if_current(
+                    proposal_id,
+                    expected_statuses=RECONCILABLE_STATUSES,
+                    new_status=SUBMISSION_UNKNOWN,
+                    error=reason,
+                )
+                result["errors"].append(reason)
+                continue
+
             apply_broker_update(
                 store,
                 proposal,
-                order,
+                authoritative,
                 event_type="poll_reconciliation",
+                # Audit trail: which replacement ids were traversed to reach
+                # the order this projection is based on.
+                raw_event={"replacement_chain": chain} if chain else None,
             )
             result["updated"] += 1
+            if chain:
+                result["replacements_followed"] = result.get("replacements_followed", 0) + 1
             refreshed = store.get_proposal(proposal_id)
             if (
                 cancel_stale
@@ -354,7 +479,9 @@ def monitor_orders(
             def consume_stream() -> None:
                 try:
                     broker_module.run_trade_update_stream(
-                        lambda update: handle_trade_update(store, update),
+                        lambda update: handle_trade_update(
+                            store, update, broker_module=broker_module
+                        ),
                         **_stream_stop_kwargs(broker_module, stop),
                     )
                 except Exception as exc:  # surfaced on the main thread below

@@ -133,6 +133,16 @@ def _finite_float(value: Any) -> float | None:
     return parsed if math.isfinite(parsed) else None
 
 
+def is_replaced_order(order: dict[str, Any]) -> bool:
+    """True when the broker reports this order as superseded by a replacement.
+
+    Public so order_reconciler can follow the replacement chain without
+    duplicating the broker-status vocabulary -- `_REPLACED` stays the single
+    source of truth for which raw statuses mean "replaced".
+    """
+    return normalize_broker_status(order.get("status")) in _REPLACED
+
+
 def proposal_status_for_order(order: dict[str, Any]) -> str:
     status = normalize_broker_status(order.get("status"))
     if status in _FILLED:

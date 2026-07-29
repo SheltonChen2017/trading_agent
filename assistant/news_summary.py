@@ -55,8 +55,23 @@ def is_ai_summary_configured() -> bool:
 def summarize_news_for_ticker(ticker: str, headlines: list[dict]) -> str | None:
     """AI-generated 2-3 sentence summary of what the headlines say might
     affect the ticker's price. Returns None (never raises) if
-    ANTHROPIC_API_KEY isn't set, there are no headlines, or the API call
-    fails -- callers should fall back to displaying the raw headlines."""
+    ANTHROPIC_API_KEY isn't set, there are no headlines, the API call fails,
+    or the response fails the deterministic output guard -- callers should
+    fall back to displaying the raw headlines.
+
+    The guard (ai_advisor._reject_unsafe_prose) is the same one the other
+    free-text AI surfaces use. This function previously returned the model's
+    text unchanged, so a response like "You should buy NVDA now." would have
+    been displayed verbatim despite the prompt forbidding exactly that -- a
+    prompt is not an enforcement mechanism (GPT review, 2026-07-29).
+
+    Grounding is checked against the SUPPLIED headlines, which are trusted
+    deterministic source data: allowed tickers are this ticker plus any
+    ticker-shaped token appearing in the headlines, and every number in the
+    summary must appear in the headlines too. Non-numeric fabricated claims
+    remain undetectable -- see _reject_unsafe_prose's own limitations note --
+    which is why the raw headlines stay the primary UI surface and this
+    summary is only ever an addition to them."""
     if not headlines or not is_ai_summary_configured():
         return None
 
@@ -80,6 +95,19 @@ def summarize_news_for_ticker(ticker: str, headlines: list[dict]) -> str | None:
             ),
             messages=[{"role": "user", "content": f"Ticker: {ticker}\n\n{headline_block}"}],
         )
-        return next((block.text for block in response.content if block.type == "text"), None)
+        text = next((block.text for block in response.content if block.type == "text"), None)
     except Exception:
         return None
+
+    if not text:
+        return None
+    # Imported here rather than at module scope to keep this module's
+    # "headline fetching needs no API key and no heavy imports" property.
+    import re
+
+    from assistant.ai_advisor import _reject_unsafe_prose
+
+    allowed_tickers = {ticker.upper()} | set(re.findall(r"\b[A-Z]{1,5}\b", headline_block))
+    if _reject_unsafe_prose(text, allowed_tickers, source_text=headline_block) is not None:
+        return None
+    return text

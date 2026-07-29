@@ -18,16 +18,18 @@ from __future__ import annotations
 
 import dataclasses
 import os
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Literal
 
-import config
 from assistant.ai_advisor import suggest_similar_tickers
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.storage import AssistantStore
-from assistant.ticker_verification import partition_by_universe, verify_tickers
+from assistant.ticker_verification import RECENT_IPO_ELIGIBILITY_POLICY, verify_tickers
 
 _FINNHUB_IPO_CALENDAR_URL = "https://finnhub.io/api/v1/calendar/ipo"
+_IPO_LOOKBACK_DAYS = 30
+_IPO_ACCEPTED_STATUSES = {"priced", "listed"}
+_MAX_IPO_DATE_GAP_DAYS = 10  # if the first real trading bar is this far from the provider's claimed IPO date, the identity likely doesn't match (e.g. a reused/renamed ticker)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -67,13 +69,19 @@ def is_ipo_calendar_configured() -> bool:
     return bool(os.environ.get("FINNHUB_API_KEY"))
 
 
-def fetch_recent_ipos(count: int = 10, lookback_days: int = 30) -> list[dict]:
+def fetch_recent_ipos(count: int = 10, lookback_days: int = _IPO_LOOKBACK_DAYS) -> list[dict]:
     """Finnhub /calendar/ipo, gated on FINNHUB_API_KEY. Returns [] gracefully
     if the key is unset, the request fails, or the response is malformed --
     matches the open_orders_available=False graceful-degradation pattern
     already used in assistant.context_builder.build_portfolio_snapshot_from_alpaca().
     I cannot obtain this key on your behalf -- sign up for a free Finnhub
-    account yourself if you want this data source live."""
+    account yourself if you want this data source live.
+
+    Only returns entries whose `status` is actually "priced" or "listed"
+    (independent review: Finnhub's calendar also includes merely "expected"
+    or "filed" IPOs that haven't traded at all yet) and whose date is not
+    in the future -- an upcoming/unconfirmed IPO is not yet a real,
+    tradeable security to recommend."""
     api_key = os.environ.get("FINNHUB_API_KEY")
     if not api_key:
         return []
@@ -91,16 +99,20 @@ def fetch_recent_ipos(count: int = 10, lookback_days: int = 30) -> list[dict]:
         response.raise_for_status()
         payload = response.json()
         entries = payload.get("ipoCalendar", []) if isinstance(payload, dict) else []
-        return [
-            {
-                "ticker": e.get("symbol"),
-                "name": e.get("name", ""),
-                "date": e.get("date", ""),
-                "status": e.get("status", ""),
-            }
-            for e in entries
-            if e.get("symbol")
-        ][:count]
+        results = []
+        for e in entries:
+            symbol = e.get("symbol")
+            status = str(e.get("status", "")).strip().lower()
+            date_str = e.get("date", "")
+            if not symbol or status not in _IPO_ACCEPTED_STATUSES:
+                continue
+            try:
+                if date.fromisoformat(date_str) > today:
+                    continue
+            except ValueError:
+                continue
+            results.append({"ticker": symbol, "name": e.get("name", ""), "date": date_str, "status": status})
+        return results[:count]
     except Exception:
         return []
 
@@ -140,12 +152,22 @@ def build_recommended_tickers(
         recommended.append(RecommendedTicker(ticker=v["ticker"], reason_category="most_active", detail=detail, fetched_at=now))
 
     ipo_candidates = [c for c in fetch_recent_ipos() if c["ticker"].upper() not in held_set]
-    verified, batch_dropped = verify_tickers([c["ticker"] for c in ipo_candidates])
+    verified, batch_dropped = verify_tickers(
+        [c["ticker"] for c in ipo_candidates], policy=RECENT_IPO_ELIGIBILITY_POLICY
+    )
     dropped.extend(batch_dropped)
     ipo_detail_by_ticker = {c["ticker"]: c for c in ipo_candidates}
     for v in verified:
         c = ipo_detail_by_ticker.get(v["ticker"], {})
-        detail = f"{v.get('longName') or c.get('name') or v['ticker']} -- IPO date: {c.get('date', 'unknown')}"
+        claimed_date = c.get("date", "")
+        if _is_ipo_identity_mismatch(v.get("first_session_date"), claimed_date):
+            dropped.append(v["ticker"])
+            continue
+        name = v.get("longName") or c.get("name") or v["ticker"]
+        detail = (
+            f"{name} -- IPO date: {claimed_date or 'unknown'} ({v['history_sessions']} completed trading "
+            "session(s) -- volatility/trend estimates are not yet reliable this early)"
+        )
         recommended.append(RecommendedTicker(ticker=v["ticker"], reason_category="recent_ipo", detail=detail, fetched_at=now))
 
     if held_set:
@@ -153,29 +175,42 @@ def build_recommended_tickers(
         raw_suggestions = suggest_similar_tickers(held_list, store=store)
         if raw_suggestions:
             raw_suggestions = [c for c in raw_suggestions if c.get("ticker", "").upper() not in held_set]
-            from_universe, wildcard = partition_by_universe(raw_suggestions, universe=config.UNIVERSE)
             reason_by_ticker = {c["ticker"].upper(): c["reason"] for c in raw_suggestions}
-            for c in from_universe:
-                ticker = c["ticker"].upper()
+            # Every AI suggestion goes through the SAME eligibility check,
+            # regardless of whether it happens to be a known config.UNIVERSE
+            # member or a wildcard pick (independent review: UNIVERSE was
+            # built for research-scan coverage, not recommendation
+            # eligibility -- a member can be illiquid, non-equity, or have
+            # gone stale since being added; universe membership answers
+            # "where did this come from," never "is this eligible today").
+            candidate_tickers = list(dict.fromkeys(c["ticker"].upper() for c in raw_suggestions))
+            verified, batch_dropped = verify_tickers(candidate_tickers)
+            dropped.extend(batch_dropped)
+            for v in verified:
                 recommended.append(
                     RecommendedTicker(
-                        ticker=ticker, reason_category="ai_suggested",
-                        detail=_similarity_detail(held_list, ticker, c["reason"]), fetched_at=now,
+                        ticker=v["ticker"], reason_category="ai_suggested",
+                        detail=_similarity_detail(held_list, v["ticker"], reason_by_ticker.get(v["ticker"], "")),
+                        fetched_at=now,
                     )
                 )
-            if wildcard:
-                verified, batch_dropped = verify_tickers([c["ticker"] for c in wildcard])
-                dropped.extend(batch_dropped)
-                for v in verified:
-                    recommended.append(
-                        RecommendedTicker(
-                            ticker=v["ticker"], reason_category="ai_suggested",
-                            detail=_similarity_detail(held_list, v["ticker"], reason_by_ticker.get(v["ticker"], "")),
-                            fetched_at=now,
-                        )
-                    )
 
     return recommended, dropped
+
+
+def _is_ipo_identity_mismatch(first_session_date: str | None, claimed_ipo_date: str) -> bool:
+    """Reject a ticker whose real first trading bar doesn't line up with the
+    IPO date the provider claimed for it -- catches a reused/renamed ticker
+    symbol masquerading as a fresh listing (independent review: "a ticker
+    that passes may actually be suspicious -- e.g. a reused symbol with
+    older history")."""
+    if not first_session_date or not claimed_ipo_date:
+        return False
+    try:
+        gap_days = abs((date.fromisoformat(first_session_date) - date.fromisoformat(claimed_ipo_date)).days)
+    except ValueError:
+        return False
+    return gap_days > _MAX_IPO_DATE_GAP_DAYS
 
 
 def _similarity_detail(held_tickers: list[str], candidate: str, llm_reason: str) -> str:

@@ -131,6 +131,30 @@ def test_verify_tickers_rejects_missing_company_name():
     assert dropped == ["NONAME"]
 
 
+def test_verify_tickers_rejects_non_us_exchange():
+    # independent review: nothing enforced the "US tickers"/"US stocks"
+    # framing already used in prompts/UI copy -- a sufficiently liquid
+    # foreign or OTC listing could pass every other check.
+    with patch("assistant.ticker_verification.fetch_historical") as mock_fetch, \
+         patch("assistant.ticker_verification._safe_ticker_info") as mock_info:
+        mock_fetch.return_value = {"FOREIGN": _df()}
+        mock_info.return_value = {**_ELIGIBLE_INFO, "exchange": "LSE"}
+        verified, dropped = ticker_verification.verify_tickers(["FOREIGN"])
+    assert verified == []
+    assert dropped == ["FOREIGN"]
+
+
+def test_verify_tickers_allowed_exchanges_none_disables_the_check():
+    with patch("assistant.ticker_verification.fetch_historical") as mock_fetch, \
+         patch("assistant.ticker_verification._safe_ticker_info") as mock_info:
+        mock_fetch.return_value = {"FOREIGN": _df()}
+        mock_info.return_value = {**_ELIGIBLE_INFO, "exchange": "LSE"}
+        no_exchange_restriction = SecurityEligibilityPolicy(allowed_exchanges=None)
+        verified, dropped = ticker_verification.verify_tickers(["FOREIGN"], policy=no_exchange_restriction)
+    assert dropped == []
+    assert len(verified) == 1
+
+
 def test_verify_tickers_custom_policy_can_relax_defaults():
     lenient_policy = SecurityEligibilityPolicy(
         allowed_quote_types=("EQUITY", "ETF"), minimum_history_sessions=5,
@@ -170,6 +194,8 @@ if __name__ == "__main__":
     test_verify_tickers_rejects_price_below_minimum()
     test_verify_tickers_rejects_illiquid_ticker()
     test_verify_tickers_rejects_missing_company_name()
+    test_verify_tickers_rejects_non_us_exchange()
+    test_verify_tickers_allowed_exchanges_none_disables_the_check()
     test_verify_tickers_custom_policy_can_relax_defaults()
     test_partition_by_universe_splits_correctly()
     test_partition_by_universe_is_case_insensitive()

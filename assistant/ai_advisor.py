@@ -39,6 +39,10 @@ _ALLOWED_SEVERITIES = ("low", "medium", "high")
 _PERCENT_PATTERN = re.compile(r"(\d+(?:\.\d+)?)\s*%")
 _DOLLAR_PATTERN = re.compile(r"\$\s*[\d,]+(?:\.\d+)?")
 _NUMBER_TOLERANCE_PCT = 1.0  # allows "60%" to match an actual weight of 60.3% without treating it as a fabricated number
+_TICKER_TOKEN_PATTERN = re.compile(r"\b[A-Z]{1,5}\b")
+_ACTION_VERB_PATTERN = re.compile(r"\b(buy|sell|replace|allocate|reduce|increase|target|rebalance)\b", re.IGNORECASE)
+_MAX_SUMMARY_LENGTH = 500
+_MAX_CLAIM_LENGTH = 300
 
 ALLOCATION_REVIEW_SCHEMA = {
     "type": "object",
@@ -78,43 +82,84 @@ class AllocationReview:
     observations: tuple[AllocationObservation, ...]
 
 
-def _contains_disallowed_number(text: str, allowed_weights_pct: list[float]) -> bool:
+def _contains_disallowed_number(text: str, allowed_values_pct: list[float]) -> bool:
     """The instruction "don't propose a revised weight" is prompt-only and
     not otherwise enforced -- this is the actual enforcement. ANY dollar
     figure is disallowed outright (this function is never given a dollar
     amount as input, so one appearing in the response can only be
     invented). A percentage is disallowed unless it's within
-    _NUMBER_TOLERANCE_PCT of one of the ACTUAL input weights -- close
-    enough to be "the same number, differently rounded/phrased," not a
-    proposed alternative."""
+    _NUMBER_TOLERANCE_PCT of one of the values it's actually allowed to
+    restate (the CALLER decides what's in scope -- e.g. only the specific
+    ticker(s) an observation is about, not every weight in the whole cart;
+    see _validate_allocation_review) -- close enough to be "the same
+    number, differently rounded/phrased," not a proposed alternative."""
     if _DOLLAR_PATTERN.search(text):
         return True
     for match in _PERCENT_PATTERN.finditer(text):
         value = float(match.group(1))
-        if not any(abs(value - allowed) <= _NUMBER_TOLERANCE_PCT for allowed in allowed_weights_pct):
+        if not any(abs(value - allowed) <= _NUMBER_TOLERANCE_PCT for allowed in allowed_values_pct):
             return True
     return False
 
 
-def _validate_allocation_review(raw: dict, cart_tickers: list[str], weights_pct: dict[str, float]) -> AllocationReview | None:
-    """Enforces, in code, what the system prompt only asks for in prose:
-    every observation's `type`/`severity` is allowlisted (schema validation
-    already guarantees this if the model followed the schema, but this is
-    checked again defensively rather than trusted), every ticker mentioned
-    was actually in the input cart, and no claim (or the summary) contains
-    a number that isn't one of the actual input weights. The summary
-    failing this check rejects the WHOLE response (returns None) --  an
-    individual observation failing it is just dropped, since the rest of
-    the response may still be trustworthy."""
+def _mentions_unknown_ticker(text: str, allowed_tickers: set[str], known_tickers: set[str]) -> bool:
+    """Flags a KNOWN ticker (a real config.UNIVERSE member, or one of the
+    cart's own tickers) mentioned in free text that is NOT in the allowed
+    scope -- e.g. "Buy TSLA" in a summary about NVDA/AMD, or "TSLA would
+    diversify" hidden inside a claim whose structured `tickers` field only
+    lists NVDA (independent review: the structured `tickers` field alone
+    doesn't stop an unlisted ticker from being named in the free-text
+    `claim`/`summary`). Deliberately scoped to KNOWN tickers only, so
+    innocuous all-caps acronyms (ETF, CEO, USD) never false-positive --
+    only a real, recognizable ticker symbol can trigger this."""
+    for match in _TICKER_TOKEN_PATTERN.finditer(text.upper()):
+        token = match.group(0)
+        if token in known_tickers and token not in allowed_tickers:
+            return True
+    return False
+
+
+def _validate_allocation_review(
+    raw: dict, cart_tickers: list[str], weights_pct: dict[str, float], volatilities: dict[str, float | None] | None = None,
+) -> AllocationReview | None:
+    """Enforces, in code, what the system prompt only asks for in prose.
+    Beyond the original type/severity/ticker-field/number checks, this also:
+    (1) scans free text (summary AND claim) for a KNOWN ticker mentioned
+    outside its allowed scope, since a legitimate-looking `tickers` field
+    doesn't stop the prose from naming a different ticker (e.g. "Buy TSLA"
+    in the summary, or "TSLA would diversify" inside a claim tagged
+    tickers=["NVDA"]); (2) rejects action-verb language (buy/sell/replace/
+    allocate/reduce/increase/target/rebalance) outright, regardless of
+    whether a number is present; (3) scopes an observation's allowed
+    percentages to ONLY the weights/volatilities of ITS OWN tickers, not
+    every weight anywhere in the cart, so a number that's real but belongs
+    to a DIFFERENT ticker can't be smuggled in as if it applied to this
+    claim; (4) treats volatility values as legitimate restatable numbers
+    too, not just weights; (5) caps string lengths; (6) drops exact-
+    duplicate observations; (7) refuses to show a false "all clear" --
+    if the model proposed observations but every single one failed
+    validation, the whole response is rejected rather than displaying just
+    the summary as if nothing was flagged."""
+    volatilities = volatilities or {}
     cart_set = {t.upper() for t in cart_tickers}
-    allowed_weights = list(weights_pct.values())
+    known_tickers = set(config.UNIVERSE) | cart_set
+    all_weights = list(weights_pct.values())
+    all_volatilities = [v for v in volatilities.values() if v is not None]
 
     summary = raw.get("summary")
-    if not isinstance(summary, str) or _contains_disallowed_number(summary, allowed_weights):
+    if (
+        not isinstance(summary, str)
+        or len(summary) > _MAX_SUMMARY_LENGTH
+        or _contains_disallowed_number(summary, all_weights + all_volatilities)
+        or _mentions_unknown_ticker(summary, cart_set, known_tickers)
+        or _contains_action_language(summary)
+    ):
         return None
 
+    raw_observations = raw.get("observations", [])
     kept_observations = []
-    for obs in raw.get("observations", []):
+    seen = set()
+    for obs in raw_observations:
         if not isinstance(obs, dict):
             continue
         obs_type = obs.get("type")
@@ -123,17 +168,41 @@ def _validate_allocation_review(raw: dict, cart_tickers: list[str], weights_pct:
         tickers = obs.get("tickers")
         if obs_type not in _ALLOWED_OBSERVATION_TYPES or severity not in _ALLOWED_SEVERITIES:
             continue
-        if not isinstance(claim, str) or not isinstance(tickers, list):
+        if not isinstance(claim, str) or not isinstance(tickers, list) or len(claim) > _MAX_CLAIM_LENGTH:
             continue
         if not tickers or not all(isinstance(t, str) and t.upper() in cart_set for t in tickers):
             continue
-        if _contains_disallowed_number(claim, allowed_weights):
+        obs_tickers = tuple(t.upper() for t in tickers)
+        obs_allowed_numbers = [weights_pct[t] for t in obs_tickers if t in weights_pct] + [
+            volatilities[t] for t in obs_tickers if volatilities.get(t) is not None
+        ]
+        if _contains_disallowed_number(claim, obs_allowed_numbers):
             continue
-        kept_observations.append(
-            AllocationObservation(type=obs_type, severity=severity, claim=claim, tickers=tuple(t.upper() for t in tickers))
-        )
+        if _mentions_unknown_ticker(claim, set(obs_tickers), known_tickers):
+            continue
+        if _contains_action_language(claim):
+            continue
+        dedup_key = (obs_type, severity, obs_tickers, claim)
+        if dedup_key in seen:
+            continue
+        seen.add(dedup_key)
+        kept_observations.append(AllocationObservation(type=obs_type, severity=severity, claim=claim, tickers=obs_tickers))
+
+    if raw_observations and not kept_observations:
+        # Every proposed observation failed validation -- showing just the
+        # summary here would read as "reviewed, nothing to flag" when the
+        # truth is "the model's actual observations were all rejected."
+        return None
 
     return AllocationReview(summary=summary, observations=tuple(kept_observations))
+
+
+def _contains_action_language(text: str) -> bool:
+    """Rejects buy/sell/replace/allocate/reduce/increase/target/rebalance
+    language outright, independent of whether any number is present --
+    "Sell NVDA and replace it with cash" carries no percentage or dollar
+    figure at all, so the numeric check alone would never catch it."""
+    return bool(_ACTION_VERB_PATTERN.search(text))
 
 
 SUGGESTION_SCHEMA = {
@@ -258,7 +327,7 @@ def review_allocation_plan(
             _record_run(store, "review_allocation_plan", _REVIEW_ALLOCATION_PROMPT_VERSION, input_hash, start, error="no text block in response")
             return None
         raw = json.loads(text)
-        result = _validate_allocation_review(raw, cart_tickers, weights_pct)
+        result = _validate_allocation_review(raw, cart_tickers, weights_pct, volatilities)
         _record_run(
             store, "review_allocation_plan", _REVIEW_ALLOCATION_PROMPT_VERSION, input_hash, start,
             response=raw, error=None if result is not None else "failed post-hoc validation",

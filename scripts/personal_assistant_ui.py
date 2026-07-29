@@ -957,7 +957,7 @@ with tab_briefing:
     for category, label in [
         ("most_active", "Most actively traded today"),
         ("recent_ipo", "Recent IPOs"),
-        ("ai_suggested", "Similar to what you currently hold (Claude)"),
+        ("ai_suggested", "Claude suggestions with measured comparison (not a validated similarity recommender)"),
     ]:
         items = [r for r in recommended_tickers if r.reason_category == category]
         if not items:
@@ -974,6 +974,10 @@ with tab_briefing:
             )
 
     if curated_note:
+        st.caption(
+            "AI commentary on the list above -- unverified prose, not a validated fact or a "
+            "recommendation. Cross-check against the tables above before acting on it."
+        )
         st.info(curated_note)
 
 with tab_watchlist:
@@ -1016,13 +1020,14 @@ with tab_watchlist:
     )
     ai_advisor_available = is_ai_advisor_configured()
     want_similar_suggestions = st.checkbox(
-        "Suggest similar tickers with Claude (real API call, small real cost)",
+        "Get Claude's own ticker suggestions, with measured comparison (real API call, small real cost)",
         value=False,
         disabled=not ai_advisor_available,
         help=(
-            "Prefers tickers already in this project's tracked universe (shown "
-            "directly); any additional suggestion is verified against real market "
-            "data before being shown."
+            "Claude picks tickers from its own knowledge -- this is NOT a validated "
+            "similarity engine. Every suggestion is checked against real market data "
+            "before being shown, and paired with a measured correlation/sector-overlap "
+            "column so you can see whether the data actually backs up Claude's stated reason."
             if ai_advisor_available
             else "ANTHROPIC_API_KEY is not set."
         ),
@@ -1083,9 +1088,19 @@ with tab_watchlist:
         if want_similar_suggestions:
             raw_suggestions = suggest_similar_tickers(cart, store=store)
             if raw_suggestions:
-                from_universe, wildcard = partition_by_universe(raw_suggestions, universe=UNIVERSE)
-                verified, dropped = verify_tickers([c["ticker"] for c in wildcard]) if wildcard else ([], [])
-                all_candidate_tickers = [c["ticker"].upper() for c in from_universe] + [v["ticker"] for v in verified]
+                from_universe_raw, wildcard_raw = partition_by_universe(raw_suggestions, universe=UNIVERSE)
+                # Universe membership is provenance ONLY -- it decides which
+                # display group a suggestion falls in, never whether it's
+                # eligible. Both groups go through the SAME verify_tickers()
+                # eligibility check (independent review: config.UNIVERSE was
+                # built for research-scan coverage, not recommendation
+                # eligibility -- a member can have gone illiquid, non-equity,
+                # or stale since being added; a prior version let a
+                # from-universe suggestion skip this check entirely).
+                from_universe, dropped = verify_tickers([c["ticker"] for c in from_universe_raw]) if from_universe_raw else ([], [])
+                wildcard, wildcard_dropped = verify_tickers([c["ticker"] for c in wildcard_raw]) if wildcard_raw else ([], [])
+                dropped = dropped + wildcard_dropped
+                all_candidate_tickers = [v["ticker"] for v in from_universe] + [v["ticker"] for v in wildcard]
                 # Measured evidence sits ALONGSIDE the LLM's stated reason, never
                 # replacing it -- a real, resolvable ticker can still carry a
                 # FALSE similarity claim (independent review: e.g. CAT mislabeled
@@ -1097,7 +1112,7 @@ with tab_watchlist:
                 }
                 st.session_state["watchlist_ai_suggestions"] = {
                     "from_universe": from_universe,
-                    "verified": verified,
+                    "verified": wildcard,
                     "dropped": dropped,
                     "reason_by_ticker": {c["ticker"].upper(): c["reason"] for c in raw_suggestions},
                     "evidence_by_ticker": evidence_by_ticker,
@@ -1111,7 +1126,7 @@ with tab_watchlist:
 
     ai_suggestions = st.session_state.get("watchlist_ai_suggestions")
     if ai_suggestions:
-        with st.expander(f"Similar tickers to {', '.join(cart)} (Claude)", expanded=False):
+        with st.expander(f"Claude's own suggestions related to {', '.join(cart)} (with measured comparison)", expanded=False):
             reason_by_ticker = ai_suggestions["reason_by_ticker"]
             evidence_by_ticker = ai_suggestions.get("evidence_by_ticker", {})
             if ai_suggestions["from_universe"]:
@@ -1119,10 +1134,10 @@ with tab_watchlist:
                 st.dataframe(
                     [
                         {
-                            "Ticker": c["ticker"], "Claude's reason": c["reason"],
-                            "Measured similarity": evidence_by_ticker.get(c["ticker"].upper(), ""),
+                            "Ticker": v["ticker"], "Claude's reason": reason_by_ticker.get(v["ticker"], ""),
+                            "Measured similarity": evidence_by_ticker.get(v["ticker"], ""),
                         }
-                        for c in ai_suggestions["from_universe"]
+                        for v in ai_suggestions["from_universe"]
                     ],
                     use_container_width=True, hide_index=True,
                 )

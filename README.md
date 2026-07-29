@@ -67,8 +67,9 @@ Important guarantees:
 - Broker order functions reject calls without a short-lived execution-gate
   authorization tied to the exact ticker, side, quantity, and order type.
 - Proposals are single-use and expire after 15 minutes by default.
-- Repeated proposal generation cannot reset an executed proposal.
-- Open broker orders and recently executed intents are checked for duplicates.
+- Repeated proposal generation cannot reset a working or filled proposal.
+- Open broker orders, working assistant orders, legacy unresolved orders, and
+  recently filled intents are checked for duplicates.
 - Buys are checked against cash reserve, position, total-exposure, basket,
   leverage, order-value, stale-price, trading-hours, spread, slippage, and
   earnings rules.
@@ -118,7 +119,8 @@ Important guarantees:
   time it's viewed or resumed, so resolving it through that proposal's own
   override control is reflected instead of the batch showing a stale
   "blocked" status forever.
-- `TRADING_ASSISTANT_KILL_SWITCH=1` blocks proposal execution -- enforced
+- `TRADING_ASSISTANT_KILL_SWITCH=1` and the durable SQLite kill switch both
+  block proposal execution -- enforced
   inside the execution service itself (not only by callers that remember to
   read the env var and pass it in), so it can't be silently bypassed.
 - The personal-assistant execution service refuses to run if
@@ -298,6 +300,8 @@ The default versioned policy is
 - per-position, total, basket, and leveraged-ETF exposure;
 - minimum cash reserve;
 - maximum order value;
+- maximum daily submitted notional, daily order count, concurrent open orders,
+  and working-order age;
 - price freshness, spread, and slippage;
 - earnings blackout window;
 - allowed sides and order types (market and limit are both routed correctly
@@ -323,6 +327,10 @@ The checked-in default is deliberately restrictive:
   "max_leveraged_etf_pct": 0.20,
   "min_cash_reserve_pct": 0.10,
   "max_order_value": 5000.0,
+  "max_daily_submitted_notional": 25000.0,
+  "max_daily_order_count": 10,
+  "max_open_orders": 5,
+  "max_order_age_minutes": 30.0,
   "max_spread_pct": 0.5,
   "allow_new_positions": false,
   "enable_strategy_proposals": false,
@@ -436,7 +444,10 @@ truth used by the service, the UI's History filter, and tests -- so these
 can't drift out of sync with each other again): `proposed`, `validating`,
 `override_available`, `blocked`, `validation_failed`, `approved`,
 `submitting`, `submission_unknown`, `reconciling`, `submission_failed`,
-`executed`, `expired`.
+`broker_accepted`, `partially_filled`, `cancel_pending`, `filled`,
+`canceled`, `broker_rejected`, `broker_expired`, legacy `executed`, and
+`expired`. New orders never use legacy `executed`: broker acceptance is
+working exposure, while only broker-confirmed `filled` means execution.
 
 ### Approve one paper order
 
@@ -453,12 +464,15 @@ Immediately before submission the service:
 
 1. verifies the proposal is still `proposed`, unexpired, and uses the active
    policy version and fingerprint;
-2. confirms Alpaca is configured for paper trading;
+2. confirms Alpaca is configured for paper trading and that the account is
+   active/unblocked and the asset is active/tradable;
 3. refreshes positions, cash, buying power, prices, and open orders;
-4. checks duplicates and every execution-gate rule;
+4. checks duplicates, the durable kill switch, and every execution-gate rule;
 5. creates a short-lived authorization bound to that exact intent;
-6. submits the paper order with an idempotent client order ID;
-7. records the order and marks the proposal executed.
+6. atomically reserves the persistent daily order/notional budget;
+7. submits the paper order with an idempotent client order ID;
+8. journals the response as `broker_accepted`, `partially_filled`, or
+   `filled` according to the broker's actual state.
 
 If the proposal is blocked ONLY by an override-eligible violation (a
 concentration cap or the earnings blackout window -- never a data-integrity
@@ -476,6 +490,14 @@ To stop all approvals without changing code:
 $env:TRADING_ASSISTANT_KILL_SWITCH = "1"
 ```
 
+The persistent switch survives process restarts:
+
+```bash
+python scripts/run_personal_assistant.py kill-switch on --reason "operator stop"
+python scripts/run_personal_assistant.py kill-switch status
+python scripts/run_personal_assistant.py kill-switch off --reason "investigation complete"
+```
+
 ### Submission reconciliation
 
 An exception while submitting an order to Alpaca does not prove the broker
@@ -486,8 +508,9 @@ exception, the service:
 
 1. looks the order up at the broker by the same idempotency key
    (`client_order_id`) it originally submitted;
-2. if found, journals it and marks the proposal `executed`, same as a normal
-   success (`reconciled_after_error` records what the original error was);
+2. if found, journals its real broker lifecycle state (accepted, partially
+   filled, filled, canceled, rejected, or expired;
+   `reconciled_after_error` records what the original error was);
 3. if the lookup itself can't confirm either way, marks the proposal
    `submission_unknown` -- a distinct, non-terminal status. Proposals in
    `submitting` or `submission_unknown` are treated as live duplicate-order
@@ -496,9 +519,9 @@ exception, the service:
    and reconciles it.
 
 Separately, if the broker call succeeds but the local SQLite journal write
-afterward fails, the proposal is still marked `executed` (the order really
-was accepted) with the local failure recorded in its `error` field --
-never silently reported as failed when a real order exists.
+afterward fails, the proposal preserves the broker response as working
+exposure with the local failure recorded in its `error` field -- it is never
+silently reported as a failed/no-order outcome.
 
 The broker lookup itself distinguishes a *confirmed* absence (the broker's
 own HTTP 404 -- genuinely no such order) from an *unconfirmed* one (the
@@ -520,8 +543,41 @@ shown automatically whenever a proposal has an unresolved broker
 submission.) This re-queries Alpaca by the same idempotency key and
 cross-checks the ticker/side against the proposal's own intent before
 trusting it -- a mismatched order is left unresolved rather than silently
-accepted. Every outcome (executed, submission_failed, or still
-submission_unknown) is timestamped in `reconciled_at` as an audit trail.
+accepted. Every outcome (a broker lifecycle state, `submission_failed`, or
+still `submission_unknown`) is timestamped in `reconciled_at`.
+
+### Continuous order monitoring
+
+Run one startup/poll reconciliation:
+
+```bash
+python scripts/run_personal_assistant.py sync-orders
+```
+
+Run the long-lived trade-update stream with a 30-second polling fallback:
+
+```bash
+python scripts/run_personal_assistant.py monitor-orders --poll-seconds 30
+```
+
+Streaming and polling share one append-only, deduplicated event journal and
+an atomic monotonic projection, so a replayed old `accepted` event cannot
+move a `filled` proposal backward. To request cancellation of working orders
+older than `max_order_age_minutes`, opt in with `--cancel-stale`; the service
+never automatically reprices or replaces an order.
+
+Before a paper soak or operator handoff:
+
+```bash
+python scripts/run_personal_assistant.py sync-orders
+python scripts/run_personal_assistant.py readiness
+python scripts/run_personal_assistant.py backup-db
+```
+
+`readiness` exits nonzero unless the policy and SQLite database are valid,
+the persistent kill switch is off, no broker outcome is ambiguous,
+reconciliation is recent/error-free, budgets are within policy, and the
+connected paper account is active and unblocked.
 
 ### Recovering a stranded reconciliation
 
@@ -604,7 +660,10 @@ records:
 
 - versioned decision packets;
 - immutable proposal identity and current status;
-- broker-order submissions linked to proposals.
+- current broker-order snapshots linked to proposals;
+- append-only broker order/fill events;
+- persistent daily execution reservations;
+- durable operator/reconciliation state.
 
 The database and its WAL files are gitignored because they contain personal
 account state. The research registry and default policy are committed because
@@ -624,6 +683,9 @@ assistant/
   allocation_proposals.py  user-directed, inverse-volatility-weighted buy proposals
   allocation_batch.py      resumable, cumulative-preflight batch submission
   execution_service.py     approval, revalidation, paper submission
+  order_lifecycle.py       broker status mapping + atomic event projection
+  order_reconciler.py      stream, polling fallback, stale cancellation
+  readiness.py             operational preflight/readiness report
   proposal_status.py       single source of truth for proposal status strings
   storage.py               SQLite state and idempotency
   risk_copilot.py          concentration, duplication, stress analysis (Briefing tab + `risk-check` CLI)
@@ -763,8 +825,9 @@ network access.
   explicitly unavailable.
 - Tax-lot selection, wash-sale handling, dividends, and realized-tax estimates
   are not yet integrated into proposals.
-- SQLite stores submitted broker state, but continuous fill/partial-fill
-  reconciliation and alerting are future work.
+- Order lifecycle reconciliation is implemented for the CLI monitor, but
+  external paging/notification delivery and supervised service deployment
+  are not yet integrated.
 - Market data used in research is not an institutional production feed.
 - Survivorship bias, delistings, liquidity, and borrow constraints remain
   important research limitations. Quantified 2026-07-26: `config.UNIVERSE`

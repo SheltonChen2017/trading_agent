@@ -92,8 +92,24 @@ BATCH_STOPPED_UNKNOWN = "stopped_unknown"
 # is handled separately (it means "eligible to attempt," not terminal).
 # "validating"/"approved" are deliberately NOT here -- see
 # _sync_leg_from_proposal()'s docstring.
-_TERMINAL_FAILURE_STATUSES = frozenset({"submission_failed", "blocked", "validation_failed", "expired"})
+_TERMINAL_FAILURE_STATUSES = frozenset({
+    "submission_failed",
+    "blocked",
+    "validation_failed",
+    "expired",
+    "canceled",
+    "broker_rejected",
+    "broker_expired",
+})
 _UNKNOWN_STATUSES = frozenset({"submitting", "submission_unknown", "reconciling"})
+_BROKER_ORDER_STATUSES = frozenset({
+    "broker_accepted",
+    "partially_filled",
+    "cancel_pending",
+    "filled",
+    # Legacy rows used this for broker acceptance.
+    "executed",
+})
 
 
 def new_batch_id() -> str:
@@ -125,7 +141,7 @@ def _sync_leg_from_proposal(leg: dict, proposal: dict | None) -> dict:
         }
 
     status = proposal["status"]
-    if status == "executed":
+    if status in _BROKER_ORDER_STATUSES:
         new_state = LEG_SUBMITTED
     elif status in _TERMINAL_FAILURE_STATUSES:
         new_state = LEG_FAILED

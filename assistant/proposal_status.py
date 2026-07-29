@@ -21,6 +21,19 @@ SUBMITTING = "submitting"
 SUBMISSION_UNKNOWN = "submission_unknown"
 SUBMISSION_FAILED = "submission_failed"
 RECONCILING = "reconciling"
+# Broker acceptance is not execution. These states mirror the broker's
+# post-submission lifecycle and remain nonterminal until a fill, rejection,
+# cancellation, or expiry is confirmed.
+BROKER_ACCEPTED = "broker_accepted"
+PARTIALLY_FILLED = "partially_filled"
+CANCEL_PENDING = "cancel_pending"
+FILLED = "filled"
+CANCELED = "canceled"
+BROKER_REJECTED = "broker_rejected"
+BROKER_EXPIRED = "broker_expired"
+# Legacy rows created before fill-aware lifecycle tracking used "executed"
+# to mean only "the broker accepted the request." Keep the value readable
+# for migration/reconciliation, but never emit it for a new submission.
 EXECUTED = "executed"
 EXPIRED = "expired"
 
@@ -36,6 +49,13 @@ STATUSES: tuple[str, ...] = (
     SUBMISSION_UNKNOWN,
     RECONCILING,
     SUBMISSION_FAILED,
+    BROKER_ACCEPTED,
+    PARTIALLY_FILLED,
+    CANCEL_PENDING,
+    FILLED,
+    CANCELED,
+    BROKER_REJECTED,
+    BROKER_EXPIRED,
     EXECUTED,
     EXPIRED,
 )
@@ -44,4 +64,33 @@ STATUSES: tuple[str, ...] = (
 # proposal hasn't reached a clean terminal state -- used to widen the
 # duplicate-order check so a regenerated proposal for the same
 # ticker/side is blocked until an unresolved submission is reconciled.
-UNRESOLVED_BROKER_STATE_STATUSES: tuple[str, ...] = (SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING)
+UNRESOLVED_BROKER_STATE_STATUSES: tuple[str, ...] = (
+    SUBMITTING,
+    SUBMISSION_UNKNOWN,
+    RECONCILING,
+    BROKER_ACCEPTED,
+    PARTIALLY_FILLED,
+    CANCEL_PENDING,
+    # A legacy "executed" row may still represent an accepted-but-unfilled
+    # order. Reconciliation must keep treating it as exposure until migrated.
+    EXECUTED,
+)
+
+TERMINAL_BROKER_STATUSES: tuple[str, ...] = (
+    FILLED,
+    CANCELED,
+    BROKER_REJECTED,
+    BROKER_EXPIRED,
+    SUBMISSION_FAILED,
+)
+
+ACTIVE_BROKER_ORDER_STATUSES: tuple[str, ...] = (
+    BROKER_ACCEPTED,
+    PARTIALLY_FILLED,
+    CANCEL_PENDING,
+)
+
+MANUAL_RECONCILIATION_STATUSES: tuple[str, ...] = (
+    SUBMITTING,
+    SUBMISSION_UNKNOWN,
+)

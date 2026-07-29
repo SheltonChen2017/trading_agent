@@ -19,6 +19,13 @@ from assistant.schemas import DecisionPacket, FindingProvenance, MarketRegime, E
 from scripts.run_personal_assistant import _print_briefing, build_parser, command_risk_check
 
 
+def test_top_level_help_renders_without_percent_format_errors():
+    help_text = build_parser().format_help()
+    assert "falls 10%" in help_text
+    assert "monitor-orders" in help_text
+    assert "readiness" in help_text
+
+
 def test_recover_stale_accepts_a_positive_stale_after_seconds():
     args = build_parser().parse_args(["recover-stale", "tp_123", "--stale-after-seconds", "600"])
     assert args.stale_after_seconds == 600

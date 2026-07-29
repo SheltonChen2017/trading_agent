@@ -148,6 +148,8 @@ def test_non_finite_numeric_fields_rejected():
     # a malformed policy file, not just a caller bug.
     numeric_fields = (
         "max_order_value",
+        "max_daily_submitted_notional",
+        "max_order_age_minutes",
         "max_stale_price_minutes",
         "max_slippage_pct",
         "max_spread_pct",
@@ -164,6 +166,16 @@ def test_non_finite_numeric_fields_rejected():
                 assert False, f"expected {field_name}={bad_value} to be rejected"
             except ValueError as exc:
                 assert field_name in str(exc), (field_name, bad_value, str(exc))
+
+
+def test_daily_order_and_open_order_caps_require_positive_integers():
+    for field_name in ("max_daily_order_count", "max_open_orders"):
+        for bad_value in (0, -1, 1.5, True):
+            try:
+                _valid_policy(**{field_name: bad_value}).validate()
+                assert False, f"expected {field_name}={bad_value!r} to be rejected"
+            except ValueError as exc:
+                assert field_name in str(exc)
 
 
 def test_non_boolean_flag_fields_rejected():

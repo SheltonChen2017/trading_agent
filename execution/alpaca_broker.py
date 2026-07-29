@@ -22,8 +22,10 @@ on purpose.
 """
 from __future__ import annotations
 
+import inspect
 import math
 import os
+from typing import Any, Callable
 
 from config import PAPER_TRADING
 from risk.execution_gate import (
@@ -55,6 +57,10 @@ class LiveTradingNotConfirmed(RuntimeError):
     """Raised when live (non-paper) trading is attempted without the explicit confirmation env var."""
 
 
+class BrokerPreflightError(RuntimeError):
+    """Raised when the account or requested asset is not execution-ready."""
+
+
 def is_configured() -> bool:
     return bool(os.environ.get("APCA_API_KEY_ID")) and bool(os.environ.get("APCA_API_SECRET_KEY"))
 
@@ -73,15 +79,114 @@ def _get_client():
     return TradingClient(key, secret, paper=PAPER_TRADING)
 
 
+def _enum_value(value: Any) -> Any:
+    return getattr(value, "value", value)
+
+
+def _optional_float(value: Any) -> float | None:
+    if value is None:
+        return None
+    parsed = float(value)
+    return parsed if math.isfinite(parsed) else None
+
+
+def _optional_iso(value: Any) -> str | None:
+    if value is None:
+        return None
+    isoformat = getattr(value, "isoformat", None)
+    return str(isoformat() if callable(isoformat) else value)
+
+
+def _normalize_order(order: Any) -> dict:
+    """Convert every broker order source into one lifecycle-complete shape."""
+    return {
+        "order_id": str(order.id),
+        "client_order_id": getattr(order, "client_order_id", None),
+        "ticker": order.symbol,
+        "shares": _optional_float(getattr(order, "qty", None)),
+        "side": str(_enum_value(getattr(order, "side", "unknown"))),
+        "type": str(_enum_value(getattr(order, "type", "unknown"))),
+        "limit_price": _optional_float(getattr(order, "limit_price", None)),
+        "notional": _optional_float(getattr(order, "notional", None)),
+        "time_in_force": (
+            str(_enum_value(order.time_in_force))
+            if getattr(order, "time_in_force", None) is not None
+            else None
+        ),
+        "status": str(_enum_value(getattr(order, "status", "unknown"))),
+        "filled_qty": _optional_float(getattr(order, "filled_qty", None)),
+        "filled_avg_price": _optional_float(getattr(order, "filled_avg_price", None)),
+        "submitted_at": _optional_iso(getattr(order, "submitted_at", None)),
+        "updated_at": _optional_iso(getattr(order, "updated_at", None)),
+        "filled_at": _optional_iso(getattr(order, "filled_at", None)),
+        "canceled_at": _optional_iso(getattr(order, "canceled_at", None)),
+        "expired_at": _optional_iso(getattr(order, "expired_at", None)),
+        "failed_at": _optional_iso(getattr(order, "failed_at", None)),
+    }
+
+
 def get_account() -> dict:
-    """Current account snapshot: equity, cash, and buying power."""
+    """Current account snapshot, including broker-side trading blocks."""
     account = _get_client().get_account()
     return {
+        "account_id": str(account.id),
+        "status": str(_enum_value(getattr(account, "status", "unknown"))),
         "equity": float(account.equity),
         "cash": float(account.cash),
         "buying_power": float(account.buying_power),
+        "trading_blocked": bool(getattr(account, "trading_blocked", False)),
+        "account_blocked": bool(getattr(account, "account_blocked", False)),
+        "trade_suspended_by_user": bool(getattr(account, "trade_suspended_by_user", False)),
+        "transfers_blocked": bool(getattr(account, "transfers_blocked", False)),
         "paper": PAPER_TRADING,
     }
+
+
+def get_asset(ticker: str) -> dict:
+    asset = _get_client().get_asset(ticker.upper())
+    return {
+        "ticker": str(asset.symbol).upper(),
+        "status": str(_enum_value(getattr(asset, "status", "unknown"))),
+        "asset_class": str(_enum_value(getattr(asset, "asset_class", "unknown"))),
+        "tradable": bool(getattr(asset, "tradable", False)),
+        "fractionable": bool(getattr(asset, "fractionable", False)),
+    }
+
+
+def assert_account_and_asset_ready(ticker: str) -> dict:
+    """Fail before submission if Alpaca says trading or the asset is blocked."""
+    account = get_account()
+    blocked = [
+        field
+        for field in ("trading_blocked", "account_blocked", "trade_suspended_by_user")
+        if account[field]
+    ]
+    if blocked:
+        raise BrokerPreflightError(
+            "Broker account is not trading-ready: " + ", ".join(blocked) + "."
+        )
+    if str(account["status"]).upper() != "ACTIVE":
+        raise BrokerPreflightError(
+            f"Broker account status is {account['status']!r}, not ACTIVE."
+        )
+    if not PAPER_TRADING:
+        expected_account_id = os.environ.get("TRADING_ASSISTANT_LIVE_ACCOUNT_ID")
+        if not expected_account_id:
+            raise LiveTradingNotConfirmed(
+                "Live account execution also requires TRADING_ASSISTANT_LIVE_ACCOUNT_ID "
+                "to be set to the exact intended Alpaca account ID."
+            )
+        if expected_account_id != account["account_id"]:
+            raise LiveTradingNotConfirmed(
+                "TRADING_ASSISTANT_LIVE_ACCOUNT_ID does not match the connected Alpaca account."
+            )
+    asset = get_asset(ticker)
+    if asset["status"].lower() != "active" or not asset["tradable"]:
+        raise BrokerPreflightError(
+            f"{asset['ticker']} is not broker-tradable "
+            f"(status={asset['status']!r}, tradable={asset['tradable']})."
+        )
+    return {"account": account, "asset": asset}
 
 
 def get_open_positions() -> list[dict]:
@@ -163,27 +268,18 @@ def find_order_by_client_id(client_order_id: str) -> dict | None:
         raise
     if order is None:
         return None
-    # Normalized representation used by assistant/execution_service.py's
-    # reconcile_submission() to verify the COMPLETE material order
-    # identity (ticker, side, shares, order type, limit price), not just
-    # ticker+side -- a prior version returned only ticker/shares/side/
-    # status, so an order under the expected client_order_id for BUY 1
-    # AAPL could reconcile a proposal for BUY 100 AAPL, or a market order
-    # could be mistaken for a limit order, purely because reconciliation
-    # never had the fields to tell them apart (GPT review, 2026-07-28).
-    return {
-        "order_id": str(order.id),
-        "client_order_id": getattr(order, "client_order_id", None),
-        "ticker": order.symbol,
-        "shares": float(order.qty) if order.qty is not None else None,
-        "side": getattr(order.side, "value", str(order.side)),
-        "type": getattr(order.type, "value", str(order.type)),
-        "limit_price": float(order.limit_price) if getattr(order, "limit_price", None) is not None else None,
-        "time_in_force": getattr(order, "time_in_force", None) and getattr(
-            order.time_in_force, "value", str(order.time_in_force)
-        ),
-        "status": getattr(order.status, "value", str(order.status)),
-    }
+    return _normalize_order(order)
+
+
+def get_order_by_id(order_id: str) -> dict | None:
+    client = _get_client()
+    try:
+        order = client.get_order_by_id(order_id)
+    except Exception as exc:
+        if getattr(exc, "status_code", None) == 404:
+            return None
+        raise
+    return None if order is None else _normalize_order(order)
 
 
 def get_open_orders() -> list[dict]:
@@ -195,25 +291,46 @@ def get_open_orders() -> list[dict]:
         from alpaca.trading.requests import GetOrdersRequest
 
         orders = client.get_orders(filter=GetOrdersRequest())
-    return [
-        {
-            "order_id": str(order.id),
-            "ticker": order.symbol,
-            "shares": float(order.qty) if order.qty is not None else None,
-            "side": getattr(order.side, "value", str(order.side)),
-            "type": getattr(order.type, "value", str(order.type)),
-            "status": getattr(order.status, "value", str(order.status)),
-            "submitted_at": order.submitted_at.isoformat() if order.submitted_at else None,
-            # Lets a caller estimate a pending order's dollar value without
-            # an extra live quote for limit/notional orders (see
-            # assistant/execution_service.py's _pending_buy_value_by_ticker,
-            # Codex review, 2026-07-27: pending buys were invisible to
-            # every exposure/concentration cap, not just the cash check).
-            "limit_price": float(order.limit_price) if getattr(order, "limit_price", None) is not None else None,
-            "notional": float(order.notional) if getattr(order, "notional", None) is not None else None,
+    return [_normalize_order(order) for order in orders]
+
+
+def cancel_order(order_id: str) -> dict:
+    """Request cancellation and return the acknowledged local transition."""
+    client = _get_client()
+    client.cancel_order_by_id(order_id)
+    return {"order_id": str(order_id), "status": "pending_cancel"}
+
+
+def run_trade_update_stream(callback: Callable[[dict], Any]) -> None:
+    """Run Alpaca's authenticated trade-update stream until interrupted."""
+    if not is_configured():
+        raise AlpacaNotConfigured(
+            "APCA_API_KEY_ID / APCA_API_SECRET_KEY are not set."
+        )
+    from alpaca.trading.stream import TradingStream
+
+    stream = TradingStream(
+        os.environ["APCA_API_KEY_ID"],
+        os.environ["APCA_API_SECRET_KEY"],
+        paper=PAPER_TRADING,
+    )
+
+    async def handle_update(update) -> None:
+        order = _normalize_order(update.order)
+        normalized = {
+            "event": str(_enum_value(getattr(update, "event", order["status"]))),
+            "event_id": getattr(update, "execution_id", None),
+            "event_at": _optional_iso(getattr(update, "timestamp", None)),
+            "fill_qty": _optional_float(getattr(update, "qty", None)),
+            "fill_price": _optional_float(getattr(update, "price", None)),
+            "order": order,
         }
-        for order in orders
-    ]
+        result = callback(normalized)
+        if inspect.isawaitable(result):
+            await result
+
+    stream.subscribe_trade_updates(handle_update)
+    stream.run()
 
 
 def submit_market_order(
@@ -249,6 +366,7 @@ def submit_market_order(
         raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
     intent = TradeIntent(ticker=ticker, shares=shares, side=side)
     verify_execution_authorization(intent, authorization)
+    assert_account_and_asset_ready(ticker)
 
     client = _get_client()
     from alpaca.trading.enums import OrderSide, TimeInForce
@@ -263,7 +381,7 @@ def submit_market_order(
             client_order_id=idempotency_key,
         )
     )
-    return {"order_id": str(order.id), "ticker": ticker, "shares": shares, "side": side, "status": str(order.status)}
+    return _normalize_order(order)
 
 
 def submit_limit_order(
@@ -296,6 +414,7 @@ def submit_limit_order(
         raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
     intent = TradeIntent(ticker=ticker, shares=shares, side=side, order_type="limit", limit_price=limit_price)
     verify_execution_authorization(intent, authorization)
+    assert_account_and_asset_ready(ticker)
 
     client = _get_client()
     from alpaca.trading.enums import OrderSide, TimeInForce
@@ -311,11 +430,4 @@ def submit_limit_order(
             client_order_id=idempotency_key,
         )
     )
-    return {
-        "order_id": str(order.id),
-        "ticker": ticker,
-        "shares": shares,
-        "side": side,
-        "limit_price": limit_price,
-        "status": str(order.status),
-    }
+    return _normalize_order(order)

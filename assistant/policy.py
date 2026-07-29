@@ -30,6 +30,10 @@ class TradingPolicy:
     max_leveraged_etf_pct: float = 0.20
     min_cash_reserve_pct: float = 0.10
     max_order_value: float = 5_000.0
+    max_daily_submitted_notional: float = 25_000.0
+    max_daily_order_count: int = 10
+    max_open_orders: int = 5
+    max_order_age_minutes: float = 30.0
     max_stale_price_minutes: float = 15.0
     max_slippage_pct: float = 1.0
     max_spread_pct: float = 0.5
@@ -45,6 +49,10 @@ class TradingPolicy:
     SUPPORTED_ORDER_TYPES = ("market", "limit")
 
     def validate(self) -> None:
+        if self.execution_mode not in ("read_only", "paper"):
+            raise ValueError(
+                f"execution_mode must be 'read_only' or 'paper', got {self.execution_mode!r}."
+            )
         percentage_fields = (
             "max_position_pct",
             "max_total_exposure_pct",
@@ -67,6 +75,23 @@ class TradingPolicy:
         # config, not just a caller bug.
         if not math.isfinite(self.max_order_value) or self.max_order_value <= 0:
             raise ValueError(f"max_order_value must be a positive, finite number, got {self.max_order_value}.")
+        if (
+            not math.isfinite(self.max_daily_submitted_notional)
+            or self.max_daily_submitted_notional <= 0
+        ):
+            raise ValueError(
+                "max_daily_submitted_notional must be a positive, finite number, "
+                f"got {self.max_daily_submitted_notional}."
+            )
+        for field_name in ("max_daily_order_count", "max_open_orders"):
+            value = getattr(self, field_name)
+            if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+                raise ValueError(f"{field_name} must be a positive integer, got {value!r}.")
+        if not math.isfinite(self.max_order_age_minutes) or self.max_order_age_minutes <= 0:
+            raise ValueError(
+                "max_order_age_minutes must be a positive, finite number, "
+                f"got {self.max_order_age_minutes}."
+            )
         if not math.isfinite(self.max_stale_price_minutes) or self.max_stale_price_minutes <= 0:
             raise ValueError(
                 f"max_stale_price_minutes must be a positive, finite number, got {self.max_stale_price_minutes}."

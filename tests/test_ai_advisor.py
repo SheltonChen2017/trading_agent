@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant import ai_advisor
@@ -306,6 +308,109 @@ def test_allows_benign_summary_with_no_ticker_dollar_or_advice_language():
     assert result is not None
 
 
+# --- Overblocking fix (independent review, fourth pass): the third pass's
+# blanket \w* verb stems (allocat\w*, target\w*, increas\w*, reduc\w*) caught
+# ordinary descriptive prose along with real advice, e.g. "This allocation is
+# concentrated in semiconductors." and "The target volatility is elevated."
+# were both wrongly rejected. Action-verb detection is now split into
+# unambiguous verbs (buy/sell/rebalance/replace), advice markers (should/
+# consider/prefer/deserve/...), and context-sensitive verbs (allocate/
+# increase/reduce/target) that only count as advice when paired with an
+# actual change-object (position/weight/exposure noun, a comparative, or a
+# percentage) nearby.
+
+def test_allows_summary_using_allocation_as_a_noun():
+    raw = {
+        "summary": "This allocation is concentrated in semiconductors.",
+        "observations": [],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    )
+    assert result is not None
+
+
+def test_allows_summary_using_target_descriptively():
+    raw = {
+        "summary": "The volatility target is based on trailing data.",
+        "observations": [],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    )
+    assert result is not None
+
+
+def test_allows_observation_describing_increased_volatility():
+    raw = {
+        "summary": "The split has differing volatility characteristics.",
+        "observations": [
+            {
+                "type": "volatility",
+                "severity": "medium",
+                "claim": "NVDA has increased volatility relative to its recent behavior.",
+                "tickers": ["NVDA"],
+            }
+        ],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {"NVDA": 2.5, "AMD": 1.5},
+    )
+    assert result is not None
+    assert len(result.observations) == 1
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "Allocate more to NVDA.",
+        "Increase the NVDA position.",
+        "Reduce AMD exposure.",
+        "Target a larger NVDA weight.",
+        "Consider increasing NVDA.",
+        "NVDA deserves a larger allocation.",
+        "Prefer NVDA over AMD.",
+        "The portfolio would benefit from more NVDA exposure.",
+    ],
+)
+def test_rejects_explicit_allocation_advice(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "RDDT would improve diversification.",
+        "ZZQZX would improve diversification.",
+        "NVDA should be 40% of the split.",
+        "AMD deserves a larger share.",
+    ],
+)
+def test_rejects_previously_reproduced_bypasses(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    ) is None
+
+
 def test_review_allocation_plan_returns_none_on_api_exception(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     with patch("anthropic.Anthropic") as mock_anthropic_cls:
@@ -494,6 +599,27 @@ if __name__ == "__main__":
     test_rejects_summary_reassigning_another_tickers_weight()
     test_rejects_summary_advice_language_without_a_number()
     test_allows_benign_summary_with_no_ticker_dollar_or_advice_language()
+    test_allows_summary_using_allocation_as_a_noun()
+    test_allows_summary_using_target_descriptively()
+    test_allows_observation_describing_increased_volatility()
+    for _summary in [
+        "Allocate more to NVDA.",
+        "Increase the NVDA position.",
+        "Reduce AMD exposure.",
+        "Target a larger NVDA weight.",
+        "Consider increasing NVDA.",
+        "NVDA deserves a larger allocation.",
+        "Prefer NVDA over AMD.",
+        "The portfolio would benefit from more NVDA exposure.",
+    ]:
+        test_rejects_explicit_allocation_advice(_summary)
+    for _summary in [
+        "RDDT would improve diversification.",
+        "ZZQZX would improve diversification.",
+        "NVDA should be 40% of the split.",
+        "AMD deserves a larger share.",
+    ]:
+        test_rejects_previously_reproduced_bypasses(_summary)
     test_review_allocation_plan_returns_none_on_api_exception(mp)
     test_suggest_similar_tickers_returns_none_when_unconfigured(mp)
     test_suggest_similar_tickers_returns_parsed_list_on_success(mp)

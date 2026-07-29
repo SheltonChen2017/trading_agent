@@ -30,7 +30,7 @@ import config
 from assistant.storage import AssistantStore
 
 _MODEL = "claude-opus-5"
-_REVIEW_ALLOCATION_PROMPT_VERSION = "review_allocation_plan.v1"
+_REVIEW_ALLOCATION_PROMPT_VERSION = "review_allocation_plan.v2"
 _SUGGEST_SIMILAR_PROMPT_VERSION = "suggest_similar_tickers.v1"
 _CURATE_RECOMMENDED_PROMPT_VERSION = "curate_recommended_tickers.v1"
 
@@ -48,14 +48,49 @@ _TICKER_TOKEN_PATTERN = re.compile(r"\b[A-Z]{1,5}\b")
 # "RDDT" all slip through silently, since UNIVERSE is a curated research
 # list and can never be a complete security master).
 _SAFE_ACRONYMS = frozenset({"ETF", "USD", "AI", "CEO", "CFO", "SEC", "IPO", "NYSE", "IRS", "GDP", "CPI", "FED", "US"})
-_ACTION_VERB_PATTERN = re.compile(
-    # Word STEMS with \w* to catch inflections (deserve/deserves/deserved,
-    # prefer/prefers/preferred, consider/considers/considering, ...) --
-    # matching only the bare infinitive missed "AMD deserves a larger
-    # share." entirely (independent review, second pass, required test).
-    r"\b(buy\w*|sell\w*|replac\w*|allocat\w*|reduc\w*|increas\w*|target\w*|rebalanc\w*|"
-    r"should|ought|prefer\w*|favor\w*|deserv\w*|consider\w*)\b"
-    r"|better mix|benefit(?:s|ed|ting)?\s+from|more exposure|less exposure",
+# Independent review, third pass: the second pass's blanket `\w*` stems
+# (allocat\w*, target\w*, increas\w*, reduc\w*) rejected ordinary descriptive
+# prose too -- "This allocation is concentrated in semiconductors.", "The
+# target volatility is elevated.", "NVDA has increased volatility." all
+# matched and were wrongly dropped. Action language is now split into three
+# tiers instead of one blanket word list:
+#   1. Unambiguous transactional verbs (buy/sell/rebalance/replace) -- these
+#      are never used descriptively in an allocation-review context, so a
+#      bare word match is safe.
+#   2. Advice/recommendation markers (should, consider, prefer, deserve, ...)
+#      -- these only ever appear when the model is giving advice, not
+#      describing a fact.
+#   3. Context-sensitive verbs (allocate/increase/reduce/target) -- these ARE
+#      used descriptively ("increased volatility", "reduced diversification",
+#      "the volatility target"), so they're only rejected when they appear
+#      near an actual allocation-change object (a position/weight/exposure
+#      noun, a comparative like "more"/"larger", or a percentage) -- i.e. an
+#      actual proposed change, not a description of the current state.
+_UNAMBIGUOUS_ACTION_PATTERN = re.compile(
+    r"\b(buy|buying|bought|sell|selling|sold|"
+    r"rebalance|rebalancing|rebalanced|replace|replacing|replaced)\b",
+    re.IGNORECASE,
+)
+_ADVICE_PATTERN = re.compile(
+    r"\b(should|ought\s+to|consider(?:ing)?|prefer(?:red|s|ring)?|"
+    r"favor(?:ed|s|ing)?|deserv(?:e|es|ed|ing)|recommend(?:ed|s|ing)?)\b",
+    re.IGNORECASE,
+)
+_ALLOCATION_CHANGE_TRIGGER = (
+    r"(?:position|weight|share|exposure|holding|allocation|"
+    r"more|less|additional|greater|smaller|larger|\d+(?:\.\d+)?\s*%)"
+)
+_ALLOCATION_ACTION_PATTERN = re.compile(
+    r"\b(?:allocate|allocating|allocated|increase|increasing|increased|"
+    r"reduce|reducing|reduced|target|targeting|targeted)\b"
+    r".{0,40}?\b" + _ALLOCATION_CHANGE_TRIGGER + r"\b",
+    re.IGNORECASE,
+)
+_EXPOSURE_ADVICE_PATTERN = re.compile(
+    r"\b(?:more|less|additional|greater|smaller|larger)\s+"
+    r"(?:exposure|weight|allocation|position|share)\b"
+    r"|better mix"
+    r"|benefit(?:s|ed|ting)?\s+from",
     re.IGNORECASE,
 )
 _MAX_SUMMARY_LENGTH = 500
@@ -232,11 +267,20 @@ def _validate_allocation_review(
 
 
 def _contains_action_language(text: str) -> bool:
-    """Rejects buy/sell/replace/allocate/reduce/increase/target/rebalance
-    language outright, independent of whether any number is present --
-    "Sell NVDA and replace it with cash" carries no percentage or dollar
-    figure at all, so the numeric check alone would never catch it."""
-    return bool(_ACTION_VERB_PATTERN.search(text))
+    """Rejects buy/sell/replace/rebalance language outright (never used
+    descriptively here), advice/recommendation markers (should/consider/
+    prefer/deserve/...), and allocate/increase/reduce/target ONLY when they
+    appear near an actual change-object (a position/weight/exposure noun, a
+    comparative like "more"/"larger", or a percentage) -- so "Sell NVDA and
+    replace it with cash" is still caught with no number present, while
+    "NVDA has increased volatility" or "The volatility target is based on
+    trailing data" are not."""
+    return bool(
+        _UNAMBIGUOUS_ACTION_PATTERN.search(text)
+        or _ADVICE_PATTERN.search(text)
+        or _ALLOCATION_ACTION_PATTERN.search(text)
+        or _EXPOSURE_ADVICE_PATTERN.search(text)
+    )
 
 
 SUGGESTION_SCHEMA = {
@@ -349,10 +393,19 @@ def review_allocation_plan(
                 "You comment on an ALREADY-COMPUTED inverse-volatility portfolio split. Return a "
                 "short summary plus 0-4 structured observations, each with a type "
                 f"({'/'.join(_ALLOWED_OBSERVATION_TYPES)}), a severity ({'/'.join(_ALLOWED_SEVERITIES)}), "
-                "a one-sentence claim, and the ticker(s) it's about. ONLY reference tickers and "
-                "weight percentages EXACTLY as given below -- never state a revised weight, a "
-                "different split, a dollar amount, or a buy/sell recommendation; every number you "
-                "write will be checked against the input and discarded if it doesn't match."
+                "a one-sentence claim, and the ticker(s) it's about (must be one of the tickers listed "
+                "below).\n\n"
+                "The summary must contain: no ticker symbols; no percentages; no dollar amounts; no "
+                "advice or portfolio-change language (nothing like buy/sell/rebalance/replace, "
+                "should/consider/prefer/deserve/recommend, or a suggested larger/smaller/increased/"
+                "reduced position, weight, or exposure). Describe the split in general terms only.\n\n"
+                "Each observation must: reference only the ticker(s) listed in its own `tickers` field; "
+                "restate only the supplied weight or volatility for those exact tickers, worded as a "
+                "fact about the CURRENT split, never a different number; describe the current "
+                "allocation (concentration, basket overlap, volatility character, diversification); "
+                "and never propose a change, an alternative weight, a purchase, a sale, or a rebalance. "
+                "Every number you write will be checked against the input and discarded if it doesn't "
+                "match; every response with advice/portfolio-change language will be discarded outright."
             ),
             messages=[{"role": "user", "content": f"Computed split:\n{detail_block}"}],
         )

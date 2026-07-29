@@ -652,10 +652,30 @@ signals/                   pluggable research signals (scanner, momentum, relati
 backtest/
   engine.py                walk-forward and dependence-aware testing
   portfolio_simulator.py   tax/slippage-aware equity-curve simulator
+  risk_metrics.py          drawdown/expected-shortfall/time-under-water/capture-ratio metrics
 strategies/                leveraged-ETF rotation research (trend_vol_rotation.py,
                             vol_target_rotation.py, kelly_rotation.py, leverage_rotation.py)
-baskets.py, config.py      overlapping ticker baskets and every other tunable knob
+baskets.py, config.py,     overlapping ticker baskets, every other tunable knob, and
+market_analytics.py        generic backward-looking primitives shared by production and research
 ```
+
+**Production vs. research** (2026-08-01): `assistant/`, `risk/execution_gate.py`,
+`execution/`, and the two entry points (`scripts/run_personal_assistant.py`,
+`scripts/personal_assistant_ui.py`) are the production surface -- the only
+code with authority to build proposals, validate them, and submit paper
+orders. `signals/`, `strategies/`, `backtest/`, and the `scripts/run_*.py`
+research scripts are the research workbench -- ideas are developed and
+rigor-tested there, and only gain production authority by being
+explicitly wired into `assistant/` (as `strategy_proposals.py`'s SOXX/SOXL
+rebalancer was) and recorded `confirmed` in `research_findings.json` --
+never automatically, and never by a rejected signal generating a buy
+proposal. `market_analytics.py` and `backtest/risk_metrics.py` are the
+two intentional exceptions: generic, network-free computation (trend
+classification, forward-return baselines, drawdown/tail-risk metrics)
+that both sides depend on, not signal logic itself. See
+`docs/ARCHITECTURE_DEBT.md` for known gaps in that boundary
+(risk-check logic still scattered across a few production files) and
+`docs/MANDATE.md` for which research directions are in-flight vs. shelved.
 
 ## Research workflow
 

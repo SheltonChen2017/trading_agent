@@ -125,6 +125,23 @@ def main():
     print("\n=== CONFIRMATION PERIOD RESULTS (after-tax/cost) ===")
     print(pd.DataFrame(results).to_string(index=False))
 
+    print(
+        "\nCAVEAT -- this table is a 6-way SELECTION, not 6 independent confirmations.\n"
+        "Each config's PARAMETERS were grid-searched on discovery only (that part is\n"
+        "clean), but the configs themselves are then compared against each other on\n"
+        "this one confirmation window. Reading off whichever row looks best makes that\n"
+        "window a selection set rather than an untouched holdout -- the same\n"
+        "multiple-comparisons surface run_defensive_carry_probe.py warns about for its\n"
+        "3 candidate weights, and the same class of error as passing too small an\n"
+        "n_tests to a significance check.\n"
+        "\n"
+        "This is not hypothetical here: config D (Kelly + one-way ratchet) won this\n"
+        "table on a single split and then FAILED walk-forward, beating baseline in only\n"
+        "1 of 3 folds (see run_kelly_ratchet_walkforward_soxx_soxl.py and memory:\n"
+        "project_kelly_ratchet_rotation). Treat a winner here as a HYPOTHESIS to send\n"
+        "to walk-forward, never as a validated result."
+    )
+
 
 if __name__ == "__main__":
     main()

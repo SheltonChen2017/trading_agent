@@ -59,6 +59,8 @@ def main():
     benchmark_df = pd.DataFrame({"close": stable_close.reindex(dates)})
 
     def run_variant(trend_lb, vol_lb, rebal_days):
+        # vol_threshold depends on vol_lookback_days, so recalibrate per variant
+        # (still discovery-only, no confirmation data used)
         vol_threshold = calibrate_threshold_from_discovery(benchmark_df, discovery_end, lookback_days=vol_lb)
         result = simulate_regime_rotation(
             stable_close, leveraged_close, stable_open, leveraged_open, vol_threshold_pct=vol_threshold,

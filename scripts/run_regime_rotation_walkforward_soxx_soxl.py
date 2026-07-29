@@ -39,6 +39,8 @@ VOL_LOOKBACK_DAYS = 60
 REBALANCE_CHECK_DAYS = 21
 BAND_PCT = 5.0
 
+# Cumulative fraction cutoffs of the full date range: fold N's discovery is
+# [0, CUTOFFS[N]) and its confirmation is [CUTOFFS[N], CUTOFFS[N+1]).
 CUTOFFS = [0.4, 0.6, 0.8, 1.0]
 
 
@@ -82,12 +84,18 @@ def main():
         best_weights = build_state_weights(best["low_vol_lev_weight"], best["high_vol_lev_weight"])
 
         confirm_dates = dates[(dates >= confirm_start) & (dates <= confirm_end)]
+        # Pass the FULL series (not just confirm slice) so trend/vol lookback
+        # has access to pre-fold history; start_date restricts what's traded.
+        # This is deliberate and NOT look-ahead: simulate_regime_rotation only
+        # ever reads backward from each traded date, and vol_threshold above
+        # was calibrated from discovery dates only.
         regime_result = simulate_regime_rotation(
             stable_close, leveraged_close, stable_open, leveraged_open, vol_threshold_pct=vol_threshold,
             state_weights=best_weights, trend_lookback_days=TREND_LOOKBACK_DAYS,
             vol_lookback_days=VOL_LOOKBACK_DAYS, rebalance_check_days=REBALANCE_CHECK_DAYS,
             band_pct=BAND_PCT, start_date=confirm_start,
         )
+        # Trim to this fold's confirm window only (simulate runs to end of full series otherwise)
         fold_series = regime_result["series"].reindex(confirm_dates)
         fold_n_trades = sum(1 for t in regime_result["trade_log"] if t["date"] in set(confirm_dates))
 

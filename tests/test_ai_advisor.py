@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant import ai_advisor
@@ -261,6 +263,420 @@ def test_review_allocation_plan_allows_claim_restating_actual_weight(monkeypatch
     assert len(result.observations) == 1
 
 
+# --- Direct _validate_allocation_review reproductions (independent review,
+# third pass: unknown-ticker detection only rejected tokens that were ALSO
+# config.UNIVERSE members, so a real-but-out-of-universe or hallucinated
+# ticker like "RDDT" read as an innocent acronym; summary percentages were
+# checked against the FULL cart pool, so a real weight could be reattached
+# to the wrong ticker in prose; "should"/"deserves"/etc. weren't in the
+# action-verb blocklist at all, or only matched the bare infinitive.)
+
+def test_rejects_summary_with_unknown_external_ticker():
+    raw = {"summary": "RDDT would improve diversification.", "observations": []}
+    result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+    assert result is None
+
+
+def test_rejects_summary_with_fabricated_ticker_symbol():
+    raw = {"summary": "ZZQZX would improve diversification.", "observations": []}
+    result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+    assert result is None
+
+
+def test_rejects_summary_reassigning_another_tickers_weight():
+    raw = {"summary": "NVDA should be 40% of the split.", "observations": []}
+    result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+    assert result is None
+
+
+def test_rejects_summary_advice_language_without_a_number():
+    cases = [
+        "NVDA ought to be smaller.",
+        "AMD deserves a larger share.",
+        "The portfolio would benefit from RDDT.",
+        "Prefer AMD over NVDA.",
+    ]
+    for summary in cases:
+        raw = {"summary": summary, "observations": []}
+        result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+        assert result is None, f"expected rejection for: {summary!r}"
+
+
+def test_allows_benign_summary_with_no_ticker_dollar_or_advice_language():
+    raw = {"summary": "This split is concentrated in semiconductors.", "observations": []}
+    result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+    assert result is not None
+
+
+# --- Overblocking fix (independent review, fourth pass): the third pass's
+# blanket \w* verb stems (allocat\w*, target\w*, increas\w*, reduc\w*) caught
+# ordinary descriptive prose along with real advice, e.g. "This allocation is
+# concentrated in semiconductors." and "The target volatility is elevated."
+# were both wrongly rejected. Action-verb detection is now split into
+# unambiguous verbs (buy/sell/rebalance/replace), advice markers (should/
+# consider/prefer/deserve/...), and context-sensitive verbs (allocate/
+# increase/reduce/target) that only count as advice when paired with an
+# actual change-object (position/weight/exposure noun, a comparative, or a
+# percentage) nearby.
+
+def test_allows_summary_using_allocation_as_a_noun():
+    raw = {
+        "summary": "This allocation is concentrated in semiconductors.",
+        "observations": [],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    )
+    assert result is not None
+
+
+def test_allows_summary_using_target_descriptively():
+    raw = {
+        "summary": "The volatility target is based on trailing data.",
+        "observations": [],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    )
+    assert result is not None
+
+
+def test_allows_observation_describing_increased_volatility():
+    raw = {
+        "summary": "The split has differing volatility characteristics.",
+        "observations": [
+            {
+                "type": "volatility",
+                "severity": "medium",
+                "claim": "NVDA has increased volatility relative to its recent behavior.",
+                "tickers": ["NVDA"],
+            }
+        ],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {"NVDA": 2.5, "AMD": 1.5},
+    )
+    assert result is not None
+    assert len(result.observations) == 1
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "Allocate more to NVDA.",
+        "Increase the NVDA position.",
+        "Reduce AMD exposure.",
+        "Target a larger NVDA weight.",
+        "Consider increasing NVDA.",
+        "NVDA deserves a larger allocation.",
+        "Prefer NVDA over AMD.",
+        "The portfolio would benefit from more NVDA exposure.",
+    ],
+)
+def test_rejects_explicit_allocation_advice(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "RDDT would improve diversification.",
+        "ZZQZX would improve diversification.",
+        "NVDA should be 40% of the split.",
+        "AMD deserves a larger share.",
+    ],
+)
+def test_rejects_previously_reproduced_bypasses(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    ) is None
+
+
+# --- Ticker-directed action + modal/passive bypass (independent review,
+# fifth pass): tier 4's trigger nouns (position/weight/share/exposure/
+# holding/allocation/comparatives/percentages) never included a bare ticker
+# symbol, so "Increase NVDA." carried no recognized trigger at all; modal/
+# passive constructions ("We can increase NVDA.", "AMD could be reduced.")
+# carried no trigger either. Also fixed: the percentage alternative had a
+# trailing \b appended after "%", which never matches (% is not a word
+# char), so "Target NVDA at 60%." silently bypassed the percent trigger too.
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "Increase NVDA.",
+        "Reduce AMD.",
+        "Allocate NVDA.",
+        "We can increase NVDA.",
+        "We could reduce AMD.",
+        "NVDA can be increased.",
+        "AMD could be reduced.",
+        "Please increase NVDA.",
+        "Increase NVDA and reduce AMD.",
+    ],
+)
+def test_rejects_ticker_directed_allocation_actions_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "claim,tickers",
+    [
+        ("Increase NVDA.", ["NVDA"]),
+        ("Reduce AMD.", ["AMD"]),
+        ("Allocate NVDA.", ["NVDA"]),
+        ("Target NVDA at 60%.", ["NVDA"]),
+        ("We can increase NVDA.", ["NVDA"]),
+        ("We could reduce AMD.", ["AMD"]),
+        ("NVDA can be increased.", ["NVDA"]),
+        ("AMD could be reduced.", ["AMD"]),
+        ("Please increase NVDA.", ["NVDA"]),
+        ("Increase NVDA and reduce AMD.", ["NVDA", "AMD"]),
+    ],
+)
+def test_rejects_ticker_directed_allocation_actions_in_observation_claim(claim, tickers):
+    raw = {
+        "summary": "The computed split has been reviewed.",
+        "observations": [
+            {"type": "concentration", "severity": "medium", "claim": claim, "tickers": tickers}
+        ],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    )
+    assert result is None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "This allocation is concentrated in semiconductors.",
+        "The volatility target is based on trailing data.",
+        "The allocation has reduced diversification.",
+    ],
+)
+def test_allows_descriptive_allocation_language_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    )
+    assert result is not None
+
+
+@pytest.mark.parametrize(
+    "claim,tickers",
+    [
+        ("NVDA has increased volatility relative to its recent behavior.", ["NVDA"]),
+        ("AMD has reduced correlation with NVDA over the sampled period.", ["AMD", "NVDA"]),
+    ],
+)
+def test_allows_descriptive_change_verbs_in_observations(claim, tickers):
+    raw = {
+        "summary": "The split has differing characteristics.",
+        "observations": [
+            {"type": "volatility", "severity": "medium", "claim": claim, "tickers": tickers}
+        ],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {"NVDA": 2.5, "AMD": 1.5},
+    )
+    assert result is not None
+    assert len(result.observations) == 1
+
+
+# --- Lowercase-ticker and action-synonym bypass (independent review, sixth
+# pass): the ticker-directed check matched ONLY exact-case tickers, so
+# "Increase nvda." bypassed it entirely (lowercase "nvda" isn't caught by
+# the unknown-ticker scanner either, since that only looks at uppercase-
+# shaped tokens -- correctly, since ordinary lowercase words shouldn't be
+# treated as tickers). And _SIZE_CHANGE_VERBS only covered allocate/
+# increase/reduce/target -- ordinary synonyms (add/raise/boost/trim/cut/
+# lower/shift/move/...) and intervening portfolio-object phrases (stake,
+# "amount invested", capital, funds, holding) were never recognized as
+# advisory triggers at all.
+
+def _obs_reject(claim, tickers):
+    raw = {
+        "summary": "The computed split has been reviewed.",
+        "observations": [
+            {"type": "concentration", "severity": "medium", "claim": claim, "tickers": tickers}
+        ],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    )
+    return result is None or len(result.observations) == 0
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "Increase nvda.",
+        "Reduce amd.",
+        "Raise Nvda.",
+        "Trim aMd.",
+    ],
+)
+def test_rejects_lowercase_or_mixed_case_ticker_instructions_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "claim,tickers",
+    [
+        ("Increase nvda.", ["NVDA"]),
+        ("Reduce amd.", ["AMD"]),
+        ("Raise Nvda.", ["NVDA"]),
+        ("Trim aMd.", ["AMD"]),
+    ],
+)
+def test_rejects_lowercase_or_mixed_case_ticker_instructions_in_observation_claim(claim, tickers):
+    assert _obs_reject(claim, tickers)
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "Raise NVDA.",
+        "Boost NVDA.",
+        "Add NVDA.",
+        "Trim AMD.",
+        "Cut AMD.",
+        "Lower AMD.",
+        "Exit AMD.",
+        "Overweight NVDA.",
+        "Underweight AMD.",
+        "Shift capital to NVDA.",
+        "Move exposure from AMD to NVDA.",
+        "Rotate from AMD into NVDA.",
+    ],
+)
+def test_rejects_action_synonyms_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "Increase our stake in NVDA.",
+        "Reduce the amount invested in AMD.",
+        "Raise the portfolio's NVDA holding.",
+        "Lower the current allocation assigned to AMD.",
+        "Move a portion of the available capital to NVDA.",
+    ],
+)
+def test_rejects_intervening_portfolio_object_phrases_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "We can raise NVDA.",
+        "NVDA could be boosted.",
+        "AMD may be trimmed.",
+        "The AMD holding might be lowered.",
+        "We could gradually add NVDA.",
+    ],
+)
+def test_rejects_modal_and_passive_action_synonyms_in_summary(summary):
+    raw = {"summary": summary, "observations": []}
+    assert ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    ) is None
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "This allocation is concentrated in semiconductors.",
+        "The volatility target is based on trailing data.",
+        "The allocation has reduced diversification.",
+    ],
+)
+def test_allows_descriptive_allocation_language_sixth_pass(summary):
+    raw = {"summary": summary, "observations": []}
+    result = ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    )
+    assert result is not None
+
+
+@pytest.mark.parametrize(
+    "claim,tickers",
+    [
+        ("NVDA has increased volatility relative to its recent behavior.", ["NVDA"]),
+        ("AMD has reduced correlation with NVDA over the sampled period.", ["AMD", "NVDA"]),
+    ],
+)
+def test_allows_descriptive_change_verbs_sixth_pass(claim, tickers):
+    assert not _obs_reject(claim, tickers)
+
+
+@pytest.mark.parametrize(
+    "summary",
+    [
+        "NVDA raised its revenue guidance.",
+        "AMD cut operating expenses.",
+        "NVDA added a new product category.",
+        "AMD lowered its reported debt.",
+    ],
+)
+def test_allows_company_business_facts_using_advisory_looking_verbs(summary):
+    # These verbs (raised/cut/added/lowered) are only advisory when they
+    # govern a ticker/portfolio-object as a proposed CHANGE TARGET -- here
+    # the ticker is the grammatical SUBJECT of a fact about the underlying
+    # business, not the object of a proposed portfolio action.
+    raw = {"summary": summary, "observations": []}
+    result = ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    )
+    assert result is not None
+
+
 def test_review_allocation_plan_returns_none_on_api_exception(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     with patch("anthropic.Anthropic") as mock_anthropic_cls:
@@ -444,6 +860,110 @@ if __name__ == "__main__":
     test_review_allocation_plan_rejects_a_different_tickers_weight_reused_as_a_number(mp)
     test_review_allocation_plan_allows_a_legitimate_volatility_restatement(mp)
     test_review_allocation_plan_allows_claim_restating_actual_weight(mp)
+    test_rejects_summary_with_unknown_external_ticker()
+    test_rejects_summary_with_fabricated_ticker_symbol()
+    test_rejects_summary_reassigning_another_tickers_weight()
+    test_rejects_summary_advice_language_without_a_number()
+    test_allows_benign_summary_with_no_ticker_dollar_or_advice_language()
+    test_allows_summary_using_allocation_as_a_noun()
+    test_allows_summary_using_target_descriptively()
+    test_allows_observation_describing_increased_volatility()
+    for _summary in [
+        "Allocate more to NVDA.",
+        "Increase the NVDA position.",
+        "Reduce AMD exposure.",
+        "Target a larger NVDA weight.",
+        "Consider increasing NVDA.",
+        "NVDA deserves a larger allocation.",
+        "Prefer NVDA over AMD.",
+        "The portfolio would benefit from more NVDA exposure.",
+    ]:
+        test_rejects_explicit_allocation_advice(_summary)
+    for _summary in [
+        "RDDT would improve diversification.",
+        "ZZQZX would improve diversification.",
+        "NVDA should be 40% of the split.",
+        "AMD deserves a larger share.",
+    ]:
+        test_rejects_previously_reproduced_bypasses(_summary)
+    for _summary in [
+        "Increase NVDA.",
+        "Reduce AMD.",
+        "Allocate NVDA.",
+        "We can increase NVDA.",
+        "We could reduce AMD.",
+        "NVDA can be increased.",
+        "AMD could be reduced.",
+        "Please increase NVDA.",
+        "Increase NVDA and reduce AMD.",
+    ]:
+        test_rejects_ticker_directed_allocation_actions_in_summary(_summary)
+    for _claim, _tickers in [
+        ("Increase NVDA.", ["NVDA"]),
+        ("Reduce AMD.", ["AMD"]),
+        ("Allocate NVDA.", ["NVDA"]),
+        ("Target NVDA at 60%.", ["NVDA"]),
+        ("We can increase NVDA.", ["NVDA"]),
+        ("We could reduce AMD.", ["AMD"]),
+        ("NVDA can be increased.", ["NVDA"]),
+        ("AMD could be reduced.", ["AMD"]),
+        ("Please increase NVDA.", ["NVDA"]),
+        ("Increase NVDA and reduce AMD.", ["NVDA", "AMD"]),
+    ]:
+        test_rejects_ticker_directed_allocation_actions_in_observation_claim(_claim, _tickers)
+    for _summary in [
+        "This allocation is concentrated in semiconductors.",
+        "The volatility target is based on trailing data.",
+        "The allocation has reduced diversification.",
+    ]:
+        test_allows_descriptive_allocation_language_in_summary(_summary)
+    for _claim, _tickers in [
+        ("NVDA has increased volatility relative to its recent behavior.", ["NVDA"]),
+        ("AMD has reduced correlation with NVDA over the sampled period.", ["AMD", "NVDA"]),
+    ]:
+        test_allows_descriptive_change_verbs_in_observations(_claim, _tickers)
+    for _summary in ["Increase nvda.", "Reduce amd.", "Raise Nvda.", "Trim aMd."]:
+        test_rejects_lowercase_or_mixed_case_ticker_instructions_in_summary(_summary)
+    for _claim, _tickers in [
+        ("Increase nvda.", ["NVDA"]),
+        ("Reduce amd.", ["AMD"]),
+        ("Raise Nvda.", ["NVDA"]),
+        ("Trim aMd.", ["AMD"]),
+    ]:
+        test_rejects_lowercase_or_mixed_case_ticker_instructions_in_observation_claim(_claim, _tickers)
+    for _summary in [
+        "Raise NVDA.", "Boost NVDA.", "Add NVDA.", "Trim AMD.", "Cut AMD.", "Lower AMD.",
+        "Exit AMD.", "Overweight NVDA.", "Underweight AMD.", "Shift capital to NVDA.",
+        "Move exposure from AMD to NVDA.", "Rotate from AMD into NVDA.",
+    ]:
+        test_rejects_action_synonyms_in_summary(_summary)
+    for _summary in [
+        "Increase our stake in NVDA.", "Reduce the amount invested in AMD.",
+        "Raise the portfolio's NVDA holding.", "Lower the current allocation assigned to AMD.",
+        "Move a portion of the available capital to NVDA.",
+    ]:
+        test_rejects_intervening_portfolio_object_phrases_in_summary(_summary)
+    for _summary in [
+        "We can raise NVDA.", "NVDA could be boosted.", "AMD may be trimmed.",
+        "The AMD holding might be lowered.", "We could gradually add NVDA.",
+    ]:
+        test_rejects_modal_and_passive_action_synonyms_in_summary(_summary)
+    for _summary in [
+        "This allocation is concentrated in semiconductors.",
+        "The volatility target is based on trailing data.",
+        "The allocation has reduced diversification.",
+    ]:
+        test_allows_descriptive_allocation_language_sixth_pass(_summary)
+    for _claim, _tickers in [
+        ("NVDA has increased volatility relative to its recent behavior.", ["NVDA"]),
+        ("AMD has reduced correlation with NVDA over the sampled period.", ["AMD", "NVDA"]),
+    ]:
+        test_allows_descriptive_change_verbs_sixth_pass(_claim, _tickers)
+    for _summary in [
+        "NVDA raised its revenue guidance.", "AMD cut operating expenses.",
+        "NVDA added a new product category.", "AMD lowered its reported debt.",
+    ]:
+        test_allows_company_business_facts_using_advisory_looking_verbs(_summary)
     test_review_allocation_plan_returns_none_on_api_exception(mp)
     test_suggest_similar_tickers_returns_none_when_unconfigured(mp)
     test_suggest_similar_tickers_returns_parsed_list_on_success(mp)

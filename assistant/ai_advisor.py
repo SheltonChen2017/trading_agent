@@ -30,7 +30,7 @@ import config
 from assistant.storage import AssistantStore
 
 _MODEL = "claude-opus-5"
-_REVIEW_ALLOCATION_PROMPT_VERSION = "review_allocation_plan.v1"
+_REVIEW_ALLOCATION_PROMPT_VERSION = "review_allocation_plan.v4"
 _SUGGEST_SIMILAR_PROMPT_VERSION = "suggest_similar_tickers.v1"
 _CURATE_RECOMMENDED_PROMPT_VERSION = "curate_recommended_tickers.v1"
 
@@ -40,7 +40,147 @@ _PERCENT_PATTERN = re.compile(r"(\d+(?:\.\d+)?)\s*%")
 _DOLLAR_PATTERN = re.compile(r"\$\s*[\d,]+(?:\.\d+)?")
 _NUMBER_TOLERANCE_PCT = 1.0  # allows "60%" to match an actual weight of 60.3% without treating it as a fabricated number
 _TICKER_TOKEN_PATTERN = re.compile(r"\b[A-Z]{1,5}\b")
-_ACTION_VERB_PATTERN = re.compile(r"\b(buy|sell|replace|allocate|reduce|increase|target|rebalance)\b", re.IGNORECASE)
+# Common all-caps acronyms that are NOT tickers -- everything else that
+# looks ticker-shaped and isn't explicitly allowed gets rejected (see
+# _mentions_unknown_ticker: independent review found that scoping the
+# reject-list to config.UNIVERSE membership let a real-but-out-of-universe
+# ticker, a newly-listed ticker, or an outright hallucinated symbol like
+# "RDDT" all slip through silently, since UNIVERSE is a curated research
+# list and can never be a complete security master).
+_SAFE_ACRONYMS = frozenset({"ETF", "USD", "AI", "CEO", "CFO", "SEC", "IPO", "NYSE", "IRS", "GDP", "CPI", "FED", "US"})
+# Independent review, third pass: the second pass's blanket `\w*` stems
+# (allocat\w*, target\w*, increas\w*, reduc\w*) rejected ordinary descriptive
+# prose too -- "This allocation is concentrated in semiconductors.", "The
+# target volatility is elevated.", "NVDA has increased volatility." all
+# matched and were wrongly dropped. Action language is now split into tiers
+# instead of one blanket word list:
+#   1. Unambiguous transactional verbs (buy/sell/purchase/exit/liquidate/
+#      replace/rebalance/rotate/overweight/underweight) -- these are never
+#      used descriptively in an allocation-review context, so a bare word
+#      match is safe regardless of context.
+#   2. Advice/recommendation markers (should, consider, prefer, deserve,
+#      recommend, "better to", "makes sense to", ...) -- these only ever
+#      appear when the model is giving advice, not describing a fact.
+#   3. Modal/passive constructions ("we can increase NVDA", "AMD could be
+#      reduced", "we could gradually add NVDA") -- these carry no noun/
+#      comparative/percentage/ticker trigger immediately adjacent, so tiers
+#      4/5 below never see them; the modal+verb combination alone is
+#      inherently advisory. A generous window after the modal word tolerates
+#      an intervening adverb or "be".
+#   4. Context-sensitive size-change verbs (allocate/increase/reduce/target/
+#      add/raise/boost/grow/enlarge/trim/cut/lower/decrease/remove/drop/
+#      shift/move) -- these ARE used descriptively ("increased volatility",
+#      "reduced diversification", "the volatility target", "NVDA raised its
+#      revenue guidance"), so they're only rejected when they appear near an
+#      actual allocation-change object (a position/weight/exposure/holding/
+#      stake/capital/funds noun, a comparative like "more"/"larger", or a
+#      percentage) -- i.e. an actual proposed change, not a description of
+#      the current state or of the underlying company's own business.
+#   5. One of those same size-change verbs directly governing one of the
+#      ALLOWED tickers as its object ("Increase NVDA.", "Target NVDA at
+#      60%.", lowercase "Increase nvda.") -- tier 4's trigger nouns don't
+#      include ticker symbols, so a bare "Increase NVDA." carries no
+#      recognized trigger at all. This is ticker-scoped and uses a SHORT
+#      (~20-char) forward window specifically to distinguish "reduce AMD"
+#      (AMD is the direct object) from "AMD has reduced correlation with
+#      NVDA over the sampled period" (NVDA is many characters away, inside
+#      an unrelated prepositional phrase) -- widening this window to tier
+#      4's 40 chars would reject that second, legitimate sentence. Ticker
+#      matching here is case-INSENSITIVE for ordinary multi-character
+#      tickers (LLM output doesn't reliably preserve ticker capitalization --
+#      "Increase nvda." must be rejected exactly like "Increase NVDA."), but
+#      a ticker of length <=2 (this project's own UNIVERSE has several: V,
+#      D, T, C, SO, GS, ...) is ambiguous with ordinary short words and only
+#      counts if written in genuine uppercase or with a $ prefix -- see
+#      _find_scoped_ticker_mention.
+_UNAMBIGUOUS_ACTION_VERBS = (
+    r"buy|buying|bought|sell|selling|sold|purchase|purchasing|purchased|"
+    r"exit|exiting|exited|liquidate|liquidating|liquidated|"
+    r"rebalance|rebalancing|rebalanced|replace|replacing|replaced|"
+    r"rotate|rotating|rotated|"
+    r"overweight|overweighting|overweighted|underweight|underweighting|underweighted"
+)
+_UNAMBIGUOUS_ACTION_PATTERN = re.compile(r"\b(" + _UNAMBIGUOUS_ACTION_VERBS + r")\b", re.IGNORECASE)
+_ADVICE_PATTERN = re.compile(
+    r"\b(should|ought\s+to|consider(?:ing)?|prefer(?:red|s|ring|able)?|"
+    r"favor(?:ed|s|ing)?|deserv(?:e|es|ed|ing)|recommend(?:ed|s|ing)?|"
+    r"better\s+to|makes?\s+sense\s+to|would\s+be\s+better|"
+    r"could\s+improve\s+the\s+portfolio\s+by)\b",
+    re.IGNORECASE,
+)
+_SIZE_CHANGE_VERBS = (
+    r"allocate|allocating|allocated|increase|increasing|increased|"
+    r"reduce|reducing|reduced|target|targeting|targeted|"
+    r"add|adding|added|raise|raising|raised|boost|boosting|boosted|"
+    r"grow|growing|grew|grown|enlarge|enlarging|enlarged|"
+    r"trim|trimming|trimmed|cut|cutting|lower|lowering|lowered|"
+    r"decrease|decreasing|decreased|remove|removing|removed|"
+    r"drop|dropping|dropped|shift|shifting|shifted|move|moving|moved"
+)
+_MODAL_ACTION_PATTERN = re.compile(
+    r"\b(?:can|could|would|might|may)\b.{0,40}?\b(?:" + _SIZE_CHANGE_VERBS +
+    r"|" + _UNAMBIGUOUS_ACTION_VERBS + r")\b",
+    re.IGNORECASE,
+)
+_ALLOCATION_CHANGE_TRIGGER = (
+    r"\b(?:positions?|holdings?|weight|allocation|exposure|shares?|stake|"
+    r"capital|funds|amount invested|portfolio percentage|"
+    r"more|less|additional|greater|smaller|larger)\b"
+    r"|\d+(?:\.\d+)?\s*%"  # no trailing \b -- "%" is not a word char, so a
+    # \b right after it never matches (the reported boundary bug)
+)
+_ALLOCATION_ACTION_PATTERN = re.compile(
+    r"\b(?:" + _SIZE_CHANGE_VERBS + r")\b"
+    r".{0,40}?(?:" + _ALLOCATION_CHANGE_TRIGGER + r")",
+    re.IGNORECASE,
+)
+_EXPOSURE_ADVICE_PATTERN = re.compile(
+    r"\b(?:more|less|additional|greater|smaller|larger)\s+"
+    r"(?:exposure|weight|allocation|position|share|stake)\b"
+    r"|better mix"
+    r"|benefit(?:s|ed|ting)?\s+from",
+    re.IGNORECASE,
+)
+_AMBIGUOUS_TICKER_MAX_LEN = 2
+_TICKER_TOKEN_SCAN_PATTERN = re.compile(r"\$?[A-Za-z]{1,10}\b")
+
+
+def _find_scoped_ticker_mention(text: str, allowed_tickers: set[str]) -> bool:
+    """True if `text` mentions one of `allowed_tickers` as a complete
+    token, matched case-insensitively for ordinary tickers. A ticker of
+    length <= _AMBIGUOUS_TICKER_MAX_LEN (e.g. "V", "T", "C", "SO", "GS" --
+    all real entries in this project's own UNIVERSE) collides with common
+    short English words, so it only counts when written in genuine
+    uppercase or with a leading "$" -- lowercase/mixed-case "so" or "it"
+    must never be treated as a ticker mention."""
+    for match in _TICKER_TOKEN_SCAN_PATTERN.finditer(text):
+        raw = match.group(0)
+        has_dollar = raw.startswith("$")
+        token = raw[1:] if has_dollar else raw
+        upper = token.upper()
+        if upper not in allowed_tickers:
+            continue
+        if len(upper) <= _AMBIGUOUS_TICKER_MAX_LEN and not has_dollar and token != upper:
+            continue
+        return True
+    return False
+
+
+def _ticker_directed_action_detected(text: str, allowed_tickers: set[str]) -> bool:
+    """True if a size-change verb directly governs one of `allowed_tickers`
+    within a short forward window ("Increase NVDA.", "Reduce amd.", "Raise
+    Nvda."). The short window (~20 chars, enough for a short filler phrase
+    like "the ", "our ", "more to ") is what distinguishes a direct object
+    from an unrelated later mention, e.g. "AMD has reduced correlation with
+    NVDA over the sampled period" -- NVDA there is well outside this window
+    and inside an unrelated prepositional phrase."""
+    if not allowed_tickers:
+        return False
+    for match in re.finditer(r"\b(?:" + _SIZE_CHANGE_VERBS + r")\b", text, re.IGNORECASE):
+        window = text[match.end():match.end() + 20]
+        if _find_scoped_ticker_mention(window, allowed_tickers):
+            return True
+    return False
 _MAX_SUMMARY_LENGTH = 500
 _MAX_CLAIM_LENGTH = 300
 
@@ -102,19 +242,31 @@ def _contains_disallowed_number(text: str, allowed_values_pct: list[float]) -> b
     return False
 
 
-def _mentions_unknown_ticker(text: str, allowed_tickers: set[str], known_tickers: set[str]) -> bool:
-    """Flags a KNOWN ticker (a real config.UNIVERSE member, or one of the
-    cart's own tickers) mentioned in free text that is NOT in the allowed
-    scope -- e.g. "Buy TSLA" in a summary about NVDA/AMD, or "TSLA would
-    diversify" hidden inside a claim whose structured `tickers` field only
-    lists NVDA (independent review: the structured `tickers` field alone
-    doesn't stop an unlisted ticker from being named in the free-text
-    `claim`/`summary`). Deliberately scoped to KNOWN tickers only, so
-    innocuous all-caps acronyms (ETF, CEO, USD) never false-positive --
-    only a real, recognizable ticker symbol can trigger this."""
-    for match in _TICKER_TOKEN_PATTERN.finditer(text.upper()):
+def _mentions_unknown_ticker(text: str, allowed_tickers: set[str]) -> bool:
+    """Flags ANY ticker-shaped token (1-5 uppercase letters) that is NOT in
+    `allowed_tickers`, except the small _SAFE_ACRONYMS allowlist -- e.g.
+    "Buy TSLA" in a summary about NVDA/AMD, or "RDDT would diversify" (a
+    real ticker that's simply not in the cart, or an outright hallucinated
+    symbol). Independent review, second pass: an earlier version only
+    rejected a token if it was ALSO a config.UNIVERSE member -- but
+    UNIVERSE is a curated ~90-ticker research list, never a complete
+    security master, so a real-but-out-of-universe ticker (or a newly
+    listed one, or a hallucinated one) slipped through as if it were an
+    innocent acronym. Being strict by default (reject unless explicitly
+    allowed or explicitly safe) is the correct default here, not being
+    lenient unless proven unsafe.
+
+    Deliberately matches against the ORIGINAL text, not text.upper() --
+    uppercasing first would turn every short, ordinary lowercase word
+    ("is", "in", "of", "on", "at", "to") into a false ticker-shaped match.
+    A genuine ticker mention in financial prose is written in real caps
+    ("NVDA", "RDDT"); this only flags tokens that are ALREADY all-caps in
+    what the model actually wrote."""
+    for match in _TICKER_TOKEN_PATTERN.finditer(text):
         token = match.group(0)
-        if token in known_tickers and token not in allowed_tickers:
+        if token in _SAFE_ACRONYMS:
+            continue
+        if token not in allowed_tickers:
             return True
     return False
 
@@ -124,35 +276,40 @@ def _validate_allocation_review(
 ) -> AllocationReview | None:
     """Enforces, in code, what the system prompt only asks for in prose.
     Beyond the original type/severity/ticker-field/number checks, this also:
-    (1) scans free text (summary AND claim) for a KNOWN ticker mentioned
-    outside its allowed scope, since a legitimate-looking `tickers` field
-    doesn't stop the prose from naming a different ticker (e.g. "Buy TSLA"
-    in the summary, or "TSLA would diversify" inside a claim tagged
-    tickers=["NVDA"]); (2) rejects action-verb language (buy/sell/replace/
-    allocate/reduce/increase/target/rebalance) outright, regardless of
-    whether a number is present; (3) scopes an observation's allowed
-    percentages to ONLY the weights/volatilities of ITS OWN tickers, not
-    every weight anywhere in the cart, so a number that's real but belongs
-    to a DIFFERENT ticker can't be smuggled in as if it applied to this
-    claim; (4) treats volatility values as legitimate restatable numbers
-    too, not just weights; (5) caps string lengths; (6) drops exact-
-    duplicate observations; (7) refuses to show a false "all clear" --
-    if the model proposed observations but every single one failed
+    (1) scans free text (summary AND claim) for ANY ticker-shaped token not
+    in the allowed scope -- not just ones that happen to be config.UNIVERSE
+    members (independent review, second pass: a real-but-out-of-universe
+    ticker, or an outright hallucinated one like "RDDT", used to slip
+    through as if it were an innocent acronym); (2) rejects action/advice
+    language outright (buy/sell/replace/allocate/reduce/increase/target/
+    rebalance/should/ought/prefer/favor/deserve/consider/"better mix"/
+    "benefit from"/"more or less exposure"), regardless of whether a
+    number is present; (3) the SUMMARY may not contain a percentage or
+    dollar figure AT ALL (independent review, second pass: allowing a
+    percentage that merely matched SOME input weight let a real weight
+    belonging to one ticker be re-stated as if it applied to a different
+    one, e.g. "NVDA should be 40%" using AMD's actual 40% weight) --
+    percentages are only ever trustworthy when scoped to a specific
+    ticker, which only an observation's own `tickers` field can establish;
+    (4) scopes an OBSERVATION's allowed percentages to ONLY the weights/
+    volatilities of ITS OWN tickers, never every weight anywhere in the
+    cart; (5) treats volatility values as legitimate restatable numbers
+    too, not just weights; (6) caps string lengths; (7) drops exact-
+    duplicate observations; (8) refuses to show a false "all clear" -- if
+    the model proposed observations but every single one failed
     validation, the whole response is rejected rather than displaying just
     the summary as if nothing was flagged."""
     volatilities = volatilities or {}
     cart_set = {t.upper() for t in cart_tickers}
-    known_tickers = set(config.UNIVERSE) | cart_set
-    all_weights = list(weights_pct.values())
-    all_volatilities = [v for v in volatilities.values() if v is not None]
 
     summary = raw.get("summary")
     if (
         not isinstance(summary, str)
         or len(summary) > _MAX_SUMMARY_LENGTH
-        or _contains_disallowed_number(summary, all_weights + all_volatilities)
-        or _mentions_unknown_ticker(summary, cart_set, known_tickers)
-        or _contains_action_language(summary)
+        or _PERCENT_PATTERN.search(summary)
+        or _DOLLAR_PATTERN.search(summary)
+        or _mentions_unknown_ticker(summary, cart_set)
+        or _contains_action_language(summary, cart_set)
     ):
         return None
 
@@ -178,9 +335,9 @@ def _validate_allocation_review(
         ]
         if _contains_disallowed_number(claim, obs_allowed_numbers):
             continue
-        if _mentions_unknown_ticker(claim, set(obs_tickers), known_tickers):
+        if _mentions_unknown_ticker(claim, set(obs_tickers)):
             continue
-        if _contains_action_language(claim):
+        if _contains_action_language(claim, set(obs_tickers)):
             continue
         dedup_key = (obs_type, severity, obs_tickers, claim)
         if dedup_key in seen:
@@ -197,12 +354,34 @@ def _validate_allocation_review(
     return AllocationReview(summary=summary, observations=tuple(kept_observations))
 
 
-def _contains_action_language(text: str) -> bool:
-    """Rejects buy/sell/replace/allocate/reduce/increase/target/rebalance
-    language outright, independent of whether any number is present --
-    "Sell NVDA and replace it with cash" carries no percentage or dollar
-    figure at all, so the numeric check alone would never catch it."""
-    return bool(_ACTION_VERB_PATTERN.search(text))
+def _contains_action_language(text: str, allowed_tickers: set[str]) -> bool:
+    """Rejects buy/sell/purchase/exit/liquidate/replace/rebalance/rotate/
+    over-or-underweight language outright (never used descriptively here),
+    advice/recommendation markers (should/consider/prefer/deserve/"better
+    to"/"makes sense to"/...), modal/passive constructions ("we can increase
+    NVDA", "AMD could be reduced", "we could gradually add NVDA"), a size-
+    change verb (allocate/increase/reduce/target/add/raise/boost/trim/cut/
+    lower/...) when it appears near an actual change-object (a position/
+    weight/exposure/holding/stake/capital/funds noun, a comparative like
+    "more"/"larger", or a percentage), AND a size-change verb when one of
+    `allowed_tickers` appears as its direct object within a short window,
+    matched case-insensitively ("Increase NVDA.", "Increase nvda.", "Target
+    NVDA at 60%.") -- so "Sell NVDA and replace it with cash" is still
+    caught with no number present, "We can increase NVDA." is caught with no
+    trigger noun present, "Raise NVDA." / "Trim AMD." / "Increase nvda." are
+    caught with no ticker-independent trigger at all, while "NVDA has
+    increased volatility", "AMD has reduced correlation with NVDA over the
+    sampled period", and "NVDA raised its revenue guidance" are not (the
+    ticker/verb ordering or distance there means the ticker is never the
+    verb's direct object within the short window)."""
+    return bool(
+        _UNAMBIGUOUS_ACTION_PATTERN.search(text)
+        or _ADVICE_PATTERN.search(text)
+        or _MODAL_ACTION_PATTERN.search(text)
+        or _ALLOCATION_ACTION_PATTERN.search(text)
+        or _EXPOSURE_ADVICE_PATTERN.search(text)
+        or _ticker_directed_action_detected(text, allowed_tickers)
+    )
 
 
 SUGGESTION_SCHEMA = {
@@ -315,10 +494,19 @@ def review_allocation_plan(
                 "You comment on an ALREADY-COMPUTED inverse-volatility portfolio split. Return a "
                 "short summary plus 0-4 structured observations, each with a type "
                 f"({'/'.join(_ALLOWED_OBSERVATION_TYPES)}), a severity ({'/'.join(_ALLOWED_SEVERITIES)}), "
-                "a one-sentence claim, and the ticker(s) it's about. ONLY reference tickers and "
-                "weight percentages EXACTLY as given below -- never state a revised weight, a "
-                "different split, a dollar amount, or a buy/sell recommendation; every number you "
-                "write will be checked against the input and discarded if it doesn't match."
+                "a one-sentence claim, and the ticker(s) it's about (must be one of the tickers listed "
+                "below).\n\n"
+                "The summary must contain: no ticker symbols; no percentages; no dollar amounts; no "
+                "advice or portfolio-change language (nothing like buy/sell/rebalance/replace, "
+                "should/consider/prefer/deserve/recommend, or a suggested larger/smaller/increased/"
+                "reduced position, weight, or exposure). Describe the split in general terms only.\n\n"
+                "Each observation must: reference only the ticker(s) listed in its own `tickers` field; "
+                "restate only the supplied weight or volatility for those exact tickers, worded as a "
+                "fact about the CURRENT split, never a different number; describe the current "
+                "allocation (concentration, basket overlap, volatility character, diversification); "
+                "and never propose a change, an alternative weight, a purchase, a sale, or a rebalance. "
+                "Every number you write will be checked against the input and discarded if it doesn't "
+                "match; every response with advice/portfolio-change language will be discarded outright."
             ),
             messages=[{"role": "user", "content": f"Computed split:\n{detail_block}"}],
         )

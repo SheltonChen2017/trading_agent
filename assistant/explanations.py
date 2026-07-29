@@ -32,6 +32,7 @@ def explain_ticker(
     portfolio: PortfolioSnapshot | None = None,
     lookback_days: int = 300,
     market_regime: MarketRegime | None = None,
+    data: dict | None = None,
 ) -> dict:
     """
     Returns a plain, JSON-serializable dict explaining a ticker's current
@@ -42,9 +43,18 @@ def explain_ticker(
     Pass `market_regime` (e.g. reused from the same DecisionPacket) to
     avoid an extra benchmark data fetch when explaining several tickers
     in one session — computed fresh via build_market_regime() otherwise.
+
+    Pass `data` (a {ticker: DataFrame} mapping, as returned by
+    fetch_historical) when the caller has ALREADY fetched this ticker's
+    history, to avoid re-fetching it here. `lookback_days` is then unused.
+    The Streamlit Briefing tab's per-holding panel does exactly this: it
+    needs the same history for its own trend/volatility figures, so
+    without this parameter every held position cost two separate yfinance
+    round-trips instead of one.
     """
     ticker = ticker.upper()
-    data = fetch_historical([ticker], lookback_days=lookback_days)
+    if data is None:
+        data = fetch_historical([ticker], lookback_days=lookback_days)
 
     triggered = []
     if ticker in data and not data[ticker].empty:

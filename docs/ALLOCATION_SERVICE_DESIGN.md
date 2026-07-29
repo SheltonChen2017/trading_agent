@@ -142,6 +142,6 @@ below — it would not need its own allocation logic.
 
 ## Change control
 
-- **2026-08-01** — initial design, written alongside the
+- **2026-07-28** — initial design, written alongside the
   `strategy_evaluations` storage addition. Not implemented beyond that
   one table/wiring.

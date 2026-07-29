@@ -659,7 +659,7 @@ baskets.py, config.py,     overlapping ticker baskets, every other tunable knob,
 market_analytics.py        generic backward-looking primitives shared by production and research
 ```
 
-**Production vs. research** (2026-08-01): `assistant/`, `risk/execution_gate.py`,
+**Production vs. research** (2026-07-28): `assistant/`, `risk/execution_gate.py`,
 `execution/`, and the two entry points (`scripts/run_personal_assistant.py`,
 `scripts/personal_assistant_ui.py`) are the production surface -- the only
 code with authority to build proposals, validate them, and submit paper

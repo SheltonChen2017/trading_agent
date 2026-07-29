@@ -11,7 +11,7 @@ from __future__ import annotations
 import numpy as np
 import pandas as pd
 
-from config import INVERSE_LEVERAGED_ETF_TICKERS, LEVERAGED_ETF_UNDERLYING
+from config import BASKETS, INVERSE_LEVERAGED_ETF_TICKERS, LEVERAGED_ETF_UNDERLYING
 from data.market_data import fetch_historical
 from assistant.policy import TradingPolicy
 from assistant.schemas import PortfolioSnapshot, RiskExposure
@@ -28,7 +28,7 @@ def check_concentration(risk: RiskExposure, basket_name: str | None = None) -> s
     concentration_warnings uses fixed informational thresholds (see
     context_builder.build_risk_exposure()), not the active TradingPolicy's
     real numeric caps. A position can be well under this function's
-    threshold while still breaching the policy (GPT review, 2026-08-01,
+    threshold while still breaching the policy (GPT review, 2026-07-28,
     reproduced: a 10% position with a 5% policy cap reported "no
     concentration warnings" here while proposal generation would flag it).
     Use check_policy_compliance() for an actual policy-bound answer.
@@ -57,7 +57,7 @@ def find_correlated_clusters(snapshot: PortfolioSnapshot) -> list[str]:
 
     Inverse (bear) leveraged ETFs -- e.g. SPXU vs. SPY -- are excluded:
     they move OPPOSITE their underlying, so holding both is a partial
-    HEDGE, not a duplicated same-direction bet (GPT review, 2026-08-01:
+    HEDGE, not a duplicated same-direction bet (GPT review, 2026-07-28:
     reproduced SPY+SPXU being wrongly described as "one amplified SPY
     bet").
     """
@@ -142,36 +142,71 @@ def estimate_stress_impact(
     return result
 
 
-def check_policy_compliance(portfolio: PortfolioSnapshot, risk: RiskExposure, policy: TradingPolicy) -> list[str]:
+def check_policy_compliance(portfolio: PortfolioSnapshot, policy: TradingPolicy) -> list[str]:
     """
     Compares ACTUAL exposure against the active TradingPolicy's real
-    numeric limits (max_position_pct/max_basket_pct/max_leveraged_etf_pct)
-    -- unlike check_concentration(), which uses fixed informational
-    thresholds unrelated to any policy. GPT review, 2026-08-01: reproduced
-    a 10% AAPL position reporting "no concentration warnings" from
-    check_concentration() while the active policy's 5% max_position_pct
-    would make it a real proposal-generation trigger -- this function
-    closes that gap by checking the same numeric caps
-    generate_risk_reduction_proposals() uses.
+    numeric limits -- position, basket, leveraged-ETF, TOTAL exposure, and
+    MINIMUM cash reserve -- unlike check_concentration(), which uses fixed
+    informational thresholds unrelated to any policy.
+
+    Computes every percentage directly from PortfolioSnapshot, NEVER from
+    RiskExposure's display fields (GPT review, 2026-07-28, reproduced: a
+    40.04% basket exposure against a 40% policy limit rounded to 40.0% in
+    RiskExposure.basket_exposure_pct -- build_risk_exposure() rounds to 1
+    decimal for display -- and silently evaded this check; same class of
+    bug assistant/proposals.py's total-exposure remediation already fixed
+    for proposal generation on 2026-07-31, for the same reason: a true
+    exposure just above a boundary can round DOWN to exactly the limit).
+    Also previously missing max_total_exposure_pct and min_cash_reserve_pct
+    entirely (reproduced: a 60%-invested portfolio against a 50% total-
+    exposure cap reported no violation) -- both now checked, matching the
+    full set of caps assistant/proposals.py and risk/execution_gate.py
+    already enforce.
     """
-    violations = []
-    if portfolio.total_equity > 0:
-        for position in portfolio.positions:
-            pct = position.market_value / portfolio.total_equity * 100
-            if pct > policy.max_position_pct * 100:
-                violations.append(
-                    f"{position.ticker} is {pct:.1f}% of equity, exceeding the policy's "
-                    f"max_position_pct limit of {policy.max_position_pct * 100:.1f}%."
-                )
-    for basket, pct in risk.basket_exposure_pct.items():
+    violations: list[str] = []
+    total = portfolio.total_equity
+    if total <= 0:
+        return violations
+
+    for position in portfolio.positions:
+        pct = position.market_value / total * 100
+        if pct > policy.max_position_pct * 100:
+            violations.append(
+                f"{position.ticker} is {pct:.2f}% of equity, exceeding the policy's "
+                f"max_position_pct limit of {policy.max_position_pct * 100:.1f}%."
+            )
+
+    for basket_name, basket_tickers in BASKETS.items():
+        basket_value = sum(p.market_value for p in portfolio.positions if p.ticker in basket_tickers)
+        if basket_value <= 0:
+            continue
+        pct = basket_value / total * 100
         if pct > policy.max_basket_pct * 100:
             violations.append(
-                f"Basket '{basket}' is {pct}% of equity, exceeding the policy's "
+                f"Basket '{basket_name}' is {pct:.2f}% of equity, exceeding the policy's "
                 f"max_basket_pct limit of {policy.max_basket_pct * 100:.1f}%."
             )
-    if risk.leveraged_etf_exposure_pct > policy.max_leveraged_etf_pct * 100:
+
+    leveraged_value = sum(p.market_value for p in portfolio.positions if p.is_leveraged_etf)
+    leveraged_pct = leveraged_value / total * 100
+    if leveraged_pct > policy.max_leveraged_etf_pct * 100:
         violations.append(
-            f"Leveraged-ETF exposure is {risk.leveraged_etf_exposure_pct}%, exceeding the policy's "
+            f"Leveraged-ETF exposure is {leveraged_pct:.2f}% of equity, exceeding the policy's "
             f"max_leveraged_etf_pct limit of {policy.max_leveraged_etf_pct * 100:.1f}%."
         )
+
+    invested_pct = sum(p.market_value for p in portfolio.positions) / total * 100
+    if invested_pct > policy.max_total_exposure_pct * 100:
+        violations.append(
+            f"Total invested exposure is {invested_pct:.2f}% of equity, exceeding the policy's "
+            f"max_total_exposure_pct limit of {policy.max_total_exposure_pct * 100:.1f}%."
+        )
+
+    cash_pct = portfolio.cash / total * 100
+    if cash_pct < policy.min_cash_reserve_pct * 100:
+        violations.append(
+            f"Cash reserve is {cash_pct:.2f}% of equity, below the policy's "
+            f"min_cash_reserve_pct minimum of {policy.min_cash_reserve_pct * 100:.1f}%."
+        )
+
     return violations

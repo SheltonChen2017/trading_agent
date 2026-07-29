@@ -447,7 +447,7 @@ def test_prune_decision_packets_never_touches_proposals_or_broker_orders():
 
 
 # --- strategy_evaluations table (docs/ALLOCATION_SERVICE_DESIGN.md,
-# 2026-08-01): persisted "last evaluated" bookkeeping for strategy
+# 2026-07-28): persisted "last evaluated" bookkeeping for strategy
 # proposal generators, closing a gap assistant/strategy_proposals.py's
 # generate_soxx_soxl_rebalance_proposals() already documented.
 

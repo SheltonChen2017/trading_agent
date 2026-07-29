@@ -426,7 +426,7 @@ def test_relied_upon_finding_confirmed_and_reproduced_is_not_broken_or_non_autho
         strategy_proposals.KNOWN_FINDINGS = original
 
 
-# --- store=... wiring (docs/ALLOCATION_SERVICE_DESIGN.md, 2026-08-01):
+# --- store=... wiring (docs/ALLOCATION_SERVICE_DESIGN.md, 2026-07-28):
 # records "this strategy was evaluated" regardless of whether a proposal
 # actually fired.
 

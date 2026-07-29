@@ -518,7 +518,7 @@ class AssistantStore:
     def record_strategy_evaluation(self, strategy_key: str, evaluated_at: str, result: dict[str, Any]) -> None:
         """Persists "this strategy was checked at this time, with this
         outcome" -- pure bookkeeping, no enforcement (docs/
-        ALLOCATION_SERVICE_DESIGN.md, 2026-08-01). Closes a gap
+        ALLOCATION_SERVICE_DESIGN.md, 2026-07-28). Closes a gap
         assistant/strategy_proposals.py's generate_soxx_soxl_rebalance_
         proposals() already documented: its backtest assumed a fixed
         ~21-trading-day check counter, but the live version had no

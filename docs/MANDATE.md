@@ -113,6 +113,6 @@ targets in §2 change, so revisions are visible, not silent edits.
 
 - **2026-07-28** — initial draft, all §2 targets marked DRAFT pending
   user revision.
-- **2026-08-01** — §5 cross-links `docs/ALLOCATION_SERVICE_DESIGN.md`
+- **2026-07-28** — §5 cross-links `docs/ALLOCATION_SERVICE_DESIGN.md`
   (a new gap raised in a later review, not one of the original four
   sleeves); no §2 target changes.

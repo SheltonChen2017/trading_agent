@@ -7,7 +7,7 @@ NOT inside assistant/ (would force research code to import from the
 production layer to re-export its own helper) or data/ (every existing
 data/* module fetches over the network; these functions are pure
 computation on already-fetched data). docs/ARCHITECTURE_DEBT.md, item 5
-(2026-08-01): assistant/stock_lookup.py used to import
+(2026-07-28): assistant/stock_lookup.py used to import
 run_baseline_forward_returns from backtest/engine.py just to compute
 holding-period ranges, which transitively pulled in
 `from signals.scanner import scan_dips_and_ups` (backtest/engine.py's own

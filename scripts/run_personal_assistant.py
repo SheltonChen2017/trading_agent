@@ -118,7 +118,7 @@ def command_risk_check(args, store: AssistantStore) -> None:
         raise SystemExit("--benchmark and --move-pct must be given together, or not at all.")
     policy = load_policy(args.policy)
     packet = _packet(include_events=False)
-    violations = check_policy_compliance(packet.portfolio, packet.risk, policy)
+    violations = check_policy_compliance(packet.portfolio, policy)
     for violation in violations:
         print(f"  POLICY VIOLATION: {violation}")
     print("Informational summary (not a policy-compliance check -- see any POLICY VIOLATION lines above):")

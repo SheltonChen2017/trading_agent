@@ -100,7 +100,7 @@ LEVERAGED_ETF_UNDERLYING = {
 # OPPOSITE their underlying, so holding both, e.g., SPY and SPXU is a
 # partial HEDGE, not a duplicated same-direction bet the way SPY+UPRO is.
 # assistant/risk_copilot.py's find_correlated_clusters() excludes these
-# from its "hidden duplication" warning (GPT review, 2026-08-01: SPXU was
+# from its "hidden duplication" warning (GPT review, 2026-07-28: SPXU was
 # reproduced being described as "one amplified SPY bet," which is wrong
 # in the opposite direction of what the warning claims).
 INVERSE_LEVERAGED_ETF_TICKERS = {"SQQQ", "QID", "SOXS", "SPXU", "SDS", "TZA"}

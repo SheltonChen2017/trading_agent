@@ -759,9 +759,17 @@ with tab_briefing:
     else:
         st.caption("No basket exposure -- no positions held.")
 
-    for policy_violation in check_policy_compliance(packet.portfolio, packet.risk, policy):
+    for policy_violation in check_policy_compliance(packet.portfolio, policy):
         st.error(f"Policy violation: {policy_violation}")
-    st.caption("Informational summary (not a policy-compliance check -- see any policy violations above): " + check_concentration(packet.risk))
+    if not packet.risk.concentration_warnings:
+        # Only show this caption in the "all clear" case -- when
+        # concentration_warnings IS non-empty, its content already appears
+        # once in the "Warnings" section below (packet.warnings includes
+        # risk.concentration_warnings verbatim, see context_builder.py) and
+        # once as a Policy violation above if it also breaches the active
+        # policy; showing it a third time here via check_concentration()
+        # was pure duplication (GPT review, 2026-07-28, reproduced).
+        st.caption("Informational summary (not a policy-compliance check): " + check_concentration(packet.risk))
     for cluster_warning in find_correlated_clusters(packet.portfolio):
         st.warning(cluster_warning)
     with st.expander("Stress test"):

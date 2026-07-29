@@ -43,7 +43,22 @@ _ACCEPTED = {
     "suspended",
 }
 _PARTIAL = {"partially_filled"}
-_CANCEL_PENDING = {"pending_cancel", "pending_replace", "replaced"}
+_CANCEL_PENDING = {"pending_cancel", "pending_replace"}
+# "replaced" is NOT cancel-pending. It is terminal for THIS order id -- the
+# replacement is a separate order with its own id -- so treating it as
+# cancel-pending left the proposal waiting forever on a state that can never
+# change, while the replacement (which reconciliation was not looking for)
+# could go on to fill. This project never calls replace_order itself, so a
+# replaced status can only come from an out-of-band actor (the Alpaca UI or
+# another tool), which means the assistant genuinely does not know the
+# authoritative order any more: exactly SUBMISSION_UNKNOWN's meaning, and it
+# is in readiness.CRITICAL_UNRESOLVED_STATUSES so readiness goes not-ready and
+# a human resolves it. order_reconciler._proposal_for_update() additionally
+# follows the chain via the order's `replaces` field, so an EQUIVALENT
+# replacement is still matched to its proposal and a non-equivalent one trips
+# the identity-mismatch kill switch instead of being silently ignored
+# (GPT review, 2026-07-29).
+_REPLACED = {"replaced"}
 _FILLED = {"filled"}
 _CANCELED = {"canceled"}
 _REJECTED = {"rejected"}
@@ -60,6 +75,15 @@ _PRE_BROKER = (
 
 
 def _expected_current_statuses(new_status: str) -> tuple[str, ...]:
+    if new_status == SUBMISSION_UNKNOWN:
+        # Reachable from any LIVE broker state, not just the pre-broker ones:
+        # an order already accepted/partially filled/cancel-pending can become
+        # authoritatively unknown (e.g. an out-of-band `replaced` -- see the
+        # _REPLACED note below). Without this case the conditional UPDATE
+        # would find no matching row and the transition would silently no-op,
+        # leaving the proposal parked in its old state -- the exact failure
+        # the replaced-order fix exists to remove.
+        return _PRE_BROKER + (BROKER_ACCEPTED, PARTIALLY_FILLED, CANCEL_PENDING)
     if new_status == BROKER_ACCEPTED:
         return _PRE_BROKER + (BROKER_ACCEPTED,)
     if new_status == PARTIALLY_FILLED:
@@ -117,6 +141,8 @@ def proposal_status_for_order(order: dict[str, Any]) -> str:
         return PARTIALLY_FILLED
     if status in _CANCEL_PENDING:
         return CANCEL_PENDING
+    if status in _REPLACED:
+        return SUBMISSION_UNKNOWN
     if status in _CANCELED:
         return CANCELED
     if status in _REJECTED:

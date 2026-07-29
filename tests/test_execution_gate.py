@@ -928,3 +928,55 @@ if __name__ == "__main__":
     test_nan_shares_does_not_crash_other_checks()
     test_naive_price_timestamp_with_aware_now_is_treated_as_eastern()
     print("All execution gate tests passed.")
+
+
+def test_buy_limit_order_is_priced_at_its_limit_not_the_cheaper_quote():
+    """A buy limit can fill anywhere up to its limit price, so every dollar cap
+    must be priced at the limit, not the current quote. Regression: a $5,000
+    max-order-value cap approved a $4,990 quoted notional whose permitted fill
+    was $5,039 (GPT review, 2026-07-29)."""
+    snapshot = _snapshot(cash=1_000_000.0)
+    intent = TradeIntent(
+        ticker="KO", side="buy", shares=100, order_type="limit", limit_price=50.39,
+    )
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=49.90,
+        max_order_value=5_000.0, now=_MARKET_HOURS_WEEKDAY,
+    )
+    assert result.approved is False, (
+        "100 shares at the $50.39 limit is $5,039 and must breach a $5,000 cap even though "
+        "the $49.90 quote makes it look like $4,990."
+    )
+    assert any("5,039" in v for v in result.violations), result.violations
+
+
+def test_sell_limit_order_is_not_repriced_upward():
+    """A sell limit fills at its limit or BETTER, so the quote never understates
+    it -- and pricing sells at a worst case could newly block an
+    exposure-reducing order, which this gate must never do."""
+    snapshot = build_portfolio_snapshot(
+        [{"ticker": "KO", "shares": 100, "entry_price": 40.0, "current_price": 49.90}],
+        cash=1_000_000.0,
+    )
+    intent = TradeIntent(
+        ticker="KO", side="sell", shares=100, order_type="limit", limit_price=50.39,
+    )
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=49.90,
+        max_order_value=5_000.0, now=_MARKET_HOURS_WEEKDAY,
+    )
+    assert result.approved is True, result.violations
+
+
+def test_market_order_pricing_is_unchanged_by_a_stale_limit_price():
+    """order_type='market' must ignore limit_price entirely, so the worst-case
+    helper can never inflate a market order's risk."""
+    snapshot = _snapshot(cash=1_000_000.0)
+    intent = TradeIntent(
+        ticker="KO", side="buy", shares=100, order_type="market", limit_price=999.0,
+    )
+    result = validate_trade_intent(
+        intent, snapshot, reference_price=49.90,
+        max_order_value=5_000.0, now=_MARKET_HOURS_WEEKDAY,
+    )
+    assert result.approved is True, result.violations

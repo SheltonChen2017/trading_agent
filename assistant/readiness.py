@@ -110,9 +110,16 @@ def transaction_readiness(
     active = store.list_proposals_by_statuses(ACTIVE_ORDER_STATUSES)
     checks.append(
         _check(
+            # `<`, not `<=`: readiness answers "can ANOTHER order be
+            # submitted right now", and execution_service refuses at
+            # `len(open_orders) >= policy.max_open_orders`. With `<=` this
+            # reported ready=True at a full budget (1 active, cap 1) while
+            # execution would correctly refuse -- readiness must not promise
+            # what the gate will deny (GPT review, 2026-07-29).
             "active_order_budget",
-            len(active) <= policy.max_open_orders,
-            f"{len(active)} active assistant order(s); cap={policy.max_open_orders}.",
+            len(active) < policy.max_open_orders,
+            f"{len(active)} active assistant order(s); cap={policy.max_open_orders} "
+            f"(room for {max(0, policy.max_open_orders - len(active))} more).",
         )
     )
 
@@ -181,9 +188,15 @@ def transaction_readiness(
             open_orders = broker_module.get_open_orders()
             checks.append(
                 _check(
+                    # Same off-by-one as active_order_budget above -- this
+                    # second site was not in the review but has the identical
+                    # defect, and execution_service counts BROKER open orders
+                    # (not assistant rows) for its own >= refusal, so this is
+                    # the check that actually mirrors the gate.
                     "broker_open_order_budget",
-                    len(open_orders) <= policy.max_open_orders,
-                    f"{len(open_orders)} broker open order(s); cap={policy.max_open_orders}.",
+                    len(open_orders) < policy.max_open_orders,
+                    f"{len(open_orders)} broker open order(s); cap={policy.max_open_orders} "
+                    f"(room for {max(0, policy.max_open_orders - len(open_orders))} more).",
                 )
             )
         except Exception as exc:

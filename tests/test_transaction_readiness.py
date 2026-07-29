@@ -399,3 +399,186 @@ def test_database_backup_is_consistent_and_cannot_target_the_live_database():
             assert False, "expected same-file backup to fail"
         except ValueError:
             pass
+
+
+def test_readiness_is_not_ready_when_the_open_order_budget_is_exactly_full():
+    """Readiness answers "can ANOTHER order be submitted", and
+    execution_service refuses at `>= max_open_orders`. With `<=` here,
+    readiness reported ready=True at a full budget while execution would
+    correctly refuse (GPT review, 2026-07-29)."""
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        now = datetime(2026, 7, 29, 15, 0, tzinfo=timezone.utc)
+        store.set_system_state(
+            "last_order_reconciliation",
+            {"at": now.isoformat(), "checked": 0, "updated": 0, "error_count": 0},
+        )
+        policy = TradingPolicy(
+            version="test", name="test", execution_mode="paper", max_open_orders=1,
+        )
+        # No active orders yet -> ready.
+        assert transaction_readiness(store, policy, now=now, check_broker=False)["ready"] is True
+
+        store.save_proposal(_proposal(status="broker_accepted", proposal_id="tp-active"))
+        report = transaction_readiness(store, policy, now=now, check_broker=False)
+        budget = next(c for c in report["checks"] if c["name"] == "active_order_budget")
+        assert budget["ok"] is False, (
+            "1 active order against a cap of 1 leaves no room for another order, so readiness "
+            "must not report ready."
+        )
+        assert report["ready"] is False
+        assert "room for 0 more" in budget["detail"]
+
+
+def test_a_replaced_order_becomes_submission_unknown_not_cancel_pending():
+    """`replaced` is terminal for that order id -- the replacement is a
+    separate order. Treating it as cancel-pending parked the proposal forever
+    on a state that could never change while the replacement might fill
+    (GPT review, 2026-07-29)."""
+    from assistant.order_lifecycle import proposal_status_for_order
+    from assistant.proposal_status import SUBMISSION_UNKNOWN
+
+    assert proposal_status_for_order(_order("replaced")) == SUBMISSION_UNKNOWN
+    # pending_replace is genuinely still in-flight and stays cancel-pending.
+    assert proposal_status_for_order(_order("pending_replace")) == "cancel_pending"
+
+
+def test_a_replaced_order_actually_transitions_a_live_proposal():
+    """The status mapping alone is not enough: SUBMISSION_UNKNOWN also has to
+    be a LEGAL transition out of broker_accepted, or the conditional update
+    silently no-ops and the proposal stays parked anyway."""
+    from assistant.proposal_status import SUBMISSION_UNKNOWN
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal(status="broker_accepted"))
+        journal_broker_order_update(
+            store, "tp-ready", _order("replaced"), event_type="replaced",
+        )
+        assert store.get_proposal("tp-ready")["status"] == SUBMISSION_UNKNOWN
+
+
+def test_reconciliation_follows_the_replacement_chain_to_the_original_proposal():
+    """A replacement arrives with a NEW order id and client_order_id, so
+    neither existing lookup could find the proposal it superseded and the
+    update was dropped. `replaces` carries the original order id."""
+    from assistant.order_reconciler import _proposal_for_update
+
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal(status="broker_accepted"))
+        # Register the ORIGINAL order against the proposal.
+        journal_broker_order_update(
+            store, "tp-ready", _order("accepted"), event_type="accepted",
+        )
+
+        replacement = _order("accepted")
+        replacement["order_id"] = "order-2"
+        replacement["client_order_id"] = "some-other-client-id"
+        replacement["replaces"] = "order-1"
+
+        found = _proposal_for_update(store, replacement)
+        assert found is not None, (
+            "the replacement must resolve back to the proposal it superseded via `replaces`"
+        )
+        assert found["proposal_id"] == "tp-ready"
+
+
+def test_stop_event_interrupts_a_healthy_connected_stream_promptly():
+    """monitor_orders() used to call the blocking stream on its own thread, so
+    a HEALTHY stream made stop_event unable to interrupt shutdown at all -- a
+    stop requested at 0.05s did not return until the stream ended (GPT review,
+    2026-07-29). The stream now runs on its own thread."""
+    import time
+    from threading import Timer
+
+    stop = Event()
+    # `release` is controlled ONLY by this test and is deliberately NOT the stop
+    # event: the fake stream ignores `stop` entirely, exactly like a real
+    # healthy connected stream. Because release is set only AFTER
+    # monitor_orders() returns, the pre-fix inline-blocking version literally
+    # cannot return before the timeout -- so the regression shows up as a full
+    # STREAM_TIMEOUT wait rather than as a few milliseconds of drift. That
+    # makes the assertion below insensitive to machine load, which a bare
+    # wall-clock threshold against a fixed sleep was not.
+    release = Event()
+    STREAM_TIMEOUT = 10.0
+
+    class BlockingStreamBroker:
+        @staticmethod
+        def find_order_by_client_id(client_order_id):
+            return _order("accepted")
+
+        @staticmethod
+        def run_trade_update_stream(callback):
+            release.wait(STREAM_TIMEOUT)
+
+    # ignore_cleanup_errors: the stream/poll threads are daemons that may still
+    # hold the SQLite file for a moment after monitor_orders() returns, and on
+    # Windows that makes the temp-dir unlink fail with PermissionError -- a
+    # teardown artifact, not a behaviour under test.
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal())
+
+        Timer(0.05, stop.set).start()
+        started = time.monotonic()
+        try:
+            monitor_orders(
+                store,
+                broker_module=BlockingStreamBroker,
+                poll_interval_seconds=0.01,
+                reconnect_delay_seconds=0.01,
+                stop_event=stop,
+            )
+            elapsed = time.monotonic() - started
+        finally:
+            # Let the stream thread end so it stops holding the temp database.
+            release.set()
+            time.sleep(0.05)
+
+    assert elapsed < 2.0, (
+        f"monitor_orders took {elapsed:.2f}s to honour stop_event; it must not wait for the "
+        "stream to end on its own."
+    )
+
+
+def test_partially_filled_buys_only_reserve_their_unfilled_remainder():
+    """The filled portion of a partial fill is already in positions, so
+    counting the ORIGINAL quantity as pending double-counts it and can block
+    unrelated purchases that are within policy (GPT review, 2026-07-29)."""
+    from assistant.execution_service import _pending_buy_value_by_ticker
+
+    class NoQuoteBroker:
+        @staticmethod
+        def get_latest_quote(ticker):
+            raise AssertionError("a limit order must not need a live quote")
+
+    order = {
+        "ticker": "AAPL", "side": "buy", "shares": 10.0,
+        "filled_qty": 4.0, "filled_avg_price": 100.0, "limit_price": 100.0,
+    }
+    totals = _pending_buy_value_by_ticker([order], NoQuoteBroker)
+    assert totals == {"AAPL": 600.0}, (
+        f"only the 6 unfilled shares are still pending, expected 600.0, got {totals}"
+    )
+
+
+def test_a_fully_filled_order_reserves_nothing_and_nan_fails_closed():
+    from assistant.execution_service import _pending_buy_value_by_ticker
+
+    class NoQuoteBroker:
+        @staticmethod
+        def get_latest_quote(ticker):
+            raise AssertionError("should not be reached")
+
+    filled = {
+        "ticker": "AAPL", "side": "buy", "shares": 10.0,
+        "filled_qty": 10.0, "filled_avg_price": 100.0, "limit_price": 100.0,
+    }
+    assert _pending_buy_value_by_ticker([filled], NoQuoteBroker) == {}
+
+    # A NaN filled_qty must fall back to counting the FULL order (conservative:
+    # overstates pending exposure and blocks more), never produce a NaN total.
+    corrupt = dict(filled, filled_qty=float("nan"))
+    assert _pending_buy_value_by_ticker([corrupt], NoQuoteBroker) == {"AAPL": 1000.0}

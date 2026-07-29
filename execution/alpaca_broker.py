@@ -25,6 +25,7 @@ from __future__ import annotations
 import inspect
 import math
 import os
+from threading import Event, Thread
 from typing import Any, Callable
 
 from config import PAPER_TRADING
@@ -114,6 +115,21 @@ def _normalize_order(order: Any) -> dict:
             else None
         ),
         "status": str(_enum_value(getattr(order, "status", "unknown"))),
+        # Replacement-chain identity. Alpaca exposes these on the order schema
+        # and in trade-update events; dropping them meant a replacement order
+        # could not be traced back to the proposal it superseded, so the
+        # replacement could fill while the proposal sat cancel-pending forever
+        # (GPT review, 2026-07-29). `replaces` is what
+        # order_reconciler._proposal_for_update() follows.
+        "replaced_by": (
+            str(getattr(order, "replaced_by", None))
+            if getattr(order, "replaced_by", None) is not None else None
+        ),
+        "replaces": (
+            str(getattr(order, "replaces", None))
+            if getattr(order, "replaces", None) is not None else None
+        ),
+        "replaced_at": _optional_iso(getattr(order, "replaced_at", None)),
         "filled_qty": _optional_float(getattr(order, "filled_qty", None)),
         "filled_avg_price": _optional_float(getattr(order, "filled_avg_price", None)),
         "submitted_at": _optional_iso(getattr(order, "submitted_at", None)),
@@ -301,8 +317,17 @@ def cancel_order(order_id: str) -> dict:
     return {"order_id": str(order_id), "status": "pending_cancel"}
 
 
-def run_trade_update_stream(callback: Callable[[dict], Any]) -> None:
-    """Run Alpaca's authenticated trade-update stream until interrupted."""
+def run_trade_update_stream(
+    callback: Callable[[dict], Any], stop_event: Event | None = None
+) -> None:
+    """Run Alpaca's authenticated trade-update stream until interrupted.
+
+    `stop_event`, when supplied, tears the stream down as soon as it is set so
+    the socket isn't left open until process exit. order_reconciler's
+    monitor_orders() already runs this on its own daemon thread (so its own
+    shutdown never depends on this parameter), and passes the event only after
+    signature-checking for it -- keep it optional.
+    """
     if not is_configured():
         raise AlpacaNotConfigured(
             "APCA_API_KEY_ID / APCA_API_SECRET_KEY are not set."
@@ -330,6 +355,20 @@ def run_trade_update_stream(callback: Callable[[dict], Any]) -> None:
             await result
 
     stream.subscribe_trade_updates(handle_update)
+
+    if stop_event is not None:
+        def _stop_when_signalled() -> None:
+            stop_event.wait()
+            try:
+                stream.stop()
+            except Exception:
+                # Best-effort teardown only: monitor_orders() does not depend
+                # on this succeeding, and raising from this watchdog thread
+                # would be unhandled and mask the real shutdown path.
+                pass
+
+        Thread(target=_stop_when_signalled, name="trade-stream-stopper", daemon=True).start()
+
     stream.run()
 
 

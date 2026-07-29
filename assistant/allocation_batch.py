@@ -68,7 +68,7 @@ from assistant.policy import TradingPolicy
 from assistant.proposal_status import POLICY_OVERRIDE_AVAILABLE
 from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
-from risk.execution_gate import ValidationResult
+from risk.execution_gate import ValidationResult, worst_case_fill_price
 
 # Leg states. "submitted"/"failed" are terminal for that leg (a failed
 # leg does not block the rest of the batch -- each proposal is
@@ -279,7 +279,14 @@ def preflight_allocation_batch(
             and outcome.reference_price is not None
             and outcome.intent.side == "buy"
         ):
-            planned_notional = outcome.intent.shares * outcome.reference_price
+            # worst_case_fill_price, not the raw quote: a buy limit order can
+            # fill up to its limit price, so reserving only the quoted notional
+            # here understated the cash/pending exposure carried into every
+            # LATER leg of the same batch (GPT review, 2026-07-29). Shared with
+            # validate_trade_intent() so the two can't drift.
+            planned_notional = outcome.intent.shares * worst_case_fill_price(
+                outcome.intent, outcome.reference_price
+            )
             reserved_cash += planned_notional
             key = outcome.intent.ticker.upper()
             reserved_pending_by_ticker[key] = reserved_pending_by_ticker.get(key, 0.0) + planned_notional

@@ -59,21 +59,56 @@ def build_portfolio_snapshot(
     `positions` is a list of dicts: {ticker, shares, entry_price, current_price}.
     See build_portfolio_snapshot_from_alpaca() for pulling this shape
     from a live account instead of supplying it manually.
+
+    Ticker identity is canonicalized here (whitespace-stripped, uppercased)
+    so a manually-supplied "aapl" is recognized identically to "AAPL" by
+    every downstream basket/exposure check (independent review: a
+    lowercase ticker was silently invisible to case-sensitive basket
+    membership checks). Multiple rows for the same canonical ticker are
+    aggregated into one PortfolioPosition -- shares and market value sum,
+    entry_price becomes the share-weighted average cost basis -- rather
+    than being left as separate rows that downstream per-ticker dict
+    lookups (e.g. `{p.ticker: p for p in positions}`) would silently
+    collapse to just one of them (independent review: two AAPL lots each
+    under a per-position cap could jointly exceed it undetected). Rows for
+    the same ticker must report the same current_price (they describe the
+    same instant); inconsistent prices raise ValueError rather than being
+    silently combined, since there's no principled way to pick one.
     """
-    built = []
+    grouped: dict[str, dict] = {}
+    order: list[str] = []
     for p in positions:
-        market_value = p["shares"] * p["current_price"]
-        cost = p["shares"] * p["entry_price"]
+        ticker = p["ticker"].strip().upper()
+        if ticker not in grouped:
+            grouped[ticker] = {"shares": 0.0, "cost": 0.0, "current_price": p["current_price"]}
+            order.append(ticker)
+        elif grouped[ticker]["current_price"] != p["current_price"]:
+            raise ValueError(
+                f"Duplicate position rows for {ticker!r} report different current_price "
+                f"values ({grouped[ticker]['current_price']} vs {p['current_price']}) -- "
+                "refusing to silently aggregate inconsistent prices."
+            )
+        grouped[ticker]["shares"] += p["shares"]
+        grouped[ticker]["cost"] += p["shares"] * p["entry_price"]
+
+    built = []
+    for ticker in order:
+        agg = grouped[ticker]
+        shares = agg["shares"]
+        current_price = agg["current_price"]
+        cost = agg["cost"]
+        market_value = shares * current_price
+        entry_price = cost / shares if shares else 0.0
         unrealized_pnl_pct = ((market_value - cost) / cost * 100) if cost else 0.0
         built.append(
             PortfolioPosition(
-                ticker=p["ticker"],
-                shares=p["shares"],
-                entry_price=p["entry_price"],
-                current_price=p["current_price"],
+                ticker=ticker,
+                shares=shares,
+                entry_price=entry_price,
+                current_price=current_price,
                 market_value=round(market_value, 2),
                 unrealized_pnl_pct=round(unrealized_pnl_pct, 2),
-                is_leveraged_etf=_classify_leveraged(p["ticker"]),
+                is_leveraged_etf=_classify_leveraged(ticker),
             )
         )
     total_equity = cash + sum(p.market_value for p in built)
@@ -150,7 +185,7 @@ def build_risk_exposure(snapshot: PortfolioSnapshot, concentration_threshold_pct
 
     basket_exposure_pct = {}
     for basket_name, tickers in BASKETS.items():
-        basket_value = sum(p.market_value for p in snapshot.positions if p.ticker in tickers)
+        basket_value = sum(p.market_value for p in snapshot.positions if p.ticker.upper() in tickers)
         if basket_value > 0:
             basket_exposure_pct[basket_name] = round(basket_value / total * 100, 1)
 
@@ -164,7 +199,7 @@ def build_risk_exposure(snapshot: PortfolioSnapshot, concentration_threshold_pct
     warnings = []
     for basket_name, pct in basket_exposure_pct.items():
         if pct > concentration_threshold_pct:
-            tickers_held = [p.ticker for p in snapshot.positions if p.ticker in BASKETS[basket_name]]
+            tickers_held = [p.ticker for p in snapshot.positions if p.ticker.upper() in BASKETS[basket_name]]
             warnings.append(
                 f"{basket_name} exposure is {pct}% of total equity (via {', '.join(tickers_held)}) — "
                 f"above the {concentration_threshold_pct}% concentration threshold."

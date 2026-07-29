@@ -158,6 +158,39 @@ def test_leveraged_etf_cap_breach_still_produces_a_proposal():
     assert any("leveraged-etf exposure" in r.lower() for p in proposals for r in p.reasons)
 
 
+def test_duplicate_ticker_rows_aggregate_exposure_still_produces_a_position_cap_proposal():
+    # Independent review reproduction: two AAPL lots that each individually
+    # sit under a 5% max_position_pct cap but jointly exceed it used to
+    # produce no remediation at all, since generate_risk_reduction_
+    # proposals() iterates snapshot.positions and position_by_ticker
+    # silently collapsed duplicate keys. build_portfolio_snapshot() now
+    # aggregates duplicate rows at ingestion, so this sees one $600 row.
+    positions = [
+        {"ticker": "AAPL", "shares": 1, "entry_price": 300.0, "current_price": 300.0},
+        {"ticker": "AAPL", "shares": 1, "entry_price": 300.0, "current_price": 300.0},
+    ]
+    packet = _packet(positions, cash=9_400.0)  # AAPL = 600/10000 = 6%
+    assert len(packet.portfolio.positions) == 1
+    policy = _permissive_policy(max_position_pct=0.05)
+    proposals = generate_risk_reduction_proposals(packet, policy)
+    assert proposals
+    assert any(p.intent.ticker == "AAPL" for p in proposals)
+    assert any("position exceeds" in r.lower() for p in proposals for r in p.reasons)
+
+
+def test_lowercase_ticker_basket_breach_still_produces_a_proposal():
+    # Independent review reproduction: a manually-supplied lowercase
+    # "aapl" used to be invisible to this generator's case-sensitive
+    # basket membership check.
+    positions = [{"ticker": "aapl", "shares": 50, "entry_price": 100.0, "current_price": 100.0}]
+    packet = _packet(positions, cash=5_000.0)  # AAPL = 5000/10000 = 50%
+    policy = _permissive_policy(max_basket_pct=0.40)
+    proposals = generate_risk_reduction_proposals(packet, policy)
+    assert proposals
+    assert any(p.intent.ticker == "AAPL" for p in proposals)
+    assert any("tech" in r.lower() for p in proposals for r in p.reasons)
+
+
 if __name__ == "__main__":
     test_total_exposure_breach_with_no_individual_violations_produces_a_proposal()
     test_total_exposure_breach_does_not_fire_when_within_cap()
@@ -166,4 +199,6 @@ if __name__ == "__main__":
     test_basket_breach_genuinely_within_cap_does_not_fire()
     test_position_cap_breach_still_produces_a_proposal()
     test_leveraged_etf_cap_breach_still_produces_a_proposal()
+    test_duplicate_ticker_rows_aggregate_exposure_still_produces_a_position_cap_proposal()
+    test_lowercase_ticker_basket_breach_still_produces_a_proposal()
     print("All proposals tests passed.")

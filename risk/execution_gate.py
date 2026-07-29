@@ -775,7 +775,7 @@ def validate_trade_intent(
             if intent.ticker.upper() not in basket_tickers and intent.ticker not in basket_tickers:
                 continue
             existing_basket_value = sum(
-                p.market_value for p in portfolio.positions if p.ticker in basket_tickers
+                p.market_value for p in portfolio.positions if p.ticker.upper() in basket_tickers
             ) + sum(v for t, v in pending_by_ticker.items() if t in basket_tickers)
             new_basket_pct = (existing_basket_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
             if new_basket_pct > max_basket_pct:

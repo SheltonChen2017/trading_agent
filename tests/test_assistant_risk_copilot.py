@@ -151,6 +151,37 @@ def test_check_policy_compliance_flags_a_basket_breach_rounding_would_have_hidde
     assert any("tech" in v and "40.04%" in v for v in violations)
 
 
+def test_check_policy_compliance_flags_lowercase_ticker_basket_exposure():
+    # Independent review reproduction: a manually-supplied lowercase
+    # "aapl" position used to be invisible to check_policy_compliance()'s
+    # case-sensitive basket membership check even though it's 50% exposed
+    # to the "tech" basket via AAPL.
+    positions = [{"ticker": "aapl", "shares": 50, "entry_price": 100.0, "current_price": 100.0}]
+    snapshot = build_portfolio_snapshot(positions, cash=5_000.0)  # AAPL = 5000/10000 = 50%
+    violations = check_policy_compliance(
+        snapshot, _policy(max_position_pct=1.0, max_basket_pct=0.40, max_leveraged_etf_pct=1.0, max_total_exposure_pct=1.0),
+    )
+    assert any("tech" in v and "50.00%" in v for v in violations)
+
+
+def test_check_policy_compliance_aggregates_duplicate_ticker_rows_against_position_cap():
+    # Independent review reproduction: two AAPL lots of $300 each used to
+    # remain two separate rows (3% each), each individually under a 5%
+    # max_position_pct cap even though their combined 6% exposure exceeds
+    # it. build_portfolio_snapshot() now aggregates duplicate rows at
+    # ingestion, so check_policy_compliance() sees one $600 position.
+    positions = [
+        {"ticker": "AAPL", "shares": 1, "entry_price": 300.0, "current_price": 300.0},
+        {"ticker": "AAPL", "shares": 1, "entry_price": 300.0, "current_price": 300.0},
+    ]
+    snapshot = build_portfolio_snapshot(positions, cash=9_400.0)  # total = 10000, AAPL = 600/10000 = 6%
+    assert len(snapshot.positions) == 1
+    violations = check_policy_compliance(
+        snapshot, _policy(max_position_pct=0.05, max_basket_pct=1.0, max_leveraged_etf_pct=1.0, max_total_exposure_pct=1.0),
+    )
+    assert any("AAPL" in v and "6.00%" in v for v in violations)
+
+
 def test_check_policy_compliance_flags_total_exposure_over_the_cap():
     # GPT review, 2026-07-28, reproduced: a 60%-invested portfolio against
     # a 50% max_total_exposure_pct limit reported no violation at all --
@@ -248,6 +279,8 @@ if __name__ == "__main__":
     test_check_policy_compliance_flags_a_position_over_the_policy_cap()
     test_check_policy_compliance_silent_when_within_the_policy_cap()
     test_check_policy_compliance_flags_a_basket_breach_rounding_would_have_hidden()
+    test_check_policy_compliance_flags_lowercase_ticker_basket_exposure()
+    test_check_policy_compliance_aggregates_duplicate_ticker_rows_against_position_cap()
     test_check_policy_compliance_flags_total_exposure_over_the_cap()
     test_check_policy_compliance_flags_cash_reserve_below_the_minimum()
     test_estimate_stress_impact_computes_beta_from_real_relationship()

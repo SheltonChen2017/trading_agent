@@ -16,6 +16,7 @@ max_drawdown_pct() -- both now delegate here (docs/ARCHITECTURE_DEBT.md).
 """
 from __future__ import annotations
 
+import numpy as np
 import pandas as pd
 
 
@@ -89,6 +90,16 @@ def _capture_pct(strategy_returns: pd.Series, benchmark_returns: pd.Series, *, d
             "align them before calling (this project fails closed on data-integrity "
             "mismatches rather than silently reindexing/dropping)."
         )
+    # Jointly drop any date where EITHER series is non-finite (NaN or +/-inf)
+    # before computing either mean -- pandas' .mean() drops NaN independently
+    # per-series, so computing benchmark_mean and strategy_mean from separately
+    # masked series can silently pair the numerator and denominator off of
+    # different date sets even though the original indexes matched
+    # (independent review, reproduced: a strategy NaN on the single worst
+    # benchmark day changed downside capture from a correct 50% to 16.67%).
+    both_finite = np.isfinite(strategy_returns.to_numpy()) & np.isfinite(benchmark_returns.to_numpy())
+    strategy_returns = strategy_returns[both_finite]
+    benchmark_returns = benchmark_returns[both_finite]
     mask = benchmark_returns < 0 if direction == "down" else benchmark_returns > 0
     if not mask.any():
         return None  # undefined, not 0.0 -- 0.0 would misleadingly read as "perfect protection"
@@ -102,11 +113,15 @@ def _capture_pct(strategy_returns: pd.Series, benchmark_returns: pd.Series, *, d
 def downside_capture_pct(strategy_returns: pd.Series, benchmark_returns: pd.Series) -> float | None:
     """Mean strategy return over periods where the benchmark was down,
     divided by the mean benchmark return over those same periods, x 100.
-    Both series must already share the same index. Returns None (not
-    0.0) if the benchmark has zero down-periods in the window."""
+    Both series must already share the same index. Any date where either
+    series is non-finite (NaN, +inf, or -inf) is dropped from BOTH series
+    before either mean is computed, so the two means are always taken
+    over the identical set of dates. Returns None (not 0.0) if no valid
+    paired down-periods remain in the window."""
     return _capture_pct(strategy_returns, benchmark_returns, direction="down")
 
 
 def upside_capture_pct(strategy_returns: pd.Series, benchmark_returns: pd.Series) -> float | None:
-    """Mirror of downside_capture_pct() over benchmark UP-periods."""
+    """Mirror of downside_capture_pct() over benchmark UP-periods (same
+    joint non-finite-pair-dropping policy; see its docstring)."""
     return _capture_pct(strategy_returns, benchmark_returns, direction="up")

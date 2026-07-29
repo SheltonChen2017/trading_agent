@@ -40,7 +40,24 @@ _PERCENT_PATTERN = re.compile(r"(\d+(?:\.\d+)?)\s*%")
 _DOLLAR_PATTERN = re.compile(r"\$\s*[\d,]+(?:\.\d+)?")
 _NUMBER_TOLERANCE_PCT = 1.0  # allows "60%" to match an actual weight of 60.3% without treating it as a fabricated number
 _TICKER_TOKEN_PATTERN = re.compile(r"\b[A-Z]{1,5}\b")
-_ACTION_VERB_PATTERN = re.compile(r"\b(buy|sell|replace|allocate|reduce|increase|target|rebalance)\b", re.IGNORECASE)
+# Common all-caps acronyms that are NOT tickers -- everything else that
+# looks ticker-shaped and isn't explicitly allowed gets rejected (see
+# _mentions_unknown_ticker: independent review found that scoping the
+# reject-list to config.UNIVERSE membership let a real-but-out-of-universe
+# ticker, a newly-listed ticker, or an outright hallucinated symbol like
+# "RDDT" all slip through silently, since UNIVERSE is a curated research
+# list and can never be a complete security master).
+_SAFE_ACRONYMS = frozenset({"ETF", "USD", "AI", "CEO", "CFO", "SEC", "IPO", "NYSE", "IRS", "GDP", "CPI", "FED", "US"})
+_ACTION_VERB_PATTERN = re.compile(
+    # Word STEMS with \w* to catch inflections (deserve/deserves/deserved,
+    # prefer/prefers/preferred, consider/considers/considering, ...) --
+    # matching only the bare infinitive missed "AMD deserves a larger
+    # share." entirely (independent review, second pass, required test).
+    r"\b(buy\w*|sell\w*|replac\w*|allocat\w*|reduc\w*|increas\w*|target\w*|rebalanc\w*|"
+    r"should|ought|prefer\w*|favor\w*|deserv\w*|consider\w*)\b"
+    r"|better mix|benefit(?:s|ed|ting)?\s+from|more exposure|less exposure",
+    re.IGNORECASE,
+)
 _MAX_SUMMARY_LENGTH = 500
 _MAX_CLAIM_LENGTH = 300
 
@@ -102,19 +119,31 @@ def _contains_disallowed_number(text: str, allowed_values_pct: list[float]) -> b
     return False
 
 
-def _mentions_unknown_ticker(text: str, allowed_tickers: set[str], known_tickers: set[str]) -> bool:
-    """Flags a KNOWN ticker (a real config.UNIVERSE member, or one of the
-    cart's own tickers) mentioned in free text that is NOT in the allowed
-    scope -- e.g. "Buy TSLA" in a summary about NVDA/AMD, or "TSLA would
-    diversify" hidden inside a claim whose structured `tickers` field only
-    lists NVDA (independent review: the structured `tickers` field alone
-    doesn't stop an unlisted ticker from being named in the free-text
-    `claim`/`summary`). Deliberately scoped to KNOWN tickers only, so
-    innocuous all-caps acronyms (ETF, CEO, USD) never false-positive --
-    only a real, recognizable ticker symbol can trigger this."""
-    for match in _TICKER_TOKEN_PATTERN.finditer(text.upper()):
+def _mentions_unknown_ticker(text: str, allowed_tickers: set[str]) -> bool:
+    """Flags ANY ticker-shaped token (1-5 uppercase letters) that is NOT in
+    `allowed_tickers`, except the small _SAFE_ACRONYMS allowlist -- e.g.
+    "Buy TSLA" in a summary about NVDA/AMD, or "RDDT would diversify" (a
+    real ticker that's simply not in the cart, or an outright hallucinated
+    symbol). Independent review, second pass: an earlier version only
+    rejected a token if it was ALSO a config.UNIVERSE member -- but
+    UNIVERSE is a curated ~90-ticker research list, never a complete
+    security master, so a real-but-out-of-universe ticker (or a newly
+    listed one, or a hallucinated one) slipped through as if it were an
+    innocent acronym. Being strict by default (reject unless explicitly
+    allowed or explicitly safe) is the correct default here, not being
+    lenient unless proven unsafe.
+
+    Deliberately matches against the ORIGINAL text, not text.upper() --
+    uppercasing first would turn every short, ordinary lowercase word
+    ("is", "in", "of", "on", "at", "to") into a false ticker-shaped match.
+    A genuine ticker mention in financial prose is written in real caps
+    ("NVDA", "RDDT"); this only flags tokens that are ALREADY all-caps in
+    what the model actually wrote."""
+    for match in _TICKER_TOKEN_PATTERN.finditer(text):
         token = match.group(0)
-        if token in known_tickers and token not in allowed_tickers:
+        if token in _SAFE_ACRONYMS:
+            continue
+        if token not in allowed_tickers:
             return True
     return False
 
@@ -124,34 +153,39 @@ def _validate_allocation_review(
 ) -> AllocationReview | None:
     """Enforces, in code, what the system prompt only asks for in prose.
     Beyond the original type/severity/ticker-field/number checks, this also:
-    (1) scans free text (summary AND claim) for a KNOWN ticker mentioned
-    outside its allowed scope, since a legitimate-looking `tickers` field
-    doesn't stop the prose from naming a different ticker (e.g. "Buy TSLA"
-    in the summary, or "TSLA would diversify" inside a claim tagged
-    tickers=["NVDA"]); (2) rejects action-verb language (buy/sell/replace/
-    allocate/reduce/increase/target/rebalance) outright, regardless of
-    whether a number is present; (3) scopes an observation's allowed
-    percentages to ONLY the weights/volatilities of ITS OWN tickers, not
-    every weight anywhere in the cart, so a number that's real but belongs
-    to a DIFFERENT ticker can't be smuggled in as if it applied to this
-    claim; (4) treats volatility values as legitimate restatable numbers
-    too, not just weights; (5) caps string lengths; (6) drops exact-
-    duplicate observations; (7) refuses to show a false "all clear" --
-    if the model proposed observations but every single one failed
+    (1) scans free text (summary AND claim) for ANY ticker-shaped token not
+    in the allowed scope -- not just ones that happen to be config.UNIVERSE
+    members (independent review, second pass: a real-but-out-of-universe
+    ticker, or an outright hallucinated one like "RDDT", used to slip
+    through as if it were an innocent acronym); (2) rejects action/advice
+    language outright (buy/sell/replace/allocate/reduce/increase/target/
+    rebalance/should/ought/prefer/favor/deserve/consider/"better mix"/
+    "benefit from"/"more or less exposure"), regardless of whether a
+    number is present; (3) the SUMMARY may not contain a percentage or
+    dollar figure AT ALL (independent review, second pass: allowing a
+    percentage that merely matched SOME input weight let a real weight
+    belonging to one ticker be re-stated as if it applied to a different
+    one, e.g. "NVDA should be 40%" using AMD's actual 40% weight) --
+    percentages are only ever trustworthy when scoped to a specific
+    ticker, which only an observation's own `tickers` field can establish;
+    (4) scopes an OBSERVATION's allowed percentages to ONLY the weights/
+    volatilities of ITS OWN tickers, never every weight anywhere in the
+    cart; (5) treats volatility values as legitimate restatable numbers
+    too, not just weights; (6) caps string lengths; (7) drops exact-
+    duplicate observations; (8) refuses to show a false "all clear" -- if
+    the model proposed observations but every single one failed
     validation, the whole response is rejected rather than displaying just
     the summary as if nothing was flagged."""
     volatilities = volatilities or {}
     cart_set = {t.upper() for t in cart_tickers}
-    known_tickers = set(config.UNIVERSE) | cart_set
-    all_weights = list(weights_pct.values())
-    all_volatilities = [v for v in volatilities.values() if v is not None]
 
     summary = raw.get("summary")
     if (
         not isinstance(summary, str)
         or len(summary) > _MAX_SUMMARY_LENGTH
-        or _contains_disallowed_number(summary, all_weights + all_volatilities)
-        or _mentions_unknown_ticker(summary, cart_set, known_tickers)
+        or _PERCENT_PATTERN.search(summary)
+        or _DOLLAR_PATTERN.search(summary)
+        or _mentions_unknown_ticker(summary, cart_set)
         or _contains_action_language(summary)
     ):
         return None
@@ -178,7 +212,7 @@ def _validate_allocation_review(
         ]
         if _contains_disallowed_number(claim, obs_allowed_numbers):
             continue
-        if _mentions_unknown_ticker(claim, set(obs_tickers), known_tickers):
+        if _mentions_unknown_ticker(claim, set(obs_tickers)):
             continue
         if _contains_action_language(claim):
             continue

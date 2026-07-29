@@ -261,6 +261,51 @@ def test_review_allocation_plan_allows_claim_restating_actual_weight(monkeypatch
     assert len(result.observations) == 1
 
 
+# --- Direct _validate_allocation_review reproductions (independent review,
+# third pass: unknown-ticker detection only rejected tokens that were ALSO
+# config.UNIVERSE members, so a real-but-out-of-universe or hallucinated
+# ticker like "RDDT" read as an innocent acronym; summary percentages were
+# checked against the FULL cart pool, so a real weight could be reattached
+# to the wrong ticker in prose; "should"/"deserves"/etc. weren't in the
+# action-verb blocklist at all, or only matched the bare infinitive.)
+
+def test_rejects_summary_with_unknown_external_ticker():
+    raw = {"summary": "RDDT would improve diversification.", "observations": []}
+    result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+    assert result is None
+
+
+def test_rejects_summary_with_fabricated_ticker_symbol():
+    raw = {"summary": "ZZQZX would improve diversification.", "observations": []}
+    result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+    assert result is None
+
+
+def test_rejects_summary_reassigning_another_tickers_weight():
+    raw = {"summary": "NVDA should be 40% of the split.", "observations": []}
+    result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+    assert result is None
+
+
+def test_rejects_summary_advice_language_without_a_number():
+    cases = [
+        "NVDA ought to be smaller.",
+        "AMD deserves a larger share.",
+        "The portfolio would benefit from RDDT.",
+        "Prefer AMD over NVDA.",
+    ]
+    for summary in cases:
+        raw = {"summary": summary, "observations": []}
+        result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+        assert result is None, f"expected rejection for: {summary!r}"
+
+
+def test_allows_benign_summary_with_no_ticker_dollar_or_advice_language():
+    raw = {"summary": "This split is concentrated in semiconductors.", "observations": []}
+    result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})
+    assert result is not None
+
+
 def test_review_allocation_plan_returns_none_on_api_exception(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     with patch("anthropic.Anthropic") as mock_anthropic_cls:
@@ -444,6 +489,11 @@ if __name__ == "__main__":
     test_review_allocation_plan_rejects_a_different_tickers_weight_reused_as_a_number(mp)
     test_review_allocation_plan_allows_a_legitimate_volatility_restatement(mp)
     test_review_allocation_plan_allows_claim_restating_actual_weight(mp)
+    test_rejects_summary_with_unknown_external_ticker()
+    test_rejects_summary_with_fabricated_ticker_symbol()
+    test_rejects_summary_reassigning_another_tickers_weight()
+    test_rejects_summary_advice_language_without_a_number()
+    test_allows_benign_summary_with_no_ticker_dollar_or_advice_language()
     test_review_allocation_plan_returns_none_on_api_exception(mp)
     test_suggest_similar_tickers_returns_none_when_unconfigured(mp)
     test_suggest_similar_tickers_returns_parsed_list_on_success(mp)

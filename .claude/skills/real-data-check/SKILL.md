@@ -108,8 +108,7 @@ not optional extras:
 
 Prefer the already-built entry points over writing new one-off analysis:
 `scripts/run_backtest.py`, `run_backtest_horizons.py`,
-`run_baseline_comparison.py`, `run_basket_report.py`, `train_model.py`,
-`run_agent.py`. If a one-off scratch script is genuinely needed (e.g. to
+`run_baseline_comparison.py`, `run_basket_report.py`. If a one-off scratch script is genuinely needed (e.g. to
 combine a specific set of tickers not covered by an existing script), put
 it in the scratchpad directory, not the repo, unless the user asks for it
 to become a permanent script.

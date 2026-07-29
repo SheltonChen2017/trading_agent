@@ -21,8 +21,8 @@ from assistant.strategy_proposals import (
     STABLE_TICKER,
     generate_soxx_soxl_rebalance_proposals,
 )
+from market_analytics import classify_trend
 from signals.regime import compute_trailing_market_volatility
-from strategies.trend_vol_rotation import classify_trend
 from strategies.vol_target_rotation import compute_target_leveraged_weight
 
 
@@ -426,6 +426,68 @@ def test_relied_upon_finding_confirmed_and_reproduced_is_not_broken_or_non_autho
         strategy_proposals.KNOWN_FINDINGS = original
 
 
+# --- store=... wiring (docs/ALLOCATION_SERVICE_DESIGN.md, 2026-07-28):
+# records "this strategy was evaluated" regardless of whether a proposal
+# actually fired.
+
+def test_records_a_strategy_evaluation_when_no_proposal_fires():
+    import tempfile
+
+    from assistant.storage import AssistantStore
+
+    market_data = _market_data()
+    target, _ = _expected_target(market_data)
+    combined = 10_000.0
+    leveraged_value = combined * target  # on target -> zero drift, no proposal
+    stable_value = combined - leveraged_value
+    packet = _packet(
+        [
+            {"ticker": STABLE_TICKER, "shares": stable_value / 50.0, "entry_price": 50.0, "current_price": 50.0},
+            {"ticker": LEVERAGED_TICKER, "shares": leveraged_value / 20.0 if leveraged_value else 0.0, "entry_price": 20.0, "current_price": 20.0},
+        ]
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        proposals = generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data, store=store)
+        assert proposals == []
+        result = store.get_last_strategy_evaluation("soxx_soxl_rebalance")
+        assert result is not None
+        assert result["last_result"] == {"fired": False, "proposal_count": 0}
+
+
+def test_records_a_strategy_evaluation_when_a_proposal_fires():
+    import tempfile
+
+    from assistant.storage import AssistantStore
+
+    market_data = _market_data()
+    target, _ = _expected_target(market_data)
+    overweight = min(target + 0.30, 0.95)
+    combined = 10_000.0
+    leveraged_value = combined * overweight
+    stable_value = combined - leveraged_value
+    leveraged_price = 20.0
+    packet = _packet(
+        [
+            {"ticker": STABLE_TICKER, "shares": stable_value / 50.0, "entry_price": 50.0, "current_price": 50.0},
+            {"ticker": LEVERAGED_TICKER, "shares": leveraged_value / leveraged_price, "entry_price": leveraged_price, "current_price": leveraged_price},
+        ]
+    )
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        proposals = generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data, store=store)
+        assert len(proposals) == 1
+        result = store.get_last_strategy_evaluation("soxx_soxl_rebalance")
+        assert result["last_result"] == {"fired": True, "proposal_count": 1}
+
+
+def test_no_store_given_does_not_raise():
+    # store is optional -- default None must behave exactly as before this change.
+    market_data = _market_data()
+    packet = _packet([])
+    assert generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data) == []
+
+
 if __name__ == "__main__":
     test_returns_nothing_when_leveraged_leg_not_held()
     test_returns_nothing_when_stable_leg_not_held()
@@ -442,4 +504,7 @@ if __name__ == "__main__":
     test_relied_upon_finding_reclassified_to_rejected_raises_not_silently_accepted()
     test_relied_upon_finding_exploratory_status_also_raises()
     test_relied_upon_finding_confirmed_and_reproduced_is_not_broken_or_non_authoritative()
+    test_records_a_strategy_evaluation_when_no_proposal_fires()
+    test_records_a_strategy_evaluation_when_a_proposal_fires()
+    test_no_store_given_does_not_raise()
     print("All strategy_proposals tests passed.")

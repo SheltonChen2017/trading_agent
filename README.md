@@ -167,11 +167,14 @@ As of the current registry (`research_findings.json` version 1.1.0):
   backtested only, not yet in live/paper trading. NVDL has substantially
   less real history than the other two pairs; see the underfilled-dataset
   warning below.
-- A handful of additional signal modules exist in `signals/` (idiosyncratic
-  volatility, variance risk premium, residual momentum, overnight-gap
-  reversal) that are frozen/pre-registered per `config.py` but do not yet
-  have a corresponding entry in the versioned registry -- treat them as
-  implemented-but-not-yet-formally-verdicted, not as validated.
+- **Rejected**: four additional signals tried on external (ChatGPT)
+  recommendation -- idiosyncratic volatility, variance risk premium,
+  residual momentum, overnight-gap reversal -- all rejected under the same
+  out-of-sample + confirmation-only + block-bootstrap rigor bar, with a
+  pre-registered shared Bonferroni correction across the family. See
+  `assistant/research_findings.json` for per-signal detail. The
+  implementations were removed from the codebase after this verdict was
+  recorded -- git history (commit 8605f0e) retains them.
 
 **One credit-spread anomaly, explicitly not promoted**: re-checked 2026-07-26
 under realistic `next_open` (rather than same-close) entry timing, the
@@ -247,7 +250,6 @@ The current dependency set is:
 
 - pandas / numpy
 - yfinance
-- scikit-learn / joblib
 - alpaca-py
 - lxml
 - pandas_market_calendars (real NYSE trading-hours/holiday calendar)
@@ -391,14 +393,6 @@ Skip live earnings lookup when working offline:
 ```bash
 python scripts/run_personal_assistant.py briefing --no-events
 ```
-
-The older formatted briefing remains available:
-
-```bash
-python scripts/run_morning_briefing.py
-```
-
-It writes both the compatibility JSONL journal and SQLite.
 
 ### Generate proposals
 
@@ -632,8 +626,7 @@ assistant/
   execution_service.py     approval, revalidation, paper submission
   proposal_status.py       single source of truth for proposal status strings
   storage.py               SQLite state and idempotency
-  audit_log.py             legacy JSONL decision-packet journal
-  risk_copilot.py          concentration, duplication, stress analysis
+  risk_copilot.py          concentration, duplication, stress analysis (Briefing tab + `risk-check` CLI)
   explanations.py          "why was this ticker flagged?"
   stock_lookup.py          own-ticker trend/volatility, price targets, hold-period ranges
   news_summary.py          recent news, optional Claude-summarized (ANTHROPIC_API_KEY)
@@ -648,7 +641,6 @@ data/
   macro_data.py            credit-spread and yield-curve proxies
 
 risk/
-  manager.py               sizing and stop calculations for research
   execution_gate.py        typed validation and short-lived authorization
 
 execution/
@@ -656,16 +648,34 @@ execution/
 
 signals/                   pluggable research signals (scanner, momentum, relative,
                             breakout, PEAD, fundamentals, analyst/analyst_target,
-                            vix_spike/credit_spread/yield_curve, regime, idio_vol,
-                            variance_risk_premium, residual_momentum, overnight_gap)
+                            vix_spike/credit_spread/yield_curve, regime)
 backtest/
   engine.py                walk-forward and dependence-aware testing
   portfolio_simulator.py   tax/slippage-aware equity-curve simulator
+  risk_metrics.py          drawdown/expected-shortfall/time-under-water/capture-ratio metrics
 strategies/                leveraged-ETF rotation research (trend_vol_rotation.py,
                             vol_target_rotation.py, kelly_rotation.py, leverage_rotation.py)
-ml/model.py                walk-forward-evaluated signal classifier
-baskets.py, config.py      overlapping ticker baskets and every other tunable knob
+baskets.py, config.py,     overlapping ticker baskets, every other tunable knob, and
+market_analytics.py        generic backward-looking primitives shared by production and research
 ```
+
+**Production vs. research** (2026-07-28): `assistant/`, `risk/execution_gate.py`,
+`execution/`, and the two entry points (`scripts/run_personal_assistant.py`,
+`scripts/personal_assistant_ui.py`) are the production surface -- the only
+code with authority to build proposals, validate them, and submit paper
+orders. `signals/`, `strategies/`, `backtest/`, and the `scripts/run_*.py`
+research scripts are the research workbench -- ideas are developed and
+rigor-tested there, and only gain production authority by being
+explicitly wired into `assistant/` (as `strategy_proposals.py`'s SOXX/SOXL
+rebalancer was) and recorded `confirmed` in `research_findings.json` --
+never automatically, and never by a rejected signal generating a buy
+proposal. `market_analytics.py` and `backtest/risk_metrics.py` are the
+two intentional exceptions: generic, network-free computation (trend
+classification, forward-return baselines, drawdown/tail-risk metrics)
+that both sides depend on, not signal logic itself. See
+`docs/ARCHITECTURE_DEBT.md` for known gaps in that boundary
+(risk-check logic still scattered across a few production files) and
+`docs/MANDATE.md` for which research directions are in-flight vs. shelved.
 
 ## Research workflow
 
@@ -703,7 +713,6 @@ python scripts/run_analyst_target_significance_check.py
 python scripts/run_momentum_block_significance.py
 python scripts/run_execution_timing_revalidation.py
 python scripts/run_basket_report.py
-python scripts/train_model.py
 ```
 
 `scripts/` also holds the leveraged-ETF rotation research line: regime-
@@ -727,27 +736,14 @@ The leveraged-ETF strategies enforce next-day-open execution after using a
 day's close to classify state. Tax and transaction-cost modeling are
 available in their simulators (`backtest/portfolio_simulator.py`).
 
-## Legacy agent behavior
-
-`scripts/run_agent.py` is now a research-only synthetic-data demo:
-
-- it cannot submit orders;
-- it refuses to size signals when the model artifact is missing;
-- it does not treat an absent model as full confidence;
-- it identifies the original scanner as research rather than a production
-  strategy.
-
-Production paper orders belong exclusively to the proposal and approval
-workflow.
-
 ## Tests
 
 ```bash
 python -m pytest tests -q
 ```
 
-The suite covers scanners, backtests, research statistics, strategies, ML,
-risk sizing, assistant schemas, context building, explanations, stress
+The suite covers scanners, backtests, research statistics, strategies,
+assistant schemas, context building, explanations, stress
 analysis, execution limits (including strict share-quantity validation),
 policy validation, SQLite idempotency, proposal generation, allocation
 batch preflight/execution, research-registry provenance/authority

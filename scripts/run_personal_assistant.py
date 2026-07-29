@@ -19,6 +19,12 @@ from assistant.execution_service import (
 from assistant.policy import load_policy
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.research_registry import underfilled_dataset_warning
+from assistant.risk_copilot import (
+    check_concentration,
+    check_policy_compliance,
+    estimate_stress_impact,
+    find_correlated_clusters,
+)
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
@@ -88,8 +94,8 @@ def _print_briefing(packet) -> None:
         # authoritative -- historical `status` is preserved, only the
         # user-facing label is qualified. This CLI briefing was the last
         # remaining consumer still reading the raw `status` value
-        # directly (run_morning_briefing.py and the Streamlit UI were
-        # already corrected).
+        # directly (the Streamlit UI and the now-removed legacy
+        # run_morning_briefing.py were already corrected).
         print(f"  [{finding.display_status}] {finding.label}: {finding.claim}")
         if finding.provenance is not None:
             dataset_warning = underfilled_dataset_warning(finding.provenance)
@@ -104,6 +110,36 @@ def command_briefing(args, store: AssistantStore) -> None:
     print(f"Persisted decision packet #{packet_id} to {store.path}")
 
 
+def command_risk_check(args, store: AssistantStore) -> None:
+    if bool(args.benchmark) != bool(args.move_pct is not None):
+        # Usability guard only, not the authoritative check -- mirrors
+        # _positive_int's role for --stale-after-seconds: catches an
+        # obviously incomplete invocation early with a clear message.
+        raise SystemExit("--benchmark and --move-pct must be given together, or not at all.")
+    policy = load_policy(args.policy)
+    packet = _packet(include_events=False)
+    violations = check_policy_compliance(packet.portfolio, policy)
+    for violation in violations:
+        print(f"  POLICY VIOLATION: {violation}")
+    print("Informational summary (not a policy-compliance check -- see any POLICY VIOLATION lines above):")
+    print(check_concentration(packet.risk, args.basket))
+    for cluster_warning in find_correlated_clusters(packet.portfolio):
+        print(f"  ! {cluster_warning}")
+    if args.benchmark:
+        result = estimate_stress_impact(packet.portfolio, args.benchmark, args.move_pct)
+        if result.get("warning"):
+            print(f"  ! {result['warning']}")
+        if result["total_estimated_impact"] is not None:
+            print(
+                f"Estimated impact of a {args.move_pct}% move in {args.benchmark}: "
+                f"${result['total_estimated_impact']:,.2f}"
+            )
+        for impact in result["position_impacts"]:
+            beta = impact["beta"] if impact["beta"] is not None else "n/a"
+            estimated = f"${impact['estimated_impact']:,.2f}" if impact["estimated_impact"] is not None else "n/a"
+            print(f"  {impact['ticker']}: beta={beta} estimated_impact={estimated}")
+
+
 def command_propose(args, store: AssistantStore) -> None:
     policy = load_policy(args.policy)
     packet = _packet(include_events=not args.no_events)
@@ -111,7 +147,7 @@ def command_propose(args, store: AssistantStore) -> None:
     proposals = generate_risk_reduction_proposals(packet, policy)
     if args.strategy_proposals or policy.enable_strategy_proposals:
         try:
-            proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy)
+            proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy, store=store)
         except Exception as exc:
             print(f"  ! SOXX/SOXL strategy proposal check failed ({exc}); showing risk-reduction proposals only.")
     if not proposals:
@@ -224,6 +260,19 @@ def build_parser() -> argparse.ArgumentParser:
     briefing = commands.add_parser("briefing")
     briefing.add_argument("--no-events", action="store_true")
     briefing.set_defaults(handler=command_briefing)
+
+    risk_check = commands.add_parser(
+        "risk-check",
+        help=(
+            "Deterministic concentration/duplication/stress-test answers (assistant/risk_copilot.py) "
+            "against the current portfolio -- e.g. 'am I overexposed to tech' or 'what happens if SPY "
+            "falls 10%'. --benchmark and --move-pct must be given together to run the stress test."
+        ),
+    )
+    risk_check.add_argument("--basket", default=None, help="Basket name to check concentration for.")
+    risk_check.add_argument("--benchmark", default=None, help="Benchmark ticker for the stress test, e.g. SPY.")
+    risk_check.add_argument("--move-pct", type=float, default=None, help="Hypothetical benchmark move, e.g. -10.")
+    risk_check.set_defaults(handler=command_risk_check)
 
     propose = commands.add_parser("propose")
     propose.add_argument("--no-events", action="store_true")

@@ -1,5 +1,5 @@
 {
-  "version": "1.2.0",
+  "version": "1.3.0",
   "updated_at": "2026-07-28",
   "findings": [
     {
@@ -163,6 +163,40 @@
         "SHY",
         "GLD"
       ]
+    },
+    {
+      "label": "Idiosyncratic volatility (low-vol anomaly proxy, residualized vs QQQ)",
+      "claim": "Low idiosyncratic volatility predicts positive forward returns",
+      "status": "rejected",
+      "detail": "Regressed each stock against QQQ monthly, ranked by residual volatility. Commit 8605f0e: 'Clean rejection' under the project's full out-of-sample + confirmation-only + block-bootstrap rigor bar, under a pre-registered shared n_tests=4 Bonferroni correction across the four-signal family tested together.",
+      "source": "commit 8605f0e; signals/idio_vol.py",
+      "relevant_tickers": []
+    },
+    {
+      "label": "Variance risk premium (VIX^2 minus realized QQQ variance)",
+      "claim": "The realized-vs-implied variance gap predicts forward returns/regime",
+      "status": "rejected",
+      "detail": "A portfolio-exposure/regime signal, not a per-ticker one. Commit 8605f0e: the first pass at a 7-year lookback was underpowered (9-13 confirmation observations); extended to ~26 years (QQQ/VIX real history back to 2000) for what the commit calls an 'adequately-powered, genuine rejection', under the same pre-registered n_tests=4 Bonferroni correction.",
+      "source": "commit 8605f0e; signals/variance_risk_premium.py",
+      "relevant_tickers": [
+        "QQQ"
+      ]
+    },
+    {
+      "label": "Residual momentum (12-1 formation, ranked by residual return vs QQQ)",
+      "claim": "Residualizing standard cross-sectional momentum against QQQ rescues the already-rejected raw-momentum signal",
+      "status": "rejected",
+      "detail": "Standard 12-1 cross-sectional momentum was already rejected in this project after three separate statistical traps were caught on it (see the project's other momentum finding). Commit 8605f0e: 'residualizing did not rescue it... explicitly the final momentum-family test per the source recommendation', under the same pre-registered n_tests=4 Bonferroni correction.",
+      "source": "commit 8605f0e; signals/residual_momentum.py",
+      "relevant_tickers": []
+    },
+    {
+      "label": "Overnight-gap reversal (today's open vs yesterday's close)",
+      "claim": "A stock's overnight gap partially reverses during the following trading day",
+      "status": "rejected",
+      "detail": "Required new backtest infrastructure -- entry_timing='same_day_open_to_close' added to run_backtest()/run_baseline_forward_returns() as a small additive third branch alongside same_close/next_open (kept in the codebase as generic infrastructure after this signal's removal -- it doesn't touch prior behavior and has its own independent test coverage). Commit 8605f0e's opening statement covers all four signals in this family as rejected under the project's full out-of-sample + confirmation-only + block-bootstrap rigor bar with the same pre-registered n_tests=4 Bonferroni correction; unlike the other three, the commit message doesn't restate a signal-specific numeric result for this one beyond that shared statement -- recorded here on that basis without inventing a more specific figure the source doesn't provide.",
+      "source": "commit 8605f0e; signals/overnight_gap.py",
+      "relevant_tickers": []
     }
   ]
 }

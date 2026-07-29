@@ -78,6 +78,12 @@ from assistant.proposal_status import (
 )
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.research_registry import summarize_evidence_authority, underfilled_dataset_warning
+from assistant.risk_copilot import (
+    check_concentration,
+    check_policy_compliance,
+    estimate_stress_impact,
+    find_correlated_clusters,
+)
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.stock_lookup import (
     compute_blended_volatility,
@@ -91,7 +97,7 @@ from config import LEVERAGED_ETF_TICKERS, PAPER_TRADING, UNIVERSE
 from data.event_data import fetch_upcoming_earnings
 from data.market_data import fetch_historical
 from execution.alpaca_broker import is_configured
-from strategies.trend_vol_rotation import classify_trend
+from market_analytics import classify_trend
 
 st.set_page_config(page_title="Personal Trading Assistant", layout="wide")
 
@@ -752,6 +758,39 @@ with tab_briefing:
         )
     else:
         st.caption("No basket exposure -- no positions held.")
+
+    for policy_violation in check_policy_compliance(packet.portfolio, policy):
+        st.error(f"Policy violation: {policy_violation}")
+    if not packet.risk.concentration_warnings:
+        # Only show this caption in the "all clear" case -- when
+        # concentration_warnings IS non-empty, its content already appears
+        # once in the "Warnings" section below (packet.warnings includes
+        # risk.concentration_warnings verbatim, see context_builder.py) and
+        # once as a Policy violation above if it also breaches the active
+        # policy; showing it a third time here via check_concentration()
+        # was pure duplication (GPT review, 2026-07-28, reproduced).
+        st.caption("Informational summary (not a policy-compliance check): " + check_concentration(packet.risk))
+    for cluster_warning in find_correlated_clusters(packet.portfolio):
+        st.warning(cluster_warning)
+    with st.expander("Stress test"):
+        stress_col1, stress_col2 = st.columns(2)
+        stress_benchmark = stress_col1.text_input("Benchmark ticker", value="SPY", key="stress_benchmark")
+        stress_move_pct = stress_col2.number_input("Hypothetical move (%)", value=-10.0, step=1.0, key="stress_move_pct")
+        if st.button("Estimate impact", key="run_stress_test"):
+            # Live fetch_historical() call for OLS beta -- explicitly
+            # button-gated, not run on every rerun, matching this tab's
+            # existing "no expensive work on every Streamlit rerun"
+            # convention (see the packet-save guard above).
+            stress_result = estimate_stress_impact(packet.portfolio, stress_benchmark, stress_move_pct)
+            if stress_result.get("warning"):
+                st.warning(stress_result["warning"])
+            if stress_result["total_estimated_impact"] is not None:
+                st.metric(
+                    f"Estimated impact of a {stress_move_pct}% move in {stress_benchmark}",
+                    f"${stress_result['total_estimated_impact']:,.2f}",
+                )
+            if stress_result["position_impacts"]:
+                st.dataframe(stress_result["position_impacts"], use_container_width=True, hide_index=True)
 
     if packet.warnings:
         st.subheader("Warnings")
@@ -1414,7 +1453,7 @@ with tab_propose:
         proposals = generate_risk_reduction_proposals(packet, policy)
         if check_strategy:
             try:
-                proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy)
+                proposals = proposals + generate_soxx_soxl_rebalance_proposals(packet, policy, store=store)
             except Exception as exc:
                 st.error(f"SOXX/SOXL strategy proposal check failed ({exc}); showing risk-reduction proposals only.")
         for proposal in proposals:

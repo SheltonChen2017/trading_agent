@@ -100,6 +100,12 @@ and doesn't compete for this project's roadmap priority:
 | Crisis-response trend-following | **Shelved** — see §4. |
 | Deterministic risk governor | `risk/execution_gate.py`'s `validate_trade_intent()`, labeled explicitly as this project's risk governor 2026-07-28 (see that module's docstring). Consolidating the scattered risk-adjacent logic (see `docs/ARCHITECTURE_DEBT.md`) is deferred to a dedicated future session, not attempted alongside this document. |
 
+A separate, related gap (not one of GPT's four sleeves, raised in a later
+2026-08 review): the current Watchlist allocation feature is user-directed
+inverse-volatility splitting, not automated market-volatility-driven
+allocation. See `docs/ALLOCATION_SERVICE_DESIGN.md` for a design-only
+proposal — not implemented beyond a small persisted-cadence storage table.
+
 ## 6. Change control
 
 Versioned like `research_findings.json` — bump the entry below whenever
@@ -107,3 +113,6 @@ targets in §2 change, so revisions are visible, not silent edits.
 
 - **2026-07-28** — initial draft, all §2 targets marked DRAFT pending
   user revision.
+- **2026-07-28** — §5 cross-links `docs/ALLOCATION_SERVICE_DESIGN.md`
+  (a new gap raised in a later review, not one of the original four
+  sleeves); no §2 target changes.

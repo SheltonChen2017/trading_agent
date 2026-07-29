@@ -21,7 +21,7 @@ import pandas as pd
 from config import BASKETS, LEVERAGED_ETF_TICKERS, MARKET_BENCHMARK_TICKERS, REGIME_VOLATILITY_LOOKBACK_DAYS
 from data.market_data import fetch_historical
 from signals.regime import calibrate_threshold_from_discovery, classify_regime, compute_trailing_market_volatility
-from strategies.trend_vol_rotation import classify_trend
+from market_analytics import classify_trend
 from assistant.schemas import (
     DecisionPacket,
     EvidenceStatus,

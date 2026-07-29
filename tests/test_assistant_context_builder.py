@@ -12,7 +12,6 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import execution.alpaca_broker as broker
-from assistant.audit_log import append_decision_packet, read_decision_log
 from assistant.context_builder import (
     build_decision_packet,
     build_portfolio_snapshot,
@@ -152,15 +151,6 @@ def test_decision_packet_to_dict_reaches_nested_signal_authority_fields():
     assert signal["production_authoritative"] is False
     assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in signal["display_status"]
 
-    # Round-trip through the JSONL audit log.
-    with tempfile.TemporaryDirectory() as tmp:
-        log_path = Path(tmp) / "log.jsonl"
-        append_decision_packet(packet, log_path=log_path)
-        entries = read_decision_log(log_path=log_path)
-        logged_signal = entries[0]["signals"][0]
-        assert logged_signal["production_authoritative"] is False
-        assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in logged_signal["display_status"]
-
     # Round-trip through SQLite (AssistantStore.save_decision_packet()).
     import json
     import sqlite3
@@ -179,25 +169,6 @@ def test_decision_packet_to_dict_reaches_nested_signal_authority_fields():
         assert stored_signal["production_authoritative"] is False
         assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in stored_signal["display_status"]
 
-
-def test_audit_log_round_trips_decision_packets():
-    from assistant.schemas import DecisionPacket, MarketRegime
-    positions = [{"ticker": "AAA", "shares": 1, "entry_price": 10.0, "current_price": 11.0}]
-    snapshot = build_portfolio_snapshot(positions, cash=50.0)
-    risk = build_risk_exposure(snapshot)
-    packet = DecisionPacket(
-        generated_at="2026-01-01T00:00:00Z", portfolio=snapshot, risk=risk,
-        regime=MarketRegime(benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
-                             trailing_volatility_pct=1.0, as_of="2026-01-01"),
-        signals=[], upcoming_events=[], warnings=[],
-    )
-    with tempfile.TemporaryDirectory() as tmp:
-        log_path = Path(tmp) / "log.jsonl"
-        append_decision_packet(packet, log_path=log_path)
-        append_decision_packet(packet, log_path=log_path)
-        entries = read_decision_log(log_path=log_path)
-        assert len(entries) == 2
-        assert entries[0]["portfolio"]["positions"][0]["ticker"] == "AAA"
 
 
 # --- AssistantStore.save_decision_packet() identity, deduplication,
@@ -475,6 +446,44 @@ def test_prune_decision_packets_never_touches_proposals_or_broker_orders():
         assert store.get_proposal("tp_test") is not None
 
 
+# --- strategy_evaluations table (docs/ALLOCATION_SERVICE_DESIGN.md,
+# 2026-07-28): persisted "last evaluated" bookkeeping for strategy
+# proposal generators, closing a gap assistant/strategy_proposals.py's
+# generate_soxx_soxl_rebalance_proposals() already documented.
+
+def test_record_and_get_strategy_evaluation_round_trips():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        assert store.get_last_strategy_evaluation("soxx_soxl_rebalance") is None
+        store.record_strategy_evaluation(
+            "soxx_soxl_rebalance", "2026-08-01T10:00:00+00:00", {"fired": True, "proposal_count": 1},
+        )
+        result = store.get_last_strategy_evaluation("soxx_soxl_rebalance")
+        assert result["last_evaluated_at"] == "2026-08-01T10:00:00+00:00"
+        assert result["last_result"] == {"fired": True, "proposal_count": 1}
+
+
+def test_record_strategy_evaluation_overwrites_the_previous_row():
+    from assistant.storage import AssistantStore
+
+    with tempfile.TemporaryDirectory() as tmp:
+        store = AssistantStore(Path(tmp) / "assistant.db")
+        store.record_strategy_evaluation("soxx_soxl_rebalance", "2026-08-01T10:00:00+00:00", {"fired": False})
+        store.record_strategy_evaluation("soxx_soxl_rebalance", "2026-08-01T11:00:00+00:00", {"fired": True})
+        result = store.get_last_strategy_evaluation("soxx_soxl_rebalance")
+        assert result["last_evaluated_at"] == "2026-08-01T11:00:00+00:00"
+        assert result["last_result"] == {"fired": True}
+
+        conn = sqlite3.connect(store.path)
+        try:
+            count = conn.execute("SELECT COUNT(*) FROM strategy_evaluations").fetchone()[0]
+        finally:
+            conn.close()
+        assert count == 1  # overwritten, not a second row
+
+
 def test_pruning_a_pre_existing_db_with_duplicate_generated_at_rows_does_not_crash():
     # Regression guard for the migration itself: a pre-existing database
     # (from before this fix) could already contain duplicate generated_at
@@ -566,10 +575,6 @@ def test_build_decision_packet_uses_live_alpaca_when_configured():
         broker.get_open_positions = original_get_positions
 
 
-def test_read_decision_log_returns_empty_list_when_missing():
-    assert read_decision_log(log_path=Path("this/path/does/not/exist.jsonl")) == []
-
-
 if __name__ == "__main__":
     test_build_portfolio_snapshot_computes_market_value_and_pnl()
     test_build_portfolio_snapshot_flags_leveraged_etfs()
@@ -579,7 +584,6 @@ if __name__ == "__main__":
     test_get_upcoming_events_are_unavailable_without_a_calendar_feed()
     test_decision_packet_to_dict_is_json_serializable()
     test_decision_packet_to_dict_reaches_nested_signal_authority_fields()
-    test_audit_log_round_trips_decision_packets()
     test_save_decision_packet_two_sessions_saving_the_same_packet_produce_one_row()
     test_save_decision_packet_two_different_timestamps_remain_separate()
     test_save_decision_packet_different_portfolio_content_at_same_timestamp_produces_two_rows()
@@ -590,9 +594,10 @@ if __name__ == "__main__":
     test_prune_decision_packets_older_than_deletes_only_old_rows()
     test_prune_decision_packets_rejects_non_positive_days()
     test_prune_decision_packets_never_touches_proposals_or_broker_orders()
+    test_record_and_get_strategy_evaluation_round_trips()
+    test_record_strategy_evaluation_overwrites_the_previous_row()
     test_pruning_a_pre_existing_db_with_duplicate_generated_at_rows_does_not_crash()
     test_build_portfolio_snapshot_from_alpaca_uses_broker_data()
     test_build_decision_packet_falls_back_when_alpaca_not_configured()
     test_build_decision_packet_uses_live_alpaca_when_configured()
-    test_read_decision_log_returns_empty_list_when_missing()
     print("All assistant context builder tests passed.")

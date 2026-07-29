@@ -869,6 +869,21 @@ network access.
   bought-the-dip-and-it-went-to-zero case, since bankrupt names aren't in
   the universe at all -- its measured downside tail is understated
   (low-stakes since it's already rejected).
+- **No embargo between the discovery and confirmation periods** (found
+  2026-07-29). The split boundary itself is clean -- `backtest/engine.py`'s
+  `_split_by_date()` puts a date in exactly one side -- but a signal firing
+  ON the split date has its forward return measured over the following
+  `hold_days`, which land inside the confirmation period. So the last
+  ~`hold_days` of discovery and the first ~`hold_days` of confirmation
+  share overlapping return windows and are not fully independent. Standard
+  walk-forward practice embargoes `hold_days` around the split. Practical
+  impact on current findings: LOW -- the overlap is roughly `hold_days`
+  dates out of a several-hundred-date confirmation period, and it biases
+  the two periods toward AGREEING, so it cannot manufacture a rejection;
+  every finding recorded so far is a rejection or a risk-shape result. It
+  is deliberately not "fixed" retroactively, since changing the split
+  would shift every number in the versioned research registry. Add an
+  embargo before trusting any future confirmation reporting a positive edge.
 - No strategy is authorized to open new positions under the default policy.
 
 These limitations should be resolved incrementally without weakening the

@@ -14,6 +14,7 @@ or care which source was used.
 """
 from __future__ import annotations
 
+import math
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -79,6 +80,24 @@ def build_portfolio_snapshot(
     order: list[str] = []
     for p in positions:
         ticker = p["ticker"].strip().upper()
+        # Reject non-finite position numbers at the BOUNDARY rather than
+        # letting them propagate (independent review, 2026-07-29). A single
+        # NaN current_price makes market_value NaN, which makes
+        # total_equity NaN, which then silently defeats every downstream
+        # `>`/`<=` comparison: generate_risk_reduction_proposals() returned
+        # ZERO proposals for an over-concentrated portfolio (NaN comparisons
+        # are always False) and reported nothing wrong. A loud failure here
+        # is the only honest outcome -- the snapshot is genuinely unusable,
+        # and this function already raises ValueError for the adjacent
+        # inconsistent-duplicate-price case.
+        for field in ("shares", "entry_price", "current_price"):
+            value = p[field]
+            if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value):
+                raise ValueError(
+                    f"Position {ticker!r} has a non-finite/invalid {field}: {value!r}. Refusing to build "
+                    "a portfolio snapshot from unusable data -- every exposure and proposal check "
+                    "downstream would silently evaluate to False against NaN."
+                )
         if ticker not in grouped:
             grouped[ticker] = {"shares": 0.0, "cost": 0.0, "current_price": p["current_price"]}
             order.append(ticker)

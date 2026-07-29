@@ -364,7 +364,12 @@ def submit_market_order(
     _require_valid_shares(shares)
     if side not in ("buy", "sell"):
         raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
-    intent = TradeIntent(ticker=ticker, shares=shares, side=side)
+    # order_type is stated explicitly rather than relying on TradeIntent's
+    # default: it is part of intent_fingerprint(), so the authorization
+    # check below silently depends on it. An implicit default is the wrong
+    # thing to lean on in the last-mile authorization reconstruction --
+    # see submit_limit_order()'s docstring for why the two are kept apart.
+    intent = TradeIntent(ticker=ticker, shares=shares, side=side, order_type="market")
     verify_execution_authorization(intent, authorization)
     assert_account_and_asset_ready(ticker)
 

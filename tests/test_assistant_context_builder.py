@@ -23,6 +23,34 @@ from assistant.context_builder import (
 from assistant.schemas import EvidenceStatus
 
 
+def test_build_portfolio_snapshot_rejects_non_finite_position_numbers():
+    # Independent review, 2026-07-29, reproduced: a single NaN current_price
+    # made market_value NaN -> total_equity NaN -> every downstream `>`/`<=`
+    # comparison silently False. generate_risk_reduction_proposals() then
+    # returned ZERO proposals for an over-concentrated portfolio and
+    # reported nothing wrong. Fail loudly at the boundary instead.
+    for field, bad in [
+        ("current_price", float("nan")),
+        ("current_price", float("inf")),
+        ("shares", float("nan")),
+        ("entry_price", float("nan")),
+    ]:
+        row = {"ticker": "AAA", "shares": 10, "entry_price": 100.0, "current_price": 110.0}
+        row[field] = bad
+        try:
+            build_portfolio_snapshot([row], cash=1_000.0)
+            assert False, f"expected a non-finite {field}={bad!r} to be rejected"
+        except ValueError as exc:
+            assert field in str(exc)
+
+
+def test_build_portfolio_snapshot_still_accepts_ordinary_numbers():
+    snapshot = build_portfolio_snapshot(
+        [{"ticker": "AAA", "shares": 10, "entry_price": 100.0, "current_price": 110.0}], cash=1_000.0,
+    )
+    assert snapshot.total_equity == 2_100.0
+
+
 def test_build_portfolio_snapshot_computes_market_value_and_pnl():
     positions = [
         {"ticker": "AAA", "shares": 10, "entry_price": 100.0, "current_price": 110.0},

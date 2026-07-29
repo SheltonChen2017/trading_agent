@@ -143,7 +143,15 @@ def build_allocation_plan(
         target_dollars = dollar_amount * weight_pct / 100
         price = prices.get(ticker)
 
-        if not price or price <= 0:
+        # math.isfinite, not just `<= 0`: a NaN price passes BOTH `not price`
+        # (NaN is truthy) and `price <= 0` (every ordered comparison against
+        # NaN is False), and then math.floor(target/NaN) raises ValueError,
+        # crashing the whole Watchlist tab. Independent review, 2026-07-29 --
+        # reproduced; every other bad price (0, negative, None, inf) already
+        # degraded gracefully to a skipped entry, only NaN crashed. NaN is
+        # reachable: get_latest_quote() builds `price` from bare
+        # float(bid/ask) without a finiteness filter.
+        if price is None or not math.isfinite(price) or price <= 0:
             projected_value = existing_value + pending_value
             projected_pct = (projected_value / total_equity * 100) if total_equity else 0.0
             entries.append(

@@ -567,6 +567,44 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
         restore()
 
 
+def test_unsupported_order_type_is_refused_not_downgraded_to_a_market_order():
+    # Independent review, 2026-07-29: the submit dispatch used to read
+    # "limit, else market", so ANY other order type would have been
+    # submitted as an unbounded-price MARKET order. risk/execution_gate.py
+    # still approves order_type="stop" (it has no view of policy), and
+    # policy.allowed_order_types is only enforced one layer up -- so the
+    # dispatch itself must fail closed rather than silently downgrade.
+    # A policy permitting "stop" is constructed directly here (policy.validate()
+    # would reject it) precisely to reach the dispatch.
+    packet = _packet()
+    permissive_policy = dataclasses.replace(
+        _policy(), allowed_order_types=("market", "limit", "stop")
+    )
+    proposal = generate_risk_reduction_proposals(packet, permissive_policy)[0]
+    stored = proposal.to_dict()
+    stored["intent"] = {**stored["intent"], "order_type": "stop", "limit_price": 90.0}
+    captured, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(stored)
+            try:
+                execute_approved_paper_proposal(
+                    proposal.proposal_id, "approve", packet.portfolio,
+                    permissive_policy, store,
+                    now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+                )
+                assert False, "expected an unsupported order type to be refused"
+            except ProposalExecutionError as exc:
+                assert "order_type" in str(exc)
+            # The critical property: no order reached the broker at all.
+            assert captured == []
+            refreshed = store.get_proposal(proposal.proposal_id)
+            assert refreshed["status"] == "blocked"
+    finally:
+        restore()
+
+
 def test_approval_rejects_a_policy_with_the_same_version_but_different_content():
     # Regression test (GPT review, 2026-07-28): approval used to compare
     # only the `policy_version` string. Two policy files (e.g. a

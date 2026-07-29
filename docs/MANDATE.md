@@ -58,6 +58,17 @@ targets above is not a win by this document's standard.
   computable, how it performed against this table — not just CAGR/win
   rate.
 
+**Current reality check (2026-07-29):** the two bullets above describe the
+intended discipline, not an automated pipeline. Today
+`backtest/risk_metrics.py` is called by exactly one script
+(`scripts/run_defensive_carry_probe.py`), and
+`backtest.portfolio_simulator.simulate_portfolio()` is exercised only by
+its own tests — no research runner currently chains
+simulate_portfolio → risk_metrics → a report against §2's table. Computing
+these metrics is therefore still a manual step per investigation. Wiring
+one reusable reporting entry point is the obvious next piece of work; it
+is deliberately recorded as missing here rather than left implied.
+
 ## 4. Scope decisions
 
 These record how this project responded to a 2026-07 conversation with

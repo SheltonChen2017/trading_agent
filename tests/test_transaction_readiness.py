@@ -107,6 +107,112 @@ def test_order_lifecycle_is_fill_aware_idempotent_and_monotonic():
         assert len(store.list_broker_order_events(proposal_id="tp-ready")) == 4
 
 
+def test_conditional_status_update_refuses_when_the_proposal_moved_on():
+    # Mutation testing, 2026-07-29: removing the status guard in
+    # update_proposal_status_if_current() failed no test, even though every
+    # submission-error path in execution_service.py relies on it (each one
+    # writes SUBMISSION_UNKNOWN only `if_current` in
+    # submitting/submission_unknown/reconciling).
+    #
+    # Without the guard, a slow error path unwinding after reconciliation
+    # already proved the order filled would rewrite a genuine fill to
+    # "submission_unknown".
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal())
+        store.update_proposal_status("tp-ready", "filled")
+
+        result = store.update_proposal_status_if_current(
+            "tp-ready",
+            expected_statuses=("submitting", "submission_unknown", "reconciling"),
+            new_status="submission_unknown",
+            error="late network error unwinding after the fill was already confirmed",
+        )
+
+        assert result is None, "must not transition a proposal that already left the expected states"
+        refreshed = store.get_proposal("tp-ready")
+        assert refreshed["status"] == "filled"
+        assert "error" not in refreshed or refreshed.get("error") is None
+
+        # Sanity: the same call DOES apply from an expected state.
+        store.update_proposal_status("tp-ready", "submitting")
+        applied = store.update_proposal_status_if_current(
+            "tp-ready",
+            expected_statuses=("submitting",),
+            new_status="submission_unknown",
+            error="genuine ambiguity",
+        )
+        assert applied is not None
+        assert store.get_proposal("tp-ready")["status"] == "submission_unknown"
+
+
+def test_confirmed_absence_cannot_stomp_a_proposal_that_already_filled():
+    # Mutation testing, 2026-07-29: removing the status guard in
+    # mark_submission_failed_and_release() failed no test. Only its happy
+    # path (a proposal still "submitting") was covered.
+    #
+    # The guard exists for the race where a slow "broker confirms no such
+    # order" conclusion lands AFTER reconciliation already proved the order
+    # filled. Without it, a real fill would be rewritten to
+    # "submission_failed" AND its daily-budget reservation released --
+    # under-counting genuine exposure.
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal())
+        store.reserve_execution_budget(
+            "tp-ready", trading_day="2026-07-29", notional=1_000.0,
+            max_daily_notional=10_000.0, max_daily_orders=10,
+        )
+        store.update_proposal_status("tp-ready", "filled")
+
+        result = store.mark_submission_failed_and_release(
+            "tp-ready",
+            expected_statuses=("submitting", "submission_unknown", "reconciling"),
+            error="late 'broker confirms absent' arriving after the fill",
+        )
+
+        assert result is None, "a filled proposal must not be transitioned to submission_failed"
+        assert store.get_proposal("tp-ready")["status"] == "filled"
+        # The reservation must survive too -- a real fill still consumes budget.
+        assert store.get_execution_budget_usage("2026-07-29")["submitted_order_count"] == 1
+
+
+def test_a_lower_cumulative_fill_is_journaled_but_never_projected():
+    # Mutation testing, 2026-07-29: replacing storage.py's
+    # `quantity_allows_projection = incoming_filled >= current_filled`
+    # with `True` did not fail any test. The existing monotonicity test
+    # only sends a late *accepted* event, which the STATUS guard already
+    # rejects -- so the quantity guard was never exercised.
+    #
+    # This is the case only the quantity guard catches: a second FILLED
+    # event (a status transition that IS allowed from "filled") carrying a
+    # LOWER cumulative filled_qty, e.g. an out-of-order redelivery. It must
+    # still be journaled for auditability, but must never walk the recorded
+    # fill backwards.
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal())
+        journal_broker_order_update(
+            store, "tp-ready", _order("accepted"), event_type="new", external_event_id="e-new",
+        )
+        journal_broker_order_update(
+            store, "tp-ready", _order("filled", filled_qty=10), event_type="fill",
+            external_event_id="e-fill-10", fill_qty=10, fill_price=100.0,
+        )
+        assert store.get_proposal("tp-ready")["broker_order"]["filled_qty"] == 10
+
+        regressed = journal_broker_order_update(
+            store, "tp-ready", _order("filled", filled_qty=6), event_type="fill",
+            external_event_id="e-fill-6-late", fill_qty=6, fill_price=100.0,
+        )
+        # Journaled (audit trail preserved) but NOT projected.
+        assert regressed["broker_event_inserted"] is True
+        assert regressed["broker_event_projected"] is False
+        # The authoritative record still shows the higher, real fill.
+        assert store.get_proposal("tp-ready")["broker_order"]["filled_qty"] == 10
+        assert store.get_proposal("tp-ready")["status"] == "filled"
+
+
 def test_identity_mismatch_activates_persistent_kill_switch():
     with tempfile.TemporaryDirectory() as temp:
         store = AssistantStore(Path(temp) / "assistant.db")

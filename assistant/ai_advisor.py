@@ -25,6 +25,7 @@ import json
 import os
 import re
 import time
+from decimal import Decimal, InvalidOperation
 
 import config
 from assistant.storage import AssistantStore
@@ -418,7 +419,48 @@ def _contains_action_language(text: str, allowed_tickers: set[str]) -> bool:
     )
 
 
-_NUMERIC_CLAIM_PATTERN = re.compile(r"\d+(?:[.,]\d+)*")
+# Dates are extracted and compared as ATOMIC tokens, before plain numbers, so
+# a source date like "2026-07-28" does not quietly license unrelated claims
+# using 2026, 7, or 28 as free-standing figures.
+_DATE_TOKEN_PATTERN = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+# Optional leading sign, but only where a minus is genuinely a sign rather than
+# a hyphen inside a token: the lookbehind stops "5-10" from yielding "-10".
+# The `\.\d+` alternative matches a leading-dot decimal (".05"); without it a
+# source written that way contributed NO number at all, so a summary correctly
+# restating it as "0.05" was flagged as invented -- a false positive found by
+# this module's own tests, not by the review.
+_NUMERIC_CLAIM_PATTERN = re.compile(r"(?<![\w-])-?(?:\d+(?:[.,]\d+)*|\.\d+)")
+
+
+def _canonical_number(token: str) -> str | None:
+    """
+    A value-preserving canonical form for a numeric token, or None when it
+    cannot be parsed safely.
+
+    Commas are dropped as thousands separators; the decimal point is NOT,
+    because deleting it changes the value. The previous implementation did
+    `.replace(".", "").lstrip("0")`, which made 3.05 equal to 305 and 0.05
+    equal to 5 -- so a model could turn a real figure into a fabricated one and
+    still pass the source check -- while ALSO flagging 3.050 against a source
+    3.05 as invented (independent review, 2026-07-29; the false-positive half
+    was found while reproducing the false-negative half).
+
+    Decimal, not float, so 0.1 + 0.2 style representation error can never make
+    two genuinely different figures compare equal. Trailing zeros are
+    normalized (3.050 == 3.05) and leading zeros are harmless (0.05 == .05),
+    both of which are pure formatting. Sign is significant: -3.05 does not
+    match 3.05.
+    """
+    cleaned = token.replace(",", "")
+    try:
+        value = Decimal(cleaned)
+    except InvalidOperation:
+        return None
+    # normalize() collapses trailing zeros; the explicit zero case avoids
+    # Decimal("-0") and Decimal("0.0") canonicalizing to different strings.
+    if value == 0:
+        return "0"
+    return str(value.normalize())
 
 
 def _unsupported_numbers(text: str, source_text: str) -> list[str]:
@@ -431,18 +473,39 @@ def _unsupported_numbers(text: str, source_text: str) -> list[str]:
     dates -- the fabrication category with the most potential to mislead a
     financial decision.
 
-    Digits are compared with separators stripped so "9,000" in the output
-    matches "9000" in the source (and vice versa) rather than being flagged as
-    invented on formatting alone.
-    """
-    def _digits(value: str) -> str:
-        return value.replace(",", "").replace(".", "").lstrip("0") or "0"
+    Explicit rules, so nothing is inferred by accident:
 
-    source_numbers = {_digits(m) for m in _NUMERIC_CLAIM_PATTERN.findall(source_text)}
-    unsupported = []
-    for match in _NUMERIC_CLAIM_PATTERN.findall(text):
-        if _digits(match) not in source_numbers:
-            unsupported.append(match)
+    * Thousands separators are formatting: "30,000" matches "30000".
+    * Decimal value is preserved: "3.05" does NOT match "305".
+    * Sign is significant: "-3.05" does NOT match "3.05".
+    * Percentages are compared as the NUMERAL WRITTEN. "5%" does not match a
+      source "0.05" -- no unit conversion is attempted, because guessing that
+      a bare 0.05 meant 5% is exactly the kind of inference this guard exists
+      to avoid. A summary must restate the figure as the source wrote it.
+    * Whole dates are atomic: a source "2026-07-28" does not make 2026, 7 or 28
+      available as free-standing numbers.
+    * A token that cannot be parsed as a number is reported as unsupported
+      (fail closed), never silently ignored.
+    """
+    text_dates = _DATE_TOKEN_PATTERN.findall(text)
+    source_dates = set(_DATE_TOKEN_PATTERN.findall(source_text))
+    unsupported = [date for date in text_dates if date not in source_dates]
+
+    # Strip dates before scanning for plain numbers so their components are
+    # never treated as independently grounded figures.
+    text_without_dates = _DATE_TOKEN_PATTERN.sub(" ", text)
+    source_without_dates = _DATE_TOKEN_PATTERN.sub(" ", source_text)
+
+    source_numbers = set()
+    for token in _NUMERIC_CLAIM_PATTERN.findall(source_without_dates):
+        canonical = _canonical_number(token)
+        if canonical is not None:
+            source_numbers.add(canonical)
+
+    for token in _NUMERIC_CLAIM_PATTERN.findall(text_without_dates):
+        canonical = _canonical_number(token)
+        if canonical is None or canonical not in source_numbers:
+            unsupported.append(token)
     return unsupported
 
 

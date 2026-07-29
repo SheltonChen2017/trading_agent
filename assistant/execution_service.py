@@ -208,6 +208,8 @@ from datetime import datetime, timedelta, timezone
 from assistant.order_lifecycle import (
     journal_broker_order_update,
     proposal_status_for_order,
+    CHAIN_ERROR_IDENTITY_MISMATCH,
+    resolve_replacement_chain,
 )
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
@@ -340,6 +342,47 @@ def _lookup_order_outcome(broker_module, idempotency_key: str):
         return broker_module.find_order_by_client_id(idempotency_key)
     except Exception:
         return _LOOKUP_UNCONFIRMED
+
+
+def _authoritative_order_for(
+    broker_module, order: dict, intent: TradeIntent
+) -> tuple[dict | None, str | None, bool, tuple[str, ...]]:
+    """
+    Resolve a looked-up order through its replacement chain.
+
+    Returns `(authoritative_order, error, is_identity_mismatch, chain)`.
+
+    Both of this module's broker-lookup consumers need this:
+    reconcile_submission() (the user-facing manual operation) and
+    submit_approved_proposal()'s post-exception recovery. Neither followed
+    `replaced_by`, so each validated and journaled the SUPERSEDED order --
+    and because the original order still matches the stored intent (only its
+    status is "replaced"), the identity check passed and nothing looked wrong.
+    A human could re-run manual reconciliation indefinitely and stay pinned to
+    a dead order while its replacement had already filled (independent review,
+    2026-07-29, reproduced: returned order-1, status submission_unknown, zero
+    replacement lookups).
+
+    Delegates to order_lifecycle.resolve_replacement_chain() -- the same
+    resolver startup polling uses, deliberately not a second implementation --
+    injecting _order_matches_intent so EVERY hop is validated, not just the
+    final order.
+    """
+    resolution = resolve_replacement_chain(
+        order,
+        # Lazy for the same reason as order_reconciler's adapter: never touch
+        # get_order_by_id unless a replacement actually has to be fetched.
+        lambda oid: broker_module.get_order_by_id(oid),
+        validate=lambda candidate: _order_matches_intent(candidate, intent),
+    )
+    if resolution.error is not None:
+        return (
+            None,
+            resolution.error,
+            resolution.error_kind == CHAIN_ERROR_IDENTITY_MISMATCH,
+            resolution.chain,
+        )
+    return resolution.authoritative_order, None, False, resolution.chain
 
 
 def _order_matches_intent(order: dict, intent: TradeIntent) -> tuple[bool, str]:
@@ -1196,15 +1239,41 @@ def execute_approved_paper_proposal(
                     f"under this idempotency key ({mismatch_detail}) -- left as 'submission_unknown' "
                     "for manual investigation, not auto-resolved."
                 ) from exc
+            # Same replacement-chain resolution as manual reconciliation: the
+            # order found under our idempotency key could already have been
+            # replaced out of band between the failed submit and this lookup.
+            # Narrower window than reconcile_submission()'s, but the identical
+            # defect -- journaling a superseded order as the outcome.
+            authoritative, chain_error, is_mismatch, chain = _authoritative_order_for(
+                broker, outcome, intent
+            )
+            if chain_error is not None:
+                reason = (
+                    f"Order submission raised ({exc}), and the replacement chain for the order found "
+                    f"under this idempotency key could not be trusted: {chain_error}. "
+                    + ("Persistent kill switch activated; investigate manually."
+                       if is_mismatch else "Left retryable as 'submission_unknown'.")
+                )
+                store.update_proposal_status_if_current(
+                    proposal_id,
+                    expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
+                    new_status=SUBMISSION_UNKNOWN,
+                    error=reason,
+                )
+                if is_mismatch:
+                    store.set_kill_switch(True, reason=reason)
+                raise ProposalExecutionError(reason) from exc
+
             journal_broker_order_update(
                 store,
                 proposal_id,
-                outcome,
+                authoritative,
                 event_type="submission_reconciled",
                 clear_error=True,
                 extra_updates={"reconciled_after_error": str(exc)},
+                raw_event={"replacement_chain": list(chain)} if chain else None,
             )
-            return outcome
+            return authoritative
         if outcome is None:
             # Confirmed absent: the broker itself says this order was
             # never accepted, so it's safe to call it a real failure
@@ -1353,16 +1422,43 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
                     f"Reconciliation for {proposal_id} found a MISMATCHED order ({mismatch_detail}) -- left "
                     "as 'submission_unknown' for manual investigation, not auto-resolved."
                 )
+
+            # The order found under our idempotency key may have been REPLACED
+            # out of band; the live state then lives on the replacement, which
+            # has its own order id. Resolve before journaling, or this manual
+            # operation cannot fix the very condition it exists to fix.
+            authoritative, chain_error, is_mismatch, chain = _authoritative_order_for(
+                broker, outcome, stored_intent
+            )
+            if chain_error is not None:
+                reason = (
+                    f"Manual reconciliation for {proposal_id} could not trust the replacement chain: "
+                    f"{chain_error}. "
+                    + ("Persistent kill switch activated; investigate manually."
+                       if is_mismatch else "Left retryable as 'submission_unknown'.")
+                )
+                store.update_proposal_status_if_current(
+                    proposal_id,
+                    expected_statuses=(RECONCILING,),
+                    new_status=SUBMISSION_UNKNOWN,
+                    reconciled_at=reconciled_at,
+                    error=reason,
+                )
+                if is_mismatch:
+                    store.set_kill_switch(True, reason=reason)
+                raise ProposalExecutionError(reason)
+
             journal_broker_order_update(
                 store,
                 proposal_id,
-                outcome,
+                authoritative,
                 event_type="manual_reconciliation",
                 event_at=reconciled_at,
                 clear_error=True,
                 extra_updates={"reconciled_at": reconciled_at},
+                raw_event={"replacement_chain": list(chain)} if chain else None,
             )
-            return outcome
+            return authoritative
 
         if outcome is None:
             transitioned = store.mark_submission_failed_and_release(

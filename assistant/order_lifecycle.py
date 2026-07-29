@@ -6,11 +6,12 @@ strings into the proposal states used by the rest of the assistant.
 """
 from __future__ import annotations
 
+import dataclasses
 import hashlib
 import json
 import math
 from datetime import datetime, timezone
-from typing import Any, TYPE_CHECKING
+from typing import Any, Callable, TYPE_CHECKING
 
 from assistant.proposal_status import (
     APPROVED,
@@ -131,6 +132,152 @@ def _finite_float(value: Any) -> float | None:
     except (TypeError, ValueError):
         return None
     return parsed if math.isfinite(parsed) else None
+
+
+MAX_REPLACEMENT_CHAIN_DEPTH = 10
+
+# Distinguishes the two failure modes, because callers must react differently:
+# an identity mismatch is an authorization anomaly that trips the persistent
+# kill switch, while an unresolved lookup is merely "we cannot tell yet" and
+# must stay retryable. Collapsing them would either fire the kill switch on a
+# network blip or silently accept an altered order.
+CHAIN_ERROR_IDENTITY_MISMATCH = "identity_mismatch"
+CHAIN_ERROR_UNRESOLVED = "unresolved"
+
+
+@dataclasses.dataclass(frozen=True)
+class ReplacementResolution:
+    """Outcome of following a broker replacement chain."""
+
+    authoritative_order: dict[str, Any] | None
+    traversed_orders: tuple[dict[str, Any], ...]
+    chain: tuple[str, ...]
+    error: str | None = None
+    error_kind: str | None = None
+
+    @property
+    def followed_a_replacement(self) -> bool:
+        return bool(self.chain)
+
+
+def resolve_replacement_chain(
+    order: dict[str, Any],
+    get_order_by_id: Callable[[str], dict[str, Any] | None],
+    *,
+    validate: Callable[[dict[str, Any]], tuple[bool, str]] | None = None,
+    max_depth: int = MAX_REPLACEMENT_CHAIN_DEPTH,
+) -> ReplacementResolution:
+    """
+    Follow `replaced_by` from `order` to the order that is authoritative NOW,
+    validating EVERY hop.
+
+    Lives here rather than in order_reconciler because three separate call
+    sites need it -- startup/poll reconciliation, the user-facing
+    reconcile_submission(), and submit_approved_proposal()'s
+    post-exception recovery -- and order_reconciler imports FROM
+    execution_service, so a resolver there could not be shared without a
+    circular import. order_lifecycle already owns the "replaced" vocabulary
+    (see _REPLACED / is_replaced_order) and imports nothing but
+    proposal_status, so it is the neutral home. `validate` is injected for the
+    same reason: `_order_matches_intent` lives in execution_service and cannot
+    be imported here.
+
+    Every fetched order is checked, not just the last one. A previous version
+    validated only the final order, so a chain of
+    10 shares -> 999 shares -> 10 shares was accepted with no error and no
+    kill switch (independent review, 2026-07-29, reproduced). That matters
+    because an altered intermediate order may have been live long enough to
+    receive fills before being replaced again, so ignoring it can hide
+    unauthorized exposure. Each hop is checked for:
+
+      * the fetched order's id actually being the id we asked for,
+      * `replaces` (when the broker provides it) pointing back at the order it
+        supersedes, and
+      * `validate(order)` -- material identity against the stored intent.
+
+    Cycle- and depth-guarded so a broker reporting A -> B -> A, or an endless
+    chain, cannot spin here. Returns a ReplacementResolution; a non-None
+    `error` means the caller MUST NOT project from `order` -- treat the
+    proposal as unresolved, and trip the kill switch when `error_kind` is
+    CHAIN_ERROR_IDENTITY_MISMATCH. A failed or missing lookup is never
+    confirmed absence.
+    """
+    chain: list[str] = []
+    traversed: list[dict[str, Any]] = []
+    visited: set[str] = set()
+    current = order
+
+    while is_replaced_order(current):
+        current_id = str(current.get("order_id") or "")
+        if current_id and current_id in visited:
+            return ReplacementResolution(
+                None, tuple(traversed), tuple(chain),
+                f"replacement chain revisits order {current_id} (cycle)",
+                CHAIN_ERROR_UNRESOLVED,
+            )
+        if current_id:
+            visited.add(current_id)
+
+        replaced_by = current.get("replaced_by")
+        if not replaced_by:
+            return ReplacementResolution(
+                None, tuple(traversed), tuple(chain),
+                "order is marked replaced but the broker reported no replaced_by, "
+                "so the replacement cannot be located",
+                CHAIN_ERROR_UNRESOLVED,
+            )
+        if len(chain) >= max_depth:
+            return ReplacementResolution(
+                None, tuple(traversed), tuple(chain),
+                f"replacement chain exceeded {max_depth} hops (stopped at {replaced_by})",
+                CHAIN_ERROR_UNRESOLVED,
+            )
+        chain.append(str(replaced_by))
+
+        try:
+            nxt = get_order_by_id(str(replaced_by))
+        except Exception as exc:
+            return ReplacementResolution(
+                None, tuple(traversed), tuple(chain),
+                f"replacement order {replaced_by} lookup failed: {exc}",
+                CHAIN_ERROR_UNRESOLVED,
+            )
+        if nxt is None:
+            return ReplacementResolution(
+                None, tuple(traversed), tuple(chain),
+                f"replacement order {replaced_by} could not be found at the broker",
+                CHAIN_ERROR_UNRESOLVED,
+            )
+
+        fetched_id = str(nxt.get("order_id") or "")
+        if fetched_id and fetched_id != str(replaced_by):
+            return ReplacementResolution(
+                None, tuple(traversed), tuple(chain),
+                f"broker returned order {fetched_id} when asked for replacement {replaced_by}",
+                CHAIN_ERROR_UNRESOLVED,
+            )
+        back_reference = nxt.get("replaces")
+        if back_reference and current_id and str(back_reference) != current_id:
+            return ReplacementResolution(
+                None, tuple(traversed), tuple(chain),
+                f"replacement {replaced_by} claims to replace {back_reference}, "
+                f"not {current_id}",
+                CHAIN_ERROR_UNRESOLVED,
+            )
+
+        traversed.append(nxt)
+        if validate is not None:
+            matches, detail = validate(nxt)
+            if not matches:
+                return ReplacementResolution(
+                    None, tuple(traversed), tuple(chain),
+                    f"replacement order {replaced_by} does not match the stored intent "
+                    f"({detail})",
+                    CHAIN_ERROR_IDENTITY_MISMATCH,
+                )
+        current = nxt
+
+    return ReplacementResolution(current, tuple(traversed), tuple(chain))
 
 
 def is_replaced_order(order: dict[str, Any]) -> bool:

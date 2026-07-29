@@ -250,7 +250,6 @@ The current dependency set is:
 
 - pandas / numpy
 - yfinance
-- scikit-learn / joblib
 - alpaca-py
 - lxml
 - pandas_market_calendars (real NYSE trading-hours/holiday calendar)

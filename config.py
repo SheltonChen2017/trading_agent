@@ -96,6 +96,15 @@ LEVERAGED_ETF_UNDERLYING = {
     "SDS": "SPY",
 }
 
+# Inverse (bear) leveraged ETFs among the tickers above -- these move
+# OPPOSITE their underlying, so holding both, e.g., SPY and SPXU is a
+# partial HEDGE, not a duplicated same-direction bet the way SPY+UPRO is.
+# assistant/risk_copilot.py's find_correlated_clusters() excludes these
+# from its "hidden duplication" warning (GPT review, 2026-08-01: SPXU was
+# reproduced being described as "one amplified SPY bet," which is wrong
+# in the opposite direction of what the warning claims).
+INVERSE_LEVERAGED_ETF_TICKERS = {"SQQQ", "QID", "SOXS", "SPXU", "SDS", "TZA"}
+
 # --- Data -----------------------------------------------------------
 # ~7 trading years (2026-07 expansion from 504 days / ~2 years), so the
 # backtest spans multiple market regimes (2020 COVID crash, 2022 bear
@@ -300,7 +309,7 @@ REGIME_VOLATILITY_LOOKBACK_DAYS = 60
 # premium, residual momentum, overnight-gap reversal) were tried here on
 # external (ChatGPT) recommendation and rejected under this project's full
 # rigor bar -- see assistant/research_findings.json and commit 8605f0e.
-# Their config constants and implementations were removed 2026-08-01;
+# Their config constants and implementations were removed 2026-07-28;
 # git history retains both.
 
 # --- Risk (default policy caps, enforced by risk/execution_gate.py) -----

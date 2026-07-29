@@ -5,10 +5,10 @@ Core architectural rule (per project design discussion, 2026-07): the
 assistant/LLM layer NEVER computes financial numbers itself — position
 sizes, exposures, drawdowns, returns, order quantities. Every number in
 these schemas is computed by deterministic Python elsewhere in this repo
-(backtest/engine.py, risk/manager.py, signals/regime.py, this package's
-own context_builder.py). The assistant only reads, prioritizes, and
-explains this already-computed, already-labeled structure — never asked
-to derive these numbers from prose or raw tables.
+(backtest/engine.py, risk/execution_gate.py, signals/regime.py, this
+package's own context_builder.py). The assistant only reads, prioritizes,
+and explains this already-computed, already-labeled structure — never
+asked to derive these numbers from prose or raw tables.
 """
 from __future__ import annotations
 

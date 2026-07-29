@@ -78,7 +78,12 @@ from assistant.proposal_status import (
 )
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.research_registry import summarize_evidence_authority, underfilled_dataset_warning
-from assistant.risk_copilot import check_concentration, estimate_stress_impact, find_correlated_clusters
+from assistant.risk_copilot import (
+    check_concentration,
+    check_policy_compliance,
+    estimate_stress_impact,
+    find_correlated_clusters,
+)
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.stock_lookup import (
     compute_blended_volatility,
@@ -754,7 +759,9 @@ with tab_briefing:
     else:
         st.caption("No basket exposure -- no positions held.")
 
-    st.caption(check_concentration(packet.risk))
+    for policy_violation in check_policy_compliance(packet.portfolio, packet.risk, policy):
+        st.error(f"Policy violation: {policy_violation}")
+    st.caption("Informational summary (not a policy-compliance check -- see any policy violations above): " + check_concentration(packet.risk))
     for cluster_warning in find_correlated_clusters(packet.portfolio):
         st.warning(cluster_warning)
     with st.expander("Stress test"):

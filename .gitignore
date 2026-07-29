@@ -3,9 +3,6 @@ __pycache__/
 *.pyo
 .pytest_cache/
 
-# Trained model artifacts -- don't commit binaries
-*.joblib
-
 # Never commit credentials
 .env
 .env.*
@@ -14,7 +11,6 @@ __pycache__/
 data/trading_assistant.db
 data/trading_assistant.db-shm
 data/trading_assistant.db-wal
-assistant/decision_log.jsonl
 
 # Claude Code session transcripts and machine-local permissions -- these
 # were committed by accident (Codex review, 2026-07-27: a 17MB session

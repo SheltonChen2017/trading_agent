@@ -11,8 +11,14 @@ import numpy as np
 import pandas as pd
 
 import assistant.risk_copilot as risk_copilot
-from assistant.context_builder import build_portfolio_snapshot
-from assistant.risk_copilot import check_concentration, estimate_stress_impact, find_correlated_clusters
+from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
+from assistant.policy import TradingPolicy
+from assistant.risk_copilot import (
+    check_concentration,
+    check_policy_compliance,
+    estimate_stress_impact,
+    find_correlated_clusters,
+)
 from assistant.schemas import RiskExposure
 
 
@@ -64,6 +70,65 @@ def test_find_correlated_clusters_silent_when_only_one_side_held():
         [{"ticker": "QQQ", "shares": 10, "entry_price": 400.0, "current_price": 400.0}], cash=0.0,
     )
     assert find_correlated_clusters(snapshot) == []
+
+
+def test_find_correlated_clusters_does_not_flag_an_inverse_etf_as_duplication():
+    # GPT review, 2026-08-01: SPY + SPXU was reproduced being described as
+    # "one amplified SPY bet" -- SPXU is INVERSE (moves opposite SPY), so
+    # holding both is a partial hedge, not duplicated same-direction
+    # exposure the way SPY + UPRO would be.
+    snapshot = build_portfolio_snapshot(
+        [
+            {"ticker": "SPY", "shares": 10, "entry_price": 500.0, "current_price": 500.0},
+            {"ticker": "SPXU", "shares": 10, "entry_price": 10.0, "current_price": 10.0},
+        ],
+        cash=0.0,
+    )
+    assert find_correlated_clusters(snapshot) == []
+
+
+def test_find_correlated_clusters_still_flags_a_non_inverse_leveraged_pair():
+    # Regression guard: the inverse-ETF exclusion must not silently
+    # disable the warning for genuine same-direction duplication.
+    snapshot = build_portfolio_snapshot(
+        [
+            {"ticker": "SPY", "shares": 10, "entry_price": 500.0, "current_price": 500.0},
+            {"ticker": "UPRO", "shares": 10, "entry_price": 80.0, "current_price": 80.0},
+        ],
+        cash=0.0,
+    )
+    warnings = find_correlated_clusters(snapshot)
+    assert len(warnings) == 1
+    assert "SPY" in warnings[0] and "UPRO" in warnings[0]
+
+
+# --- check_policy_compliance() (GPT review, 2026-08-01): check_concentration()
+# uses fixed informational thresholds unrelated to the active policy -- a
+# 10% position with a 5% policy max_position_pct reported "no concentration
+# warnings" while proposal generation would actually flag it. This function
+# checks the SAME numeric caps generate_risk_reduction_proposals() uses.
+
+def _policy(max_position_pct=0.05, max_basket_pct=0.40, max_leveraged_etf_pct=0.20):
+    return TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=max_position_pct, max_total_exposure_pct=0.50,
+        max_basket_pct=max_basket_pct, max_leveraged_etf_pct=max_leveraged_etf_pct,
+    )
+
+
+def test_check_policy_compliance_flags_a_position_over_the_policy_cap():
+    positions = [{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 100.0}]
+    snapshot = build_portfolio_snapshot(positions, cash=9_000.0)  # AAPL = 1000/10000 = 10%
+    risk = build_risk_exposure(snapshot)
+    violations = check_policy_compliance(snapshot, risk, _policy(max_position_pct=0.05))
+    assert any("AAPL" in v and "10.0%" in v for v in violations)
+
+
+def test_check_policy_compliance_silent_when_within_the_policy_cap():
+    positions = [{"ticker": "AAPL", "shares": 1, "entry_price": 100.0, "current_price": 100.0}]
+    snapshot = build_portfolio_snapshot(positions, cash=9_900.0)  # AAPL = 100/10000 = 1%
+    risk = build_risk_exposure(snapshot)
+    assert check_policy_compliance(snapshot, risk, _policy(max_position_pct=0.05)) == []
 
 
 def _synthetic_price_series(returns: np.ndarray, start_price: float = 100.0) -> pd.DataFrame:
@@ -133,6 +198,10 @@ if __name__ == "__main__":
     test_check_concentration_general_summary_when_no_basket_given()
     test_find_correlated_clusters_flags_leveraged_plus_underlying()
     test_find_correlated_clusters_silent_when_only_one_side_held()
+    test_find_correlated_clusters_does_not_flag_an_inverse_etf_as_duplication()
+    test_find_correlated_clusters_still_flags_a_non_inverse_leveraged_pair()
+    test_check_policy_compliance_flags_a_position_over_the_policy_cap()
+    test_check_policy_compliance_silent_when_within_the_policy_cap()
     test_estimate_stress_impact_computes_beta_from_real_relationship()
     test_estimate_stress_impact_flags_missing_beta_without_dropping_silently()
     print("All assistant risk copilot tests passed.")

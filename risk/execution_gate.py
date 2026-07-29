@@ -1,14 +1,15 @@
 """
 Deterministic execution gate — the "never let the LLM bypass these
-limits" layer from the assistant design (2026-07). Per-position sizing,
-stop-loss pricing, and total-exposure capping, plus the checks GPT's
-design review specifically called for: sector/basket limits, leveraged-
-ETF limits, stale-price checks, trading-hours checks, duplicate-order
-detection, max slippage, earnings restrictions, and a kill switch. (This
-module previously described itself as "extending risk/manager.py" — that
-module was part of an earlier, disconnected ML/signal-sizing research
-path with no import relationship to this one; it was removed 2026-08-01,
-see docs/ARCHITECTURE_DEBT.md.)
+limits" layer from the assistant design (2026-07). Per-position sizing
+and total-exposure capping, plus the checks GPT's design review
+specifically called for: sector/basket limits, leveraged-ETF limits,
+stale-price checks, trading-hours checks, duplicate-order detection, max
+slippage, earnings restrictions, and a kill switch. (This module
+previously described itself as "extending risk/manager.py" and as also
+handling "stop-loss pricing" — that module was part of an earlier,
+disconnected ML/signal-sizing research path with no import relationship
+to this one and no stop-loss pricing logic ever lived in this module; the
+old code was removed 2026-07-28, see docs/ARCHITECTURE_DEBT.md.)
 
 A TradeIntent is a typed, frozen data structure — not free-form text.
 validate_trade_intent() is pure validation: it never submits an order
@@ -406,8 +407,9 @@ def authorize_overridden_trade_intent(
 # authorize_overridden_trade_intent() -- implying single-use, per its own
 # docstring -- but this function never actually read or checked it, so
 # the SAME authorization object could legitimately be replayed against
-# submit_market_order()/submit_limit_order()/submit_stop_loss_order() as
-# many times as wanted within its TTL window). Doesn't survive a process
+# submit_market_order()/submit_limit_order() (and, at the time this fix
+# was written, the now-removed submit_stop_loss_order()) as many times as
+# wanted within its TTL window). Doesn't survive a process
 # restart, but neither does anything else about a short-lived (120s
 # default) authorization -- this doesn't currently bypass the personal-
 # assistant's single-use proposal workflow (the proposal state machine's

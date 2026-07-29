@@ -19,7 +19,12 @@ from assistant.execution_service import (
 from assistant.policy import load_policy
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.research_registry import underfilled_dataset_warning
-from assistant.risk_copilot import check_concentration, estimate_stress_impact, find_correlated_clusters
+from assistant.risk_copilot import (
+    check_concentration,
+    check_policy_compliance,
+    estimate_stress_impact,
+    find_correlated_clusters,
+)
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import generate_soxx_soxl_rebalance_proposals
@@ -111,7 +116,12 @@ def command_risk_check(args, store: AssistantStore) -> None:
         # _positive_int's role for --stale-after-seconds: catches an
         # obviously incomplete invocation early with a clear message.
         raise SystemExit("--benchmark and --move-pct must be given together, or not at all.")
+    policy = load_policy(args.policy)
     packet = _packet(include_events=False)
+    violations = check_policy_compliance(packet.portfolio, packet.risk, policy)
+    for violation in violations:
+        print(f"  POLICY VIOLATION: {violation}")
+    print("Informational summary (not a policy-compliance check -- see any POLICY VIOLATION lines above):")
     print(check_concentration(packet.risk, args.basket))
     for cluster_warning in find_correlated_clusters(packet.portfolio):
         print(f"  ! {cluster_warning}")

@@ -151,6 +151,44 @@ def test_daily_budget_is_idempotent_and_confirmed_absence_releases_it():
         assert store.get_execution_budget_usage("2026-07-29")["submitted_order_count"] == 0
 
 
+def test_filled_notional_buckets_by_eastern_trading_day_not_utc_date():
+    # Independent review, 2026-07-29: `trading_day` is an EASTERN market
+    # date, but event_at is an absolute (normally UTC) timestamp. Matching
+    # them by string prefix pushed any fill after 8:00pm Eastern onto the
+    # next trading day, because that instant is already past midnight UTC.
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal(status="broker_accepted"))
+
+        def record(event_id: str, event_at: str, qty: float, expected: tuple[str, ...]) -> None:
+            store.project_broker_order_event(
+                event_id=event_id,
+                proposal_id="tp-ready",
+                order={"order_id": "o1", "status": "filled", "filled_qty": qty, "filled_avg_price": 100.0},
+                event_type="fill",
+                event_at=event_at,
+                new_proposal_status="filled",
+                expected_current_statuses=expected,
+                proposal_updates={},
+                fill_qty=qty,
+                fill_price=100.0,
+            )
+
+        # 21:00 Eastern on 2026-07-29 is 01:00 UTC on 2026-07-30.
+        record("e-extended", "2026-07-30T01:00:00+00:00", 10.0, ("broker_accepted",))
+        # 10:00 Eastern the same day is 14:00 UTC the same day.
+        record("e-regular", "2026-07-29T14:00:00+00:00", 5.0, ("broker_accepted", "filled"))
+
+        assert store.get_execution_budget_usage("2026-07-29")["filled_notional"] == 1_500.0
+        assert store.get_execution_budget_usage("2026-07-30")["filled_notional"] == 0.0
+
+
+def test_filled_notional_tolerates_an_unparseable_trading_day():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        assert store.get_execution_budget_usage("not-a-date")["filled_notional"] == 0.0
+
+
 def test_poll_reconciliation_cancels_a_stale_accepted_order_without_repricing():
     class FakeBroker:
         canceled = []

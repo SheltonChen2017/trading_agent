@@ -98,15 +98,40 @@ _UNAMBIGUOUS_ACTION_VERBS = (
     r"exit|exiting|exited|liquidate|liquidating|liquidated|"
     r"rebalance|rebalancing|rebalanced|replace|replacing|replaced|"
     r"rotate|rotating|rotated|"
-    r"overweight|overweighting|overweighted|underweight|underweighting|underweighted"
+    r"overweight|overweighting|overweighted|underweight|underweighting|underweighted|"
+    # Independent adversarial probe, 2026-07-29: these all leaked through
+    # every other layer ("You might want to offload some NVDA.", "NVDA looks
+    # like a candidate for downsizing."). Unlike the size-change verbs below
+    # they need no corroborating object, because none of them has a
+    # descriptive reading in a portfolio review -- an "offload"/"divest"/
+    # "downsize" of a HOLDING is always a proposed action.
+    r"offload|offloading|offloaded|divest|divesting|divested|"
+    r"downsize|downsizing|downsized|upsize|upsizing|upsized"
 )
 _UNAMBIGUOUS_ACTION_PATTERN = re.compile(r"\b(" + _UNAMBIGUOUS_ACTION_VERBS + r")\b", re.IGNORECASE)
 _ADVICE_PATTERN = re.compile(
     r"\b(should|ought\s+to|consider(?:ing)?|prefer(?:red|s|ring|able)?|"
     r"favor(?:ed|s|ing)?|deserv(?:e|es|ed|ing)|recommend(?:ed|s|ing)?|"
     r"better\s+to|makes?\s+sense\s+to|would\s+be\s+better|"
+    # Independent adversarial probe, 2026-07-29: advisability adjectives and
+    # "warrants" carried the recommendation with no action verb the other
+    # layers recognized ("NVDA warrants a bigger slice of the portfolio.",
+    # "A tilt toward AMD is advisable.", "Scaling into AMD is sensible.").
+    # None of these has a neutral descriptive use in a concentration/
+    # volatility observation.
+    # "sensible" is deliberately NOT here: the phrasing that motivated it
+    # ("Scaling into AMD is sensible.") is already caught by the
+    # size-change/ticker-directed layer, so it added no coverage while
+    # over-blocking descriptive text like "a sensible-sounding plan".
+    r"warrant(?:s|ed|ing)?|prudent|advisable|inadvisable|"
+    r"worth\s+(?:considering|evaluating|exploring|reviewing)|"
     r"could\s+improve\s+the\s+portfolio\s+by)\b",
     re.IGNORECASE,
+)
+# "Take some profits in NVDA." -- a two-word action phrase no single verb in
+# the lists above covers (independent adversarial probe, 2026-07-29).
+_PROFIT_TAKING_PATTERN = re.compile(
+    r"\btak(?:e|es|en|ing)\b[^.]{0,20}?\bprofits?\b", re.IGNORECASE
 )
 _SIZE_CHANGE_VERBS = (
     r"allocate|allocating|allocated|increase|increasing|increased|"
@@ -115,7 +140,15 @@ _SIZE_CHANGE_VERBS = (
     r"grow|growing|grew|grown|enlarge|enlarging|enlarged|"
     r"trim|trimming|trimmed|cut|cutting|lower|lowering|lowered|"
     r"decrease|decreasing|decreased|remove|removing|removed|"
-    r"drop|dropping|dropped|shift|shifting|shifted|move|moving|moved"
+    r"drop|dropping|dropped|shift|shifting|shifted|move|moving|moved|"
+    # Independent adversarial probe, 2026-07-29: "Dial back NVDA.",
+    # "scale back NVDA", "A tilt toward AMD". Safe to widen here (rather
+    # than in the unambiguous list) because every consumer of this group
+    # additionally requires a modal, a change-object noun, or the ticker
+    # itself as the verb's direct object -- so a descriptive "NVDA has
+    # scaled its operations" still passes.
+    r"scale|scaling|scaled|tilt|tilting|tilted|"
+    r"dial|dialing|dialled|dialed|pare|paring|pared"
 )
 _MODAL_ACTION_PATTERN = re.compile(
     r"\b(?:can|could|would|might|may)\b.{0,40}?\b(?:" + _SIZE_CHANGE_VERBS +
@@ -380,6 +413,7 @@ def _contains_action_language(text: str, allowed_tickers: set[str]) -> bool:
         or _MODAL_ACTION_PATTERN.search(text)
         or _ALLOCATION_ACTION_PATTERN.search(text)
         or _EXPOSURE_ADVICE_PATTERN.search(text)
+        or _PROFIT_TAKING_PATTERN.search(text)
         or _ticker_directed_action_detected(text, allowed_tickers)
     )
 

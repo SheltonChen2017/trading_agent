@@ -101,6 +101,25 @@ _RELIED_UPON_FINDINGS: dict[str, EvidenceStatus] = {
 _RELIED_UPON_FINDING_LABELS = tuple(_RELIED_UPON_FINDINGS)
 
 
+@dataclasses.dataclass(frozen=True)
+class LeveragedPairConfig:
+    """Bundles everything that used to be SOXX/SOXL-specific module state,
+    so generate_leveraged_pair_rebalance_proposals() below can serve any
+    stable/leveraged pair. A new pair needs its OWN relied_upon_findings
+    (see SOXX_SOXL_PAIR's docstring-level discussion in this module's
+    header) and its OWN grid-searched production_params -- never assume
+    another pair's frozen numbers transfer, even if the mechanism is the
+    same (docs/ARCHITECTURE_DEBT.md-style discipline: don't overclaim)."""
+
+    stable_ticker: str
+    leveraged_ticker: str
+    strategy_key: str
+    production_params: dict
+    relied_upon_finding_labels: dict[str, EvidenceStatus]
+    evidence_status: str
+    lookback_days_for_signal: int = LOOKBACK_DAYS_FOR_SIGNAL
+
+
 class MissingResearchDependencyError(RuntimeError):
     """Raised when a finding this module's proposal generation relies on
     has NO matching entry in the research registry at all, OR no longer
@@ -125,20 +144,27 @@ class MissingResearchDependencyError(RuntimeError):
     ordinary "nothing needs rebalancing" result."""
 
 
-def _relied_upon_findings_status() -> tuple[list[str], list[str]]:
+def _relied_upon_findings_status(
+    relied_upon_findings: dict[str, EvidenceStatus] | None = None,
+) -> tuple[list[str], list[str]]:
     """Returns (broken_labels, non_authoritative_present_labels) for
-    _RELIED_UPON_FINDINGS against the current KNOWN_FINDINGS registry.
-    `broken_labels` covers BOTH a missing registry entry AND one present
-    with the WRONG status (not the specific status this strategy
-    requires) -- both are the SAME, stronger integrity failure (see
-    MissingResearchDependencyError), unlike a present-with-the-expected-
-    status-but-unreproduced finding, which is the softer
-    `non_authoritative_present` case and still allows a proposal with an
-    explicit disclosure."""
+    `relied_upon_findings` (defaults to _RELIED_UPON_FINDINGS, i.e. the
+    SOXX/SOXL pair -- kept as a default rather than a required parameter
+    so existing bare `_relied_upon_findings_status()` callers, including
+    tests/test_strategy_proposals.py, keep working unchanged) against the
+    current KNOWN_FINDINGS registry. `broken_labels` covers BOTH a missing
+    registry entry AND one present with the WRONG status (not the specific
+    status this strategy requires) -- both are the SAME, stronger
+    integrity failure (see MissingResearchDependencyError), unlike a
+    present-with-the-expected-status-but-unreproduced finding, which is
+    the softer `non_authoritative_present` case and still allows a
+    proposal with an explicit disclosure."""
+    if relied_upon_findings is None:
+        relied_upon_findings = _RELIED_UPON_FINDINGS
     by_label = {f.label: f for f in KNOWN_FINDINGS}
     broken = []
     non_authoritative_present = []
-    for label, expected_status in _RELIED_UPON_FINDINGS.items():
+    for label, expected_status in relied_upon_findings.items():
         finding = by_label.get(label)
         if finding is None or finding.status != expected_status:
             broken.append(label)
@@ -157,36 +183,103 @@ PRODUCTION_PARAMS = {
 
 EVIDENCE_STATUS = "promising_unconfirmed_strategy"
 
+SOXX_SOXL_PAIR = LeveragedPairConfig(
+    stable_ticker=STABLE_TICKER,
+    leveraged_ticker=LEVERAGED_TICKER,
+    strategy_key="soxx_soxl_rebalance",
+    production_params=PRODUCTION_PARAMS,
+    relied_upon_finding_labels=_RELIED_UPON_FINDINGS,
+    evidence_status=EVIDENCE_STATUS,
+    lookback_days_for_signal=LOOKBACK_DAYS_FOR_SIGNAL,
+)
 
-def _stable_id(packet: DecisionPacket, policy: TradingPolicy, intent: TradeIntent) -> str:
+# Pairs a caller (UI/CLI) should offer a rebalance check for. SPY/UPRO is
+# deliberately NOT here yet: its PRODUCTION_PARAMS have never been
+# finalized from a committed grid-search result (scripts/run_vol_target_
+# rotation_spy_upro.py prints "Best by Calmar" at runtime but nothing is
+# recorded in this repo) -- adding it with guessed numbers would overclaim
+# exactly what this module's docstring warns against. Re-run that script's
+# grid search (via the real-data-check skill) and record its winning
+# params here before adding SPY_UPRO_PAIR.
+CONFIGURED_LEVERAGED_PAIRS: list[LeveragedPairConfig] = [SOXX_SOXL_PAIR]
+
+
+def _stable_id(packet: DecisionPacket, policy: TradingPolicy, intent: TradeIntent, strategy_key: str) -> str:
     # See assistant/proposals.py's _stable_id for why generated_at (a full
     # timestamp) is used instead of portfolio.as_of (just a date) -- a
     # same-day regeneration must not collide with a stale/expired row.
     raw = (
-        f"soxx_soxl_rebalance|{packet.generated_at}|{policy.version}|{intent.ticker.upper()}|"
+        f"{strategy_key}|{packet.generated_at}|{policy.version}|{intent.ticker.upper()}|"
         f"{intent.side}|{intent.shares}"
     )
     return "tp_" + hashlib.sha256(raw.encode("utf-8")).hexdigest()[:16]
 
 
-def _target_leveraged_weight(stable_close: pd.Series, leveraged_close: pd.Series, as_of: pd.Timestamp) -> tuple[float | None, str]:
+def _target_leveraged_weight(
+    stable_close: pd.Series, leveraged_close: pd.Series, as_of: pd.Timestamp, production_params: dict
+) -> tuple[float | None, str]:
     """Returns (target_leveraged_weight, label). None if not computable
     (insufficient history) -- caller should skip generating a proposal."""
-    trend = classify_trend(stable_close, as_of, lookback_days=PRODUCTION_PARAMS["trend_lookback_days"])
+    trend = classify_trend(stable_close, as_of, lookback_days=production_params["trend_lookback_days"])
     if trend is None:
         return None, "insufficient_trend_history"
     if trend == "downtrend":
         return 0.0, "downtrend_defensive"
 
     leveraged_df = pd.DataFrame({"close": leveraged_close})
-    realized_vol = compute_trailing_market_volatility(leveraged_df, as_of, lookback_days=PRODUCTION_PARAMS["vol_lookback_days"])
+    realized_vol = compute_trailing_market_volatility(leveraged_df, as_of, lookback_days=production_params["vol_lookback_days"])
     if realized_vol is None:
         return None, "insufficient_volatility_history"
 
     target = compute_target_leveraged_weight(
-        realized_vol, PRODUCTION_PARAMS["target_vol_pct"], PRODUCTION_PARAMS["max_leveraged_weight"]
+        realized_vol, production_params["target_vol_pct"], production_params["max_leveraged_weight"]
     )
     return target, f"uptrend_vol_target(realized={realized_vol:.2f}%)"
+
+
+def generate_leveraged_pair_rebalance_proposals(
+    packet: DecisionPacket,
+    policy: TradingPolicy,
+    pair_config: LeveragedPairConfig,
+    ttl_minutes: int = 15,
+    market_data: dict[str, pd.DataFrame] | None = None,
+    store: AssistantStore | None = None,
+) -> list[TradeProposal]:
+    """
+    At most one proposal: rebalance `pair_config`'s stable/leveraged pair
+    toward the target leveraged weight if drift exceeds its configured
+    band. Returns [] if either ticker isn't currently held, if history is
+    insufficient to compute a target, or if the account is already within
+    the band.
+
+    `market_data` lets a caller/test inject price history instead of
+    hitting the network; production callers can omit it.
+
+    `store`, if given, records this evaluation via
+    AssistantStore.record_strategy_evaluation() under `pair_config.strategy_key`
+    -- closing a gap this module previously only documented: the backtest
+    assumed a fixed ~21-trading-day check counter, but the live version
+    had no equivalent memory of when it was last evaluated
+    (docs/ALLOCATION_SERVICE_DESIGN.md, 2026-07-28). Recorded on every
+    NORMAL return (proposal or empty list) but NOT when
+    MissingResearchDependencyError is raised below -- a refused evaluation
+    is a distinct case, deliberately not conflated with "evaluated, no
+    drift" here; no enforcement reads this data yet.
+
+    Raises MissingResearchDependencyError (fails closed, no proposal) if
+    a finding this strategy relies on has no matching entry in the
+    research registry at all, OR is present but no longer carries the
+    specific status this strategy requires (e.g. reclassified to
+    rejected/exploratory/unavailable) -- see that error's docstring.
+    """
+    proposals = _generate_leveraged_pair_rebalance_proposals(packet, policy, pair_config, ttl_minutes, market_data)
+    if store is not None:
+        store.record_strategy_evaluation(
+            pair_config.strategy_key,
+            datetime.now(timezone.utc).isoformat(),
+            {"fired": bool(proposals), "proposal_count": len(proposals)},
+        )
+    return proposals
 
 
 def generate_soxx_soxl_rebalance_proposals(
@@ -196,61 +289,38 @@ def generate_soxx_soxl_rebalance_proposals(
     market_data: dict[str, pd.DataFrame] | None = None,
     store: AssistantStore | None = None,
 ) -> list[TradeProposal]:
-    """
-    At most one proposal: rebalance SOXX/SOXL toward the target leveraged
-    weight if drift exceeds the 15% band. Returns [] if either ticker
-    isn't currently held, if history is insufficient to compute a
-    target, or if the account is already within the band.
-
-    `market_data` lets a caller/test inject price history instead of
-    hitting the network; production callers can omit it.
-
-    `store`, if given, records this evaluation via
-    AssistantStore.record_strategy_evaluation() -- closing a gap this
-    module previously only documented: the backtest assumed a fixed
-    ~21-trading-day check counter, but the live version had no equivalent
-    memory of when it was last evaluated (docs/ALLOCATION_SERVICE_DESIGN.md,
-    2026-07-28). Recorded on every NORMAL return (proposal or empty list)
-    but NOT when MissingResearchDependencyError is raised below -- a
-    refused evaluation is a distinct case, deliberately not conflated with
-    "evaluated, no drift" here; no enforcement reads this data yet.
-
-    Raises MissingResearchDependencyError (fails closed, no proposal) if
-    a finding this strategy relies on has no matching entry in the
-    research registry at all, OR is present but no longer carries the
-    specific status this strategy requires (e.g. reclassified to
-    rejected/exploratory/unavailable) -- see that error's docstring.
-    """
-    proposals = _generate_soxx_soxl_rebalance_proposals(packet, policy, ttl_minutes, market_data)
-    if store is not None:
-        store.record_strategy_evaluation(
-            "soxx_soxl_rebalance",
-            datetime.now(timezone.utc).isoformat(),
-            {"fired": bool(proposals), "proposal_count": len(proposals)},
-        )
-    return proposals
+    """Thin backward-compatible wrapper around
+    generate_leveraged_pair_rebalance_proposals(..., SOXX_SOXL_PAIR) --
+    kept so existing callers/tests that import this function by name need
+    no changes. See that function's docstring for full behavior."""
+    return generate_leveraged_pair_rebalance_proposals(packet, policy, SOXX_SOXL_PAIR, ttl_minutes, market_data, store)
 
 
-def _generate_soxx_soxl_rebalance_proposals(
+def _generate_leveraged_pair_rebalance_proposals(
     packet: DecisionPacket,
     policy: TradingPolicy,
+    pair_config: LeveragedPairConfig,
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
 ) -> list[TradeProposal]:
-    broken_dependencies, _ = _relied_upon_findings_status()
+    stable_ticker = pair_config.stable_ticker
+    leveraged_ticker = pair_config.leveraged_ticker
+    production_params = pair_config.production_params
+
+    broken_dependencies, _ = _relied_upon_findings_status(pair_config.relied_upon_finding_labels)
     if broken_dependencies:
         raise MissingResearchDependencyError(
             "Cannot verify this strategy's research dependencies -- the following relied-upon "
             "finding(s) are missing from the research registry entirely, or no longer carry the "
-            f"CONFIRMED status this strategy requires: {', '.join(broken_dependencies)}. Refusing to "
+            f"specific status this strategy requires: {', '.join(broken_dependencies)}. Refusing to "
             "generate a proposal until this is resolved (an accidental deletion, a label rename, a "
             "malformed migration, or a genuine reclassification of the underlying research)."
         )
 
     snapshot = packet.portfolio
     position_by_ticker = {p.ticker.upper(): p for p in snapshot.positions}
-    stable_position = position_by_ticker.get(STABLE_TICKER)
-    leveraged_position = position_by_ticker.get(LEVERAGED_TICKER)
+    stable_position = position_by_ticker.get(stable_ticker)
+    leveraged_position = position_by_ticker.get(leveraged_ticker)
     if stable_position is None or leveraged_position is None:
         return []
 
@@ -259,22 +329,24 @@ def _generate_soxx_soxl_rebalance_proposals(
         return []
 
     if market_data is None:
-        market_data = fetch_historical([STABLE_TICKER, LEVERAGED_TICKER], lookback_days=LOOKBACK_DAYS_FOR_SIGNAL)
-    if STABLE_TICKER not in market_data or LEVERAGED_TICKER not in market_data:
+        market_data = fetch_historical(
+            [stable_ticker, leveraged_ticker], lookback_days=pair_config.lookback_days_for_signal
+        )
+    if stable_ticker not in market_data or leveraged_ticker not in market_data:
         return []
-    stable_close = market_data[STABLE_TICKER]["close"]
-    leveraged_close = market_data[LEVERAGED_TICKER]["close"]
+    stable_close = market_data[stable_ticker]["close"]
+    leveraged_close = market_data[leveraged_ticker]["close"]
     if stable_close.empty or leveraged_close.empty:
         return []
     as_of = min(stable_close.index[-1], leveraged_close.index[-1])
 
-    target_leveraged_weight, label = _target_leveraged_weight(stable_close, leveraged_close, as_of)
+    target_leveraged_weight, label = _target_leveraged_weight(stable_close, leveraged_close, as_of, production_params)
     if target_leveraged_weight is None:
         return []
 
     current_leveraged_weight = leveraged_position.market_value / combined_value
     drift_pct = abs(current_leveraged_weight - target_leveraged_weight) * 100
-    if drift_pct <= PRODUCTION_PARAMS["band_pct"]:
+    if drift_pct <= production_params["band_pct"]:
         return []
 
     target_leveraged_value = combined_value * target_leveraged_weight
@@ -297,8 +369,8 @@ def _generate_soxx_soxl_rebalance_proposals(
         )
         side = "sell"
         reason = (
-            f"{LEVERAGED_TICKER} is {current_leveraged_weight * 100:.1f}% of the SOXX+SOXL allocation, "
-            f"{drift_pct:.1f} points outside the {PRODUCTION_PARAMS['band_pct']:.0f}% band around the "
+            f"{leveraged_ticker} is {current_leveraged_weight * 100:.1f}% of the {stable_ticker}+{leveraged_ticker} "
+            f"allocation, {drift_pct:.1f} points outside the {production_params['band_pct']:.0f}% band around the "
             f"{target_leveraged_weight * 100:.1f}% target ({label}). Sized against the policy's max order "
             "value -- may only partially close the gap in one pass."
         )
@@ -308,8 +380,8 @@ def _generate_soxx_soxl_rebalance_proposals(
         shares = min(max_order_shares, int(shortfall_value / leveraged_position.current_price))
         side = "buy"
         reason = (
-            f"{LEVERAGED_TICKER} is {current_leveraged_weight * 100:.1f}% of the SOXX+SOXL allocation, "
-            f"{drift_pct:.1f} points below the {PRODUCTION_PARAMS['band_pct']:.0f}% band around the "
+            f"{leveraged_ticker} is {current_leveraged_weight * 100:.1f}% of the {stable_ticker}+{leveraged_ticker} "
+            f"allocation, {drift_pct:.1f} points below the {production_params['band_pct']:.0f}% band around the "
             f"{target_leveraged_weight * 100:.1f}% target ({label}). Sized against currently available "
             f"cash/order-value limits -- may only partially close the gap in one pass."
         )
@@ -320,23 +392,25 @@ def _generate_soxx_soxl_rebalance_proposals(
     # Missing findings already raised above -- only "present but
     # unreproduced" reaches here, which still generates a proposal with
     # this explicit disclosure rather than being blocked.
-    _, non_authoritative = _relied_upon_findings_status()
+    _, non_authoritative = _relied_upon_findings_status(pair_config.relied_upon_finding_labels)
     uncertainties = [
-        "PRODUCTION_PARAMS (target_vol_pct=0.5, max_leveraged_weight=0.6) were selected via "
+        f"production_params (target_vol_pct={production_params['target_vol_pct']}, "
+        f"max_leveraged_weight={production_params['max_leveraged_weight']}) were selected via "
         "full-history grid search, not an out-of-sample confirmation split -- these specific "
-        "numbers are unconfirmed even though the wide-band mechanism itself is confirmed research.",
-        "This strategy has NOT been shown to beat SOXX/SOXL buy-and-hold on CAGR in any tested "
-        "configuration -- it is a risk-shape (drawdown/tax) trade, not an alpha claim.",
-        "Single-leg proposal: only SOXL is adjusted this pass. SOXX's own weight will look "
-        "correspondingly off-target until cash/proceeds settle and a later `propose` run rebalances it.",
+        "numbers are unconfirmed even though the wide-band mechanism itself may be confirmed research.",
+        f"This strategy has NOT been shown to beat {stable_ticker}/{leveraged_ticker} buy-and-hold on CAGR "
+        "in any tested configuration -- it is a risk-shape (drawdown/tax) trade, not an alpha claim.",
+        f"Single-leg proposal: only {leveraged_ticker} is adjusted this pass. {stable_ticker}'s own weight "
+        "will look correspondingly off-target until cash/proceeds settle and a later `propose` run "
+        "rebalances it.",
         "Market orders can fill away from the displayed reference price.",
     ]
     if non_authoritative:
         # Explicit, checked-at-generation-time disclosure (GPT review,
         # 2026-07-29) -- this module still generates proposals despite
         # relying on findings that haven't been re-verified since the
-        # fetch_historical lookback-days fix; EVIDENCE_STATUS is always
-        # "promising_unconfirmed_strategy" (never "confirmed"), so this
+        # fetch_historical lookback-days fix; evidence_status is always
+        # a "promising_unconfirmed*" label (never "confirmed"), so this
         # never overclaims, but the reliance itself must be surfaced,
         # not just assumed from the module docstring.
         uncertainties.append(
@@ -346,13 +420,13 @@ def _generate_soxx_soxl_rebalance_proposals(
         )
 
     intent = TradeIntent(
-        ticker=LEVERAGED_TICKER,
+        ticker=leveraged_ticker,
         side=side,
         shares=shares,
         order_type="market",
         rationale=reason,
     )
-    proposal_id = _stable_id(packet, policy, intent)
+    proposal_id = _stable_id(packet, policy, intent, pair_config.strategy_key)
     return [
         TradeProposal(
             proposal_id=proposal_id,
@@ -366,9 +440,9 @@ def _generate_soxx_soxl_rebalance_proposals(
             reference_price=leveraged_position.current_price,
             price_timestamp=now.isoformat(),
             reasons=[reason],
-            evidence_status=EVIDENCE_STATUS,
+            evidence_status=pair_config.evidence_status,
             expected_impact=preview_trade_impact(
-                snapshot, LEVERAGED_TICKER, side, shares, leveraged_position.current_price
+                snapshot, leveraged_ticker, side, shares, leveraged_position.current_price
             ),
             alternatives=[
                 "Take no action -- drift outside the band costs tax-efficiency, not immediate risk.",
@@ -378,3 +452,14 @@ def _generate_soxx_soxl_rebalance_proposals(
             uncertainties=uncertainties,
         )
     ]
+
+
+def _generate_soxx_soxl_rebalance_proposals(
+    packet: DecisionPacket,
+    policy: TradingPolicy,
+    ttl_minutes: int = 15,
+    market_data: dict[str, pd.DataFrame] | None = None,
+) -> list[TradeProposal]:
+    """Thin backward-compatible wrapper -- see
+    _generate_leveraged_pair_rebalance_proposals()."""
+    return _generate_leveraged_pair_rebalance_proposals(packet, policy, SOXX_SOXL_PAIR, ttl_minutes, market_data)

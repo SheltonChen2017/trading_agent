@@ -50,11 +50,14 @@ from signals.momentum import scan_momentum
 from signals.analyst_target import scan_analyst_target_gap
 
 
-def _run_one(name: str, data: dict, scan_fn) -> None:
+ENTRY_TIMINGS = ("same_close", "next_open")
+
+
+def _run_one(name: str, data: dict, scan_fn, n_tests: int) -> None:
     print(f"\n{'=' * 20} {name} {'=' * 20}")
-    for entry_timing in ("same_close", "next_open"):
+    for entry_timing in ENTRY_TIMINGS:
         result = out_of_sample_significance_by_block(
-            data, hold_days=5, scan_fn=scan_fn, n_tests=2, entry_timing=entry_timing,
+            data, hold_days=5, scan_fn=scan_fn, n_tests=n_tests, entry_timing=entry_timing,
         )
         if result.empty:
             print(f"  [{entry_timing}] No signals fired -- nothing to test.")
@@ -78,14 +81,41 @@ def main():
     credit_spread_proxy = build_credit_spread_proxy(macro_raw[CREDIT_SPREAD_HY_TICKER], macro_raw[CREDIT_SPREAD_IG_TICKER])
     yield_curve_proxy = build_yield_curve_proxy(macro_raw[YIELD_CURVE_SHORT_TICKER], macro_raw[YIELD_CURVE_LONG_TICKER])
 
-    _run_one("VIX spike", data, partial(scan_vix_spike, vix_data=vix_data))
-    _run_one("Credit spread widening", data, partial(scan_credit_spread, spread_data=credit_spread_proxy))
-    _run_one("Yield curve inversion", data, partial(scan_yield_curve, curve_data=yield_curve_proxy))
-    _run_one("Momentum (12-1 month)", data, scan_momentum)
-
     print(f"\nFetching analyst price-target history for {len(UNIVERSE)} tickers...")
     price_targets = fetch_price_target_history(UNIVERSE)
-    _run_one("Analyst price-target gap", data, partial(scan_analyst_target_gap, price_target_history=price_targets))
+
+    runs = [
+        ("VIX spike", partial(scan_vix_spike, vix_data=vix_data)),
+        ("Credit spread widening", partial(scan_credit_spread, spread_data=credit_spread_proxy)),
+        ("Yield curve inversion", partial(scan_yield_curve, curve_data=yield_curve_proxy)),
+        ("Momentum (12-1 month)", scan_momentum),
+        ("Analyst price-target gap", partial(scan_analyst_target_gap, price_target_history=price_targets)),
+    ]
+
+    # Bonferroni denominator must cover EVERY cell this run scans for a
+    # survivor -- signals x entry timings x directions -- not one signal's
+    # two directions (out_of_sample_significance_by_block's own docstring
+    # says to override with the total cell count; baskets.py already does).
+    # Passing the per-signal default n_tests=2 here set the threshold at
+    # 0.025 when it should be 0.05/20 = 0.0025: 10x too lenient.
+    #
+    # This is not hypothetical. This script is what produced the project's
+    # one live open anomaly -- the credit-spread "dip" leg appearing to
+    # flip to significant under next_open (see memory:
+    # project_signal_findings). Any p-value between 0.0025 and 0.025 that
+    # was called "significant" here was an artifact of under-correction,
+    # so that anomaly must be re-run under this corrected threshold before
+    # it is treated as even a candidate finding. The entry timings are
+    # counted as separate cells deliberately: both are printed and scanned
+    # for survivors in the same pass, which is exactly the multiplicity
+    # Bonferroni exists to price (self-review, 2026-07-29).
+    n_tests = len(runs) * len(ENTRY_TIMINGS) * 2  # 2 directions (dip + up)
+    print(
+        f"\nBonferroni correction: {len(runs)} signals x {len(ENTRY_TIMINGS)} entry timings x 2 "
+        f"directions = {n_tests} simultaneous cells -> threshold {0.05 / n_tests:.5f}"
+    )
+    for name, scan_fn in runs:
+        _run_one(name, data, scan_fn, n_tests)
 
 
 if __name__ == "__main__":

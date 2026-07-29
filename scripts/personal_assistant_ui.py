@@ -1139,7 +1139,14 @@ with tab_watchlist:
                     own_vol = compute_blended_volatility(close, as_of)
                     current_price = float(close.iloc[-1])
                     price_as_of = str(as_of.date())
-                explanation = explain_ticker(ticker, portfolio=watchlist_packet.portfolio, market_regime=watchlist_packet.regime)
+                # `data=data` reuses the history fetched just above rather
+                # than making explain_ticker() fetch the same bars again --
+                # halves the yfinance round-trips for a multi-ticker cart
+                # check (independent review, 2026-07-29).
+                explanation = explain_ticker(
+                    ticker, portfolio=watchlist_packet.portfolio,
+                    market_regime=watchlist_packet.regime, data=data,
+                )
                 price_targets = latest_price_targets_by_firm(ticker)
                 hold_range = historical_hold_period_range(ticker, data, hold_days=20)
                 news = fetch_recent_news(ticker)

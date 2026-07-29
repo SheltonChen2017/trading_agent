@@ -30,7 +30,7 @@ import config
 from assistant.storage import AssistantStore
 
 _MODEL = "claude-opus-5"
-_REVIEW_ALLOCATION_PROMPT_VERSION = "review_allocation_plan.v2"
+_REVIEW_ALLOCATION_PROMPT_VERSION = "review_allocation_plan.v3"
 _SUGGEST_SIMILAR_PROMPT_VERSION = "suggest_similar_tickers.v1"
 _CURATE_RECOMMENDED_PROMPT_VERSION = "curate_recommended_tickers.v1"
 
@@ -52,20 +52,38 @@ _SAFE_ACRONYMS = frozenset({"ETF", "USD", "AI", "CEO", "CFO", "SEC", "IPO", "NYS
 # (allocat\w*, target\w*, increas\w*, reduc\w*) rejected ordinary descriptive
 # prose too -- "This allocation is concentrated in semiconductors.", "The
 # target volatility is elevated.", "NVDA has increased volatility." all
-# matched and were wrongly dropped. Action language is now split into three
-# tiers instead of one blanket word list:
+# matched and were wrongly dropped. Action language is now split into tiers
+# instead of one blanket word list:
 #   1. Unambiguous transactional verbs (buy/sell/rebalance/replace) -- these
 #      are never used descriptively in an allocation-review context, so a
 #      bare word match is safe.
 #   2. Advice/recommendation markers (should, consider, prefer, deserve, ...)
 #      -- these only ever appear when the model is giving advice, not
 #      describing a fact.
-#   3. Context-sensitive verbs (allocate/increase/reduce/target) -- these ARE
+#   3. Modal/passive constructions ("we can increase NVDA", "AMD could be
+#      reduced") -- fourth pass: these carry no noun/comparative/percentage
+#      trigger at all, so tier 4 below never saw them; the modal+verb
+#      combination alone is inherently advisory regardless of what follows.
+#   4. Context-sensitive verbs (allocate/increase/reduce/target) -- these ARE
 #      used descriptively ("increased volatility", "reduced diversification",
 #      "the volatility target"), so they're only rejected when they appear
 #      near an actual allocation-change object (a position/weight/exposure
 #      noun, a comparative like "more"/"larger", or a percentage) -- i.e. an
 #      actual proposed change, not a description of the current state.
+#   5. A context-sensitive verb directly governing one of the ALLOWED
+#      tickers as its object ("Increase NVDA.", "Target NVDA at 60%.") --
+#      fourth pass: tier 4's trigger nouns don't include ticker symbols, so a
+#      bare "Increase NVDA." carried no recognized trigger at all. This is
+#      ticker-scoped and uses a SHORT (~15-char) forward window specifically
+#      to distinguish "reduce AMD" (AMD is the direct object) from "AMD has
+#      reduced correlation with NVDA over the sampled period" (NVDA is many
+#      characters away, inside an unrelated prepositional phrase) --
+#      widening this window to tier 4's 40 chars would reject that second,
+#      legitimate sentence. Ticker matching is deliberately NOT case-folded
+#      (unlike the verb match) for the same reason _mentions_unknown_ticker
+#      matches original-case text: a genuine ticker mention is written in
+#      real caps, so this only fires on an actual ticker mention, not an
+#      incidental lowercase word that happens to share letters with one.
 _UNAMBIGUOUS_ACTION_PATTERN = re.compile(
     r"\b(buy|buying|bought|sell|selling|sold|"
     r"rebalance|rebalancing|rebalanced|replace|replacing|replaced)\b",
@@ -76,14 +94,24 @@ _ADVICE_PATTERN = re.compile(
     r"favor(?:ed|s|ing)?|deserv(?:e|es|ed|ing)|recommend(?:ed|s|ing)?)\b",
     re.IGNORECASE,
 )
+_ALLOCATION_ACTION_VERBS = (
+    r"allocate|allocating|allocated|increase|increasing|increased|"
+    r"reduce|reducing|reduced|target|targeting|targeted"
+)
+_MODAL_ACTION_PATTERN = re.compile(
+    r"\b(?:can|could|would|might|may)\s+(?:be\s+)?(?:" + _ALLOCATION_ACTION_VERBS +
+    r"|rebalance|rebalanced|replace|replaced|buy|bought|sell|sold)\b",
+    re.IGNORECASE,
+)
 _ALLOCATION_CHANGE_TRIGGER = (
-    r"(?:position|weight|share|exposure|holding|allocation|"
-    r"more|less|additional|greater|smaller|larger|\d+(?:\.\d+)?\s*%)"
+    r"\b(?:position|weight|share|exposure|holding|allocation|"
+    r"more|less|additional|greater|smaller|larger)\b"
+    r"|\d+(?:\.\d+)?\s*%"  # no trailing \b -- "%" is not a word char, so a
+    # \b right after it never matches (the reported boundary bug)
 )
 _ALLOCATION_ACTION_PATTERN = re.compile(
-    r"\b(?:allocate|allocating|allocated|increase|increasing|increased|"
-    r"reduce|reducing|reduced|target|targeting|targeted)\b"
-    r".{0,40}?\b" + _ALLOCATION_CHANGE_TRIGGER + r"\b",
+    r"\b(?:" + _ALLOCATION_ACTION_VERBS + r")\b"
+    r".{0,40}?(?:" + _ALLOCATION_CHANGE_TRIGGER + r")",
     re.IGNORECASE,
 )
 _EXPOSURE_ADVICE_PATTERN = re.compile(
@@ -93,6 +121,17 @@ _EXPOSURE_ADVICE_PATTERN = re.compile(
     r"|benefit(?:s|ed|ting)?\s+from",
     re.IGNORECASE,
 )
+
+
+def _build_ticker_directed_action_pattern(allowed_tickers: set[str]) -> re.Pattern | None:
+    tickers = sorted({t for t in allowed_tickers if t})
+    if not tickers:
+        return None
+    ticker_alt = "|".join(re.escape(t) for t in tickers)
+    return re.compile(
+        r"(?i:\b(?:" + _ALLOCATION_ACTION_VERBS + r")\b)"
+        r".{0,15}?\b(?:" + ticker_alt + r")\b"
+    )
 _MAX_SUMMARY_LENGTH = 500
 _MAX_CLAIM_LENGTH = 300
 
@@ -221,7 +260,7 @@ def _validate_allocation_review(
         or _PERCENT_PATTERN.search(summary)
         or _DOLLAR_PATTERN.search(summary)
         or _mentions_unknown_ticker(summary, cart_set)
-        or _contains_action_language(summary)
+        or _contains_action_language(summary, cart_set)
     ):
         return None
 
@@ -249,7 +288,7 @@ def _validate_allocation_review(
             continue
         if _mentions_unknown_ticker(claim, set(obs_tickers)):
             continue
-        if _contains_action_language(claim):
+        if _contains_action_language(claim, set(obs_tickers)):
             continue
         dedup_key = (obs_type, severity, obs_tickers, claim)
         if dedup_key in seen:
@@ -266,21 +305,32 @@ def _validate_allocation_review(
     return AllocationReview(summary=summary, observations=tuple(kept_observations))
 
 
-def _contains_action_language(text: str) -> bool:
+def _contains_action_language(text: str, allowed_tickers: set[str]) -> bool:
     """Rejects buy/sell/replace/rebalance language outright (never used
     descriptively here), advice/recommendation markers (should/consider/
-    prefer/deserve/...), and allocate/increase/reduce/target ONLY when they
-    appear near an actual change-object (a position/weight/exposure noun, a
-    comparative like "more"/"larger", or a percentage) -- so "Sell NVDA and
-    replace it with cash" is still caught with no number present, while
-    "NVDA has increased volatility" or "The volatility target is based on
-    trailing data" are not."""
-    return bool(
+    prefer/deserve/...), modal/passive constructions ("we can increase NVDA",
+    "AMD could be reduced"), allocate/increase/reduce/target when they appear
+    near an actual change-object (a position/weight/exposure noun, a
+    comparative like "more"/"larger", or a percentage), AND allocate/
+    increase/reduce/target when one of `allowed_tickers` appears as its
+    direct object within a short window ("Increase NVDA.", "Target NVDA at
+    60%.") -- so "Sell NVDA and replace it with cash" is still caught with
+    no number present, "We can increase NVDA." is caught with no trigger
+    noun present, "Increase NVDA." is caught with no ticker-independent
+    trigger at all, while "NVDA has increased volatility" and "AMD has
+    reduced correlation with NVDA over the sampled period" are not (the
+    ticker there is far enough from the verb, inside an unrelated
+    prepositional phrase, that the short direct-object window excludes it)."""
+    if (
         _UNAMBIGUOUS_ACTION_PATTERN.search(text)
         or _ADVICE_PATTERN.search(text)
+        or _MODAL_ACTION_PATTERN.search(text)
         or _ALLOCATION_ACTION_PATTERN.search(text)
         or _EXPOSURE_ADVICE_PATTERN.search(text)
-    )
+    ):
+        return True
+    ticker_pattern = _build_ticker_directed_action_pattern(allowed_tickers)
+    return bool(ticker_pattern and ticker_pattern.search(text))
 
 
 SUGGESTION_SCHEMA = {

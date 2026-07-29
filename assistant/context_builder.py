@@ -75,7 +75,33 @@ def build_portfolio_snapshot(
     the same ticker must report the same current_price (they describe the
     same instant); inconsistent prices raise ValueError rather than being
     silently combined, since there's no principled way to pick one.
+
+    `cash`, `buying_power`, and every position number must be finite --
+    see the per-row check below for why a single NaN is a silent,
+    portfolio-wide failure rather than a local one.
     """
+    # cash/buying_power are validated alongside the position rows for the
+    # same reason: total_equity = cash + sum(market_value), so a NaN in
+    # EITHER makes total_equity NaN and silently defeats every downstream
+    # `>`/`<=` exposure comparison. (Independent review, 2026-07-29: the
+    # first version of this guard covered only the position rows, which
+    # left NaN cash producing exactly the failure it was meant to stop --
+    # check_policy_compliance() reported zero violations for a corrupt
+    # portfolio.)
+    if not isinstance(cash, (int, float)) or isinstance(cash, bool) or not math.isfinite(cash):
+        raise ValueError(
+            f"Portfolio cash must be a finite number, got {cash!r}. Refusing to build a snapshot whose "
+            "total_equity would be NaN -- every exposure check downstream would silently pass."
+        )
+    if buying_power is not None and (
+        not isinstance(buying_power, (int, float))
+        or isinstance(buying_power, bool)
+        or not math.isfinite(buying_power)
+    ):
+        raise ValueError(
+            f"Portfolio buying_power must be a finite number or None, got {buying_power!r}."
+        )
+
     grouped: dict[str, dict] = {}
     order: list[str] = []
     for p in positions:

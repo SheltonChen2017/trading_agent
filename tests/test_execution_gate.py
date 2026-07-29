@@ -548,8 +548,30 @@ def test_zero_or_negative_total_equity_blocks_a_buy():
     assert any("must be positive to size a buy" in v for v in result.violations)
 
 
+def _snapshot_with_buying_power(buying_power):
+    """Constructs the snapshot DIRECTLY rather than via
+    build_portfolio_snapshot(), which now rejects non-finite cash/
+    buying_power at its own boundary (independent review, 2026-07-29 --
+    a NaN there silently poisoned total_equity and made every downstream
+    exposure comparison pass).
+
+    Both layers are deliberately kept: the builder stops the corruption
+    entering, and validate_trade_intent() below still refuses it
+    independently, because the gate can receive a PortfolioSnapshot that
+    was never built by that helper. These tests exercise the GATE's own
+    defense-in-depth, so they must not route through the builder."""
+    from datetime import datetime as _dt, timezone as _tz
+
+    from assistant.schemas import PortfolioSnapshot
+
+    return PortfolioSnapshot(
+        positions=[], cash=10_000.0, total_equity=10_000.0, buying_power=buying_power,
+        as_of=_dt.now(_tz.utc).date().isoformat(),
+    )
+
+
 def test_nan_buying_power_blocks():
-    snapshot = build_portfolio_snapshot([], cash=10_000.0, buying_power=float("nan"))
+    snapshot = _snapshot_with_buying_power(float("nan"))
     intent = TradeIntent(ticker="KO", side="buy", shares=1)
     result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
     assert result.approved is False
@@ -557,11 +579,25 @@ def test_nan_buying_power_blocks():
 
 
 def test_infinite_buying_power_blocks():
-    snapshot = build_portfolio_snapshot([], cash=10_000.0, buying_power=float("inf"))
+    snapshot = _snapshot_with_buying_power(float("inf"))
     intent = TradeIntent(ticker="KO", side="buy", shares=1)
     result = validate_trade_intent(intent, snapshot, reference_price=60.0, now=_MARKET_HOURS_WEEKDAY)
     assert result.approved is False
     assert any("portfolio.buying_power must be finite" in v for v in result.violations)
+
+
+def test_builder_rejects_non_finite_cash_and_buying_power_at_the_boundary():
+    # The complementary half of the two-layer defense above.
+    for kwargs in (
+        {"cash": float("nan")},
+        {"cash": float("inf")},
+        {"cash": 10_000.0, "buying_power": float("nan")},
+    ):
+        try:
+            build_portfolio_snapshot([], **kwargs)
+            assert False, f"expected {kwargs!r} to be rejected at the builder boundary"
+        except ValueError:
+            pass
 
 
 def _snapshot_with_position(position):

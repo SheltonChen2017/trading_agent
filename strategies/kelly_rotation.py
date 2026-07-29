@@ -42,6 +42,8 @@ FOLLOWING trading day's OPEN. Tax/cost modeling built in from the start.
 """
 from __future__ import annotations
 
+import math
+
 import pandas as pd
 
 from strategies.leverage_rotation import cagr_pct, max_drawdown_pct
@@ -96,9 +98,24 @@ def compute_kelly_leveraged_weight(
     kelly_fraction: float,
     max_leveraged_weight: float,
 ) -> float:
-    """Returns 0.0 if inputs are missing or variance is zero/negative
-    (can't size against unknown/zero variance)."""
-    if mean_daily_return is None or variance_daily_return is None or variance_daily_return <= 0:
+    """Returns 0.0 if inputs are missing or non-finite, or if variance is
+    zero/negative (can't size against unknown/zero variance).
+
+    Non-finiteness is checked explicitly for the same reason as
+    strategies/vol_target_rotation.py's compute_target_leveraged_weight()
+    (independent review, 2026-07-29): a NaN mean or variance defeats every
+    ordered comparison, so it passed the guard, and
+    `min(max_leveraged_weight, NaN)` then returned `max_leveraged_weight` --
+    unknown inputs produced the MAXIMUM leveraged weight. None/zero/
+    negative/inf were already handled correctly; only NaN failed, and it
+    failed toward more leverage."""
+    if (
+        mean_daily_return is None
+        or variance_daily_return is None
+        or not math.isfinite(mean_daily_return)
+        or not math.isfinite(variance_daily_return)
+        or variance_daily_return <= 0
+    ):
         return 0.0
     return max(0.0, min(max_leveraged_weight, kelly_fraction * mean_daily_return / variance_daily_return))
 

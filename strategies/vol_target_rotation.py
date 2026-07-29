@@ -33,6 +33,8 @@ in from day one, not bolted on after finding out it mattered.
 """
 from __future__ import annotations
 
+import math
+
 import pandas as pd
 
 from strategies.leverage_rotation import cagr_pct, max_drawdown_pct
@@ -49,8 +51,18 @@ def compute_target_leveraged_weight(
 ) -> float:
     """`realized_vol_pct` is trailing DAILY realized volatility (%, not
     annualized) of the leveraged fund. Returns 0.0 if realized_vol_pct is
-    None, zero, or negative (can't size against unknown/zero volatility)."""
-    if realized_vol_pct is None or realized_vol_pct <= 0:
+    None, NaN, zero, or negative (can't size against unknown/zero
+    volatility).
+
+    The NaN case is checked explicitly rather than left to `<= 0`
+    (independent review, 2026-07-29, reproduced): NaN defeats every
+    ordered comparison, so it passed the guard, and
+    `min(max_leveraged_weight, target/NaN)` then returns
+    `max_leveraged_weight` -- unknown volatility produced the MAXIMUM
+    leveraged weight, the exact opposite of this function's purpose and of
+    what its own docstring promised. `None` and `inf` already returned 0.0
+    correctly; only NaN failed, and it failed toward more leverage."""
+    if realized_vol_pct is None or not math.isfinite(realized_vol_pct) or realized_vol_pct <= 0:
         return 0.0
     return max(0.0, min(max_leveraged_weight, target_vol_pct / realized_vol_pct))
 

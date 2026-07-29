@@ -62,8 +62,8 @@ import pandas as pd
 
 from data.market_data import fetch_historical
 from signals.regime import compute_trailing_market_volatility
-from strategies.trend_vol_rotation import classify_trend
 from strategies.vol_target_rotation import compute_target_leveraged_weight
+from market_analytics import classify_trend
 from assistant.context_builder import KNOWN_FINDINGS
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact

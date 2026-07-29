@@ -21,8 +21,8 @@ from assistant.strategy_proposals import (
     STABLE_TICKER,
     generate_soxx_soxl_rebalance_proposals,
 )
+from market_analytics import classify_trend
 from signals.regime import compute_trailing_market_volatility
-from strategies.trend_vol_rotation import classify_trend
 from strategies.vol_target_rotation import compute_target_leveraged_weight
 
 

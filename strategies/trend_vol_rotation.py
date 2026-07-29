@@ -44,20 +44,7 @@ import pandas as pd
 
 from strategies.leverage_rotation import cagr_pct, max_drawdown_pct
 from signals.regime import classify_regime, compute_trailing_market_volatility  # noqa: F401 (re-exported for callers)
-
-
-def classify_trend(close: pd.Series, as_of: pd.Timestamp, lookback_days: int = 200) -> str | None:
-    """"uptrend" if `close` at `as_of` is at/above its own trailing
-    `lookback_days` moving average, else "downtrend". None if there isn't
-    enough trailing history yet."""
-    if as_of not in close.index:
-        return None
-    idx = close.index.get_loc(as_of)
-    if idx < lookback_days - 1:
-        return None
-    window = close.iloc[idx - lookback_days + 1 : idx + 1]
-    sma = window.mean()
-    return "uptrend" if close.loc[as_of] >= sma else "downtrend"
+from market_analytics import classify_trend  # noqa: F401 (re-exported for callers)
 
 
 DEFAULT_STATE_WEIGHTS: dict[str, tuple[float, float]] = {

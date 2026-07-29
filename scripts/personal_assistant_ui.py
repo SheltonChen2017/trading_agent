@@ -97,7 +97,7 @@ from config import LEVERAGED_ETF_TICKERS, PAPER_TRADING, UNIVERSE
 from data.event_data import fetch_upcoming_earnings
 from data.market_data import fetch_historical
 from execution.alpaca_broker import is_configured
-from strategies.trend_vol_rotation import classify_trend
+from market_analytics import classify_trend
 
 st.set_page_config(page_title="Personal Trading Assistant", layout="wide")
 

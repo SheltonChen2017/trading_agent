@@ -13,7 +13,6 @@ import pandas as pd
 from strategies.trend_vol_rotation import (
     DEFAULT_STATE_WEIGHTS,
     build_state_weights,
-    classify_trend,
     grid_search_state_weights,
     simulate_regime_rotation,
 )
@@ -27,24 +26,6 @@ _UPTREND_STATE_WEIGHTS = {
 def _series(prices: list[float]) -> pd.Series:
     dates = pd.bdate_range("2020-01-01", periods=len(prices))
     return pd.Series(prices, index=dates)
-
-
-def test_classify_trend_none_without_enough_history():
-    close = _series(list(range(100, 150)))  # only 50 days, lookback 200
-    assert classify_trend(close, close.index[-1], lookback_days=200) is None
-
-
-def test_classify_trend_uptrend_when_above_sma():
-    # flat at 100 for 200 days, then a jump to 150 on the last day
-    prices = [100.0] * 200 + [150.0]
-    close = _series(prices)
-    assert classify_trend(close, close.index[-1], lookback_days=200) == "uptrend"
-
-
-def test_classify_trend_downtrend_when_below_sma():
-    prices = [100.0] * 200 + [50.0]
-    close = _series(prices)
-    assert classify_trend(close, close.index[-1], lookback_days=200) == "downtrend"
 
 
 def _steady_uptrend_low_vol_series(days: int) -> pd.Series:
@@ -276,9 +257,6 @@ def test_grid_search_state_weights_skips_incoherent_combos_and_ranks_by_calmar()
 
 
 if __name__ == "__main__":
-    test_classify_trend_none_without_enough_history()
-    test_classify_trend_uptrend_when_above_sma()
-    test_classify_trend_downtrend_when_below_sma()
     test_simulate_regime_rotation_trades_less_than_daily_threshold_version()
     test_simulate_regime_rotation_respects_start_date_for_warmup()
     test_rebalance_executes_at_next_day_open_not_check_day_close()

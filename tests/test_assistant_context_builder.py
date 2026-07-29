@@ -52,6 +52,85 @@ def test_build_portfolio_snapshot_flags_leveraged_etfs():
     assert qqq.is_leveraged_etf is False
 
 
+def test_build_portfolio_snapshot_uppercases_and_strips_ticker():
+    positions = [{"ticker": "  aapl  ", "shares": 10, "entry_price": 100.0, "current_price": 100.0}]
+    snapshot = build_portfolio_snapshot(positions, cash=0.0)
+    assert [p.ticker for p in snapshot.positions] == ["AAPL"]
+
+
+def test_build_portfolio_snapshot_lowercase_aapl_counts_toward_tech_basket():
+    # Independent review reproduction: a manually-supplied lowercase
+    # "aapl" position used to be invisible to case-sensitive basket
+    # membership checks even though it's economically the same exposure
+    # as uppercase "AAPL".
+    positions = [{"ticker": "aapl", "shares": 50, "entry_price": 100.0, "current_price": 100.0}]
+    snapshot = build_portfolio_snapshot(positions, cash=5000.0)
+    risk = build_risk_exposure(snapshot, concentration_threshold_pct=40.0)
+    assert "tech" in risk.basket_exposure_pct
+    assert risk.basket_exposure_pct["tech"] == 50.0
+    assert any("tech" in w for w in risk.concentration_warnings)
+
+
+def test_build_portfolio_snapshot_aggregates_duplicate_ticker_rows():
+    # Independent review reproduction: two separate AAPL lots used to
+    # remain two separate rows, each individually under a per-position
+    # cap even though their combined exposure exceeds it.
+    positions = [
+        {"ticker": "AAPL", "shares": 3, "entry_price": 90.0, "current_price": 100.0},
+        {"ticker": "aapl", "shares": 3, "entry_price": 90.0, "current_price": 100.0},
+    ]
+    snapshot = build_portfolio_snapshot(positions, cash=9400.0)
+    assert len(snapshot.positions) == 1
+    aapl = snapshot.positions[0]
+    assert aapl.ticker == "AAPL"
+    assert aapl.shares == 6
+    assert aapl.market_value == 600.0
+    assert abs(aapl.entry_price - 90.0) < 0.01
+    assert snapshot.total_equity == 10000.0
+
+
+def test_build_portfolio_snapshot_duplicate_rows_with_different_entry_prices_weight_average():
+    positions = [
+        {"ticker": "AAPL", "shares": 2, "entry_price": 100.0, "current_price": 150.0},
+        {"ticker": "AAPL", "shares": 1, "entry_price": 130.0, "current_price": 150.0},
+    ]
+    snapshot = build_portfolio_snapshot(positions, cash=0.0)
+    aapl = snapshot.positions[0]
+    assert aapl.shares == 3
+    # weighted-average cost basis: (2*100 + 1*130) / 3 = 110
+    assert abs(aapl.entry_price - 110.0) < 0.01
+    assert aapl.market_value == 450.0
+
+
+def test_build_portfolio_snapshot_duplicate_rows_with_inconsistent_current_price_raises():
+    positions = [
+        {"ticker": "AAPL", "shares": 3, "entry_price": 90.0, "current_price": 100.0},
+        {"ticker": "AAPL", "shares": 3, "entry_price": 90.0, "current_price": 101.0},
+    ]
+    try:
+        build_portfolio_snapshot(positions, cash=0.0)
+        assert False, "expected ValueError on inconsistent current_price"
+    except ValueError:
+        pass
+
+
+def test_build_portfolio_snapshot_unique_uppercase_positions_unchanged():
+    # Existing single-row, already-uppercase behavior must be exactly
+    # preserved by the aggregation rewrite.
+    positions = [
+        {"ticker": "AAA", "shares": 10, "entry_price": 100.0, "current_price": 110.0},
+        {"ticker": "BBB", "shares": 5, "entry_price": 200.0, "current_price": 180.0},
+    ]
+    snapshot = build_portfolio_snapshot(positions, cash=1000.0)
+    aaa = next(p for p in snapshot.positions if p.ticker == "AAA")
+    bbb = next(p for p in snapshot.positions if p.ticker == "BBB")
+    assert aaa.market_value == 1100.0
+    assert abs(aaa.unrealized_pnl_pct - 10.0) < 0.01
+    assert bbb.market_value == 900.0
+    assert abs(bbb.unrealized_pnl_pct - (-10.0)) < 0.01
+    assert snapshot.total_equity == 1000.0 + 1100.0 + 900.0
+
+
 def test_build_risk_exposure_flags_basket_concentration():
     # NVDA + AMD together are >40% of a small portfolio and both live in
     # the "semiconductors" basket -- should trigger a concentration warning.
@@ -578,6 +657,12 @@ def test_build_decision_packet_uses_live_alpaca_when_configured():
 if __name__ == "__main__":
     test_build_portfolio_snapshot_computes_market_value_and_pnl()
     test_build_portfolio_snapshot_flags_leveraged_etfs()
+    test_build_portfolio_snapshot_uppercases_and_strips_ticker()
+    test_build_portfolio_snapshot_lowercase_aapl_counts_toward_tech_basket()
+    test_build_portfolio_snapshot_aggregates_duplicate_ticker_rows()
+    test_build_portfolio_snapshot_duplicate_rows_with_different_entry_prices_weight_average()
+    test_build_portfolio_snapshot_duplicate_rows_with_inconsistent_current_price_raises()
+    test_build_portfolio_snapshot_unique_uppercase_positions_unchanged()
     test_build_risk_exposure_flags_basket_concentration()
     test_build_risk_exposure_flags_leveraged_etf_exposure()
     test_get_relevant_signal_evidence_includes_project_wide_and_ticker_specific()

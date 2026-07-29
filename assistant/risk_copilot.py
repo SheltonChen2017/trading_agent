@@ -177,7 +177,7 @@ def check_policy_compliance(portfolio: PortfolioSnapshot, policy: TradingPolicy)
             )
 
     for basket_name, basket_tickers in BASKETS.items():
-        basket_value = sum(p.market_value for p in portfolio.positions if p.ticker in basket_tickers)
+        basket_value = sum(p.market_value for p in portfolio.positions if p.ticker.upper() in basket_tickers)
         if basket_value <= 0:
             continue
         pct = basket_value / total * 100

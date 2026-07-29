@@ -95,7 +95,7 @@ def generate_risk_reduction_proposals(
         return []
 
     reductions: dict[str, dict] = {}
-    position_by_ticker = {p.ticker: p for p in snapshot.positions}
+    position_by_ticker = {p.ticker.upper(): p for p in snapshot.positions}
     max_position_value = snapshot.total_equity * policy.max_position_pct
     for position in snapshot.positions:
         if position.market_value > max_position_value:
@@ -135,7 +135,7 @@ def generate_risk_reduction_proposals(
     # silently evade proposal generation entirely (GPT review, 2026-07-31).
     max_basket_value = snapshot.total_equity * policy.max_basket_pct
     for basket_name, basket_tickers in BASKETS.items():
-        basket_value = sum(p.market_value for p in snapshot.positions if p.ticker in basket_tickers)
+        basket_value = sum(p.market_value for p in snapshot.positions if p.ticker.upper() in basket_tickers)
         if basket_value <= max_basket_value:
             continue
         basket_positions = sorted(

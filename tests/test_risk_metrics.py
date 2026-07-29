@@ -131,6 +131,54 @@ def test_upside_capture_pct_returns_none_when_benchmark_never_up():
     assert upside_capture_pct(strategy, benchmark) is None
 
 
+# --- Joint non-finite-pair dropping (independent review: benchmark_mean and
+# strategy_mean used to be computed from independently NaN-dropped series
+# even after the exact-index check passed, silently pairing the numerator
+# and denominator off of different date sets).
+
+def test_downside_capture_pct_drops_non_finite_pairs_jointly():
+    # Reproduction: benchmark down-periods are the first two dates
+    # ([-10, -2]); strategy is NaN on the first of those. Only the second
+    # date pairs validly -> -1 / -2 * 100 = 50%, not the previous buggy
+    # 16.67% (which averaged benchmark over both dates but strategy over
+    # only the one non-NaN date).
+    benchmark = _series([-10, -2, 1])
+    strategy = _series([float("nan"), -1, -1])
+    assert abs(downside_capture_pct(strategy, benchmark) - 50.0) < 0.01
+
+
+def test_downside_capture_pct_drops_pairs_with_nan_in_benchmark():
+    benchmark = _series([-10, float("nan"), -2, 1])
+    strategy = _series([-5, -1, -1, 0.5])
+    # date1 dropped (benchmark NaN); remaining down-periods: (-10,-5) and
+    # (-2,-1) -> benchmark mean -6, strategy mean -3 -> 50%.
+    assert abs(downside_capture_pct(strategy, benchmark) - 50.0) < 0.01
+
+
+def test_downside_capture_pct_drops_positive_infinity_pairs():
+    benchmark = _series([-10, -2, 1])
+    strategy = _series([float("inf"), -1, -1])
+    assert abs(downside_capture_pct(strategy, benchmark) - 50.0) < 0.01
+
+
+def test_downside_capture_pct_drops_negative_infinity_pairs():
+    benchmark = _series([-10, -2, 1])
+    strategy = _series([float("-inf"), -1, -1])
+    assert abs(downside_capture_pct(strategy, benchmark) - 50.0) < 0.01
+
+
+def test_downside_capture_pct_returns_none_when_all_down_periods_are_non_finite():
+    benchmark = _series([-10, -2, 1])
+    strategy = _series([float("nan"), float("nan"), 0.5])
+    assert downside_capture_pct(strategy, benchmark) is None
+
+
+def test_upside_capture_pct_returns_none_when_all_up_periods_are_non_finite():
+    benchmark = _series([-10, -2, 1, 3])
+    strategy = _series([-5, -1, float("nan"), float("inf")])
+    assert upside_capture_pct(strategy, benchmark) is None
+
+
 if __name__ == "__main__":
     test_max_drawdown_pct_matches_existing_hand_computed_value()
     test_portfolio_simulator_delegates_to_the_same_canonical_function()
@@ -146,4 +194,10 @@ if __name__ == "__main__":
     test_downside_capture_pct_raises_on_misaligned_index()
     test_downside_capture_pct_returns_none_when_benchmark_never_down()
     test_upside_capture_pct_returns_none_when_benchmark_never_up()
+    test_downside_capture_pct_drops_non_finite_pairs_jointly()
+    test_downside_capture_pct_drops_pairs_with_nan_in_benchmark()
+    test_downside_capture_pct_drops_positive_infinity_pairs()
+    test_downside_capture_pct_drops_negative_infinity_pairs()
+    test_downside_capture_pct_returns_none_when_all_down_periods_are_non_finite()
+    test_upside_capture_pct_returns_none_when_all_up_periods_are_non_finite()
     print("All risk_metrics tests passed.")

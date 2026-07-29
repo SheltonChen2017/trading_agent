@@ -114,6 +114,29 @@ def test_review_allocation_plan_drops_observation_with_disallowed_type(monkeypat
     monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
     payload = _allocation_payload(
         "Reasonable split.",
+        [
+            {"type": "buy_recommendation", "severity": "high", "claim": "Buy more AMD.", "tickers": ["AMD"]},
+            {"type": "concentration", "severity": "medium", "claim": "AMD and NVDA are both semiconductors.", "tickers": ["AMD", "NVDA"]},
+        ],
+    )
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.review_allocation_plan(["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {})
+    assert len(result.observations) == 1
+    assert result.observations[0].type == "concentration"
+
+
+def test_review_allocation_plan_rejects_whole_response_when_all_observations_fail_validation(monkeypatch):
+    # independent review: dropping the one bad observation and silently
+    # displaying the summary as "reviewed, nothing flagged" would misrepresent
+    # what actually happened -- the model DID try to flag something, and it
+    # was invalid; that's different from "nothing to flag" and must not look
+    # like a clean bill of health.
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload(
+        "Reasonable split.",
         [{"type": "buy_recommendation", "severity": "high", "claim": "Buy more AMD.", "tickers": ["AMD"]}],
     )
     with patch("anthropic.Anthropic") as mock_anthropic_cls:
@@ -121,7 +144,107 @@ def test_review_allocation_plan_drops_observation_with_disallowed_type(monkeypat
         mock_client.messages.create.return_value = _fake_response(payload)
         mock_anthropic_cls.return_value = mock_client
         result = ai_advisor.review_allocation_plan(["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {})
+    assert result is None
+
+
+def test_review_allocation_plan_accepts_genuinely_empty_observations(monkeypatch):
+    # The model returning zero observations from the start ("nothing notable")
+    # is a legitimate result and must NOT be rejected by the all-filtered-out rule.
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload("Well-diversified split, nothing notable.", [])
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.review_allocation_plan(["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {})
+    assert result is not None
     assert result.observations == ()
+
+
+def test_review_allocation_plan_rejects_summary_mentioning_unlisted_ticker(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload("Buy TSLA to improve this basket.", [])
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.review_allocation_plan(["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {})
+    assert result is None
+
+
+def test_review_allocation_plan_drops_claim_mentioning_ticker_outside_its_own_scope(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload(
+        "Reasonable split.",
+        [
+            {"type": "diversification", "severity": "high", "claim": "TSLA would provide better diversification.", "tickers": ["NVDA"]},
+            {"type": "concentration", "severity": "low", "claim": "Both are semiconductor names.", "tickers": ["NVDA", "AMD"]},
+        ],
+    )
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.review_allocation_plan(["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {})
+    assert len(result.observations) == 1
+    assert "semiconductor" in result.observations[0].claim
+
+
+def test_review_allocation_plan_rejects_action_language_even_without_a_number(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload(
+        "Reasonable split.",
+        [
+            {"type": "concentration", "severity": "high", "claim": "Sell NVDA and replace it with cash.", "tickers": ["NVDA"]},
+            {"type": "concentration", "severity": "low", "claim": "Both are semiconductor names.", "tickers": ["NVDA", "AMD"]},
+        ],
+    )
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.review_allocation_plan(["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {})
+    assert len(result.observations) == 1
+    assert "semiconductor" in result.observations[0].claim
+
+
+def test_review_allocation_plan_rejects_a_different_tickers_weight_reused_as_a_number(monkeypatch):
+    # independent review: "reduce NVDA by 40%" would pass the OLD validator
+    # because 40 is a real input weight -- it's just AMD's weight, not NVDA's.
+    # Scoping the allowed numbers to each observation's OWN tickers closes this.
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload(
+        "Reasonable split.",
+        [
+            {"type": "concentration", "severity": "high", "claim": "Reduce NVDA by 40%.", "tickers": ["NVDA"]},
+            {"type": "concentration", "severity": "low", "claim": "Both are semiconductor names.", "tickers": ["NVDA", "AMD"]},
+        ],
+    )
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.review_allocation_plan(["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {})
+    assert len(result.observations) == 1
+    assert "semiconductor" in result.observations[0].claim
+
+
+def test_review_allocation_plan_allows_a_legitimate_volatility_restatement(monkeypatch):
+    # independent review: the old validator only allowed WEIGHT numbers, so
+    # a claim honestly restating the supplied volatility would be rejected.
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload(
+        "Reasonable split.",
+        [{"type": "volatility", "severity": "medium", "claim": "NVDA has 2.50% trailing volatility.", "tickers": ["NVDA"]}],
+    )
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.review_allocation_plan(
+            ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {"NVDA": 2.5, "AMD": 3.0}, {}
+        )
+    assert len(result.observations) == 1
 
 
 def test_review_allocation_plan_allows_claim_restating_actual_weight(monkeypatch):
@@ -313,6 +436,13 @@ if __name__ == "__main__":
     test_review_allocation_plan_rejects_summary_with_dollar_amount(mp)
     test_review_allocation_plan_drops_observation_mentioning_unknown_ticker(mp)
     test_review_allocation_plan_drops_observation_with_disallowed_type(mp)
+    test_review_allocation_plan_rejects_whole_response_when_all_observations_fail_validation(mp)
+    test_review_allocation_plan_accepts_genuinely_empty_observations(mp)
+    test_review_allocation_plan_rejects_summary_mentioning_unlisted_ticker(mp)
+    test_review_allocation_plan_drops_claim_mentioning_ticker_outside_its_own_scope(mp)
+    test_review_allocation_plan_rejects_action_language_even_without_a_number(mp)
+    test_review_allocation_plan_rejects_a_different_tickers_weight_reused_as_a_number(mp)
+    test_review_allocation_plan_allows_a_legitimate_volatility_restatement(mp)
     test_review_allocation_plan_allows_claim_restating_actual_weight(mp)
     test_review_allocation_plan_returns_none_on_api_exception(mp)
     test_suggest_similar_tickers_returns_none_when_unconfigured(mp)

@@ -38,11 +38,37 @@ class SecurityEligibilityPolicy:
     minimum_price: float = 5.0
     minimum_median_dollar_volume: float = 1_000_000.0
     require_company_name: bool = True
+    # yfinance exchange codes for the major US listing venues -- NMS/NGM/NCM
+    # (Nasdaq Global Select/Global/Capital Market), NYQ (NYSE), ASE (NYSE
+    # American), PCX (NYSE Arca), BATS/BTS (Cboe BZX). None = no exchange
+    # restriction. Independent review: prompts and UI copy already say "US
+    # tickers"/"US stocks", but nothing enforced that -- a sufficiently
+    # liquid foreign or OTC listing could otherwise pass every other check.
+    allowed_exchanges: tuple[str, ...] | None = ("NMS", "NGM", "NCM", "NYQ", "ASE", "PCX", "BATS", "BTS")
 
 
 DEFAULT_ELIGIBILITY_POLICY = SecurityEligibilityPolicy()
 
-_FETCH_LOOKBACK_DAYS = 90  # comfortably covers DEFAULT_ELIGIBILITY_POLICY.minimum_history_sessions with buffer
+# A genuine IPO from the last _IPO_LOOKBACK_DAYS (see recommended_stocks.py's
+# fetch_recent_ipos) calendar days has at most ~20-22 TRADING sessions --
+# DEFAULT_ELIGIBILITY_POLICY's minimum_history_sessions=60 would reject
+# every real recent IPO by construction, not just conservatively (independent
+# review: "this does not merely make the filter conservative, it makes
+# every genuine result in the lane ineligible by definition"). This lane
+# gets its own, deliberately looser policy -- still real checks (equity
+# type, a real company name, SOME minimum liquidity/price), just not ones
+# that assume months of trading history that cannot exist yet.
+RECENT_IPO_ELIGIBILITY_POLICY = SecurityEligibilityPolicy(
+    allowed_quote_types=("EQUITY",),
+    minimum_history_sessions=3,
+    minimum_price=5.0,
+    minimum_median_dollar_volume=500_000.0,
+    require_company_name=True,
+)
+
+_FETCH_LOOKBACK_DAYS = 90  # a MAXIMUM request, not a requirement -- a ticker with less real
+# history (e.g. a genuine recent IPO) just returns fewer rows, which the eligibility policy's
+# own minimum_history_sessions then judges; safe to request uniformly regardless of lane/policy.
 
 
 def verify_tickers(
@@ -52,8 +78,8 @@ def verify_tickers(
     Returns (verified, dropped).
 
     `verified` is a list of {"ticker", "longName", "sector", "quoteType",
-    "exchange", "history_sessions", "last_price", "median_dollar_volume"}
-    dicts for candidates that resolve via fetch_historical AND pass EVERY
+    "exchange", "history_sessions", "last_price", "median_dollar_volume",
+    "first_session_date"} dicts for candidates that resolve via fetch_historical AND pass EVERY
     check in `policy`: quote type is in `policy.allowed_quote_types` (an ETF,
     warrant, preferred share, or fund is REJECTED under the default policy,
     which only allows "EQUITY" -- this is a "recommended STOCKS" feature),
@@ -103,12 +129,14 @@ def verify_tickers(
         quote_type = info.get("quoteType", "")
         company_name = info.get("longName", "")
 
+        exchange = info.get("exchange", "")
         eligible = (
             quote_type in policy.allowed_quote_types
             and history_sessions >= policy.minimum_history_sessions
             and last_price >= policy.minimum_price
             and median_dollar_volume >= policy.minimum_median_dollar_volume
             and (not policy.require_company_name or bool(company_name))
+            and (policy.allowed_exchanges is None or exchange in policy.allowed_exchanges)
         )
         if not eligible:
             dropped.append(ticker)
@@ -120,10 +148,11 @@ def verify_tickers(
                 "longName": company_name,
                 "sector": info.get("sector", ""),
                 "quoteType": quote_type,
-                "exchange": info.get("exchange", ""),
+                "exchange": exchange,
                 "history_sessions": history_sessions,
                 "last_price": last_price,
                 "median_dollar_volume": median_dollar_volume,
+                "first_session_date": str(hist.index[0].date()),
             }
         )
 

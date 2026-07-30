@@ -458,10 +458,13 @@ def test_cumulative_preflight_test_c_min_cash_reserve_fails_just_above_the_bound
         restore()
 
 
-def test_cumulative_preflight_test_d_same_ticker_concentration_boundary_is_inclusive():
-    # $10,000 account, 80% per-position cap on the SAME ticker across two
-    # separate proposals. Combined value equals the cap exactly -- must
-    # be allowed.
+def test_cumulative_preflight_rejects_same_ticker_side_before_concentration_math():
+    # Separate proposals for the same ticker/side cannot coexist in one batch:
+    # the first execution claim holds that intent slot, so approving the second
+    # here would guarantee a partial batch. This test previously changed only
+    # reference_price and incorrectly called that a distinct proposal ID, even
+    # though proposal identity intentionally binds the trade intent, not a
+    # mutable quote.
     packet = _packet(cash=10_000.0)
     policy = TradingPolicy(
         version="test", name="test", execution_mode="paper",
@@ -470,7 +473,7 @@ def test_cumulative_preflight_test_d_same_ticker_concentration_boundary_is_inclu
     )
     proposals = [
         _buy_proposal(packet, policy, "AAA", 100, 40.0),  # $4,000
-        _buy_proposal(packet, policy, "AAA", 100, 40.0000001),  # $4,000 (distinct id via price)
+        _buy_proposal(packet, policy, "AAA", 99, 40.0),  # distinct intent/id, same ticker+side
     ]
     _, restore = _mock_execution_dependencies(quote_price=40.0)
     try:
@@ -483,7 +486,10 @@ def test_cumulative_preflight_test_d_same_ticker_concentration_boundary_is_inclu
                 now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
             )
             assert results[proposals[0].proposal_id].approved
-            assert results[proposals[1].proposal_id].approved, results[proposals[1].proposal_id].violations
+            assert not results[proposals[1].proposal_id].approved
+            assert results[proposals[1].proposal_id].violation_codes == (
+                "duplicate_intent_in_batch",
+            )
     finally:
         restore()
 
@@ -752,7 +758,7 @@ def test_all_legs_submit_when_everything_is_clean():
         restore()
 
 
-def test_second_leg_definitive_failure_does_not_block_the_batch():
+def test_second_leg_immediate_404_after_submit_error_stops_until_reconciled():
     packet = _packet()
     policy = _policy()
     proposals = _two_leg_proposals(packet, policy)
@@ -767,7 +773,10 @@ def test_second_leg_definitive_failure_does_not_block_the_batch():
         return {"order_id": "paper-1", "ticker": ticker, "shares": shares, "side": side, "status": "accepted"}
 
     broker.submit_market_order = failing_submit_for_second
-    broker.find_order_by_client_id = lambda client_order_id: None  # confirmed absent -> definitively failed
+    # A 404 immediately after a generic submit exception can be broker-index
+    # lag after an accepted order, so this remains unresolved rather than
+    # releasing its reservation as a definitive failure.
+    broker.find_order_by_client_id = lambda client_order_id: None
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
@@ -782,8 +791,9 @@ def test_second_leg_definitive_failure_does_not_block_the_batch():
                 store.get_proposal(pid)["intent"]["ticker"]: leg for pid, leg in result["legs"].items()
             }
             assert legs_by_ticker[first_ticker]["state"] == LEG_SUBMITTED
-            assert legs_by_ticker[second_ticker]["state"] == LEG_FAILED
-            assert result["status"] == BATCH_COMPLETED  # a definitive failure is terminal, not a batch-stopper
+            assert legs_by_ticker[second_ticker]["state"] == LEG_UNKNOWN
+            assert result["status"] == BATCH_STOPPED_UNKNOWN
+            assert store.get_execution_budget_usage("2026-07-27")["submitted_order_count"] == 2
     finally:
         restore()
 

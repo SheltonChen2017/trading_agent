@@ -234,6 +234,40 @@ def test_a_clean_batch_within_every_cap_still_passes():
     assert all(r.approved for r in results.values())
 
 
+def test_duplicate_ticker_and_side_is_rejected_before_batch_submission_starts():
+    """The atomic execution claim blocks the second leg, so preflight must do
+    the same or the batch becomes predictably partial."""
+    packet = _packet(cash=100_000.0)
+    policy = _policy(max_open_orders=5, max_daily_order_count=5)
+    proposals = [
+        _buy_proposal(packet, policy, "AAA", 10, 40.0),
+        _buy_proposal(packet, policy, "AAA", 11, 40.0),
+    ]
+    results = _run_preflight(proposals, policy, packet)
+
+    assert results[proposals[0].proposal_id].approved
+    assert not results[proposals[1].proposal_id].approved
+    assert results[proposals[1].proposal_id].violation_codes == (
+        "duplicate_intent_in_batch",
+    )
+
+
+def test_opposite_sides_are_not_treated_as_duplicate_batch_intents():
+    packet = _packet(cash=100_000.0)
+    packet.portfolio = build_portfolio_snapshot(
+        [{"ticker": "AAA", "shares": 20, "entry_price": 40.0, "current_price": 40.0}],
+        cash=100_000.0,
+    )
+    policy = _policy(max_open_orders=5, max_daily_order_count=5)
+    proposals = [
+        _sell_proposal(packet, policy, "AAA", 5, 40.0),
+        _buy_proposal(packet, policy, "AAA", 5, 40.0),
+    ]
+    results = _run_preflight(proposals, policy, packet)
+
+    assert all(result.approved for result in results.values())
+
+
 def test_a_negative_simulated_count_is_refused_rather_than_loosening_a_cap():
     """Direct call: a bad extra_open_order_count must fail closed."""
     from assistant.execution_service import validate_proposal_for_execution

@@ -256,6 +256,7 @@ def preflight_allocation_batch(
     #   * the persistent daily submission budget, previously not checked at all
     #     (it lives in reserve_execution_budget(), called only at submit time).
     simulated_open_orders = 0
+    simulated_intents: set[tuple[str, str]] = set()
     trading_day = now_et.date().isoformat()
     usage = store.get_execution_budget_usage(trading_day)
     budget_order_count = int(usage["submitted_order_count"])
@@ -294,6 +295,23 @@ def preflight_allocation_batch(
         ):
             continue
 
+        intent_identity = (
+            outcome.intent.ticker.upper(),
+            outcome.intent.side.lower(),
+        )
+        if intent_identity in simulated_intents:
+            ticker, side = intent_identity
+            results[proposal_id] = ValidationResult(
+                approved=False,
+                violations=(
+                    f"Another passing leg in this batch already has the same "
+                    f"ticker/side intent ({side} {ticker}). Execution would reject "
+                    "this as a duplicate after partially submitting the batch.",
+                ),
+                violation_codes=("duplicate_intent_in_batch",),
+            )
+            continue
+
         # Daily budget, simulated with the SAME arithmetic and the SAME
         # side-aware price reserve_execution_budget() uses at submit time
         # (strict `>`, gross submitted notional), so preflight and the enforcer
@@ -323,6 +341,7 @@ def preflight_allocation_batch(
             continue
         budget_order_count = next_order_count
         budget_notional = next_notional
+        simulated_intents.add(intent_identity)
 
         # Every submitted leg leaves one open order behind, whichever side it
         # is -- so this increments for sells too, unlike the cash reservation

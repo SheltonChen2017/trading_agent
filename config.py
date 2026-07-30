@@ -16,18 +16,19 @@ from one source of truth instead of hardcoding values in three places.
 # result computed over this universe is conditioned on survival. Confirmed
 # concretely: SIVB, SBNY and FRC all failed inside this project's own lookback
 # window and none of them are here; SBNY's ticker was later reused by an
-# unrelated listing, so it would not even be a clean stand-in. The practical
-# effect is small on RELATIVE edge findings (a signal's edge over its own
-# ticker's baseline) and larger on ABSOLUTE return figures, which are biased
-# upward. README.md quantifies this; the note lives here too because this is
-# where the list is actually read from (independent review, 2026-07-30).
+# unrelated listing, so it would not even be a clean stand-in. Comparing a
+# signal to the same ticker's baseline may reduce some market-level distortion,
+# but it does NOT remove selection bias: failed companies can have
+# systematically different signals and downside tails. Absolute return figures
+# are especially likely to be optimistic. Treat the magnitude as unknown until
+# the research is rerun against a point-in-time constituent/delistings dataset.
 #
 # Before adding a ticker, verify it against real data (fetch_historical +
 # yf.Ticker(t).info) rather than assuming the symbol is right --
 # fetch_historical SILENTLY SKIPS tickers that return nothing, so a typo
 # vanishes instead of failing. See .claude/skills/real-data-check.
-# Checked 2026-07-30: SPCX (Space Exploration Technologies, ~$1.5T),
-# FISV (Fiserv) and XYZ (Block, Inc.) all resolve with full history. A review
+# Checked 2026-07-30: SPCX (Space Exploration Technologies),
+# FISV (Fiserv) and XYZ (Block, Inc.) resolve. A review
 # flagged them as fabricated/renamed; that was wrong, and FI -- the symbol
 # suggested as FISV's replacement -- is the one that 404s.
 UNIVERSE = [

@@ -215,6 +215,7 @@ from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
     APPROVED,
     BLOCKED,
+    BROKER_ABSENCE_GRACE_SECONDS,
     IN_FLIGHT_INTENT_STATUSES,
     POLICY_OVERRIDE_AVAILABLE,
     RECONCILING,
@@ -237,8 +238,9 @@ from risk.execution_gate import (
 
 # Sentinel: the broker lookup itself failed (network/auth/5xx/etc.), so
 # presence or absence of the order still can't be determined. Distinct
-# from `None`, which _lookup_order_outcome() reserves for a CONFIRMED
-# absence (the broker's own 404).
+# from `None`, which _lookup_order_outcome() reserves for a broker 404.
+# Whether that 404 is old enough to count as reliable absence is decided
+# separately by the reconciliation grace-period rules.
 _LOOKUP_UNCONFIRMED = object()
 
 
@@ -271,6 +273,25 @@ class PolicyOverridableBlockError(ProposalExecutionError):
         super().__init__(message)
         self.overridable_violations = overridable_violations
         self.conditions_changed = conditions_changed
+
+
+def _broker_absence_is_old_enough(claimed: dict, *, now: datetime) -> bool:
+    """Whether a just-claimed unresolved state is old enough to trust a 404.
+
+    ``claim_proposal`` returns the prior row timestamp from inside its write
+    transaction. Using that value avoids a read/claim race, while keeping the
+    metadata transient rather than adding it to the persisted proposal schema.
+    """
+    raw = claimed.get("_claimed_from_updated_at")
+    if not raw:
+        return False
+    try:
+        started = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    if started.tzinfo is None:
+        started = started.replace(tzinfo=timezone.utc)
+    return now - started >= timedelta(seconds=BROKER_ABSENCE_GRACE_SECONDS)
 
 
 def _review_digest(intent: TradeIntent, violation_codes: tuple[str, ...], violations: tuple[str, ...]) -> str:
@@ -335,11 +356,10 @@ def _intent_from_dict(raw: dict) -> TradeIntent:
 
 def _lookup_order_outcome(broker_module, idempotency_key: str):
     """Classifies a broker order lookup into exactly one of three
-    outcomes: the order dict (found), None (the broker CONFIRMS no such
-    order exists), or _LOOKUP_UNCONFIRMED (the lookup itself failed --
-    still don't know). Callers must branch on all three; treating
-    "confirmed absent" and "unconfirmed" the same way was the bug in the
-    previous round of fixes."""
+    outcomes: the order dict (found), None (the broker returned 404), or
+    _LOOKUP_UNCONFIRMED (the lookup itself failed -- still don't know).
+    Callers must branch on all three, and must not treat a new 404 as
+    durable proof of absence before the broker-indexing grace period."""
     try:
         return broker_module.find_order_by_client_id(idempotency_key)
     except Exception:
@@ -1257,8 +1277,9 @@ def execute_approved_paper_proposal(
         # a network timeout, for example, can lose the response after the
         # order was actually accepted. Reconcile by looking the order up
         # under the same idempotency key (client_order_id) before
-        # concluding anything -- and treat "confirmed absent" differently
-        # from "still don't know" (see _lookup_order_outcome).
+        # concluding anything -- and distinguish a 404 from a failed lookup
+        # without trusting a new 404 before the indexing grace period (see
+        # _lookup_order_outcome).
         outcome = _lookup_order_outcome(broker, proposal["idempotency_key"])
         if isinstance(outcome, dict):
             matches, mismatch_detail = _order_matches_intent(outcome, intent)
@@ -1320,21 +1341,30 @@ def execute_approved_paper_proposal(
             )
             return authoritative
         if outcome is None:
-            # Confirmed absent: the broker itself says this order was
-            # never accepted, so it's safe to call it a real failure
-            # rather than leaving it in limbo as "submission_unknown".
-            transitioned = store.mark_submission_failed_and_release(
+            # A 404 immediately after a timeout is not durable proof that the
+            # order was never accepted: the response may have been lost before
+            # the broker indexed client_order_id. Keep the reservation and the
+            # duplicate-intent slot until delayed reconciliation observes
+            # absence after the shared grace period.
+            unresolved = store.update_proposal_status_if_current(
                 proposal_id,
                 expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-                error=str(exc),
+                new_status=SUBMISSION_UNKNOWN,
+                error=(
+                    f"Submission raised ({exc}); an immediate broker lookup found no matching "
+                    "order, but absence is not trusted until the broker-indexing grace period "
+                    "has elapsed. Reconcile again later."
+                ),
             )
-            if transitioned is None:
+            if unresolved is None:
                 current = store.get_proposal(proposal_id)
                 if current is not None and current.get("broker_order"):
                     return current["broker_order"]
             raise ProposalExecutionError(
-                f"Order submission failed for {proposal_id}, and the broker confirms no such order "
-                f"exists ({exc})."
+                f"Could not confirm whether the order for {proposal_id} was accepted after "
+                f"the submission error ({exc}). The immediate lookup found no order, but the "
+                "broker-indexing grace period has not elapsed; status is 'submission_unknown' "
+                "and its execution reservation remains held. Reconcile again later."
             ) from exc
         unresolved = store.update_proposal_status_if_current(
             proposal_id,
@@ -1404,8 +1434,10 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
         never happen with unique idempotency keys, but this is exactly
         the kind of anomaly that must not be auto-resolved): stays
         "submission_unknown" with the mismatch recorded; raises.
-      - Broker confirms (HTTP 404) no such order exists: marked
-        "submission_failed" -- it genuinely never went through.
+      - Broker returns HTTP 404 only after the unresolved state has aged past
+        the broker-indexing grace period: marked "submission_failed" -- it is
+        then old enough to treat absence as reliable. A newer 404 stays
+        "submission_unknown" and retains its execution reservation.
       - The lookup itself still can't confirm either way (network/auth/
         etc.): returned to "submission_unknown", unchanged, safe to
         retry again later.
@@ -1506,6 +1538,24 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
             return authoritative
 
         if outcome is None:
+            if not _broker_absence_is_old_enough(
+                claimed, now=datetime.now(timezone.utc)
+            ):
+                store.update_proposal_status_if_current(
+                    proposal_id,
+                    expected_statuses=(RECONCILING,),
+                    new_status=SUBMISSION_UNKNOWN,
+                    reconciled_at=reconciled_at,
+                    error=(
+                        "Reconciliation found no matching broker order, but the unresolved "
+                        "state is too recent for absence to be reliable. The execution "
+                        "reservation remains held; retry after the broker-indexing grace period."
+                    ),
+                )
+                raise ProposalExecutionError(
+                    f"Reconciliation for {proposal_id} found no order, but the broker-indexing "
+                    "grace period has not elapsed -- still 'submission_unknown'."
+                )
             transitioned = store.mark_submission_failed_and_release(
                 proposal_id,
                 expected_statuses=(RECONCILING,),

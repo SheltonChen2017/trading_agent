@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import sqlite3
 import tempfile
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -186,6 +186,43 @@ def test_a_nonfinite_grace_period_is_rejected_before_any_broker_call():
                     store, broker_module=_AbsentBroker, min_absence_age_seconds=bad,
                 )
         assert store.get_proposal("tp-inflight")["status"] == SUBMITTING
+
+
+def test_age_is_rechecked_atomically_before_releasing_the_reservation():
+    """A stale list snapshot must not authorize release after another worker
+    refreshes the row while the broker lookup is in flight."""
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store_with_reservation(temp)
+        old = (
+            datetime.now(timezone.utc)
+            - timedelta(seconds=MIN_ABSENCE_AGE_SECONDS + 30)
+        ).isoformat()
+        with sqlite3.connect(store.path) as connection:
+            connection.execute(
+                "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
+                (old, "tp-inflight"),
+            )
+
+        class _RefreshDuringLookup(_AbsentBroker):
+            @staticmethod
+            def find_order_by_client_id(client_order_id):
+                claimed = store.claim_proposal(
+                    "tp-inflight",
+                    expected_status=SUBMITTING,
+                    new_status="reconciling",
+                )
+                assert claimed is not None
+                return None
+
+        result = reconcile_nonterminal_orders(
+            store,
+            broker_module=_RefreshDuringLookup,
+            now=datetime.now(timezone.utc),
+        )
+
+        assert result["confirmed_absent"] == 0
+        assert store.get_proposal("tp-inflight")["status"] == "reconciling"
+        assert _reserved_notional(store) == RESERVED_NOTIONAL
 
 
 if __name__ == "__main__":

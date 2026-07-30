@@ -21,6 +21,7 @@ from assistant.order_lifecycle import (
     resolve_replacement_chain,
 )
 from assistant.proposal_status import (
+    BROKER_ABSENCE_GRACE_SECONDS,
     BROKER_ACCEPTED,
     CANCEL_PENDING,
     EXECUTED,
@@ -38,7 +39,7 @@ _STREAM_SHUTDOWN_POLL_SECONDS = 0.1
 # broker. Must comfortably exceed one submit round trip (broker account/asset
 # preflight + submit + the broker's own order-indexing latency). See
 # _absence_is_believable() for why believing it too early is harmful.
-MIN_ABSENCE_AGE_SECONDS = 60.0
+MIN_ABSENCE_AGE_SECONDS = BROKER_ABSENCE_GRACE_SECONDS
 
 
 def _resolve_chain_for(
@@ -415,6 +416,12 @@ def reconcile_nonterminal_orders(
                         expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
                         reconciled_at=now.isoformat(),
                         error="Startup reconciliation: broker confirms no matching order exists.",
+                        # Recheck age inside the SAME transaction that releases
+                        # the reservation. The proposal snapshot above can go
+                        # stale while the broker lookup is in flight.
+                        not_updated_after=(
+                            now - timedelta(seconds=min_absence_age_seconds)
+                        ).astimezone(timezone.utc).isoformat(),
                     )
                     if transitioned is not None:
                         result["confirmed_absent"] += 1

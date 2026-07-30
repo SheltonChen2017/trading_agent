@@ -479,7 +479,9 @@ class AssistantStore:
         callers can never both believe they claimed the same proposal --
         SQLite serializes writers against the same database file, and
         exactly one UPDATE affects a row. Returns the claimed proposal
-        (with its embedded "status" updated to `new_status`) on success,
+        (with its embedded "status" updated to `new_status` and transient
+        `_claimed_from_updated_at` metadata containing the prior row
+        timestamp) on success,
         or None if the row didn't exist, wasn't in one of the
         `expected_status` values (already claimed by someone else,
         already terminal, etc.), or (when `not_expired_after` is given)
@@ -537,6 +539,20 @@ class AssistantStore:
         connection.row_factory = sqlite3.Row
         try:
             connection.execute("BEGIN IMMEDIATE")
+            target_before = connection.execute(
+                "SELECT payload_json, status, expires_at, updated_at "
+                "FROM trade_proposals WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchone()
+            if target_before is None or target_before["status"] not in expected_statuses:
+                connection.rollback()
+                return None
+            if (
+                not_expired_after is not None
+                and target_before["expires_at"] < not_expired_after
+            ):
+                connection.rollback()
+                return None
             if conflicting_intent_statuses:
                 conflict = self._find_conflicting_intent(
                     connection, proposal_id, tuple(conflicting_intent_statuses)
@@ -562,6 +578,11 @@ class AssistantStore:
             return None
         proposal = json.loads(row["payload_json"])
         proposal["status"] = new_status
+        # Transaction-local metadata used by reconciliation to judge whether
+        # the state it just claimed was old enough for a broker 404 to be
+        # believable. This is not part of the persisted proposal schema:
+        # claim_proposal() never writes payload_json.
+        proposal["_claimed_from_updated_at"] = target_before["updated_at"]
         return proposal
 
     @staticmethod
@@ -1077,19 +1098,33 @@ class AssistantStore:
         expected_statuses: tuple[str, ...],
         error: str,
         reconciled_at: str | None = None,
+        not_updated_after: str | None = None,
     ) -> dict[str, Any] | None:
-        """Atomically record confirmed broker absence and release its budget."""
+        """Atomically record confirmed broker absence and release its budget.
+
+        When ``not_updated_after`` is supplied, the transition also requires
+        the proposal's current status timestamp to be no newer than that UTC
+        cutoff. This makes the absence-age check and the destructive release
+        one transaction: a poller that read an old row cannot release the
+        reservation after another worker has just claimed/refreshed it.
+        """
         connection = sqlite3.connect(self.path)
         connection.row_factory = sqlite3.Row
         try:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
-                "SELECT payload_json, status FROM trade_proposals WHERE proposal_id = ?",
+                "SELECT payload_json, status, updated_at FROM trade_proposals WHERE proposal_id = ?",
                 (proposal_id,),
             ).fetchone()
             if row is None:
                 raise KeyError(f"Unknown proposal: {proposal_id}")
-            if row["status"] not in expected_statuses:
+            if (
+                row["status"] not in expected_statuses
+                or (
+                    not_updated_after is not None
+                    and row["updated_at"] > not_updated_after
+                )
+            ):
                 connection.rollback()
                 return None
             proposal = json.loads(row["payload_json"])

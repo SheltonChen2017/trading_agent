@@ -37,6 +37,14 @@ BROKER_EXPIRED = "broker_expired"
 EXECUTED = "executed"
 EXPIRED = "expired"
 
+# A broker 404 immediately after dispatch is not yet reliable evidence that an
+# order was never accepted: the submit response can be lost while the broker's
+# client-order-id index is still catching up. Reconciliation paths must retain
+# the execution reservation until the proposal has remained unresolved for at
+# least this long. Kept beside the lifecycle constants so polling and manual
+# reconciliation cannot silently choose different grace periods.
+BROKER_ABSENCE_GRACE_SECONDS = 60.0
+
 # Ordered roughly by where a proposal sits in its lifecycle.
 STATUSES: tuple[str, ...] = (
     PROPOSED,

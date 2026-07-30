@@ -290,7 +290,7 @@ if __name__ == "__main__":
     test_unsupported_numbers_flags_invented_figures()
     test_guard_rejects_invented_numeric_claims_across_categories()
     test_guard_documents_its_own_limitation_for_non_numeric_fabrication()
-    test_guard_without_source_text_still_applies_the_other_two_checks()
+    test_guard_with_an_empty_source_still_applies_the_other_two_checks()
     print("All AI output-guard tests passed.")
 
 

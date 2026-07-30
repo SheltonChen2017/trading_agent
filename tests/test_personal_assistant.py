@@ -1786,11 +1786,10 @@ def test_ambiguous_submission_failure_marks_submission_unknown_when_unconfirmabl
         restore()
 
 
-def test_ambiguous_submission_failure_marks_submission_failed_when_broker_confirms_absent():
-    """A confirmed-absent lookup (broker's own 404) after a submission
-    error means the order genuinely never went through -- this should
-    resolve straight to 'submission_failed', not sit in the more
-    conservative 'submission_unknown'."""
+def test_immediate_404_after_submission_error_remains_unknown_during_indexing_grace():
+    """A timeout can lose an accepted response before the broker's client-id
+    lookup is indexed. An immediate 404 therefore keeps both the unresolved
+    state and its execution-budget reservation."""
     packet = _packet()
     policy = _policy()
     proposal = generate_risk_reduction_proposals(packet, policy)[0]
@@ -1800,7 +1799,7 @@ def test_ambiguous_submission_failure_marks_submission_failed_when_broker_confir
         raise TimeoutError("simulated network timeout")
 
     broker.submit_market_order = failing_submit
-    broker.find_order_by_client_id = lambda client_order_id: None  # confirmed absent (broker's own 404)
+    broker.find_order_by_client_id = lambda client_order_id: None  # immediate 404; indexing may lag
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
@@ -1814,10 +1813,12 @@ def test_ambiguous_submission_failure_marks_submission_failed_when_broker_confir
                     store,
                     now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
-                assert False, "expected a confirmed-absent lookup to raise"
+                assert False, "expected an unresolved submission to raise"
             except ProposalExecutionError as exc:
-                assert "confirms no such order exists" in str(exc)
-            assert store.get_proposal(proposal.proposal_id)["status"] == "submission_failed"
+                assert "submission_unknown" in str(exc)
+            assert store.get_proposal(proposal.proposal_id)["status"] == "submission_unknown"
+            usage = store.get_execution_budget_usage("2026-07-27")
+            assert usage["submitted_order_count"] == 1
     finally:
         restore()
 
@@ -2060,6 +2061,7 @@ def test_reconcile_submission_marks_submission_failed_when_broker_confirms_absen
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
             store.update_proposal_status(proposal.proposal_id, "submitting")
+            _backdate_updated_at(store, proposal.proposal_id, seconds_ago=120)
 
             try:
                 reconcile_submission(proposal.proposal_id, store)
@@ -2067,6 +2069,40 @@ def test_reconcile_submission_marks_submission_failed_when_broker_confirms_absen
             except ProposalExecutionError as exc:
                 assert "never accepted" in str(exc)
             assert store.get_proposal(proposal.proposal_id)["status"] == "submission_failed"
+    finally:
+        restore()
+
+
+def test_reconcile_submission_keeps_a_recent_404_unresolved_and_reserved():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    broker.find_order_by_client_id = lambda client_order_id: None
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submitting")
+            store.reserve_execution_budget(
+                proposal.proposal_id,
+                trading_day="2026-07-30",
+                notional=100.0,
+                max_daily_notional=10_000.0,
+                max_daily_orders=10,
+            )
+
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, "expected a too-recent absence to remain unresolved"
+            except ProposalExecutionError as exc:
+                assert "grace period has not elapsed" in str(exc)
+
+            assert store.get_proposal(proposal.proposal_id)["status"] == "submission_unknown"
+            usage = store.get_execution_budget_usage("2026-07-30")
+            assert usage["submitted_order_count"] == 1
     finally:
         restore()
 

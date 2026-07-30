@@ -156,6 +156,19 @@ def test_the_guard_is_off_by_default():
         ) is not None
 
 
+def test_an_ineligible_target_returns_none_before_checking_sibling_conflicts():
+    """Conflict checks describe a claim that could otherwise succeed. Calling
+    claim on an already-terminal target must keep the ordinary None contract,
+    even when another proposal currently holds the same ticker/side."""
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(
+            temp,
+            _proposal("tp-done", status=FILLED),
+            _proposal("tp-live", status=SUBMITTING),
+        )
+        assert _claim(store, "tp-done") is None
+
+
 def test_concurrent_claims_for_the_same_ticker_and_side_do_not_both_win():
     """THE race. Two threads claim two DIFFERENT proposals for the same
     ticker/side at the same moment. A snapshot-based check lets both through;

@@ -24,6 +24,20 @@ BALANCE_TOLERANCE = Decimal("0.000001")
 CASH_TOLERANCE = Decimal("0.01")
 SHARE_TOLERANCE = Decimal("0.00000001")
 
+# Sign convention (standard credit-normal double-entry accounting, applied
+# consistently everywhere in this module -- independent review, 2026-07-30):
+# ASSET and EXPENSE accounts (ACCOUNT_CASH, SECURITY_ACCOUNT_PREFIX,
+# ACCOUNT_FEES) are POSITIVE when they increase -- "more cash/shares/expense"
+# reads as a bigger positive number, which matches intuition.
+# EQUITY, INCOME, and LIABILITY accounts (ACCOUNT_OPENING_EQUITY,
+# ACCOUNT_CONTRIBUTED_CAPITAL, ACCOUNT_REALIZED_PNL, ACCOUNT_DIVIDEND_INCOME)
+# are NEGATIVE when they increase -- a $100 realized GAIN posts as -100 to
+# ACCOUNT_REALIZED_PNL, a $50 dividend posts as -50 to ACCOUNT_DIVIDEND_INCOME.
+# This is what makes every transaction sum to zero across a buy (cash -,
+# security +) or a sell (cash +, security -, realized_pnl -[gain] or
+# +[loss]). Any FUTURE code that reads an income/equity account's balance
+# and reports it to a user as "P&L" or "capital contributed" MUST negate it
+# first, or the sign will read backwards.
 ACCOUNT_CASH = "ASSET:CASH"
 ACCOUNT_OPENING_EQUITY = "EQUITY:OPENING_BALANCE"
 ACCOUNT_CONTRIBUTED_CAPITAL = "EQUITY:CONTRIBUTED_CAPITAL"

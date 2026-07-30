@@ -11,6 +11,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.mandate import load_mandate
 from backtest.research_report import (
+    ResearchReportError,
     build_data_manifest,
     build_research_report,
     embargoed_split_dates,
@@ -110,3 +111,52 @@ def test_research_report_is_immutable_and_blocks_non_point_in_time_data(
     assert write_research_report(report, target) == target
     with pytest.raises(FileExistsError, match="immutable"):
         write_research_report(report, target)
+
+
+def test_confirmation_window_too_short_blocks_promotion(tmp_path):
+    # Independent review, 2026-07-30: compute_portfolio_metrics() only
+    # requires >=2 observations and this pipeline runs no significance
+    # testing, so a short confirmation window could otherwise clear the
+    # mandate's fixed thresholds by chance without anyone noticing the
+    # sample was tiny. min_confirmation_sessions is a scoped floor, not
+    # full statistical rigor -- it should still fire by default here.
+    index = pd.date_range("2025-01-01", periods=100, freq="B")
+    frame = _price_frame(index)
+    equity = pd.Series(
+        100_000 * (frame["close"] / frame["close"].iloc[0]), index=index
+    )
+    broad_mandate = dataclasses.replace(
+        load_mandate(),
+        target_annualized_volatility_min_pct=0,
+        target_annualized_volatility_max_pct=100,
+        max_drawdown_pct=100,
+        max_time_under_water_sessions=1000,
+        max_downside_capture_pct=200,
+        min_upside_capture_pct=0,
+    )
+    kwargs = dict(
+        strategy_name="test_strategy",
+        equity_curve=equity,
+        benchmark_close=frame["close"],
+        data={"AAPL": frame},
+        parameters={"entry_timing": "next_open"},
+        mandate=broad_mandate,
+        code_commit="abc123",
+        requested_sessions=100,
+        point_in_time_data=True,
+        discovery_frac=0.6,
+        hold_days=5,
+        generated_at=datetime(2026, 7, 29, tzinfo=timezone.utc),
+    )
+    default_floor = build_research_report(**kwargs)
+    assert default_floor["metrics"]["sessions"] < 60
+    assert "confirmation_window_too_short" in default_floor["promotion_blockers"]
+    assert default_floor["research_protocol"]["min_confirmation_sessions"] == 60
+
+    lowered_floor = build_research_report(
+        **{**kwargs, "min_confirmation_sessions": default_floor["metrics"]["sessions"]}
+    )
+    assert "confirmation_window_too_short" not in lowered_floor["promotion_blockers"]
+
+    with pytest.raises(ResearchReportError, match="min_confirmation_sessions"):
+        build_research_report(**{**kwargs, "min_confirmation_sessions": 0})

@@ -286,11 +286,34 @@ def build_research_report(
     discovery_frac: float,
     hold_days: int,
     generated_at: datetime | None = None,
+    min_confirmation_sessions: int = 60,
 ) -> dict[str, Any]:
+    """
+    `min_confirmation_sessions` (default 60, mirroring
+    PortfolioMandate.min_paper_sessions' existing precedent for "this
+    project's own idea of a minimally meaningful duration") is a scoped,
+    partial mitigation for a real gap -- independent review, 2026-07-30:
+    compute_portfolio_metrics() only requires >=2 observations, and this
+    pipeline runs no bootstrap/significance testing at all (unlike
+    backtest/engine.py's out_of_sample_significance_by_block() toolkit for
+    return-edge claims), so a confirmation window of just a few sessions
+    could clear the mandate's fixed numeric thresholds by chance alone.
+    This does not add statistical significance testing to risk-shape
+    metrics -- that is a real design decision (which test, what block
+    length for the equity curve's serial dependence) left for a future,
+    deliberate round -- it only stops a too-short window from silently
+    passing unnoticed.
+    """
     if not strategy_name.strip() or not code_commit.strip():
         raise ResearchReportError("strategy_name and code_commit are required")
     if not isinstance(hold_days, int) or isinstance(hold_days, bool) or hold_days < 1:
         raise ResearchReportError("hold_days must be a positive integer")
+    if (
+        not isinstance(min_confirmation_sessions, int)
+        or isinstance(min_confirmation_sessions, bool)
+        or min_confirmation_sessions < 1
+    ):
+        raise ResearchReportError("min_confirmation_sessions must be a positive integer")
     manifest = build_data_manifest(
         data,
         requested_sessions=requested_sessions,
@@ -340,6 +363,7 @@ def build_research_report(
             "discovery_frac": discovery_frac,
             "split": split,
             "point_in_time_data": bool(point_in_time_data),
+            "min_confirmation_sessions": min_confirmation_sessions,
         },
         "metrics": confirmation_metrics,
         "discovery_metrics": discovery_metrics,
@@ -351,6 +375,10 @@ def build_research_report(
                 ("data_quality_failed", not manifest["quality_passed"]),
                 ("not_point_in_time_data", not point_in_time_data),
                 ("mandate_metrics_failed", not mandate_evaluation["passed"]),
+                (
+                    "confirmation_window_too_short",
+                    confirmation_metrics["sessions"] < min_confirmation_sessions,
+                ),
             )
             if condition
         ],

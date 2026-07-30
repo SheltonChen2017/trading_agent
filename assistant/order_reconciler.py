@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import inspect
+import math
 from datetime import datetime, timedelta, timezone
 from threading import Event, Thread
 from typing import Any
@@ -31,6 +32,13 @@ from assistant.proposal_status import (
 from assistant.storage import AssistantStore
 
 _STREAM_SHUTDOWN_POLL_SECONDS = 0.1
+
+# How long a proposal must have sat in a pre-broker/unresolved status before a
+# "no such order" lookup is treated as PROOF the order never reached the
+# broker. Must comfortably exceed one submit round trip (broker account/asset
+# preflight + submit + the broker's own order-indexing latency). See
+# _absence_is_believable() for why believing it too early is harmful.
+MIN_ABSENCE_AGE_SECONDS = 60.0
 
 
 def _resolve_chain_for(
@@ -309,6 +317,46 @@ def _cancel_if_stale(
     return True
 
 
+def _absence_is_believable(
+    proposal: dict[str, Any],
+    *,
+    now: datetime,
+    min_absence_age_seconds: float,
+) -> bool:
+    """Is a "broker has no such order" lookup old enough to be BELIEVED?
+
+    submit_approved_proposal() writes "submitting" and reserves daily
+    budget BEFORE it calls the broker, so between that write and the
+    order becoming visible at Alpaca there is a real window -- a full
+    HTTP round trip, plus the broker's own indexing latency -- during
+    which a lookup correctly returns nothing for an order that is about
+    to exist. Believing that lookup marks a live order
+    "submission_failed" and RELEASES its daily reservation
+    (mark_submission_failed_and_release), so the order that then
+    succeeds no longer counts against max_daily_submitted_notional /
+    max_daily_order_count, and it briefly leaves the duplicate-risk set
+    that stops a second real order for the same ticker/side. The
+    reconciler runs on a poller/stream thread concurrently with
+    approvals, so this is reachable in normal operation, not only after
+    a crash (independent review, 2026-07-30).
+
+    Absence is therefore only believed once the proposal has been in its
+    current non-terminal status for at least `min_absence_age_seconds`.
+    `updated_at` is rewritten by every status transition, so on a
+    "submitting" row it is exactly when submission began -- the same
+    mechanism recover_stale_reconciliation() already uses to avoid
+    reclaiming a genuinely in-flight attempt.
+
+    Fails CLOSED: a missing or unparseable `updated_at` returns False
+    (absence not believed). Declining to act costs one more poll cycle;
+    acting wrongly drops a live order's budget reservation.
+    """
+    updated_at = _parse_datetime(proposal.get("updated_at"))
+    if updated_at is None:
+        return False
+    return now - updated_at >= timedelta(seconds=min_absence_age_seconds)
+
+
 def reconcile_nonterminal_orders(
     store: AssistantStore,
     *,
@@ -316,8 +364,28 @@ def reconcile_nonterminal_orders(
     now: datetime | None = None,
     cancel_stale: bool = False,
     max_order_age_minutes: float = 30.0,
+    min_absence_age_seconds: float = MIN_ABSENCE_AGE_SECONDS,
 ) -> dict[str, Any]:
-    """Poll all nonterminal proposals once and optionally cancel stale orders."""
+    """Poll all nonterminal proposals once and optionally cancel stale orders.
+
+    `min_absence_age_seconds` is the grace period before a broker lookup
+    that finds nothing is believed to PROVE the order does not exist --
+    see _absence_is_believable(). Validated FIRST, before any broker call
+    or state mutation: a non-finite or negative value would silently
+    disable the guard rather than fail, which is the exact failure mode
+    the guard exists to prevent. 0.0 is permitted (it restores the old,
+    racy behavior) but must be passed deliberately.
+    """
+    if (
+        isinstance(min_absence_age_seconds, bool)
+        or not isinstance(min_absence_age_seconds, (int, float))
+        or not math.isfinite(min_absence_age_seconds)
+        or min_absence_age_seconds < 0
+    ):
+        raise ValueError(
+            "min_absence_age_seconds must be a finite, non-negative number, "
+            f"got {min_absence_age_seconds!r}."
+        )
     if broker_module is None:
         import execution.alpaca_broker as broker_module
 
@@ -328,6 +396,7 @@ def reconcile_nonterminal_orders(
         "updated": 0,
         "cancellation_requested": 0,
         "confirmed_absent": 0,
+        "skipped_too_recent": 0,
         "errors": [],
     }
     for proposal in proposals:
@@ -336,6 +405,11 @@ def reconcile_nonterminal_orders(
             order = broker_module.find_order_by_client_id(proposal["idempotency_key"])
             if order is None:
                 if proposal["status"] in (SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING):
+                    if not _absence_is_believable(
+                        proposal, now=now, min_absence_age_seconds=min_absence_age_seconds,
+                    ):
+                        result["skipped_too_recent"] += 1
+                        continue
                     transitioned = store.mark_submission_failed_and_release(
                         proposal_id,
                         expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
@@ -429,6 +503,7 @@ def monitor_orders(
     max_order_age_minutes: float = 30.0,
     poll_interval_seconds: float = 30.0,
     reconnect_delay_seconds: float = 5.0,
+    min_absence_age_seconds: float = MIN_ABSENCE_AGE_SECONDS,
     stop_event: Event | None = None,
 ) -> dict[str, Any]:
     """Reconcile continuously while consuming a reconnecting trade stream."""
@@ -442,6 +517,7 @@ def monitor_orders(
         broker_module=broker_module,
         cancel_stale=cancel_stale,
         max_order_age_minutes=max_order_age_minutes,
+        min_absence_age_seconds=min_absence_age_seconds,
     )
     stop = stop_event or Event()
 
@@ -452,6 +528,7 @@ def monitor_orders(
                 broker_module=broker_module,
                 cancel_stale=cancel_stale,
                 max_order_age_minutes=max_order_age_minutes,
+                min_absence_age_seconds=min_absence_age_seconds,
             )
 
     poller = Thread(target=poll_loop, name="order-reconciliation-poller", daemon=True)

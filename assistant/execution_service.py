@@ -215,6 +215,7 @@ from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
     APPROVED,
     BLOCKED,
+    IN_FLIGHT_INTENT_STATUSES,
     POLICY_OVERRIDE_AVAILABLE,
     RECONCILING,
     SUBMISSION_UNKNOWN,
@@ -223,7 +224,7 @@ from assistant.proposal_status import (
     VALIDATION_FAILED,
 )
 from assistant.schemas import PortfolioSnapshot
-from assistant.storage import AssistantStore
+from assistant.storage import AssistantStore, DuplicateIntentConflict
 from risk.execution_gate import (
     TradeIntent,
     ValidationResult,
@@ -626,6 +627,7 @@ def validate_proposal_for_execution(
     extra_pending_buy_value_by_ticker: dict[str, float] | None = None,
     available_cash_override: float | None = None,
     available_buying_power_override: float | None = None,
+    extra_open_order_count: int = 0,
 ) -> ProposalValidationOutcome:
     """
     Checks, in the same order execute_approved_paper_proposal() always
@@ -730,13 +732,34 @@ def validate_proposal_for_execution(
                 "approve since the duplicate-order check would be unreliable. Try again shortly."
             ),
         )
-    if len(current_portfolio.open_orders) >= policy.max_open_orders:
+    # `extra_open_order_count` is how many orders an in-progress batch has
+    # already simulated submitting ahead of this leg. Without it a cumulative
+    # preflight sees a CONSTANT open-order count across every leg and can
+    # green-light a batch whose later legs the real path then rejects, breaking
+    # allocation_batch's "submit none, or all" guarantee (independent review,
+    # 2026-07-30). Validated rather than trusted: a negative or non-int value
+    # would loosen a cap.
+    if (
+        isinstance(extra_open_order_count, bool)
+        or not isinstance(extra_open_order_count, int)
+        or extra_open_order_count < 0
+    ):
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=None, validation=None,
+            error=f"extra_open_order_count must be a non-negative int, got {extra_open_order_count!r}.",
+        )
+    projected_open_orders = len(current_portfolio.open_orders) + extra_open_order_count
+    if projected_open_orders >= policy.max_open_orders:
+        pending_note = (
+            f" (including {extra_open_order_count} earlier leg(s) of this batch)"
+            if extra_open_order_count else ""
+        )
         return ProposalValidationOutcome(
             proposal=proposal,
             intent=None,
             validation=None,
             error=(
-                f"Open-order cap reached: {len(current_portfolio.open_orders)} active order(s), "
+                f"Open-order cap reached: {projected_open_orders} active order(s){pending_note}, "
                 f"policy maximum {policy.max_open_orders}."
             ),
         )
@@ -986,12 +1009,23 @@ def execute_approved_paper_proposal(
     # a human decision, not a terminal rejection -- re-invoking (with
     # override_policy_violations=True to actually proceed past them, or
     # without it to just re-check) must be able to pick it back up.
-    claimed = store.claim_proposal(
-        proposal_id,
-        expected_status=("proposed", POLICY_OVERRIDE_AVAILABLE),
-        new_status=VALIDATING,
-        not_expired_after=now_utc.isoformat(),
-    )
+    # conflicting_intent_statuses makes the ticker+side duplicate rule part of
+    # the SAME serialized claim as the status check. The snapshot-based
+    # duplicate check further down still runs (it also covers recent fills and
+    # broker orders this process never proposed); this closes the narrower
+    # window where two concurrent approvals of DIFFERENT proposals for the same
+    # ticker/side both read "no duplicate" before either order reached the
+    # broker (independent review, 2026-07-30).
+    try:
+        claimed = store.claim_proposal(
+            proposal_id,
+            expected_status=("proposed", POLICY_OVERRIDE_AVAILABLE),
+            new_status=VALIDATING,
+            not_expired_after=now_utc.isoformat(),
+            conflicting_intent_statuses=IN_FLIGHT_INTENT_STATUSES,
+        )
+    except DuplicateIntentConflict as exc:
+        raise ProposalExecutionError(f"Duplicate-order protection: {exc}") from exc
     if claimed is None:
         current = store.get_proposal(proposal_id)
         if (

@@ -54,6 +54,51 @@ def test_an_unrecognised_value_fails_closed_rather_than_open():
     assert env_kill_switch_active(_env("of")) is True
 
 
+def _inline_kill_switch_uses(source: str) -> list[int]:
+    """Line numbers where `source` names the kill-switch variable directly.
+
+    Extracted so the DETECTOR itself is testable against synthetic source.
+    The repo scan below can only prove the rule on code that exists today, so
+    broadening it (Compare-only -> any Constant, to cover `os.getenv(...)`
+    truthiness checks and match statements) was unverifiable: with no module
+    written in the newly-covered form, narrowing it back again passed the whole
+    suite. A guard whose strengthening cannot fail is a guard that drifts
+    silently, which is the exact failure this file exists to prevent
+    (2026-07-30).
+    """
+    return [
+        node.lineno
+        for node in ast.walk(ast.parse(source))
+        if isinstance(node, ast.Constant) and node.value == KILL_SWITCH_ENV_VAR
+    ]
+
+
+@pytest.mark.parametrize(
+    "snippet",
+    [
+        # The original form the repo-wide scan already caught.
+        'if os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1": pass',
+        # Truthiness check -- NOT an ast.Compare, so the pre-2026-07-30
+        # detector missed it entirely.
+        'if os.getenv("TRADING_ASSISTANT_KILL_SWITCH"): pass',
+        # Assignment, then use elsewhere.
+        'raw = os.environ.get("TRADING_ASSISTANT_KILL_SWITCH")',
+        # Match statement.
+        'match os.getenv("TRADING_ASSISTANT_KILL_SWITCH"):\n    case "1": pass',
+    ],
+)
+def test_the_detector_catches_every_inline_form(snippet):
+    assert _inline_kill_switch_uses(snippet), (
+        "this form re-implements the kill-switch rule but the detector "
+        "does not see it"
+    )
+
+
+def test_the_detector_does_not_flag_the_shared_helper_call():
+    """It must not fire on the correct usage, or it is unactionable noise."""
+    assert _inline_kill_switch_uses("if env_kill_switch_active(): pass") == []
+
+
 def test_no_module_reimplements_the_check_inline():
     """Eight copies of this rule existed and could drift apart independently.
 
@@ -68,14 +113,8 @@ def test_no_module_reimplements_the_check_inline():
     ) + list((REPO / "risk").rglob("*.py")) + list((REPO / "execution").rglob("*.py")):
         if path.name == "kill_switch.py":
             continue
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            # os.environ.get(KILL_SWITCH...) compared against a literal
-            if not isinstance(node, ast.Compare):
-                continue
-            source = ast.unparse(node)
-            if KILL_SWITCH_ENV_VAR in source:
-                offenders.append(f"{path.relative_to(REPO)}: {source}")
+        for lineno in _inline_kill_switch_uses(path.read_text(encoding="utf-8")):
+            offenders.append(f"{path.relative_to(REPO)}:{lineno}")
     assert not offenders, (
         "these sites compare the kill-switch variable directly instead of "
         "calling env_kill_switch_active(), and will drift from it:\n  "

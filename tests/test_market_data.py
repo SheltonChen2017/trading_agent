@@ -16,6 +16,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import types
 
 import pandas as pd
+import pytest
 
 from data.market_data import _trading_session_start_date, fetch_historical
 
@@ -194,11 +195,8 @@ if __name__ == "__main__":
     print("All market_data tests passed.")
 
 
-def test_a_transport_failure_degrades_instead_of_crashing_the_briefing():
-    """build_market_regime() already returns an "unavailable" regime when a
-    ticker is missing from the result, but build_decision_packet() has no
-    try/except around it -- so a raised network error crashed a read-only
-    report designed to survive exactly this (2026-07-30)."""
+def test_a_transport_failure_remains_visible_to_data_and_research_callers():
+    """The low-level data source must not disguise a failed request as empty."""
     import data.market_data as market_data
 
     real_download = None
@@ -210,7 +208,8 @@ def test_a_transport_failure_degrades_instead_of_crashing_the_briefing():
             raise ConnectionError("simulated provider outage")
 
         yf.download = exploding_download
-        assert market_data.fetch_historical(["SPY"], lookback_days=5) == {}
+        with pytest.raises(ConnectionError, match="simulated provider outage"):
+            market_data.fetch_historical(["SPY"], lookback_days=5)
     finally:
         if real_download is not None:
             yf.download = real_download

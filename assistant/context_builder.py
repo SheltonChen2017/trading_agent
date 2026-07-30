@@ -321,7 +321,17 @@ def build_market_regime(benchmark_ticker: str = "QQQ", lookback_days: int = 1764
     today's regime" read, unlike a backtest) — a simplification worth
     knowing about, not a bug.
     """
-    data = fetch_historical([benchmark_ticker], lookback_days=lookback_days)
+    try:
+        data = fetch_historical(
+            [benchmark_ticker], lookback_days=lookback_days
+        )
+    except Exception:
+        # A read-only briefing should remain available during a market-data
+        # outage. Keep this degradation at the briefing/regime boundary:
+        # fetch_historical() is also the data source for research scripts,
+        # where swallowing a provider/API failure as an empty dataset would
+        # hide the cause and could make a broken run look like missing tickers.
+        data = {}
     if benchmark_ticker not in data or data[benchmark_ticker].empty:
         return MarketRegime(
             benchmark_ticker=benchmark_ticker, trend=None, volatility_regime=None,
@@ -462,7 +472,10 @@ def build_decision_packet(
 
     warnings = list(risk.concentration_warnings) + extra_warnings
     if regime.trend is None or regime.volatility_regime is None:
-        warnings.append(f"Market regime for {benchmark_ticker} could not be fully computed (insufficient history).")
+        warnings.append(
+            f"Market regime for {benchmark_ticker} could not be fully "
+            "computed (market data unavailable or insufficient history)."
+        )
 
     return DecisionPacket(
         generated_at=datetime.now(timezone.utc).isoformat(),

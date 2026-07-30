@@ -436,12 +436,12 @@ def reconcile_nonterminal_orders(
                     # tracking, i.e. OLD trades. Brokers age orders out of their
                     # lookup window, so "not found" for one of these is the
                     # EXPECTED answer, not an anomaly. Flipping it to
-                    # submission_unknown was actively harmful once
-                    # IN_FLIGHT_INTENT_STATUSES started holding a ticker/side
-                    # slot (2026-07-30): a long-completed trade would silently
-                    # block every new proposal for that ticker and side, and
-                    # fail readiness, on the strength of a lookup miss that
-                    # proves nothing.
+                    # submission_unknown discards the only fact we do know:
+                    # this is a legacy row whose historical meaning was
+                    # "broker accepted", not a newly ambiguous submission.
+                    # Both statuses deliberately remain fail-closed in
+                    # duplicate prevention/readiness because absence cannot
+                    # prove whether the old order filled or was cancelled.
                     #
                     # The row stays in RECONCILABLE_STATUSES on purpose: if the
                     # broker DOES return the order, apply_broker_update() below

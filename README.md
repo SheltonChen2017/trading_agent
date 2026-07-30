@@ -239,7 +239,7 @@ re-confirmation rather than as re-validated.
 
 ## Installation
 
-Python 3.10 or newer is recommended.
+Python 3.12 or newer is required by the pinned dependency set.
 
 ```bash
 python -m venv .venv

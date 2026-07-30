@@ -10,20 +10,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     strategy:
-      # README claims 3.10+; CI proved only 3.12, so a 3.10-only syntax or
-      # stdlib regression could ship undetected against the stated support
-      # range. `fail-fast: false` so one version's failure still reports the
-      # others -- knowing whether a break is version-specific or universal is
-      # most of the diagnosis.
+      # The pinned stack sets the actual floor: pandas 3.0.5 requires 3.11+
+      # and numpy 2.5.1 requires 3.12+. Test every supported minor rather than
+      # adding jobs that can never finish dependency installation.
       fail-fast: false
       matrix:
-        python-version: ["3.10", "3.11", "3.12", "3.13"]
-      # NOTE: this project's own code uses no 3.11+ stdlib features (checked),
-      # but requirements.txt pins recent pandas/numpy/streamlit whose Python
-      # floors were NOT verifiable offline. If 3.10 fails on dependency
-      # resolution rather than on our tests, the honest fix is to correct
-      # README's "Python 3.10 or newer" claim to the real floor -- not to
-      # downgrade the pins.
+        python-version: ["3.12", "3.13"]
     name: tests (py${{ matrix.python-version }})
     steps:
       - uses: actions/checkout@v4

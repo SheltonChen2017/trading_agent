@@ -61,6 +61,7 @@ from assistant.context_builder import build_portfolio_snapshot_from_alpaca
 from assistant.execution_service import (
     PolicyOverridableBlockError,
     ProposalExecutionError,
+    _execution_budget_notional,
     execute_approved_paper_proposal,
     validate_proposal_for_execution,
 )
@@ -247,6 +248,19 @@ def preflight_allocation_batch(
     results: dict[str, ValidationResult] = {}
     reserved_cash = 0.0
     reserved_pending_by_ticker: dict[str, float] = {}
+    # Two caps the real execution path enforces that a per-leg snapshot cannot
+    # see, because both are consumed by EVERY submitted leg -- buys and sells
+    # alike -- rather than only by the cash-spending ones (independent review,
+    # 2026-07-30):
+    #   * the open-order cap, previously constant across all legs;
+    #   * the persistent daily submission budget, previously not checked at all
+    #     (it lives in reserve_execution_budget(), called only at submit time).
+    simulated_open_orders = 0
+    simulated_intents: set[tuple[str, str]] = set()
+    trading_day = now_et.date().isoformat()
+    usage = store.get_execution_budget_usage(trading_day)
+    budget_order_count = int(usage["submitted_order_count"])
+    budget_notional = float(usage["submitted_notional"])
 
     for proposal_id in proposal_ids:
         available_cash_override = current_portfolio.cash - reserved_cash
@@ -265,6 +279,7 @@ def preflight_allocation_batch(
             extra_pending_buy_value_by_ticker=dict(reserved_pending_by_ticker),
             available_cash_override=available_cash_override,
             available_buying_power_override=available_buying_power_override,
+            extra_open_order_count=simulated_open_orders,
         )
         if outcome.error is not None:
             results[proposal_id] = ValidationResult(
@@ -272,13 +287,68 @@ def preflight_allocation_batch(
             )
             continue
         results[proposal_id] = outcome.validation
-        if (
+        if not (
             outcome.validation is not None
             and outcome.validation.approved
             and outcome.intent is not None
             and outcome.reference_price is not None
-            and outcome.intent.side == "buy"
         ):
+            continue
+
+        intent_identity = (
+            outcome.intent.ticker.upper(),
+            outcome.intent.side.lower(),
+        )
+        if intent_identity in simulated_intents:
+            ticker, side = intent_identity
+            results[proposal_id] = ValidationResult(
+                approved=False,
+                violations=(
+                    f"Another passing leg in this batch already has the same "
+                    f"ticker/side intent ({side} {ticker}). Execution would reject "
+                    "this as a duplicate after partially submitting the batch.",
+                ),
+                violation_codes=("duplicate_intent_in_batch",),
+            )
+            continue
+
+        # Daily budget, simulated with the SAME arithmetic and the SAME
+        # side-aware price reserve_execution_budget() uses at submit time
+        # (strict `>`, gross submitted notional), so preflight and the enforcer
+        # cannot disagree about which leg is the one that breaks the cap.
+        leg_budget_notional = _execution_budget_notional(
+            outcome.intent, outcome.reference_price
+        )
+        next_order_count = budget_order_count + 1
+        next_notional = budget_notional + leg_budget_notional
+        budget_violation = None
+        if next_order_count > policy.max_daily_order_count:
+            budget_violation = (
+                f"Daily order-count budget would be {next_order_count}, exceeding "
+                f"{policy.max_daily_order_count}."
+            )
+        elif next_notional > policy.max_daily_submitted_notional:
+            budget_violation = (
+                f"Daily submitted notional would be ${next_notional:,.2f}, exceeding "
+                f"${policy.max_daily_submitted_notional:,.2f}."
+            )
+        if budget_violation is not None:
+            results[proposal_id] = ValidationResult(
+                approved=False,
+                violations=(budget_violation,),
+                violation_codes=("daily_execution_budget",),
+            )
+            continue
+        budget_order_count = next_order_count
+        budget_notional = next_notional
+        simulated_intents.add(intent_identity)
+
+        # Every submitted leg leaves one open order behind, whichever side it
+        # is -- so this increments for sells too, unlike the cash reservation
+        # below.
+        simulated_open_orders += 1
+
+        if outcome.intent.side == "buy":
             # worst_case_fill_price, not the raw quote: a buy limit order can
             # fill up to its limit price, so reserving only the quoted notional
             # here understated the cash/pending exposure carried into every

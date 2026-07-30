@@ -37,6 +37,14 @@ BROKER_EXPIRED = "broker_expired"
 EXECUTED = "executed"
 EXPIRED = "expired"
 
+# A broker 404 immediately after dispatch is not yet reliable evidence that an
+# order was never accepted: the submit response can be lost while the broker's
+# client-order-id index is still catching up. Reconciliation paths must retain
+# the execution reservation until the proposal has remained unresolved for at
+# least this long. Kept beside the lifecycle constants so polling and manual
+# reconciliation cannot silently choose different grace periods.
+BROKER_ABSENCE_GRACE_SECONDS = 60.0
+
 # Ordered roughly by where a proposal sits in its lifecycle.
 STATUSES: tuple[str, ...] = (
     PROPOSED,
@@ -73,6 +81,39 @@ UNRESOLVED_BROKER_STATE_STATUSES: tuple[str, ...] = (
     CANCEL_PENDING,
     # A legacy "executed" row may still represent an accepted-but-unfilled
     # order. Reconciliation must keep treating it as exposure until migrated.
+    EXECUTED,
+)
+
+# Statuses during which a proposal HOLDS its ticker/side slot against any
+# other proposal -- used by claim_proposal()'s cross-proposal duplicate guard.
+#
+# This is deliberately wider than UNRESOLVED_BROKER_STATE_STATUSES. That set
+# answers "might an order exist at the broker?", which is the right question
+# once a submission has been attempted. But the claim happens at the START of
+# the approval flow, long before "submitting" is written, so a guard using only
+# that set lets two concurrent approvals of different proposals for the same
+# ticker/side BOTH claim -- each one looks at the other and sees a proposal
+# that has not tried to submit yet. Verified by an actual two-thread test,
+# which the narrower version failed (2026-07-30). The slot must therefore be
+# held from the moment of the claim through to a terminal state.
+#
+# "override_available" is excluded on purpose: it means validation stopped and
+# is waiting on a human, with no order pending and no submission attempted, so
+# it must not block an unrelated proposal indefinitely.
+#
+# Fail-closed cost: a process that dies mid-validation leaves a proposal in
+# "validating" and that ticker/side stays blocked until the row is resolved.
+# That is the intended direction -- refusing a second order is recoverable,
+# sending one is not.
+IN_FLIGHT_INTENT_STATUSES: tuple[str, ...] = (
+    VALIDATING,
+    APPROVED,
+    SUBMITTING,
+    SUBMISSION_UNKNOWN,
+    RECONCILING,
+    BROKER_ACCEPTED,
+    PARTIALLY_FILLED,
+    CANCEL_PENDING,
     EXECUTED,
 )
 

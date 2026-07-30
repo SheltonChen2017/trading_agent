@@ -204,6 +204,7 @@ import json
 import math
 import os
 from datetime import datetime, timedelta, timezone
+from typing import Any
 
 from assistant.order_lifecycle import (
     journal_broker_order_update,
@@ -215,6 +216,8 @@ from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
     APPROVED,
     BLOCKED,
+    BROKER_ABSENCE_GRACE_SECONDS,
+    IN_FLIGHT_INTENT_STATUSES,
     POLICY_OVERRIDE_AVAILABLE,
     RECONCILING,
     SUBMISSION_UNKNOWN,
@@ -223,7 +226,7 @@ from assistant.proposal_status import (
     VALIDATION_FAILED,
 )
 from assistant.schemas import PortfolioSnapshot
-from assistant.storage import AssistantStore
+from assistant.storage import AssistantStore, DuplicateIntentConflict
 from risk.execution_gate import (
     TradeIntent,
     ValidationResult,
@@ -236,13 +239,18 @@ from risk.execution_gate import (
 
 # Sentinel: the broker lookup itself failed (network/auth/5xx/etc.), so
 # presence or absence of the order still can't be determined. Distinct
-# from `None`, which _lookup_order_outcome() reserves for a CONFIRMED
-# absence (the broker's own 404).
+# from `None`, which _lookup_order_outcome() reserves for a broker 404.
+# Whether that 404 is old enough to count as reliable absence is decided
+# separately by the reconciliation grace-period rules.
 _LOOKUP_UNCONFIRMED = object()
 
 
 class ProposalExecutionError(RuntimeError):
     pass
+
+
+class _ProposalClaimLostError(ProposalExecutionError):
+    """The worker's pre-broker claim was revoked before its next transition."""
 
 
 class PolicyOverridableBlockError(ProposalExecutionError):
@@ -270,6 +278,58 @@ class PolicyOverridableBlockError(ProposalExecutionError):
         super().__init__(message)
         self.overridable_violations = overridable_violations
         self.conditions_changed = conditions_changed
+
+
+def _transition_pre_broker_claim(
+    store: AssistantStore,
+    proposal_id: str,
+    *,
+    expected_status: str,
+    new_status: str,
+    **updates: Any,
+) -> dict[str, Any]:
+    """Advance a proposal only while this worker still owns its claim.
+
+    Stale-claim recovery can move a long-running worker's proposal to
+    ``validation_failed`` and release its ticker/side slot. The worker may
+    merely have been paused rather than dead, so every later pre-broker
+    transition must be conditional. Once recovery wins, this fences the old
+    worker out before it can reserve budget or contact the broker.
+    """
+    transitioned = store.update_proposal_status_if_current(
+        proposal_id,
+        expected_statuses=(expected_status,),
+        new_status=new_status,
+        **updates,
+    )
+    if transitioned is not None:
+        return transitioned
+    current = store.get_proposal(proposal_id)
+    current_status = None if current is None else current.get("status")
+    raise _ProposalClaimLostError(
+        f"Proposal {proposal_id} lost its execution claim while transitioning "
+        f"{expected_status!r} -> {new_status!r} (current status={current_status!r}). "
+        "Refusing to continue, reserve execution budget, or contact the broker."
+    )
+
+
+def _broker_absence_is_old_enough(claimed: dict, *, now: datetime) -> bool:
+    """Whether a just-claimed unresolved state is old enough to trust a 404.
+
+    ``claim_proposal`` returns the prior row timestamp from inside its write
+    transaction. Using that value avoids a read/claim race, while keeping the
+    metadata transient rather than adding it to the persisted proposal schema.
+    """
+    raw = claimed.get("_claimed_from_updated_at")
+    if not raw:
+        return False
+    try:
+        started = datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    if started.tzinfo is None:
+        started = started.replace(tzinfo=timezone.utc)
+    return now - started >= timedelta(seconds=BROKER_ABSENCE_GRACE_SECONDS)
 
 
 def _review_digest(intent: TradeIntent, violation_codes: tuple[str, ...], violations: tuple[str, ...]) -> str:
@@ -334,11 +394,10 @@ def _intent_from_dict(raw: dict) -> TradeIntent:
 
 def _lookup_order_outcome(broker_module, idempotency_key: str):
     """Classifies a broker order lookup into exactly one of three
-    outcomes: the order dict (found), None (the broker CONFIRMS no such
-    order exists), or _LOOKUP_UNCONFIRMED (the lookup itself failed --
-    still don't know). Callers must branch on all three; treating
-    "confirmed absent" and "unconfirmed" the same way was the bug in the
-    previous round of fixes."""
+    outcomes: the order dict (found), None (the broker returned 404), or
+    _LOOKUP_UNCONFIRMED (the lookup itself failed -- still don't know).
+    Callers must branch on all three, and must not treat a new 404 as
+    durable proof of absence before the broker-indexing grace period."""
     try:
         return broker_module.find_order_by_client_id(idempotency_key)
     except Exception:
@@ -626,6 +685,7 @@ def validate_proposal_for_execution(
     extra_pending_buy_value_by_ticker: dict[str, float] | None = None,
     available_cash_override: float | None = None,
     available_buying_power_override: float | None = None,
+    extra_open_order_count: int = 0,
 ) -> ProposalValidationOutcome:
     """
     Checks, in the same order execute_approved_paper_proposal() always
@@ -730,13 +790,34 @@ def validate_proposal_for_execution(
                 "approve since the duplicate-order check would be unreliable. Try again shortly."
             ),
         )
-    if len(current_portfolio.open_orders) >= policy.max_open_orders:
+    # `extra_open_order_count` is how many orders an in-progress batch has
+    # already simulated submitting ahead of this leg. Without it a cumulative
+    # preflight sees a CONSTANT open-order count across every leg and can
+    # green-light a batch whose later legs the real path then rejects, breaking
+    # allocation_batch's "submit none, or all" guarantee (independent review,
+    # 2026-07-30). Validated rather than trusted: a negative or non-int value
+    # would loosen a cap.
+    if (
+        isinstance(extra_open_order_count, bool)
+        or not isinstance(extra_open_order_count, int)
+        or extra_open_order_count < 0
+    ):
+        return ProposalValidationOutcome(
+            proposal=proposal, intent=None, validation=None,
+            error=f"extra_open_order_count must be a non-negative int, got {extra_open_order_count!r}.",
+        )
+    projected_open_orders = len(current_portfolio.open_orders) + extra_open_order_count
+    if projected_open_orders >= policy.max_open_orders:
+        pending_note = (
+            f" (including {extra_open_order_count} earlier leg(s) of this batch)"
+            if extra_open_order_count else ""
+        )
         return ProposalValidationOutcome(
             proposal=proposal,
             intent=None,
             validation=None,
             error=(
-                f"Open-order cap reached: {len(current_portfolio.open_orders)} active order(s), "
+                f"Open-order cap reached: {projected_open_orders} active order(s){pending_note}, "
                 f"policy maximum {policy.max_open_orders}."
             ),
         )
@@ -986,12 +1067,23 @@ def execute_approved_paper_proposal(
     # a human decision, not a terminal rejection -- re-invoking (with
     # override_policy_violations=True to actually proceed past them, or
     # without it to just re-check) must be able to pick it back up.
-    claimed = store.claim_proposal(
-        proposal_id,
-        expected_status=("proposed", POLICY_OVERRIDE_AVAILABLE),
-        new_status=VALIDATING,
-        not_expired_after=now_utc.isoformat(),
-    )
+    # conflicting_intent_statuses makes the ticker+side duplicate rule part of
+    # the SAME serialized claim as the status check. The snapshot-based
+    # duplicate check further down still runs (it also covers recent fills and
+    # broker orders this process never proposed); this closes the narrower
+    # window where two concurrent approvals of DIFFERENT proposals for the same
+    # ticker/side both read "no duplicate" before either order reached the
+    # broker (independent review, 2026-07-30).
+    try:
+        claimed = store.claim_proposal(
+            proposal_id,
+            expected_status=("proposed", POLICY_OVERRIDE_AVAILABLE),
+            new_status=VALIDATING,
+            not_expired_after=now_utc.isoformat(),
+            conflicting_intent_statuses=IN_FLIGHT_INTENT_STATUSES,
+        )
+    except DuplicateIntentConflict as exc:
+        raise ProposalExecutionError(f"Duplicate-order protection: {exc}") from exc
     if claimed is None:
         current = store.get_proposal(proposal_id)
         if (
@@ -1071,9 +1163,11 @@ def execute_approved_paper_proposal(
                     and previous_reviewed is not None
                     and previous_reviewed.get("review_digest") != current_digest
                 )
-                store.update_proposal_status(
+                _transition_pre_broker_claim(
+                    store,
                     proposal_id,
-                    POLICY_OVERRIDE_AVAILABLE,
+                    expected_status=VALIDATING,
+                    new_status=POLICY_OVERRIDE_AVAILABLE,
                     violations=list(validation.violations),
                     reviewed_override={
                         "intent_fingerprint": intent_fingerprint(intent),
@@ -1125,11 +1219,19 @@ def execute_approved_paper_proposal(
             # what was previously reviewed: fall through to
             # authorize_overridden_trade_intent() below instead of the
             # normal approved path.
+    except _ProposalClaimLostError:
+        raise
     except PolicyOverridableBlockError:
         raise
     except ProposalExecutionError as exc:
         violations = list(validation.violations) if validation is not None and not validation.approved else [str(exc)]
-        store.update_proposal_status(proposal_id, BLOCKED, violations=violations)
+        _transition_pre_broker_claim(
+            store,
+            proposal_id,
+            expected_status=VALIDATING,
+            new_status=BLOCKED,
+            violations=violations,
+        )
         raise
     except Exception as exc:
         # Something genuinely unexpected (not a validation/policy
@@ -1137,14 +1239,22 @@ def execute_approved_paper_proposal(
         # "validating" forever with no record of why. Distinct status
         # from "blocked" so this is visibly different from an ordinary
         # policy rejection in the History tab / store.
-        store.update_proposal_status(proposal_id, VALIDATION_FAILED, error=str(exc))
+        _transition_pre_broker_claim(
+            store,
+            proposal_id,
+            expected_status=VALIDATING,
+            new_status=VALIDATION_FAILED,
+            error=str(exc),
+        )
         raise
 
     if validation.approved:
         authorization = authorize_trade_intent(intent, validation)
-        store.update_proposal_status(
+        _transition_pre_broker_claim(
+            store,
             proposal_id,
-            APPROVED,
+            expected_status=VALIDATING,
+            new_status=APPROVED,
             approved_at=now_utc.isoformat(),
             violations=[],
         )
@@ -1155,9 +1265,11 @@ def execute_approved_paper_proposal(
         # violations are recorded on the proposal rather than silently
         # disappearing into an ordinary approval.
         authorization = authorize_overridden_trade_intent(intent, validation)
-        store.update_proposal_status(
+        _transition_pre_broker_claim(
+            store,
             proposal_id,
-            APPROVED,
+            expected_status=VALIDATING,
+            new_status=APPROVED,
             approved_at=now_utc.isoformat(),
             violations=[],
             policy_override={
@@ -1170,7 +1282,12 @@ def execute_approved_paper_proposal(
     # submission. If the process dies after this write, startup polling can
     # safely prove broker absence instead of leaving an "approved" proposal
     # with a stranded reservation and no recovery path.
-    store.update_proposal_status(proposal_id, SUBMITTING)
+    _transition_pre_broker_claim(
+        store,
+        proposal_id,
+        expected_status=APPROVED,
+        new_status=SUBMITTING,
+    )
 
     try:
         store.reserve_execution_budget(
@@ -1223,8 +1340,9 @@ def execute_approved_paper_proposal(
         # a network timeout, for example, can lose the response after the
         # order was actually accepted. Reconcile by looking the order up
         # under the same idempotency key (client_order_id) before
-        # concluding anything -- and treat "confirmed absent" differently
-        # from "still don't know" (see _lookup_order_outcome).
+        # concluding anything -- and distinguish a 404 from a failed lookup
+        # without trusting a new 404 before the indexing grace period (see
+        # _lookup_order_outcome).
         outcome = _lookup_order_outcome(broker, proposal["idempotency_key"])
         if isinstance(outcome, dict):
             matches, mismatch_detail = _order_matches_intent(outcome, intent)
@@ -1286,21 +1404,30 @@ def execute_approved_paper_proposal(
             )
             return authoritative
         if outcome is None:
-            # Confirmed absent: the broker itself says this order was
-            # never accepted, so it's safe to call it a real failure
-            # rather than leaving it in limbo as "submission_unknown".
-            transitioned = store.mark_submission_failed_and_release(
+            # A 404 immediately after a timeout is not durable proof that the
+            # order was never accepted: the response may have been lost before
+            # the broker indexed client_order_id. Keep the reservation and the
+            # duplicate-intent slot until delayed reconciliation observes
+            # absence after the shared grace period.
+            unresolved = store.update_proposal_status_if_current(
                 proposal_id,
                 expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-                error=str(exc),
+                new_status=SUBMISSION_UNKNOWN,
+                error=(
+                    f"Submission raised ({exc}); an immediate broker lookup found no matching "
+                    "order, but absence is not trusted until the broker-indexing grace period "
+                    "has elapsed. Reconcile again later."
+                ),
             )
-            if transitioned is None:
+            if unresolved is None:
                 current = store.get_proposal(proposal_id)
                 if current is not None and current.get("broker_order"):
                     return current["broker_order"]
             raise ProposalExecutionError(
-                f"Order submission failed for {proposal_id}, and the broker confirms no such order "
-                f"exists ({exc})."
+                f"Could not confirm whether the order for {proposal_id} was accepted after "
+                f"the submission error ({exc}). The immediate lookup found no order, but the "
+                "broker-indexing grace period has not elapsed; status is 'submission_unknown' "
+                "and its execution reservation remains held. Reconcile again later."
             ) from exc
         unresolved = store.update_proposal_status_if_current(
             proposal_id,
@@ -1370,8 +1497,10 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
         never happen with unique idempotency keys, but this is exactly
         the kind of anomaly that must not be auto-resolved): stays
         "submission_unknown" with the mismatch recorded; raises.
-      - Broker confirms (HTTP 404) no such order exists: marked
-        "submission_failed" -- it genuinely never went through.
+      - Broker returns HTTP 404 only after the unresolved state has aged past
+        the broker-indexing grace period: marked "submission_failed" -- it is
+        then old enough to treat absence as reliable. A newer 404 stays
+        "submission_unknown" and retains its execution reservation.
       - The lookup itself still can't confirm either way (network/auth/
         etc.): returned to "submission_unknown", unchanged, safe to
         retry again later.
@@ -1472,6 +1601,33 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
             return authoritative
 
         if outcome is None:
+            if not _broker_absence_is_old_enough(
+                claimed, now=datetime.now(timezone.utc)
+            ):
+                store.update_proposal_status_if_current(
+                    proposal_id,
+                    expected_statuses=(RECONCILING,),
+                    new_status=SUBMISSION_UNKNOWN,
+                    # Restore the ORIGINAL timestamp: this bounce made no
+                    # progress, and the grace period is measured from
+                    # updated_at. Writing "now" here would push the deadline
+                    # out on every attempt, so a user re-clicking Reconcile
+                    # inside the window could never let the proposal age
+                    # enough to resolve -- and would starve the background
+                    # poller too, since it reads the same column.
+                    preserve_updated_at=str(claimed.get("_claimed_from_updated_at") or "")
+                    or None,
+                    reconciled_at=reconciled_at,
+                    error=(
+                        "Reconciliation found no matching broker order, but the unresolved "
+                        "state is too recent for absence to be reliable. The execution "
+                        "reservation remains held; retry after the broker-indexing grace period."
+                    ),
+                )
+                raise ProposalExecutionError(
+                    f"Reconciliation for {proposal_id} found no order, but the broker-indexing "
+                    "grace period has not elapsed -- still 'submission_unknown'."
+                )
             transitioned = store.mark_submission_failed_and_release(
                 proposal_id,
                 expected_statuses=(RECONCILING,),
@@ -1614,3 +1770,126 @@ def recover_stale_reconciliation(
             "and is presumed to be a genuinely in-flight reconciliation, not stranded."
         )
     return recovered
+
+
+# Statuses a proposal can be stranded in BEFORE anything was ever handed to the
+# broker. submit_approved_proposal() writes "submitting" and only then calls
+# out, so a row still sitting in "validating"/"approved" provably has no broker
+# order behind it -- which is what makes recovering them safe, unlike every
+# post-submission status.
+PRE_BROKER_STRANDED_STATUSES: tuple[str, ...] = (VALIDATING, APPROVED)
+
+
+def recover_stale_claim(
+    proposal_id: str, store: AssistantStore, stale_after_seconds: int = 900,
+) -> dict:
+    """
+    Releases a proposal stranded in a PRE-BROKER status after a process died
+    between claiming it and its next write.
+
+    Why this is needed, and why it did not used to be: an ordinary exception
+    during validation is already caught and marked "validation_failed", so this
+    only matters when the PROCESS died outright (SIGKILL, power loss, a
+    Streamlit restart mid-approval). Such a row used to be a harmless orphan --
+    the user simply generated a new proposal.
+
+    It stopped being harmless when claim_proposal() started holding a
+    ticker+side slot across IN_FLIGHT_INTENT_STATUSES to close the
+    cross-proposal duplicate race (2026-07-30). "validating" and "approved" are
+    in that set, so one stranded row silently blocked EVERY future proposal for
+    that ticker and side, and nothing could clear it:
+    recover_stale_reconciliation() only accepts "reconciling", expiry sweeps
+    only touch "proposed", and no CLI command reached it. The only remedy was
+    hand-editing SQLite. Found by reviewing the change that caused it.
+
+    Recovers to "validation_failed", not "proposed": the row WAS claimed, and
+    silently making it approvable again would erase that a human-initiated
+    attempt vanished mid-flight. The user regenerates a fresh proposal, which
+    is cheap and re-runs every check against current prices.
+
+    Uses the same stale-guard + single conditional UPDATE as
+    recover_stale_reconciliation(), so a recently claimed validation is left
+    alone and two concurrent recoveries cannot both win. Staleness is not
+    proof that the original worker is dead, however: it may merely be paused.
+    Safety therefore also depends on execute_approved_paper_proposal() using
+    _transition_pre_broker_claim() for every later transition. If this recovery
+    wins, those conditional writes fence the old worker out before any budget
+    reservation or broker call.
+    """
+    if (
+        isinstance(stale_after_seconds, bool)
+        or not isinstance(stale_after_seconds, int)
+        or stale_after_seconds <= 0
+    ):
+        raise ValueError(
+            f"stale_after_seconds must be a positive int, got {stale_after_seconds!r} -- "
+            "a zero or negative value would make every claim look stale immediately, "
+            "defeating the guard."
+        )
+    now = datetime.now(timezone.utc)
+    cutoff = (now - timedelta(seconds=stale_after_seconds)).isoformat()
+    for status in PRE_BROKER_STRANDED_STATUSES:
+        recovered = store.reclaim_stale_status(
+            proposal_id,
+            expected_status=status,
+            new_status=VALIDATION_FAILED,
+            stale_before=cutoff,
+            extra_updates={
+                "recovered_at": now.isoformat(),
+                "error": (
+                    f"Recovered from a stale {status!r} status (no update for at least "
+                    f"{stale_after_seconds}s, most likely a process crash before submission). "
+                    "No broker order exists for this proposal -- that status is written before "
+                    "any broker call. Marked 'validation_failed' so it stops holding this "
+                    "ticker/side against new proposals; generate a fresh one."
+                ),
+            },
+        )
+        if recovered is not None:
+            return recovered
+
+    current = store.get_proposal(proposal_id)
+    if current is None:
+        raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
+
+    # An unparseable updated_at reaches the generic message below as "claimed
+    # less than Ns ago", which is simply the wrong reason: the staleness guard
+    # is a lexical `updated_at < cutoff` comparison in SQL, and a non-timestamp
+    # string loses it regardless of age. Recovery genuinely CANNOT proceed --
+    # staleness is unprovable, and assuming stale would revoke a live worker's
+    # claim, which is exactly the P1 this fencing round closed. But readiness
+    # now blocks on such a row, so the operator must at least be told the real
+    # reason rather than sent to wait out a window that will never expire.
+    if (
+        current["status"] in PRE_BROKER_STRANDED_STATUSES
+        and _parse_recovery_timestamp(store, proposal_id) is None
+    ):
+        raise ProposalExecutionError(
+            f"Proposal {proposal_id} is in {current['status']!r} but its updated_at is not a "
+            "readable timestamp, so its age cannot be proved and recovery cannot safely run "
+            "(assuming it is stale would revoke a possibly-live worker's claim). This is a "
+            "data-integrity problem, not a timing one: repair the row's updated_at directly, "
+            "then re-run this command."
+        )
+    raise ProposalExecutionError(
+        f"Proposal {proposal_id} is not a stale pre-broker claim (status={current['status']!r}) -- "
+        f"either it is not in {' / '.join(PRE_BROKER_STRANDED_STATUSES)}, or it was claimed less "
+        f"than {stale_after_seconds}s ago and is presumed genuinely in flight. Post-submission "
+        "statuses are NOT recoverable this way: use reconcile_submission() or "
+        "recover_stale_reconciliation(), which never assume a broker order is absent."
+    )
+
+
+def _parse_recovery_timestamp(store: AssistantStore, proposal_id: str) -> datetime | None:
+    """The row's `updated_at` as a datetime, or None if it cannot be read."""
+    rows = store.list_proposals_by_statuses(PRE_BROKER_STRANDED_STATUSES)
+    raw = next(
+        (row.get("updated_at") for row in rows if row.get("proposal_id") == proposal_id),
+        None,
+    )
+    if not raw:
+        return None
+    try:
+        return datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError:
+        return None

@@ -1052,14 +1052,14 @@ def test_free_text_surfaces_reject_trade_action_language():
         "It would be prudent to increase your NVDA position.",
         "Take profits on NVDA.",
     ):
-        assert _reject_unsafe_prose(advice, allowed) is not None, advice
+        assert _reject_unsafe_prose(advice, allowed, source_text="") is not None, advice
 
 
 def test_free_text_surfaces_reject_tickers_outside_the_verified_set():
     from assistant.ai_advisor import _reject_unsafe_prose
 
     rejection = _reject_unsafe_prose(
-        "NVDA and TSLA both design their own silicon.", {"NVDA", "AMD"}
+        "NVDA and TSLA both design their own silicon.", {"NVDA", "AMD"}, source_text="",
     )
     assert rejection is not None
     assert "outside the verified" in rejection
@@ -1071,5 +1071,69 @@ def test_free_text_surfaces_allow_grounded_descriptive_prose():
     from assistant.ai_advisor import _reject_unsafe_prose
 
     assert _reject_unsafe_prose(
-        "NVDA and AMD both operate in the semiconductor category.", {"NVDA", "AMD"}
+        "NVDA and AMD both operate in the semiconductor category.", {"NVDA", "AMD"},
+        source_text="",
     ) is None
+
+
+# --- numeric grounding at the CALL SITES (independent review, 2026-07-30) ---
+#
+# suggest_similar_tickers() and curate_recommended_tickers() both called
+# _reject_unsafe_prose() WITHOUT source_text, so its number check never ran on
+# either surface -- while the system prompt told the model every number it
+# wrote would be checked. These are integration tests against the public
+# functions, not the helper, because the defect was a missing ARGUMENT at a
+# call site: a helper-only test passes either way.
+
+def test_similar_ticker_reasons_with_invented_numbers_are_dropped(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = json.dumps({"suggestions": [
+        {"ticker": "AMD", "reason": "Also a semiconductor company"},
+        # Deliberately free of action words: an earlier version of this test
+        # used "Grew revenue 45% last quarter", which the ACTION-LANGUAGE
+        # denylist rejected, so the test passed without ever exercising the
+        # number check it was written for (caught by mutation testing).
+        {"ticker": "INTC", "reason": "Also a semiconductor company with 45 fabrication sites"},
+    ]})
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.suggest_similar_tickers(["NVDA"])
+    assert result == [{"ticker": "AMD", "reason": "Also a semiconductor company"}]
+
+
+def test_curated_recommendation_prose_with_an_invented_number_is_suppressed(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+
+    class _Candidate:
+        ticker = "AMD"
+        reason_category = "momentum"
+        detail = "appeared in a screen"
+
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(
+            "AMD looks worth a closer look after rising 32% this month."
+        )
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.curate_recommended_tickers([_Candidate()])
+    assert result is None
+
+
+def test_curated_recommendation_prose_grounded_in_the_candidate_list_passes(monkeypatch):
+    """The guard must reject invented figures without rejecting everything."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+
+    class _Candidate:
+        ticker = "AMD"
+        reason_category = "momentum"
+        detail = "appeared in a screen"
+
+    grounded = "AMD appeared in a screen and looks worth a closer look."
+    with patch("anthropic.Anthropic") as mock_anthropic_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(grounded)
+        mock_anthropic_cls.return_value = mock_client
+        result = ai_advisor.curate_recommended_tickers([_Candidate()])
+    assert result == grounded

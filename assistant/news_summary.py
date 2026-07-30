@@ -52,6 +52,21 @@ def is_ai_summary_configured() -> bool:
     return bool(os.environ.get("ANTHROPIC_API_KEY"))
 
 
+def _known_tickers() -> set[str]:
+    """Every ticker this project recognizes, for validating headline tokens.
+
+    Imported lazily for the same reason the guard is: this module's headline
+    fetching must stay free of heavy imports.
+    """
+    from config import BASKETS, LEVERAGED_ETF_TICKERS, UNIVERSE
+
+    known = {str(t).upper() for t in UNIVERSE}
+    known |= {str(t).upper() for t in LEVERAGED_ETF_TICKERS}
+    for members in BASKETS.values():
+        known |= {str(t).upper() for t in members}
+    return known
+
+
 def summarize_news_for_ticker(ticker: str, headlines: list[dict]) -> str | None:
     """AI-generated 2-3 sentence summary of what the headlines say might
     affect the ticker's price. Returns None (never raises) if
@@ -65,13 +80,28 @@ def summarize_news_for_ticker(ticker: str, headlines: list[dict]) -> str | None:
     been displayed verbatim despite the prompt forbidding exactly that -- a
     prompt is not an enforcement mechanism (GPT review, 2026-07-29).
 
-    Grounding is checked against the SUPPLIED headlines, which are trusted
-    deterministic source data: allowed tickers are this ticker plus any
-    ticker-shaped token appearing in the headlines, and every number in the
-    summary must appear in the headlines too. Non-numeric fabricated claims
-    remain undetectable -- see _reject_unsafe_prose's own limitations note --
-    which is why the raw headlines stay the primary UI surface and this
-    summary is only ever an addition to them."""
+    Grounding is checked against the SUPPLIED headlines. Those headlines are
+    NOT trusted input -- an earlier version of this docstring called them
+    "trusted deterministic source data", which was wrong: they come from
+    yfinance, i.e. a third party, and are therefore attacker-influenceable.
+    This is a genuine indirect-prompt-injection surface (independent review,
+    2026-07-30). What the guard can promise given untrusted source text:
+
+    * Allowed tickers are this ticker plus headline tokens that are ALSO in
+      this project's known ticker set -- not any ticker-shaped token, which
+      would have let an injected headline authorize its own invented symbol.
+    * Every number in the summary must appear in the headlines. Note the
+      limit of this under injection: a number injected INTO a headline is
+      grounded by definition. The mitigation is not the guard, it is that the
+      raw headline is displayed alongside, so the user sees the same claim in
+      its original form rather than only as AI prose.
+    * Explicit buy/sell/trim language is rejected regardless of source, so an
+      injected headline cannot turn the summary into advice.
+
+    Non-numeric fabricated claims remain undetectable -- see
+    _reject_unsafe_prose's own limitations note -- which is why the raw
+    headlines stay the primary UI surface and this summary is only ever an
+    addition to them."""
     if not headlines or not is_ai_summary_configured():
         return None
 
@@ -107,7 +137,17 @@ def summarize_news_for_ticker(ticker: str, headlines: list[dict]) -> str | None:
 
     from assistant.ai_advisor import _reject_unsafe_prose
 
-    allowed_tickers = {ticker.upper()} | set(re.findall(r"\b[A-Z]{1,5}\b", headline_block))
+    # Headline-derived tokens are intersected with the tickers this project
+    # actually knows, rather than accepted wholesale. Promoting every all-caps
+    # token to "allowed ticker" made the unknown-ticker check depend on
+    # attacker-influenceable text: news arrives from a third party, so a
+    # headline containing a ticker-shaped token was enough to let the model
+    # name it as though it had been verified (independent review, 2026-07-30).
+    # The requested ticker is always allowed -- it is the subject of the query
+    # and is verified upstream.
+    known = _known_tickers()
+    headline_tokens = set(re.findall(r"\b[A-Z]{1,5}\b", headline_block))
+    allowed_tickers = {ticker.upper()} | (headline_tokens & known)
     if _reject_unsafe_prose(text, allowed_tickers, source_text=headline_block) is not None:
         return None
     return text

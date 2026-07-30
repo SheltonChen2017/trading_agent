@@ -567,6 +567,115 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
         restore()
 
 
+def test_recovered_pre_broker_claim_fences_a_worker_that_resumes():
+    """An old worker must not resurrect its proposal after recovery.
+
+    Exercise both recoverable states. Recovery releases proposal A's
+    ticker/side slot, proposal B immediately claims it, and then A's original
+    execution resumes at its next transition. A must lose the conditional
+    transition before reserving budget or contacting the broker.
+    """
+    from assistant.execution_service import recover_stale_claim
+    from assistant.proposal_status import (
+        APPROVED,
+        IN_FLIGHT_INTENT_STATUSES,
+        SUBMITTING,
+        VALIDATING,
+        VALIDATION_FAILED,
+    )
+
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal.reference_price
+    )
+    try:
+        for recovered_status, next_status in (
+            (VALIDATING, APPROVED),
+            (APPROVED, SUBMITTING),
+        ):
+            with tempfile.TemporaryDirectory() as temp:
+                store = AssistantStore(Path(temp) / "assistant.db")
+                original = proposal.to_dict()
+                replacement = proposal.to_dict()
+                replacement["proposal_id"] = (
+                    f"{proposal.proposal_id}-after-{recovered_status}"
+                )
+                replacement["idempotency_key"] = (
+                    f"{proposal.idempotency_key}-after-{recovered_status}"
+                )
+                store.save_proposal(original)
+                store.save_proposal(replacement)
+
+                real_transition = store.update_proposal_status_if_current
+                interleaved = {"done": False}
+
+                def transition_with_recovery(proposal_id, **kwargs):
+                    if (
+                        not interleaved["done"]
+                        and proposal_id == proposal.proposal_id
+                        and kwargs["expected_statuses"] == (recovered_status,)
+                        and kwargs["new_status"] == next_status
+                    ):
+                        interleaved["done"] = True
+                        old_timestamp = (
+                            datetime.now(timezone.utc) - timedelta(hours=2)
+                        ).isoformat()
+                        connection = sqlite3.connect(store.path)
+                        try:
+                            connection.execute(
+                                "UPDATE trade_proposals SET updated_at = ? "
+                                "WHERE proposal_id = ?",
+                                (old_timestamp, proposal.proposal_id),
+                            )
+                            connection.commit()
+                        finally:
+                            connection.close()
+                        recovered = recover_stale_claim(
+                            proposal.proposal_id, store
+                        )
+                        assert recovered["status"] == VALIDATION_FAILED
+                        competing_claim = store.claim_proposal(
+                            replacement["proposal_id"],
+                            expected_status="proposed",
+                            new_status=VALIDATING,
+                            conflicting_intent_statuses=IN_FLIGHT_INTENT_STATUSES,
+                        )
+                        assert competing_claim is not None
+                    return real_transition(proposal_id, **kwargs)
+
+                store.update_proposal_status_if_current = transition_with_recovery
+
+                try:
+                    execute_approved_paper_proposal(
+                        proposal.proposal_id,
+                        "approve",
+                        packet.portfolio,
+                        policy,
+                        store,
+                        now_et=datetime(
+                            2026, 7, 27, 10, 0, tzinfo=timezone.utc
+                        ),
+                    )
+                    assert False, "expected the recovered worker to lose its claim"
+                except ProposalExecutionError as exc:
+                    assert "lost its execution claim" in str(exc)
+
+                assert interleaved["done"] is True
+                assert captured == []
+                assert (
+                    store.get_proposal(proposal.proposal_id)["status"]
+                    == VALIDATION_FAILED
+                )
+                assert (
+                    store.get_proposal(replacement["proposal_id"])["status"]
+                    == VALIDATING
+                )
+    finally:
+        restore()
+
+
 def test_unsupported_order_type_is_refused_not_downgraded_to_a_market_order():
     # Independent review, 2026-07-29: the submit dispatch used to read
     # "limit, else market", so ANY other order type would have been
@@ -1786,11 +1895,10 @@ def test_ambiguous_submission_failure_marks_submission_unknown_when_unconfirmabl
         restore()
 
 
-def test_ambiguous_submission_failure_marks_submission_failed_when_broker_confirms_absent():
-    """A confirmed-absent lookup (broker's own 404) after a submission
-    error means the order genuinely never went through -- this should
-    resolve straight to 'submission_failed', not sit in the more
-    conservative 'submission_unknown'."""
+def test_immediate_404_after_submission_error_remains_unknown_during_indexing_grace():
+    """A timeout can lose an accepted response before the broker's client-id
+    lookup is indexed. An immediate 404 therefore keeps both the unresolved
+    state and its execution-budget reservation."""
     packet = _packet()
     policy = _policy()
     proposal = generate_risk_reduction_proposals(packet, policy)[0]
@@ -1800,7 +1908,7 @@ def test_ambiguous_submission_failure_marks_submission_failed_when_broker_confir
         raise TimeoutError("simulated network timeout")
 
     broker.submit_market_order = failing_submit
-    broker.find_order_by_client_id = lambda client_order_id: None  # confirmed absent (broker's own 404)
+    broker.find_order_by_client_id = lambda client_order_id: None  # immediate 404; indexing may lag
     try:
         with tempfile.TemporaryDirectory() as temp:
             store = AssistantStore(Path(temp) / "assistant.db")
@@ -1814,10 +1922,12 @@ def test_ambiguous_submission_failure_marks_submission_failed_when_broker_confir
                     store,
                     now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
                 )
-                assert False, "expected a confirmed-absent lookup to raise"
+                assert False, "expected an unresolved submission to raise"
             except ProposalExecutionError as exc:
-                assert "confirms no such order exists" in str(exc)
-            assert store.get_proposal(proposal.proposal_id)["status"] == "submission_failed"
+                assert "submission_unknown" in str(exc)
+            assert store.get_proposal(proposal.proposal_id)["status"] == "submission_unknown"
+            usage = store.get_execution_budget_usage("2026-07-27")
+            assert usage["submitted_order_count"] == 1
     finally:
         restore()
 
@@ -2060,6 +2170,7 @@ def test_reconcile_submission_marks_submission_failed_when_broker_confirms_absen
             store = AssistantStore(Path(temp) / "assistant.db")
             store.save_proposal(proposal.to_dict())
             store.update_proposal_status(proposal.proposal_id, "submitting")
+            _backdate_updated_at(store, proposal.proposal_id, seconds_ago=120)
 
             try:
                 reconcile_submission(proposal.proposal_id, store)
@@ -2067,6 +2178,40 @@ def test_reconcile_submission_marks_submission_failed_when_broker_confirms_absen
             except ProposalExecutionError as exc:
                 assert "never accepted" in str(exc)
             assert store.get_proposal(proposal.proposal_id)["status"] == "submission_failed"
+    finally:
+        restore()
+
+
+def test_reconcile_submission_keeps_a_recent_404_unresolved_and_reserved():
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    _, restore = _mock_execution_dependencies(quote_price=proposal.reference_price)
+    from assistant.execution_service import reconcile_submission
+
+    broker.find_order_by_client_id = lambda client_order_id: None
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            store.update_proposal_status(proposal.proposal_id, "submitting")
+            store.reserve_execution_budget(
+                proposal.proposal_id,
+                trading_day="2026-07-30",
+                notional=100.0,
+                max_daily_notional=10_000.0,
+                max_daily_orders=10,
+            )
+
+            try:
+                reconcile_submission(proposal.proposal_id, store)
+                assert False, "expected a too-recent absence to remain unresolved"
+            except ProposalExecutionError as exc:
+                assert "grace period has not elapsed" in str(exc)
+
+            assert store.get_proposal(proposal.proposal_id)["status"] == "submission_unknown"
+            usage = store.get_execution_budget_usage("2026-07-30")
+            assert usage["submitted_order_count"] == 1
     finally:
         restore()
 

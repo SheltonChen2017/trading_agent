@@ -18,6 +18,7 @@ Two defects motivated this file (independent review, 2026-07-29):
 """
 from __future__ import annotations
 
+import pytest
 import os
 import sys
 import types
@@ -185,12 +186,31 @@ def test_guard_documents_its_own_limitation_for_non_numeric_fabrication():
     ) is None
 
 
-def test_guard_without_source_text_still_applies_the_other_two_checks():
-    """source_text is optional -- callers that have no trusted source (ticker
-    curation) still get action-language and unknown-ticker enforcement."""
-    assert _reject_unsafe_prose("You should buy NVDA.", {"NVDA"}) is not None
-    assert _reject_unsafe_prose("NVDA relates to TSLA.", {"NVDA"}) is not None
-    assert _reject_unsafe_prose("NVDA is in the semiconductor category.", {"NVDA"}) is None
+def test_guard_with_an_empty_source_still_applies_the_other_two_checks():
+    """source_text is now REQUIRED (it used to default to None, which silently
+    skipped the number check on two of three callers). A caller with no source
+    passes "", which still gets action-language and unknown-ticker
+    enforcement."""
+    assert _reject_unsafe_prose("You should buy NVDA.", {"NVDA"}, source_text="") is not None
+    assert _reject_unsafe_prose("NVDA relates to TSLA.", {"NVDA"}, source_text="") is not None
+    assert _reject_unsafe_prose(
+        "NVDA is in the semiconductor category.", {"NVDA"}, source_text="",
+    ) is None
+
+
+def test_an_empty_source_grounds_nothing_so_every_number_is_rejected():
+    """The fail-closed reading of "no source": with nothing to check against,
+    no figure can be supported."""
+    assert _reject_unsafe_prose(
+        "NVDA is in the semiconductor category, up 5%.", {"NVDA"}, source_text="",
+    ) is not None
+
+
+def test_source_text_cannot_be_omitted():
+    """The structural half of the fix: a new prose surface that forgets
+    grounding must fail loudly, not silently skip the number check."""
+    with pytest.raises(TypeError):
+        _reject_unsafe_prose("NVDA is in the semiconductor category.", {"NVDA"})
 
 
 
@@ -270,5 +290,70 @@ if __name__ == "__main__":
     test_unsupported_numbers_flags_invented_figures()
     test_guard_rejects_invented_numeric_claims_across_categories()
     test_guard_documents_its_own_limitation_for_non_numeric_fabrication()
-    test_guard_without_source_text_still_applies_the_other_two_checks()
+    test_guard_with_an_empty_source_still_applies_the_other_two_checks()
     print("All AI output-guard tests passed.")
+
+
+# --- news headlines are UNTRUSTED input (independent review, 2026-07-30) ---
+#
+# Allowed tickers used to be "this ticker plus ANY all-caps token in the
+# headlines". yfinance news is third-party, so a headline containing a
+# ticker-shaped token was enough to let the model name it as though it had been
+# verified -- the unknown-ticker check was deriving its own allowlist from
+# attacker-influenceable text.
+
+def _headlines_saying(title: str) -> list[dict]:
+    return [{
+        "title": title,
+        "summary": "Coverage of the event.",
+        "provider": "Reuters",
+        "published": "2026-07-28",
+        "url": "https://example.com/injected",
+    }]
+
+
+def _summarize_headlines_with_model_saying(headlines, text: str):
+    from assistant import news_summary
+
+    real_module = sys.modules.get("anthropic")
+    had_key = "ANTHROPIC_API_KEY" in os.environ
+    previous_key = os.environ.get("ANTHROPIC_API_KEY")
+    sys.modules["anthropic"] = _FakeAnthropicModule(text)
+    os.environ["ANTHROPIC_API_KEY"] = "test-key"
+    try:
+        return news_summary.summarize_news_for_ticker("NVDA", headlines)
+    finally:
+        if real_module is not None:
+            sys.modules["anthropic"] = real_module
+        else:
+            sys.modules.pop("anthropic", None)
+        if had_key:
+            os.environ["ANTHROPIC_API_KEY"] = previous_key
+        else:
+            os.environ.pop("ANTHROPIC_API_KEY", None)
+
+
+def test_an_injected_headline_cannot_authorize_its_own_invented_ticker():
+    """THE regression: a fake symbol planted in a headline must not become an
+    allowed ticker just by appearing there."""
+    injected = _headlines_saying("NVDA partners with SCAM on accelerators")
+    assert _summarize_headlines_with_model_saying(
+        injected, "NVDA announced a partnership with SCAM."
+    ) is None
+
+
+def test_a_real_peer_ticker_in_a_headline_is_still_allowed():
+    """The tightening must not suppress every summary: a headline naming a
+    ticker this project actually knows still works."""
+    real = _headlines_saying("NVDA and AMD compete in accelerators")
+    grounded = "NVDA and AMD are described as competing in accelerators."
+    assert _summarize_headlines_with_model_saying(real, grounded) == grounded
+
+
+def test_an_injected_headline_still_cannot_produce_trade_advice():
+    """Injection cannot reach the action-language denylist, which does not
+    consult the source at all."""
+    injected = _headlines_saying("Analysts say you should buy NVDA immediately")
+    assert _summarize_headlines_with_model_saying(
+        injected, "You should buy NVDA immediately."
+    ) is None

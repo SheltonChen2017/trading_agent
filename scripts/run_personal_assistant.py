@@ -18,6 +18,7 @@ from assistant.execution_service import (
     PolicyOverridableBlockError,
     execute_approved_paper_proposal,
     reconcile_submission,
+    recover_stale_claim,
     recover_stale_reconciliation,
 )
 import config
@@ -389,6 +390,17 @@ def command_recover_stale(args, store: AssistantStore) -> None:
     print(
         f"Recovered {args.proposal_id} from a stale 'reconciling' status -> "
         f"{recovered['status']}. Run `reconcile {args.proposal_id}` to resolve it."
+    )
+
+
+def command_recover_stale_claim(args, store: AssistantStore) -> None:
+    recovered = recover_stale_claim(
+        args.proposal_id, store, stale_after_seconds=args.stale_after_seconds
+    )
+    print(
+        f"Recovered {args.proposal_id} from a stale pre-broker claim -> {recovered['status']}. "
+        "No broker order existed for it, and it no longer holds that ticker/side against "
+        "new proposals. Run `propose` to generate a fresh one."
     )
 
 
@@ -913,6 +925,21 @@ def build_parser() -> argparse.ArgumentParser:
     recover_stale.add_argument("proposal_id")
     recover_stale.add_argument("--stale-after-seconds", type=_positive_int, default=300)
     recover_stale.set_defaults(handler=command_recover_stale)
+
+    recover_claim = commands.add_parser(
+        "recover-stale-claim",
+        help=(
+            "Release a proposal stranded in 'validating'/'approved' after a process was killed "
+            "before submission. Those statuses are written BEFORE any broker call, so no order can "
+            "exist -- but they hold the ticker/side against new proposals (duplicate-order "
+            "protection), and nothing else can clear them. Only affects a proposal untouched for "
+            "--stale-after-seconds (default 900). Post-submission statuses are NOT recoverable "
+            "this way -- use 'reconcile' or 'recover-stale'."
+        ),
+    )
+    recover_claim.add_argument("proposal_id")
+    recover_claim.add_argument("--stale-after-seconds", type=_positive_int, default=900)
+    recover_claim.set_defaults(handler=command_recover_stale_claim)
 
     prune_packets = commands.add_parser(
         "prune-packets",

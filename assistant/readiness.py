@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 
 from assistant.policy import TradingPolicy
 from assistant.proposal_status import (
+    APPROVED,
     BROKER_ACCEPTED,
     CANCEL_PENDING,
     EXECUTED,
@@ -16,6 +17,7 @@ from assistant.proposal_status import (
     RECONCILING,
     SUBMISSION_UNKNOWN,
     SUBMITTING,
+    VALIDATING,
 )
 from assistant.storage import AssistantStore
 
@@ -26,6 +28,15 @@ CRITICAL_UNRESOLVED_STATUSES = (
     EXECUTED,
 )
 ACTIVE_ORDER_STATUSES = (BROKER_ACCEPTED, PARTIALLY_FILLED, CANCEL_PENDING)
+
+# Pre-broker statuses that hold a ticker/side slot against new proposals (see
+# proposal_status.IN_FLIGHT_INTENT_STATUSES). Readiness must surface a STALE one
+# because it silently blocks that ticker while looking like nothing is wrong:
+# neither CRITICAL_UNRESOLVED_STATUSES nor ACTIVE_ORDER_STATUSES covers them, so
+# readiness used to report ready=True while proposals for that ticker could not
+# be claimed at all (found 2026-07-30 reviewing the duplicate-guard change that
+# introduced the blocking).
+STRANDED_CLAIM_STATUSES = (VALIDATING, APPROVED)
 
 
 def _check(name: str, ok: bool, detail: str) -> dict[str, Any]:
@@ -49,6 +60,7 @@ def transaction_readiness(
     broker_module=None,
     now: datetime | None = None,
     max_reconciliation_age_minutes: float = 5.0,
+    stale_claim_seconds: float = 900.0,
     check_broker: bool = True,
 ) -> dict[str, Any]:
     """Return a machine-readable, fail-closed readiness report."""
@@ -120,6 +132,51 @@ def transaction_readiness(
             len(active) < policy.max_open_orders,
             f"{len(active)} active assistant order(s); cap={policy.max_open_orders} "
             f"(room for {max(0, policy.max_open_orders - len(active))} more).",
+        )
+    )
+
+    # A claim only counts as stranded once it is older than the recovery
+    # threshold -- a proposal being validated RIGHT NOW is in flight, not stuck,
+    # and must not fail readiness for everyone else. An unreadable timestamp is
+    # different: its age cannot be proved, so fail closed and surface the row
+    # instead of silently omitting a ticker/side block from the report.
+    stranded: list[dict[str, Any]] = []
+    unreadable_claim_ages: list[dict[str, Any]] = []
+    for proposal in store.list_proposals_by_statuses(STRANDED_CLAIM_STATUSES):
+        parsed = _parse_timestamp(proposal.get("updated_at"))
+        if parsed is None:
+            unreadable_claim_ages.append(proposal)
+        elif now - parsed > timedelta(seconds=stale_claim_seconds):
+            stranded.append(proposal)
+    claim_age_issues = bool(stranded or unreadable_claim_ages)
+    detail_parts: list[str] = []
+    if stranded:
+        detail_parts.append(
+            "stale: " + ", ".join(
+                f"{p['proposal_id']}:{p['status']}" for p in stranded
+            )
+        )
+    if unreadable_claim_ages:
+        detail_parts.append(
+            "unreadable updated_at: " + ", ".join(
+                f"{p['proposal_id']}:{p['status']}={p.get('updated_at')!r}"
+                for p in unreadable_claim_ages
+            )
+        )
+    if stranded:
+        detail_parts.append(
+            "stale entries hold their ticker/side against new proposals; "
+            "clear with `recover-stale-claim <proposal_id>`"
+        )
+    if unreadable_claim_ages:
+        detail_parts.append(
+            "repair unreadable timestamp metadata before trading"
+        )
+    checks.append(
+        _check(
+            "stranded_pre_broker_claims",
+            not claim_age_issues,
+            "none" if not claim_age_issues else "; ".join(detail_parts) + ".",
         )
     )
 

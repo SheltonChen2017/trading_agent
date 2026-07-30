@@ -38,6 +38,17 @@ def configured_db_path() -> Path:
     return Path(os.environ.get("TRADING_ASSISTANT_DB", DEFAULT_DB_PATH))
 
 
+class DuplicateIntentConflict(Exception):
+    """Another proposal for the same ticker/side already has (or may have) a
+    live order at the broker.
+
+    Raised by claim_proposal() rather than returned as None so the caller can
+    tell "someone else is already trading this ticker/side" apart from the
+    ordinary "this proposal was already claimed" outcome, which needs a very
+    different message.
+    """
+
+
 class AssistantStore:
     def __init__(self, path: str | Path | None = None):
         self.path = Path(path) if path is not None else configured_db_path()
@@ -411,9 +422,21 @@ class AssistantStore:
         *,
         expected_statuses: tuple[str, ...],
         new_status: str,
+        preserve_updated_at: str | None = None,
         **updates: Any,
     ) -> dict[str, Any] | None:
-        """Atomically update only while the proposal is in an expected state."""
+        """Atomically update only while the proposal is in an expected state.
+
+        `preserve_updated_at` writes that timestamp instead of "now". Use it
+        ONLY when reverting a proposal to the state it was already in -- a
+        no-progress bounce, not a transition. `updated_at` means "when did
+        this enter its current status", and the broker-absence grace period
+        is measured from it, so refreshing it on a bounce restarts the very
+        clock the caller is waiting on: repeated reconcile attempts inside
+        the grace window would each push the deadline out and the proposal
+        could never age enough to resolve (found 2026-07-30 while reviewing
+        the reconciliation-hardening round).
+        """
         connection = sqlite3.connect(self.path)
         connection.row_factory = sqlite3.Row
         try:
@@ -430,7 +453,7 @@ class AssistantStore:
             proposal = json.loads(row["payload_json"])
             proposal.update(updates)
             proposal["status"] = new_status
-            now = datetime.now(timezone.utc).isoformat()
+            now = preserve_updated_at or datetime.now(timezone.utc).isoformat()
             connection.execute(
                 "UPDATE trade_proposals SET status = ?, payload_json = ?, updated_at = ? "
                 "WHERE proposal_id = ? AND status = ?",
@@ -457,6 +480,7 @@ class AssistantStore:
         expected_status: str | tuple[str, ...] = "proposed",
         new_status: str = "validating",
         not_expired_after: str | None = None,
+        conflicting_intent_statuses: tuple[str, ...] | None = None,
     ) -> dict[str, Any] | None:
         """
         Atomically flips status from `expected_status` (a single status,
@@ -467,7 +491,9 @@ class AssistantStore:
         callers can never both believe they claimed the same proposal --
         SQLite serializes writers against the same database file, and
         exactly one UPDATE affects a row. Returns the claimed proposal
-        (with its embedded "status" updated to `new_status`) on success,
+        (with its embedded "status" updated to `new_status` and transient
+        `_claimed_from_updated_at` metadata containing the prior row
+        timestamp) on success,
         or None if the row didn't exist, wasn't in one of the
         `expected_status` values (already claimed by someone else,
         already terminal, etc.), or (when `not_expired_after` is given)
@@ -490,6 +516,22 @@ class AssistantStore:
         separately, an unconditional expiry write that could stomp an
         already-executed proposal's status if approval was invoked again
         past its expiry.
+
+        `conflicting_intent_statuses` closes the remaining, CROSS-proposal
+        race (independent review, 2026-07-30). The guard above serializes
+        one proposal_id, but the duplicate-order rule is about ticker+side,
+        and that was evaluated from a plain snapshot read
+        (recent_executed_intents() plus the broker's open orders) far away
+        from any lock. Two DIFFERENT proposals to buy the same ticker,
+        approved concurrently before either order became visible at the
+        broker, could therefore both observe "no duplicate" and both
+        submit -- distinct idempotency keys make them two genuinely
+        separate real orders, so idempotency does not help. When this is
+        passed, the claim additionally requires that no OTHER proposal
+        with the same ticker/side sits in any of those statuses, checked
+        inside the claim's own BEGIN IMMEDIATE transaction. Raises
+        DuplicateIntentConflict (not None) when one does, so the caller can
+        distinguish it from an ordinary failed claim.
         """
         expected_statuses = (expected_status,) if isinstance(expected_status, str) else tuple(expected_status)
         now = datetime.now(timezone.utc).isoformat()
@@ -499,19 +541,119 @@ class AssistantStore:
         if not_expired_after is not None:
             query += " AND expires_at >= ?"
             params.append(not_expired_after)
-        with self._connect() as connection:
+
+        # BEGIN IMMEDIATE takes the write lock before the conflict SELECT, so
+        # the read and the UPDATE are one serialized unit. Without that the
+        # duplicate check would be a plain snapshot read and two DIFFERENT
+        # proposals for the same ticker/side could both observe "no duplicate"
+        # before either became visible at the broker.
+        connection = sqlite3.connect(self.path)
+        connection.row_factory = sqlite3.Row
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            target_before = connection.execute(
+                "SELECT payload_json, status, expires_at, updated_at "
+                "FROM trade_proposals WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchone()
+            if target_before is None or target_before["status"] not in expected_statuses:
+                connection.rollback()
+                return None
+            if (
+                not_expired_after is not None
+                and target_before["expires_at"] < not_expired_after
+            ):
+                connection.rollback()
+                return None
+            if conflicting_intent_statuses:
+                conflict = self._find_conflicting_intent(
+                    connection, proposal_id, tuple(conflicting_intent_statuses)
+                )
+                if conflict is not None:
+                    connection.rollback()
+                    raise DuplicateIntentConflict(conflict)
             cursor = connection.execute(query, params)
             if cursor.rowcount != 1:
+                connection.rollback()
                 return None
             row = connection.execute(
                 "SELECT payload_json FROM trade_proposals WHERE proposal_id = ?",
                 (proposal_id,),
             ).fetchone()
+            connection.commit()
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
         if row is None:
             return None
         proposal = json.loads(row["payload_json"])
         proposal["status"] = new_status
+        # Transaction-local metadata used by reconciliation to judge whether
+        # the state it just claimed was old enough for a broker 404 to be
+        # believable. This is not part of the persisted proposal schema:
+        # claim_proposal() never writes payload_json.
+        proposal["_claimed_from_updated_at"] = target_before["updated_at"]
         return proposal
+
+    @staticmethod
+    def _intent_identity(payload: str) -> tuple[str, str] | None:
+        """(TICKER, side) of a stored proposal, or None if unreadable."""
+        try:
+            intent = json.loads(payload).get("intent") or {}
+            ticker = str(intent["ticker"]).upper()
+            side = str(intent["side"]).lower()
+        except Exception:
+            return None
+        return (ticker, side) if ticker and side else None
+
+    def _find_conflicting_intent(
+        self, connection: sqlite3.Connection, proposal_id: str, statuses: tuple[str, ...],
+    ) -> str | None:
+        """Describe another proposal that already holds this ticker/side, if any.
+
+        Duplicate identity is ticker+side only, never shares -- the same rule
+        the snapshot-based duplicate check in validate_proposal_for_execution()
+        uses, so the two cannot disagree about what counts as a duplicate.
+
+        Fails CLOSED on unreadable rows: a proposal whose own intent cannot be
+        parsed is not claimable at all, and an OTHER row that cannot be parsed
+        is treated as a conflict rather than assumed harmless. Being unable to
+        rule out a live order is not evidence that there isn't one.
+        """
+        target = connection.execute(
+            "SELECT payload_json FROM trade_proposals WHERE proposal_id = ?", (proposal_id,),
+        ).fetchone()
+        if target is None:
+            return None  # the UPDATE below will fail on its own terms
+        identity = self._intent_identity(target["payload_json"])
+        if identity is None:
+            return (
+                f"Proposal {proposal_id} has no readable ticker/side, so it cannot be "
+                "checked for a duplicate live order."
+            )
+        placeholders = ",".join("?" for _ in statuses)
+        rows = connection.execute(
+            f"SELECT proposal_id, payload_json, status FROM trade_proposals "
+            f"WHERE status IN ({placeholders}) AND proposal_id != ?",
+            (*statuses, proposal_id),
+        ).fetchall()
+        for row in rows:
+            other = self._intent_identity(row["payload_json"])
+            if other is None:
+                return (
+                    f"Proposal {row['proposal_id']} (status {row['status']}) has an unreadable "
+                    "intent, so a duplicate order for this ticker/side cannot be ruled out."
+                )
+            if other == identity:
+                ticker, side = identity
+                return (
+                    f"Proposal {row['proposal_id']} is already {side}ing {ticker} "
+                    f"(status {row['status']}); refusing to claim a second order for the same "
+                    "ticker and side until that one reaches a terminal state."
+                )
+        return None
 
     def reclaim_stale_status(
         self,
@@ -599,13 +741,23 @@ class AssistantStore:
     def list_proposals_by_statuses(
         self, statuses: tuple[str, ...] | list[str], limit: int = 500,
     ) -> list[dict[str, Any]]:
+        """Proposals in any of `statuses`, each carrying the authoritative
+        `status` and `updated_at` from the row rather than from the stored
+        payload.
+
+        `updated_at` is rewritten by every status transition, so on a
+        non-terminal proposal it is exactly "when did this enter its
+        current state" -- which reconciliation needs in order to tell a
+        submission that is still in flight from one that has genuinely
+        been stranded (see order_reconciler's absence age guard).
+        """
         normalized = tuple(dict.fromkeys(statuses))
         if not normalized:
             return []
         placeholders = ",".join("?" for _ in normalized)
         with self._connect() as connection:
             rows = connection.execute(
-                f"SELECT payload_json, status FROM trade_proposals "
+                f"SELECT payload_json, status, updated_at FROM trade_proposals "
                 f"WHERE status IN ({placeholders}) ORDER BY created_at ASC LIMIT ?",
                 (*normalized, limit),
             ).fetchall()
@@ -613,6 +765,7 @@ class AssistantStore:
         for row in rows:
             proposal = json.loads(row["payload_json"])
             proposal["status"] = row["status"]
+            proposal["updated_at"] = row["updated_at"]
             result.append(proposal)
         return result
 
@@ -957,19 +1110,33 @@ class AssistantStore:
         expected_statuses: tuple[str, ...],
         error: str,
         reconciled_at: str | None = None,
+        not_updated_after: str | None = None,
     ) -> dict[str, Any] | None:
-        """Atomically record confirmed broker absence and release its budget."""
+        """Atomically record confirmed broker absence and release its budget.
+
+        When ``not_updated_after`` is supplied, the transition also requires
+        the proposal's current status timestamp to be no newer than that UTC
+        cutoff. This makes the absence-age check and the destructive release
+        one transaction: a poller that read an old row cannot release the
+        reservation after another worker has just claimed/refreshed it.
+        """
         connection = sqlite3.connect(self.path)
         connection.row_factory = sqlite3.Row
         try:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
-                "SELECT payload_json, status FROM trade_proposals WHERE proposal_id = ?",
+                "SELECT payload_json, status, updated_at FROM trade_proposals WHERE proposal_id = ?",
                 (proposal_id,),
             ).fetchone()
             if row is None:
                 raise KeyError(f"Unknown proposal: {proposal_id}")
-            if row["status"] not in expected_statuses:
+            if (
+                row["status"] not in expected_statuses
+                or (
+                    not_updated_after is not None
+                    and row["updated_at"] > not_updated_after
+                )
+            ):
                 connection.rollback()
                 return None
             proposal = json.loads(row["payload_json"])

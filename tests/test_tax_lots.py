@@ -551,14 +551,51 @@ def test_a_covered_ticker_still_reports_real_figures():
     assert result["methods"]["fifo"]["realized_pnl"] == 1200.0
 
 
-def test_partial_coverage_is_flagged_on_the_average_cost_view():
-    """Holding fewer shares than the sale still yields per-method errors, but
-    the average-cost view must say it only covers part of the position."""
+def test_partial_coverage_does_not_extrapolate_basis_to_uncovered_shares():
+    """A partial average cannot be applied to the whole proposed sale."""
     ledger = build_ledger([
         Fill(ticker="NVDA", qty=5, price=40.0,
              at=datetime(2025, 1, 1, tzinfo=timezone.utc), fill_id="f3", side="buy"),
     ])
     result = compare_sale_bases(ledger, "NVDA", qty=20, price=100.0)
 
-    assert result["average_cost_view"]["covers_only_shares"] == 5
+    view = result["average_cost_view"]
+    assert view["available"] is False
+    assert view["covers_only_shares"] == 5
+    assert "partial average basis" in view["reason"]
+    assert "cost_per_share" not in view
+    assert "realized_pnl" not in view
     assert result["available"] is False
+
+
+@pytest.mark.parametrize(
+    ("field", "qty", "price"),
+    [
+        ("qty", float("nan"), 100.0),
+        ("qty", float("inf"), 100.0),
+        ("qty", 0.0, 100.0),
+        ("qty", True, 100.0),
+        ("price", 1.0, float("nan")),
+        ("price", 1.0, float("inf")),
+        ("price", 1.0, 0.0),
+        ("price", 1.0, True),
+    ],
+)
+def test_sale_basis_comparison_rejects_invalid_boundaries(
+    field, qty, price
+):
+    with pytest.raises(TaxLotError, match=field):
+        compare_sale_bases(
+            _uncovered_ledger(), "NVDA", qty=qty, price=price
+        )
+
+
+def test_sale_basis_comparison_requires_timezone_aware_sale_time():
+    with pytest.raises(TaxLotError, match="timezone-aware"):
+        compare_sale_bases(
+            _uncovered_ledger(),
+            "NVDA",
+            qty=1,
+            price=100,
+            when=datetime(2026, 7, 30),
+        )

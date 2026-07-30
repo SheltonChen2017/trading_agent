@@ -434,6 +434,18 @@ def compare_sale_bases(
     which lots you choose.
     """
     when = when or datetime.now(timezone.utc)
+    for field, value in (("qty", qty), ("price", price)):
+        if (
+            not isinstance(value, (int, float))
+            or isinstance(value, bool)
+            or not math.isfinite(value)
+            or value <= 0
+        ):
+            raise TaxLotError(
+                f"{field} must be positive and finite, got {value!r}"
+            )
+    if when.tzinfo is None:
+        raise TaxLotError("when must be timezone-aware")
     lots = list(ledger.open_for(ticker))
     average_cost = ledger.average_cost(ticker)
     shares_held = ledger.shares_held(ticker)
@@ -454,12 +466,25 @@ def compare_sale_bases(
     # 2026-07-30 reviewing this feature). For a TAX figure that is the worst
     # direction to be wrong in: it overstates the bill and can talk a user out
     # of a risk-reducing sell. Report the gap instead of a fabricated number.
-    if shares_held <= 0:
+    if shares_held < qty:
         result["average_cost_view"] = {
             "available": False,
             "reason": (
-                "no lots are recorded for this ticker, so its cost basis is "
-                "unknown -- not zero"
+                (
+                    "no lots are recorded for this ticker, so its cost basis "
+                    "is unknown -- not zero"
+                )
+                if shares_held <= 0
+                else (
+                    f"recorded lots cover only {shares_held} of the {qty} "
+                    "shares in this sale; applying that partial average basis "
+                    "to every share would fabricate the uncovered basis"
+                )
+            ),
+            **(
+                {"covers_only_shares": shares_held}
+                if shares_held > 0
+                else {}
             ),
         }
     else:
@@ -468,11 +493,6 @@ def compare_sale_bases(
             "cost_per_share": round(average_cost, 4),
             "realized_pnl": round((price - average_cost) * qty, 2),
             "note": "what the average-cost display implies; not a lot-level tax result",
-            **(
-                {"covers_only_shares": shares_held}
-                if shares_held < qty
-                else {}
-            ),
         }
     for method in (FIFO, LIFO, HIFO):
         try:

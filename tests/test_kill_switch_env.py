@@ -70,12 +70,16 @@ def test_no_module_reimplements_the_check_inline():
             continue
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
-            # os.environ.get(KILL_SWITCH...) compared against a literal
-            if not isinstance(node, ast.Compare):
-                continue
-            source = ast.unparse(node)
-            if KILL_SWITCH_ENV_VAR in source:
-                offenders.append(f"{path.relative_to(REPO)}: {source}")
+            # Any direct use of the literal outside the shared helper is a
+            # second policy implementation, whether it is written as a
+            # comparison, truthiness check, os.getenv(), or match statement.
+            if (
+                isinstance(node, ast.Constant)
+                and node.value == KILL_SWITCH_ENV_VAR
+            ):
+                offenders.append(
+                    f"{path.relative_to(REPO)}:{node.lineno}"
+                )
     assert not offenders, (
         "these sites compare the kill-switch variable directly instead of "
         "calling env_kill_switch_active(), and will drift from it:\n  "

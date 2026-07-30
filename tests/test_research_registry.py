@@ -404,8 +404,13 @@ def test_the_provenance_status_set_has_exactly_one_definition():
     for path in (repo / "assistant").rglob("*.py"):
         tree = ast.parse(path.read_text(encoding="utf-8"))
         for node in ast.walk(tree):
-            if isinstance(node, ast.Assign):
-                for target in node.targets:
+            if isinstance(node, (ast.Assign, ast.AnnAssign)):
+                targets = (
+                    node.targets
+                    if isinstance(node, ast.Assign)
+                    else [node.target]
+                )
+                for target in targets:
                     name = getattr(target, "id", "")
                     if name.lstrip("_") == "STATUSES_REQUIRING_PROVENANCE":
                         definitions.append(

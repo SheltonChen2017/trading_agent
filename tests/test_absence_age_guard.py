@@ -307,8 +307,8 @@ def test_an_absent_legacy_executed_order_is_left_alone():
         assert result["confirmed_absent"] == 0
 
 
-def test_an_absent_legacy_executed_order_does_not_block_new_proposals():
-    """The harm this prevents: a completed trade silently locking its ticker."""
+def test_an_absent_legacy_executed_order_remains_fail_closed_under_real_status():
+    """Absence preserves the legacy status but cannot prove it is terminal."""
     from assistant.proposal_status import EXECUTED, IN_FLIGHT_INTENT_STATUSES
     from assistant.storage import DuplicateIntentConflict
 
@@ -325,18 +325,16 @@ def test_an_absent_legacy_executed_order_does_not_block_new_proposals():
         )
 
         # EXECUTED is itself in IN_FLIGHT_INTENT_STATUSES (a legacy row may be
-        # an accepted-but-unfilled order), so this claim is still blocked --
-        # but by the ORIGINAL status, not by a submission_unknown invented from
-        # a lookup miss. The distinction matters: submission_unknown also fails
-        # readiness and demands manual reconciliation.
+        # an accepted-but-unfilled order), so this claim remains blocked under
+        # the truthful legacy status. The old test used try/except without an
+        # assertion when no exception was raised, so it passed in both the
+        # blocking and non-blocking cases.
         assert store.get_proposal("tp-legacy")["status"] == EXECUTED
-        try:
+        with pytest.raises(DuplicateIntentConflict, match="executed"):
             store.claim_proposal(
                 "tp-new", expected_status="proposed", new_status="validating",
                 conflicting_intent_statuses=IN_FLIGHT_INTENT_STATUSES,
             )
-        except DuplicateIntentConflict as exc:
-            assert "executed" in str(exc), "must cite the real status, not a fabricated one"
 
 
 def test_an_absent_active_order_is_still_treated_as_anomalous():

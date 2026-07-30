@@ -21,15 +21,14 @@ Two standard measures separate them:
   * Money-weighted return (MWR / IRR) is the rate that makes your actual cash
     flows net to zero. It measures YOUR OUTCOME, including timing.
 
-TWR - MWR is the timing contribution. Positive MWR-minus-TWR means your
-contribution timing helped; negative means it hurt. For the case above:
+MWR minus TWR is the timing contribution. Positive means your contribution
+timing helped; negative means it hurt. For the case above:
 TWR = -5.00%, MWR = 0.00%, timing = +5.00 points.
 
 NOT a performance guarantee or a skill measurement. A single favourable timing
-episode is one observation, and buying a dip that keeps falling produces the
-opposite number. This module reports the decomposition; it does not claim the
-timing was skill rather than luck. See the project's research discipline for
-why that distinction matters (memory: project_rigor_toolkit).
+episode is one observation. This module reports the decomposition; it does not
+claim the timing was skill rather than luck. See the project's research
+discipline for why that distinction matters (memory: project_rigor_toolkit).
 
 CONVENTIONS
 -----------
@@ -78,6 +77,8 @@ class Observation:
     flow: float = 0.0
 
     def __post_init__(self) -> None:
+        if not isinstance(self.at, datetime):
+            raise PerformanceError(f"Observation.at must be a datetime, got {self.at!r}")
         for field, value in (("value_before_flow", self.value_before_flow), ("flow", self.flow)):
             if not isinstance(value, (int, float)) or isinstance(value, bool):
                 raise PerformanceError(f"{field} must be a number, got {value!r}")
@@ -88,7 +89,14 @@ class Observation:
                     "comparisons below"
                 )
         if self.value_before_flow < 0:
-            raise PerformanceError(f"value_before_flow cannot be negative, got {self.value_before_flow}")
+            raise PerformanceError(
+                f"value_before_flow cannot be negative, got {self.value_before_flow}"
+            )
+        if self.value_after_flow < 0:
+            raise PerformanceError(
+                "value_after_flow cannot be negative; the flow removes more than "
+                f"the observed value ({self.value_before_flow} + {self.flow})"
+            )
         if self.at.tzinfo is None:
             raise PerformanceError(f"Observation.at must be timezone-aware, got {self.at!r}")
 
@@ -108,7 +116,10 @@ def _annualize(total_return_pct: float, days: float) -> float | None:
     growth = 1.0 + total_return_pct / 100.0
     if growth <= 0:
         return None  # a total loss has no finite annualized rate
-    return (growth ** (DAYS_PER_YEAR / days) - 1.0) * 100.0
+    try:
+        return math.expm1(math.log(growth) * DAYS_PER_YEAR / days) * 100.0
+    except OverflowError:
+        return None
 
 
 def time_weighted_return(observations: list[Observation]) -> dict:
@@ -157,12 +168,35 @@ def time_weighted_return(observations: list[Observation]) -> dict:
     }
 
 
-def _npv(rate: float, flows: list[tuple[float, float]]) -> float:
-    """flows as (years_from_start, amount), standard signs (investment negative)."""
-    total = 0.0
-    for years, amount in flows:
-        total += amount / ((1.0 + rate) ** years)
-    return total
+def _scaled_npv(log_annual_growth: float, flows: list[tuple[float, float]]) -> float:
+    """
+    Sign-preserving NPV evaluated in log-rate space.
+
+    Searching on ``log(1 + rate)`` covers the complete valid IRR domain
+    ``rate > -1`` without a hard upper-rate ceiling. Scaling both the cash
+    amounts and exponential terms prevents overflow while preserving the sign
+    needed by bisection.
+    """
+    amount_scale = max(abs(amount) for _, amount in flows)
+    exponents = [-years * log_annual_growth for years, _ in flows]
+    exponent_scale = max(exponents)
+    return math.fsum(
+        (amount / amount_scale) * math.exp(exponent - exponent_scale)
+        for exponent, (_, amount) in zip(exponents, flows)
+    )
+
+
+def _have_opposite_signs(left: float, right: float) -> bool:
+    return (left < 0 < right) or (right < 0 < left)
+
+
+def _period_return_from_log_rate(log_annual_growth: float, days: float) -> float | None:
+    if days <= 0:
+        return None
+    try:
+        return math.expm1(log_annual_growth * days / DAYS_PER_YEAR) * 100.0
+    except OverflowError:
+        return None
 
 
 def money_weighted_return(
@@ -173,65 +207,136 @@ def money_weighted_return(
     included.
 
     `flows` uses the standard finance convention: investments NEGATIVE, proceeds
-    and the terminal value POSITIVE. Solved by bisection on the annualized rate,
-    which needs no dependency and cannot diverge the way Newton can on the
-    flat-NPV shapes that ordinary buy-and-hold produces.
+    and the terminal value POSITIVE. Conventional cash-flow series (at most one
+    sign change) are solved by bisection in log-rate space, which has no fixed
+    upper-rate ceiling and cannot diverge the way Newton can.
 
-    Returns `irr_annualized_pct=None` with a `note` when no rate solves it,
-    rather than a fabricated number: NPV has no sign change when every flow
-    points the same way (all buys, nothing sold and no terminal value), and an
-    IRR genuinely does not exist there. Failing closed beats reporting a plausible
-    fiction -- the same principle the execution gate uses.
+    Returns `irr_annualized_pct=None` with a `note` when no unique rate can be
+    reported. IRR genuinely does not exist when all flows have the same sign,
+    is undefined over a zero-duration schedule, and may be non-unique when cash
+    flow signs alternate more than once. Failing closed beats reporting a
+    plausible fiction -- the same principle the execution gate uses.
     """
     if len(flows) < 2:
         raise PerformanceError("money_weighted_return needs at least two cash flows")
+    if (
+        not isinstance(max_iterations, int)
+        or isinstance(max_iterations, bool)
+        or max_iterations <= 0
+    ):
+        raise PerformanceError("max_iterations must be a positive integer")
     for at, amount in flows:
+        if not isinstance(at, datetime):
+            raise PerformanceError(f"cash flow timestamp must be a datetime, got {at!r}")
+        if not isinstance(amount, (int, float)) or isinstance(amount, bool):
+            raise PerformanceError(f"cash flow amount must be a number, got {amount!r}")
         if not math.isfinite(amount):
             raise PerformanceError(f"cash flow amount must be finite, got {amount!r}")
         if at.tzinfo is None:
             raise PerformanceError(f"cash flow timestamps must be timezone-aware, got {at!r}")
 
-    ordered = sorted(flows, key=lambda f: f[0])
+    invested = -sum(amount for _, amount in flows if amount < 0)
+    returned = sum(amount for _, amount in flows if amount > 0)
+    simple_pct = ((returned / invested) - 1.0) * 100.0 if invested else None
+
+    # Same-timestamp flows have the same discount factor, so aggregate them.
+    # Keeping zero-net timestamps preserves the requested measurement window.
+    by_time: dict[datetime, float] = {}
+    for at, amount in flows:
+        by_time[at] = by_time.get(at, 0.0) + amount
+    ordered = sorted(by_time.items())
     start = ordered[0][0]
     days = _period_days(start, ordered[-1][0])
     in_years = [(_period_days(start, at) / DAYS_PER_YEAR, amount) for at, amount in ordered]
-
-    invested = -sum(a for _, a in ordered if a < 0)
-    returned = sum(a for _, a in ordered if a > 0)
-    simple_pct = ((returned / invested) - 1.0) * 100.0 if invested else None
 
     result = {
         "period_days": round(days, 2),
         "annualized_is_meaningful": days >= MIN_DAYS_FOR_MEANINGFUL_ANNUALIZATION,
         "total_invested": round(invested, 2),
         "total_returned": round(returned, 2),
-        # Not time-weighted and not annualized: simply (out / in) - 1. For a
-        # position this is the number that answers "did I make money".
+        # Not MWR and not annualized: simply (out / in) - 1. Retained as a
+        # separate cash-on-cash diagnostic, never used for timing attribution.
         "simple_return_pct": round(simple_pct, 4) if simple_pct is not None else None,
+        "period_return_pct": None,
         "method": "money_weighted_irr",
     }
 
-    low, high = -0.999999, 10.0
-    npv_low, npv_high = _npv(low, in_years), _npv(high, in_years)
-    if npv_low * npv_high > 0:
+    if days <= 0:
         result["irr_annualized_pct"] = None
         result["note"] = (
-            "no sign change in NPV over the searched range, so no IRR exists "
-            "(typical when every flow has the same sign -- e.g. only purchases, "
-            "with no sale or terminal value supplied)"
+            "cash flows do not span a positive amount of time, so an annualized "
+            "IRR is undefined"
         )
         return result
 
-    for _ in range(max_iterations):
-        mid = (low + high) / 2.0
-        npv_mid = _npv(mid, in_years)
-        if abs(npv_mid) < 1e-10:
+    signs = [1 if amount > 0 else -1 for _, amount in ordered if amount != 0]
+    if not signs or 1 not in signs or -1 not in signs:
+        result["irr_annualized_pct"] = None
+        result["note"] = (
+            "cash flows need at least one investment and one return; with only "
+            "one sign, no IRR exists"
+        )
+        return result
+    sign_changes = sum(left != right for left, right in zip(signs, signs[1:]))
+    if sign_changes > 1:
+        result["irr_annualized_pct"] = None
+        result["note"] = (
+            "cash-flow signs change more than once, so IRR may be non-unique; "
+            "refusing to select one root arbitrarily"
+        )
+        return result
+
+    # Expand symmetrically in log-rate space until the unique conventional root
+    # is bracketed. This admits rates far above 1000% over short windows.
+    low, high = -1.0, 1.0
+    npv_low = _scaled_npv(low, in_years)
+    npv_high = _scaled_npv(high, in_years)
+    for _ in range(64):
+        if npv_low == 0.0 or npv_high == 0.0 or _have_opposite_signs(npv_low, npv_high):
             break
-        if npv_mid * npv_low > 0:
-            low, npv_low = mid, npv_mid
-        else:
-            high = mid
-    irr = (low + high) / 2.0
+        low *= 2.0
+        high *= 2.0
+        npv_low = _scaled_npv(low, in_years)
+        npv_high = _scaled_npv(high, in_years)
+    else:
+        result["irr_annualized_pct"] = None
+        result["note"] = "unable to bracket a finite IRR for this cash-flow schedule"
+        return result
+
+    if npv_low == 0.0:
+        root = low
+    elif npv_high == 0.0:
+        root = high
+    else:
+        for _ in range(max_iterations):
+            mid = (low + high) / 2.0
+            npv_mid = _scaled_npv(mid, in_years)
+            if abs(npv_mid) < 1e-13 or abs(high - low) < 1e-13:
+                low = high = mid
+                break
+            if not _have_opposite_signs(npv_mid, npv_low):
+                low, npv_low = mid, npv_mid
+            else:
+                high = mid
+        root = (low + high) / 2.0
+
+    period_return = _period_return_from_log_rate(root, days)
+    if period_return is not None and math.isfinite(period_return):
+        result["period_return_pct"] = round(period_return, 4)
+    else:
+        result["note"] = "the period-equivalent IRR exceeds the finite numeric range"
+
+    try:
+        irr = math.expm1(root)
+    except OverflowError:
+        result["irr_annualized_pct"] = None
+        result["note"] = "the annualized IRR exceeds the finite numeric range"
+        return result
+    if not math.isfinite(irr):
+        result["irr_annualized_pct"] = None
+        result["note"] = "the annualized IRR exceeds the finite numeric range"
+        return result
+
     result["irr_annualized_pct"] = round(irr * 100.0, 4)
     return result
 
@@ -242,14 +347,14 @@ def position_performance(
     """
     Decompose one position's result into the asset's return and yours.
 
-    `fills` are `assistant.tax_lots.Fill`s; `prices` is `[(at, price), ...]`
-    covering at least the first and last fill dates. The final price is the
-    valuation point for still-open shares.
+    `fills` are `assistant.tax_lots.Fill`s; `prices` is `[(at, price), ...]`.
+    Prices must begin on or before the first fill and end on or after the last
+    fill. The final price is the valuation point for still-open shares.
 
-    Returns both measures plus `timing_contribution_pct` = MWR - TWR, which is
-    the part attributable to WHEN you put money in rather than to what the asset
-    did. For the 2-at-100 / 2-at-90 / price-95 case: asset -5.00%, yours 0.00%,
-    timing +5.00 points.
+    `asset_return` is a continuously invested price benchmark, including
+    intervals when the position itself was closed. `your_return` is the
+    cash-flow-sensitive MWR. `timing_contribution_pct` compares its
+    period-equivalent return with TWR, so both sides cover the same horizon.
     """
     if not fills:
         raise PerformanceError("position_performance needs at least one fill")
@@ -257,60 +362,87 @@ def position_performance(
         raise PerformanceError("position_performance needs at least two price points")
 
     ordered_fills = sorted(fills, key=lambda f: f.at)
-    ordered_prices = sorted(prices, key=lambda p: p[0])
-    for at, price in ordered_prices:
-        if not math.isfinite(price) or price <= 0:
+    unique_prices: dict[datetime, float] = {}
+    for at, price in prices:
+        if not isinstance(at, datetime):
+            raise PerformanceError(f"price timestamp must be a datetime, got {at!r}")
+        if at.tzinfo is None:
+            raise PerformanceError(f"price timestamps must be timezone-aware, got {at!r}")
+        if (
+            not isinstance(price, (int, float))
+            or isinstance(price, bool)
+            or not math.isfinite(price)
+            or price <= 0
+        ):
             raise PerformanceError(f"price at {at} must be positive and finite, got {price!r}")
+        if at in unique_prices and unique_prices[at] != price:
+            raise PerformanceError(
+                f"conflicting prices at {at}: {unique_prices[at]} and {price}"
+            )
+        unique_prices[at] = price
+    ordered_prices = sorted(unique_prices.items())
+    if len(ordered_prices) < 2:
+        raise PerformanceError(
+            "position_performance needs at least two distinct price timestamps"
+        )
 
     tickers = {f.ticker.upper() for f in ordered_fills}
     if len(tickers) != 1:
         raise PerformanceError(f"position_performance is per-ticker, got {sorted(tickers)}")
 
-    # Build observations at every date that is either a fill or the final price.
-    flow_by_time: dict[datetime, float] = {}
-    shares_delta: dict[datetime, float] = {}
-    for fill in ordered_fills:
-        signed_qty = fill.qty if fill.side == "buy" else -fill.qty
-        cash = fill.qty * fill.price * (1 if fill.side == "buy" else -1)
-        flow_by_time[fill.at] = flow_by_time.get(fill.at, 0.0) + cash
-        shares_delta[fill.at] = shares_delta.get(fill.at, 0.0) + signed_qty
-
-    price_at = dict(ordered_prices)
+    first_fill_at = ordered_fills[0].at
+    last_fill_at = ordered_fills[-1].at
     final_at, final_price = ordered_prices[-1]
-    timeline = sorted(set(flow_by_time) | {final_at})
+    if ordered_prices[0][0] > first_fill_at:
+        raise PerformanceError(
+            "prices must include a valuation on or before the first fill "
+            f"({first_fill_at})"
+        )
+    if final_at < last_fill_at:
+        raise PerformanceError(
+            "the terminal valuation precedes the latest fill: "
+            f"{final_at} < {last_fill_at}"
+        )
+    if final_at <= first_fill_at:
+        raise PerformanceError("terminal valuation must be after the first fill")
 
-    def _price_on(when: datetime) -> float:
-        if when in price_at:
-            return price_at[when]
-        earlier = [p for t, p in ordered_prices if t <= when]
-        if earlier:
-            return earlier[-1]
-        return ordered_prices[0][1]
+    start_price = next(price for at, price in reversed(ordered_prices) if at <= first_fill_at)
+    benchmark_prices = [(first_fill_at, start_price)]
+    benchmark_prices.extend((at, price) for at, price in ordered_prices if at > first_fill_at)
+    twr = time_weighted_return(
+        [Observation(at=at, value_before_flow=price) for at, price in benchmark_prices]
+    )
 
-    observations: list[Observation] = []
+    # Build standard-sign cash flows while validating that this long-only
+    # position never sells more shares than it owns.
+    cash_by_time: dict[datetime, float] = {}
     shares = 0.0
-    for when in timeline:
-        value_before = shares * _price_on(when)
-        flow = flow_by_time.get(when, 0.0)
-        observations.append(Observation(at=when, value_before_flow=value_before, flow=flow))
-        shares += shares_delta.get(when, 0.0)
-
-    twr = time_weighted_return(observations)
+    for fill in ordered_fills:
+        if fill.side == "buy":
+            shares += fill.qty
+            cash = -(fill.qty * fill.price)
+        else:
+            shares -= fill.qty
+            if shares < -1e-9:
+                raise PerformanceError(
+                    f"sale at {fill.at} exceeds available shares; short positions "
+                    "are not supported by position_performance"
+                )
+            if abs(shares) <= 1e-9:
+                shares = 0.0
+            cash = fill.qty * fill.price
+        cash_by_time[fill.at] = cash_by_time.get(fill.at, 0.0) + cash
 
     # MWR: purchases are investments (negative), sales proceeds positive, and
-    # the still-open shares are a positive terminal value.
+    # the still-open shares are a positive terminal value. A zero terminal flow
+    # preserves the same comparison horizon for a position closed earlier.
     terminal_value = shares * final_price
-    cash_flows = [(when, -flow_by_time[when]) for when in sorted(flow_by_time)]
-    if terminal_value > 0:
-        last = cash_flows[-1]
-        if last[0] == final_at:
-            cash_flows[-1] = (final_at, last[1] + terminal_value)
-        else:
-            cash_flows.append((final_at, terminal_value))
+    cash_by_time[final_at] = cash_by_time.get(final_at, 0.0) + terminal_value
+    cash_flows = sorted(cash_by_time.items())
     mwr = money_weighted_return(cash_flows)
 
     asset_pct = twr["total_return_pct"]
-    yours_pct = mwr["simple_return_pct"]
+    yours_pct = mwr["period_return_pct"]
     return {
         "ticker": sorted(tickers)[0],
         "shares_open": round(shares, 6),
@@ -320,13 +452,17 @@ def position_performance(
         "timing_contribution_pct": (
             round(yours_pct - asset_pct, 4) if yours_pct is not None else None
         ),
-        "interpretation": _describe_timing(yours_pct, asset_pct),
+        "timing_basis": "money_weighted_period_return_minus_time_weighted_return",
+        "interpretation": _describe_timing(yours_pct, asset_pct, mwr.get("note")),
     }
 
 
-def _describe_timing(yours_pct: float | None, asset_pct: float) -> str:
+def _describe_timing(
+    yours_pct: float | None, asset_pct: float, unavailable_reason: str | None = None
+) -> str:
     if yours_pct is None:
-        return "Your return is undefined (nothing realized and nothing held)."
+        reason = f" Reason: {unavailable_reason}" if unavailable_reason else ""
+        return f"Money-weighted return is unavailable, so timing cannot be attributed.{reason}"
     delta = yours_pct - asset_pct
     if abs(delta) < 0.005:
         return (

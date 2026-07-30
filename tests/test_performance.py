@@ -91,16 +91,12 @@ def test_buying_high_before_a_decline_hurts_and_is_reported_as_such():
     assert "timing hurt by 12.50" in result["interpretation"]
 
 
-def test_averaging_down_still_helps_even_when_the_price_keeps_falling():
-    """Correct but counterintuitive, so worth pinning: 100 -> 90 (buy more) ->
-    80. The asset lost 20% (0.90 * 0.8889), but half your money went in at 90,
-    giving an average cost of 95 against the asset's 100 start -- so you lost
-    only 15.79% and timing still contributed +4.21 points.
+def test_money_weighting_is_not_replaced_by_simple_cash_on_cash_return():
+    """Cash-on-cash ROI ignores when each dollar was exposed. MWR does not.
 
-    An earlier version of this test asserted the opposite on the assumption
-    that buying into a continuing decline must hurt. It does not: the
-    comparison is against the ASSET's start-to-end return, not against having
-    stayed out.
+    Here simple ROI is -15.79%, but the second contribution participates in a
+    sharp one-day loss. The period-equivalent IRR is -20.33%, which is the
+    like-for-like figure that must be compared with the asset's -20% TWR.
     """
     result = position_performance(
         [Fill("AAPL", "buy", 2, 100.0, D1), Fill("AAPL", "buy", 2, 90.0, D2)],
@@ -108,8 +104,9 @@ def test_averaging_down_still_helps_even_when_the_price_keeps_falling():
     )
     assert result["asset_return"]["total_return_pct"] == pytest.approx(-20.0, abs=1e-6)
     assert result["your_return"]["simple_return_pct"] == pytest.approx(-15.7895, abs=1e-3)
-    assert result["timing_contribution_pct"] == pytest.approx(4.2105, abs=1e-3)
-    assert "timing helped" in result["interpretation"]
+    assert result["your_return"]["period_return_pct"] == pytest.approx(-20.3315, abs=1e-3)
+    assert result["timing_contribution_pct"] == pytest.approx(-0.3315, abs=1e-3)
+    assert "timing hurt" in result["interpretation"]
 
 
 def test_averaging_down_before_a_recovery_beats_the_asset():
@@ -204,9 +201,69 @@ def test_no_irr_exists_when_every_flow_points_the_same_way():
     not exist. It must report None, not a plausible fabrication."""
     result = money_weighted_return([(D1, -100.0), (D2, -100.0)])
     assert result["irr_annualized_pct"] is None
-    assert "no sign change" in result["note"]
+    assert "only one sign" in result["note"]
     assert result["total_invested"] == 200.0
     assert result["total_returned"] == 0.0
+
+
+def test_short_window_irr_is_not_limited_to_one_thousand_percent():
+    """Ten percent in two days annualizes far above the former fixed bracket."""
+    result = money_weighted_return([(D1, -100.0), (D3, 110.0)])
+    assert result["irr_annualized_pct"] > 1_000.0
+    assert result["period_return_pct"] == pytest.approx(10.0, abs=1e-6)
+    assert "note" not in result
+
+
+def test_finite_period_return_survives_annualized_numeric_overflow():
+    result = money_weighted_return([(D1, -100.0), (D2, 1_000.0)])
+    assert result["period_return_pct"] == pytest.approx(900.0, abs=1e-6)
+    assert result["irr_annualized_pct"] is None
+    assert "annualized IRR exceeds" in result["note"]
+
+
+def test_same_timestamp_balanced_flows_do_not_fabricate_an_irr():
+    result = money_weighted_return([(D1, -100.0), (D1, 100.0)])
+    assert result["irr_annualized_pct"] is None
+    assert result["period_return_pct"] is None
+    assert result["total_invested"] == 100.0
+    assert result["total_returned"] == 100.0
+    assert "positive amount of time" in result["note"]
+
+
+def test_multiple_possible_irrs_fail_closed():
+    """This annual series has roots near 10% and 20%; selecting one is arbitrary."""
+    result = money_weighted_return([
+        (D1, -100.0),
+        (D1 + timedelta(days=365), 230.0),
+        (D1 + timedelta(days=730), -132.0),
+    ])
+    assert result["irr_annualized_pct"] is None
+    assert result["period_return_pct"] is None
+    assert "non-unique" in result["note"]
+
+
+def test_timing_uses_period_equivalent_mwr_not_simple_roi():
+    """Both simple ROI and TWR are 21%, but the cash arrived after a flat year.
+
+    The standard MWR therefore differs: 13.41% annualized, or 28.60% over the
+    complete two-year comparison horizon.
+    """
+    result = position_performance(
+        [
+            Fill("AAPL", "buy", 1, 100.0, D1),
+            Fill("AAPL", "buy", 1, 100.0, D1 + timedelta(days=365)),
+        ],
+        [
+            (D1, 100.0),
+            (D1 + timedelta(days=365), 100.0),
+            (D1 + timedelta(days=730), 121.0),
+        ],
+    )
+    assert result["asset_return"]["total_return_pct"] == pytest.approx(21.0, abs=1e-6)
+    assert result["your_return"]["simple_return_pct"] == pytest.approx(21.0, abs=1e-6)
+    assert result["your_return"]["irr_annualized_pct"] == pytest.approx(13.4111, abs=1e-3)
+    assert result["your_return"]["period_return_pct"] == pytest.approx(28.5987, abs=1e-3)
+    assert result["timing_contribution_pct"] == pytest.approx(7.5987, abs=1e-3)
 
 
 def test_money_weighted_return_needs_two_flows():
@@ -267,6 +324,11 @@ def test_a_negative_value_is_refused():
         Observation(D1, -1.0)
 
 
+def test_a_flow_cannot_make_the_observed_value_negative():
+    with pytest.raises(PerformanceError, match="value_after_flow cannot be negative"):
+        Observation(D1, 100.0, -101.0)
+
+
 def test_a_boolean_value_is_refused():
     with pytest.raises(PerformanceError, match="must be a number"):
         Observation(D1, True)
@@ -315,6 +377,58 @@ def test_a_fully_closed_position_uses_realized_proceeds_only():
     assert result["your_return"]["total_invested"] == 200.0
     assert result["your_return"]["total_returned"] == 220.0
     assert result["your_return"]["simple_return_pct"] == pytest.approx(10.0, abs=1e-9)
+
+
+def test_asset_benchmark_includes_the_interval_while_position_is_closed():
+    """Selling before a decline and re-entering afterward must not be reversed.
+
+    The asset goes 100 -> 110 -> 90 -> 99, a continuous -1% return. The
+    investor's alternating cash-flow signs make IRR potentially non-unique, so
+    timing fails closed rather than claiming the skipped decline hurt.
+    """
+    result = position_performance(
+        [
+            Fill("AAPL", "buy", 1, 100.0, D1),
+            Fill("AAPL", "sell", 1, 110.0, D2),
+            Fill("AAPL", "buy", 1, 90.0, D3),
+        ],
+        [
+            (D1, 100.0),
+            (D2, 110.0),
+            (D3, 90.0),
+            (D3 + timedelta(days=1), 99.0),
+        ],
+    )
+    assert result["asset_return"]["total_return_pct"] == pytest.approx(-1.0, abs=1e-6)
+    assert result["asset_return"]["sub_period_returns_pct"] == pytest.approx(
+        [10.0, -18.1818, 10.0], abs=1e-3
+    )
+    assert result["asset_return"]["sub_periods_skipped_zero_value"] == 0
+    assert result["your_return"]["irr_annualized_pct"] is None
+    assert result["timing_contribution_pct"] is None
+    assert "non-unique" in result["your_return"]["note"]
+
+
+def test_terminal_valuation_cannot_precede_the_latest_fill():
+    with pytest.raises(PerformanceError, match="terminal valuation precedes"):
+        position_performance(
+            [
+                Fill("AAPL", "buy", 1, 100.0, D1),
+                Fill("AAPL", "buy", 1, 100.0, D3),
+            ],
+            [(D1, 100.0), (D2, 110.0)],
+        )
+
+
+def test_selling_more_than_the_position_owns_is_refused():
+    with pytest.raises(PerformanceError, match="exceeds available shares"):
+        position_performance(
+            [
+                Fill("AAPL", "buy", 1, 100.0, D1),
+                Fill("AAPL", "sell", 2, 110.0, D2),
+            ],
+            [(D1, 100.0), (D2, 110.0)],
+        )
 
 
 if __name__ == "__main__":

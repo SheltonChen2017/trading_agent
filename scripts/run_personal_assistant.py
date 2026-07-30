@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
+from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
     PolicyOverridableBlockError,
     execute_approved_paper_proposal,
@@ -38,8 +39,15 @@ from assistant.order_reconciler import monitor_orders, reconcile_nonterminal_ord
 from assistant.portfolio_ledger import (
     bootstrap_opening_snapshot,
     ledger_balances,
+    record_dividend,
+    record_split,
     reconcile_snapshot,
     sync_app_fills,
+)
+from assistant.macro_context import build_descriptive_macro_context
+from assistant.portfolio_history import (
+    capture_briefing_equity_snapshot,
+    portfolio_performance_report,
 )
 from assistant.paper_evidence import (
     REQUIRED_PROMOTION_DRILLS,
@@ -58,6 +66,7 @@ from assistant.risk_copilot import (
     check_policy_compliance,
     estimate_stress_impact,
     find_correlated_clusters,
+    portfolio_risk_decomposition,
 )
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.storage import AssistantStore
@@ -251,7 +260,41 @@ def _print_briefing(packet) -> None:
 def command_briefing(args, store: AssistantStore) -> None:
     packet = _packet(include_events=not args.no_events)
     packet_id = store.save_decision_packet(packet)
+    history_note = None
+    try:
+        captured = capture_briefing_equity_snapshot(
+            store,
+            packet.portfolio,
+            captured_at=packet.generated_at,
+        )
+        report = portfolio_performance_report(
+            store, captured["account_key"]
+        )
+        if report.get("available"):
+            history_note = (
+                f"Portfolio total return {report['total_return_pct']:+.2f}% "
+                f"since {report['start_session']}; "
+                f"max drawdown {report['max_drawdown_pct']:.2f}%."
+            )
+    except Exception as exc:
+        # History is observability, never a prerequisite for a briefing.
+        history_note = f"Portfolio history capture unavailable: {exc}"
     _print_briefing(packet)
+    macro_context = build_descriptive_macro_context()
+    if macro_context.get("available"):
+        print("Descriptive macro context (not predictive):")
+        for indicator in macro_context["indicators"]:
+            print(
+                f"  {indicator['label']}: {indicator['direction']} "
+                f"(20-session change {indicator['change_20_sessions']:+.4f})"
+            )
+    else:
+        print(
+            "  Macro context unavailable: "
+            + str(macro_context.get("reason", "insufficient data"))
+        )
+    if history_note:
+        print(f"  History: {history_note}")
     print(f"Persisted decision packet #{packet_id} to {store.path}")
 
 
@@ -270,6 +313,21 @@ def command_risk_check(args, store: AssistantStore) -> None:
     print(check_concentration(packet.risk, args.basket))
     for cluster_warning in find_correlated_clusters(packet.portfolio):
         print(f"  ! {cluster_warning}")
+    decomposition = portfolio_risk_decomposition(packet.portfolio)
+    if decomposition.get("available"):
+        print(
+            "Empirical portfolio risk: "
+            f"beta={decomposition['portfolio_beta'] if decomposition['portfolio_beta'] is not None else 'n/a'} "
+            f"annualized volatility={decomposition['annualized_volatility_pct']:.2f}%"
+        )
+        for cluster in decomposition["correlated_clusters"]:
+            print(
+                "  ! Correlated cluster "
+                f"{'/'.join(cluster['tickers'])}: "
+                f"{cluster['combined_weight_pct']:.2f}% of equity"
+            )
+    else:
+        print(f"  ! Empirical risk decomposition unavailable: {decomposition.get('reason')}")
     if args.benchmark:
         result = estimate_stress_impact(packet.portfolio, args.benchmark, args.move_pct)
         if result.get("warning"):
@@ -289,7 +347,15 @@ def command_propose(args, store: AssistantStore) -> None:
     policy = load_policy(args.policy)
     packet = _packet(include_events=not args.no_events)
     store.save_decision_packet(packet)
-    proposals = generate_risk_reduction_proposals(packet, policy)
+    tax_ledger, tax_coverage = tax_ledger_with_coverage(
+        store, packet.portfolio
+    )
+    proposals = generate_risk_reduction_proposals(
+        packet,
+        policy,
+        tax_lot_ledger=tax_ledger,
+        tax_lot_coverage=tax_coverage,
+    )
     if args.strategy_proposals or policy.enable_strategy_proposals:
         for pair_config in CONFIGURED_LEVERAGED_PAIRS:
             try:
@@ -317,6 +383,21 @@ def command_propose(args, store: AssistantStore) -> None:
             f"  Preview: position {proposal.expected_impact['position_weight_before_pct']:.1f}% "
             f"-> {proposal.expected_impact['position_weight_after_pct']:.1f}%"
         )
+        tax_advisory = proposal.expected_impact.get("tax_lot_advisory", {})
+        if tax_advisory.get("available"):
+            for method, detail in tax_advisory["methods"].items():
+                if "error" not in detail:
+                    print(
+                        f"  Tax ({method.upper()}): "
+                        f"{detail['realized_pnl']:+,.2f} realized "
+                        f"(short {detail['short_term_pnl']:+,.2f}, "
+                        f"long {detail['long_term_pnl']:+,.2f})"
+                    )
+        else:
+            print(
+                "  Tax: advisory unavailable -- "
+                + str(tax_advisory.get("reason", "unknown reason"))
+            )
         for uncertainty in proposal.uncertainties:
             print(f"  ? {uncertainty}")
         print(f'  Approve with: approve {proposal.proposal_id} --confirm approve')
@@ -503,6 +584,55 @@ def command_ledger_reconcile(args, store: AssistantStore) -> None:
     print(json.dumps(report, indent=2, sort_keys=True))
     if not report["matched"]:
         raise SystemExit(2)
+
+
+def command_ledger_dividend(args, store: AssistantStore) -> None:
+    inserted = record_dividend(
+        store,
+        external_id=args.external_id,
+        ticker=args.ticker,
+        gross_amount=args.gross_amount,
+        occurred_at=args.occurred_at,
+        ex_date=args.ex_date,
+        pay_date=args.pay_date,
+        amount_per_share=args.amount_per_share,
+        shares_entitled=args.shares_entitled,
+        tax_classification=args.tax_classification,
+    )
+    print(
+        json.dumps(
+            {
+                "inserted": inserted,
+                "external_id": args.external_id,
+                "ticker": args.ticker.upper(),
+                "action": "dividend",
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
+def command_ledger_split(args, store: AssistantStore) -> None:
+    inserted = record_split(
+        store,
+        external_id=args.external_id,
+        ticker=args.ticker,
+        ratio=args.ratio,
+        occurred_at=args.occurred_at,
+    )
+    print(
+        json.dumps(
+            {
+                "inserted": inserted,
+                "external_id": args.external_id,
+                "ticker": args.ticker.upper(),
+                "action": "split",
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
 
 
 def command_operations_check(args, store: AssistantStore) -> None:
@@ -1036,6 +1166,57 @@ def build_parser() -> argparse.ArgumentParser:
         help="Do not sync app fills before comparing the snapshot.",
     )
     ledger_reconcile.set_defaults(handler=command_ledger_reconcile)
+
+    ledger_dividend = commands.add_parser(
+        "ledger-dividend",
+        help=(
+            "Append a broker-confirmed cash dividend to the journal. "
+            "Reference-feed discoveries are not accepted as confirmation."
+        ),
+    )
+    ledger_dividend.add_argument("--external-id", required=True)
+    ledger_dividend.add_argument("--ticker", required=True)
+    ledger_dividend.add_argument("--gross-amount", required=True)
+    ledger_dividend.add_argument(
+        "--occurred-at",
+        required=True,
+        help="Timezone-aware ISO-8601 time when cash was received.",
+    )
+    ledger_dividend.add_argument(
+        "--ex-date",
+        required=True,
+        help="ISO date or timezone-aware timestamp used for entitlement.",
+    )
+    ledger_dividend.add_argument("--pay-date")
+    ledger_dividend.add_argument("--amount-per-share", required=True)
+    ledger_dividend.add_argument("--shares-entitled")
+    ledger_dividend.add_argument(
+        "--tax-classification",
+        choices=("qualified", "ordinary", "unknown"),
+        default="unknown",
+    )
+    ledger_dividend.set_defaults(handler=command_ledger_dividend)
+
+    ledger_split = commands.add_parser(
+        "ledger-split",
+        help=(
+            "Append a broker-confirmed split ratio to journal share quantities "
+            "without changing total cost basis."
+        ),
+    )
+    ledger_split.add_argument("--external-id", required=True)
+    ledger_split.add_argument("--ticker", required=True)
+    ledger_split.add_argument(
+        "--ratio",
+        required=True,
+        help="New shares per old share, e.g. 4 or 0.1.",
+    )
+    ledger_split.add_argument(
+        "--occurred-at",
+        required=True,
+        help="Timezone-aware ISO-8601 effective timestamp.",
+    )
+    ledger_split.set_defaults(handler=command_ledger_split)
 
     operations_check = commands.add_parser(
         "operations-check",

@@ -203,6 +203,7 @@ import hashlib
 import json
 import math
 import os
+from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -212,6 +213,7 @@ from assistant.order_lifecycle import (
     CHAIN_ERROR_IDENTITY_MISMATCH,
     resolve_replacement_chain,
 )
+from assistant.money import MoneyInput, decimal_or_none, to_decimal
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
     APPROVED,
@@ -234,7 +236,7 @@ from risk.execution_gate import (
     authorize_trade_intent,
     intent_fingerprint,
     validate_trade_intent,
-    worst_case_fill_price,
+    worst_case_fill_price_decimal,
 )
 
 # Sentinel: the broker lookup itself failed (network/auth/5xx/etc.), so
@@ -446,8 +448,8 @@ def _authoritative_order_for(
 
 
 def _execution_budget_notional(
-    intent: TradeIntent, reference_price: float
-) -> float:
+    intent: TradeIntent, reference_price: MoneyInput
+) -> Decimal:
     """Gross submitted notional reserved against the persistent daily cap.
 
     This intentionally uses the same side-aware price as the risk gate:
@@ -455,8 +457,8 @@ def _execution_budget_notional(
     remains at the reference price so a risk-reducing order is not blocked
     merely because its limit is above the quote.
     """
-    return float(
-        intent.shares * worst_case_fill_price(intent, reference_price)
+    return Decimal(intent.shares) * worst_case_fill_price_decimal(
+        intent, reference_price
     )
 
 
@@ -515,7 +517,9 @@ def _order_matches_intent(order: dict, intent: TradeIntent) -> tuple[bool, str]:
     return True, ""
 
 
-def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict[str, float]:
+def _pending_buy_value_by_ticker(
+    open_orders: list[dict], broker_module
+) -> dict[str, Decimal]:
     """Estimated dollar value of currently pending (not-yet-filled) BUY
     orders, keyed by ticker -- fed into validate_trade_intent()'s
     exposure/concentration checks, which otherwise only see FILLED
@@ -543,7 +547,7 @@ def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict
     can't be verified right now" and failing the approval closed, the
     same way current_portfolio.open_orders_available already does for the
     duplicate-order check."""
-    totals: dict[str, float] = {}
+    totals: dict[str, Decimal] = {}
     for order in open_orders:
         if str(order.get("side", "")).lower() != "buy":
             continue
@@ -562,40 +566,50 @@ def _pending_buy_value_by_ticker(open_orders: list[dict], broker_module) -> dict
         # permitting more), matching this function's fail-closed contract for
         # quote failures described above.
         raw_filled = order.get("filled_qty")
-        try:
-            filled_qty = float(raw_filled) if raw_filled else 0.0
-        except (TypeError, ValueError):
-            filled_qty = 0.0
-        if not math.isfinite(filled_qty) or filled_qty < 0:
-            filled_qty = 0.0
+        filled_qty = decimal_or_none(raw_filled) if raw_filled else Decimal("0")
+        if filled_qty is None or filled_qty < 0:
+            filled_qty = Decimal("0")
 
         notional = order.get("notional")
         if notional:
-            value = float(notional)
+            value = to_decimal(notional, name=f"{ticker} pending notional")
             # A notional order carries no share count, so net out the filled
             # dollars directly. Without a usable fill price the full notional
             # stays counted (again, the conservative direction).
             raw_fill_price = order.get("filled_avg_price")
-            try:
-                fill_price = float(raw_fill_price) if raw_fill_price else 0.0
-            except (TypeError, ValueError):
-                fill_price = 0.0
-            if math.isfinite(fill_price) and fill_price > 0:
-                value = max(0.0, value - filled_qty * fill_price)
+            fill_price = (
+                decimal_or_none(raw_fill_price)
+                if raw_fill_price
+                else Decimal("0")
+            )
+            if fill_price is not None and fill_price > 0:
+                value = max(
+                    Decimal("0"),
+                    value - filled_qty * fill_price,
+                )
         else:
             shares = order.get("shares")
             if not shares:
                 continue
-            remaining_shares = float(shares) - filled_qty
-            if not math.isfinite(remaining_shares) or remaining_shares <= 0:
+            remaining_shares = (
+                to_decimal(shares, name=f"{ticker} pending shares")
+                - filled_qty
+            )
+            if remaining_shares <= 0:
                 continue
             limit_price = order.get("limit_price")
             if limit_price:
-                value = remaining_shares * float(limit_price)
+                value = remaining_shares * to_decimal(
+                    limit_price, name=f"{ticker} pending limit_price"
+                )
             else:
                 quote = broker_module.get_latest_quote(ticker)
-                value = remaining_shares * float(quote["price"])
-        totals[ticker.upper()] = totals.get(ticker.upper(), 0.0) + value
+                value = remaining_shares * to_decimal(
+                    quote["price"], name=f"{ticker} quote price"
+                )
+        totals[ticker.upper()] = (
+            totals.get(ticker.upper(), Decimal("0")) + value
+        )
     return totals
 
 
@@ -649,7 +663,7 @@ class ProposalValidationOutcome:
     # of proposals (assistant.allocation_batch's cumulative preflight) can
     # compute this leg's planned notional to reserve against the next
     # leg's projected portfolio, without re-fetching the same quote.
-    reference_price: float | None = None
+    reference_price: MoneyInput | None = None
 
     @property
     def approved(self) -> bool:
@@ -884,17 +898,17 @@ def validate_proposal_for_execution(
 
     try:
         quote = broker.get_latest_quote(intent.ticker)
-        reference_price = quote["price"]
+        reference_price = quote.get("price_decimal", quote["price"])
         price_timestamp = quote["timestamp"]
-        bid_price = quote.get("bid")
-        ask_price = quote.get("ask")
+        bid_price = quote.get("bid_decimal", quote.get("bid"))
+        ask_price = quote.get("ask_decimal", quote.get("ask"))
     except Exception as exc:
         return ProposalValidationOutcome(
             proposal=proposal, intent=intent, validation=None,
             error=f"Could not fetch a live quote for {intent.ticker} to check price freshness: {exc}",
         )
 
-    pending_buy_value_by_ticker: dict[str, float] = {}
+    pending_buy_value_by_ticker: dict[str, Decimal] = {}
     if intent.side == "buy":
         try:
             pending_buy_value_by_ticker = dict(_pending_buy_value_by_ticker(current_portfolio.open_orders, broker))
@@ -909,7 +923,13 @@ def validate_proposal_for_execution(
             )
         for ticker, extra_value in (extra_pending_buy_value_by_ticker or {}).items():
             key = ticker.upper()
-            pending_buy_value_by_ticker[key] = pending_buy_value_by_ticker.get(key, 0.0) + extra_value
+            pending_buy_value_by_ticker[key] = (
+                pending_buy_value_by_ticker.get(key, Decimal("0"))
+                + to_decimal(
+                    extra_value,
+                    name=f"extra pending buy value for {key}",
+                )
+            )
 
     resolved_earnings_days_away = _resolve_earnings_days_away(intent.ticker, earnings_days_away)
     if policy.require_earnings_data and intent.side == "buy" and resolved_earnings_days_away is None:

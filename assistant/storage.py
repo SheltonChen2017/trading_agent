@@ -13,6 +13,7 @@ import math
 import os
 import sqlite3
 from contextlib import contextmanager
+from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
@@ -22,6 +23,7 @@ from assistant.proposal_status import (
     FILLED,
     UNRESOLVED_BROKER_STATE_STATUSES,
 )
+from assistant.money import decimal_text, to_decimal
 from assistant.schemas import DecisionPacket
 
 DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "trading_assistant.db"
@@ -113,6 +115,7 @@ class AssistantStore:
                     proposal_id TEXT PRIMARY KEY,
                     trading_day TEXT NOT NULL,
                     reserved_notional REAL NOT NULL,
+                    reserved_notional_text TEXT NOT NULL,
                     created_at TEXT NOT NULL
                 );
                 CREATE TABLE IF NOT EXISTS system_state (
@@ -210,6 +213,18 @@ class AssistantStore:
                         REFERENCES paper_evidence_epochs(evidence_epoch),
                     UNIQUE(evidence_epoch, session_date)
                 );
+                CREATE TABLE IF NOT EXISTS portfolio_equity_snapshots (
+                    snapshot_id TEXT PRIMARY KEY,
+                    account_key TEXT NOT NULL,
+                    session_date TEXT NOT NULL,
+                    captured_at TEXT NOT NULL,
+                    total_equity_text TEXT NOT NULL,
+                    cash_text TEXT NOT NULL,
+                    net_external_flow_text TEXT NOT NULL,
+                    benchmarks_json TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    payload_hash TEXT NOT NULL
+                );
                 CREATE TABLE IF NOT EXISTS operational_drill_runs (
                     drill_id TEXT PRIMARY KEY,
                     drill_type TEXT NOT NULL,
@@ -240,11 +255,16 @@ class AssistantStore:
                     ON paper_evidence_epochs(status) WHERE status = 'active';
                 CREATE INDEX IF NOT EXISTS idx_paper_observations_epoch_date
                     ON paper_account_observations(evidence_epoch, session_date);
+                CREATE INDEX IF NOT EXISTS idx_portfolio_equity_account_date
+                    ON portfolio_equity_snapshots(
+                        account_key, session_date, captured_at
+                    );
                 CREATE INDEX IF NOT EXISTS idx_operational_drills_type_at
                     ON operational_drill_runs(drill_type, performed_at);
                 """
             )
             self._migrate_decision_packet_identity(connection)
+            self._migrate_execution_reservation_money(connection)
 
     def _migrate_decision_packet_identity(self, connection: sqlite3.Connection) -> None:
         """`generated_at` alone conflates different serialized payloads
@@ -286,6 +306,48 @@ class AssistantStore:
             "ON decision_packets(generated_at, payload_hash)"
         )
 
+    def _migrate_execution_reservation_money(
+        self, connection: sqlite3.Connection
+    ) -> None:
+        """Add an exact decimal representation beside the legacy REAL.
+
+        SQLite's REAL affinity stores binary floating-point values, so
+        summing reservations such as 0.1 and 0.2 can produce a value just
+        above an exact 0.3 cap.  The REAL column remains populated for
+        backward compatibility and ad-hoc reporting; all enforcement reads
+        ``reserved_notional_text`` and sums ``Decimal`` values in Python.
+        Existing databases are backfilled from the best representation still
+        available in the legacy column.  Precision already lost by an old
+        write cannot be recovered, but no subsequent arithmetic adds more
+        drift.
+        """
+        columns = {
+            row["name"]
+            for row in connection.execute(
+                "PRAGMA table_info(execution_reservations)"
+            )
+        }
+        if "reserved_notional_text" not in columns:
+            connection.execute(
+                "ALTER TABLE execution_reservations "
+                "ADD COLUMN reserved_notional_text TEXT"
+            )
+        rows = connection.execute(
+            "SELECT proposal_id, reserved_notional "
+            "FROM execution_reservations "
+            "WHERE reserved_notional_text IS NULL "
+            "OR reserved_notional_text = ''"
+        ).fetchall()
+        for row in rows:
+            connection.execute(
+                "UPDATE execution_reservations "
+                "SET reserved_notional_text = ? WHERE proposal_id = ?",
+                (
+                    decimal_text(row["reserved_notional"]),
+                    row["proposal_id"],
+                ),
+            )
+
     def save_decision_packet(self, packet: DecisionPacket) -> int:
         """Persists one decision packet, keyed by (`generated_at`,
         `payload_hash`) -- NOT `generated_at` alone. `generated_at` marks
@@ -315,6 +377,75 @@ class AssistantStore:
                 (packet.generated_at, payload_hash),
             ).fetchone()
             return int(existing["id"])
+
+    def append_portfolio_equity_snapshot(
+        self, snapshot: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Append one immutable briefing valuation, deduplicated by payload."""
+        payload_json = json.dumps(
+            snapshot, sort_keys=True, separators=(",", ":"), default=str
+        )
+        payload_hash = _hash_payload(payload_json)
+        snapshot_id = "equity-" + payload_hash[:24]
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO portfolio_equity_snapshots(
+                    snapshot_id, account_key, session_date, captured_at,
+                    total_equity_text, cash_text, net_external_flow_text,
+                    benchmarks_json, payload_json, payload_hash
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(snapshot_id) DO NOTHING
+                """,
+                (
+                    snapshot_id,
+                    snapshot["account_key"],
+                    snapshot["session_date"],
+                    snapshot["captured_at"],
+                    snapshot["total_equity"],
+                    snapshot["cash"],
+                    snapshot["net_external_flow"],
+                    json.dumps(
+                        snapshot.get("benchmarks", {}),
+                        sort_keys=True,
+                        separators=(",", ":"),
+                    ),
+                    payload_json,
+                    payload_hash,
+                ),
+            )
+        return {
+            **snapshot,
+            "snapshot_id": snapshot_id,
+            "payload_hash": payload_hash,
+        }
+
+    def list_portfolio_equity_snapshots(
+        self,
+        account_key: str,
+        *,
+        limit: int = 10_000,
+    ) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT snapshot_id, payload_json, payload_hash
+                FROM portfolio_equity_snapshots
+                WHERE account_key = ?
+                ORDER BY captured_at ASC, rowid ASC
+                LIMIT ?
+                """,
+                (account_key, limit),
+            ).fetchall()
+        result = []
+        for row in rows:
+            payload = json.loads(row["payload_json"])
+            payload.update(
+                snapshot_id=row["snapshot_id"],
+                payload_hash=row["payload_hash"],
+            )
+            result.append(payload)
+        return result
 
     def prune_decision_packets_older_than(self, days: int) -> int:
         """Explicit, opt-in retention cleanup -- deletes decision packets
@@ -955,8 +1086,8 @@ class AssistantStore:
         proposal_id: str,
         *,
         trading_day: str,
-        notional: float,
-        max_daily_notional: float,
+        notional: Decimal | int | float | str,
+        max_daily_notional: Decimal | int | float | str,
         max_daily_orders: int,
     ) -> dict[str, Any]:
         """Atomically reserve one submission against persistent daily caps.
@@ -967,9 +1098,13 @@ class AssistantStore:
         repeatedly releasing the reservation. Only confirmed non-submission
         is released through mark_submission_failed_and_release().
         """
-        if not math.isfinite(notional) or notional <= 0:
+        notional_decimal = to_decimal(notional, name="notional")
+        max_daily_notional_decimal = to_decimal(
+            max_daily_notional, name="max_daily_notional"
+        )
+        if notional_decimal <= 0:
             raise ValueError(f"notional must be positive and finite, got {notional!r}.")
-        if not math.isfinite(max_daily_notional) or max_daily_notional <= 0:
+        if max_daily_notional_decimal <= 0:
             raise ValueError("max_daily_notional must be positive and finite.")
         if isinstance(max_daily_orders, bool) or not isinstance(max_daily_orders, int) or max_daily_orders <= 0:
             raise ValueError("max_daily_orders must be a positive integer.")
@@ -983,41 +1118,70 @@ class AssistantStore:
                 (proposal_id,),
             ).fetchone()
             if existing is not None:
+                existing_exact = to_decimal(
+                    existing["reserved_notional_text"]
+                    if existing["reserved_notional_text"]
+                    else existing["reserved_notional"],
+                    name="stored reserved_notional",
+                )
                 connection.commit()
                 return {
                     "proposal_id": proposal_id,
                     "trading_day": existing["trading_day"],
-                    "reserved_notional": existing["reserved_notional"],
+                    "reserved_notional": float(existing_exact),
+                    "reserved_notional_decimal": decimal_text(existing_exact),
                     "already_reserved": True,
                 }
-            totals = connection.execute(
-                "SELECT COUNT(*) AS order_count, COALESCE(SUM(reserved_notional), 0) AS notional "
+            reservations = connection.execute(
+                "SELECT reserved_notional, reserved_notional_text "
                 "FROM execution_reservations WHERE trading_day = ?",
                 (trading_day,),
-            ).fetchone()
-            next_count = int(totals["order_count"]) + 1
-            next_notional = float(totals["notional"]) + notional
+            ).fetchall()
+            reserved_total = sum(
+                (
+                    to_decimal(
+                        row["reserved_notional_text"]
+                        if row["reserved_notional_text"]
+                        else row["reserved_notional"],
+                        name="stored reserved_notional",
+                    )
+                    for row in reservations
+                ),
+                Decimal("0"),
+            )
+            next_count = len(reservations) + 1
+            next_notional = reserved_total + notional_decimal
             if next_count > max_daily_orders:
                 raise ValueError(
                     f"Daily order-count budget would be {next_count}, exceeding {max_daily_orders}."
                 )
-            if next_notional > max_daily_notional:
+            if next_notional > max_daily_notional_decimal:
                 raise ValueError(
                     f"Daily submitted notional would be ${next_notional:,.2f}, "
-                    f"exceeding ${max_daily_notional:,.2f}."
+                    f"exceeding ${max_daily_notional_decimal:,.2f}."
                 )
             connection.execute(
-                "INSERT INTO execution_reservations(proposal_id, trading_day, reserved_notional, created_at) "
-                "VALUES (?, ?, ?, ?)",
-                (proposal_id, trading_day, notional, now),
+                "INSERT INTO execution_reservations("
+                "proposal_id, trading_day, reserved_notional, "
+                "reserved_notional_text, created_at"
+                ") VALUES (?, ?, ?, ?, ?)",
+                (
+                    proposal_id,
+                    trading_day,
+                    float(notional_decimal),
+                    decimal_text(notional_decimal),
+                    now,
+                ),
             )
             connection.commit()
             return {
                 "proposal_id": proposal_id,
                 "trading_day": trading_day,
-                "reserved_notional": notional,
+                "reserved_notional": float(notional_decimal),
+                "reserved_notional_decimal": decimal_text(notional_decimal),
                 "daily_order_count": next_count,
-                "daily_reserved_notional": next_notional,
+                "daily_reserved_notional": float(next_notional),
+                "daily_reserved_notional_decimal": decimal_text(next_notional),
                 "already_reserved": False,
             }
         except Exception:
@@ -1041,11 +1205,11 @@ class AssistantStore:
         would drift by an hour twice a year.
         """
         with self._connect() as connection:
-            reserved = connection.execute(
-                "SELECT COUNT(*) AS order_count, COALESCE(SUM(reserved_notional), 0) AS notional "
+            reservations = connection.execute(
+                "SELECT reserved_notional, reserved_notional_text "
                 "FROM execution_reservations WHERE trading_day = ?",
                 (trading_day,),
-            ).fetchone()
+            ).fetchall()
             # Pre-filter to the 3 UTC dates that can possibly contain the
             # Eastern day (yesterday/today/tomorrow) so this stays an
             # indexed-ish scan rather than reading the whole journal.
@@ -1067,7 +1231,19 @@ class AssistantStore:
                 candidate_dates,
             ).fetchall()
 
-        filled_notional = 0.0
+        submitted_notional = sum(
+            (
+                to_decimal(
+                    row["reserved_notional_text"]
+                    if row["reserved_notional_text"]
+                    else row["reserved_notional"],
+                    name="stored reserved_notional",
+                )
+                for row in reservations
+            ),
+            Decimal("0"),
+        )
+        filled_notional = Decimal("0")
         for row in rows:
             try:
                 parsed = datetime.fromisoformat(str(row["event_at"]).replace("Z", "+00:00"))
@@ -1078,15 +1254,20 @@ class AssistantStore:
             if parsed.astimezone(_EASTERN).date().isoformat() != trading_day:
                 continue
             try:
-                filled_notional += abs(float(row["fill_qty"]) * float(row["fill_price"]))
-            except (TypeError, ValueError):
+                filled_notional += abs(
+                    to_decimal(row["fill_qty"], name="fill_qty")
+                    * to_decimal(row["fill_price"], name="fill_price")
+                )
+            except ValueError:
                 continue
 
         return {
             "trading_day": trading_day,
-            "submitted_order_count": int(reserved["order_count"]),
-            "submitted_notional": float(reserved["notional"]),
-            "filled_notional": filled_notional,
+            "submitted_order_count": len(reservations),
+            "submitted_notional": float(submitted_notional),
+            "submitted_notional_decimal": decimal_text(submitted_notional),
+            "filled_notional": float(filled_notional),
+            "filled_notional_decimal": decimal_text(filled_notional),
         }
 
     def release_execution_reservation(self, proposal_id: str) -> bool:

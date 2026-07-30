@@ -15,6 +15,7 @@ or care which source was used.
 from __future__ import annotations
 
 import math
+from decimal import Decimal
 from datetime import datetime, timezone
 
 import pandas as pd
@@ -34,6 +35,7 @@ from assistant.schemas import (
     UpcomingEvent,
 )
 from assistant.policy import TradingPolicy, load_policy
+from assistant.money import to_decimal
 from assistant.portfolio_analytics import compute_portfolio_analytics
 from assistant.research_registry import load_research_findings, registry_version
 
@@ -88,19 +90,23 @@ def build_portfolio_snapshot(
     # left NaN cash producing exactly the failure it was meant to stop --
     # check_policy_compliance() reported zero violations for a corrupt
     # portfolio.)
-    if not isinstance(cash, (int, float)) or isinstance(cash, bool) or not math.isfinite(cash):
+    try:
+        cash_decimal = to_decimal(cash, name="portfolio.cash")
+    except ValueError:
         raise ValueError(
             f"Portfolio cash must be a finite number, got {cash!r}. Refusing to build a snapshot whose "
             "total_equity would be NaN -- every exposure check downstream would silently pass."
+        ) from None
+    try:
+        buying_power_decimal = (
+            to_decimal(buying_power, name="portfolio.buying_power")
+            if buying_power is not None
+            else None
         )
-    if buying_power is not None and (
-        not isinstance(buying_power, (int, float))
-        or isinstance(buying_power, bool)
-        or not math.isfinite(buying_power)
-    ):
+    except ValueError:
         raise ValueError(
             f"Portfolio buying_power must be a finite number or None, got {buying_power!r}."
-        )
+        ) from None
 
     grouped: dict[str, dict] = {}
     order: list[str] = []
@@ -118,23 +124,32 @@ def build_portfolio_snapshot(
         # inconsistent-duplicate-price case.
         for field in ("shares", "entry_price", "current_price"):
             value = p[field]
-            if not isinstance(value, (int, float)) or isinstance(value, bool) or not math.isfinite(value):
+            try:
+                to_decimal(value, name=f"{ticker}.{field}")
+            except ValueError:
                 raise ValueError(
                     f"Position {ticker!r} has a non-finite/invalid {field}: {value!r}. Refusing to build "
                     "a portfolio snapshot from unusable data -- every exposure and proposal check "
                     "downstream would silently evaluate to False against NaN."
-                )
+                ) from None
+        shares_decimal = to_decimal(p["shares"], name=f"{ticker}.shares")
+        entry_price_decimal = to_decimal(p["entry_price"], name=f"{ticker}.entry_price")
+        current_price_decimal = to_decimal(p["current_price"], name=f"{ticker}.current_price")
         if ticker not in grouped:
-            grouped[ticker] = {"shares": 0.0, "cost": 0.0, "current_price": p["current_price"]}
+            grouped[ticker] = {
+                "shares": Decimal("0"),
+                "cost": Decimal("0"),
+                "current_price": current_price_decimal,
+            }
             order.append(ticker)
-        elif grouped[ticker]["current_price"] != p["current_price"]:
+        elif grouped[ticker]["current_price"] != current_price_decimal:
             raise ValueError(
                 f"Duplicate position rows for {ticker!r} report different current_price "
                 f"values ({grouped[ticker]['current_price']} vs {p['current_price']}) -- "
                 "refusing to silently aggregate inconsistent prices."
             )
-        grouped[ticker]["shares"] += p["shares"]
-        grouped[ticker]["cost"] += p["shares"] * p["entry_price"]
+        grouped[ticker]["shares"] += shares_decimal
+        grouped[ticker]["cost"] += shares_decimal * entry_price_decimal
 
     built = []
     for ticker in order:
@@ -143,26 +158,43 @@ def build_portfolio_snapshot(
         current_price = agg["current_price"]
         cost = agg["cost"]
         market_value = shares * current_price
-        entry_price = cost / shares if shares else 0.0
-        unrealized_pnl_pct = ((market_value - cost) / cost * 100) if cost else 0.0
+        entry_price = cost / shares if shares else Decimal("0")
+        unrealized_pnl_pct = (
+            (market_value - cost) / cost * Decimal("100")
+            if cost
+            else Decimal("0")
+        )
         built.append(
             PortfolioPosition(
                 ticker=ticker,
-                shares=shares,
-                entry_price=entry_price,
-                current_price=current_price,
-                market_value=round(market_value, 2),
-                unrealized_pnl_pct=round(unrealized_pnl_pct, 2),
+                shares=float(shares),
+                entry_price=float(entry_price),
+                current_price=float(current_price),
+                market_value=float(round(market_value, 2)),
+                unrealized_pnl_pct=float(round(unrealized_pnl_pct, 2)),
                 is_leveraged_etf=_classify_leveraged(ticker),
             )
         )
-    total_equity = cash + sum(p.market_value for p in built)
+    # Keep the snapshot invariant that total_equity equals cash plus the
+    # market values actually exposed on its positions, but sum those
+    # display-rounded values as Decimal rather than binary floats.
+    total_equity = cash_decimal + sum(
+        (
+            to_decimal(position.market_value)
+            for position in built
+        ),
+        Decimal("0"),
+    )
     return PortfolioSnapshot(
         positions=built,
-        cash=round(cash, 2),
-        total_equity=round(total_equity, 2),
+        cash=float(round(cash_decimal, 2)),
+        total_equity=float(round(total_equity, 2)),
         as_of=datetime.now(timezone.utc).date().isoformat(),
-        buying_power=round(buying_power, 2) if buying_power is not None else None,
+        buying_power=(
+            float(round(buying_power_decimal, 2))
+            if buying_power_decimal is not None
+            else None
+        ),
         source=source,
         account_mode=account_mode,
         open_orders=open_orders or [],
@@ -199,16 +231,22 @@ def build_portfolio_snapshot_from_alpaca() -> PortfolioSnapshot:
     positions = [
         {
             "ticker": p["ticker"],
-            "shares": p["shares"],
-            "entry_price": p["avg_entry_price"],
-            "current_price": p["current_price"],
+            "shares": p.get("shares_decimal", p["shares"]),
+            "entry_price": p.get(
+                "avg_entry_price_decimal", p["avg_entry_price"]
+            ),
+            "current_price": p.get(
+                "current_price_decimal", p["current_price"]
+            ),
         }
         for p in get_open_positions()
     ]
     return build_portfolio_snapshot(
         positions,
-        cash=account["cash"],
-        buying_power=account["buying_power"],
+        cash=account.get("cash_decimal", account["cash"]),
+        buying_power=account.get(
+            "buying_power_decimal", account["buying_power"]
+        ),
         source="alpaca",
         account_mode="paper" if account["paper"] else "live",
         open_orders=open_orders,
@@ -311,10 +349,15 @@ def get_relevant_signal_evidence(portfolio_tickers: list[str]) -> list[SignalEvi
 def get_upcoming_events(tickers: list[str], fetch_live: bool = False) -> list[UpcomingEvent]:
     """Return upcoming earnings or explicit UNAVAILABLE records."""
     if fetch_live and tickers:
-        from data.event_data import fetch_upcoming_earnings
+        from data.corporate_actions import fetch_upcoming_ex_dividends
+        from data.event_data import (
+            fetch_upcoming_earnings,
+            upcoming_quad_witching_dates,
+        )
 
         raw = fetch_upcoming_earnings(tickers)
-        return [
+        dividends = fetch_upcoming_ex_dividends(tickers)
+        events = [
             UpcomingEvent(
                 ticker=t,
                 event_type="earnings",
@@ -326,6 +369,35 @@ def get_upcoming_events(tickers: list[str], fetch_live: bool = False) -> list[Up
             )
             for t in tickers
         ]
+        events.extend(
+            UpcomingEvent(
+                ticker=t,
+                event_type="ex_dividend",
+                days_away=dividends[t]["days_away"],
+                status=(
+                    EvidenceStatus.EXPLORATORY
+                    if dividends[t]["available"]
+                    else EvidenceStatus.UNAVAILABLE
+                ),
+                event_date=dividends[t]["event_date"],
+                source=dividends[t]["source"],
+                fetched_at=dividends[t]["fetched_at"],
+            )
+            for t in tickers
+        )
+        events.extend(
+            UpcomingEvent(
+                ticker=event["ticker"],
+                event_type=event["event_type"],
+                days_away=event["days_away"],
+                status=EvidenceStatus.EXPLORATORY,
+                event_date=event["event_date"],
+                source=event["source"],
+                fetched_at=event["fetched_at"],
+            )
+            for event in upcoming_quad_witching_dates()
+        )
+        return events
     return [
         UpcomingEvent(ticker=t, event_type="earnings", days_away=None, status=EvidenceStatus.UNAVAILABLE)
         for t in tickers

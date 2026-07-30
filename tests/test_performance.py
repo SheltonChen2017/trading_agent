@@ -15,6 +15,7 @@ from datetime import datetime, timedelta, timezone
 import pytest
 
 from assistant.performance import (
+    Distribution,
     MIN_DAYS_FOR_MEANINGFUL_ANNUALIZATION,
     Observation,
     PerformanceError,
@@ -71,6 +72,53 @@ def test_a_single_lump_sum_purchase_has_no_timing_contribution():
     assert result["your_return"]["simple_return_pct"] == pytest.approx(-5.0, abs=1e-6)
     assert result["timing_contribution_pct"] == pytest.approx(0.0, abs=1e-6)
     assert "no measurable difference" in result["interpretation"]
+
+
+def test_cash_distribution_is_included_in_asset_and_investor_total_return():
+    result = position_performance(
+        [Fill("KO", "buy", 2, 100.0, D1)],
+        [(D1, 100.0), (D2, 100.0), (D3, 100.0)],
+        distributions=[
+            Distribution(
+                "KO",
+                ex_at=D2,
+                paid_at=D3,
+                amount_per_share=5.0,
+                cash_amount=10.0,
+                tax_classification="qualified",
+            )
+        ],
+    )
+
+    assert result["asset_return"]["total_return_pct"] == pytest.approx(
+        5.0, abs=1e-6
+    )
+    assert result["your_return"]["simple_return_pct"] == pytest.approx(
+        5.0, abs=1e-6
+    )
+    assert result["distributions"]["gross_cash"] == 10.0
+    assert result["distributions"]["cash_by_tax_classification"] == {
+        "qualified": 10.0
+    }
+
+
+def test_adjusted_price_series_does_not_double_count_distribution():
+    result = position_performance(
+        [Fill("KO", "buy", 1, 100.0, D1)],
+        [(D1, 100.0), (D3, 105.0)],
+        distributions=[
+            Distribution("KO", ex_at=D2, amount_per_share=5.0)
+        ],
+        prices_include_distributions=True,
+    )
+
+    assert result["asset_return"]["total_return_pct"] == pytest.approx(
+        5.0, abs=1e-6
+    )
+    assert (
+        result["asset_return"]["method"]
+        == "time_weighted_adjusted_price_total_return"
+    )
 
 
 def test_buying_high_before_a_decline_hurts_and_is_reported_as_such():
@@ -264,6 +312,25 @@ def test_timing_uses_period_equivalent_mwr_not_simple_roi():
     assert result["your_return"]["irr_annualized_pct"] == pytest.approx(13.4111, abs=1e-3)
     assert result["your_return"]["period_return_pct"] == pytest.approx(28.5987, abs=1e-3)
     assert result["timing_contribution_pct"] == pytest.approx(7.5987, abs=1e-3)
+
+
+def test_dividend_paid_after_terminal_valuation_is_not_a_future_cash_flow():
+    final_at = D1 + timedelta(days=30)
+    result = position_performance(
+        [Fill("AAPL", "buy", 1, 100.0, D1)],
+        [(D1, 100.0), (final_at, 99.0)],
+        distributions=[
+            Distribution(
+                "AAPL",
+                D1 + timedelta(days=15),
+                2.0,
+                paid_at=D1 + timedelta(days=45),
+            )
+        ],
+    )
+    assert result["asset_return"]["total_return_pct"] == pytest.approx(1.0)
+    assert result["distributions"]["gross_cash"] == 0.0
+    assert result["distributions"]["pending_cash_after_valuation"] == 2.0
 
 
 def test_money_weighted_return_needs_two_flows():

@@ -13,7 +13,10 @@ asked to derive these numbers from prose or raw tables.
 from __future__ import annotations
 
 import dataclasses
+from decimal import Decimal
 from enum import Enum
+
+from assistant.money import to_decimal
 
 
 class EvidenceStatus(str, Enum):
@@ -83,6 +86,18 @@ class PortfolioPosition:
     unrealized_pnl_pct: float
     is_leveraged_etf: bool
 
+    @property
+    def entry_price_decimal(self) -> Decimal:
+        return to_decimal(self.entry_price, name=f"{self.ticker}.entry_price")
+
+    @property
+    def current_price_decimal(self) -> Decimal:
+        return to_decimal(self.current_price, name=f"{self.ticker}.current_price")
+
+    @property
+    def market_value_decimal(self) -> Decimal:
+        return to_decimal(self.market_value, name=f"{self.ticker}.market_value")
+
 
 @dataclasses.dataclass
 class PortfolioSnapshot:
@@ -95,6 +110,20 @@ class PortfolioSnapshot:
     account_mode: str = "manual"
     open_orders: list[dict] = dataclasses.field(default_factory=list)
     open_orders_available: bool = True
+
+    @property
+    def cash_decimal(self) -> Decimal:
+        return to_decimal(self.cash, name="portfolio.cash")
+
+    @property
+    def total_equity_decimal(self) -> Decimal:
+        return to_decimal(self.total_equity, name="portfolio.total_equity")
+
+    @property
+    def buying_power_decimal(self) -> Decimal | None:
+        if self.buying_power is None:
+            return None
+        return to_decimal(self.buying_power, name="portfolio.buying_power")
 
 
 @dataclasses.dataclass

@@ -1,6 +1,7 @@
 """Tests for assistant/proposals.py -- generate_risk_reduction_proposals()
 and its total-exposure remediation (GPT review, 2026-07-31)."""
 import sys
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -9,6 +10,7 @@ from assistant.context_builder import build_portfolio_snapshot, build_risk_expos
 from assistant.policy import TradingPolicy
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.schemas import DecisionPacket, MarketRegime
+from assistant.tax_lots import Fill, build_ledger
 
 
 def _packet(positions: list[dict], cash: float) -> DecisionPacket:
@@ -147,6 +149,81 @@ def test_position_cap_breach_still_produces_a_proposal():
     proposals = generate_risk_reduction_proposals(packet, policy)
     assert proposals
     assert any("position exceeds" in r.lower() for p in proposals for r in p.reasons)
+
+
+def test_sell_proposal_includes_advisory_lot_method_comparison():
+    positions = [
+        {
+            "ticker": "AAA",
+            "shares": 100,
+            "entry_price": 100.0,
+            "current_price": 100.0,
+        }
+    ]
+    packet = _packet(positions, cash=0)
+    policy = _permissive_policy(max_position_pct=0.50)
+    now = datetime.now(timezone.utc)
+    ledger = build_ledger(
+        [
+            Fill(
+                "AAA",
+                "buy",
+                50,
+                80,
+                now - timedelta(days=500),
+                fill_id="old-low",
+            ),
+            Fill(
+                "AAA",
+                "buy",
+                50,
+                120,
+                now - timedelta(days=10),
+                fill_id="new-high",
+            ),
+        ]
+    )
+
+    proposal = generate_risk_reduction_proposals(
+        packet, policy, tax_lot_ledger=ledger
+    )[0]
+    advisory = proposal.expected_impact["tax_lot_advisory"]
+
+    assert advisory["available"]
+    assert advisory["advisory_only"]
+    assert advisory["methods"]["fifo"]["long_term_pnl"] > 0
+    assert advisory["methods"]["hifo"]["short_term_pnl"] < 0
+
+
+def test_missing_tax_coverage_never_blocks_or_changes_risk_reduction():
+    packet = _packet(
+        [
+            {
+                "ticker": "AAA",
+                "shares": 100,
+                "entry_price": 100.0,
+                "current_price": 100.0,
+            }
+        ],
+        cash=0,
+    )
+    policy = _permissive_policy(max_position_pct=0.50)
+    baseline = generate_risk_reduction_proposals(packet, policy)[0]
+    with_missing_tax = generate_risk_reduction_proposals(
+        packet,
+        policy,
+        tax_lot_ledger=None,
+        tax_lot_coverage={
+            "complete": False,
+            "reason": "pre-app fills missing",
+        },
+    )[0]
+
+    assert with_missing_tax.intent == baseline.intent
+    advisory = with_missing_tax.expected_impact["tax_lot_advisory"]
+    assert not advisory["available"]
+    assert advisory["advisory_only"]
+    assert "pre-app fills missing" in advisory["reason"]
 
 
 def test_leveraged_etf_cap_breach_still_produces_a_proposal():

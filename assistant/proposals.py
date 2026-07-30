@@ -9,6 +9,7 @@ from datetime import datetime, timedelta, timezone
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.schemas import DecisionPacket, PortfolioPosition
+from assistant.tax_lots import LotLedger, TaxLotError, compare_sale_bases
 from config import BASKETS
 from risk.execution_gate import TradeIntent
 
@@ -81,6 +82,9 @@ def generate_risk_reduction_proposals(
     packet: DecisionPacket,
     policy: TradingPolicy,
     ttl_minutes: int = 15,
+    *,
+    tax_lot_ledger: LotLedger | None = None,
+    tax_lot_coverage: dict | None = None,
 ) -> list[TradeProposal]:
     """
     Generate only exposure-reducing proposals.
@@ -240,6 +244,54 @@ def generate_risk_reduction_proposals(
             rationale=" ".join(reduction["reasons"]),
         )
         proposal_id = _stable_id(packet, policy, intent)
+        expected_impact = preview_trade_impact(
+            snapshot, ticker, "sell", shares, position.current_price
+        )
+        uncertainties = [
+            "Market orders can fill away from the displayed reference price.",
+        ]
+        if tax_lot_ledger is not None:
+            try:
+                tax_advisory = compare_sale_bases(
+                    tax_lot_ledger,
+                    ticker,
+                    qty=shares,
+                    price=position.current_price,
+                    when=now,
+                )
+                tax_advisory["available"] = True
+                tax_advisory["advisory_only"] = True
+                expected_impact["tax_lot_advisory"] = tax_advisory
+                uncertainties.append(
+                    "Tax-lot figures are advisory bookkeeping, never an "
+                    "execution gate; broker records and Form 1099-B remain "
+                    "authoritative."
+                )
+            except TaxLotError as exc:
+                expected_impact["tax_lot_advisory"] = {
+                    "available": False,
+                    "reason": str(exc),
+                    "advisory_only": True,
+                }
+                uncertainties.append(
+                    "Tax-lot advice is unavailable for this sale, but that "
+                    "must never delay a risk-reducing order."
+                )
+        else:
+            reason = (
+                (tax_lot_coverage or {}).get("reason")
+                or "complete lot history is unavailable"
+            )
+            expected_impact["tax_lot_advisory"] = {
+                "available": False,
+                "reason": reason,
+                "coverage": tax_lot_coverage or {},
+                "advisory_only": True,
+            }
+            uncertainties.append(
+                "Tax-lot advice is unavailable because complete lot coverage "
+                "could not be verified; this never blocks a risk-reducing sell."
+            )
         proposals.append(
             TradeProposal(
                 proposal_id=proposal_id,
@@ -254,18 +306,13 @@ def generate_risk_reduction_proposals(
                 price_timestamp=now.isoformat(),
                 reasons=reduction["reasons"],
                 evidence_status="deterministic_risk_policy",
-                expected_impact=preview_trade_impact(
-                    snapshot, ticker, "sell", shares, position.current_price
-                ),
+                expected_impact=expected_impact,
                 alternatives=[
                     "Take no action and explicitly accept the policy breach.",
                     "Reduce a different position contributing to the same exposure.",
                     "Update the versioned policy before generating a new proposal.",
                 ],
-                uncertainties=[
-                    "Market orders can fill away from the displayed reference price.",
-                    "Tax-lot and realized-tax optimization are not yet integrated.",
-                ],
+                uncertainties=uncertainties,
             )
         )
     return proposals

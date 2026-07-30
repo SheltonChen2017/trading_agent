@@ -155,6 +155,30 @@ def test_the_daily_notional_budget_is_simulated_across_legs():
                for v in results[proposals[2].proposal_id].violations)
 
 
+def test_daily_notional_decimal_boundary_does_not_reject_final_leg():
+    """0.1 + 0.1 + 0.1 is exactly the 0.3 cap in decimal arithmetic.
+
+    Binary-float accumulation made the third leg appear to exceed the cap,
+    so preflight disagreed with the user's configured monetary boundary.
+    """
+    packet = _packet(cash=1.0)
+    policy = _policy(
+        max_daily_submitted_notional=0.3,
+        max_open_orders=99,
+        max_daily_order_count=99,
+    )
+    proposals = [
+        _buy_proposal(packet, policy, "AAA", 1, 0.1),
+        _buy_proposal(packet, policy, "BBB", 1, 0.1),
+        _buy_proposal(packet, policy, "CCC", 1, 0.1),
+    ]
+    results = _run_preflight(
+        proposals, policy, packet, quote_price=0.1
+    )
+
+    assert _approvals(results, proposals) == [True, True, True]
+
+
 def test_budget_already_consumed_today_reduces_the_headroom():
     """Preflight must start from the PERSISTED usage, not from zero."""
     packet = _packet(cash=100_000.0)

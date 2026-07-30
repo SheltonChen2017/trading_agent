@@ -202,9 +202,52 @@ def test_bonferroni_denominators_match_the_documented_cell_counts():
         assert bonferroni_threshold(actual) < bonferroni_threshold(2)
 
 
+def test_the_plainly_named_significance_function_points_at_the_block_bootstrap():
+    """Documentation regression, deliberately a source test.
+
+    out_of_sample_significance()'s docstring opened "THE correct way to test
+    whether a signal's edge is statistically real" while resampling individual
+    ROWS -- exactly what bonferroni_threshold()'s own SECOND CAUTION, a few
+    dozen lines above it, warns against. The function with the most
+    authoritative name carried the most confident claim, so a future caller
+    reaching for the obvious name got the weakest check (independent review,
+    2026-07-30).
+
+    There is no behavioral assertion available here: the defect is which
+    function the docs send you to, which only the text can express.
+    """
+    from backtest.engine import out_of_sample_significance
+
+    doc = " ".join((out_of_sample_significance.__doc__ or "").split())
+    assert "THE correct way" not in doc, (
+        "out_of_sample_significance() must not claim to be the definitive "
+        "check -- it resamples rows and inflates significance."
+    )
+    assert "out_of_sample_significance_by_block()" in doc, (
+        "the docstring must send callers to the block bootstrap, which is "
+        "this project's standing bar for claiming an edge is real."
+    )
+    assert "NOT SUFFICIENT ON ITS OWN" in doc
+
+
+def test_the_bonferroni_default_documents_that_it_covers_one_signal_only():
+    """The default of 2 cannot detect its own misuse, so the docstring is the
+    only place a sweep author is warned."""
+    from backtest.engine import out_of_sample_significance
+
+    # Whitespace-collapsed: these phrases straddle line wraps in the source,
+    # and a docstring test that breaks on reflowing a paragraph is a nuisance
+    # rather than a guard.
+    doc = " ".join((out_of_sample_significance.__doc__ or "").split())
+    assert "ONE signal" in doc, "must say the default covers a single signal"
+    assert "total cell count" in doc, "must tell sweeps to pass the full cell count"
+
+
 if __name__ == "__main__":
     test_multi_signal_runners_derive_their_bonferroni_denominator()
     test_multi_signal_runners_do_not_pass_a_literal_n_tests_at_any_call_site()
     test_single_signal_runner_is_correctly_left_alone()
     test_bonferroni_denominators_match_the_documented_cell_counts()
+    test_the_plainly_named_significance_function_points_at_the_block_bootstrap()
+    test_the_bonferroni_default_documents_that_it_covers_one_signal_only()
     print("All significance-multiplicity tests passed.")

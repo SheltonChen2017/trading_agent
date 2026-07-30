@@ -9,6 +9,27 @@ from one source of truth instead of hardcoding values in three places.
 # names spread across sectors (tech, consumer, healthcare, financials,
 # energy/industrials, communication, utilities). More names -> more
 # flagged signals -> less noise in the backtest's win-rate/return stats.
+#
+# SURVIVORSHIP BIAS -- READ BEFORE INTERPRETING ANY BACKTEST FROM THIS LIST.
+# These are companies that exist TODAY. Anything that was delisted, acquired,
+# or went to zero inside a backtest window is structurally absent, so every
+# result computed over this universe is conditioned on survival. Confirmed
+# concretely: SIVB, SBNY and FRC all failed inside this project's own lookback
+# window and none of them are here; SBNY's ticker was later reused by an
+# unrelated listing, so it would not even be a clean stand-in. The practical
+# effect is small on RELATIVE edge findings (a signal's edge over its own
+# ticker's baseline) and larger on ABSOLUTE return figures, which are biased
+# upward. README.md quantifies this; the note lives here too because this is
+# where the list is actually read from (independent review, 2026-07-30).
+#
+# Before adding a ticker, verify it against real data (fetch_historical +
+# yf.Ticker(t).info) rather than assuming the symbol is right --
+# fetch_historical SILENTLY SKIPS tickers that return nothing, so a typo
+# vanishes instead of failing. See .claude/skills/real-data-check.
+# Checked 2026-07-30: SPCX (Space Exploration Technologies, ~$1.5T),
+# FISV (Fiserv) and XYZ (Block, Inc.) all resolve with full history. A review
+# flagged them as fabricated/renamed; that was wrong, and FI -- the symbol
+# suggested as FISV's replacement -- is the one that 404s.
 UNIVERSE = [
     # Original starter set
     "AAPL", "MSFT", "NVDA", "AMZN", "GOOGL", "META", "TSLA", "AMD", "JPM", "XOM",

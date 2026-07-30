@@ -1237,22 +1237,40 @@ def out_of_sample_significance(
     entry_timing: str = "next_open",
 ) -> pd.DataFrame:
     """
-    THE correct way to test whether a signal's edge is statistically
-    real: bootstraps significance SEPARATELY for the discovery period and
-    the confirmation (holdout) period, rather than pooling both together
-    (see the CAUTION in bonferroni_threshold()'s docstring for why
-    pooling is a trap — it already fooled a check in this project once).
+    Splits discovery from confirmation and bootstraps each SEPARATELY,
+    rather than pooling both together (see the CAUTION in
+    bonferroni_threshold()'s docstring for why pooling is a trap — it
+    already fooled a check in this project once).
+
+    NOT SUFFICIENT ON ITS OWN, despite the plain name. This docstring
+    used to open by declaring itself the definitive test of whether a
+    signal's edge is real, which contradicted the SECOND CAUTION in
+    bonferroni_threshold() a few dozen lines above: this function
+    resamples individual signal ROWS, treating same-date signals as
+    independent draws when they are typically driven by the same
+    market-wide move. That inflates significance. The function with the
+    most authoritative name and the most confident docstring was the one
+    the module elsewhere warns against (independent review, 2026-07-30).
+
+    Use `out_of_sample_significance_by_block()` for any claim that an
+    edge is real. That is this project's standing bar — block resampling
+    handles both cross-sectional correlation (same-date clustering) and
+    serial correlation, and by-date alone is not enough either. Reach for
+    THIS function only when signals genuinely cannot cluster in time.
 
     Only the CONFIRMATION row's `significant` flag is evidence the edge
     is real. The DISCOVERY row is informational only (how good did it
     look before checking) — never cite discovery-period significance on
     its own as confirmatory.
 
-    `n_tests` sets the Bonferroni correction denominator — default 2 (one
-    signal's dip + up). Override with the total cell count when this is
-    being called across multiple baskets/signals at once (see
-    `baskets.basket_out_of_sample_significance()`), so the correction
-    reflects everything actually being tested simultaneously.
+    `n_tests` sets the Bonferroni correction denominator. The default of
+    2 covers exactly ONE signal's dip + up and is wrong for anything
+    else: a sweep over signals x baskets x horizons must pass the total
+    cell count, or the correction is too lenient by one to two orders of
+    magnitude. That has happened here for real — a runner's denominator
+    was 10x too lenient (see tests/test_significance_multiplicity.py,
+    which pins derived denominators at the runner call sites precisely
+    because this default cannot detect its own misuse).
     """
     discovery, confirmation = _out_of_sample_own_ticker_detail(
         data, discovery_frac, hold_days, slippage_pct, return_z_threshold, volume_z_threshold, scan_fn, scan_kwargs,

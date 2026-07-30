@@ -567,6 +567,115 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
         restore()
 
 
+def test_recovered_pre_broker_claim_fences_a_worker_that_resumes():
+    """An old worker must not resurrect its proposal after recovery.
+
+    Exercise both recoverable states. Recovery releases proposal A's
+    ticker/side slot, proposal B immediately claims it, and then A's original
+    execution resumes at its next transition. A must lose the conditional
+    transition before reserving budget or contacting the broker.
+    """
+    from assistant.execution_service import recover_stale_claim
+    from assistant.proposal_status import (
+        APPROVED,
+        IN_FLIGHT_INTENT_STATUSES,
+        SUBMITTING,
+        VALIDATING,
+        VALIDATION_FAILED,
+    )
+
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_risk_reduction_proposals(packet, policy)[0]
+    captured, restore = _mock_execution_dependencies(
+        quote_price=proposal.reference_price
+    )
+    try:
+        for recovered_status, next_status in (
+            (VALIDATING, APPROVED),
+            (APPROVED, SUBMITTING),
+        ):
+            with tempfile.TemporaryDirectory() as temp:
+                store = AssistantStore(Path(temp) / "assistant.db")
+                original = proposal.to_dict()
+                replacement = proposal.to_dict()
+                replacement["proposal_id"] = (
+                    f"{proposal.proposal_id}-after-{recovered_status}"
+                )
+                replacement["idempotency_key"] = (
+                    f"{proposal.idempotency_key}-after-{recovered_status}"
+                )
+                store.save_proposal(original)
+                store.save_proposal(replacement)
+
+                real_transition = store.update_proposal_status_if_current
+                interleaved = {"done": False}
+
+                def transition_with_recovery(proposal_id, **kwargs):
+                    if (
+                        not interleaved["done"]
+                        and proposal_id == proposal.proposal_id
+                        and kwargs["expected_statuses"] == (recovered_status,)
+                        and kwargs["new_status"] == next_status
+                    ):
+                        interleaved["done"] = True
+                        old_timestamp = (
+                            datetime.now(timezone.utc) - timedelta(hours=2)
+                        ).isoformat()
+                        connection = sqlite3.connect(store.path)
+                        try:
+                            connection.execute(
+                                "UPDATE trade_proposals SET updated_at = ? "
+                                "WHERE proposal_id = ?",
+                                (old_timestamp, proposal.proposal_id),
+                            )
+                            connection.commit()
+                        finally:
+                            connection.close()
+                        recovered = recover_stale_claim(
+                            proposal.proposal_id, store
+                        )
+                        assert recovered["status"] == VALIDATION_FAILED
+                        competing_claim = store.claim_proposal(
+                            replacement["proposal_id"],
+                            expected_status="proposed",
+                            new_status=VALIDATING,
+                            conflicting_intent_statuses=IN_FLIGHT_INTENT_STATUSES,
+                        )
+                        assert competing_claim is not None
+                    return real_transition(proposal_id, **kwargs)
+
+                store.update_proposal_status_if_current = transition_with_recovery
+
+                try:
+                    execute_approved_paper_proposal(
+                        proposal.proposal_id,
+                        "approve",
+                        packet.portfolio,
+                        policy,
+                        store,
+                        now_et=datetime(
+                            2026, 7, 27, 10, 0, tzinfo=timezone.utc
+                        ),
+                    )
+                    assert False, "expected the recovered worker to lose its claim"
+                except ProposalExecutionError as exc:
+                    assert "lost its execution claim" in str(exc)
+
+                assert interleaved["done"] is True
+                assert captured == []
+                assert (
+                    store.get_proposal(proposal.proposal_id)["status"]
+                    == VALIDATION_FAILED
+                )
+                assert (
+                    store.get_proposal(replacement["proposal_id"])["status"]
+                    == VALIDATING
+                )
+    finally:
+        restore()
+
+
 def test_unsupported_order_type_is_refused_not_downgraded_to_a_market_order():
     # Independent review, 2026-07-29: the submit dispatch used to read
     # "limit, else market", so ANY other order type would have been

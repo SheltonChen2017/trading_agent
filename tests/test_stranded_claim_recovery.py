@@ -229,6 +229,33 @@ def test_readiness_ignores_a_claim_that_is_still_in_flight():
         assert check["detail"] == "none"
 
 
+def test_readiness_fails_closed_when_a_claim_age_is_unreadable():
+    """A malformed timestamp must remain visible as an unresolved block.
+
+    Silently dropping it reports readiness while the row still holds its
+    ticker/side indefinitely, and recovery cannot prove that it is stale.
+    """
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-corrupt", VALIDATING))
+        connection = sqlite3.connect(store.path)
+        try:
+            connection.execute(
+                "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
+                ("not-a-timestamp", "tp-corrupt"),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+
+        report = _readiness(store)
+        check = _named(report, "stranded_pre_broker_claims")
+        assert check["ok"] is False
+        assert "tp-corrupt" in check["detail"]
+        assert "unreadable updated_at" in check["detail"]
+        assert "repair" in check["detail"]
+        assert report["ready"] is False
+
+
 def test_readiness_is_clean_with_no_pre_broker_claims():
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
         store = _store(temp, _proposal("tp-fresh"))

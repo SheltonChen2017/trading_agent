@@ -204,6 +204,7 @@ import json
 import math
 import os
 from datetime import datetime, timedelta, timezone
+from typing import Any
 
 from assistant.order_lifecycle import (
     journal_broker_order_update,
@@ -248,6 +249,10 @@ class ProposalExecutionError(RuntimeError):
     pass
 
 
+class _ProposalClaimLostError(ProposalExecutionError):
+    """The worker's pre-broker claim was revoked before its next transition."""
+
+
 class PolicyOverridableBlockError(ProposalExecutionError):
     """Raised instead of a plain ProposalExecutionError when EVERY
     violation on the rejected validation is override-eligible (see
@@ -273,6 +278,39 @@ class PolicyOverridableBlockError(ProposalExecutionError):
         super().__init__(message)
         self.overridable_violations = overridable_violations
         self.conditions_changed = conditions_changed
+
+
+def _transition_pre_broker_claim(
+    store: AssistantStore,
+    proposal_id: str,
+    *,
+    expected_status: str,
+    new_status: str,
+    **updates: Any,
+) -> dict[str, Any]:
+    """Advance a proposal only while this worker still owns its claim.
+
+    Stale-claim recovery can move a long-running worker's proposal to
+    ``validation_failed`` and release its ticker/side slot. The worker may
+    merely have been paused rather than dead, so every later pre-broker
+    transition must be conditional. Once recovery wins, this fences the old
+    worker out before it can reserve budget or contact the broker.
+    """
+    transitioned = store.update_proposal_status_if_current(
+        proposal_id,
+        expected_statuses=(expected_status,),
+        new_status=new_status,
+        **updates,
+    )
+    if transitioned is not None:
+        return transitioned
+    current = store.get_proposal(proposal_id)
+    current_status = None if current is None else current.get("status")
+    raise _ProposalClaimLostError(
+        f"Proposal {proposal_id} lost its execution claim while transitioning "
+        f"{expected_status!r} -> {new_status!r} (current status={current_status!r}). "
+        "Refusing to continue, reserve execution budget, or contact the broker."
+    )
 
 
 def _broker_absence_is_old_enough(claimed: dict, *, now: datetime) -> bool:
@@ -1125,9 +1163,11 @@ def execute_approved_paper_proposal(
                     and previous_reviewed is not None
                     and previous_reviewed.get("review_digest") != current_digest
                 )
-                store.update_proposal_status(
+                _transition_pre_broker_claim(
+                    store,
                     proposal_id,
-                    POLICY_OVERRIDE_AVAILABLE,
+                    expected_status=VALIDATING,
+                    new_status=POLICY_OVERRIDE_AVAILABLE,
                     violations=list(validation.violations),
                     reviewed_override={
                         "intent_fingerprint": intent_fingerprint(intent),
@@ -1179,11 +1219,19 @@ def execute_approved_paper_proposal(
             # what was previously reviewed: fall through to
             # authorize_overridden_trade_intent() below instead of the
             # normal approved path.
+    except _ProposalClaimLostError:
+        raise
     except PolicyOverridableBlockError:
         raise
     except ProposalExecutionError as exc:
         violations = list(validation.violations) if validation is not None and not validation.approved else [str(exc)]
-        store.update_proposal_status(proposal_id, BLOCKED, violations=violations)
+        _transition_pre_broker_claim(
+            store,
+            proposal_id,
+            expected_status=VALIDATING,
+            new_status=BLOCKED,
+            violations=violations,
+        )
         raise
     except Exception as exc:
         # Something genuinely unexpected (not a validation/policy
@@ -1191,14 +1239,22 @@ def execute_approved_paper_proposal(
         # "validating" forever with no record of why. Distinct status
         # from "blocked" so this is visibly different from an ordinary
         # policy rejection in the History tab / store.
-        store.update_proposal_status(proposal_id, VALIDATION_FAILED, error=str(exc))
+        _transition_pre_broker_claim(
+            store,
+            proposal_id,
+            expected_status=VALIDATING,
+            new_status=VALIDATION_FAILED,
+            error=str(exc),
+        )
         raise
 
     if validation.approved:
         authorization = authorize_trade_intent(intent, validation)
-        store.update_proposal_status(
+        _transition_pre_broker_claim(
+            store,
             proposal_id,
-            APPROVED,
+            expected_status=VALIDATING,
+            new_status=APPROVED,
             approved_at=now_utc.isoformat(),
             violations=[],
         )
@@ -1209,9 +1265,11 @@ def execute_approved_paper_proposal(
         # violations are recorded on the proposal rather than silently
         # disappearing into an ordinary approval.
         authorization = authorize_overridden_trade_intent(intent, validation)
-        store.update_proposal_status(
+        _transition_pre_broker_claim(
+            store,
             proposal_id,
-            APPROVED,
+            expected_status=VALIDATING,
+            new_status=APPROVED,
             approved_at=now_utc.isoformat(),
             violations=[],
             policy_override={
@@ -1224,7 +1282,12 @@ def execute_approved_paper_proposal(
     # submission. If the process dies after this write, startup polling can
     # safely prove broker absence instead of leaving an "approved" proposal
     # with a stranded reservation and no recovery path.
-    store.update_proposal_status(proposal_id, SUBMITTING)
+    _transition_pre_broker_claim(
+        store,
+        proposal_id,
+        expected_status=APPROVED,
+        new_status=SUBMITTING,
+    )
 
     try:
         store.reserve_execution_budget(
@@ -1745,9 +1808,13 @@ def recover_stale_claim(
     is cheap and re-runs every check against current prices.
 
     Uses the same stale-guard + single conditional UPDATE as
-    recover_stale_reconciliation(), so a genuinely in-flight validation (one
-    claimed moments ago) is left alone and two concurrent recoveries cannot
-    both win.
+    recover_stale_reconciliation(), so a recently claimed validation is left
+    alone and two concurrent recoveries cannot both win. Staleness is not
+    proof that the original worker is dead, however: it may merely be paused.
+    Safety therefore also depends on execute_approved_paper_proposal() using
+    _transition_pre_broker_claim() for every later transition. If this recovery
+    wins, those conditional writes fence the old worker out before any budget
+    reservation or broker call.
     """
     if (
         isinstance(stale_after_seconds, bool)

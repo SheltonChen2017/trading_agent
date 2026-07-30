@@ -137,26 +137,46 @@ def transaction_readiness(
 
     # A claim only counts as stranded once it is older than the recovery
     # threshold -- a proposal being validated RIGHT NOW is in flight, not stuck,
-    # and must not fail readiness for everyone else.
-    stranded = [
-        proposal
-        for proposal in store.list_proposals_by_statuses(STRANDED_CLAIM_STATUSES)
-        if (parsed := _parse_timestamp(proposal.get("updated_at"))) is not None
-        and now - parsed > timedelta(seconds=stale_claim_seconds)
-    ]
+    # and must not fail readiness for everyone else. An unreadable timestamp is
+    # different: its age cannot be proved, so fail closed and surface the row
+    # instead of silently omitting a ticker/side block from the report.
+    stranded: list[dict[str, Any]] = []
+    unreadable_claim_ages: list[dict[str, Any]] = []
+    for proposal in store.list_proposals_by_statuses(STRANDED_CLAIM_STATUSES):
+        parsed = _parse_timestamp(proposal.get("updated_at"))
+        if parsed is None:
+            unreadable_claim_ages.append(proposal)
+        elif now - parsed > timedelta(seconds=stale_claim_seconds):
+            stranded.append(proposal)
+    claim_age_issues = bool(stranded or unreadable_claim_ages)
+    detail_parts: list[str] = []
+    if stranded:
+        detail_parts.append(
+            "stale: " + ", ".join(
+                f"{p['proposal_id']}:{p['status']}" for p in stranded
+            )
+        )
+    if unreadable_claim_ages:
+        detail_parts.append(
+            "unreadable updated_at: " + ", ".join(
+                f"{p['proposal_id']}:{p['status']}={p.get('updated_at')!r}"
+                for p in unreadable_claim_ages
+            )
+        )
+    if stranded:
+        detail_parts.append(
+            "stale entries hold their ticker/side against new proposals; "
+            "clear with `recover-stale-claim <proposal_id>`"
+        )
+    if unreadable_claim_ages:
+        detail_parts.append(
+            "repair unreadable timestamp metadata before trading"
+        )
     checks.append(
         _check(
             "stranded_pre_broker_claims",
-            not stranded,
-            (
-                "none"
-                if not stranded
-                else ", ".join(
-                    f"{p['proposal_id']}:{p['status']}" for p in stranded
-                )
-                + " -- these hold their ticker/side against new proposals; "
-                "clear with `recover-stale-claim <proposal_id>`."
-            ),
+            not claim_age_issues,
+            "none" if not claim_age_issues else "; ".join(detail_parts) + ".",
         )
     )
 

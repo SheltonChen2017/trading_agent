@@ -6,6 +6,8 @@ review finding #8, 2026-07-29). Run with: python -m pytest tests/ -v
 import json
 import sys
 import tempfile
+
+import pytest
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -389,6 +391,57 @@ if __name__ == "__main__":
     print("All research registry tests passed.")
 
 
+def _provenance_set_definitions(source: str) -> list[int]:
+    """Line numbers in `source` that DEFINE the provenance status set.
+
+    Extracted so the detector is testable against synthetic source. Widening
+    it from `ast.Assign` to also cover `ast.AnnAssign` was unverifiable on the
+    repo scan alone: the one real definition is a plain assignment, so
+    narrowing it back passed the entire suite. Annotated assignments are used
+    throughout this codebase (`IN_FLIGHT_INTENT_STATUSES: tuple[str, ...] =
+    ...`), so a re-introduced duplicate written that way is exactly the form
+    most likely to slip through (2026-07-30).
+    """
+    import ast
+
+    found = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+        else:
+            continue
+        for target in targets:
+            if getattr(target, "id", "").lstrip("_") == "STATUSES_REQUIRING_PROVENANCE":
+                found.append(node.lineno)
+    return found
+
+
+@pytest.mark.parametrize(
+    "snippet",
+    [
+        "STATUSES_REQUIRING_PROVENANCE = frozenset({A, B})",
+        "_STATUSES_REQUIRING_PROVENANCE = {A, B}",
+        # Annotated -- an ast.AnnAssign, invisible to an Assign-only walk.
+        "STATUSES_REQUIRING_PROVENANCE: frozenset[str] = frozenset({A})",
+        "_STATUSES_REQUIRING_PROVENANCE: tuple[str, ...] = (A, B)",
+    ],
+)
+def test_the_definition_detector_sees_every_assignment_form(snippet):
+    assert _provenance_set_definitions(snippet), (
+        "this defines the provenance set but the detector does not see it"
+    )
+
+
+def test_the_definition_detector_ignores_reads_and_imports():
+    """Importing or reading the set is correct usage, not a second definition."""
+    assert _provenance_set_definitions(
+        "from assistant.schemas import STATUSES_REQUIRING_PROVENANCE\n"
+        "if status in STATUSES_REQUIRING_PROVENANCE: pass"
+    ) == []
+
+
 def test_the_provenance_status_set_has_exactly_one_definition():
     """schemas.py and research_registry.py each kept their own copy, hand-synced
     via a comment. A status added to one and not the other would require
@@ -396,26 +449,13 @@ def test_the_provenance_status_set_has_exactly_one_definition():
     rule always produces (2026-07-30). A source test because the defect is a
     second definition existing, which no behavioural assertion can see.
     """
-    import ast
     from pathlib import Path
 
     repo = Path(__file__).resolve().parent.parent
     definitions = []
     for path in (repo / "assistant").rglob("*.py"):
-        tree = ast.parse(path.read_text(encoding="utf-8"))
-        for node in ast.walk(tree):
-            if isinstance(node, (ast.Assign, ast.AnnAssign)):
-                targets = (
-                    node.targets
-                    if isinstance(node, ast.Assign)
-                    else [node.target]
-                )
-                for target in targets:
-                    name = getattr(target, "id", "")
-                    if name.lstrip("_") == "STATUSES_REQUIRING_PROVENANCE":
-                        definitions.append(
-                            f"{path.relative_to(repo).as_posix()}:{node.lineno}"
-                        )
+        for lineno in _provenance_set_definitions(path.read_text(encoding="utf-8")):
+            definitions.append(f"{path.relative_to(repo).as_posix()}:{lineno}")
     assert len(definitions) == 1, (
         f"expected exactly one definition of the provenance status set, found: {definitions}"
     )

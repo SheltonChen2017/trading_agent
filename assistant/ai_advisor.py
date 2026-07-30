@@ -510,7 +510,7 @@ def _unsupported_numbers(text: str, source_text: str) -> list[str]:
 
 
 def _reject_unsafe_prose(
-    text: str, allowed_tickers: set[str], source_text: str | None = None
+    text: str, allowed_tickers: set[str], *, source_text: str
 ) -> str | None:
     """
     Deterministic guard for the free-text (non-allocation) AI surfaces:
@@ -529,8 +529,19 @@ def _reject_unsafe_prose(
     2. The unknown-ticker check: any ticker outside the verified set is
        ungrounded by construction, since these callers only pass
        already-verified tickers.
-    3. When `source_text` is supplied, every NUMBER in the output must appear
-       in the source. See _unsupported_numbers().
+    3. Every NUMBER in the output must appear in `source_text`. See
+       _unsupported_numbers().
+
+    `source_text` is REQUIRED and keyword-only, deliberately. It used to
+    default to None, which silently skipped check 3 -- and two of the three
+    callers (similar-ticker reasons, recommended-ticker curation) omitted it,
+    so the system prompt's promise that "every number you write will be checked
+    against the input and discarded if it doesn't match" was simply false on
+    those surfaces (independent review, 2026-07-30). Making it required means a
+    new prose surface that forgets grounding fails with a TypeError at import
+    of the first call rather than shipping an unchecked number to the user. A
+    caller with genuinely no source passes "" -- which grounds nothing and so
+    rejects every number, the correct fail-closed reading of "no source".
 
     WHAT THIS DOES NOT DO -- deliberately named `_reject_unsafe_prose`, not
     "ungrounded", because it cannot verify factual grounding in general. A
@@ -555,10 +566,9 @@ def _reject_unsafe_prose(
         return "contains trade-action/advice language"
     if _mentions_unknown_ticker(text, allowed_tickers):
         return "mentions a ticker outside the verified candidate set"
-    if source_text is not None:
-        unsupported = _unsupported_numbers(text, source_text)
-        if unsupported:
-            return f"cites number(s) absent from the source data: {', '.join(unsupported[:5])}"
+    unsupported = _unsupported_numbers(text, source_text)
+    if unsupported:
+        return f"cites number(s) absent from the source data: {', '.join(unsupported[:5])}"
     return None
 
 
@@ -720,6 +730,9 @@ def suggest_similar_tickers(
 
     client = anthropic.Anthropic()
     universe_list = ", ".join(sorted(config.UNIVERSE))
+    # Built once and used BOTH as the model's input and as the grounding source
+    # for its output, so the two can never drift apart.
+    cart_prompt = f"Tickers already in the cart: {', '.join(cart_tickers)}"
     input_hash = _input_hash(cart_tickers, max_suggestions)
     start = time.monotonic()
     try:
@@ -738,7 +751,7 @@ def suggest_similar_tickers(
                 "confident a ticker is real, do not include it. "
                 f"Return at most {max_suggestions} suggestions."
             ),
-            messages=[{"role": "user", "content": f"Tickers already in the cart: {', '.join(cart_tickers)}"}],
+            messages=[{"role": "user", "content": cart_prompt}],
         )
         text = next((block.text for block in response.content if block.type == "text"), None)
         if not text:
@@ -757,7 +770,16 @@ def suggest_similar_tickers(
         kept = []
         for suggestion in suggestions:
             allowed = cart_upper | {str(suggestion.get("ticker", "")).upper()}
-            rejection = _reject_unsafe_prose(str(suggestion.get("reason", "")), allowed)
+            # source_text was previously omitted here, so _unsupported_numbers()
+            # never ran and a reason could state any figure it liked ("AMD grew
+            # revenue 45% last quarter") while the system prompt promised every
+            # number was checked (independent review, 2026-07-30). The cart
+            # prompt contains no figures, so in practice this rejects ANY number
+            # in a similarity rationale -- which is correct: nothing in this
+            # call's input could support one.
+            rejection = _reject_unsafe_prose(
+                str(suggestion.get("reason", "")), allowed, source_text=cart_prompt,
+            )
             if rejection is None:
                 kept.append(suggestion)
         _record_run(
@@ -786,6 +808,9 @@ def curate_recommended_tickers(candidates: list, store: AssistantStore | None = 
 
     client = anthropic.Anthropic()
     lines = [f"- {c.ticker} ({c.reason_category}): {c.detail}" for c in candidates]
+    # As in suggest_similar_tickers: one string, used as both the prompt and the
+    # grounding source, so the guard checks against exactly what the model saw.
+    candidate_block = "Candidates:\n" + "\n".join(lines)
     input_hash = _input_hash([c.ticker for c in candidates])
     start = time.monotonic()
     try:
@@ -800,11 +825,14 @@ def curate_recommended_tickers(candidates: list, store: AssistantStore | None = 
                 "do not add price predictions, trading recommendations, or facts not present "
                 "in the list. Do not include internal or system XML tags in your response."
             ),
-            messages=[{"role": "user", "content": "Candidates:\n" + "\n".join(lines)}],
+            messages=[{"role": "user", "content": candidate_block}],
         )
         text = next((block.text for block in response.content if block.type == "text"), None)
         if text:
-            rejection = _reject_unsafe_prose(text, {str(c.ticker).upper() for c in candidates})
+            rejection = _reject_unsafe_prose(
+                text, {str(c.ticker).upper() for c in candidates},
+                source_text=candidate_block,
+            )
             if rejection:
                 _record_run(
                     store, "curate_recommended_tickers", _CURATE_RECOMMENDED_PROMPT_VERSION,

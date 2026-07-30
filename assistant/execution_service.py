@@ -1707,3 +1707,87 @@ def recover_stale_reconciliation(
             "and is presumed to be a genuinely in-flight reconciliation, not stranded."
         )
     return recovered
+
+
+# Statuses a proposal can be stranded in BEFORE anything was ever handed to the
+# broker. submit_approved_proposal() writes "submitting" and only then calls
+# out, so a row still sitting in "validating"/"approved" provably has no broker
+# order behind it -- which is what makes recovering them safe, unlike every
+# post-submission status.
+PRE_BROKER_STRANDED_STATUSES: tuple[str, ...] = (VALIDATING, APPROVED)
+
+
+def recover_stale_claim(
+    proposal_id: str, store: AssistantStore, stale_after_seconds: int = 900,
+) -> dict:
+    """
+    Releases a proposal stranded in a PRE-BROKER status after a process died
+    between claiming it and its next write.
+
+    Why this is needed, and why it did not used to be: an ordinary exception
+    during validation is already caught and marked "validation_failed", so this
+    only matters when the PROCESS died outright (SIGKILL, power loss, a
+    Streamlit restart mid-approval). Such a row used to be a harmless orphan --
+    the user simply generated a new proposal.
+
+    It stopped being harmless when claim_proposal() started holding a
+    ticker+side slot across IN_FLIGHT_INTENT_STATUSES to close the
+    cross-proposal duplicate race (2026-07-30). "validating" and "approved" are
+    in that set, so one stranded row silently blocked EVERY future proposal for
+    that ticker and side, and nothing could clear it:
+    recover_stale_reconciliation() only accepts "reconciling", expiry sweeps
+    only touch "proposed", and no CLI command reached it. The only remedy was
+    hand-editing SQLite. Found by reviewing the change that caused it.
+
+    Recovers to "validation_failed", not "proposed": the row WAS claimed, and
+    silently making it approvable again would erase that a human-initiated
+    attempt vanished mid-flight. The user regenerates a fresh proposal, which
+    is cheap and re-runs every check against current prices.
+
+    Uses the same stale-guard + single conditional UPDATE as
+    recover_stale_reconciliation(), so a genuinely in-flight validation (one
+    claimed moments ago) is left alone and two concurrent recoveries cannot
+    both win.
+    """
+    if (
+        isinstance(stale_after_seconds, bool)
+        or not isinstance(stale_after_seconds, int)
+        or stale_after_seconds <= 0
+    ):
+        raise ValueError(
+            f"stale_after_seconds must be a positive int, got {stale_after_seconds!r} -- "
+            "a zero or negative value would make every claim look stale immediately, "
+            "defeating the guard."
+        )
+    now = datetime.now(timezone.utc)
+    cutoff = (now - timedelta(seconds=stale_after_seconds)).isoformat()
+    for status in PRE_BROKER_STRANDED_STATUSES:
+        recovered = store.reclaim_stale_status(
+            proposal_id,
+            expected_status=status,
+            new_status=VALIDATION_FAILED,
+            stale_before=cutoff,
+            extra_updates={
+                "recovered_at": now.isoformat(),
+                "error": (
+                    f"Recovered from a stale {status!r} status (no update for at least "
+                    f"{stale_after_seconds}s, most likely a process crash before submission). "
+                    "No broker order exists for this proposal -- that status is written before "
+                    "any broker call. Marked 'validation_failed' so it stops holding this "
+                    "ticker/side against new proposals; generate a fresh one."
+                ),
+            },
+        )
+        if recovered is not None:
+            return recovered
+
+    current = store.get_proposal(proposal_id)
+    if current is None:
+        raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
+    raise ProposalExecutionError(
+        f"Proposal {proposal_id} is not a stale pre-broker claim (status={current['status']!r}) -- "
+        f"either it is not in {' / '.join(PRE_BROKER_STRANDED_STATUSES)}, or it was claimed less "
+        f"than {stale_after_seconds}s ago and is presumed genuinely in flight. Post-submission "
+        "statuses are NOT recoverable this way: use reconcile_submission() or "
+        "recover_stale_reconciliation(), which never assume a broker order is absent."
+    )

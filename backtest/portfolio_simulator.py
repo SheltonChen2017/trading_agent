@@ -70,7 +70,6 @@ from __future__ import annotations
 
 from typing import Callable
 
-import numpy as np
 import pandas as pd
 
 from config import BACKTEST_HOLD_DAYS, RETURN_Z_THRESHOLD, ROLLING_WINDOW, SLIPPAGE_PCT, VOLUME_Z_THRESHOLD

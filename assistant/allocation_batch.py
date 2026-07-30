@@ -54,7 +54,7 @@ allow bulk policy overrides").
 from __future__ import annotations
 
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Callable
 
 from assistant.context_builder import build_portfolio_snapshot_from_alpaca

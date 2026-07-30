@@ -33,7 +33,6 @@ from data.market_data import fetch_historical
 from strategies.leverage_rotation import (
     buy_and_hold,
     cagr_pct,
-    max_drawdown_pct,
     simulate_leverage_rotation,
 )
 

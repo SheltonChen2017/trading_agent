@@ -3,7 +3,7 @@ Sanity tests for signals/pead.py. Run with: python -m pytest tests/ -v
 (or `python tests/test_pead.py` for a quick manual check).
 
 Uses hand-built `earnings_data` dicts (bypassing the network-dependent
-data.earnings_data.fetch_earnings_surprises(), same pattern as the rest
+data.earnings_data.fetch_earnings_history(), same pattern as the rest
 of this project not unit-testing yfinance calls directly) so the
 matching/threshold logic is fully testable in isolation.
 """

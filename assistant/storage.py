@@ -965,6 +965,83 @@ class AssistantStore:
             orders.append(order)
         return orders
 
+    def list_fills(self) -> list[dict[str, Any]]:
+        """
+        Every executed fill this app knows about, oldest first, as
+        `{ticker, side, qty, price, at, fill_id, order_id, proposal_id}`.
+
+        Reads out of the append-only `broker_order_events` journal rather than a
+        separate lots table, so the tax-lot ledger has no second source of truth
+        to drift from and can always be rebuilt by replay
+        (`assistant.tax_lots.build_ledger`).
+
+        Two event shapes have to be reconciled. The trade-update STREAM delivers
+        incremental fills (`fill_qty`/`fill_price` -- one event per execution),
+        while POLL reconciliation only ever sees the broker's cumulative
+        `filled_qty`/`filled_avg_price`. Incremental values are preferred when
+        present. For an order seen only through polling, one fill is emitted at
+        the final cumulative quantity and average price: exactly right for a
+        single-fill order, and for an order filled in several pieces it collapses
+        them into one lot at the average -- which is what brokers report as the
+        lot anyway, so no basis information is lost.
+
+        IMPORTANT: covers only fills this app placed and journaled. Positions
+        bought before the app existed, or through the Alpaca UI, produce no
+        events and therefore no lots. Callers must not present a ledger built
+        from these fills as a complete account history -- compare
+        `shares_held()` against the broker's reported position to detect the gap.
+        """
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT e.event_id, e.order_id, e.proposal_id, e.event_at,
+                       e.fill_qty, e.fill_price, e.filled_qty, e.filled_avg_price,
+                       tp.payload_json AS proposal_payload_json
+                FROM broker_order_events e
+                LEFT JOIN trade_proposals tp ON tp.proposal_id = e.proposal_id
+                ORDER BY e.event_at ASC, e.rowid ASC
+                """
+            ).fetchall()
+
+        fills: list[dict[str, Any]] = []
+        cumulative_only: dict[str, dict[str, Any]] = {}
+        saw_incremental: set[str] = set()
+
+        for row in rows:
+            intent = {}
+            if row["proposal_payload_json"]:
+                intent = json.loads(row["proposal_payload_json"]).get("intent") or {}
+            ticker, side = intent.get("ticker"), intent.get("side")
+            if not ticker or side not in ("buy", "sell"):
+                continue  # cannot attribute a fill without a ticker and side
+
+            qty, price = row["fill_qty"], row["fill_price"]
+            if qty and price:
+                saw_incremental.add(row["order_id"])
+                fills.append({
+                    "ticker": ticker, "side": side, "qty": float(qty), "price": float(price),
+                    "at": row["event_at"], "fill_id": row["event_id"],
+                    "order_id": row["order_id"], "proposal_id": row["proposal_id"],
+                })
+                continue
+
+            if row["filled_qty"] and row["filled_avg_price"]:
+                # Keep the LAST cumulative snapshot per order; only used if no
+                # incremental events ever arrived for that order.
+                cumulative_only[row["order_id"]] = {
+                    "ticker": ticker, "side": side,
+                    "qty": float(row["filled_qty"]), "price": float(row["filled_avg_price"]),
+                    "at": row["event_at"], "fill_id": f"{row['order_id']}-cumulative",
+                    "order_id": row["order_id"], "proposal_id": row["proposal_id"],
+                }
+
+        for order_id, fill in cumulative_only.items():
+            if order_id not in saw_incremental:
+                fills.append(fill)
+
+        fills.sort(key=lambda f: (f["at"], f["fill_id"]))
+        return fills
+
     def create_allocation_batch(
         self, batch_id: str, proposal_ids: list[str], intended_total_notional: float,
     ) -> dict[str, Any]:

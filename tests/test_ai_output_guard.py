@@ -193,6 +193,72 @@ def test_guard_without_source_text_still_applies_the_other_two_checks():
     assert _reject_unsafe_prose("NVDA is in the semiconductor category.", {"NVDA"}) is None
 
 
+
+# --- round 3: decimal-safe numeric canonicalization -----------------------
+
+def test_decimal_point_is_not_a_formatting_artifact():
+    """Deleting the decimal point changed VALUE, not formatting: 3.05 compared
+    equal to 305 and 0.05 to 5, so a model could turn a real figure into a
+    fabricated one and still pass (independent review, 2026-07-29)."""
+    assert _unsupported_numbers("EPS was 305", "EPS was 3.05") == ["305"]
+    assert _unsupported_numbers("growth was 5 percent", "growth was 0.05 percent") == ["5"]
+    assert _unsupported_numbers("value 30", "value 3.0") == ["30"]
+
+
+def test_thousands_separators_still_match_either_way():
+    assert _unsupported_numbers("revenue was 30,000", "revenue was 30000") == []
+    assert _unsupported_numbers("revenue was 30000", "revenue was 30,000") == []
+
+
+def test_trailing_and_leading_zeros_are_formatting_only():
+    """The old normalization ALSO produced a false positive here -- it flagged
+    3.050 against a source 3.05 as invented."""
+    assert _unsupported_numbers("value 3.050", "value 3.05") == []
+    assert _unsupported_numbers("value 3.05", "value 3.050") == []
+    assert _unsupported_numbers("value 0.05", "value .05") == []
+    assert _unsupported_numbers("value 0", "value 0.0") == []
+
+
+def test_sign_is_significant():
+    assert _unsupported_numbers("fell -3.05", "rose 3.05") == ["-3.05"]
+    assert _unsupported_numbers("fell -3.05", "fell -3.05") == []
+
+
+def test_a_hyphen_inside_a_range_is_not_read_as_a_negative_sign():
+    """"5-10" must yield 5 and 10, not 5 and -10, or ordinary prose would be
+    flagged as fabricated."""
+    assert _unsupported_numbers("guided 5-10 percent", "guided 5-10 percent") == []
+
+
+def test_percentages_compare_as_the_numeral_written():
+    """Documented rule: no unit conversion. Guessing that a bare 0.05 meant 5%
+    is exactly the inference this guard exists to avoid."""
+    assert _unsupported_numbers("grew 5%", "grew 0.05") == ["5"]
+    assert _unsupported_numbers("grew 5%", "grew 5 percent") == []
+
+
+def test_a_source_date_does_not_license_its_components_as_figures():
+    """2026-07-28 in the source must not substantiate "revenue grew 2026" or
+    "28 acquisitions"."""
+    source = "Filed on 2026-07-28."
+    assert _unsupported_numbers("revenue grew 2026", source) == ["2026"]
+    assert _unsupported_numbers("there were 28 acquisitions", source) == ["28"]
+    assert _unsupported_numbers("there were 7 upgrades", source) == ["7"]
+    # The whole date itself is grounded.
+    assert _unsupported_numbers("Filed on 2026-07-28.", source) == []
+
+
+def test_an_invented_date_is_flagged_whole():
+    assert _unsupported_numbers("Filed on 2025-01-15.", "Filed on 2026-07-28.") == ["2025-01-15"]
+
+
+def test_canonical_number_fails_closed_on_an_unparseable_token():
+    from assistant.ai_advisor import _canonical_number
+
+    assert _canonical_number("1.2.3") is None
+    # ...and a token that cannot be parsed counts as unsupported, never ignored.
+    assert _unsupported_numbers("ratio 1.2.3", "ratio 1.2.3") != []
+
 if __name__ == "__main__":
     test_news_summary_rejects_explicit_trade_advice()
     test_news_summary_rejects_trimming_and_increasing_advice()

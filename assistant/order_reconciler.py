@@ -11,7 +11,14 @@ from assistant.execution_service import (
     _intent_from_dict,
     _order_matches_intent,
 )
-from assistant.order_lifecycle import is_replaced_order, journal_broker_order_update
+from assistant.order_lifecycle import (
+    CHAIN_ERROR_IDENTITY_MISMATCH,
+    CHAIN_ERROR_UNRESOLVED,
+    ReplacementResolution,
+    is_replaced_order,
+    journal_broker_order_update,
+    resolve_replacement_chain,
+)
 from assistant.proposal_status import (
     BROKER_ACCEPTED,
     CANCEL_PENDING,
@@ -25,75 +32,71 @@ from assistant.storage import AssistantStore
 
 _STREAM_SHUTDOWN_POLL_SECONDS = 0.1
 
-# Bounded so a broker reporting a pathological chain can never spin here.
-_MAX_REPLACEMENT_CHAIN_DEPTH = 10
 
+def _resolve_chain_for(
+    proposal: dict[str, Any], order: dict[str, Any], broker_module: Any
+) -> ReplacementResolution:
+    """Resolve `order`'s replacement chain, validating every hop against this
+    proposal's stored intent.
 
-def _resolve_replacement_chain(
-    order: dict[str, Any], broker_module: Any
-) -> tuple[dict[str, Any] | None, list[str], str | None]:
+    Thin adapter over order_lifecycle.resolve_replacement_chain(): it supplies
+    the broker lookup and injects `_order_matches_intent` as the per-hop
+    validator (the resolver cannot import that itself without a circular
+    dependency). A malformed stored intent yields an unresolved result rather
+    than an exception, so the caller records it and moves on to the next
+    proposal instead of aborting the whole reconciliation pass.
     """
-    Follow `replaced_by` from `order` to the order that is authoritative NOW.
+    try:
+        intent = _intent_from_dict(proposal["intent"])
+    except Exception as exc:
+        return ReplacementResolution(
+            None, (), (),
+            f"stored intent could not be parsed for replacement validation: {exc}",
+            CHAIN_ERROR_UNRESOLVED,
+        )
+    return resolve_replacement_chain(
+        order,
+        # Lazy: resolving broker_module.get_order_by_id EAGERLY made every
+        # broker/fake without that method raise AttributeError even for orders
+        # that were never replaced (it broke a pre-existing poll test). Now the
+        # attribute is only touched when a hop is genuinely fetched, and a
+        # missing method surfaces as an unresolved chain rather than a crash.
+        lambda oid: broker_module.get_order_by_id(oid),
+        validate=lambda candidate: _order_matches_intent(candidate, intent),
+    )
 
-    Returns `(authoritative_order, chain_of_order_ids, error)`. When `error` is
-    non-None the caller MUST treat the proposal as unresolved
-    (submission_unknown) -- never project from the stale replaced order and
-    never interpret a failed lookup as confirmed absence.
 
-    Why this exists separately from _proposal_for_update(): that function
-    handles the LIVE direction (a replacement event arrives, find the proposal
-    it supersedes via `replaces`). This handles the POLLING direction (we hold
-    a proposal, its order comes back `replaced`, find where it went via
-    `replaced_by`). Fixing only the live path left the replacement untracked
-    whenever its trade-update was missed -- an app restart, a stream
-    disconnect, or a replacement made before monitoring started -- which is
-    precisely the durable case reconciliation exists for (GPT review,
-    2026-07-29, reproduced with a fake broker: proposal ended
-    submission_unknown, stored order still order-1, zero get_order_by_id
-    calls).
+def _record_chain_failure(
+    store: AssistantStore,
+    proposal_id: str,
+    resolution: ReplacementResolution,
+    result: dict[str, Any] | None = None,
+) -> str:
+    """Park a proposal whose replacement chain could not be trusted.
 
-    Cycle- and depth-guarded: a broker that reported A -> B -> A, or an
-    unbounded chain, would otherwise loop forever. Identity validation is NOT
-    done here -- the caller routes the resolved order through
-    apply_broker_update(), which runs _order_matches_intent() and trips the
-    persistent kill switch on a mismatch, so an out-of-band replacement whose
-    ticker/side/quantity was altered can never be silently accepted.
+    An identity mismatch anywhere in the chain trips the persistent kill switch
+    -- it means an order under our own idempotency key was altered out of band,
+    which is exactly the anomaly that protection exists for. An unresolved
+    lookup does NOT: that is "we cannot tell yet", so the proposal is left at
+    submission_unknown and stays retryable.
     """
-    chain: list[str] = []
-    visited: set[str] = set()
-    current = order
-
-    while is_replaced_order(current):
-        current_id = str(current.get("order_id") or "")
-        if current_id and current_id in visited:
-            return None, chain, f"replacement chain revisits order {current_id} (cycle)"
-        if current_id:
-            visited.add(current_id)
-
-        replaced_by = current.get("replaced_by")
-        if not replaced_by:
-            return None, chain, (
-                "order is marked replaced but the broker reported no replaced_by, "
-                "so the replacement cannot be located"
-            )
-        if len(chain) >= _MAX_REPLACEMENT_CHAIN_DEPTH:
-            return None, chain, (
-                f"replacement chain exceeded {_MAX_REPLACEMENT_CHAIN_DEPTH} hops "
-                f"(stopped at {replaced_by})"
-            )
-        chain.append(str(replaced_by))
-
-        try:
-            nxt = broker_module.get_order_by_id(str(replaced_by))
-        except Exception as exc:
-            return None, chain, f"replacement order {replaced_by} lookup failed: {exc}"
-        if nxt is None:
-            return None, chain, (
-                f"replacement order {replaced_by} could not be found at the broker"
-            )
-        current = nxt
-
-    return current, chain, None
+    mismatch = resolution.error_kind == CHAIN_ERROR_IDENTITY_MISMATCH
+    reason = (
+        f"Replacement chain could not be trusted for {proposal_id}: {resolution.error}. "
+        + ("Persistent kill switch activated; investigate manually."
+           if mismatch else "Manual investigation is required.")
+    )
+    store.update_proposal_status_if_current(
+        proposal_id,
+        expected_statuses=RECONCILABLE_STATUSES,
+        new_status=SUBMISSION_UNKNOWN,
+        error=reason,
+    )
+    if mismatch:
+        store.set_kill_switch(True, reason=reason)
+    if result is not None:
+        result["errors"].append(reason)
+    return reason
 
 
 def _stream_stop_kwargs(broker_module: Any, stop: Event) -> dict[str, Any]:
@@ -230,22 +233,16 @@ def handle_trade_update(
 
     projected = order
     if broker_module is not None and is_replaced_order(order):
-        authoritative, chain, chain_error = _resolve_replacement_chain(order, broker_module)
-        if chain_error is not None:
+        resolution = _resolve_chain_for(proposal, order, broker_module)
+        if resolution.error is not None:
             # Unresolved is unresolved on this path too: park it for a human
-            # rather than projecting from the stale replaced order.
-            store.update_proposal_status_if_current(
-                proposal["proposal_id"],
-                expected_statuses=RECONCILABLE_STATUSES,
-                new_status=SUBMISSION_UNKNOWN,
-                error=(
-                    f"Replacement chain could not be resolved for {proposal['proposal_id']}: "
-                    f"{chain_error}. Manual investigation is required."
-                ),
-            )
+            # rather than projecting from the stale replaced order. Shares
+            # _record_chain_failure with polling so both paths make the same
+            # kill-switch-vs-retryable decision.
+            _record_chain_failure(store, proposal["proposal_id"], resolution)
             return None
-        projected = authoritative
-        update = dict(update, replacement_chain=chain)
+        projected = resolution.authoritative_order
+        update = dict(update, replacement_chain=list(resolution.chain))
 
     result = apply_broker_update(
         store,
@@ -369,20 +366,11 @@ def reconcile_nonterminal_orders(
             # the live state lives on the replacement. Follow the chain before
             # projecting anything, or a replacement whose stream event was
             # missed stays untracked even after it fills.
-            authoritative, chain, chain_error = _resolve_replacement_chain(order, broker_module)
-            if chain_error is not None:
-                reason = (
-                    f"Replacement chain could not be resolved for {proposal_id}: {chain_error}. "
-                    "Manual investigation is required."
-                )
-                store.update_proposal_status_if_current(
-                    proposal_id,
-                    expected_statuses=RECONCILABLE_STATUSES,
-                    new_status=SUBMISSION_UNKNOWN,
-                    error=reason,
-                )
-                result["errors"].append(reason)
+            resolution = _resolve_chain_for(proposal, order, broker_module)
+            if resolution.error is not None:
+                _record_chain_failure(store, proposal_id, resolution, result)
                 continue
+            authoritative = resolution.authoritative_order
 
             apply_broker_update(
                 store,
@@ -391,19 +379,28 @@ def reconcile_nonterminal_orders(
                 event_type="poll_reconciliation",
                 # Audit trail: which replacement ids were traversed to reach
                 # the order this projection is based on.
-                raw_event={"replacement_chain": chain} if chain else None,
+                raw_event={"replacement_chain": list(resolution.chain)} if resolution.chain else None,
             )
             result["updated"] += 1
-            if chain:
+            if resolution.followed_a_replacement:
                 result["replacements_followed"] = result.get("replacements_followed", 0) + 1
             refreshed = store.get_proposal(proposal_id)
             if (
                 cancel_stale
                 and refreshed is not None
+                # `authoritative`, NOT `order`: cancelling the SUPERSEDED order
+                # left the live replacement running while the proposal was
+                # projected to cancel_pending against the dead id -- and
+                # reconciliation reported cancellation_requested=1 with no
+                # errors, so it looked like it had worked (independent review,
+                # 2026-07-29, reproduced: canceled order-1, order-2 still
+                # active). Passing the authoritative order also makes the
+                # staleness window, the cancel target, and the locally
+                # projected pending_cancel record all use the live order.
                 and _cancel_if_stale(
                     store,
                     refreshed,
-                    order,
+                    authoritative,
                     broker_module=broker_module,
                     now=now,
                     max_order_age_minutes=max_order_age_minutes,

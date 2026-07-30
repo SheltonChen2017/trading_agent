@@ -3,10 +3,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import math
 import os
+import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -17,7 +20,8 @@ from assistant.execution_service import (
     reconcile_submission,
     recover_stale_reconciliation,
 )
-from assistant.policy import load_policy
+import config
+from assistant.policy import compute_policy_fingerprint, load_policy
 from assistant.mandate import (
     compute_mandate_fingerprint,
     evaluate_live_promotion,
@@ -25,6 +29,7 @@ from assistant.mandate import (
 )
 from assistant.operations import (
     append_alerts_jsonl,
+    ensure_recent_database_backup,
     run_backup_restore_drill,
     run_operational_check,
 )
@@ -34,6 +39,15 @@ from assistant.portfolio_ledger import (
     ledger_balances,
     reconcile_snapshot,
     sync_app_fills,
+)
+from assistant.paper_evidence import (
+    REQUIRED_PROMOTION_DRILLS,
+    build_paper_lineage,
+    capture_paper_account_observation,
+    paper_evidence_summary,
+    paper_session_schedule,
+    record_operational_drill,
+    start_paper_evidence_epoch,
 )
 from assistant.readiness import transaction_readiness
 from assistant.proposals import generate_risk_reduction_proposals
@@ -49,6 +63,10 @@ from assistant.storage import AssistantStore
 from assistant.strategy_proposals import CONFIGURED_LEVERAGED_PAIRS, generate_leveraged_pair_rebalance_proposals
 from backtest.research_report import verify_research_report
 from execution.alpaca_broker import is_configured
+
+
+_REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
+_EASTERN = ZoneInfo("America/New_York")
 
 
 def _positive_int(value: str) -> int:
@@ -78,6 +96,98 @@ def _non_negative_int(value: str) -> int:
             f"must be a non-negative integer, got {parsed}"
         )
     return parsed
+
+
+def _positive_float(value: str) -> float:
+    try:
+        parsed = float(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"must be a positive number, got {value!r}"
+        )
+    if not math.isfinite(parsed) or parsed <= 0:
+        raise argparse.ArgumentTypeError(
+            f"must be a positive number, got {parsed}"
+        )
+    return parsed
+
+
+def _current_commit(*, require_clean: bool) -> str:
+    commit = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=_REPOSITORY_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    if require_clean:
+        status = subprocess.run(
+            ["git", "status", "--porcelain"],
+            cwd=_REPOSITORY_ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.strip()
+        if status:
+            raise SystemExit(
+                "Paper evidence requires a clean Git worktree so every "
+                "observation is attributable to an exact commit."
+            )
+    return commit
+
+
+def _active_runtime_lineage(
+    store: AssistantStore, args
+) -> dict[str, str]:
+    epoch = store.get_active_paper_evidence_epoch()
+    if epoch is None:
+        raise SystemExit("No active paper evidence epoch.")
+    recorded = epoch["lineage"]
+    mandate = load_mandate(args.mandate)
+    policy = load_policy(args.policy)
+    current = build_paper_lineage(
+        code_commit=_current_commit(require_clean=True),
+        mandate_fingerprint=compute_mandate_fingerprint(mandate),
+        policy_fingerprint=compute_policy_fingerprint(policy),
+        strategy_id=recorded["strategy_id"],
+        strategy_version=recorded["strategy_version"],
+        model_id=recorded["model_id"],
+    )
+    if current != recorded:
+        raise SystemExit(
+            "Active evidence lineage differs from the current runtime; "
+            "close this epoch and start a new one."
+        )
+    return current
+
+
+def _benchmark_close_for_session(ticker: str, session_date: str) -> float:
+    from data.market_data import fetch_historical
+
+    normalized = ticker.upper()
+    history = fetch_historical([normalized], lookback_days=10)
+    if normalized not in history:
+        raise SystemExit(f"Benchmark data unavailable for {normalized}.")
+    frame = history[normalized]
+    dates = [
+        (
+            index.date().isoformat()
+            if callable(getattr(index, "date", None))
+            else str(index)[:10]
+        )
+        for index in frame.index
+    ]
+    matching = frame.loc[[date == session_date for date in dates]]
+    if matching.empty:
+        raise SystemExit(
+            f"No {normalized} close is available for {session_date}."
+        )
+    close = float(matching.iloc[-1]["close"])
+    if close <= 0:
+        raise SystemExit(
+            f"Invalid {normalized} close for {session_date}: {close}"
+        )
+    return close
 
 
 def _now_eastern() -> datetime:
@@ -413,6 +523,8 @@ def command_ack_alert(args, store: AssistantStore) -> None:
 
 
 def command_recovery_drill(args, store: AssistantStore) -> None:
+    if store.get_active_paper_evidence_epoch() is not None:
+        _active_runtime_lineage(store, args)
     destination = args.destination
     if destination is None:
         timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
@@ -427,6 +539,211 @@ def command_recovery_drill(args, store: AssistantStore) -> None:
         raise SystemExit(2)
 
 
+def command_paper_epoch_start(args, store: AssistantStore) -> None:
+    if not config.PAPER_TRADING:
+        raise SystemExit(
+            "Refusing to start paper evidence while config.PAPER_TRADING "
+            "is false."
+        )
+    mandate = load_mandate(args.mandate)
+    policy = load_policy(args.policy)
+    lineage = build_paper_lineage(
+        code_commit=_current_commit(require_clean=True),
+        mandate_fingerprint=compute_mandate_fingerprint(mandate),
+        policy_fingerprint=compute_policy_fingerprint(policy),
+        strategy_id=args.strategy_id,
+        strategy_version=args.strategy_version,
+        model_id=args.model_id,
+    )
+    result = start_paper_evidence_epoch(
+        store, args.evidence_epoch, lineage
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+def command_paper_epoch_close(args, store: AssistantStore) -> None:
+    active = store.get_active_paper_evidence_epoch()
+    if active is None:
+        raise SystemExit("No active paper evidence epoch.")
+    if (
+        args.evidence_epoch is not None
+        and args.evidence_epoch != active["evidence_epoch"]
+    ):
+        raise SystemExit(
+            f"Active epoch is {active['evidence_epoch']!r}, not "
+            f"{args.evidence_epoch!r}."
+        )
+    result = store.close_paper_evidence_epoch(
+        active["evidence_epoch"],
+        ended_at=datetime.now(timezone.utc).isoformat(),
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+def command_paper_observation(args, store: AssistantStore) -> None:
+    if not config.PAPER_TRADING:
+        raise SystemExit(
+            "Refusing paper evidence capture while config.PAPER_TRADING "
+            "is false."
+        )
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required for paper evidence."
+        )
+    cycle_started_at = datetime.now(timezone.utc)
+    session = paper_session_schedule(cycle_started_at)
+    if session is None:
+        print(
+            json.dumps(
+                {
+                    "captured": False,
+                    "reason": "not an NYSE trading session",
+                    "at": cycle_started_at.isoformat(),
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return
+    session_date = session[0]
+    try:
+        lineage = _active_runtime_lineage(store, args)
+        policy = load_policy(args.policy)
+        order_report = reconcile_nonterminal_orders(
+            store,
+            cancel_stale=args.cancel_stale,
+            max_order_age_minutes=policy.max_order_age_minutes,
+        )
+        fill_report = sync_app_fills(store)
+        snapshot = build_portfolio_snapshot_from_alpaca()
+        reconciliation = reconcile_snapshot(store, snapshot)
+        if not reconciliation["matched"]:
+            raise RuntimeError(
+                "Ledger reconciliation failed; refusing to capture paper NAV."
+            )
+        captured_at = datetime.now(timezone.utc)
+        capture_session = paper_session_schedule(captured_at)
+        if capture_session is None or capture_session[0] != session_date:
+            raise RuntimeError(
+                "The NYSE session changed during paper observation capture."
+            )
+        benchmark_close = _benchmark_close_for_session(
+            args.benchmark, session_date
+        )
+        observation = capture_paper_account_observation(
+            store,
+            snapshot,
+            benchmark_ticker=args.benchmark,
+            benchmark_close=benchmark_close,
+            captured_at=captured_at,
+            expected_lineage=lineage,
+        )
+    except (Exception, SystemExit) as exc:
+        alert = store.upsert_operational_alert(
+            fingerprint="scheduled-paper-observation-failure",
+            severity="critical",
+            category="paper_evidence",
+            message=f"paper observation failed: {exc}",
+            details={
+                "error_type": type(exc).__name__,
+                "session_date": session_date,
+            },
+        )
+        if args.alerts_jsonl:
+            append_alerts_jsonl([alert], args.alerts_jsonl)
+        raise
+    print(
+        json.dumps(
+            {
+                "order_reconciliation": order_report,
+                "fill_sync": fill_report,
+                "ledger_reconciliation": reconciliation,
+                "paper_observation": observation,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
+def command_paper_evidence_status(args, store: AssistantStore) -> None:
+    summary = paper_evidence_summary(store, args.evidence_epoch)
+    print(json.dumps(summary, indent=2, sort_keys=True))
+
+
+def command_record_drill(args, store: AssistantStore) -> None:
+    _active_runtime_lineage(store, args)
+    evidence = json.loads(args.evidence.read_text(encoding="utf-8"))
+    if not isinstance(evidence, dict):
+        raise SystemExit("Drill evidence JSON must contain an object.")
+    performed_at = (
+        datetime.fromisoformat(args.performed_at.replace("Z", "+00:00"))
+        if args.performed_at
+        else None
+    )
+    result = record_operational_drill(
+        store,
+        drill_type=args.drill_type,
+        passed=args.result == "pass",
+        evidence=evidence,
+        performed_at=performed_at,
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+def command_operations_cycle(args, store: AssistantStore) -> None:
+    if not config.PAPER_TRADING:
+        raise SystemExit(
+            "Refusing an operational paper cycle while "
+            "config.PAPER_TRADING is false."
+        )
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required for an operational cycle."
+        )
+    policy = load_policy(args.policy)
+    try:
+        order_report = reconcile_nonterminal_orders(
+            store,
+            cancel_stale=args.cancel_stale,
+            max_order_age_minutes=policy.max_order_age_minutes,
+        )
+        fill_report = sync_app_fills(store)
+        snapshot = build_portfolio_snapshot_from_alpaca()
+        reconciliation = reconcile_snapshot(store, snapshot)
+        backup = ensure_recent_database_backup(
+            store,
+            args.backup_directory,
+            max_age_hours=args.backup_max_age_hours,
+        )
+        health = run_operational_check(
+            store, policy, check_broker=True
+        )
+        if args.alerts_jsonl and health["alerts"]:
+            append_alerts_jsonl(health["alerts"], args.alerts_jsonl)
+    except (Exception, SystemExit) as exc:
+        alert = store.upsert_operational_alert(
+            fingerprint="scheduled-operations-cycle-failure",
+            severity="critical",
+            category="operations_cycle",
+            message=f"scheduled operations cycle failed: {exc}",
+            details={"error_type": type(exc).__name__},
+        )
+        if args.alerts_jsonl:
+            append_alerts_jsonl([alert], args.alerts_jsonl)
+        raise
+    result = {
+        "order_reconciliation": order_report,
+        "fill_sync": fill_report,
+        "ledger_reconciliation": reconciliation,
+        "backup": backup,
+        "health": health,
+    }
+    print(json.dumps(result, indent=2, sort_keys=True))
+    if not reconciliation["matched"] or not health["healthy"]:
+        raise SystemExit(2)
+
+
 def command_promotion_status(args, store: AssistantStore) -> None:
     mandate = load_mandate(args.mandate)
     report = json.loads(args.research_report.read_text(encoding="utf-8"))
@@ -434,6 +751,7 @@ def command_promotion_status(args, store: AssistantStore) -> None:
         raise SystemExit(
             "Research report hash is missing or invalid; refusing promotion review."
         )
+    paper_summary = paper_evidence_summary(store, args.evidence_epoch)
     latest_reconciliation = store.get_latest_ledger_reconciliation()
     unreconciled = (
         int(latest_reconciliation.get("mismatch_count", 0))
@@ -443,11 +761,6 @@ def command_promotion_status(args, store: AssistantStore) -> None:
     critical_alerts = sum(
         alert["severity"] == "critical"
         for alert in store.list_operational_alerts(status="open", limit=1000)
-    )
-    fills = store.list_fills()
-    paper_orders = len({fill["order_id"] for fill in fills})
-    restore_drill = store.get_system_state(
-        "last_backup_restore_drill", default={}
     )
     operations_heartbeat = store.get_system_state(
         "operations_heartbeat", default={}
@@ -467,9 +780,9 @@ def command_promotion_status(args, store: AssistantStore) -> None:
     )
     result = evaluate_live_promotion(
         mandate,
-        metric_report=report.get("metrics") or {},
-        paper_sessions=args.paper_sessions,
-        paper_orders=paper_orders,
+        metric_report=paper_summary.get("metrics") or {},
+        paper_sessions=paper_summary["paper_sessions"],
+        paper_orders=paper_summary["paper_orders"]["count"],
         unreconciled_items=unreconciled,
         critical_alerts=critical_alerts,
         research_reproduced=args.research_reproduced,
@@ -478,11 +791,23 @@ def command_promotion_status(args, store: AssistantStore) -> None:
                 "point_in_time_data"
             )
         ),
-        backup_restore_drill_passed=bool(restore_drill.get("passed")),
+        backup_restore_drill_passed=bool(
+            paper_summary["required_drills"]["backup_restore"]["passed"]
+        ),
         operational_health_passed=bool(
             operations_heartbeat.get("healthy") and heartbeat_fresh
         ),
+        paper_evidence_integrity_passed=bool(
+            paper_summary["coverage_complete"]
+            and paper_summary["lineage_consistent"]
+            and paper_summary["metrics"] is not None
+        ),
+        operational_drills_passed=bool(
+            paper_summary["all_required_drills_passed"]
+        ),
     )
+    result["paper_evidence"] = paper_summary
+    result["research_report_sha256"] = report.get("report_sha256")
     print(json.dumps(result, indent=2, sort_keys=True))
     if not result["ready_for_live_canary_review"]:
         raise SystemExit(2)
@@ -490,6 +815,14 @@ def command_promotion_status(args, store: AssistantStore) -> None:
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Personal trading assistant")
+    parser.add_argument(
+        "--database",
+        type=Path,
+        help=(
+            "SQLite database path. Defaults to TRADING_ASSISTANT_DB or "
+            "data/trading_assistant.db."
+        ),
+    )
     parser.add_argument(
         "--policy",
         default=str(Path(__file__).resolve().parent.parent / "assistant" / "default_policy.json"),
@@ -705,6 +1038,83 @@ def build_parser() -> argparse.ArgumentParser:
     recovery_drill.add_argument("destination", nargs="?", type=Path)
     recovery_drill.set_defaults(handler=command_recovery_drill)
 
+    epoch_start = commands.add_parser(
+        "paper-epoch-start",
+        help="Start an immutable-lineage paper evidence collection epoch.",
+    )
+    epoch_start.add_argument("evidence_epoch")
+    epoch_start.add_argument("--strategy-id", required=True)
+    epoch_start.add_argument("--strategy-version", required=True)
+    epoch_start.add_argument(
+        "--model-id",
+        required=True,
+        help=(
+            "Exact decision-model identifier, or an explicit value such as "
+            "'deterministic-no-model'."
+        ),
+    )
+    epoch_start.set_defaults(handler=command_paper_epoch_start)
+
+    epoch_close = commands.add_parser(
+        "paper-epoch-close",
+        help="Close the active evidence epoch after a material runtime change.",
+    )
+    epoch_close.add_argument("evidence_epoch", nargs="?")
+    epoch_close.set_defaults(handler=command_paper_epoch_close)
+
+    paper_observation = commands.add_parser(
+        "paper-observation",
+        help=(
+            "Reconcile orders and ledger, then capture one immutable "
+            "post-close paper NAV observation."
+        ),
+    )
+    paper_observation.add_argument("--benchmark", default="SPY")
+    paper_observation.add_argument("--cancel-stale", action="store_true")
+    paper_observation.add_argument("--alerts-jsonl", type=Path)
+    paper_observation.set_defaults(handler=command_paper_observation)
+
+    paper_status = commands.add_parser(
+        "paper-evidence-status",
+        help="Show derived paper sessions, orders, metrics, lineage and drills.",
+    )
+    paper_status.add_argument("evidence_epoch", nargs="?")
+    paper_status.set_defaults(handler=command_paper_evidence_status)
+
+    drill_record = commands.add_parser(
+        "record-drill",
+        help="Record timestamped operational drill evidence for the active epoch.",
+    )
+    drill_record.add_argument(
+        "drill_type", choices=REQUIRED_PROMOTION_DRILLS
+    )
+    drill_record.add_argument("result", choices=("pass", "fail"))
+    drill_record.add_argument(
+        "evidence",
+        type=Path,
+        help="JSON object containing operator, artifact and drill details.",
+    )
+    drill_record.add_argument("--performed-at")
+    drill_record.set_defaults(handler=command_record_drill)
+
+    operations_cycle = commands.add_parser(
+        "operations-cycle",
+        help=(
+            "Run one scheduler-friendly order, ledger, backup and health cycle."
+        ),
+    )
+    operations_cycle.add_argument("--cancel-stale", action="store_true")
+    operations_cycle.add_argument(
+        "--backup-directory",
+        type=Path,
+        default=Path(__file__).resolve().parent.parent / "data" / "backups",
+    )
+    operations_cycle.add_argument(
+        "--backup-max-age-hours", type=_positive_float, default=20.0
+    )
+    operations_cycle.add_argument("--alerts-jsonl", type=Path)
+    operations_cycle.set_defaults(handler=command_operations_cycle)
+
     promotion = commands.add_parser(
         "promotion-status",
         help=(
@@ -714,7 +1124,8 @@ def build_parser() -> argparse.ArgumentParser:
     )
     promotion.add_argument("research_report", type=Path)
     promotion.add_argument(
-        "--paper-sessions", type=_non_negative_int, required=True
+        "--evidence-epoch",
+        help="Evidence epoch to evaluate; defaults to the active epoch.",
     )
     promotion.add_argument(
         "--research-reproduced",
@@ -727,7 +1138,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
-    store = AssistantStore()
+    store = AssistantStore(args.database)
     args.handler(args, store)
 
 

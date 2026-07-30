@@ -174,6 +174,41 @@ class AssistantStore:
                     last_seen_at TEXT NOT NULL,
                     acknowledged_at TEXT
                 );
+                CREATE TABLE IF NOT EXISTS paper_evidence_epochs (
+                    evidence_epoch TEXT PRIMARY KEY,
+                    started_at TEXT NOT NULL,
+                    ended_at TEXT,
+                    status TEXT NOT NULL,
+                    lineage_json TEXT NOT NULL,
+                    lineage_hash TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS paper_account_observations (
+                    observation_id TEXT PRIMARY KEY,
+                    evidence_epoch TEXT NOT NULL,
+                    session_date TEXT NOT NULL,
+                    captured_at TEXT NOT NULL,
+                    total_equity REAL NOT NULL,
+                    cash REAL NOT NULL,
+                    benchmark_ticker TEXT NOT NULL,
+                    benchmark_close REAL NOT NULL,
+                    net_external_flow REAL NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    payload_hash TEXT NOT NULL,
+                    FOREIGN KEY(evidence_epoch)
+                        REFERENCES paper_evidence_epochs(evidence_epoch),
+                    UNIQUE(evidence_epoch, session_date)
+                );
+                CREATE TABLE IF NOT EXISTS operational_drill_runs (
+                    drill_id TEXT PRIMARY KEY,
+                    drill_type TEXT NOT NULL,
+                    performed_at TEXT NOT NULL,
+                    passed INTEGER NOT NULL,
+                    evidence_epoch TEXT,
+                    code_commit TEXT NOT NULL,
+                    evidence_json TEXT NOT NULL,
+                    evidence_hash TEXT NOT NULL
+                );
                 CREATE INDEX IF NOT EXISTS idx_proposals_status
                     ON trade_proposals(status, created_at);
                 CREATE INDEX IF NOT EXISTS idx_broker_events_order_at
@@ -190,6 +225,12 @@ class AssistantStore:
                     ON ledger_reconciliation_runs(reconciled_at);
                 CREATE INDEX IF NOT EXISTS idx_operational_alerts_status
                     ON operational_alerts(status, severity, last_seen_at);
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_one_active_paper_epoch
+                    ON paper_evidence_epochs(status) WHERE status = 'active';
+                CREATE INDEX IF NOT EXISTS idx_paper_observations_epoch_date
+                    ON paper_account_observations(evidence_epoch, session_date);
+                CREATE INDEX IF NOT EXISTS idx_operational_drills_type_at
+                    ON operational_drill_runs(drill_type, performed_at);
                 """
             )
             self._migrate_decision_packet_identity(connection)
@@ -765,7 +806,14 @@ class AssistantStore:
         max_daily_notional: float,
         max_daily_orders: int,
     ) -> dict[str, Any]:
-        """Atomically reserve one submission against persistent daily caps."""
+        """Atomically reserve one submission against persistent daily caps.
+
+        These are gross *submission* counters, not open-exposure counters.
+        A broker-observed rejected order therefore continues consuming both
+        caps: it reached the broker and must not be retried indefinitely by
+        repeatedly releasing the reservation. Only confirmed non-submission
+        is released through mark_submission_failed_and_release().
+        """
         if not math.isfinite(notional) or notional <= 0:
             raise ValueError(f"notional must be positive and finite, got {notional!r}.")
         if not math.isfinite(max_daily_notional) or max_daily_notional <= 0:
@@ -1248,6 +1296,333 @@ class AssistantStore:
                 (now, alert_id),
             )
         return cursor.rowcount == 1
+
+    def start_paper_evidence_epoch(
+        self,
+        evidence_epoch: str,
+        *,
+        started_at: str,
+        lineage: dict[str, Any],
+    ) -> dict[str, Any]:
+        """Start one immutable-lineage paper evidence collection epoch."""
+        lineage_json = json.dumps(
+            lineage, sort_keys=True, separators=(",", ":"), default=str
+        )
+        lineage_hash = _hash_payload(lineage_json)
+        now = datetime.now(timezone.utc).isoformat()
+        connection = sqlite3.connect(self.path)
+        connection.row_factory = sqlite3.Row
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            existing = connection.execute(
+                "SELECT * FROM paper_evidence_epochs WHERE evidence_epoch = ?",
+                (evidence_epoch,),
+            ).fetchone()
+            if existing is not None:
+                if (
+                    existing["status"] == "active"
+                    and existing["lineage_hash"] == lineage_hash
+                ):
+                    connection.commit()
+                    result = self._paper_evidence_epoch_row(existing)
+                    result["already_started"] = True
+                    return result
+                raise ValueError(
+                    f"Paper evidence epoch {evidence_epoch!r} already exists "
+                    "with different lineage or is closed."
+                )
+            active = connection.execute(
+                "SELECT evidence_epoch FROM paper_evidence_epochs "
+                "WHERE status = 'active'"
+            ).fetchone()
+            if active is not None:
+                raise ValueError(
+                    f"Paper evidence epoch {active['evidence_epoch']!r} is "
+                    "already active; close it before starting another."
+                )
+            connection.execute(
+                """
+                INSERT INTO paper_evidence_epochs(
+                    evidence_epoch, started_at, ended_at, status,
+                    lineage_json, lineage_hash, created_at
+                ) VALUES (?, ?, NULL, 'active', ?, ?, ?)
+                """,
+                (
+                    evidence_epoch,
+                    started_at,
+                    lineage_json,
+                    lineage_hash,
+                    now,
+                ),
+            )
+            connection.commit()
+            result = {
+                "evidence_epoch": evidence_epoch,
+                "started_at": started_at,
+                "ended_at": None,
+                "status": "active",
+                "lineage": lineage,
+                "lineage_hash": lineage_hash,
+                "created_at": now,
+                "already_started": False,
+            }
+            return result
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+
+    def close_paper_evidence_epoch(
+        self, evidence_epoch: str, *, ended_at: str
+    ) -> dict[str, Any]:
+        with self._connect() as connection:
+            cursor = connection.execute(
+                """
+                UPDATE paper_evidence_epochs
+                SET status = 'closed', ended_at = ?
+                WHERE evidence_epoch = ? AND status = 'active'
+                """,
+                (ended_at, evidence_epoch),
+            )
+            if cursor.rowcount != 1:
+                raise ValueError(
+                    f"Active paper evidence epoch not found: {evidence_epoch}"
+                )
+        result = self.get_paper_evidence_epoch(evidence_epoch)
+        assert result is not None
+        return result
+
+    def get_active_paper_evidence_epoch(self) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM paper_evidence_epochs "
+                "WHERE status = 'active' LIMIT 1"
+            ).fetchone()
+        return None if row is None else self._paper_evidence_epoch_row(row)
+
+    def get_paper_evidence_epoch(
+        self, evidence_epoch: str
+    ) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM paper_evidence_epochs WHERE evidence_epoch = ?",
+                (evidence_epoch,),
+            ).fetchone()
+        return None if row is None else self._paper_evidence_epoch_row(row)
+
+    @staticmethod
+    def _paper_evidence_epoch_row(row: sqlite3.Row) -> dict[str, Any]:
+        return {
+            "evidence_epoch": row["evidence_epoch"],
+            "started_at": row["started_at"],
+            "ended_at": row["ended_at"],
+            "status": row["status"],
+            "lineage": json.loads(row["lineage_json"]),
+            "lineage_hash": row["lineage_hash"],
+            "created_at": row["created_at"],
+        }
+
+    def append_paper_account_observation(
+        self, observation: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Append one immutable close observation per epoch/session date."""
+        payload_json = json.dumps(
+            observation, sort_keys=True, separators=(",", ":"), default=str
+        )
+        payload_hash = _hash_payload(payload_json)
+        observation_id = "paperobs-" + payload_hash[:24]
+        evidence_epoch = str(observation["evidence_epoch"])
+        session_date = str(observation["session_date"])
+        connection = sqlite3.connect(self.path)
+        connection.row_factory = sqlite3.Row
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            epoch = connection.execute(
+                "SELECT status, lineage_hash FROM paper_evidence_epochs "
+                "WHERE evidence_epoch = ?",
+                (evidence_epoch,),
+            ).fetchone()
+            if epoch is None or epoch["status"] != "active":
+                raise ValueError(
+                    f"Paper evidence epoch is not active: {evidence_epoch}"
+                )
+            if observation.get("lineage_hash") != epoch["lineage_hash"]:
+                raise ValueError(
+                    "Observation lineage does not match the active evidence epoch."
+                )
+            existing = connection.execute(
+                "SELECT * FROM paper_account_observations "
+                "WHERE evidence_epoch = ? AND session_date = ?",
+                (evidence_epoch, session_date),
+            ).fetchone()
+            if existing is not None:
+                if existing["payload_hash"] != payload_hash:
+                    raise ValueError(
+                        f"Session {session_date} already has a different "
+                        "immutable paper observation."
+                    )
+                connection.commit()
+                result = json.loads(existing["payload_json"])
+                result.update(
+                    {
+                        "observation_id": existing["observation_id"],
+                        "payload_hash": existing["payload_hash"],
+                        "already_recorded": True,
+                    }
+                )
+                return result
+            connection.execute(
+                """
+                INSERT INTO paper_account_observations(
+                    observation_id, evidence_epoch, session_date, captured_at,
+                    total_equity, cash, benchmark_ticker, benchmark_close,
+                    net_external_flow, payload_json, payload_hash
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    observation_id,
+                    evidence_epoch,
+                    session_date,
+                    observation["captured_at"],
+                    observation["total_equity"],
+                    observation["cash"],
+                    observation["benchmark_ticker"],
+                    observation["benchmark_close"],
+                    observation["net_external_flow"],
+                    payload_json,
+                    payload_hash,
+                ),
+            )
+            connection.commit()
+            return {
+                **observation,
+                "observation_id": observation_id,
+                "payload_hash": payload_hash,
+                "already_recorded": False,
+            }
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+
+    def list_paper_account_observations(
+        self, evidence_epoch: str
+    ) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT observation_id, payload_json, payload_hash
+                FROM paper_account_observations
+                WHERE evidence_epoch = ?
+                ORDER BY session_date ASC, captured_at ASC
+                """,
+                (evidence_epoch,),
+            ).fetchall()
+        result = []
+        for row in rows:
+            payload = json.loads(row["payload_json"])
+            payload.update(
+                {
+                    "observation_id": row["observation_id"],
+                    "payload_hash": row["payload_hash"],
+                }
+            )
+            result.append(payload)
+        return result
+
+    def record_operational_drill(
+        self,
+        *,
+        drill_type: str,
+        performed_at: str,
+        passed: bool,
+        evidence_epoch: str | None,
+        code_commit: str,
+        evidence: dict[str, Any],
+    ) -> dict[str, Any]:
+        material = {
+            "drill_type": drill_type,
+            "performed_at": performed_at,
+            "passed": bool(passed),
+            "evidence_epoch": evidence_epoch,
+            "code_commit": code_commit,
+            "evidence": evidence,
+        }
+        evidence_json = json.dumps(
+            evidence, sort_keys=True, separators=(",", ":"), default=str
+        )
+        evidence_hash = _hash_payload(evidence_json)
+        drill_id = "drill-" + _hash_payload(
+            json.dumps(material, sort_keys=True, default=str)
+        )[:24]
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO operational_drill_runs(
+                    drill_id, drill_type, performed_at, passed,
+                    evidence_epoch, code_commit, evidence_json, evidence_hash
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(drill_id) DO NOTHING
+                """,
+                (
+                    drill_id,
+                    drill_type,
+                    performed_at,
+                    1 if passed else 0,
+                    evidence_epoch,
+                    code_commit,
+                    evidence_json,
+                    evidence_hash,
+                ),
+            )
+        return {
+            "drill_id": drill_id,
+            "drill_type": drill_type,
+            "performed_at": performed_at,
+            "passed": bool(passed),
+            "evidence_epoch": evidence_epoch,
+            "code_commit": code_commit,
+            "evidence": evidence,
+            "evidence_hash": evidence_hash,
+        }
+
+    def list_operational_drills(
+        self,
+        *,
+        evidence_epoch: str | None = None,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            if evidence_epoch is None:
+                rows = connection.execute(
+                    "SELECT * FROM operational_drill_runs "
+                    "ORDER BY performed_at DESC LIMIT ?",
+                    (limit,),
+                ).fetchall()
+            else:
+                rows = connection.execute(
+                    """
+                    SELECT * FROM operational_drill_runs
+                    WHERE evidence_epoch = ?
+                    ORDER BY performed_at DESC LIMIT ?
+                    """,
+                    (evidence_epoch, limit),
+                ).fetchall()
+        return [
+            {
+                "drill_id": row["drill_id"],
+                "drill_type": row["drill_type"],
+                "performed_at": row["performed_at"],
+                "passed": bool(row["passed"]),
+                "evidence_epoch": row["evidence_epoch"],
+                "code_commit": row["code_commit"],
+                "evidence": json.loads(row["evidence_json"]),
+                "evidence_hash": row["evidence_hash"],
+            }
+            for row in rows
+        ]
 
     @staticmethod
     def _operational_alert_row(row: sqlite3.Row) -> dict[str, Any]:

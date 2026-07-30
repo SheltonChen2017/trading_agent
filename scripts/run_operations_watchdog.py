@@ -26,6 +26,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         description="Persist health checks and durable operational alerts."
     )
+    parser.add_argument(
+        "--database",
+        type=Path,
+        help=(
+            "SQLite database path. Defaults to TRADING_ASSISTANT_DB or "
+            "data/trading_assistant.db."
+        ),
+    )
     parser.add_argument("--interval-seconds", type=_positive_seconds, default=60)
     parser.add_argument("--once", action="store_true")
     parser.add_argument("--offline", action="store_true")
@@ -46,7 +54,7 @@ def main() -> None:
     stop = threading.Event()
     for signum in (signal.SIGINT, signal.SIGTERM):
         signal.signal(signum, lambda *_: stop.set())
-    store = AssistantStore()
+    store = AssistantStore(args.database)
     policy = load_policy(args.policy)
     while not stop.is_set():
         report = run_operational_check(

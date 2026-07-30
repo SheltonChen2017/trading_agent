@@ -231,6 +231,7 @@ from risk.execution_gate import (
     authorize_trade_intent,
     intent_fingerprint,
     validate_trade_intent,
+    worst_case_fill_price,
 )
 
 # Sentinel: the broker lookup itself failed (network/auth/5xx/etc.), so
@@ -383,6 +384,21 @@ def _authoritative_order_for(
             resolution.chain,
         )
     return resolution.authoritative_order, None, False, resolution.chain
+
+
+def _execution_budget_notional(
+    intent: TradeIntent, reference_price: float
+) -> float:
+    """Gross submitted notional reserved against the persistent daily cap.
+
+    This intentionally uses the same side-aware price as the risk gate:
+    an aggressive BUY limit is priced at the higher limit, while a SELL
+    remains at the reference price so a risk-reducing order is not blocked
+    merely because its limit is above the quote.
+    """
+    return float(
+        intent.shares * worst_case_fill_price(intent, reference_price)
+    )
 
 
 def _order_matches_intent(order: dict, intent: TradeIntent) -> tuple[bool, str]:
@@ -1156,16 +1172,11 @@ def execute_approved_paper_proposal(
     # with a stranded reservation and no recovery path.
     store.update_proposal_status(proposal_id, SUBMITTING)
 
-    budget_price = (
-        max(float(reference_price), float(intent.limit_price))
-        if intent.order_type == "limit"
-        else reference_price
-    )
     try:
         store.reserve_execution_budget(
             proposal_id,
             trading_day=now_et.date().isoformat(),
-            notional=float(intent.shares * budget_price),
+            notional=_execution_budget_notional(intent, reference_price),
             max_daily_notional=policy.max_daily_submitted_notional,
             max_daily_orders=policy.max_daily_order_count,
         )

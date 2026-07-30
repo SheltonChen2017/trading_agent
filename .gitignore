@@ -8,10 +8,11 @@ __pycache__/
 .env.*
 
 # Personal assistant runtime state
-data/trading_assistant.db
-data/trading_assistant.db-shm
-data/trading_assistant.db-wal
+data/*.db
+data/*.db-shm
+data/*.db-wal
 data/backups/
+data/drill_evidence/
 data/research_reports/
 
 # Claude Code session transcripts and machine-local permissions -- these

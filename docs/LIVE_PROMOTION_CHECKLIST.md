@@ -32,8 +32,26 @@ approval.
 - [ ] Kill-switch, ambiguous-submission and restart drills pass.
 - [ ] A backup has been restored and its SQLite integrity verified.
 - [ ] Alert delivery and operator escalation have been exercised.
+- [ ] Every paper observation belongs to one immutable evidence epoch whose
+      Git, mandate, policy, strategy and model lineage remains consistent.
+- [ ] Every NYSE session between the first and latest paper observations is
+      present; cash transfers are excluded from investment returns.
 - [ ] A tiny-capital canary plan defines capital, order and daily-loss caps.
 - [ ] The owner explicitly approves the canary after reviewing this evidence.
 
 `evaluate_live_promotion()` fails closed when any item is unavailable. It
 intentionally reports readiness for human review; it never authorizes a trade.
+
+The CLI no longer accepts a manually asserted paper-session count. It derives
+sessions, distinct broker-observed paper orders (including rejected orders),
+cash-flow-adjusted metrics, lineage integrity, and the latest result of each
+required drill from durable evidence:
+
+```text
+python scripts/run_personal_assistant.py --database data/paper.db paper-evidence-status paper-2026q3
+python scripts/run_personal_assistant.py --database data/paper.db promotion-status research-report.json --evidence-epoch paper-2026q3 --research-reproduced
+```
+
+The calendar gate remains real: the default mandate's minimum sessions cannot
+be manufactured by rerunning a command on one day. See
+`docs/OPERATIONS_RUNBOOK.md` for collection, scheduling, and drill procedures.

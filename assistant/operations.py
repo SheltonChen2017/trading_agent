@@ -272,6 +272,61 @@ def append_alerts_jsonl(
     return target
 
 
+def ensure_recent_database_backup(
+    store: AssistantStore,
+    destination_directory: str | Path,
+    *,
+    now: datetime | None = None,
+    max_age_hours: float = 20.0,
+) -> dict[str, Any]:
+    """Create a verified backup only when the last one is absent or stale."""
+    current = now or datetime.now(timezone.utc)
+    if current.tzinfo is None:
+        raise OperationsError("now must be timezone-aware")
+    if (
+        not isinstance(max_age_hours, (int, float))
+        or isinstance(max_age_hours, bool)
+        or not math.isfinite(max_age_hours)
+        or max_age_hours <= 0
+    ):
+        raise OperationsError("max_age_hours must be positive and finite")
+    previous = store.get_system_state("last_database_backup", default={})
+    previous_at = _parse_timestamp(
+        previous.get("completed_at") if isinstance(previous, dict) else None
+    )
+    previous_path = (
+        Path(previous["path"])
+        if isinstance(previous, dict) and previous.get("path")
+        else None
+    )
+    if (
+        previous_at is not None
+        and timedelta(0) <= current - previous_at
+        <= timedelta(hours=max_age_hours)
+        and previous_path is not None
+        and previous_path.exists()
+        and store.verify_database_file(previous_path) == ["ok"]
+    ):
+        return {
+            "created": False,
+            "path": str(previous_path),
+            "completed_at": previous_at.isoformat(),
+            "reason": "recent verified backup already exists",
+        }
+    destination = Path(destination_directory)
+    timestamp = current.astimezone(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    target = store.backup_to(
+        destination / f"trading-assistant-{timestamp}.db"
+    )
+    state = store.get_system_state("last_database_backup")
+    return {
+        "created": True,
+        "path": str(target),
+        "completed_at": state["completed_at"],
+        "reason": "missing or stale backup replaced",
+    }
+
+
 def _table_counts(path: Path) -> dict[str, int]:
     connection = sqlite3.connect(path)
     try:
@@ -330,4 +385,14 @@ def run_backup_restore_drill(
             "table_counts": restored_counts,
         }
     store.set_system_state("last_backup_restore_drill", report)
+    epoch = store.get_active_paper_evidence_epoch()
+    if epoch is not None:
+        store.record_operational_drill(
+            drill_type="backup_restore",
+            performed_at=report["completed_at"],
+            passed=bool(report["passed"]),
+            evidence_epoch=epoch["evidence_epoch"],
+            code_commit=epoch["lineage"]["code_commit"],
+            evidence=report,
+        )
     return report

@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "name": "Conservative personal equity and ETF mandate",
+  "status": "proposed",
+  "approved_at": null,
+  "approved_by": null,
+  "approved_fingerprint": null,
+  "target_annualized_volatility_min_pct": 12.0,
+  "target_annualized_volatility_max_pct": 18.0,
+  "max_drawdown_pct": 25.0,
+  "max_time_under_water_sessions": 180,
+  "max_downside_capture_pct": 70.0,
+  "min_upside_capture_pct": 70.0,
+  "min_paper_sessions": 60,
+  "min_paper_orders": 30,
+  "max_unreconciled_items": 0,
+  "max_critical_alerts": 0,
+  "require_reproduced_research": true,
+  "require_point_in_time_data": true,
+  "require_backup_restore_drill": true,
+  "permitted_instruments": [
+    "equity",
+    "etf"
+  ],
+  "allow_autonomous_execution": false,
+  "notes": "Proposed machine-readable defaults derived from docs/MANDATE.md. Owner approval is intentionally required before this mandate can pass the live-promotion gate."
+}

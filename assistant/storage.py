@@ -133,6 +133,47 @@ class AssistantStore:
                     response_json TEXT,
                     error TEXT
                 );
+                CREATE TABLE IF NOT EXISTS journal_transactions (
+                    transaction_id TEXT PRIMARY KEY,
+                    occurred_at TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    external_id TEXT NOT NULL UNIQUE,
+                    description TEXT NOT NULL,
+                    metadata_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS journal_postings (
+                    posting_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    transaction_id TEXT NOT NULL,
+                    account TEXT NOT NULL,
+                    asset TEXT NOT NULL,
+                    amount TEXT NOT NULL,
+                    quantity TEXT,
+                    metadata_json TEXT NOT NULL,
+                    FOREIGN KEY(transaction_id)
+                        REFERENCES journal_transactions(transaction_id)
+                );
+                CREATE TABLE IF NOT EXISTS ledger_reconciliation_runs (
+                    reconciliation_id TEXT PRIMARY KEY,
+                    reconciled_at TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    matched INTEGER NOT NULL,
+                    mismatch_count INTEGER NOT NULL,
+                    payload_json TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS operational_alerts (
+                    alert_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    fingerprint TEXT NOT NULL UNIQUE,
+                    severity TEXT NOT NULL,
+                    category TEXT NOT NULL,
+                    message TEXT NOT NULL,
+                    details_json TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    occurrences INTEGER NOT NULL,
+                    first_seen_at TEXT NOT NULL,
+                    last_seen_at TEXT NOT NULL,
+                    acknowledged_at TEXT
+                );
                 CREATE INDEX IF NOT EXISTS idx_proposals_status
                     ON trade_proposals(status, created_at);
                 CREATE INDEX IF NOT EXISTS idx_broker_events_order_at
@@ -143,6 +184,12 @@ class AssistantStore:
                     ON execution_reservations(trading_day);
                 CREATE INDEX IF NOT EXISTS idx_ai_runs_function_called_at
                     ON ai_runs(function_name, called_at);
+                CREATE INDEX IF NOT EXISTS idx_journal_postings_transaction
+                    ON journal_postings(transaction_id, posting_id);
+                CREATE INDEX IF NOT EXISTS idx_ledger_reconciliation_at
+                    ON ledger_reconciliation_runs(reconciled_at);
+                CREATE INDEX IF NOT EXISTS idx_operational_alerts_status
+                    ON operational_alerts(status, severity, last_seen_at);
                 """
             )
             self._migrate_decision_packet_identity(connection)
@@ -952,7 +999,271 @@ class AssistantStore:
         finally:
             destination_connection.close()
             source_connection.close()
+        integrity = self.verify_database_file(target)
+        if integrity != ["ok"]:
+            raise RuntimeError(
+                f"Backup integrity check failed for {target}: {integrity}"
+            )
+        self.set_system_state(
+            "last_database_backup",
+            {
+                "path": str(target),
+                "completed_at": datetime.now(timezone.utc).isoformat(),
+                "integrity": integrity,
+            },
+        )
         return target
+
+    @staticmethod
+    def verify_database_file(path: str | Path) -> list[str]:
+        connection = sqlite3.connect(Path(path))
+        try:
+            rows = connection.execute("PRAGMA integrity_check").fetchall()
+        finally:
+            connection.close()
+        return [str(row[0]) for row in rows]
+
+    def append_journal_transaction(
+        self,
+        *,
+        transaction_id: str,
+        occurred_at: str,
+        source: str,
+        external_id: str,
+        description: str,
+        postings: list[dict[str, Any]],
+        metadata: dict[str, Any] | None = None,
+    ) -> bool:
+        """Append one immutable journal transaction exactly once.
+
+        Balance and numeric validation belong to `assistant.portfolio_ledger`;
+        this method owns atomic persistence and external-id idempotency.
+        """
+        now = datetime.now(timezone.utc).isoformat()
+        connection = sqlite3.connect(self.path)
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            cursor = connection.execute(
+                """
+                INSERT INTO journal_transactions(
+                    transaction_id, occurred_at, source, external_id,
+                    description, metadata_json, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(external_id) DO NOTHING
+                """,
+                (
+                    transaction_id,
+                    occurred_at,
+                    source,
+                    external_id,
+                    description,
+                    json.dumps(metadata or {}, sort_keys=True, default=str),
+                    now,
+                ),
+            )
+            if cursor.rowcount != 1:
+                connection.commit()
+                return False
+            connection.executemany(
+                """
+                INSERT INTO journal_postings(
+                    transaction_id, account, asset, amount, quantity,
+                    metadata_json
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                [
+                    (
+                        transaction_id,
+                        posting["account"],
+                        posting.get("asset", "USD"),
+                        posting["amount"],
+                        posting.get("quantity"),
+                        json.dumps(
+                            posting.get("metadata") or {},
+                            sort_keys=True,
+                            default=str,
+                        ),
+                    )
+                    for posting in postings
+                ],
+            )
+            connection.commit()
+            return True
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+
+    def list_journal_postings(self) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT t.transaction_id, t.occurred_at, t.source,
+                       t.external_id, t.description,
+                       p.posting_id, p.account, p.asset, p.amount,
+                       p.quantity, p.metadata_json
+                FROM journal_transactions t
+                JOIN journal_postings p
+                  ON p.transaction_id = t.transaction_id
+                ORDER BY t.occurred_at ASC, t.transaction_id ASC,
+                         p.posting_id ASC
+                """
+            ).fetchall()
+        return [
+            {
+                "transaction_id": row["transaction_id"],
+                "occurred_at": row["occurred_at"],
+                "source": row["source"],
+                "external_id": row["external_id"],
+                "description": row["description"],
+                "posting_id": row["posting_id"],
+                "account": row["account"],
+                "asset": row["asset"],
+                "amount": row["amount"],
+                "quantity": row["quantity"],
+                "metadata": json.loads(row["metadata_json"]),
+            }
+            for row in rows
+        ]
+
+    def record_ledger_reconciliation(
+        self,
+        reconciliation_id: str,
+        source: str,
+        report: dict[str, Any],
+    ) -> None:
+        reconciled_at = str(
+            report.get("reconciled_at")
+            or datetime.now(timezone.utc).isoformat()
+        )
+        mismatch_count = int(report.get("mismatch_count", 0))
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO ledger_reconciliation_runs(
+                    reconciliation_id, reconciled_at, source, matched,
+                    mismatch_count, payload_json
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    reconciliation_id,
+                    reconciled_at,
+                    source,
+                    1 if report.get("matched") else 0,
+                    mismatch_count,
+                    json.dumps(report, sort_keys=True, default=str),
+                ),
+            )
+
+    def get_latest_ledger_reconciliation(self) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT payload_json
+                FROM ledger_reconciliation_runs
+                ORDER BY reconciled_at DESC, rowid DESC
+                LIMIT 1
+                """
+            ).fetchone()
+        return None if row is None else json.loads(row["payload_json"])
+
+    def upsert_operational_alert(
+        self,
+        *,
+        fingerprint: str,
+        severity: str,
+        category: str,
+        message: str,
+        details: dict[str, Any] | None = None,
+        seen_at: str | None = None,
+    ) -> dict[str, Any]:
+        now = seen_at or datetime.now(timezone.utc).isoformat()
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO operational_alerts(
+                    fingerprint, severity, category, message, details_json,
+                    status, occurrences, first_seen_at, last_seen_at,
+                    acknowledged_at
+                ) VALUES (?, ?, ?, ?, ?, 'open', 1, ?, ?, NULL)
+                ON CONFLICT(fingerprint) DO UPDATE SET
+                    severity = excluded.severity,
+                    category = excluded.category,
+                    message = excluded.message,
+                    details_json = excluded.details_json,
+                    status = 'open',
+                    occurrences = operational_alerts.occurrences + 1,
+                    last_seen_at = excluded.last_seen_at,
+                    acknowledged_at = NULL
+                """,
+                (
+                    fingerprint,
+                    severity,
+                    category,
+                    message,
+                    json.dumps(details or {}, sort_keys=True, default=str),
+                    now,
+                    now,
+                ),
+            )
+            row = connection.execute(
+                "SELECT * FROM operational_alerts WHERE fingerprint = ?",
+                (fingerprint,),
+            ).fetchone()
+        return self._operational_alert_row(row)
+
+    def list_operational_alerts(
+        self, *, status: str | None = "open", limit: int = 100
+    ) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            if status is None:
+                rows = connection.execute(
+                    """
+                    SELECT * FROM operational_alerts
+                    ORDER BY last_seen_at DESC LIMIT ?
+                    """,
+                    (limit,),
+                ).fetchall()
+            else:
+                rows = connection.execute(
+                    """
+                    SELECT * FROM operational_alerts
+                    WHERE status = ?
+                    ORDER BY last_seen_at DESC LIMIT ?
+                    """,
+                    (status, limit),
+                ).fetchall()
+        return [self._operational_alert_row(row) for row in rows]
+
+    def acknowledge_operational_alert(self, alert_id: int) -> bool:
+        now = datetime.now(timezone.utc).isoformat()
+        with self._connect() as connection:
+            cursor = connection.execute(
+                """
+                UPDATE operational_alerts
+                SET status = 'acknowledged', acknowledged_at = ?
+                WHERE alert_id = ? AND status = 'open'
+                """,
+                (now, alert_id),
+            )
+        return cursor.rowcount == 1
+
+    @staticmethod
+    def _operational_alert_row(row: sqlite3.Row) -> dict[str, Any]:
+        return {
+            "alert_id": row["alert_id"],
+            "fingerprint": row["fingerprint"],
+            "severity": row["severity"],
+            "category": row["category"],
+            "message": row["message"],
+            "details": json.loads(row["details_json"]),
+            "status": row["status"],
+            "occurrences": row["occurrences"],
+            "first_seen_at": row["first_seen_at"],
+            "last_seen_at": row["last_seen_at"],
+            "acknowledged_at": row["acknowledged_at"],
+        }
 
     def list_broker_orders(self, limit: int = 100) -> list[dict[str, Any]]:
         """Past submitted orders, most recent first, with the originating

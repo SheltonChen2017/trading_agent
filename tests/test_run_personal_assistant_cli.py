@@ -24,6 +24,9 @@ def test_top_level_help_renders_without_percent_format_errors():
     assert "falls 10%" in help_text
     assert "monitor-orders" in help_text
     assert "readiness" in help_text
+    assert "ledger-reconcile" in help_text
+    assert "operations-check" in help_text
+    assert "promotion-status" in help_text
 
 
 def test_recover_stale_accepts_a_positive_stale_after_seconds():
@@ -58,6 +61,20 @@ def test_recover_stale_rejects_non_integer():
         assert False, "expected argparse to reject a non-integer value"
     except SystemExit as exc:
         assert exc.code != 0
+
+
+def test_production_foundation_commands_parse():
+    assert (
+        build_parser().parse_args(
+            ["ledger-bootstrap", "--confirm", "bootstrap"]
+        ).confirm
+        == "bootstrap"
+    )
+    assert build_parser().parse_args(["ledger-reconcile"]).no_sync is False
+    promotion = build_parser().parse_args(
+        ["promotion-status", "report.json", "--paper-sessions", "0"]
+    )
+    assert promotion.paper_sessions == 0
 
 
 # --- _print_briefing() user-facing evidence display (GPT review,

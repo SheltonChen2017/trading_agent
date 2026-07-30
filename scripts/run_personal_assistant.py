@@ -18,7 +18,23 @@ from assistant.execution_service import (
     recover_stale_reconciliation,
 )
 from assistant.policy import load_policy
+from assistant.mandate import (
+    compute_mandate_fingerprint,
+    evaluate_live_promotion,
+    load_mandate,
+)
+from assistant.operations import (
+    append_alerts_jsonl,
+    run_backup_restore_drill,
+    run_operational_check,
+)
 from assistant.order_reconciler import monitor_orders, reconcile_nonterminal_orders
+from assistant.portfolio_ledger import (
+    bootstrap_opening_snapshot,
+    ledger_balances,
+    reconcile_snapshot,
+    sync_app_fills,
+)
 from assistant.readiness import transaction_readiness
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.research_registry import underfilled_dataset_warning
@@ -31,6 +47,7 @@ from assistant.risk_copilot import (
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import CONFIGURED_LEVERAGED_PAIRS, generate_leveraged_pair_rebalance_proposals
+from backtest.research_report import verify_research_report
 from execution.alpaca_broker import is_configured
 
 
@@ -46,6 +63,20 @@ def _positive_int(value: str) -> int:
         raise argparse.ArgumentTypeError(f"must be a positive integer, got {value!r}")
     if parsed <= 0:
         raise argparse.ArgumentTypeError(f"must be a positive integer, got {parsed}")
+    return parsed
+
+
+def _non_negative_int(value: str) -> int:
+    try:
+        parsed = int(value)
+    except ValueError:
+        raise argparse.ArgumentTypeError(
+            f"must be a non-negative integer, got {value!r}"
+        )
+    if parsed < 0:
+        raise argparse.ArgumentTypeError(
+            f"must be a non-negative integer, got {parsed}"
+        )
     return parsed
 
 
@@ -307,11 +338,169 @@ def command_backup_db(args, store: AssistantStore) -> None:
     print(f"Database backup created: {target}")
 
 
+def command_mandate_status(args, store: AssistantStore) -> None:
+    mandate = load_mandate(args.mandate)
+    payload = mandate.to_dict()
+    payload["computed_fingerprint"] = compute_mandate_fingerprint(mandate)
+    payload["live_trading_enabled"] = False
+    print(json.dumps(payload, indent=2, sort_keys=True))
+
+
+def command_ledger_bootstrap(args, store: AssistantStore) -> None:
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required for ledger bootstrap."
+        )
+    snapshot = build_portfolio_snapshot_from_alpaca()
+    result = bootstrap_opening_snapshot(
+        store, snapshot, confirmation=args.confirm
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+def command_ledger_sync(args, store: AssistantStore) -> None:
+    result = sync_app_fills(store)
+    balances = ledger_balances(store)
+    result["cash"] = str(balances["cash"])
+    result["shares"] = {
+        ticker: str(qty)
+        for ticker, qty in sorted(balances["shares"].items())
+    }
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+def command_ledger_reconcile(args, store: AssistantStore) -> None:
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required for ledger reconciliation."
+        )
+    if not args.no_sync:
+        sync_app_fills(store)
+    snapshot = build_portfolio_snapshot_from_alpaca()
+    report = reconcile_snapshot(store, snapshot)
+    print(json.dumps(report, indent=2, sort_keys=True))
+    if not report["matched"]:
+        raise SystemExit(2)
+
+
+def command_operations_check(args, store: AssistantStore) -> None:
+    policy = load_policy(args.policy)
+    report = run_operational_check(
+        store, policy, check_broker=not args.offline
+    )
+    if args.alerts_jsonl and report["alerts"]:
+        append_alerts_jsonl(report["alerts"], args.alerts_jsonl)
+    print(json.dumps(report, indent=2, sort_keys=True))
+    if not report["healthy"]:
+        raise SystemExit(2)
+
+
+def command_list_alerts(args, store: AssistantStore) -> None:
+    status = None if args.all else "open"
+    print(
+        json.dumps(
+            store.list_operational_alerts(status=status, limit=args.limit),
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
+def command_ack_alert(args, store: AssistantStore) -> None:
+    if not store.acknowledge_operational_alert(args.alert_id):
+        raise SystemExit(f"Open alert not found: {args.alert_id}")
+    print(f"Acknowledged alert {args.alert_id}.")
+
+
+def command_recovery_drill(args, store: AssistantStore) -> None:
+    destination = args.destination
+    if destination is None:
+        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        destination = (
+            store.path.parent
+            / "backups"
+            / f"recovery-drill-{timestamp}.db"
+        )
+    report = run_backup_restore_drill(store, destination)
+    print(json.dumps(report, indent=2, sort_keys=True))
+    if not report["passed"]:
+        raise SystemExit(2)
+
+
+def command_promotion_status(args, store: AssistantStore) -> None:
+    mandate = load_mandate(args.mandate)
+    report = json.loads(args.research_report.read_text(encoding="utf-8"))
+    if not verify_research_report(report):
+        raise SystemExit(
+            "Research report hash is missing or invalid; refusing promotion review."
+        )
+    latest_reconciliation = store.get_latest_ledger_reconciliation()
+    unreconciled = (
+        int(latest_reconciliation.get("mismatch_count", 0))
+        if latest_reconciliation is not None
+        else 1
+    )
+    critical_alerts = sum(
+        alert["severity"] == "critical"
+        for alert in store.list_operational_alerts(status="open", limit=1000)
+    )
+    fills = store.list_fills()
+    paper_orders = len({fill["order_id"] for fill in fills})
+    restore_drill = store.get_system_state(
+        "last_backup_restore_drill", default={}
+    )
+    operations_heartbeat = store.get_system_state(
+        "operations_heartbeat", default={}
+    )
+    heartbeat_at = None
+    try:
+        heartbeat_at = datetime.fromisoformat(
+            str(operations_heartbeat.get("at", "")).replace("Z", "+00:00")
+        )
+        if heartbeat_at.tzinfo is None:
+            heartbeat_at = None
+    except ValueError:
+        heartbeat_at = None
+    heartbeat_fresh = (
+        heartbeat_at is not None
+        and datetime.now(timezone.utc) - heartbeat_at <= timedelta(minutes=5)
+    )
+    result = evaluate_live_promotion(
+        mandate,
+        metric_report=report.get("metrics") or {},
+        paper_sessions=args.paper_sessions,
+        paper_orders=paper_orders,
+        unreconciled_items=unreconciled,
+        critical_alerts=critical_alerts,
+        research_reproduced=args.research_reproduced,
+        point_in_time_data=bool(
+            (report.get("research_protocol") or {}).get(
+                "point_in_time_data"
+            )
+        ),
+        backup_restore_drill_passed=bool(restore_drill.get("passed")),
+        operational_health_passed=bool(
+            operations_heartbeat.get("healthy") and heartbeat_fresh
+        ),
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+    if not result["ready_for_live_canary_review"]:
+        raise SystemExit(2)
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Personal trading assistant")
     parser.add_argument(
         "--policy",
         default=str(Path(__file__).resolve().parent.parent / "assistant" / "default_policy.json"),
+    )
+    parser.add_argument(
+        "--mandate",
+        default=str(
+            Path(__file__).resolve().parent.parent
+            / "assistant"
+            / "default_mandate.json"
+        ),
     )
     commands = parser.add_subparsers(dest="command", required=True)
 
@@ -453,6 +642,86 @@ def build_parser() -> argparse.ArgumentParser:
     backup = commands.add_parser("backup-db", help="Create a consistent SQLite backup.")
     backup.add_argument("destination", nargs="?", type=Path)
     backup.set_defaults(handler=command_backup_db)
+
+    mandate_status = commands.add_parser(
+        "mandate-status",
+        help="Validate and display the machine-readable portfolio mandate.",
+    )
+    mandate_status.set_defaults(handler=command_mandate_status)
+
+    ledger_bootstrap = commands.add_parser(
+        "ledger-bootstrap",
+        help="Record the current Alpaca snapshot as the journal opening balance.",
+    )
+    ledger_bootstrap.add_argument(
+        "--confirm",
+        required=True,
+        help='Must be exactly "bootstrap" (case-insensitive).',
+    )
+    ledger_bootstrap.set_defaults(handler=command_ledger_bootstrap)
+
+    ledger_sync = commands.add_parser(
+        "ledger-sync",
+        help="Idempotently append post-bootstrap app fills to the journal.",
+    )
+    ledger_sync.set_defaults(handler=command_ledger_sync)
+
+    ledger_reconcile = commands.add_parser(
+        "ledger-reconcile",
+        help="Compare journal cash/positions with the current Alpaca snapshot.",
+    )
+    ledger_reconcile.add_argument(
+        "--no-sync",
+        action="store_true",
+        help="Do not sync app fills before comparing the snapshot.",
+    )
+    ledger_reconcile.set_defaults(handler=command_ledger_reconcile)
+
+    operations_check = commands.add_parser(
+        "operations-check",
+        help="Run readiness, accounting, backup and recovery health checks.",
+    )
+    operations_check.add_argument("--offline", action="store_true")
+    operations_check.add_argument("--alerts-jsonl", type=Path)
+    operations_check.set_defaults(handler=command_operations_check)
+
+    list_alerts = commands.add_parser(
+        "alerts", help="List durable operational alerts."
+    )
+    list_alerts.add_argument("--all", action="store_true")
+    list_alerts.add_argument("--limit", type=_positive_int, default=100)
+    list_alerts.set_defaults(handler=command_list_alerts)
+
+    acknowledge = commands.add_parser(
+        "ack-alert", help="Acknowledge one open operational alert."
+    )
+    acknowledge.add_argument("alert_id", type=_positive_int)
+    acknowledge.set_defaults(handler=command_ack_alert)
+
+    recovery_drill = commands.add_parser(
+        "recovery-drill",
+        help="Create, restore and verify a database backup.",
+    )
+    recovery_drill.add_argument("destination", nargs="?", type=Path)
+    recovery_drill.set_defaults(handler=command_recovery_drill)
+
+    promotion = commands.add_parser(
+        "promotion-status",
+        help=(
+            "Evaluate evidence for a human live-canary review. This never "
+            "enables live trading."
+        ),
+    )
+    promotion.add_argument("research_report", type=Path)
+    promotion.add_argument(
+        "--paper-sessions", type=_non_negative_int, required=True
+    )
+    promotion.add_argument(
+        "--research-reproduced",
+        action="store_true",
+        help="Attest that the report was independently reproduced.",
+    )
+    promotion.set_defaults(handler=command_promotion_status)
     return parser
 
 

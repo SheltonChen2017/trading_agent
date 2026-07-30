@@ -1,7 +1,9 @@
 # Portfolio Mandate
 
-**Status: DRAFT — numeric targets below are starting points, not settled
-policy. Revise freely; bump the changelog at the bottom when you do.**
+**Status: PROPOSED — numeric targets below are starting points, not settled
+policy. The machine-readable counterpart is
+`assistant/default_mandate.json`; it deliberately fails the live-promotion
+gate until its targets are explicitly approved and fingerprint-bound.**
 
 ## 1. Purpose
 
@@ -58,16 +60,15 @@ targets above is not a win by this document's standard.
   computable, how it performed against this table — not just CAGR/win
   rate.
 
-**Current reality check (2026-07-29):** the two bullets above describe the
-intended discipline, not an automated pipeline. Today
-`backtest/risk_metrics.py` is called by exactly one script
-(`scripts/run_defensive_carry_probe.py`), and
-`backtest.portfolio_simulator.simulate_portfolio()` is exercised only by
-its own tests — no research runner currently chains
-simulate_portfolio → risk_metrics → a report against §2's table. Computing
-these metrics is therefore still a manual step per investigation. Wiring
-one reusable reporting entry point is the obvious next piece of work; it
-is deliberately recorded as missing here rather than left implied.
+**Current reality check (2026-07-29):** a reusable first pipeline now exists:
+`scripts/run_portfolio_research_report.py` chains the shared-capital
+portfolio simulator into `backtest/research_report.py`, fingerprints its
+input data and parameters, applies a hold-period embargo, computes the
+risk-shape metrics, and writes an immutable report against the
+machine-readable mandate. Its current yfinance-backed data is explicitly
+marked `point_in_time_data=false`, so the report remains promotion-blocked.
+Historical registry findings have not yet been reproduced through this
+pipeline.
 
 ## 4. Scope decisions
 
@@ -127,3 +128,6 @@ targets in §2 change, so revisions are visible, not silent edits.
 - **2026-07-28** — §5 cross-links `docs/ALLOCATION_SERVICE_DESIGN.md`
   (a new gap raised in a later review, not one of the original four
   sleeves); no §2 target changes.
+- **2026-07-29** — status changed from draft to proposed; added the
+  fingerprint-bound machine-readable mandate and immutable mandate-scored
+  research-report pipeline. Numeric targets were not changed or approved.

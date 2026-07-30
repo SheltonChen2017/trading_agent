@@ -26,7 +26,7 @@ from assistant.order_reconciler import (
     MIN_ABSENCE_AGE_SECONDS,
     reconcile_nonterminal_orders,
 )
-from assistant.proposal_status import SUBMISSION_FAILED, SUBMITTING
+from assistant.proposal_status import SUBMISSION_FAILED, SUBMISSION_UNKNOWN, SUBMITTING
 from assistant.storage import AssistantStore
 
 RESERVED_NOTIONAL = 1_000.0
@@ -223,6 +223,60 @@ def test_age_is_rechecked_atomically_before_releasing_the_reservation():
         assert result["confirmed_absent"] == 0
         assert store.get_proposal("tp-inflight")["status"] == "reconciling"
         assert _reserved_notional(store) == RESERVED_NOTIONAL
+
+
+def test_a_blocked_reconcile_attempt_does_not_restart_the_grace_clock():
+    """Found while reviewing the reconciliation-hardening round (2026-07-30).
+
+    reconcile_submission() bounces a too-recent 404 back to
+    "submission_unknown". That write used to stamp updated_at = now -- but the
+    grace period is measured FROM updated_at, so every attempt pushed its own
+    deadline out. A user re-clicking Reconcile inside the window could never
+    let the proposal age enough to resolve, and because the background poller
+    reads the same column, the impatient clicking starved that too. The bounce
+    must preserve the original timestamp: it made no progress, so it is not a
+    transition.
+    """
+    from assistant.execution_service import reconcile_submission
+    import execution.alpaca_broker as broker_module
+
+    original_lookup = broker_module.find_order_by_client_id
+    broker_module.find_order_by_client_id = lambda client_order_id: None
+    try:
+        with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+            store = _store_with_reservation(temp, status=SUBMISSION_UNKNOWN)
+            before = _updated_at(store, SUBMISSION_UNKNOWN)
+
+            for _ in range(3):
+                with pytest.raises(Exception):
+                    reconcile_submission("tp-inflight", store)
+
+            after = _updated_at(store, SUBMISSION_UNKNOWN)
+            assert after == before, (
+                "a no-progress bounce must not refresh updated_at -- doing so "
+                "restarts the very grace period the caller is waiting on"
+            )
+            assert _reserved_notional(store) == RESERVED_NOTIONAL
+    finally:
+        broker_module.find_order_by_client_id = original_lookup
+
+
+def test_absence_age_helper_fails_closed_without_claim_metadata():
+    """Pins a fail-closed default that is unreachable today.
+
+    claim_proposal() always supplies _claimed_from_updated_at (updated_at is
+    NOT NULL), so this branch is defensive dead code -- and a mutation flipping
+    it to fail OPEN survived the whole suite. Asserted directly so the safe
+    direction is pinned rather than merely intended.
+    """
+    from assistant.execution_service import _broker_absence_is_old_enough
+
+    now = datetime.now(timezone.utc)
+    assert _broker_absence_is_old_enough({}, now=now) is False
+    assert _broker_absence_is_old_enough({"_claimed_from_updated_at": None}, now=now) is False
+    assert _broker_absence_is_old_enough(
+        {"_claimed_from_updated_at": "not-a-timestamp"}, now=now,
+    ) is False
 
 
 if __name__ == "__main__":

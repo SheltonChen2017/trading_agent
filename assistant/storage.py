@@ -422,9 +422,21 @@ class AssistantStore:
         *,
         expected_statuses: tuple[str, ...],
         new_status: str,
+        preserve_updated_at: str | None = None,
         **updates: Any,
     ) -> dict[str, Any] | None:
-        """Atomically update only while the proposal is in an expected state."""
+        """Atomically update only while the proposal is in an expected state.
+
+        `preserve_updated_at` writes that timestamp instead of "now". Use it
+        ONLY when reverting a proposal to the state it was already in -- a
+        no-progress bounce, not a transition. `updated_at` means "when did
+        this enter its current status", and the broker-absence grace period
+        is measured from it, so refreshing it on a bounce restarts the very
+        clock the caller is waiting on: repeated reconcile attempts inside
+        the grace window would each push the deadline out and the proposal
+        could never age enough to resolve (found 2026-07-30 while reviewing
+        the reconciliation-hardening round).
+        """
         connection = sqlite3.connect(self.path)
         connection.row_factory = sqlite3.Row
         try:
@@ -441,7 +453,7 @@ class AssistantStore:
             proposal = json.loads(row["payload_json"])
             proposal.update(updates)
             proposal["status"] = new_status
-            now = datetime.now(timezone.utc).isoformat()
+            now = preserve_updated_at or datetime.now(timezone.utc).isoformat()
             connection.execute(
                 "UPDATE trade_proposals SET status = ?, payload_json = ?, updated_at = ? "
                 "WHERE proposal_id = ? AND status = ?",

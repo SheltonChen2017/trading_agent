@@ -1545,6 +1545,15 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
                     proposal_id,
                     expected_statuses=(RECONCILING,),
                     new_status=SUBMISSION_UNKNOWN,
+                    # Restore the ORIGINAL timestamp: this bounce made no
+                    # progress, and the grace period is measured from
+                    # updated_at. Writing "now" here would push the deadline
+                    # out on every attempt, so a user re-clicking Reconcile
+                    # inside the window could never let the proposal age
+                    # enough to resolve -- and would starve the background
+                    # poller too, since it reads the same column.
+                    preserve_updated_at=str(claimed.get("_claimed_from_updated_at") or "")
+                    or None,
                     reconciled_at=reconciled_at,
                     error=(
                         "Reconciliation found no matching broker order, but the unresolved "

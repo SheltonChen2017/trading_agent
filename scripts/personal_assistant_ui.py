@@ -44,6 +44,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import streamlit as st
 
+from assistant.kill_switch import env_kill_switch_active
 from assistant.allocation_batch import (
     BATCH_STOPPED_UNKNOWN,
     execute_allocation_batch,
@@ -673,7 +674,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                         display_policy,
                         store,
                         now_et=_now_eastern(),
-                        kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                        kill_switch_active=env_kill_switch_active(),
                     )
                     st.session_state.pop(override_key, None)
                     st.session_state.pop(override_confirm_key, None)
@@ -739,7 +740,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                             display_policy,
                             store,
                             now_et=_now_eastern(),
-                            kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                            kill_switch_active=env_kill_switch_active(),
                             override_policy_violations=True,
                         )
                         st.session_state.pop(override_key, None)
@@ -1656,7 +1657,7 @@ with tab_watchlist:
                     preflight = preflight_allocation_batch(
                         current_proposal_ids, store, approve_policy, alloc_packet.portfolio,
                         now_et=_now_eastern(),
-                        kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                        kill_switch_active=env_kill_switch_active(),
                     )
                     failed_preflight = {pid: v for pid, v in preflight.items() if not v.approved}
                     if failed_preflight:
@@ -1688,7 +1689,7 @@ with tab_watchlist:
                     # later leg's fresh quote against an increasingly
                     # stale now_et (GPT review, 2026-07-31).
                     now_provider=_now_eastern,
-                    kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+                    kill_switch_active=env_kill_switch_active(),
                 )
                 st.write(f"Batch `{active_batch_id}` -- status: **{batch['status']}**")
                 if batch["status"] == BATCH_STOPPED_UNKNOWN:

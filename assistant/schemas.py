@@ -177,12 +177,18 @@ class FindingProvenance:
 
 
 # Statuses strong enough that a reader might treat them as
-# production-actionable without checking anything else -- kept in sync
-# with assistant/research_registry.py's _STATUSES_REQUIRING_PROVENANCE
-# (that module imports EvidenceStatus from here, so the reverse import
-# would be circular; this is the single logical definition, duplicated
-# only as this one frozenset).
-_STATUSES_REQUIRING_PROVENANCE = frozenset({EvidenceStatus.CONFIRMED, EvidenceStatus.PROMISING_UNCONFIRMED})
+# production-actionable without checking anything else, so they must carry
+# provenance.
+#
+# THE single definition. research_registry.py used to keep its own copy,
+# hand-synced via a comment; a status added to one and not the other would
+# require provenance in one layer and not the other, which is precisely the
+# drift a duplicated safety rule produces. That module already imports from
+# this one (EvidenceStatus), so sharing it is not circular -- the old comment
+# claiming otherwise had the direction backwards (2026-07-30).
+STATUSES_REQUIRING_PROVENANCE = frozenset(
+    {EvidenceStatus.CONFIRMED, EvidenceStatus.PROMISING_UNCONFIRMED}
+)
 
 
 @dataclasses.dataclass
@@ -214,7 +220,7 @@ class SignalEvidence:
         can never go stale independently of them. Statuses that make no
         strong positive claim (rejected/exploratory/unavailable) are
         always authoritative -- there is nothing here to distrust."""
-        if self.status not in _STATUSES_REQUIRING_PROVENANCE:
+        if self.status not in STATUSES_REQUIRING_PROVENANCE:
             return True
         return self.provenance is not None and self.provenance.reproduced_after_data_loader_fix
 

@@ -398,6 +398,9 @@ def reconcile_nonterminal_orders(
         "cancellation_requested": 0,
         "confirmed_absent": 0,
         "skipped_too_recent": 0,
+        # Legacy "executed" rows the broker no longer returns. Counted, never
+        # rewritten -- see the EXECUTED branch below.
+        "legacy_unverifiable": 0,
         "errors": [],
     }
     for proposal in proposals:
@@ -425,8 +428,28 @@ def reconcile_nonterminal_orders(
                     )
                     if transitioned is not None:
                         result["confirmed_absent"] += 1
+                elif proposal["status"] == EXECUTED:
+                    # Legacy "executed" rows are NOT reinterpreted on absence.
+                    #
+                    # proposal_status_for_order() never returns EXECUTED -- it
+                    # only exists on rows written before fill-aware lifecycle
+                    # tracking, i.e. OLD trades. Brokers age orders out of their
+                    # lookup window, so "not found" for one of these is the
+                    # EXPECTED answer, not an anomaly. Flipping it to
+                    # submission_unknown was actively harmful once
+                    # IN_FLIGHT_INTENT_STATUSES started holding a ticker/side
+                    # slot (2026-07-30): a long-completed trade would silently
+                    # block every new proposal for that ticker and side, and
+                    # fail readiness, on the strength of a lookup miss that
+                    # proves nothing.
+                    #
+                    # The row stays in RECONCILABLE_STATUSES on purpose: if the
+                    # broker DOES return the order, apply_broker_update() below
+                    # still migrates it to a real fill-aware status. Absence
+                    # simply is not evidence either way, so nothing is written.
+                    result["legacy_unverifiable"] += 1
                 else:
-                    # A once-known active order disappearing from a lookup is
+                    # A once-known ACTIVE order disappearing from a lookup is
                     # anomalous; do not reinterpret that as a clean failure.
                     store.update_proposal_status_if_current(
                         proposal_id,
@@ -434,7 +457,6 @@ def reconcile_nonterminal_orders(
                             BROKER_ACCEPTED,
                             PARTIALLY_FILLED,
                             CANCEL_PENDING,
-                            EXECUTED,
                         ),
                         new_status=SUBMISSION_UNKNOWN,
                         error=(

@@ -279,5 +279,89 @@ def test_absence_age_helper_fails_closed_without_claim_metadata():
     ) is False
 
 
+
+# --- L6: a legacy "executed" row must not be corrupted by an absent lookup ---
+#
+# proposal_status_for_order() never returns EXECUTED; it only exists on rows
+# written before fill-aware lifecycle tracking, i.e. OLD trades. Brokers age
+# orders out of their lookup window, so "not found" is the EXPECTED answer for
+# one of these. Flipping it to submission_unknown became actively harmful once
+# IN_FLIGHT_INTENT_STATUSES started holding a ticker/side slot: a long-completed
+# trade would silently block every new proposal for that ticker/side and fail
+# readiness, on the strength of a lookup miss that proves nothing.
+
+def test_an_absent_legacy_executed_order_is_left_alone():
+    from assistant.proposal_status import EXECUTED
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal(status=EXECUTED, proposal_id="tp-legacy"))
+
+        result = reconcile_nonterminal_orders(
+            store, broker_module=_AbsentBroker,
+            now=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+
+        assert store.get_proposal("tp-legacy")["status"] == EXECUTED
+        assert result["legacy_unverifiable"] == 1
+        assert result["confirmed_absent"] == 0
+
+
+def test_an_absent_legacy_executed_order_does_not_block_new_proposals():
+    """The harm this prevents: a completed trade silently locking its ticker."""
+    from assistant.proposal_status import EXECUTED, IN_FLIGHT_INTENT_STATUSES
+    from assistant.storage import DuplicateIntentConflict
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal(status=EXECUTED, proposal_id="tp-legacy"))
+        fresh = _proposal(proposal_id="tp-new")
+        fresh["status"] = "proposed"
+        store.save_proposal(fresh)
+
+        reconcile_nonterminal_orders(
+            store, broker_module=_AbsentBroker,
+            now=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+
+        # EXECUTED is itself in IN_FLIGHT_INTENT_STATUSES (a legacy row may be
+        # an accepted-but-unfilled order), so this claim is still blocked --
+        # but by the ORIGINAL status, not by a submission_unknown invented from
+        # a lookup miss. The distinction matters: submission_unknown also fails
+        # readiness and demands manual reconciliation.
+        assert store.get_proposal("tp-legacy")["status"] == EXECUTED
+        try:
+            store.claim_proposal(
+                "tp-new", expected_status="proposed", new_status="validating",
+                conflicting_intent_statuses=IN_FLIGHT_INTENT_STATUSES,
+            )
+        except DuplicateIntentConflict as exc:
+            assert "executed" in str(exc), "must cite the real status, not a fabricated one"
+
+
+def test_an_absent_active_order_is_still_treated_as_anomalous():
+    """The narrowing must not weaken the genuine case: a BROKER_ACCEPTED order
+    vanishing IS anomalous and must still be surfaced.
+
+    Measured note: putting EXECUTED back into the else-branch's
+    expected_statuses tuple survives this file, because the `elif` above
+    short-circuits first and the else can never receive an EXECUTED row. Dead
+    list membership, not a behavioural property -- removed for clarity, and
+    left unpinned rather than asserted on source text.
+    """
+    from assistant.proposal_status import BROKER_ACCEPTED, SUBMISSION_UNKNOWN
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal(status=BROKER_ACCEPTED, proposal_id="tp-active"))
+
+        result = reconcile_nonterminal_orders(
+            store, broker_module=_AbsentBroker,
+            now=datetime.now(timezone.utc) + timedelta(hours=1),
+        )
+
+        assert store.get_proposal("tp-active")["status"] == SUBMISSION_UNKNOWN
+        assert result["legacy_unverifiable"] == 0
+
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))

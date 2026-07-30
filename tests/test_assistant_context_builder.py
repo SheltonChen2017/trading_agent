@@ -800,3 +800,68 @@ if __name__ == "__main__":
     test_build_decision_packet_falls_back_when_alpaca_not_configured()
     test_build_decision_packet_uses_live_alpaca_when_configured()
     print("All assistant context builder tests passed.")
+
+
+def test_non_finite_total_equity_says_so_instead_of_reporting_no_warnings():
+    """NaN loses every ordered comparison, so a `total <= 0` guard passes it
+    through and every `pct > threshold` check is then False -- a portfolio 100%
+    in one name reported ZERO concentration warnings and NaN percentages.
+    build_portfolio_snapshot() rejects non-finite inputs so this is defence in
+    depth, matching what risk/execution_gate.py and paper_evidence.py already
+    do (2026-07-30)."""
+    import dataclasses
+    import math
+
+    from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
+
+    healthy = build_portfolio_snapshot(
+        [{"ticker": "NVDA", "shares": 100, "entry_price": 100.0, "current_price": 100.0}],
+        cash=0.0,
+    )
+    assert build_risk_exposure(healthy).concentration_warnings, "setup: should warn"
+
+    for bad in (float("nan"), float("inf")):
+        corrupt = dataclasses.replace(healthy, total_equity=bad)
+        exposure = build_risk_exposure(corrupt)
+        assert exposure.concentration_warnings, "must not report a clean portfolio"
+        assert "not a usable number" in exposure.concentration_warnings[0]
+        assert math.isfinite(exposure.leveraged_etf_exposure_pct)
+        assert math.isfinite(exposure.cash_pct)
+
+
+def test_non_finite_total_equity_does_not_silently_suppress_risk_reduction():
+    import dataclasses
+
+    from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
+    from assistant.policy import TradingPolicy
+    from assistant.proposals import generate_risk_reduction_proposals
+    from assistant.schemas import DecisionPacket, MarketRegime
+
+    policy = TradingPolicy(
+        version="t", name="t", execution_mode="paper", max_position_pct=0.20,
+        max_total_exposure_pct=1.0, max_basket_pct=1.0, max_leveraged_etf_pct=1.0,
+        min_cash_reserve_pct=0.0, max_order_value=500_000.0,
+    )
+    snapshot = build_portfolio_snapshot(
+        [{"ticker": "NVDA", "shares": 100, "entry_price": 100.0, "current_price": 100.0}],
+        cash=1000.0,
+    )
+
+    def packet_for(snap):
+        return DecisionPacket(
+            generated_at="2026-07-30T12:00:00+00:00", portfolio=snap,
+            risk=build_risk_exposure(snap),
+            regime=MarketRegime("QQQ", "uptrend", "low_vol", 1.0, "2026-07-29"),
+            signals=[], upcoming_events=[], warnings=[], policy_version="t",
+        )
+
+    assert generate_risk_reduction_proposals(packet_for(snapshot), policy), "setup"
+    corrupt = dataclasses.replace(snapshot, total_equity=float("nan"))
+    # NOT a behavioural pin, and deliberately said so: removing the isfinite
+    # guard in proposals.py still yields [], because every
+    # `market_value > max_*_value` comparison against NaN is already False. The
+    # guard changes intent, not output -- it makes "we refuse to reason about a
+    # corrupt total" explicit instead of an accident of IEEE-754. Measured: that
+    # mutation survives this assertion. Kept anyway to document the contract,
+    # and to stop a future edit from computing something from the NaN.
+    assert generate_risk_reduction_proposals(packet_for(corrupt), policy) == []

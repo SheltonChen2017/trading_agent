@@ -502,3 +502,63 @@ def test_selling_the_entire_position_at_a_loss_is_not_a_wash_sale():
 
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))
+
+
+# --- an uncovered ticker must not fabricate a cost basis (2026-07-30) ---
+#
+# ledger.average_cost() returns 0.0 when no lots are known, so the
+# average-cost view reported basis=0 and therefore the WHOLE proceeds as gain:
+# a "$2,000 realized gain" on a position whose basis is simply unknown. And
+# because compare_sale_bases() left `available` for the caller to stamp True
+# unconditionally, both the CLI and the UI rendered an empty result instead of
+# the "advisory unavailable" branch -- so missing lot history looked exactly
+# like "no tax implications". For a tax figure that is the worst direction to
+# be wrong in: it overstates the bill and can talk a user out of a
+# risk-reducing sell.
+
+def _uncovered_ledger():
+    return build_ledger([
+        Fill(ticker="AAPL", qty=10, price=50.0,
+             at=datetime(2025, 1, 1, tzinfo=timezone.utc), fill_id="f1", side="buy"),
+    ])
+
+
+def test_an_uncovered_ticker_reports_unavailable_rather_than_a_zero_basis():
+    result = compare_sale_bases(_uncovered_ledger(), "NVDA", qty=20, price=100.0)
+
+    assert result["available"] is False
+    assert result["reason"]
+    view = result["average_cost_view"]
+    assert view["available"] is False
+    assert "unknown -- not zero" in view["reason"]
+    assert "cost_per_share" not in view, "must not publish a fabricated basis"
+    assert "realized_pnl" not in view, "must not publish a fabricated gain"
+
+
+def test_a_covered_ticker_still_reports_real_figures():
+    """The guard must not suppress genuine advice."""
+    ledger = build_ledger([
+        Fill(ticker="NVDA", qty=50, price=40.0,
+             at=datetime(2025, 1, 1, tzinfo=timezone.utc), fill_id="f2", side="buy"),
+    ])
+    result = compare_sale_bases(ledger, "NVDA", qty=20, price=100.0)
+
+    assert result["available"] is True
+    assert "reason" not in result
+    assert result["average_cost_view"]["available"] is True
+    assert result["average_cost_view"]["cost_per_share"] == 40.0
+    # (100 - 40) * 20
+    assert result["methods"]["fifo"]["realized_pnl"] == 1200.0
+
+
+def test_partial_coverage_is_flagged_on_the_average_cost_view():
+    """Holding fewer shares than the sale still yields per-method errors, but
+    the average-cost view must say it only covers part of the position."""
+    ledger = build_ledger([
+        Fill(ticker="NVDA", qty=5, price=40.0,
+             at=datetime(2025, 1, 1, tzinfo=timezone.utc), fill_id="f3", side="buy"),
+    ])
+    result = compare_sale_bases(ledger, "NVDA", qty=20, price=100.0)
+
+    assert result["average_cost_view"]["covers_only_shares"] == 5
+    assert result["available"] is False

@@ -106,7 +106,11 @@ def generate_risk_reduction_proposals(
     concentration-limit logic worth knowing about.
     """
     snapshot = packet.portfolio
-    if snapshot.total_equity <= 0:
+    # isfinite first (see build_risk_exposure's note): with a NaN total every
+    # `market_value > max_*_value` comparison is False, so a portfolio in
+    # blatant breach silently generated ZERO risk-reduction proposals -- the
+    # fail-open direction on the one path whose whole job is reducing risk.
+    if not math.isfinite(snapshot.total_equity) or snapshot.total_equity <= 0:
         return []
 
     reductions: dict[str, dict] = {}
@@ -259,14 +263,29 @@ def generate_risk_reduction_proposals(
                     price=position.current_price,
                     when=now,
                 )
-                tax_advisory["available"] = True
+                # Do NOT force available=True here. compare_sale_bases() sets
+                # it from whether any method actually produced figures; a
+                # ticker the lot ledger has never seen (there is still no
+                # importer for fills predating this app) errors on every
+                # method, and stamping it available made the CLI print nothing
+                # at all -- skipping the "advisory unavailable" branch, so
+                # missing lot history looked exactly like "no tax implications"
+                # (found 2026-07-30 reviewing this feature).
+                tax_advisory.setdefault("available", False)
                 tax_advisory["advisory_only"] = True
                 expected_impact["tax_lot_advisory"] = tax_advisory
-                uncertainties.append(
-                    "Tax-lot figures are advisory bookkeeping, never an "
-                    "execution gate; broker records and Form 1099-B remain "
-                    "authoritative."
-                )
+                if tax_advisory["available"]:
+                    uncertainties.append(
+                        "Tax-lot figures are advisory bookkeeping, never an "
+                        "execution gate; broker records and Form 1099-B remain "
+                        "authoritative."
+                    )
+                else:
+                    uncertainties.append(
+                        "Tax-lot advice is unavailable for this sale "
+                        f"({tax_advisory.get('reason', 'unknown reason')}); "
+                        "that never delays a risk-reducing order."
+                    )
             except TaxLotError as exc:
                 expected_impact["tax_lot_advisory"] = {
                     "available": False,

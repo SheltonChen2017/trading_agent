@@ -4,14 +4,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from assistant.schemas import EvidenceStatus, FindingProvenance, SignalEvidence
+from assistant.schemas import (
+    STATUSES_REQUIRING_PROVENANCE,
+    EvidenceStatus,
+    FindingProvenance,
+    SignalEvidence,
+)
 
 DEFAULT_REGISTRY_PATH = Path(__file__).resolve().parent / "research_findings.json"
 
-# Statuses whose findings are strong enough that a reader might treat them
-# as production-actionable -- these require provenance so that trust can't
-# rest on an unlabeled, unreproducible claim (GPT review finding #8).
-_STATUSES_REQUIRING_PROVENANCE = {EvidenceStatus.CONFIRMED, EvidenceStatus.PROMISING_UNCONFIRMED}
+
 
 # The minimum provenance fields a confirmed/promising finding must carry.
 # Deliberately a small, checkable subset (not every FindingProvenance
@@ -41,7 +43,7 @@ def load_research_findings(path: str | Path = DEFAULT_REGISTRY_PATH) -> list[Sig
         status = EvidenceStatus(item["status"])
         provenance = _parse_provenance(item)
 
-        if status in _STATUSES_REQUIRING_PROVENANCE:
+        if status in STATUSES_REQUIRING_PROVENANCE:
             if provenance is None:
                 raise ValueError(
                     f"Finding {item['label']!r} has status {status.value!r} but no provenance -- "

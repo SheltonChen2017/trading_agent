@@ -207,6 +207,7 @@ from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
+from assistant.kill_switch import env_kill_switch_active
 from assistant.order_lifecycle import (
     journal_broker_order_update,
     proposal_status_for_order,
@@ -744,7 +745,7 @@ def validate_proposal_for_execution(
         )
     kill_switch_active = (
         kill_switch_active
-        or os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1"
+        or env_kill_switch_active()
         or bool(persistent_kill_switch.get("active"))
     )
     if proposal is None:
@@ -1043,7 +1044,7 @@ def execute_approved_paper_proposal(
         ) from exc
     kill_switch_active = (
         kill_switch_active
-        or os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1"
+        or env_kill_switch_active()
         or bool(persistent_kill_switch.get("active"))
     )
 

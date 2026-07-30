@@ -269,5 +269,70 @@ def test_a_stranded_claim_makes_the_overall_report_not_ready():
         _backdate(store, "tp-stuck", seconds=7200)
         assert _readiness(store)["ready"] is False
 
+
+# --- verification follow-ups (reviewing the claim-fencing round) --------
+
+def test_a_fenced_worker_raises_claim_lost_rather_than_a_generic_error():
+    """The fencing helper itself: a revoked claim must refuse and not write.
+
+    NOT a pin on `except _ProposalClaimLostError: raise` in
+    execute_approved_paper_proposal(). Deleting that line was measured against
+    the real execution path and is behaviorally UNOBSERVABLE -- the raised type
+    and message are identical either way (without it, the generic
+    ProposalExecutionError handler attempts its own fenced validating->blocked
+    write, which raises the same error from inside the handler), and both paths
+    send zero orders and hold zero reservations. It differs only in exception
+    __context__ chaining. Pinning that would assert exception plumbing rather
+    than behavior, so it is deliberately left unpinned and recorded here
+    instead of implied by a test that does not actually cover it.
+    """
+    from assistant.execution_service import (
+        _ProposalClaimLostError,
+        _transition_pre_broker_claim,
+    )
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-lost", VALIDATION_FAILED))
+
+        with pytest.raises(_ProposalClaimLostError) as caught:
+            _transition_pre_broker_claim(
+                store, "tp-lost", expected_status=VALIDATING, new_status=APPROVED,
+            )
+
+        message = str(caught.value)
+        assert "lost its execution claim" in message
+        assert "Refusing to continue" in message
+        assert store.get_proposal("tp-lost")["status"] == VALIDATION_FAILED
+
+
+def test_an_unreadable_claim_timestamp_reports_the_real_reason():
+    """readiness now BLOCKS on a corrupt updated_at, so recovery must not send
+    the operator to wait out a staleness window that can never expire: the
+    guard is a lexical SQL comparison, which a non-timestamp always loses.
+    Recovery still refuses (staleness is unprovable, and assuming stale would
+    revoke a possibly-live worker) -- but says so honestly."""
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp, _proposal("tp-corrupt", VALIDATING))
+        connection = sqlite3.connect(store.path)
+        try:
+            connection.execute(
+                "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
+                ("not-a-timestamp", "tp-corrupt"),
+            )
+            connection.commit()
+        finally:
+            connection.close()
+
+        with pytest.raises(ProposalExecutionError) as caught:
+            recover_stale_claim("tp-corrupt", store)
+
+        message = str(caught.value)
+        assert "not a readable timestamp" in message
+        assert "data-integrity problem" in message
+        assert "claimed less than" not in message, (
+            "must not report a timing reason for a data-integrity failure"
+        )
+        assert store.get_proposal("tp-corrupt")["status"] == VALIDATING
+
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))

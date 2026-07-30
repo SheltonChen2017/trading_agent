@@ -1851,6 +1851,26 @@ def recover_stale_claim(
     current = store.get_proposal(proposal_id)
     if current is None:
         raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
+
+    # An unparseable updated_at reaches the generic message below as "claimed
+    # less than Ns ago", which is simply the wrong reason: the staleness guard
+    # is a lexical `updated_at < cutoff` comparison in SQL, and a non-timestamp
+    # string loses it regardless of age. Recovery genuinely CANNOT proceed --
+    # staleness is unprovable, and assuming stale would revoke a live worker's
+    # claim, which is exactly the P1 this fencing round closed. But readiness
+    # now blocks on such a row, so the operator must at least be told the real
+    # reason rather than sent to wait out a window that will never expire.
+    if (
+        current["status"] in PRE_BROKER_STRANDED_STATUSES
+        and _parse_recovery_timestamp(store, proposal_id) is None
+    ):
+        raise ProposalExecutionError(
+            f"Proposal {proposal_id} is in {current['status']!r} but its updated_at is not a "
+            "readable timestamp, so its age cannot be proved and recovery cannot safely run "
+            "(assuming it is stale would revoke a possibly-live worker's claim). This is a "
+            "data-integrity problem, not a timing one: repair the row's updated_at directly, "
+            "then re-run this command."
+        )
     raise ProposalExecutionError(
         f"Proposal {proposal_id} is not a stale pre-broker claim (status={current['status']!r}) -- "
         f"either it is not in {' / '.join(PRE_BROKER_STRANDED_STATUSES)}, or it was claimed less "
@@ -1858,3 +1878,18 @@ def recover_stale_claim(
         "statuses are NOT recoverable this way: use reconcile_submission() or "
         "recover_stale_reconciliation(), which never assume a broker order is absent."
     )
+
+
+def _parse_recovery_timestamp(store: AssistantStore, proposal_id: str) -> datetime | None:
+    """The row's `updated_at` as a datetime, or None if it cannot be read."""
+    rows = store.list_proposals_by_statuses(PRE_BROKER_STRANDED_STATUSES)
+    raw = next(
+        (row.get("updated_at") for row in rows if row.get("proposal_id") == proposal_id),
+        None,
+    )
+    if not raw:
+        return None
+    try:
+        return datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
+    except ValueError:
+        return None

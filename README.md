@@ -26,6 +26,12 @@ buy orders.
   fresh broker snapshot before submission.
 - Submits approved orders to Alpaca **paper trading only** and journals the
   resulting proposal and broker order.
+- Scores portfolio research against a versioned machine-readable mandate;
+  proposed or incomplete evidence fails closed and never enables live trading.
+- Maintains an append-only balanced portfolio journal that can be explicitly
+  bootstrapped from, and reconciled against, an independent broker snapshot.
+- Persists operational health alerts and verifies database backup/restore
+  drills for an external process supervisor.
 - Preserves the existing signal, backtest, statistical-validation, ML, and
   leveraged-ETF research toolkit.
 
@@ -614,6 +620,47 @@ the persistent kill switch is off, no broker outcome is ambiguous,
 reconciliation is recent/error-free, budgets are within policy, and the
 connected paper account is active and unblocked.
 
+### Production-foundation controls
+
+Inspect the proposed machine-readable mandate:
+
+```bash
+python scripts/run_personal_assistant.py mandate-status
+```
+
+It remains `proposed` until the owner explicitly approves its targets and
+binds that approval to the computed fingerprint. Passing mandate metrics
+only makes a run eligible for human review; it never changes paper mode.
+See `docs/LIVE_PROMOTION_CHECKLIST.md`.
+
+After reviewing the connected paper account, initialize the accounting
+journal exactly once and reconcile it:
+
+```bash
+python scripts/run_personal_assistant.py ledger-bootstrap --confirm bootstrap
+python scripts/run_personal_assistant.py ledger-sync
+python scripts/run_personal_assistant.py ledger-reconcile
+```
+
+The opening snapshot is explicit because this app's broker-event history does
+not include positions acquired before the app existed. After bootstrap,
+`ledger-sync` records app fills exactly once and `ledger-reconcile` compares
+cash and shares independently with Alpaca. Tax lots remain separate because
+the financial journal uses moving-average book basis while tax elections can
+use FIFO/LIFO/HIFO/specific identification.
+
+Run operational controls and a recovery drill:
+
+```bash
+python scripts/run_personal_assistant.py recovery-drill
+python scripts/run_personal_assistant.py operations-check
+python scripts/run_personal_assistant.py alerts
+```
+
+For a supervised paper soak, run `monitor-orders` alongside
+`scripts/run_operations_watchdog.py`; deployment and incident-response
+details are in `docs/OPERATIONS_RUNBOOK.md`.
+
 ### Recovering a stranded reconciliation
 
 If the process crashes mid-reconciliation (no in-process handler survives
@@ -697,7 +744,10 @@ records:
 - immutable proposal identity and current status;
 - current broker-order snapshots linked to proposals;
 - append-only broker order/fill events;
+- immutable balanced journal transactions and postings;
+- broker-versus-ledger reconciliation runs;
 - persistent daily execution reservations;
+- deduplicated durable operational alerts;
 - durable operator/reconciliation state.
 
 The database and its WAL files are gitignored because they contain personal
@@ -711,6 +761,9 @@ assistant/
   schemas.py               typed DecisionPacket/PortfolioSnapshot/SignalEvidence structures
   context_builder.py       portfolio + regime + evidence DecisionPacket
   policy.py                validated, versioned personal policy
+  mandate.py               risk targets + fail-closed live-promotion review gate
+  portfolio_ledger.py      balanced journal + broker snapshot reconciliation
+  operations.py            health, alerts, backup/restore drills
   portfolio_analytics.py   deterministic portfolio metrics and previews
   research_registry.py     file-backed evidence claims + provenance/authority checks
   proposals.py             exposure-reducing typed proposals
@@ -752,8 +805,8 @@ signals/                   pluggable research signals (scanner, momentum, relati
                             vix_spike/credit_spread/yield_curve, regime)
 backtest/
   engine.py                walk-forward and dependence-aware testing
-  portfolio_simulator.py   tax/slippage-aware equity-curve simulator [DORMANT: no
-                            recorded finding used it -- see "Dormant modules"]
+  portfolio_simulator.py   tax/slippage-aware shared-capital equity-curve simulator
+  research_report.py       data lineage + embargo + mandate-scored immutable report
   risk_metrics.py          drawdown/expected-shortfall/time-under-water/capture-ratio metrics
 strategies/                leveraged-ETF rotation research (trend_vol_rotation.py,
                             vol_target_rotation.py, kelly_rotation.py, leverage_rotation.py)
@@ -762,10 +815,12 @@ market_analytics.py        generic backward-looking primitives shared by product
 ```
 
 **Dormant modules — an explicit decision, not an oversight** (2026-07-29): an
-orphan/dead-code audit found six modules that no script under `scripts/`
-reaches through imports. All six are **kept and marked dormant**; none were
-removed. The framing matters, because "unreachable from the import graph" is
-not the same as "abandoned":
+orphan/dead-code audit originally found six modules that no script under
+`scripts/` reached through imports. `backtest/portfolio_simulator.py` has
+since been activated by `scripts/run_portfolio_research_report.py`; the five
+research-evidence modules below remain deliberately dormant. The framing
+matters, because "unreachable from the import graph" is not the same as
+"abandoned":
 
 - `data/earnings_data.py` + `signals/pead.py` + `signals/fundamentals.py`, and
   `data/analyst_data.py` + `signals/analyst.py`, are **completed experiments,
@@ -784,14 +839,9 @@ not the same as "abandoned":
   `out_of_sample_significance_by_block()` would be a real (if unexciting)
   improvement — noted, not done here, because it is a research decision with
   real compute cost, not a cleanup task.
-- `backtest/portfolio_simulator.py` is **dormant infrastructure**, built and
-  tested but not yet used for research. To be explicit, since it would be an
-  easy and damaging thing to assume: **no finding in
-  `research_findings.json` was produced using this simulator.** `docs/MANDATE.md`
-  §"Current reality check" records the same thing (`simulate_portfolio()` is
-  exercised only by its tests). Keep while portfolio-constrained backtesting is
-  still planned; the honest next step is a runner that drives
-  `simulate_portfolio()` against one scanner, which does not exist yet.
+No existing finding in `research_findings.json` was produced using the
+portfolio simulator. Activation supplies a reproducible runner; it does not
+retroactively upgrade or reproduce any registered finding.
 
 `tests/test_module_hygiene.py` pins the cleanup that came out of the same
 audit (a duplicate private SOXX/SOXL wrapper, five unused imports, and a
@@ -887,7 +937,9 @@ assistant schemas, context building, explanations, stress
 analysis, execution limits (including strict share-quantity validation),
 policy validation, SQLite idempotency, proposal generation, allocation
 batch preflight/execution, research-registry provenance/authority
-enforcement, CLI argument validation, authorization binding, and approved
+enforcement, balanced journal accounting, broker reconciliation,
+mandate/promotion gates, immutable research manifests, operational alerting,
+recovery drills, CLI argument validation, authorization binding, and approved
 paper submission with a mocked broker.
 
 Broker tests do not contact Alpaca. Real-data research scripts do require
@@ -901,11 +953,12 @@ network access.
 - There is a CLI and a browser UI (Streamlit), but no conversational API.
 - Earnings come from a free best-effort data source; unavailable values remain
   explicitly unavailable.
-- Tax-lot selection, wash-sale handling, dividends, and realized-tax estimates
-  are not yet integrated into proposals.
-- Order lifecycle reconciliation is implemented for the CLI monitor, but
-  external paging/notification delivery and supervised service deployment
-  are not yet integrated.
+- The financial journal supports explicit dividend/fee/cash-transfer entries,
+  but automatic corporate-action ingestion, tax-lot election, wash-sale basis
+  adjustment and realized-tax estimates are not yet integrated into proposals.
+- Order monitoring and an operations watchdog are implemented, with durable
+  SQLite alerts and an optional local JSONL delivery boundary. An actual pager
+  or hosted supervisor still must be configured outside this repository.
 - Market data used in research is not an institutional production feed.
 - Survivorship bias, delistings, liquidity, and borrow constraints remain
   important research limitations. Quantified 2026-07-26: `config.UNIVERSE`
@@ -933,8 +986,9 @@ network access.
   bought-the-dip-and-it-went-to-zero case, since bankrupt names aren't in
   the universe at all -- its measured downside tail is understated
   (low-stakes since it's already rejected).
-- **No embargo between the discovery and confirmation periods** (found
-  2026-07-29). The split boundary itself is clean -- `backtest/engine.py`'s
+- **Legacy reports have no embargo between discovery and confirmation**
+  (found 2026-07-29). The split boundary itself is clean --
+  `backtest/engine.py`'s
   `_split_by_date()` puts a date in exactly one side -- but a signal firing
   ON the split date has its forward return measured over the following
   `hold_days`, which land inside the confirmation period. So the last
@@ -945,9 +999,11 @@ network access.
   dates out of a several-hundred-date confirmation period, and it biases
   the two periods toward AGREEING, so it cannot manufacture a rejection;
   every finding recorded so far is a rejection or a risk-shape result. It
-  is deliberately not "fixed" retroactively, since changing the split
-  would shift every number in the versioned research registry. Add an
-  embargo before trusting any future confirmation reporting a positive edge.
+  was deliberately not changed retroactively, since doing so would shift
+  every number in the versioned research registry. New immutable portfolio
+  reports generated through `backtest/research_report.py` use a conservative
+  symmetric embargo equal to `hold_days`; legacy findings still need to be
+  reproduced through that path before they can be promoted.
 - No strategy is authorized to open new positions under the default policy.
 
 These limitations should be resolved incrementally without weakening the

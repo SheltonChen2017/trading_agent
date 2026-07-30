@@ -11,6 +11,8 @@ __pycache__/
 data/trading_assistant.db
 data/trading_assistant.db-shm
 data/trading_assistant.db-wal
+data/backups/
+data/research_reports/
 
 # Claude Code session transcripts and machine-local permissions -- these
 # were committed by accident (Codex review, 2026-07-27: a 17MB session

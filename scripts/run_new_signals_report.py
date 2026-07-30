@@ -9,7 +9,7 @@ scripts/run_baseline_comparison.py-style tools) before being trusted.
 
 Uses synthetic data by default, so it runs with zero setup. See README
 for pointing this at real data via fetch_historical(), and for how to
-run PEAD (it needs data.earnings_data.fetch_earnings_surprises(), which
+run PEAD (it needs data.earnings_data.fetch_earnings_history(), which
 requires real tickers — no synthetic equivalent exists for earnings
 events).
 """
@@ -58,9 +58,9 @@ def main():
         "\nPEAD isn't included above — it needs real earnings data, which doesn't\n"
         "exist for synthetic tickers. Run it against real data:\n\n"
         "  from functools import partial\n"
-        "  from data.earnings_data import fetch_earnings_surprises\n"
+        "  from data.earnings_data import fetch_earnings_history\n"
         "  from signals.pead import scan_pead\n"
-        "  earnings = fetch_earnings_surprises(list(data.keys()))\n"
+        "  earnings = fetch_earnings_history(list(data.keys()))\n"
         "  run_backtest(data, scan_fn=partial(scan_pead, earnings_data=earnings), scan_kwargs={})\n"
     )
 

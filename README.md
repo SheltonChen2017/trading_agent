@@ -737,7 +737,7 @@ data/
   market_data.py           historical and synthetic price data
   event_data.py            upcoming earnings with availability metadata
   earnings_data.py         point-in-time earnings history
-  analyst_data.py          analyst actions
+  analyst_data.py          analyst actions [DORMANT: rejected signal, manual-only]
   price_target_data.py     point-in-time price-target consensus
   macro_data.py            credit-spread and yield-curve proxies
 
@@ -752,13 +752,52 @@ signals/                   pluggable research signals (scanner, momentum, relati
                             vix_spike/credit_spread/yield_curve, regime)
 backtest/
   engine.py                walk-forward and dependence-aware testing
-  portfolio_simulator.py   tax/slippage-aware equity-curve simulator
+  portfolio_simulator.py   tax/slippage-aware equity-curve simulator [DORMANT: no
+                            recorded finding used it -- see "Dormant modules"]
   risk_metrics.py          drawdown/expected-shortfall/time-under-water/capture-ratio metrics
 strategies/                leveraged-ETF rotation research (trend_vol_rotation.py,
                             vol_target_rotation.py, kelly_rotation.py, leverage_rotation.py)
 baskets.py, config.py,     overlapping ticker baskets, every other tunable knob, and
 market_analytics.py        generic backward-looking primitives shared by production and research
 ```
+
+**Dormant modules — an explicit decision, not an oversight** (2026-07-29): an
+orphan/dead-code audit found six modules that no script under `scripts/`
+reaches through imports. All six are **kept and marked dormant**; none were
+removed. The framing matters, because "unreachable from the import graph" is
+not the same as "abandoned":
+
+- `data/earnings_data.py` + `signals/pead.py` + `signals/fundamentals.py`, and
+  `data/analyst_data.py` + `signals/analyst.py`, are **completed experiments,
+  not pending integrations.** Both clusters were built, tested against real
+  data, and recorded `rejected` in `research_findings.json` (PEAD 0/2 cells
+  significant, fundamentals 0/2, analyst-rating 0/2 — the last being the
+  pooled-vs-confirmation-only near-miss, p=0.014 → p=0.656, that caused
+  `out_of_sample_significance()` to be built in the first place). The code is
+  retained as the **evidence trail for those verdicts** and so they can be
+  re-tested; deleting it would destroy the record that the work was done.
+  They are manually invocable (see the corrected PEAD snippet printed by
+  `scripts/run_new_signals_report.py`) and are deliberately **not** wired into
+  the CLI, the UI, or any automated pipeline. They are not app capabilities.
+  One genuine open item: these verdicts predate the by-block bootstrap, so
+  they rest on the older row-level method. Re-testing them under
+  `out_of_sample_significance_by_block()` would be a real (if unexciting)
+  improvement — noted, not done here, because it is a research decision with
+  real compute cost, not a cleanup task.
+- `backtest/portfolio_simulator.py` is **dormant infrastructure**, built and
+  tested but not yet used for research. To be explicit, since it would be an
+  easy and damaging thing to assume: **no finding in
+  `research_findings.json` was produced using this simulator.** `docs/MANDATE.md`
+  §"Current reality check" records the same thing (`simulate_portfolio()` is
+  exercised only by its tests). Keep while portfolio-constrained backtesting is
+  still planned; the honest next step is a runner that drives
+  `simulate_portfolio()` against one scanner, which does not exist yet.
+
+`tests/test_module_hygiene.py` pins the cleanup that came out of the same
+audit (a duplicate private SOXX/SOXL wrapper, five unused imports, and a
+printed PEAD snippet that named a function — `fetch_earnings_surprises` — which
+never existed, so anyone copying the displayed instructions got an
+`ImportError`).
 
 **Production vs. research** (2026-07-28): `assistant/`, `risk/execution_gate.py`,
 `execution/`, and the two entry points (`scripts/run_personal_assistant.py`,

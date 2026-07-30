@@ -452,14 +452,3 @@ def _generate_leveraged_pair_rebalance_proposals(
             uncertainties=uncertainties,
         )
     ]
-
-
-def _generate_soxx_soxl_rebalance_proposals(
-    packet: DecisionPacket,
-    policy: TradingPolicy,
-    ttl_minutes: int = 15,
-    market_data: dict[str, pd.DataFrame] | None = None,
-) -> list[TradeProposal]:
-    """Thin backward-compatible wrapper -- see
-    _generate_leveraged_pair_rebalance_proposals()."""
-    return _generate_leveraged_pair_rebalance_proposals(packet, policy, SOXX_SOXL_PAIR, ttl_minutes, market_data)

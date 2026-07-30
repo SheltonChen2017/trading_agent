@@ -260,10 +260,23 @@ def build_risk_exposure(snapshot: PortfolioSnapshot, concentration_threshold_pct
     Baskets overlap by design (see config.BASKETS) — a ticker can and
     often does count toward several basket exposures at once."""
     total = snapshot.total_equity
-    if total <= 0:
+    # isfinite first, not just `<= 0`: NaN loses every ordered comparison, so a
+    # corrupt total silently produced NaN percentages and ZERO concentration
+    # warnings on a portfolio that was 100% in one name. build_portfolio_snapshot()
+    # rejects non-finite inputs, so this is defence in depth rather than a live
+    # path -- but risk/execution_gate.py and assistant/paper_evidence.py both
+    # re-check anyway, and risk_copilot.py was hardened on 2026-07-30 while these
+    # siblings were left inconsistent with it.
+    if not math.isfinite(total) or total <= 0:
         return RiskExposure(
             basket_exposure_pct={}, leveraged_etf_exposure_pct=0.0, cash_pct=0.0,
-            largest_single_position_pct=0.0, concentration_warnings=["Portfolio has zero or negative total equity."],
+            largest_single_position_pct=0.0,
+            concentration_warnings=[
+                f"Portfolio total equity is not a usable number ({total!r}); "
+                "exposure percentages cannot be computed."
+                if not math.isfinite(total)
+                else "Portfolio has zero or negative total equity."
+            ],
         )
 
     basket_exposure_pct = {}

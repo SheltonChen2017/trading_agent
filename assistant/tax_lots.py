@@ -436,21 +436,44 @@ def compare_sale_bases(
     when = when or datetime.now(timezone.utc)
     lots = list(ledger.open_for(ticker))
     average_cost = ledger.average_cost(ticker)
+    shares_held = ledger.shares_held(ticker)
 
     result: dict = {
         "ticker": ticker.upper(),
         "qty": qty,
         "price": price,
         "as_of": when.isoformat(),
-        "shares_held": ledger.shares_held(ticker),
-        # What the portfolio snapshot / broker display would imply.
-        "average_cost_view": {
+        "shares_held": shares_held,
+        "methods": {},
+    }
+
+    # An uncovered ticker must NOT get an average-cost view. average_cost()
+    # returns 0.0 when no lots are known, so the naive view reported a cost
+    # basis of zero and therefore the entire proceeds as gain -- a $2,000
+    # "realized gain" on a position whose basis is simply unknown (found
+    # 2026-07-30 reviewing this feature). For a TAX figure that is the worst
+    # direction to be wrong in: it overstates the bill and can talk a user out
+    # of a risk-reducing sell. Report the gap instead of a fabricated number.
+    if shares_held <= 0:
+        result["average_cost_view"] = {
+            "available": False,
+            "reason": (
+                "no lots are recorded for this ticker, so its cost basis is "
+                "unknown -- not zero"
+            ),
+        }
+    else:
+        result["average_cost_view"] = {
+            "available": True,
             "cost_per_share": round(average_cost, 4),
             "realized_pnl": round((price - average_cost) * qty, 2),
             "note": "what the average-cost display implies; not a lot-level tax result",
-        },
-        "methods": {},
-    }
+            **(
+                {"covers_only_shares": shares_held}
+                if shares_held < qty
+                else {}
+            ),
+        }
     for method in (FIFO, LIFO, HIFO):
         try:
             chosen = select_lots(lots, qty, method=method)
@@ -477,6 +500,19 @@ def compare_sale_bases(
                 for c in components
             ],
         }
+    # "Available" means at least one method actually produced figures. Callers
+    # branch on this to decide between showing a table and explaining why there
+    # is none; when every method errored, both the CLI and the UI rendered an
+    # EMPTY result rather than the "advisory unavailable" message, so a missing
+    # lot history looked identical to "no tax implications" (found 2026-07-30).
+    usable = [m for m, detail in result["methods"].items() if "error" not in detail]
+    result["available"] = bool(usable)
+    if not usable:
+        first_error = next(
+            (detail.get("error") for detail in result["methods"].values() if "error" in detail),
+            "no lot-level result could be computed",
+        )
+        result["reason"] = first_error
     return result
 
 

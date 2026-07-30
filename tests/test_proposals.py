@@ -279,3 +279,36 @@ if __name__ == "__main__":
     test_duplicate_ticker_rows_aggregate_exposure_still_produces_a_position_cap_proposal()
     test_lowercase_ticker_basket_breach_still_produces_a_proposal()
     print("All proposals tests passed.")
+
+
+def test_a_sell_whose_lots_are_unknown_says_so_instead_of_going_silent():
+    """The user-visible half of the uncovered-ticker fix (2026-07-30).
+
+    proposals.py stamped available=True unconditionally, so for a ticker the
+    lot ledger has never seen (there is still no importer for fills predating
+    this app) the CLI looped every method, found them all errored, and printed
+    NOTHING -- skipping the "advisory unavailable" branch entirely. Silence
+    reads as "no tax implications", which is the opposite of the truth.
+    """
+    from datetime import datetime, timezone
+
+    from assistant.tax_lots import Fill, build_ledger
+
+    positions = [
+        {"ticker": "AAA", "shares": 900, "entry_price": 100.0, "current_price": 100.0},
+    ]
+    packet = _packet(positions, cash=10_000.0)
+    policy = _permissive_policy(max_total_exposure_pct=0.50)
+    ledger = build_ledger([
+        Fill(ticker="AAPL", qty=10, price=50.0,
+             at=datetime(2025, 1, 1, tzinfo=timezone.utc), fill_id="f1", side="buy"),
+    ])
+
+    proposals = generate_risk_reduction_proposals(packet, policy, tax_lot_ledger=ledger)
+
+    assert proposals, "missing lot coverage must never suppress a risk-reducing sell"
+    advisory = proposals[0].expected_impact["tax_lot_advisory"]
+    assert advisory["available"] is False
+    assert advisory["advisory_only"] is True
+    assert advisory["reason"]
+    assert any("unavailable" in u for u in proposals[0].uncertainties)

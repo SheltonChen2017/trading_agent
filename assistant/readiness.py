@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from assistant.money import to_decimal
 from assistant.policy import TradingPolicy
 from assistant.proposal_status import (
     APPROVED,
@@ -204,6 +205,18 @@ def transaction_readiness(
 
     trading_day = now.astimezone(ZoneInfo("America/New_York")).date().isoformat()
     usage = store.get_execution_budget_usage(trading_day)
+    submitted_notional = to_decimal(
+        usage.get("submitted_notional_decimal", usage["submitted_notional"]),
+        name="submitted_notional",
+    )
+    submitted_notional_cap = to_decimal(
+        policy.max_daily_submitted_notional,
+        name="max_daily_submitted_notional",
+    )
+    remaining_notional = max(
+        submitted_notional_cap - submitted_notional,
+        to_decimal(0),
+    )
     checks.append(
         _check(
             # `<` on BOTH axes, derived from what
@@ -219,13 +232,13 @@ def transaction_readiness(
             # 2026-07-29).
             "daily_submission_budget",
             usage["submitted_order_count"] < policy.max_daily_order_count
-            and usage["submitted_notional"] < policy.max_daily_submitted_notional,
+            and submitted_notional < submitted_notional_cap,
             (
                 f"{usage['submitted_order_count']}/{policy.max_daily_order_count} orders "
                 f"(room for {max(0, policy.max_daily_order_count - usage['submitted_order_count'])} more), "
-                f"${usage['submitted_notional']:,.2f}/"
+                f"${submitted_notional:,.2f}/"
                 f"${policy.max_daily_submitted_notional:,.2f} submitted notional "
-                f"(${max(0.0, policy.max_daily_submitted_notional - usage['submitted_notional']):,.2f} remaining)."
+                f"(${remaining_notional:,.2f} remaining)."
             ),
         )
     )

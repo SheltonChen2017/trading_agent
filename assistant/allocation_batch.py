@@ -54,10 +54,12 @@ allow bulk policy overrides").
 from __future__ import annotations
 
 import uuid
+from decimal import Decimal
 from datetime import datetime
 from typing import Callable
 
 from assistant.context_builder import build_portfolio_snapshot_from_alpaca
+from assistant.money import to_decimal
 from assistant.execution_service import (
     PolicyOverridableBlockError,
     ProposalExecutionError,
@@ -69,7 +71,7 @@ from assistant.policy import TradingPolicy
 from assistant.proposal_status import POLICY_OVERRIDE_AVAILABLE
 from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
-from risk.execution_gate import ValidationResult, worst_case_fill_price
+from risk.execution_gate import ValidationResult, worst_case_fill_price_decimal
 
 # Leg states. "submitted"/"failed" are terminal for that leg (a failed
 # leg does not block the rest of the batch -- each proposal is
@@ -246,8 +248,8 @@ def preflight_allocation_batch(
     order the allocation split was generated).
     """
     results: dict[str, ValidationResult] = {}
-    reserved_cash = 0.0
-    reserved_pending_by_ticker: dict[str, float] = {}
+    reserved_cash = Decimal("0")
+    reserved_pending_by_ticker: dict[str, Decimal] = {}
     # Two caps the real execution path enforces that a per-leg snapshot cannot
     # see, because both are consumed by EVERY submitted leg -- buys and sells
     # alike -- rather than only by the cash-spending ones (independent review,
@@ -260,13 +262,20 @@ def preflight_allocation_batch(
     trading_day = now_et.date().isoformat()
     usage = store.get_execution_budget_usage(trading_day)
     budget_order_count = int(usage["submitted_order_count"])
-    budget_notional = float(usage["submitted_notional"])
+    budget_notional = to_decimal(
+        usage.get("submitted_notional_decimal", usage["submitted_notional"]),
+        name="submitted_notional",
+    )
+    daily_notional_cap = to_decimal(
+        policy.max_daily_submitted_notional,
+        name="max_daily_submitted_notional",
+    )
 
     for proposal_id in proposal_ids:
-        available_cash_override = current_portfolio.cash - reserved_cash
+        available_cash_override = current_portfolio.cash_decimal - reserved_cash
         available_buying_power_override = (
-            current_portfolio.buying_power - reserved_cash
-            if current_portfolio.buying_power is not None
+            current_portfolio.buying_power_decimal - reserved_cash
+            if current_portfolio.buying_power_decimal is not None
             else None
         )
         outcome = validate_proposal_for_execution(
@@ -327,7 +336,7 @@ def preflight_allocation_batch(
                 f"Daily order-count budget would be {next_order_count}, exceeding "
                 f"{policy.max_daily_order_count}."
             )
-        elif next_notional > policy.max_daily_submitted_notional:
+        elif next_notional > daily_notional_cap:
             budget_violation = (
                 f"Daily submitted notional would be ${next_notional:,.2f}, exceeding "
                 f"${policy.max_daily_submitted_notional:,.2f}."
@@ -354,12 +363,18 @@ def preflight_allocation_batch(
             # here understated the cash/pending exposure carried into every
             # LATER leg of the same batch (GPT review, 2026-07-29). Shared with
             # validate_trade_intent() so the two can't drift.
-            planned_notional = outcome.intent.shares * worst_case_fill_price(
-                outcome.intent, outcome.reference_price
+            planned_notional = (
+                Decimal(outcome.intent.shares)
+                * worst_case_fill_price_decimal(
+                    outcome.intent, outcome.reference_price
+                )
             )
             reserved_cash += planned_notional
             key = outcome.intent.ticker.upper()
-            reserved_pending_by_ticker[key] = reserved_pending_by_ticker.get(key, 0.0) + planned_notional
+            reserved_pending_by_ticker[key] = (
+                reserved_pending_by_ticker.get(key, Decimal("0"))
+                + planned_notional
+            )
 
     return results
 

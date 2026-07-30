@@ -23,6 +23,7 @@ from assistant.tax_lots import (
     LIFO,
     SPECIFIC,
     Fill,
+    Split,
     TaxLotError,
     build_ledger,
     compare_sale_bases,
@@ -116,6 +117,45 @@ def test_partially_consuming_a_lot_leaves_the_remainder_open():
     assert lots["f1"].qty == 1.0, "half the first lot should remain"
     assert lots["f2"].qty == 2.0
     assert ledger.realized_pnl("AAPL") == -5.0
+
+
+def test_split_preserves_each_lots_total_basis_and_adjusts_future_sale():
+    events = _scenario() + [
+        Split("AAPL", ratio=4.0, at=DAY3, action_id="split-1"),
+        Fill(
+            "AAPL",
+            "sell",
+            4,
+            30.0,
+            DAY3 + timedelta(hours=1),
+            fill_id="s1",
+        ),
+    ]
+    ledger = build_ledger(events)
+
+    # 4 pre-split shares become 16; selling 4 consumes one original share's
+    # economics from the first lot (basis $100, proceeds $120).
+    assert ledger.shares_held("AAPL") == 12
+    assert ledger.realized_pnl("AAPL") == 20.0
+    remaining = {lot.lot_id: lot for lot in ledger.open_for("AAPL")}
+    assert remaining["f1"].qty == 4
+    assert remaining["f1"].cost_per_share == 25.0
+    assert remaining["f2"].qty == 8
+    assert remaining["f2"].cost_per_share == 22.5
+    assert sum(lot.cost_basis for lot in remaining.values()) == 280.0
+
+
+def test_reverse_split_adjusts_quantity_and_basis():
+    ledger = build_ledger(
+        [
+            Fill("XYZ", "buy", 100, 2.0, DAY1, fill_id="b1"),
+            Split("XYZ", ratio=0.1, at=DAY2, action_id="reverse-1"),
+        ]
+    )
+    lot = ledger.open_for("XYZ")[0]
+    assert lot.qty == 10
+    assert lot.cost_per_share == 20.0
+    assert lot.cost_basis == 200.0
 
 
 def test_overselling_is_refused_rather_than_partially_realized():

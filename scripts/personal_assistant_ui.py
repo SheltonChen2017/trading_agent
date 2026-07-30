@@ -56,6 +56,7 @@ from assistant.allocation_proposals import (
     generate_allocation_buy_proposals,
 )
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca, get_upcoming_events
+from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
     PolicyOverridableBlockError,
     execute_approved_paper_proposal,
@@ -69,6 +70,7 @@ from assistant.ai_advisor import (
     suggest_similar_tickers,
 )
 from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
+from assistant.macro_context import build_descriptive_macro_context
 from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calendar_configured
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.ticker_verification import partition_by_universe, verify_tickers
@@ -90,12 +92,17 @@ from assistant.proposal_status import (
     VALIDATION_FAILED,
 )
 from assistant.proposals import generate_risk_reduction_proposals
+from assistant.portfolio_history import (
+    capture_briefing_equity_snapshot,
+    portfolio_performance_report,
+)
 from assistant.research_registry import summarize_evidence_authority, underfilled_dataset_warning
 from assistant.risk_copilot import (
     check_concentration,
     check_policy_compliance,
     estimate_stress_impact,
     find_correlated_clusters,
+    portfolio_risk_decomposition,
 )
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.stock_lookup import (
@@ -609,6 +616,37 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
             f"Position weight: {impact['position_weight_before_pct']:.1f}% -> "
             f"{impact['position_weight_after_pct']:.1f}%"
         )
+        tax_advisory = impact.get("tax_lot_advisory", {})
+        with st.expander("Tax-lot advisory (never blocks this sell)"):
+            if tax_advisory.get("available"):
+                st.dataframe(
+                    [
+                        {
+                            "Method": method.upper(),
+                            "Realized P&L": detail["realized_pnl"],
+                            "Short-term P&L": detail["short_term_pnl"],
+                            "Long-term P&L": detail["long_term_pnl"],
+                        }
+                        for method, detail in tax_advisory["methods"].items()
+                        if "error" not in detail
+                    ],
+                    use_container_width=True,
+                    hide_index=True,
+                )
+                st.caption(
+                    "Advisory bookkeeping only; your broker's tax records "
+                    "and Form 1099-B are authoritative."
+                )
+            else:
+                st.caption(
+                    "Unavailable: "
+                    + str(
+                        tax_advisory.get(
+                            "reason", "complete lot history is unavailable"
+                        )
+                    )
+                    + ". The risk-reducing sell remains fully actionable."
+                )
         with st.expander("Uncertainties / caveats"):
             for uncertainty in proposal["uncertainties"]:
                 st.write(f"- {uncertainty}")
@@ -839,6 +877,22 @@ with tab_briefing:
     # (GPT review, 2026-07-31).
     if st.session_state.get("last_saved_packet_generated_at") != packet.generated_at:
         store.save_decision_packet(packet)
+        try:
+            captured_history = capture_briefing_equity_snapshot(
+                store,
+                packet.portfolio,
+                captured_at=packet.generated_at,
+            )
+            st.session_state["portfolio_history_report"] = (
+                portfolio_performance_report(
+                    store, captured_history["account_key"]
+                )
+            )
+            st.session_state.pop("portfolio_history_error", None)
+        except Exception as exc:
+            # A benchmark/history problem must never make the live account
+            # briefing unavailable.
+            st.session_state["portfolio_history_error"] = str(exc)
         st.session_state["last_saved_packet_generated_at"] = packet.generated_at
 
     st.caption(
@@ -853,6 +907,27 @@ with tab_briefing:
     col2.metric("Cash", f"${packet.portfolio.cash:,.2f} ({packet.risk.cash_pct}%)")
     col3.metric("Positions", packet.analytics["position_count"])
     col4.metric("Open orders", packet.analytics["open_order_count"])
+    history_report = st.session_state.get("portfolio_history_report")
+    if isinstance(history_report, dict) and history_report.get("available"):
+        benchmark_bits = [
+            (
+                f"{ticker} {details['total_return_pct']:+.2f}% "
+                f"(excess {details['excess_return_pct']:+.2f} pp)"
+            )
+            for ticker, details in history_report.get("benchmarks", {}).items()
+            if details.get("available")
+        ]
+        st.caption(
+            f"Account total return since {history_report['start_session']}: "
+            f"**{history_report['total_return_pct']:+.2f}%**; "
+            f"max drawdown **{history_report['max_drawdown_pct']:.2f}%**"
+            + (f"; {'; '.join(benchmark_bits)}" if benchmark_bits else "")
+        )
+    elif st.session_state.get("portfolio_history_error"):
+        st.caption(
+            "Portfolio history unavailable: "
+            + st.session_state["portfolio_history_error"]
+        )
 
     st.subheader(f"Market regime ({packet.regime.benchmark_ticker})")
     st.write(f"Trend: **{packet.regime.trend or 'unavailable'}** / Volatility: **{packet.regime.volatility_regime or 'unavailable'}**"
@@ -886,6 +961,73 @@ with tab_briefing:
         st.caption("Informational summary (not a policy-compliance check): " + check_concentration(packet.risk))
     for cluster_warning in find_correlated_clusters(packet.portfolio):
         st.warning(cluster_warning)
+    with st.expander("Descriptive macro context"):
+        st.caption(
+            "Credit/yield proxies are shown as context only. Their predictive "
+            "signal claims are rejected and cannot influence proposals."
+        )
+        if st.button("Load macro context", key="load_macro_context"):
+            st.session_state["macro_context"] = (
+                build_descriptive_macro_context()
+            )
+        macro_context = st.session_state.get("macro_context")
+        if isinstance(macro_context, dict):
+            if not macro_context.get("available"):
+                st.warning(macro_context.get("reason", "Unavailable"))
+            else:
+                for indicator in macro_context["indicators"]:
+                    st.write(
+                        f"**{indicator['label']}**: "
+                        f"{indicator['direction']} "
+                        f"(20-session change "
+                        f"{indicator['change_20_sessions']:+.4f}, "
+                        f"60-session z-score "
+                        f"{indicator['z_score_60_sessions']})"
+                    )
+    with st.expander("Empirical portfolio risk decomposition"):
+        st.caption(
+            "Uses explicitly date-aligned finite daily returns. Positive "
+            "correlation clusters identify holdings behaving like one bet."
+        )
+        if st.button("Compute portfolio risk", key="run_portfolio_risk"):
+            st.session_state["portfolio_risk_decomposition"] = (
+                portfolio_risk_decomposition(packet.portfolio)
+            )
+        decomposition = st.session_state.get(
+            "portfolio_risk_decomposition"
+        )
+        if isinstance(decomposition, dict):
+            if not decomposition.get("available"):
+                st.warning(decomposition.get("reason", "Unavailable"))
+            else:
+                risk_a, risk_b, risk_c = st.columns(3)
+                risk_a.metric(
+                    "Portfolio beta",
+                    (
+                        f"{decomposition['portfolio_beta']:.2f}"
+                        if decomposition["portfolio_beta"] is not None
+                        else "n/a"
+                    ),
+                )
+                risk_b.metric(
+                    "Annualized volatility",
+                    f"{decomposition['annualized_volatility_pct']:.2f}%",
+                )
+                risk_c.metric(
+                    "Aligned observations",
+                    decomposition["common_observations"],
+                )
+                st.dataframe(
+                    decomposition["contributions"],
+                    use_container_width=True,
+                    hide_index=True,
+                )
+                for cluster in decomposition["correlated_clusters"]:
+                    st.warning(
+                        f"Empirical correlated cluster: "
+                        f"{', '.join(cluster['tickers'])} "
+                        f"({cluster['combined_weight_pct']:.2f}% of equity)."
+                    )
     with st.expander("Stress test"):
         stress_col1, stress_col2 = st.columns(2)
         stress_benchmark = stress_col1.text_input("Benchmark ticker", value="SPY", key="stress_benchmark")
@@ -1699,8 +1841,9 @@ with tab_selling:
         st.caption(
             "Entry price is a single WEIGHTED-AVERAGE cost basis across every buy of that ticker -- "
             "this is what Alpaca itself reports (avg_entry_price), not a per-lot breakdown. If you bought "
-            "the same stock at different prices on different days, you will see one blended number here, "
-            "not separate rows per purchase. This project does not yet track individual tax lots."
+            "the same stock at different prices on different days, you will see one blended number here. "
+            "When the app's fill history fully reconciles to current shares, recommended sells show a "
+            "separate advisory FIFO/LIFO/HIFO tax-lot comparison."
         )
         st.dataframe(
             [
@@ -1721,7 +1864,15 @@ with tab_selling:
 
         st.subheader("Recommended sells (policy-breach based)")
         if st.button("Check for recommended sells", type="primary"):
-            sell_proposals = generate_risk_reduction_proposals(packet, policy)
+            tax_ledger, tax_coverage = tax_ledger_with_coverage(
+                store, packet.portfolio
+            )
+            sell_proposals = generate_risk_reduction_proposals(
+                packet,
+                policy,
+                tax_lot_ledger=tax_ledger,
+                tax_lot_coverage=tax_coverage,
+            )
             for p in sell_proposals:
                 store.save_proposal(p.to_dict())
             st.session_state["sell_proposals"] = [p.to_dict() for p in sell_proposals]
@@ -1750,7 +1901,15 @@ with tab_propose:
     )
 
     if st.button("Check for proposals", type="primary"):
-        proposals = generate_risk_reduction_proposals(packet, policy)
+        tax_ledger, tax_coverage = tax_ledger_with_coverage(
+            store, packet.portfolio
+        )
+        proposals = generate_risk_reduction_proposals(
+            packet,
+            policy,
+            tax_lot_ledger=tax_ledger,
+            tax_lot_coverage=tax_coverage,
+        )
         if check_strategy:
             for pair_config in CONFIGURED_LEVERAGED_PAIRS:
                 try:

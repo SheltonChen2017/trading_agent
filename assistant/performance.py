@@ -105,6 +105,50 @@ class Observation:
         return self.value_before_flow + self.flow
 
 
+@dataclasses.dataclass(frozen=True)
+class Distribution:
+    """One per-share cash distribution for live total-return attribution.
+
+    ``ex_at`` drives the asset total-return calculation. ``paid_at`` drives
+    the investor cash flow and defaults to ``ex_at`` when a separate payment
+    timestamp is unavailable. ``cash_amount`` may carry the broker-confirmed
+    account amount; otherwise it is derived from shares held at ``ex_at``.
+    """
+
+    ticker: str
+    ex_at: datetime
+    amount_per_share: float
+    paid_at: datetime | None = None
+    cash_amount: float | None = None
+    tax_classification: str = "unknown"
+
+    def __post_init__(self) -> None:
+        if self.ex_at.tzinfo is None or (
+            self.paid_at is not None and self.paid_at.tzinfo is None
+        ):
+            raise PerformanceError("distribution timestamps must be timezone-aware")
+        for field, value in (
+            ("amount_per_share", self.amount_per_share),
+            ("cash_amount", self.cash_amount),
+        ):
+            if value is None:
+                continue
+            if (
+                not isinstance(value, (int, float))
+                or isinstance(value, bool)
+                or not math.isfinite(value)
+                or value <= 0
+            ):
+                raise PerformanceError(
+                    f"distribution {field} must be positive and finite, got {value!r}"
+                )
+        classification = self.tax_classification.lower()
+        if classification not in ("qualified", "ordinary", "unknown"):
+            raise PerformanceError(
+                "distribution tax_classification must be qualified, ordinary, or unknown"
+            )
+
+
 def _period_days(start: datetime, end: datetime) -> float:
     return (end - start).total_seconds() / 86400.0
 
@@ -342,7 +386,11 @@ def money_weighted_return(
 
 
 def position_performance(
-    fills: list, prices: list[tuple[datetime, float]]
+    fills: list,
+    prices: list[tuple[datetime, float]],
+    *,
+    distributions: list[Distribution] | None = None,
+    prices_include_distributions: bool = False,
 ) -> dict:
     """
     Decompose one position's result into the asset's return and yours.
@@ -351,7 +399,9 @@ def position_performance(
     Prices must begin on or before the first fill and end on or after the last
     fill. The final price is the valuation point for still-open shares.
 
-    `asset_return` is a continuously invested price benchmark, including
+    `asset_return` is a continuously invested benchmark, including supplied
+    cash distributions unless ``prices_include_distributions`` says the input
+    series is already adjusted for them. It includes
     intervals when the position itself was closed. `your_return` is the
     cash-flow-sensitive MWR. `timing_contribution_pct` compares its
     period-equivalent return with TWR, so both sides cover the same horizon.
@@ -409,9 +459,70 @@ def position_performance(
     start_price = next(price for at, price in reversed(ordered_prices) if at <= first_fill_at)
     benchmark_prices = [(first_fill_at, start_price)]
     benchmark_prices.extend((at, price) for at, price in ordered_prices if at > first_fill_at)
-    twr = time_weighted_return(
-        [Observation(at=at, value_before_flow=price) for at, price in benchmark_prices]
+    relevant_distributions = sorted(
+        (
+            distribution
+            for distribution in (distributions or [])
+            if distribution.ticker.upper() in tickers
+            and first_fill_at < distribution.ex_at <= final_at
+        ),
+        key=lambda distribution: distribution.ex_at,
     )
+    foreign_distributions = [
+        distribution.ticker
+        for distribution in (distributions or [])
+        if distribution.ticker.upper() not in tickers
+    ]
+    if foreign_distributions:
+        raise PerformanceError(
+            "position_performance received distributions for another ticker: "
+            + ", ".join(sorted(set(foreign_distributions)))
+        )
+
+    if relevant_distributions and not prices_include_distributions:
+        growth = 1.0
+        sub_returns = []
+        for (previous_at, previous_price), (current_at, current_price) in zip(
+            benchmark_prices, benchmark_prices[1:]
+        ):
+            paid_per_share = sum(
+                distribution.amount_per_share
+                for distribution in relevant_distributions
+                if previous_at < distribution.ex_at <= current_at
+            )
+            factor = (current_price + paid_per_share) / previous_price
+            growth *= factor
+            sub_returns.append((factor - 1.0) * 100.0)
+        total_pct = (growth - 1.0) * 100.0
+        days = _period_days(benchmark_prices[0][0], benchmark_prices[-1][0])
+        twr = {
+            "total_return_pct": round(total_pct, 4),
+            "annualized_return_pct": (
+                round(annualized, 4)
+                if (
+                    annualized := _annualize(total_pct, days)
+                ) is not None
+                else None
+            ),
+            "period_days": round(days, 2),
+            "annualized_is_meaningful": (
+                days >= MIN_DAYS_FOR_MEANINGFUL_ANNUALIZATION
+            ),
+            "sub_period_returns_pct": [
+                round(value, 4) for value in sub_returns
+            ],
+            "sub_periods_skipped_zero_value": 0,
+            "method": "time_weighted_total_return",
+        }
+    else:
+        twr = time_weighted_return(
+            [
+                Observation(at=at, value_before_flow=price)
+                for at, price in benchmark_prices
+            ]
+        )
+        if prices_include_distributions:
+            twr["method"] = "time_weighted_adjusted_price_total_return"
 
     # Build standard-sign cash flows while validating that this long-only
     # position never sells more shares than it owns.
@@ -432,6 +543,37 @@ def position_performance(
                 shares = 0.0
             cash = fill.qty * fill.price
         cash_by_time[fill.at] = cash_by_time.get(fill.at, 0.0) + cash
+
+    def _shares_held_at(at: datetime) -> float:
+        held = 0.0
+        for fill in ordered_fills:
+            if fill.at > at:
+                break
+            held += fill.qty if fill.side == "buy" else -fill.qty
+        return max(0.0, held)
+
+    gross_distribution_cash = 0.0
+    pending_distribution_cash = 0.0
+    classifications: dict[str, float] = {}
+    for distribution in relevant_distributions:
+        cash_amount = (
+            distribution.cash_amount
+            if distribution.cash_amount is not None
+            else _shares_held_at(distribution.ex_at)
+            * distribution.amount_per_share
+        )
+        if cash_amount <= 0:
+            continue
+        paid_at = distribution.paid_at or distribution.ex_at
+        if paid_at > final_at:
+            pending_distribution_cash += cash_amount
+            continue
+        cash_by_time[paid_at] = cash_by_time.get(paid_at, 0.0) + cash_amount
+        gross_distribution_cash += cash_amount
+        classification = distribution.tax_classification.lower()
+        classifications[classification] = (
+            classifications.get(classification, 0.0) + cash_amount
+        )
 
     # MWR: purchases are investments (negative), sales proceeds positive, and
     # the still-open shares are a positive terminal value. A zero terminal flow
@@ -454,6 +596,20 @@ def position_performance(
         ),
         "timing_basis": "money_weighted_period_return_minus_time_weighted_return",
         "interpretation": _describe_timing(yours_pct, asset_pct, mwr.get("note")),
+        "distributions": {
+            "count": len(relevant_distributions),
+            "gross_cash": round(gross_distribution_cash, 2),
+            "pending_cash_after_valuation": round(
+                pending_distribution_cash, 2
+            ),
+            "cash_by_tax_classification": {
+                key: round(value, 2)
+                for key, value in sorted(classifications.items())
+            },
+            "asset_series_already_adjusted": bool(
+                prices_include_distributions
+            ),
+        },
     }
 
 

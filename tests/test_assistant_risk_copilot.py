@@ -18,6 +18,7 @@ from assistant.risk_copilot import (
     check_policy_compliance,
     estimate_stress_impact,
     find_correlated_clusters,
+    portfolio_risk_decomposition,
 )
 from assistant.schemas import RiskExposure
 
@@ -267,6 +268,100 @@ def test_estimate_stress_impact_flags_missing_beta_without_dropping_silently():
         assert "NODATA" in result["warning"]
     finally:
         risk_copilot.fetch_historical = original_fetch
+
+
+def test_portfolio_risk_decomposition_finds_empirical_cluster_and_beta():
+    rng = np.random.default_rng(42)
+    market = rng.normal(0, 0.01, size=260)
+    shared = rng.normal(0, 0.002, size=260)
+    aaa = 1.2 * market + shared
+    bbb = 1.1 * market + shared * 0.8
+    ccc = rng.normal(0, 0.012, size=260)
+    data = {
+        "SPY": _synthetic_price_series(market),
+        "AAA": _synthetic_price_series(aaa),
+        # Explicitly shorter history: alignment must use the shared dates.
+        "BBB": _synthetic_price_series(bbb).iloc[10:],
+        "CCC": _synthetic_price_series(ccc),
+    }
+    # One corrupt provider value must be dropped jointly, not create a NaN
+    # correlation that silently looks like "no concentration."
+    data["AAA"].iloc[50, data["AAA"].columns.get_loc("close")] = np.nan
+    original_fetch = risk_copilot.fetch_historical
+    try:
+        risk_copilot.fetch_historical = (
+            lambda tickers, lookback_days=252: data
+        )
+        snapshot = build_portfolio_snapshot(
+            [
+                {
+                    "ticker": ticker,
+                    "shares": 10,
+                    "entry_price": 100.0,
+                    "current_price": 100.0,
+                }
+                for ticker in ("AAA", "BBB", "CCC")
+            ],
+            cash=1_000.0,
+        )
+        result = portfolio_risk_decomposition(
+            snapshot, min_observations=100, correlation_threshold=0.75
+        )
+    finally:
+        risk_copilot.fetch_historical = original_fetch
+
+    assert result["available"], result
+    assert result["common_observations"] >= 100
+    assert result["portfolio_beta"] is not None
+    assert np.isfinite(result["annualized_volatility_pct"])
+    assert abs(
+        sum(
+            row["contribution_to_variance_pct"]
+            for row in result["contributions"]
+        )
+        - 100
+    ) < 0.01
+    assert any(
+        {"AAA", "BBB"}.issubset(set(cluster["tickers"]))
+        for cluster in result["correlated_clusters"]
+    )
+
+
+def test_portfolio_risk_decomposition_fails_closed_without_common_dates():
+    rng = np.random.default_rng(5)
+    first = _synthetic_price_series(rng.normal(0, 0.01, size=100))
+    second = _synthetic_price_series(rng.normal(0, 0.01, size=100))
+    second.index = second.index + pd.Timedelta(days=500)
+    benchmark = _synthetic_price_series(rng.normal(0, 0.01, size=100))
+    original_fetch = risk_copilot.fetch_historical
+    try:
+        risk_copilot.fetch_historical = (
+            lambda tickers, lookback_days=252: {
+                "AAA": first,
+                "BBB": second,
+                "SPY": benchmark,
+            }
+        )
+        snapshot = build_portfolio_snapshot(
+            [
+                {
+                    "ticker": ticker,
+                    "shares": 1,
+                    "entry_price": 100.0,
+                    "current_price": 100.0,
+                }
+                for ticker in ("AAA", "BBB")
+            ],
+            cash=0,
+        )
+        result = portfolio_risk_decomposition(
+            snapshot, min_observations=60
+        )
+    finally:
+        risk_copilot.fetch_historical = original_fetch
+
+    assert not result["available"]
+    assert "common finite observations" in result["reason"]
 
 
 if __name__ == "__main__":

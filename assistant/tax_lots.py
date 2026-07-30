@@ -20,7 +20,7 @@ NOT TAX ADVICE. This is deterministic bookkeeping over your own fills. It
 computes holding periods from dates and flags possible wash sales; it does not
 adjust cost basis for them, does not decide what counts as "substantially
 identical", and does not know about your other accounts, options positions,
-dividend reinvestment, corporate actions, or which basis method you have
+dividend reinvestment, unconfirmed corporate actions, or which basis method you have
 actually elected with your broker. Your broker's 1099-B is authoritative for
 filing. Use this to understand the shape of a decision before making it, and
 to see numbers the average-cost view structurally cannot show.
@@ -85,6 +85,39 @@ class Fill:
                 )
         if self.at.tzinfo is None:
             raise TaxLotError(f"Fill.at must be timezone-aware, got naive {self.at!r}")
+
+
+@dataclasses.dataclass(frozen=True)
+class Split:
+    """A confirmed split expressed as the new-shares / old-shares ratio.
+
+    A 4-for-1 split has ``ratio=4``; a 1-for-10 reverse split has
+    ``ratio=0.1``. Fractional-share cash-in-lieu is a separate broker cash
+    event and is deliberately not guessed here.
+    """
+
+    ticker: str
+    ratio: float
+    at: datetime
+    action_id: str = ""
+
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.ratio, (int, float))
+            or isinstance(self.ratio, bool)
+            or not math.isfinite(self.ratio)
+            or self.ratio <= 0
+        ):
+            raise TaxLotError(
+                f"split ratio must be positive and finite, got {self.ratio!r}"
+            )
+        if self.at.tzinfo is None:
+            raise TaxLotError(
+                f"Split.at must be timezone-aware, got naive {self.at!r}"
+            )
+
+
+LotEvent = Fill | Split
 
 
 @dataclasses.dataclass(frozen=True)
@@ -252,14 +285,14 @@ def select_lots(
 
 
 def build_ledger(
-    fills: list[Fill],
+    fills: list[LotEvent],
     *,
     method: str = FIFO,
     specific_lot_ids: dict[str, list[str]] | None = None,
 ) -> LotLedger:
     """
-    Replay `fills` in chronological order into open lots plus realized
-    components.
+    Replay fills and confirmed splits in chronological order into open lots
+    plus realized components.
 
     Deterministic and idempotent: the same fills always produce the same
     ledger, which is why lots are derived from the append-only
@@ -276,8 +309,29 @@ def build_ledger(
     realized: list[RealizedComponent] = []
     counter = 0
 
-    for fill in sorted(fills, key=lambda f: (f.at, f.fill_id)):
+    fill_events = [event for event in fills if isinstance(event, Fill)]
+    for fill in sorted(
+        fills,
+        key=lambda event: (
+            event.at,
+            event.fill_id if isinstance(event, Fill) else event.action_id,
+        ),
+    ):
         ticker = fill.ticker.upper()
+        if isinstance(fill, Split):
+            open_lots = [
+                (
+                    dataclasses.replace(
+                        lot,
+                        qty=lot.qty * fill.ratio,
+                        cost_per_share=lot.cost_per_share / fill.ratio,
+                    )
+                    if lot.ticker == ticker
+                    else lot
+                )
+                for lot in open_lots
+            ]
+            continue
         if fill.side == "buy":
             counter += 1
             open_lots.append(
@@ -318,7 +372,7 @@ def build_ledger(
             else:
                 open_lots[index] = dataclasses.replace(lot, qty=remaining)
 
-    realized = _flag_wash_sales(realized, fills)
+    realized = _flag_wash_sales(realized, fill_events)
     return LotLedger(tuple(open_lots), tuple(realized), method)
 
 

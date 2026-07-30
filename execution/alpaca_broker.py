@@ -25,6 +25,7 @@ from __future__ import annotations
 import inspect
 import math
 import os
+from decimal import Decimal, InvalidOperation
 from threading import Event, Thread
 from typing import Any, Callable
 
@@ -91,6 +92,17 @@ def _optional_float(value: Any) -> float | None:
     return parsed if math.isfinite(parsed) else None
 
 
+def _optional_decimal_text(value: Any) -> str | None:
+    """Preserve broker-supplied decimal digits beside legacy float fields."""
+    if value is None:
+        return None
+    try:
+        parsed = Decimal(str(value))
+    except (InvalidOperation, TypeError, ValueError):
+        return None
+    return format(parsed, "f") if parsed.is_finite() else None
+
+
 def _optional_iso(value: Any) -> str | None:
     if value is None:
         return None
@@ -105,10 +117,13 @@ def _normalize_order(order: Any) -> dict:
         "client_order_id": getattr(order, "client_order_id", None),
         "ticker": order.symbol,
         "shares": _optional_float(getattr(order, "qty", None)),
+        "shares_decimal": _optional_decimal_text(getattr(order, "qty", None)),
         "side": str(_enum_value(getattr(order, "side", "unknown"))),
         "type": str(_enum_value(getattr(order, "type", "unknown"))),
         "limit_price": _optional_float(getattr(order, "limit_price", None)),
+        "limit_price_decimal": _optional_decimal_text(getattr(order, "limit_price", None)),
         "notional": _optional_float(getattr(order, "notional", None)),
+        "notional_decimal": _optional_decimal_text(getattr(order, "notional", None)),
         "time_in_force": (
             str(_enum_value(order.time_in_force))
             if getattr(order, "time_in_force", None) is not None
@@ -131,7 +146,11 @@ def _normalize_order(order: Any) -> dict:
         ),
         "replaced_at": _optional_iso(getattr(order, "replaced_at", None)),
         "filled_qty": _optional_float(getattr(order, "filled_qty", None)),
+        "filled_qty_decimal": _optional_decimal_text(getattr(order, "filled_qty", None)),
         "filled_avg_price": _optional_float(getattr(order, "filled_avg_price", None)),
+        "filled_avg_price_decimal": _optional_decimal_text(
+            getattr(order, "filled_avg_price", None)
+        ),
         "submitted_at": _optional_iso(getattr(order, "submitted_at", None)),
         "updated_at": _optional_iso(getattr(order, "updated_at", None)),
         "filled_at": _optional_iso(getattr(order, "filled_at", None)),
@@ -148,8 +167,11 @@ def get_account() -> dict:
         "account_id": str(account.id),
         "status": str(_enum_value(getattr(account, "status", "unknown"))),
         "equity": float(account.equity),
+        "equity_decimal": _optional_decimal_text(account.equity),
         "cash": float(account.cash),
+        "cash_decimal": _optional_decimal_text(account.cash),
         "buying_power": float(account.buying_power),
+        "buying_power_decimal": _optional_decimal_text(account.buying_power),
         "trading_blocked": bool(getattr(account, "trading_blocked", False)),
         "account_blocked": bool(getattr(account, "account_blocked", False)),
         "trade_suspended_by_user": bool(getattr(account, "trade_suspended_by_user", False)),
@@ -211,8 +233,11 @@ def get_open_positions() -> list[dict]:
         {
             "ticker": p.symbol,
             "shares": float(p.qty),
+            "shares_decimal": _optional_decimal_text(p.qty),
             "avg_entry_price": float(p.avg_entry_price),
+            "avg_entry_price_decimal": _optional_decimal_text(p.avg_entry_price),
             "current_price": float(p.current_price),
+            "current_price_decimal": _optional_decimal_text(p.current_price),
             "unrealized_pl": float(p.unrealized_pl),
         }
         for p in client.get_all_positions()
@@ -245,12 +270,23 @@ def get_latest_quote(ticker: str) -> dict:
     client = StockHistoricalDataClient(key, secret)
     quotes = client.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=[ticker]))
     quote = quotes[ticker]
-    bid, ask = float(quote.bid_price), float(quote.ask_price)
-    if bid > 0 and ask > 0:
-        price = (bid + ask) / 2
+    bid_decimal = Decimal(str(quote.bid_price))
+    ask_decimal = Decimal(str(quote.ask_price))
+    bid, ask = float(bid_decimal), float(ask_decimal)
+    if bid_decimal > 0 and ask_decimal > 0:
+        price_decimal = (bid_decimal + ask_decimal) / Decimal("2")
     else:
-        price = ask if ask > 0 else bid
-    return {"ticker": ticker, "price": price, "bid": bid, "ask": ask, "timestamp": quote.timestamp}
+        price_decimal = ask_decimal if ask_decimal > 0 else bid_decimal
+    return {
+        "ticker": ticker,
+        "price": float(price_decimal),
+        "price_decimal": format(price_decimal, "f"),
+        "bid": bid,
+        "bid_decimal": format(bid_decimal, "f"),
+        "ask": ask,
+        "ask_decimal": format(ask_decimal, "f"),
+        "timestamp": quote.timestamp,
+    }
 
 
 def find_order_by_client_id(client_order_id: str) -> dict | None:

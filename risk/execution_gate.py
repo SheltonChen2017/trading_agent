@@ -50,6 +50,7 @@ import hmac
 import json
 import math
 import secrets
+from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 from typing import Literal
 from zoneinfo import ZoneInfo
@@ -57,6 +58,7 @@ from zoneinfo import ZoneInfo
 import pandas_market_calendars as mcal
 
 from config import BASKETS, LEVERAGED_ETF_TICKERS, MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
+from assistant.money import MoneyInput, decimal_or_none, to_decimal
 from assistant.schemas import PortfolioSnapshot
 
 _EASTERN = ZoneInfo("America/New_York")
@@ -485,15 +487,31 @@ def worst_case_fill_price(intent: TradeIntent, reference_price: float) -> float:
     the quote; a non-finite reference_price is returned as-is so the caller's
     own INVALID_REFERENCE_PRICE check still fires rather than being masked.
     """
+    try:
+        return float(worst_case_fill_price_decimal(intent, reference_price))
+    except ValueError:
+        # Preserve the helper's historical contract for corrupt reference
+        # values: the caller's INVALID_REFERENCE_PRICE check owns rejection.
+        return reference_price
+
+
+def worst_case_fill_price_decimal(
+    intent: TradeIntent, reference_price: MoneyInput
+) -> Decimal:
+    """Exact counterpart used by every dollar-denominated safety check."""
+    reference = to_decimal(reference_price, name="reference_price")
+    limit = (
+        decimal_or_none(intent.limit_price)
+        if intent.limit_price is not None
+        else None
+    )
     if (
         intent.order_type != "limit"
         or intent.side != "buy"
-        or intent.limit_price is None
-        or not math.isfinite(intent.limit_price)
-        or not math.isfinite(reference_price)
+        or limit is None
     ):
-        return reference_price
-    return max(reference_price, intent.limit_price)
+        return reference
+    return max(reference, limit)
 
 
 def validate_trade_intent(
@@ -611,39 +629,51 @@ def validate_trade_intent(
     # a cash check, an exposure cap, or a basket/leveraged-ETF sum could
     # all silently fail OPEN instead of blocking. These are always hard,
     # non-overridable violations -- never a risk-preference call.
-    if not math.isfinite(portfolio.cash):
+    portfolio_cash = decimal_or_none(portfolio.cash)
+    portfolio_equity = decimal_or_none(portfolio.total_equity)
+    portfolio_buying_power = (
+        decimal_or_none(portfolio.buying_power)
+        if portfolio.buying_power is not None
+        else None
+    )
+    if portfolio_cash is None:
         _violate(ViolationCode.INVALID_PORTFOLIO_CASH, f"portfolio.cash must be finite, got {portfolio.cash}.")
-    elif portfolio.cash < 0:
+    elif portfolio_cash < 0:
         _violate(
             ViolationCode.INVALID_PORTFOLIO_CASH,
             f"portfolio.cash must be non-negative (this project does not model margin/short cash "
             f"balances), got {portfolio.cash}.",
         )
-    if not math.isfinite(portfolio.total_equity):
+    if portfolio_equity is None:
         _violate(
             ViolationCode.INVALID_PORTFOLIO_EQUITY,
             f"portfolio.total_equity must be finite, got {portfolio.total_equity}.",
         )
-    elif intent.side == "buy" and portfolio.total_equity <= 0:
+    elif intent.side == "buy" and portfolio_equity <= 0:
         _violate(
             ViolationCode.INVALID_PORTFOLIO_EQUITY,
             f"portfolio.total_equity must be positive to size a buy against it, got {portfolio.total_equity}.",
         )
-    if portfolio.buying_power is not None and not math.isfinite(portfolio.buying_power):
+    if portfolio.buying_power is not None and portfolio_buying_power is None:
         _violate(
             ViolationCode.INVALID_BUYING_POWER,
             f"portfolio.buying_power must be finite when present, got {portfolio.buying_power}.",
         )
+    position_money: list[tuple[Decimal | None, Decimal | None, Decimal | None]] = []
     for position in portfolio.positions:
+        entry_price = decimal_or_none(position.entry_price)
+        current_price = decimal_or_none(position.current_price)
+        market_value = decimal_or_none(position.market_value)
+        position_money.append((entry_price, current_price, market_value))
         bad_fields = [
             (name, value)
-            for name, value in (
-                ("shares", position.shares),
-                ("entry_price", position.entry_price),
-                ("current_price", position.current_price),
-                ("market_value", position.market_value),
+            for name, value, converted in (
+                ("shares", position.shares, decimal_or_none(position.shares)),
+                ("entry_price", position.entry_price, entry_price),
+                ("current_price", position.current_price, current_price),
+                ("market_value", position.market_value, market_value),
             )
-            if not math.isfinite(value)
+            if converted is None
         ]
         if bad_fields:
             detail = ", ".join(f"{name}={value}" for name, value in bad_fields)
@@ -659,12 +689,16 @@ def validate_trade_intent(
                 f"Position {position.ticker} has negative shares ({position.shares}) -- this project "
                 "does not model short positions.",
             )
-        if position.market_value < 0:
+        if market_value is not None and market_value < 0:
             _violate(
                 ViolationCode.INVALID_POSITION_DATA,
                 f"Position {position.ticker} has negative market_value ({position.market_value}).",
             )
-        if position.current_price <= 0 or position.entry_price <= 0:
+        if (
+            current_price is not None
+            and entry_price is not None
+            and (current_price <= 0 or entry_price <= 0)
+        ):
             _violate(
                 ViolationCode.INVALID_POSITION_DATA,
                 f"Position {position.ticker} has a non-positive price (entry_price="
@@ -699,13 +733,33 @@ def validate_trade_intent(
     # of the checks running instead of crashing.
     safe_shares = intent.shares if shares_valid else 0
 
-    trade_value = safe_shares * worst_case_fill_price(intent, reference_price)
-    if not math.isfinite(reference_price) or reference_price <= 0:
+    reference_price_decimal = decimal_or_none(reference_price)
+    if reference_price_decimal is None or reference_price_decimal <= 0:
         _violate(
             ViolationCode.INVALID_REFERENCE_PRICE,
             f"reference_price must be a positive, finite number, got {reference_price}.",
         )
-    if max_order_value is not None and trade_value > max_order_value:
+    # Keep evaluating after invalid input so callers receive all violations;
+    # the recorded hard violation guarantees this fallback can never approve.
+    arithmetic_reference_price = reference_price_decimal or Decimal("0")
+    try:
+        fill_price = worst_case_fill_price_decimal(intent, arithmetic_reference_price)
+    except ValueError:
+        fill_price = arithmetic_reference_price
+    trade_value = Decimal(safe_shares) * fill_price
+    max_order_value_decimal = (
+        decimal_or_none(max_order_value)
+        if max_order_value is not None
+        else None
+    )
+    if max_order_value is not None and max_order_value_decimal is None:
+        # Policy validation normally makes this unreachable; fail closed for
+        # direct callers of the pure gate too.
+        _violate(
+            ViolationCode.MAX_ORDER_VALUE,
+            f"max_order_value must be positive and finite, got {max_order_value}.",
+        )
+    elif max_order_value_decimal is not None and trade_value > max_order_value_decimal:
         _violate(
             ViolationCode.MAX_ORDER_VALUE,
             f"Trade value ${trade_value:,.2f} exceeds the ${max_order_value:,.2f} maximum order value.",
@@ -719,9 +773,10 @@ def validate_trade_intent(
         # mode already fixed elsewhere in this module for reference_price/
         # limit_price/bid/ask, but missed here when
         # pending_buy_value_by_ticker was added (GPT review, 2026-07-27).
-        pending_by_ticker: dict[str, float] = {}
+        pending_by_ticker: dict[str, Decimal] = {}
         for raw_ticker, raw_value in (pending_buy_value_by_ticker or {}).items():
-            if not math.isfinite(raw_value) or raw_value < 0:
+            pending_value = decimal_or_none(raw_value)
+            if pending_value is None or pending_value < 0:
                 _violate(
                     ViolationCode.INVALID_PENDING_VALUE,
                     f"pending_buy_value_by_ticker[{raw_ticker!r}] must be a non-negative, finite "
@@ -730,14 +785,28 @@ def validate_trade_intent(
                 )
                 continue
             key = raw_ticker.upper()
-            pending_by_ticker[key] = pending_by_ticker.get(key, 0.0) + raw_value
-        total_pending_buy_value = sum(pending_by_ticker.values())
+            pending_by_ticker[key] = (
+                pending_by_ticker.get(key, Decimal("0")) + pending_value
+            )
+        total_pending_buy_value = sum(pending_by_ticker.values(), Decimal("0"))
 
         existing_position_value = sum(
-            p.market_value for p in portfolio.positions if p.ticker.upper() == intent.ticker.upper()
-        ) + pending_by_ticker.get(intent.ticker.upper(), 0.0)
-        new_position_pct = (existing_position_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
-        if new_position_pct > max_position_pct * 100:
+            (
+                market_value
+                for p, (_, _, market_value) in zip(portfolio.positions, position_money)
+                if p.ticker.upper() == intent.ticker.upper() and market_value is not None
+            ),
+            Decimal("0"),
+        ) + pending_by_ticker.get(intent.ticker.upper(), Decimal("0"))
+        new_position_pct = (
+            (existing_position_value + trade_value)
+            / portfolio_equity
+            * Decimal("100")
+            if portfolio_equity is not None and portfolio_equity
+            else Decimal("0")
+        )
+        max_position_percent = to_decimal(max_position_pct) * Decimal("100")
+        if new_position_pct > max_position_percent:
             _violate(
                 ViolationCode.MAX_POSITION_PCT,
                 f"Position size would be {new_position_pct:.1f}% of equity, exceeding the "
@@ -749,18 +818,29 @@ def validate_trade_intent(
         # hard, non-overridable violation below, so this fallback never
         # papers over the bad input; it just keeps the arithmetic sane
         # while `approved` is already guaranteed False.
-        if available_cash_override is not None and not math.isfinite(available_cash_override):
+        available_cash_decimal = (
+            decimal_or_none(available_cash_override)
+            if available_cash_override is not None
+            else None
+        )
+        if available_cash_override is not None and available_cash_decimal is None:
             _violate(
                 ViolationCode.INVALID_AVAILABLE_CAPITAL_OVERRIDE,
                 f"available_cash_override must be finite, got {available_cash_override}.",
             )
-            available_cash_override = None
-        if available_buying_power_override is not None and not math.isfinite(available_buying_power_override):
+        available_buying_power_decimal = (
+            decimal_or_none(available_buying_power_override)
+            if available_buying_power_override is not None
+            else None
+        )
+        if (
+            available_buying_power_override is not None
+            and available_buying_power_decimal is None
+        ):
             _violate(
                 ViolationCode.INVALID_AVAILABLE_CAPITAL_OVERRIDE,
                 f"available_buying_power_override must be finite, got {available_buying_power_override}.",
             )
-            available_buying_power_override = None
 
         # portfolio.cash alone ignores pending/open orders reserving that
         # same cash (e.g. two proposals approved back-to-back, or an
@@ -774,10 +854,15 @@ def validate_trade_intent(
         # tighten these WITHOUT touching portfolio.cash/buying_power
         # themselves, since those two also feed `existing_invested` below
         # and must stay at their real, unreserved values there.
-        available_capital = available_cash_override if available_cash_override is not None else portfolio.cash
+        available_capital = (
+            available_cash_decimal
+            if available_cash_decimal is not None
+            else (portfolio_cash or Decimal("0"))
+        )
         effective_buying_power = (
-            available_buying_power_override if available_buying_power_override is not None
-            else portfolio.buying_power
+            available_buying_power_decimal
+            if available_buying_power_decimal is not None
+            else portfolio_buying_power
         )
         if effective_buying_power is not None:
             available_capital = min(available_capital, effective_buying_power)
@@ -786,7 +871,10 @@ def validate_trade_intent(
                 ViolationCode.INSUFFICIENT_CASH,
                 f"Trade value ${trade_value:,.2f} exceeds available cash ${available_capital:,.2f}.",
             )
-        minimum_cash = portfolio.total_equity * min_cash_reserve_pct
+        minimum_cash = (
+            (portfolio_equity or Decimal("0"))
+            * to_decimal(min_cash_reserve_pct)
+        )
         if available_capital - trade_value < minimum_cash:
             _violate(
                 ViolationCode.MIN_CASH_RESERVE,
@@ -800,9 +888,22 @@ def validate_trade_intent(
         # ONLY via total_pending_buy_value, or an earlier reserved leg
         # would be counted twice: once here (via a shrunk cash figure)
         # and again via total_pending_buy_value (see docstring).
-        existing_invested = portfolio.total_equity - portfolio.cash + total_pending_buy_value
-        new_invested_pct = (existing_invested + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
-        if new_invested_pct > max_total_exposure_pct * 100:
+        existing_invested = (
+            (portfolio_equity or Decimal("0"))
+            - (portfolio_cash or Decimal("0"))
+            + total_pending_buy_value
+        )
+        new_invested_pct = (
+            (existing_invested + trade_value)
+            / portfolio_equity
+            * Decimal("100")
+            if portfolio_equity is not None and portfolio_equity
+            else Decimal("0")
+        )
+        max_total_exposure_percent = (
+            to_decimal(max_total_exposure_pct) * Decimal("100")
+        )
+        if new_invested_pct > max_total_exposure_percent:
             _violate(
                 ViolationCode.MAX_TOTAL_EXPOSURE_PCT,
                 f"Total invested exposure would be {new_invested_pct:.1f}% of equity, exceeding the "
@@ -813,10 +914,24 @@ def validate_trade_intent(
             if intent.ticker.upper() not in basket_tickers and intent.ticker not in basket_tickers:
                 continue
             existing_basket_value = sum(
-                p.market_value for p in portfolio.positions if p.ticker.upper() in basket_tickers
-            ) + sum(v for t, v in pending_by_ticker.items() if t in basket_tickers)
-            new_basket_pct = (existing_basket_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
-            if new_basket_pct > max_basket_pct:
+                (
+                    market_value
+                    for p, (_, _, market_value) in zip(portfolio.positions, position_money)
+                    if p.ticker.upper() in basket_tickers and market_value is not None
+                ),
+                Decimal("0"),
+            ) + sum(
+                (v for t, v in pending_by_ticker.items() if t in basket_tickers),
+                Decimal("0"),
+            )
+            new_basket_pct = (
+                (existing_basket_value + trade_value)
+                / portfolio_equity
+                * Decimal("100")
+                if portfolio_equity is not None and portfolio_equity
+                else Decimal("0")
+            )
+            if new_basket_pct > to_decimal(max_basket_pct):
                 _violate(
                     ViolationCode.MAX_BASKET_PCT,
                     f"'{basket_name}' exposure would be {new_basket_pct:.1f}% of equity, exceeding the "
@@ -825,10 +940,24 @@ def validate_trade_intent(
 
         if intent.ticker.upper() in LEVERAGED_ETF_TICKERS:
             existing_leveraged_value = sum(
-                p.market_value for p in portfolio.positions if p.is_leveraged_etf
-            ) + sum(v for t, v in pending_by_ticker.items() if t in LEVERAGED_ETF_TICKERS)
-            new_leveraged_pct = (existing_leveraged_value + trade_value) / portfolio.total_equity * 100 if portfolio.total_equity else 0.0
-            if new_leveraged_pct > max_leveraged_etf_pct:
+                (
+                    market_value
+                    for p, (_, _, market_value) in zip(portfolio.positions, position_money)
+                    if p.is_leveraged_etf and market_value is not None
+                ),
+                Decimal("0"),
+            ) + sum(
+                (v for t, v in pending_by_ticker.items() if t in LEVERAGED_ETF_TICKERS),
+                Decimal("0"),
+            )
+            new_leveraged_pct = (
+                (existing_leveraged_value + trade_value)
+                / portfolio_equity
+                * Decimal("100")
+                if portfolio_equity is not None and portfolio_equity
+                else Decimal("0")
+            )
+            if new_leveraged_pct > to_decimal(max_leveraged_etf_pct):
                 _violate(
                     ViolationCode.MAX_LEVERAGED_ETF_PCT,
                     f"Leveraged ETF exposure would be {new_leveraged_pct:.1f}% of equity, exceeding the "
@@ -913,15 +1042,24 @@ def validate_trade_intent(
                 break
 
     if intent.order_type == "limit":
-        if intent.limit_price is None or not math.isfinite(intent.limit_price) or intent.limit_price <= 0:
+        limit_price_decimal = (
+            decimal_or_none(intent.limit_price)
+            if intent.limit_price is not None
+            else None
+        )
+        if limit_price_decimal is None or limit_price_decimal <= 0:
             _violate(ViolationCode.INVALID_LIMIT_PRICE, "Limit orders require a positive, finite limit price.")
-        elif reference_price:
-            slippage_pct = abs(intent.limit_price - reference_price) / reference_price * 100
-            if slippage_pct > max_slippage_pct:
+        elif reference_price_decimal is not None and reference_price_decimal > 0:
+            slippage_pct = (
+                abs(limit_price_decimal - reference_price_decimal)
+                / reference_price_decimal
+                * Decimal("100")
+            )
+            if slippage_pct > to_decimal(max_slippage_pct):
                 _violate(
                     ViolationCode.MAX_SLIPPAGE,
-                    f"Limit price ${intent.limit_price:.2f} is {slippage_pct:.1f}% away from the reference price "
-                    f"${reference_price:.2f}, exceeding the {max_slippage_pct:.1f}% max-slippage limit.",
+                    f"Limit price ${limit_price_decimal:.2f} is {slippage_pct:.1f}% away from the reference price "
+                    f"${reference_price_decimal:.2f}, exceeding the {max_slippage_pct:.1f}% max-slippage limit.",
                 )
 
     # Bid/ask is opt-in (many callers/tests validate without a live quote
@@ -933,30 +1071,36 @@ def validate_trade_intent(
     # a data anomaly) pass with zero protection -- exactly the situations
     # where a market order is most likely to fill badly.
     if bid_price is not None and ask_price is not None:
+        bid_price_decimal = decimal_or_none(bid_price)
+        ask_price_decimal = decimal_or_none(ask_price)
         if (
-            not math.isfinite(bid_price)
-            or not math.isfinite(ask_price)
-            or bid_price <= 0
-            or ask_price <= 0
+            bid_price_decimal is None
+            or ask_price_decimal is None
+            or bid_price_decimal <= 0
+            or ask_price_decimal <= 0
         ):
             _violate(
                 ViolationCode.INVALID_QUOTE,
-                f"Bid/ask quote is one-sided or invalid (bid=${bid_price:.2f}, ask=${ask_price:.2f}) -- "
+                f"Bid/ask quote is one-sided or invalid (bid={bid_price!r}, ask={ask_price!r}) -- "
                 "refusing to trade without a complete two-sided quote.",
             )
-        elif ask_price < bid_price:
+        elif ask_price_decimal < bid_price_decimal:
             _violate(
                 ViolationCode.INVALID_QUOTE,
-                f"Bid/ask quote is crossed (bid=${bid_price:.2f} > ask=${ask_price:.2f}) -- this indicates "
+                f"Bid/ask quote is crossed (bid=${bid_price_decimal:.2f} > ask=${ask_price_decimal:.2f}) -- this indicates "
                 "a stale or corrupted quote, not a tradeable market.",
             )
         else:
-            mid = (bid_price + ask_price) / 2
-            spread_pct = (ask_price - bid_price) / mid * 100
-            if spread_pct > max_spread_pct:
+            mid = (bid_price_decimal + ask_price_decimal) / Decimal("2")
+            spread_pct = (
+                (ask_price_decimal - bid_price_decimal)
+                / mid
+                * Decimal("100")
+            )
+            if spread_pct > to_decimal(max_spread_pct):
                 _violate(
                     ViolationCode.MAX_SPREAD,
-                    f"Bid/ask spread is {spread_pct:.2f}% (bid ${bid_price:.2f} / ask ${ask_price:.2f}), "
+                    f"Bid/ask spread is {spread_pct:.2f}% (bid ${bid_price_decimal:.2f} / ask ${ask_price_decimal:.2f}), "
                     f"exceeding the {max_spread_pct:.2f}% max-spread limit -- a market order here could fill "
                     "well away from the reference price.",
                 )

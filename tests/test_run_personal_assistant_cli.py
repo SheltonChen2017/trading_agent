@@ -29,6 +29,8 @@ def test_top_level_help_renders_without_percent_format_errors():
     assert "monitor-orders" in help_text
     assert "readiness" in help_text
     assert "ledger-reconcile" in help_text
+    assert "ledger-dividend" in help_text
+    assert "ledger-split" in help_text
     assert "operations-check" in help_text
     assert "operations-cycle" in help_text
     assert "paper-epoch-start" in help_text
@@ -79,6 +81,38 @@ def test_production_foundation_commands_parse():
         == "bootstrap"
     )
     assert build_parser().parse_args(["ledger-reconcile"]).no_sync is False
+    dividend = build_parser().parse_args(
+        [
+            "ledger-dividend",
+            "--external-id",
+            "aapl-div-1",
+            "--ticker",
+            "AAPL",
+            "--gross-amount",
+            "5.00",
+            "--occurred-at",
+            "2026-08-01T14:00:00+00:00",
+            "--ex-date",
+            "2026-07-10",
+            "--amount-per-share",
+            "0.25",
+        ]
+    )
+    assert dividend.gross_amount == "5.00"
+    split = build_parser().parse_args(
+        [
+            "ledger-split",
+            "--external-id",
+            "aapl-split-1",
+            "--ticker",
+            "AAPL",
+            "--ratio",
+            "4",
+            "--occurred-at",
+            "2026-08-01T14:00:00+00:00",
+        ]
+    )
+    assert split.ratio == "4"
     promotion = build_parser().parse_args(
         ["promotion-status", "report.json", "--evidence-epoch", "paper-v1"]
     )

@@ -12,7 +12,7 @@ import dataclasses
 import hashlib
 import json
 import uuid
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -80,6 +80,15 @@ def _parse_at(value: str | datetime, field: str = "occurred_at") -> datetime:
     if parsed.tzinfo is None:
         raise LedgerError(f"{field} must include a timezone")
     return parsed
+
+
+def _corporate_date(value: str, field: str) -> str:
+    """Normalize an ISO date or an explicitly timezone-aware timestamp."""
+    text = str(value).strip()
+    try:
+        return date.fromisoformat(text).isoformat()
+    except ValueError:
+        return _parse_at(text, field).isoformat()
 
 
 def _security_account(ticker: str) -> str:
@@ -439,24 +448,132 @@ def record_dividend(
     ticker: str,
     gross_amount: Any,
     occurred_at: str,
+    ex_date: str | None = None,
+    pay_date: str | None = None,
+    amount_per_share: Any | None = None,
+    shares_entitled: Any | None = None,
+    tax_classification: str = "unknown",
 ) -> bool:
     amount = _decimal(gross_amount, "gross_amount")
     if amount <= 0:
         raise LedgerError("gross dividend must be positive")
+    normalized_classification = str(tax_classification).strip().lower()
+    if normalized_classification not in ("qualified", "ordinary", "unknown"):
+        raise LedgerError(
+            "tax_classification must be 'qualified', 'ordinary', or 'unknown'"
+        )
+    normalized_ticker = _security_account(ticker)[
+        len(SECURITY_ACCOUNT_PREFIX) :
+    ]
+    metadata: dict[str, Any] = {
+        "ticker": normalized_ticker,
+        "tax_classification": normalized_classification,
+    }
+    if ex_date is not None:
+        metadata["ex_date"] = _corporate_date(ex_date, "ex_date")
+    if pay_date is not None:
+        metadata["pay_date"] = _corporate_date(pay_date, "pay_date")
+    if amount_per_share is not None:
+        per_share = _decimal(amount_per_share, "amount_per_share")
+        if per_share <= 0:
+            raise LedgerError("amount_per_share must be positive")
+        metadata["amount_per_share"] = _decimal_text(per_share)
+    if shares_entitled is not None:
+        entitled = _decimal(shares_entitled, "shares_entitled")
+        if entitled <= 0:
+            raise LedgerError("shares_entitled must be positive")
+        metadata["shares_entitled"] = _decimal_text(entitled)
+    if amount_per_share is not None and shares_entitled is not None:
+        expected_gross = per_share * entitled
+        if abs(expected_gross - amount) > CASH_TOLERANCE:
+            raise LedgerError(
+                "gross_amount does not match amount_per_share multiplied by "
+                f"shares_entitled ({amount} vs {expected_gross})"
+            )
     transaction = JournalTransaction(
         transaction_id=_transaction_id(f"dividend:{external_id}"),
         occurred_at=_parse_at(occurred_at).isoformat(),
         source="corporate_action",
         external_id=f"dividend:{external_id}",
-        description=f"Cash dividend for {ticker.upper()}",
+        description=f"Cash dividend for {normalized_ticker}",
         postings=(
             Posting(ACCOUNT_CASH, amount),
             Posting(
                 ACCOUNT_DIVIDEND_INCOME,
                 -amount,
-                metadata={"ticker": ticker.upper()},
+                metadata=metadata,
             ),
         ),
+        metadata=metadata,
+    )
+    return post_transaction(store, transaction)
+
+
+def record_split(
+    store: AssistantStore,
+    *,
+    external_id: str,
+    ticker: str,
+    ratio: Any,
+    occurred_at: str,
+) -> bool:
+    """Apply a confirmed split to share quantity without changing book basis."""
+    split_ratio = _decimal(ratio, "ratio")
+    if split_ratio <= 0 or split_ratio == 1:
+        raise LedgerError("split ratio must be positive and different from 1")
+    normalized_ticker = _security_account(ticker)[
+        len(SECURITY_ACCOUNT_PREFIX) :
+    ]
+    effective_at = _parse_at(occurred_at)
+    expected_external_id = f"split:{external_id}"
+    postings = store.list_journal_postings()
+    if any(
+        posting["external_id"] == expected_external_id
+        for posting in postings
+    ):
+        return False
+    security_account = _security_account(normalized_ticker)
+    held_at_effective = sum(
+        (
+            _decimal(posting["quantity"], "stored posting quantity")
+            for posting in postings
+            if posting["account"] == security_account
+            and posting["quantity"] is not None
+            and _parse_at(posting["occurred_at"]) <= effective_at
+        ),
+        Decimal("0"),
+    )
+    if held_at_effective <= 0:
+        raise LedgerError(
+            f"cannot apply split for {normalized_ticker}; journal held "
+            f"{held_at_effective} shares at the effective time"
+        )
+    post_split = held_at_effective * split_ratio
+    metadata = {
+        "ticker": normalized_ticker,
+        "corporate_action": "split",
+        "ratio": _decimal_text(split_ratio),
+        "pre_split_shares": _decimal_text(held_at_effective),
+        "post_split_shares": _decimal_text(post_split),
+        "cash_in_lieu_included": False,
+    }
+    transaction = JournalTransaction(
+        transaction_id=_transaction_id(f"split:{external_id}"),
+        occurred_at=effective_at.isoformat(),
+        source="corporate_action",
+        external_id=expected_external_id,
+        description=(
+            f"Confirmed {split_ratio}:1 share adjustment for {normalized_ticker}"
+        ),
+        postings=(
+            Posting(
+                _security_account(normalized_ticker),
+                Decimal("0"),
+                quantity=post_split - held_at_effective,
+                metadata=metadata,
+            ),
+        ),
+        metadata=metadata,
     )
     return post_transaction(store, transaction)
 

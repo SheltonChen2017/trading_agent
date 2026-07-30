@@ -13,6 +13,7 @@ from assistant.portfolio_ledger import (
     ACCOUNT_DIVIDEND_INCOME,
     ACCOUNT_FEES,
     ACCOUNT_REALIZED_PNL,
+    SECURITY_ACCOUNT_PREFIX,
     JournalTransaction,
     LedgerError,
     Posting,
@@ -24,6 +25,7 @@ from assistant.portfolio_ledger import (
     record_cash_transfer,
     record_dividend,
     record_fee,
+    record_split,
     sync_app_fills,
 )
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
@@ -272,11 +274,113 @@ def test_record_dividend(tmp_path):
     assert Decimal(dividend_postings[0]["amount"]) == Decimal("-12.34")
     assert dividend_postings[0]["metadata"]["ticker"] == "AAPL"
 
+    assert record_dividend(
+        store,
+        external_id="div-2",
+        ticker="aapl",
+        gross_amount=5,
+        occurred_at="2026-08-01T10:00:00+00:00",
+        ex_date="2026-07-10",
+        pay_date="2026-08-01",
+        amount_per_share="0.25",
+        shares_entitled="20",
+        tax_classification="qualified",
+    )
+    enriched = _postings_for_account(store, ACCOUNT_DIVIDEND_INCOME)[1]
+    assert enriched["metadata"]["ex_date"] == "2026-07-10"
+    assert enriched["metadata"]["tax_classification"] == "qualified"
+
     with pytest.raises(LedgerError, match="must be positive"):
         record_dividend(
             store, external_id="div-bad", ticker="AAPL", gross_amount=0,
             occurred_at="2026-07-29T11:00:00+00:00",
         )
+    with pytest.raises(LedgerError, match="does not match"):
+        record_dividend(
+            store,
+            external_id="div-inconsistent",
+            ticker="AAPL",
+            gross_amount=10,
+            occurred_at="2026-08-01T10:00:00+00:00",
+            ex_date="2026-07-10",
+            amount_per_share="0.25",
+            shares_entitled="20",
+        )
+
+
+def test_record_split_changes_shares_without_changing_book_value(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    bootstrap_opening_snapshot(
+        store,
+        _snapshot(cash=1000, shares=2),
+        confirmation="bootstrap",
+        now=datetime(2026, 7, 29, 9, 0, tzinfo=timezone.utc),
+    )
+    before = ledger_balances(store)
+
+    assert record_split(
+        store,
+        external_id="aapl-4-for-1",
+        ticker="AAPL",
+        ratio=4,
+        occurred_at="2026-07-30T09:00:00+00:00",
+    )
+    after = ledger_balances(store)
+
+    assert after["shares"]["AAPL"] == Decimal("8")
+    assert (
+        after["security_book_value"]["AAPL"]
+        == before["security_book_value"]["AAPL"]
+    )
+    assert after["cash"] == before["cash"]
+    # Provider retries are idempotent by external_id.
+    assert not record_split(
+        store,
+        external_id="aapl-4-for-1",
+        ticker="AAPL",
+        ratio=4,
+        occurred_at="2026-07-30T09:00:00+00:00",
+    )
+
+
+def test_retroactive_split_uses_shares_at_effective_time(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    bootstrap_opening_snapshot(
+        store,
+        _snapshot(cash=1000, shares=2),
+        confirmation="bootstrap",
+        now=datetime(2026, 7, 1, 9, 0, tzinfo=timezone.utc),
+    )
+    # A later quantity-only journal event represents one post-split share
+    # leaving the account. Recording the earlier split afterward must adjust
+    # the two shares held on July 15, not the one share held today.
+    assert post_transaction(
+        store,
+        JournalTransaction(
+            transaction_id="later-share-disposal",
+            occurred_at="2026-07-20T09:00:00+00:00",
+            source="test_quantity_event",
+            external_id="later-share-disposal",
+            description="Later share disposal",
+            postings=(
+                Posting(
+                    SECURITY_ACCOUNT_PREFIX + "AAPL",
+                    Decimal("0"),
+                    quantity=Decimal("-1"),
+                ),
+            ),
+        ),
+    )
+
+    assert record_split(
+        store,
+        external_id="aapl-4-for-1-retroactive",
+        ticker="AAPL",
+        ratio=4,
+        occurred_at="2026-07-15T09:00:00+00:00",
+    )
+
+    assert ledger_balances(store)["shares"]["AAPL"] == Decimal("7")
 
 
 def test_record_fee(tmp_path):

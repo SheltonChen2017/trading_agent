@@ -107,6 +107,30 @@ def test_order_lifecycle_is_fill_aware_idempotent_and_monotonic():
         assert len(store.list_broker_order_events(proposal_id="tp-ready")) == 4
 
 
+def test_broker_accepted_at_is_preserved_across_repeated_accepted_events():
+    # Independent review, 2026-07-29: the original implementation read
+    # store.get_proposal() to decide whether to preserve an existing
+    # broker_accepted_at OUTSIDE project_broker_order_event()'s atomic
+    # transaction -- under two near-simultaneous "accepted" events (e.g.
+    # the poll loop and the trade-update stream both observing the same
+    # transition), the second writer could read "not yet set" before the
+    # first committed and clobber the first writer's timestamp with its
+    # own. Simulated here with two accepted events carrying different
+    # submitted_at values -- the first one written must win.
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal())
+
+        first = dict(_order("accepted"), submitted_at="2026-07-29T14:00:00+00:00")
+        journal_broker_order_update(store, "tp-ready", first, event_type="new", external_event_id="event-a")
+        assert store.get_proposal("tp-ready")["broker_accepted_at"] == "2026-07-29T14:00:00+00:00"
+
+        second = dict(_order("accepted"), submitted_at="2026-07-29T14:05:00+00:00")
+        result = journal_broker_order_update(store, "tp-ready", second, event_type="new", external_event_id="event-b")
+        assert result["broker_event_projected"] is True  # the second event did project (other fields update)...
+        assert store.get_proposal("tp-ready")["broker_accepted_at"] == "2026-07-29T14:00:00+00:00"  # ...but not this one
+
+
 def test_conditional_status_update_refuses_when_the_proposal_moved_on():
     # Mutation testing, 2026-07-29: removing the status guard in
     # update_proposal_status_if_current() failed no test, even though every

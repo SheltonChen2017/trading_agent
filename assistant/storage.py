@@ -542,6 +542,7 @@ class AssistantStore:
         fill_qty: float | None = None,
         fill_price: float | None = None,
         raw_event: dict[str, Any] | None = None,
+        preserve_if_set: tuple[str, ...] = (),
     ) -> dict[str, Any]:
         """Atomically append an event and advance its proposal/order projection.
 
@@ -550,6 +551,19 @@ class AssistantStore:
         cumulative filled quantity is also journaled but never projected.
         Duplicate events remain eligible to project so a crash after event
         insertion but before an older-version proposal update can self-heal.
+
+        `preserve_if_set` names fields in `proposal_updates` that must NOT
+        overwrite an already-present truthy value on the stored proposal
+        (e.g. `broker_accepted_at` -- the first-ever accepted timestamp,
+        not whichever concurrent caller's write happens to land last).
+        Resolved HERE, against the proposal just read inside this same
+        atomic transaction, rather than by the caller reading
+        get_proposal() beforehand: that earlier read was a real race --
+        two callers processing near-simultaneous events (e.g. the poll
+        loop and the trade-update stream) could both read "not yet set"
+        before either committed, so the second writer's transaction could
+        clobber the first writer's correctly-preserved value (independent
+        review, 2026-07-29).
         """
         payload = raw_event if raw_event is not None else order
         now = datetime.now(timezone.utc).isoformat()
@@ -627,7 +641,11 @@ class AssistantStore:
                     json.dumps(order, sort_keys=True, default=str),
                 ),
             )
-            proposal.update(proposal_updates)
+            effective_updates = dict(proposal_updates)
+            for field in preserve_if_set:
+                if proposal.get(field):
+                    effective_updates.pop(field, None)
+            proposal.update(effective_updates)
             proposal["status"] = new_proposal_status
             connection.execute(
                 """

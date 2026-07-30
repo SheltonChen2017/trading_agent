@@ -387,3 +387,43 @@ if __name__ == "__main__":
     test_summarize_evidence_authority_all_reproduced_has_zero_non_authoritative()
     test_default_registry_flags_the_known_underfilled_nvdl_dataset()
     print("All research registry tests passed.")
+
+
+def test_the_provenance_status_set_has_exactly_one_definition():
+    """schemas.py and research_registry.py each kept their own copy, hand-synced
+    via a comment. A status added to one and not the other would require
+    provenance in one layer and not the other -- the drift a duplicated safety
+    rule always produces (2026-07-30). A source test because the defect is a
+    second definition existing, which no behavioural assertion can see.
+    """
+    import ast
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parent.parent
+    definitions = []
+    for path in (repo / "assistant").rglob("*.py"):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Assign):
+                for target in node.targets:
+                    name = getattr(target, "id", "")
+                    if name.lstrip("_") == "STATUSES_REQUIRING_PROVENANCE":
+                        definitions.append(
+                            f"{path.relative_to(repo).as_posix()}:{node.lineno}"
+                        )
+    assert len(definitions) == 1, (
+        f"expected exactly one definition of the provenance status set, found: {definitions}"
+    )
+    assert definitions[0].startswith("assistant/schemas.py"), (
+        f"it must live in schemas.py, the layer both others import from; found {definitions[0]}"
+    )
+
+
+def test_both_layers_agree_on_which_statuses_need_provenance():
+    from assistant import research_registry
+    from assistant.schemas import STATUSES_REQUIRING_PROVENANCE
+
+    assert (
+        research_registry.STATUSES_REQUIRING_PROVENANCE
+        is STATUSES_REQUIRING_PROVENANCE
+    ), "the registry must reuse the shared set, not re-derive an equal one"

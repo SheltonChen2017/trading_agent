@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from assistant.kill_switch import env_kill_switch_active
 from assistant.money import to_decimal
 from assistant.policy import TradingPolicy
 from assistant.proposal_status import (
@@ -89,7 +90,7 @@ def transaction_readiness(
             ", ".join(integrity),
         )
     )
-    environment_kill_switch = os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1"
+    environment_kill_switch = env_kill_switch_active()
     checks.append(
         _check(
             "environment_kill_switch",

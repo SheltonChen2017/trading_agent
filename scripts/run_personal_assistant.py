@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from assistant.kill_switch import env_kill_switch_active
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
 from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
@@ -430,7 +431,7 @@ def command_approve(args, store: AssistantStore) -> None:
             policy,
             store,
             now_et=_now_eastern(),
-            kill_switch_active=os.environ.get("TRADING_ASSISTANT_KILL_SWITCH") == "1",
+            kill_switch_active=env_kill_switch_active(),
             override_policy_violations=args.override,
         )
     except PolicyOverridableBlockError as exc:

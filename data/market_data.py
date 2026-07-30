@@ -76,14 +76,30 @@ def fetch_historical(tickers: list[str], lookback_days: int = 252) -> dict[str, 
     start_date = _trading_session_start_date(lookback_days)
     data: dict[str, pd.DataFrame] = {}
 
-    raw = yf.download(
-        tickers=tickers,
-        start=start_date,
-        interval="1d",
-        group_by="ticker",
-        auto_adjust=True,
-        progress=False,
-    )
+    try:
+        raw = yf.download(
+            tickers=tickers,
+            start=start_date,
+            interval="1d",
+            group_by="ticker",
+            auto_adjust=True,
+            progress=False,
+        )
+    except Exception:
+        # A transport-level failure (DNS, timeout, provider 5xx) fetched
+        # NOTHING, so there is no partial batch to salvage -- but letting it
+        # propagate took the whole briefing down: build_market_regime() already
+        # degrades to "regime unavailable" when a ticker is missing from the
+        # result, and build_decision_packet() has no try/except around it, so a
+        # transient yfinance blip crashed a read-only report that was designed
+        # to survive exactly this (independent review, 2026-07-30).
+        #
+        # Returning {} routes into that existing degradation path. Callers must
+        # therefore read an absent ticker as "unknown right now", NOT as "no
+        # such ticker" -- the per-ticker handler below already conflates those
+        # two, and this does not make that worse. Nothing on the EXECUTION path
+        # depends on this function: live quotes come from Alpaca.
+        return {}
 
     for ticker in tickers:
         try:

@@ -125,10 +125,16 @@ Important guarantees:
   time it's viewed or resumed, so resolving it through that proposal's own
   override control is reflected instead of the batch showing a stale
   "blocked" status forever.
-- `TRADING_ASSISTANT_KILL_SWITCH=1` and the durable SQLite kill switch both
+- `TRADING_ASSISTANT_KILL_SWITCH` and the durable SQLite kill switch both
   block proposal execution -- enforced
   inside the execution service itself (not only by callers that remember to
   read the env var and pass it in), so it can't be silently bypassed.
+  Any value engages it EXCEPT the explicit off values `0`, `false`, `no`,
+  `off`, and empty (case- and whitespace-insensitive) -- so `=true`, `=yes`
+  and even a typo all halt trading. It used to require the exact string `1`,
+  which meant `=true` silently did nothing on a control people reasonably
+  trusted; the check now lives in one place (`assistant/kill_switch.py`)
+  rather than being re-typed at eight call sites.
 - The personal-assistant execution service refuses to run if
   `config.PAPER_TRADING` is `False`.
 - Live-trading support is intentionally not exposed by the assistant CLI.

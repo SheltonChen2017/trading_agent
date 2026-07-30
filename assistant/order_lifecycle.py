@@ -382,13 +382,19 @@ def journal_broker_order_update(
     }
     if clear_error:
         updates["error"] = None
+    preserve_if_set: tuple[str, ...] = ()
     if proposal_status == BROKER_ACCEPTED:
-        current = store.get_proposal(proposal_id) or {}
-        updates["broker_accepted_at"] = str(
-            current.get("broker_accepted_at")
-            or order.get("submitted_at")
-            or normalized_at
-        )
+        # Deliberately NOT read via store.get_proposal() here -- that read
+        # would happen outside project_broker_order_event()'s atomic
+        # transaction, so two near-simultaneous callers (e.g. the poll
+        # loop and the trade-update stream) could both see "not yet set"
+        # before either commits, and the second writer could clobber the
+        # first writer's correctly-preserved timestamp. `preserve_if_set`
+        # resolves this INSIDE the atomic transaction instead, against the
+        # proposal state as of the write, not an earlier read
+        # (independent review, 2026-07-29).
+        updates["broker_accepted_at"] = str(order.get("submitted_at") or normalized_at)
+        preserve_if_set = ("broker_accepted_at",)
     elif proposal_status == PARTIALLY_FILLED:
         updates["partially_filled_at"] = normalized_at
     elif proposal_status == FILLED:
@@ -411,4 +417,5 @@ def journal_broker_order_update(
         fill_qty=fill_qty,
         fill_price=fill_price,
         raw_event=raw_event,
+        preserve_if_set=preserve_if_set,
     )

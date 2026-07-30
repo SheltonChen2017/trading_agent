@@ -5,6 +5,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from threading import Event
 
+from assistant.execution_service import _execution_budget_notional
 from assistant.order_lifecycle import journal_broker_order_update
 from assistant.order_reconciler import (
     apply_broker_update,
@@ -14,6 +15,7 @@ from assistant.order_reconciler import (
 from assistant.policy import TradingPolicy
 from assistant.readiness import transaction_readiness
 from assistant.storage import AssistantStore
+from risk.execution_gate import TradeIntent
 
 
 def _proposal(status: str = "submitting", proposal_id: str = "tp-ready") -> dict:
@@ -279,6 +281,52 @@ def test_daily_budget_is_idempotent_and_confirmed_absence_releases_it():
         )
         assert transitioned["status"] == "submission_failed"
         assert store.get_execution_budget_usage("2026-07-29")["submitted_order_count"] == 0
+
+
+def test_execution_budget_uses_the_gate_price_for_buy_and_sell_limits():
+    buy = TradeIntent(
+        ticker="AAPL",
+        side="buy",
+        shares=10,
+        order_type="limit",
+        limit_price=110.0,
+    )
+    sell = TradeIntent(
+        ticker="AAPL",
+        side="sell",
+        shares=10,
+        order_type="limit",
+        limit_price=110.0,
+    )
+
+    assert _execution_budget_notional(buy, 100.0) == 1_100.0
+    assert _execution_budget_notional(sell, 100.0) == 1_000.0
+
+
+def test_broker_rejection_keeps_the_submitted_order_budget_consumed():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal())
+        store.reserve_execution_budget(
+            "tp-ready",
+            trading_day="2026-07-29",
+            notional=1_000.0,
+            max_daily_notional=10_000.0,
+            max_daily_orders=10,
+        )
+
+        journal_broker_order_update(
+            store,
+            "tp-ready",
+            _order("rejected"),
+            event_type="rejected",
+            external_event_id="rejected-order-event",
+        )
+
+        usage = store.get_execution_budget_usage("2026-07-29")
+        assert store.get_proposal("tp-ready")["status"] == "broker_rejected"
+        assert usage["submitted_order_count"] == 1
+        assert usage["submitted_notional"] == 1_000.0
 
 
 def test_filled_notional_buckets_by_eastern_trading_day_not_utc_date():

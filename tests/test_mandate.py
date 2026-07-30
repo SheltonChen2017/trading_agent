@@ -83,6 +83,8 @@ def test_proposed_mandate_can_never_pass_live_promotion():
         point_in_time_data=True,
         backup_restore_drill_passed=True,
         operational_health_passed=True,
+        paper_evidence_integrity_passed=True,
+        operational_drills_passed=True,
     )
     assert result["ready_for_live_canary_review"] is False
     assert result["does_not_enable_live_trading"] is True

@@ -657,9 +657,24 @@ python scripts/run_personal_assistant.py operations-check
 python scripts/run_personal_assistant.py alerts
 ```
 
-For a supervised paper soak, run `monitor-orders` alongside
-`scripts/run_operations_watchdog.py`; deployment and incident-response
-details are in `docs/OPERATIONS_RUNBOOK.md`.
+For a supervised paper soak, start an immutable evidence epoch and derive its
+status from recorded post-close observations rather than entering session or
+order counts manually:
+
+```bash
+python scripts/run_personal_assistant.py paper-epoch-start paper-2026q3 --strategy-id shared-capital-scanner --strategy-version 1.0.0 --model-id deterministic-no-model
+python scripts/run_personal_assistant.py operations-cycle --alerts-jsonl data/alerts.jsonl
+python scripts/run_personal_assistant.py paper-observation --alerts-jsonl data/alerts.jsonl
+python scripts/run_personal_assistant.py paper-evidence-status paper-2026q3
+```
+
+The epoch requires a clean worktree and binds the exact Git commit, mandate,
+policy, strategy and model identity. `paper-observation` only records a
+reconciled post-close Alpaca paper snapshot and removes journaled cash
+transfers from period returns. `operations-cycle` is a scheduler-friendly
+order/ledger/reconciliation/backup/health pass. A Windows Task Scheduler
+installer and the drill/evidence procedures are in
+`docs/OPERATIONS_RUNBOOK.md`.
 
 ### Recovering a stranded reconciliation
 

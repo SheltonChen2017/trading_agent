@@ -12,10 +12,14 @@ Run with: python -m pytest tests/test_run_personal_assistant_cli.py
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import scripts.run_personal_assistant as personal_assistant_cli
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.schemas import DecisionPacket, FindingProvenance, MarketRegime, EvidenceStatus, SignalEvidence
+from assistant.storage import AssistantStore
 from scripts.run_personal_assistant import _print_briefing, build_parser, command_risk_check
 
 
@@ -26,7 +30,11 @@ def test_top_level_help_renders_without_percent_format_errors():
     assert "readiness" in help_text
     assert "ledger-reconcile" in help_text
     assert "operations-check" in help_text
+    assert "operations-cycle" in help_text
+    assert "paper-epoch-start" in help_text
+    assert "paper-observation" in help_text
     assert "promotion-status" in help_text
+    assert "--database" in help_text
 
 
 def test_recover_stale_accepts_a_positive_stale_after_seconds():
@@ -72,9 +80,52 @@ def test_production_foundation_commands_parse():
     )
     assert build_parser().parse_args(["ledger-reconcile"]).no_sync is False
     promotion = build_parser().parse_args(
-        ["promotion-status", "report.json", "--paper-sessions", "0"]
+        ["promotion-status", "report.json", "--evidence-epoch", "paper-v1"]
     )
-    assert promotion.paper_sessions == 0
+    assert promotion.evidence_epoch == "paper-v1"
+    epoch = build_parser().parse_args(
+        [
+            "paper-epoch-start",
+            "paper-v1",
+            "--strategy-id",
+            "scanner",
+            "--strategy-version",
+            "1.0.0",
+            "--model-id",
+            "deterministic-no-model",
+        ]
+    )
+    assert epoch.evidence_epoch == "paper-v1"
+
+
+def test_active_epoch_rejects_changed_runtime_lineage(tmp_path, monkeypatch):
+    args = build_parser().parse_args(
+        [
+            "paper-epoch-start",
+            "paper-v1",
+            "--strategy-id",
+            "scanner",
+            "--strategy-version",
+            "1.0.0",
+            "--model-id",
+            "deterministic-no-model",
+        ]
+    )
+    store = AssistantStore(tmp_path / "assistant.db")
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "_current_commit",
+        lambda *, require_clean: "a" * 40,
+    )
+    personal_assistant_cli.command_paper_epoch_start(args, store)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "_current_commit",
+        lambda *, require_clean: "b" * 40,
+    )
+
+    with pytest.raises(SystemExit, match="differs from the current runtime"):
+        personal_assistant_cli._active_runtime_lineage(store, args)
 
 
 # --- _print_briefing() user-facing evidence display (GPT review,

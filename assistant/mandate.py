@@ -238,6 +238,8 @@ def evaluate_live_promotion(
     point_in_time_data: bool,
     backup_restore_drill_passed: bool,
     operational_health_passed: bool,
+    paper_evidence_integrity_passed: bool,
+    operational_drills_passed: bool,
 ) -> dict[str, Any]:
     """Fail-closed evidence gate. This does not enable live trading."""
     mandate.validate()
@@ -300,6 +302,16 @@ def evaluate_live_promotion(
             "name": "operational_health",
             "passed": bool(operational_health_passed),
             "detail": str(bool(operational_health_passed)),
+        },
+        {
+            "name": "paper_evidence_integrity",
+            "passed": bool(paper_evidence_integrity_passed),
+            "detail": str(bool(paper_evidence_integrity_passed)),
+        },
+        {
+            "name": "operational_drills",
+            "passed": bool(operational_drills_passed),
+            "detail": str(bool(operational_drills_passed)),
         },
         {
             "name": "manual_execution_only",

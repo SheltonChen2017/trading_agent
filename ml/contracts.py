@@ -22,7 +22,7 @@ from __future__ import annotations
 import dataclasses
 import math
 import re
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from enum import Enum
 from types import MappingProxyType
 from typing import Any, Mapping, Sequence
@@ -417,6 +417,7 @@ class PredictionRecord:
     as_of_session: str
     generated_at: str
     horizon_sessions: int
+    target_available_at: str
     values: Mapping[str, Any]
     uncertainty: Mapping[str, Any]
     data_available_at: str
@@ -442,14 +443,23 @@ class PredictionRecord:
             self.dataset_or_feature_snapshot_hash,
             "dataset_or_feature_snapshot_hash",
         )
-        _parse_date(self.as_of_session, "as_of_session")
+        as_of_session = _parse_date(self.as_of_session, "as_of_session")
         generated_at = _parse_timestamp(self.generated_at, "generated_at")
         data_available_at = _parse_timestamp(
             self.data_available_at, "data_available_at"
         )
+        target_available_at = _parse_timestamp(
+            self.target_available_at, "target_available_at"
+        )
+        _check_int(self.horizon_sessions, "horizon_sessions", minimum=1)
         if data_available_at > generated_at:
             raise ContractError("data_available_at must not be after generated_at")
-        _check_int(self.horizon_sessions, "horizon_sessions", minimum=1)
+        if target_available_at <= generated_at:
+            raise ContractError("target_available_at must be after generated_at")
+        if target_available_at.date() < as_of_session + timedelta(days=self.horizon_sessions):
+            raise ContractError(
+                "target_available_at is earlier than the minimum possible horizon date"
+            )
         _check_bool(self.available, "available")
         if not isinstance(self.refusal_reasons, (list, tuple)):
             raise ContractError("refusal_reasons must be an array of strings")
@@ -489,6 +499,12 @@ class PredictionRecord:
                 "an unavailable prediction must not carry values or uncertainty"
             )
         _check_evidence_status(self.evidence_status)
+        if self.available and self.evidence_status is EvidenceStatus.UNAVAILABLE:
+            raise ContractError("an available prediction cannot have unavailable evidence")
+        if not self.available and self.evidence_status is not EvidenceStatus.UNAVAILABLE:
+            raise ContractError(
+                "an unavailable prediction must use EvidenceStatus.UNAVAILABLE"
+            )
         object.__setattr__(self, "values", values)
         object.__setattr__(self, "uncertainty", uncertainty)
         object.__setattr__(self, "feature_freshness", feature_freshness)
@@ -500,6 +516,17 @@ class PredictionRecord:
 
     def to_dict(self) -> dict[str, Any]:
         return _to_dict(self)
+
+    @property
+    def model_key(self) -> str:
+        return f"{self.model_id}:{self.model_version}"
+
+    def to_shadow_storage_dict(self) -> dict[str, Any]:
+        """Adapt the canonical record to AssistantStore's indexed columns."""
+        payload = self.to_dict()
+        payload["model_key"] = self.model_key
+        payload["feature_snapshot_hash"] = self.dataset_or_feature_snapshot_hash
+        return payload
 
     @classmethod
     def from_dict(cls, payload: Mapping[str, Any]) -> "PredictionRecord":

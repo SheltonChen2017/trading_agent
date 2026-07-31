@@ -180,6 +180,15 @@ def test_component_sign_orientation_is_deterministic_across_runs():
         assert dominant > 0
 
 
+def test_loadings_reconstruct_standardized_variance_when_all_factors_displayed():
+    data = _independent_universe()
+    report = compute_factor_concentration_report(
+        data, _equal_weights(data), explained_variance_target=1.0
+    )
+    assert report.displayed_factor_count == len(data)
+    assert max(report.residual_risk_by_position.values()) < 1e-5
+
+
 def test_report_contains_no_trade_or_target_weight_field():
     data = _shared_factor_universe()
     payload = compute_factor_concentration_report(data, _equal_weights(data)).to_dict()
@@ -190,6 +199,8 @@ def test_report_contains_no_trade_or_target_weight_field():
         "proposed_trades", "recommendation",
     }
     assert not (forbidden & set(payload)), forbidden & set(payload)
+    assert payload["production_authoritative"] is False
+    assert payload["evidence_status"] == "exploratory"
 
 
 def test_both_doc_baselines_are_reported_alongside_the_pca():

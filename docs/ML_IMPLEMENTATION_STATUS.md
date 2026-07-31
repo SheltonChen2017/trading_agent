@@ -3,20 +3,24 @@
 Companion to `docs/ML_IMPLEMENTATION_STRATEGY.md`, recording what is built,
 what is deliberately not built, and why. Updated 2026-07-31.
 
+The next implementation sequence is defined in
+`docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`.
+
 ## Built
 
 | PR | Scope | Modules | Production behavior change |
 |---|---|---|---|
 | ML-1 | Contracts, manifests, hashing, artifact integrity, boundary tests | `ml/contracts.py`, `ml/hashing.py`, `ml/artifacts.py` | None |
 | ML-2 | Point-in-time features/labels, purged walk-forward splits, immutable datasets, leakage-safe transforms | `ml/features.py`, `ml/labels.py`, `ml/splits.py`, `ml/datasets.py`, `ml/transforms.py` | None |
-| ML-3 | Latent-factor concentration model and report | `ml/factor_risk.py` | None (read-only report) |
-| ML-4 | Volatility forecasting, frozen baselines, evaluation metrics | `ml/volatility.py`, `ml/baselines.py`, `ml/evaluation.py` | None (read-only report) |
-| ML-5 | Earnings-gap risk, exchange-calendar event mapping | `ml/earnings_gap.py` | None (read-only report) |
-| ML-6 | Shadow prediction persistence and monitoring | `ml/monitoring.py`, three `ml_*` tables + `portfolio_position_snapshots` in `assistant/storage.py` | Writes observations only |
-| ML-7 | Benchmark-relative ranker research | `ml/cross_sectional.py` | None |
-| ML-8 | Structured filing/transcript extraction contract + validator | `ml/filings.py` | None (context only) |
+| ML-3 | Latent-factor concentration calculator and typed report | `ml/factor_risk.py` | None (read-only report) |
+| ML-4 | Per-security volatility model/baseline/evaluation primitives | `ml/volatility.py`, `ml/baselines.py`, `ml/evaluation.py` | None (read-only research) |
+| ML-5 | Earnings-gap mapping, support checks, and model-fit primitives | `ml/earnings_gap.py` | None (read-only research) |
+| ML-6 | Shadow persistence plus coverage, freshness, drift, error, and lineage reports | `ml/monitoring.py`, three `ml_*` tables + `portfolio_position_snapshots` in `assistant/storage.py` | Writes observations only when called |
+| ML-7 | Cross-sectional ranker model/statistical-evaluation primitives | `ml/cross_sectional.py` | None |
+| ML-8 | Filing/transcript extraction contract + deterministic validator | `ml/filings.py` | None (context only) |
 
-Every model output carries `production_authoritative=False`, and no module
+Every typed prediction, risk, evaluation, extraction, and monitoring output
+carries `production_authoritative=False`, and no module
 under `execution/`, `risk/execution_gate.py`, `assistant/execution_service.py`,
 or `assistant/allocation_batch.py` imports `ml` — pinned by
 `tests/test_ml_import_boundary.py`, which also currently pins **zero** `ml`
@@ -59,9 +63,10 @@ shared-capital simulation; sufficient paper shadow evidence; owner approval
 of a narrowly scoped deterministic adapter; and a separate adversarial review
 of that adapter.
 
-## Known gaps within what IS built
+## Known gaps and incomplete milestone work
 
-These are honest limitations, not oversights:
+The table above records implemented building blocks, not a claim that every
+acceptance criterion in sections 7-12 is complete. In particular:
 
 1. **`point_in_time_data` is structurally `False`.** `ml/datasets.py`'s
    builder *refuses* to claim `True` because no per-feature
@@ -92,3 +97,34 @@ These are honest limitations, not oversights:
 5. **Parquet is not used.** CSV-gzip was chosen because doc 6.1 requires
    pinning a Parquet engine explicitly before depending on one, and none is
    pinned in `requirements.txt`. Revisit if dataset size demands it.
+
+6. **ML-4 is not yet portfolio-forecast complete.** Position snapshots can
+   now accumulate the required history, but there is no historical
+   portfolio-weight target builder, portfolio forecast runner, interval and
+   threshold-calibration fold report, or economic warning analysis by
+   year/regime/earnings proximity. The current evaluator covers per-row QLIKE
+   and MAE against trailing/EWMA baselines on a common validation sample.
+
+7. **ML-5 is not yet research-complete.** Event-time mapping, realized gaps,
+   support checks, and simple fit functions exist. A point-in-time pre-event
+   feature builder, grouped walk-forward event evaluator, precision/recall and
+   interval report, typed forecast output, and durable runner do not.
+
+8. **ML-6 is not yet operationally shadow-ready.** Persistence now enforces
+   registered lineage, immutable conflicts, feature freshness, timezone-aware
+   generation, and explicit target maturity. There is no fixed scheduler,
+   automatic outcome-maturation job, baseline/calibration monitor, or
+   dedicated ML evidence-epoch coordinator yet. Calling these APIs remains an
+   explicit research workflow.
+
+9. **ML-7 is statistical-research scaffolding, not the complete ranker
+   experiment.** The historically correct universe, immutable benchmark-
+   relative dataset runner, confirmation workflow, and shared-capital
+   simulation with turnover, slippage, taxes, drawdown, expected shortfall,
+   capture, concentration, and liquidity constraints remain unbuilt.
+
+10. **No user-facing ML presentation is wired.** The implementation remains
+    deliberately isolated from `assistant/` and execution. Consequently the
+    observability presentation in section 16 is also pending; this is safer
+    than presenting unevaluated outputs, but it means these modules do not yet
+    help a live decision workflow directly.

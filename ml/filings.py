@@ -21,11 +21,14 @@ from __future__ import annotations
 
 import dataclasses
 import re
+from datetime import datetime
+from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping, Sequence
 
 from ml.hashing import hash_payload
 
 PROMPT_VERSION = "filing_extraction.v1"
+EXTRACTION_SCHEMA_VERSION = "1.0"
 
 # Doc 3.2's forbidden output fields, enforced here too: an extraction is a
 # statement about a document, never an instruction about an order.
@@ -40,7 +43,12 @@ _FORBIDDEN_FIELDS = frozenset(
 # Matches a number the model claims appeared in the source: optional sign,
 # digits with optional thousands separators, optional decimal part, optional
 # trailing percent.
-_NUMBER_PATTERN = re.compile(r"-?\d[\d,]*(?:\.\d+)?%?")
+_NUMBER_PATTERN = re.compile(
+    r"(?<![\w.])(?:[$€£]\s*)?-?\d[\d,]*(?:\.\d+)?"
+    r"(?:\s*(?:%|bps?|thousand|million|billion|trillion|[kmbt]))?",
+    re.IGNORECASE,
+)
+_DATE_PATTERN = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
 
 
 class FilingExtractionError(ValueError):
@@ -62,6 +70,12 @@ class SourceDocument:
             value = getattr(self, name)
             if not isinstance(value, str) or not value.strip():
                 raise FilingExtractionError(f"{name} must be a non-empty string")
+        try:
+            published = datetime.fromisoformat(self.published_at.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise FilingExtractionError("published_at must be a valid ISO timestamp") from exc
+        if published.tzinfo is None or published.utcoffset() is None:
+            raise FilingExtractionError("published_at must be timezone-aware")
 
     @property
     def content_hash(self) -> str:
@@ -116,7 +130,9 @@ class ExtractedClaim:
             value = getattr(self, name)
             if not isinstance(value, str) or not value.strip():
                 raise FilingExtractionError(f"{name} must be a non-empty string")
-        if self.field.lower() in _FORBIDDEN_FIELDS:
+        normalized_field = re.sub(r"[^a-z0-9]+", "_", self.field.strip().lower()).strip("_")
+        field_tokens = set(normalized_field.split("_"))
+        if normalized_field in _FORBIDDEN_FIELDS or field_tokens & _FORBIDDEN_FIELDS:
             raise FilingExtractionError(
                 f"field {self.field!r} is an execution-shaped field; an extraction "
                 "may describe a document, never instruct a trade (doc 12.2)"
@@ -134,6 +150,39 @@ class FilingExtraction:
     source_documents: tuple[SourceDocument, ...]
     claims: tuple[ExtractedClaim, ...]
     generated_at: str
+    schema_version: str = EXTRACTION_SCHEMA_VERSION
+
+    def __post_init__(self) -> None:
+        for name in ("ticker", "prompt_version", "model_id"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise FilingExtractionError(f"{name} must be a non-empty string")
+        if self.schema_version != EXTRACTION_SCHEMA_VERSION:
+            raise FilingExtractionError(
+                f"schema_version must be {EXTRACTION_SCHEMA_VERSION!r}"
+            )
+        if not isinstance(self.source_documents, tuple) or not all(
+            isinstance(item, SourceDocument) for item in self.source_documents
+        ):
+            raise FilingExtractionError("source_documents must be a tuple of SourceDocument")
+        if not isinstance(self.claims, tuple) or not all(
+            isinstance(item, ExtractedClaim) for item in self.claims
+        ):
+            raise FilingExtractionError("claims must be a tuple of ExtractedClaim")
+        try:
+            generated = datetime.fromisoformat(self.generated_at.replace("Z", "+00:00"))
+        except (AttributeError, ValueError) as exc:
+            raise FilingExtractionError("generated_at must be a valid ISO timestamp") from exc
+        if generated.tzinfo is None or generated.utcoffset() is None:
+            raise FilingExtractionError("generated_at must be timezone-aware")
+        for document in self.source_documents:
+            published = datetime.fromisoformat(
+                document.published_at.replace("Z", "+00:00")
+            )
+            if generated < published:
+                raise FilingExtractionError(
+                    "generated_at cannot precede a cited document's published_at"
+                )
 
     def to_dict(self) -> dict[str, Any]:
         return {
@@ -143,6 +192,7 @@ class FilingExtraction:
             "source_documents": [d.to_dict() for d in self.source_documents],
             "claims": [c.to_dict() for c in self.claims],
             "generated_at": self.generated_at,
+            "schema_version": self.schema_version,
             "production_authoritative": False,
         }
 
@@ -152,6 +202,7 @@ class FilingExtraction:
             {
                 "ticker": self.ticker,
                 "prompt_version": self.prompt_version,
+                "schema_version": self.schema_version,
                 "documents": sorted(d.content_hash for d in self.source_documents),
             }
         )
@@ -167,7 +218,22 @@ class ValidationIssue:
 
 
 def _normalize_number(token: str) -> str:
-    return token.replace(",", "").rstrip("%")
+    compact = re.sub(r"\s+", "", token.lower().replace(",", ""))
+    match = re.fullmatch(
+        r"(?P<currency>[$€£])?(?P<number>-?\d+(?:\.\d+)?)"
+        r"(?P<unit>%|bps?|thousand|million|billion|trillion|[kmbt])?",
+        compact,
+    )
+    if match is None:
+        return compact
+    try:
+        number = Decimal(match.group("number"))
+    except InvalidOperation:
+        return compact
+    canonical_number = format(number.normalize(), "f")
+    if canonical_number == "-0":
+        canonical_number = "0"
+    return f"{match.group('currency') or ''}{canonical_number}{match.group('unit') or ''}"
 
 
 def _numbers_in(text: str) -> set[str]:
@@ -186,6 +252,12 @@ def validate_extraction(
     """
     issues: list[ValidationIssue] = []
     documents_by_id = {d.document_id: d for d in extraction.source_documents}
+    if len(documents_by_id) != len(extraction.source_documents):
+        issues.append(
+            ValidationIssue(
+                "duplicate_document_id", "source document IDs must be unique"
+            )
+        )
     if not documents_by_id:
         issues.append(
             ValidationIssue("no_source_documents", "extraction cites no source documents")
@@ -209,6 +281,16 @@ def validate_extraction(
             )
         )
 
+    for document in extraction.source_documents:
+        if document.ticker.upper() != extraction.ticker.upper():
+            issues.append(
+                ValidationIssue(
+                    "document_ticker_mismatch",
+                    f"document {document.document_id!r} is for {document.ticker!r}, "
+                    f"not extraction ticker {extraction.ticker!r}",
+                )
+            )
+
     for index, claim in enumerate(extraction.claims):
         path = f"claims[{index}]"
         document = documents_by_id.get(claim.document_id)
@@ -231,19 +313,49 @@ def validate_extraction(
                 )
             )
             continue
+        # Doc 12.2 says EVERY number must be validated against the supplied
+        # source. Labeling a claim as inference does not license invented
+        # amounts or percentages; inference changes presentation, not truth.
+        claimed_numbers = _numbers_in(claim.value)
+        source_numbers = _numbers_in(document.text)
+        unsupported = sorted(claimed_numbers - source_numbers)
+        if unsupported:
+            issues.append(
+                ValidationIssue(
+                    "unsupported_number",
+                    f"{path} asserts number(s) {unsupported} absent from the source",
+                )
+            )
         if claim.claim_kind == "direct_extraction":
-            # Doc 12.2: "validate every number against supplied source text".
-            # Only direct extractions are held to this -- an inference is
-            # allowed to reason ABOUT the document, but it is labeled as such
-            # and never presented as quoted fact.
-            claimed_numbers = _numbers_in(claim.value)
-            source_numbers = _numbers_in(document.text)
-            unsupported = sorted(claimed_numbers - source_numbers)
-            if unsupported:
+            excerpt_numbers = _numbers_in(claim.supporting_excerpt)
+            unsupported_in_excerpt = sorted(claimed_numbers - excerpt_numbers)
+            if unsupported_in_excerpt:
                 issues.append(
                     ValidationIssue(
-                        "unsupported_number",
-                        f"{path} asserts number(s) {unsupported} absent from the source",
+                        "number_not_in_supporting_excerpt",
+                        f"{path} direct-extraction number(s) {unsupported_in_excerpt} "
+                        "are not present in its cited excerpt",
+                    )
+                )
+        claimed_dates = set(_DATE_PATTERN.findall(claim.value))
+        source_dates = set(_DATE_PATTERN.findall(document.text))
+        unsupported_dates = sorted(claimed_dates - source_dates)
+        if unsupported_dates:
+            issues.append(
+                ValidationIssue(
+                    "unsupported_date",
+                    f"{path} asserts date(s) {unsupported_dates} absent from the source",
+                )
+            )
+        if claim.claim_kind == "direct_extraction":
+            excerpt_dates = set(_DATE_PATTERN.findall(claim.supporting_excerpt))
+            dates_missing_from_excerpt = sorted(claimed_dates - excerpt_dates)
+            if dates_missing_from_excerpt:
+                issues.append(
+                    ValidationIssue(
+                        "date_not_in_supporting_excerpt",
+                        f"{path} direct-extraction date(s) {dates_missing_from_excerpt} "
+                        "are not present in its cited excerpt",
                     )
                 )
 
@@ -261,7 +373,17 @@ def build_extraction_audit_record(
     makes -- committee reviews and filing extractions alike -- lands in one
     queryable log.
     """
-    accepted = not issues
+    # Never let a caller accidentally (or deliberately) pass an empty issue
+    # list for an invalid extraction and create an audit record that says it
+    # was accepted. Re-run the deterministic validator here and preserve any
+    # additional provider/workflow issues supplied by the caller.
+    combined: list[ValidationIssue] = list(validate_extraction(extraction))
+    for issue in issues:
+        if not isinstance(issue, ValidationIssue):
+            raise FilingExtractionError("audit issues must be ValidationIssue values")
+        if issue not in combined:
+            combined.append(issue)
+    accepted = not combined
     return {
         "function_name": "extract_filing_claims",
         "model": extraction.model_id,
@@ -281,9 +403,9 @@ def build_extraction_audit_record(
             "source_document_hashes": sorted(
                 d.content_hash for d in extraction.source_documents
             ),
-            "issues": [i.to_dict() for i in issues],
+            "issues": [i.to_dict() for i in combined],
         },
-        "error": None if accepted else ";".join(sorted(i.code for i in issues)),
+        "error": None if accepted else ";".join(sorted(i.code for i in combined)),
     }
 
 

@@ -17,7 +17,10 @@ significance. ml/cross_sectional.py calls that existing toolkit directly.
 from __future__ import annotations
 
 import dataclasses
+from datetime import datetime
 import math
+import re
+from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
 import numpy as np
@@ -28,6 +31,36 @@ from ml.hashing import hash_payload
 
 class EvaluationError(ValueError):
     """Inputs cannot support a trustworthy metric."""
+
+
+def _freeze_report_json(value: Any, *, path: str) -> Any:
+    if value is None or isinstance(value, (str, bool, int)):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise EvaluationError(f"{path} contains a non-finite value")
+        return value
+    if isinstance(value, Mapping):
+        frozen: dict[str, Any] = {}
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise EvaluationError(f"{path} contains a non-string key")
+            frozen[key] = _freeze_report_json(item, path=f"{path}.{key}")
+        return MappingProxyType(frozen)
+    if isinstance(value, (list, tuple)):
+        return tuple(
+            _freeze_report_json(item, path=f"{path}[{index}]")
+            for index, item in enumerate(value)
+        )
+    raise EvaluationError(f"{path} contains unsupported type {type(value).__name__}")
+
+
+def _plain_report_json(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {key: _plain_report_json(item) for key, item in value.items()}
+    if isinstance(value, (list, tuple)):
+        return [_plain_report_json(item) for item in value]
+    return value
 
 
 def _finite_pairs(
@@ -54,10 +87,12 @@ def qlike_loss(actual_volatility: Sequence[float], predicted_volatility: Sequenc
     Lower is better. Returns None if no usable pair survives.
     """
     a, p = _finite_pairs(actual_volatility, predicted_volatility)
-    mask = (a > 0) & (p > 0)
-    a, p = a[mask], p[mask]
     if a.size == 0:
         return None
+    if np.any(a <= 0) or np.any(p <= 0):
+        raise EvaluationError(
+            "QLIKE requires every usable actual and prediction to be strictly positive"
+        )
     ratio = np.square(a) / np.square(p)
     loss = float(np.mean(ratio - np.log(ratio) - 1.0))
     return loss if math.isfinite(loss) else None
@@ -141,11 +176,13 @@ def calibration_curve(
     dropped, so a model that only ever predicts one narrow band is visibly
     doing so.
     """
-    if n_bins < 2:
+    if isinstance(n_bins, bool) or not isinstance(n_bins, int) or n_bins < 2:
         raise EvaluationError("n_bins must be at least 2")
     a, p = _finite_pairs(actual_binary, predicted_probability)
     if np.any((a != 0) & (a != 1)):
         raise EvaluationError("actual_binary must contain only 0 or 1")
+    if np.any((p < 0) | (p > 1)):
+        raise EvaluationError("predicted_probability must be within [0, 1]")
     edges = np.linspace(0.0, 1.0, n_bins + 1)
     rows: list[dict[str, Any]] = []
     for i in range(n_bins):
@@ -168,7 +205,12 @@ def pinball_loss(
     actual: Sequence[float], predicted_quantile: Sequence[float], *, quantile: float
 ) -> float | None:
     """Quantile (pinball) loss (doc 9.4) for interval/quantile regression."""
-    if not 0 < quantile < 1:
+    if (
+        isinstance(quantile, bool)
+        or not isinstance(quantile, (int, float))
+        or not math.isfinite(float(quantile))
+        or not 0 < quantile < 1
+    ):
         raise EvaluationError("quantile must be in (0, 1)")
     a, p = _finite_pairs(actual, predicted_quantile)
     if a.size == 0:
@@ -184,6 +226,7 @@ def date_level_spearman_ic(
     score_column: str,
     outcome_column: str,
     date_column: str = "as_of_session",
+    ticker_column: str = "ticker",
     min_names_per_date: int = 5,
 ) -> pd.Series:
     """Per-DATE Spearman rank correlation between score and outcome (doc 11.4).
@@ -198,11 +241,16 @@ def date_level_spearman_ic(
     correlation over 2-3 names is almost pure noise and would add variance
     while looking like signal.
     """
-    for column in (score_column, outcome_column, date_column):
+    for column in (score_column, outcome_column, date_column, ticker_column):
         if column not in frame.columns:
             raise EvaluationError(f"frame is missing column {column!r}")
     if min_names_per_date < 3:
         raise EvaluationError("min_names_per_date must be at least 3")
+
+    if frame.duplicated([date_column, ticker_column]).any():
+        raise EvaluationError(
+            f"frame has duplicate ({date_column}, {ticker_column}) observations"
+        )
 
     values: dict[Any, float] = {}
     for date, group in frame.groupby(date_column, sort=True):
@@ -263,16 +311,21 @@ def top_minus_bottom_quantile_spread(
     score_column: str,
     outcome_column: str,
     date_column: str = "as_of_session",
+    ticker_column: str = "ticker",
     quantiles: int = 5,
     min_names_per_date: int = 5,
 ) -> dict[str, Any]:
     """Mean outcome of the top score quantile minus the bottom, per date
     then averaged (doc 11.4) -- again per-date, never pooled."""
-    if quantiles < 2:
+    if isinstance(quantiles, bool) or not isinstance(quantiles, int) or quantiles < 2:
         raise EvaluationError("quantiles must be at least 2")
-    for column in (score_column, outcome_column, date_column):
+    for column in (score_column, outcome_column, date_column, ticker_column):
         if column not in frame.columns:
             raise EvaluationError(f"frame is missing column {column!r}")
+    if frame.duplicated([date_column, ticker_column]).any():
+        raise EvaluationError(
+            f"frame has duplicate ({date_column}, {ticker_column}) observations"
+        )
 
     spreads: dict[Any, float] = {}
     for date, group in frame.groupby(date_column, sort=True):
@@ -343,17 +396,78 @@ class EvaluationReport:
             raise EvaluationError(
                 f"verdict must be one of {self.VERDICTS}, got {self.verdict!r}"
             )
+        for name in (
+            "research_question", "preregistered_primary_outcome",
+            "feature_set_version", "survivorship_bias_note", "entry_timing",
+        ):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise EvaluationError(f"{name} must be a non-empty string")
+        for name in (
+            "candidate_models", "baselines", "coverage_warnings", "limitations"
+        ):
+            values = getattr(self, name)
+            if not isinstance(values, tuple) or any(
+                not isinstance(value, str) or not value.strip() for value in values
+            ):
+                raise EvaluationError(f"{name} must be a tuple of non-empty strings")
+        if len(set(self.candidate_models)) != len(self.candidate_models):
+            raise EvaluationError("candidate_models must not contain duplicates")
+        if len(set(self.baselines)) != len(self.baselines):
+            raise EvaluationError("baselines must not contain duplicates")
+        if not self.candidate_models:
+            raise EvaluationError("an evaluation report must name candidate models")
         if not self.baselines:
             raise EvaluationError(
                 "an evaluation report must name at least one frozen baseline "
                 "(doc 14.1: a result is not promising merely because one metric improved)"
             )
-        if self.simultaneous_research_looks < 1:
+        if (
+            isinstance(self.simultaneous_research_looks, bool)
+            or not isinstance(self.simultaneous_research_looks, int)
+            or self.simultaneous_research_looks < 1
+        ):
             raise EvaluationError("simultaneous_research_looks must be at least 1")
         if not self.limitations:
             raise EvaluationError(
                 "an evaluation report must state its limitations explicitly (doc 14)"
             )
+        if not isinstance(self.point_in_time_data, bool):
+            raise EvaluationError("point_in_time_data must be a boolean")
+        if (
+            not isinstance(self.dataset_hash, str)
+            or re.fullmatch(r"[0-9a-f]{64}", self.dataset_hash) is None
+        ):
+            raise EvaluationError("dataset_hash must be a lowercase sha256 digest")
+        try:
+            generated = datetime.fromisoformat(self.generated_at.replace("Z", "+00:00"))
+        except (AttributeError, ValueError) as exc:
+            raise EvaluationError("generated_at must be a valid ISO timestamp") from exc
+        if generated.tzinfo is None or generated.utcoffset() is None:
+            raise EvaluationError("generated_at must be timezone-aware")
+        for name in (
+            "cost_tax_capital_assumptions", "aggregate_metrics",
+            "dependence_aware_uncertainty", "failure_analysis",
+        ):
+            value = getattr(self, name)
+            if not isinstance(value, Mapping):
+                raise EvaluationError(f"{name} must be a mapping")
+            object.__setattr__(
+                self, name, _freeze_report_json(value, path=name)
+            )
+        for name in ("split_summary", "fold_metrics", "calibration"):
+            value = getattr(self, name)
+            if not isinstance(value, tuple) or any(
+                not isinstance(item, Mapping) for item in value
+            ):
+                raise EvaluationError(f"{name} must be a tuple of mappings")
+            object.__setattr__(
+                self, name, _freeze_report_json(value, path=name)
+            )
+
+    @property
+    def production_authoritative(self) -> bool:
+        return False
 
     def to_dict(self) -> dict[str, Any]:
         payload = {
@@ -366,18 +480,23 @@ class EvaluationReport:
             "feature_set_version": self.feature_set_version,
             "point_in_time_data": self.point_in_time_data,
             "survivorship_bias_note": self.survivorship_bias_note,
-            "split_summary": [dict(s) for s in self.split_summary],
+            "split_summary": _plain_report_json(self.split_summary),
             "entry_timing": self.entry_timing,
-            "cost_tax_capital_assumptions": dict(self.cost_tax_capital_assumptions),
-            "fold_metrics": [dict(m) for m in self.fold_metrics],
-            "aggregate_metrics": dict(self.aggregate_metrics),
-            "dependence_aware_uncertainty": dict(self.dependence_aware_uncertainty),
-            "failure_analysis": dict(self.failure_analysis),
-            "calibration": [dict(c) for c in self.calibration],
+            "cost_tax_capital_assumptions": _plain_report_json(
+                self.cost_tax_capital_assumptions
+            ),
+            "fold_metrics": _plain_report_json(self.fold_metrics),
+            "aggregate_metrics": _plain_report_json(self.aggregate_metrics),
+            "dependence_aware_uncertainty": _plain_report_json(
+                self.dependence_aware_uncertainty
+            ),
+            "failure_analysis": _plain_report_json(self.failure_analysis),
+            "calibration": _plain_report_json(self.calibration),
             "coverage_warnings": list(self.coverage_warnings),
             "limitations": list(self.limitations),
             "verdict": self.verdict,
             "generated_at": self.generated_at,
+            "production_authoritative": self.production_authoritative,
             "promotion_blockers": list(self.promotion_blockers()),
         }
         payload["report_sha256"] = hash_payload(payload)
@@ -397,6 +516,10 @@ class EvaluationReport:
             blockers.append("coverage_warnings_present")
         if len(self.fold_metrics) < 2:
             blockers.append("fewer_than_two_untouched_folds")
+        # An evaluation report can request confirmation; it cannot grant
+        # authority. ML-10 and its separate owner/adversarial review do not
+        # exist, so this blocker must never disappear from an ML-3..8 report.
+        blockers.append("separate_owner_promotion_review_required")
         return tuple(blockers)
 
 
@@ -415,6 +538,12 @@ def beats_baseline_in_multiple_folds(
     reporting this cannot hide HOW narrowly it passed. Note this is a
     NECESSARY, not sufficient, condition -- doc 14.1 is explicit about that.
     """
+    if (
+        isinstance(minimum_folds, bool)
+        or not isinstance(minimum_folds, int)
+        or minimum_folds < 2
+    ):
+        raise EvaluationError("minimum_folds must be an integer >= 2")
     wins = 0
     comparable = 0
     per_fold: list[dict[str, Any]] = []

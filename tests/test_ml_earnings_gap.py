@@ -43,16 +43,21 @@ def _price_frame(index: pd.DatetimeIndex) -> pd.DataFrame:
 @pytest.mark.parametrize(
     "timestamp, expected",
     [
-        ("2026-01-06 16:30", "after_close"),
-        ("2026-01-06 21:00", "after_close"),
-        ("2026-01-06 07:00", "before_open"),
-        ("2026-01-06 09:00", "before_open"),
-        ("2026-01-06 11:00", "intraday"),
-        ("2026-01-06 09:30", "intraday"),
+        ("2026-01-06 16:30-05:00", "after_close"),
+        ("2026-01-06 21:00-05:00", "after_close"),
+        ("2026-01-06 07:00-05:00", "before_open"),
+        ("2026-01-06 09:00-05:00", "before_open"),
+        ("2026-01-06 11:00-05:00", "intraday"),
+        ("2026-01-06 09:30-05:00", "intraday"),
     ],
 )
 def test_release_timing_classification(timestamp, expected):
     assert classify_release_timing(pd.Timestamp(timestamp)) == expected
+
+
+def test_release_timing_converts_utc_to_eastern_before_classifying():
+    # 12:00 UTC in January is 07:00 ET, not an intraday noon release.
+    assert classify_release_timing(pd.Timestamp("2026-01-06T12:00:00Z")) == "before_open"
 
 
 # --- gap window mapping (doc 9.2) ------------------------------------------
@@ -60,7 +65,7 @@ def test_release_timing_classification(timestamp, expected):
 
 def test_after_close_release_maps_close_to_next_session_open():
     sessions = _sessions()
-    window = map_gap_window("2026-01-06 16:30", session_index=sessions)
+    window = map_gap_window("2026-01-06 16:30-05:00", session_index=sessions)
 
     assert window.available
     assert window.release_timing == "after_close"
@@ -72,7 +77,7 @@ def test_after_close_release_maps_close_to_next_session_open():
 
 def test_before_open_release_maps_prior_close_to_release_day_open():
     sessions = _sessions()
-    window = map_gap_window("2026-01-07 07:00", session_index=sessions)
+    window = map_gap_window("2026-01-07 07:00-05:00", session_index=sessions)
 
     assert window.available
     assert window.release_timing == "before_open"
@@ -84,7 +89,7 @@ def test_before_open_release_maps_prior_close_to_release_day_open():
 
 def test_intraday_release_is_unavailable_not_guessed():
     sessions = _sessions()
-    window = map_gap_window("2026-01-06 11:00", session_index=sessions)
+    window = map_gap_window("2026-01-06 11:00-05:00", session_index=sessions)
 
     assert not window.available
     assert window.release_timing == "intraday"
@@ -94,7 +99,7 @@ def test_intraday_release_is_unavailable_not_guessed():
 def test_friday_after_close_release_gaps_into_monday_not_saturday():
     # 2026-01-09 is a Friday; the next SESSION is Monday 2026-01-12.
     sessions = _sessions()
-    window = map_gap_window("2026-01-09 16:30", session_index=sessions)
+    window = map_gap_window("2026-01-09 16:30-05:00", session_index=sessions)
 
     assert window.available
     assert window.from_session == "2026-01-09"
@@ -104,7 +109,7 @@ def test_friday_after_close_release_gaps_into_monday_not_saturday():
 
 def test_monday_before_open_release_gaps_from_the_previous_friday():
     sessions = _sessions()
-    window = map_gap_window("2026-01-12 07:00", session_index=sessions)
+    window = map_gap_window("2026-01-12 07:00-05:00", session_index=sessions)
 
     assert window.available
     assert window.from_session == "2026-01-09"
@@ -114,21 +119,21 @@ def test_monday_before_open_release_gaps_from_the_previous_friday():
 def test_release_on_a_non_trading_day_is_unavailable():
     sessions = _sessions()
     # 2026-01-10 is a Saturday -- not a session for this ticker.
-    window = map_gap_window("2026-01-10 16:30", session_index=sessions)
+    window = map_gap_window("2026-01-10 16:30-05:00", session_index=sessions)
     assert not window.available
     assert "not a trading session" in window.reason
 
 
 def test_after_close_release_on_the_last_known_session_has_no_gap_target():
     sessions = _sessions(n=5)
-    window = map_gap_window(f"{sessions[-1].date()} 16:30", session_index=sessions)
+    window = map_gap_window(f"{sessions[-1].date()} 16:30-05:00", session_index=sessions)
     assert not window.available
     assert "no subsequent session" in window.reason
 
 
 def test_before_open_release_on_the_first_known_session_has_no_gap_source():
     sessions = _sessions(n=5)
-    window = map_gap_window(f"{sessions[0].date()} 07:00", session_index=sessions)
+    window = map_gap_window(f"{sessions[0].date()} 07:00-05:00", session_index=sessions)
     assert not window.available
     assert "no prior session" in window.reason
 
@@ -139,6 +144,12 @@ def test_unparseable_timestamp_is_unavailable():
     assert window.release_timing == "unknown"
 
 
+def test_timezone_naive_timestamp_is_unavailable():
+    window = map_gap_window("2026-01-06 16:30", session_index=_sessions())
+    assert not window.available
+    assert "timezone-naive" in window.reason
+
+
 # --- observations ----------------------------------------------------------
 
 
@@ -146,7 +157,7 @@ def test_compute_gap_observations_uses_the_mapped_price_fields():
     index = _sessions()
     price = _price_frame(index)
     observations, skipped = compute_gap_observations(
-        "AAA", price, ["2026-01-06 16:30"]
+        "AAA", price, ["2026-01-06 16:30-05:00"]
     )
 
     assert len(observations) == 1
@@ -161,10 +172,20 @@ def test_compute_gap_observations_uses_the_mapped_price_fields():
     )
 
 
+def test_compute_gap_observations_deduplicates_the_same_instant():
+    price = _price_frame(_sessions())
+    observations, skipped = compute_gap_observations(
+        "AAA", price,
+        ["2026-01-06T21:30:00Z", "2026-01-06T16:30:00-05:00"],
+    )
+    assert len(observations) == 1
+    assert skipped[0]["reason"] == "duplicate earnings event"
+
+
 def test_skipped_events_carry_their_reason():
     price = _price_frame(_sessions())
     observations, skipped = compute_gap_observations(
-        "AAA", price, ["2026-01-06 11:00", "not-a-date"]
+        "AAA", price, ["2026-01-06 11:00-05:00", "not-a-date"]
     )
     assert not observations
     assert len(skipped) == 2
@@ -175,16 +196,17 @@ def test_compute_gap_observations_requires_open_and_close_columns():
     index = _sessions()
     price = _price_frame(index).drop(columns=["open"])
     with pytest.raises(EarningsGapError, match="open"):
-        compute_gap_observations("AAA", price, ["2026-01-06 16:30"])
+        compute_gap_observations("AAA", price, ["2026-01-06 16:30-05:00"])
 
 
 # --- baseline and support checks -------------------------------------------
 
 
 def _observations(gaps: list[float]) -> list[GapObservation]:
+    timestamps = pd.bdate_range("2026-01-05", periods=len(gaps))
     return [
         GapObservation(
-            ticker="AAA", announced_at=f"2026-01-{i + 1:02d} 16:30",
+            ticker="AAA", announced_at=f"{timestamps[i].date()}T21:30:00+00:00",
             release_timing="after_close", from_session="2026-01-01",
             to_session="2026-01-02", from_price=100.0, to_price=100.0 * (1 + g / 100),
             gap_pct=g,
@@ -211,6 +233,13 @@ def test_event_support_refuses_a_thin_sample_and_explains_why():
     assert support["event_count"] == 3
     assert support["insufficiency_reasons"]
     assert support["ticker_count"] == 1
+
+
+def test_event_support_counts_distinct_events_not_duplicate_rows():
+    observation = _observations([8.0])[0]
+    support = check_event_support([observation] * 30, threshold_pct=5.0)
+    assert support["event_count"] == 1
+    assert not support["sufficient"]
 
 
 def test_event_support_reports_both_tails_separately():

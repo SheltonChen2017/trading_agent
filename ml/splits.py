@@ -19,6 +19,8 @@ from __future__ import annotations
 import dataclasses
 from typing import Sequence
 
+import pandas as pd
+
 
 class SplitError(ValueError):
     """The requested split cannot be constructed from the given sessions."""
@@ -66,6 +68,19 @@ def _split_into_blocks(items: list[str], n_blocks: int) -> list[list[str]]:
     return blocks
 
 
+def _canonical_session(value: str, *, row_index: int, field: str) -> str:
+    if not isinstance(value, str):
+        raise SplitError(
+            f"row {row_index}: {field} must use canonical YYYY-MM-DD format"
+        )
+    parsed = pd.to_datetime(value, format="%Y-%m-%d", errors="coerce")
+    if pd.isna(parsed) or parsed.strftime("%Y-%m-%d") != value:
+        raise SplitError(
+            f"row {row_index}: {field} must use canonical YYYY-MM-DD format"
+        )
+    return value
+
+
 def purged_grouped_walk_forward_splits(
     as_of_sessions: Sequence[str],
     exit_sessions: Sequence[str],
@@ -101,16 +116,22 @@ def purged_grouped_walk_forward_splits(
         or embargo_sessions < 0
     ):
         raise SplitError("embargo_sessions must be a non-negative integer")
+    canonical_as_of: list[str] = []
+    canonical_exit: list[str] = []
     for index, (entry, exit_session) in enumerate(zip(as_of_sessions, exit_sessions)):
-        if not entry or not exit_session:
-            raise SplitError(f"row {index}: as_of_session/exit_session must be non-empty")
+        entry = _canonical_session(entry, row_index=index, field="as_of_session")
+        exit_session = _canonical_session(
+            exit_session, row_index=index, field="exit_session"
+        )
         if exit_session < entry:
             raise SplitError(
                 f"row {index}: exit_session {exit_session!r} precedes "
                 f"as_of_session {entry!r}"
             )
+        canonical_as_of.append(entry)
+        canonical_exit.append(exit_session)
 
-    as_of_unique = sorted(set(as_of_sessions))
+    as_of_unique = sorted(set(canonical_as_of))
     if len(as_of_unique) < n_splits + 1:
         raise SplitError(
             f"not enough distinct sessions ({len(as_of_unique)}) for "
@@ -138,7 +159,7 @@ def purged_grouped_walk_forward_splits(
         purged = 0
         embargoed = 0
         for row_index, (entry, exit_session) in enumerate(
-            zip(as_of_sessions, exit_sessions)
+            zip(canonical_as_of, canonical_exit)
         ):
             if entry in validation_sessions:
                 validation_indices.append(row_index)
@@ -162,7 +183,7 @@ def purged_grouped_walk_forward_splits(
             raise SplitError(f"fold {fold_index}: validation block has no rows")
 
         train_sessions = sorted(
-            {as_of_sessions[i] for i in train_indices}
+            {canonical_as_of[i] for i in train_indices}
         )
         folds.append(
             Fold(

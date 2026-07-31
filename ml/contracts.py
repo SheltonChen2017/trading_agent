@@ -220,6 +220,7 @@ class DatasetManifest:
     input_hashes: Mapping[str, str]
     dataset_hash: str
     git_commit: str
+    dropped_label_row_count: int = 0
     schema_version: str = SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -244,6 +245,7 @@ class DatasetManifest:
         if actual_start > actual_end:
             raise ContractError("actual_start_date must not be after actual_end_date")
         _check_int(self.row_count, "row_count")
+        _check_int(self.dropped_label_row_count, "dropped_label_row_count")
         _check_int(self.distinct_session_count, "distinct_session_count")
         _check_int(self.ticker_count, "ticker_count")
         if self.row_count == 0 and (self.distinct_session_count or self.ticker_count):

@@ -134,6 +134,19 @@ def test_negative_volume_treated_as_missing():
     assert pd.isna(result["avg_dollar_volume_20d"].iloc[10:29]).any()
 
 
+def test_zero_volume_and_infinite_price_are_treated_as_missing_without_forward_fill():
+    n = 30
+    price = _ohlcv(n).copy()
+    price.iloc[10, price.columns.get_loc("volume")] = 0.0
+    price.iloc[12, price.columns.get_loc("close")] = float("inf")
+
+    result = compute_point_in_time_features("AAA", price, benchmarks=_benchmarks(n))
+
+    assert pd.isna(result["avg_dollar_volume_20d"].iloc[20])
+    assert pd.isna(result["return_1d_pct"].iloc[12])
+    assert pd.isna(result["return_1d_pct"].iloc[13])
+
+
 def test_rejects_unsorted_index():
     n = 30
     price = _ohlcv(n).iloc[::-1]
@@ -172,6 +185,34 @@ def test_rejects_missing_market_benchmark():
         compute_point_in_time_features(
             "AAA", price, benchmarks={"SOXX": _benchmarks(n)["SOXX"]}, market_benchmark="QQQ"
         )
+
+
+def test_requires_all_benchmarks_needed_by_the_fixed_feature_schema():
+    n = 30
+    benchmarks = _benchmarks(n)
+    benchmarks.pop("SPY")
+    with pytest.raises(FeatureError, match="missing required benchmark"):
+        compute_point_in_time_features("AAA", _ohlcv(n), benchmarks=benchmarks)
+
+
+def test_missing_benchmark_session_is_not_implicitly_forward_filled():
+    n = 40
+    benchmarks = _benchmarks(n)
+    missing_session = benchmarks["QQQ"].index[10]
+    benchmarks["QQQ"] = benchmarks["QQQ"].drop(missing_session)
+
+    result = compute_point_in_time_features("AAA", _ohlcv(n), benchmarks=benchmarks)
+
+    assert pd.isna(result["residual_return_qqq_5d_pct"].iloc[10])
+    assert pd.isna(result["residual_return_qqq_5d_pct"].iloc[15])
+
+
+def test_rejects_unsorted_benchmark_index():
+    n = 30
+    benchmarks = _benchmarks(n)
+    benchmarks["SPY"] = benchmarks["SPY"].iloc[::-1]
+    with pytest.raises(FeatureError, match="not sorted"):
+        compute_point_in_time_features("AAA", _ohlcv(n), benchmarks=benchmarks)
 
 
 def test_sessions_since_last_earnings_never_negative_and_zero_on_announcement_day():

@@ -130,6 +130,19 @@ def test_rejects_exit_before_entry():
         )
 
 
+@pytest.mark.parametrize(
+    "bad_session", ("2026-1-5", "not-a-date", "", None)
+)
+def test_rejects_noncanonical_or_missing_session_values(bad_session):
+    with pytest.raises(SplitError, match="canonical YYYY-MM-DD"):
+        purged_grouped_walk_forward_splits(
+            [bad_session, "2026-01-06"],
+            ["2026-01-07", "2026-01-08"],
+            n_splits=1,
+            embargo_sessions=0,
+        )
+
+
 def test_rejects_non_positive_n_splits():
     with pytest.raises(SplitError, match="n_splits"):
         purged_grouped_walk_forward_splits(

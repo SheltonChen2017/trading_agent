@@ -53,10 +53,36 @@ def _validate_ohlcv(df: pd.DataFrame, name: str) -> None:
     missing = [c for c in REQUIRED_COLUMNS if c not in df.columns]
     if missing:
         raise FeatureError(f"{name} is missing required columns: {missing}")
+    if not isinstance(df.index, pd.DatetimeIndex):
+        raise FeatureError(f"{name} index must be a DatetimeIndex of trading sessions")
+    if df.index.hasnans:
+        raise FeatureError(f"{name} index contains NaT")
     if not df.index.is_monotonic_increasing:
         raise FeatureError(f"{name} index is not sorted ascending")
     if df.index.has_duplicates:
         raise FeatureError(f"{name} index has duplicate sessions")
+    if not df.index.equals(df.index.normalize()):
+        raise FeatureError(f"{name} index must contain normalized trading sessions")
+
+
+def _validate_series_index(series: pd.Series, name: str) -> None:
+    if series.empty:
+        raise FeatureError(f"{name} is empty")
+    if not isinstance(series.index, pd.DatetimeIndex):
+        raise FeatureError(f"{name} index must be a DatetimeIndex of trading sessions")
+    if series.index.hasnans:
+        raise FeatureError(f"{name} index contains NaT")
+    if not series.index.is_monotonic_increasing:
+        raise FeatureError(f"{name} index is not sorted ascending")
+    if series.index.has_duplicates:
+        raise FeatureError(f"{name} index has duplicate sessions")
+    if not series.index.equals(series.index.normalize()):
+        raise FeatureError(f"{name} index must contain normalized trading sessions")
+
+
+def _sanitize_positive_series(series: pd.Series) -> pd.Series:
+    numeric = pd.to_numeric(series, errors="coerce")
+    return numeric.where((numeric > 0) & np.isfinite(numeric))
 
 
 def _sanitize_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
@@ -68,9 +94,11 @@ def _sanitize_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
     one bad row."""
     out = df.copy()
     for column in ("open", "high", "low", "close"):
-        numeric = pd.to_numeric(out[column], errors="coerce")
-        out[column] = numeric.where(numeric > 0)
-    out["volume"] = pd.to_numeric(out["volume"], errors="coerce").where(out["volume"] >= 0)
+        out[column] = _sanitize_positive_series(out[column])
+    numeric_volume = pd.to_numeric(out["volume"], errors="coerce")
+    out["volume"] = numeric_volume.where(
+        (numeric_volume > 0) & np.isfinite(numeric_volume)
+    )
     return out
 
 
@@ -105,9 +133,15 @@ def _sessions_since_last_earnings(
     dates already <= as_of are ever considered). 0 means the earnings date
     falls on (or the closest prior trading session to) as_of_session
     itself; NaN means no earnings date at or before as_of_session exists."""
-    parsed_earnings = pd.DatetimeIndex(
-        sorted(pd.Timestamp(d).normalize() for d in earnings_dates)
-    )
+    parsed: list[pd.Timestamp] = []
+    for value in earnings_dates:
+        if not isinstance(value, str):
+            raise FeatureError("earnings_dates must contain canonical YYYY-MM-DD strings")
+        event = pd.to_datetime(value, format="%Y-%m-%d", errors="coerce")
+        if pd.isna(event) or event.strftime("%Y-%m-%d") != value:
+            raise FeatureError("earnings_dates must contain canonical YYYY-MM-DD strings")
+        parsed.append(event)
+    parsed_earnings = pd.DatetimeIndex(sorted(parsed))
     result = np.full(len(index), np.nan)
     if parsed_earnings.empty:
         return pd.Series(result, index=index)
@@ -143,31 +177,47 @@ def compute_point_in_time_features(
     onto `price.index` (never backward-filled, so a value is only ever
     carried from the past into a later gap, never from the future).
     """
+    if not isinstance(ticker, str) or not ticker.strip():
+        raise FeatureError("ticker must be a non-empty string")
     _validate_ohlcv(price, f"{ticker} price")
-    for name, series in benchmarks.items():
-        if series.empty:
-            raise FeatureError(f"benchmark {name!r} is empty")
     if market_benchmark not in benchmarks:
         raise FeatureError(f"market_benchmark {market_benchmark!r} not in benchmarks")
-
+    required_benchmarks = {"SPY", "QQQ", "SOXX", market_benchmark}
+    missing_benchmarks = sorted(required_benchmarks - set(benchmarks))
+    if missing_benchmarks:
+        raise FeatureError(f"missing required benchmark(s): {missing_benchmarks}")
+    clean_benchmarks: dict[str, pd.Series] = {}
+    for name, series in benchmarks.items():
+        if not isinstance(name, str) or not name.strip():
+            raise FeatureError("benchmark names must be non-empty strings")
+        _validate_series_index(series, f"benchmark {name!r}")
+        clean_benchmarks[name] = _sanitize_positive_series(series)
     clean = _sanitize_ohlcv(price)
     close = clean["close"]
-    daily_returns = close.pct_change()
+    daily_returns = close.pct_change(fill_method=None)
 
     features: dict[str, pd.Series] = {}
 
     for window in RETURN_WINDOWS:
-        features[f"return_{window}d_pct"] = close.pct_change(window) * 100
+        features[f"return_{window}d_pct"] = (
+            close.pct_change(window, fill_method=None) * 100
+        )
 
     benchmark_returns: dict[str, pd.Series] = {
-        name: series.pct_change() for name, series in benchmarks.items()
+        name: series.pct_change(fill_method=None)
+        for name, series in clean_benchmarks.items()
     }
     for name in ("QQQ", "SOXX"):
         if name not in benchmarks:
             continue
         for window in RESIDUAL_RETURN_WINDOWS:
-            own = close.pct_change(window) * 100
-            bench = benchmarks[name].reindex(close.index).pct_change(window) * 100
+            own = close.pct_change(window, fill_method=None) * 100
+            bench = (
+                clean_benchmarks[name]
+                .reindex(close.index)
+                .pct_change(window, fill_method=None)
+                * 100
+            )
             features[f"residual_return_{name.lower()}_{window}d_pct"] = own - bench
 
     for window in MOVING_AVERAGE_WINDOWS:
@@ -207,7 +257,7 @@ def compute_point_in_time_features(
         OVERNIGHT_GAP_WINDOW
     ).std()
 
-    market_close = benchmarks[market_benchmark]
+    market_close = clean_benchmarks[market_benchmark]
     market_df = pd.DataFrame({"close": market_close})
     market_trend: list[str | None] = []
     market_vol: list[float | None] = []
@@ -222,7 +272,12 @@ def compute_point_in_time_features(
     features["market_trailing_volatility_pct"] = pd.Series(market_vol, index=close.index)
 
     for name, series in (context_series or {}).items():
-        aligned = series.reindex(close.index, method="ffill")
+        if not isinstance(name, str) or not name.strip():
+            raise FeatureError("context series names must be non-empty strings")
+        _validate_series_index(series, f"context series {name!r}")
+        numeric = pd.to_numeric(series, errors="coerce")
+        numeric = numeric.where(np.isfinite(numeric))
+        aligned = numeric.reindex(close.index, method="ffill")
         features[f"context_{name}_level"] = aligned
 
     features["day_of_week"] = pd.Series(close.index.dayofweek, index=close.index)

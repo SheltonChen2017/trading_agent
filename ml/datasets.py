@@ -13,8 +13,7 @@ explicitly before using it ("do not rely on an undeclared optional
 dependency"), and none is pinned in requirements.txt yet; adding one is a
 one-line follow-up, not blocking, if a real dataset's size later demands it.
 
-`point_in_time_data` on the resulting DatasetManifest must be supplied by
-the caller, not assumed true: ml/features.py's own windowing never looks
+`point_in_time_data` is never assumed true: ml/features.py's own windowing never looks
 ahead (tests/test_ml_features.py's
 test_point_in_time_correctness_prefix_is_unaffected_by_appending_future_rows
 proves that), but the *source* prices this module is handed may still come
@@ -22,8 +21,9 @@ from data/market_data.py's yfinance pipeline, which
 docs/ML_IMPLEMENTATION_STRATEGY.md section 3.4 and every other research
 entry point in this repo (scripts/run_portfolio_research_report.py) already
 flag `point_in_time_data=False` -- auto-adjusted closes retroactively
-reflect splits/dividends announced after the fact. This module cannot see
-where its input came from, so it does not guess.
+reflect splits/dividends announced after the fact. Until a per-feature
+event/availability/observation lineage sidecar exists, this builder refuses
+to claim `point_in_time_data=True` rather than trusting an unauditable flag.
 """
 from __future__ import annotations
 
@@ -31,6 +31,7 @@ import gzip
 import io
 import json
 import os
+import re
 import tempfile
 from pathlib import Path
 from typing import Any, Mapping, Sequence
@@ -42,10 +43,20 @@ from ml.hashing import canonical_json, hash_bytes
 from ml.labels import LabelRow
 
 REQUIRED_KEY_COLUMNS = ("as_of_session", "ticker")
+_SAFE_DATASET_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 
 
 class DatasetError(ValueError):
     """Feature/label data cannot support an immutable dataset."""
+
+
+def _require_safe_dataset_id(dataset_id: str) -> None:
+    """Keep an identifier from becoming a path when artifact names are built."""
+    if not isinstance(dataset_id, str) or not _SAFE_DATASET_ID.fullmatch(dataset_id):
+        raise DatasetError(
+            "dataset_id must be 1-128 characters using only letters, numbers, "
+            "periods, underscores, and hyphens, and must start with a letter or number"
+        )
 
 
 def _require_unique_key(frame: pd.DataFrame, name: str) -> None:
@@ -54,9 +65,54 @@ def _require_unique_key(frame: pd.DataFrame, name: str) -> None:
         raise DatasetError(f"{name} is missing key column(s): {missing}")
     if frame.empty:
         raise DatasetError(f"{name} has no rows")
-    key = list(zip(frame["as_of_session"], frame["ticker"]))
-    if len(key) != len(set(key)):
+    if frame[list(REQUIRED_KEY_COLUMNS)].isna().any().any():
+        raise DatasetError(f"{name} has a missing as_of_session or ticker")
+    tickers = frame["ticker"]
+    if not tickers.map(lambda value: isinstance(value, str) and bool(value.strip())).all():
+        raise DatasetError(f"{name} ticker values must be non-empty strings")
+    sessions = pd.to_datetime(frame["as_of_session"], format="%Y-%m-%d", errors="coerce")
+    if sessions.isna().any():
+        raise DatasetError(f"{name} has an invalid as_of_session; expected YYYY-MM-DD")
+    canonical_sessions = sessions.dt.strftime("%Y-%m-%d")
+    if not canonical_sessions.equals(frame["as_of_session"]):
+        raise DatasetError(f"{name} as_of_session values must use canonical YYYY-MM-DD format")
+    if frame.duplicated(list(REQUIRED_KEY_COLUMNS)).any():
         raise DatasetError(f"{name} has duplicate (as_of_session, ticker) rows")
+
+
+def _require_sorted_key(frame: pd.DataFrame, name: str) -> None:
+    expected = frame.sort_values(list(REQUIRED_KEY_COLUMNS), kind="stable").index
+    if not expected.equals(frame.index):
+        raise DatasetError(f"{name} rows must be sorted by as_of_session and ticker")
+
+
+def _require_single_label_version(
+    labels_df: pd.DataFrame, expected_version: str, *, name: str
+) -> None:
+    if "label_version" not in labels_df.columns:
+        raise DatasetError(f"{name} is missing label_version")
+    versions = labels_df["label_version"]
+    if versions.isna().any() or not versions.map(
+        lambda value: isinstance(value, str) and bool(value.strip())
+    ).all():
+        raise DatasetError(f"{name} has a missing or invalid label_version")
+    actual_versions = set(versions)
+    if actual_versions != {expected_version}:
+        raise DatasetError(
+            f"{name} must contain exactly the requested label_version; "
+            f"expected {expected_version!r}, found {sorted(actual_versions)!r}"
+        )
+
+
+def _require_label_keys_covered(
+    features_df: pd.DataFrame, labels_df: pd.DataFrame, name: str
+) -> None:
+    feature_keys = pd.MultiIndex.from_frame(features_df[list(REQUIRED_KEY_COLUMNS)])
+    label_keys = pd.MultiIndex.from_frame(labels_df[list(REQUIRED_KEY_COLUMNS)])
+    missing = label_keys.difference(feature_keys)
+    if len(missing):
+        sample = tuple(missing[0])
+        raise DatasetError(f"{name} has no matching feature row for key {sample!r}")
 
 
 def assemble_dataset_frames(
@@ -71,14 +127,27 @@ def assemble_dataset_frames(
     if not labels_by_ticker:
         raise DatasetError("no label rows supplied")
 
-    features_df = pd.concat(
-        [frame for frame in features_by_ticker.values()], ignore_index=True
-    )
+    for ticker, frame in features_by_ticker.items():
+        _require_unique_key(frame, f"features[{ticker}]")
+        if set(frame["ticker"]) != {ticker}:
+            raise DatasetError(
+                f"features[{ticker}] contains a ticker value that does not match its mapping key"
+            )
+        if not frame["as_of_session"].is_monotonic_increasing:
+            raise DatasetError(f"features[{ticker}] sessions are not sorted ascending")
+    features_df = pd.concat(list(features_by_ticker.values()), ignore_index=True)
     _require_unique_key(features_df, "features")
 
-    label_records = [
-        row.to_dict() for rows in labels_by_ticker.values() for row in rows
-    ]
+    label_records: list[dict[str, Any]] = []
+    for ticker, rows in labels_by_ticker.items():
+        for row in rows:
+            if not isinstance(row, LabelRow):
+                raise DatasetError(f"labels[{ticker}] contains a non-LabelRow value")
+            if row.ticker != ticker:
+                raise DatasetError(
+                    f"labels[{ticker}] contains ticker {row.ticker!r}, which does not match its mapping key"
+                )
+            label_records.append(row.to_dict())
     if not label_records:
         raise DatasetError("labels_by_ticker contained no label rows")
     labels_df = pd.DataFrame.from_records(label_records)
@@ -86,6 +155,7 @@ def assemble_dataset_frames(
         raise DatasetError("label rows are missing label_version")
     for label_version, group in labels_df.groupby("label_version"):
         _require_unique_key(group, f"labels[{label_version}]")
+        _require_label_keys_covered(features_df, group, f"labels[{label_version}]")
 
     return (
         features_df.sort_values(["as_of_session", "ticker"]).reset_index(drop=True),
@@ -98,9 +168,13 @@ def join_for_evaluation(
 ) -> pd.DataFrame:
     """Explicit, evaluation-time-only join by (as_of_session, ticker) for
     exactly one label version. Never called automatically by this module."""
+    _require_unique_key(features_df, "features")
+    if "label_version" not in labels_df.columns:
+        raise DatasetError("labels is missing label_version")
     subset = labels_df[labels_df["label_version"] == label_version]
     if subset.empty:
         raise DatasetError(f"no label rows found for label_version={label_version!r}")
+    _require_unique_key(subset, f"labels[{label_version}]")
     renamed = subset.add_prefix("label_").rename(
         columns={"label_as_of_session": "as_of_session", "label_ticker": "ticker"}
     )
@@ -122,7 +196,50 @@ def _serialize_frame_to_csv_gz(frame: pd.DataFrame) -> bytes:
     `components`) and can upcast integer dtypes that contained NaN, so a
     hash computed before serialization would almost never match a hash
     recomputed after reloading."""
-    return gzip.compress(frame.to_csv(index=False).encode("utf-8"))
+    # mtime=0 is essential: gzip otherwise embeds the current wall-clock
+    # second in its header. The same unchanged frame would then receive a
+    # different content hash whenever manifest construction and saving cross
+    # a one-second boundary.
+    return gzip.compress(frame.to_csv(index=False).encode("utf-8"), mtime=0)
+
+
+def _expected_dataset_hash(input_hashes: Mapping[str, str]) -> str:
+    return hash_bytes(canonical_json(dict(input_hashes)).encode("utf-8"))
+
+
+def _validate_manifest_frames(
+    features_df: pd.DataFrame,
+    labels_df: pd.DataFrame,
+    manifest: DatasetManifest,
+) -> None:
+    _require_safe_dataset_id(manifest.dataset_id)
+    _require_unique_key(features_df, "features")
+    _require_sorted_key(features_df, "features")
+    _require_single_label_version(
+        labels_df, manifest.label_version, name="labels"
+    )
+    _require_unique_key(labels_df, f"labels[{manifest.label_version}]")
+    _require_sorted_key(labels_df, f"labels[{manifest.label_version}]")
+    _require_label_keys_covered(
+        features_df, labels_df, f"labels[{manifest.label_version}]"
+    )
+    sessions = features_df["as_of_session"]
+    expected_metadata = {
+        "row_count": len(features_df),
+        "distinct_session_count": int(sessions.nunique()),
+        "ticker_count": int(features_df["ticker"].nunique()),
+        "actual_start_date": str(sessions.min()),
+        "actual_end_date": str(sessions.max()),
+    }
+    for field, expected in expected_metadata.items():
+        actual = getattr(manifest, field)
+        if actual != expected:
+            raise DatasetError(
+                f"manifest.{field}={actual!r} does not match features ({expected!r})"
+            )
+    expected_dataset_hash = _expected_dataset_hash(manifest.input_hashes)
+    if manifest.dataset_hash != expected_dataset_hash:
+        raise DatasetError("manifest.dataset_hash does not match manifest.input_hashes")
 
 
 def build_dataset_manifest(
@@ -140,6 +257,7 @@ def build_dataset_manifest(
     entry_timing: str,
     target_horizon_sessions: int,
     embargo_sessions: int,
+    dropped_label_row_count: int,
     transaction_cost_bps: float,
     tax_assumptions: str,
     git_commit: str,
@@ -148,12 +266,24 @@ def build_dataset_manifest(
     they exist right now -- callers must construct this immediately before
     persisting, not lazily, so `dataset_hash` cannot drift from the frames
     it claims to describe."""
+    _require_safe_dataset_id(dataset_id)
+    if point_in_time_data:
+        raise DatasetError(
+            "this builder does not yet persist per-feature event_at/available_at/"
+            "observed_at lineage and therefore cannot claim point_in_time_data=True"
+        )
+    _require_unique_key(features_df, "features")
+    _require_sorted_key(features_df, "features")
+    _require_single_label_version(labels_df, label_version, name="labels")
+    _require_unique_key(labels_df, f"labels[{label_version}]")
+    _require_sorted_key(labels_df, f"labels[{label_version}]")
+    _require_label_keys_covered(features_df, labels_df, f"labels[{label_version}]")
     sessions = features_df["as_of_session"]
     input_hashes = {
         "features": hash_bytes(_serialize_frame_to_csv_gz(features_df)),
         "labels": hash_bytes(_serialize_frame_to_csv_gz(labels_df)),
     }
-    dataset_hash = hash_bytes(canonical_json(input_hashes).encode("utf-8"))
+    dataset_hash = _expected_dataset_hash(input_hashes)
     return DatasetManifest(
         dataset_id=dataset_id,
         created_at=created_at,
@@ -173,6 +303,7 @@ def build_dataset_manifest(
         entry_timing=entry_timing,
         target_horizon_sessions=target_horizon_sessions,
         embargo_sessions=embargo_sessions,
+        dropped_label_row_count=dropped_label_row_count,
         transaction_cost_bps=transaction_cost_bps,
         tax_assumptions=tax_assumptions,
         input_hashes=input_hashes,
@@ -206,6 +337,16 @@ def _atomic_write_bytes(directory: Path, filename: str, data: bytes) -> None:
         raise
 
 
+def _preflight_immutable_writes(
+    directory: Path, payloads: Mapping[str, bytes]
+) -> None:
+    """Refuse the whole save before writing any member if one conflicts."""
+    for filename, data in payloads.items():
+        destination = directory / filename
+        if destination.exists() and destination.read_bytes() != data:
+            raise DatasetError(f"refusing to overwrite immutable dataset file {destination}")
+
+
 def save_dataset(
     features_df: pd.DataFrame,
     labels_df: pd.DataFrame,
@@ -217,6 +358,7 @@ def save_dataset(
     into `directory`, all named after `manifest.dataset_id` so a directory
     can hold more than one dataset. Returns the three file paths written."""
     directory = Path(directory)
+    _validate_manifest_frames(features_df, labels_df, manifest)
     features_bytes = _serialize_frame_to_csv_gz(features_df)
     labels_bytes = _serialize_frame_to_csv_gz(labels_df)
     actual_hashes = {
@@ -230,15 +372,23 @@ def save_dataset(
             "Build the manifest immediately before saving, from the exact "
             "frames being persisted."
         )
+    expected_dataset_hash = _expected_dataset_hash(actual_hashes)
+    if manifest.dataset_hash != expected_dataset_hash:
+        raise DatasetError("manifest.dataset_hash does not match the frames being saved")
     manifest_bytes = canonical_json(manifest.to_dict()).encode("utf-8")
 
     features_name = f"{manifest.dataset_id}.features.csv.gz"
     labels_name = f"{manifest.dataset_id}.labels.csv.gz"
     manifest_name = f"{manifest.dataset_id}.manifest.json"
 
-    _atomic_write_bytes(directory, features_name, features_bytes)
-    _atomic_write_bytes(directory, labels_name, labels_bytes)
-    _atomic_write_bytes(directory, manifest_name, manifest_bytes)
+    payloads = {
+        features_name: features_bytes,
+        labels_name: labels_bytes,
+        manifest_name: manifest_bytes,
+    }
+    _preflight_immutable_writes(directory, payloads)
+    for filename, data in payloads.items():
+        _atomic_write_bytes(directory, filename, data)
     return {
         "features": str(directory / features_name),
         "labels": str(directory / labels_name),
@@ -253,6 +403,7 @@ def load_dataset(
     on-disk frames still hash to what the manifest claims before returning
     them -- a silently edited CSV must not be trusted."""
     directory = Path(directory)
+    _require_safe_dataset_id(dataset_id)
     manifest_path = directory / f"{dataset_id}.manifest.json"
     features_path = directory / f"{dataset_id}.features.csv.gz"
     labels_path = directory / f"{dataset_id}.labels.csv.gz"
@@ -260,6 +411,10 @@ def load_dataset(
     manifest = DatasetManifest.from_dict(
         json.loads(manifest_path.read_text(encoding="utf-8"))
     )
+    if manifest.dataset_id != dataset_id:
+        raise DatasetError(
+            f"manifest dataset_id {manifest.dataset_id!r} does not match requested {dataset_id!r}"
+        )
     features_bytes = features_path.read_bytes()
     labels_bytes = labels_path.read_bytes()
 
@@ -278,7 +433,12 @@ def load_dataset(
             f"dataset {dataset_id!r} on disk does not match its manifest's "
             "recorded content hashes -- refusing to load"
         )
+    if manifest.dataset_hash != _expected_dataset_hash(actual_hashes):
+        raise DatasetError(
+            f"dataset {dataset_id!r} manifest has an inconsistent dataset_hash -- refusing to load"
+        )
 
     features_df = pd.read_csv(io.StringIO(gzip.decompress(features_bytes).decode("utf-8")))
     labels_df = pd.read_csv(io.StringIO(gzip.decompress(labels_bytes).decode("utf-8")))
+    _validate_manifest_frames(features_df, labels_df, manifest)
     return features_df, labels_df, manifest

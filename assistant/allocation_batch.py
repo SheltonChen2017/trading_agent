@@ -515,7 +515,17 @@ def execute_allocation_batch(
             legs[proposal_id] = {"state": LEG_BLOCKED_OVERRIDABLE, "order": None, "error": str(exc)}
         except ProposalExecutionError as exc:
             current = store.get_proposal(proposal_id)
-            if current is not None and current["status"] == "submission_unknown":
+            # Reuse _sync_leg_from_proposal()'s own status mapping rather than
+            # duplicating a narrower check -- it treats "submitting",
+            # "reconciling", AND "validating"/"approved" as an unresolved
+            # in-flight state (e.g. a losing concurrent execution attempt
+            # reading back the winner's in-progress status), not just the
+            # literal "submission_unknown". A duplicated, narrower check here
+            # previously let those other in-flight statuses fall through to
+            # LEG_FAILED -- a terminal state -- even though the order might
+            # still succeed (independent review, 2026-07-31).
+            unresolved = current is not None and _sync_leg_from_proposal(leg, current)["state"] == LEG_UNKNOWN
+            if unresolved:
                 legs[proposal_id] = {"state": LEG_UNKNOWN, "order": None, "error": str(exc)}
                 return store.update_allocation_batch(batch_id, status=BATCH_STOPPED_UNKNOWN, legs=legs)
             legs[proposal_id] = {"state": LEG_FAILED, "order": None, "error": str(exc)}

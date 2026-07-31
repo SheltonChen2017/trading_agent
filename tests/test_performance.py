@@ -19,6 +19,8 @@ from assistant.performance import (
     MIN_DAYS_FOR_MEANINGFUL_ANNUALIZATION,
     Observation,
     PerformanceError,
+    _decimal_accumulate,
+    _decimal_sum,
     money_weighted_return,
     position_performance,
     time_weighted_return,
@@ -500,3 +502,17 @@ def test_selling_more_than_the_position_owns_is_refused():
 
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))
+
+
+def test_decimal_helpers_avoid_binary_float_accumulation_error():
+    # Independent review, 2026-07-31 (P2 #4): money_weighted_return()'s
+    # invested/returned sums and position_performance()'s cash_by_time
+    # accumulation used to be plain binary float addition, which can drift
+    # from the exact decimal total -- the textbook case:
+    # 0.1 + 0.1 + 0.1 != 0.3 in raw binary float.
+    assert 0.1 + 0.1 + 0.1 != 0.3  # the drift these helpers avoid
+    assert _decimal_sum([0.1, 0.1, 0.1]) == 0.3
+    running = 0.0
+    for amount in (0.1, 0.1, 0.1):
+        running = _decimal_accumulate(running, amount)
+    assert running == 0.3

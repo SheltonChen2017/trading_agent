@@ -80,6 +80,7 @@ from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calen
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.ticker_verification import partition_by_universe, verify_tickers
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
+from assistant.portfolio_analytics import compute_portfolio_analytics
 from assistant.proposal_status import (
     ACTIVE_BROKER_ORDER_STATUSES,
     BLOCKED,
@@ -1944,6 +1945,13 @@ with tab_selling:
             "When the app's fill history fully reconciles to current shares, recommended sells show a "
             "separate advisory FIFO/LIFO/HIFO tax-lot comparison."
         )
+        # Independent review, 2026-07-31 (P2 #9): this used to compute
+        # "% of portfolio" inline instead of sourcing it from
+        # assistant/portfolio_analytics.py -- the one arithmetic
+        # expression in the Selling tab not sourced from assistant/*.py,
+        # which is what the "no separate logic between CLI and UI" design
+        # otherwise guarantees everywhere else.
+        position_weights_pct = compute_portfolio_analytics(packet.portfolio)["position_weights_pct"]
         st.dataframe(
             [
                 {
@@ -1953,7 +1961,7 @@ with tab_selling:
                     "Current price": p.current_price,
                     "Unrealized P&L %": p.unrealized_pnl_pct,
                     "Market value": p.market_value,
-                    "% of portfolio": round(p.market_value / packet.portfolio.total_equity * 100, 1) if packet.portfolio.total_equity else 0.0,
+                    "% of portfolio": position_weights_pct.get(p.ticker, 0.0),
                 }
                 for p in packet.portfolio.positions
             ],

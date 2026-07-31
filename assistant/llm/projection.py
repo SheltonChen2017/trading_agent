@@ -327,7 +327,15 @@ def project_committee_input(
             ),
             tickers=(event.ticker,),
             production_authoritative=available,
-            critical=False,
+            # Independent review, 2026-07-31 (P2 #7): this was hardcoded
+            # False regardless of availability, unlike regime.trend/
+            # regime.volatility/data_freshness facts above -- an
+            # unavailable earnings/ex-dividend date could be silently
+            # omitted from data_quality_warnings without tripping
+            # validators.py's fail-closed "concealed critical warning"
+            # check, since that check only requires citation for facts
+            # where critical=True.
+            critical=not available,
         )
 
     for warning in packet.warnings:

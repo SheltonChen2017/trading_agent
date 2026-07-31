@@ -539,6 +539,40 @@ def record_split(
     ):
         return False
     security_account = _security_account(normalized_ticker)
+    # Independent review, 2026-07-31: held_at_effective below only sums
+    # postings ALREADY in the journal -- if ledger-sync hasn't caught up on
+    # every pre-split fill yet (e.g. a delayed poll picks up an old fill
+    # after the split was already recorded), the adjustment is sized
+    # against too few shares, and the late-arriving fill then posts its
+    # ORIGINAL non-split-adjusted qty/price with no correction, silently
+    # understating post-split share count and cost basis. Fail closed here
+    # instead: refuse to apply the split while any known app fill for this
+    # ticker at/before the effective date has not yet been journaled.
+    bootstrap = store.get_system_state("ledger_bootstrap")
+    bootstrap_cutoff = (
+        _parse_at(bootstrap["bootstrapped_at"], "ledger bootstrapped_at")
+        if isinstance(bootstrap, dict) and bootstrap.get("bootstrapped_at")
+        else None
+    )
+    journaled_external_ids = {posting["external_id"] for posting in postings}
+    unsynced_pre_split_fills = [
+        fill
+        for fill in store.list_fills()
+        if str(fill.get("ticker", "")).upper() == normalized_ticker
+        and _parse_at(fill["at"]) <= effective_at
+        # Fills at/before the bootstrap cutoff are represented by the
+        # opening snapshot, not an app_fill:* posting -- sync_app_fills()
+        # deliberately skips them the same way, so they must be excluded
+        # here too or the split would be permanently blocked.
+        and (bootstrap_cutoff is None or _parse_at(fill["at"]) > bootstrap_cutoff)
+        and f"app_fill:{fill.get('fill_id')}" not in journaled_external_ids
+    ]
+    if unsynced_pre_split_fills:
+        raise LedgerError(
+            f"cannot apply split for {normalized_ticker}; "
+            f"{len(unsynced_pre_split_fills)} pre-split fill(s) have not "
+            "been journaled yet -- run ledger-sync before ledger-split"
+        )
     held_at_effective = sum(
         (
             _decimal(posting["quantity"], "stored posting quantity")

@@ -324,6 +324,45 @@ def test_critical_warning_must_be_visible_in_data_quality_warnings():
     ).accepted
 
 
+def test_unavailable_event_fact_is_critical_and_must_be_visible():
+    # Independent review, 2026-07-31 (P2 #7): event facts (earnings/
+    # ex-dividend) used to be hardcoded critical=False regardless of
+    # availability, unlike regime.trend/regime.volatility/data_freshness
+    # facts -- an unavailable event date could be silently omitted from
+    # data_quality_warnings without tripping this same fail-closed check.
+    from assistant.schemas import UpcomingEvent
+
+    packet = dataclasses.replace(
+        _packet(),
+        upcoming_events=[
+            UpcomingEvent(
+                ticker="NVDA",
+                event_type="earnings",
+                days_away=None,
+                status=EvidenceStatus.UNAVAILABLE,
+            )
+        ],
+    )
+    committee_input = project_committee_input(packet, _proposal())
+    event_fact = next(
+        fact for fact in committee_input.facts if fact.category == "event"
+    )
+    assert event_fact.critical is True
+
+    report = validate_committee_review(
+        committee_input, CommitteeReview.from_mapping(_valid_raw_review())
+    )
+    assert "concealed_critical_warning" in _codes(report)
+
+    raw = _valid_raw_review()
+    raw["data_quality_warnings"] = [
+        {"text": "Earnings date is unavailable.", "source_ids": [event_fact.source_id]}
+    ]
+    assert validate_committee_review(
+        committee_input, CommitteeReview.from_mapping(raw)
+    ).accepted
+
+
 def test_portfolio_change_language_is_rejected_even_when_sources_are_real():
     raw = _valid_raw_review()
     raw["summary"]["text"] = "Sell NVDA because its current weight is 50 percent."

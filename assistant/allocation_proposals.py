@@ -46,7 +46,10 @@ import math
 from datetime import datetime, timedelta, timezone
 
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
-from assistant.portfolio_analytics import preview_trade_impact
+from assistant.portfolio_analytics import (
+    estimate_pending_buy_value_by_ticker,  # noqa: F401 -- re-exported, scripts/personal_assistant_ui.py imports it from here
+    preview_trade_impact,
+)
 from assistant.proposals import TradeProposal
 from assistant.schemas import DecisionPacket
 from risk.execution_gate import TradeIntent
@@ -72,42 +75,6 @@ class AllocationPlanEntry:
     distance_to_limit_pct: float  # positive = room left under the policy limit; negative = already over it
     skipped: bool
     skip_reason: str | None
-
-
-def estimate_pending_buy_value_by_ticker(open_orders: list[dict]) -> tuple[dict[str, float], set[str]]:
-    """
-    Estimated dollar value of currently pending (not-yet-filled) BUY
-    orders, keyed by ticker, for the allocation PREVIEW -- deliberately
-    does NOT make a live quote call (unlike
-    assistant.execution_service._pending_buy_value_by_ticker(), which is
-    allowed to since it gates real order submission). A UI preview
-    refreshing on every rerun shouldn't fire a network call per pending
-    order; instead, a pending order whose value can't be determined from
-    the order itself (a plain market order with no notional or limit
-    price) is reported back in the second return value so the caller can
-    show the projection as incomplete rather than silently treating it
-    as zero (GPT review, 2026-07-28).
-    """
-    totals: dict[str, float] = {}
-    unknown: set[str] = set()
-    for order in open_orders:
-        if str(order.get("side", "")).lower() != "buy":
-            continue
-        ticker = order.get("ticker")
-        if not ticker:
-            continue
-        ticker = ticker.upper()
-        notional = order.get("notional")
-        if notional:
-            totals[ticker] = totals.get(ticker, 0.0) + float(notional)
-            continue
-        shares = order.get("shares")
-        limit_price = order.get("limit_price")
-        if shares and limit_price:
-            totals[ticker] = totals.get(ticker, 0.0) + float(shares) * float(limit_price)
-            continue
-        unknown.add(ticker)
-    return totals, unknown
 
 
 def build_allocation_plan(

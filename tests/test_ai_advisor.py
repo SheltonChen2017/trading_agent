@@ -303,6 +303,51 @@ def test_rejects_summary_advice_language_without_a_number():
         assert result is None, f"expected rejection for: {summary!r}"
 
 
+def test_rejects_multi_ticker_observation_reassigning_another_tickers_weight():
+    # Independent review, 2026-07-31 (P2 #8): a multi-ticker observation's
+    # allowed numbers used to be the UNION of every ticker in its
+    # `tickers` field, so a claim entirely about NVDA could cite AMD's
+    # real 40% weight (present in the union just because AMD is also
+    # listed on this observation) instead of NVDA's own 60%.
+    raw = {
+        "summary": "This split is concentrated in semiconductors.",
+        "observations": [
+            {
+                "type": "concentration",
+                "severity": "medium",
+                "claim": "NVDA is a large 40% position here.",  # 40% is AMD's weight, not NVDA's
+                "tickers": ["NVDA", "AMD"],
+            }
+        ],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    )
+    # The lone observation fails number validation, and per this
+    # function's own "no false all-clear" rule, a response whose only
+    # proposed observation was rejected is rejected wholesale.
+    assert result is None
+
+
+def test_allows_multi_ticker_observation_citing_each_tickers_own_weight():
+    raw = {
+        "summary": "This split is concentrated in semiconductors.",
+        "observations": [
+            {
+                "type": "concentration",
+                "severity": "medium",
+                "claim": "NVDA is 60% while AMD is 40% of this split.",
+                "tickers": ["NVDA", "AMD"],
+            }
+        ],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    )
+    assert result is not None
+    assert len(result.observations) == 1
+
+
 def test_allows_benign_summary_with_no_ticker_dollar_or_advice_language():
     raw = {"summary": "This split is concentrated in semiconductors.", "observations": []}
     result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})

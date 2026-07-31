@@ -6,7 +6,7 @@ subsystem reviews, each reading the actual code (not just docstrings/comments
 claiming correctness) and cross-checking behavior against `README.md`'s
 documented safety claims. No code was changed as part of this review.
 
-**Result: 0 P0, 4 P1, 8 P2.** This codebase has already been through 19+
+**Result: 0 P0, 4 P1, 10 P2.** This codebase has already been through 19+
 documented rounds of adversarial review on its execution kernel alone, and it
 shows — most subsystems came back clean. The findings below are what a 20th
 reviewer still caught: mostly race conditions and drift between two

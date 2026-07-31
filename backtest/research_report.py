@@ -5,6 +5,7 @@ import hashlib
 import json
 import math
 import os
+import uuid
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -409,15 +410,28 @@ def write_research_report(
     report: dict[str, Any], destination: str | Path
 ) -> Path:
     target = Path(destination)
-    if target.exists():
+    target.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(report, indent=2, sort_keys=True, default=str) + "\n"
+    # Independent review, 2026-07-31: exists() + os.replace() is NOT
+    # atomic -- os.replace() unconditionally overwrites its destination on
+    # both POSIX and Windows, and two concurrent writers targeting the
+    # same path can both pass the existence check before either writes,
+    # silently replacing the first report's content under the same
+    # "immutable" identifier with no exception. A uuid-suffixed temp name
+    # (so concurrent writers never collide on the temp file itself) plus
+    # os.link() as the actual publish step fixes both problems: os.link()
+    # is an atomic, OS-level create-exclusive that fails with
+    # FileExistsError if `target` already exists, and the destination is
+    # only ever visible fully-written (linked to the already-complete
+    # temp file's contents), never partial.
+    temp = target.with_name(f".{target.name}.{uuid.uuid4().hex}.tmp")
+    temp.write_text(payload, encoding="utf-8")
+    try:
+        os.link(temp, target)
+    except FileExistsError as exc:
         raise FileExistsError(
             f"research reports are immutable; destination exists: {target}"
-        )
-    target.parent.mkdir(parents=True, exist_ok=True)
-    temp = target.with_name(target.name + ".tmp")
-    temp.write_text(
-        json.dumps(report, indent=2, sort_keys=True, default=str) + "\n",
-        encoding="utf-8",
-    )
-    os.replace(temp, target)
+        ) from exc
+    finally:
+        temp.unlink(missing_ok=True)
     return target

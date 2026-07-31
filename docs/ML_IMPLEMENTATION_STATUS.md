@@ -3,6 +3,9 @@
 Companion to `docs/ML_IMPLEMENTATION_STRATEGY.md`, recording what is built,
 what is deliberately not built, and why. Updated 2026-07-31.
 
+The next implementation sequence is defined in
+`docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`.
+
 ## Built
 
 | PR | Scope | Modules | Production behavior change |

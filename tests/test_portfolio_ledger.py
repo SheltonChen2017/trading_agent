@@ -1,4 +1,5 @@
 import sys
+import sqlite3
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -18,6 +19,7 @@ from assistant.portfolio_ledger import (
     LedgerError,
     Posting,
     _fill_transaction,
+    bind_legacy_alpaca_account,
     bootstrap_opening_snapshot,
     ledger_balances,
     post_transaction,
@@ -50,6 +52,7 @@ def _snapshot(cash=1000.0, shares=1.0):
         as_of="2026-07-29",
         source="alpaca",
         account_mode="paper",
+        account_id="paper-account-1",
     )
 
 
@@ -144,6 +147,214 @@ def test_reconciliation_records_cash_and_position_mismatches(tmp_path):
         "cash",
         "position",
     }
+
+
+def test_reconciliation_rejects_a_different_broker_account(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 7, 29, 10, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(
+        store, _snapshot(), confirmation="bootstrap", now=boot_at
+    )
+    wrong_account = _snapshot()
+    wrong_account.account_id = "paper-account-2"
+
+    with pytest.raises(LedgerError, match="does not match"):
+        reconcile_snapshot(
+            store, wrong_account, now=boot_at + timedelta(minutes=1)
+        )
+
+
+def test_legacy_account_binding_requires_an_exact_reconciliation(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 7, 29, 10, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(
+        store, _snapshot(), confirmation="bootstrap", now=boot_at
+    )
+    legacy = store.get_system_state("ledger_bootstrap")
+    legacy.pop("account_id")
+    store.set_system_state("ledger_bootstrap", legacy)
+
+    result = bind_legacy_alpaca_account(
+        store,
+        _snapshot(),
+        confirmation="bind account",
+        now=boot_at + timedelta(minutes=1),
+    )
+    assert result["already_bound"] is False
+    assert result["account_id"] == "paper-account-1"
+    assert (
+        store.get_system_state("ledger_bootstrap")["account_id"]
+        == "paper-account-1"
+    )
+    assert (
+        store.get_latest_ledger_reconciliation()["broker"]["account_id"]
+        == "paper-account-1"
+    )
+
+
+def test_legacy_account_binding_refuses_a_mismatch_without_binding(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 7, 29, 10, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(
+        store, _snapshot(), confirmation="bootstrap", now=boot_at
+    )
+    legacy = store.get_system_state("ledger_bootstrap")
+    legacy.pop("account_id")
+    store.set_system_state("ledger_bootstrap", legacy)
+
+    with pytest.raises(LedgerError, match="do not reconcile"):
+        bind_legacy_alpaca_account(
+            store,
+            _snapshot(cash=999.0),
+            confirmation="bind account",
+            now=boot_at + timedelta(minutes=1),
+        )
+    assert "account_id" not in store.get_system_state("ledger_bootstrap")
+
+
+def test_store_enables_foreign_keys_and_rejects_orphan_postings(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    with store._connect() as connection:
+        assert connection.execute("PRAGMA foreign_keys").fetchone()[0] == 1
+        with pytest.raises(sqlite3.IntegrityError):
+            connection.execute(
+                """
+                INSERT INTO journal_postings(
+                    transaction_id, account, asset, amount, quantity,
+                    metadata_json
+                ) VALUES ('missing', 'cash', 'USD', '1', NULL, '{}')
+                """
+            )
+
+
+def test_store_rejects_orphan_broker_order_updates(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(
+        {
+            "proposal_id": "tp-1",
+            "created_at": "2026-07-30T12:00:00+00:00",
+            "expires_at": "2026-07-31T12:00:00+00:00",
+            "status": "broker_accepted",
+            "idempotency_key": "idem-1",
+            "intent": {
+                "ticker": "AAPL",
+                "side": "buy",
+                "shares": 1,
+                "order_type": "market",
+                "limit_price": None,
+            },
+        }
+    )
+    with store._connect() as connection:
+        connection.execute(
+            """
+            INSERT INTO broker_orders(
+                order_id, proposal_id, submitted_at, status, payload_json
+            ) VALUES ('order-1', 'tp-1', '2026-07-30T12:00:00+00:00',
+                      'accepted', '{}')
+            """
+        )
+        with pytest.raises(sqlite3.IntegrityError):
+            connection.execute(
+                """
+                UPDATE broker_orders
+                SET proposal_id = 'missing-proposal'
+                WHERE order_id = 'order-1'
+                """
+            )
+
+
+def test_integrity_check_detects_legacy_orphan_rows(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    # Simulate a row already present in a pre-hardening database. New writes
+    # are protected by declared FKs and compatibility triggers, so the test
+    # deliberately bypasses/removes the insert trigger using a raw legacy
+    # connection.
+    connection = sqlite3.connect(store.path)
+    try:
+        connection.execute("DROP TRIGGER fk_broker_orders_proposal_insert")
+        connection.execute(
+            """
+            INSERT INTO broker_orders(
+                order_id, proposal_id, submitted_at, status, payload_json
+            ) VALUES ('legacy-orphan', 'missing-proposal',
+                      '2026-07-30T12:00:00+00:00', 'accepted', '{}')
+            """
+        )
+        connection.commit()
+    finally:
+        connection.close()
+
+    results = store.database_integrity_check()
+    assert results != ["ok"]
+    assert any(
+        "broker_orders.proposal_id" in result for result in results
+    )
+
+
+def test_broker_order_and_event_ids_cannot_be_rebound(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    for proposal_id in ("tp-1", "tp-2"):
+        store.save_proposal(
+            {
+                "proposal_id": proposal_id,
+                "created_at": "2026-07-30T12:00:00+00:00",
+                "expires_at": "2026-07-31T12:00:00+00:00",
+                "status": "submitting",
+                "idempotency_key": f"idem-{proposal_id}",
+                "intent": {
+                    "ticker": "AAPL",
+                    "side": "buy",
+                    "shares": 1,
+                    "order_type": "market",
+                    "limit_price": None,
+                },
+            }
+        )
+    order = {
+        "order_id": "order-1",
+        "status": "accepted",
+        "submitted_at": "2026-07-30T12:01:00+00:00",
+        "filled_qty": 0,
+    }
+    store.project_broker_order_event(
+        event_id="event-1",
+        proposal_id="tp-1",
+        order=order,
+        event_type="new",
+        event_at="2026-07-30T12:01:00+00:00",
+        new_proposal_status="broker_accepted",
+        expected_current_statuses=("submitting",),
+        proposal_updates={"broker_order": order},
+    )
+
+    with pytest.raises(ValueError, match="already bound to proposal"):
+        store.project_broker_order_event(
+            event_id="event-2",
+            proposal_id="tp-2",
+            order=order,
+            event_type="new",
+            event_at="2026-07-30T12:02:00+00:00",
+            new_proposal_status="broker_accepted",
+            expected_current_statuses=("submitting",),
+            proposal_updates={"broker_order": order},
+        )
+
+    second_order = dict(order, order_id="order-2")
+    with pytest.raises(ValueError, match="event-1.*already bound"):
+        store.project_broker_order_event(
+            event_id="event-1",
+            proposal_id="tp-2",
+            order=second_order,
+            event_type="new",
+            event_at="2026-07-30T12:02:00+00:00",
+            new_proposal_status="broker_accepted",
+            expected_current_statuses=("submitting",),
+            proposal_updates={"broker_order": second_order},
+        )
+
+    assert store.list_broker_orders()[0]["proposal_id"] == "tp-1"
+    assert store.get_proposal("tp-2")["status"] == "submitting"
 
 
 def _postings_for_account(store: AssistantStore, account: str) -> list[dict]:

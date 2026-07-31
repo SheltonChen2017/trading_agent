@@ -64,6 +64,7 @@ def test_backup_cadence_is_idempotent_and_drill_is_epoch_evidence(tmp_path):
             strategy_id="scanner",
             strategy_version="1.0.0",
             model_id="deterministic-no-model",
+            broker_account_id="paper-account-1",
         ),
         started_at=datetime(2026, 7, 29, tzinfo=timezone.utc),
     )

@@ -36,11 +36,19 @@ from assistant.operations import (
     run_backup_restore_drill,
     run_operational_check,
 )
-from assistant.order_reconciler import monitor_orders, reconcile_nonterminal_orders
+from assistant.order_reconciler import (
+    cancel_all_open_orders,
+    cancel_assistant_order,
+    monitor_orders,
+    reconcile_nonterminal_orders,
+)
 from assistant.portfolio_ledger import (
+    bind_legacy_alpaca_account,
     bootstrap_opening_snapshot,
     ledger_balances,
+    record_cash_transfer,
     record_dividend,
+    record_fee,
     record_split,
     reconcile_snapshot,
     sync_app_fills,
@@ -73,7 +81,7 @@ from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import CONFIGURED_LEVERAGED_PAIRS, generate_leveraged_pair_rebalance_proposals
 from backtest.research_report import verify_research_report
-from execution.alpaca_broker import is_configured
+from execution.alpaca_broker import get_account, is_configured
 
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
@@ -156,6 +164,15 @@ def _active_runtime_lineage(
     recorded = epoch["lineage"]
     mandate = load_mandate(args.mandate)
     policy = load_policy(args.policy)
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required to verify evidence lineage."
+        )
+    account = get_account()
+    if not account["paper"]:
+        raise SystemExit(
+            "Paper evidence lineage cannot be verified against a live account."
+        )
     current = build_paper_lineage(
         code_commit=_current_commit(require_clean=True),
         mandate_fingerprint=compute_mandate_fingerprint(mandate),
@@ -163,6 +180,7 @@ def _active_runtime_lineage(
         strategy_id=recorded["strategy_id"],
         strategy_version=recorded["strategy_version"],
         model_id=recorded["model_id"],
+        broker_account_id=account["account_id"],
     )
     if current != recorded:
         raise SystemExit(
@@ -515,6 +533,27 @@ def command_monitor_orders(args, store: AssistantStore) -> None:
     )
 
 
+def command_cancel_order(args, store: AssistantStore) -> None:
+    if str(args.confirm).strip().lower() != "cancel":
+        raise SystemExit(
+            'Cancellation not confirmed. Pass --confirm "cancel".'
+        )
+    result = cancel_assistant_order(store, args.proposal_id)
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
+def command_cancel_all_orders(args, store: AssistantStore) -> None:
+    if str(args.confirm).strip().lower() != "cancel all open orders":
+        raise SystemExit(
+            "Emergency cancellation not confirmed. Pass "
+            '--confirm "cancel all open orders".'
+        )
+    result = cancel_all_open_orders(store, reason=args.reason)
+    print(json.dumps(result, indent=2, sort_keys=True))
+    if result["errors"]:
+        raise SystemExit(2)
+
+
 def command_readiness(args, store: AssistantStore) -> None:
     policy = load_policy(args.policy)
     report = transaction_readiness(store, policy, check_broker=not args.offline)
@@ -587,6 +626,20 @@ def command_ledger_reconcile(args, store: AssistantStore) -> None:
         raise SystemExit(2)
 
 
+def command_ledger_bind_account(args, store: AssistantStore) -> None:
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required for ledger account binding."
+        )
+    snapshot = build_portfolio_snapshot_from_alpaca()
+    result = bind_legacy_alpaca_account(
+        store,
+        snapshot,
+        confirmation=args.confirm,
+    )
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
 def command_ledger_dividend(args, store: AssistantStore) -> None:
     inserted = record_dividend(
         store,
@@ -629,6 +682,50 @@ def command_ledger_split(args, store: AssistantStore) -> None:
                 "external_id": args.external_id,
                 "ticker": args.ticker.upper(),
                 "action": "split",
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
+def command_ledger_transfer(args, store: AssistantStore) -> None:
+    inserted = record_cash_transfer(
+        store,
+        external_id=args.external_id,
+        amount=args.amount,
+        occurred_at=args.occurred_at,
+        description=args.description,
+    )
+    print(
+        json.dumps(
+            {
+                "inserted": inserted,
+                "external_id": args.external_id,
+                "amount": args.amount,
+                "action": "cash_transfer",
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+
+def command_ledger_fee(args, store: AssistantStore) -> None:
+    inserted = record_fee(
+        store,
+        external_id=args.external_id,
+        amount=args.amount,
+        occurred_at=args.occurred_at,
+        description=args.description,
+    )
+    print(
+        json.dumps(
+            {
+                "inserted": inserted,
+                "external_id": args.external_id,
+                "amount": args.amount,
+                "action": "fee",
             },
             indent=2,
             sort_keys=True,
@@ -688,6 +785,15 @@ def command_paper_epoch_start(args, store: AssistantStore) -> None:
             "Refusing to start paper evidence while config.PAPER_TRADING "
             "is false."
         )
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required to start paper evidence."
+        )
+    account = get_account()
+    if not account["paper"]:
+        raise SystemExit(
+            "Refusing to start paper evidence against a live account."
+        )
     mandate = load_mandate(args.mandate)
     policy = load_policy(args.policy)
     lineage = build_paper_lineage(
@@ -697,6 +803,7 @@ def command_paper_epoch_start(args, store: AssistantStore) -> None:
         strategy_id=args.strategy_id,
         strategy_version=args.strategy_version,
         model_id=args.model_id,
+        broker_account_id=account["account_id"],
     )
     result = start_paper_evidence_epoch(
         store, args.evidence_epoch, lineage
@@ -1111,6 +1218,40 @@ def build_parser() -> argparse.ArgumentParser:
     )
     monitor.set_defaults(handler=command_monitor_orders)
 
+    cancel_order = commands.add_parser(
+        "cancel-order",
+        help=(
+            "Cancel the current authoritative broker order for one assistant "
+            "proposal, following any replacement chain."
+        ),
+    )
+    cancel_order.add_argument("proposal_id")
+    cancel_order.add_argument(
+        "--confirm",
+        required=True,
+        help='Must be exactly "cancel" (case-insensitive).',
+    )
+    cancel_order.set_defaults(handler=command_cancel_order)
+
+    cancel_all = commands.add_parser(
+        "cancel-all-orders",
+        help=(
+            "Engage the persistent kill switch, then request cancellation "
+            "for every open broker order, including unmanaged orders."
+        ),
+    )
+    cancel_all.add_argument(
+        "--confirm",
+        required=True,
+        help='Must be exactly "cancel all open orders" (case-insensitive).',
+    )
+    cancel_all.add_argument(
+        "--reason",
+        required=True,
+        help="Operator incident reason stored with the durable kill switch.",
+    )
+    cancel_all.set_defaults(handler=command_cancel_all_orders)
+
     readiness = commands.add_parser(
         "readiness",
         help="Check policy, SQLite integrity, reconciliation freshness, budgets, and broker state.",
@@ -1168,6 +1309,20 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ledger_reconcile.set_defaults(handler=command_ledger_reconcile)
 
+    ledger_bind = commands.add_parser(
+        "ledger-bind-account",
+        help=(
+            "One-time migration for an Alpaca journal created before account "
+            "IDs were recorded; requires an exact live reconciliation."
+        ),
+    )
+    ledger_bind.add_argument(
+        "--confirm",
+        required=True,
+        help='Must be exactly "bind account" (case-insensitive).',
+    )
+    ledger_bind.set_defaults(handler=command_ledger_bind_account)
+
     ledger_dividend = commands.add_parser(
         "ledger-dividend",
         help=(
@@ -1218,6 +1373,41 @@ def build_parser() -> argparse.ArgumentParser:
         help="Timezone-aware ISO-8601 effective timestamp.",
     )
     ledger_split.set_defaults(handler=command_ledger_split)
+
+    ledger_transfer = commands.add_parser(
+        "ledger-transfer",
+        help=(
+            "Append a broker-confirmed cash contribution (positive) or "
+            "withdrawal (negative) to the journal."
+        ),
+    )
+    ledger_transfer.add_argument("--external-id", required=True)
+    ledger_transfer.add_argument(
+        "--amount",
+        required=True,
+        help="Signed cash amount; positive deposits, negative withdraws.",
+    )
+    ledger_transfer.add_argument(
+        "--occurred-at",
+        required=True,
+        help="Timezone-aware ISO-8601 broker posting timestamp.",
+    )
+    ledger_transfer.add_argument("--description", required=True)
+    ledger_transfer.set_defaults(handler=command_ledger_transfer)
+
+    ledger_fee = commands.add_parser(
+        "ledger-fee",
+        help="Append a broker-confirmed positive fee amount to the journal.",
+    )
+    ledger_fee.add_argument("--external-id", required=True)
+    ledger_fee.add_argument("--amount", required=True)
+    ledger_fee.add_argument(
+        "--occurred-at",
+        required=True,
+        help="Timezone-aware ISO-8601 broker posting timestamp.",
+    )
+    ledger_fee.add_argument("--description", required=True)
+    ledger_fee.set_defaults(handler=command_ledger_fee)
 
     operations_check = commands.add_parser(
         "operations-check",

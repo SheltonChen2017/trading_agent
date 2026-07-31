@@ -348,6 +348,20 @@ def test_allows_summary_using_target_descriptively():
     assert result is not None
 
 
+def test_allows_descriptive_relative_position_size():
+    raw = {
+        "summary": "NVDA is a larger position than AMD in this portfolio.",
+        "observations": [],
+    }
+    result = ai_advisor._validate_allocation_review(
+        raw,
+        ["NVDA", "AMD"],
+        {"NVDA": 60.0, "AMD": 40.0},
+        {},
+    )
+    assert result is not None
+
+
 def test_allows_observation_describing_increased_volatility():
     raw = {
         "summary": "The split has differing volatility characteristics.",

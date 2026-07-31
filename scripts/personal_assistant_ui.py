@@ -63,6 +63,10 @@ from assistant.execution_service import (
     execute_approved_paper_proposal,
     reconcile_submission,
 )
+from assistant.order_reconciler import (
+    cancel_all_open_orders,
+    cancel_assistant_order,
+)
 from assistant.explanations import explain_ticker
 from assistant.ai_advisor import (
     curate_recommended_tickers,
@@ -2038,6 +2042,51 @@ with tab_propose:
         _render_proposal_approval(proposal, store, policy_path, packet.portfolio)
 
 with tab_history:
+    with st.expander("Emergency order controls", expanded=False):
+        st.warning(
+            "Cancel-all activates the persistent kill switch first, then "
+            "requests cancellation for every open Alpaca order—including "
+            "orders not created by this app. Verify the broker directly if "
+            "any request fails."
+        )
+        emergency_reason = st.text_input(
+            "Incident reason",
+            key="emergency_cancel_all_reason",
+        )
+        emergency_confirmation = st.text_input(
+            'Type "cancel all open orders" to confirm',
+            key="emergency_cancel_all_confirmation",
+        )
+        if st.button(
+            "Activate kill switch and cancel all open orders",
+            type="primary",
+            disabled=(
+                not emergency_reason.strip()
+                or emergency_confirmation.strip().lower()
+                != "cancel all open orders"
+            ),
+        ):
+            try:
+                result = cancel_all_open_orders(
+                    store, reason=emergency_reason
+                )
+                if result["errors"]:
+                    st.error(
+                        "Cancel-all completed with failures. Keep the kill "
+                        "switch active and verify Alpaca directly."
+                    )
+                else:
+                    st.success(
+                        "Kill switch active; cancellation requested for "
+                        f"{result['cancel_requested_count']} open order(s)."
+                    )
+                st.json(result)
+            except Exception as exc:
+                st.error(
+                    "Emergency cancel-all failed. The persistent kill switch "
+                    f"may still be active; verify Alpaca directly: {exc}"
+                )
+
     proposals_col, orders_col = st.columns(2)
 
     with proposals_col:
@@ -2087,6 +2136,43 @@ with tab_history:
                         )
                     except Exception as exc:
                         st.error(f"Reconciliation result: {exc}")
+
+        cancelable = [
+            p
+            for p in stored
+            if p["status"] in UNRESOLVED_BROKER_STATE_STATUSES
+        ]
+        if cancelable:
+            st.write("Cancel a working or unresolved assistant order")
+            st.caption(
+                "The service follows Alpaca replacement links and cancels "
+                "the current authoritative order, not a superseded order."
+            )
+            for p in cancelable:
+                intent = p["intent"]
+                confirmation = st.text_input(
+                    f'Type "cancel" for {p["proposal_id"]}',
+                    key=f"cancel_confirmation_{p['proposal_id']}",
+                )
+                if st.button(
+                    (
+                        f"Cancel {intent['side'].upper()} "
+                        f"{intent['shares']} {intent['ticker']} "
+                        f"({p['proposal_id']})"
+                    ),
+                    key=f"cancel_order_{p['proposal_id']}",
+                    disabled=confirmation.strip().lower() != "cancel",
+                ):
+                    try:
+                        result = cancel_assistant_order(
+                            store, p["proposal_id"]
+                        )
+                        st.success(
+                            "Cancellation requested for broker order "
+                            f"{result['order_id']}."
+                        )
+                    except Exception as exc:
+                        st.error(f"Cancellation result: {exc}")
 
     with orders_col:
         st.subheader("Orders")

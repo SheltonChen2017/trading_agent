@@ -60,6 +60,7 @@ def build_paper_lineage(
     strategy_id: str,
     strategy_version: str,
     model_id: str,
+    broker_account_id: str,
 ) -> dict[str, str]:
     """Build the immutable identity shared by every observation in an epoch."""
     return {
@@ -75,6 +76,9 @@ def build_paper_lineage(
             strategy_version, "strategy_version"
         ),
         "model_id": _required_text(model_id, "model_id"),
+        "broker_account_id": _required_text(
+            broker_account_id, "broker_account_id"
+        ),
     }
 
 
@@ -94,6 +98,7 @@ def start_paper_evidence_epoch(
         "strategy_id",
         "strategy_version",
         "model_id",
+        "broker_account_id",
     }
     if set(lineage) != expected_keys:
         raise PaperEvidenceError(
@@ -129,6 +134,10 @@ def _validate_snapshot(snapshot: PortfolioSnapshot) -> None:
     if snapshot.account_mode != "paper":
         raise PaperEvidenceError(
             "Paper evidence can only be captured from an Alpaca paper account"
+        )
+    if snapshot.source == "alpaca" and not snapshot.account_id:
+        raise PaperEvidenceError(
+            "Paper evidence requires the connected broker account ID"
         )
     for field, value in (
         ("cash", snapshot.cash),
@@ -209,6 +218,10 @@ def capture_paper_account_observation(
             "Active evidence lineage differs from the current runtime"
         )
     _validate_snapshot(snapshot)
+    if snapshot.account_id != epoch["lineage"].get("broker_account_id"):
+        raise PaperEvidenceError(
+            "Connected broker account does not match the active evidence epoch"
+        )
     when = _parse_at(
         captured_at or datetime.now(timezone.utc), "captured_at"
     ).astimezone(timezone.utc)
@@ -246,6 +259,14 @@ def capture_paper_account_observation(
     if not reconciliation or not reconciliation.get("matched"):
         raise PaperEvidenceError(
             "A matching ledger reconciliation is required before NAV capture"
+        )
+    reconciled_account_id = str(
+        ((reconciliation.get("broker") or {}).get("account_id") or "")
+    )
+    if reconciled_account_id != snapshot.account_id:
+        raise PaperEvidenceError(
+            "The latest ledger reconciliation belongs to a different or "
+            "unidentified broker account"
         )
     reconciled_at = _parse_at(
         reconciliation.get("reconciled_at"), "reconciled_at"
@@ -285,6 +306,7 @@ def capture_paper_account_observation(
         "market_close": market_close.isoformat(),
         "source": snapshot.source,
         "account_mode": snapshot.account_mode,
+        "account_id": snapshot.account_id,
         "cash": float(snapshot.cash),
         "total_equity": float(snapshot.total_equity),
         "buying_power": (

@@ -108,7 +108,11 @@ def capture_briefing_equity_snapshot(
     key = (
         str(account_key).strip()
         if account_key is not None
-        else f"{portfolio.source}:{portfolio.account_mode}"
+        else (
+            f"{portfolio.source}:{portfolio.account_mode}:{portfolio.account_id}"
+            if portfolio.account_id
+            else f"{portfolio.source}:{portfolio.account_mode}"
+        )
     )
     if not key:
         raise ValueError("account_key must be non-empty")
@@ -146,6 +150,7 @@ def capture_briefing_equity_snapshot(
         "captured_at": when.isoformat(),
         "source": portfolio.source,
         "account_mode": portfolio.account_mode,
+        "account_id": portfolio.account_id,
         "total_equity": decimal_text(portfolio.total_equity_decimal),
         "cash": decimal_text(portfolio.cash_decimal),
         "net_external_flow": decimal_text(net_external_flow),

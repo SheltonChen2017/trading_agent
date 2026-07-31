@@ -190,8 +190,25 @@ def test_budget_already_consumed_today_reduces_the_headroom():
 
     def seed(store):
         for index in range(2):
+            proposal_id = f"earlier-{index}"
+            store.save_proposal(
+                {
+                    "proposal_id": proposal_id,
+                    "created_at": NOW_ET.isoformat(),
+                    "expires_at": "2026-12-31T00:00:00+00:00",
+                    "status": "filled",
+                    "idempotency_key": f"idem-{proposal_id}",
+                    "intent": {
+                        "ticker": f"OLD{index}",
+                        "side": "buy",
+                        "shares": 1,
+                        "order_type": "market",
+                        "limit_price": None,
+                    },
+                }
+            )
             store.reserve_execution_budget(
-                f"earlier-{index}", trading_day=TRADING_DAY, notional=100.0,
+                proposal_id, trading_day=TRADING_DAY, notional=100.0,
                 max_daily_notional=1_000_000.0, max_daily_orders=10,
             )
 

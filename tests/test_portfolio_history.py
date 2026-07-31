@@ -14,9 +14,13 @@ from assistant.storage import AssistantStore
 DAY1 = datetime(2026, 7, 27, 21, 0, tzinfo=timezone.utc)
 
 
-def _portfolio(equity: float):
+def _portfolio(equity: float, *, account_id: str | None = None):
     return build_portfolio_snapshot(
-        [], cash=equity, source="alpaca", account_mode="paper"
+        [],
+        cash=equity,
+        source="alpaca",
+        account_mode="paper",
+        account_id=account_id,
     )
 
 
@@ -141,3 +145,41 @@ def test_benchmark_excess_requires_same_account_period_boundaries(tmp_path):
     assert report["total_return_pct"] == 10.0
     assert not report["benchmarks"]["SPY"]["available"]
     assert "boundary" in report["benchmarks"]["SPY"]["reason"]
+
+
+def test_default_history_key_is_bound_to_broker_account_id(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    first = capture_briefing_equity_snapshot(
+        store,
+        _portfolio(100, account_id="account-1"),
+        captured_at=DAY1,
+        benchmark_levels={},
+    )
+    second = capture_briefing_equity_snapshot(
+        store,
+        _portfolio(200, account_id="account-2"),
+        captured_at=DAY1,
+        benchmark_levels={},
+    )
+
+    assert first["account_key"] == "alpaca:paper:account-1"
+    assert second["account_key"] == "alpaca:paper:account-2"
+    assert len(store.list_portfolio_equity_snapshots(first["account_key"])) == 1
+    assert len(store.list_portfolio_equity_snapshots(second["account_key"])) == 1
+
+
+def test_history_limit_returns_the_newest_rows_in_chronological_order(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    for day, equity in enumerate((100, 101, 102)):
+        capture_briefing_equity_snapshot(
+            store,
+            _portfolio(equity),
+            captured_at=DAY1 + timedelta(days=day),
+            account_key="paper-account",
+            benchmark_levels={},
+        )
+
+    latest = store.list_portfolio_equity_snapshots(
+        "paper-account", limit=2
+    )
+    assert [row["total_equity"] for row in latest] == ["101", "102"]

@@ -54,11 +54,11 @@ $watchdogArgument = Quote-TaskArgument $watchdogScript
 
 $cycleAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
-    -Argument "$assistantArgument --database $databaseArgument operations-cycle --alerts-jsonl $alertsArgument" `
+    -Argument "$assistantArgument --database $databaseArgument operations-cycle --cancel-stale --alerts-jsonl $alertsArgument" `
     -WorkingDirectory $resolvedRepository
 $monitorAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
-    -Argument "$assistantArgument --database $databaseArgument monitor-orders --poll-seconds 30" `
+    -Argument "$assistantArgument --database $databaseArgument monitor-orders --cancel-stale --poll-seconds 30" `
     -WorkingDirectory $resolvedRepository
 $watchdogAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
@@ -66,7 +66,7 @@ $watchdogAction = New-ScheduledTaskAction `
     -WorkingDirectory $resolvedRepository
 $observationAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
-    -Argument "$assistantArgument --database $databaseArgument paper-observation --alerts-jsonl $alertsArgument" `
+    -Argument "$assistantArgument --database $databaseArgument paper-observation --cancel-stale --alerts-jsonl $alertsArgument" `
     -WorkingDirectory $resolvedRepository
 
 $cycleTrigger = New-ScheduledTaskTrigger `

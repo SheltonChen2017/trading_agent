@@ -27,10 +27,15 @@ def test_top_level_help_renders_without_percent_format_errors():
     help_text = build_parser().format_help()
     assert "falls 10%" in help_text
     assert "monitor-orders" in help_text
+    assert "cancel-order" in help_text
+    assert "cancel-all-orders" in help_text
     assert "readiness" in help_text
     assert "ledger-reconcile" in help_text
+    assert "ledger-bind-account" in help_text
     assert "ledger-dividend" in help_text
     assert "ledger-split" in help_text
+    assert "ledger-transfer" in help_text
+    assert "ledger-fee" in help_text
     assert "operations-check" in help_text
     assert "operations-cycle" in help_text
     assert "paper-epoch-start" in help_text
@@ -81,6 +86,12 @@ def test_production_foundation_commands_parse():
         == "bootstrap"
     )
     assert build_parser().parse_args(["ledger-reconcile"]).no_sync is False
+    assert (
+        build_parser().parse_args(
+            ["ledger-bind-account", "--confirm", "bind account"]
+        ).confirm
+        == "bind account"
+    )
     dividend = build_parser().parse_args(
         [
             "ledger-dividend",
@@ -113,6 +124,48 @@ def test_production_foundation_commands_parse():
         ]
     )
     assert split.ratio == "4"
+    transfer = build_parser().parse_args(
+        [
+            "ledger-transfer",
+            "--external-id",
+            "deposit-1",
+            "--amount",
+            "1000.00",
+            "--occurred-at",
+            "2026-08-01T14:00:00+00:00",
+            "--description",
+            "Broker cash deposit",
+        ]
+    )
+    assert transfer.amount == "1000.00"
+    fee = build_parser().parse_args(
+        [
+            "ledger-fee",
+            "--external-id",
+            "reg-fee-1",
+            "--amount",
+            "0.03",
+            "--occurred-at",
+            "2026-08-01T14:00:00+00:00",
+            "--description",
+            "Regulatory fee",
+        ]
+    )
+    assert fee.amount == "0.03"
+    cancel = build_parser().parse_args(
+        ["cancel-order", "tp-1", "--confirm", "cancel"]
+    )
+    assert cancel.proposal_id == "tp-1"
+    cancel_all = build_parser().parse_args(
+        [
+            "cancel-all-orders",
+            "--confirm",
+            "cancel all open orders",
+            "--reason",
+            "operator drill",
+        ]
+    )
+    assert cancel_all.reason == "operator drill"
     promotion = build_parser().parse_args(
         ["promotion-status", "report.json", "--evidence-epoch", "paper-v1"]
     )
@@ -150,6 +203,12 @@ def test_active_epoch_rejects_changed_runtime_lineage(tmp_path, monkeypatch):
         personal_assistant_cli,
         "_current_commit",
         lambda *, require_clean: "a" * 40,
+    )
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "get_account",
+        lambda: {"paper": True, "account_id": "paper-account-1"},
     )
     personal_assistant_cli.command_paper_epoch_start(args, store)
     monkeypatch.setattr(

@@ -33,7 +33,10 @@ approval.
 - [ ] A backup has been restored and its SQLite integrity verified.
 - [ ] Alert delivery and operator escalation have been exercised.
 - [ ] Every paper observation belongs to one immutable evidence epoch whose
-      Git, mandate, policy, strategy and model lineage remains consistent.
+      Git, mandate, policy, strategy, model, and Alpaca account lineage
+      remains consistent.
+- [ ] The journal bootstrap, latest reconciliation, active evidence epoch,
+      and every paper observation identify the same Alpaca paper account.
 - [ ] Every NYSE session between the first and latest paper observations is
       present; cash transfers are excluded from investment returns.
 - [ ] A tiny-capital canary plan defines capital, order and daily-loss caps.

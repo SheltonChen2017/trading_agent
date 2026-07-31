@@ -4,6 +4,24 @@
 alongside this document. Nothing in `assistant/`, `risk/`, or `execution/`
 changes until this design is accepted.
 
+> **Relationship to the shipped committee (added 2026-07-30).** A different,
+> narrower surface shipped since this was written: `assistant/llm/`, governed
+> by `docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md`. It is **one** reviewer
+> examining **one** deterministically-generated risk-reducing candidate, and
+> it does have a `verdict` field. That does not contradict §6/§7 below. The
+> "no verdict field" constraint here is about refusing to *adjudicate between
+> two model-generated positions* — the synthesis step that would turn a
+> debate into a recommendation. The committee has no second position to
+> adjudicate against; its verdict is bounded by deterministic checks (a
+> supportive verdict requires a counterargument, an invalidation condition,
+> and production-authoritative sources) and is advisory to a human approval
+> that is still mandatory.
+>
+> The multi-position debate described below remains **unbuilt**. If it is
+> built, §7's non-goals still apply to it, and the ADR's measured limitation
+> on action-language filtering applies with more force, since N positions
+> means N times the free prose to filter.
+
 ## 1. Why this document exists
 
 Asked on 2026-07-30 whether the app has AI debate functionality. It does

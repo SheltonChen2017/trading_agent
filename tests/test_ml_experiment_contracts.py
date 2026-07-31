@@ -86,10 +86,23 @@ def _confirmation_spec(**overrides) -> ExperimentSpec:
 
 
 def test_spec_round_trips_and_hash_is_stable():
-    first, second = _spec(), _spec()
+    first = _spec()
+    second = ExperimentSpec.from_dict(first.to_dict())
     assert first.to_dict() == second.to_dict()
     assert first.spec_hash == second.spec_hash
     assert len(first.spec_hash) == 64
+
+
+def test_spec_loader_rejects_unknown_and_missing_fields():
+    unknown = _spec().to_dict()
+    unknown["future_schema_field"] = True
+    with pytest.raises(ExperimentContractError, match="unknown fields"):
+        ExperimentSpec.from_dict(unknown)
+
+    missing = _spec().to_dict()
+    del missing["task"]
+    with pytest.raises(ExperimentContractError, match="missing required field"):
+        ExperimentSpec.from_dict(missing)
 
 
 def test_spec_is_json_serializable():
@@ -159,7 +172,7 @@ def test_frozen_nested_mapping_rejects_direct_mutation():
 
 def test_research_look_dimension_lists_are_frozen():
     dimensions = {"models": ["a", "b"], "horizons": ["20"]}
-    spec = _spec(research_look_dimensions=dimensions)
+    spec = _spec(candidate_models=("a", "b"), research_look_dimensions=dimensions)
     dimensions["models"].append("c")
     assert spec.total_research_looks() == 2
 
@@ -169,6 +182,7 @@ def test_research_look_dimension_lists_are_frozen():
 
 def test_research_looks_derive_from_the_variants_present_in_the_spec():
     spec = _spec(
+        candidate_models=("a", "b", "c"),
         research_look_dimensions={
             "models": ["a", "b", "c"],
             "benchmarks": ["QQQ", "SOXX"],
@@ -176,6 +190,14 @@ def test_research_looks_derive_from_the_variants_present_in_the_spec():
         }
     )
     assert spec.total_research_looks() == 12
+
+
+def test_research_dimensions_cannot_understate_candidate_model_variants():
+    with pytest.raises(ExperimentContractError, match="complete candidate_models"):
+        _spec(
+            candidate_models=("a", "b", "c"),
+            research_look_dimensions={"models": ["a", "b"], "horizons": ["20"]},
+        )
 
 
 def test_adding_a_variant_increases_the_look_count_automatically():
@@ -270,6 +292,12 @@ def test_non_positive_horizon_is_refused():
         _spec(horizon_sessions=0)
 
 
+def test_negative_or_boolean_random_seed_is_refused():
+    for bad_seed in (-1, True):
+        with pytest.raises(ExperimentContractError, match="random_seed"):
+            _spec(random_seed=bad_seed)
+
+
 def test_empty_research_look_dimensions_are_refused():
     with pytest.raises(ExperimentContractError, match="non-empty mapping"):
         _spec(research_look_dimensions={})
@@ -287,6 +315,9 @@ def test_empty_research_look_dimensions_are_refused():
         {"authorization": "granted"},
         {"nested": {"quantity": 10}},
         {"PRODUCTION": True},  # case-insensitive
+        {"targetWeight": 0.2},  # alternate spelling must not bypass the boundary
+        {"portfolioTargetWeight": 0.2},
+        {"trade-side": "buy"},
     ],
 )
 def test_execution_shaped_fields_cannot_enter_a_spec(assumptions):
@@ -369,9 +400,24 @@ def test_run_record_round_trips_and_is_never_authoritative():
     payload = record.to_dict()
     assert payload["production_authoritative"] is False
     assert len(record.run_hash) == 64
+    restored = ExperimentRunRecord.from_dict(payload)
+    assert restored.to_dict() == payload
+    assert restored.run_hash == record.run_hash
     import json
 
     json.dumps(payload)
+
+
+def test_run_record_loader_rejects_authority_and_unknown_fields():
+    authoritative = _run_record().to_dict()
+    authoritative["production_authoritative"] = True
+    with pytest.raises(ExperimentContractError, match="must be false"):
+        ExperimentRunRecord.from_dict(authoritative)
+
+    unknown = _run_record().to_dict()
+    unknown["approved"] = True
+    with pytest.raises(ExperimentContractError, match="unknown fields"):
+        ExperimentRunRecord.from_dict(unknown)
 
 
 def test_run_record_rejects_a_promoted_verdict():

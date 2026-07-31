@@ -89,6 +89,7 @@ def feature_health_report(predictions: Sequence[Mapping[str, Any]]) -> dict[str,
     missing_total = 0
     stale_total = 0
     maximum_ages: list[int] = []
+    valid = 0
     invalid = 0
     future_dated = 0
     for prediction in predictions:
@@ -117,6 +118,7 @@ def feature_health_report(predictions: Sequence[Mapping[str, Any]]) -> dict[str,
             missing_total += int(freshness["missing_count"])
             stale_total += int(freshness["stale_count"])
             maximum_ages.append(int(freshness["maximum_age_sessions"]))
+            valid += 1
             continue
 
         # Canonical PredictionRecord also permits per-feature availability
@@ -127,39 +129,53 @@ def feature_health_report(predictions: Sequence[Mapping[str, Any]]) -> dict[str,
         try:
             as_of = date.fromisoformat(str(prediction.get("as_of_session")))
         except ValueError:
-            as_of = None
+            invalid += 1
+            continue
         ages: list[int] = []
         has_future_dated_feature = False
-        if as_of is not None:
-            for value in freshness.values():
-                if not isinstance(value, str):
-                    continue
+        has_malformed_feature_date = False
+        for value in freshness.values():
+            if value is None:
+                continue
+            if not isinstance(value, str):
+                has_malformed_feature_date = True
+                continue
+            try:
+                # A date-only value is unambiguous and is the canonical
+                # PredictionRecord shape used by current producers.
+                available_date = date.fromisoformat(value)
+            except ValueError:
                 try:
-                    available_date = datetime.fromisoformat(
-                        value.replace("Z", "+00:00")
-                    ).date()
+                    available_at = datetime.fromisoformat(value.replace("Z", "+00:00"))
                 except ValueError:
-                    try:
-                        available_date = date.fromisoformat(value)
-                    except ValueError:
-                        continue
-                if available_date > as_of:
-                    # Leakage: this feature claims it was not knowable until
-                    # after the session it was used to predict. Flag the
-                    # PREDICTION once (below) and contribute no age -- an
-                    # age here would be negative, and clamping it to 0 is
-                    # what previously disguised leakage as freshness.
-                    has_future_dated_feature = True
+                    has_malformed_feature_date = True
                     continue
-                ages.append((as_of - available_date).days)
+                if available_at.tzinfo is None or available_at.utcoffset() is None:
+                    has_malformed_feature_date = True
+                    continue
+                available_date = available_at.astimezone(_EASTERN).date()
+            if available_date > as_of:
+                # Leakage: this feature claims it was not knowable until
+                # after the session it was used to predict. Flag the
+                # PREDICTION once (below) and contribute no age -- an
+                # age here would be negative, and clamping it to 0 is
+                # what previously disguised leakage as freshness.
+                has_future_dated_feature = True
+                continue
+            ages.append((as_of - available_date).days)
         if has_future_dated_feature:
             future_dated += 1
             invalid += 1
             continue
-        maximum_ages.append(max(ages) if ages else 0)
+        if has_malformed_feature_date:
+            invalid += 1
+            continue
+        valid += 1
+        if ages:
+            maximum_ages.append(max(ages))
     return {
         "prediction_count": len(predictions),
-        "valid_freshness_count": len(maximum_ages),
+        "valid_freshness_count": valid,
         "invalid_or_missing_freshness_count": invalid,
         "future_dated_feature_prediction_count": future_dated,
         "missing_feature_count": missing_total,

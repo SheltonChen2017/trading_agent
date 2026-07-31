@@ -376,6 +376,37 @@ def test_feature_health_age_is_measured_from_the_prediction_session():
     assert report["future_dated_feature_prediction_count"] == 0
 
 
+@pytest.mark.parametrize(
+    "prediction",
+    [
+        {"feature_freshness": {"a": "2026-07-29"}},
+        {"as_of_session": "not-a-date", "feature_freshness": {"a": "2026-07-29"}},
+        {"as_of_session": "2026-07-31", "feature_freshness": {"a": "not-a-date"}},
+        {"as_of_session": "2026-07-31", "feature_freshness": {"a": 123}},
+    ],
+)
+def test_feature_health_does_not_launder_malformed_dates_into_age_zero(prediction):
+    report = feature_health_report([prediction])
+    assert report["valid_freshness_count"] == 0
+    assert report["invalid_or_missing_freshness_count"] == 1
+    assert report["maximum_age_sessions"] is None
+
+
+def test_feature_health_normalizes_aware_timestamps_to_the_market_timezone():
+    report = feature_health_report(
+        [
+            {
+                "as_of_session": "2026-07-31",
+                # August 1 in this offset is still July 31 in New York.
+                "feature_freshness": {"a": "2026-08-01T01:00:00+02:00"},
+            }
+        ]
+    )
+    assert report["valid_freshness_count"] == 1
+    assert report["future_dated_feature_prediction_count"] == 0
+    assert report["maximum_age_sessions"] == 0
+
+
 def test_distribution_drift_flags_a_real_shift_and_not_a_stable_one():
     rng = np.random.default_rng(0)
     reference = rng.normal(0, 1, 500)

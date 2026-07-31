@@ -65,6 +65,29 @@ def test_mandate_metric_scorecard_fails_closed_on_missing_metric():
     assert upside["available"] is False
 
 
+def test_mandate_metric_scorecard_rejects_a_stray_boolean_metric():
+    # Independent review, 2026-07-31 (P2 #5): float(actual) alone doesn't
+    # exclude bool before casting -- isinstance(True, int) is True, so
+    # float(True) == 1.0 would silently coerce instead of being rejected.
+    mandate = load_mandate()
+    result = evaluate_mandate_metrics(
+        mandate,
+        {
+            "annualized_volatility_pct": 15,
+            "max_drawdown_pct": True,  # stray boolean, not a real metric
+            "max_time_under_water_sessions": 100,
+            "downside_capture_pct": 60,
+            "upside_capture_pct": 90,
+        },
+    )
+    drawdown = next(
+        check for check in result["checks"] if check["name"] == "max_drawdown_pct"
+    )
+    assert drawdown["available"] is False
+    assert drawdown["actual"] is None
+    assert drawdown["passed"] is False
+
+
 def test_proposed_mandate_can_never_pass_live_promotion():
     result = evaluate_live_promotion(
         load_mandate(),

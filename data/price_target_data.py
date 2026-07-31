@@ -24,16 +24,25 @@ from __future__ import annotations
 import pandas as pd
 
 from config import ANALYST_TARGET_MIN_ANALYSTS, ANALYST_TARGET_METHOD, ANALYST_TARGET_STALENESS_DAYS
+from data.earnings_data import MARKET_CLOSE_HOUR
 
 
 def fetch_price_target_history(tickers: list[str]) -> dict[str, pd.DataFrame]:
     """
     Fetch each ticker's full analyst price-target history via yfinance,
-    one row per (ticker, GradeDate, Firm) with a real currentPriceTarget
-    (rows with a missing/zero target are dropped — yfinance uses 0.0 for
-    actions that didn't include a price target, e.g. some "Maintains"/
-    "Announces" entries). Returns a dict mapping ticker -> DataFrame
-    indexed by GradeDate with columns [firm, price_target].
+    one row per (ticker, effective_date, Firm) with a real
+    currentPriceTarget (rows with a missing/zero target are dropped —
+    yfinance uses 0.0 for actions that didn't include a price target, e.g.
+    some "Maintains"/"Announces" entries). Returns a dict mapping ticker ->
+    DataFrame indexed by `effective_date` with columns [firm, price_target].
+
+    `effective_date` applies the same after-close correction as
+    data/analyst_data.py and data/earnings_data.py to this same
+    `upgrades_downgrades` field (GradeDate): an action at/after market
+    close is attributed to the next trading day, not the day it was
+    published, so compute_consensus_price_target()'s `as_of` comparisons
+    can't look ahead into a same-day target published after the close
+    (independent review, 2026-07-31).
     """
     import yfinance as yf  # imported lazily, same pattern as fetch_historical
 
@@ -46,6 +55,8 @@ def fetch_price_target_history(tickers: list[str]) -> dict[str, pd.DataFrame]:
             raw = raw.copy()
             if raw.index.tz is not None:
                 raw.index = raw.index.tz_localize(None)
+            after_close = raw.index.hour >= MARKET_CLOSE_HOUR
+            raw.index = raw.index.normalize() + pd.to_timedelta(after_close.astype(int), unit="D")
             valid = raw[raw["currentPriceTarget"] > 0][["Firm", "currentPriceTarget"]].copy()
             valid.columns = ["firm", "price_target"]
             data[ticker] = valid.sort_index()

@@ -158,7 +158,15 @@ def _metric_check(
             "target": target,
             "detail": "metric unavailable",
         }
+    # Independent review, 2026-07-31 (P2 #5): float(actual) alone doesn't
+    # exclude bool before casting, unlike every other numeric-validation
+    # path in this codebase (money.py, tax_lots.py, portfolio_ledger.py,
+    # allocation_proposals.py) -- isinstance(True, int) is True, so a stray
+    # boolean would otherwise silently coerce to 0.0/1.0 instead of being
+    # rejected as not-a-metric.
     try:
+        if isinstance(actual, bool):
+            raise TypeError(f"metric {name!r} must be a number, got bool {actual!r}")
         value = float(actual)
     except (TypeError, ValueError):
         value = math.nan

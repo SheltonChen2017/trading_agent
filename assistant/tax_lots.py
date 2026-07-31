@@ -44,6 +44,9 @@ from __future__ import annotations
 import dataclasses
 import math
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
+
+from assistant.money import to_decimal
 
 # Selection methods. "specific" requires the caller to name lot ids.
 FIFO = "fifo"          # oldest first -- the US default when you elect nothing
@@ -59,6 +62,17 @@ WASH_SALE_WINDOW_DAYS = 30
 
 class TaxLotError(ValueError):
     """Malformed fill data, or a sale that cannot be satisfied from open lots."""
+
+
+def _decimal_sum(values) -> float:
+    """Sum an iterable of money floats through Decimal, return a float.
+
+    Independent review, 2026-07-31 (P2 #4): summing many lots'/components'
+    dollar figures as plain binary floats can drift by float epsilon from
+    the ledger's exact Decimal figures. Only used at aggregation points --
+    single-operation per-lot arithmetic (one multiply/subtract) already has
+    negligible error and doesn't need this."""
+    return float(sum((to_decimal(v) for v in values), Decimal("0")))
 
 
 @dataclasses.dataclass(frozen=True)
@@ -189,7 +203,9 @@ class LotLedger:
         """The single number the portfolio snapshot shows, for comparison."""
         lots = self.open_for(ticker)
         shares = sum(lot.qty for lot in lots)
-        return (sum(lot.cost_basis for lot in lots) / shares) if shares else 0.0
+        if not shares:
+            return 0.0
+        return _decimal_sum(lot.cost_basis for lot in lots) / shares
 
     def realized_pnl(self, ticker: str | None = None, *, long_term: bool | None = None) -> float:
         rows = self.realized
@@ -197,7 +213,7 @@ class LotLedger:
             rows = tuple(r for r in rows if r.ticker == ticker.upper())
         if long_term is not None:
             rows = tuple(r for r in rows if r.long_term is long_term)
-        return sum(r.realized_pnl for r in rows)
+        return _decimal_sum(r.realized_pnl for r in rows)
 
 
 def is_long_term(acquired_at: datetime, sold_at: datetime) -> bool:
@@ -510,9 +526,13 @@ def compare_sale_bases(
             for lot, take in chosen
         ]
         result["methods"][method] = {
-            "realized_pnl": round(sum(c.realized_pnl for c in components), 2),
-            "short_term_pnl": round(sum(c.realized_pnl for c in components if not c.long_term), 2),
-            "long_term_pnl": round(sum(c.realized_pnl for c in components if c.long_term), 2),
+            "realized_pnl": round(_decimal_sum(c.realized_pnl for c in components), 2),
+            "short_term_pnl": round(
+                _decimal_sum(c.realized_pnl for c in components if not c.long_term), 2
+            ),
+            "long_term_pnl": round(
+                _decimal_sum(c.realized_pnl for c in components if c.long_term), 2
+            ),
             "lots": [
                 {"lot_id": c.lot_id, "qty": c.qty, "cost_per_share": c.cost_per_share,
                  "realized_pnl": round(c.realized_pnl, 2),

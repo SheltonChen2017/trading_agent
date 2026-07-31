@@ -327,7 +327,11 @@ def _validate_allocation_review(
     ticker, which only an observation's own `tickers` field can establish;
     (4) scopes an OBSERVATION's allowed percentages to ONLY the weights/
     volatilities of ITS OWN tickers, never every weight anywhere in the
-    cart; (5) treats volatility values as legitimate restatable numbers
+    cart -- and for a MULTI-ticker observation, further scopes to only
+    the ticker(s) the claim text itself names when it names any, so a
+    claim entirely about ticker A can't cite ticker B's real number just
+    because B is also in the observation's ticker list (independent
+    review, 2026-07-31); (5) treats volatility values as legitimate restatable numbers
     too, not just weights; (6) caps string lengths; (7) drops exact-
     duplicate observations; (8) refuses to show a false "all clear" -- if
     the model proposed observations but every single one failed
@@ -364,8 +368,26 @@ def _validate_allocation_review(
         if not tickers or not all(isinstance(t, str) and t.upper() in cart_set for t in tickers):
             continue
         obs_tickers = tuple(t.upper() for t in tickers)
-        obs_allowed_numbers = [weights_pct[t] for t in obs_tickers if t in weights_pct] + [
-            volatilities[t] for t in obs_tickers if volatilities.get(t) is not None
+        # Independent review, 2026-07-31 (P2 #8): for a multi-ticker
+        # observation, this used to union every ticker's own numbers into
+        # one allowed set for the WHOLE claim -- so a claim entirely about
+        # ticker A could cite ticker B's real weight/volatility just
+        # because B was also in this observation's ticker list, with no
+        # check that the claim actually attributes the number to the
+        # RIGHT ticker. Scope the allowed numbers to only the ticker(s)
+        # the claim text itself names (the same ticker-token pattern
+        # _mentions_unknown_ticker uses below); fall back to the full
+        # observation ticker set only when the claim names none of them
+        # explicitly, so a legitimate ticker-less claim isn't newly
+        # over-rejected.
+        claim_named_tickers = {
+            match.group(0)
+            for match in _TICKER_TOKEN_PATTERN.finditer(claim)
+            if match.group(0) in obs_tickers
+        }
+        scoped_tickers = claim_named_tickers or set(obs_tickers)
+        obs_allowed_numbers = [weights_pct[t] for t in scoped_tickers if t in weights_pct] + [
+            volatilities[t] for t in scoped_tickers if volatilities.get(t) is not None
         ]
         if _contains_disallowed_number(claim, obs_allowed_numbers):
             continue

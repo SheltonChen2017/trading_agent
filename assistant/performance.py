@@ -48,6 +48,9 @@ from __future__ import annotations
 import dataclasses
 import math
 from datetime import datetime
+from decimal import Decimal
+
+from assistant.money import to_decimal
 
 DAYS_PER_YEAR = 365.25
 # Below this many days, an annualized figure is reported but flagged as not
@@ -58,6 +61,24 @@ MIN_DAYS_FOR_MEANINGFUL_ANNUALIZATION = 90
 
 class PerformanceError(ValueError):
     """Malformed observations or cash flows."""
+
+
+def _decimal_sum(values) -> float:
+    """Sum an iterable of money floats through Decimal, return a float.
+
+    Independent review, 2026-07-31 (P2 #4): used only at the MONEY
+    aggregation points (summing/accumulating cash-flow amounts) -- never
+    inside the IRR bisection or log-space annualization math below, which
+    is genuinely iterative floating-point numerical work (math.log,
+    math.exp) where Decimal doesn't apply and wouldn't add exactness."""
+    return float(sum((to_decimal(v) for v in values), Decimal("0")))
+
+
+def _decimal_accumulate(existing: float, amount) -> float:
+    """Add `amount` onto a running float total through Decimal (see
+    _decimal_sum) -- for dict-based running accumulators where the terms
+    arrive one at a time rather than as a single iterable."""
+    return float(to_decimal(existing) + to_decimal(amount))
 
 
 @dataclasses.dataclass(frozen=True)
@@ -279,15 +300,15 @@ def money_weighted_return(
         if at.tzinfo is None:
             raise PerformanceError(f"cash flow timestamps must be timezone-aware, got {at!r}")
 
-    invested = -sum(amount for _, amount in flows if amount < 0)
-    returned = sum(amount for _, amount in flows if amount > 0)
+    invested = -_decimal_sum(amount for _, amount in flows if amount < 0)
+    returned = _decimal_sum(amount for _, amount in flows if amount > 0)
     simple_pct = ((returned / invested) - 1.0) * 100.0 if invested else None
 
     # Same-timestamp flows have the same discount factor, so aggregate them.
     # Keeping zero-net timestamps preserves the requested measurement window.
     by_time: dict[datetime, float] = {}
     for at, amount in flows:
-        by_time[at] = by_time.get(at, 0.0) + amount
+        by_time[at] = _decimal_accumulate(by_time.get(at, 0.0), amount)
     ordered = sorted(by_time.items())
     start = ordered[0][0]
     days = _period_days(start, ordered[-1][0])
@@ -542,7 +563,7 @@ def position_performance(
             if abs(shares) <= 1e-9:
                 shares = 0.0
             cash = fill.qty * fill.price
-        cash_by_time[fill.at] = cash_by_time.get(fill.at, 0.0) + cash
+        cash_by_time[fill.at] = _decimal_accumulate(cash_by_time.get(fill.at, 0.0), cash)
 
     def _shares_held_at(at: datetime) -> float:
         held = 0.0
@@ -566,20 +587,20 @@ def position_performance(
             continue
         paid_at = distribution.paid_at or distribution.ex_at
         if paid_at > final_at:
-            pending_distribution_cash += cash_amount
+            pending_distribution_cash = _decimal_accumulate(pending_distribution_cash, cash_amount)
             continue
-        cash_by_time[paid_at] = cash_by_time.get(paid_at, 0.0) + cash_amount
-        gross_distribution_cash += cash_amount
+        cash_by_time[paid_at] = _decimal_accumulate(cash_by_time.get(paid_at, 0.0), cash_amount)
+        gross_distribution_cash = _decimal_accumulate(gross_distribution_cash, cash_amount)
         classification = distribution.tax_classification.lower()
-        classifications[classification] = (
-            classifications.get(classification, 0.0) + cash_amount
+        classifications[classification] = _decimal_accumulate(
+            classifications.get(classification, 0.0), cash_amount
         )
 
     # MWR: purchases are investments (negative), sales proceeds positive, and
     # the still-open shares are a positive terminal value. A zero terminal flow
     # preserves the same comparison horizon for a position closed earlier.
     terminal_value = shares * final_price
-    cash_by_time[final_at] = cash_by_time.get(final_at, 0.0) + terminal_value
+    cash_by_time[final_at] = _decimal_accumulate(cash_by_time.get(final_at, 0.0), terminal_value)
     cash_flows = sorted(cash_by_time.items())
     mwr = money_weighted_return(cash_flows)
 

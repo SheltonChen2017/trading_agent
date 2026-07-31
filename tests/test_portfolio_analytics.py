@@ -6,6 +6,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_portfolio_snapshot
 from assistant.portfolio_analytics import (
+    compute_portfolio_analytics,
     estimate_pending_buy_value_by_ticker,
     preview_trade_impact,
 )
@@ -60,6 +61,29 @@ def test_preview_trade_impact_ignores_pending_sell_orders():
     )
     impact = preview_trade_impact(snapshot, "AAPL", "buy", shares=2, reference_price=100.0)
     assert impact["pending_buy_value"] == 0.0
+
+
+def test_preview_trade_impact_invested_value_matches_compute_portfolio_analytics():
+    # Independent review, 2026-07-31 (P2 #3): preview_trade_impact() and
+    # compute_portfolio_analytics() used to compute "current invested
+    # value" via two different formulas -- total_equity - cash vs. a direct
+    # sum of position.market_value. Mathematically equal by the snapshot's
+    # own construction invariant, but two independently-rounded float paths
+    # with no enforced agreement (independent review: values chosen so the
+    # two formulas' raw floats actually differ by float epsilon, e.g.
+    # 2111.11 vs 2111.1099999999997). Now both use the same direct-sum
+    # formula, so a no-op preview (0 shares) must agree exactly with the
+    # ordinary briefing's invested percentage.
+    snapshot = build_portfolio_snapshot(
+        [
+            {"ticker": "AAPL", "shares": 1, "entry_price": 1111.11, "current_price": 1111.11},
+            {"ticker": "MSFT", "shares": 1, "entry_price": 1000.0, "current_price": 1000.0},
+        ],
+        cash=1234.56,
+    )
+    analytics = compute_portfolio_analytics(snapshot)
+    impact = preview_trade_impact(snapshot, "AAPL", "buy", shares=0, reference_price=1111.11)
+    assert impact["invested_pct_after"] == analytics["invested_pct"]
 
 
 def test_estimate_pending_buy_value_by_ticker_matches_allocation_proposals_reexport():

@@ -2374,19 +2374,41 @@ class AssistantStore:
         return batch
 
     def update_allocation_batch(self, batch_id: str, status: str | None = None, **updates: Any) -> dict[str, Any]:
-        batch = self.get_allocation_batch(batch_id)
-        if batch is None:
-            raise KeyError(f"Unknown batch_id: {batch_id}")
-        batch.update(updates)
-        if status is not None:
-            batch["status"] = status
+        # Independent review, 2026-07-31: this used to be a plain
+        # read-then-write with no BEGIN IMMEDIATE/conditional-UPDATE guard,
+        # unlike every other proposal-mutating method in this file. Two
+        # concurrent callers (e.g. two overlapping execute_allocation_batch()
+        # invocations for the same batch_id) could each read the batch, merge
+        # their own leg update on top, and write back -- last writer wins,
+        # silently discarding an earlier writer's correct leg result.
+        # Read-modify-write inside a single BEGIN IMMEDIATE transaction, same
+        # pattern as project_broker_order_event() above.
         now = datetime.now(timezone.utc).isoformat()
-        with self._connect() as connection:
+        connection = self._open_database(self.path)
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            row = connection.execute(
+                "SELECT payload_json, status FROM allocation_batches WHERE batch_id = ?",
+                (batch_id,),
+            ).fetchone()
+            if row is None:
+                raise KeyError(f"Unknown batch_id: {batch_id}")
+            batch = json.loads(row["payload_json"])
+            batch["status"] = row["status"]
+            batch.update(updates)
+            if status is not None:
+                batch["status"] = status
             connection.execute(
                 "UPDATE allocation_batches SET status = ?, payload_json = ?, updated_at = ? WHERE batch_id = ?",
                 (batch["status"], json.dumps(batch, sort_keys=True), now, batch_id),
             )
-        return batch
+            connection.commit()
+            return batch
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
 
     def recent_executed_intents(
         self,

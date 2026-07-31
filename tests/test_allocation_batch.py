@@ -6,6 +6,7 @@ action (GPT review, 2026-07-28).
 import dataclasses
 import sys
 import tempfile
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -112,6 +113,43 @@ def _mock_batch_execution(packet, quote_price=50.0, **kwargs):
         restore_exec()
 
     return captured, restore
+
+
+def test_concurrent_update_allocation_batch_calls_dont_lose_an_update():
+    # Independent review, 2026-07-31 (P2 #1): update_allocation_batch() used
+    # to be a plain read-then-write with no BEGIN IMMEDIATE/conditional-UPDATE
+    # guard, unlike every other proposal-mutating method in storage.py. Two
+    # concurrent callers could each read the row before either write landed,
+    # so whichever committed last would silently overwrite the other's field
+    # with a stale snapshot -- a lost update, compounding P1 #1's own
+    # concurrent-batch-execution trigger. Now wrapped in a single BEGIN
+    # IMMEDIATE transaction, so concurrent writers serialize instead of
+    # racing on a stale in-memory read.
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        batch_id = new_batch_id()
+        store.create_allocation_batch(batch_id, ["p1", "p2"], intended_total_notional=1000.0)
+
+        errors = []
+        barrier = threading.Barrier(8)
+
+        def _write(i):
+            barrier.wait()
+            try:
+                store.update_allocation_batch(batch_id, **{f"field_{i}": i})
+            except Exception as exc:  # pragma: no cover - surfaced via errors
+                errors.append(exc)
+
+        threads = [threading.Thread(target=_write, args=(i,)) for i in range(8)]
+        for t in threads:
+            t.start()
+        for t in threads:
+            t.join()
+
+        assert errors == []
+        final = store.get_allocation_batch(batch_id)
+        for i in range(8):
+            assert final[f"field_{i}"] == i
 
 
 def test_preflight_passes_when_every_leg_is_clean():

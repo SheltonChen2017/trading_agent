@@ -1320,7 +1320,18 @@ def execute_approved_paper_proposal(
         )
     except Exception as exc:
         message = f"Persistent daily execution budget blocked submission: {exc}"
-        store.update_proposal_status(proposal_id, BLOCKED, violations=[message])
+        # Independent review, 2026-07-31 (P2 #2): this used to write via
+        # plain update_proposal_status() instead of the file's own
+        # _transition_pre_broker_claim() fenced pattern -- inconsistent
+        # with this module's own stated invariant ("every later pre-broker
+        # transition must be conditional"). _ProposalClaimLostError is a
+        # ProposalExecutionError subclass, so a lost claim here propagates
+        # exactly like every other pre-broker failure path in this file.
+        _transition_pre_broker_claim(
+            store, proposal_id,
+            expected_status=SUBMITTING, new_status=BLOCKED,
+            violations=[message],
+        )
         raise ProposalExecutionError(message) from exc
 
     # Dispatch explicitly rather than "limit, else market". Two upstream
@@ -1344,7 +1355,13 @@ def execute_approved_paper_proposal(
             f"No broker submission path implements order_type={intent.order_type!r}; refusing to "
             "submit rather than silently downgrading it to a market order."
         )
-        store.update_proposal_status(proposal_id, BLOCKED, violations=[message])
+        # Independent review, 2026-07-31 (P2 #2): same fencing fix as the
+        # budget-reservation-failure branch above.
+        _transition_pre_broker_claim(
+            store, proposal_id,
+            expected_status=SUBMITTING, new_status=BLOCKED,
+            violations=[message],
+        )
         store.release_execution_reservation(proposal_id)
         raise ProposalExecutionError(message)
     try:

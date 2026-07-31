@@ -9,7 +9,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
 
-from data.price_target_data import compute_consensus_price_target
+from data.price_target_data import compute_consensus_price_target, fetch_price_target_history
 
 
 def _history(entries: list[tuple[str, str, float]]) -> pd.DataFrame:
@@ -87,6 +87,34 @@ def test_returns_none_below_min_analysts_threshold():
 
 def test_returns_none_on_empty_history():
     assert compute_consensus_price_target(pd.DataFrame(columns=["firm", "price_target"]), pd.Timestamp("2024-01-10")) is None
+
+
+def test_fetch_price_target_history_applies_after_close_effective_date(monkeypatch):
+    # Independent review, 2026-07-31 (P2 #6): this used to index by the raw
+    # GradeDate with no after-close correction, unlike data/analyst_data.py
+    # and data/earnings_data.py, which both apply one to this same
+    # upgrades_downgrades field. A grade published at/after MARKET_CLOSE_HOUR
+    # must be attributed to the NEXT trading day.
+    raw = pd.DataFrame(
+        {
+            "Firm": ["Before Close", "After Close"],
+            "currentPriceTarget": [100.0, 200.0],
+        },
+        index=pd.to_datetime(["2024-01-02 09:30", "2024-01-02 16:30"]),
+    )
+
+    class _FakeTicker:
+        def __init__(self, ticker):
+            self.ticker = ticker
+            self.upgrades_downgrades = raw
+
+    monkeypatch.setattr("yfinance.Ticker", _FakeTicker)
+    history = fetch_price_target_history(["AAPL"])["AAPL"]
+
+    before_close_row = history.loc[pd.Timestamp("2024-01-02")]
+    after_close_row = history.loc[pd.Timestamp("2024-01-03")]
+    assert before_close_row["price_target"] == 100.0
+    assert after_close_row["price_target"] == 200.0
 
 
 if __name__ == "__main__":

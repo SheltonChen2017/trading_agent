@@ -101,7 +101,16 @@ def preview_trade_impact(
     signed_value = trade_value if side == "buy" else -trade_value
     post_position_value = max(0.0, existing_value + signed_value)
     post_cash = snapshot.cash - signed_value
-    post_invested = (snapshot.total_equity - snapshot.cash) + signed_value
+    # Independent review, 2026-07-31 (P2 #3): this used to back out current
+    # invested value as (total_equity - cash) -- a different formula from
+    # compute_portfolio_analytics()'s direct sum(position.market_value).
+    # Both are mathematically equal by the snapshot's own construction
+    # invariant (see context_builder.py), but as two independently-rounded
+    # float computations they can drift by a cent of float epsilon. Reusing
+    # the exact same direct-sum formula here removes the drift instead of
+    # merely making it rare.
+    current_invested = sum(p.market_value for p in snapshot.positions)
+    post_invested = current_invested + signed_value
     total = snapshot.total_equity
     return {
         "trade_value": round(trade_value, 2),

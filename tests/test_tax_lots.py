@@ -25,6 +25,7 @@ from assistant.tax_lots import (
     Fill,
     Split,
     TaxLotError,
+    _decimal_sum,
     build_ledger,
     compare_sale_bases,
     is_long_term,
@@ -599,3 +600,12 @@ def test_sale_basis_comparison_requires_timezone_aware_sale_time():
             price=100,
             when=datetime(2026, 7, 30),
         )
+
+
+def test_decimal_sum_avoids_binary_float_accumulation_error():
+    # Independent review, 2026-07-31 (P2 #4): realized_pnl()/average_cost()
+    # used to sum many lots' dollar figures as plain binary floats, which
+    # can drift from the exact decimal total -- the textbook case:
+    # 0.1 + 0.1 + 0.1 != 0.3 in raw binary float.
+    assert 0.1 + 0.1 + 0.1 != 0.3  # the drift this helper avoids
+    assert _decimal_sum([0.1, 0.1, 0.1]) == 0.3

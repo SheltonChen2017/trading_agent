@@ -716,6 +716,13 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
             f"Position weight: {impact['position_weight_before_pct']:.1f}% -> "
             f"{impact['position_weight_after_pct']:.1f}%"
         )
+        if not impact.get("projection_complete", True):
+            unknown = ", ".join(impact.get("pending_buy_unknown_tickers", []))
+            st.warning(
+                "Pending buy value is unavailable"
+                + (f" for {unknown}" if unknown else "")
+                + "; actual cash may be lower and exposure may be higher."
+            )
         tax_advisory = impact.get("tax_lot_advisory", {})
         with st.expander("Tax-lot advisory (never blocks this sell)"):
             if tax_advisory.get("available"):

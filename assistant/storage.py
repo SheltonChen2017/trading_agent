@@ -2373,7 +2373,14 @@ class AssistantStore:
         batch["status"] = row["status"]
         return batch
 
-    def update_allocation_batch(self, batch_id: str, status: str | None = None, **updates: Any) -> dict[str, Any]:
+    def update_allocation_batch(
+        self,
+        batch_id: str,
+        status: str | None = None,
+        *,
+        expected_legs: dict[str, dict] | None = None,
+        **updates: Any,
+    ) -> dict[str, Any]:
         # Independent review, 2026-07-31: this used to be a plain
         # read-then-write with no BEGIN IMMEDIATE/conditional-UPDATE guard,
         # unlike every other proposal-mutating method in this file. Two
@@ -2395,9 +2402,58 @@ class AssistantStore:
                 raise KeyError(f"Unknown batch_id: {batch_id}")
             batch = json.loads(row["payload_json"])
             batch["status"] = row["status"]
+            # `legs` is a nested, independently-mutated projection.  Merely
+            # serializing this read/modify/write is not sufficient if a caller
+            # carries a stale whole-batch snapshot: replacing the mapping can
+            # still discard another worker's already-committed leg.  Treat
+            # supplied legs as a per-proposal patch and merge them into the
+            # freshly-read row while the write lock is held.
+            incoming_legs = updates.pop("legs", None)
+            if incoming_legs is not None:
+                if not isinstance(incoming_legs, dict):
+                    raise TypeError("allocation batch legs must be a mapping")
+                current_legs = dict(batch.get("legs") or {})
+                if expected_legs is not None and any(
+                    current_legs.get(str(proposal_id)) != expected_leg
+                    for proposal_id, expected_leg in expected_legs.items()
+                ):
+                    # A same-leg writer committed after the caller took its
+                    # snapshot. Return the fresh row without applying the
+                    # stale patch; the caller can re-project from the
+                    # authoritative proposal and retry.
+                    connection.rollback()
+                    return batch
+                merged_legs = current_legs
+                merged_legs.update(
+                    {
+                        str(proposal_id): dict(leg)
+                        for proposal_id, leg in incoming_legs.items()
+                    }
+                )
+                batch["legs"] = merged_legs
             batch.update(updates)
             if status is not None:
                 batch["status"] = status
+            if incoming_legs is not None or status is not None:
+                # Keep the materialized batch status consistent with the
+                # freshly locked leg mapping. This also prevents a worker
+                # that calculated `completed` from a stale pre-lock snapshot
+                # from publishing that status over a newly-unknown leg.
+                leg_states = {
+                    str(leg.get("state"))
+                    for leg in (batch.get("legs") or {}).values()
+                }
+                terminal_states = {
+                    "submitted",
+                    "failed",
+                    "blocked_overridable",
+                }
+                if "unknown" in leg_states:
+                    batch["status"] = "stopped_unknown"
+                elif leg_states and leg_states <= terminal_states:
+                    batch["status"] = "completed"
+                elif batch["status"] in {"completed", "stopped_unknown"}:
+                    batch["status"] = "stopped"
             connection.execute(
                 "UPDATE allocation_batches SET status = ?, payload_json = ?, updated_at = ? WHERE batch_id = ?",
                 (batch["status"], json.dumps(batch, sort_keys=True), now, batch_id),

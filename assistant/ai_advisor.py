@@ -276,6 +276,61 @@ def _contains_disallowed_number(text: str, allowed_values_pct: list[float]) -> b
     return False
 
 
+def _contains_misattributed_multi_ticker_number(
+    text: str,
+    tickers: set[str],
+    weights_pct: dict[str, float],
+    volatilities: dict[str, float | None],
+) -> bool:
+    """Reject percentages attached to the wrong ticker in a multi-name claim.
+
+    A union of all named tickers' legitimate values proves that a number is
+    real, but not that it is attributed to the right security.  Associate
+    each percentage with the nearest explicit ticker token and fail closed on
+    ties/ambiguity.  The ordinary generated form ("NVDA is 60% while AMD is
+    40%") remains supported; constructions whose attribution cannot be
+    established locally should be split into separate observations.
+    """
+    ticker_matches = [
+        match
+        for match in _TICKER_TOKEN_PATTERN.finditer(text)
+        if match.group(0) in tickers
+    ]
+    if len({match.group(0) for match in ticker_matches}) < 2:
+        return False
+    for number_match in _PERCENT_PATTERN.finditer(text):
+        distances: dict[str, int] = {}
+        for ticker_match in ticker_matches:
+            if ticker_match.end() <= number_match.start():
+                distance = number_match.start() - ticker_match.end()
+            elif number_match.end() <= ticker_match.start():
+                distance = ticker_match.start() - number_match.end()
+            else:
+                distance = 0
+            ticker = ticker_match.group(0)
+            distances[ticker] = min(distances.get(ticker, distance), distance)
+        nearest_distance = min(distances.values())
+        nearest = [
+            ticker
+            for ticker, distance in distances.items()
+            if distance == nearest_distance
+        ]
+        if len(nearest) != 1:
+            return True
+        ticker = nearest[0]
+        allowed = [weights_pct[ticker]] if ticker in weights_pct else []
+        volatility = volatilities.get(ticker)
+        if volatility is not None:
+            allowed.append(volatility)
+        value = float(number_match.group(1))
+        if not any(
+            abs(value - candidate) <= _NUMBER_TOLERANCE_PCT
+            for candidate in allowed
+        ):
+            return True
+    return False
+
+
 def _mentions_unknown_ticker(text: str, allowed_tickers: set[str]) -> bool:
     """Flags ANY ticker-shaped token (1-5 uppercase letters) that is NOT in
     `allowed_tickers`, except the small _SAFE_ACRONYMS allowlist -- e.g.
@@ -390,6 +445,13 @@ def _validate_allocation_review(
             volatilities[t] for t in scoped_tickers if volatilities.get(t) is not None
         ]
         if _contains_disallowed_number(claim, obs_allowed_numbers):
+            continue
+        if _contains_misattributed_multi_ticker_number(
+            claim,
+            set(obs_tickers),
+            weights_pct,
+            volatilities,
+        ):
             continue
         if _mentions_unknown_ticker(claim, set(obs_tickers)):
             continue

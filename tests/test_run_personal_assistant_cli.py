@@ -11,6 +11,7 @@ Run with: python -m pytest tests/test_run_personal_assistant_cli.py
 """
 import sys
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -219,6 +220,98 @@ def test_active_epoch_rejects_changed_runtime_lineage(tmp_path, monkeypatch):
 
     with pytest.raises(SystemExit, match="differs from the current runtime"):
         personal_assistant_cli._active_runtime_lineage(store, args)
+
+
+def test_ledger_split_reconciles_broker_and_syncs_fills_before_mutation(
+    monkeypatch,
+):
+    calls = []
+    args = SimpleNamespace(
+        policy="policy.json",
+        external_id="split-1",
+        ticker="AAPL",
+        ratio="4",
+        occurred_at="2026-07-31T13:30:00+00:00",
+    )
+    store = object()
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "load_policy",
+        lambda path: SimpleNamespace(max_order_age_minutes=30.0),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "reconcile_nonterminal_orders",
+        lambda actual_store, **kwargs: (
+            calls.append(("orders", actual_store)),
+            {"checked": 0},
+        )[1],
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_app_fills",
+        lambda actual_store: (
+            calls.append(("fills", actual_store)),
+            {"inserted": 0},
+        )[1],
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "record_split",
+        lambda actual_store, **kwargs: (
+            calls.append(("split", actual_store)),
+            True,
+        )[1],
+    )
+
+    personal_assistant_cli.command_ledger_split(args, store)
+
+    assert calls == [
+        ("orders", store),
+        ("fills", store),
+        ("split", store),
+    ]
+
+
+def test_ledger_split_refuses_incomplete_broker_reconciliation(monkeypatch):
+    calls = []
+    args = SimpleNamespace(
+        policy="policy.json",
+        external_id="split-1",
+        ticker="AAPL",
+        ratio="4",
+        occurred_at="2026-07-31T13:30:00+00:00",
+    )
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "load_policy",
+        lambda path: SimpleNamespace(max_order_age_minutes=30.0),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "reconcile_nonterminal_orders",
+        lambda store, **kwargs: {
+            "errors": ["broker lookup timed out"],
+            "skipped_too_recent": 0,
+        },
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_app_fills",
+        lambda store: calls.append("fills"),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "record_split",
+        lambda store, **kwargs: calls.append("split"),
+    )
+
+    with pytest.raises(SystemExit, match="reconciliation was incomplete"):
+        personal_assistant_cli.command_ledger_split(args, object())
+
+    assert calls == []
 
 
 # --- _print_briefing() user-facing evidence display (GPT review,

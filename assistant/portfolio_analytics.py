@@ -95,12 +95,15 @@ def preview_trade_impact(
     # exceeding a cap. Folding the same same-ticker pending value in here
     # makes this per-proposal preview match what the execution gate (and
     # allocation_proposals.py's own build_allocation_plan()) actually see.
-    pending_buy_value_by_ticker, _ = estimate_pending_buy_value_by_ticker(snapshot.open_orders)
+    pending_buy_value_by_ticker, pending_unknown_tickers = (
+        estimate_pending_buy_value_by_ticker(snapshot.open_orders)
+    )
     pending_value = pending_buy_value_by_ticker.get(ticker_upper, 0.0)
+    total_pending_value = sum(pending_buy_value_by_ticker.values())
     existing_value = held_value + pending_value
     signed_value = trade_value if side == "buy" else -trade_value
     post_position_value = max(0.0, existing_value + signed_value)
-    post_cash = snapshot.cash - signed_value
+    post_cash = snapshot.cash - total_pending_value - signed_value
     # Independent review, 2026-07-31 (P2 #3): this used to back out current
     # invested value as (total_equity - cash) -- a different formula from
     # compute_portfolio_analytics()'s direct sum(position.market_value).
@@ -110,7 +113,7 @@ def preview_trade_impact(
     # the exact same direct-sum formula here removes the drift instead of
     # merely making it rare.
     current_invested = sum(p.market_value for p in snapshot.positions)
-    post_invested = current_invested + signed_value
+    post_invested = current_invested + total_pending_value + signed_value
     total = snapshot.total_equity
     return {
         "trade_value": round(trade_value, 2),
@@ -120,4 +123,7 @@ def preview_trade_impact(
         "cash_after": round(post_cash, 2),
         "invested_pct_after": round(post_invested / total * 100, 2) if total else 0.0,
         "pending_buy_value": round(pending_value, 2),
+        "pending_buy_total_value": round(total_pending_value, 2),
+        "pending_buy_unknown_tickers": sorted(pending_unknown_tickers),
+        "projection_complete": not pending_unknown_tickers,
     }

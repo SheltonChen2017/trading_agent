@@ -65,11 +65,32 @@ def coverage_report(predictions: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
 
 
 def feature_health_report(predictions: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
-    """Aggregate freshness metadata recorded with every shadow attempt."""
+    """Aggregate freshness metadata recorded with every shadow attempt.
+
+    Counter semantics, fixed after an independent review found three
+    overlapping defects (2026-07-31):
+
+      * every count below is PER PREDICTION, never per feature. An earlier
+        version incremented the invalid counter once per offending feature
+        while every other branch incremented it once per prediction, so a
+        single prediction with three bad features reported "3 invalid" out
+        of a prediction_count of 1;
+      * `valid_freshness_count` and `invalid_or_missing_freshness_count`
+        are mutually exclusive and sum to at most `prediction_count`. An
+        earlier version counted a prediction with a future-dated feature in
+        BOTH;
+      * a feature claiming availability AFTER the prediction's own
+        as_of_session is LOOK-AHEAD LEAKAGE and now gets its own dedicated
+        counter. Previously it was folded into the generic invalid count
+        and, worse, still contributed `age 0` to `maximum_age_sessions` --
+        rendering the most serious defect this function can observe
+        numerically identical to perfectly fresh data.
+    """
     missing_total = 0
     stale_total = 0
     maximum_ages: list[int] = []
     invalid = 0
+    future_dated = 0
     for prediction in predictions:
         freshness = prediction.get("feature_freshness")
         if freshness is None and isinstance(prediction.get("prediction"), Mapping):
@@ -108,6 +129,7 @@ def feature_health_report(predictions: Sequence[Mapping[str, Any]]) -> dict[str,
         except ValueError:
             as_of = None
         ages: list[int] = []
+        has_future_dated_feature = False
         if as_of is not None:
             for value in freshness.values():
                 if not isinstance(value, str):
@@ -122,14 +144,24 @@ def feature_health_report(predictions: Sequence[Mapping[str, Any]]) -> dict[str,
                     except ValueError:
                         continue
                 if available_date > as_of:
-                    invalid += 1
+                    # Leakage: this feature claims it was not knowable until
+                    # after the session it was used to predict. Flag the
+                    # PREDICTION once (below) and contribute no age -- an
+                    # age here would be negative, and clamping it to 0 is
+                    # what previously disguised leakage as freshness.
+                    has_future_dated_feature = True
                     continue
                 ages.append((as_of - available_date).days)
+        if has_future_dated_feature:
+            future_dated += 1
+            invalid += 1
+            continue
         maximum_ages.append(max(ages) if ages else 0)
     return {
         "prediction_count": len(predictions),
         "valid_freshness_count": len(maximum_ages),
         "invalid_or_missing_freshness_count": invalid,
+        "future_dated_feature_prediction_count": future_dated,
         "missing_feature_count": missing_total,
         "stale_feature_count": stale_total,
         "maximum_age_sessions": max(maximum_ages) if maximum_ages else None,

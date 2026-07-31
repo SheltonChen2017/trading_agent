@@ -317,6 +317,65 @@ def test_feature_health_reads_persisted_prediction_payloads():
     assert report["maximum_age_sessions"] == 3
 
 
+def test_feature_health_counters_are_per_prediction_not_per_feature():
+    """Independent review, 2026-07-31: the per-feature-date branch
+    incremented the invalid counter once per offending FEATURE while every
+    other branch incremented once per PREDICTION, so one bad prediction
+    could report an invalid count larger than prediction_count."""
+    predictions = [
+        {
+            "as_of_session": "2026-07-31",
+            "feature_freshness": {"a": "2026-08-05", "b": "2026-08-06", "c": "2026-08-07"},
+        }
+    ]
+    report = feature_health_report(predictions)
+    assert report["prediction_count"] == 1
+    assert report["invalid_or_missing_freshness_count"] == 1  # not 3
+
+
+def test_feature_health_valid_and_invalid_counts_partition_the_predictions():
+    """The two counters must be mutually exclusive: a prediction previously
+    counted as BOTH valid and invalid made the report self-contradictory."""
+    predictions = [
+        {"as_of_session": "2026-07-31", "feature_freshness": {"a": "2026-07-30"}},
+        {"as_of_session": "2026-07-31", "feature_freshness": {"a": "2026-08-05"}},
+        {"as_of_session": "2026-07-31", "feature_freshness": {}},
+    ]
+    report = feature_health_report(predictions)
+    assert (
+        report["valid_freshness_count"] + report["invalid_or_missing_freshness_count"]
+        == report["prediction_count"]
+    )
+
+
+def test_future_dated_feature_is_reported_as_leakage_not_as_fresh_data():
+    """The worst of the three defects: a feature claiming availability AFTER
+    the session it predicts is look-ahead leakage, but it contributed
+    `age 0` to maximum_age_sessions -- numerically identical to perfectly
+    fresh data, i.e. the most serious observable defect rendered invisible."""
+    leaky = feature_health_report(
+        [{"as_of_session": "2026-07-31", "feature_freshness": {"a": "2026-08-05"}}]
+    )
+    fresh = feature_health_report(
+        [{"as_of_session": "2026-07-31", "feature_freshness": {"a": "2026-07-31"}}]
+    )
+
+    assert leaky["future_dated_feature_prediction_count"] == 1
+    assert fresh["future_dated_feature_prediction_count"] == 0
+    # The leaky prediction must NOT be summarized as a fresh, age-0 observation.
+    assert leaky["maximum_age_sessions"] != 0
+    assert fresh["maximum_age_sessions"] == 0
+    assert not leaky["sufficient_sample"]
+
+
+def test_feature_health_age_is_measured_from_the_prediction_session():
+    report = feature_health_report(
+        [{"as_of_session": "2026-07-31", "feature_freshness": {"a": "2026-07-29"}}]
+    )
+    assert report["maximum_age_sessions"] == 2
+    assert report["future_dated_feature_prediction_count"] == 0
+
+
 def test_distribution_drift_flags_a_real_shift_and_not_a_stable_one():
     rng = np.random.default_rng(0)
     reference = rng.normal(0, 1, 500)

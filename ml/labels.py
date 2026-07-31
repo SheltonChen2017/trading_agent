@@ -21,13 +21,13 @@ compute_forward_excess_return_labels() requires `benchmark_open` and does
 not merely reuse `benchmark_close` at both ends. This is not a stylistic
 preference. The first version of this module used the benchmark's close on
 the entry session, so the ticker's return was measured open-to-close while
-the benchmark's was measured close-to-close; the benchmark's own overnight
-gap leaked into every excess return. Measured on real AAPL-vs-QQQ data
-(independent review, 2026-07-31, reproduced before this note was written):
-mean absolute label error 0.69pp, max 4.47pp, and the label's SIGN flipped
-on 22 of 279 rows. For a 20-session excess-return target whose plausible
-real edge is a fraction of a percentage point, that is not a rounding
-detail -- it silently corrupts every model trained on it.
+the benchmark's was measured close-to-close. That timing mismatch
+contaminates the target with the benchmark's overnight move and can change
+both the magnitude and sign of an excess-return label. It is target
+misalignment, not feature/look-ahead leakage. Any empirical estimate of its
+impact belongs in a reproducible research artifact that records the symbol,
+date range, retrieval time, provider, and adjustment settings rather than in
+this module-level contract.
 """
 from __future__ import annotations
 

@@ -31,8 +31,10 @@ import pytest
 
 from backtest.engine import (
     MIN_BLOCK_BOOTSTRAP_DATES,
+    bonferroni_threshold,
     bootstrap_daily_edge_significance_by_block,
     bootstrap_edge_significance_by_block,
+    recommended_n_bootstrap,
 )
 
 BOTH_VARIANTS = (
@@ -127,6 +129,89 @@ def test_false_positive_rate_on_pure_noise_is_near_nominal(fn):
         f"false-positive rate on pure noise is {rate:.0%} against a nominal 5% -- "
         "the block bootstrap has lost calibration"
     )
+
+
+def test_resample_count_keeps_the_p_floor_below_the_threshold():
+    """The percentile bootstrap cannot return a non-zero p below 2/n_bootstrap.
+
+    At the historical fixed 2000 that floor is 0.001, while Bonferroni pushes
+    the threshold down as a run widens -- 0.003125 at 16 cells left only three
+    distinct p-values underneath it, so "significant" became a rounding
+    artifact rather than a measurement. n_bootstrap now scales with n_tests.
+    """
+    for n_tests in (6, 16, 20, 32):
+        n_bootstrap = recommended_n_bootstrap(n_tests)
+        p_floor = 2 / n_bootstrap
+        threshold = bonferroni_threshold(n_tests)
+        assert p_floor * 10 <= threshold, (
+            f"n_tests={n_tests}: p-value floor {p_floor} leaves fewer than 10 "
+            f"resolvable steps below threshold {threshold}"
+        )
+
+
+def test_the_by_block_entry_point_actually_uses_the_scaled_count(monkeypatch):
+    """Pins the WIRING, not just the formula.
+
+    Added after a mutation survived: replacing the auto-default with a
+    hardcoded 2000 inside out_of_sample_significance_by_block() broke nothing,
+    because every other test here exercises recommended_n_bootstrap() in
+    isolation. A correct helper nobody calls is not a fix.
+    """
+    import backtest.engine as engine
+
+    seen: list[int] = []
+
+    def spy(edge_values, dates, block_length, n_bootstrap=2000, seed=0):
+        seen.append(n_bootstrap)
+        return {
+            "n": 10, "n_dates": 10, "block_length": block_length,
+            "mean": 0.0, "ci_low": -1.0, "ci_high": 1.0, "p_value": 0.5,
+            "refusal_reason": None,
+        }
+
+    monkeypatch.setattr(engine, "bootstrap_edge_significance_by_block", spy)
+    monkeypatch.setattr(engine, "bootstrap_daily_edge_significance_by_block", spy)
+
+    days = 400
+    returns = np.full(days, 0.0005)
+    volume = np.full(days, 1_000_000.0)
+    for idx in range(30, 350, 15):
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    frame = pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999,
+         "close": close, "volume": volume},
+        index=dates,
+    )
+
+    engine.out_of_sample_significance_by_block(
+        {"A": frame, "B": frame}, hold_days=5, slippage_pct=0.0, n_tests=16,
+    )
+
+    assert seen, "the bootstrap was never called -- test setup produced no signals"
+    expected = recommended_n_bootstrap(16)
+    assert expected > 2000, "guard the guard: n_tests=16 must scale above the floor"
+    assert set(seen) == {expected}, (
+        f"entry point passed {sorted(set(seen))} but n_tests=16 requires {expected}; "
+        "the scaled default is not wired through"
+    )
+
+
+def test_narrow_runs_are_not_made_slower():
+    """A single-signal run already resolved its threshold fine; scaling it up
+    would just cost runtime for no gain."""
+    assert recommended_n_bootstrap(2) == 2000
+
+
+def test_the_cap_binds_on_very_wide_runs_and_that_is_documented():
+    """Honest limit: past ~64 cells the runtime cap wins and resolution
+    degrades again. Pinned so it is a known tradeoff rather than a surprise --
+    a run that wide should reduce its cell count, not lean on the bootstrap.
+    """
+    assert recommended_n_bootstrap(200) == 20000
+    assert 2 / 20000 > bonferroni_threshold(200) / 10
 
 
 def test_min_dates_constant_is_not_quietly_lowered():

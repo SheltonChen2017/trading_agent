@@ -1046,6 +1046,41 @@ def bootstrap_edge_significance_by_date(
 # calibrated -- see _block_bootstrap_refusal() for the measurements.
 MIN_BLOCK_BOOTSTRAP_DATES = 50
 
+# How many distinct p-values must fit below the significance threshold before
+# a "p < threshold" verdict is a measurement rather than a rounding artifact.
+_MIN_RESOLVABLE_STEPS_BELOW_THRESHOLD = 10
+
+
+def recommended_n_bootstrap(
+    n_tests: int, alpha: float = 0.05, floor: int = 2000, cap: int = 20000
+) -> int:
+    """Resamples needed for the p-value to actually resolve `threshold`.
+
+    The percentile bootstrap's p-value is ``2 * min(tail fractions)``, so the
+    smallest non-zero value it can EVER return is ``2 / n_bootstrap`` -- 0.001
+    at the long-standing default of 2000. Meanwhile Bonferroni pushes the
+    threshold down as the run widens: 16 cells gives 0.003125, so only three
+    distinct p-values (0.0, 0.001, 0.002) exist below the bar and "significant"
+    becomes a near-binary artifact of resampling granularity rather than a
+    measurement. At 32 cells the threshold (0.0016) sits nearly ON the floor.
+
+    Scales n_bootstrap so at least `_MIN_RESOLVABLE_STEPS_BELOW_THRESHOLD`
+    distinct values fit underneath, never below `floor` (no run gets cheaper
+    than the historical default) and never above `cap` (bounded runtime).
+
+    Noted while calibrating the block bootstrap, 2026-07-30: this is a
+    resolution limit, not the calibration defect fixed alongside it, and it
+    bites hardest in exactly the wide multi-signal scans where the correction
+    is strictest.
+    """
+    if n_tests < 1:
+        raise ValueError(f"n_tests must be >= 1, got {n_tests}")
+    threshold = bonferroni_threshold(n_tests, alpha=alpha)
+    if not math.isfinite(threshold) or threshold <= 0:
+        return floor
+    needed = int(math.ceil(2 * _MIN_RESOLVABLE_STEPS_BELOW_THRESHOLD / threshold))
+    return max(floor, min(cap, needed))
+
 
 def _min_detectable_effect_pct(ci_low, ci_high, threshold: float) -> float | None:
     """The smallest true edge this test could have called significant.
@@ -1514,7 +1549,7 @@ def out_of_sample_significance_by_block(
     scan_fn: Callable = scan_dips_and_ups,
     scan_kwargs: dict | None = None,
     block_lengths: tuple[int, ...] | None = None,
-    n_bootstrap: int = 2000,
+    n_bootstrap: int | None = None,
     n_tests: int = 2,
     entry_timing: str = "next_open",
 ) -> pd.DataFrame:
@@ -1577,6 +1612,13 @@ def out_of_sample_significance_by_block(
     primary_block_length = block_lengths[min(1, len(block_lengths) - 1)]  # 2x hold_days by default
 
     threshold = bonferroni_threshold(n_tests, alpha=0.05)
+    # Default the resample count to whatever actually RESOLVES this run's
+    # threshold, rather than a fixed 2000 whose p-value floor (2/2000 = 0.001)
+    # creeps up on the Bonferroni bar as the run widens -- see
+    # recommended_n_bootstrap(). An explicit n_bootstrap still wins, so
+    # existing callers and tests are unaffected.
+    if n_bootstrap is None:
+        n_bootstrap = recommended_n_bootstrap(n_tests)
 
     rows = []
     for period, subset in zip(OUT_OF_SAMPLE_PERIODS, (discovery, confirmation)):

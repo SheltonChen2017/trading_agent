@@ -13,6 +13,12 @@ from ml.artifacts import (
     save_model_manifest,
 )
 from ml.contracts import ModelManifest
+from ml.hashing import hash_bytes
+
+
+_HASH_A = "a" * 64
+_HASH_B = "b" * 64
+_HASH_C = "c" * 64
 
 
 def _manifest(**overrides) -> ModelManifest:
@@ -22,7 +28,7 @@ def _manifest(**overrides) -> ModelManifest:
         task="volatility_forecast",
         created_at="2026-07-31T00:00:00+00:00",
         dataset_id="ds-1",
-        dataset_hash="def456",
+        dataset_hash=_HASH_A,
         feature_set_version="fs-1",
         ordered_feature_names=("realized_vol_20d",),
         label_version="lv-1",
@@ -32,8 +38,8 @@ def _manifest(**overrides) -> ModelManifest:
         training_window={"start": "2020-01-01", "end": "2025-01-01"},
         validation_windows=({"start": "2025-01-01", "end": "2025-06-01"},),
         dependency_versions={"scikit-learn": "1.9.0"},
-        artifact_hash="placeholder",
-        evaluation_report_hash="reporthash",
+        artifact_hash=_HASH_B,
+        evaluation_report_hash=_HASH_C,
         evidence_status=EvidenceStatus.EXPLORATORY,
     )
     kwargs.update(overrides)
@@ -60,7 +66,7 @@ def test_save_model_artifact_is_atomic_no_partial_file_on_disk(tmp_path):
 
 def test_load_model_artifact_refuses_hash_mismatch(tmp_path):
     save_model_artifact({"weights": [1.0]}, directory=tmp_path, filename="model.joblib")
-    manifest = _manifest(artifact_hash="not-the-real-hash")
+    manifest = _manifest(artifact_hash="0" * 64)
 
     with pytest.raises(ArtifactError, match="hash mismatch"):
         load_model_artifact(manifest, directory=tmp_path, filename="model.joblib")
@@ -113,4 +119,51 @@ def test_load_model_manifest_refuses_model_version_mismatch(tmp_path):
             filename="manifest.json",
             model_id="model-1",
             model_version="9.9.9",
+        )
+
+
+def test_artifact_paths_cannot_escape_the_supplied_directory(tmp_path):
+    with pytest.raises(ArtifactError, match="plain relative file name"):
+        save_model_artifact({"a": 1}, directory=tmp_path, filename="../escape.joblib")
+    with pytest.raises(ArtifactError, match="plain relative file name"):
+        load_model_manifest(
+            directory=tmp_path,
+            filename="subdir\\manifest.json",
+            model_id="model-1",
+            model_version="0.1.0",
+        )
+
+
+def test_versioned_artifact_path_is_immutable(tmp_path):
+    save_model_artifact({"a": 1}, directory=tmp_path, filename="model.joblib")
+    with pytest.raises(ArtifactError, match="refusing to overwrite"):
+        save_model_artifact({"a": 2}, directory=tmp_path, filename="model.joblib")
+
+
+def test_idempotent_rewrite_of_identical_artifact_is_allowed(tmp_path):
+    first = save_model_artifact({"a": 1}, directory=tmp_path, filename="model.joblib")
+    second = save_model_artifact({"a": 1}, directory=tmp_path, filename="model.joblib")
+    assert first == second
+
+
+def test_load_manifest_can_verify_its_external_hash(tmp_path):
+    manifest = _manifest()
+    save_model_manifest(manifest, directory=tmp_path, filename="manifest.json")
+    expected = hash_bytes((tmp_path / "manifest.json").read_bytes())
+    restored = load_model_manifest(
+        directory=tmp_path,
+        filename="manifest.json",
+        model_id="model-1",
+        model_version="0.1.0",
+        expected_manifest_hash=expected,
+    )
+    assert restored == manifest
+
+    with pytest.raises(ArtifactError, match="manifest hash mismatch"):
+        load_model_manifest(
+            directory=tmp_path,
+            filename="manifest.json",
+            model_id="model-1",
+            model_version="0.1.0",
+            expected_manifest_hash="0" * 64,
         )

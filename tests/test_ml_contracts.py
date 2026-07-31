@@ -7,6 +7,7 @@ inputs; different hash for any behavior-relevant change.
 from __future__ import annotations
 
 import math
+from types import MappingProxyType
 
 import pytest
 
@@ -19,6 +20,12 @@ from ml.contracts import (
     require_matching_feature_order,
 )
 from ml.hashing import hash_payload
+
+
+_HASH_A = "a" * 64
+_HASH_B = "b" * 64
+_HASH_C = "c" * 64
+_HASH_D = "d" * 64
 
 
 def _dataset_manifest_kwargs(**overrides):
@@ -43,8 +50,8 @@ def _dataset_manifest_kwargs(**overrides):
         embargo_sessions=20,
         transaction_cost_bps=5.0,
         tax_assumptions="none",
-        input_hashes={"prices": "abc123"},
-        dataset_hash="def456",
+        input_hashes={"prices": _HASH_A},
+        dataset_hash=_HASH_B,
         git_commit="0123456789abcdef",
     )
     kwargs.update(overrides)
@@ -58,7 +65,7 @@ def _model_manifest_kwargs(**overrides):
         task="volatility_forecast",
         created_at="2026-07-31T00:00:00+00:00",
         dataset_id="ds-1",
-        dataset_hash="def456",
+        dataset_hash=_HASH_B,
         feature_set_version="fs-1",
         ordered_feature_names=("realized_vol_20d", "realized_vol_60d"),
         label_version="lv-1",
@@ -68,8 +75,8 @@ def _model_manifest_kwargs(**overrides):
         training_window={"start": "2020-01-01", "end": "2025-01-01"},
         validation_windows=({"start": "2025-01-01", "end": "2025-06-01"},),
         dependency_versions={"scikit-learn": "1.9.0"},
-        artifact_hash="artifacthash",
-        evaluation_report_hash="reporthash",
+        artifact_hash=_HASH_C,
+        evaluation_report_hash=_HASH_D,
         evidence_status=EvidenceStatus.EXPLORATORY,
     )
     kwargs.update(overrides)
@@ -81,8 +88,8 @@ def _prediction_kwargs(**overrides):
         prediction_id="pred-1",
         model_id="model-1",
         model_version="0.1.0",
-        artifact_hash="artifacthash",
-        dataset_or_feature_snapshot_hash="snaphash",
+        artifact_hash=_HASH_C,
+        dataset_or_feature_snapshot_hash=_HASH_D,
         task="volatility_forecast",
         subject_key="NVDA",
         as_of_session="2026-07-30",
@@ -121,16 +128,41 @@ def test_dataset_manifest_rejects_missing_required_field():
         DatasetManifest.from_dict(kwargs)
 
 
+def test_dataset_manifest_does_not_coerce_a_string_into_descriptions():
+    payload = _dataset_manifest_kwargs(source_descriptions="prices")
+    with pytest.raises(ContractError, match="source_descriptions"):
+        DatasetManifest.from_dict(payload)
+
+
 def test_dataset_manifest_rejects_non_finite_transaction_cost():
-    with pytest.raises(ContractError, match="not finite"):
+    with pytest.raises(ContractError, match="finite number"):
         DatasetManifest(**_dataset_manifest_kwargs(transaction_cost_bps=math.nan))
 
 
 def test_dataset_manifest_rejects_non_finite_nested_input_hash_value_is_a_noop_for_strings():
     # input_hashes values are strings (hex digests), not numeric -- confirm
     # the finite-check walks the structure without misfiring on strings.
-    manifest = DatasetManifest(**_dataset_manifest_kwargs(input_hashes={"prices": "abc"}))
-    assert manifest.input_hashes == {"prices": "abc"}
+    manifest = DatasetManifest(**_dataset_manifest_kwargs(input_hashes={"prices": _HASH_A}))
+    assert manifest.input_hashes == {"prices": _HASH_A}
+
+
+def test_dataset_manifest_requires_embargo_at_least_as_long_as_target():
+    with pytest.raises(ContractError, match="at least target_horizon"):
+        DatasetManifest(**_dataset_manifest_kwargs(embargo_sessions=19))
+
+
+def test_dataset_manifest_rejects_boolean_and_fractional_counts():
+    with pytest.raises(ContractError, match="row_count"):
+        DatasetManifest(**_dataset_manifest_kwargs(row_count=True))
+    with pytest.raises(ContractError, match="ticker_count"):
+        DatasetManifest(**_dataset_manifest_kwargs(ticker_count=1.5))
+
+
+def test_dataset_manifest_rejects_malformed_hashes():
+    with pytest.raises(ContractError, match="dataset_hash"):
+        DatasetManifest(**_dataset_manifest_kwargs(dataset_hash="not-a-hash"))
+    with pytest.raises(ContractError, match="input_hashes.prices"):
+        DatasetManifest(**_dataset_manifest_kwargs(input_hashes={"prices": "bad"}))
 
 
 def test_dataset_manifest_deterministic_hash_for_identical_canonical_input():
@@ -141,7 +173,12 @@ def test_dataset_manifest_deterministic_hash_for_identical_canonical_input():
 
 def test_dataset_manifest_hash_changes_for_behavior_relevant_change():
     a = DatasetManifest(**_dataset_manifest_kwargs())
-    b = DatasetManifest(**_dataset_manifest_kwargs(target_horizon_sessions=60))
+    b = DatasetManifest(
+        **_dataset_manifest_kwargs(
+            target_horizon_sessions=60,
+            embargo_sessions=60,
+        )
+    )
     assert hash_payload(a.to_dict()) != hash_payload(b.to_dict())
 
 
@@ -172,7 +209,7 @@ def test_model_manifest_rejects_duplicate_feature_names():
 
 
 def test_model_manifest_rejects_empty_feature_names():
-    with pytest.raises(ContractError, match="not be empty"):
+    with pytest.raises(ContractError, match="at least one"):
         ModelManifest(**_model_manifest_kwargs(ordered_feature_names=()))
 
 
@@ -184,6 +221,31 @@ def test_model_manifest_rejects_non_evidence_status_enum():
 def test_model_manifest_rejects_non_finite_hyperparameter():
     with pytest.raises(ContractError, match="not finite"):
         ModelManifest(**_model_manifest_kwargs(hyperparameters={"lr": math.inf}))
+
+
+def test_model_manifest_deep_freezes_nested_behavior_fields():
+    parameters = {"nested": {"depths": [1, 2]}}
+    manifest = ModelManifest(**_model_manifest_kwargs(hyperparameters=parameters))
+    parameters["nested"]["depths"].append(999)
+
+    assert isinstance(manifest.hyperparameters, MappingProxyType)
+    assert manifest.to_dict()["hyperparameters"] == {"nested": {"depths": [1, 2]}}
+    with pytest.raises(TypeError):
+        manifest.hyperparameters["new"] = 1
+
+
+def test_model_manifest_rejects_true_authority_from_json():
+    payload = ModelManifest(**_model_manifest_kwargs()).to_dict()
+    payload["production_authoritative"] = True
+    with pytest.raises(ContractError, match="must be false"):
+        ModelManifest.from_dict(payload)
+
+
+def test_model_manifest_does_not_coerce_a_string_into_feature_names():
+    payload = ModelManifest(**_model_manifest_kwargs()).to_dict()
+    payload["ordered_feature_names"] = "realized_vol_20d"
+    with pytest.raises(ContractError, match="ordered_feature_names"):
+        ModelManifest.from_dict(payload)
 
 
 def test_model_manifest_hash_changes_for_behavior_relevant_change():
@@ -248,8 +310,60 @@ def test_prediction_record_rejects_non_finite_value():
 
 
 def test_prediction_record_rejects_non_positive_horizon():
-    with pytest.raises(ContractError, match="positive integer"):
+    with pytest.raises(ContractError, match="integer >= 1"):
         PredictionRecord(**_prediction_kwargs(horizon_sessions=0))
+
+
+def test_prediction_record_rejects_nonfinite_payload_even_when_unavailable():
+    with pytest.raises(ContractError, match="not finite"):
+        PredictionRecord(
+            **_prediction_kwargs(
+                available=False,
+                values={"stale_value": math.nan},
+                uncertainty={},
+                refusal_reasons=("stale_features",),
+            )
+        )
+
+
+def test_prediction_record_unavailable_cannot_carry_stale_values():
+    with pytest.raises(ContractError, match="must not carry values"):
+        PredictionRecord(
+            **_prediction_kwargs(
+                available=False,
+                values={"stale_value": 1.0},
+                uncertainty={},
+                refusal_reasons=("stale_features",),
+            )
+        )
+
+
+def test_prediction_record_rejects_future_data_availability():
+    with pytest.raises(ContractError, match="must not be after generated_at"):
+        PredictionRecord(
+            **_prediction_kwargs(data_available_at="2026-08-01T00:00:00+00:00")
+        )
+
+
+def test_prediction_record_rejects_true_authority_from_json():
+    payload = PredictionRecord(**_prediction_kwargs()).to_dict()
+    payload["production_authoritative"] = True
+    with pytest.raises(ContractError, match="must be false"):
+        PredictionRecord.from_dict(payload)
+
+
+def test_prediction_record_does_not_coerce_a_string_into_refusal_reasons():
+    payload = PredictionRecord(
+        **_prediction_kwargs(
+            available=False,
+            values={},
+            uncertainty={},
+            refusal_reasons=("stale_features",),
+        )
+    ).to_dict()
+    payload["refusal_reasons"] = "stale_features"
+    with pytest.raises(ContractError, match="array of strings"):
+        PredictionRecord.from_dict(payload)
 
 
 # --- require_matching_feature_order --------------------------------------

@@ -29,8 +29,30 @@ class ArtifactError(ValueError):
     """An artifact write or load failed its integrity/identity check."""
 
 
+def _safe_filename(filename: str) -> str:
+    if (
+        not isinstance(filename, str)
+        or not filename
+        or filename in {".", ".."}
+        or "/" in filename
+        or "\\" in filename
+        or "\x00" in filename
+        or Path(filename).is_absolute()
+    ):
+        raise ArtifactError("filename must be one plain relative file name")
+    return filename
+
+
 def _atomic_write_bytes(directory: Path, filename: str, data: bytes) -> None:
+    filename = _safe_filename(filename)
     directory.mkdir(parents=True, exist_ok=True)
+    destination = directory / filename
+    if destination.exists():
+        if destination.read_bytes() == data:
+            return
+        raise ArtifactError(
+            f"refusing to overwrite immutable artifact file {destination}"
+        )
     fd, tmp_name = tempfile.mkstemp(dir=directory, prefix=f".{filename}.", suffix=".tmp")
     tmp_path = Path(tmp_name)
     try:
@@ -38,7 +60,16 @@ def _atomic_write_bytes(directory: Path, filename: str, data: bytes) -> None:
             handle.write(data)
             handle.flush()
             os.fsync(handle.fileno())
-        os.replace(tmp_path, directory / filename)
+        # Recheck after serialization in case another writer created the same
+        # versioned path while this writer was preparing its temporary file.
+        if destination.exists():
+            if destination.read_bytes() == data:
+                tmp_path.unlink(missing_ok=True)
+                return
+            raise ArtifactError(
+                f"refusing to overwrite immutable artifact file {destination}"
+            )
+        os.replace(tmp_path, destination)
     except BaseException:
         tmp_path.unlink(missing_ok=True)
         raise
@@ -67,8 +98,11 @@ def save_model_manifest(manifest: ModelManifest, *, directory: Path, filename: s
 def load_model_artifact(manifest: ModelManifest, *, directory: Path, filename: str) -> Any:
     """Load a joblib model artifact, verifying its sha256 hash against
     `manifest.artifact_hash` before deserializing (5.4 step 6)."""
-    path = Path(directory) / filename
-    data = path.read_bytes()
+    path = Path(directory) / _safe_filename(filename)
+    try:
+        data = path.read_bytes()
+    except OSError as exc:
+        raise ArtifactError(f"could not read model artifact {path}") from exc
     actual_hash = hash_bytes(data)
     if actual_hash != manifest.artifact_hash:
         raise ArtifactError(
@@ -79,17 +113,41 @@ def load_model_artifact(manifest: ModelManifest, *, directory: Path, filename: s
 
 
 def load_model_manifest(
-    *, directory: Path, filename: str, model_id: str, model_version: str
+    *,
+    directory: Path,
+    filename: str,
+    model_id: str,
+    model_version: str,
+    expected_manifest_hash: str | None = None,
 ) -> ModelManifest:
     """Read and reconstruct a ModelManifest, requiring it to declare the
     caller's expected model_id/model_version -- callers must not silently
     load a manifest for a different model than the one they asked for."""
-    path = Path(directory) / filename
-    payload = json.loads(path.read_text(encoding="utf-8"))
+    path = Path(directory) / _safe_filename(filename)
+    try:
+        data = path.read_bytes()
+    except OSError as exc:
+        raise ArtifactError(f"could not read model manifest {path}") from exc
+    if expected_manifest_hash is not None:
+        actual_manifest_hash = hash_bytes(data)
+        if actual_manifest_hash != expected_manifest_hash:
+            raise ArtifactError(
+                f"manifest hash mismatch loading {path}: expected "
+                f"{expected_manifest_hash}, file hashes to {actual_manifest_hash}"
+            )
+    try:
+        payload = json.loads(data.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ArtifactError(f"manifest at {path} is not valid UTF-8 JSON") from exc
+    if not isinstance(payload, dict):
+        raise ArtifactError(f"manifest at {path} must contain one JSON object")
     if payload.get("model_id") != model_id or payload.get("model_version") != model_version:
         raise ArtifactError(
             f"manifest at {path} declares model_id={payload.get('model_id')!r} "
             f"model_version={payload.get('model_version')!r}, expected "
             f"{model_id!r}/{model_version!r}"
         )
-    return ModelManifest.from_dict(payload)
+    try:
+        return ModelManifest.from_dict(payload)
+    except ValueError as exc:
+        raise ArtifactError(f"manifest at {path} failed contract validation: {exc}") from exc

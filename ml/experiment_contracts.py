@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
+import re
 from typing import Any, Mapping, Sequence
 
 from ml.contracts import (
@@ -52,6 +53,15 @@ _FORBIDDEN_KEYS = frozenset(
         "limit_price", "stop_price", "execute", "promote", "promoted",
     }
 )
+
+_FORBIDDEN_KEY_TOKENS = frozenset(
+    {
+        "production", "approved", "approval", "authority", "authorization",
+        "authorized", "side", "quantity", "shares", "execute", "promote",
+        "promoted",
+    }
+)
+_MODEL_DIMENSION_KEYS = frozenset({"models", "candidate_models", "model_variants"})
 
 
 class ExperimentContractError(ContractError):
@@ -87,12 +97,25 @@ def _check_schema_version(schema_version: str) -> None:
         )
 
 
+def _normalize_key(key: Any) -> str:
+    key_text = re.sub(r"([a-z0-9])([A-Z])", r"\1_\2", str(key).strip())
+    return re.sub(r"[^a-zA-Z0-9]+", "_", key_text).strip("_").lower()
+
+
 def _reject_forbidden_keys(payload: Any, *, path: str = "spec") -> None:
     """Walk a serialized payload rejecting any execution-shaped key."""
     if isinstance(payload, Mapping):
         for key, value in payload.items():
-            normalized = str(key).strip().lower()
-            if normalized in _FORBIDDEN_KEYS:
+            # Normalize snake_case, kebab-case, spaces, and camelCase so an
+            # execution-shaped field cannot bypass the boundary merely by
+            # changing its spelling (for example targetWeight or trade-side).
+            normalized = _normalize_key(key)
+            tokens = frozenset(part for part in normalized.split("_") if part)
+            padded = f"_{normalized}_"
+            contains_forbidden_phrase = any(
+                f"_{forbidden}_" in padded for forbidden in _FORBIDDEN_KEYS
+            )
+            if contains_forbidden_phrase or tokens & _FORBIDDEN_KEY_TOKENS:
                 raise ExperimentContractError(
                     f"{path}.{key} is an execution-shaped field; an experiment "
                     "spec describes research, never trade authority"
@@ -119,6 +142,32 @@ def _unique_string_tuple(value: Any, name: str, *, allow_empty: bool = False) ->
         # correction relative to the variants actually examined.
         raise ExperimentContractError(f"{name} must not contain duplicates")
     return result
+
+
+def _strict_payload_kwargs(
+    contract_type: type[Any],
+    payload: Mapping[str, Any],
+    *,
+    read_only_fields: Sequence[str] = (),
+) -> dict[str, Any]:
+    """Return constructor kwargs from a strict JSON-object payload.
+
+    Dataclass construction already rejects unknown keyword arguments, but it
+    does so with a raw ``TypeError`` and provides no loading path for nested
+    contracts.  Every persisted experiment contract uses this helper so
+    schema drift fails closed and is reported through the module's advertised
+    error type.
+    """
+    name = contract_type.__name__
+    if not isinstance(payload, Mapping):
+        raise ExperimentContractError(f"{name} payload must be a JSON object")
+    fields = {field.name for field in dataclasses.fields(contract_type)}
+    unknown = set(payload) - fields - set(read_only_fields)
+    if unknown:
+        raise ExperimentContractError(
+            f"{name} payload has unknown fields: {sorted(unknown, key=str)}"
+        )
+    return {key: value for key, value in payload.items() if key in fields}
 
 
 @dataclasses.dataclass(frozen=True)
@@ -186,6 +235,18 @@ class ResearchGateSpec:
             "failure_slices": list(self.failure_slices),
         }
 
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "ResearchGateSpec":
+        kwargs = _strict_payload_kwargs(cls, payload)
+        if isinstance(kwargs.get("block_lengths"), (list, tuple)):
+            kwargs["block_lengths"] = tuple(kwargs["block_lengths"])
+        try:
+            return cls(**kwargs)
+        except TypeError as exc:
+            raise ExperimentContractError(
+                f"ResearchGateSpec payload missing required field(s): {exc}"
+            ) from exc
+
 
 @dataclasses.dataclass(frozen=True)
 class ConfirmationSpec:
@@ -216,6 +277,16 @@ class ConfirmationSpec:
             "parent_spec_hash": self.parent_spec_hash,
             "parent_report_hash": self.parent_report_hash,
         }
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "ConfirmationSpec":
+        kwargs = _strict_payload_kwargs(cls, payload)
+        try:
+            return cls(**kwargs)
+        except TypeError as exc:
+            raise ExperimentContractError(
+                f"ConfirmationSpec payload missing required field(s): {exc}"
+            ) from exc
 
 
 @dataclasses.dataclass(frozen=True)
@@ -262,8 +333,14 @@ class ExperimentSpec:
             or self.horizon_sessions < 1
         ):
             raise ExperimentContractError("horizon_sessions must be a positive integer")
-        if isinstance(self.random_seed, bool) or not isinstance(self.random_seed, int):
-            raise ExperimentContractError("random_seed must be an integer")
+        if (
+            isinstance(self.random_seed, bool)
+            or not isinstance(self.random_seed, int)
+            or self.random_seed < 0
+        ):
+            # Matches the existing ModelManifest contract and the sklearn
+            # random_state consumers these experiment specs will drive.
+            raise ExperimentContractError("random_seed must be a non-negative integer")
         if not isinstance(self.research_gate, ResearchGateSpec):
             raise ExperimentContractError("research_gate must be a ResearchGateSpec")
 
@@ -287,6 +364,18 @@ class ExperimentSpec:
             _check_required_str(key, "research_look_dimensions key")
             frozen_dimensions[key] = _unique_string_tuple(
                 values, f"research_look_dimensions[{key}]"
+            )
+        model_dimensions = (
+            values
+            for key, values in frozen_dimensions.items()
+            if _normalize_key(key) in _MODEL_DIMENSION_KEYS
+        )
+        if len(candidates) > 1 and not any(
+            set(values) == set(candidates) for values in model_dimensions
+        ):
+            raise ExperimentContractError(
+                "research_look_dimensions must include the complete candidate_models "
+                "variant set so total_research_looks cannot undercount tested models"
             )
 
         # Mode/confirmation consistency, both directions (plan 6.2: "reject
@@ -394,6 +483,30 @@ class ExperimentSpec:
             spec_hash=self.spec_hash,
         )
 
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "ExperimentSpec":
+        kwargs = _strict_payload_kwargs(cls, payload)
+        gate_payload = kwargs.get("research_gate")
+        if isinstance(gate_payload, Mapping):
+            kwargs["research_gate"] = ResearchGateSpec.from_dict(gate_payload)
+        elif gate_payload is not None:
+            raise ExperimentContractError(
+                "ExperimentSpec research_gate must be a JSON object"
+            )
+        confirmation_payload = kwargs.get("confirmation")
+        if isinstance(confirmation_payload, Mapping):
+            kwargs["confirmation"] = ConfirmationSpec.from_dict(confirmation_payload)
+        elif confirmation_payload is not None:
+            raise ExperimentContractError(
+                "ExperimentSpec confirmation must be a JSON object or null"
+            )
+        try:
+            return cls(**kwargs)
+        except TypeError as exc:
+            raise ExperimentContractError(
+                f"ExperimentSpec payload missing required field(s): {exc}"
+            ) from exc
+
 
 def _plain(value: Any) -> Any:
     """Convert frozen MappingProxyType/tuple structures back to plain JSON
@@ -432,6 +545,16 @@ class ExperimentIdentity:
             "mode": self.mode,
             "spec_hash": self.spec_hash,
         }
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "ExperimentIdentity":
+        kwargs = _strict_payload_kwargs(cls, payload)
+        try:
+            return cls(**kwargs)
+        except TypeError as exc:
+            raise ExperimentContractError(
+                f"ExperimentIdentity payload missing required field(s): {exc}"
+            ) from exc
 
 
 @dataclasses.dataclass(frozen=True)
@@ -523,6 +646,29 @@ class ExperimentRunRecord:
             "promotion_blockers": list(self.promotion_blockers),
             "production_authoritative": self.production_authoritative,
         }
+
+    @classmethod
+    def from_dict(cls, payload: Mapping[str, Any]) -> "ExperimentRunRecord":
+        kwargs = _strict_payload_kwargs(
+            cls, payload, read_only_fields=("production_authoritative",)
+        )
+        if payload.get("production_authoritative", False) is not False:
+            raise ExperimentContractError(
+                "ExperimentRunRecord production_authoritative must be false"
+            )
+        identity_payload = kwargs.get("identity")
+        if isinstance(identity_payload, Mapping):
+            kwargs["identity"] = ExperimentIdentity.from_dict(identity_payload)
+        elif identity_payload is not None:
+            raise ExperimentContractError(
+                "ExperimentRunRecord identity must be a JSON object"
+            )
+        try:
+            return cls(**kwargs)
+        except TypeError as exc:
+            raise ExperimentContractError(
+                f"ExperimentRunRecord payload missing required field(s): {exc}"
+            ) from exc
 
     @property
     def run_hash(self) -> str:

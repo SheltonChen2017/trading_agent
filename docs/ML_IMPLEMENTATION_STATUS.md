@@ -20,6 +20,28 @@ The next implementation sequence is defined in
 | ML-8 | Filing/transcript extraction contract + deterministic validator | `ml/filings.py` | None (context only) |
 | ML-LR-0 | Shared experiment identity, preregistered research gates, run records | `ml/experiment_contracts.py` | None |
 | ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
+| ML-LR-2 | Durable discovery/confirmation runner and CLI | `ml/experiments.py`, `scripts/run_ml_experiment.py` | None |
+
+ML-LR-2 gives both supported tasks a reproducible runner. Verified against
+the milestone's own definition of done by invoking the real CLI twice: the
+same spec/dataset/commit reproduces identical report, run, and artifact
+hashes. Outputs are content-addressed, so an exact retry is a no-op and a
+rerun that would change results is refused rather than silently
+overwriting.
+
+The verdict is derived from the preregistered gate, never from inspection:
+fold wins alone are treated as necessary-but-insufficient, and a candidate
+must also clear the preregistered alpha (tightened by the Bonferroni
+correction) at **every** declared block length. A discovery run can never
+return `promising_unconfirmed` — the most it can say is
+`confirmation_run_requested`, which requires a separate experiment with a
+new immutable ID.
+
+Not yet built here: task-specific detail reports beyond fold metrics and
+aggregate significance (calibration is emitted empty), and the
+`research/ml_specs/` spec library the plan's CLI examples reference. No
+experiment has been run against real data, and no research-registry entry
+exists.
 
 ML-LR-1 makes `point_in_time_data=True` **derivable but still unreachable
 from real data**. `evaluate_point_in_time_coverage()` is now the only code

@@ -221,6 +221,8 @@ class DatasetManifest:
     dataset_hash: str
     git_commit: str
     dropped_label_row_count: int = 0
+    input_row_counts: Mapping[str, int] = dataclasses.field(default_factory=dict)
+    point_in_time_evidence: Mapping[str, Any] | None = None
     schema_version: str = SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -268,8 +270,45 @@ class DatasetManifest:
         hashes = _string_mapping(self.input_hashes, "input_hashes", require_nonempty=True)
         for key, digest in hashes.items():
             _check_sha256(digest, f"input_hashes.{key}")
+        if not isinstance(self.input_row_counts, Mapping):
+            raise ContractError("input_row_counts must be a mapping")
+        row_counts: dict[str, int] = {}
+        for key, count in self.input_row_counts.items():
+            _check_required_str(key, "input_row_counts key")
+            _check_int(count, f"input_row_counts.{key}")
+            row_counts[key] = count
+        if row_counts and set(row_counts) != set(hashes):
+            raise ContractError(
+                "input_row_counts must contain exactly the same artifact keys as input_hashes"
+            )
+        evidence = None
+        if self.point_in_time_evidence is not None:
+            evidence = _freeze_json(
+                self.point_in_time_evidence, path="point_in_time_evidence"
+            )
+            if not isinstance(evidence, Mapping):
+                raise ContractError("point_in_time_evidence must be a JSON object")
+        if self.point_in_time_data:
+            if evidence is None:
+                raise ContractError(
+                    "point_in_time_data requires persisted point_in_time_evidence"
+                )
+            if set(("availability", "universe", "coverage")) - set(hashes):
+                raise ContractError(
+                    "point_in_time_data requires availability, universe, and coverage hashes"
+                )
+            if set(row_counts) != set(hashes):
+                raise ContractError(
+                    "point_in_time_data requires row counts for every hashed artifact"
+                )
+            if evidence.get("point_in_time_data") is not True:
+                raise ContractError(
+                    "point_in_time_evidence must independently report point_in_time_data=true"
+                )
         object.__setattr__(self, "source_descriptions", sources)
         object.__setattr__(self, "input_hashes", hashes)
+        object.__setattr__(self, "input_row_counts", MappingProxyType(row_counts))
+        object.__setattr__(self, "point_in_time_evidence", evidence)
 
     def to_dict(self) -> dict[str, Any]:
         return _to_dict(self)

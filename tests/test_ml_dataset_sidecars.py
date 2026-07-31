@@ -6,6 +6,8 @@ earlier dataset snapshot.
 """
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import pandas as pd
 import pytest
 
@@ -13,6 +15,7 @@ from ml.availability import (
     FeatureAvailabilityRecord,
     UniverseMembershipRecord,
     evaluate_point_in_time_coverage,
+    hash_feature_value,
 )
 from ml.datasets import (
     DatasetError,
@@ -24,7 +27,6 @@ from ml.datasets import (
 )
 from ml.labels import LabelRow
 
-_HASH = "a" * 64
 _SESSIONS = ("2026-01-01", "2026-01-02")
 
 
@@ -61,9 +63,9 @@ def _availability_records() -> list[FeatureAvailabilityRecord]:
             source_id="fixture-vendor",
             source_version="1.0",
             revision_id="r1",
-            raw_value_hash=_HASH,
+            raw_value_hash=hash_feature_value(value),
         )
-        for session in _SESSIONS
+        for session, value in zip(_SESSIONS, (100.0, 101.0))
     ]
 
 
@@ -90,6 +92,10 @@ def _coverage(availability=None, universe=None):
         universe=_universe_records() if universe is None else universe,
         universe_id="fixture-v1",
         decision_cutoffs={s: f"{s}T21:00:00+00:00" for s in _SESSIONS},
+        feature_values={
+            (session, "AAA", "close"): value
+            for session, value in zip(_SESSIONS, (100.0, 101.0))
+        },
     )
 
 
@@ -145,6 +151,15 @@ def test_complete_fixture_lineage_yields_a_point_in_time_dataset(tmp_path):
     assert manifest.point_in_time_data is True
     assert "availability" in manifest.input_hashes
     assert "universe" in manifest.input_hashes
+    assert "coverage" in manifest.input_hashes
+    assert manifest.point_in_time_evidence is not None
+    assert dict(manifest.input_row_counts) == {
+        "features": 2,
+        "labels": 2,
+        "availability": 2,
+        "universe": 1,
+        "coverage": 1,
+    }
 
 
 def test_a_dataset_without_lineage_stays_exploratory(tmp_path):
@@ -158,6 +173,35 @@ def test_the_caller_still_cannot_assert_point_in_time_directly(tmp_path):
     with pytest.raises(DatasetError, match="cannot be asserted by the caller"):
         build_dataset_manifest(
             **_manifest_kwargs(features_df, labels_df, point_in_time_data=True)
+        )
+
+
+def test_a_lookalike_coverage_object_cannot_forge_the_claim():
+    features_df, labels_df = assemble_dataset_frames({"AAA": _features()}, {"AAA": _labels()})
+    with pytest.raises(DatasetError, match="must be an ml.availability.CoverageResult"):
+        build_dataset_manifest(
+            **_manifest_kwargs(
+                features_df,
+                labels_df,
+                availability_df=_frame(_availability_records()),
+                universe_df=_frame(_universe_records()),
+                coverage=SimpleNamespace(point_in_time_data=True),
+            )
+        )
+
+
+def test_coverage_hashes_must_match_actual_feature_cells():
+    features_df, labels_df = assemble_dataset_frames({"AAA": _features()}, {"AAA": _labels()})
+    features_df.loc[0, "close"] = 999.0
+    with pytest.raises(DatasetError, match="does not match feature data"):
+        build_dataset_manifest(
+            **_manifest_kwargs(
+                features_df,
+                labels_df,
+                availability_df=_frame(_availability_records()),
+                universe_df=_frame(_universe_records()),
+                coverage=_coverage(),
+            )
         )
 
 
@@ -247,19 +291,66 @@ def test_appending_future_source_records_cannot_alter_an_earlier_snapshot(tmp_pa
     must reproduce the identical dataset hash."""
     _, _, original, _, _ = _build(tmp_path)
 
-    # The vendor later publishes a third session; the earlier snapshot's
-    # inputs are untouched, so rebuilding the prefix must be identical.
+    # The vendor later publishes both a restatement and a third session.
+    # Neither was visible to this snapshot, so both must be excluded from
+    # the frozen lineage bytes and identity.
     features_df, labels_df = assemble_dataset_frames({"AAA": _features()}, {"AAA": _labels()})
+    later_revision = FeatureAvailabilityRecord(
+        **{
+            **_availability_records()[0].to_dict(),
+            "revision_id": "r2",
+            "available_at": "2027-01-10T14:00:00+00:00",
+            "observed_at": "2027-01-10T14:00:00+00:00",
+            "raw_value_hash": hash_feature_value(999.0),
+        }
+    )
+    future_session = FeatureAvailabilityRecord(
+        as_of_session="2026-01-03", ticker="AAA", feature_name="close",
+        event_at="2026-01-03T20:00:00+00:00",
+        available_at="2026-01-03T20:05:00+00:00",
+        observed_at="2026-01-03T20:10:00+00:00", source_id="fixture-vendor",
+        source_version="1.0", revision_id="r1",
+        raw_value_hash=hash_feature_value(102.0),
+    )
+    expanded_availability = [*_availability_records(), later_revision, future_session]
     rebuilt = build_dataset_manifest(
         **_manifest_kwargs(
             features_df, labels_df,
-            availability_df=_frame(_availability_records()),
+            availability_df=_frame(expanded_availability),
             universe_df=_frame(_universe_records()),
-            coverage=_coverage(),
+            coverage=_coverage(availability=expanded_availability),
         )
     )
     assert rebuilt.dataset_hash == original.dataset_hash
     assert rebuilt.point_in_time_data == original.point_in_time_data
+
+
+def test_changing_the_decision_cutoff_changes_dataset_identity(tmp_path):
+    _, _, original, _, _ = _build(tmp_path)
+    features_df, labels_df = assemble_dataset_frames({"AAA": _features()}, {"AAA": _labels()})
+    coverage = evaluate_point_in_time_coverage(
+        feature_keys=[(session, "AAA") for session in _SESSIONS],
+        feature_columns=["close"],
+        availability=_availability_records(),
+        universe=_universe_records(),
+        universe_id="fixture-v1",
+        decision_cutoffs={session: f"{session}T22:00:00+00:00" for session in _SESSIONS},
+        feature_values={
+            (session, "AAA", "close"): value
+            for session, value in zip(_SESSIONS, (100.0, 101.0))
+        },
+    )
+    rebuilt = build_dataset_manifest(
+        **_manifest_kwargs(
+            features_df,
+            labels_df,
+            availability_df=_frame(_availability_records()),
+            universe_df=_frame(_universe_records()),
+            coverage=coverage,
+        )
+    )
+    assert rebuilt.point_in_time_data
+    assert rebuilt.dataset_hash != original.dataset_hash
 
 
 def test_saving_a_point_in_time_dataset_without_sidecars_is_refused(tmp_path):

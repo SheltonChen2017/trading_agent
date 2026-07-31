@@ -21,11 +21,12 @@ from ml.availability import (
     FeatureAvailabilityRecord,
     RetroactivelyAdjustedSource,
     UniverseMembershipRecord,
+    hash_feature_value,
     evaluate_point_in_time_coverage,
     latest_visible_revision,
 )
 
-_HASH = "a" * 64
+_HASH = hash_feature_value(100.0)
 
 
 def _record(**overrides) -> FeatureAvailabilityRecord:
@@ -62,6 +63,10 @@ def _membership(**overrides) -> UniverseMembershipRecord:
 
 def _cutoffs(session: str = "2026-07-31", at: str = "2026-07-31T21:00:00+00:00"):
     return {session: at}
+
+
+def _values(*, session: str = "2026-07-31", ticker: str = "NVDA"):
+    return {(session, ticker, "close"): 100.0}
 
 
 # --- timestamp ordering -----------------------------------------------------
@@ -105,6 +110,19 @@ def test_timezone_equivalent_timestamps_order_consistently():
     assert not eastern.is_available_by(earlier)
 
 
+def test_timezone_equivalent_membership_availability_uses_one_utc_cutoff():
+    utc = _membership(
+        announced_at="2026-07-31T00:00:00+00:00",
+        available_at="2026-07-31T00:00:00+00:00",
+    )
+    eastern = _membership(
+        announced_at="2026-07-30T20:00:00-04:00",
+        available_at="2026-07-30T20:00:00-04:00",
+    )
+    assert utc.is_known_by_session("2026-07-31")
+    assert eastern.is_known_by_session("2026-07-31")
+
+
 # --- decision cutoff --------------------------------------------------------
 
 
@@ -123,6 +141,7 @@ def test_a_future_availability_timestamp_is_refused_against_the_cutoff():
         universe=[_membership()],
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
     )
     assert not result.point_in_time_data
     assert any(f.startswith("availability_after_cutoff") for f in result.failures)
@@ -170,6 +189,25 @@ def test_a_later_revision_does_not_replace_the_historically_visible_value():
     assert latest_visible_revision(records, cutoff=today_cutoff).revision_id == "r2"
 
 
+def test_a_future_revision_cannot_invalidate_historical_coverage():
+    restatement = _record(
+        revision_id="r2",
+        available_at="2026-11-15T14:00:00+00:00",
+        observed_at="2026-11-15T14:00:00+00:00",
+        raw_value_hash=hash_feature_value(999.0),
+    )
+    result = evaluate_point_in_time_coverage(
+        feature_keys=[("2026-07-31", "NVDA")],
+        feature_columns=["close"],
+        availability=[_record(), restatement],
+        universe=[_membership()],
+        universe_id="tech-v1",
+        decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
+    )
+    assert result.point_in_time_data
+
+
 def test_no_visible_revision_returns_none_rather_than_the_newest():
     record = _record(available_at="2026-07-31T20:05:00+00:00")
     early = datetime(2020, 1, 1, tzinfo=timezone.utc)
@@ -185,6 +223,7 @@ def test_duplicate_feature_availability_identity_is_detected():
         universe=[_membership()],
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
     )
     assert "duplicate_feature_availability_identity" in result.failures
 
@@ -200,11 +239,38 @@ def test_complete_valid_lineage_is_the_only_path_to_point_in_time_true():
         universe=[_membership()],
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
     )
     assert result.point_in_time_data
     assert result.survivorship_bias_free
     assert result.failures == ()
     assert result.covered_feature_columns == ("close",)
+
+
+def test_raw_value_hash_must_bind_to_the_actual_feature_value():
+    result = evaluate_point_in_time_coverage(
+        feature_keys=[("2026-07-31", "NVDA")],
+        feature_columns=["close"],
+        availability=[_record(raw_value_hash=hash_feature_value(999.0))],
+        universe=[_membership()],
+        universe_id="tech-v1",
+        decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
+    )
+    assert not result.point_in_time_data
+    assert any(f.startswith("feature_value_hash_mismatch") for f in result.failures)
+
+
+def test_empty_feature_keys_cannot_pass_vacuously():
+    with pytest.raises(AvailabilityError, match="feature_keys must be non-empty"):
+        evaluate_point_in_time_coverage(
+            feature_keys=[],
+            feature_columns=["close"],
+            availability=[],
+            universe=[_membership()],
+            universe_id="tech-v1",
+            decision_cutoffs={},
+        )
 
 
 def test_missing_lineage_keeps_point_in_time_false():
@@ -215,6 +281,7 @@ def test_missing_lineage_keeps_point_in_time_false():
         universe=[_membership()],
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
     )
     assert not result.point_in_time_data
     assert "missing_feature_lineage" in result.failures
@@ -232,6 +299,7 @@ def test_a_derived_feature_is_covered_by_its_complete_input_lineage():
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
         derived_columns={"return_1d_pct": ["close"]},
+        feature_values=_values(),
     )
     assert result.point_in_time_data
 
@@ -245,9 +313,23 @@ def test_a_derived_feature_with_incomplete_inputs_is_not_covered():
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
         derived_columns={"dollar_volume": ["close", "volume"]},
+        feature_values=_values(),
     )
     assert not result.point_in_time_data
     assert result.missing_lineage_columns == ("dollar_volume",)
+
+
+def test_derived_lineage_cycles_are_refused():
+    with pytest.raises(AvailabilityError, match="contains a cycle"):
+        evaluate_point_in_time_coverage(
+            feature_keys=[("2026-07-31", "NVDA")],
+            feature_columns=["a", "b"],
+            availability=[],
+            universe=[_membership()],
+            universe_id="tech-v1",
+            decision_cutoffs=_cutoffs(),
+            derived_columns={"a": ["b"], "b": ["a"]},
+        )
 
 
 def test_a_missing_decision_cutoff_fails_closed():
@@ -258,6 +340,7 @@ def test_a_missing_decision_cutoff_fails_closed():
         universe=[_membership()],
         universe_id="tech-v1",
         decision_cutoffs={},
+        feature_values=_values(),
     )
     assert not result.point_in_time_data
     assert any(f.startswith("missing_decision_cutoff") for f in result.failures)
@@ -276,6 +359,7 @@ def test_no_universe_records_is_labeled_survivorship_biased():
         universe=[],
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
     )
     assert not result.point_in_time_data
     assert not result.survivorship_bias_free
@@ -300,6 +384,7 @@ def test_a_ticker_outside_its_membership_window_is_ineligible():
         ],
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
+        feature_values=_values(ticker="SIVB"),
     )
     assert not result.point_in_time_data
     assert any(f.startswith("ticker_not_eligible") for f in result.failures)
@@ -316,10 +401,27 @@ def test_membership_not_yet_announced_is_not_usable():
     assert not future_announcement.is_known_by_session("2026-07-31")
 
 
+def test_membership_is_evaluated_at_the_exact_decision_cutoff():
+    intraday_membership = _membership(
+        announced_at="2026-07-31T20:15:00+00:00",
+        available_at="2026-07-31T20:15:00+00:00",
+    )
+    result = evaluate_point_in_time_coverage(
+        feature_keys=[("2026-07-31", "NVDA")],
+        feature_columns=["close"],
+        availability=[_record()],
+        universe=[intraday_membership],
+        universe_id="tech-v1",
+        decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
+    )
+    assert result.point_in_time_data
+
+
 def test_overlapping_membership_intervals_are_detected():
     overlapping = [
-        _membership(effective_from="2020-01-01", effective_to="2023-01-01"),
-        _membership(effective_from="2022-01-01", effective_to="2024-01-01"),
+        _membership(effective_from="2020-01-01", effective_to=None),
+        _membership(effective_from="2022-01-01", effective_to=None),
     ]
     result = evaluate_point_in_time_coverage(
         feature_keys=[("2026-07-31", "NVDA")],
@@ -328,6 +430,7 @@ def test_overlapping_membership_intervals_are_detected():
         universe=overlapping,
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
     )
     assert any(f.startswith("overlapping_universe_interval") for f in result.failures)
 
@@ -376,6 +479,7 @@ def test_a_yfinance_backed_dataset_cannot_reach_point_in_time_true():
         ),
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
     )
     assert not result.point_in_time_data
 
@@ -403,5 +507,7 @@ def test_coverage_result_is_json_serializable():
         universe=[_membership()],
         universe_id="tech-v1",
         decision_cutoffs=_cutoffs(),
+        feature_values=_values(),
     )
     json.dumps(result.to_dict())
+    assert CoverageResult.from_dict(result.to_dict()) == result

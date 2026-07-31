@@ -870,11 +870,17 @@ def test_bootstrap_edge_significance_by_block_catches_serial_dependence_by_date_
 
 
 def test_bootstrap_edge_significance_by_block_handles_too_few_dates():
+    # Contract changed 2026-07-30: a refusal now withholds the INFERENCE
+    # (ci/p_value) but still reports the descriptive mean, which needs no
+    # resampling. Nulling the mean conflated "cannot be tested" with
+    # "nothing here" and broke the legitimate breadth-comparison use below.
     edges = pd.Series([1.0, 2.0, 1.5, 2.5, 1.2])
     dates = pd.Series(pd.bdate_range("2024-01-01", periods=5))
     result = bootstrap_edge_significance_by_block(edges, dates, block_length=10)
-    assert result["mean"] is None
     assert result["p_value"] is None
+    assert result["ci_low"] is None and result["ci_high"] is None
+    assert result["mean"] == 1.64
+    assert result["refusal_reason"]
 
 
 def test_bootstrap_daily_edge_significance_disagrees_with_trade_weighted_when_breadth_drives_it():
@@ -906,11 +912,14 @@ def test_bootstrap_daily_edge_significance_disagrees_with_trade_weighted_when_br
 
 
 def test_bootstrap_daily_edge_significance_by_block_handles_too_few_dates():
+    # Same contract change as the trade-weighted sibling above.
     edges = pd.Series([1.0, 2.0, 1.5, 2.5, 1.2])
     dates = pd.Series(pd.bdate_range("2024-01-01", periods=5))
     result = bootstrap_daily_edge_significance_by_block(edges, dates, block_length=10)
-    assert result["mean"] is None
     assert result["p_value"] is None
+    assert result["ci_low"] is None and result["ci_high"] is None
+    assert result["mean"] == 1.64
+    assert result["refusal_reason"]
 
 
 def test_out_of_sample_significance_by_block_reports_both_weightings():

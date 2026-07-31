@@ -16,6 +16,8 @@ isn't modeled here.
 """
 from __future__ import annotations
 
+import math
+from statistics import NormalDist
 from typing import Callable
 
 import numpy as np
@@ -1040,6 +1042,91 @@ def bootstrap_edge_significance_by_date(
     }
 
 
+# Below this many distinct signal dates the moving-block bootstrap is not
+# calibrated -- see _block_bootstrap_refusal() for the measurements.
+MIN_BLOCK_BOOTSTRAP_DATES = 50
+
+
+def _min_detectable_effect_pct(ci_low, ci_high, threshold: float) -> float | None:
+    """The smallest true edge this test could have called significant.
+
+    Reported alongside every verdict so a rejection states what it could
+    have seen. Derived from the bootstrap CI's own width: half-width /1.96
+    recovers the standard error, and a two-sided test at `threshold` needs
+    roughly that many standard errors of separation from zero.
+
+    Without this, "not significant" reads as "no effect" when it often
+    means "this test could not resolve an effect of the size claimed" --
+    the failure mode measured across the 2026-07-30 candidate run, where
+    the monthly signals' floor was 1.6-5.7%/month against a literature
+    claim of ~0.5-1%/month.
+    """
+    if ci_low is None or ci_high is None:
+        return None
+    standard_error = (float(ci_high) - float(ci_low)) / 2 / 1.96
+    if not math.isfinite(standard_error) or standard_error <= 0:
+        return None
+    # Two-sided normal critical value for the (already Bonferroni-corrected)
+    # threshold; ~2.95 sigma at 0.003125, ~1.96 at 0.05.
+    critical = float(NormalDist().inv_cdf(1 - threshold / 2))
+    return round(critical * standard_error, 3)
+
+
+def _block_bootstrap_refusal(n_rows: int, n_dates: int, block_length: int) -> str | None:
+    """Why this (n_rows, n_dates, block_length) cannot yield a usable p-value.
+
+    Returns a reason string, or None when the bootstrap may proceed.
+    Shared by both block-bootstrap variants so the rule cannot drift apart
+    between them.
+
+    Measured on pure noise (true mean edge exactly zero), 2026-07-30:
+
+      shape                       null          false-positive rate @0.05
+      400 dates, block 10         independent   0.050   (nominal -- exact)
+      400 dates, block 10         factor        0.083
+      31 dates,  block 10         independent   0.185   (3.7x nominal)
+      31 dates,  block 10         factor        0.265   (5.3x nominal)
+
+    Two findings drive the rules below.
+
+    1. `block_length >= n_dates` is degenerate, not merely coarse. With
+       n_blocks_needed == 1, every circular resample is a ROTATION of the
+       entire date set -- identical dates, identical values, every draw. So
+       boot_means is constant, the CI collapses to zero width, and
+       p = 2 * min(0, 1) = 0 for ANY nonzero mean. The previous guard used
+       `n_dates < max(5, block_length)`, which is strict, so exact equality
+       slipped through. This fired on real project data: a VIX-spike
+       discovery cell with block_length=15 and n_dates=15 reported a mean
+       edge of +0.013% as "significant" at p=0.0.
+
+    2. Requiring merely 2 blocks is not enough either. The false-positive
+       rate degrades continuously as block_length approaches n_dates, and
+       below ~50 distinct dates NO block length is well calibrated (3.5x
+       to 6.5x nominal across block lengths 2/5/10/20 at n_dates=31).
+       Refusing is the honest answer there: a number that reads as evidence
+       but is wrong 1 time in 5 is worse than no number.
+
+    NOTE the direction: this error made significance EASIER, so it never
+    manufactured a false REJECTION. Verdicts recorded as rejected are
+    unaffected; positive results at small n_dates are the ones to re-check.
+    """
+    if n_rows < 5 or n_dates < 5:
+        return f"too few observations (n={n_rows}, n_dates={n_dates}; need >=5 of each)"
+    if n_dates < 2 * block_length:
+        return (
+            f"block_length={block_length} leaves fewer than 2 independent blocks across "
+            f"{n_dates} dates; the resample distribution degenerates toward a rotation of "
+            "the whole sample, collapsing the CI and driving p toward 0 regardless of the data"
+        )
+    if n_dates < MIN_BLOCK_BOOTSTRAP_DATES:
+        return (
+            f"only {n_dates} distinct signal dates (need >={MIN_BLOCK_BOOTSTRAP_DATES}); "
+            "measured false-positive rate on pure noise is 3.5-6.5x nominal at this sample "
+            "size for every block length, so no p-value here would be trustworthy"
+        )
+    return None
+
+
 def bootstrap_edge_significance_by_block(
     edge_values: pd.Series, dates: pd.Series, block_length: int, n_bootstrap: int = 2000, seed: int = 0
 ) -> dict:
@@ -1068,16 +1155,35 @@ def bootstrap_edge_significance_by_block(
     (see out_of_sample_significance_by_block(), which does this for you)
     rather than trusting one arbitrary choice — a real effect should hold
     up across nearby block lengths.
+
+    A LONGER BLOCK IS NOT THE CONSERVATIVE CHOICE. This is the natural
+    reading of "accounts for more serial dependence" and it is backwards.
+    Measured on pure noise at 31 signal dates, the false-positive rate at
+    alpha=0.05 rose monotonically with block length: 12.5% at block 5,
+    18.5% at block 10, 29.0% at block 15. With `n_dates` fixed, a longer
+    block means fewer independent blocks per resample, so the resample
+    distribution narrows and p shrinks. The right block length scales with
+    `n_dates`, not with `hold_days` alone — at n_dates 120-240 block 10 is
+    near-nominal (1.6-1.7x), while at n_dates 31 no block length is
+    (3.5-6.5x). `_block_bootstrap_refusal()` now declines the cases where
+    this bites hardest.
     """
     df = pd.DataFrame({"edge": pd.Series(edge_values).to_numpy(), "date": pd.Series(dates).to_numpy()})
     df = df.dropna(subset=["edge"])
     unique_dates = np.sort(df["date"].unique())
     n_dates = len(unique_dates)
 
-    if len(df) < 5 or n_dates < max(5, block_length):
+    refusal = _block_bootstrap_refusal(len(df), n_dates, block_length)
+    if refusal is not None:
+        # The MEAN is descriptive and needs no resampling, so it is still
+        # reported; only the INFERENCE (CI, p-value) is withheld. Nulling the
+        # mean too would destroy a legitimate descriptive statistic and
+        # conflate "we cannot test this" with "there is nothing here".
         return {
             "n": len(df), "n_dates": n_dates, "block_length": block_length,
-            "mean": None, "ci_low": None, "ci_high": None, "p_value": None,
+            "mean": round(float(df["edge"].mean()), 3) if len(df) else None,
+            "ci_low": None, "ci_high": None, "p_value": None,
+            "refusal_reason": refusal,
         }
 
     grouped = {d: g["edge"].to_numpy() for d, g in df.groupby("date")}
@@ -1106,6 +1212,7 @@ def bootstrap_edge_significance_by_block(
         "ci_low": round(float(ci_low), 3),
         "ci_high": round(float(ci_high), 3),
         "p_value": round(float(p_value), 4),
+        "refusal_reason": None,
     }
 
 
@@ -1138,10 +1245,15 @@ def bootstrap_daily_edge_significance_by_block(
     unique_dates = daily.index.to_numpy()
     n_dates = len(unique_dates)
 
-    if len(df) < 5 or n_dates < max(5, block_length):
+    refusal = _block_bootstrap_refusal(len(df), n_dates, block_length)
+    if refusal is not None:
+        # See the sibling function: the equal-date-weighted mean is likewise
+        # descriptive, so it survives the refusal; the inference does not.
         return {
             "n": len(df), "n_dates": n_dates, "block_length": block_length,
-            "mean": None, "ci_low": None, "ci_high": None, "p_value": None,
+            "mean": round(float(daily.mean()), 3) if n_dates else None,
+            "ci_low": None, "ci_high": None, "p_value": None,
+            "refusal_reason": refusal,
         }
 
     values = daily.to_numpy()
@@ -1169,6 +1281,7 @@ def bootstrap_daily_edge_significance_by_block(
         "ci_low": round(float(ci_low), 3),
         "ci_high": round(float(ci_high), 3),
         "p_value": round(float(p_value), 4),
+        "refusal_reason": None,
     }
 
 
@@ -1382,6 +1495,12 @@ def out_of_sample_significance_by_date(
 OUT_OF_SAMPLE_SIGNIFICANCE_BY_BLOCK_COLUMNS = [
     "period", "direction", "weighting", "block_length", "primary", "n", "n_dates", "mean_edge_pct", "ci_low", "ci_high",
     "p_value", "bonferroni_threshold", "significant",
+    # Added 2026-07-30. `min_detectable_effect_pct` is the smallest true edge
+    # this cell could have called significant; read every `significant=False`
+    # against it before calling the result a rejection. `refusal_reason` is
+    # non-null when the bootstrap declined to produce a p-value at all --
+    # which is NOT the same as "tested and found nothing".
+    "min_detectable_effect_pct", "refusal_reason",
 ]
 
 
@@ -1492,6 +1611,10 @@ def out_of_sample_significance_by_block(
                             "p_value": stats["p_value"],
                             "bonferroni_threshold": round(threshold, 6),
                             "significant": stats["p_value"] is not None and stats["p_value"] < threshold,
+                            "min_detectable_effect_pct": _min_detectable_effect_pct(
+                                stats["ci_low"], stats["ci_high"], threshold
+                            ),
+                            "refusal_reason": stats.get("refusal_reason"),
                         }
                     )
 

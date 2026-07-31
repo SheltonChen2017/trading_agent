@@ -1,25 +1,7 @@
 {
-  "version": "1.4.0",
+  "version": "1.4.1",
   "updated_at": "2026-07-30",
   "findings": [
-    {
-      "label": "Eight literature signals (short-term reversal, MAX/lottery, price-to-52-week-high, betting-against-beta, Amihud illiquidity, volume-shock-on-flat-price, close-at-day's-extreme, turn-of-month)",
-      "claim": "Any of eight documented cross-sectional or calendar anomalies beats a random-day baseline out-of-sample",
-      "status": "rejected",
-      "detail": "Pre-registered before any data was fetched (protocol fixed in advance: next_open as the ONLY entry timing, hold_days and block lengths chosen from each signal's own literature horizon, direction predictions and the Bonferroni denominator all written down first -- closing the pre-registration gap that keeps the credit-spread anomaly un-elevated). 8 signals x 2 directions = 16 cells under one shared n_tests=16 threshold of 0.003125. Result: 0 of 16 confirmation-period primary cells significant. Two side-findings worth keeping: MAX came out BACKWARDS (high-MAX leg +3.32%/month, p=0.070; long-short spread -3.72% against the literature's sign) -- consistent with a 2019-2026 semiconductor/tech-heavy universe rewarding high-volatility names, an artifact of this universe rather than a refutation of the anomaly; and turn-of-month failed its own built-in placebo (the mid-month control leg, -0.367%, was MORE negative than the turn-of-month leg, -0.198%), so there is nothing there before significance is even considered. CRITICAL CAVEAT ON THE FIVE MONTHLY SIGNALS: this test could not have detected the effect it was looking for. Minimum detectable effect at the 0.003125 bar was 1.6-5.7% per month against the ~0.5-1%/month these anomalies actually claim -- 3x to 11x too coarse. Working back from the observed ~7.9% monthly dispersion, resolving a 0.5%/month effect would need ~2185 monthly observations (~180 years); even at an uncorrected alpha=0.05 it needs ~80 years. For signals 1-5 the honest verdict is UNTESTABLE ON THIS DATA, which is a different claim from rejected. The obvious fix was tested and REFUTED: testing the long-short spread instead of each leg separately INCREASES the standard error (0.59-0.97x), because edge_vs_own_ticker_pct already removes each ticker's own drift, so differencing two weakly-correlated 10-name estimates just adds variance. The binding constraint is 32 confirmation months x 10 names per leg, not the estimator. The two daily signals (349-468 confirmation dates) are far better positioned and their rejections carry real weight.",
-      "source": "scratchpad PREREGISTRATION.md / run_candidate_signals.py (2026-07-30); backtest/engine.py out_of_sample_significance_by_block",
-      "relevant_tickers": [],
-      "provenance": {
-        "actual_start_date": "2019-07-24",
-        "actual_end_date": "2026-07-30",
-        "actual_row_count": 1764,
-        "requested_lookback_sessions": 1764,
-        "actual_lookback_sessions": 1764,
-        "entry_timing": "next_open",
-        "data_fetched_at": "2026-07-31T01:59:57+00:00",
-        "reproduced_after_data_loader_fix": true
-      }
-    },
     {
       "label": "Original z-score dip/up scanner",
       "claim": "Beats a random-day baseline out-of-sample",

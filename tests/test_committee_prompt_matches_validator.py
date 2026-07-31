@@ -67,6 +67,12 @@ def test_describing_the_candidate_without_the_side_verb_is_accepted():
     assert report.accepted, [issue.message for issue in report.issues]
 
 
+def test_formal_committee_directive_is_rejected_end_to_end():
+    report = _validate("The committee endorses a lighter allocation to NVDA.")
+    assert not report.accepted
+    assert [issue.code for issue in report.issues] == ["forbidden_action_language"]
+
+
 @pytest.mark.parametrize("verb", ["sell", "buy"])
 def test_the_prompt_warns_about_the_side_verb(verb):
     """Half two: the prompt states the enforced rule.
@@ -88,6 +94,13 @@ def test_the_prompt_tells_the_model_not_to_restate_the_side_verb():
         "the prompt must say the ban covers DESCRIPTIVE use, not just "
         "instructions -- that exact gap is what this file exists to prevent"
     )
+
+
+def test_the_prompt_warns_about_committee_recommendation_framing():
+    lowered = SYSTEM_PROMPT.lower()
+    assert "committee-recommendation voice" in lowered
+    assert "committee endorses" in lowered
+    assert "without prescribing" in lowered
 
 
 if __name__ == "__main__":

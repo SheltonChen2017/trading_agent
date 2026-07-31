@@ -170,7 +170,7 @@ _ALLOCATION_ACTION_PATTERN = re.compile(
 )
 _EXPOSURE_ADVICE_PATTERN = re.compile(
     r"\b(?:more|less|additional|greater|smaller|larger)\s+"
-    r"(?:exposure|weight|allocation|position|share|stake)\b"
+    r"(?:exposure|weight|allocation|position|share|stake)\b(?!\s+than\b)"
     r"|better mix"
     r"|benefit(?:s|ed|ting)?\s+from",
     re.IGNORECASE,

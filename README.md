@@ -161,7 +161,7 @@ versioned, labeled independently by `EvidenceStatus`
 strategy can carry a confirmed claim and a rejected claim at the same time
 (see SOXX/SOXL below).
 
-As of the current registry (`research_findings.json` version 1.3.0):
+As of the current registry (`research_findings.json` version 1.4.1):
 
 - **Rejected** (did not survive full confirmation and dependence-aware
   testing): the original z-score scanner; cross-sectional momentum (12-1

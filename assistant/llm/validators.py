@@ -19,6 +19,48 @@ from assistant.llm.schemas import (
 
 _SOURCE_TICKER_PATTERN = re.compile(r"\b[A-Z]{1,5}\b")
 
+# Committee prose has a formal third-person register that the shared advisor
+# filter does not cover well.  Keep this second layer scoped to directive
+# *framing* rather than allocation vocabulary alone: words such as "reduction"
+# and "smaller" are also needed for neutral descriptions of the candidate and
+# its measured effects.
+_COMMITTEE_DIRECTIVE_PATTERN = re.compile(
+    r"\b(?:"
+    r"best\s+brought\s+down\b|"
+    r"the\s+appropriate\s+response\b.{0,80}?\b(?:smaller|less|lower|lighter)\b|"
+    r"the\s+evidence\s+points\s+toward\s+(?:paring|lightening|reducing)\b|"
+    r"the\s+committee\s+endorses\b.{0,80}?\b(?:lighter|smaller|less|lower)\b|"
+    r"the\s+committee\s+sees\s+a\s+case\s+for\s+(?:unwinding|paring|reducing)\b|"
+    r"the\s+committee(?:'s)?\s+recommendation\b.{0,80}?\b(?:smaller|lighter|less|lower)\b|"
+    r"the\s+indicated\s+course\b.{0,80}?\b(?:lighten|reduce|pare|unwind)\b|"
+    r"the\s+natural\s+remedy\b.{0,80}?\b(?:sale|reduction|smaller|lighter)\b|"
+    r"corrective\s+action\b|"
+    r"the\s+data\s+supports\s+stepping\s+back\b|"
+    r"better\s+served\s+by\s+less\b|"
+    r"\breduction\s+in\b.{0,40}?\b(?:holding|position|allocation|exposure)\b"
+    r".{0,60}?\bfollows\s+from\b|"
+    r"\bbringing\b.{0,60}?\bcloser\s+to\s+target\b|"
+    r"\brightsizing\b.{0,60}?\bwould\s+resolve\b"
+    r")",
+    re.IGNORECASE,
+)
+
+
+def _contains_committee_action_language(
+    text: str, allowed_tickers: set[str]
+) -> bool:
+    """Reject advisor-style actions and committee-specific directives.
+
+    This remains a deterministic presentation filter, not a semantic proof
+    that arbitrary prose contains no advice.  The committee is still bounded
+    by its read-only architecture and mandatory human approval/revalidation.
+    """
+
+    return bool(
+        _contains_action_language(text, allowed_tickers)
+        or _COMMITTEE_DIRECTIVE_PATTERN.search(text)
+    )
+
 
 @dataclasses.dataclass(frozen=True)
 class ValidationIssue:
@@ -42,27 +84,18 @@ def validate_committee_review(
     not licensed merely because it appeared somewhere else in the packet.  It
     must appear in at least one source cited by that exact point.
 
-    MEASURED LIMITATION -- the action-language check is a presentation
-    filter, NOT the safety boundary (2026-07-30).  ``_contains_action_language``
-    was tuned against ADVISOR phrasing; committee prose is formal and
-    third-person, a register it covers poorly.  An adversarial probe of 25
-    directives written in committee voice leaked **14** of them -- e.g. "The
-    committee endorses a lighter allocation to NVDA", "The appropriate
-    response to this concentration is a smaller NVDA position".  That is a
-    worse rate than the 8-of-20 advisor probe that already prompted two
-    rounds of patching.  See tests/test_committee_action_language_probe.py,
-    which pins the current behaviour so it cannot silently degrade further.
+    MEASURED LIMITATION -- action-language checking is a presentation filter,
+    NOT the safety boundary (2026-07-30).  The shared advisor filter originally
+    missed 14 of 24 directives written in formal committee voice.  A separate
+    committee-specific layer now rejects all 24 measured directives while
+    preserving the descriptive corpus, including neutral descriptions of the
+    candidate's weight change and drawdown effects.  See
+    tests/test_committee_action_language_probe.py.
 
-    A regex widening to close that family was written and REJECTED after
-    measurement: it caught all 14 but newly blocked 6 of 12 legitimate
-    descriptive sentences, including "the candidate produces a reduction in
-    NVDA weight from 50 to 25 percent" (the committee's core job) and "the
-    strategy showed a reduction in maximum drawdown" (this project's own
-    confirmed finding).  The same words carry directive and descriptive
-    force, so a denylist over free prose cannot separate them -- this is the
-    third probe to demonstrate that.  A structural fix (constraining the
-    output surface so prose cannot express a position change at all) is the
-    real answer; more patterns are not.
+    This is still lexical enforcement over free prose.  It cannot prove the
+    absence of every semantically equivalent recommendation, and passing the
+    probe must not be represented as such a proof.  A future constrained
+    output surface would reduce that residual ambiguity further.
 
     What actually contains the risk is architectural, per
     docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md: the committee is read-only,
@@ -110,7 +143,9 @@ def validate_committee_review(
                 path,
                 "Point contains an uppercase ticker/acronym absent from its cited sources.",
             )
-        if _contains_action_language(point.text, set(committee_input.portfolio_tickers)):
+        if _contains_committee_action_language(
+            point.text, set(committee_input.portfolio_tickers)
+        ):
             issue(
                 "forbidden_action_language",
                 path,

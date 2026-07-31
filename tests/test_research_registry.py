@@ -366,6 +366,31 @@ def test_default_registry_flags_the_known_underfilled_nvdl_dataset():
     assert warning is not None
 
 
+def test_default_registry_does_not_depend_on_ephemeral_scratchpad_sources():
+    raw = json.loads(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8"))
+    scratchpad_sources = [
+        item["source"]
+        for item in raw["findings"]
+        if "scratchpad" in item.get("source", "").lower()
+    ]
+    assert scratchpad_sources == [], (
+        "The versioned evidence registry must point to durable, reviewable "
+        f"artifacts, not local scratchpad files: {scratchpad_sources}"
+    )
+
+
+def test_readme_reports_the_live_registry_version():
+    import re
+
+    raw = json.loads(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8"))
+    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(
+        encoding="utf-8"
+    )
+    match = re.search(r"research_findings\.json` version ([0-9.]+)", readme)
+    assert match is not None
+    assert match.group(1) == str(raw["version"])
+
+
 if __name__ == "__main__":
     test_confirmed_finding_without_provenance_is_rejected()
     test_promising_unconfirmed_finding_without_provenance_is_rejected()

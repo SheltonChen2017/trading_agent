@@ -16,12 +16,14 @@ Background (2026-07-30): a candidate-signal run surfaced two defects here.
    reported a +0.013% mean edge as significant at p=0.0.
 
 2. Even away from that corner the test was anti-conservative at small
-   `n_dates` -- 18.5% false positives at alpha=0.05 on i.i.d. noise with
-   31 dates and block 10, against a nominal 5%.
+   `n_dates` and when the block consumed too much of the sample -- 18.5%
+   false positives at 31 dates/block 10, and 16.7% at 50 dates/block 20,
+   against a nominal 5%.
 
-Both now return a `refusal_reason` instead of a number. Note the direction
-of the original error: it made significance EASIER, so it never produced a
-false REJECTION -- previously-recorded rejections are unaffected.
+Both now return a `refusal_reason` instead of a number unless there are at
+least 50 dates and 10 full blocks. Note the direction of the original error:
+it made significance EASIER, so it never produced a false REJECTION --
+previously-recorded rejections are unaffected.
 """
 from __future__ import annotations
 
@@ -30,10 +32,13 @@ import pandas as pd
 import pytest
 
 from backtest.engine import (
+    MIN_BLOCK_BOOTSTRAP_BLOCKS,
     MIN_BLOCK_BOOTSTRAP_DATES,
+    _min_detectable_effect_pct,
     bonferroni_threshold,
     bootstrap_daily_edge_significance_by_block,
     bootstrap_edge_significance_by_block,
+    out_of_sample_significance_by_block,
     recommended_n_bootstrap,
 )
 
@@ -65,15 +70,16 @@ def test_a_block_as_long_as_the_sample_is_refused(fn):
         "mean; it must be refused, not reported"
     )
     assert stats["refusal_reason"], "a refusal must say why"
-    assert "independent blocks" in stats["refusal_reason"]
+    assert "full blocks" in stats["refusal_reason"]
 
 
 @pytest.mark.parametrize("fn", BOTH_VARIANTS)
-def test_fewer_than_two_blocks_is_refused(fn):
-    """One block short of degenerate is still degenerate enough."""
-    stats = fn(pd.Series(np.full(80, 0.5)), _dates(20, 4), block_length=11)
+def test_fewer_than_ten_full_blocks_is_refused(fn):
+    """The measured 50-date boundary was still anti-conservative with
+    block lengths that left only 2.5-5 full blocks."""
+    stats = fn(pd.Series(np.full(80, 0.5)), _dates(20, 4), block_length=3)
     assert stats["p_value"] is None
-    assert "independent blocks" in stats["refusal_reason"]
+    assert "10 full blocks" in stats["refusal_reason"]
 
 
 @pytest.mark.parametrize("fn", BOTH_VARIANTS)
@@ -105,6 +111,21 @@ def test_enough_dates_still_produces_a_p_value(fn):
 
 
 @pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_fifty_dates_only_accepts_a_block_with_ten_full_repetitions(fn):
+    rng = np.random.default_rng(11)
+    edges = pd.Series(rng.normal(0, 3.0, size=50 * 4))
+    date_col = _dates(50, 4)
+
+    accepted = fn(edges, date_col, block_length=5, n_bootstrap=200)
+    refused = fn(edges, date_col, block_length=10, n_bootstrap=200)
+
+    assert accepted["p_value"] is not None
+    assert accepted["refusal_reason"] is None
+    assert refused["p_value"] is None
+    assert "10 full blocks" in refused["refusal_reason"]
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
 def test_false_positive_rate_on_pure_noise_is_near_nominal(fn):
     """The test that keeps the rest honest.
 
@@ -125,7 +146,7 @@ def test_false_positive_rate_on_pure_noise_is_near_nominal(fn):
             false_positives += 1
 
     rate = false_positives / trials
-    assert rate <= 0.20, (
+    assert rate <= 0.15, (
         f"false-positive rate on pure noise is {rate:.0%} against a nominal 5% -- "
         "the block bootstrap has lost calibration"
     )
@@ -214,6 +235,66 @@ def test_the_cap_binds_on_very_wide_runs_and_that_is_documented():
     assert 2 / 20000 > bonferroni_threshold(200) / 10
 
 
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+@pytest.mark.parametrize(
+    ("name", "kwargs"),
+    [
+        ("block_length", {"block_length": 0}),
+        ("block_length", {"block_length": 1.5}),
+        ("n_bootstrap", {"block_length": 5, "n_bootstrap": 0}),
+    ],
+)
+def test_invalid_resampling_parameters_fail_clearly(fn, name, kwargs):
+    with pytest.raises(ValueError, match=name):
+        fn(pd.Series(np.ones(60)), _dates(60, 1), **kwargs)
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_nonfinite_edges_and_missing_dates_are_excluded(fn):
+    edges = pd.Series(np.linspace(-1, 1, 62))
+    dates = _dates(62, 1)
+    edges.iloc[0] = np.inf
+    dates.iloc[1] = pd.NaT
+
+    stats = fn(edges, dates, block_length=5, n_bootstrap=200)
+
+    assert stats["n"] == 60
+    assert stats["n_dates"] == 60
+    assert stats["p_value"] is not None
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_misaligned_edges_and_dates_are_rejected(fn):
+    with pytest.raises(ValueError, match="same length"):
+        fn(pd.Series(np.ones(60)), _dates(59, 1), block_length=5)
+
+
+def test_minimum_detectable_effect_includes_target_power():
+    # A symmetric [-1.96, 1.96] interval implies SE ~= 1. At alpha=.05
+    # and 80% power the normal approximation is 1.96 + 0.842 = 2.802.
+    assert _min_detectable_effect_pct(-1.96, 1.96, 0.05) == 2.802
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"n_tests": 0},
+        {"n_tests": 2, "alpha": 0},
+        {"n_tests": 2, "floor": 0},
+        {"n_tests": 2, "floor": 3000, "cap": 2000},
+    ],
+)
+def test_recommended_resample_count_rejects_invalid_configuration(kwargs):
+    with pytest.raises(ValueError):
+        recommended_n_bootstrap(**kwargs)
+
+
+@pytest.mark.parametrize("block_lengths", [(), (0, 5), (5, 5), (10, 5)])
+def test_by_block_entry_point_rejects_ambiguous_block_sweeps(block_lengths):
+    with pytest.raises(ValueError, match="block_lengths"):
+        out_of_sample_significance_by_block({}, block_lengths=block_lengths)
+
+
 def test_min_dates_constant_is_not_quietly_lowered():
     """The threshold is a measured value, not a tunable.
 
@@ -222,6 +303,7 @@ def test_min_dates_constant_is_not_quietly_lowered():
     measurements in _block_bootstrap_refusal's docstring together.
     """
     assert MIN_BLOCK_BOOTSTRAP_DATES == 50
+    assert MIN_BLOCK_BOOTSTRAP_BLOCKS == 10
 
 
 if __name__ == "__main__":

@@ -110,6 +110,7 @@ class PortfolioSnapshot:
     account_mode: str = "manual"
     open_orders: list[dict] = dataclasses.field(default_factory=list)
     open_orders_available: bool = True
+    account_id: str | None = None
 
     @property
     def cash_decimal(self) -> Decimal:

@@ -28,7 +28,8 @@ python scripts/run_personal_assistant.py --database data/paper.db recovery-drill
 ```
 
 The epoch binds the Git commit, mandate fingerprint, policy fingerprint,
-strategy ID/version, and model ID. A material change to any of them requires:
+strategy ID/version, model ID, and the connected Alpaca paper account ID. A
+material change to any of them—or switching broker accounts—requires:
 
 ```text
 python scripts/run_personal_assistant.py --database data/paper.db paper-epoch-close paper-2026q3
@@ -37,14 +38,19 @@ python scripts/run_personal_assistant.py --database data/paper.db paper-epoch-cl
 Commit the change and start a new epoch. Do not combine observations from
 different epochs to satisfy a promotion threshold.
 
+An epoch created before broker-account lineage was introduced cannot be
+continued under the stronger schema. Close it, complete any required legacy
+`ledger-bind-account` migration, commit the upgraded runtime, and start a new
+epoch bound to the verified account.
+
 ## Unattended cadence
 
 | Control | Cadence | Command |
 | --- | --- | --- |
-| Order monitor | Continuous; 30-second polling fallback | `monitor-orders --poll-seconds 30` |
+| Order monitor | Continuous; 30-second polling fallback | `monitor-orders --cancel-stale --poll-seconds 30` |
 | Watchdog | Continuous; 60-second health heartbeat | `run_operations_watchdog.py --interval-seconds 60` |
-| Operations cycle | Every 10 minutes | `operations-cycle --alerts-jsonl data/alerts.jsonl` |
-| Paper observation | Once after each NYSE close | `paper-observation --alerts-jsonl data/alerts.jsonl` |
+| Operations cycle | Every 10 minutes | `operations-cycle --cancel-stale --alerts-jsonl data/alerts.jsonl` |
+| Paper observation | Once after each NYSE close | `paper-observation --cancel-stale --alerts-jsonl data/alerts.jsonl` |
 
 `operations-cycle` runs order reconciliation, idempotent fill-to-ledger sync,
 broker-versus-ledger reconciliation, conditional verified backup, and the
@@ -64,7 +70,7 @@ creates a critical alert.
 The continuous processes can also be started directly:
 
 ```text
-python scripts/run_personal_assistant.py --database data/paper.db monitor-orders --poll-seconds 30
+python scripts/run_personal_assistant.py --database data/paper.db monitor-orders --cancel-stale --poll-seconds 30
 python scripts/run_operations_watchdog.py --database data/paper.db --interval-seconds 60 --alerts-jsonl data/alerts.jsonl
 ```
 
@@ -150,13 +156,19 @@ through the operator's evidence-retention system.
 
 ## Incident response
 
-1. Activate the persistent kill switch.
+1. Run `cancel-all-orders --confirm "cancel all open orders" --reason
+   "<incident>"`; it activates the persistent kill switch before attempting
+   every open broker-order cancellation.
 2. Preserve logs, the database and WAL files.
 3. Check ambiguous broker outcomes before retrying anything.
 4. Query Alpaca directly for current orders, positions and account state.
 5. Run order synchronization and portfolio-ledger reconciliation.
 6. Keep the kill switch active until every discrepancy is explained.
 7. Record the incident, corrective action and recovery evidence.
+
+If cancel-all exits nonzero, treat every reported failure as potentially
+still live and verify it directly at Alpaca. Do not clear the kill switch
+until the broker has no unexplained open orders.
 
 The recovery drill creates a consistent backup, restores it to a temporary
 database, runs SQLite integrity checks on both copies, and compares every

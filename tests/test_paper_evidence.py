@@ -26,6 +26,7 @@ def _lineage(commit: str = "a" * 40) -> dict[str, str]:
         strategy_id="shared-capital-scanner",
         strategy_version="1.0.0",
         model_id="deterministic-no-model",
+        broker_account_id="paper-account-1",
     )
 
 
@@ -40,6 +41,7 @@ def _snapshot(
         buying_power=equity,
         source="alpaca",
         account_mode=account_mode,
+        account_id="paper-account-1",
     )
 
 
@@ -52,6 +54,7 @@ def _reconcile(store: AssistantStore, at: datetime) -> None:
             "reconciled_at": at.isoformat(),
             "matched": True,
             "mismatch_count": 0,
+            "broker": {"account_id": "paper-account-1"},
         },
     )
 
@@ -209,6 +212,29 @@ def test_observation_requires_paper_mode_recent_reconciliation_and_close(tmp_pat
     assert later_retry["observation_id"] == recorded["observation_id"]
     assert later_retry["total_equity"] == recorded["total_equity"]
     assert later_retry["already_recorded"] is True
+
+
+def test_observation_rejects_a_different_broker_account(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    start_paper_evidence_epoch(
+        store,
+        "paper-v1",
+        _lineage(),
+        started_at=datetime(2026, 7, 29, 13, tzinfo=timezone.utc),
+    )
+    after_close = datetime(2026, 7, 29, 20, 30, tzinfo=timezone.utc)
+    _reconcile(store, after_close)
+    snapshot = _snapshot(1_000)
+    snapshot.account_id = "paper-account-2"
+
+    with pytest.raises(PaperEvidenceError, match="active evidence epoch"):
+        capture_paper_account_observation(
+            store,
+            snapshot,
+            benchmark_ticker="SPY",
+            benchmark_close=100,
+            captured_at=after_close,
+        )
 
 
 def test_summary_adjusts_external_flows_counts_orders_and_requires_coverage(

@@ -513,13 +513,20 @@ def _mock_execution_dependencies(
     def fake_submit(ticker, shares, side="buy", *, authorization=None, idempotency_key=None):
         assert authorization is not None
         captured.append((ticker, shares, side, idempotency_key))
-        return {"order_id": "paper-1", "ticker": ticker, "shares": shares, "side": side, "status": "accepted"}
+        return {
+            "order_id": f"paper-{len(captured)}",
+            "ticker": ticker,
+            "shares": shares,
+            "side": side,
+            "status": "accepted",
+        }
 
     def fake_submit_limit(ticker, shares, limit_price, side="buy", *, authorization=None, idempotency_key=None):
         assert authorization is not None
         captured.append((ticker, shares, side, idempotency_key, limit_price))
         return {
-            "order_id": "paper-limit-1", "ticker": ticker, "shares": shares, "side": side,
+            "order_id": f"paper-limit-{len(captured)}",
+            "ticker": ticker, "shares": shares, "side": side,
             "limit_price": limit_price, "status": "accepted",
         }
 

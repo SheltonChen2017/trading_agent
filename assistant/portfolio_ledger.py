@@ -246,6 +246,10 @@ def bootstrap_opening_snapshot(
     occurred = now or datetime.now(timezone.utc)
     if occurred.tzinfo is None:
         raise LedgerError("bootstrap time must be timezone-aware")
+    if snapshot.source == "alpaca" and not snapshot.account_id:
+        raise LedgerError(
+            "Alpaca ledger bootstrap requires the connected broker account ID"
+        )
 
     postings: list[Posting] = []
     total_opening_value = _decimal(snapshot.cash, "snapshot.cash")
@@ -273,6 +277,7 @@ def bootstrap_opening_snapshot(
         "as_of": snapshot.as_of,
         "source": snapshot.source,
         "account_mode": snapshot.account_mode,
+        "account_id": snapshot.account_id,
         "cash": snapshot.cash,
         "positions": [
             {
@@ -303,6 +308,7 @@ def bootstrap_opening_snapshot(
         "snapshot_as_of": snapshot.as_of,
         "source": snapshot.source,
         "account_mode": snapshot.account_mode,
+        "account_id": snapshot.account_id,
         "snapshot_hash": digest,
     }
     store.set_system_state("ledger_bootstrap", state)
@@ -609,10 +615,30 @@ def reconcile_snapshot(
     *,
     source: str | None = None,
     now: datetime | None = None,
+    _allow_unbound_alpaca: bool = False,
 ) -> dict[str, Any]:
     reconciled_at = now or datetime.now(timezone.utc)
     if reconciled_at.tzinfo is None:
         raise LedgerError("reconciliation time must be timezone-aware")
+    bootstrap = store.get_system_state("ledger_bootstrap")
+    if isinstance(bootstrap, dict) and bootstrap.get("source") == "alpaca":
+        bound_account_id = str(bootstrap.get("account_id") or "").strip()
+        current_account_id = str(snapshot.account_id or "").strip()
+        if not bound_account_id and not _allow_unbound_alpaca:
+            raise LedgerError(
+                "The existing Alpaca journal predates account-ID binding. "
+                "Run ledger-bind-account to migrate it only after verifying "
+                "the connected broker account."
+            )
+        if bound_account_id and current_account_id != bound_account_id:
+            raise LedgerError(
+                "Connected Alpaca account does not match the account bound "
+                "to the portfolio journal."
+            )
+    elif snapshot.source == "alpaca" and not snapshot.account_id:
+        raise LedgerError(
+            "Alpaca reconciliation requires the connected broker account ID"
+        )
     balances = ledger_balances(store)
     ledger_cash = balances["cash"]
     broker_cash = _decimal(snapshot.cash, "snapshot.cash")
@@ -676,6 +702,7 @@ def reconcile_snapshot(
             },
             "snapshot_as_of": snapshot.as_of,
             "account_mode": snapshot.account_mode,
+            "account_id": snapshot.account_id,
         },
         "tolerances": {
             "cash": _decimal_text(CASH_TOLERANCE),
@@ -686,3 +713,79 @@ def reconcile_snapshot(
         report["reconciliation_id"], report["source"], report
     )
     return report
+
+
+def bind_legacy_alpaca_account(
+    store: AssistantStore,
+    snapshot: PortfolioSnapshot,
+    *,
+    confirmation: str,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Bind a pre-account-ID Alpaca journal after an exact reconciliation."""
+    if str(confirmation).strip().lower() != "bind account":
+        raise LedgerError(
+            'legacy account binding requires confirmation "bind account"'
+        )
+    bootstrap = store.get_system_state("ledger_bootstrap")
+    if not isinstance(bootstrap, dict) or bootstrap.get("source") != "alpaca":
+        raise LedgerError(
+            "legacy account binding requires an existing Alpaca bootstrap"
+        )
+    account_id = str(snapshot.account_id or "").strip()
+    if snapshot.source != "alpaca" or not account_id:
+        raise LedgerError(
+            "legacy account binding requires an identified Alpaca snapshot"
+        )
+    expected_mode = str(bootstrap.get("account_mode") or "").strip()
+    if expected_mode and snapshot.account_mode != expected_mode:
+        raise LedgerError(
+            "connected Alpaca account mode does not match the journal "
+            f"bootstrap ({snapshot.account_mode!r} vs {expected_mode!r})"
+        )
+    existing = str(bootstrap.get("account_id") or "").strip()
+    if existing:
+        if existing != account_id:
+            raise LedgerError(
+                "journal is already bound to a different Alpaca account"
+            )
+        return {
+            "bound": True,
+            "already_bound": True,
+            "account_id": existing,
+        }
+
+    report = reconcile_snapshot(
+        store,
+        snapshot,
+        now=now,
+        _allow_unbound_alpaca=True,
+    )
+    if not report["matched"]:
+        raise LedgerError(
+            "refusing to bind the legacy journal because cash/positions do "
+            "not reconcile within the journal's strict cash/share "
+            "tolerances with the connected Alpaca account"
+        )
+    bound_at = (now or datetime.now(timezone.utc)).astimezone(
+        timezone.utc
+    )
+    migrated = dict(bootstrap)
+    migrated.update(
+        {
+            "account_id": account_id,
+            "account_bound_at": bound_at.isoformat(),
+            "account_binding_method": "exact_ledger_reconciliation",
+            "account_binding_reconciliation_id": report[
+                "reconciliation_id"
+            ],
+        }
+    )
+    store.set_system_state("ledger_bootstrap", migrated)
+    return {
+        "bound": True,
+        "already_bound": False,
+        "account_id": account_id,
+        "account_bound_at": bound_at.isoformat(),
+        "reconciliation_id": report["reconciliation_id"],
+    }

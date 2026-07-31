@@ -318,6 +318,240 @@ def _cancel_if_stale(
     return True
 
 
+def cancel_assistant_order(
+    store: AssistantStore,
+    proposal_id: str,
+    *,
+    broker_module=None,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Cancel the authoritative broker order for one assistant proposal."""
+    if broker_module is None:
+        import execution.alpaca_broker as broker_module
+    requested_at = now or datetime.now(timezone.utc)
+    if requested_at.tzinfo is None:
+        raise ValueError("cancel timestamp must be timezone-aware")
+    requested_at = requested_at.astimezone(timezone.utc)
+    proposal = store.get_proposal(proposal_id)
+    if proposal is None:
+        raise KeyError(f"Unknown proposal: {proposal_id}")
+    if proposal["status"] not in RECONCILABLE_STATUSES:
+        raise ProposalExecutionError(
+            f"Proposal {proposal_id} is not in a cancelable broker state "
+            f"(status={proposal['status']!r})."
+        )
+
+    order = broker_module.find_order_by_client_id(
+        proposal["idempotency_key"]
+    )
+    if order is None:
+        raise ProposalExecutionError(
+            f"Broker confirms no order exists for proposal {proposal_id}."
+        )
+    resolution = _resolve_chain_for(proposal, order, broker_module)
+    if resolution.error is not None:
+        # If an altered replacement was actually located, cancellation is a
+        # risk-reducing action and must not be obstructed by the identity
+        # anomaly. Follow the remaining structural chain without trusting
+        # identity, cancel the latest order we can locate, then always
+        # park/kill-switch—even if the broker rejects the cancellation.
+        if (
+            resolution.error_kind == CHAIN_ERROR_IDENTITY_MISMATCH
+            and resolution.traversed_orders
+        ):
+            anomalous = resolution.traversed_orders[-1]
+            untrusted_tail = resolve_replacement_chain(
+                anomalous,
+                lambda order_id: broker_module.get_order_by_id(order_id),
+            )
+            cancel_target = (
+                untrusted_tail.authoritative_order
+                or (
+                    untrusted_tail.traversed_orders[-1]
+                    if untrusted_tail.traversed_orders
+                    else anomalous
+                )
+            )
+            cancel_error: str | None = None
+            try:
+                broker_module.cancel_order(
+                    str(cancel_target["order_id"])
+                )
+            except Exception as exc:
+                cancel_error = str(exc)
+            reason = _record_chain_failure(store, proposal_id, resolution)
+            if cancel_error:
+                reason += (
+                    " The emergency cancellation request for "
+                    f"{cancel_target.get('order_id')} also failed: "
+                    f"{cancel_error}"
+                )
+            raise ProposalExecutionError(reason)
+        reason = _record_chain_failure(store, proposal_id, resolution)
+        raise ProposalExecutionError(reason)
+
+    authoritative = resolution.authoritative_order
+    cancel_result = broker_module.cancel_order(
+        str(authoritative["order_id"])
+    )
+    pending = dict(authoritative)
+    pending.update(cancel_result or {})
+    pending["status"] = "pending_cancel"
+    pending["cancel_requested_at"] = requested_at.isoformat()
+    projected = apply_broker_update(
+        store,
+        proposal,
+        pending,
+        event_type="operator_cancel_requested",
+        event_at=requested_at.isoformat(),
+        raw_event={
+            "operator_cancel": True,
+            "replacement_chain": list(resolution.chain),
+            "order": pending,
+        },
+    )
+    return {
+        "proposal_id": proposal_id,
+        "order_id": str(authoritative["order_id"]),
+        "status": projected["status"],
+        "cancel_requested_at": requested_at.isoformat(),
+        "replacement_chain": list(resolution.chain),
+    }
+
+
+def cancel_all_open_orders(
+    store: AssistantStore,
+    *,
+    broker_module=None,
+    reason: str,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Engage the durable kill switch, then cancel every broker open order.
+
+    Unmanaged and identity-mismatched orders are still canceled. Emergency
+    risk reduction must not depend on the assistant being able to attribute
+    an order cleanly; attribution errors are returned and preserved for
+    investigation after the cancellation request.
+    """
+    if broker_module is None:
+        import execution.alpaca_broker as broker_module
+    normalized_reason = str(reason).strip()
+    if not normalized_reason:
+        raise ValueError("cancel-all reason must be non-empty")
+    requested_at = now or datetime.now(timezone.utc)
+    if requested_at.tzinfo is None:
+        raise ValueError("cancel-all timestamp must be timezone-aware")
+    requested_at = requested_at.astimezone(timezone.utc)
+    store.set_kill_switch(
+        True,
+        reason=f"Emergency cancel-all requested: {normalized_reason}",
+    )
+
+    try:
+        orders = broker_module.get_open_orders()
+    except Exception as exc:
+        result = {
+            "requested_at": requested_at.isoformat(),
+            "reason": normalized_reason,
+            "kill_switch_active": True,
+            "open_order_count": None,
+            "cancel_requested_count": 0,
+            "unmanaged_order_count": 0,
+            "canceled": [],
+            "errors": [
+                {
+                    "order_id": None,
+                    "error": f"open-order query failed: {exc}",
+                }
+            ],
+        }
+        store.set_system_state("last_cancel_all_open_orders", result)
+        return result
+    canceled: list[dict[str, Any]] = []
+    errors: list[dict[str, Any]] = []
+    unmanaged = 0
+    for order in orders:
+        order_id = str(order.get("order_id") or "")
+        if not order_id:
+            errors.append(
+                {"order_id": None, "error": "broker open order has no ID"}
+            )
+            continue
+        try:
+            # Reach the broker before doing any local attribution or
+            # projection. In an emergency, a damaged local database must not
+            # stop a later open order from receiving its cancellation.
+            cancel_result = broker_module.cancel_order(order_id)
+        except Exception as exc:
+            errors.append({"order_id": order_id, "error": str(exc)})
+            continue
+
+        proposal: dict[str, Any] | None = None
+        try:
+            proposal = _proposal_for_update(store, order)
+        except Exception as exc:
+            errors.append(
+                {
+                    "order_id": order_id,
+                    "error": (
+                        "cancel requested; local attribution failed: "
+                        f"{exc}"
+                    ),
+                }
+            )
+        canceled.append(
+            {
+                "order_id": order_id,
+                "proposal_id": (
+                    proposal.get("proposal_id") if proposal else None
+                ),
+            }
+        )
+        if proposal is None:
+            unmanaged += 1
+            continue
+        try:
+            pending = dict(order)
+            pending.update(cancel_result or {})
+            pending["status"] = "pending_cancel"
+            pending["cancel_requested_at"] = requested_at.isoformat()
+            apply_broker_update(
+                store,
+                proposal,
+                pending,
+                event_type="emergency_cancel_all_requested",
+                event_at=requested_at.isoformat(),
+                raw_event={
+                    "emergency_cancel_all": True,
+                    "reason": normalized_reason,
+                    "order": pending,
+                },
+            )
+        except Exception as exc:
+            # The cancellation already reached the broker. Keep going so
+            # one corrupt local projection cannot leave later orders live.
+            errors.append(
+                {
+                    "order_id": order_id,
+                    "proposal_id": proposal.get("proposal_id"),
+                    "error": f"cancel requested; local projection failed: {exc}",
+                }
+            )
+
+    result = {
+        "requested_at": requested_at.isoformat(),
+        "reason": normalized_reason,
+        "kill_switch_active": True,
+        "open_order_count": len(orders),
+        "cancel_requested_count": len(canceled),
+        "unmanaged_order_count": unmanaged,
+        "canceled": canceled,
+        "errors": errors,
+    }
+    store.set_system_state("last_cancel_all_open_orders", result)
+    return result
+
+
 def _absence_is_believable(
     proposal: dict[str, Any],
     *,
@@ -609,7 +843,14 @@ def monitor_orders(
             stop.wait(reconnect_delay_seconds)
     finally:
         stop.set()
-        poller.join(timeout=min(poll_interval_seconds, 2.0))
+        # A short polling interval must not also become an unrealistically
+        # short shutdown deadline. The poller may already be finishing one
+        # reconciliation/database transaction when stop is set; returning
+        # while it still owns SQLite leaves the caller with a live background
+        # worker and, on Windows, a database file that cannot be moved or
+        # removed. Keep shutdown bounded for a genuinely stuck broker call,
+        # but give an in-flight normal poll a real opportunity to finish.
+        poller.join(timeout=max(2.0, min(poll_interval_seconds, 30.0)))
         store.set_system_state(
             "trade_stream_state",
             {

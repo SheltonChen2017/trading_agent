@@ -36,7 +36,11 @@ from assistant.order_lifecycle import (
     journal_broker_order_update,
     resolve_replacement_chain,
 )
-from assistant.order_reconciler import reconcile_nonterminal_orders
+from assistant.order_reconciler import (
+    cancel_all_open_orders,
+    cancel_assistant_order,
+    reconcile_nonterminal_orders,
+)
 from assistant.proposal_status import (
     BROKER_ACCEPTED,
     CANCEL_PENDING,
@@ -315,6 +319,154 @@ def test_stale_cancellation_targets_the_final_order_in_a_multi_hop_chain():
             cancel_stale=True, max_order_age_minutes=1.0,
         )
         assert canceled == ["order-3"]
+
+
+def test_operator_cancel_follows_the_replacement_chain():
+    orders = {
+        "order-1": _order(
+            "order-1", "replaced", replaced_by="order-2"
+        ),
+        "order-2": _order(
+            "order-2", "accepted", replaces="order-1"
+        ),
+    }
+    canceled: list[str] = []
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        result = cancel_assistant_order(
+            store,
+            "tp-ready",
+            broker_module=_broker(orders, canceled=canceled),
+            now=datetime(2026, 7, 30, 15, 0, tzinfo=timezone.utc),
+        )
+
+        assert canceled == ["order-2"]
+        assert result["order_id"] == "order-2"
+        # The shared resolver records the replacement IDs it followed; the
+        # original order is available separately through the proposal/order
+        # journal.
+        assert result["replacement_chain"] == ["order-2"]
+        assert store.get_proposal("tp-ready")["status"] == CANCEL_PENDING
+
+
+def test_operator_cancel_kill_switches_even_if_mismatch_cancel_fails():
+    orders = {
+        "order-1": _order(
+            "order-1", "replaced", replaced_by="order-2"
+        ),
+        "order-2": _order(
+            "order-2",
+            "accepted",
+            replaces="order-1",
+            shares=999.0,
+        ),
+    }
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        with pytest.raises(Exception, match="cancellation request"):
+            cancel_assistant_order(
+                store,
+                "tp-ready",
+                broker_module=_broker(orders, cancel_raises=True),
+            )
+
+        assert store.get_kill_switch()["active"] is True
+        assert store.get_proposal("tp-ready")["status"] == SUBMISSION_UNKNOWN
+
+
+def test_emergency_cancel_all_engages_kill_switch_and_cancels_unmanaged_orders():
+    managed = _order(
+        "order-1",
+        "accepted",
+        client_order_id="idem-tp-ready",
+    )
+    unmanaged = _order(
+        "outside-order",
+        "accepted",
+        client_order_id="outside-client-id",
+    )
+    canceled: list[str] = []
+
+    class Broker:
+        @staticmethod
+        def get_open_orders():
+            return [managed, unmanaged]
+
+        @staticmethod
+        def cancel_order(order_id):
+            canceled.append(order_id)
+            return {"order_id": order_id, "status": "pending_cancel"}
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        result = cancel_all_open_orders(
+            store,
+            broker_module=Broker,
+            reason="operator incident drill",
+            now=datetime(2026, 7, 30, 15, 0, tzinfo=timezone.utc),
+        )
+
+        assert canceled == ["order-1", "outside-order"]
+        assert result["cancel_requested_count"] == 2
+        assert result["unmanaged_order_count"] == 1
+        assert result["errors"] == []
+        assert store.get_kill_switch()["active"] is True
+        assert store.get_proposal("tp-ready")["status"] == CANCEL_PENDING
+
+
+def test_emergency_cancel_all_continues_after_one_broker_rejection():
+    first = _order("order-1", "accepted")
+    second = _order("order-2", "accepted")
+    attempted: list[str] = []
+
+    class Broker:
+        @staticmethod
+        def get_open_orders():
+            return [first, second]
+
+        @staticmethod
+        def cancel_order(order_id):
+            attempted.append(order_id)
+            if order_id == "order-1":
+                raise RuntimeError("temporary broker rejection")
+            return {"order_id": order_id, "status": "pending_cancel"}
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        result = cancel_all_open_orders(
+            store,
+            broker_module=Broker,
+            reason="cancel-all partial failure test",
+        )
+
+        assert attempted == ["order-1", "order-2"]
+        assert result["cancel_requested_count"] == 1
+        assert len(result["errors"]) == 1
+        assert store.get_kill_switch()["active"] is True
+
+
+def test_emergency_cancel_all_records_an_open_order_query_failure():
+    class Broker:
+        @staticmethod
+        def get_open_orders():
+            raise RuntimeError("broker unavailable")
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = _store(temp)
+        result = cancel_all_open_orders(
+            store,
+            broker_module=Broker,
+            reason="broker outage incident",
+        )
+
+        assert result["open_order_count"] is None
+        assert result["cancel_requested_count"] == 0
+        assert "open-order query failed" in result["errors"][0]["error"]
+        assert store.get_kill_switch()["active"] is True
+        assert (
+            store.get_system_state("last_cancel_all_open_orders")
+            == result
+        )
 
 
 def test_a_non_stale_replacement_is_not_cancelled_even_if_the_original_is_old():

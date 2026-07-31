@@ -12,6 +12,25 @@ from assistant.storage import AssistantStore
 from risk.execution_gate import TradeIntent, validate_trade_intent
 
 
+def _save_budget_proposal(store: AssistantStore, proposal_id: str) -> None:
+    store.save_proposal(
+        {
+            "proposal_id": proposal_id,
+            "created_at": "2026-07-30T12:00:00+00:00",
+            "expires_at": "2026-07-31T12:00:00+00:00",
+            "status": "filled",
+            "idempotency_key": f"idem-{proposal_id}",
+            "intent": {
+                "ticker": proposal_id.upper(),
+                "side": "buy",
+                "shares": 1,
+                "order_type": "market",
+                "limit_price": None,
+            },
+        }
+    )
+
+
 def test_decimal_conversion_uses_visible_value_not_binary_expansion():
     assert to_decimal(0.1) == Decimal("0.1")
     assert to_decimal(0.1) + to_decimal(0.2) == Decimal("0.3")
@@ -20,6 +39,8 @@ def test_decimal_conversion_uses_visible_value_not_binary_expansion():
 
 def test_daily_reservation_accepts_exact_float_boundary(tmp_path):
     store = AssistantStore(tmp_path / "assistant.db")
+    for proposal_id in ("p-1", "p-2", "p-3"):
+        _save_budget_proposal(store, proposal_id)
 
     store.reserve_execution_budget(
         "p-1",

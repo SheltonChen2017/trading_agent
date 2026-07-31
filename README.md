@@ -34,6 +34,10 @@ buy orders.
   drills for an external process supervisor.
 - Preserves the existing signal, backtest, statistical-validation, ML, and
   leveraged-ETF research toolkit.
+- Provides a provider-neutral, read-only investment-committee foundation:
+  privacy-controlled packet projection, addressable deterministic facts,
+  strict review schemas, and fail-closed source/number/ticker/research-authority
+  validation. It does not call a model or broker by itself.
 
 ## Safety model
 
@@ -604,7 +608,7 @@ python scripts/run_personal_assistant.py sync-orders
 Run the long-lived trade-update stream with a 30-second polling fallback:
 
 ```bash
-python scripts/run_personal_assistant.py monitor-orders --poll-seconds 30
+python scripts/run_personal_assistant.py monitor-orders --cancel-stale --poll-seconds 30
 ```
 
 Streaming and polling share one append-only, deduplicated event journal and
@@ -612,6 +616,27 @@ an atomic monotonic projection, so a replayed old `accepted` event cannot
 move a `filled` proposal backward. To request cancellation of working orders
 older than `max_order_age_minutes`, opt in with `--cancel-stale`; the service
 never automatically reprices or replaces an order.
+
+An operator can cancel the authoritative order for one proposal even after
+the broker has replaced it:
+
+```bash
+python scripts/run_personal_assistant.py cancel-order tp_0123456789abcdef --confirm cancel
+```
+
+For an incident, the emergency command activates the persistent kill switch
+first and then attempts to cancel every open broker order, including orders
+not created by this app. It continues through individual failures and exits
+nonzero if any cancellation or local projection failed:
+
+```bash
+python scripts/run_personal_assistant.py cancel-all-orders --confirm "cancel all open orders" --reason "operator incident"
+```
+
+The Windows scheduled-task installer enables `--cancel-stale` on the order
+monitor, operations cycle, and post-close observation. Stale cancellation is
+therefore enforced by the supplied unattended configuration, while direct
+ad-hoc commands retain an explicit opt-in.
 
 Before a paper soak or operator handoff:
 
@@ -645,15 +670,29 @@ journal exactly once and reconcile it:
 ```bash
 python scripts/run_personal_assistant.py ledger-bootstrap --confirm bootstrap
 python scripts/run_personal_assistant.py ledger-sync
+python scripts/run_personal_assistant.py ledger-transfer --external-id deposit-2026-08-01 --amount 1000 --occurred-at 2026-08-01T14:00:00+00:00 --description "Broker cash deposit"
+python scripts/run_personal_assistant.py ledger-fee --external-id fee-2026-08-01 --amount 0.03 --occurred-at 2026-08-01T14:00:00+00:00 --description "Regulatory fee"
 python scripts/run_personal_assistant.py ledger-reconcile
 ```
 
 The opening snapshot is explicit because this app's broker-event history does
 not include positions acquired before the app existed. After bootstrap,
 `ledger-sync` records app fills exactly once and `ledger-reconcile` compares
-cash and shares independently with Alpaca. Tax lots remain separate because
-the financial journal uses moving-average book basis while tax elections can
-use FIFO/LIFO/HIFO/specific identification.
+cash and shares independently with Alpaca. The journal is permanently bound
+to the Alpaca account ID captured at bootstrap; reconciliation refuses a
+different or unidentified account. Transfers use signed amounts (positive
+deposit, negative withdrawal), while fees use positive amounts. Tax lots
+remain separate because the financial journal uses moving-average book basis
+while tax elections can use FIFO/LIFO/HIFO/specific identification.
+
+If the journal was bootstrapped by a version from before account-ID binding,
+`ledger-reconcile` fails closed. Migrate it once while connected to the
+original account; the command binds only after cash and every share quantity
+match the journal within its strict cent/share tolerances:
+
+```bash
+python scripts/run_personal_assistant.py ledger-bind-account --confirm "bind account"
+```
 
 Run operational controls and a recovery drill:
 
@@ -675,9 +714,11 @@ python scripts/run_personal_assistant.py paper-evidence-status paper-2026q3
 ```
 
 The epoch requires a clean worktree and binds the exact Git commit, mandate,
-policy, strategy and model identity. `paper-observation` only records a
-reconciled post-close Alpaca paper snapshot and removes journaled cash
-transfers from period returns. `operations-cycle` is a scheduler-friendly
+policy, strategy, model, and Alpaca paper-account identity. Every observation
+also verifies that the most recent ledger reconciliation belongs to that same
+account. `paper-observation` only records a reconciled post-close Alpaca paper
+snapshot and removes journaled cash transfers from period returns.
+`operations-cycle` is a scheduler-friendly
 order/ledger/reconciliation/backup/health pass. A Windows Task Scheduler
 installer and the drill/evidence procedures are in
 `docs/OPERATIONS_RUNBOOK.md`.
@@ -802,6 +843,7 @@ assistant/
   stock_lookup.py          own-ticker trend/volatility, price targets, hold-period ranges
   news_summary.py          recent news, optional Claude-summarized (ANTHROPIC_API_KEY)
   ai_advisor.py            optional LLM notes, output-validated so it can never advise an allocation
+  llm/                     read-only committee contracts, privacy projection, provider boundary, validators
   ticker_verification.py   confirms a ticker is real/liquid before it enters a cart
   similarity_evidence.py   deterministic co-movement evidence behind "similar tickers"
   recommended_stocks.py    not-currently-held candidates surfaced in the Briefing tab (exploration only)
@@ -974,9 +1016,13 @@ network access.
 - There is a CLI and a browser UI (Streamlit), but no conversational API.
 - Earnings come from a free best-effort data source; unavailable values remain
   explicitly unavailable.
-- The financial journal supports explicit dividend/fee/cash-transfer entries,
-  but automatic corporate-action ingestion, tax-lot election, wash-sale basis
-  adjustment and realized-tax estimates are not yet integrated into proposals.
+- The financial journal supports explicit dividend, split, fee, and
+  cash-transfer entries. Risk-reducing sell proposals already display an
+  advisory FIFO/LIFO/HIFO lot comparison when complete app-derived lot
+  coverage exists, and missing coverage never blocks a sell. Automatic
+  broker corporate-action/fee/transfer ingestion, broker-side specific-lot
+  election, wash-sale basis adjustment, and actual tax-liability calculation
+  remain unimplemented.
 - Order monitoring and an operations watchdog are implemented, with durable
   SQLite alerts and an optional local JSONL delivery boundary. An actual pager
   or hosted supervisor still must be configured outside this repository.

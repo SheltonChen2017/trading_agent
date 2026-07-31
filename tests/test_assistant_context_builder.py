@@ -715,7 +715,13 @@ def test_build_portfolio_snapshot_from_alpaca_uses_broker_data():
     original_get_account = broker.get_account
     original_get_positions = broker.get_open_positions
     try:
-        broker.get_account = lambda: {"equity": 1000.0, "cash": 200.0, "buying_power": 200.0, "paper": True}
+        broker.get_account = lambda: {
+            "account_id": "paper-account-1",
+            "equity": 1000.0,
+            "cash": 200.0,
+            "buying_power": 200.0,
+            "paper": True,
+        }
         broker.get_open_positions = lambda: [
             {"ticker": "AAA", "shares": 5.0, "avg_entry_price": 100.0, "current_price": 110.0, "unrealized_pl": 50.0},
         ]
@@ -749,7 +755,13 @@ def test_build_decision_packet_uses_live_alpaca_when_configured():
     original_get_positions = broker.get_open_positions
     try:
         broker.is_configured = lambda: True
-        broker.get_account = lambda: {"equity": 1000.0, "cash": 300.0, "buying_power": 300.0, "paper": True}
+        broker.get_account = lambda: {
+            "account_id": "paper-account-1",
+            "equity": 1000.0,
+            "cash": 300.0,
+            "buying_power": 300.0,
+            "paper": True,
+        }
         broker.get_open_positions = lambda: [
             {"ticker": "ZZZ", "shares": 2.0, "avg_entry_price": 50.0, "current_price": 60.0, "unrealized_pl": 20.0},
         ]

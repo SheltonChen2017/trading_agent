@@ -57,10 +57,18 @@ class AssistantStore:
         self.path.parent.mkdir(parents=True, exist_ok=True)
         self._initialize()
 
+    @staticmethod
+    def _open_database(path: str | Path) -> sqlite3.Connection:
+        """Open a consistently configured connection for every code path."""
+        connection = sqlite3.connect(Path(path), timeout=30.0)
+        connection.row_factory = sqlite3.Row
+        connection.execute("PRAGMA foreign_keys=ON")
+        connection.execute("PRAGMA busy_timeout=30000")
+        return connection
+
     @contextmanager
     def _connect(self):
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
+        connection = self._open_database(self.path)
         try:
             yield connection
             connection.commit()
@@ -96,7 +104,9 @@ class AssistantStore:
                     proposal_id TEXT NOT NULL,
                     submitted_at TEXT NOT NULL,
                     status TEXT NOT NULL,
-                    payload_json TEXT NOT NULL
+                    payload_json TEXT NOT NULL,
+                    FOREIGN KEY(proposal_id)
+                        REFERENCES trade_proposals(proposal_id)
                 );
                 CREATE TABLE IF NOT EXISTS broker_order_events (
                     event_id TEXT PRIMARY KEY,
@@ -109,14 +119,20 @@ class AssistantStore:
                     filled_avg_price REAL,
                     fill_qty REAL,
                     fill_price REAL,
-                    payload_json TEXT NOT NULL
+                    payload_json TEXT NOT NULL,
+                    FOREIGN KEY(order_id)
+                        REFERENCES broker_orders(order_id),
+                    FOREIGN KEY(proposal_id)
+                        REFERENCES trade_proposals(proposal_id)
                 );
                 CREATE TABLE IF NOT EXISTS execution_reservations (
                     proposal_id TEXT PRIMARY KEY,
                     trading_day TEXT NOT NULL,
                     reserved_notional REAL NOT NULL,
                     reserved_notional_text TEXT NOT NULL,
-                    created_at TEXT NOT NULL
+                    created_at TEXT NOT NULL,
+                    FOREIGN KEY(proposal_id)
+                        REFERENCES trade_proposals(proposal_id)
                 );
                 CREATE TABLE IF NOT EXISTS system_state (
                     state_key TEXT PRIMARY KEY,
@@ -261,6 +277,102 @@ class AssistantStore:
                     );
                 CREATE INDEX IF NOT EXISTS idx_operational_drills_type_at
                     ON operational_drill_runs(drill_type, performed_at);
+                CREATE TRIGGER IF NOT EXISTS fk_broker_orders_proposal_insert
+                BEFORE INSERT ON broker_orders
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM trade_proposals
+                    WHERE proposal_id = NEW.proposal_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'broker order proposal does not exist');
+                END;
+                CREATE TRIGGER IF NOT EXISTS fk_broker_orders_proposal_update
+                BEFORE UPDATE OF proposal_id ON broker_orders
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM trade_proposals
+                    WHERE proposal_id = NEW.proposal_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'broker order proposal does not exist');
+                END;
+                CREATE TRIGGER IF NOT EXISTS fk_broker_events_order_insert
+                BEFORE INSERT ON broker_order_events
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM broker_orders
+                    WHERE order_id = NEW.order_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'broker event order does not exist');
+                END;
+                CREATE TRIGGER IF NOT EXISTS fk_broker_events_order_update
+                BEFORE UPDATE OF order_id ON broker_order_events
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM broker_orders
+                    WHERE order_id = NEW.order_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'broker event order does not exist');
+                END;
+                CREATE TRIGGER IF NOT EXISTS fk_broker_events_proposal_insert
+                BEFORE INSERT ON broker_order_events
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM trade_proposals
+                    WHERE proposal_id = NEW.proposal_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'broker event proposal does not exist');
+                END;
+                CREATE TRIGGER IF NOT EXISTS fk_broker_events_proposal_update
+                BEFORE UPDATE OF proposal_id ON broker_order_events
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM trade_proposals
+                    WHERE proposal_id = NEW.proposal_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'broker event proposal does not exist');
+                END;
+                CREATE TRIGGER IF NOT EXISTS fk_execution_reservation_proposal_insert
+                BEFORE INSERT ON execution_reservations
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM trade_proposals
+                    WHERE proposal_id = NEW.proposal_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'execution reservation proposal does not exist');
+                END;
+                CREATE TRIGGER IF NOT EXISTS fk_execution_reservation_proposal_update
+                BEFORE UPDATE OF proposal_id ON execution_reservations
+                WHEN NOT EXISTS (
+                    SELECT 1 FROM trade_proposals
+                    WHERE proposal_id = NEW.proposal_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'execution reservation proposal does not exist');
+                END;
+                CREATE TRIGGER IF NOT EXISTS fk_trade_proposals_children_delete
+                BEFORE DELETE ON trade_proposals
+                WHEN EXISTS (
+                    SELECT 1 FROM broker_orders
+                    WHERE proposal_id = OLD.proposal_id
+                ) OR EXISTS (
+                    SELECT 1 FROM broker_order_events
+                    WHERE proposal_id = OLD.proposal_id
+                ) OR EXISTS (
+                    SELECT 1 FROM execution_reservations
+                    WHERE proposal_id = OLD.proposal_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'trade proposal still has child rows');
+                END;
+                CREATE TRIGGER IF NOT EXISTS fk_broker_orders_events_delete
+                BEFORE DELETE ON broker_orders
+                WHEN EXISTS (
+                    SELECT 1 FROM broker_order_events
+                    WHERE order_id = OLD.order_id
+                )
+                BEGIN
+                    SELECT RAISE(ABORT, 'broker order still has event rows');
+                END;
                 """
             )
             self._migrate_decision_packet_identity(connection)
@@ -430,10 +542,15 @@ class AssistantStore:
             rows = connection.execute(
                 """
                 SELECT snapshot_id, payload_json, payload_hash
-                FROM portfolio_equity_snapshots
-                WHERE account_key = ?
-                ORDER BY captured_at ASC, rowid ASC
-                LIMIT ?
+                FROM (
+                    SELECT rowid AS storage_rowid, snapshot_id, captured_at,
+                           payload_json, payload_hash
+                    FROM portfolio_equity_snapshots
+                    WHERE account_key = ?
+                    ORDER BY captured_at DESC, rowid DESC
+                    LIMIT ?
+                )
+                ORDER BY captured_at ASC, storage_rowid ASC
                 """,
                 (account_key, limit),
             ).fetchall()
@@ -568,8 +685,7 @@ class AssistantStore:
         could never age enough to resolve (found 2026-07-30 while reviewing
         the reconciliation-hardening round).
         """
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
+        connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -678,8 +794,7 @@ class AssistantStore:
         # duplicate check would be a plain snapshot read and two DIFFERENT
         # proposals for the same ticker/side could both observe "no duplicate"
         # before either became visible at the broker.
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
+        connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
             target_before = connection.execute(
@@ -939,10 +1054,72 @@ class AssistantStore:
         """
         payload = raw_event if raw_event is not None else order
         now = datetime.now(timezone.utc).isoformat()
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
+        connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
+            row = connection.execute(
+                "SELECT payload_json, status FROM trade_proposals WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchone()
+            if row is None:
+                raise KeyError(f"Unknown proposal: {proposal_id}")
+
+            order_id = str(order["order_id"])
+            existing_order = connection.execute(
+                """
+                SELECT proposal_id FROM broker_orders
+                WHERE order_id = ?
+                """,
+                (order_id,),
+            ).fetchone()
+            if (
+                existing_order is not None
+                and existing_order["proposal_id"] != proposal_id
+            ):
+                raise ValueError(
+                    f"Broker order {order_id} is already bound to proposal "
+                    f"{existing_order['proposal_id']}, not {proposal_id}."
+                )
+            existing_event = connection.execute(
+                """
+                SELECT order_id, proposal_id
+                FROM broker_order_events
+                WHERE event_id = ?
+                """,
+                (event_id,),
+            ).fetchone()
+            if existing_event is not None and (
+                existing_event["order_id"] != order_id
+                or existing_event["proposal_id"] != proposal_id
+            ):
+                raise ValueError(
+                    f"Broker event {event_id} is already bound to order "
+                    f"{existing_event['order_id']} / proposal "
+                    f"{existing_event['proposal_id']}."
+                )
+
+            submitted_at = str(order.get("submitted_at") or event_at)
+            # The order row must exist before the event insert now that
+            # broker_order_events has a real foreign key. Insert a missing
+            # row first, but do not update an existing row until we know this
+            # event is new: replaying an old event must not regress the latest
+            # broker-order projection. Duplicate events can still repair an
+            # old database that contains an event but lacks its order row.
+            connection.execute(
+                """
+                INSERT INTO broker_orders(
+                    order_id, proposal_id, submitted_at, status, payload_json
+                ) VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(order_id) DO NOTHING
+                """,
+                (
+                    order_id,
+                    proposal_id,
+                    submitted_at,
+                    str(order.get("status", "unknown")),
+                    json.dumps(order, sort_keys=True, default=str),
+                ),
+            )
             cursor = connection.execute(
                 """
                 INSERT INTO broker_order_events(
@@ -954,7 +1131,7 @@ class AssistantStore:
                 """,
                 (
                     event_id,
-                    str(order["order_id"]),
+                    order_id,
                     proposal_id,
                     event_type,
                     event_at,
@@ -966,12 +1143,6 @@ class AssistantStore:
                     json.dumps(payload, sort_keys=True, default=str),
                 ),
             )
-            row = connection.execute(
-                "SELECT payload_json, status FROM trade_proposals WHERE proposal_id = ?",
-                (proposal_id,),
-            ).fetchone()
-            if row is None:
-                raise KeyError(f"Unknown proposal: {proposal_id}")
             proposal = json.loads(row["payload_json"])
             proposal["status"] = row["status"]
 
@@ -994,31 +1165,25 @@ class AssistantStore:
                 proposal["broker_event_projected"] = False
                 return proposal
 
-            submitted_at = str(order.get("submitted_at") or event_at)
-            connection.execute(
-                """
-                INSERT INTO broker_orders(
-                    order_id, proposal_id, submitted_at, status, payload_json
-                ) VALUES (?, ?, ?, ?, ?)
-                ON CONFLICT(order_id) DO UPDATE SET
-                    proposal_id = excluded.proposal_id,
-                    status = excluded.status,
-                    payload_json = excluded.payload_json
-                """,
-                (
-                    str(order["order_id"]),
-                    proposal_id,
-                    submitted_at,
-                    str(order.get("status", "unknown")),
-                    json.dumps(order, sort_keys=True, default=str),
-                ),
-            )
             effective_updates = dict(proposal_updates)
             for field in preserve_if_set:
                 if proposal.get(field):
                     effective_updates.pop(field, None)
             proposal.update(effective_updates)
             proposal["status"] = new_proposal_status
+            connection.execute(
+                """
+                UPDATE broker_orders
+                SET proposal_id = ?, status = ?, payload_json = ?
+                WHERE order_id = ?
+                """,
+                (
+                    proposal_id,
+                    str(order.get("status", "unknown")),
+                    json.dumps(order, sort_keys=True, default=str),
+                    order_id,
+                ),
+            )
             connection.execute(
                 """
                 UPDATE trade_proposals
@@ -1109,8 +1274,7 @@ class AssistantStore:
         if isinstance(max_daily_orders, bool) or not isinstance(max_daily_orders, int) or max_daily_orders <= 0:
             raise ValueError("max_daily_orders must be a positive integer.")
         now = datetime.now(timezone.utc).isoformat()
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
+        connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
             existing = connection.execute(
@@ -1301,8 +1465,7 @@ class AssistantStore:
         one transaction: a poller that read an old row cannot release the
         reservation after another worker has just claimed/refreshed it.
         """
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
+        connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
@@ -1380,16 +1543,91 @@ class AssistantStore:
 
     def database_integrity_check(self) -> list[str]:
         with self._connect() as connection:
-            rows = connection.execute("PRAGMA integrity_check").fetchall()
-        return [str(row[0]) for row in rows]
+            return self._integrity_results(connection)
+
+    @staticmethod
+    def _integrity_results(
+        connection: sqlite3.Connection,
+    ) -> list[str]:
+        """Check SQLite pages plus referential integrity.
+
+        ``PRAGMA integrity_check`` does not include foreign-key validation.
+        Explicit relationship queries also cover databases created before
+        these broker tables acquired declared foreign keys.
+        """
+        page_results = [
+            str(row[0])
+            for row in connection.execute("PRAGMA integrity_check").fetchall()
+        ]
+        if page_results != ["ok"]:
+            return page_results
+
+        violations = [
+            (
+                "broker_orders.proposal_id",
+                """
+                SELECT COUNT(*)
+                FROM broker_orders AS child
+                LEFT JOIN trade_proposals AS parent
+                  ON parent.proposal_id = child.proposal_id
+                WHERE parent.proposal_id IS NULL
+                """,
+            ),
+            (
+                "broker_order_events.order_id",
+                """
+                SELECT COUNT(*)
+                FROM broker_order_events AS child
+                LEFT JOIN broker_orders AS parent
+                  ON parent.order_id = child.order_id
+                WHERE parent.order_id IS NULL
+                """,
+            ),
+            (
+                "broker_order_events.proposal_id",
+                """
+                SELECT COUNT(*)
+                FROM broker_order_events AS child
+                LEFT JOIN trade_proposals AS parent
+                  ON parent.proposal_id = child.proposal_id
+                WHERE parent.proposal_id IS NULL
+                """,
+            ),
+            (
+                "execution_reservations.proposal_id",
+                """
+                SELECT COUNT(*)
+                FROM execution_reservations AS child
+                LEFT JOIN trade_proposals AS parent
+                  ON parent.proposal_id = child.proposal_id
+                WHERE parent.proposal_id IS NULL
+                """,
+            ),
+        ]
+        results: list[str] = []
+        for relationship, query in violations:
+            count = int(connection.execute(query).fetchone()[0])
+            if count:
+                results.append(
+                    f"foreign-key violation: {relationship} has "
+                    f"{count} orphan row(s)"
+                )
+        for row in connection.execute("PRAGMA foreign_key_check").fetchall():
+            detail = (
+                f"foreign-key violation: table={row[0]} rowid={row[1]} "
+                f"parent={row[2]} constraint={row[3]}"
+            )
+            if detail not in results:
+                results.append(detail)
+        return results or ["ok"]
 
     def backup_to(self, destination: str | Path) -> Path:
         target = Path(destination)
         if target.resolve() == self.path.resolve():
             raise ValueError("Backup destination must be different from the live database path.")
         target.parent.mkdir(parents=True, exist_ok=True)
-        source_connection = sqlite3.connect(self.path)
-        destination_connection = sqlite3.connect(target)
+        source_connection = self._open_database(self.path)
+        destination_connection = self._open_database(target)
         try:
             source_connection.backup(destination_connection)
         finally:
@@ -1412,12 +1650,11 @@ class AssistantStore:
 
     @staticmethod
     def verify_database_file(path: str | Path) -> list[str]:
-        connection = sqlite3.connect(Path(path))
+        connection = AssistantStore._open_database(path)
         try:
-            rows = connection.execute("PRAGMA integrity_check").fetchall()
+            return AssistantStore._integrity_results(connection)
         finally:
             connection.close()
-        return [str(row[0]) for row in rows]
 
     def append_journal_transaction(
         self,
@@ -1436,7 +1673,7 @@ class AssistantStore:
         this method owns atomic persistence and external-id idempotency.
         """
         now = datetime.now(timezone.utc).isoformat()
-        connection = sqlite3.connect(self.path)
+        connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
             cursor = connection.execute(
@@ -1658,8 +1895,7 @@ class AssistantStore:
         )
         lineage_hash = _hash_payload(lineage_json)
         now = datetime.now(timezone.utc).isoformat()
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
+        connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
             existing = connection.execute(
@@ -1782,8 +2018,7 @@ class AssistantStore:
         observation_id = "paperobs-" + payload_hash[:24]
         evidence_epoch = str(observation["evidence_epoch"])
         session_date = str(observation["session_date"])
-        connection = sqlite3.connect(self.path)
-        connection.row_factory = sqlite3.Row
+        connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
             epoch = connection.execute(

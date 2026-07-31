@@ -55,6 +55,7 @@ def build_portfolio_snapshot(
     buying_power: float | None = None,
     source: str = "manual",
     account_mode: str = "manual",
+    account_id: str | None = None,
     open_orders: list[dict] | None = None,
     open_orders_available: bool = True,
 ) -> PortfolioSnapshot:
@@ -199,6 +200,7 @@ def build_portfolio_snapshot(
         account_mode=account_mode,
         open_orders=open_orders or [],
         open_orders_available=open_orders_available,
+        account_id=account_id,
     )
 
 
@@ -249,6 +251,7 @@ def build_portfolio_snapshot_from_alpaca() -> PortfolioSnapshot:
         ),
         source="alpaca",
         account_mode="paper" if account["paper"] else "live",
+        account_id=account["account_id"],
         open_orders=open_orders,
         open_orders_available=open_orders_available,
     )

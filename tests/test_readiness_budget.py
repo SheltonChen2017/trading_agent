@@ -55,8 +55,25 @@ def _consume(store: AssistantStore, *, orders: int, notional_each: float, policy
     usage_day = store.get_execution_budget_usage(trading_day)
     del usage_day
     for index in range(orders):
+        proposal_id = f"tp-{index}"
+        store.save_proposal(
+            {
+                "proposal_id": proposal_id,
+                "created_at": _NOW.isoformat(),
+                "expires_at": "2026-07-30T15:00:00+00:00",
+                "status": "filled",
+                "idempotency_key": f"idem-{proposal_id}",
+                "intent": {
+                    "ticker": f"T{index}",
+                    "side": "buy",
+                    "shares": 1,
+                    "order_type": "market",
+                    "limit_price": None,
+                },
+            }
+        )
         store.reserve_execution_budget(
-            f"tp-{index}",
+            proposal_id,
             trading_day=trading_day,
             notional=notional_each,
             max_daily_notional=policy.max_daily_submitted_notional,
@@ -132,6 +149,22 @@ def test_readiness_agrees_with_reserve_execution_budget_at_the_boundary():
 
         readiness_says_ok = _budget_check(store, policy)["ok"]
         trading_day = _NOW.astimezone().date().isoformat()
+        store.save_proposal(
+            {
+                "proposal_id": "tp-next",
+                "created_at": _NOW.isoformat(),
+                "expires_at": "2026-07-30T15:00:00+00:00",
+                "status": "filled",
+                "idempotency_key": "idem-tp-next",
+                "intent": {
+                    "ticker": "NEXT",
+                    "side": "buy",
+                    "shares": 1,
+                    "order_type": "market",
+                    "limit_price": None,
+                },
+            }
+        )
         try:
             store.reserve_execution_budget(
                 "tp-next",

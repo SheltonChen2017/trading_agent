@@ -102,11 +102,31 @@ def _check_schema_version(schema_version: str) -> None:
 
 
 def hash_feature_value(value: Any) -> str:
-    """Canonical digest used to bind a lineage record to its actual value."""
+    """Canonical digest used to bind a lineage record to its actual value.
+
+    NaN is normalized to None ("this value is absent"), NOT rejected.
+    ml/features.py deliberately emits NaN for a feature whose lookback
+    window is not yet satisfied, and its documented sanitization rule turns
+    a non-positive price or non-positive volume into NaN rather than a
+    fabricated 0. Those cells are legitimately absent, and a lineage record
+    must be able to attest "absent as of this cutoff" -- otherwise no real
+    feature frame could ever be bound to lineage at all, and the
+    point-in-time path would be unreachable outside hand-built fixtures.
+
+    Infinity is still rejected. Unlike NaN it is never this pipeline's
+    marker for "absent": it only arises from a division blowup (a zero
+    denominator that escaped sanitization), which is a computation defect
+    that should surface rather than be hashed as though it were data.
+    """
     if hasattr(value, "item"):
         value = value.item()
+    if isinstance(value, float) and math.isnan(value):
+        value = None
     if isinstance(value, float) and not math.isfinite(value):
-        raise AvailabilityError("feature values used for lineage must be finite")
+        raise AvailabilityError(
+            "infinite feature values cannot be bound to lineage; NaN is accepted "
+            "as 'absent' but infinity indicates a computation defect"
+        )
     if value is not None and not isinstance(value, (str, bool, int, float)):
         raise AvailabilityError(
             "feature values used for lineage must be JSON scalar values"

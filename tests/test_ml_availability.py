@@ -511,3 +511,50 @@ def test_coverage_result_is_json_serializable():
     )
     json.dumps(result.to_dict())
     assert CoverageResult.from_dict(result.to_dict()) == result
+
+
+# --- absent values vs computation defects -----------------------------------
+
+
+def test_nan_is_bound_as_absent_rather_than_rejected():
+    """ml/features.py DELIBERATELY emits NaN for a feature whose lookback is
+    not yet satisfied, and turns a non-positive price/volume into NaN rather
+    than a fabricated 0. If NaN could not be bound to lineage, no real
+    feature frame could ever be certified point-in-time and the whole path
+    would be reachable only from hand-built fixtures."""
+    import math
+
+    assert hash_feature_value(float("nan")) == hash_feature_value(None)
+
+
+def test_numpy_nan_is_normalized_the_same_way():
+    import numpy as np
+
+    assert hash_feature_value(np.float64("nan")) == hash_feature_value(None)
+
+
+def test_infinity_is_still_rejected_as_a_computation_defect():
+    """Unlike NaN, infinity is never this pipeline's 'absent' marker -- it
+    only arises from a division blowup, which should surface rather than be
+    hashed as though it were data."""
+    with pytest.raises(AvailabilityError, match="infinite feature values"):
+        hash_feature_value(float("inf"))
+    with pytest.raises(AvailabilityError, match="infinite feature values"):
+        hash_feature_value(float("-inf"))
+
+
+def test_a_realistic_feature_frame_with_missing_early_rows_can_be_bound():
+    import numpy as np
+    import pandas as pd
+
+    # A long-lookback column is NaN until its window fills -- exactly what
+    # compute_point_in_time_features() produces for early sessions.
+    frame = pd.DataFrame({"return_252d_pct": [np.nan, np.nan, 1.5]})
+    hashes = [hash_feature_value(value) for value in frame["return_252d_pct"]]
+    assert hashes[0] == hashes[1] == hash_feature_value(None)
+    assert hashes[2] != hashes[0]
+
+
+def test_non_scalar_values_are_still_rejected():
+    with pytest.raises(AvailabilityError, match="JSON scalar"):
+        hash_feature_value({"nested": 1})

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import dataclasses
 import math
+from types import MappingProxyType
 from typing import Any, Mapping
 
 import pandas as pd
@@ -40,6 +41,46 @@ class LabelRow:
     value: float
     components: Mapping[str, float]
 
+    def __post_init__(self) -> None:
+        for name in ("ticker", "label_version"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise LabelError(f"{name} must be a non-empty string")
+        dates = {
+            name: _parse_session(getattr(self, name), name)
+            for name in ("as_of_session", "entry_session", "exit_session")
+        }
+        if dates["entry_session"] < dates["as_of_session"]:
+            raise LabelError("entry_session must not precede as_of_session")
+        if dates["exit_session"] < dates["entry_session"]:
+            raise LabelError("exit_session must not precede entry_session")
+        for name in ("entry_price", "exit_price"):
+            value = getattr(self, name)
+            if isinstance(value, bool) or not isinstance(value, (int, float)):
+                raise LabelError(f"{name} must be a positive finite number")
+            if value <= 0 or not math.isfinite(float(value)):
+                raise LabelError(f"{name} must be a positive finite number")
+        if (
+            isinstance(self.value, bool)
+            or not isinstance(self.value, (int, float))
+            or not math.isfinite(float(self.value))
+        ):
+            raise LabelError("value must be a finite number")
+        if not isinstance(self.components, Mapping):
+            raise LabelError("components must be a mapping")
+        frozen_components: dict[str, float] = {}
+        for key, value in self.components.items():
+            if not isinstance(key, str) or not key.strip():
+                raise LabelError("component names must be non-empty strings")
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(float(value))
+            ):
+                raise LabelError(f"component {key!r} must be a finite number")
+            frozen_components[key] = float(value)
+        object.__setattr__(self, "components", MappingProxyType(frozen_components))
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "ticker": self.ticker,
@@ -54,13 +95,48 @@ class LabelRow:
         }
 
 
-def _validate_price_index(close: pd.Series, name: str) -> None:
-    if close.empty:
+def _parse_session(value: str, name: str) -> pd.Timestamp:
+    if not isinstance(value, str):
+        raise LabelError(f"{name} must use canonical YYYY-MM-DD format")
+    parsed = pd.to_datetime(value, format="%Y-%m-%d", errors="coerce")
+    if pd.isna(parsed) or parsed.strftime("%Y-%m-%d") != value:
+        raise LabelError(f"{name} must use canonical YYYY-MM-DD format")
+    return parsed
+
+
+def _validate_price_index(series: pd.Series, name: str) -> None:
+    if series.empty:
         raise LabelError(f"{name} is empty")
-    if not close.index.is_monotonic_increasing:
+    if not isinstance(series.index, pd.DatetimeIndex):
+        raise LabelError(f"{name} index must be a DatetimeIndex of trading sessions")
+    if series.index.hasnans:
+        raise LabelError(f"{name} index contains NaT")
+    if not series.index.is_monotonic_increasing:
         raise LabelError(f"{name} index is not sorted ascending")
-    if close.index.has_duplicates:
+    if series.index.has_duplicates:
         raise LabelError(f"{name} index has duplicate sessions")
+    normalized = series.index.normalize()
+    if not series.index.equals(normalized):
+        raise LabelError(f"{name} index must contain normalized trading sessions")
+
+
+def _require_positive_int(value: Any, name: str, *, minimum: int) -> None:
+    if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+        qualifier = "positive" if minimum == 1 else f"at least {minimum}"
+        raise LabelError(f"{name} must be {qualifier}")
+
+
+def _is_positive_finite(value: Any) -> bool:
+    try:
+        numeric = float(value)
+    except (TypeError, ValueError):
+        return False
+    return numeric > 0 and math.isfinite(numeric)
+
+
+def _require_nonempty_string(value: Any, name: str) -> None:
+    if not isinstance(value, str) or not value.strip():
+        raise LabelError(f"{name} must be a non-empty string")
 
 
 def _next_open_exit_pairs(
@@ -94,48 +170,62 @@ def compute_forward_excess_return_labels(
     open_: pd.Series,
     benchmark_close: pd.Series,
     *,
+    benchmark_open: pd.Series,
     horizon_sessions: int = 20,
     round_trip_cost_bps: float = 0.0,
-    label_version: str = "forward_excess_return_20d_next_open_v1",
+    label_version: str | None = None,
 ) -> tuple[tuple[LabelRow, ...], int]:
     """Strategy doc 6.4: "return from the next tradable open through the
     configured 20-session exit, less the aligned QQQ or SOXX return and
     round-trip cost." Returns (label_rows, dropped_tail_row_count)."""
+    _require_nonempty_string(ticker, "ticker")
     _validate_price_index(close, "close")
     _validate_price_index(open_, "open")
     _validate_price_index(benchmark_close, "benchmark_close")
-    if horizon_sessions < 1:
-        raise LabelError("horizon_sessions must be a positive integer")
-    if round_trip_cost_bps < 0 or not math.isfinite(round_trip_cost_bps):
+    _validate_price_index(benchmark_open, "benchmark_open")
+    _require_positive_int(horizon_sessions, "horizon_sessions", minimum=1)
+    if (
+        isinstance(round_trip_cost_bps, bool)
+        or not isinstance(round_trip_cost_bps, (int, float))
+        or round_trip_cost_bps < 0
+        or not math.isfinite(float(round_trip_cost_bps))
+    ):
         raise LabelError("round_trip_cost_bps must be a non-negative finite number")
     if not close.index.equals(open_.index):
         raise LabelError("close and open must share the same session index")
+    if label_version is None:
+        label_version = f"forward_excess_return_{horizon_sessions}d_next_open_v1"
+    if not isinstance(label_version, str) or not label_version.strip():
+        raise LabelError("label_version must be a non-empty string")
 
-    aligned_benchmark = benchmark_close.reindex(close.index)
+    aligned_benchmark_close = benchmark_close.reindex(close.index)
+    aligned_benchmark_open = benchmark_open.reindex(close.index)
     as_of_pos, entry_pos, exit_pos, dropped = _next_open_exit_pairs(
         close.index, horizon_sessions=horizon_sessions
     )
     cost_pct = round_trip_cost_bps / 10_000.0 * 100
     rows: list[LabelRow] = []
     for as_of_i, entry_i, exit_i in zip(as_of_pos, entry_pos, exit_pos):
-        entry_price = float(open_.iloc[entry_i])
-        exit_price = float(close.iloc[exit_i])
-        benchmark_entry = aligned_benchmark.iloc[entry_i]
-        benchmark_exit = aligned_benchmark.iloc[exit_i]
+        raw_entry_price = open_.iloc[entry_i]
+        raw_exit_price = close.iloc[exit_i]
+        benchmark_entry = aligned_benchmark_open.iloc[entry_i]
+        benchmark_exit = aligned_benchmark_close.iloc[exit_i]
         if (
-            entry_price <= 0
-            or not math.isfinite(entry_price)
-            or exit_price <= 0
-            or not math.isfinite(exit_price)
-            or pd.isna(benchmark_entry)
-            or pd.isna(benchmark_exit)
-            or benchmark_entry <= 0
+            not _is_positive_finite(raw_entry_price)
+            or not _is_positive_finite(raw_exit_price)
+            or not _is_positive_finite(benchmark_entry)
+            or not _is_positive_finite(benchmark_exit)
         ):
             dropped += 1
             continue
+        entry_price = float(raw_entry_price)
+        exit_price = float(raw_exit_price)
         raw_return_pct = (exit_price / entry_price - 1.0) * 100
         benchmark_return_pct = (float(benchmark_exit) / float(benchmark_entry) - 1.0) * 100
         value = raw_return_pct - benchmark_return_pct - cost_pct
+        if not all(math.isfinite(item) for item in (raw_return_pct, benchmark_return_pct, value)):
+            dropped += 1
+            continue
         rows.append(
             LabelRow(
                 ticker=ticker,
@@ -149,6 +239,8 @@ def compute_forward_excess_return_labels(
                 components={
                     "raw_return_pct": round(raw_return_pct, 6),
                     "benchmark_return_pct": round(benchmark_return_pct, 6),
+                    "benchmark_entry_price": round(float(benchmark_entry), 6),
+                    "benchmark_exit_price": round(float(benchmark_exit), 6),
                     "round_trip_cost_pct": round(cost_pct, 6),
                 },
             )
@@ -161,15 +253,19 @@ def compute_forward_realized_vol_labels(
     close: pd.Series,
     *,
     horizon_sessions: int = 20,
-    label_version: str = "forward_realized_vol_20d_v1",
+    label_version: str | None = None,
 ) -> tuple[tuple[LabelRow, ...], int]:
     """Realized volatility (daily-return std, in percent -- same
     non-annualized convention as signals/regime.py's
     compute_trailing_market_volatility(), not reinvented here) over the
     `horizon_sessions` sessions following `as_of_session`."""
+    _require_nonempty_string(ticker, "ticker")
     _validate_price_index(close, "close")
-    if horizon_sessions < 2:
-        raise LabelError("horizon_sessions must be at least 2 to compute a volatility")
+    _require_positive_int(horizon_sessions, "horizon_sessions", minimum=2)
+    if label_version is None:
+        label_version = f"forward_realized_vol_{horizon_sessions}d_v1"
+    if not isinstance(label_version, str) or not label_version.strip():
+        raise LabelError("label_version must be a non-empty string")
 
     n = len(close)
     dropped = 0
@@ -181,7 +277,11 @@ def compute_forward_realized_vol_labels(
             dropped += 1
             continue
         window = close.iloc[window_start - 1 : window_end]  # include i's close as the base for pct_change
-        daily_returns = window.pct_change().dropna()
+        numeric_window = pd.to_numeric(window, errors="coerce")
+        if not numeric_window.map(_is_positive_finite).all():
+            dropped += 1
+            continue
+        daily_returns = numeric_window.pct_change(fill_method=None).dropna()
         if len(daily_returns) < 2:
             dropped += 1
             continue
@@ -211,6 +311,7 @@ def compute_forward_downside_threshold_labels(
     open_: pd.Series,
     benchmark_close: pd.Series,
     *,
+    benchmark_open: pd.Series,
     horizon_sessions: int = 20,
     round_trip_cost_bps: float = 0.0,
     downside_threshold_pct: float = 5.0,
@@ -222,13 +323,20 @@ def compute_forward_downside_threshold_labels(
     (strategy doc 14: "research question and preregistered primary
     outcome"); the 5.0 default here is a placeholder, not a preregistered
     value, and callers doing real research must pass their own."""
-    if downside_threshold_pct <= 0 or not math.isfinite(downside_threshold_pct):
+    _require_nonempty_string(ticker, "ticker")
+    if (
+        isinstance(downside_threshold_pct, bool)
+        or not isinstance(downside_threshold_pct, (int, float))
+        or downside_threshold_pct <= 0
+        or not math.isfinite(float(downside_threshold_pct))
+    ):
         raise LabelError("downside_threshold_pct must be a positive finite number")
     excess_rows, dropped = compute_forward_excess_return_labels(
         ticker,
         close,
         open_,
         benchmark_close,
+        benchmark_open=benchmark_open,
         horizon_sessions=horizon_sessions,
         round_trip_cost_bps=round_trip_cost_bps,
         label_version=label_version,

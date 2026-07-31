@@ -38,7 +38,7 @@ def test_excess_return_drops_tail_rows_without_complete_horizon():
     benchmark = _flat_series(n)
 
     rows, dropped = compute_forward_excess_return_labels(
-        "AAA", close, open_, benchmark, horizon_sessions=horizon
+        "AAA", close, open_, benchmark, benchmark_open=benchmark, horizon_sessions=horizon
     )
 
     # last (horizon + 1) as_of positions have no complete forward horizon
@@ -55,7 +55,7 @@ def test_excess_return_entry_and_exit_prices_match_next_open_and_horizon_close()
     benchmark = _flat_series(10)
 
     rows, _ = compute_forward_excess_return_labels(
-        "AAA", close, open_, benchmark, horizon_sessions=3
+        "AAA", close, open_, benchmark, benchmark_open=benchmark, horizon_sessions=3
     )
 
     first = rows[0]
@@ -73,7 +73,8 @@ def test_excess_return_subtracts_benchmark_and_cost():
     benchmark = _trending_close(n, daily_pct=0.5)
 
     rows, _ = compute_forward_excess_return_labels(
-        "AAA", close, open_, benchmark, horizon_sessions=2, round_trip_cost_bps=50.0
+        "AAA", close, open_, benchmark, benchmark_open=benchmark,
+        horizon_sessions=2, round_trip_cost_bps=50.0
     )
 
     row = rows[0]
@@ -88,32 +89,68 @@ def test_excess_return_subtracts_benchmark_and_cost():
     )
 
 
+def test_excess_return_uses_benchmark_open_for_aligned_next_open_entry():
+    n = 10
+    close = _flat_series(n)
+    open_ = _flat_series(n)
+    benchmark_close = _flat_series(n)
+    benchmark_open = _flat_series(n)
+    benchmark_open.iloc[1] = 50.0
+
+    rows, _ = compute_forward_excess_return_labels(
+        "AAA", close, open_, benchmark_close,
+        benchmark_open=benchmark_open, horizon_sessions=2
+    )
+
+    first = rows[0]
+    assert first.components["benchmark_entry_price"] == 50.0
+    assert first.components["benchmark_exit_price"] == 100.0
+    assert first.components["benchmark_return_pct"] == pytest.approx(100.0)
+    assert first.value == pytest.approx(-100.0)
+
+
+def test_default_label_version_tracks_nondefault_horizon():
+    close = _flat_series(10)
+    rows, _ = compute_forward_excess_return_labels(
+        "AAA", close, close, close, benchmark_open=close, horizon_sessions=3
+    )
+    assert rows[0].label_version == "forward_excess_return_3d_next_open_v1"
+
+
 def test_excess_return_rejects_mismatched_close_open_index():
     close = _flat_series(10)
     open_ = _flat_series(9)
     benchmark = _flat_series(10)
     with pytest.raises(LabelError, match="same session index"):
-        compute_forward_excess_return_labels("AAA", close, open_, benchmark, horizon_sessions=2)
+        compute_forward_excess_return_labels(
+            "AAA", close, open_, benchmark, benchmark_open=benchmark, horizon_sessions=2
+        )
 
 
 def test_excess_return_rejects_unsorted_index():
     close = _flat_series(10)
     shuffled = close.iloc[::-1]
     with pytest.raises(LabelError, match="not sorted"):
-        compute_forward_excess_return_labels("AAA", shuffled, shuffled, close, horizon_sessions=2)
+        compute_forward_excess_return_labels(
+            "AAA", shuffled, shuffled, close, benchmark_open=close, horizon_sessions=2
+        )
 
 
 def test_excess_return_rejects_duplicate_index():
     index = _session_index(5).append(_session_index(5)[-1:])
     close = pd.Series(range(6), index=index, dtype=float)
     with pytest.raises(LabelError, match="duplicate"):
-        compute_forward_excess_return_labels("AAA", close, close, close, horizon_sessions=1)
+        compute_forward_excess_return_labels(
+            "AAA", close, close, close, benchmark_open=close, horizon_sessions=1
+        )
 
 
 def test_excess_return_rejects_empty_series():
     empty = pd.Series([], index=pd.DatetimeIndex([]), dtype=float)
     with pytest.raises(LabelError, match="empty"):
-        compute_forward_excess_return_labels("AAA", empty, empty, empty, horizon_sessions=1)
+        compute_forward_excess_return_labels(
+            "AAA", empty, empty, empty, benchmark_open=empty, horizon_sessions=1
+        )
 
 
 def test_excess_return_drops_rows_where_benchmark_is_unavailable():
@@ -126,7 +163,7 @@ def test_excess_return_drops_rows_where_benchmark_is_unavailable():
     benchmark = _flat_series(n // 2)
 
     rows, dropped = compute_forward_excess_return_labels(
-        "AAA", close, open_, benchmark, horizon_sessions=2
+        "AAA", close, open_, benchmark, benchmark_open=benchmark, horizon_sessions=2
     )
     for row in rows:
         # only rows whose entry+exit both fall within the benchmark's
@@ -134,18 +171,39 @@ def test_excess_return_drops_rows_where_benchmark_is_unavailable():
         assert row.entry_session <= str(benchmark.index[-1].date())
 
 
+def test_excess_return_drops_nonfinite_benchmark_exit():
+    n = 10
+    close = _flat_series(n)
+    benchmark_close = _flat_series(n)
+    benchmark_close.iloc[3] = float("inf")
+    rows, dropped = compute_forward_excess_return_labels(
+        "AAA", close, close, benchmark_close,
+        benchmark_open=_flat_series(n), horizon_sessions=2
+    )
+    assert dropped > 3
+    assert str(close.index[0].date()) not in {row.as_of_session for row in rows}
+
+
 def test_excess_return_rejects_negative_cost():
     close = _flat_series(10)
     with pytest.raises(LabelError, match="round_trip_cost_bps"):
         compute_forward_excess_return_labels(
-            "AAA", close, close, close, horizon_sessions=2, round_trip_cost_bps=-1.0
+            "AAA", close, close, close, benchmark_open=close,
+            horizon_sessions=2, round_trip_cost_bps=-1.0
         )
 
 
 def test_excess_return_rejects_non_positive_horizon():
     close = _flat_series(10)
     with pytest.raises(LabelError, match="horizon_sessions"):
-        compute_forward_excess_return_labels("AAA", close, close, close, horizon_sessions=0)
+        compute_forward_excess_return_labels(
+            "AAA", close, close, close, benchmark_open=close, horizon_sessions=0
+        )
+
+    with pytest.raises(LabelError, match="horizon_sessions"):
+        compute_forward_excess_return_labels(
+            "AAA", close, close, close, benchmark_open=close, horizon_sessions=True
+        )
 
 
 def test_realized_vol_label_values_are_finite_and_nonnegative():
@@ -166,6 +224,17 @@ def test_realized_vol_label_zero_for_perfectly_flat_forward_window():
     assert all(row.value == 0.0 for row in rows)
 
 
+def test_realized_vol_drops_windows_with_nonpositive_or_nonfinite_prices():
+    close = _trending_close(15)
+    close.iloc[4] = 0.0
+    close.iloc[10] = float("inf")
+    rows, dropped = compute_forward_realized_vol_labels(
+        "AAA", close, horizon_sessions=3
+    )
+    assert dropped > 3
+    assert all(row.entry_price > 0 and math.isfinite(row.exit_price) for row in rows)
+
+
 def test_realized_vol_rejects_horizon_below_two():
     close = _flat_series(10)
     with pytest.raises(LabelError, match="at least 2"):
@@ -180,7 +249,8 @@ def test_downside_threshold_flags_rows_crossing_the_threshold():
     benchmark = _flat_series(n)
 
     rows, _ = compute_forward_downside_threshold_labels(
-        "AAA", close, open_, benchmark, horizon_sessions=3, downside_threshold_pct=5.0
+        "AAA", close, open_, benchmark, benchmark_open=benchmark,
+        horizon_sessions=3, downside_threshold_pct=5.0
     )
 
     assert rows
@@ -196,7 +266,8 @@ def test_downside_threshold_never_flags_a_rising_ticker():
     benchmark = _flat_series(n)
 
     rows, _ = compute_forward_downside_threshold_labels(
-        "AAA", close, open_, benchmark, horizon_sessions=3, downside_threshold_pct=5.0
+        "AAA", close, open_, benchmark, benchmark_open=benchmark,
+        horizon_sessions=3, downside_threshold_pct=5.0
     )
     assert all(row.value == 0.0 for row in rows)
 
@@ -205,7 +276,8 @@ def test_downside_threshold_rejects_non_positive_threshold():
     close = _flat_series(10)
     with pytest.raises(LabelError, match="downside_threshold_pct"):
         compute_forward_downside_threshold_labels(
-            "AAA", close, close, close, horizon_sessions=2, downside_threshold_pct=0.0
+            "AAA", close, close, close, benchmark_open=close,
+            horizon_sessions=2, downside_threshold_pct=0.0
         )
 
 
@@ -213,5 +285,7 @@ def test_label_row_to_dict_is_json_serializable():
     import json
 
     close = _trending_close(10)
-    rows, _ = compute_forward_excess_return_labels("AAA", close, close, close, horizon_sessions=2)
+    rows, _ = compute_forward_excess_return_labels(
+        "AAA", close, close, close, benchmark_open=close, horizon_sessions=2
+    )
     json.dumps(rows[0].to_dict())

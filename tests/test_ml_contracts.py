@@ -42,6 +42,7 @@ def _dataset_manifest_kwargs(**overrides):
         actual_start_date="2020-01-02",
         actual_end_date="2026-07-30",
         row_count=100,
+        dropped_label_row_count=20,
         distinct_session_count=100,
         ticker_count=1,
         universe_definition="fixed:v1",
@@ -156,6 +157,8 @@ def test_dataset_manifest_rejects_boolean_and_fractional_counts():
         DatasetManifest(**_dataset_manifest_kwargs(row_count=True))
     with pytest.raises(ContractError, match="ticker_count"):
         DatasetManifest(**_dataset_manifest_kwargs(ticker_count=1.5))
+    with pytest.raises(ContractError, match="dropped_label_row_count"):
+        DatasetManifest(**_dataset_manifest_kwargs(dropped_label_row_count=-1))
 
 
 def test_dataset_manifest_rejects_malformed_hashes():

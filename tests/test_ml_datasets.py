@@ -7,6 +7,7 @@ import pytest
 
 from ml.datasets import (
     DatasetError,
+    _serialize_frame_to_csv_gz,
     assemble_dataset_frames,
     build_dataset_manifest,
     join_for_evaluation,
@@ -102,6 +103,21 @@ def test_assemble_dataset_frames_rejects_empty_inputs():
         assemble_dataset_frames({"AAA": _features_frame("AAA", _sessions(1))}, {})
 
 
+def test_assemble_rejects_unsorted_features_and_uncovered_label_keys():
+    sessions = _sessions(3)
+    unsorted = _features_frame("AAA", sessions).iloc[::-1].reset_index(drop=True)
+    with pytest.raises(DatasetError, match="not sorted"):
+        assemble_dataset_frames(
+            {"AAA": unsorted}, {"AAA": _label_rows("AAA", sessions, "v1")}
+        )
+
+    with pytest.raises(DatasetError, match="no matching feature row"):
+        assemble_dataset_frames(
+            {"AAA": _features_frame("AAA", sessions[:2])},
+            {"AAA": _label_rows("AAA", sessions, "v1")},
+        )
+
+
 def test_join_for_evaluation_joins_by_as_of_session_and_ticker():
     sessions = _sessions(3)
     features_df, labels_df = assemble_dataset_frames(
@@ -139,6 +155,7 @@ def _manifest_kwargs(features_df, labels_df, **overrides):
         entry_timing="next_open",
         target_horizon_sessions=5,
         embargo_sessions=5,
+        dropped_label_row_count=5,
         transaction_cost_bps=5.0,
         tax_assumptions="none",
         git_commit="0" * 40,
@@ -179,6 +196,67 @@ def test_manifest_and_save_load_round_trip(tmp_path):
         loaded_labels["components"].apply(ast.literal_eval).tolist()
         == labels_df["components"].tolist()
     )
+
+
+def test_csv_gzip_serialization_is_deterministic():
+    frame = _features_frame("AAA", _sessions(2))
+    first = _serialize_frame_to_csv_gz(frame)
+    second = _serialize_frame_to_csv_gz(frame)
+
+    assert first == second
+    assert first[4:8] == b"\x00\x00\x00\x00"  # gzip MTIME header
+
+
+def test_manifest_rejects_multiple_label_versions():
+    sessions = _sessions(3)
+    features_df, labels_df = assemble_dataset_frames(
+        {"AAA": _features_frame("AAA", sessions)},
+        {
+            "AAA": _label_rows("AAA", sessions, "v1")
+            + _label_rows("AAA", sessions, "v2")
+        },
+    )
+    with pytest.raises(DatasetError, match="exactly the requested label_version"):
+        build_dataset_manifest(**_manifest_kwargs(features_df, labels_df))
+
+
+def test_manifest_cannot_claim_unaudited_point_in_time_data():
+    sessions = _sessions(3)
+    features_df, labels_df = assemble_dataset_frames(
+        {"AAA": _features_frame("AAA", sessions)},
+        {"AAA": _label_rows("AAA", sessions, "v1")},
+    )
+    with pytest.raises(DatasetError, match="cannot claim point_in_time_data=True"):
+        build_dataset_manifest(
+            **_manifest_kwargs(
+                features_df, labels_df, point_in_time_data=True
+            )
+        )
+
+
+@pytest.mark.parametrize("dataset_id", ("../escape", "nested/path", "..\\escape"))
+def test_dataset_id_cannot_escape_storage_directory(tmp_path, dataset_id):
+    sessions = _sessions(2)
+    features_df, labels_df = assemble_dataset_frames(
+        {"AAA": _features_frame("AAA", sessions)},
+        {"AAA": _label_rows("AAA", sessions, "v1")},
+    )
+    with pytest.raises(DatasetError, match="dataset_id"):
+        build_dataset_manifest(
+            **_manifest_kwargs(features_df, labels_df, dataset_id=dataset_id)
+        )
+
+
+def test_assemble_rejects_noncanonical_or_missing_session_keys():
+    labels = {"AAA": _label_rows("AAA", _sessions(2), "v1")}
+    malformed = _features_frame("AAA", ["2026-1-1", "2026-01-02"])
+    with pytest.raises(DatasetError, match="canonical"):
+        assemble_dataset_frames({"AAA": malformed}, labels)
+
+    missing = _features_frame("AAA", ["2026-01-01", "2026-01-02"])
+    missing.loc[0, "as_of_session"] = None
+    with pytest.raises(DatasetError, match="missing"):
+        assemble_dataset_frames({"AAA": missing}, labels)
 
 
 def test_save_dataset_refuses_stale_manifest(tmp_path):
@@ -231,6 +309,20 @@ def test_save_dataset_refuses_to_overwrite_with_different_content(tmp_path):
 
     with pytest.raises(DatasetError, match="refusing to overwrite"):
         save_dataset(other_features, other_labels, other_manifest, directory=tmp_path)
+
+
+def test_conflicting_member_is_detected_before_any_new_member_is_written(tmp_path):
+    sessions = _sessions(3)
+    features_df, labels_df = assemble_dataset_frames(
+        {"AAA": _features_frame("AAA", sessions)},
+        {"AAA": _label_rows("AAA", sessions, "v1")},
+    )
+    manifest = build_dataset_manifest(**_manifest_kwargs(features_df, labels_df))
+    (tmp_path / "ds-test-1.labels.csv.gz").write_bytes(b"conflict")
+
+    with pytest.raises(DatasetError, match="refusing to overwrite"):
+        save_dataset(features_df, labels_df, manifest, directory=tmp_path)
+    assert not (tmp_path / "ds-test-1.features.csv.gz").exists()
 
 
 def test_multiple_datasets_coexist_in_one_directory(tmp_path):

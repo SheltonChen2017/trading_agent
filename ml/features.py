@@ -86,12 +86,20 @@ def _sanitize_positive_series(series: pd.Series) -> pd.Series:
 
 
 def _sanitize_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
-    """Documented rule for zero/negative price and negative volume: treat
-    as missing (NaN), never as a literal 0% return or 0 liquidity, so a
-    data glitch cannot masquerade as a real observation. NaN propagates
-    through the rolling windows below as "feature unavailable" for the
-    sessions it touches, rather than crashing the whole computation over
-    one bad row."""
+    """Documented rule for non-positive/non-finite price and non-positive
+    volume: treat as missing (NaN), never as a literal 0% return or 0
+    liquidity, so a data glitch cannot masquerade as a real observation.
+    NaN propagates through the rolling windows below as "feature
+    unavailable" for the sessions it touches, rather than crashing the
+    whole computation over one bad row.
+
+    Volume of exactly 0 is included in that rule (independent review,
+    2026-07-31, tightened from an earlier `>= 0`): for the liquid
+    technology names this project actually trades, a genuinely zero-volume
+    session is a data artifact or a halt, not a real observation of "no
+    demand" -- and letting it through would emit volume_ratio_20d == 0.0,
+    an extreme-looking value indistinguishable from a real liquidity
+    collapse. Fail closed instead."""
     out = df.copy()
     for column in ("open", "high", "low", "close"):
         out[column] = _sanitize_positive_series(out[column])
@@ -208,8 +216,6 @@ def compute_point_in_time_features(
         for name, series in clean_benchmarks.items()
     }
     for name in ("QQQ", "SOXX"):
-        if name not in benchmarks:
-            continue
         for window in RESIDUAL_RETURN_WINDOWS:
             own = close.pct_change(window, fill_method=None) * 100
             bench = (
@@ -240,9 +246,14 @@ def compute_point_in_time_features(
         "volume"
     ].rolling(VOLUME_RATIO_WINDOW).mean()
 
+    # No `if name not in benchmarks` guard: compute_point_in_time_features()
+    # already hard-requires SPY/QQQ/SOXX above. That check is what makes the
+    # output SCHEMA fixed -- silently skipping a missing benchmark would
+    # emit a frame with fewer columns, which ModelManifest's
+    # ordered_feature_names contract (ml/contracts.py) would then reject
+    # downstream with a confusing mismatch instead of a clear missing-input
+    # error here.
     for name in ("SPY", "QQQ", "SOXX"):
-        if name not in benchmarks:
-            continue
         beta, correlation = _rolling_beta_and_correlation(
             daily_returns, benchmark_returns[name], BETA_CORRELATION_WINDOW
         )

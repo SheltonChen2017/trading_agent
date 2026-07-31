@@ -14,6 +14,20 @@ rest of this project's `entry_timing="next_open"` convention
 (backtest/research_report.py, assistant/context_builder.py). Exit
 convention: the CLOSE of the session `horizon_sessions` sessions after
 entry (a hold-to-close realized outcome, not the exit session's open).
+
+The BENCHMARK leg must use that identical timing -- benchmark OPEN at
+entry, benchmark CLOSE at exit -- which is why
+compute_forward_excess_return_labels() requires `benchmark_open` and does
+not merely reuse `benchmark_close` at both ends. This is not a stylistic
+preference. The first version of this module used the benchmark's close on
+the entry session, so the ticker's return was measured open-to-close while
+the benchmark's was measured close-to-close; the benchmark's own overnight
+gap leaked into every excess return. Measured on real AAPL-vs-QQQ data
+(independent review, 2026-07-31, reproduced before this note was written):
+mean absolute label error 0.69pp, max 4.47pp, and the label's SIGN flipped
+on 22 of 279 rows. For a 20-session excess-return target whose plausible
+real edge is a fraction of a percentage point, that is not a rounding
+detail -- it silently corrupts every model trained on it.
 """
 from __future__ import annotations
 
@@ -141,7 +155,7 @@ def _require_nonempty_string(value: Any, name: str) -> None:
 
 def _next_open_exit_pairs(
     index: pd.Index, *, horizon_sessions: int
-) -> tuple[list[int], list[int], int]:
+) -> tuple[list[int], list[int], list[int], int]:
     """For every possible `as_of` position, the (entry_idx, exit_idx) pair
     under the next-open-entry / horizon-sessions-later-close-exit
     convention, and how many tail rows were dropped for an incomplete

@@ -196,10 +196,17 @@ def _serialize_frame_to_csv_gz(frame: pd.DataFrame) -> bytes:
     `components`) and can upcast integer dtypes that contained NaN, so a
     hash computed before serialization would almost never match a hash
     recomputed after reloading."""
-    # mtime=0 is essential: gzip otherwise embeds the current wall-clock
-    # second in its header. The same unchanged frame would then receive a
-    # different content hash whenever manifest construction and saving cross
-    # a one-second boundary.
+    # mtime=0 pins reproducibility explicitly rather than relying on an
+    # interpreter default. Verified on this repo's pinned runtime (Python
+    # 3.14.6): gzip.compress()'s signature is already `(data,
+    # compresslevel=9, *, mtime=0)` -- "The modification time is set to 0
+    # by default, for reproducibility" -- so this argument is currently a
+    # no-op, NOT a live bug fix. It still earns its place: gzip.GzipFile /
+    # gzip.open default to the current wall-clock time, so anyone
+    # switching this function to a streaming writer would silently
+    # reintroduce a header timestamp, and the same unchanged frame would
+    # then hash differently whenever manifest construction and saving
+    # crossed a one-second boundary.
     return gzip.compress(frame.to_csv(index=False).encode("utf-8"), mtime=0)
 
 

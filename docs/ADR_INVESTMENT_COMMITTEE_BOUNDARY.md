@@ -99,3 +99,14 @@ Before daily model-backed use:
   adversarial cases;
 - display a clear `review unavailable` state in CLI and Streamlit;
 - keep execution revalidation mandatory after any human approval.
+
+### Current implementation status (2026-07-31)
+
+The provider, mandatory audit persistence, exact-input UI cache binding, clear
+unavailable state, and execution isolation are implemented. The required
+50-case frozen replay/adversarial corpus is **not** complete; the shipped probe
+describes itself accurately as a seed. The Streamlit surface therefore remains
+disabled by default even when `ANTHROPIC_API_KEY` is present. Supervised
+experimental use requires the additional explicit process opt-in
+`ENABLE_EXPERIMENTAL_COMMITTEE=1`. Remove that experimental gate only in a
+separately reviewed change that supplies and pins the required corpus.

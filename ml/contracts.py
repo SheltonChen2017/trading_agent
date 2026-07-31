@@ -21,43 +21,21 @@ from __future__ import annotations
 
 import dataclasses
 import math
+import re
+from datetime import date, datetime
 from enum import Enum
+from types import MappingProxyType
 from typing import Any, Mapping, Sequence
 
 from assistant.schemas import EvidenceStatus
 
 SCHEMA_VERSION = "1.0"
 _SUPPORTED_SCHEMA_VERSIONS = frozenset({SCHEMA_VERSION})
+_SHA256_PATTERN = re.compile(r"^[0-9a-f]{64}$")
 
 
 class ContractError(ValueError):
     """A manifest or prediction record failed its contract check."""
-
-
-def _check_finite(value: Any, *, path: str = "value") -> None:
-    """Recursively reject NaN/inf anywhere in a JSON-serializable structure.
-
-    Strategy doc section 5.5: "rejection of NaN and infinity anywhere in
-    numeric output" -- not just at the top level of a manifest.
-    """
-    if isinstance(value, bool):
-        return
-    if isinstance(value, float):
-        if not math.isfinite(value):
-            raise ContractError(f"{path} is not finite: {value!r}")
-        return
-    if isinstance(value, (int, str)) or value is None:
-        return
-    if isinstance(value, Mapping):
-        for key, item in value.items():
-            _check_finite(item, path=f"{path}.{key}")
-        return
-    if isinstance(value, (list, tuple)):
-        for index, item in enumerate(value):
-            _check_finite(item, path=f"{path}[{index}]")
-        return
-    # Anything else (e.g. an Enum) is not a numeric leaf this check owns;
-    # to_dict()/JSON serialization is the backstop for unrecognized types.
 
 
 def _check_schema_version(schema_version: str) -> None:
@@ -71,6 +49,110 @@ def _check_schema_version(schema_version: str) -> None:
 def _check_required_str(value: Any, name: str) -> None:
     if not isinstance(value, str) or not value.strip():
         raise ContractError(f"{name} is required and must be a non-empty string")
+
+
+def _check_bool(value: Any, name: str) -> None:
+    if not isinstance(value, bool):
+        raise ContractError(f"{name} must be a boolean")
+
+
+def _check_int(value: Any, name: str, *, minimum: int = 0) -> None:
+    if isinstance(value, bool) or not isinstance(value, int) or value < minimum:
+        raise ContractError(f"{name} must be an integer >= {minimum}")
+
+
+def _check_nonnegative_number(value: Any, name: str) -> None:
+    if isinstance(value, bool) or not isinstance(value, (int, float)):
+        raise ContractError(f"{name} must be a non-negative finite number")
+    if not math.isfinite(float(value)) or value < 0:
+        raise ContractError(f"{name} must be a non-negative finite number")
+
+
+def _check_sha256(value: Any, name: str) -> None:
+    if not isinstance(value, str) or _SHA256_PATTERN.fullmatch(value) is None:
+        raise ContractError(f"{name} must be a lowercase 64-character sha256 digest")
+
+
+def _parse_date(value: Any, name: str) -> date:
+    _check_required_str(value, name)
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise ContractError(f"{name} must be an ISO-8601 date") from exc
+
+
+def _parse_timestamp(value: Any, name: str) -> datetime:
+    _check_required_str(value, name)
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ContractError(f"{name} must be an ISO-8601 timestamp") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ContractError(f"{name} must be timezone-aware")
+    return parsed
+
+
+def _freeze_json(value: Any, *, path: str) -> Any:
+    """Validate and recursively freeze one JSON-like value.
+
+    ``frozen=True`` protects dataclass attribute assignment only. Without this
+    copy/freeze step, a caller could mutate a manifest's nested dict after
+    validation, including inserting NaN or changing a model parameter while
+    retaining the same object identity.
+    """
+    if value is None or isinstance(value, (str, bool, int)):
+        return value
+    if isinstance(value, float):
+        if not math.isfinite(value):
+            raise ContractError(f"{path} is not finite: {value!r}")
+        return value
+    if isinstance(value, Mapping):
+        frozen: dict[str, Any] = {}
+        for key, item in value.items():
+            if not isinstance(key, str):
+                raise ContractError(f"{path} contains non-string key {key!r}")
+            frozen[key] = _freeze_json(item, path=f"{path}.{key}")
+        return MappingProxyType(frozen)
+    if isinstance(value, (list, tuple)):
+        return tuple(
+            _freeze_json(item, path=f"{path}[{index}]")
+            for index, item in enumerate(value)
+        )
+    raise ContractError(
+        f"{path} contains unsupported JSON value of type {type(value).__name__}"
+    )
+
+
+def _required_string_tuple(value: Any, name: str) -> tuple[str, ...]:
+    if not isinstance(value, (list, tuple)) or not value:
+        raise ContractError(f"{name} must contain at least one string")
+    result = tuple(value)
+    for index, item in enumerate(result):
+        _check_required_str(item, f"{name}[{index}]")
+    return result
+
+
+def _string_mapping(value: Any, name: str, *, require_nonempty: bool) -> Mapping[str, str]:
+    if not isinstance(value, Mapping) or (require_nonempty and not value):
+        qualifier = "a non-empty" if require_nonempty else "a"
+        raise ContractError(f"{name} must be {qualifier} string mapping")
+    result: dict[str, str] = {}
+    for key, item in value.items():
+        _check_required_str(key, f"{name} key")
+        _check_required_str(item, f"{name}.{key}")
+        result[key] = item
+    return MappingProxyType(result)
+
+
+def _window(value: Any, name: str) -> Mapping[str, str]:
+    result = _string_mapping(value, name, require_nonempty=True)
+    if set(result) != {"start", "end"}:
+        raise ContractError(f"{name} must contain exactly 'start' and 'end'")
+    start = _parse_date(result["start"], f"{name}.start")
+    end = _parse_date(result["end"], f"{name}.end")
+    if start > end:
+        raise ContractError(f"{name}.start must not be after {name}.end")
+    return result
 
 
 def _check_evidence_status(value: Any) -> None:
@@ -147,16 +229,45 @@ class DatasetManifest:
         _check_required_str(self.task, "task")
         _check_required_str(self.feature_set_version, "feature_set_version")
         _check_required_str(self.label_version, "label_version")
-        _check_required_str(self.dataset_hash, "dataset_hash")
+        _check_required_str(self.universe_definition, "universe_definition")
+        _check_required_str(self.entry_timing, "entry_timing")
+        _check_required_str(self.tax_assumptions, "tax_assumptions")
         _check_required_str(self.git_commit, "git_commit")
-        if self.row_count < 0 or self.distinct_session_count < 0 or self.ticker_count < 0:
-            raise ContractError("row_count/distinct_session_count/ticker_count must be >= 0")
-        if self.target_horizon_sessions < 1:
-            raise ContractError("target_horizon_sessions must be a positive integer")
-        if self.embargo_sessions < 0:
-            raise ContractError("embargo_sessions must be >= 0")
-        _check_finite(self.transaction_cost_bps, path="transaction_cost_bps")
-        _check_finite(dict(self.input_hashes), path="input_hashes")
+        _parse_timestamp(self.created_at, "created_at")
+        _check_bool(self.point_in_time_data, "point_in_time_data")
+        requested_start = _parse_date(self.requested_start_date, "requested_start_date")
+        requested_end = _parse_date(self.requested_end_date, "requested_end_date")
+        actual_start = _parse_date(self.actual_start_date, "actual_start_date")
+        actual_end = _parse_date(self.actual_end_date, "actual_end_date")
+        if requested_start > requested_end:
+            raise ContractError("requested_start_date must not be after requested_end_date")
+        if actual_start > actual_end:
+            raise ContractError("actual_start_date must not be after actual_end_date")
+        _check_int(self.row_count, "row_count")
+        _check_int(self.distinct_session_count, "distinct_session_count")
+        _check_int(self.ticker_count, "ticker_count")
+        if self.row_count == 0 and (self.distinct_session_count or self.ticker_count):
+            raise ContractError("empty datasets cannot declare sessions or tickers")
+        if self.row_count > 0 and (
+            self.distinct_session_count == 0 or self.ticker_count == 0
+        ):
+            raise ContractError("non-empty datasets must declare sessions and tickers")
+        if self.distinct_session_count > self.row_count or self.ticker_count > self.row_count:
+            raise ContractError("session/ticker counts cannot exceed row_count")
+        _check_int(self.target_horizon_sessions, "target_horizon_sessions", minimum=1)
+        _check_int(self.embargo_sessions, "embargo_sessions")
+        if self.embargo_sessions < self.target_horizon_sessions:
+            raise ContractError(
+                "embargo_sessions must be at least target_horizon_sessions"
+            )
+        _check_nonnegative_number(self.transaction_cost_bps, "transaction_cost_bps")
+        _check_sha256(self.dataset_hash, "dataset_hash")
+        sources = _required_string_tuple(self.source_descriptions, "source_descriptions")
+        hashes = _string_mapping(self.input_hashes, "input_hashes", require_nonempty=True)
+        for key, digest in hashes.items():
+            _check_sha256(digest, f"input_hashes.{key}")
+        object.__setattr__(self, "source_descriptions", sources)
+        object.__setattr__(self, "input_hashes", hashes)
 
     def to_dict(self) -> dict[str, Any]:
         return _to_dict(self)
@@ -171,7 +282,11 @@ class DatasetManifest:
             raise ContractError(f"DatasetManifest payload has unknown fields: {sorted(unknown)}")
         try:
             kwargs = dict(payload)
-            kwargs["source_descriptions"] = tuple(kwargs["source_descriptions"])
+            # Presence is checked here so the resulting error identifies the
+            # missing field. Shape/type validation remains in __post_init__;
+            # coercing a string with tuple("prices") would otherwise turn it
+            # into valid-looking one-character descriptions.
+            _ = kwargs["source_descriptions"]
         except KeyError as exc:
             raise ContractError(f"DatasetManifest payload missing required field: {exc}") from exc
         try:
@@ -215,18 +330,38 @@ class ModelManifest:
         _check_required_str(self.task, "task")
         _check_required_str(self.created_at, "created_at")
         _check_required_str(self.dataset_id, "dataset_id")
-        _check_required_str(self.dataset_hash, "dataset_hash")
         _check_required_str(self.feature_set_version, "feature_set_version")
         _check_required_str(self.label_version, "label_version")
         _check_required_str(self.algorithm, "algorithm")
-        _check_required_str(self.artifact_hash, "artifact_hash")
-        _check_required_str(self.evaluation_report_hash, "evaluation_report_hash")
-        if not self.ordered_feature_names:
-            raise ContractError("ordered_feature_names must not be empty")
-        if len(set(self.ordered_feature_names)) != len(self.ordered_feature_names):
+        _parse_timestamp(self.created_at, "created_at")
+        _check_sha256(self.dataset_hash, "dataset_hash")
+        _check_sha256(self.artifact_hash, "artifact_hash")
+        _check_sha256(self.evaluation_report_hash, "evaluation_report_hash")
+        feature_names = _required_string_tuple(
+            self.ordered_feature_names, "ordered_feature_names"
+        )
+        if len(set(feature_names)) != len(feature_names):
             raise ContractError("ordered_feature_names must not contain duplicates")
+        _check_int(self.random_seed, "random_seed")
         _check_evidence_status(self.evidence_status)
-        _check_finite(dict(self.hyperparameters), path="hyperparameters")
+        hyperparameters = _freeze_json(self.hyperparameters, path="hyperparameters")
+        if not isinstance(hyperparameters, Mapping):
+            raise ContractError("hyperparameters must be a JSON object")
+        training_window = _window(self.training_window, "training_window")
+        if not isinstance(self.validation_windows, (list, tuple)) or not self.validation_windows:
+            raise ContractError("validation_windows must contain at least one window")
+        validation_windows = tuple(
+            _window(window, f"validation_windows[{index}]")
+            for index, window in enumerate(self.validation_windows)
+        )
+        dependency_versions = _string_mapping(
+            self.dependency_versions, "dependency_versions", require_nonempty=True
+        )
+        object.__setattr__(self, "ordered_feature_names", feature_names)
+        object.__setattr__(self, "hyperparameters", hyperparameters)
+        object.__setattr__(self, "training_window", training_window)
+        object.__setattr__(self, "validation_windows", validation_windows)
+        object.__setattr__(self, "dependency_versions", dependency_versions)
 
     @property
     def production_authoritative(self) -> bool:
@@ -247,12 +382,12 @@ class ModelManifest:
         unknown = set(payload) - fields - {"production_authoritative"}
         if unknown:
             raise ContractError(f"ModelManifest payload has unknown fields: {sorted(unknown)}")
+        if payload.get("production_authoritative", False) is not False:
+            raise ContractError("ModelManifest production_authoritative must be false")
         try:
             kwargs = {k: v for k, v in payload.items() if k != "production_authoritative"}
-            kwargs["ordered_feature_names"] = tuple(kwargs["ordered_feature_names"])
-            kwargs["validation_windows"] = tuple(
-                dict(window) for window in kwargs["validation_windows"]
-            )
+            _ = kwargs["ordered_feature_names"]
+            _ = kwargs["validation_windows"]
             kwargs["evidence_status"] = EvidenceStatus(kwargs["evidence_status"])
         except KeyError as exc:
             raise ContractError(f"ModelManifest payload missing required field: {exc}") from exc
@@ -294,30 +429,68 @@ class PredictionRecord:
         _check_required_str(self.prediction_id, "prediction_id")
         _check_required_str(self.model_id, "model_id")
         _check_required_str(self.model_version, "model_version")
-        _check_required_str(self.artifact_hash, "artifact_hash")
+        _check_required_str(
+            self.dataset_or_feature_snapshot_hash,
+            "dataset_or_feature_snapshot_hash",
+        )
         _check_required_str(self.task, "task")
         _check_required_str(self.subject_key, "subject_key")
-        _check_required_str(self.as_of_session, "as_of_session")
-        _check_required_str(self.generated_at, "generated_at")
-        _check_required_str(self.data_available_at, "data_available_at")
-        if self.horizon_sessions < 1:
-            raise ContractError("horizon_sessions must be a positive integer")
+        _check_sha256(self.artifact_hash, "artifact_hash")
+        _check_sha256(
+            self.dataset_or_feature_snapshot_hash,
+            "dataset_or_feature_snapshot_hash",
+        )
+        _parse_date(self.as_of_session, "as_of_session")
+        generated_at = _parse_timestamp(self.generated_at, "generated_at")
+        data_available_at = _parse_timestamp(
+            self.data_available_at, "data_available_at"
+        )
+        if data_available_at > generated_at:
+            raise ContractError("data_available_at must not be after generated_at")
+        _check_int(self.horizon_sessions, "horizon_sessions", minimum=1)
+        _check_bool(self.available, "available")
+        if not isinstance(self.refusal_reasons, (list, tuple)):
+            raise ContractError("refusal_reasons must be an array of strings")
+        refusal_reasons = tuple(self.refusal_reasons)
+        for index, reason in enumerate(refusal_reasons):
+            _check_required_str(reason, f"refusal_reasons[{index}]")
+        if len(set(refusal_reasons)) != len(refusal_reasons):
+            raise ContractError("refusal_reasons must not contain duplicates")
+        values = _freeze_json(self.values, path="values")
+        uncertainty = _freeze_json(self.uncertainty, path="uncertainty")
+        feature_freshness = _freeze_json(
+            self.feature_freshness, path="feature_freshness"
+        )
+        if not isinstance(values, Mapping) or not isinstance(uncertainty, Mapping):
+            raise ContractError("values and uncertainty must be JSON objects")
+        if not isinstance(feature_freshness, Mapping):
+            raise ContractError("feature_freshness must be a JSON object")
         if not self.available and not self.refusal_reasons:
             raise ContractError(
                 "an unavailable prediction must record at least one refusal reason "
                 "(strategy doc 3.3: missing/stale/non-finite features must produce "
                 "an unavailable prediction, never a silent default)"
             )
-        if self.available and self.refusal_reasons:
+        if self.available and refusal_reasons:
             raise ContractError(
                 "an available prediction must not carry refusal_reasons"
             )
         if self.available:
-            if not self.values:
+            if not values:
                 raise ContractError("an available prediction must carry values")
-            _check_finite(dict(self.values), path="values")
-            _check_finite(dict(self.uncertainty), path="uncertainty")
+            if not feature_freshness:
+                raise ContractError(
+                    "an available prediction must carry feature_freshness"
+                )
+        elif values or uncertainty:
+            raise ContractError(
+                "an unavailable prediction must not carry values or uncertainty"
+            )
         _check_evidence_status(self.evidence_status)
+        object.__setattr__(self, "values", values)
+        object.__setattr__(self, "uncertainty", uncertainty)
+        object.__setattr__(self, "feature_freshness", feature_freshness)
+        object.__setattr__(self, "refusal_reasons", refusal_reasons)
 
     @property
     def production_authoritative(self) -> bool:
@@ -334,9 +507,11 @@ class PredictionRecord:
         unknown = set(payload) - fields - {"production_authoritative"}
         if unknown:
             raise ContractError(f"PredictionRecord payload has unknown fields: {sorted(unknown)}")
+        if payload.get("production_authoritative", False) is not False:
+            raise ContractError("PredictionRecord production_authoritative must be false")
         try:
             kwargs = {k: v for k, v in payload.items() if k != "production_authoritative"}
-            kwargs["refusal_reasons"] = tuple(kwargs["refusal_reasons"])
+            _ = kwargs["refusal_reasons"]
             kwargs["evidence_status"] = EvidenceStatus(kwargs["evidence_status"])
         except KeyError as exc:
             raise ContractError(f"PredictionRecord payload missing required field: {exc}") from exc

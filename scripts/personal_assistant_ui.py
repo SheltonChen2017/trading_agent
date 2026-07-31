@@ -80,9 +80,13 @@ from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calen
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.ticker_verification import partition_by_universe, verify_tickers
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
-from assistant.llm import PrivacyMode, ReviewStatus, project_committee_input
-from assistant.llm.anthropic_provider import AnthropicCommitteeProvider, is_anthropic_committee_configured
-from assistant.llm.committee_service import run_committee_review_and_record
+from assistant.llm import PrivacyMode, ProjectionError, ReviewStatus, project_committee_input
+from assistant.llm.anthropic_provider import (
+    AnthropicCommitteeProvider,
+    is_anthropic_committee_configured,
+    is_anthropic_committee_experiment_enabled,
+)
+from assistant.llm.committee_service import committee_input_hash, run_committee_review_and_record
 from assistant.schemas import DecisionPacket
 from assistant.portfolio_analytics import compute_portfolio_analytics
 from assistant.proposal_status import (
@@ -531,6 +535,7 @@ def _clear_confirmation_state_if_digest_changed(session_state, proposal_id: str,
     session_state[f"confirm_{proposal_id}"] = ""
     session_state.pop(f"override_available_{proposal_id}", None)
     session_state.pop(f"override_confirm_{proposal_id}", None)
+    session_state.pop(f"committee_result_{proposal_id}", None)
     session_state[digest_key] = current_digest
     return True
 
@@ -650,6 +655,34 @@ def _render_committee_result(result) -> None:
         )
 
 
+def _cache_committee_result(
+    session_state, proposal_id: str, input_hash: str, result
+) -> None:
+    """Bind a cached review to the exact projected facts it reviewed."""
+    session_state[f"committee_result_{proposal_id}"] = {
+        "input_hash": input_hash,
+        "result": result,
+    }
+
+
+def _committee_result_for_input(
+    session_state, proposal_id: str, input_hash: str
+):
+    """Return only a review produced for the current committee input.
+
+    A DecisionPacket can refresh without changing proposal_id. Caching only by
+    proposal ID previously displayed an old verdict beside new portfolio,
+    policy, warning, or market facts. Legacy/unbound cache entries are removed
+    rather than trusted.
+    """
+    key = f"committee_result_{proposal_id}"
+    cached = session_state.get(key)
+    if not isinstance(cached, dict) or cached.get("input_hash") != input_hash:
+        session_state.pop(key, None)
+        return None
+    return cached.get("result")
+
+
 def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str, portfolio, packet: DecisionPacket) -> None:
     """One proposal card with the typed-confirmation approve flow.
     Shared by the Selling, Propose & Approve, and Watchlist tabs --
@@ -698,6 +731,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
         st.session_state.pop(override_confirm_key, None)
         st.session_state.pop(digest_key, None)
         st.session_state.pop(stale_key, None)
+        st.session_state.pop(f"committee_result_{proposal_id}", None)
         with st.container(border=True):
             st.subheader(f"{intent['side'].upper()} {intent['shares']} {intent['ticker']}")
             st.caption(f"{proposal_id} -- evidence_status: {proposal.get('evidence_status', '')}")
@@ -722,8 +756,10 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
     # recomputed, so they can go stale exactly when the digest does).
     if previous_digest is not None and previous_digest != current_digest:
         st.session_state[stale_key] = True
+        st.session_state.pop(f"committee_result_{proposal_id}", None)
     is_stale = st.session_state.get(stale_key, False)
     if is_stale:
+        st.session_state.pop(f"committee_result_{proposal_id}", None)
         st.warning(
             "This proposal's content, policy, or portfolio context has changed since it was last "
             "displayed -- the reasons/expected-impact below were computed against the OLD context and "
@@ -784,9 +820,35 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
             and intent.get("side") == "sell"
         )
         if is_committee_eligible:
-            committee_available = is_anthropic_committee_configured()
+            committee_input = None
+            committee_projection_error = None
+            if not is_stale:
+                try:
+                    committee_input = project_committee_input(
+                        packet, proposal, privacy_mode=PrivacyMode.PERCENTAGES_ONLY
+                    )
+                except ProjectionError as exc:
+                    committee_projection_error = str(exc)
+                except Exception:
+                    committee_projection_error = (
+                        "Committee input preparation failed unexpectedly."
+                    )
+            current_committee_hash = (
+                committee_input_hash(committee_input)
+                if committee_input is not None
+                else None
+            )
+            provider_configured = is_anthropic_committee_configured()
+            experiment_enabled = is_anthropic_committee_experiment_enabled()
+            committee_available = (
+                provider_configured
+                and experiment_enabled
+                and committee_input is not None
+                and not is_stale
+            )
             want_committee_review = st.checkbox(
-                "Get an investment committee review of this sell (real API call, small real cost)",
+                "Get an experimental investment committee review of this sell "
+                "(real API call, real cost)",
                 value=False,
                 key=f"want_committee_{proposal_id}",
                 disabled=not committee_available,
@@ -794,19 +856,29 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                     "Advisory only -- cites only the deterministic facts already shown above; "
                     "never proposes a different trade."
                     if committee_available
-                    else "ANTHROPIC_API_KEY is not set."
+                    else (
+                        committee_projection_error
+                        or (
+                            "This proposal is stale; regenerate it before requesting a review."
+                            if is_stale
+                            else (
+                                "The committee remains release-gated until its frozen replay "
+                                "corpus is complete. Set ENABLE_EXPERIMENTAL_COMMITTEE=1 only "
+                                "for supervised experimental use."
+                                if provider_configured and not experiment_enabled
+                                else "ANTHROPIC_API_KEY is not set."
+                            )
+                        )
+                    )
                 ),
             )
             if st.button(
                 "Get committee review",
                 key=f"committee_button_{proposal_id}",
-                disabled=not want_committee_review,
+                disabled=not want_committee_review or not committee_available,
             ):
                 try:
-                    committee_input = project_committee_input(
-                        packet, proposal, privacy_mode=PrivacyMode.PERCENTAGES_ONLY
-                    )
-                    st.session_state[f"committee_result_{proposal_id}"] = run_committee_review_and_record(
+                    result = run_committee_review_and_record(
                         committee_input,
                         AnthropicCommitteeProvider(),
                         store=store,
@@ -816,15 +888,23 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                         # existing structured-output calls.
                         timeout_seconds=60.0,
                     )
-                except Exception as exc:
-                    # project_committee_input()'s ProjectionError is the only
-                    # expected failure here (e.g. a reloaded proposal that no
-                    # longer satisfies the hard eligibility constraints) --
-                    # run_committee_review_and_record() itself never raises.
+                    _cache_committee_result(
+                        st.session_state,
+                        proposal_id,
+                        current_committee_hash,
+                        result,
+                    )
+                except Exception:
                     st.session_state[f"committee_result_{proposal_id}"] = None
-                    st.error(f"Could not prepare committee review: {exc}")
+                    st.error("Could not complete the committee review.")
 
-            committee_result = st.session_state.get(f"committee_result_{proposal_id}")
+            committee_result = (
+                _committee_result_for_input(
+                    st.session_state, proposal_id, current_committee_hash
+                )
+                if current_committee_hash is not None
+                else None
+            )
             if committee_result is not None:
                 _render_committee_result(committee_result)
 

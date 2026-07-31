@@ -12,6 +12,7 @@ else is allowed to propagate as a generic "provider_error".
 from __future__ import annotations
 
 import json
+import math
 import os
 from typing import Any, Mapping
 
@@ -24,6 +25,7 @@ _MODEL = "claude-opus-5"  # same model as assistant/ai_advisor.py's _MODEL
 # confidence_basis, runs closer to ~12-13K tokens -- this must comfortably
 # exceed that, not merely approach it.
 _MAX_TOKENS = 16000
+_EXPERIMENTAL_ENABLE_ENV = "ENABLE_EXPERIMENTAL_COMMITTEE"
 
 
 class AnthropicCommitteeProvider:
@@ -32,7 +34,15 @@ class AnthropicCommitteeProvider:
     provider_id = "anthropic"
 
     def __init__(self, *, model: str = _MODEL, max_tokens: int = _MAX_TOKENS) -> None:
-        self.model_id = model
+        if not isinstance(model, str) or not model.strip():
+            raise ValueError("model must be a non-empty string")
+        if (
+            isinstance(max_tokens, bool)
+            or not isinstance(max_tokens, int)
+            or not 0 < max_tokens <= _MAX_TOKENS
+        ):
+            raise ValueError(f"max_tokens must be an integer between 1 and {_MAX_TOKENS}")
+        self.model_id = model.strip()
         self._max_tokens = max_tokens
 
     def complete_json(
@@ -44,6 +54,28 @@ class AnthropicCommitteeProvider:
         timeout_seconds: float,
     ) -> Mapping[str, Any]:
         import anthropic  # imported lazily, same pattern as assistant/ai_advisor.py
+
+        if (
+            isinstance(timeout_seconds, bool)
+            or not isinstance(timeout_seconds, (int, float))
+            or not math.isfinite(float(timeout_seconds))
+            or timeout_seconds <= 0
+        ):
+            raise CommitteeProviderError(
+                "invalid_timeout", "timeout_seconds must be positive and finite."
+            )
+        try:
+            serialized_payload = json.dumps(
+                dict(input_payload),
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=False,
+                allow_nan=False,
+            )
+        except (TypeError, ValueError) as exc:
+            raise CommitteeProviderError(
+                "invalid_request", "Provider input was not strict JSON."
+            ) from exc
 
         client = anthropic.Anthropic()
         try:
@@ -66,9 +98,7 @@ class AnthropicCommitteeProvider:
                 messages=[
                     {
                         "role": "user",
-                        "content": json.dumps(
-                            dict(input_payload), sort_keys=True, default=str
-                        ),
+                        "content": serialized_payload,
                     }
                 ],
             )
@@ -91,6 +121,11 @@ class AnthropicCommitteeProvider:
             raise CommitteeProviderError(
                 "refusal", f"Provider declined the request: {detail}"
             )
+        if response.stop_reason != "end_turn":
+            raise CommitteeProviderError(
+                "incomplete_response",
+                f"Provider stopped before a complete response ({response.stop_reason}).",
+            )
         text = next(
             (block.text for block in response.content if block.type == "text"), None
         )
@@ -99,12 +134,22 @@ class AnthropicCommitteeProvider:
                 "empty_response", "Provider returned no text content block."
             )
         try:
-            return json.loads(text)
+            parsed = json.loads(text)
         except json.JSONDecodeError as exc:
             raise CommitteeProviderError(
                 "invalid_json", "Provider response was not valid JSON."
             ) from exc
+        if not isinstance(parsed, dict):
+            raise CommitteeProviderError(
+                "invalid_json", "Provider response must be one JSON object."
+            )
+        return parsed
 
 
 def is_anthropic_committee_configured() -> bool:
-    return bool(os.environ.get("ANTHROPIC_API_KEY"))
+    return bool(os.environ.get("ANTHROPIC_API_KEY", "").strip())
+
+
+def is_anthropic_committee_experiment_enabled() -> bool:
+    """Explicit opt-in while the ADR's frozen-corpus release gate is open."""
+    return os.environ.get(_EXPERIMENTAL_ENABLE_ENV, "").strip() == "1"

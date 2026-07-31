@@ -27,7 +27,9 @@ from assistant.proposal_status import STATUSES
 from assistant.schemas import DecisionPacket, MarketRegime
 from scripts.personal_assistant_ui import (
     _allocation_input_signature,
+    _cache_committee_result,
     _clear_confirmation_state_if_digest_changed,
+    _committee_result_for_input,
     _load_packet,
     _portfolio_context_payload,
     _proposal_content_digest,
@@ -264,6 +266,7 @@ def test_clear_confirmation_state_clears_confirm_and_override_phrase_on_change()
         "confirm_tp_1": "approve",
         "override_available_tp_1": ["some violation"],
         "override_confirm_tp_1": "OVERRIDE BUY 10 AAPL",
+        "committee_result_tp_1": {"input_hash": "old", "result": object()},
         "content_digest_tp_1": "old-digest",
     }
     changed = _clear_confirmation_state_if_digest_changed(session_state, "tp_1", "new-digest")
@@ -271,6 +274,7 @@ def test_clear_confirmation_state_clears_confirm_and_override_phrase_on_change()
     assert session_state["confirm_tp_1"] == ""
     assert "override_available_tp_1" not in session_state
     assert "override_confirm_tp_1" not in session_state
+    assert "committee_result_tp_1" not in session_state
     assert session_state["content_digest_tp_1"] == "new-digest"
 
 
@@ -284,6 +288,22 @@ def test_clear_confirmation_state_no_op_when_digest_unchanged():
     assert changed is False
     assert session_state["confirm_tp_1"] == "approve"  # untouched
     assert session_state["override_confirm_tp_1"] == "OVERRIDE BUY 10 AAPL"  # untouched
+
+
+def test_committee_cache_is_bound_to_exact_projected_input_hash():
+    session_state = {}
+    result = object()
+    _cache_committee_result(session_state, "tp_1", "hash-a", result)
+
+    assert _committee_result_for_input(session_state, "tp_1", "hash-a") is result
+    assert _committee_result_for_input(session_state, "tp_1", "hash-b") is None
+    assert "committee_result_tp_1" not in session_state
+
+
+def test_legacy_unbound_committee_cache_is_refused():
+    session_state = {"committee_result_tp_1": object()}
+    assert _committee_result_for_input(session_state, "tp_1", "hash-a") is None
+    assert "committee_result_tp_1" not in session_state
 
 
 def test_clear_confirmation_state_handles_first_render_with_no_prior_digest():

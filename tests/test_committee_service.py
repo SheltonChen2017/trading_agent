@@ -10,7 +10,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from assistant.llm.committee_service import run_committee_review_and_record
+from assistant.llm.committee_service import committee_input_hash, run_committee_review_and_record
 from assistant.llm.projection import project_committee_input
 from assistant.llm.schemas import ReviewStatus
 from assistant.storage import AssistantStore
@@ -39,6 +39,11 @@ def test_accepted_review_writes_one_successful_ai_run(tmp_path):
     assert rows[0]["model"] == "fake-v1"
     assert rows[0]["prompt_version"] == result.prompt_version
     assert rows[0]["error"] is None
+    assert rows[0]["input_hash"] == committee_input_hash(committee_input)
+    assert rows[0]["response"]["status"] == "accepted"
+    assert rows[0]["response"]["accepted"] is True
+    assert rows[0]["response"]["provider_id"] == "fake"
+    assert rows[0]["response"]["review"] is not None
 
 
 def test_rejected_review_writes_one_failed_ai_run(tmp_path):
@@ -54,10 +59,13 @@ def test_rejected_review_writes_one_failed_ai_run(tmp_path):
     rows = store.list_ai_runs(function_name="run_committee_review")
     assert len(rows) == 1
     assert rows[0]["success"] is False
-    assert rows[0]["error"] is not None
+    assert rows[0]["error"] == "schema_rejected"
+    assert rows[0]["response"]["status"] == "review_unavailable"
+    assert rows[0]["response"]["error_code"] == "schema_rejected"
+    assert rows[0]["response"]["review"] is None
 
 
-def test_persistence_failure_does_not_break_the_feature(tmp_path, monkeypatch):
+def test_persistence_failure_fails_closed_instead_of_displaying_unaudited_review(tmp_path, monkeypatch):
     store = AssistantStore(tmp_path / "assistant.db")
 
     def _broken_record_ai_run(*args, **kwargs):
@@ -69,4 +77,7 @@ def test_persistence_failure_does_not_break_the_feature(tmp_path, monkeypatch):
 
     result = run_committee_review_and_record(committee_input, provider, store=store)
 
-    assert result.accepted  # the review itself is unaffected by the logging failure
+    assert not result.accepted
+    assert result.status == ReviewStatus.REVIEW_UNAVAILABLE
+    assert result.review is None
+    assert result.error_code == "audit_persistence_failed"

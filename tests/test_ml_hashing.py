@@ -1,7 +1,12 @@
 """Tests for ml/hashing.py."""
 from __future__ import annotations
 
-from ml.hashing import hash_bytes, hash_payload
+import math
+from types import MappingProxyType
+
+import pytest
+
+from ml.hashing import HashingError, canonical_json, hash_bytes, hash_payload
 
 
 def test_hash_payload_is_deterministic_for_identical_input():
@@ -25,3 +30,22 @@ def test_hash_bytes_matches_hashlib_sha256():
 
     data = b"some artifact bytes"
     assert hash_bytes(data) == hashlib.sha256(data).hexdigest()
+
+
+@pytest.mark.parametrize(
+    "payload",
+    [
+        {"value": math.nan},
+        {"value": math.inf},
+        {1: "non-string key"},
+        {"value": object()},
+    ],
+)
+def test_canonical_json_rejects_nonstandard_or_coerced_values(payload):
+    with pytest.raises(HashingError):
+        canonical_json(payload)
+
+
+def test_canonical_json_supports_immutable_mapping_contract_values():
+    payload = MappingProxyType({"nested": MappingProxyType({"values": (1, 2)})})
+    assert canonical_json(payload) == '{"nested":{"values":[1,2]}}'

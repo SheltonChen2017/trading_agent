@@ -128,6 +128,18 @@ def test_refusal_stop_reason_raises_committee_provider_error():
     assert exc_info.value.code == "refusal"
 
 
+@pytest.mark.parametrize("stop_reason", ["max_tokens", "pause_turn", "tool_use"])
+def test_incomplete_stop_reason_is_never_parsed_as_an_accepted_review(stop_reason):
+    response = _fake_response(json.dumps({"apparently": "complete"}), stop_reason=stop_reason)
+    client, _ = _mock_client_returning(response)
+    with patch("anthropic.Anthropic", return_value=client):
+        with pytest.raises(CommitteeProviderError) as exc_info:
+            AnthropicCommitteeProvider().complete_json(
+                system_prompt="s", input_payload={}, response_schema={}, timeout_seconds=1.0,
+            )
+    assert exc_info.value.code == "incomplete_response"
+
+
 def test_empty_content_raises_committee_provider_error():
     response = MagicMock()
     response.content = []
@@ -156,3 +168,79 @@ def test_provider_id_and_model_id_attrs():
     provider = AnthropicCommitteeProvider()
     assert provider.provider_id == "anthropic"
     assert provider.model_id == "claude-opus-5"
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"model": ""},
+        {"max_tokens": 0},
+        {"max_tokens": True},
+        {"max_tokens": 16001},
+    ],
+)
+def test_provider_constructor_rejects_invalid_budget_or_identity(kwargs):
+    with pytest.raises(ValueError):
+        AnthropicCommitteeProvider(**kwargs)
+
+
+def test_configuration_requires_a_non_whitespace_api_key(monkeypatch):
+    from assistant.llm.anthropic_provider import is_anthropic_committee_configured
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "   ")
+    assert is_anthropic_committee_configured() is False
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "configured")
+    assert is_anthropic_committee_configured() is True
+
+
+def test_experimental_committee_requires_exact_explicit_opt_in(monkeypatch):
+    from assistant.llm.anthropic_provider import (
+        is_anthropic_committee_experiment_enabled,
+    )
+
+    monkeypatch.delenv("ENABLE_EXPERIMENTAL_COMMITTEE", raising=False)
+    assert is_anthropic_committee_experiment_enabled() is False
+    monkeypatch.setenv("ENABLE_EXPERIMENTAL_COMMITTEE", "true")
+    assert is_anthropic_committee_experiment_enabled() is False
+    monkeypatch.setenv("ENABLE_EXPERIMENTAL_COMMITTEE", "1")
+    assert is_anthropic_committee_experiment_enabled() is True
+
+
+def test_provider_rejects_nonfinite_timeout_before_constructing_client():
+    with patch("anthropic.Anthropic") as client:
+        with pytest.raises(CommitteeProviderError) as exc_info:
+            AnthropicCommitteeProvider().complete_json(
+                system_prompt="s",
+                input_payload={},
+                response_schema={},
+                timeout_seconds=float("nan"),
+            )
+    assert exc_info.value.code == "invalid_timeout"
+    client.assert_not_called()
+
+
+def test_provider_rejects_non_strict_json_input_before_api_call():
+    with patch("anthropic.Anthropic") as client:
+        with pytest.raises(CommitteeProviderError) as exc_info:
+            AnthropicCommitteeProvider().complete_json(
+                system_prompt="s",
+                input_payload={"bad": float("nan")},
+                response_schema={},
+                timeout_seconds=1.0,
+            )
+    assert exc_info.value.code == "invalid_request"
+    client.assert_not_called()
+
+
+def test_provider_rejects_json_array_response():
+    response = _fake_response("[]")
+    client, _ = _mock_client_returning(response)
+    with patch("anthropic.Anthropic", return_value=client):
+        with pytest.raises(CommitteeProviderError) as exc_info:
+            AnthropicCommitteeProvider().complete_json(
+                system_prompt="s",
+                input_payload={},
+                response_schema={},
+                timeout_seconds=1.0,
+            )
+    assert exc_info.value.code == "invalid_json"

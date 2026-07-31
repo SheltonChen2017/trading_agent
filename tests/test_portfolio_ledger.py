@@ -554,6 +554,55 @@ def test_record_split_changes_shares_without_changing_book_value(tmp_path):
     )
 
 
+def test_split_is_blocked_while_a_pre_split_fill_is_still_unsynced(tmp_path):
+    # Independent review, 2026-07-31: record_split() used to size its
+    # adjustment purely off postings ALREADY in the journal. If ledger-sync
+    # hadn't caught up on every pre-split fill yet (e.g. a delayed poll
+    # picks up an old fill after the split was already recorded), the
+    # adjustment posted against too few shares, and the late-arriving fill
+    # then posted its ORIGINAL non-split-adjusted qty with no correction --
+    # silently understating post-split share count. Must fail closed
+    # instead of silently under-sizing the split.
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 7, 1, 9, 0, tzinfo=timezone.utc)
+    # 2 shares are already journaled via the opening snapshot, so
+    # held_at_effective is NOT zero -- the pre-existing "held 0 shares"
+    # guard alone can't catch this case. A second, still-unsynced fill
+    # (also dated before the split's effective time) is what must block it.
+    bootstrap_opening_snapshot(
+        store, _snapshot(shares=2.0), confirmation="bootstrap", now=boot_at
+    )
+    fills = [
+        {
+            "ticker": "AAPL", "side": "buy", "qty": 2.0, "price": 100.0,
+            "at": (boot_at + timedelta(days=5)).isoformat(), "fill_id": "f-early",
+        },
+    ]
+    store.list_fills = lambda: fills
+    # Deliberately never ran sync_app_fills() -- this fill is still
+    # unsynced when the split effective date arrives.
+    with pytest.raises(LedgerError, match="have not been journaled yet"):
+        record_split(
+            store,
+            external_id="aapl-4-for-1-early",
+            ticker="AAPL",
+            ratio=4,
+            occurred_at="2026-07-15T09:00:00+00:00",
+        )
+
+    # Once synced, the same split proceeds correctly against the full
+    # (2 + 2 = 4) pre-split count, not just the 2 that were already journaled.
+    sync_app_fills(store)
+    assert record_split(
+        store,
+        external_id="aapl-4-for-1-early",
+        ticker="AAPL",
+        ratio=4,
+        occurred_at="2026-07-15T09:00:00+00:00",
+    )
+    assert ledger_balances(store)["shares"]["AAPL"] == Decimal("16")
+
+
 def test_retroactive_split_uses_shares_at_effective_time(tmp_path):
     store = AssistantStore(tmp_path / "assistant.db")
     bootstrap_opening_snapshot(

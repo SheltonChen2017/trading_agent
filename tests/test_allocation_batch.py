@@ -25,7 +25,11 @@ from assistant.allocation_batch import (
 )
 from assistant.allocation_proposals import generate_allocation_buy_proposals
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
-from assistant.execution_service import execute_approved_paper_proposal, validate_proposal_for_execution
+from assistant.execution_service import (
+    ProposalExecutionError,
+    execute_approved_paper_proposal,
+    validate_proposal_for_execution,
+)
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposals import TradeProposal, _stable_id
 from assistant.schemas import DecisionPacket, MarketRegime
@@ -835,6 +839,59 @@ def test_second_leg_submission_unknown_stops_the_batch():
             assert legs_by_ticker[first_ticker]["state"] == LEG_SUBMITTED
             assert legs_by_ticker[second_ticker]["state"] == LEG_UNKNOWN
     finally:
+        restore()
+
+
+def test_second_leg_in_flight_status_stops_as_unknown_not_failed():
+    # Independent review, 2026-07-31: execute_allocation_batch()'s
+    # ProposalExecutionError handler used to only treat the literal status
+    # "submission_unknown" as unresolved -- every OTHER in-flight status
+    # ("submitting", "reconciling", "validating", "approved") fell through
+    # to the terminal LEG_FAILED, even though _sync_leg_from_proposal()
+    # (used everywhere else in this file) already treats all of those the
+    # same way. Simulates the real trigger: a losing concurrent execution
+    # attempt for the same proposal reads back the winner's in-flight
+    # "approved" status, not "submission_unknown".
+    import assistant.allocation_batch as batch_module
+
+    packet = _packet()
+    policy = _policy()
+    proposals = _two_leg_proposals(packet, policy)
+    first_ticker, second_ticker = proposals[0].intent.ticker, proposals[1].intent.ticker
+    proposal_ids = [p.proposal_id for p in proposals]
+    second_proposal_id = proposals[1].proposal_id
+
+    real_execute = execute_approved_paper_proposal
+
+    def racing_execute(proposal_id, *args, **kwargs):
+        if proposal_id == second_proposal_id:
+            store = args[3] if len(args) > 3 else kwargs["store"]
+            # A concurrent winner has claimed this proposal and moved it to
+            # an in-flight (not yet terminal) status.
+            store.update_proposal_status(proposal_id, "approved")
+            raise ProposalExecutionError("simulated losing concurrent claim")
+        return real_execute(proposal_id, *args, **kwargs)
+
+    batch_module.execute_approved_paper_proposal = racing_execute
+    _, restore = _mock_batch_execution(packet, quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for p in proposals:
+                store.save_proposal(p.to_dict())
+            batch_id = new_batch_id()
+            store.create_allocation_batch(batch_id, proposal_ids, intended_total_notional=2000.0)
+            result = execute_allocation_batch(
+                batch_id, store, policy, now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert result["status"] == BATCH_STOPPED_UNKNOWN
+            legs_by_ticker = {
+                store.get_proposal(pid)["intent"]["ticker"]: leg for pid, leg in result["legs"].items()
+            }
+            assert legs_by_ticker[first_ticker]["state"] == LEG_SUBMITTED
+            assert legs_by_ticker[second_ticker]["state"] == LEG_UNKNOWN
+    finally:
+        batch_module.execute_approved_paper_proposal = real_execute
         restore()
 
 

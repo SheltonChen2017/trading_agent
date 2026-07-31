@@ -1,5 +1,7 @@
 import dataclasses
+import json
 import sys
+import threading
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -111,6 +113,49 @@ def test_research_report_is_immutable_and_blocks_non_point_in_time_data(
     assert write_research_report(report, target) == target
     with pytest.raises(FileExistsError, match="immutable"):
         write_research_report(report, target)
+
+
+def test_concurrent_writes_to_the_same_destination_dont_silently_clobber(tmp_path):
+    # Independent review, 2026-07-31: write_research_report() used to check
+    # target.exists() and then unconditionally os.replace() -- not atomic,
+    # so two concurrent writers targeting the same path could both pass the
+    # existence check before either wrote, and the second os.replace()
+    # would silently replace the first report's content under the same
+    # "immutable" identifier with NO exception. os.link() is now the
+    # actual publish step: an OS-level atomic create-exclusive that fails
+    # closed instead.
+    target = tmp_path / "report.json"
+    report_a = {"id": "a"}
+    report_b = {"id": "b"}
+    successes: list[str] = []
+    failures: list[str] = []
+    barrier = threading.Barrier(2)
+
+    def _write(report, tag):
+        barrier.wait()
+        try:
+            write_research_report(report, target)
+            successes.append(tag)
+        except FileExistsError:
+            failures.append(tag)
+
+    t1 = threading.Thread(target=_write, args=(report_a, "a"))
+    t2 = threading.Thread(target=_write, args=(report_b, "b"))
+    t1.start()
+    t2.start()
+    t1.join()
+    t2.join()
+
+    # Exactly one writer wins and one is turned away with an exception --
+    # never both "succeeding" (one silently clobbering the other) and
+    # never both failing (the destination must end up written).
+    assert len(successes) == 1
+    assert len(failures) == 1
+    winner_report = report_a if successes[0] == "a" else report_b
+    on_disk = json.loads(target.read_text(encoding="utf-8"))
+    assert on_disk == winner_report
+    # No stray uuid-suffixed temp file left behind by either writer.
+    assert list(tmp_path.glob("*.tmp")) == []
 
 
 def test_confirmation_window_too_short_blocks_promotion(tmp_path):

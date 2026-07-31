@@ -241,6 +241,45 @@ class AssistantStore:
                     payload_json TEXT NOT NULL,
                     payload_hash TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS portfolio_position_snapshots (
+                    snapshot_id TEXT PRIMARY KEY,
+                    account_key TEXT NOT NULL,
+                    session_date TEXT NOT NULL,
+                    captured_at TEXT NOT NULL,
+                    ticker TEXT NOT NULL,
+                    shares_text TEXT NOT NULL,
+                    market_value_text TEXT NOT NULL,
+                    price_text TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    snapshot_hash TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS ml_model_registrations (
+                    model_key TEXT PRIMARY KEY,
+                    registered_at TEXT NOT NULL,
+                    manifest_json TEXT NOT NULL,
+                    manifest_hash TEXT NOT NULL,
+                    status TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS ml_predictions (
+                    prediction_id TEXT PRIMARY KEY,
+                    model_key TEXT NOT NULL,
+                    task TEXT NOT NULL,
+                    subject_key TEXT NOT NULL,
+                    as_of_session TEXT NOT NULL,
+                    generated_at TEXT NOT NULL,
+                    horizon_sessions INTEGER NOT NULL,
+                    feature_snapshot_hash TEXT NOT NULL,
+                    prediction_json TEXT NOT NULL,
+                    prediction_hash TEXT NOT NULL,
+                    available INTEGER NOT NULL,
+                    refusal_reasons_json TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS ml_prediction_outcomes (
+                    prediction_id TEXT PRIMARY KEY,
+                    matured_at TEXT NOT NULL,
+                    outcome_json TEXT NOT NULL,
+                    outcome_hash TEXT NOT NULL
+                );
                 CREATE TABLE IF NOT EXISTS operational_drill_runs (
                     drill_id TEXT PRIMARY KEY,
                     drill_type TEXT NOT NULL,
@@ -271,6 +310,18 @@ class AssistantStore:
                     ON paper_evidence_epochs(status) WHERE status = 'active';
                 CREATE INDEX IF NOT EXISTS idx_paper_observations_epoch_date
                     ON paper_account_observations(evidence_epoch, session_date);
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_position_snapshot_unique
+                    ON portfolio_position_snapshots(
+                        account_key, session_date, ticker, captured_at
+                    );
+                CREATE INDEX IF NOT EXISTS idx_position_snapshot_account_date
+                    ON portfolio_position_snapshots(account_key, session_date);
+                CREATE INDEX IF NOT EXISTS idx_ml_predictions_model_session
+                    ON ml_predictions(model_key, as_of_session);
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_ml_predictions_identity
+                    ON ml_predictions(
+                        model_key, task, subject_key, as_of_session, horizon_sessions
+                    );
                 CREATE INDEX IF NOT EXISTS idx_portfolio_equity_account_date
                     ON portfolio_equity_snapshots(
                         account_key, session_date, captured_at
@@ -563,6 +614,296 @@ class AssistantStore:
             )
             result.append(payload)
         return result
+
+    def append_portfolio_position_snapshots(
+        self, snapshots: list[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
+        """Append per-position holdings for one session (ML strategy doc 8.1).
+
+        A faithful HISTORICAL portfolio-volatility target needs daily
+        position/weight history, which portfolio_equity_snapshots (account
+        totals only) cannot provide. Doc 8.1 explicitly directs adding a
+        separate append-only table "rather than altering the versioned
+        DecisionPacket schema" -- so this does not touch DecisionPacket.
+
+        Money is stored as exact decimal TEXT, matching this table's
+        *_text column convention and the rest of this module; float
+        round-tripping would corrupt a reconstructed historical weight.
+        Deduplicated by content hash, so re-capturing an identical session
+        is a no-op rather than a duplicate row.
+        """
+        written: list[dict[str, Any]] = []
+        with self._connect() as connection:
+            for snapshot in snapshots:
+                payload_json = json.dumps(
+                    snapshot, sort_keys=True, separators=(",", ":"), default=str
+                )
+                snapshot_hash = _hash_payload(payload_json)
+                snapshot_id = "position-" + snapshot_hash[:24]
+                connection.execute(
+                    """
+                    INSERT INTO portfolio_position_snapshots(
+                        snapshot_id, account_key, session_date, captured_at,
+                        ticker, shares_text, market_value_text, price_text,
+                        source, snapshot_hash
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ON CONFLICT(snapshot_id) DO NOTHING
+                    """,
+                    (
+                        snapshot_id,
+                        snapshot["account_key"],
+                        snapshot["session_date"],
+                        snapshot["captured_at"],
+                        snapshot["ticker"],
+                        decimal_text(snapshot["shares"]),
+                        decimal_text(snapshot["market_value"]),
+                        decimal_text(snapshot["price"]),
+                        snapshot.get("source", "unknown"),
+                        snapshot_hash,
+                    ),
+                )
+                written.append(
+                    {**snapshot, "snapshot_id": snapshot_id, "snapshot_hash": snapshot_hash}
+                )
+        return written
+
+    def list_portfolio_position_snapshots(
+        self, account_key: str, *, session_date: str | None = None, limit: int = 100_000
+    ) -> list[dict[str, Any]]:
+        query = (
+            "SELECT * FROM portfolio_position_snapshots WHERE account_key = ?"
+        )
+        params: list[Any] = [account_key]
+        if session_date is not None:
+            query += " AND session_date = ?"
+            params.append(session_date)
+        query += " ORDER BY session_date ASC, ticker ASC, captured_at ASC LIMIT ?"
+        params.append(limit)
+        with self._connect() as connection:
+            rows = connection.execute(query, tuple(params)).fetchall()
+        return [
+            {
+                "snapshot_id": row["snapshot_id"],
+                "account_key": row["account_key"],
+                "session_date": row["session_date"],
+                "captured_at": row["captured_at"],
+                "ticker": row["ticker"],
+                "shares": row["shares_text"],
+                "market_value": row["market_value_text"],
+                "price": row["price_text"],
+                "source": row["source"],
+                "snapshot_hash": row["snapshot_hash"],
+            }
+            for row in rows
+        ]
+
+    def register_ml_model(
+        self, model_key: str, manifest: dict[str, Any], *, status: str = "shadow",
+        registered_at: str | None = None,
+    ) -> dict[str, Any]:
+        """Register a model manifest for shadow observation (doc 10.1).
+
+        `status` deliberately defaults to "shadow". Doc 17 prohibits
+        automatic promotion outright, and doc 3.1 says "no model status
+        automatically becomes production authority" -- so nothing in the
+        training or inference path may write a status implying authority.
+        """
+        if status not in ("shadow", "retired"):
+            raise ValueError(
+                "ml model status must be 'shadow' or 'retired'; production "
+                "authority requires a separate, explicit promotion decision "
+                "that this method deliberately cannot grant"
+            )
+        manifest_json = json.dumps(
+            manifest, sort_keys=True, separators=(",", ":"), default=str
+        )
+        manifest_hash = _hash_payload(manifest_json)
+        timestamp = registered_at or datetime.now(timezone.utc).isoformat()
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO ml_model_registrations(
+                    model_key, registered_at, manifest_json, manifest_hash, status
+                ) VALUES (?, ?, ?, ?, ?)
+                ON CONFLICT(model_key) DO NOTHING
+                """,
+                (model_key, timestamp, manifest_json, manifest_hash, status),
+            )
+            row = connection.execute(
+                "SELECT * FROM ml_model_registrations WHERE model_key = ?", (model_key,)
+            ).fetchone()
+        return {
+            "model_key": row["model_key"],
+            "registered_at": row["registered_at"],
+            "manifest": json.loads(row["manifest_json"]),
+            "manifest_hash": row["manifest_hash"],
+            "status": row["status"],
+        }
+
+    def record_ml_prediction(self, prediction: dict[str, Any]) -> dict[str, Any]:
+        """Append one shadow prediction, idempotently (doc 10.2).
+
+        Idempotency is enforced by a UNIQUE index on
+        (model_key, task, subject_key, as_of_session, horizon_sessions), so
+        re-running a scheduled shadow job cannot create a second, possibly
+        DIFFERENT prediction for a session already recorded. Doc 10.2:
+        "Never rewrite a prediction after its as_of_session" -- a conflict
+        is therefore a no-op that returns the ORIGINAL row, never an update.
+        """
+        payload_json = json.dumps(
+            prediction, sort_keys=True, separators=(",", ":"), default=str
+        )
+        prediction_hash = _hash_payload(payload_json)
+        prediction_id = prediction.get("prediction_id") or (
+            "mlpred-" + prediction_hash[:24]
+        )
+        available = bool(prediction.get("available", False))
+        refusal_reasons = list(prediction.get("refusal_reasons", ()))
+        if not available and not refusal_reasons:
+            raise ValueError(
+                "an unavailable prediction must record at least one refusal reason"
+            )
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO ml_predictions(
+                    prediction_id, model_key, task, subject_key, as_of_session,
+                    generated_at, horizon_sessions, feature_snapshot_hash,
+                    prediction_json, prediction_hash, available, refusal_reasons_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT DO NOTHING
+                """,
+                (
+                    prediction_id,
+                    prediction["model_key"],
+                    prediction["task"],
+                    prediction["subject_key"],
+                    prediction["as_of_session"],
+                    prediction["generated_at"],
+                    int(prediction["horizon_sessions"]),
+                    prediction["feature_snapshot_hash"],
+                    payload_json,
+                    prediction_hash,
+                    1 if available else 0,
+                    json.dumps(refusal_reasons, sort_keys=True, separators=(",", ":")),
+                ),
+            )
+            row = connection.execute(
+                """
+                SELECT * FROM ml_predictions
+                WHERE model_key = ? AND task = ? AND subject_key = ?
+                  AND as_of_session = ? AND horizon_sessions = ?
+                """,
+                (
+                    prediction["model_key"],
+                    prediction["task"],
+                    prediction["subject_key"],
+                    prediction["as_of_session"],
+                    int(prediction["horizon_sessions"]),
+                ),
+            ).fetchone()
+        return self._ml_prediction_row_to_dict(row)
+
+    @staticmethod
+    def _ml_prediction_row_to_dict(row: Any) -> dict[str, Any]:
+        return {
+            "prediction_id": row["prediction_id"],
+            "model_key": row["model_key"],
+            "task": row["task"],
+            "subject_key": row["subject_key"],
+            "as_of_session": row["as_of_session"],
+            "generated_at": row["generated_at"],
+            "horizon_sessions": row["horizon_sessions"],
+            "feature_snapshot_hash": row["feature_snapshot_hash"],
+            "prediction": json.loads(row["prediction_json"]),
+            "prediction_hash": row["prediction_hash"],
+            "available": bool(row["available"]),
+            "refusal_reasons": json.loads(row["refusal_reasons_json"]),
+        }
+
+    def list_ml_predictions(
+        self, *, model_key: str | None = None, limit: int = 10_000
+    ) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            if model_key is not None:
+                rows = connection.execute(
+                    "SELECT * FROM ml_predictions WHERE model_key = ? "
+                    "ORDER BY as_of_session ASC, subject_key ASC LIMIT ?",
+                    (model_key, limit),
+                ).fetchall()
+            else:
+                rows = connection.execute(
+                    "SELECT * FROM ml_predictions "
+                    "ORDER BY as_of_session ASC, subject_key ASC LIMIT ?",
+                    (limit,),
+                ).fetchall()
+        return [self._ml_prediction_row_to_dict(row) for row in rows]
+
+    def record_ml_prediction_outcome(
+        self, prediction_id: str, outcome: dict[str, Any], *, matured_at: str
+    ) -> dict[str, Any]:
+        """Attach a realized outcome to an existing prediction (doc 10.2).
+
+        Enforces both of doc 10.1's integrity rules explicitly rather than
+        relying on SQLite foreign keys (which this project does not enable
+        by default): "An outcome cannot exist before its prediction or
+        before its horizon matures." The maturity check compares against
+        the prediction's OWN recorded as_of_session, so a caller cannot
+        attach an outcome early by passing an optimistic timestamp.
+        """
+        with self._connect() as connection:
+            prediction = connection.execute(
+                "SELECT * FROM ml_predictions WHERE prediction_id = ?", (prediction_id,)
+            ).fetchone()
+            if prediction is None:
+                raise ValueError(
+                    f"no prediction {prediction_id!r} exists; an outcome cannot "
+                    "precede its prediction"
+                )
+            if matured_at < prediction["as_of_session"]:
+                raise ValueError(
+                    f"matured_at {matured_at!r} precedes the prediction's "
+                    f"as_of_session {prediction['as_of_session']!r}"
+                )
+            outcome_json = json.dumps(
+                outcome, sort_keys=True, separators=(",", ":"), default=str
+            )
+            outcome_hash = _hash_payload(outcome_json)
+            connection.execute(
+                """
+                INSERT INTO ml_prediction_outcomes(
+                    prediction_id, matured_at, outcome_json, outcome_hash
+                ) VALUES (?, ?, ?, ?)
+                ON CONFLICT(prediction_id) DO NOTHING
+                """,
+                (prediction_id, matured_at, outcome_json, outcome_hash),
+            )
+            row = connection.execute(
+                "SELECT * FROM ml_prediction_outcomes WHERE prediction_id = ?",
+                (prediction_id,),
+            ).fetchone()
+        return {
+            "prediction_id": row["prediction_id"],
+            "matured_at": row["matured_at"],
+            "outcome": json.loads(row["outcome_json"]),
+            "outcome_hash": row["outcome_hash"],
+        }
+
+    def list_ml_prediction_outcomes(self, *, limit: int = 10_000) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT * FROM ml_prediction_outcomes ORDER BY matured_at ASC LIMIT ?",
+                (limit,),
+            ).fetchall()
+        return [
+            {
+                "prediction_id": row["prediction_id"],
+                "matured_at": row["matured_at"],
+                "outcome": json.loads(row["outcome_json"]),
+                "outcome_hash": row["outcome_hash"],
+            }
+            for row in rows
+        ]
 
     def prune_decision_packets_older_than(self, days: int) -> int:
         """Explicit, opt-in retention cleanup -- deletes decision packets

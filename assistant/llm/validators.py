@@ -41,6 +41,34 @@ def validate_committee_review(
     Numeric and ticker validation is citation-scoped: a number or ticker is
     not licensed merely because it appeared somewhere else in the packet.  It
     must appear in at least one source cited by that exact point.
+
+    MEASURED LIMITATION -- the action-language check is a presentation
+    filter, NOT the safety boundary (2026-07-30).  ``_contains_action_language``
+    was tuned against ADVISOR phrasing; committee prose is formal and
+    third-person, a register it covers poorly.  An adversarial probe of 25
+    directives written in committee voice leaked **14** of them -- e.g. "The
+    committee endorses a lighter allocation to NVDA", "The appropriate
+    response to this concentration is a smaller NVDA position".  That is a
+    worse rate than the 8-of-20 advisor probe that already prompted two
+    rounds of patching.  See tests/test_committee_action_language_probe.py,
+    which pins the current behaviour so it cannot silently degrade further.
+
+    A regex widening to close that family was written and REJECTED after
+    measurement: it caught all 14 but newly blocked 6 of 12 legitimate
+    descriptive sentences, including "the candidate produces a reduction in
+    NVDA weight from 50 to 25 percent" (the committee's core job) and "the
+    strategy showed a reduction in maximum drawdown" (this project's own
+    confirmed finding).  The same words carry directive and descriptive
+    force, so a denylist over free prose cannot separate them -- this is the
+    third probe to demonstrate that.  A structural fix (constraining the
+    output surface so prose cannot express a position change at all) is the
+    real answer; more patterns are not.
+
+    What actually contains the risk is architectural, per
+    docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md: the committee is read-only,
+    cannot create or modify a proposal, cannot reach a broker, and every
+    execution path still requires human approval plus revalidation.  Do not
+    treat a clean pass here as evidence the prose carries no advice.
     """
 
     facts = committee_input.fact_by_id

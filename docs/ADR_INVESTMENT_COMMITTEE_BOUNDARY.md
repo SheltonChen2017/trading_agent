@@ -65,6 +65,41 @@ responses, HTML, logs, or concatenated external text.
   trading, new-position creation, live trading, or model-driven proposal
   changes.
 
+## Measured limitation: check 4 leaks (2026-07-30)
+
+Check 4 above ("No portfolio-change or execution language") is a
+**presentation filter, not the safety boundary.** It reuses
+`ai_advisor._contains_action_language`, which was tuned against advisor
+phrasing. Committee prose is formal and third-person — a register it covers
+poorly.
+
+An adversarial probe of 25 directives written in committee voice **leaked 14
+of them**, including "The committee endorses a lighter allocation to NVDA"
+and "The appropriate response to this concentration is a smaller NVDA
+position". That is worse than the 8-of-20 advisor probe that already forced
+two rounds of patching.
+
+A regex widening was written and **rejected after measurement**: it caught
+all 14 but newly blocked 6 of 12 legitimate descriptive sentences, including
+"the candidate produces a reduction in NVDA weight from 50 to 25 percent" —
+the committee's core job. The same vocabulary carries directive and
+descriptive force, so a denylist over free prose cannot separate them. This
+is the third probe to show it.
+
+The guard also over-blocks today: "NVDA is a larger position than AMD" is
+rejected while "the smaller positions total under 5 percent" passes, purely
+because a regex word boundary behaves differently on the plural.
+
+`tests/test_committee_action_language_probe.py` pins all three sets so the
+numbers in this ADR stay true.
+
+**What actually contains the risk** is everything else in this document: the
+committee is read-only, cannot create or modify a proposal, cannot reach a
+broker, and human approval plus execution revalidation remain mandatory. Do
+not treat a clean validator pass as evidence that the prose carries no
+advice. The structural fix — constraining the output surface so prose cannot
+express a position change at all — is the real answer and is not yet built.
+
 ## Release gates for the next slice
 
 Before daily model-backed use:

@@ -80,6 +80,10 @@ from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calen
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.ticker_verification import partition_by_universe, verify_tickers
 from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
+from assistant.llm import PrivacyMode, ReviewStatus, project_committee_input
+from assistant.llm.anthropic_provider import AnthropicCommitteeProvider, is_anthropic_committee_configured
+from assistant.llm.committee_service import run_committee_review_and_record
+from assistant.schemas import DecisionPacket
 from assistant.portfolio_analytics import compute_portfolio_analytics
 from assistant.proposal_status import (
     ACTIVE_BROKER_ORDER_STATUSES,
@@ -607,7 +611,46 @@ def _render_terminal_or_inflight_status(proposal: dict, status: str) -> None:
         st.info(f"Status: {status} -- an approval attempt is currently in progress for this proposal.")
 
 
-def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str, portfolio) -> None:
+def _render_committee_result(result) -> None:
+    """Renders one CommitteeResult -- either every CommitteeReview section, or
+    an explicit "review unavailable" reason. Deliberately NOT silent on
+    failure (unlike the Watchlist's allocation-review checkbox): the ADR's
+    own release-gate list requires a clear unavailable state in CLI/
+    Streamlit, and this sits next to a sell the user may be about to
+    approve, not a purchase-split comment."""
+    with st.expander("Investment committee review", expanded=True):
+        if result.status == ReviewStatus.REVIEW_UNAVAILABLE:
+            st.warning(
+                f"Review unavailable ({result.error_code}): "
+                + (result.error_message or "no further detail.")
+            )
+            if result.issues:
+                st.caption("Validation issues: " + "; ".join(str(issue) for issue in result.issues))
+            return
+        review = result.review
+        st.write(f"**Verdict:** {review.verdict.value.replace('_', ' ')}")
+        st.write(f"**Confidence:** {review.confidence_label.value} -- {review.confidence_basis.text}")
+        st.write(review.summary.text)
+
+        def _points(title: str, points) -> None:
+            if points:
+                st.write(f"**{title}:**")
+                for point in points:
+                    st.write(f"- {point.text} _(sources: {', '.join(point.source_ids)})_")
+
+        _points("Supporting points", review.supporting_points)
+        _points("Counterarguments", review.counterarguments)
+        _points("Hidden risks", review.hidden_risks)
+        _points("Data quality warnings", review.data_quality_warnings)
+        _points("Invalidation conditions", review.invalidation_conditions)
+        _points("Revision requests", review.revision_requests)
+        st.caption(
+            f"Provider: {result.provider_id}/{result.model_id} -- prompt {result.prompt_version}. "
+            "Advisory only; does not change or block this proposal."
+        )
+
+
+def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str, portfolio, packet: DecisionPacket) -> None:
     """One proposal card with the typed-confirmation approve flow.
     Shared by the Selling, Propose & Approve, and Watchlist tabs --
     identical safety flow everywhere a proposal can be approved: type the
@@ -723,6 +766,68 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                 + (f" for {unknown}" if unknown else "")
                 + "; actual cash may be lower and exposure may be higher."
             )
+
+        # Independent review, 2026-07-31: assistant/llm/ (the "investment
+        # committee" AI reviewer) was fully built, tested, and governed by
+        # docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md, but had zero real usage
+        # anywhere -- no provider adapter, no persistence, no UI surface.
+        # The committee is architecturally restricted (both by the ADR and
+        # by project_committee_input()'s own hard checks) to exactly this
+        # proposal shape: a deterministic risk-reduction sell. Gating on
+        # that here, inside the shared function, means the button appears
+        # correctly at all 3 call sites with no per-call-site duplication --
+        # including "for free" correctness on Watchlist buy proposals
+        # (never eligible) and the Propose & Approve tab's mixed sell/
+        # strategy proposals (only the sells qualify).
+        is_committee_eligible = (
+            proposal.get("evidence_status") == "deterministic_risk_policy"
+            and intent.get("side") == "sell"
+        )
+        if is_committee_eligible:
+            committee_available = is_anthropic_committee_configured()
+            want_committee_review = st.checkbox(
+                "Get an investment committee review of this sell (real API call, small real cost)",
+                value=False,
+                key=f"want_committee_{proposal_id}",
+                disabled=not committee_available,
+                help=(
+                    "Advisory only -- cites only the deterministic facts already shown above; "
+                    "never proposes a different trade."
+                    if committee_available
+                    else "ANTHROPIC_API_KEY is not set."
+                ),
+            )
+            if st.button(
+                "Get committee review",
+                key=f"committee_button_{proposal_id}",
+                disabled=not want_committee_review,
+            ):
+                try:
+                    committee_input = project_committee_input(
+                        packet, proposal, privacy_mode=PrivacyMode.PERCENTAGES_ONLY
+                    )
+                    st.session_state[f"committee_result_{proposal_id}"] = run_committee_review_and_record(
+                        committee_input,
+                        AnthropicCommitteeProvider(),
+                        store=store,
+                        # Larger than run_committee_review()'s own 30.0
+                        # default: this provider's response budget (16000
+                        # tokens) is much bigger than ai_advisor.py's
+                        # existing structured-output calls.
+                        timeout_seconds=60.0,
+                    )
+                except Exception as exc:
+                    # project_committee_input()'s ProjectionError is the only
+                    # expected failure here (e.g. a reloaded proposal that no
+                    # longer satisfies the hard eligibility constraints) --
+                    # run_committee_review_and_record() itself never raises.
+                    st.session_state[f"committee_result_{proposal_id}"] = None
+                    st.error(f"Could not prepare committee review: {exc}")
+
+            committee_result = st.session_state.get(f"committee_result_{proposal_id}")
+            if committee_result is not None:
+                _render_committee_result(committee_result)
+
         tax_advisory = impact.get("tax_lot_advisory", {})
         with st.expander("Tax-lot advisory (never blocks this sell)"):
             if tax_advisory.get("available"):
@@ -1820,7 +1925,7 @@ with tab_watchlist:
                 st.dataframe(leg_rows, use_container_width=True, hide_index=True)
 
         for proposal in st.session_state.get("allocation_proposals", []):
-            _render_proposal_approval(proposal, store, policy_path, alloc_packet.portfolio)
+            _render_proposal_approval(proposal, store, policy_path, alloc_packet.portfolio, alloc_packet)
 
     for ticker, result in watchlist_results.items():
         with st.container(border=True):
@@ -2001,7 +2106,7 @@ with tab_selling:
         else:
             st.write(f"Checked at {sell_checked_at} -- {len(sell_proposals)} recommended sell(s):")
             for proposal in sell_proposals:
-                _render_proposal_approval(proposal, store, policy_path, packet.portfolio)
+                _render_proposal_approval(proposal, store, policy_path, packet.portfolio, packet)
 
 with tab_propose:
     policy, packet = _load_packet(policy_path, include_events)
@@ -2054,7 +2159,7 @@ with tab_propose:
         st.write(f"Checked at {last_checked_at} -- {len(proposals)} proposal(s):")
 
     for proposal in proposals or []:
-        _render_proposal_approval(proposal, store, policy_path, packet.portfolio)
+        _render_proposal_approval(proposal, store, policy_path, packet.portfolio, packet)
 
 with tab_history:
     with st.expander("Emergency order controls", expanded=False):

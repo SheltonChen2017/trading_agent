@@ -57,6 +57,74 @@ class VolatilityForecast:
     available: bool
     refusal_reasons: tuple[str, ...] = ()
 
+    def __post_init__(self) -> None:
+        for name in ("task", "subject_key", "as_of_session", "model_key", "evidence_status"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise VolatilityModelError(f"{name} must be a non-empty string")
+        parsed = pd.to_datetime(
+            self.as_of_session, format="%Y-%m-%d", errors="coerce"
+        )
+        if pd.isna(parsed) or parsed.strftime("%Y-%m-%d") != self.as_of_session:
+            raise VolatilityModelError("as_of_session must use canonical YYYY-MM-DD format")
+        if self.horizon_sessions not in SUPPORTED_HORIZONS:
+            raise VolatilityModelError(
+                f"horizon_sessions must be one of {SUPPORTED_HORIZONS}"
+            )
+        if self.evidence_status not in {
+            "exploratory", "promising_unconfirmed", "rejected", "unavailable"
+        }:
+            raise VolatilityModelError(
+                "evidence_status is not a recognized non-authoritative state"
+            )
+        if not isinstance(self.available, bool):
+            raise VolatilityModelError("available must be a boolean")
+        if not isinstance(self.refusal_reasons, tuple) or any(
+            not isinstance(reason, str) or not reason.strip()
+            for reason in self.refusal_reasons
+        ):
+            raise VolatilityModelError(
+                "refusal_reasons must be a tuple of non-empty strings"
+            )
+        if self.available:
+            if self.refusal_reasons:
+                raise VolatilityModelError("an available forecast cannot carry refusal reasons")
+            if (
+                self.annualized_volatility_pct is None
+                or not math.isfinite(float(self.annualized_volatility_pct))
+                or self.annualized_volatility_pct <= 0
+            ):
+                raise VolatilityModelError(
+                    "an available forecast requires positive finite volatility"
+                )
+            if (
+                not isinstance(self.prediction_interval_pct, tuple)
+                or len(self.prediction_interval_pct) != 2
+            ):
+                raise VolatilityModelError("an available forecast requires a two-sided interval")
+            lower, upper = self.prediction_interval_pct
+            if not all(math.isfinite(float(v)) and v > 0 for v in (lower, upper)):
+                raise VolatilityModelError("prediction interval must be positive and finite")
+            if lower > self.annualized_volatility_pct or upper < self.annualized_volatility_pct:
+                raise VolatilityModelError("prediction interval must contain the point forecast")
+            probability = self.probability_above_mandate_ceiling
+            if probability is None or not math.isfinite(float(probability)) or not 0 <= probability <= 1:
+                raise VolatilityModelError("ceiling probability must be within [0, 1]")
+        else:
+            if not self.refusal_reasons:
+                raise VolatilityModelError("an unavailable forecast must carry a reason")
+            if any(
+                value is not None
+                for value in (
+                    self.annualized_volatility_pct,
+                    self.prediction_interval_pct,
+                    self.probability_above_mandate_ceiling,
+                )
+            ):
+                raise VolatilityModelError(
+                    "an unavailable forecast cannot carry numeric predictions"
+                )
+
     @property
     def production_authoritative(self) -> bool:
         """Always False. See ml/contracts.py -- authority can only come from
@@ -105,7 +173,7 @@ def unavailable_forecast(
         prediction_interval_pct=None,
         probability_above_mandate_ceiling=None,
         model_key=model_key,
-        evidence_status="exploratory",
+        evidence_status="unavailable",
         available=False,
         refusal_reasons=tuple(reasons),
     )
@@ -113,6 +181,8 @@ def unavailable_forecast(
 
 def annualize_pct(daily_volatility_pct: float) -> float:
     """Daily percent std -> annualized percent, sqrt-of-time."""
+    if not math.isfinite(daily_volatility_pct) or daily_volatility_pct < 0:
+        raise VolatilityModelError("daily_volatility_pct must be non-negative and finite")
     return float(daily_volatility_pct * math.sqrt(252))
 
 
@@ -182,6 +252,20 @@ def fit_log_volatility_regression(
     """
     from sklearn.linear_model import Ridge
 
+    if (
+        isinstance(alpha, bool)
+        or not isinstance(alpha, (int, float))
+        or not math.isfinite(float(alpha))
+        or alpha < 0
+    ):
+        raise VolatilityModelError("alpha must be a non-negative finite number")
+
+    x_train = np.asarray(x_train, dtype=float)
+    y_train = np.asarray(y_train, dtype=float)
+    if x_train.ndim != 2 or y_train.ndim != 1 or x_train.shape[0] != y_train.shape[0]:
+        raise VolatilityModelError("x_train and y_train must have aligned 2D/1D rows")
+    if not np.isfinite(x_train).all() or not np.isfinite(y_train).all():
+        raise VolatilityModelError("training data must be finite")
     if x_train.shape[0] < MIN_TRAINING_ROWS:
         raise VolatilityModelError(
             f"need at least {MIN_TRAINING_ROWS} training rows, got {x_train.shape[0]}"
@@ -204,6 +288,15 @@ def fit_gradient_boosted_volatility(
     """
     from sklearn.ensemble import HistGradientBoostingRegressor
 
+    if isinstance(max_iter, bool) or not isinstance(max_iter, int) or max_iter < 1:
+        raise VolatilityModelError("max_iter must be a positive integer")
+
+    x_train = np.asarray(x_train, dtype=float)
+    y_train = np.asarray(y_train, dtype=float)
+    if x_train.ndim != 2 or y_train.ndim != 1 or x_train.shape[0] != y_train.shape[0]:
+        raise VolatilityModelError("x_train and y_train must have aligned 2D/1D rows")
+    if not np.isfinite(x_train).all() or not np.isfinite(y_train).all():
+        raise VolatilityModelError("training data must be finite")
     if x_train.shape[0] < MIN_TRAINING_ROWS:
         raise VolatilityModelError(
             f"need at least {MIN_TRAINING_ROWS} training rows, got {x_train.shape[0]}"
@@ -223,7 +316,12 @@ def predict_volatility(model, x: np.ndarray) -> np.ndarray:
     Structurally positive by construction -- no clipping, no max(0, ...)
     patch that would silently mask a model predicting nonsense.
     """
-    predictions = np.exp(np.asarray(model.predict(x), dtype=float))
+    values = np.asarray(x, dtype=float)
+    if values.ndim != 2 or not np.isfinite(values).all():
+        raise VolatilityModelError("prediction features must be a finite 2D matrix")
+    predictions = np.exp(np.asarray(model.predict(values), dtype=float))
+    if predictions.ndim != 1 or not np.isfinite(predictions).all() or np.any(predictions <= 0):
+        raise VolatilityModelError("model produced non-positive or non-finite volatility")
     return predictions
 
 
@@ -244,6 +342,14 @@ def evaluate_volatility_models(
     ever sees the whole dataset at once, which is the entire point of
     accepting pre-computed folds rather than doing its own splitting.
     """
+    required_columns = set(feature_columns) | {
+        target_column,
+        trailing_baseline_column,
+        ewma_baseline_column,
+    }
+    missing_columns = sorted(required_columns - set(feature_frame.columns))
+    if missing_columns:
+        raise VolatilityModelError(f"feature frame is missing columns: {missing_columns}")
     results: list[dict[str, Any]] = []
     for fold in folds:
         train_index = list(fold.train_row_indices)
@@ -263,16 +369,32 @@ def evaluate_volatility_models(
             "embargoed_row_count": fold.embargoed_row_count,
         }
 
-        actual = pd.to_numeric(
-            validation_frame[target_column], errors="coerce"
-        ).to_numpy(dtype=float)
+        comparison_columns = list(dict.fromkeys(
+            list(feature_columns)
+            + [target_column, trailing_baseline_column, ewma_baseline_column]
+        ))
+        validation_common = validation_frame[comparison_columns].apply(
+            pd.to_numeric, errors="coerce"
+        ).replace([np.inf, -np.inf], np.nan).dropna()
+        before_positive_filter = len(validation_common)
+        positive_columns = [
+            target_column, trailing_baseline_column, ewma_baseline_column
+        ]
+        validation_common = validation_common[
+            (validation_common[positive_columns] > 0).all(axis=1)
+        ]
+        metrics["nonpositive_validation_rows_excluded"] = (
+            before_positive_filter - len(validation_common)
+        )
+        metrics["common_validation_row_count"] = len(validation_common)
+        actual = validation_common[target_column].to_numpy(dtype=float)
 
         for label, column in (
             ("trailing", trailing_baseline_column),
             ("ewma", ewma_baseline_column),
         ):
             predicted = pd.to_numeric(
-                validation_frame[column], errors="coerce"
+                validation_common[column], errors="coerce"
             ).to_numpy(dtype=float)
             metrics[f"{label}_qlike"] = qlike_loss(actual, predicted)
             metrics[f"{label}_mae"] = mean_absolute_error(actual, predicted)
@@ -281,11 +403,12 @@ def evaluate_volatility_models(
             x_train, y_train, ordered = build_volatility_training_matrix(
                 train_frame, feature_columns=feature_columns, target_column=target_column
             )
-            x_validation, y_validation, _ = build_volatility_training_matrix(
-                validation_frame,
-                feature_columns=feature_columns,
-                target_column=target_column,
-            )
+            if validation_common.empty:
+                raise VolatilityModelError(
+                    "no common validation rows survive model and baseline requirements"
+                )
+            x_validation = validation_common[list(feature_columns)].to_numpy(dtype=float)
+            y_validation = actual
             metrics["ordered_feature_names"] = list(ordered)
 
             ridge = fit_log_volatility_regression(

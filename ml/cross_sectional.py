@@ -58,6 +58,39 @@ class RankerObservation:
     model_key: str
     evidence_status: str
 
+    def __post_init__(self) -> None:
+        for name in ("ticker", "as_of_session", "model_key", "evidence_status"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise RankerError(f"{name} must be a non-empty string")
+        if self.evidence_status not in {
+            "exploratory", "promising_unconfirmed", "rejected", "unavailable"
+        }:
+            raise RankerError("evidence_status is not a recognized non-authoritative state")
+        parsed = pd.to_datetime(
+            self.as_of_session, format="%Y-%m-%d", errors="coerce"
+        )
+        if pd.isna(parsed) or parsed.strftime("%Y-%m-%d") != self.as_of_session:
+            raise RankerError("as_of_session must use canonical YYYY-MM-DD format")
+        if (
+            isinstance(self.horizon_sessions, bool)
+            or not isinstance(self.horizon_sessions, int)
+            or self.horizon_sessions < 1
+        ):
+            raise RankerError("horizon_sessions must be a positive integer")
+        for name in (
+            "expected_excess_return_pct",
+            "probability_positive_excess",
+            "cross_sectional_percentile",
+        ):
+            value = getattr(self, name)
+            if value is not None and not math.isfinite(float(value)):
+                raise RankerError(f"{name} must be finite when present")
+        for name in ("probability_positive_excess", "cross_sectional_percentile"):
+            value = getattr(self, name)
+            if value is not None and not 0 <= float(value) <= 1:
+                raise RankerError(f"{name} must be within [0, 1]")
+
     @property
     def production_authoritative(self) -> bool:
         return False
@@ -104,6 +137,23 @@ def count_research_looks(
     for name, value in counts.items():
         if value < 1:
             raise RankerError(f"{name} must contain at least one entry")
+    for name, variants in (
+        ("models", models),
+        ("labels", labels),
+        ("benchmarks", benchmarks),
+        ("horizons", horizons),
+        ("feature_families", feature_families),
+    ):
+        if name == "horizons":
+            if any(
+                isinstance(value, bool) or not isinstance(value, int) or value < 1
+                for value in variants
+            ):
+                raise RankerError("horizons must contain positive integers")
+        elif any(not isinstance(value, str) or not value.strip() for value in variants):
+            raise RankerError(f"{name} must contain non-empty strings")
+        if len(set(variants)) != len(variants):
+            raise RankerError(f"{name} contains duplicate variants")
     total = 1
     for value in counts.values():
         total *= value
@@ -132,6 +182,27 @@ def fit_elastic_net_ranker(
     """
     from sklearn.linear_model import ElasticNet
 
+    if (
+        isinstance(alpha, bool)
+        or not isinstance(alpha, (int, float))
+        or not math.isfinite(float(alpha))
+        or alpha < 0
+    ):
+        raise RankerError("alpha must be a non-negative finite number")
+    if (
+        isinstance(l1_ratio, bool)
+        or not isinstance(l1_ratio, (int, float))
+        or not math.isfinite(float(l1_ratio))
+        or not 0 <= l1_ratio <= 1
+    ):
+        raise RankerError("l1_ratio must be a finite number within [0, 1]")
+
+    x_train = np.asarray(x_train, dtype=float)
+    y_train = np.asarray(y_train, dtype=float)
+    if x_train.ndim != 2 or y_train.ndim != 1 or x_train.shape[0] != y_train.shape[0]:
+        raise RankerError("x_train and y_train must have aligned 2D/1D rows")
+    if not np.isfinite(x_train).all() or not np.isfinite(y_train).all():
+        raise RankerError("ranker training data must be finite")
     if x_train.shape[0] < MIN_TRAINING_ROWS:
         raise RankerError(
             f"need at least {MIN_TRAINING_ROWS} pooled training rows, got {x_train.shape[0]}"
@@ -147,6 +218,15 @@ def fit_gradient_boosted_ranker(
     """Doc 11.3 model #4: histogram gradient boosting, pooled."""
     from sklearn.ensemble import HistGradientBoostingRegressor
 
+    if isinstance(max_iter, bool) or not isinstance(max_iter, int) or max_iter < 1:
+        raise RankerError("max_iter must be a positive integer")
+
+    x_train = np.asarray(x_train, dtype=float)
+    y_train = np.asarray(y_train, dtype=float)
+    if x_train.ndim != 2 or y_train.ndim != 1 or x_train.shape[0] != y_train.shape[0]:
+        raise RankerError("x_train and y_train must have aligned 2D/1D rows")
+    if not np.isfinite(x_train).all() or not np.isfinite(y_train).all():
+        raise RankerError("ranker training data must be finite")
     if x_train.shape[0] < MIN_TRAINING_ROWS:
         raise RankerError(
             f"need at least {MIN_TRAINING_ROWS} pooled training rows, got {x_train.shape[0]}"
@@ -213,7 +293,13 @@ def block_bootstrap_ic_significance(
     result = bootstrap_edge_significance_by_block(
         values, dates, block_length=block_length, n_bootstrap=n_bootstrap, seed=seed
     )
-    return {"available": True, "block_length": block_length, **result}
+    refusal = result.get("refusal_reason")
+    return {
+        "available": refusal is None,
+        "reason": refusal,
+        "block_length": block_length,
+        **result,
+    }
 
 
 def build_ranker_observations(
@@ -237,10 +323,24 @@ def build_ranker_observations(
     for column in (score_column, date_column, ticker_column):
         if column not in frame.columns:
             raise RankerError(f"frame is missing column {column!r}")
+    if frame.duplicated([date_column, ticker_column]).any():
+        raise RankerError(
+            f"frame has duplicate ({date_column}, {ticker_column}) observations"
+        )
+    if (
+        isinstance(horizon_sessions, bool)
+        or not isinstance(horizon_sessions, int)
+        or horizon_sessions < 1
+    ):
+        raise RankerError("horizon_sessions must be a positive integer")
+    if not isinstance(model_key, str) or not model_key.strip():
+        raise RankerError("model_key must be a non-empty string")
 
     observations: list[RankerObservation] = []
     for date, group in frame.groupby(date_column, sort=True):
-        scores = pd.to_numeric(group[score_column], errors="coerce")
+        scores = pd.to_numeric(group[score_column], errors="coerce").replace(
+            [np.inf, -np.inf], np.nan
+        )
         percentiles = scores.rank(pct=True)
         for (_, row), score, percentile in zip(group.iterrows(), scores, percentiles):
             observations.append(

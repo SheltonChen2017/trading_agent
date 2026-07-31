@@ -69,9 +69,20 @@ class FactorRiskReport:
     warnings: tuple[str, ...]
     unavailable_reason: str | None = None
 
+    @property
+    def production_authoritative(self) -> bool:
+        """Risk description is context only and can never authorize a trade."""
+        return False
+
+    @property
+    def evidence_status(self) -> str:
+        return "exploratory" if self.available else "unavailable"
+
     def to_dict(self) -> dict[str, Any]:
         return {
             "available": self.available,
+            "evidence_status": self.evidence_status,
+            "production_authoritative": self.production_authoritative,
             "as_of": self.as_of,
             "tickers": list(self.tickers),
             "missing_tickers": list(self.missing_tickers),
@@ -318,8 +329,14 @@ def compute_factor_concentration_report(
     pca = PCA(n_components=max_components, svd_solver="full", random_state=0)
     pca.fit(standardized)
     explained = np.asarray(pca.explained_variance_ratio_, dtype=float)
+    eigenvalues = np.asarray(pca.explained_variance_, dtype=float)
     cumulative = np.cumsum(explained)
     components = _orient_components_deterministically(np.asarray(pca.components_, dtype=float))
+    # PCA's components_ are unit eigenvectors, not factor loadings.  For
+    # standardized inputs the economically interpretable loading is
+    # eigenvector * sqrt(eigenvalue): its square is the share of that
+    # position's standardized variance explained by the factor.
+    factor_loadings = components * np.sqrt(eigenvalues)[:, np.newaxis]
 
     reached_target = int(np.searchsorted(cumulative, explained_variance_target) + 1)
     displayed = max(1, min(reached_target, MAX_DISPLAYED_FACTORS, len(explained)))
@@ -336,7 +353,7 @@ def compute_factor_concentration_report(
     loadings: dict[str, dict[str, float]] = {}
     for factor_index, factor_name in enumerate(factor_names):
         loadings[factor_name] = {
-            ticker: round(float(components[factor_index, ticker_index]), 6)
+            ticker: round(float(factor_loadings[factor_index, ticker_index]), 6)
             for ticker_index, ticker in enumerate(tickers)
         }
 
@@ -351,19 +368,19 @@ def compute_factor_concentration_report(
         ticker: {} for ticker in tickers
     }
     for factor_index, factor_name in enumerate(factor_names):
-        component = components[factor_index]
-        exposure = float(np.dot(weight_vector, component))
+        loading = factor_loadings[factor_index]
+        exposure = float(np.dot(weight_vector, loading))
         portfolio_exposures[factor_name] = round(exposure, 6)
         for ticker_index, ticker in enumerate(tickers):
             contribution_by_position[ticker][factor_name] = round(
-                float(weight_vector[ticker_index] * component[ticker_index]), 6
+                float(weight_vector[ticker_index] * loading[ticker_index]), 6
             )
 
     # Residual risk: the share of each position's standardized variance NOT
     # captured by the displayed factors. 1.0 means the position is entirely
     # idiosyncratic relative to what is displayed; 0.0 means fully explained.
-    displayed_components = components[:displayed]
-    explained_share_by_ticker = np.sum(np.square(displayed_components), axis=0)
+    displayed_loadings = factor_loadings[:displayed]
+    explained_share_by_ticker = np.sum(np.square(displayed_loadings), axis=0)
     residual_by_position = {
         ticker: round(float(max(0.0, 1.0 - explained_share_by_ticker[i])), 6)
         for i, ticker in enumerate(tickers)

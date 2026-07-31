@@ -42,7 +42,9 @@ def _claim(**overrides) -> ExtractedClaim:
         "field": "next_quarter_revenue_guidance",
         "value": "32,500 million dollars",
         "document_id": "doc-1",
-        "supporting_excerpt": "guided next-quarter revenue to approximately 32,500",
+        "supporting_excerpt": (
+            "guided next-quarter revenue to approximately 32,500 million dollars"
+        ),
     }
     payload.update(overrides)
     return ExtractedClaim(**payload)
@@ -125,7 +127,7 @@ def test_a_number_present_in_the_source_is_accepted():
     assert validate_extraction(extraction) == ()
 
 
-def test_percentages_are_matched_without_their_percent_sign():
+def test_percentages_preserve_their_numeric_unit():
     extraction = _extraction(
         claims=(
             _claim(
@@ -138,10 +140,8 @@ def test_percentages_are_matched_without_their_percent_sign():
     assert validate_extraction(extraction) == ()
 
 
-def test_model_inference_is_not_held_to_the_number_check_but_is_labeled():
-    """Doc 12.2 requires direct extraction and inference be 'clearly
-    separate' -- an inference may reason about the document, but it is
-    marked as inference and never presented as a quoted fact."""
+def test_model_inference_is_labeled_but_cannot_invent_numbers():
+    """Inference changes presentation, not the source-of-facts rule."""
     extraction = _extraction(
         claims=(
             _claim(
@@ -152,8 +152,37 @@ def test_model_inference_is_not_held_to_the_number_check_but_is_labeled():
             ),
         )
     )
-    assert validate_extraction(extraction) == ()
+    assert "unsupported_number" in {i.code for i in validate_extraction(extraction)}
     assert extraction.claims[0].claim_kind == "model_inference"
+
+
+def test_percent_cannot_be_sourced_from_an_unqualified_number():
+    document = _document(text="Management described growth of 10 dollars.")
+    extraction = _extraction(
+        source_documents=(document,),
+        claims=(
+            _claim(
+                field="growth",
+                value="10%",
+                supporting_excerpt="growth of 10 dollars",
+            ),
+        ),
+    )
+    assert "unsupported_number" in {i.code for i in validate_extraction(extraction)}
+
+
+def test_direct_number_must_appear_in_its_supporting_excerpt():
+    extraction = _extraction(
+        claims=(
+            _claim(
+                value="8.2%",
+                supporting_excerpt="Management guided next-quarter revenue",
+            ),
+        )
+    )
+    assert "number_not_in_supporting_excerpt" in {
+        i.code for i in validate_extraction(extraction)
+    }
 
 
 def test_citing_an_unsupplied_document_is_rejected():
@@ -207,6 +236,13 @@ def test_audit_record_records_a_rejection_with_its_codes():
     extraction = _extraction(claims=(_claim(value="99,999 million dollars"),))
     issues = validate_extraction(extraction)
     record = build_extraction_audit_record(extraction, issues)
+    assert record["success"] is False
+    assert "unsupported_number" in record["error"]
+
+
+def test_audit_record_cannot_be_tricked_with_an_empty_issue_list():
+    extraction = _extraction(claims=(_claim(value="99,999 million dollars"),))
+    record = build_extraction_audit_record(extraction, [])
     assert record["success"] is False
     assert "unsupported_number" in record["error"]
 

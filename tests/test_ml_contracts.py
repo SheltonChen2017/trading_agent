@@ -96,6 +96,7 @@ def _prediction_kwargs(**overrides):
         as_of_session="2026-07-30",
         generated_at="2026-07-31T00:00:00+00:00",
         horizon_sessions=20,
+        target_available_at="2026-08-27T20:00:00+00:00",
         values={"annualized_volatility_pct": 24.3},
         uncertainty={"prediction_interval_pct": [18.1, 33.7]},
         data_available_at="2026-07-30T20:00:00+00:00",
@@ -105,6 +106,8 @@ def _prediction_kwargs(**overrides):
         evidence_status=EvidenceStatus.EXPLORATORY,
     )
     kwargs.update(overrides)
+    if kwargs["available"] is False and "evidence_status" not in overrides:
+        kwargs["evidence_status"] = EvidenceStatus.UNAVAILABLE
     return kwargs
 
 
@@ -264,6 +267,14 @@ def test_prediction_record_round_trips_through_to_dict_and_from_dict():
     record = PredictionRecord(**_prediction_kwargs())
     restored = PredictionRecord.from_dict(record.to_dict())
     assert restored == record
+
+
+def test_prediction_record_adapts_to_shadow_storage_columns():
+    record = PredictionRecord(**_prediction_kwargs())
+    payload = record.to_shadow_storage_dict()
+    assert payload["model_key"] == "model-1:0.1.0"
+    assert payload["feature_snapshot_hash"] == _HASH_D
+    assert payload["target_available_at"] == "2026-08-27T20:00:00+00:00"
 
 
 def test_prediction_record_production_authoritative_is_always_false():

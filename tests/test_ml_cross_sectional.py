@@ -19,6 +19,7 @@ from ml.cross_sectional import (
     fit_gradient_boosted_ranker,
 )
 from ml.evaluation import (
+    EvaluationError,
     date_level_spearman_ic,
     summarize_information_coefficient,
     top_minus_bottom_quantile_spread,
@@ -147,17 +148,17 @@ def test_quantile_spread_is_positive_only_when_skill_exists():
 # --- same-day independence (doc 15.2) --------------------------------------
 
 
-def test_duplicate_same_day_rows_do_not_inflate_the_date_count():
+def test_duplicate_date_ticker_rows_are_rejected_not_counted_twice():
     """Doc 15.2: 'duplicate same-day cross-sectional rows must not be
     treated as independent time observations.' Date-level IC collapses each
     session to ONE observation, so tripling the names on a day cannot
     triple the apparent sample size."""
     panel = _panel(n_dates=20, n_names=10, seed=7)
-    tripled = pd.concat([panel, panel.assign(ticker=panel["ticker"] + "b"),
-                         panel.assign(ticker=panel["ticker"] + "c")])
-    original = date_level_spearman_ic(panel, score_column="score", outcome_column="outcome")
-    inflated = date_level_spearman_ic(tripled, score_column="score", outcome_column="outcome")
-    assert len(original) == len(inflated) == 20
+    duplicated = pd.concat([panel, panel.iloc[[0]]], ignore_index=True)
+    with pytest.raises(EvaluationError, match="duplicate"):
+        date_level_spearman_ic(
+            duplicated, score_column="score", outcome_column="outcome"
+        )
 
 
 # --- significance delegation ------------------------------------------------
@@ -165,8 +166,8 @@ def test_duplicate_same_day_rows_do_not_inflate_the_date_count():
 
 def test_block_bootstrap_delegates_to_the_existing_project_toolkit():
     rng = np.random.default_rng(0)
-    dates = pd.bdate_range("2026-01-01", periods=120)
-    ic = pd.Series(rng.normal(0, 0.1, 120), index=[str(d.date()) for d in dates])
+    dates = pd.bdate_range("2026-01-01", periods=240)
+    ic = pd.Series(rng.normal(0, 0.1, 240), index=[str(d.date()) for d in dates])
     result = block_bootstrap_ic_significance(ic, block_length=20, n_bootstrap=200, seed=0)
     assert result["available"]
     assert result["block_length"] == 20
@@ -178,6 +179,16 @@ def test_block_bootstrap_delegates_to_the_existing_project_toolkit():
 def test_block_bootstrap_is_unavailable_for_empty_input():
     result = block_bootstrap_ic_significance(pd.Series(dtype=float), block_length=5)
     assert not result["available"]
+
+
+def test_block_bootstrap_propagates_a_thin_sample_refusal():
+    result = block_bootstrap_ic_significance(
+        pd.Series([0.1, -0.1], index=["2026-01-01", "2026-01-02"]),
+        block_length=2,
+        n_bootstrap=20,
+    )
+    assert not result["available"]
+    assert result["reason"]
 
 
 # --- model fits -------------------------------------------------------------

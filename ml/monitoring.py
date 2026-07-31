@@ -13,13 +13,16 @@ burned by small-sample results that looked real.
 """
 from __future__ import annotations
 
+from datetime import date, datetime
 import math
 from typing import Any, Mapping, Sequence
+from zoneinfo import ZoneInfo
 
 import numpy as np
 import pandas as pd
 
 MIN_OBSERVATIONS_FOR_CONCLUSION = 30
+_EASTERN = ZoneInfo("America/New_York")
 
 
 class MonitoringError(ValueError):
@@ -61,6 +64,81 @@ def coverage_report(predictions: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     }
 
 
+def feature_health_report(predictions: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    """Aggregate freshness metadata recorded with every shadow attempt."""
+    missing_total = 0
+    stale_total = 0
+    maximum_ages: list[int] = []
+    invalid = 0
+    for prediction in predictions:
+        freshness = prediction.get("feature_freshness")
+        if freshness is None and isinstance(prediction.get("prediction"), Mapping):
+            freshness = prediction["prediction"].get("feature_freshness")
+        if not isinstance(freshness, Mapping):
+            invalid += 1
+            continue
+        if not freshness:
+            invalid += 1
+            continue
+        aggregate_names = {
+            "missing_count", "stale_count", "maximum_age_sessions"
+        }
+        if aggregate_names <= set(freshness):
+            values = tuple(freshness[name] for name in aggregate_names)
+            if any(
+                isinstance(value, bool)
+                or not isinstance(value, int)
+                or value < 0
+                for value in values
+            ):
+                invalid += 1
+                continue
+            missing_total += int(freshness["missing_count"])
+            stale_total += int(freshness["stale_count"])
+            maximum_ages.append(int(freshness["maximum_age_sessions"]))
+            continue
+
+        # Canonical PredictionRecord also permits per-feature availability
+        # dates, e.g. {"realized_vol_20d": "2026-07-30"}.  Missing values
+        # are countable; age is reported in calendar days because no exchange
+        # calendar/policy threshold is part of this generic monitor.
+        missing_total += sum(value is None for value in freshness.values())
+        try:
+            as_of = date.fromisoformat(str(prediction.get("as_of_session")))
+        except ValueError:
+            as_of = None
+        ages: list[int] = []
+        if as_of is not None:
+            for value in freshness.values():
+                if not isinstance(value, str):
+                    continue
+                try:
+                    available_date = datetime.fromisoformat(
+                        value.replace("Z", "+00:00")
+                    ).date()
+                except ValueError:
+                    try:
+                        available_date = date.fromisoformat(value)
+                    except ValueError:
+                        continue
+                if available_date > as_of:
+                    invalid += 1
+                    continue
+                ages.append((as_of - available_date).days)
+        maximum_ages.append(max(ages) if ages else 0)
+    return {
+        "prediction_count": len(predictions),
+        "valid_freshness_count": len(maximum_ages),
+        "invalid_or_missing_freshness_count": invalid,
+        "missing_feature_count": missing_total,
+        "stale_feature_count": stale_total,
+        "maximum_age_sessions": max(maximum_ages) if maximum_ages else None,
+        "sufficient_sample": (
+            len(predictions) >= MIN_OBSERVATIONS_FOR_CONCLUSION and invalid == 0
+        ),
+    }
+
+
 def _finite_array(values: Sequence[float]) -> np.ndarray:
     array = np.asarray(list(values), dtype=float)
     return array[np.isfinite(array)]
@@ -91,10 +169,16 @@ def distribution_drift(
             "sufficient_sample": False,
         }
 
-    quantiles = np.quantile(reference_values, np.linspace(0, 1, 11))
-    edges = np.unique(quantiles)
+    # Internal reference deciles define the buckets, while infinite outer
+    # edges ensure a shifted current distribution is fully counted.  Using
+    # the reference min/max as histogram bounds silently discarded exactly
+    # the out-of-range observations that should create the strongest drift
+    # signal.
+    quantiles = np.quantile(reference_values, np.linspace(0.1, 0.9, 9))
+    internal_edges = np.unique(quantiles)
+    edges = np.concatenate(([-np.inf], internal_edges, [np.inf]))
     psi: float | None
-    if edges.size < 3:
+    if np.unique(reference_values).size < 2:
         # A near-constant reference distribution cannot produce meaningful
         # bins; report unavailable rather than a divide-by-zero artifact.
         psi = None
@@ -158,12 +242,22 @@ def realized_error_by_window(
         actual = record.get(actual_key)
         if predicted is None or actual is None:
             continue
-        predicted_value, actual_value = float(predicted), float(actual)
+        try:
+            predicted_value, actual_value = float(predicted), float(actual)
+        except (TypeError, ValueError):
+            continue
         if not (math.isfinite(predicted_value) and math.isfinite(actual_value)):
             continue
+        raw_session = record.get("as_of_session")
+        try:
+            parsed_session = date.fromisoformat(str(raw_session))
+        except (TypeError, ValueError) as exc:
+            raise MonitoringError(
+                f"invalid as_of_session in matured outcome: {raw_session!r}"
+            ) from exc
         rows.append(
             {
-                "as_of_session": record.get("as_of_session"),
+                "as_of_session": parsed_session.isoformat(),
                 "error": actual_value - predicted_value,
                 "absolute_error": abs(actual_value - predicted_value),
             }
@@ -211,13 +305,48 @@ def lineage_consistency(
         identity_counts[identity] = identity_counts.get(identity, 0) + 1
     duplicates = [list(k) for k, v in identity_counts.items() if v > 1]
 
-    sessions = [p.get("as_of_session") for p in predictions if p.get("as_of_session")]
-    generated = [p.get("generated_at") for p in predictions if p.get("generated_at")]
-    clock_errors = [
-        {"as_of_session": s, "generated_at": g}
-        for s, g in zip(sessions, generated)
-        if g is not None and s is not None and str(g)[:10] < str(s)
-    ]
+    clock_errors: list[dict[str, Any]] = []
+    invalid_lineage: list[dict[str, Any]] = []
+    for prediction in predictions:
+        session_raw = prediction.get("as_of_session")
+        generated_raw = prediction.get("generated_at")
+        try:
+            session = date.fromisoformat(str(session_raw))
+            generated_at = datetime.fromisoformat(str(generated_raw).replace("Z", "+00:00"))
+            if generated_at.tzinfo is None or generated_at.utcoffset() is None:
+                raise ValueError("generated_at is naive")
+            generated_session = generated_at.astimezone(_EASTERN).date()
+            # Shadow evidence is only prequential if it was generated for
+            # that session, not reconstructed days earlier or backfilled
+            # after the answer was known.
+            if generated_session != session:
+                clock_errors.append(
+                    {
+                        "as_of_session": session.isoformat(),
+                        "generated_at": generated_at.isoformat(),
+                    }
+                )
+        except (TypeError, ValueError) as exc:
+            clock_errors.append(
+                {
+                    "as_of_session": session_raw,
+                    "generated_at": generated_raw,
+                    "reason": str(exc),
+                }
+            )
+
+        snapshot_hash = prediction.get("feature_snapshot_hash")
+        if (
+            not isinstance(snapshot_hash, str)
+            or len(snapshot_hash) != 64
+            or any(character not in "0123456789abcdefABCDEF" for character in snapshot_hash)
+        ):
+            invalid_lineage.append(
+                {
+                    "prediction_id": prediction.get("prediction_id"),
+                    "reason": "missing_or_invalid_feature_snapshot_hash",
+                }
+            )
 
     return {
         "distinct_model_keys": model_keys,
@@ -227,6 +356,8 @@ def lineage_consistency(
         "duplicate_identities": duplicates[:10],
         "clock_error_count": len(clock_errors),
         "clock_errors": clock_errors[:10],
+        "invalid_lineage_count": len(invalid_lineage),
+        "invalid_lineage": invalid_lineage[:10],
     }
 
 
@@ -246,21 +377,31 @@ def build_monitoring_report(
     function's output back into training, registration, or status change.
     """
     coverage = coverage_report(predictions)
+    feature_health = feature_health_report(predictions)
     lineage = lineage_consistency(predictions)
     error = realized_error_by_window(
         matured, predicted_key=predicted_key, actual_key=actual_key
     )
     drift = distribution_drift(reference_values, current_values)
 
+    drift_requested = len(reference_values) > 0 or len(current_values) > 0
     conclusions_supported = bool(
-        coverage["sufficient_sample"] and error.get("sufficient_sample")
+        coverage["sufficient_sample"]
+        and feature_health["sufficient_sample"]
+        and error.get("sufficient_sample")
+        and (not drift_requested or drift.get("sufficient_sample"))
+        and not lineage["requires_new_evidence_epoch"]
+        and lineage["clock_error_count"] == 0
+        and lineage["invalid_lineage_count"] == 0
     )
     return {
         "coverage": coverage,
+        "feature_health": feature_health,
         "lineage": lineage,
         "realized_error": error,
         "output_drift": drift,
         "conclusions_supported_by_sample_size": conclusions_supported,
+        "production_authoritative": False,
         "notes": (
             "Monitoring is read-only: it never retrains, registers, or promotes "
             "a model (strategy doc 10.3). Any status change requires a separate, "

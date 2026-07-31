@@ -57,6 +57,12 @@ def test_trailing_volatility_returns_none_when_too_short():
     assert trailing_realized_volatility_pct(pd.Series([0.01, 0.02]), window=20) is None
 
 
+def test_baselines_do_not_compress_away_recent_missing_observations():
+    values = pd.Series([0.01] * 25 + [np.nan])
+    assert trailing_realized_volatility_pct(values, window=20) is None
+    assert ewma_volatility_pct(values, min_observations=20) is None
+
+
 def test_ewma_volatility_reacts_faster_than_trailing_to_a_vol_spike():
     calm = [0.001] * 100
     spike = [0.05, -0.05] * 10
@@ -110,8 +116,9 @@ def test_qlike_penalizes_under_prediction_more_than_over_prediction():
     assert under > over
 
 
-def test_qlike_ignores_non_positive_predictions():
-    assert qlike_loss([20.0, 20.0], [0.0, -5.0]) is None
+def test_qlike_rejects_non_positive_predictions_instead_of_improving_coverage():
+    with pytest.raises(EvaluationError, match="strictly positive"):
+        qlike_loss([20.0, 20.0], [0.0, -5.0])
 
 
 def test_mean_absolute_error_skips_non_finite_pairs():
@@ -154,6 +161,11 @@ def test_calibration_curve_reports_empty_bins_rather_than_dropping_them():
     assert any(r["count"] == 0 for r in rows)
     populated = [r for r in rows if r["count"]]
     assert all(r["observed_frequency"] is not None for r in populated)
+
+
+def test_calibration_curve_rejects_probabilities_outside_unit_interval():
+    with pytest.raises(EvaluationError, match="within"):
+        calibration_curve([1, 0], [2.0, -1.0])
 
 
 def test_pinball_loss_is_asymmetric_by_quantile():
@@ -250,7 +262,19 @@ def test_evaluation_report_is_hashed_and_json_serializable():
 
     payload = _report().to_dict()
     assert len(payload["report_sha256"]) == 64
+    assert payload["production_authoritative"] is False
     json.dumps(payload)
+
+
+def test_evaluation_report_deep_copies_and_freezes_metric_payloads():
+    metrics = {"nested": {"values": [1.0, 2.0]}}
+    report = _report(aggregate_metrics=metrics)
+    metrics["nested"]["values"].append(999.0)
+    assert report.to_dict()["aggregate_metrics"] == {
+        "nested": {"values": [1.0, 2.0]}
+    }
+    with pytest.raises(TypeError):
+        report.aggregate_metrics["new"] = 1
 
 
 # --- volatility models -----------------------------------------------------
@@ -362,6 +386,28 @@ def test_evaluate_volatility_models_scores_every_fold_on_untouched_validation():
         assert metrics["ridge_qlike"] is not None
         assert metrics["gbm_qlike"] is not None
         assert metrics["validation_row_count"] > 0
+
+
+def test_model_and_baselines_use_the_same_finite_validation_rows():
+    frame = _volatility_frame(250)
+    folds = purged_grouped_walk_forward_splits(
+        list(frame["as_of_session"]), list(frame["exit_session"]),
+        n_splits=2, embargo_sessions=0,
+    )
+    missing_row = folds[0].validation_row_indices[0]
+    frame.loc[missing_row, "ewma_vol"] = np.nan
+    results = evaluate_volatility_models(
+        frame, folds,
+        feature_columns=["trailing_vol", "downside_vol"],
+        target_column="forward_vol",
+        trailing_baseline_column="trailing_vol",
+        ewma_baseline_column="ewma_vol",
+    )
+    assert results[0]["common_validation_row_count"] == (
+        results[0]["validation_row_count"] - 1
+    )
+    assert results[0]["ridge_qlike"] is not None
+    assert results[0]["ewma_qlike"] is not None
 
 
 def test_thin_fold_records_a_fit_error_rather_than_silently_skipping():

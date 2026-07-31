@@ -14,7 +14,7 @@ import os
 import sqlite3
 from contextlib import contextmanager
 from decimal import Decimal
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
@@ -34,6 +34,53 @@ _EASTERN = ZoneInfo("America/New_York")
 
 def _hash_payload(payload_json: str) -> str:
     return hashlib.sha256(payload_json.encode("utf-8")).hexdigest()
+
+
+def _canonical_ml_json(payload: Any, name: str) -> str:
+    try:
+        return json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=False,
+        )
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"{name} must be finite JSON-compatible data") from exc
+
+
+def _parse_aware_timestamp(value: Any, name: str) -> datetime:
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError(f"{name} must be a non-empty timezone-aware ISO timestamp")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a valid timezone-aware ISO timestamp") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise ValueError(f"{name} must be timezone-aware")
+    return parsed
+
+
+def _parse_session_date(value: Any, name: str) -> date:
+    if not isinstance(value, str):
+        raise ValueError(f"{name} must use canonical YYYY-MM-DD format")
+    try:
+        parsed = date.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError(f"{name} must use canonical YYYY-MM-DD format") from exc
+    if parsed.isoformat() != value:
+        raise ValueError(f"{name} must use canonical YYYY-MM-DD format")
+    return parsed
+
+
+def _require_sha256(value: Any, name: str) -> None:
+    if not isinstance(value, str) or len(value) != 64:
+        raise ValueError(f"{name} must be a lowercase 64-character sha256 digest")
+    try:
+        int(value, 16)
+    except ValueError as exc:
+        raise ValueError(f"{name} must be a lowercase 64-character sha256 digest") from exc
+    if value != value.lower():
+        raise ValueError(f"{name} must be a lowercase 64-character sha256 digest")
 
 
 def configured_db_path() -> Path:
@@ -268,17 +315,22 @@ class AssistantStore:
                     as_of_session TEXT NOT NULL,
                     generated_at TEXT NOT NULL,
                     horizon_sessions INTEGER NOT NULL,
+                    target_available_at TEXT NOT NULL,
                     feature_snapshot_hash TEXT NOT NULL,
                     prediction_json TEXT NOT NULL,
                     prediction_hash TEXT NOT NULL,
                     available INTEGER NOT NULL,
-                    refusal_reasons_json TEXT NOT NULL
+                    refusal_reasons_json TEXT NOT NULL,
+                    FOREIGN KEY(model_key)
+                        REFERENCES ml_model_registrations(model_key)
                 );
                 CREATE TABLE IF NOT EXISTS ml_prediction_outcomes (
                     prediction_id TEXT PRIMARY KEY,
                     matured_at TEXT NOT NULL,
                     outcome_json TEXT NOT NULL,
-                    outcome_hash TEXT NOT NULL
+                    outcome_hash TEXT NOT NULL,
+                    FOREIGN KEY(prediction_id)
+                        REFERENCES ml_predictions(prediction_id)
                 );
                 CREATE TABLE IF NOT EXISTS operational_drill_runs (
                     drill_id TEXT PRIMARY KEY,
@@ -428,6 +480,21 @@ class AssistantStore:
             )
             self._migrate_decision_packet_identity(connection)
             self._migrate_execution_reservation_money(connection)
+            self._migrate_ml_prediction_maturity(connection)
+
+    def _migrate_ml_prediction_maturity(self, connection: sqlite3.Connection) -> None:
+        """Add immutable target availability to databases created by ML-6's
+        first draft. Legacy predictions remain readable but cannot receive an
+        outcome: their true maturity was never recorded, so guessing it from
+        a session count would fail closed on holidays and non-close targets."""
+        columns = {
+            row["name"]
+            for row in connection.execute("PRAGMA table_info(ml_predictions)")
+        }
+        if "target_available_at" not in columns:
+            connection.execute(
+                "ALTER TABLE ml_predictions ADD COLUMN target_available_at TEXT"
+            )
 
     def _migrate_decision_packet_identity(self, connection: sqlite3.Connection) -> None:
         """`generated_at` alone conflates different serialized payloads
@@ -635,9 +702,50 @@ class AssistantStore:
         written: list[dict[str, Any]] = []
         with self._connect() as connection:
             for snapshot in snapshots:
-                payload_json = json.dumps(
-                    snapshot, sort_keys=True, separators=(",", ":"), default=str
+                required = {
+                    "account_key", "session_date", "captured_at", "ticker",
+                    "shares", "market_value", "price",
+                }
+                missing = sorted(required - set(snapshot))
+                if missing:
+                    raise ValueError(f"position snapshot is missing fields: {missing}")
+                for name in ("account_key", "ticker"):
+                    value = snapshot[name]
+                    if not isinstance(value, str) or not value.strip():
+                        raise ValueError(f"position snapshot {name} must be non-empty")
+                ticker = snapshot["ticker"].strip().upper()
+                if ticker != snapshot["ticker"]:
+                    raise ValueError("position snapshot ticker must be canonical uppercase")
+                source = snapshot.get("source", "unknown")
+                if not isinstance(source, str) or not source.strip():
+                    raise ValueError("position snapshot source must be non-empty")
+                session = _parse_session_date(snapshot["session_date"], "session_date")
+                captured = _parse_aware_timestamp(snapshot["captured_at"], "captured_at")
+                if captured.astimezone(_EASTERN).date() != session:
+                    raise ValueError(
+                        "captured_at must fall on session_date in America/New_York"
+                    )
+                shares = to_decimal(snapshot["shares"], name="shares")
+                market_value = to_decimal(
+                    snapshot["market_value"], name="market_value"
                 )
+                price = to_decimal(snapshot["price"], name="price")
+                if shares < 0 or market_value < 0 or price <= 0:
+                    raise ValueError(
+                        "position shares and market value must be non-negative and "
+                        "price must be positive"
+                    )
+                canonical = {
+                    "account_key": snapshot["account_key"].strip(),
+                    "session_date": session.isoformat(),
+                    "captured_at": captured.isoformat(),
+                    "ticker": ticker,
+                    "shares": decimal_text(shares),
+                    "market_value": decimal_text(market_value),
+                    "price": decimal_text(price),
+                    "source": source.strip(),
+                }
+                payload_json = _canonical_ml_json(canonical, "position snapshot")
                 snapshot_hash = _hash_payload(payload_json)
                 snapshot_id = "position-" + snapshot_hash[:24]
                 connection.execute(
@@ -647,23 +755,44 @@ class AssistantStore:
                         ticker, shares_text, market_value_text, price_text,
                         source, snapshot_hash
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                    ON CONFLICT(snapshot_id) DO NOTHING
+                    ON CONFLICT DO NOTHING
                     """,
                     (
                         snapshot_id,
-                        snapshot["account_key"],
-                        snapshot["session_date"],
-                        snapshot["captured_at"],
-                        snapshot["ticker"],
-                        decimal_text(snapshot["shares"]),
-                        decimal_text(snapshot["market_value"]),
-                        decimal_text(snapshot["price"]),
-                        snapshot.get("source", "unknown"),
+                        canonical["account_key"],
+                        canonical["session_date"],
+                        canonical["captured_at"],
+                        canonical["ticker"],
+                        canonical["shares"],
+                        canonical["market_value"],
+                        canonical["price"],
+                        canonical["source"],
                         snapshot_hash,
                     ),
                 )
+                row = connection.execute(
+                    """
+                    SELECT snapshot_id, snapshot_hash
+                    FROM portfolio_position_snapshots
+                    WHERE account_key = ? AND session_date = ? AND ticker = ?
+                      AND captured_at = ?
+                    """,
+                    (
+                        canonical["account_key"], canonical["session_date"],
+                        canonical["ticker"], canonical["captured_at"],
+                    ),
+                ).fetchone()
+                if row is None or row["snapshot_hash"] != snapshot_hash:
+                    raise ValueError(
+                        "a different immutable position snapshot already exists "
+                        "for this account/session/ticker/capture identity"
+                    )
                 written.append(
-                    {**snapshot, "snapshot_id": snapshot_id, "snapshot_hash": snapshot_hash}
+                    {
+                        **canonical,
+                        "snapshot_id": row["snapshot_id"],
+                        "snapshot_hash": snapshot_hash,
+                    }
                 )
         return written
 
@@ -708,17 +837,20 @@ class AssistantStore:
         automatically becomes production authority" -- so nothing in the
         training or inference path may write a status implying authority.
         """
+        if not isinstance(model_key, str) or not model_key.strip():
+            raise ValueError("model_key must be a non-empty string")
         if status not in ("shadow", "retired"):
             raise ValueError(
                 "ml model status must be 'shadow' or 'retired'; production "
                 "authority requires a separate, explicit promotion decision "
                 "that this method deliberately cannot grant"
             )
-        manifest_json = json.dumps(
-            manifest, sort_keys=True, separators=(",", ":"), default=str
-        )
+        if not isinstance(manifest, dict) or not manifest:
+            raise ValueError("manifest must be a non-empty dictionary")
+        manifest_json = _canonical_ml_json(manifest, "manifest")
         manifest_hash = _hash_payload(manifest_json)
         timestamp = registered_at or datetime.now(timezone.utc).isoformat()
+        _parse_aware_timestamp(timestamp, "registered_at")
         with self._connect() as connection:
             connection.execute(
                 """
@@ -732,6 +864,11 @@ class AssistantStore:
             row = connection.execute(
                 "SELECT * FROM ml_model_registrations WHERE model_key = ?", (model_key,)
             ).fetchone()
+            if row["manifest_hash"] != manifest_hash or row["status"] != status:
+                raise ValueError(
+                    f"model_key {model_key!r} is already registered with different "
+                    "manifest content or status; use a new versioned model_key"
+                )
         return {
             "model_key": row["model_key"],
             "registered_at": row["registered_at"],
@@ -747,30 +884,127 @@ class AssistantStore:
         (model_key, task, subject_key, as_of_session, horizon_sessions), so
         re-running a scheduled shadow job cannot create a second, possibly
         DIFFERENT prediction for a session already recorded. Doc 10.2:
-        "Never rewrite a prediction after its as_of_session" -- a conflict
-        is therefore a no-op that returns the ORIGINAL row, never an update.
+        "Never rewrite a prediction after its as_of_session" -- an exact
+        retry returns the original row, while a conflicting value for the
+        same identity is rejected loudly rather than silently hidden.
         """
-        payload_json = json.dumps(
-            prediction, sort_keys=True, separators=(",", ":"), default=str
+        required = (
+            "model_key",
+            "task",
+            "subject_key",
+            "as_of_session",
+            "generated_at",
+            "horizon_sessions",
+            "target_available_at",
+            "data_available_at",
+            "feature_freshness",
+            "feature_snapshot_hash",
+            "evidence_status",
+            "production_authoritative",
+            "available",
         )
+        missing = [name for name in required if name not in prediction]
+        if missing:
+            raise ValueError(f"prediction is missing required fields: {missing}")
+        for name in ("model_key", "task", "subject_key"):
+            if not isinstance(prediction[name], str) or not prediction[name].strip():
+                raise ValueError(f"prediction.{name} must be a non-empty string")
+        as_of = _parse_session_date(prediction["as_of_session"], "as_of_session")
+        generated_at = _parse_aware_timestamp(prediction["generated_at"], "generated_at")
+        target_available_at = _parse_aware_timestamp(
+            prediction["target_available_at"], "target_available_at"
+        )
+        data_available_at = _parse_aware_timestamp(
+            prediction["data_available_at"], "data_available_at"
+        )
+        horizon = prediction["horizon_sessions"]
+        if isinstance(horizon, bool) or not isinstance(horizon, int) or horizon < 1:
+            raise ValueError("horizon_sessions must be a positive integer")
+        earliest_possible_target = as_of + timedelta(days=horizon)
+        if target_available_at.date() < earliest_possible_target:
+            raise ValueError(
+                "target_available_at is earlier than the minimum possible date "
+                "for horizon_sessions"
+            )
+        if target_available_at <= generated_at:
+            raise ValueError("target_available_at must be after generated_at")
+        if data_available_at > generated_at:
+            raise ValueError("data_available_at cannot be after generated_at")
+        if generated_at.astimezone(_EASTERN).date() != as_of:
+            raise ValueError(
+                "generated_at must fall on as_of_session in America/New_York; "
+                "backfilled predictions require a separate evidence workflow"
+            )
+        _require_sha256(prediction["feature_snapshot_hash"], "feature_snapshot_hash")
+        if not isinstance(prediction["feature_freshness"], dict):
+            raise ValueError("feature_freshness must be a dictionary")
+        _canonical_ml_json(prediction["feature_freshness"], "feature_freshness")
+        if prediction["available"] and not prediction["feature_freshness"]:
+            raise ValueError("an available prediction must record feature_freshness")
+        if prediction["evidence_status"] not in {
+            "exploratory", "promising_unconfirmed", "rejected", "unavailable"
+        }:
+            raise ValueError("prediction.evidence_status is not recognized")
+        if prediction["production_authoritative"] is not False:
+            raise ValueError("shadow predictions must be production_authoritative=false")
+        if not isinstance(prediction["available"], bool):
+            raise ValueError("prediction.available must be a boolean")
+        values = prediction.get("values")
+        if prediction["available"]:
+            if not isinstance(values, dict) or not values:
+                raise ValueError("an available prediction must contain non-empty values")
+            _canonical_ml_json(values, "prediction.values")
+            forbidden = {
+                "side", "shares", "quantity", "order_type", "limit_price",
+                "stop_price", "approved", "execute", "authorization",
+                "target_weight", "trade_intent", "recommendation", "action",
+            }
+            normalized_value_keys = {
+                str(key).strip().lower().replace("-", "_") for key in values
+            }
+            if forbidden & normalized_value_keys:
+                raise ValueError("prediction.values contains execution-shaped fields")
+            if prediction["evidence_status"] == "unavailable":
+                raise ValueError("an available prediction cannot have unavailable evidence")
+        elif values not in (None, {}):
+            raise ValueError("an unavailable prediction cannot contain predicted values")
+        elif prediction["evidence_status"] != "unavailable":
+            raise ValueError("an unavailable prediction must have unavailable evidence status")
+        payload_json = _canonical_ml_json(prediction, "prediction")
         prediction_hash = _hash_payload(payload_json)
         prediction_id = prediction.get("prediction_id") or (
             "mlpred-" + prediction_hash[:24]
         )
-        available = bool(prediction.get("available", False))
+        available = prediction["available"]
         refusal_reasons = list(prediction.get("refusal_reasons", ()))
+        if any(not isinstance(reason, str) or not reason.strip() for reason in refusal_reasons):
+            raise ValueError("refusal_reasons must contain non-empty strings")
         if not available and not refusal_reasons:
             raise ValueError(
                 "an unavailable prediction must record at least one refusal reason"
             )
+        if available and refusal_reasons:
+            raise ValueError("an available prediction cannot carry refusal reasons")
         with self._connect() as connection:
+            registration = connection.execute(
+                "SELECT status FROM ml_model_registrations WHERE model_key = ?",
+                (prediction["model_key"],),
+            ).fetchone()
+            if registration is None:
+                raise ValueError(
+                    f"model_key {prediction['model_key']!r} is not registered"
+                )
+            if registration["status"] != "shadow":
+                raise ValueError(
+                    f"model_key {prediction['model_key']!r} is not active for shadow predictions"
+                )
             connection.execute(
                 """
                 INSERT INTO ml_predictions(
                     prediction_id, model_key, task, subject_key, as_of_session,
-                    generated_at, horizon_sessions, feature_snapshot_hash,
+                    generated_at, horizon_sessions, target_available_at, feature_snapshot_hash,
                     prediction_json, prediction_hash, available, refusal_reasons_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT DO NOTHING
                 """,
                 (
@@ -780,7 +1014,8 @@ class AssistantStore:
                     prediction["subject_key"],
                     prediction["as_of_session"],
                     prediction["generated_at"],
-                    int(prediction["horizon_sessions"]),
+                    horizon,
+                    prediction["target_available_at"],
                     prediction["feature_snapshot_hash"],
                     payload_json,
                     prediction_hash,
@@ -799,9 +1034,18 @@ class AssistantStore:
                     prediction["task"],
                     prediction["subject_key"],
                     prediction["as_of_session"],
-                    int(prediction["horizon_sessions"]),
+                    horizon,
                 ),
             ).fetchone()
+            if row is None:
+                raise ValueError(
+                    "prediction_id conflicts with a different prediction identity"
+                )
+            if row["prediction_hash"] != prediction_hash:
+                raise ValueError(
+                    "a different prediction already exists for this immutable "
+                    "model/task/subject/session/horizon identity"
+                )
         return self._ml_prediction_row_to_dict(row)
 
     @staticmethod
@@ -814,6 +1058,7 @@ class AssistantStore:
             "as_of_session": row["as_of_session"],
             "generated_at": row["generated_at"],
             "horizon_sessions": row["horizon_sessions"],
+            "target_available_at": row["target_available_at"],
             "feature_snapshot_hash": row["feature_snapshot_hash"],
             "prediction": json.loads(row["prediction_json"]),
             "prediction_hash": row["prediction_hash"],
@@ -844,12 +1089,11 @@ class AssistantStore:
     ) -> dict[str, Any]:
         """Attach a realized outcome to an existing prediction (doc 10.2).
 
-        Enforces both of doc 10.1's integrity rules explicitly rather than
-        relying on SQLite foreign keys (which this project does not enable
-        by default): "An outcome cannot exist before its prediction or
-        before its horizon matures." The maturity check compares against
-        the prediction's OWN recorded as_of_session, so a caller cannot
-        attach an outcome early by passing an optimistic timestamp.
+        Enforces both of doc 10.1's integrity rules explicitly in addition
+        to the database foreign key: "An outcome cannot exist before its
+        prediction or before its horizon matures." The maturity check uses
+        the prediction's immutable target-availability timestamp, so a
+        caller cannot attach an outcome early.
         """
         with self._connect() as connection:
             prediction = connection.execute(
@@ -860,14 +1104,26 @@ class AssistantStore:
                     f"no prediction {prediction_id!r} exists; an outcome cannot "
                     "precede its prediction"
                 )
-            if matured_at < prediction["as_of_session"]:
+            if not bool(prediction["available"]):
+                raise ValueError("an unavailable prediction cannot receive a realized outcome")
+            matured_timestamp = _parse_aware_timestamp(matured_at, "matured_at")
+            target_available_raw = prediction["target_available_at"]
+            if not target_available_raw:
                 raise ValueError(
-                    f"matured_at {matured_at!r} precedes the prediction's "
-                    f"as_of_session {prediction['as_of_session']!r}"
+                    "legacy prediction has no target_available_at; maturity cannot "
+                    "be established safely"
                 )
-            outcome_json = json.dumps(
-                outcome, sort_keys=True, separators=(",", ":"), default=str
+            target_available = _parse_aware_timestamp(
+                target_available_raw, "prediction.target_available_at"
             )
+            if matured_timestamp < target_available:
+                raise ValueError(
+                    f"matured_at {matured_at!r} precedes target availability "
+                    f"{target_available_raw!r}"
+                )
+            if not isinstance(outcome, dict) or not outcome:
+                raise ValueError("outcome must be a non-empty dictionary")
+            outcome_json = _canonical_ml_json(outcome, "outcome")
             outcome_hash = _hash_payload(outcome_json)
             connection.execute(
                 """
@@ -882,6 +1138,10 @@ class AssistantStore:
                 "SELECT * FROM ml_prediction_outcomes WHERE prediction_id = ?",
                 (prediction_id,),
             ).fetchone()
+            if row["outcome_hash"] != outcome_hash or row["matured_at"] != matured_at:
+                raise ValueError(
+                    "a different immutable outcome already exists for this prediction"
+                )
         return {
             "prediction_id": row["prediction_id"],
             "matured_at": row["matured_at"],

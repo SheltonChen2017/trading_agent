@@ -30,12 +30,15 @@ def trailing_realized_volatility_pct(
     """
     if window < 2:
         raise BaselineError("window must be at least 2")
-    clean = pd.to_numeric(daily_returns, errors="coerce").replace(
+    numeric = pd.to_numeric(daily_returns, errors="coerce").replace(
         [np.inf, -np.inf], np.nan
-    ).dropna()
-    if len(clean) < window:
+    )
+    if len(numeric) < window:
         return None
-    value = float(clean.tail(window).std(ddof=1) * 100)
+    recent = numeric.tail(window)
+    if recent.isna().any():
+        return None
+    value = float(recent.std(ddof=1) * 100)
     return value if np.isfinite(value) else None
 
 
@@ -50,12 +53,12 @@ def ewma_volatility_pct(
     """
     if halflife <= 0 or not np.isfinite(halflife):
         raise BaselineError("halflife must be a positive finite number")
-    clean = pd.to_numeric(daily_returns, errors="coerce").replace(
+    numeric = pd.to_numeric(daily_returns, errors="coerce").replace(
         [np.inf, -np.inf], np.nan
-    ).dropna()
-    if len(clean) < min_observations:
+    )
+    if len(numeric) < min_observations or numeric.tail(min_observations).isna().any():
         return None
-    variance = clean.pow(2).ewm(halflife=halflife).mean()
+    variance = numeric.pow(2).ewm(halflife=halflife, ignore_na=False).mean()
     if variance.empty:
         return None
     value = float(np.sqrt(variance.iloc[-1]) * 100)

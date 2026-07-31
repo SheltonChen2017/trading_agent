@@ -17,7 +17,7 @@ import pytest
 from assistant.schemas import EvidenceStatus
 from assistant.storage import AssistantStore
 from ml.artifacts import load_model_artifact, save_model_artifact, save_model_manifest
-from ml.contracts import ModelManifest, require_matching_feature_order
+from ml.contracts import ModelManifest, PredictionRecord, require_matching_feature_order
 from ml.datasets import (
     assemble_dataset_frames,
     build_dataset_manifest,
@@ -201,17 +201,26 @@ def test_end_to_end_dataset_model_shadow_and_monitoring_creates_no_execution_sta
     # --- 6. persist a shadow prediction, idempotently ---------------------
     store = AssistantStore(tmp_path / "assistant.db")
     store.register_ml_model("integration-vol:0.1.0", model_manifest.to_dict())
-    prediction_payload = {
-        "model_key": "integration-vol:0.1.0",
-        "task": "volatility_forecast",
-        "subject_key": "AAA",
-        "as_of_session": "2026-07-31",
-        "generated_at": "2026-07-31T21:00:00+00:00",
-        "horizon_sessions": 20,
-        "feature_snapshot_hash": manifest.dataset_hash,
-        "available": True,
-        "values": {"annualized_volatility_pct": float(scored[0])},
-    }
+    prediction_payload = PredictionRecord(
+        prediction_id="integration-vol-AAA-20260731",
+        model_id="integration-vol",
+        model_version="0.1.0",
+        artifact_hash=model_manifest.artifact_hash,
+        dataset_or_feature_snapshot_hash=manifest.dataset_hash,
+        task="volatility_forecast",
+        subject_key="AAA",
+        as_of_session="2026-07-31",
+        generated_at="2026-07-31T21:00:00+00:00",
+        horizon_sessions=20,
+        target_available_at="2026-08-28T20:00:00+00:00",
+        values={"annualized_volatility_pct": float(scored[0])},
+        uncertainty={"status": "not_yet_calibrated"},
+        data_available_at="2026-07-31T20:00:00+00:00",
+        feature_freshness={"feature_snapshot": "2026-07-31"},
+        available=True,
+        refusal_reasons=(),
+        evidence_status=EvidenceStatus.EXPLORATORY,
+    ).to_shadow_storage_dict()
     first = store.record_ml_prediction(prediction_payload)
     second = store.record_ml_prediction(prediction_payload)
     assert first["prediction_id"] == second["prediction_id"]
@@ -219,17 +228,37 @@ def test_end_to_end_dataset_model_shadow_and_monitoring_creates_no_execution_sta
 
     # A refusal is recorded too, not only successes.
     store.record_ml_prediction(
-        {**prediction_payload, "subject_key": "BBB", "available": False,
-         "refusal_reasons": ["stale_features"]}
+        PredictionRecord(
+            prediction_id="integration-vol-BBB-20260731",
+            model_id="integration-vol",
+            model_version="0.1.0",
+            artifact_hash=model_manifest.artifact_hash,
+            dataset_or_feature_snapshot_hash=manifest.dataset_hash,
+            task="volatility_forecast",
+            subject_key="BBB",
+            as_of_session="2026-07-31",
+            generated_at="2026-07-31T21:00:00+00:00",
+            horizon_sessions=20,
+            target_available_at="2026-08-28T20:00:00+00:00",
+            values={},
+            uncertainty={},
+            data_available_at="2026-07-31T20:00:00+00:00",
+            feature_freshness={"feature_snapshot": "2026-07-31"},
+            available=False,
+            refusal_reasons=("stale_features",),
+            evidence_status=EvidenceStatus.UNAVAILABLE,
+        ).to_shadow_storage_dict()
     )
 
     # --- 7. attach an outcome only after maturity -------------------------
     with pytest.raises(ValueError, match="precedes"):
         store.record_ml_prediction_outcome(
-            first["prediction_id"], {"realized": 1.0}, matured_at="2026-01-01"
+            first["prediction_id"], {"realized": 1.0},
+            matured_at="2026-08-27T20:00:00+00:00",
         )
     store.record_ml_prediction_outcome(
-        first["prediction_id"], {"realized_vol_pct": 22.0}, matured_at="2026-08-28"
+        first["prediction_id"], {"realized_vol_pct": 22.0},
+        matured_at="2026-08-28T20:00:00+00:00",
     )
     assert len(store.list_ml_prediction_outcomes()) == 1
 

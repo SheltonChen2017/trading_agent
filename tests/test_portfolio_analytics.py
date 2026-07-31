@@ -36,6 +36,9 @@ def test_preview_trade_impact_folds_in_same_ticker_pending_buy_orders():
     # + this new 200 trade -> 1_700 / 9_000 = 18.89%
     assert impact["position_weight_after_pct"] == 18.89
     assert impact["pending_buy_value"] == 500.0
+    assert impact["invested_pct_after"] == 18.89
+    assert impact["cash_after"] == 7_300.0
+    assert impact["projection_complete"] is True
 
 
 def test_preview_trade_impact_ignores_pending_orders_for_other_tickers():
@@ -61,6 +64,30 @@ def test_preview_trade_impact_ignores_pending_sell_orders():
     )
     impact = preview_trade_impact(snapshot, "AAPL", "buy", shares=2, reference_price=100.0)
     assert impact["pending_buy_value"] == 0.0
+
+
+def test_preview_marks_plain_market_pending_buy_as_incomplete():
+    snapshot = build_portfolio_snapshot(
+        [
+            {
+                "ticker": "AAPL",
+                "shares": 10,
+                "entry_price": 100.0,
+                "current_price": 100.0,
+            }
+        ],
+        cash=8_000.0,
+        open_orders=[
+            {"ticker": "AAPL", "side": "buy", "shares": 5},
+        ],
+    )
+
+    impact = preview_trade_impact(
+        snapshot, "AAPL", "buy", shares=2, reference_price=100.0
+    )
+
+    assert impact["projection_complete"] is False
+    assert impact["pending_buy_unknown_tickers"] == ["AAPL"]
 
 
 def test_preview_trade_impact_invested_value_matches_compute_portfolio_analytics():

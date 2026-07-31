@@ -523,7 +523,14 @@ def record_split(
     ratio: Any,
     occurred_at: str,
 ) -> bool:
-    """Apply a confirmed split to share quantity without changing book basis."""
+    """Apply a confirmed split to share quantity without changing book basis.
+
+    Production callers must refresh broker order state and run
+    :func:`sync_app_fills` immediately before calling this function.  The
+    local guard below can prove that every *known* pre-split fill is
+    journaled, but only broker reconciliation can discover a delayed fill
+    that has not reached the local event journal yet.
+    """
     split_ratio = _decimal(ratio, "ratio")
     if split_ratio <= 0 or split_ratio == 1:
         raise LedgerError("split ratio must be positive and different from 1")

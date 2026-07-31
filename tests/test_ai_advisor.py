@@ -348,6 +348,26 @@ def test_allows_multi_ticker_observation_citing_each_tickers_own_weight():
     assert len(result.observations) == 1
 
 
+def test_rejects_multi_ticker_observation_with_swapped_real_weights():
+    raw = {
+        "summary": "This split is concentrated in semiconductors.",
+        "observations": [
+            {
+                "type": "concentration",
+                "severity": "medium",
+                "claim": "NVDA is 40% while AMD is 60% of this split.",
+                "tickers": ["NVDA", "AMD"],
+            }
+        ],
+    }
+
+    result = ai_advisor._validate_allocation_review(
+        raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}
+    )
+
+    assert result is None
+
+
 def test_allows_benign_summary_with_no_ticker_dollar_or_advice_language():
     raw = {"summary": "This split is concentrated in semiconductors.", "observations": []}
     result = ai_advisor._validate_allocation_review(raw, ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {})

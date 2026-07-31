@@ -152,6 +152,110 @@ def test_concurrent_update_allocation_batch_calls_dont_lose_an_update():
             assert final[f"field_{i}"] == i
 
 
+def test_serialized_partial_leg_updates_preserve_other_writer_result():
+    """The database lock must merge nested leg updates, not replace them.
+
+    BEGIN IMMEDIATE only serializes the read/modify/write.  Production
+    workers carry their own in-memory `legs` projection, so replacing the
+    complete mapping can still discard a leg persisted by an earlier worker
+    after that worker releases the lock.
+    """
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        batch_id = new_batch_id()
+        store.create_allocation_batch(
+            batch_id, ["p1", "p2"], intended_total_notional=1000.0
+        )
+
+        store.update_allocation_batch(
+            batch_id,
+            legs={
+                "p1": {
+                    "state": LEG_SUBMITTED,
+                    "order": {"order_id": "order-p1"},
+                    "error": None,
+                }
+            },
+        )
+        store.update_allocation_batch(
+            batch_id,
+            legs={
+                "p2": {
+                    "state": LEG_FAILED,
+                    "order": None,
+                    "error": "definitive failure",
+                }
+            },
+        )
+
+        final = store.get_allocation_batch(batch_id)
+        assert final["legs"]["p1"]["state"] == LEG_SUBMITTED
+        assert final["legs"]["p2"]["state"] == LEG_FAILED
+
+
+def test_stale_same_leg_patch_cannot_overwrite_newer_projection():
+    """A serialized write still needs a same-leg compare-and-swap guard."""
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        batch_id = new_batch_id()
+        store.create_allocation_batch(
+            batch_id, ["p1", "p2"], intended_total_notional=1000.0
+        )
+        stale_p1 = store.get_allocation_batch(batch_id)["legs"]["p1"]
+
+        store.update_allocation_batch(
+            batch_id,
+            legs={
+                "p1": {
+                    "state": LEG_SUBMITTED,
+                    "order": {"order_id": "winner-order"},
+                    "error": None,
+                }
+            },
+        )
+        result = store.update_allocation_batch(
+            batch_id,
+            status=BATCH_STOPPED_UNKNOWN,
+            expected_legs={"p1": stale_p1},
+            legs={
+                "p1": {
+                    "state": LEG_UNKNOWN,
+                    "order": None,
+                    "error": "stale losing-worker projection",
+                }
+            },
+        )
+
+        assert result["legs"]["p1"]["state"] == LEG_SUBMITTED
+        assert result["legs"]["p1"]["order"]["order_id"] == "winner-order"
+        assert result["status"] != BATCH_STOPPED_UNKNOWN
+
+
+def test_stale_completed_status_is_normalized_against_locked_leg_state():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        batch_id = new_batch_id()
+        store.create_allocation_batch(
+            batch_id, ["p1"], intended_total_notional=1000.0
+        )
+        store.update_allocation_batch(
+            batch_id,
+            legs={
+                "p1": {
+                    "state": LEG_UNKNOWN,
+                    "order": None,
+                    "error": "broker outcome unresolved",
+                }
+            },
+        )
+
+        result = store.update_allocation_batch(
+            batch_id, status=BATCH_COMPLETED
+        )
+
+        assert result["status"] == BATCH_STOPPED_UNKNOWN
+
+
 def test_preflight_passes_when_every_leg_is_clean():
     packet = _packet()
     policy = _policy()
@@ -928,6 +1032,59 @@ def test_second_leg_in_flight_status_stops_as_unknown_not_failed():
             }
             assert legs_by_ticker[first_ticker]["state"] == LEG_SUBMITTED
             assert legs_by_ticker[second_ticker]["state"] == LEG_UNKNOWN
+    finally:
+        batch_module.execute_approved_paper_proposal = real_execute
+        restore()
+
+
+def test_concurrent_winner_submission_is_projected_as_submitted_not_failed():
+    """A losing worker may observe that the winner already reached broker state."""
+    import assistant.allocation_batch as batch_module
+
+    packet = _packet()
+    policy = _policy()
+    proposals = _two_leg_proposals(packet, policy)
+    proposal_ids = [proposal.proposal_id for proposal in proposals]
+    second_proposal_id = proposal_ids[1]
+    real_execute = execute_approved_paper_proposal
+
+    def racing_execute(proposal_id, *args, **kwargs):
+        if proposal_id == second_proposal_id:
+            store = args[3] if len(args) > 3 else kwargs["store"]
+            store.update_proposal_status(
+                proposal_id,
+                "broker_accepted",
+                broker_order={
+                    "order_id": "winner-order",
+                    "status": "accepted",
+                },
+            )
+            raise ProposalExecutionError("simulated losing concurrent claim")
+        return real_execute(proposal_id, *args, **kwargs)
+
+    batch_module.execute_approved_paper_proposal = racing_execute
+    _, restore = _mock_batch_execution(packet, quote_price=50.0)
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            for proposal in proposals:
+                store.save_proposal(proposal.to_dict())
+            batch_id = new_batch_id()
+            store.create_allocation_batch(
+                batch_id, proposal_ids, intended_total_notional=2000.0
+            )
+
+            result = execute_allocation_batch(
+                batch_id,
+                store,
+                policy,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+
+            assert result["status"] == BATCH_COMPLETED
+            second = result["legs"][second_proposal_id]
+            assert second["state"] == LEG_SUBMITTED
+            assert second["order"]["order_id"] == "winner-order"
     finally:
         batch_module.execute_approved_paper_proposal = real_execute
         restore()

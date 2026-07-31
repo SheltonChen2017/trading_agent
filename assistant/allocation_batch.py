@@ -195,6 +195,40 @@ def _sync_leg_from_proposal(leg: dict, proposal: dict | None) -> dict:
     return synced
 
 
+def _persist_leg_projection(
+    store: AssistantStore,
+    batch_id: str,
+    proposal_id: str,
+    observed_leg: dict,
+    projected_leg: dict,
+) -> dict:
+    """Persist one leg without allowing a stale same-leg overwrite.
+
+    A different worker may update this leg after it was observed but before
+    this write obtains SQLite's lock.  The storage compare-and-swap returns
+    the fresh batch in that case; re-project from the proposal (the source of
+    truth) and retry against the newly observed leg.
+    """
+    for _ in range(20):
+        persisted = store.update_allocation_batch(
+            batch_id,
+            expected_legs={proposal_id: observed_leg},
+            legs={proposal_id: projected_leg},
+        )
+        current_leg = persisted["legs"][proposal_id]
+        if current_leg == projected_leg:
+            return persisted
+        observed_leg = current_leg
+        projected_leg = _sync_leg_from_proposal(
+            observed_leg, store.get_proposal(proposal_id)
+        )
+        if projected_leg == observed_leg:
+            return persisted
+    raise ProposalExecutionError(
+        f"Allocation batch leg kept changing concurrently: {proposal_id}"
+    )
+
+
 def preflight_allocation_batch(
     proposal_ids: list[str],
     store: AssistantStore,
@@ -453,7 +487,8 @@ def execute_allocation_batch(
         # Never calls execute_approved_paper_proposal() here -- this is
         # a read/display refresh only, never a broker submission.
         legs = batch["legs"]
-        changed = False
+        changed_legs: dict[str, dict] = {}
+        observed_changed_legs: dict[str, dict] = {}
         for proposal_id in batch["proposal_ids"]:
             leg = legs.get(proposal_id, {"state": LEG_UNATTEMPTED, "order": None, "error": None})
             current_proposal = store.get_proposal(proposal_id)
@@ -470,9 +505,10 @@ def execute_allocation_batch(
                 or synced.get("order") != leg.get("order")
                 or synced.get("error") != leg.get("error")
             ):
-                changed = True
+                observed_changed_legs[proposal_id] = leg
                 legs[proposal_id] = synced
-        if not changed:
+                changed_legs[proposal_id] = synced
+        if not changed_legs:
             return batch  # idempotent: nothing to persist, no-op read
         all_terminal = all(
             legs.get(pid, {"state": LEG_UNATTEMPTED})["state"] in (LEG_SUBMITTED, LEG_FAILED, LEG_BLOCKED_OVERRIDABLE)
@@ -486,19 +522,46 @@ def execute_allocation_batch(
         # honestly stop reporting "completed" the same way the main
         # execution loop below would.
         final_status = BATCH_COMPLETED if all_terminal else BATCH_STOPPED_UNKNOWN
-        return store.update_allocation_batch(batch_id, status=final_status, legs=legs)
+        latest = batch
+        for proposal_id, synced in changed_legs.items():
+            latest = _persist_leg_projection(
+                store,
+                batch_id,
+                proposal_id,
+                observed_changed_legs.get(
+                    proposal_id,
+                    {
+                        "state": LEG_UNATTEMPTED,
+                        "order": None,
+                        "error": None,
+                    },
+                ),
+                synced,
+            )
+        return store.update_allocation_batch(batch_id, status=final_status)
 
     legs = batch["legs"]
     for proposal_id in batch["proposal_ids"]:
-        leg = legs.get(proposal_id, {"state": LEG_UNATTEMPTED, "order": None, "error": None})
+        prior_leg = legs.get(
+            proposal_id,
+            {"state": LEG_UNATTEMPTED, "order": None, "error": None},
+        )
         current_proposal = store.get_proposal(proposal_id)
-        leg = _sync_leg_from_proposal(leg, current_proposal)
+        leg = _sync_leg_from_proposal(prior_leg, current_proposal)
         legs[proposal_id] = leg
+        if leg != prior_leg:
+            persisted = _persist_leg_projection(
+                store, batch_id, proposal_id, prior_leg, leg
+            )
+            legs = persisted["legs"]
+            leg = legs[proposal_id]
 
         if leg["state"] in (LEG_SUBMITTED, LEG_FAILED, LEG_BLOCKED_OVERRIDABLE):
             continue
         if leg["state"] == LEG_UNKNOWN:
-            return store.update_allocation_batch(batch_id, status=BATCH_STOPPED_UNKNOWN, legs=legs)
+            return store.update_allocation_batch(
+                batch_id, status=BATCH_STOPPED_UNKNOWN
+            )
 
         # leg["state"] == LEG_UNATTEMPTED and the proposal is genuinely
         # still "proposed" -- eligible to attempt. now_provider() is
@@ -515,25 +578,57 @@ def execute_allocation_batch(
             legs[proposal_id] = {"state": LEG_BLOCKED_OVERRIDABLE, "order": None, "error": str(exc)}
         except ProposalExecutionError as exc:
             current = store.get_proposal(proposal_id)
-            # Reuse _sync_leg_from_proposal()'s own status mapping rather than
-            # duplicating a narrower check -- it treats "submitting",
-            # "reconciling", AND "validating"/"approved" as an unresolved
-            # in-flight state (e.g. a losing concurrent execution attempt
-            # reading back the winner's in-progress status), not just the
-            # literal "submission_unknown". A duplicated, narrower check here
-            # previously let those other in-flight statuses fall through to
-            # LEG_FAILED -- a terminal state -- even though the order might
-            # still succeed (independent review, 2026-07-31).
-            unresolved = current is not None and _sync_leg_from_proposal(leg, current)["state"] == LEG_UNKNOWN
-            if unresolved:
-                legs[proposal_id] = {"state": LEG_UNKNOWN, "order": None, "error": str(exc)}
-                return store.update_allocation_batch(batch_id, status=BATCH_STOPPED_UNKNOWN, legs=legs)
-            legs[proposal_id] = {"state": LEG_FAILED, "order": None, "error": str(exc)}
-        store.update_allocation_batch(batch_id, legs=legs)
+            synced = _sync_leg_from_proposal(leg, current)
+            if synced["state"] == LEG_UNKNOWN:
+                if not synced.get("error"):
+                    synced["error"] = str(exc)
+                legs[proposal_id] = synced
+                persisted = _persist_leg_projection(
+                    store,
+                    batch_id,
+                    proposal_id,
+                    leg,
+                    synced,
+                )
+                return store.update_allocation_batch(
+                    batch_id, status=BATCH_STOPPED_UNKNOWN
+                )
+            if synced["state"] in (
+                LEG_SUBMITTED,
+                LEG_FAILED,
+                LEG_BLOCKED_OVERRIDABLE,
+            ):
+                # A concurrent winner may already have reached an
+                # authoritative terminal/broker state.  Project that state
+                # instead of turning every non-unknown outcome into failure.
+                if (
+                    synced["state"] in (LEG_FAILED, LEG_BLOCKED_OVERRIDABLE)
+                    and not synced.get("error")
+                ):
+                    synced["error"] = str(exc)
+                legs[proposal_id] = synced
+            else:
+                legs[proposal_id] = {
+                    "state": LEG_FAILED,
+                    "order": None,
+                    "error": str(exc),
+                }
+        persisted = _persist_leg_projection(
+            store,
+            batch_id,
+            proposal_id,
+            leg,
+            legs[proposal_id],
+        )
+        legs = persisted["legs"]
 
+    latest = store.get_allocation_batch(batch_id)
+    if latest is None:
+        raise ProposalExecutionError(f"Allocation batch disappeared: {batch_id}")
+    legs = latest["legs"]
     all_terminal = all(
         legs.get(pid, {"state": LEG_UNATTEMPTED})["state"] in (LEG_SUBMITTED, LEG_FAILED, LEG_BLOCKED_OVERRIDABLE)
         for pid in batch["proposal_ids"]
     )
     final_status = BATCH_COMPLETED if all_terminal else BATCH_STOPPED
-    return store.update_allocation_batch(batch_id, status=final_status, legs=legs)
+    return store.update_allocation_batch(batch_id, status=final_status)

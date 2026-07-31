@@ -402,6 +402,15 @@ def command_propose(args, store: AssistantStore) -> None:
             f"  Preview: position {proposal.expected_impact['position_weight_before_pct']:.1f}% "
             f"-> {proposal.expected_impact['position_weight_after_pct']:.1f}%"
         )
+        if not proposal.expected_impact.get("projection_complete", True):
+            unknown = ", ".join(
+                proposal.expected_impact.get("pending_buy_unknown_tickers", [])
+            )
+            print(
+                "  Preview warning: pending buy value is unavailable"
+                + (f" for {unknown}" if unknown else "")
+                + "; actual cash may be lower and exposure may be higher."
+            )
         tax_advisory = proposal.expected_impact.get("tax_lot_advisory", {})
         if tax_advisory.get("available"):
             for method, detail in tax_advisory["methods"].items():
@@ -668,6 +677,24 @@ def command_ledger_dividend(args, store: AssistantStore) -> None:
 
 
 def command_ledger_split(args, store: AssistantStore) -> None:
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required to reconcile fills before "
+            "recording a split."
+        )
+    policy = load_policy(args.policy)
+    order_reconciliation = reconcile_nonterminal_orders(
+        store,
+        max_order_age_minutes=policy.max_order_age_minutes,
+    )
+    if order_reconciliation.get("errors") or order_reconciliation.get(
+        "skipped_too_recent", 0
+    ):
+        raise SystemExit(
+            "Broker order reconciliation was incomplete; refusing to record "
+            "the split until every possible pre-split fill is resolved."
+        )
+    fill_sync = sync_app_fills(store)
     inserted = record_split(
         store,
         external_id=args.external_id,
@@ -682,6 +709,8 @@ def command_ledger_split(args, store: AssistantStore) -> None:
                 "external_id": args.external_id,
                 "ticker": args.ticker.upper(),
                 "action": "split",
+                "order_reconciliation": order_reconciliation,
+                "fill_sync": fill_sync,
             },
             indent=2,
             sort_keys=True,

@@ -226,7 +226,7 @@ def test_manifest_cannot_claim_unaudited_point_in_time_data():
         {"AAA": _features_frame("AAA", sessions)},
         {"AAA": _label_rows("AAA", sessions, "v1")},
     )
-    with pytest.raises(DatasetError, match="cannot claim point_in_time_data=True"):
+    with pytest.raises(DatasetError, match="cannot be asserted by the caller"):
         build_dataset_manifest(
             **_manifest_kwargs(
                 features_df, labels_df, point_in_time_data=True

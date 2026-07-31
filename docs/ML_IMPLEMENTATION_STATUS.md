@@ -19,6 +19,23 @@ The next implementation sequence is defined in
 | ML-7 | Cross-sectional ranker model/statistical-evaluation primitives | `ml/cross_sectional.py` | None |
 | ML-8 | Filing/transcript extraction contract + deterministic validator | `ml/filings.py` | None (context only) |
 | ML-LR-0 | Shared experiment identity, preregistered research gates, run records | `ml/experiment_contracts.py` | None |
+| ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
+
+ML-LR-1 makes `point_in_time_data=True` **derivable but still unreachable
+from real data**. `evaluate_point_in_time_coverage()` is now the only code
+path that can return True, and `build_dataset_manifest()` refuses a
+caller-asserted claim outright. A fixture dataset with explicit lineage does
+prove point-in-time (the milestone's definition of done); the real yfinance
+path returns `False` with the failures `missing_feature_lineage` and
+`no_universe_membership_records`, because `RetroactivelyAdjustedSource`
+deliberately returns **no** records rather than synthesizing availability
+from download time. Availability and universe sidecars now participate in
+`dataset_hash`, so swapping lineage under a dataset changes its identity.
+
+Still external, and still the blocker: an authoritative vendor providing
+real historical availability timestamps and index-constituent history. Until
+one is configured, every dataset built from live data remains exploratory
+and promotion-blocked — which is the honest state, not a gap in the code.
 
 ML-LR-0 delivers **contracts only** — no runner, no CLI, no experiment has
 been executed through them. `ExperimentSpec` can fully describe the existing

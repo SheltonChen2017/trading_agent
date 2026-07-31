@@ -264,16 +264,28 @@ def build_dataset_manifest(
     transaction_cost_bps: float,
     tax_assumptions: str,
     git_commit: str,
+    availability_df: pd.DataFrame | None = None,
+    universe_df: pd.DataFrame | None = None,
+    coverage: Any = None,
 ) -> DatasetManifest:
     """Build the DatasetManifest describing `features_df`/`labels_df` as
     they exist right now -- callers must construct this immediately before
     persisting, not lazily, so `dataset_hash` cannot drift from the frames
-    it claims to describe."""
+    it claims to describe.
+
+    `point_in_time_data` cannot be passed as True (ML-LR-1, plan 7.3: "The
+    caller must not be able to set `point_in_time_data=True` directly").
+    The only way to reach True is to supply a `coverage` result produced by
+    ml/availability.py's `evaluate_point_in_time_coverage()`, which DERIVES
+    it from actual lineage and returns the failures when it cannot.
+    """
     _require_safe_dataset_id(dataset_id)
     if point_in_time_data:
         raise DatasetError(
-            "this builder does not yet persist per-feature event_at/available_at/"
-            "observed_at lineage and therefore cannot claim point_in_time_data=True"
+            "point_in_time_data cannot be asserted by the caller; supply a "
+            "coverage result from ml.availability.evaluate_point_in_time_coverage() "
+            "so the claim is derived from real event_at/available_at/observed_at "
+            "lineage"
         )
     _require_unique_key(features_df, "features")
     _require_sorted_key(features_df, "features")
@@ -281,12 +293,36 @@ def build_dataset_manifest(
     _require_unique_key(labels_df, f"labels[{label_version}]")
     _require_sorted_key(labels_df, f"labels[{label_version}]")
     _require_label_keys_covered(features_df, labels_df, f"labels[{label_version}]")
+
+    derived_point_in_time = False
+    if coverage is not None:
+        derived_point_in_time = bool(getattr(coverage, "point_in_time_data", False))
+        if derived_point_in_time and (availability_df is None or universe_df is None):
+            # A point-in-time claim must be reproducible from persisted
+            # sidecars, not merely from a coverage object the caller
+            # computed in memory and could have fabricated.
+            raise DatasetError(
+                "a point-in-time dataset must persist its availability and "
+                "universe sidecars"
+            )
+
     sessions = features_df["as_of_session"]
     input_hashes = {
         "features": hash_bytes(_serialize_frame_to_csv_gz(features_df)),
         "labels": hash_bytes(_serialize_frame_to_csv_gz(labels_df)),
     }
+    # Sidecars participate in dataset identity (plan 7.3: "Dataset identity
+    # must change if any sidecar changes"), so swapping lineage under a
+    # dataset produces a different dataset_hash rather than a silent
+    # re-interpretation of the same one.
+    if availability_df is not None:
+        input_hashes["availability"] = hash_bytes(
+            _serialize_frame_to_csv_gz(availability_df)
+        )
+    if universe_df is not None:
+        input_hashes["universe"] = hash_bytes(_serialize_frame_to_csv_gz(universe_df))
     dataset_hash = _expected_dataset_hash(input_hashes)
+    point_in_time_data = derived_point_in_time
     return DatasetManifest(
         dataset_id=dataset_id,
         created_at=created_at,
@@ -356,10 +392,13 @@ def save_dataset(
     manifest: DatasetManifest,
     *,
     directory: Path,
+    availability_df: pd.DataFrame | None = None,
+    universe_df: pd.DataFrame | None = None,
 ) -> dict[str, str]:
-    """Atomically write features.csv.gz, labels.csv.gz, and manifest.json
-    into `directory`, all named after `manifest.dataset_id` so a directory
-    can hold more than one dataset. Returns the three file paths written."""
+    """Atomically write features.csv.gz, labels.csv.gz, the optional
+    availability/universe sidecars, and manifest.json into `directory`, all
+    named after `manifest.dataset_id` so a directory can hold more than one
+    dataset. Returns every file path written."""
     directory = Path(directory)
     _validate_manifest_frames(features_df, labels_df, manifest)
     features_bytes = _serialize_frame_to_csv_gz(features_df)
@@ -368,6 +407,18 @@ def save_dataset(
         "features": hash_bytes(features_bytes),
         "labels": hash_bytes(labels_bytes),
     }
+    sidecar_bytes: dict[str, bytes] = {}
+    for name, frame in (("availability", availability_df), ("universe", universe_df)):
+        if frame is None:
+            continue
+        data = _serialize_frame_to_csv_gz(frame)
+        sidecar_bytes[name] = data
+        actual_hashes[name] = hash_bytes(data)
+    if manifest.point_in_time_data and set(sidecar_bytes) != {"availability", "universe"}:
+        raise DatasetError(
+            "a point-in-time dataset must be saved with both its availability "
+            "and universe sidecars"
+        )
     if actual_hashes != dict(manifest.input_hashes):
         raise DatasetError(
             "manifest.input_hashes does not match the frames being saved -- "
@@ -389,14 +440,19 @@ def save_dataset(
         labels_name: labels_bytes,
         manifest_name: manifest_bytes,
     }
-    _preflight_immutable_writes(directory, payloads)
-    for filename, data in payloads.items():
-        _atomic_write_bytes(directory, filename, data)
-    return {
+    written = {
         "features": str(directory / features_name),
         "labels": str(directory / labels_name),
         "manifest": str(directory / manifest_name),
     }
+    for name, data in sidecar_bytes.items():
+        filename = f"{manifest.dataset_id}.{name}.csv.gz"
+        payloads[filename] = data
+        written[name] = str(directory / filename)
+    _preflight_immutable_writes(directory, payloads)
+    for filename, data in payloads.items():
+        _atomic_write_bytes(directory, filename, data)
+    return written
 
 
 def load_dataset(
@@ -431,6 +487,29 @@ def load_dataset(
         "features": hash_bytes(features_bytes),
         "labels": hash_bytes(labels_bytes),
     }
+    # Sidecars are verified on exactly the same footing as the primary
+    # frames: a dataset whose availability lineage was edited after the fact
+    # is no more trustworthy than one whose features were.
+    # Read and HASH every sidecar first; parse none of them yet. Parsing
+    # inside this loop would hand a tampered file to gzip/pandas before the
+    # hash comparison below could reject it -- the caller would then see a
+    # BadGzipFile traceback instead of the accurate "does not match its
+    # manifest" refusal, and integrity checking would depend on the
+    # corruption happening to be unparseable. Same bytes-before-parser
+    # ordering this function already documents for the primary frames.
+    sidecar_bytes: dict[str, bytes] = {}
+    for name in ("availability", "universe"):
+        if name not in manifest.input_hashes:
+            continue
+        path = directory / f"{dataset_id}.{name}.csv.gz"
+        if not path.exists():
+            raise DatasetError(
+                f"dataset {dataset_id!r} manifest records a {name} sidecar that is "
+                "missing on disk -- refusing to load"
+            )
+        data = path.read_bytes()
+        sidecar_bytes[name] = data
+        actual_hashes[name] = hash_bytes(data)
     if actual_hashes != dict(manifest.input_hashes):
         raise DatasetError(
             f"dataset {dataset_id!r} on disk does not match its manifest's "
@@ -440,8 +519,38 @@ def load_dataset(
         raise DatasetError(
             f"dataset {dataset_id!r} manifest has an inconsistent dataset_hash -- refusing to load"
         )
+    if manifest.point_in_time_data and set(sidecar_bytes) != {"availability", "universe"}:
+        raise DatasetError(
+            f"dataset {dataset_id!r} claims point_in_time_data but is missing "
+            "availability/universe lineage -- refusing to load"
+        )
 
     features_df = pd.read_csv(io.StringIO(gzip.decompress(features_bytes).decode("utf-8")))
     labels_df = pd.read_csv(io.StringIO(gzip.decompress(labels_bytes).decode("utf-8")))
     _validate_manifest_frames(features_df, labels_df, manifest)
     return features_df, labels_df, manifest
+
+
+def load_dataset_sidecars(
+    directory: Path, dataset_id: str
+) -> dict[str, pd.DataFrame]:
+    """Load the availability/universe sidecars, hash-verified against the
+    manifest. Separate from load_dataset() so existing three-tuple callers
+    keep working unchanged."""
+    directory = Path(directory)
+    _require_safe_dataset_id(dataset_id)
+    manifest = DatasetManifest.from_dict(
+        json.loads((directory / f"{dataset_id}.manifest.json").read_text(encoding="utf-8"))
+    )
+    frames: dict[str, pd.DataFrame] = {}
+    for name in ("availability", "universe"):
+        expected = manifest.input_hashes.get(name)
+        if expected is None:
+            continue
+        data = (directory / f"{dataset_id}.{name}.csv.gz").read_bytes()
+        if hash_bytes(data) != expected:
+            raise DatasetError(
+                f"{name} sidecar for {dataset_id!r} does not match its recorded hash"
+            )
+        frames[name] = pd.read_csv(io.StringIO(gzip.decompress(data).decode("utf-8")))
+    return frames

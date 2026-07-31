@@ -18,6 +18,15 @@ The next implementation sequence is defined in
 | ML-6 | Shadow persistence plus coverage, freshness, drift, error, and lineage reports | `ml/monitoring.py`, three `ml_*` tables + `portfolio_position_snapshots` in `assistant/storage.py` | Writes observations only when called |
 | ML-7 | Cross-sectional ranker model/statistical-evaluation primitives | `ml/cross_sectional.py` | None |
 | ML-8 | Filing/transcript extraction contract + deterministic validator | `ml/filings.py` | None (context only) |
+| ML-LR-0 | Shared experiment identity, preregistered research gates, run records | `ml/experiment_contracts.py` | None |
+
+ML-LR-0 delivers **contracts only** — no runner, no CLI, no experiment has
+been executed through them. `ExperimentSpec` can fully describe the existing
+synthetic volatility and ranker experiments (the milestone's definition of
+done), and the research gate and confirmation parent are bound into
+`spec_hash`, so moving a preregistered threshold produces a different
+experiment identity rather than silently mutating one. The runner that would
+consume these specs is ML-LR-2.
 
 Every typed prediction, risk, evaluation, extraction, and monitoring output
 carries `production_authoritative=False`, and no module

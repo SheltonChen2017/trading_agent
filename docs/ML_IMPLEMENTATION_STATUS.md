@@ -19,6 +19,25 @@ The next implementation sequence is defined in
 | ML-7 | Cross-sectional ranker model/statistical-evaluation primitives | `ml/cross_sectional.py` | None |
 | ML-8 | Filing/transcript extraction contract + deterministic validator | `ml/filings.py` | None (context only) |
 | ML-LR-0 | Shared experiment identity, preregistered research gates, run records | `ml/experiment_contracts.py` | None |
+| ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
+
+ML-LR-1 makes `point_in_time_data=True` **derivable but still unreachable
+from real data**. `evaluate_point_in_time_coverage()` is now the only code
+path that can return True, and `build_dataset_manifest()` refuses a
+caller-asserted claim outright. A fixture dataset with explicit lineage does
+prove point-in-time (the milestone's definition of done); the real yfinance
+path returns `False` with the failures `missing_feature_lineage` and
+`no_universe_membership_records`, because `RetroactivelyAdjustedSource`
+deliberately returns **no** records rather than synthesizing availability
+from download time. Availability, universe, and typed coverage evidence now
+participate in `dataset_hash`; their row counts are recorded, and the claim is
+replayed during build, save, and load. Swapping lineage, decision cutoffs, or
+feature-value bindings therefore changes identity or is refused.
+
+Still external, and still the blocker: an authoritative vendor providing
+real historical availability timestamps and index-constituent history. Until
+one is configured, every dataset built from live data remains exploratory
+and promotion-blocked — which is the honest state, not a gap in the code.
 
 ML-LR-0 delivers **contracts only** — no runner, no CLI, no experiment has
 been executed through them. `ExperimentSpec` can fully describe the existing
@@ -77,18 +96,18 @@ of that adapter.
 The table above records implemented building blocks, not a claim that every
 acceptance criterion in sections 7-12 is complete. In particular:
 
-1. **`point_in_time_data` is structurally `False`.** `ml/datasets.py`'s
-   builder *refuses* to claim `True` because no per-feature
-   `event_at`/`available_at`/`observed_at` lineage sidecar exists yet. The
-   underlying yfinance source is retroactively adjusted, so every result
-   produced today is exploratory and promotion-blocked by construction. This
-   is doc 3.4's promotion blocker, working as intended.
+1. **Real-data `point_in_time_data` remains `False`.** The builder can now
+   prove fixture data from persisted per-feature lineage, value hashes,
+   decision cutoffs, and historical membership. The configured yfinance
+   source supplies none of that authoritative history, so real results remain
+   exploratory and promotion-blocked. An authoritative vendor adapter and
+   licensed history are still external dependencies.
 
-2. **Universe survivorship bias is unresolved.** Datasets record a
-   `universe_definition` string, but a fixed current-membership universe
-   projected backward still excludes names that failed during the window.
-   Doc 11.2 permits this for exploratory work *if labeled*; it blocks
-   production-authoritative research.
+2. **Real historical universe data is unavailable.** The typed membership
+   contract and cutoff-aware validation now reject fixed current-membership
+   projections, but no configured source supplies authoritative constituent
+   history. Doc 11.2 permits current-member universes for exploratory work
+   *if labeled*; they still block production-authoritative research.
 
 3. **No model has been fit on real data and evaluated for edge.** Every test
    here verifies *software behavior* on synthetic or fixture data. Doc 19.6:

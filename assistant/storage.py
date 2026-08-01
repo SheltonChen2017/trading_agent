@@ -31,6 +31,24 @@ DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "trading_ass
 # get_execution_budget_usage), not UTC days.
 _EASTERN = ZoneInfo("America/New_York")
 
+# ML-LR-6 plan 12.2's minimum lineage. Every one of these can change WITHOUT
+# any code change -- a re-fit model, a new report, a swapped provider, an
+# edited config -- and each silently invalidates comparison against earlier
+# predictions. Requiring them by name is what forces a new epoch rather than
+# letting two systems accumulate one indistinguishable track record.
+_REQUIRED_LINEAGE_KEYS = frozenset(
+    {
+        "model_artifact_hash",
+        "evaluation_report_hash",
+        "feature_set_version",
+        "label_version",
+        "data_provider_id",
+        "configuration_hash",
+        "code_commit",
+        "schedule_version",
+    }
+)
+
 
 def _hash_payload(payload_json: str) -> str:
     return hashlib.sha256(payload_json.encode("utf-8")).hexdigest()
@@ -324,6 +342,31 @@ class AssistantStore:
                     FOREIGN KEY(model_key)
                         REFERENCES ml_model_registrations(model_key)
                 );
+                CREATE TABLE IF NOT EXISTS ml_evidence_epochs (
+                    evidence_epoch TEXT PRIMARY KEY,
+                    model_key TEXT NOT NULL,
+                    task TEXT NOT NULL,
+                    started_at TEXT NOT NULL,
+                    closed_at TEXT,
+                    status TEXT NOT NULL,
+                    lineage_json TEXT NOT NULL,
+                    lineage_hash TEXT NOT NULL,
+                    created_by TEXT NOT NULL
+                );
+                CREATE TABLE IF NOT EXISTS ml_shadow_runs (
+                    run_id TEXT PRIMARY KEY,
+                    schedule_key TEXT NOT NULL,
+                    scheduled_for TEXT NOT NULL,
+                    started_at TEXT NOT NULL,
+                    completed_at TEXT,
+                    status TEXT NOT NULL,
+                    code_commit TEXT NOT NULL,
+                    configuration_hash TEXT NOT NULL,
+                    evidence_epoch TEXT NOT NULL,
+                    prediction_count INTEGER NOT NULL,
+                    unavailable_count INTEGER NOT NULL,
+                    error_json TEXT
+                );
                 CREATE TABLE IF NOT EXISTS ml_prediction_outcomes (
                     prediction_id TEXT PRIMARY KEY,
                     matured_at TEXT NOT NULL,
@@ -368,6 +411,20 @@ class AssistantStore:
                     );
                 CREATE INDEX IF NOT EXISTS idx_position_snapshot_account_date
                     ON portfolio_position_snapshots(account_key, session_date);
+                -- At most ONE active epoch per (model_key, task). A second
+                -- active epoch would let predictions from two different
+                -- systems accumulate under one banner, which is exactly the
+                -- pooling doc 10.2 forbids.
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_ml_epoch_one_active
+                    ON ml_evidence_epochs(model_key, task)
+                    WHERE status = 'active';
+                -- An exact retry of a scheduled run is idempotent; two
+                -- concurrent runners cannot both create evidence for the
+                -- same slot.
+                CREATE UNIQUE INDEX IF NOT EXISTS idx_ml_shadow_run_slot
+                    ON ml_shadow_runs(schedule_key, scheduled_for);
+                CREATE INDEX IF NOT EXISTS idx_ml_shadow_runs_epoch
+                    ON ml_shadow_runs(evidence_epoch, scheduled_for);
                 CREATE INDEX IF NOT EXISTS idx_ml_predictions_model_session
                     ON ml_predictions(model_key, as_of_session);
                 CREATE UNIQUE INDEX IF NOT EXISTS idx_ml_predictions_identity
@@ -495,6 +552,18 @@ class AssistantStore:
             connection.execute(
                 "ALTER TABLE ml_predictions ADD COLUMN target_available_at TEXT"
             )
+        # ML-LR-6 (plan 12.2): nullable so databases written before the
+        # shadow runtime existed still load. Legacy rows keep NULL and are
+        # therefore visibly outside every epoch -- which is correct, since
+        # their lineage was never recorded and cannot be reconstructed.
+        # Scheduled predictions written from now on require both, enforced
+        # in record_ml_prediction() rather than by a NOT NULL constraint
+        # that would break the existing rows.
+        for column in ("evidence_epoch", "shadow_run_id"):
+            if column not in columns:
+                connection.execute(
+                    f"ALTER TABLE ml_predictions ADD COLUMN {column} TEXT"
+                )
 
     def _migrate_decision_packet_identity(self, connection: sqlite3.Connection) -> None:
         """`generated_at` alone conflates different serialized payloads
@@ -877,6 +946,322 @@ class AssistantStore:
             "status": row["status"],
         }
 
+    def open_ml_evidence_epoch(
+        self,
+        *,
+        evidence_epoch: str,
+        model_key: str,
+        task: str,
+        lineage: dict[str, Any],
+        created_by: str,
+        started_at: str | None = None,
+    ) -> dict[str, Any]:
+        """Open one active evidence epoch for (model_key, task) (plan 12.2).
+
+        `lineage` fingerprints the whole system that produced the evidence:
+        model artifact, evaluation report, feature/label versions, data
+        provider, configuration, code commit, schedule version. Any change
+        starts a NEW epoch, because pooling predictions from two different
+        systems into one track record produces a number that describes
+        neither.
+
+        The partial unique index makes a second active epoch impossible at
+        the database level rather than by convention.
+        """
+        for name, value in (
+            ("evidence_epoch", evidence_epoch), ("model_key", model_key),
+            ("task", task), ("created_by", created_by),
+        ):
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{name} must be a non-empty string")
+        if not isinstance(lineage, dict) or not lineage:
+            raise ValueError("lineage must be a non-empty dictionary")
+        missing = sorted(_REQUIRED_LINEAGE_KEYS - set(lineage))
+        if missing:
+            raise ValueError(f"lineage is missing required key(s): {missing}")
+        lineage_json = _canonical_ml_json(lineage, "lineage")
+        lineage_hash = _hash_payload(lineage_json)
+        timestamp = _parse_aware_timestamp(
+            started_at or datetime.now(timezone.utc).isoformat(), "started_at"
+        ).isoformat()
+
+        with self._connect() as connection:
+            existing = connection.execute(
+                "SELECT * FROM ml_evidence_epochs WHERE evidence_epoch = ?",
+                (evidence_epoch,),
+            ).fetchone()
+            if existing is not None:
+                if existing["lineage_hash"] != lineage_hash:
+                    raise ValueError(
+                        f"evidence epoch {evidence_epoch!r} already exists with "
+                        "different lineage; a lineage change requires a NEW epoch"
+                    )
+                return self._ml_epoch_row_to_dict(existing)
+            active = connection.execute(
+                "SELECT evidence_epoch, lineage_hash FROM ml_evidence_epochs "
+                "WHERE model_key = ? AND task = ? AND status = 'active'",
+                (model_key, task),
+            ).fetchone()
+            if active is not None:
+                raise ValueError(
+                    f"{model_key!r}/{task!r} already has active epoch "
+                    f"{active['evidence_epoch']!r}; close it before opening another "
+                    "so evidence from two systems is never pooled"
+                )
+            connection.execute(
+                """
+                INSERT INTO ml_evidence_epochs(
+                    evidence_epoch, model_key, task, started_at, closed_at,
+                    status, lineage_json, lineage_hash, created_by
+                ) VALUES (?, ?, ?, ?, NULL, 'active', ?, ?, ?)
+                """,
+                (
+                    evidence_epoch, model_key, task, timestamp,
+                    lineage_json, lineage_hash, created_by,
+                ),
+            )
+            row = connection.execute(
+                "SELECT * FROM ml_evidence_epochs WHERE evidence_epoch = ?",
+                (evidence_epoch,),
+            ).fetchone()
+        return self._ml_epoch_row_to_dict(row)
+
+    def close_ml_evidence_epoch(
+        self, evidence_epoch: str, *, closed_at: str | None = None
+    ) -> dict[str, Any]:
+        timestamp = _parse_aware_timestamp(
+            closed_at or datetime.now(timezone.utc).isoformat(), "closed_at"
+        ).isoformat()
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM ml_evidence_epochs WHERE evidence_epoch = ?",
+                (evidence_epoch,),
+            ).fetchone()
+            if row is None:
+                raise ValueError(f"no evidence epoch {evidence_epoch!r}")
+            if row["status"] != "active":
+                return self._ml_epoch_row_to_dict(row)
+            if timestamp < row["started_at"]:
+                raise ValueError("closed_at must not precede started_at")
+            connection.execute(
+                "UPDATE ml_evidence_epochs SET status = 'closed', closed_at = ? "
+                "WHERE evidence_epoch = ? AND status = 'active'",
+                (timestamp, evidence_epoch),
+            )
+            row = connection.execute(
+                "SELECT * FROM ml_evidence_epochs WHERE evidence_epoch = ?",
+                (evidence_epoch,),
+            ).fetchone()
+        return self._ml_epoch_row_to_dict(row)
+
+    @staticmethod
+    def _ml_epoch_row_to_dict(row: Any) -> dict[str, Any]:
+        return {
+            "evidence_epoch": row["evidence_epoch"],
+            "model_key": row["model_key"],
+            "task": row["task"],
+            "started_at": row["started_at"],
+            "closed_at": row["closed_at"],
+            "status": row["status"],
+            "lineage": json.loads(row["lineage_json"]),
+            "lineage_hash": row["lineage_hash"],
+            "created_by": row["created_by"],
+        }
+
+    def get_active_ml_evidence_epoch(
+        self, model_key: str, task: str
+    ) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM ml_evidence_epochs WHERE model_key = ? AND task = ? "
+                "AND status = 'active' LIMIT 1",
+                (model_key, task),
+            ).fetchone()
+        return self._ml_epoch_row_to_dict(row) if row is not None else None
+
+    def list_ml_evidence_epochs(self, *, limit: int = 1000) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT * FROM ml_evidence_epochs ORDER BY started_at ASC LIMIT ?",
+                (limit,),
+            ).fetchall()
+        return [self._ml_epoch_row_to_dict(row) for row in rows]
+
+    def claim_ml_shadow_run(
+        self,
+        *,
+        schedule_key: str,
+        scheduled_for: str,
+        evidence_epoch: str,
+        code_commit: str,
+        configuration_hash: str,
+        started_at: str | None = None,
+    ) -> dict[str, Any]:
+        """Transactionally claim one scheduled slot (plan 12.3 step 1).
+
+        The unique index on (schedule_key, scheduled_for) is what makes this
+        safe: two concurrent runners race on the INSERT and exactly one wins.
+        The loser gets the winner's row back rather than an exception, so an
+        exact retry is idempotent -- but a retry whose CONFIGURATION differs
+        is loud, because that is a different experiment wearing the same
+        slot's name.
+        """
+        for name, value in (
+            ("schedule_key", schedule_key), ("evidence_epoch", evidence_epoch),
+            ("code_commit", code_commit), ("configuration_hash", configuration_hash),
+        ):
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{name} must be a non-empty string")
+        _parse_aware_timestamp(scheduled_for, "scheduled_for")
+        timestamp = _parse_aware_timestamp(
+            started_at or datetime.now(timezone.utc).isoformat(), "started_at"
+        ).isoformat()
+        run_id = "mlrun-" + _hash_payload(
+            _canonical_ml_json(
+                {"schedule_key": schedule_key, "scheduled_for": scheduled_for},
+                "run identity",
+            )
+        )[:24]
+
+        with self._connect() as connection:
+            epoch = connection.execute(
+                "SELECT status FROM ml_evidence_epochs WHERE evidence_epoch = ?",
+                (evidence_epoch,),
+            ).fetchone()
+            if epoch is None:
+                raise ValueError(
+                    f"evidence epoch {evidence_epoch!r} does not exist; a shadow run "
+                    "cannot create evidence outside a registered epoch"
+                )
+            if epoch["status"] != "active":
+                raise ValueError(
+                    f"evidence epoch {evidence_epoch!r} is {epoch['status']}; a closed "
+                    "epoch cannot accept new predictions"
+                )
+            connection.execute(
+                """
+                INSERT INTO ml_shadow_runs(
+                    run_id, schedule_key, scheduled_for, started_at, completed_at,
+                    status, code_commit, configuration_hash, evidence_epoch,
+                    prediction_count, unavailable_count, error_json
+                ) VALUES (?, ?, ?, ?, NULL, 'claimed', ?, ?, ?, 0, 0, NULL)
+                ON CONFLICT(schedule_key, scheduled_for) DO NOTHING
+                """,
+                (
+                    run_id, schedule_key, scheduled_for, timestamp,
+                    code_commit, configuration_hash, evidence_epoch,
+                ),
+            )
+            row = connection.execute(
+                "SELECT * FROM ml_shadow_runs WHERE schedule_key = ? AND scheduled_for = ?",
+                (schedule_key, scheduled_for),
+            ).fetchone()
+            if row["configuration_hash"] != configuration_hash:
+                raise ValueError(
+                    f"scheduled slot {schedule_key!r}@{scheduled_for!r} already ran with "
+                    "a different configuration_hash; a changed configuration is a "
+                    "different experiment and requires a new schedule or epoch"
+                )
+            if row["evidence_epoch"] != evidence_epoch:
+                raise ValueError(
+                    f"scheduled slot {schedule_key!r}@{scheduled_for!r} belongs to epoch "
+                    f"{row['evidence_epoch']!r}, not {evidence_epoch!r}"
+                )
+        return self._ml_shadow_run_row_to_dict(row)
+
+    def complete_ml_shadow_run(
+        self,
+        run_id: str,
+        *,
+        status: str,
+        prediction_count: int,
+        unavailable_count: int,
+        error: dict[str, Any] | None = None,
+        completed_at: str | None = None,
+    ) -> dict[str, Any]:
+        """Close a run with durable counts and errors (plan 12.3 step 6)."""
+        if status not in ("completed", "failed"):
+            raise ValueError("shadow run status must be 'completed' or 'failed'")
+        for name, value in (
+            ("prediction_count", prediction_count),
+            ("unavailable_count", unavailable_count),
+        ):
+            if isinstance(value, bool) or not isinstance(value, int) or value < 0:
+                raise ValueError(f"{name} must be a non-negative integer")
+        timestamp = _parse_aware_timestamp(
+            completed_at or datetime.now(timezone.utc).isoformat(), "completed_at"
+        ).isoformat()
+        error_json = (
+            _canonical_ml_json(error, "error") if error is not None else None
+        )
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM ml_shadow_runs WHERE run_id = ?", (run_id,)
+            ).fetchone()
+            if row is None:
+                raise ValueError(f"no shadow run {run_id!r}")
+            if row["status"] != "claimed":
+                # Already closed. Idempotent for an exact repeat, loud for a
+                # different result, so a crash-resume cannot silently rewrite
+                # a completed run's counts.
+                if (
+                    row["status"] == status
+                    and row["prediction_count"] == prediction_count
+                    and row["unavailable_count"] == unavailable_count
+                ):
+                    return self._ml_shadow_run_row_to_dict(row)
+                raise ValueError(
+                    f"shadow run {run_id!r} is already {row['status']} with different "
+                    "counts; refusing to rewrite a closed run"
+                )
+            connection.execute(
+                "UPDATE ml_shadow_runs SET status = ?, completed_at = ?, "
+                "prediction_count = ?, unavailable_count = ?, error_json = ? "
+                "WHERE run_id = ? AND status = 'claimed'",
+                (
+                    status, timestamp, prediction_count, unavailable_count,
+                    error_json, run_id,
+                ),
+            )
+            row = connection.execute(
+                "SELECT * FROM ml_shadow_runs WHERE run_id = ?", (run_id,)
+            ).fetchone()
+        return self._ml_shadow_run_row_to_dict(row)
+
+    @staticmethod
+    def _ml_shadow_run_row_to_dict(row: Any) -> dict[str, Any]:
+        return {
+            "run_id": row["run_id"],
+            "schedule_key": row["schedule_key"],
+            "scheduled_for": row["scheduled_for"],
+            "started_at": row["started_at"],
+            "completed_at": row["completed_at"],
+            "status": row["status"],
+            "code_commit": row["code_commit"],
+            "configuration_hash": row["configuration_hash"],
+            "evidence_epoch": row["evidence_epoch"],
+            "prediction_count": row["prediction_count"],
+            "unavailable_count": row["unavailable_count"],
+            "error": json.loads(row["error_json"]) if row["error_json"] else None,
+        }
+
+    def list_ml_shadow_runs(
+        self, *, schedule_key: str | None = None, limit: int = 1000
+    ) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            if schedule_key is not None:
+                rows = connection.execute(
+                    "SELECT * FROM ml_shadow_runs WHERE schedule_key = ? "
+                    "ORDER BY scheduled_for ASC LIMIT ?",
+                    (schedule_key, limit),
+                ).fetchall()
+            else:
+                rows = connection.execute(
+                    "SELECT * FROM ml_shadow_runs ORDER BY scheduled_for ASC LIMIT ?",
+                    (limit,),
+                ).fetchall()
+        return [self._ml_shadow_run_row_to_dict(row) for row in rows]
+
     def record_ml_prediction(self, prediction: dict[str, Any]) -> dict[str, Any]:
         """Append one shadow prediction, idempotently (doc 10.2).
 
@@ -909,6 +1294,18 @@ class AssistantStore:
         for name in ("model_key", "task", "subject_key"):
             if not isinstance(prediction[name], str) or not prediction[name].strip():
                 raise ValueError(f"prediction.{name} must be a non-empty string")
+        # ML-LR-6 (plan 12.2): both are nullable in the schema so pre-shadow
+        # rows still load, but a prediction that names EITHER must name BOTH
+        # and they must agree with a real, active run. A prediction carrying
+        # an epoch but no run cannot be traced to the schedule that produced
+        # it, which is precisely the lineage the epoch is supposed to give.
+        epoch = prediction.get("evidence_epoch")
+        shadow_run_id = prediction.get("shadow_run_id")
+        if (epoch is None) != (shadow_run_id is None):
+            raise ValueError(
+                "evidence_epoch and shadow_run_id must be supplied together; a "
+                "prediction inside an epoch must be traceable to the run that made it"
+            )
         as_of = _parse_session_date(prediction["as_of_session"], "as_of_session")
         generated_at = _parse_aware_timestamp(prediction["generated_at"], "generated_at")
         target_available_at = _parse_aware_timestamp(
@@ -1003,8 +1400,9 @@ class AssistantStore:
                 INSERT INTO ml_predictions(
                     prediction_id, model_key, task, subject_key, as_of_session,
                     generated_at, horizon_sessions, target_available_at, feature_snapshot_hash,
-                    prediction_json, prediction_hash, available, refusal_reasons_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    prediction_json, prediction_hash, available, refusal_reasons_json,
+                    evidence_epoch, shadow_run_id
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT DO NOTHING
                 """,
                 (
@@ -1021,6 +1419,8 @@ class AssistantStore:
                     prediction_hash,
                     1 if available else 0,
                     json.dumps(refusal_reasons, sort_keys=True, separators=(",", ":")),
+                    epoch,
+                    shadow_run_id,
                 ),
             )
             row = connection.execute(
@@ -1064,24 +1464,42 @@ class AssistantStore:
             "prediction_hash": row["prediction_hash"],
             "available": bool(row["available"]),
             "refusal_reasons": json.loads(row["refusal_reasons_json"]),
+            # NULL for pre-shadow rows, which is the honest answer: their
+            # lineage was never recorded and cannot be reconstructed.
+            "evidence_epoch": row["evidence_epoch"],
+            "shadow_run_id": row["shadow_run_id"],
         }
 
     def list_ml_predictions(
-        self, *, model_key: str | None = None, limit: int = 10_000
+        self,
+        *,
+        model_key: str | None = None,
+        evidence_epoch: str | None = None,
+        limit: int = 10_000,
     ) -> list[dict[str, Any]]:
+        """List predictions, optionally scoped to ONE evidence epoch.
+
+        Plan 12.2: "Do not pool across epochs." Any monitoring or scoring
+        caller should pass `evidence_epoch`, because a track record spanning
+        a model or provider change describes neither system. The unscoped
+        form remains available for inventory and debugging, where seeing
+        everything is the point.
+        """
+        clauses: list[str] = []
+        params: list[Any] = []
+        if model_key is not None:
+            clauses.append("model_key = ?")
+            params.append(model_key)
+        if evidence_epoch is not None:
+            clauses.append("evidence_epoch = ?")
+            params.append(evidence_epoch)
+        query = "SELECT * FROM ml_predictions"
+        if clauses:
+            query += " WHERE " + " AND ".join(clauses)
+        query += " ORDER BY as_of_session ASC, subject_key ASC LIMIT ?"
+        params.append(limit)
         with self._connect() as connection:
-            if model_key is not None:
-                rows = connection.execute(
-                    "SELECT * FROM ml_predictions WHERE model_key = ? "
-                    "ORDER BY as_of_session ASC, subject_key ASC LIMIT ?",
-                    (model_key, limit),
-                ).fetchall()
-            else:
-                rows = connection.execute(
-                    "SELECT * FROM ml_predictions "
-                    "ORDER BY as_of_session ASC, subject_key ASC LIMIT ?",
-                    (limit,),
-                ).fetchall()
+            rows = connection.execute(query, tuple(params)).fetchall()
         return [self._ml_prediction_row_to_dict(row) for row in rows]
 
     def record_ml_prediction_outcome(

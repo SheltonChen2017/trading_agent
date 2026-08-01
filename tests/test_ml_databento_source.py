@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -49,9 +50,23 @@ def _request() -> DailyBarsRequest:
 class _FakeStore:
     def __init__(self, frame: pd.DataFrame):
         self.frame = frame
+        self._data_source = _FakeDataSource()
 
     def to_df(self, **_kwargs):
         return self.frame.copy()
+
+
+class _FakeReader:
+    def __init__(self):
+        self.closed = False
+
+    def close(self):
+        self.closed = True
+
+
+class _FakeDataSource:
+    def __init__(self):
+        self.reader = _FakeReader()
 
 
 class _FakeMetadata:
@@ -71,11 +86,13 @@ class _FakeTimeseries:
     def __init__(self, frame: pd.DataFrame):
         self.frame = frame
         self.calls = []
+        self.store = None
 
     def get_range(self, **kwargs):
         self.calls.append(kwargs)
         Path(kwargs["path"]).write_bytes(b"immutable-dbn-fixture")
-        return _FakeStore(self.frame)
+        self.store = _FakeStore(self.frame)
+        return self.store
 
 
 class _FakeClient:
@@ -166,6 +183,7 @@ def test_snapshot_is_immutable_hash_bound_and_fail_closed(tmp_path):
     assert manifest["adjustment_status"] == "unadjusted"
     assert len(manifest["raw_sha256"]) == 64
     assert "receipt/publication" in manifest["limitation"]
+    assert client.timeseries.store._data_source.reader.closed
 
     with pytest.raises(DatabentoSourceError, match="overwrite"):
         fetch_daily_bars_snapshot(
@@ -175,6 +193,26 @@ def test_snapshot_is_immutable_hash_bound_and_fail_closed(tmp_path):
             client=client,
             observed_at="2026-08-01T12:00:00+00:00",
         )
+
+
+def test_snapshot_releases_dbn_file_before_atomic_move(tmp_path, monkeypatch):
+    client = _FakeClient(_raw_frame(), cost=0.01)
+    real_replace = os.replace
+
+    def guarded_replace(source, destination):
+        if str(source).endswith(".dbn.tmp"):
+            assert client.timeseries.store._data_source.reader.closed
+        return real_replace(source, destination)
+
+    monkeypatch.setattr("ml.databento_source.os.replace", guarded_replace)
+    snapshot = fetch_daily_bars_snapshot(
+        _request(),
+        directory=tmp_path,
+        max_cost_usd=0.10,
+        client=client,
+        observed_at="2026-08-01T12:00:00+00:00",
+    )
+    assert snapshot.raw_path.is_file()
 
 
 def test_ohlcv_only_source_cannot_fabricate_point_in_time_lineage():

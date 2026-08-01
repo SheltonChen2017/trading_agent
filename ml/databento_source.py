@@ -349,6 +349,24 @@ def _atomic_write(path: Path, data: bytes) -> None:
         raise
 
 
+def _close_dbn_store(store: Any) -> None:
+    """Release a file-backed DBNStore before moving its source on Windows.
+
+    Databento 0.81.0 exposes the underlying reader but does not give DBNStore
+    a close method or context-manager protocol.  ``get_range(path=...)``
+    returns a store whose FileDataSource keeps that path open after ``to_df``.
+    Closing the data-source reader is therefore required before an atomic
+    rename (and before best-effort cleanup on an error path).
+    """
+    if store is None:
+        return
+    data_source = getattr(store, "_data_source", None)
+    reader = getattr(data_source, "reader", None)
+    close = getattr(reader, "close", None)
+    if callable(close):
+        close()
+
+
 def fetch_daily_bars_snapshot(
     request: DailyBarsRequest,
     *,
@@ -392,6 +410,7 @@ def fetch_daily_bars_snapshot(
     temporary_raw = Path(temporary_name)
     # The Databento client requires a non-existent destination path.
     temporary_raw.unlink()
+    store = None
     try:
         try:
             store = active_client.timeseries.get_range(
@@ -404,6 +423,8 @@ def fetch_daily_bars_snapshot(
         if not temporary_raw.is_file() or temporary_raw.stat().st_size <= 0:
             raise DatabentoSourceError("Databento did not write a non-empty DBN snapshot")
         frames = normalize_daily_bars(store, request)
+        _close_dbn_store(store)
+        store = None
         raw_bytes = temporary_raw.read_bytes()
         normalized = _normalized_material(frames)
         manifest = {
@@ -449,7 +470,10 @@ def fetch_daily_bars_snapshot(
             manifest_path=manifest_path,
         )
     finally:
-        temporary_raw.unlink(missing_ok=True)
+        try:
+            _close_dbn_store(store)
+        finally:
+            temporary_raw.unlink(missing_ok=True)
 
 
 class DatabentoDailyBarsSource:

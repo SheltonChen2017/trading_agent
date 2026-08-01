@@ -33,6 +33,7 @@ from ml.availability import (
     UniverseMembershipRecord,
 )
 from ml.hashing import canonical_json, hash_bytes, hash_payload
+from ml.shadow import trading_sessions
 
 DATABENTO_API_KEY_ENV = "DATABENTO_API_KEY"
 DEFAULT_DATASET = "EQUS.SUMMARY"
@@ -45,6 +46,19 @@ _REQUIRED_BAR_COLUMNS = ("open", "high", "low", "close", "volume", "symbol")
 
 class DatabentoSourceError(ValueError):
     """A Databento request or returned snapshot is unsafe to use."""
+
+
+class DatabentoSnapshotRetainedError(DatabentoSourceError):
+    """Validation rejected a snapshot that was already downloaded and paid for.
+
+    Distinct from the base error so a caller can tell "nothing was purchased"
+    apart from "the bytes are on disk and re-downloading would bill again".
+    """
+
+    def __init__(self, message: str, *, raw_path: Path, manifest_path: Path) -> None:
+        super().__init__(message)
+        self.raw_path = raw_path
+        self.manifest_path = manifest_path
 
 
 class _MetadataClient(Protocol):
@@ -173,10 +187,31 @@ class DailyBarsSnapshot:
     manifest: Mapping[str, Any]
     raw_path: Path
     manifest_path: Path
+    refusals: tuple[Mapping[str, str], ...] = ()
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "frames", MappingProxyType(dict(self.frames)))
         object.__setattr__(self, "manifest", MappingProxyType(dict(self.manifest)))
+        object.__setattr__(self, "refusals", tuple(self.refusals))
+
+
+def databento_source_version() -> str:
+    """The client version that actually produced a snapshot.
+
+    Derived rather than hard-coded: a manifest is immutable and hash-bound,
+    so a stale literal would permanently assert a provenance that never
+    happened. When the package is absent the snapshot did not come from the
+    real client, and the manifest says exactly that instead of naming a
+    version nothing here can confirm.
+    """
+    try:
+        import databento
+    except ImportError:
+        return "databento-python-not-installed"
+    version = getattr(databento, "__version__", None)
+    if not isinstance(version, str) or not version.strip():
+        return "databento-python-unknown-version"
+    return f"databento-python-{version.strip()}"
 
 
 def databento_is_configured(environ: Mapping[str, str] | None = None) -> bool:
@@ -217,9 +252,33 @@ def estimate_daily_bars_cost(
     return value
 
 
+@dataclasses.dataclass(frozen=True)
+class NormalizedBars:
+    """Accepted bars plus every row this adapter refused, and why.
+
+    Refusals are returned rather than raised because a legitimate market
+    condition -- a halted name with no volume, a ticker that had not listed
+    yet, a delisted ticker with no bars in the window -- must not discard an
+    entire paid multi-ticker download.  Structural problems (a response that
+    is not what was requested) still raise, because salvaging those would be
+    guessing.
+    """
+
+    frames: Mapping[str, pd.DataFrame]
+    refusals: tuple[Mapping[str, str], ...]
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "frames", MappingProxyType(dict(self.frames)))
+        object.__setattr__(self, "refusals", tuple(self.refusals))
+
+
+def _refusal(ticker: str, session: str, reason: str) -> dict[str, str]:
+    return {"ticker": ticker, "session": session, "reason": reason}
+
+
 def _normalize_daily_frame(
     raw: pd.DataFrame, request: DailyBarsRequest
-) -> dict[str, pd.DataFrame]:
+) -> NormalizedBars:
     if not isinstance(raw, pd.DataFrame) or raw.empty:
         raise DatabentoSourceError("Databento returned no daily bars")
     missing = [name for name in _REQUIRED_BAR_COLUMNS if name not in raw.columns]
@@ -248,11 +307,29 @@ def _normalize_daily_frame(
             f"Databento returned unrequested symbols: {unknown}"
         )
 
+    # Resolved once for the whole request rather than per row: the NYSE
+    # calendar is the authority on what a US-equity daily bar may be dated,
+    # and a bar dated outside it is the signature of a timestamp-convention
+    # error in the block above, not of bad market data.
+    sessions = set(
+        trading_sessions(
+            date.fromisoformat(request.start),
+            date.fromisoformat(request.end),
+        )
+    )
+
     frames: dict[str, pd.DataFrame] = {}
+    refusals: list[Mapping[str, str]] = []
     for ticker in request.tickers:
         frame = working.loc[working["symbol"] == ticker].drop(columns="symbol")
         if frame.empty:
-            raise DatabentoSourceError(f"Databento omitted requested ticker {ticker!r}")
+            # A ticker can legitimately have no bars in the window: it had not
+            # listed yet, or it was already delisted. Refusing the request
+            # would make survivorship-aware universes impossible to fetch.
+            refusals.append(
+                _refusal(ticker, "", "no bars returned for this ticker in the window")
+            )
+            continue
         if frame.index.has_duplicates:
             raise DatabentoSourceError(
                 f"Databento returned duplicate daily bars for {ticker!r}"
@@ -266,46 +343,92 @@ def _normalize_daily_frame(
             )
         for column in ("open", "high", "low", "close", "volume"):
             frame[column] = pd.to_numeric(frame[column], errors="coerce")
-        numeric = frame.loc[:, ["open", "high", "low", "close", "volume"]]
-        finite = numeric.apply(lambda column: column.map(math.isfinite)).all().all()
-        if not finite or (numeric <= 0).any().any():
-            raise DatabentoSourceError(
-                f"Databento returned non-positive or non-finite bars for {ticker!r}"
+
+        keep: list[bool] = []
+        for timestamp, row in frame.iterrows():
+            session = timestamp.date()
+            session_text = session.isoformat()
+            reason: str | None = None
+            prices = [row["open"], row["high"], row["low"], row["close"]]
+            volume = row["volume"]
+            if session not in sessions:
+                reason = "bar is not dated on an NYSE trading session"
+            elif any(
+                not isinstance(value, (int, float))
+                or isinstance(value, bool)
+                or not math.isfinite(float(value))
+                for value in prices
+            ):
+                reason = "non-finite price"
+            elif any(float(value) <= 0 for value in prices):
+                # Zero is invalid for a price but valid for volume, so the two
+                # are deliberately not checked together.
+                reason = "non-positive price"
+            elif (
+                not isinstance(volume, (int, float))
+                or isinstance(volume, bool)
+                or not math.isfinite(float(volume))
+            ):
+                reason = "non-finite volume"
+            elif float(volume) < 0:
+                reason = "negative volume"
+            elif float(volume) % 1 != 0:
+                reason = "non-integral volume"
+            elif float(row["high"]) < max(
+                float(row["open"]), float(row["low"]), float(row["close"])
+            ) or float(row["low"]) > min(
+                float(row["open"]), float(row["high"]), float(row["close"])
+            ):
+                reason = "internally inconsistent OHLC values"
+            if reason is None:
+                keep.append(True)
+            else:
+                keep.append(False)
+                refusals.append(_refusal(ticker, session_text, reason))
+
+        frame = frame.loc[pd.Series(keep, index=frame.index)]
+        if frame.empty:
+            refusals.append(
+                _refusal(ticker, "", "every returned bar for this ticker was refused")
             )
-        if (
-            (frame["high"] < frame[["open", "low", "close"]].max(axis=1)).any()
-            or (frame["low"] > frame[["open", "high", "close"]].min(axis=1)).any()
-        ):
-            raise DatabentoSourceError(
-                f"Databento returned internally inconsistent OHLC values for {ticker!r}"
-            )
-        volumes = frame["volume"]
-        if ((volumes % 1) != 0).any():
-            raise DatabentoSourceError(
-                f"Databento returned non-integral volume for {ticker!r}"
-            )
-        frame["volume"] = volumes.astype("int64")
+            continue
+        frame["volume"] = frame["volume"].astype("int64")
         frames[ticker] = frame
-    return frames
+
+    if not frames:
+        raise DatabentoSourceError(
+            "no requested ticker produced a usable bar; refusals: "
+            f"{[dict(item) for item in refusals[:10]]}"
+        )
+    return NormalizedBars(frames=frames, refusals=tuple(refusals))
+
+
+def _materialize_frame(store_or_frame: Any) -> pd.DataFrame:
+    """Read the response into pandas.
+
+    Separate from validation because a file-backed ``DBNStore`` holds its
+    source path open: the frame must be materialized while the temporary
+    file still exists, but validation must happen only after that file has
+    been moved to its permanent, already-paid-for location.
+    """
+    if isinstance(store_or_frame, pd.DataFrame):
+        return store_or_frame
+    converter = getattr(store_or_frame, "to_df", None)
+    if not callable(converter):
+        raise DatabentoSourceError("Databento response cannot be converted to pandas")
+    try:
+        return converter(price_type="float", pretty_ts=True, map_symbols=True)
+    except Exception as exc:
+        raise DatabentoSourceError(
+            f"Databento DBN conversion failed: {type(exc).__name__}: {exc}"
+        ) from exc
 
 
 def normalize_daily_bars(
     store_or_frame: Any, request: DailyBarsRequest
-) -> dict[str, pd.DataFrame]:
+) -> NormalizedBars:
     """Normalize an official ``DBNStore`` (or a test DataFrame) into frames."""
-    if isinstance(store_or_frame, pd.DataFrame):
-        raw = store_or_frame
-    else:
-        converter = getattr(store_or_frame, "to_df", None)
-        if not callable(converter):
-            raise DatabentoSourceError("Databento response cannot be converted to pandas")
-        try:
-            raw = converter(price_type="float", pretty_ts=True, map_symbols=True)
-        except Exception as exc:
-            raise DatabentoSourceError(
-                f"Databento DBN conversion failed: {type(exc).__name__}: {exc}"
-            ) from exc
-    return _normalize_daily_frame(raw, request)
+    return _normalize_daily_frame(_materialize_frame(store_or_frame), request)
 
 
 def _normalized_material(frames: Mapping[str, pd.DataFrame]) -> list[dict[str, Any]]:
@@ -422,58 +545,108 @@ def fetch_daily_bars_snapshot(
             ) from exc
         if not temporary_raw.is_file() or temporary_raw.stat().st_size <= 0:
             raise DatabentoSourceError("Databento did not write a non-empty DBN snapshot")
-        frames = normalize_daily_bars(store, request)
+        # Materialize while the store's backing file still exists, then close
+        # it so the move below can succeed on Windows.
+        raw_frame = _materialize_frame(store)
         _close_dbn_store(store)
         store = None
         raw_bytes = temporary_raw.read_bytes()
-        normalized = _normalized_material(frames)
-        manifest = {
-            "schema_version": SNAPSHOT_SCHEMA_VERSION,
-            "source_id": SOURCE_ID,
-            "source_version": "databento-python-0.81.0",
-            "request": request.to_dict(),
-            "request_hash": request.request_hash,
-            "observed_at": observed,
-            "estimated_cost_usd": estimate,
-            "raw_filename": raw_path.name,
-            "raw_sha256": hash_bytes(raw_bytes),
-            "normalized_sha256": hash_bytes(
-                canonical_json(normalized).encode("utf-8")
-            ),
-            "row_count": len(normalized),
-            "session_count": len({row["session"] for row in normalized}),
-            "point_in_time_data": False,
-            "provides_point_in_time_lineage": False,
-            "adjustment_status": "unadjusted",
-            "limitation": (
-                "EQUS.SUMMARY OHLCV-1d records identify the UTC aggregation "
-                "interval but do not carry the per-record receipt/publication "
-                "timestamp required for historical availability lineage. The "
-                "bars are also unadjusted. Receipt-timestamped statistics plus "
-                "point-in-time adjustment and security-master evidence are "
-                "required before this snapshot can pass the promotion gate."
-            ),
-        }
-        manifest_bytes = canonical_json(manifest).encode("utf-8")
         if raw_path.exists() or manifest_path.exists():
             raise DatabentoSourceError("refusing to overwrite an immutable snapshot")
+        # The download is billable and has already been paid for. Preserve it
+        # BEFORE validating, so that a rejected snapshot costs the operator a
+        # retry of the parsing step rather than a second purchase.
         os.replace(temporary_raw, raw_path)
-        try:
-            _atomic_write(manifest_path, manifest_bytes)
-        except BaseException:
-            raw_path.unlink(missing_ok=True)
-            raise
-        return DailyBarsSnapshot(
-            frames=frames,
-            manifest=manifest,
-            raw_path=raw_path,
-            manifest_path=manifest_path,
-        )
     finally:
         try:
             _close_dbn_store(store)
         finally:
             temporary_raw.unlink(missing_ok=True)
+
+    base_manifest = {
+        "schema_version": SNAPSHOT_SCHEMA_VERSION,
+        "source_id": SOURCE_ID,
+        "source_version": databento_source_version(),
+        "request": request.to_dict(),
+        "request_hash": request.request_hash,
+        "observed_at": observed,
+        "estimated_cost_usd": estimate,
+        "raw_filename": raw_path.name,
+        "raw_sha256": hash_bytes(raw_bytes),
+        "point_in_time_data": False,
+        "provides_point_in_time_lineage": False,
+        "adjustment_status": "unadjusted",
+        "limitation": (
+            "EQUS.SUMMARY OHLCV-1d records identify the UTC aggregation "
+            "interval but do not carry the per-record receipt/publication "
+            "timestamp required for historical availability lineage. The "
+            "bars are also unadjusted. Receipt-timestamped statistics plus "
+            "point-in-time adjustment and security-master evidence are "
+            "required before this snapshot can pass the promotion gate."
+        ),
+    }
+
+    try:
+        normalized_bars = _normalize_daily_frame(raw_frame, request)
+    except DatabentoSourceError as exc:
+        # A retained snapshot with no manifest would be an unlabeled artifact
+        # nobody could later classify, so the rejection is recorded next to it.
+        rejection = dict(base_manifest)
+        rejection.update(
+            {
+                "validation_status": "rejected",
+                "rejection_reason": str(exc),
+                "normalized_sha256": None,
+                "row_count": 0,
+                "session_count": 0,
+                "refusals": [],
+                "refusal_count": 0,
+                "non_session_refusal_count": 0,
+            }
+        )
+        _atomic_write(manifest_path, canonical_json(rejection).encode("utf-8"))
+        raise DatabentoSnapshotRetainedError(
+            f"{exc} — the paid raw snapshot was retained at {raw_path} and does "
+            f"not need to be downloaded again; its rejection manifest is "
+            f"{manifest_path}",
+            raw_path=raw_path,
+            manifest_path=manifest_path,
+        ) from exc
+
+    normalized = _normalized_material(normalized_bars.frames)
+    refusals = [dict(item) for item in normalized_bars.refusals]
+    manifest = dict(base_manifest)
+    manifest.update(
+        {
+            "validation_status": "accepted",
+            "rejection_reason": None,
+            "normalized_sha256": hash_bytes(canonical_json(normalized).encode("utf-8")),
+            "row_count": len(normalized),
+            "session_count": len({row["session"] for row in normalized}),
+            "refusals": refusals,
+            "refusal_count": len(refusals),
+            # A large count here means the timestamp convention above is wrong,
+            # not that the market data is bad. It is surfaced separately so a
+            # systematic off-by-one session shift is visible rather than buried.
+            "non_session_refusal_count": sum(
+                1
+                for item in refusals
+                if item["reason"] == "bar is not dated on an NYSE trading session"
+            ),
+        }
+    )
+    try:
+        _atomic_write(manifest_path, canonical_json(manifest).encode("utf-8"))
+    except BaseException:
+        raw_path.unlink(missing_ok=True)
+        raise
+    return DailyBarsSnapshot(
+        frames=normalized_bars.frames,
+        manifest=manifest,
+        raw_path=raw_path,
+        manifest_path=manifest_path,
+        refusals=normalized_bars.refusals,
+    )
 
 
 class DatabentoDailyBarsSource:

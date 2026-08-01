@@ -62,6 +62,35 @@ same timestamped snapshot cannot overwrite it. `artifacts/databento/` is
 Git-ignored because the snapshot contains licensed vendor data and is local
 operational state, not repository source.
 
+`--output-dir` defaults to `artifacts/databento` and is refused if it is not
+Git-ignored. Licensed vendor data must never enter version control, and Git
+history is impractical to purge once pushed, so this is checked before the
+download rather than caught in review afterwards.
+
+## What a rejected snapshot costs
+
+The download is billable. It is therefore moved to its permanent path
+*before* the bars are validated: if parsing or validation then rejects the
+response, the raw DBN is retained alongside a manifest whose
+`validation_status` is `rejected`, and the command exits with
+`paid_snapshot_retained: true` and the retained path. Fixing the parser and
+re-reading that file costs nothing; re-downloading would bill again.
+
+Row-level problems are recorded as refusals rather than voiding the request.
+A halted name with zero volume, a ticker that had not listed yet, and a
+delisted ticker with no bars in the window are all legitimate market
+conditions, and one of them must not discard a large paid multi-ticker
+download. Each refusal records its ticker, session, and reason in the
+manifest. Structural problems — a response containing unrequested symbols,
+duplicate bars, or bars outside the requested window — still fail the whole
+request, because salvaging those would be guessing.
+
+Every bar is checked against the NYSE calendar. A non-zero
+`non_session_refusal_count` in the manifest means the timestamp convention in
+`_normalize_daily_frame` is wrong, **not** that the market data is bad — a
+systematic off-by-one session shift is exactly the silent look-ahead error
+this check exists to make visible.
+
 ## Point-in-time status
 
 `EQUS.SUMMARY` daily OHLCV is useful authoritative market data, but these

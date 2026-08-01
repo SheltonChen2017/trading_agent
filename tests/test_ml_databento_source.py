@@ -10,8 +10,10 @@ import pytest
 from ml.databento_source import (
     DailyBarsRequest,
     DatabentoDailyBarsSource,
+    DatabentoSnapshotRetainedError,
     DatabentoSourceError,
     databento_is_configured,
+    databento_source_version,
     estimate_daily_bars_cost,
     fetch_daily_bars_snapshot,
     normalize_daily_bars,
@@ -153,16 +155,23 @@ def test_cost_cap_refuses_before_any_download(tmp_path):
 
 
 def test_normalization_splits_symbols_and_validates_ohlcv():
-    frames = normalize_daily_bars(_raw_frame(), _request())
+    normalized = normalize_daily_bars(_raw_frame(), _request())
+    frames = normalized.frames
     assert tuple(frames) == ("NVDA", "MSFT")
     assert frames["NVDA"].index.tz is None
     assert frames["NVDA"].index[0] == pd.Timestamp("2026-07-29")
     assert frames["MSFT"].loc[pd.Timestamp("2026-07-30"), "volume"] == 2_100
+    assert normalized.refusals == ()
 
+    # An inconsistent OHLC row is still never accepted -- it is now excluded
+    # and recorded rather than discarding the whole paid download.
     broken = _raw_frame()
     broken.loc[broken["symbol"] == "NVDA", "high"] = 1.0
-    with pytest.raises(DatabentoSourceError, match="inconsistent OHLC"):
-        normalize_daily_bars(broken, _request())
+    rejected = normalize_daily_bars(broken, _request())
+    assert "NVDA" not in rejected.frames
+    assert "MSFT" in rejected.frames
+    reasons = {item["reason"] for item in rejected.refusals}
+    assert "internally inconsistent OHLC values" in reasons
 
 
 def test_snapshot_is_immutable_hash_bound_and_fail_closed(tmp_path):
@@ -246,3 +255,187 @@ def test_cli_reports_errors_without_leaking_credentials(monkeypatch, capsys):
     assert exit_code == 1
     assert "not configured" in output
     assert "db-" not in output
+
+
+# --- Fixes to the first ingestion review (2026-08-01) --------------------
+#
+# Each test below pins a behavior whose absence costs the operator money,
+# corrupts lineage, or leaks licensed data.
+
+
+def _frame_with(overrides: dict[tuple[str, str], dict[str, float]]) -> pd.DataFrame:
+    rows = []
+    for ticker, base in (("NVDA", 100.0), ("MSFT", 200.0)):
+        for session in ("2026-07-29", "2026-07-30"):
+            row = {
+                "open": base,
+                "high": base + 2.0,
+                "low": base - 1.0,
+                "close": base + 1.0,
+                "volume": 1_000.0,
+                "symbol": ticker,
+                "ts": f"{session}T00:00:00Z",
+            }
+            row.update(overrides.get((ticker, session), {}))
+            rows.append(row)
+    frame = pd.DataFrame(rows)
+    frame.index = pd.to_datetime(frame.pop("ts"), utc=True)
+    return frame
+
+
+def test_zero_volume_is_a_recorded_refusal_not_a_discarded_download():
+    """A halted or untraded name must not void an entire paid request."""
+    normalized = normalize_daily_bars(
+        _frame_with({("MSFT", "2026-07-30"): {"volume": 0.0}}), _request()
+    )
+    assert set(normalized.frames) == {"NVDA", "MSFT"}
+    # The zero-volume session is kept: zero volume is real market data.
+    assert len(normalized.frames["MSFT"]) == 2
+    assert normalized.refusals == ()
+
+    negative = normalize_daily_bars(
+        _frame_with({("MSFT", "2026-07-30"): {"volume": -5.0}}), _request()
+    )
+    assert len(negative.frames["MSFT"]) == 1
+    assert negative.refusals[0]["reason"] == "negative volume"
+    assert negative.refusals[0]["session"] == "2026-07-30"
+
+
+def test_non_positive_price_is_refused_per_row_with_its_session():
+    normalized = normalize_daily_bars(
+        _frame_with({("NVDA", "2026-07-29"): {"low": 0.0}}), _request()
+    )
+    assert len(normalized.frames["NVDA"]) == 1
+    assert normalized.refusals[0] == {
+        "ticker": "NVDA",
+        "session": "2026-07-29",
+        "reason": "non-positive price",
+    }
+
+
+def test_a_ticker_absent_from_the_window_does_not_void_the_request():
+    """Delisted and not-yet-listed tickers must be fetchable in one request."""
+    frame = _frame_with({})
+    frame = frame.loc[frame["symbol"] != "MSFT"]
+    normalized = normalize_daily_bars(frame, _request())
+    assert set(normalized.frames) == {"NVDA"}
+    assert normalized.refusals[0]["ticker"] == "MSFT"
+    assert "no bars returned" in normalized.refusals[0]["reason"]
+
+
+def test_a_bar_dated_off_the_nyse_calendar_is_refused_and_counted():
+    """A weekend bar is the signature of a timestamp-convention bug."""
+    rows = []
+    for session in ("2026-07-29", "2026-08-01"):  # 2026-08-01 is a Saturday
+        for ticker, base in (("NVDA", 100.0), ("MSFT", 200.0)):
+            rows.append(
+                {
+                    "open": base, "high": base + 2.0, "low": base - 1.0,
+                    "close": base + 1.0, "volume": 1_000.0, "symbol": ticker,
+                    "ts": f"{session}T00:00:00Z",
+                }
+            )
+    frame = pd.DataFrame(rows)
+    frame.index = pd.to_datetime(frame.pop("ts"), utc=True)
+    request = DailyBarsRequest(
+        tickers=("NVDA", "MSFT"), start="2026-07-29", end="2026-08-02"
+    )
+    normalized = normalize_daily_bars(frame, request)
+    off_calendar = [
+        item
+        for item in normalized.refusals
+        if item["reason"] == "bar is not dated on an NYSE trading session"
+    ]
+    assert {item["ticker"] for item in off_calendar} == {"NVDA", "MSFT"}
+    assert all(item["session"] == "2026-08-01" for item in off_calendar)
+    for frame in normalized.frames.values():
+        assert [stamp.date().isoformat() for stamp in frame.index] == ["2026-07-29"]
+
+
+def test_rejected_snapshot_retains_the_paid_download_and_labels_it(tmp_path):
+    """The download is billable; a parse failure must not delete it."""
+    broken = _raw_frame()
+    # Every row invalid for every ticker -> normalization raises.
+    broken["high"] = 1.0
+    broken["low"] = 9_999.0
+    client = _FakeClient(broken, cost=0.01)
+    with pytest.raises(DatabentoSnapshotRetainedError) as caught:
+        fetch_daily_bars_snapshot(
+            _request(),
+            directory=tmp_path,
+            max_cost_usd=0.10,
+            client=client,
+            observed_at="2026-08-01T12:00:00+00:00",
+        )
+    error = caught.value
+    assert error.raw_path.is_file(), "the paid snapshot was deleted"
+    assert error.raw_path.read_bytes() == b"immutable-dbn-fixture"
+    assert "does not need to be downloaded again" in str(error)
+
+    manifest = json.loads(error.manifest_path.read_text(encoding="utf-8"))
+    assert manifest["validation_status"] == "rejected"
+    assert manifest["rejection_reason"]
+    assert manifest["normalized_sha256"] is None
+    assert len(manifest["raw_sha256"]) == 64
+    assert manifest["point_in_time_data"] is False
+
+
+def test_accepted_manifest_records_refusals_and_a_derived_source_version(tmp_path):
+    client = _FakeClient(
+        _frame_with({("MSFT", "2026-07-30"): {"volume": -1.0}}), cost=0.01
+    )
+    snapshot = fetch_daily_bars_snapshot(
+        _request(),
+        directory=tmp_path,
+        max_cost_usd=0.10,
+        client=client,
+        observed_at="2026-08-01T12:00:00+00:00",
+    )
+    manifest = json.loads(snapshot.manifest_path.read_text(encoding="utf-8"))
+    assert manifest["validation_status"] == "accepted"
+    assert manifest["refusal_count"] == 1
+    assert manifest["refusals"][0]["reason"] == "negative volume"
+    assert manifest["non_session_refusal_count"] == 0
+    # Never a stale literal: the version must describe this process.
+    assert manifest["source_version"] == databento_source_version()
+    assert "0.81.0" not in manifest["source_version"] or _databento_installed()
+
+
+def _databento_installed() -> bool:
+    try:
+        import databento  # noqa: F401
+    except ImportError:
+        return False
+    return True
+
+
+def test_source_version_is_derived_not_asserted():
+    version = databento_source_version()
+    if _databento_installed():
+        import databento
+
+        assert version == f"databento-python-{databento.__version__}"
+    else:
+        assert version == "databento-python-not-installed"
+
+
+def test_download_refuses_an_output_directory_that_git_would_track(tmp_path):
+    """Licensed vendor data must not be committable; git history is forever."""
+    tracked = Path(__file__).resolve().parent  # tests/ is tracked
+    with pytest.raises(DatabentoSourceError, match="not git-ignored"):
+        run_databento_ingest.assert_output_dir_is_git_ignored(tracked)
+
+    ignored = Path(__file__).resolve().parent.parent / "artifacts" / "databento"
+    run_databento_ingest.assert_output_dir_is_git_ignored(ignored)
+
+    # A path outside the working tree cannot be committed at all.
+    run_databento_ingest.assert_output_dir_is_git_ignored(tmp_path)
+
+
+def test_download_defaults_to_the_ignored_snapshot_directory():
+    args = run_databento_ingest.build_parser().parse_args(
+        ["download", "--symbols", "NVDA", "--start", "2026-07-29",
+         "--end", "2026-07-31", "--max-cost-usd", "1.0"]
+    )
+    assert args.output_dir.name == "databento"
+    run_databento_ingest.assert_output_dir_is_git_ignored(args.output_dir)

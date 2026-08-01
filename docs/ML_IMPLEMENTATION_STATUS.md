@@ -209,11 +209,35 @@ Units are daily-return standard deviation in percent, matching
 a field whose name says `annualized`, and there is no unlabeled
 `volatility_pct` key that could be mistaken for either.
 
-**Still outstanding for ML-LR-3** (section 9.4/9.5): empirical prediction
-intervals built only from prior out-of-fold residuals, interval coverage by
-fold, Brier/log-loss/calibration for a preregistered mandate ceiling,
-warning lead time and false-warning rate, performance sliced by
-year/ticker/volatility regime/earnings proximity, and the extended typed
-`VolatilityForecast` wrapper. Portfolio research against real data also
-remains underfilled until enough daily position/equity snapshots accumulate;
-per plan 9.7 that is reported as unavailable rather than backfilled.
+`ml/volatility_evaluation.py` completes sections 9.4 and 9.5.
+
+`expanding_out_of_fold_intervals()` is the leakage-critical piece: fold k's
+interval is built from residuals observed in folds < k only. Fold 0 gets no
+interval at all rather than borrowing later data. Verified decisively --
+corrupting a fold's actuals 8x leaves its own interval bounds byte-identical
+while its coverage collapses 0.85 -> 0.00, which is only possible if the
+fold never informed its own interval. Residuals are on the log scale so
+bounds are structurally positive and the upper tail is not understated.
+
+Also delivered: aggregate interval coverage; Brier/log-loss/calibration for
+a preregistered mandate ceiling; warning lead time and false-warning rate
+versus trailing volatility; and QLIKE/MAE sliced by
+year/ticker/volatility-regime/earnings-proximity. The slice report is what
+makes doc 8.3's "small aggregate win produced by one crisis window" visible
+-- measured: a crisis-only model wins 1 of 4 year buckets (0.25) against 4
+of 4 (1.00) for a genuinely better one.
+
+`ShadowVolatilityForecast` carries every plan-9.5 field. A probability is
+serialized under the key `experimental_probability` unless calibration has
+cleared a preregistered Brier bar, in which case it becomes
+`calibrated_probability`; the word "confidence" never appears. Calibration
+has three states, not two -- "not measured" and "measured and failed" are
+different situations, and collapsing them would let an unmeasured
+probability inherit the benefit of the doubt.
+
+**Still outstanding for ML-LR-3:** wiring these reports into
+`ml/experiments.py`'s volatility runner (they are currently standalone,
+tested functions), and a portfolio-target experiment runner. Portfolio
+research against real data also remains underfilled until enough daily
+position/equity snapshots accumulate; per plan 9.7 that is reported as
+unavailable rather than backfilled.

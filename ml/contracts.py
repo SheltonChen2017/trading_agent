@@ -469,6 +469,7 @@ class PredictionRecord:
     evidence_status: EvidenceStatus
     monitoring_features: Mapping[str, Any] = dataclasses.field(default_factory=dict)
     monitoring_context: Mapping[str, Any] = dataclasses.field(default_factory=dict)
+    prospective_contract: Mapping[str, Any] = dataclasses.field(default_factory=dict)
     schema_version: str = SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -523,6 +524,9 @@ class PredictionRecord:
         monitoring_context = freeze_json(
             self.monitoring_context, path="monitoring_context"
         )
+        prospective_contract = freeze_json(
+            self.prospective_contract, path="prospective_contract"
+        )
         if not isinstance(values, Mapping) or not isinstance(uncertainty, Mapping):
             raise ContractError("values and uncertainty must be JSON objects")
         if not isinstance(feature_freshness, Mapping):
@@ -531,6 +535,8 @@ class PredictionRecord:
             raise ContractError("monitoring_features must be a JSON object")
         if not isinstance(monitoring_context, Mapping):
             raise ContractError("monitoring_context must be a JSON object")
+        if not isinstance(prospective_contract, Mapping):
+            raise ContractError("prospective_contract must be a JSON object")
         for name, value in monitoring_features.items():
             if (
                 isinstance(value, bool)
@@ -577,6 +583,7 @@ class PredictionRecord:
         object.__setattr__(self, "feature_freshness", feature_freshness)
         object.__setattr__(self, "monitoring_features", monitoring_features)
         object.__setattr__(self, "monitoring_context", monitoring_context)
+        object.__setattr__(self, "prospective_contract", prospective_contract)
         object.__setattr__(self, "refusal_reasons", refusal_reasons)
 
     @property

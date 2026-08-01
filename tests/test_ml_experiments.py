@@ -938,12 +938,29 @@ def test_the_runner_emits_aggregate_interval_coverage(tmp_path):
 
 def test_calibration_uses_the_preregistered_ceiling_from_the_hashed_gate(tmp_path):
     _build_dataset(tmp_path)
-    _run(tmp_path, _lr3_spec())
+    spec = _lr3_spec()
+    record = _run(tmp_path, spec)
     report = json.loads((tmp_path / "out" / "vol-discovery-v1.report.json").read_text())
     calibration = report["aggregate_metrics"]["ridge_log_vol"]["ceiling_calibration"]
     assert calibration["ceiling_pct"] == 22.0
     assert calibration["calibration_status"] in ("calibrated", "experimental")
     assert calibration["brier_score"] is not None
+    manifest = load_model_manifest(
+        directory=tmp_path / "out",
+        filename="vol-discovery-v1.ridge_log_vol.manifest.json",
+        model_id="vol-discovery-v1.ridge_log_vol",
+        model_version=spec.spec_hash,
+        expected_manifest_hash=record.artifact_hashes["ridge_log_vol.manifest"],
+    )
+    bundle = load_model_artifact(
+        manifest,
+        directory=tmp_path / "out",
+        filename="vol-discovery-v1.ridge_log_vol.joblib",
+    )
+    profile = bundle["prospective_profile"]
+    assert profile["interval"]["status"] == "available"
+    assert profile["threshold"]["ceiling_daily_pct"] == 22.0
+    assert profile["threshold"]["empirical_log_residuals"]
 
 
 def test_without_a_preregistered_ceiling_calibration_is_not_measured(tmp_path):

@@ -38,7 +38,7 @@ gates, and model isolation. This plan fills the operational path around it:
 
 Current baseline:
 
-- ML-FS-0 through ML-FS-4 are software-complete; ML-FS-3's real-data
+- ML-FS-0 through ML-FS-5 are software-complete; ML-FS-3's real-data
   definition of done remains pending a reviewed licensed historical-universe
   snapshot and an actual authoritative build;
 - ML-LR-0, ML-LR-1, ML-LR-2, ML-LR-4, ML-LR-6, ML-LR-7, and
@@ -53,9 +53,9 @@ Current baseline:
 - the scheduled paper observation now writes normalized portfolio history and
   a complete-capture manifest, while claimed execution attempts retain
   pre-broker telemetry joined to the authoritative broker event journal; and
-- volatility shadow operation exists, but current online output does not yet
-  carry every prospective interval, calibrated-probability, and monitoring
-  field required for promotion review.
+- volatility shadow operation now emits a complete immutable prospective
+  contract; elapsed shadow evidence and its monitoring conclusions do not yet
+  exist.
 
 ## 3. Delivery rules
 
@@ -238,6 +238,9 @@ eligible historical data. Insufficient real position history returns
 unavailable rather than guessed holdings.
 
 ## 10. ML-FS-5 — prospective inference contract
+
+Status: software implemented 2026-08-01. This records prospective evidence;
+it does not establish calibration quality or authorize trading use.
 
 ### Implementation
 

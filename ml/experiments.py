@@ -77,6 +77,7 @@ from ml.portfolio_research import (
     PortfolioResearchError,
     validate_portfolio_experiment_spec,
 )
+from ml.prospective import build_volatility_prospective_profile
 from ml.hashing import canonical_json, hash_bytes
 from ml.volatility_evaluation import (
     MIN_RESIDUALS_FOR_INTERVAL,
@@ -123,6 +124,7 @@ class _FittedModel:
     training_start: str
     training_end: str
     feature_reference: Mapping[str, Any] = dataclasses.field(default_factory=dict)
+    prospective_profile: Mapping[str, Any] = dataclasses.field(default_factory=dict)
 
 
 def _feature_reference(
@@ -633,6 +635,16 @@ def _run_volatility_task(
             _volatility_evaluation_reports(spec, fold_predictions.get(candidate, []))
         )
         aggregate[candidate] = result
+        if candidate in fitted_models:
+            fitted_models[candidate] = dataclasses.replace(
+                fitted_models[candidate],
+                prospective_profile=build_volatility_prospective_profile(
+                    fold_predictions.get(candidate, []),
+                    ceiling_calibration=result.get("ceiling_calibration", {
+                        "calibration_status": CalibrationStatus.NOT_MEASURED,
+                    }),
+                ),
+            )
     return fold_metrics, fitted_models, aggregate
 
 
@@ -777,6 +789,9 @@ def _save_and_verify_models(
         feature_reference = dict(getattr(fitted, "feature_reference", {}))
         if feature_reference:
             bundle["feature_reference"] = feature_reference
+        prospective_profile = dict(getattr(fitted, "prospective_profile", {}))
+        if prospective_profile:
+            bundle["prospective_profile"] = prospective_profile
         artifact_hash = save_model_artifact(
             bundle,
             directory=output_directory,

@@ -77,6 +77,37 @@ def _runtime_fixture(tmp_path: Path, *, feature_names=None):
             "training_end": "2025-12-31",
         },
         "ordered_feature_names": feature_names,
+        "feature_reference": {
+            name: {
+                "independent_date_count": 100,
+                "bin_edges": [-1.0, 0.0, 1.0],
+                "bin_counts": [10, 40, 40, 10],
+                "minimum": -2.0,
+                "maximum": 2.0,
+                "mean": 0.0,
+                "standard_deviation": 1.0,
+            }
+            for name in feature_names
+        },
+        "prospective_profile": {
+            "schema_version": "1",
+            "interval": {
+                "status": "available",
+                "method": "out_of_fold_empirical_log_residual",
+                "target_coverage": 0.9,
+                "log_residual_quantiles": [-0.25, 0.25],
+                "residual_count": 40,
+            },
+            "threshold": {
+                "status": "available",
+                "method": "out_of_fold_empirical_log_residual",
+                "ceiling_daily_pct": 2.0,
+                "calibration_status": "experimental",
+                "brier_score": 0.2,
+                "event_count": 40,
+                "empirical_log_residuals": [-0.25] * 20 + [0.25] * 20,
+            },
+        },
     }
     artifact_hash = save_model_artifact(
         bundle, directory=artifact_dir, filename="vol.joblib"
@@ -263,6 +294,20 @@ def test_predict_resume_mature_monitor_is_idempotent_and_non_authoritative(tmp_p
     assert completed["available_count"] == 2
     predictions = store.list_ml_predictions(shadow_run_id=run["run_id"])
     assert len(predictions) == 2
+    prospective = predictions[0]["prediction"]["prospective_contract"]
+    assert prospective["point_estimate"]["unit"] == "daily_return_standard_deviation_pct"
+    assert prospective["prediction_interval"]["lower"] <= prospective["point_estimate"]["value"]
+    assert prospective["prediction_interval"]["upper"] >= prospective["point_estimate"]["value"]
+    assert prospective["threshold_probability"]["label"] == "experimental_probability"
+    assert prospective["calibration"]["status"] == "experimental"
+    assert prospective["reference_distribution"]["identity_hash"]
+    assert prospective["regime_category"] in {
+        "above_training_mean", "at_or_below_training_mean"
+    }
+    assert prospective["event_category"] == "ordinary_session"
+    assert prospective["lineage"]["evidence_epoch"] == evidence_epoch
+    assert prospective["lineage"]["dataset_hash"] == manifest.dataset_hash
+    assert prospective["production_authoritative"] is False
     assert next(p for p in predictions if p["subject_key"] == "AAA")["prediction_hash"] == first[
         "prediction_hash"
     ]
@@ -415,6 +460,41 @@ def test_future_fixture_rows_cannot_change_an_as_of_prediction(tmp_path):
     assert first["feature_snapshot_hash"] == second["feature_snapshot_hash"]
 
 
+def test_incomplete_artifact_produces_complete_unavailable_contract(tmp_path):
+    _store, config, config_path, artifact_dir, _provider_path, _manifest = _registered_store(
+        tmp_path
+    )
+    verified_manifest, bundle, _report = verify_runtime_artifacts(config, artifact_dir)
+    frames = load_price_frames(
+        config,
+        config_directory=config_path.parent,
+        requested_tickers=(*config.subjects, "SPY", "QQQ", "SOXX"),
+    )
+    incomplete = dict(bundle)
+    incomplete.pop("prospective_profile")
+    result = build_volatility_prediction(
+        config,
+        verified_manifest,
+        incomplete,
+        frames,
+        subject="AAA",
+        as_of_session="2026-02-25",
+        generated_at="2026-02-25T21:05:00+00:00",
+        decision_cutoff=resolve_decision_cutoff("2026-02-25"),
+        target_available_at=resolve_target_availability("2026-02-25", 20),
+        evidence_epoch="epoch",
+        shadow_run_id="run",
+    )
+    prospective = result["prospective_contract"]
+    assert result["available"] is False
+    assert "prospective_profile_unavailable" in result["refusal_reasons"]
+    assert prospective["point_estimate"] is None
+    assert prospective["prediction_interval"] is None
+    assert prospective["threshold_probability"] is None
+    assert prospective["lineage"]["evaluation_report_hash"] == verified_manifest.evaluation_report_hash
+    assert all(feature["missing"] for feature in prospective["feature_observations"])
+
+
 def test_artifact_corruption_fails_the_claimed_run_and_emits_a_durable_alert(
     tmp_path, capsys
 ):
@@ -453,6 +533,10 @@ def test_artifact_corruption_fails_the_claimed_run_and_emits_a_durable_alert(
     assert all(not prediction["available"] for prediction in predictions)
     assert all(
         "artifact_mismatch" in prediction["refusal_reasons"]
+        for prediction in predictions
+    )
+    assert all(
+        prediction["prediction"]["prospective_contract"]["available"] is False
         for prediction in predictions
     )
 

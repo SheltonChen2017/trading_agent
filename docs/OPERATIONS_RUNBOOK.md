@@ -273,3 +273,24 @@ manifests, model artifacts, and run manifest together. This is research-only:
 do not edit the research registry, proposals, or execution state based on the
 result. Until enough genuine daily captures exist, report the path as
 underfilled rather than validating it on reconstructed positions.
+
+## Inspecting prospective shadow evidence
+
+New volatility artifacts must contain a frozen `prospective_profile` generated
+by the experiment runner from out-of-fold residuals and a preregistered mandate
+ceiling. Do not retrofit that profile into an old artifact: rerun the immutable
+experiment under a new artifact identity and start a new evidence epoch.
+
+Each stored prediction's `prediction.prospective_contract` is the review
+surface. Verify that it contains the point and interval, an
+`experimental_probability` or `calibrated_probability` label, calibration and
+baseline state, per-feature observations, reference-distribution hash,
+regime/event categories, target availability, and complete lineage. For a
+refusal, the point, interval, and probability must remain null and the reason
+must be present. Never reconstruct these fields when an outcome matures.
+
+An experimental label is not a confidence statement. A calibrated label only
+means the preregistered calibration gate encoded in that model's immutable
+evaluation cleared; it still has no proposal or execution authority. Any
+artifact, provider, schedule, configuration, code, or feature-semantics change
+requires a new evidence epoch before collection resumes.

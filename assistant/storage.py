@@ -1889,6 +1889,37 @@ class AssistantStore:
             raise ValueError("an unavailable prediction cannot contain predicted values")
         elif prediction["evidence_status"] != "unavailable":
             raise ValueError("an unavailable prediction must have unavailable evidence status")
+        prospective = prediction.get("prospective_contract")
+        if prospective not in (None, {}):
+            if not isinstance(prospective, dict):
+                raise ValueError("prediction.prospective_contract must be a dictionary")
+            if prospective.get("production_authoritative") is not False:
+                raise ValueError(
+                    "prediction.prospective_contract must be production_authoritative=false"
+                )
+            matching = {
+                "prediction_id": prediction.get("prediction_id"),
+                "task": prediction["task"],
+                "subject_key": prediction["subject_key"],
+                "as_of_session": prediction["as_of_session"],
+                "horizon_sessions": horizon,
+                "target_available_at": prediction["target_available_at"],
+                "available": prediction["available"],
+            }
+            mismatches = {
+                key: {"prediction": expected, "prospective_contract": prospective.get(key)}
+                for key, expected in matching.items()
+                if prospective.get(key) != expected
+            }
+            if mismatches:
+                raise ValueError(
+                    "prediction.prospective_contract identity mismatch: "
+                    f"{mismatches}"
+                )
+            _canonical_ml_json(prospective, "prediction.prospective_contract")
+            _reject_execution_shaped_values(
+                prospective, path="prediction.prospective_contract"
+            )
         payload_json = _canonical_ml_json(prediction, "prediction")
         prediction_hash = _hash_payload(payload_json)
         prediction_id = prediction.get("prediction_id") or (

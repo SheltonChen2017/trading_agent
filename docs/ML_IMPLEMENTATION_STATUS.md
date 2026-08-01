@@ -30,6 +30,7 @@ The next implementation sequence is defined in
 | ML-FS-1 | Scheduled paper observations normalized into portfolio equity/position history plus complete-capture manifests | `assistant/paper_evidence.py`, `assistant/storage.py` | Writes reconciled paper observations and research history only |
 | ML-FS-2 | Immutable pre-broker execution telemetry plus rebuildable lifecycle materialization | `assistant/execution_telemetry.py`, `assistant/execution_service.py`, `assistant/storage.py` | Claimed attempts write observations; a failed pre-submit telemetry append refuses the broker call |
 | ML-FS-3 software | Vintage-correct Databento adjustment/security resolution, independent universe snapshots, PIT feature batches, replay CLI, and shared online provider | `ml/databento_authoritative.py`, `ml/databento_pit.py`, `scripts/run_databento_ingest.py` | Research/online data only; no model or execution authority |
+| ML-FS-5 software | Frozen deployable OOF uncertainty profile plus complete prospective success/refusal contract | `ml/prospective.py`, `ml/experiments.py`, `ml/shadow_runtime.py`, `ml/contracts.py`, `assistant/storage.py` | Writes non-authoritative shadow evidence only |
 
 ML-LR-2 gives both supported tasks a reproducible runner. Verified against
 the milestone's own definition of done by invoking the real CLI twice: the
@@ -186,12 +187,11 @@ acceptance criterion in sections 7-12 is complete. In particular:
    feature builder, grouped walk-forward event evaluator, precision/recall and
    interval report, typed forecast output, and durable runner do not.
 
-8. **ML-6 is not yet operationally shadow-ready.** Persistence now enforces
-   registered lineage, immutable conflicts, feature freshness, timezone-aware
-   generation, and explicit target maturity. There is no fixed scheduler,
-   automatic outcome-maturation job, baseline/calibration monitor, or
-   dedicated ML evidence-epoch coordinator yet. Calling these APIs remains an
-   explicit research workflow.
+8. **Shadow software is ready; elapsed evidence is absent.** The fixed
+   scheduler, outcome maturation, monitoring, evidence epochs, durable
+   failures, and the complete ML-FS-5 prospective contract are implemented.
+   That capability is not a substitute for operating the jobs across real
+   sessions and retaining a sufficient, reviewed sample within one epoch.
 
 9. **ML-7 is statistical-research scaffolding, not the complete ranker
    experiment.** The historically correct universe, immutable benchmark-
@@ -322,6 +322,32 @@ missing-row underfill, shared-runner dispatch, exact task-parameter refusal,
 immutable output loading, typed available/unavailable forecasts, and the ML
 execution import boundary. The fixture suite passed without creating research
 registry, proposal, or execution state.
+
+## ML-FS-5 notes
+
+Volatility experiment artifacts now freeze a prospective profile made only
+from out-of-fold log residuals. The profile contains the interval quantiles,
+preregistered ceiling, residual population used for the threshold probability,
+and the measured calibration state. Shadow inference consumes that immutable
+profile; it never derives an interval or probability from later shadow
+outcomes. A model without a usable profile or preregistered threshold produces
+an unavailable attempt instead of a point-only forecast.
+
+Every runtime success now embeds `ProspectiveInferenceContract`: daily point
+and interval, explicitly experimental or calibrated ceiling probability,
+calibration state, frozen trailing/EWMA baselines, each feature's value,
+availability and age, missingness, a hash-bound training reference
+distribution, prospective regime/event categories, target availability, and
+provider/dataset/artifact/report/configuration/epoch/run lineage. Failure paths
+embed the same schema with prediction values set to null and durable reasons;
+fields are not reconstructed after the target is observed.
+
+Storage confirms the nested contract belongs to the same immutable prediction
+identity, refuses action-shaped fields, and requires
+`production_authoritative=false`. Provider failure, artifact corruption,
+restart/idempotent retry, and epoch changes remain covered by the shadow
+runtime suite. These are software assertions, not evidence that the interval
+coverage or threshold calibration works on future market observations.
 
 
 ## ML-LR-4 notes

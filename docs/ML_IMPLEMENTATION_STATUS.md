@@ -20,6 +20,7 @@ The next implementation sequence is defined in
 | ML-8 | Filing/transcript extraction contract + deterministic validator | `ml/filings.py` | None (context only) |
 | ML-LR-0 | Shared experiment identity, preregistered research gates, run records | `ml/experiment_contracts.py` | None |
 | ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
+| ML data-source prerequisite | Cost-capped Databento `EQUS.SUMMARY` ingestion, immutable DBN snapshots, fail-closed lineage status | `ml/databento_source.py`, `scripts/run_databento_ingest.py` | None (research data only) |
 | ML-LR-2 | Durable discovery/confirmation runner and CLI | `ml/experiments.py`, `scripts/run_ml_experiment.py` | None |
 | ML-LR-3 | Portfolio-volatility targets, evaluation completion, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py` | None |
 | ML-LR-4 | Earnings event identity, pre-event features, event-date experiment runner, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `ml/earnings_experiments.py`, `ml/experiments.py`, `scripts/run_filing_extraction.py` | None (research/context only) |
@@ -67,10 +68,16 @@ participate in `dataset_hash`; their row counts are recorded, and the claim is
 replayed during build, save, and load. Swapping lineage, decision cutoffs, or
 feature-value bindings therefore changes identity or is refused.
 
-Still external, and still the blocker: an authoritative vendor providing
-real historical availability timestamps and index-constituent history. Until
-one is configured, every dataset built from live data remains exploratory
-and promotion-blocked — which is the honest state, not a gap in the code.
+Databento is now the selected external vendor, and the first adapter can
+cost-estimate, validate, hash-bind, and immutably preserve unadjusted
+`EQUS.SUMMARY` daily bars. That removes credential and raw-ingestion
+plumbing as unknowns, but does **not** make real-data `point_in_time_data`
+reachable: the OHLCV-1d record identifies its aggregation interval, not the
+exact receipt/publication time required by the availability contract, and
+the values still need point-in-time split/dividend and security-master
+evidence. The adapter therefore returns no fabricated lineage and explicitly
+records `point_in_time_data=false`. Receipt-timestamped `statistics` records,
+licensed reference data, and historical membership remain the blocker.
 
 ML-LR-0 supplied the shared contracts now consumed by ML-LR-2. `ExperimentSpec`
 fully describes the synthetic volatility and ranker experiments, and the
@@ -131,8 +138,9 @@ acceptance criterion in sections 7-12 is complete. In particular:
    prove fixture data from persisted per-feature lineage, value hashes,
    decision cutoffs, and historical membership. The configured yfinance
    source supplies none of that authoritative history, so real results remain
-   exploratory and promotion-blocked. An authoritative vendor adapter and
-   licensed history are still external dependencies.
+   exploratory and promotion-blocked. The Databento OHLCV adapter preserves
+   real raw snapshots but correctly stays `False` until receipt-timestamped
+   statistics and licensed point-in-time reference sidecars are bound.
 
 2. **Real historical universe data is unavailable.** The typed membership
    contract and cutoff-aware validation now reject fixed current-membership

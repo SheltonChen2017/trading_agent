@@ -13,7 +13,7 @@ results is not a gate; binding it into `spec_hash` means moving the goalposts
 produces a different experiment identity, which `--mode confirmation` then
 refuses (plan section 8.3).
 
-Deliberately reuses `ml/contracts.py`'s existing `_freeze_json`,
+Deliberately reuses `ml/contracts.py`'s existing `freeze_json`,
 `_check_sha256`, and `_parse_timestamp` rather than adding a third copy of
 each -- the repository already carries two (contracts.py and
 evaluation.py's `_freeze_report_json`), and a third would be one more place
@@ -31,7 +31,7 @@ from ml.contracts import (
     ContractError,
     _check_required_str,
     _check_sha256,
-    _freeze_json,
+    freeze_json,
     _parse_timestamp,
 )
 from ml.hashing import hash_payload
@@ -73,7 +73,7 @@ class ExperimentContractError(ContractError):
 def _as_experiment_error():
     """Translate reused ml/contracts.py failures into this module's type.
 
-    The helpers below (`_check_sha256`, `_parse_timestamp`, `_freeze_json`,
+    The helpers below (`_check_sha256`, `_parse_timestamp`, `freeze_json`,
     `_check_required_str`) are deliberately shared rather than duplicated,
     but they raise the parent `ContractError`. Since
     `ExperimentContractError` is a SUBCLASS, a caller writing
@@ -445,16 +445,16 @@ class ExperimentSpec:
                 "than the discovery run it confirms"
             )
 
-        split_configuration = _freeze_json(
+        split_configuration = freeze_json(
             self.split_configuration, path="split_configuration"
         )
-        assumptions = _freeze_json(
+        assumptions = freeze_json(
             self.cost_tax_liquidity_assumptions, path="cost_tax_liquidity_assumptions"
         )
-        baseline_columns = _freeze_json(
+        baseline_columns = freeze_json(
             self.baseline_columns, path="baseline_columns"
         )
-        task_parameters = _freeze_json(
+        task_parameters = freeze_json(
             self.task_parameters, path="task_parameters"
         )
         if not isinstance(split_configuration, Mapping):
@@ -480,7 +480,7 @@ class ExperimentSpec:
         object.__setattr__(self, "ordered_feature_names", ordered_features)
         object.__setattr__(
             self, "research_look_dimensions",
-            _freeze_json(frozen_dimensions, path="research_look_dimensions"),
+            freeze_json(frozen_dimensions, path="research_look_dimensions"),
         )
         object.__setattr__(self, "split_configuration", split_configuration)
         object.__setattr__(self, "cost_tax_liquidity_assumptions", assumptions)
@@ -689,7 +689,7 @@ class ExperimentRunRecord:
             _check_sha256(digest, f"artifact_hashes[{key}]")
         object.__setattr__(
             self, "artifact_hashes",
-            _freeze_json(dict(self.artifact_hashes), path="artifact_hashes"),
+            freeze_json(dict(self.artifact_hashes), path="artifact_hashes"),
         )
         object.__setattr__(
             self, "promotion_blockers",

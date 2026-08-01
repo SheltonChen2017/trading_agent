@@ -303,6 +303,8 @@ The current dependency set is:
 
 - pandas / numpy
 - yfinance
+- Databento (cost-capped, immutable real-data ML ingestion; see
+  `docs/DATABENTO_DATA_SOURCE.md`)
 - alpaca-py
 - lxml
 - pandas_market_calendars (real NYSE trading-hours/holiday calendar)

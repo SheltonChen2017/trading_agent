@@ -10,3 +10,4 @@ pandas_market_calendars==5.4.0
 requests==2.34.2
 scikit-learn==1.9.0
 joblib==1.5.3
+databento==0.81.0

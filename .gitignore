@@ -2,6 +2,7 @@ __pycache__/
 *.pyc
 *.pyo
 .pytest_cache/
+.venv/
 
 # Never commit credentials
 .env
@@ -14,6 +15,10 @@ data/*.db-wal
 data/backups/
 data/drill_evidence/
 data/research_reports/
+
+# Licensed, machine-local market-data snapshots. Manifests and raw DBN files
+# may contain vendor data and must never be committed or redistributed.
+artifacts/databento/
 
 # Claude Code session transcripts and machine-local permissions -- these
 # were committed by accident (Codex review, 2026-07-27: a 17MB session

@@ -101,12 +101,18 @@ statistical_evidence     promising | unsupported | insufficient
 economic_evidence        promising | unsupported | insufficient
 robustness               passed | failed | insufficient
 operational_eligibility  research_only | shadow_eligible | paper_eligible
-authority                unapproved | approved_shadow | approved_paper | retired
+authority                unapproved | approved_shadow | approved_paper |
+                         approved_live_canary | expired | revoked
 ```
 
 No average score is allowed. A strategy is paper-eligible only when every
 required dimension independently passes its declared gate. "Promising" means
 worthy of additional evaluation, not profitable, safe, or live-authorized.
+Evidence lifecycle and authority are separate state machines. An evidence or
+eligibility transition can make a strategy a candidate for owner review; it
+cannot create an authority grant. `approved_live_canary` is a reserved scope
+whose contract may be defined in AS-0 but whose construction path must not
+exist until AS-10 is explicitly authorized.
 
 The user-facing answer should use language such as:
 
@@ -144,9 +150,13 @@ These rules apply to every milestone:
   cause abstention. They never receive a favorable default.
 - Risk-reducing sales must not be blocked or delayed by strategy or ML
   unavailability.
-- The existing execution path must not import the LLM client, strategy
-  authoring code, backtest code, or ML model code.
-- Existing ML and investment-committee import-boundary tests remain green.
+- The existing execution and proposal paths must not directly or transitively
+  reach the LLM client, strategy-authoring code, backtest code, or ML model
+  code through an internal import chain.
+- Existing ML and investment-committee import-boundary tests remain green, but
+  their current direct-import checks are not proof of transitive isolation.
+  AS-0 must add an internal import-graph closure test before new strategy
+  packages are introduced.
 - Point-in-time-unsuitable data may support software tests or clearly labeled
   exploration, but never confirmation or promotion evidence.
 - Every order remains a normal immutable `TradeProposal`, is revalidated with
@@ -169,7 +179,10 @@ user/claude/ai-strategy-as1-dsl-YYYYMMDD
 Before changing code, the implementation agent must inspect the full milestone,
 the current branch, dirty files, existing contracts, and tests. It must reuse
 existing hashing, artifact, experiment, money, storage, backtest, proposal,
-and policy infrastructure rather than introducing parallel versions.
+policy, and LLM infrastructure rather than introducing parallel versions. For
+AS-5, inspect `assistant/llm/provider.py`, `anthropic_provider.py`,
+`committee_service.py`, `validators.py`, `schemas.py`, `prompt_builder.py`, and
+the existing `ai_runs` audit table before proposing a new abstraction.
 
 At every handoff, report:
 
@@ -237,6 +250,23 @@ typed enums or value objects for:
 - refusal reason; and
 - supported asset, schedule, order-intent, and evaluation categories.
 
+Freeze evidence lifecycle and authority as independent contracts. The evidence
+lifecycle may contain states such as:
+
+```text
+draft -> accepted_research -> discovery_complete
+      -> confirmation_candidate
+      -> confirmation_rejected | shadow_candidate
+      -> paper_candidate | research_retired
+```
+
+The separate authority contract may contain `unapproved`, `approved_shadow`,
+`approved_paper`, `approved_live_canary`, `expired`, and `revoked`. The ordinary
+evidence-transition function cannot accept, return, or mutate authority. The
+general non-live authorization function cannot construct
+`approved_live_canary`; that reserved value requires AS-10's separate entry
+point, schema/consumer review, and explicit owner authorization.
+
 Define four separate immutable identities:
 
 ```text
@@ -252,12 +282,21 @@ content hash must be documented field by field.
 
 Add an exact authority matrix covering research, presentation, shadow, paper,
 and live consumers. No generic `production` or `enabled` boolean is allowed.
+Add a repository-internal import-graph test that resolves transitive imports
+from proposal- and execution-capable roots. It must fail if any reachable
+module imports `ml`, `assistant.llm`, strategy authoring, or backtest code.
+Dynamic imports in a boundary-relevant module are prohibited unless the test
+can resolve and audit the exact target.
 
 ### 7.3 Tests
 
 - lifecycle states cannot be skipped by an ordinary transition;
 - evidence state cannot grant authority;
+- lifecycle transition code has no authority parameter or return value;
+- the non-live authorization path cannot construct `approved_live_canary`;
 - paper authority cannot be interpreted as live authority;
+- the transitive import test catches an indirect
+  `assistant -> strategy package -> ml` path;
 - IDs change when economic content changes and remain stable for canonical
   equivalent input;
 - non-finite numeric values and naive timestamps are rejected; and
@@ -277,9 +316,18 @@ arbitrary generated source code as the strategy format.
 
 ### 8.2 StrategySpec v1
 
-Prefer extending the existing `strategies/` package with focused modules such
-as `contracts.py`, `operators.py`, and `validation.py`. Before choosing names,
-inspect the current package and consolidate overlapping helpers.
+Do not place the DSL, compiler, or authoring workflow in the existing
+`strategies/` package. `assistant/strategy_proposals.py` already imports that
+package, so doing so would put new code one transitive hop from proposal
+generation while the current direct-import boundary tests stayed green.
+
+Create a separate package, tentatively `strategy_lab/`, that nothing under
+`assistant/`, proposal, broker, risk-gate, or execution code imports during
+AS-1 through AS-7. Split authoring from the deterministic runtime so importing
+`strategy_lab.runtime` cannot transitively import `strategy_lab.authoring`,
+`assistant.llm`, `ml`, or `backtest`. Keep `strategy_lab/__init__.py` empty of
+eager cross-layer imports. Before choosing final names, inspect the current
+packages and consolidate overlapping helpers without weakening this boundary.
 
 `StrategySpec` should contain at least:
 
@@ -362,8 +410,12 @@ an explicit owner-visible revision.
 - duplicate JSON keys, unknown fields, NaN, infinity, and extreme values;
 - nested mutation attempts after construction;
 - malicious strings containing code, prompt instructions, paths, or URLs;
-- unsupported asset/order types; and
-- deterministic canonicalization and identity generation.
+- unsupported asset/order types;
+- deterministic canonicalization and identity generation;
+- the internal import graph proves no proposal/execution root can reach the new
+  package before AS-8; and
+- importing a future runtime leaf cannot reach authoring, LLM, ML, or backtest
+  modules through package initializers.
 
 ### 8.6 Definition of done
 
@@ -436,9 +488,11 @@ The trace is audit evidence, not an LLM-generated explanation.
 - no-lookahead behavior around market open, close, weekends, holidays, and
   daylight-saving changes;
 - operator version changes alter compiler identity;
-- traces reproduce the decision exactly; and
+- traces reproduce the decision exactly;
 - AST/import tests prove the compiler cannot import broker, execution,
-  approval, or LLM client modules.
+  approval, ML, or LLM client modules; and
+- transitive import-closure tests prove proposal/execution roots cannot reach
+  the compiler, authoring, ML, LLM, or backtest layers.
 
 ### 9.6 Definition of done
 
@@ -644,6 +698,13 @@ the exact semantic content is preserved and recorded.
 
 ### 12.4 Provider isolation and reproducibility
 
+Extend the existing `assistant/llm/` provider boundary and `ai_runs` audit
+infrastructure. Do not add a second Anthropic/OpenAI/local-provider client,
+retry policy, provider configuration format, prompt-version mechanism, or
+parallel LLM audit table. The dedicated strategy-lab command may compose the
+existing provider with a strategy-specific schema and validator, but the
+deterministic runtime package must not import that authoring composition.
+
 Store the exact normalized owner prompt, system instruction version, model and
 provider identity, sampling settings, raw response hash, parsed draft, and
 validation result. Do not store provider credentials or unnecessary private
@@ -755,9 +816,9 @@ shadow/paper promotion review.
 Separate research evidence from authority in the same way the ML roadmap
 separates model results from promotion.
 
-### 14.2 Lifecycle
+### 14.2 Evidence lifecycle and separate authority grants
 
-Use explicit, audited transitions such as:
+Use explicit, audited evidence transitions such as:
 
 ```text
 draft
@@ -765,13 +826,19 @@ draft
   -> discovery_complete
   -> confirmation_candidate
   -> confirmation_rejected | shadow_candidate
-  -> approved_shadow
-  -> approved_paper
-  -> retired
+  -> paper_candidate | research_retired
 ```
 
-Live scope is deliberately absent from the ordinary transition function. It
-belongs to AS-10 and requires a separate owner-authorized operation.
+These transitions never grant trading authority. Approval creates a separate,
+immutable `AuthorizationGrant` tied to the exact strategy, experiment, dossier,
+and allowed scope. Its non-live path may issue `approved_shadow` or
+`approved_paper`; expiration or revocation changes the effective authority
+without rewriting research history.
+
+`approved_live_canary` is deliberately unavailable from the ordinary
+authorization function. It belongs to AS-10 and requires a separate
+owner-authorized operation. Every consumer must reject an authority schema or
+scope it does not explicitly understand.
 
 Promotion must require:
 
@@ -803,6 +870,7 @@ behavior.
 ### 14.4 Tests
 
 - invalid transitions and stale expected hashes fail atomically;
+- evidence transitions cannot create or mutate an authorization grant;
 - expired approval has no authority;
 - scope cannot widen implicitly;
 - paper scope cannot reach live configuration;
@@ -833,6 +901,9 @@ The runtime loads only:
 
 It must not load an LLM client, prompt, draft response, research notebook,
 unapproved model artifact, or backtest result into the decision path.
+The AS-8 review may allowlist exactly one narrow runtime/adapter edge only after
+the transitive import graph proves that edge cannot reach authoring, LLM, ML
+model code, or backtest code.
 
 ### 15.2 ML observation bridge
 
@@ -848,6 +919,11 @@ If a strategy consumes ML output, require all of:
 
 An ML observation may contribute a bounded risk estimate or score. It may not
 create a symbol, bypass the strategy specification, or alter execution policy.
+The bridge consumes a frozen, serialized observation through a neutral contract;
+neither `strategy_lab.runtime` nor the proposal adapter imports `ml`. A
+script-level or storage-level reader must verify the serialized record and map
+only allowlisted observation fields. The transitive boundary test must prove
+there is no `assistant/proposal -> strategy_lab -> ml` path.
 
 ### 15.3 Proposal generation
 
@@ -1056,9 +1132,12 @@ At minimum, run:
 ```text
 python -m pytest -q <focused tests>
 python -m pytest -q tests
-python -m compileall -q assistant data execution risk scripts signals strategies backtest ml tests baskets.py config.py
+python -m compileall -q assistant data execution risk scripts signals strategies backtest ml tests baskets.py config.py market_analytics.py
 git diff --check
 ```
+
+From AS-1 onward, also include `strategy_lab` (or the final isolated package
+name) in `compileall`. Do not reference a not-yet-created package during AS-0.
 
 Also perform milestone-appropriate adversarial probes for:
 

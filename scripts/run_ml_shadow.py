@@ -39,7 +39,11 @@ from assistant.storage import AssistantStore
 from ml.artifacts import ArtifactError, load_model_manifest
 from ml.contracts import ContractError, ModelManifest
 from ml.labels import LabelError
-from ml.monitoring import build_monitoring_report
+from ml.experiment_contracts import ExperimentContractError, ExperimentSpec
+from ml.monitoring_reports import (
+    ShadowMonitoringGate,
+    build_epoch_monitoring_report,
+)
 from ml.shadow import (
     ShadowScheduleError,
     build_lineage,
@@ -148,12 +152,23 @@ def _record_alert(
     fingerprint = hashlib.sha256(
         f"ml_shadow:{identity}:{kind}".encode("utf-8")
     ).hexdigest()
+    detail_payload = dict(details)
+    nested_summary = detail_payload.get("summary")
+    evidence_epoch = detail_payload.get("evidence_epoch")
+    if evidence_epoch is None and isinstance(nested_summary, Mapping):
+        evidence_epoch = nested_summary.get("evidence_epoch")
     alert = store.upsert_operational_alert(
         fingerprint=fingerprint,
         severity=severity,
         category="ml_shadow",
         message=f"{kind}: {message}",
-        details={"kind": kind, **dict(details)},
+        details={
+            "kind": kind,
+            "schedule_key": config.schedule_key if config is not None else None,
+            "model_key": config.model_key if config is not None else None,
+            **detail_payload,
+            "evidence_epoch": evidence_epoch,
+        },
     )
     if alerts_jsonl is not None:
         append_alerts_jsonl([alert], alerts_jsonl)
@@ -663,32 +678,6 @@ def command_mature(
     return summary
 
 
-def _monitoring_rows(
-    predictions: list[dict[str, Any]], outcomes: list[dict[str, Any]]
-) -> tuple[list[dict[str, Any]], list[float]]:
-    outcome_by_id = {row["prediction_id"]: row for row in outcomes}
-    matured: list[dict[str, Any]] = []
-    outputs: list[float] = []
-    for prediction in predictions:
-        payload = prediction.get("prediction")
-        values = payload.get("values", {}) if isinstance(payload, Mapping) else {}
-        predicted = values.get("daily_volatility_pct")
-        if prediction["available"] and isinstance(predicted, (int, float)):
-            outputs.append(float(predicted))
-        outcome = outcome_by_id.get(prediction["prediction_id"])
-        if outcome is None:
-            continue
-        actual = outcome["outcome"].get("realized_daily_volatility_pct")
-        matured.append(
-            {
-                "as_of_session": prediction["as_of_session"],
-                "predicted": predicted,
-                "actual": actual,
-            }
-        )
-    return matured, outputs
-
-
 def _atomic_json_write(path: Path, payload: Mapping[str, Any]) -> None:
     destination = Path(path)
     destination.parent.mkdir(parents=True, exist_ok=True)
@@ -714,6 +703,9 @@ def command_monitor(
     *,
     evidence_epoch: str | None,
     output: Path | None,
+    artifact_directory: Path | None = None,
+    confirmation_spec: Path | None = None,
+    as_of: str | None = None,
 ) -> dict[str, Any]:
     epoch = _resolve_epoch(store, config, evidence_epoch)
     predictions = store.list_ml_predictions(evidence_epoch=epoch["evidence_epoch"])
@@ -723,16 +715,51 @@ def command_monitor(
         for row in store.list_ml_prediction_outcomes()
         if row["prediction_id"] in prediction_ids
     ]
-    matured, outputs = _monitoring_rows(predictions, outcomes)
-    midpoint = len(outputs) // 2
     runs = store.list_ml_shadow_runs(evidence_epoch=epoch["evidence_epoch"])
-    report = build_monitoring_report(
-        predictions,
-        matured,
-        predicted_key="predicted",
-        actual_key="actual",
-        reference_values=outputs[:midpoint],
-        current_values=outputs[midpoint:],
+    gate = None
+    if confirmation_spec is not None:
+        try:
+            spec_payload = json.loads(Path(confirmation_spec).read_text(encoding="utf-8"))
+            spec = ExperimentSpec.from_dict(spec_payload)
+        except (OSError, UnicodeDecodeError, json.JSONDecodeError, ExperimentContractError) as exc:
+            raise ShadowCommandError(f"could not load confirmation spec: {exc}") from exc
+        if spec.mode != "confirmation":
+            raise ShadowCommandError("--confirmation-spec must be a confirmation-mode spec")
+        if spec.task != config.task:
+            raise ShadowCommandError("confirmation spec task does not match shadow task")
+        gate = ShadowMonitoringGate.from_confirmation_spec(spec.to_dict())
+    feature_reference = None
+    if artifact_directory is not None:
+        _manifest, bundle, _evaluation = verify_runtime_artifacts(
+            config, artifact_directory
+        )
+        raw_reference = bundle.get("feature_reference")
+        if isinstance(raw_reference, Mapping):
+            feature_reference = raw_reference
+    alerts = [
+        alert
+        for alert in store.list_operational_alerts(status=None, limit=10_000)
+        if alert.get("category") == "ml_shadow"
+        and (
+            not isinstance(alert.get("details"), Mapping)
+            or (
+                alert["details"].get("schedule_key") in (None, config.schedule_key)
+                and alert["details"].get("evidence_epoch")
+                in (None, epoch["evidence_epoch"])
+            )
+        )
+    ]
+    report = build_epoch_monitoring_report(
+        evidence_epoch=epoch["evidence_epoch"],
+        lineage_hash=epoch["lineage_hash"],
+        predictions=predictions,
+        outcomes=outcomes,
+        runs=runs,
+        operational_alerts=alerts,
+        expected_subjects=config.subjects,
+        feature_reference=feature_reference,
+        gate=gate,
+        as_of=as_of,
     )
     summary = {
         "ok": True,
@@ -847,6 +874,18 @@ def build_parser() -> argparse.ArgumentParser:
     monitor = subparsers.add_parser("monitor", help="Build one read-only epoch report.")
     monitor.add_argument("--evidence-epoch")
     monitor.add_argument("--output", type=Path)
+    monitor.add_argument(
+        "--confirmation-spec",
+        type=Path,
+        help=(
+            "Frozen confirmation spec containing task_parameters.shadow_monitoring_gate. "
+            "Without it every sample-dependent conclusion is explicitly insufficient."
+        ),
+    )
+    monitor.add_argument(
+        "--as-of",
+        help="Timezone-aware report cutoff; defaults to now.",
+    )
 
     subparsers.add_parser("status", help="Show registration, epoch, run, and alert status.")
 
@@ -901,6 +940,9 @@ def main(argv: list[str] | None = None) -> int:
                 config,
                 evidence_epoch=args.evidence_epoch,
                 output=args.output,
+                artifact_directory=args.artifact_dir,
+                confirmation_spec=args.confirmation_spec,
+                as_of=args.as_of,
             )
         elif args.command == "status":
             summary = command_status(store, config)

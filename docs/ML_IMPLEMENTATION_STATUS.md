@@ -406,3 +406,82 @@ dependency, not something this runtime guesses around. Earnings and ranker
 shadow adapters are intentionally absent: ML-LR-6 requires one supervised
 task, and those tasks need their own reviewed online feature/label semantics
 rather than a generic adapter that merely looks reusable.
+
+
+## ML-LR-7 notes
+
+ML-LR-7 is **software complete**. `ml/monitoring_reports.py` replaces the
+minimal LR-6 monitoring summary with a hash-addressed report for exactly one
+evidence epoch. Its independent unit is a unique scheduled/as-of date: two or
+twenty tickers observed on the same date still count as one observation.
+Candidate and frozen-baseline losses are calculated on identical matured rows
+and then averaged by date, so a model cannot appear to outperform merely
+because a difficult baseline row went missing. Historical operational
+incidents remain visible after later successful runs.
+
+The report covers attempts, refusals, freshness, feature/output drift,
+rolling realized error, interval coverage, probability calibration, both
+frozen volatility baselines, year/regime/ticker/event slices, lineage,
+outcome underfill, and operational failures. Every sample-dependent section
+carries its own independent count, preregistered requirement, and explicit
+insufficiency reasons. A confirmation spec must freeze this object under
+`task_parameters.shadow_monitoring_gate` before outcomes are observed:
+
+```json
+{
+  "minimum_unique_dates": 252,
+  "rolling_window_unique_dates": 60,
+  "minimum_slice_unique_dates": 30,
+  "minimum_regime_count": 2,
+  "minimum_prediction_coverage": 0.98,
+  "maximum_refusal_fraction": 0.02,
+  "target_interval_coverage": 0.90,
+  "interval_coverage_tolerance": 0.05,
+  "mandate_ceiling_daily_pct": 2.0,
+  "maximum_brier": 0.20,
+  "maximum_feature_psi": 0.25,
+  "maximum_output_mean_shift_fraction": 0.20,
+  "minimum_model_better_date_fraction": 0.55,
+  "sample_size_justification": "Replace with the preregistered frequency, overlap, effect-size, and power justification."
+}
+```
+
+The numbers above illustrate the schema; they are not a recommendation or a
+universal gate. Without a frozen gate, the monitor reports every conclusion
+as insufficient. New model artifacts preserve date-aggregated training
+feature histograms, and new shadow predictions preserve monitoring-only
+feature values and event categories. Older artifacts/predictions remain
+readable, but feature drift is honestly unavailable for them.
+
+Generate the full report with:
+
+```text
+python scripts/run_ml_shadow.py --database <db> --config <shadow.json> --artifact-dir <artifacts> monitor --evidence-epoch <epoch> --confirmation-spec <confirmation.spec.json> --output <monitoring.json>
+```
+
+`ml/promotion.py` adds the frozen `PromotionDossier`. The standalone
+`scripts/run_ml_promotion_dossier.py` hashes and inventories discovery,
+confirmation, dataset/availability/universe, model, economic, shadow, and
+monitoring evidence; derives the initial review gates; preserves unresolved ML
+alerts and ambiguous broker outcomes; and writes one immutable JSON dossier.
+It has no registry import or transition method, is always
+`production_authoritative=false`, and always retains
+`separate_owner_promotion_review_required`.
+
+Availability and universe evidence must be JSON objects that explicitly carry
+`"complete": true` (or `"coverage_complete": true`) and zero
+`unresolved_count`/`failure_count`; merely handing the dossier a file is not a
+coverage result. Economic evidence must explicitly carry both
+`acceptable_after_costs_taxes_shared_capital=true` and
+`no_material_mandate_degradation=true`.
+
+```text
+python scripts/run_ml_promotion_dossier.py --database <db> --config <shadow.json> --artifact-dir <artifacts> --evidence-epoch <epoch> --discovery-spec <discovery.spec.json> --discovery-report <discovery.report.json> --confirmation-spec <confirmation.spec.json> --dataset-manifest <dataset.manifest.json> --availability-manifest <availability.json> --universe-manifest <universe.json> --economic-simulation <economics.json> --monitoring-report <monitoring.json> --proposed-adapter-scope <read-only-scope.json> --known-limitation "<known limitation>" --output <dossier.json>
+```
+
+Software completion does not imply review eligibility. Existing volatility
+shadow records do not contain online intervals or calibrated probabilities,
+so those monitoring gates remain blocked until a future model version emits
+them prospectively. Yfinance remains non-point-in-time, real shadow duration
+has not elapsed, and no owner promotion authority exists. The dossier makes
+those facts visible; it cannot remove them.

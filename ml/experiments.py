@@ -115,6 +115,52 @@ class _FittedModel:
     hyperparameters: Mapping[str, Any]
     training_start: str
     training_end: str
+    feature_reference: Mapping[str, Any] = dataclasses.field(default_factory=dict)
+
+
+def _feature_reference(
+    sample: pd.DataFrame,
+    sessions: pd.Series,
+    feature_names: Sequence[str],
+) -> dict[str, Any]:
+    """Freeze date-level training distributions for later shadow drift checks.
+
+    Ticker rows from the same date are deliberately collapsed to their median.
+    LR-7 forbids treating overlapping ticker rows as independent evidence, and
+    storing only decile counts keeps the model artifact compact while retaining
+    out-of-training-range observations in the two open-ended outer bins.
+    """
+    result: dict[str, Any] = {}
+    session_values = sessions.astype(str)
+    for name in feature_names:
+        frame = pd.DataFrame(
+            {
+                "session": session_values.to_numpy(),
+                "value": pd.to_numeric(sample[name], errors="coerce").to_numpy(),
+            }
+        ).replace([np.inf, -np.inf], np.nan).dropna()
+        date_values = frame.groupby("session", sort=True)["value"].median().to_numpy(
+            dtype=float
+        )
+        if date_values.size == 0:
+            continue
+        edges = np.unique(np.quantile(date_values, np.linspace(0.1, 0.9, 9)))
+        counts, _ = np.histogram(
+            date_values, bins=np.concatenate(([-np.inf], edges, [np.inf]))
+        )
+        result[name] = {
+            "independent_date_count": int(date_values.size),
+            "bin_edges": [float(value) for value in edges],
+            "bin_counts": [int(value) for value in counts],
+            "minimum": float(date_values.min()),
+            "maximum": float(date_values.max()),
+            "mean": float(date_values.mean()),
+            "standard_deviation": (
+                float(date_values.std(ddof=1)) if date_values.size > 1 else None
+            ),
+            "aggregation": "median_by_as_of_session",
+        }
+    return result
 
 
 def _require_safe_output_name(filename: str) -> None:
@@ -523,6 +569,11 @@ def _run_volatility_task(
                         ),
                         training_start=standardizer.training_start,
                         training_end=standardizer.training_end,
+                        feature_reference=_feature_reference(
+                            train_sample,
+                            joined.loc[train_sample.index, "as_of_session"],
+                            feature_columns,
+                        ),
                     )
             metrics["fit_error"] = None
         except Exception as exc:  # a thin fold is recorded, never silently skipped
@@ -711,6 +762,9 @@ def _save_and_verify_models(
             },
             "ordered_feature_names": spec.ordered_feature_names,
         }
+        feature_reference = dict(getattr(fitted, "feature_reference", {}))
+        if feature_reference:
+            bundle["feature_reference"] = feature_reference
         artifact_hash = save_model_artifact(
             bundle,
             directory=output_directory,
@@ -894,6 +948,11 @@ def _run_ranker_task(
                         ),
                         training_start=standardizer.training_start,
                         training_end=standardizer.training_end,
+                        feature_reference=_feature_reference(
+                            train_sample,
+                            joined.loc[train_sample.index, "as_of_session"],
+                            feature_columns,
+                        ),
                     )
             metrics["fit_error"] = None
         except Exception as exc:

@@ -18,6 +18,7 @@ from ml.portfolio_experiments import (
     build_portfolio_target_series,
     build_realized_account_target_series,
     group_position_snapshots_by_session,
+    group_position_snapshots_with_refusals,
     summarize_portfolio_targets,
     targets_to_frame,
 )
@@ -402,3 +403,65 @@ def test_building_targets_creates_no_files(tmp_path, monkeypatch):
     monkeypatch.chdir(tmp_path)
     _build(n_sessions=60)
     assert list(tmp_path.iterdir()) == []
+
+
+# --- ambiguous-cohort blast radius ------------------------------------------
+
+
+def test_one_ambiguous_session_does_not_destroy_an_entire_history():
+    """The strict grouper correctly refuses a session whose capture cohorts
+    disagree on ticker membership -- a partially-written capture and a
+    genuine mid-day sell look identical. But raising costs the WHOLE
+    account: measured, one bad session out of 120 destroyed all 120, while
+    the same condition inside build_portfolio_target_series() costs exactly
+    one session. A mid-day sell is not corruption; it is Tuesday."""
+    sessions, close, positions, cash, cutoffs = _fixture(120)
+    bad = sessions[50]
+    positions[bad] = [positions[bad][0]] + [
+        {**positions[bad][1], "captured_at": f"{bad}T21:30:00+00:00"}
+    ]
+    flat = [row for rows in positions.values() for row in rows]
+
+    # Strict: all-or-nothing.
+    with pytest.raises(PortfolioExperimentError, match="cannot be proven complete"):
+        group_position_snapshots_by_session(flat)
+
+    # Tolerant: the ambiguous session is skipped and reported.
+    grouped, refusals = group_position_snapshots_with_refusals(flat)
+    assert len(grouped) == 119
+    assert len(refusals) == 1
+    assert refusals[0]["as_of_session"] == bad
+
+
+def test_a_skipped_session_still_yields_no_target_rather_than_a_hybrid():
+    """The safety property is unchanged: an ambiguous session produces NO
+    observation, never a portfolio assembled from captures taken at
+    different instants."""
+    sessions, close, positions, cash, cutoffs = _fixture(60)
+    bad = sessions[10]
+    positions[bad] = [positions[bad][0]] + [
+        {**positions[bad][1], "captured_at": f"{bad}T21:30:00+00:00"}
+    ]
+    flat = [row for rows in positions.values() for row in rows]
+    grouped, refusals = group_position_snapshots_with_refusals(flat)
+
+    assert bad not in grouped
+    result = build_portfolio_target_series(
+        "paper", positions_by_session=grouped, cash_by_session=cash,
+        close_by_ticker=close, forecast_cutoff_by_session=cutoffs, horizon_sessions=20,
+    )
+    assert all(t.as_of_session != bad for t in result.targets)
+
+
+def test_the_tolerant_grouper_matches_the_strict_one_when_nothing_is_ambiguous():
+    sessions, close, positions, cash, cutoffs = _fixture(30)
+    flat = [row for rows in positions.values() for row in rows]
+    strict = group_position_snapshots_by_session(flat)
+    tolerant, refusals = group_position_snapshots_with_refusals(flat)
+    assert refusals == ()
+    assert tolerant.keys() == strict.keys()
+
+
+def test_the_tolerant_grouper_still_requires_a_session_date():
+    with pytest.raises(PortfolioExperimentError, match="session_date"):
+        group_position_snapshots_with_refusals([{"ticker": "AAA"}])

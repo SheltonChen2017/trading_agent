@@ -170,6 +170,48 @@ def group_position_snapshots_by_session(
     return grouped
 
 
+def group_position_snapshots_with_refusals(
+    snapshots: Sequence[Mapping[str, Any]],
+) -> tuple[dict[str, list[Mapping[str, Any]]], tuple[Mapping[str, str], ...]]:
+    """Group by session, SKIPPING ambiguous sessions instead of failing the
+    whole history.
+
+    `group_position_snapshots_by_session()` raises on a session whose capture
+    cohorts disagree on ticker membership. That refusal is correct -- a
+    partially-written capture and a genuine mid-day sell look identical, so
+    the latest cohort cannot be proven complete -- but its BLAST RADIUS is
+    wrong for the realistic pipeline. Measured: one ambiguous session out of
+    120 destroyed all 120, while the same condition inside
+    `build_portfolio_target_series()` costs exactly one session.
+
+    A mid-day sell is not corruption; it is Tuesday. The briefing runs at
+    14:00 with five positions, the owner sells one, and it runs again at
+    21:00 with four. Losing an entire account's history to that is the wrong
+    trade, and it also silently defeats plan 9.7's underfill reporting: a
+    raised exception produces no target count and no refusal reasons to show
+    the user.
+
+    This preserves the safety property exactly -- an ambiguous session still
+    yields NO target, never a hybrid portfolio -- while localizing the cost
+    and keeping the reason visible. The strict function is left unchanged
+    for callers that genuinely want an all-or-nothing load.
+    """
+    per_session: dict[str, list[Mapping[str, Any]]] = {}
+    for row in snapshots:
+        if not isinstance(row, Mapping) or "session_date" not in row:
+            raise PortfolioExperimentError("position snapshot is missing 'session_date'")
+        per_session.setdefault(str(row["session_date"]), []).append(row)
+
+    grouped: dict[str, list[Mapping[str, Any]]] = {}
+    refusals: list[dict[str, str]] = []
+    for session, rows in sorted(per_session.items()):
+        try:
+            grouped.update(group_position_snapshots_by_session(rows))
+        except PortfolioExperimentError as exc:
+            refusals.append({"as_of_session": session, "reason": str(exc)})
+    return grouped, tuple(refusals)
+
+
 def build_portfolio_target_series(
     account_key: str,
     *,

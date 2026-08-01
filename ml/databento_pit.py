@@ -1095,6 +1095,21 @@ def canonical_reference_records(
     return tuple(sorted(records, key=canonical_json))
 
 
+def _serialize_reference_frame(frame: Any) -> bytes:
+    """Faithful text form of the vendor response, for preservation only.
+
+    The reference API returns a DataFrame rather than a file, so the closest
+    equivalent of "the bytes we paid for" is a lossless text rendering of
+    whatever arrived -- including a response whose columns are not what this
+    adapter expects, which is precisely the case worth keeping.
+    """
+    if isinstance(frame, pd.DataFrame):
+        return frame.to_csv(index=True).encode("utf-8")
+    # Not a DataFrame at all: still preserve something inspectable rather
+    # than discarding a served request.
+    return repr(frame).encode("utf-8", errors="replace")
+
+
 def fetch_reference_snapshot(
     request: ReferenceRequest,
     *,
@@ -1121,29 +1136,22 @@ def fetch_reference_snapshot(
         if observed_at is not None
         else _canonical_observed_at(None)
     )
-    records = canonical_reference_records(frame, request)
-    if any(
-        _timestamp(record["ts_created"], "reference.ts_created")
-        > _timestamp(observed, "observed_at")
-        for record in records
-    ):
-        raise DatabentoSourceError(
-            "reference response contains a record created after observed_at"
-        )
-    payload = {
-        "schema_version": PIT_SNAPSHOT_SCHEMA_VERSION,
-        "kind": request.kind,
-        "request": request.to_dict(),
-        "records": list(records),
-    }
-    data_bytes = canonical_json(payload).encode("utf-8")
     stamp = datetime.fromisoformat(naming_instant).strftime("%Y%m%dT%H%M%S%fZ")
     stem = f"databento-{request.kind.replace('_', '-')}-{stamp}-{request.request_hash[:12]}"
     directory = Path(directory)
+    raw_path = directory / f"{stem}.raw.csv"
     data_path = directory / f"{stem}.reference.json"
     manifest_path = directory / f"{stem}.manifest.json"
-    write_immutable_bytes(data_path, data_bytes)
-    manifest = {
+
+    # The reference request is licensed and billable, and it has already been
+    # served. Preserve the vendor response BEFORE canonicalizing it, exactly
+    # as fetch_statistics_snapshot preserves its DBN: an unexpected column set
+    # is one of the failures for which the operator must not have to buy the
+    # same response twice.
+    raw_bytes = _serialize_reference_frame(frame)
+    write_immutable_bytes(raw_path, raw_bytes)
+
+    base_manifest = {
         "schema_version": PIT_SNAPSHOT_SCHEMA_VERSION,
         "source_id": REFERENCE_SOURCE_ID,
         "source_version": databento_source_version(),
@@ -1151,10 +1159,8 @@ def fetch_reference_snapshot(
         "request": request.to_dict(),
         "request_hash": request.request_hash,
         "observed_at": observed,
-        "data_filename": data_path.name,
-        "data_sha256": hash_bytes(data_bytes),
-        "row_count": len(records),
-        "validation_status": "accepted",
+        "raw_filename": raw_path.name,
+        "raw_sha256": hash_bytes(raw_bytes),
         "point_in_time_reference": True,
         "point_in_time_data": False,
         "provides_point_in_time_lineage": False,
@@ -1163,6 +1169,75 @@ def fetch_reference_snapshot(
             "or establish historical strategy/index membership."
         ),
     }
+
+    try:
+        records = canonical_reference_records(frame, request)
+        if any(
+            _timestamp(record["ts_created"], "reference.ts_created")
+            > _timestamp(observed, "observed_at")
+            for record in records
+        ):
+            raise DatabentoSourceError(
+                "reference response contains a record created after observed_at"
+            )
+    except Exception as exc:
+        reason = (
+            exc
+            if isinstance(exc, DatabentoSourceError)
+            else DatabentoSourceError(
+                f"Databento reference validation failed: {type(exc).__name__}: {exc}"
+            )
+        )
+        rejected = dict(base_manifest)
+        rejected.update(
+            {
+                "validation_status": "rejected",
+                "rejection_reason": str(reason),
+                "data_filename": None,
+                "data_sha256": None,
+                "row_count": 0,
+                # A rejected reference snapshot cannot support a
+                # point-in-time claim, whatever its subscription status.
+                "point_in_time_reference": False,
+            }
+        )
+        try:
+            write_immutable_bytes(
+                manifest_path, canonical_json(rejected).encode("utf-8")
+            )
+        except Exception as manifest_exc:
+            raise DatabentoSnapshotRetainedError(
+                f"{reason} — paid reference response retained at {raw_path}, but "
+                f"its rejection manifest could not be written: "
+                f"{type(manifest_exc).__name__}: {manifest_exc}",
+                raw_path=raw_path,
+                manifest_path=manifest_path,
+            ) from manifest_exc
+        raise DatabentoSnapshotRetainedError(
+            f"{reason} — the paid reference response was retained at {raw_path} "
+            f"and does not need to be requested again; its rejection manifest "
+            f"is {manifest_path}",
+            raw_path=raw_path,
+            manifest_path=manifest_path,
+        ) from reason
+
+    payload = {
+        "schema_version": PIT_SNAPSHOT_SCHEMA_VERSION,
+        "kind": request.kind,
+        "request": request.to_dict(),
+        "records": list(records),
+    }
+    data_bytes = canonical_json(payload).encode("utf-8")
+    write_immutable_bytes(data_path, data_bytes)
+    manifest = dict(base_manifest)
+    manifest.update(
+        {
+            "data_filename": data_path.name,
+            "data_sha256": hash_bytes(data_bytes),
+            "row_count": len(records),
+            "validation_status": "accepted",
+        }
+    )
     try:
         write_immutable_bytes(manifest_path, canonical_json(manifest).encode("utf-8"))
     except Exception as exc:

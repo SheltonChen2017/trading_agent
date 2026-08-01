@@ -200,6 +200,15 @@ Schema version 2 distinguishes `accepted`, `accepted_with_refusals`, and
 `rejected`. It also records `underfilled`, so a successful download cannot
 hide the fact that some requested observations were unusable.
 
+The same rule applies to the licensed reference requests. Because the
+reference API returns a DataFrame rather than a file, the response is written
+to `<stem>.raw.csv` before it is canonicalized — an unexpected column set is
+exactly the failure worth keeping, and the preserved CSV shows which columns
+actually arrived. A rejected reference snapshot records
+`validation_status: rejected` and, critically, `point_in_time_reference:
+false`: a response that could not be validated cannot support a
+point-in-time claim whatever the subscription says.
+
 Row-level problems are recorded as refusals rather than voiding the request.
 A zero-volume row, a ticker that had not listed yet, and a delisted ticker with
 no bars in the window must not discard a large paid multi-ticker download.

@@ -21,7 +21,7 @@ from ml.databento_pit import (
     normalize_statistics_frame,
     select_complete_statistics_cohorts,
 )
-from ml.databento_source import DatabentoSourceError
+from ml.databento_source import DatabentoSnapshotRetainedError, DatabentoSourceError
 from scripts import run_databento_ingest
 
 
@@ -487,3 +487,83 @@ def test_cli_keeps_statistics_cost_cap_and_reference_acknowledgement_separate():
         ]
     )
     assert acknowledged.acknowledge_reference_subscription is True
+
+
+# --- Review follow-up (2026-08-01): paid reference responses -------------
+#
+# fetch_statistics_snapshot preserves its billable DBN before validating it.
+# fetch_reference_snapshot must do the same: a reference request is licensed
+# and billable, and an unexpected column set is exactly the failure for which
+# the operator must not have to buy the same response twice.
+
+
+def test_rejected_reference_response_is_retained_not_discarded(tmp_path):
+    broken = _security_frame().drop(columns=["symbol"])
+    client = _FakeReferenceClient(broken, _adjustment_frame())
+    request = _reference_request("security_master")
+
+    with pytest.raises(DatabentoSnapshotRetainedError) as caught:
+        fetch_reference_snapshot(
+            request,
+            directory=tmp_path,
+            acknowledge_reference_subscription=True,
+            client=client,
+            observed_at="2026-08-01T12:00:00+00:00",
+        )
+    error = caught.value
+    # The request was served and billed.
+    assert client.security_master.calls
+    assert error.raw_path.is_file(), "the paid reference response was discarded"
+    # The preserved response is diagnosable without re-requesting it.
+    header = error.raw_path.read_text(encoding="utf-8").splitlines()[0]
+    assert "ts_effective" in header and "symbol" not in header
+    assert "does not need to be requested again" in str(error)
+
+    manifest = json.loads(error.manifest_path.read_text(encoding="utf-8"))
+    assert manifest["validation_status"] == "rejected"
+    assert manifest["rejection_reason"]
+    assert manifest["data_filename"] is None
+    assert manifest["row_count"] == 0
+    assert len(manifest["raw_sha256"]) == 64
+    # A rejected snapshot cannot support a point-in-time claim.
+    assert manifest["point_in_time_reference"] is False
+    assert manifest["point_in_time_data"] is False
+
+
+def test_reference_record_created_after_observed_at_still_retains_the_response(
+    tmp_path,
+):
+    """The look-ahead refusal must not also destroy the evidence."""
+    client = _FakeReferenceClient(_security_frame(), _adjustment_frame())
+    with pytest.raises(DatabentoSnapshotRetainedError) as caught:
+        fetch_reference_snapshot(
+            _reference_request("security_master"),
+            directory=tmp_path,
+            acknowledge_reference_subscription=True,
+            client=client,
+            # Earlier than the fixture's ts_created, so the refusal fires.
+            observed_at="2026-01-01T00:00:00+00:00",
+        )
+    assert "created after observed_at" in str(caught.value)
+    assert caught.value.raw_path.is_file()
+
+
+def test_accepted_reference_snapshot_also_preserves_the_raw_response(tmp_path):
+    client = _FakeReferenceClient(_security_frame(), _adjustment_frame())
+    snapshot = fetch_reference_snapshot(
+        _reference_request("security_master"),
+        directory=tmp_path,
+        acknowledge_reference_subscription=True,
+        client=client,
+        observed_at="2026-08-01T12:00:00+00:00",
+    )
+    manifest = snapshot.manifest
+    assert manifest["validation_status"] == "accepted"
+    assert manifest["point_in_time_reference"] is True
+    raw_path = snapshot.data_path.parent / manifest["raw_filename"]
+    assert raw_path.is_file()
+    assert len(manifest["raw_sha256"]) == 64
+    # Raw and canonical forms are distinct artifacts, both immutable.
+    assert raw_path != snapshot.data_path
+    with pytest.raises(DatabentoSourceError, match="immutable snapshot"):
+        databento_pit.write_immutable_bytes(raw_path, b"overwrite")

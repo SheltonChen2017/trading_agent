@@ -23,7 +23,7 @@ import dataclasses
 import re
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
-from typing import Any, Mapping, Sequence
+from typing import Any, Sequence
 
 from ml.hashing import hash_payload
 

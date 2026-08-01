@@ -25,6 +25,9 @@ The next implementation sequence is defined in
 | ML-LR-3 | Portfolio-volatility targets, evaluation completion, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py` | None |
 | ML-LR-4 | Earnings event identity, pre-event features, event-date experiment runner, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `ml/earnings_experiments.py`, `ml/experiments.py`, `scripts/run_filing_extraction.py` | None (research/context only) |
 | ML-LR-6 | Automated volatility shadow prediction, exact-calendar maturity, evidence epochs, monitoring/status CLI, durable operational failures, separate Windows scheduler | `ml/shadow.py`, `ml/shadow_runtime.py`, `scripts/run_ml_shadow.py`, `scripts/install_windows_ml_shadow_tasks.ps1`, ML epoch/run columns and tables in `assistant/storage.py` | Writes non-authoritative observations and operational alerts only |
+| ML-LR-7 | Evidence-epoch monitoring and immutable promotion dossier | `ml/monitoring_reports.py`, `ml/promotion.py`, `scripts/run_ml_promotion_dossier.py` | Read-only reports only |
+| ML-LR-8 | Read-only model-observation presentation | `ml/presentation.py`, `scripts/run_ml_shadow.py status` | Context display only |
+| ML-FS-1 | Scheduled paper observations normalized into portfolio equity/position history plus complete-capture manifests | `assistant/paper_evidence.py`, `assistant/storage.py` | Writes reconciled paper observations and research history only |
 
 ML-LR-2 gives both supported tasks a reproducible runner. Verified against
 the milestone's own definition of done by invoking the real CLI twice: the
@@ -543,3 +546,29 @@ before it is trusted, a mismatch is displayed as rejected rather than
 dropped, and its `promotion_blockers` are surfaced verbatim. When no
 monitoring report exists, monitoring evidence is reported unavailable and an
 explicit blocker is added — absence is not a clean result.
+
+## ML-FS-1 notes
+
+`docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md` layers the remaining collection,
+research, evidence, and reviewed-assistance work on top of ML-LR. Its first
+milestone closes the production-writer gap in portfolio history.
+
+The existing scheduled `paper-observation` command now derives normalized
+`portfolio_equity_snapshots` and `portfolio_position_snapshots` from the
+already-committed immutable paper observation. A retry with a newer broker
+snapshot therefore cannot rewrite the recorded session: normalization uses the
+stored observation payload. The account key includes provider, paper/live mode,
+and broker account ID.
+
+The new `portfolio_capture_sessions` manifest is written only after the paper
+observation, equity snapshot, and every position snapshot exist and their
+hashes have been verified. A zero-position manifest proves a genuine cash-only
+capture; no manifest means normalization is incomplete. A crash after child
+writes is recoverable by an exact scheduler retry, which repairs the missing
+manifest without duplicating or changing history.
+
+This milestone creates no proposal, order, execution reservation, allocation,
+or ML authority. Execution-quality telemetry, authoritative Databento online
+features, prospective intervals/probabilities, real confirmation, elapsed
+shadow evidence, promotion, and bounded trading assistance remain later
+ML-FS milestones.

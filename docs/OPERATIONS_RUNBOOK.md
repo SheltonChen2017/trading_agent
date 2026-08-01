@@ -78,6 +78,40 @@ retry derives normalized records from the stored immutable observation—not a
 newer broker snapshot—and repairs missing children or the manifest
 idempotently.
 
+## Execution telemetry collection
+
+No separate telemetry daemon is required. For each proposal successfully
+claimed by `execute_approved_paper_proposal()`, the service appends validation
+and quote evidence to `execution_telemetry_events`. If execution reaches the
+broker boundary, it appends `submission_started` before the API call. A failure
+to persist that event blocks the call and releases the execution-budget
+reservation. Do not bypass this service to place assistant-originated orders;
+direct broker orders cannot produce a complete pre-broker record.
+
+Acknowledgements, fills, cancels, and replacements continue to come from the
+order monitor's authoritative `broker_order_events` journal. Keep
+`monitor-orders` running and retain the same SQLite database for the execution
+service and monitor. The analysis record is rebuilt with
+`assistant.execution_telemetry.materialize_execution_attempt(store,
+attempt_id)`; no mutable materialized table needs repair.
+
+For a quick completeness check:
+
+```sql
+SELECT attempt_id, proposal_id, event_type, event_at,
+       account_mode, broker_account_id
+FROM execution_telemetry_events
+ORDER BY event_at DESC;
+```
+
+A refused validation normally has one event. A dispatched attempt has both a
+validation event and `submission_started`; subsequent lifecycle rows are in
+`broker_order_events`. Paper and live rows must remain partitioned by
+`account_mode` and `broker_account_id`. Recent volume and liquidity bucket are
+currently marked unavailable because Alpaca's latest-quote response contains
+neither volume nor depth; do not backfill estimates and present them as
+observations.
+
 The continuous processes can also be started directly:
 
 ```text

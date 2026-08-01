@@ -5,6 +5,7 @@ import sqlite3
 import sys
 import tempfile
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -502,7 +503,11 @@ def _mock_execution_dependencies(
 
     broker.get_latest_quote = fake_quote
     broker.assert_account_and_asset_ready = lambda ticker: {
-        "account": {"paper": True, "status": "ACTIVE"},
+        "account": {
+            "account_id": "test-paper-account",
+            "paper": True,
+            "status": "ACTIVE",
+        },
         "asset": {"ticker": ticker, "status": "active", "tradable": True},
     }
     event_data.fetch_upcoming_earnings = lambda tickers, as_of=None: {
@@ -570,6 +575,22 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
             assert order["order_id"] == "paper-1"
             assert store.get_proposal(proposal.proposal_id)["status"] == "broker_accepted"
             assert len(captured) == 1
+            telemetry = store.list_execution_telemetry_events(
+                proposal_id=proposal.proposal_id
+            )
+            assert [event["event_type"] for event in telemetry] == [
+                "validation_approved",
+                "submission_started",
+            ]
+            assert len({event["attempt_id"] for event in telemetry}) == 1
+            assert all(event["account_mode"] == "paper" for event in telemetry)
+            assert all(
+                event["broker_account_id"] == "test-paper-account"
+                for event in telemetry
+            )
+            assert Decimal(telemetry[0]["payload"]["quote"]["price"]) == Decimal(
+                str(proposal.reference_price)
+            )
     finally:
         restore()
 
@@ -1285,6 +1306,13 @@ def test_approval_blocked_when_quote_is_stale():
             except ProposalExecutionError as exc:
                 assert "stale" in str(exc).lower() or "minute" in str(exc).lower()
             assert len(captured) == 0
+            telemetry = store.list_execution_telemetry_events(
+                proposal_id=proposal.proposal_id
+            )
+            assert [event["event_type"] for event in telemetry] == [
+                "validation_refused"
+            ]
+            assert "stale_price" in telemetry[0]["payload"]["violation_codes"]
     finally:
         restore()
 
@@ -1455,6 +1483,13 @@ def test_unexpected_exception_during_validation_marks_validation_failed_not_stuc
             # silently reset to "proposed" either.
             status = store.get_proposal(proposal.proposal_id)["status"]
             assert status == "validation_failed", status
+            telemetry = store.list_execution_telemetry_events(
+                proposal_id=proposal.proposal_id
+            )
+            assert [event["event_type"] for event in telemetry] == [
+                "validation_failed"
+            ]
+            assert "simulated unexpected bug" in telemetry[0]["payload"]["error"]
     finally:
         execution_service.validate_trade_intent = original_validate
         restore()

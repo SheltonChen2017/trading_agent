@@ -38,6 +38,8 @@ gates, and model isolation. This plan fills the operational path around it:
 
 Current baseline:
 
+- ML-FS-0, ML-FS-1, and ML-FS-2 are software-complete; the next software
+  milestone is ML-FS-3;
 - ML-LR-0, ML-LR-1, ML-LR-2, ML-LR-4, ML-LR-6, ML-LR-7, and
   ML-LR-8 are software-complete within their documented limits;
 - ML-LR-3 is complete for per-security volatility but not for portfolio model
@@ -46,9 +48,9 @@ Current baseline:
   path;
 - real `point_in_time_data=True` remains blocked on authoritative adjustment
   vintages and historical universe membership;
-- the scheduled paper observation stores holdings in its immutable payload,
-  but does not populate the normalized portfolio-history tables consumed by
-  portfolio ML research; and
+- the scheduled paper observation now writes normalized portfolio history and
+  a complete-capture manifest, while claimed execution attempts retain
+  pre-broker telemetry joined to the authoritative broker event journal; and
 - volatility shadow operation exists, but current online output does not yet
   carry every prospective interval, calibrated-probability, and monitoring
   field required for promotion review.
@@ -108,6 +110,8 @@ describing fixture tests as market evidence.
 
 ## 6. ML-FS-1 — normalized portfolio collection
 
+Status: implemented 2026-08-01.
+
 ### Purpose
 
 Make the existing scheduled post-close paper observation directly usable by
@@ -150,6 +154,8 @@ edits.
 
 ## 7. ML-FS-2 — execution telemetry collection
 
+Status: implemented 2026-08-01. No execution model was fit or enabled.
+
 ### Purpose
 
 Retain analysis-ready order-lifecycle evidence now without fitting or deploying
@@ -170,6 +176,16 @@ Add an immutable execution observation identity spanning:
 The event journal remains authoritative. Materialized telemetry must be
 rebuildable from its source events and must never pool paper and live records by
 default.
+
+The implemented boundary treats a successfully claimed proposal as the start
+of an order attempt. It appends validation/quote evidence and, only when the
+attempt reaches it, a `submission_started` event before contacting the broker.
+Acknowledgement, partial/final fills, cancellation, and replacement chains are
+derived from `broker_order_events`; they are not duplicated into a competing
+lifecycle store. Current quote data has no recent volume or depth, so those
+fields are explicitly unavailable rather than estimated. If the mandatory
+pre-submit append fails, the execution service releases its reservation and
+refuses the broker call.
 
 ### Definition of done
 

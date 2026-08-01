@@ -28,6 +28,7 @@ The next implementation sequence is defined in
 | ML-LR-7 | Evidence-epoch monitoring and immutable promotion dossier | `ml/monitoring_reports.py`, `ml/promotion.py`, `scripts/run_ml_promotion_dossier.py` | Read-only reports only |
 | ML-LR-8 | Read-only model-observation presentation | `ml/presentation.py`, `scripts/run_ml_shadow.py status` | Context display only |
 | ML-FS-1 | Scheduled paper observations normalized into portfolio equity/position history plus complete-capture manifests | `assistant/paper_evidence.py`, `assistant/storage.py` | Writes reconciled paper observations and research history only |
+| ML-FS-2 | Immutable pre-broker execution telemetry plus rebuildable lifecycle materialization | `assistant/execution_telemetry.py`, `assistant/execution_service.py`, `assistant/storage.py` | Claimed attempts write observations; a failed pre-submit telemetry append refuses the broker call |
 
 ML-LR-2 gives both supported tasks a reproducible runner. Verified against
 the milestone's own definition of done by invoking the real CLI twice: the
@@ -568,7 +569,34 @@ writes is recoverable by an exact scheduler retry, which repairs the missing
 manifest without duplicating or changing history.
 
 This milestone creates no proposal, order, execution reservation, allocation,
-or ML authority. Execution-quality telemetry, authoritative Databento online
-features, prospective intervals/probabilities, real confirmation, elapsed
-shadow evidence, promotion, and bounded trading assistance remain later
-ML-FS milestones.
+or ML authority. Authoritative Databento online features, prospective
+intervals/probabilities, real confirmation, elapsed shadow evidence, promotion,
+and bounded trading assistance remain later ML-FS milestones.
+
+## ML-FS-2 notes
+
+Every proposal that the execution service successfully claims now receives a
+content-addressed attempt identity. Validation completion appends its decision,
+intent, broker account/asset preflight, quote observation/receipt timestamps,
+bid, ask, spread, measured quote age, reference price, violations, and explicit
+unavailability. An attempt that reaches dispatch appends `submission_started`
+before the broker is contacted. The store is append-only and exact retries are
+idempotent.
+
+Post-submit truth is not copied. `materialize_execution_attempt()` joins those
+pre-broker events to the existing authoritative `broker_order_events` journal
+to reconstruct acknowledgement, partial and final fills, cancellations,
+replacement chains, requested/filled quantities, and decision/arrival/fill
+prices. The output binds one broker account and mode and sets
+`pool_paper_and_live=false`; inconsistent account identity is refused. Recent
+volume and a liquidity bucket are explicitly unavailable because the current
+quote source supplies neither volume nor market depth.
+
+This milestone fits no model and grants no authority to ML. It does not alter
+validation, sizing, order type, broker routing, cancellation, or replacement
+logic. The only execution-side enforcement is fail-closed evidence capture: if
+the local `submission_started` append fails, the reserved budget is released,
+the proposal becomes a confirmed `submission_failed`, and no broker API is
+called. Attempts rejected before the atomic claim (unknown proposal, incorrect
+confirmation phrase, or unclaimable state) remain service requests, not order
+attempts, and therefore do not enter the ML execution dataset.

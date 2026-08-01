@@ -38,8 +38,9 @@ gates, and model isolation. This plan fills the operational path around it:
 
 Current baseline:
 
-- ML-FS-0, ML-FS-1, and ML-FS-2 are software-complete; the next software
-  milestone is ML-FS-3;
+- ML-FS-0 through ML-FS-3 are software-complete; ML-FS-3's real-data
+  definition of done remains pending a reviewed licensed historical-universe
+  snapshot and an actual authoritative build;
 - ML-LR-0, ML-LR-1, ML-LR-2, ML-LR-4, ML-LR-6, ML-LR-7, and
   ML-LR-8 are software-complete within their documented limits;
 - ML-LR-3 is complete for per-security volatility but not for portfolio model
@@ -194,6 +195,9 @@ unavailable telemetry record suitable for a future dataset. No execution model
 is fit.
 
 ## 8. ML-FS-3 — authoritative historical and online data
+
+Status: software implemented 2026-08-01. Real-data completion remains blocked
+until a reviewed historical-universe source and licensed captures are supplied.
 
 ### Implementation
 

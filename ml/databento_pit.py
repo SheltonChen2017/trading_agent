@@ -17,6 +17,7 @@ historical-universe source exist.
 from __future__ import annotations
 
 import dataclasses
+import json
 import math
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -361,6 +362,7 @@ class StatisticsSnapshot:
     normalized: NormalizedStatistics
     manifest: Mapping[str, Any]
     raw_path: Path
+    normalized_path: Path
     manifest_path: Path
 
     def __post_init__(self) -> None:
@@ -715,6 +717,7 @@ def fetch_statistics_snapshot(
     stem = f"databento-equs-statistics-{stamp}-{request.request_hash[:12]}"
     directory = Path(directory)
     raw_path = directory / f"{stem}.dbn"
+    normalized_path = directory / f"{stem}.normalized.json"
     manifest_path = directory / f"{stem}.manifest.json"
     download = download_and_preserve_dbn(
         api_kwargs=request.api_kwargs(),
@@ -778,7 +781,9 @@ def fetch_statistics_snapshot(
                 "refusals": [],
                 "invalid_cohort_count": 0,
                 "invalid_cohorts": [],
+                "normalized_filename": None,
                 "normalized_sha256": None,
+                "normalized_payload_sha256": None,
                 "blockers": [
                     "unadjusted_statistics",
                     "missing_point_in_time_adjustment_application",
@@ -803,11 +808,20 @@ def fetch_statistics_snapshot(
             manifest_path=manifest_path,
         ) from reason
     material = [record.to_dict() for record in normalized.records]
-    manifest = dict(base_manifest)
     invalid_cohorts = [
         {"session": session, "ticker": ticker, "summary_flag": flag}
         for session, ticker, flag in normalized.invalid_cohorts
     ]
+    normalized_payload = {
+        "schema_version": PIT_SNAPSHOT_SCHEMA_VERSION,
+        "request": request.to_dict(),
+        "records": material,
+        "refusals": [dict(item) for item in normalized.refusals],
+        "invalid_cohorts": invalid_cohorts,
+    }
+    normalized_bytes = canonical_json(normalized_payload).encode("utf-8")
+    write_immutable_bytes(normalized_path, normalized_bytes)
+    manifest = dict(base_manifest)
     manifest.update(
         {
             "validation_status": (
@@ -819,9 +833,11 @@ def fetch_statistics_snapshot(
             "refusals": [dict(item) for item in normalized.refusals],
             "invalid_cohort_count": len(invalid_cohorts),
             "invalid_cohorts": invalid_cohorts,
+            "normalized_filename": normalized_path.name,
             "normalized_sha256": hash_bytes(
                 canonical_json(material).encode("utf-8")
             ),
+            "normalized_payload_sha256": hash_bytes(normalized_bytes),
             "blockers": [
                 "unadjusted_statistics",
                 "missing_point_in_time_adjustment_application",
@@ -842,6 +858,79 @@ def fetch_statistics_snapshot(
         normalized=normalized,
         manifest=manifest,
         raw_path=raw_path,
+        normalized_path=normalized_path,
+        manifest_path=manifest_path,
+    )
+
+
+def _snapshot_file(directory: Path, filename: Any, name: str) -> Path:
+    if not isinstance(filename, str) or not filename or Path(filename).name != filename:
+        raise DatabentoSourceError(f"{name} must be a local snapshot filename")
+    return directory / filename
+
+
+def load_statistics_snapshot(manifest_path: Path) -> StatisticsSnapshot:
+    """Replay an accepted capture only after verifying every immutable byte."""
+    manifest_path = Path(manifest_path)
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise DatabentoSourceError(f"invalid statistics manifest: {exc}") from exc
+    if manifest.get("source_id") != STATISTICS_SOURCE_ID or manifest.get(
+        "validation_status"
+    ) not in {"accepted", "accepted_with_refusals"}:
+        raise DatabentoSourceError("statistics manifest is not an accepted Databento capture")
+    directory = manifest_path.parent
+    raw_path = _snapshot_file(directory, manifest.get("raw_filename"), "raw_filename")
+    normalized_path = _snapshot_file(
+        directory, manifest.get("normalized_filename"), "normalized_filename"
+    )
+    try:
+        raw_bytes = raw_path.read_bytes()
+        normalized_bytes = normalized_path.read_bytes()
+    except OSError as exc:
+        raise DatabentoSourceError(f"statistics snapshot artifact is missing: {exc}") from exc
+    if hash_bytes(raw_bytes) != manifest.get("raw_sha256"):
+        raise DatabentoSourceError("statistics raw DBN hash mismatch")
+    if hash_bytes(normalized_bytes) != manifest.get("normalized_payload_sha256"):
+        raise DatabentoSourceError("statistics normalized payload hash mismatch")
+    try:
+        payload = json.loads(normalized_bytes.decode("utf-8"))
+        if payload.get("schema_version") != PIT_SNAPSHOT_SCHEMA_VERSION:
+            raise DatabentoSourceError("statistics normalized schema version mismatch")
+        if payload.get("request") != manifest.get("request"):
+            raise DatabentoSourceError("statistics normalized request mismatch")
+        records = tuple(StatisticsValueRecord(**item) for item in payload["records"])
+        refusals = tuple(dict(item) for item in payload.get("refusals", []))
+        invalid_cohorts = tuple(
+            (item["session"], item["ticker"], item["summary_flag"])
+            for item in payload.get("invalid_cohorts", [])
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError, ValueError) as exc:
+        if isinstance(exc, DatabentoSourceError):
+            raise
+        raise DatabentoSourceError(f"invalid normalized statistics payload: {exc}") from exc
+    material = [record.to_dict() for record in records]
+    if hash_bytes(canonical_json(material).encode("utf-8")) != manifest.get(
+        "normalized_sha256"
+    ):
+        raise DatabentoSourceError("statistics normalized record hash mismatch")
+    normalized = NormalizedStatistics(
+        records=records,
+        refusals=refusals,
+        invalid_cohorts=invalid_cohorts,
+    )
+    if (
+        len(records) != manifest.get("record_count")
+        or len(refusals) != manifest.get("refusal_count")
+        or len(invalid_cohorts) != manifest.get("invalid_cohort_count")
+    ):
+        raise DatabentoSourceError("statistics manifest counts do not match normalized payload")
+    return StatisticsSnapshot(
+        normalized=normalized,
+        manifest=manifest,
+        raw_path=raw_path,
+        normalized_path=normalized_path,
         manifest_path=manifest_path,
     )
 
@@ -1247,6 +1336,56 @@ def fetch_reference_snapshot(
             raw_path=data_path,
             manifest_path=manifest_path,
         ) from exc
+    return ReferenceSnapshot(
+        records=records,
+        manifest=manifest,
+        data_path=data_path,
+        manifest_path=manifest_path,
+    )
+
+
+def load_reference_snapshot(manifest_path: Path) -> ReferenceSnapshot:
+    """Load accepted canonical reference evidence with raw/canonical hashes."""
+    manifest_path = Path(manifest_path)
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise DatabentoSourceError(f"invalid reference manifest: {exc}") from exc
+    if (
+        manifest.get("source_id") != REFERENCE_SOURCE_ID
+        or manifest.get("validation_status") != "accepted"
+        or manifest.get("point_in_time_reference") is not True
+    ):
+        raise DatabentoSourceError("reference manifest is not an accepted PIT capture")
+    kind = manifest.get("kind")
+    if kind not in _REFERENCE_KINDS:
+        raise DatabentoSourceError("reference manifest kind is invalid")
+    directory = manifest_path.parent
+    raw_path = _snapshot_file(directory, manifest.get("raw_filename"), "raw_filename")
+    data_path = _snapshot_file(directory, manifest.get("data_filename"), "data_filename")
+    try:
+        raw_bytes = raw_path.read_bytes()
+        data_bytes = data_path.read_bytes()
+    except OSError as exc:
+        raise DatabentoSourceError(f"reference snapshot artifact is missing: {exc}") from exc
+    if hash_bytes(raw_bytes) != manifest.get("raw_sha256"):
+        raise DatabentoSourceError("reference raw response hash mismatch")
+    if hash_bytes(data_bytes) != manifest.get("data_sha256"):
+        raise DatabentoSourceError("reference canonical payload hash mismatch")
+    try:
+        payload = json.loads(data_bytes.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise DatabentoSourceError(f"invalid reference canonical payload: {exc}") from exc
+    if (
+        payload.get("schema_version") != PIT_SNAPSHOT_SCHEMA_VERSION
+        or payload.get("kind") != kind
+        or payload.get("request") != manifest.get("request")
+        or not isinstance(payload.get("records"), list)
+    ):
+        raise DatabentoSourceError("reference canonical payload does not match manifest")
+    records = tuple(payload["records"])
+    if len(records) != manifest.get("row_count"):
+        raise DatabentoSourceError("reference manifest count does not match canonical payload")
     return ReferenceSnapshot(
         records=records,
         manifest=manifest,

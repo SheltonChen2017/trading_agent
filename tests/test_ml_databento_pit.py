@@ -18,6 +18,8 @@ from ml.databento_pit import (
     evaluate_databento_pit_prerequisites,
     fetch_reference_snapshot,
     fetch_statistics_snapshot,
+    load_reference_snapshot,
+    load_statistics_snapshot,
     normalize_statistics_frame,
     select_complete_statistics_cohorts,
 )
@@ -314,6 +316,25 @@ def test_statistics_download_is_cost_capped_and_manifest_cannot_claim_authority(
     assert manifest["provides_point_in_time_lineage"] is False
     assert manifest["invalid_cohort_count"] == 0
     assert "unadjusted_statistics" in manifest["blockers"]
+    assert snapshot.normalized_path.is_file()
+    assert manifest["normalized_filename"] == snapshot.normalized_path.name
+
+
+def test_statistics_snapshot_replay_verifies_raw_and_normalized_bytes(tmp_path):
+    snapshot = fetch_statistics_snapshot(
+        _statistics_request(),
+        directory=tmp_path,
+        max_cost_usd=0.10,
+        client=_FakeHistoricalClient(_statistics_frame()),
+        observed_at="2026-08-01T12:00:00+00:00",
+    )
+    loaded = load_statistics_snapshot(snapshot.manifest_path)
+    assert loaded.normalized.records == snapshot.normalized.records
+    assert loaded.normalized.refusals == snapshot.normalized.refusals
+
+    snapshot.normalized_path.write_bytes(snapshot.normalized_path.read_bytes() + b" ")
+    with pytest.raises(DatabentoSourceError, match="normalized payload hash mismatch"):
+        load_statistics_snapshot(snapshot.manifest_path)
 
 
 def test_reference_contract_uses_real_api_shape_and_explicit_acknowledgement(
@@ -567,3 +588,19 @@ def test_accepted_reference_snapshot_also_preserves_the_raw_response(tmp_path):
     assert raw_path != snapshot.data_path
     with pytest.raises(DatabentoSourceError, match="immutable snapshot"):
         databento_pit.write_immutable_bytes(raw_path, b"overwrite")
+
+
+def test_reference_snapshot_replay_verifies_raw_and_canonical_bytes(tmp_path):
+    snapshot = fetch_reference_snapshot(
+        _reference_request("security_master"),
+        directory=tmp_path,
+        acknowledge_reference_subscription=True,
+        client=_FakeReferenceClient(_security_frame(), _adjustment_frame()),
+        observed_at="2026-08-01T12:00:00+00:00",
+    )
+    loaded = load_reference_snapshot(snapshot.manifest_path)
+    assert loaded.records == snapshot.records
+
+    snapshot.data_path.write_bytes(snapshot.data_path.read_bytes() + b" ")
+    with pytest.raises(DatabentoSourceError, match="canonical payload hash mismatch"):
+        load_reference_snapshot(snapshot.manifest_path)

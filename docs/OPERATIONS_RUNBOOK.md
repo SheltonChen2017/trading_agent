@@ -151,6 +151,31 @@ The supervisor should also:
 `data/alerts.jsonl` is a local delivery boundary for a log shipper or paging
 sidecar. Durable alert state remains in SQLite until acknowledged.
 
+## Authoritative Databento feature replay
+
+Capture statistics for each required session plus security-master and
+adjustment-factor reference windows with `run_databento_ingest.py`. Accepted
+statistics captures contain the paid raw DBN, a normalized JSON replay
+artifact, and a manifest binding both hashes. Reference captures retain raw and
+canonical forms. Do not edit any of these files.
+
+Prepare a separately reviewed historical-universe snapshot. A Databento
+listing record proves listing state and security identity; it does not prove
+membership in an index or strategy universe. The universe snapshot must retain
+the upstream artifact hash and every membership's announcement/availability
+time. Then provide exact per-session decision cutoffs and build:
+
+```text
+python scripts/run_databento_ingest.py build-authoritative --statistics-manifest artifacts/databento/STATS.manifest.json --security-master-manifest artifacts/databento/SECURITY.manifest.json --adjustment-factors-manifest artifacts/databento/ADJUSTMENTS.manifest.json --universe-snapshot artifacts/databento/universe.json --decision-cutoffs-json artifacts/databento/cutoffs.json --output-dir artifacts/databento
+```
+
+Repeat `--statistics-manifest` for multiple sessions. Output is stored beneath
+its `batch_hash`; an exact replay is idempotent and conflicting bytes are
+refused. A `point_in_time_data=true` result means the supplied rows have
+complete cutoff-valid feature and universe evidence. It does not establish
+that the upstream universe source itself was appropriately licensed, complete,
+or reviewed; retain that external review with the source artifact.
+
 ## Paper evidence status
 
 Use the derived status rather than manually entering session or order counts:

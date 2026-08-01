@@ -29,6 +29,7 @@ The next implementation sequence is defined in
 | ML-LR-8 | Read-only model-observation presentation | `ml/presentation.py`, `scripts/run_ml_shadow.py status` | Context display only |
 | ML-FS-1 | Scheduled paper observations normalized into portfolio equity/position history plus complete-capture manifests | `assistant/paper_evidence.py`, `assistant/storage.py` | Writes reconciled paper observations and research history only |
 | ML-FS-2 | Immutable pre-broker execution telemetry plus rebuildable lifecycle materialization | `assistant/execution_telemetry.py`, `assistant/execution_service.py`, `assistant/storage.py` | Claimed attempts write observations; a failed pre-submit telemetry append refuses the broker call |
+| ML-FS-3 software | Vintage-correct Databento adjustment/security resolution, independent universe snapshots, PIT feature batches, replay CLI, and shared online provider | `ml/databento_authoritative.py`, `ml/databento_pit.py`, `scripts/run_databento_ingest.py` | Research/online data only; no model or execution authority |
 
 ML-LR-2 gives both supported tasks a reproducible runner. Verified against
 the milestone's own definition of done by invoking the real CLI twice: the
@@ -600,3 +601,36 @@ the proposal becomes a confirmed `submission_failed`, and no broker API is
 called. Attempts rejected before the atomic claim (unknown proposal, incorrect
 confirmation phrase, or unclaimable state) remain service requests, not order
 attempts, and therefore do not enter the ML execution dataset.
+
+## ML-FS-3 notes
+
+Accepted Databento statistics captures now persist a canonical normalized
+artifact in addition to the paid DBN. Hash-verifying statistics and reference
+loaders make later research replayable without another vendor request. The
+authoritative builder resolves only security-master revisions effective and
+visible at each decision cutoff, selects exactly one shareholder option per
+corporate-action event, applies only the latest visible `A` revision, removes
+events whose latest visible revision is `R`, and leaves `P` revisions pending.
+Historical prices are multiplied by applicable factors; volume is divided only
+for subdivision/consolidation reasons.
+
+Every adjusted value receives a `FeatureAvailabilityRecord` binding the raw
+statistics revision, listing revision, selected factor revisions, option
+policy, value hash, and actual ingredient availability. Coverage is still
+derived exclusively through `evaluate_point_in_time_coverage()`. Security-
+master listing status is never substituted for index or strategy membership;
+the builder requires a separately hash-bound `HistoricalUniverseSnapshot`.
+
+`build-authoritative` replays accepted statistics/reference manifests, a
+historical-universe snapshot, and exact decision cutoffs into a content-
+addressed feature batch. `DatabentoOnlineFeatureProvider` performs a cost-
+capped statistics capture and invokes the same pure builder, refusing a
+response observed after its declared cutoff. Prefix and revision tests prove
+future reference changes cannot alter earlier feature values, while later
+rescissions produce a new vintage.
+
+No real authoritative batch was created in this repository: licensed source
+data and a reviewed complete historical-universe artifact were not supplied.
+Consequently the real-data definition of done and promotion eligibility remain
+blocked even though the software path can derive `point_in_time_data=True` from
+complete verified fixture evidence.

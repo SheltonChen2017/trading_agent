@@ -28,6 +28,7 @@ passes in what `AssistantStore.list_portfolio_position_snapshots()` and
 from __future__ import annotations
 
 import dataclasses
+from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 import numpy as np
@@ -48,6 +49,29 @@ MIN_TARGETS_FOR_RESEARCH = 60
 
 class PortfolioExperimentError(ValueError):
     """Portfolio records cannot support an experiment."""
+
+
+def _canonical_session(value: Any, name: str) -> str:
+    if not isinstance(value, str):
+        raise PortfolioExperimentError(f"{name} must use canonical YYYY-MM-DD format")
+    parsed = pd.to_datetime(value, format="%Y-%m-%d", errors="coerce")
+    if pd.isna(parsed) or parsed.strftime("%Y-%m-%d") != value:
+        raise PortfolioExperimentError(f"{name} must use canonical YYYY-MM-DD format")
+    return value
+
+
+def _capture_instant(value: Any, name: str) -> datetime:
+    if not isinstance(value, str) or not value.strip():
+        raise PortfolioExperimentError(f"{name} must be a timezone-aware ISO timestamp")
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise PortfolioExperimentError(
+            f"{name} must be a timezone-aware ISO timestamp"
+        ) from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise PortfolioExperimentError(f"{name} must be timezone-aware")
+    return parsed.astimezone(timezone.utc)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -79,6 +103,7 @@ class TargetBuildResult:
             "attempted_session_count": self.attempted_session_count,
             "refusal_rate": self.refusal_rate,
             "refusal_reason_counts": _count_reasons(self.refusals),
+            "refusals": [dict(refusal) for refusal in self.refusals],
             "targets": [t.to_dict() for t in self.targets],
         }
 
@@ -97,7 +122,7 @@ def group_position_snapshots_by_session(
     snapshots: Sequence[Mapping[str, Any]],
 ) -> dict[str, list[Mapping[str, Any]]]:
     """Group `AssistantStore.list_portfolio_position_snapshots()` rows by
-    session, keeping only the LATEST capture per (session, ticker).
+    session, keeping the latest coherent capture cohort.
 
     Multiple captures of the same session are legitimate -- the briefing may
     run more than once a day. Taking the latest is right for a
@@ -105,21 +130,43 @@ def group_position_snapshots_by_session(
     what enforces that it was still knowable in time; taking the earliest
     would silently use a stale intraday snapshot.
     """
-    latest: dict[tuple[str, str], Mapping[str, Any]] = {}
+    cohorts: dict[tuple[str, datetime], dict[str, Mapping[str, Any]]] = {}
     for row in snapshots:
         for field in ("session_date", "ticker", "captured_at", "market_value"):
             if field not in row:
                 raise PortfolioExperimentError(
                     f"position snapshot is missing {field!r}"
                 )
-        key = (str(row["session_date"]), str(row["ticker"]))
-        current = latest.get(key)
-        if current is None or str(row["captured_at"]) > str(current["captured_at"]):
-            latest[key] = row
+        session = _canonical_session(row["session_date"], "position session_date")
+        captured = _capture_instant(row["captured_at"], "position captured_at")
+        ticker = row["ticker"]
+        if not isinstance(ticker, str) or ticker != ticker.upper() or not ticker.strip():
+            raise PortfolioExperimentError(
+                "position snapshot ticker must be canonical uppercase"
+            )
+        cohort = cohorts.setdefault((session, captured), {})
+        if ticker in cohort:
+            raise PortfolioExperimentError(
+                f"duplicate position snapshot for {session}/{ticker}/{captured.isoformat()}"
+            )
+        cohort[ticker] = row
 
     grouped: dict[str, list[Mapping[str, Any]]] = {}
-    for (session, _ticker), row in sorted(latest.items()):
-        grouped.setdefault(session, []).append(row)
+    sessions = sorted({session for session, _captured in cohorts})
+    for session in sessions:
+        captures = sorted(
+            (captured, rows)
+            for (cohort_session, captured), rows in cohorts.items()
+            if cohort_session == session
+        )
+        _latest_captured, latest_rows = captures[-1]
+        latest_tickers = set(latest_rows)
+        if any(set(rows) != latest_tickers for _captured, rows in captures[:-1]):
+            raise PortfolioExperimentError(
+                f"position captures for {session} disagree on ticker membership; "
+                "without a snapshot-set identity the latest capture cannot be proven complete"
+            )
+        grouped[session] = [latest_rows[ticker] for ticker in sorted(latest_rows)]
     return grouped
 
 
@@ -154,8 +201,36 @@ def build_portfolio_target_series(
                 {"as_of_session": session, "reason": "forecast cutoff unrecorded"}
             )
             continue
-        captured = max(str(row["captured_at"]) for row in snapshots)
         try:
+            _canonical_session(session, "positions_by_session key")
+            if not snapshots:
+                raise PortfolioExperimentError("position snapshot cohort is empty")
+            if any(not isinstance(row, Mapping) for row in snapshots):
+                raise PortfolioExperimentError(
+                    "position snapshot cohort must contain mapping records"
+                )
+            missing_fields = sorted(
+                {
+                    field
+                    for row in snapshots
+                    for field in ("ticker", "market_value", "captured_at")
+                    if field not in row
+                }
+            )
+            if missing_fields:
+                raise PortfolioExperimentError(
+                    f"position snapshot cohort is missing fields: {missing_fields}"
+                )
+            capture_instants = {
+                _capture_instant(row["captured_at"], "position captured_at")
+                for row in snapshots
+            }
+            if len(capture_instants) != 1:
+                raise PortfolioExperimentError(
+                    "position snapshot cohort mixes capture timestamps; refusing a "
+                    "portfolio that may never have existed"
+                )
+            captured = next(iter(capture_instants)).isoformat()
             targets.append(
                 build_frozen_weight_targets(
                     account_key,
@@ -171,7 +246,7 @@ def build_portfolio_target_series(
                     horizon_sessions=horizon_sessions,
                 )
             )
-        except (PortfolioVolatilityError, ValueError) as exc:
+        except (PortfolioExperimentError, PortfolioVolatilityError, ValueError) as exc:
             refusals.append({"as_of_session": session, "reason": str(exc)})
 
     return TargetBuildResult(targets=tuple(targets), refusals=tuple(refusals))
@@ -206,8 +281,7 @@ def build_realized_account_target_series(
 
 
 def targets_to_frame(targets: Sequence[PortfolioVolatilityTarget]) -> pd.DataFrame:
-    """Flatten targets into the (as_of_session, ticker) shape the shared
-    dataset/experiment machinery expects.
+    """Flatten targets into a deterministic account-session research frame.
 
     `ticker` is the literal account key rather than a security: the
     observation unit here is an account-session. Naming it honestly keeps
@@ -265,7 +339,31 @@ def assess_portfolio_research_readiness(
     fraction of every training fold is purged away, so the usable sample is
     materially smaller than the raw count suggests.
     """
+    if (
+        isinstance(minimum_targets, bool)
+        or not isinstance(minimum_targets, int)
+        or minimum_targets < 1
+    ):
+        raise PortfolioExperimentError("minimum_targets must be a positive integer")
+    if isinstance(n_splits, bool) or not isinstance(n_splits, int) or n_splits < 2:
+        raise PortfolioExperimentError("n_splits must be an integer >= 2")
+    if (
+        isinstance(embargo_sessions, bool)
+        or not isinstance(embargo_sessions, int)
+        or embargo_sessions < 0
+    ):
+        raise PortfolioExperimentError("embargo_sessions must be a non-negative integer")
+
     target_count = len(result.targets)
+    horizons = {target.horizon_sessions for target in result.targets}
+    if len(horizons) > 1:
+        raise PortfolioExperimentError(
+            "readiness cannot pool portfolio targets with different horizons"
+        )
+    if horizons and embargo_sessions < next(iter(horizons)):
+        raise PortfolioExperimentError(
+            "embargo_sessions must be at least the portfolio target horizon"
+        )
     # Each fold needs at least the embargo plus horizon of separation; this
     # is a floor, not a guarantee of statistical power.
     required_for_folds = (n_splits + 1) * (embargo_sessions + 1)

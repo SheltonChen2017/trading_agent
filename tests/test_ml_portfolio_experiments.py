@@ -83,6 +83,33 @@ def test_grouping_keeps_the_latest_capture_per_session_and_ticker():
     assert grouped["2026-01-01"][0]["market_value"] == "200"
 
 
+def test_grouping_compares_timezone_equivalent_capture_instants_not_strings():
+    rows = [
+        {"session_date": "2026-01-01", "ticker": "AAA", "market_value": "100",
+         "captured_at": "2026-01-01T21:00:00+00:00"},
+        # 14:00 Pacific is 22:00 UTC and is therefore the later capture even
+        # though its timestamp string sorts before the UTC representation.
+        {"session_date": "2026-01-01", "ticker": "AAA", "market_value": "200",
+         "captured_at": "2026-01-01T14:00:00-08:00"},
+    ]
+    grouped = group_position_snapshots_by_session(rows)
+    assert grouped["2026-01-01"][0]["market_value"] == "200"
+
+
+def test_grouping_refuses_capture_cohorts_with_ambiguous_ticker_membership():
+    rows = [
+        {"session_date": "2026-01-01", "ticker": ticker, "market_value": "100",
+         "captured_at": "2026-01-01T20:00:00+00:00"}
+        for ticker in ("AAA", "BBB")
+    ]
+    rows.append(
+        {"session_date": "2026-01-01", "ticker": "AAA", "market_value": "200",
+         "captured_at": "2026-01-01T21:00:00+00:00"}
+    )
+    with pytest.raises(PortfolioExperimentError, match="cannot be proven complete"):
+        group_position_snapshots_by_session(rows)
+
+
 def test_grouping_requires_its_fields():
     with pytest.raises(PortfolioExperimentError, match="missing 'captured_at'"):
         group_position_snapshots_by_session(
@@ -123,6 +150,18 @@ def test_refusals_are_returned_not_silently_dropped():
     assert result.refusal_rate is not None and 0 < result.refusal_rate < 1
     counts = result.to_dict()["refusal_reason_counts"]
     assert counts and sum(counts.values()) == len(result.refusals)
+    assert result.to_dict()["refusals"] == [dict(value) for value in result.refusals]
+
+
+def test_a_mixed_capture_cohort_refuses_instead_of_building_a_hybrid_portfolio():
+    sessions, close, positions, cash, cutoffs = _fixture(60)
+    positions[sessions[0]][1]["captured_at"] = f"{sessions[0]}T21:30:00+00:00"
+    result = build_portfolio_target_series(
+        "paper", positions_by_session=positions, cash_by_session=cash,
+        close_by_ticker=close, forecast_cutoff_by_session=cutoffs, horizon_sessions=20,
+    )
+    refusal = next(value for value in result.refusals if value["as_of_session"] == sessions[0])
+    assert "may never have existed" in refusal["reason"]
 
 
 def test_an_unrecorded_cash_balance_refuses_that_session():
@@ -266,12 +305,18 @@ def test_readiness_accounts_for_purged_fold_arithmetic():
     fraction of every training fold is purged away."""
     result = _build(n_sessions=120)
     strict = assess_portfolio_research_readiness(
-        result, n_splits=4, embargo_sessions=20
+        result, n_splits=4, embargo_sessions=30
     )
     lenient = assess_portfolio_research_readiness(
-        result, n_splits=2, embargo_sessions=5
+        result, n_splits=2, embargo_sessions=20
     )
     assert strict["targets_needed_for_folds"] > lenient["targets_needed_for_folds"]
+
+
+def test_readiness_refuses_an_embargo_shorter_than_the_target_horizon():
+    result = _build(n_sessions=120, horizon=20)
+    with pytest.raises(PortfolioExperimentError, match="at least the portfolio target horizon"):
+        assess_portfolio_research_readiness(result, n_splits=2, embargo_sessions=5)
 
 
 def test_an_adequately_filled_account_is_reported_ready():

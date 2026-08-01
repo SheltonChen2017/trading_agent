@@ -269,7 +269,12 @@ account-session, so `ticker` carries the account key — naming it honestly
 keeps cross-sectional rank metrics from being applied to a panel with one
 name per date, where a rank correlation is undefined.
 
-**ML-LR-3 is now complete.** Remaining across the plan: ML-LR-4 onward.
-Portfolio research against real data stays underfilled until enough daily
-position/equity snapshots accumulate; per plan 9.7 that is reported as
-unavailable rather than backfilled.
+The portfolio target-preparation half of ML-LR-3 is complete. The module does
+not yet satisfy section 9.7's full definition of done: it does not fit a
+portfolio model or emit an immutable experiment report and typed forecast.
+Those outputs require a frozen portfolio feature/baseline dataset contract
+and integration with the shared experiment runner. Portfolio research against
+real data also stays underfilled until enough daily position/equity snapshots
+accumulate; per plan 9.7 that is reported as unavailable rather than
+backfilled. ML-LR-3 therefore remains **in progress** rather than being marked
+complete based on target preparation alone.

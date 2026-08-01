@@ -251,9 +251,30 @@ than inventing a threshold from the observed distribution, which would be
 choosing the bar after seeing the results. `maximum_brier` without a ceiling
 is refused outright as a gate that could never be evaluated.
 
-**Still outstanding for ML-LR-3:** a portfolio-target experiment runner —
-`ml/portfolio_volatility.py` builds the targets but nothing yet drives a
-full portfolio experiment through `run_experiment()`. Portfolio research
-against real data also remains underfilled until enough daily
-position/equity snapshots accumulate; per plan 9.7 that is reported as
-unavailable rather than backfilled.
+`ml/portfolio_experiments.py` completes section 9.7's portfolio half. It
+builds a target per account-session from stored position/equity records,
+keeps every refusal with its reason rather than dropping it, and reports
+research readiness instead of running on an inadequate sample.
+
+Underfill is a first-class outcome. Measured on a 120-session fixture with a
+20-session horizon: 100 targets, 20 refusals (exactly the tail with no
+forward window). A 30-session account reports `underfilled` with actionable
+blockers — *"only 10 portfolio targets; 60 required"* and *"only 10 targets;
+63 needed for 2 purged folds with a 20-session embargo"* — because target
+count alone understates what purging costs.
+
+The two target kinds cannot be pooled into one frame; `targets_to_frame()`
+refuses, since they measure different quantities. The observation unit is an
+account-session, so `ticker` carries the account key — naming it honestly
+keeps cross-sectional rank metrics from being applied to a panel with one
+name per date, where a rank correlation is undefined.
+
+The portfolio target-preparation half of ML-LR-3 is complete. The module does
+not yet satisfy section 9.7's full definition of done: it does not fit a
+portfolio model or emit an immutable experiment report and typed forecast.
+Those outputs require a frozen portfolio feature/baseline dataset contract
+and integration with the shared experiment runner. Portfolio research against
+real data also stays underfilled until enough daily position/equity snapshots
+accumulate; per plan 9.7 that is reported as unavailable rather than
+backfilled. ML-LR-3 therefore remains **in progress** rather than being marked
+complete based on target preparation alone.

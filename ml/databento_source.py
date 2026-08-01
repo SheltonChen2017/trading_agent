@@ -32,6 +32,7 @@ from ml.availability import (
     FeatureAvailabilityRecord,
     UniverseMembershipRecord,
 )
+from ml.contracts import _freeze_json
 from ml.hashing import canonical_json, hash_bytes, hash_payload
 from ml.shadow import trading_sessions
 
@@ -40,7 +41,7 @@ DEFAULT_DATASET = "EQUS.SUMMARY"
 DEFAULT_SCHEMA = "ohlcv-1d"
 DEFAULT_STYPE_IN = "raw_symbol"
 SOURCE_ID = "databento_equities_summary"
-SNAPSHOT_SCHEMA_VERSION = "1"
+SNAPSHOT_SCHEMA_VERSION = "2"
 _REQUIRED_BAR_COLUMNS = ("open", "high", "low", "close", "volume", "symbol")
 
 
@@ -191,8 +192,14 @@ class DailyBarsSnapshot:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "frames", MappingProxyType(dict(self.frames)))
-        object.__setattr__(self, "manifest", MappingProxyType(dict(self.manifest)))
-        object.__setattr__(self, "refusals", tuple(self.refusals))
+        object.__setattr__(
+            self, "manifest", _freeze_json(dict(self.manifest), path="manifest")
+        )
+        object.__setattr__(
+            self,
+            "refusals",
+            tuple(MappingProxyType(dict(item)) for item in self.refusals),
+        )
 
 
 def databento_source_version() -> str:
@@ -269,7 +276,11 @@ class NormalizedBars:
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "frames", MappingProxyType(dict(self.frames)))
-        object.__setattr__(self, "refusals", tuple(self.refusals))
+        object.__setattr__(
+            self,
+            "refusals",
+            tuple(MappingProxyType(dict(item)) for item in self.refusals),
+        )
 
 
 def _refusal(ticker: str, session: str, reason: str) -> dict[str, str]:
@@ -372,6 +383,8 @@ def _normalize_daily_frame(
                 reason = "non-finite volume"
             elif float(volume) < 0:
                 reason = "negative volume"
+            elif float(volume) == 0:
+                reason = "zero volume"
             elif float(volume) % 1 != 0:
                 reason = "non-integral volume"
             elif float(row["high"]) < max(
@@ -534,34 +547,57 @@ def fetch_daily_bars_snapshot(
     # The Databento client requires a non-existent destination path.
     temporary_raw.unlink()
     store = None
+    downloaded_artifact_exists = False
+    raw_preserved = False
+    raw_frame: pd.DataFrame | None = None
+    materialization_error: DatabentoSourceError | None = None
     try:
         try:
             store = active_client.timeseries.get_range(
                 **request.api_kwargs(), path=temporary_raw
             )
         except Exception as exc:
+            downloaded_artifact_exists = (
+                temporary_raw.is_file() and temporary_raw.stat().st_size > 0
+            )
             raise DatabentoSourceError(
                 f"Databento download failed: {type(exc).__name__}: {exc}"
             ) from exc
+        downloaded_artifact_exists = temporary_raw.is_file()
         if not temporary_raw.is_file() or temporary_raw.stat().st_size <= 0:
             raise DatabentoSourceError("Databento did not write a non-empty DBN snapshot")
-        # Materialize while the store's backing file still exists, then close
-        # it so the move below can succeed on Windows.
-        raw_frame = _materialize_frame(store)
-        _close_dbn_store(store)
-        store = None
         raw_bytes = temporary_raw.read_bytes()
         if raw_path.exists() or manifest_path.exists():
             raise DatabentoSourceError("refusing to overwrite an immutable snapshot")
-        # The download is billable and has already been paid for. Preserve it
-        # BEFORE validating, so that a rejected snapshot costs the operator a
-        # retry of the parsing step rather than a second purchase.
-        os.replace(temporary_raw, raw_path)
+        # The download is billable and has already been paid for. Preserve its
+        # exact bytes BEFORE even converting DBN to pandas: a client/API/parser
+        # mismatch is itself one of the failures for which the operator must
+        # not have to purchase the same response again. Copying through the
+        # atomic writer avoids renaming Databento's still-open file on Windows.
+        _atomic_write(raw_path, raw_bytes)
+        raw_preserved = True
+        try:
+            raw_frame = _materialize_frame(store)
+        except DatabentoSourceError as exc:
+            materialization_error = exc
+    except Exception as exc:
+        if downloaded_artifact_exists and not raw_preserved and temporary_raw.exists():
+            # Even a local persistence failure must not silently destroy bytes
+            # that may already have been billed. The temporary name is surfaced
+            # explicitly so an operator can recover it without re-downloading.
+            raise DatabentoSnapshotRetainedError(
+                f"{exc} — downloaded bytes could not be copied to the permanent "
+                f"snapshot path, so they were retained at {temporary_raw}",
+                raw_path=temporary_raw,
+                manifest_path=manifest_path,
+            ) from exc
+        raise
     finally:
         try:
             _close_dbn_store(store)
         finally:
-            temporary_raw.unlink(missing_ok=True)
+            if not downloaded_artifact_exists or raw_preserved:
+                temporary_raw.unlink(missing_ok=True)
 
     base_manifest = {
         "schema_version": SNAPSHOT_SCHEMA_VERSION,
@@ -587,44 +623,68 @@ def fetch_daily_bars_snapshot(
     }
 
     try:
+        if materialization_error is not None:
+            raise materialization_error
+        if raw_frame is None:
+            raise DatabentoSourceError("Databento response was not materialized")
         normalized_bars = _normalize_daily_frame(raw_frame, request)
-    except DatabentoSourceError as exc:
+    except Exception as exc:
+        rejection_reason = (
+            exc
+            if isinstance(exc, DatabentoSourceError)
+            else DatabentoSourceError(
+                f"Databento normalization failed: {type(exc).__name__}: {exc}"
+            )
+        )
         # A retained snapshot with no manifest would be an unlabeled artifact
         # nobody could later classify, so the rejection is recorded next to it.
         rejection = dict(base_manifest)
         rejection.update(
             {
                 "validation_status": "rejected",
-                "rejection_reason": str(exc),
+                "rejection_reason": str(rejection_reason),
                 "normalized_sha256": None,
                 "row_count": 0,
                 "session_count": 0,
                 "refusals": [],
                 "refusal_count": 0,
                 "non_session_refusal_count": 0,
+                "underfilled": True,
             }
         )
-        _atomic_write(manifest_path, canonical_json(rejection).encode("utf-8"))
+        try:
+            _atomic_write(manifest_path, canonical_json(rejection).encode("utf-8"))
+        except Exception as manifest_exc:
+            raise DatabentoSnapshotRetainedError(
+                f"{rejection_reason} — the paid raw snapshot was retained at "
+                f"{raw_path}, but its rejection manifest could not be written: "
+                f"{type(manifest_exc).__name__}: {manifest_exc}",
+                raw_path=raw_path,
+                manifest_path=manifest_path,
+            ) from manifest_exc
         raise DatabentoSnapshotRetainedError(
-            f"{exc} — the paid raw snapshot was retained at {raw_path} and does "
+            f"{rejection_reason} — the paid raw snapshot was retained at {raw_path} and does "
             f"not need to be downloaded again; its rejection manifest is "
             f"{manifest_path}",
             raw_path=raw_path,
             manifest_path=manifest_path,
-        ) from exc
+        ) from rejection_reason
 
     normalized = _normalized_material(normalized_bars.frames)
     refusals = [dict(item) for item in normalized_bars.refusals]
     manifest = dict(base_manifest)
     manifest.update(
         {
-            "validation_status": "accepted",
+            "validation_status": (
+                "accepted_with_refusals" if refusals else "accepted"
+            ),
             "rejection_reason": None,
             "normalized_sha256": hash_bytes(canonical_json(normalized).encode("utf-8")),
             "row_count": len(normalized),
             "session_count": len({row["session"] for row in normalized}),
             "refusals": refusals,
             "refusal_count": len(refusals),
+            "underfilled": bool(refusals),
             # A large count here means the timestamp convention above is wrong,
             # not that the market data is bad. It is surfaced separately so a
             # systematic off-by-one session shift is visible rather than buried.
@@ -637,9 +697,13 @@ def fetch_daily_bars_snapshot(
     )
     try:
         _atomic_write(manifest_path, canonical_json(manifest).encode("utf-8"))
-    except BaseException:
-        raw_path.unlink(missing_ok=True)
-        raise
+    except Exception as exc:
+        raise DatabentoSnapshotRetainedError(
+            f"validated paid snapshot was retained at {raw_path}, but its "
+            f"manifest could not be written: {type(exc).__name__}: {exc}",
+            raw_path=raw_path,
+            manifest_path=manifest_path,
+        ) from exc
     return DailyBarsSnapshot(
         frames=normalized_bars.frames,
         manifest=manifest,
@@ -673,7 +737,7 @@ class DatabentoDailyBarsSource:
     def source_manifest(self) -> Mapping[str, str]:
         return {
             "source_id": self.source_id,
-            "source_version": "databento-python-0.81.0",
+            "source_version": databento_source_version(),
             "dataset": DEFAULT_DATASET,
             "schema": DEFAULT_SCHEMA,
             "provides_point_in_time_lineage": "false",

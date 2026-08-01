@@ -44,10 +44,14 @@ def assert_output_dir_is_git_ignored(output_dir: Path) -> None:
     try:
         inside_repository = resolved.is_relative_to(_REPOSITORY_ROOT)
     except (OSError, ValueError):
-        return
+        inside_repository = False
     if not inside_repository:
-        # Outside the working tree, git cannot track it and cannot ignore it.
-        return
+        # It may be inside another repository. This process cannot prove the
+        # ignore rules or licensing controls of an arbitrary external tree.
+        raise DatabentoSourceError(
+            f"cannot prove that {resolved} is protected by this repository's "
+            f"ignore rules. Use {_DEFAULT_OUTPUT_DIR}."
+        )
     probe = resolved / ".databento-write-probe"
     try:
         completed = subprocess.run(
@@ -172,6 +176,8 @@ def command_download(
         "max_cost_usd": max_cost_usd,
         "row_count": snapshot.manifest["row_count"],
         "session_count": snapshot.manifest["session_count"],
+        "validation_status": snapshot.manifest["validation_status"],
+        "underfilled": snapshot.manifest["underfilled"],
         "refusal_count": snapshot.manifest["refusal_count"],
         "non_session_refusal_count": snapshot.manifest["non_session_refusal_count"],
         "point_in_time_data": snapshot.manifest["point_in_time_data"],

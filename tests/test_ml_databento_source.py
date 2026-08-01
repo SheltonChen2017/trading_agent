@@ -1,12 +1,12 @@
 from __future__ import annotations
 
 import json
-import os
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
+import ml.databento_source as databento_source_module
 from ml.databento_source import (
     DailyBarsRequest,
     DatabentoDailyBarsSource,
@@ -54,7 +54,10 @@ class _FakeStore:
         self.frame = frame
         self._data_source = _FakeDataSource()
 
-    def to_df(self, **_kwargs):
+    def to_df(self, *, price_type, pretty_ts, map_symbols):
+        assert price_type == "float"
+        assert pretty_ts is True
+        assert map_symbols is True
         return self.frame.copy()
 
 
@@ -187,12 +190,17 @@ def test_snapshot_is_immutable_hash_bound_and_fail_closed(tmp_path):
     manifest = json.loads(snapshot.manifest_path.read_text(encoding="utf-8"))
     assert manifest["row_count"] == 4
     assert manifest["session_count"] == 2
+    assert manifest["schema_version"] == "2"
+    assert manifest["validation_status"] == "accepted"
+    assert manifest["underfilled"] is False
     assert manifest["point_in_time_data"] is False
     assert manifest["provides_point_in_time_lineage"] is False
     assert manifest["adjustment_status"] == "unadjusted"
     assert len(manifest["raw_sha256"]) == 64
     assert "receipt/publication" in manifest["limitation"]
     assert client.timeseries.store._data_source.reader.closed
+    with pytest.raises(TypeError):
+        snapshot.manifest["request"]["start"] = "mutated"
 
     with pytest.raises(DatabentoSourceError, match="overwrite"):
         fetch_daily_bars_snapshot(
@@ -204,16 +212,20 @@ def test_snapshot_is_immutable_hash_bound_and_fail_closed(tmp_path):
         )
 
 
-def test_snapshot_releases_dbn_file_before_atomic_move(tmp_path, monkeypatch):
+def test_snapshot_releases_dbn_file_before_temporary_cleanup(tmp_path, monkeypatch):
     client = _FakeClient(_raw_frame(), cost=0.01)
-    real_replace = os.replace
+    real_unlink = Path.unlink
 
-    def guarded_replace(source, destination):
-        if str(source).endswith(".dbn.tmp"):
+    def guarded_unlink(path, *args, **kwargs):
+        if (
+            path.name.endswith(".dbn.tmp")
+            and path.exists()
+            and client.timeseries.store is not None
+        ):
             assert client.timeseries.store._data_source.reader.closed
-        return real_replace(source, destination)
+        return real_unlink(path, *args, **kwargs)
 
-    monkeypatch.setattr("ml.databento_source.os.replace", guarded_replace)
+    monkeypatch.setattr(Path, "unlink", guarded_unlink)
     snapshot = fetch_daily_bars_snapshot(
         _request(),
         directory=tmp_path,
@@ -236,6 +248,7 @@ def test_ohlcv_only_source_cannot_fabricate_point_in_time_lineage():
         end_session="2026-07-31",
     ) == ()
     assert source.source_manifest()["provides_point_in_time_lineage"] == "false"
+    assert source.source_manifest()["source_version"] == databento_source_version()
 
 
 def test_cli_reports_errors_without_leaking_credentials(monkeypatch, capsys):
@@ -289,9 +302,11 @@ def test_zero_volume_is_a_recorded_refusal_not_a_discarded_download():
         _frame_with({("MSFT", "2026-07-30"): {"volume": 0.0}}), _request()
     )
     assert set(normalized.frames) == {"NVDA", "MSFT"}
-    # The zero-volume session is kept: zero volume is real market data.
-    assert len(normalized.frames["MSFT"]) == 2
-    assert normalized.refusals == ()
+    assert len(normalized.frames["MSFT"]) == 1
+    assert normalized.refusals[0]["reason"] == "zero volume"
+    assert normalized.refusals[0]["session"] == "2026-07-30"
+    with pytest.raises(TypeError):
+        normalized.refusals[0]["reason"] = "mutated"
 
     negative = normalize_daily_bars(
         _frame_with({("MSFT", "2026-07-30"): {"volume": -5.0}}), _request()
@@ -380,6 +395,82 @@ def test_rejected_snapshot_retains_the_paid_download_and_labels_it(tmp_path):
     assert manifest["point_in_time_data"] is False
 
 
+def test_dbn_conversion_failure_retains_paid_bytes_before_parsing(tmp_path):
+    """A real-client signature/parser error occurs before bar validation."""
+
+    class _BrokenStore(_FakeStore):
+        def to_df(self, *, price_type, pretty_ts, map_symbols):
+            raise TypeError("simulated Databento conversion incompatibility")
+
+    client = _FakeClient(_raw_frame(), cost=0.01)
+
+    def broken_range(**kwargs):
+        client.timeseries.calls.append(kwargs)
+        Path(kwargs["path"]).write_bytes(b"paid-dbn-before-parser")
+        client.timeseries.store = _BrokenStore(_raw_frame())
+        return client.timeseries.store
+
+    client.timeseries.get_range = broken_range
+    with pytest.raises(DatabentoSnapshotRetainedError) as caught:
+        fetch_daily_bars_snapshot(
+            _request(),
+            directory=tmp_path,
+            max_cost_usd=0.10,
+            client=client,
+            observed_at="2026-08-01T12:00:00+00:00",
+        )
+    assert caught.value.raw_path.read_bytes() == b"paid-dbn-before-parser"
+    manifest = json.loads(caught.value.manifest_path.read_text(encoding="utf-8"))
+    assert manifest["validation_status"] == "rejected"
+    assert "conversion failed" in manifest["rejection_reason"]
+
+
+def test_manifest_write_failure_never_deletes_paid_raw_snapshot(
+    tmp_path, monkeypatch
+):
+    real_atomic_write = databento_source_module._atomic_write
+
+    def fail_manifest(path, data):
+        if path.name.endswith(".manifest.json"):
+            raise OSError("simulated manifest storage failure")
+        return real_atomic_write(path, data)
+
+    monkeypatch.setattr(databento_source_module, "_atomic_write", fail_manifest)
+    client = _FakeClient(_raw_frame(), cost=0.01)
+    with pytest.raises(DatabentoSnapshotRetainedError) as caught:
+        fetch_daily_bars_snapshot(
+            _request(),
+            directory=tmp_path,
+            max_cost_usd=0.10,
+            client=client,
+            observed_at="2026-08-01T12:00:00+00:00",
+        )
+    assert caught.value.raw_path.read_bytes() == b"immutable-dbn-fixture"
+    assert not caught.value.manifest_path.exists()
+    assert "manifest could not be written" in str(caught.value)
+
+
+def test_raw_persistence_failure_retains_download_temporary_file(
+    tmp_path, monkeypatch
+):
+    def fail_raw_write(_path, _data):
+        raise OSError("simulated snapshot storage failure")
+
+    monkeypatch.setattr(databento_source_module, "_atomic_write", fail_raw_write)
+    client = _FakeClient(_raw_frame(), cost=0.01)
+    with pytest.raises(DatabentoSnapshotRetainedError) as caught:
+        fetch_daily_bars_snapshot(
+            _request(),
+            directory=tmp_path,
+            max_cost_usd=0.10,
+            client=client,
+            observed_at="2026-08-01T12:00:00+00:00",
+        )
+    assert caught.value.raw_path.name.endswith(".dbn.tmp")
+    assert caught.value.raw_path.read_bytes() == b"immutable-dbn-fixture"
+    assert "could not be copied" in str(caught.value)
+
+
 def test_accepted_manifest_records_refusals_and_a_derived_source_version(tmp_path):
     client = _FakeClient(
         _frame_with({("MSFT", "2026-07-30"): {"volume": -1.0}}), cost=0.01
@@ -392,7 +483,9 @@ def test_accepted_manifest_records_refusals_and_a_derived_source_version(tmp_pat
         observed_at="2026-08-01T12:00:00+00:00",
     )
     manifest = json.loads(snapshot.manifest_path.read_text(encoding="utf-8"))
-    assert manifest["validation_status"] == "accepted"
+    assert manifest["schema_version"] == "2"
+    assert manifest["validation_status"] == "accepted_with_refusals"
+    assert manifest["underfilled"] is True
     assert manifest["refusal_count"] == 1
     assert manifest["refusals"][0]["reason"] == "negative volume"
     assert manifest["non_session_refusal_count"] == 0
@@ -419,7 +512,7 @@ def test_source_version_is_derived_not_asserted():
         assert version == "databento-python-not-installed"
 
 
-def test_download_refuses_an_output_directory_that_git_would_track(tmp_path):
+def test_download_refuses_an_output_directory_that_git_would_track():
     """Licensed vendor data must not be committable; git history is forever."""
     tracked = Path(__file__).resolve().parent  # tests/ is tracked
     with pytest.raises(DatabentoSourceError, match="not git-ignored"):
@@ -428,8 +521,11 @@ def test_download_refuses_an_output_directory_that_git_would_track(tmp_path):
     ignored = Path(__file__).resolve().parent.parent / "artifacts" / "databento"
     run_databento_ingest.assert_output_dir_is_git_ignored(ignored)
 
-    # A path outside the working tree cannot be committed at all.
-    run_databento_ingest.assert_output_dir_is_git_ignored(tmp_path)
+    # An outside path may belong to another repository whose rules are
+    # unknown, so this repository cannot prove that it is safe.
+    outside = run_databento_ingest._REPOSITORY_ROOT.parent / "outside-databento"
+    with pytest.raises(DatabentoSourceError, match="cannot prove"):
+        run_databento_ingest.assert_output_dir_is_git_ignored(outside)
 
 
 def test_download_defaults_to_the_ignored_snapshot_directory():

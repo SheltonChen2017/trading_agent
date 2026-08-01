@@ -72,6 +72,11 @@ from ml.experiment_contracts import (
     ExperimentRunRecord,
     ExperimentSpec,
 )
+from ml.portfolio_research import (
+    TASK as PORTFOLIO_VOLATILITY_TASK,
+    PortfolioResearchError,
+    validate_portfolio_experiment_spec,
+)
 from ml.hashing import canonical_json, hash_bytes
 from ml.volatility_evaluation import (
     MIN_RESIDUALS_FOR_INTERVAL,
@@ -92,9 +97,11 @@ from ml.volatility import (
 
 SUPPORTED_TASKS = (
     "volatility_forecast",
+    PORTFOLIO_VOLATILITY_TASK,
     "cross_sectional_excess_return_ranking",
     EARNINGS_TASK,
 )
+_VOLATILITY_TASKS = frozenset({"volatility_forecast", PORTFOLIO_VOLATILITY_TASK})
 _VOLATILITY_CANDIDATES = frozenset({"ridge_log_vol", "hist_gradient_boosting"})
 _VOLATILITY_BASELINES = frozenset({"trailing_realized", "ewma"})
 _RANKER_CANDIDATES = frozenset({"elastic_net", "hist_gradient_boosting"})
@@ -286,7 +293,12 @@ def _validate_task_configuration(
 
     candidates = set(spec.candidate_models)
     baselines = set(spec.frozen_baselines)
-    if spec.task == "volatility_forecast":
+    if spec.task in _VOLATILITY_TASKS:
+        if spec.task == PORTFOLIO_VOLATILITY_TASK:
+            try:
+                validate_portfolio_experiment_spec(spec)
+            except PortfolioResearchError as exc:
+                raise ExperimentError(str(exc)) from exc
         unsupported = candidates - _VOLATILITY_CANDIDATES
         if unsupported:
             raise ExperimentError(f"unsupported volatility candidates: {sorted(unsupported)}")
@@ -1101,7 +1113,7 @@ def run_experiment(
         embargo_sessions=embargo,
     )
 
-    if spec.task == "volatility_forecast":
+    if spec.task in _VOLATILITY_TASKS:
         if not trailing_baseline_column or not ewma_baseline_column:
             raise ExperimentError(
                 "a volatility experiment requires trailing and EWMA baseline columns; "

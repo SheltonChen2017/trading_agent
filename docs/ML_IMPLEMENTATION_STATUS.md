@@ -22,7 +22,7 @@ The next implementation sequence is defined in
 | ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
 | ML data-source prerequisite | Cost-capped Databento bars/statistics, immutable DBN and PIT reference snapshots, fail-closed prerequisite report | `ml/databento_source.py`, `ml/databento_pit.py`, `scripts/run_databento_ingest.py` | None (research data only) |
 | ML-LR-2 | Durable discovery/confirmation runner and CLI | `ml/experiments.py`, `scripts/run_ml_experiment.py` | None |
-| ML-LR-3 | Portfolio-volatility targets, evaluation completion, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py` | None |
+| ML-LR-3 / ML-FS-4 software | Portfolio-volatility targets, frozen account-session dataset contract, shared experiment evaluation, immutable reports, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py`, `ml/portfolio_research.py`, `ml/experiments.py` | None (read-only research) |
 | ML-LR-4 | Earnings event identity, pre-event features, event-date experiment runner, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `ml/earnings_experiments.py`, `ml/experiments.py`, `scripts/run_filing_extraction.py` | None (research/context only) |
 | ML-LR-6 | Automated volatility shadow prediction, exact-calendar maturity, evidence epochs, monitoring/status CLI, durable operational failures, separate Windows scheduler | `ml/shadow.py`, `ml/shadow_runtime.py`, `scripts/run_ml_shadow.py`, `scripts/install_windows_ml_shadow_tasks.ps1`, ML epoch/run columns and tables in `assistant/storage.py` | Writes non-authoritative observations and operational alerts only |
 | ML-LR-7 | Evidence-epoch monitoring and immutable promotion dossier | `ml/monitoring_reports.py`, `ml/promotion.py`, `scripts/run_ml_promotion_dossier.py` | Read-only reports only |
@@ -174,12 +174,12 @@ acceptance criterion in sections 7-12 is complete. In particular:
    pinning a Parquet engine explicitly before depending on one, and none is
    pinned in `requirements.txt`. Revisit if dataset size demands it.
 
-6. **ML-4 is not yet portfolio-forecast complete.** Position snapshots can
-   now accumulate the required history, but there is no historical
-   portfolio-weight target builder, portfolio forecast runner, interval and
-   threshold-calibration fold report, or economic warning analysis by
-   year/regime/earnings proximity. The current evaluator covers per-row QLIKE
-   and MAE against trailing/EWMA baselines on a common validation sample.
+6. **Real portfolio research is still underfilled.** The software now builds
+   cash-aware frozen-weight or realized-account targets, freezes portfolio
+   features and distinct trailing/EWMA baselines, uses the shared purged
+   walk-forward runner, and emits immutable reports plus a typed forecast.
+   It deliberately returns unavailable until enough complete daily position
+   and equity captures exist; fixture success is not evidence of market edge.
 
 7. **ML-5 is not yet research-complete.** Event-time mapping, realized gaps,
    support checks, and simple fit functions exist. A point-in-time pre-event
@@ -205,7 +205,7 @@ acceptance criterion in sections 7-12 is complete. In particular:
     than presenting unevaluated outputs, but it means these modules do not yet
     help a live decision workflow directly.
 
-## ML-LR-3 (in progress)
+## ML-LR-3 / ML-FS-4 (software complete; real evidence underfilled)
 
 `ml/portfolio_volatility.py` delivers the section 9.2 target builder and the
 9.3 unit convention. Two explicitly distinct targets that are never
@@ -292,15 +292,36 @@ account-session, so `ticker` carries the account key — naming it honestly
 keeps cross-sectional rank metrics from being applied to a panel with one
 name per date, where a rank correlation is undefined.
 
-The portfolio target-preparation half of ML-LR-3 is complete. The module does
-not yet satisfy section 9.7's full definition of done: it does not fit a
-portfolio model or emit an immutable experiment report and typed forecast.
-Those outputs require a frozen portfolio feature/baseline dataset contract
-and integration with the shared experiment runner. Portfolio research against
-real data also stays underfilled until enough daily position/equity snapshots
-accumulate; per plan 9.7 that is reported as unavailable rather than
-backfilled. ML-LR-3 therefore remains **in progress** rather than being marked
-complete based on target preparation alone.
+`ml/portfolio_research.py` completes the software path. Its immutable
+`PortfolioDatasetContract` freezes one account, target kind, horizon, ordered
+features, and distinct trailing/EWMA baseline columns. Cash exposure is a
+required feature, action-shaped fields are refused, and missing account-
+session features remain explicit refusals. Readiness is recomputed after those
+refusals, so the runner cannot start merely because the pre-filter target count
+looked adequate.
+
+The shared experiment runner now recognizes
+`portfolio_volatility_forecast` as its own task and requires exact
+account-session, target-kind, and daily-volatility-unit parameters. It reuses
+the leakage-safe volatility evaluation machinery without pooling portfolio and
+per-security evidence. Reports, specs, model bundles, and run manifests retain
+their existing immutable hashes. `PortfolioVolatilityForecast` carries daily
+point/interval/ceiling-probability output with dataset, report, and feature
+lineage; any annualized display value is explicitly named and the contract is
+always non-authoritative.
+
+The software definition is complete on fixtures. Real portfolio research
+remains unavailable until enough complete daily position/equity snapshots
+accumulate; no missing holdings are backfilled and no fixture result is treated
+as evidence of market edge.
+
+## ML-FS-4 verification notes
+
+The milestone-focused suite covers cash preservation, contract hashing,
+missing-row underfill, shared-runner dispatch, exact task-parameter refusal,
+immutable output loading, typed available/unavailable forecasts, and the ML
+execution import boundary. The fixture suite passed without creating research
+registry, proposal, or execution state.
 
 
 ## ML-LR-4 notes

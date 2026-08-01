@@ -244,3 +244,32 @@ The recovery drill creates a consistent backup, restores it to a temporary
 database, runs SQLite integrity checks on both copies, and compares every
 table count. It never replaces the live database. A successful drill expires
 for health purposes after 30 days by default.
+
+## Portfolio-volatility research preparation
+
+Use complete `portfolio_capture_sessions` only. Build either `frozen_weight`
+or `realized_account` targets for one exact account key; never pool target
+kinds, broker accounts, or paper/live identities. Then use
+`PortfolioDatasetContract` and `build_portfolio_dataset_frames()` to bind the
+ordered features, cash exposure, horizon, and distinct trailing/EWMA baseline
+columns. An unavailable result is an operationally valid outcome: inspect its
+refusals and readiness blockers instead of filling missing holdings or account
+sessions.
+
+A portfolio experiment spec must use task
+`portfolio_volatility_forecast` and freeze these exact task parameters:
+
+```json
+{
+  "observation_unit": "account_session",
+  "target_kind": "frozen_weight",
+  "target_units": "daily_return_standard_deviation_pct"
+}
+```
+
+Run the resulting content-addressed dataset through the existing
+`run_ml_experiment.py` workflow. Preserve the emitted spec, report, model
+manifests, model artifacts, and run manifest together. This is research-only:
+do not edit the research registry, proposals, or execution state based on the
+result. Until enough genuine daily captures exist, report the path as
+underfilled rather than validating it on reconstructed positions.

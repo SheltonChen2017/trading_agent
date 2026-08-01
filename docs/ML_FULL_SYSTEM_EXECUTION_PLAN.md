@@ -38,13 +38,14 @@ gates, and model isolation. This plan fills the operational path around it:
 
 Current baseline:
 
-- ML-FS-0 through ML-FS-3 are software-complete; ML-FS-3's real-data
+- ML-FS-0 through ML-FS-4 are software-complete; ML-FS-3's real-data
   definition of done remains pending a reviewed licensed historical-universe
   snapshot and an actual authoritative build;
 - ML-LR-0, ML-LR-1, ML-LR-2, ML-LR-4, ML-LR-6, ML-LR-7, and
   ML-LR-8 are software-complete within their documented limits;
-- ML-LR-3 is complete for per-security volatility but not for portfolio model
-  fitting, immutable portfolio reports, or typed portfolio forecasts;
+- ML-LR-3 is software-complete for separate per-security and portfolio
+  volatility research paths; real portfolio research remains unavailable
+  until enough complete daily account history accumulates;
 - ML-LR-5 was deliberately skipped and is optional for the volatility-first
   path;
 - real `point_in_time_data=True` remains blocked on authoritative adjustment
@@ -218,6 +219,9 @@ information. If authoritative membership remains unavailable, promotion stays
 blocked and the limitation is explicit.
 
 ## 9. ML-FS-4 — finish volatility and portfolio research software
+
+Status: software implemented 2026-08-01. Real portfolio evidence remains
+underfilled until sufficient complete daily account history accumulates.
 
 ### Implementation
 

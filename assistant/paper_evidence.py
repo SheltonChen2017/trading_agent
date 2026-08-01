@@ -9,6 +9,7 @@ from zoneinfo import ZoneInfo
 import pandas as pd
 import pandas_market_calendars as mcal
 
+from assistant.money import decimal_text, to_decimal
 from assistant.portfolio_ledger import ACCOUNT_CASH
 from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
@@ -199,6 +200,152 @@ def _net_external_flow(
     return flow
 
 
+def _persist_normalized_portfolio_capture(
+    store: AssistantStore,
+    observation: dict[str, Any],
+) -> dict[str, Any]:
+    """Derive the ML portfolio history from the immutable paper observation.
+
+    A retry may arrive with a different current broker snapshot after the paper
+    observation for that session was already committed. Normalizing the stored
+    observation, rather than the retrying caller's snapshot, prevents that
+    mutable input from rewriting the historical portfolio.
+    """
+    source = _required_text(observation.get("source"), "observation.source")
+    account_mode = _required_text(
+        observation.get("account_mode"), "observation.account_mode"
+    )
+    if account_mode != "paper":
+        raise PaperEvidenceError(
+            "Normalized paper portfolio capture requires account_mode=paper"
+        )
+    account_id = _required_text(
+        observation.get("account_id"), "observation.account_id"
+    )
+    account_key = f"{source}:{account_mode}:{account_id}"
+    observation_id = _required_text(
+        observation.get("observation_id"), "observation.observation_id"
+    )
+    observation_hash = _required_text(
+        observation.get("payload_hash"), "observation.payload_hash"
+    )
+    evidence_epoch = _required_text(
+        observation.get("evidence_epoch"), "observation.evidence_epoch"
+    )
+    lineage_hash = _required_text(
+        observation.get("lineage_hash"), "observation.lineage_hash"
+    )
+    session_date = _required_text(
+        observation.get("session_date"), "observation.session_date"
+    )
+    captured_at = _required_text(
+        observation.get("captured_at"), "observation.captured_at"
+    )
+    capture_id = f"portfolio-{observation_id}"
+
+    benchmark_ticker = _required_text(
+        observation.get("benchmark_ticker"), "observation.benchmark_ticker"
+    ).upper()
+    equity = store.append_portfolio_equity_snapshot(
+        {
+            "schema_version": "1.1",
+            "portfolio_capture_id": capture_id,
+            "paper_observation_id": observation_id,
+            "paper_observation_hash": observation_hash,
+            "evidence_epoch": evidence_epoch,
+            "lineage_hash": lineage_hash,
+            "account_key": account_key,
+            "session_date": session_date,
+            "captured_at": captured_at,
+            "source": source,
+            "account_mode": account_mode,
+            "account_id": account_id,
+            "total_equity": decimal_text(
+                to_decimal(observation.get("total_equity"), name="total_equity")
+            ),
+            "cash": decimal_text(to_decimal(observation.get("cash"), name="cash")),
+            "net_external_flow": decimal_text(
+                to_decimal(
+                    observation.get("net_external_flow"),
+                    name="net_external_flow",
+                )
+            ),
+            "benchmarks": {
+                benchmark_ticker: decimal_text(
+                    to_decimal(
+                        observation.get("benchmark_close"),
+                        name="benchmark_close",
+                    )
+                )
+            },
+            "benchmark_basis": "recorded_post_close_session_value",
+            "benchmark_unavailable": [],
+        }
+    )
+
+    positions = observation.get("positions")
+    if not isinstance(positions, list):
+        raise PaperEvidenceError("observation.positions must be a list")
+    if any(not isinstance(position, dict) for position in positions):
+        raise PaperEvidenceError("observation position must be an object")
+    normalized_positions: list[dict[str, Any]] = []
+    for position in sorted(positions, key=lambda item: str(item.get("ticker", ""))):
+        ticker = _required_text(position.get("ticker"), "position.ticker").upper()
+        normalized_positions.append(
+            {
+                "account_key": account_key,
+                "session_date": session_date,
+                "captured_at": captured_at,
+                "ticker": ticker,
+                "shares": decimal_text(
+                    to_decimal(position.get("shares"), name=f"{ticker}.shares")
+                ),
+                "market_value": decimal_text(
+                    to_decimal(
+                        position.get("market_value"),
+                        name=f"{ticker}.market_value",
+                    )
+                ),
+                "price": decimal_text(
+                    to_decimal(
+                        position.get("current_price"),
+                        name=f"{ticker}.current_price",
+                    )
+                ),
+                "source": source,
+            }
+        )
+    written_positions = store.append_portfolio_position_snapshots(
+        normalized_positions
+    )
+    manifest = store.append_portfolio_capture_session(
+        {
+            "schema_version": "1.0",
+            "capture_id": capture_id,
+            "observation_id": observation_id,
+            "observation_payload_hash": observation_hash,
+            "evidence_epoch": evidence_epoch,
+            "lineage_hash": lineage_hash,
+            "account_key": account_key,
+            "account_mode": account_mode,
+            "broker_account_id": account_id,
+            "session_date": session_date,
+            "captured_at": captured_at,
+            "source": source,
+            "equity_snapshot_id": equity["snapshot_id"],
+            "equity_payload_hash": equity["payload_hash"],
+            "position_snapshot_ids": [
+                item["snapshot_id"] for item in written_positions
+            ],
+            "position_snapshot_hashes": [
+                item["snapshot_hash"] for item in written_positions
+            ],
+            "position_count": len(written_positions),
+        }
+    )
+    return manifest
+
+
 def capture_paper_account_observation(
     store: AssistantStore,
     snapshot: PortfolioSnapshot,
@@ -288,9 +435,15 @@ def capture_paper_account_observation(
                 "Paper observations must advance monotonically in time"
             )
         if prior[-1]["session_date"] == session_date:
-            return {
+            recorded = {
                 **prior[-1],
                 "already_recorded": True,
+            }
+            return {
+                **recorded,
+                "portfolio_capture": _persist_normalized_portfolio_capture(
+                    store, recorded
+                ),
             }
         if when > previous_at:
             net_external_flow = _net_external_flow(
@@ -335,7 +488,13 @@ def capture_paper_account_observation(
             reconciliation.get("mismatch_count", 0)
         ),
     }
-    return store.append_paper_account_observation(observation)
+    recorded = store.append_paper_account_observation(observation)
+    return {
+        **recorded,
+        "portfolio_capture": _persist_normalized_portfolio_capture(
+            store, recorded
+        ),
+    }
 
 
 def record_operational_drill(

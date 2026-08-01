@@ -14,7 +14,7 @@ from assistant.paper_evidence import (
     start_paper_evidence_epoch,
 )
 from assistant.portfolio_ledger import record_cash_transfer
-from assistant.schemas import PortfolioSnapshot
+from assistant.schemas import PortfolioPosition, PortfolioSnapshot
 from assistant.storage import AssistantStore
 
 
@@ -31,11 +31,15 @@ def _lineage(commit: str = "a" * 40) -> dict[str, str]:
 
 
 def _snapshot(
-    equity: float, *, account_mode: str = "paper"
+    equity: float,
+    *,
+    account_mode: str = "paper",
+    cash: float | None = None,
+    positions: list[PortfolioPosition] | None = None,
 ) -> PortfolioSnapshot:
     return PortfolioSnapshot(
-        positions=[],
-        cash=equity,
+        positions=list(positions or []),
+        cash=equity if cash is None else cash,
         total_equity=equity,
         as_of="2026-07-29",
         buying_power=equity,
@@ -200,6 +204,9 @@ def test_observation_requires_paper_mode_recent_reconciliation_and_close(tmp_pat
     )
     assert recorded["already_recorded"] is False
     assert repeated["already_recorded"] is True
+    assert recorded["portfolio_capture"]["already_recorded"] is False
+    assert repeated["portfolio_capture"]["already_recorded"] is True
+    assert recorded["portfolio_capture"]["position_count"] == 0
 
     later_retry = capture_paper_account_observation(
         store,
@@ -212,6 +219,131 @@ def test_observation_requires_paper_mode_recent_reconciliation_and_close(tmp_pat
     assert later_retry["observation_id"] == recorded["observation_id"]
     assert later_retry["total_equity"] == recorded["total_equity"]
     assert later_retry["already_recorded"] is True
+    assert later_retry["portfolio_capture"]["capture_id"] == (
+        recorded["portfolio_capture"]["capture_id"]
+    )
+    account_key = "alpaca:paper:paper-account-1"
+    equity = store.list_portfolio_equity_snapshots(account_key)
+    assert len(equity) == 1
+    assert equity[0]["total_equity"] == "1000"
+    assert store.list_portfolio_position_snapshots(account_key) == []
+    assert len(store.list_portfolio_capture_sessions(account_key=account_key)) == 1
+
+
+def test_paper_observation_populates_normalized_equity_positions_and_manifest(
+    tmp_path,
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    start_paper_evidence_epoch(
+        store,
+        "paper-v1",
+        _lineage(),
+        started_at=datetime(2026, 7, 29, 13, tzinfo=timezone.utc),
+    )
+    after_close = datetime(2026, 7, 29, 20, 30, tzinfo=timezone.utc)
+    _reconcile(store, after_close)
+    position = PortfolioPosition(
+        ticker="AAPL",
+        shares=2,
+        entry_price=90,
+        current_price=100,
+        market_value=200,
+        unrealized_pnl_pct=11.1111,
+        is_leveraged_etf=False,
+    )
+
+    recorded = capture_paper_account_observation(
+        store,
+        _snapshot(1_000, cash=800, positions=[position]),
+        benchmark_ticker="SPY",
+        benchmark_close=500,
+        captured_at=after_close,
+        expected_lineage=_lineage(),
+    )
+
+    account_key = "alpaca:paper:paper-account-1"
+    equity = store.list_portfolio_equity_snapshots(account_key)
+    positions = store.list_portfolio_position_snapshots(account_key)
+    captures = store.list_portfolio_capture_sessions(
+        account_key=account_key,
+        evidence_epoch="paper-v1",
+    )
+    assert len(equity) == 1
+    assert equity[0]["total_equity"] == "1000"
+    assert equity[0]["cash"] == "800"
+    assert equity[0]["paper_observation_id"] == recorded["observation_id"]
+    assert positions == [
+        {
+            "snapshot_id": positions[0]["snapshot_id"],
+            "account_key": account_key,
+            "session_date": "2026-07-29",
+            "captured_at": after_close.isoformat(),
+            "ticker": "AAPL",
+            "shares": "2",
+            "market_value": "200",
+            "price": "100",
+            "source": "alpaca",
+            "snapshot_hash": positions[0]["snapshot_hash"],
+        }
+    ]
+    assert len(captures) == 1
+    assert captures[0]["observation_id"] == recorded["observation_id"]
+    assert captures[0]["equity_snapshot_id"] == equity[0]["snapshot_id"]
+    assert captures[0]["position_snapshot_ids"] == [positions[0]["snapshot_id"]]
+    assert captures[0]["position_count"] == 1
+    assert recorded["portfolio_capture"]["payload_hash"] == captures[0]["payload_hash"]
+
+
+def test_retry_repairs_a_capture_that_failed_after_normalized_children(
+    tmp_path,
+    monkeypatch,
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    start_paper_evidence_epoch(
+        store,
+        "paper-v1",
+        _lineage(),
+        started_at=datetime(2026, 7, 29, 13, tzinfo=timezone.utc),
+    )
+    after_close = datetime(2026, 7, 29, 20, 30, tzinfo=timezone.utc)
+    _reconcile(store, after_close)
+    original_append = store.append_portfolio_capture_session
+
+    def fail_manifest_once(capture):
+        raise RuntimeError("simulated crash before the completion manifest")
+
+    monkeypatch.setattr(store, "append_portfolio_capture_session", fail_manifest_once)
+    with pytest.raises(RuntimeError, match="simulated crash"):
+        capture_paper_account_observation(
+            store,
+            _snapshot(1_000),
+            benchmark_ticker="SPY",
+            benchmark_close=500,
+            captured_at=after_close,
+            expected_lineage=_lineage(),
+        )
+
+    account_key = "alpaca:paper:paper-account-1"
+    assert len(store.list_paper_account_observations("paper-v1")) == 1
+    assert len(store.list_portfolio_equity_snapshots(account_key)) == 1
+    assert store.list_portfolio_capture_sessions(account_key=account_key) == []
+
+    monkeypatch.setattr(store, "append_portfolio_capture_session", original_append)
+    repaired = capture_paper_account_observation(
+        store,
+        _snapshot(1_500),
+        benchmark_ticker="SPY",
+        benchmark_close=550,
+        captured_at=datetime(2026, 7, 29, 20, 40, tzinfo=timezone.utc),
+        expected_lineage=_lineage(),
+    )
+
+    assert repaired["total_equity"] == 1_000
+    assert repaired["portfolio_capture"]["already_recorded"] is False
+    assert len(store.list_portfolio_capture_sessions(account_key=account_key)) == 1
+    equity = store.list_portfolio_equity_snapshots(account_key)
+    assert len(equity) == 1
+    assert equity[0]["total_equity"] == "1000"
 
 
 def test_observation_rejects_a_different_broker_account(tmp_path):

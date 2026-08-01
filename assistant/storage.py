@@ -363,6 +363,28 @@ class AssistantStore:
                     source TEXT NOT NULL,
                     snapshot_hash TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS portfolio_capture_sessions (
+                    capture_id TEXT PRIMARY KEY,
+                    observation_id TEXT NOT NULL UNIQUE,
+                    evidence_epoch TEXT NOT NULL,
+                    lineage_hash TEXT NOT NULL,
+                    account_key TEXT NOT NULL,
+                    account_mode TEXT NOT NULL,
+                    broker_account_id TEXT NOT NULL,
+                    session_date TEXT NOT NULL,
+                    captured_at TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    equity_snapshot_id TEXT NOT NULL,
+                    position_count INTEGER NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    payload_hash TEXT NOT NULL,
+                    FOREIGN KEY(observation_id)
+                        REFERENCES paper_account_observations(observation_id),
+                    FOREIGN KEY(evidence_epoch)
+                        REFERENCES paper_evidence_epochs(evidence_epoch),
+                    FOREIGN KEY(equity_snapshot_id)
+                        REFERENCES portfolio_equity_snapshots(snapshot_id)
+                );
                 CREATE TABLE IF NOT EXISTS ml_model_registrations (
                     model_key TEXT PRIMARY KEY,
                     registered_at TEXT NOT NULL,
@@ -456,6 +478,10 @@ class AssistantStore:
                     );
                 CREATE INDEX IF NOT EXISTS idx_position_snapshot_account_date
                     ON portfolio_position_snapshots(account_key, session_date);
+                CREATE INDEX IF NOT EXISTS idx_portfolio_capture_account_date
+                    ON portfolio_capture_sessions(account_key, session_date);
+                CREATE INDEX IF NOT EXISTS idx_portfolio_capture_epoch_date
+                    ON portfolio_capture_sessions(evidence_epoch, session_date);
                 -- At most ONE active epoch per (model_key, task). A second
                 -- active epoch would let predictions from two different
                 -- systems accumulate under one banner, which is exactly the
@@ -939,6 +965,273 @@ class AssistantStore:
             }
             for row in rows
         ]
+
+    def append_portfolio_capture_session(
+        self, capture: dict[str, Any]
+    ) -> dict[str, Any]:
+        """Commit a manifest proving one normalized portfolio capture is complete.
+
+        The paper observation, equity snapshot, and position snapshots are
+        individually append-only. This manifest is deliberately written last:
+        its presence means every referenced child exists and matches its hash;
+        its absence means a crash or refusal left the normalization incomplete.
+        A zero-position manifest is therefore distinguishable from a capture
+        that failed before holdings were persisted.
+        """
+        required = {
+            "capture_id",
+            "observation_id",
+            "observation_payload_hash",
+            "evidence_epoch",
+            "lineage_hash",
+            "account_key",
+            "account_mode",
+            "broker_account_id",
+            "session_date",
+            "captured_at",
+            "source",
+            "equity_snapshot_id",
+            "equity_payload_hash",
+            "position_snapshot_ids",
+            "position_snapshot_hashes",
+            "position_count",
+        }
+        missing = sorted(required - set(capture))
+        if missing:
+            raise ValueError(f"portfolio capture is missing fields: {missing}")
+        for name in (
+            "capture_id",
+            "observation_id",
+            "evidence_epoch",
+            "account_key",
+            "account_mode",
+            "broker_account_id",
+            "source",
+            "equity_snapshot_id",
+        ):
+            value = capture[name]
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"portfolio capture {name} must be non-empty")
+            if value != value.strip():
+                raise ValueError(
+                    f"portfolio capture {name} must not contain surrounding whitespace"
+                )
+        for name in (
+            "observation_payload_hash",
+            "lineage_hash",
+            "equity_payload_hash",
+        ):
+            _require_sha256(capture[name], f"portfolio capture {name}")
+        session = _parse_session_date(capture["session_date"], "session_date")
+        captured = _parse_aware_timestamp(capture["captured_at"], "captured_at")
+        if captured.astimezone(_EASTERN).date() != session:
+            raise ValueError(
+                "portfolio capture captured_at must fall on session_date in "
+                "America/New_York"
+            )
+        position_count = capture["position_count"]
+        if (
+            isinstance(position_count, bool)
+            or not isinstance(position_count, int)
+            or position_count < 0
+        ):
+            raise ValueError("portfolio capture position_count must be >= 0")
+        position_ids = capture["position_snapshot_ids"]
+        position_hashes = capture["position_snapshot_hashes"]
+        if not isinstance(position_ids, (list, tuple)) or not isinstance(
+            position_hashes, (list, tuple)
+        ):
+            raise ValueError(
+                "portfolio capture position snapshot identities must be sequences"
+            )
+        if len(position_ids) != position_count or len(position_hashes) != position_count:
+            raise ValueError(
+                "portfolio capture position_count must match its snapshot identities"
+            )
+        for index, snapshot_id in enumerate(position_ids):
+            if not isinstance(snapshot_id, str) or not snapshot_id.strip():
+                raise ValueError(
+                    f"portfolio capture position_snapshot_ids[{index}] must be non-empty"
+                )
+        if len(set(position_ids)) != position_count:
+            raise ValueError("portfolio capture position snapshot IDs must be unique")
+        for index, snapshot_hash in enumerate(position_hashes):
+            _require_sha256(
+                snapshot_hash,
+                f"portfolio capture position_snapshot_hashes[{index}]",
+            )
+
+        canonical = {
+            "schema_version": str(capture.get("schema_version", "1.0")),
+            "capture_id": capture["capture_id"],
+            "observation_id": capture["observation_id"],
+            "observation_payload_hash": capture["observation_payload_hash"],
+            "evidence_epoch": capture["evidence_epoch"],
+            "lineage_hash": capture["lineage_hash"],
+            "account_key": capture["account_key"],
+            "account_mode": capture["account_mode"],
+            "broker_account_id": capture["broker_account_id"],
+            "session_date": session.isoformat(),
+            "captured_at": captured.isoformat(),
+            "source": capture["source"],
+            "equity_snapshot_id": capture["equity_snapshot_id"],
+            "equity_payload_hash": capture["equity_payload_hash"],
+            "position_snapshot_ids": list(position_ids),
+            "position_snapshot_hashes": list(position_hashes),
+            "position_count": position_count,
+        }
+        payload_json = _canonical_ml_json(canonical, "portfolio capture")
+        payload_hash = _hash_payload(payload_json)
+        connection = self._open_database(self.path)
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            observation = connection.execute(
+                "SELECT evidence_epoch, payload_hash FROM paper_account_observations "
+                "WHERE observation_id = ?",
+                (canonical["observation_id"],),
+            ).fetchone()
+            if observation is None:
+                raise ValueError("portfolio capture paper observation does not exist")
+            if (
+                observation["evidence_epoch"] != canonical["evidence_epoch"]
+                or observation["payload_hash"] != canonical["observation_payload_hash"]
+            ):
+                raise ValueError(
+                    "portfolio capture paper observation identity or hash does not match"
+                )
+            epoch = connection.execute(
+                "SELECT lineage_hash FROM paper_evidence_epochs WHERE evidence_epoch = ?",
+                (canonical["evidence_epoch"],),
+            ).fetchone()
+            if epoch is None or epoch["lineage_hash"] != canonical["lineage_hash"]:
+                raise ValueError("portfolio capture evidence lineage does not match")
+            equity = connection.execute(
+                "SELECT account_key, session_date, captured_at, payload_hash "
+                "FROM portfolio_equity_snapshots WHERE snapshot_id = ?",
+                (canonical["equity_snapshot_id"],),
+            ).fetchone()
+            if equity is None or any(
+                (
+                    equity["account_key"] != canonical["account_key"],
+                    equity["session_date"] != canonical["session_date"],
+                    equity["captured_at"] != canonical["captured_at"],
+                    equity["payload_hash"] != canonical["equity_payload_hash"],
+                )
+            ):
+                raise ValueError("portfolio capture equity snapshot does not match")
+            actual_positions: dict[str, str] = {}
+            if position_ids:
+                placeholders = ",".join("?" for _ in position_ids)
+                rows = connection.execute(
+                    f"SELECT snapshot_id, account_key, session_date, captured_at, "
+                    f"snapshot_hash FROM portfolio_position_snapshots "
+                    f"WHERE snapshot_id IN ({placeholders})",
+                    tuple(position_ids),
+                ).fetchall()
+                for row in rows:
+                    if (
+                        row["account_key"] != canonical["account_key"]
+                        or row["session_date"] != canonical["session_date"]
+                        or row["captured_at"] != canonical["captured_at"]
+                    ):
+                        raise ValueError(
+                            "portfolio capture position snapshot belongs to another capture"
+                        )
+                    actual_positions[row["snapshot_id"]] = row["snapshot_hash"]
+            expected_positions = dict(zip(position_ids, position_hashes))
+            if actual_positions != expected_positions:
+                raise ValueError(
+                    "portfolio capture position snapshot identities or hashes do not match"
+                )
+            existing_capture = connection.execute(
+                "SELECT payload_hash FROM portfolio_capture_sessions WHERE capture_id = ?",
+                (canonical["capture_id"],),
+            ).fetchone()
+            connection.execute(
+                """
+                INSERT INTO portfolio_capture_sessions(
+                    capture_id, observation_id, evidence_epoch, lineage_hash,
+                    account_key, account_mode, broker_account_id, session_date,
+                    captured_at, source, equity_snapshot_id, position_count,
+                    payload_json, payload_hash
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT DO NOTHING
+                """,
+                (
+                    canonical["capture_id"],
+                    canonical["observation_id"],
+                    canonical["evidence_epoch"],
+                    canonical["lineage_hash"],
+                    canonical["account_key"],
+                    canonical["account_mode"],
+                    canonical["broker_account_id"],
+                    canonical["session_date"],
+                    canonical["captured_at"],
+                    canonical["source"],
+                    canonical["equity_snapshot_id"],
+                    canonical["position_count"],
+                    payload_json,
+                    payload_hash,
+                ),
+            )
+            row = connection.execute(
+                "SELECT * FROM portfolio_capture_sessions WHERE capture_id = ?",
+                (canonical["capture_id"],),
+            ).fetchone()
+            if row is None:
+                conflict = connection.execute(
+                    "SELECT capture_id FROM portfolio_capture_sessions "
+                    "WHERE observation_id = ?",
+                    (canonical["observation_id"],),
+                ).fetchone()
+                raise ValueError(
+                    "paper observation already belongs to a different portfolio capture "
+                    f"{None if conflict is None else conflict['capture_id']!r}"
+                )
+            if row["payload_hash"] != payload_hash:
+                raise ValueError(
+                    "portfolio capture identity already exists with different content"
+                )
+            connection.commit()
+            return {
+                **json.loads(row["payload_json"]),
+                "payload_hash": row["payload_hash"],
+                "already_recorded": existing_capture is not None,
+            }
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+
+    def list_portfolio_capture_sessions(
+        self,
+        *,
+        account_key: str | None = None,
+        evidence_epoch: str | None = None,
+        limit: int = 100_000,
+    ) -> list[dict[str, Any]]:
+        query = "SELECT payload_json, payload_hash FROM portfolio_capture_sessions"
+        clauses: list[str] = []
+        params: list[Any] = []
+        if account_key is not None:
+            clauses.append("account_key = ?")
+            params.append(account_key)
+        if evidence_epoch is not None:
+            clauses.append("evidence_epoch = ?")
+            params.append(evidence_epoch)
+        if clauses:
+            query += " WHERE " + " AND ".join(clauses)
+        query += " ORDER BY session_date ASC, captured_at ASC LIMIT ?"
+        params.append(limit)
+        with self._connect() as connection:
+            rows = connection.execute(query, tuple(params)).fetchall()
+        result: list[dict[str, Any]] = []
+        for row in rows:
+            payload = json.loads(row["payload_json"])
+            payload["payload_hash"] = row["payload_hash"]
+            result.append(payload)
+        return result
 
     def register_ml_model(
         self, model_key: str, manifest: dict[str, Any], *, status: str = "shadow",

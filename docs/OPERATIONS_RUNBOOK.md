@@ -67,6 +67,17 @@ older than 30 minutes, verifies the current evidence lineage, and records
 cash-transfer-adjusted NAV plus the exact benchmark close. A real failure
 creates a critical alert.
 
+The same accepted observation is also the source of truth for normalized ML
+portfolio history. The command writes one `portfolio_equity_snapshots` row,
+one `portfolio_position_snapshots` row per holding, and then a final
+`portfolio_capture_sessions` manifest binding their hashes to the paper
+observation and evidence epoch. A manifest with `position_count=0` is a valid
+cash-only portfolio; a missing manifest means normalization did not complete.
+Retry the same `paper-observation` command after correcting the failure. The
+retry derives normalized records from the stored immutable observation—not a
+newer broker snapshot—and repairs missing children or the manifest
+idempotently.
+
 The continuous processes can also be started directly:
 
 ```text

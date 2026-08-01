@@ -37,7 +37,7 @@ from typing import Any, Mapping, Sequence
 import numpy as np
 import pandas as pd
 
-from ml.contracts import ContractError, _freeze_json, _to_dict
+from ml.contracts import ContractError, freeze_json, _to_dict
 from ml.earnings_gap import (
     GapObservation,
     classify_release_timing,
@@ -691,7 +691,7 @@ class EarningsGapForecast:
         if not isinstance(self.event_support, Mapping) or not self.event_support:
             raise EarningsFeatureError("event_support must be a non-empty mapping")
         try:
-            frozen_support = _freeze_json(dict(self.event_support), path="event_support")
+            frozen_support = freeze_json(dict(self.event_support), path="event_support")
         except ContractError as exc:
             raise EarningsFeatureError(str(exc)) from exc
         object.__setattr__(self, "event_support", frozen_support)

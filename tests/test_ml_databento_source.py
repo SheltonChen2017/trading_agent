@@ -535,3 +535,117 @@ def test_download_defaults_to_the_ignored_snapshot_directory():
     )
     assert args.output_dir.name == "databento"
     run_databento_ingest.assert_output_dir_is_git_ignored(args.output_dir)
+
+
+def _session_frame(volumes: dict[str, float]) -> pd.DataFrame:
+    """One ticker across four consecutive NYSE sessions (Mon..Thu)."""
+    rows = []
+    for session, volume in volumes.items():
+        rows.append(
+            {
+                "open": 100.0, "high": 102.0, "low": 99.0, "close": 101.0,
+                "volume": volume, "symbol": "NVDA",
+                "ts": f"{session}T00:00:00Z",
+            }
+        )
+    frame = pd.DataFrame(rows)
+    frame.index = pd.to_datetime(frame.pop("ts"), utc=True)
+    return frame
+
+
+def test_a_refused_interior_session_becomes_an_explicit_gap_row():
+    """A hole must not be absorbed into the neighbouring return.
+
+    ml/features.py computes returns with close.pct_change(), which counts
+    rows rather than sessions, so a dropped session would silently relabel a
+    two-session move as a one-session move.
+    """
+    request = DailyBarsRequest(
+        tickers=("NVDA",), start="2026-07-27", end="2026-07-31"
+    )
+    normalized = normalize_daily_bars(
+        _session_frame(
+            {
+                "2026-07-27": 1_000.0,
+                "2026-07-28": 0.0,  # refused: zero volume
+                "2026-07-29": 1_000.0,
+                "2026-07-30": 1_000.0,
+            }
+        ),
+        request,
+    )
+    frame = normalized.frames["NVDA"]
+    # The session is still present, as an explicit hole.
+    assert [stamp.date().isoformat() for stamp in frame.index] == [
+        "2026-07-27", "2026-07-28", "2026-07-29", "2026-07-30",
+    ]
+    assert pd.isna(frame.loc[pd.Timestamp("2026-07-28"), "close"])
+    assert frame["volume"].dtype == "Int64"
+    assert pd.isna(frame.loc[pd.Timestamp("2026-07-28"), "volume"])
+
+    # The return spanning the hole is unavailable rather than wrong.
+    returns = frame["close"].pct_change(fill_method=None)
+    assert pd.isna(returns.loc[pd.Timestamp("2026-07-29")])
+    assert not pd.isna(returns.loc[pd.Timestamp("2026-07-30")])
+
+    reasons = [item["reason"] for item in normalized.refusals]
+    assert "zero volume" in reasons
+    assert any("explicit gap" in reason for reason in reasons)
+
+
+def test_gaps_are_not_padded_outside_the_ticker_s_own_span():
+    """Padding before a listing or after a delisting would fabricate rows."""
+    request = DailyBarsRequest(
+        tickers=("NVDA",), start="2026-07-27", end="2026-07-31"
+    )
+    normalized = normalize_daily_bars(
+        _session_frame({"2026-07-29": 1_000.0, "2026-07-30": 1_000.0}), request
+    )
+    assert [
+        stamp.date().isoformat() for stamp in normalized.frames["NVDA"].index
+    ] == ["2026-07-29", "2026-07-30"]
+    assert normalized.refusals == ()
+
+
+def test_manifest_reports_gap_sessions_and_excludes_them_from_content_identity(tmp_path):
+    request = DailyBarsRequest(
+        tickers=("NVDA",), start="2026-07-27", end="2026-07-31"
+    )
+    client = _FakeClient(
+        _session_frame(
+            {
+                "2026-07-27": 1_000.0,
+                "2026-07-28": 0.0,
+                "2026-07-29": 1_000.0,
+                "2026-07-30": 1_000.0,
+            }
+        ),
+        cost=0.01,
+    )
+    snapshot = fetch_daily_bars_snapshot(
+        request,
+        directory=tmp_path,
+        max_cost_usd=0.10,
+        client=client,
+        observed_at="2026-08-01T12:00:00+00:00",
+    )
+    manifest = json.loads(snapshot.manifest_path.read_text(encoding="utf-8"))
+    assert manifest["gap_session_count"] == 1
+    # The hash covers observed bars only, so it does not depend on padding.
+    assert manifest["row_count"] == 3
+    assert manifest["session_count"] == 3
+    assert manifest["underfilled"] is True
+    assert manifest["validation_status"] == "accepted_with_refusals"
+
+
+def test_freeze_json_is_public_shared_api():
+    """Three ml modules import it; a private name across that boundary would
+    let a rename in ml/contracts.py break them silently."""
+    from ml import contracts
+
+    assert hasattr(contracts, "freeze_json")
+    assert not hasattr(contracts, "_freeze_json")
+    frozen = contracts.freeze_json({"a": {"b": [1, 2]}}, path="probe")
+    with pytest.raises(TypeError):
+        frozen["a"]["b"] = "mutated"
+    assert databento_source_module.freeze_json is contracts.freeze_json

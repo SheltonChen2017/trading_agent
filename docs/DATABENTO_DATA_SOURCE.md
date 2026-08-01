@@ -97,6 +97,27 @@ Every bar is checked against the NYSE calendar. A non-zero
 systematic off-by-one session shift is exactly the silent look-ahead error
 this check exists to make visible.
 
+## Gaps are explicit, never implied
+
+A refused row, and a session the vendor simply omitted, both leave a hole.
+`ml/features.py` computes returns with `close.pct_change()`, which counts
+rows rather than sessions, so a dropped session would silently relabel a
+two-session move as a one-session move — a real distortion of the very
+quantity the volatility work measures.
+
+Each ticker's frame is therefore reindexed to the exchange calendar across
+its own first-to-last usable session, and a hole is carried as an explicit
+NaN row (`volume` uses the nullable `Int64` dtype so a gap is `pd.NA` rather
+than a zero). `_sanitize_ohlcv` already treats NaN as "unavailable" and
+propagates it through the rolling windows, so the return spanning a hole
+becomes unavailable instead of wrong.
+
+Padding stops at the ticker's own span. Extending it to the whole request
+window would fabricate rows for sessions when the security was not listed.
+`gap_session_count` reports the total; `row_count`, `session_count`, and
+`normalized_sha256` count observed bars only, so the content identity does
+not depend on how far the calendar was padded.
+
 ## Point-in-time status
 
 `EQUS.SUMMARY` daily OHLCV is useful authoritative market data, but these

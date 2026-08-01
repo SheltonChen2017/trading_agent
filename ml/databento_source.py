@@ -32,7 +32,7 @@ from ml.availability import (
     FeatureAvailabilityRecord,
     UniverseMembershipRecord,
 )
-from ml.contracts import _freeze_json
+from ml.contracts import freeze_json
 from ml.hashing import canonical_json, hash_bytes, hash_payload
 from ml.shadow import trading_sessions
 
@@ -193,7 +193,7 @@ class DailyBarsSnapshot:
     def __post_init__(self) -> None:
         object.__setattr__(self, "frames", MappingProxyType(dict(self.frames)))
         object.__setattr__(
-            self, "manifest", _freeze_json(dict(self.manifest), path="manifest")
+            self, "manifest", freeze_json(dict(self.manifest), path="manifest")
         )
         object.__setattr__(
             self,
@@ -405,7 +405,38 @@ def _normalize_daily_frame(
                 _refusal(ticker, "", "every returned bar for this ticker was refused")
             )
             continue
-        frame["volume"] = frame["volume"].astype("int64")
+
+        # Make every gap explicit. A refused row and a session the vendor
+        # simply omitted both leave a hole, and a consumer computing returns
+        # positionally -- ml/features.py uses close.pct_change(), which counts
+        # rows rather than sessions -- would silently absorb that hole into
+        # the neighbouring return, relabelling a two-session move as a
+        # one-session move. Reindexing to the exchange calendar turns the hole
+        # into NaN, which _sanitize_ohlcv already treats as "unavailable" and
+        # propagates through the rolling windows.
+        #
+        # The span is the ticker's own first-to-last usable session, not the
+        # whole request: padding outside that range would fabricate rows for
+        # sessions when the security was not listed.
+        span = sorted(
+            session
+            for session in sessions
+            if frame.index[0].date() <= session <= frame.index[-1].date()
+        )
+        full_index = pd.DatetimeIndex([pd.Timestamp(session) for session in span])
+        gap_sessions = full_index.difference(frame.index)
+        frame = frame.reindex(full_index)
+        # Nullable integer: volume stays integral, and a gap is pd.NA rather
+        # than a float that could be mistaken for a real zero.
+        frame["volume"] = frame["volume"].astype("Int64")
+        for stamp in gap_sessions:
+            refusals.append(
+                _refusal(
+                    ticker,
+                    stamp.date().isoformat(),
+                    "no usable bar for this session; present as an explicit gap",
+                )
+            )
         frames[ticker] = frame
 
     if not frames:
@@ -445,9 +476,17 @@ def normalize_daily_bars(
 
 
 def _normalized_material(frames: Mapping[str, pd.DataFrame]) -> list[dict[str, Any]]:
+    """Content identity for the observed bars only.
+
+    Explicit gap rows are deliberately excluded: they carry no observation,
+    and including them would make the content hash depend on how far the
+    calendar was padded rather than on what the vendor actually returned.
+    """
     rows: list[dict[str, Any]] = []
     for ticker in sorted(frames):
         for session, row in frames[ticker].sort_index().iterrows():
+            if pd.isna(row["close"]):
+                continue
             rows.append(
                 {
                     "ticker": ticker,
@@ -460,6 +499,10 @@ def _normalized_material(frames: Mapping[str, pd.DataFrame]) -> list[dict[str, A
                 }
             )
     return rows
+
+
+def _gap_session_count(frames: Mapping[str, pd.DataFrame]) -> int:
+    return int(sum(int(frame["close"].isna().sum()) for frame in frames.values()))
 
 
 def _atomic_write(path: Path, data: bytes) -> None:
@@ -646,6 +689,7 @@ def fetch_daily_bars_snapshot(
                 "normalized_sha256": None,
                 "row_count": 0,
                 "session_count": 0,
+                "gap_session_count": 0,
                 "refusals": [],
                 "refusal_count": 0,
                 "non_session_refusal_count": 0,
@@ -682,6 +726,9 @@ def fetch_daily_bars_snapshot(
             "normalized_sha256": hash_bytes(canonical_json(normalized).encode("utf-8")),
             "row_count": len(normalized),
             "session_count": len({row["session"] for row in normalized}),
+            # Sessions carried in the frames as explicit NaN rather than
+            # omitted, so a consumer cannot mistake a hole for adjacency.
+            "gap_session_count": _gap_session_count(normalized_bars.frames),
             "refusals": refusals,
             "refusal_count": len(refusals),
             "underfilled": bool(refusals),

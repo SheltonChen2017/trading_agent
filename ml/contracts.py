@@ -92,7 +92,7 @@ def _parse_timestamp(value: Any, name: str) -> datetime:
     return parsed
 
 
-def _freeze_json(value: Any, *, path: str) -> Any:
+def freeze_json(value: Any, *, path: str) -> Any:
     """Validate and recursively freeze one JSON-like value.
 
     ``frozen=True`` protects dataclass attribute assignment only. Without this
@@ -111,11 +111,11 @@ def _freeze_json(value: Any, *, path: str) -> Any:
         for key, item in value.items():
             if not isinstance(key, str):
                 raise ContractError(f"{path} contains non-string key {key!r}")
-            frozen[key] = _freeze_json(item, path=f"{path}.{key}")
+            frozen[key] = freeze_json(item, path=f"{path}.{key}")
         return MappingProxyType(frozen)
     if isinstance(value, (list, tuple)):
         return tuple(
-            _freeze_json(item, path=f"{path}[{index}]")
+            freeze_json(item, path=f"{path}[{index}]")
             for index, item in enumerate(value)
         )
     raise ContractError(
@@ -286,7 +286,7 @@ class DatasetManifest:
             )
         evidence = None
         if self.point_in_time_evidence is not None:
-            evidence = _freeze_json(
+            evidence = freeze_json(
                 self.point_in_time_evidence, path="point_in_time_evidence"
             )
             if not isinstance(evidence, Mapping):
@@ -388,7 +388,7 @@ class ModelManifest:
             raise ContractError("ordered_feature_names must not contain duplicates")
         _check_int(self.random_seed, "random_seed")
         _check_evidence_status(self.evidence_status)
-        hyperparameters = _freeze_json(self.hyperparameters, path="hyperparameters")
+        hyperparameters = freeze_json(self.hyperparameters, path="hyperparameters")
         if not isinstance(hyperparameters, Mapping):
             raise ContractError("hyperparameters must be a JSON object")
         training_window = _window(self.training_window, "training_window")
@@ -512,15 +512,15 @@ class PredictionRecord:
             _check_required_str(reason, f"refusal_reasons[{index}]")
         if len(set(refusal_reasons)) != len(refusal_reasons):
             raise ContractError("refusal_reasons must not contain duplicates")
-        values = _freeze_json(self.values, path="values")
-        uncertainty = _freeze_json(self.uncertainty, path="uncertainty")
-        feature_freshness = _freeze_json(
+        values = freeze_json(self.values, path="values")
+        uncertainty = freeze_json(self.uncertainty, path="uncertainty")
+        feature_freshness = freeze_json(
             self.feature_freshness, path="feature_freshness"
         )
-        monitoring_features = _freeze_json(
+        monitoring_features = freeze_json(
             self.monitoring_features, path="monitoring_features"
         )
-        monitoring_context = _freeze_json(
+        monitoring_context = freeze_json(
             self.monitoring_context, path="monitoring_context"
         )
         if not isinstance(values, Mapping) or not isinstance(uncertainty, Mapping):

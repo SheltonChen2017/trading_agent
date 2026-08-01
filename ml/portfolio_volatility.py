@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import dataclasses
 import math
+import re
 from datetime import datetime
 from decimal import Decimal
 from typing import Any, Mapping, Sequence
@@ -43,6 +44,7 @@ from ml.hashing import hash_payload
 
 TRADING_SESSIONS_PER_YEAR = 252
 CASH_TICKER = "__CASH__"
+_SHA256 = re.compile(r"^[0-9a-f]{64}$")
 
 
 class PortfolioVolatilityError(ValueError):
@@ -109,6 +111,12 @@ class PortfolioVolatilityTarget:
         if not isinstance(self.account_key, str) or not self.account_key.strip():
             raise PortfolioVolatilityError("account_key must be a non-empty string")
         _parse_session(self.as_of_session, "as_of_session")
+        first_return = _parse_session(self.first_return_session, "first_return_session")
+        last_return = _parse_session(self.last_return_session, "last_return_session")
+        if first_return > last_return:
+            raise PortfolioVolatilityError(
+                "first_return_session must not be after last_return_session"
+            )
         if (
             isinstance(self.horizon_sessions, bool)
             or not isinstance(self.horizon_sessions, int)
@@ -125,6 +133,52 @@ class PortfolioVolatilityTarget:
         ):
             raise PortfolioVolatilityError(
                 "daily_volatility_pct must be a non-negative finite number"
+            )
+        if (
+            isinstance(self.observation_count, bool)
+            or not isinstance(self.observation_count, int)
+            or self.observation_count < 2
+        ):
+            raise PortfolioVolatilityError(
+                "observation_count must be an integer >= 2 to support a volatility"
+            )
+        for name in ("position_snapshot_hash", "price_input_hash"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or _SHA256.fullmatch(value) is None:
+                raise PortfolioVolatilityError(f"{name} must be a lowercase SHA-256 hash")
+        if not isinstance(self.weights, Mapping):
+            raise PortfolioVolatilityError("weights must be a mapping")
+        if (
+            isinstance(self.cash_weight, bool)
+            or not isinstance(self.cash_weight, (int, float))
+            or not math.isfinite(float(self.cash_weight))
+            or self.cash_weight < 0
+        ):
+            raise PortfolioVolatilityError("cash_weight must be a non-negative finite number")
+        if self.target_kind == "frozen_weight":
+            if not self.weights:
+                raise PortfolioVolatilityError("a frozen_weight target requires held security weights")
+            total_weight = float(self.cash_weight)
+            for ticker, weight in self.weights.items():
+                if not isinstance(ticker, str) or ticker != ticker.upper() or not ticker.strip():
+                    raise PortfolioVolatilityError("weight tickers must be canonical uppercase strings")
+                if (
+                    isinstance(weight, bool)
+                    or not isinstance(weight, (int, float))
+                    or not math.isfinite(float(weight))
+                    or weight == 0
+                ):
+                    raise PortfolioVolatilityError(
+                        "frozen_weight targets require finite, non-zero security weights"
+                    )
+                total_weight += float(weight)
+            if not math.isclose(total_weight, 1.0, abs_tol=1e-12):
+                raise PortfolioVolatilityError(
+                    "security weights plus cash_weight must sum to one"
+                )
+        elif self.weights or self.cash_weight != 0:
+            raise PortfolioVolatilityError(
+                "a realized_account target cannot carry frozen security or cash weights"
             )
 
     @property
@@ -213,6 +267,15 @@ def compute_frozen_weights(
     if total <= 0:
         raise PortfolioVolatilityError(
             "total portfolio value must be positive to define weights"
+        )
+    zero_weight_tickers = sorted(ticker for ticker, value in market_values.items() if value == 0)
+    if zero_weight_tickers:
+        # A zero-valued row is not a held position. Retaining it would require
+        # price coverage for a security that cannot affect the target, masking
+        # stale position data as a genuine holding.
+        raise PortfolioVolatilityError(
+            "zero-weight positions cannot define a portfolio-volatility target: "
+            f"{zero_weight_tickers}"
         )
 
     weights = {

@@ -7,6 +7,7 @@ calibration clears its preregistered gate.
 from __future__ import annotations
 
 import math
+import re
 
 import numpy as np
 import pandas as pd
@@ -221,6 +222,31 @@ def test_a_model_that_never_warns_earlier_gets_no_credit():
     assert result["model_warns_earlier_than_trailing"] is False
 
 
+def test_warning_episodes_are_not_interleaved_across_tickers():
+    """A calm ticker must not split a different ticker's contiguous crisis."""
+    rows = []
+    sessions = ["2026-01-01", "2026-01-02", "2026-01-03", "2026-01-04"]
+    for index, session in enumerate(sessions):
+        rows.extend(
+            (
+                {
+                    "ticker": "AAA", "as_of_session": session,
+                    "actual": (10, 10, 30, 30)[index],
+                    "model_predicted": (10, 30, 30, 30)[index],
+                    "trailing_predicted": (10, 10, 30, 30)[index],
+                },
+                {
+                    "ticker": "BBB", "as_of_session": session,
+                    "actual": 10, "model_predicted": 10, "trailing_predicted": 10,
+                },
+            )
+        )
+    result = evaluate_warning_behavior(pd.DataFrame(rows), ceiling_pct=25.0)
+    assert result["breach_episode_count"] == 1
+    assert result["per_subject"]["AAA"]["model"]["mean_lead_sessions"] == 1
+    assert result["model_warns_earlier_than_trailing"] is True
+
+
 def test_warning_behavior_requires_its_columns():
     with pytest.raises(VolatilityEvaluationError, match="missing column"):
         evaluate_warning_behavior(pd.DataFrame({"a": [1]}), ceiling_pct=25.0)
@@ -374,6 +400,29 @@ def test_an_available_forecast_cannot_carry_refusal_reasons():
 def test_an_unknown_calibration_status_is_refused():
     with pytest.raises(VolatilityEvaluationError, match="calibration_status"):
         _forecast(calibration_status="looks_fine")
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("task", "ranker", "task must"),
+        ("artifact_hash", "not-a-hash", "SHA-256"),
+        ("as_of_session", "31-07-2026", "canonical"),
+        ("target_available_at", "2026-08-28T20:00:00", "timezone-aware"),
+        ("horizon_sessions", 0, "positive integer"),
+        ("evidence_status", "approved", "non-authoritative"),
+        ("prediction_interval_daily_pct", (3.0, 1.0), "contain the point"),
+        ("probability_above_ceiling", 1.1, "within [0, 1]"),
+    ),
+)
+def test_shadow_forecast_rejects_invalid_identity_and_numeric_values(field, value, message):
+    with pytest.raises(VolatilityEvaluationError, match=re.escape(message)):
+        _forecast(**{field: value})
+
+
+def test_an_unavailable_forecast_cannot_carry_a_numeric_prediction():
+    with pytest.raises(VolatilityEvaluationError, match="cannot carry numeric"):
+        _forecast(available=False, refusal_reasons=("stale_features",))
 
 
 def test_forecast_is_json_serializable():

@@ -124,6 +124,11 @@ def test_zero_total_value_is_refused():
         compute_frozen_weights([{"ticker": "AAA", "market_value": "0"}], cash="0")
 
 
+def test_a_zero_weight_position_is_refused_even_when_cash_makes_total_positive():
+    with pytest.raises(PortfolioVolatilityError, match="zero-weight"):
+        compute_frozen_weights([{"ticker": "AAA", "market_value": "0"}], cash="100")
+
+
 def test_duplicate_and_reserved_tickers_are_refused():
     with pytest.raises(PortfolioVolatilityError, match="duplicate"):
         compute_frozen_weights(
@@ -236,6 +241,25 @@ def test_a_target_rejects_a_negative_or_non_finite_volatility():
             horizon_sessions=20, daily_volatility_pct=-1.0, observation_count=20,
             weights={}, cash_weight=0.0, first_return_session=_AS_OF,
             last_return_session=_AS_OF, position_snapshot_hash="a", price_input_hash="b",
+        )
+
+
+def test_target_contract_rejects_unverifiable_provenance_and_weights():
+    with pytest.raises(PortfolioVolatilityError, match="SHA-256"):
+        PortfolioVolatilityTarget(
+            account_key="paper", as_of_session=_AS_OF, target_kind="frozen_weight",
+            horizon_sessions=20, daily_volatility_pct=1.0, observation_count=20,
+            weights={"AAA": 1.0}, cash_weight=0.0, first_return_session=_AS_OF,
+            last_return_session=_AS_OF, position_snapshot_hash="a", price_input_hash="b",
+        )
+
+    with pytest.raises(PortfolioVolatilityError, match="sum to one"):
+        PortfolioVolatilityTarget(
+            account_key="paper", as_of_session=_AS_OF, target_kind="frozen_weight",
+            horizon_sessions=20, daily_volatility_pct=1.0, observation_count=20,
+            weights={"AAA": 0.5}, cash_weight=0.0, first_return_session=_AS_OF,
+            last_return_session=_AS_OF, position_snapshot_hash="a" * 64,
+            price_input_hash="b" * 64,
         )
 
 

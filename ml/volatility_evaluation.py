@@ -20,6 +20,8 @@ from __future__ import annotations
 
 import dataclasses
 import math
+import re
+from datetime import datetime
 from typing import Any, Mapping, Sequence
 
 import numpy as np
@@ -38,6 +40,10 @@ from ml.evaluation import (
 TRADING_SESSIONS_PER_YEAR = 252
 MIN_RESIDUALS_FOR_INTERVAL = 20
 MIN_EVENTS_FOR_CALIBRATION = 30
+_SHA256 = re.compile(r"^[0-9a-f]{64}$")
+_NON_AUTHORITATIVE_EVIDENCE = frozenset(
+    {"exploratory", "promising_unconfirmed", "rejected", "unavailable"}
+)
 
 
 class VolatilityEvaluationError(ValueError):
@@ -231,6 +237,7 @@ def evaluate_warning_behavior(
     model_column: str = "model_predicted",
     trailing_column: str = "trailing_predicted",
     ceiling_pct: float,
+    subject_column: str = "ticker",
 ) -> dict[str, Any]:
     """Warning lead time and false-warning rate versus trailing volatility
     (plan 9.4).
@@ -248,41 +255,99 @@ def evaluate_warning_behavior(
         if column not in frame.columns:
             raise VolatilityEvaluationError(f"frame is missing column {column!r}")
 
-    ordered = frame.sort_values(session_column).reset_index(drop=True)
-    breach = pd.to_numeric(ordered[actual_column], errors="coerce") > ceiling_pct
+    # A per-security report may contain several rows for one session.  Those
+    # rows are independent timelines, not adjacent moments in one portfolio
+    # timeline.  Group before finding contiguous breach episodes; otherwise a
+    # calm BBB row between two consecutive AAA breaches manufactures two
+    # episodes and erases AAA's genuine warning lead time.
+    if subject_column in frame.columns:
+        groups = list(frame.groupby(subject_column, sort=True, dropna=False))
+    else:
+        groups = [("__all_subjects__", frame)]
 
-    # Identify contiguous breach episodes.
-    episode_starts: list[int] = []
-    previous = False
-    for index, value in enumerate(breach):
-        if bool(value) and not previous:
-            episode_starts.append(index)
-        previous = bool(value)
+    def _subject_summary(subject_frame: pd.DataFrame) -> dict[str, Any]:
+        ordered = subject_frame.sort_values(session_column).reset_index(drop=True)
+        breach = pd.to_numeric(ordered[actual_column], errors="coerce") > ceiling_pct
+        episode_starts: list[int] = []
+        previous = False
+        for index, value in enumerate(breach):
+            if bool(value) and not previous:
+                episode_starts.append(index)
+            previous = bool(value)
 
-    def _warnings(column: str) -> pd.Series:
-        return pd.to_numeric(ordered[column], errors="coerce") > ceiling_pct
+        result: dict[str, Any] = {
+            "session_count": int(len(ordered)),
+            "breach_episode_count": len(episode_starts),
+            "non_breach_session_count": int((~breach).sum()),
+        }
+        for label, column in (("model", model_column), ("trailing", trailing_column)):
+            warned = pd.to_numeric(ordered[column], errors="coerce") > ceiling_pct
+            leads: list[int] = []
+            for start in episode_starts:
+                lead = 0
+                position = start - 1
+                while position >= 0 and bool(warned.iloc[position]):
+                    lead += 1
+                    position -= 1
+                leads.append(lead)
+            false_warnings = int((warned & ~breach).sum())
+            result[label] = {
+                "warning_count": int(warned.sum()),
+                "leads": leads,
+                "false_warning_count": false_warnings,
+            }
+        return result
 
+    subject_summaries = {
+        str(subject): _subject_summary(subject_frame) for subject, subject_frame in groups
+    }
     summary: dict[str, Any] = {
         "ceiling_pct": ceiling_pct,
-        "session_count": int(len(ordered)),
-        "breach_episode_count": len(episode_starts),
+        "session_count": int(len(frame)),
+        "subject_count": len(subject_summaries),
+        "breach_episode_count": sum(
+            value["breach_episode_count"] for value in subject_summaries.values()
+        ),
+        "per_subject": {
+            subject: {
+                "breach_episode_count": value["breach_episode_count"],
+                "model": {
+                    "warning_count": value["model"]["warning_count"],
+                    "mean_lead_sessions": (
+                        round(float(np.mean(value["model"]["leads"])), 6)
+                        if value["model"]["leads"]
+                        else None
+                    ),
+                },
+                "trailing": {
+                    "warning_count": value["trailing"]["warning_count"],
+                    "mean_lead_sessions": (
+                        round(float(np.mean(value["trailing"]["leads"])), 6)
+                        if value["trailing"]["leads"]
+                        else None
+                    ),
+                },
+            }
+            for subject, value in subject_summaries.items()
+        },
     }
-    for label, column in (("model", model_column), ("trailing", trailing_column)):
-        warned = _warnings(column)
-        leads: list[int] = []
-        for start in episode_starts:
-            # Look back for the most recent unbroken run of warnings ending
-            # at or just before the episode start.
-            lead = 0
-            position = start - 1
-            while position >= 0 and bool(warned.iloc[position]):
-                lead += 1
-                position -= 1
-            leads.append(lead)
-        false_warnings = int((warned & ~breach).sum())
-        non_breach_sessions = int((~breach).sum())
+    for label in ("model", "trailing"):
+        leads = [
+            lead
+            for value in subject_summaries.values()
+            for lead in value[label]["leads"]
+        ]
+        false_warnings = sum(
+            value[label]["false_warning_count"] for value in subject_summaries.values()
+        )
+        warning_count = sum(
+            value[label]["warning_count"] for value in subject_summaries.values()
+        )
+        non_breach_sessions = sum(
+            value["non_breach_session_count"] for value in subject_summaries.values()
+        )
         summary[label] = {
-            "warning_count": int(warned.sum()),
+            "warning_count": warning_count,
             "mean_lead_sessions": round(float(np.mean(leads)), 6) if leads else None,
             "episodes_warned_in_advance": int(sum(1 for lead in leads if lead > 0)),
             "false_warning_count": false_warnings,
@@ -410,6 +475,52 @@ class ShadowVolatilityForecast:
     )
 
     def __post_init__(self) -> None:
+        if self.task != "volatility_forecast":
+            raise VolatilityEvaluationError(
+                "task must be 'volatility_forecast' for a ShadowVolatilityForecast"
+            )
+        for name in ("subject_key", "model_key"):
+            value = getattr(self, name)
+            if not isinstance(value, str) or not value.strip():
+                raise VolatilityEvaluationError(f"{name} must be a non-empty string")
+        if not isinstance(self.artifact_hash, str) or _SHA256.fullmatch(self.artifact_hash) is None:
+            raise VolatilityEvaluationError("artifact_hash must be a lowercase SHA-256 hash")
+        try:
+            session = pd.to_datetime(self.as_of_session, format="%Y-%m-%d", errors="coerce")
+        except (TypeError, ValueError):
+            session = pd.NaT
+        if pd.isna(session) or session.strftime("%Y-%m-%d") != self.as_of_session:
+            raise VolatilityEvaluationError("as_of_session must use canonical YYYY-MM-DD format")
+        if not isinstance(self.target_available_at, str):
+            raise VolatilityEvaluationError("target_available_at must be timezone-aware ISO-8601")
+        try:
+            available_at = datetime.fromisoformat(self.target_available_at.replace("Z", "+00:00"))
+        except ValueError as exc:
+            raise VolatilityEvaluationError(
+                "target_available_at must be timezone-aware ISO-8601"
+            ) from exc
+        if available_at.tzinfo is None or available_at.utcoffset() is None:
+            raise VolatilityEvaluationError("target_available_at must be timezone-aware ISO-8601")
+        if (
+            isinstance(self.horizon_sessions, bool)
+            or not isinstance(self.horizon_sessions, int)
+            or self.horizon_sessions < 1
+        ):
+            raise VolatilityEvaluationError("horizon_sessions must be a positive integer")
+        if self.evidence_status not in _NON_AUTHORITATIVE_EVIDENCE:
+            raise VolatilityEvaluationError(
+                "evidence_status is not a recognized non-authoritative state"
+            )
+        if not isinstance(self.available, bool):
+            raise VolatilityEvaluationError("available must be a boolean")
+        if not isinstance(self.refusal_reasons, tuple) or any(
+            not isinstance(reason, str) or not reason.strip() for reason in self.refusal_reasons
+        ):
+            raise VolatilityEvaluationError(
+                "refusal_reasons must be a tuple of non-empty strings"
+            )
+        if not isinstance(self.feature_freshness, Mapping):
+            raise VolatilityEvaluationError("feature_freshness must be a mapping")
         if self.calibration_status not in CalibrationStatus.ALL:
             raise VolatilityEvaluationError(
                 f"calibration_status must be one of {CalibrationStatus.ALL}"
@@ -422,13 +533,62 @@ class ShadowVolatilityForecast:
             raise VolatilityEvaluationError(
                 "an unavailable forecast must carry at least one refusal reason"
             )
-        if self.available and (
-            self.daily_volatility_pct is None
-            or not math.isfinite(float(self.daily_volatility_pct))
-            or self.daily_volatility_pct < 0
+        def _optional_daily_value(value: float | None, name: str) -> None:
+            if value is not None and (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(float(value))
+                or value < 0
+            ):
+                raise VolatilityEvaluationError(f"{name} must be a non-negative finite daily percent")
+
+        _optional_daily_value(self.trailing_baseline_daily_pct, "trailing_baseline_daily_pct")
+        _optional_daily_value(self.ewma_baseline_daily_pct, "ewma_baseline_daily_pct")
+        if self.available:
+            if (
+                self.daily_volatility_pct is None
+                or isinstance(self.daily_volatility_pct, bool)
+                or not isinstance(self.daily_volatility_pct, (int, float))
+                or not math.isfinite(float(self.daily_volatility_pct))
+                or self.daily_volatility_pct < 0
+            ):
+                raise VolatilityEvaluationError(
+                    "an available forecast requires a non-negative finite daily volatility"
+                )
+            if (
+                not isinstance(self.prediction_interval_daily_pct, tuple)
+                or len(self.prediction_interval_daily_pct) != 2
+            ):
+                raise VolatilityEvaluationError("an available forecast requires a two-sided interval")
+            lower, upper = self.prediction_interval_daily_pct
+            if not all(
+                isinstance(value, (int, float))
+                and not isinstance(value, bool)
+                and math.isfinite(float(value))
+                and value >= 0
+                for value in (lower, upper)
+            ) or lower > self.daily_volatility_pct or upper < self.daily_volatility_pct:
+                raise VolatilityEvaluationError(
+                    "prediction interval must be finite, ordered, and contain the point forecast"
+                )
+            if (
+                self.probability_above_ceiling is None
+                or isinstance(self.probability_above_ceiling, bool)
+                or not isinstance(self.probability_above_ceiling, (int, float))
+                or not math.isfinite(float(self.probability_above_ceiling))
+                or not 0 <= self.probability_above_ceiling <= 1
+            ):
+                raise VolatilityEvaluationError("ceiling probability must be within [0, 1]")
+        elif any(
+            value is not None
+            for value in (
+                self.daily_volatility_pct,
+                self.prediction_interval_daily_pct,
+                self.probability_above_ceiling,
+            )
         ):
             raise VolatilityEvaluationError(
-                "an available forecast requires a non-negative finite daily volatility"
+                "an unavailable forecast cannot carry numeric predictions"
             )
 
     @property

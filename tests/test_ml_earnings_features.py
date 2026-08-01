@@ -7,6 +7,8 @@ and no event output alters a proposal or blackout rule.
 """
 from __future__ import annotations
 
+from types import MappingProxyType
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -103,6 +105,19 @@ def test_constructing_identity_directly_with_a_non_utc_offset_is_refused():
             ticker="NVDA", announced_at_utc="2026-02-25T16:30:00-05:00",
             source_id="v", source_event_id="q4",
         )
+
+
+def test_direct_identity_construction_cannot_bypass_canonical_utc_format():
+    with pytest.raises(EarningsFeatureError, match="canonical UTC representation"):
+        EventIdentity(
+            ticker="NVDA", announced_at_utc="2026-02-25T21:30:00Z",
+            source_id="v", source_event_id="q4",
+        )
+
+
+def test_identity_rejects_surrounding_ticker_whitespace():
+    with pytest.raises(EarningsFeatureError, match="surrounding whitespace"):
+        _identity(ticker=" NVDA ")
 
 
 def test_lowercase_ticker_is_refused():
@@ -214,6 +229,20 @@ def test_features_do_not_change_when_future_prices_are_appended():
     assert row_short.features == row_long.features
 
 
+def test_timezone_aware_daily_index_uses_the_same_market_sessions():
+    price = _price(60, start="2026-01-05")
+    aware = price.copy()
+    aware.index = aware.index.tz_localize("America/New_York")
+    identity = _identity(announced_at="2026-02-25T21:30:00+00:00")
+
+    naive_row = build_pre_event_features(identity, price=price)
+    aware_row = build_pre_event_features(identity, price=aware)
+
+    assert aware_row.available
+    assert aware_row.as_of_session == naive_row.as_of_session
+    assert aware_row.features == naive_row.features
+
+
 def test_appending_future_sessions_cannot_change_a_pre_event_row():
     """The decisive leakage test, done properly: build ONE frame and slice it,
     so the prefix is byte-identical rather than merely similar.
@@ -262,6 +291,41 @@ def test_only_prior_gaps_contribute_to_prior_gap_features():
     assert with_future.features == past_only.features
 
 
+def test_prior_gap_features_never_mix_another_tickers_history():
+    price = _price(60, start="2026-01-05")
+    identity = _identity(announced_at="2026-02-25T21:30:00+00:00")
+
+    def gap(ticker: str, value: float) -> GapObservation:
+        return GapObservation(
+            ticker=ticker, announced_at="2026-01-20T21:30:00+00:00",
+            release_timing="after_close", from_session="2026-01-20",
+            to_session="2026-01-21", from_price=100.0,
+            to_price=100.0 * (1 + value / 100), gap_pct=value,
+        )
+
+    own_only = build_pre_event_features(
+        identity, price=price, prior_gaps=[gap("NVDA", 5.0)]
+    )
+    mixed_input = build_pre_event_features(
+        identity, price=price,
+        prior_gaps=[gap("NVDA", 5.0), gap("MSFT", 40.0)],
+    )
+    assert mixed_input.features == own_only.features
+
+
+def test_a_stale_benchmark_cannot_create_misaligned_residual_momentum():
+    price = _price(60, start="2026-01-05")
+    identity = _identity(announced_at="2026-02-25T21:30:00+00:00")
+    benchmark = price["close"].drop(pd.Timestamp("2026-02-25"))
+
+    row = build_pre_event_features(
+        identity, price=price, benchmark_close=benchmark
+    )
+
+    assert not row.available
+    assert any("benchmark close history is incomplete" in r for r in row.refusal_reasons)
+
+
 def test_available_rows_reject_a_prohibited_feature_name():
     identity = _identity()
     with pytest.raises(EarningsFeatureError, match="post-release information"):
@@ -280,6 +344,21 @@ def test_a_non_finite_feature_is_refused():
             as_of_session="2026-02-25", cutoff_at=identity.announced_at_utc,
             features={"pre_event_volatility_pct": float("nan")}, available=True,
         )
+
+
+def test_feature_rows_copy_and_freeze_caller_owned_features():
+    identity = _identity()
+    features = {"pre_event_volatility_pct": 2.0}
+    row = EventFeatureRow(
+        identity=identity, release_timing="after_close",
+        as_of_session="2026-02-25", cutoff_at=identity.announced_at_utc,
+        features=features, available=True,
+    )
+    features["pre_event_volatility_pct"] = 999.0
+    assert row.features["pre_event_volatility_pct"] == 2.0
+    assert isinstance(row.features, MappingProxyType)
+    with pytest.raises(TypeError):
+        row.features["pre_event_volatility_pct"] = 3.0
 
 
 def test_an_unavailable_row_requires_a_reason():
@@ -425,6 +504,13 @@ def test_an_unordered_interval_is_refused():
         _forecast(absolute_gap_interval_pct=(9.0, 2.0))
 
 
+def test_a_mutable_or_wrong_sized_interval_is_refused():
+    with pytest.raises(EarningsFeatureError, match="two-sided"):
+        _forecast(absolute_gap_interval_pct=[2.5, 9.0])
+    with pytest.raises(EarningsFeatureError, match="two-sided"):
+        _forecast(absolute_gap_interval_pct=(2.5, 5.0, 9.0))
+
+
 def test_an_out_of_range_probability_is_refused():
     with pytest.raises(EarningsFeatureError, match="within \\[0, 1\\]"):
         _forecast(probability_above_absolute_threshold=1.4)
@@ -437,6 +523,8 @@ def test_an_unavailable_forecast_requires_a_reason():
         available=False, absolute_gap_interval_pct=None,
         probability_above_absolute_threshold=None,
         probability_below_downside_threshold=None,
+        baseline_median_absolute_gap_pct=None,
+        evidence_status="unavailable",
         refusal_reasons=("intraday release",),
     )
     assert refused.to_dict()["absolute_gap_interval_pct"] is None
@@ -447,6 +535,33 @@ def test_the_forecast_carries_its_event_support_and_hashes():
     assert payload["event_support"]["distinct_events"] == 48
     assert payload["model_key"] and payload["artifact_hash"]
     assert payload["feature_snapshot_hash"]
+
+
+def test_forecast_rejects_invalid_identity_hashes_and_thresholds():
+    with pytest.raises(EarningsFeatureError, match="event_id must be"):
+        _forecast(event_id="not-a-hash")
+    with pytest.raises(EarningsFeatureError, match="absolute_threshold_pct"):
+        _forecast(absolute_threshold_pct=float("nan"))
+    with pytest.raises(EarningsFeatureError, match="downside_threshold_pct"):
+        _forecast(downside_threshold_pct=5.0)
+
+
+def test_forecast_rejects_invalid_time_and_evidence_states():
+    with pytest.raises(EarningsFeatureError, match="must follow"):
+        _forecast(target_available_at="2026-02-25T20:00:00+00:00")
+    with pytest.raises(EarningsFeatureError, match="normalized to UTC"):
+        _forecast(announced_at_utc="2026-02-25T16:30:00-05:00")
+    with pytest.raises(EarningsFeatureError, match="recognized non-authoritative"):
+        _forecast(evidence_status="confirmed")
+
+
+def test_forecast_deep_freezes_event_support():
+    support = {"distinct_events": 48, "slices": {"year": [2025, 2026]}}
+    forecast = _forecast(event_support=support)
+    support["slices"]["year"].append(2027)
+    assert forecast.to_dict()["event_support"]["slices"]["year"] == [2025, 2026]
+    with pytest.raises(TypeError):
+        forecast.event_support["distinct_events"] = 49
 
 
 def test_forecast_and_row_are_json_serializable():

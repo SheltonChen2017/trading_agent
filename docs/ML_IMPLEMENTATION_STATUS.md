@@ -298,9 +298,19 @@ post-release price (which restates the gap), transcript text (published
 after the release it describes), revised consensus (today's estimate, not the
 one that stood before the print), and later filings. Prior-gap features are
 allowed through an explicit allowlist rather than accidentally, because they
-describe *earlier* events. Naive, unknown, or intraday timing produces an
-unavailable event rather than a guess, matching `ml/earnings_gap.py`'s
-existing refusal so the two layers agree.
+describe *earlier* events. Intraday timing produces an unavailable feature
+row rather than a guess. A naive or unknown instant is refused before a
+stable `EventIdentity` can be created; the still-missing event runner must
+persist that intake refusal so it is counted rather than disappearing.
+
+The independent review hardened this layer against cross-security and
+cross-time contamination: prior-gap features now use only the same ticker's
+deduplicated earlier events, timezone-aware daily indexes are normalized
+consistently, and a supplied benchmark must cover the exact paired momentum
+window rather than silently using a stale endpoint. Feature mappings and
+nested forecast support are copied and frozen, while the forecast contract
+now refuses malformed hashes, timestamps, thresholds, calibration/evidence
+states, and prediction-bearing unavailable records.
 
 `EarningsGapForecast` carries no trade field and states in its own payload
 that it never overrides the deterministic earnings blackout and never delays
@@ -312,7 +322,11 @@ text" — filing text is transported as an inert JSON payload and has nothing
 to invoke. Deterministic validation is rerun when the audit record is built,
 so a record cannot assert an acceptance the validator never granted, and a
 rejected extraction is persisted rather than discarded (exit code 2: the run
-succeeded, the output was unusable).
+succeeded, the output was unusable). The CLI now requires an audit database;
+provider, JSON-schema, and claim-contract failures are also written as
+rejected runs instead of escaping before persistence. Written month dates are
+validated as complete dates, so changing `July 31` to `August 31` cannot pass
+merely because the day and year numbers still appear in the source.
 
 **Still outstanding for ML-LR-4:** the event-model runner itself (plan 10.2's
 frozen model order and 10.3's fold-level evaluation grouped by distinct event

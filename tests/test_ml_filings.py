@@ -185,6 +185,43 @@ def test_direct_number_must_appear_in_its_supporting_excerpt():
     }
 
 
+def test_a_changed_written_month_cannot_reuse_the_same_day_and_year_numbers():
+    document = _document(
+        text="The quarter ended July 31, 2026 with strong demand."
+    )
+    extraction = _extraction(
+        source_documents=(document,),
+        claims=(
+            _claim(
+                field="quarter_end",
+                value="August 31, 2026",
+                supporting_excerpt="The quarter ended July 31, 2026",
+            ),
+        ),
+    )
+
+    codes = {issue.code for issue in validate_extraction(extraction)}
+    assert "unsupported_date" in codes
+    assert "date_not_in_supporting_excerpt" in codes
+
+
+def test_equivalent_written_date_formatting_is_accepted():
+    document = _document(
+        text="The quarter ended July 31, 2026 with strong demand."
+    )
+    extraction = _extraction(
+        source_documents=(document,),
+        claims=(
+            _claim(
+                field="quarter_end",
+                value="july 31 2026",
+                supporting_excerpt="The quarter ended July 31, 2026",
+            ),
+        ),
+    )
+    assert validate_extraction(extraction) == ()
+
+
 def test_citing_an_unsupplied_document_is_rejected():
     extraction = _extraction(claims=(_claim(document_id="doc-does-not-exist"),))
     issues = validate_extraction(extraction)

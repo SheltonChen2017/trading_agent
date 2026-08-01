@@ -208,6 +208,12 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from assistant.kill_switch import env_kill_switch_active
+from assistant.execution_telemetry import (
+    execution_attempt_id,
+    record_submission_started,
+    record_validation_exception,
+    record_validation_outcome,
+)
 from assistant.order_lifecycle import (
     journal_broker_order_update,
     proposal_status_for_order,
@@ -665,6 +671,13 @@ class ProposalValidationOutcome:
     # compute this leg's planned notional to reserve against the next
     # leg's projected portfolio, without re-fetching the same quote.
     reference_price: MoneyInput | None = None
+    # Safe broker/market evidence captured while validating. These fields
+    # remain observational only: callers must never reuse them as execution
+    # authorization. They exist so a claimed attempt can be recorded before
+    # an order (and therefore a broker lifecycle row) exists.
+    broker_preflight: dict | None = None
+    quote: dict | None = None
+    quote_received_at: str | None = None
 
     @property
     def approved(self) -> bool:
@@ -863,7 +876,7 @@ def validate_proposal_for_execution(
             )
 
     try:
-        broker.assert_account_and_asset_ready(intent.ticker)
+        broker_preflight = broker.assert_account_and_asset_ready(intent.ticker)
     except Exception as exc:
         return ProposalValidationOutcome(
             proposal=proposal,
@@ -884,6 +897,7 @@ def validate_proposal_for_execution(
         return ProposalValidationOutcome(
             proposal=proposal, intent=intent, validation=None,
             error=f"Could not check recent order history for duplicates: malformed stored intent: {exc}",
+            broker_preflight=broker_preflight,
         )
     for order in current_portfolio.open_orders:
         side = str(order.get("side", "")).lower()
@@ -899,6 +913,7 @@ def validate_proposal_for_execution(
 
     try:
         quote = broker.get_latest_quote(intent.ticker)
+        quote_received_at = datetime.now(timezone.utc).isoformat()
         reference_price = quote.get("price_decimal", quote["price"])
         price_timestamp = quote["timestamp"]
         bid_price = quote.get("bid_decimal", quote.get("bid"))
@@ -907,6 +922,7 @@ def validate_proposal_for_execution(
         return ProposalValidationOutcome(
             proposal=proposal, intent=intent, validation=None,
             error=f"Could not fetch a live quote for {intent.ticker} to check price freshness: {exc}",
+            broker_preflight=broker_preflight,
         )
 
     pending_buy_value_by_ticker: dict[str, Decimal] = {}
@@ -921,6 +937,9 @@ def validate_proposal_for_execution(
                     f"exposure/concentration limits: {exc}"
                 ),
                 reference_price=reference_price,
+                broker_preflight=broker_preflight,
+                quote=quote,
+                quote_received_at=quote_received_at,
             )
         for ticker, extra_value in (extra_pending_buy_value_by_ticker or {}).items():
             key = ticker.upper()
@@ -942,6 +961,9 @@ def validate_proposal_for_execution(
                 "skip the earnings blackout check."
             ),
             reference_price=reference_price,
+            broker_preflight=broker_preflight,
+            quote=quote,
+            quote_received_at=quote_received_at,
         )
 
     validation = validate_trade_intent(
@@ -970,7 +992,14 @@ def validate_proposal_for_execution(
         available_buying_power_override=available_buying_power_override,
     )
     return ProposalValidationOutcome(
-        proposal=proposal, intent=intent, validation=validation, error=None, reference_price=reference_price,
+        proposal=proposal,
+        intent=intent,
+        validation=validation,
+        error=None,
+        reference_price=reference_price,
+        broker_preflight=broker_preflight,
+        quote=quote,
+        quote_received_at=quote_received_at,
     )
 
 
@@ -1124,8 +1153,11 @@ def execute_approved_paper_proposal(
     import execution.alpaca_broker as broker
 
     validation = None
+    validation_outcome = None
     intent = None
     reference_price = None
+    attempt_started_at = now_utc.isoformat()
+    attempt_id = execution_attempt_id(proposal_id, attempt_started_at)
     try:
         validation_outcome = validate_proposal_for_execution(
             proposal_id,
@@ -1136,6 +1168,13 @@ def execute_approved_paper_proposal(
             kill_switch_active=kill_switch_active,
             earnings_days_away=earnings_days_away,
             proposal=proposal,
+        )
+        record_validation_outcome(
+            store,
+            attempt_id=attempt_id,
+            proposal_id=proposal_id,
+            attempted_at=datetime.now(timezone.utc).isoformat(),
+            outcome=validation_outcome,
         )
         if validation_outcome.error is not None:
             # Every check up through validate_trade_intent() lives in
@@ -1260,12 +1299,24 @@ def execute_approved_paper_proposal(
         # "validating" forever with no record of why. Distinct status
         # from "blocked" so this is visibly different from an ordinary
         # policy rejection in the History tab / store.
+        failure_error = str(exc)
+        if validation_outcome is None:
+            try:
+                record_validation_exception(
+                    store,
+                    attempt_id=attempt_id,
+                    proposal_id=proposal_id,
+                    event_at=datetime.now(timezone.utc).isoformat(),
+                    error=failure_error,
+                )
+            except Exception as telemetry_exc:
+                failure_error += f"; execution telemetry also failed: {telemetry_exc}"
         _transition_pre_broker_claim(
             store,
             proposal_id,
             expected_status=VALIDATING,
             new_status=VALIDATION_FAILED,
-            error=str(exc),
+            error=failure_error,
         )
         raise
 
@@ -1364,6 +1415,30 @@ def execute_approved_paper_proposal(
         )
         store.release_execution_reservation(proposal_id)
         raise ProposalExecutionError(message)
+    try:
+        record_submission_started(
+            store,
+            attempt_id=attempt_id,
+            proposal_id=proposal_id,
+            submitted_at=datetime.now(timezone.utc).isoformat(),
+            outcome=validation_outcome,
+        )
+    except Exception as exc:
+        # Telemetry is part of the execution evidence contract. If the local
+        # append fails, stop BEFORE contacting the broker and atomically
+        # release the reserved budget; an unobserved order attempt would be
+        # harder to recover than a refused one.
+        message = f"Execution telemetry failed before broker submission: {exc}"
+        failed = store.mark_submission_failed_and_release(
+            proposal_id,
+            expected_statuses=(SUBMITTING,),
+            error=message,
+        )
+        if failed is None:
+            raise _ProposalClaimLostError(
+                f"Proposal {proposal_id} changed state before telemetry failure could be recorded."
+            ) from exc
+        raise ProposalExecutionError(message) from exc
     try:
         order = submit(
             intent.ticker,

@@ -235,6 +235,21 @@ class AssistantStore:
                     FOREIGN KEY(proposal_id)
                         REFERENCES trade_proposals(proposal_id)
                 );
+                CREATE TABLE IF NOT EXISTS execution_telemetry_events (
+                    telemetry_event_id TEXT PRIMARY KEY,
+                    attempt_id TEXT NOT NULL,
+                    proposal_id TEXT NOT NULL,
+                    order_id TEXT,
+                    event_type TEXT NOT NULL,
+                    event_at TEXT NOT NULL,
+                    account_mode TEXT NOT NULL,
+                    broker_account_id TEXT,
+                    source TEXT NOT NULL,
+                    payload_json TEXT NOT NULL,
+                    payload_hash TEXT NOT NULL,
+                    FOREIGN KEY(proposal_id)
+                        REFERENCES trade_proposals(proposal_id)
+                );
                 CREATE TABLE IF NOT EXISTS execution_reservations (
                     proposal_id TEXT PRIMARY KEY,
                     trading_day TEXT NOT NULL,
@@ -458,6 +473,12 @@ class AssistantStore:
                     ON broker_order_events(order_id, event_at);
                 CREATE INDEX IF NOT EXISTS idx_broker_events_proposal_at
                     ON broker_order_events(proposal_id, event_at);
+                CREATE INDEX IF NOT EXISTS idx_execution_telemetry_attempt_at
+                    ON execution_telemetry_events(attempt_id, event_at);
+                CREATE INDEX IF NOT EXISTS idx_execution_telemetry_proposal_at
+                    ON execution_telemetry_events(proposal_id, event_at);
+                CREATE INDEX IF NOT EXISTS idx_execution_telemetry_order_at
+                    ON execution_telemetry_events(order_id, event_at);
                 CREATE INDEX IF NOT EXISTS idx_execution_reservations_day
                     ON execution_reservations(trading_day);
                 CREATE INDEX IF NOT EXISTS idx_ai_runs_function_called_at
@@ -2836,6 +2857,153 @@ class AssistantStore:
                 "fill_qty": row["fill_qty"],
                 "fill_price": row["fill_price"],
                 "payload": json.loads(row["payload_json"]),
+            }
+            for row in rows
+        ]
+
+    def append_execution_telemetry_event(
+        self,
+        *,
+        attempt_id: str,
+        proposal_id: str,
+        event_type: str,
+        event_at: str,
+        account_mode: str,
+        source: str,
+        payload: dict[str, Any],
+        broker_account_id: str | None = None,
+        order_id: str | None = None,
+    ) -> dict[str, Any]:
+        """Append one immutable, analysis-oriented execution event.
+
+        The broker event journal remains authoritative after submission. This
+        journal deliberately captures only evidence that otherwise disappears
+        before a broker order exists (validation/quote context and submission
+        start). Its content-derived key makes exact retries idempotent.
+        """
+        text_fields = {
+            "attempt_id": attempt_id,
+            "proposal_id": proposal_id,
+            "event_type": event_type,
+            "source": source,
+        }
+        normalized: dict[str, str] = {}
+        for name, value in text_fields.items():
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{name} must be a non-empty string")
+            normalized[name] = value.strip()
+        if account_mode not in {"paper", "live", "unavailable"}:
+            raise ValueError("account_mode must be paper, live, or unavailable")
+        if broker_account_id is not None:
+            if not isinstance(broker_account_id, str) or not broker_account_id.strip():
+                raise ValueError("broker_account_id must be null or a non-empty string")
+            broker_account_id = broker_account_id.strip()
+        if order_id is not None:
+            if not isinstance(order_id, str) or not order_id.strip():
+                raise ValueError("order_id must be null or a non-empty string")
+            order_id = order_id.strip()
+        timestamp = _parse_aware_timestamp(event_at, "event_at").isoformat()
+        payload_json = _canonical_ml_json(payload, "execution telemetry payload")
+        payload_hash = _hash_payload(payload_json)
+        event_material = _canonical_ml_json(
+            {
+                **normalized,
+                "event_at": timestamp,
+                "account_mode": account_mode,
+                "broker_account_id": broker_account_id,
+                "order_id": order_id,
+                "payload_hash": payload_hash,
+            },
+            "execution telemetry event",
+        )
+        telemetry_event_id = "exec-tel-" + _hash_payload(event_material)[:32]
+        values = (
+            telemetry_event_id,
+            normalized["attempt_id"],
+            normalized["proposal_id"],
+            order_id,
+            normalized["event_type"],
+            timestamp,
+            account_mode,
+            broker_account_id,
+            normalized["source"],
+            payload_json,
+            payload_hash,
+        )
+        with self._connect() as connection:
+            cursor = connection.execute(
+                """
+                INSERT INTO execution_telemetry_events(
+                    telemetry_event_id, attempt_id, proposal_id, order_id,
+                    event_type, event_at, account_mode, broker_account_id,
+                    source, payload_json, payload_hash
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(telemetry_event_id) DO NOTHING
+                """,
+                values,
+            )
+            row = connection.execute(
+                "SELECT * FROM execution_telemetry_events "
+                "WHERE telemetry_event_id = ?",
+                (telemetry_event_id,),
+            ).fetchone()
+        if row is None:  # pragma: no cover - defensive database invariant
+            raise RuntimeError("execution telemetry insert did not persist")
+        return {
+            "telemetry_event_id": row["telemetry_event_id"],
+            "attempt_id": row["attempt_id"],
+            "proposal_id": row["proposal_id"],
+            "order_id": row["order_id"],
+            "event_type": row["event_type"],
+            "event_at": row["event_at"],
+            "account_mode": row["account_mode"],
+            "broker_account_id": row["broker_account_id"],
+            "source": row["source"],
+            "payload": json.loads(row["payload_json"]),
+            "payload_hash": row["payload_hash"],
+            "inserted": cursor.rowcount == 1,
+        }
+
+    def list_execution_telemetry_events(
+        self,
+        *,
+        attempt_id: str | None = None,
+        proposal_id: str | None = None,
+        order_id: str | None = None,
+        limit: int = 500,
+    ) -> list[dict[str, Any]]:
+        if isinstance(limit, bool) or not isinstance(limit, int) or limit <= 0:
+            raise ValueError("limit must be a positive integer")
+        query = "SELECT * FROM execution_telemetry_events"
+        params: list[Any] = []
+        clauses: list[str] = []
+        for column, value in (
+            ("attempt_id", attempt_id),
+            ("proposal_id", proposal_id),
+            ("order_id", order_id),
+        ):
+            if value is not None:
+                clauses.append(f"{column} = ?")
+                params.append(value)
+        if clauses:
+            query += " WHERE " + " AND ".join(clauses)
+        query += " ORDER BY event_at ASC, rowid ASC LIMIT ?"
+        params.append(limit)
+        with self._connect() as connection:
+            rows = connection.execute(query, params).fetchall()
+        return [
+            {
+                "telemetry_event_id": row["telemetry_event_id"],
+                "attempt_id": row["attempt_id"],
+                "proposal_id": row["proposal_id"],
+                "order_id": row["order_id"],
+                "event_type": row["event_type"],
+                "event_at": row["event_at"],
+                "account_mode": row["account_mode"],
+                "broker_account_id": row["broker_account_id"],
+                "source": row["source"],
+                "payload": json.loads(row["payload_json"]),
+                "payload_hash": row["payload_hash"],
             }
             for row in rows
         ]

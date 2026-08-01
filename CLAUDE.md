@@ -50,14 +50,18 @@ inspect:
 
 Use this priority order when instructions differ:
 
-1. the user's current explicit request;
-2. safety and authorization boundaries;
+1. safety and authorization boundaries;
+2. the user's current explicit request, within its clearly defined scope;
 3. the current milestone's implementation plan;
 4. this file;
 5. older status notes or examples.
 
 If two higher-priority requirements genuinely conflict, stop and explain the
 conflict rather than silently choosing the more convenient interpretation.
+An explicit user authorization may lift one named boundary only for the exact
+action, account mode, capital scope, and duration stated. It does not implicitly
+lift adjacent safety boundaries or turn a broad feature request into funded
+account authority.
 
 An implementation plan is a contract, not proof that every proposed detail is
 correct. Point out internal contradictions, unsafe implications, or facts made
@@ -100,6 +104,13 @@ Keep `tests/test_ml_import_boundary.py` passing. In particular:
 - do not add an `ml` import under `assistant/` unless a separately approved,
   exact-file read-only adapter milestone requires it; and
 - do not change `DecisionPacket` casually. Treat it as a versioned interface.
+
+That test currently detects direct imports only. Green direct-import tests are
+not proof that the boundary holds transitively. Whenever package dependencies
+change, inspect the reachable internal import graph from execution-capable
+assistant, proposal, risk-gate, broker, and execution roots, and add or maintain
+a transitive-closure test so an indirect
+`assistant -> another package -> ml` path fails.
 
 Prefer script-level composition of serialized, hash-verified, frozen records
 over making core packages import one another.
@@ -322,6 +333,12 @@ For planned feature work:
 
 If dependent work exists on another branch, branch from its exact reviewed
 commit rather than copying changes or assuming it has been merged.
+
+Match command syntax to the shell actually executing it. PowerShell here-strings
+such as `@' ... '@` are not valid POSIX shell input; Bash/POSIX heredocs are not
+PowerShell. Do not pass syntax from one shell through the other. Prefer
+`apply_patch` for file changes and explicit argument arrays or properly quoted
+commands for git metadata.
 
 Do not commit generated caches, local databases, credentials, temporary test
 dependencies, `.pytest_cache`, or machine-specific configuration.

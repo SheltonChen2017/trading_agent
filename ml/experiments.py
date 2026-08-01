@@ -62,6 +62,12 @@ from ml.evaluation import (
     mean_absolute_error,
     qlike_loss,
 )
+from ml.earnings_experiments import (
+    TASK as EARNINGS_TASK,
+    EarningsExperimentError,
+    run_earnings_task,
+    validate_earnings_spec,
+)
 from ml.experiment_contracts import (
     ExperimentRunRecord,
     ExperimentSpec,
@@ -84,7 +90,11 @@ from ml.volatility import (
     predict_volatility,
 )
 
-SUPPORTED_TASKS = ("volatility_forecast", "cross_sectional_excess_return_ranking")
+SUPPORTED_TASKS = (
+    "volatility_forecast",
+    "cross_sectional_excess_return_ranking",
+    EARNINGS_TASK,
+)
 _VOLATILITY_CANDIDATES = frozenset({"ridge_log_vol", "hist_gradient_boosting"})
 _VOLATILITY_BASELINES = frozenset({"trailing_realized", "ewma"})
 _RANKER_CANDIDATES = frozenset({"elastic_net", "hist_gradient_boosting"})
@@ -251,7 +261,7 @@ def _validate_task_configuration(
                 "runner baseline columns do not match spec.baseline_columns: "
                 f"runner={expected!r} spec={dict(spec.baseline_columns)!r}"
             )
-    else:
+    elif spec.task == "cross_sectional_excess_return_ranking":
         unsupported = candidates - _RANKER_CANDIDATES
         if unsupported:
             raise ExperimentError(f"unsupported ranker candidates: {sorted(unsupported)}")
@@ -261,6 +271,13 @@ def _validate_task_configuration(
             raise ExperimentError("ranker baseline_columns must be empty for no_skill")
         if trailing_baseline_column is not None or ewma_baseline_column is not None:
             raise ExperimentError("ranker runs do not accept volatility baseline columns")
+    else:
+        try:
+            validate_earnings_spec(spec)
+        except EarningsExperimentError as exc:
+            raise ExperimentError(str(exc)) from exc
+        if trailing_baseline_column is not None or ewma_baseline_column is not None:
+            raise ExperimentError("earnings runs do not accept volatility baseline columns")
     return features
 
 
@@ -1016,8 +1033,10 @@ def run_experiment(
 
     # 3. purged grouped walk-forward folds
     n_splits, embargo = _fold_configuration(spec)
+    grouping_column = "event_date" if spec.task == EARNINGS_TASK else "as_of_session"
+    _require_columns(joined, [grouping_column], "joined dataset")
     folds = purged_grouped_walk_forward_splits(
-        list(joined["as_of_session"]),
+        list(joined[grouping_column]),
         list(joined["label_exit_session"]),
         n_splits=n_splits,
         embargo_sessions=embargo,
@@ -1037,11 +1056,22 @@ def run_experiment(
             feature_columns=feature_columns, target_column=target_column,
             trailing_column=trailing_baseline_column, ewma_column=ewma_baseline_column,
         )
-    else:
+    elif spec.task == "cross_sectional_excess_return_ranking":
         fold_metrics, fitted_models, aggregate = _run_ranker_task(
             spec, joined, folds,
             feature_columns=feature_columns, target_column=target_column,
         )
+    else:
+        try:
+            fold_metrics, fitted_models, aggregate = run_earnings_task(
+                spec,
+                joined,
+                folds,
+                feature_columns=feature_columns,
+                target_column=target_column,
+            )
+        except EarningsExperimentError as exc:
+            raise ExperimentError(str(exc)) from exc
 
     # 8. multiplicity-adjusted uncertainty
     total_looks = spec.total_research_looks()
@@ -1067,6 +1097,28 @@ def run_experiment(
 
     verdict = _derive_verdict(spec, aggregate, coverage_warnings, manifest)
 
+    calibration = ()
+    failure_analysis: Mapping[str, Any] = {
+        "failure_slices": list(spec.research_gate.failure_slices)
+    }
+    if spec.task == EARNINGS_TASK:
+        calibration = tuple(
+            {
+                "candidate": candidate,
+                **dict(result["calibration"]),
+            }
+            for candidate, result in aggregate.items()
+            if isinstance(result, Mapping) and isinstance(result.get("calibration"), Mapping)
+        )
+        failure_analysis = {
+            "required_slices": list(spec.research_gate.failure_slices),
+            "candidate_slices": {
+                candidate: result.get("failure_slices", {})
+                for candidate, result in aggregate.items()
+                if isinstance(result, Mapping)
+            },
+        }
+
     report = EvaluationReport(
         research_question=spec.primary_outcome,
         preregistered_primary_outcome=spec.primary_outcome,
@@ -1086,8 +1138,8 @@ def run_experiment(
         fold_metrics=tuple(fold_metrics),
         aggregate_metrics=aggregate,
         dependence_aware_uncertainty=uncertainty,
-        failure_analysis={"failure_slices": list(spec.research_gate.failure_slices)},
-        calibration=(),
+        failure_analysis=failure_analysis,
+        calibration=calibration,
         coverage_warnings=tuple(coverage_warnings),
         limitations=_limitations(spec, manifest),
         verdict=verdict,

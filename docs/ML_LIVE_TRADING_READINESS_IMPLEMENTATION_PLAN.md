@@ -133,7 +133,7 @@ does not need them.
 | ML-LR-1 | Point-in-time lineage and historical universe contracts | Code: yes; authoritative data: external | None |
 | ML-LR-2 | Durable experiment specifications and runners | Yes | None |
 | ML-LR-3 | Complete volatility and portfolio-risk research | Partly; history must accumulate | None |
-| ML-LR-4 | Complete earnings-gap research and filing context | Partly; reliable event data required | None |
+| ML-LR-4 | Complete earnings-gap research and filing context | Software complete; real confirmation needs authoritative event data | None |
 | ML-LR-5 | Complete ranker economic evaluation | Code: yes; credible confirmation data: external | None |
 | ML-LR-6 | Automated shadow runtime and ML evidence epochs | Yes | Observation writes only |
 | ML-LR-7 | Monitoring and promotion dossier | Yes after LR-6 | Read-only reports |

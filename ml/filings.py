@@ -23,7 +23,7 @@ import dataclasses
 import re
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
-from typing import Any, Mapping, Sequence
+from typing import Any, Sequence
 
 from ml.hashing import hash_payload
 
@@ -49,6 +49,19 @@ _NUMBER_PATTERN = re.compile(
     re.IGNORECASE,
 )
 _DATE_PATTERN = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+_MONTH_NAME = (
+    r"Jan(?:uary)?|Feb(?:ruary)?|Mar(?:ch)?|Apr(?:il)?|May|Jun(?:e)?|"
+    r"Jul(?:y)?|Aug(?:ust)?|Sep(?:tember)?|Oct(?:ober)?|Nov(?:ember)?|"
+    r"Dec(?:ember)?"
+)
+_MONTH_FIRST_DATE_PATTERN = re.compile(
+    rf"\b(?:{_MONTH_NAME})\.?\s+\d{{1,2}}(?:st|nd|rd|th)?(?:,\s*|\s+)\d{{4}}\b",
+    re.IGNORECASE,
+)
+_DAY_FIRST_DATE_PATTERN = re.compile(
+    rf"\b\d{{1,2}}(?:st|nd|rd|th)?\s+(?:{_MONTH_NAME})\.?\s+\d{{4}}\b",
+    re.IGNORECASE,
+)
 
 
 class FilingExtractionError(ValueError):
@@ -240,6 +253,25 @@ def _numbers_in(text: str) -> set[str]:
     return {_normalize_number(m.group()) for m in _NUMBER_PATTERN.finditer(text)}
 
 
+def _normalize_date_token(token: str) -> str:
+    normalized = token.lower().replace(",", " ").replace(".", " ")
+    normalized = re.sub(r"(?<=\d)(?:st|nd|rd|th)\b", "", normalized)
+    return re.sub(r"\s+", " ", normalized).strip()
+
+
+def _dates_in(text: str) -> set[str]:
+    """Find ISO and common written dates without losing the month name.
+
+    Comparing only the numbers in a date lets ``July 31, 2026`` support a
+    fabricated ``August 31, 2026`` claim.  The month therefore remains part
+    of the normalized token.
+    """
+    matches = list(_DATE_PATTERN.finditer(text))
+    matches.extend(_MONTH_FIRST_DATE_PATTERN.finditer(text))
+    matches.extend(_DAY_FIRST_DATE_PATTERN.finditer(text))
+    return {_normalize_date_token(match.group()) for match in matches}
+
+
 def validate_extraction(
     extraction: FilingExtraction, *, allowed_tickers: Sequence[str] = ()
 ) -> tuple[ValidationIssue, ...]:
@@ -337,8 +369,8 @@ def validate_extraction(
                         "are not present in its cited excerpt",
                     )
                 )
-        claimed_dates = set(_DATE_PATTERN.findall(claim.value))
-        source_dates = set(_DATE_PATTERN.findall(document.text))
+        claimed_dates = _dates_in(claim.value)
+        source_dates = _dates_in(document.text)
         unsupported_dates = sorted(claimed_dates - source_dates)
         if unsupported_dates:
             issues.append(
@@ -348,7 +380,7 @@ def validate_extraction(
                 )
             )
         if claim.claim_kind == "direct_extraction":
-            excerpt_dates = set(_DATE_PATTERN.findall(claim.supporting_excerpt))
+            excerpt_dates = _dates_in(claim.supporting_excerpt)
             dates_missing_from_excerpt = sorted(claimed_dates - excerpt_dates)
             if dates_missing_from_excerpt:
                 issues.append(

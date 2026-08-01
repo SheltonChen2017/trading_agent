@@ -351,6 +351,7 @@ class ExperimentSpec:
     baseline_columns: Mapping[str, str] = dataclasses.field(default_factory=dict)
     confirmation: ConfirmationSpec | None = None
     schema_version: str = SCHEMA_VERSION
+    task_parameters: Mapping[str, Any] = dataclasses.field(default_factory=dict)
 
     def __post_init__(self) -> None:
         with _as_experiment_error():
@@ -453,6 +454,9 @@ class ExperimentSpec:
         baseline_columns = _freeze_json(
             self.baseline_columns, path="baseline_columns"
         )
+        task_parameters = _freeze_json(
+            self.task_parameters, path="task_parameters"
+        )
         if not isinstance(split_configuration, Mapping):
             raise ExperimentContractError("split_configuration must be a JSON object")
         if not isinstance(assumptions, Mapping):
@@ -461,6 +465,8 @@ class ExperimentSpec:
             )
         if not isinstance(baseline_columns, Mapping):
             raise ExperimentContractError("baseline_columns must be a JSON object")
+        if not isinstance(task_parameters, Mapping):
+            raise ExperimentContractError("task_parameters must be a JSON object")
         for name, column in baseline_columns.items():
             _check_required_str(name, "baseline_columns key")
             _check_required_str(column, f"baseline_columns[{name}]")
@@ -479,6 +485,7 @@ class ExperimentSpec:
         object.__setattr__(self, "split_configuration", split_configuration)
         object.__setattr__(self, "cost_tax_liquidity_assumptions", assumptions)
         object.__setattr__(self, "baseline_columns", baseline_columns)
+        object.__setattr__(self, "task_parameters", task_parameters)
 
         _reject_forbidden_keys(self.to_dict())
 
@@ -511,6 +518,11 @@ class ExperimentSpec:
                 self.confirmation.to_dict() if self.confirmation is not None else None
             ),
         }
+        # Preserve the byte identity of pre-ML-LR-4 specs. Task parameters
+        # were added later and an empty optional object must not invalidate
+        # already-persisted discovery/confirmation parent hashes.
+        if self.task_parameters:
+            payload["task_parameters"] = _plain(self.task_parameters)
         return payload
 
     @property

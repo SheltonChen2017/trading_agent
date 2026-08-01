@@ -21,6 +21,8 @@ The next implementation sequence is defined in
 | ML-LR-0 | Shared experiment identity, preregistered research gates, run records | `ml/experiment_contracts.py` | None |
 | ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
 | ML-LR-2 | Durable discovery/confirmation runner and CLI | `ml/experiments.py`, `scripts/run_ml_experiment.py` | None |
+| ML-LR-3 | Portfolio-volatility targets, evaluation completion, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py` | None |
+| ML-LR-4 | Earnings event identity, pre-event features, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `scripts/run_filing_extraction.py` | None (context only) |
 
 ML-LR-2 gives both supported tasks a reproducible runner. Verified against
 the milestone's own definition of done by invoking the real CLI twice: the
@@ -281,3 +283,40 @@ real data also stays underfilled until enough daily position/equity snapshots
 accumulate; per plan 9.7 that is reported as unavailable rather than
 backfilled. ML-LR-3 therefore remains **in progress** rather than being marked
 complete based on target preparation alone.
+
+
+## ML-LR-4 notes
+
+`ml/earnings_features.py` makes the EVENT, not the row, the unit of evidence.
+`EventIdentity` normalizes every announcement instant to UTC before hashing,
+so the same release filed as `21:30+00:00` and `16:30-05:00` collapses to one
+event — counting it twice would inflate the sample the whole experiment's
+power rests on.
+
+Pre-event features reject post-release information **by name**:
+post-release price (which restates the gap), transcript text (published
+after the release it describes), revised consensus (today's estimate, not the
+one that stood before the print), and later filings. Prior-gap features are
+allowed through an explicit allowlist rather than accidentally, because they
+describe *earlier* events. Naive, unknown, or intraday timing produces an
+unavailable event rather than a guess, matching `ml/earnings_gap.py`'s
+existing refusal so the two layers agree.
+
+`EarningsGapForecast` carries no trade field and states in its own payload
+that it never overrides the deterministic earnings blackout and never delays
+a risk-reducing sale.
+
+`scripts/run_filing_extraction.py` declares **no tools at all**, which is the
+strongest available form of plan 10.5's "no tool calls initiated by retrieved
+text" — filing text is transported as an inert JSON payload and has nothing
+to invoke. Deterministic validation is rerun when the audit record is built,
+so a record cannot assert an acceptance the validator never granted, and a
+rejected extraction is persisted rather than discarded (exit code 2: the run
+succeeded, the output was unusable).
+
+**Still outstanding for ML-LR-4:** the event-model runner itself (plan 10.2's
+frozen model order and 10.3's fold-level evaluation grouped by distinct event
+date). `ml/earnings_gap.py` already provides the fit primitives and support
+checks; nothing yet drives them through `run_experiment()`. Real confirmation
+also remains blocked while historical surprise and revision timestamps are
+not authoritative — the same external-vendor dependency that blocks ML-LR-1.

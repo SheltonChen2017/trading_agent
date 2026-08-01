@@ -428,14 +428,16 @@ def test_dbn_conversion_failure_retains_paid_bytes_before_parsing(tmp_path):
 def test_manifest_write_failure_never_deletes_paid_raw_snapshot(
     tmp_path, monkeypatch
 ):
-    real_atomic_write = databento_source_module._atomic_write
+    real_atomic_write = databento_source_module.write_immutable_bytes
 
     def fail_manifest(path, data):
         if path.name.endswith(".manifest.json"):
             raise OSError("simulated manifest storage failure")
         return real_atomic_write(path, data)
 
-    monkeypatch.setattr(databento_source_module, "_atomic_write", fail_manifest)
+    monkeypatch.setattr(
+        databento_source_module, "write_immutable_bytes", fail_manifest
+    )
     client = _FakeClient(_raw_frame(), cost=0.01)
     with pytest.raises(DatabentoSnapshotRetainedError) as caught:
         fetch_daily_bars_snapshot(
@@ -456,7 +458,9 @@ def test_raw_persistence_failure_retains_download_temporary_file(
     def fail_raw_write(_path, _data):
         raise OSError("simulated snapshot storage failure")
 
-    monkeypatch.setattr(databento_source_module, "_atomic_write", fail_raw_write)
+    monkeypatch.setattr(
+        databento_source_module, "write_immutable_bytes", fail_raw_write
+    )
     client = _FakeClient(_raw_frame(), cost=0.01)
     with pytest.raises(DatabentoSnapshotRetainedError) as caught:
         fetch_daily_bars_snapshot(

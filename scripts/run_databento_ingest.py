@@ -1,8 +1,10 @@
-"""Cost-capped Databento ingestion CLI.
+"""Fail-closed Databento evidence-capture CLI.
 
 Metadata and cost-estimate calls are not billable.  ``download`` always
 obtains an estimate first and refuses to request data above the operator's
-explicit per-request cap.
+explicit per-request cap. Statistics use the same cap. Reference requests
+instead require an explicit licensed-subscription acknowledgement because
+that service uses account allocations rather than the historical cost API.
 """
 from __future__ import annotations
 
@@ -24,6 +26,13 @@ from ml.databento_source import (
     databento_is_configured,
     estimate_daily_bars_cost,
     fetch_daily_bars_snapshot,
+)
+from ml.databento_pit import (
+    ReferenceRequest,
+    StatisticsRequest,
+    estimate_statistics_cost,
+    fetch_reference_snapshot,
+    fetch_statistics_snapshot,
 )
 
 
@@ -82,10 +91,39 @@ def _request(args: argparse.Namespace) -> DailyBarsRequest:
     )
 
 
+def _statistics_request(args: argparse.Namespace) -> StatisticsRequest:
+    return StatisticsRequest(
+        tickers=tuple(args.symbols),
+        start=args.start,
+        end=args.end,
+        summary_flag=args.summary_flag,
+    )
+
+
+def _reference_request(args: argparse.Namespace) -> ReferenceRequest:
+    return ReferenceRequest(
+        kind=args.kind,
+        tickers=tuple(args.symbols),
+        start=args.start,
+        end=args.end,
+    )
+
+
 def _add_request_arguments(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--symbols", nargs="+", required=True)
     parser.add_argument("--start", required=True, help="inclusive YYYY-MM-DD")
     parser.add_argument("--end", required=True, help="exclusive YYYY-MM-DD")
+
+
+def _add_statistics_arguments(parser: argparse.ArgumentParser) -> None:
+    _add_request_arguments(parser)
+    parser.add_argument(
+        "--summary-flag",
+        type=int,
+        choices=(1, 2),
+        required=True,
+        help="preliminary EOD summary vintage (1 near 16:15 ET; 2 near 17:00 ET)",
+    )
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -120,6 +158,59 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     download.add_argument("--max-cost-usd", type=float, required=True)
+
+    estimate_statistics = subparsers.add_parser(
+        "estimate-statistics",
+        help="obtain a free cost estimate for receipt-timestamped statistics",
+    )
+    _add_statistics_arguments(estimate_statistics)
+
+    download_statistics = subparsers.add_parser(
+        "download-statistics",
+        help="cost-cap and save receipt-timestamped preliminary EOD statistics",
+    )
+    _add_statistics_arguments(download_statistics)
+    download_statistics.add_argument(
+        "--output-dir",
+        type=Path,
+        default=_DEFAULT_OUTPUT_DIR,
+        help=(
+            "Destination for the licensed snapshot. Must be a git-ignored path; "
+            f"defaults to {_DEFAULT_OUTPUT_DIR}."
+        ),
+    )
+    download_statistics.add_argument("--max-cost-usd", type=float, required=True)
+
+    download_reference = subparsers.add_parser(
+        "download-reference",
+        help=(
+            "save a licensed point-in-time reference response; this uses the "
+            "account's reference subscription allocation"
+        ),
+    )
+    _add_request_arguments(download_reference)
+    download_reference.add_argument(
+        "--kind",
+        choices=("security_master", "adjustment_factors"),
+        required=True,
+    )
+    download_reference.add_argument(
+        "--output-dir",
+        type=Path,
+        default=_DEFAULT_OUTPUT_DIR,
+        help=(
+            "Destination for the licensed snapshot. Must be a git-ignored path; "
+            f"defaults to {_DEFAULT_OUTPUT_DIR}."
+        ),
+    )
+    download_reference.add_argument(
+        "--acknowledge-reference-subscription",
+        action="store_true",
+        help=(
+            "confirm that the operator understands this call requires licensed "
+            "reference access and may consume the account's symbol allocation"
+        ),
+    )
     return parser
 
 
@@ -186,6 +277,67 @@ def command_download(
     }
 
 
+def command_estimate_statistics(request: StatisticsRequest) -> dict[str, object]:
+    estimate = estimate_statistics_cost(request)
+    return {
+        "ok": True,
+        "request": request.to_dict(),
+        "request_hash": request.request_hash,
+        "estimated_cost_usd": estimate,
+        "data_downloaded": False,
+        "point_in_time_data": False,
+    }
+
+
+def command_download_statistics(
+    request: StatisticsRequest, *, output_dir: Path, max_cost_usd: float
+) -> dict[str, object]:
+    assert_output_dir_is_git_ignored(output_dir)
+    snapshot = fetch_statistics_snapshot(
+        request,
+        directory=output_dir,
+        max_cost_usd=max_cost_usd,
+    )
+    return {
+        "ok": True,
+        "estimated_cost_usd": snapshot.manifest["estimated_cost_usd"],
+        "max_cost_usd": max_cost_usd,
+        "validation_status": snapshot.manifest["validation_status"],
+        "record_count": snapshot.manifest["record_count"],
+        "refusal_count": snapshot.manifest["refusal_count"],
+        "invalid_cohort_count": snapshot.manifest["invalid_cohort_count"],
+        "point_in_time_data": snapshot.manifest["point_in_time_data"],
+        "blockers": snapshot.manifest["blockers"],
+        "raw_path": str(snapshot.raw_path),
+        "manifest_path": str(snapshot.manifest_path),
+    }
+
+
+def command_download_reference(
+    request: ReferenceRequest,
+    *,
+    output_dir: Path,
+    acknowledge_reference_subscription: bool,
+) -> dict[str, object]:
+    assert_output_dir_is_git_ignored(output_dir)
+    snapshot = fetch_reference_snapshot(
+        request,
+        directory=output_dir,
+        acknowledge_reference_subscription=acknowledge_reference_subscription,
+    )
+    return {
+        "ok": True,
+        "kind": snapshot.manifest["kind"],
+        "row_count": snapshot.manifest["row_count"],
+        "validation_status": snapshot.manifest["validation_status"],
+        "point_in_time_reference": snapshot.manifest["point_in_time_reference"],
+        "point_in_time_data": snapshot.manifest["point_in_time_data"],
+        "limitation": snapshot.manifest["limitation"],
+        "data_path": str(snapshot.data_path),
+        "manifest_path": str(snapshot.manifest_path),
+    }
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
@@ -195,11 +347,27 @@ def main(argv: Sequence[str] | None = None) -> int:
             result = command_check_access(args.dataset)
         elif args.command == "estimate":
             result = command_estimate(_request(args))
-        else:
+        elif args.command == "download":
             result = command_download(
                 _request(args),
                 output_dir=args.output_dir,
                 max_cost_usd=args.max_cost_usd,
+            )
+        elif args.command == "estimate-statistics":
+            result = command_estimate_statistics(_statistics_request(args))
+        elif args.command == "download-statistics":
+            result = command_download_statistics(
+                _statistics_request(args),
+                output_dir=args.output_dir,
+                max_cost_usd=args.max_cost_usd,
+            )
+        else:
+            result = command_download_reference(
+                _reference_request(args),
+                output_dir=args.output_dir,
+                acknowledge_reference_subscription=(
+                    args.acknowledge_reference_subscription
+                ),
             )
     except DatabentoSnapshotRetainedError as exc:
         # Surfaced distinctly so the operator knows a retry costs nothing.

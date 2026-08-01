@@ -20,7 +20,7 @@ The next implementation sequence is defined in
 | ML-8 | Filing/transcript extraction contract + deterministic validator | `ml/filings.py` | None (context only) |
 | ML-LR-0 | Shared experiment identity, preregistered research gates, run records | `ml/experiment_contracts.py` | None |
 | ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
-| ML data-source prerequisite | Cost-capped Databento `EQUS.SUMMARY` ingestion, immutable DBN snapshots, fail-closed lineage status | `ml/databento_source.py`, `scripts/run_databento_ingest.py` | None (research data only) |
+| ML data-source prerequisite | Cost-capped Databento bars/statistics, immutable DBN and PIT reference snapshots, fail-closed prerequisite report | `ml/databento_source.py`, `ml/databento_pit.py`, `scripts/run_databento_ingest.py` | None (research data only) |
 | ML-LR-2 | Durable discovery/confirmation runner and CLI | `ml/experiments.py`, `scripts/run_ml_experiment.py` | None |
 | ML-LR-3 | Portfolio-volatility targets, evaluation completion, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py` | None |
 | ML-LR-4 | Earnings event identity, pre-event features, event-date experiment runner, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `ml/earnings_experiments.py`, `ml/experiments.py`, `scripts/run_filing_extraction.py` | None (research/context only) |
@@ -68,16 +68,19 @@ participate in `dataset_hash`; their row counts are recorded, and the claim is
 replayed during build, save, and load. Swapping lineage, decision cutoffs, or
 feature-value bindings therefore changes identity or is refused.
 
-Databento is now the selected external vendor, and the first adapter can
-cost-estimate, validate, hash-bind, and immutably preserve unadjusted
-`EQUS.SUMMARY` daily bars. That removes credential and raw-ingestion
-plumbing as unknowns, but does **not** make real-data `point_in_time_data`
-reachable: the OHLCV-1d record identifies its aggregation interval, not the
-exact receipt/publication time required by the availability contract, and
-the values still need point-in-time split/dividend and security-master
-evidence. The adapter therefore returns no fabricated lineage and explicitly
-records `point_in_time_data=false`. Receipt-timestamped `statistics` records,
-licensed reference data, and historical membership remain the blocker.
+Databento is now the selected external vendor. The adapters can cost-estimate,
+validate, hash-bind, and immutably preserve unadjusted `EQUS.SUMMARY` daily
+bars and receipt-timestamped preliminary `statistics` DBN. A separate,
+explicitly acknowledged Reference path preserves PIT security-master and
+adjustment-factor responses with their availability and identity fields. This
+removes credential, raw-ingestion, exact-receipt capture, and reference-client
+plumbing as software unknowns, but does **not** make real-data
+`point_in_time_data` reachable. Statistics cohorts remain unadjusted and are
+deliberately not emitted as `FeatureAvailabilityRecord`s. Reference capture
+does not reconstruct the factor vintage at each decision, resolve the correct
+listing/option/rescission, or supply historical strategy/index constituents.
+The prerequisite report therefore remains hardcoded `False`; only the normal
+coverage gate may derive authority after those missing pieces are supplied.
 
 ML-LR-0 supplied the shared contracts now consumed by ML-LR-2. `ExperimentSpec`
 fully describes the synthetic volatility and ranker experiments, and the
@@ -138,9 +141,10 @@ acceptance criterion in sections 7-12 is complete. In particular:
    prove fixture data from persisted per-feature lineage, value hashes,
    decision cutoffs, and historical membership. The configured yfinance
    source supplies none of that authoritative history, so real results remain
-   exploratory and promotion-blocked. The Databento OHLCV adapter preserves
-   real raw snapshots but correctly stays `False` until receipt-timestamped
-   statistics and licensed point-in-time reference sidecars are bound.
+   exploratory and promotion-blocked. Databento bars, receipt-timestamped
+   statistics, and licensed point-in-time reference sidecars can now be
+   captured, but correctly stay `False` until a vintage-correct adjustment
+   builder binds them and authoritative historical membership is supplied.
 
 2. **Real historical universe data is unavailable.** The typed membership
    contract and cutoff-aware validation now reject fixed current-membership

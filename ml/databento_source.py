@@ -447,7 +447,7 @@ def _normalize_daily_frame(
     return NormalizedBars(frames=frames, refusals=tuple(refusals))
 
 
-def _materialize_frame(store_or_frame: Any) -> pd.DataFrame:
+def materialize_dbn_frame(store_or_frame: Any) -> pd.DataFrame:
     """Read the response into pandas.
 
     Separate from validation because a file-backed ``DBNStore`` holds its
@@ -472,7 +472,7 @@ def normalize_daily_bars(
     store_or_frame: Any, request: DailyBarsRequest
 ) -> NormalizedBars:
     """Normalize an official ``DBNStore`` (or a test DataFrame) into frames."""
-    return _normalize_daily_frame(_materialize_frame(store_or_frame), request)
+    return _normalize_daily_frame(materialize_dbn_frame(store_or_frame), request)
 
 
 def _normalized_material(frames: Mapping[str, pd.DataFrame]) -> list[dict[str, Any]]:
@@ -505,7 +505,7 @@ def _gap_session_count(frames: Mapping[str, pd.DataFrame]) -> int:
     return int(sum(int(frame["close"].isna().sum()) for frame in frames.values()))
 
 
-def _atomic_write(path: Path, data: bytes) -> None:
+def write_immutable_bytes(path: Path, data: bytes) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     if path.exists():
         raise DatabentoSourceError(f"refusing to overwrite immutable snapshot {path}")
@@ -528,7 +528,7 @@ def _atomic_write(path: Path, data: bytes) -> None:
         raise
 
 
-def _close_dbn_store(store: Any) -> None:
+def close_dbn_store(store: Any) -> None:
     """Release a file-backed DBNStore before moving its source on Windows.
 
     Databento 0.81.0 exposes the underlying reader but does not give DBNStore
@@ -544,6 +544,93 @@ def _close_dbn_store(store: Any) -> None:
     close = getattr(reader, "close", None)
     if callable(close):
         close()
+
+
+@dataclasses.dataclass(frozen=True)
+class PreservedDbnDownload:
+    """Paid DBN bytes preserved before their decoded frame is trusted."""
+
+    raw_bytes: bytes
+    raw_path: Path
+    frame: pd.DataFrame | None
+    materialization_error: DatabentoSourceError | None
+
+
+def download_and_preserve_dbn(
+    *,
+    api_kwargs: Mapping[str, Any],
+    directory: Path,
+    stem: str,
+    raw_path: Path,
+    manifest_path: Path,
+    client: HistoricalClient,
+) -> PreservedDbnDownload:
+    """Download once and retain exact billable bytes before DBN conversion.
+
+    The helper is schema-neutral so every Databento historical adapter shares
+    the same paid-data retention and Windows handle-lifecycle behavior.
+    Validation remains the caller's responsibility.
+    """
+    directory = Path(directory)
+    if raw_path.exists() or manifest_path.exists():
+        raise DatabentoSourceError("refusing to overwrite an immutable snapshot")
+    directory.mkdir(parents=True, exist_ok=True)
+    file_descriptor, temporary_name = tempfile.mkstemp(
+        dir=directory, prefix=f".{stem}.", suffix=".dbn.tmp"
+    )
+    os.close(file_descriptor)
+    temporary_raw = Path(temporary_name)
+    # The Databento client requires a non-existent destination path.
+    temporary_raw.unlink()
+    store = None
+    downloaded_artifact_exists = False
+    raw_preserved = False
+    raw_frame: pd.DataFrame | None = None
+    materialization_error: DatabentoSourceError | None = None
+    raw_bytes = b""
+    try:
+        try:
+            store = client.timeseries.get_range(**dict(api_kwargs), path=temporary_raw)
+        except Exception as exc:
+            downloaded_artifact_exists = (
+                temporary_raw.is_file() and temporary_raw.stat().st_size > 0
+            )
+            raise DatabentoSourceError(
+                f"Databento download failed: {type(exc).__name__}: {exc}"
+            ) from exc
+        downloaded_artifact_exists = temporary_raw.is_file()
+        if not temporary_raw.is_file() or temporary_raw.stat().st_size <= 0:
+            raise DatabentoSourceError("Databento did not write a non-empty DBN snapshot")
+        raw_bytes = temporary_raw.read_bytes()
+        if raw_path.exists() or manifest_path.exists():
+            raise DatabentoSourceError("refusing to overwrite an immutable snapshot")
+        write_immutable_bytes(raw_path, raw_bytes)
+        raw_preserved = True
+        try:
+            raw_frame = materialize_dbn_frame(store)
+        except DatabentoSourceError as exc:
+            materialization_error = exc
+    except Exception as exc:
+        if downloaded_artifact_exists and not raw_preserved and temporary_raw.exists():
+            raise DatabentoSnapshotRetainedError(
+                f"{exc} — downloaded bytes could not be copied to the permanent "
+                f"snapshot path, so they were retained at {temporary_raw}",
+                raw_path=temporary_raw,
+                manifest_path=manifest_path,
+            ) from exc
+        raise
+    finally:
+        try:
+            close_dbn_store(store)
+        finally:
+            if not downloaded_artifact_exists or raw_preserved:
+                temporary_raw.unlink(missing_ok=True)
+    return PreservedDbnDownload(
+        raw_bytes=raw_bytes,
+        raw_path=raw_path,
+        frame=raw_frame,
+        materialization_error=materialization_error,
+    )
 
 
 def fetch_daily_bars_snapshot(
@@ -578,69 +665,17 @@ def fetch_daily_bars_snapshot(
     directory = Path(directory)
     raw_path = directory / f"{stem}.dbn"
     manifest_path = directory / f"{stem}.manifest.json"
-    if raw_path.exists() or manifest_path.exists():
-        raise DatabentoSourceError("refusing to overwrite an immutable snapshot")
-    directory.mkdir(parents=True, exist_ok=True)
-
-    file_descriptor, temporary_name = tempfile.mkstemp(
-        dir=directory, prefix=f".{stem}.", suffix=".dbn.tmp"
+    download = download_and_preserve_dbn(
+        api_kwargs=request.api_kwargs(),
+        directory=directory,
+        stem=stem,
+        raw_path=raw_path,
+        manifest_path=manifest_path,
+        client=active_client,
     )
-    os.close(file_descriptor)
-    temporary_raw = Path(temporary_name)
-    # The Databento client requires a non-existent destination path.
-    temporary_raw.unlink()
-    store = None
-    downloaded_artifact_exists = False
-    raw_preserved = False
-    raw_frame: pd.DataFrame | None = None
-    materialization_error: DatabentoSourceError | None = None
-    try:
-        try:
-            store = active_client.timeseries.get_range(
-                **request.api_kwargs(), path=temporary_raw
-            )
-        except Exception as exc:
-            downloaded_artifact_exists = (
-                temporary_raw.is_file() and temporary_raw.stat().st_size > 0
-            )
-            raise DatabentoSourceError(
-                f"Databento download failed: {type(exc).__name__}: {exc}"
-            ) from exc
-        downloaded_artifact_exists = temporary_raw.is_file()
-        if not temporary_raw.is_file() or temporary_raw.stat().st_size <= 0:
-            raise DatabentoSourceError("Databento did not write a non-empty DBN snapshot")
-        raw_bytes = temporary_raw.read_bytes()
-        if raw_path.exists() or manifest_path.exists():
-            raise DatabentoSourceError("refusing to overwrite an immutable snapshot")
-        # The download is billable and has already been paid for. Preserve its
-        # exact bytes BEFORE even converting DBN to pandas: a client/API/parser
-        # mismatch is itself one of the failures for which the operator must
-        # not have to purchase the same response again. Copying through the
-        # atomic writer avoids renaming Databento's still-open file on Windows.
-        _atomic_write(raw_path, raw_bytes)
-        raw_preserved = True
-        try:
-            raw_frame = _materialize_frame(store)
-        except DatabentoSourceError as exc:
-            materialization_error = exc
-    except Exception as exc:
-        if downloaded_artifact_exists and not raw_preserved and temporary_raw.exists():
-            # Even a local persistence failure must not silently destroy bytes
-            # that may already have been billed. The temporary name is surfaced
-            # explicitly so an operator can recover it without re-downloading.
-            raise DatabentoSnapshotRetainedError(
-                f"{exc} — downloaded bytes could not be copied to the permanent "
-                f"snapshot path, so they were retained at {temporary_raw}",
-                raw_path=temporary_raw,
-                manifest_path=manifest_path,
-            ) from exc
-        raise
-    finally:
-        try:
-            _close_dbn_store(store)
-        finally:
-            if not downloaded_artifact_exists or raw_preserved:
-                temporary_raw.unlink(missing_ok=True)
+    raw_bytes = download.raw_bytes
+    raw_frame = download.frame
+    materialization_error = download.materialization_error
 
     base_manifest = {
         "schema_version": SNAPSHOT_SCHEMA_VERSION,
@@ -697,7 +732,9 @@ def fetch_daily_bars_snapshot(
             }
         )
         try:
-            _atomic_write(manifest_path, canonical_json(rejection).encode("utf-8"))
+            write_immutable_bytes(
+                manifest_path, canonical_json(rejection).encode("utf-8")
+            )
         except Exception as manifest_exc:
             raise DatabentoSnapshotRetainedError(
                 f"{rejection_reason} — the paid raw snapshot was retained at "
@@ -743,7 +780,7 @@ def fetch_daily_bars_snapshot(
         }
     )
     try:
-        _atomic_write(manifest_path, canonical_json(manifest).encode("utf-8"))
+        write_immutable_bytes(manifest_path, canonical_json(manifest).encode("utf-8"))
     except Exception as exc:
         raise DatabentoSnapshotRetainedError(
             f"validated paid snapshot was retained at {raw_path}, but its "

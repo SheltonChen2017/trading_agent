@@ -29,7 +29,7 @@ from ml.shadow_runtime import (
     load_shadow_config,
     verify_runtime_artifacts,
 )
-from scripts import run_ml_shadow
+from scripts import run_ml_promotion_dossier, run_ml_shadow
 
 
 def _bar_payload(start: str = "2024-01-02", end: str = "2026-04-10"):
@@ -324,6 +324,67 @@ def test_predict_resume_mature_monitor_is_idempotent_and_non_authoritative(tmp_p
             "allocation_batches",
         ):
             assert connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0] == 0
+
+
+def test_promotion_dossier_command_has_no_registry_or_execution_side_effect(tmp_path):
+    store, config, _config_path, artifact_dir, _provider_path, manifest = _registered_store(
+        tmp_path
+    )
+    lineage = build_lineage(
+        model_artifact_hash=manifest.artifact_hash,
+        evaluation_report_hash=manifest.evaluation_report_hash,
+        feature_set_version=manifest.feature_set_version,
+        label_version=manifest.label_version,
+        data_provider_id=config.provider_id,
+        configuration_hash=config.configuration_hash,
+        code_commit="d" * 40,
+        schedule_version=config.schedule_version,
+    )
+    evidence_epoch = epoch_key(config.model_key, config.task, lineage)
+    store.open_ml_evidence_epoch(
+        evidence_epoch=evidence_epoch,
+        model_key=config.model_key,
+        task=config.task,
+        lineage=lineage,
+        created_by="dossier-side-effect-test",
+        started_at="2026-02-25T20:00:00+00:00",
+    )
+    with store._connect() as connection:
+        before = {
+            table: connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            for table in (
+                "ml_model_registrations",
+                "ml_evidence_epochs",
+                "trade_proposals",
+                "broker_orders",
+                "execution_reservations",
+                "allocation_batches",
+            )
+        }
+    output = tmp_path / "dossier.json"
+    args = run_ml_promotion_dossier.build_parser().parse_args(
+        [
+            "--database", str(store.path),
+            "--config", str(_config_path),
+            "--artifact-dir", str(artifact_dir),
+            "--evidence-epoch", evidence_epoch,
+            "--known-limitation", "fixture evidence only",
+            "--output", str(output),
+        ]
+    )
+    summary = run_ml_promotion_dossier.command_build(args)
+    assert summary["ok"]
+    assert summary["production_authoritative"] is False
+    assert "separate_owner_promotion_review_required" in summary["promotion_blockers"]
+    assert json.loads(output.read_text(encoding="utf-8"))[
+        "production_authoritative"
+    ] is False
+    with store._connect() as connection:
+        after = {
+            table: connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+            for table in before
+        }
+    assert after == before
 
 
 def test_future_fixture_rows_cannot_change_an_as_of_prediction(tmp_path):

@@ -467,6 +467,8 @@ class PredictionRecord:
     available: bool
     refusal_reasons: tuple[str, ...]
     evidence_status: EvidenceStatus
+    monitoring_features: Mapping[str, Any] = dataclasses.field(default_factory=dict)
+    monitoring_context: Mapping[str, Any] = dataclasses.field(default_factory=dict)
     schema_version: str = SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -515,10 +517,33 @@ class PredictionRecord:
         feature_freshness = _freeze_json(
             self.feature_freshness, path="feature_freshness"
         )
+        monitoring_features = _freeze_json(
+            self.monitoring_features, path="monitoring_features"
+        )
+        monitoring_context = _freeze_json(
+            self.monitoring_context, path="monitoring_context"
+        )
         if not isinstance(values, Mapping) or not isinstance(uncertainty, Mapping):
             raise ContractError("values and uncertainty must be JSON objects")
         if not isinstance(feature_freshness, Mapping):
             raise ContractError("feature_freshness must be a JSON object")
+        if not isinstance(monitoring_features, Mapping):
+            raise ContractError("monitoring_features must be a JSON object")
+        if not isinstance(monitoring_context, Mapping):
+            raise ContractError("monitoring_context must be a JSON object")
+        for name, value in monitoring_features.items():
+            if (
+                isinstance(value, bool)
+                or not isinstance(value, (int, float))
+                or not math.isfinite(float(value))
+            ):
+                raise ContractError(
+                    f"monitoring_features.{name} must be a finite number"
+                )
+        if not self.available and (monitoring_features or monitoring_context):
+            raise ContractError(
+                "an unavailable prediction cannot carry monitoring observations"
+            )
         if not self.available and not self.refusal_reasons:
             raise ContractError(
                 "an unavailable prediction must record at least one refusal reason "
@@ -550,6 +575,8 @@ class PredictionRecord:
         object.__setattr__(self, "values", values)
         object.__setattr__(self, "uncertainty", uncertainty)
         object.__setattr__(self, "feature_freshness", feature_freshness)
+        object.__setattr__(self, "monitoring_features", monitoring_features)
+        object.__setattr__(self, "monitoring_context", monitoring_context)
         object.__setattr__(self, "refusal_reasons", refusal_reasons)
 
     @property

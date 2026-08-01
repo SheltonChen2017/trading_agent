@@ -406,6 +406,45 @@ def _validate_model_bundle(manifest: ModelManifest, bundle: Any) -> None:
             )
     if not callable(getattr(bundle["estimator"], "predict", None)):
         raise ShadowRuntimeError("model bundle estimator has no callable predict method")
+    reference = bundle.get("feature_reference")
+    if reference is not None:
+        if not isinstance(reference, Mapping) or set(reference) != set(ordered):
+            raise ShadowRuntimeError(
+                "feature_reference must contain exactly the model's ordered features"
+            )
+        for name, summary in reference.items():
+            if not isinstance(summary, Mapping):
+                raise ShadowRuntimeError(f"feature_reference.{name} must be an object")
+            edges = summary.get("bin_edges")
+            counts = summary.get("bin_counts")
+            independent_dates = summary.get("independent_date_count")
+            if (
+                not isinstance(edges, (list, tuple))
+                or not isinstance(counts, (list, tuple))
+                or len(counts) != len(edges) + 1
+                or isinstance(independent_dates, bool)
+                or not isinstance(independent_dates, int)
+                or independent_dates < 1
+            ):
+                raise ShadowRuntimeError(
+                    f"feature_reference.{name} has invalid bins or sample count"
+                )
+            try:
+                numeric_edges = [float(value) for value in edges]
+                numeric_counts = [int(value) for value in counts]
+            except (TypeError, ValueError) as exc:
+                raise ShadowRuntimeError(
+                    f"feature_reference.{name} bins/counts must be numeric"
+                ) from exc
+            if (
+                any(not math.isfinite(value) for value in numeric_edges)
+                or numeric_edges != sorted(set(numeric_edges))
+                or any(value < 0 for value in numeric_counts)
+                or sum(numeric_counts) != independent_dates
+            ):
+                raise ShadowRuntimeError(
+                    f"feature_reference.{name} is internally inconsistent"
+                )
 
 
 def _fixture_frame(rows: Any, ticker: str) -> pd.DataFrame:
@@ -743,6 +782,14 @@ def build_volatility_prediction(
         available=True,
         refusal_reasons=(),
         evidence_status=manifest.evidence_status,
+        monitoring_features=numeric_values,
+        monitoring_context={
+            "event_category": (
+                "earnings_session"
+                if as_of_session in config.earnings_dates_by_subject.get(subject, ())
+                else "ordinary_session"
+            )
+        },
     ).to_shadow_storage_dict()
     record["evidence_epoch"] = evidence_epoch
     record["shadow_run_id"] = shadow_run_id

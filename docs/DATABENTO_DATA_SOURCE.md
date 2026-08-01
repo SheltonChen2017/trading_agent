@@ -1,8 +1,8 @@
 # Databento data-source operation
 
 Databento is the selected real-market-data source for the volatility ML work.
-Alpaca remains the broker and execution source. The first supported Databento
-request is deliberately narrow:
+Alpaca remains the broker and execution source. The supported market-data
+request remains deliberately narrow:
 
 ```text
 dataset: EQUS.SUMMARY
@@ -62,6 +62,123 @@ same timestamped snapshot cannot overwrite it. `artifacts/databento/` is
 Git-ignored because the snapshot contains licensed vendor data and is local
 operational state, not repository source.
 
+## Receipt-timestamped preliminary summaries
+
+`ohlcv-1d` contains the final approximately 20:15 ET summary, but it does not
+carry the exact publication/receipt time needed by the ML availability
+contract. `EQUS.SUMMARY` also publishes the first two preliminary summaries
+through the `statistics` schema at approximately 16:15 and 17:00 ET. Those
+records carry Databento's capture-server `ts_recv`; `stat_flags=1` and `2`
+identify the two vintages. See Databento's
+[EQUS.SUMMARY guide](https://databento.com/docs/venues-and-datasets/equs-summary)
+and [statistics schema](https://databento.com/docs/schemas-and-data-formats/statistics).
+
+Estimate before downloading:
+
+```powershell
+python scripts/run_databento_ingest.py estimate-statistics `
+  --symbols NVDA MSFT `
+  --start 2026-07-29 `
+  --end 2026-07-30 `
+  --summary-flag 2
+```
+
+Then use an explicit cap:
+
+```powershell
+python scripts/run_databento_ingest.py download-statistics `
+  --symbols NVDA MSFT `
+  --start 2026-07-29 `
+  --end 2026-07-30 `
+  --summary-flag 2 `
+  --max-cost-usd 0.10 `
+  --output-dir artifacts/databento
+```
+
+Each request must cover exactly one NYSE session and one summary flag. The
+adapter derives a small ET query window around that publication (16:05-16:30
+for flag 1, or 16:50-17:15 for flag 2). This is a cost-control boundary, not
+an availability shortcut: the exact `ts_recv` in the returned record remains
+the only accepted availability time. A broad full-day statistics request is
+unsafe operationally because this schema also carries consolidated-volume
+updates during the session; on 2026-08-01 the two-symbol, two-session estimate
+was about $5.65, while the two implemented narrow windows estimated at about
+$0.06 total for one session ($0.0504 for flag 1 and $0.0093 for flag 2).
+Always inspect the current estimate because vendor pricing and activity vary.
+Repeat the command once per required session and summary vintage.
+
+The paid DBN is retained before parsing. Target OHLCV statistics outside the
+exclusive request window, duplicate sequence identities, malformed exact
+timestamps, and unrequested symbols fail closed. A delete or invalid value
+invalidates its entire preliminary cohort; the adapter will not silently
+fall back to a stale member of that cohort. A usable cohort must contain one
+internally consistent open, high, low, close, and volume state, and becomes
+available only at the latest `ts_recv` among those five records.
+
+The returned cohort is intentionally **not** a `FeatureAvailabilityRecord`.
+The values are still unadjusted, so giving them that production-shaped type
+would let a caller bypass the corporate-action work described below.
+
+## Licensed point-in-time reference snapshots
+
+The Reference API can provide point-in-time security-master records and
+corporate-action adjustment factors. It is a licensed subscription service
+with account symbol allocations, not a historical time-series download with
+the same per-request cost estimator. The CLI therefore requires an explicit
+acknowledgement before making either call.
+
+Capture security identity and listing history:
+
+```powershell
+python scripts/run_databento_ingest.py download-reference `
+  --kind security_master `
+  --symbols NVDA MSFT `
+  --start 2020-01-01 `
+  --end 2026-08-01 `
+  --acknowledge-reference-subscription `
+  --output-dir artifacts/databento
+```
+
+Capture adjustment-factor history over a range covering the complete feature
+lookback:
+
+```powershell
+python scripts/run_databento_ingest.py download-reference `
+  --kind adjustment_factors `
+  --symbols NVDA MSFT `
+  --start 2020-01-01 `
+  --end 2026-08-01 `
+  --acknowledge-reference-subscription `
+  --output-dir artifacts/databento
+```
+
+Before running those commands, confirm in the Databento portal that the
+account has Reference access and that the symbol/date scope fits the intended
+allocation. The snapshots preserve `ts_created`, security/listing IDs,
+listing status, exchange identity, adjustment status, reason, option, factor,
+and ex-date. Those fields are necessary because a later rescission can remove
+an old factor and multiple choices for one event must not all be applied.
+Databento's
+[adjustment-factor guide](https://databento.com/docs/venues-and-datasets/adjustment-factors)
+documents those rules.
+
+### Two boundaries that remain closed
+
+1. Security-master listing status proves security identity and whether a
+   listing existed. It does **not** prove that a security belonged to this
+   strategy's or an index's historical universe. An authoritative constituent
+   history source must produce actual `UniverseMembershipRecord`s.
+2. Capturing factors does not apply them. A separately reviewed builder must
+   reconstruct the factor vintage visible at each decision cutoff, resolve
+   rescissions and options, select the correct listing, and bind every
+   adjusted input value to its complete raw/statistics/reference lineage.
+
+`evaluate_databento_pit_prerequisites()` reports missing or mismatched capture
+inputs but deliberately hardcodes `point_in_time_data=false`. Only the existing
+`evaluate_point_in_time_coverage()` gate may eventually derive `True` from a
+fully built dataset. Nothing in these commands is wired to model proposals or
+order execution.
+
 `--output-dir` defaults to `artifacts/databento` and is refused if it is
 outside this repository or is not Git-ignored here. An outside directory may
 belong to another repository whose rules this process cannot verify. Licensed
@@ -82,6 +199,15 @@ re-reading that file costs nothing; re-downloading would bill again.
 Schema version 2 distinguishes `accepted`, `accepted_with_refusals`, and
 `rejected`. It also records `underfilled`, so a successful download cannot
 hide the fact that some requested observations were unusable.
+
+The same rule applies to the licensed reference requests. Because the
+reference API returns a DataFrame rather than a file, the response is written
+to `<stem>.raw.csv` before it is canonicalized — an unexpected column set is
+exactly the failure worth keeping, and the preserved CSV shows which columns
+actually arrived. A rejected reference snapshot records
+`validation_status: rejected` and, critically, `point_in_time_reference:
+false`: a response that could not be validated cannot support a
+point-in-time claim whatever the subscription says.
 
 Row-level problems are recorded as refusals rather than voiding the request.
 A zero-volume row, a ticker that had not listed yet, and a delisted ticker with
@@ -132,7 +258,8 @@ provides_point_in_time_lineage=false
 adjustment_status=unadjusted
 ```
 
-That is intentional. Promotion remains blocked until a later stage binds the
-bars to receipt-timestamped Databento statistics and obtains point-in-time
-adjustment/security-master evidence. A paid vendor name is not, by itself,
-proof that a particular dataset is safe from look-ahead bias.
+That is intentional. Receipt-timestamped statistics and immutable reference
+capture are now implemented as separate local evidence, but promotion remains
+blocked until a vintage-correct adjustment builder binds them and an
+authoritative historical-universe source is configured. A paid vendor name is
+not, by itself, proof that a particular dataset is safe from look-ahead bias.

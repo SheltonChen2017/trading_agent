@@ -44,6 +44,10 @@ from ml.monitoring_reports import (
     ShadowMonitoringGate,
     build_epoch_monitoring_report,
 )
+from ml.presentation import (
+    EXPERIMENTAL_LABEL,
+    build_presentation,
+)
 from ml.shadow import (
     ShadowScheduleError,
     build_lineage,
@@ -780,9 +784,53 @@ def command_monitor(
     return summary
 
 
+def _load_monitoring_report(path: Path | None) -> tuple[Mapping[str, Any] | None, str | None]:
+    """Load a supplied monitoring report, returning a reason instead of raising.
+
+    A presentation input that cannot be read must not abort the status
+    command, because the failure path writes an operational alert and this
+    command is required to be read-only.
+    """
+    if path is None:
+        return None, None
+    try:
+        payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        return None, f"could not read monitoring report: {exc}"
+    if not isinstance(payload, Mapping):
+        return None, "monitoring report is not a JSON object"
+    # `monitor --output` writes a CLI envelope with the real report nested
+    # under "monitoring"; build_epoch_monitoring_report returns the report
+    # itself. Accept either, so the file this tool emits is the file this
+    # tool consumes, and unwrap only when the nested object is the one
+    # carrying the verifiable report_hash.
+    nested = payload.get("monitoring")
+    if isinstance(nested, Mapping) and "report_hash" in nested:
+        return nested, None
+    return payload, None
+
+
 def command_status(
-    store: AssistantStore, config: ShadowRuntimeConfig
+    store: AssistantStore,
+    config: ShadowRuntimeConfig,
+    *,
+    task: str | None = None,
+    evidence_epoch: str | None = None,
+    subject: str | None = None,
+    monitoring_report: Path | None = None,
 ) -> dict[str, Any]:
+    # `--task` is an assertion, not a selector. This runtime is configured
+    # for exactly one task, so the only honest response to a mismatch is to
+    # say so rather than silently show a different task's evidence.
+    if task is not None and task != config.task:
+        raise ShadowCommandError(
+            f"--task {task!r} does not match the configured task {config.task!r}"
+        )
+    if subject is not None and subject not in config.subjects:
+        raise ShadowCommandError(
+            f"--subject {subject!r} is not a configured subject for this runtime"
+        )
+
     registration = store.get_ml_model_registration(config.model_key)
     epochs = [
         epoch
@@ -805,15 +853,86 @@ def command_status(
         for alert in store.list_operational_alerts(status="open", limit=1000)
         if alert["category"] == "ml_shadow"
     ]
+    active_epoch = next(
+        (epoch["evidence_epoch"] for epoch in epochs if epoch["status"] == "active"),
+        None,
+    )
+
+    # Presentation is strictly additive to the operational summary below. It
+    # is built inside a try/except because a presentation failure must never
+    # reach main()'s handler, which records an operational alert -- that is a
+    # write, and this command must not write.
+    selected_epoch = evidence_epoch if evidence_epoch is not None else active_epoch
+    epoch_record = next(
+        (epoch for epoch in epochs if epoch["evidence_epoch"] == selected_epoch), None
+    )
+    # The general inventory above retains the command's historical 10,000-row
+    # bound.  Presentation cannot use a bounded oldest-first result, however:
+    # after enough shadow sessions it would silently omit the newest attempt
+    # and display a stale prediction.  Read the explicitly selected epoch in
+    # full; this is one local, single-user evidence stream.
+    presentation_predictions = (
+        store.list_ml_predictions(
+            model_key=config.model_key,
+            evidence_epoch=selected_epoch,
+            limit=None,
+        )
+        if epoch_record is not None
+        else []
+    )
+    report_payload, report_error = _load_monitoring_report(monitoring_report)
+    try:
+        if evidence_epoch is not None and epoch_record is None:
+            presentation = {
+                "presentation_available": False,
+                "reason": (
+                    f"evidence epoch {evidence_epoch!r} does not belong to this model "
+                    "and task"
+                ),
+                "observations": [],
+                "promotion_blockers": ["requested_evidence_epoch_not_found"],
+                "production_authoritative": False,
+                "label": EXPERIMENTAL_LABEL,
+            }
+        else:
+            presentation = build_presentation(
+                task=config.task,
+                model_key=config.model_key,
+                evidence_epoch=selected_epoch,
+                epoch_status=epoch_record["status"] if epoch_record else None,
+                predictions=presentation_predictions,
+                monitoring_report=report_payload,
+                subjects=[subject] if subject else list(config.subjects),
+            )
+        if report_error is not None:
+            presentation["monitoring"] = {
+                "status": "rejected",
+                "reason": report_error,
+                "report_hash": None,
+                "evidence_epoch": None,
+                "promotion_blockers": [],
+            }
+            presentation["promotion_blockers"] = list(
+                dict.fromkeys(
+                    [*presentation.get("promotion_blockers", []), "monitoring_report_rejected"]
+                )
+            )
+    except Exception as exc:
+        presentation = {
+            "presentation_available": False,
+            "reason": f"presentation could not be built: {exc}",
+            "observations": [],
+            "promotion_blockers": ["presentation_unavailable"],
+            "production_authoritative": False,
+            "label": EXPERIMENTAL_LABEL,
+        }
+
     return {
         "ok": True,
         "command": "status",
         "model_key": config.model_key,
         "registration_status": registration["status"] if registration else "missing",
-        "active_evidence_epoch": next(
-            (epoch["evidence_epoch"] for epoch in epochs if epoch["status"] == "active"),
-            None,
-        ),
+        "active_evidence_epoch": active_epoch,
         "evidence_epoch_count": len(epochs),
         "run_status_counts": dict(sorted(Counter(run["status"] for run in runs).items())),
         "prediction_count": len(predictions),
@@ -821,6 +940,7 @@ def command_status(
         "open_ml_alert_count": len(alerts),
         "open_ml_alerts": alerts,
         "production_authoritative": False,
+        "presentation": presentation,
     }
 
 
@@ -887,7 +1007,33 @@ def build_parser() -> argparse.ArgumentParser:
         help="Timezone-aware report cutoff; defaults to now.",
     )
 
-    subparsers.add_parser("status", help="Show registration, epoch, run, and alert status.")
+    status = subparsers.add_parser(
+        "status",
+        help=(
+            "Show registration, epoch, run, and alert status, plus the read-only "
+            "experimental model observation. Never writes."
+        ),
+    )
+    status.add_argument(
+        "--task",
+        help=(
+            "Assert the configured task (presentation alias). A mismatch is an "
+            "error, not a selector for a different task."
+        ),
+    )
+    status.add_argument(
+        "--evidence-epoch",
+        help="Epoch to display. Defaults to the active epoch; epochs are never pooled.",
+    )
+    status.add_argument("--subject", help="Display one configured subject only.")
+    status.add_argument(
+        "--monitoring-report",
+        type=Path,
+        help=(
+            "Monitoring report JSON to display alongside the observation. Its "
+            "report_hash and evidence epoch are verified before it is trusted."
+        ),
+    )
 
     close = subparsers.add_parser("close-epoch", help="Explicitly close one evidence epoch.")
     close.add_argument("--evidence-epoch", required=True)
@@ -945,7 +1091,14 @@ def main(argv: list[str] | None = None) -> int:
                 as_of=args.as_of,
             )
         elif args.command == "status":
-            summary = command_status(store, config)
+            summary = command_status(
+                store,
+                config,
+                task=args.task,
+                evidence_epoch=args.evidence_epoch,
+                subject=args.subject,
+                monitoring_report=args.monitoring_report,
+            )
         else:
             summary = command_close_epoch(
                 store,
@@ -956,50 +1109,57 @@ def main(argv: list[str] | None = None) -> int:
     except (Exception, KeyboardInterrupt) as exc:
         kind = _failure_kind(exc)
         alert_error = None
-        try:
-            alert = _record_alert(
-                store,
-                config,
-                kind=kind,
-                message=str(exc),
-                details={"command": args.command, "exception_type": type(exc).__name__},
-                severity="critical" if kind in {"artifact_mismatch", "database_lock_after_bounded_retries"} else "warning",
-                alerts_jsonl=args.alerts_jsonl,
-            )
-            alert_id = alert["alert_id"]
-        except Exception as persist_error:
+        if args.command == "status":
+            # Status is the dedicated read-only surface.  Even invalid CLI
+            # assertions or corrupt presentation inputs must not turn a read
+            # into an operational-alert write (or a JSONL fallback write).
             alert_id = None
-            alert_error = f"{type(persist_error).__name__}: {persist_error}"
-            if args.alerts_jsonl is not None:
-                try:
-                    append_alerts_jsonl(
-                        [
-                            {
-                                "category": "ml_shadow",
-                                "severity": (
-                                    "critical"
-                                    if kind
-                                    in {
-                                        "artifact_mismatch",
-                                        "database_lock_after_bounded_retries",
-                                    }
-                                    else "warning"
-                                ),
-                                "kind": kind,
-                                "message": str(exc),
-                                "command": args.command,
-                                "seen_at": datetime.now(timezone.utc).isoformat(),
-                                "database_alert_error": alert_error,
-                            }
-                        ],
-                        args.alerts_jsonl,
-                    )
-                    alert_error += "; durable JSONL fallback written"
-                except Exception as fallback_error:
-                    alert_error += (
-                        "; JSONL fallback failed: "
-                        f"{type(fallback_error).__name__}: {fallback_error}"
-                    )
+            alert_error = "status is read-only; alert persistence was skipped"
+        else:
+            try:
+                alert = _record_alert(
+                    store,
+                    config,
+                    kind=kind,
+                    message=str(exc),
+                    details={"command": args.command, "exception_type": type(exc).__name__},
+                    severity="critical" if kind in {"artifact_mismatch", "database_lock_after_bounded_retries"} else "warning",
+                    alerts_jsonl=args.alerts_jsonl,
+                )
+                alert_id = alert["alert_id"]
+            except Exception as persist_error:
+                alert_id = None
+                alert_error = f"{type(persist_error).__name__}: {persist_error}"
+                if args.alerts_jsonl is not None:
+                    try:
+                        append_alerts_jsonl(
+                            [
+                                {
+                                    "category": "ml_shadow",
+                                    "severity": (
+                                        "critical"
+                                        if kind
+                                        in {
+                                            "artifact_mismatch",
+                                            "database_lock_after_bounded_retries",
+                                        }
+                                        else "warning"
+                                    ),
+                                    "kind": kind,
+                                    "message": str(exc),
+                                    "command": args.command,
+                                    "seen_at": datetime.now(timezone.utc).isoformat(),
+                                    "database_alert_error": alert_error,
+                                }
+                            ],
+                            args.alerts_jsonl,
+                        )
+                        alert_error += "; durable JSONL fallback written"
+                    except Exception as fallback_error:
+                        alert_error += (
+                            "; JSONL fallback failed: "
+                            f"{type(fallback_error).__name__}: {fallback_error}"
+                        )
         print(
             json.dumps(
                 {

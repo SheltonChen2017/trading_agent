@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
+import math
 import re
 from typing import Any, Mapping, Sequence
 
@@ -186,6 +187,13 @@ class ResearchGateSpec:
     block_lengths: tuple[int, ...]
     required_calibration_bins: int
     failure_slices: tuple[str, ...]
+    # Optional so existing specs stay valid, but part of the hashed gate when
+    # supplied: plan 9.4 requires calibration against a PREREGISTERED mandate
+    # ceiling, and a ceiling chosen after seeing which threshold made the
+    # model look good is not preregistered. Binding it here means moving it
+    # produces a different spec_hash.
+    mandate_ceiling_daily_pct: float | None = None
+    maximum_brier: float | None = None
 
     def __post_init__(self) -> None:
         with _as_experiment_error():
@@ -221,6 +229,32 @@ class ResearchGateSpec:
             or self.required_calibration_bins < 2
         ):
             raise ExperimentContractError("required_calibration_bins must be an integer >= 2")
+        if self.mandate_ceiling_daily_pct is not None and (
+            isinstance(self.mandate_ceiling_daily_pct, bool)
+            or not isinstance(self.mandate_ceiling_daily_pct, (int, float))
+            or not math.isfinite(float(self.mandate_ceiling_daily_pct))
+            or self.mandate_ceiling_daily_pct <= 0
+        ):
+            raise ExperimentContractError(
+                "mandate_ceiling_daily_pct must be a positive finite number when supplied"
+            )
+        if self.maximum_brier is not None and (
+            isinstance(self.maximum_brier, bool)
+            or not isinstance(self.maximum_brier, (int, float))
+            or not 0 < float(self.maximum_brier) <= 1
+        ):
+            raise ExperimentContractError(
+                "maximum_brier must be within (0, 1] when supplied"
+            )
+        if self.maximum_brier is not None and self.mandate_ceiling_daily_pct is None:
+            # A Brier bar with nothing to be calibrated against is a gate that
+            # can never be evaluated -- and would silently read as "no
+            # calibration requirement" rather than as the misconfiguration it
+            # is.
+            raise ExperimentContractError(
+                "maximum_brier requires mandate_ceiling_daily_pct; a calibration bar "
+                "with no declared ceiling can never be evaluated"
+            )
         object.__setattr__(
             self, "failure_slices", _unique_string_tuple(self.failure_slices, "failure_slices")
         )
@@ -233,6 +267,8 @@ class ResearchGateSpec:
             "block_lengths": list(self.block_lengths),
             "required_calibration_bins": self.required_calibration_bins,
             "failure_slices": list(self.failure_slices),
+            "mandate_ceiling_daily_pct": self.mandate_ceiling_daily_pct,
+            "maximum_brier": self.maximum_brier,
         }
 
     @classmethod
@@ -310,6 +346,9 @@ class ExperimentSpec:
     cost_tax_liquidity_assumptions: Mapping[str, Any]
     research_gate: ResearchGateSpec
     random_seed: int
+    ordered_feature_names: tuple[str, ...] = ()
+    target_column: str = "label_value"
+    baseline_columns: Mapping[str, str] = dataclasses.field(default_factory=dict)
     confirmation: ConfirmationSpec | None = None
     schema_version: str = SCHEMA_VERSION
 
@@ -321,7 +360,7 @@ class ExperimentSpec:
         _check_schema_version(self.schema_version)
         for name in (
             "experiment_id", "task", "primary_outcome", "feature_set_version",
-            "label_version", "benchmark", "universe_definition",
+            "label_version", "benchmark", "universe_definition", "target_column",
         ):
             _check_required_str(getattr(self, name), name)
         if self.mode not in MODES:
@@ -346,6 +385,11 @@ class ExperimentSpec:
 
         candidates = _unique_string_tuple(self.candidate_models, "candidate_models")
         baselines = _unique_string_tuple(self.frozen_baselines, "frozen_baselines")
+        ordered_features = _unique_string_tuple(
+            self.ordered_feature_names,
+            "ordered_feature_names",
+            allow_empty=True,
+        )
         overlap = set(candidates) & set(baselines)
         if overlap:
             # A model cannot be its own control. If the same name appears on
@@ -406,21 +450,35 @@ class ExperimentSpec:
         assumptions = _freeze_json(
             self.cost_tax_liquidity_assumptions, path="cost_tax_liquidity_assumptions"
         )
+        baseline_columns = _freeze_json(
+            self.baseline_columns, path="baseline_columns"
+        )
         if not isinstance(split_configuration, Mapping):
             raise ExperimentContractError("split_configuration must be a JSON object")
         if not isinstance(assumptions, Mapping):
             raise ExperimentContractError(
                 "cost_tax_liquidity_assumptions must be a JSON object"
             )
+        if not isinstance(baseline_columns, Mapping):
+            raise ExperimentContractError("baseline_columns must be a JSON object")
+        for name, column in baseline_columns.items():
+            _check_required_str(name, "baseline_columns key")
+            _check_required_str(column, f"baseline_columns[{name}]")
+        if len(set(baseline_columns.values())) != len(baseline_columns):
+            raise ExperimentContractError(
+                "baseline_columns must not map multiple baselines to one column"
+            )
 
         object.__setattr__(self, "candidate_models", candidates)
         object.__setattr__(self, "frozen_baselines", baselines)
+        object.__setattr__(self, "ordered_feature_names", ordered_features)
         object.__setattr__(
             self, "research_look_dimensions",
             _freeze_json(frozen_dimensions, path="research_look_dimensions"),
         )
         object.__setattr__(self, "split_configuration", split_configuration)
         object.__setattr__(self, "cost_tax_liquidity_assumptions", assumptions)
+        object.__setattr__(self, "baseline_columns", baseline_columns)
 
         _reject_forbidden_keys(self.to_dict())
 
@@ -446,6 +504,9 @@ class ExperimentSpec:
             "cost_tax_liquidity_assumptions": _plain(self.cost_tax_liquidity_assumptions),
             "research_gate": self.research_gate.to_dict(),
             "random_seed": self.random_seed,
+            "ordered_feature_names": list(self.ordered_feature_names),
+            "target_column": self.target_column,
+            "baseline_columns": dict(self.baseline_columns),
             "confirmation": (
                 self.confirmation.to_dict() if self.confirmation is not None else None
             ),

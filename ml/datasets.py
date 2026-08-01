@@ -456,6 +456,7 @@ def build_dataset_manifest(
     availability_df: pd.DataFrame | None = None,
     universe_df: pd.DataFrame | None = None,
     coverage: CoverageResult | None = None,
+    benchmark: str | None = None,
 ) -> DatasetManifest:
     """Build the DatasetManifest describing `features_df`/`labels_df` as
     they exist right now -- callers must construct this immediately before
@@ -552,6 +553,7 @@ def build_dataset_manifest(
         dataset_hash=dataset_hash,
         git_commit=git_commit,
         point_in_time_evidence=point_in_time_evidence,
+        benchmark=benchmark,
     )
 
 

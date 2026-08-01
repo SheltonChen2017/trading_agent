@@ -63,6 +63,12 @@ def _spec(**overrides) -> ExperimentSpec:
         cost_tax_liquidity_assumptions={"transaction_cost_bps": 5.0},
         research_gate=_gate(),
         random_seed=0,
+        ordered_feature_names=("realized_vol_10d_pct", "realized_vol_60d_pct"),
+        target_column="label_value",
+        baseline_columns={
+            "trailing_realized": "realized_vol_10d_pct",
+            "ewma": "realized_vol_60d_pct",
+        },
     )
     kwargs.update(overrides)
     return ExperimentSpec(**kwargs)
@@ -121,6 +127,9 @@ def test_spec_is_json_serializable():
         {"universe_definition": "fixed:tech-v2"},
         {"split_configuration": {"n_splits": 5, "embargo_sessions": 20}},
         {"cost_tax_liquidity_assumptions": {"transaction_cost_bps": 10.0}},
+        {"ordered_feature_names": ("realized_vol_60d_pct", "realized_vol_10d_pct")},
+        {"target_column": "label_components"},
+        {"baseline_columns": {"trailing_realized": "other", "ewma": "ewma"}},
     ],
 )
 def test_behavior_relevant_changes_alter_the_hash(overrides):

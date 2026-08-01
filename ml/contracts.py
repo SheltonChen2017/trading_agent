@@ -223,6 +223,7 @@ class DatasetManifest:
     dropped_label_row_count: int = 0
     input_row_counts: Mapping[str, int] = dataclasses.field(default_factory=dict)
     point_in_time_evidence: Mapping[str, Any] | None = None
+    benchmark: str | None = None
     schema_version: str = SCHEMA_VERSION
 
     def __post_init__(self) -> None:
@@ -236,6 +237,8 @@ class DatasetManifest:
         _check_required_str(self.entry_timing, "entry_timing")
         _check_required_str(self.tax_assumptions, "tax_assumptions")
         _check_required_str(self.git_commit, "git_commit")
+        if self.benchmark is not None:
+            _check_required_str(self.benchmark, "benchmark")
         _parse_timestamp(self.created_at, "created_at")
         _check_bool(self.point_in_time_data, "point_in_time_data")
         requested_start = _parse_date(self.requested_start_date, "requested_start_date")

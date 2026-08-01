@@ -184,3 +184,36 @@ acceptance criterion in sections 7-12 is complete. In particular:
     observability presentation in section 16 is also pending; this is safer
     than presenting unevaluated outputs, but it means these modules do not yet
     help a live decision workflow directly.
+
+## ML-LR-3 (in progress)
+
+`ml/portfolio_volatility.py` delivers the section 9.2 target builder and the
+9.3 unit convention. Two explicitly distinct targets that are never
+substituted for one another: `frozen_weight` (weights known at
+`as_of_session`, applied to the next `horizon_sessions` of aligned security
+returns) and `realized_account` (flow-adjusted account-equity returns). Each
+carries its own `target_kind`, so mixing them downstream is impossible
+rather than merely discouraged.
+
+Cash is retained as zero-volatility exposure rather than renormalized away —
+verified linear: a 75/50/25%-invested book measures 0.750/0.500/0.250x the
+fully-invested volatility, where a renormalizing implementation would report
+the fully-invested number for all of them. Every target records its position
+snapshot hash and price input hash, refuses a snapshot captured after the
+forecast cutoff, and refuses rather than dropping a held security that lacks
+prices — dropping one would silently re-weight the survivors and report the
+volatility of a book that was never held.
+
+Units are daily-return standard deviation in percent, matching
+`compute_forward_realized_vol_labels`. The only annualized value sits behind
+a field whose name says `annualized`, and there is no unlabeled
+`volatility_pct` key that could be mistaken for either.
+
+**Still outstanding for ML-LR-3** (section 9.4/9.5): empirical prediction
+intervals built only from prior out-of-fold residuals, interval coverage by
+fold, Brier/log-loss/calibration for a preregistered mandate ceiling,
+warning lead time and false-warning rate, performance sliced by
+year/ticker/volatility regime/earnings proximity, and the extended typed
+`VolatilityForecast` wrapper. Portfolio research against real data also
+remains underfilled until enough daily position/equity snapshots accumulate;
+per plan 9.7 that is reported as unavailable rather than backfilled.

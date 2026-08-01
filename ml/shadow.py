@@ -28,8 +28,8 @@ evidence (plan 12.5), never a default.
 from __future__ import annotations
 
 import dataclasses
-from datetime import date, datetime, time, timedelta, timezone
-from typing import Any, Mapping, Sequence
+from datetime import date, datetime, timedelta, timezone
+from typing import Any, Mapping
 
 import pandas as pd
 import pandas_market_calendars as mcal
@@ -39,10 +39,12 @@ from ml.hashing import hash_payload
 _NYSE = mcal.get_calendar("NYSE")
 _EASTERN = "America/New_York"
 
-# A daily-close task's features are final once the session's close is
-# published. 20:00 UTC is 16:00 ET on a standard session; the calendar's own
-# market_close is used when available so half-days are handled correctly.
-DEFAULT_CLOSE_HOUR_ET = 16
+# There is deliberately no default close-hour constant. An earlier draft
+# carried DEFAULT_CLOSE_HOUR_ET = 16, which was never read and actively
+# contradicted the behavior: session_close_instant() takes market_close from
+# the exchange calendar, so a half-day resolves to 13:00 ET and the DST
+# transition moves the UTC offset. A constant asserting 16:00 would be the
+# first thing a reader trusted and the first thing that was wrong.
 
 
 class ShadowScheduleError(ValueError):
@@ -234,6 +236,10 @@ def decide_maturity(
 
     try:
         target_session = resolve_target_session(str(as_of), horizon)
+        canonical_available_at = _parse_instant(
+            resolve_target_availability(str(as_of), horizon),
+            "canonical_target_available_at",
+        )
     except ShadowScheduleError as exc:
         return MaturityDecision(
             prediction_id=prediction_id, ready=False,
@@ -241,6 +247,18 @@ def decide_maturity(
         )
 
     available_at = _parse_instant(recorded, "target_available_at")
+    if available_at < canonical_available_at:
+        return MaturityDecision(
+            prediction_id=prediction_id,
+            ready=False,
+            target_session=target_session,
+            target_available_at=recorded,
+            reason=(
+                f"recorded target availability {recorded} precedes the exchange-"
+                f"calendar target close {canonical_available_at.isoformat()}; refuse "
+                "early maturity"
+            ),
+        )
     if current < available_at:
         return MaturityDecision(
             prediction_id=prediction_id, ready=False,

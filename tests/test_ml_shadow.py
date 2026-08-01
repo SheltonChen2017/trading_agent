@@ -202,6 +202,16 @@ def test_a_prediction_without_recorded_target_availability_cannot_mature():
     assert "cannot be reconstructed" in decision.reason
 
 
+def test_recorded_availability_cannot_move_maturity_before_the_calendar_target():
+    decision = decide_maturity(
+        _prediction(target_available_at="2026-03-18T20:00:00+00:00"),
+        now="2026-03-19T20:00:00+00:00",
+    )
+    assert not decision.ready
+    assert "refuse early maturity" in decision.reason
+    assert decision.target_session == "2026-03-25"
+
+
 def test_a_naive_now_fails_closed():
     with pytest.raises(ShadowScheduleError, match="timezone-aware"):
         decide_maturity(_prediction(), now="2026-04-01T00:00:00")
@@ -272,6 +282,19 @@ def test_reusing_an_epoch_name_with_different_lineage_is_refused(tmp_path):
         )
 
 
+def test_reusing_an_epoch_name_for_a_different_model_or_task_is_refused(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    epoch = _open_epoch(store)
+    with pytest.raises(ValueError, match="cannot be reused"):
+        store.open_ml_evidence_epoch(
+            evidence_epoch=epoch["evidence_epoch"],
+            model_key="other-model",
+            task="other-task",
+            lineage=_lineage(),
+            created_by="test",
+        )
+
+
 def test_incomplete_lineage_is_refused(tmp_path):
     store = AssistantStore(tmp_path / "a.db")
     with pytest.raises(ValueError, match="missing required key"):
@@ -328,12 +351,52 @@ def test_two_claims_on_one_slot_produce_one_run(tmp_path):
     assert len(store.list_ml_shadow_runs()) == 1
 
 
+def test_concurrent_claims_on_one_slot_produce_one_run(tmp_path):
+    from concurrent.futures import ThreadPoolExecutor
+    from threading import Barrier
+
+    path = tmp_path / "a.db"
+    store = AssistantStore(path)
+    epoch = _open_epoch(store)["evidence_epoch"]
+    stores = (AssistantStore(path), AssistantStore(path))
+    barrier = Barrier(2)
+
+    def claim(index):
+        barrier.wait()
+        return _claim(stores[index], epoch)["run_id"]
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        run_ids = list(pool.map(claim, (0, 1)))
+    assert len(set(run_ids)) == 1
+    assert len(store.list_ml_shadow_runs()) == 1
+
+
+def test_timezone_equivalent_schedule_slots_are_one_identity(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    epoch = _open_epoch(store)["evidence_epoch"]
+    first = _claim(store, epoch)
+    second = _claim(
+        store,
+        epoch,
+        scheduled_for="2026-02-25T16:00:00-05:00",
+        started_at="2026-02-25T16:05:00-05:00",
+    )
+    assert first["run_id"] == second["run_id"]
+    assert len(store.list_ml_shadow_runs()) == 1
+
+
 def test_a_conflicting_configuration_on_the_same_slot_is_loud(tmp_path):
     store = AssistantStore(tmp_path / "a.db")
     epoch = _open_epoch(store)["evidence_epoch"]
-    _claim(store, epoch)
-    with pytest.raises(ValueError, match="different configuration_hash"):
+    with pytest.raises(ValueError, match="does not match the active evidence epoch"):
         _claim(store, epoch, configuration_hash="9" * 64)
+
+
+def test_a_run_code_commit_must_match_its_epoch(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    epoch = _open_epoch(store)["evidence_epoch"]
+    with pytest.raises(ValueError, match="code_commit does not match"):
+        _claim(store, epoch, code_commit="9" * 40)
 
 
 def test_a_run_cannot_be_claimed_outside_a_registered_epoch(tmp_path):
@@ -350,21 +413,81 @@ def test_a_closed_epoch_cannot_accept_new_runs(tmp_path):
         _claim(store, epoch)
 
 
+def test_a_run_slot_cannot_predate_its_evidence_epoch(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    epoch = _open_epoch(
+        store, started_at="2026-02-26T00:00:00+00:00"
+    )["evidence_epoch"]
+    with pytest.raises(ValueError, match="must not precede the evidence epoch"):
+        _claim(store, epoch)
+
+
 def test_completing_a_run_records_counts_and_is_idempotent(tmp_path):
     store = AssistantStore(tmp_path / "a.db")
+    store.register_ml_model("vol:0.1.0", {"model_id": "vol"})
     epoch = _open_epoch(store)["evidence_epoch"]
     run = _claim(store, epoch)
+    store.record_ml_prediction(_shadow_prediction(epoch, run["run_id"]))
+    store.record_ml_prediction(
+        _shadow_prediction(
+            epoch,
+            run["run_id"],
+            subject_key="MSFT",
+            available=False,
+            values={},
+            evidence_status="unavailable",
+            refusal_reasons=["stale_features"],
+        )
+    )
     first = store.complete_ml_shadow_run(
-        run["run_id"], status="completed", prediction_count=8, unavailable_count=2,
+        run["run_id"], status="completed", prediction_count=2, unavailable_count=1,
         completed_at="2026-02-25T21:10:00+00:00",
     )
     second = store.complete_ml_shadow_run(
-        run["run_id"], status="completed", prediction_count=8, unavailable_count=2,
+        run["run_id"], status="completed", prediction_count=2, unavailable_count=1,
         completed_at="2026-02-25T21:10:00+00:00",
     )
     assert first == second
-    assert first["prediction_count"] == 8
-    assert first["unavailable_count"] == 2
+    assert first["prediction_count"] == 2
+    assert first["unavailable_count"] == 1
+
+
+def test_an_epoch_with_a_claimed_run_cannot_close(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    epoch = _open_epoch(store)["evidence_epoch"]
+    _claim(store, epoch)
+    with pytest.raises(ValueError, match="complete or fail it"):
+        store.close_ml_evidence_epoch(
+            epoch, closed_at="2026-03-01T00:00:00+00:00"
+        )
+
+
+def test_an_epoch_cannot_close_before_its_last_run_completed(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    epoch = _open_epoch(store)["evidence_epoch"]
+    run = _claim(store, epoch)
+    store.complete_ml_shadow_run(
+        run["run_id"], status="completed", prediction_count=0, unavailable_count=0,
+        completed_at="2026-02-25T21:10:00+00:00",
+    )
+    with pytest.raises(ValueError, match="must not precede shadow run"):
+        store.close_ml_evidence_epoch(
+            epoch, closed_at="2026-02-25T21:09:00+00:00"
+        )
+
+
+def test_an_exact_run_retry_survives_epoch_closure(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    epoch = _open_epoch(store)["evidence_epoch"]
+    first = _claim(store, epoch)
+    store.complete_ml_shadow_run(
+        first["run_id"], status="completed", prediction_count=0, unavailable_count=0,
+        completed_at="2026-02-25T21:10:00+00:00",
+    )
+    store.close_ml_evidence_epoch(
+        epoch, closed_at="2026-02-25T21:11:00+00:00"
+    )
+    assert _claim(store, epoch)["run_id"] == first["run_id"]
 
 
 def test_rewriting_a_closed_run_with_different_counts_is_refused(tmp_path):
@@ -373,11 +496,48 @@ def test_rewriting_a_closed_run_with_different_counts_is_refused(tmp_path):
     epoch = _open_epoch(store)["evidence_epoch"]
     run = _claim(store, epoch)
     store.complete_ml_shadow_run(
-        run["run_id"], status="completed", prediction_count=8, unavailable_count=0
+        run["run_id"], status="completed", prediction_count=0, unavailable_count=0
     )
     with pytest.raises(ValueError, match="refusing to rewrite"):
         store.complete_ml_shadow_run(
             run["run_id"], status="completed", prediction_count=99, unavailable_count=0
+        )
+
+
+def test_run_completion_counts_must_match_its_immutable_predictions(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    epoch = _open_epoch(store)["evidence_epoch"]
+    run = _claim(store, epoch)
+    with pytest.raises(ValueError, match="counts do not match"):
+        store.complete_ml_shadow_run(
+            run["run_id"], status="completed", prediction_count=1, unavailable_count=0
+        )
+
+
+def test_a_run_cannot_complete_before_its_last_prediction(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    store.register_ml_model("vol:0.1.0", {"model_id": "vol"})
+    epoch = _open_epoch(store)["evidence_epoch"]
+    run = _claim(store, epoch)
+    store.record_ml_prediction(
+        _shadow_prediction(
+            epoch, run["run_id"], generated_at="2026-02-25T21:10:00+00:00"
+        )
+    )
+    with pytest.raises(ValueError, match="must not precede a prediction"):
+        store.complete_ml_shadow_run(
+            run["run_id"], status="completed", prediction_count=1,
+            unavailable_count=0, completed_at="2026-02-25T21:06:00+00:00",
+        )
+
+
+def test_failed_run_requires_a_durable_error(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    epoch = _open_epoch(store)["evidence_epoch"]
+    run = _claim(store, epoch)
+    with pytest.raises(ValueError, match="non-empty durable error"):
+        store.complete_ml_shadow_run(
+            run["run_id"], status="failed", prediction_count=0, unavailable_count=0
         )
 
 
@@ -452,6 +612,63 @@ def test_an_epoch_without_a_run_is_refused(tmp_path):
         )
 
 
+def test_arbitrary_epoch_and_run_names_cannot_enter_the_evidence_record(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    store.register_ml_model("vol:0.1.0", {"model_id": "vol"})
+    with pytest.raises(ValueError, match="evidence_epoch .* does not exist"):
+        store.record_ml_prediction(_shadow_prediction("fabricated-epoch", "fabricated-run"))
+
+
+def test_a_run_cannot_record_a_prediction_for_another_session(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    store.register_ml_model("vol:0.1.0", {"model_id": "vol"})
+    epoch = _open_epoch(store)["evidence_epoch"]
+    run = _claim(store, epoch)
+    with pytest.raises(ValueError, match="does not match its shadow run slot"):
+        store.record_ml_prediction(
+            _shadow_prediction(
+                epoch,
+                run["run_id"],
+                as_of_session="2026-02-26",
+                generated_at="2026-02-26T21:05:00+00:00",
+                data_available_at="2026-02-26T21:00:00+00:00",
+                target_available_at=resolve_target_availability("2026-02-26", 20),
+            )
+        )
+
+
+def test_a_closed_run_allows_exact_retry_but_no_new_prediction(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    store.register_ml_model("vol:0.1.0", {"model_id": "vol"})
+    epoch = _open_epoch(store)["evidence_epoch"]
+    run = _claim(store, epoch)
+    payload = _shadow_prediction(epoch, run["run_id"])
+    first = store.record_ml_prediction(payload)
+    store.complete_ml_shadow_run(
+        run["run_id"], status="completed", prediction_count=1, unavailable_count=0
+    )
+    assert store.record_ml_prediction(payload)["prediction_id"] == first["prediction_id"]
+    with pytest.raises(ValueError, match="no new prediction"):
+        store.record_ml_prediction(
+            _shadow_prediction(epoch, run["run_id"], subject_key="MSFT")
+        )
+
+
+def test_nested_execution_shaped_prediction_values_are_refused(tmp_path):
+    store = AssistantStore(tmp_path / "a.db")
+    store.register_ml_model("vol:0.1.0", {"model_id": "vol"})
+    epoch = _open_epoch(store)["evidence_epoch"]
+    run = _claim(store, epoch)
+    with pytest.raises(ValueError, match="execution-shaped field"):
+        store.record_ml_prediction(
+            _shadow_prediction(
+                epoch,
+                run["run_id"],
+                values={"forecast": {"trade": {"side": "buy"}}},
+            )
+        )
+
+
 def test_predictions_from_different_epochs_are_never_pooled(tmp_path):
     """Plan 12.2: 'Do not pool across epochs.' A track record spanning a
     model change describes neither system."""
@@ -461,6 +678,10 @@ def test_predictions_from_different_epochs_are_never_pooled(tmp_path):
     first_epoch = _open_epoch(store)["evidence_epoch"]
     first_run = _claim(store, first_epoch)
     store.record_ml_prediction(_shadow_prediction(first_epoch, first_run["run_id"]))
+    store.complete_ml_shadow_run(
+        first_run["run_id"], status="completed", prediction_count=1,
+        unavailable_count=0, completed_at="2026-02-25T21:10:00+00:00",
+    )
     store.close_ml_evidence_epoch(first_epoch, closed_at="2026-03-01T00:00:00+00:00")
 
     changed = _lineage(model_artifact_hash="f" * 64)

@@ -254,7 +254,10 @@ is refused outright as a gate that could never be evaluated.
 `ml/portfolio_experiments.py` completes section 9.7's portfolio half. It
 builds a target per account-session from stored position/equity records,
 keeps every refusal with its reason rather than dropping it, and reports
-research readiness instead of running on an inadequate sample.
+research readiness instead of running on an inadequate sample. Its combined
+raw-snapshot pipeline carries ambiguous capture-cohort refusals into the same
+`TargetBuildResult`, so attempted-session counts and readiness reports cannot
+silently lose exclusions between grouping and target construction.
 
 Underfill is a first-class outcome. Measured on a 120-session fixture with a
 20-session horizon: 100 targets, 20 refusals (exactly the tail with no

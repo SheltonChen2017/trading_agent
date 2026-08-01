@@ -212,6 +212,42 @@ def group_position_snapshots_with_refusals(
     return grouped, tuple(refusals)
 
 
+def build_portfolio_target_series_from_snapshots(
+    account_key: str,
+    *,
+    snapshots: Sequence[Mapping[str, Any]],
+    cash_by_session: Mapping[str, Any],
+    close_by_ticker: Mapping[str, pd.Series],
+    forecast_cutoff_by_session: Mapping[str, str],
+    horizon_sessions: int = 20,
+) -> TargetBuildResult:
+    """Build one complete refusal-aware result from raw snapshot rows.
+
+    This is the safe pipeline entry point for tolerant operation.  It keeps
+    ambiguous capture-cohort refusals in the same ``TargetBuildResult`` as
+    downstream cash, cutoff, price, and horizon refusals.  Returning the two
+    stages separately makes it too easy for a caller to pass only the grouped
+    rows onward, undercount attempted sessions, and silently lose why a
+    session was excluded.
+    """
+    grouped, grouping_refusals = group_position_snapshots_with_refusals(snapshots)
+    built = build_portfolio_target_series(
+        account_key,
+        positions_by_session=grouped,
+        cash_by_session=cash_by_session,
+        close_by_ticker=close_by_ticker,
+        forecast_cutoff_by_session=forecast_cutoff_by_session,
+        horizon_sessions=horizon_sessions,
+    )
+    refusals = tuple(
+        sorted(
+            (*grouping_refusals, *built.refusals),
+            key=lambda value: (value["as_of_session"], value["reason"]),
+        )
+    )
+    return TargetBuildResult(targets=built.targets, refusals=refusals)
+
+
 def build_portfolio_target_series(
     account_key: str,
     *,

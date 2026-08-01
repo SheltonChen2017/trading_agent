@@ -1,0 +1,26 @@
+{
+  "schema_version": "1",
+  "task": "volatility_forecast",
+  "schedule_key": "volatility-daily-v1",
+  "schedule_version": "daily-close-v1",
+  "model_id": "replace-with-experiment-and-candidate-id",
+  "model_version": "replace-with-frozen-spec-hash",
+  "manifest_filename": "replace-with-model.manifest.json",
+  "manifest_hash": "0000000000000000000000000000000000000000000000000000000000000000",
+  "artifact_filename": "replace-with-model.joblib",
+  "evaluation_report_filename": "replace-with-experiment.report.json",
+  "subjects": [
+    "NVDA",
+    "MSFT"
+  ],
+  "horizon_sessions": 20,
+  "data_provider": {
+    "kind": "yfinance_adjusted",
+    "provider_id": "yfinance:auto_adjust=true:point_in_time=false",
+    "lookback_sessions": 320
+  },
+  "market_benchmark": "QQQ",
+  "trailing_baseline_window": 20,
+  "ewma_halflife": 20.0,
+  "earnings_dates_by_subject": {}
+}

@@ -1,7 +1,7 @@
 # ML Implementation Status
 
 Companion to `docs/ML_IMPLEMENTATION_STRATEGY.md`, recording what is built,
-what is deliberately not built, and why. Updated 2026-07-31.
+what is deliberately not built, and why. Updated 2026-08-01.
 
 The next implementation sequence is defined in
 `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`.
@@ -23,6 +23,7 @@ The next implementation sequence is defined in
 | ML-LR-2 | Durable discovery/confirmation runner and CLI | `ml/experiments.py`, `scripts/run_ml_experiment.py` | None |
 | ML-LR-3 | Portfolio-volatility targets, evaluation completion, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py` | None |
 | ML-LR-4 | Earnings event identity, pre-event features, event-date experiment runner, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `ml/earnings_experiments.py`, `ml/experiments.py`, `scripts/run_filing_extraction.py` | None (research/context only) |
+| ML-LR-6 | Automated volatility shadow prediction, exact-calendar maturity, evidence epochs, monitoring/status CLI, durable operational failures, separate Windows scheduler | `ml/shadow.py`, `ml/shadow_runtime.py`, `scripts/run_ml_shadow.py`, `scripts/install_windows_ml_shadow_tasks.ps1`, ML epoch/run columns and tables in `assistant/storage.py` | Writes non-authoritative observations and operational alerts only |
 
 ML-LR-2 gives both supported tasks a reproducible runner. Verified against
 the milestone's own definition of done by invoking the real CLI twice: the
@@ -353,3 +354,55 @@ confirmation remains blocked while historical surprise/revision timestamps
 or event coverage are not authoritative -- the external-vendor dependency
 already recorded by ML-LR-1. The 30/8 software minimum remains only a fit
 refusal, never a promotion threshold.
+
+
+## ML-LR-6 notes
+
+ML-LR-6 is **software complete for the supervised volatility task**, which is
+the milestone's section 12.7 finish line. `scripts/run_ml_shadow.py` provides
+explicit `register`, `predict`, `mature`, `monitor`, `status`, and
+`close-epoch` commands. It verifies the manifest, evaluation report, and
+serialized model before scoring; requires the database registration to match
+that verified manifest; opens deterministic immutable-lineage epochs; and
+claims each schedule slot transactionally.
+
+Prediction input is sliced at the recorded `as_of_session` before feature
+construction, even when a fixture contains later rows. Each configured
+subject receives one immutable available or unavailable attempt. Available
+attempts carry the candidate output and both frozen trailing and EWMA
+baselines; missing/stale/non-finite inputs produce refusals. A crash that
+leaves a claimed run with some predictions resumes only the missing subjects,
+while a normal artifact/provider/schema failure closes the run as failed and
+records unavailable attempts plus a durable operational alert.
+
+Maturity recomputes the target session from the NYSE calendar, requires every
+close in the exact forward window, and attaches the realized-volatility label
+once. Missing target data remains underfill and raises an alert; it is never
+written as zero. Monitoring is scoped to one evidence epoch and stays
+read-only. The full fixture cycle creates no proposal, authorization, broker
+order, reservation, or allocation state.
+
+The separate Windows installer creates only ML prediction, maturity, and
+monitoring tasks. It uses `MultipleInstances IgnoreNew`, bounded execution,
+retries, caller-supplied Python/database/config/artifact paths, and defaults
+prediction to 16:30 Eastern. Weekday exchange holidays are a successful skip,
+not a false operational failure.
+
+Minimal setup, using a config shaped like
+`docs/ml_shadow_volatility_config.example.json`:
+
+```text
+python scripts/run_ml_shadow.py --database data/paper.db --config <config.json> --artifact-dir <artifact-dir> register
+python scripts/run_ml_shadow.py --database data/paper.db --config <config.json> --artifact-dir <artifact-dir> predict
+python scripts/run_ml_shadow.py --database data/paper.db --config <config.json> --artifact-dir <artifact-dir> mature
+python scripts/run_ml_shadow.py --database data/paper.db --config <config.json> --artifact-dir <artifact-dir> monitor --output artifacts/ml-shadow-monitoring.json
+```
+
+The built-in `yfinance_adjusted` provider remains explicitly
+`point_in_time_data=false`; its predictions are useful exploratory shadow
+evidence but can never satisfy the authoritative-data promotion gate. A
+vendor-backed provider with real availability history remains an external
+dependency, not something this runtime guesses around. Earnings and ranker
+shadow adapters are intentionally absent: ML-LR-6 requires one supervised
+task, and those tasks need their own reviewed online feature/label semantics
+rather than a generic adapter that merely looks reusable.

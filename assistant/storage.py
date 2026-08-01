@@ -991,6 +991,23 @@ class AssistantStore:
             "status": row["status"],
         }
 
+    def get_ml_model_registration(self, model_key: str) -> dict[str, Any] | None:
+        """Return one immutable shadow registration without changing status."""
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM ml_model_registrations WHERE model_key = ?",
+                (model_key,),
+            ).fetchone()
+        if row is None:
+            return None
+        return {
+            "model_key": row["model_key"],
+            "registered_at": row["registered_at"],
+            "manifest": json.loads(row["manifest_json"]),
+            "manifest_hash": row["manifest_hash"],
+            "status": row["status"],
+        }
+
     def open_ml_evidence_epoch(
         self,
         *,
@@ -1151,6 +1168,14 @@ class AssistantStore:
                 "SELECT * FROM ml_evidence_epochs WHERE model_key = ? AND task = ? "
                 "AND status = 'active' LIMIT 1",
                 (model_key, task),
+            ).fetchone()
+        return self._ml_epoch_row_to_dict(row) if row is not None else None
+
+    def get_ml_evidence_epoch(self, evidence_epoch: str) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM ml_evidence_epochs WHERE evidence_epoch = ?",
+                (evidence_epoch,),
             ).fetchone()
         return self._ml_epoch_row_to_dict(row) if row is not None else None
 
@@ -1431,20 +1456,27 @@ class AssistantStore:
         }
 
     def list_ml_shadow_runs(
-        self, *, schedule_key: str | None = None, limit: int = 1000
+        self,
+        *,
+        schedule_key: str | None = None,
+        evidence_epoch: str | None = None,
+        limit: int = 1000,
     ) -> list[dict[str, Any]]:
+        clauses: list[str] = []
+        params: list[Any] = []
+        if schedule_key is not None:
+            clauses.append("schedule_key = ?")
+            params.append(schedule_key)
+        if evidence_epoch is not None:
+            clauses.append("evidence_epoch = ?")
+            params.append(evidence_epoch)
+        query = "SELECT * FROM ml_shadow_runs"
+        if clauses:
+            query += " WHERE " + " AND ".join(clauses)
+        query += " ORDER BY scheduled_for ASC LIMIT ?"
+        params.append(limit)
         with self._connect() as connection:
-            if schedule_key is not None:
-                rows = connection.execute(
-                    "SELECT * FROM ml_shadow_runs WHERE schedule_key = ? "
-                    "ORDER BY scheduled_for ASC LIMIT ?",
-                    (schedule_key, limit),
-                ).fetchall()
-            else:
-                rows = connection.execute(
-                    "SELECT * FROM ml_shadow_runs ORDER BY scheduled_for ASC LIMIT ?",
-                    (limit,),
-                ).fetchall()
+            rows = connection.execute(query, tuple(params)).fetchall()
         return [self._ml_shadow_run_row_to_dict(row) for row in rows]
 
     def record_ml_prediction(self, prediction: dict[str, Any]) -> dict[str, Any]:
@@ -1717,9 +1749,10 @@ class AssistantStore:
         *,
         model_key: str | None = None,
         evidence_epoch: str | None = None,
+        shadow_run_id: str | None = None,
         limit: int = 10_000,
     ) -> list[dict[str, Any]]:
-        """List predictions, optionally scoped to ONE evidence epoch.
+        """List predictions, optionally scoped to a model, epoch, and/or run.
 
         Plan 12.2: "Do not pool across epochs." Any monitoring or scoring
         caller should pass `evidence_epoch`, because a track record spanning
@@ -1735,6 +1768,9 @@ class AssistantStore:
         if evidence_epoch is not None:
             clauses.append("evidence_epoch = ?")
             params.append(evidence_epoch)
+        if shadow_run_id is not None:
+            clauses.append("shadow_run_id = ?")
+            params.append(shadow_run_id)
         query = "SELECT * FROM ml_predictions"
         if clauses:
             query += " WHERE " + " AND ".join(clauses)

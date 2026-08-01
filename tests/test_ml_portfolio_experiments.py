@@ -16,6 +16,7 @@ from ml.portfolio_experiments import (
     PortfolioExperimentError,
     assess_portfolio_research_readiness,
     build_portfolio_target_series,
+    build_portfolio_target_series_from_snapshots,
     build_realized_account_target_series,
     group_position_snapshots_by_session,
     group_position_snapshots_with_refusals,
@@ -443,14 +444,38 @@ def test_a_skipped_session_still_yields_no_target_rather_than_a_hybrid():
         {**positions[bad][1], "captured_at": f"{bad}T21:30:00+00:00"}
     ]
     flat = [row for rows in positions.values() for row in rows]
-    grouped, refusals = group_position_snapshots_with_refusals(flat)
-
-    assert bad not in grouped
-    result = build_portfolio_target_series(
-        "paper", positions_by_session=grouped, cash_by_session=cash,
+    result = build_portfolio_target_series_from_snapshots(
+        "paper", snapshots=flat, cash_by_session=cash,
         close_by_ticker=close, forecast_cutoff_by_session=cutoffs, horizon_sessions=20,
     )
     assert all(t.as_of_session != bad for t in result.targets)
+    assert result.attempted_session_count == len(sessions)
+    assert any(
+        refusal["as_of_session"] == bad
+        and "cannot be proven complete" in refusal["reason"]
+        for refusal in result.refusals
+    )
+
+
+def test_combined_pipeline_preserves_grouping_refusals_in_readiness_counts():
+    sessions, close, positions, cash, cutoffs = _fixture(60)
+    bad = sessions[10]
+    positions[bad] = [positions[bad][0]] + [
+        {**positions[bad][1], "captured_at": f"{bad}T21:30:00+00:00"}
+    ]
+    result = build_portfolio_target_series_from_snapshots(
+        "paper",
+        snapshots=[row for rows in positions.values() for row in rows],
+        cash_by_session=cash,
+        close_by_ticker=close,
+        forecast_cutoff_by_session=cutoffs,
+        horizon_sessions=20,
+    )
+
+    readiness = assess_portfolio_research_readiness(result)
+    assert readiness["attempted_session_count"] == 60
+    assert readiness["refusal_count"] == len(result.refusals)
+    assert any(value["as_of_session"] == bad for value in result.refusals)
 
 
 def test_the_tolerant_grouper_matches_the_strict_one_when_nothing_is_ambiguous():

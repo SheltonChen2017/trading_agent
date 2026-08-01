@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 import os
+import re
 import sqlite3
 from contextlib import contextmanager
 from decimal import Decimal
@@ -46,6 +47,17 @@ _REQUIRED_LINEAGE_KEYS = frozenset(
         "configuration_hash",
         "code_commit",
         "schedule_version",
+    }
+)
+_LINEAGE_SHA256_KEYS = frozenset(
+    {"model_artifact_hash", "evaluation_report_hash", "configuration_hash"}
+)
+_COMMIT_HASH = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
+_EXECUTION_VALUE_KEYS = frozenset(
+    {
+        "side", "shares", "quantity", "order_type", "limit_price",
+        "stop_price", "approved", "execute", "authorization",
+        "target_weight", "trade_intent", "recommendation", "action",
     }
 )
 
@@ -99,6 +111,40 @@ def _require_sha256(value: Any, name: str) -> None:
         raise ValueError(f"{name} must be a lowercase 64-character sha256 digest") from exc
     if value != value.lower():
         raise ValueError(f"{name} must be a lowercase 64-character sha256 digest")
+
+
+def _validate_ml_lineage(lineage: Any) -> str:
+    """Validate and canonically serialize one evidence-epoch lineage."""
+    if not isinstance(lineage, dict) or not lineage:
+        raise ValueError("lineage must be a non-empty dictionary")
+    missing = sorted(_REQUIRED_LINEAGE_KEYS - set(lineage))
+    if missing:
+        raise ValueError(f"lineage is missing required key(s): {missing}")
+    for name in _REQUIRED_LINEAGE_KEYS:
+        value = lineage[name]
+        if not isinstance(value, str) or not value.strip():
+            raise ValueError(f"lineage.{name} must be a non-empty string")
+        if value != value.strip():
+            raise ValueError(f"lineage.{name} must not contain surrounding whitespace")
+    for name in _LINEAGE_SHA256_KEYS:
+        _require_sha256(lineage[name], f"lineage.{name}")
+    if _COMMIT_HASH.fullmatch(lineage["code_commit"]) is None:
+        raise ValueError("lineage.code_commit must be a lowercase 40- or 64-character git hash")
+    return _canonical_ml_json(lineage, "lineage")
+
+
+def _reject_execution_shaped_values(value: Any, *, path: str = "prediction.values") -> None:
+    """Recursively keep generic observation payloads free of trade fields."""
+    if isinstance(value, dict):
+        for key, item in value.items():
+            normalized = re.sub(r"[^a-zA-Z0-9]+", "_", str(key)).strip("_").lower()
+            tokens = {token for token in normalized.split("_") if token}
+            if normalized in _EXECUTION_VALUE_KEYS or tokens & _EXECUTION_VALUE_KEYS:
+                raise ValueError(f"{path}.{key} is an execution-shaped field")
+            _reject_execution_shaped_values(item, path=f"{path}.{key}")
+    elif isinstance(value, (list, tuple)):
+        for index, item in enumerate(value):
+            _reject_execution_shaped_values(item, path=f"{path}[{index}]")
 
 
 def configured_db_path() -> Path:
@@ -974,16 +1020,11 @@ class AssistantStore:
         ):
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(f"{name} must be a non-empty string")
-        if not isinstance(lineage, dict) or not lineage:
-            raise ValueError("lineage must be a non-empty dictionary")
-        missing = sorted(_REQUIRED_LINEAGE_KEYS - set(lineage))
-        if missing:
-            raise ValueError(f"lineage is missing required key(s): {missing}")
-        lineage_json = _canonical_ml_json(lineage, "lineage")
+        lineage_json = _validate_ml_lineage(lineage)
         lineage_hash = _hash_payload(lineage_json)
         timestamp = _parse_aware_timestamp(
             started_at or datetime.now(timezone.utc).isoformat(), "started_at"
-        ).isoformat()
+        ).astimezone(timezone.utc).isoformat()
 
         with self._connect() as connection:
             existing = connection.execute(
@@ -995,6 +1036,12 @@ class AssistantStore:
                     raise ValueError(
                         f"evidence epoch {evidence_epoch!r} already exists with "
                         "different lineage; a lineage change requires a NEW epoch"
+                    )
+                if existing["model_key"] != model_key or existing["task"] != task:
+                    raise ValueError(
+                        f"evidence epoch {evidence_epoch!r} already belongs to "
+                        f"{existing['model_key']!r}/{existing['task']!r}; an epoch "
+                        "identity cannot be reused for another model or task"
                     )
                 return self._ml_epoch_row_to_dict(existing)
             active = connection.execute(
@@ -1029,10 +1076,12 @@ class AssistantStore:
     def close_ml_evidence_epoch(
         self, evidence_epoch: str, *, closed_at: str | None = None
     ) -> dict[str, Any]:
-        timestamp = _parse_aware_timestamp(
+        closed_timestamp = _parse_aware_timestamp(
             closed_at or datetime.now(timezone.utc).isoformat(), "closed_at"
-        ).isoformat()
+        ).astimezone(timezone.utc)
+        timestamp = closed_timestamp.isoformat()
         with self._connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
                 "SELECT * FROM ml_evidence_epochs WHERE evidence_epoch = ?",
                 (evidence_epoch,),
@@ -1041,8 +1090,35 @@ class AssistantStore:
                 raise ValueError(f"no evidence epoch {evidence_epoch!r}")
             if row["status"] != "active":
                 return self._ml_epoch_row_to_dict(row)
-            if timestamp < row["started_at"]:
+            started_timestamp = _parse_aware_timestamp(
+                row["started_at"], "started_at"
+            ).astimezone(timezone.utc)
+            if closed_timestamp < started_timestamp:
                 raise ValueError("closed_at must not precede started_at")
+            runs = connection.execute(
+                "SELECT run_id, status, completed_at FROM ml_shadow_runs "
+                "WHERE evidence_epoch = ?",
+                (evidence_epoch,),
+            ).fetchall()
+            claimed_run = next((run for run in runs if run["status"] == "claimed"), None)
+            if claimed_run is not None:
+                raise ValueError(
+                    f"evidence epoch {evidence_epoch!r} still has claimed shadow run "
+                    f"{claimed_run['run_id']!r}; complete or fail it before closing the epoch"
+                )
+            for run in runs:
+                if run["completed_at"] is None:
+                    raise ValueError(
+                        f"closed shadow run {run['run_id']!r} has no completion timestamp"
+                    )
+                run_completed = _parse_aware_timestamp(
+                    run["completed_at"], "shadow_run.completed_at"
+                ).astimezone(timezone.utc)
+                if closed_timestamp < run_completed:
+                    raise ValueError(
+                        f"closed_at must not precede shadow run {run['run_id']!r} "
+                        "completion"
+                    )
             connection.execute(
                 "UPDATE ml_evidence_epochs SET status = 'closed', closed_at = ? "
                 "WHERE evidence_epoch = ? AND status = 'active'",
@@ -1112,10 +1188,19 @@ class AssistantStore:
         ):
             if not isinstance(value, str) or not value.strip():
                 raise ValueError(f"{name} must be a non-empty string")
-        _parse_aware_timestamp(scheduled_for, "scheduled_for")
-        timestamp = _parse_aware_timestamp(
+        if _COMMIT_HASH.fullmatch(code_commit) is None:
+            raise ValueError("code_commit must be a lowercase 40- or 64-character git hash")
+        _require_sha256(configuration_hash, "configuration_hash")
+        scheduled_timestamp = _parse_aware_timestamp(
+            scheduled_for, "scheduled_for"
+        ).astimezone(timezone.utc)
+        scheduled_for = scheduled_timestamp.isoformat()
+        started_timestamp = _parse_aware_timestamp(
             started_at or datetime.now(timezone.utc).isoformat(), "started_at"
-        ).isoformat()
+        ).astimezone(timezone.utc)
+        if started_timestamp < scheduled_timestamp:
+            raise ValueError("started_at must not precede scheduled_for")
+        timestamp = started_timestamp.isoformat()
         run_id = "mlrun-" + _hash_payload(
             _canonical_ml_json(
                 {"schedule_key": schedule_key, "scheduled_for": scheduled_for},
@@ -1124,8 +1209,37 @@ class AssistantStore:
         )[:24]
 
         with self._connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            # An exact retry remains idempotent even after its epoch closes.
+            # It cannot add or alter evidence, so epoch status is relevant
+            # only when claiming a genuinely new slot.
+            row = connection.execute(
+                "SELECT * FROM ml_shadow_runs WHERE schedule_key = ? AND scheduled_for = ?",
+                (schedule_key, scheduled_for),
+            ).fetchone()
+            if row is not None:
+                if row["configuration_hash"] != configuration_hash:
+                    raise ValueError(
+                        f"scheduled slot {schedule_key!r}@{scheduled_for!r} already ran with "
+                        "a different configuration_hash; a changed configuration is a "
+                        "different experiment and requires a new schedule or epoch"
+                    )
+                if row["code_commit"] != code_commit:
+                    raise ValueError(
+                        f"scheduled slot {schedule_key!r}@{scheduled_for!r} already ran "
+                        "with a different code_commit"
+                    )
+                if row["evidence_epoch"] != evidence_epoch:
+                    raise ValueError(
+                        f"scheduled slot {schedule_key!r}@{scheduled_for!r} belongs to epoch "
+                        f"{row['evidence_epoch']!r}, not {evidence_epoch!r}"
+                    )
+                return self._ml_shadow_run_row_to_dict(row)
+
             epoch = connection.execute(
-                "SELECT status FROM ml_evidence_epochs WHERE evidence_epoch = ?",
+                "SELECT status, model_key, task, started_at, lineage_json "
+                "FROM ml_evidence_epochs "
+                "WHERE evidence_epoch = ?",
                 (evidence_epoch,),
             ).fetchone()
             if epoch is None:
@@ -1137,6 +1251,24 @@ class AssistantStore:
                 raise ValueError(
                     f"evidence epoch {evidence_epoch!r} is {epoch['status']}; a closed "
                     "epoch cannot accept new predictions"
+                )
+            epoch_lineage = json.loads(epoch["lineage_json"])
+            if epoch_lineage["configuration_hash"] != configuration_hash:
+                raise ValueError(
+                    "configuration_hash does not match the active evidence epoch; "
+                    "a configuration change requires a new epoch"
+                )
+            if epoch_lineage["code_commit"] != code_commit:
+                raise ValueError(
+                    "code_commit does not match the active evidence epoch; a code "
+                    "change requires a new epoch"
+                )
+            epoch_started = _parse_aware_timestamp(
+                epoch["started_at"], "evidence_epoch.started_at"
+            ).astimezone(timezone.utc)
+            if scheduled_timestamp < epoch_started:
+                raise ValueError(
+                    "scheduled_for must not precede the evidence epoch's started_at"
                 )
             connection.execute(
                 """
@@ -1161,6 +1293,11 @@ class AssistantStore:
                     f"scheduled slot {schedule_key!r}@{scheduled_for!r} already ran with "
                     "a different configuration_hash; a changed configuration is a "
                     "different experiment and requires a new schedule or epoch"
+                )
+            if row["code_commit"] != code_commit:
+                raise ValueError(
+                    f"scheduled slot {schedule_key!r}@{scheduled_for!r} already ran "
+                    "with a different code_commit"
                 )
             if row["evidence_epoch"] != evidence_epoch:
                 raise ValueError(
@@ -1188,13 +1325,23 @@ class AssistantStore:
         ):
             if isinstance(value, bool) or not isinstance(value, int) or value < 0:
                 raise ValueError(f"{name} must be a non-negative integer")
-        timestamp = _parse_aware_timestamp(
+        if unavailable_count > prediction_count:
+            raise ValueError("unavailable_count cannot exceed prediction_count")
+        if status == "completed" and error is not None:
+            raise ValueError("a completed shadow run cannot carry an operational error")
+        if status == "failed" and (not isinstance(error, dict) or not error):
+            raise ValueError("a failed shadow run must carry a non-empty durable error")
+        completed_timestamp = _parse_aware_timestamp(
             completed_at or datetime.now(timezone.utc).isoformat(), "completed_at"
-        ).isoformat()
+        ).astimezone(timezone.utc)
+        timestamp = completed_timestamp.isoformat()
         error_json = (
             _canonical_ml_json(error, "error") if error is not None else None
         )
         with self._connect() as connection:
+            # Lock writers before counting predictions so a late prediction
+            # cannot slip in between the count and the close transition.
+            connection.execute("BEGIN IMMEDIATE")
             row = connection.execute(
                 "SELECT * FROM ml_shadow_runs WHERE run_id = ?", (run_id,)
             ).fetchone()
@@ -1208,13 +1355,43 @@ class AssistantStore:
                     row["status"] == status
                     and row["prediction_count"] == prediction_count
                     and row["unavailable_count"] == unavailable_count
+                    and row["error_json"] == error_json
                 ):
                     return self._ml_shadow_run_row_to_dict(row)
                 raise ValueError(
                     f"shadow run {run_id!r} is already {row['status']} with different "
                     "counts; refusing to rewrite a closed run"
                 )
-            connection.execute(
+            if completed_timestamp < _parse_aware_timestamp(
+                row["started_at"], "started_at"
+            ).astimezone(timezone.utc):
+                raise ValueError("completed_at must not precede started_at")
+            predictions = connection.execute(
+                "SELECT available, generated_at FROM ml_predictions WHERE shadow_run_id = ?",
+                (run_id,),
+            ).fetchall()
+            actual_prediction_count = len(predictions)
+            actual_unavailable_count = sum(
+                1 for prediction in predictions if not prediction["available"]
+            )
+            if (
+                actual_prediction_count != prediction_count
+                or actual_unavailable_count != unavailable_count
+            ):
+                raise ValueError(
+                    f"shadow run counts do not match immutable predictions: "
+                    f"stored={actual_prediction_count}/{actual_unavailable_count} "
+                    f"reported={prediction_count}/{unavailable_count}"
+                )
+            for prediction in predictions:
+                generated_at = _parse_aware_timestamp(
+                    prediction["generated_at"], "prediction.generated_at"
+                ).astimezone(timezone.utc)
+                if completed_timestamp < generated_at:
+                    raise ValueError(
+                        "completed_at must not precede a prediction generated by the run"
+                    )
+            cursor = connection.execute(
                 "UPDATE ml_shadow_runs SET status = ?, completed_at = ?, "
                 "prediction_count = ?, unavailable_count = ?, error_json = ? "
                 "WHERE run_id = ? AND status = 'claimed'",
@@ -1226,6 +1403,15 @@ class AssistantStore:
             row = connection.execute(
                 "SELECT * FROM ml_shadow_runs WHERE run_id = ?", (run_id,)
             ).fetchone()
+            if cursor.rowcount != 1 and not (
+                row["status"] == status
+                and row["prediction_count"] == prediction_count
+                and row["unavailable_count"] == unavailable_count
+                and row["error_json"] == error_json
+            ):
+                raise ValueError(
+                    f"shadow run {run_id!r} was concurrently closed with a different result"
+                )
         return self._ml_shadow_run_row_to_dict(row)
 
     @staticmethod
@@ -1351,16 +1537,7 @@ class AssistantStore:
             if not isinstance(values, dict) or not values:
                 raise ValueError("an available prediction must contain non-empty values")
             _canonical_ml_json(values, "prediction.values")
-            forbidden = {
-                "side", "shares", "quantity", "order_type", "limit_price",
-                "stop_price", "approved", "execute", "authorization",
-                "target_weight", "trade_intent", "recommendation", "action",
-            }
-            normalized_value_keys = {
-                str(key).strip().lower().replace("-", "_") for key in values
-            }
-            if forbidden & normalized_value_keys:
-                raise ValueError("prediction.values contains execution-shaped fields")
+            _reject_execution_shaped_values(values)
             if prediction["evidence_status"] == "unavailable":
                 raise ValueError("an available prediction cannot have unavailable evidence")
         elif values not in (None, {}):
@@ -1383,6 +1560,10 @@ class AssistantStore:
         if available and refusal_reasons:
             raise ValueError("an available prediction cannot carry refusal reasons")
         with self._connect() as connection:
+            # Serialize prediction writes against run completion. Otherwise a
+            # completion could count rows and close the run while this method
+            # was still between its lineage checks and INSERT.
+            connection.execute("BEGIN IMMEDIATE")
             registration = connection.execute(
                 "SELECT status FROM ml_model_registrations WHERE model_key = ?",
                 (prediction["model_key"],),
@@ -1395,6 +1576,68 @@ class AssistantStore:
                 raise ValueError(
                     f"model_key {prediction['model_key']!r} is not active for shadow predictions"
                 )
+            existing = connection.execute(
+                "SELECT * FROM ml_predictions WHERE model_key = ? AND task = ? "
+                "AND subject_key = ? AND as_of_session = ? AND horizon_sessions = ?",
+                (
+                    prediction["model_key"], prediction["task"],
+                    prediction["subject_key"], prediction["as_of_session"], horizon,
+                ),
+            ).fetchone()
+            if existing is not None:
+                if existing["prediction_hash"] != prediction_hash:
+                    raise ValueError(
+                        "a different prediction already exists for this immutable "
+                        "model/task/subject/session/horizon identity"
+                    )
+                return self._ml_prediction_row_to_dict(existing)
+            if epoch is not None:
+                epoch_row = connection.execute(
+                    "SELECT model_key, task, status FROM ml_evidence_epochs "
+                    "WHERE evidence_epoch = ?",
+                    (epoch,),
+                ).fetchone()
+                if epoch_row is None:
+                    raise ValueError(f"evidence_epoch {epoch!r} does not exist")
+                if (
+                    epoch_row["model_key"] != prediction["model_key"]
+                    or epoch_row["task"] != prediction["task"]
+                ):
+                    raise ValueError(
+                        "prediction model_key/task does not match its evidence epoch"
+                    )
+                if epoch_row["status"] != "active":
+                    raise ValueError(
+                        f"evidence_epoch {epoch!r} is {epoch_row['status']}; no new "
+                        "prediction may be added"
+                    )
+                run_row = connection.execute(
+                    "SELECT evidence_epoch, scheduled_for, status FROM ml_shadow_runs "
+                    "WHERE run_id = ?",
+                    (shadow_run_id,),
+                ).fetchone()
+                if run_row is None:
+                    raise ValueError(f"shadow_run_id {shadow_run_id!r} does not exist")
+                if run_row["evidence_epoch"] != epoch:
+                    raise ValueError(
+                        "prediction shadow run belongs to a different evidence epoch"
+                    )
+                if run_row["status"] != "claimed":
+                    raise ValueError(
+                        f"shadow run {shadow_run_id!r} is {run_row['status']}; no new "
+                        "prediction may be added"
+                    )
+                scheduled_timestamp = _parse_aware_timestamp(
+                    run_row["scheduled_for"], "shadow_run.scheduled_for"
+                )
+                if scheduled_timestamp.astimezone(_EASTERN).date() != as_of:
+                    raise ValueError(
+                        "prediction as_of_session does not match its shadow run slot"
+                    )
+                if generated_at < scheduled_timestamp:
+                    raise ValueError(
+                        "prediction.generated_at cannot precede its scheduled shadow run"
+                    )
             connection.execute(
                 """
                 INSERT INTO ml_predictions(

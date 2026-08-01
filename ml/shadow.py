@@ -234,6 +234,10 @@ def decide_maturity(
 
     try:
         target_session = resolve_target_session(str(as_of), horizon)
+        canonical_available_at = _parse_instant(
+            resolve_target_availability(str(as_of), horizon),
+            "canonical_target_available_at",
+        )
     except ShadowScheduleError as exc:
         return MaturityDecision(
             prediction_id=prediction_id, ready=False,
@@ -241,6 +245,18 @@ def decide_maturity(
         )
 
     available_at = _parse_instant(recorded, "target_available_at")
+    if available_at < canonical_available_at:
+        return MaturityDecision(
+            prediction_id=prediction_id,
+            ready=False,
+            target_session=target_session,
+            target_available_at=recorded,
+            reason=(
+                f"recorded target availability {recorded} precedes the exchange-"
+                f"calendar target close {canonical_available_at.isoformat()}; refuse "
+                "early maturity"
+            ),
+        )
     if current < available_at:
         return MaturityDecision(
             prediction_id=prediction_id, ready=False,

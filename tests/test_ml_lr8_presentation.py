@@ -42,51 +42,84 @@ def _prediction(
     uncertainty: dict | None = None,
     values: dict | None = None,
 ) -> dict:
-    return {
-        "prediction_id": f"{subject}-{session}",
+    prediction_id = f"{subject}-{session}"
+    refusal_reasons = list(refusals)
+    payload = {
+        "prediction_id": prediction_id,
+        "model_key": "demo:1.0.0",
+        "task": "volatility_forecast",
+        "subject_key": subject,
+        "as_of_session": session,
+        "generated_at": generated_at,
+        "horizon_sessions": 20,
+        "available": available,
+        "evidence_epoch": epoch,
+        "shadow_run_id": "shadow-run-fixture",
+        "production_authoritative": False,
+        "refusal_reasons": refusal_reasons,
+        "model_id": "demo",
+        "model_version": "1.0.0",
+        "evidence_status": "exploratory" if available else "unavailable",
+        "values": (
+            values
+            if values is not None
+            else (
+                {
+                    "daily_volatility_pct": 0.95,
+                    "annualized_volatility_pct": 15.0,
+                    "trailing_baseline_daily_pct": 0.046,
+                    "ewma_baseline_daily_pct": 0.137,
+                }
+                if available
+                else {}
+            )
+        ),
+        "uncertainty": (
+            uncertainty
+            if uncertainty is not None
+            else (
+                {
+                    "status": "refer_to_frozen_evaluation_report",
+                    "evaluation_report_hash": "40d2affc",
+                }
+                if available
+                else {}
+            )
+        ),
+        "feature_freshness": {
+            "maximum_age_sessions": 0,
+            "missing_count": 0,
+            "stale_count": 0,
+        },
+    }
+    row = {
+        "prediction_id": prediction_id,
+        "model_key": "demo:1.0.0",
+        "task": "volatility_forecast",
         "subject_key": subject,
         "as_of_session": session,
         "generated_at": generated_at,
         "horizon_sessions": 20,
         "evidence_epoch": epoch,
         "available": available,
-        "refusal_reasons": list(refusals),
-        "prediction": {
-            "task": "volatility_forecast",
-            "model_id": "demo",
-            "model_version": "1.0.0",
-            "evidence_status": "exploratory",
-            "values": values
-            if values is not None
-            else {
-                "daily_volatility_pct": 0.95,
-                "annualized_volatility_pct": 15.0,
-                "trailing_baseline_daily_pct": 0.046,
-                "ewma_baseline_daily_pct": 0.137,
-            },
-            "uncertainty": uncertainty
-            if uncertainty is not None
-            else {
-                "status": "refer_to_frozen_evaluation_report",
-                "evaluation_report_hash": "40d2affc",
-            },
-            "feature_freshness": {
-                "maximum_age_sessions": 0,
-                "missing_count": 0,
-                "stale_count": 0,
-            },
-        },
+        "shadow_run_id": "shadow-run-fixture",
+        "refusal_reasons": refusal_reasons,
+        "prediction": payload,
+        "prediction_hash": hash_payload(payload),
     }
+    return row
 
 
 def _report(*, epoch: str = EPOCH, blockers: list[str] | None = None) -> dict:
+    resolved_blockers = blockers if blockers is not None else [
+        "coverage_evidence_insufficient",
+        "interval_coverage_insufficient",
+    ]
     payload = {
         "schema_version": "1.0",
         "evidence_epoch": epoch,
-        "promotion_blockers": blockers
-        if blockers is not None
-        else ["coverage_evidence_insufficient", "interval_coverage_insufficient"],
-        "conclusions_supported": False,
+        "promotion_blockers": resolved_blockers,
+        "conclusions_supported": not resolved_blockers,
         "production_authoritative": False,
     }
     payload["report_hash"] = hash_payload(payload)
@@ -131,6 +164,8 @@ def test_no_serialized_field_is_shaped_like_a_trade_instruction():
     assert_no_action_shaped_keys(result)
     with pytest.raises(PresentationError):
         assert_no_action_shaped_keys({"observations": [{"side": "sell"}]})
+    with pytest.raises(PresentationError):
+        assert_no_action_shaped_keys({"observations": [{"target-weight": 0.5}]})
 
 
 # --- Nothing is reconstructed --------------------------------------------
@@ -165,6 +200,55 @@ def test_uncalibrated_probability_is_never_presented_as_confidence():
     assert observation["threshold_probability"] == "unavailable"
     assert observation["calibration_status"] == "not_measured"
     assert "confidence" not in json.dumps(observation).lower()
+
+
+def test_numeric_probability_is_hidden_until_prospective_calibration_exists():
+    observation = build_observation(
+        _prediction(
+            uncertainty={
+                "probability_above_ceiling": 0.23,
+                "calibration_status": "uncalibrated",
+            }
+        ),
+        evidence_epoch=EPOCH,
+    ).to_dict()
+    assert observation["threshold_probability"] == "unavailable"
+    assert observation["calibration_status"] == "uncalibrated"
+
+
+@pytest.mark.parametrize(
+    "uncertainty",
+    [
+        {"prediction_interval_daily_pct": [float("nan"), 1.0]},
+        {"prediction_interval_daily_pct": [1.0, 0.5]},
+        {
+            "probability_above_ceiling": 1.1,
+            "calibration_status": "calibrated_prospectively",
+        },
+    ],
+)
+def test_invalid_prospective_uncertainty_is_rejected(uncertainty):
+    prediction = _prediction()
+    prediction["prediction"]["uncertainty"] = uncertainty
+    try:
+        prediction["prediction_hash"] = hash_payload(prediction["prediction"])
+    except ValueError:
+        # Non-finite JSON cannot have a valid content hash; the presentation
+        # must translate that integrity failure into PresentationError too.
+        pass
+    with pytest.raises(PresentationError):
+        build_observation(prediction, evidence_epoch=EPOCH)
+
+
+def test_nonfinite_or_negative_estimates_are_rejected():
+    for value in (float("nan"), float("inf"), -0.01):
+        prediction = _prediction()
+        prediction["prediction"]["values"]["daily_volatility_pct"] = value
+        # Simulate a self-consistent but semantically invalid persisted row.
+        if value == value and value not in (float("inf"), float("-inf")):
+            prediction["prediction_hash"] = hash_payload(prediction["prediction"])
+        with pytest.raises(PresentationError):
+            build_observation(prediction, evidence_epoch=EPOCH)
 
 
 def test_prospectively_recorded_interval_is_displayed_when_it_exists():
@@ -219,6 +303,27 @@ def test_unavailable_latest_attempt_never_falls_back_to_an_older_success():
         "latest_attempt_unavailable_for_at_least_one_subject"
         in result["promotion_blockers"]
     )
+
+
+def test_tampered_latest_prediction_is_rejected_without_falling_back():
+    older = _prediction(
+        session="2026-02-24", generated_at="2026-02-24T21:05:00+00:00"
+    )
+    latest = _prediction(session="2026-02-25")
+    latest["prediction"]["values"]["daily_volatility_pct"] = 999.0
+    result = build_presentation(
+        task="volatility_forecast",
+        model_key="demo:1.0.0",
+        evidence_epoch=EPOCH,
+        epoch_status="active",
+        predictions=[older, latest],
+        monitoring_report=_report(),
+    )
+    observation = result["observations"][0]
+    assert observation["available"] is False
+    assert observation["estimate_daily_volatility_pct"] is None
+    assert "latest prediction rejected" in observation["refusal_reasons"][0]
+    assert "latest_prediction_integrity_rejected" in result["promotion_blockers"]
 
 
 def test_refusal_reasons_and_feature_freshness_are_surfaced():
@@ -276,6 +381,28 @@ def test_tampered_monitoring_report_is_visibly_rejected():
     assert rejected["status"] == "rejected"
     assert "hash mismatch" in rejected["reason"]
     assert rejected["promotion_blockers"] == []
+
+
+def test_monitoring_report_rejects_malformed_empty_blocker_container():
+    report = _report()
+    report["promotion_blockers"] = ""
+    report["report_hash"] = hash_payload(
+        {key: value for key, value in report.items() if key != "report_hash"}
+    )
+    rejected = verify_monitoring_report(report, expected_epoch=EPOCH)
+    assert rejected["status"] == "rejected"
+    assert "not a list" in rejected["reason"]
+
+
+def test_monitoring_report_rejects_inconsistent_conclusion_flag():
+    report = _report(blockers=[])
+    report["conclusions_supported"] = False
+    report["report_hash"] = hash_payload(
+        {key: value for key, value in report.items() if key != "report_hash"}
+    )
+    rejected = verify_monitoring_report(report, expected_epoch=EPOCH)
+    assert rejected["status"] == "rejected"
+    assert "inconsistent" in rejected["reason"]
 
 
 def test_monitoring_report_from_a_different_epoch_is_rejected():
@@ -336,6 +463,9 @@ def test_every_configured_subject_is_displayed_including_ones_with_no_attempt():
     assert set(shown) == {"AAA", "BBB"}
     assert shown["BBB"]["available"] is False
     assert "no attempt recorded" in shown["BBB"]["refusal_reasons"][0]
+    assert set(shown["AAA"]) == set(shown["BBB"])
+    assert shown["BBB"]["prediction_interval"] == "unavailable"
+    assert shown["BBB"]["calibration_status"] == "not_measured"
 
 
 # --- CLI integration: read-only, and additive to the existing status -----
@@ -366,6 +496,34 @@ def test_status_command_is_read_only_and_extends_the_existing_summary(tmp_path):
     assert database.read_bytes() == before, "status must not write to the database"
 
 
+def test_status_reads_the_selected_epoch_without_a_silent_row_limit(
+    tmp_path, monkeypatch
+):
+    store, config, _config_path, _artifact_dir, _provider, manifest = _registered_store(
+        tmp_path
+    )
+    run_ml_shadow._ensure_epoch(
+        store,
+        config,
+        manifest,
+        "d" * 40,
+        started_at="2026-02-25T21:00:00+00:00",
+    )
+    original = store.list_ml_predictions
+    calls = []
+
+    def recording_list(**kwargs):
+        calls.append(kwargs)
+        return original(**kwargs)
+
+    monkeypatch.setattr(store, "list_ml_predictions", recording_list)
+    run_ml_shadow.command_status(store, config)
+    assert any(
+        call.get("evidence_epoch") is not None and call.get("limit") is None
+        for call in calls
+    )
+
+
 def test_status_task_flag_is_an_assertion_not_a_selector(tmp_path):
     store, config, *_rest = _registered_store(tmp_path)
     summary = run_ml_shadow.command_status(store, config, task="volatility_forecast")
@@ -378,6 +536,35 @@ def test_status_rejects_an_unconfigured_subject(tmp_path):
     store, config, *_rest = _registered_store(tmp_path)
     with pytest.raises(run_ml_shadow.ShadowCommandError):
         run_ml_shadow.command_status(store, config, subject="NOT_A_SUBJECT")
+
+
+def test_status_cli_failure_does_not_persist_an_alert_or_jsonl(
+    tmp_path, monkeypatch
+):
+    store, _config, config_path, artifact_dir, *_rest = _registered_store(tmp_path)
+    alerts_path = tmp_path / "status-alerts.jsonl"
+
+    def forbidden_alert(*_args, **_kwargs):
+        raise AssertionError("read-only status must never persist an alert")
+
+    monkeypatch.setattr(run_ml_shadow, "_record_alert", forbidden_alert)
+    result = run_ml_shadow.main(
+        [
+            "--database",
+            str(store.path),
+            "--config",
+            str(config_path),
+            "--artifact-dir",
+            str(artifact_dir),
+            "--alerts-jsonl",
+            str(alerts_path),
+            "status",
+            "--task",
+            "direction_ranker",
+        ]
+    )
+    assert result == 1
+    assert not alerts_path.exists()
 
 
 def test_status_marks_an_unreadable_monitoring_report_as_rejected(tmp_path):

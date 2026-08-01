@@ -1750,7 +1750,7 @@ class AssistantStore:
         model_key: str | None = None,
         evidence_epoch: str | None = None,
         shadow_run_id: str | None = None,
-        limit: int = 10_000,
+        limit: int | None = 10_000,
     ) -> list[dict[str, Any]]:
         """List predictions, optionally scoped to a model, epoch, and/or run.
 
@@ -1774,8 +1774,12 @@ class AssistantStore:
         query = "SELECT * FROM ml_predictions"
         if clauses:
             query += " WHERE " + " AND ".join(clauses)
-        query += " ORDER BY as_of_session ASC, subject_key ASC LIMIT ?"
-        params.append(limit)
+        query += " ORDER BY as_of_session ASC, subject_key ASC"
+        if limit is not None:
+            if isinstance(limit, bool) or not isinstance(limit, int) or limit < 1:
+                raise ValueError("limit must be a positive integer or None")
+            query += " LIMIT ?"
+            params.append(limit)
         with self._connect() as connection:
             rows = connection.execute(query, tuple(params)).fetchall()
         return [self._ml_prediction_row_to_dict(row) for row in rows]

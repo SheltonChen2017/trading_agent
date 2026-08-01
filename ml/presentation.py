@@ -33,6 +33,8 @@ keeps `assistant/` free of any `ml` import.
 from __future__ import annotations
 
 import dataclasses
+import math
+import re
 from typing import Any, Mapping, Sequence
 
 from ml.hashing import HashingError, hash_payload
@@ -68,7 +70,8 @@ def assert_no_action_shaped_keys(payload: Any, *, path: str = "observation") -> 
     """Reject any key that could be read as a trade instruction."""
     if isinstance(payload, Mapping):
         for key, value in payload.items():
-            if str(key).strip().lower() in _ACTION_SHAPED_KEYS:
+            normalized = re.sub(r"[^a-zA-Z0-9]+", "_", str(key)).strip("_").lower()
+            if normalized in _ACTION_SHAPED_KEYS:
                 raise PresentationError(
                     f"{path}.{key} is an action-shaped field; this surface displays "
                     "observations and must never read as an instruction"
@@ -146,11 +149,51 @@ def verify_monitoring_report(
             "promotion_blockers": [],
         }
 
-    blockers = report.get("promotion_blockers") or []
+    if report.get("schema_version") != "1.0":
+        return {
+            "status": "rejected",
+            "reason": "monitoring report schema_version is not supported",
+            "report_hash": recorded,
+            "evidence_epoch": epoch,
+            "promotion_blockers": [],
+        }
+    if report.get("production_authoritative") is not False:
+        return {
+            "status": "rejected",
+            "reason": "monitoring report must be production_authoritative=false",
+            "report_hash": recorded,
+            "evidence_epoch": epoch,
+            "promotion_blockers": [],
+        }
+
+    blockers = report.get("promotion_blockers")
     if not isinstance(blockers, (list, tuple)):
         return {
             "status": "rejected",
             "reason": "monitoring report promotion_blockers is not a list",
+            "report_hash": recorded,
+            "evidence_epoch": epoch,
+            "promotion_blockers": [],
+        }
+    if any(not isinstance(item, str) or not item.strip() for item in blockers):
+        return {
+            "status": "rejected",
+            "reason": "monitoring report promotion_blockers must be non-empty strings",
+            "report_hash": recorded,
+            "evidence_epoch": epoch,
+            "promotion_blockers": [],
+        }
+    conclusions_supported = report.get("conclusions_supported")
+    if (
+        not isinstance(conclusions_supported, bool)
+        or conclusions_supported != (len(blockers) == 0)
+    ):
+        return {
+            "status": "rejected",
+            "reason": (
+                "monitoring report conclusions_supported is inconsistent with "
+                "promotion_blockers"
+            ),
             "report_hash": recorded,
             "evidence_epoch": epoch,
             "promotion_blockers": [],
@@ -163,7 +206,7 @@ def verify_monitoring_report(
         # Surfaced verbatim. Reinterpreting, filtering, or softening a
         # blocker here would let the presentation layer overrule the
         # monitoring layer that computed it.
-        "promotion_blockers": [str(item) for item in blockers],
+        "promotion_blockers": list(blockers),
     }
 
 
@@ -201,9 +244,104 @@ def latest_attempt_by_subject(
     return latest
 
 
-def _value_or_unavailable(values: Mapping[str, Any], name: str) -> Any:
+def _finite_nonnegative_value(values: Mapping[str, Any], name: str) -> float | None:
     value = values.get(name)
-    return value if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+    if value is None:
+        return None
+    if (
+        isinstance(value, bool)
+        or not isinstance(value, (int, float))
+        or not math.isfinite(float(value))
+        or float(value) < 0
+    ):
+        raise PresentationError(f"prediction value {name!r} must be finite and non-negative")
+    return float(value)
+
+
+def _verify_prediction_row(prediction: Mapping[str, Any]) -> Mapping[str, Any]:
+    """Verify the immutable payload and its duplicated indexed identity.
+
+    SQLite index columns make status queries efficient, but the content hash
+    covers the serialized prediction.  Both representations must agree before
+    a number is shown to a person.
+    """
+    payload = prediction.get("prediction")
+    if not isinstance(payload, Mapping):
+        raise PresentationError("prediction row is missing its serialized payload")
+    recorded_hash = prediction.get("prediction_hash")
+    if not isinstance(recorded_hash, str):
+        raise PresentationError("prediction row is missing its immutable content hash")
+    try:
+        actual_hash = hash_payload(payload)
+    except HashingError as exc:
+        raise PresentationError(f"prediction payload is not canonically hashable: {exc}") from exc
+    if recorded_hash != actual_hash:
+        raise PresentationError(
+            f"prediction content hash mismatch: records {recorded_hash!r}, "
+            f"content hashes to {actual_hash!r}"
+        )
+
+    for name in (
+        "prediction_id",
+        "model_key",
+        "task",
+        "subject_key",
+        "as_of_session",
+        "generated_at",
+        "horizon_sessions",
+        "available",
+        "evidence_epoch",
+        "shadow_run_id",
+    ):
+        if payload.get(name) != prediction.get(name):
+            raise PresentationError(
+                f"prediction indexed field {name!r} does not match its hashed payload"
+            )
+    if list(payload.get("refusal_reasons") or ()) != list(
+        prediction.get("refusal_reasons") or ()
+    ):
+        raise PresentationError(
+            "prediction indexed refusal_reasons do not match its hashed payload"
+        )
+    if payload.get("production_authoritative") is not False:
+        raise PresentationError("prediction must be production_authoritative=false")
+    return payload
+
+
+def _unavailable_observation(
+    *,
+    task: str,
+    model_key: str,
+    evidence_epoch: str,
+    subject: str,
+    reason: str,
+) -> dict[str, Any]:
+    model_id, separator, model_version = model_key.rpartition(":")
+    if not separator:
+        model_id, model_version = model_key, ""
+    return {
+        "task": task,
+        "model_id": model_id,
+        "model_version": model_version,
+        "evidence_epoch": evidence_epoch,
+        "subject_key": subject,
+        "as_of_session": None,
+        "horizon_sessions": None,
+        "available": False,
+        "estimate_daily_volatility_pct": None,
+        "estimate_annualized_volatility_pct": None,
+        "prediction_interval": UNAVAILABLE,
+        "prediction_interval_reason": "no verified prospective prediction is available",
+        "threshold_probability": UNAVAILABLE,
+        "calibration_status": NOT_MEASURED,
+        "trailing_baseline_daily_pct": None,
+        "ewma_baseline_daily_pct": None,
+        "feature_freshness": {},
+        "refusal_reasons": [reason],
+        "evidence_status": UNAVAILABLE,
+        "production_authoritative": False,
+        "label": EXPERIMENTAL_LABEL,
+    }
 
 
 @dataclasses.dataclass(frozen=True)
@@ -269,9 +407,7 @@ def build_observation(
     prediction: Mapping[str, Any], *, evidence_epoch: str
 ) -> ModelObservation:
     """Present one stored attempt without inventing anything it lacks."""
-    payload = prediction.get("prediction")
-    if not isinstance(payload, Mapping):
-        raise PresentationError("prediction row is missing its serialized payload")
+    payload = _verify_prediction_row(prediction)
     if prediction.get("evidence_epoch") != evidence_epoch:
         raise PresentationError(
             "refusing to present a prediction from a different evidence epoch"
@@ -291,7 +427,19 @@ def build_observation(
     # estimate.
     interval = uncertainty.get("prediction_interval_daily_pct")
     if available and isinstance(interval, (list, tuple)) and len(interval) == 2:
-        interval_text = f"[{float(interval[0]):.6f}, {float(interval[1]):.6f}]"
+        if any(
+            isinstance(item, bool)
+            or not isinstance(item, (int, float))
+            or not math.isfinite(float(item))
+            for item in interval
+        ):
+            raise PresentationError("prediction interval bounds must be finite numbers")
+        lower, upper = float(interval[0]), float(interval[1])
+        if lower < 0 or upper < lower:
+            raise PresentationError(
+                "prediction interval must be non-negative and ordered lower-to-upper"
+            )
+        interval_text = f"[{lower:.6f}, {upper:.6f}]"
         interval_reason = "recorded prospectively by the model"
     else:
         interval_text = UNAVAILABLE
@@ -301,12 +449,27 @@ def build_observation(
         )
 
     probability = uncertainty.get("probability_above_ceiling")
-    if available and isinstance(probability, (int, float)) and not isinstance(probability, bool):
+    calibration_value = uncertainty.get("calibration_status")
+    calibration = (
+        calibration_value
+        if isinstance(calibration_value, str) and calibration_value.strip()
+        else NOT_MEASURED
+    )
+    if probability is not None and (
+        isinstance(probability, bool)
+        or not isinstance(probability, (int, float))
+        or not math.isfinite(float(probability))
+        or not 0 <= float(probability) <= 1
+    ):
+        raise PresentationError("threshold probability must be a finite value in [0, 1]")
+    if (
+        available
+        and probability is not None
+        and calibration == "calibrated_prospectively"
+    ):
         probability_text = f"{float(probability):.6f}"
-        calibration = str(uncertainty.get("calibration_status", NOT_MEASURED))
     else:
         probability_text = UNAVAILABLE
-        calibration = NOT_MEASURED
 
     return ModelObservation(
         task=str(payload.get("task", prediction.get("task", ""))),
@@ -318,10 +481,12 @@ def build_observation(
         horizon_sessions=int(prediction.get("horizon_sessions", 0) or 0),
         available=available,
         estimate_daily_volatility_pct=(
-            _value_or_unavailable(values, "daily_volatility_pct") if available else None
+            _finite_nonnegative_value(values, "daily_volatility_pct")
+            if available
+            else None
         ),
         estimate_annualized_volatility_pct=(
-            _value_or_unavailable(values, "annualized_volatility_pct")
+            _finite_nonnegative_value(values, "annualized_volatility_pct")
             if available
             else None
         ),
@@ -330,12 +495,12 @@ def build_observation(
         threshold_probability=probability_text,
         calibration_status=calibration,
         trailing_baseline_daily_pct=(
-            _value_or_unavailable(values, "trailing_baseline_daily_pct")
+            _finite_nonnegative_value(values, "trailing_baseline_daily_pct")
             if available
             else None
         ),
         ewma_baseline_daily_pct=(
-            _value_or_unavailable(values, "ewma_baseline_daily_pct")
+            _finite_nonnegative_value(values, "ewma_baseline_daily_pct")
             if available
             else None
         ),
@@ -406,19 +571,30 @@ def build_presentation(
         row = latest.get(subject)
         if row is None:
             observations.append(
-                {
-                    "subject_key": subject,
-                    "available": False,
-                    "refusal_reasons": ["no attempt recorded in this evidence epoch"],
-                    "evidence_epoch": evidence_epoch,
-                    "production_authoritative": False,
-                    "label": EXPERIMENTAL_LABEL,
-                }
+                _unavailable_observation(
+                    task=task,
+                    model_key=model_key,
+                    evidence_epoch=evidence_epoch,
+                    subject=subject,
+                    reason="no attempt recorded in this evidence epoch",
+                )
             )
             continue
-        observations.append(
-            build_observation(row, evidence_epoch=evidence_epoch).to_dict()
-        )
+        try:
+            observations.append(
+                build_observation(row, evidence_epoch=evidence_epoch).to_dict()
+            )
+        except PresentationError as exc:
+            observations.append(
+                _unavailable_observation(
+                    task=task,
+                    model_key=model_key,
+                    evidence_epoch=evidence_epoch,
+                    subject=subject,
+                    reason=f"latest prediction rejected: {exc}",
+                )
+            )
+            blockers.append("latest_prediction_integrity_rejected")
 
     if any(not item.get("available") for item in observations):
         blockers.append("latest_attempt_unavailable_for_at_least_one_subject")
@@ -429,8 +605,18 @@ def build_presentation(
     # visible until a model version actually changes that.
     if any(item.get("prediction_interval") == UNAVAILABLE for item in observations):
         blockers.append("prospective_prediction_interval_unavailable")
-    if any(item.get("calibration_status") == NOT_MEASURED for item in observations):
+    if any(
+        item.get("threshold_probability") == UNAVAILABLE
+        or item.get("calibration_status") != "calibrated_prospectively"
+        for item in observations
+    ):
         blockers.append("threshold_probability_calibration_not_measured")
+    if any(
+        item.get("trailing_baseline_daily_pct") is None
+        or item.get("ewma_baseline_daily_pct") is None
+        for item in observations
+    ):
+        blockers.append("frozen_baseline_unavailable")
 
     payload = {
         "presentation_available": True,

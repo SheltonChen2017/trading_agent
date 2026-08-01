@@ -866,6 +866,20 @@ def command_status(
     epoch_record = next(
         (epoch for epoch in epochs if epoch["evidence_epoch"] == selected_epoch), None
     )
+    # The general inventory above retains the command's historical 10,000-row
+    # bound.  Presentation cannot use a bounded oldest-first result, however:
+    # after enough shadow sessions it would silently omit the newest attempt
+    # and display a stale prediction.  Read the explicitly selected epoch in
+    # full; this is one local, single-user evidence stream.
+    presentation_predictions = (
+        store.list_ml_predictions(
+            model_key=config.model_key,
+            evidence_epoch=selected_epoch,
+            limit=None,
+        )
+        if epoch_record is not None
+        else []
+    )
     report_payload, report_error = _load_monitoring_report(monitoring_report)
     try:
         if evidence_epoch is not None and epoch_record is None:
@@ -886,7 +900,7 @@ def command_status(
                 model_key=config.model_key,
                 evidence_epoch=selected_epoch,
                 epoch_status=epoch_record["status"] if epoch_record else None,
-                predictions=predictions,
+                predictions=presentation_predictions,
                 monitoring_report=report_payload,
                 subjects=[subject] if subject else list(config.subjects),
             )
@@ -1095,50 +1109,57 @@ def main(argv: list[str] | None = None) -> int:
     except (Exception, KeyboardInterrupt) as exc:
         kind = _failure_kind(exc)
         alert_error = None
-        try:
-            alert = _record_alert(
-                store,
-                config,
-                kind=kind,
-                message=str(exc),
-                details={"command": args.command, "exception_type": type(exc).__name__},
-                severity="critical" if kind in {"artifact_mismatch", "database_lock_after_bounded_retries"} else "warning",
-                alerts_jsonl=args.alerts_jsonl,
-            )
-            alert_id = alert["alert_id"]
-        except Exception as persist_error:
+        if args.command == "status":
+            # Status is the dedicated read-only surface.  Even invalid CLI
+            # assertions or corrupt presentation inputs must not turn a read
+            # into an operational-alert write (or a JSONL fallback write).
             alert_id = None
-            alert_error = f"{type(persist_error).__name__}: {persist_error}"
-            if args.alerts_jsonl is not None:
-                try:
-                    append_alerts_jsonl(
-                        [
-                            {
-                                "category": "ml_shadow",
-                                "severity": (
-                                    "critical"
-                                    if kind
-                                    in {
-                                        "artifact_mismatch",
-                                        "database_lock_after_bounded_retries",
-                                    }
-                                    else "warning"
-                                ),
-                                "kind": kind,
-                                "message": str(exc),
-                                "command": args.command,
-                                "seen_at": datetime.now(timezone.utc).isoformat(),
-                                "database_alert_error": alert_error,
-                            }
-                        ],
-                        args.alerts_jsonl,
-                    )
-                    alert_error += "; durable JSONL fallback written"
-                except Exception as fallback_error:
-                    alert_error += (
-                        "; JSONL fallback failed: "
-                        f"{type(fallback_error).__name__}: {fallback_error}"
-                    )
+            alert_error = "status is read-only; alert persistence was skipped"
+        else:
+            try:
+                alert = _record_alert(
+                    store,
+                    config,
+                    kind=kind,
+                    message=str(exc),
+                    details={"command": args.command, "exception_type": type(exc).__name__},
+                    severity="critical" if kind in {"artifact_mismatch", "database_lock_after_bounded_retries"} else "warning",
+                    alerts_jsonl=args.alerts_jsonl,
+                )
+                alert_id = alert["alert_id"]
+            except Exception as persist_error:
+                alert_id = None
+                alert_error = f"{type(persist_error).__name__}: {persist_error}"
+                if args.alerts_jsonl is not None:
+                    try:
+                        append_alerts_jsonl(
+                            [
+                                {
+                                    "category": "ml_shadow",
+                                    "severity": (
+                                        "critical"
+                                        if kind
+                                        in {
+                                            "artifact_mismatch",
+                                            "database_lock_after_bounded_retries",
+                                        }
+                                        else "warning"
+                                    ),
+                                    "kind": kind,
+                                    "message": str(exc),
+                                    "command": args.command,
+                                    "seen_at": datetime.now(timezone.utc).isoformat(),
+                                    "database_alert_error": alert_error,
+                                }
+                            ],
+                            args.alerts_jsonl,
+                        )
+                        alert_error += "; durable JSONL fallback written"
+                    except Exception as fallback_error:
+                        alert_error += (
+                            "; JSONL fallback failed: "
+                            f"{type(fallback_error).__name__}: {fallback_error}"
+                        )
         print(
             json.dumps(
                 {

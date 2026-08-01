@@ -485,3 +485,49 @@ so those monitoring gates remain blocked until a future model version emits
 them prospectively. Yfinance remains non-point-in-time, real shadow duration
 has not elapsed, and no owner promotion authority exists. The dossier makes
 those facts visible; it cannot remove them.
+
+## ML-LR-8 notes
+
+`ml/presentation.py` builds the read-only observation surface, and
+`scripts/run_ml_shadow.py status` displays it. The status command was
+extended rather than duplicated: every operational key it previously
+returned is unchanged, and the observation is added under `presentation`.
+New options are `--task` (an assertion against the configured task, not a
+selector), `--evidence-epoch`, `--subject`, and `--monitoring-report`.
+
+```text
+python scripts/run_ml_shadow.py --database <db> --config <shadow.json> --artifact-dir <artifacts> status --subject <ticker> --monitoring-report <monitoring.json>
+```
+
+The command is read-only with respect to both ML evidence and every
+execution-related table. A presentation failure is caught and returned as an
+unavailable presentation rather than raised, because the CLI's failure path
+records an operational alert and that would be a write. `ml/presentation.py`
+imports no storage, broker, or execution module, and nothing under
+`assistant/` imports `ml`.
+
+Read-only visibility does not grant trading authority. Every serialized
+result carries `production_authoritative=false` and the label "Experimental
+model observation — not a recommendation and not used by the execution
+gate." No field is shaped like a trade instruction, and a serialization
+check rejects one if it is ever added.
+
+The display shows what the record contains and refuses to supply what it
+does not. Current volatility shadow predictions record an estimate and both
+frozen baselines but no prospective prediction interval and no calibrated
+probability — their `uncertainty` only references the frozen evaluation
+report. Those two fields are therefore shown as `unavailable` and
+`not_measured`, are never reconstructed from realized outcomes or read out
+of the evaluation report, and remain real promotion blockers rather than
+presentation defects. An uncalibrated probability is never labeled
+"confidence".
+
+Epochs are never pooled: without `--evidence-epoch` only the active epoch is
+displayed, and a closed epoch is never shown implicitly. If the latest
+attempt for a subject is unavailable, that refusal is displayed; the surface
+never falls back to an older available prediction. A supplied monitoring
+report has its own `report_hash` verified and its evidence epoch matched
+before it is trusted, a mismatch is displayed as rejected rather than
+dropped, and its `promotion_blockers` are surfaced verbatim. When no
+monitoring report exists, monitoring evidence is reported unavailable and an
+explicit blocker is added — absence is not a clean result.

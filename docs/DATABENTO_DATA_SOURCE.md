@@ -58,7 +58,9 @@ python scripts/run_databento_ingest.py download `
 The adapter estimates again immediately before the download and refuses the
 request when the estimate exceeds the cap. A successful request writes an
 immutable raw DBN file plus a hash-bound JSON manifest. Re-running the exact
-same timestamped snapshot cannot overwrite it.
+same timestamped snapshot cannot overwrite it. `artifacts/databento/` is
+Git-ignored because the snapshot contains licensed vendor data and is local
+operational state, not repository source.
 
 ## Point-in-time status
 

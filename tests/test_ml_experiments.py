@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+from ml.artifacts import load_model_artifact, load_model_manifest
 from ml.datasets import assemble_dataset_frames, build_dataset_manifest, save_dataset
 from ml.experiment_contracts import (
     ConfirmationSpec,
@@ -26,7 +27,7 @@ from ml.experiment_contracts import (
 from ml.experiments import ExperimentError, run_experiment
 from ml.labels import LabelRow
 
-_FIXED_TIME = datetime(2026, 7, 31, 12, 0, tzinfo=timezone.utc)
+_FIXED_TIME = datetime(2026, 7, 31, 0, 0, tzinfo=timezone.utc)
 _FEATURES = ["feature_a", "feature_b"]
 
 
@@ -65,12 +66,25 @@ def _spec(**overrides) -> ExperimentSpec:
         cost_tax_liquidity_assumptions={"transaction_cost_bps": 5.0},
         research_gate=_gate(),
         random_seed=0,
+        ordered_feature_names=tuple(_FEATURES),
+        target_column="label_value",
+        baseline_columns={
+            "trailing_realized": "trailing_vol",
+            "ewma": "ewma_vol",
+        },
     )
     kwargs.update(overrides)
     return ExperimentSpec(**kwargs)
 
 
-def _build_dataset(tmp_path: Path, *, n: int = 240, skill: bool = True, seed: int = 0):
+def _build_dataset(
+    tmp_path: Path,
+    *,
+    n: int = 240,
+    skill: bool = True,
+    seed: int = 0,
+    missing_every: int | None = None,
+):
     """A fixture dataset where forward volatility genuinely depends on the
     features when `skill` is True, and is pure noise when False."""
     rng = np.random.default_rng(seed)
@@ -110,6 +124,8 @@ def _build_dataset(tmp_path: Path, *, n: int = 240, skill: bool = True, seed: in
         "trailing_vol": trailing,
         "ewma_vol": ewma,
     })
+    if missing_every is not None:
+        features.loc[features.index % missing_every == 0, "feature_b"] = np.nan
     labels = tuple(
         LabelRow(
             ticker="AAA", as_of_session=session_text[i], label_version="v1",
@@ -128,9 +144,96 @@ def _build_dataset(tmp_path: Path, *, n: int = 240, skill: bool = True, seed: in
         universe_definition="fixture-v1", entry_timing="next_open",
         target_horizon_sessions=5, embargo_sessions=5, dropped_label_row_count=0,
         transaction_cost_bps=5.0, tax_assumptions="none", git_commit="0" * 40,
+        benchmark="QQQ",
     )
     save_dataset(features_df, labels_df, manifest, directory=tmp_path)
     return manifest
+
+
+def _build_ranker_dataset(tmp_path: Path, *, n_sessions: int = 120, seed: int = 0):
+    rng = np.random.default_rng(seed)
+    sessions = [str(value.date()) for value in pd.bdate_range("2024-01-01", periods=n_sessions)]
+    features_by_ticker = {}
+    labels_by_ticker = {}
+    for ticker_index in range(10):
+        ticker = f"T{ticker_index:02d}"
+        feature_a = ticker_index + rng.normal(0, 0.15, n_sessions)
+        feature_b = np.sin(ticker_index) + rng.normal(0, 0.10, n_sessions)
+        outcome = 3.0 * feature_a - 0.5 * feature_b + rng.normal(0, 0.03, n_sessions)
+        features_by_ticker[ticker] = pd.DataFrame(
+            {
+                "ticker": [ticker] * n_sessions,
+                "as_of_session": sessions,
+                "feature_a": feature_a,
+                "feature_b": feature_b,
+            }
+        )
+        labels_by_ticker[ticker] = tuple(
+            LabelRow(
+                ticker=ticker,
+                as_of_session=sessions[index],
+                label_version="rank-v1",
+                entry_session=sessions[index],
+                entry_price=100.0,
+                exit_session=sessions[min(index + 5, n_sessions - 1)],
+                exit_price=101.0,
+                value=float(outcome[index]),
+                components={"excess_return_pct": float(outcome[index])},
+            )
+            for index in range(n_sessions)
+        )
+    features_df, labels_df = assemble_dataset_frames(
+        features_by_ticker, labels_by_ticker
+    )
+    manifest = build_dataset_manifest(
+        features_df=features_df,
+        labels_df=labels_df,
+        dataset_id="ranker-ds",
+        created_at="2026-07-31T00:00:00+00:00",
+        task="cross_sectional_excess_return_ranking",
+        feature_set_version="rank-fs-v1",
+        label_version="rank-v1",
+        source_descriptions=("synthetic ranker fixture",),
+        point_in_time_data=False,
+        universe_definition="fixture-v1",
+        entry_timing="next_open",
+        target_horizon_sessions=5,
+        embargo_sessions=5,
+        dropped_label_row_count=0,
+        transaction_cost_bps=5.0,
+        tax_assumptions="none",
+        git_commit="0" * 40,
+        benchmark="QQQ",
+    )
+    save_dataset(features_df, labels_df, manifest, directory=tmp_path)
+    return manifest
+
+
+def _ranker_spec(**overrides) -> ExperimentSpec:
+    kwargs = dict(
+        experiment_id="ranker-discovery-v1",
+        task="cross_sectional_excess_return_ranking",
+        mode="discovery",
+        created_at="2026-07-31T00:00:00+00:00",
+        primary_outcome="out-of-fold date-level Spearman IC",
+        candidate_models=("elastic_net",),
+        frozen_baselines=("no_skill",),
+        feature_set_version="rank-fs-v1",
+        label_version="rank-v1",
+        benchmark="QQQ",
+        horizon_sessions=5,
+        universe_definition="fixture-v1",
+        research_look_dimensions={"models": ["elastic_net"], "horizons": ["5"]},
+        split_configuration={"n_splits": 2, "embargo_sessions": 5},
+        cost_tax_liquidity_assumptions={"transaction_cost_bps": 5.0},
+        research_gate=_gate(),
+        random_seed=0,
+        ordered_feature_names=tuple(_FEATURES),
+        target_column="label_value",
+        baseline_columns={},
+    )
+    kwargs.update(overrides)
+    return ExperimentSpec(**kwargs)
 
 
 def _run(tmp_path: Path, spec: ExperimentSpec, **overrides):
@@ -210,7 +313,12 @@ def test_the_run_manifest_records_every_output_hash(tmp_path):
     assert payload["report_hash"] == record.report_hash
     assert payload["dataset_hash"] == record.dataset_hash
     assert payload["production_authoritative"] is False
-    assert set(payload["artifact_hashes"]) == set(record.artifact_hashes)
+    assert set(payload["artifact_hashes"]) == set(record.artifact_hashes) == {
+        "ridge_log_vol.artifact",
+        "ridge_log_vol.manifest",
+        "hist_gradient_boosting.artifact",
+        "hist_gradient_boosting.manifest",
+    }
 
 
 def test_the_frozen_spec_is_persisted_beside_the_report(tmp_path):
@@ -219,6 +327,36 @@ def test_the_frozen_spec_is_persisted_beside_the_report(tmp_path):
     _run(tmp_path, spec)
     persisted = json.loads((tmp_path / "out" / "vol-discovery-v1.spec.json").read_text())
     assert ExperimentSpec.from_dict(persisted).spec_hash == spec.spec_hash
+
+
+def test_model_artifacts_have_verified_manifests_and_training_transforms(tmp_path):
+    _build_dataset(tmp_path)
+    record = _run(tmp_path, _spec())
+    directory = tmp_path / "out"
+    manifest = load_model_manifest(
+        directory=directory,
+        filename="vol-discovery-v1.ridge_log_vol.manifest.json",
+        model_id="vol-discovery-v1.ridge_log_vol",
+        model_version=_spec().spec_hash,
+        expected_manifest_hash=record.artifact_hashes["ridge_log_vol.manifest"],
+    )
+    assert manifest.evaluation_report_hash == record.report_hash
+    bundle = load_model_artifact(
+        manifest,
+        directory=directory,
+        filename="vol-discovery-v1.ridge_log_vol.joblib",
+    )
+    assert tuple(bundle["ordered_feature_names"]) == tuple(_FEATURES)
+    assert set(bundle["standardizer"]["means"]) == set(_FEATURES)
+
+
+def test_a_corrupted_model_artifact_refuses_an_exact_retry(tmp_path):
+    _build_dataset(tmp_path)
+    _run(tmp_path, _spec())
+    artifact = tmp_path / "out" / "vol-discovery-v1.ridge_log_vol.joblib"
+    artifact.write_bytes(b"tampered")
+    with pytest.raises(ValueError, match="refusing to overwrite immutable artifact"):
+        _run(tmp_path, _spec())
 
 
 # --- spec/dataset agreement -------------------------------------------------
@@ -232,6 +370,7 @@ def test_the_frozen_spec_is_persisted_beside_the_report(tmp_path):
         ({"label_version": "v9"}, "label_version"),
         ({"horizon_sessions": 20}, "horizon_sessions"),
         ({"universe_definition": "other"}, "universe_definition"),
+        ({"benchmark": "SPY"}, "benchmark"),
     ],
 )
 def test_a_spec_that_does_not_describe_the_dataset_is_refused(tmp_path, overrides, expected):
@@ -275,6 +414,64 @@ def test_an_unsupported_task_is_refused(tmp_path):
     object.__setattr__(spec, "task", "not_a_task")
     with pytest.raises(ExperimentError, match="unsupported task"):
         _run(tmp_path, spec)
+
+
+def test_runner_arguments_must_match_the_frozen_spec(tmp_path):
+    _build_dataset(tmp_path)
+    with pytest.raises(ExperimentError, match="ordered_feature_names exactly"):
+        _run(tmp_path, _spec(), feature_columns=list(reversed(_FEATURES)))
+    with pytest.raises(ExperimentError, match="target_column"):
+        _run(tmp_path, _spec(), target_column="label_components")
+    with pytest.raises(ExperimentError, match="baseline columns do not match"):
+        _run(tmp_path, _spec(), ewma_baseline_column="trailing_vol")
+
+
+def test_unknown_candidate_names_are_refused_instead_of_silently_skipped(tmp_path):
+    _build_dataset(tmp_path)
+    spec = _spec(
+        candidate_models=("invented_model",),
+        research_look_dimensions={"models": ["invented_model"], "horizons": ["5"]},
+    )
+    with pytest.raises(ExperimentError, match="unsupported volatility candidates"):
+        _run(tmp_path, spec)
+
+
+def test_dependence_block_length_must_cover_the_outcome_horizon(tmp_path):
+    _build_dataset(tmp_path)
+    with pytest.raises(ExperimentError, match="block_length must be at least"):
+        _run(tmp_path, _spec(research_gate=_gate(block_lengths=(1,))))
+
+
+def test_generated_at_cannot_be_an_unhashed_runner_input(tmp_path):
+    _build_dataset(tmp_path)
+    with pytest.raises(ExperimentError, match="frozen by spec.created_at"):
+        _run(
+            tmp_path,
+            _spec(),
+            generated_at=datetime(2026, 7, 31, 1, 0, tzinfo=timezone.utc),
+        )
+
+
+def test_path_shaped_experiment_ids_are_refused_before_writing(tmp_path):
+    _build_dataset(tmp_path)
+    with pytest.raises(ExperimentError, match="path-safe"):
+        _run(tmp_path, _spec(experiment_id="../escape"))
+    assert not (tmp_path / "escape.report.json").exists()
+
+
+def test_code_commit_must_be_a_real_git_hash_shape(tmp_path):
+    _build_dataset(tmp_path)
+    with pytest.raises(ExperimentError, match="git hash"):
+        run_experiment(
+            _spec(),
+            tmp_path,
+            tmp_path / "out",
+            "not-a-commit",
+            dataset_id="fixture-ds",
+            feature_columns=_FEATURES,
+            trailing_baseline_column="trailing_vol",
+            ewma_baseline_column="ewma_vol",
+        )
 
 
 # --- leakage discipline -----------------------------------------------------
@@ -352,6 +549,30 @@ def test_a_planted_effect_is_detectable(tmp_path):
     assert ridge["folds_won"] >= 1
 
 
+def test_ranker_path_produces_a_real_gate_result(tmp_path):
+    _build_ranker_dataset(tmp_path)
+    spec = _ranker_spec()
+    record = run_experiment(
+        spec,
+        tmp_path,
+        tmp_path / "ranker-out",
+        "c" * 40,
+        dataset_id="ranker-ds",
+        feature_columns=_FEATURES,
+        target_column="label_value",
+        generated_at=_FIXED_TIME,
+    )
+    report = json.loads(
+        (tmp_path / "ranker-out" / "ranker-discovery-v1.report.json").read_text()
+    )
+    elastic_net = report["aggregate_metrics"]["elastic_net"]
+    assert elastic_net["comparable_folds"] == 2
+    assert elastic_net["folds_won"] == 2
+    assert elastic_net["passes"] is True
+    assert elastic_net["block_significance"]["5"]["p_value"] is not None
+    assert record.verdict == "confirmation_run_requested"
+
+
 def test_non_point_in_time_data_always_blocks_promotion(tmp_path):
     _build_dataset(tmp_path)
     record = _run(tmp_path, _spec())
@@ -359,6 +580,24 @@ def test_non_point_in_time_data_always_blocks_promotion(tmp_path):
 
 
 def test_a_confirmation_run_on_exploratory_data_cannot_be_promising(tmp_path):
+    _build_dataset(tmp_path)
+    discovery = _spec()
+    parent = _run(tmp_path, discovery)
+    assert parent.verdict == "confirmation_run_requested"
+    confirmation = _spec(
+        experiment_id="vol-confirmation-v1",
+        mode="confirmation",
+        confirmation=ConfirmationSpec(
+            parent_experiment_id="vol-discovery-v1",
+            parent_spec_hash=discovery.spec_hash,
+            parent_report_hash=parent.report_hash,
+        ),
+    )
+    record = _run(tmp_path, confirmation)
+    assert record.verdict != "promising_unconfirmed"
+
+
+def test_confirmation_refuses_an_unverifiable_parent(tmp_path):
     _build_dataset(tmp_path)
     confirmation = _spec(
         experiment_id="vol-confirmation-v1",
@@ -369,8 +608,43 @@ def test_a_confirmation_run_on_exploratory_data_cannot_be_promising(tmp_path):
             parent_report_hash="b" * 64,
         ),
     )
-    record = _run(tmp_path, confirmation)
-    assert record.verdict != "promising_unconfirmed"
+    with pytest.raises(ExperimentError, match="could not read parent discovery spec"):
+        _run(tmp_path, confirmation)
+
+
+def test_confirmation_cannot_change_parent_features_or_gate(tmp_path):
+    _build_dataset(tmp_path)
+    discovery = _spec()
+    parent = _run(tmp_path, discovery)
+    confirmation = _spec(
+        experiment_id="vol-confirmation-v1",
+        mode="confirmation",
+        ordered_feature_names=tuple(reversed(_FEATURES)),
+        confirmation=ConfirmationSpec(
+            parent_experiment_id=discovery.experiment_id,
+            parent_spec_hash=discovery.spec_hash,
+            parent_report_hash=parent.report_hash,
+        ),
+    )
+    with pytest.raises(ExperimentError, match="changes behavior frozen"):
+        _run(tmp_path, confirmation, feature_columns=list(reversed(_FEATURES)))
+
+
+def test_confirmation_parent_report_hash_is_verified(tmp_path):
+    _build_dataset(tmp_path)
+    discovery = _spec()
+    _run(tmp_path, discovery)
+    confirmation = _spec(
+        experiment_id="vol-confirmation-v1",
+        mode="confirmation",
+        confirmation=ConfirmationSpec(
+            parent_experiment_id=discovery.experiment_id,
+            parent_spec_hash=discovery.spec_hash,
+            parent_report_hash="b" * 64,
+        ),
+    )
+    with pytest.raises(ExperimentError, match="report hash does not match"):
+        _run(tmp_path, confirmation)
 
 
 # --- no side effects --------------------------------------------------------
@@ -453,6 +727,20 @@ def test_cli_exits_non_zero_on_a_corrupted_dataset(tmp_path):
     assert payload["ok"] is False
 
 
+def test_cli_records_but_exits_non_zero_on_coverage_failure(tmp_path):
+    _build_dataset(tmp_path, missing_every=2)
+    spec = _spec(research_gate=_gate(minimum_coverage_fraction=0.75))
+
+    code, payload = _cli(tmp_path, _write_spec(tmp_path, spec))
+
+    assert code == 1
+    assert payload["ok"] is False
+    assert payload["verdict"] == "rejected"
+    assert payload["error"] == "experiment completed with coverage or fit failures"
+    assert "coverage_warnings_present" in payload["promotion_blockers"]
+    assert (tmp_path / "cli-out" / "vol-discovery-v1.report.json").exists()
+
+
 def test_cli_exits_non_zero_on_an_invalid_spec(tmp_path):
     _build_dataset(tmp_path)
     bad = tmp_path / "bad.json"
@@ -515,11 +803,18 @@ def test_cli_refuses_a_mutated_confirmation_spec(tmp_path):
 
 def test_cli_accepts_a_matching_confirmation_hash(tmp_path):
     _build_dataset(tmp_path)
+    discovery = _spec()
+    discovery_code, discovery_payload = _cli(
+        tmp_path, _write_spec(tmp_path, discovery)
+    )
+    assert discovery_code == 0
+    assert discovery_payload["verdict"] == "confirmation_run_requested"
     confirmation = _spec(
         experiment_id="vol-confirmation-v1", mode="confirmation",
         confirmation=ConfirmationSpec(
             parent_experiment_id="vol-discovery-v1",
-            parent_spec_hash=_spec().spec_hash, parent_report_hash="b" * 64,
+            parent_spec_hash=discovery.spec_hash,
+            parent_report_hash=discovery_payload["report_hash"],
         ),
     )
     code, payload = _cli(

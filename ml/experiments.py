@@ -25,8 +25,11 @@ writes into the caller-supplied output directory.
 from __future__ import annotations
 
 import dataclasses
+import importlib.metadata
 import json
-from datetime import datetime, timezone
+import re
+import warnings
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -37,7 +40,13 @@ from backtest.engine import (
     bonferroni_threshold,
     bootstrap_edge_significance_by_block,
 )
-from ml.artifacts import save_model_artifact, save_model_manifest
+from assistant.schemas import EvidenceStatus
+from ml.artifacts import (
+    load_model_artifact,
+    load_model_manifest,
+    save_model_artifact,
+    save_model_manifest,
+)
 from ml.contracts import ModelManifest
 from ml.cross_sectional import (
     block_bootstrap_ic_significance,
@@ -67,10 +76,39 @@ from ml.volatility import (
 from ml.evaluation import mean_absolute_error, qlike_loss
 
 SUPPORTED_TASKS = ("volatility_forecast", "cross_sectional_excess_return_ranking")
+_VOLATILITY_CANDIDATES = frozenset({"ridge_log_vol", "hist_gradient_boosting"})
+_VOLATILITY_BASELINES = frozenset({"trailing_realized", "ewma"})
+_RANKER_CANDIDATES = frozenset({"elastic_net", "hist_gradient_boosting"})
+_RANKER_BASELINES = frozenset({"no_skill"})
+_SAFE_EXPERIMENT_ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
+_COMMIT_PATTERN = re.compile(r"^(?:[0-9a-f]{40}|[0-9a-f]{64})$")
 
 
 class ExperimentError(ValueError):
     """An experiment cannot be run reproducibly as specified."""
+
+
+@dataclasses.dataclass(frozen=True)
+class _FittedModel:
+    estimator: Any
+    standardizer: Any
+    algorithm: str
+    hyperparameters: Mapping[str, Any]
+    training_start: str
+    training_end: str
+
+
+def _require_safe_output_name(filename: str) -> None:
+    if (
+        not isinstance(filename, str)
+        or not filename
+        or filename in {".", ".."}
+        or Path(filename).name != filename
+        or "/" in filename
+        or "\\" in filename
+        or "\x00" in filename
+    ):
+        raise ExperimentError("experiment output filename must be one plain file name")
 
 
 def _atomic_write(directory: Path, filename: str, data: bytes) -> Path:
@@ -80,6 +118,7 @@ def _atomic_write(directory: Path, filename: str, data: bytes) -> Path:
     import os
     import tempfile
 
+    _require_safe_output_name(filename)
     directory.mkdir(parents=True, exist_ok=True)
     destination = directory / filename
     if destination.exists():
@@ -144,9 +183,144 @@ def _verify_spec_against_dataset(spec: ExperimentSpec, manifest: Any) -> None:
             f"universe_definition: spec={spec.universe_definition!r} "
             f"dataset={manifest.universe_definition!r}"
         )
+    if spec.benchmark != getattr(manifest, "benchmark", None):
+        mismatches.append(
+            f"benchmark: spec={spec.benchmark!r} "
+            f"dataset={getattr(manifest, 'benchmark', None)!r}"
+        )
     if mismatches:
         raise ExperimentError(
             "spec does not match the dataset it was run against: " + "; ".join(mismatches)
+        )
+
+
+def _validate_task_configuration(
+    spec: ExperimentSpec,
+    *,
+    feature_columns: Sequence[str],
+    target_column: str,
+    trailing_baseline_column: str | None,
+    ewma_baseline_column: str | None,
+) -> tuple[str, ...]:
+    """Bind every behavior-changing runner argument to the hashed spec."""
+    features = tuple(feature_columns)
+    if not spec.ordered_feature_names:
+        raise ExperimentError(
+            "the experiment spec must freeze ordered_feature_names before it can run"
+        )
+    if features != spec.ordered_feature_names:
+        raise ExperimentError(
+            "feature_columns does not match spec.ordered_feature_names exactly "
+            f"(including order): runner={features!r} spec={spec.ordered_feature_names!r}"
+        )
+    if target_column != spec.target_column:
+        raise ExperimentError(
+            f"target_column {target_column!r} does not match frozen spec target "
+            f"{spec.target_column!r}"
+        )
+
+    candidates = set(spec.candidate_models)
+    baselines = set(spec.frozen_baselines)
+    if spec.task == "volatility_forecast":
+        unsupported = candidates - _VOLATILITY_CANDIDATES
+        if unsupported:
+            raise ExperimentError(f"unsupported volatility candidates: {sorted(unsupported)}")
+        if baselines != _VOLATILITY_BASELINES:
+            raise ExperimentError(
+                "volatility frozen_baselines must be exactly trailing_realized and ewma"
+            )
+        if not trailing_baseline_column or not ewma_baseline_column:
+            raise ExperimentError(
+                "a volatility experiment requires trailing and EWMA baseline columns"
+            )
+        expected = {
+            "trailing_realized": trailing_baseline_column,
+            "ewma": ewma_baseline_column,
+        }
+        if dict(spec.baseline_columns) != expected:
+            raise ExperimentError(
+                "runner baseline columns do not match spec.baseline_columns: "
+                f"runner={expected!r} spec={dict(spec.baseline_columns)!r}"
+            )
+    else:
+        unsupported = candidates - _RANKER_CANDIDATES
+        if unsupported:
+            raise ExperimentError(f"unsupported ranker candidates: {sorted(unsupported)}")
+        if baselines != _RANKER_BASELINES:
+            raise ExperimentError("ranker frozen_baselines must be exactly no_skill")
+        if spec.baseline_columns:
+            raise ExperimentError("ranker baseline_columns must be empty for no_skill")
+        if trailing_baseline_column is not None or ewma_baseline_column is not None:
+            raise ExperimentError("ranker runs do not accept volatility baseline columns")
+    return features
+
+
+def _read_json_object(path: Path, label: str) -> tuple[bytes, dict[str, Any]]:
+    try:
+        data = path.read_bytes()
+        payload = json.loads(data.decode("utf-8"))
+    except (OSError, UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise ExperimentError(f"could not read {label} at {path}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise ExperimentError(f"{label} at {path} must contain one JSON object")
+    return data, payload
+
+
+def _confirmation_behavior(spec: ExperimentSpec) -> dict[str, Any]:
+    payload = spec.to_dict()
+    for key in ("experiment_id", "mode", "created_at", "confirmation"):
+        payload.pop(key, None)
+    return payload
+
+
+def _verify_confirmation_parent(spec: ExperimentSpec, output_directory: Path) -> None:
+    if spec.mode != "confirmation":
+        return
+    parent = spec.confirmation
+    if parent is None:  # the contract already rejects this; keep the runner fail-closed
+        raise ExperimentError("confirmation spec is missing its parent")
+    prefix = parent.parent_experiment_id
+    spec_bytes, spec_payload = _read_json_object(
+        output_directory / f"{prefix}.spec.json", "parent discovery spec"
+    )
+    del spec_bytes  # identity is the contract's canonical spec hash, not file formatting
+    try:
+        parent_spec = ExperimentSpec.from_dict(spec_payload)
+    except ValueError as exc:
+        raise ExperimentError(f"parent discovery spec failed validation: {exc}") from exc
+    if parent_spec.experiment_id != prefix or parent_spec.mode != "discovery":
+        raise ExperimentError("confirmation parent must resolve to the named discovery spec")
+    if parent_spec.spec_hash != parent.parent_spec_hash:
+        raise ExperimentError(
+            "parent discovery spec hash does not match confirmation.parent_spec_hash"
+        )
+    if _confirmation_behavior(parent_spec) != _confirmation_behavior(spec):
+        raise ExperimentError(
+            "confirmation changes behavior frozen by its parent discovery spec"
+        )
+
+    report_bytes, report_payload = _read_json_object(
+        output_directory / f"{prefix}.report.json", "parent discovery report"
+    )
+    if hash_bytes(report_bytes) != parent.parent_report_hash:
+        raise ExperimentError(
+            "parent discovery report hash does not match confirmation.parent_report_hash"
+        )
+    _, run_payload = _read_json_object(
+        output_directory / f"{prefix}.run.json", "parent discovery run"
+    )
+    try:
+        parent_run = ExperimentRunRecord.from_dict(run_payload)
+    except ValueError as exc:
+        raise ExperimentError(f"parent discovery run failed validation: {exc}") from exc
+    if (
+        parent_run.identity.spec_hash != parent_spec.spec_hash
+        or parent_run.report_hash != parent.parent_report_hash
+        or parent_run.verdict != "confirmation_run_requested"
+        or report_payload.get("verdict") != "confirmation_run_requested"
+    ):
+        raise ExperimentError(
+            "parent discovery did not produce a verified confirmation request"
         )
 
 
@@ -166,6 +340,15 @@ def _fold_configuration(spec: ExperimentSpec) -> tuple[int, int]:
             "split_configuration.embargo_sessions must be at least horizon_sessions; "
             "a shorter embargo leaves overlapping label windows adjacent to validation"
         )
+    if spec.research_gate.minimum_folds_won > n_splits:
+        raise ExperimentError(
+            "research_gate.minimum_folds_won cannot exceed split_configuration.n_splits"
+        )
+    if any(length < spec.horizon_sessions for length in spec.research_gate.block_lengths):
+        raise ExperimentError(
+            "every research_gate.block_length must be at least horizon_sessions "
+            "to cover overlapping outcome windows"
+        )
     return n_splits, embargo
 
 
@@ -184,11 +367,10 @@ def _run_volatility_task(
     target_column: str,
     trailing_column: str,
     ewma_column: str,
-    output_directory: Path,
-) -> tuple[list[dict[str, Any]], dict[str, str], dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], dict[str, _FittedModel], dict[str, Any]]:
     """Fit frozen baselines first, then candidates, on identical rows."""
     fold_metrics: list[dict[str, Any]] = []
-    artifact_hashes: dict[str, str] = {}
+    fitted_models: dict[str, _FittedModel] = {}
     # Out-of-fold per-row QLIKE losses, retained by their independent date so
     # aggregate significance is computed across untouched validation rows
     # only (plan 8.2 step 7).
@@ -252,9 +434,15 @@ def _run_volatility_task(
             standardizer.training_start, standardizer.training_end
         ]
 
-        x_train = train_sample[list(feature_columns)].to_numpy(dtype=float)
+        transformed = apply_training_standardizer(joined, standardizer)
+        standardized_columns = [f"{name}__standardized" for name in feature_columns]
+        x_train = transformed.loc[train_sample.index, standardized_columns].to_numpy(
+            dtype=float
+        )
         y_train = train_sample[target_column].to_numpy(dtype=float)
-        x_validation = validation_sample[list(feature_columns)].to_numpy(dtype=float)
+        x_validation = transformed.loc[
+            validation_sample.index, standardized_columns
+        ].to_numpy(dtype=float)
 
         try:
             for candidate, fit in (
@@ -278,9 +466,17 @@ def _run_volatility_task(
                         })
                     )
                 if fold.fold_index == folds[-1].fold_index:
-                    artifact_hashes[candidate] = save_model_artifact(
-                        model, directory=output_directory,
-                        filename=f"{spec.experiment_id}.{candidate}.joblib",
+                    fitted_models[candidate] = _FittedModel(
+                        estimator=model,
+                        standardizer=standardizer,
+                        algorithm=type(model).__name__,
+                        hyperparameters=(
+                            {"alpha": 1.0}
+                            if candidate == "ridge_log_vol"
+                            else {"max_iter": 200, "early_stopping": False}
+                        ),
+                        training_start=standardizer.training_start,
+                        training_end=standardizer.training_end,
                     )
             metrics["fit_error"] = None
         except Exception as exc:  # a thin fold is recorded, never silently skipped
@@ -325,7 +521,7 @@ def _run_volatility_task(
         else:
             result["block_significance"] = {}
         aggregate[candidate] = result
-    return fold_metrics, artifact_hashes, aggregate
+    return fold_metrics, fitted_models, aggregate
 
 
 def _pointwise_qlike(actual: np.ndarray, predicted: np.ndarray) -> np.ndarray:
@@ -336,6 +532,127 @@ def _pointwise_qlike(actual: np.ndarray, predicted: np.ndarray) -> np.ndarray:
     return ratio - np.log(ratio) - 1.0
 
 
+def _dependency_versions() -> dict[str, str]:
+    return {
+        package: importlib.metadata.version(package)
+        for package in ("numpy", "pandas", "scikit-learn", "joblib")
+    }
+
+
+def _evidence_status(verdict: str) -> EvidenceStatus:
+    if verdict == "rejected":
+        return EvidenceStatus.REJECTED
+    if verdict == "promising_unconfirmed":
+        return EvidenceStatus.PROMISING_UNCONFIRMED
+    return EvidenceStatus.EXPLORATORY
+
+
+def _save_and_verify_models(
+    *,
+    spec: ExperimentSpec,
+    fitted_models: Mapping[str, _FittedModel],
+    output_directory: Path,
+    dataset_id: str,
+    dataset_hash: str,
+    report_hash: str,
+    created_at: str,
+    folds: Sequence[Any],
+    verdict: str,
+) -> dict[str, str]:
+    """Persist typed model bundles and prove their bytes reload under manifests."""
+    hashes: dict[str, str] = {}
+    validation_windows = tuple(
+        {"start": fold.validation_start, "end": fold.validation_end}
+        for fold in folds
+    )
+    for candidate, fitted in fitted_models.items():
+        artifact_filename = f"{spec.experiment_id}.{candidate}.joblib"
+        manifest_filename = f"{spec.experiment_id}.{candidate}.manifest.json"
+        bundle = {
+            "estimator": fitted.estimator,
+            "standardizer": {
+                "feature_names": tuple(fitted.standardizer.feature_names),
+                "means": dict(fitted.standardizer.means),
+                "scales": dict(fitted.standardizer.scales),
+                "training_row_count": fitted.standardizer.training_row_count,
+                "training_start": fitted.standardizer.training_start,
+                "training_end": fitted.standardizer.training_end,
+            },
+            "ordered_feature_names": spec.ordered_feature_names,
+        }
+        artifact_hash = save_model_artifact(
+            bundle,
+            directory=output_directory,
+            filename=artifact_filename,
+        )
+        manifest = ModelManifest(
+            model_id=f"{spec.experiment_id}.{candidate}",
+            model_version=spec.spec_hash,
+            task=spec.task,
+            created_at=created_at,
+            dataset_id=dataset_id,
+            dataset_hash=dataset_hash,
+            feature_set_version=spec.feature_set_version,
+            ordered_feature_names=spec.ordered_feature_names,
+            label_version=spec.label_version,
+            algorithm=fitted.algorithm,
+            hyperparameters={
+                **dict(fitted.hyperparameters),
+                "training_only_standardizer": True,
+            },
+            random_seed=spec.random_seed,
+            training_window={
+                "start": fitted.training_start,
+                "end": fitted.training_end,
+            },
+            validation_windows=validation_windows,
+            dependency_versions=_dependency_versions(),
+            artifact_hash=artifact_hash,
+            evaluation_report_hash=report_hash,
+            evidence_status=_evidence_status(verdict),
+        )
+        manifest_hash = save_model_manifest(
+            manifest,
+            directory=output_directory,
+            filename=manifest_filename,
+        )
+        reloaded_manifest = load_model_manifest(
+            directory=output_directory,
+            filename=manifest_filename,
+            model_id=manifest.model_id,
+            model_version=manifest.model_version,
+            expected_manifest_hash=manifest_hash,
+        )
+        with warnings.catch_warnings():
+            # joblib 1.5.3 mutates ndarray.shape while reconstructing arrays;
+            # NumPy 2.5 deprecates that internal implementation detail. It is
+            # unrelated to artifact integrity and otherwise emits hundreds of
+            # warnings per tree-based model verification.
+            warnings.filterwarnings(
+                "ignore",
+                message="Setting the shape on a NumPy array has been deprecated.*",
+                category=DeprecationWarning,
+            )
+            reloaded = load_model_artifact(
+                reloaded_manifest,
+                directory=output_directory,
+                filename=artifact_filename,
+            )
+        if (
+            not isinstance(reloaded, dict)
+            or tuple(reloaded.get("ordered_feature_names", ()))
+            != spec.ordered_feature_names
+            or "estimator" not in reloaded
+            or "standardizer" not in reloaded
+        ):
+            raise ExperimentError(
+                f"reloaded model bundle for {candidate!r} failed structural verification"
+            )
+        hashes[f"{candidate}.artifact"] = artifact_hash
+        hashes[f"{candidate}.manifest"] = manifest_hash
+    return hashes
+
+
 def _run_ranker_task(
     spec: ExperimentSpec,
     joined: pd.DataFrame,
@@ -343,10 +660,9 @@ def _run_ranker_task(
     *,
     feature_columns: Sequence[str],
     target_column: str,
-    output_directory: Path,
-) -> tuple[list[dict[str, Any]], dict[str, str], dict[str, Any]]:
+) -> tuple[list[dict[str, Any]], dict[str, _FittedModel], dict[str, Any]]:
     fold_metrics: list[dict[str, Any]] = []
-    artifact_hashes: dict[str, str] = {}
+    fitted_models: dict[str, _FittedModel] = {}
     out_of_fold: list[pd.DataFrame] = []
 
     for fold in folds:
@@ -356,6 +672,11 @@ def _run_ranker_task(
         train_sample = train[columns].apply(pd.to_numeric, errors="coerce").replace(
             [np.inf, -np.inf], np.nan
         ).dropna()
+        validation_sample = validation[columns].apply(
+            pd.to_numeric, errors="coerce"
+        ).replace([np.inf, -np.inf], np.nan).dropna()
+        validation_eval = validation.loc[validation_sample.index].copy()
+        validation_eval[target_column] = validation_sample[target_column]
 
         metrics: dict[str, Any] = {
             "fold_index": fold.fold_index,
@@ -365,14 +686,15 @@ def _run_ranker_task(
             "validation_end": fold.validation_end,
             "train_row_count": len(train_sample),
             "validation_row_count": len(validation),
+            "evaluated_validation_row_count": len(validation_eval),
             "purged_row_count": fold.purged_row_count,
             "embargoed_row_count": fold.embargoed_row_count,
         }
 
         # --- frozen baseline FIRST: a no-skill constant score -------------
-        validation["score_no_skill"] = 0.0
+        validation_eval["score_no_skill"] = 0.0
         baseline_fold = evaluate_ranker_fold(
-            validation, score_column="score_no_skill", outcome_column=target_column
+            validation_eval, score_column="score_no_skill", outcome_column=target_column
         )
         metrics["no_skill_mean_ic"] = baseline_fold["information_coefficient"]["mean_ic"]
 
@@ -381,13 +703,30 @@ def _run_ranker_task(
             fold_metrics.append(metrics)
             continue
 
-        x_train = train_sample[list(feature_columns)].to_numpy(dtype=float)
+        if validation_eval.empty:
+            metrics["fit_error"] = "no validation rows survive finite filtering"
+            fold_metrics.append(metrics)
+            continue
+
+        standardizer = fit_training_standardizer(
+            joined,
+            list(feature_columns),
+            train_row_indices=list(train_sample.index),
+        )
+        transformed = apply_training_standardizer(joined, standardizer)
+        standardized_columns = [f"{name}__standardized" for name in feature_columns]
+        metrics["standardizer_training_rows"] = standardizer.training_row_count
+        metrics["standardizer_training_window"] = [
+            standardizer.training_start,
+            standardizer.training_end,
+        ]
+        x_train = transformed.loc[train_sample.index, standardized_columns].to_numpy(
+            dtype=float
+        )
         y_train = train_sample[target_column].to_numpy(dtype=float)
-        validation_numeric = validation[list(feature_columns)].apply(
-            pd.to_numeric, errors="coerce"
-        ).replace([np.inf, -np.inf], np.nan)
-        usable = validation_numeric.notna().all(axis=1)
-        metrics["evaluated_validation_row_count"] = int(usable.sum())
+        x_validation = transformed.loc[
+            validation_eval.index, standardized_columns
+        ].to_numpy(dtype=float)
 
         try:
             for candidate, fit in (
@@ -397,15 +736,13 @@ def _run_ranker_task(
                 if candidate not in spec.candidate_models:
                     continue
                 model = fit(x_train, y_train, random_seed=spec.random_seed)
-                scores = pd.Series(np.nan, index=validation.index, dtype=float)
-                if usable.any():
-                    scores.loc[usable] = model.predict(
-                        validation_numeric.loc[usable].to_numpy(dtype=float)
-                    )
+                scores = pd.Series(
+                    model.predict(x_validation), index=validation_eval.index, dtype=float
+                )
                 column = f"score_{candidate}"
-                validation[column] = scores
+                validation_eval[column] = scores
                 fold_result = evaluate_ranker_fold(
-                    validation, score_column=column, outcome_column=target_column
+                    validation_eval, score_column=column, outcome_column=target_column
                 )
                 metrics[f"{candidate}_mean_ic"] = fold_result["information_coefficient"]["mean_ic"]
                 metrics[f"{candidate}_positive_date_fraction"] = fold_result[
@@ -415,9 +752,17 @@ def _run_ranker_task(
                     "mean_spread"
                 ]
                 if fold.fold_index == folds[-1].fold_index:
-                    artifact_hashes[candidate] = save_model_artifact(
-                        model, directory=output_directory,
-                        filename=f"{spec.experiment_id}.{candidate}.joblib",
+                    fitted_models[candidate] = _FittedModel(
+                        estimator=model,
+                        standardizer=standardizer,
+                        algorithm=type(model).__name__,
+                        hyperparameters=(
+                            {"alpha": 0.01, "l1_ratio": 0.5, "max_iter": 5000}
+                            if candidate == "elastic_net"
+                            else {"max_iter": 200, "early_stopping": False}
+                        ),
+                        training_start=standardizer.training_start,
+                        training_end=standardizer.training_end,
                     )
             metrics["fit_error"] = None
         except Exception as exc:
@@ -427,9 +772,9 @@ def _run_ranker_task(
         # independent date, so aggregate significance is computed across
         # untouched validation rows only -- never in-sample.
         keep = ["as_of_session", "ticker", target_column] + [
-            c for c in validation.columns if c.startswith("score_")
+            c for c in validation_eval.columns if c.startswith("score_")
         ]
-        out_of_fold.append(validation[keep].assign(fold_index=fold.fold_index))
+        out_of_fold.append(validation_eval[keep].assign(fold_index=fold.fold_index))
         fold_metrics.append(metrics)
 
     aggregate: dict[str, Any] = {}
@@ -449,12 +794,36 @@ def _run_ranker_task(
             )
             for block_length in spec.research_gate.block_lengths
         }
+        per_fold = []
+        folds_won = 0
+        comparable_folds = 0
+        for metrics in fold_metrics:
+            value = metrics.get(f"{candidate}_mean_ic")
+            comparable = value is not None and np.isfinite(float(value))
+            won = bool(comparable and float(value) > 0.0)
+            comparable_folds += int(comparable)
+            folds_won += int(won)
+            per_fold.append(
+                {
+                    "fold_index": metrics["fold_index"],
+                    "comparable": bool(comparable),
+                    "won": won,
+                }
+            )
         aggregate[candidate] = {
             "out_of_fold_date_count": int(len(ic)),
             "mean_ic": round(float(ic.mean()), 6) if len(ic) else None,
             "block_significance": {str(k): v for k, v in significance.items()},
+            "comparable_folds": comparable_folds,
+            "folds_won": folds_won,
+            "minimum_folds_required": spec.research_gate.minimum_folds_won,
+            "passes": (
+                comparable_folds >= spec.research_gate.minimum_folds_won
+                and folds_won >= spec.research_gate.minimum_folds_won
+            ),
+            "per_fold": per_fold,
         }
-    return fold_metrics, artifact_hashes, aggregate
+    return fold_metrics, fitted_models, aggregate
 
 
 def run_experiment(
@@ -482,9 +851,15 @@ def run_experiment(
         raise ExperimentError(
             f"unsupported task {spec.task!r}; supported: {SUPPORTED_TASKS}"
         )
-    if not isinstance(code_commit, str) or not code_commit.strip():
-        raise ExperimentError("code_commit is required for reproducibility")
+    if not isinstance(code_commit, str) or _COMMIT_PATTERN.fullmatch(code_commit) is None:
+        raise ExperimentError("code_commit must be a lowercase 40- or 64-character git hash")
+    if _SAFE_EXPERIMENT_ID.fullmatch(spec.experiment_id) is None:
+        raise ExperimentError(
+            "experiment_id must be 1-128 path-safe letters, numbers, periods, "
+            "underscores, or hyphens"
+        )
     output_directory = Path(output_directory)
+    _verify_confirmation_parent(spec, output_directory)
     # Experiment outputs are CONTENT-ADDRESSED, so wall-clock time is
     # deliberately excluded from them. Defaulting to datetime.now() made two
     # otherwise-identical runs produce different bytes, which broke plan
@@ -500,12 +875,26 @@ def run_experiment(
     # fabricated one, and it is already part of spec_hash. Actual execution
     # wall-clock is not research content -- the filesystem records it, and
     # a caller who needs it can pass generated_at explicitly.
-    started_at = generated_at or _parse_spec_timestamp(spec)
+    started_at = _parse_spec_timestamp(spec)
+    if generated_at is not None:
+        if generated_at.tzinfo is None or generated_at.utcoffset() is None:
+            raise ExperimentError("generated_at must be timezone-aware")
+        if generated_at != started_at:
+            raise ExperimentError(
+                "generated_at is frozen by spec.created_at and cannot vary independently"
+            )
 
     # 1. load and verify the dataset manifest and hashes
     features_df, labels_df, manifest = load_dataset(Path(dataset_directory), dataset_id)
     # 2. verify the spec matches the dataset
     _verify_spec_against_dataset(spec, manifest)
+    feature_columns = _validate_task_configuration(
+        spec,
+        feature_columns=feature_columns,
+        target_column=target_column,
+        trailing_baseline_column=trailing_baseline_column,
+        ewma_baseline_column=ewma_baseline_column,
+    )
 
     joined = join_for_evaluation(features_df, labels_df, label_version=spec.label_version)
     _require_columns(joined, feature_columns, "joined dataset")
@@ -529,17 +918,15 @@ def run_experiment(
         _require_columns(
             joined, [trailing_baseline_column, ewma_baseline_column], "joined dataset"
         )
-        fold_metrics, artifact_hashes, aggregate = _run_volatility_task(
+        fold_metrics, fitted_models, aggregate = _run_volatility_task(
             spec, joined, folds,
             feature_columns=feature_columns, target_column=target_column,
             trailing_column=trailing_baseline_column, ewma_column=ewma_baseline_column,
-            output_directory=output_directory,
         )
     else:
-        fold_metrics, artifact_hashes, aggregate = _run_ranker_task(
+        fold_metrics, fitted_models, aggregate = _run_ranker_task(
             spec, joined, folds,
             feature_columns=feature_columns, target_column=target_column,
-            output_directory=output_directory,
         )
 
     # 8. multiplicity-adjusted uncertainty
@@ -595,9 +982,24 @@ def run_experiment(
 
     report_payload = report.to_dict()
     report_bytes = canonical_json(report_payload).encode("utf-8")
+    report_hash = hash_bytes(report_bytes)
     _atomic_write(output_directory, f"{spec.experiment_id}.report.json", report_bytes)
     spec_bytes = canonical_json(spec.to_dict()).encode("utf-8")
     _atomic_write(output_directory, f"{spec.experiment_id}.spec.json", spec_bytes)
+
+    # 10. Artifacts carry their training-only transform and a ModelManifest,
+    # then are hash-verified and deserialized through the sanctioned loader.
+    artifact_hashes = _save_and_verify_models(
+        spec=spec,
+        fitted_models=fitted_models,
+        output_directory=output_directory,
+        dataset_id=dataset_id,
+        dataset_hash=manifest.dataset_hash,
+        report_hash=report_hash,
+        created_at=started_at.isoformat(),
+        folds=folds,
+        verdict=verdict,
+    )
 
     # Same determinism rule as started_at: the run manifest is content-
     # addressed, so an exact retry reproduces it byte for byte.
@@ -609,7 +1011,7 @@ def run_experiment(
         code_commit=code_commit,
         started_at=started_at.isoformat(),
         completed_at=completed_at.isoformat(),
-        report_hash=hash_bytes(report_bytes),
+        report_hash=report_hash,
         artifact_hashes=artifact_hashes,
         total_research_looks=total_looks,
         verdict=verdict,

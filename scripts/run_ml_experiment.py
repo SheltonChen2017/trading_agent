@@ -35,13 +35,23 @@ from ml.experiments import ExperimentError, run_experiment
 
 
 def _current_commit() -> str:
+    repository = Path(__file__).resolve().parent.parent
     result = subprocess.run(
         ["git", "rev-parse", "HEAD"],
-        cwd=Path(__file__).resolve().parent.parent,
+        cwd=repository,
         check=True,
         capture_output=True,
         text=True,
     )
+    clean = subprocess.run(
+        ["git", "diff", "--quiet", "HEAD", "--"],
+        cwd=repository,
+        check=False,
+    )
+    if clean.returncode != 0:
+        raise RuntimeError(
+            "tracked working-tree changes are not represented by the current commit"
+        )
     return result.stdout.strip()
 
 
@@ -124,7 +134,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         code_commit = args.code_commit or _current_commit()
-    except (subprocess.CalledProcessError, OSError) as exc:
+    except (subprocess.CalledProcessError, OSError, RuntimeError) as exc:
         print(json.dumps({"ok": False, "error": f"could not resolve code commit: {exc}"}))
         return 1
 
@@ -144,8 +154,9 @@ def main(argv: list[str] | None = None) -> int:
         print(json.dumps({"ok": False, "error": f"{type(exc).__name__}: {exc}"}))
         return 1
 
-    print(json.dumps({
-        "ok": True,
+    evidence_failure = "coverage_warnings_present" in record.promotion_blockers
+    summary = {
+        "ok": not evidence_failure,
         "experiment_id": spec.experiment_id,
         "mode": spec.mode,
         "spec_hash": spec.spec_hash,
@@ -156,8 +167,14 @@ def main(argv: list[str] | None = None) -> int:
         "promotion_blockers": list(record.promotion_blockers),
         "total_research_looks": record.total_research_looks,
         "artifact_hashes": dict(record.artifact_hashes),
-    }, indent=2, sort_keys=True))
-    return 0
+    }
+    if evidence_failure:
+        # The rejected report is still valuable immutable evidence, but plan
+        # 8.3 requires automation to receive a non-zero status when a fold
+        # failed to fit or validation coverage fell below the frozen gate.
+        summary["error"] = "experiment completed with coverage or fit failures"
+    print(json.dumps(summary, indent=2, sort_keys=True))
+    return 1 if evidence_failure else 0
 
 
 if __name__ == "__main__":

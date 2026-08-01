@@ -29,6 +29,14 @@ hashes. Outputs are content-addressed, so an exact retry is a no-op and a
 rerun that would change results is refused rather than silently
 overwriting.
 
+Every behavior-changing runner input is now frozen into `spec_hash`: ordered
+features, target column, and named baseline columns cannot be changed at the
+CLI. Confirmation resolves and hash-verifies the parent discovery spec,
+report, and run, requires that the parent actually requested confirmation,
+and rejects changes to the discovery behavior. Model bundles include the
+training-fold standardizer, carry a `ModelManifest`, and are reloaded through
+the hash-verifying artifact loader immediately after writing.
+
 The verdict is derived from the preregistered gate, never from inspection:
 fold wins alone are treated as necessary-but-insufficient, and a candidate
 must also clear the preregistered alpha (tightened by the Bonferroni
@@ -61,13 +69,11 @@ real historical availability timestamps and index-constituent history. Until
 one is configured, every dataset built from live data remains exploratory
 and promotion-blocked — which is the honest state, not a gap in the code.
 
-ML-LR-0 delivers **contracts only** — no runner, no CLI, no experiment has
-been executed through them. `ExperimentSpec` can fully describe the existing
-synthetic volatility and ranker experiments (the milestone's definition of
-done), and the research gate and confirmation parent are bound into
-`spec_hash`, so moving a preregistered threshold produces a different
-experiment identity rather than silently mutating one. The runner that would
-consume these specs is ML-LR-2.
+ML-LR-0 supplied the shared contracts now consumed by ML-LR-2. `ExperimentSpec`
+fully describes the synthetic volatility and ranker experiments, and the
+research gate, invocation columns, and confirmation parent are bound into
+`spec_hash`, so moving a threshold or changing a feature produces a different
+experiment identity rather than silently mutating one.
 
 Every typed prediction, risk, evaluation, extraction, and monitoring output
 carries `production_authoritative=False`, and no module

@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import contextlib
 import dataclasses
+import math
 import re
 from typing import Any, Mapping, Sequence
 
@@ -186,6 +187,13 @@ class ResearchGateSpec:
     block_lengths: tuple[int, ...]
     required_calibration_bins: int
     failure_slices: tuple[str, ...]
+    # Optional so existing specs stay valid, but part of the hashed gate when
+    # supplied: plan 9.4 requires calibration against a PREREGISTERED mandate
+    # ceiling, and a ceiling chosen after seeing which threshold made the
+    # model look good is not preregistered. Binding it here means moving it
+    # produces a different spec_hash.
+    mandate_ceiling_daily_pct: float | None = None
+    maximum_brier: float | None = None
 
     def __post_init__(self) -> None:
         with _as_experiment_error():
@@ -221,6 +229,32 @@ class ResearchGateSpec:
             or self.required_calibration_bins < 2
         ):
             raise ExperimentContractError("required_calibration_bins must be an integer >= 2")
+        if self.mandate_ceiling_daily_pct is not None and (
+            isinstance(self.mandate_ceiling_daily_pct, bool)
+            or not isinstance(self.mandate_ceiling_daily_pct, (int, float))
+            or not math.isfinite(float(self.mandate_ceiling_daily_pct))
+            or self.mandate_ceiling_daily_pct <= 0
+        ):
+            raise ExperimentContractError(
+                "mandate_ceiling_daily_pct must be a positive finite number when supplied"
+            )
+        if self.maximum_brier is not None and (
+            isinstance(self.maximum_brier, bool)
+            or not isinstance(self.maximum_brier, (int, float))
+            or not 0 < float(self.maximum_brier) <= 1
+        ):
+            raise ExperimentContractError(
+                "maximum_brier must be within (0, 1] when supplied"
+            )
+        if self.maximum_brier is not None and self.mandate_ceiling_daily_pct is None:
+            # A Brier bar with nothing to be calibrated against is a gate that
+            # can never be evaluated -- and would silently read as "no
+            # calibration requirement" rather than as the misconfiguration it
+            # is.
+            raise ExperimentContractError(
+                "maximum_brier requires mandate_ceiling_daily_pct; a calibration bar "
+                "with no declared ceiling can never be evaluated"
+            )
         object.__setattr__(
             self, "failure_slices", _unique_string_tuple(self.failure_slices, "failure_slices")
         )
@@ -233,6 +267,8 @@ class ResearchGateSpec:
             "block_lengths": list(self.block_lengths),
             "required_calibration_bins": self.required_calibration_bins,
             "failure_slices": list(self.failure_slices),
+            "mandate_ceiling_daily_pct": self.mandate_ceiling_daily_pct,
+            "maximum_brier": self.maximum_brier,
         }
 
     @classmethod

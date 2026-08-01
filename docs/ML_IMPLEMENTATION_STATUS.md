@@ -235,9 +235,25 @@ has three states, not two -- "not measured" and "measured and failed" are
 different situations, and collapsing them would let an unmeasured
 probability inherit the benefit of the doubt.
 
-**Still outstanding for ML-LR-3:** wiring these reports into
-`ml/experiments.py`'s volatility runner (they are currently standalone,
-tested functions), and a portfolio-target experiment runner. Portfolio
-research against real data also remains underfilled until enough daily
+All four report families are now wired into `ml/experiments.py`'s volatility
+runner and land in the immutable evaluation report: per-fold intervals,
+aggregate coverage, ceiling calibration, warning behavior, and performance
+slices. Threshold probabilities are derived from the same expanding
+out-of-fold residual history the intervals use, so a probability for fold k
+is informed only by folds < k.
+
+`ResearchGateSpec` gained `mandate_ceiling_daily_pct` and `maximum_brier`
+(both optional, so existing specs stay valid). They are part of `spec_hash`,
+which is what makes the ceiling genuinely *preregistered* — moving it
+produces a different experiment rather than silently re-grading the same
+one. Without a declared ceiling the runner reports `not_measured` rather
+than inventing a threshold from the observed distribution, which would be
+choosing the bar after seeing the results. `maximum_brier` without a ceiling
+is refused outright as a gate that could never be evaluated.
+
+**Still outstanding for ML-LR-3:** a portfolio-target experiment runner —
+`ml/portfolio_volatility.py` builds the targets but nothing yet drives a
+full portfolio experiment through `run_experiment()`. Portfolio research
+against real data also remains underfilled until enough daily
 position/equity snapshots accumulate; per plan 9.7 that is reported as
 unavailable rather than backfilled.

@@ -823,3 +823,86 @@ def test_cli_accepts_a_matching_confirmation_hash(tmp_path):
     )
     assert code == 0
     assert payload["mode"] == "confirmation"
+
+
+# --- ML-LR-3 section 9.4 reports wired into the runner -----------------------
+
+
+def _lr3_spec(**overrides):
+    gate = _gate(mandate_ceiling_daily_pct=22.0, maximum_brier=0.25)
+    kwargs = dict(research_gate=gate)
+    kwargs.update(overrides)
+    return _spec(**kwargs)
+
+
+def test_the_runner_emits_out_of_fold_interval_reports(tmp_path):
+    _build_dataset(tmp_path)
+    _run(tmp_path, _lr3_spec())
+    report = json.loads((tmp_path / "out" / "vol-discovery-v1.report.json").read_text())
+    intervals = report["aggregate_metrics"]["ridge_log_vol"]["interval_report"]
+    assert intervals
+    # The first scored fold has no prior residuals and therefore no interval.
+    assert intervals[0]["interval_available"] is False
+    assert intervals[0]["prior_residual_count"] == 0
+    # A later fold builds its interval only from earlier folds' residuals.
+    assert any(f["interval_available"] and f["prior_residual_count"] > 0 for f in intervals)
+
+
+def test_the_runner_emits_aggregate_interval_coverage(tmp_path):
+    _build_dataset(tmp_path)
+    _run(tmp_path, _lr3_spec())
+    report = json.loads((tmp_path / "out" / "vol-discovery-v1.report.json").read_text())
+    coverage = report["aggregate_metrics"]["ridge_log_vol"]["interval_coverage"]
+    assert coverage["target_coverage"] == 0.90
+    assert 0.0 <= coverage["aggregate_coverage"] <= 1.0
+
+
+def test_calibration_uses_the_preregistered_ceiling_from_the_hashed_gate(tmp_path):
+    _build_dataset(tmp_path)
+    _run(tmp_path, _lr3_spec())
+    report = json.loads((tmp_path / "out" / "vol-discovery-v1.report.json").read_text())
+    calibration = report["aggregate_metrics"]["ridge_log_vol"]["ceiling_calibration"]
+    assert calibration["ceiling_pct"] == 22.0
+    assert calibration["calibration_status"] in ("calibrated", "experimental")
+    assert calibration["brier_score"] is not None
+
+
+def test_without_a_preregistered_ceiling_calibration_is_not_measured(tmp_path):
+    """Plan 9.4 requires a PREREGISTERED ceiling. Absent one, the runner must
+    report that rather than inventing a threshold from the observed
+    distribution -- which is choosing the bar after seeing the results."""
+    _build_dataset(tmp_path)
+    _run(tmp_path, _spec())  # default gate declares no ceiling
+    report = json.loads((tmp_path / "out" / "vol-discovery-v1.report.json").read_text())
+    calibration = report["aggregate_metrics"]["ridge_log_vol"]["ceiling_calibration"]
+    assert calibration["calibration_status"] == "not_measured"
+    assert "no mandate_ceiling_daily_pct was preregistered" in calibration["insufficiency_reason"]
+
+
+def test_the_runner_emits_warning_behavior_against_trailing(tmp_path):
+    _build_dataset(tmp_path)
+    _run(tmp_path, _lr3_spec())
+    report = json.loads((tmp_path / "out" / "vol-discovery-v1.report.json").read_text())
+    warnings_report = report["aggregate_metrics"]["ridge_log_vol"]["warning_behavior"]
+    assert "model" in warnings_report and "trailing" in warnings_report
+    assert "model_warns_earlier_than_trailing" in warnings_report
+    assert warnings_report["ceiling_pct"] == 22.0
+
+
+def test_the_runner_emits_performance_slices(tmp_path):
+    _build_dataset(tmp_path)
+    _run(tmp_path, _lr3_spec())
+    report = json.loads((tmp_path / "out" / "vol-discovery-v1.report.json").read_text())
+    slices = report["aggregate_metrics"]["ridge_log_vol"]["slice_report"]
+    assert set(slices) == {"year", "ticker", "volatility_regime", "earnings_proximity"}
+    assert slices["year"]["available"] is True
+    # earnings_proximity is genuinely absent from this fixture and must be
+    # reported as unavailable rather than silently skipped.
+    assert slices["earnings_proximity"]["available"] is False
+
+
+def test_declaring_a_ceiling_changes_the_spec_hash(tmp_path):
+    """The ceiling is preregistered because it is part of spec_hash -- moving
+    it produces a different experiment rather than silently re-grading the
+    same one."""
+    assert _spec().spec_hash != _lr3_spec().spec_hash

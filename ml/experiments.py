@@ -67,6 +67,15 @@ from ml.experiment_contracts import (
     ExperimentSpec,
 )
 from ml.hashing import canonical_json, hash_bytes
+from ml.volatility_evaluation import (
+    MIN_RESIDUALS_FOR_INTERVAL,
+    CalibrationStatus,
+    aggregate_interval_coverage,
+    evaluate_by_slice,
+    evaluate_ceiling_calibration,
+    evaluate_warning_behavior,
+    expanding_out_of_fold_intervals,
+)
 from ml.splits import purged_grouped_walk_forward_splits
 from ml.transforms import apply_training_standardizer, fit_training_standardizer
 from ml.volatility import (
@@ -375,6 +384,7 @@ def _run_volatility_task(
     # aggregate significance is computed across untouched validation rows
     # only (plan 8.2 step 7).
     loss_rows: dict[str, list[pd.DataFrame]] = {}
+    fold_predictions: dict[str, list[dict[str, Any]]] = {}
 
     for fold in folds:
         train = joined.iloc[list(fold.train_row_indices)]
@@ -465,6 +475,25 @@ def _run_volatility_task(
                             - _pointwise_qlike(actual, prediction),
                         })
                     )
+                # Retain raw per-fold prediction/actual pairs so ML-LR-3's
+                # interval, calibration, warning, and slice reports can be
+                # computed from untouched validation rows after every fold has
+                # been scored (plan 9.4).
+                fold_predictions.setdefault(candidate, []).append(
+                    {
+                        "fold_index": fold.fold_index,
+                        "actual": actual,
+                        "predicted": prediction,
+                        "sessions": sessions.to_numpy(),
+                        "tickers": (
+                            joined.loc[validation_sample.index, "ticker"].to_numpy()
+                            if "ticker" in joined.columns
+                            else np.array([""] * len(actual))
+                        ),
+                        "trailing": validation_sample[trailing_column].to_numpy(dtype=float),
+                        "ewma": validation_sample[ewma_column].to_numpy(dtype=float),
+                    }
+                )
                 if fold.fold_index == folds[-1].fold_index:
                     fitted_models[candidate] = _FittedModel(
                         estimator=model,
@@ -520,8 +549,93 @@ def _run_volatility_task(
             }
         else:
             result["block_significance"] = {}
+        result.update(
+            _volatility_evaluation_reports(spec, fold_predictions.get(candidate, []))
+        )
         aggregate[candidate] = result
     return fold_metrics, fitted_models, aggregate
+
+
+def _volatility_evaluation_reports(
+    spec: ExperimentSpec, predictions: Sequence[Mapping[str, Any]]
+) -> dict[str, Any]:
+    """Plan 9.4's completion reports, computed from untouched validation rows.
+
+    Everything here is REPORTING. The preregistered gate in _derive_verdict()
+    decides what the numbers mean; this function never returns a pass/fail.
+    """
+    if not predictions:
+        return {"interval_report": [], "interval_coverage": {}, "slice_report": {}}
+
+    intervals = expanding_out_of_fold_intervals(predictions)
+    reports: dict[str, Any] = {
+        "interval_report": intervals,
+        "interval_coverage": aggregate_interval_coverage(intervals),
+    }
+
+    frame = pd.DataFrame(
+        {
+            "as_of_session": np.concatenate([p["sessions"] for p in predictions]),
+            "ticker": np.concatenate([p["tickers"] for p in predictions]),
+            "actual": np.concatenate([p["actual"] for p in predictions]),
+            "model_predicted": np.concatenate([p["predicted"] for p in predictions]),
+            "trailing_predicted": np.concatenate([p["trailing"] for p in predictions]),
+            "ewma_predicted": np.concatenate([p["ewma"] for p in predictions]),
+        }
+    )
+    frame["year"] = frame["as_of_session"].astype(str).str.slice(0, 4)
+    # Volatility regime is derived from the ACTUAL realized level, which is a
+    # description of the period rather than a model input -- it slices results,
+    # it never feeds a prediction.
+    median_actual = float(frame["actual"].median())
+    frame["volatility_regime"] = np.where(
+        frame["actual"] > median_actual, "high", "low"
+    )
+    reports["slice_report"] = evaluate_by_slice(frame)
+
+    ceiling = spec.research_gate.mandate_ceiling_daily_pct
+    if ceiling is None:
+        # Doc 9.4 requires a PREREGISTERED ceiling. Without one there is
+        # nothing honest to calibrate against, so this reports its absence
+        # rather than inventing a threshold from the observed distribution --
+        # which would be choosing the bar after seeing the results.
+        reports["ceiling_calibration"] = {
+            "calibration_status": CalibrationStatus.NOT_MEASURED,
+            "insufficiency_reason": (
+                "no mandate_ceiling_daily_pct was preregistered in the research gate"
+            ),
+        }
+        reports["warning_behavior"] = {}
+        return reports
+
+    reports["warning_behavior"] = evaluate_warning_behavior(
+        frame, ceiling_pct=ceiling
+    )
+    # Threshold probabilities come from the SAME expanding out-of-fold
+    # residual history the intervals use, so a probability for fold k is
+    # informed only by folds < k.
+    probabilities: list[float] = []
+    actuals: list[float] = []
+    prior: list[float] = []
+    for prediction in predictions:
+        actual = np.asarray(prediction["actual"], dtype=float)
+        predicted = np.asarray(prediction["predicted"], dtype=float)
+        usable = np.isfinite(actual) & np.isfinite(predicted) & (actual > 0) & (predicted > 0)
+        if len(prior) >= MIN_RESIDUALS_FOR_INTERVAL and usable.any():
+            residuals = np.asarray(prior, dtype=float)
+            for point in predicted[usable]:
+                implied = point * np.exp(residuals)
+                probabilities.append(float(np.mean(implied > ceiling)))
+            actuals.extend(actual[usable].tolist())
+        prior.extend(np.log(actual[usable] / predicted[usable]).tolist())
+
+    reports["ceiling_calibration"] = evaluate_ceiling_calibration(
+        actuals, probabilities,
+        ceiling_pct=ceiling,
+        n_bins=spec.research_gate.required_calibration_bins,
+        maximum_brier=spec.research_gate.maximum_brier,
+    )
+    return reports
 
 
 def _pointwise_qlike(actual: np.ndarray, predicted: np.ndarray) -> np.ndarray:

@@ -277,6 +277,7 @@ class EventFeatureRow:
     features: Mapping[str, float]
     available: bool
     refusal_reasons: tuple[str, ...] = ()
+    industry: str = "unknown"
 
     def __post_init__(self) -> None:
         if not isinstance(self.identity, EventIdentity):
@@ -287,6 +288,10 @@ class EventFeatureRow:
             )
         if not isinstance(self.available, bool):
             raise EarningsFeatureError("available must be a boolean")
+        if not isinstance(self.industry, str) or not self.industry.strip():
+            raise EarningsFeatureError("industry must be a non-empty string")
+        if self.industry != self.industry.strip():
+            raise EarningsFeatureError("industry must not contain surrounding whitespace")
         if not isinstance(self.refusal_reasons, tuple) or any(
             not isinstance(reason, str) or not reason.strip()
             for reason in self.refusal_reasons
@@ -345,6 +350,12 @@ class EventFeatureRow:
         return {
             **self.identity.to_dict(),
             "release_timing": self.release_timing,
+            "event_date": str(
+                pd.Timestamp(self.identity.announced_at_utc)
+                .tz_convert("America/New_York")
+                .date()
+            ),
+            "industry": self.industry,
             "as_of_session": self.as_of_session,
             "cutoff_at": self.cutoff_at,
             "features": dict(self.features),
@@ -354,7 +365,11 @@ class EventFeatureRow:
 
 
 def _unavailable_row(
-    identity: EventIdentity, timing: str, reasons: Sequence[str]
+    identity: EventIdentity,
+    timing: str,
+    reasons: Sequence[str],
+    *,
+    industry: str = "unknown",
 ) -> EventFeatureRow:
     return EventFeatureRow(
         identity=identity,
@@ -363,6 +378,7 @@ def _unavailable_row(
         cutoff_at=identity.announced_at_utc,
         features={},
         available=False,
+        industry=industry,
         refusal_reasons=tuple(reasons),
     )
 
@@ -374,6 +390,7 @@ def build_pre_event_features(
     prior_gaps: Sequence[GapObservation] = (),
     benchmark_close: pd.Series | None = None,
     minimum_prior_sessions: int = 20,
+    industry: str = "unknown",
 ) -> EventFeatureRow:
     """One feature row computed strictly from data available before the cutoff.
 
@@ -394,11 +411,17 @@ def build_pre_event_features(
         return _unavailable_row(
             identity, timing,
             ["intraday release has no isolatable open/close gap (plan 10.1)"],
+            industry=industry,
         )
 
     window = map_gap_window(pd.Timestamp(announced), session_index=sessions)
     if not window.available:
-        return _unavailable_row(identity, timing, [window.reason or "unmappable event"])
+        return _unavailable_row(
+            identity,
+            timing,
+            [window.reason or "unmappable event"],
+            industry=industry,
+        )
 
     # The last session whose close is genuinely prior to the event. For an
     # after-close release that is the release day itself; for a before-open
@@ -409,13 +432,17 @@ def build_pre_event_features(
         return _unavailable_row(
             identity, timing,
             [f"only {len(history)} prior sessions; {minimum_prior_sessions + 1} required"],
+            industry=industry,
         )
 
     close = pd.to_numeric(history["close"], errors="coerce").where(lambda s: s > 0)
     recent_close = close.tail(minimum_prior_sessions + 1)
     if len(recent_close) < minimum_prior_sessions + 1 or recent_close.isna().any():
         return _unavailable_row(
-            identity, timing, ["recent close history is missing, non-finite, or non-positive"]
+            identity,
+            timing,
+            ["recent close history is missing, non-finite, or non-positive"],
+            industry=industry,
         )
     recent = recent_close.pct_change(fill_method=None).iloc[1:]
     downside = recent.clip(upper=0.0)
@@ -454,6 +481,7 @@ def build_pre_event_features(
                 identity,
                 timing,
                 ["benchmark close history is incomplete at the event cutoff"],
+                industry=industry,
             )
         own = float(recent_close.iloc[-1] / recent_close.iloc[0] - 1.0) * 100
         bench = float(aligned.iloc[-1] / aligned.iloc[0] - 1.0) * 100
@@ -503,26 +531,37 @@ def build_pre_event_features(
         cutoff_at=identity.announced_at_utc,
         features=features,
         available=True,
+        industry=industry,
     )
 
 
 def event_frame(rows: Sequence[EventFeatureRow]) -> pd.DataFrame:
     """Available rows as a frame keyed by event, for grouped evaluation.
 
-    `as_of_session` doubles as the grouping key so ml/splits.py's
-    date-grouped purging works unchanged: two companies reporting on the same
-    session share market conditions and are not independent draws.
+    `event_date` is the grouping key for earnings evaluation. It deliberately
+    differs from `as_of_session`: a before-open event uses the prior session as
+    its feature cutoff, but must still be grouped with every other event
+    announced on its own Eastern calendar date.
     """
     usable = [row for row in rows if row.available]
     if not usable:
         return pd.DataFrame(
-            columns=["event_id", "ticker", "as_of_session", "release_timing"]
+            columns=[
+                "event_id", "ticker", "event_date", "industry",
+                "as_of_session", "release_timing", "announced_at_utc",
+            ]
         )
     records = []
     for row in usable:
         record = {
             "event_id": row.identity.event_id,
             "ticker": row.identity.ticker,
+            "event_date": str(
+                pd.Timestamp(row.identity.announced_at_utc)
+                .tz_convert("America/New_York")
+                .date()
+            ),
+            "industry": row.industry,
             "as_of_session": row.as_of_session,
             "release_timing": row.release_timing,
             "announced_at_utc": row.identity.announced_at_utc,
@@ -535,7 +574,7 @@ def event_frame(rows: Sequence[EventFeatureRow]) -> pd.DataFrame:
             "duplicate event_id in the feature frame; repeated rows would be "
             "counted as independent evidence"
         )
-    return frame.sort_values(["as_of_session", "ticker"]).reset_index(drop=True)
+    return frame.sort_values(["event_date", "ticker"]).reset_index(drop=True)
 
 
 def summarize_event_support(

@@ -22,7 +22,7 @@ The next implementation sequence is defined in
 | ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
 | ML-LR-2 | Durable discovery/confirmation runner and CLI | `ml/experiments.py`, `scripts/run_ml_experiment.py` | None |
 | ML-LR-3 | Portfolio-volatility targets, evaluation completion, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py` | None |
-| ML-LR-4 | Earnings event identity, pre-event features, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `scripts/run_filing_extraction.py` | None (context only) |
+| ML-LR-4 | Earnings event identity, pre-event features, event-date experiment runner, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `ml/earnings_experiments.py`, `ml/experiments.py`, `scripts/run_filing_extraction.py` | None (research/context only) |
 
 ML-LR-2 gives both supported tasks a reproducible runner. Verified against
 the milestone's own definition of done by invoking the real CLI twice: the
@@ -328,9 +328,28 @@ rejected runs instead of escaping before persistence. Written month dates are
 validated as complete dates, so changing `July 31` to `August 31` cannot pass
 merely because the day and year numbers still appear in the source.
 
-**Still outstanding for ML-LR-4:** the event-model runner itself (plan 10.2's
-frozen model order and 10.3's fold-level evaluation grouped by distinct event
-date). `ml/earnings_gap.py` already provides the fit primitives and support
-checks; nothing yet drives them through `run_experiment()`. Real confirmation
-also remains blocked while historical surprise and revision timestamps are
-not authoritative — the same external-vendor dependency that blocks ML-LR-1.
+`ml/earnings_experiments.py` completes the event-model runner. The shared
+`run_experiment()` path now groups on canonical Eastern event date, computes
+the historical-median and unconditional-frequency baselines before fitting,
+enforces the full simple-to-boosted model order, and refuses fitting below 30
+distinct training events or eight events in either tail. Reports include
+fold-level event/ticker and tail support, Brier/log loss, calibration error
+and curves, frozen-threshold precision/recall, quantile pinball/coverage,
+dependence-aware event-date uncertainty, and the required ticker, industry,
+year, volatility-regime, and release-timing slices.
+
+The hashed task parameters also freeze the confirmation minimum for distinct
+untouched events and each tail together with its power/effect-size
+justification. The 30/8 software floor cannot satisfy that gate by itself;
+confirmation candidates fail closed when their out-of-fold event identities
+do not meet the separately preregistered requirement.
+
+The typed inference bridge consumes only hash-verified persisted bundles,
+checks their feature order and training standardizers, and binds its forecast
+to the canonical digest of the complete frozen model set. A point-in-time
+fixture proves the complete dataset -> runner -> immutable report/artifact ->
+typed forecast path. ML-LR-4 is therefore **software complete**. Real
+confirmation remains blocked while historical surprise/revision timestamps
+or event coverage are not authoritative -- the external-vendor dependency
+already recorded by ML-LR-1. The 30/8 software minimum remains only a fit
+refusal, never a promotion threshold.

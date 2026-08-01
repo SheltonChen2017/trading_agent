@@ -394,8 +394,23 @@ def test_event_frame_keys_by_event_and_groups_by_session():
     frame = event_frame(_rows())
     assert not frame.empty
     assert frame["event_id"].is_unique
-    # as_of_session doubles as the grouping key for purged splits.
+    assert "event_date" in frame.columns
+    assert "industry" in frame.columns
+    # as_of_session remains the point-in-time cutoff, not the event grouping key.
     assert "as_of_session" in frame.columns
+
+
+def test_before_open_event_date_differs_from_prior_feature_session():
+    price = _price(90, start="2026-01-05")
+    row = build_pre_event_features(
+        _identity(announced_at="2026-02-25T13:00:00+00:00"),
+        price=price,
+        industry="Semiconductors",
+    )
+    frame = event_frame([row])
+    assert frame.loc[0, "event_date"] == "2026-02-25"
+    assert frame.loc[0, "as_of_session"] == "2026-02-24"
+    assert frame.loc[0, "industry"] == "Semiconductors"
 
 
 def test_event_frame_refuses_duplicate_event_ids():

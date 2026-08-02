@@ -69,3 +69,79 @@ def test_assistant_package_has_no_ml_import_except_the_future_shadow_adapter():
     assert not offenders, (
         f"assistant/ imports ml with no reviewed shadow adapter yet: {offenders}"
     )
+
+
+def _module_name(path: Path) -> str:
+    relative = path.relative_to(REPO_ROOT).with_suffix("")
+    parts = list(relative.parts)
+    if parts[-1] == "__init__":
+        parts.pop()
+    return ".".join(parts)
+
+
+def _internal_import_graph() -> dict[str, set[str]]:
+    """Map every non-test first-party module to the modules it imports."""
+    graph: dict[str, set[str]] = {}
+    for path in REPO_ROOT.rglob("*.py"):
+        parts = path.relative_to(REPO_ROOT).parts
+        if parts[0] in {"tests", ".git", "__pycache__", ".pytest_cache"}:
+            continue
+        if "__pycache__" in parts:
+            continue
+        try:
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+        except (OSError, SyntaxError):  # pragma: no cover - unreadable file
+            continue
+        dependencies: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                dependencies.update(alias.name for alias in node.names)
+            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+                dependencies.add(node.module)
+                # `from data import helper` binds a submodule, not just the
+                # package. Recording only `data` loses the edge that
+                # actually carries the dependency, which would make this
+                # whole test pass while an indirect path existed.
+                dependencies.update(
+                    f"{node.module}.{alias.name}" for alias in node.names
+                )
+        graph[_module_name(path)] = dependencies
+    return graph
+
+
+def test_no_execution_capable_module_reaches_ml_transitively():
+    """CLAUDE.md section 4: a green direct-import test is not proof.
+
+    The two tests above walk one file's own import statements. They cannot
+    see `assistant -> some_helper -> ml`, which would satisfy them while
+    breaking the boundary they exist to protect. This walks the reachable
+    first-party import graph from every execution-capable root and reports
+    the offending chain, so a future indirect dependency fails loudly
+    instead of silently.
+    """
+    graph = _internal_import_graph()
+    roots = sorted(
+        name
+        for name in graph
+        if name.split(".")[0] in {"assistant", "execution", "risk"}
+    )
+    assert roots, "expected to discover execution-capable modules to check"
+
+    offending_chains: list[str] = []
+    for root in roots:
+        seen = {root}
+        stack = [(root, (root,))]
+        while stack:
+            current, chain = stack.pop()
+            for dependency in sorted(graph.get(current, ())):
+                if dependency == "ml" or dependency.startswith("ml."):
+                    offending_chains.append(" -> ".join(chain + (dependency,)))
+                    continue
+                if dependency in graph and dependency not in seen:
+                    seen.add(dependency)
+                    stack.append((dependency, chain + (dependency,)))
+
+    assert not offending_chains, (
+        "execution-capable code reaches ml through an indirect import: "
+        + "; ".join(sorted(offending_chains))
+    )

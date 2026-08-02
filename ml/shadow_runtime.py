@@ -28,6 +28,12 @@ from ml.contracts import ModelManifest, PredictionRecord, require_matching_featu
 from ml.features import FeatureError, compute_point_in_time_features
 from ml.hashing import canonical_json, hash_bytes, hash_payload
 from ml.labels import compute_forward_realized_vol_labels
+from ml.prospective import (
+    DAILY_VOLATILITY_UNIT,
+    ProspectiveContractError,
+    ProspectiveInferenceContract,
+    derive_volatility_uncertainty,
+)
 from ml.shadow import trading_sessions
 from ml.volatility import (
     VolatilityModelError,
@@ -546,8 +552,57 @@ def build_unavailable_prediction(
             "material": dict(snapshot_material),
         }
     )
+    prediction_id = _prediction_id(config, subject, as_of_session)
+    prospective = ProspectiveInferenceContract(
+        prediction_id=prediction_id,
+        task=config.task,
+        subject_key=subject,
+        as_of_session=as_of_session,
+        generated_at=generated_at,
+        horizon_sessions=config.horizon_sessions,
+        target_available_at=target_available_at,
+        point_estimate=None,
+        prediction_interval=None,
+        threshold_probability=None,
+        calibration={"status": "unavailable", "reason": "prediction_unavailable"},
+        frozen_baselines={
+            "trailing_daily_pct": snapshot_material.get("trailing_baseline_daily_pct"),
+            "ewma_daily_pct": snapshot_material.get("ewma_baseline_daily_pct"),
+        },
+        feature_observations=tuple(
+            {
+                "name": name,
+                "value": None,
+                "available_at": None,
+                "age_sessions": None,
+                "missing": True,
+                "reason": unique_reasons[0] if unique_reasons else "unavailable_without_detail",
+            }
+            for name in manifest.ordered_feature_names
+        ),
+        reference_distribution={
+            "status": "unavailable",
+            "identity_hash": None,
+            "reason": "prediction_inputs_or_artifact_unavailable",
+        },
+        regime_category="unavailable",
+        event_category=(
+            "earnings_session"
+            if as_of_session in config.earnings_dates_by_subject.get(subject, ())
+            else "ordinary_session"
+        ),
+        lineage=_prospective_lineage(
+            config=config,
+            manifest=manifest,
+            evidence_epoch=evidence_epoch,
+            shadow_run_id=shadow_run_id,
+            feature_snapshot_hash=snapshot_hash,
+        ),
+        available=False,
+        refusal_reasons=unique_reasons or ("unavailable_without_detail",),
+    )
     record = PredictionRecord(
-        prediction_id=_prediction_id(config, subject, as_of_session),
+        prediction_id=prediction_id,
         model_id=manifest.model_id,
         model_version=manifest.model_version,
         artifact_hash=manifest.artifact_hash,
@@ -565,6 +620,7 @@ def build_unavailable_prediction(
         available=False,
         refusal_reasons=unique_reasons or ("unavailable_without_detail",),
         evidence_status=EvidenceStatus.UNAVAILABLE,
+        prospective_contract=prospective.to_dict(),
     ).to_shadow_storage_dict()
     record["evidence_epoch"] = evidence_epoch
     record["shadow_run_id"] = shadow_run_id
@@ -584,6 +640,62 @@ def _prediction_id(
         }
     )
     return f"mlpred-{digest[:24]}"
+
+
+def _prospective_lineage(
+    *,
+    config: ShadowRuntimeConfig,
+    manifest: ModelManifest,
+    evidence_epoch: str,
+    shadow_run_id: str,
+    feature_snapshot_hash: str,
+) -> dict[str, str]:
+    return {
+        "model_key": config.model_key,
+        "provider_id": config.provider_id,
+        "dataset_id": manifest.dataset_id,
+        "dataset_hash": manifest.dataset_hash,
+        "artifact_hash": manifest.artifact_hash,
+        "evaluation_report_hash": manifest.evaluation_report_hash,
+        "feature_set_version": manifest.feature_set_version,
+        "label_version": manifest.label_version,
+        "configuration_hash": config.configuration_hash,
+        "evidence_epoch": evidence_epoch,
+        "shadow_run_id": shadow_run_id,
+        "feature_snapshot_hash": feature_snapshot_hash,
+        "schedule_version": config.schedule_version,
+    }
+
+
+def _prospective_reference(
+    bundle: Mapping[str, Any], ordered_features: Sequence[str]
+) -> tuple[dict[str, Any], str]:
+    reference = bundle.get("feature_reference")
+    if not isinstance(reference, Mapping) or set(reference) != set(ordered_features):
+        raise ProspectiveContractError(
+            "model artifact lacks the complete frozen feature reference distribution"
+        )
+    payload = {name: dict(reference[name]) for name in ordered_features}
+    identity = hash_payload(payload)
+    return payload, identity
+
+
+def _prospective_regime(
+    feature_values: Mapping[str, float], reference: Mapping[str, Any]
+) -> tuple[str, str]:
+    preferred = "realized_vol_20d_pct"
+    name = preferred if preferred in feature_values else next(iter(feature_values))
+    summary = reference.get(name)
+    if not isinstance(summary, Mapping):
+        raise ProspectiveContractError("regime reference feature is unavailable")
+    mean = float(summary.get("mean"))
+    if not math.isfinite(mean):
+        raise ProspectiveContractError("regime reference mean is invalid")
+    category = (
+        "above_training_mean" if float(feature_values[name]) > mean
+        else "at_or_below_training_mean"
+    )
+    return category, name
 
 
 def build_volatility_prediction(
@@ -707,6 +819,10 @@ def build_volatility_prediction(
         reasons.append(f"nonfinite_features:{','.join(invalid_names)}")
     if trailing is None or ewma is None:
         reasons.append("frozen_baseline_unavailable")
+    if not isinstance(bundle.get("prospective_profile"), Mapping):
+        reasons.append("prospective_profile_unavailable")
+    if not isinstance(bundle.get("feature_reference"), Mapping):
+        reasons.append("reference_distribution_unavailable")
     snapshot_material = {
         "ordered_features": numeric_values,
         "trailing_baseline_daily_pct": trailing,
@@ -755,8 +871,82 @@ def build_volatility_prediction(
             **snapshot_material,
         }
     )
+    uncertainty = derive_volatility_uncertainty(
+        daily_volatility, bundle["prospective_profile"]
+    )
+    reference, reference_hash = _prospective_reference(bundle, ordered)
+    regime_category, regime_feature = _prospective_regime(numeric_values, reference)
+    prediction_id = _prediction_id(config, subject, as_of_session)
+    event_category = (
+        "earnings_session"
+        if as_of_session in config.earnings_dates_by_subject.get(subject, ())
+        else "ordinary_session"
+    )
+    prospective = ProspectiveInferenceContract(
+        prediction_id=prediction_id,
+        task=config.task,
+        subject_key=subject,
+        as_of_session=as_of_session,
+        generated_at=generated_at,
+        horizon_sessions=config.horizon_sessions,
+        target_available_at=target_available_at,
+        point_estimate={
+            "value": round(daily_volatility, 6),
+            "unit": DAILY_VOLATILITY_UNIT,
+        },
+        prediction_interval={
+            "lower": uncertainty["prediction_interval_daily_pct"][0],
+            "upper": uncertainty["prediction_interval_daily_pct"][1],
+            "unit": DAILY_VOLATILITY_UNIT,
+            "target_coverage": uncertainty["target_coverage"],
+            "profile_hash": uncertainty["profile_hash"],
+        },
+        threshold_probability={
+            "value": uncertainty["threshold_probability"],
+            "label": uncertainty["probability_label"],
+            "event": "daily_volatility_above_preregistered_ceiling",
+            "ceiling_daily_pct": uncertainty["ceiling_daily_pct"],
+        },
+        calibration={
+            "status": uncertainty["calibration_status"],
+            "brier_score": uncertainty["calibration_brier_score"],
+            "event_count": uncertainty["calibration_event_count"],
+            "evaluation_report_hash": manifest.evaluation_report_hash,
+            "profile_hash": uncertainty["profile_hash"],
+        },
+        frozen_baselines={
+            "trailing_daily_pct": round(float(trailing), 6),
+            "ewma_daily_pct": round(float(ewma), 6),
+        },
+        feature_observations=tuple(
+            {
+                "name": name,
+                "value": numeric_values[name],
+                "available_at": decision_cutoff,
+                "age_sessions": 0,
+                "missing": False,
+            }
+            for name in ordered
+        ),
+        reference_distribution={
+            "status": "available",
+            "identity_hash": reference_hash,
+            "artifact_hash": manifest.artifact_hash,
+            "features": reference,
+        },
+        regime_category=regime_category,
+        event_category=event_category,
+        lineage=_prospective_lineage(
+            config=config,
+            manifest=manifest,
+            evidence_epoch=evidence_epoch,
+            shadow_run_id=shadow_run_id,
+            feature_snapshot_hash=feature_snapshot_hash,
+        ),
+        available=True,
+    )
     record = PredictionRecord(
-        prediction_id=_prediction_id(config, subject, as_of_session),
+        prediction_id=prediction_id,
         model_id=manifest.model_id,
         model_version=manifest.model_version,
         artifact_hash=manifest.artifact_hash,
@@ -772,10 +962,19 @@ def build_volatility_prediction(
             "annualized_volatility_pct": round(annualize_pct(daily_volatility), 6),
             "trailing_baseline_daily_pct": round(float(trailing), 6),
             "ewma_baseline_daily_pct": round(float(ewma), 6),
+            "prediction_interval_daily_pct": uncertainty[
+                "prediction_interval_daily_pct"
+            ],
+            uncertainty["probability_label"]: uncertainty[
+                "threshold_probability"
+            ],
+            "mandate_ceiling_daily_pct": uncertainty["ceiling_daily_pct"],
         },
         uncertainty={
-            "status": "refer_to_frozen_evaluation_report",
+            "status": "available",
             "evaluation_report_hash": manifest.evaluation_report_hash,
+            "prospective_profile_hash": uncertainty["profile_hash"],
+            "calibration_status": uncertainty["calibration_status"],
         },
         data_available_at=decision_cutoff,
         feature_freshness={"missing_count": 0, "stale_count": 0, "maximum_age_sessions": 0},
@@ -784,12 +983,12 @@ def build_volatility_prediction(
         evidence_status=manifest.evidence_status,
         monitoring_features=numeric_values,
         monitoring_context={
-            "event_category": (
-                "earnings_session"
-                if as_of_session in config.earnings_dates_by_subject.get(subject, ())
-                else "ordinary_session"
-            )
+            "event_category": event_category,
+            "regime_category": regime_category,
+            "regime_feature": regime_feature,
+            "reference_distribution_hash": reference_hash,
         },
+        prospective_contract=prospective.to_dict(),
     ).to_shadow_storage_dict()
     record["evidence_epoch"] = evidence_epoch
     record["shadow_run_id"] = shadow_run_id

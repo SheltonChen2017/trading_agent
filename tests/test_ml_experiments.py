@@ -26,6 +26,7 @@ from ml.experiment_contracts import (
 )
 from ml.experiments import ExperimentError, run_experiment
 from ml.labels import LabelRow
+from ml.portfolio_research import TASK as PORTFOLIO_VOLATILITY_TASK
 
 _FIXED_TIME = datetime(2026, 7, 31, 0, 0, tzinfo=timezone.utc)
 _FEATURES = ["feature_a", "feature_b"]
@@ -84,6 +85,7 @@ def _build_dataset(
     skill: bool = True,
     seed: int = 0,
     missing_every: int | None = None,
+    task: str = "volatility_forecast",
 ):
     """A fixture dataset where forward volatility genuinely depends on the
     features when `skill` is True, and is pure noise when False."""
@@ -138,7 +140,7 @@ def _build_dataset(
     features_df, labels_df = assemble_dataset_frames({"AAA": features}, {"AAA": labels})
     manifest = build_dataset_manifest(
         features_df=features_df, labels_df=labels_df, dataset_id="fixture-ds",
-        created_at="2026-07-31T00:00:00+00:00", task="volatility_forecast",
+        created_at="2026-07-31T00:00:00+00:00", task=task,
         feature_set_version="fs-v1", label_version="v1",
         source_descriptions=("synthetic fixture",), point_in_time_data=False,
         universe_definition="fixture-v1", entry_timing="next_open",
@@ -148,6 +150,83 @@ def _build_dataset(
     )
     save_dataset(features_df, labels_df, manifest, directory=tmp_path)
     return manifest
+
+
+def test_portfolio_volatility_uses_shared_runner_with_exact_task_contract(tmp_path):
+    manifest = _build_dataset(
+        tmp_path / "dataset",
+        task=PORTFOLIO_VOLATILITY_TASK,
+    )
+    spec = _spec(
+        experiment_id="portfolio-vol-discovery-v1",
+        task=PORTFOLIO_VOLATILITY_TASK,
+        task_parameters={
+            "observation_unit": "account_session",
+            "target_kind": "frozen_weight",
+            "target_units": "daily_return_standard_deviation_pct",
+        },
+    )
+
+    record = run_experiment(
+        spec,
+        tmp_path / "dataset",
+        tmp_path / "runs",
+        "0" * 40,
+        dataset_id="fixture-ds",
+        feature_columns=_FEATURES,
+        target_column="label_value",
+        trailing_baseline_column="trailing_vol",
+        ewma_baseline_column="ewma_vol",
+        generated_at=_FIXED_TIME,
+    )
+
+    report = json.loads(
+        (tmp_path / "runs" / "portfolio-vol-discovery-v1.report.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    model_manifest = load_model_manifest(
+        directory=tmp_path / "runs",
+        filename="portfolio-vol-discovery-v1.ridge_log_vol.manifest.json",
+        model_id="portfolio-vol-discovery-v1.ridge_log_vol",
+        model_version=spec.spec_hash,
+        expected_manifest_hash=record.artifact_hashes["ridge_log_vol.manifest"],
+    )
+    persisted_spec = json.loads(
+        (tmp_path / "runs" / "portfolio-vol-discovery-v1.spec.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert persisted_spec["task"] == PORTFOLIO_VOLATILITY_TASK
+    assert report["dataset_hash"] == manifest.dataset_hash
+    assert model_manifest.task == PORTFOLIO_VOLATILITY_TASK
+    assert record.run_hash
+
+
+def test_portfolio_volatility_refuses_incomplete_task_parameters(tmp_path):
+    manifest = _build_dataset(
+        tmp_path / "dataset",
+        task=PORTFOLIO_VOLATILITY_TASK,
+    )
+    spec = _spec(
+        experiment_id="portfolio-vol-discovery-v1",
+        task=PORTFOLIO_VOLATILITY_TASK,
+        task_parameters={"observation_unit": "account_session"},
+    )
+
+    with pytest.raises(ExperimentError, match="task_parameters"):
+        run_experiment(
+            spec,
+            tmp_path / "dataset",
+            tmp_path / "runs",
+            "0" * 40,
+            dataset_id="fixture-ds",
+            feature_columns=_FEATURES,
+            target_column="label_value",
+            trailing_baseline_column="trailing_vol",
+            ewma_baseline_column="ewma_vol",
+            generated_at=_FIXED_TIME,
+        )
 
 
 def _build_ranker_dataset(tmp_path: Path, *, n_sessions: int = 120, seed: int = 0):
@@ -859,12 +938,29 @@ def test_the_runner_emits_aggregate_interval_coverage(tmp_path):
 
 def test_calibration_uses_the_preregistered_ceiling_from_the_hashed_gate(tmp_path):
     _build_dataset(tmp_path)
-    _run(tmp_path, _lr3_spec())
+    spec = _lr3_spec()
+    record = _run(tmp_path, spec)
     report = json.loads((tmp_path / "out" / "vol-discovery-v1.report.json").read_text())
     calibration = report["aggregate_metrics"]["ridge_log_vol"]["ceiling_calibration"]
     assert calibration["ceiling_pct"] == 22.0
     assert calibration["calibration_status"] in ("calibrated", "experimental")
     assert calibration["brier_score"] is not None
+    manifest = load_model_manifest(
+        directory=tmp_path / "out",
+        filename="vol-discovery-v1.ridge_log_vol.manifest.json",
+        model_id="vol-discovery-v1.ridge_log_vol",
+        model_version=spec.spec_hash,
+        expected_manifest_hash=record.artifact_hashes["ridge_log_vol.manifest"],
+    )
+    bundle = load_model_artifact(
+        manifest,
+        directory=tmp_path / "out",
+        filename="vol-discovery-v1.ridge_log_vol.joblib",
+    )
+    profile = bundle["prospective_profile"]
+    assert profile["interval"]["status"] == "available"
+    assert profile["threshold"]["ceiling_daily_pct"] == 22.0
+    assert profile["threshold"]["empirical_log_residuals"]
 
 
 def test_without_a_preregistered_ceiling_calibration_is_not_measured(tmp_path):

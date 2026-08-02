@@ -72,6 +72,12 @@ from ml.experiment_contracts import (
     ExperimentRunRecord,
     ExperimentSpec,
 )
+from ml.portfolio_research import (
+    TASK as PORTFOLIO_VOLATILITY_TASK,
+    PortfolioResearchError,
+    validate_portfolio_experiment_spec,
+)
+from ml.prospective import build_volatility_prospective_profile
 from ml.hashing import canonical_json, hash_bytes
 from ml.volatility_evaluation import (
     MIN_RESIDUALS_FOR_INTERVAL,
@@ -92,9 +98,11 @@ from ml.volatility import (
 
 SUPPORTED_TASKS = (
     "volatility_forecast",
+    PORTFOLIO_VOLATILITY_TASK,
     "cross_sectional_excess_return_ranking",
     EARNINGS_TASK,
 )
+_VOLATILITY_TASKS = frozenset({"volatility_forecast", PORTFOLIO_VOLATILITY_TASK})
 _VOLATILITY_CANDIDATES = frozenset({"ridge_log_vol", "hist_gradient_boosting"})
 _VOLATILITY_BASELINES = frozenset({"trailing_realized", "ewma"})
 _RANKER_CANDIDATES = frozenset({"elastic_net", "hist_gradient_boosting"})
@@ -116,6 +124,7 @@ class _FittedModel:
     training_start: str
     training_end: str
     feature_reference: Mapping[str, Any] = dataclasses.field(default_factory=dict)
+    prospective_profile: Mapping[str, Any] = dataclasses.field(default_factory=dict)
 
 
 def _feature_reference(
@@ -286,7 +295,12 @@ def _validate_task_configuration(
 
     candidates = set(spec.candidate_models)
     baselines = set(spec.frozen_baselines)
-    if spec.task == "volatility_forecast":
+    if spec.task in _VOLATILITY_TASKS:
+        if spec.task == PORTFOLIO_VOLATILITY_TASK:
+            try:
+                validate_portfolio_experiment_spec(spec)
+            except PortfolioResearchError as exc:
+                raise ExperimentError(str(exc)) from exc
         unsupported = candidates - _VOLATILITY_CANDIDATES
         if unsupported:
             raise ExperimentError(f"unsupported volatility candidates: {sorted(unsupported)}")
@@ -621,6 +635,16 @@ def _run_volatility_task(
             _volatility_evaluation_reports(spec, fold_predictions.get(candidate, []))
         )
         aggregate[candidate] = result
+        if candidate in fitted_models:
+            fitted_models[candidate] = dataclasses.replace(
+                fitted_models[candidate],
+                prospective_profile=build_volatility_prospective_profile(
+                    fold_predictions.get(candidate, []),
+                    ceiling_calibration=result.get("ceiling_calibration", {
+                        "calibration_status": CalibrationStatus.NOT_MEASURED,
+                    }),
+                ),
+            )
     return fold_metrics, fitted_models, aggregate
 
 
@@ -765,6 +789,9 @@ def _save_and_verify_models(
         feature_reference = dict(getattr(fitted, "feature_reference", {}))
         if feature_reference:
             bundle["feature_reference"] = feature_reference
+        prospective_profile = dict(getattr(fitted, "prospective_profile", {}))
+        if prospective_profile:
+            bundle["prospective_profile"] = prospective_profile
         artifact_hash = save_model_artifact(
             bundle,
             directory=output_directory,
@@ -1101,7 +1128,7 @@ def run_experiment(
         embargo_sessions=embargo,
     )
 
-    if spec.task == "volatility_forecast":
+    if spec.task in _VOLATILITY_TASKS:
         if not trailing_baseline_column or not ewma_baseline_column:
             raise ExperimentError(
                 "a volatility experiment requires trailing and EWMA baseline columns; "

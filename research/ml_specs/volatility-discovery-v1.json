@@ -1,0 +1,82 @@
+{
+  "schema_version": "1.0",
+  "experiment_id": "volatility-discovery-v1",
+  "task": "volatility_forecast",
+  "mode": "discovery",
+  "created_at": "2026-08-01T16:00:00+00:00",
+  "primary_outcome": "Out-of-fold QLIKE versus the frozen EWMA volatility baseline",
+  "candidate_models": [
+    "ridge_log_vol",
+    "hist_gradient_boosting"
+  ],
+  "frozen_baselines": [
+    "trailing_realized",
+    "ewma"
+  ],
+  "feature_set_version": "databento-authoritative-volatility-v1",
+  "label_version": "forward-realized-volatility-20d-v1",
+  "benchmark": "QQQ",
+  "horizon_sessions": 20,
+  "universe_definition": "reviewed-historical-universe-v1",
+  "research_look_dimensions": {
+    "models": [
+      "ridge_log_vol",
+      "hist_gradient_boosting"
+    ],
+    "horizons": [
+      "20"
+    ],
+    "benchmarks": [
+      "QQQ"
+    ]
+  },
+  "split_configuration": {
+    "n_splits": 4,
+    "embargo_sessions": 20
+  },
+  "cost_tax_liquidity_assumptions": {
+    "transaction_cost_bps": 5.0,
+    "tax_assumptions": "none for risk-forecast evaluation; no trade simulation",
+    "liquidity_assumptions": "features require finite point-in-time OHLCV; no execution claim"
+  },
+  "research_gate": {
+    "minimum_folds_won": 3,
+    "minimum_coverage_fraction": 0.8,
+    "maximum_alpha": 0.05,
+    "block_lengths": [
+      10,
+      20,
+      40
+    ],
+    "required_calibration_bins": 10,
+    "failure_slices": [
+      "year",
+      "ticker",
+      "volatility_regime",
+      "earnings_proximity"
+    ],
+    "mandate_ceiling_daily_pct": 2.0,
+    "maximum_brier": 0.2
+  },
+  "random_seed": 0,
+  "ordered_feature_names": [
+    "realized_vol_20d_pct",
+    "realized_vol_60d_pct",
+    "downside_semivol_20d_pct",
+    "max_drawdown_60d_pct",
+    "return_20d_pct",
+    "residual_return_qqq_20d_pct",
+    "beta_qqq_60d",
+    "correlation_qqq_60d",
+    "volume_ratio_20d",
+    "overnight_gap_std_20d_pct",
+    "market_trailing_volatility_pct",
+    "sessions_since_last_earnings"
+  ],
+  "target_column": "label_value",
+  "baseline_columns": {
+    "trailing_realized": "baseline_trailing_realized_vol_20d_pct",
+    "ewma": "baseline_ewma_vol_20d_pct"
+  },
+  "confirmation": null
+}

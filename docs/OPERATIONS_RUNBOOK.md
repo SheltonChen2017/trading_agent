@@ -294,3 +294,35 @@ means the preregistered calibration gate encoded in that model's immutable
 evaluation cleared; it still has no proposal or execution authority. Any
 artifact, provider, schedule, configuration, code, or feature-semantics change
 requires a new evidence epoch before collection resumes.
+
+## Review-gated discovery and confirmation
+
+First place an already-built dataset into the authoritative content-addressed
+store. This command replays all hashes and point-in-time coverage and refuses
+exploratory data:
+
+```text
+python scripts/run_ml_research_campaign.py materialize-dataset --source-dir artifacts/datasets/staging --dataset-id volatility-discovery-2026q3 --store-root artifacts/datasets/authoritative
+```
+
+Review `research/ml_specs/volatility-discovery-v1.json` and its review request.
+An identified reviewer must create a separate `SpecReviewAttestation`; the
+repository request is deliberately not an approval. Verify it before running:
+
+```text
+python scripts/run_ml_research_campaign.py verify-spec-review --spec research/ml_specs/volatility-discovery-v1.json --review artifacts/reviews/volatility-discovery-v1.approved.json
+python scripts/run_ml_research_campaign.py run-reviewed --spec research/ml_specs/volatility-discovery-v1.json --review artifacts/reviews/volatility-discovery-v1.approved.json --dataset-dir artifacts/datasets/authoritative/DATASET_HASH --dataset-id volatility-discovery-2026q3 --output-dir artifacts/experiments/volatility-v1 --code-commit COMMIT_HASH
+```
+
+Only a verified `confirmation_run_requested` discovery may prepare
+confirmation. Supply a separately materialized, different dataset hash:
+
+```text
+python scripts/run_ml_research_campaign.py prepare-confirmation --discovery-output-dir artifacts/experiments/volatility-v1 --discovery-experiment-id volatility-discovery-v1 --confirmation-dataset-dir artifacts/datasets/authoritative/CONFIRMATION_DATASET_HASH --confirmation-dataset-id volatility-confirmation-2026q4 --confirmation-experiment-id volatility-confirmation-v1 --created-at REVIEW_REQUEST_TIME --spec-output artifacts/experiments/volatility-v1/volatility-confirmation-v1.pending.json --request-output artifacts/experiments/volatility-v1/volatility-confirmation-v1.request.json
+```
+
+Review and attest the generated confirmation spec separately, then call
+`run-reviewed` with `--confirmation-request`. Do not retune a failed
+confirmation identity or copy discovery rows into its dataset. These commands
+write research artifacts only and never update the model registry or trading
+state.

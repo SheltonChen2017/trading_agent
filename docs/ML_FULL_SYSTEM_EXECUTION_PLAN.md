@@ -38,7 +38,7 @@ gates, and model isolation. This plan fills the operational path around it:
 
 Current baseline:
 
-- ML-FS-0 through ML-FS-5 are software-complete; ML-FS-3's real-data
+- ML-FS-0 through ML-FS-6 preparation is software-complete; ML-FS-3's real-data
   definition of done remains pending a reviewed licensed historical-universe
   snapshot and an actual authoritative build;
 - ML-LR-0, ML-LR-1, ML-LR-2, ML-LR-4, ML-LR-6, ML-LR-7, and
@@ -264,6 +264,11 @@ The shadow runtime produces the complete monitored contract and survives
 provider failure, artifact corruption, restart, and epoch change on fixtures.
 
 ## 11. ML-FS-6 — real discovery and untouched confirmation
+
+Status: preparation software implemented 2026-08-01. The repository contains
+a review-ready discovery spec, not an approval or a real experiment result.
+Real discovery and confirmation remain blocked on reviewed authoritative data,
+explicit spec attestations, and execution of the elapsed-data workflow.
 
 ### Implementation
 

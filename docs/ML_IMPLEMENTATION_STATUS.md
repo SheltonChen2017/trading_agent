@@ -31,6 +31,7 @@ The next implementation sequence is defined in
 | ML-FS-2 | Immutable pre-broker execution telemetry plus rebuildable lifecycle materialization | `assistant/execution_telemetry.py`, `assistant/execution_service.py`, `assistant/storage.py` | Claimed attempts write observations; a failed pre-submit telemetry append refuses the broker call |
 | ML-FS-3 software | Vintage-correct Databento adjustment/security resolution, independent universe snapshots, PIT feature batches, replay CLI, and shared online provider | `ml/databento_authoritative.py`, `ml/databento_pit.py`, `scripts/run_databento_ingest.py` | Research/online data only; no model or execution authority |
 | ML-FS-5 software | Frozen deployable OOF uncertainty profile plus complete prospective success/refusal contract | `ml/prospective.py`, `ml/experiments.py`, `ml/shadow_runtime.py`, `ml/contracts.py`, `assistant/storage.py` | Writes non-authoritative shadow evidence only |
+| ML-FS-6 preparation | Content-addressed authoritative dataset admission, exact spec review attestations, reviewed-run wrapper, distinct untouched-confirmation request | `ml/research_orchestration.py`, `scripts/run_ml_research_campaign.py`, `research/ml_specs/` | Research artifacts only; no real run, registry, proposal, or execution state |
 
 ML-LR-2 gives both supported tasks a reproducible runner. Verified against
 the milestone's own definition of done by invoking the real CLI twice: the
@@ -348,6 +349,34 @@ identity, refuses action-shaped fields, and requires
 restart/idempotent retry, and epoch changes remain covered by the shadow
 runtime suite. These are software assertions, not evidence that the interval
 coverage or threshold calibration works on future market observations.
+
+## ML-FS-6 preparation notes
+
+`materialize-dataset` accepts only a fully hash-verified dataset whose normal
+coverage gate derived `point_in_time_data=true`, requires availability and
+historical-universe sidecars, and copies the exact immutable bytes beneath
+`<store-root>/<dataset_hash>/`. A separate address artifact binds the
+directory, dataset hash, and manifest hash. Exploratory or renamed/tampered
+datasets are refused.
+
+`run-reviewed` requires a `SpecReviewAttestation` whose exact spec hash,
+identified reviewer, timestamp, approved decision, and review scope validate.
+The wrapper derives runner columns from the reviewed spec and reuses the
+existing no-side-effect experiment runner. A discovery spec may not carry a
+confirmation request.
+
+`prepare-confirmation` accepts only a verified discovery spec/report/run whose
+verdict requested confirmation. It requires a different content-addressed
+confirmation dataset hash, clones the discovery behavior without retuning,
+adds immutable parent hashes, and writes a new confirmation spec plus a request
+that remains `review_required`. Confirmation cannot run until that exact new
+spec is separately attested. A rejected confirmation remains an immutable
+rejection; changing behavior requires a new discovery identity.
+
+The checked-in volatility discovery spec is review-ready but intentionally
+unapproved. No licensed historical dataset, human review attestation, real
+discovery report, confirmation request, or real model artifact was fabricated
+by this milestone.
 
 
 ## ML-LR-4 notes

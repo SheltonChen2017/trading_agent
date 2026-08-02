@@ -66,6 +66,7 @@ from assistant.proposal_status import (
 )
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
 from assistant.storage import AssistantStore
+from risk.execution_gate import TradeIntent
 
 NOW_ET = datetime(2026, 8, 3, 14, 30, tzinfo=timezone.utc)
 
@@ -936,4 +937,50 @@ def test_a_failed_lookup_is_never_treated_as_confirmed_absence(store):
     assert state["reservations"] != [], (
         "a failed lookup must keep the budget held -- releasing it would free "
         "capital against an order that may still exist at the broker"
+    )
+
+
+def test_the_override_review_digest_binds_to_the_exact_reviewed_violations():
+    """The control that stops an override becoming blanket permission.
+
+    `override_policy_violations=True` is only honoured when the CURRENT
+    violations match a previously stored reviewed-override record, and
+    `_review_digest` is what "match" means. A digest that ignores its inputs
+    makes any override-eligible condition match any prior review -- exactly
+    the vulnerability the 2026-07-30 review closed, where an override could
+    accept whatever conditions happened to exist at the later execution
+    instant rather than the ones a human actually saw.
+
+    Found by mutation while extracting the kernel: returning a constant from
+    `_review_digest` left the entire suite green.
+    """
+    from assistant.execution_service import _review_digest
+
+    intent = TradeIntent(ticker="AAPL", side="sell", shares=1, order_type="market")
+    base = _review_digest(intent, ("max_position_pct",), ("AAPL is 30% of the book.",))
+
+    # Same inputs, any ordering -> same digest (no spurious mismatch).
+    assert base == _review_digest(
+        intent, ("max_position_pct",), ("AAPL is 30% of the book.",)
+    )
+    # A DIFFERENT violation code must not reuse a prior review.
+    assert base != _review_digest(
+        intent, ("earnings_blackout",), ("AAPL is 30% of the book.",)
+    )
+    # Same code, materially different severity in the message, must differ --
+    # "slightly over the cap" is not the reviewed risk of "dramatically over".
+    assert base != _review_digest(
+        intent, ("max_position_pct",), ("AAPL is 80% of the book.",)
+    )
+    # An additional violation the human never saw must not match.
+    assert base != _review_digest(
+        intent,
+        ("max_position_pct", "earnings_blackout"),
+        ("AAPL is 30% of the book.", "Earnings in 2 days."),
+    )
+    # A different trade entirely must not match.
+    assert base != _review_digest(
+        TradeIntent(ticker="MSFT", side="sell", shares=1, order_type="market"),
+        ("max_position_pct",),
+        ("AAPL is 30% of the book.",),
     )

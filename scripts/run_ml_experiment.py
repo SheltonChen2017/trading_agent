@@ -24,7 +24,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import subprocess
 import sys
 from pathlib import Path
 
@@ -35,10 +34,13 @@ from ml.experiment_contracts import ExperimentContractError, ExperimentSpec
 from ml.experiments import ExperimentError, run_experiment
 
 
-def _current_commit() -> str:
+def _current_commit(expected_commit: str | None = None) -> str:
     """Strict runtime identity; see assistant/runtime_identity.py."""
     try:
-        return current_commit(require_clean=True)
+        return current_commit(
+            require_clean=True,
+            expected_commit=expected_commit,
+        )
     except RuntimeIdentityError as exc:
         raise RuntimeError(str(exc)) from exc
 
@@ -73,7 +75,11 @@ def build_parser() -> argparse.ArgumentParser:
             "after the confirmation was requested."
         ),
     )
-    parser.add_argument("--code-commit", default=None, help="Defaults to git HEAD.")
+    parser.add_argument(
+        "--code-commit",
+        default=None,
+        help="Optional assertion that must equal the clean runtime git HEAD.",
+    )
     return parser
 
 
@@ -121,8 +127,8 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     try:
-        code_commit = args.code_commit or _current_commit()
-    except (subprocess.CalledProcessError, OSError, RuntimeError) as exc:
+        code_commit = _current_commit(args.code_commit)
+    except (OSError, RuntimeError) as exc:
         print(json.dumps({"ok": False, "error": f"could not resolve code commit: {exc}"}))
         return 1
 

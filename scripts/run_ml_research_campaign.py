@@ -8,6 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from assistant.runtime_identity import RuntimeIdentityError, current_commit
 from ml.research_orchestration import (
     ResearchOrchestrationError,
     load_reviewed_spec,
@@ -48,7 +49,11 @@ def build_parser() -> argparse.ArgumentParser:
     run.add_argument("--dataset-dir", required=True)
     run.add_argument("--dataset-id", required=True)
     run.add_argument("--output-dir", required=True)
-    run.add_argument("--code-commit", required=True)
+    run.add_argument(
+        "--code-commit",
+        required=True,
+        help="Required reviewed commit assertion; must equal the clean runtime git HEAD.",
+    )
     run.add_argument("--confirmation-request")
     return parser
 
@@ -98,13 +103,17 @@ def main(argv: list[str] | None = None) -> int:
                 "production_authoritative": False,
             }
         else:
+            code_commit = current_commit(
+                require_clean=True,
+                expected_commit=args.code_commit,
+            )
             record, evidence = run_reviewed_experiment(
                 spec_path=Path(args.spec),
                 review_path=Path(args.review),
                 dataset_directory=Path(args.dataset_dir),
                 dataset_id=args.dataset_id,
                 output_directory=Path(args.output_dir),
-                code_commit=args.code_commit,
+                code_commit=code_commit,
                 confirmation_request_path=(
                     Path(args.confirmation_request)
                     if args.confirmation_request
@@ -117,7 +126,7 @@ def main(argv: list[str] | None = None) -> int:
                 "experiment_id": record.identity.experiment_id,
                 **dict(evidence),
             }
-    except (ResearchOrchestrationError, ValueError, OSError) as exc:
+    except (ResearchOrchestrationError, RuntimeIdentityError, ValueError, OSError) as exc:
         summary = {
             "ok": False,
             "command": args.command,

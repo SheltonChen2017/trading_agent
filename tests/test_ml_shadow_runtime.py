@@ -32,6 +32,19 @@ from ml.shadow_runtime import (
 from scripts import run_ml_evidence_supervisor, run_ml_promotion_dossier, run_ml_shadow
 
 
+def test_shadow_code_commit_argument_is_a_runtime_assertion(monkeypatch):
+    seen = {}
+
+    def _runtime_commit(**kwargs):
+        seen.update(kwargs)
+        return "d" * 40
+
+    monkeypatch.setattr(run_ml_shadow, "current_commit", _runtime_commit)
+
+    assert run_ml_shadow._current_commit("d" * 40) == "d" * 40
+    assert seen == {"require_clean": True, "expected_commit": "d" * 40}
+
+
 def _bar_payload(start: str = "2024-01-02", end: str = "2026-04-10"):
     sessions = trading_sessions(date.fromisoformat(start), date.fromisoformat(end))
     bars = {}
@@ -530,10 +543,15 @@ def test_incomplete_artifact_produces_complete_unavailable_contract(tmp_path):
 
 
 def test_artifact_corruption_fails_the_claimed_run_and_emits_a_durable_alert(
-    tmp_path, capsys
+    tmp_path, capsys, monkeypatch
 ):
     store, config, config_path, artifact_dir, _provider_path, _manifest = _registered_store(
         tmp_path
+    )
+    monkeypatch.setattr(
+        run_ml_shadow,
+        "current_commit",
+        lambda **_kwargs: "d" * 40,
     )
     (artifact_dir / "vol.joblib").write_bytes(b"tampered")
     exit_code = run_ml_shadow.main(

@@ -761,11 +761,18 @@ def _write_spec(tmp_path: Path, spec: ExperimentSpec) -> Path:
     return path
 
 
-def _cli(tmp_path: Path, spec_path: Path, extra: list[str] | None = None) -> tuple[int, dict]:
+def _cli(
+    tmp_path: Path,
+    spec_path: Path,
+    extra: list[str] | None = None,
+    *,
+    patch_runtime: bool = True,
+) -> tuple[int, dict]:
     import io
-    from contextlib import redirect_stdout
+    from contextlib import nullcontext, redirect_stdout
+    from unittest.mock import patch
 
-    from scripts.run_ml_experiment import main
+    from scripts import run_ml_experiment
 
     argv = [
         "--spec", str(spec_path),
@@ -778,8 +785,13 @@ def _cli(tmp_path: Path, spec_path: Path, extra: list[str] | None = None) -> tup
         "--code-commit", "c" * 40,
     ] + (extra or [])
     buffer = io.StringIO()
-    with redirect_stdout(buffer):
-        code = main(argv)
+    runtime_context = (
+        patch.object(run_ml_experiment, "current_commit", return_value="c" * 40)
+        if patch_runtime
+        else nullcontext()
+    )
+    with runtime_context, redirect_stdout(buffer):
+        code = run_ml_experiment.main(argv)
     return code, json.loads(buffer.getvalue())
 
 
@@ -791,6 +803,36 @@ def test_cli_runs_and_prints_a_json_summary(tmp_path):
     assert payload["ok"] is True
     assert payload["spec_hash"] == spec.spec_hash
     assert payload["verdict"] in EXPECTED_VERDICTS
+
+
+def test_cli_code_commit_is_an_assertion_not_a_lineage_override(
+    tmp_path, monkeypatch
+):
+    """Supplying a hash must not bypass clean runtime identification."""
+    from scripts import run_ml_experiment
+
+    _build_dataset(tmp_path)
+    spec = _spec()
+    seen = {}
+
+    def _runtime_commit(**kwargs):
+        seen.update(kwargs)
+        raise run_ml_experiment.RuntimeIdentityError(
+            "expected code commit does not match runtime HEAD"
+        )
+
+    monkeypatch.setattr(run_ml_experiment, "current_commit", _runtime_commit)
+
+    code, payload = _cli(
+        tmp_path,
+        _write_spec(tmp_path, spec),
+        patch_runtime=False,
+    )
+
+    assert code == 1
+    assert payload["ok"] is False
+    assert "does not match" in payload["error"]
+    assert seen == {"require_clean": True, "expected_commit": "c" * 40}
 
 
 EXPECTED_VERDICTS = (

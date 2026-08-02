@@ -1,6 +1,6 @@
-import sqlite3
 """Tests for assistant/ai_advisor.py. Run with:
 python tests/test_ai_advisor.py"""
+import sqlite3
 import json
 import re
 import sys

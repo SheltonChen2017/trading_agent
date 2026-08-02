@@ -1,277 +1,495 @@
-# Development Session Handoff
+# Development transition handoff
 
-Prepared: 2026-08-01 (America/Los_Angeles)
+Prepared: 2026-08-02, approximately 11:25 America/Los_Angeles
 
-This document carries the useful state of the current local Codex task to a
-new computer. It intentionally contains no API keys, brokerage credentials,
-account numbers, or licensed market-data content.
+Purpose: transfer the durable development, safety, Git, data, and operational
+context for this repository to another computer. This document intentionally
+contains no API keys, brokerage secrets, account numbers, or licensed market
+data. Verify every time-sensitive statement after cloning.
 
 ## 1. Start here on the new computer
 
-Clone the repository and open the repository root in Codex. Then give the new
-task this prompt:
+Clone or update the repository, fetch every remote branch, and open the
+repository root in Codex or Claude Code. Then use this prompt:
 
 ```text
-Read CLAUDE.md and docs/SESSION_HANDOFF.md completely. Then read the
-implementation plan and status documents named by the handoff. Establish the
-actual Git branch, commit, worktree, local-data, and credential state before
-making changes. Preserve the ML/LLM observation-only boundary. Do not infer
-live-trading or model-promotion authority from software completion. Report
-what is missing on this computer before continuing the requested milestone.
+Read CLAUDE.md and docs/SESSION_HANDOFF.md completely. Then read the current
+status and implementation documents named in the handoff. Establish the real
+Git branch, commit, worktree, local-data, credential, scheduler, and paper
+account state before changing anything. Preserve all uncommitted work. Preserve
+the ML/LLM observation-only boundary and the exact human approval requirement.
+Do not infer live-trading or model-promotion authority from software completion.
+Report drift from the handoff and any missing machine-local prerequisites before
+continuing the requested milestone.
 ```
 
-Do not assume that the original Codex conversation will synchronize. The
-repository, this handoff, and the separately transferred operational files
-are the durable continuation mechanism.
+Do not assume the original Codex task or Claude session will synchronize. The
+repository, this file, pushed feature branches, and a separately encrypted
+transfer of ignored operational data are the durable continuation mechanism.
 
-## 2. Repository snapshot
-
-- Repository: `https://github.com/SheltonChen2017/trading_agent`
-- Source baseline before this handoff: `main` at `cbf017b0478462745eb4881d803cbfe2f9e489db`
-- Baseline subject: merge of the Databento point-in-time reference-retention
-  review.
-- Repository state at handoff preparation: clean and synchronized with
-  `origin/main`.
-- Handoff branch: `codex/session-handoff-20260801`.
-- Python used for validation: 3.12.13 in `.venv`.
-- Dependency check: `pip check` reported no broken requirements.
-
-After cloning, verify rather than trusting this snapshot:
+Initial Git checks:
 
 ```powershell
 git fetch --all --prune
 git status --short --branch
-git log -12 --oneline --decorate
+git log -15 --oneline --decorate
+git branch --all --verbose
 ```
 
-If this handoff branch has not yet been merged into `main`, check it out
-explicitly:
+The transition branch is:
+
+```text
+codex/transition-handoff-20260802-computer-move
+```
+
+If it has not been merged into `main`, read or check it out explicitly:
 
 ```powershell
-git switch --track origin/codex/session-handoff-20260801
+git switch --track origin/codex/transition-handoff-20260802-computer-move
 ```
 
-## 3. Current product and safety state
+Do not reset a newer or dirty worktree merely to reproduce this snapshot.
+
+## 2. Authoritative repository snapshot
+
+- Repository: `https://github.com/SheltonChen2017/trading_agent`
+- Reviewed and merged base: `6699633`
+- Base subject: merge of PR #101, containing the reviewed first GR-1 execution
+  kernel extraction.
+- `origin/main` pointed to `6699633` when this handoff worktree was created.
+- Transition branch base: exactly `6699633`.
+- Transition branch: `codex/transition-handoff-20260802-computer-move`.
+- The transition commit changes only `docs/SESSION_HANDOFF.md`.
+- Python used for the last reviewed full run: 3.12.13 in `.venv`.
+
+Important commits in the current GR sequence:
+
+```text
+6699633  Merge PR #101 (reviewed outcome extraction into main)
+be5429e  Harden GR-1 execution-kernel boundary
+9eb0e3d  Extract broker outcome interpretation into execution_kernel/outcomes.py
+dd17a94  Close real concurrent-claim characterization gap
+4d60e90  Characterize confirmed-absence release; correct overstated gap
+3f8c604  Record the GR-1A mutation coverage and honest limits
+df297d5  Close two characterization mutation gaps
+c54b165  Extend GR-1A execution characterization
+e8b2980  Initial partial GR-1A characterization
+2d5f096  Merge reviewed GR-0 platform readiness
+2649184  Correct GR-0 readiness classifications
+f4f911d  Build GR-0 five-dimension platform readiness
+```
+
+## 3. Urgent: Claude has uncommitted GR-1 work
+
+At the time this handoff was prepared, Claude was actively working in the
+original worktree on:
+
+```text
+branch: user/claude/gr-1a-extract-kernel-modules-20260802
+
+modified:
+  assistant/execution_service.py
+  tests/test_execution_characterization.py
+
+untracked:
+  assistant/execution_kernel/claim.py
+  assistant/execution_kernel/errors.py
+  assistant/execution_kernel/intents.py
+  assistant/execution_kernel/revalidate.py
+  assistant/execution_kernel/submit.py
+```
+
+The observed tracked-file diff was approximately 69 insertions and 275
+deletions. This was active, unreviewed work, not part of `6699633` and not part
+of this transition commit. Uncommitted files do not transfer through Git.
+
+Before abandoning the old computer, allow Claude to finish, validate, commit,
+and push that feature branch. If that cannot happen, preserve a patch and the
+untracked files separately without staging them into this transition commit.
+On the new computer, do not recreate this work from the summary above; retrieve
+Claude's exact pushed branch or exact transferred files.
+
+The transition branch was created in an isolated Git worktree under `C:\tmp`
+specifically so preparing this document could not switch Claude's branch,
+modify its files, or stage its work.
+
+## 4. Current platform and safety posture
 
 The application is an approval-gated paper-trading and investment-research
-platform. It has durable proposal/order state, reconciliation, a portfolio
-ledger, operational checks, paper-evidence epochs, backup/restore drills, an
-audited LLM context layer, and a non-authoritative ML research/shadow layer.
+platform with durable proposal/order state, broker reconciliation, a portfolio
+ledger, operational checks, paper-evidence epochs, backup/restore drill support,
+an audited LLM context layer, and a non-authoritative ML research/shadow layer.
 
 The following boundaries remain mandatory:
 
-- Alpaca remains configured for paper trading unless the owner separately and
-  explicitly authorizes a bounded live milestone.
-- Every order remains subject to the deterministic policy, execution gate,
-  exact human approval, and broker reconciliation.
-- ML and LLM output is observation/explanation only.
+- `config.PAPER_TRADING` remains `True`.
+- Never operate a funded brokerage account without a new, explicit, narrowly
+  scoped owner authorization.
+- Every order remains subject to deterministic policy, execution validation,
+  exact human approval, durable idempotency, and broker reconciliation.
+- A timeout or failed lookup is not a broker rejection and must not release
+  reserved budget as if absence were confirmed.
+- ML and LLM output remains observation, research, or explanation only.
 - No ML or LLM output may create, approve, size, submit, cancel, replace, or
   weaken a deterministic control.
-- Missing or invalid AI output is equivalent to no AI output.
-- Software completion, fixture tests, backtests, and shadow predictions are
-  not evidence of edge and do not grant trading authority.
+- Missing, stale, invalid, unavailable, or corrupt AI output is equivalent to
+  no AI output.
+- AI failure must not stop reconciliation or a legitimate risk-reducing sale.
+- Software completion, fixture tests, backtests, and shadow predictions are not
+  evidence of market edge and grant no promotion or trading authority.
 
-Read `CLAUDE.md` completely before changing code. Its safety, testing, Git,
-and handoff requirements apply to both Claude Code and Codex work.
+Read `CLAUDE.md` completely before changing code. Its safety, data, testing,
+Git, and handoff requirements apply to both Codex and Claude Code.
 
-## 4. Important plans and status documents
+## 5. General Readiness status
 
-Read these in this order when resuming broad development:
+The authoritative roadmap is
+`docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`; current deviations and status
+are in `docs/GENERAL_READINESS_STATUS.md`.
 
-1. `CLAUDE.md`
-2. `docs/SESSION_HANDOFF.md`
-3. `docs/ML_IMPLEMENTATION_STATUS.md`
-4. `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`
-5. `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
-6. `docs/OPERATIONS_RUNBOOK.md`
-7. `docs/LIVE_PROMOTION_CHECKLIST.md`
-8. `docs/DATABENTO_DATA_SOURCE.md`
-9. `docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md`
-10. `docs/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md`
+### GR-0: built and independently reviewed
 
-`docs/ML_IMPLEMENTATION_STATUS.md` contains stale passages in its older
-"Known gaps" and ML-LR-3 sections. Later commits completed ML-LR-3 and
-ML-LR-4/6/7/8 software. Reconcile that document before treating every sentence
-as current; do not use the stale text to reimplement completed work.
+`assistant/platform_readiness.py` and the `platform-readiness` CLI score five
+dimensions independently: strategy, execution integrity, data integrity,
+operational readiness, and evidence readiness. They are never averaged.
 
-## 5. ML live-readiness status
+The fresh-store result is honestly blocked in all five dimensions. That is an
+observation, not a software failure. The review corrected five material
+misclassifications, including a misspelled stranded-claim check, ledger
+reconciliation in the wrong dimension, truthy strings passing boolean checks,
+caller-asserted data readiness, and ignoring the 60-session/30-order mandate.
 
-The initial non-authoritative software sequence is substantially complete:
+### GR-1: partial and currently active
 
-- ML-LR-0: shared experiment contracts complete.
-- ML-LR-1: point-in-time contracts complete; authoritative real-data coverage
-  is not complete.
-- ML-LR-2: durable experiment specifications and runners complete.
-- ML-LR-3: volatility and portfolio-risk software complete; real portfolio
-  evidence remains data/history dependent.
-- ML-LR-4: earnings-gap and filing-context software complete; authoritative
-  event data and real confirmation remain external evidence gaps.
-- ML-LR-5: ranker economic evaluation was deliberately skipped/deprioritized.
-- ML-LR-6: supervised volatility shadow runtime complete.
-- ML-LR-7: monitoring reports and promotion dossier software complete.
-- ML-LR-8: read-only presentation complete.
-- ML-LR-9: human promotion registry and bounded adapter are not implemented or
-  authorized.
-- ML-LR-10: limited-capital canary is not authorized and cannot be completed by
-  code alone.
-- ML-LR-11: execution-quality modeling remains deferred until representative
-  live-order data exists and the owner explicitly authorizes the research.
+Completed and reviewed:
 
-### Remaining ML evidence gates
+- behavior characterization across all five public execution entry points;
+- successful/refused submission, call ordering, reservations, telemetry,
+  idempotency, timeout reconciliation, manual reconciliation, recovery, and
+  broker-absence grace handling;
+- mutation verification of the dangerous behavior directions;
+- a synchronized four-writer test proving exactly one atomic claim winner;
+- first production extraction into
+  `assistant/execution_kernel/outcomes.py`;
+- a transitive execution-kernel boundary that catches direct, relative,
+  submodule, dynamic, and indirect paths into proposal-generation code; and
+- preservation of the `assistant.execution_service` public facade.
 
-Databento ingestion and evidence capture are implemented, but they correctly
-remain `point_in_time_data=false`. The next meaningful technical/data work is:
+The reviewed extraction moved outcome lookup, intent matching,
+replacement-chain interpretation, and absence-age classification. It did not
+change execution behavior.
 
-1. obtain and retain the necessary security-master and adjustment-factor
-   reference history;
-2. implement a separately reviewed adjustment builder that reconstructs the
-   exact factor vintage available at each decision cutoff, including
-   rescissions, options, and listing identity;
-3. configure an authoritative historical strategy/index membership source and
-   emit real `UniverseMembershipRecord` evidence;
-4. bind raw, receipt-timestamped statistics, reference, adjustment, membership,
-   and feature lineage through `evaluate_point_in_time_coverage()`;
-5. prove the normal coverage gate derives `point_in_time_data=true` without a
-   caller assertion;
-6. run real preregistered volatility discovery/confirmation experiments; and
-7. operate the shadow schedule long enough to accumulate prospective evidence
-   within one immutable evidence epoch.
+Still incomplete:
 
-Do not begin ML-LR-9 merely because the ingestion code works. A real promotion
-dossier still needs complete point-in-time coverage, untouched confirmation,
-economic evidence, sufficient shadow dates, clean monitoring, no unresolved
-operational blockers, and separate owner review.
+- Claude's active claim/error/intent/revalidation/submission extraction;
+- decomposition of the interleaved orchestration in
+  `execute_approved_paper_proposal()`;
+- a genuinely thin `assistant.execution_service` composition facade;
+- independent review of each new module and moved behavior; and
+- the GR-1 definition of done on the final tree.
 
-The ranker has a low prior after repeated momentum-family rejections. Prefer
-closing the volatility/risk data and evidence path before deciding whether
-ML-LR-5 is worth the research cost.
+Critical constraints for the next review:
 
-## 6. General live-readiness work after the ML software phase
+- keep the atomic conditional claim in `AssistantStore`; do not reimplement it
+  as read-then-write across modules;
+- preserve facade import paths and exact exception identities;
+- preserve the distinction between confirmed broker absence and an
+  unconfirmed lookup;
+- preserve all three reservation-release paths and all ambiguous-outcome budget
+  holds;
+- do not let kernel modules reach proposal generation directly or transitively;
+- do not rewrite valid tests to accommodate a refactor; and
+- add a mutation result for moved behavior not already frozen.
 
-`docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md` is the next broad development
-roadmap. Separately, the current default mandate requires at least 60 derived
-paper sessions and 30 distinct broker-observed paper orders. Those are
-calendar/operation evidence gates, not values to enter manually.
+### GR-2 through GR-9
 
-The unattended paper cadence is:
+Not started. Each requires a gap analysis against the post-ML codebase before
+implementation. The intended sequence is GR-2 risk-check consolidation, GR-3
+fault injection, GR-4 data-layer resilience, GR-5 delivered alerting, GR-6
+recovery/secrets/portability, GR-7 product completeness, and only then a
+separately authorized GR-8 bounded live canary. GR-9 is explicitly deferred.
 
-```powershell
-python scripts/run_personal_assistant.py operations-cycle --alerts-jsonl data/alerts.jsonl
-python scripts/run_personal_assistant.py paper-observation --alerts-jsonl data/alerts.jsonl
-python scripts/run_personal_assistant.py paper-evidence-status <epoch-id>
-```
+GR-5 requires a real owner-visible delivery channel and a receipt test. GR-6
+requires off-machine recovery and credential-rotation exercises. They are not
+fixture-only code milestones.
 
-Before any live review, complete and record the kill-switch,
-ambiguous-submission, restart, and real backup/restore drills; keep cash and
-positions reconciled; and resolve every ambiguous broker outcome and critical
-alert. Follow `docs/OPERATIONS_RUNBOOK.md`, not an improvised procedure.
+## 6. Latest reviewed validation baseline
 
-## 7. Deferred feature plans
-
-### Proposal-history cleanup
-
-`docs/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` is planning only. No
-cleanup behavior has been implemented yet.
-
-Its intended first release adds:
-
-- deterministic expiry of stale unused proposals;
-- a terminal, non-executable `dismissed` status;
-- default hiding of expired/dismissed rows in History;
-- preview-bound bulk dismissal with a required reason; and
-- complete retention of every proposal that touched validation, approval,
-  allocation batching, reservation, submission, or broker state.
-
-Physical deletion remains explicitly deferred. Do not replace dismissal with
-an unreviewed `DELETE FROM trade_proposals` command.
-
-### AI strategy authoring
-
-`docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md` is also planning only. The
-platform does not yet accept an unrestricted natural-language strategy and
-turn it directly into an executable trading strategy.
-
-The intended safe flow is natural-language description to a typed,
-reviewable strategy specification; deterministic validation and refusal;
-reproducible backtesting and untouched confirmation; explicit human promotion;
-then observation/proposal integration behind the existing policy and approval
-boundaries. The LLM must not emit arbitrary executable code or bypass those
-stages.
-
-## 8. Machine-local state that Git will not transfer
-
-Transfer these files privately while the application and scheduled tasks are
-stopped. Do not upload them to GitHub. Use encrypted storage or a direct
-trusted-device transfer.
-
-### SQLite operational database
+The reviewed tree underlying `6699633` passed:
 
 ```text
-data/trading_assistant.db
-size at handoff: 2,863,104 bytes
-SHA-256: 02D468223C5BBB14EF7F90BBF283D737772345F13E392846E29E0206EEEBD69F
+2391 passed, 1 skipped, 26 warnings in 152.09 seconds
+compileall: clean
+git diff --check: clean
 ```
 
-This database is Git-ignored. Its hash is valid only for the snapshot present
-when this handoff was prepared; continued application use will legitimately
-change it. Stop writers, make a consistent backup using the documented backup
-workflow, transfer that backup, restore it on the new computer, and run SQLite
-integrity plus ledger reconciliation checks.
+The warnings were third-party notices: one `websockets.legacy` deprecation,
+one joblib physical-core detection warning, and NumPy/joblib pickle shape
+deprecations. They were not test failures.
 
-### Licensed Databento snapshots
+This result does not validate Claude's uncommitted kernel-module work. After
+retrieving that branch, run focused execution/boundary tests first, then the
+full required validation on the exact final tree.
 
-The entire `artifacts/databento/` directory is Git-ignored and must remain out
-of version control. Files present at handoff:
+Use a writable pytest base directory if the Codex sandbox cannot access the
+default Windows temp directory:
+
+```powershell
+New-Item -ItemType Directory -Force .venv\codex_test_tmp | Out-Null
+.\.venv\Scripts\python.exe -m pytest -q --basetemp .venv\codex_test_tmp\full -p no:cacheprovider
+.\.venv\Scripts\python.exe -m compileall -q assistant backtest data execution ml risk scripts signals strategies tests baskets.py config.py market_analytics.py
+git diff --check
+git status --short --branch
+```
+
+Pytest is isolated from the operator database by `tests/conftest.py`. Keep that
+protection intact. Historical test runs previously wrote UI/sample data into
+the operator database and, in another incident, inherited live broker
+credentials during collection.
+
+## 7. ML software status
+
+The ML layer remains non-authoritative and isolated from proposal and execution
+authority.
+
+| Milestone | Current state |
+|---|---|
+| ML-LR-0 | Shared experiment and acceptance contracts complete |
+| ML-LR-1 | PIT contracts complete; real authoritative coverage still blocked |
+| ML-LR-2 | Durable experiment orchestration complete |
+| ML-LR-3 / ML-FS-4 | Volatility and portfolio-risk software complete; real evidence underfilled |
+| ML-LR-4 | Earnings/filing research software complete; authoritative real event data absent |
+| ML-LR-5 | Deliberately skipped/deprioritized; ranker remains incomplete |
+| ML-LR-6 | Supervised-volatility shadow runtime complete |
+| ML-LR-7 | Monitoring report and immutable promotion dossier software complete |
+| ML-LR-8 | Read-only presentation complete |
+| ML-LR-9 | Promotion registry/bounded adapter not implemented or authorized |
+| ML-LR-10 | Limited-capital canary not authorized; cannot be completed by code alone |
+| ML-LR-11 | Execution-quality modeling deferred pending representative live-order data |
+| ML-FS-1 | Normalized paper portfolio collection software complete |
+| ML-FS-2 | Execution telemetry collection/materialization complete |
+| ML-FS-3 | Authoritative Databento builder software complete; no real authoritative batch |
+| ML-FS-5 | Prospective inference contract software complete |
+| ML-FS-6 | Reviewed research-campaign preparation complete; no real campaign run |
+| ML-FS-7 | Evidence operations/scheduler verification infrastructure complete; not deployed here |
+| ML-FS-8/9 | Not authorized and not implemented |
+
+Do not begin ML-LR-9, ML-FS-8, ML-LR-10, or ML-FS-9 merely because the
+software scaffolding exists.
+
+## 8. Remaining ML data and evidence gates
+
+Databento is the selected market-data vendor. The repository can cost-estimate,
+capture, retain, and hash-bind raw statistics and reference data, and its pure
+builder can derive `point_in_time_data=True` from complete verified fixture
+evidence. No real authoritative feature batch has been created.
+
+The remaining real-data gates are:
+
+1. obtain and retain licensed security-master and adjustment-factor history;
+2. resolve the exact listing, option, revision, rescission, and factor vintage
+   visible at every decision cutoff;
+3. obtain an independently sourced, authoritative historical strategy/index
+   membership history;
+4. build a real content-addressed feature batch through the normal coverage
+   gate rather than a caller assertion;
+5. have a human review and attest the frozen real discovery specification;
+6. run the real preregistered volatility discovery and separate untouched
+   confirmation without retuning;
+7. operate one immutable shadow evidence epoch for enough independent dates;
+8. clear monitoring, economic, operational, and paper-evidence gates; and
+9. conduct a separate owner promotion review.
+
+Yfinance remains exploratory and must stay `point_in_time_data=false`.
+Databento market data does not itself supply historical index membership.
+Raw as-printed prices also require vintage-correct corporate-action handling;
+a split must never be interpreted as a genuine extreme return.
+
+The ranker has a low prior after repeated momentum-family rejections. Continue
+to prioritize volatility and portfolio-risk evidence unless the owner
+explicitly reorders the research roadmap.
+
+## 9. Paper-operation and live-promotion state
+
+No paper evidence epoch has started in the current operator database. No
+broker order, broker-order event, execution reservation, operational drill, or
+operational alert is recorded there. Therefore the 60-session and 30-order
+mandate gates have not begun accumulating in this database.
+
+The unattended cadence, when intentionally deployed against the correct paper
+account and isolated operational database, is documented in
+`docs/OPERATIONS_RUNBOOK.md`. The core commands are:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_personal_assistant.py --database <paper-db> operations-cycle --alerts-jsonl <alerts.jsonl>
+.\.venv\Scripts\python.exe scripts/run_personal_assistant.py --database <paper-db> paper-observation --alerts-jsonl <alerts.jsonl>
+.\.venv\Scripts\python.exe scripts/run_personal_assistant.py --database <paper-db> paper-evidence-status <epoch-id>
+```
+
+Do not start an epoch casually from a moving development checkout. The epoch
+binds the Git commit, mandate, policy, strategy/model identifiers, schedule,
+provider, and broker account. A lineage change starts a new epoch; epochs are
+never pooled.
+
+Before any live review, all of these remain real gates:
+
+- approved and fingerprinted mandate;
+- reproduced point-in-time research and honest confirmation;
+- realistic costs, taxes, liquidity, and shared-capital simulation;
+- at least the mandated paper sessions and broker-observed paper orders;
+- clean cash/position reconciliation;
+- no unresolved broker outcomes or critical alerts;
+- kill-switch, ambiguous-submission, restart, backup/restore, and delivered
+  alert drills;
+- a reviewed tiny-capital canary plan; and
+- explicit owner authorization after evidence review.
+
+Passing `evaluate_live_promotion()` only makes the platform eligible for human
+review. It does not turn on live trading or authorize an order.
+
+## 10. Operator database snapshot
+
+The database is Git-ignored and must be transferred privately while all writers
+are stopped.
+
+Snapshot captured 2026-08-02T11:22:10-07:00:
+
+```text
+path: data/trading_assistant.db
+size: 2,920,448 bytes
+last write: 2026-08-01T20:08:24.4605786Z
+SHA-256: 02D468223C5BBB14EF7F90BBF283D737772345F13E392846E29E0206EEEBD69F
+PRAGMA quick_check: ok
+```
+
+Selected row counts:
+
+```text
+decision_packets:              277
+trade_proposals:                31
+portfolio_equity_snapshots:    118
+portfolio_position_snapshots:    0
+paper_account_observations:       0
+paper_evidence_epochs:            0
+ml_evidence_epochs:               0
+broker_orders:                    0
+broker_order_events:              0
+execution_reservations:           0
+operational_alerts:               0
+operational_drill_runs:            0
+```
+
+The 118 equity rows include data written before pytest was isolated from the
+operator database. `docs/GENERAL_READINESS_STATUS.md` treats equity history
+before 2026-08-02 as unreliable. The 277 decision packets and 31 proposals
+have not been individually classified. Do not delete or use them as evidence
+without a scoped backup, provenance analysis, explicit owner approval, and a
+reviewed cleanup operation.
+
+The hash above is only a snapshot. Recalculate it after stopping writers and
+creating the actual transfer backup. Prefer the documented SQLite backup and
+restore workflow over copying a live database file.
+
+After restoring on the new computer:
+
+1. verify the transfer hash;
+2. run SQLite integrity/quick checks;
+3. confirm the expected paper account identity without printing credentials;
+4. reconcile the ledger against Alpaca paper state;
+5. run the operational health check; and
+6. confirm development/tests point to a separate database.
+
+## 11. Licensed Databento artifacts
+
+`artifacts/databento/` is Git-ignored and licensed. Transfer it privately; do
+not commit or upload it.
+
+Files present at the snapshot:
 
 ```text
 databento-equs-summary-20260801T174244622922Z-fb9977a96b02.dbn
-  E94F236F25802834066639D97B79DAEA5D782E454F8245C24D6D127E87E45257
+  size: 319 bytes
+  SHA-256: E94F236F25802834066639D97B79DAEA5D782E454F8245C24D6D127E87E45257
+
 databento-equs-summary-20260801T174244622922Z-fb9977a96b02.manifest.json
-  8F4295E4C230423008ADD6E5BB9675B1D40B894AF91171542C0A531A97E28378
+  size: 1,170 bytes
+  SHA-256: 8F4295E4C230423008ADD6E5BB9675B1D40B894AF91171542C0A531A97E28378
+
 databento-equs-summary-20260801T185751821111Z-4651a31b789d.dbn
-  1A3DD34834D24809168A4642FBF6EC150E8173411BF14B878FDC98696492F7CB
+  size: 474 bytes
+  SHA-256: 1A3DD34834D24809168A4642FBF6EC150E8173411BF14B878FDC98696492F7CB
+
 databento-equs-summary-20260801T185751821111Z-4651a31b789d.manifest.json
-  459D8B154567F0BA4F0E4501F3E87FFAC33BB8C5A4BF722189AE0DD39F0EB588
+  size: 1,330 bytes
+  SHA-256: 459D8B154567F0BA4F0E4501F3E87FFAC33BB8C5A4BF722189AE0DD39F0EB588
 ```
 
-Preserve each raw file together with its manifest. These samples are
-unadjusted and do not prove point-in-time feature readiness.
+These are tiny unadjusted `EQUS.SUMMARY` samples. They do not prove
+point-in-time feature readiness. Preserve each DBN together with its manifest.
 
-Other ignored operational files may be created after this handoff. Before the
-move, inspect `data/`, `artifacts/`, local policy/config paths, alert JSONL,
-drill evidence, backups, and scheduled-task configuration without adding
-credentials or licensed data to Git.
+For all future requests, follow `docs/DATABENTO_DATA_SOURCE.md`, estimate cost
+before downloading, and supply an explicit `--max-cost-usd`. Do not infer
+availability timestamps from download time.
 
-## 9. Secrets and account configuration to recreate
+## 12. Credentials and host configuration
 
-Recreate environment variables on the new computer; do not transfer their
-values in this document or commit them anywhere:
+Never store secret values in this document, Git, logs, screenshots, or issue
+comments.
 
-- `APCA_API_KEY_ID`
-- `APCA_API_SECRET_KEY`
-- `DATABENTO_API_KEY`
-- optional `ANTHROPIC_API_KEY`
-- optional `FINNHUB_API_KEY`
+At the snapshot, the current process could see:
 
-Keep `config.py` paper-trading mode enabled. After setting user-level Windows
-environment variables, restart PowerShell and Codex so new processes inherit
-them. Verify presence without printing values.
-
-For Databento:
-
-```powershell
-python scripts/run_databento_ingest.py status
-python scripts/run_databento_ingest.py check-access --dataset EQUS.SUMMARY
+```text
+APCA_API_KEY_ID: configured in process
+APCA_API_SECRET_KEY: configured in process
+DATABENTO_API_KEY: configured in process
+ANTHROPIC_API_KEY: not configured
+FINNHUB_API_KEY: not configured
 ```
 
-Always estimate before downloading and always use an explicit
-`--max-cost-usd`. Follow `docs/DATABENTO_DATA_SOURCE.md`. Reference requests
-require subscription confirmation and the explicit acknowledgement option.
+The user-scope environment query returned false for all five names. Recreate
+required values on the new computer and start a new terminal/Codex process so
+it inherits them. Verify presence without printing values. Keep Alpaca pointed
+at the intended paper account.
 
-## 10. Environment reconstruction
+No Windows scheduled task matching `TradingAgent-*` was installed at the
+snapshot. Do not assume the operational or ML evidence cadence is running.
+Install tasks only through the reviewed scripts, using explicit repository,
+Python, database, config, artifact, and alert paths, then run
+`scripts/verify_windows_evidence_tasks.ps1` and inspect `LastTaskResult`.
 
-Do not copy `.venv` between computers. Recreate it from the pinned repository
-requirements:
+`config.py` currently has:
+
+```text
+PAPER_TRADING = True
+```
+
+Do not change it during machine reconstruction.
+
+## 13. What Git will not transfer
+
+Before leaving the old computer, stop Streamlit, scheduled jobs, shadow jobs,
+paper operations, and any other database writers. Privately inventory and
+transfer, as applicable:
+
+- a consistent backup of `data/trading_assistant.db`;
+- `artifacts/databento/` raw files and manifests;
+- ML model, dataset, monitoring, dossier, and shadow configuration artifacts
+  that are intentionally ignored;
+- alert JSONL, heartbeat, drill, and backup evidence files;
+- local policy/mandate/config files that are not tracked;
+- scheduled-task configuration values and service-account requirements;
+- any uncommitted Claude WIP that could not be pushed; and
+- credentials through a secure secret manager or manual recreation, never in
+  the transfer document.
+
+Use encrypted storage or direct trusted-device transfer. Recalculate and keep
+a separate local transfer manifest of sizes and hashes.
+
+Do not copy `.venv`, `.pytest_cache`, `__pycache__`, or other generated caches.
+
+## 14. Environment reconstruction
+
+Create a new virtual environment from the pinned requirements:
 
 ```powershell
 py -3.12 -m venv .venv
@@ -280,83 +498,128 @@ py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip check
 ```
 
-If installation encounters Windows long-path failures, follow the Windows
-dependency notes in `README.md`; do not silently downgrade pinned packages.
+If Windows long-path problems occur, follow the dependency notes in
+`README.md`; do not silently downgrade pinned libraries.
 
-Run the UI only after restoring the intended database and confirming paper
-credentials:
+Restore and validate the intended database before starting the UI:
 
 ```powershell
 .\.venv\Scripts\python.exe -m streamlit run scripts/personal_assistant_ui.py
 ```
 
-Reinstall scheduled tasks from the reviewed scripts and runbooks. Do not copy
-Task Scheduler definitions blindly because absolute Python, repository,
-database, artifact, and alert paths change across machines.
+Do not let development and tests share the restored operational database.
 
-## 11. Fresh validation baseline
+## 15. Documents to read in order
 
-On source baseline `cbf017b`, with Alpaca credentials removed only from the
-test process and an unrestricted temporary directory:
+For the current development sequence:
+
+1. `CLAUDE.md`
+2. `docs/SESSION_HANDOFF.md`
+3. `docs/GENERAL_READINESS_STATUS.md`
+4. `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
+5. `docs/ARCHITECTURE_DEBT.md`
+6. `tests/test_execution_characterization.py`
+7. the active GR-1 branch diff and all new kernel modules
+8. `docs/ML_IMPLEMENTATION_STATUS.md`
+9. `docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md`
+10. `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`
+11. `docs/OPERATIONS_RUNBOOK.md`
+12. `docs/LIVE_PROMOTION_CHECKLIST.md`
+13. `docs/DATABENTO_DATA_SOURCE.md`
+14. `docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md`
+15. `docs/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md`
+
+Older passages in status documents may lag later commits. Treat the latest
+specific status section and current code/tests as authoritative; update stale
+text rather than reimplementing completed work.
+
+## 16. Deferred product plans
+
+### Proposal History cleanup
+
+`docs/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` is planning only. No
+cleanup behavior has been implemented. It proposes deterministic expiry,
+terminal non-executable dismissal, default hiding, preview-bound bulk actions,
+and retention of anything that touched validation, approval, reservation,
+submission, allocation, or broker state. Physical deletion remains deferred.
+
+### AI strategy authoring
+
+`docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md` is planning only. The safe
+intended flow is natural-language description to a typed restricted strategy
+specification, deterministic validation/refusal, realistic reproducible
+backtesting, untouched confirmation, explicit human promotion, and only then a
+paper/shadow proposal adapter behind every existing control. The LLM must not
+emit arbitrary executable code or directly authorize trading.
+
+Do not start either plan while GR-1 is half-extracted unless the owner
+explicitly changes priority.
+
+## 17. Owner workflow preferences
+
+- Codex generally initiates the plan and alternates implementation/review with
+  Claude when requested.
+- When reviewing Claude's code, verify findings, fix serious defects where
+  possible, and include a 1-10 code-quality rating.
+- Commit review fixes unless the owner says not to. If on `main`, branch first.
+- Preserve unrelated and uncommitted work in the shared worktree.
+- Do not push, merge, or open a pull request unless requested. Cross-computer
+  handoffs are an explicit exception when the owner asks for a push.
+- Keep one coherent milestone per branch and stop for independent review.
+- Do not call a milestone complete because modules or CLI shells exist; verify
+  the documented definition of done end to end.
+
+## 18. Recommended next actions
+
+1. On the old computer, let Claude finish, test, commit, and push
+   `user/claude/gr-1a-extract-kernel-modules-20260802`.
+2. Transfer the ignored database and Databento files through encrypted storage
+   after stopping writers; verify their hashes after restore.
+3. Recreate the Python environment and required credentials on the new
+   computer; confirm paper mode and database isolation.
+4. Fetch Claude's GR-1 branch and independently review every moved helper,
+   facade export, import boundary, exception identity, reservation path,
+   idempotency path, and ambiguous-outcome path.
+5. Run focused characterization/import/reconciliation tests and then the full
+   suite on Claude's exact final tree.
+6. Finish GR-1 before starting GR-2 unless the owner explicitly changes the
+   sequence.
+7. In parallel only at the operational level, decide when and how to deploy an
+   isolated paper cadence; do not start an evidence epoch from a moving or
+   mixed runtime.
+8. Resolve the historical-universe and licensed PIT reference-data dependency
+   before claiming authoritative ML evidence.
+9. Keep ML promotion, bounded adapters, and funded canaries blocked until the
+   real evidence and owner-authorization gates are satisfied.
+
+## 19. Decisions still required from the owner
+
+The following are not safe to infer:
+
+1. Which authoritative historical index-membership vendor/source will be
+   funded and used?
+2. When should the operational paper cadence and first immutable evidence
+   epoch start?
+3. Which owner-visible delivery channel should GR-5 implement and verify?
+4. Should the pre-isolation database pollution be cleaned after backup and
+   provenance analysis, or simply excluded by a dated boundary?
+5. When is the elevated Windows deployment/credential-rotation window?
+6. When, if ever, should the deferred ranker, proposal-history cleanup, or AI
+   strategy-authoring plans take priority?
+
+None of these decisions grants funded-account authority by implication.
+
+## 20. Resume prompt after verifying the new machine
 
 ```text
-2256 passed, 1 skipped, 20 warnings in 125.89 seconds
+Read CLAUDE.md and docs/SESSION_HANDOFF.md completely. Verify origin/main,
+the transition branch, and whether Claude pushed
+user/claude/gr-1a-extract-kernel-modules-20260802. Compare the real state with
+the handoff. Verify the restored database and Databento artifact hashes,
+paper-mode configuration, credential presence without displaying values, and
+scheduled-task state. Do not delete data, start an evidence epoch, install
+tasks, enable live trading, or wire ML/LLM output into proposals. If Claude's
+GR-1 extraction is committed, review it against the characterization suite and
+GR-1 definition of done, fix serious defects, include a 1-10 rating, commit the
+review, and stop before GR-2.
 ```
-
-Warnings were one `websockets.legacy` deprecation and 19 joblib/NumPy shape
-deprecations. `pip check` reported no broken requirements.
-
-The ordinary sandboxed attempt was not a product failure: the test collector
-first inherited live Alpaca variables, and later sandbox attempts could not
-create pytest temporary directories. The successful baseline used no broker
-credentials and made no live broker call.
-
-For a clean offline run in PowerShell, clear credentials only in that shell
-before starting pytest:
-
-```powershell
-Remove-Item Env:APCA_API_KEY_ID -ErrorAction SilentlyContinue
-Remove-Item Env:APCA_API_SECRET_KEY -ErrorAction SilentlyContinue
-.\.venv\Scripts\python.exe -m pytest -q
-```
-
-This does not delete user-level variables; it removes them only from the
-current PowerShell process. Opening a new shell restores inherited user-level
-configuration.
-
-For completed milestones also run:
-
-```powershell
-.\.venv\Scripts\python.exe -m compileall -q assistant backtest data execution ml risk scripts signals strategies tests baskets.py config.py market_analytics.py
-git diff --check
-git status --short --branch
-```
-
-## 12. Owner workflow preferences
-
-- Codex initiates the execution plan and alternates implementation/review with
-  Claude when the owner requests that workflow.
-- When reviewing Claude's code, verify findings, fix serious defects where
-  possible, and include a 1-10 code-quality rating with the review report.
-- After a Claude-code review, commit the review fixes unless the owner says not
-  to. If currently on `main`, create a branch before committing.
-- Preserve unrelated work in the shared worktree.
-- Do not push, merge, or open a pull request unless requested or necessary for
-  an explicitly requested cross-computer handoff.
-- Use one coherent milestone per branch and stop for independent review.
-
-## 13. Recommended next actions
-
-1. Transfer and restore the ignored database and Databento artifacts, then
-   verify their hashes/integrity.
-2. Recreate credentials and confirm Alpaca is the intended paper account.
-3. Run the offline validation suite on the new machine.
-4. Reconcile the stale sections of `docs/ML_IMPLEMENTATION_STATUS.md`.
-5. Close the ML-LR-1 authoritative-data gaps: vintage-correct corporate-action
-   adjustment and historical universe membership.
-6. Run the real volatility experiment and begin one correctly configured
-   prospective shadow evidence epoch.
-7. Continue the general-readiness roadmap and paper operating cadence while
-   shadow evidence accumulates.
-8. Defer ML-LR-9, ML-LR-10, and funded trading until their evidence and owner
-   authorization gates are genuinely satisfied.

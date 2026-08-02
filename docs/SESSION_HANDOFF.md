@@ -1,6 +1,6 @@
 # Development transition handoff
 
-Prepared: 2026-08-02, approximately 11:25 America/Los_Angeles
+Prepared: 2026-08-02, approximately 11:30 America/Los_Angeles
 
 Purpose: transfer the durable development, safety, Git, data, and operational
 context for this repository to another computer. This document intentionally
@@ -65,6 +65,7 @@ Do not reset a newer or dirty worktree merely to reproduce this snapshot.
 Important commits in the current GR sequence:
 
 ```text
+c8cbf4e  Claude's unmerged remaining-kernel extraction; independent review pending
 6699633  Merge PR #101 (reviewed outcome extraction into main)
 be5429e  Harden GR-1 execution-kernel boundary
 9eb0e3d  Extract broker outcome interpretation into execution_kernel/outcomes.py
@@ -79,19 +80,18 @@ e8b2980  Initial partial GR-1A characterization
 f4f911d  Build GR-0 five-dimension platform readiness
 ```
 
-## 3. Urgent: Claude has uncommitted GR-1 work
+## 3. Claude's next GR-1 extraction is pushed but unreviewed
 
-At the time this handoff was prepared, Claude was actively working in the
-original worktree on:
+Claude completed and pushed the next extraction while this handoff was being
+prepared:
 
 ```text
 branch: user/claude/gr-1a-extract-kernel-modules-20260802
+commit: c8cbf4e5b8fea452e8ab88ae826f8983dff4c30e
 
-modified:
+changed:
   assistant/execution_service.py
   tests/test_execution_characterization.py
-
-untracked:
   assistant/execution_kernel/claim.py
   assistant/execution_kernel/errors.py
   assistant/execution_kernel/intents.py
@@ -99,15 +99,15 @@ untracked:
   assistant/execution_kernel/submit.py
 ```
 
-The observed tracked-file diff was approximately 69 insertions and 275
-deletions. This was active, unreviewed work, not part of `6699633` and not part
-of this transition commit. Uncommitted files do not transfer through Git.
+The commit contains five new modules plus facade and characterization changes:
+412 insertions and 277 deletions. Claude reports `2392 passed, 1 skipped` and
+mutation checks for the moved helpers. That report has not yet received the
+independent Codex review required by the workflow. The branch was clean and
+matched its remote after the push.
 
-Before abandoning the old computer, allow Claude to finish, validate, commit,
-and push that feature branch. If that cannot happen, preserve a patch and the
-untracked files separately without staging them into this transition commit.
-On the new computer, do not recreate this work from the summary above; retrieve
-Claude's exact pushed branch or exact transferred files.
+This work is not part of `6699633` and is not part of the transition branch.
+Retrieve the exact remote commit; do not recreate it from the summary above or
+assume its commit message proves the GR-1 definition of done.
 
 The transition branch was created in an isolated Git worktree under `C:\tmp`
 specifically so preparing this document could not switch Claude's branch,
@@ -159,7 +159,7 @@ misclassifications, including a misspelled stranded-claim check, ledger
 reconciliation in the wrong dimension, truthy strings passing boolean checks,
 caller-asserted data readiness, and ignoring the 60-session/30-order mandate.
 
-### GR-1: partial and currently active
+### GR-1: partial; next extraction committed and awaiting review
 
 Completed and reviewed:
 
@@ -179,9 +179,9 @@ The reviewed extraction moved outcome lookup, intent matching,
 replacement-chain interpretation, and absence-age classification. It did not
 change execution behavior.
 
-Still incomplete:
+Still incomplete or unverified:
 
-- Claude's active claim/error/intent/revalidation/submission extraction;
+- independent review and any corrections for Claude's commit `c8cbf4e`;
 - decomposition of the interleaved orchestration in
   `execute_approved_paper_proposal()`;
 - a genuinely thin `assistant.execution_service` composition facade;
@@ -227,9 +227,10 @@ The warnings were third-party notices: one `websockets.legacy` deprecation,
 one joblib physical-core detection warning, and NumPy/joblib pickle shape
 deprecations. They were not test failures.
 
-This result does not validate Claude's uncommitted kernel-module work. After
-retrieving that branch, run focused execution/boundary tests first, then the
-full required validation on the exact final tree.
+This result does not independently validate Claude's commit `c8cbf4e`. Claude
+reports `2392 passed, 1 skipped` for that branch. After retrieving it, run
+focused execution/boundary tests first, then the full required validation on
+the exact reviewed tree.
 
 Use a writable pytest base directory if the Codex sandbox cannot access the
 default Windows temp directory:
@@ -478,7 +479,7 @@ transfer, as applicable:
 - alert JSONL, heartbeat, drill, and backup evidence files;
 - local policy/mandate/config files that are not tracked;
 - scheduled-task configuration values and service-account requirements;
-- any uncommitted Claude WIP that could not be pushed; and
+- any later uncommitted Claude WIP that could not be pushed; and
 - credentials through a secure secret manager or manual recreation, never in
   the transfer document.
 
@@ -571,13 +572,13 @@ explicitly changes priority.
 
 ## 18. Recommended next actions
 
-1. On the old computer, let Claude finish, test, commit, and push
+1. Fetch and independently review exact commit `c8cbf4e` from
    `user/claude/gr-1a-extract-kernel-modules-20260802`.
 2. Transfer the ignored database and Databento files through encrypted storage
    after stopping writers; verify their hashes after restore.
 3. Recreate the Python environment and required credentials on the new
    computer; confirm paper mode and database isolation.
-4. Fetch Claude's GR-1 branch and independently review every moved helper,
+4. Independently review every moved helper,
    facade export, import boundary, exception identity, reservation path,
    idempotency path, and ambiguous-outcome path.
 5. Run focused characterization/import/reconciliation tests and then the full
@@ -613,7 +614,7 @@ None of these decisions grants funded-account authority by implication.
 
 ```text
 Read CLAUDE.md and docs/SESSION_HANDOFF.md completely. Verify origin/main,
-the transition branch, and whether Claude pushed
+the transition branch, and exact Claude commit c8cbf4e on
 user/claude/gr-1a-extract-kernel-modules-20260802. Compare the real state with
 the handoff. Verify the restored database and Databento artifact hashes,
 paper-mode configuration, credential presence without displaying values, and

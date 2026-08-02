@@ -1,11 +1,12 @@
 # Operations runbook
 
-The order monitor, operations watchdog, scheduled operations cycle, and
-post-close evidence capture are independent controls. The monitor owns
+The order monitor, operations watchdog, scheduled operations cycle, post-close
+evidence capture, and ML evidence supervisor are independent controls. The monitor owns
 broker-order reconciliation; the watchdog records frequent health
 heartbeats; the cycle synchronizes the ledger, reconciles Alpaca, maintains
 verified backups, and emits alerts; the post-close job records the paper
-equity curve. No one process may be the only copy of another control.
+equity curve; the ML supervisor verifies that expected evidence arrived. No one
+process may be the only copy of another control.
 
 ## Before starting a paper evidence epoch
 
@@ -51,6 +52,8 @@ epoch bound to the verified account.
 | Watchdog | Continuous; 60-second health heartbeat | `run_operations_watchdog.py --interval-seconds 60` |
 | Operations cycle | Every 10 minutes | `operations-cycle --cancel-stale --alerts-jsonl data/alerts.jsonl` |
 | Paper observation | Once after each NYSE close | `paper-observation --cancel-stale --alerts-jsonl data/alerts.jsonl` |
+| ML prediction/maturity/monitoring | Once after each weekday close at staggered times | `run_ml_shadow.py predict`, `mature`, and `monitor` |
+| ML evidence supervisor | Every 15 minutes | `run_ml_evidence_supervisor.py` |
 
 `operations-cycle` runs order reconciliation, idempotent fill-to-ledger sync,
 broker-versus-ledger reconciliation, conditional verified backup, and the
@@ -121,25 +124,53 @@ python scripts/run_operations_watchdog.py --database data/paper.db --interval-se
 
 ### Windows Task Scheduler
 
-Preview the four user-level scheduled tasks:
+Preview the four operational tasks under the intended least-privilege account:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install_windows_operational_tasks.ps1 -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -WhatIf
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install_windows_operational_tasks.ps1 -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -RunAsUser "MACHINE\trading-agent" -WhatIf
 ```
 
 Remove `-WhatIf` only after checking the resolved Python, repository,
 database, alert path, and local post-close time. The installer registers the
-monitor and watchdog at logon, the operations cycle every 10 minutes, and
-the paper observation at 4:30 PM local time on weekdays. On this workstation
-that time is safely after the NYSE close.
+monitor and watchdog at boot for S4U (or at the named user's logon for
+interactive mode), the operations cycle every 10 minutes, and the paper
+observation at 4:30 PM local time on weekdays. On this workstation that time
+is safely after the NYSE close. Start the boot-triggered tasks manually once
+after first installation; their automatic trigger otherwise begins at the next
+boot.
 
-By default the tasks use the current user's interactive security context.
-For operation while logged out, change them in Task Scheduler to a dedicated
-least-privilege account, select "Run whether user is logged on or not", and
-verify that account can read the repository and paper credentials, write
-only the selected database/backups/alert path, and reach Alpaca. Run each
-task manually once and inspect its exit code, SQLite alerts, JSONL output,
-and heartbeat before calling the cadence operational.
+The installers default to the current user, S4U logon, and `Limited` run level.
+Prefer a dedicated account and pass it explicitly with `-RunAsUser`. Grant only
+"Log on as a batch job", read/execute access to Python and the repository,
+read access to credentials/config/artifacts, write access to the selected
+database/backups/alerts/reports, and outbound access required by the configured
+providers. Use `-TaskLogonType Interactive` only when operation exclusively
+while that user is logged on is intentional.
+
+Preview the four ML tasks (predict, mature, monitor, and independent
+supervisor) with the same account:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install_windows_ml_shadow_tasks.ps1 -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -ConfigPath C:\path\to\shadow.json -ArtifactPath C:\path\to\artifact-dir -RunAsUser "MACHINE\trading-agent" -WhatIf
+```
+
+Remove `-WhatIf` only after reviewing every resolved path and local scheduled
+time. Provide required environment-variable *names* through
+`-RequiredCredentialNames`; never place secret values in task arguments.
+After installation, start every task manually at least once, then run:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify_windows_evidence_tasks.ps1 -RunAsUser "MACHINE\trading-agent" -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -ConfigPath C:\path\to\shadow.json -ArtifactPath C:\path\to\artifact-dir
+```
+
+The verifier is read-only and non-authoritative. It checks paths, credential
+presence without printing values, all eight task principals/logon types/
+actions, and last task results. Run it as the task account to verify user-scoped
+credentials; when run as another account, only machine-scoped credentials are
+accepted as visible to the target. A never-run task is reported but is not a
+successful manual-run receipt; retain Task Scheduler history, stdout/stderr,
+SQLite alerts, JSONL delivery, and heartbeat/report evidence separately before
+declaring the host operational.
 
 The supervisor should also:
 
@@ -150,6 +181,44 @@ The supervisor should also:
 
 `data/alerts.jsonl` is a local delivery boundary for a log shipper or paging
 sidecar. Durable alert state remains in SQLite until acknowledged.
+
+The ML supervisor can also be run directly:
+
+```text
+python scripts/run_ml_evidence_supervisor.py --database data/paper.db --config artifacts/shadow.json --artifact-dir artifacts/model --required-credential APCA_API_KEY_ID --required-credential APCA_API_SECRET_KEY --alerts-jsonl data/alerts.jsonl --output artifacts/ml-evidence-supervisor.json
+```
+
+It exits nonzero and creates deduplicated `ml_evidence_operations` alerts when
+expected paper observations/capture manifests, ML runs/outcomes, explicit
+healthy heartbeats, verified backup/restore evidence, credentials, database
+integrity, or artifact integrity are absent. It never creates a missing
+observation, prediction, or outcome. Treat a persistent alert as an incident,
+not as permission to edit the evidence database manually.
+
+## Authoritative Databento feature replay
+
+Capture statistics for each required session plus security-master and
+adjustment-factor reference windows with `run_databento_ingest.py`. Accepted
+statistics captures contain the paid raw DBN, a normalized JSON replay
+artifact, and a manifest binding both hashes. Reference captures retain raw and
+canonical forms. Do not edit any of these files.
+
+Prepare a separately reviewed historical-universe snapshot. A Databento
+listing record proves listing state and security identity; it does not prove
+membership in an index or strategy universe. The universe snapshot must retain
+the upstream artifact hash and every membership's announcement/availability
+time. Then provide exact per-session decision cutoffs and build:
+
+```text
+python scripts/run_databento_ingest.py build-authoritative --statistics-manifest artifacts/databento/STATS.manifest.json --security-master-manifest artifacts/databento/SECURITY.manifest.json --adjustment-factors-manifest artifacts/databento/ADJUSTMENTS.manifest.json --universe-snapshot artifacts/databento/universe.json --decision-cutoffs-json artifacts/databento/cutoffs.json --output-dir artifacts/databento
+```
+
+Repeat `--statistics-manifest` for multiple sessions. Output is stored beneath
+its `batch_hash`; an exact replay is idempotent and conflicting bytes are
+refused. A `point_in_time_data=true` result means the supplied rows have
+complete cutoff-valid feature and universe evidence. It does not establish
+that the upstream universe source itself was appropriately licensed, complete,
+or reviewed; retain that external review with the source artifact.
 
 ## Paper evidence status
 
@@ -219,3 +288,85 @@ The recovery drill creates a consistent backup, restores it to a temporary
 database, runs SQLite integrity checks on both copies, and compares every
 table count. It never replaces the live database. A successful drill expires
 for health purposes after 30 days by default.
+
+## Portfolio-volatility research preparation
+
+Use complete `portfolio_capture_sessions` only. Build either `frozen_weight`
+or `realized_account` targets for one exact account key; never pool target
+kinds, broker accounts, or paper/live identities. Then use
+`PortfolioDatasetContract` and `build_portfolio_dataset_frames()` to bind the
+ordered features, cash exposure, horizon, and distinct trailing/EWMA baseline
+columns. An unavailable result is an operationally valid outcome: inspect its
+refusals and readiness blockers instead of filling missing holdings or account
+sessions.
+
+A portfolio experiment spec must use task
+`portfolio_volatility_forecast` and freeze these exact task parameters:
+
+```json
+{
+  "observation_unit": "account_session",
+  "target_kind": "frozen_weight",
+  "target_units": "daily_return_standard_deviation_pct"
+}
+```
+
+Run the resulting content-addressed dataset through the existing
+`run_ml_experiment.py` workflow. Preserve the emitted spec, report, model
+manifests, model artifacts, and run manifest together. This is research-only:
+do not edit the research registry, proposals, or execution state based on the
+result. Until enough genuine daily captures exist, report the path as
+underfilled rather than validating it on reconstructed positions.
+
+## Inspecting prospective shadow evidence
+
+New volatility artifacts must contain a frozen `prospective_profile` generated
+by the experiment runner from out-of-fold residuals and a preregistered mandate
+ceiling. Do not retrofit that profile into an old artifact: rerun the immutable
+experiment under a new artifact identity and start a new evidence epoch.
+
+Each stored prediction's `prediction.prospective_contract` is the review
+surface. Verify that it contains the point and interval, an
+`experimental_probability` or `calibrated_probability` label, calibration and
+baseline state, per-feature observations, reference-distribution hash,
+regime/event categories, target availability, and complete lineage. For a
+refusal, the point, interval, and probability must remain null and the reason
+must be present. Never reconstruct these fields when an outcome matures.
+
+An experimental label is not a confidence statement. A calibrated label only
+means the preregistered calibration gate encoded in that model's immutable
+evaluation cleared; it still has no proposal or execution authority. Any
+artifact, provider, schedule, configuration, code, or feature-semantics change
+requires a new evidence epoch before collection resumes.
+
+## Review-gated discovery and confirmation
+
+First place an already-built dataset into the authoritative content-addressed
+store. This command replays all hashes and point-in-time coverage and refuses
+exploratory data:
+
+```text
+python scripts/run_ml_research_campaign.py materialize-dataset --source-dir artifacts/datasets/staging --dataset-id volatility-discovery-2026q3 --store-root artifacts/datasets/authoritative
+```
+
+Review `research/ml_specs/volatility-discovery-v1.json` and its review request.
+An identified reviewer must create a separate `SpecReviewAttestation`; the
+repository request is deliberately not an approval. Verify it before running:
+
+```text
+python scripts/run_ml_research_campaign.py verify-spec-review --spec research/ml_specs/volatility-discovery-v1.json --review artifacts/reviews/volatility-discovery-v1.approved.json
+python scripts/run_ml_research_campaign.py run-reviewed --spec research/ml_specs/volatility-discovery-v1.json --review artifacts/reviews/volatility-discovery-v1.approved.json --dataset-dir artifacts/datasets/authoritative/DATASET_HASH --dataset-id volatility-discovery-2026q3 --output-dir artifacts/experiments/volatility-v1 --code-commit COMMIT_HASH
+```
+
+Only a verified `confirmation_run_requested` discovery may prepare
+confirmation. Supply a separately materialized, different dataset hash:
+
+```text
+python scripts/run_ml_research_campaign.py prepare-confirmation --discovery-output-dir artifacts/experiments/volatility-v1 --discovery-experiment-id volatility-discovery-v1 --confirmation-dataset-dir artifacts/datasets/authoritative/CONFIRMATION_DATASET_HASH --confirmation-dataset-id volatility-confirmation-2026q4 --confirmation-experiment-id volatility-confirmation-v1 --created-at REVIEW_REQUEST_TIME --spec-output artifacts/experiments/volatility-v1/volatility-confirmation-v1.pending.json --request-output artifacts/experiments/volatility-v1/volatility-confirmation-v1.request.json
+```
+
+Review and attest the generated confirmation spec separately, then call
+`run-reviewed` with `--confirmation-request`. Do not retune a failed
+confirmation identity or copy discovery rows into its dataset. These commands
+write research artifacts only and never update the model registry or trading
+state.

@@ -11,6 +11,11 @@ param(
 
     [string]$TaskPrefix = "TradingAgent-Paper",
 
+    [string]$RunAsUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name,
+
+    [ValidateSet("Interactive", "S4U")]
+    [string]$TaskLogonType = "S4U",
+
     [ValidateRange(5, 60)]
     [int]$OperationsCycleMinutes = 10,
 
@@ -74,7 +79,12 @@ $cycleTrigger = New-ScheduledTaskTrigger `
     -At ((Get-Date).AddMinutes(1)) `
     -RepetitionInterval (New-TimeSpan -Minutes $OperationsCycleMinutes) `
     -RepetitionDuration (New-TimeSpan -Days 3650)
-$logonTrigger = New-ScheduledTaskTrigger -AtLogOn
+$longRunningTrigger = if ($TaskLogonType -eq "S4U") {
+    New-ScheduledTaskTrigger -AtStartup
+}
+else {
+    New-ScheduledTaskTrigger -AtLogOn -User $RunAsUser
+}
 $observationTrigger = New-ScheduledTaskTrigger `
     -Weekly `
     -WeeksInterval 1 `
@@ -93,6 +103,10 @@ $longSettings = New-ScheduledTaskSettingsSet `
     -RestartCount 10 `
     -RestartInterval (New-TimeSpan -Minutes 1) `
     -ExecutionTimeLimit ([TimeSpan]::Zero)
+$principal = New-ScheduledTaskPrincipal `
+    -UserId $RunAsUser `
+    -LogonType $TaskLogonType `
+    -RunLevel Limited
 
 $tasks = @(
     @{
@@ -106,14 +120,14 @@ $tasks = @(
         Name = "$TaskPrefix-OrderMonitor"
         Description = "Continuously reconcile Alpaca paper-order state with polling fallback."
         Action = $monitorAction
-        Trigger = $logonTrigger
+        Trigger = $longRunningTrigger
         Settings = $longSettings
     },
     @{
         Name = "$TaskPrefix-Watchdog"
         Description = "Continuously record operational heartbeats and durable alerts."
         Action = $watchdogAction
-        Trigger = $logonTrigger
+        Trigger = $longRunningTrigger
         Settings = $longSettings
     },
     @{
@@ -133,6 +147,7 @@ foreach ($task in $tasks) {
             -Action $task.Action `
             -Trigger $task.Trigger `
             -Settings $task.Settings `
+            -Principal $principal `
             -Force | Out-Null
     }
 }
@@ -140,7 +155,9 @@ foreach ($task in $tasks) {
 $tasks | ForEach-Object {
     [PSCustomObject]@{
         TaskName = $_.Name
-        CurrentUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name
+        RunAsUser = $RunAsUser
+        RunLevel = "Limited"
+        LogonType = $TaskLogonType
         Database = $database
         AlertsJsonl = $alerts
     }

@@ -38,12 +38,14 @@ gates, and model isolation. This plan fills the operational path around it:
 
 Current baseline:
 
-- ML-FS-0, ML-FS-1, and ML-FS-2 are software-complete; the next software
-  milestone is ML-FS-3;
+- ML-FS-0 through ML-FS-7 infrastructure is software-complete; ML-FS-3's real-data
+  definition of done remains pending a reviewed licensed historical-universe
+  snapshot and an actual authoritative build;
 - ML-LR-0, ML-LR-1, ML-LR-2, ML-LR-4, ML-LR-6, ML-LR-7, and
   ML-LR-8 are software-complete within their documented limits;
-- ML-LR-3 is complete for per-security volatility but not for portfolio model
-  fitting, immutable portfolio reports, or typed portfolio forecasts;
+- ML-LR-3 is software-complete for separate per-security and portfolio
+  volatility research paths; real portfolio research remains unavailable
+  until enough complete daily account history accumulates;
 - ML-LR-5 was deliberately skipped and is optional for the volatility-first
   path;
 - real `point_in_time_data=True` remains blocked on authoritative adjustment
@@ -51,9 +53,9 @@ Current baseline:
 - the scheduled paper observation now writes normalized portfolio history and
   a complete-capture manifest, while claimed execution attempts retain
   pre-broker telemetry joined to the authoritative broker event journal; and
-- volatility shadow operation exists, but current online output does not yet
-  carry every prospective interval, calibrated-probability, and monitoring
-  field required for promotion review.
+- volatility shadow operation now emits a complete immutable prospective
+  contract, and an independent supervisor detects missed or incomplete
+  evidence; task installation and elapsed shadow conclusions do not yet exist.
 
 ## 3. Delivery rules
 
@@ -195,6 +197,9 @@ is fit.
 
 ## 8. ML-FS-3 — authoritative historical and online data
 
+Status: software implemented 2026-08-01. Real-data completion remains blocked
+until a reviewed historical-universe source and licensed captures are supplied.
+
 ### Implementation
 
 - Reconstruct vintage-correct Databento adjustment factors.
@@ -215,6 +220,9 @@ blocked and the limitation is explicit.
 
 ## 9. ML-FS-4 — finish volatility and portfolio research software
 
+Status: software implemented 2026-08-01. Real portfolio evidence remains
+underfilled until sufficient complete daily account history accumulates.
+
 ### Implementation
 
 - Define the frozen portfolio feature/baseline dataset contract.
@@ -230,6 +238,9 @@ eligible historical data. Insufficient real position history returns
 unavailable rather than guessed holdings.
 
 ## 10. ML-FS-5 — prospective inference contract
+
+Status: software implemented 2026-08-01. This records prospective evidence;
+it does not establish calibration quality or authorize trading use.
 
 ### Implementation
 
@@ -254,6 +265,11 @@ provider failure, artifact corruption, restart, and epoch change on fixtures.
 
 ## 11. ML-FS-6 — real discovery and untouched confirmation
 
+Status: preparation software implemented 2026-08-01. The repository contains
+a review-ready discovery spec, not an approval or a real experiment result.
+Real discovery and confirmation remain blocked on reviewed authoritative data,
+explicit spec attestations, and execution of the elapsed-data workflow.
+
 ### Implementation
 
 - Add reviewed specs under `research/ml_specs/`.
@@ -270,6 +286,12 @@ not grant trading authority.
 
 ## 12. ML-FS-7 — supervised evidence operations
 
+Status: supervision infrastructure implemented 2026-08-01. The independent
+health rules, durable alerts, limited-principal task installers, and read-only
+host verifier are built and fixture-tested. Actual task registration,
+credential/permission validation, manual first runs, alert-delivery receipts,
+restore evidence, and elapsed sessions must be completed on the operating host.
+
 ### Implementation
 
 - Install and verify operational and ML scheduled tasks under a least-privilege
@@ -278,6 +300,12 @@ not grant trading authority.
 - Run predict/mature/monitor continuously with one lineage per epoch.
 - Alert on missed paper observations and incomplete capture manifests.
 - Retain every scheduled refusal, outcome underfill, and operational incident.
+
+The implementation checks exchange-calendar session coverage, distinguishes a
+cash-only complete capture from a missing manifest, treats stuck/failed ML runs
+and matured predictions without outcomes as underfill, and fails closed on
+missing or unhealthy heartbeats. It verifies credential *presence* without
+emitting values and never creates missing evidence.
 
 ### Definition of done
 

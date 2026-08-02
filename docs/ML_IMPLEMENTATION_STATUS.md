@@ -3,8 +3,9 @@
 Companion to `docs/ML_IMPLEMENTATION_STRATEGY.md`, recording what is built,
 what is deliberately not built, and why. Updated 2026-08-01.
 
-The next implementation sequence is defined in
-`docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`.
+The original readiness sequence is defined in
+`docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`; the current end-to-end
+overlay and remaining sequence are in `docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md`.
 
 ## Built
 
@@ -22,13 +23,17 @@ The next implementation sequence is defined in
 | ML-LR-1 | Point-in-time lineage contracts, universe membership, dataset sidecars | `ml/availability.py`, `ml/datasets.py` | None |
 | ML data-source prerequisite | Cost-capped Databento bars/statistics, immutable DBN and PIT reference snapshots, fail-closed prerequisite report | `ml/databento_source.py`, `ml/databento_pit.py`, `scripts/run_databento_ingest.py` | None (research data only) |
 | ML-LR-2 | Durable discovery/confirmation runner and CLI | `ml/experiments.py`, `scripts/run_ml_experiment.py` | None |
-| ML-LR-3 | Portfolio-volatility targets, evaluation completion, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py` | None |
+| ML-LR-3 / ML-FS-4 software | Portfolio-volatility targets, frozen account-session dataset contract, shared experiment evaluation, immutable reports, typed forecast | `ml/portfolio_volatility.py`, `ml/volatility_evaluation.py`, `ml/portfolio_experiments.py`, `ml/portfolio_research.py`, `ml/experiments.py` | None (read-only research) |
 | ML-LR-4 | Earnings event identity, pre-event features, event-date experiment runner, typed gap forecast, filing extraction runner | `ml/earnings_features.py`, `ml/earnings_experiments.py`, `ml/experiments.py`, `scripts/run_filing_extraction.py` | None (research/context only) |
 | ML-LR-6 | Automated volatility shadow prediction, exact-calendar maturity, evidence epochs, monitoring/status CLI, durable operational failures, separate Windows scheduler | `ml/shadow.py`, `ml/shadow_runtime.py`, `scripts/run_ml_shadow.py`, `scripts/install_windows_ml_shadow_tasks.ps1`, ML epoch/run columns and tables in `assistant/storage.py` | Writes non-authoritative observations and operational alerts only |
 | ML-LR-7 | Evidence-epoch monitoring and immutable promotion dossier | `ml/monitoring_reports.py`, `ml/promotion.py`, `scripts/run_ml_promotion_dossier.py` | Read-only reports only |
 | ML-LR-8 | Read-only model-observation presentation | `ml/presentation.py`, `scripts/run_ml_shadow.py status` | Context display only |
 | ML-FS-1 | Scheduled paper observations normalized into portfolio equity/position history plus complete-capture manifests | `assistant/paper_evidence.py`, `assistant/storage.py` | Writes reconciled paper observations and research history only |
 | ML-FS-2 | Immutable pre-broker execution telemetry plus rebuildable lifecycle materialization | `assistant/execution_telemetry.py`, `assistant/execution_service.py`, `assistant/storage.py` | Claimed attempts write observations; a failed pre-submit telemetry append refuses the broker call |
+| ML-FS-3 software | Vintage-correct Databento adjustment/security resolution, independent universe snapshots, PIT feature batches, replay CLI, and shared online provider | `ml/databento_authoritative.py`, `ml/databento_pit.py`, `scripts/run_databento_ingest.py` | Research/online data only; no model or execution authority |
+| ML-FS-5 software | Frozen deployable OOF uncertainty profile plus complete prospective success/refusal contract | `ml/prospective.py`, `ml/experiments.py`, `ml/shadow_runtime.py`, `ml/contracts.py`, `assistant/storage.py` | Writes non-authoritative shadow evidence only |
+| ML-FS-6 preparation | Content-addressed authoritative dataset admission, exact spec review attestations, reviewed-run wrapper, distinct untouched-confirmation request | `ml/research_orchestration.py`, `scripts/run_ml_research_campaign.py`, `research/ml_specs/` | Research artifacts only; no real run, registry, proposal, or execution state |
+| ML-FS-7 infrastructure | Independent paper/ML evidence health rules, durable failure alerts, limited-principal Windows task installers, and read-only host verification | `ml/evidence_operations.py`, `scripts/run_ml_evidence_supervisor.py`, `scripts/install_windows_operational_tasks.ps1`, `scripts/install_windows_ml_shadow_tasks.ps1`, `scripts/verify_windows_evidence_tasks.ps1` | Writes non-authoritative health reports, heartbeats, and operational alerts only |
 
 ML-LR-2 gives both supported tasks a reproducible runner. Verified against
 the milestone's own definition of done by invoking the real CLI twice: the
@@ -141,14 +146,13 @@ of that adapter.
 The table above records implemented building blocks, not a claim that every
 acceptance criterion in sections 7-12 is complete. In particular:
 
-1. **Real-data `point_in_time_data` remains `False`.** The builder can now
-   prove fixture data from persisted per-feature lineage, value hashes,
-   decision cutoffs, and historical membership. The configured yfinance
-   source supplies none of that authoritative history, so real results remain
-   exploratory and promotion-blocked. Databento bars, receipt-timestamped
-   statistics, and licensed point-in-time reference sidecars can now be
-   captured, but correctly stay `False` until a vintage-correct adjustment
-   builder binds them and authoritative historical membership is supplied.
+1. **Real-data `point_in_time_data` has not been established.** The
+   vintage-correct builder now binds immutable Databento statistics,
+   security-master and adjustment vintages, exact cutoffs, and independently
+   sourced historical membership. No reviewed licensed reference/universe
+   artifacts have been supplied to an actual authoritative build, so current
+   real results remain exploratory and promotion-blocked. Yfinance cannot
+   satisfy this gate.
 
 2. **Real historical universe data is unavailable.** The typed membership
    contract and cutoff-aware validation now reject fixed current-membership
@@ -173,24 +177,24 @@ acceptance criterion in sections 7-12 is complete. In particular:
    pinning a Parquet engine explicitly before depending on one, and none is
    pinned in `requirements.txt`. Revisit if dataset size demands it.
 
-6. **ML-4 is not yet portfolio-forecast complete.** Position snapshots can
-   now accumulate the required history, but there is no historical
-   portfolio-weight target builder, portfolio forecast runner, interval and
-   threshold-calibration fold report, or economic warning analysis by
-   year/regime/earnings proximity. The current evaluator covers per-row QLIKE
-   and MAE against trailing/EWMA baselines on a common validation sample.
+6. **Real portfolio research is still underfilled.** The software now builds
+   cash-aware frozen-weight or realized-account targets, freezes portfolio
+   features and distinct trailing/EWMA baselines, uses the shared purged
+   walk-forward runner, and emits immutable reports plus a typed forecast.
+   It deliberately returns unavailable until enough complete daily position
+   and equity captures exist; fixture success is not evidence of market edge.
 
-7. **ML-5 is not yet research-complete.** Event-time mapping, realized gaps,
-   support checks, and simple fit functions exist. A point-in-time pre-event
-   feature builder, grouped walk-forward event evaluator, precision/recall and
-   interval report, typed forecast output, and durable runner do not.
+7. **Real earnings-gap research has not run.** The point-in-time pre-event
+   builder, event-time mapping, realized gaps, grouped walk-forward evaluator,
+   support/precision/recall/interval report, typed forecast, and durable runner
+   are software-complete. No authoritative consensus/announcement dataset or
+   reviewed real discovery/confirmation result has been supplied.
 
-8. **ML-6 is not yet operationally shadow-ready.** Persistence now enforces
-   registered lineage, immutable conflicts, feature freshness, timezone-aware
-   generation, and explicit target maturity. There is no fixed scheduler,
-   automatic outcome-maturation job, baseline/calibration monitor, or
-   dedicated ML evidence-epoch coordinator yet. Calling these APIs remains an
-   explicit research workflow.
+8. **Shadow software is ready; elapsed evidence is absent.** The fixed
+   scheduler, outcome maturation, monitoring, evidence epochs, durable
+   failures, and the complete ML-FS-5 prospective contract are implemented.
+   That capability is not a substitute for operating the jobs across real
+   sessions and retaining a sufficient, reviewed sample within one epoch.
 
 9. **ML-7 is statistical-research scaffolding, not the complete ranker
    experiment.** The historically correct universe, immutable benchmark-
@@ -198,13 +202,13 @@ acceptance criterion in sections 7-12 is complete. In particular:
    simulation with turnover, slippage, taxes, drawdown, expected shortfall,
    capture, concentration, and liquidity constraints remain unbuilt.
 
-10. **No user-facing ML presentation is wired.** The implementation remains
-    deliberately isolated from `assistant/` and execution. Consequently the
-    observability presentation in section 16 is also pending; this is safer
-    than presenting unevaluated outputs, but it means these modules do not yet
-    help a live decision workflow directly.
+10. **No ML output is wired into the decision workflow.** A read-only status
+    presentation exists, but the implementation remains deliberately isolated
+    from `assistant/` decision packets, proposals, and execution. Context-only
+    integration requires ML-FS-8 owner authorization after real evidence and a
+    promotion dossier exist.
 
-## ML-LR-3 (in progress)
+## ML-LR-3 / ML-FS-4 (software complete; real evidence underfilled)
 
 `ml/portfolio_volatility.py` delivers the section 9.2 target builder and the
 9.3 unit convention. Two explicitly distinct targets that are never
@@ -291,15 +295,120 @@ account-session, so `ticker` carries the account key — naming it honestly
 keeps cross-sectional rank metrics from being applied to a panel with one
 name per date, where a rank correlation is undefined.
 
-The portfolio target-preparation half of ML-LR-3 is complete. The module does
-not yet satisfy section 9.7's full definition of done: it does not fit a
-portfolio model or emit an immutable experiment report and typed forecast.
-Those outputs require a frozen portfolio feature/baseline dataset contract
-and integration with the shared experiment runner. Portfolio research against
-real data also stays underfilled until enough daily position/equity snapshots
-accumulate; per plan 9.7 that is reported as unavailable rather than
-backfilled. ML-LR-3 therefore remains **in progress** rather than being marked
-complete based on target preparation alone.
+`ml/portfolio_research.py` completes the software path. Its immutable
+`PortfolioDatasetContract` freezes one account, target kind, horizon, ordered
+features, and distinct trailing/EWMA baseline columns. Cash exposure is a
+required feature, action-shaped fields are refused, and missing account-
+session features remain explicit refusals. Readiness is recomputed after those
+refusals, so the runner cannot start merely because the pre-filter target count
+looked adequate.
+
+The shared experiment runner now recognizes
+`portfolio_volatility_forecast` as its own task and requires exact
+account-session, target-kind, and daily-volatility-unit parameters. It reuses
+the leakage-safe volatility evaluation machinery without pooling portfolio and
+per-security evidence. Reports, specs, model bundles, and run manifests retain
+their existing immutable hashes. `PortfolioVolatilityForecast` carries daily
+point/interval/ceiling-probability output with dataset, report, and feature
+lineage; any annualized display value is explicitly named and the contract is
+always non-authoritative.
+
+The software definition is complete on fixtures. Real portfolio research
+remains unavailable until enough complete daily position/equity snapshots
+accumulate; no missing holdings are backfilled and no fixture result is treated
+as evidence of market edge.
+
+## ML-FS-4 verification notes
+
+The milestone-focused suite covers cash preservation, contract hashing,
+missing-row underfill, shared-runner dispatch, exact task-parameter refusal,
+immutable output loading, typed available/unavailable forecasts, and the ML
+execution import boundary. The fixture suite passed without creating research
+registry, proposal, or execution state.
+
+## ML-FS-5 notes
+
+Volatility experiment artifacts now freeze a prospective profile made only
+from out-of-fold log residuals. The profile contains the interval quantiles,
+preregistered ceiling, residual population used for the threshold probability,
+and the measured calibration state. Shadow inference consumes that immutable
+profile; it never derives an interval or probability from later shadow
+outcomes. A model without a usable profile or preregistered threshold produces
+an unavailable attempt instead of a point-only forecast.
+
+Every runtime success now embeds `ProspectiveInferenceContract`: daily point
+and interval, explicitly experimental or calibrated ceiling probability,
+calibration state, frozen trailing/EWMA baselines, each feature's value,
+availability and age, missingness, a hash-bound training reference
+distribution, prospective regime/event categories, target availability, and
+provider/dataset/artifact/report/configuration/epoch/run lineage. Failure paths
+embed the same schema with prediction values set to null and durable reasons;
+fields are not reconstructed after the target is observed.
+
+Storage confirms the nested contract belongs to the same immutable prediction
+identity, refuses action-shaped fields, and requires
+`production_authoritative=false`. Provider failure, artifact corruption,
+restart/idempotent retry, and epoch changes remain covered by the shadow
+runtime suite. These are software assertions, not evidence that the interval
+coverage or threshold calibration works on future market observations.
+
+## ML-FS-6 preparation notes
+
+`materialize-dataset` accepts only a fully hash-verified dataset whose normal
+coverage gate derived `point_in_time_data=true`, requires availability and
+historical-universe sidecars, and copies the exact immutable bytes beneath
+`<store-root>/<dataset_hash>/`. A separate address artifact binds the
+directory, dataset hash, and manifest hash. Exploratory or renamed/tampered
+datasets are refused.
+
+`run-reviewed` requires a `SpecReviewAttestation` whose exact spec hash,
+identified reviewer, timestamp, approved decision, and review scope validate.
+The wrapper derives runner columns from the reviewed spec and reuses the
+existing no-side-effect experiment runner. A discovery spec may not carry a
+confirmation request.
+
+`prepare-confirmation` accepts only a verified discovery spec/report/run whose
+verdict requested confirmation. It requires a different content-addressed
+confirmation dataset hash, clones the discovery behavior without retuning,
+adds immutable parent hashes, and writes a new confirmation spec plus a request
+that remains `review_required`. Confirmation cannot run until that exact new
+spec is separately attested. A rejected confirmation remains an immutable
+rejection; changing behavior requires a new discovery identity.
+
+The checked-in volatility discovery spec is review-ready but intentionally
+unapproved. No licensed historical dataset, human review attestation, real
+discovery report, confirmation request, or real model artifact was fabricated
+by this milestone.
+
+## ML-FS-7 infrastructure notes
+
+`ml/evidence_operations.py` derives expected sessions from the NYSE calendar
+and the exact evidence-epoch start. It independently reports missing paper
+observations, incomplete portfolio capture manifests, missing/stuck/failed ML
+runs, matured available predictions without outcomes, stale or explicitly
+unhealthy worker/operations heartbeats, missing configured credential names,
+artifact or database-integrity failures, stale verified backups, and missing
+or failed restore drills. Zero positions with a complete manifest remains a
+valid cash-only capture; absent evidence is never replaced with zeros.
+
+`run_ml_evidence_supervisor.py` reads the persisted paper and ML records,
+hash-verifies the shadow artifacts, creates deduplicated durable alerts for
+each failed check, optionally appends the alerts to the JSONL delivery
+boundary, and atomically writes a non-authoritative report. Credential values
+are neither returned nor persisted. The pure rules and adapter have no imports
+from proposal, allocation, or execution authority.
+
+Both Windows installers now register tasks under an explicit configurable
+user, S4U or interactive logon type, and `Limited` run level. The ML installer
+adds a separate repeating supervisor; `verify_windows_evidence_tasks.ps1`
+checks all eight task identities, their user/run level/Python action and last
+result, required paths, and credential presence without displaying secrets.
+
+This repository change did **not** install those tasks, validate a real
+operator account or credentials, exercise external alert delivery, or produce
+backup/restore and elapsed-session evidence. Those are host/runtime acceptance
+steps and cannot be satisfied with fixtures. ML-FS-8 and ML-FS-9 remain outside
+the authorized scope.
 
 
 ## ML-LR-4 notes
@@ -317,8 +426,8 @@ one that stood before the print), and later filings. Prior-gap features are
 allowed through an explicit allowlist rather than accidentally, because they
 describe *earlier* events. Intraday timing produces an unavailable feature
 row rather than a guess. A naive or unknown instant is refused before a
-stable `EventIdentity` can be created; the still-missing event runner must
-persist that intake refusal so it is counted rather than disappearing.
+stable `EventIdentity` can be created; the durable event runner persists that
+intake refusal so it is counted rather than disappearing.
 
 The independent review hardened this layer against cross-security and
 cross-time contamination: prior-gap features now use only the same ticker's
@@ -495,12 +604,13 @@ coverage result. Economic evidence must explicitly carry both
 python scripts/run_ml_promotion_dossier.py --database <db> --config <shadow.json> --artifact-dir <artifacts> --evidence-epoch <epoch> --discovery-spec <discovery.spec.json> --discovery-report <discovery.report.json> --confirmation-spec <confirmation.spec.json> --dataset-manifest <dataset.manifest.json> --availability-manifest <availability.json> --universe-manifest <universe.json> --economic-simulation <economics.json> --monitoring-report <monitoring.json> --proposed-adapter-scope <read-only-scope.json> --known-limitation "<known limitation>" --output <dossier.json>
 ```
 
-Software completion does not imply review eligibility. Existing volatility
-shadow records do not contain online intervals or calibrated probabilities,
-so those monitoring gates remain blocked until a future model version emits
-them prospectively. Yfinance remains non-point-in-time, real shadow duration
-has not elapsed, and no owner promotion authority exists. The dossier makes
-those facts visible; it cannot remove them.
+Software completion does not imply review eligibility. Pre-ML-FS-5 volatility
+records may lack online intervals or threshold probabilities and remain
+ineligible; new artifacts must freeze an out-of-fold prospective profile and
+new predictions carry its interval plus an explicitly experimental or
+calibrated probability label. Yfinance remains non-point-in-time, real shadow
+duration has not elapsed, and no owner promotion authority exists. The dossier
+makes those facts visible; it cannot remove them.
 
 ## ML-LR-8 notes
 
@@ -528,14 +638,12 @@ model observation — not a recommendation and not used by the execution
 gate." No field is shaped like a trade instruction, and a serialization
 check rejects one if it is ever added.
 
-The display shows what the record contains and refuses to supply what it
-does not. Current volatility shadow predictions record an estimate and both
-frozen baselines but no prospective prediction interval and no calibrated
-probability — their `uncertainty` only references the frozen evaluation
-report. Those two fields are therefore shown as `unavailable` and
-`not_measured`, are never reconstructed from realized outcomes or read out
-of the evaluation report, and remain real promotion blockers rather than
-presentation defects. An uncalibrated probability is never labeled
+The display shows what the record contains and refuses to supply what it does
+not. New ML-FS-5 volatility records contain the immutable prospective point,
+interval, and an explicitly experimental or calibrated threshold-probability
+label. Legacy records without those fields remain `unavailable` and
+`not_measured`; the presentation never reconstructs them from realized
+outcomes or an evaluation report. An experimental probability is never labeled
 "confidence".
 
 Epochs are never pooled: without `--evidence-epoch` only the active epoch is
@@ -600,3 +708,36 @@ the proposal becomes a confirmed `submission_failed`, and no broker API is
 called. Attempts rejected before the atomic claim (unknown proposal, incorrect
 confirmation phrase, or unclaimable state) remain service requests, not order
 attempts, and therefore do not enter the ML execution dataset.
+
+## ML-FS-3 notes
+
+Accepted Databento statistics captures now persist a canonical normalized
+artifact in addition to the paid DBN. Hash-verifying statistics and reference
+loaders make later research replayable without another vendor request. The
+authoritative builder resolves only security-master revisions effective and
+visible at each decision cutoff, selects exactly one shareholder option per
+corporate-action event, applies only the latest visible `A` revision, removes
+events whose latest visible revision is `R`, and leaves `P` revisions pending.
+Historical prices are multiplied by applicable factors; volume is divided only
+for subdivision/consolidation reasons.
+
+Every adjusted value receives a `FeatureAvailabilityRecord` binding the raw
+statistics revision, listing revision, selected factor revisions, option
+policy, value hash, and actual ingredient availability. Coverage is still
+derived exclusively through `evaluate_point_in_time_coverage()`. Security-
+master listing status is never substituted for index or strategy membership;
+the builder requires a separately hash-bound `HistoricalUniverseSnapshot`.
+
+`build-authoritative` replays accepted statistics/reference manifests, a
+historical-universe snapshot, and exact decision cutoffs into a content-
+addressed feature batch. `DatabentoOnlineFeatureProvider` performs a cost-
+capped statistics capture and invokes the same pure builder, refusing a
+response observed after its declared cutoff. Prefix and revision tests prove
+future reference changes cannot alter earlier feature values, while later
+rescissions produce a new vintage.
+
+No real authoritative batch was created in this repository: licensed source
+data and a reviewed complete historical-universe artifact were not supplied.
+Consequently the real-data definition of done and promotion eligibility remain
+blocked even though the software path can derive `point_in_time_data=True` from
+complete verified fixture evidence.

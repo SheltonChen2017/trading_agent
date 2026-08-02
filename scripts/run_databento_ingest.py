@@ -33,7 +33,16 @@ from ml.databento_pit import (
     estimate_statistics_cost,
     fetch_reference_snapshot,
     fetch_statistics_snapshot,
+    load_reference_snapshot,
+    load_statistics_snapshot,
+    select_complete_statistics_cohorts,
 )
+from ml.databento_authoritative import (
+    build_authoritative_feature_batch,
+    load_historical_universe_snapshot,
+    save_authoritative_feature_batch,
+)
+from ml.hashing import hash_payload
 
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
@@ -211,6 +220,26 @@ def build_parser() -> argparse.ArgumentParser:
             "reference access and may consume the account's symbol allocation"
         ),
     )
+
+    build_authoritative = subparsers.add_parser(
+        "build-authoritative",
+        help="replay accepted snapshots into a vintage-correct PIT feature batch",
+    )
+    build_authoritative.add_argument(
+        "--statistics-manifest", type=Path, action="append", required=True,
+        help="accepted statistics manifest; repeat for each captured session",
+    )
+    build_authoritative.add_argument("--security-master-manifest", type=Path, required=True)
+    build_authoritative.add_argument("--adjustment-factors-manifest", type=Path, required=True)
+    build_authoritative.add_argument("--universe-snapshot", type=Path, required=True)
+    build_authoritative.add_argument(
+        "--decision-cutoffs-json", type=Path, required=True,
+        help="JSON object mapping YYYY-MM-DD sessions to timezone-aware cutoffs",
+    )
+    build_authoritative.add_argument(
+        "--output-dir", type=Path, default=_DEFAULT_OUTPUT_DIR,
+        help="git-ignored root for the content-addressed feature batch",
+    )
     return parser
 
 
@@ -221,6 +250,70 @@ def command_status() -> dict[str, object]:
         "environment_variable": DATABENTO_API_KEY_ENV,
         "configured": configured,
         "secret_printed": False,
+    }
+
+
+def command_build_authoritative(
+    *,
+    statistics_manifests: Sequence[Path],
+    security_master_manifest: Path,
+    adjustment_factors_manifest: Path,
+    universe_snapshot: Path,
+    decision_cutoffs_json: Path,
+    output_dir: Path,
+) -> dict[str, object]:
+    assert_output_dir_is_git_ignored(output_dir)
+    statistics = [load_statistics_snapshot(path) for path in statistics_manifests]
+    security = load_reference_snapshot(security_master_manifest)
+    adjustments = load_reference_snapshot(adjustment_factors_manifest)
+    if security.manifest.get("kind") != "security_master":
+        raise DatabentoSourceError("--security-master-manifest has the wrong reference kind")
+    if adjustments.manifest.get("kind") != "adjustment_factors":
+        raise DatabentoSourceError("--adjustment-factors-manifest has the wrong reference kind")
+    universe = load_historical_universe_snapshot(universe_snapshot)
+    try:
+        decision_cutoffs = json.loads(Path(decision_cutoffs_json).read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise DatabentoSourceError(f"invalid decision cutoffs JSON: {exc}") from exc
+    if not isinstance(decision_cutoffs, dict):
+        raise DatabentoSourceError("decision cutoffs JSON must be an object")
+    cohorts = []
+    for snapshot in statistics:
+        cohorts.extend(
+            select_complete_statistics_cohorts(
+                snapshot.normalized,
+                decision_cutoffs=decision_cutoffs,
+                observed_at=str(snapshot.manifest["observed_at"]),
+            )
+        )
+    reference_observed_at = max(
+        str(security.manifest["observed_at"]),
+        str(adjustments.manifest["observed_at"]),
+    )
+    batch = build_authoritative_feature_batch(
+        cohorts,
+        security_master_records=security.records,
+        adjustment_factor_records=adjustments.records,
+        historical_universe=universe.records,
+        universe_id=universe.universe_id,
+        decision_cutoffs=decision_cutoffs,
+        reference_observed_at=reference_observed_at,
+        statistics_snapshot_hash=hash_payload(
+            [snapshot.manifest["raw_sha256"] for snapshot in statistics]
+        ),
+        security_master_snapshot_hash=str(security.manifest["data_sha256"]),
+        adjustment_snapshot_hash=str(adjustments.manifest["data_sha256"]),
+        universe_snapshot_hash=universe.snapshot_hash,
+    )
+    path = save_authoritative_feature_batch(batch, output_dir)
+    return {
+        "ok": True,
+        "batch_hash": batch.batch_hash,
+        "point_in_time_data": batch.coverage.point_in_time_data,
+        "coverage_failures": list(batch.coverage.failures),
+        "row_count": len(batch.rows),
+        "refusal_count": len(batch.refusals),
+        "batch_path": str(path),
     }
 
 
@@ -360,6 +453,15 @@ def main(argv: Sequence[str] | None = None) -> int:
                 _statistics_request(args),
                 output_dir=args.output_dir,
                 max_cost_usd=args.max_cost_usd,
+            )
+        elif args.command == "build-authoritative":
+            result = command_build_authoritative(
+                statistics_manifests=args.statistics_manifest,
+                security_master_manifest=args.security_master_manifest,
+                adjustment_factors_manifest=args.adjustment_factors_manifest,
+                universe_snapshot=args.universe_snapshot,
+                decision_cutoffs_json=args.decision_cutoffs_json,
+                output_dir=args.output_dir,
             )
         else:
             result = command_download_reference(

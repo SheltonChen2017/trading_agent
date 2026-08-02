@@ -1,10 +1,16 @@
 from __future__ import annotations
 
+import json
 import sqlite3
 
 from assistant.execution_telemetry import (
+    FAILURE_DETERMINISTIC_POLICY,
+    FAILURE_INFRASTRUCTURE,
+    execution_attempt_id,
     materialize_execution_attempt,
     materialized_record_hash,
+    record_validation_exception,
+    record_validation_outcome,
 )
 from assistant.order_lifecycle import journal_broker_order_update
 from assistant.storage import AssistantStore
@@ -314,3 +320,73 @@ def test_paper_and_live_attempts_remain_separate(tmp_path):
     assert paper["account"]["broker_account_id"] != live["account"]["broker_account_id"]
     assert paper["account"]["pool_paper_and_live"] is False
     assert live["account"]["pool_paper_and_live"] is False
+
+
+def _outcome(**kwargs):
+    """Minimal ProposalValidationOutcome, built through the real class."""
+    from assistant.execution_service import ProposalValidationOutcome
+
+    defaults = dict(proposal=None, intent=None, validation=None, error=None)
+    defaults.update(kwargs)
+    return ProposalValidationOutcome(**defaults)
+
+
+def test_infrastructure_failure_is_not_recorded_as_a_policy_rejection(tmp_path):
+    """A broker outage and a policy refusal must not share a label.
+
+    Both are trading-safe -- both refuse -- but an execution-quality model
+    trained on this journal would otherwise learn that the policy declines
+    trades the policy actually approved.
+    """
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(_proposal("p-infra"))
+
+    outcome = _outcome(
+        error="Broker account/asset preflight failed: connection reset",
+        failure_class=FAILURE_INFRASTRUCTURE,
+    )
+    assert outcome.resolved_failure_class == FAILURE_INFRASTRUCTURE
+
+    event = record_validation_outcome(
+        store,
+        attempt_id=execution_attempt_id("p-infra", "2026-08-01T14:30:00+00:00"),
+        proposal_id="p-infra",
+        attempted_at="2026-08-01T14:30:00+00:00",
+        outcome=outcome,
+    )
+    payload = json.loads(event["payload_json"]) if "payload_json" in event else event["payload"]
+    assert payload["failure_class"] == FAILURE_INFRASTRUCTURE
+    assert payload["failure_class"] != FAILURE_DETERMINISTIC_POLICY
+    assert payload["result"] != "policy_refusal"
+
+
+def test_unclassified_service_error_defaults_to_deterministic_policy(tmp_path):
+    """An unlabelled refusal stays in the conservative bucket."""
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(_proposal("p-plain"))
+    outcome = _outcome(error="Proposal has expired.")
+    assert outcome.resolved_failure_class == FAILURE_DETERMINISTIC_POLICY
+
+    event = record_validation_outcome(
+        store,
+        attempt_id=execution_attempt_id("p-plain", "2026-08-01T14:30:00+00:00"),
+        proposal_id="p-plain",
+        attempted_at="2026-08-01T14:30:00+00:00",
+        outcome=outcome,
+    )
+    payload = json.loads(event["payload_json"]) if "payload_json" in event else event["payload"]
+    assert payload["failure_class"] == FAILURE_DETERMINISTIC_POLICY
+
+
+def test_validation_exception_is_infrastructure_not_policy(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(_proposal("p-exc"))
+    event = record_validation_exception(
+        store,
+        attempt_id=execution_attempt_id("p-exc", "2026-08-01T14:30:00+00:00"),
+        proposal_id="p-exc",
+        event_at="2026-08-01T14:30:00+00:00",
+        error="disk full",
+    )
+    payload = json.loads(event["payload_json"]) if "payload_json" in event else event["payload"]
+    assert payload["failure_class"] == FAILURE_INFRASTRUCTURE

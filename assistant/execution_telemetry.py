@@ -18,7 +18,31 @@ from typing import Any
 from assistant.storage import AssistantStore
 
 
-SCHEMA_VERSION = "1.0"
+SCHEMA_VERSION = "1.1"
+
+# Why an execution attempt did not proceed. These are training labels as much
+# as operational states: collapsing an infrastructure fault into
+# "policy_refusal" teaches a later execution-quality model that the policy
+# declined trades the policy actually approved. Every value must be
+# distinguishable without parsing an error string.
+FAILURE_NONE = "none"
+#: validate_trade_intent() or an explicit policy rule refused the trade.
+FAILURE_DETERMINISTIC_POLICY = "deterministic_policy"
+#: A dependency was unavailable or errored -- broker, quote source, market
+#: calendar, exposure computation, or the telemetry store itself.
+FAILURE_INFRASTRUCTURE = "infrastructure"
+#: Stored data was missing or malformed, so no decision could be made.
+FAILURE_DATA_INTEGRITY = "data_integrity"
+#: A submission was sent but its outcome is unknown. Never a rejection.
+FAILURE_BROKER_AMBIGUOUS = "broker_ambiguous"
+
+FAILURE_CLASSES = frozenset({
+    FAILURE_NONE,
+    FAILURE_DETERMINISTIC_POLICY,
+    FAILURE_INFRASTRUCTURE,
+    FAILURE_DATA_INTEGRITY,
+    FAILURE_BROKER_AMBIGUOUS,
+})
 
 
 def execution_attempt_id(proposal_id: str, attempted_at: str) -> str:
@@ -178,23 +202,36 @@ def record_validation_outcome(
     outcome: Any,
 ) -> dict[str, Any]:
     validation = outcome.validation
+    failure_class = getattr(
+        outcome, "resolved_failure_class", FAILURE_DETERMINISTIC_POLICY
+    )
     if outcome.error is not None:
         event_type = "validation_refused"
-        result = "service_refusal"
+        # "service_refusal" previously covered a broker outage, a corrupt
+        # stored intent, and a policy rule alike. The result now names the
+        # actual class so an infrastructure fault is never counted as the
+        # policy declining a trade.
+        result = failure_class
     elif validation is not None and validation.approved:
         event_type = "validation_approved"
         result = "approved"
+        failure_class = FAILURE_NONE
     elif validation is not None and validation.overridable:
         event_type = "validation_override_available"
         result = "override_available"
+        failure_class = FAILURE_NONE
     else:
         event_type = "validation_refused"
         result = "policy_refusal"
+        failure_class = FAILURE_DETERMINISTIC_POLICY
+    if failure_class not in FAILURE_CLASSES:
+        raise ValueError(f"unknown execution failure class {failure_class!r}")
     preflight = _preflight_payload(outcome.broker_preflight)
     account_mode, account_id = _account_identity(outcome.broker_preflight)
     payload = {
         "schema_version": SCHEMA_VERSION,
         "result": result,
+        "failure_class": failure_class,
         "intent": _intent_payload(outcome.intent),
         "reference_price": _number_text(outcome.reference_price),
         "quote": _quote_payload(outcome.quote, outcome.quote_received_at),
@@ -239,6 +276,9 @@ def record_validation_exception(
         payload={
             "schema_version": SCHEMA_VERSION,
             "result": "validation_failed",
+            # An unexpected exception before a validation result existed is
+            # never the policy declining a trade.
+            "failure_class": FAILURE_INFRASTRUCTURE,
             "error": str(error),
             "intent": None,
             "reference_price": None,

@@ -209,6 +209,10 @@ from typing import Any
 
 from assistant.kill_switch import env_kill_switch_active
 from assistant.execution_telemetry import (
+    FAILURE_DATA_INTEGRITY,
+    FAILURE_DETERMINISTIC_POLICY,
+    FAILURE_INFRASTRUCTURE,
+    FAILURE_NONE,
     execution_attempt_id,
     record_submission_started,
     record_validation_exception,
@@ -678,6 +682,20 @@ class ProposalValidationOutcome:
     broker_preflight: dict | None = None
     quote: dict | None = None
     quote_received_at: str | None = None
+    # Why this attempt failed, classified at the raising site rather than by
+    # matching error text later. An infrastructure fault recorded as a
+    # policy rejection is trading-safe -- both refuse -- but it is a wrong
+    # training label for any later execution-quality analysis, which would
+    # learn that the policy declines trades the policy actually approved.
+    # None means "not classified here"; see resolved_failure_class.
+    failure_class: str | None = None
+
+    @property
+    def resolved_failure_class(self) -> str:
+        """One of the FAILURE_* constants, never None."""
+        if self.error is None:
+            return FAILURE_NONE
+        return self.failure_class or FAILURE_DETERMINISTIC_POLICY
 
     @property
     def approved(self) -> bool:
@@ -765,7 +783,8 @@ def validate_proposal_for_execution(
         proposal = store.get_proposal(proposal_id)
     if proposal is None:
         return ProposalValidationOutcome(
-            proposal=None, intent=None, validation=None, error=f"Unknown proposal: {proposal_id}"
+            proposal=None, intent=None, validation=None, error=f"Unknown proposal: {proposal_id}",
+            failure_class=FAILURE_DATA_INTEGRITY,
         )
 
     now_utc = datetime.now(timezone.utc)
@@ -801,6 +820,7 @@ def validate_proposal_for_execution(
     if not broker.is_configured():
         return ProposalValidationOutcome(
             proposal=proposal, intent=None, validation=None, error="Alpaca paper credentials are not configured.",
+            failure_class=FAILURE_INFRASTRUCTURE,
         )
     if kill_switch_active:
         reason = str(persistent_kill_switch.get("reason") or "active")
@@ -855,6 +875,7 @@ def validate_proposal_for_execution(
     except Exception as exc:
         return ProposalValidationOutcome(
             proposal=proposal, intent=None, validation=None, error=f"Malformed stored intent: {exc}",
+            failure_class=FAILURE_DATA_INTEGRITY,
         )
 
     if intent.side not in policy.allowed_sides:
@@ -883,6 +904,7 @@ def validate_proposal_for_execution(
             intent=intent,
             validation=None,
             error=f"Broker account/asset preflight failed: {exc}",
+            failure_class=FAILURE_INFRASTRUCTURE,
         )
 
     try:
@@ -898,6 +920,7 @@ def validate_proposal_for_execution(
             proposal=proposal, intent=intent, validation=None,
             error=f"Could not check recent order history for duplicates: malformed stored intent: {exc}",
             broker_preflight=broker_preflight,
+            failure_class=FAILURE_DATA_INTEGRITY,
         )
     for order in current_portfolio.open_orders:
         side = str(order.get("side", "")).lower()
@@ -923,6 +946,7 @@ def validate_proposal_for_execution(
             proposal=proposal, intent=intent, validation=None,
             error=f"Could not fetch a live quote for {intent.ticker} to check price freshness: {exc}",
             broker_preflight=broker_preflight,
+            failure_class=FAILURE_INFRASTRUCTURE,
         )
 
     pending_buy_value_by_ticker: dict[str, Decimal] = {}
@@ -940,6 +964,7 @@ def validate_proposal_for_execution(
                 broker_preflight=broker_preflight,
                 quote=quote,
                 quote_received_at=quote_received_at,
+                failure_class=FAILURE_INFRASTRUCTURE,
             )
         for ticker, extra_value in (extra_pending_buy_value_by_ticker or {}).items():
             key = ticker.upper()
@@ -964,6 +989,13 @@ def validate_proposal_for_execution(
             broker_preflight=broker_preflight,
             quote=quote,
             quote_received_at=quote_received_at,
+            # Classified as infrastructure, not policy: the policy rule here
+            # is fail-closed handling of a data outage, not a judgment about
+            # this trade. The same trade with the data present would have
+            # been evaluated normally, so labelling it a policy rejection
+            # would teach a later model that the policy declines trades it
+            # does not decline.
+            failure_class=FAILURE_INFRASTRUCTURE,
         )
 
     validation = validate_trade_intent(

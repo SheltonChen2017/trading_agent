@@ -146,6 +146,34 @@ assistant` package cycle. GR-1 remains partial until helpers and then the
 interleaved orchestration are extracted behind the unchanged
 `assistant.execution_service` facade and independently reviewed.
 
+### What the characterization suite can actually detect
+
+A green characterization suite means nothing on its own; it must be shown to
+fail when the behaviour it names is removed. Three rounds of mutation testing
+were needed here, and every round found tests that passed while their subject
+was deleted — first the original suite, then the reviewed extension.
+
+Confirmed **detected** (each verified by deleting the behaviour and observing
+a failure, then restoring):
+
+| Mutation | Detected by |
+|---|---|
+| kill-switch check removed | `test_an_engaged_kill_switch_blocks_...` |
+| exception identity changed | `test_wrong_confirmation_phrase_...` |
+| reservation release removed on the unsupported-order-type path | `test_an_unsupported_order_type_blocks_and_releases_...` |
+| idempotency key not passed to the broker | `test_submission_carries_the_proposals_exact_idempotency_key` |
+| unsupported order type silently downgraded to market | `test_an_unsupported_order_type_blocks_and_releases_...` |
+
+Still **NOT characterized**. GR-1B must not assume these are frozen:
+
+- the third release path, `mark_submission_failed_and_release` at
+  `execution_service.py:1776`;
+- partial-fill and replacement-chain handling.
+
+Two of the three release paths have now had an undetected mutation at some
+point, so release paths deserve a recorded mutation result before any of them
+is moved.
+
 ## GR-2 .. GR-9 — not started
 
 Each requires its own gap analysis first; the plan predates the ML

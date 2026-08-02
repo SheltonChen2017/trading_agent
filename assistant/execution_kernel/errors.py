@@ -16,6 +16,12 @@ class _ProposalClaimLostError(ProposalExecutionError):
     """The worker's pre-broker claim was revoked before its next transition."""
 
 
+# Public kernel contract for peer modules. Keep the legacy private name above
+# as the defining class so assistant.execution_service can re-export the exact
+# same exception object, name, and inheritance identity as before GR-1.
+ProposalClaimLostError = _ProposalClaimLostError
+
+
 class PolicyOverridableBlockError(ProposalExecutionError):
     """Raised instead of a plain ProposalExecutionError when EVERY
     violation on the rejected validation is override-eligible (see

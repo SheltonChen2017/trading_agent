@@ -122,7 +122,7 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 — execution kernel split: **partial**
+## GR-1 — execution kernel split: **partial; helper extraction reviewed**
 
 GR-1A characterization is built and independently reviewed in
 `tests/test_execution_characterization.py`. The first production extraction is
@@ -147,10 +147,26 @@ The gap analysis corrected three stale plan assumptions:
 The reviewed package decision is `assistant/execution_kernel/`, preserving the
 existing dependency direction and avoiding an `assistant -> execution ->
 assistant` package cycle. Outcome lookup, identity matching, replacement-chain
-interpretation, and absence-age classification have moved there. GR-1 remains
-partial until the claim/revalidation/submission helpers and then the
-interleaved orchestration are extracted behind the unchanged
-`assistant.execution_service` facade and independently reviewed.
+interpretation, absence-age classification, stored-intent parsing, pre-broker
+claim fencing/recovery support, revalidation inputs, submission sizing, and
+the shared exception hierarchy now live there. The unchanged
+`assistant.execution_service` facade re-exports the legacy names and exception
+objects.
+
+The independent review of the remaining helper extraction found one structural
+contract violation: `claim.py` imported the private
+`_ProposalClaimLostError` name from the peer `errors.py` seam despite GR-1
+section 6.2 forbidding private peer dependencies. The review added an AST
+boundary regression test, exposed a public kernel alias, and preserved the
+legacy private facade name as the exact same class object.
+
+GR-1 remains partial. `assistant/execution_service.py` is still 1,656 lines,
+including the interleaved 580-line `execute_approved_paper_proposal()` and
+315-line validation orchestration. It is not yet the thin composition facade
+required by the definition of done. The remaining work is to extract that
+orchestration without changing the facade, claims, reservations, broker-call
+ordering, or ambiguous-outcome behavior, then independently review the final
+tree.
 
 ### What the characterization suite can actually detect
 
@@ -193,9 +209,9 @@ of them. What GR-1 actually moves is the thin delegating wrapper
 `_authoritative_order_for()`, not the chain logic.
 
 Remaining honest limit: the characterization freezes representative paths,
-not every branch of a 2,040-line module. GR-1B should add a recorded mutation
-result for any specific behaviour it moves that is not already listed above,
-rather than treating a green suite as sufficient.
+not every branch of the 1,656-line facade. The final orchestration extraction
+should add a recorded mutation result for any specific behaviour it moves that
+is not already listed above, rather than treating a green suite as sufficient.
 
 ## GR-2 .. GR-9 — not started
 

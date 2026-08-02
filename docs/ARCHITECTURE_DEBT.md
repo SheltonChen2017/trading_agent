@@ -49,12 +49,21 @@ multi-row transition inside a single `BEGIN IMMEDIATE` transaction rather
 than spreading it across service-layer calls — the specific failure mode
 this entry warned about.
 
-**Still open**: `execution_service.py` remains ~1,450 lines and still
-mixes validation, the approval/submission state machine, duplicate-order
-and pending-exposure estimation, and earnings-data resolution;
-`allocation_batch.py` still owns cross-leg reservation math separately
-from the storage-level budget reservation added above. The remaining
-split is smaller than it was, but not done.
+**Partially addressed 2026-08-02** by GR-1's reviewed
+`assistant/execution_kernel/` helper extraction. Broker-outcome
+interpretation, stored-intent parsing, pre-broker claim fencing/recovery
+support, revalidation inputs, submission sizing, and the shared exception
+hierarchy now have explicit modules behind the unchanged
+`assistant.execution_service` facade.
+
+**Still open**: `execution_service.py` remains 1,656 lines. Its 580-line
+`execute_approved_paper_proposal()` and 315-line validation function still
+interleave the approval/submission state machine, broker preflight,
+revalidation, authorization, reservation, telemetry, submission, and
+ambiguous-outcome handling. It is not yet the thin composition facade in the
+GR-1 definition of done. `allocation_batch.py` also still owns cross-leg
+reservation math separately from the storage-level budget reservation. The
+remaining split is smaller than it was, but not done.
 
 ## 2. Risk-check scatter
 

@@ -12,7 +12,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from assistant.execution_kernel.errors import _ProposalClaimLostError
+from assistant.execution_kernel.errors import ProposalClaimLostError
 from assistant.proposal_status import APPROVED, VALIDATING
 from assistant.storage import AssistantStore
 
@@ -51,7 +51,7 @@ def _transition_pre_broker_claim(
         return transitioned
     current = store.get_proposal(proposal_id)
     current_status = None if current is None else current.get("status")
-    raise _ProposalClaimLostError(
+    raise ProposalClaimLostError(
         f"Proposal {proposal_id} lost its execution claim while transitioning "
         f"{expected_status!r} -> {new_status!r} (current status={current_status!r}). "
         "Refusing to continue, reserve execution budget, or contact the broker."

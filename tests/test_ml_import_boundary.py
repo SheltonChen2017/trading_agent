@@ -318,3 +318,29 @@ def test_execution_kernel_never_reaches_proposal_generation():
         "execution kernel reaches proposal-generation code: "
         + "; ".join(sorted(offenders))
     )
+
+
+def test_execution_kernel_modules_do_not_import_private_peer_names():
+    """GR-1 section 6.2: kernel seams cannot depend on peer internals."""
+    kernel_root = REPO_ROOT / "assistant" / "execution_kernel"
+    offenders: list[str] = []
+    for path in kernel_root.glob("*.py"):
+        current_module = _module_name(path)
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.ImportFrom):
+                continue
+            imported_from = _absolute_from_import(path, node)
+            if (
+                imported_from is None
+                or imported_from == current_module
+                or not imported_from.startswith("assistant.execution_kernel.")
+            ):
+                continue
+            for alias in node.names:
+                if alias.name.startswith("_"):
+                    offenders.append(
+                        f"{path.relative_to(REPO_ROOT)} imports private peer "
+                        f"{imported_from}.{alias.name}"
+                    )
+    assert not offenders, offenders

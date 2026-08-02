@@ -199,13 +199,9 @@ acting):
 from __future__ import annotations
 
 import dataclasses
-import hashlib
-import json
-import math
 import os
 from decimal import Decimal
 from datetime import datetime, timedelta, timezone
-from typing import Any
 
 from assistant.execution_kernel.outcomes import (
     _LOOKUP_UNCONFIRMED,
@@ -251,7 +247,7 @@ from assistant.order_lifecycle import (
     journal_broker_order_update,
     proposal_status_for_order,
 )
-from assistant.money import MoneyInput, decimal_or_none, to_decimal
+from assistant.money import MoneyInput, to_decimal
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
     APPROVED,
@@ -273,7 +269,6 @@ from risk.execution_gate import (
     authorize_trade_intent,
     intent_fingerprint,
     validate_trade_intent,
-    worst_case_fill_price_decimal,
 )
 
 # Sentinel: the broker lookup itself failed (network/auth/5xx/etc.), so

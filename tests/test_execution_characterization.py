@@ -984,3 +984,20 @@ def test_the_override_review_digest_binds_to_the_exact_reviewed_violations():
         ("max_position_pct",),
         ("AAPL is 30% of the book.",),
     )
+
+
+def test_the_legacy_facade_reexports_the_exact_kernel_exception_objects():
+    """GR-1 moves definitions without changing caller-visible identities."""
+    from assistant import execution_service
+    from assistant.execution_kernel import errors
+
+    assert execution_service.ProposalExecutionError is errors.ProposalExecutionError
+    assert (
+        execution_service.PolicyOverridableBlockError
+        is errors.PolicyOverridableBlockError
+    )
+    assert errors.ProposalClaimLostError is errors._ProposalClaimLostError
+    assert (
+        execution_service._ProposalClaimLostError
+        is errors.ProposalClaimLostError
+    )

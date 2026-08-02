@@ -13,6 +13,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.kill_switch import env_kill_switch_active
+from assistant.platform_readiness import BLOCKED, build_platform_readiness
 from assistant.runtime_identity import RuntimeIdentityError, current_commit
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
 from assistant.corporate_actions import tax_ledger_with_coverage
@@ -552,6 +553,23 @@ def command_readiness(args, store: AssistantStore) -> None:
     report = transaction_readiness(store, policy, check_broker=not args.offline)
     print(json.dumps(report, indent=2, sort_keys=True))
     if not report["ready"]:
+        raise SystemExit(2)
+
+
+def command_platform_readiness(args, store: AssistantStore) -> None:
+    """GR-0: five independently scored dimensions, deliberately not averaged.
+
+    Read-only. Exits 2 when any dimension is blocked so a scheduled caller
+    can react, but prints every dimension either way -- a blocked dimension
+    must never suppress the others.
+    """
+    policy = load_policy(args.policy)
+    mandate = load_mandate(args.mandate)
+    report = build_platform_readiness(
+        store, policy, mandate, check_broker=not args.offline
+    )
+    print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
+    if any(d.status == BLOCKED for d in report.dimensions):
         raise SystemExit(2)
 
 
@@ -1269,6 +1287,23 @@ def build_parser() -> argparse.ArgumentParser:
         "readiness",
         help="Check policy, SQLite integrity, reconciliation freshness, budgets, and broker state.",
     )
+    platform = commands.add_parser(
+        "platform-readiness",
+        help=(
+            "Score execution, data, operational, evidence, and strategy "
+            "readiness independently. Never averaged into one number."
+        ),
+    )
+    platform.add_argument(
+        "--offline",
+        action="store_true",
+        help=(
+            "Skip live broker calls. Missing broker checks remain explicit "
+            "execution blockers; offline never means verified."
+        ),
+    )
+    platform.set_defaults(handler=command_platform_readiness)
+
     readiness.add_argument(
         "--offline",
         action="store_true",

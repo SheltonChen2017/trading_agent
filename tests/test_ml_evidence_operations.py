@@ -288,6 +288,10 @@ def test_windows_installers_use_limited_principals_and_schedule_supervisor():
         assert "New-ScheduledTaskPrincipal" in source
         assert "-RunLevel Limited" in source
         assert "-Principal $principal" in source
+        assert "-SkipElevationCheck:$WhatIfPreference" in source
+        assert "-ErrorVariable registrationErrors" in source
+        assert "@($registrationErrors).Count -gt 0" in source
+        assert "[WildcardPattern]::Escape($Name)" in source
     assert "New-ScheduledTaskTrigger -AtStartup" in operational
     assert "New-ScheduledTaskTrigger -AtLogOn -User $RunAsUser" in operational
     assert "Get-ScheduledTask" in verifier

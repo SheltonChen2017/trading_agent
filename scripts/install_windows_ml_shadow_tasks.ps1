@@ -47,13 +47,17 @@ $ErrorActionPreference = "Stop"
 
 function Assert-InstallerPreconditions {
     param(
-        [Parameter(Mandatory = $true)][string]$InterpreterPath
+        [Parameter(Mandatory = $true)][string]$InterpreterPath,
+        [switch]$SkipElevationCheck
     )
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal($identity)
-    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    if (
+        -not $SkipElevationCheck -and
+        -not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    ) {
         throw (
-            "Registering an S4U scheduled task requires elevation. Re-run this " +
+            "Registering these scheduled tasks requires elevation. Re-run this " +
             "installer from a PowerShell session started with 'Run as " +
             "Administrator'. Checked up front so the failure is one clear " +
             "message rather than one 'Access is denied' per task."
@@ -76,6 +80,14 @@ function Assert-InstallerPreconditions {
             "re-run."
         )
     }
+}
+
+function Get-InstalledTaskExact {
+    param([Parameter(Mandatory = $true)][string]$Name)
+    $escapedName = [WildcardPattern]::Escape($Name)
+    return @(
+        Get-ScheduledTask -TaskName $escapedName -ErrorAction SilentlyContinue
+    ) | Where-Object { $_.TaskName -eq $Name }
 }
 
 function Quote-TaskArgument {
@@ -101,7 +113,9 @@ if (-not $RepositoryPath) {
 }
 $resolvedRepository = (Resolve-Path -LiteralPath $RepositoryPath).Path
 $resolvedPython = (Resolve-Path -LiteralPath $PythonPath).Path
-Assert-InstallerPreconditions -InterpreterPath $resolvedPython
+Assert-InstallerPreconditions `
+    -InterpreterPath $resolvedPython `
+    -SkipElevationCheck:$WhatIfPreference
 $resolvedConfig = (Resolve-Path -LiteralPath $ConfigPath).Path
 $resolvedArtifacts = (Resolve-Path -LiteralPath $ArtifactPath).Path
 $database = [IO.Path]::GetFullPath($DatabasePath)
@@ -237,6 +251,7 @@ $failedTasks = New-Object System.Collections.Generic.List[string]
 foreach ($task in $tasks) {
     if ($PSCmdlet.ShouldProcess($task.Name, "Register or replace scheduled task")) {
         $attempted = $true
+        $registrationErrors = @()
         Register-ScheduledTask `
             -TaskName $task.Name `
             -Description $task.Description `
@@ -245,21 +260,29 @@ foreach ($task in $tasks) {
             -Settings $settings `
             -Principal $principal `
             -Force `
-            -ErrorAction SilentlyContinue | Out-Null
-        # See install_windows_operational_tasks.ps1: CIM cmdlet errors are
-        # non-terminating even under $ErrorActionPreference = "Stop", so a
-        # failed registration must be detected by reading the task back.
-        if (-not (Get-ScheduledTask -TaskName $task.Name -ErrorAction SilentlyContinue)) {
-            $failedTasks.Add($task.Name)
+            -ErrorAction SilentlyContinue `
+            -ErrorVariable registrationErrors | Out-Null
+        # Existence alone is not success: an older task may already have this
+        # name while its replacement just failed. Capture the CIM error AND
+        # read back the exact (non-wildcard) task name.
+        $live = Get-InstalledTaskExact -Name $task.Name
+        if (@($registrationErrors).Count -gt 0 -or -not $live) {
+            $detail = if (@($registrationErrors).Count -gt 0) {
+                (@($registrationErrors) | ForEach-Object { $_.Exception.Message }) -join "; "
+            }
+            else {
+                "task was not present after registration"
+            }
+            $failedTasks.Add("$($task.Name): $detail")
         }
     }
 }
 
 if ($failedTasks.Count -gt 0) {
     throw (
-        "Failed to register: " + ($failedTasks -join ", ") + ". " +
-        "Registering an S4U scheduled task requires an elevated PowerShell " +
-        "session; re-run this installer as Administrator."
+        "Failed to register or replace: " + ($failedTasks -join ", ") + ". " +
+        "Verify the elevated session, RunAsUser, TaskLogonType, and Task " +
+        "Scheduler service, then retry."
     )
 }
 
@@ -288,6 +311,6 @@ $tasks | ForEach-Object {
         & $summary $_.Name "planned (WhatIf)" $null
     }
     else {
-        & $summary $_.Name "registered" (Get-ScheduledTask -TaskName $_.Name)
+        & $summary $_.Name "registered" (Get-InstalledTaskExact -Name $_.Name)
     }
 }

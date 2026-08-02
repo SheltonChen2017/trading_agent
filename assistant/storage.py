@@ -348,6 +348,10 @@ class AssistantStore:
                     benchmark_ticker TEXT NOT NULL,
                     benchmark_close REAL NOT NULL,
                     net_external_flow REAL NOT NULL,
+                    total_equity_text TEXT NOT NULL,
+                    cash_text TEXT NOT NULL,
+                    benchmark_close_text TEXT NOT NULL,
+                    net_external_flow_text TEXT NOT NULL,
                     payload_json TEXT NOT NULL,
                     payload_hash TEXT NOT NULL,
                     FOREIGN KEY(evidence_epoch)
@@ -629,6 +633,7 @@ class AssistantStore:
             )
             self._migrate_decision_packet_identity(connection)
             self._migrate_execution_reservation_money(connection)
+            self._migrate_paper_observation_money(connection)
             self._migrate_ml_prediction_maturity(connection)
 
     def _migrate_ml_prediction_maturity(self, connection: sqlite3.Connection) -> None:
@@ -736,6 +741,63 @@ class AssistantStore:
                 (
                     decimal_text(row["reserved_notional"]),
                     row["proposal_id"],
+                ),
+            )
+
+    def _migrate_paper_observation_money(
+        self, connection: sqlite3.Connection
+    ) -> None:
+        """Keep exact observation decimals beside legacy REAL projections.
+
+        SQLite applies REAL affinity even when decimal text is bound to the
+        legacy convenience columns. Exact text columns make direct evidence
+        queries lossless too. Existing rows are backfilled from payload_json;
+        old JSON floats fall back to their best surviving representation.
+        """
+        fields = (
+            "total_equity",
+            "cash",
+            "benchmark_close",
+            "net_external_flow",
+        )
+        columns = {
+            row["name"]
+            for row in connection.execute(
+                "PRAGMA table_info(paper_account_observations)"
+            )
+        }
+        for field in fields:
+            column = f"{field}_text"
+            if column not in columns:
+                connection.execute(
+                    f"ALTER TABLE paper_account_observations ADD COLUMN {column} TEXT"
+                )
+        rows = connection.execute(
+            "SELECT observation_id, payload_json, total_equity, cash, "
+            "benchmark_close, net_external_flow, total_equity_text, cash_text, "
+            "benchmark_close_text, net_external_flow_text "
+            "FROM paper_account_observations"
+        ).fetchall()
+        for row in rows:
+            if all(row[f"{field}_text"] not in (None, "") for field in fields):
+                continue
+            payload = json.loads(row["payload_json"])
+            exact = {
+                field: decimal_text(
+                    to_decimal(payload.get(field, row[field]), name=field)
+                )
+                for field in fields
+            }
+            connection.execute(
+                "UPDATE paper_account_observations SET "
+                "total_equity_text = ?, cash_text = ?, benchmark_close_text = ?, "
+                "net_external_flow_text = ? WHERE observation_id = ?",
+                (
+                    exact["total_equity"],
+                    exact["cash"],
+                    exact["benchmark_close"],
+                    exact["net_external_flow"],
+                    row["observation_id"],
                 ),
             )
 
@@ -3853,8 +3915,10 @@ class AssistantStore:
                 INSERT INTO paper_account_observations(
                     observation_id, evidence_epoch, session_date, captured_at,
                     total_equity, cash, benchmark_ticker, benchmark_close,
-                    net_external_flow, payload_json, payload_hash
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    net_external_flow, total_equity_text, cash_text,
+                    benchmark_close_text, net_external_flow_text,
+                    payload_json, payload_hash
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     observation_id,
@@ -3866,6 +3930,21 @@ class AssistantStore:
                     observation["benchmark_ticker"],
                     observation["benchmark_close"],
                     observation["net_external_flow"],
+                    decimal_text(
+                        to_decimal(observation["total_equity"], name="total_equity")
+                    ),
+                    decimal_text(to_decimal(observation["cash"], name="cash")),
+                    decimal_text(
+                        to_decimal(
+                            observation["benchmark_close"], name="benchmark_close"
+                        )
+                    ),
+                    decimal_text(
+                        to_decimal(
+                            observation["net_external_flow"],
+                            name="net_external_flow",
+                        )
+                    ),
                     payload_json,
                     payload_hash,
                 ),

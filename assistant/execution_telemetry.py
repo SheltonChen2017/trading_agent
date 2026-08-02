@@ -432,6 +432,14 @@ def materialize_execution_attempt(store: AssistantStore, attempt_id: str) -> dic
     unavailable = []
     if not validation:
         unavailable.append({"field": "validation", "reason": "validation event is missing"})
+    elif "failure_class" not in validation_payload:
+        # Schema 1.0 events predate the explicit taxonomy. Do not infer a
+        # training label from error text or collapse a legacy service refusal
+        # into deterministic policy.
+        unavailable.append({
+            "field": "validation.failure_class",
+            "reason": "validation event predates failure classification",
+        })
     if not submission:
         unavailable.append({"field": "submission", "reason": "attempt stopped before broker submission"})
     if not broker_events:
@@ -454,6 +462,14 @@ def materialize_execution_attempt(store: AssistantStore, attempt_id: str) -> dic
             "pool_paper_and_live": False,
         },
         "decision": {"at": proposal.get("created_at"), "intent": intent},
+        "validation": {
+            "event_type": validation["event_type"] if validation else None,
+            "result": validation_payload.get("result"),
+            "failure_class": validation_payload.get("failure_class"),
+            "violations": validation_payload.get("violations") or [],
+            "violation_codes": validation_payload.get("violation_codes") or [],
+            "error": validation_payload.get("error"),
+        },
         "quote": quote,
         "submission": {"started_at": submission["event_at"] if submission else None},
         "lifecycle": {

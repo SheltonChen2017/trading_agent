@@ -1,11 +1,12 @@
 # Operations runbook
 
-The order monitor, operations watchdog, scheduled operations cycle, and
-post-close evidence capture are independent controls. The monitor owns
+The order monitor, operations watchdog, scheduled operations cycle, post-close
+evidence capture, and ML evidence supervisor are independent controls. The monitor owns
 broker-order reconciliation; the watchdog records frequent health
 heartbeats; the cycle synchronizes the ledger, reconciles Alpaca, maintains
 verified backups, and emits alerts; the post-close job records the paper
-equity curve. No one process may be the only copy of another control.
+equity curve; the ML supervisor verifies that expected evidence arrived. No one
+process may be the only copy of another control.
 
 ## Before starting a paper evidence epoch
 
@@ -51,6 +52,8 @@ epoch bound to the verified account.
 | Watchdog | Continuous; 60-second health heartbeat | `run_operations_watchdog.py --interval-seconds 60` |
 | Operations cycle | Every 10 minutes | `operations-cycle --cancel-stale --alerts-jsonl data/alerts.jsonl` |
 | Paper observation | Once after each NYSE close | `paper-observation --cancel-stale --alerts-jsonl data/alerts.jsonl` |
+| ML prediction/maturity/monitoring | Once after each weekday close at staggered times | `run_ml_shadow.py predict`, `mature`, and `monitor` |
+| ML evidence supervisor | Every 15 minutes | `run_ml_evidence_supervisor.py` |
 
 `operations-cycle` runs order reconciliation, idempotent fill-to-ledger sync,
 broker-versus-ledger reconciliation, conditional verified backup, and the
@@ -121,25 +124,53 @@ python scripts/run_operations_watchdog.py --database data/paper.db --interval-se
 
 ### Windows Task Scheduler
 
-Preview the four user-level scheduled tasks:
+Preview the four operational tasks under the intended least-privilege account:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install_windows_operational_tasks.ps1 -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -WhatIf
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install_windows_operational_tasks.ps1 -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -RunAsUser "MACHINE\trading-agent" -WhatIf
 ```
 
 Remove `-WhatIf` only after checking the resolved Python, repository,
 database, alert path, and local post-close time. The installer registers the
-monitor and watchdog at logon, the operations cycle every 10 minutes, and
-the paper observation at 4:30 PM local time on weekdays. On this workstation
-that time is safely after the NYSE close.
+monitor and watchdog at boot for S4U (or at the named user's logon for
+interactive mode), the operations cycle every 10 minutes, and the paper
+observation at 4:30 PM local time on weekdays. On this workstation that time
+is safely after the NYSE close. Start the boot-triggered tasks manually once
+after first installation; their automatic trigger otherwise begins at the next
+boot.
 
-By default the tasks use the current user's interactive security context.
-For operation while logged out, change them in Task Scheduler to a dedicated
-least-privilege account, select "Run whether user is logged on or not", and
-verify that account can read the repository and paper credentials, write
-only the selected database/backups/alert path, and reach Alpaca. Run each
-task manually once and inspect its exit code, SQLite alerts, JSONL output,
-and heartbeat before calling the cadence operational.
+The installers default to the current user, S4U logon, and `Limited` run level.
+Prefer a dedicated account and pass it explicitly with `-RunAsUser`. Grant only
+"Log on as a batch job", read/execute access to Python and the repository,
+read access to credentials/config/artifacts, write access to the selected
+database/backups/alerts/reports, and outbound access required by the configured
+providers. Use `-TaskLogonType Interactive` only when operation exclusively
+while that user is logged on is intentional.
+
+Preview the four ML tasks (predict, mature, monitor, and independent
+supervisor) with the same account:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install_windows_ml_shadow_tasks.ps1 -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -ConfigPath C:\path\to\shadow.json -ArtifactPath C:\path\to\artifact-dir -RunAsUser "MACHINE\trading-agent" -WhatIf
+```
+
+Remove `-WhatIf` only after reviewing every resolved path and local scheduled
+time. Provide required environment-variable *names* through
+`-RequiredCredentialNames`; never place secret values in task arguments.
+After installation, start every task manually at least once, then run:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify_windows_evidence_tasks.ps1 -RunAsUser "MACHINE\trading-agent" -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -ConfigPath C:\path\to\shadow.json -ArtifactPath C:\path\to\artifact-dir
+```
+
+The verifier is read-only and non-authoritative. It checks paths, credential
+presence without printing values, all eight task principals/logon types/
+actions, and last task results. Run it as the task account to verify user-scoped
+credentials; when run as another account, only machine-scoped credentials are
+accepted as visible to the target. A never-run task is reported but is not a
+successful manual-run receipt; retain Task Scheduler history, stdout/stderr,
+SQLite alerts, JSONL delivery, and heartbeat/report evidence separately before
+declaring the host operational.
 
 The supervisor should also:
 
@@ -150,6 +181,19 @@ The supervisor should also:
 
 `data/alerts.jsonl` is a local delivery boundary for a log shipper or paging
 sidecar. Durable alert state remains in SQLite until acknowledged.
+
+The ML supervisor can also be run directly:
+
+```text
+python scripts/run_ml_evidence_supervisor.py --database data/paper.db --config artifacts/shadow.json --artifact-dir artifacts/model --required-credential APCA_API_KEY_ID --required-credential APCA_API_SECRET_KEY --alerts-jsonl data/alerts.jsonl --output artifacts/ml-evidence-supervisor.json
+```
+
+It exits nonzero and creates deduplicated `ml_evidence_operations` alerts when
+expected paper observations/capture manifests, ML runs/outcomes, explicit
+healthy heartbeats, verified backup/restore evidence, credentials, database
+integrity, or artifact integrity are absent. It never creates a missing
+observation, prediction, or outcome. Treat a persistent alert as an incident,
+not as permission to edit the evidence database manually.
 
 ## Authoritative Databento feature replay
 

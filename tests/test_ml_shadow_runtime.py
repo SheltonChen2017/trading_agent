@@ -29,7 +29,7 @@ from ml.shadow_runtime import (
     load_shadow_config,
     verify_runtime_artifacts,
 )
-from scripts import run_ml_promotion_dossier, run_ml_shadow
+from scripts import run_ml_evidence_supervisor, run_ml_promotion_dossier, run_ml_shadow
 
 
 def _bar_payload(start: str = "2024-01-02", end: str = "2026-04-10"):
@@ -174,6 +174,40 @@ def _registered_store(tmp_path: Path):
     summary = run_ml_shadow.command_register(store, config, artifact_dir)
     assert summary["ok"]
     return store, config, config_path, artifact_dir, provider_path, manifest
+
+
+def test_evidence_supervisor_adapter_records_fail_closed_report_and_alerts(tmp_path):
+    store, config, config_path, artifact_dir, _provider_path, _manifest = (
+        _registered_store(tmp_path)
+    )
+    output = tmp_path / "supervisor.json"
+    args = run_ml_evidence_supervisor.build_parser().parse_args([
+        "--database",
+        str(store.path),
+        "--config",
+        str(config_path),
+        "--artifact-dir",
+        str(artifact_dir),
+        "--output",
+        str(output),
+        "--as-of",
+        "2026-04-10T23:00:00+00:00",
+    ])
+
+    summary, exit_code = run_ml_evidence_supervisor.command_check(args)
+
+    assert exit_code == 1
+    assert summary["ok"] is False
+    assert summary["production_authoritative"] is False
+    assert output.exists()
+    assert any(
+        alert["category"] == "ml_evidence_operations"
+        for alert in store.list_operational_alerts()
+    )
+    heartbeat = store.get_system_state(
+        f"ml_evidence_supervisor_heartbeat:{config.schedule_key}"
+    )
+    assert heartbeat["ok"] is False
 
 
 def test_shadow_config_is_strict_and_hashes_defaults(tmp_path):

@@ -38,7 +38,7 @@ gates, and model isolation. This plan fills the operational path around it:
 
 Current baseline:
 
-- ML-FS-0 through ML-FS-6 preparation is software-complete; ML-FS-3's real-data
+- ML-FS-0 through ML-FS-7 infrastructure is software-complete; ML-FS-3's real-data
   definition of done remains pending a reviewed licensed historical-universe
   snapshot and an actual authoritative build;
 - ML-LR-0, ML-LR-1, ML-LR-2, ML-LR-4, ML-LR-6, ML-LR-7, and
@@ -54,8 +54,8 @@ Current baseline:
   a complete-capture manifest, while claimed execution attempts retain
   pre-broker telemetry joined to the authoritative broker event journal; and
 - volatility shadow operation now emits a complete immutable prospective
-  contract; elapsed shadow evidence and its monitoring conclusions do not yet
-  exist.
+  contract, and an independent supervisor detects missed or incomplete
+  evidence; task installation and elapsed shadow conclusions do not yet exist.
 
 ## 3. Delivery rules
 
@@ -286,6 +286,12 @@ not grant trading authority.
 
 ## 12. ML-FS-7 — supervised evidence operations
 
+Status: supervision infrastructure implemented 2026-08-01. The independent
+health rules, durable alerts, limited-principal task installers, and read-only
+host verifier are built and fixture-tested. Actual task registration,
+credential/permission validation, manual first runs, alert-delivery receipts,
+restore evidence, and elapsed sessions must be completed on the operating host.
+
 ### Implementation
 
 - Install and verify operational and ML scheduled tasks under a least-privilege
@@ -294,6 +300,12 @@ not grant trading authority.
 - Run predict/mature/monitor continuously with one lineage per epoch.
 - Alert on missed paper observations and incomplete capture manifests.
 - Retain every scheduled refusal, outcome underfill, and operational incident.
+
+The implementation checks exchange-calendar session coverage, distinguishes a
+cash-only complete capture from a missing manifest, treats stuck/failed ML runs
+and matured predictions without outcomes as underfill, and fails closed on
+missing or unhealthy heartbeats. It verifies credential *presence* without
+emitting values and never creates missing evidence.
 
 ### Definition of done
 

@@ -14,6 +14,24 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
+# Only repository-owned source belongs in the first-party graph.  Walking the
+# entire checkout also descends into .venv/site-packages and makes the result
+# depend on whichever environment happens to be installed beside the source.
+_FIRST_PARTY_PATHS = (
+    REPO_ROOT / "assistant",
+    REPO_ROOT / "backtest",
+    REPO_ROOT / "data",
+    REPO_ROOT / "execution",
+    REPO_ROOT / "ml",
+    REPO_ROOT / "risk",
+    REPO_ROOT / "scripts",
+    REPO_ROOT / "signals",
+    REPO_ROOT / "strategies",
+    REPO_ROOT / "baskets.py",
+    REPO_ROOT / "config.py",
+    REPO_ROOT / "market_analytics.py",
+)
+
 _CHECKED_PATHS = (
     REPO_ROOT / "execution",
     REPO_ROOT / "risk" / "execution_gate.py",
@@ -79,6 +97,29 @@ def _module_name(path: Path) -> str:
     return ".".join(parts)
 
 
+def _first_party_python_files():
+    for path in _FIRST_PARTY_PATHS:
+        if path.is_dir():
+            yield from path.rglob("*.py")
+        elif path.exists():
+            yield path
+
+
+def _absolute_from_import(path: Path, node: ast.ImportFrom) -> str | None:
+    """Resolve one ImportFrom target using Python's relative-import rules."""
+    if node.level == 0:
+        return node.module
+    module_parts = _module_name(path).split(".")
+    package_parts = module_parts if path.name == "__init__.py" else module_parts[:-1]
+    parents_to_remove = node.level - 1
+    if parents_to_remove >= len(package_parts):
+        return None
+    base = package_parts[: len(package_parts) - parents_to_remove]
+    if node.module:
+        base.extend(node.module.split("."))
+    return ".".join(base) or None
+
+
 def _internal_import_graph() -> tuple[dict[str, set[str]], list[str]]:
     """Map every non-test first-party module to the modules it imports.
 
@@ -89,56 +130,65 @@ def _internal_import_graph() -> tuple[dict[str, set[str]], list[str]]:
     """
     graph: dict[str, set[str]] = {}
     unresolved: list[str] = []
-    for path in REPO_ROOT.rglob("*.py"):
-        parts = path.relative_to(REPO_ROOT).parts
-        if parts[0] in {"tests", ".git", "__pycache__", ".pytest_cache"}:
-            continue
-        if "__pycache__" in parts:
-            continue
+    for path in _first_party_python_files():
         try:
             tree = ast.parse(path.read_text(encoding="utf-8"))
-        except (OSError, SyntaxError):  # pragma: no cover - unreadable file
+        except (OSError, SyntaxError, UnicodeError) as exc:
+            unresolved.append(f"{path.relative_to(REPO_ROOT)}: cannot parse: {exc}")
             continue
         dependencies: set[str] = set()
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 dependencies.update(alias.name for alias in node.names)
             elif isinstance(node, ast.ImportFrom):
-                if node.level:
-                    # Relative imports are not resolved to absolute module
-                    # names here. There are currently none in non-test code,
-                    # so this costs nothing today -- but the first one
-                    # written must break this test rather than quietly
-                    # become an edge the walker cannot follow.
+                imported_from = _absolute_from_import(path, node)
+                if imported_from is None:
                     unresolved.append(
-                        f"{_module_name(path)}: relative import "
+                        f"{_module_name(path)}: invalid relative import "
                         f"(level={node.level}, module={node.module!r})"
                     )
                     continue
-                if not node.module:
-                    continue
-                dependencies.add(node.module)
+                dependencies.add(imported_from)
                 # `from data import helper` binds a submodule, not just the
                 # package. Recording only `data` loses the edge that
                 # actually carries the dependency, which would make this
                 # whole test pass while an indirect path existed.
                 dependencies.update(
-                    f"{node.module}.{alias.name}" for alias in node.names
+                    f"{imported_from}.{alias.name}" for alias in node.names
+                    if alias.name != "*"
                 )
             elif isinstance(node, ast.Call):
-                # importlib.import_module("ml.x") is an edge no static walk
-                # can follow. Flag the call site instead of pretending the
-                # graph is complete.
+                # Literal dynamic imports are still statically knowable. For
+                # a computed target, fail closed only if traversal reaches
+                # this module; unrelated tooling must not invalidate the
+                # execution boundary.
                 function = node.func
                 name = getattr(function, "attr", None) or getattr(
                     function, "id", None
                 )
                 if name in {"import_module", "__import__"}:
-                    unresolved.append(
-                        f"{_module_name(path)}: dynamic import via {name}()"
-                    )
+                    if (
+                        node.args
+                        and isinstance(node.args[0], ast.Constant)
+                        and isinstance(node.args[0].value, str)
+                        and not node.args[0].value.startswith(".")
+                    ):
+                        dependencies.add(node.args[0].value)
+                    else:
+                        dependencies.add(f"<unresolved dynamic import via {name}()>")
         graph[_module_name(path)] = dependencies
     return graph, unresolved
+
+
+def test_relative_imports_resolve_to_first_party_module_names():
+    module_path = REPO_ROOT / "assistant" / "nested" / "worker.py"
+    sibling = ast.parse("from .helper import build").body[0]
+    parent = ast.parse("from ..shared import value").body[0]
+
+    assert isinstance(sibling, ast.ImportFrom)
+    assert isinstance(parent, ast.ImportFrom)
+    assert _absolute_from_import(module_path, sibling) == "assistant.nested.helper"
+    assert _absolute_from_import(module_path, parent) == "assistant.shared"
 
 
 def test_no_execution_capable_module_reaches_ml_transitively():
@@ -171,6 +221,9 @@ def test_no_execution_capable_module_reaches_ml_transitively():
         while stack:
             current, chain = stack.pop()
             for dependency in sorted(graph.get(current, ())):
+                if dependency.startswith("<unresolved "):
+                    offending_chains.append(" -> ".join(chain + (dependency,)))
+                    continue
                 if dependency == "ml" or dependency.startswith("ml."):
                     offending_chains.append(" -> ".join(chain + (dependency,)))
                     continue

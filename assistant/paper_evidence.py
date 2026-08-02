@@ -206,6 +206,29 @@ def _validate_snapshot(snapshot: PortfolioSnapshot) -> None:
                 ) from exc
             if not exact.is_finite():
                 raise PaperEvidenceError(f"{ticker}.{field} must be finite")
+        if position.has_exact_numerics:
+            expected_market_value = (
+                position.exact_field("shares")
+                * position.exact_field("current_price")
+            )
+            if position.exact_field("market_value") != expected_market_value:
+                raise PaperEvidenceError(
+                    f"{ticker}.market_value exact value does not equal "
+                    "shares * current_price"
+                )
+    if snapshot.has_exact_numerics:
+        expected_total_equity = snapshot.cash_exact_decimal + sum(
+            (
+                position.exact_field("market_value")
+                for position in snapshot.positions
+            ),
+            Decimal("0"),
+        )
+        if snapshot.total_equity_exact_decimal != expected_total_equity:
+            raise PaperEvidenceError(
+                "snapshot.total_equity exact value does not equal cash plus "
+                "position market values"
+            )
 
 
 def _net_external_flow(

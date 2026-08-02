@@ -359,6 +359,20 @@ def test_infrastructure_failure_is_not_recorded_as_a_policy_rejection(tmp_path):
     assert payload["failure_class"] != FAILURE_DETERMINISTIC_POLICY
     assert payload["result"] != "policy_refusal"
 
+    materialized = materialize_execution_attempt(store, event["attempt_id"])
+    assert materialized["validation"] == {
+        "event_type": "validation_refused",
+        "result": FAILURE_INFRASTRUCTURE,
+        "failure_class": FAILURE_INFRASTRUCTURE,
+        "violations": [],
+        "violation_codes": [],
+        "error": "Broker account/asset preflight failed: connection reset",
+    }
+    assert not any(
+        item["field"] == "validation.failure_class"
+        for item in materialized["unavailable_fields"]
+    )
+
 
 def test_unclassified_service_error_defaults_to_deterministic_policy(tmp_path):
     """An unlabelled refusal stays in the conservative bucket."""
@@ -390,3 +404,25 @@ def test_validation_exception_is_infrastructure_not_policy(tmp_path):
     )
     payload = json.loads(event["payload_json"]) if "payload_json" in event else event["payload"]
     assert payload["failure_class"] == FAILURE_INFRASTRUCTURE
+
+
+def test_legacy_attempt_does_not_invent_a_failure_class(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(_proposal("p-legacy"))
+    store.append_execution_telemetry_event(
+        attempt_id="attempt-legacy",
+        proposal_id="p-legacy",
+        event_type="validation_refused",
+        event_at="2026-07-31T14:30:00+00:00",
+        account_mode="paper",
+        broker_account_id="paper-account-1",
+        source="legacy-test",
+        payload={"schema_version": "1.0", "result": "service_refusal"},
+    )
+
+    materialized = materialize_execution_attempt(store, "attempt-legacy")
+    assert materialized["validation"]["failure_class"] is None
+    assert {
+        "field": "validation.failure_class",
+        "reason": "validation event predates failure classification",
+    } in materialized["unavailable_fields"]

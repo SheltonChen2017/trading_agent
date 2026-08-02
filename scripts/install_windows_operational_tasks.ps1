@@ -29,13 +29,17 @@ $ErrorActionPreference = "Stop"
 
 function Assert-InstallerPreconditions {
     param(
-        [Parameter(Mandatory = $true)][string]$InterpreterPath
+        [Parameter(Mandatory = $true)][string]$InterpreterPath,
+        [switch]$SkipElevationCheck
     )
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal($identity)
-    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    if (
+        -not $SkipElevationCheck -and
+        -not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+    ) {
         throw (
-            "Registering an S4U scheduled task requires elevation. Re-run this " +
+            "Registering these scheduled tasks requires elevation. Re-run this " +
             "installer from a PowerShell session started with 'Run as " +
             "Administrator'. Checked up front so the failure is one clear " +
             "message rather than one 'Access is denied' per task."
@@ -60,6 +64,14 @@ function Assert-InstallerPreconditions {
     }
 }
 
+function Get-InstalledTaskExact {
+    param([Parameter(Mandatory = $true)][string]$Name)
+    $escapedName = [WildcardPattern]::Escape($Name)
+    return @(
+        Get-ScheduledTask -TaskName $escapedName -ErrorAction SilentlyContinue
+    ) | Where-Object { $_.TaskName -eq $Name }
+}
+
 function Quote-TaskArgument {
     param([Parameter(Mandatory = $true)][string]$Value)
     return '"' + $Value.Replace('"', '\"') + '"'
@@ -70,7 +82,9 @@ if (-not $RepositoryPath) {
 }
 $resolvedRepository = (Resolve-Path -LiteralPath $RepositoryPath).Path
 $resolvedPython = (Resolve-Path -LiteralPath $PythonPath).Path
-Assert-InstallerPreconditions -InterpreterPath $resolvedPython
+Assert-InstallerPreconditions `
+    -InterpreterPath $resolvedPython `
+    -SkipElevationCheck:$WhatIfPreference
 $database = [IO.Path]::GetFullPath($DatabasePath)
 $alerts = if ($AlertsJsonlPath) {
     [IO.Path]::GetFullPath($AlertsJsonlPath)
@@ -178,6 +192,7 @@ $failedTasks = New-Object System.Collections.Generic.List[string]
 foreach ($task in $tasks) {
     if ($PSCmdlet.ShouldProcess($task.Name, "Register or replace scheduled task")) {
         $attempted = $true
+        $registrationErrors = @()
         Register-ScheduledTask `
             -TaskName $task.Name `
             -Description $task.Description `
@@ -186,24 +201,29 @@ foreach ($task in $tasks) {
             -Settings $task.Settings `
             -Principal $principal `
             -Force `
-            -ErrorAction SilentlyContinue | Out-Null
-        # Register-ScheduledTask is a CIM cmdlet, and CIM errors do not honour
-        # $ErrorActionPreference = "Stop". Without reading the task back, an
-        # unelevated run prints four "Access is denied" lines and then a full
-        # success table -- the operator believes evidence collection is live
-        # and it is collecting nothing. Confirm, never assume.
-        if (-not (Get-ScheduledTask -TaskName $task.Name -ErrorAction SilentlyContinue)) {
-            $failedTasks.Add($task.Name)
+            -ErrorAction SilentlyContinue `
+            -ErrorVariable registrationErrors | Out-Null
+        # Existence alone is not success: an older task may already have this
+        # name while its replacement just failed. Capture the CIM error AND
+        # read back the exact (non-wildcard) task name.
+        $live = Get-InstalledTaskExact -Name $task.Name
+        if (@($registrationErrors).Count -gt 0 -or -not $live) {
+            $detail = if (@($registrationErrors).Count -gt 0) {
+                (@($registrationErrors) | ForEach-Object { $_.Exception.Message }) -join "; "
+            }
+            else {
+                "task was not present after registration"
+            }
+            $failedTasks.Add("$($task.Name): $detail")
         }
     }
 }
 
 if ($failedTasks.Count -gt 0) {
     throw (
-        "Failed to register: " + ($failedTasks -join ", ") + ". " +
-        "Registering an S4U scheduled task requires an elevated PowerShell " +
-        "session; re-run this installer as Administrator. No summary is " +
-        "printed for tasks that do not exist."
+        "Failed to register or replace: " + ($failedTasks -join ", ") + ". " +
+        "Verify the elevated session, RunAsUser, TaskLogonType, and Task " +
+        "Scheduler service, then retry. No success summary is printed."
     )
 }
 
@@ -225,7 +245,7 @@ if (-not $attempted) {
 
 # Report what the scheduler actually holds, not what we intended to create.
 $tasks | ForEach-Object {
-    $live = Get-ScheduledTask -TaskName $_.Name
+    $live = Get-InstalledTaskExact -Name $_.Name
     [PSCustomObject]@{
         TaskName = $live.TaskName
         Status = "registered"

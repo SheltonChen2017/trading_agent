@@ -1,3 +1,4 @@
+import sqlite3
 from datetime import datetime, timezone
 from decimal import Decimal
 
@@ -444,6 +445,18 @@ def test_broker_decimal_precision_survives_into_immutable_evidence(tmp_path):
         recorded["positions"][0]["market_value"]
     ) == Decimal(market_value)
 
+    # SQLite coerces decimal strings bound to REAL-affinity columns. Direct
+    # evidence queries therefore need the exact text projection as well as the
+    # immutable JSON payload.
+    with sqlite3.connect(store.path) as connection:
+        stored = connection.execute(
+            "SELECT total_equity_text, cash_text FROM paper_account_observations "
+            "WHERE observation_id = ?",
+            (recorded["observation_id"],),
+        ).fetchone()
+    assert Decimal(stored[0]) == Decimal(equity_exact)
+    assert Decimal(stored[1]) == Decimal(cash)
+
     # ...and into the normalized rows the portfolio ML target builder reads.
     account_key = (
         f"{recorded['source']}:{recorded['account_mode']}:{recorded['account_id']}"
@@ -476,6 +489,88 @@ def test_snapshot_without_preserved_decimals_is_recorded_as_inexact(tmp_path):
     )
     assert recorded["exact_numerics"] is False
     assert recorded["schema_version"] == "1.2"
+
+
+def test_exact_snapshot_rejects_internally_inconsistent_values(tmp_path):
+    position = PortfolioPosition(
+        ticker="AAPL",
+        shares=2.0,
+        entry_price=10.0,
+        current_price=10.0,
+        market_value=21.0,
+        unrealized_pnl_pct=0.0,
+        is_leveraged_etf=False,
+        shares_exact="2",
+        entry_price_exact="10",
+        current_price_exact="10",
+        market_value_exact="21",
+    )
+    snapshot = PortfolioSnapshot(
+        positions=[position],
+        cash=100.0,
+        total_equity=121.0,
+        as_of="2026-07-29",
+        buying_power=100.0,
+        source="alpaca",
+        account_mode="paper",
+        account_id="paper-account-1",
+        cash_exact="100",
+        total_equity_exact="121",
+        buying_power_exact="100",
+    )
+    store = AssistantStore(tmp_path / "assistant.db")
+    start_paper_evidence_epoch(
+        store,
+        "paper-v1",
+        _lineage(),
+        started_at=datetime(2026, 7, 28, 13, tzinfo=timezone.utc),
+    )
+    at = datetime(2026, 7, 29, 20, 30, tzinfo=timezone.utc)
+    _reconcile(store, at)
+
+    with pytest.raises(PaperEvidenceError, match=r"shares \* current_price"):
+        capture_paper_account_observation(
+            store,
+            snapshot,
+            benchmark_ticker="SPY",
+            benchmark_close=550,
+            captured_at=at,
+            expected_lineage=_lineage(),
+        )
+
+
+def test_exact_observation_columns_are_backfilled_from_immutable_payload(tmp_path):
+    path = tmp_path / "assistant.db"
+    store = AssistantStore(path)
+    start_paper_evidence_epoch(
+        store,
+        "paper-v1",
+        _lineage(),
+        started_at=datetime(2026, 7, 28, 13, tzinfo=timezone.utc),
+    )
+    recorded = _capture(
+        store,
+        at=datetime(2026, 7, 29, 20, 30, tzinfo=timezone.utc),
+        equity=1_000.25,
+        benchmark_close=550.125,
+    )
+    with sqlite3.connect(path) as connection:
+        connection.execute(
+            "UPDATE paper_account_observations SET total_equity_text = '', "
+            "cash_text = '', benchmark_close_text = '', net_external_flow_text = '' "
+            "WHERE observation_id = ?",
+            (recorded["observation_id"],),
+        )
+
+    AssistantStore(path)
+    with sqlite3.connect(path) as connection:
+        restored = connection.execute(
+            "SELECT total_equity_text, cash_text, benchmark_close_text, "
+            "net_external_flow_text FROM paper_account_observations "
+            "WHERE observation_id = ?",
+            (recorded["observation_id"],),
+        ).fetchone()
+    assert restored == ("1000.25", "1000.25", "550.125", "0")
 
 
 def test_external_flow_accumulates_exactly_not_in_binary_float(tmp_path):

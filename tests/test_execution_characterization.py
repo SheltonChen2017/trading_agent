@@ -169,7 +169,12 @@ def observable_state(store: AssistantStore, proposal_id: str) -> dict[str, Any]:
 
 
 def _proposal(
-    proposal_id: str = "p-1", *, status: str = "proposed", side: str = "buy", **overrides
+    proposal_id: str = "p-1",
+    *,
+    status: str = "proposed",
+    side: str = "buy",
+    intent_overrides: dict | None = None,
+    **overrides,
 ) -> dict:
     payload = {
         "proposal_id": proposal_id,
@@ -188,6 +193,8 @@ def _proposal(
         },
     }
     payload.update(overrides)
+    if intent_overrides:
+        payload["intent"] = {**payload["intent"], **intent_overrides}
     return payload
 
 
@@ -700,3 +707,88 @@ def test_the_atomic_claim_is_still_a_single_conditional_update():
     assert begin < update < commit, (
         "the conditional UPDATE must execute after BEGIN IMMEDIATE and before commit"
     )
+
+
+# --------------------------------------------------------------------------
+# gaps found by mutation-testing the suite itself (2026-08-02)
+# --------------------------------------------------------------------------
+
+
+def test_submission_carries_the_proposals_exact_idempotency_key(store):
+    """Nothing asserted the key's VALUE, only that submission happened.
+
+    Verified by mutation: replacing `idempotency_key=proposal[...]` with
+    `idempotency_key=None` at the submit call left the whole suite green.
+    That key is the only thing preventing a retry from becoming a second
+    real order, so its value -- not merely its presence -- must be frozen.
+    """
+    store.save_proposal(_proposal(side="sell"))
+    recorder = _submission_recorder(
+        submit={
+            "order_id": "order-1",
+            "ticker": "AAPL",
+            "shares": 1,
+            "side": "sell",
+            "type": "market",
+            "status": "accepted",
+        }
+    )
+    with patched_broker(recorder):
+        execute_approved_paper_proposal(
+            "p-1", "approve", _held_portfolio(), load_policy(), store,
+            now_et=NOW_ET, earnings_days_away=10,
+        )
+
+    submits = [call for call in recorder.calls if call[0] == "submit_market_order"]
+    assert len(submits) == 1, recorder.call_names
+    _, args, kwargs = submits[0]
+    assert kwargs.get("idempotency_key") == "idem-p-1", (
+        f"submission did not carry the proposal's idempotency key: {kwargs}"
+    )
+
+
+def test_an_unsupported_order_type_blocks_and_releases_its_reservation(store):
+    """The 2026-07-29 fail-closed branch, previously uncharacterised.
+
+    execution_gate.validate_trade_intent() approves order_type="stop"; it is
+    a lower layer with no view of policy. The dispatch refuses rather than
+    silently downgrading a stop to a MARKET order -- an unbounded-price
+    order where a bounded one was intended -- and must release the budget it
+    had already reserved. Verified by mutation: deleting that
+    release_execution_reservation() call left the suite green before this
+    test existed.
+
+    Reaching the branch requires a policy that permits "stop", which
+    TradingPolicy.__post_init__ rejects. Constructing it through
+    object.__setattr__ is deliberate: it reproduces exactly the layer
+    disagreement the branch was added to survive.
+    """
+    policy = load_policy()
+    object.__setattr__(
+        policy, "allowed_order_types", tuple(policy.allowed_order_types) + ("stop",)
+    )
+    # The proposal must carry the MUTATED policy's fingerprint, or the call
+    # stops at the fingerprint check and never reaches the dispatch.
+    store.save_proposal(
+        _proposal(
+            side="sell",
+            intent_overrides={"order_type": "stop"},
+            policy_fingerprint=compute_policy_fingerprint(policy),
+        )
+    )
+    recorder = _submission_recorder(submit={"order_id": "must-not-exist"})
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            execute_approved_paper_proposal(
+                "p-1", "approve", _held_portfolio(), policy, store,
+                now_et=NOW_ET, earnings_days_away=10,
+            )
+
+    assert "order_type" in str(caught.value)
+    state = observable_state(store, "p-1")
+    assert state["reservations"] == [], (
+        "an unsupported order type left budget reserved with no order to release it"
+    )
+    assert "submit_market_order" not in recorder.call_names
+    assert "submit_limit_order" not in recorder.call_names

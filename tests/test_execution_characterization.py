@@ -15,17 +15,18 @@ changes any of this, one of these fails and the change was not a refactor.
 COVERAGE NOTE -- read before relying on this suite during GR-1B.
 
 What is frozen: refusal paths (confirmation phrase, unknown proposal,
-engaged kill switch), validation purity through the full body, recovery
-refusals, exception identity, and the atomic-claim structural invariant.
-Mutation-verified: deleting the kill-switch check and changing an exception
-type are both detected.
+engaged kill switch), validation purity through the full body, ordinary
+submission call ordering and persisted evidence, reservation release after a
+pre-submit telemetry failure, timeout reconciliation without resubmission,
+manual reconciliation, successful and refused recovery, exception identity,
+and the atomic-claim structural invariant. Mutation-verified: deleting the
+kill-switch check and changing an exception type are both detected.
 
-What is NOT yet frozen: any path that reaches submission. Every refusal
-characterised here fails before a reservation is taken, so removing
-`release_execution_reservation()` is invisible to these tests -- verified.
-Reservation lifecycle, broker submission ordering, and ambiguous-outcome
-reconciliation still need fixtures that drive a proposal all the way
-through, and GR-1B must not treat this file as covering them.
+What is NOT frozen exhaustively: every broker-error/mismatch/replacement-chain
+branch, override review, local journal failure, and every concurrent race.
+The existing execution suite still owns those cases. This file freezes the
+representative cross-seam paths most likely to change during GR-1 extraction;
+it must not be treated as proof that uncharacterised branches are safe.
 
 Frozen against `assistant/execution_service.py` at GR-1A. The five public
 entry points:
@@ -134,16 +135,16 @@ def observable_state(store: AssistantStore, proposal_id: str) -> dict[str, Any]:
             "ORDER BY trading_day", proposal_id
         )
         orders = rows(
-            "SELECT proposal_id, status FROM broker_orders "
-            "WHERE proposal_id = ? ORDER BY proposal_id", proposal_id
+            "SELECT order_id, proposal_id, status FROM broker_orders "
+            "WHERE proposal_id = ? ORDER BY order_id", proposal_id
         )
         events = rows(
             "SELECT event_type FROM broker_order_events "
-            "WHERE proposal_id = ? ORDER BY event_id", proposal_id
+            "WHERE proposal_id = ? ORDER BY event_at, rowid", proposal_id
         )
         telemetry = rows(
             "SELECT event_type FROM execution_telemetry_events "
-            "WHERE proposal_id = ? ORDER BY telemetry_event_id", proposal_id
+            "WHERE proposal_id = ? ORDER BY event_at, rowid", proposal_id
         )
     with store._connect() as connection:
         stamp = connection.execute(
@@ -205,6 +206,48 @@ def _portfolio() -> PortfolioSnapshot:
     )
 
 
+def _held_portfolio() -> PortfolioSnapshot:
+    portfolio = _portfolio()
+    portfolio.positions = [
+        PortfolioPosition(
+            ticker="AAPL",
+            shares=10.0,
+            entry_price=90.0,
+            current_price=100.0,
+            market_value=1000.0,
+            unrealized_pnl_pct=11.1,
+            is_leveraged_etf=False,
+        )
+    ]
+    return portfolio
+
+
+def _submission_recorder(*, submit: Any, lookup: Any = None) -> BrokerRecorder:
+    return BrokerRecorder(
+        is_configured=True,
+        assert_account_and_asset_ready={
+            "account": {
+                "account_id": "paper-account-1",
+                "paper": True,
+                "status": "ACTIVE",
+            },
+            "asset": {"symbol": "AAPL", "status": "active", "tradable": True},
+        },
+        get_latest_quote={
+            "ticker": "AAPL",
+            "price": 100.0,
+            "price_decimal": "100.00",
+            "bid": 99.99,
+            "ask": 100.01,
+            "bid_decimal": "99.99",
+            "ask_decimal": "100.01",
+            "timestamp": NOW_ET,
+        },
+        submit_market_order=submit,
+        find_order_by_client_id=lookup,
+    )
+
+
 @pytest.fixture()
 def store(tmp_path):
     return AssistantStore(tmp_path / "characterize.db")
@@ -247,13 +290,7 @@ def test_validate_is_side_effect_free_on_a_real_proposal(store):
             "timestamp": NOW_ET,  # broker returns a datetime, not a string
         },
     )
-    held = _portfolio()
-    held.positions = [
-        PortfolioPosition(
-            ticker="AAPL", shares=10.0, entry_price=90.0, current_price=100.0,
-            market_value=1000.0, unrealized_pnl_pct=11.1, is_leveraged_etf=False,
-        )
-    ]
+    held = _held_portfolio()
     before = observable_state(store, "p-1")
     with patched_broker(recorder):
         outcome = validate_proposal_for_execution(
@@ -346,6 +383,139 @@ def test_early_refusals_never_create_a_reservation(store):
         )
 
 
+def test_successful_submission_freezes_call_order_state_and_evidence(store):
+    """Characterise the ordinary path all four GR-1 seams participate in."""
+    store.save_proposal(_proposal(side="sell"))
+    accepted = {
+        "order_id": "paper-success-1",
+        "ticker": "AAPL",
+        "shares": 1,
+        "side": "sell",
+        "type": "market",
+        "status": "accepted",
+    }
+    recorder = _submission_recorder(submit=accepted)
+
+    with patched_broker(recorder):
+        result = execute_approved_paper_proposal(
+            "p-1",
+            "approve",
+            _held_portfolio(),
+            load_policy(),
+            store,
+            now_et=NOW_ET,
+            earnings_days_away=10,
+        )
+
+    assert result == accepted
+    assert recorder.call_names == (
+        "is_configured",
+        "assert_account_and_asset_ready",
+        "get_latest_quote",
+        "submit_market_order",
+    )
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "broker_accepted"
+    assert len(state["reservations"]) == 1
+    assert state["broker_orders"] == [
+        {
+            "order_id": "paper-success-1",
+            "proposal_id": "p-1",
+            "status": "accepted",
+        }
+    ]
+    assert state["order_events"] == ["submission_response"]
+    assert state["telemetry"] == ["validation_approved", "submission_started"]
+
+
+def test_pre_submit_telemetry_failure_releases_budget_without_broker_contact(
+    store, monkeypatch
+):
+    """Freeze the after-reservation failure path GR-1 is most likely to lose."""
+    store.save_proposal(_proposal(side="sell"))
+    recorder = _submission_recorder(
+        submit={
+            "order_id": "must-not-submit",
+            "ticker": "AAPL",
+            "shares": 1,
+            "side": "sell",
+            "type": "market",
+            "status": "accepted",
+        }
+    )
+
+    def fail_submission_telemetry(*args, **kwargs):
+        raise RuntimeError("characterized telemetry failure")
+
+    monkeypatch.setattr(
+        execution_service, "record_submission_started", fail_submission_telemetry
+    )
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            execute_approved_paper_proposal(
+                "p-1",
+                "approve",
+                _held_portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+                earnings_days_away=10,
+            )
+
+    assert "telemetry failed before broker submission" in str(caught.value).lower()
+    assert "submit_market_order" not in recorder.call_names
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "submission_failed"
+    assert state["reservations"] == []
+    assert state["broker_orders"] == []
+    assert state["order_events"] == []
+    assert state["telemetry"] == ["validation_approved"]
+
+
+def test_timeout_reconciles_by_idempotency_key_without_resubmitting(store):
+    """An ambiguous submit must query the broker and never issue a blind retry."""
+    store.save_proposal(_proposal(side="sell"))
+    reconciled = {
+        "order_id": "paper-reconciled-1",
+        "ticker": "AAPL",
+        "shares": 1,
+        "side": "sell",
+        "type": "market",
+        "limit_price": None,
+        "status": "accepted",
+    }
+    recorder = _submission_recorder(
+        submit=TimeoutError("response lost after submission"),
+        lookup=reconciled,
+    )
+
+    with patched_broker(recorder):
+        result = execute_approved_paper_proposal(
+            "p-1",
+            "approve",
+            _held_portfolio(),
+            load_policy(),
+            store,
+            now_et=NOW_ET,
+            earnings_days_away=10,
+        )
+
+    assert result == reconciled
+    assert recorder.call_names == (
+        "is_configured",
+        "assert_account_and_asset_ready",
+        "get_latest_quote",
+        "submit_market_order",
+        "find_order_by_client_id",
+    )
+    assert recorder.call_names.count("submit_market_order") == 1
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "broker_accepted"
+    assert len(state["reservations"]) == 1
+    assert state["order_events"] == ["submission_reconciled"]
+    assert state["telemetry"] == ["validation_approved", "submission_started"]
+
+
 # --------------------------------------------------------------------------
 # 3-5. reconciliation and recovery entry points
 # --------------------------------------------------------------------------
@@ -353,12 +523,46 @@ def test_early_refusals_never_create_a_reservation(store):
 
 def test_reconcile_submission_on_unknown_proposal_is_defined_behaviour(store):
     recorder = BrokerRecorder()
+    before = observable_state(store, "missing")
     with patched_broker(recorder):
-        try:
-            result = reconcile_submission("missing", store)
-        except Exception as exc:  # characterise the type, whatever it is
-            result = {"raised": type(exc).__name__}
-    assert isinstance(result, dict)
+        with pytest.raises(ProposalExecutionError) as caught:
+            reconcile_submission("missing", store)
+    assert type(caught.value) is ProposalExecutionError
+    assert str(caught.value) == "Unknown proposal: missing"
+    assert observable_state(store, "missing") == before
+    assert recorder.call_names == ()
+
+
+def test_manual_reconciliation_freezes_lookup_state_and_held_reservation(store):
+    store.save_proposal(_proposal(status="submission_unknown", side="sell"))
+    store.reserve_execution_budget(
+        "p-1",
+        trading_day="2026-08-03",
+        notional="100.00",
+        max_daily_notional="1000.00",
+        max_daily_orders=5,
+    )
+    accepted = {
+        "order_id": "paper-manual-reconcile-1",
+        "ticker": "AAPL",
+        "shares": 1,
+        "side": "sell",
+        "type": "market",
+        "limit_price": None,
+        "status": "accepted",
+    }
+    recorder = BrokerRecorder(find_order_by_client_id=accepted)
+
+    with patched_broker(recorder):
+        result = reconcile_submission("p-1", store)
+
+    assert result == accepted
+    assert recorder.call_names == ("find_order_by_client_id",)
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "broker_accepted"
+    assert len(state["reservations"]) == 1
+    assert state["order_events"] == ["manual_reconciliation"]
+    assert state["telemetry"] == []
 
 
 def test_recovery_refuses_a_proposal_that_is_not_actually_stranded(store):
@@ -395,6 +599,61 @@ def test_recovery_on_an_unknown_proposal_also_refuses(store):
     assert recorder.call_names == ()
 
 
+def _make_proposal_stale(store: AssistantStore, proposal_id: str) -> None:
+    with store._connect() as connection:
+        connection.execute(
+            "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
+            ("2000-01-01T00:00:00+00:00", proposal_id),
+        )
+
+
+def test_stale_pre_broker_claim_recovery_is_atomic_and_never_contacts_broker(store):
+    store.save_proposal(_proposal(status="validating"))
+    _make_proposal_stale(store, "p-1")
+    recorder = BrokerRecorder()
+
+    with patched_broker(recorder):
+        recovered = recover_stale_claim("p-1", store, stale_after_seconds=1)
+
+    assert recovered["status"] == "validation_failed"
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "validation_failed"
+    assert state["reservations"] == []
+    assert state["broker_orders"] == []
+    assert state["order_events"] == []
+    assert state["telemetry"] == []
+    assert recorder.call_names == ()
+
+
+def test_stale_reconciliation_recovery_preserves_ambiguous_budget_hold(store):
+    store.save_proposal(_proposal(status="reconciling", side="sell"))
+    store.reserve_execution_budget(
+        "p-1",
+        trading_day="2026-08-03",
+        notional="100.00",
+        max_daily_notional="1000.00",
+        max_daily_orders=5,
+    )
+    _make_proposal_stale(store, "p-1")
+    recorder = BrokerRecorder()
+
+    with patched_broker(recorder):
+        recovered = recover_stale_reconciliation(
+            "p-1", store, stale_after_seconds=1
+        )
+
+    assert recovered["status"] == "submission_unknown"
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "submission_unknown"
+    # A crashed local reconciler proves nothing about broker acceptance.
+    # Keep the budget held until an actual broker lookup resolves it.
+    assert len(state["reservations"]) == 1
+    assert state["broker_orders"] == []
+    assert state["order_events"] == []
+    assert state["telemetry"] == []
+    assert recorder.call_names == ()
+
+
 # --------------------------------------------------------------------------
 # structural facts GR-1 must preserve
 # --------------------------------------------------------------------------
@@ -420,17 +679,24 @@ def test_the_atomic_claim_is_still_a_single_conditional_update():
     AssistantStore and must stay there; a kernel module may orchestrate the
     claim phase but must not reimplement the update.
     """
-    import ast
     import inspect
 
     source = inspect.getsource(AssistantStore.claim_proposal)
-    tree = ast.parse(inspect.cleandoc(source.split("\n", 1)[1]).join(["", ""])) if False else None
-    updates = source.upper().count("UPDATE TRADE_PROPOSALS")
+    updates = source.count("UPDATE trade_proposals SET status")
     assert updates == 1, (
         f"claim_proposal() issues {updates} UPDATE statements; the atomic claim "
         "must remain exactly one conditional UPDATE"
     )
-    assert "SELECT" not in source.upper().split("UPDATE TRADE_PROPOSALS")[0][-400:], (
-        "a read immediately before the claiming UPDATE suggests the atomicity "
-        "was split into read-then-write"
+    assert (
+        "WHERE proposal_id = ? AND status IN ({placeholders})" in source
+    ), "the claiming UPDATE must retain both identity and expected-status guards"
+    assert 'query += " AND expires_at >= ?"' in source
+    assert "self.get_proposal(" not in source, (
+        "claim_proposal() must not perform an out-of-transaction application-level read"
+    )
+    begin = source.index('connection.execute("BEGIN IMMEDIATE")')
+    update = source.index("cursor = connection.execute(query, params)")
+    commit = source.index("connection.commit()")
+    assert begin < update < commit, (
+        "the conditional UPDATE must execute after BEGIN IMMEDIATE and before commit"
     )

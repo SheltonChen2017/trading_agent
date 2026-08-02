@@ -122,7 +122,31 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 .. GR-9 — not started
+## GR-1 — execution kernel split: **partial**
+
+GR-1A characterization is built and independently reviewed in
+`tests/test_execution_characterization.py`. No production code has moved yet.
+The reviewed freeze covers representative behavior across all five public
+entry points, including ordinary submission, broker-call order, reservation
+retention/release, immediate timeout reconciliation without a blind retry,
+manual reconciliation, recovery, telemetry, persisted order events, exception
+identity, and the storage-level conditional claim guard.
+
+The gap analysis corrected three stale plan assumptions:
+
+- `assistant/execution_service.py` is 2,040 lines, not approximately 1,450;
+- the four planned seams are interleaved inside the 582-line
+  `execute_approved_paper_proposal()` function; and
+- the atomic conditional claim already belongs to `AssistantStore`, so the
+  kernel may orchestrate it but must not move or reimplement it.
+
+The reviewed package decision is `assistant/execution_kernel/`, preserving the
+existing dependency direction and avoiding an `assistant -> execution ->
+assistant` package cycle. GR-1 remains partial until helpers and then the
+interleaved orchestration are extracted behind the unchanged
+`assistant.execution_service` facade and independently reviewed.
+
+## GR-2 .. GR-9 — not started
 
 Each requires its own gap analysis first; the plan predates the ML
 full-system additions throughout.

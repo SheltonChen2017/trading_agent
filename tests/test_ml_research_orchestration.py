@@ -337,6 +337,44 @@ def test_campaign_modules_have_no_execution_or_registry_imports():
         )
 
 
+def test_campaign_cli_treats_code_commit_as_runtime_assertion(
+    tmp_path, monkeypatch, capsys
+):
+    from assistant.runtime_identity import RuntimeIdentityError
+    from scripts import run_ml_research_campaign
+
+    seen = {}
+
+    def _runtime_commit(**kwargs):
+        seen.update(kwargs)
+        raise RuntimeIdentityError("expected code commit does not match runtime HEAD")
+
+    monkeypatch.setattr(run_ml_research_campaign, "current_commit", _runtime_commit)
+    code = run_ml_research_campaign.main(
+        [
+            "run-reviewed",
+            "--spec",
+            str(tmp_path / "spec.json"),
+            "--review",
+            str(tmp_path / "review.json"),
+            "--dataset-dir",
+            str(tmp_path / "dataset"),
+            "--dataset-id",
+            "dataset",
+            "--output-dir",
+            str(tmp_path / "output"),
+            "--code-commit",
+            "e" * 40,
+        ]
+    )
+
+    assert code == 1
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["ok"] is False
+    assert "does not match" in payload["error"]
+    assert seen == {"require_clean": True, "expected_commit": "e" * 40}
+
+
 def test_repository_discovery_spec_is_valid_and_explicitly_unapproved():
     root = Path(__file__).resolve().parent.parent
     spec_payload = json.loads(

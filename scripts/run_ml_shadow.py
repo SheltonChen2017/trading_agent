@@ -99,7 +99,7 @@ def _parse_instant(value: str, name: str) -> datetime:
     return parsed.astimezone(timezone.utc)
 
 
-def _current_commit() -> str:
+def _current_commit(expected_commit: str | None = None) -> str:
     """Strict runtime identity; see assistant/runtime_identity.py.
 
     The previous local copy used ``git diff --quiet HEAD --``, which does
@@ -107,7 +107,10 @@ def _current_commit() -> str:
     commit while importing a module that commit does not contain.
     """
     try:
-        return current_commit(require_clean=True)
+        return current_commit(
+            require_clean=True,
+            expected_commit=expected_commit,
+        )
     except RuntimeIdentityError as exc:
         raise ShadowCommandError(str(exc)) from exc
 
@@ -972,7 +975,10 @@ def build_parser() -> argparse.ArgumentParser:
         "--scheduled-for",
         help="Timezone-aware slot. Defaults to today's exact NYSE close.",
     )
-    predict.add_argument("--code-commit")
+    predict.add_argument(
+        "--code-commit",
+        help="Optional assertion that must equal the clean runtime git HEAD.",
+    )
     predict.add_argument(
         "--started-at",
         help="Fixture-only deterministic clock. Live providers always use now.",
@@ -1052,7 +1058,7 @@ def main(argv: list[str] | None = None) -> int:
                 }
                 _set_heartbeat(store, config, "predict", summary)
             else:
-                code_commit = args.code_commit or _current_commit()
+                code_commit = _current_commit(args.code_commit)
                 summary = command_predict(
                     store,
                     config,

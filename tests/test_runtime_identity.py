@@ -62,6 +62,31 @@ def test_untracked_file_makes_the_tree_unattributable(repository):
         current_commit(require_clean=True, repository=repository)
 
 
+def test_git_config_cannot_hide_an_untracked_runtime_file(repository):
+    """Repository/user config must not weaken the evidence boundary."""
+    _git(repository, "config", "status.showUntrackedFiles", "no")
+    (repository / "untracked.py").write_text("SNEAKY = True\n", encoding="utf-8")
+
+    # Establish the configuration-dependent blind spot before checking the
+    # production helper. An explicit command-line policy must override it.
+    assert _git(repository, "status", "--porcelain") == ""
+
+    with pytest.raises(RuntimeIdentityError, match="untracked"):
+        current_commit(require_clean=True, repository=repository)
+
+
+def test_git_ignore_cannot_hide_importable_runtime_source(repository):
+    source = repository / "ml"
+    source.mkdir()
+    (source / "ignored.py").write_text("SNEAKY = True\n", encoding="utf-8")
+    exclude = repository / ".git" / "info" / "exclude"
+    exclude.write_text("ml/ignored.py\n", encoding="utf-8")
+
+    assert _git(repository, "status", "--porcelain", "--untracked-files=all") == ""
+    with pytest.raises(RuntimeIdentityError, match="ignored Python source"):
+        current_commit(require_clean=True, repository=repository)
+
+
 def test_modified_tracked_file_is_also_refused(repository):
     (repository / "tracked.py").write_text("VALUE = 2\n", encoding="utf-8")
     with pytest.raises(RuntimeIdentityError):
@@ -72,6 +97,23 @@ def test_require_clean_false_still_reports_the_commit(repository):
     (repository / "untracked.py").write_text("SNEAKY = True\n", encoding="utf-8")
     commit = current_commit(require_clean=False, repository=repository)
     assert commit == _git(repository, "rev-parse", "HEAD")
+
+
+def test_expected_commit_is_an_assertion_not_a_caller_override(repository):
+    actual = _git(repository, "rev-parse", "HEAD")
+    assert current_commit(
+        require_clean=True,
+        repository=repository,
+        expected_commit=actual,
+    ) == actual
+
+    other = ("0" if actual[0] != "0" else "1") + actual[1:]
+    with pytest.raises(RuntimeIdentityError, match="does not match"):
+        current_commit(
+            require_clean=True,
+            repository=repository,
+            expected_commit=other,
+        )
 
 
 def test_a_directory_that_is_not_a_repository_fails_closed(tmp_path):

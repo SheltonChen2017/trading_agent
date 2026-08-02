@@ -130,7 +130,8 @@ The reviewed freeze covers representative behavior across all five public
 entry points, including ordinary submission, broker-call order, reservation
 retention/release, immediate timeout reconciliation without a blind retry,
 manual reconciliation, recovery, telemetry, persisted order events, exception
-identity, and the storage-level conditional claim guard.
+identity, the storage-level conditional claim guard, and a synchronized
+four-writer contention test that permits exactly one claim winner.
 
 The gap analysis corrected three stale plan assumptions:
 
@@ -145,6 +146,51 @@ existing dependency direction and avoiding an `assistant -> execution ->
 assistant` package cycle. GR-1 remains partial until helpers and then the
 interleaved orchestration are extracted behind the unchanged
 `assistant.execution_service` facade and independently reviewed.
+
+### What the characterization suite can actually detect
+
+A green characterization suite means nothing on its own; it must be shown to
+fail when the behaviour it names is removed. Three rounds of mutation testing
+were needed here, and every round found tests that passed while their subject
+was deleted — first the original suite, then the reviewed extension.
+
+Confirmed **detected** (each verified by deleting the behaviour and observing
+a failure, then restoring):
+
+| Mutation | Detected by |
+|---|---|
+| kill-switch check removed | `test_an_engaged_kill_switch_blocks_...` |
+| exception identity changed | `test_wrong_confirmation_phrase_...` |
+| reservation release removed on the unsupported-order-type path | `test_an_unsupported_order_type_blocks_and_releases_...` |
+| idempotency key not passed to the broker | `test_submission_carries_the_proposals_exact_idempotency_key` |
+| unsupported order type silently downgraded to market | `test_an_unsupported_order_type_blocks_and_releases_...` |
+
+All three release paths now have a recorded mutation result. The third,
+`mark_submission_failed_and_release` in `reconcile_submission`, is the only
+place a broker 404 frees reserved budget, and it is gated on
+`BROKER_ABSENCE_GRACE_SECONDS` because a fresh 404 may only mean the broker
+has not indexed the order yet. Both halves are frozen and verified:
+
+| Mutation | Result |
+|---|---|
+| grace period ignored — a fresh 404 trusted as absence | DETECTED |
+| confirmed absence no longer releases budget | DETECTED |
+| absence check inverted — a 404 never trusted | DETECTED |
+
+**Correction to an earlier entry.** Partial-fill and replacement-chain
+handling was previously listed here as uncharacterized. That was wrong.
+`execution_service.py:444` delegates to
+`order_lifecycle.resolve_replacement_chain()`, which lives in a module GR-1
+does not split and carries 42 dedicated tests across
+`tests/test_replacement_chain.py` and `tests/test_replacement_chain_round3.py`.
+Those were mutation-checked directly: suppressing chain recording fails six
+of them. What GR-1 actually moves is the thin delegating wrapper
+`_authoritative_order_for()`, not the chain logic.
+
+Remaining honest limit: the characterization freezes representative paths,
+not every branch of a 2,040-line module. GR-1B should add a recorded mutation
+result for any specific behaviour it moves that is not already listed above,
+rather than treating a green suite as sufficient.
 
 ## GR-2 .. GR-9 — not started
 

@@ -7,7 +7,7 @@ working through its original import path.
 
 This is outcome INTERPRETATION only -- deciding what the broker's answer
 means. It never submits, claims, or transitions a proposal. The sentinel
-``LOOKUP_UNCONFIRMED`` is the reason the module exists: "the broker says no
+``_LOOKUP_UNCONFIRMED`` is the reason the module exists: "the broker says no
 order" and "we could not ask the broker" are different answers, and
 collapsing them would let a failed lookup be read as durable proof of
 absence.
@@ -26,8 +26,7 @@ from risk.execution_gate import TradeIntent
 
 # Distinct from None: None means the broker answered "no such order",
 # this means the question could not be asked.
-LOOKUP_UNCONFIRMED = object()
-_LOOKUP_UNCONFIRMED = LOOKUP_UNCONFIRMED
+_LOOKUP_UNCONFIRMED = object()
 
 
 def _broker_absence_is_old_enough(claimed: dict, *, now: datetime) -> bool:

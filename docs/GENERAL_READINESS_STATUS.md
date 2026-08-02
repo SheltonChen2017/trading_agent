@@ -125,7 +125,10 @@ command.
 ## GR-1 — execution kernel split: **partial**
 
 GR-1A characterization is built and independently reviewed in
-`tests/test_execution_characterization.py`. No production code has moved yet.
+`tests/test_execution_characterization.py`. The first production extraction is
+complete: broker outcome interpretation now lives in
+`assistant/execution_kernel/outcomes.py`, while
+`assistant.execution_service` preserves the existing facade imports.
 The reviewed freeze covers representative behavior across all five public
 entry points, including ordinary submission, broker-call order, reservation
 retention/release, immediate timeout reconciliation without a blind retry,
@@ -143,7 +146,9 @@ The gap analysis corrected three stale plan assumptions:
 
 The reviewed package decision is `assistant/execution_kernel/`, preserving the
 existing dependency direction and avoiding an `assistant -> execution ->
-assistant` package cycle. GR-1 remains partial until helpers and then the
+assistant` package cycle. Outcome lookup, identity matching, replacement-chain
+interpretation, and absence-age classification have moved there. GR-1 remains
+partial until the claim/revalidation/submission helpers and then the
 interleaved orchestration are extracted behind the unchanged
 `assistant.execution_service` facade and independently reviewed.
 

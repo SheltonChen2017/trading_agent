@@ -208,7 +208,6 @@ from datetime import datetime, timedelta, timezone
 from typing import Any
 
 from assistant.execution_kernel.outcomes import (
-    LOOKUP_UNCONFIRMED,
     _LOOKUP_UNCONFIRMED,
     _authoritative_order_for,
     _broker_absence_is_old_enough,
@@ -229,15 +228,12 @@ from assistant.execution_telemetry import (
 from assistant.order_lifecycle import (
     journal_broker_order_update,
     proposal_status_for_order,
-    CHAIN_ERROR_IDENTITY_MISMATCH,
-    resolve_replacement_chain,
 )
 from assistant.money import MoneyInput, decimal_or_none, to_decimal
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
     APPROVED,
     BLOCKED,
-    BROKER_ABSENCE_GRACE_SECONDS,
     IN_FLIGHT_INTENT_STATUSES,
     POLICY_OVERRIDE_AVAILABLE,
     RECONCILING,

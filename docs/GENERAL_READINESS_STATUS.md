@@ -130,7 +130,8 @@ The reviewed freeze covers representative behavior across all five public
 entry points, including ordinary submission, broker-call order, reservation
 retention/release, immediate timeout reconciliation without a blind retry,
 manual reconciliation, recovery, telemetry, persisted order events, exception
-identity, and the storage-level conditional claim guard.
+identity, the storage-level conditional claim guard, and a synchronized
+four-writer contention test that permits exactly one claim winner.
 
 The gap analysis corrected three stale plan assumptions:
 

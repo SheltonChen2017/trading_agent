@@ -19,8 +19,9 @@ engaged kill switch), validation purity through the full body, ordinary
 submission call ordering and persisted evidence, reservation release after a
 pre-submit telemetry failure, timeout reconciliation without resubmission,
 manual reconciliation, successful and refused recovery, exception identity,
-and the atomic-claim structural invariant. Mutation-verified: deleting the
-kill-switch check and changing an exception type are both detected.
+the atomic-claim structural invariant, and simultaneous claim contention.
+Mutation-verified: deleting the kill-switch check and changing an exception
+type are both detected.
 
 What is NOT frozen exhaustively: every broker-error/mismatch/replacement-chain
 branch, override review, local journal failure, and every concurrent race.
@@ -40,7 +41,9 @@ entry points:
 from __future__ import annotations
 
 import contextlib
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
+from threading import Barrier
 from typing import Any
 
 import pytest
@@ -712,6 +715,33 @@ def test_the_atomic_claim_is_still_a_single_conditional_update():
     assert begin < update < commit, (
         "the conditional UPDATE must execute after BEGIN IMMEDIATE and before commit"
     )
+
+
+def test_simultaneous_claim_attempts_have_exactly_one_winner(store):
+    """Exercise the storage guarantee under real writer contention.
+
+    Older tests described two back-to-back calls as "concurrent". Those prove
+    the status guard, but they cannot detect a refactor that stops acquiring
+    the SQLite write lock before its claim checks. A barrier makes four worker
+    threads enter the claim together; every call opens its own connection.
+    """
+    store.save_proposal(_proposal())
+    contender_count = 4
+    start = Barrier(contender_count)
+
+    def claim(_: int):
+        start.wait(timeout=10)
+        return store.claim_proposal("p-1")
+
+    with ThreadPoolExecutor(max_workers=contender_count) as executor:
+        results = list(executor.map(claim, range(contender_count)))
+
+    winners = [result for result in results if result is not None]
+    assert len(winners) == 1, (
+        f"expected exactly one claim winner under contention, got {len(winners)}"
+    )
+    assert winners[0]["status"] == "validating"
+    assert store.get_proposal("p-1")["status"] == "validating"
 
 
 # --------------------------------------------------------------------------

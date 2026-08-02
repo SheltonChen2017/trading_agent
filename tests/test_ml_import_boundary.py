@@ -235,3 +235,86 @@ def test_no_execution_capable_module_reaches_ml_transitively():
         "execution-capable code reaches ml through an indirect import: "
         + "; ".join(sorted(offending_chains))
     )
+
+
+_PROPOSAL_GENERATION_MODULES = frozenset(
+    {
+        "assistant.proposals",
+        "assistant.allocation_proposals",
+        "assistant.strategy_proposals",
+        "assistant.allocation_batch",
+        "assistant.ai_advisor",
+        "assistant.recommended_stocks",
+    }
+)
+
+
+def _is_proposal_generation_module(module: str) -> bool:
+    return any(
+        module == forbidden or module.startswith(f"{forbidden}.")
+        for forbidden in _PROPOSAL_GENERATION_MODULES
+    )
+
+
+def _forbidden_dependency_chains(
+    graph: dict[str, set[str]], roots: list[str]
+) -> list[str]:
+    """Return direct or transitive kernel paths into proposal generation."""
+    offending: list[str] = []
+    for root in roots:
+        seen = {root}
+        stack = [(root, (root,))]
+        while stack:
+            current, chain = stack.pop()
+            for dependency in sorted(graph.get(current, ())):
+                next_chain = chain + (dependency,)
+                if dependency.startswith("<unresolved "):
+                    offending.append(" -> ".join(next_chain))
+                    continue
+                if _is_proposal_generation_module(dependency):
+                    offending.append(" -> ".join(next_chain))
+                    continue
+                if dependency in graph and dependency not in seen:
+                    seen.add(dependency)
+                    stack.append((dependency, next_chain))
+    return offending
+
+
+def test_kernel_boundary_walker_detects_indirect_and_submodule_imports():
+    """Keep the guard itself from becoming a green but bypassable test."""
+    graph = {
+        "assistant.execution_kernel.submit": {"assistant.context_builder"},
+        "assistant.context_builder": {"assistant.proposals.builders"},
+    }
+    assert _forbidden_dependency_chains(
+        graph, ["assistant.execution_kernel.submit"]
+    ) == [
+        "assistant.execution_kernel.submit -> assistant.context_builder -> "
+        "assistant.proposals.builders"
+    ]
+
+
+def test_execution_kernel_never_reaches_proposal_generation():
+    """GR-1 section 6.2: the seams must be real.
+
+    A kernel module that could import proposal generation would let the
+    submission path reach back into the code that decides WHAT to trade.
+    The kernel interprets and executes decisions; it must never make them.
+    """
+    graph, unresolved = _internal_import_graph()
+    assert not unresolved, (
+        "the execution-kernel boundary cannot be proved while imports are "
+        "unresolved: " + "; ".join(sorted(unresolved))
+    )
+    roots = sorted(
+        module
+        for module in graph
+        if module == "assistant.execution_kernel"
+        or module.startswith("assistant.execution_kernel.")
+    )
+    assert roots, "expected assistant.execution_kernel modules to exist"
+    offenders = _forbidden_dependency_chains(graph, roots)
+    assert not offenders, (
+        "execution kernel reaches proposal-generation code: "
+        + "; ".join(sorted(offenders))
+    )

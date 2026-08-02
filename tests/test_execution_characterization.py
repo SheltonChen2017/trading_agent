@@ -899,3 +899,41 @@ def test_a_fresh_absent_order_keeps_the_budget_held(store):
         "a 404 inside the grace period must keep the budget held; releasing it "
         "would free capital against an order that may still be live"
     )
+
+
+def test_a_failed_lookup_is_never_treated_as_confirmed_absence(store):
+    """The three-state contract `_lookup_order_outcome` exists to protect.
+
+    "The broker says no such order" and "we could not ask the broker" are
+    different answers. Collapsing them means a network failure is read as
+    durable proof the order never existed -- releasing reserved budget and
+    marking submission_failed for an order that may be live at the broker.
+
+    Found by mutation: returning None instead of LOOKUP_UNCONFIRMED left the
+    whole suite green, including the grace-period tests, because those only
+    exercise the confirmed-absence branch.
+    """
+    old = (
+        datetime.now(timezone.utc)
+        - timedelta(seconds=BROKER_ABSENCE_GRACE_SECONDS + 60)
+    ).isoformat()
+    _unresolved_with_reservation(store, updated_at=old)
+
+    # The lookup itself fails -- not a 404.
+    recorder = BrokerRecorder(
+        is_configured=True,
+        find_order_by_client_id=ConnectionError("broker unreachable"),
+    )
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            reconcile_submission("p-1", store)
+
+    assert "lookup" in str(caught.value).lower(), caught.value
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == SUBMISSION_UNKNOWN, (
+        "a failed lookup must leave the proposal unresolved, not failed"
+    )
+    assert state["reservations"] != [], (
+        "a failed lookup must keep the budget held -- releasing it would free "
+        "capital against an order that may still exist at the broker"
+    )

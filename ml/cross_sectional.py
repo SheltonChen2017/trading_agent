@@ -37,6 +37,17 @@ from ml.evaluation import (
 )
 
 MIN_NAMES_PER_DATE = 5
+# POOLED rows (names x dates), not independent observations. At
+# MIN_NAMES_PER_DATE this floor implies roughly 40 dates, and the date is the
+# independent unit here -- same-day names are correlated, so 200 rows is far
+# weaker evidence than 200 would suggest for a time series. Deliberately
+# shares no value with ml/volatility.py's MIN_TRAINING_ROWS, which counts
+# per-security sessions; the two measure different things under one name.
+#
+# This is a refusal floor, not a power calculation: it stops a fit on
+# obviously inadequate data. It does NOT establish that a passing sample is
+# adequate -- doc 11.3's multiplicity-corrected block bootstrap decides that,
+# and the readiness reports state the independent date count separately.
 MIN_TRAINING_ROWS = 200
 
 

@@ -23,7 +23,6 @@ import hashlib
 import json
 import os
 import sqlite3
-import subprocess
 import sys
 import tempfile
 from collections import Counter
@@ -35,6 +34,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.operations import append_alerts_jsonl
+from assistant.runtime_identity import RuntimeIdentityError, current_commit
 from assistant.storage import AssistantStore
 from ml.artifacts import ArtifactError, load_model_manifest
 from ml.contracts import ContractError, ModelManifest
@@ -100,25 +100,16 @@ def _parse_instant(value: str, name: str) -> datetime:
 
 
 def _current_commit() -> str:
-    repository = Path(__file__).resolve().parent.parent
-    result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=repository,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    clean = subprocess.run(
-        ["git", "diff", "--quiet", "HEAD", "--"], cwd=repository, check=False
-    )
-    if clean.returncode != 0:
-        raise ShadowCommandError(
-            "tracked working-tree changes are not represented by the current commit"
-        )
-    commit = result.stdout.strip()
-    if len(commit) not in (40, 64) or any(c not in "0123456789abcdef" for c in commit):
-        raise ShadowCommandError("git HEAD is not a canonical commit hash")
-    return commit
+    """Strict runtime identity; see assistant/runtime_identity.py.
+
+    The previous local copy used ``git diff --quiet HEAD --``, which does
+    not see untracked files -- a shadow prediction could be stamped with a
+    commit while importing a module that commit does not contain.
+    """
+    try:
+        return current_commit(require_clean=True)
+    except RuntimeIdentityError as exc:
+        raise ShadowCommandError(str(exc)) from exc
 
 
 def _failure_kind(error: BaseException) -> str:

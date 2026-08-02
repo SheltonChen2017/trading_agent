@@ -139,6 +139,13 @@ INVERSE_LEVERAGED_ETF_TICKERS = {"SQQQ", "QID", "SOXS", "SPXU", "SDS", "TZA"}
 # have — the pipeline already handles mismatched history lengths per
 # ticker (see signals/scanner.py's as_of-in-index guard).
 LOOKBACK_DAYS = 1764
+# NOTE: this governs the scanner/backtest pipeline only. The rotation and
+# vol-target research scripts under scripts/ deliberately hardcode their own
+# LOOKBACK_DAYS = 4200 (~16 years) because each is a frozen, self-contained
+# experiment whose window is part of its recorded result -- reading this
+# value instead would silently re-scope a completed experiment. Do not
+# "consolidate" them into this constant; change one only by writing a new
+# experiment.
 ROLLING_WINDOW = 20          # window for rolling mean/std used in z-scores
 
 # --- Baskets -----------------------------------------------------------

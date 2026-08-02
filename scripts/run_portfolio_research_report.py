@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 import argparse
-import subprocess
 import sys
 from datetime import datetime, timezone
 from pathlib import Path
@@ -11,20 +10,22 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import config
 from assistant.mandate import load_mandate
+from assistant.runtime_identity import RuntimeIdentityError, current_commit
 from backtest.portfolio_simulator import simulate_portfolio
 from backtest.research_report import build_research_report, write_research_report
 from data.market_data import fetch_historical
 
 
 def _current_commit() -> str:
-    result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=Path(__file__).resolve().parent.parent,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    return result.stdout.strip()
+    """Strict runtime identity; see assistant/runtime_identity.py.
+
+    Previously unguarded: a fully dirty tree was stamped into the research
+    report's ``code_commit`` as though it described the code that ran.
+    """
+    try:
+        return current_commit(require_clean=True)
+    except RuntimeIdentityError as exc:
+        raise SystemExit(str(exc)) from exc
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -25,6 +25,7 @@ import json
 import os
 import re
 import time
+import warnings
 from decimal import Decimal, InvalidOperation
 
 import config
@@ -702,7 +703,11 @@ def _record_run(
     generate_soxx_soxl_rebalance_proposals's own `store` param) -- callers
     that don't have a store on hand simply don't get a persisted record.
     A persistence failure must never break the actual advisory feature, so
-    this swallows its own exceptions rather than propagating them."""
+    this swallows its own exceptions rather than propagating them -- but it
+    does not swallow them SILENTLY. A bare `except Exception: pass` here
+    meant the audit log could be broken indefinitely while every AI call
+    looked successful, which defeats the point of having an audit log at
+    all. The exception is still not propagated; it is made audible."""
     if store is None:
         return
     latency_ms = (time.monotonic() - start) * 1000
@@ -717,8 +722,14 @@ def _record_run(
             response=response,
             error=error,
         )
-    except Exception:
-        pass
+    except Exception as exc:
+        # Deliberately still non-fatal (see docstring), but never silent.
+        warnings.warn(
+            f"AI audit log write failed for {function_name!r}; this call is "
+            f"unaudited: {type(exc).__name__}: {exc}",
+            RuntimeWarning,
+            stacklevel=2,
+        )
 
 
 def review_allocation_plan(

@@ -235,3 +235,39 @@ def test_no_execution_capable_module_reaches_ml_transitively():
         "execution-capable code reaches ml through an indirect import: "
         + "; ".join(sorted(offending_chains))
     )
+
+
+def test_execution_kernel_never_imports_proposal_generation():
+    """GR-1 section 6.2: the seams must be real.
+
+    A kernel module that could import proposal generation would let the
+    submission path reach back into the code that decides WHAT to trade.
+    The kernel interprets and executes decisions; it must never make them.
+    """
+    kernel = REPO_ROOT / "assistant" / "execution_kernel"
+    if not kernel.exists():
+        return
+    forbidden = {
+        "assistant.proposals",
+        "assistant.allocation_proposals",
+        "assistant.strategy_proposals",
+        "assistant.allocation_batch",
+        "assistant.ai_advisor",
+        "assistant.recommended_stocks",
+    }
+    offenders = []
+    for path in sorted(kernel.rglob("*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                names = [a.name for a in node.names]
+            elif isinstance(node, ast.ImportFrom):
+                names = [node.module or ""]
+            else:
+                continue
+            for name in names:
+                if name in forbidden:
+                    offenders.append(f"{path.name}: {name}")
+    assert not offenders, (
+        "execution kernel must not import proposal-generation code: " + repr(offenders)
+    )

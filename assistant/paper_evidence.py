@@ -151,7 +151,25 @@ def _validate_snapshot(snapshot: PortfolioSnapshot) -> None:
             or not math.isfinite(value)
         ):
             raise PaperEvidenceError(f"snapshot.{field} must be finite")
+    # The exact fields are what actually gets persisted, so they are
+    # validated rather than trusted: a malformed decimal string would
+    # otherwise reach immutable evidence unchecked.
+    for field, accessor in (
+        ("cash", lambda: snapshot.cash_exact_decimal),
+        ("total_equity", lambda: snapshot.total_equity_exact_decimal),
+        ("buying_power", lambda: snapshot.buying_power_exact_decimal),
+    ):
+        try:
+            exact = accessor()
+        except ValueError as exc:
+            raise PaperEvidenceError(
+                f"snapshot.{field} exact value is not a finite decimal: {exc}"
+            ) from exc
+        if exact is not None and not exact.is_finite():
+            raise PaperEvidenceError(f"snapshot.{field} must be finite")
     if snapshot.total_equity <= 0:
+        raise PaperEvidenceError("snapshot.total_equity must be positive")
+    if snapshot.total_equity_exact_decimal <= 0:
         raise PaperEvidenceError("snapshot.total_equity must be positive")
     if snapshot.buying_power is not None and not math.isfinite(
         snapshot.buying_power
@@ -180,6 +198,14 @@ def _validate_snapshot(snapshot: PortfolioSnapshot) -> None:
                 raise PaperEvidenceError(
                     f"{ticker}.{field} must be finite"
                 )
+            try:
+                exact = position.exact_field(field)
+            except ValueError as exc:
+                raise PaperEvidenceError(
+                    f"{ticker}.{field} exact value is not a finite decimal: {exc}"
+                ) from exc
+            if not exact.is_finite():
+                raise PaperEvidenceError(f"{ticker}.{field} must be finite")
 
 
 def _net_external_flow(
@@ -461,11 +487,15 @@ def capture_paper_account_observation(
             )
 
     observation = {
-        # 1.1: net_external_flow is exact decimal text rather than a JSON
-        # float. The payload hash therefore differs from a 1.0 observation
-        # of the same session, which is correct -- they are not the same
-        # evidence.
-        "schema_version": "1.1",
+        # 1.2: every money and quantity field is exact decimal text taken
+        # from the broker's own decimals, not a JSON float. Paper
+        # observations are immutable, so precision discarded at write time
+        # can never be reconstructed. `exact_numerics` records whether the
+        # snapshot actually supplied preserved decimals, so a consumer can
+        # tell exact capture from a rounded float that merely round-tripped
+        # instead of having to assume.
+        "schema_version": "1.2",
+        "exact_numerics": snapshot.has_exact_numerics,
         "evidence_epoch": epoch["evidence_epoch"],
         "lineage_hash": epoch["lineage_hash"],
         "session_date": session_date,
@@ -474,15 +504,17 @@ def capture_paper_account_observation(
         "source": snapshot.source,
         "account_mode": snapshot.account_mode,
         "account_id": snapshot.account_id,
-        "cash": float(snapshot.cash),
-        "total_equity": float(snapshot.total_equity),
+        "cash": decimal_text(snapshot.cash_exact_decimal),
+        "total_equity": decimal_text(snapshot.total_equity_exact_decimal),
         "buying_power": (
             None
             if snapshot.buying_power is None
-            else float(snapshot.buying_power)
+            else decimal_text(snapshot.buying_power_exact_decimal)
         ),
         "benchmark_ticker": ticker,
-        "benchmark_close": float(benchmark_close),
+        "benchmark_close": decimal_text(
+            to_decimal(benchmark_close, name="benchmark_close")
+        ),
         # Decimal text, not float: the normalized portfolio tables and the
         # flow-adjusted return series both re-read this field, and a float
         # here would hand them an already-corrupted value to preserve
@@ -491,10 +523,16 @@ def capture_paper_account_observation(
         "positions": [
             {
                 "ticker": position.ticker.upper(),
-                "shares": float(position.shares),
-                "entry_price": float(position.entry_price),
-                "current_price": float(position.current_price),
-                "market_value": float(position.market_value),
+                "shares": decimal_text(position.exact_field("shares")),
+                "entry_price": decimal_text(
+                    position.exact_field("entry_price")
+                ),
+                "current_price": decimal_text(
+                    position.exact_field("current_price")
+                ),
+                "market_value": decimal_text(
+                    position.exact_field("market_value")
+                ),
             }
             for position in sorted(
                 snapshot.positions, key=lambda item: item.ticker.upper()

@@ -76,6 +76,22 @@ def _to_dict(obj):
     return obj
 
 
+def exact_decimal(
+    exact_text: str | None, fallback: float, *, name: str
+) -> Decimal:
+    """Prefer a preserved exact decimal over a display-rounded float.
+
+    The ``*_exact`` fields carry the broker's own decimal text unchanged.
+    The plain float fields are display-rounded (2dp) and are what the UI and
+    the pre-existing budget arithmetic have always used, so they are left
+    alone. Immutable evidence must read the exact value: what is discarded
+    when an observation is written cannot be reconstructed afterwards.
+    """
+    if exact_text is None:
+        return to_decimal(fallback, name=name)
+    return to_decimal(exact_text, name=name)
+
+
 @dataclasses.dataclass
 class PortfolioPosition:
     ticker: str
@@ -85,6 +101,12 @@ class PortfolioPosition:
     market_value: float
     unrealized_pnl_pct: float
     is_leveraged_etf: bool
+    # Broker-supplied decimal text, unrounded. None means the caller had no
+    # exact value -- never a silent substitution of the rounded float.
+    shares_exact: str | None = None
+    entry_price_exact: str | None = None
+    current_price_exact: str | None = None
+    market_value_exact: str | None = None
 
     @property
     def entry_price_decimal(self) -> Decimal:
@@ -97,6 +119,23 @@ class PortfolioPosition:
     @property
     def market_value_decimal(self) -> Decimal:
         return to_decimal(self.market_value, name=f"{self.ticker}.market_value")
+
+    @property
+    def has_exact_numerics(self) -> bool:
+        return None not in (
+            self.shares_exact,
+            self.entry_price_exact,
+            self.current_price_exact,
+            self.market_value_exact,
+        )
+
+    def exact_field(self, field: str) -> Decimal:
+        """Exact decimal for one money/quantity field, rounded float if absent."""
+        return exact_decimal(
+            getattr(self, f"{field}_exact"),
+            getattr(self, field),
+            name=f"{self.ticker}.{field}",
+        )
 
 
 @dataclasses.dataclass
@@ -111,6 +150,42 @@ class PortfolioSnapshot:
     open_orders: list[dict] = dataclasses.field(default_factory=list)
     open_orders_available: bool = True
     account_id: str | None = None
+    # Broker-supplied decimal text, unrounded. See exact_decimal() above.
+    cash_exact: str | None = None
+    total_equity_exact: str | None = None
+    buying_power_exact: str | None = None
+
+    @property
+    def has_exact_numerics(self) -> bool:
+        """True only when every money field came from a preserved decimal.
+
+        Recorded on immutable evidence so a consumer can tell an exactly
+        captured observation from one that merely round-tripped a rounded
+        float, instead of having to assume.
+        """
+        if self.cash_exact is None or self.total_equity_exact is None:
+            return False
+        if self.buying_power is not None and self.buying_power_exact is None:
+            return False
+        return all(position.has_exact_numerics for position in self.positions)
+
+    @property
+    def cash_exact_decimal(self) -> Decimal:
+        return exact_decimal(self.cash_exact, self.cash, name="portfolio.cash")
+
+    @property
+    def total_equity_exact_decimal(self) -> Decimal:
+        return exact_decimal(
+            self.total_equity_exact, self.total_equity, name="portfolio.total_equity"
+        )
+
+    @property
+    def buying_power_exact_decimal(self) -> Decimal | None:
+        if self.buying_power is None:
+            return None
+        return exact_decimal(
+            self.buying_power_exact, self.buying_power, name="portfolio.buying_power"
+        )
 
     @property
     def cash_decimal(self) -> Decimal:

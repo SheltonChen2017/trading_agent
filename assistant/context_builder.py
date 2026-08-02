@@ -35,7 +35,7 @@ from assistant.schemas import (
     UpcomingEvent,
 )
 from assistant.policy import TradingPolicy, load_policy
-from assistant.money import to_decimal
+from assistant.money import decimal_text, to_decimal
 from assistant.portfolio_analytics import compute_portfolio_analytics
 from assistant.research_registry import load_research_findings, registry_version
 
@@ -174,6 +174,14 @@ def build_portfolio_snapshot(
                 market_value=float(round(market_value, 2)),
                 unrealized_pnl_pct=float(round(unrealized_pnl_pct, 2)),
                 is_leveraged_etf=_classify_leveraged(ticker),
+                # The float fields above are display-rounded and stay that
+                # way. These carry the unrounded decimals so immutable
+                # evidence is not forced to reconstruct them from a rounded
+                # float, which is impossible.
+                shares_exact=decimal_text(shares),
+                entry_price_exact=decimal_text(entry_price),
+                current_price_exact=decimal_text(current_price),
+                market_value_exact=decimal_text(market_value),
             )
         )
     # Keep the snapshot invariant that total_equity equals cash plus the
@@ -186,10 +194,24 @@ def build_portfolio_snapshot(
         ),
         Decimal("0"),
     )
+    # The same invariant without the display rounding. Summed from the exact
+    # position values, not from the rounded ones, so the exact total is not
+    # silently the rounded total under a different name.
+    exact_total_equity = cash_decimal + sum(
+        (position.exact_field("market_value") for position in built),
+        Decimal("0"),
+    )
     return PortfolioSnapshot(
         positions=built,
         cash=float(round(cash_decimal, 2)),
         total_equity=float(round(total_equity, 2)),
+        cash_exact=decimal_text(cash_decimal),
+        total_equity_exact=decimal_text(exact_total_equity),
+        buying_power_exact=(
+            decimal_text(buying_power_decimal)
+            if buying_power_decimal is not None
+            else None
+        ),
         as_of=datetime.now(timezone.utc).date().isoformat(),
         buying_power=(
             float(round(buying_power_decimal, 2))

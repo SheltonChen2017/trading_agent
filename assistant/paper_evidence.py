@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import math
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from typing import Any
 from zoneinfo import ZoneInfo
 
@@ -186,8 +187,17 @@ def _net_external_flow(
     *,
     after: datetime,
     through: datetime,
-) -> float:
-    flow = 0.0
+) -> Decimal:
+    """Sum external cash transfers exactly.
+
+    Accumulating in ``float`` here silently corrupted the result: four exact
+    cent-denominated postings summing to 10000.30 accumulated to
+    10000.300000000001, and the normalized portfolio tables then stored that
+    error as though it were the broker's decimal value. The error also flows
+    into the external-flow-adjusted return series, so it compounds across
+    sessions rather than cancelling.
+    """
+    flow = Decimal("0")
     for posting in store.list_journal_postings():
         if (
             posting["source"] != "cash_transfer"
@@ -196,7 +206,7 @@ def _net_external_flow(
             continue
         occurred_at = _parse_at(posting["occurred_at"], "posting.occurred_at")
         if after < occurred_at <= through:
-            flow += float(posting["amount"])
+            flow += to_decimal(posting["amount"], name="posting.amount")
     return flow
 
 
@@ -427,7 +437,7 @@ def capture_paper_account_observation(
         )
 
     prior = store.list_paper_account_observations(epoch["evidence_epoch"])
-    net_external_flow = 0.0
+    net_external_flow = Decimal("0")
     if prior:
         previous_at = _parse_at(prior[-1]["captured_at"], "captured_at")
         if when < previous_at:
@@ -451,7 +461,11 @@ def capture_paper_account_observation(
             )
 
     observation = {
-        "schema_version": "1.0",
+        # 1.1: net_external_flow is exact decimal text rather than a JSON
+        # float. The payload hash therefore differs from a 1.0 observation
+        # of the same session, which is correct -- they are not the same
+        # evidence.
+        "schema_version": "1.1",
         "evidence_epoch": epoch["evidence_epoch"],
         "lineage_hash": epoch["lineage_hash"],
         "session_date": session_date,
@@ -469,7 +483,11 @@ def capture_paper_account_observation(
         ),
         "benchmark_ticker": ticker,
         "benchmark_close": float(benchmark_close),
-        "net_external_flow": net_external_flow,
+        # Decimal text, not float: the normalized portfolio tables and the
+        # flow-adjusted return series both re-read this field, and a float
+        # here would hand them an already-corrupted value to preserve
+        # "exactly". ml/portfolio_volatility.py already expects decimal text.
+        "net_external_flow": decimal_text(net_external_flow),
         "positions": [
             {
                 "ticker": position.ticker.upper(),

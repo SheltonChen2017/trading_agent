@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from decimal import Decimal
 
 import pytest
 
@@ -13,6 +14,7 @@ from assistant.paper_evidence import (
     record_operational_drill,
     start_paper_evidence_epoch,
 )
+from assistant.money import to_decimal
 from assistant.portfolio_ledger import record_cash_transfer
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
 from assistant.storage import AssistantStore
@@ -369,6 +371,67 @@ def test_observation_rejects_a_different_broker_account(tmp_path):
         )
 
 
+def test_external_flow_accumulates_exactly_not_in_binary_float(tmp_path):
+    """Several exact cent transfers must not accumulate float error.
+
+    These four amounts sum to exactly 10000.30, but ``flow += float(amount)``
+    accumulates to 10000.300000000001. The normalized portfolio tables store
+    whatever this field holds as "the broker's decimal value", and the
+    flow-adjusted return series subtracts it from equity, so the error would
+    be preserved and compounded rather than caught.
+    """
+    store = AssistantStore(tmp_path / "assistant.db")
+    start_paper_evidence_epoch(
+        store,
+        "paper-v1",
+        _lineage(),
+        started_at=datetime(2026, 7, 28, 13, tzinfo=timezone.utc),
+    )
+    _capture(
+        store,
+        at=datetime(2026, 7, 29, 20, 30, tzinfo=timezone.utc),
+        equity=1_000,
+        benchmark_close=100,
+    )
+
+    amounts = ("1234.57", "8765.43", "0.10", "0.20")
+    for index, amount in enumerate(amounts):
+        record_cash_transfer(
+            store,
+            external_id=f"deposit-{index}",
+            amount=amount,
+            occurred_at=f"2026-07-30T15:0{index}:00+00:00",
+            description="Exact cent deposit",
+        )
+
+    # Guard the premise: this set really is float-inexact.
+    naive = 0.0
+    for amount in amounts:
+        naive += float(amount)
+    assert naive != float(Decimal("10000.30"))
+
+    second = _capture(
+        store,
+        at=datetime(2026, 7, 30, 20, 30, tzinfo=timezone.utc),
+        equity=11_000,
+        benchmark_close=101,
+    )
+
+    assert to_decimal(second["net_external_flow"]) == Decimal("10000.30")
+    # The normalized row that ML portfolio research reads must agree exactly.
+    account_key = (
+        f"{second['source']}:{second['account_mode']}:{second['account_id']}"
+    )
+    equity_rows = store.list_portfolio_equity_snapshots(account_key)
+    captured = [
+        row
+        for row in equity_rows
+        if row["session_date"] == second["session_date"]
+    ]
+    assert len(captured) == 1
+    assert to_decimal(captured[0]["net_external_flow"]) == Decimal("10000.30")
+
+
 def test_summary_adjusts_external_flows_counts_orders_and_requires_coverage(
     tmp_path,
 ):
@@ -418,7 +481,7 @@ def test_summary_adjusts_external_flows_counts_orders_and_requires_coverage(
     )
 
     summary = paper_evidence_summary(store, "paper-v1")
-    assert second["net_external_flow"] == 100
+    assert to_decimal(second["net_external_flow"]) == Decimal("100")
     assert summary["paper_sessions"] == 3
     assert summary["coverage_complete"] is True
     assert summary["paper_orders"]["count"] == 2

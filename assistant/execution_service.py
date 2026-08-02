@@ -214,6 +214,28 @@ from assistant.execution_kernel.outcomes import (
     _lookup_order_outcome,
     _order_matches_intent,
 )
+from assistant.execution_kernel.errors import (
+    PolicyOverridableBlockError,
+    ProposalExecutionError,
+    _ProposalClaimLostError,
+)
+from assistant.execution_kernel.intents import (
+    _intent_from_dict,
+    _shares_from_stored_value,
+)
+from assistant.execution_kernel.claim import (
+    PRE_BROKER_STRANDED_STATUSES,
+    _parse_recovery_timestamp,
+    _transition_pre_broker_claim,
+)
+from assistant.execution_kernel.revalidate import (
+    _pending_buy_value_by_ticker,
+    _resolve_earnings_days_away,
+    _review_digest,
+)
+from assistant.execution_kernel.submit import (
+    _execution_budget_notional,
+)
 from assistant.kill_switch import env_kill_switch_active
 from assistant.execution_telemetry import (
     FAILURE_DATA_INTEGRITY,
@@ -259,260 +281,6 @@ from risk.execution_gate import (
 # from `None`, which _lookup_order_outcome() reserves for a broker 404.
 # Whether that 404 is old enough to count as reliable absence is decided
 # separately by the reconciliation grace-period rules.
-
-
-class ProposalExecutionError(RuntimeError):
-    pass
-
-
-class _ProposalClaimLostError(ProposalExecutionError):
-    """The worker's pre-broker claim was revoked before its next transition."""
-
-
-class PolicyOverridableBlockError(ProposalExecutionError):
-    """Raised instead of a plain ProposalExecutionError when EVERY
-    violation on the rejected validation is override-eligible (see
-    risk.execution_gate.ValidationResult.overridable_violations) -- the
-    proposal is left in POLICY_OVERRIDE_AVAILABLE (not BLOCKED, which is
-    terminal) so a caller can re-invoke with override_policy_violations=
-    True to proceed. `overridable_violations` is always the complete
-    violations list here, since a mix of overridable and non-overridable
-    violations always raises the plain ProposalExecutionError instead.
-
-    `conditions_changed` (GPT review, 2026-07-30): True only when the
-    caller DID pass override_policy_violations=True, a PRIOR reviewed-
-    override record existed for this proposal, and the current
-    violations no longer match that prior record -- i.e. the human's
-    earlier review no longer describes what would actually be overridden
-    right now. False for an ordinary first-time presentation (nothing to
-    compare against yet) and for a plain non-override check. Callers
-    (CLI, UI) should show a distinctly different message in this case --
-    "the conditions changed, review again" rather than "every violation
-    is override-eligible, rerun with --override"."""
-
-    def __init__(self, message: str, overridable_violations: list[str], conditions_changed: bool = False):
-        super().__init__(message)
-        self.overridable_violations = overridable_violations
-        self.conditions_changed = conditions_changed
-
-
-def _transition_pre_broker_claim(
-    store: AssistantStore,
-    proposal_id: str,
-    *,
-    expected_status: str,
-    new_status: str,
-    **updates: Any,
-) -> dict[str, Any]:
-    """Advance a proposal only while this worker still owns its claim.
-
-    Stale-claim recovery can move a long-running worker's proposal to
-    ``validation_failed`` and release its ticker/side slot. The worker may
-    merely have been paused rather than dead, so every later pre-broker
-    transition must be conditional. Once recovery wins, this fences the old
-    worker out before it can reserve budget or contact the broker.
-    """
-    transitioned = store.update_proposal_status_if_current(
-        proposal_id,
-        expected_statuses=(expected_status,),
-        new_status=new_status,
-        **updates,
-    )
-    if transitioned is not None:
-        return transitioned
-    current = store.get_proposal(proposal_id)
-    current_status = None if current is None else current.get("status")
-    raise _ProposalClaimLostError(
-        f"Proposal {proposal_id} lost its execution claim while transitioning "
-        f"{expected_status!r} -> {new_status!r} (current status={current_status!r}). "
-        "Refusing to continue, reserve execution budget, or contact the broker."
-    )
-
-
-def _review_digest(intent: TradeIntent, violation_codes: tuple[str, ...], violations: tuple[str, ...]) -> str:
-    """Fingerprint over the EXACT trade intent plus the EXACT set of
-    override-eligible violations (both stable codes AND human-readable
-    messages, each canonically sorted so no ordering artifact can ever
-    cause a spurious mismatch) that a human has been shown before
-    requesting an override (GPT review, 2026-07-30: `override_policy_
-    violations=True` used to be treated as blanket permission to accept
-    WHATEVER override-eligible conditions happened to exist at the later
-    execution instant, not specifically the ones actually reviewed).
-    Hashing the messages too, not just the codes, matters: the same code
-    (e.g. max_position_pct) can represent materially different severity
-    as the underlying numbers change -- a position slightly over the cap
-    is not the same reviewed risk as one dramatically over it, and the
-    human-readable message is what carries that number."""
-    payload = {
-        "intent_fingerprint": intent_fingerprint(intent),
-        "violation_codes": sorted(violation_codes),
-        "violations": sorted(violations),
-    }
-    serialized = json.dumps(payload, sort_keys=True)
-    return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
-
-
-def _shares_from_stored_value(raw_shares: object) -> int:
-    """Converts a stored proposal's `shares` field to an int WITHOUT ever
-    silently truncating a malformed value -- a bare `int(raw["shares"])`
-    used to turn a corrupted or hand-edited row's `shares: 1.9` into `1`
-    with no error at all (GPT review, 2026-07-29: `int()` truncates
-    toward zero rather than rejecting a non-whole value). Raises
-    ValueError (caught by this module's callers, which already treat a
-    malformed stored intent as a hard, fail-closed error) for anything
-    that isn't a real whole-share quantity: a bool, a non-finite float, a
-    fractional float, or a non-numeric value."""
-    if isinstance(raw_shares, bool):
-        raise ValueError(f"Stored shares value is a bool ({raw_shares!r}), not a share quantity.")
-    if isinstance(raw_shares, int):
-        return raw_shares
-    if isinstance(raw_shares, float):
-        if not math.isfinite(raw_shares):
-            raise ValueError(f"Stored shares value is not finite: {raw_shares!r}.")
-        if not raw_shares.is_integer():
-            raise ValueError(
-                f"Stored shares value {raw_shares!r} is fractional, not a whole share count -- refusing "
-                "to silently truncate it."
-            )
-        return int(raw_shares)
-    raise ValueError(f"Stored shares value {raw_shares!r} ({type(raw_shares).__name__}) is not numeric.")
-
-
-def _intent_from_dict(raw: dict) -> TradeIntent:
-    return TradeIntent(
-        ticker=raw["ticker"],
-        side=raw["side"],
-        shares=_shares_from_stored_value(raw["shares"]),
-        order_type=raw.get("order_type", "market"),
-        limit_price=raw.get("limit_price"),
-        rationale=raw.get("rationale", ""),
-    )
-
-
-def _execution_budget_notional(
-    intent: TradeIntent, reference_price: MoneyInput
-) -> Decimal:
-    """Gross submitted notional reserved against the persistent daily cap.
-
-    This intentionally uses the same side-aware price as the risk gate:
-    an aggressive BUY limit is priced at the higher limit, while a SELL
-    remains at the reference price so a risk-reducing order is not blocked
-    merely because its limit is above the quote.
-    """
-    return Decimal(intent.shares) * worst_case_fill_price_decimal(
-        intent, reference_price
-    )
-
-
-def _pending_buy_value_by_ticker(
-    open_orders: list[dict], broker_module
-) -> dict[str, Decimal]:
-    """Estimated dollar value of currently pending (not-yet-filled) BUY
-    orders, keyed by ticker -- fed into validate_trade_intent()'s
-    exposure/concentration checks, which otherwise only see FILLED
-    positions and are blind to money already committed by a pending order
-    (Codex review, 2026-07-27). Risk-adjacent but intentionally NOT in
-    risk/execution_gate.py -- see that module's "Known scatter points"
-    note and docs/ARCHITECTURE_DEBT.md. Prefers exact values already on the order
-    (notional, or shares * limit_price for a limit order); for a plain
-    market buy order (no price on the order itself) falls back to one
-    live quote per such order.
-
-    A notional-only order (Alpaca lets you submit a dollar amount instead
-    of a share count -- `shares` is None, `notional` is the real dollar
-    value) used to be skipped entirely, because `shares` was checked
-    before `notional` -- so a valid notional value was never read (GPT
-    review, 2026-07-27). `ticker`/`notional` are now checked first;
-    `shares` is only required for the two branches that actually need it
-    (shares * limit_price, shares * quote price).
-
-    Deliberately does NOT swallow a quote-fetch failure here -- an earlier
-    version caught it and silently dropped that order's value to zero,
-    which undercounts real exposure exactly like the bug this function
-    exists to fix, just one step removed (GPT review, 2026-07-27). The
-    caller is responsible for treating a raised exception as "exposure
-    can't be verified right now" and failing the approval closed, the
-    same way current_portfolio.open_orders_available already does for the
-    duplicate-order check."""
-    totals: dict[str, Decimal] = {}
-    for order in open_orders:
-        if str(order.get("side", "")).lower() != "buy":
-            continue
-        ticker = order.get("ticker")
-        if not ticker:
-            continue
-        # Only the UNFILLED remainder is still pending. The filled portion of
-        # a partially-filled buy is already sitting in portfolio.positions, so
-        # counting the original quantity here double-counts it and can block
-        # unrelated purchases that are actually within policy (GPT review,
-        # 2026-07-29).
-        #
-        # A non-finite/absent filled_qty is treated as 0 -- i.e. the FULL order
-        # stays counted. That is the conservative direction (it overstates
-        # pending exposure and blocks more, rather than understating it and
-        # permitting more), matching this function's fail-closed contract for
-        # quote failures described above.
-        raw_filled = order.get("filled_qty")
-        filled_qty = decimal_or_none(raw_filled) if raw_filled else Decimal("0")
-        if filled_qty is None or filled_qty < 0:
-            filled_qty = Decimal("0")
-
-        notional = order.get("notional")
-        if notional:
-            value = to_decimal(notional, name=f"{ticker} pending notional")
-            # A notional order carries no share count, so net out the filled
-            # dollars directly. Without a usable fill price the full notional
-            # stays counted (again, the conservative direction).
-            raw_fill_price = order.get("filled_avg_price")
-            fill_price = (
-                decimal_or_none(raw_fill_price)
-                if raw_fill_price
-                else Decimal("0")
-            )
-            if fill_price is not None and fill_price > 0:
-                value = max(
-                    Decimal("0"),
-                    value - filled_qty * fill_price,
-                )
-        else:
-            shares = order.get("shares")
-            if not shares:
-                continue
-            remaining_shares = (
-                to_decimal(shares, name=f"{ticker} pending shares")
-                - filled_qty
-            )
-            if remaining_shares <= 0:
-                continue
-            limit_price = order.get("limit_price")
-            if limit_price:
-                value = remaining_shares * to_decimal(
-                    limit_price, name=f"{ticker} pending limit_price"
-                )
-            else:
-                quote = broker_module.get_latest_quote(ticker)
-                value = remaining_shares * to_decimal(
-                    quote["price"], name=f"{ticker} quote price"
-                )
-        totals[ticker.upper()] = (
-            totals.get(ticker.upper(), Decimal("0")) + value
-        )
-    return totals
-
-
-def _resolve_earnings_days_away(ticker: str, override: int | None) -> int | None:
-    """Caller-supplied override wins (useful for tests / explicit control).
-    Otherwise fetch live -- returns None (check skipped) only when the
-    data is honestly unavailable, never guessed."""
-    if override is not None:
-        return override
-    try:
-        from data.event_data import fetch_upcoming_earnings
-
-        record = fetch_upcoming_earnings([ticker]).get(ticker, {})
-        return record.get("days_away") if record.get("available") else None
-    except Exception:
-        return None
 
 
 @dataclasses.dataclass(frozen=True)
@@ -1793,14 +1561,6 @@ def recover_stale_reconciliation(
     return recovered
 
 
-# Statuses a proposal can be stranded in BEFORE anything was ever handed to the
-# broker. submit_approved_proposal() writes "submitting" and only then calls
-# out, so a row still sitting in "validating"/"approved" provably has no broker
-# order behind it -- which is what makes recovering them safe, unlike every
-# post-submission status.
-PRE_BROKER_STRANDED_STATUSES: tuple[str, ...] = (VALIDATING, APPROVED)
-
-
 def recover_stale_claim(
     proposal_id: str, store: AssistantStore, stale_after_seconds: int = 900,
 ) -> dict:
@@ -1899,18 +1659,3 @@ def recover_stale_claim(
         "statuses are NOT recoverable this way: use reconcile_submission() or "
         "recover_stale_reconciliation(), which never assume a broker order is absent."
     )
-
-
-def _parse_recovery_timestamp(store: AssistantStore, proposal_id: str) -> datetime | None:
-    """The row's `updated_at` as a datetime, or None if it cannot be read."""
-    rows = store.list_proposals_by_statuses(PRE_BROKER_STRANDED_STATUSES)
-    raw = next(
-        (row.get("updated_at") for row in rows if row.get("proposal_id") == proposal_id),
-        None,
-    )
-    if not raw:
-        return None
-    try:
-        return datetime.fromisoformat(str(raw).replace("Z", "+00:00"))
-    except ValueError:
-        return None

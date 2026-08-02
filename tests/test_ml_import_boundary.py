@@ -79,9 +79,16 @@ def _module_name(path: Path) -> str:
     return ".".join(parts)
 
 
-def _internal_import_graph() -> dict[str, set[str]]:
-    """Map every non-test first-party module to the modules it imports."""
+def _internal_import_graph() -> tuple[dict[str, set[str]], list[str]]:
+    """Map every non-test first-party module to the modules it imports.
+
+    Returns the graph plus any import forms this walker cannot resolve.
+    Unresolvable forms are returned rather than skipped: a boundary test
+    that silently stops seeing part of the codebase is worse than one that
+    refuses, because it keeps reporting success while going blind.
+    """
     graph: dict[str, set[str]] = {}
+    unresolved: list[str] = []
     for path in REPO_ROOT.rglob("*.py"):
         parts = path.relative_to(REPO_ROOT).parts
         if parts[0] in {"tests", ".git", "__pycache__", ".pytest_cache"}:
@@ -96,7 +103,20 @@ def _internal_import_graph() -> dict[str, set[str]]:
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 dependencies.update(alias.name for alias in node.names)
-            elif isinstance(node, ast.ImportFrom) and node.level == 0 and node.module:
+            elif isinstance(node, ast.ImportFrom):
+                if node.level:
+                    # Relative imports are not resolved to absolute module
+                    # names here. There are currently none in non-test code,
+                    # so this costs nothing today -- but the first one
+                    # written must break this test rather than quietly
+                    # become an edge the walker cannot follow.
+                    unresolved.append(
+                        f"{_module_name(path)}: relative import "
+                        f"(level={node.level}, module={node.module!r})"
+                    )
+                    continue
+                if not node.module:
+                    continue
                 dependencies.add(node.module)
                 # `from data import helper` binds a submodule, not just the
                 # package. Recording only `data` loses the edge that
@@ -105,8 +125,20 @@ def _internal_import_graph() -> dict[str, set[str]]:
                 dependencies.update(
                     f"{node.module}.{alias.name}" for alias in node.names
                 )
+            elif isinstance(node, ast.Call):
+                # importlib.import_module("ml.x") is an edge no static walk
+                # can follow. Flag the call site instead of pretending the
+                # graph is complete.
+                function = node.func
+                name = getattr(function, "attr", None) or getattr(
+                    function, "id", None
+                )
+                if name in {"import_module", "__import__"}:
+                    unresolved.append(
+                        f"{_module_name(path)}: dynamic import via {name}()"
+                    )
         graph[_module_name(path)] = dependencies
-    return graph
+    return graph, unresolved
 
 
 def test_no_execution_capable_module_reaches_ml_transitively():
@@ -119,7 +151,12 @@ def test_no_execution_capable_module_reaches_ml_transitively():
     the offending chain, so a future indirect dependency fails loudly
     instead of silently.
     """
-    graph = _internal_import_graph()
+    graph, unresolved = _internal_import_graph()
+    assert not unresolved, (
+        "this test cannot follow these import forms, so it can no longer "
+        "prove the boundary holds -- resolve them or teach the walker: "
+        + "; ".join(sorted(unresolved))
+    )
     roots = sorted(
         name
         for name in graph

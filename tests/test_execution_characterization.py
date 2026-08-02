@@ -986,6 +986,85 @@ def test_the_override_review_digest_binds_to_the_exact_reviewed_violations():
     )
 
 
+def test_a_mismatched_order_under_our_key_halts_the_platform(store):
+    """The only execution path that ENGAGES the persistent kill switch.
+
+    Submission raised, and a lookup by our exact idempotency key found an
+    order that is NOT what we submitted. That means either the broker
+    reused our key or something we do not understand happened to an order
+    carrying our identity -- precisely the anomaly duplicate-order
+    protection exists to catch. It must never auto-resolve: the proposal
+    stays unresolved, the reservation stays held, no order is journaled as
+    ours, and the whole platform stops until a human looks.
+
+    GR-1B gap analysis, 2026-08-02: grepping this branch's error strings
+    across tests/ returned nothing, so a path that halts the entire
+    platform was moving into the kernel with zero coverage. Frozen here
+    before the orchestration split, not after.
+    """
+    store.save_proposal(_proposal(side="sell"))
+    # Same ticker/side/type under our key, but 100 shares where we sent 1.
+    mismatched = {
+        "order_id": "paper-not-ours-1",
+        "ticker": "AAPL",
+        "shares": 100,
+        "side": "sell",
+        "type": "market",
+        "limit_price": None,
+        "status": "accepted",
+    }
+    recorder = _submission_recorder(
+        submit=TimeoutError("response lost after submission"),
+        lookup=mismatched,
+    )
+
+    assert store.get_kill_switch().get("active") is not True
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            execute_approved_paper_proposal(
+                "p-1",
+                "approve",
+                _held_portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+                earnings_days_away=10,
+            )
+
+    message = str(caught.value)
+    assert "MISMATCHED" in message, message
+    # The audit trail must name WHICH field disagreed, not just that one did.
+    assert "shares" in message, message
+
+    assert recorder.call_names.count("submit_market_order") == 1, (
+        "a mismatch must never be retried -- that is how a duplicate real "
+        "order gets sent"
+    )
+    assert recorder.call_names[-1] == "find_order_by_client_id"
+
+    kill_switch = store.get_kill_switch()
+    assert kill_switch.get("active") is True, (
+        "an order carrying our idempotency key that is not our order is an "
+        "unexplained broker-state anomaly; the platform must stop"
+    )
+    assert "MISMATCH" in str(kill_switch.get("reason", "")).upper() or "match" in str(
+        kill_switch.get("reason", "")
+    ), kill_switch
+
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == SUBMISSION_UNKNOWN, (
+        "never auto-resolved to failed or accepted -- we do not know what "
+        "happened, and a terminal status would claim we do"
+    )
+    assert state["reservations"] != [], (
+        "the budget stays held: an order may be live at the broker"
+    )
+    assert state["broker_orders"] == [], (
+        "the mismatched order must NOT be journaled as this proposal's order"
+    )
+
+
 def test_the_legacy_facade_reexports_the_exact_kernel_exception_objects():
     """GR-1 moves definitions without changing caller-visible identities."""
     from assistant import execution_service

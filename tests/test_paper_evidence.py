@@ -340,7 +340,7 @@ def test_retry_repairs_a_capture_that_failed_after_normalized_children(
         expected_lineage=_lineage(),
     )
 
-    assert repaired["total_equity"] == 1_000
+    assert to_decimal(repaired["total_equity"]) == Decimal("1000")
     assert repaired["portfolio_capture"]["already_recorded"] is False
     assert len(store.list_portfolio_capture_sessions(account_key=account_key)) == 1
     equity = store.list_portfolio_equity_snapshots(account_key)
@@ -369,6 +369,113 @@ def test_observation_rejects_a_different_broker_account(tmp_path):
             benchmark_close=100,
             captured_at=after_close,
         )
+
+
+def test_broker_decimal_precision_survives_into_immutable_evidence(tmp_path):
+    """Sub-cent broker precision must reach the normalized ML tables intact.
+
+    Paper observations are immutable: precision discarded at write time can
+    never be reconstructed. These share/price values are chosen so that a
+    float round-trip visibly loses digits, which is what happened while the
+    observation stored ``float(...)`` and the normalized tables then
+    re-derived a Decimal from the already-damaged value.
+    """
+    shares = "3.141592653589793238"
+    price = "197.339999999999999999"
+    market_value = str(Decimal(shares) * Decimal(price))
+    cash = "10000.005"
+
+    position = PortfolioPosition(
+        ticker="AAPL",
+        shares=float(shares),
+        entry_price=float(price),
+        current_price=float(price),
+        market_value=float(market_value),
+        unrealized_pnl_pct=0.0,
+        is_leveraged_etf=False,
+        shares_exact=shares,
+        entry_price_exact=price,
+        current_price_exact=price,
+        market_value_exact=market_value,
+    )
+    equity_exact = str(Decimal(cash) + Decimal(market_value))
+    snapshot = PortfolioSnapshot(
+        positions=[position],
+        cash=float(cash),
+        total_equity=float(equity_exact),
+        as_of="2026-07-29",
+        buying_power=float(cash),
+        source="alpaca",
+        account_mode="paper",
+        account_id="paper-account-1",
+        cash_exact=cash,
+        total_equity_exact=equity_exact,
+        buying_power_exact=cash,
+    )
+    assert snapshot.has_exact_numerics is True
+    # Guard the premise: these values really do not survive a float trip.
+    assert to_decimal(float(shares)) != Decimal(shares)
+    assert to_decimal(float(market_value)) != Decimal(market_value)
+    assert to_decimal(float(equity_exact)) != Decimal(equity_exact)
+
+    store = AssistantStore(tmp_path / "assistant.db")
+    start_paper_evidence_epoch(
+        store,
+        "paper-v1",
+        _lineage(),
+        started_at=datetime(2026, 7, 28, 13, tzinfo=timezone.utc),
+    )
+    at = datetime(2026, 7, 29, 20, 30, tzinfo=timezone.utc)
+    _reconcile(store, at)
+    recorded = capture_paper_account_observation(
+        store,
+        snapshot,
+        benchmark_ticker="SPY",
+        benchmark_close=550,
+        captured_at=at,
+        expected_lineage=_lineage(),
+    )
+
+    assert recorded["exact_numerics"] is True
+    assert to_decimal(recorded["cash"]) == Decimal(cash)
+    assert to_decimal(recorded["total_equity"]) == Decimal(equity_exact)
+    assert to_decimal(recorded["positions"][0]["shares"]) == Decimal(shares)
+    assert to_decimal(
+        recorded["positions"][0]["market_value"]
+    ) == Decimal(market_value)
+
+    # ...and into the normalized rows the portfolio ML target builder reads.
+    account_key = (
+        f"{recorded['source']}:{recorded['account_mode']}:{recorded['account_id']}"
+    )
+    equity_rows = store.list_portfolio_equity_snapshots(account_key)
+    assert len(equity_rows) == 1
+    assert to_decimal(equity_rows[0]["total_equity"]) == Decimal(equity_exact)
+    assert to_decimal(equity_rows[0]["cash"]) == Decimal(cash)
+
+    position_rows = store.list_portfolio_position_snapshots(account_key)
+    assert len(position_rows) == 1
+    assert to_decimal(position_rows[0]["shares"]) == Decimal(shares)
+    assert to_decimal(position_rows[0]["market_value"]) == Decimal(market_value)
+
+
+def test_snapshot_without_preserved_decimals_is_recorded_as_inexact(tmp_path):
+    """A snapshot with no exact fields must say so rather than imply exactness."""
+    store = AssistantStore(tmp_path / "assistant.db")
+    start_paper_evidence_epoch(
+        store,
+        "paper-v1",
+        _lineage(),
+        started_at=datetime(2026, 7, 28, 13, tzinfo=timezone.utc),
+    )
+    recorded = _capture(
+        store,
+        at=datetime(2026, 7, 29, 20, 30, tzinfo=timezone.utc),
+        equity=1_000,
+        benchmark_close=100,
+    )
+    assert recorded["exact_numerics"] is False
+    assert recorded["schema_version"] == "1.2"
 
 
 def test_external_flow_accumulates_exactly_not_in_binary_float(tmp_path):

@@ -40,7 +40,7 @@ entry points:
 from __future__ import annotations
 
 import contextlib
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from typing import Any
 
 import pytest
@@ -56,6 +56,11 @@ from assistant.execution_service import (
     validate_proposal_for_execution,
 )
 from assistant.policy import compute_policy_fingerprint, load_policy
+from assistant.proposal_status import (
+    BROKER_ABSENCE_GRACE_SECONDS,
+    SUBMISSION_FAILED,
+    SUBMISSION_UNKNOWN,
+)
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
 from assistant.storage import AssistantStore
 
@@ -792,3 +797,75 @@ def test_an_unsupported_order_type_blocks_and_releases_its_reservation(store):
     )
     assert "submit_market_order" not in recorder.call_names
     assert "submit_limit_order" not in recorder.call_names
+
+
+# --------------------------------------------------------------------------
+# the third release path: reconcile_submission's confirmed-absence branch
+# --------------------------------------------------------------------------
+
+
+def _unresolved_with_reservation(store, *, updated_at: str) -> None:
+    """A proposal stuck in submission_unknown, holding reserved budget.
+
+    `updated_at` is what claim_proposal() hands to
+    _broker_absence_is_old_enough() as `_claimed_from_updated_at`, so it is
+    the only thing deciding whether a 404 is trusted.
+    """
+    store.save_proposal(_proposal(side="sell", status=SUBMISSION_UNKNOWN))
+    store.reserve_execution_budget(
+        "p-1",
+        trading_day="2026-08-03",
+        notional="100.00",
+        max_daily_notional="1000000.00",
+        max_daily_orders=100,
+    )
+    with store._connect() as connection:
+        connection.execute(
+            "UPDATE trade_proposals SET updated_at = ? WHERE proposal_id = ?",
+            (updated_at, "p-1"),
+        )
+
+
+def test_a_confirmed_absent_order_releases_budget_only_after_the_grace_period(store):
+    """The third release path -- `mark_submission_failed_and_release`.
+
+    A 404 from the broker is not proof the order never existed: the broker
+    may simply not have indexed it yet. Only once BROKER_ABSENCE_GRACE_SECONDS
+    has elapsed is absence trusted, and only then is the reserved budget
+    released. Freezing both halves, because releasing too early frees capital
+    against an order that may still be live.
+    """
+    now = datetime.now(timezone.utc)
+    old = (now - timedelta(seconds=BROKER_ABSENCE_GRACE_SECONDS + 60)).isoformat()
+    _unresolved_with_reservation(store, updated_at=old)
+    recorder = BrokerRecorder(is_configured=True, find_order_by_client_id=None)
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            reconcile_submission("p-1", store)
+
+    assert "never accepted" in str(caught.value)
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == SUBMISSION_FAILED
+    assert state["reservations"] == [], (
+        "confirmed absence past the grace period must release the reservation"
+    )
+
+
+def test_a_fresh_absent_order_keeps_the_budget_held(store):
+    """The safety half: a recent 404 must NOT be trusted as absence."""
+    recent = datetime.now(timezone.utc).isoformat()
+    _unresolved_with_reservation(store, updated_at=recent)
+    recorder = BrokerRecorder(is_configured=True, find_order_by_client_id=None)
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            reconcile_submission("p-1", store)
+
+    assert "grace period has not elapsed" in str(caught.value)
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == SUBMISSION_UNKNOWN
+    assert state["reservations"] != [], (
+        "a 404 inside the grace period must keep the budget held; releasing it "
+        "would free capital against an order that may still be live"
+    )

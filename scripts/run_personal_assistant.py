@@ -5,7 +5,6 @@ import argparse
 import json
 import math
 import os
-import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -14,6 +13,7 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.kill_switch import env_kill_switch_active
+from assistant.runtime_identity import RuntimeIdentityError, current_commit
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
 from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
@@ -132,27 +132,11 @@ def _positive_float(value: str) -> float:
 
 
 def _current_commit(*, require_clean: bool) -> str:
-    commit = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=_REPOSITORY_ROOT,
-        check=True,
-        capture_output=True,
-        text=True,
-    ).stdout.strip()
-    if require_clean:
-        status = subprocess.run(
-            ["git", "status", "--porcelain"],
-            cwd=_REPOSITORY_ROOT,
-            check=True,
-            capture_output=True,
-            text=True,
-        ).stdout.strip()
-        if status:
-            raise SystemExit(
-                "Paper evidence requires a clean Git worktree so every "
-                "observation is attributable to an exact commit."
-            )
-    return commit
+    """Strict runtime identity; see assistant/runtime_identity.py."""
+    try:
+        return current_commit(require_clean=require_clean)
+    except RuntimeIdentityError as exc:
+        raise SystemExit(str(exc)) from exc
 
 
 def _active_runtime_lineage(

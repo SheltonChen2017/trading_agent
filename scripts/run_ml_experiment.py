@@ -30,29 +30,17 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from assistant.runtime_identity import RuntimeIdentityError, current_commit
 from ml.experiment_contracts import ExperimentContractError, ExperimentSpec
 from ml.experiments import ExperimentError, run_experiment
 
 
 def _current_commit() -> str:
-    repository = Path(__file__).resolve().parent.parent
-    result = subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=repository,
-        check=True,
-        capture_output=True,
-        text=True,
-    )
-    clean = subprocess.run(
-        ["git", "diff", "--quiet", "HEAD", "--"],
-        cwd=repository,
-        check=False,
-    )
-    if clean.returncode != 0:
-        raise RuntimeError(
-            "tracked working-tree changes are not represented by the current commit"
-        )
-    return result.stdout.strip()
+    """Strict runtime identity; see assistant/runtime_identity.py."""
+    try:
+        return current_commit(require_clean=True)
+    except RuntimeIdentityError as exc:
+        raise RuntimeError(str(exc)) from exc
 
 
 def build_parser() -> argparse.ArgumentParser:

@@ -34,6 +34,15 @@ from ml.evaluation import (
 
 PRIMARY_HORIZON_SESSIONS = 20  # doc 8.1: preregistered primary horizon
 SUPPORTED_HORIZONS = (5, 10, 20)
+# Per-security SESSION rows -- one security's own time series, so ~3 months
+# of sessions. Deliberately unequal to ml/cross_sectional.py's
+# MIN_TRAINING_ROWS (200), which counts pooled name-date rows; the two count
+# different units and should not be reconciled to a shared number.
+#
+# A refusal floor, not a power calculation. Note these rows OVERLAP at the
+# 20-session primary horizon, so 60 rows carry far fewer than 60 independent
+# observations; purged walk-forward splitting and the interval/coverage
+# reports are what actually judge sufficiency.
 MIN_TRAINING_ROWS = 60
 
 

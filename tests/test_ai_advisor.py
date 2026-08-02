@@ -1,3 +1,4 @@
+import sqlite3
 """Tests for assistant/ai_advisor.py. Run with:
 python tests/test_ai_advisor.py"""
 import json
@@ -1216,3 +1217,34 @@ def test_curated_recommendation_prose_grounded_in_the_candidate_list_passes(monk
         mock_anthropic_cls.return_value = mock_client
         result = ai_advisor.curate_recommended_tickers([_Candidate()])
     assert result == grounded
+
+
+def test_audit_log_failure_is_non_fatal_but_never_silent():
+    """A broken audit log must not break the feature -- and must not hide.
+
+    The previous `except Exception: pass` meant every AI call could go
+    unaudited indefinitely while looking successful, which defeats the
+    purpose of an audit log.
+    """
+    import warnings as _warnings
+
+    from assistant import ai_advisor
+
+    class _BrokenStore:
+        def record_ai_run(self, **kwargs):
+            raise sqlite3.OperationalError("database is locked")
+
+    with _warnings.catch_warnings(record=True) as caught:
+        _warnings.simplefilter("always")
+        ai_advisor._record_run(
+            store=_BrokenStore(),
+            function_name="unit_test_probe",
+            prompt_version="v1",
+            input_hash="0" * 64,
+            start=0.0,
+            response=None,
+            error=None,
+        )
+
+    messages = [str(w.message) for w in caught]
+    assert any("unaudited" in m and "unit_test_probe" in m for m in messages), messages

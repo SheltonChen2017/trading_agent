@@ -45,6 +45,39 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+function Assert-InstallerPreconditions {
+    param(
+        [Parameter(Mandatory = $true)][string]$InterpreterPath
+    )
+    $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
+    $principal = New-Object Security.Principal.WindowsPrincipal($identity)
+    if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+        throw (
+            "Registering an S4U scheduled task requires elevation. Re-run this " +
+            "installer from a PowerShell session started with 'Run as " +
+            "Administrator'. Checked up front so the failure is one clear " +
+            "message rather than one 'Access is denied' per task."
+        )
+    }
+    # Test-Path -PathType Leaf returns true for a Microsoft Store app execution
+    # alias, which is a zero-byte reparse point rather than an executable. Such
+    # an alias resolves only inside an interactive session with the package
+    # registered, so a scheduled task pointed at one can fail to launch while
+    # the task itself looks perfectly healthy -- the silent-failure mode this
+    # whole pipeline exists to avoid.
+    $item = Get-Item -LiteralPath $InterpreterPath -Force
+    $isReparse = [bool]($item.Attributes -band [IO.FileAttributes]::ReparsePoint)
+    if ($isReparse -or $item.Length -eq 0) {
+        throw (
+            "$InterpreterPath is a Microsoft Store app execution alias " +
+            "(zero-byte reparse point), not a real interpreter. A scheduled " +
+            "task cannot rely on it. Install Python from python.org, or point " +
+            "-PythonPath at a virtual environment's Scripts\python.exe, and " +
+            "re-run."
+        )
+    }
+}
+
 function Quote-TaskArgument {
     param([Parameter(Mandatory = $true)][string]$Value)
     return '"' + $Value.Replace('"', '\"') + '"'
@@ -68,6 +101,7 @@ if (-not $RepositoryPath) {
 }
 $resolvedRepository = (Resolve-Path -LiteralPath $RepositoryPath).Path
 $resolvedPython = (Resolve-Path -LiteralPath $PythonPath).Path
+Assert-InstallerPreconditions -InterpreterPath $resolvedPython
 $resolvedConfig = (Resolve-Path -LiteralPath $ConfigPath).Path
 $resolvedArtifacts = (Resolve-Path -LiteralPath $ArtifactPath).Path
 $database = [IO.Path]::GetFullPath($DatabasePath)
@@ -198,8 +232,11 @@ $tasks = @(
     }
 )
 
+$attempted = $false
+$failedTasks = New-Object System.Collections.Generic.List[string]
 foreach ($task in $tasks) {
     if ($PSCmdlet.ShouldProcess($task.Name, "Register or replace scheduled task")) {
+        $attempted = $true
         Register-ScheduledTask `
             -TaskName $task.Name `
             -Description $task.Description `
@@ -207,16 +244,34 @@ foreach ($task in $tasks) {
             -Trigger $task.Trigger `
             -Settings $settings `
             -Principal $principal `
-            -Force | Out-Null
+            -Force `
+            -ErrorAction SilentlyContinue | Out-Null
+        # See install_windows_operational_tasks.ps1: CIM cmdlet errors are
+        # non-terminating even under $ErrorActionPreference = "Stop", so a
+        # failed registration must be detected by reading the task back.
+        if (-not (Get-ScheduledTask -TaskName $task.Name -ErrorAction SilentlyContinue)) {
+            $failedTasks.Add($task.Name)
+        }
     }
 }
 
-$tasks | ForEach-Object {
+if ($failedTasks.Count -gt 0) {
+    throw (
+        "Failed to register: " + ($failedTasks -join ", ") + ". " +
+        "Registering an S4U scheduled task requires an elevated PowerShell " +
+        "session; re-run this installer as Administrator."
+    )
+}
+
+$summary = {
+    param($name, $status, $live)
     [PSCustomObject]@{
-        TaskName = $_.Name
-        RunAsUser = $RunAsUser
-        RunLevel = "Limited"
-        LogonType = $TaskLogonType
+        TaskName = $name
+        Status = $status
+        State = if ($live) { $live.State } else { $null }
+        RunAsUser = if ($live) { $live.Principal.UserId } else { $RunAsUser }
+        RunLevel = if ($live) { $live.Principal.RunLevel } else { "Limited" }
+        LogonType = if ($live) { $live.Principal.LogonType } else { $TaskLogonType }
         Database = $database
         Config = $resolvedConfig
         Artifacts = $resolvedArtifacts
@@ -225,5 +280,14 @@ $tasks | ForEach-Object {
         MultipleInstances = "IgnoreNew"
         ExecutionTimeLimitMinutes = 30
         RestartCount = 3
+    }
+}
+
+$tasks | ForEach-Object {
+    if (-not $attempted) {
+        & $summary $_.Name "planned (WhatIf)" $null
+    }
+    else {
+        & $summary $_.Name "registered" (Get-ScheduledTask -TaskName $_.Name)
     }
 }

@@ -1,0 +1,126 @@
+# General Readiness implementation status
+
+Companion to `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`, recording what
+is built and every deliberate deviation from the plan. Updated 2026-08-02.
+
+The plan was written before the ML full-system milestones landed. Each
+milestone therefore needs a gap analysis against the current code *before*
+implementation, and the deviations that analysis produces are recorded here
+so a future reviewer does not mistake them for accidental divergence.
+
+## GR-0 — readiness taxonomy: **built**
+
+`assistant/platform_readiness.py`, CLI `platform-readiness`,
+`tests/test_platform_readiness.py`.
+
+Five dimensions scored independently and never averaged. Strictly read-only:
+it calls `operational_health()` and never `run_operational_check()`, which
+persists alerts and heartbeat state.
+
+Observed on a fresh store, 2026-08-02: all five dimensions `blocked`. That is
+the honest starting measurement GR-0 exists to produce, not a target. It is
+recorded here as an observation; the tests prove `ready`, `degraded`, and
+`blocked` independently from fixtures rather than pinning today's result.
+
+### Deviations from plan section 5, and why
+
+**1. The plan's `_check()` instruction is obsolete.**
+
+> §5.2: "Reuse `assistant/readiness.py`'s existing `_check()` shape rather
+> than inventing a second report format."
+
+Three incompatible shapes now exist:
+
+| Module | Shape |
+|---|---|
+| `assistant/readiness.py:44` | `{name, ok, detail}` |
+| `assistant/operations.py:32` | `{name, ok, detail, severity, category}` |
+| `ml/evidence_operations.py:68` | `{name, ok, severity, detail, evidence}` |
+
+`readiness.py`'s bare boolean cannot express the three-valued status GR-0 is
+required to emit. Importing another module's private `_check()` would also
+repeat the drift the 2026-08-02 audit found in eleven other helper families
+(`tests/test_ml_helper_divergence.py`). GR-0 therefore defines one public
+typed contract — `ReadinessCheck` / `DimensionReadiness` /
+`PlatformReadinessReport` — and adapts the existing formats into it. No
+existing producer was modified.
+
+**2. Severity is decided per dimension, never inherited.**
+
+`operational_health()` labels `environment_kill_switch` and
+`persistent_kill_switch` as `warning`. Inheriting that would report an
+engaged emergency stop as "degraded" — platform impaired but operable —
+which is the opposite of what an engaged kill switch means. Every
+execution-safety check is mandatory in `execution_integrity` regardless of
+its source label (`_MANDATORY_EXECUTION_CHECKS`).
+
+Outside execution safety the producer's own split is correct and is honoured:
+a stale backup is a genuine deficiency that does not make the platform unsafe
+to operate, so it degrades rather than blocks.
+
+Pinned by `test_an_engaged_kill_switch_blocks_despite_its_warning_label`, and
+mutation-verified: reinstating the blanket rule turns that test red.
+
+**3. Strategy readiness rests on authority, not on a false premise.**
+
+> §5.2: "`strategy_readiness` must report `blocked` while zero confirmed
+> findings exist — currently and correctly zero."
+
+Registry 1.4.1 holds 17 findings, **2 of them confirmed**. Not zero. But
+`production_authoritative` means "re-verified since the lookback-days fix
+(`9f0ebc1`)" and is orthogonal to the verdict:
+
+```
+verdict == confirmed        : 2   (neither authoritative)
+production authoritative    : 14  (mostly the 13 REJECTIONS)
+confirmed AND authoritative : 0
+```
+
+A production-authoritative *rejection* is real research evidence and says
+nothing about a strategy being ready. GR-0 therefore requires at least one
+finding that is both confirmed and production-authoritative. The verdict is
+unchanged today, but it no longer depends on a false premise and will not
+silently flip to `ready` when one of those two findings is re-verified.
+
+**4. Absent evidence and invalid evidence are distinguished.**
+
+Both block, but they demand completely different responses — one machine has
+not started collecting, the other has corrupt or unattributable evidence — so
+the report preserves the distinction in its explanation rather than
+collapsing every `PaperEvidenceError` into "no epoch".
+
+**5. `data_integrity` refuses rather than crossing the import boundary.**
+
+`assistant/` may not import `ml/`, so this report cannot reach
+`ml/availability.py` for adjustment honesty. Absent evidence is reported
+`blocked: not supplied`, never optimistically assumed. The `AdjustmentEvidence`
+input contract lets a later data-layer or CLI adapter supply verified evidence
+without changing the readiness model.
+
+Pinned by `test_platform_readiness_does_not_import_ml`.
+
+## GR-1 .. GR-9 — not started
+
+Each requires its own gap analysis first; the plan predates the ML
+full-system additions throughout.
+
+Known items already identified for later milestones:
+
+- **GR-3** drills should include the two isolation failures found on
+  2026-08-02: pytest writing to the operator database (`ce03386`) and the
+  suite issuing live broker calls during collection (`2203e7e`). Both were
+  live for weeks.
+- **GR-5** must account for `operational_alerts`, `alerts.jsonl`, and the ML
+  evidence supervisor, which already exist. Choosing a real alert channel is
+  an owner decision.
+- **GR-6** is where a database-identity guard belongs. Under the single
+  installation topology chosen over the pinned-worktree alternative, it is
+  defense-in-depth rather than a precondition.
+
+## Data-quality note for readiness reporting
+
+`portfolio_equity_snapshots` contains a mixture of legitimate briefing rows
+and test pollution written before 2026-08-02, when pytest was isolated from
+the operator database. The rows were deliberately **not** deleted. Any
+readiness or evidence report covering that table should treat it as
+unreliable before that date rather than averaging across the boundary.

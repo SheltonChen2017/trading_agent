@@ -34,6 +34,10 @@ deliberate; see docs/GENERAL_READINESS_STATUS.md.
 This module is strictly read-only. It calls ``operational_health()`` and
 never ``run_operational_check()``, which persists alerts and heartbeat
 state.
+
+Data integrity remains blocked until GR-4 supplies derived provider-health,
+freshness, and adjustment-honesty evidence. GR-0 deliberately exposes no
+boolean escape hatch that lets a caller assert those facts.
 """
 from __future__ import annotations
 
@@ -42,16 +46,20 @@ from datetime import datetime, timezone
 from typing import Any, Mapping, Sequence
 
 from assistant.operations import operational_health
-from assistant.paper_evidence import PaperEvidenceError, paper_evidence_summary
+from assistant.mandate import PortfolioMandate
+from assistant.paper_evidence import (
+    REQUIRED_PROMOTION_DRILLS,
+    PaperEvidenceError,
+    paper_evidence_summary,
+)
 from assistant.policy import TradingPolicy
 from assistant.research_registry import load_research_findings, registry_version
+from assistant.schemas import EvidenceStatus
 from assistant.storage import AssistantStore
 
 READY = "ready"
 DEGRADED = "degraded"
 BLOCKED = "blocked"
-_STATUSES = (READY, DEGRADED, BLOCKED)
-
 EXECUTION_INTEGRITY = "execution_integrity"
 DATA_INTEGRITY = "data_integrity"
 OPERATIONAL_READINESS = "operational_readiness"
@@ -66,10 +74,11 @@ DIMENSIONS = (
     STRATEGY_READINESS,
 )
 
-# Execution-safety checks whose failure is ALWAYS blocking, whatever
-# severity the producing report happens to attach. An inherited "warning"
-# must never downgrade the emergency stop.
-_MANDATORY_EXECUTION_CHECKS = frozenset({
+# The complete inventory currently emitted by transaction_readiness() plus
+# the canonical portfolio-ledger reconciliation emitted by
+# operational_health(). Missing checks are explicit blockers. This matters for
+# --offline: skipping the broker call must not turn "unverified" into ready.
+_EXPECTED_EXECUTION_CHECKS = frozenset({
     "database_integrity",
     "ambiguous_broker_outcomes",
     "environment_kill_switch",
@@ -77,11 +86,18 @@ _MANDATORY_EXECUTION_CHECKS = frozenset({
     "policy",
     "policy_execution_mode",
     "reconciliation_freshness",
-    "stranded_claims",
+    "stranded_pre_broker_claims",
     "broker_account",
+    "broker_open_order_budget",
+    "active_order_budget",
+    "daily_submission_budget",
+    "portfolio_ledger_reconciliation",
 })
 
-_EXECUTION_CATEGORIES = frozenset({"transaction_readiness"})
+_EXECUTION_CATEGORIES = frozenset({
+    "transaction_readiness",
+    "portfolio_accounting",
+})
 
 
 class PlatformReadinessError(RuntimeError):
@@ -100,30 +116,6 @@ class ReadinessCheck:
 
     def to_dict(self) -> dict[str, Any]:
         return dataclasses.asdict(self)
-
-
-@dataclasses.dataclass(frozen=True)
-class AdjustmentEvidence:
-    """Verified point-in-time adjustment evidence, supplied by a caller.
-
-    ``assistant/`` may not import ``ml/``, so this report cannot reach for
-    adjustment honesty itself. The input contract exists so a later
-    data-layer or CLI adapter can supply verified evidence without
-    changing the readiness model. Absent evidence is blocking, never
-    optimistically assumed.
-    """
-
-    point_in_time_data: bool
-    source_id: str
-    observed_at: str
-
-    def __post_init__(self) -> None:
-        if not isinstance(self.point_in_time_data, bool):
-            raise PlatformReadinessError("point_in_time_data must be a boolean")
-        for field in ("source_id", "observed_at"):
-            value = getattr(self, field)
-            if not isinstance(value, str) or not value.strip():
-                raise PlatformReadinessError(f"{field} must be a non-empty string")
 
 
 @dataclasses.dataclass(frozen=True)
@@ -191,14 +183,35 @@ def _dimension(name: str, checks: Sequence[ReadinessCheck]) -> DimensionReadines
     )
 
 
+def _unavailable_dimension(
+    name: str,
+    *,
+    check_name: str,
+    source: str,
+    detail: str,
+) -> DimensionReadiness:
+    return _dimension(
+        name,
+        [
+            ReadinessCheck(
+                name=check_name,
+                ok=False,
+                detail=detail,
+                mandatory=True,
+                source=source,
+            )
+        ],
+    )
+
+
 def _adapt_operations_check(raw: Mapping[str, Any], *, mandatory: bool) -> ReadinessCheck:
     """Adapt assistant/operations.py's five-key shape."""
     if not isinstance(raw, Mapping) or "name" not in raw or "ok" not in raw:
         raise PlatformReadinessError(f"malformed operational check: {raw!r}")
     return ReadinessCheck(
-        name=str(raw["name"]),
-        ok=bool(raw["ok"]),
-        detail=str(raw.get("detail", "")),
+        name=raw["name"],
+        ok=raw["ok"],
+        detail=raw["detail"],
         mandatory=mandatory,
         source="operational_health",
     )
@@ -211,28 +224,55 @@ def _validated_checks(health: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     malformed check instead of refusing it -- a delegated report could be
     partly garbage and this report would quietly score the remainder.
     """
+    if not isinstance(health, Mapping):
+        raise PlatformReadinessError("operational health report must be a mapping")
     raw_checks = health.get("checks")
     if not isinstance(raw_checks, list):
         raise PlatformReadinessError("operational health report has no checks list")
+    seen: set[str] = set()
     for raw in raw_checks:
         if (
             not isinstance(raw, Mapping)
-            or "name" not in raw
-            or "ok" not in raw
-            or "category" not in raw
+            or not isinstance(raw.get("name"), str)
+            or not raw["name"].strip()
+            or not isinstance(raw.get("ok"), bool)
+            or not isinstance(raw.get("detail"), str)
+            or not isinstance(raw.get("category"), str)
+            or not raw["category"].strip()
+            or raw.get("severity") not in {"critical", "warning"}
         ):
             raise PlatformReadinessError(f"malformed operational check: {raw!r}")
+        if raw["name"] in seen:
+            raise PlatformReadinessError(
+                f"duplicate operational check name: {raw['name']!r}"
+            )
+        seen.add(raw["name"])
     return raw_checks
 
 
 def build_execution_integrity(health: Mapping[str, Any]) -> DimensionReadiness:
-    checks = [
+    checks: list[ReadinessCheck] = [
         _adapt_operations_check(
-            raw, mandatory=str(raw.get("name")) in _MANDATORY_EXECUTION_CHECKS
+            # Every check delegated to execution_integrity controls whether
+            # the platform can safely submit or account for another order.
+            # Capacity exhaustion is temporary, but it still means execution
+            # is blocked now rather than merely impaired.
+            raw, mandatory=True
         )
         for raw in _validated_checks(health)
-        if str(raw.get("category")) in _EXECUTION_CATEGORIES
+        if raw["category"] in _EXECUTION_CATEGORIES
     ]
+    present = {check.name for check in checks}
+    for missing in sorted(_EXPECTED_EXECUTION_CHECKS - present):
+        checks.append(
+            ReadinessCheck(
+                name=missing,
+                ok=False,
+                detail="required execution check was unavailable",
+                mandatory=True,
+                source="operational_health",
+            )
+        )
     return _dimension(EXECUTION_INTEGRITY, checks)
 
 
@@ -243,124 +283,175 @@ def build_operational_readiness(health: Mapping[str, Any]) -> DimensionReadiness
         # but does not make the platform unsafe to operate.
         _adapt_operations_check(raw, mandatory=str(raw.get("severity")) == "critical")
         for raw in _validated_checks(health)
-        if str(raw.get("category")) not in _EXECUTION_CATEGORIES
+        if raw["category"] not in _EXECUTION_CATEGORIES
     ]
     return _dimension(OPERATIONAL_READINESS, checks)
 
 
-def build_data_integrity(
-    evidence: AdjustmentEvidence | None,
-) -> DimensionReadiness:
-    if evidence is None:
-        return _dimension(
-            DATA_INTEGRITY,
-            [
-                ReadinessCheck(
-                    name="adjustment_honesty",
-                    ok=False,
-                    detail=(
-                        "blocked: verified point-in-time adjustment evidence was "
-                        "not supplied. assistant/ may not import ml/, so this "
-                        "report refuses rather than assuming."
-                    ),
-                    mandatory=True,
-                    source="caller",
-                )
-            ],
-        )
+def build_data_integrity() -> DimensionReadiness:
+    """Report the three GR-0 data checks as unavailable until GR-4.
+
+    The previous API let any caller set ``point_in_time_data=True`` and used
+    that assertion to make this dimension ready. A claim is not evidence. GR-4
+    will add a data-layer adapter that derives these checks from authenticated
+    provider records; until then all three required checks remain explicit
+    blockers.
+    """
     return _dimension(
         DATA_INTEGRITY,
-        [
+        tuple(
             ReadinessCheck(
-                name="adjustment_honesty",
-                ok=evidence.point_in_time_data,
+                name=name,
+                ok=False,
                 detail=(
-                    f"{evidence.source_id} reports point_in_time_data="
-                    f"{str(evidence.point_in_time_data).lower()} as of "
-                    f"{evidence.observed_at}"
+                    "verified data-layer evidence is unavailable; GR-4 must "
+                    "derive this check without an assistant-to-ml import"
                 ),
                 mandatory=True,
-                source="adjustment_evidence",
+                source="data_layer",
             )
-        ],
+            for name in ("price_freshness", "provider_health", "adjustment_honesty")
+        ),
     )
 
 
-def build_evidence_readiness(store: AssistantStore) -> DimensionReadiness:
-    """Absent evidence and invalid evidence are both blocking, distinctly.
-
-    Collapsing them would report a corrupt epoch the same way as a machine
-    that has simply not started collecting yet -- two situations needing
-    completely different responses.
-    """
+def _load_paper_summary(
+    store: AssistantStore,
+) -> tuple[Mapping[str, Any] | None, DimensionReadiness | None]:
+    """Load one evidence snapshot or return a precise blocked dimension."""
     try:
         epoch = store.get_active_paper_evidence_epoch()
-    except Exception as exc:  # storage-level failure is unattributable evidence
-        return _dimension(
+    except Exception as exc:
+        return None, _unavailable_dimension(
             EVIDENCE_READINESS,
-            [
-                ReadinessCheck(
-                    name="evidence_epoch",
-                    ok=False,
-                    detail=f"evidence is unreadable: {type(exc).__name__}: {exc}",
-                    mandatory=True,
-                    source="storage",
-                )
-            ],
+            check_name="evidence_epoch",
+            source="storage",
+            detail=f"evidence is unreadable: {type(exc).__name__}: {exc}",
         )
     if epoch is None:
-        return _dimension(
+        return None, _unavailable_dimension(
             EVIDENCE_READINESS,
-            [
-                ReadinessCheck(
-                    name="evidence_epoch",
-                    ok=False,
-                    detail="evidence is absent: no active paper evidence epoch",
-                    mandatory=True,
-                    source="storage",
-                )
-            ],
+            check_name="evidence_epoch",
+            source="storage",
+            detail="evidence is absent: no active paper evidence epoch",
+        )
+    if not isinstance(epoch, Mapping):
+        return None, _unavailable_dimension(
+            EVIDENCE_READINESS,
+            check_name="evidence_epoch",
+            source="storage",
+            detail="evidence is invalid: active epoch is malformed",
+        )
+    evidence_epoch = epoch.get("evidence_epoch")
+    if not isinstance(evidence_epoch, str) or not evidence_epoch.strip():
+        return None, _unavailable_dimension(
+            EVIDENCE_READINESS,
+            check_name="evidence_epoch",
+            source="storage",
+            detail="evidence is invalid: active epoch has no valid identity",
         )
     try:
-        summary = paper_evidence_summary(store, epoch["evidence_epoch"])
+        summary = paper_evidence_summary(store, evidence_epoch)
     except PaperEvidenceError as exc:
-        return _dimension(
+        return None, _unavailable_dimension(
             EVIDENCE_READINESS,
-            [
-                ReadinessCheck(
-                    name="evidence_epoch",
-                    ok=False,
-                    detail=(
-                        f"evidence is invalid for epoch {epoch['evidence_epoch']!r}: "
-                        f"{exc}"
-                    ),
-                    mandatory=True,
-                    source="paper_evidence_summary",
-                )
-            ],
+            check_name="evidence_epoch",
+            source="paper_evidence_summary",
+            detail=f"evidence is invalid for epoch {evidence_epoch!r}: {exc}",
         )
-    sessions = summary.get("paper_sessions")
+    except Exception as exc:
+        # This is deliberately distinct from absence. Storage corruption,
+        # malformed persisted JSON, and a broken delegated report must produce
+        # a visible blocker rather than terminate the readiness command.
+        return None, _unavailable_dimension(
+            EVIDENCE_READINESS,
+            check_name="evidence_epoch",
+            source="paper_evidence_summary",
+            detail=(
+                f"evidence is unreadable for epoch {evidence_epoch!r}: "
+                f"{type(exc).__name__}: {exc}"
+            ),
+        )
+    if not isinstance(summary, Mapping):
+        return None, _unavailable_dimension(
+            EVIDENCE_READINESS,
+            check_name="evidence_summary",
+            source="paper_evidence_summary",
+            detail="evidence summary is malformed: expected a mapping",
+        )
+    return summary, None
+
+
+def _nonnegative_int(value: Any, field: str) -> int:
+    if not isinstance(value, int) or isinstance(value, bool) or value < 0:
+        raise PlatformReadinessError(
+            f"paper evidence {field} must be a non-negative integer"
+        )
+    return value
+
+
+def _required_bool(value: Any, field: str) -> bool:
+    if not isinstance(value, bool):
+        raise PlatformReadinessError(f"paper evidence {field} must be a boolean")
+    return value
+
+
+def _build_evidence_from_summary(
+    summary: Mapping[str, Any], mandate: PortfolioMandate
+) -> DimensionReadiness:
+    try:
+        evidence_epoch = summary["evidence_epoch"]
+        if not isinstance(evidence_epoch, str) or not evidence_epoch.strip():
+            raise PlatformReadinessError(
+                "paper evidence evidence_epoch must be a non-empty string"
+            )
+        sessions = _nonnegative_int(summary.get("paper_sessions"), "paper_sessions")
+        orders = summary.get("paper_orders")
+        if not isinstance(orders, Mapping):
+            raise PlatformReadinessError("paper evidence paper_orders must be a mapping")
+        order_count = _nonnegative_int(orders.get("count"), "paper_orders.count")
+        coverage_complete = _required_bool(
+            summary.get("coverage_complete"), "coverage_complete"
+        )
+        lineage_consistent = _required_bool(
+            summary.get("lineage_consistent"), "lineage_consistent"
+        )
+    except (KeyError, PlatformReadinessError) as exc:
+        return _unavailable_dimension(
+            EVIDENCE_READINESS,
+            check_name="evidence_summary",
+            source="paper_evidence_summary",
+            detail=f"evidence summary is malformed: {exc}",
+        )
+
     checks = [
         ReadinessCheck(
             name="evidence_epoch",
             ok=True,
-            detail=f"active epoch {epoch['evidence_epoch']}",
+            detail=f"active epoch {evidence_epoch}",
             mandatory=True,
-            source="storage",
+            source="paper_evidence_summary",
         ),
         ReadinessCheck(
             name="paper_sessions",
-            ok=bool(sessions),
-            detail=f"{sessions} recorded paper session(s)",
+            ok=sessions >= mandate.min_paper_sessions,
+            detail=f"{sessions}/{mandate.min_paper_sessions} required paper sessions",
+            mandatory=True,
+            source="paper_evidence_summary",
+        ),
+        ReadinessCheck(
+            name="paper_orders",
+            ok=order_count >= mandate.min_paper_orders,
+            detail=f"{order_count}/{mandate.min_paper_orders} required paper orders",
             mandatory=True,
             source="paper_evidence_summary",
         ),
         ReadinessCheck(
             name="coverage_complete",
-            ok=bool(summary.get("coverage_complete")),
+            ok=coverage_complete,
             detail=(
                 "every expected session is present"
-                if summary.get("coverage_complete")
+                if coverage_complete
                 else "sessions are missing from the epoch"
             ),
             mandatory=True,
@@ -368,10 +459,10 @@ def build_evidence_readiness(store: AssistantStore) -> DimensionReadiness:
         ),
         ReadinessCheck(
             name="lineage_consistent",
-            ok=bool(summary.get("lineage_consistent")),
+            ok=lineage_consistent,
             detail=(
                 "every observation matches the epoch lineage"
-                if summary.get("lineage_consistent")
+                if lineage_consistent
                 else "an observation does not match the epoch lineage"
             ),
             mandatory=True,
@@ -379,6 +470,74 @@ def build_evidence_readiness(store: AssistantStore) -> DimensionReadiness:
         ),
     ]
     return _dimension(EVIDENCE_READINESS, checks)
+
+
+def _operational_drill_checks(
+    summary: Mapping[str, Any] | None,
+) -> tuple[ReadinessCheck, ...]:
+    if summary is None:
+        return (
+            ReadinessCheck(
+                name="operational_drills",
+                ok=False,
+                detail="paper evidence is unavailable, so drill results cannot be verified",
+                mandatory=True,
+                source="paper_evidence_summary",
+            ),
+        )
+    raw_drills = summary.get("required_drills")
+    if not isinstance(raw_drills, Mapping):
+        return (
+            ReadinessCheck(
+                name="operational_drills",
+                ok=False,
+                detail="paper evidence required_drills is malformed or unavailable",
+                mandatory=True,
+                source="paper_evidence_summary",
+            ),
+        )
+    checks: list[ReadinessCheck] = []
+    for drill_type in REQUIRED_PROMOTION_DRILLS:
+        raw = raw_drills.get(drill_type)
+        passed = raw.get("passed") if isinstance(raw, Mapping) else None
+        if not isinstance(passed, bool):
+            checks.append(
+                ReadinessCheck(
+                    name=f"drill_{drill_type}",
+                    ok=False,
+                    detail="required drill result is unavailable or malformed",
+                    mandatory=True,
+                    source="paper_evidence_summary",
+                )
+            )
+            continue
+        checks.append(
+            ReadinessCheck(
+                name=f"drill_{drill_type}",
+                ok=passed,
+                detail="latest recorded result passed" if passed else "no passing result recorded",
+                mandatory=True,
+                source="paper_evidence_summary",
+            )
+        )
+    return tuple(checks)
+
+
+def build_evidence_readiness(
+    store: AssistantStore, mandate: PortfolioMandate
+) -> DimensionReadiness:
+    """Absent evidence and invalid evidence are both blocking, distinctly.
+
+    Collapsing them would report a corrupt epoch the same way as a machine
+    that has simply not started collecting yet -- two situations needing
+    completely different responses.
+    """
+    mandate.validate()
+    summary, failure = _load_paper_summary(store)
+    if failure is not None:
+        return failure
+    assert summary is not None
+    return _build_evidence_from_summary(summary, mandate)
 
 
 def build_strategy_readiness(findings: Sequence[Any] | None = None) -> DimensionReadiness:
@@ -389,8 +548,28 @@ def build_strategy_readiness(findings: Sequence[Any] | None = None) -> Dimension
     two confirmed findings are not authoritative, so the eligible set is
     empty.
     """
-    if findings is None:
-        findings = load_research_findings()
+    try:
+        if findings is None:
+            findings = load_research_findings()
+        version = registry_version()
+    except Exception as exc:
+        return _unavailable_dimension(
+            STRATEGY_READINESS,
+            check_name="research_registry",
+            source="research_registry",
+            detail=f"research registry is unreadable: {type(exc).__name__}: {exc}",
+        )
+    allowed_statuses = {status.value for status in EvidenceStatus}
+    for finding in findings:
+        status = getattr(getattr(finding, "status", None), "value", None)
+        authority = getattr(finding, "production_authoritative", None)
+        if status not in allowed_statuses or not isinstance(authority, bool):
+            return _unavailable_dimension(
+                STRATEGY_READINESS,
+                check_name="research_registry",
+                source="research_registry",
+                detail="research registry contains a malformed finding",
+            )
     eligible = [
         finding
         for finding in findings
@@ -411,7 +590,7 @@ def build_strategy_readiness(findings: Sequence[Any] | None = None) -> Dimension
                 detail=(
                     f"{len(eligible)} finding(s) are both confirmed and "
                     f"production-authoritative ({confirmed} confirmed overall, "
-                    f"registry {registry_version()}). A platform being excellent "
+                    f"registry {version}). A platform being excellent "
                     "does not make a strategy ready."
                 ),
                 mandatory=True,
@@ -424,12 +603,11 @@ def build_strategy_readiness(findings: Sequence[Any] | None = None) -> Dimension
 def build_platform_readiness(
     store: AssistantStore,
     policy: TradingPolicy,
+    mandate: PortfolioMandate,
     *,
     now: datetime | None = None,
     broker_module=None,
     check_broker: bool = True,
-    adjustment_evidence: AdjustmentEvidence | None = None,
-    findings: Sequence[Any] | None = None,
     **health_options: Any,
 ) -> PlatformReadinessReport:
     """Read-only readiness across five independent dimensions."""
@@ -438,20 +616,65 @@ def build_platform_readiness(
         raise PlatformReadinessError("now must be timezone-aware")
     # operational_health(), never run_operational_check(): the latter
     # persists alerts and heartbeat state, and this report must not write.
-    health = operational_health(
-        store,
-        policy,
-        broker_module=broker_module,
-        now=now,
-        check_broker=check_broker,
-        **health_options,
+    mandate.validate()
+    try:
+        health = operational_health(
+            store,
+            policy,
+            broker_module=broker_module,
+            now=now,
+            check_broker=check_broker,
+            **health_options,
+        )
+        try:
+            execution = build_execution_integrity(health)
+        except PlatformReadinessError as exc:
+            execution = _unavailable_dimension(
+                EXECUTION_INTEGRITY,
+                check_name="operational_health",
+                source="operational_health",
+                detail=f"execution checks are malformed: {exc}",
+            )
+        try:
+            operations = build_operational_readiness(health)
+        except PlatformReadinessError as exc:
+            operations = _unavailable_dimension(
+                OPERATIONAL_READINESS,
+                check_name="operational_health",
+                source="operational_health",
+                detail=f"operational checks are malformed: {exc}",
+            )
+    except Exception as exc:
+        failure = f"operational health is unavailable: {type(exc).__name__}: {exc}"
+        execution = _unavailable_dimension(
+            EXECUTION_INTEGRITY,
+            check_name="operational_health",
+            source="operational_health",
+            detail=failure,
+        )
+        operations = _unavailable_dimension(
+            OPERATIONAL_READINESS,
+            check_name="operational_health",
+            source="operational_health",
+            detail=failure,
+        )
+
+    summary, evidence_failure = _load_paper_summary(store)
+    if evidence_failure is not None:
+        evidence = evidence_failure
+    else:
+        assert summary is not None
+        evidence = _build_evidence_from_summary(summary, mandate)
+    operations = _dimension(
+        OPERATIONAL_READINESS,
+        (*operations.checks, *_operational_drill_checks(summary)),
     )
     dimensions = (
-        build_execution_integrity(health),
-        build_data_integrity(adjustment_evidence),
-        build_operational_readiness(health),
-        build_evidence_readiness(store),
-        build_strategy_readiness(findings),
+        execution,
+        build_data_integrity(),
+        operations,
+        evidence,
+        build_strategy_readiness(),
     )
     assert {d.dimension for d in dimensions} == set(DIMENSIONS)
     return PlatformReadinessReport(

@@ -8,7 +8,7 @@ milestone therefore needs a gap analysis against the current code *before*
 implementation, and the deviations that analysis produces are recorded here
 so a future reviewer does not mistake them for accidental divergence.
 
-## GR-0 — readiness taxonomy: **built**
+## GR-0 — readiness taxonomy: **built and independently reviewed**
 
 `assistant/platform_readiness.py`, CLI `platform-readiness`,
 `tests/test_platform_readiness.py`.
@@ -50,9 +50,8 @@ existing producer was modified.
 `operational_health()` labels `environment_kill_switch` and
 `persistent_kill_switch` as `warning`. Inheriting that would report an
 engaged emergency stop as "degraded" — platform impaired but operable —
-which is the opposite of what an engaged kill switch means. Every
-execution-safety check is mandatory in `execution_integrity` regardless of
-its source label (`_MANDATORY_EXECUTION_CHECKS`).
+which is the opposite of what an engaged kill switch means. Every check in
+`execution_integrity` is mandatory regardless of its source label.
 
 Outside execution safety the producer's own split is correct and is honoured:
 a stale backup is a genuine deficiency that does not make the platform unsafe
@@ -92,12 +91,36 @@ collapsing every `PaperEvidenceError` into "no epoch".
 **5. `data_integrity` refuses rather than crossing the import boundary.**
 
 `assistant/` may not import `ml/`, so this report cannot reach
-`ml/availability.py` for adjustment honesty. Absent evidence is reported
-`blocked: not supplied`, never optimistically assumed. The `AdjustmentEvidence`
-input contract lets a later data-layer or CLI adapter supply verified evidence
-without changing the readiness model.
+`ml/availability.py` for adjustment honesty. GR-0 reports all three plan checks
+— price freshness, provider health, and adjustment honesty — as unavailable
+and blocked. GR-4 must supply a data-layer adapter that derives them from
+authenticated provider records. GR-0 deliberately has no caller-settable
+`point_in_time_data=True` escape hatch: a boolean assertion is not evidence.
 
 Pinned by `test_platform_readiness_does_not_import_ml`.
+
+### Independent review corrections
+
+The 2026-08-02 independent review found and fixed five material readiness
+misclassifications before GR-0 was accepted:
+
+- `stranded_pre_broker_claims` was misspelled in the mandatory inventory, so a
+  stuck claim was reported `degraded` instead of `blocked`;
+- `portfolio_ledger_reconciliation` was placed under operations even though
+  the plan explicitly makes clean reconciliation part of execution integrity;
+- delegated values were coerced with `bool(...)`, so malformed
+  `{"ok": "false"}` was treated as passing;
+- data integrity covered only adjustment honesty and let a caller assert it
+  true; freshness and provider health were absent; and
+- one paper session was sufficient for evidence readiness, ignoring the
+  mandate's 60-session and 30-order minimums.
+
+The reviewed implementation now validates delegated report types strictly,
+blocks when required broker checks are skipped in offline mode, applies the
+mandate's evidence counts, and includes every required operational drill
+(including alert delivery) in operational readiness. Unreadable delegated
+reports become explicit blocked dimensions instead of terminating the whole
+command.
 
 ## GR-1 .. GR-9 — not started
 

@@ -564,8 +564,9 @@ def command_platform_readiness(args, store: AssistantStore) -> None:
     must never suppress the others.
     """
     policy = load_policy(args.policy)
+    mandate = load_mandate(args.mandate)
     report = build_platform_readiness(
-        store, policy, check_broker=not args.offline
+        store, policy, mandate, check_broker=not args.offline
     )
     print(json.dumps(report.to_dict(), indent=2, sort_keys=True))
     if any(d.status == BLOCKED for d in report.dimensions):
@@ -1296,7 +1297,10 @@ def build_parser() -> argparse.ArgumentParser:
     platform.add_argument(
         "--offline",
         action="store_true",
-        help="Skip the live broker-account check; all local checks still run.",
+        help=(
+            "Skip live broker calls. Missing broker checks remain explicit "
+            "execution blockers; offline never means verified."
+        ),
     )
     platform.set_defaults(handler=command_platform_readiness)
 

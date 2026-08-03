@@ -198,8 +198,6 @@ acting):
 """
 from __future__ import annotations
 
-import dataclasses
-from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 
 from assistant.execution_kernel.outcomes import (
@@ -241,6 +239,11 @@ from assistant.execution_kernel.submit import (
     reserve_daily_budget,
     resolve_submission_call,
 )
+from assistant.execution_kernel.validate import (
+    ProposalValidationDeps,
+    ProposalValidationOutcome,
+    run_proposal_validation,
+)
 from assistant.kill_switch import env_kill_switch_active
 from assistant.execution_telemetry import (
     FAILURE_DATA_INTEGRITY,
@@ -256,6 +259,13 @@ from assistant.order_lifecycle import (
     journal_broker_order_update,
     proposal_status_for_order,
 )
+# MoneyInput/to_decimal, the FAILURE_* constants, and risk.execution_gate's
+# TradeIntent/ValidationResult/intent_fingerprint below are no longer called
+# on the facade after GR-1C moved the validation body into the kernel -- they
+# stay imported because they were importable from this module before GR-1
+# began, and the facade's importable surface is a compatibility contract
+# (independent review, 2026-08-02: dropping DuplicateIntentConflict during
+# GR-1B was rejected on exactly this ground).
 from assistant.money import MoneyInput, to_decimal
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import (
@@ -287,83 +297,24 @@ from risk.execution_gate import (
 # separately by the reconciliation grace-period rules.
 
 
-@dataclasses.dataclass(frozen=True)
-class ProposalValidationOutcome:
+# ProposalValidationOutcome is defined in assistant/execution_kernel/validate.py
+# since GR-1C and re-exported above -- same class object, so isinstance checks
+# and `from assistant.execution_service import ProposalValidationOutcome` are
+# unaffected.
+
+
+def _import_execution_broker():
+    """Deferred broker import, injected into the validation kernel.
+
+    A provider function rather than a module-level import so the kernel can
+    run it at the exact point the historical inline
+    ``import execution.alpaca_broker`` statement sat -- AFTER the existence/
+    expiry/policy refusals -- preserving which error wins when the broker
+    package itself cannot import.
     """
-    Pure, side-effect-free result of checking whether a proposal is
-    currently eligible to execute -- never claims, never writes proposal
-    status, never submits, never authorizes. Used by BOTH
-    execute_approved_paper_proposal() (immediately after its own atomic
-    claim) and preflight_allocation_batch() (read-only, no claim at all)
-    (2026-07-29, GPT review): these two had started to drift, since
-    preflight only duplicated PART of the real execution path's checks
-    (missing policy version/fingerprint, execution_mode, paper mode,
-    open_orders_available, allowed sides/types, allow_new_positions,
-    require_earnings_data) -- this function is now the single source of
-    truth both consume, so they can no longer disagree.
+    import execution.alpaca_broker as broker
 
-    Deliberately does NOT check whether the proposal's CURRENT status is
-    claimable ("proposed"/"override_available") -- that's inherently a
-    claim-time race the caller must still resolve atomically via
-    store.claim_proposal() (the real execution path) or a plain read
-    filtered by status (preflight, which must never mutate anything);
-    this function only answers "would every OTHER check pass right now."
-    """
-    proposal: dict | None
-    intent: TradeIntent | None
-    validation: ValidationResult | None
-    # Non-None iff a hard service-level failure occurred before
-    # validate_trade_intent() could even run (unknown proposal, expired,
-    # policy mismatch, disallowed side, quote fetch failure, ...) --
-    # `validation` is then also None. Never override-eligible.
-    error: str | None
-    # The live quote price actually used (None iff `error` is set before a
-    # quote could be fetched). Exposed so a caller simulating a SEQUENCE
-    # of proposals (assistant.allocation_batch's cumulative preflight) can
-    # compute this leg's planned notional to reserve against the next
-    # leg's projected portfolio, without re-fetching the same quote.
-    reference_price: MoneyInput | None = None
-    # Safe broker/market evidence captured while validating. These fields
-    # remain observational only: callers must never reuse them as execution
-    # authorization. They exist so a claimed attempt can be recorded before
-    # an order (and therefore a broker lifecycle row) exists.
-    broker_preflight: dict | None = None
-    quote: dict | None = None
-    quote_received_at: str | None = None
-    # Why this attempt failed, classified at the raising site rather than by
-    # matching error text later. An infrastructure fault recorded as a
-    # policy rejection is trading-safe -- both refuse -- but it is a wrong
-    # training label for any later execution-quality analysis, which would
-    # learn that the policy declines trades the policy actually approved.
-    # None means "not classified here"; see resolved_failure_class.
-    failure_class: str | None = None
-
-    @property
-    def resolved_failure_class(self) -> str:
-        """One of the FAILURE_* constants, never None."""
-        if self.error is None:
-            return FAILURE_NONE
-        return self.failure_class or FAILURE_DETERMINISTIC_POLICY
-
-    @property
-    def approved(self) -> bool:
-        if self.error is not None:
-            return False
-        return self.validation is not None and self.validation.approved
-
-    @property
-    def overridable(self) -> bool:
-        if self.error is not None:
-            return False
-        return self.validation is not None and self.validation.overridable
-
-    @property
-    def violation_messages(self) -> list[str]:
-        if self.error is not None:
-            return [self.error]
-        if self.validation is not None:
-            return list(self.validation.violations)
-        return []
+    return broker
 
 
 def validate_proposal_for_execution(
@@ -412,274 +363,41 @@ def validate_proposal_for_execution(
     shrunk cash figure, once via `extra_pending_buy_value_by_ticker`).
     None (the default) for both preserves exact single-proposal-execution
     behavior.
+
+    GR-1C: the orchestration body lives in assistant/execution_kernel/
+    validate.py's run_proposal_validation(); this wrapper only assembles its
+    dependency contract. The ProposalValidationDeps construction below MUST
+    stay inside this function body, built from bare names: each bare name is
+    resolved from THIS module's namespace at call time, which is precisely
+    what keeps a monkeypatch such as
+    ``execution_service.validate_trade_intent = stub`` working after the
+    move. Hoisting the construction to module scope (or importing the seams
+    inside the kernel) would freeze import-time bindings and silently defeat
+    every such patch -- tests/test_execution_characterization.py freezes
+    each seam against exactly that edit.
     """
-    try:
-        persistent_kill_switch = store.get_kill_switch()
-    except Exception as exc:
-        return ProposalValidationOutcome(
-            proposal=proposal,
-            intent=None,
-            validation=None,
-            error=f"Could not verify the persistent kill switch: {exc}",
-        )
-    kill_switch_active = (
-        kill_switch_active
-        or env_kill_switch_active()
-        or bool(persistent_kill_switch.get("active"))
-    )
-    if proposal is None:
-        proposal = store.get_proposal(proposal_id)
-    if proposal is None:
-        return ProposalValidationOutcome(
-            proposal=None, intent=None, validation=None, error=f"Unknown proposal: {proposal_id}",
-            failure_class=FAILURE_DATA_INTEGRITY,
-        )
-
-    now_utc = datetime.now(timezone.utc)
-    if now_utc > datetime.fromisoformat(proposal["expires_at"]):
-        return ProposalValidationOutcome(proposal=proposal, intent=None, validation=None, error="Proposal has expired.")
-    if policy.execution_mode != "paper":
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=None, validation=None,
-            error="The active policy does not permit paper execution.",
-        )
-    if proposal["policy_version"] != policy.version:
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=None, validation=None,
-            error="Proposal policy version does not match the active policy.",
-        )
-    if proposal.get("policy_fingerprint") != compute_policy_fingerprint(policy):
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=None, validation=None,
-            error=(
-                "Proposal's policy fingerprint does not match the active policy's current content -- the "
-                "policy may have been edited without a version bump (or this proposal predates fingerprint "
-                "binding). Regenerate the proposal against the current policy."
-            ),
-        )
-
-    import execution.alpaca_broker as broker
-
-    if not broker.PAPER_TRADING:
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=None, validation=None,
-            error="This workflow refuses live trading; PAPER_TRADING must remain True.",
-        )
-    if not broker.is_configured():
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=None, validation=None, error="Alpaca paper credentials are not configured.",
-            failure_class=FAILURE_INFRASTRUCTURE,
-        )
-    if kill_switch_active:
-        reason = str(persistent_kill_switch.get("reason") or "active")
-        return ProposalValidationOutcome(
-            proposal=proposal,
-            intent=None,
-            validation=None,
-            error=f"The execution kill switch is active ({reason}).",
-        )
-    if not current_portfolio.open_orders_available:
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=None, validation=None,
-            error=(
-                "Cannot verify open orders right now (the broker's order endpoint failed) -- refusing to "
-                "approve since the duplicate-order check would be unreliable. Try again shortly."
-            ),
-        )
-    # `extra_open_order_count` is how many orders an in-progress batch has
-    # already simulated submitting ahead of this leg. Without it a cumulative
-    # preflight sees a CONSTANT open-order count across every leg and can
-    # green-light a batch whose later legs the real path then rejects, breaking
-    # allocation_batch's "submit none, or all" guarantee (independent review,
-    # 2026-07-30). Validated rather than trusted: a negative or non-int value
-    # would loosen a cap.
-    if (
-        isinstance(extra_open_order_count, bool)
-        or not isinstance(extra_open_order_count, int)
-        or extra_open_order_count < 0
-    ):
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=None, validation=None,
-            error=f"extra_open_order_count must be a non-negative int, got {extra_open_order_count!r}.",
-        )
-    projected_open_orders = len(current_portfolio.open_orders) + extra_open_order_count
-    if projected_open_orders >= policy.max_open_orders:
-        pending_note = (
-            f" (including {extra_open_order_count} earlier leg(s) of this batch)"
-            if extra_open_order_count else ""
-        )
-        return ProposalValidationOutcome(
-            proposal=proposal,
-            intent=None,
-            validation=None,
-            error=(
-                f"Open-order cap reached: {projected_open_orders} active order(s){pending_note}, "
-                f"policy maximum {policy.max_open_orders}."
-            ),
-        )
-
-    try:
-        intent = _intent_from_dict(proposal["intent"])
-    except Exception as exc:
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=None, validation=None, error=f"Malformed stored intent: {exc}",
-            failure_class=FAILURE_DATA_INTEGRITY,
-        )
-
-    if intent.side not in policy.allowed_sides:
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=intent, validation=None,
-            error=f"Side '{intent.side}' is not allowed by policy.",
-        )
-    if intent.order_type not in policy.allowed_order_types:
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=intent, validation=None,
-            error=f"Order type '{intent.order_type}' is not allowed by policy.",
-        )
-    if intent.side == "buy" and not policy.allow_new_positions:
-        held = {p.ticker.upper() for p in current_portfolio.positions}
-        if intent.ticker.upper() not in held:
-            return ProposalValidationOutcome(
-                proposal=proposal, intent=intent, validation=None,
-                error="Opening new positions is disabled by policy.",
-            )
-
-    try:
-        broker_preflight = broker.assert_account_and_asset_ready(intent.ticker)
-    except Exception as exc:
-        return ProposalValidationOutcome(
-            proposal=proposal,
-            intent=intent,
-            validation=None,
-            error=f"Broker account/asset preflight failed: {exc}",
-            failure_class=FAILURE_INFRASTRUCTURE,
-        )
-
-    try:
-        recent_intents = [_intent_from_dict(raw) for raw in store.recent_executed_intents()]
-    except Exception as exc:
-        # A malformed HISTORICAL row (e.g. a hand-edited or corrupted
-        # shares value now caught by _shares_from_stored_value()) must
-        # fail this proposal closed the same way a malformed CURRENT
-        # intent already does above, not raise uncaught out of this
-        # read-only function (preflight_allocation_batch() calls this
-        # directly, with no surrounding try/except of its own).
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=intent, validation=None,
-            error=f"Could not check recent order history for duplicates: malformed stored intent: {exc}",
-            broker_preflight=broker_preflight,
-            failure_class=FAILURE_DATA_INTEGRITY,
-        )
-    for order in current_portfolio.open_orders:
-        side = str(order.get("side", "")).lower()
-        # See execute_approved_paper_proposal()'s own duplicate-check
-        # comment: identity depends only on ticker+side, never shares.
-        if side in ("buy", "sell") and order.get("ticker"):
-            recent_intents.append(
-                TradeIntent(
-                    ticker=order["ticker"], side=side,
-                    shares=int(float(order["shares"])) if order.get("shares") else 1,
-                )
-            )
-
-    try:
-        quote = broker.get_latest_quote(intent.ticker)
-        quote_received_at = datetime.now(timezone.utc).isoformat()
-        reference_price = quote.get("price_decimal", quote["price"])
-        price_timestamp = quote["timestamp"]
-        bid_price = quote.get("bid_decimal", quote.get("bid"))
-        ask_price = quote.get("ask_decimal", quote.get("ask"))
-    except Exception as exc:
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=intent, validation=None,
-            error=f"Could not fetch a live quote for {intent.ticker} to check price freshness: {exc}",
-            broker_preflight=broker_preflight,
-            failure_class=FAILURE_INFRASTRUCTURE,
-        )
-
-    pending_buy_value_by_ticker: dict[str, Decimal] = {}
-    if intent.side == "buy":
-        try:
-            pending_buy_value_by_ticker = dict(_pending_buy_value_by_ticker(current_portfolio.open_orders, broker))
-        except Exception as exc:
-            return ProposalValidationOutcome(
-                proposal=proposal, intent=intent, validation=None,
-                error=(
-                    f"Could not determine the dollar value of a pending buy order needed to check "
-                    f"exposure/concentration limits: {exc}"
-                ),
-                reference_price=reference_price,
-                broker_preflight=broker_preflight,
-                quote=quote,
-                quote_received_at=quote_received_at,
-                failure_class=FAILURE_INFRASTRUCTURE,
-            )
-        for ticker, extra_value in (extra_pending_buy_value_by_ticker or {}).items():
-            key = ticker.upper()
-            pending_buy_value_by_ticker[key] = (
-                pending_buy_value_by_ticker.get(key, Decimal("0"))
-                + to_decimal(
-                    extra_value,
-                    name=f"extra pending buy value for {key}",
-                )
-            )
-
-    resolved_earnings_days_away = _resolve_earnings_days_away(intent.ticker, earnings_days_away)
-    if policy.require_earnings_data and intent.side == "buy" and resolved_earnings_days_away is None:
-        return ProposalValidationOutcome(
-            proposal=proposal, intent=intent, validation=None,
-            error=(
-                f"Earnings-date data for {intent.ticker} is unavailable and your policy requires it "
-                "for buys (require_earnings_data=true) -- refusing to approve rather than silently "
-                "skip the earnings blackout check."
-            ),
-            reference_price=reference_price,
-            broker_preflight=broker_preflight,
-            quote=quote,
-            quote_received_at=quote_received_at,
-            # Classified as infrastructure, not policy: the policy rule here
-            # is fail-closed handling of a data outage, not a judgment about
-            # this trade. The same trade with the data present would have
-            # been evaluated normally, so labelling it a policy rejection
-            # would teach a later model that the policy declines trades it
-            # does not decline.
-            failure_class=FAILURE_INFRASTRUCTURE,
-        )
-
-    validation = validate_trade_intent(
-        intent,
+    return run_proposal_validation(
+        proposal_id,
         current_portfolio,
-        reference_price,
-        price_timestamp=price_timestamp,
-        now=now_et,
-        recent_intents=recent_intents,
+        policy,
+        store,
+        now_et=now_et,
+        deps=ProposalValidationDeps(
+            import_broker=_import_execution_broker,
+            env_kill_switch_active=env_kill_switch_active,
+            compute_policy_fingerprint=compute_policy_fingerprint,
+            intent_from_dict=_intent_from_dict,
+            pending_buy_value_by_ticker=_pending_buy_value_by_ticker,
+            resolve_earnings_days_away=_resolve_earnings_days_away,
+            validate_trade_intent=validate_trade_intent,
+        ),
         kill_switch_active=kill_switch_active,
-        earnings_days_away=resolved_earnings_days_away,
-        bid_price=bid_price,
-        ask_price=ask_price,
-        max_position_pct=policy.max_position_pct,
-        max_total_exposure_pct=policy.max_total_exposure_pct,
-        max_basket_pct=policy.max_basket_pct * 100,
-        max_leveraged_etf_pct=policy.max_leveraged_etf_pct * 100,
-        max_stale_price_minutes=policy.max_stale_price_minutes,
-        max_slippage_pct=policy.max_slippage_pct,
-        max_spread_pct=policy.max_spread_pct,
-        earnings_blackout_days=policy.earnings_blackout_days,
-        max_order_value=policy.max_order_value,
-        min_cash_reserve_pct=policy.min_cash_reserve_pct,
-        pending_buy_value_by_ticker=pending_buy_value_by_ticker,
+        earnings_days_away=earnings_days_away,
+        proposal=proposal,
+        extra_pending_buy_value_by_ticker=extra_pending_buy_value_by_ticker,
         available_cash_override=available_cash_override,
         available_buying_power_override=available_buying_power_override,
-    )
-    return ProposalValidationOutcome(
-        proposal=proposal,
-        intent=intent,
-        validation=validation,
-        error=None,
-        reference_price=reference_price,
-        broker_preflight=broker_preflight,
-        quote=quote,
-        quote_received_at=quote_received_at,
+        extra_open_order_count=extra_open_order_count,
     )
 
 

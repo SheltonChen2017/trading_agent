@@ -78,20 +78,25 @@ sys.modules-level broker-fake test seams work unchanged. PR #120 merged at
 `711095c`; independent review at `2f37210` required no code correction and
 reproduced representative facade-seam and mismatch-kill-switch mutations.
 
-**GR-1 chapter CLOSED 2026-08-03 by the GR-1E assessment (pending
-independent review)**: the mechanical measurement in
-`docs/GENERAL_READINESS_STATUS.md` (GR-1E section) found the 281-line
-execution "composition" is 172 executable lines invoking nineteen named
-kernel/gate/telemetry functions with exactly one broker-contact line and
-zero inline computation — i.e., it IS the thin composition layer the
-definition of done asks for — and the two recovery wrappers are input
-validation plus one atomic `reclaim_stale_status` storage call each, whose
-extraction would relocate rather than reduce risk. Declared complete
-against plan section 6.4 with that residual documented rather than churned.
+**The `execution_service.py` portion closed 2026-08-03 after independent
+GR-1E review**: the source/AST assessment in
+`docs/GENERAL_READINESS_STATUS.md` found that the remaining 281-line
+execution coordinator orders named kernel, gate, telemetry, and storage
+phases and contains exactly one broker-submission call. It still contains
+ordinary coordinator control flow and message construction, but no inline
+financial computation, state-transition SQL, or broker-outcome
+interpretation. The recovery wrappers validate inputs and diagnose refusals
+around the atomic `reclaim_stale_status` storage primitive; the claim wrapper
+can invoke its single static call site for more than one candidate status.
+Further extraction would relocate the composition without reducing the
+remaining risk. GR-1 is complete against archived plan section 6.4's intended
+scope.
 
-**Still open (outside GR-1's scope)**: `allocation_batch.py` owns cross-leg
-reservation math separately from the storage-level budget reservation;
-risk-check scatter (item 2 below) remains GR-2's consolidation target.
+**Item 1 remains partially open**: its original scope also names
+`allocation_batch.py`, which still owns cross-leg reservation math separately
+from storage-level budget reservation. GR-1 completion does not close that
+debt. Track it here and in item 2 below, and schedule it only through the
+adopted action plan rather than assigning it to a milestone by implication.
 
 ## 2. Risk-check scatter
 

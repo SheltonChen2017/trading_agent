@@ -49,8 +49,8 @@ deterministic execution path (propose → validate → approve → claim → sub
 reconcile) is built, characterization-frozen, and three-review hardened; the
 ML research/shadow stack is software-complete through monitoring and dossier;
 the LLM committee foundation is built and gated; the execution-kernel split
-(GR-1) is complete per the 2026-08-03 GR-1E assessment (pending review of
-that assessment). What does not exist is: all of GR-2
+(GR-1) is complete after the independently reviewed 2026-08-03 GR-1E
+assessment. What does not exist is: all of GR-2
 through GR-7, every AI *product* plan beyond the committee (strategy
 authoring, debate, allocation service, MCP, and proposal cleanup), and — most
 importantly — **any qualifying frozen-epoch operational evidence at all**:
@@ -140,7 +140,7 @@ already-merged work does not reorder the adopted next step.
 
 | Item | Remaining | Size |
 |---|---|---|
-| **GR-1E** — ~~assess the composition + recovery wrappers~~ **ASSESSED 2026-08-03 (branch `user/claude/gr-1e-assessment-20260803`): no extraction — the 281-line composition measures 172 executable lines invoking 19 named kernel/gate functions with one broker line and no inline logic; the recovery wrappers are validation + one atomic storage call each. GR-1 declared COMPLETE against plan §6.4 with the residual documented (see GENERAL_READINESS_STATUS GR-1E section). Awaiting independent review of the assessment** | review | review only |
+| **GR-1E** — ~~assess the composition + recovery wrappers~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03: no extraction. The 281-line coordinator sequences extracted phases, performs ordinary control/exception/message composition, contains one broker-submission call, and contains no inline financial math, transition SQL, or broker interpretation. Recovery remains around the atomic storage primitive; the claim wrapper may try more than one candidate status. GR-1 is complete against the archived plan's intended §6.4 scope; `allocation_batch.py` debt remains open. See GENERAL_READINESS_STATUS and the GR-1E review report.** | none | complete |
 | **Committee release gates** — ADR requires ≥50 frozen replay cases (0 exist), memory-poisoning cases (0), broader injection corpus (3 seeds), a CLI `review unavailable` surface (none); only then remove the experiment gate | corpus authoring + CLI wiring | 1–2 milestones |
 | **ML-FS-6 real discovery/confirmation** — spec `research/ml_specs/volatility-discovery-v1.json` is review-ready; no `SpecReviewAttestation` exists | blocked on owner-designated reviewer + real PIT data | owner + data |
 
@@ -234,14 +234,17 @@ one P2 fail-open verifier gap: same-named weakened indexes/triggers must not
 pass. The durable disposition and issue ledger are in
 `docs/REVIEW_2026-08-03_PHASE2_HYGIENE.md`.
 
-**Phase 3 — finish the kernel (COMPLETE pending assessment review):**
+**Phase 3 — finish the kernel (COMPLETE AND INDEPENDENTLY REVIEWED):**
 GR-1D reconciliation extraction is implemented, merged as PR #120 at
 `711095c`, and independently accepted at `2f37210` with no code correction.
-The GR-1E assessment (2026-08-03) measured the residue mechanically and
-declared GR-1 COMPLETE with no further extraction — the record is the GR-1E
-section of `docs/GENERAL_READINESS_STATUS.md`. After that assessment passes
-independent review, Phase 4 (GR-5 alert delivery + GR-3 fault drills, with
-GR-2 riding along) is next; GR-5's channel remains an owner decision.
+The GR-1E assessment (2026-08-03) declared GR-1 COMPLETE with no further
+extraction. Independent review accepted that architectural conclusion after
+correcting overbroad measurement, test-history, recovery-call, and
+architecture-debt claims. The records are the GR-1E section of
+`docs/GENERAL_READINESS_STATUS.md` and
+`docs/REVIEW_2026-08-03_GR1E_ASSESSMENT.md`. Phase 4 (GR-5 alert delivery +
+GR-3 fault drills, with GR-2 riding along) is next; GR-5's channel remains an
+owner decision.
 
 **Phase 4 — the two milestones that unblock operations:**
 GR-5 alert delivery (owner picks the channel — decision needed) and GR-3

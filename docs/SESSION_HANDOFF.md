@@ -1,6 +1,6 @@
 # Development session handoff
 
-Prepared: 2026-08-03T10:55:17-07:00
+Prepared: 2026-08-03T11:40:00-07:00
 
 Audience: Codex, Claude Code, and the repository owner after moving to another
 computer.
@@ -31,11 +31,13 @@ the handoff before continuing. GR-1C is implemented and independently
 reviewed; do not redo it. UI feature controls (Phase 1) are fully merged:
 implementation PR #116, review chain PR #117 at 661a7d4. Do not redo or
 bypass that review. Action-plan Phase 2 hygiene (AP-1, AP-2, AP-4) is
-implemented at 34ce463 and independently accepted after correction at
-36c69d3 on pushed branch codex/review-phase2-hygiene-20260803. Do not
-reimplement or repeat that review, and do not merge it without owner approval.
-Phase 3 GR-1D is next in the adopted sequence but still requires the owner's
-go-ahead; do not start it implicitly.
+COMPLETE: implemented at 34ce463, independently accepted after correction at
+36c69d3, MERGED as PR #118 at 8278510, and third-round confirmed by Claude
+(red-proof on the exact snapshot, reverse-mutation, evidence checks) at
+5cffb1f on local branch user/claude/phase2-confirmation-20260803. Do not
+reimplement or repeat that review. Phase 3 GR-1D is next in the adopted
+sequence but still requires the owner's go-ahead; do not start it
+implicitly.
 ```
 
 Initial commands:
@@ -73,23 +75,32 @@ Repository:
 https://github.com/SheltonChen2017/trading_agent.git
 ```
 
-State after independent Phase 2 hygiene review (2026-08-03):
+State after the merged and confirmed Phase 2 hygiene milestone (2026-08-03):
 
 ```text
 origin/main and local main:
-  661a7d4  Merge PR #117, the complete UI review chain (implementation was
-           merged earlier as PR #116 at 4c8e959)
+  8278510  Merge PR #118, the reviewed Phase 2 hygiene chain
+           (tree verified byte-identical to the review tip 35fc2dd)
 
-Phase 2 hygiene, based on main 661a7d4:
+Phase 2 hygiene, based on main 661a7d4 — COMPLETE AND MERGED:
   implementation branch: user/claude/phase2-hygiene-20260803
   implementation: 34ce463
   implementation handoff: c8271a1
   review branch: codex/review-phase2-hygiene-20260803
   review correction/report: 36c69d3
+  push-state correction: 35fc2dd
+  merge: 8278510 (PR #118; origin/main)
   disposition: accepted after one resolved P2 and two resolved P3 findings;
                no P0/P1 and no open issue
-  remote state: PUSHED; another computer can fetch the complete reviewed tree
-                from origin/codex/review-phase2-hygiene-20260803
+
+Claude third-round confirmation, based on merged main 8278510:
+  branch: user/claude/phase2-confirmation-20260803 — LOCAL ONLY until the
+          owner authorizes a push
+  confirmation: 5cffb1f (review-report addendum: commit dispositions,
+          red-proof on exact 34ce463, reverse-mutation, PH2REV-002/003
+          evidence checks, merged-tree full-suite validation, 9/10 review
+          rating, one documented residual boundary)
+  handoff: the commit containing this text
 
 UI implementation, pushed and merged:
   branch: user/claude/ui-feature-controls-20260802
@@ -200,7 +211,11 @@ Git-ignored and machine-local.
 Recent sequence:
 
 ```text
-36c69d3  Codex: complete independent Phase 2 hygiene review (PUSHED)
+5cffb1f  Claude: confirm the Phase 2 hygiene review (LOCAL ONLY)
+8278510  Merge PR #118: the reviewed Phase 2 hygiene chain into main
+35fc2dd  Codex: record pushed Phase 2 review branch (PUSHED, MERGED)
+e3a5b9a  Codex: update handoff after reviewed Phase 2 hygiene (PUSHED, MERGED)
+36c69d3  Codex: complete independent Phase 2 hygiene review (PUSHED, MERGED)
 c8271a1  Claude: Phase 2 implementation handoff (PUSHED via review branch)
 34ce463  Claude: Phase 2 hygiene implementation (PUSHED via review branch)
 661a7d4  Merge PR #117: the complete UI review chain into main
@@ -496,7 +511,8 @@ record is in `docs/REVIEW_2026-08-03_UI_FEATURE_CONTROLS.md` and
 `docs/FEATURE_MILESTONE_RECORD.md`.
 
 Active milestone status (2026-08-03): **action-plan Phase 2 hygiene is
-accepted after independent correction.**
+COMPLETE — reviewed, merged (PR #118, `8278510`), and third-round
+confirmed.**
 
 ```text
 implementation branch: user/claude/phase2-hygiene-20260803
@@ -504,7 +520,18 @@ implementation commit: 34ce463
 implementation handoff: c8271a1
 review branch: codex/review-phase2-hygiene-20260803 (PUSHED)
 review correction/report: 36c69d3
-disposition: accepted after correction
+merge: 8278510 (PR #118; merge tree verified byte-identical to 35fc2dd)
+third-round confirmation: 5cffb1f on user/claude/phase2-confirmation-20260803
+  (LOCAL ONLY until pushed): PH2REV-001 red-proof reproduced in a worktree
+  at exact 34ce463 (matches=True on weakened same-named objects);
+  correction reverse-mutated and detected; PH2REV-002 reproduced via
+  git cat-file and branch inventory; PH2REV-003 corrected text verified;
+  merge tree equality verified; full suite on the merged tree 2441 passed /
+  1 skipped / 25 warnings in 341.77s (Python 3.13.14); review rated 9/10;
+  one residual boundary documented (--apply creates missing objects but
+  deliberately cannot repair a same-named mismatched index/trigger — it
+  surfaces in mismatched_* instead)
+disposition: accepted after correction; confirmation found no new issue
 scope:
   AP-1 - assistant/storage.py gains verify_database_schema() (read-only,
        fail-closed, expected schema built by the real AssistantStore
@@ -556,12 +583,11 @@ honest limits: verify-db-schema compares table/column presence and exact
        the operator-DB drift noted in section 8 is recorded, not explained;
        no execution-kernel file changed; no policy, broker, scheduler, or
        epoch state was touched.
-next: owner merge decision for the reviewed Phase 2 branch. Phase 3 GR-1D is
-       next in sequence but must not start before owner go-ahead.
+next: Phase 2 is merged and closed. Phase 3 GR-1D is next in sequence but
+       must not start before owner go-ahead.
 ```
 
-After the owner accepts Phase 2, GR-1D is the next kernel milestone
-(action-plan Phase 3):
+GR-1D is the next kernel milestone (action-plan Phase 3):
 
 ```text
 GR-1D: extract manual reconciliation orchestration behind an explicit,
@@ -1058,10 +1084,11 @@ Do not let UI/development tests share the restored operational database.
 
 Do not infer answers to these:
 
-1. ~~Merge the UI review chain~~ — **RESOLVED 2026-08-03**: merged as
-   PR #117 at `661a7d4`. NEW: whether to merge the independently reviewed
-   Phase 2 branch `codex/review-phase2-hygiene-20260803` (implementation
-   `34ce463`, correction `36c69d3`, now PUSHED).
+1. ~~Merge the UI review chain / Phase 2 review chain~~ — **RESOLVED
+   2026-08-03**: PR #117 at `661a7d4` and PR #118 at `8278510` both merged.
+   NEW: whether to push (and then merge) Claude's Phase 2 confirmation
+   branch `user/claude/phase2-confirmation-20260803` (`5cffb1f` + handoff,
+   currently LOCAL ONLY).
 2. ~~Push/cross-review the consolidated plans~~ — **RESOLVED 2026-08-02**:
    both plans merged (PR #113/#114); the owner adopted Claude's plan as
    `docs/ACTION_PLAN_2026-08-02.md` with UI feature controls as Phase 1;
@@ -1095,14 +1122,13 @@ git status --short --branch
 git log -10 --oneline --decorate
 ```
 
-Verify that `main` is at or after `661a7d4` (PR #117, the merged UI review
-chain) and that history contains the GR-1C chain through `ff8c16e`. The
-Reviewed Phase 2 branch `codex/review-phase2-hygiene-20260803`
-(`34ce463` + `c8271a1` + `36c69d3` + the handoff commits) is pushed and can be
-fetched on a new computer. Local strategy-tool branch
-`codex/ai-strategy-tool-doc-v2-20260802` (`a656015`) remains local-only and
-cannot be fetched elsewhere. Everything merged syncs through Git alone — no
-session files need copying.
+Verify that `main` is at or after `8278510` (PR #118, the merged Phase 2
+hygiene chain) and that history contains the GR-1C chain through `ff8c16e`.
+Claude's confirmation branch `user/claude/phase2-confirmation-20260803`
+(`5cffb1f` + this handoff commit) is LOCAL ONLY until the owner authorizes a
+push. Local strategy-tool branch
+`codex/ai-strategy-tool-doc-v2-20260802` (`a656015`) also remains local-only.
+Everything merged syncs through Git alone — no session files need copying.
 
 Recommended resume prompt:
 
@@ -1122,14 +1148,14 @@ scheduler state, and ignored artifact transfer. Do not start live trading, an
 evidence epoch, scheduled tasks, ML/LLM proposal integration, or destructive
 cleanup. UI feature controls (Phase 1) are fully merged: PR #116 plus the
 review chain PR #117 at 661a7d4; do not repeat that review. Action-plan
-Phase 2 hygiene (AP-1, AP-2, AP-4) is implemented at 34ce463 and independently
-accepted after correction at 36c69d3 on pushed branch
-codex/review-phase2-hygiene-20260803 — do not reimplement or repeat that
-review. The next action is the owner's merge decision. Note the AP-1
-operational finding: the operator database passes the corrected read-only
-compatibility check and has a pre-change backup under data/backups/, but the
-historical source of database drift remains unknown. Local strategy-tool
-branch codex/ai-strategy-tool-doc-v2-20260802 at a656015 is present but also
+Phase 2 hygiene (AP-1, AP-2, AP-4) is COMPLETE: implemented at 34ce463,
+accepted after correction at 36c69d3, merged as PR #118 at 8278510, and
+third-round confirmed at 5cffb1f (local confirmation branch) — do not
+reimplement or repeat any of it. Note the AP-1 operational finding: the
+operator database passes the corrected read-only compatibility check and has
+a pre-change backup under data/backups/, but the historical source of
+database drift remains unknown. Local strategy-tool branch
+codex/ai-strategy-tool-doc-v2-20260802 at a656015 is present but
 unpublished. Phase 3 GR-1D manual reconciliation extraction is next in the
 adopted sequence only after owner go-ahead: characterize first, implement one
 reviewable slice, run focused/full validation, commit, and stop for independent

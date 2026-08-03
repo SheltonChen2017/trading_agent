@@ -17,7 +17,9 @@ characterization-pinned execution facade, so it neither blocks nor is
 blocked by the remaining GR-1 kernel work.
 
 Prepared: 2026-08-02, by Claude, at `origin/main` = `ff8c16e` (post PR #112);
-adopted and reprioritized at `ded68b0` (post PR #113/#114).
+adopted and reprioritized at `ded68b0` (post PR #113/#114); UI Phase 1
+implemented and merged as PR #116 at `4c8e959`, then independently accepted
+after corrections on local-only Codex review commit `a6d5254`.
 
 Method: four parallel verified surveys over every implementation plan and
 design document under `docs/`, each claim checked against the actual code
@@ -42,9 +44,9 @@ ML research/shadow stack is software-complete through monitoring and dossier;
 the LLM committee foundation is built and gated. What does not exist is:
 the last two slices of the execution-kernel split (GR-1D/1E), all of GR-2
 through GR-7, every AI *product* plan beyond the committee (strategy
-authoring, debate, allocation service, MCP, proposal cleanup, UI settings —
-all ~0% built by design), and — most importantly — **any operational
-evidence at all**: zero scheduled tasks installed, zero evidence epochs, zero
+authoring, debate, allocation service, MCP, and proposal cleanup), and — most
+importantly — **any qualifying frozen-epoch operational evidence at all**:
+zero scheduled tasks installed, zero evidence epochs, zero
 drills recorded, zero ledger bootstraps, zero broker lifecycle rows, and the
 60-session / 30-order mandate clock has never started. The scarcest resource
 on the critical path is not engineering — it is elapsed calendar time on a
@@ -97,6 +99,19 @@ two-paragraph milestone record (`docs/FEATURE_MILESTONE_RECORD.md`), canonical
 git-synchronized session handoff (`docs/SESSION_HANDOFF.md`), all wired into
 `CLAUDE.md` and the review skill.
 
+### 2.5 UI feature controls (2026-08-03)
+
+The Streamlit app now has seven tabs, including Settings & Features and a
+research-only Ticker Suggestions surface. Session-scoped AI preferences gate
+all optional LLM surfaces; provider and safety state are read-only; and
+`allow_new_positions` / `enable_strategy_proposals` use a protected typed
+confirmation, validate-before-write, version/fingerprint-changing persistence
+workflow. Independent review added behavioral coverage proving the real UI
+toggle persists and refreshes authoritative status in both directions, binds
+editor state to the selected policy, and prevents disabled suggestion sources
+from calling their providers. Implementation merge: `4c8e959`; accepted after
+local-only review correction `a6d5254`.
+
 ---
 
 ## 3. IN PROGRESS — started, not finished
@@ -120,8 +135,6 @@ git-synchronized session handoff (`docs/SESSION_HANDOFF.md`), all wired into
 | GR-5 alert delivery | a real channel + delivery records + weekly self-test + operator dashboard; alerts are currently recorded but never delivered | no transport code at all |
 | GR-6 recovery/portability | off-machine backup restore, secrets audit, key rotation, portable scheduler, second-machine stand-up proven once | zero matches for all markers |
 | GR-7 product completeness | mandate-target rebalance proposals, tax-aware sell preview, performance attribution, annual tax export (wash sales), idle-cash management | `wash_sale`/`idle_cash`/attribution: zero hits |
-| UI feature controls (M1) | Settings & Features tab (3 control classes), provider/safety status panels, Ticker Suggestions surface — **read-only for policy fields in M1** | UI still has exactly 5 tabs |
-| UI feature controls (M2) | protected `allow_new_positions` policy-edit workflow (fingerprint change + proposal invalidation warning) | absent |
 | Allocation service | delta-vs-target primitive, calibrated regime threshold, cadence, universe list, sizing | only the `strategy_evaluations` table exists |
 | Proposal-history cleanup | `dismissed` status, expiry sweep, preview-first CLI, History UI (10 steps; physical purge stays deferred) | 19 statuses, no `dismissed`; only `prune-packets` exists (decision packets, not proposals) |
 | AI strategy authoring AS-0..AS-7 | prose → StrategySpec → compiler → evaluation plan → orchestrated backtest → dossier → registry | 0% — no `strategy_lab/`, no DSL, no Backtest tab |
@@ -175,9 +188,9 @@ model 2 starts the 3-month clock **now** and time is the scarcest input.
 
 ## 8. Adopted sequencing (owner-approved 2026-08-02)
 
-**Phase 1 — UI feature controls (ACTIVE — owner priority, supports daily
-paper trading starting 2026-08-03):**
-One reviewed milestone implementing `docs/reference/UI_FEATURE_CONTROLS_DESIGN.md`:
+**Phase 1 — UI feature controls (COMPLETE AND INDEPENDENTLY REVIEWED on the
+local Codex review branch; owner-authorized push/merge still required):**
+Implemented `docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` as one milestone:
 the Settings & Features tab (three control classes), AI master + per-feature
 preferences gating all four LLM surfaces, read-only data-source and safety
 status panels (reading from the enforcing functions, never re-implementing
@@ -185,10 +198,12 @@ checks), the protected policy-update workflow for `allow_new_positions` /
 `enable_strategy_proposals` (validation → explicit typed confirmation →
 atomic write → version bump → new fingerprint → prior-proposal invalidation
 warning), and the dedicated Ticker Suggestions surface. The design's four
-open decisions are resolved (§9 item 11). Independent review before merge,
-as always.
+open decisions are resolved (§9 item 11). PR #116 merged the implementation
+at `4c8e959`; independent review accepted it after two P2 corrections in
+local-only `a6d5254`, with 2,427 full-suite tests passing. No live authority
+or formal evidence epoch was enabled.
 
-**Phase 2 — hygiene (days):**
+**Phase 2 — hygiene (NEXT after the reviewed UI branch is pushed/merged):**
 AP-1, AP-2, AP-4 doc reconciliation; add GR-1D/1E to the GR status doc.
 
 **Phase 3 — finish the kernel (1–2 milestone cycles):**

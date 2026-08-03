@@ -2,11 +2,12 @@
 
 Prepared: 2026-08-03 by Codex.
 
-Review base: `6f658fb`  
-Implementation: `edc87e9`  
-Implementation handoff: `47effd7`  
-Merge under review: `4c8e959` (PR #116)  
+Review base: `6f658fb`
+Implementation: `edc87e9`
+Implementation handoff: `47effd7`
+Merge under review: `4c8e959` (PR #116)
 Review branch: `codex/review-ui-feature-controls-20260803`
+Review correction: `a6d5254`
 
 ## Commit dispositions
 

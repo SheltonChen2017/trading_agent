@@ -1,14 +1,14 @@
 # Development session handoff
 
-Prepared: 2026-08-02T22:47:03-07:00
+Prepared: 2026-08-03T00:17:43-07:00
 
 Audience: Codex, Claude Code, and the repository owner after moving to another
 computer.
 
-Purpose: record the exact post-merge, independently re-reviewed GR-1C tree,
-the consolidated-plan audit state, safety posture, Git state, local-data
-observations, and next step. This file contains no secret values, brokerage
-account numbers, or licensed market data. Every machine-local and
+Purpose: record the exact merged and independently reviewed UI feature-control
+tree, consolidated-plan state, safety posture, Git topology, validation,
+local-data observations, and next step. This file contains no secret values,
+brokerage account numbers, or licensed market data. Every machine-local and
 time-sensitive statement must be verified after a move.
 
 ## 1. Read this first
@@ -28,9 +28,12 @@ ignored-data state, credential presence, paper-account identity, and
 scheduler state. Preserve uncommitted work. Do not infer live trading,
 model promotion, or autonomous execution authority. Report any drift from
 the handoff before continuing. GR-1C is implemented and independently
-reviewed; do not redo it. The active phase is Phase 1 of the action plan:
-UI feature controls (owner priority change, 2026-08-02, to support daily
-paper trading from 2026-08-03). GR-1D follows in Phase 3.
+reviewed; do not redo it. UI feature controls were merged as PR #116 and
+independently accepted after two P2 corrections on local-only branch
+codex/review-ui-feature-controls-20260803 at a6d5254. Do not redo or bypass
+that review. The immediate next action is owner-authorized push/merge of the
+review branch; after that, action-plan Phase 2 hygiene is next. GR-1D remains
+Phase 3 and must not start early.
 ```
 
 Initial commands:
@@ -68,11 +71,24 @@ Repository:
 https://github.com/SheltonChen2017/trading_agent.git
 ```
 
-State after the independent Codex implementation-plan audit:
+State after the independent Codex UI-controls review:
 
 ```text
 origin/main and local main:
-  ff8c16e  Merge PR #112, independent GR-1C confirmation review/handoff
+  4c8e959  Merge PR #116, Claude UI feature controls
+
+UI implementation, pushed and merged:
+  branch: user/claude/ui-feature-controls-20260802
+  implementation: edc87e9
+  implementation handoff: 47effd7
+  merge: 4c8e959 (PR #116)
+
+Codex independent UI review:
+  branch: codex/review-ui-feature-controls-20260803
+  review correction/report: a6d5254
+  disposition: accepted after two resolved P2 findings and one P3 handoff
+               correction; no P0/P1 and no open issue
+  remote state: LOCAL ONLY, NOT PUSHED OR MERGED
 
 Original GR-1C implementation and review, pushed and merged:
   b4d9b1f  Claude validation extraction and dependency injection
@@ -145,21 +161,26 @@ do not recreate it from memory while an exact copy may exist elsewhere.
 
 ### Required action before abandoning the old computer
 
-All GR-1C implementation/review work is merged into remote `main` at
-`ff8c16e`, and Claude's independent consolidated plan is pushed at `ca4bae4`.
-The current Codex plan commit `9fcf254` and the handoff commit containing this
-text remain local-only until the owner authorizes a push; another computer
-cannot fetch the Codex plan/final audit state yet. The other artifact requiring
-separate treatment is unavailable historical `a656015` (strategy-tool
-document), which exists — if anywhere — only on the earlier computer.
+Claude's UI implementation is merged into remote `main` at `4c8e959`. The
+review correction `a6d5254` and the handoff commit containing this text are
+local-only until the owner authorizes a push; another computer cannot fetch
+the corrected toggle/status behavior or final review state yet. Do not begin
+Phase 2 from uncorrected `main` as though review were complete. The separate
+historical artifact `a656015` (strategy-tool document) remains unavailable
+from this clone and exists — if anywhere — only on the earlier computer.
 
 ## 3. Relevant GR-1 commit history
 
 Recent sequence:
 
 ```text
-9fcf254  Codex: add consolidated implementation action plan (local)
-ca4bae4  Claude: add consolidated implementation action plan (pushed branch)
+a6d5254  Codex: independent UI review corrections/report (LOCAL ONLY)
+4c8e959  Merge PR #116: Claude UI feature controls into main
+47effd7  Claude: UI implementation handoff, awaiting review
+edc87e9  Claude: UI feature controls implementation
+6f658fb  Merge PR #115: adopt the go-to action plan
+9fcf254  Codex: add consolidated implementation action plan (merged via PR #113)
+ca4bae4  Claude: add consolidated implementation action plan (merged via PR #114)
 ff8c16e  Merge PR #112: Codex independent GR-1C confirmation review into main
 77c266a  Codex: update handoff after GR-1C confirmation review
 85c72da  Codex: complete independent GR-1C confirmation review
@@ -434,44 +455,50 @@ Still on the facade:
 - stale reconciliation/claim recovery wrappers; and
 - several compatibility exports and top-level composition responsibilities.
 
-Active milestone status (2026-08-02, end of day): **UI feature controls are
-IMPLEMENTED and awaiting independent review** — Phase 1 of
-`docs/ACTION_PLAN_2026-08-02.md`, implementing
-`docs/reference/UI_FEATURE_CONTROLS_DESIGN.md`.
+Active milestone status (2026-08-03): **UI feature controls are independently
+accepted after correction** — Phase 1 of `docs/ACTION_PLAN_2026-08-02.md`.
 
 ```text
-branch: user/claude/ui-feature-controls-20260802 (based on the pushed
-        adoption branch tip 2bbcffc, which archives the plans and binds
-        the go-to plan; one PR carries both)
+implementation branch: user/claude/ui-feature-controls-20260802
 implementation commit: edc87e9
+implementation handoff: 47effd7
+implementation merge: 4c8e959 (PR #116; origin/main)
+review branch: codex/review-ui-feature-controls-20260803
+review correction/report: a6d5254 (LOCAL ONLY)
+disposition: accepted after correction
 scope: Settings & Features tab (three control classes), AI master +
        per-feature preferences gating all four LLM surfaces (paid calls
        prevented, not hidden), protected policy-update workflow for
        allow_new_positions / enable_strategy_proposals (typed UPDATE
        POLICY confirmation, validate-before-write, atomic save, version
        bump, fingerprint change, prior-proposal invalidation warning),
-       read-only data-source and safety panels (sourced from the
-       enforcing functions), dedicated research-only Ticker Suggestions
-       tab. New helpers in assistant/policy.py; include_ai_suggestions
-       flag in assistant/recommended_stocks.py.
-validation: full suite 2424 passed / 1 skipped (+12 new tests);
-       compileall clean; git diff --check clean; 3/3 mutation sweep
-       CAUGHT; streamlit AppTest full-script render 0 exceptions, 7 tabs.
-honest limits: Streamlit widget wiring itself is exercised by AppTest
-       render only, not per-widget behavioral tests (repo precedent);
-       save_policy atomicity is enforced by os.replace but only its
-       observable effects (no temp residue, complete JSON) are tested.
-next: independent Codex review of this branch, then merge; the owner
-       begins daily paper trading 2026-08-03 (informal data collection --
-       no evidence epoch; the 60-session clock starts later on a frozen
-       runtime).
+       read-only data-source and safety panels (sourced from enforcing
+       functions), dedicated research-only Ticker Suggestions tab, and
+       provider source toggles that prevent disabled calls.
+confirmed review findings:
+       UIREV-001 P2: durable policy changed but the same render showed old
+       authoritative status; editor state also leaked across policy paths.
+       Corrected with path+fingerprint binding and an immediate rerun.
+       UIREV-002 P2: disabled most-active/IPO controls still called their
+       providers and only hid output. Corrected with provider-call flags.
+       UIREV-003 P3: implementation handoff was necessarily stale after
+       review and repeated the GR-1D transition. Superseded here.
+validation: red tests reproduced both P2 findings; corrected focused suite
+       236 passed in 78.60s; full suite 2427 passed / 1 skipped /
+       26 warnings in 203.31s under Python 3.12.13; compileall and
+       git diff --check clean. The real Streamlit control was tested with
+       a temporary policy through off -> on -> off; file values, version,
+       fingerprint, checkbox, and status panel agreed after both changes.
+honest limits: no owner policy, operator database, broker order, funded
+       account, scheduler, or evidence epoch was modified by review.
+next: owner-authorized push/merge of the local review branch; then Phase 2
+       hygiene (AP-1, AP-2, AP-4). Informal paper trading remains distinct
+       from the later frozen evidence epoch.
 ```
 
 The milestone touches no execution-kernel file and the facade surface is
-unchanged. GR-1D follows as the next kernel milestone (action-plan
-Phase 3).
-
-GR-1D follows as the next kernel milestone (action-plan Phase 3):
+unchanged. After Phase 2 hygiene, GR-1D follows as the next kernel milestone
+(action-plan Phase 3):
 
 ```text
 GR-1D: extract manual reconciliation orchestration behind an explicit,
@@ -585,6 +612,26 @@ full: 2412 passed, 1 skipped, 26 warnings in 238.98 seconds
 compileall: clean
 git diff --check: clean
 ```
+
+Independent UI feature-controls review (Python 3.12.13, merge `4c8e959`
+plus local-only correction `a6d5254`):
+
+```text
+red proof:
+  provider-control test failed because disabled-source flags did not exist
+  Streamlit policy file advanced to 1.1.1 while status stayed at 1.1.0
+corrected focused: 236 passed in 78.60 seconds
+corrected full: 2427 passed, 1 skipped, 26 warnings in 203.31 seconds
+compileall: clean
+git diff --check: clean after removing review-report trailing whitespace
+end-to-end temporary-policy toggle: off -> on -> off; persisted policy,
+  version, fingerprint, checkbox, and read-only status agreed both times
+```
+
+The normal full command's `--cache-clear` failed before collection because
+Windows denied access to the pre-existing repository `.pytest_cache\v`
+directory. The recorded full run used `-p no:cacheprovider`; this disabled
+only pytest's result cache, not test collection, fixtures, or behavior.
 
 Additional gates:
 
@@ -762,7 +809,7 @@ All individual product/design plans were archived to `docs/reference/` on
 reflect that location; the documents' content is unchanged and they remain
 authoritative for their own milestone definitions.
 
-### UI feature controls — NOW THE ACTIVE PHASE-1 MILESTONE
+### UI feature controls — PHASE 1 COMPLETE ON LOCAL REVIEW BRANCH
 
 `docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` is the governing design. Its
 four open decisions were resolved by the owner on 2026-08-02 (recorded in
@@ -774,7 +821,10 @@ four open decisions were resolved by the owner on 2026-08-02 (recorded in
 - a dedicated, research-only ticker-suggestions surface.
 
 It does not authorize a live toggle, secret editing in Streamlit, autonomous
-approval, or direct suggestion-to-proposal conversion.
+approval, or direct suggestion-to-proposal conversion. Implementation is
+merged at `4c8e959`; the accepted corrected tree is local-only at `a6d5254`
+until the owner authorizes push/merge. The durable two-paragraph completion
+record is in `docs/FEATURE_MILESTONE_RECORD.md`.
 
 ### AI strategy authoring
 
@@ -825,9 +875,9 @@ For the next coding session:
 6. `docs/ACTION_PLAN_2026-08-02.md` — the adopted go-to plan
 7. `docs/GENERAL_READINESS_STATUS.md`
 8. `docs/ARCHITECTURE_DEBT.md`
-9. the archived plan in `docs/reference/` covering the scheduled milestone
-   (currently `docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` for Phase 1;
-   `docs/reference/README.md` maps the rest)
+9. the archived plan in `docs/reference/` covering the scheduled milestone;
+   `docs/reference/README.md` maps the plans. Phase 2 hygiene is specified
+   directly by AP-1/AP-2/AP-4 in the go-to action plan.
 10. `assistant/execution_service.py`
 11. every file under `assistant/execution_kernel/`
 12. `tests/test_execution_characterization.py`, plus reconciliation,
@@ -901,14 +951,17 @@ Do not let UI/development tests share the restored operational database.
 
 Do not infer answers to these:
 
-1. ~~Push/cross-review the consolidated plans~~ — **RESOLVED 2026-08-02**:
+1. Whether to authorize pushing and merging local UI-review commit `a6d5254`
+   and this separate handoff commit. Until then the corrected reviewed tree
+   is not available on another computer.
+2. ~~Push/cross-review the consolidated plans~~ — **RESOLVED 2026-08-02**:
    both plans merged (PR #113/#114); the owner adopted Claude's plan as
    `docs/ACTION_PLAN_2026-08-02.md` with UI feature controls as Phase 1;
    Codex's draft is archived at `docs/reference/ACTION_PLAN_codex.md`.
-2. Whether to retrieve unavailable local-only strategy-tool commit `a656015`
+3. Whether to retrieve unavailable local-only strategy-tool commit `a656015`
    from the earlier computer or a private bundle.
-3. When to begin GR-1D (action-plan Phase 3, after the UI controls
-   milestone completes review).
+4. When to begin GR-1D (action-plan Phase 3, after Phase 2 hygiene completes
+   its own reviewed milestone).
 5. Which authoritative historical membership/reference-data source will be
    obtained and funded.
 6. When to deploy the operational paper cadence and start the first immutable
@@ -934,10 +987,12 @@ git status --short --branch
 git log -10 --oneline --decorate
 ```
 
-Verify that `main` is at or after `ded68b0` (both consolidated plans
-merged) and that history contains the GR-1C chain through `ff8c16e`. Every
-plan, this handoff, CLAUDE.md, and AGENTS.md sync via `git pull` alone —
-no session files need copying.
+Verify that `main` is at or after `4c8e959` (UI implementation merge) and that
+history contains the GR-1C chain through `ff8c16e`. The corrected reviewed UI
+tree additionally requires `a6d5254` and its later handoff commit; those are
+local-only until the owner authorizes a push. After that push, every plan,
+review, handoff, CLAUDE.md, and AGENTS.md syncs through Git alone — no session
+files need copying.
 
 Recommended resume prompt:
 
@@ -955,13 +1010,14 @@ ProposalValidationOutcome.resolved_failure_class's kernel-resolved fallbacks.
 Verify paper mode, database isolation, credential presence without values,
 scheduler state, and ignored artifact transfer. Do not start live trading, an
 evidence epoch, scheduled tasks, ML/LLM proposal integration, or destructive
-cleanup. The active milestone is action-plan Phase 1: UI feature controls
-per docs/reference/UI_FEATURE_CONTROLS_DESIGN.md with the resolved
-decisions recorded in the action plan. After it completes independent
-review, Phase 3 is a gap
-analysis for GR-1D manual reconciliation extraction, characterization
-first, one reviewable slice, focused/full validation, commit,
-and stop for independent review before GR-2. If the owner instead requests
+cleanup. UI feature controls were merged at 4c8e959 and accepted after the
+two P2 corrections in local-only a6d5254; do not repeat that review or use
+uncorrected main as the final reviewed tree. First obtain/merge the Codex
+review branch when authorized. Then execute action-plan Phase 2 hygiene
+(AP-1, AP-2, AP-4) as one reviewed milestone. Phase 3 is the later gap
+analysis for GR-1D manual reconciliation extraction, characterization first,
+one reviewable slice, focused/full validation, commit, and stop for independent
+review before GR-2. If the owner instead requests
 plan reconciliation, compare the committed Claude and Codex plans with an
 explicit evidence-backed difference ledger before drafting a final plan.
 ```

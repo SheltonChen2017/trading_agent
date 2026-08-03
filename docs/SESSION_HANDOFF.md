@@ -1,105 +1,91 @@
 # Development session handoff
 
-Prepared: 2026-08-03T15:05:00-07:00
+Prepared: 2026-08-03T15:13:00-07:00
 
 Audience: Codex, Claude Code, and the repository owner after changing
 computers or starting a new agent session.
 
-This file replaces every earlier handoff. Read it as one document; do not
-append an older handoff or follow an older “GR-1E next” instruction. Verify
-all Git claims after fetching because another session may have advanced the
-remote.
+This file replaces every earlier handoff. Fetch and verify its Git claims
+before acting; do not follow an older “review GR-3” instruction.
 
 ## 1. Read this first
 
-**GR-1E is complete and independently reviewed. GR-1 is complete against the
-intended scope of archived plan sections 6.2–6.4. No further GR-1 extraction
-is warranted.** Claude's GR-1E assessment reached the correct architectural
-decision: the remaining 281-line execution function is the composition layer,
-not an unextracted financial or broker kernel. Independent review corrected
-several overbroad documentation claims but changed no production or test code.
+**GR-3 is complete after independent correction and review.** Claude's core
+fault-matrix design was strong, but the submitted runner had material
+fail-open evidence paths, F4 did not create its required critical alert, and
+F3 did not actually rehearse restart from `submitting`. All confirmed findings
+are corrected on `codex/review-gr3-fault-drills-20260803`.
 
-Canonical durable records:
+Canonical records:
 
-- `docs/REVIEW_2026-08-03_GR1E_ASSESSMENT.md` — commit-by-commit disposition,
-  issue ledger, source assessment, validation, and genuine quality score;
-- `docs/GENERAL_READINESS_STATUS.md` — corrected GR-1E definition-of-done
-  adjudication;
-- `docs/ARCHITECTURE_DEBT.md` — only the `execution_service.py` portion of
-  item 1 is closed; `allocation_batch.py` remains open debt;
-- `docs/ACTION_PLAN_2026-08-02.md` — owner-adopted sequencing authority; and
-- `docs/FEATURE_MILESTONE_RECORD.md` — completed GR-1 two-audience record.
+- `docs/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md` — every commit disposition,
+  P0–P3 ledger, red/green proof, limitations, and quality score;
+- `docs/ACTION_PLAN_2026-08-02.md` — owner-adopted sequencing authority;
+- `docs/GENERAL_READINESS_STATUS.md` — corrected GR-3 status;
+- `docs/OPERATIONS_RUNBOOK.md` — exact drill behavior/operator command; and
+- `docs/FEATURE_MILESTONE_RECORD.md` — completed two-audience GR-3 record.
 
-**Phase 4 is ACTIVE (owner-directed, 2026-08-03).** GR-3 fault-injection
-drills are IMPLEMENTED at commit `4c395d7` on PUSHED branch
-`user/claude/gr-3-fault-drills-20260803` and await independent review — do
-not reimplement them, and do not merge without owner approval:
-eleven behavioral drills in `tests/faults/` (the archived plan's nine
-fault rows plus the two 2026-08-02 isolation regressions), each asserting
-the mandated refusal AND no partial persisted state, plus
-`scripts/run_fault_drill.py` (hash-stamped report; fail-closed inventory;
-records ambiguous_submission/restart_recovery/kill_switch drill rows,
-epoch-bound or verification_only; dirty-tree lineage records
-code_commit=unknown). Full suite on that tree: 2,498 passed / 1 skipped /
-25 warnings; mutation evidence: neutered injector and renamed inventory
-entry both detected. GR-5 alert delivery remains blocked on the owner's
-channel choice and will supply the last drill producer (alert_delivery).
+**Current next-step constraint:** Phase 4 remains active. GR-5 alert delivery
+is blocked on the owner's channel choice and is the only missing producer for
+`alert_delivery`. GR-2 remains the action plan's Phase 4 ride-along. Do not
+choose an alert channel, start GR-2, or substitute another milestone without
+the owner's direction.
 
-No work in GR-1E or its review enabled live trading, funded-account access,
-autonomous execution, proposal authority, model promotion, scheduled tasks,
-operator-database mutation, or a formal paper-evidence epoch.
+No GR-3 implementation or review action used a live broker, funded account,
+operator database, scheduler, or formal evidence epoch. Nothing authorizes
+live trading, deployment, or model/signal promotion.
 
 ## 2. Canonical Git state
 
 Repository: `https://github.com/SheltonChen2017/trading_agent`
 
-At handoff preparation:
+Verified at handoff preparation:
 
 ```text
-origin/main = local main = 16e04512786649a8697d631a12967fca36c9d185
-active branch = codex/review-gr1e-assessment-20260803
-active HEAD = d2d1e97 (before this handoff commit)
+origin/main = local main = d5400cc6d148eca22fc6bcd5c33c6ac24f523ac9
+main meaning = PR #126 merged the reviewed GR-1E branch
+Claude GR-3 branch = user/claude/gr-3-fault-drills-20260803
+Claude GR-3 tip = 61e03146f6c865c2468b282136883aa442d2fbad (pushed)
+active branch = codex/review-gr3-fault-drills-20260803
+active HEAD before this handoff = a35d369
 worktree = clean before replacing this file
 ```
 
-Initial commands on another computer:
+Commands on another computer:
 
 ```powershell
 git fetch --all --prune
 git status --short --branch
-git log --graph --decorate --oneline -20 --all
+git log --graph --decorate --oneline -25 --all
 git branch -vv
 git worktree list
+git switch --track origin/codex/review-gr3-fault-drills-20260803
 ```
 
-Merged history relevant to GR-1E:
+Claude implementation history:
 
 ```text
-2673714  Claude third-round GR-1D review confirmation
-c66db0a  PR #123 merge; exact tree of 2673714
-b12058f  GR-1E assessment; docs only
-015fc8b  post-assessment handoff
-2f4a360  PR #124 merge; exact tree of 015fc8b
-768a626  restore an omitted handoff paragraph
-16e0451  PR #125 merge; exact tree of 768a626; current main
+d5400cc  base / current main
+4c395d7  GR-3 fault matrix and runner implementation
+9c466f6  implementation handoff update
+61e0314  record pushed Claude branch
 ```
 
-Review branch commits after `main`:
+Independent review history after Claude's tip:
 
 ```text
-8bbe82b  Correct and complete independent GR-1E assessment review
-d2d1e97  Record completed GR-1 execution kernel split
-4d9416d  Replace session handoff after reviewed GR-1E
-b570fce  Record pushed GR-1E review handoff
+9f5ab5e  Correct and complete independent GR-3 fault-drill review
+a35d369  Record completed GR-3 fault-drill milestone
+<handoff commit>  Replace session handoff after reviewed GR-3
 ```
 
-The review branch was pushed to
-`origin/codex/review-gr1e-assessment-20260803`, configured to track it, and
-remote creation through `4d9416d` succeeded. The post-push commit containing
-this paragraph is pushed before handoff completion, so another computer can
-retrieve the complete review with `git fetch --all --prune` and switch to the
-remote branch. No pull request has been opened and this branch has not been
-merged into `main`; opening or merging a PR remains an owner decision.
+At preparation time the review branch is local-only. The owner previously
+directed the reviewer not to forget to push, so the branch and final handoff
+must be pushed and remote parity verified before closing this session. Until
+then another computer can fetch Claude's `61e0314` but not review correction
+`9f5ab5e`, milestone record `a35d369`, or this handoff. No pull request has
+been opened and neither Claude's branch nor this review branch has been merged
+into `main`; PR creation/merge remains an owner decision.
 
 ### Shared-worktree caution
 
@@ -110,237 +96,202 @@ C:\Users\sheltonchen\AppData\Local\Temp\claude\C--git-customizedAgent-trading-ag
 ```
 
 It holds local branch `user/claude/residual-signals-20260803` at `a1d2587`;
-its remote branch has been deleted after merge. Do not delete, move, prune,
-switch, or commit in that worktree. Before every future stage/commit, recheck
-`HEAD`, `git status`, and `git worktree list` because agents share repository
-objects.
+its remote is deleted. Do not delete, move, prune, switch, or commit in that
+worktree. Recheck `HEAD`, `git status`, and `git worktree list` before every
+future stage/commit because agents share Git objects.
 
 ### Other local-only work
 
-`codex/ai-strategy-tool-doc-v2-20260802` remains local at `a656015`, has no
-remote branch, and contains the AI-driven strategy/backtest-tool design.
-Preserve it. Do not recreate, delete, merge, or push it without owner
-direction.
+`codex/ai-strategy-tool-doc-v2-20260802` remains local-only at `a656015` and
+contains the AI-driven strategy/backtest-tool design. Preserve it; do not
+recreate, delete, merge, or push it without owner direction.
 
-## 3. GR-1E independent-review result
+## 3. GR-3 review result
 
-Final disposition: **accepted after documentation correction**.
+Final disposition: **accepted after correction**.
 
-Genuine assessment: **7.5/10 for Claude's submitted GR-1E assessment;
-9.5/10 for the corrected durable record.** Claude made the right stop/extract
-decision and correctly recognized that another dependency-injection layer
-would mostly move the coordinator. The submitted evidence was materially too
-absolute, which matters because this milestone's deliverable was the
-assessment itself.
+Genuine assessment: **7/10 submitted, 9.5/10 corrected**. Claude did well on
+the fault taxonomy, real temporary SQLite use, broker scripting, transaction
+rollback scenario, inventory mapping, and runbook. The lower submitted score
+reflects evidence integrity and definition-of-done failures in an operational
+safety milestone, not cosmetic preferences.
 
-Commit dispositions for exact review range `c66db0a..16e0451`:
+Commit dispositions (`d5400cc..61e0314`):
 
 | Commit | Disposition |
 |---|---|
-| `b12058f` | accepted after GR1EREV-001 and GR1EREV-002 documentation corrections |
-| `015fc8b` | accepted as an accurate awaiting-review handoff at commit time |
-| `2f4a360` | accepted; merge tree exactly equals `015fc8b` |
-| `768a626` | accepted after GR1EREV-003 provenance/handoff correction |
-| `16e0451` | accepted; merge tree exactly equals `768a626` |
+| `4c395d7` | accepted after GR3REV-001 through GR3REV-005 corrections |
+| `9c466f6` | accepted after GR3REV-006 replacement of its stale handoff state |
+| `61e0314` | accepted after GR3REV-006; pushed-state statement was correct |
 
-`2673714` and `c66db0a` are the GR-1D-confirmation base, not GR-1E
-implementation commits. The PR #123 merge tree exactly equals `2673714`.
+No merge commit is in the reviewed range.
 
-Resolved issue summary:
+Resolved findings:
 
 | ID | Priority | Correction |
 |---|---|---|
-| GR1EREV-001 | P2 | Replaced non-reproducible/overbroad “172 executable lines, every call a domain phase, no inline logic” evidence with source/AST facts. The coordinator has ordinary branching, exception mapping, time/message construction, and constructors, but no inline financial math, transition SQL, or broker interpretation. Clarified that `recover_stale_claim()` has one static reclaim call site inside a bounded loop and can invoke it more than once. Recorded that the archived “no test file changed except imports” clause contradicts its own requirement to add characterization tests; no pre-existing behavioral expectation was relaxed to make the split pass. |
-| GR1EREV-002 | P2 | Reopened architecture-debt item 1 as partially open because its original scope explicitly includes `allocation_batch.py`. GR-1 closes the execution-service split, not that separate cross-leg-reservation debt. Future ownership/sequencing comes from the adopted action plan. |
-| GR1EREV-003 | P3 | Replaced stale/contradictory handoff instructions and corrected the claim that `32f0378` was lost during PR #123 conflict resolution. It was never an ancestor of the merged line and was simply absent from PR #123's topic history; its useful content was later restored by `768a626`. |
+| GR3REV-001 | P2 | Active-epoch recording now refuses `unknown`, dirty, missing, or different runtime lineage; report commit must exactly equal the epoch commit before any row is written. |
+| GR3REV-002 | P2 | Skipped tests are failures. Pytest exit 1 is allowed only when JUnit contains a corresponding non-passing case; unexplained exit 1 and exit 2+ abort instead of certifying the matrix. |
+| GR3REV-003 | P2 | Reconciliation identity/malformed-intent halts now atomically write both the persistent kill switch and a deduplicated critical `broker_reconciliation` alert across manual, startup, stream, and replacement-chain paths. |
+| GR3REV-004 | P2 | F3 now starts from a truly ambiguous `submitting` row and proves startup lookup adopts the broker order with zero resubmit and retained reservation. Missing F5/F7 reservation/order/integrity assertions were added. |
+| GR3REV-005 | P2 | Immutable reports now write/flush/fsync a same-directory temporary file and publish through an atomic no-overwrite hard link; failure removes the temporary path. |
+| GR3REV-006 | P3 | Corrected “genuine disk full” overstatement, test-count wording, status/runbook details, and stale handoff topology. |
 
-No P0 or P1 finding exists. No runtime correction was necessary.
+No P0 or P1 issue remains.
 
-## 4. Why no further extraction is correct
+## 4. Completed GR-3 behavior
 
-The exact merged starting tree has:
+The final matrix contains eleven fault IDs mapped to fourteen behavioral
+tests:
 
-```text
-assistant/execution_service.py: 952 source lines
-module audit-history docstring: 198 lines
-execute_approved_paper_proposal(): 281 source lines
-```
+1. submit timeout resolves by idempotency lookup, never blind resubmit;
+2. duplicate order identity stays one projected order;
+3. pre-broker claim recovery, dead reconciliation recovery, and actual
+   `submitting` startup recovery;
+4. mismatched broker identity creates an atomic critical alert + halt and
+   blocks further submissions;
+5. one halted ticker refuses while an unrelated risk-reducing sell proceeds;
+6. share-count mismatch refuses before broker submission;
+7. stale and future-skewed quotes refuse;
+8. journal-write disk-full-shaped error rolls back the real SQLite transaction
+   and later reconciliation repairs it;
+9. mid-flight kill switch blocks new submissions while reconciliation runs;
+10. pytest stays off the operator database; and
+11. inherited brokerage credentials do not reach the suite.
 
-An independent Python-AST inventory of the coordinator found 54 statement
-nodes, 49 call nodes, and 28 distinct call expressions. The function orders
-the already-reviewed claim, validation, risk authorization, reservation,
-submission, outcome-resolution, journaling, and telemetry phases. It contains
-exactly one broker-submission call. The remaining local control flow is the
-composition contract: phase order, exception-to-terminal-state mapping,
-attempt/timestamp context, and diagnostic construction.
+`scripts/run_fault_drill.py` runs the complete inventory, fails on missing,
+skipped, unmapped, or unexplained-abort state, and emits an atomic hash-stamped
+report. It can record `ambiguous_submission`, `restart_recovery`, and
+`kill_switch` rows. With an active epoch, exact clean commit equality is
+mandatory. Without an epoch, rows are explicitly `verification_only` and may
+carry `code_commit=unknown`; they are not promotion evidence.
 
-The two recovery wrappers remain intentionally on the facade. Both validate
-inputs and diagnose refusal around the atomic
-`AssistantStore.reclaim_stale_status` primitive. Reconciliation recovery
-invokes it once. Claim recovery iterates a bounded set of stranded statuses
-and can invoke the same primitive for more than one candidate before success.
-The concurrency semantics remain in storage.
+Limitations: F8 injects a `sqlite3.OperationalError` at the event-insert
+statement after earlier statements ran in the same real transaction. It
+proves application rollback behavior, not physical disk/filesystem exhaustion.
+`alert_delivery` remains unproducible until GR-5; `backup_restore` retains its
+existing recovery-drill producer.
 
-Eight direct kernel modules remain independently testable, private peer
-imports are AST-forbidden, atomic claim/reclaim transitions remain storage
-operations, and ambiguous broker submissions still reconcile instead of
-blind-retrying. Another wrapper/kernel extraction would preserve all this
-same coordinator logic elsewhere and add a dependency/seam family without a
-material safety or maintainability gain.
-
-## 5. Validation and environment
-
-Final validation ran on commit content equivalent to `8bbe82b`; the review
-changed documentation only.
+## 5. Validation and review evidence
 
 ```text
 Python: 3.13.14
-focused GR-1 architecture/characterization/recovery set:
-  93 passed in 31.62s
+submitted matrix baseline:
+  13 passed in 17.56s
+red runner reproduction:
+  4 failed as expected (skip, unexplained exit, unknown/mismatched epoch)
+red F4 reproduction:
+  1 failed as expected (zero operational alerts)
+corrected narrow runner/F3/F4:
+  6 passed in 1.91s
+corrected combined focused suite:
+  110 passed in 36.40s
 full suite:
-  2,485 passed, 1 skipped, 25 warnings in 420.68s
-compileall:
+  2,506 passed, 1 skipped, 25 warnings in 423.31s
+post-full runner regression:
+  7 passed in 13.69s
+post-full CLI:
+  passed; 11 fault IDs; 0 unmapped tests
+compileall on exact final correction tree:
   clean
 git diff --check:
   clean
 ```
 
-The 25 warnings are the known non-failing `websockets.legacy` and
-joblib/NumPy deprecations. The full run explicitly cleared inherited Alpaca
-credential variables and pointed the process at a disposable database path;
-tests also apply their own isolation.
+Warnings are the known non-failing `websockets.legacy` and joblib/NumPy
+deprecations. Full tests explicitly cleared inherited Alpaca credentials and
+used a disposable process database; root pytest isolation also applied. All
+review pytest trees and generated drill reports were verified inside the
+workspace and removed. The CLI executed from a dirty review worktree, so its
+standalone report correctly said `code_commit=unknown`; it was never recorded
+to a database and was deleted.
 
-The first focused command used a base-temp path beneath a missing `.tmp`
-parent: 51 cases passed and 42 fixture setups errored with
-`FileNotFoundError`. Rerunning with a valid top-level base-temp produced the
-clean 93-pass result above. This was a test-runner path mistake, not a product
-failure. Both pytest temp trees were verified inside the workspace and
-removed; the disposable database did not remain.
+Mutation/red sensitivity:
 
-## 6. Current roadmap and exact next action
+- the submitted skipped-case parser returned pass; corrected test catches it;
+- the submitted unexplained nonzero exit returned pass; corrected test catches
+  it;
+- the submitted epoch recorder accepted both unknown and mismatched commits;
+  two corrected tests catch them while a matching commit still records;
+- submitted F4 produced no alert; strengthened drill failed red then passed;
+- injected alert-insert failure proves halt + alert roll back together; and
+- injected report publication failure leaves no destination or temp file.
 
-Completed and do not repeat:
+## 6. Exact next action and open owner decisions
 
-- UI feature controls: merged and reviewed through PR #117;
-- Phase 2 hygiene: merged/reviewed through PR #119;
-- GR-1C: completed through its review/confirmation rounds;
-- GR-1D: merged as PR #120 and independently accepted;
-- residual/PEAD exploratory utilities: merged as PR #121 and independently
-  corrected; no finding promoted;
-- GR-1E/GR-1: accepted complete by this review.
+The action plan remains authoritative. GR-3 is done; do not repeat it.
 
-The sequencing authority is `docs/ACTION_PLAN_2026-08-02.md`. Phase 4 is
-ACTIVE:
+Before GR-5 can proceed, the owner must choose a real alert-delivery channel
+(email, webhook, push, or another concrete transport) and authorize that
+implementation. GR-5 must add delivery records, weekly self-test, operator
+surface, and the final `alert_delivery` drill producer. GR-2 is still described
+as the Phase 4 ride-along, but this handoff does not independently authorize
+starting it.
 
-1. GR-3 fault drills: IMPLEMENTED at `4c395d7`
-   (`user/claude/gr-3-fault-drills-20260803`, pushed) — the next
-   action is an independent review of that exact commit per
-   `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`;
-2. owner chooses the GR-5 alert-delivery channel and authorizes the
-   concrete implementation slice;
-3. implement/review GR-5 delivery records, self-test, and operator
-   surface (adds the final alert_delivery drill producer); and
-4. perform GR-2 risk-registry consolidation as the action plan's
-   ride-along, without silently absorbing the separately tracked
-   allocation-batch debt.
+Other owner decisions remain open:
 
-Do not start Phase 5 operational deployment or a formal evidence epoch merely
-because Phase 3 is complete. The adopted plan deliberately finishes the
-operations-unblocking Phase 4 work first.
+- whether to open/merge the pushed GR-3 review branch;
+- whether to push/merge the local AI-strategy design branch;
+- evidence-epoch hosting model and later mandate approval;
+- operator database path/divergent snapshot handling;
+- historical/reference data vendors and budget; and
+- elevated scheduler deployment/credential rotation timing.
 
-Still not started or not authorized: GR-2 through GR-9 except where the plan
-explicitly says otherwise; qualifying paper evidence epoch; ML promotion,
-adapters, or canary; AI strategy authoring implementation; proposal-history
-cleanup; AI debate; allocation service; and MCP.
+None implies live/funded trading authority.
 
-## 7. Owner decisions still open
+## 7. Non-negotiable safety boundaries
 
-Do not infer answers to these:
-
-1. GR-5 delivery channel (email, webhook, push, or another concrete channel)
-   and the precise Phase 4 implementation authorization;
-2. whether to open/merge the pushed GR-1E review branch;
-3. whether to push/merge the local AI-strategy-tool design branch;
-4. freeze-then-collect versus a pinned operational host for the later
-   evidence epoch;
-5. mandate approval or revision of draft targets;
-6. operator database path and divergent-snapshot handling;
-7. historical-membership/reference-data vendor, budget, and adjustment
-   ownership; and
-8. timing for elevated scheduler deployment and credential rotation.
-
-None grants live or funded trading authority by implication.
-
-## 8. Non-negotiable safety boundaries
-
-- Paper trading remains the only execution mode in scope.
-- LLM output is advisory text only; it cannot create approval or execution
-  authority.
-- No live/funded brokerage path may be enabled or made convenient.
-- Every order still requires exact owner approval, a fresh policy-bound
-  proposal, atomic claim, deterministic risk validation, budget reservation,
-  telemetry, idempotent submission, and reconciliation.
-- Ambiguous broker outcomes must never be blind-retried.
-- Reservations release only on already-reviewed definitive paths.
-- Same-key mismatched orders require a persistent kill switch and manual
-  investigation.
-- ML research/candidate signals are non-authoritative and cannot influence
-  execution.
-- Never commit credentials, licensed data, operator databases, or generated
+- Paper trading is the only execution mode in scope.
+- LLM/ML output is advisory or observational and cannot create approval,
+  sizing, execution, cancellation, replacement, or policy authority.
+- No funded brokerage path may be enabled or made convenient.
+- Exact approval, policy fingerprint, atomic claim, deterministic risk checks,
+  reservation, telemetry, idempotent submission, and reconciliation remain
+  mandatory.
+- Ambiguous submissions are reconciled, never blind-retried.
+- A same-key broker mismatch remains unresolved, retains budget, atomically
+  halts the platform, creates a critical alert, and requires investigation.
+- Never commit credentials, operator databases, licensed data, or generated
   evidence artifacts.
 
-## 9. Machine-local operational state
+## 8. Machine-local operational state
 
-GR-1E review did not inspect or mutate the operator database, scheduler,
-credentials, broker account, or ignored artifacts. The following is carried
-forward from the prior handoff and must be remeasured on the destination
-computer before operational use:
+This review deliberately did not inspect or modify the operator database,
+broker account, credentials, scheduler, or formal evidence state. Previous
+handoffs contained machine-local measurements, but they were not revalidated
+in this session and must not be treated as current. Before operations:
+
+- identify the intended database path explicitly;
+- run read-only schema/integrity verification before any apply action;
+- confirm the Alpaca account is paper without printing credentials;
+- inspect scheduler state in an elevated window;
+- keep development/tests on disposable databases; and
+- do not start or append to an evidence epoch from a moving/dirty checkout.
+
+The previously recorded local backup path/hash may be useful for provenance
+only and must be rechecked before reliance:
 
 ```text
-operator DB path recorded previously:
-  C:\git\customizedagent\trading_agent\data\trading_assistant.db
-previous measured size:
-  3,670,016 bytes
-previous quick_check:
-  ok
-previous schema verification:
-  required tables/columns and named index/trigger definitions matched;
-  table types/constraints were not compared byte-for-byte
-verified backup path:
-  data/backups/trading_assistant-pre-phase2-schema-20260803T171810Z.db
-backup SHA-256:
-  cc70b8d39fdd854075c81f17666d5ac8c1147344d46f8837ee2cb3fa41ccb6b5
-scheduler:
-  unknown; prior Get-ScheduledTask attempt returned Access Denied
-formal evidence epoch:
-  none started
+data/backups/trading_assistant-pre-phase2-schema-20260803T171810Z.db
+cc70b8d39fdd854075c81f17666d5ac8c1147344d46f8837ee2cb3fa41ccb6b5
 ```
 
-Prior recorded database counts conflict with an earlier machine snapshot;
-do not combine histories or assume which local database is authoritative
-without backup/provenance analysis. Credentials must be recreated through a
-secret manager and only their presence—not values—may be reported. Keep test
-and development databases separate from operator state. `config.py` still
-sets `PAPER_TRADING = True`; do not change it during setup.
+## 9. Required reading order
 
-## 10. Required reading order
-
-Before any next implementation:
+Before the next implementation:
 
 1. `CLAUDE.md` and `AGENTS.md` completely;
 2. `docs/ACTION_PLAN_2026-08-02.md`;
 3. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`;
 4. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`;
 5. `docs/SESSION_HANDOFF.md` (this file);
-6. `docs/REVIEW_2026-08-03_GR1E_ASSESSMENT.md`;
-7. `docs/GENERAL_READINESS_STATUS.md` GR-1E; and
-8. the archived plan section for whichever Phase 4 milestone the owner
-   actually authorizes.
+6. `docs/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md`;
+7. `docs/OPERATIONS_RUNBOOK.md` GR-3 section; and
+8. the archived plan section for the owner-authorized Phase 4 work.
 
-Every completed review must update and separately commit this handoff. Never
-leave a stale next-action instruction above a later addendum.
+Every completed review must replace/update and separately commit this handoff.
 
-## 11. Exact resume prompt
+## 10. Exact resume prompt
 
 ```text
 Read CLAUDE.md and AGENTS.md completely, then read
@@ -348,16 +299,15 @@ docs/ACTION_PLAN_2026-08-02.md,
 docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md,
 docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md,
 docs/SESSION_HANDOFF.md, and
-docs/REVIEW_2026-08-03_GR1E_ASSESSMENT.md. Fetch/prune and verify every SHA,
-branch, worktree, and remote claim before acting. Main is 16e0451. GR-1E was
-accepted after documentation correction at review commit 8bbe82b, and the
-completed GR-1 milestone record is d2d1e97. GR-1 is complete; do not repeat
-GR-1E or perform another execution-service extraction. allocation_batch.py
-debt remains open even though the execution-service portion is closed. The
-owner-adopted next phase is Phase 4: GR-5 alert delivery plus GR-3 fault
-drills, with GR-2 riding along; obtain the owner's GR-5 channel choice and
-concrete authorization before implementing. Do not enable live trading,
-start an evidence epoch, deploy scheduled tasks, promote ML/signals, mutate
-the operator database, or touch the other Claude worktree. Preserve local
-AI-strategy design branch a656015 and all ignored/credential state.
+docs/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md. Fetch/prune and verify every SHA,
+branch, remote, and worktree before acting. Main is d5400cc. Claude's GR-3
+tip is pushed at 61e0314. Independent corrections are 9f5ab5e and the
+milestone record is a35d369 on codex/review-gr3-fault-drills-20260803. GR-3
+is complete; do not repeat it. The remaining Phase 4 blocker is GR-5 alert
+delivery, which requires the owner's channel choice and implementation
+authorization; GR-2 is only the documented ride-along, not implied authority.
+Do not enable live trading, start an evidence epoch, deploy scheduled tasks,
+promote ML/signals, mutate the operator database, or touch the other Claude
+worktree. Preserve local AI-strategy branch a656015 and ignored/credential
+state.
 ```

@@ -1,6 +1,6 @@
 # Development session handoff
 
-Prepared: 2026-08-03T15:13:00-07:00
+Prepared: 2026-08-03T16:10:00-07:00
 
 Audience: Codex, Claude Code, and the repository owner after changing
 computers or starting a new agent session.
@@ -10,11 +10,22 @@ before acting; do not follow an older “review GR-3” instruction.
 
 ## 1. Read this first
 
-**GR-3 is complete after independent correction and review.** Claude's core
-fault-matrix design was strong, but the submitted runner had material
-fail-open evidence paths, F4 did not create its required critical alert, and
-F3 did not actually rehearse restart from `submitting`. All confirmed findings
-are corrected on `codex/review-gr3-fault-drills-20260803`.
+**GR-3 is complete after independent correction, review, and third-round
+confirmation.** Claude's core fault-matrix design was strong, but the
+submitted runner had material fail-open evidence paths, F4 did not create
+its required critical alert, and F3 did not actually rehearse restart from
+`submitting`. All confirmed findings are corrected on
+`codex/review-gr3-fault-drills-20260803`. Claude's confirmation
+(commit `c168b7a` on branch `user/claude/gr-3-review-confirmation-20260803`,
+based on review tip `7e846f1`) reproduced all seven red proofs on exact
+`4c395d7`, reverse-mutated one runner fix (detected), and found + fixed one
+additional P2 of the review's own headline class (GR3CONF-001): the
+submit-time mismatch halts in
+`assistant/execution_kernel/outcomes.py::resolve_failed_submission` still
+used bare `set_kill_switch` with no durable alert; both sites now route
+through `activate_reconciliation_halt`, pinned by a third F4 drill test in
+the harness inventory. Full suite on the confirmation tree: 2,507 passed /
+1 skipped / 25 warnings.
 
 Canonical records:
 

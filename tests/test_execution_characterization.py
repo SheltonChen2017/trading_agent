@@ -583,6 +583,110 @@ def test_gr1c_validation_clock_still_resolves_from_the_facade(store, monkeypatch
     assert str(outcome.quote_received_at).startswith("2099-01-01T00:00:00")
 
 
+# The complete, deliberate set of module-scope names the moved validation
+# body may read at runtime. Everything else it consults must arrive through
+# ProposalValidationDeps -- see that class's docstring for why each of these
+# three is excluded from injection (the module's own return type, a
+# never-invoked tzinfo constant, and immutable failure-class strings).
+_KERNEL_VALIDATION_ALLOWED_GLOBALS = frozenset({
+    "ProposalValidationOutcome",
+    "timezone",
+    "FAILURE_DATA_INTEGRITY",
+    "FAILURE_INFRASTRUCTURE",
+})
+
+
+def test_gr1c_the_kernel_body_reads_no_unexpected_module_globals():
+    """Structural guard behind the whole GR-1C seam family.
+
+    The behavioural tests above each freeze ONE seam. This pins the
+    boundary itself: run_proposal_validation() may read exactly the
+    module-scope names in _KERNEL_VALIDATION_ALLOWED_GLOBALS and nothing
+    else. A future edit that resolves ANY new name from the kernel's module
+    scope -- including quietly reverting an injected dep back to a direct
+    call, the regression class both GR-1C mutation rounds targeted -- fails
+    here by name, forcing the inject-or-allowlist decision to be explicit.
+    An AST test rather than a behavioural one because the invariant is
+    about name RESOLUTION, which runtime behaviour cannot observe once the
+    kernel's own import happens to point at the same object as the facade's.
+
+    Annotations are excluded from the read set: under ``from __future__
+    import annotations`` they are never evaluated, so a type name appearing
+    only in an annotation is not a runtime resolution.
+    """
+    import ast
+    import builtins
+    from pathlib import Path
+
+    source_path = (
+        Path(__file__).resolve().parent.parent
+        / "assistant" / "execution_kernel" / "validate.py"
+    )
+    tree = ast.parse(source_path.read_text(encoding="utf-8"))
+    fn = next(
+        node for node in tree.body
+        if isinstance(node, ast.FunctionDef)
+        and node.name == "run_proposal_validation"
+    )
+
+    bound: set[str] = {
+        a.arg
+        for a in (fn.args.posonlyargs + fn.args.args + fn.args.kwonlyargs)
+    }
+    for vararg in (fn.args.vararg, fn.args.kwarg):
+        if vararg is not None:
+            bound.add(vararg.arg)
+
+    # Pass 1: every name the body BINDS (assignments, loop/with/except and
+    # comprehension targets). Collected before reading loads so that a
+    # comprehension's element expression -- which the AST orders before its
+    # generators -- cannot misreport its own target as a global read.
+    class StoreCollector(ast.NodeVisitor):
+        def visit_Name(self, node: ast.Name) -> None:
+            if isinstance(node.ctx, (ast.Store, ast.Del)):
+                bound.add(node.id)
+
+        def visit_ExceptHandler(self, node: ast.ExceptHandler) -> None:
+            if node.name:
+                bound.add(node.name)
+            self.generic_visit(node)
+
+    # Pass 2: every name the body READS, skipping annotation subtrees.
+    loads: set[str] = set()
+
+    class LoadCollector(ast.NodeVisitor):
+        def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
+            self.visit(node.target)
+            if node.value is not None:
+                self.visit(node.value)
+
+        def visit_Name(self, node: ast.Name) -> None:
+            if isinstance(node.ctx, ast.Load):
+                loads.add(node.id)
+
+    for statement in fn.body:
+        StoreCollector().visit(statement)
+        LoadCollector().visit(statement)
+
+    module_reads = {
+        name for name in loads
+        if name not in bound and not hasattr(builtins, name)
+    }
+    unexpected = module_reads - _KERNEL_VALIDATION_ALLOWED_GLOBALS
+    assert not unexpected, (
+        "run_proposal_validation() reads module-scope names outside the "
+        f"deliberate allowlist: {sorted(unexpected)}. Either inject them "
+        "through ProposalValidationDeps (facade-patchable, the default) or "
+        "add them to the allowlist WITH a documented reason in the deps "
+        "docstring."
+    )
+    # Keep the allowlist honest in the other direction too: an entry the
+    # body no longer reads must be removed, or the list quietly rots into
+    # permission the code does not use.
+    stale = _KERNEL_VALIDATION_ALLOWED_GLOBALS - module_reads
+    assert not stale, f"allowlisted but no longer read: {sorted(stale)}"
+
+
 # --------------------------------------------------------------------------
 # 2. execute_approved_paper_proposal
 # --------------------------------------------------------------------------

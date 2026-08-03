@@ -59,9 +59,9 @@ from risk.execution_gate import TradeIntent, ValidationResult
 @dataclasses.dataclass(frozen=True)
 class ProposalValidationOutcome:
     """
-    Pure, side-effect-free result of checking whether a proposal is
-    currently eligible to execute -- never claims, never writes proposal
-    status, never submits, never authorizes. Used by BOTH
+    Read-only result of checking whether a proposal is currently eligible
+    to execute -- never claims, never writes proposal status, never
+    submits, never authorizes. Used by BOTH
     execute_approved_paper_proposal() (immediately after its own atomic
     claim) and preflight_allocation_batch() (read-only, no claim at all)
     (2026-07-29, GPT review): these two had started to drift, since
@@ -148,6 +148,30 @@ class ProposalValidationDeps:
     imports one of these callables here directly, silently breaks that seam;
     tests/test_execution_characterization.py freezes each field against
     exactly that edit.
+
+    The injection boundary, stated exactly (GR-1C review follow-up,
+    2026-08-02): injected = every name the moved body INVOKES at runtime
+    that is not defined by this module -- functions, constructors, the
+    clock, and the deferred broker import. Three names the old facade body
+    also resolved from its module globals are DELIBERATELY not injected,
+    and run_proposal_validation() resolves them from this module instead:
+
+    - ``ProposalValidationOutcome`` -- defined in this module; the facade
+      name is an alias to this class, so injecting the function's own
+      return type back into it would be circular. A facade-level patch of
+      that alias no longer redirects the kernel's constructions; no test
+      ever used that as a seam.
+    - ``timezone`` -- read (``timezone.utc``), never invoked. Freezing
+      time goes through the injected ``datetime_type``, which both clock
+      reads use.
+    - ``FAILURE_*`` constants -- immutable strings defined in
+      assistant.execution_telemetry; behavioral meaning is carried by
+      which constant a branch selects, not by the constant's value.
+
+    test_gr1c_the_kernel_body_reads_no_unexpected_module_globals pins this
+    exact allowlist, so adding ANY new module-global read to the body --
+    including quietly resolving a formerly injected dep -- fails loudly and
+    forces the inject-or-allowlist decision to be made explicitly.
     """
     # Deferred provider for execution.alpaca_broker, called mid-sequence at
     # the point the historical inline import ran. A provider rather than the

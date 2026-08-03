@@ -79,7 +79,11 @@ from assistant.risk_copilot import (
     portfolio_risk_decomposition,
 )
 from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
-from assistant.storage import AssistantStore
+from assistant.storage import (
+    AssistantStore,
+    configured_db_path,
+    verify_database_schema,
+)
 from assistant.strategy_proposals import CONFIGURED_LEVERAGED_PAIRS, generate_leveraged_pair_rebalance_proposals
 from backtest.research_report import verify_research_report
 from execution.alpaca_broker import get_account, is_configured
@@ -590,6 +594,25 @@ def command_backup_db(args, store: AssistantStore) -> None:
         destination = store.path.parent / "backups" / f"trading_assistant-{timestamp}.db"
     target = store.backup_to(destination)
     print(f"Database backup created: {target}")
+
+
+def command_verify_db_schema(args) -> None:
+    """AP-1: prove the database carries the schema current code declares.
+
+    Read-only by default -- an operator can check a database without
+    migrating it as a side effect, which is why this handler runs WITHOUT
+    the store construction main() performs for every other command (that
+    construction IS the migration). ``--apply`` opts into opening the
+    database with current code first (idempotent CREATE IF NOT EXISTS plus
+    column migrations), then verifies the result.
+    """
+    database = Path(args.database) if args.database is not None else configured_db_path()
+    if args.apply:
+        AssistantStore(database)
+    result = verify_database_schema(database)
+    print(json.dumps(result.to_dict(), indent=2, sort_keys=True))
+    if not result.matches:
+        raise SystemExit(2)
 
 
 def command_mandate_status(args, store: AssistantStore) -> None:
@@ -1323,6 +1346,22 @@ def build_parser() -> argparse.ArgumentParser:
     backup.add_argument("destination", nargs="?", type=Path)
     backup.set_defaults(handler=command_backup_db)
 
+    verify_schema = commands.add_parser(
+        "verify-db-schema",
+        help=(
+            "Verify the database schema matches current code. Read-only by "
+            "default; --apply opens the database with current code first, "
+            "which idempotently creates any missing tables, columns, "
+            "indexes, and triggers."
+        ),
+    )
+    verify_schema.add_argument(
+        "--apply",
+        action="store_true",
+        help="Apply the current schema (open with current code) before verifying.",
+    )
+    verify_schema.set_defaults(handler=command_verify_db_schema, needs_store=False)
+
     mandate_status = commands.add_parser(
         "mandate-status",
         help="Validate and display the machine-readable portfolio mandate.",
@@ -1585,6 +1624,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
+    # verify-db-schema declares needs_store=False: constructing the store
+    # would migrate the database before the handler runs, making read-only
+    # verification of a pre-migration database impossible.
+    if not getattr(args, "needs_store", True):
+        args.handler(args)
+        return
     store = AssistantStore(args.database)
     args.handler(args, store)
 

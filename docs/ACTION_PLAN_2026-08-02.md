@@ -18,8 +18,9 @@ blocked by the remaining GR-1 kernel work.
 
 Prepared: 2026-08-02, by Claude, at `origin/main` = `ff8c16e` (post PR #112);
 adopted and reprioritized at `ded68b0` (post PR #113/#114); UI Phase 1
-implemented and merged as PR #116 at `4c8e959`, then independently accepted
-after corrections on local-only Codex review commit `a6d5254`.
+implemented and merged as PR #116 at `4c8e959`, independently accepted
+after corrections (`a6d5254`), confirmed by Claude's third round, and the
+whole review chain merged as PR #117 at `661a7d4` (2026-08-03).
 
 Method: four parallel verified surveys over every implementation plan and
 design document under `docs/`, each claim checked against the actual code
@@ -110,7 +111,8 @@ workflow. Independent review added behavioral coverage proving the real UI
 toggle persists and refreshes authoritative status in both directions, binds
 editor state to the selected policy, and prevents disabled suggestion sources
 from calling their providers. Implementation merge: `4c8e959`; accepted after
-local-only review correction `a6d5254`.
+review correction `a6d5254`; the full review chain (correction, handoff,
+third-round confirmation) merged as PR #117 at `661a7d4`.
 
 ---
 
@@ -158,10 +160,10 @@ local-only review correction `a6d5254`.
 
 | ID | Priority | Finding | Fix |
 |---|---|---|---|
-| AP-1 | P2 | **Operator DB schema is stale**: `execution_telemetry_events` and `portfolio_capture_sessions` are declared in `assistant/storage.py` but absent from `data/trading_assistant.db` (24 tables present). Telemetry/capture chains cannot run until current code opens the DB. | open the DB once with current code before any epoch; verify with `PRAGMA table_info` |
-| AP-2 | P2 | **`.gitignore` gap**: ML runtime writes `artifacts/shadow.json`, `artifacts/model/`, `artifacts/{datasets,experiments,reviews}/` — none ignored. First scheduled run dirties the worktree, and evidence capture **refuses a dirty worktree** → silent cadence failure. | extend `.gitignore` before any task install |
+| AP-1 | P2 | **Operator DB schema is stale**: `execution_telemetry_events` and `portfolio_capture_sessions` are declared in `assistant/storage.py` but absent from `data/trading_assistant.db` (24 tables present). Telemetry/capture chains cannot run until current code opens the DB. | open the DB once with current code before any epoch; verify with `PRAGMA table_info` — **implemented 2026-08-03 (Phase 2 branch): `verify-db-schema` CLI + `verify_database_schema()` with migration tests. Operator DB was backed up pre-change, then verification found the schema ALREADY current (both tables present with full declared columns; the owner's normal use had opened the DB with current code since the audit snapshot) — read-only verify reports an exact match** |
+| AP-2 | P2 | **`.gitignore` gap**: ML runtime writes `artifacts/shadow.json`, `artifacts/model/`, `artifacts/{datasets,experiments,reviews}/` — none ignored. First scheduled run dirties the worktree, and evidence capture **refuses a dirty worktree** → silent cadence failure. | extend `.gitignore` before any task install — **implemented 2026-08-03 (Phase 2 branch): `artifacts/` ignored wholesale, regression-tested via `git check-ignore`** |
 | AP-3 | P3 | 118 `portfolio_equity_snapshots` rows are mixed briefing/test-pollution provenance (pre-2026-08-02); any evidence report over them is unreliable | treat pre-2026-08-02 rows as non-evidence; decide retention at epoch start |
-| AP-4 | P3 | Doc staleness cluster: `validate.py` figure 479→490 (grew in `7f431b6`); characterization-suite docstring still says "2,040 lines"; STATUS "corrects" a 1,450 figure the plan never contained; GR-1D/1E exist only in SESSION_HANDOFF, absent from plan and status docs; ML status doc has 3 internally stale paragraphs (spec library "not built" vs delivered; "calibration emitted empty" vs wired; ML-FS §2 overstates ML-FS-6) | one doc-reconciliation commit |
+| AP-4 | P3 | Doc staleness cluster: `validate.py` figure 479→490 (grew in `7f431b6`); characterization-suite docstring still says "2,040 lines"; STATUS "corrects" a 1,450 figure the plan never contained; GR-1D/1E exist only in SESSION_HANDOFF, absent from plan and status docs; ML status doc has 3 internally stale paragraphs (spec library "not built" vs delivered; "calibration emitted empty" vs wired; ML-FS §2 overstates ML-FS-6) | one doc-reconciliation commit — **implemented 2026-08-03 (Phase 2 branch), including the post-merge PR #117 state in this plan** |
 | AP-5 | P3 | 4 of 5 `REQUIRED_PROMOTION_DRILLS` have no producer (only `backup_restore` does) — structurally unproducible until GR-3/GR-5 | note in GR-3/GR-5 scope; do not fake |
 
 ---
@@ -188,8 +190,8 @@ model 2 starts the 3-month clock **now** and time is the scarcest input.
 
 ## 8. Adopted sequencing (owner-approved 2026-08-02)
 
-**Phase 1 — UI feature controls (COMPLETE: implemented, independently
-reviewed, confirmed, and pushed — only the final merge remains):**
+**Phase 1 — UI feature controls (COMPLETE AND MERGED: implementation
+PR #116, review chain PR #117 at `661a7d4`):**
 Implemented `docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` as one milestone:
 the Settings & Features tab (three control classes), AI master + per-feature
 preferences gating all four LLM surfaces, read-only data-source and safety
@@ -203,11 +205,11 @@ at `4c8e959`; independent review accepted it after two P2 corrections
 (`a6d5254`); Claude's third-round confirmation re-verified both corrections
 red/green with a three-mutation sweep (all caught) and hardened one
 environment-sensitive runtime-identity test the confirmation run exposed.
-The review chain is pushed on
-`user/claude/ui-review-confirmation-20260803`. No live authority or formal
-evidence epoch was enabled.
+The review chain from `user/claude/ui-review-confirmation-20260803` merged
+as PR #117. No live authority or formal evidence epoch was enabled.
 
-**Phase 2 — hygiene (NEXT after the reviewed UI chain merges):**
+**Phase 2 — hygiene (ACTIVE — implemented 2026-08-03 on branch
+`user/claude/phase2-hygiene-20260803`, awaiting independent review):**
 AP-1, AP-2, AP-4 doc reconciliation; add GR-1D/1E to the GR status doc.
 
 **Phase 3 — finish the kernel (1–2 milestone cycles):**

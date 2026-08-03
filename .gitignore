@@ -16,9 +16,20 @@ data/backups/
 data/drill_evidence/
 data/research_reports/
 
-# Licensed, machine-local market-data snapshots. Manifests and raw DBN files
-# may contain vendor data and must never be committed or redistributed.
-artifacts/databento/
+# Machine-local runtime artifacts (AP-2, ACTION_PLAN 2026-08-02). The
+# documented operational commands write inside the repository -- the
+# runbook's supervisor/shadow invocations use artifacts/shadow.json,
+# artifacts/model/, artifacts/ml-*.json, and the experiment CLI documents
+# artifacts/{datasets,experiments,reviews}/. Two reasons the whole
+# directory is ignored:
+#   1. licensed vendor data (artifacts/databento/) must never be committed
+#      or redistributed; and
+#   2. evidence capture (assistant/runtime_identity.py) refuses ANY
+#      untracked file, so one unignored artifact from a scheduled run
+#      would silently stop the evidence cadence.
+# Nothing under artifacts/ has ever been tracked; models and datasets are
+# hash-verified at load instead of being version-controlled.
+artifacts/
 
 # Claude Code session transcripts and machine-local permissions -- these
 # were committed by accident (Codex review, 2026-07-27: a 17MB session

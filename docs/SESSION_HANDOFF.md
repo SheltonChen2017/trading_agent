@@ -17,7 +17,8 @@ On the new computer, clone or update the repository and give either agent this
 instruction:
 
 ```text
-Read CLAUDE.md and docs/SESSION_HANDOFF.md completely before acting. Then read
+Read CLAUDE.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
+docs/SESSION_HANDOFF.md completely before acting. Then read
 docs/GENERAL_READINESS_STATUS.md, docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md,
 and docs/ARCHITECTURE_DEBT.md. Establish the actual remote branches, HEAD,
 worktree, Python version, ignored-data state, credential presence, paper-account
@@ -61,11 +62,13 @@ Claude GR-1C branch, pushed and clean:
 Codex independent GR-1C review branch:
   branch: codex/review-claude-gr1c-20260802
   review commit: 465df8d  Complete independent GR-1C review
+  replacement handoff commit: c280142  Replace session handoff after reviewed GR-1C
   remote state at handoff preparation: LOCAL ONLY, NOT PUSHED
 
-This replacement handoff is committed after 465df8d on that same review
-branch. Its own commit is the branch commit whose subject records the updated
-post-GR-1C session handoff.
+The repository-wide review process and the cross-reference from this handoff
+are committed after c280142 on the same review branch. That documentation
+commit is the branch tip whose subject records the mandatory review/handoff
+workflow.
 ```
 
 The review branch is based directly on Claude's `b4d9b1f`. Therefore a pull
@@ -73,7 +76,8 @@ request from `codex/review-claude-gr1c-20260802` to `main` contains:
 
 1. Claude's complete GR-1C implementation;
 2. the independent review corrections;
-3. this replacement handoff.
+3. the replacement handoff; and
+4. the repository-wide review/handoff process.
 
 Do not separately cherry-pick both `b4d9b1f` and `465df8d` after taking the
 review branch; the latter already has the former as its parent.
@@ -105,14 +109,16 @@ git push -u origin codex/ai-strategy-tool-doc-v2-20260802
 ```
 
 If those branches are not pushed or bundled before the old Git object database
-is lost, commits `465df8d`, the handoff commit after it, and `a656015` will not
-be available from GitHub. Claude's `b4d9b1f` is already remote.
+is lost, commits `465df8d`, `c280142`, the process-document commit after it,
+and `a656015` will not be available from GitHub. Claude's `b4d9b1f` is already
+remote.
 
 ## 3. Relevant GR-1 commit history
 
 Recent sequence:
 
 ```text
+c280142  Codex: replace session handoff after reviewed GR-1C (local at preparation)
 465df8d  Codex: complete independent GR-1C review (local at preparation)
 b4d9b1f  Claude: GR-1C validation extraction and dependency injection (pushed)
 5dda78e  Merge PR #107: GR-1B follow-up review into main
@@ -537,24 +543,25 @@ the owner explicitly changes priority.
 For the next coding session:
 
 1. `CLAUDE.md`
-2. `docs/SESSION_HANDOFF.md`
-3. `docs/GENERAL_READINESS_STATUS.md`
-4. `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
-5. `docs/ARCHITECTURE_DEBT.md`
-6. `assistant/execution_service.py`
-7. every file under `assistant/execution_kernel/`
-8. `tests/test_execution_characterization.py`
-9. reconciliation, replacement-chain, transaction-readiness, telemetry, and
+2. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+3. `docs/SESSION_HANDOFF.md`
+4. `docs/GENERAL_READINESS_STATUS.md`
+5. `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
+6. `docs/ARCHITECTURE_DEBT.md`
+7. `assistant/execution_service.py`
+8. every file under `assistant/execution_kernel/`
+9. `tests/test_execution_characterization.py`
+10. reconciliation, replacement-chain, transaction-readiness, telemetry, and
    import-boundary tests
-10. `docs/ML_IMPLEMENTATION_STATUS.md`
-11. `docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md`
-12. `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`
-13. `docs/OPERATIONS_RUNBOOK.md`
-14. `docs/LIVE_PROMOTION_CHECKLIST.md`
-15. `docs/DATABENTO_DATA_SOURCE.md`
-16. `docs/UI_FEATURE_CONTROLS_DESIGN.md`
-17. `docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md`
-18. the focused AI strategy-tool document if branch `a656015` was transferred
+11. `docs/ML_IMPLEMENTATION_STATUS.md`
+12. `docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md`
+13. `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`
+14. `docs/OPERATIONS_RUNBOOK.md`
+15. `docs/LIVE_PROMOTION_CHECKLIST.md`
+16. `docs/DATABENTO_DATA_SOURCE.md`
+17. `docs/UI_FEATURE_CONTROLS_DESIGN.md`
+18. `docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md`
+19. the focused AI strategy-tool document if branch `a656015` was transferred
 
 The current code and latest specific status section override stale historical
 statements in older documents. Update stale text rather than reimplementing
@@ -658,8 +665,9 @@ locate or transfer the missing Codex commits from the old computer.
 Recommended resume prompt:
 
 ```text
-Read CLAUDE.md and docs/SESSION_HANDOFF.md completely. Verify origin/main and
-all branch/commit claims against Git. GR-1C implementation b4d9b1f and Codex
+Read CLAUDE.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
+docs/SESSION_HANDOFF.md completely. Verify origin/main and all branch/commit
+claims against Git. GR-1C implementation b4d9b1f and Codex
 review 465df8d are complete; do not redo them. Confirm whether the review and
 handoff branch was pushed or merged. Preserve facade imports and call-time DI,
 including datetime, Decimal, TradeIntent, and to_decimal. Verify paper mode,

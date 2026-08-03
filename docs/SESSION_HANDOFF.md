@@ -1,15 +1,15 @@
 # Development session handoff
 
-Prepared: 2026-08-02T22:25:51-07:00
+Prepared: 2026-08-02T22:47:03-07:00
 
 Audience: Codex, Claude Code, and the repository owner after moving to another
 computer.
 
 Purpose: record the exact post-merge, independently re-reviewed GR-1C tree,
-safety posture, Git state, local-data observations, and next step. This file
-contains no secret values, brokerage account numbers, or licensed market data.
-Every machine-local and time-sensitive statement must be verified after a
-move.
+the consolidated-plan audit state, safety posture, Git state, local-data
+observations, and next step. This file contains no secret values, brokerage
+account numbers, or licensed market data. Every machine-local and
+time-sensitive statement must be verified after a move.
 
 ## 1. Read this first
 
@@ -18,7 +18,8 @@ instruction:
 
 ```text
 Read CLAUDE.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
-docs/SESSION_HANDOFF.md completely before acting. Then read
+docs/SESSION_HANDOFF.md completely before acting. Then read both available
+ACTION_PLAN documents before implementation planning, followed by
 docs/GENERAL_READINESS_STATUS.md, docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md,
 and docs/ARCHITECTURE_DEBT.md. Establish the actual remote branches, HEAD,
 worktree, Python version, ignored-data state, credential presence, paper-account
@@ -64,11 +65,11 @@ Repository:
 https://github.com/SheltonChen2017/trading_agent.git
 ```
 
-State after the independent review of Claude's third-round confirmation:
+State after the independent Codex implementation-plan audit:
 
 ```text
 origin/main and local main:
-  ef77bbf  Merge PR #111, Claude GR-1C third-round confirmation
+  ff8c16e  Merge PR #112, independent GR-1C confirmation review/handoff
 
 Original GR-1C implementation and review, pushed and merged:
   b4d9b1f  Claude validation extraction and dependency injection
@@ -106,13 +107,26 @@ Codex independent confirmation-review branch:
   base: ef77bbf
   review report/correction: 85c72da
   disposition: accepted after one P3 handoff-state correction; no P0-P2 issue
+  remote state: PUSHED AND MERGED as ff8c16e (PR #112)
+
+Claude consolidated-plan branch:
+  branch: user/claude/action-plan-20260802
+  plan commit: ca4bae4
+  file: docs/ACTION_PLAN_claude.md
+  remote state: PUSHED; not yet cross-reviewed by Codex
+
+Codex consolidated-plan branch:
+  branch: codex/consolidated-action-plan-20260802
+  base: ff8c16e
+  plan commit: 9fcf254
+  file: docs/ACTION_PLAN_codex.md
   remote state: LOCAL ONLY, NOT PUSHED
 ```
 
-The current Codex review branch is based on merged `main` `ef77bbf`. It adds
-only the independent confirmation review report and this corrected handoff.
-Do not redo or separately cherry-pick earlier GR-1C commits; they are already
-ancestors of `ef77bbf`.
+The current Codex action-plan branch is based on merged `main` `ff8c16e`. It
+adds the independent consolidated implementation audit and this handoff. Do
+not redo or separately cherry-pick earlier GR-1C commits; they are already
+ancestors of `ff8c16e`.
 
 ### Local-only strategy-tool document
 
@@ -133,20 +147,24 @@ do not recreate it from memory while an exact copy may exist elsewhere.
 
 ### Required action before abandoning the old computer
 
-All implementation and Claude-confirmation work is merged into remote `main`
-at `ef77bbf`. The current independent review commit `85c72da` and the handoff
-commit containing this text remain local-only until the owner authorizes a
-push; another computer cannot fetch this final review state yet. The other
-artifact requiring separate treatment is unavailable historical `a656015`
-(strategy-tool document), which exists — if anywhere — only on the earlier
-computer.
+All GR-1C implementation/review work is merged into remote `main` at
+`ff8c16e`, and Claude's independent consolidated plan is pushed at `ca4bae4`.
+The current Codex plan commit `9fcf254` and the handoff commit containing this
+text remain local-only until the owner authorizes a push; another computer
+cannot fetch the Codex plan/final audit state yet. The other artifact requiring
+separate treatment is unavailable historical `a656015` (strategy-tool
+document), which exists — if anywhere — only on the earlier computer.
 
 ## 3. Relevant GR-1 commit history
 
 Recent sequence:
 
 ```text
-85c72da  Codex: complete independent GR-1C confirmation review (local)
+9fcf254  Codex: add consolidated implementation action plan (local)
+ca4bae4  Claude: add consolidated implementation action plan (pushed branch)
+ff8c16e  Merge PR #112: Codex independent GR-1C confirmation review into main
+77c266a  Codex: update handoff after GR-1C confirmation review
+85c72da  Codex: complete independent GR-1C confirmation review
 ef77bbf  Merge PR #111: Claude GR-1C third-round confirmation into main
 f2b5fa9  Claude: update session handoff after confirmed GR-1C follow-up review
 e9f2e83  Claude: wire owner-mandated review workflow into instructions/record
@@ -524,6 +542,15 @@ focused: 50 passed in 26.28 seconds
 full: 2412 passed, 1 skipped, 26 warnings in 333.69 seconds
 ```
 
+Consolidated Codex action-plan audit (Python 3.12.13, documentation-only
+commit `9fcf254` plus the pending handoff update):
+
+```text
+full: 2412 passed, 1 skipped, 26 warnings in 238.98 seconds
+compileall: clean
+git diff --check: clean
+```
+
 Additional gates:
 
 ```text
@@ -730,6 +757,28 @@ adapter, job runner, or Backtest page has been implemented.
 No destructive cleanup should be inferred or performed from the existence of
 that plan.
 
+### Consolidated implementation action plans
+
+Codex independently audited every tracked implementation plan, design backlog,
+status ledger, architecture-debt record, operational gate, and current code/Git
+evidence into `docs/ACTION_PLAN_codex.md` at `9fcf254`. It records:
+
+- GR-0 complete, GR-1 partial through reviewed GR-1C, and GR-2..GR-9 not
+  started as milestones;
+- the original ML foundation plus ML-LR/ML-FS software that is complete,
+  separately from missing licensed data, real research, host deployment,
+  elapsed evidence, and promotion authority;
+- AI strategy authoring, UI controls, proposal dismissal, MCP, multi-position
+  AI debate, and the allocation service as unimplemented or partial designs;
+- six stale planning statements that must not drive new work; and
+- one ordered default: GR-1D manual reconciliation extraction remains the next
+  code milestone, followed by any final GR-1 thin-facade slice before GR-2.
+
+Claude independently produced `docs/ACTION_PLAN_claude.md` at pushed commit
+`ca4bae4`. Codex deliberately did not read it before committing its own plan.
+The next planning step is an explicit cross-review/difference ledger and an
+owner-approved final plan; neither draft should silently replace the other.
+
 Do not mix these product plans into the active execution-kernel split unless
 the owner explicitly changes priority.
 
@@ -742,12 +791,13 @@ For the next coding session:
 3. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
 4. `docs/FEATURE_MILESTONE_RECORD.md`
 5. `docs/SESSION_HANDOFF.md`
-6. `docs/GENERAL_READINESS_STATUS.md`
-7. `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
-8. `docs/ARCHITECTURE_DEBT.md`
-9. `assistant/execution_service.py`
-10. every file under `assistant/execution_kernel/`
-11. `tests/test_execution_characterization.py`
+6. `docs/ACTION_PLAN_codex.md` and `docs/ACTION_PLAN_claude.md` when present
+7. `docs/GENERAL_READINESS_STATUS.md`
+8. `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
+9. `docs/ARCHITECTURE_DEBT.md`
+10. `assistant/execution_service.py`
+11. every file under `assistant/execution_kernel/`
+12. `tests/test_execution_characterization.py`
 12. reconciliation, replacement-chain, transaction-readiness, telemetry, and
    import-boundary tests
 13. `docs/ML_IMPLEMENTATION_STATUS.md`
@@ -822,22 +872,25 @@ Do not let UI/development tests share the restored operational database.
 
 Do not infer answers to these:
 
-1. Authorization to push the local confirmation-review branch
-   `codex/review-claude-gr1c-confirmation-20260803`, including review commit
-   `85c72da` and the separate handoff commit containing this state.
-2. Whether to retrieve unavailable local-only strategy-tool commit `a656015`
+1. Authorization to push the local Codex consolidated-plan branch
+   `codex/consolidated-action-plan-20260802`, including plan commit `9fcf254`
+   and the separate handoff commit containing this state.
+2. When to cross-review `ACTION_PLAN_codex.md` and `ACTION_PLAN_claude.md`,
+   resolve factual/priority differences, and create the owner-approved final
+   implementation plan.
+3. Whether to retrieve unavailable local-only strategy-tool commit `a656015`
    from the earlier computer or a private bundle.
-3. When to begin GR-1D and whether reconciliation is the selected next slice.
-4. Which authoritative historical membership/reference-data source will be
+4. When to begin GR-1D and whether reconciliation is the selected next slice.
+5. Which authoritative historical membership/reference-data source will be
    obtained and funded.
-5. When to deploy the operational paper cadence and start the first immutable
+6. When to deploy the operational paper cadence and start the first immutable
    evidence epoch.
-6. Which owner-visible delivery channel GR-5 should implement and verify.
-7. Whether and how to handle historical operator-database contamination or
+7. Which owner-visible delivery channel GR-5 should implement and verify.
+8. Whether and how to handle historical operator-database contamination or
    divergent snapshots after backup and provenance analysis.
-8. When an elevated Windows deployment/credential-rotation window is
+9. When an elevated Windows deployment/credential-rotation window is
    available.
-9. When, if ever, AI strategy authoring, proposal-history cleanup, ranker work,
+10. When, if ever, AI strategy authoring, proposal-history cleanup, ranker work,
    promotion adapters, or funded-account work should supersede readiness work.
 
 None of these decisions grants live or funded-account authority by
@@ -853,20 +906,23 @@ git status --short --branch
 git log -10 --oneline --decorate
 ```
 
-Verify that `main` is at or after merge `ef77bbf` and history contains
+Verify that `main` is at or after merge `ff8c16e` and history contains
+Codex confirmation review commits `85c72da`/`77c266a`, merge `ef77bbf`,
 Claude confirmation commits `7f431b6`/`e9f2e83`/`f2b5fa9`, merged main
 `2882889`, Codex corrections
 `c1de927`/`d2d836b`, reviewed handoff `6d3a703`, workflow docs `3c180b4`,
-and canonical-handoff rule `1cdff99`. The final Codex confirmation review and
-this handoff are not cross-computer available until their local review branch
-is pushed with owner authorization.
+and canonical-handoff rule `1cdff99`. Claude's action plan is fetchable at
+`origin/user/claude/action-plan-20260802`. The Codex action plan and this
+handoff are not cross-computer available until their local branch is pushed
+with owner authorization.
 
 Recommended resume prompt:
 
 ```text
 Read CLAUDE.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
 docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md completely, then read
-docs/FEATURE_MILESTONE_RECORD.md and docs/SESSION_HANDOFF.md. Verify
+docs/FEATURE_MILESTONE_RECORD.md and docs/SESSION_HANDOFF.md. Then read both
+available ACTION_PLAN documents before choosing work. Verify
 origin/main and all branch/commit claims against Git. GR-1C through Claude
 follow-up merge 2882889, Codex follow-up corrections c1de927/d2d836b, and the
 Claude third-round confirmation merged as ef77bbf are complete and independently
@@ -881,5 +937,7 @@ evidence epoch, scheduled tasks, ML/LLM proposal integration, or destructive
 cleanup. If the owner authorizes the next coding milestone, perform a gap
 analysis for GR-1D manual reconciliation extraction, add characterization
 first, implement one reviewable slice, run focused/full validation, commit,
-and stop for independent review before GR-2.
+and stop for independent review before GR-2. If the owner instead requests
+plan reconciliation, compare the committed Claude and Codex plans with an
+explicit evidence-backed difference ledger before drafting a final plan.
 ```

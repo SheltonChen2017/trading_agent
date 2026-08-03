@@ -1,6 +1,6 @@
 # Development session handoff
 
-Prepared: 2026-08-03T12:26:26-07:00
+Prepared: 2026-08-03T13:20:00-07:00
 
 Audience: Codex, Claude Code, and the repository owner after changing
 computers or starting a new agent session.
@@ -21,8 +21,15 @@ Both reviews are complete on
 `codex/review-pr120-pr121-20260803`. GR-1D is accepted with no code
 correction. The residual-signals work is accepted after a material
 family-wide multiplicity correction and a fail-closed evidence-selection
-correction. The adopted next step is **GR-1E assessment**. Do not repeat either
-review and do not begin GR-2 merely because GR-1D passed.
+correction. UPDATE (later 2026-08-03): the GR-1E assessment is DONE —
+commit `b12058f` on branch `user/claude/gr-1e-assessment-20260803`
+(base `c66db0a`) records the mechanical measurement and declares GR-1
+COMPLETE with no further extraction; the full record is the GR-1E section
+of `docs/GENERAL_READINESS_STATUS.md`. Docs-only change; full suite
+2,485 passed / 1 skipped / 25 warnings on the exact tree. The next step is
+independent review of that assessment; after it passes, Phase 4 (GR-5
+alert delivery + GR-3 fault drills, GR-2 riding along) is next and GR-5's
+channel remains an owner decision. Do not repeat the completed reviews.
 
 Durable review records:
 
@@ -220,11 +227,30 @@ Independent evidence:
 - returning every table row as evidence was detected; and
 - both mutations were restored before the full run.
 
-## 5. Exact next action: GR-1E assessment
+## 5. Exact next action: independent review of the completed GR-1E assessment
 
-The sequencing authority is `docs/ACTION_PLAN_2026-08-02.md`. Phase 3 remains
-active. GR-1D is done; **assess GR-1E next**. Do not start GR-2, operations
+The sequencing authority is `docs/ACTION_PLAN_2026-08-02.md`.
+
+DONE (2026-08-03, after this section was written): the GR-1E assessment was
+performed per the instructions below and recorded at commit `b12058f` on
+branch `user/claude/gr-1e-assessment-20260803` (base `c66db0a`). Outcome 1
+was chosen: the mechanical measurement (172 executable composition lines
+invoking nineteen named kernel/gate functions, one broker-contact line, no
+inline logic; recovery wrappers = validation + one atomic storage call
+each) supports declaring **GR-1 COMPLETE** with the residual documented.
+The record is the GR-1E section of `docs/GENERAL_READINESS_STATUS.md`;
+`docs/ARCHITECTURE_DEBT.md` item 1 closes its GR-1 chapter with
+`allocation_batch` cross-leg math left explicitly open for GR-2. Docs-only
+change; full suite 2,485 / 1 skipped / 25 warnings on the exact tree.
+
+**Next: independent review of that assessment.** If the reviewer disputes
+the thinness judgment, outcome 2's characterize-first extraction path
+below still applies. After the assessment passes review, Phase 4 (GR-5
+alert delivery + GR-3 fault drills, GR-2 riding along) is next; GR-5's
+channel remains an owner decision. Do not start GR-2, operations
 deployment, or a different product milestone without owner reprioritization.
+
+The original assessment instructions are retained below for the reviewer:
 
 Read before assessing:
 

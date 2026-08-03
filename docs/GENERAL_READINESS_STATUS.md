@@ -122,7 +122,7 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 — execution kernel split: **partial; GR-1C independently reviewed**
+## GR-1 — execution kernel split: **partial; GR-1D implemented, awaiting review**
 
 GR-1A characterization is built and independently reviewed in
 `tests/test_execution_characterization.py`. The first production extraction is
@@ -514,21 +514,56 @@ every branch of the 1,361-line facade. The 315-line
 `validate_proposal_for_execution` orchestration is unchanged by GR-1B and its
 internal branches remain covered only by the pre-existing suite.
 
-### GR-1D — manual reconciliation extraction: NOT STARTED
+### GR-1D — manual reconciliation extraction: IMPLEMENTED, awaiting review
 
-Scheduled as action-plan Phase 3 (`docs/ACTION_PLAN_2026-08-02.md`); do not
-begin without the owner's go-ahead. Scope: extract the 221-line
-`reconcile_submission()` orchestration behind an explicit, call-time
-dependency contract while preserving the public facade, exact exception
-identities, broker-absence grace behavior, replacement-chain handling,
-reservation holds/releases, kill-switch behavior, and every existing
-monkeypatch/import seam. Before implementing: characterize every
-reconciliation branch in place, enumerate every runtime global the body
-resolves from the facade (the lesson GR-1C taught three times), compare the
-full pre/post facade import surface mechanically, keep storage transactions
-and conditional transitions in `AssistantStore`, and mutation-test confirmed
-absence, unconfirmed lookup, fresh-404 grace, replacement chains, mismatches,
-journal failures, and state-race recovery.
+The 221-line `reconcile_submission()` orchestration moved token-verbatim
+(813 tokens identical after seam-rename and one trailing-comma
+normalization) into
+`assistant/execution_kernel/reconcile.py::run_submission_reconciliation`,
+behind a frozen 13-field `ReconciliationDeps` contract the facade builds at
+call time from its own namespace. The injection boundary was enumerated
+MECHANICALLY BEFORE the move (symtable over the pre-move facade body — the
+lesson GR-1C taught three times), yielding exactly twelve module-global
+reads plus the deferred broker import:
+
+| Seam | Fields |
+|---|---|
+| Deferred broker import (first statement inside the try, after the atomic claim) | `import_broker` (shared `_import_execution_broker` provider) |
+| Clock | `datetime_type`, `timezone_type` (`timezone.utc` resolved at its historical evaluation points) |
+| Exception identity (raised AND caught through the same injected object) | `proposal_execution_error` |
+| Behavior-bearing status constants | `submitting`, `submission_unknown`, `reconciling` |
+| Stored-intent parsing | `intent_from_dict` |
+| Broker lookup / matching / replacement chains / absence age | `lookup_order_outcome`, `order_matches_intent`, `authoritative_order_for`, `broker_absence_is_old_enough` |
+| Order journaling | `journal_broker_order_update` |
+
+Eight seam-freeze characterization tests were written FIRST and run green on
+the pre-move code, then re-run green after the move; the sys.modules-level
+broker-fake suites (`test_replacement_chain_round3.py`,
+`test_absence_age_guard.py`) pass unchanged because the injected provider
+executes the same `import execution.alpaca_broker` statement. The kernel
+body has zero module-global runtime reads, pinned by
+`test_gr1d_the_kernel_body_reads_no_module_globals` (same symtable mechanism
+as GR-1C). The mechanical pre/post facade-surface comparison shows nothing
+removed and exactly two additions (`ReconciliationDeps`,
+`run_submission_reconciliation`, both the exact kernel objects). The atomic
+claim and every conditional transition remain `AssistantStore` operations.
+`execution_service.py` is now 952 lines (from 1,094); `reconcile.py` is 269.
+
+### GR-1D mutation results
+
+Every mutation was applied in the code's NEW location (or to the new
+wrapper), run, and restored. All eight were detected:
+
+| Mutation | Result |
+|---|---|
+| fresh-404 grace guard deleted (too-recent absence becomes confirmed failure) | DETECTED (3 tests) |
+| unconfirmed lookup collapsed into the confirmed-absence branch | DETECTED (3 tests, incl. `test_a_failed_lookup_is_never_treated_as_confirmed_absence`) |
+| same-key mismatch guard deleted (mismatched order journaled) | DETECTED (8 tests) |
+| replacement-chain resolution bypassed | DETECTED (12 tests) |
+| unexpected-error recovery write no-oped (proposal strands in `reconciling`) | DETECTED (4 tests, incl. journal-failure recovery) |
+| kill-switch activation on direct mismatch deleted | DETECTED (1 test — the new seam test; precision note: pre-existing direct-mismatch tests assert the refusal but not kill-switch persistence, and the round3 kill-switch test covers only the chain-mismatch branch) |
+| grace-clock `preserve_updated_at` dropped (retry starvation) | DETECTED (`test_a_blocked_reconcile_attempt_does_not_restart_the_grace_clock`) |
+| wrapper resolves a dep from the kernel instead of the facade namespace | DETECTED (5 seam tests) |
 
 ### GR-1E — conditional composition thinning: NOT ASSESSED
 

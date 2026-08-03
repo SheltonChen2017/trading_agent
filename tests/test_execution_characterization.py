@@ -1881,3 +1881,327 @@ def test_gr1c_preserves_the_facades_export_only_names():
     assert execution_service.intent_fingerprint is intent_fingerprint
     assert execution_service.dataclasses is stdlib_dataclasses
     assert execution_service.Decimal is Decimal
+
+
+# --------------------------------------------------------------------------
+# GR-1D: manual-reconciliation seam freeze
+#
+# reconcile_submission() historically resolved twelve runtime names from
+# this facade's module namespace (symtable-enumerated before the move):
+# ProposalExecutionError, SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING,
+# _intent_from_dict, _lookup_order_outcome, _order_matches_intent,
+# _authoritative_order_for, _broker_absence_is_old_enough,
+# journal_broker_order_update, datetime, timezone -- plus the deferred
+# `import execution.alpaca_broker` (frozen separately by the sys.modules
+# patching tests in test_replacement_chain_round3.py). Each test below pins
+# one seam: replacing the FACADE name must keep changing reconciliation
+# behaviour, exactly as it did before GR-1D moved the body into the kernel.
+# --------------------------------------------------------------------------
+
+
+def _unknown_proposal(store, proposal_id: str = "p-1") -> None:
+    store.save_proposal(_proposal(proposal_id, status="submission_unknown"))
+    store.reserve_execution_budget(
+        proposal_id,
+        trading_day="2026-08-03",
+        notional="100.00",
+        max_daily_notional="1000.00",
+        max_daily_orders=5,
+    )
+
+
+def test_gr1d_patching_lookup_and_absence_guard_on_the_facade_is_honoured(
+    store, monkeypatch
+):
+    _unknown_proposal(store)
+    lookup_calls = []
+    absence_calls = []
+
+    def facade_lookup(broker, idempotency_key):
+        lookup_calls.append(idempotency_key)
+        return None
+
+    def facade_absence_guard(claimed, *, now):
+        absence_calls.append(now)
+        return False
+
+    monkeypatch.setattr(execution_service, "_lookup_order_outcome", facade_lookup)
+    monkeypatch.setattr(
+        execution_service, "_broker_absence_is_old_enough", facade_absence_guard
+    )
+
+    with pytest.raises(ProposalExecutionError) as caught:
+        reconcile_submission("p-1", store)
+
+    assert "grace period has not elapsed" in str(caught.value)
+    assert lookup_calls == ["idem-p-1"]
+    assert len(absence_calls) == 1
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "submission_unknown"
+    assert len(state["reservations"]) == 1  # reservation retained
+
+
+def test_gr1d_patching_order_match_on_the_facade_drives_the_mismatch_path(
+    store, monkeypatch
+):
+    _unknown_proposal(store)
+    monkeypatch.setattr(
+        execution_service,
+        "_lookup_order_outcome",
+        lambda broker, key: {"order_id": "o-1", "status": "accepted"},
+    )
+    monkeypatch.setattr(
+        execution_service,
+        "_order_matches_intent",
+        lambda outcome, intent: (False, "gr1d-sentinel-mismatch"),
+    )
+
+    with pytest.raises(ProposalExecutionError) as caught:
+        reconcile_submission("p-1", store)
+
+    assert "gr1d-sentinel-mismatch" in str(caught.value)
+    assert store.get_kill_switch()["active"] is True
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "submission_unknown"
+    assert len(state["reservations"]) == 1
+    store.set_kill_switch(False, reason="test cleanup")
+
+
+def test_gr1d_patching_chain_resolution_on_the_facade_is_honoured(
+    store, monkeypatch
+):
+    _unknown_proposal(store)
+    monkeypatch.setattr(
+        execution_service,
+        "_lookup_order_outcome",
+        lambda broker, key: {"order_id": "o-1", "status": "accepted"},
+    )
+    monkeypatch.setattr(
+        execution_service, "_order_matches_intent", lambda outcome, intent: (True, None)
+    )
+    monkeypatch.setattr(
+        execution_service,
+        "_authoritative_order_for",
+        lambda broker, outcome, intent: (None, "gr1d-chain-error", False, ()),
+    )
+
+    with pytest.raises(ProposalExecutionError) as caught:
+        reconcile_submission("p-1", store)
+
+    assert "gr1d-chain-error" in str(caught.value)
+    assert "Left retryable" in str(caught.value)
+    assert store.get_kill_switch()["active"] is False
+    assert observable_state(store, "p-1")["proposal_status"] == "submission_unknown"
+
+
+def test_gr1d_patching_journal_on_the_facade_receives_the_authoritative_order(
+    store, monkeypatch
+):
+    _unknown_proposal(store)
+    authoritative = {"order_id": "o-replacement", "status": "filled"}
+    journal_calls = []
+
+    def facade_journal(store_arg, proposal_id, order, **kwargs):
+        journal_calls.append((proposal_id, order, kwargs))
+
+    monkeypatch.setattr(
+        execution_service,
+        "_lookup_order_outcome",
+        lambda broker, key: {"order_id": "o-1", "status": "accepted"},
+    )
+    monkeypatch.setattr(
+        execution_service, "_order_matches_intent", lambda outcome, intent: (True, None)
+    )
+    monkeypatch.setattr(
+        execution_service,
+        "_authoritative_order_for",
+        lambda broker, outcome, intent: (
+            authoritative,
+            None,
+            False,
+            ("o-1", "o-replacement"),
+        ),
+    )
+    monkeypatch.setattr(
+        execution_service, "journal_broker_order_update", facade_journal
+    )
+
+    result = reconcile_submission("p-1", store)
+
+    assert result is authoritative
+    assert len(journal_calls) == 1
+    proposal_id, order, kwargs = journal_calls[0]
+    assert proposal_id == "p-1"
+    assert order is authoritative
+    assert kwargs["event_type"] == "manual_reconciliation"
+    assert kwargs["clear_error"] is True
+    assert kwargs["raw_event"] == {"replacement_chain": ["o-1", "o-replacement"]}
+    assert "reconciled_at" in kwargs["extra_updates"]
+
+
+def test_gr1d_patching_intent_parsing_on_the_facade_is_honoured(store, monkeypatch):
+    _unknown_proposal(store)
+
+    def broken_intent(payload):
+        raise ValueError("gr1d-intent-sentinel")
+
+    monkeypatch.setattr(execution_service, "_intent_from_dict", broken_intent)
+
+    with pytest.raises(ProposalExecutionError) as caught:
+        reconcile_submission("p-1", store)
+
+    assert "gr1d-intent-sentinel" in str(caught.value)
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "submission_unknown"
+    proposal = store.get_proposal("p-1")
+    assert "gr1d-intent-sentinel" in (proposal.get("error") or "")
+
+
+def test_gr1d_the_reconciliation_clock_and_timezone_resolve_from_the_facade(
+    store, monkeypatch
+):
+    _unknown_proposal(store)
+    fixed = datetime(2031, 1, 2, 3, 4, 5, tzinfo=timezone.utc)
+
+    class FacadeTimezone:
+        utc = object()
+
+    seen_tz = []
+
+    class RecordingDateTime:
+        @classmethod
+        def now(cls, tz=None):
+            seen_tz.append(tz)
+            return fixed
+
+    journal_calls = []
+    monkeypatch.setattr(
+        execution_service,
+        "_lookup_order_outcome",
+        lambda broker, key: {"order_id": "o-1", "status": "accepted"},
+    )
+    monkeypatch.setattr(
+        execution_service, "_order_matches_intent", lambda outcome, intent: (True, None)
+    )
+    monkeypatch.setattr(
+        execution_service,
+        "_authoritative_order_for",
+        lambda broker, outcome, intent: (
+            {"order_id": "o-1", "status": "accepted"},
+            None,
+            False,
+            (),
+        ),
+    )
+    monkeypatch.setattr(
+        execution_service,
+        "journal_broker_order_update",
+        lambda store_arg, proposal_id, order, **kwargs: journal_calls.append(kwargs),
+    )
+    monkeypatch.setattr(execution_service, "datetime", RecordingDateTime)
+    monkeypatch.setattr(execution_service, "timezone", FacadeTimezone)
+
+    reconcile_submission("p-1", store)
+
+    assert journal_calls[0]["event_at"] == fixed.isoformat()
+    assert journal_calls[0]["extra_updates"]["reconciled_at"] == fixed.isoformat()
+    assert seen_tz == [FacadeTimezone.utc]
+
+
+def test_gr1d_patching_the_exception_class_on_the_facade_controls_raise_identity(
+    store, monkeypatch
+):
+    class SentinelError(Exception):
+        pass
+
+    monkeypatch.setattr(execution_service, "ProposalExecutionError", SentinelError)
+
+    with pytest.raises(SentinelError) as caught:
+        reconcile_submission("missing", store)
+
+    assert type(caught.value) is SentinelError
+    assert str(caught.value) == "Unknown proposal: missing"
+
+
+def test_gr1d_status_constants_resolve_from_the_facade(store, monkeypatch):
+    store.save_proposal(_proposal(status="gr1d-unknown"))
+    monkeypatch.setattr(execution_service, "SUBMISSION_UNKNOWN", "gr1d-unknown")
+    monkeypatch.setattr(execution_service, "RECONCILING", "gr1d-reconciling")
+    monkeypatch.setattr(
+        execution_service, "_lookup_order_outcome", lambda broker, key: object()
+    )
+
+    with pytest.raises(ProposalExecutionError) as caught:
+        reconcile_submission("p-1", store)
+
+    # The claim accepted the patched claimable status, transitioned through
+    # the patched RECONCILING, and the unconfirmed-lookup branch wrote the
+    # patched SUBMISSION_UNKNOWN back.
+    assert "could not confirm the broker's outcome" in str(caught.value)
+    assert observable_state(store, "p-1")["proposal_status"] == "gr1d-unknown"
+
+
+def test_gr1d_facade_exports_the_exact_kernel_reconciliation_objects():
+    from assistant.execution_kernel import reconcile as reconcile_kernel
+
+    assert execution_service.ReconciliationDeps is reconcile_kernel.ReconciliationDeps
+    assert (
+        execution_service.run_submission_reconciliation
+        is reconcile_kernel.run_submission_reconciliation
+    )
+
+
+def test_gr1d_the_kernel_body_reads_no_module_globals():
+    """Structural guard behind the whole GR-1D seam family.
+
+    The behavioural tests above each freeze one seam. This pins the boundary
+    itself: run_submission_reconciliation() may not read any module-scope
+    runtime name; every collaborator must arrive through ReconciliationDeps.
+    A symbol-table test is used because it follows Python's actual lexical
+    scopes (including comprehensions and nested blocks) and still detects a
+    module global that shadows a builtin. Runtime behavior cannot observe the
+    distinction when the kernel and facade imports happen to point at the
+    same object.
+    """
+    import builtins
+    from pathlib import Path
+    import symtable
+
+    source_path = (
+        Path(__file__).resolve().parent.parent
+        / "assistant" / "execution_kernel" / "reconcile.py"
+    )
+    source = source_path.read_text(encoding="utf-8")
+    module_table = symtable.symtable(source, str(source_path), "exec")
+    function_table = next(
+        table
+        for table in module_table.get_children()
+        if table.get_name() == "run_submission_reconciliation"
+    )
+
+    module_bindings = {
+        symbol.get_name()
+        for symbol in module_table.get_symbols()
+        if symbol.is_assigned() or symbol.is_imported() or symbol.is_namespace()
+    }
+
+    def runtime_module_reads(table) -> set[str]:
+        reads = {
+            symbol.get_name()
+            for symbol in table.get_symbols()
+            if symbol.is_global()
+            and symbol.is_referenced()
+            and (
+                symbol.get_name() in module_bindings
+                or not hasattr(builtins, symbol.get_name())
+            )
+        }
+        for child in table.get_children():
+            reads.update(runtime_module_reads(child))
+        return reads
+
+    module_reads = runtime_module_reads(function_table)
+    assert not module_reads, (
+        "run_submission_reconciliation() reads module-scope runtime names "
+        f"instead of ReconciliationDeps: {sorted(module_reads)}"
+    )

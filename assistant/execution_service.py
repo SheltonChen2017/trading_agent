@@ -246,6 +246,10 @@ from assistant.execution_kernel.validate import (
     ProposalValidationOutcome,
     run_proposal_validation,
 )
+from assistant.execution_kernel.reconcile import (
+    ReconciliationDeps,
+    run_submission_reconciliation,
+)
 from assistant.kill_switch import env_kill_switch_active
 from assistant.execution_telemetry import (
     FAILURE_DATA_INTEGRITY,
@@ -306,13 +310,16 @@ from risk.execution_gate import (
 
 
 def _import_execution_broker():
-    """Deferred broker import, injected into the validation kernel.
+    """Deferred broker import, injected into the validation and
+    reconciliation kernels.
 
-    A provider function rather than a module-level import so the kernel can
-    run it at the exact point the historical inline
-    ``import execution.alpaca_broker`` statement sat -- AFTER the existence/
-    expiry/policy refusals -- preserving which error wins when the broker
-    package itself cannot import.
+    A provider function rather than a module-level import so each kernel can
+    run it at the exact point its historical inline
+    ``import execution.alpaca_broker`` statement sat -- for validation,
+    AFTER the existence/expiry/policy refusals (preserving which error wins
+    when the broker package itself cannot import); for reconciliation, first
+    inside the try block AFTER the atomic claim (so an unimportable broker
+    package still takes the unexpected-error recovery path).
     """
     import execution.alpaca_broker as broker
 
@@ -740,181 +747,32 @@ def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:
         see recover_stale_reconciliation() below for the crash-recovery
         path this can't cover (no in-process handler survives a crash).
     """
-    proposal = store.get_proposal(proposal_id)
-    if proposal is None:
-        raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
-
-    claimed = store.claim_proposal(
-        proposal_id, expected_status=(SUBMITTING, SUBMISSION_UNKNOWN), new_status=RECONCILING
+    # GR-1D: the orchestration body lives in
+    # assistant/execution_kernel/reconcile.py. The dependency bundle is
+    # constructed HERE, inside the wrapper, on every call, from bare names --
+    # each resolves from this module's namespace at call time, so replacing
+    # any of them on the facade (tests, tooling) still reaches the kernel
+    # exactly as it did when the body was inline. Hoisting this construction
+    # to module scope would silently freeze every seam.
+    return run_submission_reconciliation(
+        proposal_id,
+        store,
+        deps=ReconciliationDeps(
+            import_broker=_import_execution_broker,
+            datetime_type=datetime,
+            timezone_type=timezone,
+            proposal_execution_error=ProposalExecutionError,
+            submitting=SUBMITTING,
+            submission_unknown=SUBMISSION_UNKNOWN,
+            reconciling=RECONCILING,
+            intent_from_dict=_intent_from_dict,
+            lookup_order_outcome=_lookup_order_outcome,
+            order_matches_intent=_order_matches_intent,
+            authoritative_order_for=_authoritative_order_for,
+            broker_absence_is_old_enough=_broker_absence_is_old_enough,
+            journal_broker_order_update=journal_broker_order_update,
+        ),
     )
-    if claimed is None:
-        current_status = proposal["status"]
-        raise ProposalExecutionError(
-            f"Proposal {proposal_id} is not reconcilable (status={current_status!r}) -- reconciliation "
-            "only applies to proposals stuck in 'submitting' or 'submission_unknown'."
-        )
-
-    try:
-        import execution.alpaca_broker as broker
-
-        stored_intent = _intent_from_dict(proposal["intent"])
-        outcome = _lookup_order_outcome(broker, proposal["idempotency_key"])
-        reconciled_at = datetime.now(timezone.utc).isoformat()
-
-        if isinstance(outcome, dict):
-            matches, mismatch_detail = _order_matches_intent(outcome, stored_intent)
-            if not matches:
-                expected_desc = f"{stored_intent.side} {stored_intent.shares} {stored_intent.ticker} {stored_intent.order_type}"
-                if stored_intent.order_type == "limit":
-                    expected_desc += f" @ {stored_intent.limit_price}"
-                reason = (
-                    f"Reconciliation found an order under this idempotency key that does NOT match the "
-                    f"proposal's intent (mismatch: {mismatch_detail}; expected {expected_desc}; broker "
-                    f"returned {outcome}) -- persistent kill switch activated; investigate manually."
-                )
-                store.update_proposal_status_if_current(
-                    proposal_id,
-                    expected_statuses=(RECONCILING,),
-                    new_status=SUBMISSION_UNKNOWN,
-                    reconciled_at=reconciled_at,
-                    error=reason,
-                )
-                store.set_kill_switch(True, reason=reason)
-                raise ProposalExecutionError(
-                    f"Reconciliation for {proposal_id} found a MISMATCHED order ({mismatch_detail}) -- left "
-                    "as 'submission_unknown' for manual investigation, not auto-resolved."
-                )
-
-            # The order found under our idempotency key may have been REPLACED
-            # out of band; the live state then lives on the replacement, which
-            # has its own order id. Resolve before journaling, or this manual
-            # operation cannot fix the very condition it exists to fix.
-            authoritative, chain_error, is_mismatch, chain = _authoritative_order_for(
-                broker, outcome, stored_intent
-            )
-            if chain_error is not None:
-                reason = (
-                    f"Manual reconciliation for {proposal_id} could not trust the replacement chain: "
-                    f"{chain_error}. "
-                    + ("Persistent kill switch activated; investigate manually."
-                       if is_mismatch else "Left retryable as 'submission_unknown'.")
-                )
-                store.update_proposal_status_if_current(
-                    proposal_id,
-                    expected_statuses=(RECONCILING,),
-                    new_status=SUBMISSION_UNKNOWN,
-                    reconciled_at=reconciled_at,
-                    error=reason,
-                )
-                if is_mismatch:
-                    store.set_kill_switch(True, reason=reason)
-                raise ProposalExecutionError(reason)
-
-            journal_broker_order_update(
-                store,
-                proposal_id,
-                authoritative,
-                event_type="manual_reconciliation",
-                event_at=reconciled_at,
-                clear_error=True,
-                extra_updates={"reconciled_at": reconciled_at},
-                raw_event={"replacement_chain": list(chain)} if chain else None,
-            )
-            return authoritative
-
-        if outcome is None:
-            if not _broker_absence_is_old_enough(
-                claimed, now=datetime.now(timezone.utc)
-            ):
-                store.update_proposal_status_if_current(
-                    proposal_id,
-                    expected_statuses=(RECONCILING,),
-                    new_status=SUBMISSION_UNKNOWN,
-                    # Restore the ORIGINAL timestamp: this bounce made no
-                    # progress, and the grace period is measured from
-                    # updated_at. Writing "now" here would push the deadline
-                    # out on every attempt, so a user re-clicking Reconcile
-                    # inside the window could never let the proposal age
-                    # enough to resolve -- and would starve the background
-                    # poller too, since it reads the same column.
-                    preserve_updated_at=str(claimed.get("_claimed_from_updated_at") or "")
-                    or None,
-                    reconciled_at=reconciled_at,
-                    error=(
-                        "Reconciliation found no matching broker order, but the unresolved "
-                        "state is too recent for absence to be reliable. The execution "
-                        "reservation remains held; retry after the broker-indexing grace period."
-                    ),
-                )
-                raise ProposalExecutionError(
-                    f"Reconciliation for {proposal_id} found no order, but the broker-indexing "
-                    "grace period has not elapsed -- still 'submission_unknown'."
-                )
-            transitioned = store.mark_submission_failed_and_release(
-                proposal_id,
-                expected_statuses=(RECONCILING,),
-                reconciled_at=reconciled_at,
-                error="Reconciliation: the broker confirms no order exists for this idempotency key.",
-            )
-            if transitioned is None:
-                current = store.get_proposal(proposal_id)
-                if current is not None and current.get("broker_order"):
-                    return current["broker_order"]
-            raise ProposalExecutionError(
-                f"Reconciliation for {proposal_id}: the broker confirms this order was never accepted -- "
-                "marked 'submission_failed'."
-            )
-
-        # outcome is _LOOKUP_UNCONFIRMED
-        unresolved = store.update_proposal_status_if_current(
-            proposal_id,
-            expected_statuses=(RECONCILING,),
-            new_status=SUBMISSION_UNKNOWN,
-            reconciled_at=reconciled_at,
-            error="Reconciliation attempted but the broker lookup itself failed -- still unresolved.",
-        )
-        if unresolved is None:
-            current = store.get_proposal(proposal_id)
-            if current is not None and current.get("broker_order"):
-                return current["broker_order"]
-        raise ProposalExecutionError(
-            f"Reconciliation for {proposal_id} could not confirm the broker's outcome (the lookup itself "
-            "failed) -- still 'submission_unknown'. Try again once connectivity is restored."
-        )
-    except ProposalExecutionError:
-        raise
-    except Exception as exc:
-        # Genuinely unexpected: a malformed stored intent, the broker-
-        # order journal write failing, an unexpected database error, etc.
-        # Never leave the proposal stranded in "reconciling" (unretriable
-        # via the normal interface), and never claim "submission_failed"
-        # -- that status specifically means the broker CONFIRMED absence,
-        # which an unexpected local error never establishes.
-        try:
-            recovered = store.update_proposal_status_if_current(
-                proposal_id,
-                expected_statuses=(RECONCILING,),
-                new_status=SUBMISSION_UNKNOWN,
-                reconciled_at=datetime.now(timezone.utc).isoformat(),
-                error=f"Unexpected error during reconciliation: {exc}",
-            )
-            if recovered is None:
-                current = store.get_proposal(proposal_id)
-                if current is not None and current.get("broker_order"):
-                    return current["broker_order"]
-        except Exception as write_exc:
-            raise RuntimeError(
-                f"CRITICAL: reconciliation for {proposal_id} failed unexpectedly ({exc!r}), and recording "
-                f"that failure ALSO failed ({write_exc!r}) -- this proposal is likely stranded in "
-                "'reconciling'. The broker outcome is NOT known; do not assume success or failure. Manual "
-                "database intervention, or recover_stale_reconciliation() once it's old enough, will be "
-                "needed."
-            ) from exc
-        raise ProposalExecutionError(
-            f"Reconciliation for {proposal_id} failed unexpectedly ({exc}) -- marked 'submission_unknown' "
-            "rather than left stranded in 'reconciling'. The broker outcome is not known; retry once the "
-            "underlying issue is fixed."
-        ) from exc
 
 
 def recover_stale_reconciliation(

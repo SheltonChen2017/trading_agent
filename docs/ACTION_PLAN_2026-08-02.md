@@ -122,7 +122,7 @@ third-round confirmation) merged as PR #117 at `661a7d4`.
 
 | Item | Remaining | Size |
 |---|---|---|
-| **GR-1D** — extract the 221-line `reconcile_submission()` (`execution_service.py:697-917`) behind call-time DI | characterize every branch first; enumerate every facade-resolved runtime global (the lesson of GR-1C, three times over); mutation-test confirmed absence, unconfirmed lookup, fresh-404 grace, replacement chains, journal failures | 1 milestone + review |
+| **GR-1D** — extract the 221-line `reconcile_submission()` behind call-time DI | **IMPLEMENTED 2026-08-03** (branch `user/claude/gr-1d-reconciliation-extraction-20260803`): token-verbatim move into `execution_kernel/reconcile.py` behind 13-field `ReconciliationDeps`; seams symtable-enumerated BEFORE the move; 10 new characterization tests; 8/8 mutation sweep detected. Awaiting independent review | review |
 | **GR-1E** (conditional) — thin the 281-line `execute_approved_paper_proposal` composition + 2 recovery wrappers, then declare GR-1's "thin composition layer" DoD met or explain the residual | assess after GR-1D | 0–1 milestone |
 | **Committee release gates** — ADR requires ≥50 frozen replay cases (0 exist), memory-poisoning cases (0), broader injection corpus (3 seeds), a CLI `review unavailable` surface (none); only then remove the experiment gate | corpus authoring + CLI wiring | 1–2 milestones |
 | **ML-FS-6 real discovery/confirmation** — spec `research/ml_specs/volatility-discovery-v1.json` is review-ready; no `SpecReviewAttestation` exists | blocked on owner-designated reviewer + real PIT data | owner + data |
@@ -217,10 +217,11 @@ one P2 fail-open verifier gap: same-named weakened indexes/triggers must not
 pass. The durable disposition and issue ledger are in
 `docs/REVIEW_2026-08-03_PHASE2_HYGIENE.md`.
 
-**Phase 3 — finish the kernel (NEXT, owner go-ahead required; 1–2 milestone
-cycles):**
-GR-1D (reconciliation extraction, characterize-first) → GR-1E assessment →
-declare GR-1 done honestly against its DoD.
+**Phase 3 — finish the kernel (ACTIVE — owner gave the GR-1D go-ahead
+2026-08-03):**
+GR-1D (reconciliation extraction, characterize-first) — implemented on
+`user/claude/gr-1d-reconciliation-extraction-20260803`, awaiting independent
+review → GR-1E assessment → declare GR-1 done honestly against its DoD.
 
 **Phase 4 — the two milestones that unblock operations:**
 GR-5 alert delivery (owner picks the channel — decision needed) and GR-3
@@ -260,7 +261,9 @@ explicit authorization).
 
 ## 9. Owner decisions required (consolidated, deduplicated)
 
-1. GR-1D go-ahead (Phase 3, after UI controls) — and epoch model 1 vs 2 (§7).
+1. ~~GR-1D go-ahead~~ — **RESOLVED 2026-08-03: granted; implemented same
+   day, awaiting review.** Still open from this item: epoch model 1 vs 2
+   (§7).
 2. Approve the mandate (or first revise its DRAFT §2 targets) — the only
    promotion gate satisfiable today.
 3. GR-5 alert delivery channel (email / webhook / push / other).

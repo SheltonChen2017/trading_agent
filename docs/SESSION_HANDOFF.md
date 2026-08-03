@@ -434,15 +434,42 @@ Still on the facade:
 - stale reconciliation/claim recovery wrappers; and
 - several compatibility exports and top-level composition responsibilities.
 
-Active next milestone (owner priority change, 2026-08-02): **UI feature
-controls** — Phase 1 of `docs/ACTION_PLAN_2026-08-02.md`, implementing
-`docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` (Settings & Features tab,
-AI master/per-feature preferences, read-only status panels sourced from the
-enforcing functions, protected policy-update workflow for
-`allow_new_positions`/`enable_strategy_proposals`, Ticker Suggestions
-surface). The owner begins daily paper trading 2026-08-03; this milestone
-supports it. It touches no execution-kernel file and consumes only the
-characterization-pinned facade.
+Active milestone status (2026-08-02, end of day): **UI feature controls are
+IMPLEMENTED and awaiting independent review** — Phase 1 of
+`docs/ACTION_PLAN_2026-08-02.md`, implementing
+`docs/reference/UI_FEATURE_CONTROLS_DESIGN.md`.
+
+```text
+branch: user/claude/ui-feature-controls-20260802 (based on the pushed
+        adoption branch tip 2bbcffc, which archives the plans and binds
+        the go-to plan; one PR carries both)
+implementation commit: edc87e9
+scope: Settings & Features tab (three control classes), AI master +
+       per-feature preferences gating all four LLM surfaces (paid calls
+       prevented, not hidden), protected policy-update workflow for
+       allow_new_positions / enable_strategy_proposals (typed UPDATE
+       POLICY confirmation, validate-before-write, atomic save, version
+       bump, fingerprint change, prior-proposal invalidation warning),
+       read-only data-source and safety panels (sourced from the
+       enforcing functions), dedicated research-only Ticker Suggestions
+       tab. New helpers in assistant/policy.py; include_ai_suggestions
+       flag in assistant/recommended_stocks.py.
+validation: full suite 2424 passed / 1 skipped (+12 new tests);
+       compileall clean; git diff --check clean; 3/3 mutation sweep
+       CAUGHT; streamlit AppTest full-script render 0 exceptions, 7 tabs.
+honest limits: Streamlit widget wiring itself is exercised by AppTest
+       render only, not per-widget behavioral tests (repo precedent);
+       save_policy atomicity is enforced by os.replace but only its
+       observable effects (no temp residue, complete JSON) are tested.
+next: independent Codex review of this branch, then merge; the owner
+       begins daily paper trading 2026-08-03 (informal data collection --
+       no evidence epoch; the 60-session clock starts later on a frozen
+       runtime).
+```
+
+The milestone touches no execution-kernel file and the facade surface is
+unchanged. GR-1D follows as the next kernel milestone (action-plan
+Phase 3).
 
 GR-1D follows as the next kernel milestone (action-plan Phase 3):
 

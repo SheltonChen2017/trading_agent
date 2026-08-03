@@ -737,13 +737,12 @@ Notable mechanics:
   real test in ``unmapped_tests``; neutering the F8 injector was detected
   by the F8 test itself).
 
-`alert_delivery` remains the one drill type without a producer until GR-5
-ships a real channel; `backup_restore` keeps its existing `recovery-drill`
-producer. The runbook's incident section now links every fault row to its
-observed behavior and the drill command. Independent review and validation
-are recorded in `docs/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md`.
+GR-5 now supplies the `alert_delivery` producer; `backup_restore` keeps its
+existing `recovery-drill` producer. The runbook's incident section links
+every fault row to its observed behavior and the drill command. Independent
+GR-3 review is recorded in `docs/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md`.
 
-## GR-5 — observability that actually delivers: IMPLEMENTED, awaiting review (2026-08-03)
+## GR-5 — observability that actually delivers: COMPLETE AND INDEPENDENTLY REVIEWED (2026-08-03)
 
 `operational_alerts` had always RECORDED alerts; nothing had ever DELIVERED
 one, so a critical broker-identity halt could sit in SQLite while the
@@ -764,7 +763,9 @@ operator watched a green screen. `assistant/alert_delivery.py` closes that:
   then surfaced via the return value (nonzero CLI exit) AND a durable
   critical `alert_delivery` alert. It is never recorded as delivered. The
   "delivery is broken" alert is deliberately not pushed through the broken
-  channel.
+  channel. Independent review corrected the recovery direction: that open
+  failure alert remains a mandatory readiness failure until a later successful
+  self-test proves the channel recovered and acknowledges it.
 - **Re-delivery is occurrence-based:** an unchanged condition is not
   re-toasted every 60-second sweep; a genuinely new occurrence is.
 - **Self-test:** emits a synthetic critical alert, delivers it, and verifies
@@ -795,12 +796,12 @@ routing, and dropping occurrence-based re-delivery are each detected.
 `alert_delivery` was the last `REQUIRED_PROMOTION_DRILLS` type without a
 producer — **AP-5 is now closed**; all five drill types can be produced.
 
-Honest limits: the Windows channel is exercised through its failure
-directions (missing PowerShell, nonzero exit, stdin argument passing) and
-never by raising a real toast in tests; delivery proves the notification was
-*raised*, not that a human read it; scheduled-task installation for
-`deliver-alerts`/`alert-self-test` is Phase 5 deployment work, not this
-milestone.
+Honest limits: the Windows channel has failure-direction unit coverage
+(missing PowerShell, nonzero exit, stdin argument passing) and independent
+review also raised one isolated real test toast successfully. Delivery proves
+the notification was *raised*, not that a human read it. Scheduled-task
+installation for `deliver-alerts`/`alert-self-test` is Phase 5 deployment
+work, not this milestone.
 
 ## GR-2, GR-4, GR-6 .. GR-9 — not started
 
@@ -809,9 +810,6 @@ full-system additions throughout.
 
 Known items already identified for later milestones:
 
-- **GR-5** must account for `operational_alerts`, `alerts.jsonl`, and the ML
-  evidence supervisor, which already exist. Choosing a real alert channel is
-  an owner decision.
 - **GR-6** is where a database-identity guard belongs. Under the single
   installation topology chosen over the pinned-worktree alternative, it is
   defense-in-depth rather than a precondition.

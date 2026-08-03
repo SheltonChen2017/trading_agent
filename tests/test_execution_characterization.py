@@ -764,6 +764,54 @@ def test_gr1c_the_kernel_body_reads_no_module_globals():
     )
 
 
+def test_gr1c_resolved_failure_class_fallbacks_are_class_resolved(monkeypatch):
+    """Pins the one deliberate residual of the injection boundary.
+
+    ProposalValidationOutcome.resolved_failure_class resolves its
+    FAILURE_NONE / FAILURE_DETERMINISTIC_POLICY fallbacks from the KERNEL's
+    namespace at property-access time. Pre-GR-1C the class lived on the
+    facade, so patching either facade constant changed this property's
+    output; post-extraction it does not. That IS a facade-seam difference,
+    accepted deliberately: injecting the fallbacks would change the frozen
+    dataclass's public field set (a larger compatibility break), and
+    resolving them from the facade would invert the kernel->facade
+    dependency direction GR-1 forbids. This test makes the boundary an
+    explicit decision -- if it starts failing, someone moved the boundary
+    and must update the ProposalValidationDeps/property docstrings to match.
+    """
+    from assistant import execution_service
+    from assistant.execution_kernel import validate as kernel_validate
+    from assistant.execution_telemetry import (
+        FAILURE_DETERMINISTIC_POLICY,
+        FAILURE_NONE,
+    )
+
+    errored = execution_service.ProposalValidationOutcome(
+        proposal=None, intent=None, validation=None, error="boom"
+    )
+    clean = execution_service.ProposalValidationOutcome(
+        proposal=None, intent=None, validation=None, error=None
+    )
+
+    # A facade-level patch of either constant must NOT reach the property...
+    monkeypatch.setattr(
+        execution_service, "FAILURE_DETERMINISTIC_POLICY", "facade-patched-dp"
+    )
+    monkeypatch.setattr(execution_service, "FAILURE_NONE", "facade-patched-none")
+    assert errored.resolved_failure_class == FAILURE_DETERMINISTIC_POLICY
+    assert clean.resolved_failure_class == FAILURE_NONE
+
+    # ...because the property resolves from the kernel module, where a patch
+    # DOES reach. (This direction proves the test observes real resolution
+    # rather than passing vacuously against constants that equal each other.)
+    monkeypatch.setattr(
+        kernel_validate, "FAILURE_DETERMINISTIC_POLICY", "kernel-patched-dp"
+    )
+    monkeypatch.setattr(kernel_validate, "FAILURE_NONE", "kernel-patched-none")
+    assert errored.resolved_failure_class == "kernel-patched-dp"
+    assert clean.resolved_failure_class == "kernel-patched-none"
+
+
 # --------------------------------------------------------------------------
 # 2. execute_approved_paper_proposal
 # --------------------------------------------------------------------------
@@ -1787,13 +1835,18 @@ def test_gr1c_the_outcome_class_is_the_exact_kernel_object():
 
 
 def test_gr1c_preserves_the_facades_export_only_names():
-    """Names GR-1C left with no remaining facade call site stay importable.
+    """The facade's pre-GR-1C importable surface stays importable, by identity.
 
     The facade's importable surface is a compatibility contract -- the
     GR-1B review rejected dropping DuplicateIntentConflict on exactly this
-    ground even with zero in-repo consumers. These names became export-only
-    when the validation body moved into the kernel; losing any of them from
-    ``assistant.execution_service`` is an API change, not a cleanup.
+    ground even with zero in-repo consumers. Losing any of these names from
+    ``assistant.execution_service`` is an API change, not a cleanup. Naming
+    precision (third round): not all of these are export-ONLY -- Decimal,
+    to_decimal, TradeIntent, FAILURE_DATA_INTEGRITY, and
+    FAILURE_INFRASTRUCTURE are live facade call sites (the deps wiring);
+    only MoneyInput, ValidationResult, intent_fingerprint, dataclasses,
+    FAILURE_DETERMINISTIC_POLICY, and FAILURE_NONE remain import-only.
+    Either way the pin is the same: identity, not mere importability.
     """
     import dataclasses as stdlib_dataclasses
     from decimal import Decimal

@@ -290,16 +290,21 @@ namespace, so the section 6.2 private-peer-import guard is satisfied
 structurally rather than by aliasing.
 
 The facade-surface rule applies without distinguishing standard-library from
-first-party names when GR-1 itself makes an existing import dead. Every name
-left with no remaining facade call site
-  (`MoneyInput`, `to_decimal`, the four `FAILURE_*` constants, `TradeIntent`,
-  `ValidationResult`, `intent_fingerprint`, `dataclasses`, and `Decimal`)
-  stays imported and is now pinned
-  by `test_gr1c_preserves_the_facades_export_only_names` — the review
-  rejected dropping `DuplicateIntentConflict` on exactly this ground, so the
-  same rule is applied consistently. The earlier removal of an unrelated
-  pre-existing dead `os` import was cleanup; removing names solely because
-  this refactor moved their call sites would be a GR-1 compatibility change.
+first-party names when GR-1 itself makes an existing import dead. The full
+pre-GR-1C importable surface stays importable and identity-pinned by
+`test_gr1c_preserves_the_facades_export_only_names` — the review rejected
+dropping `DuplicateIntentConflict` on exactly this ground, so the same rule
+is applied consistently. Precision correction (third round): the passage
+above previously described every pinned name as having "no remaining facade
+call site", which was wrong from the moment the deps wiring existed —
+`Decimal`, `to_decimal`, and `TradeIntent` have been facade call sites since
+the review's injection (`465df8d`), and `FAILURE_DATA_INTEGRITY` /
+`FAILURE_INFRASTRUCTURE` joined them in the follow-up review (`c1de927`).
+The genuinely export-only names are `MoneyInput`, `ValidationResult`,
+`intent_fingerprint`, `dataclasses`, `FAILURE_DETERMINISTIC_POLICY`, and
+`FAILURE_NONE`. The earlier removal of an unrelated pre-existing dead `os`
+import was cleanup; removing names solely because this refactor moved their
+call sites would be a GR-1 compatibility change.
 
 #### Independent review corrections
 
@@ -349,6 +354,40 @@ pinned by `test_gr1c_the_kernel_body_reads_no_module_globals`. The guard uses
 Python's symbol table rather than a hand-rolled AST scope approximation, so
 nested scopes and module globals shadowing builtins cannot create false
 negatives.
+
+#### Confirmation of the follow-up review (Claude, 2026-08-02, third round)
+
+Every correction in `c1de927`/`d2d836b` was independently re-verified before
+acceptance:
+
+- all three new characterization tests fail red on the exact pre-correction
+  tree (`2882889`) and the symtable guard fails there naming exactly the four
+  residual globals;
+- reverse-mutating each injected seam back to kernel-local resolution
+  (`outcome_factory` → direct construction, `timezone_type` → kernel-imported
+  `timezone`, `failure_data_integrity` → kernel-imported constant) is caught
+  by BOTH the guard and the matching behavioral test — six of six detections;
+- the size corrections are exact (`execution_service.py` 1,094;
+  `execute_approved_paper_proposal` 281; `validate.py` 479;
+  `run_proposal_validation` 294); the follow-up's earlier 276/1,090 figures
+  were stale carry-forwards, correctly caught.
+
+The P2 classification of the allowlist is accepted: by the standard this
+repository already applied to `DuplicateIntentConflict`, "no test uses the
+seam" does not make removing the seam compatible.
+
+One residual of the same regression class remains, on the class rather than
+the body: `ProposalValidationOutcome.resolved_failure_class` still resolves
+its `FAILURE_NONE` / `FAILURE_DETERMINISTIC_POLICY` fallbacks from the
+kernel's namespace at property-access time. Pre-GR-1C the class lived on the
+facade, so patching either facade constant changed the property's output
+(verified on `5dda78e`); it no longer does. This is documented rather than
+fixed because both available fixes are worse than the gap: injecting the
+fallbacks would change the frozen dataclass's public field set (a larger
+compatibility break than the seam it restores), and resolving them from the
+facade would invert the kernel→facade dependency direction GR-1 forbids.
+`test_gr1c_resolved_failure_class_fallbacks_are_class_resolved` pins the
+boundary so changing it becomes an explicit decision.
 
 ### GR-1C mutation results
 

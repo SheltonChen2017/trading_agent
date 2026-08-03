@@ -108,7 +108,18 @@ class ProposalValidationOutcome:
 
     @property
     def resolved_failure_class(self) -> str:
-        """One of the FAILURE_* constants, never None."""
+        """One of the FAILURE_* constants, never None.
+
+        Boundary note (GR-1C third round): these two fallbacks resolve from
+        THIS module, not the facade, so they sit outside the
+        ProposalValidationDeps injection contract, which is scoped to
+        run_proposal_validation()'s body. Pre-GR-1C the class lived on the
+        facade and a facade-level patch of either constant reached this
+        property; it no longer does. Deliberate: injecting them would change
+        this frozen dataclass's public field set, and resolving them from the
+        facade would invert the kernel->facade dependency direction. Pinned
+        by test_gr1c_resolved_failure_class_fallbacks_are_class_resolved.
+        """
         if self.error is None:
             return FAILURE_NONE
         return self.failure_class or FAILURE_DETERMINISTIC_POLICY

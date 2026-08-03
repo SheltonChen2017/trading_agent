@@ -111,15 +111,23 @@ Do not delete, move, prune, or switch that worktree as part of this handoff.
 Before staging any future change, re-run `git status`, `git rev-parse HEAD`,
 and `git worktree list`; Claude and Codex share repository objects.
 
-During final handoff preparation, another Claude process briefly switched the
-root checkout and created local branch
-`user/claude/gr-1d-review-confirmation-20260803` at `478e531` (the same review
-tip that existed before the handoff commits). Codex detected the switch before
-staging, returned to its own branch, and preserved the Claude branch ref. As of
-the final inventory, that branch has no unique commit, no configured upstream,
-and no completed confirmation report. Do not call a third-round confirmation
-complete merely because the branch name exists; inspect it and coordinate with
-the owner/Claude before deleting, pushing, or continuing it.
+RESOLVED (2026-08-03, later the same day): the briefly created
+`user/claude/gr-1d-review-confirmation-20260803` was Claude starting its
+third-round confirmation while Codex was still preparing this handoff;
+Claude detected the collision, backed out, and deleted that branch itself
+(it never carried a unique commit). The completed confirmation was then made
+on `user/claude/gr-1d-confirmation-20260803` and MERGED as PR #123
+(`c66db0a`): commit `2673714` appends the confirmation to
+`docs/REVIEW_2026-08-03_GR1D_RECONCILIATION.md` with commit-by-commit
+dispositions, independently reproduced merge-tree identity checks, a
+verified no-execution-code-change sweep, and an independent full-suite run
+reproducing 2,485 passed / 1 skipped / 25 warnings on code byte-identical
+to merged main. The owner-requested branch cleanup also completed: origin's
+topic branches were deleted after merge verification; locally only
+`codex/ai-strategy-tool-doc-v2-20260802` (unmerged, owner decision) and a
+merged signals branch held by another session's worktree remain. (This
+paragraph was originally committed in `32f0378` but was dropped from the
+PR #123 merge tree's handoff during conflict resolution; restored here.)
 
 ### Other local-only work
 

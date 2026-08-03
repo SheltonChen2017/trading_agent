@@ -145,9 +145,11 @@ def test_delivery_failure_is_recorded_escalated_and_never_marked_delivered(store
     ]
     assert len(escalations) == 1
     assert escalations[0]["severity"] == "critical"
-    # And the original alert still counts as undelivered.
+    # Both the original condition and the broken-channel escalation remain
+    # mandatory until a successful self-test proves the channel recovered.
     assert [a["fingerprint"] for a in undelivered_critical_alerts(store)] == [
-        "fp-critical"
+        "fp-critical",
+        DELIVERY_FAILURE_FINGERPRINT,
     ]
 
 
@@ -269,6 +271,31 @@ def test_readiness_flags_a_stale_channel_self_test_without_blocking(store):
     assert checks["alert_channel_self_test"].ok is False
     # Degrades rather than blocks: an unproven channel is not a halt.
     assert checks["alert_channel_self_test"].mandatory is False
+
+
+def test_delivery_failure_remains_mandatory_until_a_successful_self_test(store):
+    """A broken channel cannot make the readiness surface claim green.
+
+    The failure alert is deliberately not sent through the known-broken
+    channel, so a later successful self-test is the recovery proof that can
+    safely acknowledge it.
+    """
+    _critical(store)
+    deliver_pending_alerts(
+        store, RecordingChannel(fail_with=RuntimeError("offline")), now=NOW
+    )
+    # The original alert later reaches the operator, but the separate
+    # channel-failure alert must still keep readiness failed.
+    deliver_pending_alerts(store, RecordingChannel(), now=NOW + timedelta(minutes=1))
+    assert [a["fingerprint"] for a in undelivered_critical_alerts(store)] == [
+        DELIVERY_FAILURE_FINGERPRINT
+    ]
+    assert {c.name: c for c in build_alert_delivery_checks(store)}[
+        "critical_alert_delivery"
+    ].ok is False
+
+    run_channel_self_test(store, RecordingChannel(), now=NOW + timedelta(minutes=2))
+    assert undelivered_critical_alerts(store) == []
 
 
 def test_delivery_health_never_manufactures_its_own_alert(store):

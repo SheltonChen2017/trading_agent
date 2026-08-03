@@ -309,13 +309,23 @@ def pending_briefing_alerts(
 
 def undelivered_critical_alerts(store: AssistantStore) -> list[dict[str, Any]]:
     """Open critical alerts with no successful delivery at their current
-    occurrence count -- the condition GR-5 exists to make detectable."""
+    occurrence count -- the condition GR-5 exists to make detectable.
+
+    A delivery-failure alert is the one exception to the ordinary delivery
+    attempt rule: it is deliberately not re-sent through a channel already
+    known to be broken.  It is nevertheless an open, mandatory condition
+    until a successful channel self-test proves recovery and acknowledges it.
+    Excluding it here would make readiness claim every critical alert was
+    delivered immediately after the original alert eventually succeeded.
+    """
     return [
         alert
         for alert in store.list_operational_alerts(status="open", limit=500)
         if alert["severity"] == CRITICAL
-        and alert["fingerprint"] != DELIVERY_FAILURE_FINGERPRINT
-        and needs_delivery(store, alert)
+        and (
+            alert["fingerprint"] == DELIVERY_FAILURE_FINGERPRINT
+            or needs_delivery(store, alert)
+        )
     ]
 
 
@@ -353,6 +363,13 @@ def run_channel_self_test(
         # The self-test alert has served its purpose; leaving it open would
         # pollute the operator's real alert list.
         store.acknowledge_operational_alert(synthetic["alert_id"])
+        # A previous delivery-failure alert intentionally could not be
+        # delivered through its known-broken channel.  This successful test
+        # is the recovery proof: preserve its immutable delivery evidence,
+        # but close the now-resolved open alert so readiness can recover.
+        for alert in store.list_operational_alerts(status="open", limit=500):
+            if alert["fingerprint"] == DELIVERY_FAILURE_FINGERPRINT:
+                store.acknowledge_operational_alert(alert["alert_id"])
     else:
         store.upsert_operational_alert(
             fingerprint=DELIVERY_FAILURE_FINGERPRINT,

@@ -1,6 +1,6 @@
 # Development session handoff
 
-Prepared: 2026-08-03T14:16:21-07:00
+Prepared: 2026-08-03T15:05:00-07:00
 
 Audience: Codex, Claude Code, and the repository owner after changing
 computers or starting a new agent session.
@@ -30,11 +30,20 @@ Canonical durable records:
 - `docs/ACTION_PLAN_2026-08-02.md` — owner-adopted sequencing authority; and
 - `docs/FEATURE_MILESTONE_RECORD.md` — completed GR-1 two-audience record.
 
-**Next owner-directed phase:** Phase 4 in the action plan: GR-5 alert delivery
-plus GR-3 fault-injection drills, with GR-2 risk-registry consolidation riding
-along. The owner must choose the GR-5 alert channel and authorize the concrete
-Phase 4 slice. Do not infer that completing GR-1 authorizes a different
-milestone.
+**Phase 4 is ACTIVE (owner-directed, 2026-08-03).** GR-3 fault-injection
+drills are IMPLEMENTED at commit `4c395d7` on LOCAL-ONLY branch
+`user/claude/gr-3-fault-drills-20260803` and await independent review — do
+not reimplement them, and do not push or merge without owner approval:
+eleven behavioral drills in `tests/faults/` (the archived plan's nine
+fault rows plus the two 2026-08-02 isolation regressions), each asserting
+the mandated refusal AND no partial persisted state, plus
+`scripts/run_fault_drill.py` (hash-stamped report; fail-closed inventory;
+records ambiguous_submission/restart_recovery/kill_switch drill rows,
+epoch-bound or verification_only; dirty-tree lineage records
+code_commit=unknown). Full suite on that tree: 2,498 passed / 1 skipped /
+25 warnings; mutation evidence: neutered injector and renamed inventory
+entry both detected. GR-5 alert delivery remains blocked on the owner's
+channel choice and will supply the last drill producer (alert_delivery).
 
 No work in GR-1E or its review enabled live trading, funded-account access,
 autonomous execution, proposal authority, model promotion, scheduled tasks,
@@ -221,14 +230,19 @@ Completed and do not repeat:
 - GR-1E/GR-1: accepted complete by this review.
 
 The sequencing authority is `docs/ACTION_PLAN_2026-08-02.md`. Phase 4 is
-next:
+ACTIVE:
 
-1. owner chooses the GR-5 alert-delivery channel and authorizes the concrete
-   implementation slice;
-2. implement/review GR-5 delivery records, self-test, and operator surface;
-3. implement/review GR-3's missing fault drills; and
-4. perform GR-2 risk-registry consolidation as the action plan's ride-along,
-   without silently absorbing the separately tracked allocation-batch debt.
+1. GR-3 fault drills: IMPLEMENTED at `4c395d7`
+   (`user/claude/gr-3-fault-drills-20260803`, local-only) — the next
+   action is an independent review of that exact commit per
+   `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`;
+2. owner chooses the GR-5 alert-delivery channel and authorizes the
+   concrete implementation slice;
+3. implement/review GR-5 delivery records, self-test, and operator
+   surface (adds the final alert_delivery drill producer); and
+4. perform GR-2 risk-registry consolidation as the action plan's
+   ride-along, without silently absorbing the separately tracked
+   allocation-batch debt.
 
 Do not start Phase 5 operational deployment or a formal evidence epoch merely
 because Phase 3 is complete. The adopted plan deliberately finishes the

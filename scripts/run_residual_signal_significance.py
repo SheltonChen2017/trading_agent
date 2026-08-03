@@ -21,14 +21,17 @@ Signals and their pre-committed hold periods:
   discovery_frac  = 0.6          (engine default)
   block bootstrap = block lengths (hold, 2x, 3x), the engine default
 
-MULTIPLICITY. 3 signals x 2 directions = 6 pre-registered cells, so
-n_tests=6 and every Bonferroni threshold below is alpha/6. The weighting
-and block-length variants that each cell reports are sensitivity checks,
-NOT extra tests to pick from — backtest/engine.py marks exactly one
-`primary` row per (period, direction), and only that row in the
-CONFIRMATION period counts as evidence. Reading any other row as a
-finding is the researcher-degrees-of-freedom trap this project has
-already been burned by once (the `analyst` "dip" cell).
+MULTIPLICITY. These three signals and the companion PEAD-persistence
+signal are one 2026-08-03 candidate screen: 4 signals x 2 directions = 8
+pre-registered cells, so every Bonferroni threshold below is alpha/8.
+The shared family contract lives in candidate_screen_20260803.py so the
+two executable reports cannot drift apart. The weighting and block-length
+variants that each cell reports are sensitivity checks, NOT extra tests
+to pick from — backtest/engine.py marks exactly one `primary` row per
+(period, direction), and only that row in the CONFIRMATION period counts
+as evidence. Reading any other row as a finding is the researcher-degrees-
+of-freedom trap this project has already been burned by once (the
+`analyst` "dip" cell).
 
 DIRECTION SEMANTICS. The backtester only ever goes long. For the two
 momentum signals the "up" leg is the well-evidenced academic half and
@@ -50,11 +53,11 @@ import pandas as pd
 from config import LOOKBACK_DAYS, UNIVERSE
 from data.market_data import fetch_historical
 from backtest.engine import out_of_sample_significance_by_block
+from scripts.candidate_screen_20260803 import N_TESTS, confirmation_primary_rows
 from signals.residual import build_residual_frames, scan_residual_momentum, scan_residual_reversal
 from signals.vol_scaled_momentum import scan_vol_scaled_momentum
 
 BENCHMARK_TICKER = "SPY"
-N_TESTS = 6  # 3 signals x 2 directions, frozen in advance
 
 
 def main():
@@ -97,7 +100,7 @@ def main():
 
     for name, scan_fn, scan_kwargs, hold_days in runs:
         print(f"\n{'=' * 78}")
-        print(f"{name} — hold {hold_days}d, entry next_open, n_tests={N_TESTS} (Bonferroni alpha/6)")
+        print(f"{name} — hold {hold_days}d, entry next_open, n_tests={N_TESTS} (Bonferroni alpha/{N_TESTS})")
         print("=" * 78)
 
         table = out_of_sample_significance_by_block(
@@ -113,26 +116,28 @@ def main():
             print("No signals flagged — nothing to test.")
             continue
 
+        # Validate the evidence schema before printing any row as primary.
+        # Missing/malformed columns are a refusal, never permission to treat
+        # the full sensitivity grid as evidence.
+        evidence = confirmation_primary_rows(table)
+        primary = table.loc[table["primary"]]
         print("\n--- PRIMARY rows (the only ones that count as evidence) ---")
-        primary = table[table["primary"]] if "primary" in table.columns else table
         print(primary.to_string(index=False))
 
         print("\n--- Full sensitivity grid (weightings x block lengths; NOT independent tests) ---")
         print(table.to_string(index=False))
 
-        if "primary" in table.columns and "period" in table.columns:
-            evidence = primary[primary["period"] == "confirmation"]
-            passed = evidence[evidence["significant"]] if "significant" in evidence.columns else evidence.iloc[0:0]
-            verdict = (
-                f"CONFIRMATION-PERIOD PRIMARY ROWS SIGNIFICANT: {passed['direction'].tolist()}"
-                if not passed.empty
-                else "No confirmation-period primary row cleared the corrected threshold."
-            )
-            print(f"\n>>> {name}: {verdict}")
+        passed = evidence.loc[evidence["significant"]]
+        verdict = (
+            f"CONFIRMATION-PERIOD PRIMARY ROWS SIGNIFICANT: {passed['direction'].tolist()}"
+            if not passed.empty
+            else "No confirmation-period primary row cleared the corrected threshold."
+        )
+        print(f"\n>>> {name}: {verdict}")
 
     print(f"\n{'=' * 78}")
     print(
-        "Reminder: a confirmation-period primary row clearing alpha/6 is ONE piece of\n"
+        f"Reminder: a confirmation-period primary row clearing alpha/{N_TESTS} is ONE piece of\n"
         "evidence from ONE historical sample of ONE universe, on adjusted yfinance data\n"
         "that is explicitly NOT point-in-time. It is not a validated edge, and nothing\n"
         "here authorizes any trading."

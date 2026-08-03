@@ -41,6 +41,14 @@ signal therefore cannot support a point-in-time claim
 (`point_in_time_data=false`), and a positive result here is exploratory
 evidence about a hypothesis, not a tradeable backtest.
 
+DIRECTION SEMANTICS. backtest/engine.py scores every flagged signal as a
+LONG position; shorting is not modeled. The "up" leg therefore tests the
+stated persistence hypothesis (buy after a run of beats). The "dip" leg
+goes long after a run of misses and tests reversal, the OPPOSITE of the
+stated negative-surprise persistence hypothesis. A negative long-leg edge
+on "dip" can be consistent with downward persistence, but it is not a
+modeled short strategy and must not be reported as one.
+
 Same output column contract as scan_dips_and_ups(); bind `earnings_data`
 with functools.partial before passing as scan_fn, exactly like
 signals/pead.py.
@@ -130,7 +138,9 @@ def scan_pead_persistence(
     `return_zscore` carries the streak length (the signal's strength
     measure), and `volume_zscore` carries the current surprise percent —
     both repurposed to keep the shared column contract, matching how
-    signals/pead.py repurposes `return_zscore` for the surprise.
+    signals/pead.py repurposes `return_zscore` for the surprise. Direction
+    is the sign of the event, not necessarily the side of a supported
+    trade; see the module-level direction caveat.
     """
     if as_of is None:
         return pd.DataFrame(columns=RESULT_COLUMNS)

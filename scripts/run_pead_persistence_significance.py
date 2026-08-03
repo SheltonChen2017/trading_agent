@@ -14,14 +14,11 @@ FROZEN SPECIFICATION
 MULTIPLICITY. This is cell 7 and 8 of the same 2026-08-03 candidate
 screen that produced the three price signals in
 run_residual_signal_significance.py — 4 signals x 2 directions = 8
-pre-registered cells in total. n_tests=8 here.
-
-The price-signal run used n_tests=6 because this fourth signal had not
-been built when it launched, so its thresholds were alpha/6 rather than
-alpha/8. That does not change any conclusion drawn from it: nothing
-cleared alpha/6, and alpha/8 is strictly stricter, so nothing would have
-cleared alpha/8 either. If a future run makes a POSITIVE claim, it must
-be re-run at the full family size rather than relying on this argument.
+pre-registered cells in total. Both runners import the same frozen family
+contract and use n_tests=8. The first price-signal run used alpha/6 before
+this fourth signal was built; nothing cleared that looser bar, so no prior
+positive conclusion changes, but every future run uses the full alpha/8
+family threshold directly.
 
 SAMPLE SIZE IS THE POINT OF FAILURE HERE. An event signal that requires
 a 4-quarter streak fires rarely. Read `n`, `n_dates` and
@@ -32,6 +29,11 @@ test, not evidence that the effect is absent.
 NOT POINT-IN-TIME: yfinance earnings figures are as-recorded-now, and
 only currently-listed tickers exist in the universe at all. See
 signals/pead_persistence.py.
+
+DIRECTION SEMANTICS. The engine goes long every signal. The "up" row tests
+continuation after beats; the "dip" row is a long-after-misses reversal
+test, not a short test of downward PEAD. Its edge sign must be read before
+attaching an interpretation; see signals/pead_persistence.py.
 
 This script REPORTS. It does not promote anything or authorize trading.
 """
@@ -47,10 +49,10 @@ from config import LOOKBACK_DAYS, UNIVERSE
 from data.market_data import fetch_historical
 from data.earnings_data import fetch_earnings_history
 from backtest.engine import out_of_sample_significance_by_block
+from scripts.candidate_screen_20260803 import N_TESTS, confirmation_primary_rows
 from signals.pead_persistence import scan_pead_persistence
 
 HOLD_DAYS = 40
-N_TESTS = 8  # 4 signals x 2 directions across the 2026-08-03 screen
 
 
 def main():
@@ -92,22 +94,22 @@ def main():
         print("No signals flagged — the streak gate never fired. Nothing to test.")
         return
 
+    # Validate the evidence schema before printing any row as primary.
+    evidence = confirmation_primary_rows(table)
+    primary = table.loc[table["primary"]]
     print("\n--- PRIMARY rows (the only ones that count as evidence) ---")
-    primary = table[table["primary"]] if "primary" in table.columns else table
     print(primary.to_string(index=False))
 
     print("\n--- Full sensitivity grid (NOT independent tests) ---")
     print(table.to_string(index=False))
 
-    if "primary" in table.columns and "period" in table.columns:
-        evidence = primary[primary["period"] == "confirmation"]
-        passed = evidence[evidence["significant"]] if "significant" in evidence.columns else evidence.iloc[0:0]
-        print(
-            f"\n>>> pead_persistence: "
-            + (f"CONFIRMATION-PERIOD PRIMARY ROWS SIGNIFICANT: {passed['direction'].tolist()}"
-               if not passed.empty
-               else "No confirmation-period primary row cleared the corrected threshold.")
-        )
+    passed = evidence.loc[evidence["significant"]]
+    print(
+        f"\n>>> pead_persistence: "
+        + (f"CONFIRMATION-PERIOD PRIMARY ROWS SIGNIFICANT: {passed['direction'].tolist()}"
+           if not passed.empty
+           else "No confirmation-period primary row cleared the corrected threshold.")
+    )
 
     print(
         "\nCheck n / n_dates / min_detectable_effect_pct above before concluding anything: "

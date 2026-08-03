@@ -122,7 +122,7 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 — execution kernel split: **partial; GR-1D implemented, awaiting review**
+## GR-1 — execution kernel split: **partial; GR-1D independently reviewed**
 
 GR-1A characterization is built and independently reviewed in
 `tests/test_execution_characterization.py`. The first production extraction is
@@ -514,7 +514,7 @@ every branch of the 1,361-line facade. The 315-line
 `validate_proposal_for_execution` orchestration is unchanged by GR-1B and its
 internal branches remain covered only by the pre-existing suite.
 
-### GR-1D — manual reconciliation extraction: IMPLEMENTED, awaiting review
+### GR-1D — manual reconciliation extraction: built and independently reviewed
 
 The 221-line `reconcile_submission()` orchestration moved token-verbatim
 (813 tokens identical after seam-rename and one trailing-comma
@@ -565,7 +565,27 @@ wrapper), run, and restored. All eight were detected:
 | grace-clock `preserve_updated_at` dropped (retry starvation) | DETECTED (`test_a_blocked_reconcile_attempt_does_not_restart_the_grace_clock`) |
 | wrapper resolves a dep from the kernel instead of the facade namespace | DETECTED (5 seam tests) |
 
-### GR-1E — conditional composition thinning: NOT ASSESSED
+### GR-1D independent review (2026-08-03)
+
+PR #120 merged the topic at `711095c`; its merge tree is byte-identical to
+topic tip `88b06f8`. Independent review found no P0-P2 defect in the
+extraction. The old branch order, three-way lookup interpretation,
+fresh-absence reservation hold, aged-confirmed-absence release, replacement
+chain, mismatch kill switch, and unexpected-error recovery were checked in
+the new location. The facade still constructs all thirteen dependencies at
+call time, the kernel body still reads zero module-global runtime names, and
+all claims/transitions remain storage-level operations.
+
+The focused reconciliation set passed 119 tests. Two representative reverse
+mutations were reproduced independently and detected: bypassing the facade's
+lookup seam changed the outcome branch, and suppressing the direct-mismatch
+kill switch failed the safety assertion. The corrected combined review tree
+passed 2,485 tests with 1 skipped and 25 warnings; compilation and diff checks
+were clean. Durable disposition:
+`docs/REVIEW_2026-08-03_GR1D_RECONCILIATION.md` (`2f37210`). GR-1D is
+accepted; GR-1 remains partial pending the GR-1E assessment below.
+
+### GR-1E — conditional composition thinning: NOT ASSESSED — NEXT
 
 After GR-1D, reassess whether one final slice is needed to thin the 281-line
 `execute_approved_paper_proposal` composition and the two recovery wrappers,

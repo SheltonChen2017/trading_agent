@@ -23,6 +23,8 @@ import ast
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 SCRIPTS_DIR = Path(__file__).resolve().parent.parent / "scripts"
@@ -243,6 +245,81 @@ def test_the_bonferroni_default_documents_that_it_covers_one_signal_only():
     assert "total cell count" in doc, "must tell sweeps to pass the full cell count"
 
 
+def test_20260803_candidate_screen_uses_one_fail_closed_family_contract():
+    """The two runners are one four-signal screen, not independent families.
+
+    PR #121 initially left the three-price-signal runner at ``n_tests=6``
+    after adding PEAD persistence as cells seven and eight.  That makes a
+    future p-value in [0.00625, 0.00833) a false positive in one runner but
+    not the other.  Keep the family definition and primary-row selection in
+    one shared contract so the two executable reports cannot drift apart.
+    """
+    import pandas as pd
+
+    from scripts.candidate_screen_20260803 import (
+        CANDIDATE_SIGNAL_NAMES,
+        N_TESTS,
+        confirmation_primary_rows,
+    )
+
+    assert CANDIDATE_SIGNAL_NAMES == (
+        "residual_momentum",
+        "vol_scaled_momentum",
+        "residual_reversal",
+        "pead_persistence",
+    )
+    assert N_TESTS == len(CANDIDATE_SIGNAL_NAMES) * 2 == 8
+
+    for filename in (
+        "run_residual_signal_significance.py",
+        "run_pead_persistence_significance.py",
+    ):
+        tree = ast.parse((SCRIPTS_DIR / filename).read_text(encoding="utf-8"))
+        local_assignments = {
+            target.id
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Assign)
+            for target in node.targets
+            if isinstance(target, ast.Name)
+        }
+        assert "N_TESTS" not in local_assignments, (
+            f"{filename} must import the shared family denominator, not define "
+            "a runner-local value that can drift."
+        )
+
+        significance_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and (
+                node.func.attr
+                if isinstance(node.func, ast.Attribute)
+                else getattr(node.func, "id", None)
+            )
+            in SIGNIFICANCE_FNS
+        ]
+        assert significance_calls, f"{filename} makes no significance call"
+        for call in significance_calls:
+            n_tests_kw = next((kw.value for kw in call.keywords if kw.arg == "n_tests"), None)
+            assert isinstance(n_tests_kw, ast.Name) and n_tests_kw.id == "N_TESTS", (
+                f"{filename} must pass the shared N_TESTS denominator."
+            )
+
+    table = pd.DataFrame(
+        [
+            {"period": "confirmation", "direction": "up", "primary": False, "significant": True},
+            {"period": "confirmation", "direction": "up", "primary": True, "significant": False},
+            {"period": "discovery", "direction": "up", "primary": True, "significant": True},
+        ]
+    )
+    selected = confirmation_primary_rows(table)
+    assert selected.index.tolist() == [1]
+
+    for missing in ("period", "direction", "primary", "significant"):
+        with pytest.raises(ValueError, match=missing):
+            confirmation_primary_rows(table.drop(columns=[missing]))
+
+
 if __name__ == "__main__":
     test_multi_signal_runners_derive_their_bonferroni_denominator()
     test_multi_signal_runners_do_not_pass_a_literal_n_tests_at_any_call_site()
@@ -250,4 +327,5 @@ if __name__ == "__main__":
     test_bonferroni_denominators_match_the_documented_cell_counts()
     test_the_plainly_named_significance_function_points_at_the_block_bootstrap()
     test_the_bonferroni_default_documents_that_it_covers_one_signal_only()
+    test_20260803_candidate_screen_uses_one_fail_closed_family_contract()
     print("All significance-multiplicity tests passed.")

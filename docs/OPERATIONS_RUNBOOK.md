@@ -284,6 +284,41 @@ If cancel-all exits nonzero, treat every reported failure as potentially
 still live and verify it directly at Alpaca. Do not clear the kill switch
 until the broker has no unexplained open orders.
 
+### Fault-drill matrix (GR-3): each incident class and its exercised behavior
+
+Every failure class below has a standing adversarial drill in
+`tests/faults/test_fault_matrix.py`, run end to end by:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/run_fault_drill.py
+```
+
+The harness writes a hash-stamped JSON report (default under the
+Git-ignored `artifacts/`), and `--record-database <db> --operator "<name>"`
+additionally records the `ambiguous_submission`, `restart_recovery`, and
+`kill_switch` promotion drill types in `operational_drill_runs`
+(epoch-bound when an active paper evidence epoch exists; marked
+`verification_only` otherwise). A dirty worktree records
+`code_commit=unknown` by design — run drills from a clean checkout when
+lineage matters.
+
+| Fault | Observed platform behavior (drilled) |
+|---|---|
+| F1 broker timeout after submit | resolved by idempotency-key lookup; exactly one submit call, never a blind resubmit; reservation retained |
+| F2 duplicate order ID on retry | one `broker_orders` row, one order; crash-retry adopts, never resubmits |
+| F3 process killed mid-submission | `recover-stale-claim` frees the pre-broker slot to `validation_failed`; `recover-stale` returns a dead reconciliation to retryable `submission_unknown` with budget held |
+| F4 unexpected order under our key | persistent kill switch activates, proposal stays `submission_unknown` unresolved, further submissions refused |
+| F5 ticker halted before submit | per-ticker refusal (`blocked`), kill switch NOT engaged, risk-reducing sells in other tickers still execute |
+| F6 corporate action between snapshot and submit | share-count mismatch refused before any broker call |
+| F7 stale quote / clock skew | freshness refusal in both directions (old and future timestamps) |
+| F8 disk full during journal write | the atomic projection rolls back whole (no half-journal), the accepted order is never reported failed, reconciliation repairs the record afterwards |
+| F9 kill switch mid-flight | no new submissions; the in-flight order still reconciles cleanly |
+| F10 (regression 2026-08-02) | pytest sessions are pinned away from the operator database |
+| F11 (regression 2026-08-02) | no brokerage credentials reach the test suite; live calls impossible |
+
+`alert_delivery` remains unproducible until GR-5 ships a real channel;
+`backup_restore` keeps its dedicated `recovery-drill` producer above.
+
 The recovery drill creates a consistent backup, restores it to a temporary
 database, runs SQLite integrity checks on both copies, and compares every
 table count. It never replaces the live database. A successful drill expires

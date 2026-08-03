@@ -325,6 +325,166 @@ def test_validate_is_side_effect_free_on_a_real_proposal(store):
     assert observable_state(store, "p-1") == before
 
 
+def _validation_recorder() -> BrokerRecorder:
+    """Broker behaviours that let validation reach validate_trade_intent."""
+    return BrokerRecorder(
+        is_configured=True,
+        assert_account_and_asset_ready={"account": {}, "asset": {}},
+        get_latest_quote={
+            "price": 100.0, "price_decimal": "100.00",
+            "bid": 99.99, "ask": 100.01,
+            "bid_decimal": "99.99", "ask_decimal": "100.01",
+            "timestamp": NOW_ET,
+        },
+    )
+
+
+def test_gr1c_patching_validate_trade_intent_on_the_facade_reaches_the_kernel(
+    store, monkeypatch
+):
+    """THE seam that kept validation on the facade through GR-1B.
+
+    tests/test_personal_assistant.py patches
+    ``execution_service.validate_trade_intent`` to simulate an unexpected
+    gate failure. GR-1C moved the orchestration into
+    assistant/execution_kernel/validate.py behind explicit dependency
+    injection, and this test freezes the contract that made the move safe:
+    the facade builds the deps AT CALL TIME from its own namespace, so a
+    patch on the facade name must still be the callable the kernel invokes.
+    A future edit that resolves validate_trade_intent inside the kernel, or
+    hoists the deps construction to import time, fails here.
+    """
+    from risk.execution_gate import ValidationResult
+
+    store.save_proposal(_proposal(side="sell"))
+    seen: list = []
+
+    def sentinel_gate(intent, portfolio, reference_price, **kwargs):
+        seen.append(intent)
+        return ValidationResult(
+            approved=False,
+            violations=("SENTINEL: the patched gate ran",),
+            violation_codes=("sentinel",),
+        )
+
+    monkeypatch.setattr(execution_service, "validate_trade_intent", sentinel_gate)
+    with patched_broker(_validation_recorder()):
+        outcome = validate_proposal_for_execution(
+            "p-1", _held_portfolio(), load_policy(), store, now_et=NOW_ET
+        )
+    assert outcome.error is None, outcome.error
+    assert outcome.validation.violations == ("SENTINEL: the patched gate ran",), (
+        "the kernel consulted a validate_trade_intent other than the one "
+        "patched onto the facade -- the injection seam is broken"
+    )
+    assert seen and seen[0].ticker == "AAPL"
+
+
+def test_gr1c_every_injected_seam_resolves_from_the_facade_at_call_time(
+    store, monkeypatch
+):
+    """Each remaining ProposalValidationDeps field, frozen one at a time.
+
+    For every injected seam: patch the facade name, call the unchanged
+    public entry point, and require the seam-specific observable that only
+    the PATCHED callable can produce. Any kernel-side import of one of
+    these names (or an import-time deps cache) breaks exactly one context
+    below, naming the regressed seam.
+    """
+    from risk.execution_gate import ValidationResult
+
+    # env_kill_switch_active -- checked after broker configuration, so the
+    # broker recorder must let validation get that far.
+    store.save_proposal(_proposal("p-env", side="sell"))
+    with monkeypatch.context() as patch:
+        patch.setattr(execution_service, "env_kill_switch_active", lambda: True)
+        with patched_broker(_validation_recorder()):
+            outcome = validate_proposal_for_execution(
+                "p-env", _held_portfolio(), load_policy(), store, now_et=NOW_ET
+            )
+        assert "kill switch is active" in str(outcome.error), outcome.error
+
+    # compute_policy_fingerprint -- checked before the broker import.
+    store.save_proposal(_proposal("p-fp", side="sell"))
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            execution_service, "compute_policy_fingerprint", lambda policy: "0" * 64
+        )
+        outcome = validate_proposal_for_execution(
+            "p-fp", _held_portfolio(), load_policy(), store, now_et=NOW_ET
+        )
+        assert "policy fingerprint does not match" in str(outcome.error), outcome.error
+
+    # _intent_from_dict -- parses the stored intent after the broker checks.
+    store.save_proposal(_proposal("p-intent", side="sell"))
+    with monkeypatch.context() as patch:
+        def broken_intent(raw):
+            raise ValueError("SENTINEL-intent")
+
+        patch.setattr(execution_service, "_intent_from_dict", broken_intent)
+        with patched_broker(_validation_recorder()):
+            outcome = validate_proposal_for_execution(
+                "p-intent", _held_portfolio(), load_policy(), store, now_et=NOW_ET
+            )
+        assert "Malformed stored intent: SENTINEL-intent" in str(outcome.error)
+
+    # _pending_buy_value_by_ticker -- consulted only for buys; AAPL is held,
+    # so the no-new-positions policy does not return early.
+    store.save_proposal(_proposal("p-pending", side="buy"))
+    with monkeypatch.context() as patch:
+        def broken_pending(open_orders, broker):
+            raise RuntimeError("SENTINEL-pending")
+
+        patch.setattr(
+            execution_service, "_pending_buy_value_by_ticker", broken_pending
+        )
+        with patched_broker(_validation_recorder()):
+            outcome = validate_proposal_for_execution(
+                "p-pending", _held_portfolio(), load_policy(), store, now_et=NOW_ET
+            )
+        assert "SENTINEL-pending" in str(outcome.error), outcome.error
+
+    # _resolve_earnings_days_away -- its return value must be the one the
+    # (also patched) gate receives, proving the resolver consulted is the
+    # facade's, not one the kernel found in its own namespace.
+    store.save_proposal(_proposal("p-earn", side="sell"))
+    with monkeypatch.context() as patch:
+        received: dict = {}
+
+        def recording_gate(intent, portfolio, reference_price, **kwargs):
+            received.update(kwargs)
+            return ValidationResult(
+                approved=False, violations=("stop",), violation_codes=("sentinel",)
+            )
+
+        patch.setattr(
+            execution_service,
+            "_resolve_earnings_days_away",
+            lambda ticker, override: 77,
+        )
+        patch.setattr(execution_service, "validate_trade_intent", recording_gate)
+        with patched_broker(_validation_recorder()):
+            validate_proposal_for_execution(
+                "p-earn", _held_portfolio(), load_policy(), store, now_et=NOW_ET
+            )
+        assert received.get("earnings_days_away") == 77, received
+
+    # _import_execution_broker -- the deferred broker import is itself
+    # injected, so a facade-level replacement must be what the kernel sees.
+    store.save_proposal(_proposal("p-broker", side="sell"))
+    with monkeypatch.context() as patch:
+        class StubBroker:
+            PAPER_TRADING = False
+
+        patch.setattr(
+            execution_service, "_import_execution_broker", lambda: StubBroker
+        )
+        outcome = validate_proposal_for_execution(
+            "p-broker", _held_portfolio(), load_policy(), store, now_et=NOW_ET
+        )
+        assert "PAPER_TRADING must remain True" in str(outcome.error), outcome.error
+
+
 # --------------------------------------------------------------------------
 # 2. execute_approved_paper_proposal
 # --------------------------------------------------------------------------
@@ -1325,3 +1485,60 @@ def test_gr1b_preserves_the_legacy_duplicate_conflict_facade_export():
     from assistant.storage import DuplicateIntentConflict
 
     assert execution_service.DuplicateIntentConflict is DuplicateIntentConflict
+
+
+def test_gr1c_the_outcome_class_is_the_exact_kernel_object():
+    """Same class object, not a copy: isinstance checks and constructions
+    through either import path must be interchangeable."""
+    from assistant import execution_service
+    from assistant.execution_kernel import validate as validate_kernel
+
+    assert (
+        execution_service.ProposalValidationOutcome
+        is validate_kernel.ProposalValidationOutcome
+    )
+    assert (
+        execution_service.ProposalValidationDeps
+        is validate_kernel.ProposalValidationDeps
+    )
+    assert (
+        execution_service.run_proposal_validation
+        is validate_kernel.run_proposal_validation
+    )
+
+
+def test_gr1c_preserves_the_facades_export_only_names():
+    """Names GR-1C left with no remaining facade call site stay importable.
+
+    The facade's importable surface is a compatibility contract -- the
+    GR-1B review rejected dropping DuplicateIntentConflict on exactly this
+    ground even with zero in-repo consumers. These names became export-only
+    when the validation body moved into the kernel; losing any of them from
+    ``assistant.execution_service`` is an API change, not a cleanup.
+    """
+    from assistant import execution_service
+    from assistant.execution_telemetry import (
+        FAILURE_DATA_INTEGRITY,
+        FAILURE_DETERMINISTIC_POLICY,
+        FAILURE_INFRASTRUCTURE,
+        FAILURE_NONE,
+    )
+    from assistant.money import MoneyInput, to_decimal
+    from risk.execution_gate import (
+        TradeIntent,
+        ValidationResult,
+        intent_fingerprint,
+    )
+
+    assert execution_service.FAILURE_DATA_INTEGRITY is FAILURE_DATA_INTEGRITY
+    assert (
+        execution_service.FAILURE_DETERMINISTIC_POLICY
+        is FAILURE_DETERMINISTIC_POLICY
+    )
+    assert execution_service.FAILURE_INFRASTRUCTURE is FAILURE_INFRASTRUCTURE
+    assert execution_service.FAILURE_NONE is FAILURE_NONE
+    assert execution_service.MoneyInput is MoneyInput
+    assert execution_service.to_decimal is to_decimal
+    assert execution_service.TradeIntent is TradeIntent
+    assert execution_service.ValidationResult is ValidationResult
+    assert execution_service.intent_fingerprint is intent_fingerprint

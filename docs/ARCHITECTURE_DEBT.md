@@ -59,16 +59,19 @@ precondition, override-review, budget-reservation, submission-dispatch,
 ambiguous-outcome, and accepted-order-journaling orchestration into named
 kernel phases while retaining the storage-level atomic transition primitives.
 
-**Still open**: `execution_service.py` remains 1,361 lines. Its 315-line
-validation orchestration, 276-line execution composition, and 221-line manual
-reconciliation function still keep substantial state-machine orchestration on
-the facade. It is not yet the thin composition layer in the GR-1 definition of
-done. The validation caller deliberately remains there because an existing
-test and therefore a compatibility seam monkeypatches the facade's
-`validate_trade_intent`; explicit dependency injection is the safer route to
-finishing that move. `allocation_batch.py` also still owns cross-leg
-reservation math separately from the storage-level budget reservation. The
-remaining split is smaller than it was, but not done.
+**Partially addressed 2026-08-02 (GR-1C)**: the 315-line validation
+orchestration moved into `assistant/execution_kernel/validate.py` behind an
+explicit `ProposalValidationDeps` injection contract that the facade builds
+at call time from its own namespace — which is what preserves the
+`execution_service.validate_trade_intent` monkeypatch seam the previous
+paragraph of this entry said made the move unsafe without DI.
+
+**Still open**: `execution_service.py` remains 1,084 lines. Its 276-line
+execution composition and 221-line manual reconciliation function still keep
+substantial state-machine orchestration on the facade, and it is not yet the
+thin composition layer in the GR-1 definition of done. `allocation_batch.py`
+also still owns cross-leg reservation math separately from the storage-level
+budget reservation. The remaining split is smaller than it was, but not done.
 
 ## 2. Risk-check scatter
 

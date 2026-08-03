@@ -122,7 +122,7 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 — execution kernel split: **partial; GR-1B independently reviewed**
+## GR-1 — execution kernel split: **partial; GR-1C built, awaiting review**
 
 GR-1A characterization is built and independently reviewed in
 `tests/test_execution_characterization.py`. The first production extraction is
@@ -246,6 +246,90 @@ Two gaps in the review itself were closed as follow-ups:
   that name ever existed. All four now name
   `execute_approved_paper_proposal()`. Comment-only edits; no test behavior
   changed.
+
+### GR-1C — validation orchestration moved behind explicit dependency injection
+
+The step GR-1B's review named is done: the 315-line
+`validate_proposal_for_execution()` body now lives in
+`assistant/execution_kernel/validate.py` as `run_proposal_validation()`,
+together with the `ProposalValidationOutcome` dataclass (re-exported from the
+facade as the same class object). `execution_service.py` is down from 1,361
+to 1,084 lines. No existing test was modified; 2 characterization tests and
+2 identity/export pins were added.
+
+The mechanism is the one GR-1B's deviation #1 predicted would be required.
+Every callable the orchestration used to resolve from the facade's module
+namespace is now an explicit field on a frozen `ProposalValidationDeps`
+contract:
+
+| Injected seam | Legacy facade name |
+|---|---|
+| deferred broker import (provider, called mid-sequence) | `import execution.alpaca_broker` inline |
+| environment kill switch | `env_kill_switch_active` |
+| policy fingerprint | `compute_policy_fingerprint` |
+| stored-intent parsing | `_intent_from_dict` |
+| pending-buy exposure estimation | `_pending_buy_value_by_ticker` |
+| earnings-date resolution | `_resolve_earnings_days_away` |
+| the risk gate itself | `validate_trade_intent` |
+
+The facade wrapper constructs the deps INSIDE its function body from bare
+names, so each name is resolved from `assistant.execution_service.__dict__`
+at call time — which is exactly what keeps
+`execution_service.validate_trade_intent = stub`
+(`tests/test_personal_assistant.py:1465`) working after the move. The broker
+dependency is a provider function rather than a module object so the deferred
+import still runs AFTER the existence/expiry/policy refusals, preserving
+which error wins when the broker package itself cannot import. A side
+benefit: the kernel module imports none of the injected callables, so the
+section 6.2 private-peer-import guard is satisfied structurally rather than
+by aliasing.
+
+Two facade-surface decisions, applying the GR-1B review's own standard:
+
+- The now-dead stdlib imports (`dataclasses`, `Decimal`) were removed,
+  matching the review's removal of dead `import os`.
+- Every first-party name left with no remaining facade call site
+  (`MoneyInput`, `to_decimal`, the four `FAILURE_*` constants, `TradeIntent`,
+  `ValidationResult`, `intent_fingerprint`) stays imported and is now pinned
+  by `test_gr1c_preserves_the_facades_export_only_names` — the review
+  rejected dropping `DuplicateIntentConflict` on exactly this ground, so the
+  same rule is applied here proactively instead of waiting to be caught.
+
+### GR-1C mutation results
+
+Every mutation was applied in the code's NEW location (or to the new
+wrapper), run, and restored. All seven were detected:
+
+| Mutation | Result |
+|---|---|
+| kernel resolves `validate_trade_intent` from its own namespace instead of the injected dep — the exact regression this milestone exists to prevent | DETECTED (2 tests: the new seam freeze AND the pre-existing `validation_failed` test) |
+| facade passes the real gate directly, bypassing its own namespace | DETECTED (same 2 tests) |
+| kernel kill-switch refusal deleted | DETECTED (2 tests) |
+| expiry check deleted | DETECTED |
+| policy-fingerprint check deleted | DETECTED (2 tests) |
+| open-orders fail-closed check deleted | DETECTED |
+| wrapper silently drops the `extra_open_order_count` passthrough | DETECTED (4 batch-cap tests) |
+
+Precision notes, stated so the table cannot over-claim:
+
+- The kill-switch deletion is single-site WITHIN validation:
+  `validate_trade_intent()` also receives the flag and still rejects, so what
+  the deletion loses is the error-classified hard refusal (`outcome.error`)
+  in favour of a policy-violation rejection — and that is precisely the form
+  the new seam test pins.
+- The passthrough mutation class is NEW risk introduced by the wrapper shape
+  itself (a kwarg silently dropped between wrapper and kernel would revert
+  that parameter to its default). One representative passthrough was mutated;
+  the others are exercised by `test_allocation_batch`'s
+  override-comparison tests and the existing preflight suite.
+
+Honest limit: the orchestration body moved verbatim, and its internal
+branches remain covered by the same pre-existing suite as before — the new
+tests freeze the injection contract, they do not add branch coverage. GR-1
+remains partial: the 276-line execute composition, the 221-line
+`reconcile_submission`, and the two recovery functions still live on the
+1,084-line facade, and whether that satisfies the plan's "thin composition
+layer" is a reviewer call, not a claim made here.
 
 ### What the characterization suite can actually detect
 

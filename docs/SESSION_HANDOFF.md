@@ -88,24 +88,25 @@ Codex independent follow-up review branch:
   status-doc correction: d2d836b  Correct GR-1C follow-up size accounting
   reviewed handoff: 6d3a703  Update session handoff after reviewed GR-1C follow-ups
   general workflow docs: 3c180b4  Add general code review and milestone record instructions
-  remote state: LOCAL ONLY, NOT PUSHED
-  worktree: DIRTY — preserve the unstaged concurrent GR-1C third-round edits:
-    assistant/execution_kernel/validate.py
-      documents class-resolved FAILURE_NONE/deterministic-policy fallbacks
-    tests/test_execution_characterization.py
-      corrects facade-export test terminology
-    docs/GENERAL_READINESS_STATUS.md
-      records the same boundary/terminology precision work
-    These files are not part of commit 3c180b4 or this handoff update. Treat
-    them as one in-progress external edit set; do not overwrite, stage, or
-    describe them as reviewed until their author finishes and commits them.
+  canonical-handoff rule: 1cdff99  Make session handoff the canonical cross-computer state
+  remote state: PUSHED (the earlier LOCAL ONLY statement in 1cdff99's text
+  became stale the moment the branch itself was pushed)
+
+Claude third-round confirmation branch, based on Codex tip 1cdff99:
+  branch: user/claude/gr-1c-followup-confirmation-20260802
+  contents: the previously in-flight three-file edit set 1cdff99 flagged as
+  "preserve, do not overwrite" (now committed and validated), plus the
+  CLAUDE.md / skill / milestone-record wiring for the owner-mandated general
+  instructions, plus this handoff update
+  remote state: PUSHED; one pull request from this branch carries the whole
+  Codex + Claude chain, since the Codex commits are its ancestors
 ```
 
-The current Codex review branch is based on merged `main` `2882889`. It adds
-only the independently verified compatibility/status corrections and this
-handoff.
+The Codex review branch is based on merged `main` `2882889`. It adds the
+independently verified compatibility/status corrections, the rewritten
+handoff, and the owner-mandated review/record process documents.
 Do not redo or separately cherry-pick the earlier GR-1C commits when taking
-this branch; they are already ancestors of `2882889`.
+either branch; they are already ancestors of `2882889`.
 
 ### Local-only strategy-tool document
 
@@ -126,28 +127,26 @@ do not recreate it from memory while an exact copy may exist elsewhere.
 
 ### Required action before abandoning the old computer
 
-The following push has **not** been performed because the normal workflow
-requires explicit owner authorization:
-
-```powershell
-git push -u origin codex/review-claude-gr1c-followups-20260802
-```
-
-The original GR-1C implementation, original review, Claude follow-up, and both
-merges are already remote. Only Codex commits `c1de927`, `d2d836b`, `6d3a703`,
-`3c180b4`, the handoff update after them, the three-file uncommitted GR-1C
-third-round edit set, and the unavailable historical `a656015` require
-separate treatment.
+Both active branches are now on the remote
+(`codex/review-claude-gr1c-followups-20260802` and
+`user/claude/gr-1c-followup-confirmation-20260802`), so every GR-1C commit,
+the follow-up review, the third-round confirmation, and the general workflow
+documents survive a computer switch via `git fetch` alone. The only artifact
+still requiring separate treatment is the unavailable historical `a656015`
+(strategy-tool document), which exists — if anywhere — only on the earlier
+computer.
 
 ## 3. Relevant GR-1 commit history
 
 Recent sequence:
 
 ```text
-3c180b4  Codex: add general code review and milestone record instructions (local)
-6d3a703  Codex: update session handoff after reviewed GR-1C follow-ups (local)
-d2d836b  Codex: correct GR-1C follow-up size accounting (local)
-c1de927  Codex: complete independent GR-1C follow-up review (local)
+(Claude third-round commits follow on user/claude/gr-1c-followup-confirmation-20260802)
+1cdff99  Codex: make session handoff the canonical cross-computer state (pushed)
+3c180b4  Codex: add general code review and milestone record instructions (pushed)
+6d3a703  Codex: update session handoff after reviewed GR-1C follow-ups (pushed)
+d2d836b  Codex: correct GR-1C follow-up size accounting (pushed)
+c1de927  Codex: complete independent GR-1C follow-up review (pushed)
 2882889  Merge PR #110: Claude GR-1C review follow-ups into main
 b06a281  Claude: update session handoff after GR-1C review follow-ups
 7058cb2  Claude: pin the injection boundary the original review left implicit
@@ -327,6 +326,38 @@ execute_approved_paper_proposal():         281 lines
 reconcile_submission():                    221 lines
 ```
 
+### Third-round confirmation (Claude, 2026-08-02)
+
+Every Codex correction was independently re-verified before acceptance, per
+`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` (commit-by-commit dispositions and
+the P0–P3 ledger live in the review report):
+
+- all three new characterization tests fail red on the exact pre-correction
+  tree `2882889` (an initial "3 passed" observation was a measurement
+  artifact — the probe imported the corrected code from the main worktree via
+  the working directory; rerun correctly inside the pre-correction worktree,
+  all three fail red) and the symtable guard fails there naming exactly
+  `ProposalValidationOutcome`, `timezone`, `FAILURE_DATA_INTEGRITY`,
+  `FAILURE_INFRASTRUCTURE`;
+- reverse-mutating each injected seam back to kernel-local resolution is
+  caught by BOTH the guard and the matching behavioral test (six of six
+  detections);
+- the size corrections are exact; the follow-up's earlier 276/1,090 figures
+  were stale carry-forwards;
+- the P2 classification of the allowlist is accepted as fair.
+
+One residual of the same regression class was found and documented rather
+than fixed: `ProposalValidationOutcome.resolved_failure_class` resolves its
+`FAILURE_NONE`/`FAILURE_DETERMINISTIC_POLICY` fallbacks from the kernel at
+property-access time; pre-GR-1C a facade patch of either constant reached it
+(verified on `5dda78e`), and it no longer does. Both available fixes are
+worse than the gap (injecting changes the frozen dataclass's public field
+set; facade resolution inverts the kernel->facade dependency direction), so
+the boundary is documented in the property docstring and pinned by
+`test_gr1c_resolved_failure_class_fallbacks_are_class_resolved`, which also
+proves itself non-vacuous by patching the kernel side. Codex should treat
+that boundary as open for challenge in its next review round.
+
 ## 5. GR-1 status and the exact next development step
 
 GR-1 is **partial**. GR-1A, GR-1B, and GR-1C are implemented and independently
@@ -447,6 +478,16 @@ Full suite:
 2411 passed, 1 skipped, 26 warnings in 166.45 seconds
 ```
 
+Third-round confirmation run (Claude, Python 3.12.13, on the final tree with
+the confirmation commits' code/test changes applied):
+
+```text
+2412 passed, 1 skipped, 25 warnings in 376.99 seconds
+(+1 = test_gr1c_resolved_failure_class_fallbacks_are_class_resolved)
+focused: tests/test_execution_characterization.py +
+         tests/test_ml_import_boundary.py = 50 passed
+```
+
 Additional gates:
 
 ```text
@@ -454,6 +495,8 @@ compileall: clean
 git diff --check: clean
 review branch: clean before editing this handoff
 mutation: direct kernel outcome construction detected, then restored green
+third-round mutation sweep: all three seam reverse-mutations caught by both
+  the symtable guard and the matching behavioral test (six of six)
 ```
 
 The warnings were non-failing third-party/environment notices. Do not convert
@@ -531,12 +574,17 @@ After restore:
 Presence only; no values were read or recorded:
 
 ```text
-APCA_API_KEY_ID         process=True   user=False
-APCA_API_SECRET_KEY     process=True   user=False
-DATABENTO_API_KEY       process=True   user=False
-ANTHROPIC_API_KEY       process=False  user=False
-FINNHUB_API_KEY         process=False  user=False
+APCA_API_KEY_ID         process=True   user=True
+APCA_API_SECRET_KEY     process=True   user=True
+DATABENTO_API_KEY       process=True   user=True
+ANTHROPIC_API_KEY      process=False  user=False
+FINNHUB_API_KEY        process=False  user=False
 ```
+
+Third-round correction: the previous revision recorded `user=False` for the
+first three; re-measured presence-only via both
+`[Environment]::GetEnvironmentVariable(..., 'User')` and the
+`HKCU:\Environment` registry key, both report the user-scope values present.
 
 Recreate required secrets through a secure mechanism. Start a new terminal or
 agent process so it inherits them. Confirm Alpaca points to the intended paper
@@ -736,8 +784,9 @@ Do not let UI/development tests share the restored operational database.
 
 Do not infer answers to these:
 
-1. Authorization to push/merge local review branch
-   `codex/review-claude-gr1c-followups-20260802` after its handoff commit.
+1. Authorization to merge `user/claude/gr-1c-followup-confirmation-20260802`
+   (which carries the entire Codex follow-up review chain as ancestors);
+   both branches are already pushed, so only the merge decision remains.
 2. Whether to retrieve unavailable local-only strategy-tool commit `a656015`
    from the earlier computer or a private bundle.
 3. When to begin GR-1D and whether reconciliation is the selected next slice.
@@ -758,24 +807,18 @@ implication.
 
 ## 16. Exact resume sequence on the new computer
 
-If the Codex follow-up review branch was pushed:
-
 ```powershell
 git fetch --all --prune
-git switch --track origin/codex/review-claude-gr1c-followups-20260802
+git switch --track origin/user/claude/gr-1c-followup-confirmation-20260802
 git status --short --branch
-git log -6 --oneline --decorate
+git log -10 --oneline --decorate
 ```
 
 Verify that history contains merged main `2882889`, Codex corrections
-`c1de927`/`d2d836b`, reviewed handoff `6d3a703`, general workflow commit
-`3c180b4`, and the later handoff commit containing this file. Then rerun
+`c1de927`/`d2d836b`, reviewed handoff `6d3a703`, workflow docs `3c180b4`,
+canonical-handoff rule `1cdff99`, and the Claude third-round confirmation
+commits ending with the handoff commit containing this file. Then rerun
 focused/full tests in the reconstructed environment before merging.
-
-If the Codex branch is not remote, it remains local to the computer that
-created this handoff. Push it with owner authorization or transfer it as a Git
-bundle before that object database is lost. Claude's follow-up and all earlier
-GR-1C work are already merged in `origin/main`.
 
 Recommended resume prompt:
 
@@ -784,17 +827,19 @@ Read CLAUDE.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
 docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md completely, then read
 docs/FEATURE_MILESTONE_RECORD.md and docs/SESSION_HANDOFF.md. Verify
 origin/main and all branch/commit claims against Git. GR-1C through Claude
-follow-up merge 2882889 and Codex follow-up corrections c1de927/d2d836b are
-complete; do not redo them. Preserve the recorded dirty readiness-status edit.
-Confirm whether the Codex review/handoff branch was pushed or merged. Preserve
-facade imports and complete call-time DI, including the outcome factory,
-datetime, timezone, Decimal, TradeIntent, to_decimal, and behavior-bearing
-failure constants. Verify paper mode,
-database isolation, credential presence without values, scheduler state, and
-ignored artifact transfer. Do not start live trading, an evidence epoch,
-scheduled tasks, ML/LLM proposal integration, or destructive cleanup. If the
-owner authorizes the next coding milestone, perform a gap analysis for GR-1D
-manual reconciliation extraction, add characterization first, implement one
-reviewable slice, run focused/full validation, commit, and stop for independent
-review before GR-2.
+follow-up merge 2882889, Codex follow-up corrections c1de927/d2d836b, and the
+Claude third-round confirmation on
+user/claude/gr-1c-followup-confirmation-20260802 are complete; do not redo
+them. Confirm whether the confirmation branch was merged. Preserve facade
+imports and complete call-time DI, including the outcome factory, datetime,
+timezone, Decimal, TradeIntent, to_decimal, and behavior-bearing failure
+constants; the one documented residual is
+ProposalValidationOutcome.resolved_failure_class's kernel-resolved fallbacks.
+Verify paper mode, database isolation, credential presence without values,
+scheduler state, and ignored artifact transfer. Do not start live trading, an
+evidence epoch, scheduled tasks, ML/LLM proposal integration, or destructive
+cleanup. If the owner authorizes the next coding milestone, perform a gap
+analysis for GR-1D manual reconciliation extraction, add characterization
+first, implement one reviewable slice, run focused/full validation, commit,
+and stop for independent review before GR-2.
 ```

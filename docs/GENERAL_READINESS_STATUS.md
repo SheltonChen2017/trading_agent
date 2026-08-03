@@ -122,7 +122,7 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 — execution kernel split: **partial; GR-1C built, awaiting review**
+## GR-1 — execution kernel split: **partial; GR-1C independently reviewed**
 
 GR-1A characterization is built and independently reviewed in
 `tests/test_execution_characterization.py`. The first production extraction is
@@ -254,8 +254,9 @@ The step GR-1B's review named is done: the 315-line
 `assistant/execution_kernel/validate.py` as `run_proposal_validation()`,
 together with the `ProposalValidationOutcome` dataclass (re-exported from the
 facade as the same class object). `execution_service.py` is down from 1,361
-to 1,084 lines. No existing test was modified; 2 characterization tests and
-2 identity/export pins were added.
+to 1,090 lines after independent-review compatibility corrections. Claude's
+implementation added 2 characterization tests and 2 identity/export pins;
+the review added 2 more characterization tests and expanded the export pin.
 
 The mechanism is the one GR-1B's deviation #1 predicted would be required.
 Every callable the orchestration used to resolve from the facade's module
@@ -265,6 +266,10 @@ contract:
 | Injected seam | Legacy facade name |
 |---|---|
 | deferred broker import (provider, called mid-sequence) | `import execution.alpaca_broker` inline |
+| validation clock/type | `datetime` |
+| decimal-zero factory | `Decimal` |
+| open-order intent construction | `TradeIntent` |
+| decimal conversion | `to_decimal` |
 | environment kill switch | `env_kill_switch_active` |
 | policy fingerprint | `compute_policy_fingerprint` |
 | stored-intent parsing | `_intent_from_dict` |
@@ -280,20 +285,34 @@ at call time — which is exactly what keeps
 dependency is a provider function rather than a module object so the deferred
 import still runs AFTER the existence/expiry/policy refusals, preserving
 which error wins when the broker package itself cannot import. A side
-benefit: the kernel module imports none of the injected callables, so the
-section 6.2 private-peer-import guard is satisfied structurally rather than
-by aliasing.
+benefit: the kernel resolves none of these collaborators from its own runtime
+namespace, so the section 6.2 private-peer-import guard is satisfied
+structurally rather than by aliasing.
 
-Two facade-surface decisions, applying the GR-1B review's own standard:
-
-- The now-dead stdlib imports (`dataclasses`, `Decimal`) were removed,
-  matching the review's removal of dead `import os`.
-- Every first-party name left with no remaining facade call site
+The facade-surface rule applies without distinguishing standard-library from
+first-party names when GR-1 itself makes an existing import dead. Every name
+left with no remaining facade call site
   (`MoneyInput`, `to_decimal`, the four `FAILURE_*` constants, `TradeIntent`,
-  `ValidationResult`, `intent_fingerprint`) stays imported and is now pinned
+  `ValidationResult`, `intent_fingerprint`, `dataclasses`, and `Decimal`)
+  stays imported and is now pinned
   by `test_gr1c_preserves_the_facades_export_only_names` — the review
   rejected dropping `DuplicateIntentConflict` on exactly this ground, so the
-  same rule is applied here proactively instead of waiting to be caught.
+  same rule is applied consistently. The earlier removal of an unrelated
+  pre-existing dead `os` import was cleanup; removing names solely because
+  this refactor moved their call sites would be a GR-1 compatibility change.
+
+#### Independent review corrections
+
+The review found that the original seven-field dependency bundle was not yet
+complete. The moved body still resolved `datetime`, `Decimal`, `TradeIntent`,
+and `to_decimal` inside the kernel. On Claude's committed snapshot, focused
+tests proved that replacing each corresponding facade name no longer affected
+validation, even though the milestone claimed every callable seam remained a
+call-time facade dependency. The review injected all four remaining runtime
+collaborators, covered both expiration and quote-receipt clock reads, restored
+the two dropped facade exports, and corrected the module's description from
+"pure" to "read-only": validation reads durable state and queries the broker,
+but does not mutate proposal, reservation, telemetry, or order state.
 
 ### GR-1C mutation results
 
@@ -328,7 +347,7 @@ branches remain covered by the same pre-existing suite as before — the new
 tests freeze the injection contract, they do not add branch coverage. GR-1
 remains partial: the 276-line execute composition, the 221-line
 `reconcile_submission`, and the two recovery functions still live on the
-1,084-line facade, and whether that satisfies the plan's "thin composition
+1,090-line facade, and whether that satisfies the plan's "thin composition
 layer" is a reviewer call, not a claim made here.
 
 ### What the characterization suite can actually detect

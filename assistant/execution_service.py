@@ -198,6 +198,8 @@ acting):
 """
 from __future__ import annotations
 
+import dataclasses
+from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 
 from assistant.execution_kernel.outcomes import (
@@ -384,6 +386,10 @@ def validate_proposal_for_execution(
         now_et=now_et,
         deps=ProposalValidationDeps(
             import_broker=_import_execution_broker,
+            datetime_type=datetime,
+            decimal_factory=Decimal,
+            trade_intent_factory=TradeIntent,
+            to_decimal=to_decimal,
             env_kill_switch_active=env_kill_switch_active,
             compute_policy_fingerprint=compute_policy_fingerprint,
             intent_from_dict=_intent_from_dict,

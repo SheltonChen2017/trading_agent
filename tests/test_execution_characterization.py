@@ -290,7 +290,7 @@ def test_validate_unknown_proposal_touches_no_broker_and_writes_nothing(store):
     assert observable_state(store, "missing") == before
 
 
-def test_validate_is_side_effect_free_on_a_real_proposal(store):
+def test_validate_is_read_only_on_a_real_proposal(store):
     # A SELL of a held position, because the active policy refuses to open
     # new positions -- a buy returns early at that check and never exercises
     # the body this test claims to characterise. (Found by instrumenting the
@@ -315,13 +315,13 @@ def test_validate_is_side_effect_free_on_a_real_proposal(store):
             "p-1", held, load_policy(), store, now_et=NOW_ET
         )
     # Freeze that it reached the body rather than an early refusal -- an
-    # early return makes a purity claim vacuous.
+    # early return makes a read-only-state claim vacuous.
     assert outcome.validation is not None, (
         f"validation returned early ({outcome.error}); this test would then "
-        "prove nothing about the body's purity"
+        "prove nothing about the body's read-only state contract"
     )
-    # Validation is documented as pure. Freeze that: no status change, no
-    # reservation, no telemetry, no order rows.
+    # Validation may perform store and broker reads. Freeze the actual
+    # contract: no status change, reservation, telemetry, or order rows.
     assert observable_state(store, "p-1") == before
 
 
@@ -483,6 +483,104 @@ def test_gr1c_every_injected_seam_resolves_from_the_facade_at_call_time(
             "p-broker", _held_portfolio(), load_policy(), store, now_et=NOW_ET
         )
         assert "PAPER_TRADING must remain True" in str(outcome.error), outcome.error
+
+
+def test_gr1c_runtime_constructors_resolve_from_the_facade_at_call_time(
+    store, monkeypatch
+):
+    """The moved body used these public facade names at runtime too.
+
+    Injecting only the named helper functions is not enough: open-order
+    normalization constructed ``TradeIntent`` directly, and cumulative batch
+    exposure called ``to_decimal`` directly. Moving those resolutions into
+    the kernel would silently defeat the same facade monkeypatch contract that
+    motivated GR-1C's dependency bundle.
+    """
+    from assistant.money import to_decimal as real_to_decimal
+    from risk.execution_gate import TradeIntent as RealTradeIntent
+
+    store.save_proposal(_proposal("p-runtime", side="buy"))
+    portfolio = _held_portfolio()
+    portfolio.open_orders = [
+        {"ticker": "MSFT", "side": "sell", "shares": 1, "type": "market"}
+    ]
+    constructed: list[dict] = []
+    converted: list[tuple] = []
+
+    def recording_trade_intent(*args, **kwargs):
+        constructed.append(dict(kwargs))
+        return RealTradeIntent(*args, **kwargs)
+
+    def recording_to_decimal(value, **kwargs):
+        converted.append((value, dict(kwargs)))
+        return real_to_decimal(value, **kwargs)
+
+    monkeypatch.setattr(execution_service, "TradeIntent", recording_trade_intent)
+    monkeypatch.setattr(execution_service, "to_decimal", recording_to_decimal)
+    with patched_broker(_validation_recorder()):
+        outcome = validate_proposal_for_execution(
+            "p-runtime",
+            portfolio,
+            load_policy(),
+            store,
+            now_et=NOW_ET,
+            earnings_days_away=10,
+            extra_pending_buy_value_by_ticker={"AAPL": 25.0},
+        )
+
+    assert outcome.validation is not None, outcome.error
+    assert constructed and constructed[0]["ticker"] == "MSFT"
+    assert converted and converted[0][0] == 25.0
+
+
+def test_gr1c_validation_clock_still_resolves_from_the_facade(store, monkeypatch):
+    """Callers could replace the facade clock before the body moved.
+
+    Both expiration and the captured quote-receipt timestamp used that same
+    name, so the dependency must cover every runtime clock read rather than
+    only the first one encountered in the function.
+    """
+    real_datetime = datetime
+
+    class FutureDateTime:
+        @classmethod
+        def now(cls, tz=None):
+            return real_datetime(2099, 1, 1, tzinfo=timezone.utc)
+
+        @classmethod
+        def fromisoformat(cls, value):
+            return real_datetime.fromisoformat(value)
+
+    store.save_proposal(
+        _proposal("p-clock", side="sell", expires_at="2090-01-01T00:00:00+00:00")
+    )
+    monkeypatch.setattr(execution_service, "datetime", FutureDateTime)
+
+    outcome = validate_proposal_for_execution(
+        "p-clock", _held_portfolio(), load_policy(), store, now_et=NOW_ET
+    )
+
+    assert outcome.error == "Proposal has expired."
+
+    store.save_proposal(
+        _proposal(
+            "p-clock-quote",
+            side="sell",
+            expires_at="2100-01-01T00:00:00+00:00",
+        )
+    )
+    with patched_broker(_validation_recorder()):
+        outcome = validate_proposal_for_execution(
+            "p-clock-quote",
+            _held_portfolio(),
+            load_policy(),
+            store,
+            now_et=NOW_ET,
+            earnings_days_away=10,
+        )
+
+    assert outcome.validation is not None, outcome.error
+    assert str(outcome.quote_received_at).startswith("2099-01-01T00:00:00")
 
 
 # --------------------------------------------------------------------------
@@ -1516,6 +1614,9 @@ def test_gr1c_preserves_the_facades_export_only_names():
     when the validation body moved into the kernel; losing any of them from
     ``assistant.execution_service`` is an API change, not a cleanup.
     """
+    import dataclasses as stdlib_dataclasses
+    from decimal import Decimal
+
     from assistant import execution_service
     from assistant.execution_telemetry import (
         FAILURE_DATA_INTEGRITY,
@@ -1542,3 +1643,5 @@ def test_gr1c_preserves_the_facades_export_only_names():
     assert execution_service.TradeIntent is TradeIntent
     assert execution_service.ValidationResult is ValidationResult
     assert execution_service.intent_fingerprint is intent_fingerprint
+    assert execution_service.dataclasses is stdlib_dataclasses
+    assert execution_service.Decimal is Decimal

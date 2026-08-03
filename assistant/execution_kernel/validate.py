@@ -1,11 +1,11 @@
-"""Proposal validation orchestration: the pure eligibility check.
+"""Proposal validation orchestration: the read-only eligibility check.
 
 GR-1C extraction. ``run_proposal_validation()`` is the single source of
 truth for "would this proposal be allowed to execute right now" -- consumed
 by BOTH execute_approved_paper_proposal() (immediately after its own atomic
 claim) and preflight_allocation_batch() (read-only, no claim at all). It
-reads; it never claims, never transitions a proposal, never reserves
-budget, never submits.
+reads durable state and queries the broker; it never claims, never transitions
+a proposal, never reserves budget, never submits.
 
 Dependency injection, not namespace resolution: every callable seam this
 orchestration consults arrives explicitly via ``ProposalValidationDeps``.
@@ -49,7 +49,7 @@ from assistant.execution_telemetry import (
     FAILURE_INFRASTRUCTURE,
     FAILURE_NONE,
 )
-from assistant.money import MoneyInput, to_decimal
+from assistant.money import MoneyInput
 from assistant.policy import TradingPolicy
 from assistant.schemas import PortfolioSnapshot
 from assistant.storage import AssistantStore
@@ -154,6 +154,10 @@ class ProposalValidationDeps:
     # module object so an unimportable broker package cannot preempt the
     # earlier existence/expiry/policy refusals.
     import_broker: Callable[[], Any]
+    datetime_type: Any
+    decimal_factory: Callable[[str], Decimal]
+    trade_intent_factory: Callable[..., TradeIntent]
+    to_decimal: Callable[..., Decimal]
     env_kill_switch_active: Callable[[], bool]
     compute_policy_fingerprint: Callable[[TradingPolicy], str]
     intent_from_dict: Callable[[dict], TradeIntent]
@@ -206,8 +210,8 @@ def run_proposal_validation(
             failure_class=FAILURE_DATA_INTEGRITY,
         )
 
-    now_utc = datetime.now(timezone.utc)
-    if now_utc > datetime.fromisoformat(proposal["expires_at"]):
+    now_utc = deps.datetime_type.now(timezone.utc)
+    if now_utc > deps.datetime_type.fromisoformat(proposal["expires_at"]):
         return ProposalValidationOutcome(proposal=proposal, intent=None, validation=None, error="Proposal has expired.")
     if policy.execution_mode != "paper":
         return ProposalValidationOutcome(
@@ -347,7 +351,7 @@ def run_proposal_validation(
         # comment: identity depends only on ticker+side, never shares.
         if side in ("buy", "sell") and order.get("ticker"):
             recent_intents.append(
-                TradeIntent(
+                deps.trade_intent_factory(
                     ticker=order["ticker"], side=side,
                     shares=int(float(order["shares"])) if order.get("shares") else 1,
                 )
@@ -355,7 +359,7 @@ def run_proposal_validation(
 
     try:
         quote = broker.get_latest_quote(intent.ticker)
-        quote_received_at = datetime.now(timezone.utc).isoformat()
+        quote_received_at = deps.datetime_type.now(timezone.utc).isoformat()
         reference_price = quote.get("price_decimal", quote["price"])
         price_timestamp = quote["timestamp"]
         bid_price = quote.get("bid_decimal", quote.get("bid"))
@@ -390,8 +394,8 @@ def run_proposal_validation(
         for ticker, extra_value in (extra_pending_buy_value_by_ticker or {}).items():
             key = ticker.upper()
             pending_buy_value_by_ticker[key] = (
-                pending_buy_value_by_ticker.get(key, Decimal("0"))
-                + to_decimal(
+                pending_buy_value_by_ticker.get(key, deps.decimal_factory("0"))
+                + deps.to_decimal(
                     extra_value,
                     name=f"extra pending buy value for {key}",
                 )

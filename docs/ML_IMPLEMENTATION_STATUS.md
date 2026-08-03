@@ -1,7 +1,7 @@
 # ML Implementation Status
 
 Companion to `docs/ML_IMPLEMENTATION_STRATEGY.md`, recording what is built,
-what is deliberately not built, and why. Updated 2026-08-01.
+what is deliberately not built, and why. Updated 2026-08-03.
 
 The original readiness sequence is defined in
 `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`; the current end-to-end
@@ -58,11 +58,14 @@ return `promising_unconfirmed` — the most it can say is
 `confirmation_run_requested`, which requires a separate experiment with a
 new immutable ID.
 
-Not yet built here: task-specific detail reports beyond fold metrics and
-aggregate significance (calibration is emitted empty), and the
-`research/ml_specs/` spec library the plan's CLI examples reference. No
-experiment has been run against real data, and no research-registry entry
-exists.
+Both gaps this paragraph originally recorded have since closed: the
+task-specific report families (per-fold intervals, aggregate coverage,
+ceiling calibration, warning behavior, performance slices) are now wired
+into `ml/experiments.py`'s volatility runner (see the ML-LR-3/ML-FS-4
+section below), and the `research/ml_specs/` spec library exists with a
+review-ready volatility discovery spec (see the ML-FS-6 preparation notes).
+What remains true: no experiment has been run against real data, no
+`SpecReviewAttestation` exists, and no research-registry entry exists.
 
 ML-LR-1 makes `point_in_time_data=True` **derivable but still unreachable
 from real data**. `evaluate_point_in_time_coverage()` is now the only code

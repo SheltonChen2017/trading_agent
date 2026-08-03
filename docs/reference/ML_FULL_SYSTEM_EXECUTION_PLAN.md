@@ -38,7 +38,11 @@ gates, and model isolation. This plan fills the operational path around it:
 
 Current baseline:
 
-- ML-FS-0 through ML-FS-7 infrastructure is software-complete; ML-FS-3's real-data
+- ML-FS-0 through ML-FS-5 and ML-FS-7 infrastructure is software-complete;
+  ML-FS-6 exists only as preparation (dataset admission, attestation
+  contracts, reviewed-run wrapper, confirmation-request tooling) — no real
+  discovery or confirmation has run and no `SpecReviewAttestation` exists;
+  ML-FS-3's real-data
   definition of done remains pending a reviewed licensed historical-universe
   snapshot and an actual authoritative build;
 - ML-LR-0, ML-LR-1, ML-LR-2, ML-LR-4, ML-LR-6, ML-LR-7, and

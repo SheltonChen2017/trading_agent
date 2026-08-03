@@ -138,7 +138,10 @@ four-writer contention test that permits exactly one claim winner.
 
 The gap analysis corrected three stale plan assumptions:
 
-- `assistant/execution_service.py` is 2,040 lines, not approximately 1,450;
+- `assistant/execution_service.py` measured 2,040 lines at the GR-1A freeze
+  (larger than working estimates; the archived plan itself states no line
+  count — an earlier revision of this section attributed a "~1,450" figure
+  to the plan that appears nowhere in it);
 - the four planned seams are interleaved inside the 582-line
   `execute_approved_paper_proposal()` function; and
 - the atomic conditional claim already belongs to `AssistantStore`, so the
@@ -367,10 +370,13 @@ acceptance:
   (`outcome_factory` → direct construction, `timezone_type` → kernel-imported
   `timezone`, `failure_data_integrity` → kernel-imported constant) is caught
   by BOTH the guard and the matching behavioral test — six of six detections;
-- the size corrections are exact (`execution_service.py` 1,094;
-  `execute_approved_paper_proposal` 281; `validate.py` 479;
+- the size corrections are exact as of `c1de927` (`execution_service.py`
+  1,094; `execute_approved_paper_proposal` 281; `validate.py` 479;
   `run_proposal_validation` 294); the follow-up's earlier 276/1,090 figures
-  were stale carry-forwards, correctly caught.
+  were stale carry-forwards, correctly caught. (`validate.py` then grew to
+  490 lines when this same round's `7f431b6` added the residual-seam
+  property docstring — the 479 above is the figure verified at `c1de927`,
+  not the current size.)
 
 The P2 classification of the allowlist is accepted: by the standard this
 repository already applied to `DuplicateIntentConflict`, "no test uses the
@@ -507,6 +513,30 @@ Remaining honest limit: the characterization freezes representative paths, not
 every branch of the 1,361-line facade. The 315-line
 `validate_proposal_for_execution` orchestration is unchanged by GR-1B and its
 internal branches remain covered only by the pre-existing suite.
+
+### GR-1D — manual reconciliation extraction: NOT STARTED
+
+Scheduled as action-plan Phase 3 (`docs/ACTION_PLAN_2026-08-02.md`); do not
+begin without the owner's go-ahead. Scope: extract the 221-line
+`reconcile_submission()` orchestration behind an explicit, call-time
+dependency contract while preserving the public facade, exact exception
+identities, broker-absence grace behavior, replacement-chain handling,
+reservation holds/releases, kill-switch behavior, and every existing
+monkeypatch/import seam. Before implementing: characterize every
+reconciliation branch in place, enumerate every runtime global the body
+resolves from the facade (the lesson GR-1C taught three times), compare the
+full pre/post facade import surface mechanically, keep storage transactions
+and conditional transitions in `AssistantStore`, and mutation-test confirmed
+absence, unconfirmed lookup, fresh-404 grace, replacement chains, mismatches,
+journal failures, and state-race recovery.
+
+### GR-1E — conditional composition thinning: NOT ASSESSED
+
+After GR-1D, reassess whether one final slice is needed to thin the 281-line
+`execute_approved_paper_proposal` composition and the two recovery wrappers,
+then either declare GR-1's "thin composition layer" definition of done met
+or explain the residual honestly. GR-1 must not be called done before that
+assessment.
 
 ## GR-2 .. GR-9 — not started
 

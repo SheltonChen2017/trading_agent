@@ -1,6 +1,7 @@
 """GR-1A: freeze the execution service's OBSERVABLE behaviour before splitting it.
 
-`assistant/execution_service.py` is 2,040 lines and GR-1 splits it into
+`assistant/execution_service.py` was 2,040 lines at the GR-1A freeze and
+GR-1 splits it into
 `assistant/execution_kernel/`. A refactor is only behaviour-preserving if
 you can prove it, and a returned dictionary proves very little: the things
 that matter on this path are the state transitions committed, the broker
@@ -15,7 +16,8 @@ changes any of this, one of these fails and the change was not a refactor.
 COVERAGE NOTE -- read before relying on this suite during GR-1B.
 
 What is frozen: refusal paths (confirmation phrase, unknown proposal,
-engaged kill switch), validation purity through the full body, ordinary
+engaged kill switch), validation read-only behavior (reads state and
+queries the broker, writes nothing) through the full body, ordinary
 submission call ordering and persisted evidence, reservation release after a
 pre-submit telemetry failure, timeout reconciliation without resubmission,
 manual reconciliation, successful and refused recovery, exception identity,

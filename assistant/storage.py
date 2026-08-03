@@ -12,7 +12,9 @@ import json
 import os
 import re
 import sqlite3
+import tempfile
 from contextlib import contextmanager
+from dataclasses import dataclass
 from decimal import Decimal
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -4463,3 +4465,168 @@ class AssistantStore:
             }
             for row in rows
         ]
+
+
+# --- Schema verification (AP-1, ACTION_PLAN 2026-08-02) --------------------
+#
+# AssistantStore.__init__ applies the declared schema idempotently
+# (CREATE ... IF NOT EXISTS plus column-presence-guarded migrations), so a
+# database is brought current by simply opening it with current code. What
+# opening cannot do is PROVE the result: an operator database written by
+# older code silently lacks newer tables until something checks. These
+# helpers compare a database's actual schema objects against the schema the
+# current code creates, read-only and fail-closed.
+
+
+@dataclass(frozen=True)
+class SchemaVerificationResult:
+    """Outcome of comparing a database against the currently declared schema.
+
+    ``matches`` is True only when every declared table and column exists and
+    every declared index and trigger exists with the definition produced by
+    current code. Index and trigger definitions are enforcement mechanisms,
+    not labels: a same-named non-unique index or no-op trigger must fail the
+    check. ``extra_tables`` is informational only: legacy or operator-local
+    tables never fail verification, because the contract is "current code's
+    compatible schema is present", not "nothing else is".
+    """
+
+    matches: bool
+    missing_tables: tuple[str, ...]
+    missing_columns: tuple[str, ...]
+    missing_indexes: tuple[str, ...]
+    missing_triggers: tuple[str, ...]
+    mismatched_indexes: tuple[str, ...]
+    mismatched_triggers: tuple[str, ...]
+    extra_tables: tuple[str, ...]
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "matches": self.matches,
+            "missing_tables": list(self.missing_tables),
+            "missing_columns": list(self.missing_columns),
+            "missing_indexes": list(self.missing_indexes),
+            "missing_triggers": list(self.missing_triggers),
+            "mismatched_indexes": list(self.mismatched_indexes),
+            "mismatched_triggers": list(self.mismatched_triggers),
+            "extra_tables": list(self.extra_tables),
+        }
+
+
+def _normalize_schema_sql(sql: str) -> str:
+    """Ignore formatting-only whitespace in one declared schema object."""
+    return " ".join(sql.split())
+
+
+def _schema_objects(
+    connection: sqlite3.Connection,
+) -> tuple[dict[str, set[str]], dict[str, str], dict[str, str]]:
+    """Read tables/columns and enforcement-object definitions.
+
+    SQLite-internal objects (``sqlite_*`` tables, ``sqlite_autoindex*``
+    implicit indexes) are excluded: they are storage details rather than
+    independently declared schema objects. Named index and trigger SQL is
+    retained so verification cannot be fooled by a weaker object reusing the
+    expected name.
+    """
+    tables: dict[str, set[str]] = {}
+    for row in connection.execute(
+        "SELECT name FROM sqlite_master "
+        "WHERE type = 'table' AND name NOT LIKE 'sqlite_%'"
+    ).fetchall():
+        name = row["name"]
+        tables[name] = {
+            column["name"]
+            for column in connection.execute(f'PRAGMA table_info("{name}")')
+        }
+    indexes = {
+        row["name"]: _normalize_schema_sql(row["sql"])
+        for row in connection.execute(
+            "SELECT name, sql FROM sqlite_master "
+            "WHERE type = 'index' AND name NOT LIKE 'sqlite_autoindex%'"
+        ).fetchall()
+    }
+    triggers = {
+        row["name"]: _normalize_schema_sql(row["sql"])
+        for row in connection.execute(
+            "SELECT name, sql FROM sqlite_master WHERE type = 'trigger'"
+        ).fetchall()
+    }
+    return tables, indexes, triggers
+
+
+def verify_database_schema(path: str | Path) -> SchemaVerificationResult:
+    """Compare the database at ``path`` against the current declared schema.
+
+    Read-only: the target is opened with SQLite's ``mode=ro`` and is never
+    created, migrated, or written. Fail-closed: a missing database file
+    raises ``FileNotFoundError`` and an unreadable one propagates its
+    ``sqlite3`` error -- neither is reported as a match.
+
+    The expected schema is not a hand-maintained list (which would drift):
+    it is read from a throwaway reference database built by the exact
+    production initialization path, so whatever ``AssistantStore`` creates
+    today is by construction what this function requires.
+    """
+    target_path = Path(path)
+    if not target_path.exists():
+        raise FileNotFoundError(
+            f"Cannot verify schema: database does not exist at {target_path}"
+        )
+    with tempfile.TemporaryDirectory(prefix="schema-reference-") as reference_dir:
+        reference = AssistantStore(Path(reference_dir) / "schema_reference.db")
+        reference_connection = AssistantStore._open_database(reference.path)
+        try:
+            expected_tables, expected_indexes, expected_triggers = _schema_objects(
+                reference_connection
+            )
+        finally:
+            reference_connection.close()
+    target_connection = sqlite3.connect(
+        target_path.resolve().as_uri() + "?mode=ro", uri=True
+    )
+    target_connection.row_factory = sqlite3.Row
+    try:
+        actual_tables, actual_indexes, actual_triggers = _schema_objects(
+            target_connection
+        )
+    finally:
+        target_connection.close()
+
+    missing_tables = sorted(set(expected_tables) - set(actual_tables))
+    missing_columns = sorted(
+        f"{table}.{column}"
+        for table, expected_columns in expected_tables.items()
+        if table in actual_tables
+        for column in expected_columns - actual_tables[table]
+    )
+    missing_indexes = sorted(set(expected_indexes) - set(actual_indexes))
+    missing_triggers = sorted(set(expected_triggers) - set(actual_triggers))
+    mismatched_indexes = sorted(
+        name
+        for name in set(expected_indexes) & set(actual_indexes)
+        if expected_indexes[name] != actual_indexes[name]
+    )
+    mismatched_triggers = sorted(
+        name
+        for name in set(expected_triggers) & set(actual_triggers)
+        if expected_triggers[name] != actual_triggers[name]
+    )
+    extra_tables = sorted(set(actual_tables) - set(expected_tables))
+    return SchemaVerificationResult(
+        matches=not (
+            missing_tables
+            or missing_columns
+            or missing_indexes
+            or missing_triggers
+            or mismatched_indexes
+            or mismatched_triggers
+        ),
+        missing_tables=tuple(missing_tables),
+        missing_columns=tuple(missing_columns),
+        missing_indexes=tuple(missing_indexes),
+        missing_triggers=tuple(missing_triggers),
+        mismatched_indexes=tuple(mismatched_indexes),
+        mismatched_triggers=tuple(mismatched_triggers),
+        extra_tables=tuple(extra_tables),
+    )

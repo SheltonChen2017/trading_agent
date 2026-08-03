@@ -254,7 +254,7 @@ The step GR-1B's review named is done: the 315-line
 `assistant/execution_kernel/validate.py` as `run_proposal_validation()`,
 together with the `ProposalValidationOutcome` dataclass (re-exported from the
 facade as the same class object). `execution_service.py` is down from 1,361
-to 1,090 lines after independent-review compatibility corrections. Claude's
+to 1,094 lines after all independent-review compatibility corrections. Claude's
 implementation added 2 characterization tests and 2 identity/export pins;
 the review added 2 more characterization tests and expanded the export pin.
 
@@ -381,9 +381,9 @@ Precision notes, stated so the table cannot over-claim:
 Honest limit: the orchestration body moved verbatim, and its internal
 branches remain covered by the same pre-existing suite as before — the new
 tests freeze the injection contract, they do not add branch coverage. GR-1
-remains partial: the 276-line execute composition, the 221-line
+remains partial: the 281-line execute composition, the 221-line
 `reconcile_submission`, and the two recovery functions still live on the
-1,090-line facade, and whether that satisfies the plan's "thin composition
+1,094-line facade, and whether that satisfies the plan's "thin composition
 layer" is a reviewer call, not a claim made here.
 
 ### What the characterization suite can actually detect

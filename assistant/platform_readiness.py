@@ -276,7 +276,9 @@ def build_execution_integrity(health: Mapping[str, Any]) -> DimensionReadiness:
     return _dimension(EXECUTION_INTEGRITY, checks)
 
 
-def build_operational_readiness(health: Mapping[str, Any]) -> DimensionReadiness:
+def build_operational_readiness(
+    health: Mapping[str, Any], store: AssistantStore | None = None
+) -> DimensionReadiness:
     checks = [
         # Outside execution, the producing report's own critical/warning
         # split is the right signal: a stale backup is a real deficiency
@@ -285,7 +287,53 @@ def build_operational_readiness(health: Mapping[str, Any]) -> DimensionReadiness
         for raw in _validated_checks(health)
         if raw["category"] not in _EXECUTION_CATEGORIES
     ]
+    if store is not None:
+        checks.extend(build_alert_delivery_checks(store))
     return _dimension(OPERATIONAL_READINESS, checks)
+
+
+def build_alert_delivery_checks(store: AssistantStore) -> tuple[ReadinessCheck, ...]:
+    """GR-5: is anything actually reaching the operator?
+
+    Deliberately reported HERE rather than as an ``operational_health``
+    check: that producer persists an alert for every failing check, so an
+    "undelivered critical alerts exist" check would raise a critical alert
+    that is itself undelivered, and each cycle would manufacture another.
+    This report is strictly read-only, so the same fact is surfaced without
+    the feedback loop.
+
+    An undelivered critical alert is mandatory (the operator was not told
+    about a platform-halting condition). A stale channel self-test degrades:
+    the channel may still work, it has merely not been proven this week.
+    """
+    from assistant.alert_delivery import (
+        self_test_freshness,
+        undelivered_critical_alerts,
+    )
+
+    undelivered = undelivered_critical_alerts(store)
+    freshness = self_test_freshness(store)
+    return (
+        ReadinessCheck(
+            name="critical_alert_delivery",
+            ok=not undelivered,
+            detail=(
+                "every open critical alert has a recorded delivery"
+                if not undelivered
+                else f"{len(undelivered)} critical alert(s) never delivered: "
+                + ", ".join(sorted(a["fingerprint"] for a in undelivered))[:200]
+            ),
+            mandatory=True,
+            source="alert_delivery",
+        ),
+        ReadinessCheck(
+            name="alert_channel_self_test",
+            ok=bool(freshness["ok"]),
+            detail=str(freshness["detail"]),
+            mandatory=False,
+            source="alert_delivery",
+        ),
+    )
 
 
 def build_data_integrity() -> DimensionReadiness:
@@ -636,7 +684,7 @@ def build_platform_readiness(
                 detail=f"execution checks are malformed: {exc}",
             )
         try:
-            operations = build_operational_readiness(health)
+            operations = build_operational_readiness(health, store)
         except PlatformReadinessError as exc:
             operations = _unavailable_dimension(
                 OPERATIONAL_READINESS,

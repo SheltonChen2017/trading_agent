@@ -810,6 +810,88 @@ def command_list_alerts(args, store: AssistantStore) -> None:
     )
 
 
+def _alert_channel(args):
+    """Resolve the delivery channel. Windows toast is the owner-chosen
+    mandatory immediate channel (2026-08-03); --dry-run swaps in a
+    recording channel that never notifies a human, for verification."""
+    from assistant.alert_delivery import RecordingChannel, WindowsToastChannel
+
+    if getattr(args, "dry_run", False):
+        return RecordingChannel(name="dry_run")
+    return WindowsToastChannel()
+
+
+def command_deliver_alerts(args, store: AssistantStore) -> None:
+    """GR-5: deliver open critical alerts and record every attempt."""
+    from assistant.alert_delivery import deliver_pending_alerts
+
+    report = deliver_pending_alerts(store, _alert_channel(args))
+    print(json.dumps(report, indent=2, sort_keys=True))
+    if not report["healthy"]:
+        raise SystemExit(2)
+
+
+def command_alert_self_test(args, store: AssistantStore) -> None:
+    """GR-5: prove the critical channel still works, end to end.
+
+    Records the `alert_delivery` promotion drill -- epoch-bound when an
+    active paper evidence epoch exists (and only when the runtime commit
+    matches that epoch's lineage exactly), otherwise verification-only.
+    A FAILED self-test is recorded too; failure is evidence.
+    """
+    from assistant.alert_delivery import run_channel_self_test
+    from assistant.paper_evidence import record_operational_drill
+
+    if args.record_drill and not (args.operator or "").strip():
+        raise SystemExit("--operator is required with --record-drill.")
+    result = run_channel_self_test(store, _alert_channel(args))
+    if args.record_drill:
+        evidence = {
+            "operator": args.operator.strip(),
+            "artifact": f"alert_deliveries#{result['delivery']['delivery_id']}",
+            "channel": result["channel"],
+            "verified_from_storage": result["verified_from_storage"],
+            "detail": result["delivery"]["detail"],
+        }
+        epoch = store.get_active_paper_evidence_epoch()
+        if epoch is None:
+            evidence["verification_only"] = True
+            result["drill"] = store.record_operational_drill(
+                drill_type="alert_delivery",
+                performed_at=result["performed_at"],
+                passed=result["passed"],
+                evidence_epoch=None,
+                code_commit=_runtime_commit_or_unknown(),
+                evidence=evidence,
+            )
+        else:
+            commit = _runtime_commit_or_unknown()
+            expected = epoch["lineage"]["code_commit"]
+            if commit == "unknown" or commit != expected:
+                raise SystemExit(
+                    "Refusing to record epoch-bound drill evidence: the runtime "
+                    f"commit ({commit}) does not exactly match the active epoch's "
+                    f"lineage ({expected}). Commit a clean tree at the epoch's "
+                    "commit, or run without --record-drill."
+                )
+            result["drill"] = record_operational_drill(
+                store,
+                drill_type="alert_delivery",
+                passed=result["passed"],
+                evidence=evidence,
+            )
+    print(json.dumps(result, indent=2, sort_keys=True))
+    if not result["passed"]:
+        raise SystemExit(2)
+
+
+def _runtime_commit_or_unknown() -> str:
+    try:
+        return current_commit()
+    except RuntimeIdentityError:
+        return "unknown"
+
+
 def command_ack_alert(args, store: AssistantStore) -> None:
     if not store.acknowledge_operational_alert(args.alert_id):
         raise SystemExit(f"Open alert not found: {args.alert_id}")
@@ -1510,6 +1592,40 @@ def build_parser() -> argparse.ArgumentParser:
     list_alerts.add_argument("--all", action="store_true")
     list_alerts.add_argument("--limit", type=_positive_int, default=100)
     list_alerts.set_defaults(handler=command_list_alerts)
+
+    deliver_alerts = commands.add_parser(
+        "deliver-alerts",
+        help=(
+            "Deliver open CRITICAL alerts to the Windows desktop channel and "
+            "record every attempt. Warnings batch into the daily briefing "
+            "instead. Exits 2 when any delivery failed."
+        ),
+    )
+    deliver_alerts.add_argument(
+        "--dry-run",
+        action="store_true",
+        help="Use a recording channel that never notifies a human.",
+    )
+    deliver_alerts.set_defaults(handler=command_deliver_alerts)
+
+    alert_self_test = commands.add_parser(
+        "alert-self-test",
+        help=(
+            "Emit a synthetic critical alert, deliver it, and verify the "
+            "recorded receipt. Run weekly: a channel that silently broke is "
+            "worse than no channel. Exits 2 on failure."
+        ),
+    )
+    alert_self_test.add_argument("--dry-run", action="store_true")
+    alert_self_test.add_argument(
+        "--record-drill",
+        action="store_true",
+        help="Record the alert_delivery promotion drill for this self-test.",
+    )
+    alert_self_test.add_argument(
+        "--operator", default="", help="Operator name (required with --record-drill)."
+    )
+    alert_self_test.set_defaults(handler=command_alert_self_test)
 
     acknowledge = commands.add_parser(
         "ack-alert", help="Acknowledge one open operational alert."

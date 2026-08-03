@@ -331,6 +331,24 @@ class AssistantStore:
                     last_seen_at TEXT NOT NULL,
                     acknowledged_at TEXT
                 );
+                -- GR-5: one row per delivery ATTEMPT, never overwritten.
+                -- A failed attempt is evidence too: "critical alert raised
+                -- but never delivered" must be detectable, which is
+                -- impossible if failures overwrite or are dropped.
+                CREATE TABLE IF NOT EXISTS alert_deliveries (
+                    delivery_id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    fingerprint TEXT NOT NULL,
+                    alert_id INTEGER,
+                    channel TEXT NOT NULL,
+                    severity TEXT NOT NULL,
+                    outcome TEXT NOT NULL,
+                    attempted_at TEXT NOT NULL,
+                    delivered_at TEXT,
+                    occurrences_at_attempt INTEGER NOT NULL,
+                    detail TEXT NOT NULL,
+                    FOREIGN KEY(alert_id)
+                        REFERENCES operational_alerts(alert_id)
+                );
                 CREATE TABLE IF NOT EXISTS paper_evidence_epochs (
                     evidence_epoch TEXT PRIMARY KEY,
                     started_at TEXT NOT NULL,
@@ -495,6 +513,10 @@ class AssistantStore:
                     ON ledger_reconciliation_runs(reconciled_at);
                 CREATE INDEX IF NOT EXISTS idx_operational_alerts_status
                     ON operational_alerts(status, severity, last_seen_at);
+                CREATE INDEX IF NOT EXISTS idx_alert_deliveries_fingerprint
+                    ON alert_deliveries(fingerprint, attempted_at);
+                CREATE INDEX IF NOT EXISTS idx_alert_deliveries_outcome
+                    ON alert_deliveries(outcome, attempted_at);
                 CREATE UNIQUE INDEX IF NOT EXISTS idx_one_active_paper_epoch
                     ON paper_evidence_epochs(status) WHERE status = 'active';
                 CREATE INDEX IF NOT EXISTS idx_paper_observations_epoch_date
@@ -3787,6 +3809,119 @@ class AssistantStore:
                     (status, limit),
                 ).fetchall()
         return [self._operational_alert_row(row) for row in rows]
+
+    def record_alert_delivery(
+        self,
+        *,
+        fingerprint: str,
+        alert_id: int | None,
+        channel: str,
+        severity: str,
+        outcome: str,
+        occurrences_at_attempt: int,
+        detail: str = "",
+        attempted_at: str | None = None,
+        delivered_at: str | None = None,
+    ) -> dict[str, Any]:
+        """Append one immutable delivery attempt record (GR-5).
+
+        Never an upsert: a later success must not erase an earlier failure,
+        because "this critical alert took three attempts" and "this critical
+        alert was never delivered" are exactly the facts the operator and the
+        undelivered-critical health check need.
+        """
+        if outcome not in ("delivered", "failed", "suppressed"):
+            raise ValueError(
+                f"outcome must be delivered/failed/suppressed, got {outcome!r}"
+            )
+        attempted = attempted_at or datetime.now(timezone.utc).isoformat()
+        with self._connect() as connection:
+            cursor = connection.execute(
+                """
+                INSERT INTO alert_deliveries(
+                    fingerprint, alert_id, channel, severity, outcome,
+                    attempted_at, delivered_at, occurrences_at_attempt, detail
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    fingerprint,
+                    alert_id,
+                    channel,
+                    severity,
+                    outcome,
+                    attempted,
+                    delivered_at if outcome == "delivered" else None,
+                    int(occurrences_at_attempt),
+                    detail,
+                ),
+            )
+            row = connection.execute(
+                "SELECT * FROM alert_deliveries WHERE delivery_id = ?",
+                (cursor.lastrowid,),
+            ).fetchone()
+        return self._alert_delivery_row(row)
+
+    def list_alert_deliveries(
+        self,
+        *,
+        fingerprint: str | None = None,
+        outcome: str | None = None,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        clauses = []
+        params: list[Any] = []
+        if fingerprint is not None:
+            clauses.append("fingerprint = ?")
+            params.append(fingerprint)
+        if outcome is not None:
+            clauses.append("outcome = ?")
+            params.append(outcome)
+        where = f"WHERE {' AND '.join(clauses)}" if clauses else ""
+        params.append(limit)
+        with self._connect() as connection:
+            rows = connection.execute(
+                f"SELECT * FROM alert_deliveries {where} "
+                "ORDER BY attempted_at DESC, delivery_id DESC LIMIT ?",
+                params,
+            ).fetchall()
+        return [self._alert_delivery_row(row) for row in rows]
+
+    def latest_successful_delivery(
+        self, fingerprint: str, *, min_occurrences: int | None = None
+    ) -> dict[str, Any] | None:
+        """The most recent DELIVERED attempt for a fingerprint.
+
+        ``min_occurrences`` asks "was the alert delivered at or after this
+        occurrence count", which is how re-delivery of a recurring alert is
+        decided without re-notifying on every sweep.
+        """
+        clause = "AND occurrences_at_attempt >= ?" if min_occurrences is not None else ""
+        params: list[Any] = [fingerprint]
+        if min_occurrences is not None:
+            params.append(int(min_occurrences))
+        with self._connect() as connection:
+            row = connection.execute(
+                "SELECT * FROM alert_deliveries WHERE fingerprint = ? "
+                f"AND outcome = 'delivered' {clause} "
+                "ORDER BY attempted_at DESC, delivery_id DESC LIMIT 1",
+                params,
+            ).fetchone()
+        return self._alert_delivery_row(row) if row is not None else None
+
+    @staticmethod
+    def _alert_delivery_row(row: sqlite3.Row) -> dict[str, Any]:
+        return {
+            "delivery_id": row["delivery_id"],
+            "fingerprint": row["fingerprint"],
+            "alert_id": row["alert_id"],
+            "channel": row["channel"],
+            "severity": row["severity"],
+            "outcome": row["outcome"],
+            "attempted_at": row["attempted_at"],
+            "delivered_at": row["delivered_at"],
+            "occurrences_at_attempt": row["occurrences_at_attempt"],
+            "detail": row["detail"],
+        }
 
     def acknowledge_operational_alert(self, alert_id: int) -> bool:
         now = datetime.now(timezone.utc).isoformat()

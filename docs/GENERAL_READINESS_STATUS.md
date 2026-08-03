@@ -737,22 +737,79 @@ Notable mechanics:
   real test in ``unmapped_tests``; neutering the F8 injector was detected
   by the F8 test itself).
 
-`alert_delivery` remains the one drill type without a producer until GR-5
-ships a real channel; `backup_restore` keeps its existing `recovery-drill`
-producer. The runbook's incident section now links every fault row to its
-observed behavior and the drill command. Independent review and validation
-are recorded in `docs/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md`.
+GR-5 now supplies the `alert_delivery` producer; `backup_restore` keeps its
+existing `recovery-drill` producer. The runbook's incident section links
+every fault row to its observed behavior and the drill command. Independent
+GR-3 review is recorded in `docs/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md`.
 
-## GR-2, GR-4 .. GR-9 — not started
+## GR-5 — observability that actually delivers: COMPLETE AND INDEPENDENTLY REVIEWED (2026-08-03)
+
+`operational_alerts` had always RECORDED alerts; nothing had ever DELIVERED
+one, so a critical broker-identity halt could sit in SQLite while the
+operator watched a green screen. `assistant/alert_delivery.py` closes that:
+
+- **Channel (owner decision 2026-08-03):** Windows desktop notification is
+  the mandatory immediate channel for `critical`; `warning` batches into the
+  daily briefing; webhook is deliberately out of scope. The toast goes
+  through PowerShell's built-in WinRT API, so the milestone adds **no new
+  pinned dependency**, and alert text is passed on **stdin as JSON** rather
+  than interpolated into a command line.
+- **Delivery is recorded, never assumed:** every attempt appends an
+  immutable `alert_deliveries` row (channel, outcome, attempted/delivered
+  timestamps, occurrence count at attempt). A later success never erases an
+  earlier failure, so "this took three attempts" and "this was never
+  delivered" both remain answerable.
+- **Failure escalates:** a channel exception is caught only to record it,
+  then surfaced via the return value (nonzero CLI exit) AND a durable
+  critical `alert_delivery` alert. It is never recorded as delivered. The
+  "delivery is broken" alert is deliberately not pushed through the broken
+  channel. Independent review corrected the recovery direction: that open
+  failure alert remains a mandatory readiness failure until a later successful
+  self-test proves the channel recovered and acknowledges it.
+- **Re-delivery is occurrence-based:** an unchanged condition is not
+  re-toasted every 60-second sweep; a genuinely new occurrence is.
+- **Self-test:** emits a synthetic critical alert, delivers it, and verifies
+  the receipt **read back from storage** (not the in-memory return), then
+  acknowledges the synthetic alert so it cannot pollute the operator's list.
+  It records the `alert_delivery` promotion drill — epoch-bound only when
+  the runtime commit exactly matches the active epoch's lineage (the GR-3
+  review's GR3REV-001 rule, applied here from the start), else
+  verification-only. A failed self-test is recorded and escalated.
+- **Detection:** `platform-readiness` now reports `critical_alert_delivery`
+  (mandatory) and `alert_channel_self_test` (degrades only).
+
+**Design note worth preserving:** these two checks live in the READ-ONLY
+readiness report rather than `operational_health`. An earlier revision put
+them in `operational_health`, whose caller persists an alert for every
+failing check — so "undelivered critical alerts exist" raised a critical
+alert that was itself undelivered, manufacturing a new alert every cycle. A
+pre-existing dedup test caught it. `test_delivery_health_never_manufactures_
+its_own_alert` now pins the resolution.
+
+New operator surface: the Streamlit **Operations** tab (undelivered
+criticals, self-test freshness, open alerts with delivered flags, recent
+delivery attempts, readiness dimensions, heartbeat/backup/epoch state,
+recent drills) plus CLI `deliver-alerts` and `alert-self-test`.
+
+Mutation-verified: recording a failed send as delivered, dropping severity
+routing, and dropping occurrence-based re-delivery are each detected.
+`alert_delivery` was the last `REQUIRED_PROMOTION_DRILLS` type without a
+producer — **AP-5 is now closed**; all five drill types can be produced.
+
+Honest limits: the Windows channel has failure-direction unit coverage
+(missing PowerShell, nonzero exit, stdin argument passing) and independent
+review also raised one isolated real test toast successfully. Delivery proves
+the notification was *raised*, not that a human read it. Scheduled-task
+installation for `deliver-alerts`/`alert-self-test` is Phase 5 deployment
+work, not this milestone.
+
+## GR-2, GR-4, GR-6 .. GR-9 — not started
 
 Each requires its own gap analysis first; the plan predates the ML
 full-system additions throughout.
 
 Known items already identified for later milestones:
 
-- **GR-5** must account for `operational_alerts`, `alerts.jsonl`, and the ML
-  evidence supervisor, which already exist. Choosing a real alert channel is
-  an owner decision.
 - **GR-6** is where a database-identity guard belongs. Under the single
   installation topology chosen over the pinned-worktree alternative, it is
   defense-in-depth rather than a precondition.

@@ -1264,6 +1264,7 @@ store = _store()
     tab_propose,
     tab_history,
     tab_suggestions,
+    tab_operations,
     tab_settings,
 ) = st.tabs(
     [
@@ -1273,6 +1274,7 @@ store = _store()
         "Propose & Approve",
         "History",
         "Ticker Suggestions",
+        "Operations",
         "Settings & Features",
     ]
 )
@@ -2695,6 +2697,195 @@ with tab_suggestions:
             "Research only — to act on any of these, add the ticker to the Watchlist "
             "cart yourself and go through the normal check/propose/approve workflow."
         )
+
+# ---------------------------------------------------------------------------
+# Operations -- GR-5's single operator dashboard. STRICTLY READ-ONLY except
+# the two explicit alert-delivery buttons: it never proposes, approves,
+# sizes, submits, or cancels anything, and it never edits policy. Every
+# number comes from the enforcing function or the durable record, never a
+# re-implementation.
+# ---------------------------------------------------------------------------
+
+with tab_operations:
+    st.caption(
+        "One place to see whether the platform is healthy and whether anything "
+        "is trying to reach you. Read-only: nothing here can place, approve, or "
+        "cancel a trade."
+    )
+
+    from assistant.alert_delivery import (
+        RecordingChannel,
+        WindowsToastChannel,
+        deliver_pending_alerts,
+        pending_briefing_alerts,
+        run_channel_self_test,
+        self_test_freshness,
+        undelivered_critical_alerts,
+    )
+
+    ops_store = _store()
+
+    st.subheader("Critical alert delivery")
+    undelivered = undelivered_critical_alerts(ops_store)
+    freshness = self_test_freshness(ops_store)
+    delivery_columns = st.columns(2)
+    with delivery_columns[0]:
+        if undelivered:
+            st.error(
+                f"{len(undelivered)} critical alert(s) have NOT been delivered: "
+                + ", ".join(sorted(a["fingerprint"] for a in undelivered))
+            )
+        else:
+            st.success("Every open critical alert has a recorded delivery.")
+    with delivery_columns[1]:
+        (st.success if freshness["ok"] else st.warning)(
+            f"Channel self-test: {freshness['detail']}"
+        )
+
+    action_columns = st.columns(2)
+    with action_columns[0]:
+        if st.button("Deliver pending critical alerts", key="ops_deliver"):
+            report = deliver_pending_alerts(ops_store, WindowsToastChannel())
+            if report["healthy"]:
+                st.success(f"Delivered {len(report['delivered'])} alert(s).")
+            else:
+                st.error(
+                    f"{len(report['failed'])} delivery failure(s): "
+                    + report["failed"][0]["detail"][:200]
+                )
+            st.rerun()
+    with action_columns[1]:
+        if st.button("Run channel self-test (sends a real toast)", key="ops_selftest"):
+            result = run_channel_self_test(ops_store, WindowsToastChannel())
+            if result["passed"]:
+                st.success("Self-test delivered and verified from the delivery record.")
+            else:
+                st.error(f"Self-test FAILED: {result['delivery']['detail'][:200]}")
+            st.rerun()
+
+    st.subheader("Open alerts")
+    open_alerts = ops_store.list_operational_alerts(status="open", limit=50)
+    if not open_alerts:
+        st.success("No open operational alerts.")
+    else:
+        st.dataframe(
+            [
+                {
+                    "severity": alert["severity"],
+                    "category": alert["category"],
+                    "message": alert["message"][:120],
+                    "occurrences": alert["occurrences"],
+                    "last seen": alert["last_seen_at"],
+                    "delivered": bool(
+                        ops_store.latest_successful_delivery(
+                            alert["fingerprint"],
+                            min_occurrences=alert["occurrences"],
+                        )
+                    ),
+                }
+                for alert in open_alerts
+            ],
+            width="stretch",
+            hide_index=True,
+        )
+    batched = pending_briefing_alerts(ops_store)
+    st.caption(
+        f"{len(batched)} warning-level alert(s) are batched for the daily "
+        "briefing rather than interrupting you (owner routing decision)."
+    )
+
+    st.subheader("Recent delivery attempts")
+    deliveries = ops_store.list_alert_deliveries(limit=20)
+    if not deliveries:
+        st.info("No delivery attempt has been recorded yet.")
+    else:
+        st.dataframe(
+            [
+                {
+                    "outcome": record["outcome"],
+                    "channel": record["channel"],
+                    "severity": record["severity"],
+                    "fingerprint": record["fingerprint"],
+                    "attempted": record["attempted_at"],
+                    "detail": record["detail"][:80],
+                }
+                for record in deliveries
+            ],
+            width="stretch",
+            hide_index=True,
+        )
+
+    st.subheader("Platform readiness")
+    try:
+        from assistant.mandate import load_mandate
+        from assistant.platform_readiness import build_platform_readiness
+
+        readiness_report = build_platform_readiness(
+            ops_store,
+            load_policy(policy_path),
+            load_mandate(),
+            check_broker=False,
+        ).to_dict()
+        st.dataframe(
+            [
+                {
+                    "dimension": dimension["name"],
+                    "status": dimension["status"],
+                    "explanation": dimension["explanation"][:160],
+                }
+                for dimension in readiness_report["dimensions"]
+            ],
+            width="stretch",
+            hide_index=True,
+        )
+        st.caption(
+            "Offline evaluation (no broker calls). Dimensions are scored "
+            "independently and never averaged."
+        )
+    except Exception as exc:  # readiness must never break the dashboard
+        st.warning(f"Readiness report unavailable: {exc}")
+
+    st.subheader("Operational state")
+    heartbeat = ops_store.get_system_state("operations_heartbeat", default={})
+    last_backup = ops_store.get_system_state("last_database_backup", default={})
+    epoch = ops_store.get_active_paper_evidence_epoch()
+    state_columns = st.columns(3)
+    with state_columns[0]:
+        st.metric(
+            "Last health heartbeat",
+            (heartbeat or {}).get("at", "never")[:19],
+            help="Written by the operations watchdog/cycle.",
+        )
+    with state_columns[1]:
+        st.metric(
+            "Last verified backup",
+            (last_backup or {}).get("completed_at", "never")[:19],
+        )
+    with state_columns[2]:
+        st.metric(
+            "Active evidence epoch",
+            epoch["evidence_epoch"] if epoch else "none",
+            help="A formal paper-evidence epoch is required for promotion evidence.",
+        )
+    drills = ops_store.list_operational_drills(limit=10) if hasattr(
+        ops_store, "list_operational_drills"
+    ) else []
+    if drills:
+        st.caption("Most recent operational drills")
+        st.dataframe(
+            [
+                {
+                    "drill": drill["drill_type"],
+                    "passed": bool(drill["passed"]),
+                    "performed": drill["performed_at"][:19],
+                    "epoch": drill.get("evidence_epoch") or "verification-only",
+                }
+                for drill in drills
+            ],
+            width="stretch",
+            hide_index=True,
+        )
+
 
 # ---------------------------------------------------------------------------
 # Settings & Features -- three distinct control classes

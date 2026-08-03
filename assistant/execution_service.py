@@ -386,7 +386,9 @@ def validate_proposal_for_execution(
         now_et=now_et,
         deps=ProposalValidationDeps(
             import_broker=_import_execution_broker,
+            outcome_factory=ProposalValidationOutcome,
             datetime_type=datetime,
+            timezone_type=timezone,
             decimal_factory=Decimal,
             trade_intent_factory=TradeIntent,
             to_decimal=to_decimal,
@@ -396,6 +398,8 @@ def validate_proposal_for_execution(
             pending_buy_value_by_ticker=_pending_buy_value_by_ticker,
             resolve_earnings_days_away=_resolve_earnings_days_away,
             validate_trade_intent=validate_trade_intent,
+            failure_data_integrity=FAILURE_DATA_INTEGRITY,
+            failure_infrastructure=FAILURE_INFRASTRUCTURE,
         ),
         kill_switch_active=kill_switch_active,
         earnings_days_away=earnings_days_away,

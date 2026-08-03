@@ -283,11 +283,16 @@ categories include:
 - read-only commands leaving registry and execution tables unchanged; and
 - risk-reducing sells remaining possible.
 
-For a code review, verify each finding before fixing it. Classify it as
-confirmed, partially correct, or a false alarm, then search for generalized
-instances. After writing a regression test, temporarily break or revert the
-fix when practical and confirm the test detects the regression. Always restore
-the real code in a `finally`-safe manner.
+For a code review, follow `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+(owner-mandated, 2026-08-02): give every commit in the review range an
+explicit disposition — never review only the tip or a combined diff — and
+maintain a P0–P3 issue ledger in the review report, with a concrete reason
+for every fix and with resolved items retained rather than deleted. Verify
+each finding before fixing it. Classify it as confirmed, partially correct,
+or a false alarm, then search for generalized instances. After writing a
+regression test, temporarily break or revert the fix when practical and
+confirm the test detects the regression. Always restore the real code in a
+`finally`-safe manner.
 
 Do not weaken, delete, skip, or rewrite a valid existing test merely to make a
 change pass. If an existing expectation is obsolete, explain the contract
@@ -362,3 +367,17 @@ At handoff, state:
 Be explicit about defects found in your own implementation. Independent review
 is a safety control, not a formality. Stop after the requested milestone and
 leave the repository in a clean, reviewable state.
+
+Two standing owner-mandated records (2026-08-02) accompany every handoff:
+
+- When a feature or milestone genuinely completes its definition of done and
+  required review, add its entry to `docs/FEATURE_MILESTONE_RECORD.md`:
+  exactly two paragraphs, one technical and one a high-school student could
+  follow, per that file's template. Do not record partial or unreviewed work.
+- Before ending any session that changed durable state — commits, branches,
+  merges, milestone status, validation results, operational observations, or
+  owner decisions — update and commit `docs/SESSION_HANDOFF.md` so that
+  switching computers requires only `git pull`, never copying session files.
+  Follow `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` for its required
+  contents; verify machine-local observations rather than copying them
+  forward.

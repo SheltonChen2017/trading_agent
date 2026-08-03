@@ -254,7 +254,7 @@ The step GR-1B's review named is done: the 315-line
 `assistant/execution_kernel/validate.py` as `run_proposal_validation()`,
 together with the `ProposalValidationOutcome` dataclass (re-exported from the
 facade as the same class object). `execution_service.py` is down from 1,361
-to 1,090 lines after independent-review compatibility corrections. Claude's
+to 1,094 lines after all independent-review compatibility corrections. Claude's
 implementation added 2 characterization tests and 2 identity/export pins;
 the review added 2 more characterization tests and expanded the export pin.
 
@@ -290,16 +290,21 @@ namespace, so the section 6.2 private-peer-import guard is satisfied
 structurally rather than by aliasing.
 
 The facade-surface rule applies without distinguishing standard-library from
-first-party names when GR-1 itself makes an existing import dead. Every name
-left with no remaining facade call site
-  (`MoneyInput`, `to_decimal`, the four `FAILURE_*` constants, `TradeIntent`,
-  `ValidationResult`, `intent_fingerprint`, `dataclasses`, and `Decimal`)
-  stays imported and is now pinned
-  by `test_gr1c_preserves_the_facades_export_only_names` — the review
-  rejected dropping `DuplicateIntentConflict` on exactly this ground, so the
-  same rule is applied consistently. The earlier removal of an unrelated
-  pre-existing dead `os` import was cleanup; removing names solely because
-  this refactor moved their call sites would be a GR-1 compatibility change.
+first-party names when GR-1 itself makes an existing import dead. The full
+pre-GR-1C importable surface stays importable and identity-pinned by
+`test_gr1c_preserves_the_facades_export_only_names` — the review rejected
+dropping `DuplicateIntentConflict` on exactly this ground, so the same rule
+is applied consistently. Precision correction (third round): the passage
+above previously described every pinned name as having "no remaining facade
+call site", which was wrong from the moment the deps wiring existed —
+`Decimal`, `to_decimal`, and `TradeIntent` have been facade call sites since
+the review's injection (`465df8d`), and `FAILURE_DATA_INTEGRITY` /
+`FAILURE_INFRASTRUCTURE` joined them in the follow-up review (`c1de927`).
+The genuinely export-only names are `MoneyInput`, `ValidationResult`,
+`intent_fingerprint`, `dataclasses`, `FAILURE_DETERMINISTIC_POLICY`, and
+`FAILURE_NONE`. The earlier removal of an unrelated pre-existing dead `os`
+import was cleanup; removing names solely because this refactor moved their
+call sites would be a GR-1 compatibility change.
 
 #### Independent review corrections
 
@@ -314,7 +319,7 @@ the two dropped facade exports, and corrected the module's description from
 "pure" to "read-only": validation reads durable state and queries the broker,
 but does not mutate proposal, reservation, telemetry, or order state.
 
-#### Review-of-review follow-ups (2026-08-02, second round)
+#### Review-of-review follow-ups and independent correction (2026-08-02)
 
 Every review change was independently verified before acceptance. The four
 injections are correct and complete for their category (no direct
@@ -325,27 +330,64 @@ and the facade-surface rule is internally consistent: the GR-1B `os`
 removal survives it because `os` was already dead at `d9e3196`, before any
 GR-1 refactor orphaned anything.
 
-Two precision gaps were closed as follow-ups:
+Claude's follow-up identified two precision gaps:
 
 - **"Injected every runtime collaborator" claimed more than the code
-  enforced** — the same over-claim shape this review corrected twice in
-  Claude's work. Three names the old facade body also resolved from module
-  globals remain kernel-resolved: `ProposalValidationOutcome` (the kernel's
-  own return type — injecting it would be circular), `timezone` (read, never
-  invoked; time-freezing goes through the injected clock), and the
-  `FAILURE_*` constants (immutable strings). The boundary is now stated
-  exactly in the `ProposalValidationDeps` docstring, and
-  `test_gr1c_the_kernel_body_reads_no_unexpected_module_globals` pins the
-  complete module-global read set of the body as an exact two-sided
-  allowlist — any new module-scope read (including quietly reverting an
-  injected dep to a direct call) fails by name. Mutation-verified: restoring
-  either the direct `TradeIntent` call or the direct expiry-clock call
-  fails the guard.
+  enforced.** Claude documented and allowlisted the three remaining
+  categories: `ProposalValidationOutcome`, `timezone`, and the
+  behavior-bearing `FAILURE_*` constants.
 - **The "pure" sweep was incomplete** — the reviewed rename fixed the module
   docstring and one test, but "pure, side-effect-free" survived in the
   `ProposalValidationOutcome` class docstring and a
   `test_personal_assistant.py` section comment. Both now say read-only.
   Comment-only edits.
+
+The independent review accepted the terminology cleanup but rejected the
+allowlist as a compatibility solution. Before extraction, replacing any of
+those names on `assistant.execution_service` changed validation behavior;
+after Claude's follow-up it did not. Three red characterization tests proved
+the regressions independently for outcome construction, the UTC argument, and
+failure classification. `ProposalValidationDeps` now carries the facade's
+outcome factory, timezone collaborator, and data-integrity/infrastructure
+constants at call time. The kernel body has no module-global runtime reads,
+pinned by `test_gr1c_the_kernel_body_reads_no_module_globals`. The guard uses
+Python's symbol table rather than a hand-rolled AST scope approximation, so
+nested scopes and module globals shadowing builtins cannot create false
+negatives.
+
+#### Confirmation of the follow-up review (Claude, 2026-08-02, third round)
+
+Every correction in `c1de927`/`d2d836b` was independently re-verified before
+acceptance:
+
+- all three new characterization tests fail red on the exact pre-correction
+  tree (`2882889`) and the symtable guard fails there naming exactly the four
+  residual globals;
+- reverse-mutating each injected seam back to kernel-local resolution
+  (`outcome_factory` → direct construction, `timezone_type` → kernel-imported
+  `timezone`, `failure_data_integrity` → kernel-imported constant) is caught
+  by BOTH the guard and the matching behavioral test — six of six detections;
+- the size corrections are exact (`execution_service.py` 1,094;
+  `execute_approved_paper_proposal` 281; `validate.py` 479;
+  `run_proposal_validation` 294); the follow-up's earlier 276/1,090 figures
+  were stale carry-forwards, correctly caught.
+
+The P2 classification of the allowlist is accepted: by the standard this
+repository already applied to `DuplicateIntentConflict`, "no test uses the
+seam" does not make removing the seam compatible.
+
+One residual of the same regression class remains, on the class rather than
+the body: `ProposalValidationOutcome.resolved_failure_class` still resolves
+its `FAILURE_NONE` / `FAILURE_DETERMINISTIC_POLICY` fallbacks from the
+kernel's namespace at property-access time. Pre-GR-1C the class lived on the
+facade, so patching either facade constant changed the property's output
+(verified on `5dda78e`); it no longer does. This is documented rather than
+fixed because both available fixes are worse than the gap: injecting the
+fallbacks would change the frozen dataclass's public field set (a larger
+compatibility break than the seam it restores), and resolving them from the
+facade would invert the kernel→facade dependency direction GR-1 forbids.
+`test_gr1c_resolved_failure_class_fallbacks_are_class_resolved` pins the
+boundary so changing it becomes an explicit decision.
 
 ### GR-1C mutation results
 
@@ -378,9 +420,9 @@ Precision notes, stated so the table cannot over-claim:
 Honest limit: the orchestration body moved verbatim, and its internal
 branches remain covered by the same pre-existing suite as before — the new
 tests freeze the injection contract, they do not add branch coverage. GR-1
-remains partial: the 276-line execute composition, the 221-line
+remains partial: the 281-line execute composition, the 221-line
 `reconcile_submission`, and the two recovery functions still live on the
-1,090-line facade, and whether that satisfies the plan's "thin composition
+1,094-line facade, and whether that satisfies the plan's "thin composition
 layer" is a reviewer call, not a claim made here.
 
 ### What the characterization suite can actually detect

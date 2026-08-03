@@ -7,12 +7,13 @@ claim) and preflight_allocation_batch() (read-only, no claim at all). It
 reads durable state and queries the broker; it never claims, never transitions
 a proposal, never reserves budget, never submits.
 
-Dependency injection, not namespace resolution: every callable seam this
-orchestration consults arrives explicitly via ``ProposalValidationDeps``.
+Dependency injection, not namespace resolution: every facade-derived runtime
+name this orchestration consults arrives explicitly via
+``ProposalValidationDeps``.
 The facade (assistant.execution_service) constructs that contract AT CALL
 TIME from its own module namespace, so a monkeypatch on
 ``assistant.execution_service.validate_trade_intent`` (or any other
-injected seam name) still reaches this module. That is the property that
+injected runtime name) still reaches this module. That is the property that
 kept this orchestration on the facade through GR-1B: moving the code while
 resolving ``validate_trade_intent`` from THIS module's namespace would have
 silently defeated every such patch --
@@ -20,7 +21,7 @@ tests/test_personal_assistant.py::
 test_unexpected_exception_during_validation_marks_validation_failed_not_stuck
 patches exactly that name, and
 tests/test_execution_characterization.py freezes the seam directly. This
-module therefore imports none of the injected callables, which also keeps
+module therefore imports none of the injected collaborators, which also keeps
 GR-1 section 6.2 satisfied structurally: no private peer imports exist to
 forbid.
 
@@ -39,14 +40,12 @@ earlier refusal.
 from __future__ import annotations
 
 import dataclasses
-from datetime import datetime, timezone
+from datetime import datetime
 from decimal import Decimal
 from typing import Any, Callable
 
 from assistant.execution_telemetry import (
-    FAILURE_DATA_INTEGRITY,
     FAILURE_DETERMINISTIC_POLICY,
-    FAILURE_INFRASTRUCTURE,
     FAILURE_NONE,
 )
 from assistant.money import MoneyInput
@@ -109,7 +108,18 @@ class ProposalValidationOutcome:
 
     @property
     def resolved_failure_class(self) -> str:
-        """One of the FAILURE_* constants, never None."""
+        """One of the FAILURE_* constants, never None.
+
+        Boundary note (GR-1C third round): these two fallbacks resolve from
+        THIS module, not the facade, so they sit outside the
+        ProposalValidationDeps injection contract, which is scoped to
+        run_proposal_validation()'s body. Pre-GR-1C the class lived on the
+        facade and a facade-level patch of either constant reached this
+        property; it no longer does. Deliberate: injecting them would change
+        this frozen dataclass's public field set, and resolving them from the
+        facade would invert the kernel->facade dependency direction. Pinned
+        by test_gr1c_resolved_failure_class_fallbacks_are_class_resolved.
+        """
         if self.error is None:
             return FAILURE_NONE
         return self.failure_class or FAILURE_DETERMINISTIC_POLICY
@@ -137,7 +147,7 @@ class ProposalValidationOutcome:
 
 @dataclasses.dataclass(frozen=True)
 class ProposalValidationDeps:
-    """Every callable seam run_proposal_validation() consults, injected.
+    """Every facade-resolved runtime name used by validation, injected.
 
     The facade builds this AT CALL TIME from its own module globals -- never
     at import time, never from this module's namespace -- which is the whole
@@ -149,36 +159,28 @@ class ProposalValidationDeps:
     tests/test_execution_characterization.py freezes each field against
     exactly that edit.
 
-    The injection boundary, stated exactly (GR-1C review follow-up,
-    2026-08-02): injected = every name the moved body INVOKES at runtime
-    that is not defined by this module -- functions, constructors, the
-    clock, and the deferred broker import. Three names the old facade body
-    also resolved from its module globals are DELIBERATELY not injected,
-    and run_proposal_validation() resolves them from this module instead:
+    The injection boundary is exact: ``run_proposal_validation()`` resolves
+    no runtime collaborator from this module. That includes the outcome
+    constructor, timezone collaborator, and behavior-bearing failure
+    constants, all of which the body historically resolved from the facade
+    and callers could replace there. The outcome class remains defined here
+    and re-exported by the facade as the same object, but the facade still
+    supplies the factory used for each construction at call time; this is
+    ordinary dependency injection, not a circular dependency.
 
-    - ``ProposalValidationOutcome`` -- defined in this module; the facade
-      name is an alias to this class, so injecting the function's own
-      return type back into it would be circular. A facade-level patch of
-      that alias no longer redirects the kernel's constructions; no test
-      ever used that as a seam.
-    - ``timezone`` -- read (``timezone.utc``), never invoked. Freezing
-      time goes through the injected ``datetime_type``, which both clock
-      reads use.
-    - ``FAILURE_*`` constants -- immutable strings defined in
-      assistant.execution_telemetry; behavioral meaning is carried by
-      which constant a branch selects, not by the constant's value.
-
-    test_gr1c_the_kernel_body_reads_no_unexpected_module_globals pins this
-    exact allowlist, so adding ANY new module-global read to the body --
-    including quietly resolving a formerly injected dep -- fails loudly and
-    forces the inject-or-allowlist decision to be made explicitly.
+    ``test_gr1c_the_kernel_body_reads_no_module_globals`` pins the empty
+    runtime-global set. Adding any module-global read to the body -- including
+    quietly resolving a formerly injected dependency directly -- fails and
+    requires the collaborator to join this contract.
     """
     # Deferred provider for execution.alpaca_broker, called mid-sequence at
     # the point the historical inline import ran. A provider rather than the
     # module object so an unimportable broker package cannot preempt the
     # earlier existence/expiry/policy refusals.
     import_broker: Callable[[], Any]
+    outcome_factory: Callable[..., ProposalValidationOutcome]
     datetime_type: Any
+    timezone_type: Any
     decimal_factory: Callable[[str], Decimal]
     trade_intent_factory: Callable[..., TradeIntent]
     to_decimal: Callable[..., Decimal]
@@ -188,6 +190,8 @@ class ProposalValidationDeps:
     pending_buy_value_by_ticker: Callable[[list, Any], dict[str, Decimal]]
     resolve_earnings_days_away: Callable[[str, int | None], int | None]
     validate_trade_intent: Callable[..., ValidationResult]
+    failure_data_integrity: str
+    failure_infrastructure: str
 
 
 def run_proposal_validation(
@@ -215,7 +219,7 @@ def run_proposal_validation(
     try:
         persistent_kill_switch = store.get_kill_switch()
     except Exception as exc:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal,
             intent=None,
             validation=None,
@@ -229,26 +233,26 @@ def run_proposal_validation(
     if proposal is None:
         proposal = store.get_proposal(proposal_id)
     if proposal is None:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=None, intent=None, validation=None, error=f"Unknown proposal: {proposal_id}",
-            failure_class=FAILURE_DATA_INTEGRITY,
+            failure_class=deps.failure_data_integrity,
         )
 
-    now_utc = deps.datetime_type.now(timezone.utc)
+    now_utc = deps.datetime_type.now(deps.timezone_type.utc)
     if now_utc > deps.datetime_type.fromisoformat(proposal["expires_at"]):
-        return ProposalValidationOutcome(proposal=proposal, intent=None, validation=None, error="Proposal has expired.")
+        return deps.outcome_factory(proposal=proposal, intent=None, validation=None, error="Proposal has expired.")
     if policy.execution_mode != "paper":
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=None, validation=None,
             error="The active policy does not permit paper execution.",
         )
     if proposal["policy_version"] != policy.version:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=None, validation=None,
             error="Proposal policy version does not match the active policy.",
         )
     if proposal.get("policy_fingerprint") != deps.compute_policy_fingerprint(policy):
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=None, validation=None,
             error=(
                 "Proposal's policy fingerprint does not match the active policy's current content -- the "
@@ -260,25 +264,25 @@ def run_proposal_validation(
     broker = deps.import_broker()
 
     if not broker.PAPER_TRADING:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=None, validation=None,
             error="This workflow refuses live trading; PAPER_TRADING must remain True.",
         )
     if not broker.is_configured():
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=None, validation=None, error="Alpaca paper credentials are not configured.",
-            failure_class=FAILURE_INFRASTRUCTURE,
+            failure_class=deps.failure_infrastructure,
         )
     if kill_switch_active:
         reason = str(persistent_kill_switch.get("reason") or "active")
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal,
             intent=None,
             validation=None,
             error=f"The execution kill switch is active ({reason}).",
         )
     if not current_portfolio.open_orders_available:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=None, validation=None,
             error=(
                 "Cannot verify open orders right now (the broker's order endpoint failed) -- refusing to "
@@ -297,7 +301,7 @@ def run_proposal_validation(
         or not isinstance(extra_open_order_count, int)
         or extra_open_order_count < 0
     ):
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=None, validation=None,
             error=f"extra_open_order_count must be a non-negative int, got {extra_open_order_count!r}.",
         )
@@ -307,7 +311,7 @@ def run_proposal_validation(
             f" (including {extra_open_order_count} earlier leg(s) of this batch)"
             if extra_open_order_count else ""
         )
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal,
             intent=None,
             validation=None,
@@ -320,25 +324,25 @@ def run_proposal_validation(
     try:
         intent = deps.intent_from_dict(proposal["intent"])
     except Exception as exc:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=None, validation=None, error=f"Malformed stored intent: {exc}",
-            failure_class=FAILURE_DATA_INTEGRITY,
+            failure_class=deps.failure_data_integrity,
         )
 
     if intent.side not in policy.allowed_sides:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=intent, validation=None,
             error=f"Side '{intent.side}' is not allowed by policy.",
         )
     if intent.order_type not in policy.allowed_order_types:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=intent, validation=None,
             error=f"Order type '{intent.order_type}' is not allowed by policy.",
         )
     if intent.side == "buy" and not policy.allow_new_positions:
         held = {p.ticker.upper() for p in current_portfolio.positions}
         if intent.ticker.upper() not in held:
-            return ProposalValidationOutcome(
+            return deps.outcome_factory(
                 proposal=proposal, intent=intent, validation=None,
                 error="Opening new positions is disabled by policy.",
             )
@@ -346,12 +350,12 @@ def run_proposal_validation(
     try:
         broker_preflight = broker.assert_account_and_asset_ready(intent.ticker)
     except Exception as exc:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal,
             intent=intent,
             validation=None,
             error=f"Broker account/asset preflight failed: {exc}",
-            failure_class=FAILURE_INFRASTRUCTURE,
+            failure_class=deps.failure_infrastructure,
         )
 
     try:
@@ -363,11 +367,11 @@ def run_proposal_validation(
         # intent already does above, not raise uncaught out of this
         # read-only function (preflight_allocation_batch() calls this
         # directly, with no surrounding try/except of its own).
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=intent, validation=None,
             error=f"Could not check recent order history for duplicates: malformed stored intent: {exc}",
             broker_preflight=broker_preflight,
-            failure_class=FAILURE_DATA_INTEGRITY,
+            failure_class=deps.failure_data_integrity,
         )
     for order in current_portfolio.open_orders:
         side = str(order.get("side", "")).lower()
@@ -383,17 +387,17 @@ def run_proposal_validation(
 
     try:
         quote = broker.get_latest_quote(intent.ticker)
-        quote_received_at = deps.datetime_type.now(timezone.utc).isoformat()
+        quote_received_at = deps.datetime_type.now(deps.timezone_type.utc).isoformat()
         reference_price = quote.get("price_decimal", quote["price"])
         price_timestamp = quote["timestamp"]
         bid_price = quote.get("bid_decimal", quote.get("bid"))
         ask_price = quote.get("ask_decimal", quote.get("ask"))
     except Exception as exc:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=intent, validation=None,
             error=f"Could not fetch a live quote for {intent.ticker} to check price freshness: {exc}",
             broker_preflight=broker_preflight,
-            failure_class=FAILURE_INFRASTRUCTURE,
+            failure_class=deps.failure_infrastructure,
         )
 
     pending_buy_value_by_ticker: dict[str, Decimal] = {}
@@ -403,7 +407,7 @@ def run_proposal_validation(
                 deps.pending_buy_value_by_ticker(current_portfolio.open_orders, broker)
             )
         except Exception as exc:
-            return ProposalValidationOutcome(
+            return deps.outcome_factory(
                 proposal=proposal, intent=intent, validation=None,
                 error=(
                     f"Could not determine the dollar value of a pending buy order needed to check "
@@ -413,7 +417,7 @@ def run_proposal_validation(
                 broker_preflight=broker_preflight,
                 quote=quote,
                 quote_received_at=quote_received_at,
-                failure_class=FAILURE_INFRASTRUCTURE,
+                failure_class=deps.failure_infrastructure,
             )
         for ticker, extra_value in (extra_pending_buy_value_by_ticker or {}).items():
             key = ticker.upper()
@@ -429,7 +433,7 @@ def run_proposal_validation(
         intent.ticker, earnings_days_away
     )
     if policy.require_earnings_data and intent.side == "buy" and resolved_earnings_days_away is None:
-        return ProposalValidationOutcome(
+        return deps.outcome_factory(
             proposal=proposal, intent=intent, validation=None,
             error=(
                 f"Earnings-date data for {intent.ticker} is unavailable and your policy requires it "
@@ -446,7 +450,7 @@ def run_proposal_validation(
             # been evaluated normally, so labelling it a policy rejection
             # would teach a later model that the policy declines trades it
             # does not decline.
-            failure_class=FAILURE_INFRASTRUCTURE,
+            failure_class=deps.failure_infrastructure,
         )
 
     validation = deps.validate_trade_intent(
@@ -474,7 +478,7 @@ def run_proposal_validation(
         available_cash_override=available_cash_override,
         available_buying_power_override=available_buying_power_override,
     )
-    return ProposalValidationOutcome(
+    return deps.outcome_factory(
         proposal=proposal,
         intent=intent,
         validation=validation,

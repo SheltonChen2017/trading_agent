@@ -14,6 +14,25 @@ mistakes worth not repeating.
 Both have been wrong in this repo. Verify claims against the code; verify
 fixes by breaking them on purpose.
 
+## 0. Owner-mandated review mechanics (2026-08-02)
+
+`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` is binding for every review in
+this repo, including this skill's rounds:
+
+- Enumerate the exact commit range first (`git log --reverse --oneline
+  <base>..<head>`) and give EVERY commit an explicit disposition —
+  accepted / accepted after correction / rejected, with issues or
+  "no issue found". Never review only the tip or one combined diff.
+- Keep a P0–P3 issue ledger in the report (ID, priority, status, commit,
+  location, issue+impact, evidence, reason for fix, correction,
+  verification). State a concrete reason per fix — "cleanup" is not one.
+  Keep resolved items in the ledger; do not delete them.
+- If the review completes a feature/milestone, add its two-paragraph entry
+  (technical + plain-language) to `docs/FEATURE_MILESTONE_RECORD.md`.
+- Before ending the session, update and commit `docs/SESSION_HANDOFF.md`
+  with the final commits, validation, and next step, so a computer switch
+  needs only git.
+
 ## 1. Verify every claim first — fix nothing yet
 
 Read the cited file and line before touching anything. Reviews here have run

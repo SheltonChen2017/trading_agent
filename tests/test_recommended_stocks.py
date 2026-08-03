@@ -196,6 +196,34 @@ def test_include_ai_suggestions_false_prevents_the_paid_call_entirely(monkeypatc
     assert not any(r.ticker == "AAPL" for r in recommended)
 
 
+def test_disabled_market_sources_do_not_make_network_calls():
+    """A source toggle is an execution control for that source, not merely
+    a display filter: disabled lanes must not call their providers or add
+    failures to the combined dropped count."""
+    with patch(
+        "assistant.recommended_stocks.fetch_most_active_tickers"
+    ) as mock_active, patch(
+        "assistant.recommended_stocks.fetch_recent_ipos"
+    ) as mock_ipos, patch(
+        "assistant.recommended_stocks.verify_tickers"
+    ) as mock_verify, patch(
+        "assistant.recommended_stocks.suggest_similar_tickers"
+    ) as mock_suggest:
+        recommended, dropped = recommended_stocks.build_recommended_tickers(
+            held_tickers=["AAPL"],
+            include_most_active=False,
+            include_recent_ipos=False,
+            include_ai_suggestions=False,
+        )
+
+    mock_active.assert_not_called()
+    mock_ipos.assert_not_called()
+    mock_suggest.assert_not_called()
+    mock_verify.assert_not_called()
+    assert recommended == []
+    assert dropped == []
+
+
 _NO_EVIDENCE = similarity_evidence.SimilarityEvidence(
     source_tickers=(), candidate_ticker="", shared_sectors=(), shared_industries=(),
     return_correlation_pct=None, lookback_days=126, data_start=None, data_end=None,

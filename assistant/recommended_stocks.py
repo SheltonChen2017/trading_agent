@@ -121,6 +121,8 @@ def build_recommended_tickers(
     held_tickers: list[str] | None = None,
     store: AssistantStore | None = None,
     *,
+    include_most_active: bool = True,
+    include_recent_ipos: bool = True,
     include_ai_suggestions: bool = True,
 ) -> tuple[list[RecommendedTicker], list[str]]:
     """Composes most-actives + IPO calendar + assistant.ai_advisor.suggest_similar_tickers()
@@ -140,46 +142,76 @@ def build_recommended_tickers(
     personalized to a user's holdings when it was actually just always
     suggesting tickers similar to a fixed mega-cap-tech basket).
 
-    `include_ai_suggestions=False` skips the Claude suggestion lane (and
-    therefore its paid API call) entirely while leaving the deterministic
-    most-active and IPO lanes untouched -- the UI's optional-AI master
-    preference must be able to prevent the call from firing at all, not
-    merely hide its output (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md
-    section 3.2: disabling AI must not disable deterministic content, and
-    credential presence must not automatically trigger an API call)."""
+    Each `include_*` flag prevents its provider call entirely, rather than
+    fetching candidates and hiding the corresponding rows afterward. This is
+    load-bearing for the dedicated UI's explicit source controls. In
+    particular, `include_ai_suggestions=False` prevents the paid Claude call
+    while leaving whichever deterministic lanes were selected untouched
+    (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md sections 3.2 and 4.2)."""
     now = datetime.now(timezone.utc).isoformat()
     held_set = {t.upper() for t in (held_tickers or [])}
     recommended: list[RecommendedTicker] = []
     dropped: list[str] = []
 
-    most_active_candidates = [c for c in fetch_most_active_tickers() if c["ticker"].upper() not in held_set]
-    verified, batch_dropped = verify_tickers([c["ticker"] for c in most_active_candidates])
-    dropped.extend(batch_dropped)
-    detail_by_ticker = {c["ticker"]: c for c in most_active_candidates}
-    for v in verified:
-        c = detail_by_ticker.get(v["ticker"], {})
-        volume = c.get("volume")
-        detail = f"{v.get('longName') or c.get('name') or v['ticker']} -- trading volume today: {volume:,}" if volume else f"{v.get('longName') or v['ticker']}"
-        recommended.append(RecommendedTicker(ticker=v["ticker"], reason_category="most_active", detail=detail, fetched_at=now))
-
-    ipo_candidates = [c for c in fetch_recent_ipos() if c["ticker"].upper() not in held_set]
-    verified, batch_dropped = verify_tickers(
-        [c["ticker"] for c in ipo_candidates], policy=RECENT_IPO_ELIGIBILITY_POLICY
-    )
-    dropped.extend(batch_dropped)
-    ipo_detail_by_ticker = {c["ticker"]: c for c in ipo_candidates}
-    for v in verified:
-        c = ipo_detail_by_ticker.get(v["ticker"], {})
-        claimed_date = c.get("date", "")
-        if _is_ipo_identity_mismatch(v.get("first_session_date"), claimed_date):
-            dropped.append(v["ticker"])
-            continue
-        name = v.get("longName") or c.get("name") or v["ticker"]
-        detail = (
-            f"{name} -- IPO date: {claimed_date or 'unknown'} ({v['history_sessions']} completed trading "
-            "session(s) -- volatility/trend estimates are not yet reliable this early)"
+    if include_most_active:
+        most_active_candidates = [
+            c
+            for c in fetch_most_active_tickers()
+            if c["ticker"].upper() not in held_set
+        ]
+        verified, batch_dropped = verify_tickers(
+            [c["ticker"] for c in most_active_candidates]
         )
-        recommended.append(RecommendedTicker(ticker=v["ticker"], reason_category="recent_ipo", detail=detail, fetched_at=now))
+        dropped.extend(batch_dropped)
+        detail_by_ticker = {c["ticker"]: c for c in most_active_candidates}
+        for v in verified:
+            c = detail_by_ticker.get(v["ticker"], {})
+            volume = c.get("volume")
+            detail = (
+                f"{v.get('longName') or c.get('name') or v['ticker']} -- "
+                f"trading volume today: {volume:,}"
+                if volume
+                else f"{v.get('longName') or v['ticker']}"
+            )
+            recommended.append(
+                RecommendedTicker(
+                    ticker=v["ticker"],
+                    reason_category="most_active",
+                    detail=detail,
+                    fetched_at=now,
+                )
+            )
+
+    if include_recent_ipos:
+        ipo_candidates = [
+            c for c in fetch_recent_ipos() if c["ticker"].upper() not in held_set
+        ]
+        verified, batch_dropped = verify_tickers(
+            [c["ticker"] for c in ipo_candidates],
+            policy=RECENT_IPO_ELIGIBILITY_POLICY,
+        )
+        dropped.extend(batch_dropped)
+        ipo_detail_by_ticker = {c["ticker"]: c for c in ipo_candidates}
+        for v in verified:
+            c = ipo_detail_by_ticker.get(v["ticker"], {})
+            claimed_date = c.get("date", "")
+            if _is_ipo_identity_mismatch(v.get("first_session_date"), claimed_date):
+                dropped.append(v["ticker"])
+                continue
+            name = v.get("longName") or c.get("name") or v["ticker"]
+            detail = (
+                f"{name} -- IPO date: {claimed_date or 'unknown'} "
+                f"({v['history_sessions']} completed trading session(s) -- "
+                "volatility/trend estimates are not yet reliable this early)"
+            )
+            recommended.append(
+                RecommendedTicker(
+                    ticker=v["ticker"],
+                    reason_category="recent_ipo",
+                    detail=detail,
+                    fetched_at=now,
+                )
+            )
 
     if held_set and include_ai_suggestions:
         held_list = sorted(held_set)

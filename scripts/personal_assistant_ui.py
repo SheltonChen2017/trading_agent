@@ -392,7 +392,14 @@ _AI_PREF_OFF_HELP = (
 
 
 @st.cache_data(ttl=_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS)
-def _load_recommended_tickers(held_tickers: tuple[str, ...], include_ai: bool = True):
+def _load_recommended_tickers(
+    held_tickers: tuple[str, ...],
+    include_ai: bool = True,
+    *,
+    include_most_active: bool = True,
+    include_recent_ipos: bool = True,
+    include_ai_curation: bool = True,
+):
     """Composes yf.screen (most-actives) + Finnhub (IPO calendar, if
     configured) + a Claude ticker-suggestion call + a verification pass over
     every candidate -- genuinely expensive to run on every Briefing rerun
@@ -418,14 +425,44 @@ def _load_recommended_tickers(held_tickers: tuple[str, ...], include_ai: bool = 
     curation call fires -- the preference prevents the paid calls, it does
     not merely hide their output."""
     recommended, dropped = build_recommended_tickers(
-        list(held_tickers), store=store, include_ai_suggestions=include_ai
+        list(held_tickers),
+        store=store,
+        include_most_active=include_most_active,
+        include_recent_ipos=include_recent_ipos,
+        include_ai_suggestions=include_ai,
     )
     curated_note = (
         curate_recommended_tickers(recommended, store=store)
-        if recommended and include_ai
+        if recommended and include_ai and include_ai_curation
         else None
     )
     return recommended, dropped, curated_note
+
+
+_POLICY_EDITOR_SOURCE_KEY = "policy_editor_source"
+
+
+def _sync_policy_editor_state(session_state, policy_path: str, policy) -> bool:
+    """Bind policy-editor widgets to the selected policy's exact content.
+
+    Streamlit widget keys otherwise survive sidebar policy-path changes and
+    external policy edits. That can make a true flag in the newly selected
+    file render as false and look like an intentional pending change. Preserve
+    an unsaved edit while the source identity is unchanged, but reset both
+    controls and typed confirmation whenever the resolved path or fingerprint
+    changes. Returns True when a reset occurred, for focused tests.
+    """
+    source = (
+        str(Path(policy_path).resolve(strict=False)),
+        compute_policy_fingerprint(policy),
+    )
+    if session_state.get(_POLICY_EDITOR_SOURCE_KEY) == source:
+        return False
+    session_state["policy_edit_allow_new_positions"] = policy.allow_new_positions
+    session_state["policy_edit_enable_strategy"] = policy.enable_strategy_proposals
+    session_state.pop("policy_edit_confirm_phrase", None)
+    session_state[_POLICY_EDITOR_SOURCE_KEY] = source
+    return True
 
 
 def _load_packet(policy_path: str, include_events: bool):
@@ -2600,7 +2637,12 @@ with tab_suggestions:
         # allow it -- passing include_ai=False prevents the paid calls.
         suggestion_rows, suggestion_dropped, _suggestion_note = _load_recommended_tickers(
             tuple(sorted({t.upper() for t in seed_tickers})),
-            want_ai_source and suggestions_ai_available,
+            include_ai=want_ai_source and suggestions_ai_available,
+            include_most_active=want_most_active,
+            include_recent_ipos=want_recent_ipo,
+            # The dedicated tab does not render the Briefing's separate
+            # Claude curation note, so do not make and discard that paid call.
+            include_ai_curation=False,
         )
         st.session_state["ticker_suggestions_result"] = {
             "rows": suggestion_rows,
@@ -2686,17 +2728,25 @@ with tab_settings:
         st.error(f"The selected policy file could not be loaded: {settings_policy_error}")
     else:
         active_fingerprint = compute_policy_fingerprint(settings_policy)
+        _sync_policy_editor_state(st.session_state, policy_path, settings_policy)
         st.caption(
             f"Active policy: **{settings_policy.name}** v{settings_policy.version} "
             f"({settings_policy.execution_mode}) — fingerprint `{active_fingerprint[:16]}…` — "
             f"file: `{policy_path}`"
         )
-        st.session_state.setdefault(
-            "policy_edit_allow_new_positions", settings_policy.allow_new_positions
-        )
-        st.session_state.setdefault(
-            "policy_edit_enable_strategy", settings_policy.enable_strategy_proposals
-        )
+        update_notice = st.session_state.pop("policy_update_notice", None)
+        if update_notice is not None:
+            st.success(
+                f"Policy updated and saved: v{update_notice['old_version']} → "
+                f"v{update_notice['new_version']}, fingerprint "
+                f"`{update_notice['old_fingerprint'][:16]}…` → "
+                f"`{update_notice['new_fingerprint'][:16]}…`."
+            )
+            st.warning(
+                "Proposals created before this change can no longer execute. "
+                "Regenerate anything you still want on the Selling or "
+                "Propose & Approve tab."
+            )
         proposed_allow_new = st.checkbox(
             "Allow new positions (exposure-increasing buys become policy-eligible)",
             key="policy_edit_allow_new_positions",
@@ -2746,18 +2796,18 @@ with tab_settings:
                     st.error(f"Policy update refused; the file was not changed: {exc}")
                 else:
                     st.cache_data.clear()
-                    st.session_state.pop("policy_edit_confirm_phrase", None)
                     new_fingerprint = compute_policy_fingerprint(updated_policy)
-                    st.success(
-                        f"Policy updated and saved: v{settings_policy.version} → "
-                        f"v{updated_policy.version}, fingerprint "
-                        f"`{active_fingerprint[:16]}…` → `{new_fingerprint[:16]}…`."
-                    )
-                    st.warning(
-                        "Proposals created before this change can no longer execute. "
-                        "Regenerate anything you still want on the Selling or "
-                        "Propose & Approve tab."
-                    )
+                    st.session_state["policy_update_notice"] = {
+                        "old_version": settings_policy.version,
+                        "new_version": updated_policy.version,
+                        "old_fingerprint": active_fingerprint,
+                        "new_fingerprint": new_fingerprint,
+                    }
+                    # Every other tab was rendered earlier in this script run
+                    # with the old policy. Rerun immediately so the editor,
+                    # proposal defaults, and read-only status all agree with
+                    # the policy that was just persisted.
+                    st.rerun()
         else:
             st.caption("No policy change selected — the values above match the active policy.")
 

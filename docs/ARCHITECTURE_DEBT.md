@@ -78,13 +78,20 @@ sys.modules-level broker-fake test seams work unchanged. PR #120 merged at
 `711095c`; independent review at `2f37210` required no code correction and
 reproduced representative facade-seam and mismatch-kill-switch mutations.
 
-**Still open**: `execution_service.py` is 952 lines after GR-1D. Its
-281-line execution composition and the stale-reconciliation/claim recovery
-wrappers still keep state-machine orchestration on the facade, and it is not
-yet the thin composition layer in the GR-1 definition of done — that residue
-is exactly GR-1E's assessment question. `allocation_batch.py` also still
-owns cross-leg reservation math separately from the storage-level budget
-reservation. The remaining split is smaller than it was, but not done.
+**GR-1 chapter CLOSED 2026-08-03 by the GR-1E assessment (pending
+independent review)**: the mechanical measurement in
+`docs/GENERAL_READINESS_STATUS.md` (GR-1E section) found the 281-line
+execution "composition" is 172 executable lines invoking nineteen named
+kernel/gate/telemetry functions with exactly one broker-contact line and
+zero inline computation — i.e., it IS the thin composition layer the
+definition of done asks for — and the two recovery wrappers are input
+validation plus one atomic `reclaim_stale_status` storage call each, whose
+extraction would relocate rather than reduce risk. Declared complete
+against plan section 6.4 with that residual documented rather than churned.
+
+**Still open (outside GR-1's scope)**: `allocation_batch.py` owns cross-leg
+reservation math separately from the storage-level budget reservation;
+risk-check scatter (item 2 below) remains GR-2's consolidation target.
 
 ## 2. Risk-check scatter
 

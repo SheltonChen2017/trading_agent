@@ -583,108 +583,185 @@ def test_gr1c_validation_clock_still_resolves_from_the_facade(store, monkeypatch
     assert str(outcome.quote_received_at).startswith("2099-01-01T00:00:00")
 
 
-# The complete, deliberate set of module-scope names the moved validation
-# body may read at runtime. Everything else it consults must arrive through
-# ProposalValidationDeps -- see that class's docstring for why each of these
-# three is excluded from injection (the module's own return type, a
-# never-invoked tzinfo constant, and immutable failure-class strings).
-_KERNEL_VALIDATION_ALLOWED_GLOBALS = frozenset({
-    "ProposalValidationOutcome",
-    "timezone",
-    "FAILURE_DATA_INTEGRITY",
-    "FAILURE_INFRASTRUCTURE",
-})
+def test_gr1c_outcome_construction_still_resolves_from_the_facade(
+    store, monkeypatch
+):
+    """Moving the body must not bypass the facade's return-type seam."""
+    from assistant import execution_service
+
+    sentinel = object()
+    constructions: list[dict] = []
+
+    def recording_outcome(**kwargs):
+        constructions.append(dict(kwargs))
+        return sentinel
+
+    monkeypatch.setattr(
+        execution_service, "ProposalValidationOutcome", recording_outcome
+    )
+
+    outcome = execution_service.validate_proposal_for_execution(
+        "missing-proposal",
+        _held_portfolio(),
+        load_policy(),
+        store,
+        now_et=NOW_ET,
+    )
+
+    assert outcome is sentinel
+    assert constructions == [
+        {
+            "proposal": None,
+            "intent": None,
+            "validation": None,
+            "error": "Unknown proposal: missing-proposal",
+            "failure_class": execution_service.FAILURE_DATA_INTEGRITY,
+        }
+    ]
 
 
-def test_gr1c_the_kernel_body_reads_no_unexpected_module_globals():
+def test_gr1c_utc_source_still_resolves_from_the_facade(store, monkeypatch):
+    """The moved body historically read both datetime and timezone there."""
+    from assistant import execution_service
+
+    real_datetime = datetime
+    facade_utc = object()
+    clock_arguments: list[object] = []
+
+    class FacadeTimezone:
+        utc = facade_utc
+
+    class RecordingDateTime:
+        @classmethod
+        def now(cls, tz=None):
+            clock_arguments.append(tz)
+            return real_datetime(2099, 1, 1, tzinfo=timezone.utc)
+
+        @classmethod
+        def fromisoformat(cls, value):
+            return real_datetime.fromisoformat(value)
+
+    store.save_proposal(
+        _proposal(
+            "p-facade-utc",
+            side="sell",
+            expires_at="2090-01-01T00:00:00+00:00",
+        )
+    )
+    monkeypatch.setattr(execution_service, "datetime", RecordingDateTime)
+    monkeypatch.setattr(execution_service, "timezone", FacadeTimezone)
+
+    outcome = execution_service.validate_proposal_for_execution(
+        "p-facade-utc",
+        _held_portfolio(),
+        load_policy(),
+        store,
+        now_et=NOW_ET,
+    )
+
+    assert outcome.error == "Proposal has expired."
+    assert clock_arguments == [facade_utc]
+
+
+def test_gr1c_failure_constants_still_resolve_from_the_facade(store, monkeypatch):
+    """Failure classifications are behavioral collaborators, not decoration."""
+    from assistant import execution_service
+
+    facade_data_failure = "facade-data-integrity"
+    facade_infrastructure_failure = "facade-infrastructure"
+    monkeypatch.setattr(
+        execution_service,
+        "FAILURE_DATA_INTEGRITY",
+        facade_data_failure,
+    )
+    monkeypatch.setattr(
+        execution_service,
+        "FAILURE_INFRASTRUCTURE",
+        facade_infrastructure_failure,
+    )
+
+    outcome = execution_service.validate_proposal_for_execution(
+        "missing-proposal",
+        _held_portfolio(),
+        load_policy(),
+        store,
+        now_et=NOW_ET,
+    )
+    assert outcome.failure_class == facade_data_failure
+
+    store.save_proposal(
+        _proposal(
+            "p-facade-failure",
+            side="sell",
+            expires_at="2100-01-01T00:00:00+00:00",
+        )
+    )
+    with patched_broker(BrokerRecorder(is_configured=False)):
+        outcome = execution_service.validate_proposal_for_execution(
+            "p-facade-failure",
+            _held_portfolio(),
+            load_policy(),
+            store,
+            now_et=NOW_ET,
+        )
+
+    assert outcome.failure_class == facade_infrastructure_failure
+
+
+def test_gr1c_the_kernel_body_reads_no_module_globals():
     """Structural guard behind the whole GR-1C seam family.
 
-    The behavioural tests above each freeze ONE seam. This pins the
-    boundary itself: run_proposal_validation() may read exactly the
-    module-scope names in _KERNEL_VALIDATION_ALLOWED_GLOBALS and nothing
-    else. A future edit that resolves ANY new name from the kernel's module
-    scope -- including quietly reverting an injected dep back to a direct
-    call, the regression class both GR-1C mutation rounds targeted -- fails
-    here by name, forcing the inject-or-allowlist decision to be explicit.
-    An AST test rather than a behavioural one because the invariant is
-    about name RESOLUTION, which runtime behaviour cannot observe once the
-    kernel's own import happens to point at the same object as the facade's.
-
-    Annotations are excluded from the read set: under ``from __future__
-    import annotations`` they are never evaluated, so a type name appearing
-    only in an annotation is not a runtime resolution.
+    The behavioural tests above each freeze one seam. This pins the boundary
+    itself: run_proposal_validation() may not read any module-scope runtime
+    name; every collaborator must arrive through ProposalValidationDeps. A
+    symbol-table test is used because it follows Python's actual lexical
+    scopes (including comprehensions and nested blocks) and still detects a
+    module global that shadows a builtin. Runtime behavior cannot observe the
+    distinction when the kernel and facade imports happen to point at the
+    same object.
     """
-    import ast
     import builtins
     from pathlib import Path
+    import symtable
 
     source_path = (
         Path(__file__).resolve().parent.parent
         / "assistant" / "execution_kernel" / "validate.py"
     )
-    tree = ast.parse(source_path.read_text(encoding="utf-8"))
-    fn = next(
-        node for node in tree.body
-        if isinstance(node, ast.FunctionDef)
-        and node.name == "run_proposal_validation"
+    source = source_path.read_text(encoding="utf-8")
+    module_table = symtable.symtable(source, str(source_path), "exec")
+    function_table = next(
+        table
+        for table in module_table.get_children()
+        if table.get_name() == "run_proposal_validation"
     )
 
-    bound: set[str] = {
-        a.arg
-        for a in (fn.args.posonlyargs + fn.args.args + fn.args.kwonlyargs)
+    module_bindings = {
+        symbol.get_name()
+        for symbol in module_table.get_symbols()
+        if symbol.is_assigned() or symbol.is_imported() or symbol.is_namespace()
     }
-    for vararg in (fn.args.vararg, fn.args.kwarg):
-        if vararg is not None:
-            bound.add(vararg.arg)
 
-    # Pass 1: every name the body BINDS (assignments, loop/with/except and
-    # comprehension targets). Collected before reading loads so that a
-    # comprehension's element expression -- which the AST orders before its
-    # generators -- cannot misreport its own target as a global read.
-    class StoreCollector(ast.NodeVisitor):
-        def visit_Name(self, node: ast.Name) -> None:
-            if isinstance(node.ctx, (ast.Store, ast.Del)):
-                bound.add(node.id)
+    def runtime_module_reads(table) -> set[str]:
+        reads = {
+            symbol.get_name()
+            for symbol in table.get_symbols()
+            if symbol.is_global()
+            and symbol.is_referenced()
+            and (
+                symbol.get_name() in module_bindings
+                or not hasattr(builtins, symbol.get_name())
+            )
+        }
+        for child in table.get_children():
+            reads.update(runtime_module_reads(child))
+        return reads
 
-        def visit_ExceptHandler(self, node: ast.ExceptHandler) -> None:
-            if node.name:
-                bound.add(node.name)
-            self.generic_visit(node)
-
-    # Pass 2: every name the body READS, skipping annotation subtrees.
-    loads: set[str] = set()
-
-    class LoadCollector(ast.NodeVisitor):
-        def visit_AnnAssign(self, node: ast.AnnAssign) -> None:
-            self.visit(node.target)
-            if node.value is not None:
-                self.visit(node.value)
-
-        def visit_Name(self, node: ast.Name) -> None:
-            if isinstance(node.ctx, ast.Load):
-                loads.add(node.id)
-
-    for statement in fn.body:
-        StoreCollector().visit(statement)
-        LoadCollector().visit(statement)
-
-    module_reads = {
-        name for name in loads
-        if name not in bound and not hasattr(builtins, name)
-    }
-    unexpected = module_reads - _KERNEL_VALIDATION_ALLOWED_GLOBALS
-    assert not unexpected, (
-        "run_proposal_validation() reads module-scope names outside the "
-        f"deliberate allowlist: {sorted(unexpected)}. Either inject them "
-        "through ProposalValidationDeps (facade-patchable, the default) or "
-        "add them to the allowlist WITH a documented reason in the deps "
-        "docstring."
+    module_reads = runtime_module_reads(function_table)
+    assert not module_reads, (
+        "run_proposal_validation() reads module-scope runtime names instead "
+        f"of ProposalValidationDeps: {sorted(module_reads)}"
     )
-    # Keep the allowlist honest in the other direction too: an entry the
-    # body no longer reads must be removed, or the list quietly rots into
-    # permission the code does not use.
-    stale = _KERNEL_VALIDATION_ALLOWED_GLOBALS - module_reads
-    assert not stale, f"allowlisted but no longer read: {sorted(stale)}"
 
 
 # --------------------------------------------------------------------------

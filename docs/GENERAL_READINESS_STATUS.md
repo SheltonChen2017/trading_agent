@@ -314,7 +314,7 @@ the two dropped facade exports, and corrected the module's description from
 "pure" to "read-only": validation reads durable state and queries the broker,
 but does not mutate proposal, reservation, telemetry, or order state.
 
-#### Review-of-review follow-ups (2026-08-02, second round)
+#### Review-of-review follow-ups and independent correction (2026-08-02)
 
 Every review change was independently verified before acceptance. The four
 injections are correct and complete for their category (no direct
@@ -325,27 +325,30 @@ and the facade-surface rule is internally consistent: the GR-1B `os`
 removal survives it because `os` was already dead at `d9e3196`, before any
 GR-1 refactor orphaned anything.
 
-Two precision gaps were closed as follow-ups:
+Claude's follow-up identified two precision gaps:
 
 - **"Injected every runtime collaborator" claimed more than the code
-  enforced** — the same over-claim shape this review corrected twice in
-  Claude's work. Three names the old facade body also resolved from module
-  globals remain kernel-resolved: `ProposalValidationOutcome` (the kernel's
-  own return type — injecting it would be circular), `timezone` (read, never
-  invoked; time-freezing goes through the injected clock), and the
-  `FAILURE_*` constants (immutable strings). The boundary is now stated
-  exactly in the `ProposalValidationDeps` docstring, and
-  `test_gr1c_the_kernel_body_reads_no_unexpected_module_globals` pins the
-  complete module-global read set of the body as an exact two-sided
-  allowlist — any new module-scope read (including quietly reverting an
-  injected dep to a direct call) fails by name. Mutation-verified: restoring
-  either the direct `TradeIntent` call or the direct expiry-clock call
-  fails the guard.
+  enforced.** Claude documented and allowlisted the three remaining
+  categories: `ProposalValidationOutcome`, `timezone`, and the
+  behavior-bearing `FAILURE_*` constants.
 - **The "pure" sweep was incomplete** — the reviewed rename fixed the module
   docstring and one test, but "pure, side-effect-free" survived in the
   `ProposalValidationOutcome` class docstring and a
   `test_personal_assistant.py` section comment. Both now say read-only.
   Comment-only edits.
+
+The independent review accepted the terminology cleanup but rejected the
+allowlist as a compatibility solution. Before extraction, replacing any of
+those names on `assistant.execution_service` changed validation behavior;
+after Claude's follow-up it did not. Three red characterization tests proved
+the regressions independently for outcome construction, the UTC argument, and
+failure classification. `ProposalValidationDeps` now carries the facade's
+outcome factory, timezone collaborator, and data-integrity/infrastructure
+constants at call time. The kernel body has no module-global runtime reads,
+pinned by `test_gr1c_the_kernel_body_reads_no_module_globals`. The guard uses
+Python's symbol table rather than a hand-rolled AST scope approximation, so
+nested scopes and module globals shadowing builtins cannot create false
+negatives.
 
 ### GR-1C mutation results
 

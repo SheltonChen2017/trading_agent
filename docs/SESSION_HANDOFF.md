@@ -17,17 +17,20 @@ On the new computer, clone or update the repository and give either agent this
 instruction:
 
 ```text
-Read CLAUDE.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
-docs/SESSION_HANDOFF.md completely before acting. Then read both available
-ACTION_PLAN documents before implementation planning, followed by
-docs/GENERAL_READINESS_STATUS.md, docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md,
-and docs/ARCHITECTURE_DEBT.md. Establish the actual remote branches, HEAD,
-worktree, Python version, ignored-data state, credential presence, paper-account
-identity, and scheduler state. Preserve uncommitted work. Do not infer live
-trading, model promotion, or autonomous execution authority. Report any drift
-from the handoff before continuing. GR-1C is implemented and independently
-reviewed; do not redo it. Finish the remaining GR-1 facade work before GR-2
-unless the owner explicitly changes priority.
+Read CLAUDE.md, AGENTS.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md,
+and docs/SESSION_HANDOFF.md completely before acting. Then read
+docs/ACTION_PLAN_2026-08-02.md — the owner-adopted go-to plan that alone
+decides sequencing (adopted 2026-08-02; individual plans are archived in
+docs/reference/ and remain authoritative only for milestone definitions).
+Then docs/GENERAL_READINESS_STATUS.md and docs/ARCHITECTURE_DEBT.md.
+Establish the actual remote branches, HEAD, worktree, Python version,
+ignored-data state, credential presence, paper-account identity, and
+scheduler state. Preserve uncommitted work. Do not infer live trading,
+model promotion, or autonomous execution authority. Report any drift from
+the handoff before continuing. GR-1C is implemented and independently
+reviewed; do not redo it. The active phase is Phase 1 of the action plan:
+UI feature controls (owner priority change, 2026-08-02, to support daily
+paper trading from 2026-08-03). GR-1D follows in Phase 3.
 ```
 
 Initial commands:
@@ -109,24 +112,19 @@ Codex independent confirmation-review branch:
   disposition: accepted after one P3 handoff-state correction; no P0-P2 issue
   remote state: PUSHED AND MERGED as ff8c16e (PR #112)
 
-Claude consolidated-plan branch:
-  branch: user/claude/action-plan-20260802
-  plan commit: ca4bae4
-  file: docs/ACTION_PLAN_claude.md
-  remote state: PUSHED; not yet cross-reviewed by Codex
+Consolidated plans, both PUSHED AND MERGED (PR #113 Codex, PR #114 Claude;
+main at ded68b0):
+  Claude draft ca4bae4, Codex draft 9fcf254
 
-Codex consolidated-plan branch:
-  branch: codex/consolidated-action-plan-20260802
-  base: ff8c16e
-  plan commit: 9fcf254
-  file: docs/ACTION_PLAN_codex.md
-  remote state: LOCAL ONLY, NOT PUSHED
+Plan adoption (owner decision, 2026-08-02, after discussing both drafts
+with Codex): Claude's plan is the adopted go-to plan. It was renamed to
+docs/ACTION_PLAN_2026-08-02.md, re-sequenced so UI feature controls are
+Phase 1 (owner starts daily paper trading 2026-08-03), and bound as a
+standing instruction in CLAUDE.md section 2 and the new AGENTS.md. All
+individual implementation/design plans, plus Codex's draft, are archived
+under docs/reference/ (git mv, history preserved) with a README stating
+they remain authoritative for milestone definitions but not sequencing.
 ```
-
-The current Codex action-plan branch is based on merged `main` `ff8c16e`. It
-adds the independent consolidated implementation audit and this handoff. Do
-not redo or separately cherry-pick earlier GR-1C commits; they are already
-ancestors of `ff8c16e`.
 
 ### Local-only strategy-tool document
 
@@ -436,7 +434,17 @@ Still on the facade:
 - stale reconciliation/claim recovery wrappers; and
 - several compatibility exports and top-level composition responsibilities.
 
-Recommended next milestone:
+Active next milestone (owner priority change, 2026-08-02): **UI feature
+controls** — Phase 1 of `docs/ACTION_PLAN_2026-08-02.md`, implementing
+`docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` (Settings & Features tab,
+AI master/per-feature preferences, read-only status panels sourced from the
+enforcing functions, protected policy-update workflow for
+`allow_new_positions`/`enable_strategy_proposals`, Ticker Suggestions
+surface). The owner begins daily paper trading 2026-08-03; this milestone
+supports it. It touches no execution-kernel file and consumes only the
+characterization-pinned facade.
+
+GR-1D follows as the next kernel milestone (action-plan Phase 3):
 
 ```text
 GR-1D: extract manual reconciliation orchestration behind an explicit,
@@ -722,10 +730,16 @@ separate owner decision remain mandatory.
 
 ## 10. Product and design documents
 
-### UI feature controls
+All individual product/design plans were archived to `docs/reference/` on
+2026-08-02 when the go-to plan was adopted (see section 2). The paths below
+reflect that location; the documents' content is unchanged and they remain
+authoritative for their own milestone definitions.
 
-`docs/UI_FEATURE_CONTROLS_DESIGN.md` is present on the active tree. It is a
-design document only. It covers:
+### UI feature controls — NOW THE ACTIVE PHASE-1 MILESTONE
+
+`docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` is the governing design. Its
+four open decisions were resolved by the owner on 2026-08-02 (recorded in
+`docs/ACTION_PLAN_2026-08-02.md` section 9). It covers:
 
 - UI controls for `enable_strategy_proposals` and `allow_new_positions`;
 - read-only secret/provider availability instead of exposing API key values;
@@ -737,7 +751,7 @@ approval, or direct suggestion-to-proposal conversion.
 
 ### AI strategy authoring
 
-`docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md` is the comprehensive
+`docs/reference/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md` is the comprehensive
 long-term roadmap. Many prerequisites already exist—backtest engines, research
 reports, manifests, LLM provider/auditing, ML experiments, and hand-coded
 strategies—but the actual product chain is not implemented:
@@ -753,62 +767,50 @@ adapter, job runner, or Backtest page has been implemented.
 
 ### Proposal history cleanup
 
-`docs/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` remains planning only.
-No destructive cleanup should be inferred or performed from the existence of
-that plan.
+`docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` remains
+planning only. No destructive cleanup should be inferred or performed from
+the existence of that plan.
 
-### Consolidated implementation action plans
+### Consolidated action plan — adopted
 
-Codex independently audited every tracked implementation plan, design backlog,
-status ledger, architecture-debt record, operational gate, and current code/Git
-evidence into `docs/ACTION_PLAN_codex.md` at `9fcf254`. It records:
+Both agents produced independent consolidated audits (Codex `9fcf254`,
+Claude `ca4bae4`; merged via PR #113/#114) that converged on the same
+milestone facts. After discussing both with Codex, the owner adopted
+Claude's plan. It now lives at `docs/ACTION_PLAN_2026-08-02.md`, is the
+single sequencing authority (bound in CLAUDE.md section 2 and AGENTS.md),
+incorporates Codex's doc-inventory and staleness corrections by reference,
+and was re-sequenced with UI feature controls as Phase 1 by owner priority
+change. Codex's draft is preserved at
+`docs/reference/ACTION_PLAN_codex.md`.
 
-- GR-0 complete, GR-1 partial through reviewed GR-1C, and GR-2..GR-9 not
-  started as milestones;
-- the original ML foundation plus ML-LR/ML-FS software that is complete,
-  separately from missing licensed data, real research, host deployment,
-  elapsed evidence, and promotion authority;
-- AI strategy authoring, UI controls, proposal dismissal, MCP, multi-position
-  AI debate, and the allocation service as unimplemented or partial designs;
-- six stale planning statements that must not drive new work; and
-- one ordered default: GR-1D manual reconciliation extraction remains the next
-  code milestone, followed by any final GR-1 thin-facade slice before GR-2.
-
-Claude independently produced `docs/ACTION_PLAN_claude.md` at pushed commit
-`ca4bae4`. Codex deliberately did not read it before committing its own plan.
-The next planning step is an explicit cross-review/difference ledger and an
-owner-approved final plan; neither draft should silently replace the other.
-
-Do not mix these product plans into the active execution-kernel split unless
-the owner explicitly changes priority.
+Do not mix product milestones into the execution-kernel split; each remains
+its own reviewed branch.
 
 ## 11. Files and documents to read in order
 
 For the next coding session:
 
-1. `CLAUDE.md`
+1. `CLAUDE.md` and `AGENTS.md`
 2. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
 3. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
 4. `docs/FEATURE_MILESTONE_RECORD.md`
 5. `docs/SESSION_HANDOFF.md`
-6. `docs/ACTION_PLAN_codex.md` and `docs/ACTION_PLAN_claude.md` when present
+6. `docs/ACTION_PLAN_2026-08-02.md` — the adopted go-to plan
 7. `docs/GENERAL_READINESS_STATUS.md`
-8. `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
-9. `docs/ARCHITECTURE_DEBT.md`
+8. `docs/ARCHITECTURE_DEBT.md`
+9. the archived plan in `docs/reference/` covering the scheduled milestone
+   (currently `docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` for Phase 1;
+   `docs/reference/README.md` maps the rest)
 10. `assistant/execution_service.py`
 11. every file under `assistant/execution_kernel/`
-12. `tests/test_execution_characterization.py`
-12. reconciliation, replacement-chain, transaction-readiness, telemetry, and
-   import-boundary tests
+12. `tests/test_execution_characterization.py`, plus reconciliation,
+   replacement-chain, transaction-readiness, telemetry, and import-boundary
+   tests
 13. `docs/ML_IMPLEMENTATION_STATUS.md`
-14. `docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md`
-15. `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`
-16. `docs/OPERATIONS_RUNBOOK.md`
-17. `docs/LIVE_PROMOTION_CHECKLIST.md`
-18. `docs/DATABENTO_DATA_SOURCE.md`
-19. `docs/UI_FEATURE_CONTROLS_DESIGN.md`
-20. `docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md`
-21. the focused AI strategy-tool document if branch `a656015` was transferred
+14. `docs/OPERATIONS_RUNBOOK.md`
+15. `docs/LIVE_PROMOTION_CHECKLIST.md`
+16. `docs/DATABENTO_DATA_SOURCE.md`
+17. the focused AI strategy-tool document if branch `a656015` was transferred
 
 The current code and latest specific status section override stale historical
 statements in older documents. Update stale text rather than reimplementing
@@ -872,15 +874,14 @@ Do not let UI/development tests share the restored operational database.
 
 Do not infer answers to these:
 
-1. Authorization to push the local Codex consolidated-plan branch
-   `codex/consolidated-action-plan-20260802`, including plan commit `9fcf254`
-   and the separate handoff commit containing this state.
-2. When to cross-review `ACTION_PLAN_codex.md` and `ACTION_PLAN_claude.md`,
-   resolve factual/priority differences, and create the owner-approved final
-   implementation plan.
-3. Whether to retrieve unavailable local-only strategy-tool commit `a656015`
+1. ~~Push/cross-review the consolidated plans~~ — **RESOLVED 2026-08-02**:
+   both plans merged (PR #113/#114); the owner adopted Claude's plan as
+   `docs/ACTION_PLAN_2026-08-02.md` with UI feature controls as Phase 1;
+   Codex's draft is archived at `docs/reference/ACTION_PLAN_codex.md`.
+2. Whether to retrieve unavailable local-only strategy-tool commit `a656015`
    from the earlier computer or a private bundle.
-4. When to begin GR-1D and whether reconciliation is the selected next slice.
+3. When to begin GR-1D (action-plan Phase 3, after the UI controls
+   milestone completes review).
 5. Which authoritative historical membership/reference-data source will be
    obtained and funded.
 6. When to deploy the operational paper cadence and start the first immutable
@@ -906,27 +907,20 @@ git status --short --branch
 git log -10 --oneline --decorate
 ```
 
-Verify that `main` is at or after merge `ff8c16e` and history contains
-Codex confirmation review commits `85c72da`/`77c266a`, merge `ef77bbf`,
-Claude confirmation commits `7f431b6`/`e9f2e83`/`f2b5fa9`, merged main
-`2882889`, Codex corrections
-`c1de927`/`d2d836b`, reviewed handoff `6d3a703`, workflow docs `3c180b4`,
-and canonical-handoff rule `1cdff99`. Claude's action plan is fetchable at
-`origin/user/claude/action-plan-20260802`. The Codex action plan and this
-handoff are not cross-computer available until their local branch is pushed
-with owner authorization.
+Verify that `main` is at or after `ded68b0` (both consolidated plans
+merged) and that history contains the GR-1C chain through `ff8c16e`. Every
+plan, this handoff, CLAUDE.md, and AGENTS.md sync via `git pull` alone —
+no session files need copying.
 
 Recommended resume prompt:
 
 ```text
-Read CLAUDE.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
-docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md completely, then read
-docs/FEATURE_MILESTONE_RECORD.md and docs/SESSION_HANDOFF.md. Then read both
-available ACTION_PLAN documents before choosing work. Verify
-origin/main and all branch/commit claims against Git. GR-1C through Claude
-follow-up merge 2882889, Codex follow-up corrections c1de927/d2d836b, and the
-Claude third-round confirmation merged as ef77bbf are complete and independently
-reviewed; do not redo them. Preserve facade
+Read CLAUDE.md, AGENTS.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md,
+and docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md completely, then
+docs/FEATURE_MILESTONE_RECORD.md, docs/SESSION_HANDOFF.md, and the adopted
+go-to plan docs/ACTION_PLAN_2026-08-02.md. Verify origin/main and all
+branch/commit claims against Git. The GR-1C chain (through merge ff8c16e)
+is complete and independently reviewed; do not redo it. Preserve facade
 imports and complete call-time DI, including the outcome factory, datetime,
 timezone, Decimal, TradeIntent, to_decimal, and behavior-bearing failure
 constants; the one documented residual is
@@ -934,9 +928,12 @@ ProposalValidationOutcome.resolved_failure_class's kernel-resolved fallbacks.
 Verify paper mode, database isolation, credential presence without values,
 scheduler state, and ignored artifact transfer. Do not start live trading, an
 evidence epoch, scheduled tasks, ML/LLM proposal integration, or destructive
-cleanup. If the owner authorizes the next coding milestone, perform a gap
-analysis for GR-1D manual reconciliation extraction, add characterization
-first, implement one reviewable slice, run focused/full validation, commit,
+cleanup. The active milestone is action-plan Phase 1: UI feature controls
+per docs/reference/UI_FEATURE_CONTROLS_DESIGN.md with the resolved
+decisions recorded in the action plan. After it completes independent
+review, Phase 3 is a gap
+analysis for GR-1D manual reconciliation extraction, characterization
+first, one reviewable slice, focused/full validation, commit,
 and stop for independent review before GR-2. If the owner instead requests
 plan reconciliation, compare the committed Claude and Codex plans with an
 explicit evidence-backed difference ledger before drafting a final plan.

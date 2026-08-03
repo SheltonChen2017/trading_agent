@@ -79,13 +79,15 @@ Review branch history:
 6d3603d  Correct and review residual candidate signal evidence
 2f37210  Accept GR-1D reconciliation extraction after review
 478e531  Record completed GR-1D and signal reviews
-handoff   the commit containing this file
+e99737f  Replace session handoff after dual branch review
+post-push state  the commit containing this file
 ```
 
-At the moment this first handoff commit is prepared, the review branch is
-local and its push is pending. The final follow-up commit must replace this
-paragraph with the verified remote state after `git push` succeeds. Do not
-assume a branch exists remotely merely because this file names it.
+The review branch is pushed and tracks
+`origin/codex/review-pr120-pr121-20260803`. The initial handoff push succeeded
+at `e99737f`; the commit containing this paragraph records that verified
+remote state and is pushed as the final handoff update. On another computer,
+fetch this branch and verify local/remote parity before using it.
 
 No pull request was opened and the review branch was not merged into `main`.
 Those actions remain owner decisions.
@@ -416,7 +418,8 @@ docs/SESSION_HANDOFF.md. Verify every branch and SHA against Git before
 acting. Main contains PR #120 GR-1D at 711095c and PR #121 residual signals
 at 5a6ffd5. The review branch codex/review-pr120-pr121-20260803 contains
 residual corrections/report 6d3603d, GR-1D acceptance 2f37210, durable plan
-updates 478e531, and the final handoff commit; do not repeat either review.
+updates 478e531, initial replacement handoff e99737f, and the final post-push
+handoff commit; do not repeat either review.
 GR-1D is accepted with no code correction. The candidate signals are
 exploratory only and were corrected to one eight-cell Bonferroni family with
 fail-closed confirmation-primary selection; no result is promoted. The exact

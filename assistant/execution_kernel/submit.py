@@ -136,10 +136,10 @@ def release_after_telemetry_failure(
 ) -> NoReturn:
     """Atomically fail and release a reservation whose attempt went unrecorded.
 
-    ``NoReturn`` is part of the contract, not decoration: the facade call
-    site relies on this function raising to stop execution ahead of the
-    broker-contact line that follows it. A future edit that adds a normal
-    return path here would let a telemetry failure fall through to a live
+    ``NoReturn`` documents the helper's contract: every current path raises
+    after recording the failure. The facade also carries an independent
+    bare-``raise`` guard, so a future edit that accidentally adds a normal
+    return path here still cannot let a telemetry failure fall through to an
     order submission.
 
     The CALL to record_submission_started deliberately stays in

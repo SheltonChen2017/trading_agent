@@ -1,6 +1,6 @@
 # Development session handoff
 
-Prepared: 2026-08-03T16:10:00-07:00
+Prepared: 2026-08-03T17:05:00-07:00
 
 Audience: Codex, Claude Code, and the repository owner after changing
 computers or starting a new agent session.
@@ -36,11 +36,16 @@ Canonical records:
 - `docs/OPERATIONS_RUNBOOK.md` — exact drill behavior/operator command; and
 - `docs/FEATURE_MILESTONE_RECORD.md` — completed two-audience GR-3 record.
 
-**Current next-step constraint:** Phase 4 remains active. GR-5 alert delivery
-is blocked on the owner's channel choice and is the only missing producer for
-`alert_delivery`. GR-2 remains the action plan's Phase 4 ride-along. Do not
-choose an alert channel, start GR-2, or substitute another milestone without
-the owner's direction.
+**Current state:** Phase 4 remains active. The owner chose the GR-5 channel
+on 2026-08-03 (**Windows desktop notification mandatory for critical;
+warnings batched into the daily briefing; webhook out of scope**) and
+authorized implementation. GR-5 is IMPLEMENTED at commit `00a8d13` on
+LOCAL-ONLY branch `user/claude/gr-5-alert-delivery-20260803` and awaits
+independent review — do not reimplement it, and do not push or merge it
+without owner approval. `alert_delivery` was the last drill type without a
+producer, so **AP-5 is now closed**: all five `REQUIRED_PROMOTION_DRILLS`
+have producers. GR-2 remains the action plan's Phase 4 ride-along and is
+NOT authorized by this handoff.
 
 No GR-3 implementation or review action used a live broker, funded account,
 operator database, scheduler, or formal evidence epoch. Nothing authorizes
@@ -232,12 +237,34 @@ Mutation/red sensitivity:
 
 The action plan remains authoritative. GR-3 is done; do not repeat it.
 
-Before GR-5 can proceed, the owner must choose a real alert-delivery channel
-(email, webhook, push, or another concrete transport) and authorize that
-implementation. GR-5 must add delivery records, weekly self-test, operator
-surface, and the final `alert_delivery` drill producer. GR-2 is still described
-as the Phase 4 ride-along, but this handoff does not independently authorize
-starting it.
+GR-5 is implemented and awaiting review at `00a8d13`
+(`user/claude/gr-5-alert-delivery-20260803`, base `95c4ea1`). Scope:
+`assistant/alert_delivery.py` (channel protocol, dependency-free
+`WindowsToastChannel` via PowerShell WinRT with alert text passed as JSON on
+stdin, occurrence-based re-delivery, storage-verified self-test), an
+immutable `alert_deliveries` table plus storage helpers, escalation of any
+channel failure through both a nonzero CLI exit and a durable critical
+alert, CLI `deliver-alerts` / `alert-self-test` (the latter producing the
+`alert_delivery` drill, epoch-bound only on exact lineage match), read-only
+`platform-readiness` checks, and the Streamlit **Operations** tab.
+
+One design decision worth carrying forward: the delivery-health checks live
+in the READ-ONLY readiness report, not `operational_health`. The latter
+persists an alert for every failing check, so an "undelivered critical
+alerts exist" check there raised a critical alert that was itself
+undelivered — manufacturing a new alert every cycle. A pre-existing dedup
+test caught it; `test_delivery_health_never_manufactures_its_own_alert`
+pins the resolution.
+
+Validation on that tree: full suite 2,525 passed / 1 skipped / 25 warnings;
+18 focused delivery tests; three mutations detected (failure-as-delivered,
+dropped severity routing, dropped occurrence-based re-delivery); compileall
+and `git diff --check` clean. Honest limits: the Windows channel is
+exercised only through its failure directions (never by raising a real
+toast in tests), delivery proves the notification was raised rather than
+read, and scheduling `deliver-alerts`/`alert-self-test` as tasks is Phase 5
+deployment work. GR-2 remains the Phase 4 ride-along and is not authorized
+by this handoff.
 
 Other owner decisions remain open:
 
@@ -314,9 +341,11 @@ docs/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md. Fetch/prune and verify every SHA,
 branch, remote, and worktree before acting. Main is d5400cc. Claude's GR-3
 tip is pushed at 61e0314. Independent corrections are 9f5ab5e and the
 milestone record is a35d369 on codex/review-gr3-fault-drills-20260803. GR-3
-is complete; do not repeat it. The remaining Phase 4 blocker is GR-5 alert
-delivery, which requires the owner's channel choice and implementation
-authorization; GR-2 is only the documented ride-along, not implied authority.
+is complete; do not repeat it. GR-5 alert delivery is IMPLEMENTED at 00a8d13
+on local-only branch user/claude/gr-5-alert-delivery-20260803 (owner chose
+Windows desktop notification for critical, warnings batched to the briefing,
+webhook out of scope) and awaits independent review — do not reimplement it.
+GR-2 is only the documented ride-along, not implied authority.
 Do not enable live trading, start an evidence epoch, deploy scheduled tasks,
 promote ML/signals, mutate the operator database, or touch the other Claude
 worktree. Preserve local AI-strategy branch a656015 and ignored/credential

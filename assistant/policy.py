@@ -167,3 +167,77 @@ def load_policy(path: str | Path = DEFAULT_POLICY_PATH) -> TradingPolicy:
     policy = TradingPolicy(**raw)
     policy.validate()
     return policy
+
+
+def bump_policy_version(version: str) -> str:
+    """Increment the last dot-separated numeric segment ("1.1.0" -> "1.1.1").
+
+    A version string with no trailing numeric segment gets ".1" appended
+    rather than being rejected -- the fingerprint, not the version string,
+    is what approval actually binds to (see compute_policy_fingerprint), so
+    the version's only job here is to be visibly different from its
+    predecessor."""
+    head, dot, tail = version.rpartition(".")
+    if dot and tail.isdigit():
+        return f"{head}.{int(tail) + 1}"
+    if version.isdigit():
+        return str(int(version) + 1)
+    return f"{version}.1"
+
+
+def policy_with_updated_flags(
+    policy: TradingPolicy,
+    *,
+    allow_new_positions: bool | None = None,
+    enable_strategy_proposals: bool | None = None,
+) -> TradingPolicy:
+    """Return a NEW validated policy with the requested boolean policy flags
+    changed and the version bumped.
+
+    Exists for the UI's protected policy-update workflow
+    (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md section 3.1): these two
+    flags are authoritative trading policy, not UI preferences, so a change
+    must produce a new version and therefore a new fingerprint -- proposals
+    created under the previous fingerprint fail validation and must be
+    regenerated. That invalidation is the intended fail-closed consequence
+    of editing policy, not a bug.
+
+    Raises ValueError if the call would change nothing: a no-op "update"
+    that still bumped the version would invalidate every pending proposal
+    for no behavioral reason.
+    """
+    changes: dict[str, bool] = {}
+    if allow_new_positions is not None and allow_new_positions != policy.allow_new_positions:
+        changes["allow_new_positions"] = allow_new_positions
+    if (
+        enable_strategy_proposals is not None
+        and enable_strategy_proposals != policy.enable_strategy_proposals
+    ):
+        changes["enable_strategy_proposals"] = enable_strategy_proposals
+    if not changes:
+        raise ValueError(
+            "No policy change requested: the proposed values match the active policy."
+        )
+    updated = dataclasses.replace(
+        policy, version=bump_policy_version(policy.version), **changes
+    )
+    updated.validate()
+    return updated
+
+
+def save_policy(policy: TradingPolicy, path: str | Path) -> None:
+    """Validate, then atomically write the policy as JSON.
+
+    Atomic via write-to-temp-then-os.replace in the destination directory,
+    so a crash mid-write can never leave a half-written policy file that a
+    later load_policy() would reject (or worse, a truncated-but-parseable
+    one). Validation runs BEFORE any filesystem effect: an invalid policy
+    must leave the existing file byte-identical."""
+    import os
+
+    policy.validate()
+    destination = Path(path)
+    serialized = json.dumps(policy.to_dict(), indent=2) + "\n"
+    temp_path = destination.with_name(destination.name + ".tmp")
+    temp_path.write_text(serialized, encoding="utf-8")
+    os.replace(temp_path, destination)

@@ -169,6 +169,33 @@ def test_build_recommended_tickers_skips_ai_suggested_lane_when_no_holdings(monk
     assert not any(r.reason_category == "ai_suggested" for r in recommended)
 
 
+def test_include_ai_suggestions_false_prevents_the_paid_call_entirely(monkeypatch):
+    """The UI's optional-AI master preference must be able to stop the LLM
+    call from FIRING, not merely hide its output -- and it must not disturb
+    the deterministic lanes or the held-ticker exclusion while doing so
+    (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md section 3.2)."""
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers") as mock_active, \
+         patch("assistant.recommended_stocks.suggest_similar_tickers") as mock_suggest, \
+         patch("assistant.recommended_stocks.verify_tickers") as mock_verify:
+        mock_active.return_value = [
+            {"ticker": "AAPL", "name": "Apple", "volume": 1000},
+            {"ticker": "MSFT", "name": "Microsoft", "volume": 2000},
+        ]
+        mock_verify.return_value = ([_verified("MSFT", longName="Microsoft")], [])
+        recommended, _ = recommended_stocks.build_recommended_tickers(
+            held_tickers=["AAPL"], include_ai_suggestions=False
+        )
+    # The dangerous direction: despite holdings existing (which normally
+    # triggers the suggestion call), the LLM helper is never invoked.
+    mock_suggest.assert_not_called()
+    assert not any(r.reason_category == "ai_suggested" for r in recommended)
+    # Deterministic lanes are unaffected: most-active still runs, and the
+    # held-ticker exclusion still holds.
+    assert any(r.ticker == "MSFT" for r in recommended)
+    assert not any(r.ticker == "AAPL" for r in recommended)
+
+
 _NO_EVIDENCE = similarity_evidence.SimilarityEvidence(
     source_tickers=(), candidate_ticker="", shared_sectors=(), shared_industries=(),
     return_correlation_pct=None, lookback_days=126, data_start=None, data_end=None,

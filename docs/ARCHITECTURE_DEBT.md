@@ -68,7 +68,9 @@ paragraph of this entry said made the move unsafe without DI.
 
 **Still open**: `execution_service.py` remains 1,090 lines after the GR-1C
 review restored the complete facade surface and injected every runtime
-collaborator formerly resolved there. Its 276-line
+collaborator the moved body invokes (three deliberately excluded,
+allowlist-pinned names remain kernel-resolved — see the
+`ProposalValidationDeps` docstring). Its 276-line
 execution composition and 221-line manual reconciliation function still keep
 substantial state-machine orchestration on the facade, and it is not yet the
 thin composition layer in the GR-1 definition of done. `allocation_batch.py`

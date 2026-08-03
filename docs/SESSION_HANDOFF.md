@@ -228,6 +228,29 @@ After correction, GR-1C is accepted. A fair quality assessment is about
 8.5/10: strong architecture and testing, with a material but contained
 compatibility miss caught during independent review.
 
+### Review-of-review follow-ups (Claude, 2026-08-02, after the merge)
+
+Branch `user/claude/gr-1c-review-followups-20260802`, commit `7058cb2`,
+based on merged `main` (`091efc2`), pushed. Claude verified every review
+change before acceptance: the four injections are complete for their
+category, both new seam tests fail under reverse-mutation (each clock read
+independently), and the facade-surface rule is internally consistent (`os`
+was already dead at `d9e3196`, so the GR-1B removal survives the sharper
+rule). Two precision gaps were closed:
+
+- the "injected every runtime collaborator" claim was itself over-broad —
+  `ProposalValidationOutcome`, `timezone`, and the `FAILURE_*` constants
+  remain kernel-resolved, deliberately; the boundary is now documented in
+  the `ProposalValidationDeps` docstring and enforced by a new exact
+  two-sided AST allowlist guard over the body's module-global reads
+  (mutation-verified in both regression directions); and
+- the pure -> read-only sweep missed the `ProposalValidationOutcome` class
+  docstring and a `test_personal_assistant.py` section comment (both
+  comment-only).
+
+Validation on that tree: `2408 passed, 1 skipped, 25 warnings`
+(+1 = the AST guard), compileall clean, `git diff --check` clean.
+
 ## 5. GR-1 status and the exact next development step
 
 GR-1 is **partial**. GR-1A, GR-1B, and GR-1C are implemented and independently
@@ -246,8 +269,10 @@ Completed and reviewed:
 - ambiguous broker outcomes keep budget reserved;
 - replacement-chain identity and mismatch behavior remain fail-closed;
 - exact exception identities and facade imports are pinned;
-- validation orchestration now lives behind complete call-time dependency
-  injection; and
+- validation orchestration now lives behind call-time dependency injection
+  covering every runtime name the body invokes, with the three deliberate
+  non-injected names (the kernel's own return type, `timezone`, the
+  `FAILURE_*` constants) pinned by an exact AST allowlist guard; and
 - execution-kernel import boundaries prevent direct or transitive reach into
   proposal-generation code.
 

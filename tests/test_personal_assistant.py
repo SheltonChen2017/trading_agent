@@ -2787,8 +2787,9 @@ def test_reconcile_submission_rejects_a_non_reconcilable_status():
             assert "not reconcilable" in str(exc)
 
 
-# --- validate_proposal_for_execution() -- the pure, side-effect-free
-# validation shared by execute_approved_paper_proposal() and
+# --- validate_proposal_for_execution() -- the read-only (reads state and
+# queries the broker, writes nothing) validation shared by
+# execute_approved_paper_proposal() and
 # preflight_allocation_batch() (GPT review, 2026-07-29: preflight used to
 # duplicate only PART of this, so it could approve a batch the real
 # execution path would then reject for a reason preflight never checked).

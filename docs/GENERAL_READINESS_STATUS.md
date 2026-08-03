@@ -308,11 +308,44 @@ complete. The moved body still resolved `datetime`, `Decimal`, `TradeIntent`,
 and `to_decimal` inside the kernel. On Claude's committed snapshot, focused
 tests proved that replacing each corresponding facade name no longer affected
 validation, even though the milestone claimed every callable seam remained a
-call-time facade dependency. The review injected all four remaining runtime
+call-time facade dependency. The review injected those four runtime
 collaborators, covered both expiration and quote-receipt clock reads, restored
 the two dropped facade exports, and corrected the module's description from
 "pure" to "read-only": validation reads durable state and queries the broker,
 but does not mutate proposal, reservation, telemetry, or order state.
+
+#### Review-of-review follow-ups (2026-08-02, second round)
+
+Every review change was independently verified before acceptance. The four
+injections are correct and complete for their category (no direct
+`datetime`/`Decimal`/`TradeIntent`/`to_decimal` calls remain in the body),
+the two new seam tests are load-bearing (reverse-mutations restoring each
+kernel-resolved call fail them — both clock reads verified independently),
+and the facade-surface rule is internally consistent: the GR-1B `os`
+removal survives it because `os` was already dead at `d9e3196`, before any
+GR-1 refactor orphaned anything.
+
+Two precision gaps were closed as follow-ups:
+
+- **"Injected every runtime collaborator" claimed more than the code
+  enforced** — the same over-claim shape this review corrected twice in
+  Claude's work. Three names the old facade body also resolved from module
+  globals remain kernel-resolved: `ProposalValidationOutcome` (the kernel's
+  own return type — injecting it would be circular), `timezone` (read, never
+  invoked; time-freezing goes through the injected clock), and the
+  `FAILURE_*` constants (immutable strings). The boundary is now stated
+  exactly in the `ProposalValidationDeps` docstring, and
+  `test_gr1c_the_kernel_body_reads_no_unexpected_module_globals` pins the
+  complete module-global read set of the body as an exact two-sided
+  allowlist — any new module-scope read (including quietly reverting an
+  injected dep to a direct call) fails by name. Mutation-verified: restoring
+  either the direct `TradeIntent` call or the direct expiry-clock call
+  fails the guard.
+- **The "pure" sweep was incomplete** — the reviewed rename fixed the module
+  docstring and one test, but "pure, side-effect-free" survived in the
+  `ProposalValidationOutcome` class docstring and a
+  `test_personal_assistant.py` section comment. Both now say read-only.
+  Comment-only edits.
 
 ### GR-1C mutation results
 

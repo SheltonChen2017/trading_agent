@@ -22,7 +22,11 @@ implemented and merged as PR #116 at `4c8e959`, independently accepted
 after corrections (`a6d5254`), confirmed by Claude's third round, and the
 whole review chain merged as PR #117 at `661a7d4` (2026-08-03).
 Phase 2 hygiene was implemented at `34ce463` and independently accepted
-after correction on `codex/review-phase2-hygiene-20260803`.
+after correction on `codex/review-phase2-hygiene-20260803`, then merged as
+PR #118 and confirmed through PR #119. GR-1D merged as PR #120 at `711095c`
+and was independently accepted at `2f37210`. PR #121 added four exploratory
+candidate-signal utilities at `5a6ffd5`; independent review corrected their
+family-wide evidence reporting at `6d3603d` without changing roadmap order.
 
 Method: four parallel verified surveys over every implementation plan and
 design document under `docs/`, each claim checked against the actual code
@@ -45,7 +49,7 @@ deterministic execution path (propose → validate → approve → claim → sub
 reconcile) is built, characterization-frozen, and three-review hardened; the
 ML research/shadow stack is software-complete through monitoring and dossier;
 the LLM committee foundation is built and gated. What does not exist is:
-the last two slices of the execution-kernel split (GR-1D/1E), all of GR-2
+the final conditional assessment/slice of the execution-kernel split (GR-1E), all of GR-2
 through GR-7, every AI *product* plan beyond the committee (strategy
 authoring, debate, allocation service, MCP, and proposal cleanup), and — most
 importantly — **any qualifying frozen-epoch operational evidence at all**:
@@ -67,8 +71,9 @@ frozen runtime, plus a small number of owner decisions and data purchases.
 | GR-1A execution characterization freeze (5 public entry points, atomic-claim pin, 4-writer contention) | `tests/test_execution_characterization.py` | independently reviewed |
 | GR-1A/B helper + orchestration extraction (7 kernel modules) | `assistant/execution_kernel/{claim,revalidate,submit,outcomes,errors,intents,validate}.py` | independently reviewed |
 | GR-1C validation orchestration behind complete call-time DI (15-field frozen `ProposalValidationDeps`; kernel body has zero module-global runtime reads, symtable-pinned) | `assistant/execution_kernel/validate.py` | three review rounds, closed at PR #112 |
+| GR-1D manual reconciliation behind complete call-time DI (13-field frozen `ReconciliationDeps`; kernel body has zero module-global runtime reads, symtable-pinned) | `assistant/execution_kernel/reconcile.py` | merged as PR #120; independently accepted at `2f37210` |
 | Execution-kernel import boundary: no direct or transitive path from kernel/assistant/execution/risk roots into `ml` or proposal generation | `tests/test_ml_import_boundary.py` (transitive graph walk, fails closed on unresolvable imports) | reviewed |
-| Order lifecycle: idempotent submission, ambiguous-outcome reconciliation, replacement chains, absence-age grace, reservation accounting, telemetry-before-submission | `assistant/execution_service.py` (facade, 1,094 lines), `assistant/order_lifecycle.py`, `assistant/order_reconciler.py` | multiple review rounds |
+| Order lifecycle: idempotent submission, ambiguous-outcome reconciliation, replacement chains, absence-age grace, reservation accounting, telemetry-before-submission | `assistant/execution_service.py` (facade, 952 lines), `assistant/order_lifecycle.py`, `assistant/order_reconciler.py` | multiple review rounds |
 | Risk-metrics consolidation (`max_drawdown_pct` single source) | `backtest/risk_metrics.py` | closed in ARCHITECTURE_DEBT |
 
 ### 2.2 ML stack (all **observation-only**, promotion-blocked by design)
@@ -116,14 +121,25 @@ from calling their providers. Implementation merge: `4c8e959`; accepted after
 review correction `a6d5254`; the full review chain (correction, handoff,
 third-round confirmation) merged as PR #117 at `661a7d4`.
 
+### 2.6 Exploratory candidate-signal software (2026-08-03)
+
+PR #121 added causal residual momentum/reversal, volatility-scaled momentum,
+and consecutive-earnings-surprise persistence scanners plus reporting-only
+block-bootstrap runners. Independent review at `6d3603d` made the two runners
+share the full eight-cell Bonferroni family, made evidence-column drift fail
+closed, and documented PEAD's long-only direction asymmetry. These are
+reviewed research utilities, not confirmed findings: yfinance/current-universe
+inputs are not point-in-time, no result was promoted, and no proposal,
+execution, policy, scheduler, epoch, or live-authority path changed. This
+already-merged work does not reorder the adopted next step.
+
 ---
 
 ## 3. IN PROGRESS — started, not finished
 
 | Item | Remaining | Size |
 |---|---|---|
-| **GR-1D** — extract the 221-line `reconcile_submission()` behind call-time DI | **IMPLEMENTED 2026-08-03** (branch `user/claude/gr-1d-reconciliation-extraction-20260803`): token-verbatim move into `execution_kernel/reconcile.py` behind 13-field `ReconciliationDeps`; seams symtable-enumerated BEFORE the move; 10 new characterization tests; 8/8 mutation sweep detected. Awaiting independent review | review |
-| **GR-1E** (conditional) — thin the 281-line `execute_approved_paper_proposal` composition + 2 recovery wrappers, then declare GR-1's "thin composition layer" DoD met or explain the residual | assess after GR-1D | 0–1 milestone |
+| **GR-1E** (conditional) — assess the 281-line `execute_approved_paper_proposal` composition + 2 recovery wrappers, then either thin them or declare GR-1's "thin composition layer" DoD met with the residual explained | assess now; GR-1D review is complete | 0–1 milestone |
 | **Committee release gates** — ADR requires ≥50 frozen replay cases (0 exist), memory-poisoning cases (0), broader injection corpus (3 seeds), a CLI `review unavailable` surface (none); only then remove the experiment gate | corpus authoring + CLI wiring | 1–2 milestones |
 | **ML-FS-6 real discovery/confirmation** — spec `research/ml_specs/volatility-discovery-v1.json` is review-ready; no `SpecReviewAttestation` exists | blocked on owner-designated reviewer + real PIT data | owner + data |
 
@@ -217,11 +233,12 @@ one P2 fail-open verifier gap: same-named weakened indexes/triggers must not
 pass. The durable disposition and issue ledger are in
 `docs/REVIEW_2026-08-03_PHASE2_HYGIENE.md`.
 
-**Phase 3 — finish the kernel (ACTIVE — owner gave the GR-1D go-ahead
-2026-08-03):**
-GR-1D (reconciliation extraction, characterize-first) — implemented on
-`user/claude/gr-1d-reconciliation-extraction-20260803`, awaiting independent
-review → GR-1E assessment → declare GR-1 done honestly against its DoD.
+**Phase 3 — finish the kernel (ACTIVE):**
+GR-1D reconciliation extraction is implemented, merged as PR #120 at
+`711095c`, and independently accepted at `2f37210` with no code correction.
+Next: perform the GR-1E assessment, then either implement one final thinning
+slice or declare GR-1 done honestly against its "thin composition layer" DoD.
+Do not begin GR-2 before that assessment is recorded.
 
 **Phase 4 — the two milestones that unblock operations:**
 GR-5 alert delivery (owner picks the channel — decision needed) and GR-3
@@ -261,9 +278,9 @@ explicit authorization).
 
 ## 9. Owner decisions required (consolidated, deduplicated)
 
-1. ~~GR-1D go-ahead~~ — **RESOLVED 2026-08-03: granted; implemented same
-   day, awaiting review.** Still open from this item: epoch model 1 vs 2
-   (§7).
+1. ~~GR-1D go-ahead/review~~ — **RESOLVED 2026-08-03: granted,
+   implemented, merged as PR #120, and independently accepted at `2f37210`.**
+   Still open from this item: epoch model 1 vs 2 (§7).
 2. Approve the mandate (or first revise its DRAFT §2 targets) — the only
    promotion gate satisfiable today.
 3. GR-5 alert delivery channel (email / webhook / push / other).

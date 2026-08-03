@@ -66,7 +66,7 @@ at call time from its own namespace — which is what preserves the
 `execution_service.validate_trade_intent` monkeypatch seam the previous
 paragraph of this entry said made the move unsafe without DI.
 
-**Partially addressed 2026-08-03 (GR-1D, awaiting review)**: the 221-line
+**Partially addressed 2026-08-03 (GR-1D, independently reviewed)**: the 221-line
 manual `reconcile_submission()` orchestration moved token-verbatim into
 `assistant/execution_kernel/reconcile.py` behind a frozen 13-field
 `ReconciliationDeps` contract the facade builds at call time — the seam set
@@ -74,7 +74,9 @@ was enumerated mechanically (symtable) BEFORE the move rather than
 discovered by review afterwards, covering the exception class, status
 constants, clock, deferred broker import, and every helper. The kernel body
 has zero module-global runtime reads (symtable-pinned), and the
-sys.modules-level broker-fake test seams work unchanged.
+sys.modules-level broker-fake test seams work unchanged. PR #120 merged at
+`711095c`; independent review at `2f37210` required no code correction and
+reproduced representative facade-seam and mismatch-kill-switch mutations.
 
 **Still open**: `execution_service.py` is 952 lines after GR-1D. Its
 281-line execution composition and the stale-reconciliation/claim recovery

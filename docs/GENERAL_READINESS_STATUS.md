@@ -122,7 +122,7 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 — execution kernel split: **partial; helper extraction reviewed**
+## GR-1 — execution kernel split: **partial; GR-1B independently reviewed**
 
 GR-1A characterization is built and independently reviewed in
 `tests/test_execution_characterization.py`. The first production extraction is
@@ -160,13 +160,64 @@ section 6.2 forbidding private peer dependencies. The review added an AST
 boundary regression test, exposed a public kernel alias, and preserved the
 legacy private facade name as the exact same class object.
 
-GR-1 remains partial. `assistant/execution_service.py` is still 1,656 lines,
-including the interleaved 580-line `execute_approved_paper_proposal()` and
-315-line validation orchestration. It is not yet the thin composition facade
-required by the definition of done. The remaining work is to extract that
-orchestration without changing the facade, claims, reservations, broker-call
-ordering, or ambiguous-outcome behavior, then independently review the final
-tree.
+### GR-1B — orchestration decomposition: built and independently reviewed
+
+`execute_approved_paper_proposal()` is decomposed from 580 lines to 276, and
+`assistant/execution_service.py` from 1,656 to 1,361. The twelve phases are
+now named calls in a readable sequence. Moved this milestone:
+
+| Phase | Now in |
+|---|---|
+| kill-switch resolution (caller ∨ env ∨ persistent) | `claim.resolve_kill_switch` |
+| pre-claim preconditions and policy binding | `claim.verify_execution_preconditions` |
+| atomic claim and conditional expiry fallback | `claim.claim_for_execution` |
+| reviewed-override matching and record construction | `revalidate.classify_override_review`, `revalidate.build_reviewed_override_record` |
+| budget reservation and its fenced refusal | `submit.reserve_daily_budget` |
+| order-type dispatch and unsupported-type release | `submit.resolve_submission_call` |
+| telemetry-failure release | `submit.release_after_telemetry_failure` |
+| ambiguous-outcome resolution (110 lines, 4 branches) | `outcomes.resolve_failed_submission` |
+| accepted-order journaling | `submit.journal_accepted_order` |
+
+The atomic claim did not move: `claim_for_execution()` orchestrates
+`AssistantStore.claim_proposal()`'s single conditional UPDATE, as GR-1
+section 6.2 requires. No test file was changed except by addition.
+
+#### Deviations, and why
+
+**1. `validate_proposal_for_execution` stays on the facade.**
+`tests/test_personal_assistant.py:1465` monkeypatches
+`execution_service.validate_trade_intent`. Moving its caller into the kernel
+would make that name resolve in the kernel's namespace instead, silently
+defeating the patch. That is a caller-visible seam change, not an import-path
+change, so the 315-line validation orchestration remains where it is.
+
+**2. The `record_submission_started` CALL stays on the facade, for the same
+reason** — and this one was not predicted, it was caught.
+`test_pre_submit_telemetry_failure_releases_budget_without_broker_contact`
+turned red the moment that call moved into `submit.py`. Only the failure
+HANDLING, which has no such seam, was extracted. The characterization suite
+did exactly the job it was built for.
+
+**3. `transition_pre_broker_claim` gained a public name.** `submit.py` needs
+it, and GR-1 section 6.2 forbids importing a private peer name. Same pattern
+the review applied to `ProposalClaimLostError`: the public name is the
+definition, the underscore name is an alias to the same function object, and
+the facade re-exports the legacy name.
+
+The independent review found one facade-compatibility regression:
+`DuplicateIntentConflict` had been dropped merely because the decomposed
+implementation no longer used it locally. GR-1 requires the facade to remain
+unchanged, so a regression test now pins the export to the exact class object
+from `assistant.storage` and the facade re-export is restored. The review also
+removed the unrelated dead `os` import and corrected kernel documentation that
+understated `outcomes.resolve_failed_submission()`'s durable side effects.
+
+GR-1B's decomposition is accepted, but GR-1 remains partial. At 1,361 lines,
+with 315-line validation orchestration and 221-line manual reconciliation
+still on the facade, `execution_service.py` is not yet the plan's "thin
+composition layer". A remaining GR-1 step should replace the facade
+monkeypatch seams with explicit dependency injection before moving those
+orchestrators, preserving test and caller behavior while completing the split.
 
 ### What the characterization suite can actually detect
 
@@ -208,10 +259,48 @@ Those were mutation-checked directly: suppressing chain recording fails six
 of them. What GR-1 actually moves is the thin delegating wrapper
 `_authoritative_order_for()`, not the chain logic.
 
-Remaining honest limit: the characterization freezes representative paths,
-not every branch of the 1,656-line facade. The final orchestration extraction
-should add a recorded mutation result for any specific behaviour it moves that
-is not already listed above, rather than treating a green suite as sufficient.
+### GR-1B mutation results
+
+Every behaviour moved in GR-1B was mutated in its NEW location, measured, and
+restored. Five previously uncovered behaviours were found this way and are now
+frozen by six added tests (no existing test was modified).
+
+| Mutation | Result |
+|---|---|
+| `set_kill_switch(True)` removed from the mismatched-order path | DETECTED |
+| `_order_matches_intent` always returns True | DETECTED |
+| reservation released on a mismatched order | DETECTED |
+| `classify_override_review` reduced to `bool(override_requested)` | DETECTED (6 tests) |
+| journal failure reported as a submission failure | DETECTED |
+| budget refusal raises without the fenced transition | DETECTED *(after new test)* |
+| `not_expired_after` dropped from the atomic claim | DETECTED *(after new test)* |
+| kill switch reduced to the caller flag, BOTH sites | DETECTED *(after new test)* |
+| policy-fingerprint check disabled, BOTH sites | DETECTED *(after new test)* |
+
+Four of these were uncovered before GR-1B and are recorded precisely, because
+the imprecise version of each claim is misleading:
+
+- **The mismatched-order platform halt had no test anywhere in the repository.**
+  Grepping its error strings across `tests/` returned nothing. It is the only
+  execution path that engages the persistent kill switch.
+- **The kill switch and the policy fingerprint are each enforced at TWO
+  sites** — the pre-claim gate and, authoritatively, inside
+  `validate_proposal_for_execution()`. A single-site mutation survives *by
+  design*, so it proves nothing. Removing either check from BOTH sites was
+  undetected until GR-1B added end-to-end tests, including one for the
+  PERSISTENT switch: the pre-existing kill-switch test passes
+  `kill_switch_active=True`, so it only ever proved the caller's own flag was
+  honoured, not the switch an operator actually flips.
+- **Dropping `not_expired_after` does not let an expired order reach the
+  broker** — validation still refuses, measured. What it loses is the
+  *location*: the proposal gets claimed first and ends `blocked` rather than
+  `expired`, briefly holding its ticker/side duplicate slot. The new test
+  pins the status precisely to tell the two arrangements apart.
+
+Remaining honest limit: the characterization freezes representative paths, not
+every branch of the 1,361-line facade. The 315-line
+`validate_proposal_for_execution` orchestration is unchanged by GR-1B and its
+internal branches remain covered only by the pre-existing suite.
 
 ## GR-2 .. GR-9 — not started
 

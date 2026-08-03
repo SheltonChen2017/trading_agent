@@ -284,6 +284,33 @@ If cancel-all exits nonzero, treat every reported failure as potentially
 still live and verify it directly at Alpaca. Do not clear the kill switch
 until the broker has no unexplained open orders.
 
+### Alert delivery (GR-5): critical alerts reach you without looking
+
+Owner channel decision (2026-08-03): **Windows desktop notification is the
+mandatory immediate channel for `critical` alerts**; `warning` batches into
+the daily briefing instead of interrupting; a webhook channel is
+deliberately out of scope.
+
+```powershell
+# deliver open critical alerts (add --dry-run to verify without notifying)
+.\.venv\Scripts\python.exe scripts/run_personal_assistant.py deliver-alerts
+
+# weekly: prove the channel still works, end to end
+.\.venv\Scripts\python.exe scripts/run_personal_assistant.py alert-self-test --record-drill --operator "<name>"
+```
+
+| Behavior | Guarantee |
+|---|---|
+| Delivery record | Every attempt appends an immutable `alert_deliveries` row (channel, outcome, timestamps, occurrence count). A later success never erases an earlier failure. |
+| Failure | Escalates two ways: nonzero CLI exit AND a durable critical `alert_delivery` alert. A failed attempt is never recorded as delivered. |
+| Re-delivery | Occurrence-based: an unchanged condition is not re-toasted every sweep, but a genuinely new occurrence is delivered again. |
+| Self-test | Emits a synthetic critical alert, delivers it, and verifies the receipt **read back from storage**; records the `alert_delivery` promotion drill (epoch-bound only when the runtime commit exactly matches the epoch lineage, else verification-only). A failed self-test is recorded too. |
+| Detection | `platform-readiness` reports `critical_alert_delivery` (mandatory) and `alert_channel_self_test` (degrades only). These live in the READ-ONLY readiness report on purpose: `operational_health` persists an alert per failing check, so an "undelivered critical" check there would raise a critical alert that is itself undelivered, manufacturing a new alert every cycle. |
+| Operator surface | The Streamlit **Operations** tab shows undelivered criticals, self-test freshness, open alerts with a delivered flag, recent delivery attempts, readiness dimensions, heartbeat/backup/epoch state, and recent drills. |
+
+Schedule `deliver-alerts` alongside the operations cycle and `alert-self-test`
+weekly. A channel that silently broke is worse than no channel.
+
 ### Fault-drill matrix (GR-3): each incident class and its exercised behavior
 
 Every failure class below has a standing adversarial drill in

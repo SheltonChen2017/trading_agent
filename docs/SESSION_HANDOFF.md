@@ -31,9 +31,9 @@ Canonical durable records:
 - `docs/FEATURE_MILESTONE_RECORD.md` — completed GR-1 two-audience record.
 
 **Phase 4 is ACTIVE (owner-directed, 2026-08-03).** GR-3 fault-injection
-drills are IMPLEMENTED at commit `4c395d7` on LOCAL-ONLY branch
+drills are IMPLEMENTED at commit `4c395d7` on PUSHED branch
 `user/claude/gr-3-fault-drills-20260803` and await independent review — do
-not reimplement them, and do not push or merge without owner approval:
+not reimplement them, and do not merge without owner approval:
 eleven behavioral drills in `tests/faults/` (the archived plan's nine
 fault rows plus the two 2026-08-02 isolation regressions), each asserting
 the mandated refusal AND no partial persisted state, plus
@@ -233,7 +233,7 @@ The sequencing authority is `docs/ACTION_PLAN_2026-08-02.md`. Phase 4 is
 ACTIVE:
 
 1. GR-3 fault drills: IMPLEMENTED at `4c395d7`
-   (`user/claude/gr-3-fault-drills-20260803`, local-only) — the next
+   (`user/claude/gr-3-fault-drills-20260803`, pushed) — the next
    action is an independent review of that exact commit per
    `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`;
 2. owner chooses the GR-5 alert-delivery channel and authorizes the

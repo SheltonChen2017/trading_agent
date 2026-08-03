@@ -490,17 +490,16 @@ def test_pre_submit_telemetry_failure_releases_budget_without_broker_contact(
     assert state["telemetry"] == ["validation_approved"]
 
 
-def test_a_neutered_release_helper_still_never_reaches_the_broker(
+def test_a_neutered_release_helper_still_never_submits_to_the_broker(
     store, monkeypatch
 ):
     """The fail-closed guard behind the telemetry-failure path.
 
-    ``release_after_telemetry_failure`` is ``NoReturn``: the facade relies on
-    it raising to stop execution before the broker-contact line that follows.
-    That reliance used to be invisible at the call site -- nothing there said
-    "if this returns, we submit a live order anyway." This test neuters the
-    helper into a plain return and proves the facade STILL refuses to contact
-    the broker, because a bare ``raise`` guard re-raises the telemetry
+    ``release_after_telemetry_failure`` is ``NoReturn``, but submission safety
+    must not depend solely on that helper contract. The old call site said
+    nothing equivalent to "if this returns, stop anyway." This test neuters
+    the helper into a plain return and proves the facade STILL refuses to
+    submit an order, because a bare ``raise`` guard re-raises the telemetry
     failure.
 
     GR-1B self-audit finding, 2026-08-02: without the guard, this exact

@@ -230,13 +230,13 @@ decomposition introduced ("never transitions a proposal" became false when
 
 Two gaps in the review itself were closed as follow-ups:
 
-- **The telemetry fall-through hazard was not addressed.** The facade calls
-  `release_after_telemetry_failure()` with no `raise` at the call site, so
-  "never contact the broker after a telemetry failure" silently depended on
-  the helper always raising. The helper is now annotated `NoReturn`, the call
-  site gained a bare-`raise` guard, and
-  `test_a_neutered_release_helper_still_never_reaches_the_broker` neuters the
-  helper into a plain return and proves the broker is still never contacted.
+- **The telemetry fall-through hazard was not addressed.** The facade
+  previously called `release_after_telemetry_failure()` with no independent
+  `raise` at the call site, so "never submit after a telemetry failure"
+  silently depended on the helper always raising. The helper is now annotated
+  `NoReturn`, the call site has a bare-`raise` guard, and
+  `test_a_neutered_release_helper_still_never_submits_to_the_broker` neuters
+  the helper into a plain return and proves an order is still never submitted.
   Mutation-verified: deleting the guard fails that test.
 - **The stale-name fix was not generalized.** The review corrected two
   references to the never-existent `submit_approved_proposal()` but the same

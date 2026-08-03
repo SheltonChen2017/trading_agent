@@ -122,7 +122,7 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 — execution kernel split: **COMPLETE per the GR-1E assessment (2026-08-03, pending independent review)**
+## GR-1 — execution kernel split: **COMPLETE after independent GR-1E review (2026-08-03)**
 
 GR-1A characterization is built and independently reviewed in
 `tests/test_execution_characterization.py`. The first production extraction is
@@ -585,13 +585,19 @@ were clean. Durable disposition:
 `docs/REVIEW_2026-08-03_GR1D_RECONCILIATION.md` (`2f37210`). GR-1D is
 accepted; GR-1 remains partial pending the GR-1E assessment below.
 
-### GR-1E — composition-thinning assessment: NO FURTHER EXTRACTION; GR-1 declared complete (2026-08-03, pending independent review)
+### GR-1E — composition-thinning assessment: NO FURTHER EXTRACTION; GR-1 accepted complete (2026-08-03)
 
 GR-1E was defined as an assessment first, not an automatic extraction:
 compare the remaining facade against the archived definition of done
 (plan section 6.4) and record one of two honest outcomes. The assessment
-was performed mechanically (AST/tokenize line classification and call
-inventory over the exact tree at `c66db0a`) rather than by impression.
+was performed over the exact tree at `c66db0a` and independently reviewed
+against the merged tree at `16e0451`. The implementation did not retain its
+line-classification script, so the original 172-line/19-domain-call figures
+are descriptive measurements rather than a reproducible acceptance gate.
+The independent review instead recorded a reproducible Python-AST inventory:
+the function contains 54 statement nodes, 49 call nodes, and 28 distinct call
+expressions. Those calls include kernel phases, gate and telemetry seams,
+ordinary constructors/formatters, and exactly one broker submission call.
 
 #### What the facade actually contains (952 lines)
 
@@ -599,15 +605,14 @@ inventory over the exact tree at `c66db0a`) rather than by impression.
 |---|---|---|
 | Module docstring (19-round audit history, deliberately retained) | 198 | 0 |
 | Imports incl. review-pinned compatibility re-exports | ~90 | — |
-| `execute_approved_paper_proposal` | 281 | 172 |
+| `execute_approved_paper_proposal` | 281 | 172 (implementer classification) |
 | `validate_proposal_for_execution` (GR-1C wrapper) | 90 | 43 |
 | `reconcile_submission` (GR-1D wrapper) | 72 | 18 |
 | `recover_stale_reconciliation` | 75 | 31 |
 | `recover_stale_claim` | 98 | 51 |
 | Remaining helpers/docstrings/comments | — | — |
 
-The 172 executable lines of the execution composition invoke nineteen
-distinct named functions — every one a kernel phase
+The execution composition invokes the named domain phases
 (`resolve_kill_switch`, `verify_execution_preconditions`,
 `claim_for_execution`, `classify_override_review`,
 `build_reviewed_override_record`, `_transition_pre_broker_claim`,
@@ -615,8 +620,10 @@ distinct named functions — every one a kernel phase
 `release_after_telemetry_failure`, `resolve_failed_submission`,
 `journal_accepted_order`), the GR-1C validation wrapper, a risk-gate
 authorization (`authorize_trade_intent` /
-`authorize_overridden_trade_intent`), or a telemetry recorder — plus
-exactly one broker-contact line. There is no inline financial
+`authorize_overridden_trade_intent`), and telemetry recorders — plus exactly
+one broker-contact line. It also performs the ordinary coordinator work the
+AST inventory makes explicit: branching, exception mapping, timestamps, and
+message/list/dictionary construction. There is no inline financial
 computation, no inline state-transition SQL, and no interpretation logic
 left in the body: what remains is the phase ORDER, the exception→terminal-
 status mapping, and two telemetry calls that stay facade-resolved by
@@ -636,8 +643,14 @@ composition, not thin it.
   modules (`claim`, `revalidate`, `submit`, `outcomes`, `errors`,
   `intents`, `validate`, `reconcile`), each exercised directly by the
   characterization/execution suites plus their structural guards.
-- **"No test file changed except by import path"** — HELD through
-  GR-1A→GR-1D; each independent review verified zero existing-test edits.
+- **"No test file changed except by import path"** — NOT LITERALLY
+  SATISFIABLE alongside section 6.3's requirement to add characterization
+  tests. Across the GR-1 history, existing characterization files gained new
+  assertions and a few import/comment adjustments. Independent review found
+  no pre-existing behavioral assertion relaxed or rewritten to make an
+  extraction pass. This is the behavior-preservation intent used for
+  acceptance; the archived plan's contradictory literal wording remains
+  recorded rather than misreported as held.
 - **"The atomic claim stays a single conditional UPDATE"** — HELD; it
   never left `AssistantStore`, and both recovery paths use the same
   conditional `reclaim_stale_status` primitive.
@@ -648,23 +661,31 @@ composition, not thin it.
 
 #### The residual, stated honestly
 
-The two recovery wrappers (82 executable lines combined) remain on the
-facade DELIBERATELY: each is input validation plus one atomic storage
-call plus precise refusal diagnosis. Their entire concurrency and
+The two recovery wrappers (82 implementer-classified executable lines
+combined) remain on the facade DELIBERATELY: each is input validation around
+the atomic `AssistantStore.reclaim_stale_status` primitive plus precise
+refusal diagnosis. `recover_stale_reconciliation` has one invocation;
+`recover_stale_claim` has one static call site inside a bounded status loop
+and can invoke the primitive more than once before one candidate succeeds.
+Their entire concurrency and
 atomicity risk already lives in `AssistantStore.reclaim_stale_status`;
 extracting them would add a third deps contract and seam-test family
 while reducing no risk and simplifying nothing. If a future milestone
 changes recovery SEMANTICS, extraction can be reconsidered then, with
 characterization first.
 
-Outside GR-1's scope and therefore NOT closed by this declaration:
-`allocation_batch.py` still owns cross-leg reservation math separately
-from storage-level budget reservation (ARCHITECTURE_DEBT item 1 keeps
-that note), and risk-check scatter remains GR-2's consolidation target
-(item 2).
+Outside the archived GR-1 plan's execution-service scope and therefore NOT
+closed by this declaration: `allocation_batch.py` still owns cross-leg
+reservation math separately from storage-level budget reservation. That work
+remains open in ARCHITECTURE_DEBT items 1 and 2 and must follow the adopted
+action plan's sequencing. Risk-check scatter remains GR-2's consolidation
+target.
 
-**Decision: outcome 1 — no GR-1E extraction; GR-1 is complete against its
-definition of done.** Subject to independent review of this assessment.
+**Independent-review decision: outcome 1 — no GR-1E extraction; GR-1 is
+complete against the archived plan's intended definition of done.** The
+review accepted the architectural conclusion after correcting the evidence
+and scope statements above; see
+`docs/REVIEW_2026-08-03_GR1E_ASSESSMENT.md`.
 
 ## GR-2 .. GR-9 — not started
 

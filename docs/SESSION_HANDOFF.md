@@ -1,6 +1,6 @@
 # Development session handoff
 
-Prepared: 2026-08-02T22:02:02-07:00
+Prepared: 2026-08-02T22:25:51-07:00
 
 Audience: Codex, Claude Code, and the repository owner after moving to another
 computer.
@@ -64,11 +64,11 @@ Repository:
 https://github.com/SheltonChen2017/trading_agent.git
 ```
 
-State after the independent follow-up review correction:
+State after the independent review of Claude's third-round confirmation:
 
 ```text
 origin/main and local main:
-  2882889  Merge PR #110, Claude GR-1C review follow-ups
+  ef77bbf  Merge PR #111, Claude GR-1C third-round confirmation
 
 Original GR-1C implementation and review, pushed and merged:
   b4d9b1f  Claude validation extraction and dependency injection
@@ -98,15 +98,21 @@ Claude third-round confirmation branch, based on Codex tip 1cdff99:
   "preserve, do not overwrite" (now committed and validated), plus the
   CLAUDE.md / skill / milestone-record wiring for the owner-mandated general
   instructions, plus this handoff update
-  remote state: PUSHED; one pull request from this branch carries the whole
-  Codex + Claude chain, since the Codex commits are its ancestors
+  commits: 7f431b6, e9f2e83, f2b5fa9
+  remote state: PUSHED AND MERGED as ef77bbf (PR #111)
+
+Codex independent confirmation-review branch:
+  branch: codex/review-claude-gr1c-confirmation-20260803
+  base: ef77bbf
+  review report/correction: 85c72da
+  disposition: accepted after one P3 handoff-state correction; no P0-P2 issue
+  remote state: LOCAL ONLY, NOT PUSHED
 ```
 
-The Codex review branch is based on merged `main` `2882889`. It adds the
-independently verified compatibility/status corrections, the rewritten
-handoff, and the owner-mandated review/record process documents.
-Do not redo or separately cherry-pick the earlier GR-1C commits when taking
-either branch; they are already ancestors of `2882889`.
+The current Codex review branch is based on merged `main` `ef77bbf`. It adds
+only the independent confirmation review report and this corrected handoff.
+Do not redo or separately cherry-pick earlier GR-1C commits; they are already
+ancestors of `ef77bbf`.
 
 ### Local-only strategy-tool document
 
@@ -127,12 +133,11 @@ do not recreate it from memory while an exact copy may exist elsewhere.
 
 ### Required action before abandoning the old computer
 
-Both active branches are now on the remote
-(`codex/review-claude-gr1c-followups-20260802` and
-`user/claude/gr-1c-followup-confirmation-20260802`), so every GR-1C commit,
-the follow-up review, the third-round confirmation, and the general workflow
-documents survive a computer switch via `git fetch` alone. The only artifact
-still requiring separate treatment is the unavailable historical `a656015`
+All implementation and Claude-confirmation work is merged into remote `main`
+at `ef77bbf`. The current independent review commit `85c72da` and the handoff
+commit containing this text remain local-only until the owner authorizes a
+push; another computer cannot fetch this final review state yet. The other
+artifact requiring separate treatment is unavailable historical `a656015`
 (strategy-tool document), which exists — if anywhere — only on the earlier
 computer.
 
@@ -141,7 +146,11 @@ computer.
 Recent sequence:
 
 ```text
-(Claude third-round commits follow on user/claude/gr-1c-followup-confirmation-20260802)
+85c72da  Codex: complete independent GR-1C confirmation review (local)
+ef77bbf  Merge PR #111: Claude GR-1C third-round confirmation into main
+f2b5fa9  Claude: update session handoff after confirmed GR-1C follow-up review
+e9f2e83  Claude: wire owner-mandated review workflow into instructions/record
+7f431b6  Claude: confirm follow-up review and pin residual class-resolved seam
 1cdff99  Codex: make session handoff the canonical cross-computer state (pushed)
 3c180b4  Codex: add general code review and milestone record instructions (pushed)
 6d3a703  Codex: update session handoff after reviewed GR-1C follow-ups (pushed)
@@ -358,6 +367,25 @@ the boundary is documented in the property docstring and pinned by
 proves itself non-vacuous by patching the kernel side. Codex should treat
 that boundary as open for challenge in its next review round.
 
+### Independent review of the third-round confirmation (Codex, 2026-08-02)
+
+Codex reviewed every commit from `1cdff99..ef77bbf` separately. Commit
+`7f431b6` is accepted: the class-resolved fallback compatibility difference
+is real, explicitly documented, non-vacuously tested, and restoring
+property-time facade lookup would require a kernel-to-facade dependency,
+mutable class-wide resolver state, or a public construction-contract change.
+Commit `e9f2e83` is accepted with no issue; it correctly wires the owner's
+review and record requirements and adds the required two-paragraph GR-1C
+milestone entry. Commit `f2b5fa9` is accepted with no issue at its pre-merge
+snapshot. Merge `ef77bbf` is accepted after correction: it merged cleanly but
+made the canonical handoff's pending-merge decision and topic-branch resume
+instructions stale.
+
+The durable report is
+`docs/REVIEW_2026-08-02_GR1C_CONFIRMATION.md` at `85c72da`. Its retained issue
+ledger contains one resolved P3 (`REV-001`, stale post-merge handoff state)
+and no P0, P1, or P2 findings. The review rates Claude's latest round 9/10.
+
 ## 5. GR-1 status and the exact next development step
 
 GR-1 is **partial**. GR-1A, GR-1B, and GR-1C are implemented and independently
@@ -488,6 +516,14 @@ focused: tests/test_execution_characterization.py +
          tests/test_ml_import_boundary.py = 50 passed
 ```
 
+Independent confirmation review (Codex, Python 3.12.13, exact merge tree
+`ef77bbf` before documentation-only review commits):
+
+```text
+focused: 50 passed in 26.28 seconds
+full: 2412 passed, 1 skipped, 26 warnings in 333.69 seconds
+```
+
 Additional gates:
 
 ```text
@@ -497,6 +533,8 @@ review branch: clean before editing this handoff
 mutation: direct kernel outcome construction detected, then restored green
 third-round mutation sweep: all three seam reverse-mutations caught by both
   the symtable guard and the matching behavioral test (six of six)
+Codex confirmation review: compileall clean; git diff --check clean;
+  no residual `if False:` mutation markers
 ```
 
 The warnings were non-failing third-party/environment notices. Do not convert
@@ -784,9 +822,9 @@ Do not let UI/development tests share the restored operational database.
 
 Do not infer answers to these:
 
-1. Authorization to merge `user/claude/gr-1c-followup-confirmation-20260802`
-   (which carries the entire Codex follow-up review chain as ancestors);
-   both branches are already pushed, so only the merge decision remains.
+1. Authorization to push the local confirmation-review branch
+   `codex/review-claude-gr1c-confirmation-20260803`, including review commit
+   `85c72da` and the separate handoff commit containing this state.
 2. Whether to retrieve unavailable local-only strategy-tool commit `a656015`
    from the earlier computer or a private bundle.
 3. When to begin GR-1D and whether reconciliation is the selected next slice.
@@ -809,16 +847,19 @@ implication.
 
 ```powershell
 git fetch --all --prune
-git switch --track origin/user/claude/gr-1c-followup-confirmation-20260802
+git switch main
+git pull --ff-only
 git status --short --branch
 git log -10 --oneline --decorate
 ```
 
-Verify that history contains merged main `2882889`, Codex corrections
+Verify that `main` is at or after merge `ef77bbf` and history contains
+Claude confirmation commits `7f431b6`/`e9f2e83`/`f2b5fa9`, merged main
+`2882889`, Codex corrections
 `c1de927`/`d2d836b`, reviewed handoff `6d3a703`, workflow docs `3c180b4`,
-canonical-handoff rule `1cdff99`, and the Claude third-round confirmation
-commits ending with the handoff commit containing this file. Then rerun
-focused/full tests in the reconstructed environment before merging.
+and canonical-handoff rule `1cdff99`. The final Codex confirmation review and
+this handoff are not cross-computer available until their local review branch
+is pushed with owner authorization.
 
 Recommended resume prompt:
 
@@ -828,9 +869,8 @@ docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md completely, then read
 docs/FEATURE_MILESTONE_RECORD.md and docs/SESSION_HANDOFF.md. Verify
 origin/main and all branch/commit claims against Git. GR-1C through Claude
 follow-up merge 2882889, Codex follow-up corrections c1de927/d2d836b, and the
-Claude third-round confirmation on
-user/claude/gr-1c-followup-confirmation-20260802 are complete; do not redo
-them. Confirm whether the confirmation branch was merged. Preserve facade
+Claude third-round confirmation merged as ef77bbf are complete and independently
+reviewed; do not redo them. Preserve facade
 imports and complete call-time DI, including the outcome factory, datetime,
 timezone, Decimal, TradeIntent, to_decimal, and behavior-bearing failure
 constants; the one documented residual is

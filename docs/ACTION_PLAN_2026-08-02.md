@@ -188,8 +188,8 @@ model 2 starts the 3-month clock **now** and time is the scarcest input.
 
 ## 8. Adopted sequencing (owner-approved 2026-08-02)
 
-**Phase 1 — UI feature controls (COMPLETE AND INDEPENDENTLY REVIEWED on the
-local Codex review branch; owner-authorized push/merge still required):**
+**Phase 1 — UI feature controls (COMPLETE: implemented, independently
+reviewed, confirmed, and pushed — only the final merge remains):**
 Implemented `docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` as one milestone:
 the Settings & Features tab (three control classes), AI master + per-feature
 preferences gating all four LLM surfaces, read-only data-source and safety
@@ -199,11 +199,15 @@ checks), the protected policy-update workflow for `allow_new_positions` /
 atomic write → version bump → new fingerprint → prior-proposal invalidation
 warning), and the dedicated Ticker Suggestions surface. The design's four
 open decisions are resolved (§9 item 11). PR #116 merged the implementation
-at `4c8e959`; independent review accepted it after two P2 corrections in
-local-only `a6d5254`, with 2,427 full-suite tests passing. No live authority
-or formal evidence epoch was enabled.
+at `4c8e959`; independent review accepted it after two P2 corrections
+(`a6d5254`); Claude's third-round confirmation re-verified both corrections
+red/green with a three-mutation sweep (all caught) and hardened one
+environment-sensitive runtime-identity test the confirmation run exposed.
+The review chain is pushed on
+`user/claude/ui-review-confirmation-20260803`. No live authority or formal
+evidence epoch was enabled.
 
-**Phase 2 — hygiene (NEXT after the reviewed UI branch is pushed/merged):**
+**Phase 2 — hygiene (NEXT after the reviewed UI chain merges):**
 AP-1, AP-2, AP-4 doc reconciliation; add GR-1D/1E to the GR status doc.
 
 **Phase 3 — finish the kernel (1–2 milestone cycles):**

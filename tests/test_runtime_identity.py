@@ -116,7 +116,16 @@ def test_expected_commit_is_an_assertion_not_a_caller_override(repository):
         )
 
 
-def test_a_directory_that_is_not_a_repository_fails_closed(tmp_path):
+def test_a_directory_that_is_not_a_repository_fails_closed(tmp_path, monkeypatch):
+    # GIT_CEILING_DIRECTORIES stops git's upward .git discovery at tmp_path,
+    # so this test means the same thing regardless of where pytest's basetemp
+    # lives. Without it, running with --basetemp inside this repository (the
+    # documented validation command pattern does exactly that) put
+    # "not-a-repo" INSIDE the repo: on a clean worktree git found the real
+    # repository and the test failed; on a dirty worktree it "passed" for the
+    # wrong reason (the dirtiness refusal, not the non-repo refusal). Found
+    # 2026-08-03 when a clean-tree full run first exposed the trap.
+    monkeypatch.setenv("GIT_CEILING_DIRECTORIES", str(tmp_path))
     outside = tmp_path / "not-a-repo"
     outside.mkdir()
     with pytest.raises(RuntimeIdentityError):

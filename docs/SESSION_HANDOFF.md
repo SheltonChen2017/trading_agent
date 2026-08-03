@@ -1,15 +1,15 @@
 # Development session handoff
 
-Prepared: 2026-08-03T10:45:00-07:00
+Prepared: 2026-08-03T10:51:54-07:00
 
 Audience: Codex, Claude Code, and the repository owner after moving to another
 computer.
 
-Purpose: record the post-merge UI state (PR #117), the implemented Phase 2
-hygiene milestone awaiting independent review, safety posture, Git topology,
-validation, local-data observations, and next step. This file contains no
-secret values, brokerage account numbers, or licensed market data. Every
-machine-local and time-sensitive statement must be verified after a move.
+Purpose: record the independently reviewed and corrected Phase 2 hygiene
+milestone, safety posture, Git topology, validation, local-data observations,
+and next step. This file contains no secret values, brokerage account numbers,
+or licensed market data. Every machine-local and time-sensitive statement
+must be verified after a move.
 
 ## 1. Read this first
 
@@ -31,10 +31,11 @@ the handoff before continuing. GR-1C is implemented and independently
 reviewed; do not redo it. UI feature controls (Phase 1) are fully merged:
 implementation PR #116, review chain PR #117 at 661a7d4. Do not redo or
 bypass that review. Action-plan Phase 2 hygiene (AP-1, AP-2, AP-4) is
-IMPLEMENTED at commit 34ce463 on LOCAL-ONLY branch
-user/claude/phase2-hygiene-20260803 and awaits independent review; do not
-reimplement it and do not push or merge it without owner approval. GR-1D
-remains Phase 3 and must not start early.
+implemented at 34ce463 and independently accepted after correction at
+36c69d3 on LOCAL-ONLY branch codex/review-phase2-hygiene-20260803. Do not
+reimplement or repeat that review, and do not push or merge it without owner
+approval. Phase 3 GR-1D is next in the adopted sequence but still requires
+the owner's go-ahead; do not start it implicitly.
 ```
 
 Initial commands:
@@ -72,21 +73,23 @@ Repository:
 https://github.com/SheltonChen2017/trading_agent.git
 ```
 
-State after Phase 2 hygiene implementation (2026-08-03):
+State after independent Phase 2 hygiene review (2026-08-03):
 
 ```text
 origin/main and local main:
   661a7d4  Merge PR #117, the complete UI review chain (implementation was
            merged earlier as PR #116 at 4c8e959)
 
-Phase 2 hygiene (ACTIVE), based on main 661a7d4:
-  branch: user/claude/phase2-hygiene-20260803 — LOCAL ONLY, NOT PUSHED;
-          another computer cannot fetch it until the owner authorizes a push
-  implementation: 34ce463  (AP-1 verify-db-schema CLI + verification helper
-          + migration tests; AP-2 artifacts/ ignore + check-ignore test;
-          AP-4 doc reconciliation incl. post-PR-#117 action-plan state)
-  status: awaiting independent review; do not merge or push without the
-          owner
+Phase 2 hygiene, based on main 661a7d4:
+  implementation branch: user/claude/phase2-hygiene-20260803
+  implementation: 34ce463
+  implementation handoff: c8271a1
+  review branch: codex/review-phase2-hygiene-20260803
+  review correction/report: 36c69d3
+  disposition: accepted after one resolved P2 and two resolved P3 findings;
+               no P0/P1 and no open issue
+  remote state: LOCAL ONLY, NOT PUSHED; another computer cannot fetch the
+                reviewed tree until the owner authorizes a push
 
 UI implementation, pushed and merged:
   branch: user/claude/ui-feature-controls-20260802
@@ -165,40 +168,43 @@ they remain authoritative for milestone definitions but not sequencing.
 
 ### Local-only strategy-tool document
 
-A separate local branch existed on an earlier computer:
+The previously missing strategy-tool work is present in this checkout:
 
 ```text
 branch: codex/ai-strategy-tool-doc-v2-20260802
 commit: a656015  Document AI-driven strategy backtest tool
 file: docs/AI_DRIVEN_STRATEGY_FORMING_TOOL_IMPLEMENTATION.md
-recorded state: LOCAL ONLY, NOT PUSHED
+current state: LOCAL ONLY, NOT PUSHED OR MERGED
 ```
 
-Commit `a656015` is absent from this computer's Git object database and the
-file is not in `origin/main`. The similarly named remote commit `929ba09` is a
-different GR-1B follow-up and must not be mistaken for it. Retrieve the exact
-commit from the earlier computer or a private bundle if it is still wanted;
-do not recreate it from memory while an exact copy may exist elsewhere.
+`git cat-file` and `git show` both resolve `a656015` here, and `git branch -vv`
+lists the local branch. The file is deliberately absent from the active review
+tree and `origin/main`; switch to or inspect that branch to read it. The
+similarly named `929ba09` is a different GR-1B follow-up and must not be
+mistaken for it.
 
 ### Required action before abandoning this computer
 
 The full UI review chain is merged into `origin/main` at `661a7d4`. What is
-NOT on the remote: the Phase 2 hygiene branch
-`user/claude/phase2-hygiene-20260803` (implementation `34ce463` and the
-handoff commit containing this text) is LOCAL ONLY until the owner
-authorizes a push — another computer cannot fetch it. The pre-change
-operator-database backup
+NOT on the remote: reviewed Phase 2 branch
+`codex/review-phase2-hygiene-20260803` (implementation `34ce463`,
+implementation handoff `c8271a1`, review correction `36c69d3`, and the
+handoff commit containing this text) is LOCAL ONLY until the owner authorizes
+a push. Local strategy-tool branch
+`codex/ai-strategy-tool-doc-v2-20260802` (`a656015`) is also LOCAL ONLY.
+Another computer cannot fetch either branch. The pre-change operator-database
+backup
 `data/backups/trading_assistant-pre-phase2-schema-20260803T171810Z.db` is
-Git-ignored and machine-local. The separate historical artifact `a656015`
-(strategy-tool document) remains unavailable from this clone and exists —
-if anywhere — only on the earlier computer.
+Git-ignored and machine-local.
 
 ## 3. Relevant GR-1 commit history
 
 Recent sequence:
 
 ```text
-34ce463  Claude: Phase 2 hygiene implementation (LOCAL ONLY, awaiting review)
+36c69d3  Codex: complete independent Phase 2 hygiene review (LOCAL ONLY)
+c8271a1  Claude: Phase 2 implementation handoff (LOCAL ONLY)
+34ce463  Claude: Phase 2 hygiene implementation (LOCAL ONLY)
 661a7d4  Merge PR #117: the complete UI review chain into main
 8093fa2  Claude: confirm the UI-controls review; harden the
          environment-sensitive identity test
@@ -492,11 +498,15 @@ record is in `docs/REVIEW_2026-08-03_UI_FEATURE_CONTROLS.md` and
 `docs/FEATURE_MILESTONE_RECORD.md`.
 
 Active milestone status (2026-08-03): **action-plan Phase 2 hygiene is
-IMPLEMENTED and awaiting independent review.**
+accepted after independent correction.**
 
 ```text
-branch: user/claude/phase2-hygiene-20260803 (LOCAL ONLY, base 661a7d4)
+implementation branch: user/claude/phase2-hygiene-20260803
 implementation commit: 34ce463
+implementation handoff: c8271a1
+review branch: codex/review-phase2-hygiene-20260803 (LOCAL ONLY)
+review correction/report: 36c69d3
+disposition: accepted after correction
 scope:
   AP-1 - assistant/storage.py gains verify_database_schema() (read-only,
        fail-closed, expected schema built by the real AssistantStore
@@ -515,37 +525,45 @@ scope:
        sections added to the GR status doc; ML status doc contradictions
        fixed (spec library delivered, calibration reports wired, ML-FS §2
        no longer sweeps ML-FS-6 into "software-complete"); action plan
-       updated to the post-PR-#117 merged state and Phase-2-active state.
-tests: 13 new (12 schema verification/migration incl. fresh, pre-migration,
-       mutated, missing-database, and CLI-through-main() coverage; 1
-       git check-ignore regression test). Mutation/red evidence: the
-       needs_store dispatch and the missing-column comparison were each
-       broken and detected; the .gitignore rule was reverted and detected.
+       updated to the post-PR-#117 merged state and reviewed Phase 2 state.
+review findings:
+  PH2REV-001 P2 - same-named weakened indexes/triggers passed the original
+       verifier. Corrected by comparing normalized definitions and reporting
+       mismatched_indexes/mismatched_triggers; proven red then green.
+  PH2REV-002 P3 - the implementation handoff incorrectly said a656015 was
+       absent from this clone. The commit and local branch are present.
+  PH2REV-003 P3 - "EXACT MATCH" and the claimed cause of operator-DB drift
+       exceeded the evidence. Corrected to compatibility match and unknown
+       historical provenance.
+tests: implementation added 13 tests (12 schema + 1 artifact-ignore);
+       independent review added the thirteenth schema test, for 14 total new
+       Phase 2 tests. Mutation/red evidence includes the original three
+       implementation probes plus the review's same-name definition probe.
 operational AP-1 run (this machine): operator DB backed up FIRST via the
        SQLite backup API from a read-only connection
        (data/backups/trading_assistant-pre-phase2-schema-20260803T171810Z.db,
        integrity ok, SHA-256 cc70b8d39fdd854075c81f17666d5ac8c1147344d4
-       6f8837ee2cb3fa41ccb6b5); read-only verify-db-schema then reported an
-       EXACT MATCH - both AP-1 tables already present with full declared
-       columns, because normal owner use had already opened the DB with
-       current code since the audit snapshot. --apply was therefore not
-       needed; no schema change was made to the operator DB this session.
-validation: full suite 2440 passed / 1 skipped / 25 warnings in 434.76s
-       under Python 3.13.14 (.venv, this machine); focused 80 passed
-       (schema verification, artifact ignores, CLI parser, execution
-       characterization, ML import boundary); compileall clean;
-       git diff --check clean.
-honest limits: verify-db-schema compares object presence (tables, columns,
-       indexes, triggers), not column types/constraints byte-for-byte;
+       6f8837ee2cb3fa41ccb6b5); corrected read-only verification reports a
+       compatibility match: all required tables/columns present and all
+       named index/trigger definitions matched. --apply was not needed; no
+       schema change was made to the operator DB during implementation or
+       review. How this DB became current is not established.
+validation: corrected focused suite 81 passed in 21.74s; corrected full suite
+       2441 passed / 1 skipped / 25 warnings in 316.46s under Python 3.13.14;
+       compileall and git diff --check clean. The first full review attempt
+       was externally terminated at 120s and is not counted.
+honest limits: verify-db-schema compares table/column presence and exact
+       normalized named-index/trigger definitions, not table column types or
+       constraints byte-for-byte;
        the operator-DB drift noted in section 8 is recorded, not explained;
        no execution-kernel file changed; no policy, broker, scheduler, or
        epoch state was touched.
-next: independent Codex review of 34ce463, then owner merge decision;
-       Phase 3 (GR-1D) must not start before the owner's go-ahead.
+next: owner push/merge decision for the reviewed Phase 2 branch. Phase 3
+       GR-1D is next in sequence but must not start before owner go-ahead.
 ```
 
-After Phase 2 hygiene completes review, GR-1D follows as the next kernel
-milestone (action-plan Phase 3):
+After the owner accepts Phase 2, GR-1D is the next kernel milestone
+(action-plan Phase 3):
 
 ```text
 GR-1D: extract manual reconciliation orchestration behind an explicit,
@@ -694,6 +712,25 @@ mutation/red evidence: needs_store dispatch broken -> detected; missing-
   detected; all restored green
 ```
 
+Independent Phase 2 review (Codex, Python 3.13.14, corrected tree
+`36c69d3`):
+
+```text
+red proof: replacing idx_one_active_paper_epoch with a same-named non-unique
+  index and fk_broker_orders_proposal_insert with a same-named no-op trigger
+  still produced matches=True on 34ce463
+corrected focused: 81 passed in 21.74 seconds
+corrected full: 2441 passed, 1 skipped, 25 warnings in 316.46 seconds
+operator DB read-only compatibility check: match; no missing or mismatched
+  required objects
+compileall: clean
+git diff --check: clean
+```
+
+The first Codex full-suite attempt was terminated by its command runner's
+120-second limit and then encountered a closed stdout pipe; it is not a test
+failure and is not counted. The clean retry above is the authoritative result.
+
 Additional gates:
 
 ```text
@@ -738,10 +775,12 @@ path: C:\git\customizedagent\trading_agent\data\trading_assistant.db
 size: 3,670,016 bytes
 WAL: present, 0 bytes
 PRAGMA quick_check: ok
-schema: EXACT MATCH against current code (verify-db-schema, read-only);
-        25 declared tables all present, including execution_telemetry_events
+schema: compatibility match against current code (verify-db-schema,
+        read-only); all required tables/columns present and all named
+        index/trigger definitions match, including execution_telemetry_events
         (11 declared columns) and portfolio_capture_sessions (14 declared
-        columns)
+        columns). Table column types and constraints are not compared
+        byte-for-byte.
 pre-change backup: data/backups/
         trading_assistant-pre-phase2-schema-20260803T171810Z.db
         (SQLite backup API from a read-only connection; integrity_check ok;
@@ -761,15 +800,15 @@ journal_transactions:              0
 DRIFT WARNING: the previous revision of this section (prepared
 2026-08-03T00:17) recorded size 2,920,448, 24 tables with both AP-1 tables
 ABSENT, and larger row counts (decision_packets 277, trade_proposals 31,
-portfolio_equity_snapshots 118). The database has since been opened by
-current code through normal owner use (which created the two tables and, by
-the documented decision-packet identity migration, collapses exact
-duplicate packets), but the trade-proposal and equity-snapshot decreases
-are NOT explained by any migration. The two measurements may also come from
-different machines' databases. Do not silently combine them; treat
-provenance as unresolved (related to open owner decision on historical
-contamination). No paper-evidence epoch has started here, and no broker
-lifecycle or reservation evidence exists in this database.
+portfolio_equity_snapshots 118). Current code may have opened and migrated
+this database, but the measurements may instead describe different restored
+databases or machine profiles; the historical cause is not established. The
+documented decision-packet migration can collapse exact duplicate packets,
+but the trade-proposal and equity-snapshot decreases are NOT explained by any
+migration. Do not silently combine the snapshots; treat provenance as
+unresolved (related to the open owner decision on historical contamination).
+No paper-evidence epoch has started here, and no broker lifecycle or
+reservation evidence exists in this database.
 
 The database is Git-ignored. Stop Streamlit, tests, schedulers, paper
 operations, and other writers before making a transfer backup. Prefer the
@@ -905,9 +944,11 @@ owner prose -> restricted StrategySpec -> deterministic compiler/interpreter
 -> generic backtest adapter -> persisted run -> Backtest UI page
 ```
 
-The narrower product draft is in local-only commit `a656015`, described in the
-Git section above. No strategy-language, compiler, authoring workflow, generic
-adapter, job runner, or Backtest page has been implemented.
+The narrower product draft is available on local-only branch
+`codex/ai-strategy-tool-doc-v2-20260802` at `a656015`, described in the Git
+section above. It remains absent from the active tree and remote. No
+strategy-language, compiler, authoring workflow, generic adapter, job runner,
+or Backtest page has been implemented.
 
 ### Proposal history cleanup
 
@@ -954,7 +995,8 @@ For the next coding session:
 14. `docs/OPERATIONS_RUNBOOK.md`
 15. `docs/LIVE_PROMOTION_CHECKLIST.md`
 16. `docs/DATABENTO_DATA_SOURCE.md`
-17. the focused AI strategy-tool document if branch `a656015` was transferred
+17. the focused AI strategy-tool document on local branch
+    `codex/ai-strategy-tool-doc-v2-20260802` if that branch is preserved
 
 The current code and latest specific status section override stale historical
 statements in older documents. Update stale text rather than reimplementing
@@ -1019,17 +1061,17 @@ Do not let UI/development tests share the restored operational database.
 Do not infer answers to these:
 
 1. ~~Merge the UI review chain~~ — **RESOLVED 2026-08-03**: merged as
-   PR #117 at `661a7d4`. NEW: whether to push and (after independent
-   review) merge the Phase 2 hygiene branch
-   `user/claude/phase2-hygiene-20260803` (`34ce463`, currently LOCAL ONLY).
+   PR #117 at `661a7d4`. NEW: whether to push and merge the independently
+   reviewed Phase 2 branch `codex/review-phase2-hygiene-20260803`
+   (implementation `34ce463`, correction `36c69d3`, currently LOCAL ONLY).
 2. ~~Push/cross-review the consolidated plans~~ — **RESOLVED 2026-08-02**:
    both plans merged (PR #113/#114); the owner adopted Claude's plan as
    `docs/ACTION_PLAN_2026-08-02.md` with UI feature controls as Phase 1;
    Codex's draft is archived at `docs/reference/ACTION_PLAN_codex.md`.
-3. Whether to retrieve unavailable local-only strategy-tool commit `a656015`
-   from the earlier computer or a private bundle.
-4. When to begin GR-1D (action-plan Phase 3, after Phase 2 hygiene completes
-   its own reviewed milestone).
+3. Whether to push/merge or otherwise transfer the now-available local-only
+   strategy-tool branch `codex/ai-strategy-tool-doc-v2-20260802` (`a656015`).
+4. When to begin GR-1D (action-plan Phase 3; Phase 2 review is complete, but
+   the next milestone still requires owner go-ahead).
 5. Which authoritative historical membership/reference-data source will be
    obtained and funded.
 6. When to deploy the operational paper cadence and start the first immutable
@@ -1057,11 +1099,12 @@ git log -10 --oneline --decorate
 
 Verify that `main` is at or after `661a7d4` (PR #117, the merged UI review
 chain) and that history contains the GR-1C chain through `ff8c16e`. The
-Phase 2 hygiene branch `user/claude/phase2-hygiene-20260803` (`34ce463` plus
-the handoff commit) is LOCAL ONLY to the implementing computer until the
-owner authorizes a push — a new computer cannot fetch it and must not
-recreate it from memory. Everything merged syncs through Git alone — no
-session files need copying.
+Reviewed Phase 2 branch `codex/review-phase2-hygiene-20260803`
+(`34ce463` + `c8271a1` + `36c69d3` + this handoff commit) is LOCAL ONLY until
+the owner authorizes a push; local strategy-tool branch
+`codex/ai-strategy-tool-doc-v2-20260802` (`a656015`) is also local-only. A new
+computer cannot fetch either branch. Everything merged syncs through Git
+alone — no session files need copying.
 
 Recommended resume prompt:
 
@@ -1081,14 +1124,16 @@ scheduler state, and ignored artifact transfer. Do not start live trading, an
 evidence epoch, scheduled tasks, ML/LLM proposal integration, or destructive
 cleanup. UI feature controls (Phase 1) are fully merged: PR #116 plus the
 review chain PR #117 at 661a7d4; do not repeat that review. Action-plan
-Phase 2 hygiene (AP-1, AP-2, AP-4) is IMPLEMENTED at 34ce463 on LOCAL-ONLY
-branch user/claude/phase2-hygiene-20260803 — do not reimplement it. The
-next action is an independent review of that exact commit per
-docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, then the owner's
-push/merge decision. Note the AP-1 operational finding recorded in the
-handoff: the operator database schema was already current when verified;
-a pre-change backup exists under data/backups/. After Phase 2 completes
-review, Phase 3 is the gap analysis for GR-1D manual reconciliation
-extraction, characterization first, one reviewable slice, focused/full
-validation, commit, and stop for independent review before GR-2.
+Phase 2 hygiene (AP-1, AP-2, AP-4) is implemented at 34ce463 and independently
+accepted after correction at 36c69d3 on LOCAL-ONLY branch
+codex/review-phase2-hygiene-20260803 — do not reimplement or repeat that
+review. The next action is the owner's push/merge decision. Note the AP-1
+operational finding: the operator database passes the corrected read-only
+compatibility check and has a pre-change backup under data/backups/, but the
+historical source of database drift remains unknown. Local strategy-tool
+branch codex/ai-strategy-tool-doc-v2-20260802 at a656015 is present but also
+unpublished. Phase 3 GR-1D manual reconciliation extraction is next in the
+adopted sequence only after owner go-ahead: characterize first, implement one
+reviewable slice, run focused/full validation, commit, and stop for independent
+review before GR-2.
 ```

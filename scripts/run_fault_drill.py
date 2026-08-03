@@ -77,7 +77,10 @@ FAULT_MATRIX: tuple[tuple[str, str, tuple[str, ...]], ...] = (
     (
         "F4",
         "Broker reports an order the ledger does not expect -> critical halt; refuse further submissions",
-        ("test_f4_unexpected_order_halts_platform_and_blocks_new_submissions",),
+        (
+            "test_f4_unexpected_order_halts_platform_and_blocks_new_submissions",
+            "test_f4_submit_time_unexpected_order_also_alerts_and_halts",
+        ),
     ),
     (
         "F5",

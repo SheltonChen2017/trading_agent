@@ -111,3 +111,74 @@ producer for `alert_delivery`. GR-2 remains the action plan's Phase 4
 ride-along. This review does not authorize choosing a channel, implementing a
 different milestone, deploying scheduled tasks, starting an evidence epoch,
 or enabling live trading.
+
+## Third-round confirmation (Claude, 2026-08-03)
+
+Every review claim was independently re-verified before acceptance, and the
+review's own generalization was extended one step further.
+
+### Commit dispositions (review chain `61e0314..7e846f1`)
+
+| Commit | Scope | Disposition |
+|---|---|---|
+| `9f5ab5e` | Six corrections + report | Accepted after one additional correction of the same class (GR3CONF-001 below) |
+| `a35d369` | GR-3 milestone record | Accepted, no issue |
+| `dad82ee` / `7e846f1` | Handoff replacement + push record | Accepted, no issue |
+
+### Verification evidence
+
+- **All red claims reproduced on the exact implementation snapshot**: in a
+  worktree at `4c395d7`, Codex's new tests produced 7 failures for exactly
+  the reported reasons — skipped-as-passed, exit-1 fail-open, both
+  epoch-lineage refusal cases, non-atomic artifact publish,
+  halt/alert one-transaction atomicity, and F4's zero-alert gap. The F3
+  `submitting`-restart test PASSED on the old tree, confirming GR3REV-004
+  was a coverage gap in the drill inventory, not a runtime defect.
+- **Reverse-mutation**: reverting the skipped-as-passed fix was detected by
+  `test_skipped_fault_case_is_not_reported_as_passed`; restored green (7/7
+  runner tests).
+- **GR3REV-001's severity is endorsed**: allowing `code_commit=unknown` or a
+  mismatched commit into an active epoch's drill rows would have been
+  exactly the cross-epoch pooling defect the evidence rules exist to
+  prevent; requiring exact lineage equality is the correct fail-closed
+  boundary.
+
+### GR3CONF-001 (P2, resolved): the halt-alert sweep missed the submit-time twin
+
+GR3REV-003's correction routed four reconciliation halt paths through the
+new atomic `activate_reconciliation_halt()`, but the generalized-instances
+search stopped before `assistant/execution_kernel/outcomes.py::
+resolve_failed_submission` — the SUBMIT-TIME discovery of the identical
+anomaly. Both its halt sites (direct same-key mismatch and
+replacement-chain mismatch) still called bare `set_kill_switch`: an
+unexpected order discovered thirty seconds earlier than reconciliation
+produced a halt with no durable critical alert — the exact defect
+GR3REV-003 fixed elsewhere, with the same GR-5 deliverability consequence.
+
+Proven red first: `test_f4_submit_time_unexpected_order_also_alerts_and_halts`
+failed on the review tree with zero alerts after a submit-time mismatch.
+Fixed by routing both sites through `activate_reconciliation_halt()`
+(`path: submit_lookup` / `submit_replacement_chain`), and the new test was
+added to the harness's F4 inventory so the drill matrix now carries three
+F4 tests. This is the recurring bidirectional lesson of this workflow: a
+"generalized instances" sweep must enumerate call sites mechanically
+(`grep set_kill_switch\(True`), not by module family.
+
+### Validation on the confirmation tree
+
+Full suite 2,507 passed / 1 skipped / 25 warnings (+1 = the submit-time
+drill); focused faults/runner/characterization/replacement/absence suites
+120 passed; compileall and `git diff --check` clean; Python 3.13.14.
+
+### Assessment of the review
+
+**9/10.** Five genuine P2s — two of them fail-open evidence paths in the
+runner (skips certified as passed; promotion rows attributable to code an
+epoch never ran) that materially strengthen GR-3's fitness as promotion
+tooling — every finding proven red before fixing, and a well-designed
+atomic halt+alert primitive that this confirmation found worth extending
+rather than reworking. Docked for the incomplete sweep that left the
+submit-time twin of its own headline finding unfixed.
+
+GR-3 is complete on the corrected-plus-confirmed tree. Phase 4 continues:
+GR-5 blocked on the owner's channel choice; GR-2 remains the ride-along.

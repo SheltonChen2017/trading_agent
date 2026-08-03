@@ -168,7 +168,11 @@ def resolve_failed_submission(
                 new_status=SUBMISSION_UNKNOWN,
                 error=reason,
             )
-            store.set_kill_switch(True, reason=reason)
+            store.activate_reconciliation_halt(
+                proposal_id=proposal_id,
+                reason=reason,
+                details={"mismatch": mismatch_detail, "path": "submit_lookup"},
+            )
             raise ProposalExecutionError(
                 f"Order submission failed for {proposal_id}, and a MISMATCHED order was found "
                 f"under this idempotency key ({mismatch_detail}) -- left as 'submission_unknown' "
@@ -196,7 +200,11 @@ def resolve_failed_submission(
                 error=reason,
             )
             if is_mismatch:
-                store.set_kill_switch(True, reason=reason)
+                store.activate_reconciliation_halt(
+                    proposal_id=proposal_id,
+                    reason=reason,
+                    details={"path": "submit_replacement_chain"},
+                )
             raise ProposalExecutionError(reason) from exc
 
         journal_broker_order_update(

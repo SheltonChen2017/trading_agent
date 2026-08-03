@@ -467,3 +467,40 @@ def test_f11_no_live_broker_credentials_reach_the_suite():
     # The real, unpatched predicate: without credentials no code path can
     # open a live brokerage session during tests.
     assert real_broker_module.is_configured() is False
+
+
+def test_f4_submit_time_unexpected_order_also_alerts_and_halts(store, policy):
+    """The SUBMIT-TIME twin of the reconciliation mismatch: a raising
+    submit whose idempotency-key lookup finds an order that does NOT match
+    the intent must produce the same atomic critical alert + halt as the
+    manual-reconciliation path -- an anomaly discovered thirty seconds
+    earlier is not less critical."""
+    store.set_kill_switch(False, reason="drill reset")
+    store.save_proposal(make_proposal("p-f4-submit", side="sell"))
+    broker = _sell_broker(
+        submit_market_order=TimeoutError("gateway timed out after submit"),
+        # Same key, wrong side: not our order.
+        find_order_by_client_id=accepted_order("paper-f4s", side="buy"),
+    )
+
+    with scripted_broker(broker):
+        with pytest.raises(ProposalExecutionError) as caught:
+            execute_approved_paper_proposal(
+                "p-f4-submit", "approve", _held_portfolio(), policy, store,
+                now_et=NOW_ET, earnings_days_away=10,
+            )
+
+    assert "MISMATCHED" in str(caught.value)
+    assert store.get_kill_switch()["active"] is True
+    alerts = [
+        a for a in store.list_operational_alerts()
+        if a["category"] == "broker_reconciliation"
+        and a["details"].get("proposal_id") == "p-f4-submit"
+    ]
+    assert len(alerts) == 1
+    assert alerts[0]["severity"] == "critical"
+    state = observable_state(store, "p-f4-submit")
+    assert state["proposal_status"] == "submission_unknown"
+    assert len(state["reservations"]) == 1
+    assert referential_integrity_holds(store)
+    store.set_kill_switch(False, reason="drill cleanup")

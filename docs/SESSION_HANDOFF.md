@@ -81,7 +81,7 @@ Review branch commits after `main`:
 8bbe82b  Correct and complete independent GR-1E assessment review
 d2d1e97  Record completed GR-1 execution kernel split
 4d9416d  Replace session handoff after reviewed GR-1E
-<post-push commit>  Record verified remote GR-1E handoff
+b570fce  Record pushed GR-1E review handoff
 ```
 
 The review branch was pushed to

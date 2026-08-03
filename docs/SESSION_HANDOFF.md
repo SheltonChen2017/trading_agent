@@ -40,9 +40,9 @@ Canonical records:
 on 2026-08-03 (**Windows desktop notification mandatory for critical;
 warnings batched into the daily briefing; webhook out of scope**) and
 authorized implementation. GR-5 is IMPLEMENTED at commit `00a8d13` on
-LOCAL-ONLY branch `user/claude/gr-5-alert-delivery-20260803` and awaits
-independent review — do not reimplement it, and do not push or merge it
-without owner approval. `alert_delivery` was the last drill type without a
+PUSHED branch `user/claude/gr-5-alert-delivery-20260803` and awaits
+independent review — do not reimplement it, and do not merge it without
+owner approval. `alert_delivery` was the last drill type without a
 producer, so **AP-5 is now closed**: all five `REQUIRED_PROMOTION_DRILLS`
 have producers. GR-2 remains the action plan's Phase 4 ride-along and is
 NOT authorized by this handoff.
@@ -342,7 +342,7 @@ branch, remote, and worktree before acting. Main is d5400cc. Claude's GR-3
 tip is pushed at 61e0314. Independent corrections are 9f5ab5e and the
 milestone record is a35d369 on codex/review-gr3-fault-drills-20260803. GR-3
 is complete; do not repeat it. GR-5 alert delivery is IMPLEMENTED at 00a8d13
-on local-only branch user/claude/gr-5-alert-delivery-20260803 (owner chose
+on pushed branch user/claude/gr-5-alert-delivery-20260803 (owner chose
 Windows desktop notification for critical, warnings batched to the briefing,
 webhook out of scope) and awaits independent review — do not reimplement it.
 GR-2 is only the documented ride-along, not implied authority.

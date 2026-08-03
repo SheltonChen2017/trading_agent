@@ -50,3 +50,78 @@ reconciliation were strong. The one material miss was narrow but important:
 the operational verifier treated safety-object names as proof of their
 definitions. No execution-kernel, policy, broker, scheduler, evidence epoch,
 or live-authority behavior changed.
+
+## Third-round confirmation (Claude, 2026-08-03)
+
+Every review claim was independently re-verified before acceptance, on the
+exact commits named, per `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`.
+
+### Commit dispositions (review range `c8271a1..8278510`)
+
+| Commit | Scope | Disposition |
+|---|---|---|
+| `36c69d3` | PH2REV-001 correction, mismatch detection, review report | Accepted, no issue found |
+| `e3a5b9a` | Reviewed handoff | Accepted after Codex's own `35fc2dd` correction (its "LOCAL ONLY, NOT PUSHED" claim was already stale when committed — the same staleness class as historical `1cdff99`, independently observed by Claude via `git ls-remote` before `35fc2dd` landed) |
+| `35fc2dd` | Handoff push-state correction | Accepted, no issue found |
+| `8278510` | Merge PR #118 | Accepted: merge tree verified byte-identical to `35fc2dd` (`git diff --stat` empty); no conflict-resolution delta |
+
+### Verification evidence
+
+- **PH2REV-001 red-proof reproduced on the exact implementation snapshot**:
+  in a separate worktree at `34ce463`, Codex's
+  `test_same_named_weakened_index_and_trigger_are_detected` failed with
+  `SchemaVerificationResult(matches=True, ...)` on a database whose
+  active-epoch index had lost UNIQUE and whose broker-order trigger was a
+  no-op — the exact reported fail-open, for the exact reported reason.
+- **Reverse-mutation**: removing `mismatched_indexes`/`mismatched_triggers`
+  from the corrected `matches` computation was detected by the same test;
+  restored, all 13 schema tests green. The correction is load-bearing in
+  both directions.
+- **P2 severity accepted**: a schema verifier intended to run before
+  evidence operations reported success while uniqueness and relationship
+  enforcement were absent; that is a meaningful fail-open in a fail-closed
+  tool, not a documentation nit. The implementation's own "honest limits"
+  note had flagged byte-level table definitions but did not extend the
+  concern to index/trigger definitions — the miss was real.
+- **PH2REV-002 reproduced**: `git cat-file -t a656015` returns `commit`;
+  local branch `codex/ai-strategy-tool-doc-v2-20260802` resolves to it with
+  the 528-line strategy-tool document. The "absent from this computer"
+  claim (carried forward from earlier handoffs without re-measurement) was
+  false. Accepted.
+- **PH2REV-003 accepted**: the corrected action-plan and handoff text
+  separate the measurement (compatibility match: required tables/columns
+  present, named index/trigger definitions equal) from the unresolved
+  provenance of the operator database's current state.
+- **Validation on the merged tree `8278510`** (byte-identical to
+  `35fc2dd`), Python 3.13.14: full suite **2,441 passed, 1 skipped,
+  25 warnings in 341.77s**; schema-verification suite 13 passed;
+  compileall clean; `git diff --check` clean; worktree clean.
+
+### Residual boundary, documented for the next round
+
+`verify-db-schema --apply` creates missing objects (idempotent
+`CREATE ... IF NOT EXISTS` plus column migrations) but cannot repair a
+same-named MISMATCHED index or trigger — SQLite's `IF NOT EXISTS` skips an
+existing weaker object, so after `--apply` verification still fails and
+reports the object in `mismatched_*`. This is the correct fail-closed
+behavior (surfacing, not silently dropping/recreating enforcement objects
+on an operator database), and the CLI help's "creates any missing" wording
+makes no repair claim; recorded here so the boundary is an explicit
+decision rather than an accident. Repairing a mismatched object remains a
+deliberate operator action.
+
+### Assessment of the review
+
+**9/10.** The review found a real P2 fail-open in the exact tool whose job
+is fail-closed verification, proved it red on the implementer's snapshot
+before fixing it, corrected it minimally (name -> normalized-definition
+comparison; no contract churn), and re-ran full validation. Both P3
+documentation findings were evidence-backed and their corrections are
+precise. The single slip — committing a handoff that called the branch
+LOCAL ONLY moments before/after pushing it — repeated a documented
+historical staleness class, and was self-corrected in `35fc2dd` within
+minutes.
+
+Phase 2 hygiene is genuinely complete against its scope (AP-1, AP-2, AP-4)
+and merged at `8278510`. The next milestone is GR-1D (action-plan Phase 3),
+which requires the owner's explicit go-ahead.

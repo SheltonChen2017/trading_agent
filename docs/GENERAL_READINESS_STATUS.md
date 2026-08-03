@@ -219,6 +219,34 @@ composition layer". A remaining GR-1 step should replace the facade
 monkeypatch seams with explicit dependency injection before moving those
 orchestrators, preserving test and caller behavior while completing the split.
 
+#### Review-of-review follow-ups (2026-08-02)
+
+Every review change was independently verified before acceptance: the
+`DuplicateIntentConflict` restoration is correct (the name was importable
+from the facade at `d9e3196`, so dropping it was an API change regardless of
+in-repo usage), the corrected `outcomes.py` docstring fixes a real defect the
+decomposition introduced ("never transitions a proposal" became false when
+`resolve_failed_submission` moved in), and the 1,361 figure is exact.
+
+Two gaps in the review itself were closed as follow-ups:
+
+- **The telemetry fall-through hazard was not addressed.** The facade calls
+  `release_after_telemetry_failure()` with no `raise` at the call site, so
+  "never contact the broker after a telemetry failure" silently depended on
+  the helper always raising. The helper is now annotated `NoReturn`, the call
+  site gained a bare-`raise` guard, and
+  `test_a_neutered_release_helper_still_never_reaches_the_broker` neuters the
+  helper into a plain return and proves the broker is still never contacted.
+  Mutation-verified: deleting the guard fails that test.
+- **The stale-name fix was not generalized.** The review corrected two
+  references to the never-existent `submit_approved_proposal()` but the same
+  wrong name survived in four more places (`order_lifecycle.py`,
+  `order_reconciler.py`, `test_absence_age_guard.py`,
+  `test_stranded_claim_recovery.py`); `git log -S` confirms no function of
+  that name ever existed. All four now name
+  `execute_approved_paper_proposal()`. Comment-only edits; no test behavior
+  changed.
+
 ### What the characterization suite can actually detect
 
 A green characterization suite means nothing on its own; it must be shown to

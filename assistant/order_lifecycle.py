@@ -173,7 +173,7 @@ def resolve_replacement_chain(
 
     Lives here rather than in order_reconciler because three separate call
     sites need it -- startup/poll reconciliation, the user-facing
-    reconcile_submission(), and submit_approved_proposal()'s
+    reconcile_submission(), and execute_approved_paper_proposal()'s
     post-exception recovery -- and order_reconciler imports FROM
     execution_service, so a resolver there could not be shared without a
     circular import. order_lifecycle already owns the "replaced" vocabulary

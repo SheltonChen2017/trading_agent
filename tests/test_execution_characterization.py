@@ -490,6 +490,68 @@ def test_pre_submit_telemetry_failure_releases_budget_without_broker_contact(
     assert state["telemetry"] == ["validation_approved"]
 
 
+def test_a_neutered_release_helper_still_never_reaches_the_broker(
+    store, monkeypatch
+):
+    """The fail-closed guard behind the telemetry-failure path.
+
+    ``release_after_telemetry_failure`` is ``NoReturn``: the facade relies on
+    it raising to stop execution before the broker-contact line that follows.
+    That reliance used to be invisible at the call site -- nothing there said
+    "if this returns, we submit a live order anyway." This test neuters the
+    helper into a plain return and proves the facade STILL refuses to contact
+    the broker, because a bare ``raise`` guard re-raises the telemetry
+    failure.
+
+    GR-1B self-audit finding, 2026-08-02: without the guard, this exact
+    scenario fell through to the broker submit. Mutation-verified by deleting
+    the guard and watching this test observe a submitted order.
+    """
+    store.save_proposal(_proposal(side="sell"))
+    recorder = _submission_recorder(
+        submit={
+            "order_id": "must-not-submit",
+            "ticker": "AAPL",
+            "shares": 1,
+            "side": "sell",
+            "type": "market",
+            "status": "accepted",
+        }
+    )
+
+    def fail_submission_telemetry(*args, **kwargs):
+        raise RuntimeError("characterized telemetry failure")
+
+    monkeypatch.setattr(
+        execution_service, "record_submission_started", fail_submission_telemetry
+    )
+    # The dangerous future edit, simulated: the helper gains a return path.
+    monkeypatch.setattr(
+        execution_service,
+        "release_after_telemetry_failure",
+        lambda *args, **kwargs: None,
+    )
+
+    with patched_broker(recorder):
+        with pytest.raises(RuntimeError) as caught:
+            execute_approved_paper_proposal(
+                "p-1",
+                "approve",
+                _held_portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+                earnings_days_away=10,
+            )
+
+    assert "characterized telemetry failure" in str(caught.value)
+    assert "submit_market_order" not in recorder.call_names, (
+        "a telemetry failure must never fall through to a live order "
+        "submission, even if the release helper stops raising"
+    )
+    assert observable_state(store, "p-1")["broker_orders"] == []
+
+
 def test_timeout_reconciles_by_idempotency_key_without_resubmitting(store):
     """An ambiguous submit must query the broker and never issue a blind retry."""
     store.save_proposal(_proposal(side="sell"))

@@ -13,7 +13,7 @@ proposal for that ticker and side, with no way out:
 
 The only remedy was hand-editing SQLite. Found by reviewing the change that
 caused it. Recovery is safe for exactly these two statuses because
-submit_approved_proposal() writes "submitting" BEFORE it calls the broker, so a
+execute_approved_paper_proposal() writes "submitting" BEFORE it calls the broker, so a
 row still in "validating"/"approved" provably has no order behind it.
 """
 from __future__ import annotations

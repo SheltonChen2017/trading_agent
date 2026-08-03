@@ -2,7 +2,7 @@
 Reconciliation must not believe "the broker has no such order" while a
 submission is still in flight.
 
-submit_approved_proposal() writes "submitting" and reserves daily budget
+execute_approved_paper_proposal() writes "submitting" and reserves daily budget
 BEFORE it calls the broker. A poller running in that window used to treat a
 404 as a CONFIRMED failure: it marked the proposal submission_failed and
 released the daily reservation, so the order that then succeeded no longer

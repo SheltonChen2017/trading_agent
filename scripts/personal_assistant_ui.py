@@ -79,7 +79,13 @@ from assistant.macro_context import build_descriptive_macro_context
 from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calendar_configured
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.ticker_verification import partition_by_universe, verify_tickers
-from assistant.policy import DEFAULT_POLICY_PATH, compute_policy_fingerprint, load_policy
+from assistant.policy import (
+    DEFAULT_POLICY_PATH,
+    compute_policy_fingerprint,
+    load_policy,
+    policy_with_updated_flags,
+    save_policy,
+)
 from assistant.llm import PrivacyMode, ProjectionError, ReviewStatus, project_committee_input
 from assistant.llm.anthropic_provider import (
     AnthropicCommitteeProvider,
@@ -350,8 +356,43 @@ def _regime_fields(regime) -> tuple:
     )
 
 
+# Optional-AI feature preferences (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md
+# section 3.2). Session-state only, all default OFF (owner decision,
+# 2026-08-02, recorded in docs/ACTION_PLAN_2026-08-02.md section 9). These are
+# UI preferences, never authority: they decide whether an optional paid LLM
+# surface is OFFERED; every call still requires the per-surface checkbox, its
+# own explicit click, and a configured credential. Deterministic content is
+# never affected by any of them.
+_AI_MASTER_PREF_KEY = "ai_pref_master"
+_AI_FEATURE_PREFS = (
+    ("ai_pref_news_summaries", "Claude news summaries",
+     "Summarizes displayed headlines; no proposal authority."),
+    ("ai_pref_similar_tickers", "Claude similar-ticker suggestions",
+     "Research candidates only; every ticker is verified against real market data."),
+    ("ai_pref_allocation_commentary", "Claude allocation commentary",
+     "Cannot alter deterministic weights."),
+    ("ai_pref_committee", "Experimental investment committee",
+     "Advisory only; ALSO requires ENABLE_EXPERIMENTAL_COMMITTEE=1 -- that "
+     "release gate stays mandatory regardless of these preferences."),
+)
+
+
+def _ai_feature_enabled(pref_key: str) -> bool:
+    """Master preference ANDed with the per-feature preference (owner
+    decision d: master off means nothing AI is offered anywhere)."""
+    return bool(st.session_state.get(_AI_MASTER_PREF_KEY, False)) and bool(
+        st.session_state.get(pref_key, False)
+    )
+
+
+_AI_PREF_OFF_HELP = (
+    "Optional AI features are turned off. Enable them (and this specific "
+    "feature) in the Settings & Features tab."
+)
+
+
 @st.cache_data(ttl=_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS)
-def _load_recommended_tickers(held_tickers: tuple[str, ...]):
+def _load_recommended_tickers(held_tickers: tuple[str, ...], include_ai: bool = True):
     """Composes yf.screen (most-actives) + Finnhub (IPO calendar, if
     configured) + a Claude ticker-suggestion call + a verification pass over
     every candidate -- genuinely expensive to run on every Briefing rerun
@@ -369,9 +410,21 @@ def _load_recommended_tickers(held_tickers: tuple[str, ...]):
     cached function rather than calling it separately per rerun -- it's a
     third Claude call layered on top of the other two data sources, and
     firing it on every widget interaction anywhere in this tab would be a
-    real, avoidable cost."""
-    recommended, dropped = build_recommended_tickers(list(held_tickers), store=store)
-    curated_note = curate_recommended_tickers(recommended, store=store) if recommended else None
+    real, avoidable cost.
+
+    `include_ai` is part of the cache key on purpose: toggling the AI
+    preference must recompute rather than serve a cached result built under
+    the other setting. When False, neither the suggestion call nor the
+    curation call fires -- the preference prevents the paid calls, it does
+    not merely hide their output."""
+    recommended, dropped = build_recommended_tickers(
+        list(held_tickers), store=store, include_ai_suggestions=include_ai
+    )
+    curated_note = (
+        curate_recommended_tickers(recommended, store=store)
+        if recommended and include_ai
+        else None
+    )
     return recommended, dropped, curated_note
 
 
@@ -840,9 +893,11 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
             )
             provider_configured = is_anthropic_committee_configured()
             experiment_enabled = is_anthropic_committee_experiment_enabled()
+            committee_pref_on = _ai_feature_enabled("ai_pref_committee")
             committee_available = (
                 provider_configured
                 and experiment_enabled
+                and committee_pref_on
                 and committee_input is not None
                 and not is_stale
             )
@@ -862,11 +917,19 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                             "This proposal is stale; regenerate it before requesting a review."
                             if is_stale
                             else (
+                                # The env release gate outranks the UI
+                                # preference in this message chain: a user
+                                # who has not set the gate should be told
+                                # about the gate, not sent to Settings.
                                 "The committee remains release-gated until its frozen replay "
                                 "corpus is complete. Set ENABLE_EXPERIMENTAL_COMMITTEE=1 only "
                                 "for supervised experimental use."
                                 if provider_configured and not experiment_enabled
-                                else "ANTHROPIC_API_KEY is not set."
+                                else (
+                                    _AI_PREF_OFF_HELP
+                                    if provider_configured and not committee_pref_on
+                                    else "ANTHROPIC_API_KEY is not set."
+                                )
                             )
                         )
                     )
@@ -1143,7 +1206,13 @@ with badge_col:
 with st.sidebar:
     st.header("Settings")
     policy_path = st.text_input("Policy file", value=str(DEFAULT_POLICY_PATH))
-    include_events = st.checkbox("Fetch live earnings events", value=False)
+    # Default seeded from the Settings & Features preference; the per-run
+    # choice here still wins once touched (design section 3.1: expose the
+    # default centrally while retaining a per-run choice).
+    include_events = st.checkbox(
+        "Fetch live earnings events",
+        value=bool(st.session_state.get("pref_include_events_default", False)),
+    )
     if is_configured():
         st.success("Alpaca paper credentials: connected")
     else:
@@ -1151,8 +1220,24 @@ with st.sidebar:
 
 store = _store()
 
-tab_briefing, tab_watchlist, tab_selling, tab_propose, tab_history = st.tabs(
-    ["Briefing", "Watchlist", "Selling", "Propose & Approve", "History"]
+(
+    tab_briefing,
+    tab_watchlist,
+    tab_selling,
+    tab_propose,
+    tab_history,
+    tab_suggestions,
+    tab_settings,
+) = st.tabs(
+    [
+        "Briefing",
+        "Watchlist",
+        "Selling",
+        "Propose & Approve",
+        "History",
+        "Ticker Suggestions",
+        "Settings & Features",
+    ]
 )
 
 with tab_briefing:
@@ -1457,7 +1542,10 @@ with tab_briefing:
     if st.button("Refresh recommended stocks", key="refresh_recommended"):
         _load_recommended_tickers.clear()
     held_tickers_tuple = tuple(sorted({p.ticker.upper() for p in packet.portfolio.positions}))
-    recommended_tickers, dropped_candidates, curated_note = _load_recommended_tickers(held_tickers_tuple)
+    briefing_ai_on = _ai_feature_enabled("ai_pref_similar_tickers")
+    recommended_tickers, dropped_candidates, curated_note = _load_recommended_tickers(
+        held_tickers_tuple, briefing_ai_on
+    )
     if dropped_candidates:
         st.caption(
             f"{len(dropped_candidates)} candidate ticker(s) could not be verified against real market data "
@@ -1472,6 +1560,11 @@ with tab_briefing:
         if not items:
             if category == "recent_ipo" and not is_ipo_calendar_configured():
                 st.caption("IPO calendar unavailable -- FINNHUB_API_KEY is not set. Sign up for a free Finnhub account and set this env var to enable it.")
+            elif category == "ai_suggested" and not briefing_ai_on:
+                st.caption(
+                    "Claude suggestions are off (optional AI features are disabled -- "
+                    "enable them in Settings & Features)."
+                )
             elif category == "ai_suggested" and not held_tickers_tuple:
                 st.caption("No current holdings to base similarity suggestions on.")
             continue
@@ -1515,7 +1608,9 @@ with tab_watchlist:
     if cart:
         st.write(f"**Cart:** {', '.join(cart)}")
 
-    ai_news_available = is_ai_summary_configured()
+    ai_news_available = is_ai_summary_configured() and _ai_feature_enabled(
+        "ai_pref_news_summaries"
+    )
     want_ai_summary = st.checkbox(
         "Summarize news with Claude (real API call, small real cost per ticker)",
         value=False,
@@ -1524,32 +1619,50 @@ with tab_watchlist:
             "Requires ANTHROPIC_API_KEY to be set. Off by default -- headlines "
             "are shown either way; this only adds an AI-written summary of them."
             if ai_news_available
-            else "ANTHROPIC_API_KEY is not set -- showing raw headlines only."
+            else (
+                _AI_PREF_OFF_HELP
+                if is_ai_summary_configured()
+                else "ANTHROPIC_API_KEY is not set -- showing raw headlines only."
+            )
         ),
     )
-    ai_advisor_available = is_ai_advisor_configured()
+    ai_advisor_configured = is_ai_advisor_configured()
+    similar_available = ai_advisor_configured and _ai_feature_enabled(
+        "ai_pref_similar_tickers"
+    )
     want_similar_suggestions = st.checkbox(
         "Get Claude's own ticker suggestions, with measured comparison (real API call, small real cost)",
         value=False,
-        disabled=not ai_advisor_available,
+        disabled=not similar_available,
         help=(
             "Claude picks tickers from its own knowledge -- this is NOT a validated "
             "similarity engine. Every suggestion is checked against real market data "
             "before being shown, and paired with a measured correlation/sector-overlap "
             "column so you can see whether the data actually backs up Claude's stated reason."
-            if ai_advisor_available
-            else "ANTHROPIC_API_KEY is not set."
+            if similar_available
+            else (
+                _AI_PREF_OFF_HELP
+                if ai_advisor_configured
+                else "ANTHROPIC_API_KEY is not set."
+            )
         ),
+    )
+    allocation_review_available = ai_advisor_configured and _ai_feature_enabled(
+        "ai_pref_allocation_commentary"
     )
     want_allocation_review = st.checkbox(
         "Get an AI review of the purchase split with Claude (real API call, small real cost)",
         value=False,
-        disabled=not ai_advisor_available,
+        disabled=not allocation_review_available,
         help=(
             "Advisory commentary only -- never changes the computed weights below. "
             "Requires 2+ tickers checked together."
-            if ai_advisor_available
-            else "ANTHROPIC_API_KEY is not set."
+            if allocation_review_available
+            else (
+                _AI_PREF_OFF_HELP
+                if ai_advisor_configured
+                else "ANTHROPIC_API_KEY is not set."
+            )
         ),
     )
 
@@ -2397,3 +2510,375 @@ with tab_history:
                 use_container_width=True,
                 hide_index=True,
             )
+
+# ---------------------------------------------------------------------------
+# Ticker Suggestions -- dedicated research-only surface
+# (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md section 4). The Briefing and
+# Watchlist keep their existing embedded suggestion features (owner decision c,
+# 2026-08-02); this tab consolidates the same verified pipeline behind explicit
+# source toggles, explicit seed selection, and an explicit run button, so every
+# network call is a deliberate act rather than a side effect of rendering.
+# ---------------------------------------------------------------------------
+
+with tab_suggestions:
+    st.error(
+        "**Research only — not a proposal or allocation authorization.** "
+        "Nothing on this tab can create, size, approve, or submit an order. "
+        "Adding a ticker to the Watchlist cart, generating a proposal, and "
+        "approving it remain separate, explicit actions governed by policy, "
+        "fresh data, deterministic risk checks, and exact human approval."
+    )
+    _, suggestions_packet = _load_packet(policy_path, include_events=False)
+    suggestions_held = tuple(
+        sorted({p.ticker.upper() for p in suggestions_packet.portfolio.positions})
+    )
+
+    st.subheader("Sources")
+    # Defaults are seeded into session state ONCE (before widget creation),
+    # then the widgets own their keys -- passing value= and key= together
+    # makes Streamlit warn about two sources of truth after the first
+    # interaction.
+    ipo_configured = is_ipo_calendar_configured()
+    st.session_state.setdefault("suggest_src_most_active", True)
+    st.session_state.setdefault("suggest_src_recent_ipo", ipo_configured)
+    source_col1, source_col2, source_col3 = st.columns(3)
+    with source_col1:
+        want_most_active = st.checkbox(
+            "Most-active market screen",
+            key="suggest_src_most_active",
+            help="yfinance most-actives. Reflects trading VOLUME and price movement, "
+            "NOT buy-vs-sell order flow.",
+        )
+    with source_col2:
+        want_recent_ipo = st.checkbox(
+            "Recent IPO calendar",
+            key="suggest_src_recent_ipo",
+            disabled=not ipo_configured,
+            help=(
+                "Finnhub IPO calendar."
+                if ipo_configured
+                else "FINNHUB_API_KEY is not set."
+            ),
+        )
+    with source_col3:
+        suggestions_ai_pref = _ai_feature_enabled("ai_pref_similar_tickers")
+        suggestions_ai_available = is_ai_advisor_configured() and suggestions_ai_pref
+        want_ai_source = st.checkbox(
+            "Claude suggestions (real API call, small real cost)",
+            key="suggest_src_ai",
+            disabled=not suggestions_ai_available,
+            help=(
+                "NOT a validated similarity engine -- every suggestion is verified "
+                "against real market data and shown with measured evidence."
+                if suggestions_ai_available
+                else (
+                    _AI_PREF_OFF_HELP
+                    if is_ai_advisor_configured()
+                    else "ANTHROPIC_API_KEY is not set."
+                )
+            ),
+        )
+
+    seed_options = sorted(set(suggestions_held) | set(UNIVERSE) | set(LEVERAGED_ETF_TICKERS))
+    seed_tickers = st.multiselect(
+        "Seed tickers (similarity basis for Claude suggestions; every lane excludes them from results)",
+        options=seed_options,
+        default=[t for t in suggestions_held],
+        key="suggest_seed_tickers",
+    )
+
+    run_suggestions = st.button(
+        "Run suggestions",
+        type="primary",
+        disabled=not (want_most_active or want_recent_ipo or want_ai_source),
+        help="Network calls happen only when you click this -- never on page load.",
+    )
+    if run_suggestions:
+        # The shared cached loader is deliberately reused (same verification
+        # pipeline, same TTL); the source toggles filter its output below. The
+        # AI lane fires only when its toggle AND preference AND credential all
+        # allow it -- passing include_ai=False prevents the paid calls.
+        suggestion_rows, suggestion_dropped, _suggestion_note = _load_recommended_tickers(
+            tuple(sorted({t.upper() for t in seed_tickers})),
+            want_ai_source and suggestions_ai_available,
+        )
+        st.session_state["ticker_suggestions_result"] = {
+            "rows": suggestion_rows,
+            "dropped": suggestion_dropped,
+            "ran_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "sources": {
+                "most_active": want_most_active,
+                "recent_ipo": want_recent_ipo,
+                "ai_suggested": want_ai_source and suggestions_ai_available,
+            },
+        }
+
+    suggestions_result = st.session_state.get("ticker_suggestions_result")
+    if suggestions_result:
+        st.caption(
+            f"Fetched at {suggestions_result['ran_at']} UTC. Verification: every ticker "
+            "shown resolved against real market data; "
+            f"{len(suggestions_result['dropped'])} candidate(s) failed verification and "
+            "were omitted."
+        )
+        source_labels = {
+            "most_active": "Most actively traded (source: yfinance screen)",
+            "recent_ipo": "Recent IPOs (source: Finnhub calendar)",
+            "ai_suggested": "Claude suggestions with measured comparison (source: LLM, verified)",
+        }
+        for category, label in source_labels.items():
+            if not suggestions_result["sources"].get(category):
+                continue
+            items = [
+                r for r in suggestions_result["rows"] if r.reason_category == category
+            ]
+            with st.expander(f"{label} ({len(items)})", expanded=bool(items)):
+                if items:
+                    st.dataframe(
+                        [
+                            {
+                                "Ticker": r.ticker,
+                                "Source": category,
+                                "Detail / stated reason & measured evidence": r.detail,
+                                "Fetched at": r.fetched_at,
+                            }
+                            for r in items
+                        ],
+                        use_container_width=True,
+                        hide_index=True,
+                    )
+                else:
+                    st.caption("No verified candidates from this source on this run.")
+        st.caption(
+            "Research only — to act on any of these, add the ticker to the Watchlist "
+            "cart yourself and go through the normal check/propose/approve workflow."
+        )
+
+# ---------------------------------------------------------------------------
+# Settings & Features -- three distinct control classes
+# (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md sections 2-3): UI preferences
+# (session-state toggles), authoritative trading policy (protected workflow,
+# typed confirmation, new fingerprint), and read-only credential/safety status
+# (never editable here, never shows a secret value).
+# ---------------------------------------------------------------------------
+
+with tab_settings:
+    st.caption(
+        "Three kinds of controls live here and they are deliberately not equal: "
+        "**UI preferences** (plain toggles, this session only), **authoritative "
+        "trading policy** (protected workflow with typed confirmation and a new "
+        "policy fingerprint), and **read-only status** (cannot be changed here at "
+        "all). No control on this tab can enable live trading, edit a secret, or "
+        "approve an order."
+    )
+
+    # ------------------------------------------------------------------ #
+    # 1. Authoritative trading policy (protected workflow)               #
+    # ------------------------------------------------------------------ #
+    st.subheader("Trading policy (authoritative — protected workflow)")
+    try:
+        settings_policy = load_policy(policy_path)
+        settings_policy_error = None
+    except Exception as exc:
+        settings_policy = None
+        settings_policy_error = str(exc)
+    if settings_policy is None:
+        st.error(f"The selected policy file could not be loaded: {settings_policy_error}")
+    else:
+        active_fingerprint = compute_policy_fingerprint(settings_policy)
+        st.caption(
+            f"Active policy: **{settings_policy.name}** v{settings_policy.version} "
+            f"({settings_policy.execution_mode}) — fingerprint `{active_fingerprint[:16]}…` — "
+            f"file: `{policy_path}`"
+        )
+        st.session_state.setdefault(
+            "policy_edit_allow_new_positions", settings_policy.allow_new_positions
+        )
+        st.session_state.setdefault(
+            "policy_edit_enable_strategy", settings_policy.enable_strategy_proposals
+        )
+        proposed_allow_new = st.checkbox(
+            "Allow new positions (exposure-increasing buys become policy-eligible)",
+            key="policy_edit_allow_new_positions",
+            help="Authoritative policy, not a preference. Changing it requires the "
+            "typed confirmation below. It does NOT bypass position, exposure, cash, "
+            "freshness, earnings, duplicate-order, kill-switch, or approval controls "
+            "-- it only stops the blanket refusal of buys that would open a new position.",
+        )
+        proposed_enable_strategy = st.checkbox(
+            "Enable leveraged-pair strategy proposals by default",
+            key="policy_edit_enable_strategy",
+            help="Sets the durable default for the Propose & Approve tab's per-run "
+            "checkbox. Configured leveraged-pair strategies carry NO confirmed, "
+            "production-authoritative evidence -- enabling only allows the "
+            "deterministic generator to be checked; it approves nothing.",
+        )
+        pending_policy_change = (
+            proposed_allow_new != settings_policy.allow_new_positions
+            or proposed_enable_strategy != settings_policy.enable_strategy_proposals
+        )
+        if pending_policy_change:
+            st.warning(
+                "Applying this change writes the policy file atomically, bumps the "
+                "policy version, and produces a NEW policy fingerprint. **Every "
+                "pending proposal created under the current fingerprint will refuse "
+                "to execute and must be regenerated.** That refusal is deliberate: "
+                "an approval given under one policy must not authorize execution "
+                "under another."
+            )
+            policy_confirm_phrase = st.text_input(
+                'Type exactly "UPDATE POLICY" to enable the apply button',
+                key="policy_edit_confirm_phrase",
+            )
+            if st.button(
+                "Apply policy change",
+                type="primary",
+                disabled=policy_confirm_phrase.strip() != "UPDATE POLICY",
+            ):
+                try:
+                    updated_policy = policy_with_updated_flags(
+                        settings_policy,
+                        allow_new_positions=proposed_allow_new,
+                        enable_strategy_proposals=proposed_enable_strategy,
+                    )
+                    save_policy(updated_policy, policy_path)
+                except Exception as exc:
+                    st.error(f"Policy update refused; the file was not changed: {exc}")
+                else:
+                    st.cache_data.clear()
+                    st.session_state.pop("policy_edit_confirm_phrase", None)
+                    new_fingerprint = compute_policy_fingerprint(updated_policy)
+                    st.success(
+                        f"Policy updated and saved: v{settings_policy.version} → "
+                        f"v{updated_policy.version}, fingerprint "
+                        f"`{active_fingerprint[:16]}…` → `{new_fingerprint[:16]}…`."
+                    )
+                    st.warning(
+                        "Proposals created before this change can no longer execute. "
+                        "Regenerate anything you still want on the Selling or "
+                        "Propose & Approve tab."
+                    )
+        else:
+            st.caption("No policy change selected — the values above match the active policy.")
+
+    # ------------------------------------------------------------------ #
+    # 2. UI preferences (session-state; never authority)                 #
+    # ------------------------------------------------------------------ #
+    st.divider()
+    st.subheader("UI preferences (this session)")
+    st.checkbox(
+        "Fetch live earnings events by default",
+        key="pref_include_events_default",
+        help="Seeds the sidebar checkbox's default. The sidebar's per-run choice "
+        "still wins once you touch it. Missing event data is always shown as "
+        "honestly unavailable, never guessed.",
+    )
+
+    st.subheader("Optional AI features (this session; every call still needs its own click)")
+    anthropic_configured = is_ai_advisor_configured()
+    st.caption(
+        f"Anthropic credential: **{'Configured' if anthropic_configured else 'Not configured'}** "
+        "(presence only — the key value is never displayed, stored, or accepted here). "
+        "Credential presence makes features available; it never triggers a call by itself."
+    )
+    st.checkbox(
+        "Enable optional AI features (master)",
+        key=_AI_MASTER_PREF_KEY,
+        help="Master gate over every optional LLM surface. Off means no AI control "
+        "is offered anywhere; deterministic content is completely unaffected either way.",
+    )
+    master_on = bool(st.session_state.get(_AI_MASTER_PREF_KEY, False))
+    for pref_key, pref_label, pref_boundary in _AI_FEATURE_PREFS:
+        st.checkbox(
+            pref_label,
+            key=pref_key,
+            disabled=not master_on,
+            help=pref_boundary
+            + (" (Enable the master toggle above first.)" if not master_on else ""),
+        )
+
+    # ------------------------------------------------------------------ #
+    # 3. Read-only status (data sources + safety)                        #
+    # ------------------------------------------------------------------ #
+    st.divider()
+    st.subheader("Data-source status (read-only)")
+    provider_rows = [
+        {
+            "Provider": "Alpaca paper trading",
+            "Status": "Configured" if is_configured() else "Not configured",
+            "Notes": "Portfolio, quotes, and paper order routing. Unconfigured = sample portfolio.",
+        },
+        {
+            "Provider": "Finnhub IPO calendar",
+            "Status": "Configured" if is_ipo_calendar_configured() else "Not configured",
+            "Notes": "Recent-IPO suggestion lane (FINNHUB_API_KEY).",
+        },
+        {
+            "Provider": "Databento research ingestion",
+            "Status": "Configured" if os.environ.get("DATABENTO_API_KEY") else "Not configured",
+            "Notes": "Licensed research data. Availability here never starts a download -- "
+            "downloads remain explicit CLI commands with a cost estimate and cap.",
+        },
+        {
+            "Provider": "Anthropic optional AI",
+            "Status": "Configured" if anthropic_configured else "Not configured",
+            "Notes": "Optional advisory features only (ANTHROPIC_API_KEY). No proposal authority.",
+        },
+    ]
+    st.dataframe(provider_rows, use_container_width=True, hide_index=True)
+
+    st.subheader("Safety status (read-only — sourced from the enforcing code, not re-computed here)")
+    # Each row reads the SAME function/state the execution path enforces with,
+    # so this panel cannot disagree with enforcement (the platform-readiness /
+    # fake-staleness lessons: a status display that re-implements its check
+    # eventually drifts from the check).
+    persistent_kill = store.get_kill_switch()
+    env_kill = env_kill_switch_active()
+    safety_rows = [
+        {
+            "Control": "Trading mode (config.PAPER_TRADING)",
+            "State": "PAPER" if PAPER_TRADING else "LIVE (verify immediately)",
+            "Detail": "Cannot be changed from this app, deliberately.",
+        },
+        {
+            "Control": "Environment kill switch",
+            "State": "ENGAGED" if env_kill else "off",
+            "Detail": "assistant.kill_switch.env_kill_switch_active() -- the same "
+            "call execution makes.",
+        },
+        {
+            "Control": "Persistent kill switch",
+            "State": "ENGAGED" if persistent_kill.get("active") else "off",
+            "Detail": (
+                f"Reason: {persistent_kill.get('reason') or '—'} "
+                "(store.get_kill_switch(), the same read execution makes)."
+            ),
+        },
+        {
+            "Control": "Active policy",
+            "State": (
+                f"{settings_policy.name} v{settings_policy.version} "
+                f"({settings_policy.execution_mode})"
+                if settings_policy is not None
+                else "UNLOADABLE — see error above"
+            ),
+            "Detail": (
+                f"Fingerprint {compute_policy_fingerprint(settings_policy)[:16]}… "
+                "(compute_policy_fingerprint, the same function approval binds to)."
+                if settings_policy is not None
+                else "Fix the policy file before trading."
+            ),
+        },
+        {
+            "Control": "Per-order human approval",
+            "State": "REQUIRED (structural)",
+            "Detail": "Typed approval phrase per proposal; overrides need the separate "
+            "order-specific phrase. No batch or autonomous approval exists.",
+        },
+    ]
+    st.dataframe(safety_rows, use_container_width=True, hide_index=True)
+    if (env_kill or persistent_kill.get("active")):
+        st.error(
+            "A kill switch is ENGAGED — execution will refuse orders until it is "
+            "cleared through the CLI kill-switch workflow."
+        )

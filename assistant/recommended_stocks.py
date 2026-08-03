@@ -118,7 +118,10 @@ def fetch_recent_ipos(count: int = 10, lookback_days: int = _IPO_LOOKBACK_DAYS) 
 
 
 def build_recommended_tickers(
-    held_tickers: list[str] | None = None, store: AssistantStore | None = None
+    held_tickers: list[str] | None = None,
+    store: AssistantStore | None = None,
+    *,
+    include_ai_suggestions: bool = True,
 ) -> tuple[list[RecommendedTicker], list[str]]:
     """Composes most-actives + IPO calendar + assistant.ai_advisor.suggest_similar_tickers()
     through the SAME two-tier partition + verify_tickers() pipeline as the
@@ -135,7 +138,15 @@ def build_recommended_tickers(
     review, 2026-07-28: a prior version silently substituted
     config.UNIVERSE[:5] here, which could make the Briefing appear
     personalized to a user's holdings when it was actually just always
-    suggesting tickers similar to a fixed mega-cap-tech basket)."""
+    suggesting tickers similar to a fixed mega-cap-tech basket).
+
+    `include_ai_suggestions=False` skips the Claude suggestion lane (and
+    therefore its paid API call) entirely while leaving the deterministic
+    most-active and IPO lanes untouched -- the UI's optional-AI master
+    preference must be able to prevent the call from firing at all, not
+    merely hide its output (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md
+    section 3.2: disabling AI must not disable deterministic content, and
+    credential presence must not automatically trigger an API call)."""
     now = datetime.now(timezone.utc).isoformat()
     held_set = {t.upper() for t in (held_tickers or [])}
     recommended: list[RecommendedTicker] = []
@@ -170,7 +181,7 @@ def build_recommended_tickers(
         )
         recommended.append(RecommendedTicker(ticker=v["ticker"], reason_category="recent_ipo", detail=detail, fetched_at=now))
 
-    if held_set:
+    if held_set and include_ai_suggestions:
         held_list = sorted(held_set)
         raw_suggestions = suggest_similar_tickers(held_list, store=store)
         if raw_suggestions:

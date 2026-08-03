@@ -76,16 +76,16 @@ Independent review history after Claude's tip:
 ```text
 9f5ab5e  Correct and complete independent GR-3 fault-drill review
 a35d369  Record completed GR-3 fault-drill milestone
-<handoff commit>  Replace session handoff after reviewed GR-3
+dad82ee  Replace session handoff after reviewed GR-3
 ```
 
-At preparation time the review branch is local-only. The owner previously
-directed the reviewer not to forget to push, so the branch and final handoff
-must be pushed and remote parity verified before closing this session. Until
-then another computer can fetch Claude's `61e0314` but not review correction
-`9f5ab5e`, milestone record `a35d369`, or this handoff. No pull request has
-been opened and neither Claude's branch nor this review branch has been merged
-into `main`; PR creation/merge remains an owner decision.
+The review branch was pushed to
+`origin/codex/review-gr3-fault-drills-20260803`, configured to track it, and
+remote creation through `dad82ee` succeeded. The commit containing this
+post-push paragraph is also pushed before handoff completion, so another
+computer can fetch the full correction/review and handoff. No pull request
+has been opened and neither Claude's branch nor this review branch has been
+merged into `main`; PR creation/merge remains an owner decision.
 
 ### Shared-worktree caution
 

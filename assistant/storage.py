@@ -3394,6 +3394,68 @@ class AssistantStore:
             },
         )
 
+    def activate_reconciliation_halt(
+        self,
+        *,
+        proposal_id: str,
+        reason: str,
+        seen_at: str | None = None,
+        details: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Atomically persist a reconciliation kill switch and critical alert.
+
+        A broker identity anomaly is not merely a local exception: operators
+        and the later GR-5 delivery channel need a durable critical alert.
+        Writing the alert and halt in one transaction prevents either record
+        from claiming the other safety action occurred when it did not.
+        """
+        now = seen_at or datetime.now(timezone.utc).isoformat()
+        fingerprint = f"broker_reconciliation:{proposal_id}"
+        alert_details = {"proposal_id": proposal_id, **(details or {})}
+        kill_switch = {
+            "active": True,
+            "reason": reason,
+            "changed_at": now,
+        }
+        with self._connect() as connection:
+            connection.execute(
+                "INSERT INTO system_state(state_key, value_json, updated_at) "
+                "VALUES (?, ?, ?) ON CONFLICT(state_key) DO UPDATE SET "
+                "value_json = excluded.value_json, updated_at = excluded.updated_at",
+                ("kill_switch", json.dumps(kill_switch, sort_keys=True), now),
+            )
+            connection.execute(
+                """
+                INSERT INTO operational_alerts(
+                    fingerprint, severity, category, message, details_json,
+                    status, occurrences, first_seen_at, last_seen_at,
+                    acknowledged_at
+                ) VALUES (?, 'critical', 'broker_reconciliation', ?, ?,
+                          'open', 1, ?, ?, NULL)
+                ON CONFLICT(fingerprint) DO UPDATE SET
+                    severity = excluded.severity,
+                    category = excluded.category,
+                    message = excluded.message,
+                    details_json = excluded.details_json,
+                    status = 'open',
+                    occurrences = operational_alerts.occurrences + 1,
+                    last_seen_at = excluded.last_seen_at,
+                    acknowledged_at = NULL
+                """,
+                (
+                    fingerprint,
+                    reason,
+                    json.dumps(alert_details, sort_keys=True, default=str),
+                    now,
+                    now,
+                ),
+            )
+            row = connection.execute(
+                "SELECT * FROM operational_alerts WHERE fingerprint = ?",
+                (fingerprint,),
+            ).fetchone()
+        return self._operational_alert_row(row)
+
     def get_kill_switch(self) -> dict[str, Any]:
         value = self.get_system_state("kill_switch", default={"active": False, "reason": ""})
         return value if isinstance(value, dict) else {"active": bool(value), "reason": ""}

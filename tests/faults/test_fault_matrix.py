@@ -33,6 +33,7 @@ from assistant.execution_service import (
     recover_stale_claim,
     recover_stale_reconciliation,
 )
+from assistant.order_reconciler import reconcile_nonterminal_orders
 from assistant.storage import AssistantStore, configured_db_path
 from fault_harness import (
     NOW_ET,
@@ -188,6 +189,26 @@ def test_f3_crash_mid_reconciliation_recovers_to_retryable(store):
     assert referential_integrity_holds(store)
 
 
+def test_f3_restart_recovers_submitting_order_without_resubmit(store):
+    store.save_proposal(make_proposal("p-f3c", side="sell", status="submitting"))
+    _reserve(store, "p-f3c")
+    broker = _sell_broker(
+        find_order_by_client_id=accepted_order("paper-f3c", side="sell")
+    )
+
+    with scripted_broker(broker):
+        result = reconcile_nonterminal_orders(store, now=NOW_ET)
+
+    assert result["updated"] == 1
+    assert broker.count("submit_market_order") == 0
+    assert broker.count("find_order_by_client_id") == 1
+    state = observable_state(store, "p-f3c")
+    assert state["proposal_status"] == "broker_accepted"
+    assert [order["order_id"] for order in state["broker_orders"]] == ["paper-f3c"]
+    assert len(state["reservations"]) == 1
+    assert referential_integrity_holds(store)
+
+
 # --------------------------------------------------------------------------
 # F4 — broker reports an order the ledger does not expect (same-key
 #      mismatch): critical halt, further submissions refused
@@ -209,6 +230,11 @@ def test_f4_unexpected_order_halts_platform_and_blocks_new_submissions(store, po
 
     assert "MISMATCHED" in str(caught.value)
     assert store.get_kill_switch()["active"] is True
+    alerts = store.list_operational_alerts()
+    assert len(alerts) == 1
+    assert alerts[0]["severity"] == "critical"
+    assert alerts[0]["category"] == "broker_reconciliation"
+    assert alerts[0]["details"]["proposal_id"] == "p-f4"
     state = observable_state(store, "p-f4")
     assert state["proposal_status"] == "submission_unknown"  # never auto-resolved
     assert len(state["reservations"]) == 1
@@ -253,7 +279,10 @@ def test_f5_halted_ticker_refused_but_other_risk_reducing_sell_proceeds(store, p
     assert broker.count("submit_market_order") == 0
     # A per-ticker halt is not a platform halt.
     assert store.get_kill_switch()["active"] is False
-    assert observable_state(store, "p-f5-halt")["proposal_status"] == "blocked"
+    halted_state = observable_state(store, "p-f5-halt")
+    assert halted_state["proposal_status"] == "blocked"
+    assert halted_state["reservations"] == []
+    assert halted_state["broker_orders"] == []
 
     # The OTHER holding's risk-reducing sell still executes.
     store.save_proposal(make_proposal("p-f5-sell", side="sell", ticker="AAPL"))
@@ -312,7 +341,11 @@ def test_f7_stale_quote_is_refused(store, policy):
             )
 
     assert broker.count("submit_market_order") == 0
-    assert observable_state(store, "p-f7a")["proposal_status"] == "blocked"
+    state = observable_state(store, "p-f7a")
+    assert state["proposal_status"] == "blocked"
+    assert state["reservations"] == []
+    assert state["broker_orders"] == []
+    assert referential_integrity_holds(store)
 
 
 def test_f7_future_quote_timestamp_clock_skew_is_refused(store, policy):
@@ -330,6 +363,7 @@ def test_f7_future_quote_timestamp_clock_skew_is_refused(store, policy):
     assert broker.count("submit_market_order") == 0
     state = observable_state(store, "p-f7b")
     assert state["proposal_status"] == "blocked"
+    assert state["reservations"] == []
     assert state["broker_orders"] == []
     assert referential_integrity_holds(store)
 

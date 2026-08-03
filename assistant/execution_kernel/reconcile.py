@@ -131,7 +131,12 @@ def run_submission_reconciliation(
                     reconciled_at=reconciled_at,
                     error=reason,
                 )
-                store.set_kill_switch(True, reason=reason)
+                store.activate_reconciliation_halt(
+                    proposal_id=proposal_id,
+                    reason=reason,
+                    seen_at=reconciled_at,
+                    details={"mismatch": mismatch_detail, "path": "manual_lookup"},
+                )
                 raise deps.proposal_execution_error(
                     f"Reconciliation for {proposal_id} found a MISMATCHED order ({mismatch_detail}) -- left "
                     "as 'submission_unknown' for manual investigation, not auto-resolved."
@@ -159,7 +164,12 @@ def run_submission_reconciliation(
                     error=reason,
                 )
                 if is_mismatch:
-                    store.set_kill_switch(True, reason=reason)
+                    store.activate_reconciliation_halt(
+                        proposal_id=proposal_id,
+                        reason=reason,
+                        seen_at=reconciled_at,
+                        details={"path": "manual_replacement_chain"},
+                    )
                 raise deps.proposal_execution_error(reason)
 
             deps.journal_broker_order_update(

@@ -38,6 +38,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -70,6 +71,7 @@ FAULT_MATRIX: tuple[tuple[str, str, tuple[str, ...]], ...] = (
         (
             "test_f3_pre_broker_crash_recovers_claim_and_frees_the_slot",
             "test_f3_crash_mid_reconciliation_recovers_to_retryable",
+            "test_f3_restart_recovers_submitting_order_without_resubmit",
         ),
     ),
     (
@@ -158,10 +160,34 @@ def _run_fault_matrix() -> dict:
     for case in tree.iter("testcase"):
         name = case.attrib.get("name", "")
         failure_nodes = list(case.iter("failure")) + list(case.iter("error"))
+        skipped_nodes = list(case.iter("skipped"))
+        nonpassing_nodes = failure_nodes + skipped_nodes
+        if skipped_nodes:
+            message = skipped_nodes[0].attrib.get("message", "")
+            detail = f"skipped: {message}" if message else "skipped"
+        elif failure_nodes:
+            detail = failure_nodes[0].attrib.get("message", "")[:500]
+        else:
+            detail = ""
         outcomes[name] = {
-            "passed": not failure_nodes,
-            "detail": (failure_nodes[0].attrib.get("message", "")[:500] if failure_nodes else ""),
+            "passed": not nonpassing_nodes,
+            "detail": detail,
         }
+    # Exit 1 is the ordinary "one or more tests failed" result and those
+    # failures are useful drill evidence when JUnit captured them. Every
+    # other non-zero code is a harness failure; exit 1 with no non-passing
+    # case is also a session/teardown failure that the per-test inventory
+    # cannot honestly explain.
+    captured_failure = any(not result["passed"] for result in outcomes.values())
+    if completed.returncode not in (0, 1) or (
+        completed.returncode == 1 and not captured_failure
+    ):
+        raise RuntimeError(
+            f"fault-matrix pytest exited with exit code {completed.returncode} "
+            "without a complete per-test explanation; stdout/stderr tail:\n"
+            + completed.stdout[-1000:]
+            + completed.stderr[-1000:]
+        )
     return outcomes
 
 
@@ -222,6 +248,16 @@ def record_drills(report: dict, database: Path, operator: str, artifact: str) ->
 
     store = AssistantStore(database)
     epoch = store.get_active_paper_evidence_epoch()
+    if epoch is not None:
+        report_commit = str(report.get("code_commit") or "")
+        epoch_commit = str(epoch.get("lineage", {}).get("code_commit") or "")
+        if report_commit == "unknown" or report_commit != epoch_commit:
+            raise RuntimeError(
+                "Refusing to record GR-3 drills into the active evidence epoch: "
+                f"the drill runtime commit is {report_commit or 'missing'}, but "
+                f"the epoch is bound to {epoch_commit or 'missing'}. Run the "
+                "drill from the epoch's exact clean commit."
+            )
     fault_by_id = {f["fault_id"]: f for f in report["faults"]}
     recorded = []
     for drill_type, fault_ids in sorted(DRILL_TYPE_FAULTS.items()):
@@ -249,6 +285,34 @@ def record_drills(report: dict, database: Path, operator: str, artifact: str) ->
             )
         recorded.append({"drill_type": drill_type, "passed": passed, "drill_id": row.get("drill_id")})
     return recorded
+
+
+def _write_report_atomically(output: Path, report: dict) -> None:
+    """Create one complete report without exposing a partial JSON artifact."""
+    output.parent.mkdir(parents=True, exist_ok=True)
+    if output.exists():
+        raise FileExistsError(output)
+    data = (json.dumps(report, indent=2, sort_keys=True) + "\n").encode("utf-8")
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=output.parent,
+        prefix=f".{output.name}.",
+        suffix=".tmp",
+    )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(data)
+            handle.flush()
+            os.fsync(handle.fileno())
+        # A same-filesystem hard link publishes the already-complete inode and
+        # fails atomically if another process won the destination name. Unlike
+        # os.replace(), it cannot overwrite an immutable report in the race
+        # between an existence check and publication.
+        os.link(temporary, output)
+        temporary.unlink()
+    except BaseException:
+        temporary.unlink(missing_ok=True)
+        raise
 
 
 def main() -> None:
@@ -281,12 +345,12 @@ def main() -> None:
     if output is None:
         stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
         output = _REPOSITORY_ROOT / "artifacts" / f"fault-drill-{stamp}.json"
-    output.parent.mkdir(parents=True, exist_ok=True)
-    if output.exists():
+    try:
+        _write_report_atomically(output, report)
+    except FileExistsError:
         raise SystemExit(
             f"Refusing to overwrite an existing drill report: {output}"
         )
-    output.write_text(json.dumps(report, indent=2, sort_keys=True), encoding="utf-8")
     report["artifact"] = str(output)
 
     if args.record_database is not None:

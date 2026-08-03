@@ -37,15 +37,25 @@ explicit request that clearly defines the allowed action and scope.
 
 ## 2. Instruction and document hierarchy
 
+`docs/ACTION_PLAN_2026-08-02.md` is the owner-adopted go-to plan
+(2026-08-02): it alone decides which milestone happens next across every
+workstream. The individual implementation plans are archived in
+`docs/reference/` and remain authoritative for their own milestone
+definitions, safety gates, and definitions of done — consult the relevant
+one when the action plan schedules its milestone, but never resume a
+milestone merely because an archived plan's own sequencing text names it.
+
 Before changing code, read the relevant authoritative documents. At minimum,
 inspect:
 
 - `README.md` for setup and platform behavior;
-- the implementation plan named by the user;
+- `docs/ACTION_PLAN_2026-08-02.md` for what is done, what is next, and why;
+- the implementation plan named by the user (or the archived plan in
+  `docs/reference/` covering the scheduled milestone);
 - `docs/ML_IMPLEMENTATION_STATUS.md` for current ML state when working under
   `ml/` or on ML scripts;
-- `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md` for general live-readiness
-  work; and
+- `docs/reference/GENERAL_READINESS_IMPLEMENTATION_PLAN.md` for general
+  live-readiness milestone definitions; and
 - the closest tests and contracts for the code being changed.
 
 Use this priority order when instructions differ:

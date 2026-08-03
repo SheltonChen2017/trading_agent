@@ -1,8 +1,23 @@
-# ACTION_PLAN (Claude) — consolidated done / remaining ledger
+# ACTION PLAN — the go-to consolidated done / remaining ledger
 
-Prepared: 2026-08-02, by Claude, at `origin/main` = `ff8c16e` (post PR #112).
-Companion: `ACTION_PLAN_codex.md` (Codex's independent version). The two are
-to be cross-reviewed and merged into one final plan.
+Status: **owner-adopted go-to plan** (2026-08-02). After independent audits
+by Claude and Codex converged on the same facts, the owner selected this
+plan as the single sequencing authority for all workstreams. Codex's
+independent draft is preserved at `docs/reference/ACTION_PLAN_codex.md`;
+its doc-inventory table and staleness corrections are incorporated by
+reference. The individual implementation plans are archived in
+`docs/reference/` and remain authoritative for their own milestone
+*definitions* — this document decides only *what happens next*.
+
+Owner priority change (2026-08-02): **UI feature controls moved to the
+front of the queue** — the owner begins daily paper trading to gather real
+transaction data, and the Settings/policy/AI controls directly support
+that. Both audits agree this reordering is safe: the UI consumes only the
+characterization-pinned execution facade, so it neither blocks nor is
+blocked by the remaining GR-1 kernel work.
+
+Prepared: 2026-08-02, by Claude, at `origin/main` = `ff8c16e` (post PR #112);
+adopted and reprioritized at `ded68b0` (post PR #113/#114).
 
 Method: four parallel verified surveys over every implementation plan and
 design document under `docs/`, each claim checked against the actual code
@@ -158,36 +173,53 @@ model 2 starts the 3-month clock **now** and time is the scarcest input.
 
 ---
 
-## 8. Proposed sequencing (Claude's recommendation, for negotiation with Codex)
+## 8. Adopted sequencing (owner-approved 2026-08-02)
 
-**Phase 0 — hygiene (days):**
+**Phase 1 — UI feature controls (ACTIVE — owner priority, supports daily
+paper trading starting 2026-08-03):**
+One reviewed milestone implementing `docs/reference/UI_FEATURE_CONTROLS_DESIGN.md`:
+the Settings & Features tab (three control classes), AI master + per-feature
+preferences gating all four LLM surfaces, read-only data-source and safety
+status panels (reading from the enforcing functions, never re-implementing
+checks), the protected policy-update workflow for `allow_new_positions` /
+`enable_strategy_proposals` (validation → explicit typed confirmation →
+atomic write → version bump → new fingerprint → prior-proposal invalidation
+warning), and the dedicated Ticker Suggestions surface. The design's four
+open decisions are resolved (§9 item 11). Independent review before merge,
+as always.
+
+**Phase 2 — hygiene (days):**
 AP-1, AP-2, AP-4 doc reconciliation; add GR-1D/1E to the GR status doc.
 
-**Phase 1 — finish the kernel (1–2 milestone cycles):**
+**Phase 3 — finish the kernel (1–2 milestone cycles):**
 GR-1D (reconciliation extraction, characterize-first) → GR-1E assessment →
 declare GR-1 done honestly against its DoD.
 
-**Phase 2 — the two milestones that unblock operations:**
+**Phase 4 — the two milestones that unblock operations:**
 GR-5 alert delivery (owner picks the channel — decision needed) and GR-3
 fault drills (produces the 4 missing drill types). These two convert the
 promotion checklist's drill/alert gates from structurally-impossible to
 executable. GR-2 (risk registry) rides along here as pure code consolidation.
 
-**Phase 3 — operational deployment + epoch start (owner-heavy):**
+**Phase 5 — operational deployment + epoch start (owner-heavy):**
 elevated window → dedicated task account → install + verify 8 scheduled
 tasks → ledger bootstrap/reconcile → **approve the mandate** → start the
 first paper evidence epoch on a frozen commit → run all 5 drills inside it →
 let the 60-session clock run. From here on, the machine collects evidence
 while development continues un-deployed (model 2 discipline) or pauses
-runtime changes (model 1).
+runtime changes (model 1). Note: the owner's informal paper trading (from
+2026-08-03) already accumulates real order/telemetry/ledger data before any
+formal epoch; that data informs execution realism but does not count toward
+the mandate's 60-session minimum, which requires one immutable epoch.
 
-**Phase 4 — parallel product work during the evidence window (pick by owner
+**Phase 6 — parallel product work during the evidence window (pick by owner
 preference, all non-runtime):**
-UI feature controls M1 (near-zero risk, high daily usability) → committee
-replay corpus + CLI surface → GR-4 data honesty → GR-7 product completeness →
-proposal-history cleanup → UI M2 policy workflow → allocation service.
+committee replay corpus + CLI surface → GR-4 data honesty → GR-7 product
+completeness (fold in the allocation-service design here, per Codex's
+recommendation, so the app keeps one authoritative sizing path) →
+proposal-history cleanup.
 
-**Phase 5 — data purchases, whenever decided (independent of code):**
+**Phase 7 — data purchases, whenever decided (independent of code):**
 membership vendor decision → Databento statistics/reference captures →
 universe/cutoffs artifacts → real authoritative build → real ML discovery/
 confirmation under the review-gated campaign.
@@ -201,7 +233,7 @@ explicit authorization).
 
 ## 9. Owner decisions required (consolidated, deduplicated)
 
-1. GR-1D go-ahead (next code milestone) — and epoch model 1 vs 2 (§7).
+1. GR-1D go-ahead (Phase 3, after UI controls) — and epoch model 1 vs 2 (§7).
 2. Approve the mandate (or first revise its DRAFT §2 targets) — the only
    promotion gate satisfiable today.
 3. GR-5 alert delivery channel (email / webhook / push / other).
@@ -215,9 +247,17 @@ explicit authorization).
 8. Who writes/reviews the vintage-correct adjustment builder; who signs the
    `SpecReviewAttestation` for the volatility discovery spec.
 9. Handling of the 118 mixed-provenance equity snapshots (AP-3).
-10. Whether UI feature controls M1 jumps ahead of Phase 2 (it safely can).
-11. Session vs durable persistence for UI preferences; policy-edit mechanism
-    for M2 (deferred decision, not urgent).
+10. ~~Whether UI feature controls jump ahead~~ — **RESOLVED 2026-08-02: yes,
+    UI controls are Phase 1** (owner priority change to support daily paper
+    trading from 2026-08-03).
+11. ~~UI design's four open decisions~~ — **RESOLVED 2026-08-02** with the
+    defaults both audits recommended: (a) session-state preferences first,
+    durable persistence only if re-toggling proves annoying; (b) policy
+    edits write the sidebar-selected policy file through the full protected
+    workflow (no new policy-record store yet); (c) existing Briefing/
+    Watchlist suggestion surfaces remain alongside the dedicated tab;
+    (d) the master AI preference is a hard gate ANDed with per-feature
+    toggles.
 12. Whether to retrieve strategy-tool commit `a656015` from the old computer
     (verified unrecoverable from this clone) or declare it lost.
 13. Whether AI debate is worth building at all (its own doc doubts it).
@@ -229,10 +269,12 @@ explicit authorization).
 ## 10. What this plan deliberately does not do
 
 It does not restate every sub-check of every milestone (the per-milestone
-plans remain authoritative for their internals); it does not adjudicate
-GR-1's "thin composition layer" DoD (that is GR-1E's question); it does not
-propose starting any authorization-gated work; and it does not treat any
-synthetic/fixture result as market evidence anywhere. The final merged plan
-(after cross-review with `ACTION_PLAN_codex.md`) should replace the need to
+plans, archived in `docs/reference/`, remain authoritative for their
+internals); it does not adjudicate GR-1's "thin composition layer" DoD
+(that is GR-1E's question); it does not propose starting any
+authorization-gated work; and it does not treat any synthetic/fixture
+result as market evidence anywhere. This adopted plan replaces the need to
 juggle individual plan docs for day-to-day sequencing, while leaving those
-docs as the detailed specs they are.
+docs as the detailed specs they are. Keep it current: when a phase
+completes or the owner reorders priorities, update THIS file (and
+`docs/SESSION_HANDOFF.md`) rather than resurrecting per-plan sequencing.

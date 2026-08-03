@@ -21,6 +21,8 @@ adopted and reprioritized at `ded68b0` (post PR #113/#114); UI Phase 1
 implemented and merged as PR #116 at `4c8e959`, independently accepted
 after corrections (`a6d5254`), confirmed by Claude's third round, and the
 whole review chain merged as PR #117 at `661a7d4` (2026-08-03).
+Phase 2 hygiene was implemented at `34ce463` and independently accepted
+after correction on `codex/review-phase2-hygiene-20260803`.
 
 Method: four parallel verified surveys over every implementation plan and
 design document under `docs/`, each claim checked against the actual code
@@ -160,10 +162,10 @@ third-round confirmation) merged as PR #117 at `661a7d4`.
 
 | ID | Priority | Finding | Fix |
 |---|---|---|---|
-| AP-1 | P2 | **Operator DB schema is stale**: `execution_telemetry_events` and `portfolio_capture_sessions` are declared in `assistant/storage.py` but absent from `data/trading_assistant.db` (24 tables present). Telemetry/capture chains cannot run until current code opens the DB. | open the DB once with current code before any epoch; verify with `PRAGMA table_info` — **implemented 2026-08-03 (Phase 2 branch): `verify-db-schema` CLI + `verify_database_schema()` with migration tests. Operator DB was backed up pre-change, then verification found the schema ALREADY current (both tables present with full declared columns; the owner's normal use had opened the DB with current code since the audit snapshot) — read-only verify reports an exact match** |
-| AP-2 | P2 | **`.gitignore` gap**: ML runtime writes `artifacts/shadow.json`, `artifacts/model/`, `artifacts/{datasets,experiments,reviews}/` — none ignored. First scheduled run dirties the worktree, and evidence capture **refuses a dirty worktree** → silent cadence failure. | extend `.gitignore` before any task install — **implemented 2026-08-03 (Phase 2 branch): `artifacts/` ignored wholesale, regression-tested via `git check-ignore`** |
+| AP-1 | P2 | **Operator DB schema is stale**: `execution_telemetry_events` and `portfolio_capture_sessions` are declared in `assistant/storage.py` but absent from `data/trading_assistant.db` (24 tables present). Telemetry/capture chains cannot run until current code opens the DB. | **Resolved and reviewed 2026-08-03:** `verify-db-schema` and `verify_database_schema()` provide a read-only compatibility check plus explicit `--apply`. The measured operator DB was already current for an unknown historical reason: all required tables/columns were present and every named index/trigger definition matched current code. A pre-change SQLite backup was verified. Table column types and constraints are not compared byte-for-byte. |
+| AP-2 | P2 | **`.gitignore` gap**: ML runtime writes `artifacts/shadow.json`, `artifacts/model/`, `artifacts/{datasets,experiments,reviews}/` — none ignored. First scheduled run dirties the worktree, and evidence capture **refuses a dirty worktree** → silent cadence failure. | **Resolved and reviewed 2026-08-03:** `artifacts/` is ignored wholesale and enforced through `git check-ignore` regression coverage. |
 | AP-3 | P3 | 118 `portfolio_equity_snapshots` rows are mixed briefing/test-pollution provenance (pre-2026-08-02); any evidence report over them is unreliable | treat pre-2026-08-02 rows as non-evidence; decide retention at epoch start |
-| AP-4 | P3 | Doc staleness cluster: `validate.py` figure 479→490 (grew in `7f431b6`); characterization-suite docstring still says "2,040 lines"; STATUS "corrects" a 1,450 figure the plan never contained; GR-1D/1E exist only in SESSION_HANDOFF, absent from plan and status docs; ML status doc has 3 internally stale paragraphs (spec library "not built" vs delivered; "calibration emitted empty" vs wired; ML-FS §2 overstates ML-FS-6) | one doc-reconciliation commit — **implemented 2026-08-03 (Phase 2 branch), including the post-merge PR #117 state in this plan** |
+| AP-4 | P3 | Doc staleness cluster: `validate.py` figure 479→490 (grew in `7f431b6`); characterization-suite docstring still says "2,040 lines"; STATUS "corrects" a 1,450 figure the plan never contained; GR-1D/1E exist only in SESSION_HANDOFF, absent from plan and status docs; ML status doc has 3 internally stale paragraphs (spec library "not built" vs delivered; "calibration emitted empty" vs wired; ML-FS §2 overstates ML-FS-6) | **Resolved and reviewed 2026-08-03:** reconciled all listed statements, added GR-1D/1E status, and recorded post-PR-#117 state. |
 | AP-5 | P3 | 4 of 5 `REQUIRED_PROMOTION_DRILLS` have no producer (only `backup_restore` does) — structurally unproducible until GR-3/GR-5 | note in GR-3/GR-5 scope; do not fake |
 
 ---
@@ -208,11 +210,15 @@ environment-sensitive runtime-identity test the confirmation run exposed.
 The review chain from `user/claude/ui-review-confirmation-20260803` merged
 as PR #117. No live authority or formal evidence epoch was enabled.
 
-**Phase 2 — hygiene (ACTIVE — implemented 2026-08-03 on branch
-`user/claude/phase2-hygiene-20260803`, awaiting independent review):**
-AP-1, AP-2, AP-4 doc reconciliation; add GR-1D/1E to the GR status doc.
+**Phase 2 — hygiene (COMPLETE AFTER INDEPENDENT CORRECTION, 2026-08-03):**
+AP-1 schema apply/verify, AP-2 runtime-artifact ignores, and AP-4 document
+reconciliation were implemented at `34ce463`. Independent review corrected
+one P2 fail-open verifier gap: same-named weakened indexes/triggers must not
+pass. The durable disposition and issue ledger are in
+`docs/REVIEW_2026-08-03_PHASE2_HYGIENE.md`.
 
-**Phase 3 — finish the kernel (1–2 milestone cycles):**
+**Phase 3 — finish the kernel (NEXT, owner go-ahead required; 1–2 milestone
+cycles):**
 GR-1D (reconciliation extraction, characterize-first) → GR-1E assessment →
 declare GR-1 done honestly against its DoD.
 
@@ -279,11 +285,14 @@ explicit authorization).
     Watchlist suggestion surfaces remain alongside the dedicated tab;
     (d) the master AI preference is a hard gate ANDed with per-feature
     toggles.
-12. Whether to retrieve strategy-tool commit `a656015` from the old computer
-    (verified unrecoverable from this clone) or declare it lost.
+12. ~~Whether strategy-tool commit `a656015` can be retrieved~~ — **RESOLVED
+    2026-08-03:** the commit and local branch
+    `codex/ai-strategy-tool-doc-v2-20260802` are present in this checkout but
+    remain local-only and must be pushed or transferred before changing
+    computers if the owner wants to preserve them.
 13. Whether AI debate is worth building at all (its own doc doubts it).
-14. `.gitignore` extension for ML artifact paths (AP-2) — trivially yes,
-    listed for completeness.
+14. ~~`.gitignore` extension for ML artifact paths (AP-2)~~ — **RESOLVED
+    2026-08-03:** `artifacts/` is ignored wholesale and regression-tested.
 
 ---
 

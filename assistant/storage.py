@@ -4482,11 +4482,13 @@ class AssistantStore:
 class SchemaVerificationResult:
     """Outcome of comparing a database against the currently declared schema.
 
-    ``matches`` is True only when every declared table, column, index, and
-    trigger exists in the target database. ``extra_tables`` is informational
-    only: legacy or operator-local tables never fail verification, because
-    the contract is "current code's schema is present", not "nothing else
-    is".
+    ``matches`` is True only when every declared table and column exists and
+    every declared index and trigger exists with the definition produced by
+    current code. Index and trigger definitions are enforcement mechanisms,
+    not labels: a same-named non-unique index or no-op trigger must fail the
+    check. ``extra_tables`` is informational only: legacy or operator-local
+    tables never fail verification, because the contract is "current code's
+    compatible schema is present", not "nothing else is".
     """
 
     matches: bool
@@ -4494,6 +4496,8 @@ class SchemaVerificationResult:
     missing_columns: tuple[str, ...]
     missing_indexes: tuple[str, ...]
     missing_triggers: tuple[str, ...]
+    mismatched_indexes: tuple[str, ...]
+    mismatched_triggers: tuple[str, ...]
     extra_tables: tuple[str, ...]
 
     def to_dict(self) -> dict[str, Any]:
@@ -4503,18 +4507,27 @@ class SchemaVerificationResult:
             "missing_columns": list(self.missing_columns),
             "missing_indexes": list(self.missing_indexes),
             "missing_triggers": list(self.missing_triggers),
+            "mismatched_indexes": list(self.mismatched_indexes),
+            "mismatched_triggers": list(self.mismatched_triggers),
             "extra_tables": list(self.extra_tables),
         }
 
 
+def _normalize_schema_sql(sql: str) -> str:
+    """Ignore formatting-only whitespace in one declared schema object."""
+    return " ".join(sql.split())
+
+
 def _schema_objects(
     connection: sqlite3.Connection,
-) -> tuple[dict[str, set[str]], set[str], set[str]]:
-    """Read (tables with their column names, index names, trigger names).
+) -> tuple[dict[str, set[str]], dict[str, str], dict[str, str]]:
+    """Read tables/columns and enforcement-object definitions.
 
     SQLite-internal objects (``sqlite_*`` tables, ``sqlite_autoindex*``
-    implicit indexes) are excluded: they are storage details, not part of
-    the declared schema.
+    implicit indexes) are excluded: they are storage details rather than
+    independently declared schema objects. Named index and trigger SQL is
+    retained so verification cannot be fooled by a weaker object reusing the
+    expected name.
     """
     tables: dict[str, set[str]] = {}
     for row in connection.execute(
@@ -4527,16 +4540,16 @@ def _schema_objects(
             for column in connection.execute(f'PRAGMA table_info("{name}")')
         }
     indexes = {
-        row["name"]
+        row["name"]: _normalize_schema_sql(row["sql"])
         for row in connection.execute(
-            "SELECT name FROM sqlite_master "
+            "SELECT name, sql FROM sqlite_master "
             "WHERE type = 'index' AND name NOT LIKE 'sqlite_autoindex%'"
         ).fetchall()
     }
     triggers = {
-        row["name"]
+        row["name"]: _normalize_schema_sql(row["sql"])
         for row in connection.execute(
-            "SELECT name FROM sqlite_master WHERE type = 'trigger'"
+            "SELECT name, sql FROM sqlite_master WHERE type = 'trigger'"
         ).fetchall()
     }
     return tables, indexes, triggers
@@ -4587,16 +4600,33 @@ def verify_database_schema(path: str | Path) -> SchemaVerificationResult:
         if table in actual_tables
         for column in expected_columns - actual_tables[table]
     )
-    missing_indexes = sorted(expected_indexes - actual_indexes)
-    missing_triggers = sorted(expected_triggers - actual_triggers)
+    missing_indexes = sorted(set(expected_indexes) - set(actual_indexes))
+    missing_triggers = sorted(set(expected_triggers) - set(actual_triggers))
+    mismatched_indexes = sorted(
+        name
+        for name in set(expected_indexes) & set(actual_indexes)
+        if expected_indexes[name] != actual_indexes[name]
+    )
+    mismatched_triggers = sorted(
+        name
+        for name in set(expected_triggers) & set(actual_triggers)
+        if expected_triggers[name] != actual_triggers[name]
+    )
     extra_tables = sorted(set(actual_tables) - set(expected_tables))
     return SchemaVerificationResult(
         matches=not (
-            missing_tables or missing_columns or missing_indexes or missing_triggers
+            missing_tables
+            or missing_columns
+            or missing_indexes
+            or missing_triggers
+            or mismatched_indexes
+            or mismatched_triggers
         ),
         missing_tables=tuple(missing_tables),
         missing_columns=tuple(missing_columns),
         missing_indexes=tuple(missing_indexes),
         missing_triggers=tuple(missing_triggers),
+        mismatched_indexes=tuple(mismatched_indexes),
+        mismatched_triggers=tuple(mismatched_triggers),
         extra_tables=tuple(extra_tables),
     )

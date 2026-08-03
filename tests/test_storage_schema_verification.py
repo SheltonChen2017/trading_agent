@@ -147,6 +147,8 @@ def test_fresh_database_matches_declared_schema(tmp_path):
     assert result.missing_columns == ()
     assert result.missing_indexes == ()
     assert result.missing_triggers == ()
+    assert result.mismatched_indexes == ()
+    assert result.mismatched_triggers == ()
 
 
 def test_fresh_database_contains_both_ap1_tables_with_expected_columns(tmp_path):
@@ -222,6 +224,42 @@ def test_dropping_a_declared_table_is_detected_by_name(tmp_path):
     result = verify_database_schema(db_path)
     assert result.matches is False
     assert "portfolio_capture_sessions" in result.missing_tables
+
+
+def test_same_named_weakened_index_and_trigger_are_detected(tmp_path):
+    """Names alone must not let corrupted enforcement objects pass.
+
+    The active-epoch index is intentionally UNIQUE and the broker-order
+    trigger enforces proposal ownership for databases whose historical table
+    shape cannot gain a foreign key in place.  Replacing either object with a
+    weaker definition under the expected name must fail verification.
+    """
+    db_path = tmp_path / "weakened.db"
+    AssistantStore(db_path)
+    connection = sqlite3.connect(db_path)
+    try:
+        connection.executescript(
+            """
+            DROP INDEX idx_one_active_paper_epoch;
+            CREATE INDEX idx_one_active_paper_epoch
+                ON paper_evidence_epochs(status);
+            DROP TRIGGER fk_broker_orders_proposal_insert;
+            CREATE TRIGGER fk_broker_orders_proposal_insert
+                BEFORE INSERT ON broker_orders
+                BEGIN
+                    SELECT 1;
+                END;
+            """
+        )
+        connection.commit()
+    finally:
+        connection.close()
+
+    result = verify_database_schema(db_path)
+
+    assert result.matches is False
+    assert "idx_one_active_paper_epoch" in result.mismatched_indexes
+    assert "fk_broker_orders_proposal_insert" in result.mismatched_triggers
 
 
 def test_extra_operator_local_tables_never_fail_verification(tmp_path):

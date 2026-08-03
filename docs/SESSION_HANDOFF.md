@@ -1,15 +1,15 @@
 # Development session handoff
 
-Prepared: 2026-08-03T00:17:43-07:00
+Prepared: 2026-08-03T10:45:00-07:00
 
 Audience: Codex, Claude Code, and the repository owner after moving to another
 computer.
 
-Purpose: record the exact merged and independently reviewed UI feature-control
-tree, consolidated-plan state, safety posture, Git topology, validation,
-local-data observations, and next step. This file contains no secret values,
-brokerage account numbers, or licensed market data. Every machine-local and
-time-sensitive statement must be verified after a move.
+Purpose: record the post-merge UI state (PR #117), the implemented Phase 2
+hygiene milestone awaiting independent review, safety posture, Git topology,
+validation, local-data observations, and next step. This file contains no
+secret values, brokerage account numbers, or licensed market data. Every
+machine-local and time-sensitive statement must be verified after a move.
 
 ## 1. Read this first
 
@@ -28,14 +28,13 @@ ignored-data state, credential presence, paper-account identity, and
 scheduler state. Preserve uncommitted work. Do not infer live trading,
 model promotion, or autonomous execution authority. Report any drift from
 the handoff before continuing. GR-1C is implemented and independently
-reviewed; do not redo it. UI feature controls were merged as PR #116,
-independently accepted after two P2 corrections (a6d5254), and confirmed by
-Claude's third round (red/green re-verification, 3/3 mutation sweep, one
-hardened environment-sensitive test) on pushed branch
-user/claude/ui-review-confirmation-20260803, which carries the whole review
-chain. Do not redo or bypass that review. The immediate next action is the
-owner merging that branch; after that, action-plan Phase 2 hygiene is next.
-GR-1D remains Phase 3 and must not start early.
+reviewed; do not redo it. UI feature controls (Phase 1) are fully merged:
+implementation PR #116, review chain PR #117 at 661a7d4. Do not redo or
+bypass that review. Action-plan Phase 2 hygiene (AP-1, AP-2, AP-4) is
+IMPLEMENTED at commit 34ce463 on LOCAL-ONLY branch
+user/claude/phase2-hygiene-20260803 and awaits independent review; do not
+reimplement it and do not push or merge it without owner approval. GR-1D
+remains Phase 3 and must not start early.
 ```
 
 Initial commands:
@@ -73,11 +72,21 @@ Repository:
 https://github.com/SheltonChen2017/trading_agent.git
 ```
 
-State after the independent Codex UI-controls review:
+State after Phase 2 hygiene implementation (2026-08-03):
 
 ```text
 origin/main and local main:
-  4c8e959  Merge PR #116, Claude UI feature controls
+  661a7d4  Merge PR #117, the complete UI review chain (implementation was
+           merged earlier as PR #116 at 4c8e959)
+
+Phase 2 hygiene (ACTIVE), based on main 661a7d4:
+  branch: user/claude/phase2-hygiene-20260803 — LOCAL ONLY, NOT PUSHED;
+          another computer cannot fetch it until the owner authorizes a push
+  implementation: 34ce463  (AP-1 verify-db-schema CLI + verification helper
+          + migration tests; AP-2 artifacts/ ignore + check-ignore test;
+          AP-4 doc reconciliation incl. post-PR-#117 action-plan state)
+  status: awaiting independent review; do not merge or push without the
+          owner
 
 UI implementation, pushed and merged:
   branch: user/claude/ui-feature-controls-20260802
@@ -92,8 +101,8 @@ Codex independent UI review:
                correction; no P0/P1 and no open issue
 
 Claude third-round confirmation (2026-08-03), based on Codex tip 1bdbd4e:
-  branch: user/claude/ui-review-confirmation-20260803 — PUSHED, carrying the
-  Codex review commits as ancestors, so the whole chain is fetchable
+  branch: user/claude/ui-review-confirmation-20260803 — PUSHED AND MERGED
+  as PR #117 (661a7d4), carrying the Codex review commits as ancestors
   contents: independent re-verification of both P2 corrections (all three
   new tests red on pre-correction 4c8e959; 3/3 reverse-mutation sweep
   caught: ignored source flag, non-rebinding editor state, missing
@@ -171,21 +180,29 @@ different GR-1B follow-up and must not be mistaken for it. Retrieve the exact
 commit from the earlier computer or a private bundle if it is still wanted;
 do not recreate it from memory while an exact copy may exist elsewhere.
 
-### Required action before abandoning the old computer
+### Required action before abandoning this computer
 
-The full UI review chain (implementation merge `4c8e959`, Codex correction
-`a6d5254`, Codex handoff `1bdbd4e`, Claude confirmation commits) is pushed
-on `user/claude/ui-review-confirmation-20260803` and fetchable from any
-computer; only the merge decision remains. Do not begin Phase 2 from
-uncorrected `main` as though review were complete. The separate
-historical artifact `a656015` (strategy-tool document) remains unavailable
-from this clone and exists — if anywhere — only on the earlier computer.
+The full UI review chain is merged into `origin/main` at `661a7d4`. What is
+NOT on the remote: the Phase 2 hygiene branch
+`user/claude/phase2-hygiene-20260803` (implementation `34ce463` and the
+handoff commit containing this text) is LOCAL ONLY until the owner
+authorizes a push — another computer cannot fetch it. The pre-change
+operator-database backup
+`data/backups/trading_assistant-pre-phase2-schema-20260803T171810Z.db` is
+Git-ignored and machine-local. The separate historical artifact `a656015`
+(strategy-tool document) remains unavailable from this clone and exists —
+if anywhere — only on the earlier computer.
 
 ## 3. Relevant GR-1 commit history
 
 Recent sequence:
 
 ```text
+34ce463  Claude: Phase 2 hygiene implementation (LOCAL ONLY, awaiting review)
+661a7d4  Merge PR #117: the complete UI review chain into main
+8093fa2  Claude: confirm the UI-controls review; harden the
+         environment-sensitive identity test
+1bdbd4e  Codex: update handoff after reviewed UI controls
 a6d5254  Codex: independent UI review corrections/report (pushed via the
          Claude confirmation branch)
 4c8e959  Merge PR #116: Claude UI feature controls into main
@@ -468,50 +485,67 @@ Still on the facade:
 - stale reconciliation/claim recovery wrappers; and
 - several compatibility exports and top-level composition responsibilities.
 
-Active milestone status (2026-08-03): **UI feature controls are independently
-accepted after correction** — Phase 1 of `docs/ACTION_PLAN_2026-08-02.md`.
+Phase 1 (UI feature controls) is fully merged: implementation PR #116
+(`4c8e959`), review chain PR #117 (`661a7d4`), accepted after two P2
+corrections (`a6d5254`) and Claude's third-round confirmation. The complete
+record is in `docs/REVIEW_2026-08-03_UI_FEATURE_CONTROLS.md` and
+`docs/FEATURE_MILESTONE_RECORD.md`.
+
+Active milestone status (2026-08-03): **action-plan Phase 2 hygiene is
+IMPLEMENTED and awaiting independent review.**
 
 ```text
-implementation branch: user/claude/ui-feature-controls-20260802
-implementation commit: edc87e9
-implementation handoff: 47effd7
-implementation merge: 4c8e959 (PR #116; origin/main)
-review branch: codex/review-ui-feature-controls-20260803
-review correction/report: a6d5254 (pushed via the confirmation branch)
-disposition: accepted after correction
-scope: Settings & Features tab (three control classes), AI master +
-       per-feature preferences gating all four LLM surfaces (paid calls
-       prevented, not hidden), protected policy-update workflow for
-       allow_new_positions / enable_strategy_proposals (typed UPDATE
-       POLICY confirmation, validate-before-write, atomic save, version
-       bump, fingerprint change, prior-proposal invalidation warning),
-       read-only data-source and safety panels (sourced from enforcing
-       functions), dedicated research-only Ticker Suggestions tab, and
-       provider source toggles that prevent disabled calls.
-confirmed review findings:
-       UIREV-001 P2: durable policy changed but the same render showed old
-       authoritative status; editor state also leaked across policy paths.
-       Corrected with path+fingerprint binding and an immediate rerun.
-       UIREV-002 P2: disabled most-active/IPO controls still called their
-       providers and only hid output. Corrected with provider-call flags.
-       UIREV-003 P3: implementation handoff was necessarily stale after
-       review and repeated the GR-1D transition. Superseded here.
-validation: red tests reproduced both P2 findings; corrected focused suite
-       236 passed in 78.60s; full suite 2427 passed / 1 skipped /
-       26 warnings in 203.31s under Python 3.12.13; compileall and
-       git diff --check clean. The real Streamlit control was tested with
-       a temporary policy through off -> on -> off; file values, version,
-       fingerprint, checkbox, and status panel agreed after both changes.
-honest limits: no owner policy, operator database, broker order, funded
-       account, scheduler, or evidence epoch was modified by review.
-next: owner-authorized push/merge of the local review branch; then Phase 2
-       hygiene (AP-1, AP-2, AP-4). Informal paper trading remains distinct
-       from the later frozen evidence epoch.
+branch: user/claude/phase2-hygiene-20260803 (LOCAL ONLY, base 661a7d4)
+implementation commit: 34ce463
+scope:
+  AP-1 - assistant/storage.py gains verify_database_schema() (read-only,
+       fail-closed, expected schema built by the real AssistantStore
+       initialization path so it cannot drift) and a SchemaVerificationResult
+       contract; scripts/run_personal_assistant.py gains verify-db-schema,
+       which deliberately runs WITHOUT main()'s store construction (that
+       construction IS the migration) so the read-only default is truly
+       read-only; --apply opts into open-with-current-code then verify.
+  AP-2 - .gitignore now ignores artifacts/ wholesale (nothing under it was
+       ever tracked; runbook-documented runtime writes land there and
+       evidence capture refuses ANY untracked file).
+  AP-4 - doc reconciliation: phantom "~1,450" plan attribution fixed in
+       GENERAL_READINESS_STATUS; 479-vs-490 validate.py figure annotated;
+       GR-1A characterization docstring made historical ("was 2,040
+       lines"); stale "validation purity" wording corrected; GR-1D/GR-1E
+       sections added to the GR status doc; ML status doc contradictions
+       fixed (spec library delivered, calibration reports wired, ML-FS §2
+       no longer sweeps ML-FS-6 into "software-complete"); action plan
+       updated to the post-PR-#117 merged state and Phase-2-active state.
+tests: 13 new (12 schema verification/migration incl. fresh, pre-migration,
+       mutated, missing-database, and CLI-through-main() coverage; 1
+       git check-ignore regression test). Mutation/red evidence: the
+       needs_store dispatch and the missing-column comparison were each
+       broken and detected; the .gitignore rule was reverted and detected.
+operational AP-1 run (this machine): operator DB backed up FIRST via the
+       SQLite backup API from a read-only connection
+       (data/backups/trading_assistant-pre-phase2-schema-20260803T171810Z.db,
+       integrity ok, SHA-256 cc70b8d39fdd854075c81f17666d5ac8c1147344d4
+       6f8837ee2cb3fa41ccb6b5); read-only verify-db-schema then reported an
+       EXACT MATCH - both AP-1 tables already present with full declared
+       columns, because normal owner use had already opened the DB with
+       current code since the audit snapshot. --apply was therefore not
+       needed; no schema change was made to the operator DB this session.
+validation: full suite 2440 passed / 1 skipped / 25 warnings in 434.76s
+       under Python 3.13.14 (.venv, this machine); focused 80 passed
+       (schema verification, artifact ignores, CLI parser, execution
+       characterization, ML import boundary); compileall clean;
+       git diff --check clean.
+honest limits: verify-db-schema compares object presence (tables, columns,
+       indexes, triggers), not column types/constraints byte-for-byte;
+       the operator-DB drift noted in section 8 is recorded, not explained;
+       no execution-kernel file changed; no policy, broker, scheduler, or
+       epoch state was touched.
+next: independent Codex review of 34ce463, then owner merge decision;
+       Phase 3 (GR-1D) must not start before the owner's go-ahead.
 ```
 
-The milestone touches no execution-kernel file and the facade surface is
-unchanged. After Phase 2 hygiene, GR-1D follows as the next kernel milestone
-(action-plan Phase 3):
+After Phase 2 hygiene completes review, GR-1D follows as the next kernel
+milestone (action-plan Phase 3):
 
 ```text
 GR-1D: extract manual reconciliation orchestration behind an explicit,
@@ -646,6 +680,20 @@ Windows denied access to the pre-existing repository `.pytest_cache\v`
 directory. The recorded full run used `-p no:cacheprovider`; this disabled
 only pytest's result cache, not test collection, fixtures, or behavior.
 
+Phase 2 hygiene implementation (Claude, Python 3.13.14 in this machine's
+`.venv`, tree `34ce463`):
+
+```text
+focused: 80 passed (schema verification, artifact ignores, CLI parser,
+         execution characterization, ML import boundary)
+full: 2440 passed, 1 skipped, 25 warnings in 434.76s
+compileall: clean
+git diff --check: clean
+mutation/red evidence: needs_store dispatch broken -> detected; missing-
+  column comparison neutralized -> detected; .gitignore rule reverted ->
+  detected; all restored green
+```
+
 Additional gates:
 
 ```text
@@ -683,37 +731,45 @@ all writers and again after restoring on the new computer.
 
 ### Operator database
 
+Re-measured read-only on 2026-08-03 during the Phase 2 AP-1 run:
+
 ```text
 path: C:\git\customizedagent\trading_agent\data\trading_assistant.db
-size: 2,920,448 bytes
-last database-file write UTC: 2026-08-01T20:08:24Z
+size: 3,670,016 bytes
 WAL: present, 0 bytes
-SHM: present, 32,768 bytes
-SHA-256: 02D468223C5BBB14EF7F90BBF283D737772345F13E392846E29E0206EEEBD69F
 PRAGMA quick_check: ok
+schema: EXACT MATCH against current code (verify-db-schema, read-only);
+        25 declared tables all present, including execution_telemetry_events
+        (11 declared columns) and portfolio_capture_sessions (14 declared
+        columns)
+pre-change backup: data/backups/
+        trading_assistant-pre-phase2-schema-20260803T171810Z.db
+        (SQLite backup API from a read-only connection; integrity_check ok;
+        SHA-256 cc70b8d39fdd854075c81f17666d5ac8c1147344d46f8837ee2cb3fa41ccb6b5)
 ```
 
-Selected row counts:
+Selected row counts (2026-08-03):
 
 ```text
-decision_packets:               277
-trade_proposals:                 31
-portfolio_equity_snapshots:     118
-portfolio_position_snapshots:     0
-paper_account_observations:        0
-paper_evidence_epochs:             0
-ml_evidence_epochs:                0
+decision_packets:                209
+trade_proposals:                   7
+portfolio_equity_snapshots:       78
 broker_orders:                     0
-broker_order_events:               0
-execution_reservations:            0
-operational_alerts:                0
-operational_drill_runs:             0
+journal_transactions:              0
 ```
 
-This differs from the prior snapshot and should not be silently combined with
-it. No paper-evidence epoch has started here, and no broker lifecycle or
-reservation evidence exists in this database. The hash identifies the main
-database file at the instant measured; it is not a transfer-backup hash.
+DRIFT WARNING: the previous revision of this section (prepared
+2026-08-03T00:17) recorded size 2,920,448, 24 tables with both AP-1 tables
+ABSENT, and larger row counts (decision_packets 277, trade_proposals 31,
+portfolio_equity_snapshots 118). The database has since been opened by
+current code through normal owner use (which created the two tables and, by
+the documented decision-packet identity migration, collapses exact
+duplicate packets), but the trade-proposal and equity-snapshot decreases
+are NOT explained by any migration. The two measurements may also come from
+different machines' databases. Do not silently combine them; treat
+provenance as unresolved (related to open owner decision on historical
+contamination). No paper-evidence epoch has started here, and no broker
+lifecycle or reservation evidence exists in this database.
 
 The database is Git-ignored. Stop Streamlit, tests, schedulers, paper
 operations, and other writers before making a transfer backup. Prefer the
@@ -731,20 +787,21 @@ After restore:
 
 ### Credentials
 
-Presence only; no values were read or recorded:
+Presence only; no values were read or recorded. Re-measured 2026-08-03
+during the Phase 2 session:
 
 ```text
 APCA_API_KEY_ID         process=True   user=True
 APCA_API_SECRET_KEY     process=True   user=True
-DATABENTO_API_KEY       process=True   user=True
+DATABENTO_API_KEY       process=False  user=False
 ANTHROPIC_API_KEY      process=False  user=False
 FINNHUB_API_KEY        process=False  user=False
 ```
 
-Third-round correction: the previous revision recorded `user=False` for the
-first three; re-measured presence-only via both
-`[Environment]::GetEnvironmentVariable(..., 'User')` and the
-`HKCU:\Environment` registry key, both report the user-scope values present.
+Drift from the previous revision: DATABENTO_API_KEY was recorded
+present/present there and is absent in both scopes here — consistent with
+the two revisions describing different machines or profiles. Do not assume
+Databento access on this machine without re-provisioning.
 
 Recreate required secrets through a secure mechanism. Start a new terminal or
 agent process so it inherits them. Confirm Alpaca points to the intended paper
@@ -765,15 +822,12 @@ repository, Python, database, config, artifact, and alert paths, then verify
 
 ### Databento artifacts
 
-```text
-artifacts/databento/: present (4 files; contents not inspected or recorded here)
-DATABENTO_API_KEY: present in this process; value not read
-```
-
-Presence does not establish provenance, completeness, or authoritative
-point-in-time coverage. Inventory licensed artifacts privately with exact
-manifests and hashes before relying on or transferring them; never commit
-licensed contents.
+Re-measured 2026-08-03: `artifacts/` does not exist in this worktree at
+all, and DATABENTO_API_KEY is absent (see above). The previous revision's
+"artifacts/databento/: present (4 files)" describes a different machine or
+an earlier state. If licensed Databento files are still wanted, they must
+be transferred privately from wherever they live; never commit licensed
+contents. (The whole `artifacts/` directory is now Git-ignored — AP-2.)
 
 ### Paper mode
 
@@ -822,7 +876,7 @@ All individual product/design plans were archived to `docs/reference/` on
 reflect that location; the documents' content is unchanged and they remain
 authoritative for their own milestone definitions.
 
-### UI feature controls — PHASE 1 COMPLETE ON LOCAL REVIEW BRANCH
+### UI feature controls — PHASE 1 COMPLETE AND MERGED (PR #116 + PR #117)
 
 `docs/reference/UI_FEATURE_CONTROLS_DESIGN.md` is the governing design. Its
 four open decisions were resolved by the owner on 2026-08-02 (recorded in
@@ -835,9 +889,9 @@ four open decisions were resolved by the owner on 2026-08-02 (recorded in
 
 It does not authorize a live toggle, secret editing in Streamlit, autonomous
 approval, or direct suggestion-to-proposal conversion. Implementation is
-merged at `4c8e959`; the accepted corrected tree is pushed on the Claude
-confirmation branch awaiting the owner's merge. The durable two-paragraph
-completion record is in `docs/FEATURE_MILESTONE_RECORD.md`.
+merged at `4c8e959` (PR #116) and the accepted corrected review chain is
+merged at `661a7d4` (PR #117). The durable two-paragraph completion record
+is in `docs/FEATURE_MILESTONE_RECORD.md`.
 
 ### AI strategy authoring
 
@@ -964,9 +1018,10 @@ Do not let UI/development tests share the restored operational database.
 
 Do not infer answers to these:
 
-1. Whether to merge pushed branch `user/claude/ui-review-confirmation-20260803`
-   (the complete UI review chain; pushing was completed 2026-08-03, so the
-   corrected reviewed tree is already fetchable everywhere).
+1. ~~Merge the UI review chain~~ — **RESOLVED 2026-08-03**: merged as
+   PR #117 at `661a7d4`. NEW: whether to push and (after independent
+   review) merge the Phase 2 hygiene branch
+   `user/claude/phase2-hygiene-20260803` (`34ce463`, currently LOCAL ONLY).
 2. ~~Push/cross-review the consolidated plans~~ — **RESOLVED 2026-08-02**:
    both plans merged (PR #113/#114); the owner adopted Claude's plan as
    `docs/ACTION_PLAN_2026-08-02.md` with UI feature controls as Phase 1;
@@ -1000,12 +1055,13 @@ git status --short --branch
 git log -10 --oneline --decorate
 ```
 
-Verify that `main` is at or after `4c8e959` (UI implementation merge) and that
-history contains the GR-1C chain through `ff8c16e`. The corrected reviewed UI
-tree is on pushed branch `user/claude/ui-review-confirmation-20260803`
-(fetch it if main has not yet merged it). Every plan, review, handoff,
-CLAUDE.md, and AGENTS.md syncs through Git alone — no session files need
-copying.
+Verify that `main` is at or after `661a7d4` (PR #117, the merged UI review
+chain) and that history contains the GR-1C chain through `ff8c16e`. The
+Phase 2 hygiene branch `user/claude/phase2-hygiene-20260803` (`34ce463` plus
+the handoff commit) is LOCAL ONLY to the implementing computer until the
+owner authorizes a push — a new computer cannot fetch it and must not
+recreate it from memory. Everything merged syncs through Git alone — no
+session files need copying.
 
 Recommended resume prompt:
 
@@ -1023,15 +1079,16 @@ ProposalValidationOutcome.resolved_failure_class's kernel-resolved fallbacks.
 Verify paper mode, database isolation, credential presence without values,
 scheduler state, and ignored artifact transfer. Do not start live trading, an
 evidence epoch, scheduled tasks, ML/LLM proposal integration, or destructive
-cleanup. UI feature controls were merged at 4c8e959, accepted after the two
-P2 corrections in a6d5254, and confirmed on pushed branch
-user/claude/ui-review-confirmation-20260803; do not repeat that review or
-use uncorrected main as the final reviewed tree. First merge that branch
-when the owner decides. Then execute action-plan Phase 2 hygiene
-(AP-1, AP-2, AP-4) as one reviewed milestone. Phase 3 is the later gap
-analysis for GR-1D manual reconciliation extraction, characterization first,
-one reviewable slice, focused/full validation, commit, and stop for independent
-review before GR-2. If the owner instead requests
-plan reconciliation, compare the committed Claude and Codex plans with an
-explicit evidence-backed difference ledger before drafting a final plan.
+cleanup. UI feature controls (Phase 1) are fully merged: PR #116 plus the
+review chain PR #117 at 661a7d4; do not repeat that review. Action-plan
+Phase 2 hygiene (AP-1, AP-2, AP-4) is IMPLEMENTED at 34ce463 on LOCAL-ONLY
+branch user/claude/phase2-hygiene-20260803 — do not reimplement it. The
+next action is an independent review of that exact commit per
+docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, then the owner's
+push/merge decision. Note the AP-1 operational finding recorded in the
+handoff: the operator database schema was already current when verified;
+a pre-change backup exists under data/backups/. After Phase 2 completes
+review, Phase 3 is the gap analysis for GR-1D manual reconciliation
+extraction, characterization first, one reviewable slice, focused/full
+validation, commit, and stop for independent review before GR-2.
 ```

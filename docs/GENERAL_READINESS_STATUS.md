@@ -122,7 +122,7 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 — execution kernel split: **partial; orchestration decomposed, review pending**
+## GR-1 — execution kernel split: **partial; GR-1B independently reviewed**
 
 GR-1A characterization is built and independently reviewed in
 `tests/test_execution_characterization.py`. The first production extraction is
@@ -160,10 +160,10 @@ section 6.2 forbidding private peer dependencies. The review added an AST
 boundary regression test, exposed a public kernel alias, and preserved the
 legacy private facade name as the exact same class object.
 
-### GR-1B — orchestration decomposition: built, awaiting independent review
+### GR-1B — orchestration decomposition: built and independently reviewed
 
 `execute_approved_paper_proposal()` is decomposed from 580 lines to 276, and
-`assistant/execution_service.py` from 1,656 to 1,363. The twelve phases are
+`assistant/execution_service.py` from 1,656 to 1,361. The twelve phases are
 now named calls in a readable sequence. Moved this milestone:
 
 | Phase | Now in |
@@ -204,15 +204,20 @@ the review applied to `ProposalClaimLostError`: the public name is the
 definition, the underscore name is an alias to the same function object, and
 the facade re-exports the legacy name.
 
-`DuplicateIntentConflict` was dropped from the facade imports (now unused
-there; every consumer already imports it from `assistant.storage`). One
-unrelated dead import, `os`, was left in place as out of scope.
+The independent review found one facade-compatibility regression:
+`DuplicateIntentConflict` had been dropped merely because the decomposed
+implementation no longer used it locally. GR-1 requires the facade to remain
+unchanged, so a regression test now pins the export to the exact class object
+from `assistant.storage` and the facade re-export is restored. The review also
+removed the unrelated dead `os` import and corrected kernel documentation that
+understated `outcomes.resolve_failed_submission()`'s durable side effects.
 
-GR-1 remains partial pending independent review of this decomposition and a
-judgement on whether 1,363 lines — with the 315-line validation orchestration
-deliberately retained — satisfies "thin composition layer", or whether the
-monkeypatch seams above should be replaced with explicit injection so that
-code can move too.
+GR-1B's decomposition is accepted, but GR-1 remains partial. At 1,361 lines,
+with 315-line validation orchestration and 221-line manual reconciliation
+still on the facade, `execution_service.py` is not yet the plan's "thin
+composition layer". A remaining GR-1 step should replace the facade
+monkeypatch seams with explicit dependency injection before moving those
+orchestrators, preserving test and caller behavior while completing the split.
 
 ### What the characterization suite can actually detect
 
@@ -293,7 +298,7 @@ the imprecise version of each claim is misleading:
   pins the status precisely to tell the two arrangements apart.
 
 Remaining honest limit: the characterization freezes representative paths, not
-every branch of the 1,363-line facade. The 315-line
+every branch of the 1,361-line facade. The 315-line
 `validate_proposal_for_execution` orchestration is unchanged by GR-1B and its
 internal branches remain covered only by the pre-existing suite.
 

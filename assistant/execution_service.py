@@ -199,7 +199,6 @@ acting):
 from __future__ import annotations
 
 import dataclasses
-import os
 from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 
@@ -271,7 +270,7 @@ from assistant.proposal_status import (
     VALIDATION_FAILED,
 )
 from assistant.schemas import PortfolioSnapshot
-from assistant.storage import AssistantStore
+from assistant.storage import AssistantStore, DuplicateIntentConflict
 from risk.execution_gate import (
     TradeIntent,
     ValidationResult,

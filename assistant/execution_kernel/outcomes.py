@@ -1,15 +1,15 @@
-"""Broker outcome interpretation.
+"""Broker outcome interpretation and failed-submission resolution.
 
-GR-1A extraction from ``assistant/execution_service.py``. Behaviour is
-unchanged: these functions were moved verbatim and are re-exported from
-``assistant.execution_service``, so every existing caller and test keeps
-working through its original import path.
+GR-1A extracted the pure lookup and identity helpers from
+``assistant/execution_service.py``. GR-1B added the durable resolution of a
+raising submit call behind the same unchanged facade.
 
-This is outcome INTERPRETATION only -- deciding what the broker's answer
-means. It never submits, claims, or transitions a proposal. The sentinel
-``_LOOKUP_UNCONFIRMED`` is the reason the module exists: "the broker says no
-order" and "we could not ask the broker" are different answers, and
-collapsing them would let a failed lookup be read as durable proof of
+This module never submits or claims a proposal. Its pure helpers decide what
+the broker's answer means; ``resolve_failed_submission`` then projects that
+answer into durable proposal, journal, reservation-hold, and kill-switch state.
+The sentinel ``_LOOKUP_UNCONFIRMED`` is the reason the module exists: "the
+broker says no order" and "we could not ask the broker" are different answers,
+and collapsing them would let a failed lookup be read as durable proof of
 absence.
 """
 from __future__ import annotations
@@ -263,7 +263,7 @@ def _authoritative_order_for(
 
     Both of this module's broker-lookup consumers need this:
     reconcile_submission() (the user-facing manual operation) and
-    submit_approved_proposal()'s post-exception recovery. Neither followed
+    execute_approved_paper_proposal()'s post-exception recovery. Neither followed
     `replaced_by`, so each validated and journaled the SUPERSEDED order --
     and because the original order still matches the stored intent (only its
     status is "replaced"), the identity check passed and nothing looked wrong.

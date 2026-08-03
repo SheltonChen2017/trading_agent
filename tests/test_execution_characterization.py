@@ -1256,3 +1256,11 @@ def test_the_legacy_facade_reexports_the_exact_kernel_exception_objects():
         execution_service._ProposalClaimLostError
         is errors.ProposalClaimLostError
     )
+
+
+def test_gr1b_preserves_the_legacy_duplicate_conflict_facade_export():
+    """The facade cannot silently lose names merely because GR-1 moved code."""
+    from assistant import execution_service
+    from assistant.storage import DuplicateIntentConflict
+
+    assert execution_service.DuplicateIntentConflict is DuplicateIntentConflict

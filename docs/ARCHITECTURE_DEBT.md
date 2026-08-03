@@ -54,14 +54,19 @@ this entry warned about.
 interpretation, stored-intent parsing, pre-broker claim fencing/recovery
 support, revalidation inputs, submission sizing, and the shared exception
 hierarchy now have explicit modules behind the unchanged
-`assistant.execution_service` facade.
+`assistant.execution_service` facade. GR-1B then moved the claim,
+precondition, override-review, budget-reservation, submission-dispatch,
+ambiguous-outcome, and accepted-order-journaling orchestration into named
+kernel phases while retaining the storage-level atomic transition primitives.
 
-**Still open**: `execution_service.py` remains 1,656 lines. Its 580-line
-`execute_approved_paper_proposal()` and 315-line validation function still
-interleave the approval/submission state machine, broker preflight,
-revalidation, authorization, reservation, telemetry, submission, and
-ambiguous-outcome handling. It is not yet the thin composition facade in the
-GR-1 definition of done. `allocation_batch.py` also still owns cross-leg
+**Still open**: `execution_service.py` remains 1,361 lines. Its 315-line
+validation orchestration, 276-line execution composition, and 221-line manual
+reconciliation function still keep substantial state-machine orchestration on
+the facade. It is not yet the thin composition layer in the GR-1 definition of
+done. The validation caller deliberately remains there because an existing
+test and therefore a compatibility seam monkeypatches the facade's
+`validate_trade_intent`; explicit dependency injection is the safer route to
+finishing that move. `allocation_batch.py` also still owns cross-leg
 reservation math separately from the storage-level budget reservation. The
 remaining split is smaller than it was, but not done.
 

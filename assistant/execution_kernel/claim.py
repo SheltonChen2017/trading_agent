@@ -34,7 +34,7 @@ from assistant.storage import AssistantStore, DuplicateIntentConflict
 
 
 # Statuses a proposal can be stranded in BEFORE anything was ever handed to the
-# broker. submit_approved_proposal() writes "submitting" and only then calls
+# broker. execute_approved_paper_proposal() writes "submitting" and only then calls
 # out, so a row still sitting in "validating"/"approved" provably has no broker
 # order behind it -- which is what makes recovering them safe, unlike every
 # post-submission status.

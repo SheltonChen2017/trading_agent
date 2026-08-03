@@ -1,6 +1,6 @@
 # Development session handoff
 
-Prepared: 2026-08-02T21:43:40-07:00
+Prepared: 2026-08-02T22:02:02-07:00
 
 Audience: Codex, Claude Code, and the repository owner after moving to another
 computer.
@@ -41,6 +41,21 @@ git branch --all --verbose
 Do not reset, clean, delete, or overwrite a dirty worktree merely to reproduce
 this snapshot.
 
+### Canonical cross-computer synchronization rule
+
+This tracked file is the canonical development-session state. After every
+completed review, feature, or milestone — and after any material change to
+branch availability, open issues, validation, authorization, machine-local
+state, or the next step — update and commit `docs/SESSION_HANDOFF.md`
+separately from the implementation/review commits it describes.
+
+Do not use a loose copied session file as the normal computer-transfer method.
+Cross-computer synchronization is complete only when this handoff commit and
+every commit needed to resume are verified on the approved Git remote. Pushing
+or merging still requires explicit owner authorization; until then, mark the
+branch local-only and warn that another computer cannot fetch it. The reusable
+workflow is in `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`.
+
 ## 2. Critical Git snapshot
 
 Repository:
@@ -67,11 +82,23 @@ Claude review-of-review follow-up, pushed and merged:
   handoff: b06a281
   merge: 2882889
 
-Codex independent follow-up review branch, clean before this handoff edit:
+Codex independent follow-up review branch:
   branch: codex/review-claude-gr1c-followups-20260802
   correction: c1de927  Complete independent GR-1C follow-up review
   status-doc correction: d2d836b  Correct GR-1C follow-up size accounting
+  reviewed handoff: 6d3a703  Update session handoff after reviewed GR-1C follow-ups
+  general workflow docs: 3c180b4  Add general code review and milestone record instructions
   remote state: LOCAL ONLY, NOT PUSHED
+  worktree: DIRTY — preserve the unstaged concurrent GR-1C third-round edits:
+    assistant/execution_kernel/validate.py
+      documents class-resolved FAILURE_NONE/deterministic-policy fallbacks
+    tests/test_execution_characterization.py
+      corrects facade-export test terminology
+    docs/GENERAL_READINESS_STATUS.md
+      records the same boundary/terminology precision work
+    These files are not part of commit 3c180b4 or this handoff update. Treat
+    them as one in-progress external edit set; do not overwrite, stage, or
+    describe them as reviewed until their author finishes and commits them.
 ```
 
 The current Codex review branch is based on merged `main` `2882889`. It adds
@@ -107,8 +134,9 @@ git push -u origin codex/review-claude-gr1c-followups-20260802
 ```
 
 The original GR-1C implementation, original review, Claude follow-up, and both
-merges are already remote. Only Codex corrections `c1de927`/`d2d836b`, the
-handoff commit after them, and the unavailable historical `a656015` require
+merges are already remote. Only Codex commits `c1de927`, `d2d836b`, `6d3a703`,
+`3c180b4`, the handoff update after them, the three-file uncommitted GR-1C
+third-round edit set, and the unavailable historical `a656015` require
 separate treatment.
 
 ## 3. Relevant GR-1 commit history
@@ -116,6 +144,8 @@ separate treatment.
 Recent sequence:
 
 ```text
+3c180b4  Codex: add general code review and milestone record instructions (local)
+6d3a703  Codex: update session handoff after reviewed GR-1C follow-ups (local)
 d2d836b  Codex: correct GR-1C follow-up size accounting (local)
 c1de927  Codex: complete independent GR-1C follow-up review (local)
 2882889  Merge PR #110: Claude GR-1C review follow-ups into main
@@ -623,24 +653,26 @@ For the next coding session:
 
 1. `CLAUDE.md`
 2. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-3. `docs/SESSION_HANDOFF.md`
-4. `docs/GENERAL_READINESS_STATUS.md`
-5. `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
-6. `docs/ARCHITECTURE_DEBT.md`
-7. `assistant/execution_service.py`
-8. every file under `assistant/execution_kernel/`
-9. `tests/test_execution_characterization.py`
-10. reconciliation, replacement-chain, transaction-readiness, telemetry, and
+3. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+4. `docs/FEATURE_MILESTONE_RECORD.md`
+5. `docs/SESSION_HANDOFF.md`
+6. `docs/GENERAL_READINESS_STATUS.md`
+7. `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
+8. `docs/ARCHITECTURE_DEBT.md`
+9. `assistant/execution_service.py`
+10. every file under `assistant/execution_kernel/`
+11. `tests/test_execution_characterization.py`
+12. reconciliation, replacement-chain, transaction-readiness, telemetry, and
    import-boundary tests
-11. `docs/ML_IMPLEMENTATION_STATUS.md`
-12. `docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md`
-13. `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`
-14. `docs/OPERATIONS_RUNBOOK.md`
-15. `docs/LIVE_PROMOTION_CHECKLIST.md`
-16. `docs/DATABENTO_DATA_SOURCE.md`
-17. `docs/UI_FEATURE_CONTROLS_DESIGN.md`
-18. `docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md`
-19. the focused AI strategy-tool document if branch `a656015` was transferred
+13. `docs/ML_IMPLEMENTATION_STATUS.md`
+14. `docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md`
+15. `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`
+16. `docs/OPERATIONS_RUNBOOK.md`
+17. `docs/LIVE_PROMOTION_CHECKLIST.md`
+18. `docs/DATABENTO_DATA_SOURCE.md`
+19. `docs/UI_FEATURE_CONTROLS_DESIGN.md`
+20. `docs/AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md`
+21. the focused AI strategy-tool document if branch `a656015` was transferred
 
 The current code and latest specific status section override stale historical
 statements in older documents. Update stale text rather than reimplementing
@@ -736,8 +768,9 @@ git log -6 --oneline --decorate
 ```
 
 Verify that history contains merged main `2882889`, Codex corrections
-`c1de927`/`d2d836b`, and the later handoff commit containing this file. Then
-rerun focused/full tests in the reconstructed environment before merging.
+`c1de927`/`d2d836b`, reviewed handoff `6d3a703`, general workflow commit
+`3c180b4`, and the later handoff commit containing this file. Then rerun
+focused/full tests in the reconstructed environment before merging.
 
 If the Codex branch is not remote, it remains local to the computer that
 created this handoff. Push it with owner authorization or transfer it as a Git
@@ -748,13 +781,15 @@ Recommended resume prompt:
 
 ```text
 Read CLAUDE.md, docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
-docs/SESSION_HANDOFF.md completely. Verify origin/main and all branch/commit
-claims against Git. GR-1C through Claude follow-up merge 2882889 and Codex
-follow-up corrections c1de927/d2d836b are complete; do not redo them. Confirm
-whether the Codex review/handoff branch was pushed or merged. Preserve facade
-imports and complete call-time DI, including the outcome factory, datetime,
-timezone, Decimal, TradeIntent, to_decimal, and behavior-bearing failure
-constants. Verify paper mode,
+docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md completely, then read
+docs/FEATURE_MILESTONE_RECORD.md and docs/SESSION_HANDOFF.md. Verify
+origin/main and all branch/commit claims against Git. GR-1C through Claude
+follow-up merge 2882889 and Codex follow-up corrections c1de927/d2d836b are
+complete; do not redo them. Preserve the recorded dirty readiness-status edit.
+Confirm whether the Codex review/handoff branch was pushed or merged. Preserve
+facade imports and complete call-time DI, including the outcome factory,
+datetime, timezone, Decimal, TradeIntent, to_decimal, and behavior-bearing
+failure constants. Verify paper mode,
 database isolation, credential presence without values, scheduler state, and
 ignored artifact transfer. Do not start live trading, an evidence epoch,
 scheduled tasks, ML/LLM proposal integration, or destructive cleanup. If the

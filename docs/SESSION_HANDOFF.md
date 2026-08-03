@@ -80,16 +80,17 @@ Review branch commits after `main`:
 ```text
 8bbe82b  Correct and complete independent GR-1E assessment review
 d2d1e97  Record completed GR-1 execution kernel split
-<handoff commit>  Replace session handoff after reviewed GR-1E
+4d9416d  Replace session handoff after reviewed GR-1E
+<post-push commit>  Record verified remote GR-1E handoff
 ```
 
-At preparation time the review branch is local-only and origin exposes only
-`main`. The owner previously directed the reviewer not to forget to push, so
-this branch and its handoff are to be pushed before the session closes. Until
-the push is verified, another computer cannot retrieve `8bbe82b`, `d2d1e97`,
-or this replacement handoff. No pull request has been opened and this branch
-has not been merged into `main`; opening or merging a PR remains an owner
-decision.
+The review branch was pushed to
+`origin/codex/review-gr1e-assessment-20260803`, configured to track it, and
+remote creation through `4d9416d` succeeded. The post-push commit containing
+this paragraph is pushed before handoff completion, so another computer can
+retrieve the complete review with `git fetch --all --prune` and switch to the
+remote branch. No pull request has been opened and this branch has not been
+merged into `main`; opening or merging a PR remains an owner decision.
 
 ### Shared-worktree caution
 

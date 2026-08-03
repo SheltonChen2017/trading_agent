@@ -1,6 +1,6 @@
 # Development session handoff
 
-Prepared: 2026-08-03T10:51:54-07:00
+Prepared: 2026-08-03T10:55:17-07:00
 
 Audience: Codex, Claude Code, and the repository owner after moving to another
 computer.
@@ -32,10 +32,10 @@ reviewed; do not redo it. UI feature controls (Phase 1) are fully merged:
 implementation PR #116, review chain PR #117 at 661a7d4. Do not redo or
 bypass that review. Action-plan Phase 2 hygiene (AP-1, AP-2, AP-4) is
 implemented at 34ce463 and independently accepted after correction at
-36c69d3 on LOCAL-ONLY branch codex/review-phase2-hygiene-20260803. Do not
-reimplement or repeat that review, and do not push or merge it without owner
-approval. Phase 3 GR-1D is next in the adopted sequence but still requires
-the owner's go-ahead; do not start it implicitly.
+36c69d3 on pushed branch codex/review-phase2-hygiene-20260803. Do not
+reimplement or repeat that review, and do not merge it without owner approval.
+Phase 3 GR-1D is next in the adopted sequence but still requires the owner's
+go-ahead; do not start it implicitly.
 ```
 
 Initial commands:
@@ -88,8 +88,8 @@ Phase 2 hygiene, based on main 661a7d4:
   review correction/report: 36c69d3
   disposition: accepted after one resolved P2 and two resolved P3 findings;
                no P0/P1 and no open issue
-  remote state: LOCAL ONLY, NOT PUSHED; another computer cannot fetch the
-                reviewed tree until the owner authorizes a push
+  remote state: PUSHED; another computer can fetch the complete reviewed tree
+                from origin/codex/review-phase2-hygiene-20260803
 
 UI implementation, pushed and merged:
   branch: user/claude/ui-feature-controls-20260802
@@ -185,15 +185,13 @@ mistaken for it.
 
 ### Required action before abandoning this computer
 
-The full UI review chain is merged into `origin/main` at `661a7d4`. What is
-NOT on the remote: reviewed Phase 2 branch
-`codex/review-phase2-hygiene-20260803` (implementation `34ce463`,
-implementation handoff `c8271a1`, review correction `36c69d3`, and the
-handoff commit containing this text) is LOCAL ONLY until the owner authorizes
-a push. Local strategy-tool branch
-`codex/ai-strategy-tool-doc-v2-20260802` (`a656015`) is also LOCAL ONLY.
-Another computer cannot fetch either branch. The pre-change operator-database
-backup
+The full UI review chain is merged into `origin/main` at `661a7d4`. Reviewed
+Phase 2 branch `codex/review-phase2-hygiene-20260803` is PUSHED with
+implementation `34ce463`, implementation handoff `c8271a1`, review correction
+`36c69d3`, and the handoff commits; another computer can fetch it. What is NOT
+on the remote: local strategy-tool branch
+`codex/ai-strategy-tool-doc-v2-20260802` (`a656015`). Another computer cannot
+fetch that branch. The pre-change operator-database backup
 `data/backups/trading_assistant-pre-phase2-schema-20260803T171810Z.db` is
 Git-ignored and machine-local.
 
@@ -202,9 +200,9 @@ Git-ignored and machine-local.
 Recent sequence:
 
 ```text
-36c69d3  Codex: complete independent Phase 2 hygiene review (LOCAL ONLY)
-c8271a1  Claude: Phase 2 implementation handoff (LOCAL ONLY)
-34ce463  Claude: Phase 2 hygiene implementation (LOCAL ONLY)
+36c69d3  Codex: complete independent Phase 2 hygiene review (PUSHED)
+c8271a1  Claude: Phase 2 implementation handoff (PUSHED via review branch)
+34ce463  Claude: Phase 2 hygiene implementation (PUSHED via review branch)
 661a7d4  Merge PR #117: the complete UI review chain into main
 8093fa2  Claude: confirm the UI-controls review; harden the
          environment-sensitive identity test
@@ -504,7 +502,7 @@ accepted after independent correction.**
 implementation branch: user/claude/phase2-hygiene-20260803
 implementation commit: 34ce463
 implementation handoff: c8271a1
-review branch: codex/review-phase2-hygiene-20260803 (LOCAL ONLY)
+review branch: codex/review-phase2-hygiene-20260803 (PUSHED)
 review correction/report: 36c69d3
 disposition: accepted after correction
 scope:
@@ -558,8 +556,8 @@ honest limits: verify-db-schema compares table/column presence and exact
        the operator-DB drift noted in section 8 is recorded, not explained;
        no execution-kernel file changed; no policy, broker, scheduler, or
        epoch state was touched.
-next: owner push/merge decision for the reviewed Phase 2 branch. Phase 3
-       GR-1D is next in sequence but must not start before owner go-ahead.
+next: owner merge decision for the reviewed Phase 2 branch. Phase 3 GR-1D is
+       next in sequence but must not start before owner go-ahead.
 ```
 
 After the owner accepts Phase 2, GR-1D is the next kernel milestone
@@ -1061,9 +1059,9 @@ Do not let UI/development tests share the restored operational database.
 Do not infer answers to these:
 
 1. ~~Merge the UI review chain~~ — **RESOLVED 2026-08-03**: merged as
-   PR #117 at `661a7d4`. NEW: whether to push and merge the independently
-   reviewed Phase 2 branch `codex/review-phase2-hygiene-20260803`
-   (implementation `34ce463`, correction `36c69d3`, currently LOCAL ONLY).
+   PR #117 at `661a7d4`. NEW: whether to merge the independently reviewed
+   Phase 2 branch `codex/review-phase2-hygiene-20260803` (implementation
+   `34ce463`, correction `36c69d3`, now PUSHED).
 2. ~~Push/cross-review the consolidated plans~~ — **RESOLVED 2026-08-02**:
    both plans merged (PR #113/#114); the owner adopted Claude's plan as
    `docs/ACTION_PLAN_2026-08-02.md` with UI feature controls as Phase 1;
@@ -1100,11 +1098,11 @@ git log -10 --oneline --decorate
 Verify that `main` is at or after `661a7d4` (PR #117, the merged UI review
 chain) and that history contains the GR-1C chain through `ff8c16e`. The
 Reviewed Phase 2 branch `codex/review-phase2-hygiene-20260803`
-(`34ce463` + `c8271a1` + `36c69d3` + this handoff commit) is LOCAL ONLY until
-the owner authorizes a push; local strategy-tool branch
-`codex/ai-strategy-tool-doc-v2-20260802` (`a656015`) is also local-only. A new
-computer cannot fetch either branch. Everything merged syncs through Git
-alone — no session files need copying.
+(`34ce463` + `c8271a1` + `36c69d3` + the handoff commits) is pushed and can be
+fetched on a new computer. Local strategy-tool branch
+`codex/ai-strategy-tool-doc-v2-20260802` (`a656015`) remains local-only and
+cannot be fetched elsewhere. Everything merged syncs through Git alone — no
+session files need copying.
 
 Recommended resume prompt:
 
@@ -1125,9 +1123,9 @@ evidence epoch, scheduled tasks, ML/LLM proposal integration, or destructive
 cleanup. UI feature controls (Phase 1) are fully merged: PR #116 plus the
 review chain PR #117 at 661a7d4; do not repeat that review. Action-plan
 Phase 2 hygiene (AP-1, AP-2, AP-4) is implemented at 34ce463 and independently
-accepted after correction at 36c69d3 on LOCAL-ONLY branch
+accepted after correction at 36c69d3 on pushed branch
 codex/review-phase2-hygiene-20260803 — do not reimplement or repeat that
-review. The next action is the owner's push/merge decision. Note the AP-1
+review. The next action is the owner's merge decision. Note the AP-1
 operational finding: the operator database passes the corrected read-only
 compatibility check and has a pre-change backup under data/backups/, but the
 historical source of database drift remains unknown. Local strategy-tool

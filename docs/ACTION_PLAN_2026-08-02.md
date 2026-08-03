@@ -151,7 +151,7 @@ already-merged work does not reorder the adopted next step.
 | Milestone | Scope (one line) | Verified-absent marker |
 |---|---|---|
 | GR-2 risk-check registry | one ordered registry of named checks with `applies_at` phases replacing the hand-written ~600-line gate sequence | zero hits for `applies_at`/registry names |
-| GR-3 fault-injection drills | `tests/faults/` + `scripts/run_fault_drill.py`, 9 named faults, immutable drill records | neither path exists; only 1 of 5 required drill types has any producer |
+| GR-3 fault-injection drills | ~~9 named faults + drill harness~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: 11 fault IDs / 14 behavioral tests plus an atomic hash-stamped runner. Review corrected active-epoch lineage binding, skipped/abnormal pytest fail-open behavior, the missing F4 critical alert, the absent true `submitting` restart case, partial-state assertions, and artifact atomicity. Records ambiguous_submission/restart_recovery/kill_switch rows only under exact epoch lineage or as explicit verification-only evidence. | complete |
 | GR-4 data-layer honesty | `PriceSource` protocol, staleness SLAs, provider health, split-between-snapshot-and-submit detection, degradation banner | no protocol in `data/`/`assistant/`; GR-0's `data_integrity` dimension is blocked-by-design until this lands |
 | GR-5 alert delivery | a real channel + delivery records + weekly self-test + operator dashboard; alerts are currently recorded but never delivered | no transport code at all |
 | GR-6 recovery/portability | off-machine backup restore, secrets audit, key rotation, portable scheduler, second-machine stand-up proven once | zero matches for all markers |
@@ -183,7 +183,7 @@ already-merged work does not reorder the adopted next step.
 | AP-2 | P2 | **`.gitignore` gap**: ML runtime writes `artifacts/shadow.json`, `artifacts/model/`, `artifacts/{datasets,experiments,reviews}/` — none ignored. First scheduled run dirties the worktree, and evidence capture **refuses a dirty worktree** → silent cadence failure. | **Resolved and reviewed 2026-08-03:** `artifacts/` is ignored wholesale and enforced through `git check-ignore` regression coverage. |
 | AP-3 | P3 | 118 `portfolio_equity_snapshots` rows are mixed briefing/test-pollution provenance (pre-2026-08-02); any evidence report over them is unreliable | treat pre-2026-08-02 rows as non-evidence; decide retention at epoch start |
 | AP-4 | P3 | Doc staleness cluster: `validate.py` figure 479→490 (grew in `7f431b6`); characterization-suite docstring still says "2,040 lines"; STATUS "corrects" a 1,450 figure the plan never contained; GR-1D/1E exist only in SESSION_HANDOFF, absent from plan and status docs; ML status doc has 3 internally stale paragraphs (spec library "not built" vs delivered; "calibration emitted empty" vs wired; ML-FS §2 overstates ML-FS-6) | **Resolved and reviewed 2026-08-03:** reconciled all listed statements, added GR-1D/1E status, and recorded post-PR-#117 state. |
-| AP-5 | P3 | 4 of 5 `REQUIRED_PROMOTION_DRILLS` have no producer (only `backup_restore` does) — structurally unproducible until GR-3/GR-5 | note in GR-3/GR-5 scope; do not fake |
+| AP-5 | P3 | 4 of 5 `REQUIRED_PROMOTION_DRILLS` have no producer (only `backup_restore` does) — structurally unproducible until GR-3/GR-5 | **GR-3 completed/reviewed 2026-08-03 and adds exact-lineage producers for ambiguous_submission, restart_recovery, and kill_switch; only alert_delivery remains unproducible until GR-5. Do not fake it.** |
 
 ---
 
@@ -246,11 +246,14 @@ architecture-debt claims. The records are the GR-1E section of
 GR-3 fault drills, with GR-2 riding along) is next; GR-5's channel remains an
 owner decision.
 
-**Phase 4 — the two milestones that unblock operations:**
-GR-5 alert delivery (owner picks the channel — decision needed) and GR-3
-fault drills (produces the 4 missing drill types). These two convert the
-promotion checklist's drill/alert gates from structurally-impossible to
-executable. GR-2 (risk registry) rides along here as pure code consolidation.
+**Phase 4 — the two milestones that unblock operations (ACTIVE):**
+GR-3 fault drills are COMPLETE after independent correction/review
+(11-fault/14-test matrix + fail-closed harness; producers added for
+ambiguous_submission/restart_recovery/kill_switch). GR-5 alert delivery
+remains blocked on the owner's channel decision and will add the last producer
+(alert_delivery). These two convert the promotion checklist's drill/alert
+gates from structurally-impossible to executable. GR-2 (risk registry)
+rides along here as pure code consolidation.
 
 **Phase 5 — operational deployment + epoch start (owner-heavy):**
 elevated window → dedicated task account → install + verify 8 scheduled

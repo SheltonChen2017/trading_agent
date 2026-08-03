@@ -102,7 +102,11 @@ def _record_chain_failure(
         error=reason,
     )
     if mismatch:
-        store.set_kill_switch(True, reason=reason)
+        store.activate_reconciliation_halt(
+            proposal_id=proposal_id,
+            reason=reason,
+            details={"path": "startup_replacement_chain"},
+        )
     if result is not None:
         result["errors"].append(reason)
     return reason
@@ -184,7 +188,12 @@ def apply_broker_update(
     try:
         intent = _intent_from_dict(proposal["intent"])
     except Exception as exc:
-        store.set_kill_switch(True, reason=f"Malformed intent during reconciliation: {exc}")
+        reason = f"Malformed intent during reconciliation: {exc}"
+        store.activate_reconciliation_halt(
+            proposal_id=str(proposal.get("proposal_id") or "unknown"),
+            reason=reason,
+            details={"path": "broker_update_malformed_intent"},
+        )
         raise ProposalExecutionError(
             f"Malformed stored intent for {proposal.get('proposal_id')}: {exc}"
         ) from exc
@@ -200,7 +209,11 @@ def apply_broker_update(
             new_status=SUBMISSION_UNKNOWN,
             error=reason,
         )
-        store.set_kill_switch(True, reason=reason)
+        store.activate_reconciliation_halt(
+            proposal_id=proposal["proposal_id"],
+            reason=reason,
+            details={"mismatch": detail, "path": "broker_update_identity"},
+        )
         raise ProposalExecutionError(reason)
     return journal_broker_order_update(
         store,

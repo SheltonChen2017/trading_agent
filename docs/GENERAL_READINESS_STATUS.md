@@ -687,17 +687,69 @@ review accepted the architectural conclusion after correcting the evidence
 and scope statements above; see
 `docs/REVIEW_2026-08-03_GR1E_ASSESSMENT.md`.
 
-## GR-2 .. GR-9 — not started
+## GR-3 — fault injection and adversarial drills: COMPLETE after independent review (2026-08-03)
+
+The archived plan's section 8.2 fault matrix is implemented as
+`tests/faults/` (a self-contained harness: real `AssistantStore` on
+temporary SQLite, the real execution entry points, and a scripted broker
+patched at the same `execution.alpaca_broker` attributes the deferred
+import resolves) plus `scripts/run_fault_drill.py`, which runs the whole
+matrix, maps every plan row to its observed outcome, and atomically writes a
+hash-stamped JSON report. The eleven fault IDs map to fourteen behavioral
+tests asserting the mandated refusal/resolution and applicable no-partial-
+state invariants (shared referential-integrity checks plus per-fault state
+snapshots); the two 2026-08-02 isolation incidents the
+previous revision of this section earmarked (pytest touching the operator
+database, live broker calls during collection) are standing drills F10/F11.
+
+Notable mechanics:
+
+- the disk-full fault (F8) injects a `sqlite3.OperationalError` carrying
+  SQLite's ``database or disk is full`` message on the events insert INSIDE
+  the atomic journal projection, after earlier statements of the same
+  transaction have really executed. This is statement-level fault injection,
+  not physical disk exhaustion; the observed rollback (no half-journal) is
+  SQLite's own, and the drill also proves the accepted order is never reported
+  as a submission failure and that reconciliation repairs the record;
+- F3 now includes the actual startup case left by a process death in
+  `submitting`: broker lookup adopts the already-accepted order without any
+  resubmit, retains its reservation, and leaves no orphan;
+- F4 now atomically persists both the kill switch and a deduplicated critical
+  `broker_reconciliation` alert. The same invariant covers manual, startup,
+  stream, and replacement-chain identity mismatch paths, ready for GR-5's
+  later delivery channel;
+- the harness records the three newly producible promotion drill types
+  (``ambiguous_submission`` ← F1/F2, ``restart_recovery`` ← F3,
+  ``kill_switch`` ← F4/F9) via ``--record-database``: epoch-bound through
+  `assistant.paper_evidence.record_operational_drill` when an active epoch
+  exists, else explicitly ``verification_only`` with ``evidence_epoch``
+  NULL. Active-epoch recording now requires the drill report's exact clean
+  commit to equal the epoch lineage; unknown, dirty, or different code is
+  refused before any drill row is written. Failed drills are recorded as
+  failures, never dropped;
+- lineage is fail-closed: a dirty worktree records ``code_commit=unknown`` in
+  the standalone report and cannot be written into an active epoch;
+- the fault inventory cannot silently shrink: a listed test that fails to
+  collect or is skipped is a FAILED drill, abnormal pytest exits without a
+  matching failed/error case abort the harness, and any unmapped test in
+  `tests/faults/` fails the report (mutation-verified: renaming the F6 entry
+  produced overall ``passed=false``, exit 2, and surfaced the orphaned
+  real test in ``unmapped_tests``; neutering the F8 injector was detected
+  by the F8 test itself).
+
+`alert_delivery` remains the one drill type without a producer until GR-5
+ships a real channel; `backup_restore` keeps its existing `recovery-drill`
+producer. The runbook's incident section now links every fault row to its
+observed behavior and the drill command. Independent review and validation
+are recorded in `docs/REVIEW_2026-08-03_GR3_FAULT_DRILLS.md`.
+
+## GR-2, GR-4 .. GR-9 — not started
 
 Each requires its own gap analysis first; the plan predates the ML
 full-system additions throughout.
 
 Known items already identified for later milestones:
 
-- **GR-3** drills should include the two isolation failures found on
-  2026-08-02: pytest writing to the operator database (`ce03386`) and the
-  suite issuing live broker calls during collection (`2203e7e`). Both were
-  live for weeks.
 - **GR-5** must account for `operational_alerts`, `alerts.jsonl`, and the ML
   evidence supervisor, which already exist. Choosing a real alert channel is
   an owner decision.

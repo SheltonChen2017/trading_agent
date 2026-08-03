@@ -1,6 +1,6 @@
 # Development session handoff
 
-Prepared: 2026-08-03T11:40:00-07:00
+Prepared: 2026-08-03T13:30:00-07:00
 
 Audience: Codex, Claude Code, and the repository owner after moving to another
 computer.
@@ -35,9 +35,11 @@ COMPLETE: implemented at 34ce463, independently accepted after correction at
 36c69d3, MERGED as PR #118 at 8278510, and third-round confirmed by Claude
 (red-proof on the exact snapshot, reverse-mutation, evidence checks) at
 5cffb1f on local branch user/claude/phase2-confirmation-20260803. Do not
-reimplement or repeat that review. Phase 3 GR-1D is next in the adopted
-sequence but still requires the owner's go-ahead; do not start it
-implicitly.
+reimplement or repeat that review. The owner granted the Phase 3 GR-1D
+go-ahead on 2026-08-03; GR-1D is IMPLEMENTED at dce5e23 on PUSHED branch
+user/claude/gr-1d-reconciliation-extraction-20260803 and awaits
+independent review — do not reimplement it, and do not merge it without
+owner approval. GR-1E assessment follows the GR-1D review.
 ```
 
 Initial commands:
@@ -79,8 +81,17 @@ State after the merged and confirmed Phase 2 hygiene milestone (2026-08-03):
 
 ```text
 origin/main and local main:
-  8278510  Merge PR #118, the reviewed Phase 2 hygiene chain
-           (tree verified byte-identical to the review tip 35fc2dd)
+  40af55c  Merge PR #119, the Phase 2 third-round confirmation
+           (PR #118 at 8278510 merged the reviewed Phase 2 chain earlier)
+
+GR-1D (ACTIVE), based on main 40af55c:
+  branch: user/claude/gr-1d-reconciliation-extraction-20260803 — PUSHED
+          (owner-authorized 2026-08-03); another computer can fetch the
+          implementation and handoff commits from origin
+  implementation: dce5e23  (reconciliation extraction behind call-time
+          ReconciliationDeps; details in section 5)
+  handoff: the commit containing this text
+  status: awaiting independent review
 
 Phase 2 hygiene, based on main 661a7d4 — COMPLETE AND MERGED:
   implementation branch: user/claude/phase2-hygiene-20260803
@@ -94,8 +105,8 @@ Phase 2 hygiene, based on main 661a7d4 — COMPLETE AND MERGED:
                no P0/P1 and no open issue
 
 Claude third-round confirmation, based on merged main 8278510:
-  branch: user/claude/phase2-confirmation-20260803 — LOCAL ONLY until the
-          owner authorizes a push
+  branch: user/claude/phase2-confirmation-20260803 — PUSHED AND MERGED as
+          PR #119 (40af55c)
   confirmation: 5cffb1f (review-report addendum: commit dispositions,
           red-proof on exact 34ce463, reverse-mutation, PH2REV-002/003
           evidence checks, merged-tree full-suite validation, 9/10 review
@@ -211,7 +222,10 @@ Git-ignored and machine-local.
 Recent sequence:
 
 ```text
-5cffb1f  Claude: confirm the Phase 2 hygiene review (LOCAL ONLY)
+dce5e23  Claude: GR-1D reconciliation extraction (PUSHED, awaiting review)
+40af55c  Merge PR #119: Phase 2 third-round confirmation into main
+6b1b174  Claude: update session handoff after confirmed Phase 2 (MERGED)
+5cffb1f  Claude: confirm the Phase 2 hygiene review (MERGED via PR #119)
 8278510  Merge PR #118: the reviewed Phase 2 hygiene chain into main
 35fc2dd  Codex: record pushed Phase 2 review branch (PUSHED, MERGED)
 e3a5b9a  Codex: update handoff after reviewed Phase 2 hygiene (PUSHED, MERGED)
@@ -510,9 +524,54 @@ corrections (`a6d5254`) and Claude's third-round confirmation. The complete
 record is in `docs/REVIEW_2026-08-03_UI_FEATURE_CONTROLS.md` and
 `docs/FEATURE_MILESTONE_RECORD.md`.
 
-Active milestone status (2026-08-03): **action-plan Phase 2 hygiene is
-COMPLETE — reviewed, merged (PR #118, `8278510`), and third-round
-confirmed.**
+Active milestone status (2026-08-03): **GR-1D is IMPLEMENTED and awaiting
+independent review** (owner go-ahead granted 2026-08-03).
+
+```text
+branch: user/claude/gr-1d-reconciliation-extraction-20260803
+        (PUSHED, base 40af55c = merged main after PR #119)
+implementation commit: dce5e23
+scope: the 221-line reconcile_submission() body moved token-verbatim
+       (813 tokens identical after seam-rename + one trailing-comma
+       normalization) into
+       assistant/execution_kernel/reconcile.py::run_submission_reconciliation
+       behind a frozen 13-field ReconciliationDeps the facade builds at
+       call time from its own namespace. Seams were enumerated
+       MECHANICALLY (symtable) BEFORE the move: the exception class
+       (raised AND caught through the injected object), SUBMITTING /
+       SUBMISSION_UNKNOWN / RECONCILING, datetime + timezone, the deferred
+       broker import (shared _import_execution_broker provider, executed
+       first inside the try after the atomic claim), and the six helpers
+       (intent parsing, lookup, matching, replacement chains, absence age,
+       journaling). Atomic claim and all conditional transitions remain
+       AssistantStore operations. Facade 1,094 -> 952 lines.
+tests: 10 new (8 seam-freeze tests written FIRST and green on the
+       pre-move code, kernel-object identity, symtable zero-global guard);
+       zero existing tests edited. Mechanical pre/post facade-surface
+       comparison: nothing removed, exactly ReconciliationDeps and
+       run_submission_reconciliation added.
+mutation sweep (applied in the NEW location, restored finally): 8/8
+       DETECTED — fresh-404 grace deleted (3 tests), unconfirmed lookup
+       collapsed into confirmed absence (3, incl. the never-treat-failed-
+       lookup-as-absence freeze), mismatch guard deleted (8), replacement
+       chain bypassed (12), unexpected-error recovery no-oped (4),
+       kill-switch-on-direct-mismatch deleted (1 — only the NEW seam test;
+       precision note recorded in the GR status doc), grace-clock
+       preserve_updated_at dropped (the anti-starvation test), facade
+       wrapper resolving a dep from the kernel (5 seam tests).
+validation: full suite 2451 passed / 1 skipped / 25 warnings in 448.48s
+       (Python 3.13.14); focused 122 passed; compileall clean;
+       git diff --check clean.
+honest limits: the recovery wrappers (recover_stale_reconciliation,
+       recover_stale_claim) and the 281-line execution composition remain
+       on the facade — that residue is GR-1E's assessment question; no
+       broker, policy, scheduler, or epoch state was touched.
+next: independent Codex review of dce5e23; then GR-1E assessment. Do not
+       begin GR-2.
+```
+
+Phase 2 hygiene (COMPLETE — reviewed, merged as PR #118 `8278510`,
+confirmation merged as PR #119 `40af55c`):
 
 ```text
 implementation branch: user/claude/phase2-hygiene-20260803
@@ -522,7 +581,7 @@ review branch: codex/review-phase2-hygiene-20260803 (PUSHED)
 review correction/report: 36c69d3
 merge: 8278510 (PR #118; merge tree verified byte-identical to 35fc2dd)
 third-round confirmation: 5cffb1f on user/claude/phase2-confirmation-20260803
-  (LOCAL ONLY until pushed): PH2REV-001 red-proof reproduced in a worktree
+  (merged via PR #119): PH2REV-001 red-proof reproduced in a worktree
   at exact 34ce463 (matches=True on weakened same-named objects);
   correction reverse-mutated and detected; PH2REV-002 reproduced via
   git cat-file and branch inventory; PH2REV-003 corrected text verified;
@@ -583,36 +642,19 @@ honest limits: verify-db-schema compares table/column presence and exact
        the operator-DB drift noted in section 8 is recorded, not explained;
        no execution-kernel file changed; no policy, broker, scheduler, or
        epoch state was touched.
-next: Phase 2 is merged and closed. Phase 3 GR-1D is next in sequence but
-       must not start before owner go-ahead.
+next: Phase 2 is merged and closed.
 ```
 
-GR-1D is the next kernel milestone (action-plan Phase 3):
+The GR-1D pre-implementation checklist (characterize first, symtable-
+enumerate every facade-resolved global, mechanical facade-surface
+comparison, storage-level transitions untouched, the seven-branch mutation
+list, focused/full validation, stop for review) was executed in full; the
+evidence lives in the GR-1D sections of `docs/GENERAL_READINESS_STATUS.md`
+and in `tests/test_execution_characterization.py`'s gr1d test family.
 
-```text
-GR-1D: extract manual reconciliation orchestration behind an explicit,
-call-time dependency contract while preserving the public facade, exact
-exception identities, broker-absence grace behavior, replacement-chain
-handling, reservation holds/releases, kill-switch behavior, and every
-existing monkeypatch/import seam.
-```
-
-Before implementing GR-1D:
-
-1. read the complete GR-1 definition of done and current GR-1 status;
-2. characterize every manual reconciliation branch in its current location;
-3. enumerate every runtime global the body resolves from the facade, not only
-   the helpers already monkeypatched in the suite;
-4. compare the full pre/post facade import surface mechanically;
-5. keep storage transactions and conditional transitions in `AssistantStore`;
-6. mutation-test confirmed absence, unconfirmed lookup, fresh 404 grace,
-   replacement chains, mismatches, journal failures, and state-race recovery;
-7. run focused and full validation; and
-8. stop for independent review.
-
-After reconciliation extraction, reassess whether one final GR-1E is needed to
-thin the 281-line execution composition and recovery wrappers. Do not begin
-GR-2 merely because GR-1C is complete.
+After the GR-1D review, reassess whether one final GR-1E is needed to thin
+the 281-line execution composition and recovery wrappers. Do not begin GR-2
+merely because GR-1D is implemented.
 
 ## 6. Non-negotiable safety boundaries
 
@@ -1084,19 +1126,19 @@ Do not let UI/development tests share the restored operational database.
 
 Do not infer answers to these:
 
-1. ~~Merge the UI review chain / Phase 2 review chain~~ — **RESOLVED
-   2026-08-03**: PR #117 at `661a7d4` and PR #118 at `8278510` both merged.
-   NEW: whether to push (and then merge) Claude's Phase 2 confirmation
-   branch `user/claude/phase2-confirmation-20260803` (`5cffb1f` + handoff,
-   currently LOCAL ONLY).
+1. ~~Merge the UI/Phase 2 review chains and the Phase 2 confirmation~~ —
+   **RESOLVED 2026-08-03**: PR #117 (`661a7d4`), PR #118 (`8278510`), and
+   PR #119 (`40af55c`) all merged, and the GR-1D branch push was
+   authorized and completed 2026-08-03. NEW: whether to merge the GR-1D
+   branch after its independent review completes.
 2. ~~Push/cross-review the consolidated plans~~ — **RESOLVED 2026-08-02**:
    both plans merged (PR #113/#114); the owner adopted Claude's plan as
    `docs/ACTION_PLAN_2026-08-02.md` with UI feature controls as Phase 1;
    Codex's draft is archived at `docs/reference/ACTION_PLAN_codex.md`.
 3. Whether to push/merge or otherwise transfer the now-available local-only
    strategy-tool branch `codex/ai-strategy-tool-doc-v2-20260802` (`a656015`).
-4. When to begin GR-1D (action-plan Phase 3; Phase 2 review is complete, but
-   the next milestone still requires owner go-ahead).
+4. ~~When to begin GR-1D~~ — **RESOLVED 2026-08-03: go-ahead granted;
+   implemented same day (`dce5e23`), awaiting independent review.**
 5. Which authoritative historical membership/reference-data source will be
    obtained and funded.
 6. When to deploy the operational paper cadence and start the first immutable
@@ -1122,11 +1164,11 @@ git status --short --branch
 git log -10 --oneline --decorate
 ```
 
-Verify that `main` is at or after `8278510` (PR #118, the merged Phase 2
-hygiene chain) and that history contains the GR-1C chain through `ff8c16e`.
-Claude's confirmation branch `user/claude/phase2-confirmation-20260803`
-(`5cffb1f` + this handoff commit) is LOCAL ONLY until the owner authorizes a
-push. Local strategy-tool branch
+Verify that `main` is at or after `40af55c` (PR #119, the merged Phase 2
+confirmation) and that history contains the GR-1C chain through `ff8c16e`.
+The GR-1D branch `user/claude/gr-1d-reconciliation-extraction-20260803`
+(`dce5e23` + the handoff commits) is PUSHED and fetchable from origin;
+only the post-review merge decision remains. Local strategy-tool branch
 `codex/ai-strategy-tool-doc-v2-20260802` (`a656015`) also remains local-only.
 Everything merged syncs through Git alone — no session files need copying.
 
@@ -1150,14 +1192,19 @@ cleanup. UI feature controls (Phase 1) are fully merged: PR #116 plus the
 review chain PR #117 at 661a7d4; do not repeat that review. Action-plan
 Phase 2 hygiene (AP-1, AP-2, AP-4) is COMPLETE: implemented at 34ce463,
 accepted after correction at 36c69d3, merged as PR #118 at 8278510, and
-third-round confirmed at 5cffb1f (local confirmation branch) — do not
+third-round confirmed and merged as PR #119 at 40af55c — do not
 reimplement or repeat any of it. Note the AP-1 operational finding: the
 operator database passes the corrected read-only compatibility check and has
 a pre-change backup under data/backups/, but the historical source of
 database drift remains unknown. Local strategy-tool branch
 codex/ai-strategy-tool-doc-v2-20260802 at a656015 is present but
-unpublished. Phase 3 GR-1D manual reconciliation extraction is next in the
-adopted sequence only after owner go-ahead: characterize first, implement one
-reviewable slice, run focused/full validation, commit, and stop for independent
-review before GR-2.
+unpublished. GR-1D (Phase 3, owner go-ahead 2026-08-03) is IMPLEMENTED at
+dce5e23 on pushed branch
+user/claude/gr-1d-reconciliation-extraction-20260803 with a symtable-
+enumerated 13-field ReconciliationDeps, a token-verbatim move, 10 new
+characterization tests, and an 8/8 mutation sweep — do not reimplement it.
+The next action is an independent review of that exact commit per
+docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md; after review, the GR-1E
+assessment decides whether GR-1's thin-composition definition of done is
+met. Do not begin GR-2.
 ```

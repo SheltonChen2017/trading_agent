@@ -34,6 +34,7 @@ from scripts.personal_assistant_ui import (
     _portfolio_context_payload,
     _proposal_content_digest,
     _proposal_status_category,
+    _sync_policy_editor_state,
 )
 
 
@@ -74,6 +75,37 @@ def test_changing_cash_invalidates_the_signature():
     packet_a = _packet([], cash=5_000.0)
     packet_b = _packet([], cash=6_000.0)
     assert _signature(packet_a) != _signature(packet_b)
+
+
+def test_policy_editor_state_tracks_the_selected_policy_identity(tmp_path):
+    false_policy = _policy(version="1.0")
+    true_policy = dataclasses.replace(
+        false_policy, version="1.1", allow_new_positions=True
+    )
+    state = {
+        "policy_edit_allow_new_positions": False,
+        "policy_edit_enable_strategy": False,
+        "policy_edit_confirm_phrase": "UPDATE POLICY",
+    }
+
+    assert _sync_policy_editor_state(state, str(tmp_path / "first.json"), false_policy)
+    state["policy_edit_allow_new_positions"] = True  # unsaved widget edit
+    assert not _sync_policy_editor_state(
+        state, str(tmp_path / "first.json"), false_policy
+    )
+    assert state["policy_edit_allow_new_positions"] is True
+
+    assert _sync_policy_editor_state(state, str(tmp_path / "second.json"), true_policy)
+    assert state["policy_edit_allow_new_positions"] is True
+    assert "policy_edit_confirm_phrase" not in state
+
+    externally_changed = dataclasses.replace(
+        true_policy, version="1.2", allow_new_positions=False
+    )
+    assert _sync_policy_editor_state(
+        state, str(tmp_path / "second.json"), externally_changed
+    )
+    assert state["policy_edit_allow_new_positions"] is False
 
 
 def test_changing_a_held_position_invalidates_the_signature():

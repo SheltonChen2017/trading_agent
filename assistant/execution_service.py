@@ -937,6 +937,11 @@ def execute_approved_paper_proposal(
         )
     except Exception as exc:
         release_after_telemetry_failure(store, proposal_id, exc)
+        # Unreachable today -- the helper is NoReturn -- but load-bearing as a
+        # guard: if it ever gains a return path, this re-raise still stops
+        # execution before the broker-contact line below, instead of letting a
+        # telemetry failure fall through to a live order submission.
+        raise
 
     # PHASE 10: the only line in this function that contacts the broker.
     try:

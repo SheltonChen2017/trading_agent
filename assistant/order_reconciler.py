@@ -560,7 +560,7 @@ def _absence_is_believable(
 ) -> bool:
     """Is a "broker has no such order" lookup old enough to be BELIEVED?
 
-    submit_approved_proposal() writes "submitting" and reserves daily
+    execute_approved_paper_proposal() writes "submitting" and reserves daily
     budget BEFORE it calls the broker, so between that write and the
     order becoming visible at Alpaca there is a real window -- a full
     HTTP round trip, plus the broker's own indexing latency -- during

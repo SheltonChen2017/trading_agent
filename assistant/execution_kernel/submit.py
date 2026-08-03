@@ -20,7 +20,7 @@ far cheaper to recover than an unrecorded one.
 from __future__ import annotations
 
 from decimal import Decimal
-from typing import Any, Callable
+from typing import Any, Callable, NoReturn
 
 from assistant.execution_kernel.claim import transition_pre_broker_claim
 from assistant.execution_kernel.errors import (
@@ -133,8 +133,14 @@ def resolve_submission_call(
 
 def release_after_telemetry_failure(
     store: AssistantStore, proposal_id: str, exc: Exception
-) -> None:
+) -> NoReturn:
     """Atomically fail and release a reservation whose attempt went unrecorded.
+
+    ``NoReturn`` is part of the contract, not decoration: the facade call
+    site relies on this function raising to stop execution ahead of the
+    broker-contact line that follows it. A future edit that adds a normal
+    return path here would let a telemetry failure fall through to a live
+    order submission.
 
     The CALL to record_submission_started deliberately stays in
     ``assistant.execution_service``: tests and tooling monkeypatch that name

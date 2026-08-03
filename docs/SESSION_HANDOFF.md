@@ -36,10 +36,10 @@ COMPLETE: implemented at 34ce463, independently accepted after correction at
 (red-proof on the exact snapshot, reverse-mutation, evidence checks) at
 5cffb1f on local branch user/claude/phase2-confirmation-20260803. Do not
 reimplement or repeat that review. The owner granted the Phase 3 GR-1D
-go-ahead on 2026-08-03; GR-1D is IMPLEMENTED at dce5e23 on LOCAL-ONLY
-branch user/claude/gr-1d-reconciliation-extraction-20260803 and awaits
-independent review — do not reimplement it, and do not push or merge it
-without owner approval. GR-1E assessment follows the GR-1D review.
+go-ahead on 2026-08-03; GR-1D is IMPLEMENTED at dce5e23 on PUSHED branch
+user/claude/gr-1d-reconciliation-extraction-20260803 and awaits
+independent review — do not reimplement it, and do not merge it without
+owner approval. GR-1E assessment follows the GR-1D review.
 ```
 
 Initial commands:
@@ -85,9 +85,9 @@ origin/main and local main:
            (PR #118 at 8278510 merged the reviewed Phase 2 chain earlier)
 
 GR-1D (ACTIVE), based on main 40af55c:
-  branch: user/claude/gr-1d-reconciliation-extraction-20260803 — LOCAL
-          ONLY, NOT PUSHED; another computer cannot fetch it until the
-          owner authorizes a push
+  branch: user/claude/gr-1d-reconciliation-extraction-20260803 — PUSHED
+          (owner-authorized 2026-08-03); another computer can fetch the
+          implementation and handoff commits from origin
   implementation: dce5e23  (reconciliation extraction behind call-time
           ReconciliationDeps; details in section 5)
   handoff: the commit containing this text
@@ -105,8 +105,8 @@ Phase 2 hygiene, based on main 661a7d4 — COMPLETE AND MERGED:
                no P0/P1 and no open issue
 
 Claude third-round confirmation, based on merged main 8278510:
-  branch: user/claude/phase2-confirmation-20260803 — LOCAL ONLY until the
-          owner authorizes a push
+  branch: user/claude/phase2-confirmation-20260803 — PUSHED AND MERGED as
+          PR #119 (40af55c)
   confirmation: 5cffb1f (review-report addendum: commit dispositions,
           red-proof on exact 34ce463, reverse-mutation, PH2REV-002/003
           evidence checks, merged-tree full-suite validation, 9/10 review
@@ -222,7 +222,7 @@ Git-ignored and machine-local.
 Recent sequence:
 
 ```text
-dce5e23  Claude: GR-1D reconciliation extraction (LOCAL ONLY, awaiting review)
+dce5e23  Claude: GR-1D reconciliation extraction (PUSHED, awaiting review)
 40af55c  Merge PR #119: Phase 2 third-round confirmation into main
 6b1b174  Claude: update session handoff after confirmed Phase 2 (MERGED)
 5cffb1f  Claude: confirm the Phase 2 hygiene review (MERGED via PR #119)
@@ -529,7 +529,7 @@ independent review** (owner go-ahead granted 2026-08-03).
 
 ```text
 branch: user/claude/gr-1d-reconciliation-extraction-20260803
-        (LOCAL ONLY, base 40af55c = merged main after PR #119)
+        (PUSHED, base 40af55c = merged main after PR #119)
 implementation commit: dce5e23
 scope: the 221-line reconcile_submission() body moved token-verbatim
        (813 tokens identical after seam-rename + one trailing-comma
@@ -581,7 +581,7 @@ review branch: codex/review-phase2-hygiene-20260803 (PUSHED)
 review correction/report: 36c69d3
 merge: 8278510 (PR #118; merge tree verified byte-identical to 35fc2dd)
 third-round confirmation: 5cffb1f on user/claude/phase2-confirmation-20260803
-  (LOCAL ONLY until pushed): PH2REV-001 red-proof reproduced in a worktree
+  (merged via PR #119): PH2REV-001 red-proof reproduced in a worktree
   at exact 34ce463 (matches=True on weakened same-named objects);
   correction reverse-mutated and detected; PH2REV-002 reproduced via
   git cat-file and branch inventory; PH2REV-003 corrected text verified;
@@ -1128,9 +1128,9 @@ Do not infer answers to these:
 
 1. ~~Merge the UI/Phase 2 review chains and the Phase 2 confirmation~~ —
    **RESOLVED 2026-08-03**: PR #117 (`661a7d4`), PR #118 (`8278510`), and
-   PR #119 (`40af55c`) all merged. NEW: whether to push (for review) the
-   GR-1D branch `user/claude/gr-1d-reconciliation-extraction-20260803`
-   (`dce5e23` + handoff, currently LOCAL ONLY).
+   PR #119 (`40af55c`) all merged, and the GR-1D branch push was
+   authorized and completed 2026-08-03. NEW: whether to merge the GR-1D
+   branch after its independent review completes.
 2. ~~Push/cross-review the consolidated plans~~ — **RESOLVED 2026-08-02**:
    both plans merged (PR #113/#114); the owner adopted Claude's plan as
    `docs/ACTION_PLAN_2026-08-02.md` with UI feature controls as Phase 1;
@@ -1167,9 +1167,8 @@ git log -10 --oneline --decorate
 Verify that `main` is at or after `40af55c` (PR #119, the merged Phase 2
 confirmation) and that history contains the GR-1C chain through `ff8c16e`.
 The GR-1D branch `user/claude/gr-1d-reconciliation-extraction-20260803`
-(`dce5e23` + this handoff commit) is LOCAL ONLY until the owner authorizes a
-push — another computer cannot fetch it and must not recreate it from
-memory. Local strategy-tool branch
+(`dce5e23` + the handoff commits) is PUSHED and fetchable from origin;
+only the post-review merge decision remains. Local strategy-tool branch
 `codex/ai-strategy-tool-doc-v2-20260802` (`a656015`) also remains local-only.
 Everything merged syncs through Git alone — no session files need copying.
 
@@ -1200,7 +1199,7 @@ a pre-change backup under data/backups/, but the historical source of
 database drift remains unknown. Local strategy-tool branch
 codex/ai-strategy-tool-doc-v2-20260802 at a656015 is present but
 unpublished. GR-1D (Phase 3, owner go-ahead 2026-08-03) is IMPLEMENTED at
-dce5e23 on LOCAL-ONLY branch
+dce5e23 on pushed branch
 user/claude/gr-1d-reconciliation-extraction-20260803 with a symtable-
 enumerated 13-field ReconciliationDeps, a token-verbatim move, 10 new
 characterization tests, and an 8/8 mutation sweep — do not reimplement it.

@@ -104,6 +104,16 @@ Do not delete, move, prune, or switch that worktree as part of this handoff.
 Before staging any future change, re-run `git status`, `git rev-parse HEAD`,
 and `git worktree list`; Claude and Codex share repository objects.
 
+During final handoff preparation, another Claude process briefly switched the
+root checkout and created local branch
+`user/claude/gr-1d-review-confirmation-20260803` at `478e531` (the same review
+tip that existed before the handoff commits). Codex detected the switch before
+staging, returned to its own branch, and preserved the Claude branch ref. As of
+the final inventory, that branch has no unique commit, no configured upstream,
+and no completed confirmation report. Do not call a third-round confirmation
+complete merely because the branch name exists; inspect it and coordinate with
+the owner/Claude before deleting, pushing, or continuing it.
+
 ### Other local-only work
 
 `codex/ai-strategy-tool-doc-v2-20260802` remains local at `a656015` and has

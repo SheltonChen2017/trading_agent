@@ -122,7 +122,7 @@ mandate's evidence counts, and includes every required operational drill
 reports become explicit blocked dimensions instead of terminating the whole
 command.
 
-## GR-1 — execution kernel split: **partial; GR-1D independently reviewed**
+## GR-1 — execution kernel split: **COMPLETE per the GR-1E assessment (2026-08-03, pending independent review)**
 
 GR-1A characterization is built and independently reviewed in
 `tests/test_execution_characterization.py`. The first production extraction is
@@ -585,13 +585,86 @@ were clean. Durable disposition:
 `docs/REVIEW_2026-08-03_GR1D_RECONCILIATION.md` (`2f37210`). GR-1D is
 accepted; GR-1 remains partial pending the GR-1E assessment below.
 
-### GR-1E — conditional composition thinning: NOT ASSESSED — NEXT
+### GR-1E — composition-thinning assessment: NO FURTHER EXTRACTION; GR-1 declared complete (2026-08-03, pending independent review)
 
-After GR-1D, reassess whether one final slice is needed to thin the 281-line
-`execute_approved_paper_proposal` composition and the two recovery wrappers,
-then either declare GR-1's "thin composition layer" definition of done met
-or explain the residual honestly. GR-1 must not be called done before that
-assessment.
+GR-1E was defined as an assessment first, not an automatic extraction:
+compare the remaining facade against the archived definition of done
+(plan section 6.4) and record one of two honest outcomes. The assessment
+was performed mechanically (AST/tokenize line classification and call
+inventory over the exact tree at `c66db0a`) rather than by impression.
+
+#### What the facade actually contains (952 lines)
+
+| Segment | Lines | Of which executable code |
+|---|---|---|
+| Module docstring (19-round audit history, deliberately retained) | 198 | 0 |
+| Imports incl. review-pinned compatibility re-exports | ~90 | — |
+| `execute_approved_paper_proposal` | 281 | 172 |
+| `validate_proposal_for_execution` (GR-1C wrapper) | 90 | 43 |
+| `reconcile_submission` (GR-1D wrapper) | 72 | 18 |
+| `recover_stale_reconciliation` | 75 | 31 |
+| `recover_stale_claim` | 98 | 51 |
+| Remaining helpers/docstrings/comments | — | — |
+
+The 172 executable lines of the execution composition invoke nineteen
+distinct named functions — every one a kernel phase
+(`resolve_kill_switch`, `verify_execution_preconditions`,
+`claim_for_execution`, `classify_override_review`,
+`build_reviewed_override_record`, `_transition_pre_broker_claim`,
+`reserve_daily_budget`, `resolve_submission_call`,
+`release_after_telemetry_failure`, `resolve_failed_submission`,
+`journal_accepted_order`), the GR-1C validation wrapper, a risk-gate
+authorization (`authorize_trade_intent` /
+`authorize_overridden_trade_intent`), or a telemetry recorder — plus
+exactly one broker-contact line. There is no inline financial
+computation, no inline state-transition SQL, and no interpretation logic
+left in the body: what remains is the phase ORDER, the exception→terminal-
+status mapping, and two telemetry calls that stay facade-resolved by
+documented seam design (`record_submission_started` is monkeypatched by
+tests on the facade). That control flow is not residue to be extracted —
+it is the composition layer the definition of done asks for. Moving it
+into a kernel function behind another deps contract would relocate the
+composition, not thin it.
+
+#### Definition-of-done adjudication (plan sections 6.2-6.4)
+
+- **"`execution_service.py` is a thin composition layer"** — MET, as
+  measured above: ~315 executable orchestration lines across five
+  functions, all sequencing, argument validation, or refusal-message
+  construction around kernel and storage primitives.
+- **"Each kernel module independently testable"** — MET: eight kernel
+  modules (`claim`, `revalidate`, `submit`, `outcomes`, `errors`,
+  `intents`, `validate`, `reconcile`), each exercised directly by the
+  characterization/execution suites plus their structural guards.
+- **"No test file changed except by import path"** — HELD through
+  GR-1A→GR-1D; each independent review verified zero existing-test edits.
+- **"The atomic claim stays a single conditional UPDATE"** — HELD; it
+  never left `AssistantStore`, and both recovery paths use the same
+  conditional `reclaim_stale_status` primitive.
+- **"No module may import another's private helpers"** — HELD,
+  AST-enforced since GR-1A's review.
+- **"An ambiguous submission still resolves to the reconciler, not a
+  retry"** — HELD (`resolve_failed_submission`, characterization-frozen).
+
+#### The residual, stated honestly
+
+The two recovery wrappers (82 executable lines combined) remain on the
+facade DELIBERATELY: each is input validation plus one atomic storage
+call plus precise refusal diagnosis. Their entire concurrency and
+atomicity risk already lives in `AssistantStore.reclaim_stale_status`;
+extracting them would add a third deps contract and seam-test family
+while reducing no risk and simplifying nothing. If a future milestone
+changes recovery SEMANTICS, extraction can be reconsidered then, with
+characterization first.
+
+Outside GR-1's scope and therefore NOT closed by this declaration:
+`allocation_batch.py` still owns cross-leg reservation math separately
+from storage-level budget reservation (ARCHITECTURE_DEBT item 1 keeps
+that note), and risk-check scatter remains GR-2's consolidation target
+(item 2).
+
+**Decision: outcome 1 — no GR-1E extraction; GR-1 is complete against its
+definition of done.** Subject to independent review of this assessment.
 
 ## GR-2 .. GR-9 — not started
 

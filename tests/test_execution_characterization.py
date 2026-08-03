@@ -41,6 +41,7 @@ entry points:
 from __future__ import annotations
 
 import contextlib
+import dataclasses
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, timedelta, timezone
 from threading import Barrier
@@ -60,6 +61,7 @@ from assistant.execution_service import (
 )
 from assistant.policy import compute_policy_fingerprint, load_policy
 from assistant.proposal_status import (
+    BLOCKED,
     BROKER_ABSENCE_GRACE_SECONDS,
     SUBMISSION_FAILED,
     SUBMISSION_UNKNOWN,
@@ -984,6 +986,180 @@ def test_the_override_review_digest_binds_to_the_exact_reviewed_violations():
         ("max_position_pct",),
         ("AAPL is 30% of the book.",),
     )
+
+
+def test_a_budget_refusal_fences_the_proposal_out_of_submitting(store):
+    """A refused reservation must not leave the row looking submitted.
+
+    `submitting` means "this may have reached the broker" -- it is the
+    status recovery treats as ambiguous and reconciles rather than
+    retries. A proposal refused by the daily budget provably never
+    contacted the broker, so leaving it in `submitting` would manufacture
+    a false ambiguity: reconciliation would go looking for an order that
+    cannot exist, and the ticker/side slot would stay occupied.
+
+    The transition is fenced (conditional on still owning the claim)
+    rather than a plain write, so stale-claim recovery cannot be clobbered
+    by a worker that was merely paused.
+
+    Mutation result, GR-1B: dropping the fenced transition and raising
+    directly left the execution suite green -- the raise still happened,
+    only the status was wrong. Uncovered until this test.
+    """
+    # A policy that permits zero orders today: the reservation is refused
+    # by the persistent daily cap, after the SUBMITTING fence is written.
+    # The proposal must be bound to THIS policy's fingerprint, or execution
+    # refuses at the policy-binding gate long before the budget is touched.
+    exhausted = dataclasses.replace(load_policy(), max_daily_order_count=0)
+    store.save_proposal(
+        _proposal(
+            side="sell",
+            policy_version=exhausted.version,
+            policy_fingerprint=compute_policy_fingerprint(exhausted),
+        )
+    )
+    recorder = _submission_recorder(submit={"order_id": "must-not-submit"})
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            execute_approved_paper_proposal(
+                "p-1", "approve", _held_portfolio(), exhausted, store,
+                now_et=NOW_ET, earnings_days_away=10,
+            )
+
+    assert "budget" in str(caught.value).lower(), caught.value
+    assert "submit_market_order" not in recorder.call_names, (
+        "a budget refusal happens before the broker is contacted"
+    )
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == BLOCKED, (
+        "left in a status that would make recovery hunt for an order that "
+        "was never sent"
+    )
+    assert state["reservations"] == []
+    assert state["broker_orders"] == []
+
+
+def test_the_persistent_kill_switch_blocks_execution_on_its_own(store):
+    """The switch an OPERATOR actually engages, with no caller cooperation.
+
+    test_kill_switch_blocks_execution_without_reaching_the_broker passes
+    `kill_switch_active=True`, so it only proves the caller's own flag is
+    honoured. The persistent switch lives in the store and is what an
+    operator flips to stop the platform -- including the one this service
+    sets itself on a mismatched order. A caller that passes nothing, or
+    passes False, must still be stopped.
+
+    Mutation result, GR-1B. The switch is resolved at TWO sites: the
+    pre-claim gate in execution_kernel/claim.py and, authoritatively,
+    inside validate_proposal_for_execution(). Reducing either one alone to
+    `return caller_flag` is survivable BY DESIGN -- the other still
+    refuses -- so a single-site mutation proves nothing here. Removing the
+    persistent and environment switches from BOTH sites was undetected by
+    this suite until this test existed; it is what fails now.
+    """
+    store.save_proposal(_proposal(status="proposed"))
+    store.set_kill_switch(True, reason="operator halted the platform")
+    recorder = BrokerRecorder(is_configured=True)
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            execute_approved_paper_proposal(
+                "p-1", "approve", _portfolio(), load_policy(), store,
+                now_et=NOW_ET,
+                # Deliberately False: the caller is NOT cooperating.
+                kill_switch_active=False,
+            )
+
+    assert "kill switch" in str(caught.value).lower(), (
+        f"blocked for the wrong reason: {caught.value}"
+    )
+    assert "submit_market_order" not in recorder.call_names
+    assert "submit_limit_order" not in recorder.call_names
+    assert observable_state(store, "p-1")["broker_orders"] == []
+
+
+def test_a_proposal_bound_to_a_different_policy_content_is_refused(store):
+    """Version equality is not enough; the fingerprint covers content.
+
+    Two policy files can share a version string yet carry materially
+    different limits -- a personal copy edited without a version bump is
+    the realistic case. The fingerprint covers every behaviour-affecting
+    field, so it changes when the version does not, and a proposal whose
+    stored fingerprint no longer matches must be regenerated rather than
+    executed against limits nobody approved it under.
+
+    Mutation result, GR-1B. Like the kill switch, this is checked at two
+    sites -- the pre-claim gate and validate_proposal_for_execution() --
+    so disabling either alone is survivable by design. Disabling BOTH was
+    undetected by this suite until this test existed.
+    """
+    proposal = _proposal(side="sell")
+    proposal["policy_fingerprint"] = "0" * 64  # a policy that is not this one
+    store.save_proposal(proposal)
+    recorder = _submission_recorder(submit={"order_id": "must-not-submit"})
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            execute_approved_paper_proposal(
+                "p-1", "approve", _held_portfolio(), load_policy(), store,
+                now_et=NOW_ET, earnings_days_away=10,
+            )
+
+    assert "fingerprint" in str(caught.value).lower(), caught.value
+    assert recorder.call_names == (), (
+        "a policy-binding failure must be refused before any broker contact"
+    )
+    state = observable_state(store, "p-1")
+    assert state["reservations"] == []
+    assert state["broker_orders"] == []
+
+
+def test_an_expired_proposal_is_refused_and_never_reaches_the_broker(store):
+    """Expiry is enforced INSIDE the atomic claim, and that must be proved.
+
+    An expired proposal was priced, sized, and approved against a market
+    view that no longer holds. Submitting it sends an order the human
+    approved under conditions that have since changed.
+
+    Mutation result, GR-1B, stated precisely. Deleting `not_expired_after`
+    from the atomic claim left the ENTIRE suite green (2395 passed). It
+    does NOT let an expired order reach the broker -- validation still
+    refuses, measured -- but the proposal is CLAIMED first and ends in
+    `blocked` rather than `expired`. So what was uncovered is not the
+    refusal, it is that expiry belongs INSIDE the conditional claim.
+
+    That location is the point. The claim is the serialization boundary:
+    deciding expiry after it means an expired proposal briefly holds a
+    claim and occupies its ticker/side duplicate slot, blocking a live
+    proposal for the same trade. Pinning the resulting status is how this
+    test tells the two arrangements apart.
+    """
+    store.save_proposal(
+        _proposal(side="sell", expires_at="2020-01-01T00:00:00+00:00")
+    )
+    recorder = _submission_recorder(submit={"order_id": "must-not-submit"})
+
+    with patched_broker(recorder):
+        with pytest.raises(ProposalExecutionError) as caught:
+            execute_approved_paper_proposal(
+                "p-1",
+                "approve",
+                _held_portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+                earnings_days_away=10,
+            )
+
+    assert "expired" in str(caught.value).lower(), caught.value
+    assert recorder.call_names == (), (
+        "an expired proposal must be refused before any broker contact"
+    )
+    state = observable_state(store, "p-1")
+    assert state["proposal_status"] == "expired"
+    assert state["reservations"] == [], "an expired proposal must reserve nothing"
+    assert state["broker_orders"] == []
 
 
 def test_a_mismatched_order_under_our_key_halts_the_platform(store):

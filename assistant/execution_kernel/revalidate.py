@@ -38,6 +38,92 @@ def _review_digest(intent: TradeIntent, violation_codes: tuple[str, ...], violat
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
 
 
+def classify_override_review(
+    proposal: dict,
+    intent: TradeIntent,
+    violation_codes: tuple[str, ...],
+    violations: tuple[str, ...],
+    override_requested: bool,
+) -> tuple[bool, bool, str]:
+    """Decide whether an override request matches what a human reviewed.
+
+    GR-1B extraction. Returns ``(reviewed_matches, conditions_changed,
+    current_digest)``.
+
+    Reviewed-override binding (GPT review, 2026-07-30): a digest match
+    against the LAST reviewed-override record stored on this proposal is
+    required, IN ADDITION to ``override_requested``, before proceeding.
+    Otherwise the caller always (re-)stores the current violations as the
+    new record to review and raises, never silently escalating to an
+    authorization based on conditions the human has not specifically seen
+    and accepted.
+
+    ``proposal`` must be the snapshot fetched BEFORE this call's atomic
+    claim, so ``reviewed_override`` reflects whatever a PRIOR call stored
+    -- ``claim_proposal()`` never touches ``payload_json``. Passing a
+    post-claim snapshot would not change today's behaviour but would make
+    the guarantee accidental rather than structural.
+
+    ``conditions_changed`` is True only when an override WAS requested,
+    a prior record existed, and it no longer matches -- i.e. the human's
+    earlier review no longer describes what would actually be overridden.
+    That is a different message to the caller than a first presentation.
+    """
+    current_digest = _review_digest(intent, violation_codes, violations)
+    previous_reviewed = proposal.get("reviewed_override")
+    reviewed_matches = (
+        override_requested
+        and previous_reviewed is not None
+        and previous_reviewed.get("review_digest") == current_digest
+    )
+    conditions_changed = (
+        override_requested
+        and previous_reviewed is not None
+        and previous_reviewed.get("review_digest") != current_digest
+    )
+    return reviewed_matches, conditions_changed, current_digest
+
+
+def build_reviewed_override_record(
+    intent: TradeIntent,
+    violation_codes: tuple[str, ...],
+    violations: tuple[str, ...],
+    review_digest: str,
+    presented_at: str,
+) -> dict:
+    """The record a human must match on a second call to override.
+
+    KNOWN LIMITATION (GPT review, 2026-07-31, not fixed --
+    dormant/architectural, not currently exploitable through either real
+    caller): ``presented_at`` is recorded the moment the SERVICE computes
+    the block, not necessarily the moment a human actually saw it rendered
+    on a screen. The two-call digest-match convention proves the SECOND
+    call's violations exactly match what was stored on a PRIOR call, but
+    does not cryptographically prove a human visually reviewed them in
+    between -- a hypothetical future programmatic caller invoking
+    execution twice in a tight loop with identical conditions would satisfy
+    the digest match without any human ever seeing the first block.
+
+    Both real callers today (the CLI, which requires a separate
+    ``approve ... --override`` process re-invocation, and the UI, which
+    requires clicking a button and then typing a distinct order-specific
+    phrase into a text box) already require a genuine human action between
+    the two calls, so this isn't currently exploitable -- but a fully
+    rigorous fix would replace this convention with a signed, single-use
+    challenge token returned to the caller after presentation and required
+    back verbatim on the override call, rather than relying on that
+    assumption. Revisit before exposing this override path through any new
+    (e.g. programmatic/API) caller.
+    """
+    return {
+        "intent_fingerprint": intent_fingerprint(intent),
+        "violation_codes": sorted(violation_codes),
+        "violations": sorted(violations),
+        "review_digest": review_digest,
+        "presented_at": presented_at,
+    }
+
+
 def _pending_buy_value_by_ticker(
     open_orders: list[dict], broker_module
 ) -> dict[str, Decimal]:

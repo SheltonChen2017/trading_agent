@@ -209,6 +209,7 @@ from assistant.execution_kernel.outcomes import (
     _broker_absence_is_old_enough,
     _lookup_order_outcome,
     _order_matches_intent,
+    resolve_failed_submission,
 )
 from assistant.execution_kernel.errors import (
     PolicyOverridableBlockError,
@@ -223,14 +224,23 @@ from assistant.execution_kernel.claim import (
     PRE_BROKER_STRANDED_STATUSES,
     _parse_recovery_timestamp,
     _transition_pre_broker_claim,
+    claim_for_execution,
+    resolve_kill_switch,
+    verify_execution_preconditions,
 )
 from assistant.execution_kernel.revalidate import (
     _pending_buy_value_by_ticker,
     _resolve_earnings_days_away,
     _review_digest,
+    build_reviewed_override_record,
+    classify_override_review,
 )
 from assistant.execution_kernel.submit import (
     _execution_budget_notional,
+    journal_accepted_order,
+    release_after_telemetry_failure,
+    reserve_daily_budget,
+    resolve_submission_call,
 )
 from assistant.kill_switch import env_kill_switch_active
 from assistant.execution_telemetry import (
@@ -261,7 +271,7 @@ from assistant.proposal_status import (
     VALIDATION_FAILED,
 )
 from assistant.schemas import PortfolioSnapshot
-from assistant.storage import AssistantStore, DuplicateIntentConflict
+from assistant.storage import AssistantStore
 from risk.execution_gate import (
     TradeIntent,
     ValidationResult,
@@ -733,93 +743,12 @@ def execute_approved_paper_proposal(
     Proposals are single-use, short-lived, and currently restricted to
     Alpaca paper accounts regardless of the global broker configuration.
     """
-    # Enforce the environment kill switch here too, not only in callers --
-    # a caller that forgets to pass kill_switch_active must not silently
-    # bypass it. This makes the switch an invariant of the service itself.
-    try:
-        persistent_kill_switch = store.get_kill_switch()
-    except Exception as exc:
-        raise ProposalExecutionError(
-            f"Could not verify the persistent kill switch; refusing execution: {exc}"
-        ) from exc
-    kill_switch_active = (
-        kill_switch_active
-        or env_kill_switch_active()
-        or bool(persistent_kill_switch.get("active"))
-    )
-
-    proposal = store.get_proposal(proposal_id)
-    if proposal is None:
-        raise ProposalExecutionError(f"Unknown proposal: {proposal_id}")
-    if confirmation.strip().lower() != "approve":
-        raise ProposalExecutionError('Explicit approval phrase did not match -- type "approve".')
-    if policy.execution_mode != "paper":
-        raise ProposalExecutionError("The active policy does not permit paper execution.")
-    if proposal["policy_version"] != policy.version:
-        raise ProposalExecutionError("Proposal policy version does not match the active policy.")
-    # A manually-maintained version string alone can't catch an edited-
-    # but-not-rebumped policy file: two policy files (e.g. a personal one
-    # copied from the default) can share the same version yet have
-    # materially different limits (GPT review, 2026-07-28). The
-    # fingerprint covers every behavior-affecting field, so it changes
-    # even when version doesn't. A proposal predating fingerprinting
-    # (missing the field entirely) fails closed here rather than being
-    # grandfathered in -- regenerate it instead.
-    if proposal.get("policy_fingerprint") != compute_policy_fingerprint(policy):
-        raise ProposalExecutionError(
-            "Proposal's policy fingerprint does not match the active policy's current content -- the "
-            "policy may have been edited without a version bump (or this proposal predates fingerprint "
-            "binding). Regenerate the proposal against the current policy."
-        )
-
+    # PHASE 1-3: admission. Kill switch, then preconditions, then the atomic
+    # claim -- in that order, and none of them contacts the broker.
+    kill_switch_active = resolve_kill_switch(store, kill_switch_active)
+    proposal = verify_execution_preconditions(store, proposal_id, confirmation, policy)
     now_utc = datetime.now(timezone.utc)
-
-    # Atomic claim: proposed -> validating, ONLY if not already expired.
-    # Both the claim and the expiry write below are conditioned on the
-    # row still being "proposed" at the moment they run, so neither can
-    # ever clobber an "executed"/"approved"/"validating"/"submission_failed"
-    # status -- a prior version checked expiry with an unconditional write
-    # before claiming, which could silently flip an already-executed
-    # proposal back to "expired" if approval was invoked again past its
-    # expiry window (or race an in-flight claim into "expired" out from
-    # under it).
-    # Also claimable from POLICY_OVERRIDE_AVAILABLE: that status means a
-    # PRIOR call found only override-eligible violations and is waiting on
-    # a human decision, not a terminal rejection -- re-invoking (with
-    # override_policy_violations=True to actually proceed past them, or
-    # without it to just re-check) must be able to pick it back up.
-    # conflicting_intent_statuses makes the ticker+side duplicate rule part of
-    # the SAME serialized claim as the status check. The snapshot-based
-    # duplicate check further down still runs (it also covers recent fills and
-    # broker orders this process never proposed); this closes the narrower
-    # window where two concurrent approvals of DIFFERENT proposals for the same
-    # ticker/side both read "no duplicate" before either order reached the
-    # broker (independent review, 2026-07-30).
-    try:
-        claimed = store.claim_proposal(
-            proposal_id,
-            expected_status=("proposed", POLICY_OVERRIDE_AVAILABLE),
-            new_status=VALIDATING,
-            not_expired_after=now_utc.isoformat(),
-            conflicting_intent_statuses=IN_FLIGHT_INTENT_STATUSES,
-        )
-    except DuplicateIntentConflict as exc:
-        raise ProposalExecutionError(f"Duplicate-order protection: {exc}") from exc
-    if claimed is None:
-        current = store.get_proposal(proposal_id)
-        if (
-            current is not None
-            and current["status"] in ("proposed", POLICY_OVERRIDE_AVAILABLE)
-            and now_utc > datetime.fromisoformat(current["expires_at"])
-        ):
-            store.claim_proposal(
-                proposal_id, expected_status=("proposed", POLICY_OVERRIDE_AVAILABLE), new_status="expired"
-            )
-            raise ProposalExecutionError("Proposal has expired; generate a fresh one.")
-        raise ProposalExecutionError(
-            f"Proposal {proposal_id} could not be claimed (already being processed, "
-            "already executed, or not in a 'proposed' or 'override_available' state)."
-        )
+    claim_for_execution(store, proposal_id, now_utc)
 
     import execution.alpaca_broker as broker
 
@@ -870,73 +799,29 @@ def execute_approved_paper_proposal(
                 raise ProposalExecutionError(
                     "Execution gate blocked the proposal: " + "; ".join(validation.violations)
                 )
-            # Reviewed-override binding (GPT review, 2026-07-30): a
-            # digest match against the LAST reviewed-override record
-            # stored on this proposal is required, in addition to
-            # override_policy_violations=True, before proceeding --
-            # otherwise this always (re-)stores the current violations as
-            # the new record to review and raises, never silently
-            # escalating to an authorization based on conditions the
-            # human hasn't specifically seen and accepted. `proposal`
-            # here is the snapshot fetched BEFORE this call's atomic
-            # claim, so `reviewed_override` reflects whatever a PRIOR
-            # call stored -- claim_proposal() never touches payload_json.
-            current_digest = _review_digest(intent, validation.violation_codes, validation.violations)
-            previous_reviewed = proposal.get("reviewed_override")
-            reviewed_matches = (
-                override_policy_violations
-                and previous_reviewed is not None
-                and previous_reviewed.get("review_digest") == current_digest
+            reviewed_matches, conditions_changed, current_digest = (
+                classify_override_review(
+                    proposal,
+                    intent,
+                    validation.violation_codes,
+                    validation.violations,
+                    override_policy_violations,
+                )
             )
             if not reviewed_matches:
-                conditions_changed = (
-                    override_policy_violations
-                    and previous_reviewed is not None
-                    and previous_reviewed.get("review_digest") != current_digest
-                )
                 _transition_pre_broker_claim(
                     store,
                     proposal_id,
                     expected_status=VALIDATING,
                     new_status=POLICY_OVERRIDE_AVAILABLE,
                     violations=list(validation.violations),
-                    reviewed_override={
-                        "intent_fingerprint": intent_fingerprint(intent),
-                        "violation_codes": sorted(validation.violation_codes),
-                        "violations": sorted(validation.violations),
-                        "review_digest": current_digest,
-                        # KNOWN LIMITATION (GPT review, 2026-07-31, not
-                        # fixed -- dormant/architectural, not currently
-                        # exploitable through either real caller): this
-                        # timestamp is recorded the moment the SERVICE
-                        # computes the block, not necessarily the moment
-                        # a human actually saw it rendered on a screen.
-                        # The two-call digest-match convention proves the
-                        # SECOND call's violations exactly match what was
-                        # stored on a PRIOR call, but does not
-                        # cryptographically prove a human visually
-                        # reviewed them in between -- a hypothetical
-                        # future programmatic caller invoking this
-                        # function twice in a tight loop with identical
-                        # conditions would satisfy the digest match
-                        # without any human ever seeing the first block.
-                        # Both real callers today (the CLI, which
-                        # requires a separate `approve ... --override`
-                        # process re-invocation, and the UI, which
-                        # requires clicking a button and then typing a
-                        # distinct order-specific phrase into a text box)
-                        # already require a genuine human action between
-                        # the two calls, so this isn't currently
-                        # exploitable -- but a fully rigorous fix would
-                        # replace this convention with a signed, single-
-                        # use challenge token returned to the caller after
-                        # presentation and required back verbatim on the
-                        # override call, rather than relying on that
-                        # assumption. Revisit before exposing this
-                        # override path through any new (e.g.
-                        # programmatic/API) caller.
-                        "presented_at": now_utc.isoformat(),
-                    },
+                    reviewed_override=build_reviewed_override_record(
+                        intent,
+                        validation.violation_codes,
+                        validation.violations,
+                        current_digest,
+                        now_utc.isoformat(),
+                    ),
                 )
                 raise PolicyOverridableBlockError(
                     "Execution gate blocked this proposal, but every violation is override-eligible "
@@ -1032,60 +917,17 @@ def execute_approved_paper_proposal(
         new_status=SUBMITTING,
     )
 
-    try:
-        store.reserve_execution_budget(
-            proposal_id,
-            trading_day=now_et.date().isoformat(),
-            notional=_execution_budget_notional(intent, reference_price),
-            max_daily_notional=policy.max_daily_submitted_notional,
-            max_daily_orders=policy.max_daily_order_count,
-        )
-    except Exception as exc:
-        message = f"Persistent daily execution budget blocked submission: {exc}"
-        # Independent review, 2026-07-31 (P2 #2): this used to write via
-        # plain update_proposal_status() instead of the file's own
-        # _transition_pre_broker_claim() fenced pattern -- inconsistent
-        # with this module's own stated invariant ("every later pre-broker
-        # transition must be conditional"). _ProposalClaimLostError is a
-        # ProposalExecutionError subclass, so a lost claim here propagates
-        # exactly like every other pre-broker failure path in this file.
-        _transition_pre_broker_claim(
-            store, proposal_id,
-            expected_status=SUBMITTING, new_status=BLOCKED,
-            violations=[message],
-        )
-        raise ProposalExecutionError(message) from exc
-
-    # Dispatch explicitly rather than "limit, else market". Two upstream
-    # layers already prevent anything else reaching here (policy.validate()
-    # rejects an allowed_order_types outside SUPPORTED_ORDER_TYPES, and the
-    # allowed_order_types check above blocks the proposal), but
-    # risk/execution_gate.py's validate_trade_intent() DOES still approve
-    # order_type="stop" -- it is a lower layer with no view of policy. Under
-    # the old else-branch such an intent would have been silently submitted
-    # as a MARKET order, i.e. an unbounded-price order where a stop was
-    # intended. Fail closed instead, so adding a new order type can never
-    # silently degrade into a market order (independent review, 2026-07-29).
-    if intent.order_type == "limit":
-        submit = broker.submit_limit_order
-        submit_kwargs = {"limit_price": intent.limit_price}
-    elif intent.order_type == "market":
-        submit = broker.submit_market_order
-        submit_kwargs = {}
-    else:
-        message = (
-            f"No broker submission path implements order_type={intent.order_type!r}; refusing to "
-            "submit rather than silently downgrading it to a market order."
-        )
-        # Independent review, 2026-07-31 (P2 #2): same fencing fix as the
-        # budget-reservation-failure branch above.
-        _transition_pre_broker_claim(
-            store, proposal_id,
-            expected_status=SUBMITTING, new_status=BLOCKED,
-            violations=[message],
-        )
-        store.release_execution_reservation(proposal_id)
-        raise ProposalExecutionError(message)
+    # PHASE 7-9: reserve, choose the dispatch, record the attempt. Order is
+    # load-bearing -- see assistant/execution_kernel/submit.py.
+    reserve_daily_budget(
+        store, proposal_id, intent, reference_price, policy, now_et.date().isoformat()
+    )
+    submit, submit_kwargs = resolve_submission_call(broker, store, proposal_id, intent)
+    # Telemetry is part of the execution evidence contract, and this CALL
+    # stays on the facade on purpose: tests and tooling monkeypatch
+    # execution_service.record_submission_started, and resolving it inside
+    # the kernel would silently defeat those patches. Only the failure
+    # handling is delegated.
     try:
         record_submission_started(
             store,
@@ -1095,21 +937,9 @@ def execute_approved_paper_proposal(
             outcome=validation_outcome,
         )
     except Exception as exc:
-        # Telemetry is part of the execution evidence contract. If the local
-        # append fails, stop BEFORE contacting the broker and atomically
-        # release the reserved budget; an unobserved order attempt would be
-        # harder to recover than a refused one.
-        message = f"Execution telemetry failed before broker submission: {exc}"
-        failed = store.mark_submission_failed_and_release(
-            proposal_id,
-            expected_statuses=(SUBMITTING,),
-            error=message,
-        )
-        if failed is None:
-            raise _ProposalClaimLostError(
-                f"Proposal {proposal_id} changed state before telemetry failure could be recorded."
-            ) from exc
-        raise ProposalExecutionError(message) from exc
+        release_after_telemetry_failure(store, proposal_id, exc)
+
+    # PHASE 10: the only line in this function that contacts the broker.
     try:
         order = submit(
             intent.ticker,
@@ -1120,140 +950,16 @@ def execute_approved_paper_proposal(
             **submit_kwargs,
         )
     except Exception as exc:
-        # An exception here does NOT prove the broker rejected the order --
-        # a network timeout, for example, can lose the response after the
-        # order was actually accepted. Reconcile by looking the order up
-        # under the same idempotency key (client_order_id) before
-        # concluding anything -- and distinguish a 404 from a failed lookup
-        # without trusting a new 404 before the indexing grace period (see
-        # _lookup_order_outcome).
-        outcome = _lookup_order_outcome(broker, proposal["idempotency_key"])
-        if isinstance(outcome, dict):
-            matches, mismatch_detail = _order_matches_intent(outcome, intent)
-            if not matches:
-                # An order exists under our exact idempotency key but does
-                # NOT match what we submitted -- never auto-resolve this;
-                # it's exactly the anomaly duplicate-order protection
-                # exists to catch (GPT review, 2026-07-28).
-                reason = (
-                    f"Order submission raised ({exc}), and the order found under this idempotency "
-                    f"key does NOT match the intent (mismatch: {mismatch_detail}) -- refusing to "
-                    "auto-resolve. Persistent kill switch activated; investigate manually."
-                )
-                store.update_proposal_status_if_current(
-                    proposal_id,
-                    expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-                    new_status=SUBMISSION_UNKNOWN,
-                    error=reason,
-                )
-                store.set_kill_switch(True, reason=reason)
-                raise ProposalExecutionError(
-                    f"Order submission failed for {proposal_id}, and a MISMATCHED order was found "
-                    f"under this idempotency key ({mismatch_detail}) -- left as 'submission_unknown' "
-                    "for manual investigation, not auto-resolved."
-                ) from exc
-            # Same replacement-chain resolution as manual reconciliation: the
-            # order found under our idempotency key could already have been
-            # replaced out of band between the failed submit and this lookup.
-            # Narrower window than reconcile_submission()'s, but the identical
-            # defect -- journaling a superseded order as the outcome.
-            authoritative, chain_error, is_mismatch, chain = _authoritative_order_for(
-                broker, outcome, intent
-            )
-            if chain_error is not None:
-                reason = (
-                    f"Order submission raised ({exc}), and the replacement chain for the order found "
-                    f"under this idempotency key could not be trusted: {chain_error}. "
-                    + ("Persistent kill switch activated; investigate manually."
-                       if is_mismatch else "Left retryable as 'submission_unknown'.")
-                )
-                store.update_proposal_status_if_current(
-                    proposal_id,
-                    expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-                    new_status=SUBMISSION_UNKNOWN,
-                    error=reason,
-                )
-                if is_mismatch:
-                    store.set_kill_switch(True, reason=reason)
-                raise ProposalExecutionError(reason) from exc
-
-            journal_broker_order_update(
-                store,
-                proposal_id,
-                authoritative,
-                event_type="submission_reconciled",
-                clear_error=True,
-                extra_updates={"reconciled_after_error": str(exc)},
-                raw_event={"replacement_chain": list(chain)} if chain else None,
-            )
-            return authoritative
-        if outcome is None:
-            # A 404 immediately after a timeout is not durable proof that the
-            # order was never accepted: the response may have been lost before
-            # the broker indexed client_order_id. Keep the reservation and the
-            # duplicate-intent slot until delayed reconciliation observes
-            # absence after the shared grace period.
-            unresolved = store.update_proposal_status_if_current(
-                proposal_id,
-                expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-                new_status=SUBMISSION_UNKNOWN,
-                error=(
-                    f"Submission raised ({exc}); an immediate broker lookup found no matching "
-                    "order, but absence is not trusted until the broker-indexing grace period "
-                    "has elapsed. Reconcile again later."
-                ),
-            )
-            if unresolved is None:
-                current = store.get_proposal(proposal_id)
-                if current is not None and current.get("broker_order"):
-                    return current["broker_order"]
-            raise ProposalExecutionError(
-                f"Could not confirm whether the order for {proposal_id} was accepted after "
-                f"the submission error ({exc}). The immediate lookup found no order, but the "
-                "broker-indexing grace period has not elapsed; status is 'submission_unknown' "
-                "and its execution reservation remains held. Reconcile again later."
-            ) from exc
-        unresolved = store.update_proposal_status_if_current(
-            proposal_id,
-            expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-            new_status=SUBMISSION_UNKNOWN,
-            error=str(exc),
+        # PHASE 11: the submit raised. What that MEANS is the kernel's job --
+        # it may or may not have reached the broker, and only a lookup under
+        # the same idempotency key can tell us. Never a blind retry.
+        return resolve_failed_submission(
+            broker, store, proposal_id, proposal["idempotency_key"], intent, exc
         )
-        if unresolved is None:
-            current = store.get_proposal(proposal_id)
-            if current is not None and current.get("broker_order"):
-                return current["broker_order"]
-        raise ProposalExecutionError(
-            f"Could not confirm whether the order for {proposal_id} was accepted by the broker "
-            f"after an error ({exc}). Status is 'submission_unknown' -- run "
-            f"`reconcile_submission({proposal_id!r}, store)` (CLI: `reconcile {proposal_id}`) once "
-            "connectivity is restored; this ticker/side is treated as a duplicate-order risk until then."
-        ) from exc
 
-    try:
-        journal_broker_order_update(
-            store,
-            proposal_id,
-            order,
-            event_type="submission_response",
-        )
-    except Exception as exc:
-        # The broker DID accept the order (we got a normal response) --
-        # the failure is only in our local journal write. Do not report
-        # this as a submission failure; that would misrepresent an order
-        # that genuinely exists. Keep the order info in `error` so it can
-        # be reconciled/re-journaled manually.
-        store.update_proposal_status_if_current(
-            proposal_id,
-            expected_statuses=(SUBMITTING, SUBMISSION_UNKNOWN, RECONCILING),
-            new_status=proposal_status_for_order(order),
-            broker_order=order,
-            broker_status=str(order.get("status", "unknown")),
-            error=f"Order was accepted by the broker but local recording failed: {exc}",
-        )
-        return order
-
-    return order
+    # PHASE 12: the broker accepted it. A local journal failure from here on
+    # must never be reported as a submission failure.
+    return journal_accepted_order(store, proposal_id, order)
 
 
 def reconcile_submission(proposal_id: str, store: AssistantStore) -> dict:

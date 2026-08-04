@@ -125,6 +125,103 @@ TERMINAL_BROKER_STATUSES: tuple[str, ...] = (
     SUBMISSION_FAILED,
 )
 
+# --- UI-2b: user-facing outcome groups (frozen 2026-08-04) ------------------
+#
+# The History page's primary filter groups the 19 lifecycle statuses into a
+# small set of outcomes a person can reason about. The grouping rules were
+# frozen in docs/ACTION_PLAN_2026-08-02.md section 8 (UI-2b) BEFORE
+# implementation:
+#
+#   - legacy "executed" means only "the broker accepted the request", never a
+#     confirmed fill, so it belongs to "Broker working / unresolved" -- an
+#     unresolved order must never display as completed;
+#   - "Filled" contains exactly `filled` and nothing else; and
+#   - a status value this mapping has never seen (a future release adding one)
+#     must display as "Other / unknown", never silently join a completed-
+#     looking group. `outcome_group_for_status()` is the only lookup path and
+#     enforces that fail-safe.
+#
+# When UI-2d introduces the `dismissed` status, the exhaustiveness contract
+# (`set(STATUS_OUTCOME_GROUPS) == set(STATUSES)`, pinned in
+# tests/test_proposal_outcome_groups.py) forces the same reviewed change to
+# add it here, into "Closed without fill" per the frozen plan.
+#
+# This is deliberately NOT the same rule as the Propose & Approve page's
+# `_proposal_status_category()` rendering router in
+# scripts/personal_assistant_ui.py: that helper decides which CONTROLS to
+# show (and lumps expired/canceled in with failures for that purpose), while
+# this mapping is the user-facing outcome taxonomy (which separates
+# "Refused / failed" from "Closed without fill"). Do not consolidate them.
+
+OUTCOME_AWAITING_DECISION = "Awaiting decision"
+OUTCOME_PROCESSING = "Processing"
+OUTCOME_BROKER_WORKING = "Broker working / unresolved"
+OUTCOME_FILLED = "Filled"
+OUTCOME_REFUSED_FAILED = "Refused / failed"
+OUTCOME_CLOSED_WITHOUT_FILL = "Closed without fill"
+OUTCOME_OTHER_UNKNOWN = "Other / unknown"
+
+# Display order for filter widgets: lifecycle order, catch-all last.
+OUTCOME_GROUPS: tuple[str, ...] = (
+    OUTCOME_AWAITING_DECISION,
+    OUTCOME_PROCESSING,
+    OUTCOME_BROKER_WORKING,
+    OUTCOME_FILLED,
+    OUTCOME_REFUSED_FAILED,
+    OUTCOME_CLOSED_WITHOUT_FILL,
+    OUTCOME_OTHER_UNKNOWN,
+)
+
+# Every canonical status maps to exactly one group. OUTCOME_OTHER_UNKNOWN is
+# intentionally absent from the values: it exists only as the fail-safe for
+# statuses outside this mapping.
+STATUS_OUTCOME_GROUPS: dict[str, str] = {
+    PROPOSED: OUTCOME_AWAITING_DECISION,
+    POLICY_OVERRIDE_AVAILABLE: OUTCOME_AWAITING_DECISION,
+    VALIDATING: OUTCOME_PROCESSING,
+    APPROVED: OUTCOME_PROCESSING,
+    SUBMITTING: OUTCOME_BROKER_WORKING,
+    SUBMISSION_UNKNOWN: OUTCOME_BROKER_WORKING,
+    RECONCILING: OUTCOME_BROKER_WORKING,
+    BROKER_ACCEPTED: OUTCOME_BROKER_WORKING,
+    PARTIALLY_FILLED: OUTCOME_BROKER_WORKING,
+    CANCEL_PENDING: OUTCOME_BROKER_WORKING,
+    EXECUTED: OUTCOME_BROKER_WORKING,
+    FILLED: OUTCOME_FILLED,
+    BLOCKED: OUTCOME_REFUSED_FAILED,
+    VALIDATION_FAILED: OUTCOME_REFUSED_FAILED,
+    SUBMISSION_FAILED: OUTCOME_REFUSED_FAILED,
+    BROKER_REJECTED: OUTCOME_REFUSED_FAILED,
+    CANCELED: OUTCOME_CLOSED_WITHOUT_FILL,
+    BROKER_EXPIRED: OUTCOME_CLOSED_WITHOUT_FILL,
+    EXPIRED: OUTCOME_CLOSED_WITHOUT_FILL,
+}
+
+
+def outcome_group_for_status(status: object) -> str:
+    """The one lookup path from a stored status to its outcome group.
+
+    Fail-safe direction: anything not in the frozen mapping -- a future
+    status value, None, a non-string -- is "Other / unknown". It must never
+    default into a group that reads as resolved or completed.
+    """
+    if not isinstance(status, str):
+        return OUTCOME_OTHER_UNKNOWN
+    return STATUS_OUTCOME_GROUPS.get(status, OUTCOME_OTHER_UNKNOWN)
+
+
+def statuses_for_outcome_groups(groups) -> tuple[str, ...]:
+    """The canonical statuses belonging to the selected outcome groups, in
+    STATUSES order. OUTCOME_OTHER_UNKNOWN contributes no canonical status --
+    it can only be matched negatively (status NOT IN STATUSES), which the
+    storage query expresses with its own explicit flag."""
+    wanted = set(groups)
+    return tuple(
+        status
+        for status in STATUSES
+        if STATUS_OUTCOME_GROUPS[status] in wanted
+    )
+
 ACTIVE_BROKER_ORDER_STATUSES: tuple[str, ...] = (
     BROKER_ACCEPTED,
     PARTIALLY_FILLED,

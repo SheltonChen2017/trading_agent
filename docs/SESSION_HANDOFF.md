@@ -38,13 +38,15 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     implementation branch = user/claude/mandate-approval-20260804 (pushed)
     implementation approval commit = e8fe943
     implementation handoff commit = f78e5ff
-    review branch = codex/review-mandate-approval-20260804 (local-only)
+    review branch = codex/review-mandate-approval-20260804 (pushed)
     review correction = d4cd5ee
-    review handoff = the commit containing this file
+    initial review handoff = 89ab9c6
+    publication handoff = the commit containing this file
 
 Nothing from the mandate branch or review branch is merged into `main`.
-The review branch has not been pushed; another computer cannot fetch
-`d4cd5ee` or this handoff until the owner authorizes a push.
+The review branch is available from `origin`. Automated PR creation failed
+because the authenticated GitHub Enterprise Managed User is not authorized to
+create pull requests; no PR exists yet.
 
 Commit dispositions:
 
@@ -100,8 +102,11 @@ database, ledger bootstrap, epoch creation, or operational drills.
 
 ## 5. What is next (do not start automatically)
 
-1. Owner decides whether to push and merge
-   `codex/review-mandate-approval-20260804`.
+1. Owner opens a PR from
+   `codex/review-mandate-approval-20260804` to `main` using
+   https://github.com/SheltonChen2017/trading_agent/pull/new/codex/review-mandate-approval-20260804.
+   The agent cannot create it with the currently authenticated Enterprise
+   Managed User.
 2. After merge, update the clean operational checkout to the exact merged
    commit and rerun the full suite there.
 3. In an owner-led elevated shell, preview, inspect, install, and verify the
@@ -153,8 +158,8 @@ On resume, read in this order:
 6. `docs/OPERATIONS_RUNBOOK.md` before any owner-led deployment action.
 
 Suggested resume prompt: "Read the required instructions and canonical
-handoff, fetch all refs, and verify whether
-`codex/review-mandate-approval-20260804` was pushed or merged. Preserve
-`d4cd5ee`. Do not install tasks, touch the operator database, contact the
-broker, bootstrap the ledger, or start an evidence epoch without the owner's
-explicit direction."
+handoff, fetch all refs, and verify whether the pushed
+`codex/review-mandate-approval-20260804` branch has a PR or was merged.
+Preserve `d4cd5ee` and `89ab9c6`. Do not install tasks, touch the operator
+database, contact the broker, bootstrap the ledger, or start an evidence epoch
+without the owner's explicit direction."

@@ -62,3 +62,38 @@ The existing single-process transaction tests and storage claim-concurrency
 coverage support the `BEGIN IMMEDIATE`/compare-and-set race design; UI-2d still
 has no dedicated multi-process dismiss-versus-claim test. This is a remaining
 test limit, not evidence of an observed defect.
+
+## Claude counter-review (2026-08-04, appended)
+
+Every finding was independently re-verified red on submitted snapshot
+`6d287f0` with fresh probes before acceptance:
+
+- **UI2DREV-001 confirmed red:** a proposal with an
+  `execution_telemetry_events` row was reported `dismissible` — durable
+  validation-attempt evidence ignored. The finding is correct, and after
+  the fix the child-table check list is verified COMPLETE against the
+  schema: exactly four tables carry a `proposal_id` column
+  (broker_orders, broker_order_events, execution_telemetry_events,
+  execution_reservations) and all four now refuse.
+- **UI2DREV-002 confirmed red:** a batch payload with
+  `"proposal_ids": "p-any"` (a string) was iterated character-by-character
+  and the referenced proposal classified dismissible. Correct; the
+  structural validation now fails closed.
+- **UI2DREV-003 confirmed red:** swapping the stored intent's ticker
+  without touching `updated_at` left the old preview hash valid and the
+  mutated row was dismissed. Correct; the hash now covers the exact stored
+  payload, idempotency key, and all timestamps.
+- **UI2DREV-004 accepted:** the handoff/action-plan staleness after the
+  owner's fast merge is the known push/merge race; the replacement records
+  are accurate.
+
+Verdict: both P2s and both P3s are genuine; the corrections are accepted
+as written. Focused suites re-ran green on merged main during the
+counter-review.
+
+The generalized-instance search over the corrected code found one residual
+member of the UI2DREV-001 evidence class:
+
+| ID | Priority | Status | Location | Issue | Correction | Verification |
+|---|---|---|---|---|---|---|
+| CRUI2D-001 | P3 | Resolved | `assistant/storage.py::_DISMISSAL_EXECUTION_EVIDENCE_KEYS` | The `reviewed_override` payload key — written by the same `override_available` transition that writes `violations` (execution_service stores `build_reviewed_override_record()` under it) — was missing from the frozen evidence-key list. Unreachable without `violations` through any code path, but the payload check exists precisely for arbitrary status/payload corruption, so each override-evidence key must refuse on its own. | Added `reviewed_override` to the frozen tuple with a comment recording the co-write relationship, plus a parametrized refusal case. | Reverse mutation (key removed) failed the new case `test_execution_shaped_payload_evidence_refuses[reviewed_override-...]` and restoration returned it green; focused dismissal/History/outcome suites 69 passed; full suite green on the exact final tree (counts in the session handoff). |

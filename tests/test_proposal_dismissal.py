@@ -274,6 +274,9 @@ def test_structurally_invalid_allocation_batch_payload_fails_closed(store):
         ("submitted_at", "2026-08-04T10:00:00+00:00"),
         ("policy_override", True),
         ("error", "submission raised"),
+        # CRUI2D-001: the reviewed-override record is co-written with
+        # `violations`, but each override-evidence key must refuse alone.
+        ("reviewed_override", {"intent_fingerprint": "abc", "codes": ["x"]}),
     ],
 )
 def test_execution_shaped_payload_evidence_refuses(store, evidence_key, evidence_value):

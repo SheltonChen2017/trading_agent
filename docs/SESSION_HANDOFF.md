@@ -1,7 +1,10 @@
 # Development session handoff
 
 Prepared: 2026-08-04 after Codex independently reviewed and corrected
-Claude's UI-2d durable proposal dismissal/archive implementation.
+Claude's UI-2d durable proposal dismissal/archive implementation, the owner
+merged both PRs, and Claude counter-reviewed the review — confirming every
+finding red on the submitted snapshot and closing one further P3
+(CRUI2D-001) from the same evidence class.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
@@ -9,13 +12,21 @@ model, or session change. This file completely replaces the prior handoff.
 ## 1. Current outcome
 
 UI-2d — dismiss/archive for unused proposals — is **merged, independently
-accepted after correction, and complete against its dismissal-only definition
-of done**. The implementation merged to `main` as PR #143 at `8f2e9a7`; the
-independent correction is pushed on
-`codex/review-ui-2d-proposal-dismissal-20260804` at `a118470` and awaits the
-owner's pull-request/merge decision. This milestone changes durable proposal
-state (a new lifecycle status and payload metadata) but grants no execution
-authority. The contract is
+accepted after correction, counter-review confirmed, and complete against
+its dismissal-only definition of done**. The implementation merged as
+PR #143 at `8f2e9a7`; the review correction merged as PR #144 at `98cfa6b`.
+Claude's counter-review (appended to
+`docs/REVIEW_2026-08-04_UI2D_PROPOSAL_DISMISSAL.md`) re-proved all three
+code findings red with fresh probes on `6d287f0` (telemetry ignored;
+string batch reference iterated character-wise; identity swap surviving
+the old hash), verified the child-table list is now complete against the
+schema (exactly four tables carry `proposal_id`), and added `CRUI2D-001`
+(P3): the `reviewed_override` payload key — co-written with `violations`
+at the override_available transition — was missing from the frozen
+evidence-key list; it now refuses on its own, with a parametrized
+regression whose reverse mutation was shown red then green. This
+milestone changes durable proposal state (a new lifecycle status and
+payload metadata) but grants no execution authority. The contract is
 `docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` (as
 rewritten by the 2026-08-03 plan review: dismissal only — automatic expiry
 is a separately approved follow-up that was NOT implemented, and physical
@@ -54,7 +65,8 @@ What was implemented, per that plan:
   execution-shaped payload key (`_DISMISSAL_EXECUTION_EVIDENCE_KEYS`:
   approved_at, broker_order, broker_order_update, broker_status,
   cancel_requested_at, error, executed_at, filled_at, policy_override,
-  reconciled_at, submitted_at, violations) so a status corrupted back to
+  reconciled_at, reviewed_override, submitted_at, violations) so a status
+  corrupted back to
   `proposed` still refuses. `list_proposals()` gained keyword-only
   `include_dismissed`/`include_expired` flags (default True for audit
   callers; applied ONLY when `status is None` so an explicit exact-status
@@ -97,15 +109,15 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     implementation base = 5cb831c (post PR #142)
     implementation = 6d287f0
     implementation docs = 1ff8063
-    implementation merge / main / origin-main = 8f2e9a7 (PR #143)
+    implementation merge = 8f2e9a7 (PR #143)
     review correction = a118470
-    review docs/handoff = branch-tip commit containing this file
-    review branch = codex/review-ui-2d-proposal-dismissal-20260804 (pushed)
+    review merge / current main / origin-main base = 98cfa6b (PR #144)
+    counter-review correction (CRUI2D-001) + this handoff =
+        user/claude/ui-2d-counter-review-20260804 (pushed)
 
-The review correction and review record at `5a9fdbd` are available from
-`origin/codex/review-ui-2d-proposal-dismissal-20260804`. This follow-up handoff
-commit is pushed to the same branch after it is created, so another computer
-can resume with a normal `git fetch`.
+Both review-round branches merged and were deleted (local and origin);
+merge second-parents verified as the intended tips (`1ff8063`, `9d0b0f1`).
+The counter-review branch above awaits the owner's PR/merge decision.
 
 Commit dispositions:
 
@@ -151,6 +163,13 @@ Corrected code quality: **9.5/10**.
 - Required compileall and pre-commit diff checks: clean. Final branch status
   is verified after the documentation/handoff commit.
 
+Counter-review validation (development machine, Python 3.13, exact final
+tree): three fresh red probes on `6d287f0` reproduced every code finding;
+CRUI2D-001's reverse mutation shown red then green; focused dismissal/
+History/outcome suites 69 passed; full-suite/compileall/diff results are
+recorded in the counter-review commit message and were green on the exact
+final tree.
+
 Known test limit: there is no dedicated multi-process/threaded
 dismiss-versus-claim race test. The `BEGIN IMMEDIATE` plus conditional-update
 mechanism is covered single-threaded here and `claim_proposal` concurrency is
@@ -159,8 +178,9 @@ covered elsewhere. No defect was observed in that transaction design.
 ## 5. What is next (do not start automatically)
 
 The immediate next step is the owner's pull-request/merge decision for the
-pushed review branch. Until it merges, `origin/main` contains the submitted
-UI-2d behavior without the three review corrections.
+counter-review branch `user/claude/ui-2d-counter-review-20260804`
+(CRUI2D-001 plus these records); the review corrections themselves are
+already on `main` via PR #144.
 
 UI Phase 2 is otherwise complete. Automatic expiry remains unapproved and
 unimplemented; physical purge remains deferred and owner-authorized. Phase 5

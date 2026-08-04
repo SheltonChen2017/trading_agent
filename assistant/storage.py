@@ -23,6 +23,7 @@ from zoneinfo import ZoneInfo
 
 from assistant.proposal_status import (
     FILLED,
+    STATUSES,
     UNRESOLVED_BROKER_STATE_STATUSES,
 )
 from assistant.money import decimal_text, to_decimal
@@ -2744,6 +2745,59 @@ class AssistantStore:
             proposal = json.loads(row["payload_json"])
             proposal["status"] = row["status"]
             proposal["updated_at"] = row["updated_at"]
+            result.append(proposal)
+        return result
+
+    def list_proposals_for_outcomes(
+        self,
+        *,
+        statuses: tuple[str, ...] | list[str],
+        include_unknown_statuses: bool = False,
+        limit: int = 100,
+    ) -> list[dict[str, Any]]:
+        """Read-only History query for UI-2b outcome filtering: the most
+        recent proposals whose status is in `statuses`, optionally ALSO any
+        row whose status is outside the canonical STATUSES tuple (the
+        "Other / unknown" outcome group, which is only expressible as a
+        negative match -- a positive IN-list cannot name statuses that do
+        not exist yet).
+
+        Same ordering and hydration as list_proposals (created_at DESC,
+        authoritative row status over the stored payload's), so the two
+        filter paths on the History page share row semantics: "the newest
+        `limit` rows OF THE FILTERED KIND", never a client-side subset of
+        the newest `limit` rows overall.
+
+        Empty criteria return no rows: an empty outcome selection must not
+        silently widen into "(any)".
+        """
+        known = tuple(dict.fromkeys(statuses))
+        clauses: list[str] = []
+        params: list[Any] = []
+        if known:
+            clauses.append(
+                f"status IN ({','.join('?' for _ in known)})"
+            )
+            params.extend(known)
+        if include_unknown_statuses:
+            clauses.append(
+                f"status NOT IN ({','.join('?' for _ in STATUSES)})"
+            )
+            params.extend(STATUSES)
+        if not clauses:
+            return []
+        query = (
+            "SELECT payload_json, status FROM trade_proposals WHERE "
+            + " OR ".join(clauses)
+            + " ORDER BY created_at DESC LIMIT ?"
+        )
+        params.append(limit)
+        with self._connect() as connection:
+            rows = connection.execute(query, params).fetchall()
+        result = []
+        for row in rows:
+            proposal = json.loads(row["payload_json"])
+            proposal["status"] = row["status"]
             result.append(proposal)
         return result
 

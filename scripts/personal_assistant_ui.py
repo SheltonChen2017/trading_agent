@@ -104,12 +104,16 @@ from assistant.proposal_status import (
     EXPIRED,
     FILLED,
     MANUAL_RECONCILIATION_STATUSES,
+    OUTCOME_GROUPS,
+    OUTCOME_OTHER_UNKNOWN,
     POLICY_OVERRIDE_AVAILABLE,
     PROPOSED,
     STATUSES,
     SUBMISSION_FAILED,
     UNRESOLVED_BROKER_STATE_STATUSES,
     VALIDATION_FAILED,
+    outcome_group_for_status,
+    statuses_for_outcome_groups,
 )
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.portfolio_history import (
@@ -417,6 +421,7 @@ _PERSISTENT_PAGE_WIDGET_KEYS = (
     "allocation_max_weight_pct",
     "allocation_dollar_amount",
     "strategy_proposals_enabled",
+    "proposal_outcome_filter",
     "proposal_status_filter",
     "proposal_history_limit",
     "order_history_limit",
@@ -2527,21 +2532,80 @@ if page == "History":
 
     with proposals_col:
         st.subheader("Proposals")
-        status_filter = st.selectbox(
-            "Status filter",
-            ["(any)"] + list(STATUSES),
-            key="proposal_status_filter",
+        outcome_filter = st.multiselect(
+            "Outcome filter",
+            list(OUTCOME_GROUPS),
+            key="proposal_outcome_filter",
+            help=(
+                "Groups every lifecycle status by what it means for the "
+                "trade. \"Broker working / unresolved\" includes legacy "
+                "\"executed\" rows (broker accepted, fill not confirmed); "
+                "\"Other / unknown\" catches any status this app version "
+                "does not recognize. Empty selection shows all outcomes."
+            ),
         )
+        with st.expander("Advanced: exact status filter"):
+            status_filter = st.selectbox(
+                "Exact status",
+                ["(any)"] + list(STATUSES),
+                key="proposal_status_filter",
+                help=(
+                    "Combines with the outcome filter by intersection: "
+                    "rows must match both."
+                ),
+            )
         proposal_limit = st.slider("Max rows", 5, 100, 20, key="proposal_history_limit")
-        stored = store.list_proposals(status=None if status_filter == "(any)" else status_filter, limit=proposal_limit)
+
+        exact_status = None if status_filter == "(any)" else status_filter
+        # Both filters constrain the DATABASE query domain, not merely the
+        # fetched page: each path returns the newest `proposal_limit` rows of
+        # the filtered kind. When both filters are set they intersect -- and
+        # because every status belongs to exactly one outcome group, that
+        # intersection is either the exact-status rows or nothing.
+        if exact_status is not None:
+            stored = store.list_proposals(status=exact_status, limit=proposal_limit)
+            if outcome_filter:
+                stored = [
+                    p
+                    for p in stored
+                    if outcome_group_for_status(p["status"]) in outcome_filter
+                ]
+        elif outcome_filter:
+            stored = store.list_proposals_for_outcomes(
+                statuses=statuses_for_outcome_groups(outcome_filter),
+                include_unknown_statuses=OUTCOME_OTHER_UNKNOWN in outcome_filter,
+                limit=proposal_limit,
+            )
+        else:
+            stored = store.list_proposals(status=None, limit=proposal_limit)
+
+        active_filter_parts = []
+        if outcome_filter:
+            active_filter_parts.append(
+                "outcomes = " + ", ".join(outcome_filter)
+            )
+        if exact_status is not None:
+            active_filter_parts.append(f"exact status = {exact_status}")
+        if active_filter_parts:
+            st.caption(
+                "Active filters: "
+                + "; ".join(active_filter_parts)
+                + ". When both filters are set, a row must match both "
+                "(intersection)."
+            )
+
         if not stored:
-            st.info("No proposals found in history.")
+            if active_filter_parts:
+                st.info("No proposals match the active filters.")
+            else:
+                st.info("No proposals found in history.")
         else:
             st.dataframe(
                 [
                     {
                         "Proposal ID": p["proposal_id"],
                         "Status": p["status"],
+                        "Outcome": outcome_group_for_status(p["status"]),
                         "Side": p["intent"]["side"],
                         "Shares": p["intent"]["shares"],
                         "Ticker": p["intent"]["ticker"],

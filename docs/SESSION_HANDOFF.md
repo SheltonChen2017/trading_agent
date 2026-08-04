@@ -1,231 +1,119 @@
 # Development session handoff
 
-Prepared: 2026-08-03T20:02:14-07:00, after pushing the independently reviewed
-Claude integrity-sweep and GR-2 correction branch
+Prepared: 2026-08-03, after the GR-2 counter-review, branch cleanup, and
+Phase 5 preflight
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
 
-Claude's latest six-commit range, `9e2826a..b021499`, is **accepted after
-correction**. It contains the owner-requested whole-project integrity sweep,
-its handoff and PR #129 merge, followed by the GR-2 risk-registry
-implementation, its handoff, and PR #130 merge. Every commit has an explicit
-disposition in `docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`.
+Three things happened this session, in order:
 
-The review resolved one P2 and four P3 findings. Durable warning batches now
-render in the CLI before fallible account/data construction; terminal
-registry checks stop only when that check adds a violation; frozen registry
-tests bind each name to its actual runner and genuinely inspect referenced
-violation codes; the plan/status documents no longer contain stale GR-2,
-GR-5-channel, or MCP-dashboard claims; and this handoff replaces the
-contradictory appended implementation updates.
+1. **Codex's GR-2/integrity review (PR #131) is counter-reviewed and
+   CONFIRMED.** All five findings (CRREV-001 P2, CRREV-002..005 P3) are
+   genuine; both behavioral corrections were independently red-verified on
+   the exact pre-correction merged code, and both test hardenings were
+   mutation-verified (runner swap caught only by the new binding test;
+   unreachable bogus ViolationCode caught only by the new AST test). The
+   full ledger and counter-review section live in
+   `docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`. **Phase 4 is closed
+   with both agents' verification on record.**
+2. **Branch cleanup**: 7 merged local branches and 2 merged remote branches
+   deleted. Remaining: `main`, plus local
+   `codex/transition-handoff-20260802-computer-move` (merged, but pinned by
+   the `C:\tmp\trading-agent-transition-20260802` worktree — delete both
+   together whenever that worktree is no longer wanted). Origin now has
+   only `main`.
+3. **Phase 5 preflight (non-elevated, development machine)**: all Phase 5
+   CLI producers verified present; operational-task installer `-WhatIf`
+   plans all 4 tasks and correctly refuses a fake python; ML-task installer
+   correctly fail-closes without the machine-local shadow config; fault
+   harness 11/11 on clean commit; `platform-readiness` fails closed exactly
+   as designed without credentials. Results and the ordered owner
+   deployment session are in **`docs/PHASE5_DEPLOYMENT_SESSION.md`** (new).
 
-GR-2 and action-plan Phase 4 are now complete and independently reviewed.
-Nothing in this result authorizes Phase 5 operations. The immediate next
-repository action is an owner-authorized merge of the pushed Codex review
-branch. Only after that merge should the owner conduct the separate Phase 5
-decision/deployment session.
-
-Claude's submitted work is rated **8/10 overall**: integrity sweep 8/10 and
-GR-2 implementation 8.5/10. The corrected combined result is 9/10.
+Nothing here authorizes funded/live trading, starts an evidence epoch,
+installs scheduled tasks, approves the mandate, or changes policy.
 
 ## 2. Canonical Git state
 
 Repository: https://github.com/SheltonChen2017/trading_agent
 
-    origin/main = b021499  Merge PR #130 (Claude GR-2)
-    local main  = b021499
-    review base = b021499
-    active branch = codex/review-claude-gr2-integrity-20260803
-    review correction = 0167c67
-    review/status records = 2239c13
-    handoff = the later commit containing this file
-    review remote state = PUSHED, NOT MERGED
+    origin/main = local main = d5fab71  (merge PR #131, Codex GR-2/integrity review)
+    session branch = user/claude/phase5-preflight-20260803 (base d5fab71)
+    branch contents = counter-review record + PHASE5_DEPLOYMENT_SESSION.md
+                      + action-plan/handoff updates (docs only, no code)
 
-Claude integrity sweep:
+Reviewed history now fully on main: GR-2 implementation (`03895ae`, PR
+#130) → Codex corrections `0167c67` + records `2239c13` (PR #131) →
+counter-review on the session branch. Merge `d5fab71` is tree-identical to
+topic tip `43f2949`.
 
-    5f4d9cc  integrity sweep + GR-5 review confirmation
-    c79d97f  implementation handoff
-    f778ef3  merge PR #129
-    topic remote = deleted after merge; commits are reachable from main
+Worktrees on the development machine: the main checkout, plus two `C:\tmp`
+worktrees from the 2026-08-02 transition (one pins the transition branch,
+one detached). Do not commit in them.
 
-Claude GR-2:
+## 3. Validation (this session, on `d5fab71`)
 
-    03895ae  ordered risk-check registry
-    f5071d8  implementation handoff
-    b021499  merge PR #130
-    origin/user/claude/gr-2-risk-registry-20260803 = f5071d8
-
-The two merge commits have no conflict-resolution delta: `f778ef3` is
-tree-identical to `c79d97f`, and `b021499` is tree-identical to `f5071d8`.
-The approved remote contains the complete reviewed history through `a827ea3`
-and the later pushed handoff commit containing this update. Cross-computer
-retrieval is ready from
-`origin/codex/review-claude-gr2-integrity-20260803`; the corrections are not
-yet on `main`.
-
-## 3. Commit dispositions and issue summary
-
-| Commit | Disposition |
-|---|---|
-| `5f4d9cc` | accepted after `CRREV-001` correction |
-| `c79d97f` | accepted after `CRREV-004` handoff replacement |
-| `f778ef3` | accepted after cumulative corrections; merge tree exact |
-| `03895ae` | accepted after `CRREV-002` and `CRREV-003` corrections |
-| `f5071d8` | accepted after `CRREV-004` handoff replacement |
-| `b021499` | accepted after cumulative corrections; merge tree exact |
-
-| ID | Priority | Status | Result |
-|---|---|---|---|
-| CRREV-001 | P2 | Resolved | CLI warnings render before fallible briefing construction, so their only routed surface does not disappear with a packet/data failure. |
-| CRREV-002 | P3 | Resolved | A terminal registry entry stops only after adding its own violation. |
-| CRREV-003 | P3 | Resolved | Frozen inventory binds names to runner functions; the violation-code assertion is no longer vacuous. |
-| CRREV-004 | P3 | Resolved | This coherent handoff supersedes stale canonical Git, roadmap, and resume sections. |
-| CRREV-005 | P3 | Resolved | Action-plan/readiness drift about completed milestones, GR-5 routing, MCP prerequisites, and GR-2 residual debt is reconciled. |
-
-No P0 or P1 issue was found. No P0-P3 issue remains open. The complete
-evidence and reason-for-fix ledger is in
-`docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`.
-
-## 4. Completed behavior and honest limits
-
-The pre-submit gate now runs a twenty-entry `RISK_CHECK_REGISTRY` in the exact
-historical order. Each check has a stable name, side applicability,
-terminality, and `applies_at` phase. Shared Decimal and sanitized state flows
-through `_GateContext`; the kill switch remains the only current terminal
-check, and the historical buy/non-buy asymmetry is preserved. A deterministic
-1,200-case comparison produced identical old/new approvals, exceptions,
-violation identities, messages, and ordering.
-
-The integrity sweep's warning route is complete for both briefing surfaces:
-the UI reads the durable warning batch before loading its packet, and the CLI
-now does the same. GR-5's critical Windows-toast path, immutable attempts,
-self-test recovery, and readiness behavior remain unchanged. The shared
-`verify_drill_lineage_commit()` continues to reject active-epoch evidence
-unless the runtime commit exactly matches the epoch lineage.
-
-The proposal-generation concentration heuristic, allocation-batch cross-leg
-math, and pending-order exposure-input computation remain intentionally
-separate, documented architecture debt; none replaces or bypasses the
-execution gate. A Windows toast proves the operating system accepted a
-notification, not that a human read it. This review did not exercise a real
-broker, send another real toast, deploy tasks, or start an evidence epoch.
-
-## 5. Final validation
-
-    Python 3.12.13
-    red proof: 2 failed as expected on merged Claude code
-    immediate green proof: 4 passed
-    focused final: 290 passed in 61.03s
-    old/new differential: 1,200/1,200 identical
-    differential SHA-256: 755ab4a4c24347c947e9cdc6f88efa24b5de83be54c02a8127853a2010dcfcb2
-    fault wrapper: 11/11 fault IDs, 15/15 mapped tests, 0 unmapped
-    full suite: 2,543 passed, 1 skipped, 26 warnings in 242.85s
-    compileall: clean
+    focused Phase 4 suites: 109 passed (pre-PR#131) / 36 passed (registry+alerts, post)
+    red proof: 2 corrected tests fail on exact b021499 as claimed
+    mutations: 2/2 caught (runner swap; unreachable ViolationCode)
+    fault harness: 11/11, code_commit d5fab71
+    full suite: 2,543 passed, 1 skipped, 25 warnings in 206.66s
     git diff --check: clean
-    PAPER_TRADING: True
 
-Warnings are the existing WebSockets and joblib/NumPy deprecations plus the
-physical-core detection warning. The managed sandbox's default temp directory
-could not accept the fault runner's JUnit file; two bounded attempts timed out.
-The unchanged runner completed in 30.7 seconds after `TEMP`/`TMP` were pointed
-to a writable workspace directory. Its report was verification-only with
-`code_commit=unknown` because the review tree was dirty before documentation
-commits, and no drill row was written.
+The Streamlit app was launched on this machine from `main` and is healthy
+at http://localhost:8501 (no broker credentials installed here, so
+broker-backed views correctly report unavailable).
 
-Tests used disposable databases and did not contact the broker. The operator
-database, credentials, scheduler, mandate, and evidence epoch were not read or
-mutated; the tracked default policy has no review diff and no real policy was
-written.
+## 4. Roadmap and next step
 
-## 6. Roadmap and next authorized step
+Phase 4 is complete. **Phase 5 is next and is owner-gated.** Blocking owner
+decisions, in order (details in `docs/PHASE5_DEPLOYMENT_SESSION.md` §2):
 
-Phases 1-4 are complete and independently reviewed. Phase 5 is next in
-`docs/ACTION_PLAN_2026-08-02.md`, but it is owner-heavy and must not begin
-automatically. It requires explicit decisions/actions including:
+1. Epoch model 1 vs 2 (freeze this runtime vs dedicated frozen host).
+2. Mandate approval (or revise DRAFT targets first) — `mandate-status`.
+3. Operator DB path (`data/trading_assistant.db` vs `data/paper.db`).
+4. Task account choice + the elevated window for account/scheduler setup.
 
-1. authorize merging the already-pushed review branch;
-2. choose freeze-then-collect versus a pinned operational host;
-3. approve or revise the draft mandate;
-4. choose the operator database path;
-5. provide an elevated window for the dedicated task account, credential
-   rotation, and installation/verification of eight scheduled tasks; and
-6. bootstrap/reconcile the ledger, start one immutable paper evidence epoch,
-   and run all five required drills inside that exact epoch.
+The deployment session itself runs on the operational (credentialed)
+machine per the checklist; the development-machine preflight is done.
+Phase 6 product work (committee replay corpus + CLI, GR-4, GR-7,
+proposal-history cleanup) can proceed in parallel once the epoch is
+running — do not start it automatically.
 
-The owner's informal paper trading remains useful operational data but does
-not count toward the mandate's 60-session/30-order minimum outside a formally
-bound epoch. Do not treat code completion, tests, drills on fixtures, or the
-current paper operation as live-trading authorization or evidence of market
-edge.
-
-## 7. Non-negotiable boundaries
+## 5. Non-negotiable boundaries
 
 - Paper trading is the only execution mode in scope.
-- Exact human approval and current policy fingerprint remain mandatory.
-- The persistent/environment kill switches cannot be bypassed.
-- Storage-level atomic claims, reservations, idempotency, telemetry-before-
-  submission, and reconciliation remain authoritative.
-- Ambiguous broker outcomes retain budget and reconcile; they are never blind
-  retries. Identity mismatch halts and alerts.
-- ML/LLM output remains advisory or observational and cannot create, approve,
-  size, submit, cancel, replace, or promote anything.
+- ML/LLM output is advisory or observational only.
+- No funded brokerage path may be enabled or made convenient.
+- Exact approval, policy fingerprint, atomic claims, deterministic risk
+  checks, reservations, telemetry, idempotency, and reconciliation remain
+  mandatory.
+- Ambiguous submissions are reconciled, never blind-retried.
 - Never commit credentials, operator databases, licensed data, or evidence
   artifacts.
 
-## 8. Machine-local state
+## 6. Machine-local state
 
-Actual worktrees after review cleanup:
+This session ran on the development machine (no Alpaca credentials). It did
+not inspect or mutate the operator database, credentials, broker,
+scheduler, mandate, or evidence epoch. The `platform-readiness` probe used
+a disposable scratch database. Re-measure everything machine-local on the
+operational machine before deploying.
 
-    C:/git/customizedagent/trading_agent
-      codex/review-claude-gr2-integrity-20260803
-    C:/tmp/trading-agent-transition-20260802
-      codex/transition-handoff-20260802-computer-move at 77699b3 (remote gone)
-    C:/tmp/trading-agent-ui-controls-review-20260802
-      detached at 47effd7
+## 7. Reading order and resume prompt
 
-Preserve both pre-existing temporary worktrees; this review did not modify
-them. The detached `9e2826a` worktree created for the differential comparison
-was verified clean and removed.
+Read CLAUDE.md, AGENTS.md, docs/ACTION_PLAN_2026-08-02.md,
+docs/PHASE5_DEPLOYMENT_SESSION.md,
+docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md, and this file.
 
-The prior handoff claimed local-only AI-strategy design commit `a656015` was
-present. It is not resolvable in this checkout and no local branch points to
-it now. If that unmerged design is still wanted, recover it from the earlier
-computer or another clone that retained the object; do not claim it is safely
-synced through this repository.
-
-The verification-only fault artifact is under ignored `.venv/codex_test_tmp/`
-and is not evidence. Re-measure all database, credential, scheduler, mandate,
-account-mode, and epoch state before Phase 5; do not copy earlier machine
-observations forward as current facts.
-
-## 9. Reading order and resume prompt
-
-Read, in order:
-
-1. `CLAUDE.md`
-2. `AGENTS.md`
-3. `docs/ACTION_PLAN_2026-08-02.md`
-4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-5. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-6. `docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`
-7. this file
-8. the relevant archived Phase 5 plans only after the owner selects a Phase 5
-   action
-
-Resume prompt:
-
-    Fetch/prune and verify every SHA, branch, remote, and worktree before
-    acting. Main is b021499 (Claude GR-2 merge). Claude's full six-commit
-    range 9e2826a..b021499 was independently accepted after corrections on
-    codex/review-claude-gr2-integrity-20260803: code correction 0167c67,
-    review/status records 2239c13, then the handoff commit containing this
-    text. Do not repeat the integrity or GR-2 reviews. The review branch is
-    pushed and cross-computer retrievable but not merged; do not start Phase 5
-    from uncorrected main. Phase 4 is complete. Phase 5 is owner-heavy: wait
-    for explicit decisions on merge, epoch model, mandate, operator DB, and
-    elevated scheduler deployment. Do not touch a funded account, start an
-    epoch, install tasks, mutate the operator database or policy, promote
-    ML/signals, or disturb the two pre-existing temporary worktrees.
+    Fetch/prune and verify SHAs. Main is d5fab71 and carries all reviewed
+    Phase 4 work. The GR-2 review is counter-reviewed and confirmed; do not
+    re-review it. Session branch user/claude/phase5-preflight-20260803
+    holds the counter-review record and Phase 5 brief awaiting merge.
+    Phase 5 needs the four owner decisions in
+    PHASE5_DEPLOYMENT_SESSION.md §2 before any elevated, scheduler,
+    mandate, or epoch action. Do not enable live trading, start an epoch,
+    install tasks, promote ML/signals, or commit in the C:\tmp worktrees.

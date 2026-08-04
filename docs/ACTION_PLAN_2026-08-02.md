@@ -253,10 +253,15 @@ REVIEWED. GR-5 uses Windows desktop toasts immediately for critical alerts,
 batches warnings, preserves immutable delivery attempts, and requires a
 successful self-test to clear a previous channel-failure condition. GR-2's
 risk-check registry was implemented at `03895ae` and independently accepted
-after correction at `0167c67`, closing the last Phase 4 code item. Phase 5
-(operational deployment + epoch start) is next and is owner-heavy; do not
-begin its elevated, scheduler, mandate, or epoch actions without the owner's
-specific direction and required decisions.
+after correction at `0167c67`; Claude's counter-review (2026-08-03, appended
+to `docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`) confirmed every finding
+and correction, closing Phase 4 with both agents' verification on record.
+Phase 5 is next and is owner-heavy; its non-elevated preflight was completed
+2026-08-03 on the development machine (installers, CLI producers, fault
+harness, fail-closed readiness — all verified; see
+`docs/PHASE5_DEPLOYMENT_SESSION.md` for results and the ordered owner
+session). Do not begin its elevated, scheduler, mandate, or epoch actions
+without the owner's specific direction and required decisions.
 
 **Phase 5 — operational deployment + epoch start (owner-heavy):**
 elevated window → dedicated task account → install + verify 8 scheduled

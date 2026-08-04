@@ -86,3 +86,47 @@ writable workspace completed in 30.7 seconds and passed all 11 fault IDs.
 The direct underlying fault suite also executed all 15 tests successfully;
 its only failure was the same denied JUnit output path. No partial artifact
 was accepted as a result, and no operational drill row was recorded.
+
+## Counter-review (Claude, 2026-08-03, after PR #131 merged)
+
+Scope: Codex's review range `b021499..d5fab71` (`0167c67` corrections,
+`2239c13` records, `a827ea3` handoff, `43f2949` pushed-state record,
+`d5fab71` merge of PR #131). Verdict: **the review is confirmed correct at
+every point checked; all five findings are genuine and their corrections
+verified.** The 8/10-submitted / 9/10-corrected assessment of my work is
+accepted as fair — CRREV-002's terminal-semantics defect and CRREV-003's
+vacuous assertion were both mine.
+
+| Commit | Disposition |
+|---|---|
+| `0167c67` | accepted — both behavioral fixes red-verified on my exact pre-correction merged code, both hardening tests mutation-verified (below) |
+| `2239c13` | accepted — ledger claims spot-checked against code and diffs; the CRREV-003 "compared against an empty set" claim is verbatim true (`assert {c.value for c in ViolationCode} >= set()`) |
+| `a827ea3` | accepted — coherent at write time; its "PUSHED, NOT MERGED" state was made stale by the owner's PR #131 merge (recurring merge-staleness class, same as CRREV-004 itself; superseded by the next handoff) |
+| `43f2949` | accepted — pushed-state claim verified against origin |
+| `d5fab71` | accepted — tree-identical to `43f2949` (`bd4c883…`), no conflict-resolution delta |
+
+Independent verification performed in a scratch worktree (never the live
+tree, which was serving the running Streamlit app):
+
+- **Red proof reproduced** on exact pre-correction `b021499` with the
+  corrected tests overlaid: `test_terminal_check_stops_only_when_that_check_adds_a_violation`
+  and `test_cli_briefing_surfaces_warnings_before_packet_failure` both
+  failed for exactly the claimed reasons — the failure output showed the
+  passing terminal check breaking on the earlier `intent_side` violation
+  and the empty captured briefing output. Green on `d5fab71`: 36/36.
+- **Mutation M1 (CRREV-003 runner binding):** swapping the `intent_side`
+  and `order_type` runners in the registry was caught by the new binding
+  test while the ORIGINAL frozen-inventory test still passed — proving the
+  metadata-only blind spot Codex claimed.
+- **Mutation M2 (CRREV-003 AST codes):** an unreachable
+  `ViolationCode.NOT_A_REAL_CODE` reference inside a runner was caught by
+  the new AST test while all 11 behavioral registry tests stayed green —
+  the runtime-unreachable blind spot, closed.
+- Both mutations restored finally-safe via `git checkout`; scratch
+  worktree removed clean.
+- **Full suite on merged `d5fab71`:** 2,543 passed, 1 skipped, 25 warnings
+  in 206.66s (Codex's 26th warning was its sandbox's physical-core
+  detection notice; the delta is environmental, not behavioral).
+
+No new issues found. GR-2 and Phase 4 are closed with both agents'
+independent verification on record.

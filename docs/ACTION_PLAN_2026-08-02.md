@@ -321,6 +321,69 @@ on the development side immediately.
 
 Then: proposal-history physical purge remains deferred as before.
 
+**UI-3 — interactive Backtest page (owner-requested 2026-08-04, inserted
+into this phase ahead of UI-2d at the owner's direction):**
+
+The owner asked to set up signals and run backtests directly in the UI,
+with a graphic showing the result. This is a **read-only research
+surface** — the plan below was written before implementation and is the
+milestone's contract:
+
+1. **Scope.** One new sidebar page, "Backtest", that (a) selects one of
+   the existing price-only `scan_fn` signals from `signals/` (dip/up
+   z-score, momentum, relative dip/up, 52-week breakout, 52-week-high
+   proximity, vol-scaled momentum — PEAD/fundamentals are excluded in v1
+   because they need an earnings feed, and residual momentum/reversal and
+   idio vol because they refuse to run without a precomputed residual or
+   benchmark feed), (b) exposes that signal's own parameters as widgets
+   from a
+   frozen inventory, (c) chooses data source, universe scope (whole
+   universe or one basket), lookback, and hold horizons, (d) runs the
+   walk-forward engine on demand, and (e) renders a multi-horizon summary
+   table plus a cumulative-net-return chart per signal direction.
+2. **Composition, not reimplementation.** The page calls the SAME
+   `backtest/engine.py` functions the CLI scripts call
+   (`run_multi_horizon_backtest`, `summarize_multi_horizon`) through a
+   thin pure module (`backtest/interactive.py`) holding the frozen signal
+   inventory, strict parameter validation (unknown signal or parameter
+   fails closed), and chart-frame builders. No backtest math lives in the
+   Streamlit script.
+3. **Research honesty is part of the definition of done.** Synthetic data
+   is the default source and every synthetic result is labeled as a
+   plumbing check whose expected win rate is ~50%. Real-data results are
+   labeled exploratory: not point-in-time, no multiplicity correction, and
+   an on-page statement that confirmatory significance runs only in the
+   frozen CLI pipeline (`run_significance_check.py` /
+   `run_out_of_sample_check.py`). The page must not compute or display a
+   pooled significance number.
+4. **Runtime behavior.** Runs execute only on an explicit button click;
+   results persist in session state so navigation and widget interaction
+   do not re-trigger computation; real-data fetches are cached with a TTL;
+   entry timing is the executable `next_open` default and is displayed,
+   not chosen.
+5. **Boundary.** The page has no path to proposals, approvals, orders,
+   policy, or the research registry: no action-shaped controls, no
+   registry writes, no execution imports from `backtest/interactive.py`
+   (structurally tested). A good-looking chart must lead nowhere.
+6. **Tests.** Inventory/validation/chart-frame unit tests; an AppTest
+   proving the page renders, a synthetic run completes end to end on a
+   small basket/lookback, and the exploratory labeling is present; the
+   reachability suite gains the page; the import-boundary suite still
+   passes.
+
+Size: medium. Read-only; no persistence schema, lifecycle, or authority
+change. UI-2d follows after this milestone's review unless the owner
+reorders again.
+
+Status: **implemented at `198339d` (2026-08-04), awaiting independent
+review.** All six contract points above are implemented as written (with
+the residual/idio-vol exclusion noted in point 1 discovered and recorded
+before coding). Three reverse mutations were proven caught: the UI running
+a different experiment than displayed, a synthetic run mislabeled with the
+real-data caveat, and backtest widget state dropped from the navigation
+whitelist. Full suite on the final tree: 2,597 passed / 1 skipped / 25
+warnings; compileall and diff checks clean.
+
 **Phase 7 — data purchases, whenever decided (independent of code):**
 membership vendor decision → Databento statistics/reference captures →
 universe/cutoffs artifacts → real authoritative build → real ML discovery/

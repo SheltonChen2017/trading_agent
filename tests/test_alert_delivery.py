@@ -429,6 +429,27 @@ def test_cli_briefing_prints_nothing_when_no_warnings_are_open(store, capsys):
     assert capsys.readouterr().out == ""
 
 
+def test_cli_briefing_surfaces_warnings_before_packet_failure(
+    store, capsys, monkeypatch
+):
+    """The briefing is warnings' only routed surface, so an upstream
+    portfolio/data failure must not hide warnings that are already durable."""
+    import scripts.run_personal_assistant as cli
+
+    _warning(store)
+
+    def _packet_failure(*, include_events):
+        raise RuntimeError("portfolio feed unavailable")
+
+    monkeypatch.setattr(cli, "_packet", _packet_failure)
+    args = type("Args", (), {"no_events": False})()
+
+    with pytest.raises(RuntimeError, match="portfolio feed unavailable"):
+        cli.command_briefing(args, store)
+
+    assert "[recovery] backup is stale" in capsys.readouterr().out
+
+
 def test_ui_briefing_tab_surfaces_batched_warnings(tmp_path, monkeypatch):
     """The Streamlit briefing must show the same batch. Uses the real app
     via AppTest with the session-isolated database seeded with one open

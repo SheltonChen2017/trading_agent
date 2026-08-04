@@ -1382,8 +1382,9 @@ def validate_trade_intent(
     for check in checks_for_phase(PRE_SUBMIT_PHASE):
         if not _check_applies(check, intent.side):
             continue
+        violation_count_before = len(context.violations)
         check.run(context)
-        if check.terminal and context.violations:
+        if check.terminal and len(context.violations) > violation_count_before:
             break
 
     approved = len(context.violations) == 0

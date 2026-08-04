@@ -10,6 +10,8 @@ Run with: python -m pytest tests/test_risk_check_registry.py
 """
 from __future__ import annotations
 
+import ast
+import inspect
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -108,6 +110,16 @@ def test_every_check_name_is_unique():
     assert len(names) == len(set(names))
 
 
+def test_frozen_inventory_binds_each_name_to_its_runner_function():
+    """Metadata alone cannot detect two correctly named entries whose
+    implementations were accidentally swapped."""
+    assert tuple(
+        (check.name, check.run.__name__) for check in RISK_CHECK_REGISTRY
+    ) == tuple(
+        (name, f"_check_{name}") for name, _, _, _ in FROZEN_INVENTORY
+    )
+
+
 def test_pre_submit_phase_runs_the_entire_registry_today():
     assert checks_for_phase(PRE_SUBMIT_PHASE) == RISK_CHECK_REGISTRY
 
@@ -202,6 +214,45 @@ def test_kill_switch_is_the_only_terminal_check_and_short_circuits():
     assert result.violation_codes == (ViolationCode.KILL_SWITCH.value,)
 
 
+def test_terminal_check_stops_only_when_that_check_adds_a_violation(monkeypatch):
+    """A later terminal check that passes must not mistake an earlier
+    violation for its own and suppress the checks that follow it."""
+
+    def _passes(ctx) -> None:
+        return None
+
+    def _always_blocks(ctx) -> None:
+        ctx.violate(ViolationCode.DUPLICATE_ORDER, "later check still ran")
+
+    passing_terminal = RiskCheck(
+        name="passing_terminal",
+        applies_to_side="both",
+        terminal=True,
+        applies_at=frozenset({PRE_SUBMIT_PHASE}),
+        run=_passes,
+    )
+    later_check = RiskCheck(
+        name="later_check",
+        applies_to_side="both",
+        terminal=False,
+        applies_at=frozenset({PRE_SUBMIT_PHASE}),
+        run=_always_blocks,
+    )
+    monkeypatch.setattr(
+        gate,
+        "RISK_CHECK_REGISTRY",
+        RISK_CHECK_REGISTRY + (passing_terminal, later_check),
+    )
+
+    result = validate_trade_intent(
+        _intent(side="banana", shares=1),
+        _portfolio(),
+        100.0,
+    )
+
+    assert "later check still ran" in result.violations
+
+
 def test_invalid_side_still_exercises_the_non_buy_branch():
     """The historical sequence ran the held-shares check in the buy
     branch's `else`, so side='banana' still hit it; 'non_buy' preserves
@@ -218,9 +269,20 @@ def test_invalid_side_still_exercises_the_non_buy_branch():
 
 def test_every_violation_code_used_by_a_check_exists():
     """Every registry check's identity is drawn from ViolationCode; a code
-    removed from the enum while a check still references it should fail at
-    import, but pin the relationship explicitly for reviewers."""
-    assert {c.value for c in ViolationCode} >= set()
+    removed from the enum while a check still references it must be caught
+    even when normal inputs do not happen to exercise that function."""
+    referenced_members = set()
+    for check in RISK_CHECK_REGISTRY:
+        tree = ast.parse(inspect.getsource(check.run))
+        referenced_members.update(
+            node.attr
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Attribute)
+            and isinstance(node.value, ast.Name)
+            and node.value.id == "ViolationCode"
+        )
+    assert referenced_members
+    assert referenced_members <= set(ViolationCode.__members__)
     # The registry must cover at least every code the historical sequence
     # could emit -- spot-pin the safety-critical ones by name.
     for critical in (

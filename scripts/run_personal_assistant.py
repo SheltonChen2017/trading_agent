@@ -266,6 +266,10 @@ def _print_briefing(packet) -> None:
 
 
 def command_briefing(args, store: AssistantStore) -> None:
+    # Operational warnings are durable and this command is their routed
+    # delivery surface. Render them before any fallible market/account work
+    # so the condition that broke the briefing cannot hide the warning too.
+    _print_batched_warnings(store)
     packet = _packet(include_events=not args.no_events)
     packet_id = store.save_decision_packet(packet)
     history_note = None
@@ -303,7 +307,6 @@ def command_briefing(args, store: AssistantStore) -> None:
         )
     if history_note:
         print(f"  History: {history_note}")
-    _print_batched_warnings(store)
     print(f"Persisted decision packet #{packet_id} to {store.path}")
 
 

@@ -44,6 +44,20 @@ explicitly rather than presented as more precise than it is.
 | Hedge-cost tolerance | Not applicable yet | No hedging instruments (options, futures) are in scope — see §4. |
 | Permitted instrument types | Equities and ETFs only (no shorting, futures, or options) | Matches current broker capability (Alpaca paper, long-only equities/ETFs) — see §4. |
 
+The same approved fingerprint also binds the non-metric promotion safeguards
+below. They are listed explicitly because they are behavior fields in
+`assistant/default_mandate.json`, even though they are evidence requirements
+rather than portfolio-return targets:
+
+| Promotion safeguard | Approved value |
+|---|---|
+| Minimum paper evidence | 60 independent sessions and 30 broker-observed orders in one immutable evidence epoch |
+| Unresolved operational state | 0 unreconciled items and 0 critical alerts |
+| Research evidence | Reproduction required |
+| Historical-data evidence | Point-in-time data required |
+| Recovery evidence | A successful backup/restore drill required |
+| Execution authority | Autonomous execution prohibited; exact human approval remains required |
+
 **Explicit non-goal**: no CAGR or Sharpe ratio target is stated as a
 primary objective here. They can still be reported for context, but a
 result that improves CAGR/Sharpe while missing the drawdown/capture

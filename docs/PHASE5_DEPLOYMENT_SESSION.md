@@ -7,6 +7,10 @@ paper evidence." It references `docs/OPERATIONS_RUNBOOK.md` for every
 procedure rather than duplicating it; if the two ever disagree, the runbook
 wins.
 
+Updated 2026-08-04 after the owner resolved all four blocking decisions:
+model 2, the owner-approved mandate, `data/trading_assistant.db` as the single
+operator record, and the owner's account for scheduled tasks.
+
 Nothing in this document authorizes live trading. `config.PAPER_TRADING`
 stays `True` throughout.
 
@@ -31,47 +35,48 @@ The independent review reproduced the original operational preview with exit
 exit code could be ignored. The corrected preview must exit zero and list all
 four resolved actions; any nonzero exit remains a blocker to investigate.
 
-## 2. Decisions the owner must make first (blocking, in order)
+## 2. Owner decisions (resolved 2026-08-04)
 
-1. **Epoch model 1 vs 2** (action plan §7): freeze this machine's runtime
-   for the whole 60-session window (model 1) or dedicate the operational
-   machine to the frozen commit while development continues elsewhere
-   un-deployed (model 2). Everything below assumes a decision.
-2. **Approve the mandate** (or revise its DRAFT §2 targets first):
-   `python scripts/run_personal_assistant.py --database <db> mandate-status`
-   validates and displays the current state, but it does not approve anything.
-   Approval requires a separately reviewed and committed update to
-   `assistant/default_mandate.json` that sets the approval metadata and binds
-   `approved_fingerprint` to the final behavior fields. The epoch binds that
-   exact mandate fingerprint, so this precedes `paper-epoch-start`.
-3. **Operator DB path**: keep `data/trading_assistant.db` or adopt the
-   runbook's `data/paper.db`. Every command below uses the chosen path;
-   mixing paths splits the evidence.
-4. **Task account**: dedicated least-privilege account (recommended by the
-   runbook) or current user. Dedicated requires the elevated window below.
+1. **Epoch model 2**: the frozen operational checkout collects evidence while
+   development continues elsewhere and is not deployed into that checkout.
+2. **Mandate approved with targets unchanged**: the separately committed
+   `assistant/default_mandate.json` binds the owner's approval to the exact
+   behavior fingerprint. It still needs independent review and merge before
+   the operational checkout is pinned or an epoch starts.
+3. **Operator DB path**: keep `data/trading_assistant.db` as the single record.
+   The operational checkout reaches the same absolute file through
+   `TRADING_ASSISTANT_DB`; mixing paths would split the evidence.
+4. **Task account**: use the owner's own account. No dedicated account is
+   created; scheduler registration still uses an owner-led elevated shell.
 
 ## 3. The session itself (operational machine, in order)
 
 Every step is in `docs/OPERATIONS_RUNBOOK.md`; this is the ordering with
 its gates.
 
-1. **Freeze**: `git pull`, confirm `main = d5fab71` (or the later
-   owner-chosen epoch commit), clean worktree. Run the full suite once on
-   this exact tree.
-2. **Elevated window** (owner, admin shell): create the task account if
-   decided; grant "Log on as a batch job" and the runbook's minimal ACLs.
+1. **Freeze**: after the reviewed mandate branch merges, update the operational
+   checkout to that exact `main` commit and confirm a clean worktree. Run the
+   full suite once on this exact tree.
+2. **Elevated window** (owner, admin shell): use the owner's selected account
+   and confirm it has the runbook's minimum file/credential access. No account
+   creation is required.
 3. **Install operational tasks**: runbook §Windows Task Scheduler —
    `-WhatIf` first, review every resolved path, then install and start the
-   boot-triggered tasks manually once. ML shadow tasks only if the shadow
-   config exists and ML evidence collection is wanted this epoch.
-4. **Verify tasks**: `verify_windows_evidence_tasks.ps1` as the task
-   account; then check each task produced real output at least once.
+   4 operational tasks manually once. Install the additional 4 ML shadow
+   tasks only if a reviewed shadow config/artifact exists and ML evidence
+   collection is wanted this epoch.
+4. **Verify tasks**: inspect the four operational task definitions and check
+   each produced real output at least once. The current
+   `verify_windows_evidence_tasks.ps1` contract requires the complete set of
+   8 operational + ML tasks and is applicable only when the optional ML set
+   was installed; do not misreport its expected failure on an intentional
+   operational-only deployment as successful verification.
 5. **Bootstrap the ledger**: `readiness`, then `ledger-bootstrap --confirm
    bootstrap` (once), then `ledger-reconcile` — runbook §Before starting a
    paper evidence epoch.
-6. **Verify the approved mandate**: check out the separately reviewed mandate
-   commit, run `mandate-status`, and confirm the reported status and computed
-   fingerprint match the owner-approved file. There is no approval CLI.
+6. **Verify the approved mandate**: run `mandate-status` from the pinned
+   checkout and confirm the reported status and computed fingerprint match the
+   reviewed owner-approved file. There is no approval CLI.
 7. **Start the epoch**: `paper-epoch-start <epoch-id> --strategy-id ...
    --strategy-version ... --model-id ...` on the frozen commit. From this
    moment the commit, mandate/policy fingerprints, strategy/model IDs, and

@@ -171,7 +171,7 @@ already-merged work does not reorder the adopted next step.
 |---|---|
 | **Data purchase** | authoritative historical index/strategy membership (NOT purchasable from Databento — needs a separate vendor decision); Databento statistics captures per session/vintage (~$0.06/session measured), reference security-master + adjustment-factors snapshots, universe + cutoffs artifacts, then a real `build-authoritative` run; authoritative earnings/consensus event data |
 | **Elapsed time on a frozen runtime** | mandate minimums: **60 paper sessions / 30 broker orders inside ONE evidence epoch** (~3+ calendar months); ML shadow evidence duration; 30-day backup-restore-drill freshness window |
-| **Owner authorization only** | mandate approval (the only promotion gate satisfiable today with zero data); ML-FS-8/ML-LR-9 promotion registry; ML-FS-9/ML-LR-10 canary; AS-8+ adapters; GR-8 live canary; committee gate removal |
+| **Owner authorization only** | ML-FS-8/ML-LR-9 promotion registry; ML-FS-9/ML-LR-10 canary; AS-8+ adapters; GR-8 live canary; committee gate removal. Mandate approval was granted 2026-08-04 and is no longer a blocker. |
 | **Prohibited until conditions change** | ML-LR-11 / ML-9 execution-quality modeling (needs representative *live* order data + explicit authorization); AS-11 autonomous strategy mutation (permanent); GR-9 non-goals (permanent) |
 
 ---
@@ -256,22 +256,28 @@ risk-check registry was implemented at `03895ae` and independently accepted
 after correction at `0167c67`; Claude's counter-review (2026-08-03, appended
 to `docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`) confirmed every finding
 and correction, closing Phase 4 with both agents' verification on record.
-Phase 5 is next and is owner-heavy; its non-elevated preflight was independently
+Phase 5 is active and owner-heavy. Its non-elevated preflight was independently
 reviewed and corrected 2026-08-03 on the development machine (installer
 previews, CLI producers, fault harness, fail-closed readiness; see
 `docs/PHASE5_DEPLOYMENT_SESSION.md` for results and the ordered owner
-session). Do not begin its elevated, scheduler, mandate, or epoch actions
-without the owner's specific direction and required decisions.
+session). On 2026-08-04 the owner chose model 2, approved the mandate, retained
+the existing operator database, and chose the owner's account for scheduled
+tasks. The mandate commit still requires independent review and merge; no
+scheduler installation, ledger bootstrap, or epoch action follows without the
+owner's specific direction.
 
 **Phase 5 — operational deployment + epoch start (owner-heavy):**
-elevated window → dedicated task account → install + verify 8 scheduled
-tasks → ledger bootstrap/reconcile → **approve the mandate** → start the
-first paper evidence epoch on a frozen commit → run all 5 drills inside it →
-let the 60-session clock run. From here on, the machine collects evidence
-while development continues un-deployed (model 2 discipline) or pauses
-runtime changes (model 1). Note: the owner's informal paper trading (from
-2026-08-03) already accumulates real order/telemetry/ledger data before any
-formal epoch; that data informs execution realism but does not count toward
+merge the independently reviewed approved mandate → pin the model-2
+operational checkout → elevated scheduler window under the owner's account →
+install + verify the 4 operational tasks (`-WhatIf` first) → install the
+additional 4 ML shadow tasks only if a reviewed shadow configuration and
+artifact are available and the owner wants ML collection in this epoch →
+ledger bootstrap/reconcile → start the first paper evidence epoch on the
+frozen commit → run all 5 drills inside it → let the 60-session clock run.
+From here on, the machine collects evidence while development continues
+un-deployed under model-2 discipline. Note: the owner's informal paper trading
+(from 2026-08-03) already accumulates real order/telemetry/ledger data before
+any formal epoch; that data informs execution realism but does not count toward
 the mandate's 60-session minimum, which requires one immutable epoch.
 
 **Phase 6 — parallel product work during the evidence window (pick by owner
@@ -396,10 +402,10 @@ ML/LLM, or execution-authority behavior changed.
 
 Sequencing after UI Phase 2: UI-2d is complete after independent correction.
 Automatic expiry remains a separately approved optional milestone and physical
-purge remains deferred. Phase 5 operational deployment and epoch start remain
-the next adopted phase, but require the owner's four decisions and explicit
-direction; do not begin elevated, scheduler, mandate-approval, ledger-bootstrap,
-or epoch actions automatically.
+purge remains deferred. Phase 5 operational deployment and epoch start are
+active: the four owner decisions were made on 2026-08-04 and the mandate
+approval is in independent review. Do not begin the elevated scheduler
+installation, ledger bootstrap, or epoch actions automatically.
 
 **Phase 7 — data purchases, whenever decided (independent of code):**
 membership vendor decision → Databento statistics/reference captures →
@@ -431,11 +437,11 @@ explicit authorization).
 3. ~~GR-5 alert delivery channel~~ — **RESOLVED 2026-08-03:** immediate
    critical alerts use Windows desktop toasts; warnings batch into the daily
    briefing. Webhooks remain out of scope.
-4. ~~Elevated Windows window for task-account creation + scheduler
-   install~~ — **RESOLVED 2026-08-04: scheduled tasks run under the
-   owner's own account** (single-owner paper machine; no dedicated task
-   account, so no account-creation elevation is required — only whatever
-   elevation the scheduler install itself demands).
+4. ~~Task-account choice~~ — **RESOLVED 2026-08-04: scheduled tasks run
+   under the owner's own account** (single-owner paper machine; no dedicated
+   task account or account-creation elevation). Scheduler registration still
+   requires its owner-led elevated window and successful preview/verification;
+   that is an operational step, not an unresolved design decision.
 5. ~~Operator DB path~~ — **RESOLVED 2026-08-04: keep
    `data/trading_assistant.db`** as the single record; every checkout
    (including the operational clone) reaches it via `TRADING_ASSISTANT_DB`.

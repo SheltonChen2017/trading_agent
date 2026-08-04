@@ -39,13 +39,16 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     implementation branch = user/claude/phase5-preflight-20260803
     implementation commit = 1273a06 (pushed, not merged)
     review branch = codex/review-phase5-preflight-20260803
-    correction commit = b502127 (LOCAL-ONLY)
-    handoff commit = the commit containing this file (LOCAL-ONLY)
+    correction commit = b502127 (pushed on review branch)
+    first handoff commit = 0c16b58 (pushed on review branch)
+    pushed-state handoff = the later commit containing this update
 
-The Codex review branch is not yet on an approved remote. Another computer
-cannot retrieve `b502127` or this handoff with `git fetch` until the owner
-explicitly authorizes a push. Do not report cross-computer synchronization as
-complete before verifying the pushed ref.
+The Codex review branch was pushed to
+`origin/codex/review-phase5-preflight-20260803`, and `git ls-remote` resolved
+its first handoff tip as full commit
+`0c16b58a0dff9b87f2b9def2bc131bd5bbfae90a`. The correction and handoff are
+therefore retrievable on another computer after this pushed-state update is
+also pushed. The branch is not merged into `main`.
 
 Other machine-local worktrees remain present and must be preserved:
 
@@ -65,7 +68,7 @@ unless another machine or backup still holds it.
 | Commit | Disposition |
 |---|---|
 | `1273a06` | Accepted after `P5REV-001..003` corrections |
-| `b502127` | Codex review corrections; pending owner review/push |
+| `b502127` | Codex review corrections; pushed, pending owner merge decision |
 
 | ID | Priority | Status | Result |
 |---|---|---|---|
@@ -110,8 +113,8 @@ and inspect all eight resolved task actions before installing anything.
 `platform-readiness` must be interpreted dimension by dimension: deployment
 checks can improve while evidence and strategy legitimately remain blocked.
 
-The immediate Git step is owner review of `b502127` and this handoff commit.
-Push, merge, and pull-request creation still require explicit authorization.
+The immediate Git step is owner review of `b502127` and the handoff commits.
+Merge and pull-request creation still require explicit authorization.
 
 ## 6. Non-negotiable boundaries
 
@@ -151,8 +154,8 @@ handoff.
     Fetch/prune and verify SHAs. Claude Phase 5 preflight commit 1273a06 was
     accepted after correction on codex/review-phase5-preflight-20260803.
     Correction b502127 fixes non-elevated scheduler previews and the Phase 5
-    mandate/readiness guidance. Verify whether the Codex branch and handoff
-    have been pushed; they were local-only when written. Do not redo Phase 4.
+    mandate/readiness guidance. The Codex branch and handoff are pushed but
+    not merged; verify the remote tip after fetching. Do not redo Phase 4.
     Do not install tasks, approve/edit a mandate, start an epoch, contact a
     broker, or enable funded trading without the owner's Phase 5 decisions
     and authorization. Preserve both C:\tmp worktrees.

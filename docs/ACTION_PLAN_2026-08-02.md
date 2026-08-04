@@ -51,7 +51,7 @@ ML research/shadow stack is software-complete through monitoring and dossier;
 the LLM committee foundation is built and gated; the execution-kernel split
 (GR-1) is complete after the independently reviewed 2026-08-03 GR-1E
 assessment; GR-3 fault drills and GR-5 alert delivery are implemented and
-reviewed (2026-08-03). What does not exist is: GR-2, GR-4, GR-6, GR-7,
+reviewed (2026-08-03), and GR-2's registry is implemented pending review. What does not exist is: GR-4, GR-6, GR-7,
 every AI *product* plan beyond the committee (strategy
 authoring, debate, allocation service, MCP, and proposal cleanup), and — most
 importantly — **any qualifying frozen-epoch operational evidence at all**:
@@ -151,7 +151,7 @@ already-merged work does not reorder the adopted next step.
 
 | Milestone | Scope (one line) | Verified-absent marker |
 |---|---|---|
-| GR-2 risk-check registry | one ordered registry of named checks with `applies_at` phases replacing the hand-written ~600-line gate sequence | zero hits for `applies_at`/registry names |
+| GR-2 risk-check registry | ~~ordered registry replacing the hand-written gate sequence~~ **IMPLEMENTED 2026-08-03** (branch `user/claude/gr-2-risk-registry-20260803`): 20-check `RISK_CHECK_REGISTRY` with `applies_at` phases, frozen-inventory test, registry-injection proof, zero existing-test edits. Awaiting independent review — completes Phase 4's code work | — |
 | GR-3 fault-injection drills | ~~9 named faults + drill harness~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: 11 fault IDs / 14 behavioral tests plus an atomic hash-stamped runner. Review corrected active-epoch lineage binding, skipped/abnormal pytest fail-open behavior, the missing F4 critical alert, the absent true `submitting` restart case, partial-state assertions, and artifact atomicity. Records ambiguous_submission/restart_recovery/kill_switch rows only under exact epoch lineage or as explicit verification-only evidence. | complete |
 | GR-4 data-layer honesty | `PriceSource` protocol, staleness SLAs, provider health, split-between-snapshot-and-submit detection, degradation banner | no protocol in `data/`/`assistant/`; GR-0's `data_integrity` dimension is blocked-by-design until this lands |
 | GR-5 alert delivery | ~~a real channel + delivery records + weekly self-test + operator dashboard~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: Windows toast for critical (owner decision), warnings batched to the briefing, immutable `alert_deliveries` records, escalation on failure, storage-verified weekly self-test producing the `alert_delivery` drill, readiness checks, and the Streamlit Operations tab. Review corrected a P2 gap: a durable broken-channel alert now keeps mandatory readiness failed until a later successful self-test proves recovery and acknowledges it. | complete |
@@ -246,12 +246,16 @@ architecture-debt claims. The records are the GR-1E section of
 `docs/REVIEW_2026-08-03_GR1E_ASSESSMENT.md`. Phase 4 completed GR-3 and
 GR-5; GR-2 remains its authorized ride-along implementation milestone.
 
-**Phase 4 — operational drill/alert prerequisites (ACTIVE):**
+**Phase 4 — operational drill/alert prerequisites (CODE COMPLETE pending
+GR-2 review, 2026-08-03):**
 GR-3 fault drills and GR-5 alert delivery are COMPLETE AND INDEPENDENTLY
 REVIEWED. GR-5 uses Windows desktop toasts immediately for critical alerts,
 batches warnings, preserves immutable delivery attempts, and requires a
-successful self-test to clear a previous channel-failure condition. The
-remaining Phase 4 implementation milestone is GR-2 (risk-check registry).
+successful self-test to clear a previous channel-failure condition. GR-2's
+risk-check registry is IMPLEMENTED on
+`user/claude/gr-2-risk-registry-20260803` and awaiting independent review —
+the last Phase 4 item. After it merges, Phase 5 (operational deployment +
+epoch start) is next and is owner-heavy.
 
 **Phase 5 — operational deployment + epoch start (owner-heavy):**
 elevated window → dedicated task account → install + verify 8 scheduled

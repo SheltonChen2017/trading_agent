@@ -1,7 +1,7 @@
 # Development session handoff
 
-Prepared: 2026-08-03T19:52:22-07:00, after independent review of Claude's
-integrity sweep and GR-2 risk-check registry
+Prepared: 2026-08-03T20:02:14-07:00, after pushing the independently reviewed
+Claude integrity-sweep and GR-2 correction branch
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
@@ -24,9 +24,9 @@ contradictory appended implementation updates.
 
 GR-2 and action-plan Phase 4 are now complete and independently reviewed.
 Nothing in this result authorizes Phase 5 operations. The immediate next
-repository action is an owner-authorized push and merge of the local Codex
-review branch. Only after that merge should the owner conduct the separate
-Phase 5 decision/deployment session.
+repository action is an owner-authorized merge of the pushed Codex review
+branch. Only after that merge should the owner conduct the separate Phase 5
+decision/deployment session.
 
 Claude's submitted work is rated **8/10 overall**: integrity sweep 8/10 and
 GR-2 implementation 8.5/10. The corrected combined result is 9/10.
@@ -42,7 +42,7 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     review correction = 0167c67
     review/status records = 2239c13
     handoff = the later commit containing this file
-    review remote state = LOCAL ONLY, NOT PUSHED OR MERGED
+    review remote state = PUSHED, NOT MERGED
 
 Claude integrity sweep:
 
@@ -60,8 +60,11 @@ Claude GR-2:
 
 The two merge commits have no conflict-resolution delta: `f778ef3` is
 tree-identical to `c79d97f`, and `b021499` is tree-identical to `f5071d8`.
-No approved remote contains `2239c13` or the later handoff commit yet, so a
-different computer cannot fetch the corrected reviewed state.
+The approved remote contains the complete reviewed history through `a827ea3`
+and the later pushed handoff commit containing this update. Cross-computer
+retrieval is ready from
+`origin/codex/review-claude-gr2-integrity-20260803`; the corrections are not
+yet on `main`.
 
 ## 3. Commit dispositions and issue summary
 
@@ -143,7 +146,7 @@ Phases 1-4 are complete and independently reviewed. Phase 5 is next in
 `docs/ACTION_PLAN_2026-08-02.md`, but it is owner-heavy and must not begin
 automatically. It requires explicit decisions/actions including:
 
-1. authorize pushing and merging this review branch;
+1. authorize merging the already-pushed review branch;
 2. choose freeze-then-collect versus a pinned operational host;
 3. approve or revise the draft mandate;
 4. choose the operator database path;
@@ -220,7 +223,7 @@ Resume prompt:
     codex/review-claude-gr2-integrity-20260803: code correction 0167c67,
     review/status records 2239c13, then the handoff commit containing this
     text. Do not repeat the integrity or GR-2 reviews. The review branch is
-    local-only until the owner authorizes push/merge; do not start Phase 5
+    pushed and cross-computer retrievable but not merged; do not start Phase 5
     from uncorrected main. Phase 4 is complete. Phase 5 is owner-heavy: wait
     for explicit decisions on merge, epoch model, mandate, operator DB, and
     elevated scheduler deployment. Do not touch a funded account, start an

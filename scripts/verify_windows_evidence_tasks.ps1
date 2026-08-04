@@ -10,13 +10,14 @@ param(
     [Parameter(Mandatory = $true)]
     [string]$DatabasePath,
 
-    [Parameter(Mandatory = $true)]
-    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Leaf })]
-    [string]$ConfigPath,
+    # Required for the full eight-task verification (Scope "all"); with
+    # Scope "operational" the ML shadow config/artifact checks are skipped
+    # explicitly, so these may be omitted. Existence is validated at run
+    # time per scope rather than by ValidateScript so an operational-only
+    # host without any shadow artifact can still verify its four tasks.
+    [string]$ConfigPath = "",
 
-    [Parameter(Mandatory = $true)]
-    [ValidateScript({ Test-Path -LiteralPath $_ -PathType Container })]
-    [string]$ArtifactPath,
+    [string]$ArtifactPath = "",
 
     [string]$OperationalTaskPrefix = "TradingAgent-Paper",
 
@@ -25,28 +26,61 @@ param(
     [ValidateSet("Interactive", "S4U")]
     [string]$ExpectedTaskLogonType = "S4U",
 
-    [string[]]$RequiredCredentialNames = @("APCA_API_KEY_ID", "APCA_API_SECRET_KEY")
+    [string[]]$RequiredCredentialNames = @("APCA_API_KEY_ID", "APCA_API_SECRET_KEY"),
+
+    # MANDREV-001 follow-up: Phase 5 mandates the four operational tasks;
+    # the four ML shadow tasks are conditional on a reviewed shadow
+    # configuration and the owner's decision to collect ML evidence.
+    # "all" (default) preserves the original eight-task contract exactly.
+    # "operational" verifies the four mandatory tasks and REPORTS the ML
+    # task/config/artifact checks as skipped -- visibly, never silently --
+    # so an intentional four-task installation has a valid fail-closed
+    # success check instead of an unusable one.
+    [ValidateSet("all", "operational")]
+    [string]$Scope = "all"
 )
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+$verifyMl = $Scope -eq "all"
+if ($verifyMl) {
+    if ([string]::IsNullOrWhiteSpace($ConfigPath) -or [string]::IsNullOrWhiteSpace($ArtifactPath)) {
+        throw (
+            "Scope 'all' verifies the ML shadow tasks and requires " +
+            "-ConfigPath and -ArtifactPath. For an operational-only " +
+            "installation pass -Scope operational instead."
+        )
+    }
+}
+
 $resolvedPython = (Resolve-Path -LiteralPath $PythonPath).Path
-$resolvedConfig = (Resolve-Path -LiteralPath $ConfigPath).Path
-$resolvedArtifacts = (Resolve-Path -LiteralPath $ArtifactPath).Path
 $database = [IO.Path]::GetFullPath($DatabasePath)
 $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name
 
-$expectedTasks = @(
+$operationalTasks = @(
     "$OperationalTaskPrefix-OperationsCycle",
     "$OperationalTaskPrefix-OrderMonitor",
     "$OperationalTaskPrefix-Watchdog",
-    "$OperationalTaskPrefix-PaperObservation",
+    "$OperationalTaskPrefix-PaperObservation"
+)
+$mlTasks = @(
     "$MlTaskPrefix-Predict",
     "$MlTaskPrefix-Mature",
     "$MlTaskPrefix-Monitor",
     "$MlTaskPrefix-Supervisor"
 )
+$expectedTasks = if ($verifyMl) { $operationalTasks + $mlTasks } else { $operationalTasks }
+
+$skippedChecks = [Collections.Generic.List[object]]::new()
+if (-not $verifyMl) {
+    foreach ($skippedName in (@("config_path", "artifact_path") + ($mlTasks | ForEach-Object { "task:$_" }))) {
+        $skippedChecks.Add([PSCustomObject]@{
+            Name = $skippedName
+            Detail = "skipped: Scope=operational (ML shadow collection not requested for this installation)"
+        })
+    }
+}
 
 $checks = [Collections.Generic.List[object]]::new()
 function Add-Check {
@@ -60,8 +94,18 @@ function Add-Check {
 
 Add-Check -Name "python_path" -Ok (Test-Path -LiteralPath $resolvedPython -PathType Leaf) -Detail $resolvedPython
 Add-Check -Name "database_path" -Ok (Test-Path -LiteralPath $database -PathType Leaf) -Detail $database
-Add-Check -Name "config_path" -Ok (Test-Path -LiteralPath $resolvedConfig -PathType Leaf) -Detail $resolvedConfig
-Add-Check -Name "artifact_path" -Ok (Test-Path -LiteralPath $resolvedArtifacts -PathType Container) -Detail $resolvedArtifacts
+if ($verifyMl) {
+    # Resolve-Path throws on absence; report a failed check instead so the
+    # JSON report stays the single verification surface.
+    $configOk = Test-Path -LiteralPath $ConfigPath -PathType Leaf
+    $artifactsOk = Test-Path -LiteralPath $ArtifactPath -PathType Container
+    Add-Check -Name "config_path" -Ok $configOk -Detail $(
+        if ($configOk) { (Resolve-Path -LiteralPath $ConfigPath).Path } else { "$ConfigPath (missing)" }
+    )
+    Add-Check -Name "artifact_path" -Ok $artifactsOk -Detail $(
+        if ($artifactsOk) { (Resolve-Path -LiteralPath $ArtifactPath).Path } else { "$ArtifactPath (missing)" }
+    )
+}
 
 foreach ($credentialName in $RequiredCredentialNames) {
     $processValue = [Environment]::GetEnvironmentVariable($credentialName, "Process")
@@ -73,7 +117,12 @@ foreach ($credentialName in $RequiredCredentialNames) {
     $machinePresent = -not [string]::IsNullOrWhiteSpace($machineValue)
     $targetContextPresent = $runningAsTaskUser -and ($processPresent -or $userPresent)
     $present = $machinePresent -or $targetContextPresent
-    Add-Check -Name "credential:$credentialName" -Ok $present -Detail (
+    # $( ... ) not ( ... ): a parenthesized `if` statement is a runtime
+    # error in PowerShell ("the term 'if' is not recognized") -- this line
+    # crashed every end-to-end run of this verifier before 2026-08-04; it
+    # went unnoticed because the old mandatory ConfigPath ValidateScript
+    # aborted even earlier on hosts without a shadow config.
+    Add-Check -Name "credential:$credentialName" -Ok $present -Detail $(
         if ($machinePresent) {
             "present in machine scope; value not displayed"
         } elseif ($targetContextPresent) {
@@ -115,10 +164,12 @@ $failed = @($checks | Where-Object { -not $_.Ok })
 $report = [PSCustomObject]@{
     CheckedAt = [datetime]::UtcNow.ToString("o")
     Ok = $failed.Count -eq 0
+    Scope = $Scope
     RunAsUser = $RunAsUser
     CurrentUser = $currentUser
     ExpectedTaskLogonType = $ExpectedTaskLogonType
     Checks = $checks
+    SkippedChecks = $skippedChecks
     FailedCheckCount = $failed.Count
     ProductionAuthoritative = $false
 }

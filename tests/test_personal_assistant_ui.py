@@ -48,6 +48,9 @@ def test_page_state_persistence_excludes_every_sensitive_confirmation():
         "confirm_tp-1": "approve",
         "override_confirm_tp-1": "OVERRIDE BUY 1 AAPL",
         "cancel_confirmation_tp-1": "cancel",
+        "dismiss_selection": ["tp-1"],
+        "dismiss_reason": "unused",
+        "dismiss_confirmation": "dismiss 1 proposals",
     }
 
     _preserve_page_widget_state(state)
@@ -60,6 +63,11 @@ def test_page_state_persistence_excludes_every_sensitive_confirmation():
         "confirm_tp-1",
         "override_confirm_tp-1",
         "cancel_confirmation_tp-1",
+        # UI-2d: the dismissal workflow is a durable mutation -- its
+        # selection/reason/confirmation must never survive navigation.
+        "dismiss_selection",
+        "dismiss_reason",
+        "dismiss_confirmation",
     ):
         assert sensitive_key not in _PERSISTENT_PAGE_WIDGET_KEYS
 
@@ -413,6 +421,9 @@ def test_proposal_status_category_covers_every_real_status():
         "submitting": "unresolved",
         "submission_unknown": "unresolved",
         "reconciling": "unresolved",
+        # UI-2d (2026-08-04, deliberate): the archive status renders its own
+        # terminal card -- never approval controls, never "in_progress".
+        "dismissed": "dismissed",
     }
     assert set(expected) == set(STATUSES), "test fixture is out of sync with assistant.proposal_status.STATUSES"
     for status in STATUSES:

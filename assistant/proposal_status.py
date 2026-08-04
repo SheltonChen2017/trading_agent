@@ -36,6 +36,16 @@ BROKER_EXPIRED = "broker_expired"
 # for migration/reconciliation, but never emit it for a new submission.
 EXECUTED = "executed"
 EXPIRED = "expired"
+# UI-2d dismiss/archive: a terminal, non-executable archive state for
+# proposals that never touched validation, approval, reservation, or any
+# broker lifecycle. Dismissal hides the row from the default History view
+# while retaining the complete database record (including the unique
+# idempotency key, so the same logical proposal cannot silently be
+# regenerated). It is deliberately absent from IN_FLIGHT_INTENT_STATUSES,
+# UNRESOLVED_BROKER_STATE_STATUSES, ACTIVE_BROKER_ORDER_STATUSES, and
+# TERMINAL_BROKER_STATUSES: it holds no ticker/side slot, implies no broker
+# order, and is not a broker outcome.
+DISMISSED = "dismissed"
 
 # A broker 404 immediately after dispatch is not yet reliable evidence that an
 # order was never accepted: the submit response can be lost while the broker's
@@ -65,6 +75,17 @@ STATUSES: tuple[str, ...] = (
     BROKER_REJECTED,
     BROKER_EXPIRED,
     EXECUTED,
+    EXPIRED,
+    DISMISSED,
+)
+
+# UI-2d: the only statuses a dismissal may transition FROM. Deliberately
+# narrow -- `override_available` is excluded because it proves validation
+# was attempted and produced a human-reviewable policy result; blocked,
+# validation_failed, approved, every submission state, and every broker
+# state remain permanent audit history.
+DISMISSIBLE_SOURCE_STATUSES: tuple[str, ...] = (
+    PROPOSED,
     EXPIRED,
 )
 
@@ -195,6 +216,9 @@ STATUS_OUTCOME_GROUPS: dict[str, str] = {
     CANCELED: OUTCOME_CLOSED_WITHOUT_FILL,
     BROKER_EXPIRED: OUTCOME_CLOSED_WITHOUT_FILL,
     EXPIRED: OUTCOME_CLOSED_WITHOUT_FILL,
+    # UI-2d: the action plan's frozen UI-2b groups pre-assigned the future
+    # dismissed status to Closed without fill.
+    DISMISSED: OUTCOME_CLOSED_WITHOUT_FILL,
 }
 
 

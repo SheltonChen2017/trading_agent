@@ -575,6 +575,88 @@ def command_cancel_all_orders(args, store: AssistantStore) -> None:
         raise SystemExit(2)
 
 
+def command_dismiss_proposals(args, store: AssistantStore) -> None:
+    """UI-2d: preview-first dismissal of unused, never-broker-touched
+    proposals. Archive, never delete: the row, payload, and idempotency
+    key all remain. Defaults to preview-only; the mutation requires BOTH
+    the preview hash printed by the preview run AND the exact confirmation
+    string, so a copied-and-edited command cannot dismiss a different set
+    of proposals than the one previewed."""
+    preview = store.proposal_dismissal_eligibility(args.proposal_ids)
+    print(
+        json.dumps(
+            {
+                "rows": [
+                    {
+                        "proposal_id": row.proposal_id,
+                        "ticker": row.ticker,
+                        "side": row.side,
+                        "shares": row.shares,
+                        "status": row.status,
+                        "created_at": row.created_at,
+                        "expires_at": row.expires_at,
+                        "dismissible": row.dismissible,
+                        "refusal_reasons": list(row.refusal_reasons),
+                    }
+                    for row in preview.rows
+                ],
+                "dismissible_ids": list(preview.dismissible_ids),
+                "preview_hash": preview.preview_hash,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+
+    mutation_requested = (
+        args.confirm_preview_hash is not None or args.confirm_dismiss is not None
+    )
+    if not mutation_requested:
+        print(
+            "[preview only] To dismiss the dismissible rows above, re-run with "
+            f"--reason <text> --confirm-preview-hash {preview.preview_hash} "
+            "--confirm-dismiss unused-paper-proposals"
+        )
+        return
+
+    if args.confirm_dismiss != "unused-paper-proposals":
+        raise SystemExit(
+            "Dismissal not confirmed. Pass --confirm-dismiss "
+            "unused-paper-proposals (exactly)."
+        )
+    if args.confirm_preview_hash is None:
+        raise SystemExit(
+            "Dismissal requires --confirm-preview-hash from a preview run."
+        )
+    if not (args.reason or "").strip():
+        raise SystemExit("Dismissal requires a non-empty --reason.")
+
+    try:
+        result = store.dismiss_proposals(
+            args.proposal_ids,
+            dismissed_by=args.operator,
+            reason=args.reason,
+            expected_preview_hash=args.confirm_preview_hash,
+        )
+    except ValueError as exc:
+        raise SystemExit(f"Dismissal refused: {exc}")
+    print(
+        json.dumps(
+            {
+                "dismissed_ids": list(result.dismissed_ids),
+                "already_dismissed_ids": list(result.already_dismissed_ids),
+                "dismissed_at": result.dismissed_at,
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    print(
+        "Dismissed proposals remain in the local audit history and cannot "
+        "be executed."
+    )
+
+
 def command_readiness(args, store: AssistantStore) -> None:
     policy = load_policy(args.policy)
     report = transaction_readiness(store, policy, check_broker=not args.offline)
@@ -1466,6 +1548,22 @@ def build_parser() -> argparse.ArgumentParser:
         help="Apply the current schema (open with current code) before verifying.",
     )
     verify_schema.set_defaults(handler=command_verify_db_schema, needs_store=False)
+
+    dismiss = commands.add_parser(
+        "dismiss-proposals",
+        help=(
+            "UI-2d: preview (default) or dismiss unused, never-broker-touched "
+            "proposals. Archive, never delete -- the row and idempotency key "
+            "remain. Mutation requires --reason, --confirm-preview-hash from "
+            "the preview, and --confirm-dismiss unused-paper-proposals."
+        ),
+    )
+    dismiss.add_argument("proposal_ids", nargs="+")
+    dismiss.add_argument("--reason", default=None)
+    dismiss.add_argument("--operator", default="local_operator")
+    dismiss.add_argument("--confirm-preview-hash", default=None)
+    dismiss.add_argument("--confirm-dismiss", default=None)
+    dismiss.set_defaults(handler=command_dismiss_proposals)
 
     mandate_status = commands.add_parser(
         "mandate-status",

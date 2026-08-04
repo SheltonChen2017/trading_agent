@@ -105,6 +105,33 @@ $alertsArgument = Quote-TaskArgument $alerts
 $assistantArgument = Quote-TaskArgument $assistantScript
 $watchdogArgument = Quote-TaskArgument $watchdogScript
 
+# ScheduledTasks object construction can itself require access to the local
+# Task Scheduler CIM provider.  A non-elevated operator must still be able to
+# inspect a -WhatIf plan, so return a data-only preview before invoking any
+# New-ScheduledTask* cmdlet.
+if ($WhatIfPreference) {
+    @(
+        @{ Name = "$TaskPrefix-OperationsCycle"; Command = "$assistantArgument --database $databaseArgument operations-cycle --cancel-stale --alerts-jsonl $alertsArgument" },
+        @{ Name = "$TaskPrefix-OrderMonitor"; Command = "$assistantArgument --database $databaseArgument monitor-orders --cancel-stale --poll-seconds 30" },
+        @{ Name = "$TaskPrefix-Watchdog"; Command = "$watchdogArgument --database $databaseArgument --interval-seconds 60 --alerts-jsonl $alertsArgument" },
+        @{ Name = "$TaskPrefix-PaperObservation"; Command = "$assistantArgument --database $databaseArgument paper-observation --cancel-stale --alerts-jsonl $alertsArgument" }
+    ) | ForEach-Object {
+        [PSCustomObject]@{
+            TaskName = $_.Name
+            Status = "planned (WhatIf)"
+            Execute = $resolvedPython
+            Arguments = $_.Command
+            WorkingDirectory = $resolvedRepository
+            RunAsUser = $RunAsUser
+            RunLevel = "Limited"
+            LogonType = $TaskLogonType
+            Database = $database
+            AlertsJsonl = $alerts
+        }
+    }
+    return
+}
+
 $cycleAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
     -Argument "$assistantArgument --database $databaseArgument operations-cycle --cancel-stale --alerts-jsonl $alertsArgument" `

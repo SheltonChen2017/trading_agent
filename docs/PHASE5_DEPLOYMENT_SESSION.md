@@ -21,14 +21,15 @@ machine before deploying.
 |---|---|---|
 | Full test suite | 2,543 passed / 1 skipped / 25 warnings | yes — must pass on the exact frozen commit |
 | All Phase 5 CLI producers exist (`readiness`, `platform-readiness`, `ledger-bootstrap`, `ledger-reconcile`, `paper-epoch-start/close`, `paper-observation`, `paper-evidence-status`, `record-drill`, `recovery-drill`, `deliver-alerts`, `alert-self-test`, `operations-cycle`, `monitor-orders`) | all present | no |
-| `install_windows_operational_tasks.ps1 -WhatIf` | plans all 4 operational tasks (S4U, Limited); correctly REFUSED the Microsoft Store python alias until given a real interpreter | yes — with the operational machine's python and chosen DB path |
+| `install_windows_operational_tasks.ps1 -WhatIf` | the original preflight hit Task Scheduler `Access denied` before printing a plan; the independent review corrected both installers to emit a four-task, data-only preview without elevation | yes — with the operational machine's python and chosen DB path; require exit 0 and inspect every resolved action |
 | `install_windows_ml_shadow_tasks.ps1 -WhatIf` | correctly fail-closed: refuses to plan without a real `artifacts/shadow.json` (machine-local, absent on the dev machine) | yes — where the shadow config exists |
 | GR-3 fault-drill harness (`run_fault_drill.py`) | 11/11 fault IDs passed, report bound to clean commit `d5fab71` | yes — with `--record-database` once an epoch is active |
-| `platform-readiness` against a disposable DB | fails closed exactly as designed: policy/paper-mode/DB-integrity/kill-switch green; broker `unauthorized` and never-run reconciliation reported as blockers, nonzero exit | yes — should go green stepwise as the session proceeds |
+| `platform-readiness` against a disposable DB | fails closed exactly as designed: policy/paper-mode/DB-integrity/kill-switch green; broker `unauthorized` and never-run reconciliation reported as blockers, nonzero exit | yes — individual deployment checks should improve stepwise; evidence and strategy dimensions remain blocked until their independent gates are met |
 
-Preflight finding worth knowing: the operational-tasks installer exits
-nonzero after a successful `-WhatIf` preview. Judge the preview by its
-planned-task output, not the exit code.
+The independent review reproduced the original operational preview with exit
+1 and no planned-task output. That was a failed preview, not a success whose
+exit code could be ignored. The corrected preview must exit zero and list all
+four resolved actions; any nonzero exit remains a blocker to investigate.
 
 ## 2. Decisions the owner must make first (blocking, in order)
 
@@ -38,8 +39,11 @@ planned-task output, not the exit code.
    un-deployed (model 2). Everything below assumes a decision.
 2. **Approve the mandate** (or revise its DRAFT §2 targets first):
    `python scripts/run_personal_assistant.py --database <db> mandate-status`
-   shows the current state. The epoch binds the mandate fingerprint, so
-   this precedes `paper-epoch-start`.
+   validates and displays the current state, but it does not approve anything.
+   Approval requires a separately reviewed and committed update to
+   `assistant/default_mandate.json` that sets the approval metadata and binds
+   `approved_fingerprint` to the final behavior fields. The epoch binds that
+   exact mandate fingerprint, so this precedes `paper-epoch-start`.
 3. **Operator DB path**: keep `data/trading_assistant.db` or adopt the
    runbook's `data/paper.db`. Every command below uses the chosen path;
    mixing paths splits the evidence.
@@ -65,7 +69,9 @@ its gates.
 5. **Bootstrap the ledger**: `readiness`, then `ledger-bootstrap --confirm
    bootstrap` (once), then `ledger-reconcile` — runbook §Before starting a
    paper evidence epoch.
-6. **Approve the mandate** (decision 2 executed).
+6. **Verify the approved mandate**: check out the separately reviewed mandate
+   commit, run `mandate-status`, and confirm the reported status and computed
+   fingerprint match the owner-approved file. There is no approval CLI.
 7. **Start the epoch**: `paper-epoch-start <epoch-id> --strategy-id ...
    --strategy-version ... --model-id ...` on the frozen commit. From this
    moment the commit, mandate/policy fingerprints, strategy/model IDs, and
@@ -75,15 +81,22 @@ its gates.
    `run_fault_drill.py --record-database <db> --operator "<name>"`),
    `recovery-drill`, and `alert-self-test --record-drill`. Store evidence
    under `data/drill_evidence/` (git-ignored).
-9. **Confirm green**: `platform-readiness` exits zero;
-   `paper-evidence-status <epoch-id>` shows session counting begun.
+9. **Confirm the expected staged state**: run `platform-readiness` and inspect
+   every dimension independently. It is expected to remain nonzero while the
+   60-session/30-order evidence minimums are unmet and while no confirmed,
+   production-authoritative strategy exists; do not relabel those blockers as
+   deployment failures or bypass them. `paper-evidence-status <epoch-id>`
+   should show that the epoch exists and will count qualifying post-close
+   observations as they are recorded.
 10. **Let the 60-session clock run.** The pre-epoch informal paper trading
     data remains useful for execution realism but does not count toward
     the mandate's 60-session minimum.
 
 ## 4. What must NOT happen in this session
 
-- No live/funded account, credential, or endpoint anywhere.
+- No live/funded account, credential, or endpoint anywhere. Alpaca **paper**
+  credentials and the paper endpoint are required on the operational host and
+  must never be committed or printed.
 - No epoch start from a dirty worktree or unmerged branch (the tooling
   refuses; do not work around it).
 - No manual edits to evidence tables, ever — a persistent alert is an

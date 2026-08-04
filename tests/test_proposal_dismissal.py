@@ -191,6 +191,30 @@ def test_child_rows_refuse_dismissal(store):
     assert "execution reservation" in reasons["p-reservation"]
 
 
+def test_execution_telemetry_refuses_dismissal(store):
+    """Validation telemetry is durable proof that approval was attempted,
+    even if the proposal status was later corrupted back to `proposed`."""
+    _seed(store, "p-telemetry", status="proposed")
+    store.append_execution_telemetry_event(
+        attempt_id="attempt-p-telemetry",
+        proposal_id="p-telemetry",
+        event_type="validation_refused",
+        event_at=_BASE_TIME.isoformat(),
+        account_mode="paper",
+        broker_account_id=None,
+        source="test",
+        payload={"result": "policy_refusal"},
+    )
+
+    preview = store.proposal_dismissal_eligibility(["p-telemetry"])
+
+    assert preview.dismissible_ids == ()
+    assert any(
+        "execution telemetry" in reason
+        for reason in preview.rows[0].refusal_reasons
+    )
+
+
 def test_allocation_batch_reference_refuses_dismissal(store):
     _seed(store, "p-batched", status="proposed")
     _seed(store, "p-free", status="proposed")
@@ -215,6 +239,28 @@ def test_unreadable_allocation_batch_payload_fails_closed(store):
             (now, now),
         )
     preview = store.proposal_dismissal_eligibility(["p-any"])
+    assert preview.dismissible_ids == ()
+    assert any("unreadable" in r for r in preview.rows[0].refusal_reasons)
+
+
+def test_structurally_invalid_allocation_batch_payload_fails_closed(store):
+    """Valid JSON with the wrong field types is still unreadable as a batch.
+
+    Treating a string proposal_ids field as an iterable would compare one
+    character at a time and could miss the referenced proposal.
+    """
+    _seed(store, "p-any", status="proposed")
+    now = _BASE_TIME.isoformat()
+    malformed = json.dumps({"proposal_ids": "p-any", "legs": {}})
+    with store._connect() as connection:
+        connection.execute(
+            "INSERT INTO allocation_batches(batch_id, created_at, status, "
+            "payload_json, updated_at) VALUES ('bad-shape', ?, 'created', ?, ?)",
+            (now, malformed, now),
+        )
+
+    preview = store.proposal_dismissal_eligibility(["p-any"])
+
     assert preview.dismissible_ids == ()
     assert any("unreadable" in r for r in preview.rows[0].refusal_reasons)
 
@@ -279,6 +325,37 @@ def test_benign_state_change_with_same_verdicts_still_refuses_old_hash(store):
             expected_preview_hash=preview.preview_hash,
         )
     assert store.get_proposal("p-touch")["status"] == "proposed"
+
+
+def test_preview_hash_covers_complete_proposal_state(store):
+    """The preview confirmation binds the displayed intent, not only status.
+
+    This direct mutation models row corruption or a future writer that fails
+    to maintain updated_at: changing the ticker after preview must not allow
+    the old confirmation to archive a different proposal identity.
+    """
+    _seed(store, "p-identity", status="proposed")
+    preview = store.proposal_dismissal_eligibility(["p-identity"])
+    with store._connect() as connection:
+        row = connection.execute(
+            "SELECT payload_json FROM trade_proposals WHERE proposal_id = ?",
+            ("p-identity",),
+        ).fetchone()
+        payload = json.loads(row["payload_json"])
+        payload["intent"]["ticker"] = "MSFT"
+        connection.execute(
+            "UPDATE trade_proposals SET payload_json = ? WHERE proposal_id = ?",
+            (json.dumps(payload, sort_keys=True), "p-identity"),
+        )
+
+    with pytest.raises(ValueError, match="Stale"):
+        store.dismiss_proposals(
+            ["p-identity"],
+            dismissed_by="local_operator",
+            reason="unused",
+            expected_preview_hash=preview.preview_hash,
+        )
+    assert store.get_proposal("p-identity")["status"] == "proposed"
 
 
 def test_bulk_dismissal_is_all_or_nothing(store):

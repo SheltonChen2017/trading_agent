@@ -141,9 +141,27 @@ from assistant.strategy_proposals import (
     MissingResearchDependencyError,
     generate_leveraged_pair_rebalance_proposals,
 )
-from config import BASKETS, LEVERAGED_ETF_TICKERS, PAPER_TRADING, UNIVERSE
+from config import (
+    BASKETS,
+    HORIZON_LABELS,
+    HORIZON_SWEEP_DAYS,
+    LEVERAGED_ETF_TICKERS,
+    LOOKBACK_DAYS,
+    PAPER_TRADING,
+    SLIPPAGE_PCT,
+    UNIVERSE,
+)
+from backtest.engine import summarize_multi_horizon
+from backtest.interactive import (
+    CHART_CAPTION,
+    EXPLORATORY_CAVEATS,
+    SIGNAL_INVENTORY,
+    SYNTHETIC_CAVEAT,
+    cumulative_return_frame,
+    run_interactive_backtest,
+)
 from data.event_data import fetch_upcoming_earnings
-from data.market_data import fetch_historical
+from data.market_data import fetch_historical, generate_synthetic
 from execution.alpaca_broker import is_configured
 from market_analytics import classify_trend
 
@@ -429,6 +447,21 @@ _PERSISTENT_PAGE_WIDGET_KEYS = (
     "suggest_src_recent_ipo",
     "suggest_src_ai",
     "suggest_seed_tickers",
+    # Backtest page (UI-3): research configuration is benign page work.
+    # Completed run RESULTS live in the non-widget "backtest_run" session
+    # key and survive navigation without needing this whitelist.
+    "bt_signal",
+    "bt_data_source",
+    "bt_scope",
+    "bt_lookback_days",
+    "bt_horizons",
+) + tuple(
+    # Per-signal parameter widgets, namespaced by signal so two signals
+    # sharing a parameter name (with different bounds) can never collide
+    # in session state.
+    f"bt_param_{signal.key}_{param.name}"
+    for signal in SIGNAL_INVENTORY
+    for param in signal.params
 )
 
 
@@ -1316,6 +1349,7 @@ _PAGE_LABELS = (
     "Propose & Approve",
     "History",
     "Ticker Suggestions",
+    "Backtest",
     "Operations",
     "Settings & Features",
 )
@@ -2849,6 +2883,231 @@ if page == "Ticker Suggestions":
             "Research only — to act on any of these, add the ticker to the Buying "
             "cart yourself and go through the normal check/propose/approve workflow."
         )
+
+# ---------------------------------------------------------------------------
+# Backtest -- UI-3's read-only research surface. Composes the SAME
+# backtest/engine.py walk-forward the CLI research scripts use, through the
+# frozen inventory in backtest/interactive.py. It has no path to proposals,
+# approvals, orders, policy, or the research registry, and it must never
+# grow one: a good-looking chart leads nowhere. Confirmatory significance
+# deliberately does NOT run here (see EXPLORATORY_CAVEATS).
+# ---------------------------------------------------------------------------
+
+_WHOLE_UNIVERSE_SCOPE = f"Entire universe ({len(UNIVERSE)} tickers)"
+
+
+@st.cache_data(show_spinner=False)
+def _load_backtest_synthetic_data(tickers: tuple[str, ...], days: int):
+    """Deterministic (fixed-seed) synthetic OHLCV -- cache keyed by the
+    ticker tuple and day count so widget interactions never regenerate."""
+    return generate_synthetic(list(tickers), days=days)
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def _load_backtest_real_data(tickers: tuple[str, ...], lookback_days: int):
+    """Real yfinance history, cached for an hour so parameter tweaks rerun
+    the backtest without re-fetching the network data."""
+    return fetch_historical(list(tickers), lookback_days=lookback_days)
+
+
+if page == "Backtest":
+    st.caption(
+        "Research-only walk-forward backtesting of the project's signal "
+        "scanners -- the same engine the CLI research scripts use. Nothing "
+        "here can propose, approve, or submit a trade."
+    )
+
+    signal_by_label = {signal.label: signal for signal in SIGNAL_INVENTORY}
+    chosen_label = st.selectbox(
+        "Signal",
+        list(signal_by_label),
+        key="bt_signal",
+    )
+    bt_signal = signal_by_label[chosen_label]
+    st.caption(bt_signal.description)
+
+    param_values: dict[str, float] = {}
+    param_columns = st.columns(2)
+    for index, spec in enumerate(bt_signal.params):
+        with param_columns[index % 2]:
+            if spec.kind == "int":
+                value = st.number_input(
+                    spec.label,
+                    min_value=int(spec.min_value),
+                    max_value=int(spec.max_value),
+                    value=int(spec.default),
+                    step=int(spec.step),
+                    key=f"bt_param_{bt_signal.key}_{spec.name}",
+                    help=spec.help,
+                )
+            else:
+                value = st.number_input(
+                    spec.label,
+                    min_value=float(spec.min_value),
+                    max_value=float(spec.max_value),
+                    value=float(spec.default),
+                    step=float(spec.step),
+                    key=f"bt_param_{bt_signal.key}_{spec.name}",
+                    help=spec.help,
+                )
+        param_values[spec.name] = value
+
+    source_choice = st.radio(
+        "Data source",
+        (
+            "Synthetic (plumbing check, seconds)",
+            "Real market data (yfinance; minutes on first fetch)",
+        ),
+        key="bt_data_source",
+        help=(
+            "Synthetic random-walk data proves the pipeline works and is "
+            "the safe default; only real history can say anything about "
+            "edge -- and even then only as an exploratory look."
+        ),
+    )
+    use_real_data = source_choice.startswith("Real")
+
+    scope_choice = st.selectbox(
+        "Universe scope",
+        [_WHOLE_UNIVERSE_SCOPE] + [f"Basket: {name}" for name in sorted(BASKETS)],
+        key="bt_scope",
+    )
+    if scope_choice == _WHOLE_UNIVERSE_SCOPE:
+        bt_tickers = tuple(UNIVERSE)
+    else:
+        bt_tickers = tuple(BASKETS[scope_choice.removeprefix("Basket: ")])
+
+    bt_lookback = st.number_input(
+        "History length (trading days)",
+        min_value=120,
+        max_value=LOOKBACK_DAYS,
+        value=504,
+        step=21,
+        key="bt_lookback_days",
+        help=(
+            f"Walk-forward window. The scanner pipeline's own config uses "
+            f"{LOOKBACK_DAYS} days (~7 years); shorter runs are faster but "
+            f"produce fewer, luck-dominated signals."
+        ),
+    )
+    bt_horizons = st.multiselect(
+        "Hold horizons",
+        HORIZON_SWEEP_DAYS,
+        default=HORIZON_SWEEP_DAYS,
+        format_func=lambda days: HORIZON_LABELS.get(days, f"{days}d"),
+        key="bt_horizons",
+        help=(
+            "Each selected horizon runs its own walk-forward pass. An edge "
+            "that only appears at one arbitrary exit timing is suspect."
+        ),
+    )
+    st.caption(
+        f"Entry timing: next_open (executable; fixed -- the legacy "
+        f"same-close timing is not offered here). Slippage: "
+        f"{SLIPPAGE_PCT * 100:.2f}% per leg, deducted round-trip."
+    )
+
+    if st.button("Run backtest", type="primary", key="bt_run"):
+        if not bt_horizons:
+            st.error("Select at least one hold horizon.")
+        else:
+            try:
+                with st.spinner(
+                    "Fetching real history and walking forward -- first "
+                    "fetch can take minutes..."
+                    if use_real_data
+                    else "Running the walk-forward backtest..."
+                ):
+                    bt_data = (
+                        _load_backtest_real_data(bt_tickers, int(bt_lookback))
+                        if use_real_data
+                        else _load_backtest_synthetic_data(
+                            bt_tickers, int(bt_lookback)
+                        )
+                    )
+                    results_by_horizon = run_interactive_backtest(
+                        bt_data,
+                        signal_key=bt_signal.key,
+                        param_values=param_values,
+                        hold_days_options=sorted(bt_horizons),
+                        slippage_pct=SLIPPAGE_PCT,
+                    )
+                st.session_state["backtest_run"] = {
+                    "signal_key": bt_signal.key,
+                    "signal_label": bt_signal.label,
+                    "param_values": dict(param_values),
+                    "source": "real" if use_real_data else "synthetic",
+                    "scope": scope_choice,
+                    "ticker_count": len(bt_tickers),
+                    "lookback_days": int(bt_lookback),
+                    "results_by_horizon": results_by_horizon,
+                    "ran_at": datetime.now(timezone.utc).isoformat(),
+                }
+            except Exception as exc:
+                st.error(f"Backtest failed: {exc}")
+
+    completed_run = st.session_state.get("backtest_run")
+    if completed_run is None:
+        st.info("Configure a signal above and click Run backtest.")
+    else:
+        st.subheader(f"Results -- {completed_run['signal_label']}")
+        run_params = ", ".join(
+            f"{name}={value}"
+            for name, value in sorted(completed_run["param_values"].items())
+        )
+        st.caption(
+            f"Run configuration: {completed_run['source']} data, "
+            f"{completed_run['scope']} ({completed_run['ticker_count']} "
+            f"tickers), {completed_run['lookback_days']} trading days, "
+            f"{run_params}, entry next_open, ran {completed_run['ran_at']}. "
+            "Results reflect this configuration, not any widget changed "
+            "since."
+        )
+        if completed_run["source"] == "synthetic":
+            st.warning(SYNTHETIC_CAVEAT)
+        else:
+            st.warning(EXPLORATORY_CAVEATS)
+
+        summary = summarize_multi_horizon(
+            completed_run["results_by_horizon"], entry_timing="next_open"
+        )
+        if summary.empty:
+            st.info(
+                "No signals were flagged anywhere in this window -- "
+                "nothing to score."
+            )
+        else:
+            st.dataframe(summary, use_container_width=True, hide_index=True)
+
+            horizons_with_rows = [
+                horizon
+                for horizon, frame in sorted(
+                    completed_run["results_by_horizon"].items()
+                )
+                if not frame.empty
+            ]
+            if horizons_with_rows:
+                # A previous run may have offered different horizons; a
+                # stale selection outside the current options would make
+                # the selectbox error out.
+                if st.session_state.get("bt_chart_horizon") not in horizons_with_rows:
+                    st.session_state.pop("bt_chart_horizon", None)
+                chart_horizon = st.selectbox(
+                    "Chart hold horizon",
+                    horizons_with_rows,
+                    format_func=lambda days: HORIZON_LABELS.get(
+                        days, f"{days}d"
+                    ),
+                    key="bt_chart_horizon",
+                )
+                st.line_chart(
+                    cumulative_return_frame(
+                        completed_run["results_by_horizon"][chart_horizon]
+                    ),
+                    height=280,
+                )
+                st.caption(CHART_CAPTION)
+
 
 # ---------------------------------------------------------------------------
 # Operations -- GR-5's single operator dashboard. STRICTLY READ-ONLY except

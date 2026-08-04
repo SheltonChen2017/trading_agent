@@ -1,9 +1,13 @@
 # Portfolio Mandate
 
-**Status: PROPOSED — numeric targets below are starting points, not settled
-policy. The machine-readable counterpart is
-`assistant/default_mandate.json`; it deliberately fails the live-promotion
-gate until its targets are explicitly approved and fingerprint-bound.**
+**Status: APPROVED by the owner (sheltonchen), 2026-08-04, with the §2
+targets adopted unchanged from the draft values.** The machine-readable
+counterpart `assistant/default_mandate.json` carries the approval metadata
+and an `approved_fingerprint` bound to the exact behavior fields; changing
+any target requires a new reviewed approval, not an edit. Approval plants
+the goalposts for the live-promotion gate — it does not itself enable live
+trading, autonomous execution, or anything beyond the paper-evidence
+collection it now makes countable.
 
 ## 1. Purpose
 
@@ -19,7 +23,8 @@ as the operative goal statement — the README stays the operational
 entry point (how to run things); this document carries the why and the
 numbers.
 
-## 2. Numeric targets (DRAFT)
+## 2. Numeric targets (approved 2026-08-04; "Draft value" column kept as
+the historical basis record)
 
 Where this project has direct evidence, targets are anchored to it rather
 than picked from thin air. Where it doesn't yet, that's called out
@@ -131,3 +136,10 @@ targets in §2 change, so revisions are visible, not silent edits.
 - **2026-07-29** — status changed from draft to proposed; added the
   fingerprint-bound machine-readable mandate and immutable mandate-scored
   research-report pipeline. Numeric targets were not changed or approved.
+- **2026-08-04** — **owner approval** (Phase 5 decision 2): sheltonchen
+  approved every §2 target unchanged after a plain-language walkthrough
+  (including the 60-session/30-order evidence minimums).
+  `assistant/default_mandate.json` now carries status `approved` with the
+  bound `approved_fingerprint`; the evidence epoch will bind that exact
+  fingerprint. `allow_autonomous_execution` remains `false` — approval
+  changes what evidence counts, never what the machine may do.

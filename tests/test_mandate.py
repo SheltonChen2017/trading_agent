@@ -15,11 +15,20 @@ from assistant.mandate import (
 )
 
 
-def test_default_mandate_is_valid_but_deliberately_not_approved():
+def test_default_mandate_is_owner_approved_with_bound_fingerprint():
+    """Contract change 2026-08-04: the owner explicitly approved the
+    mandate (Phase 5 decision) with targets unchanged from the proposed
+    defaults. The old expectation ("deliberately not approved") described
+    the pre-decision state; what must now hold is that the approval is
+    complete, fingerprint-bound to the behavior fields, and still grants
+    no autonomy."""
     mandate = load_mandate()
-    assert mandate.status == "proposed"
+    assert mandate.status == "approved"
+    assert mandate.approved_by == "sheltonchen"
+    assert mandate.approved_at
+    assert mandate.approved_fingerprint == compute_mandate_fingerprint(mandate)
+    # Approval must never flip the permanent human-approval boundary.
     assert mandate.allow_autonomous_execution is False
-    assert len(compute_mandate_fingerprint(mandate)) == 64
 
 
 def test_approved_mandate_is_bound_to_its_behavior_fields(tmp_path):
@@ -89,8 +98,18 @@ def test_mandate_metric_scorecard_rejects_a_stray_boolean_metric():
 
 
 def test_proposed_mandate_can_never_pass_live_promotion():
-    result = evaluate_live_promotion(
+    """The default mandate is now approved, so this safety invariant is
+    exercised on an explicitly-constructed proposed variant: an unapproved
+    mandate must fail the gate even when every other input is perfect."""
+    proposed = dataclasses.replace(
         load_mandate(),
+        status="proposed",
+        approved_at=None,
+        approved_by=None,
+        approved_fingerprint=None,
+    )
+    result = evaluate_live_promotion(
+        proposed,
         metric_report={
             "annualized_volatility_pct": 15,
             "max_drawdown_pct": -20,

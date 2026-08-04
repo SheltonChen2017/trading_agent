@@ -417,16 +417,28 @@ explicit authorization).
 
 1. ~~GR-1D go-ahead/review~~ — **RESOLVED 2026-08-03: granted,
    implemented, merged as PR #120, and independently accepted at `2f37210`.**
-   Still open from this item: epoch model 1 vs 2 (§7).
-2. Approve the mandate (or first revise its DRAFT §2 targets) — the only
-   promotion gate satisfiable today.
+   ~~Still open from this item: epoch model 1 vs 2 (§7).~~ — **RESOLVED
+   2026-08-04: model 2 (pinned operational checkout).** The operational
+   clone lives at `C:\git\trading_agent_operational` (pinned to the frozen
+   epoch commit at epoch start); the machine-local launcher
+   `C:\git\launch_trading_app.ps1` starts the app from it with
+   `TRADING_ASSISTANT_DB` pointed at the single operator database.
+2. ~~Approve the mandate (or first revise its DRAFT §2 targets)~~ —
+   **RESOLVED 2026-08-04: owner approved with targets unchanged** after a
+   plain-language walkthrough. `assistant/default_mandate.json` is status
+   `approved`, fingerprint-bound; `docs/MANDATE.md` §2 and change control
+   updated. `allow_autonomous_execution` remains false.
 3. ~~GR-5 alert delivery channel~~ — **RESOLVED 2026-08-03:** immediate
    critical alerts use Windows desktop toasts; warnings batch into the daily
    briefing. Webhooks remain out of scope.
-4. Elevated Windows window for task-account creation + scheduler install;
-   credential rotation at the same time.
-5. Operator DB path: keep `data/trading_assistant.db` or adopt the runbook's
-   `data/paper.db`.
+4. ~~Elevated Windows window for task-account creation + scheduler
+   install~~ — **RESOLVED 2026-08-04: scheduled tasks run under the
+   owner's own account** (single-owner paper machine; no dedicated task
+   account, so no account-creation elevation is required — only whatever
+   elevation the scheduler install itself demands).
+5. ~~Operator DB path~~ — **RESOLVED 2026-08-04: keep
+   `data/trading_assistant.db`** as the single record; every checkout
+   (including the operational clone) reaches it via `TRADING_ASSISTANT_DB`.
 6. Historical-membership vendor selection and funding (not Databento).
 7. Databento statistics/reference budget + ticker/session range;
    Reference-API subscription confirmation.

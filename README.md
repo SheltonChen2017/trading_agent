@@ -805,7 +805,16 @@ write path merely by living in the same UI:
   Refused / Closed without fill / Other-unknown; exact status remains
   under Advanced, combining by intersection), plus a "Reconcile" button
   that appears automatically on any proposal with an unresolved broker
-  submission.
+  submission. Expired and dismissed proposals are hidden by default and
+  recoverable through explicit include-checkboxes (an explicit outcome or
+  status selection always shows its rows). A "Manage unused proposals"
+  expander **dismisses** (archives -- never deletes) unused
+  never-broker-touched `proposed`/`expired` rows behind a preview, a
+  required reason, and an exact typed phrase; the complete database
+  record, audit metadata, and idempotency key remain, and dismissal can
+  never call the broker. CLI parity: `dismiss-proposals` (preview-first;
+  mutation requires the preview hash and
+  `--confirm-dismiss unused-paper-proposals`).
 - **Ticker Suggestions** -- research-only candidate tickers from
   most-active/IPO/AI sources, each independently verified before display;
   acting on one still requires the normal Buying-cart workflow.

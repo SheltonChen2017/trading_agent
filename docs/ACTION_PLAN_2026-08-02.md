@@ -375,14 +375,25 @@ Size: medium. Read-only; no persistence schema, lifecycle, or authority
 change. UI-2d follows after this milestone's review unless the owner
 reorders again.
 
-Status: **implemented at `198339d` (2026-08-04), awaiting independent
-review.** All six contract points above are implemented as written (with
-the residual/idio-vol exclusion noted in point 1 discovered and recorded
-before coding). Three reverse mutations were proven caught: the UI running
-a different experiment than displayed, a synthetic run mislabeled with the
-real-data caveat, and backtest widget state dropped from the navigation
-whitelist. Full suite on the final tree: 2,597 passed / 1 skipped / 25
-warnings; compileall and diff checks clean.
+Status: **completed and independently accepted after correction on
+2026-08-04** at implementation `198339d`, documentation `d664402`, and
+review correction `540467e`. The submitted architecture and authority
+boundary were sound, but review corrected two P2 research-correctness gaps:
+empty/partial provider data and impossible signal/history combinations can
+no longer look like a fully covered zero-signal run, and the composition
+helper no longer truncates fractional integer parameters or accepts invalid
+horizons/slippage. Actual coverage, horizons, entry timing, and slippage are
+stored with the session result; partial real-data coverage is disclosed.
+Review also strengthened exact-frame UI/engine equivalence, real-data caveat
+coverage, and the transitive research/authority import boundary. Corrected
+validation passed 88 focused tests and 2,613 full-suite tests with 1 skipped
+and 25 known warnings; compileall and diff checks were clean. No result was
+promoted and no proposal, policy, registry, broker, schema, scheduler, epoch,
+ML/LLM, or execution-authority behavior changed.
+
+Sequencing after UI-3 review: **UI-2d is next**, subject to explicit owner
+direction. Automatic expiry remains separate and physical purge remains
+deferred.
 
 **Phase 7 — data purchases, whenever decided (independent of code):**
 membership vendor decision → Databento statistics/reference captures →

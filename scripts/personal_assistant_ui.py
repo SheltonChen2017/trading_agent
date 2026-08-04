@@ -158,6 +158,7 @@ from backtest.interactive import (
     SIGNAL_INVENTORY,
     SYNTHETIC_CAVEAT,
     cumulative_return_frame,
+    inspect_data_coverage,
     run_interactive_backtest,
 )
 from data.event_data import fetch_upcoming_earnings
@@ -2899,15 +2900,31 @@ _WHOLE_UNIVERSE_SCOPE = f"Entire universe ({len(UNIVERSE)} tickers)"
 @st.cache_data(show_spinner=False)
 def _load_backtest_synthetic_data(tickers: tuple[str, ...], days: int):
     """Deterministic (fixed-seed) synthetic OHLCV -- cache keyed by the
-    ticker tuple and day count so widget interactions never regenerate."""
-    return generate_synthetic(list(tickers), days=days)
+    ticker tuple and day count so widget interactions never regenerate.
+    Returns (data, coverage); see _load_backtest_real_data for why the
+    coverage check runs inside the cached body."""
+    data = generate_synthetic(list(tickers), days=days)
+    return data, inspect_data_coverage(
+        data, requested_tickers=tickers, requested_sessions=days
+    )
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def _load_backtest_real_data(tickers: tuple[str, ...], lookback_days: int):
     """Real yfinance history, cached for an hour so parameter tweaks rerun
-    the backtest without re-fetching the network data."""
-    return fetch_historical(list(tickers), lookback_days=lookback_days)
+    the backtest without re-fetching the network data.
+
+    The coverage check runs INSIDE this cached function on purpose
+    (counter-review CRUI3-001): st.cache_data caches return values but
+    never exceptions, so a failed/empty fetch raises here and nothing is
+    cached -- the next attempt re-fetches instead of replaying an empty
+    provider response for the rest of the TTL. Validating outside would
+    leave the empty dict cached and every retry inside the hour would
+    fail against it even after the network recovered."""
+    data = fetch_historical(list(tickers), lookback_days=lookback_days)
+    return data, inspect_data_coverage(
+        data, requested_tickers=tickers, requested_sessions=lookback_days
+    )
 
 
 if page == "Backtest":
@@ -3018,7 +3035,7 @@ if page == "Backtest":
                     if use_real_data
                     else "Running the walk-forward backtest..."
                 ):
-                    bt_data = (
+                    bt_data, data_coverage = (
                         _load_backtest_real_data(bt_tickers, int(bt_lookback))
                         if use_real_data
                         else _load_backtest_synthetic_data(
@@ -3038,8 +3055,12 @@ if page == "Backtest":
                     "param_values": dict(param_values),
                     "source": "real" if use_real_data else "synthetic",
                     "scope": scope_choice,
-                    "ticker_count": len(bt_tickers),
+                    "ticker_count": data_coverage.loaded_ticker_count,
+                    "data_coverage": data_coverage,
                     "lookback_days": int(bt_lookback),
+                    "hold_days_options": tuple(sorted(bt_horizons)),
+                    "entry_timing": "next_open",
+                    "slippage_pct": SLIPPAGE_PCT,
                     "results_by_horizon": results_by_horizon,
                     "ran_at": datetime.now(timezone.utc).isoformat(),
                 }
@@ -3055,11 +3076,22 @@ if page == "Backtest":
             f"{name}={value}"
             for name, value in sorted(completed_run["param_values"].items())
         )
+        stored_horizons = list(
+            completed_run.get(
+                "hold_days_options",
+                sorted(completed_run["results_by_horizon"]),
+            )
+        )
+        stored_entry_timing = completed_run.get("entry_timing", "next_open")
+        stored_slippage = completed_run.get("slippage_pct", SLIPPAGE_PCT)
         st.caption(
             f"Run configuration: {completed_run['source']} data, "
             f"{completed_run['scope']} ({completed_run['ticker_count']} "
             f"tickers), {completed_run['lookback_days']} trading days, "
-            f"{run_params}, entry next_open, ran {completed_run['ran_at']}. "
+            f"hold horizons {stored_horizons}, {run_params}, "
+            f"entry {stored_entry_timing}, "
+            f"slippage {stored_slippage * 100:.2f}% per leg, "
+            f"ran {completed_run['ran_at']}. "
             "Results reflect this configuration, not any widget changed "
             "since."
         )
@@ -3068,8 +3100,34 @@ if page == "Backtest":
         else:
             st.warning(EXPLORATORY_CAVEATS)
 
+        data_coverage = completed_run.get("data_coverage")
+        if data_coverage is not None and data_coverage.has_gaps:
+            coverage_parts = [
+                f"loaded {data_coverage.loaded_ticker_count} of "
+                f"{data_coverage.requested_ticker_count} requested tickers",
+                f"{data_coverage.complete_ticker_count} had the full "
+                f"{completed_run['lookback_days']}-session history",
+            ]
+            if data_coverage.missing_tickers:
+                coverage_parts.append(
+                    "missing: " + ", ".join(data_coverage.missing_tickers)
+                )
+            if data_coverage.underfilled_tickers:
+                coverage_parts.append(
+                    "short history: "
+                    + ", ".join(
+                        f"{ticker} ({sessions})"
+                        for ticker, sessions in data_coverage.underfilled_tickers
+                    )
+                )
+            st.warning(
+                "Incomplete market-data coverage -- results describe only "
+                "the rows actually loaded: " + "; ".join(coverage_parts) + "."
+            )
+
         summary = summarize_multi_horizon(
-            completed_run["results_by_horizon"], entry_timing="next_open"
+            completed_run["results_by_horizon"],
+            entry_timing=stored_entry_timing,
         )
         if summary.empty:
             st.info(

@@ -237,6 +237,46 @@ def test_no_execution_capable_module_reaches_ml_transitively():
     )
 
 
+def test_interactive_backtest_cannot_reach_authority_or_ml_transitively():
+    """UI-3 is research-only across its full reachable dependency graph.
+
+    A direct source check on ``backtest.interactive`` would miss a future
+    ``interactive -> helper -> assistant/execution/risk/ml`` dependency.
+    Walk the same fail-closed first-party graph used for the execution/ML
+    boundary so an indirect authority path is rejected too.
+    """
+    graph, unresolved = _internal_import_graph()
+    assert not unresolved, (
+        "this test cannot follow these import forms, so it can no longer "
+        "prove the UI-3 boundary holds -- resolve them or teach the walker: "
+        + "; ".join(sorted(unresolved))
+    )
+    root = "backtest.interactive"
+    assert root in graph, f"expected to discover {root} in the import graph"
+
+    forbidden_roots = {"assistant", "execution", "risk", "ml"}
+    offending_chains: list[str] = []
+    seen = {root}
+    stack = [(root, (root,))]
+    while stack:
+        current, chain = stack.pop()
+        for dependency in sorted(graph.get(current, ())):
+            if dependency.startswith("<unresolved "):
+                offending_chains.append(" -> ".join(chain + (dependency,)))
+                continue
+            if dependency.split(".")[0] in forbidden_roots:
+                offending_chains.append(" -> ".join(chain + (dependency,)))
+                continue
+            if dependency in graph and dependency not in seen:
+                seen.add(dependency)
+                stack.append((dependency, chain + (dependency,)))
+
+    assert not offending_chains, (
+        "interactive Backtest research code reaches authority or ML code "
+        "through an indirect import: " + "; ".join(sorted(offending_chains))
+    )
+
+
 _PROPOSAL_GENERATION_MODULES = frozenset(
     {
         "assistant.proposals",

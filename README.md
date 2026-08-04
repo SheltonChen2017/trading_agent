@@ -766,9 +766,10 @@ could submit an order by accident. An override-eligible block adds a second,
 separate text box requiring an exact `OVERRIDE <SIDE> <SHARES> <TICKER>`
 phrase naming that specific order.
 
-Nine pages, selected from a left-sidebar menu (only the selected page's
-body executes per rerun), all reading/writing the same SQLite store and
-policy file:
+Nine pages are selected from a left-sidebar menu, and only the selected
+page's body executes per rerun. Operational pages share the same SQLite
+store and policy file where applicable; research-only pages do not gain a
+write path merely by living in the same UI:
 
 - **Briefing** -- portfolio totals, market regime, risk exposure, open
   positions with per-position trend/volatility and evidence-labeled
@@ -813,9 +814,12 @@ policy file:
   (default, seconds) or real yfinance data, universe or basket scope, and
   hold horizons, then run the same walk-forward engine the CLI research
   scripts use. Shows a multi-horizon summary table and a cumulative
-  net-return chart per signal direction. Results are labeled exploratory:
-  no multiplicity correction runs here, and confirmatory significance
-  lives only in the frozen CLI pipeline.
+  net-return chart per signal direction. Synthetic results are labeled as
+  plumbing checks; real-data results are labeled exploratory, disclose
+  missing or short-history tickers, and refuse an empty provider response
+  or a signal configuration with too little history. No multiplicity
+  correction runs here, and confirmatory significance lives only in the
+  frozen CLI pipeline.
 - **Operations** -- GR-5's read-only operator dashboard: platform
   readiness, alert-delivery records, and the two explicit alert-delivery
   buttons.
@@ -996,8 +1000,11 @@ python scripts/run_basket_report.py
 
 The Streamlit UI's **Backtest** page runs the same walk-forward engine
 interactively (signal picker, parameter widgets, summary table, cumulative
-net-return chart) for exploratory looks; the confirmatory
-significance/out-of-sample pipeline above remains CLI-only on purpose.
+net-return chart) for exploratory looks. It records the actual loaded data
+coverage with each session result, warns about missing/short histories, and
+refuses inputs that would silently describe a different or impossible
+experiment. The confirmatory significance/out-of-sample pipeline above
+remains CLI-only on purpose.
 
 `scripts/` also holds the leveraged-ETF rotation research line: regime-
 rotation backtests/walk-forward/sensitivity/grid-search

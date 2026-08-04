@@ -42,6 +42,15 @@ FROZEN_INVENTORY = (
     ),
 )
 
+FROZEN_DEFAULT_TRAILING_SESSIONS = {
+    "dips_and_ups": 20,
+    "momentum": 147,
+    "relative_dips_and_ups": 20,
+    "breakout_52_week": 252,
+    "high52_proximity": 252,
+    "vol_scaled_momentum": 273,
+}
+
 
 # --- the frozen inventory ---------------------------------------------------
 
@@ -87,6 +96,14 @@ def test_defaults_lie_within_their_own_bounds_and_kinds_are_valid():
             assert param.min_value <= param.default <= param.max_value
             if param.kind == "int":
                 assert float(param.default).is_integer()
+
+
+def test_default_trailing_history_requirements_match_signal_semantics():
+    actual = {
+        signal.key: signal.trailing_sessions_required(_defaults(signal.key))
+        for signal in SIGNAL_INVENTORY
+    }
+    assert actual == FROZEN_DEFAULT_TRAILING_SESSIONS
 
 
 def test_unknown_signal_key_raises():
@@ -164,6 +181,26 @@ def test_out_of_bounds_value_fails_closed():
         )
 
 
+def test_fractional_integer_parameter_fails_closed_instead_of_being_truncated(
+    monkeypatch,
+):
+    values = _defaults("momentum")
+    values["lookback_days"] = 21.9
+    monkeypatch.setattr(
+        interactive,
+        "run_multi_horizon_backtest",
+        lambda *args, **kwargs: kwargs,
+    )
+    with pytest.raises(ValueError, match="whole number"):
+        run_interactive_backtest(
+            _small_data(),
+            signal_key="momentum",
+            param_values=values,
+            hold_days_options=[1],
+            slippage_pct=0.0015,
+        )
+
+
 def test_empty_horizon_list_fails_closed():
     with pytest.raises(ValueError, match="hold horizon"):
         run_interactive_backtest(
@@ -173,6 +210,78 @@ def test_empty_horizon_list_fails_closed():
             hold_days_options=[],
             slippage_pct=0.0015,
         )
+
+
+@pytest.mark.parametrize("horizons", [[0], [-5], [1.5], [True], [1, 1]])
+def test_invalid_hold_horizons_fail_closed(monkeypatch, horizons):
+    monkeypatch.setattr(
+        interactive,
+        "run_multi_horizon_backtest",
+        lambda *args, **kwargs: kwargs,
+    )
+    with pytest.raises(ValueError, match="hold horizon"):
+        run_interactive_backtest(
+            _small_data(),
+            signal_key="dips_and_ups",
+            param_values=_defaults("dips_and_ups"),
+            hold_days_options=horizons,
+            slippage_pct=0.0015,
+        )
+
+
+@pytest.mark.parametrize("slippage", [-0.001, float("nan"), float("inf"), True])
+def test_invalid_slippage_fails_closed(monkeypatch, slippage):
+    monkeypatch.setattr(
+        interactive,
+        "run_multi_horizon_backtest",
+        lambda *args, **kwargs: kwargs,
+    )
+    with pytest.raises(ValueError, match="slippage_pct"):
+        run_interactive_backtest(
+            _small_data(),
+            signal_key="dips_and_ups",
+            param_values=_defaults("dips_and_ups"),
+            hold_days_options=[1],
+            slippage_pct=slippage,
+        )
+
+
+def test_empty_input_data_fails_closed_instead_of_looking_like_no_signals():
+    with pytest.raises(ValueError, match="usable market data"):
+        run_interactive_backtest(
+            {},
+            signal_key="dips_and_ups",
+            param_values=_defaults("dips_and_ups"),
+            hold_days_options=[1],
+            slippage_pct=0.0015,
+        )
+
+
+def test_impossible_signal_history_fails_closed_instead_of_reporting_no_signals():
+    with pytest.raises(ValueError, match="insufficient history"):
+        run_interactive_backtest(
+            _small_data(),
+            signal_key="breakout_52_week",
+            param_values=_defaults("breakout_52_week"),
+            hold_days_options=[1],
+            slippage_pct=0.0015,
+        )
+
+
+def test_data_coverage_reports_missing_and_underfilled_tickers():
+    full = generate_synthetic(["AAA"], days=160)["AAA"]
+    short = generate_synthetic(["BBB"], days=80)["BBB"]
+    coverage = interactive.inspect_data_coverage(
+        {"AAA": full, "BBB": short},
+        requested_tickers=("AAA", "BBB", "CCC"),
+        requested_sessions=160,
+    )
+
+    assert coverage.requested_ticker_count == 3
+    assert coverage.loaded_ticker_count == 2
+    assert coverage.complete_ticker_count == 1
+    assert coverage.missing_tickers == ("CCC",)
+    assert coverage.underfilled_tickers == (("BBB", 80),)
 
 
 # --- the chart frame --------------------------------------------------------

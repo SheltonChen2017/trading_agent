@@ -161,6 +161,40 @@ def test_exact_status_filter_still_works_alone(seeded_history):
     assert _seeded_ids(_proposal_rows(app)) == {"ui2b-blocked"}
 
 
+def test_outcome_filter_applies_before_the_history_row_limit(seeded_history):
+    """The UI must query newest-N OF the selected outcome, not filter a
+    limited unfiltered page. Newer non-matching rows must not hide an older
+    matching proposal."""
+    extra_ids = []
+    for index in range(6):
+        proposal_id = f"ui2b-newer-nonmatch-{index}"
+        extra_ids.append(proposal_id)
+        created = _BASE_TIME + timedelta(hours=1, minutes=index)
+        seeded_history.save_proposal(
+            {
+                "proposal_id": proposal_id,
+                "created_at": created.isoformat(),
+                "expires_at": (created + timedelta(hours=4)).isoformat(),
+                "status": "proposed",
+                "idempotency_key": f"idem-{proposal_id}",
+                "intent": {"ticker": "AAPL", "side": "buy", "shares": 1},
+            }
+        )
+    try:
+        app = _history_app()
+        app.slider(key="proposal_history_limit").set_value(5).run()
+        app.multiselect(key="proposal_outcome_filter").set_value(["Filled"]).run()
+        assert not app.exception
+        assert "ui2b-filled" in _seeded_ids(_proposal_rows(app))
+    finally:
+        with seeded_history._connect() as connection:
+            connection.execute(
+                "DELETE FROM trade_proposals WHERE proposal_id IN "
+                f"({','.join('?' for _ in extra_ids)})",
+                tuple(extra_ids),
+            )
+
+
 def test_outcome_filter_survives_navigating_away_and_back(seeded_history):
     """History filters are whitelisted benign page state (UINAV-001): the
     outcome selection must survive a round trip through another page."""

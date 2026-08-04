@@ -1,141 +1,162 @@
 # Development session handoff
 
-Prepared: 2026-08-04 after Claude implemented UI-2b (History outcome
-filtering) and pushed it for independent review.
+Prepared: 2026-08-04 after Codex independently reviewed and hardened
+Claude's UI-2b History outcome-filtering implementation.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
 
-UI-2b — read-only History outcome filtering — is **implemented and pushed,
-awaiting independent review**. Implementation commit `335c9fc` on branch
-`user/claude/ui-2b-history-outcome-filter-20260804`, based on `main =
-3c991a3` (post PR #138). Its blocking condition from the prior handoff (the
-owner deciding on the UI-nav review branch) was satisfied when PR #137
-merged.
+UI-2b is **complete and independently accepted after one P3 test-only
+correction**. Claude's production implementation was correct; review found
+no runtime defect, financial-safety defect, or authority expansion. The one
+finding, `UI2BREV-001`, was that the submitted UI AppTests did not prove the
+important large-history behavior that outcome filtering happens before the
+History row limit. Codex added a mutation-proven AppTest at `9dcff80`.
 
-What it does, per the frozen action-plan contract (§8, UI-2b):
+The completed behavior is:
 
-- `assistant/proposal_status.py` gains the frozen seven-group outcome
-  taxonomy beside `STATUSES`: Awaiting decision, Processing, Broker
-  working / unresolved, Filled, Refused / failed, Closed without fill,
-  Other / unknown. Exhaustive over all 19 statuses
-  (`set(STATUS_OUTCOME_GROUPS) == set(STATUSES)` is tested); legacy
-  `executed` maps to Broker working / unresolved, never Filled; the Filled
-  group contains exactly `filled`; any unmapped status (including None and
-  non-strings) fail-safes to Other / unknown via the single lookup path
-  `outcome_group_for_status()`. A comment records that this is deliberately
-  NOT the same rule as the Propose & Approve page's rendering router
-  `_proposal_status_category()` — do not consolidate them.
-- `assistant/storage.py` gains one narrow read-only query,
-  `list_proposals_for_outcomes(statuses, include_unknown_statuses, limit)`,
-  so both History filter paths share row semantics ("the newest N rows OF
-  the filtered kind", created_at DESC, authoritative row status), including
-  the Other/unknown group, which is only expressible as a negative match
-  (`status NOT IN STATUSES`). Empty criteria return no rows rather than
-  widening to "(any)".
-- The History page's primary filter is an outcome multi-select; the exact-
-  status selectbox moved into an "Advanced: exact status filter" expander
-  (same widget key, so its navigation persistence is unchanged). When both
-  filters are set they combine by intersection, the caption states that
-  rule, and active filters are shown above results. The proposals table
-  gains an Outcome column. `proposal_outcome_filter` joined the benign
-  navigation-persistence whitelist (UINAV-001 pattern).
+- the frozen seven-group outcome taxonomy lives beside `STATUSES` in
+  `assistant/proposal_status.py` and is exhaustive over all 19 canonical
+  statuses;
+- legacy `executed` remains Broker working / unresolved, `filled` alone is
+  Filled, and every unmapped/non-string status fails safe to Other / unknown;
+- `assistant/storage.py` performs the read-only status/outcome filtering in
+  parameterized SQL before `ORDER BY created_at DESC LIMIT`, including the
+  negative-match path for unknown statuses;
+- History exposes the outcome multi-select as its primary filter, retains
+  exact status under Advanced, combines both by intersection with an explicit
+  caption, shows active filters, and adds an Outcome table column; and
+- the benign outcome-filter widget survives page navigation while all
+  approval, override, bulk-submit, cancel, and emergency confirmations retain
+  their non-persistent safety behavior.
 
-Deliberately NOT implemented: no persistence/schema change, no `dismissed`
-status (that is UI-2d), no change to reconcile/cancel controls (they still
-operate on the displayed row set, exactly as they did under the old exact-
-status filter), no CLI change, no README change (README does not document
-the History filter widgets). No proposal, policy, broker, scheduler, epoch,
-ML/LLM, or execution authority changed.
+Nothing in UI-2b changes proposal state, schema, policy, broker interaction,
+scheduler state, evidence epochs, ML/LLM behavior, or execution authority.
+There is no `dismissed` state in UI-2b; that belongs to UI-2d.
 
 ## 2. Canonical Git state
 
 Repository: https://github.com/SheltonChen2017/trading_agent
 
-    base = 3c991a3 (main, post PR #138)
-    implementation = 335c9fc
-    handoff = the branch-tip commit containing this file
-    branch = user/claude/ui-2b-history-outcome-filter-20260804 (pushed)
+    base/main/origin-main = 3c991a3 (post PR #138)
+    Claude implementation = 335c9fc
+    Claude implementation handoff = 8ff2017
+    Claude branch = user/claude/ui-2b-history-outcome-filter-20260804
+    Codex review correction = 9dcff80
+    Codex review records = df4d278
+    review-report formatting = bf0e396
+    replacement handoff = 1300aaa
+    Codex branch = codex/review-ui-2b-history-outcomes-20260804
 
-`main` still equals `3c991a3`; nothing was merged this session. The branch
-is pushed for the owner to open a PR (the machine's gh account cannot create
-PRs) and for Codex's independent review.
+Claude's branch is pushed at `8ff2017`. The Codex branch was pushed and its
+first handoff tip `1300aaa` was verified byte-for-byte against GitHub with
+`git ls-remote`; this post-push handoff update is the final branch-tip commit
+and must also be remote-verified. Nothing has been merged and no pull request
+has been opened by Codex.
 
-## 3. Validation (development machine, Python 3.13, this exact tree)
+## 3. Commit-by-commit review dispositions
 
-    focused new tests: 16 mapping/storage + 5 AppTest = 21, all passed
-    UI-adjacent focused suites (new + test_personal_assistant_ui.py +
-        test_ui_feature_controls.py): 65 passed
-    full suite: 2,575 passed, 1 skipped, 25 warnings in 447.76s
-    compileall (assistant backtest data execution ml risk scripts signals
-        strategies tests baskets.py config.py market_analytics.py): clean
-    git diff --check: clean
+- `335c9fc` — **accepted after test hardening**. Production mapping, query,
+  UI wiring, authority boundaries, and failure-safe semantics match the
+  adopted UI-2b contract. The P3 correction is regression coverage, not a
+  production-code fix.
+- `8ff2017` — **accepted after replacement**. Its implementation-state
+  documentation was accurate when written, but its session handoff is now
+  superseded by this completed-review handoff.
+- `9dcff80` — **accepted**. Adds only the UI-level large-history pagination
+  regression test and cleans up only its own seeded proposal rows.
+- `df4d278` — **accepted**. Records completion in the action plan, adds the
+  required two-paragraph milestone record, and creates the review report.
+- `bf0e396` — **accepted**. Removes the review report's extra trailing blank
+  line; no substantive content changes.
+- `1300aaa` — **accepted**. Replaces the canonical session handoff with the
+  completed independent-review state.
 
-Reverse-mutation proof (each mutation applied, shown red, then restored):
+Full review detail is in
+`docs/REVIEW_2026-08-04_UI2B_HISTORY_OUTCOMES.md`.
 
-1. Regrouping `executed` into Filled → caught by the frozen-literal test
-   AND `test_legacy_executed_is_unresolved_not_filled`.
-2. Unknown status defaulting to Filled → caught at BOTH layers (unit test
-   and the History AppTest).
-3. Removing `proposal_outcome_filter` from the persistence whitelist →
-   caught by `test_outcome_filter_survives_navigating_away_and_back`.
+## 4. P0-P3 issue ledger
 
-Known coverage limit, stated for the reviewer: the storage test
-`test_query_orders_newest_first_and_respects_the_limit` pins the
-newest-N-of-the-filtered-kind semantics at the query layer, but a UI-level
-mutation that swapped `list_proposals_for_outcomes` for fetch-then-filter
-would not be caught by the (small-row-count) AppTests — the UI's use of the
-query is verified by inspection and the intersection tests, not by a
-dedicated large-history AppTest.
+| ID | Priority | Disposition | Evidence and correction |
+|---|---:|---|---|
+| UI2BREV-001 | P3 | Resolved at `9dcff80` | The submitted storage test pinned filter-before-limit, but the UI AppTests used too few rows to fail if the UI were later changed to fetch N rows and filter them in memory. The added AppTest seeds six newer nonmatching rows above an older Filled row with a five-row limit. Correct code shows the older Filled row. A finally-safe reverse mutation to fetch-then-filter made the new test fail for exactly that reason, and restoration returned it green. |
 
-## 4. Review guidance
+No P0, P1, or P2 issue was found. Submitted quality is approximately 9/10;
+the reviewed/hardened result is approximately 9.5/10.
 
-Review range: `335c9fc` plus this handoff commit, both on
-`user/claude/ui-2b-history-outcome-filter-20260804`, based on `3c991a3`.
-Read `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` and the UI-2b row of
-`docs/ACTION_PLAN_2026-08-02.md` (frozen group contents are enumerated
-there). Things worth adversarial attention:
+## 5. Validation (development machine, exact final code tree)
 
-- the frozen mapping literal vs the action plan's group lists;
-- the SQL negative-match path (`include_unknown_statuses`) and its
-  parameter ordering;
-- intersection behavior when the exact status's group is excluded by the
-  outcome selection (must be empty WITH the explanatory caption, not a bare
-  empty view);
-- whether moving the exact-status selectbox into an expander changes any
-  AppTest or navigation-persistence behavior the prior review pinned; and
-- the seeded AppTest cleanup (direct DELETE of the four `ui2b-*` rows from
-  the shared session database in a `finally`).
+Environment: Python 3.13.14.
 
-## 5. Next steps (do not start without owner direction)
+- Claude submitted focused baseline: 65 passed in 25.53s.
+- Strengthened focused mapping/storage/UI/import-boundary set: 73 passed in
+  38.18s.
+- New pagination regression alone: 1 passed, 5 deselected in 4.04s.
+- Complete UI-2b AppTest file after mutation restoration: 6 passed in 12.38s.
+- Reverse mutation: 1 expected failure because the older Filled row vanished
+  behind newer nonmatching rows; the mutation was restored in `finally`.
+- Full suite: 2,576 passed, 1 skipped, 25 warnings in 397.43s.
+- Compileall: clean.
+- `git diff --check`: clean before the handoff commit and must be clean again
+  before push.
 
-- Independent review of this branch, then owner merge decision.
-- UI-2d (durable dismiss/archive) is the next UI milestone after UI-2b's
-  review; it is a runtime persistence change and gets its own branch,
-  migration/concurrency tests, and review per the rewritten
-  `docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` (automatic
-  expiry is a separately approved follow-up; physical purge stays deferred).
-- Phase 5 (operational deployment + epoch start) remains owner-heavy and
-  blocked only on the four decisions in
-  `docs/PHASE5_DEPLOYMENT_SESSION.md` §2.
+The 25 warnings are the existing WebSockets legacy and joblib/NumPy
+deprecations. No broker endpoint, operator database, scheduled task, running
+Streamlit process, or evidence artifact was touched.
 
-## 6. Non-negotiable boundaries
+## 6. What is next
+
+Per `docs/ACTION_PLAN_2026-08-02.md`, UI-2d is the next planned UI milestone,
+but **do not start it without owner direction**. Its first release is durable
+dismiss/archive, never physical deletion: introduce a terminal `dismissed`
+state, hide it by default while retaining audit/idempotency data, and allow it
+only for narrowly defined never-broker-touched proposals. It requires its own
+branch, migration/concurrency tests, and independent review. Adding this new
+status also requires updating UI-2b's exhaustive outcome mapping.
+
+Automatic expiry is a separate optional lifecycle milestone and must not be
+folded into UI-2d without approval. Physical purge remains separately deferred
+and owner-authorized.
+
+Phase 5 operational deployment/epoch start is still owner-heavy. Do not run
+elevated installer actions, install scheduled tasks, approve the mandate, or
+start a formal evidence epoch without the owner's explicit direction and the
+decisions listed in `docs/PHASE5_DEPLOYMENT_SESSION.md` section 2. Informal
+paper trading does not itself create a formal frozen evidence epoch.
+
+## 7. Non-negotiable boundaries
 
 - Paper trading is the only execution mode in scope.
-- History filtering is read-only: no filter may create, approve, submit,
-  cancel, reconcile, or dismiss anything.
-- An unresolved or unknown proposal status must never display as completed.
+- History filtering is read-only and cannot create, approve, submit, cancel,
+  reconcile, dismiss, or otherwise mutate a proposal.
+- Unknown or unresolved state must never be presented as completed.
 - ML/LLM output remains advisory or observational only.
 - Never commit credentials, operator databases, licensed data, or evidence
   artifacts.
+- A formal evidence epoch binds an exact Git commit. Under freeze-then-collect,
+  runtime changes wait for the epoch boundary; under a separate deployed
+  frozen worktree, development may continue without changing that runtime.
 
-## 7. Machine-local state
+## 8. Machine-local and resume state
 
-The owner's Streamlit app may still be running from an earlier checkout; it
-does not pick up UI-2b until this branch merges and the app reloads. This
-session did not stop, restart, or mutate that process, and did not touch the
-operator database (all tests ran against the pytest-isolated session
-database). Older review worktrees under `C:\tmp\trading-agent-*` remain;
-keep or remove only after confirming no local-only work.
+The owner's Streamlit app may be running from an earlier checkout. This review
+did not stop, restart, or interact with it. At review start, `git worktree
+list` showed only this primary worktree; do not rely on the superseded
+handoff's claim about older temporary worktrees. Preserve any uncommitted work
+not authored by the current agent and re-check `HEAD` plus `git status` before
+every stage/commit because Claude and Codex may share this checkout.
+
+On resume, read in this order:
+
+1. `CLAUDE.md` and `AGENTS.md`;
+2. `docs/ACTION_PLAN_2026-08-02.md`;
+3. this handoff;
+4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` and
+   `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`; and
+5. the UI-2b review report named above.
+
+Suggested resume prompt: "Read the required repository instructions and the
+canonical handoff. Verify the recorded local/remote Git state. Do not start
+UI-2d or Phase 5 actions until the owner explicitly directs them."

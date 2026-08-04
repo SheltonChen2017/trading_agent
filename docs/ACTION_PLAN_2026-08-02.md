@@ -253,10 +253,15 @@ REVIEWED. GR-5 uses Windows desktop toasts immediately for critical alerts,
 batches warnings, preserves immutable delivery attempts, and requires a
 successful self-test to clear a previous channel-failure condition. GR-2's
 risk-check registry was implemented at `03895ae` and independently accepted
-after correction at `0167c67`, closing the last Phase 4 code item. Phase 5
-(operational deployment + epoch start) is next and is owner-heavy; do not
-begin its elevated, scheduler, mandate, or epoch actions without the owner's
-specific direction and required decisions.
+after correction at `0167c67`; Claude's counter-review (2026-08-03, appended
+to `docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`) confirmed every finding
+and correction, closing Phase 4 with both agents' verification on record.
+Phase 5 is next and is owner-heavy; its non-elevated preflight was independently
+reviewed and corrected 2026-08-03 on the development machine (installer
+previews, CLI producers, fault harness, fail-closed readiness; see
+`docs/PHASE5_DEPLOYMENT_SESSION.md` for results and the ordered owner
+session). Do not begin its elevated, scheduler, mandate, or epoch actions
+without the owner's specific direction and required decisions.
 
 **Phase 5 — operational deployment + epoch start (owner-heavy):**
 elevated window → dedicated task account → install + verify 8 scheduled
@@ -319,11 +324,11 @@ explicit authorization).
     Watchlist suggestion surfaces remain alongside the dedicated tab;
     (d) the master AI preference is a hard gate ANDed with per-feature
     toggles.
-12. ~~Whether strategy-tool commit `a656015` can be retrieved~~ — **RESOLVED
-    2026-08-03:** the commit and local branch
-    `codex/ai-strategy-tool-doc-v2-20260802` are present in this checkout but
-    remain local-only and must be pushed or transferred before changing
-    computers if the owner wants to preserve them.
+12. Whether strategy-tool commit `a656015` can be retrieved — **OPEN again
+    after independent verification 2026-08-03:** neither the commit nor its
+    former local branch resolves in this checkout or the fetched refs. Treat
+    that work as unavailable unless another machine or backup still has it;
+    do not plan against it as preserved implementation.
 13. Whether AI debate is worth building at all (its own doc doubts it).
 14. ~~`.gitignore` extension for ML artifact paths (AP-2)~~ — **RESOLVED
     2026-08-03:** `artifacts/` is ignored wholesale and regression-tested.

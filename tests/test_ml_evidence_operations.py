@@ -284,7 +284,10 @@ def test_windows_installers_use_limited_principals_and_schedule_supervisor():
     assert "run_ml_evidence_supervisor.py" in ml_installer
     assert "$TaskPrefix-Supervisor" in ml_installer
     assert "RepetitionInterval" in ml_installer
-    for source in (ml_installer, operational):
+    for source, first_action in (
+        (ml_installer, "$predictAction = New-ScheduledTaskAction"),
+        (operational, "$cycleAction = New-ScheduledTaskAction"),
+    ):
         assert "New-ScheduledTaskPrincipal" in source
         assert "-RunLevel Limited" in source
         assert "-Principal $principal" in source
@@ -292,6 +295,11 @@ def test_windows_installers_use_limited_principals_and_schedule_supervisor():
         assert "-ErrorVariable registrationErrors" in source
         assert "@($registrationErrors).Count -gt 0" in source
         assert "[WildcardPattern]::Escape($Name)" in source
+        preview = source.index("if ($WhatIfPreference)")
+        first_scheduler_object = source.index(first_action)
+        assert preview < first_scheduler_object
+        assert 'Status = "planned (WhatIf)"' in source[preview:first_scheduler_object]
+        assert "Arguments = $_.Command" in source[preview:first_scheduler_object]
     assert "New-ScheduledTaskTrigger -AtStartup" in operational
     assert "New-ScheduledTaskTrigger -AtLogOn -User $RunAsUser" in operational
     assert "Get-ScheduledTask" in verifier

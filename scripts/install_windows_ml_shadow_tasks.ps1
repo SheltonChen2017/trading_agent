@@ -173,6 +173,35 @@ $credentialArguments = ($RequiredCredentialNames | ForEach-Object {
 $commonArguments = "$scriptArgument --database $databaseArgument --config $configArgument --artifact-dir $artifactArgument --alerts-jsonl $alertsArgument"
 $supervisorArguments = "$supervisorArgument --database $databaseArgument --config $configArgument --artifact-dir $artifactArgument --alerts-jsonl $alertsArgument --output $supervisorOutputArgument $credentialArguments"
 
+# Build a data-only preview before touching the Task Scheduler CIM provider.
+# New-ScheduledTaskAction can be access-denied for a non-elevated user even
+# though -WhatIf must remain a safe, useful preflight.
+if ($WhatIfPreference) {
+    @(
+        @{ Name = "$TaskPrefix-Predict"; Command = "$commonArguments predict" },
+        @{ Name = "$TaskPrefix-Mature"; Command = "$commonArguments mature" },
+        @{ Name = "$TaskPrefix-Monitor"; Command = "$commonArguments monitor --output $monitoringArgument" },
+        @{ Name = "$TaskPrefix-Supervisor"; Command = $supervisorArguments }
+    ) | ForEach-Object {
+        [PSCustomObject]@{
+            TaskName = $_.Name
+            Status = "planned (WhatIf)"
+            Execute = $resolvedPython
+            Arguments = $_.Command
+            WorkingDirectory = $resolvedRepository
+            RunAsUser = $RunAsUser
+            RunLevel = "Limited"
+            LogonType = $TaskLogonType
+            Database = $database
+            Config = $resolvedConfig
+            Artifacts = $resolvedArtifacts
+            AlertsJsonl = $alerts
+            SupervisorOutput = $supervisorOutput
+        }
+    }
+    return
+}
+
 $predictAction = New-ScheduledTaskAction `
     -Execute $resolvedPython `
     -Argument "$commonArguments predict" `

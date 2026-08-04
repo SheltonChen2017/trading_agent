@@ -44,13 +44,15 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     Claude branch = user/claude/ui-3-backtest-page-20260804 (pushed)
     Codex correction = 540467e
     Codex review records = 538eae9
+    first pushed replacement handoff = 8be0f20
     Codex branch = codex/review-ui-3-backtest-20260804
     canonical handoff = branch-tip commit containing this file
 
-At the time this replacement was prepared, the Codex review branch had not
-yet been pushed. The post-push handoff update at the final branch tip records
-and verifies remote availability. UI-3 has not been merged and Codex has not
-opened a pull request.
+The Codex review branch was pushed and `8be0f20` was verified byte-for-byte
+against GitHub with `git ls-remote` after one transient connection timeout;
+this post-push handoff update is the final branch-tip commit and must also be
+remote-verified. UI-3 has not been merged and Codex has not opened a pull
+request.
 
 ## 3. Commit-by-commit dispositions
 
@@ -69,6 +71,8 @@ opened a pull request.
 - `538eae9` — **accepted**. Updates the adopted action plan and README, adds
   the binding review report, and adds the required two-paragraph completed
   milestone record.
+- `8be0f20` — **accepted**. Replaces the canonical handoff with the completed
+  corrected-review state.
 
 ## 4. P0-P3 issue summary
 

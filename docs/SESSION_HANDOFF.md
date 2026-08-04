@@ -11,9 +11,9 @@ model, or session change. This file completely replaces the prior handoff.
 UI-2d — dismiss/archive for unused proposals — is **merged, independently
 accepted after correction, and complete against its dismissal-only definition
 of done**. The implementation merged to `main` as PR #143 at `8f2e9a7`; the
-independent correction is local-only on
-`codex/review-ui-2d-proposal-dismissal-20260804` at `a118470` until the owner
-authorizes pushing and merging it. This milestone changes durable proposal
+independent correction is pushed on
+`codex/review-ui-2d-proposal-dismissal-20260804` at `a118470` and awaits the
+owner's pull-request/merge decision. This milestone changes durable proposal
 state (a new lifecycle status and payload metadata) but grants no execution
 authority. The contract is
 `docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` (as
@@ -100,12 +100,12 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     implementation merge / main / origin-main = 8f2e9a7 (PR #143)
     review correction = a118470
     review docs/handoff = branch-tip commit containing this file
-    review branch = codex/review-ui-2d-proposal-dismissal-20260804 (local-only)
+    review branch = codex/review-ui-2d-proposal-dismissal-20260804 (pushed)
 
-The review correction and this handoff are not on the approved remote. Another
-computer cannot retrieve them with `git fetch` until the owner authorizes a
-push. Do not copy files between computers as a substitute for pushing the
-review branch.
+The review correction and review record at `5a9fdbd` are available from
+`origin/codex/review-ui-2d-proposal-dismissal-20260804`. This follow-up handoff
+commit is pushed to the same branch after it is created, so another computer
+can resume with a normal `git fetch`.
 
 Commit dispositions:
 
@@ -158,10 +158,9 @@ covered elsewhere. No defect was observed in that transaction design.
 
 ## 5. What is next (do not start automatically)
 
-The immediate next step is the owner's decision to push the local review
-branch and merge `a118470` plus its documentation/handoff commit. Until that
-happens, `origin/main` contains the submitted UI-2d behavior without the three
-review corrections.
+The immediate next step is the owner's pull-request/merge decision for the
+pushed review branch. Until it merges, `origin/main` contains the submitted
+UI-2d behavior without the three review corrections.
 
 UI Phase 2 is otherwise complete. Automatic expiry remains unapproved and
 unimplemented; physical purge remains deferred and owner-authorized. Phase 5

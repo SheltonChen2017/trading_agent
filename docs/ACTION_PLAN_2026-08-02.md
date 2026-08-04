@@ -276,10 +276,31 @@ the mandate's 60-session minimum, which requires one immutable epoch.
 
 **Phase 6 — parallel product work during the evidence window (pick by owner
 preference, all non-runtime):**
+**UI Phase 2 (owner-requested 2026-08-03, jumps to the front of this phase
+— the owner is paper trading daily and these directly support it)** →
 committee replay corpus + CLI surface → GR-4 data honesty → GR-7 product
 completeness (fold in the allocation-service design here, per Codex's
-recommendation, so the app keeps one authoritative sizing path) →
-proposal-history cleanup.
+recommendation, so the app keeps one authoritative sizing path).
+
+**UI Phase 2 — four owner requests, in implementation priority order:**
+
+| # | Item | Owner request | Scope and constraints | Size |
+|---|---|---|---|---|
+| UI-2a | Rename "Watchlist" tab to **"Buying"** | request 2 | Label + copy rename opposite "Selling". Sweep UI strings, help text, and tests that select by tab label. No behavior change. | trivial |
+| UI-2b | History **outcome filtering** | request 4 | History already has a raw status filter over all statuses (`personal_assistant_ui.py`, "Status filter" selectbox). Add the outcome-level grouping the owner actually wants — e.g. Executed (reached a broker fill), In-flight/unresolved, Blocked/refused, Expired/dismissed — as a multi-select layered on the existing filter, mapped from the frozen status sets in `assistant/proposal_status.py` (do not invent a parallel status taxonomy). Read-side only; no persistence change. | small |
+| UI-2c | **Left-side navigation** replacing the top tab bar | request 1 | Move the 8 surfaces to a sidebar navigation (modern trading-app layout). Presentation-only, but the AppTest suites select widgets via the tab structure, so every UI test that navigates by tab must be reworked in the same commit — this is the reason it ranks below 2a/2b despite being cosmetic. The sidebar already hosts the policy-file selector; keep policy context visually distinct from navigation. | medium |
+| UI-2d | History **entry removal, persisted** | request 3 | Implement the archived `docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md`, whose definition is authoritative: the user-facing action is **dismiss/archive as a durable persisted status** (a `dismissed` status hidden from the default History view), NOT physical row deletion. Proposals that reached validation/approval/reservation/submission or any broker lifecycle remain permanently auditable — SQLite triggers already refuse to delete rows with broker children, and that protection stays. Physical purge stays out of scope per that plan (later, owner-authorized, dry-run + typed confirmation, never-submitted rows only). Persistence change + status addition ⇒ own milestone, own branch, independent review. | large |
+
+Sequencing: UI-2a + UI-2b can ship together as one small milestone; UI-2c
+is its own milestone (test rework); UI-2d is its own milestone under the
+archived plan's definition of done. All four are non-runtime for the
+execution path, but UI-2d touches the proposal store and therefore gets the
+full review treatment. If a formal evidence epoch has started under model 1
+(frozen runtime) before this work merges, deployment of these changes to the
+operational machine waits for the epoch boundary; under model 2 they proceed
+on the development side immediately.
+
+Then: proposal-history physical purge remains deferred as before.
 
 **Phase 7 — data purchases, whenever decided (independent of code):**
 membership vendor decision → Databento statistics/reference captures →

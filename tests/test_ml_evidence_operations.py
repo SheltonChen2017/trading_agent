@@ -308,3 +308,26 @@ def test_windows_installers_use_limited_principals_and_schedule_supervisor():
     assert "$task.Principal.LogonType -eq $ExpectedTaskLogonType" in verifier
     assert "not verifiable: rerun as $RunAsUser" in verifier
     assert "ProductionAuthoritative = $false" in verifier
+    # MANDREV-001 follow-up: an operational-only (four-task) installation
+    # must have a valid fail-closed success check. Scope "all" keeps the
+    # original eight-task contract and still hard-requires the ML
+    # config/artifact paths; scope "operational" must skip the ML checks
+    # VISIBLY (a SkippedChecks report section), never silently.
+    assert '[ValidateSet("all", "operational")]' in verifier
+    assert "Scope 'all' verifies the ML shadow tasks and requires" in verifier
+    assert "$expectedTasks = if ($verifyMl) { $operationalTasks + $mlTasks } else { $operationalTasks }" in verifier
+    assert "SkippedChecks = $skippedChecks" in verifier
+    assert "skipped: Scope=operational" in verifier
+    # Statement-position `if` inside plain parentheses is a runtime error
+    # in PowerShell; a conditional Detail must use the $( ... )
+    # subexpression form. (Plain parentheses around ordinary expressions,
+    # e.g. string concatenation, remain fine.) The bare `( if ...` form
+    # crashed every end-to-end verifier run before 2026-08-04.
+    import re as _re
+
+    normalized = verifier.replace("\r\n", "\n")
+    assert not _re.search(r"-(?:Detail|Ok) \(\s*\n\s*if\b", normalized), (
+        "verifier uses a statement-position `if` inside plain parentheses; "
+        "use the $( ... ) subexpression form"
+    )
+    assert "-Detail $(" in verifier

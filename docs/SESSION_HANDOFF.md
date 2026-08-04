@@ -1,7 +1,9 @@
 # Development session handoff
 
 Prepared: 2026-08-04 after Codex independently reviewed and corrected Claude's
-Phase 5 mandate-approval branch.
+Phase 5 mandate-approval branch, the owner merged both branches (PR #146,
+PR #147), and Claude counter-reviewed the review — confirming every finding
+and closing the verifier tool gap MANDREV-001 documented (CRMAND-001).
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
@@ -43,10 +45,20 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     initial review handoff = 89ab9c6
     publication handoff = the commit containing this file
 
-Nothing from the mandate branch or review branch is merged into `main`.
-The review branch is available from `origin`. Automated PR creation failed
-because the authenticated GitHub Enterprise Managed User is not authorized to
-create pull requests; no PR exists yet.
+Both branches are now merged: the mandate branch as PR #146 (`702b98e`)
+and the review branch as PR #147 (`6a551cd`, second parent `14c9ac0` —
+topology verified). Claude's counter-review runs on
+`user/claude/verifier-operational-scope-20260804` (this branch) and adds
+CRMAND-001: `verify_windows_evidence_tasks.ps1` gained
+`-Scope all|operational` so the intentional four-task operational-only
+installation has a valid fail-closed success check ("all" preserves the
+original eight-task contract exactly), and two latent statement-position
+`( if ... )` runtime crashes were fixed — the script had never completed
+an end-to-end run before; its first successful run (operational scope,
+this host) produced the correct pre-install report. Deployment note:
+pass `-RunAsUser "REDMOND\sheltonchen"` (the full CurrentUser name) so
+credential checks evaluate. The counter-review record is appended to
+`docs/REVIEW_2026-08-04_PHASE5_MANDATE_APPROVAL.md`.
 
 Commit dispositions:
 

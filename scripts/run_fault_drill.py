@@ -252,15 +252,9 @@ def record_drills(report: dict, database: Path, operator: str, artifact: str) ->
     store = AssistantStore(database)
     epoch = store.get_active_paper_evidence_epoch()
     if epoch is not None:
-        report_commit = str(report.get("code_commit") or "")
-        epoch_commit = str(epoch.get("lineage", {}).get("code_commit") or "")
-        if report_commit == "unknown" or report_commit != epoch_commit:
-            raise RuntimeError(
-                "Refusing to record GR-3 drills into the active evidence epoch: "
-                f"the drill runtime commit is {report_commit or 'missing'}, but "
-                f"the epoch is bound to {epoch_commit or 'missing'}. Run the "
-                "drill from the epoch's exact clean commit."
-            )
+        from assistant.paper_evidence import verify_drill_lineage_commit
+
+        verify_drill_lineage_commit(epoch, str(report.get("code_commit") or ""))
     fault_by_id = {f["fault_id"]: f for f in report["faults"]}
     recorded = []
     for drill_type, fault_ids in sorted(DRILL_TYPE_FAULTS.items()):

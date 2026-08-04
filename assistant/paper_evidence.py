@@ -576,6 +576,31 @@ def capture_paper_account_observation(
     }
 
 
+def verify_drill_lineage_commit(
+    epoch: dict[str, Any], runtime_commit: str
+) -> None:
+    """Refuse epoch-bound drill evidence unless the runtime commit exactly
+    matches the epoch's bound lineage (GR-3 review rule GR3REV-001).
+
+    An evidence epoch may pool only identical immutable lineage: recording a
+    drill under an epoch whose code the drill never ran would let a
+    promotion gate appear satisfied by unexercised code. ``unknown`` (a
+    dirty or unreadable worktree) can never match. This is THE authoritative
+    check -- both the fault-drill runner and the alert self-test call it, so
+    the rule cannot drift between producers.
+    """
+    expected = str((epoch.get("lineage") or {}).get("code_commit") or "")
+    actual = str(runtime_commit or "")
+    if actual == "unknown" or not actual or actual != expected:
+        raise PaperEvidenceError(
+            "Refusing to record epoch-bound drill evidence: the drill runtime "
+            f"commit is {actual or 'missing'}, but the active evidence epoch "
+            f"is bound to {expected or 'missing'}. Run the drill from the "
+            "epoch's exact clean commit, or record without an active epoch "
+            "(verification-only)."
+        )
+
+
 def record_operational_drill(
     store: AssistantStore,
     *,

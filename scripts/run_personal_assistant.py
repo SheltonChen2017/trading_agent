@@ -303,7 +303,27 @@ def command_briefing(args, store: AssistantStore) -> None:
         )
     if history_note:
         print(f"  History: {history_note}")
+    _print_batched_warnings(store)
     print(f"Persisted decision packet #{packet_id} to {store.path}")
+
+
+def _print_batched_warnings(store: AssistantStore) -> None:
+    """GR-5 severity routing (owner decision 2026-08-03): warnings are NOT
+    delivered immediately -- the daily briefing is their delivery surface,
+    so omitting them here would leave warnings surfaced nowhere at all."""
+    from assistant.alert_delivery import pending_briefing_alerts
+
+    batched_warnings = pending_briefing_alerts(store)
+    if not batched_warnings:
+        return
+    print(
+        f"Open operational warnings ({len(batched_warnings)}, batched here by policy):"
+    )
+    for alert in batched_warnings:
+        print(
+            f"  [{alert['category']}] {alert['message']} "
+            f"(x{alert['occurrences']}, last {alert['last_seen_at'][:19]})"
+        )
 
 
 def command_risk_check(args, store: AssistantStore) -> None:
@@ -865,15 +885,15 @@ def command_alert_self_test(args, store: AssistantStore) -> None:
                 evidence=evidence,
             )
         else:
-            commit = _runtime_commit_or_unknown()
-            expected = epoch["lineage"]["code_commit"]
-            if commit == "unknown" or commit != expected:
-                raise SystemExit(
-                    "Refusing to record epoch-bound drill evidence: the runtime "
-                    f"commit ({commit}) does not exactly match the active epoch's "
-                    f"lineage ({expected}). Commit a clean tree at the epoch's "
-                    "commit, or run without --record-drill."
-                )
+            from assistant.paper_evidence import (
+                PaperEvidenceError,
+                verify_drill_lineage_commit,
+            )
+
+            try:
+                verify_drill_lineage_commit(epoch, _runtime_commit_or_unknown())
+            except PaperEvidenceError as exc:
+                raise SystemExit(str(exc)) from exc
             result["drill"] = record_operational_drill(
                 store,
                 drill_type="alert_delivery",

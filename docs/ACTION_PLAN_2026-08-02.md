@@ -50,8 +50,9 @@ reconcile) is built, characterization-frozen, and three-review hardened; the
 ML research/shadow stack is software-complete through monitoring and dossier;
 the LLM committee foundation is built and gated; the execution-kernel split
 (GR-1) is complete after the independently reviewed 2026-08-03 GR-1E
-assessment. What does not exist is: all of GR-2
-through GR-7, every AI *product* plan beyond the committee (strategy
+assessment; GR-3 fault drills and GR-5 alert delivery are implemented and
+reviewed (2026-08-03). What does not exist is: GR-2, GR-4, GR-6, GR-7,
+every AI *product* plan beyond the committee (strategy
 authoring, debate, allocation service, MCP, and proposal cleanup), and — most
 importantly — **any qualifying frozen-epoch operational evidence at all**:
 zero scheduled tasks installed, zero evidence epochs, zero
@@ -110,8 +111,8 @@ git-synchronized session handoff (`docs/SESSION_HANDOFF.md`), all wired into
 
 ### 2.5 UI feature controls (2026-08-03)
 
-The Streamlit app now has seven tabs, including Settings & Features and a
-research-only Ticker Suggestions surface. Session-scoped AI preferences gate
+The Streamlit app gained its sixth and seventh tabs here (Settings & Features and a
+research-only Ticker Suggestions surface; GR-5 later added an eighth, read-only Operations tab). Session-scoped AI preferences gate
 all optional LLM surfaces; provider and safety state are read-only; and
 `allow_new_positions` / `enable_strategy_proposals` use a protected typed
 confirmation, validate-before-write, version/fingerprint-changing persistence

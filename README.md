@@ -766,17 +766,21 @@ could submit an order by accident. An override-eligible block adds a second,
 separate text box requiring an exact `OVERRIDE <SIDE> <SHARES> <TICKER>`
 phrase naming that specific order.
 
-Five tabs, all reading/writing the same SQLite store and policy file:
+Nine pages, selected from a left-sidebar menu (only the selected page's
+body executes per rerun), all reading/writing the same SQLite store and
+policy file:
 
 - **Briefing** -- portfolio totals, market regime, risk exposure, open
   positions with per-position trend/volatility and evidence-labeled
-  research, open orders, upcoming earnings, and warnings. Click "Refresh
-  briefing" to re-pull from Alpaca.
-- **Watchlist** -- add tickers to a cart (pick from the universe or type any
-  other symbol), then "Check cart" for each ticker's own trend/volatility,
-  recent analyst price targets, recent news (optionally summarized by Claude
-  if `ANTHROPIC_API_KEY` is set), a real historical best/worst hold-period
-  return range, and this project's evidence-labeled signal history --
+  research, open orders, upcoming earnings, and warnings (including the
+  batched GR-5 operational warnings). Click "Refresh briefing" to re-pull
+  from Alpaca.
+- **Buying** (formerly Watchlist) -- add tickers to a cart (pick from the
+  universe or type any other symbol), then "Check cart" for each ticker's
+  own trend/volatility, recent analyst price targets, recent news
+  (optionally summarized by Claude if `ANTHROPIC_API_KEY` is set), a real
+  historical best/worst hold-period return range, and this project's
+  evidence-labeled signal history --
   **no probability-of-return number is ever shown**. With 2+ tickers
   checked, an inverse-volatility purchase split appears (a risk-sizing
   heuristic, not a stock pick), with a "max weight per ticker" cap slider.
@@ -795,9 +799,29 @@ Five tabs, all reading/writing the same SQLite store and policy file:
   never a price prediction.
 - **Propose & Approve** -- the same risk-reduction (and optionally SOXX/SOXL
   strategy) proposals as the CLI's `propose`/`approve`, in card form.
-- **History** -- filterable proposal and broker-order tables, plus a
-  "Reconcile" button that appears automatically on any proposal with an
-  unresolved broker submission.
+- **History** -- proposal and broker-order tables with an outcome-group
+  filter (Awaiting decision / Processing / Broker working / Filled /
+  Refused / Closed without fill / Other-unknown; exact status remains
+  under Advanced, combining by intersection), plus a "Reconcile" button
+  that appears automatically on any proposal with an unresolved broker
+  submission.
+- **Ticker Suggestions** -- research-only candidate tickers from
+  most-active/IPO/AI sources, each independently verified before display;
+  acting on one still requires the normal Buying-cart workflow.
+- **Backtest** -- read-only research surface: pick one of the project's
+  price-only signal scanners, tune its parameters, choose synthetic
+  (default, seconds) or real yfinance data, universe or basket scope, and
+  hold horizons, then run the same walk-forward engine the CLI research
+  scripts use. Shows a multi-horizon summary table and a cumulative
+  net-return chart per signal direction. Results are labeled exploratory:
+  no multiplicity correction runs here, and confirmatory significance
+  lives only in the frozen CLI pipeline.
+- **Operations** -- GR-5's read-only operator dashboard: platform
+  readiness, alert-delivery records, and the two explicit alert-delivery
+  buttons.
+- **Settings & Features** -- session AI-feature preferences, read-only
+  data-source/safety status, and the protected typed-confirmation policy
+  editor for `allow_new_positions` / `enable_strategy_proposals`.
 
 ## Persistence
 
@@ -969,6 +993,11 @@ python scripts/run_momentum_block_significance.py
 python scripts/run_execution_timing_revalidation.py
 python scripts/run_basket_report.py
 ```
+
+The Streamlit UI's **Backtest** page runs the same walk-forward engine
+interactively (signal picker, parameter widgets, summary table, cumulative
+net-return chart) for exploratory looks; the confirmatory
+significance/out-of-sample pipeline above remains CLI-only on purpose.
 
 `scripts/` also holds the leveraged-ETF rotation research line: regime-
 rotation backtests/walk-forward/sensitivity/grid-search

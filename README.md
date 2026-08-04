@@ -27,7 +27,8 @@ buy orders.
 - Submits approved orders to Alpaca **paper trading only** and journals the
   resulting proposal and broker order.
 - Scores portfolio research against a versioned machine-readable mandate;
-  proposed or incomplete evidence fails closed and never enables live trading.
+  an unapproved mandate or incomplete evidence fails closed and never enables
+  live trading.
 - Maintains an append-only balanced portfolio journal that can be explicitly
   bootstrapped from, and reconciled against, an independent broker snapshot.
 - Persists operational health alerts and verifies database backup/restore
@@ -655,16 +656,18 @@ connected paper account is active and unblocked.
 
 ### Production-foundation controls
 
-Inspect the proposed machine-readable mandate:
+Inspect the owner-approved, fingerprint-bound machine-readable mandate:
 
 ```bash
 python scripts/run_personal_assistant.py mandate-status
 ```
 
-It remains `proposed` until the owner explicitly approves its targets and
-binds that approval to the computed fingerprint. Passing mandate metrics
-only makes a run eligible for human review; it never changes paper mode.
-See `docs/LIVE_PROMOTION_CHECKLIST.md`.
+The owner approved the current targets on 2026-08-04. `mandate-status`
+recomputes the behavior fingerprint and refuses a mismatched approval.
+Approval satisfies only one review gate: passing mandate metrics and every
+other evidence check can make a run eligible for human review, but never
+changes paper mode or authorizes live trading. See
+`docs/LIVE_PROMOTION_CHECKLIST.md`.
 
 After reviewing the connected paper account, initialize the accounting
 journal exactly once and reconcile it:

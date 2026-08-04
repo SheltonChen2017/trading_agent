@@ -4,10 +4,9 @@ This checklist is a review gate, not a live-trading switch. Passing it does
 not change `config.PAPER_TRADING`, expose live execution in the CLI, or remove
 the exact human approval required for every proposal.
 
-The machine-readable starting point is
-`assistant/default_mandate.json`. It deliberately has `status: proposed`.
-The owner must settle the targets before changing it to `approved`. An
-approved mandate must contain:
+The machine-readable mandate is `assistant/default_mandate.json`. The owner
+approved its current targets on 2026-08-04, and it now has
+`status: approved`. An approved mandate must contain:
 
 - `approved_at`: an ISO-8601 timestamp;
 - `approved_by`: the accountable owner;
@@ -19,7 +18,7 @@ approval.
 
 ## Required evidence
 
-- [ ] Mandate targets are approved and versioned.
+- [x] Mandate targets are approved and versioned (owner, 2026-08-04).
 - [ ] Research was reproduced with current code and point-in-time data.
 - [ ] Discovery/confirmation windows use an embargo at least as long as the
       forward-return holding period.
@@ -51,8 +50,8 @@ cash-flow-adjusted metrics, lineage integrity, and the latest result of each
 required drill from durable evidence:
 
 ```text
-python scripts/run_personal_assistant.py --database data/paper.db paper-evidence-status paper-2026q3
-python scripts/run_personal_assistant.py --database data/paper.db promotion-status research-report.json --evidence-epoch paper-2026q3 --research-reproduced
+python scripts/run_personal_assistant.py --database data/trading_assistant.db paper-evidence-status paper-2026q3
+python scripts/run_personal_assistant.py --database data/trading_assistant.db promotion-status research-report.json --evidence-epoch paper-2026q3 --research-reproduced
 ```
 
 The calendar gate remains real: the default mandate's minimum sessions cannot

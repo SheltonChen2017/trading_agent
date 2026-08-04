@@ -41,17 +41,22 @@ or replaced.
 
 ## 3. Product decision
 
-Implement two separate concepts:
+Implement three separate concepts and do not make one a hidden prerequisite
+of another:
 
 1. **Dismiss/archive:** removes an unused proposal from the default History
    view while retaining its complete database record.
-2. **Physical purge:** destructive database maintenance, excluded from the
+2. **Automatic expiry:** an optional lifecycle-normalization milestone,
+   separately approved after dismissal. It is not required to remove unused
+   entries from the default UI and must not run merely because History was
+   opened in the first release.
+3. **Physical purge:** destructive database maintenance, excluded from the
    first implementation. It may be considered later only for already-dismissed,
    never-submitted paper proposals, with a dry run, backup, typed confirmation,
    and separate owner authorization.
 
 The first release must solve the UI problem entirely through dismissal and
-filtering. It must not delete trading evidence.
+filtering. It must not automatically expire rows or delete trading evidence.
 
 ## 4. Lifecycle contract
 
@@ -141,8 +146,9 @@ No broker API call is permitted anywhere in dismissal or expiry code.
 
 ## 6. Storage implementation
 
-Add narrowly named methods to `AssistantStore`; do not expose a generic
-arbitrary-status update to the UI:
+Add narrowly named dismissal methods to `AssistantStore`; do not expose a
+generic arbitrary-status update to the UI. The expiry method shown below
+belongs only to the separately approved follow-up:
 
 ```python
 expire_due_proposals(*, now: datetime, limit: int = 500) -> ExpiryResult
@@ -160,7 +166,12 @@ dismiss_proposals(
 ) -> DismissalResult
 ```
 
-### 6.1 Expiry sweep
+### 6.1 Optional follow-up: expiry sweep
+
+This subsection is a separate follow-up milestone, not part of the first
+dismiss/archive release. Its implementation requires separate owner approval
+and review. Until then, existing approval-time expiry behavior remains
+unchanged and opening History performs no durable lifecycle mutation.
 
 `expire_due_proposals()` must:
 
@@ -212,11 +223,13 @@ compatibility and audit callers. The UI will choose cleaner defaults.
 
 Update the History tab in `scripts/personal_assistant_ui.py`.
 
-### 7.1 Automatic lifecycle refresh
+### 7.1 Automatic lifecycle refresh (optional follow-up only)
 
-Before listing proposals, run the bounded expiry sweep with the current UTC
-time. Display a small notice only when rows were expired or malformed. Do not
-run destructive retention or deletion from page rendering.
+Do not run an expiry sweep in the first dismissal release. If the separately
+approved expiry milestone later ships, its trigger must be chosen explicitly
+(for example the existing operations cycle or an operator action) rather than
+silently making a read-oriented page visit mutate lifecycle state. Display a
+small notice when that explicit action expires rows or finds malformed data.
 
 ### 7.2 Visibility controls
 
@@ -256,7 +269,8 @@ remain in the local audit history and cannot be executed."
 
 ## 8. CLI parity
 
-Add commands to `scripts/run_personal_assistant.py`:
+The first dismissal release adds `dismiss-proposals`. The optional expiry
+follow-up adds `expire-proposals`; it is not a prerequisite for dismissal:
 
 ```text
 expire-proposals
@@ -296,16 +310,18 @@ row and key remain present.
 
 ## 10. Tests
 
-### 10.1 Status and expiry
+### 10.1 Status and optional expiry follow-up
 
-- `dismissed` is canonical, terminal, non-approvable, and non-inflight;
-- a proposal one microsecond before expiry is not expired;
-- a proposal exactly at the chosen expiry boundary follows the documented
+- the first dismissal release proves `dismissed` is canonical, terminal,
+  non-approvable, and non-inflight;
+- when the optional expiry follow-up is implemented, a proposal one
+  microsecond before expiry is not expired;
+- in that follow-up, a proposal exactly at the chosen expiry boundary follows the documented
   inclusive/exclusive rule;
-- due `proposed` and `override_available` rows expire;
-- no other status can be changed by the sweep;
+- due `proposed` and `override_available` rows expire in that follow-up;
+- no other status can be changed by its sweep;
 - malformed timestamps/payloads are reported and preserved; and
-- a concurrent approval claim cannot be overwritten by expiry.
+- a concurrent approval claim cannot be overwritten by that expiry sweep.
 
 ### 10.2 Dismissal safety
 
@@ -344,9 +360,8 @@ row and key remain present.
 ## 11. Implementation sequence
 
 1. Add `DISMISSED` and lifecycle classification tests.
-2. Add typed expiry/dismissal result contracts.
-3. Implement storage eligibility, preview hashing, atomic dismissal, and expiry
-   sweep.
+2. Add typed dismissal result contracts.
+3. Implement storage eligibility, preview hashing, and atomic dismissal.
 4. Add storage and concurrency tests, including allocation-batch JSON
    references.
 5. Add preview-first CLI commands and tests.
@@ -357,13 +372,15 @@ row and key remain present.
 9. Run the focused lifecycle/UI suites and the complete offline suite.
 10. Have the implementation adversarially reviewed before merge.
 
+Optional expiry is planned and reviewed afterwards as a separate milestone,
+using the contracts in sections 4.2, 6.1, and 10.1 without changing the
+accepted dismissal release retroactively.
+
 ## 12. Definition of done
 
 This feature is complete only when:
 
 - unused Watchlist experiments can be bulk-dismissed from the UI;
-- stale unused proposals automatically become `expired` without an approval
-  attempt;
 - expired and dismissed proposals no longer clutter the default History view;
 - all dismissed records remain queryable with their reason, actor, source
   status, and timestamp;

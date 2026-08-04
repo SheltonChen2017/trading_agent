@@ -1,175 +1,126 @@
 # Development session handoff
 
-Prepared: 2026-08-03 after Codex independently reviewed and corrected
-Claude's Phase 5 preflight commit.
+Prepared: 2026-08-03, late night, after implementing UI Phase 2 milestone 1
+(sidebar navigation + Buying rename)
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
 
-Claude's single documentation commit `1273a06` is **accepted after
-correction**. Its GR-2 counter-review is accepted. Its Phase 5 checklist had
-one P2 and two P3 findings, all resolved by Codex correction commit `b502127`.
-The complete commit disposition, issue reasons, corrections, and evidence are
-in `docs/REVIEW_2026-08-03_PHASE5_PREFLIGHT.md`.
+Claude reviewed Codex's UI Phase 2 plan corrections (`0b4c19a`) and
+**accepted them without issues**: the frozen 19-status outcome mapping was
+verified exhaustive against `assistant/proposal_status.py` (legacy
+`executed` correctly grouped as broker-working, not completed), and the
+UIPLAN-001 render-control finding was confirmed real by inspection of the
+eight always-executing tab bodies.
 
-The P2 was operational: the submitted record called a nonzero `-WhatIf`
-installer result successful and advised ignoring its exit code. Exact
-reproduction instead returned exit 1 with Task Scheduler `Access denied` and
-no plan. Both Windows task installers now produce a data-only four-task plan
-before accessing Task Scheduler; non-elevated operational and ML previews
-each exit zero and expose their resolved commands and paths.
+The owner then authorized implementation. **UI-2a + UI-2c are IMPLEMENTED**
+at commit `cbae8e6` on PUSHED branch `user/claude/ui-nav-buying-20260803`
+(base `72e1da2`, Codex's reviewed plan tip), awaiting independent review:
 
-The checklist now also states that `mandate-status` validates but does not
-approve a mandate, and that `platform-readiness` correctly remains blocked
-during early evidence collection and while no confirmed authoritative
-strategy exists. The owner must not bypass those independent gates.
+- The eight-tab bar is replaced by sidebar page routing (radio, key
+  `nav_page`); only the selected page body executes per rerun. The policy
+  selector stays in the sidebar below a divider, visually separate from
+  navigation.
+- "Watchlist" is renamed to **"Buying"** in the navigation and all
+  user-facing copy; internal identifiers deliberately keep `watchlist`
+  naming where renaming would be churn (per the corrected plan).
+- The page-effect inventory found two cross-page state hazards, both
+  closed: (1) the AI/earnings preference keys are read by five other
+  surfaces but were widget-backed on Settings — Streamlit deletes
+  widget-backed keys on reruns that don't render them, so navigation would
+  have silently reset every AI preference; they now live in durable
+  non-widget keys synced from widget checkboxes via `on_change`. (2) The
+  policy editor re-seeds from the persisted policy when routing cleanup
+  removed its widget keys (unsaved edits deliberately abandoned on
+  navigation).
+- New tests: 8 parametrized reachability tests (each page renders in
+  isolation AND shows a marker widget — catches silent-empty pages, not
+  just exceptions) and a preference-survival test across navigation.
+  Mutation sweep 3/3 caught (direct widget key; removed re-seed guard;
+  silently-empty History page).
 
-Phase 4 remains complete. Phase 5 remains incomplete and owner-gated. This
-review did not install/start tasks, contact a broker, inspect or mutate an
-operator database, approve a mandate, start an epoch, record operational
-drills, enable funded trading, or change policy.
+Two process incidents occurred and were recovered, recorded here for the
+reviewer's awareness: (1) Claude wiped its own uncommitted implementation
+once via `git checkout --` during mutation testing, replayed every edit
+from the session record, and re-verified parity (66 focused tests) before
+committing — mutation testing now only runs against committed state.
+(2) The first commit landed on `user/claude/new-signal-candidates-20260803`
+because the shared worktree had been switched under the session; it was
+cherry-picked to the correct branch and Codex's branch was restored to its
+exact tip `91bf63e` (one commit, candidate-signal research — untouched).
+
+Nothing here changes execution authority, policy semantics, ML/LLM
+boundaries, or Phase 5 deployment state.
 
 ## 2. Canonical Git state
 
 Repository: https://github.com/SheltonChen2017/trading_agent
 
-    origin/main = local main = d5fab71 (merge PR #131)
-    implementation branch = user/claude/phase5-preflight-20260803
-    implementation commit = 1273a06 (pushed, not merged)
-    review branch = codex/review-phase5-preflight-20260803
-    correction commit = b502127 (pushed on review branch)
-    first handoff commit = 0c16b58 (pushed on review branch)
-    pushed-state handoff = the later commit containing this update
+    origin/main = local main = 17605f5 (merge PR #132)
+    plan chain: 3a35d8d (Claude, pushed) -> 0b4c19a + 72e1da2
+        (Codex corrections + handoff, on codex/review-ui-phase2-plan-20260803)
+    implementation branch = user/claude/ui-nav-buying-20260803
+    implementation commit = cbae8e6 (base 72e1da2) — PUSHED
+    Codex signal branch = user/claude/new-signal-candidates-20260803 at 91bf63e
+        (local; not Claude's work; preserve)
 
-The Codex review branch was pushed to
-`origin/codex/review-phase5-preflight-20260803`, and `git ls-remote` resolved
-its first handoff tip as full commit
-`0c16b58a0dff9b87f2b9def2bc131bd5bbfae90a`. The correction and handoff are
-therefore retrievable on another computer after this pushed-state update is
-also pushed. The branch is not merged into `main`.
+The C:\tmp worktrees from the 2026-08-02 transition remain and must be
+preserved (transition branch `77699b3`; detached `47effd7`).
 
-Other machine-local worktrees remain present and must be preserved:
+## 3. Validation (on `cbae8e6`)
 
-- `C:\tmp\trading-agent-transition-20260802` pins local branch
-  `codex/transition-handoff-20260802-computer-move` at `77699b3`; its former
-  remote is gone.
-- `C:\tmp\trading-agent-ui-controls-review-20260802` is detached at
-  `47effd7`.
-
-Do not commit in either temporary worktree. The previously claimed strategy
-commit `a656015` and branch `codex/ai-strategy-tool-doc-v2-20260802` do not
-resolve in this checkout or fetched refs; treat that work as unavailable
-unless another machine or backup still holds it.
-
-## 3. Commit disposition and issues
-
-| Commit | Disposition |
-|---|---|
-| `1273a06` | Accepted after `P5REV-001..003` corrections |
-| `b502127` | Codex review corrections; pushed, pending owner merge decision |
-
-| ID | Priority | Status | Result |
-|---|---|---|---|
-| P5REV-001 | P2 | Resolved | Non-elevated installer previews now return four data-only resolved actions before touching Task Scheduler; failures may not be ignored. |
-| P5REV-002 | P3 | Resolved | Mandate approval and staged readiness instructions now match the actual CLI and independent readiness gates. |
-| P5REV-003 | P3 | Resolved | Branch, app-process, and missing-commit state is measured accurately here and in the action plan. |
-
-No P0 or P1 issue was found. No reviewed issue remains open.
-
-## 4. Validation
-
-    Python 3.12.13
-    submitted operational preview: exit 1, Access denied, no plan (red proof)
-    corrected operational preview: exit 0, 4 resolved actions
-    corrected ML preview: exit 0, 4 resolved actions
-    focused: 12 passed, 1 environment cache warning in 2.26s
-    full suite: 2,543 passed, 1 skipped, 27 warnings in 229.94s
-    compileall: clean
+    focused UI suites: 66 passed (feature-controls 10, personal-assistant-ui, alert-delivery)
+    mutation sweep: 3/3 caught, tree restored from committed state each time
+    full suite: 2,552 passed, 1 skipped, 25 warnings in 171.94s
+    compileall (UI script): clean
     git diff --check: clean
 
-The first full-suite invocation reached 48% without failures before its
-120-second command wrapper expired; the clean result above is the complete
-rerun with a sufficient timeout. The two warnings beyond Claude's 25-warning
-baseline are environmental physical-core detection and denied pytest cache
-creation, not behavioral failures.
+The owner's Streamlit app runs from this shared worktree, so it is already
+serving the new sidebar UI live. Alpaca paper credentials are installed and
+verified authenticating on this machine (presence/shape only; values never
+printed or stored).
 
-## 5. Roadmap and next authorized step
+## 4. Roadmap and next step
 
-UPDATE (2026-08-03, late evening): the owner requested four UI changes and
-directed Claude to prioritize them in the action plan for Codex review.
-They are recorded as **UI Phase 2 (UI-2a..UI-2d)** at the front of Phase 6
-in `docs/ACTION_PLAN_2026-08-02.md`, on pushed branch
-`user/claude/ui-phase2-plan-20260803` (docs only; no implementation
-started). UI-2d (History entry removal) deliberately schedules the archived
-`docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` —
-dismiss/archive as a persisted status, never physical deletion of
-broker-touched rows. Codex: review that plan entry next. Separately, the
-owner's Alpaca paper credentials are now installed and verified
-authenticating on the development machine (presence/shape checked only;
-values never printed), and the Streamlit app is running from `main` at
-`17605f5`.
+Per the corrected UI Phase 2 plan in `docs/ACTION_PLAN_2026-08-02.md`:
 
-Phase 5 is next and remains owner-heavy. Read
-`docs/PHASE5_DEPLOYMENT_SESSION.md` and make these decisions before any
-elevated or durable action:
+1. **DONE (this session, awaiting review): UI-2a + UI-2c** — sidebar
+   navigation + Buying rename.
+2. **Next: independent review of `cbae8e6`**, then UI-2b (canonical History
+   outcome filtering, read-only) on its own branch.
+3. Then UI-2d (durable dismiss/archive per the archived cleanup plan, own
+   branch, migration/concurrency tests).
+4. Automatic expiry only after a separate owner decision; physical purge
+   stays deferred.
 
-1. Epoch model 1 (freeze this runtime) or model 2 (dedicated frozen host).
-2. Final mandate targets and a separately reviewed, fingerprint-bound mandate
-   commit; there is no approval CLI.
-3. One canonical operator database path.
-4. Dedicated task account versus current user, and the elevated setup window.
+Phase 5 deployment remains owner-gated per
+`docs/PHASE5_DEPLOYMENT_SESSION.md`; nothing in this milestone touches it.
 
-After those decisions, execute the runbook on the operational machine in
-paper mode. Run both corrected installers with `-WhatIf`; require exit zero
-and inspect all eight resolved task actions before installing anything.
-`platform-readiness` must be interpreted dimension by dimension: deployment
-checks can improve while evidence and strategy legitimately remain blocked.
-
-The immediate Git step is owner review of `b502127` and the handoff commits.
-Merge and pull-request creation still require explicit authorization.
-
-## 6. Non-negotiable boundaries
+## 5. Non-negotiable boundaries
 
 - Paper trading is the only execution mode in scope.
-- No funded/live account, credential, or endpoint may be enabled or made
-  convenient. Paper credentials belong only on the operational host and must
-  never be committed or printed.
+- Navigation and filtering must not create, approve, submit, cancel, or
+  reconcile an order merely by rendering.
 - ML/LLM output remains advisory or observational only.
 - Exact approval, policy/mandate fingerprints, atomic claims, deterministic
-  risk checks, reservations, telemetry, idempotency, and reconciliation remain
-  mandatory.
-- Ambiguous submissions are reconciled, never blind-retried.
+  risk checks, reservations, telemetry, idempotency, and reconciliation
+  remain mandatory.
 - Never commit credentials, operator databases, licensed data, or evidence
   artifacts.
 
-## 7. Machine-local state
-
-This review ran on the development machine. At final measurement, nothing was
-listening on TCP port 8501; do not rely on the prior handoff's claim that the
-Streamlit app was healthy. No credential values were inspected. No scheduled
-task was installed or started. Preview database paths under `.venv` were
-arguments only and no operator database was used.
-
-Re-measure credentials by presence only, task definitions/results, selected
-database path/integrity, broker paper identity, and evidence artifacts on the
-actual operational host before deployment.
-
-## 8. Required reading and resume prompt
+## 6. Required reading and resume prompt
 
 Read, in order: `CLAUDE.md`, `AGENTS.md`,
-`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`,
-`docs/ACTION_PLAN_2026-08-02.md`,
-`docs/REVIEW_2026-08-03_PHASE5_PREFLIGHT.md`,
-`docs/PHASE5_DEPLOYMENT_SESSION.md`, `docs/OPERATIONS_RUNBOOK.md`, and this
-handoff.
+`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, `docs/ACTION_PLAN_2026-08-02.md`,
+`docs/REVIEW_2026-08-03_UI_PHASE2_PLAN.md`, and this handoff.
 
-    Fetch/prune and verify SHAs. Claude Phase 5 preflight commit 1273a06 was
-    accepted after correction on codex/review-phase5-preflight-20260803.
-    Correction b502127 fixes non-elevated scheduler previews and the Phase 5
-    mandate/readiness guidance. The Codex branch and handoff are pushed but
-    not merged; verify the remote tip after fetching. Do not redo Phase 4.
-    Do not install tasks, approve/edit a mandate, start an epoch, contact a
-    broker, or enable funded trading without the owner's Phase 5 decisions
-    and authorization. Preserve both C:\tmp worktrees.
+    Fetch/prune and verify SHAs. UI-2a/UI-2c are implemented at cbae8e6 on
+    pushed branch user/claude/ui-nav-buying-20260803 (base 72e1da2),
+    awaiting independent review — review the single commit, red-verify the
+    two cross-page state protections, and check the shared-worktree
+    incidents' recovery claims (Codex signal branch must still be exactly
+    91bf63e). Do not start UI-2b before that review completes. Do not
+    install tasks, approve a mandate, start an epoch, or enable funded
+    trading without owner direction. Preserve both C:\tmp worktrees.

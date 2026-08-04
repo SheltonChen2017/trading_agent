@@ -47,13 +47,14 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     Codex review correction = 9dcff80
     Codex review records = df4d278
     review-report formatting = bf0e396
+    replacement handoff = 1300aaa
     Codex branch = codex/review-ui-2b-history-outcomes-20260804
 
-Claude's branch is pushed at `8ff2017`. At the time this replacement handoff
-was prepared, the Codex branch had not yet been pushed; the final handoff
-commit and remote verification are recorded by the post-push update at the
-tip of this branch. Nothing has been merged and no pull request has been
-opened by Codex.
+Claude's branch is pushed at `8ff2017`. The Codex branch was pushed and its
+first handoff tip `1300aaa` was verified byte-for-byte against GitHub with
+`git ls-remote`; this post-push handoff update is the final branch-tip commit
+and must also be remote-verified. Nothing has been merged and no pull request
+has been opened by Codex.
 
 ## 3. Commit-by-commit review dispositions
 
@@ -70,6 +71,8 @@ opened by Codex.
   required two-paragraph milestone record, and creates the review report.
 - `bf0e396` — **accepted**. Removes the review report's extra trailing blank
   line; no substantive content changes.
+- `1300aaa` — **accepted**. Replaces the canonical session handoff with the
+  completed independent-review state.
 
 Full review detail is in
 `docs/REVIEW_2026-08-04_UI2B_HISTORY_OUTCOMES.md`.

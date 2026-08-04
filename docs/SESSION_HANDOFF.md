@@ -1,11 +1,30 @@
 # Development session handoff
 
-Prepared: 2026-08-03T18:40:00-07:00, after the integrity sweep
+Prepared: 2026-08-03T20:30:00-07:00, after GR-2 implementation
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
+
+UPDATE (2026-08-03, evening): the owner authorized GR-2 through to Phase 4
+completion. GR-2 is IMPLEMENTED at commit `03895ae` on PUSHED branch
+`user/claude/gr-2-risk-registry-20260803` (base `f778ef3`), awaiting
+independent review — do not reimplement it, and do not merge without owner
+approval. The gate now RUNS a twenty-check `RISK_CHECK_REGISTRY`
+(exact historical order, `applies_at` phases, kill switch the only
+terminal check, buy/non_buy asymmetry preserved verbatim), pinned by
+`tests/test_risk_check_registry.py`'s frozen inventory plus
+registry-injection and deletion-consequence proofs. Zero existing tests
+were edited; 178 focused gate/characterization/fault/batch tests pass
+unchanged; mutations (entry deletion, terminal flip) each caught twice.
+Full suite on that tree: 2,540 passed / 1 skipped / 25 warnings.
+**This closes Phase 4's code work** (GR-3 reviewed, GR-5 reviewed, GR-2
+awaiting review). After the GR-2 review merges, the action plan's next
+phase is Phase 5 — operational deployment + epoch start — which is
+owner-heavy (elevated window, task account, scheduler install, mandate
+approval, epoch model 1-vs-2 decision).
+
 
 UPDATE (2026-08-03, after PR #128 merged): the owner requested a
 whole-project integrity sweep following the ~120-commit dual-agent cycle.

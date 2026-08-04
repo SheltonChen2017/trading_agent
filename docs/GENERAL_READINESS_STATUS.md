@@ -803,7 +803,56 @@ the notification was *raised*, not that a human read it. Scheduled-task
 installation for `deliver-alerts`/`alert-self-test` is Phase 5 deployment
 work, not this milestone.
 
-## GR-2, GR-4, GR-6 .. GR-9 — not started
+## GR-2 — risk-check registry: IMPLEMENTED, awaiting review (2026-08-03)
+
+The ~600-line hand-written check sequence in
+`risk/execution_gate.py::validate_trade_intent()` is now a **registry-driven
+gate**: twenty named checks in `RISK_CHECK_REGISTRY`, each declaring its
+side applicability, terminality, and `applies_at` phase, executed in the
+exact historical order by a ~45-line driver. The extraction is
+behavior-preserving to the letter:
+
+- every check function is the verbatim logic and message text of the block
+  it replaced, with each block's review-history commentary moved WITH the
+  logic it documents;
+- shared intermediate state (decimal conversions, per-position money,
+  sanitized share count, trade value, pending-buy sums) flows through an
+  explicit `_GateContext`, making the order-dependence the registry freezes
+  visible instead of implicit;
+- the kill switch remains the only terminal check (its historical early
+  return is reproduced by terminal-break semantics, byte-identical output);
+- the buy/non-buy asymmetry is preserved exactly — `sell_exceeds_held`
+  runs for any non-buy side (including invalid sides like "banana"),
+  matching the historical `else` branch, and the inventory spells that
+  "non_buy" so nobody "simplifies" it to "sell" and silently skips it;
+- zero existing tests were edited: the gate suite, the execution
+  characterization freeze, the fault matrix, and allocation-batch preflight
+  all pass unchanged (178 focused).
+
+Phases: every check today carries `pre_submit` — the gate's single
+historical moment (fresh revalidation immediately before submission).
+`checks_for_phase()` exists so a future proposal-time or post-approval
+consumer runs the registry instead of growing another hand-written
+sequence; an unknown phase raises rather than returning an empty list.
+
+`tests/test_risk_check_registry.py` pins the plan's contract: the frozen
+inventory (names, order, sides, terminality, phases — exact literal), a
+registry-injected check enforced with zero gate edits (proving the gate
+runs the registry), deletion demonstrably removing enforcement (why the
+inventory test is load-bearing), original error identity, and the
+kill-switch short-circuit. Mutation-verified: deleting a registry entry is
+caught by BOTH the inventory test and the pre-existing behavioral suite;
+flipping the terminal flag is caught twice.
+
+Deliberately NOT absorbed (ARCHITECTURE_DEBT item 2 remains open):
+`proposals.py`'s generation-time concentration precheck,
+`allocation_batch`'s cross-leg reservation math, and
+`_pending_buy_value_by_ticker` stay where they are — they feed or shadow
+the gate rather than duplicate it, and folding them in is a separate
+reviewed decision now made EASIER by `checks_for_phase("proposal")`
+existing as the convergence point.
+
+## GR-4, GR-6 .. GR-9 — not started
 
 Each requires its own gap analysis first; the plan predates the ML
 full-system additions throughout.

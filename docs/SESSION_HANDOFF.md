@@ -1,126 +1,171 @@
 # Development session handoff
 
-Prepared: 2026-08-03, late night, after implementing UI Phase 2 milestone 1
-(sidebar navigation + Buying rename)
+Prepared: 2026-08-04 after Codex independently reviewed, corrected, and pushed
+Claude's UI-2a/UI-2c sidebar-navigation milestone.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
 
-Claude reviewed Codex's UI Phase 2 plan corrections (`0b4c19a`) and
-**accepted them without issues**: the frozen 19-status outcome mapping was
-verified exhaustive against `assistant/proposal_status.py` (legacy
-`executed` correctly grouped as broker-working, not completed), and the
-UIPLAN-001 render-control finding was confirmed real by inspection of the
-eight always-executing tab bodies.
+Claude's UI milestone is **accepted after correction**. The submitted scope
+was implementation `cbae8e6` plus handoff `7c02b5c`, based on reviewed plan
+tip `72e1da2`. It replaces eight always-executing tabs with a left sidebar
+that renders one selected page, separates policy context from navigation, and
+renames the user-facing Watchlist page to Buying.
 
-The owner then authorized implementation. **UI-2a + UI-2c are IMPLEMENTED**
-at commit `cbae8e6` on PUSHED branch `user/claude/ui-nav-buying-20260803`
-(base `72e1da2`, Codex's reviewed plan tip), awaiting independent review:
+Independent review found one P2 and two P3 issues. Correction `3a29138`
+preserves benign page work across navigation—Buying cart, allocation values,
+strategy choice, History filters/limits, and suggestion inputs—through a
+narrow explicit whitelist. Exact approval, override, bulk-submit, cancel, and
+emergency confirmation phrases are excluded and still clear when their page
+disappears. Tests now select each target page before its first render, and two
+stale user-visible references to tabs now say pages.
 
-- The eight-tab bar is replaced by sidebar page routing (radio, key
-  `nav_page`); only the selected page body executes per rerun. The policy
-  selector stays in the sidebar below a divider, visually separate from
-  navigation.
-- "Watchlist" is renamed to **"Buying"** in the navigation and all
-  user-facing copy; internal identifiers deliberately keep `watchlist`
-  naming where renaming would be churn (per the corrected plan).
-- The page-effect inventory found two cross-page state hazards, both
-  closed: (1) the AI/earnings preference keys are read by five other
-  surfaces but were widget-backed on Settings — Streamlit deletes
-  widget-backed keys on reruns that don't render them, so navigation would
-  have silently reset every AI preference; they now live in durable
-  non-widget keys synced from widget checkboxes via `on_change`. (2) The
-  policy editor re-seeds from the persisted policy when routing cleanup
-  removed its widget keys (unsaved edits deliberately abandoned on
-  navigation).
-- New tests: 8 parametrized reachability tests (each page renders in
-  isolation AND shows a marker widget — catches silent-empty pages, not
-  just exceptions) and a preference-survival test across navigation.
-  Mutation sweep 3/3 caught (direct widget key; removed re-seed guard;
-  silently-empty History page).
+The complete issue/reason/evidence ledger is
+`docs/REVIEW_2026-08-03_UI_NAV_BUYING.md`. The action plan marks UI-2a/UI-2c
+complete and names UI-2b History outcome filtering as next. The milestone's
+technical and plain-language record is in `docs/FEATURE_MILESTONE_RECORD.md`.
 
-Two process incidents occurred and were recovered, recorded here for the
-reviewer's awareness: (1) Claude wiped its own uncommitted implementation
-once via `git checkout --` during mutation testing, replayed every edit
-from the session record, and re-verified parity (66 focused tests) before
-committing — mutation testing now only runs against committed state.
-(2) The first commit landed on `user/claude/new-signal-candidates-20260803`
-because the shared worktree had been switched under the session; it was
-cherry-picked to the correct branch and Codex's branch was restored to its
-exact tip `91bf63e` (one commit, candidate-signal research — untouched).
-
-Nothing here changes execution authority, policy semantics, ML/LLM
-boundaries, or Phase 5 deployment state.
+This review deliberately excluded all later signal research. No signal,
+strategy, backtest, registry, or research-report file was inspected or edited.
+No proposal, policy, database schema, broker, scheduler, epoch, ML/LLM, or
+execution authority changed.
 
 ## 2. Canonical Git state
 
 Repository: https://github.com/SheltonChen2017/trading_agent
 
-    origin/main = local main = 17605f5 (merge PR #132)
-    plan chain: 3a35d8d (Claude, pushed) -> 0b4c19a + 72e1da2
-        (Codex corrections + handoff, on codex/review-ui-phase2-plan-20260803)
-    implementation branch = user/claude/ui-nav-buying-20260803
-    implementation commit = cbae8e6 (base 72e1da2) — PUSHED
-    Codex signal branch = user/claude/new-signal-candidates-20260803 at 91bf63e
-        (local; not Claude's work; preserve)
+    reviewed base = 72e1da2
+    implementation = cbae8e6
+    implementation handoff = 7c02b5c
+    implementation branch = user/claude/ui-nav-buying-20260803 (pushed)
+    review branch = codex/review-ui-nav-buying-20260803
+    correction = 3a29138 (pushed)
+    review/status record = e673b94 (pushed)
+    initial review handoff = cf75777 (pushed)
+    current handoff = the branch-tip commit containing this file (pushed)
 
-The C:\tmp worktrees from the 2026-08-02 transition remain and must be
-preserved (transition branch `77699b3`; detached `47effd7`).
+At review start, `origin/main` and local `main` were `ff87567`, after UI merge
+PR #134 and a later signal-work merge PR #135. That later work is not present
+in this deliberately isolated review history and was not reviewed. The review
+branch starts from the UI topic tip, which is an ancestor of current `main`,
+so its UI-only corrections can be reviewed/merged without editing signal
+files.
 
-## 3. Validation (on `cbae8e6`)
+Another computer can retrieve the full review by fetching
+`origin/codex/review-ui-nav-buying-20260803`. Remote verification confirmed
+that the initial push resolved to full SHA
+`cf75777f03e5b1765ab543461aee94c5fafe5a71`; the branch-tip handoff commit
+supersedes that tip after the final push. The branch is not merged. The
+running app continues to use the already merged submitted UI, so the
+cart-preservation correction is not active there until this branch is merged
+and the app reloads it.
 
-    focused UI suites: 66 passed (feature-controls 10, personal-assistant-ui, alert-delivery)
-    mutation sweep: 3/3 caught, tree restored from committed state each time
-    full suite: 2,552 passed, 1 skipped, 25 warnings in 171.94s
-    compileall (UI script): clean
+## 3. Isolation and preserved concurrent work
+
+Review worktree:
+
+    C:\tmp\trading-agent-ui-revisions-review-20260803
+
+It was created at exact UI tip `7c02b5c` specifically to avoid switching or
+editing the primary shared worktree while Claude works on signals. The review
+branch is now preserved on `origin`; keep or remove this worktree only after
+confirming no local-only work has subsequently been added.
+
+Existing older worktrees also remain:
+
+- `C:\tmp\trading-agent-transition-20260802` at `77699b3`, pinned branch.
+- `C:\tmp\trading-agent-ui-controls-review-20260802` detached at `47effd7`.
+
+## 4. Commit dispositions and issues
+
+| Commit | Disposition |
+|---|---|
+| `cbae8e6` | Accepted after `UINAV-001..003` corrections |
+| `7c02b5c` | Accepted after replacement by this final handoff |
+| `3a29138` | UI-only review correction; pushed, not merged |
+| `e673b94` | Review report, action-plan state, and milestone record; pushed |
+| `cf75777` | Initial review handoff; pushed and superseded by current branch-tip handoff |
+
+| ID | Priority | Status | Result |
+|---|---|---|---|
+| UINAV-001 | P2 | Resolved | Ordinary page work now survives navigation; all sensitive confirmations remain transient. |
+| UINAV-002 | P3 | Resolved | Page reachability tests select the target before first render rather than executing Briefing first. |
+| UINAV-003 | P3 | Resolved | Remaining visible “tab” wording was corrected to “page.” |
+
+No P0 or P1 issue was found. No reviewed issue remains open.
+
+## 5. Validation
+
+    Python 3.12.13
+    red proof: Buying cart lost after Buying -> History -> Buying on cbae8e6
+    corrected focused inventory: 68 tests reached 100%, no failure/skip marker
+    corrected full inventory: 2,555 cases reached 100%
+                              2,554 pass markers, 1 skip, no failure/error
+    in-memory compilation: 315 Python files clean
     git diff --check: clean
 
-The owner's Streamlit app runs from this shared worktree, so it is already
-serving the new sidebar UI live. Alpaca paper credentials are installed and
-verified authenticating on this machine (presence/shape only; values never
-printed or stored).
+Environment deviation: in the isolated worktree, pytest's Streamlit process
+remained alive after both runs printed 100%, so the command wrapper timed out
+before pytest emitted its normal timing/warning summary or returned an exit
+code. The submitted-tree run reported by Claude exited normally. Initial
+attempts that placed `--basetemp` beside the C:\tmp worktree also produced
+sandbox permission errors; final inventories used the writable project
+environment and reached 100% without any failure/error marker. Do not rewrite
+these observations as ordinary exit-zero results.
 
-## 4. Roadmap and next step
+Ordinary `compileall` could not create `__pycache__` in the isolated worktree,
+so all 315 Python sources were parsed and compiled in memory without writes.
 
-Per the corrected UI Phase 2 plan in `docs/ACTION_PLAN_2026-08-02.md`:
+## 6. Completed behavior and next step
 
-1. **DONE (this session, awaiting review): UI-2a + UI-2c** — sidebar
-   navigation + Buying rename.
-2. **Next: independent review of `cbae8e6`**, then UI-2b (canonical History
-   outcome filtering, read-only) on its own branch.
-3. Then UI-2d (durable dismiss/archive per the archived cleanup plan, own
-   branch, migration/concurrency tests).
-4. Automatic expiry only after a separate owner decision; physical purge
-   stays deferred.
+Completed UI-2a/UI-2c behavior:
 
-Phase 5 deployment remains owner-gated per
-`docs/PHASE5_DEPLOYMENT_SESSION.md`; nothing in this milestone touches it.
+- eight pages are selected from the left sidebar;
+- only the selected page body executes;
+- Watchlist is user-facing Buying;
+- policy selection remains globally visible and separate;
+- durable global preferences and benign page work survive navigation; and
+- safety-sensitive confirmations do not survive navigation.
 
-## 5. Non-negotiable boundaries
+The next action-plan UI milestone is UI-2b, read-only History outcome
+filtering using the frozen exhaustive status mapping. Do not start UI-2b until
+the owner decides whether to merge this pushed review branch. UI-2d persisted
+dismiss/archive follows later; automatic expiry and physical purge remain
+separate/deferred decisions.
+
+## 7. Non-negotiable boundaries
 
 - Paper trading is the only execution mode in scope.
-- Navigation and filtering must not create, approve, submit, cancel, or
-  reconcile an order merely by rendering.
+- Navigation must not create, approve, submit, cancel, or reconcile an order
+  merely by rendering.
+- Typed approval, override, bulk-submit, cancel, and emergency confirmations
+  must not persist across page navigation.
 - ML/LLM output remains advisory or observational only.
-- Exact approval, policy/mandate fingerprints, atomic claims, deterministic
-  risk checks, reservations, telemetry, idempotency, and reconciliation
-  remain mandatory.
+- Exact approval, policy/mandate fingerprints, kill switches, atomic claims,
+  deterministic checks, reservations, telemetry, idempotency, and
+  reconciliation remain mandatory.
 - Never commit credentials, operator databases, licensed data, or evidence
   artifacts.
 
-## 6. Required reading and resume prompt
+## 8. Machine-local state and resume prompt
 
-Read, in order: `CLAUDE.md`, `AGENTS.md`,
-`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, `docs/ACTION_PLAN_2026-08-02.md`,
-`docs/REVIEW_2026-08-03_UI_PHASE2_PLAN.md`, and this handoff.
+The owner confirmed the Streamlit app is running and is being tested. This
+review did not stop, restart, browse, or mutate that process. Claude previously
+recorded authenticated Alpaca paper credentials on the development machine;
+this review did not inspect values or contact Alpaca.
 
-    Fetch/prune and verify SHAs. UI-2a/UI-2c are implemented at cbae8e6 on
-    pushed branch user/claude/ui-nav-buying-20260803 (base 72e1da2),
-    awaiting independent review — review the single commit, red-verify the
-    two cross-page state protections, and check the shared-worktree
-    incidents' recovery claims (Codex signal branch must still be exactly
-    91bf63e). Do not start UI-2b before that review completes. Do not
-    install tasks, approve a mandate, start an epoch, or enable funded
-    trading without owner direction. Preserve both C:\tmp worktrees.
+Read `CLAUDE.md`, `AGENTS.md`,
+`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`,
+`docs/ACTION_PLAN_2026-08-02.md`,
+`docs/REVIEW_2026-08-03_UI_NAV_BUYING.md`, and this handoff.
+
+    Fetch/prune and verify SHAs. Review only UI-2a/UI-2c: cbae8e6 and
+    7c02b5c were accepted after correction 3a29138, with records e673b94
+    and the handoff commits, on codex/review-ui-nav-buying-20260803. Fetch
+    that remote branch and verify its tip; it is pushed but not merged.
+    Preserve concurrent signal work and do not edit its files. The owner says
+    Streamlit is running; do not stop it. Next UI milestone is UI-2b only
+    after owner direction. Do not install tasks, start an epoch, or enable
+    funded trading without authorization.

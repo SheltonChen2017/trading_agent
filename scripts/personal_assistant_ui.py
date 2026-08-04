@@ -404,6 +404,35 @@ def _sync_pref_from_widget(pref_key: str) -> None:
     )
 
 
+# Streamlit removes a widget's key when that widget is not rendered. Sidebar
+# routing therefore needs an explicit, narrow persistence boundary for benign
+# page inputs that users reasonably expect to survive navigation. Self-
+# assignment detaches these values from widget cleanup for the current rerun.
+# Safety-sensitive confirmation text is intentionally absent: approval,
+# override, bulk-submit, cancel, and emergency phrases must be retyped after
+# leaving their page.
+_PERSISTENT_PAGE_WIDGET_KEYS = (
+    "watchlist_picked",
+    "watchlist_typed",
+    "allocation_max_weight_pct",
+    "allocation_dollar_amount",
+    "strategy_proposals_enabled",
+    "proposal_status_filter",
+    "proposal_history_limit",
+    "order_history_limit",
+    "suggest_src_most_active",
+    "suggest_src_recent_ipo",
+    "suggest_src_ai",
+    "suggest_seed_tickers",
+)
+
+
+def _preserve_page_widget_state(session_state) -> None:
+    for key in _PERSISTENT_PAGE_WIDGET_KEYS:
+        if key in session_state:
+            session_state[key] = session_state[key]
+
+
 _AI_PREF_OFF_HELP = (
     "Optional AI features are turned off. Enable them (and this specific "
     "feature) in the Settings & Features page."
@@ -883,7 +912,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
             "This proposal's content, policy, or portfolio context has changed since it was last "
             "displayed -- the reasons/expected-impact below were computed against the OLD context and "
             "may no longer be accurate. Approval is disabled for this card; regenerate it (use this "
-            "tab's Check/refresh button) to get a current, actionable proposal."
+            "page's Check/refresh button) to get a current, actionable proposal."
         )
 
     estimated_notional = intent["shares"] * proposal["reference_price"]
@@ -1285,6 +1314,8 @@ _PAGE_LABELS = (
     "Operations",
     "Settings & Features",
 )
+
+_preserve_page_widget_state(st.session_state)
 
 with st.sidebar:
     st.header("Navigation")
@@ -2399,6 +2430,7 @@ if page == "Propose & Approve":
     check_strategy = st.checkbox(
         f"Also check leveraged-pair rebalance strategies ({pair_labels})",
         value=policy.enable_strategy_proposals,
+        key="strategy_proposals_enabled",
         help="Each pair's evidence_status is shown per-proposal -- none are 'confirmed' -- "
         "see assistant/strategy_proposals.py",
     )
@@ -2495,7 +2527,11 @@ if page == "History":
 
     with proposals_col:
         st.subheader("Proposals")
-        status_filter = st.selectbox("Status filter", ["(any)"] + list(STATUSES))
+        status_filter = st.selectbox(
+            "Status filter",
+            ["(any)"] + list(STATUSES),
+            key="proposal_status_filter",
+        )
         proposal_limit = st.slider("Max rows", 5, 100, 20, key="proposal_history_limit")
         stored = store.list_proposals(status=None if status_filter == "(any)" else status_filter, limit=proposal_limit)
         if not stored:
@@ -2951,7 +2987,7 @@ if page == "Settings & Features":
         "**UI preferences** (plain toggles, this session only), **authoritative "
         "trading policy** (protected workflow with typed confirmation and a new "
         "policy fingerprint), and **read-only status** (cannot be changed here at "
-        "all). No control on this tab can enable live trading, edit a secret, or "
+        "all). No control on this page can enable live trading, edit a secret, or "
         "approve an order."
     )
 

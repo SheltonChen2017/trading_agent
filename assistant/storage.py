@@ -173,6 +173,13 @@ _DISMISSAL_EXECUTION_EVIDENCE_KEYS: tuple[str, ...] = (
     "filled_at",
     "policy_override",
     "reconciled_at",
+    # Written by the same override_available transition as `violations`
+    # (execution_service stores build_reviewed_override_record() under this
+    # key). Unreachable without `violations` through any code path, but the
+    # payload check exists precisely for arbitrary corruption, so every
+    # override-evidence key must refuse on its own (counter-review
+    # CRUI2D-001, 2026-08-04).
+    "reviewed_override",
     "submitted_at",
     "violations",
 )

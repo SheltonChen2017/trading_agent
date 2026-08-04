@@ -101,6 +101,8 @@ from assistant.proposal_status import (
     BROKER_EXPIRED,
     BROKER_REJECTED,
     CANCELED,
+    DISMISSED,
+    DISMISSIBLE_SOURCE_STATUSES,
     EXPIRED,
     FILLED,
     MANUAL_RECONCILIATION_STATUSES,
@@ -443,6 +445,12 @@ _PERSISTENT_PAGE_WIDGET_KEYS = (
     "proposal_outcome_filter",
     "proposal_status_filter",
     "proposal_history_limit",
+    # UI-2d: archive-visibility checkboxes are benign filters. The
+    # dismissal selection/reason/confirmation keys are deliberately absent:
+    # a durable-mutation confirmation must be retyped after leaving the
+    # page, exactly like approval/override/cancel phrases.
+    "history_include_expired",
+    "history_include_dismissed",
     "order_history_limit",
     "suggest_src_most_active",
     "suggest_src_recent_ipo",
@@ -740,11 +748,18 @@ def _proposal_status_category(status: str) -> str:
       "failed"     -- terminal failure: show the stored violations/error.
       "unresolved" -- broker outcome not yet confirmed (submitting/
                       submission_unknown/reconciling): point at Reconcile.
+      "dismissed"  -- archived by the operator (UI-2d): terminal,
+                      never-broker-touched, never approval controls.
       "in_progress"-- claimed by an approval attempt elsewhere (validating/
                       approved): never approval controls, but not terminal.
     """
     if status in (PROPOSED, POLICY_OVERRIDE_AVAILABLE):
         return "approvable"
+    if status == DISMISSED:
+        # Must precede every fallback: a dismissed proposal rendered from a
+        # stale session snapshot must never fall through to "in_progress"
+        # (which reads as an active approval attempt) or show controls.
+        return "dismissed"
     if status == FILLED:
         return "filled"
     if status in ACTIVE_BROKER_ORDER_STATUSES:
@@ -796,6 +811,14 @@ def _render_terminal_or_inflight_status(proposal: dict, status: str) -> None:
             f"Status: {status} -- this proposal's broker outcome is not yet confirmed. Resolve it via "
             "the History page's Reconcile action (or `recover-stale` on the CLI if it's stuck in "
             "'reconciling') before approving an equivalent trade."
+        )
+    elif category == "dismissed":
+        st.info(
+            f"Dismissed {proposal.get('dismissed_at', '?')} by "
+            f"{proposal.get('dismissed_by', '?')}: "
+            f"{proposal.get('dismissed_reason', 'no reason recorded')}. "
+            "Dismissed proposals remain in the local audit history and "
+            "cannot be executed."
         )
     else:
         # in_progress: VALIDATING / APPROVED -- an approval attempt is
@@ -2567,6 +2590,9 @@ if page == "History":
 
     with proposals_col:
         st.subheader("Proposals")
+        dismissal_notice = st.session_state.pop("dismissal_notice", None)
+        if dismissal_notice:
+            st.success(dismissal_notice)
         outcome_filter = st.multiselect(
             "Outcome filter",
             list(OUTCOME_GROUPS),
@@ -2591,6 +2617,22 @@ if page == "History":
             )
         proposal_limit = st.slider("Max rows", 5, 100, 20, key="proposal_history_limit")
 
+        # UI-2d visibility (archive classes hidden by default). These flags
+        # govern ONLY the unfiltered default view: explicitly selecting an
+        # outcome group or exact status always shows that selection's rows,
+        # so a hidden visibility flag can never contradict an explicit
+        # filter into a misleading empty result.
+        include_expired = st.checkbox(
+            "Include expired proposals",
+            value=False,
+            key="history_include_expired",
+        )
+        include_dismissed = st.checkbox(
+            "Include dismissed proposals",
+            value=False,
+            key="history_include_dismissed",
+        )
+
         exact_status = None if status_filter == "(any)" else status_filter
         # Both filters constrain the DATABASE query domain, not merely the
         # fetched page: each path returns the newest `proposal_limit` rows of
@@ -2612,7 +2654,12 @@ if page == "History":
                 limit=proposal_limit,
             )
         else:
-            stored = store.list_proposals(status=None, limit=proposal_limit)
+            stored = store.list_proposals(
+                status=None,
+                limit=proposal_limit,
+                include_dismissed=include_dismissed,
+                include_expired=include_expired,
+            )
 
         active_filter_parts = []
         if outcome_filter:
@@ -2622,11 +2669,30 @@ if page == "History":
         if exact_status is not None:
             active_filter_parts.append(f"exact status = {exact_status}")
         if active_filter_parts:
-            st.caption(
+            caption = (
                 "Active filters: "
                 + "; ".join(active_filter_parts)
                 + ". When both filters are set, a row must match both "
                 "(intersection)."
+            )
+            if exact_status in (EXPIRED, DISMISSED):
+                caption += (
+                    f" Selecting the {exact_status} status shows those rows "
+                    "even while their include-checkbox is off."
+                )
+            st.caption(caption)
+        elif not (include_expired and include_dismissed):
+            hidden_classes = [
+                label
+                for flag, label in (
+                    (include_expired, "expired"),
+                    (include_dismissed, "dismissed"),
+                )
+                if not flag
+            ]
+            st.caption(
+                f"Hiding {' and '.join(hidden_classes)} proposals -- use the "
+                "checkboxes above (or an outcome/status filter) to show them."
             )
 
         if not stored:
@@ -2652,6 +2718,147 @@ if page == "History":
                 use_container_width=True,
                 hide_index=True,
             )
+
+        # --- UI-2d: dismiss/archive unused proposals -----------------------
+        # Archive, never delete: the row, payload, and idempotency key all
+        # remain; only pristine never-broker-touched proposed/expired rows
+        # qualify, enforced by the storage layer (the UI reproduces no
+        # eligibility rule of its own).
+        with st.expander("Manage unused proposals"):
+            st.caption(
+                "Dismiss unused Watchlist/Buying experiments to declutter "
+                "History. Dismissed proposals remain in the local audit "
+                "history and cannot be executed. Only never-broker-touched "
+                "proposed/expired rows qualify; nothing here can call the "
+                "broker or delete a record."
+            )
+            manage_candidates = store.list_proposals_for_outcomes(
+                statuses=DISMISSIBLE_SOURCE_STATUSES, limit=200
+            )
+            if not manage_candidates:
+                st.caption("No proposed or expired rows to manage.")
+            else:
+                candidate_preview = store.proposal_dismissal_eligibility(
+                    [p["proposal_id"] for p in manage_candidates]
+                )
+                dismissible_rows = [
+                    row for row in candidate_preview.rows if row.dismissible
+                ]
+                blocked_rows = [
+                    row for row in candidate_preview.rows if not row.dismissible
+                ]
+                if blocked_rows:
+                    st.caption(
+                        f"{len(blocked_rows)} proposed/expired row(s) are not "
+                        "dismissible (they touched validation, batching, "
+                        "reservation, or the broker) and stay in History."
+                    )
+                if not dismissible_rows:
+                    st.caption("No currently dismissible proposals.")
+                else:
+                    row_by_id = {row.proposal_id: row for row in dismissible_rows}
+                    # A rerun can shrink the dismissible set (another
+                    # process dismissed or claimed a row); a stale selection
+                    # outside the current options would error the widget.
+                    if "dismiss_selection" in st.session_state:
+                        st.session_state["dismiss_selection"] = [
+                            pid
+                            for pid in st.session_state["dismiss_selection"]
+                            if pid in row_by_id
+                        ]
+                    selection = st.multiselect(
+                        "Proposals to dismiss",
+                        list(row_by_id),
+                        key="dismiss_selection",
+                        format_func=lambda pid: (
+                            f"{pid} ({row_by_id[pid].side.upper()} "
+                            f"{row_by_id[pid].shares} {row_by_id[pid].ticker}, "
+                            f"{row_by_id[pid].status})"
+                        ),
+                    )
+                    if selection:
+                        selection_preview = store.proposal_dismissal_eligibility(
+                            selection
+                        )
+                        st.dataframe(
+                            [
+                                {
+                                    "Proposal ID": row.proposal_id,
+                                    "Ticker": row.ticker,
+                                    "Side": row.side,
+                                    "Shares": row.shares,
+                                    "Status": row.status,
+                                    "Created": row.created_at,
+                                    "Expires": row.expires_at,
+                                }
+                                for row in selection_preview.rows
+                            ],
+                            use_container_width=True,
+                            hide_index=True,
+                        )
+                        dismiss_reason = st.text_input(
+                            "Dismissal reason (required)",
+                            key="dismiss_reason",
+                        )
+                        dismiss_phrase = f"dismiss {len(selection)} proposals"
+                        dismiss_confirmation = st.text_input(
+                            f'Type "{dismiss_phrase}" to enable the button',
+                            key="dismiss_confirmation",
+                        )
+                        if st.button(
+                            "Dismiss selected proposals",
+                            key="dismiss_button",
+                            disabled=(
+                                not dismiss_reason.strip()
+                                or dismiss_confirmation.strip() != dismiss_phrase
+                                or tuple(selection)
+                                != selection_preview.dismissible_ids
+                            ),
+                        ):
+                            try:
+                                dismissal = store.dismiss_proposals(
+                                    selection,
+                                    dismissed_by="local_operator",
+                                    reason=dismiss_reason,
+                                    expected_preview_hash=(
+                                        selection_preview.preview_hash
+                                    ),
+                                )
+                            except ValueError as exc:
+                                st.error(f"Dismissal refused: {exc}")
+                            else:
+                                # Stale per-proposal approval/override/cancel
+                                # state must die with the dismissal so no
+                                # snapshot can re-offer controls for these IDs.
+                                for pid in (
+                                    dismissal.dismissed_ids
+                                    + dismissal.already_dismissed_ids
+                                ):
+                                    for stale_key in (
+                                        f"confirm_{pid}",
+                                        f"override_available_{pid}",
+                                        f"override_confirm_{pid}",
+                                        f"committee_result_{pid}",
+                                        f"content_digest_{pid}",
+                                        f"cancel_confirmation_{pid}",
+                                    ):
+                                        st.session_state.pop(stale_key, None)
+                                for own_key in (
+                                    "dismiss_selection",
+                                    "dismiss_reason",
+                                    "dismiss_confirmation",
+                                ):
+                                    st.session_state.pop(own_key, None)
+                                # The success message must survive the
+                                # refresh rerun, so it travels via a
+                                # non-widget session key.
+                                st.session_state["dismissal_notice"] = (
+                                    f"Dismissed "
+                                    f"{len(dismissal.dismissed_ids)} "
+                                    "proposal(s). They remain in the local "
+                                    "audit history and cannot be executed."
+                                )
+                                st.rerun()
 
         unresolved = [p for p in stored if p["status"] in MANUAL_RECONCILIATION_STATUSES]
         if unresolved:

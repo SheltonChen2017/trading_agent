@@ -1,200 +1,183 @@
 # Development session handoff
 
-Prepared: 2026-08-04 after Codex independently reviewed and corrected
-Claude's UI-3 interactive Backtest page, and Claude counter-reviewed the
-review, confirming every finding red on the submitted snapshot and closing
-one further P3 (CRUI3-001) from the same failure class.
+Prepared: 2026-08-04 after Claude implemented UI-2d (durable proposal
+dismiss/archive) and pushed it for independent review.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
 
-UI-3 is **complete, independently accepted after correction, and
-counter-review confirmed**. No P0 or
-P1 issue, live-authority escape, broker interaction, secret exposure, or
-durable-state change was found.
+UI-2d — dismiss/archive for unused proposals — is **implemented and pushed,
+awaiting independent review**. This is the first UI Phase 2 milestone that
+changes durable runtime state (a new lifecycle status and payload metadata),
+though it grants no execution authority. The contract is
+`docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` (as
+rewritten by the 2026-08-03 plan review: dismissal only — automatic expiry
+is a separately approved follow-up that was NOT implemented, and physical
+purge remains deferred).
 
-Claude's counter-review (appended to the review report) independently
-re-proved all three findings red on submitted snapshot `198339d`
-(empty-data `{1: 0}` result; `21.9` truncation; `[-5]` horizon forwarded),
-accepted the corrections as written, and found/fixed one residual member of
-the same class: **CRUI3-001 (P3)** — coverage was validated OUTSIDE the
-cached real-data loader, so `st.cache_data` would cache a transient
-failed/empty fetch for the full 1-hour TTL (exceptions are never cached;
-return values are). Both cached loaders now validate coverage inside their
-bodies and return `(data, coverage)`; a source-level regression pins the
-call-site invariant and its reverse mutation was shown red then green. Claude's architecture was strong: the ninth
-Streamlit page composes the existing walk-forward engine through a pure
-research helper, defaults to synthetic data, fixes executable entry timing at
-`next_open`, caches real yfinance data, persists results without automatic
-reruns, labels research limitations, and exposes no proposal/order/policy or
-registry action.
+What was implemented, per that plan:
 
-Review resolved two P2 research-correctness findings and one P3 proof gap at
-`540467e`:
+- **Lifecycle** (`assistant/proposal_status.py`): terminal `DISMISSED`
+  status appended to `STATUSES`; deliberately absent from
+  IN_FLIGHT/UNRESOLVED/ACTIVE/TERMINAL_BROKER sets (holds no ticker/side
+  slot, implies no broker order); `DISMISSIBLE_SOURCE_STATUSES = (proposed,
+  expired)` — `override_available` is excluded because it proves validation
+  was attempted. UI-2b's exhaustive outcome mapping gained
+  `dismissed -> Closed without fill` (the exhaustiveness test forced this
+  same-change update, exactly as designed), and the frozen literals in
+  `tests/test_proposal_outcome_groups.py` and
+  `tests/test_personal_assistant_ui.py` were updated as deliberate reviewed
+  regroupings.
+- **Storage** (`assistant/storage.py`): `proposal_dismissal_eligibility()`
+  (read-only preview: per-row verdicts, exact refusal reasons, and a
+  canonical sha256 preview hash over id/status/updated_at/verdicts) and
+  `dismiss_proposals()` (BEGIN IMMEDIATE; recomputes eligibility with the
+  SAME shared `_dismissal_records()` rule so preview and mutation can never
+  drift; refuses all-or-nothing when any non-dismissed row is ineligible;
+  refuses a stale preview hash; per-row compare-and-set UPDATE guarded by
+  rowcount; writes dismissed_at/by/reason/from_status into the payload in
+  the same transaction; idempotent replay when every row is already
+  dismissed — original metadata never rewritten, nothing enforced or
+  written). Eligibility refuses on: non-dismissible status, any
+  broker_orders/broker_order_events/execution_reservations child row,
+  any allocation-batch payload reference (proposal_ids or legs; an
+  UNREADABLE batch payload fails closed against every candidate), and any
+  execution-shaped payload key (`_DISMISSAL_EXECUTION_EVIDENCE_KEYS`:
+  approved_at, broker_order, broker_order_update, broker_status,
+  cancel_requested_at, error, executed_at, filled_at, policy_override,
+  reconciled_at, submitted_at, violations) so a status corrupted back to
+  `proposed` still refuses. `list_proposals()` gained keyword-only
+  `include_dismissed`/`include_expired` flags (default True for audit
+  callers; applied ONLY when `status is None` so an explicit exact-status
+  selection always wins). No schema migration was needed: `status` is an
+  unconstrained TEXT column and the payload is JSON.
+- **CLI** (`scripts/run_personal_assistant.py`): `dismiss-proposals`
+  defaults to preview (JSON rows + refusal reasons + preview hash);
+  mutation requires `--reason`, `--confirm-preview-hash <sha256>` AND
+  `--confirm-dismiss unused-paper-proposals`; calls the same storage
+  functions as the UI.
+- **UI** (`scripts/personal_assistant_ui.py`): History gains default-off
+  `Include expired proposals` / `Include dismissed proposals` checkboxes
+  (whitelisted benign filters) that govern ONLY the unfiltered view —
+  outcome-group or exact-status selection always shows its rows, with a
+  caption stating the auto-visibility when expired/dismissed is selected
+  and a "Hiding X and Y" caption otherwise. The "Manage unused proposals"
+  expander lists only currently dismissible rows (storage decides; the UI
+  reproduces no eligibility rule), shows a preview table, requires a
+  non-empty reason plus the exact phrase `dismiss N proposals`, and the
+  button stays disabled until both match. Success clears every
+  per-proposal confirm/override/committee/digest/cancel session key for
+  the dismissed IDs plus the expander's own keys, then reruns with the
+  notice carried in a non-widget session key. The
+  `dismiss_selection`/`dismiss_reason`/`dismiss_confirmation` keys are
+  deliberately NOT navigation-persistent (added to the sensitive-key
+  structural test). `_proposal_status_category()` gained a "dismissed"
+  branch ahead of every fallback so a stale card renders the dismissal
+  record, never approval controls or "in progress".
 
-- empty/partial provider responses and impossible signal/history combinations
-  can no longer appear as a fully covered zero-signal result;
-- fractional integer parameters are no longer truncated, and invalid
-  horizons or negative/non-finite slippage fail closed;
-- completed session results now retain actual data coverage, selected
-  horizons, entry timing, and slippage, with missing/short histories disclosed;
-- UI/engine equivalence compares complete DataFrames instead of row counts;
-  a stored-real-result AppTest pins the exploratory/coverage warnings; and
-- the research boundary is enforced across the complete reachable first-party
-  import graph, not merely direct imports.
-
-The review is documented in
-`docs/REVIEW_2026-08-04_UI3_BACKTEST_PAGE.md`.
+Deliberately NOT implemented: `expire_due_proposals()`/`expire-proposals`
+(the optional follow-up), any physical deletion, any broker call in
+dismissal code, any change to approval/claim/reconciliation logic (a
+dismissed row is simply never claimable because claims expect
+proposed/override_available — pinned by test).
 
 ## 2. Canonical Git state
 
 Repository: https://github.com/SheltonChen2017/trading_agent
 
-    base/main/origin-main = 1286966 (post PR #140)
-    Claude implementation = 198339d
-    Claude documentation/handoff = d664402
-    Claude branch = user/claude/ui-3-backtest-page-20260804 (pushed)
-    Codex correction = 540467e
-    Codex review records = 538eae9
-    first pushed replacement handoff = 8be0f20
-    Codex branch = codex/review-ui-3-backtest-20260804
-    Claude counter-review correction (CRUI3-001) = branch-tip commit
-        containing this file, on the same Codex review branch
-    canonical handoff = branch-tip commit containing this file
+    base/main/origin-main = 5cb831c (post PR #142)
+    implementation = the first commit on this branch
+    docs/handoff = the branch-tip commit containing this file
+    branch = user/claude/ui-2d-proposal-dismissal-20260804 (pushed)
 
-Counter-review validation on the exact final tree: focused suites 89
-passed; full suite 2,614 passed, 1 skipped, 25 warnings in 367.56s;
-compileall and `git diff --check` clean (Python 3.13).
+Nothing has been merged. The owner opens the PR (this machine's gh account
+cannot create PRs).
 
-The Codex review branch was pushed and `8be0f20` was verified byte-for-byte
-against GitHub with `git ls-remote` after one transient connection timeout;
-this post-push handoff update is the final branch-tip commit and must also be
-remote-verified. UI-3 has not been merged and Codex has not opened a pull
-request.
+## 3. Validation (development machine, Python 3.13, exact final tree)
 
-## 3. Commit-by-commit dispositions
+    dismissal storage + CLI tests (tests/test_proposal_dismissal.py): 43
+    History dismissal AppTests (tests/test_ui_history_dismissal.py): 6
+    all UI-2d-adjacent focused suites (incl. outcome groups, UI-2b filter,
+        UI helpers, feature controls, import boundary): 124 passed
+    full suite: 2,663 passed, 1 skipped, 25 warnings in 629.63s
+    compileall (all packages + root modules): clean
+    git diff --check: clean
 
-- `198339d` — **accepted after correction**. Core engine composition, frozen
-  six-signal inventory, routing, caching, session behavior, caveats, chart
-  semantics, and read-only authority boundary are correct. `UI3REV-001` and
-  `UI3REV-002` required production corrections; `UI3REV-003` required stronger
-  regression proof.
-- `d664402` — **accepted after documentation replacement**. Its plan/README
-  accurately described the submitted intent and its handoff accurately marked
-  UI-3 awaiting review. Completion status, validation, and coverage-limit text
-  are superseded by the corrected review records and this handoff.
-- `540467e` — **accepted**. Corrects data coverage/sufficiency and strict
-  experiment validation, strengthens stored attribution, exact-frame
-  equivalence, real-result warnings, and transitive research boundaries.
-- `538eae9` — **accepted**. Updates the adopted action plan and README, adds
-  the binding review report, and adds the required two-paragraph completed
-  milestone record.
-- `8be0f20` — **accepted**. Replaces the canonical handoff with the completed
-  corrected-review state.
+Reverse-mutation proofs (each applied, shown red, restored):
 
-## 4. P0-P3 issue summary
+1. Widening `DISMISSIBLE_SOURCE_STATUSES` with `approved` → caught by
+   THREE tests (lifecycle literal, the parametrized per-status refusal,
+   and all-or-nothing).
+2. Disabling the preview-hash comparison in `dismiss_proposals` → caught
+   at BOTH layers (storage stale-hash test and the CLI wrong-hash test).
+3. Removing the `dismissed` branch from `_proposal_status_category` →
+   caught by the exhaustive status-router coverage test (dismissed fell
+   through to "in_progress").
 
-| ID | Priority | Status | Summary |
-|---|---:|---|---|
-| UI3REV-001 | P2 | Resolved at `540467e` | Empty/partial real data and insufficient signal history could be presented as a valid full-scope no-signal result. UI-3 now fails empty/impossible runs, stores actual coverage, and visibly discloses missing or short histories. |
-| UI3REV-002 | P2 | Resolved at `540467e` | Fractional integer parameters were silently truncated and invalid horizons/slippage reached the engine. All numeric experiment boundaries now validate finite values and fail closed without changing the requested experiment. |
-| UI3REV-003 | P3 | Resolved at `540467e` | Equivalence checked row counts only, real-result warnings lacked an AppTest, and the authority boundary checked direct imports only. Exact frames, stored-real warnings, frozen history semantics, and transitive reachability are now regression-tested and mutation-proven. |
+Known coverage limits, stated for the reviewer: there is no
+multi-process/threaded concurrency test for dismiss-vs-claim races (the
+compare-and-set UPDATE + BEGIN IMMEDIATE + the benign-state-change hash
+test cover the mechanism single-threaded, and claim_proposal's own
+concurrency coverage exists elsewhere); the UI expander's
+stale-selection sanitization (another process dismissing a selected row
+mid-session) is exercised only indirectly through the hash-refusal path.
 
-No P0 or P1 issue was found. See the review report for the full reason,
-evidence, correction, and verification columns retained for each item.
+## 4. Review guidance
 
-## 5. Completed UI-3 behavior and limits
+Review range: the implementation commit plus this handoff commit on
+`user/claude/ui-2d-proposal-dismissal-20260804`, based on `5cb831c`. The
+contract is `docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md`
+sections 3–8 and 10 (dismissal scope only). Adversarial attention is most
+useful on:
 
-The Backtest page exposes six price-only signal scanners: dip/up z-score,
-cross-sectional momentum, relative dip/up, 52-week breakout, 52-week-high
-proximity, and volatility-scaled momentum. PEAD/fundamentals remain excluded
-because they require an earnings feed; residual momentum/reversal and
-idiosyncratic volatility remain excluded because they require precomputed
-residual or benchmark inputs.
+- the eligibility rule: any way a proposal that touched
+  validation/batching/reservation/broker can still pass (payload-key set
+  completeness; the allocation-batch scan's `proposal_ids`+`legs` reach);
+- the preview-hash canonicalization: any state change that should
+  invalidate a confirmation but does not alter the hash inputs
+  (id/status/updated_at/dismissible/refusal_reasons);
+- the idempotent-replay branch (all-rows-dismissed → no-op without hash
+  enforcement): whether it can be abused to skip a check;
+- transaction discipline in `dismiss_proposals` (BEGIN IMMEDIATE, rowcount
+  guard, rollback paths, connection close);
+- Streamlit state: the pre-instantiation sanitization of
+  `dismiss_selection`, post-success key clearing + rerun notice, and that
+  no dismissal key survives navigation; and
+- CLI confirmation ordering (preview default, exact confirm string, hash
+  required, refusals exit nonzero without partial writes).
 
-The page offers synthetic or yfinance data, whole-universe or basket scope,
-signal-specific parameters, history length, and fixed hold-horizon choices.
-An explicit Run button is the only computation trigger. It renders a
-multi-horizon summary and an equal-weight running sum of per-signal net
-returns by direction. The chart is explicitly not a compounded portfolio
-equity curve; overlapping holds and no capital constraint remain disclosed.
+## 5. What is next (do not start without owner direction)
 
-Synthetic output is a plumbing check whose expected win rate is about 50%.
-Real output is exploratory, not point-in-time, uncorrected for multiple looks,
-and not evidence of edge. Confirmatory significance/out-of-sample work remains
-CLI-only. No UI result can create, approve, size, submit, cancel, reconcile, or
-dismiss a proposal/order, write the research registry, or change policy.
+- Independent review of this branch, then the owner's merge decision.
+- The optional automatic-expiry follow-up remains unapproved and
+  unimplemented; physical purge remains deferred and owner-authorized.
+- UI Phase 2 is otherwise complete (UI-2a/2b/2c/3 reviewed; UI-2d in
+  review). Phase 5 (operational deployment + epoch start) remains
+  owner-heavy, blocked only on the four decisions in
+  `docs/PHASE5_DEPLOYMENT_SESSION.md` §2. Note: if the owner starts a
+  model-1 frozen-runtime epoch before this branch merges, deployment of
+  UI-2d to the operational machine waits for the epoch boundary.
 
-## 6. Validation
+## 6. Non-negotiable boundaries
 
-Environment: Python 3.13.14.
+- Paper trading is the only execution mode in scope.
+- Dismissal is archive, never delete: no row, payload, or idempotency key
+  leaves the database, and no cleanup action can call the broker or alter
+  an order.
+- Only never-broker-touched `proposed`/`expired` rows are dismissible;
+  everything else is permanent audit history.
+- A dismissed proposal can never be approved, claimed, or executed —
+  through service, CLI, or stale UI state.
+- ML/LLM output remains advisory or observational only.
+- Never commit credentials, operator databases, licensed data, or evidence
+  artifacts.
 
-- Submitted focused baseline re-run: 72 passed in 138.52s.
-- Initial corrected UI-3 unit/AppTest set: 33 passed in 51.25s.
-- Final corrected adjacent focused set: 88 passed in 144.16s.
-- Full suite on exact code commit `540467e`: 2,613 passed, 1 skipped,
-  25 warnings in 633.75s.
-- Compileall over required packages/root modules: clean.
-- `git diff --check`: clean.
+## 7. Machine-local state
 
-Red/green evidence:
-
-- twelve strict-validation/data regressions failed on the submitted behavior
-  and passed after correction;
-- the impossible 252-session breakout on 160 rows failed red, then rejected
-  clearly after correction;
-- forcing zero slippage in the UI failed exact-frame comparison on every
-  `net_return_pct`, then passed after restoration;
-- suppressing incomplete-coverage presentation failed the stored-real-result
-  AppTest, then passed after restoration; and
-- an indirect `backtest.interactive -> backtest.engine -> assistant` import
-  failed with the complete chain, then passed after restoration.
-
-The 25 warnings are the existing WebSockets legacy and joblib/NumPy
-deprecations. Tests do not call the live yfinance network path; deterministic
-fixtures exercise empty, partial, short-history, attribution, and presentation
-semantics without an external request.
-
-## 7. What is next
-
-Per `docs/ACTION_PLAN_2026-08-02.md`, UI-2d is the next planned UI milestone,
-but **do not start it without owner direction**. Its first release is durable
-dismiss/archive, never physical deletion: add terminal `dismissed`, hide it by
-default while retaining audit/idempotency data, and permit it only for narrowly
-defined never-broker-touched proposals. It needs its own branch,
-migration/concurrency coverage, and independent review. Adding `dismissed`
-must update UI-2b's exhaustive outcome map.
-
-Automatic expiry remains a separately approved optional lifecycle milestone.
-Physical purge remains deferred and separately owner-authorized.
-
-Phase 5 operational deployment/epoch start remains owner-heavy. Do not run
-elevated installer actions, install scheduled tasks, approve the mandate, or
-start a formal evidence epoch without the owner's explicit direction and the
-decisions in `docs/PHASE5_DEPLOYMENT_SESSION.md` section 2.
-
-## 8. Machine-local and safety state
-
-The owner's Streamlit app may be running from an earlier checkout. This review
-did not stop, restart, or interact with it. No Alpaca endpoint, operator
-database, scheduled task, research registry, evidence artifact, or external
-data provider was contacted or mutated. All tests used their isolated data.
-
-At review start, only the primary worktree was registered. Claude and Codex
-share this checkout, so re-check `HEAD` and `git status` before every future
-stage/commit and preserve work not authored by the current agent.
-
-On resume, read in this order:
-
-1. `CLAUDE.md` and `AGENTS.md`;
-2. `docs/ACTION_PLAN_2026-08-02.md`;
-3. this handoff;
-4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` and
-   `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`; and
-5. `docs/REVIEW_2026-08-04_UI3_BACKTEST_PAGE.md`.
-
-Suggested resume prompt: "Read the required repository instructions and the
-canonical handoff, then verify local/remote Git state. Do not start UI-2d or
-Phase 5 actions until the owner explicitly directs them."
+The owner's Streamlit app may be running from an earlier checkout; it does
+not gain dismissal until this branch merges and the app reloads. This
+session did not stop, restart, or mutate that process. All tests ran
+against the pytest-isolated session database; the operator database was
+not touched.

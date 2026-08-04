@@ -22,6 +22,9 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from assistant.proposal_status import (
+    DISMISSED,
+    DISMISSIBLE_SOURCE_STATUSES,
+    EXPIRED,
     FILLED,
     STATUSES,
     UNRESOLVED_BROKER_STATE_STATUSES,
@@ -151,6 +154,131 @@ def _reject_execution_shaped_values(value: Any, *, path: str = "prediction.value
 
 def configured_db_path() -> Path:
     return Path(os.environ.get("TRADING_ASSISTANT_DB", DEFAULT_DB_PATH))
+
+
+# UI-2d: payload keys that only validation/approval/override/submission/
+# broker/reconciliation code paths ever write into a proposal payload. A
+# pristine generated proposal (see assistant/proposals.py TradeProposal)
+# carries none of them. Their PRESENCE is execution-shaped evidence, so a
+# proposal whose status was somehow corrupted back to "proposed" still
+# refuses dismissal. Extending this tuple is a reviewed change.
+_DISMISSAL_EXECUTION_EVIDENCE_KEYS: tuple[str, ...] = (
+    "approved_at",
+    "broker_order",
+    "broker_order_update",
+    "broker_status",
+    "cancel_requested_at",
+    "error",
+    "executed_at",
+    "filled_at",
+    "policy_override",
+    "reconciled_at",
+    "submitted_at",
+    "violations",
+)
+
+
+@dataclass(frozen=True)
+class DismissalPreviewRow:
+    """One proposal's dismissibility verdict with its exact refusal
+    reasons. `status`/`updated_at` participate in the preview hash so any
+    concurrent state change invalidates a confirmation built on this row."""
+
+    proposal_id: str
+    ticker: str
+    side: str
+    shares: Any
+    status: str
+    created_at: str
+    expires_at: str
+    updated_at: str
+    dismissible: bool
+    refusal_reasons: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class DismissalPreview:
+    rows: tuple[DismissalPreviewRow, ...]
+    dismissible_ids: tuple[str, ...]
+    preview_hash: str
+
+
+@dataclass(frozen=True)
+class DismissalResult:
+    """dismissed_ids: rows transitioned by THIS call. already_dismissed_ids:
+    rows that were dismissed before the call (idempotent replay -- their
+    original metadata is never rewritten). dismissed_at is None when the
+    call wrote nothing."""
+
+    dismissed_ids: tuple[str, ...]
+    already_dismissed_ids: tuple[str, ...]
+    dismissed_at: str | None
+
+
+def _preview_row_from_record(record: dict[str, Any]) -> DismissalPreviewRow:
+    intent = record["payload"].get("intent") or {}
+    return DismissalPreviewRow(
+        proposal_id=record["proposal_id"],
+        ticker=str(intent.get("ticker", "?")),
+        side=str(intent.get("side", "?")),
+        shares=intent.get("shares", "?"),
+        status=record["status"],
+        created_at=record["created_at"],
+        expires_at=record["expires_at"],
+        updated_at=record["updated_at"],
+        dismissible=record["dismissible"],
+        refusal_reasons=record["refusal_reasons"],
+    )
+
+
+def _preview_from_records(records: list[dict[str, Any]]) -> DismissalPreview:
+    rows = tuple(_preview_row_from_record(record) for record in records)
+    canonical = json.dumps(
+        [
+            {
+                "proposal_id": row.proposal_id,
+                "status": row.status,
+                "updated_at": row.updated_at,
+                "dismissible": row.dismissible,
+                "refusal_reasons": list(row.refusal_reasons),
+            }
+            for row in rows
+        ],
+        sort_keys=True,
+    )
+    return DismissalPreview(
+        rows=rows,
+        dismissible_ids=tuple(row.proposal_id for row in rows if row.dismissible),
+        preview_hash=hashlib.sha256(canonical.encode("utf-8")).hexdigest(),
+    )
+
+
+def _allocation_batch_references(
+    connection: sqlite3.Connection,
+) -> tuple[dict[str, set[str]], tuple[str, ...]]:
+    """Map proposal_id -> batch_ids referencing it, scanning payload JSON
+    (there is no foreign key from allocation_batches to trade_proposals).
+    A batch payload that cannot be parsed fails CLOSED: the error string is
+    attached to every candidate, because an unreadable batch might
+    reference any of them and 'unused' can no longer be proven."""
+    referenced: dict[str, set[str]] = {}
+    errors: list[str] = []
+    for row in connection.execute(
+        "SELECT batch_id, payload_json FROM allocation_batches"
+    ).fetchall():
+        try:
+            payload = json.loads(row["payload_json"])
+            proposal_ids = payload.get("proposal_ids") or []
+            leg_ids = list((payload.get("legs") or {}).keys())
+        except (ValueError, TypeError, AttributeError):
+            errors.append(
+                f"allocation batch {row['batch_id']} payload is unreadable; "
+                "cannot prove the proposal is unused"
+            )
+            continue
+        for proposal_id in list(proposal_ids) + leg_ids:
+            referenced.setdefault(str(proposal_id), set()).add(row["batch_id"])
+    return referenced, tuple(errors)
 
 
 class DuplicateIntentConflict(Exception):
@@ -2700,12 +2828,37 @@ class AssistantStore:
                 return None
         return payload
 
-    def list_proposals(self, status: str | None = None, limit: int = 100) -> list[dict[str, Any]]:
+    def list_proposals(
+        self,
+        status: str | None = None,
+        limit: int = 100,
+        *,
+        include_dismissed: bool = True,
+        include_expired: bool = True,
+    ) -> list[dict[str, Any]]:
+        """Newest proposals, optionally excluding archive-class rows.
+
+        The visibility flags (UI-2d) default to True so every existing
+        audit caller keeps seeing complete history, and they apply ONLY
+        when `status is None`: an explicit exact-status selection always
+        wins, so asking for `status="dismissed"` can never be silently
+        contradicted by a hidden visibility flag.
+        """
         query = "SELECT payload_json, status FROM trade_proposals"
+        clauses: list[str] = []
         params: list[Any] = []
         if status is not None:
-            query += " WHERE status = ?"
+            clauses.append("status = ?")
             params.append(status)
+        else:
+            if not include_dismissed:
+                clauses.append("status != ?")
+                params.append(DISMISSED)
+            if not include_expired:
+                clauses.append("status != ?")
+                params.append(EXPIRED)
+        if clauses:
+            query += " WHERE " + " AND ".join(clauses)
         query += " ORDER BY created_at DESC LIMIT ?"
         params.append(limit)
         with self._connect() as connection:
@@ -2800,6 +2953,241 @@ class AssistantStore:
             proposal["status"] = row["status"]
             result.append(proposal)
         return result
+
+    # --- UI-2d: proposal dismissal (archive, never delete) -----------------
+    #
+    # Dismissal removes an unused proposal from the DEFAULT History view
+    # while retaining its complete database row, payload, and unique
+    # idempotency key. It is the narrow, audited alternative to deletion:
+    # no row leaves the database, no broker call is made, and only rows
+    # that provably never touched validation, approval, reservation,
+    # allocation batching, or any broker lifecycle qualify.
+
+    def proposal_dismissal_eligibility(self, proposal_ids) -> "DismissalPreview":
+        """Read-only preview: per-proposal dismissibility, exact refusal
+        reasons, and a canonical hash binding the preview to current
+        database state. The mutation requires that hash, so the user can
+        never confirm one set of proposals while a refresh or concurrent
+        process changes their state or identity."""
+        ids = self._validated_dismissal_ids(proposal_ids)
+        with self._connect() as connection:
+            records = self._dismissal_records(connection, ids)
+        return _preview_from_records(records)
+
+    def dismiss_proposals(
+        self,
+        proposal_ids,
+        *,
+        dismissed_by: str,
+        reason: str,
+        expected_preview_hash: str,
+    ) -> "DismissalResult":
+        """Atomically dismiss the requested proposals, all-or-nothing.
+
+        Inside one BEGIN IMMEDIATE transaction, eligibility is recomputed
+        with the same rule as the preview and the recomputed preview hash
+        must equal `expected_preview_hash` -- any concurrent state change
+        (a claim, an expiry, another dismissal of PART of the selection)
+        alters a row's status/updated_at and therefore the hash, so the
+        stale confirmation is refused and nothing is written.
+
+        Idempotent replay: when EVERY requested proposal is already
+        `dismissed`, the call reports them as already dismissed and writes
+        nothing (the original dismissal metadata is never rewritten); the
+        hash is not enforced on that no-op path because no state changes.
+
+        Never calls a broker and never creates order/event/reservation
+        rows; the payload gains dismissed_at/by/reason/from_status in the
+        same transaction as the status transition.
+        """
+        ids = self._validated_dismissal_ids(proposal_ids)
+        if not isinstance(dismissed_by, str) or not dismissed_by.strip():
+            raise ValueError("dismissed_by must be a non-empty string.")
+        if not isinstance(reason, str) or not reason.strip():
+            raise ValueError("A non-empty dismissal reason is required.")
+
+        connection = self._open_database(self.path)
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            records = self._dismissal_records(connection, ids)
+
+            already = tuple(
+                record["proposal_id"]
+                for record in records
+                if record["status"] == DISMISSED
+            )
+            pending = [
+                record for record in records if record["status"] != DISMISSED
+            ]
+            if not pending:
+                connection.rollback()
+                return DismissalResult(
+                    dismissed_ids=(),
+                    already_dismissed_ids=already,
+                    dismissed_at=None,
+                )
+
+            refusals = {
+                record["proposal_id"]: record["refusal_reasons"]
+                for record in pending
+                if not record["dismissible"]
+            }
+            if refusals:
+                connection.rollback()
+                detail = "; ".join(
+                    f"{proposal_id}: {', '.join(reasons)}"
+                    for proposal_id, reasons in sorted(refusals.items())
+                )
+                raise ValueError(
+                    "Dismissal refused (all-or-nothing; nothing was "
+                    f"dismissed): {detail}"
+                )
+
+            current_hash = _preview_from_records(records).preview_hash
+            if current_hash != expected_preview_hash:
+                connection.rollback()
+                raise ValueError(
+                    "Stale dismissal preview: proposal state changed since "
+                    "the preview was generated. Nothing was dismissed -- "
+                    "refresh the preview and confirm again."
+                )
+
+            dismissed_at = datetime.now(timezone.utc).isoformat()
+            dismissed_ids: list[str] = []
+            for record in pending:
+                payload = record["payload"]
+                payload["status"] = DISMISSED
+                payload["dismissed_at"] = dismissed_at
+                payload["dismissed_by"] = dismissed_by.strip()
+                payload["dismissed_reason"] = reason.strip()
+                payload["dismissed_from_status"] = record["status"]
+                cursor = connection.execute(
+                    "UPDATE trade_proposals SET status = ?, payload_json = ?, "
+                    "updated_at = ? WHERE proposal_id = ? AND status = ?",
+                    (
+                        DISMISSED,
+                        json.dumps(payload, sort_keys=True),
+                        dismissed_at,
+                        record["proposal_id"],
+                        record["status"],
+                    ),
+                )
+                if cursor.rowcount != 1:
+                    raise ValueError(
+                        f"Concurrent change to {record['proposal_id']} during "
+                        "dismissal; nothing was dismissed."
+                    )
+                dismissed_ids.append(record["proposal_id"])
+            connection.commit()
+            return DismissalResult(
+                dismissed_ids=tuple(dismissed_ids),
+                already_dismissed_ids=already,
+                dismissed_at=dismissed_at,
+            )
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+
+    @staticmethod
+    def _validated_dismissal_ids(proposal_ids) -> tuple[str, ...]:
+        ids = tuple(proposal_ids)
+        if not ids:
+            raise ValueError("At least one proposal_id is required.")
+        if any(not isinstance(pid, str) or not pid for pid in ids):
+            raise ValueError("proposal_ids must be non-empty strings.")
+        if len(set(ids)) != len(ids):
+            raise ValueError("proposal_ids must be unique.")
+        return ids
+
+    def _dismissal_records(
+        self, connection: sqlite3.Connection, ids: tuple[str, ...]
+    ) -> list[dict[str, Any]]:
+        """THE eligibility rule, shared verbatim by preview and mutation so
+        the two can never drift. Every check runs against the same
+        connection (and, for the mutation, inside its transaction)."""
+        batch_referenced, batch_errors = _allocation_batch_references(connection)
+        records: list[dict[str, Any]] = []
+        for proposal_id in ids:
+            row = connection.execute(
+                "SELECT payload_json, status, created_at, expires_at, "
+                "updated_at FROM trade_proposals WHERE proposal_id = ?",
+                (proposal_id,),
+            ).fetchone()
+            if row is None:
+                records.append(
+                    {
+                        "proposal_id": proposal_id,
+                        "payload": {},
+                        "status": "(missing)",
+                        "created_at": "",
+                        "expires_at": "",
+                        "updated_at": "",
+                        "dismissible": False,
+                        "refusal_reasons": ("unknown proposal_id",),
+                    }
+                )
+                continue
+
+            reasons: list[str] = []
+            status = row["status"]
+            if status != DISMISSED and status not in DISMISSIBLE_SOURCE_STATUSES:
+                reasons.append(
+                    f"status {status!r} is not dismissible (only "
+                    f"{', '.join(DISMISSIBLE_SOURCE_STATUSES)} qualify)"
+                )
+            for table, label in (
+                ("broker_orders", "broker order"),
+                ("broker_order_events", "broker order event"),
+                ("execution_reservations", "execution reservation"),
+            ):
+                count = connection.execute(
+                    f"SELECT COUNT(*) FROM {table} WHERE proposal_id = ?",
+                    (proposal_id,),
+                ).fetchone()[0]
+                if count:
+                    reasons.append(f"{count} {label} row(s) reference it")
+            if proposal_id in batch_referenced:
+                reasons.append(
+                    "an allocation batch references it "
+                    f"({', '.join(sorted(batch_referenced[proposal_id]))})"
+                )
+            reasons.extend(batch_errors)
+
+            try:
+                payload = json.loads(row["payload_json"])
+                if not isinstance(payload, dict):
+                    raise ValueError("payload is not an object")
+            except (ValueError, TypeError):
+                payload = {}
+                reasons.append("payload JSON is unreadable")
+            evidence = sorted(
+                key
+                for key in _DISMISSAL_EXECUTION_EVIDENCE_KEYS
+                if key in payload
+            )
+            if evidence:
+                reasons.append(
+                    "payload carries execution-shaped evidence "
+                    f"({', '.join(evidence)})"
+                )
+
+            records.append(
+                {
+                    "proposal_id": proposal_id,
+                    "payload": payload,
+                    "status": status,
+                    "created_at": row["created_at"],
+                    "expires_at": row["expires_at"],
+                    "updated_at": row["updated_at"],
+                    "dismissible": not reasons and status != DISMISSED,
+                    "refusal_reasons": tuple(
+                        reasons if status != DISMISSED else ["already dismissed"]
+                    ),
+                }
+            )
+        return records
 
     def project_broker_order_event(
         self,

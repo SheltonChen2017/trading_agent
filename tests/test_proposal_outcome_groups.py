@@ -68,6 +68,10 @@ FROZEN_OUTCOME_MAPPING = {
     "canceled": "Closed without fill",
     "broker_expired": "Closed without fill",
     "expired": "Closed without fill",
+    # UI-2d (2026-08-04, deliberate reviewed regrouping): the dismissed
+    # archive status joins Closed without fill exactly as the action plan's
+    # frozen UI-2b group list pre-assigned it.
+    "dismissed": "Closed without fill",
 }
 
 

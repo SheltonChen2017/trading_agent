@@ -11,11 +11,13 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+import pandas as pd
 from streamlit.testing.v1 import AppTest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from backtest.interactive import (
+    BacktestDataCoverage,
     EXPLORATORY_CAVEATS,
     SYNTHETIC_CAVEAT,
     run_interactive_backtest,
@@ -81,9 +83,13 @@ def test_synthetic_run_completes_and_matches_the_engine():
 
     expected = _expected_default_run()
     for horizon in _HORIZONS:
-        assert len(run["results_by_horizon"][horizon]) == len(expected[horizon]), (
-            "UI backtest diverged from the direct engine run on identical "
-            "deterministic inputs -- the page is not the same experiment."
+        pd.testing.assert_frame_equal(
+            run["results_by_horizon"][horizon],
+            expected[horizon],
+            obj=(
+                "UI backtest result on identical deterministic inputs -- "
+                "the page must run the exact experiment it displays"
+            ),
         )
 
     # The deterministic seed produces flagged signals at this size, so the
@@ -104,6 +110,46 @@ def test_synthetic_result_carries_the_synthetic_caveat():
     # The exploratory (real-data) caveat belongs to real runs only; a
     # synthetic run must be labeled as plumbing, not as market evidence.
     assert EXPLORATORY_CAVEATS not in warnings
+
+
+def test_stored_real_result_carries_the_exploratory_caveat_without_refetching():
+    signal = signal_for_key("dips_and_ups")
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Backtest"
+    app.session_state["backtest_run"] = {
+        "signal_key": signal.key,
+        "signal_label": signal.label,
+        "param_values": {p.name: p.default for p in signal.params},
+        "source": "real",
+        "scope": _SCOPE,
+        "ticker_count": 2,
+        "data_coverage": BacktestDataCoverage(
+            requested_ticker_count=3,
+            loaded_ticker_count=2,
+            complete_ticker_count=1,
+            missing_tickers=("CCC",),
+            underfilled_tickers=(("BBB", 80),),
+        ),
+        "lookback_days": _LOOKBACK,
+        "hold_days_options": tuple(_HORIZONS),
+        "entry_timing": "next_open",
+        "slippage_pct": SLIPPAGE_PCT,
+        "results_by_horizon": _expected_default_run(),
+        "ran_at": "2026-08-04T12:00:00+00:00",
+    }
+    app.run()
+    assert not app.exception
+
+    warnings = " ".join(str(w.value) for w in app.warning)
+    assert EXPLORATORY_CAVEATS in warnings
+    assert SYNTHETIC_CAVEAT not in warnings
+    assert "Incomplete market-data coverage" in warnings
+    assert "loaded 2 of 3 requested tickers" in warnings
+    assert "missing: CCC" in warnings
+    assert "short history: BBB (80)" in warnings
+
+    captions = " ".join(str(c.value) for c in app.caption)
+    assert "(2 tickers)" in captions
 
 
 def test_results_survive_navigating_away_and_back():
@@ -137,6 +183,8 @@ def test_run_configuration_is_stated_with_the_results():
     assert "synthetic" in captions
     assert _BASKET in captions
     assert "next_open" in captions
+    assert "hold horizons [1, 5]" in captions
+    assert "slippage 0.15% per leg" in captions
 
 
 def test_the_page_has_no_action_shaped_controls():

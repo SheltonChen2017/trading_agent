@@ -1,17 +1,21 @@
 # Development session handoff
 
-Prepared: 2026-08-04 after Claude implemented UI-2d (durable proposal
-dismiss/archive) and pushed it for independent review.
+Prepared: 2026-08-04 after Codex independently reviewed and corrected
+Claude's UI-2d durable proposal dismissal/archive implementation.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
 
-UI-2d — dismiss/archive for unused proposals — is **implemented and pushed,
-awaiting independent review**. This is the first UI Phase 2 milestone that
-changes durable runtime state (a new lifecycle status and payload metadata),
-though it grants no execution authority. The contract is
+UI-2d — dismiss/archive for unused proposals — is **merged, independently
+accepted after correction, and complete against its dismissal-only definition
+of done**. The implementation merged to `main` as PR #143 at `8f2e9a7`; the
+independent correction is pushed on
+`codex/review-ui-2d-proposal-dismissal-20260804` at `a118470` and awaits the
+owner's pull-request/merge decision. This milestone changes durable proposal
+state (a new lifecycle status and payload metadata) but grants no execution
+authority. The contract is
 `docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` (as
 rewritten by the 2026-08-03 plan review: dismissal only — automatic expiry
 is a separately approved follow-up that was NOT implemented, and physical
@@ -32,7 +36,8 @@ What was implemented, per that plan:
   regroupings.
 - **Storage** (`assistant/storage.py`): `proposal_dismissal_eligibility()`
   (read-only preview: per-row verdicts, exact refusal reasons, and a
-  canonical sha256 preview hash over id/status/updated_at/verdicts) and
+  canonical SHA-256 preview hash over the complete durable proposal state)
+  and
   `dismiss_proposals()` (BEGIN IMMEDIATE; recomputes eligibility with the
   SAME shared `_dismissal_records()` rule so preview and mutation can never
   drift; refuses all-or-nothing when any non-dismissed row is ineligible;
@@ -41,9 +46,11 @@ What was implemented, per that plan:
   the same transaction; idempotent replay when every row is already
   dismissed — original metadata never rewritten, nothing enforced or
   written). Eligibility refuses on: non-dismissible status, any
-  broker_orders/broker_order_events/execution_reservations child row,
+  broker_orders/broker_order_events/execution_telemetry_events/
+  execution_reservations child row,
   any allocation-batch payload reference (proposal_ids or legs; an
-  UNREADABLE batch payload fails closed against every candidate), and any
+  unreadable or structurally malformed batch payload fails closed against
+  every candidate), and any
   execution-shaped payload key (`_DISMISSAL_EXECUTION_EVIDENCE_KEYS`:
   approved_at, broker_order, broker_order_update, broker_status,
   cancel_requested_at, error, executed_at, filled_at, policy_override,
@@ -87,78 +94,81 @@ proposed/override_available — pinned by test).
 
 Repository: https://github.com/SheltonChen2017/trading_agent
 
-    base/main/origin-main = 5cb831c (post PR #142)
-    implementation = the first commit on this branch
-    docs/handoff = the branch-tip commit containing this file
-    branch = user/claude/ui-2d-proposal-dismissal-20260804 (pushed)
+    implementation base = 5cb831c (post PR #142)
+    implementation = 6d287f0
+    implementation docs = 1ff8063
+    implementation merge / main / origin-main = 8f2e9a7 (PR #143)
+    review correction = a118470
+    review docs/handoff = branch-tip commit containing this file
+    review branch = codex/review-ui-2d-proposal-dismissal-20260804 (pushed)
 
-Nothing has been merged. The owner opens the PR (this machine's gh account
-cannot create PRs).
+The review correction and review record at `5a9fdbd` are available from
+`origin/codex/review-ui-2d-proposal-dismissal-20260804`. This follow-up handoff
+commit is pushed to the same branch after it is created, so another computer
+can resume with a normal `git fetch`.
 
-## 3. Validation (development machine, Python 3.13, exact final tree)
+Commit dispositions:
 
-    dismissal storage + CLI tests (tests/test_proposal_dismissal.py): 43
-    History dismissal AppTests (tests/test_ui_history_dismissal.py): 6
-    all UI-2d-adjacent focused suites (incl. outcome groups, UI-2b filter,
-        UI helpers, feature controls, import boundary): 124 passed
-    full suite: 2,663 passed, 1 skipped, 25 warnings in 629.63s
-    compileall (all packages + root modules): clean
-    git diff --check: clean
+- `6d287f0`: accepted after correction (UI2DREV-001 through UI2DREV-003);
+- `1ff8063`: accepted after replacement (post-merge handoff was stale);
+- `8f2e9a7`: accepted after correction; merge tree exactly matches `1ff8063`;
+- `a118470`: accepted independent production/test correction.
 
-Reverse-mutation proofs (each applied, shown red, restored):
+## 3. Findings and corrections
 
-1. Widening `DISMISSIBLE_SOURCE_STATUSES` with `approved` → caught by
-   THREE tests (lifecycle literal, the parametrized per-status refusal,
-   and all-or-nothing).
-2. Disabling the preview-hash comparison in `dismiss_proposals` → caught
-   at BOTH layers (storage stale-hash test and the CLI wrong-hash test).
-3. Removing the `dismissed` branch from `_proposal_status_category` →
-   caught by the exhaustive status-router coverage test (dismissed fell
-   through to "in_progress").
+The durable P0–P4 ledger is
+`docs/REVIEW_2026-08-04_UI2D_PROPOSAL_DISMISSAL.md`.
 
-Known coverage limits, stated for the reviewer: there is no
-multi-process/threaded concurrency test for dismiss-vs-claim races (the
-compare-and-set UPDATE + BEGIN IMMEDIATE + the benign-state-change hash
-test cover the mechanism single-threaded, and claim_proposal's own
-concurrency coverage exists elsewhere); the UI expander's
-stale-selection sanitization (another process dismissing a selected row
-mid-session) is exercised only indirectly through the hash-refusal path.
+- **UI2DREV-001 (P2, resolved at `a118470`)**: validation telemetry was not
+  disqualifying, so a status-corrupted proposal with a durable execution
+  attempt could be archived. `execution_telemetry_events` now refuses
+  dismissal.
+- **UI2DREV-002 (P2, resolved at `a118470`)**: a valid-JSON batch with a
+  string `proposal_ids` field was scanned character-by-character and could
+  miss its proposal reference. Batch objects, lists, mappings, and ID types
+  are now validated; malformed structure fails closed.
+- **UI2DREV-003 (P3, resolved at `a118470`)**: the preview hash omitted the
+  displayed intent and other durable identity. It now covers exact payload
+  JSON, idempotency key, timestamps, status, ID, and verdicts.
+- **UI2DREV-004 (P3, resolved by this documentation update)**: the handoff
+  and action plan still described UI-2d as unmerged and awaiting review after
+  PR #143 merged.
 
-## 4. Review guidance
+No P0, P1, P4, or open issue remains. Submitted code quality: **7.5/10**.
+Corrected code quality: **9.5/10**.
 
-Review range: the implementation commit plus this handoff commit on
-`user/claude/ui-2d-proposal-dismissal-20260804`, based on `5cb831c`. The
-contract is `docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md`
-sections 3–8 and 10 (dismissal scope only). Adversarial attention is most
-useful on:
+## 4. Validation (review machine, Python 3.13.14)
 
-- the eligibility rule: any way a proposal that touched
-  validation/batching/reservation/broker can still pass (payload-key set
-  completeness; the allocation-batch scan's `proposal_ids`+`legs` reach);
-- the preview-hash canonicalization: any state change that should
-  invalidate a confirmation but does not alter the hash inputs
-  (id/status/updated_at/dismissible/refusal_reasons);
-- the idempotent-replay branch (all-rows-dismissed → no-op without hash
-  enforcement): whether it can be abused to skip a check;
-- transaction discipline in `dismiss_proposals` (BEGIN IMMEDIATE, rowcount
-  guard, rollback paths, connection close);
-- Streamlit state: the pre-instantiation sanitization of
-  `dismiss_selection`, post-success key clearing + rerun notice, and that
-  no dismissal key survives navigation; and
-- CLI confirmation ordering (preview default, exact confirm string, hash
-  required, refusals exit nonzero without partial writes).
+- Three targeted regressions failed red on merged `8f2e9a7`, each for the
+  expected reason; all three passed at `a118470`.
+- UI-2d and History-focused suites: 107 passed in 69.32 seconds.
+- Adjacent execution telemetry, allocation batch, import-boundary, execution,
+  and schema suites: 184 passed in 79.17 seconds.
+- Full suite on code commit `a118470`: 2,666 passed, 1 skipped, 25 warnings in
+  531.89 seconds.
+- The warnings are the existing WebSockets legacy warning and 24 joblib/NumPy
+  deprecations.
+- Required compileall and pre-commit diff checks: clean. Final branch status
+  is verified after the documentation/handoff commit.
 
-## 5. What is next (do not start without owner direction)
+Known test limit: there is no dedicated multi-process/threaded
+dismiss-versus-claim race test. The `BEGIN IMMEDIATE` plus conditional-update
+mechanism is covered single-threaded here and `claim_proposal` concurrency is
+covered elsewhere. No defect was observed in that transaction design.
 
-- Independent review of this branch, then the owner's merge decision.
-- The optional automatic-expiry follow-up remains unapproved and
-  unimplemented; physical purge remains deferred and owner-authorized.
-- UI Phase 2 is otherwise complete (UI-2a/2b/2c/3 reviewed; UI-2d in
-  review). Phase 5 (operational deployment + epoch start) remains
-  owner-heavy, blocked only on the four decisions in
-  `docs/PHASE5_DEPLOYMENT_SESSION.md` §2. Note: if the owner starts a
-  model-1 frozen-runtime epoch before this branch merges, deployment of
-  UI-2d to the operational machine waits for the epoch boundary.
+## 5. What is next (do not start automatically)
+
+The immediate next step is the owner's pull-request/merge decision for the
+pushed review branch. Until it merges, `origin/main` contains the submitted
+UI-2d behavior without the three review corrections.
+
+UI Phase 2 is otherwise complete. Automatic expiry remains unapproved and
+unimplemented; physical purge remains deferred and owner-authorized. Phase 5
+operational deployment and epoch start remain owner-heavy and blocked on the
+four decisions in `docs/PHASE5_DEPLOYMENT_SESSION.md` section 2. Do not run
+elevated installers, install scheduled tasks, approve the mandate, bootstrap
+the operator ledger, or start an evidence epoch without explicit owner
+direction.
 
 ## 6. Non-negotiable boundaries
 
@@ -176,8 +186,21 @@ useful on:
 
 ## 7. Machine-local state
 
-The owner's Streamlit app may be running from an earlier checkout; it does
-not gain dismissal until this branch merges and the app reloads. This
-session did not stop, restart, or mutate that process. All tests ran
-against the pytest-isolated session database; the operator database was
-not touched.
+This review did not inspect, stop, restart, or mutate any separately running
+Streamlit process. It did not contact Alpaca, inspect credentials, mutate the
+operator database, install or alter scheduled tasks, access licensed data, or
+start an evidence epoch. All tests used pytest-isolated databases.
+
+On resume, read in this order:
+
+1. `CLAUDE.md` and `AGENTS.md`;
+2. `docs/ACTION_PLAN_2026-08-02.md`;
+3. this handoff;
+4. `docs/REVIEW_2026-08-04_UI2D_PROPOSAL_DISMISSAL.md`; and
+5. `docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md`.
+
+Suggested resume prompt: "Read the required instructions and canonical
+handoff, fetch all refs, and verify whether
+`codex/review-ui-2d-proposal-dismissal-20260804` was pushed or merged. Preserve
+the UI-2d correction commits. Do not begin automatic expiry, physical purge,
+or Phase 5 owner actions without explicit direction."

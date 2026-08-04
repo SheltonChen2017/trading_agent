@@ -238,13 +238,23 @@ def _preview_from_records(records: list[dict[str, Any]]) -> DismissalPreview:
             {
                 "proposal_id": row.proposal_id,
                 "status": row.status,
+                "created_at": row.created_at,
+                "expires_at": row.expires_at,
                 "updated_at": row.updated_at,
+                # Bind the confirmation to the complete durable proposal
+                # identity, not only the eligibility verdict. A future writer
+                # or manual repair that changes the payload/idempotency key
+                # without maintaining updated_at must still invalidate the
+                # operator's preview.
+                "idempotency_key": record["idempotency_key"],
+                "payload_json": record["payload_json"],
                 "dismissible": row.dismissible,
                 "refusal_reasons": list(row.refusal_reasons),
             }
-            for row in rows
+            for row, record in zip(rows, records, strict=True)
         ],
         sort_keys=True,
+        separators=(",", ":"),
     )
     return DismissalPreview(
         rows=rows,
@@ -268,8 +278,24 @@ def _allocation_batch_references(
     ).fetchall():
         try:
             payload = json.loads(row["payload_json"])
+            if not isinstance(payload, dict):
+                raise TypeError("allocation batch payload is not an object")
             proposal_ids = payload.get("proposal_ids") or []
-            leg_ids = list((payload.get("legs") or {}).keys())
+            legs = payload.get("legs") or {}
+            if (
+                not isinstance(proposal_ids, list)
+                or any(
+                    not isinstance(proposal_id, str) or not proposal_id
+                    for proposal_id in proposal_ids
+                )
+                or not isinstance(legs, dict)
+                or any(
+                    not isinstance(proposal_id, str) or not proposal_id
+                    for proposal_id in legs
+                )
+            ):
+                raise TypeError("allocation batch reference fields are malformed")
+            leg_ids = list(legs)
         except (ValueError, TypeError, AttributeError):
             errors.append(
                 f"allocation batch {row['batch_id']} payload is unreadable; "
@@ -3112,7 +3138,8 @@ class AssistantStore:
         for proposal_id in ids:
             row = connection.execute(
                 "SELECT payload_json, status, created_at, expires_at, "
-                "updated_at FROM trade_proposals WHERE proposal_id = ?",
+                "idempotency_key, updated_at FROM trade_proposals "
+                "WHERE proposal_id = ?",
                 (proposal_id,),
             ).fetchone()
             if row is None:
@@ -3124,6 +3151,8 @@ class AssistantStore:
                         "created_at": "",
                         "expires_at": "",
                         "updated_at": "",
+                        "idempotency_key": "",
+                        "payload_json": "",
                         "dismissible": False,
                         "refusal_reasons": ("unknown proposal_id",),
                     }
@@ -3140,6 +3169,7 @@ class AssistantStore:
             for table, label in (
                 ("broker_orders", "broker order"),
                 ("broker_order_events", "broker order event"),
+                ("execution_telemetry_events", "execution telemetry event"),
                 ("execution_reservations", "execution reservation"),
             ):
                 count = connection.execute(
@@ -3181,6 +3211,8 @@ class AssistantStore:
                     "created_at": row["created_at"],
                     "expires_at": row["expires_at"],
                     "updated_at": row["updated_at"],
+                    "idempotency_key": row["idempotency_key"],
+                    "payload_json": row["payload_json"],
                     "dismissible": not reasons and status != DISMISSED,
                     "refusal_reasons": tuple(
                         reasons if status != DISMISSED else ["already dismissed"]

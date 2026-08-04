@@ -57,3 +57,29 @@ The real network fetch itself remains uncalled in tests; provider underfill and
 presentation behavior are tested deterministically without contacting the
 network. No operator database, Alpaca endpoint, running Streamlit process,
 scheduler, evidence epoch, or external registry was touched.
+
+## Claude counter-review (2026-08-04, appended)
+
+Every finding was independently re-verified on the submitted snapshot
+`198339d` before being accepted:
+
+- **UI3REV-001 confirmed red:** `run_interactive_backtest({})` returned
+  `{1: 0}` -- an empty provider response presented as a legitimate
+  zero-signal result.
+- **UI3REV-002 confirmed red (both halves):** `lookback_days=21.9` was
+  silently truncated and accepted, and `hold_days_options=[-5]` was
+  forwarded to the engine.
+- **UI3REV-003 accepted:** the submitted equivalence test compared row
+  counts only and the boundary test checked direct imports only; the
+  corrected exact-frame and transitive-walk versions are strictly stronger.
+
+Verdict: both P2s are genuine defects in the submitted implementation and
+the corrections are accepted as written. The corrected focused suites
+(43 tests) and full suite were re-run green during the counter-review.
+
+The generalized-instance search over the corrected code found one residual
+member of the same failure class:
+
+| ID | Priority | Status | Location | Issue | Correction | Verification |
+|---|---|---|---|---|---|---|
+| CRUI3-001 | P3 | Resolved | `scripts/personal_assistant_ui.py` cached data loaders | `_load_backtest_real_data` returned the raw fetch result and coverage was validated OUTSIDE the cached function. `st.cache_data` caches return values but never exceptions, so a transient failed/empty fetch would cache `{}` for the full 1-hour TTL: every retry inside that hour would loudly fail against the stale empty response even after the network recovered. | Coverage validation moved INSIDE both cached loaders, which now return `(data, coverage)`; a failed fetch raises in the cached body so nothing is cached and the next attempt re-fetches. | Source-level regression `test_data_loaders_validate_coverage_inside_the_cached_body` (the invariant is a call-site property only a live provider failure could exercise behaviorally); reverse mutation (coverage call removed from the real loader) failed the test and restoration returned it green. Focused suites 89 passed; full suite 2,614 passed, 1 skipped, 25 warnings; compileall and diff checks clean. |

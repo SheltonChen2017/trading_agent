@@ -1,16 +1,30 @@
 # Development session handoff
 
 Prepared: 2026-08-04 after Codex independently reviewed and corrected
-Claude's UI-3 interactive Backtest page.
+Claude's UI-3 interactive Backtest page, and Claude counter-reviewed the
+review, confirming every finding red on the submitted snapshot and closing
+one further P3 (CRUI3-001) from the same failure class.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
 
-UI-3 is **complete and independently accepted after correction**. No P0 or
+UI-3 is **complete, independently accepted after correction, and
+counter-review confirmed**. No P0 or
 P1 issue, live-authority escape, broker interaction, secret exposure, or
-durable-state change was found. Claude's architecture was strong: the ninth
+durable-state change was found.
+
+Claude's counter-review (appended to the review report) independently
+re-proved all three findings red on submitted snapshot `198339d`
+(empty-data `{1: 0}` result; `21.9` truncation; `[-5]` horizon forwarded),
+accepted the corrections as written, and found/fixed one residual member of
+the same class: **CRUI3-001 (P3)** — coverage was validated OUTSIDE the
+cached real-data loader, so `st.cache_data` would cache a transient
+failed/empty fetch for the full 1-hour TTL (exceptions are never cached;
+return values are). Both cached loaders now validate coverage inside their
+bodies and return `(data, coverage)`; a source-level regression pins the
+call-site invariant and its reverse mutation was shown red then green. Claude's architecture was strong: the ninth
 Streamlit page composes the existing walk-forward engine through a pure
 research helper, defaults to synthetic data, fixes executable entry timing at
 `next_open`, caches real yfinance data, persists results without automatic
@@ -46,7 +60,13 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     Codex review records = 538eae9
     first pushed replacement handoff = 8be0f20
     Codex branch = codex/review-ui-3-backtest-20260804
+    Claude counter-review correction (CRUI3-001) = branch-tip commit
+        containing this file, on the same Codex review branch
     canonical handoff = branch-tip commit containing this file
+
+Counter-review validation on the exact final tree: focused suites 89
+passed; full suite 2,614 passed, 1 skipped, 25 warnings in 367.56s;
+compileall and `git diff --check` clean (Python 3.13).
 
 The Codex review branch was pushed and `8be0f20` was verified byte-for-byte
 against GitHub with `git ls-remote` after one transient connection timeout;

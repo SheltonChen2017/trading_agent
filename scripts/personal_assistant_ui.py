@@ -2900,15 +2900,31 @@ _WHOLE_UNIVERSE_SCOPE = f"Entire universe ({len(UNIVERSE)} tickers)"
 @st.cache_data(show_spinner=False)
 def _load_backtest_synthetic_data(tickers: tuple[str, ...], days: int):
     """Deterministic (fixed-seed) synthetic OHLCV -- cache keyed by the
-    ticker tuple and day count so widget interactions never regenerate."""
-    return generate_synthetic(list(tickers), days=days)
+    ticker tuple and day count so widget interactions never regenerate.
+    Returns (data, coverage); see _load_backtest_real_data for why the
+    coverage check runs inside the cached body."""
+    data = generate_synthetic(list(tickers), days=days)
+    return data, inspect_data_coverage(
+        data, requested_tickers=tickers, requested_sessions=days
+    )
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
 def _load_backtest_real_data(tickers: tuple[str, ...], lookback_days: int):
     """Real yfinance history, cached for an hour so parameter tweaks rerun
-    the backtest without re-fetching the network data."""
-    return fetch_historical(list(tickers), lookback_days=lookback_days)
+    the backtest without re-fetching the network data.
+
+    The coverage check runs INSIDE this cached function on purpose
+    (counter-review CRUI3-001): st.cache_data caches return values but
+    never exceptions, so a failed/empty fetch raises here and nothing is
+    cached -- the next attempt re-fetches instead of replaying an empty
+    provider response for the rest of the TTL. Validating outside would
+    leave the empty dict cached and every retry inside the hour would
+    fail against it even after the network recovered."""
+    data = fetch_historical(list(tickers), lookback_days=lookback_days)
+    return data, inspect_data_coverage(
+        data, requested_tickers=tickers, requested_sessions=lookback_days
+    )
 
 
 if page == "Backtest":
@@ -3019,17 +3035,12 @@ if page == "Backtest":
                     if use_real_data
                     else "Running the walk-forward backtest..."
                 ):
-                    bt_data = (
+                    bt_data, data_coverage = (
                         _load_backtest_real_data(bt_tickers, int(bt_lookback))
                         if use_real_data
                         else _load_backtest_synthetic_data(
                             bt_tickers, int(bt_lookback)
                         )
-                    )
-                    data_coverage = inspect_data_coverage(
-                        bt_data,
-                        requested_tickers=bt_tickers,
-                        requested_sessions=int(bt_lookback),
                     )
                     results_by_horizon = run_interactive_backtest(
                         bt_data,

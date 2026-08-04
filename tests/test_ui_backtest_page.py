@@ -152,6 +152,45 @@ def test_stored_real_result_carries_the_exploratory_caveat_without_refetching():
     assert "(2 tickers)" in captions
 
 
+def test_data_loaders_validate_coverage_inside_the_cached_body():
+    """Counter-review CRUI3-001: st.cache_data caches return values but
+    never exceptions. If coverage were validated OUTSIDE the cached
+    loaders, a transient empty/failed fetch would return {} and be cached
+    for the full TTL -- every retry inside the hour would replay the empty
+    response even after the network recovered. The inspect_data_coverage
+    call must therefore sit inside each cached loader body, so a failed
+    fetch raises and nothing is cached. Source-level check because only a
+    live provider failure could exercise this behaviorally."""
+    import ast
+
+    tree = ast.parse(_APP_PATH.read_text(encoding="utf-8"))
+    loader_names = {
+        "_load_backtest_synthetic_data",
+        "_load_backtest_real_data",
+    }
+    loaders = {
+        node.name: node
+        for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name in loader_names
+    }
+    assert set(loaders) == loader_names
+    for name, fn_node in loaders.items():
+        calls = [
+            node
+            for node in ast.walk(fn_node)
+            if isinstance(node, ast.Call)
+            and (
+                getattr(node.func, "id", None) == "inspect_data_coverage"
+                or getattr(node.func, "attr", None) == "inspect_data_coverage"
+            )
+        ]
+        assert calls, (
+            f"{name} must call inspect_data_coverage inside its cached "
+            "body (CRUI3-001) so a failed fetch raises instead of caching "
+            "an empty provider response"
+        )
+
+
 def test_results_survive_navigating_away_and_back():
     """The completed run lives in a non-widget session key: inspecting
     another page must not force the user to re-run minutes of work."""

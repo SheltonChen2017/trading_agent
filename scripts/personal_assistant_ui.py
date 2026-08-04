@@ -1283,6 +1283,24 @@ with tab_briefing:
     if st.button("Refresh briefing", key="refresh_briefing"):
         st.cache_data.clear()
         st.toast("Refreshed against the live account.", icon="\U0001F503")
+    # GR-5 severity routing (owner decision 2026-08-03): warnings batch into
+    # the daily briefing instead of interrupting via desktop notification --
+    # which makes THIS surface their delivery point, not an optional extra.
+    from assistant.alert_delivery import pending_briefing_alerts as _briefing_alerts
+
+    _batched_warnings = _briefing_alerts(_store())
+    if _batched_warnings:
+        with st.expander(
+            f"⚠️ {len(_batched_warnings)} open operational warning(s) "
+            "(batched here by policy)",
+            expanded=False,
+        ):
+            for _warning_alert in _batched_warnings:
+                st.warning(
+                    f"[{_warning_alert['category']}] {_warning_alert['message']} "
+                    f"(x{_warning_alert['occurrences']}, "
+                    f"last {_warning_alert['last_seen_at'][:19]})"
+                )
     policy, packet = _load_packet(policy_path, include_events)
     # Persist one row per genuinely NEW packet (a fresh live fetch --
     # packet.generated_at changes only when _load_packet()'s cache
@@ -2867,9 +2885,7 @@ with tab_operations:
             epoch["evidence_epoch"] if epoch else "none",
             help="A formal paper-evidence epoch is required for promotion evidence.",
         )
-    drills = ops_store.list_operational_drills(limit=10) if hasattr(
-        ops_store, "list_operational_drills"
-    ) else []
+    drills = ops_store.list_operational_drills(limit=10)
     if drills:
         st.caption("Most recent operational drills")
         st.dataframe(

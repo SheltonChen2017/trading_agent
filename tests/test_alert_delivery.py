@@ -25,7 +25,6 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from assistant.alert_delivery import (
     DELIVERY_FAILURE_FINGERPRINT,
     SELF_TEST_FINGERPRINT,
-    AlertDeliveryError,
     RecordingChannel,
     WindowsToastChannel,
     deliver_alert,
@@ -147,10 +146,9 @@ def test_delivery_failure_is_recorded_escalated_and_never_marked_delivered(store
     assert escalations[0]["severity"] == "critical"
     # Both the original condition and the broken-channel escalation remain
     # mandatory until a successful self-test proves the channel recovered.
-    assert [a["fingerprint"] for a in undelivered_critical_alerts(store)] == [
-        "fp-critical",
-        DELIVERY_FAILURE_FINGERPRINT,
-    ]
+    assert sorted(
+        a["fingerprint"] for a in undelivered_critical_alerts(store)
+    ) == sorted(["fp-critical", DELIVERY_FAILURE_FINGERPRINT])
 
 
 def test_a_later_success_never_erases_an_earlier_failure(store):
@@ -402,3 +400,94 @@ def test_delivery_never_touches_execution_state(store):
         ).fetchone()[0]
     assert (proposals, orders, reservations) == (0, 0, 0)
     assert store.get_kill_switch() == before[1]
+
+
+# --- the briefing is the warnings' delivery surface (routing completeness) --
+
+
+def test_cli_briefing_prints_batched_warnings(store, capsys):
+    """Owner routing (2026-08-03): warnings batch into the daily briefing.
+    Without this surface they would be delivered NOWHERE -- not toasted
+    (deliberately) and not briefed (this regression)."""
+    import scripts.run_personal_assistant as cli
+
+    _warning(store)
+    _critical(store)  # criticals belong to the toast path, not the briefing
+
+    cli._print_batched_warnings(store)
+    out = capsys.readouterr().out
+
+    assert "Open operational warnings (1, batched here by policy)" in out
+    assert "[recovery] backup is stale" in out
+    assert "mismatched broker order" not in out
+
+
+def test_cli_briefing_prints_nothing_when_no_warnings_are_open(store, capsys):
+    import scripts.run_personal_assistant as cli
+
+    cli._print_batched_warnings(store)
+    assert capsys.readouterr().out == ""
+
+
+def test_ui_briefing_tab_surfaces_batched_warnings(tmp_path, monkeypatch):
+    """The Streamlit briefing must show the same batch. Uses the real app
+    via AppTest with the session-isolated database seeded with one open
+    warning."""
+    import os
+
+    from streamlit.testing.v1 import AppTest
+
+    seeded = AssistantStore(Path(os.environ["TRADING_ASSISTANT_DB"]))
+    seeded.upsert_operational_alert(
+        fingerprint="fp-ui-warning",
+        severity="warning",
+        category="recovery",
+        message="ui-visible stale backup warning",
+        details={},
+        seen_at=NOW.isoformat(),
+    )
+    try:
+        at = AppTest.from_file(
+            str(Path(__file__).resolve().parent.parent / "scripts" / "personal_assistant_ui.py"),
+            default_timeout=120,
+        )
+        at.run()
+        assert not at.exception
+        rendered = [w.value for w in at.warning]
+        assert any("ui-visible stale backup warning" in str(v) for v in rendered)
+    finally:
+        # The session database is shared by every UI render test: leaving
+        # the seeded alert open would leak into their assertions.
+        for alert in seeded.list_operational_alerts(status="open", limit=50):
+            if alert["fingerprint"] == "fp-ui-warning":
+                seeded.acknowledge_operational_alert(alert["alert_id"])
+
+
+# --- end-to-end: the cycle's marquee seam, halt -> alert -> operator -------
+
+
+def test_reconciliation_halt_reaches_the_operator_end_to_end(store):
+    """GR-3 gave broker anomalies an atomic kill-switch + critical alert;
+    GR-5 gave critical alerts a delivery path. This pins the JOINED
+    contract: a mismatched-order halt produced by the real storage
+    primitive is picked up by the real delivery sweep and reaches the
+    channel, with the delivery recorded against the same alert row."""
+    store.activate_reconciliation_halt(
+        proposal_id="p-integration",
+        reason="Order under this idempotency key does NOT match the intent",
+        details={"mismatch": "side", "path": "manual_lookup"},
+    )
+    assert store.get_kill_switch()["active"] is True
+
+    channel = RecordingChannel()
+    report = deliver_pending_alerts(store, channel, now=NOW)
+
+    assert report["healthy"] is True
+    assert len(channel.sent) == 1
+    assert channel.sent[0]["severity"] == "critical"
+    assert "does NOT match" in channel.sent[0]["body"]
+    fingerprint = "broker_reconciliation:p-integration"
+    record = store.list_alert_deliveries(fingerprint=fingerprint)[0]
+    assert record["outcome"] == "delivered"
+    assert undelivered_critical_alerts(store) == []
+    store.set_kill_switch(False, reason="test cleanup")

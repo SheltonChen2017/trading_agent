@@ -1,11 +1,31 @@
 # Development session handoff
 
-Prepared: 2026-08-03 after independent GR-5 review
+Prepared: 2026-08-03T18:40:00-07:00, after the integrity sweep
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
+
+UPDATE (2026-08-03, after PR #128 merged): the owner requested a
+whole-project integrity sweep following the ~120-commit dual-agent cycle.
+Claude's sweep + GR-5 third-round confirmation are at commit `5f4d9cc` on
+PUSHED branch `user/claude/gr-5-review-confirmation-20260803` (base
+`9e2826a`), awaiting independent review. Durable ledger:
+`docs/REVIEW_2026-08-03_INTEGRITY_SWEEP.md`. Sweep verdict: **no P0/P1
+anywhere**; one P2 fixed (INT-001: the warnings-batch-into-briefing half of
+the owner's GR-5 routing decision was wired into neither briefing surface —
+missed by implementation and review alike; both surfaces now show the
+batch, AppTest-proven and reverse-mutated); five P3s fixed (epoch-lineage
+guard consolidated into `paper_evidence.verify_drill_lineage_commit`,
+order-fragile review assertion, unused import, doc drift including
+seven→eight tabs, dashboard hasattr guard); one end-to-end
+halt→alert→delivery seam test added. Clean probes: merge-tree survival for
+the last 12 merges, zero bare `set_kill_switch` sites, 11/11 fault matrix,
+7/7 import boundary. Full suite on that tree: 2,530 passed / 1 skipped /
+25 warnings; GR5REV-001 was independently reproduced red on exact
+`27fb586` and the GR-5 review is accepted at 9/10.
+
 
 GR-5 alert delivery is COMPLETE after independent review and one P2
 correction. Claude's implementation was strong: immediate Windows desktop

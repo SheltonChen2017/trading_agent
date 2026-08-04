@@ -547,7 +547,7 @@ as GR-1C). The mechanical pre/post facade-surface comparison shows nothing
 removed and exactly two additions (`ReconciliationDeps`,
 `run_submission_reconciliation`, both the exact kernel objects). The atomic
 claim and every conditional transition remain `AssistantStore` operations.
-`execution_service.py` is now 952 lines (from 1,094); `reconcile.py` is 269.
+`execution_service.py` is now 952 lines (from 1,094); `reconcile.py` was 269 at implementation (279 after the GR-3 review routed its mismatch halts through `activate_reconciliation_halt`).
 
 ### GR-1D mutation results
 

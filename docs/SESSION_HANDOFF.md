@@ -97,6 +97,20 @@ creation, not behavioral failures.
 
 ## 5. Roadmap and next authorized step
 
+UPDATE (2026-08-03, late evening): the owner requested four UI changes and
+directed Claude to prioritize them in the action plan for Codex review.
+They are recorded as **UI Phase 2 (UI-2a..UI-2d)** at the front of Phase 6
+in `docs/ACTION_PLAN_2026-08-02.md`, on pushed branch
+`user/claude/ui-phase2-plan-20260803` (docs only; no implementation
+started). UI-2d (History entry removal) deliberately schedules the archived
+`docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` —
+dismiss/archive as a persisted status, never physical deletion of
+broker-touched rows. Codex: review that plan entry next. Separately, the
+owner's Alpaca paper credentials are now installed and verified
+authenticating on the development machine (presence/shape checked only;
+values never printed), and the Streamlit app is running from `main` at
+`17605f5`.
+
 Phase 5 is next and remains owner-heavy. Read
 `docs/PHASE5_DEPLOYMENT_SESSION.md` and make these decisions before any
 elevated or durable action:

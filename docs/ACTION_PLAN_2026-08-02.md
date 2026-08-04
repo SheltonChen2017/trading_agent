@@ -289,7 +289,7 @@ recommendation, so the app keeps one authoritative sizing path).
 | UI-2a | Rename "Watchlist" to **"Buying"** | request 2 | **Completed and independently accepted after correction** at implementation `cbae8e6` plus review `3a29138`, together with UI-2c. User-facing navigation/copy says Buying; internal domain identifiers remain stable. | done |
 | UI-2b | History **outcome filtering** | request 4 | **Completed and independently accepted 2026-08-04** at implementation `335c9fc` plus review hardening `9dcff80`. The exhaustive mapping lives beside `STATUSES`, unknown statuses fail-safe to Other/unknown, legacy `executed` stays unresolved, and the read-only SQL query applies filtering before the row limit. Outcome multi-select is primary, exact status is Advanced, and intersections are stated. Review found no runtime defect and added a reverse-mutation-proven large-history UI regression. | done |
 | UI-2c | **Left-side navigation** replacing the top tab bar | request 1 | **Completed and independently accepted after correction** at implementation `cbae8e6` plus review `3a29138`. All 8 surfaces route from the sidebar with policy context separate. Review corrected one missed render-control effect: benign page inputs now survive navigation through an explicit whitelist, while approval/override/bulk-submit/cancel/emergency confirmations deliberately do not. | done |
-| UI-2d | History **entry removal, persisted** | request 3 | **Implemented (2026-08-04), awaiting independent review.** Dismiss/archive only, never deletion: terminal `dismissed` status (canonical, non-inflight, outcome group Closed without fill), storage eligibility limited to pristine never-broker-touched `proposed`/`expired` rows (children, allocation-batch payload references, and execution-shaped payload evidence all refuse; unreadable batch payloads fail closed), preview-hash-bound all-or-nothing atomic dismissal with idempotent replay, `list_proposals` visibility flags, preview-first CLI `dismiss-proposals`, and the History Manage-unused-proposals expander with default-off archive visibility. Automatic expiry remains a separately approved follow-up; physical purge remains deferred and owner-authorized. | large |
+| UI-2d | History **entry removal, persisted** | request 3 | **Completed and independently accepted after correction 2026-08-04** at implementation `6d287f0`, documentation `1ff8063`, merge `8f2e9a7`, and review correction `a118470`. Dismiss/archive only, never deletion: terminal `dismissed` status (canonical, non-inflight, outcome group Closed without fill), storage eligibility limited to pristine never-broker-touched `proposed`/`expired` rows, preview-hash-bound all-or-nothing atomic dismissal with idempotent replay, `list_proposals` visibility flags, preview-first CLI `dismiss-proposals`, and the History Manage-unused-proposals expander with default-off archive visibility. Review made execution telemetry disqualifying, made structurally malformed allocation-batch references fail closed, and bound the confirmation hash to the complete durable proposal state. Automatic expiry remains a separately approved follow-up; physical purge remains deferred and owner-authorized. | done |
 
 UI-2b's frozen outcome groups are:
 
@@ -301,8 +301,8 @@ UI-2b's frozen outcome groups are:
 - **Filled:** `filled` only;
 - **Refused / failed:** `blocked`, `validation_failed`, `submission_failed`,
   `broker_rejected`;
-- **Closed without fill:** `canceled`, `broker_expired`, `expired`, and the
-  future `dismissed` status; and
+- **Closed without fill:** `canceled`, `broker_expired`, `expired`, and
+  `dismissed`; and
 - **Other / unknown:** any future value absent from the frozen mapping.
 
 The implementation must define this map beside the canonical status constants
@@ -312,7 +312,8 @@ reconstructing financial lifecycle meaning.
 Sequencing: **UI-2a + UI-2c completed and reviewed** as one navigation
 milestone; **UI-2b completed and independently reviewed 2026-08-04**;
 **UI-3 (Backtest page) completed and independently reviewed 2026-08-04**;
-**UI-2d implemented 2026-08-04, awaiting independent review**. Automatic
+**UI-2d completed and independently accepted after correction 2026-08-04**.
+Automatic
 expiry, if still desired, follows as
 a separately approved lifecycle milestone; physical purge stays deferred.
 UI-2d changes runtime durable state even though it grants no execution
@@ -393,9 +394,12 @@ and 25 known warnings; compileall and diff checks were clean. No result was
 promoted and no proposal, policy, registry, broker, schema, scheduler, epoch,
 ML/LLM, or execution-authority behavior changed.
 
-Sequencing after UI-3 review: **UI-2d is next**, subject to explicit owner
-direction. Automatic expiry remains separate and physical purge remains
-deferred.
+Sequencing after UI Phase 2: UI-2d is complete after independent correction.
+Automatic expiry remains a separately approved optional milestone and physical
+purge remains deferred. Phase 5 operational deployment and epoch start remain
+the next adopted phase, but require the owner's four decisions and explicit
+direction; do not begin elevated, scheduler, mandate-approval, ledger-bootstrap,
+or epoch actions automatically.
 
 **Phase 7 — data purchases, whenever decided (independent of code):**
 membership vendor decision → Databento statistics/reference captures →

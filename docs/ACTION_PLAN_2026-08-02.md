@@ -287,7 +287,7 @@ recommendation, so the app keeps one authoritative sizing path).
 | # | Item | Owner request | Scope and constraints | Size |
 |---|---|---|---|---|
 | UI-2a | Rename "Watchlist" to **"Buying"** | request 2 | **Completed and independently accepted after correction** at implementation `cbae8e6` plus review `3a29138`, together with UI-2c. User-facing navigation/copy says Buying; internal domain identifiers remain stable. | done |
-| UI-2b | History **outcome filtering** | request 4 | Add one canonical, exhaustive outcome mapping beside `STATUSES` in `assistant/proposal_status.py`; every current status must map to exactly one group and unknown future statuses must display as **Other/unknown**, never as completed. Use outcome multi-select as the primary filter and retain exact status as an Advanced filter. When both are set they combine by intersection, the UI states that rule, and it shows the active filters above results. Read-side only; no persistence change. | small |
+| UI-2b | History **outcome filtering** | request 4 | **Implemented at `335c9fc` (2026-08-04), awaiting independent review.** The exhaustive mapping lives beside `STATUSES` (frozen-literal tested, `set(mapping) == set(STATUSES)`), unknown statuses fail-safe to Other/unknown, legacy `executed` stays under Broker working / unresolved, and a narrow read-only storage query keeps both filter paths on newest-N-of-the-filtered-kind row semantics (including the negative-match Other/unknown case). Outcome multi-select primary, exact status as an Advanced expander, intersection stated with active filters shown above results. Read-side only; no persistence change. | small |
 | UI-2c | **Left-side navigation** replacing the top tab bar | request 1 | **Completed and independently accepted after correction** at implementation `cbae8e6` plus review `3a29138`. All 8 surfaces route from the sidebar with policy context separate. Review corrected one missed render-control effect: benign page inputs now survive navigation through an explicit whitelist, while approval/override/bulk-submit/cancel/emergency confirmations deliberately do not. | done |
 | UI-2d | History **entry removal, persisted** | request 3 | First release is **dismiss/archive**, never physical deletion: add a terminal `dismissed` state, hide it from the default History view, retain its audit record and idempotency key, and permit only narrowly defined never-broker-touched proposals. It is a durable runtime persistence change and gets its own branch, migration/concurrency tests, and independent review. Automatic expiry is a separate optional lifecycle milestone and must not be smuggled into the removal feature merely because the archived plan previously combined them. Physical purge remains separately deferred and owner-authorized. | large |
 
@@ -310,8 +310,8 @@ and test `set(mapping) == set(STATUSES)`; the UI imports it rather than
 reconstructing financial lifecycle meaning.
 
 Sequencing: **UI-2a + UI-2c completed and reviewed** as one navigation
-milestone; **UI-2b is next** as a read-only History milestone; **UI-2d third** as the
-durable dismissal milestone. Automatic expiry, if still desired, follows as
+milestone; **UI-2b implemented 2026-08-04, awaiting independent review**;
+**UI-2d third** as the durable dismissal milestone. Automatic expiry, if still desired, follows as
 a separately approved lifecycle milestone; physical purge stays deferred.
 UI-2d changes runtime durable state even though it grants no execution
 authority. If a formal evidence epoch has started under model 1

@@ -48,4 +48,3 @@ Validation on Python 3.13.14:
 - compileall and git diff --check: clean.
 
 Warnings are the existing WebSockets and joblib/NumPy deprecations.
-

@@ -120,14 +120,17 @@ three other files:
   concentration-limit logic that could drift out of sync with the real
   gate over time.
 
-**Gate-side consolidation DONE 2026-08-03 (GR-2, pending review)**: the
+**Gate-side consolidation DONE AND INDEPENDENTLY REVIEWED 2026-08-03
+(GR-2)**: the
 gate's own hand-written sequence is now the registry-driven
 `RISK_CHECK_REGISTRY` with `applies_at` phases and a frozen inventory test,
 so a check can no longer be added in one place and silently missed in
 another WITHIN the gate. The three scatter points listed above remain
 outside it by deliberate scope; `checks_for_phase("proposal")` now exists
 as their convergence target when each is consolidated as its own reviewed
-decision.
+decision. Review correction `0167c67` binds frozen names to their actual
+runner functions and makes terminal checks stop only on violations they
+themselves add.
 
 **Not consolidated this round; cross-reference comments added
 2026-07-28** at all three locations (and in `risk/execution_gate.py`'s

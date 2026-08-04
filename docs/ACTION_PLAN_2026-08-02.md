@@ -50,8 +50,8 @@ reconcile) is built, characterization-frozen, and three-review hardened; the
 ML research/shadow stack is software-complete through monitoring and dossier;
 the LLM committee foundation is built and gated; the execution-kernel split
 (GR-1) is complete after the independently reviewed 2026-08-03 GR-1E
-assessment; GR-3 fault drills and GR-5 alert delivery are implemented and
-reviewed (2026-08-03), and GR-2's registry is implemented pending review. What does not exist is: GR-4, GR-6, GR-7,
+assessment; GR-3 fault drills, GR-5 alert delivery, and GR-2's risk registry
+are complete and independently reviewed (2026-08-03). What does not exist is: GR-4, GR-6, GR-7,
 every AI *product* plan beyond the committee (strategy
 authoring, debate, allocation service, MCP, and proposal cleanup), and — most
 importantly — **any qualifying frozen-epoch operational evidence at all**:
@@ -147,11 +147,11 @@ already-merged work does not reorder the adopted next step.
 
 ---
 
-## 4. NOT STARTED — planned code work, verified absent
+## 4. Planned-code milestone ledger — current completion state
 
 | Milestone | Scope (one line) | Verified-absent marker |
 |---|---|---|
-| GR-2 risk-check registry | ~~ordered registry replacing the hand-written gate sequence~~ **IMPLEMENTED 2026-08-03** (branch `user/claude/gr-2-risk-registry-20260803`): 20-check `RISK_CHECK_REGISTRY` with `applies_at` phases, frozen-inventory test, registry-injection proof, zero existing-test edits. Awaiting independent review — completes Phase 4's code work | — |
+| GR-2 risk-check registry | ~~ordered registry replacing the hand-written gate sequence~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: 20-check `RISK_CHECK_REGISTRY` with `applies_at` phases, exact old/new behavior preservation, runner-bound frozen inventory, registry-injection proof, and corrected terminal semantics. Implementation `03895ae`; review correction `0167c67`. | complete |
 | GR-3 fault-injection drills | ~~9 named faults + drill harness~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: 11 fault IDs / 14 behavioral tests plus an atomic hash-stamped runner. Review corrected active-epoch lineage binding, skipped/abnormal pytest fail-open behavior, the missing F4 critical alert, the absent true `submitting` restart case, partial-state assertions, and artifact atomicity. Records ambiguous_submission/restart_recovery/kill_switch rows only under exact epoch lineage or as explicit verification-only evidence. | complete |
 | GR-4 data-layer honesty | `PriceSource` protocol, staleness SLAs, provider health, split-between-snapshot-and-submit detection, degradation banner | no protocol in `data/`/`assistant/`; GR-0's `data_integrity` dimension is blocked-by-design until this lands |
 | GR-5 alert delivery | ~~a real channel + delivery records + weekly self-test + operator dashboard~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: Windows toast for critical (owner decision), warnings batched to the briefing, immutable `alert_deliveries` records, escalation on failure, storage-verified weekly self-test producing the `alert_delivery` drill, readiness checks, and the Streamlit Operations tab. Review corrected a P2 gap: a durable broken-channel alert now keeps mandatory readiness failed until a later successful self-test proves recovery and acknowledges it. | complete |
@@ -161,7 +161,7 @@ already-merged work does not reorder the adopted next step.
 | Proposal-history cleanup | `dismissed` status, expiry sweep, preview-first CLI, History UI (10 steps; physical purge stays deferred) | 19 statuses, no `dismissed`; only `prune-packets` exists (decision packets, not proposals) |
 | AI strategy authoring AS-0..AS-7 | prose → StrategySpec → compiler → evaluation plan → orchestrated backtest → dossier → registry | 0% — no `strategy_lab/`, no DSL, no Backtest tab |
 | AI debate surface | `assistant/ai_debate.py` parallel-framing design | 0%; its own doc questions whether the safe version is worth building |
-| MCP read-only server | `mcp_bridge/` + 9 tools | 0%; **fails its own §3.6 activation gate today** (GR-5 dashboard hasn't shipped) |
+| MCP read-only server | `mcp_bridge/` + 9 tools | 0%; GR-5's dashboard prerequisite is now satisfied, but the §3.6 activation gate still fails because the broader GR list is incomplete, no five-question preceding-month need is recorded, and higher-leverage work remains open. |
 
 ---
 
@@ -243,19 +243,20 @@ extraction. Independent review accepted that architectural conclusion after
 correcting overbroad measurement, test-history, recovery-call, and
 architecture-debt claims. The records are the GR-1E section of
 `docs/GENERAL_READINESS_STATUS.md` and
-`docs/REVIEW_2026-08-03_GR1E_ASSESSMENT.md`. Phase 4 completed GR-3 and
-GR-5; GR-2 remains its authorized ride-along implementation milestone.
+`docs/REVIEW_2026-08-03_GR1E_ASSESSMENT.md`. Phase 4 later completed GR-3,
+GR-5, and the independently reviewed GR-2 registry.
 
-**Phase 4 — operational drill/alert prerequisites (CODE COMPLETE pending
-GR-2 review, 2026-08-03):**
+**Phase 4 — operational drill/alert prerequisites (COMPLETE AND
+INDEPENDENTLY REVIEWED, 2026-08-03):**
 GR-3 fault drills and GR-5 alert delivery are COMPLETE AND INDEPENDENTLY
 REVIEWED. GR-5 uses Windows desktop toasts immediately for critical alerts,
 batches warnings, preserves immutable delivery attempts, and requires a
 successful self-test to clear a previous channel-failure condition. GR-2's
-risk-check registry is IMPLEMENTED on
-`user/claude/gr-2-risk-registry-20260803` and awaiting independent review —
-the last Phase 4 item. After it merges, Phase 5 (operational deployment +
-epoch start) is next and is owner-heavy.
+risk-check registry was implemented at `03895ae` and independently accepted
+after correction at `0167c67`, closing the last Phase 4 code item. Phase 5
+(operational deployment + epoch start) is next and is owner-heavy; do not
+begin its elevated, scheduler, mandate, or epoch actions without the owner's
+specific direction and required decisions.
 
 **Phase 5 — operational deployment + epoch start (owner-heavy):**
 elevated window → dedicated task account → install + verify 8 scheduled
@@ -294,7 +295,9 @@ explicit authorization).
    Still open from this item: epoch model 1 vs 2 (§7).
 2. Approve the mandate (or first revise its DRAFT §2 targets) — the only
    promotion gate satisfiable today.
-3. GR-5 alert delivery channel (email / webhook / push / other).
+3. ~~GR-5 alert delivery channel~~ — **RESOLVED 2026-08-03:** immediate
+   critical alerts use Windows desktop toasts; warnings batch into the daily
+   briefing. Webhooks remain out of scope.
 4. Elevated Windows window for task-account creation + scheduler install;
    credential rotation at the same time.
 5. Operator DB path: keep `data/trading_assistant.db` or adopt the runbook's

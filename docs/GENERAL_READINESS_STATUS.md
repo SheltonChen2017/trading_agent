@@ -678,8 +678,9 @@ Outside the archived GR-1 plan's execution-service scope and therefore NOT
 closed by this declaration: `allocation_batch.py` still owns cross-leg
 reservation math separately from storage-level budget reservation. That work
 remains open in ARCHITECTURE_DEBT items 1 and 2 and must follow the adopted
-action plan's sequencing. Risk-check scatter remains GR-2's consolidation
-target.
+action plan's sequencing. GR-2 later consolidated the gate's own ordered
+checks; the external batch, proposal-suggestion, and pending-order input
+calculations remain explicit architecture debt rather than part of GR-1.
 
 **Independent-review decision: outcome 1 — no GR-1E extraction; GR-1 is
 complete against the archived plan's intended definition of done.** The
@@ -803,7 +804,7 @@ the notification was *raised*, not that a human read it. Scheduled-task
 installation for `deliver-alerts`/`alert-self-test` is Phase 5 deployment
 work, not this milestone.
 
-## GR-2 — risk-check registry: IMPLEMENTED, awaiting review (2026-08-03)
+## GR-2 — risk-check registry: COMPLETE AND INDEPENDENTLY REVIEWED (2026-08-03)
 
 The ~600-line hand-written check sequence in
 `risk/execution_gate.py::validate_trade_intent()` is now a **registry-driven
@@ -851,6 +852,16 @@ Deliberately NOT absorbed (ARCHITECTURE_DEBT item 2 remains open):
 the gate rather than duplicate it, and folding them in is a separate
 reviewed decision now made EASIER by `checks_for_phase("proposal")`
 existing as the convergence point.
+
+Independent review at `0167c67` found no behavioral drift across a
+deterministic 1,200-case old/new comparison and accepted the twenty-check
+extraction after two P3 hardenings: terminal checks now stop only when that
+specific check adds a violation, and the frozen inventory binds each name to
+its runner while replacing a vacuous violation-code assertion. The same
+review also corrected the integrity sweep's remaining P2 warning-routing
+gap by making the CLI render durable warning batches before fallible
+portfolio/data construction. Final dispositions and evidence are in
+`docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`.
 
 ## GR-4, GR-6 .. GR-9 — not started
 

@@ -49,12 +49,9 @@ def test_allow_new_positions_toggle_persists_and_refreshes_status(tmp_path: Path
     save_policy(original, policy_path)
 
     app_path = Path(__file__).resolve().parents[1] / "scripts" / "personal_assistant_ui.py"
-    app = AppTest.from_file(str(app_path), default_timeout=40).run()
-    assert not app.exception
-
-    # Sidebar routing renders only the selected page; the policy editor
-    # lives on Settings & Features.
-    app.radio(key="nav_page").set_value("Settings & Features").run()
+    app = AppTest.from_file(str(app_path), default_timeout=40)
+    app.session_state["nav_page"] = "Settings & Features"
+    app.run()
     assert not app.exception
 
     _one(app.text_input, "Policy file").set_value(str(policy_path)).run()
@@ -124,9 +121,10 @@ def test_every_page_is_reachable_through_the_sidebar(page, marker_label):
     Every surface must render on its own — a cross-page variable dependency
     that tabs used to mask would surface here as an exception, and a page
     that silently rendered nothing would miss its marker widget."""
-    app = AppTest.from_file(str(_APP_PATH), default_timeout=60).run()
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=60)
+    app.session_state["nav_page"] = page
+    app.run()
     assert not app.exception
-    app.radio(key="nav_page").set_value(page).run()
     assert not app.exception, f"page {page!r} failed to render in isolation"
     labels = [widget.label for widget in list(app.button) + list(app.checkbox)]
     assert marker_label in labels, (
@@ -139,8 +137,9 @@ def test_ai_preferences_survive_navigating_away_from_settings():
     widget-backed keys on reruns that don't render them, so the prefs live
     in durable session keys synced from the widgets — navigating away from
     Settings must not silently reset an enabled preference."""
-    app = AppTest.from_file(str(_APP_PATH), default_timeout=60).run()
-    app.radio(key="nav_page").set_value("Settings & Features").run()
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=60)
+    app.session_state["nav_page"] = "Settings & Features"
+    app.run()
     assert not app.exception
 
     _one(app.checkbox, "Enable optional AI features (master)").set_value(True).run()
@@ -155,3 +154,21 @@ def test_ai_preferences_survive_navigating_away_from_settings():
 
     app.radio(key="nav_page").set_value("Settings & Features").run()
     assert _one(app.checkbox, "Enable optional AI features (master)").value is True
+
+
+def test_buying_cart_survives_navigating_to_another_page():
+    """A navigation control must not erase the in-progress Buying cart."""
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=40)
+    app.session_state["nav_page"] = "Buying"
+    app.run()
+    assert not app.exception
+
+    cart = _one(app.multiselect, "Pick from common tickers")
+    cart.set_value(["AAPL"]).run()
+    assert _one(app.multiselect, "Pick from common tickers").value == ["AAPL"]
+
+    app.radio(key="nav_page").set_value("History").run()
+    assert not app.exception
+    app.radio(key="nav_page").set_value("Buying").run()
+    assert not app.exception
+    assert _one(app.multiselect, "Pick from common tickers").value == ["AAPL"]

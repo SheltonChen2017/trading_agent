@@ -26,6 +26,7 @@ from assistant.policy import DEFAULT_POLICY_PATH, TradingPolicy, compute_policy_
 from assistant.proposal_status import STATUSES
 from assistant.schemas import DecisionPacket, MarketRegime
 from scripts.personal_assistant_ui import (
+    _PERSISTENT_PAGE_WIDGET_KEYS,
     _allocation_input_signature,
     _cache_committee_result,
     _clear_confirmation_state_if_digest_changed,
@@ -34,8 +35,33 @@ from scripts.personal_assistant_ui import (
     _portfolio_context_payload,
     _proposal_content_digest,
     _proposal_status_category,
+    _preserve_page_widget_state,
     _sync_policy_editor_state,
 )
+
+
+def test_page_state_persistence_excludes_every_sensitive_confirmation():
+    state = {
+        "watchlist_picked": ["AAPL"],
+        "allocation_bulk_confirm": "approve all",
+        "emergency_cancel_all_confirmation": "cancel all open orders",
+        "confirm_tp-1": "approve",
+        "override_confirm_tp-1": "OVERRIDE BUY 1 AAPL",
+        "cancel_confirmation_tp-1": "cancel",
+    }
+
+    _preserve_page_widget_state(state)
+
+    assert state["watchlist_picked"] == ["AAPL"]
+    assert "watchlist_picked" in _PERSISTENT_PAGE_WIDGET_KEYS
+    for sensitive_key in (
+        "allocation_bulk_confirm",
+        "emergency_cancel_all_confirmation",
+        "confirm_tp-1",
+        "override_confirm_tp-1",
+        "cancel_confirmation_tp-1",
+    ):
+        assert sensitive_key not in _PERSISTENT_PAGE_WIDGET_KEYS
 
 
 def _policy(version: str = "test", max_order_value: float = 5_000.0) -> TradingPolicy:

@@ -158,7 +158,7 @@ already-merged work does not reorder the adopted next step.
 | GR-6 recovery/portability | off-machine backup restore, secrets audit, key rotation, portable scheduler, second-machine stand-up proven once | zero matches for all markers |
 | GR-7 product completeness | mandate-target rebalance proposals, tax-aware sell preview, performance attribution, annual tax export (wash sales), idle-cash management | `wash_sale`/`idle_cash`/attribution: zero hits |
 | Allocation service | delta-vs-target primitive, calibrated regime threshold, cadence, universe list, sizing | only the `strategy_evaluations` table exists |
-| Proposal-history cleanup | `dismissed` status, expiry sweep, preview-first CLI, History UI (10 steps; physical purge stays deferred) | 19 statuses, no `dismissed`; only `prune-packets` exists (decision packets, not proposals) |
+| Proposal-history cleanup | first milestone: `dismissed` status, preview-first dismissal CLI, History UI; optional later milestone: explicit-trigger expiry sweep; physical purge stays deferred | 19 statuses, no `dismissed`; only `prune-packets` exists (decision packets, not proposals) |
 | AI strategy authoring AS-0..AS-7 | prose → StrategySpec → compiler → evaluation plan → orchestrated backtest → dossier → registry | 0% — no `strategy_lab/`, no DSL, no Backtest tab |
 | AI debate surface | `assistant/ai_debate.py` parallel-framing design | 0%; its own doc questions whether the safe version is worth building |
 | MCP read-only server | `mcp_bridge/` + 9 tools | 0%; GR-5's dashboard prerequisite is now satisfied, but the §3.6 activation gate still fails because the broader GR list is incomplete, no five-question preceding-month need is recorded, and higher-leverage work remains open. |
@@ -282,20 +282,40 @@ committee replay corpus + CLI surface → GR-4 data honesty → GR-7 product
 completeness (fold in the allocation-service design here, per Codex's
 recommendation, so the app keeps one authoritative sizing path).
 
-**UI Phase 2 — four owner requests, in implementation priority order:**
+**UI Phase 2 — four owner requests, grouped into implementation milestones:**
 
 | # | Item | Owner request | Scope and constraints | Size |
 |---|---|---|---|---|
-| UI-2a | Rename "Watchlist" tab to **"Buying"** | request 2 | Label + copy rename opposite "Selling". Sweep UI strings, help text, and tests that select by tab label. No behavior change. | trivial |
-| UI-2b | History **outcome filtering** | request 4 | History already has a raw status filter over all statuses (`personal_assistant_ui.py`, "Status filter" selectbox). Add the outcome-level grouping the owner actually wants — e.g. Executed (reached a broker fill), In-flight/unresolved, Blocked/refused, Expired/dismissed — as a multi-select layered on the existing filter, mapped from the frozen status sets in `assistant/proposal_status.py` (do not invent a parallel status taxonomy). Read-side only; no persistence change. | small |
-| UI-2c | **Left-side navigation** replacing the top tab bar | request 1 | Move the 8 surfaces to a sidebar navigation (modern trading-app layout). Presentation-only, but the AppTest suites select widgets via the tab structure, so every UI test that navigates by tab must be reworked in the same commit — this is the reason it ranks below 2a/2b despite being cosmetic. The sidebar already hosts the policy-file selector; keep policy context visually distinct from navigation. | medium |
-| UI-2d | History **entry removal, persisted** | request 3 | Implement the archived `docs/reference/PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md`, whose definition is authoritative: the user-facing action is **dismiss/archive as a durable persisted status** (a `dismissed` status hidden from the default History view), NOT physical row deletion. Proposals that reached validation/approval/reservation/submission or any broker lifecycle remain permanently auditable — SQLite triggers already refuse to delete rows with broker children, and that protection stays. Physical purge stays out of scope per that plan (later, owner-authorized, dry-run + typed confirmation, never-submitted rows only). Persistence change + status addition ⇒ own milestone, own branch, independent review. | large |
+| UI-2a | Rename "Watchlist" to **"Buying"** | request 2 | Ship with UI-2c so navigation labels, copy, and navigation tests change once. Sweep user-facing strings, help text, and test fixtures; internal domain names may remain `watchlist` where renaming them would create needless compatibility churn. | trivial within UI-2c |
+| UI-2b | History **outcome filtering** | request 4 | Add one canonical, exhaustive outcome mapping beside `STATUSES` in `assistant/proposal_status.py`; every current status must map to exactly one group and unknown future statuses must display as **Other/unknown**, never as completed. Use outcome multi-select as the primary filter and retain exact status as an Advanced filter. When both are set they combine by intersection, the UI states that rule, and it shows the active filters above results. Read-side only; no persistence change. | small |
+| UI-2c | **Left-side navigation** replacing the top tab bar | request 1 | Ship with UI-2a. Move the 8 surfaces to sidebar navigation while keeping the policy selector visually separate. This is a render-control change, not merely cosmetic: today every tab body executes on each rerun, while selected-page rendering will execute only one surface. Inventory every page-local read/write/network effect first; keep truly global safety/status behavior global, make the selected-page behavior intentional, and prove every surface remains reachable with AppTest. | medium |
+| UI-2d | History **entry removal, persisted** | request 3 | First release is **dismiss/archive**, never physical deletion: add a terminal `dismissed` state, hide it from the default History view, retain its audit record and idempotency key, and permit only narrowly defined never-broker-touched proposals. It is a durable runtime persistence change and gets its own branch, migration/concurrency tests, and independent review. Automatic expiry is a separate optional lifecycle milestone and must not be smuggled into the removal feature merely because the archived plan previously combined them. Physical purge remains separately deferred and owner-authorized. | large |
 
-Sequencing: UI-2a + UI-2b can ship together as one small milestone; UI-2c
-is its own milestone (test rework); UI-2d is its own milestone under the
-archived plan's definition of done. All four are non-runtime for the
-execution path, but UI-2d touches the proposal store and therefore gets the
-full review treatment. If a formal evidence epoch has started under model 1
+UI-2b's frozen outcome groups are:
+
+- **Awaiting decision:** `proposed`, `override_available`;
+- **Processing:** `validating`, `approved`;
+- **Broker working / unresolved:** `submitting`, `submission_unknown`,
+  `reconciling`, `broker_accepted`, `partially_filled`, `cancel_pending`, and
+  legacy `executed` (which means accepted, not confirmed filled);
+- **Filled:** `filled` only;
+- **Refused / failed:** `blocked`, `validation_failed`, `submission_failed`,
+  `broker_rejected`;
+- **Closed without fill:** `canceled`, `broker_expired`, `expired`, and the
+  future `dismissed` status; and
+- **Other / unknown:** any future value absent from the frozen mapping.
+
+The implementation must define this map beside the canonical status constants
+and test `set(mapping) == set(STATUSES)`; the UI imports it rather than
+reconstructing financial lifecycle meaning.
+
+Sequencing: **UI-2a + UI-2c first** as one navigation milestone, so the
+owner's layout priority lands first and navigation labels/tests change once;
+**UI-2b second** as a read-only History milestone; **UI-2d third** as the
+durable dismissal milestone. Automatic expiry, if still desired, follows as
+a separately approved lifecycle milestone; physical purge stays deferred.
+UI-2d changes runtime durable state even though it grants no execution
+authority. If a formal evidence epoch has started under model 1
 (frozen runtime) before this work merges, deployment of these changes to the
 operational machine waits for the epoch boundary; under model 2 they proceed
 on the development side immediately.

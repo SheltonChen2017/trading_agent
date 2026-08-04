@@ -1,7 +1,7 @@
 # Development session handoff
 
-Prepared: 2026-08-03 after Codex independently reviewed and corrected Claude's
-UI-2a/UI-2c sidebar-navigation milestone.
+Prepared: 2026-08-04 after Codex independently reviewed, corrected, and pushed
+Claude's UI-2a/UI-2c sidebar-navigation milestone.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
@@ -41,9 +41,10 @@ Repository: https://github.com/SheltonChen2017/trading_agent
     implementation handoff = 7c02b5c
     implementation branch = user/claude/ui-nav-buying-20260803 (pushed)
     review branch = codex/review-ui-nav-buying-20260803
-    correction = 3a29138 (LOCAL-ONLY)
-    review/status record = e673b94 (LOCAL-ONLY)
-    handoff = the later commit containing this file (LOCAL-ONLY)
+    correction = 3a29138 (pushed)
+    review/status record = e673b94 (pushed)
+    initial review handoff = cf75777 (pushed)
+    current handoff = the branch-tip commit containing this file (pushed)
 
 At review start, `origin/main` and local `main` were `ff87567`, after UI merge
 PR #134 and a later signal-work merge PR #135. That later work is not present
@@ -52,10 +53,14 @@ branch starts from the UI topic tip, which is an ancestor of current `main`,
 so its UI-only corrections can be reviewed/merged without editing signal
 files.
 
-Another computer cannot retrieve `3a29138`, `e673b94`, or this handoff until
-the owner authorizes a push. The running app continues to use the already
-merged submitted UI; the cart-preservation correction is not active there
-until this branch is merged and the app reloads it.
+Another computer can retrieve the full review by fetching
+`origin/codex/review-ui-nav-buying-20260803`. Remote verification confirmed
+that the initial push resolved to full SHA
+`cf75777f03e5b1765ab543461aee94c5fafe5a71`; the branch-tip handoff commit
+supersedes that tip after the final push. The branch is not merged. The
+running app continues to use the already merged submitted UI, so the
+cart-preservation correction is not active there until this branch is merged
+and the app reloads it.
 
 ## 3. Isolation and preserved concurrent work
 
@@ -64,8 +69,9 @@ Review worktree:
     C:\tmp\trading-agent-ui-revisions-review-20260803
 
 It was created at exact UI tip `7c02b5c` specifically to avoid switching or
-editing the primary shared worktree while Claude works on signals. Do not
-remove it until the review branch is pushed or otherwise preserved.
+editing the primary shared worktree while Claude works on signals. The review
+branch is now preserved on `origin`; keep or remove this worktree only after
+confirming no local-only work has subsequently been added.
 
 Existing older worktrees also remain:
 
@@ -78,8 +84,9 @@ Existing older worktrees also remain:
 |---|---|
 | `cbae8e6` | Accepted after `UINAV-001..003` corrections |
 | `7c02b5c` | Accepted after replacement by this final handoff |
-| `3a29138` | UI-only review correction; pending owner push/merge decision |
-| `e673b94` | Review report, action-plan state, and milestone record |
+| `3a29138` | UI-only review correction; pushed, not merged |
+| `e673b94` | Review report, action-plan state, and milestone record; pushed |
+| `cf75777` | Initial review handoff; pushed and superseded by current branch-tip handoff |
 
 | ID | Priority | Status | Result |
 |---|---|---|---|
@@ -124,7 +131,7 @@ Completed UI-2a/UI-2c behavior:
 
 The next action-plan UI milestone is UI-2b, read-only History outcome
 filtering using the frozen exhaustive status mapping. Do not start UI-2b until
-the owner decides what to do with this local review branch. UI-2d persisted
+the owner decides whether to merge this pushed review branch. UI-2d persisted
 dismiss/archive follows later; automatic expiry and physical purge remain
 separate/deferred decisions.
 
@@ -156,8 +163,9 @@ Read `CLAUDE.md`, `AGENTS.md`,
 
     Fetch/prune and verify SHAs. Review only UI-2a/UI-2c: cbae8e6 and
     7c02b5c were accepted after correction 3a29138, with records e673b94
-    and the handoff commit, on codex/review-ui-nav-buying-20260803. The
-    review was local-only when written. Preserve concurrent signal work and
-    do not edit its files. The owner says Streamlit is running; do not stop
-    it. Next UI milestone is UI-2b only after owner direction. Do not install
-    tasks, start an epoch, or enable funded trading without authorization.
+    and the handoff commits, on codex/review-ui-nav-buying-20260803. Fetch
+    that remote branch and verify its tip; it is pushed but not merged.
+    Preserve concurrent signal work and do not edit its files. The owner says
+    Streamlit is running; do not stop it. Next UI milestone is UI-2b only
+    after owner direction. Do not install tasks, start an epoch, or enable
+    funded trading without authorization.

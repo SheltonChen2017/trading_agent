@@ -385,9 +385,28 @@ def _ai_feature_enabled(pref_key: str) -> bool:
     )
 
 
+# Durable session preferences vs. widget state: these preference keys are
+# read from pages OTHER than Settings & Features (Briefing, Buying, Propose,
+# Ticker Suggestions, and the global sidebar). Under sidebar routing the
+# Settings page only renders when selected, and Streamlit deletes a
+# widget-backed session key on any rerun that does not render its widget --
+# so if the checkboxes owned these keys directly, navigating away from
+# Settings would silently reset every AI preference to off. Each checkbox
+# therefore uses its own widget key, seeded from the durable key, and copies
+# its value into the durable key on change.
+def _pref_widget_key(pref_key: str) -> str:
+    return "widget_" + pref_key
+
+
+def _sync_pref_from_widget(pref_key: str) -> None:
+    st.session_state[pref_key] = bool(
+        st.session_state.get(_pref_widget_key(pref_key), False)
+    )
+
+
 _AI_PREF_OFF_HELP = (
     "Optional AI features are turned off. Enable them (and this specific "
-    "feature) in the Settings & Features tab."
+    "feature) in the Settings & Features page."
 )
 
 
@@ -456,7 +475,17 @@ def _sync_policy_editor_state(session_state, policy_path: str, policy) -> bool:
         str(Path(policy_path).resolve(strict=False)),
         compute_policy_fingerprint(policy),
     )
-    if session_state.get(_POLICY_EDITOR_SOURCE_KEY) == source:
+    if (
+        session_state.get(_POLICY_EDITOR_SOURCE_KEY) == source
+        # Under sidebar routing, Settings only renders when selected, and
+        # Streamlit deletes widget-backed keys on reruns that skip them. An
+        # unchanged source with missing editor keys therefore means the user
+        # navigated away and back: re-seed from the persisted policy
+        # (deliberately abandoning any unsaved edit) rather than letting the
+        # checkboxes silently render their False defaults.
+        and "policy_edit_allow_new_positions" in session_state
+        and "policy_edit_enable_strategy" in session_state
+    ):
         return False
     session_state["policy_edit_allow_new_positions"] = policy.allow_new_positions
     session_state["policy_edit_enable_strategy"] = policy.enable_strategy_proposals
@@ -501,8 +530,8 @@ def _portfolio_context_payload(portfolio) -> dict:
     holdings/orders in a different order can never spuriously invalidate
     an otherwise-unchanged signature), and cash/equity/buying_power
     rounded to a coarse $100 band. Shared by BOTH _proposal_content_
-    digest() (ordinary Selling/Propose & Approve/per-ticker Watchlist
-    cards) and _allocation_input_signature() (the Watchlist's
+    digest() (ordinary Selling/Propose & Approve/per-ticker Buying
+    cards) and _allocation_input_signature() (the Buying page's
     multi-ticker allocation split), so the same material-state
     definition protects every proposal card in the app.
 
@@ -697,7 +726,7 @@ def _render_terminal_or_inflight_status(proposal: dict, status: str) -> None:
     elif category == "unresolved":
         st.warning(
             f"Status: {status} -- this proposal's broker outcome is not yet confirmed. Resolve it via "
-            "the History tab's Reconcile action (or `recover-stale` on the CLI if it's stuck in "
+            "the History page's Reconcile action (or `recover-stale` on the CLI if it's stuck in "
             "'reconciling') before approving an equivalent trade."
         )
     else:
@@ -709,7 +738,7 @@ def _render_terminal_or_inflight_status(proposal: dict, status: str) -> None:
 def _render_committee_result(result) -> None:
     """Renders one CommitteeResult -- either every CommitteeReview section, or
     an explicit "review unavailable" reason. Deliberately NOT silent on
-    failure (unlike the Watchlist's allocation-review checkbox): the ADR's
+    failure (unlike the Buying page's allocation-review checkbox): the ADR's
     own release-gate list requires a clear unavailable state in CLI/
     Streamlit, and this sits next to a sell the user may be about to
     approve, not a purchase-split comment."""
@@ -775,7 +804,7 @@ def _committee_result_for_input(
 
 def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str, portfolio, packet: DecisionPacket) -> None:
     """One proposal card with the typed-confirmation approve flow.
-    Shared by the Selling, Propose & Approve, and Watchlist tabs --
+    Shared by the Selling, Propose & Approve, and Buying pages --
     identical safety flow everywhere a proposal can be approved: type the
     exact "approve" phrase, or the submit button stays disabled. The
     confirmation phrase is intentionally simple (2026-07-28) -- what
@@ -902,7 +931,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
         # proposal shape: a deterministic risk-reduction sell. Gating on
         # that here, inside the shared function, means the button appears
         # correctly at all 3 call sites with no per-call-site duplication --
-        # including "for free" correctness on Watchlist buy proposals
+        # including "for free" correctness on Buying-page buy proposals
         # (never eligible) and the Propose & Approve tab's mixed sell/
         # strategy proposals (only the sells qualify).
         is_committee_eligible = (
@@ -1240,7 +1269,34 @@ with badge_col:
         "on purpose: no single click here can ever enable real-money trading."
     )
 
+# Sidebar navigation (UI-2c) with the Watchlist tab renamed to "Buying"
+# (UI-2a). This is a render-control change, not styling: under st.tabs every
+# tab body executed on every rerun; under this routing only the selected
+# page's body executes. Cross-page state must therefore live in non-widget
+# session keys (see the durable-preference helpers), because Streamlit
+# deletes a widget's session-state key on any rerun that does not render it.
+_PAGE_LABELS = (
+    "Briefing",
+    "Buying",
+    "Selling",
+    "Propose & Approve",
+    "History",
+    "Ticker Suggestions",
+    "Operations",
+    "Settings & Features",
+)
+
 with st.sidebar:
+    st.header("Navigation")
+    page = st.radio(
+        "Page",
+        _PAGE_LABELS,
+        key="nav_page",
+        label_visibility="collapsed",
+    )
+    st.divider()
+    # Policy context is deliberately separated from navigation: choosing a
+    # page never changes which policy file governs proposals, and vice versa.
     st.header("Settings")
     policy_path = st.text_input("Policy file", value=str(DEFAULT_POLICY_PATH))
     # Default seeded from the Settings & Features preference; the per-run
@@ -1257,29 +1313,7 @@ with st.sidebar:
 
 store = _store()
 
-(
-    tab_briefing,
-    tab_watchlist,
-    tab_selling,
-    tab_propose,
-    tab_history,
-    tab_suggestions,
-    tab_operations,
-    tab_settings,
-) = st.tabs(
-    [
-        "Briefing",
-        "Watchlist",
-        "Selling",
-        "Propose & Approve",
-        "History",
-        "Ticker Suggestions",
-        "Operations",
-        "Settings & Features",
-    ]
-)
-
-with tab_briefing:
+if page == "Briefing":
     if st.button("Refresh briefing", key="refresh_briefing"):
         st.cache_data.clear()
         st.toast("Refreshed against the live account.", icon="\U0001F503")
@@ -1545,7 +1579,7 @@ with tab_briefing:
                 if explanation["triggered_today"]:
                     for trig in explanation["triggered_today"]:
                         st.caption(f"Signal firing today: {trig['rule']} ({trig['direction']})")
-        st.caption("For price targets, news, and the full history/best-worst range for any holding, look it up in the Watchlist tab.")
+        st.caption("For price targets, news, and the full history/best-worst range for any holding, look it up in the Buying page.")
 
     if packet.portfolio.open_orders:
         st.subheader("Open orders")
@@ -1639,14 +1673,14 @@ with tab_briefing:
         )
         st.info(curated_note)
 
-with tab_watchlist:
+if page == "Buying":
     st.caption(
         "Add tickers to your cart, then check them for: own trend/volatility, "
         "recent analyst price targets by firm, recent news, a REAL historical "
         "best/worst hold-period return range, and this project's own "
         "evidence-labeled signal history. **No probability-of-return number "
         "is shown anywhere.** This project has confirmed zero signals as real "
-        "edge after rigorous out-of-sample testing (see the Briefing tab's "
+        "edge after rigorous out-of-sample testing (see the Briefing page's "
         "evidence summary) -- a bare probability would either be fabricated "
         "or would dress up an already-rejected backtest as more confident "
         "than it is. When 2+ tickers are checked together, an inverse-volatility "
@@ -2285,11 +2319,11 @@ with tab_watchlist:
                             st.warning(e["dataset_warning"])
             st.caption(explanation["note"])
 
-with tab_selling:
+if page == "Selling":
     st.caption(
         "\"Recommended to sell\" here means one thing specifically: this position currently "
         "breaks one of your policy's risk limits (too concentrated, too much leveraged-ETF "
-        "exposure, etc.), computed the same deterministic way as the Propose & Approve tab. "
+        "exposure, etc.), computed the same deterministic way as the Propose & Approve page. "
         "It is NOT a price prediction -- this project has confirmed zero signals as real edge "
         "for predicting which stocks will go down, so nothing here claims to know that."
     )
@@ -2358,7 +2392,7 @@ with tab_selling:
             for proposal in sell_proposals:
                 _render_proposal_approval(proposal, store, policy_path, packet.portfolio, packet)
 
-with tab_propose:
+if page == "Propose & Approve":
     policy, packet = _load_packet(policy_path, include_events)
 
     pair_labels = ", ".join(f"{p.stable_ticker}/{p.leveraged_ticker}" for p in CONFIGURED_LEVERAGED_PAIRS)
@@ -2411,7 +2445,7 @@ with tab_propose:
     for proposal in proposals or []:
         _render_proposal_approval(proposal, store, policy_path, packet.portfolio, packet)
 
-with tab_history:
+if page == "History":
     with st.expander("Emergency order controls", expanded=False):
         st.warning(
             "Cancel-all activates the persistent kill switch first, then "
@@ -2571,17 +2605,17 @@ with tab_history:
 # ---------------------------------------------------------------------------
 # Ticker Suggestions -- dedicated research-only surface
 # (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md section 4). The Briefing and
-# Watchlist keep their existing embedded suggestion features (owner decision c,
+# Buying keep their existing embedded suggestion features (owner decision c,
 # 2026-08-02); this tab consolidates the same verified pipeline behind explicit
 # source toggles, explicit seed selection, and an explicit run button, so every
 # network call is a deliberate act rather than a side effect of rendering.
 # ---------------------------------------------------------------------------
 
-with tab_suggestions:
+if page == "Ticker Suggestions":
     st.error(
         "**Research only — not a proposal or allocation authorization.** "
-        "Nothing on this tab can create, size, approve, or submit an order. "
-        "Adding a ticker to the Watchlist cart, generating a proposal, and "
+        "Nothing on this page can create, size, approve, or submit an order. "
+        "Adding a ticker to the Buying cart, generating a proposal, and "
         "approving it remain separate, explicit actions governed by policy, "
         "fresh data, deterministic risk checks, and exact human approval."
     )
@@ -2712,7 +2746,7 @@ with tab_suggestions:
                 else:
                     st.caption("No verified candidates from this source on this run.")
         st.caption(
-            "Research only — to act on any of these, add the ticker to the Watchlist "
+            "Research only — to act on any of these, add the ticker to the Buying "
             "cart yourself and go through the normal check/propose/approve workflow."
         )
 
@@ -2724,7 +2758,7 @@ with tab_suggestions:
 # re-implementation.
 # ---------------------------------------------------------------------------
 
-with tab_operations:
+if page == "Operations":
     st.caption(
         "One place to see whether the platform is healthy and whether anything "
         "is trying to reach you. Read-only: nothing here can place, approve, or "
@@ -2911,7 +2945,7 @@ with tab_operations:
 # (never editable here, never shows a secret value).
 # ---------------------------------------------------------------------------
 
-with tab_settings:
+if page == "Settings & Features":
     st.caption(
         "Three kinds of controls live here and they are deliberately not equal: "
         "**UI preferences** (plain toggles, this session only), **authoritative "
@@ -2952,7 +2986,7 @@ with tab_settings:
             st.warning(
                 "Proposals created before this change can no longer execute. "
                 "Regenerate anything you still want on the Selling or "
-                "Propose & Approve tab."
+                "Propose & Approve page."
             )
         proposed_allow_new = st.checkbox(
             "Allow new positions (exposure-increasing buys become policy-eligible)",
@@ -2965,7 +2999,7 @@ with tab_settings:
         proposed_enable_strategy = st.checkbox(
             "Enable leveraged-pair strategy proposals by default",
             key="policy_edit_enable_strategy",
-            help="Sets the durable default for the Propose & Approve tab's per-run "
+            help="Sets the durable default for the Propose & Approve page's per-run "
             "checkbox. Configured leveraged-pair strategies carry NO confirmed, "
             "production-authoritative evidence -- enabling only allows the "
             "deterministic generator to be checked; it approves nothing.",
@@ -3010,10 +3044,11 @@ with tab_settings:
                         "old_fingerprint": active_fingerprint,
                         "new_fingerprint": new_fingerprint,
                     }
-                    # Every other tab was rendered earlier in this script run
-                    # with the old policy. Rerun immediately so the editor,
-                    # proposal defaults, and read-only status all agree with
-                    # the policy that was just persisted.
+                    # Earlier parts of this page (editor seed, status panel)
+                    # already rendered against the old policy. Rerun
+                    # immediately so the editor, proposal defaults, and
+                    # read-only status all agree with the policy that was
+                    # just persisted.
                     st.rerun()
         else:
             st.caption("No policy change selected — the values above match the active policy.")
@@ -3025,7 +3060,10 @@ with tab_settings:
     st.subheader("UI preferences (this session)")
     st.checkbox(
         "Fetch live earnings events by default",
-        key="pref_include_events_default",
+        key=_pref_widget_key("pref_include_events_default"),
+        value=bool(st.session_state.get("pref_include_events_default", False)),
+        on_change=_sync_pref_from_widget,
+        args=("pref_include_events_default",),
         help="Seeds the sidebar checkbox's default. The sidebar's per-run choice "
         "still wins once you touch it. Missing event data is always shown as "
         "honestly unavailable, never guessed.",
@@ -3040,7 +3078,10 @@ with tab_settings:
     )
     st.checkbox(
         "Enable optional AI features (master)",
-        key=_AI_MASTER_PREF_KEY,
+        key=_pref_widget_key(_AI_MASTER_PREF_KEY),
+        value=bool(st.session_state.get(_AI_MASTER_PREF_KEY, False)),
+        on_change=_sync_pref_from_widget,
+        args=(_AI_MASTER_PREF_KEY,),
         help="Master gate over every optional LLM surface. Off means no AI control "
         "is offered anywhere; deterministic content is completely unaffected either way.",
     )
@@ -3048,7 +3089,10 @@ with tab_settings:
     for pref_key, pref_label, pref_boundary in _AI_FEATURE_PREFS:
         st.checkbox(
             pref_label,
-            key=pref_key,
+            key=_pref_widget_key(pref_key),
+            value=bool(st.session_state.get(pref_key, False)),
+            on_change=_sync_pref_from_widget,
+            args=(pref_key,),
             disabled=not master_on,
             help=pref_boundary
             + (" (Enable the master toggle above first.)" if not master_on else ""),

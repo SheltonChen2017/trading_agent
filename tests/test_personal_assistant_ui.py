@@ -107,6 +107,18 @@ def test_policy_editor_state_tracks_the_selected_policy_identity(tmp_path):
     )
     assert state["policy_edit_allow_new_positions"] is False
 
+    # Sidebar routing: navigating away from Settings makes Streamlit delete
+    # the widget-backed editor keys while the source-identity key survives.
+    # Returning must re-seed from the persisted policy (abandoning unsaved
+    # edits), never render the checkboxes' False defaults for a True policy.
+    state.pop("policy_edit_allow_new_positions")
+    state.pop("policy_edit_enable_strategy", None)
+    assert _sync_policy_editor_state(
+        state, str(tmp_path / "second.json"), externally_changed
+    )
+    assert state["policy_edit_allow_new_positions"] is False
+    assert state["policy_edit_enable_strategy"] is False
+
 
 def test_changing_a_held_position_invalidates_the_signature():
     packet_a = _packet([{"ticker": "AAPL", "shares": 10, "entry_price": 100.0, "current_price": 150.0}])

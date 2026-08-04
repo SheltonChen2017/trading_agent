@@ -1,163 +1,176 @@
 # Development session handoff
 
-Prepared: 2026-08-04 after Claude (a) counter-reviewed Codex's UI-2b review,
-(b) added the UI-3 Backtest-page plan to the action plan, and (c) implemented
-UI-3 and pushed it for independent review.
+Prepared: 2026-08-04 after Codex independently reviewed and corrected
+Claude's UI-3 interactive Backtest page.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Current outcome
 
-**UI-2b counter-review: closed clean.** Codex's review chain (PR #140,
-commits `9dcff80`/`df4d278`/`bf0e396`/`c5fea82`/`1300aaa`) was verified
-commit by commit. The single finding, UI2BREV-001, was independently
-re-proven: Claude applied the fetch-then-filter mutation to the real UI and
-Codex's large-history AppTest failed for exactly the claimed reason, then
-passed after restoration. Docs and merge topology (PR #139 second parent =
-`8ff2017`, PR #140 second parent = `c5fea82`) check out. Merged branches
-were deleted locally and on origin; the remote again holds only `main`.
+UI-3 is **complete and independently accepted after correction**. No P0 or
+P1 issue, live-authority escape, broker interaction, secret exposure, or
+durable-state change was found. Claude's architecture was strong: the ninth
+Streamlit page composes the existing walk-forward engine through a pure
+research helper, defaults to synthetic data, fixes executable entry timing at
+`next_open`, caches real yfinance data, persists results without automatic
+reruns, labels research limitations, and exposes no proposal/order/policy or
+registry action.
 
-**UI-3 — interactive Backtest page — is implemented and pushed, awaiting
-independent review.** The owner requested it 2026-08-04 ("set up signals and
-run backtest in the UI directly", with a result graphic); the frozen
-six-point plan was written into `docs/ACTION_PLAN_2026-08-02.md` (UI-3)
-BEFORE implementation and is the review contract. Implementation commit
-`198339d` on `user/claude/ui-3-backtest-page-20260804`, based on
-`main = 1286966` (post PR #140).
+Review resolved two P2 research-correctness findings and one P3 proof gap at
+`540467e`:
 
-What UI-3 contains:
+- empty/partial provider responses and impossible signal/history combinations
+  can no longer appear as a fully covered zero-signal result;
+- fractional integer parameters are no longer truncated, and invalid
+  horizons or negative/non-finite slippage fail closed;
+- completed session results now retain actual data coverage, selected
+  horizons, entry timing, and slippage, with missing/short histories disclosed;
+- UI/engine equivalence compares complete DataFrames instead of row counts;
+  a stored-real-result AppTest pins the exploratory/coverage warnings; and
+- the research boundary is enforced across the complete reachable first-party
+  import graph, not merely direct imports.
 
-- `backtest/interactive.py` (new): a frozen inventory of six price-only
-  signals (dip/up z-score, cross-sectional momentum, relative dip/up,
-  52-week breakout, 52-week-high proximity, vol-scaled momentum) with
-  per-parameter widget bounds whose defaults are asserted equal to each
-  scan function's own signature defaults; `run_interactive_backtest()`
-  (fail-closed on unknown signal, undeclared/missing/out-of-bounds
-  parameters, empty horizons) calling the SAME
-  `backtest/engine.py::run_multi_horizon_backtest` the CLI scripts use with
-  entry timing fixed to executable `next_open`; `cumulative_return_frame()`
-  for the chart; and the exact caveat texts the UI must render
-  (SYNTHETIC_CAVEAT, EXPLORATORY_CAVEATS, CHART_CAPTION). PEAD/fundamentals
-  (earnings feed) and residual/idio-vol (require a precomputed residual or
-  benchmark feed) are deliberately excluded from v1.
-- A ninth sidebar page, "Backtest", between Ticker Suggestions and
-  Operations: signal selectbox with description, per-signal namespaced
-  parameter widgets (`bt_param_<signal>_<name>`, so shared names with
-  different bounds can never collide), data source radio defaulting to
-  synthetic (network is never implied by opening the page), universe/basket
-  scope, history length, hold-horizon multiselect, and an explicit Run
-  button. Synthetic loads are cached; real yfinance loads are cached with a
-  1-hour TTL. Completed runs live in the non-widget `backtest_run` session
-  key, survive navigation, and render a configuration caption ("results
-  reflect this configuration, not any widget changed since"), the severity-
-  correct caveat, the multi-horizon summary table, and a per-direction
-  cumulative net-return `st.line_chart` with a stale-selection guard on the
-  chart-horizon selectbox.
-- Benign backtest configuration keys joined the UINAV-001 persistence
-  whitelist (statically plus a comprehension over the inventory's
-  parameter keys).
-- README's Streamlit section was rewritten: it still said "Five tabs" with
-  Watchlist; it now documents the nine sidebar pages (including UI-2b's
-  outcome filter and the Backtest page) and notes that the confirmatory
-  significance pipeline remains CLI-only on purpose.
-
-Deliberately NOT implemented: no significance/bootstrap computation in the
-UI (the page states that confirmatory significance runs only in the frozen
-CLI pipeline — this is a design rule, not an omission), no portfolio equity
-curve (the chart caption says explicitly it is an equal-weight running sum,
-not compounded equity), no registry writes, no new dependency, no CLI
-change, no persistence schema change, and no path from any backtest result
-toward proposals or execution.
+The review is documented in
+`docs/REVIEW_2026-08-04_UI3_BACKTEST_PAGE.md`.
 
 ## 2. Canonical Git state
 
 Repository: https://github.com/SheltonChen2017/trading_agent
 
     base/main/origin-main = 1286966 (post PR #140)
-    UI-3 implementation = 198339d
-    UI-3 docs/handoff = the branch-tip commit containing this file
-    branch = user/claude/ui-3-backtest-page-20260804 (pushed)
+    Claude implementation = 198339d
+    Claude documentation/handoff = d664402
+    Claude branch = user/claude/ui-3-backtest-page-20260804 (pushed)
+    Codex correction = 540467e
+    Codex review records = 538eae9
+    Codex branch = codex/review-ui-3-backtest-20260804
+    canonical handoff = branch-tip commit containing this file
 
-Nothing has been merged for UI-3. The owner opens the PR (this machine's gh
-account cannot create PRs).
+At the time this replacement was prepared, the Codex review branch had not
+yet been pushed. The post-push handoff update at the final branch tip records
+and verifies remote availability. UI-3 has not been merged and Codex has not
+opened a pull request.
 
-## 3. Validation (development machine, Python 3.13, exact final tree)
+## 3. Commit-by-commit dispositions
 
-    new unit tests (inventory/validation/chart/boundary): 14 passed
-    new AppTests (Backtest page end-to-end on deterministic synthetic
-        data, incl. an engine-equivalence check): 6 passed
-    UI-adjacent focused set incl. import boundary: 78 passed in 102.64s
-    full suite: 2,597 passed, 1 skipped, 25 warnings in 407.67s
-    compileall (all packages + root modules): clean
-    git diff --check: clean
+- `198339d` — **accepted after correction**. Core engine composition, frozen
+  six-signal inventory, routing, caching, session behavior, caveats, chart
+  semantics, and read-only authority boundary are correct. `UI3REV-001` and
+  `UI3REV-002` required production corrections; `UI3REV-003` required stronger
+  regression proof.
+- `d664402` — **accepted after documentation replacement**. Its plan/README
+  accurately described the submitted intent and its handoff accurately marked
+  UI-3 awaiting review. Completion status, validation, and coverage-limit text
+  are superseded by the corrected review records and this handoff.
+- `540467e` — **accepted**. Corrects data coverage/sufficiency and strict
+  experiment validation, strengthens stored attribution, exact-frame
+  equivalence, real-result warnings, and transitive research boundaries.
+- `538eae9` — **accepted**. Updates the adopted action plan and README, adds
+  the binding review report, and adds the required two-paragraph completed
+  milestone record.
 
-Reverse-mutation proofs (each applied, shown red, restored):
+## 4. P0-P3 issue summary
 
-1. UI silently running a different experiment than displayed (hardcoded
-   z-threshold override in the run call) → caught by
-   `test_synthetic_run_completes_and_matches_the_engine`, which compares
-   the UI's per-horizon row counts against a direct engine run on the same
-   deterministic inputs.
-2. Synthetic run labeled with the real-data exploratory caveat → caught by
-   `test_synthetic_result_carries_the_synthetic_caveat`.
-3. `bt_scope` removed from the persistence whitelist → caught by
-   `test_results_survive_navigating_away_and_back`.
+| ID | Priority | Status | Summary |
+|---|---:|---|---|
+| UI3REV-001 | P2 | Resolved at `540467e` | Empty/partial real data and insufficient signal history could be presented as a valid full-scope no-signal result. UI-3 now fails empty/impossible runs, stores actual coverage, and visibly discloses missing or short histories. |
+| UI3REV-002 | P2 | Resolved at `540467e` | Fractional integer parameters were silently truncated and invalid horizons/slippage reached the engine. All numeric experiment boundaries now validate finite values and fail closed without changing the requested experiment. |
+| UI3REV-003 | P3 | Resolved at `540467e` | Equivalence checked row counts only, real-result warnings lacked an AppTest, and the authority boundary checked direct imports only. Exact frames, stored-real warnings, frozen history semantics, and transitive reachability are now regression-tested and mutation-proven. |
 
-Known coverage limits, stated for the reviewer: the real-data path
-(`_load_backtest_real_data`) is not exercised by tests (network); its cache
-key/TTL and the engine call are shared with the tested synthetic path. The
-chart itself is pinned via its caption and the frame builder's unit tests,
-not by asserting rendered chart internals (AppTest has no first-class
-line-chart accessor).
+No P0 or P1 issue was found. See the review report for the full reason,
+evidence, correction, and verification columns retained for each item.
 
-## 4. Review guidance
+## 5. Completed UI-3 behavior and limits
 
-Review range: `198339d` plus this handoff commit on
-`user/claude/ui-3-backtest-page-20260804`, based on `1286966`. The contract
-is the UI-3 section of `docs/ACTION_PLAN_2026-08-02.md` (six numbered
-points). Adversarial attention is most useful on:
+The Backtest page exposes six price-only signal scanners: dip/up z-score,
+cross-sectional momentum, relative dip/up, 52-week breakout, 52-week-high
+proximity, and volatility-scaled momentum. PEAD/fundamentals remain excluded
+because they require an earnings feed; residual momentum/reversal and
+idiosyncratic volatility remain excluded because they require precomputed
+residual or benchmark inputs.
 
-- research-honesty wording: does every rendered result carry the correct
-  caveat, and is there any path to a pooled-significance-looking number;
-- the fail-closed validation in `run_interactive_backtest` (unknown/
-  missing/out-of-bounds/empty-horizon) and int coercion of int-kind params;
-- Streamlit state edge cases: switching signals mid-session, a second run
-  with different horizons (the `bt_chart_horizon` stale-selection guard),
-  whitelist interaction with `_preserve_page_widget_state`;
-- the boundary test (`test_interactive_module_never_imports_execution_or_ml_code`)
-  and whether the transitive import-boundary suite still holds; and
-- README accuracy against the actual nine pages.
+The page offers synthetic or yfinance data, whole-universe or basket scope,
+signal-specific parameters, history length, and fixed hold-horizon choices.
+An explicit Run button is the only computation trigger. It renders a
+multi-horizon summary and an equal-weight running sum of per-signal net
+returns by direction. The chart is explicitly not a compounded portfolio
+equity curve; overlapping holds and no capital constraint remain disclosed.
 
-## 5. What is next (do not start without owner direction)
+Synthetic output is a plumbing check whose expected win rate is about 50%.
+Real output is exploratory, not point-in-time, uncorrected for multiple looks,
+and not evidence of edge. Confirmatory significance/out-of-sample work remains
+CLI-only. No UI result can create, approve, size, submit, cancel, reconcile, or
+dismiss a proposal/order, write the research registry, or change policy.
 
-- Independent review of this branch, then the owner's merge decision.
-- UI-2d (durable dismiss/archive) remains the next UI milestone after
-  UI-3's review; adding its `dismissed` status must also update UI-2b's
-  exhaustive outcome mapping (the exhaustiveness test will force it).
-- Phase 5 (operational deployment + epoch start) remains owner-heavy,
-  blocked only on the four decisions in
-  `docs/PHASE5_DEPLOYMENT_SESSION.md` §2.
+## 6. Validation
 
-## 6. Non-negotiable boundaries
+Environment: Python 3.13.14.
 
-- Paper trading is the only execution mode in scope.
-- The Backtest page is research-only: nothing on it may create, approve,
-  size, submit, cancel, or reconcile an order, write to the research
-  registry, or change policy.
-- A backtest result — however good-looking — is never evidence of edge and
-  never grounds for live trading; confirmatory significance runs only in
-  the frozen CLI pipeline.
-- ML/LLM output remains advisory or observational only.
-- Never commit credentials, operator databases, licensed data, or evidence
-  artifacts.
+- Submitted focused baseline re-run: 72 passed in 138.52s.
+- Initial corrected UI-3 unit/AppTest set: 33 passed in 51.25s.
+- Final corrected adjacent focused set: 88 passed in 144.16s.
+- Full suite on exact code commit `540467e`: 2,613 passed, 1 skipped,
+  25 warnings in 633.75s.
+- Compileall over required packages/root modules: clean.
+- `git diff --check`: clean.
 
-## 7. Machine-local state
+Red/green evidence:
 
-The owner's Streamlit app may be running from an earlier checkout; it does
-not gain the Backtest page until this branch merges and the app reloads.
-This session did not stop, restart, or mutate that process. All tests ran
-against the pytest-isolated session database. An earlier full-suite
-background run in this session produced an empty output file while a
-foreground rerun completed normally with identical results; both exited 0 —
-recorded here so the empty file is not mistaken for a failed run.
+- twelve strict-validation/data regressions failed on the submitted behavior
+  and passed after correction;
+- the impossible 252-session breakout on 160 rows failed red, then rejected
+  clearly after correction;
+- forcing zero slippage in the UI failed exact-frame comparison on every
+  `net_return_pct`, then passed after restoration;
+- suppressing incomplete-coverage presentation failed the stored-real-result
+  AppTest, then passed after restoration; and
+- an indirect `backtest.interactive -> backtest.engine -> assistant` import
+  failed with the complete chain, then passed after restoration.
+
+The 25 warnings are the existing WebSockets legacy and joblib/NumPy
+deprecations. Tests do not call the live yfinance network path; deterministic
+fixtures exercise empty, partial, short-history, attribution, and presentation
+semantics without an external request.
+
+## 7. What is next
+
+Per `docs/ACTION_PLAN_2026-08-02.md`, UI-2d is the next planned UI milestone,
+but **do not start it without owner direction**. Its first release is durable
+dismiss/archive, never physical deletion: add terminal `dismissed`, hide it by
+default while retaining audit/idempotency data, and permit it only for narrowly
+defined never-broker-touched proposals. It needs its own branch,
+migration/concurrency coverage, and independent review. Adding `dismissed`
+must update UI-2b's exhaustive outcome map.
+
+Automatic expiry remains a separately approved optional lifecycle milestone.
+Physical purge remains deferred and separately owner-authorized.
+
+Phase 5 operational deployment/epoch start remains owner-heavy. Do not run
+elevated installer actions, install scheduled tasks, approve the mandate, or
+start a formal evidence epoch without the owner's explicit direction and the
+decisions in `docs/PHASE5_DEPLOYMENT_SESSION.md` section 2.
+
+## 8. Machine-local and safety state
+
+The owner's Streamlit app may be running from an earlier checkout. This review
+did not stop, restart, or interact with it. No Alpaca endpoint, operator
+database, scheduled task, research registry, evidence artifact, or external
+data provider was contacted or mutated. All tests used their isolated data.
+
+At review start, only the primary worktree was registered. Claude and Codex
+share this checkout, so re-check `HEAD` and `git status` before every future
+stage/commit and preserve work not authored by the current agent.
+
+On resume, read in this order:
+
+1. `CLAUDE.md` and `AGENTS.md`;
+2. `docs/ACTION_PLAN_2026-08-02.md`;
+3. this handoff;
+4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` and
+   `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`; and
+5. `docs/REVIEW_2026-08-04_UI3_BACKTEST_PAGE.md`.
+
+Suggested resume prompt: "Read the required repository instructions and the
+canonical handoff, then verify local/remote Git state. Do not start UI-2d or
+Phase 5 actions until the owner explicitly directs them."

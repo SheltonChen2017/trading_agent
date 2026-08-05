@@ -336,25 +336,80 @@ def build_alert_delivery_checks(store: AssistantStore) -> tuple[ReadinessCheck, 
     )
 
 
-def build_data_integrity() -> DimensionReadiness:
-    """Report the three GR-0 data checks as unavailable until GR-4.
+def build_data_integrity(store: AssistantStore | None = None) -> DimensionReadiness:
+    """GR-4: derive the three GR-0 data checks from recorded fetches.
 
-    The previous API let any caller set ``point_in_time_data=True`` and used
-    that assertion to make this dimension ready. A claim is not evidence. GR-4
-    will add a data-layer adapter that derives these checks from authenticated
-    provider records; until then all three required checks remain explicit
-    blockers.
+    The pre-GR-4 API let any caller set ``point_in_time_data=True`` and used
+    that assertion to make this dimension ready. A claim is not evidence, so
+    the checks now come from ``assistant.data_integrity``'s derivation over
+    the append-only ``data_provider_fetches`` records -- and there is still
+    no caller-settable boolean. A machine with no store (or no recorded
+    fetches, or an unreadable record table) stays blocked with an explicit
+    reason; readiness must never improve because evidence became
+    unavailable.
     """
+    if store is not None and not isinstance(store, AssistantStore):
+        # The pre-GR-4 escape hatch was a caller passing
+        # point_in_time_data=True; the store parameter must never become a
+        # new place to smuggle an assertion. Only a real store (evidence)
+        # or None (explicitly blocked) is meaningful.
+        raise TypeError(
+            "build_data_integrity takes an AssistantStore or None; a "
+            "boolean assertion cannot make data integrity ready"
+        )
+    if store is None:
+        return _dimension(
+            DATA_INTEGRITY,
+            tuple(
+                ReadinessCheck(
+                    name=name,
+                    ok=False,
+                    detail=(
+                        "no store supplied; data-layer evidence cannot be "
+                        "derived from recorded provider fetches"
+                    ),
+                    mandatory=True,
+                    source="data_layer",
+                )
+                for name in (
+                    "price_freshness",
+                    "provider_health",
+                    "adjustment_honesty",
+                )
+            ),
+        )
+    from assistant.data_integrity import build_data_layer_evidence
+
+    try:
+        evidence = build_data_layer_evidence(store)
+    except Exception as exc:
+        return _dimension(
+            DATA_INTEGRITY,
+            tuple(
+                ReadinessCheck(
+                    name=name,
+                    ok=False,
+                    detail=(
+                        "data-layer evidence derivation failed "
+                        f"({type(exc).__name__}); refusing to guess"
+                    ),
+                    mandatory=True,
+                    source="data_layer",
+                )
+                for name in (
+                    "price_freshness",
+                    "provider_health",
+                    "adjustment_honesty",
+                )
+            ),
+        )
     return _dimension(
         DATA_INTEGRITY,
         tuple(
             ReadinessCheck(
                 name=name,
-                ok=False,
-                detail=(
-                    "verified data-layer evidence is unavailable; GR-4 must "
-                    "derive this check without an assistant-to-ml import"
-                ),
+                ok=bool(evidence[name]["ok"]),
+                detail=str(evidence[name]["detail"]),
                 mandatory=True,
                 source="data_layer",
             )
@@ -719,7 +774,7 @@ def build_platform_readiness(
     )
     dimensions = (
         execution,
-        build_data_integrity(),
+        build_data_integrity(store),
         operations,
         evidence,
         build_strategy_readiness(),

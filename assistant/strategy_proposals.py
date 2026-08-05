@@ -120,6 +120,17 @@ class LeveragedPairConfig:
     lookback_days_for_signal: int = LOOKBACK_DAYS_FOR_SIGNAL
 
 
+class StaleMarketDataError(RuntimeError):
+    """GR-4: refuse to size a strategy rebalance from stale bars.
+
+    A stale bar past its SLA blocks the strategy proposals that depend on
+    it -- and ONLY them: risk-reduction proposals derive from policy and
+    the live portfolio snapshot, never from these bars, so a data outage
+    can never obstruct a legitimate risk-reducing sell. Raised loudly
+    (not a silent empty return) so the caller's surface names the refusal.
+    """
+
+
 class MissingResearchDependencyError(RuntimeError):
     """Raised when a finding this module's proposal generation relies on
     has NO matching entry in the research registry at all, OR no longer
@@ -339,6 +350,20 @@ def _generate_leveraged_pair_rebalance_proposals(
     if stable_close.empty or leveraged_close.empty:
         return []
     as_of = min(stable_close.index[-1], leveraged_close.index[-1])
+
+    # GR-4 staleness SLA: a rebalance sized from bars that miss the latest
+    # completed NYSE session would trade current dollars on old prices.
+    # Refuse loudly; the caller catches per-pair and risk-reduction
+    # proposals remain unaffected (they never consult these bars).
+    from data.price_source import evaluate_bar_freshness
+
+    freshness = evaluate_bar_freshness(as_of.date().isoformat())
+    if not freshness.fresh:
+        raise StaleMarketDataError(
+            f"{stable_ticker}/{leveraged_ticker} bars are stale "
+            f"({freshness.detail}); refusing to size a rebalance from "
+            "stale market data"
+        )
 
     target_leveraged_weight, label = _target_leveraged_weight(stable_close, leveraged_close, as_of, production_params)
     if target_leveraged_weight is None:

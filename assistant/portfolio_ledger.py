@@ -707,15 +707,27 @@ def reconcile_snapshot(
         broker_qty = broker_shares.get(ticker, Decimal("0"))
         difference = ledger_qty - broker_qty
         if abs(difference) > SHARE_TOLERANCE:
-            mismatches.append(
-                {
-                    "kind": "position",
-                    "ticker": ticker,
-                    "ledger": _decimal_text(ledger_qty),
-                    "broker": _decimal_text(broker_qty),
-                    "difference": _decimal_text(difference),
-                }
+            mismatch: dict[str, Any] = {
+                "kind": "position",
+                "ticker": ticker,
+                "ledger": _decimal_text(ledger_qty),
+                "broker": _decimal_text(broker_qty),
+                "difference": _decimal_text(difference),
+            }
+            # GR-4: a share count that multiplied by a near-integer ratio
+            # is split-shaped -- name it, so the operator confirms a split
+            # in the journal instead of chasing a phantom fill. Detection
+            # by share-count reconciliation only; the mismatch still
+            # counts as a mismatch (fail-closed) until the split is
+            # CONFIRMED as a journal action.
+            from assistant.corporate_actions import (
+                detect_split_like_share_mismatch,
             )
+
+            suspicion = detect_split_like_share_mismatch(ledger_qty, broker_qty)
+            if suspicion is not None:
+                mismatch["suspected_split"] = suspicion
+            mismatches.append(mismatch)
 
     report = {
         "reconciliation_id": "recon-" + uuid.uuid4().hex,

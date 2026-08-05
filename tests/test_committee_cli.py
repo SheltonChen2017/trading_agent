@@ -75,7 +75,9 @@ def _enable_gates(monkeypatch, provider):
     monkeypatch.setattr(cli, "is_anthropic_committee_configured", lambda: True)
     monkeypatch.setattr(cli, "is_anthropic_committee_experiment_enabled", lambda: True)
     monkeypatch.setattr(cli, "AnthropicCommitteeProvider", lambda: provider)
-    monkeypatch.setattr(cli, "_packet", lambda include_events=True: _packet())
+    monkeypatch.setattr(
+        cli, "_packet", lambda include_events=True, store=None: _packet()
+    )
 
 
 def _unavailable_line(capsys) -> str:

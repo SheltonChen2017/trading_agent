@@ -438,7 +438,7 @@ def test_cli_briefing_surfaces_warnings_before_packet_failure(
 
     _warning(store)
 
-    def _packet_failure(*, include_events):
+    def _packet_failure(*, include_events, store=None):
         raise RuntimeError("portfolio feed unavailable")
 
     monkeypatch.setattr(cli, "_packet", _packet_failure)

@@ -13,6 +13,13 @@ from zoneinfo import ZoneInfo
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.kill_switch import env_kill_switch_active
+from assistant.llm import ProjectionError, project_committee_input
+from assistant.llm.anthropic_provider import (
+    AnthropicCommitteeProvider,
+    is_anthropic_committee_configured,
+    is_anthropic_committee_experiment_enabled,
+)
+from assistant.llm.committee_service import run_committee_review_and_record
 from assistant.platform_readiness import BLOCKED, build_platform_readiness
 from assistant.runtime_identity import RuntimeIdentityError, current_commit
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
@@ -573,6 +580,93 @@ def command_cancel_all_orders(args, store: AssistantStore) -> None:
     print(json.dumps(result, indent=2, sort_keys=True))
     if result["errors"]:
         raise SystemExit(2)
+
+
+def _committee_unavailable(code: str, message: str) -> None:
+    """The ADR-required CLI `review unavailable` state: one unmistakable
+    line, never a traceback, never a partial review, nonzero exit."""
+    print(f"Review unavailable ({code}): {message}")
+    raise SystemExit(2)
+
+
+def _print_cited_points(label: str, points) -> None:
+    if not points:
+        return
+    print(f"{label}:")
+    for point in points:
+        print(f"  - {point.text}")
+        print(f"    sources: {', '.join(point.source_ids)}")
+
+
+def command_committee_review(args, store: AssistantStore) -> None:
+    """Experimental investment-committee review of ONE stored sell proposal.
+
+    Advisory only: the output can never create, approve, size, submit,
+    cancel, or replace an order, and execution revalidation remains
+    mandatory after any human approval. Double-gated exactly like the
+    Streamlit surface (ANTHROPIC_API_KEY AND ENABLE_EXPERIMENTAL_COMMITTEE=1
+    -- completing the replay corpus did not remove that gate; removal is a
+    separately owner-authorized decision). Every call, accepted or not, is
+    audit-persisted; a review that cannot be audited is unavailable.
+    """
+    if not is_anthropic_committee_configured():
+        _committee_unavailable(
+            "not_configured",
+            "ANTHROPIC_API_KEY is not set; no provider call was made.",
+        )
+    if not is_anthropic_committee_experiment_enabled():
+        _committee_unavailable(
+            "experiment_disabled",
+            "Set ENABLE_EXPERIMENTAL_COMMITTEE=1 to opt into supervised "
+            "experimental use; this release gate stays mandatory.",
+        )
+
+    proposal = store.get_proposal(args.proposal_id)
+    if proposal is None:
+        _committee_unavailable(
+            "unknown_proposal", f"No stored proposal {args.proposal_id!r}."
+        )
+
+    packet = _packet(include_events=not args.no_events)
+    try:
+        committee_input = project_committee_input(packet, proposal)
+    except ProjectionError as exc:
+        _committee_unavailable("projection_refused", str(exc))
+
+    result = run_committee_review_and_record(
+        committee_input,
+        AnthropicCommitteeProvider(),
+        store,
+        timeout_seconds=args.timeout_seconds,
+    )
+    if not result.accepted:
+        detail = result.error_message or "no further detail."
+        if result.issues:
+            detail += " Issues: " + "; ".join(
+                f"{issue.code} at {issue.path}" for issue in result.issues
+            )
+        _committee_unavailable(result.error_code or "unknown", detail)
+
+    review = result.review
+    print("Committee review ACCEPTED — advisory only, not a trade instruction.")
+    print(
+        f"provider={result.provider_id} model={result.model_id} "
+        f"prompt_version={result.prompt_version}"
+    )
+    print(f"verdict: {review.verdict.value}")
+    print(f"confidence: {review.confidence_label.value}")
+    _print_cited_points("summary", [review.summary])
+    _print_cited_points("supporting points", review.supporting_points)
+    _print_cited_points("counterarguments", review.counterarguments)
+    _print_cited_points("hidden risks", review.hidden_risks)
+    _print_cited_points("data-quality warnings", review.data_quality_warnings)
+    _print_cited_points("invalidation conditions", review.invalidation_conditions)
+    _print_cited_points("revision requests", review.revision_requests)
+    _print_cited_points("confidence basis", [review.confidence_basis])
+    print(
+        "Every order still requires exact human approval and deterministic "
+        "revalidation; this review changes neither."
+    )
 
 
 def command_dismiss_proposals(args, store: AssistantStore) -> None:
@@ -1548,6 +1642,20 @@ def build_parser() -> argparse.ArgumentParser:
         help="Apply the current schema (open with current code) before verifying.",
     )
     verify_schema.set_defaults(handler=command_verify_db_schema, needs_store=False)
+
+    committee = commands.add_parser(
+        "committee-review",
+        help=(
+            "Experimental, advisory-only committee review of one stored sell "
+            "proposal (real API call, real cost). Requires ANTHROPIC_API_KEY "
+            "AND ENABLE_EXPERIMENTAL_COMMITTEE=1; prints an explicit 'Review "
+            "unavailable (<code>)' line and exits 2 on any failure."
+        ),
+    )
+    committee.add_argument("proposal_id")
+    committee.add_argument("--no-events", action="store_true")
+    committee.add_argument("--timeout-seconds", type=float, default=30.0)
+    committee.set_defaults(handler=command_committee_review)
 
     dismiss = commands.add_parser(
         "dismiss-proposals",

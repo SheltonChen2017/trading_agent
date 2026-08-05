@@ -100,13 +100,27 @@ Before daily model-backed use:
 - display a clear `review unavailable` state in CLI and Streamlit;
 - keep execution revalidation mandatory after any human approval.
 
-### Current implementation status (2026-07-31)
+### Current implementation status (2026-08-04)
 
 The provider, mandatory audit persistence, exact-input UI cache binding, clear
 unavailable state, and execution isolation are implemented. The required
-50-case frozen replay/adversarial corpus is **not** complete; the shipped probe
-describes itself accurately as a seed. The Streamlit surface therefore remains
-disabled by default even when `ANTHROPIC_API_KEY` is present. Supervised
-experimental use requires the additional explicit process opt-in
-`ENABLE_EXPERIMENTAL_COMMITTEE=1`. Remove that experimental gate only in a
-separately reviewed change that supplies and pins the required corpus.
+frozen replay/adversarial corpus now exists and is enforced:
+`tests/committee_corpus/cases.json` holds 69 deterministic cases (51 replay,
+10 injection, 8 memory-poisoning) executed through the REAL projection/
+validation/error-mapping pipeline by `tests/test_committee_replay_corpus.py`,
+whose inventory tests pin the ADR minimums (>=50 replay plus adversarial
+categories). One injection case deliberately freezes a DOCUMENTED lexical-
+filter limitation (a homoglyph-obfuscated directive passes the filter) as a
+measurement, not an endorsement — the architectural boundary remains the
+containment. The CLI `review unavailable` surface exists as
+`committee-review <proposal-id>` in `scripts/run_personal_assistant.py`:
+every failure mode prints one `Review unavailable (<code>): ...` line and
+exits 2, an accepted review prints its cited sections plus the mandatory
+human-approval reminder, and the audit row remains a display precondition.
+
+**The experimental gate is deliberately NOT removed by this work.** The
+Streamlit surface and CLI both still require `ANTHROPIC_API_KEY` AND the
+explicit process opt-in `ENABLE_EXPERIMENTAL_COMMITTEE=1`. With the corpus
+and CLI surface in place, every listed release-gate prerequisite is
+satisfied; removing the gate is now purely a separately reviewed,
+owner-authorized decision.

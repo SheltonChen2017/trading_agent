@@ -1,6 +1,11 @@
 from __future__ import annotations
 
 import ast
+import json
+import os
+import shutil
+import subprocess
+import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -331,3 +336,88 @@ def test_windows_installers_use_limited_principals_and_schedule_supervisor():
         "use the $( ... ) subexpression form"
     )
     assert "-Detail $(" in verifier
+
+
+@pytest.mark.skipif(
+    os.name != "nt",
+    reason="The verifier targets Windows PowerShell and Task Scheduler.",
+)
+def test_windows_operational_verifier_executes_without_ml_paths(tmp_path):
+    """Exercise the real PowerShell scope instead of only inspecting source.
+
+    Scheduler cmdlets are replaced with read-only no-task stubs so this test
+    verifies parameter binding, conditional expressions, JSON reporting, and
+    fail-closed task absence without touching the host scheduler.
+    """
+    powershell = shutil.which("powershell")
+    assert powershell is not None, "Windows validation requires powershell.exe"
+
+    database = tmp_path / "paper.db"
+    database.touch()
+    verifier = (
+        Path(__file__).resolve().parent.parent
+        / "scripts"
+        / "verify_windows_evidence_tasks.ps1"
+    )
+
+    def ps_quote(value: str | Path) -> str:
+        return "'" + str(value).replace("'", "''") + "'"
+
+    harness = tmp_path / "run-verifier.ps1"
+    harness.write_text(
+        "\n".join(
+            (
+                "$ErrorActionPreference = 'Stop'",
+                "function Get-ScheduledTask {",
+                "    [CmdletBinding()]",
+                "    param([string]$TaskName)",
+                "    return $null",
+                "}",
+                "function Get-ScheduledTaskInfo { throw 'unexpected task-info call' }",
+                (
+                    f"& {ps_quote(verifier)} "
+                    f"-RunAsUser 'REVIEW\\verifier' "
+                    f"-PythonPath {ps_quote(sys.executable)} "
+                    f"-DatabasePath {ps_quote(database)} "
+                    "-RequiredCredentialNames @() "
+                    "-Scope operational"
+                ),
+                "exit $LASTEXITCODE",
+            )
+        ),
+        encoding="utf-8",
+    )
+    result = subprocess.run(
+        [
+            powershell,
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(harness),
+        ],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    assert result.returncode == 1, result.stderr
+    report = json.loads(result.stdout)
+    assert report["Scope"] == "operational"
+    assert report["Ok"] is False
+    assert report["ProductionAuthoritative"] is False
+    assert report["FailedCheckCount"] == 4
+    assert [item["Name"] for item in report["Checks"] if item["Name"].startswith("task:")] == [
+        "task:TradingAgent-Paper-OperationsCycle",
+        "task:TradingAgent-Paper-OrderMonitor",
+        "task:TradingAgent-Paper-Watchdog",
+        "task:TradingAgent-Paper-PaperObservation",
+    ]
+    assert [item["Name"] for item in report["SkippedChecks"]] == [
+        "config_path",
+        "artifact_path",
+        "task:TradingAgent-ML-Shadow-Predict",
+        "task:TradingAgent-ML-Shadow-Mature",
+        "task:TradingAgent-ML-Shadow-Monitor",
+        "task:TradingAgent-ML-Shadow-Supervisor",
+    ]

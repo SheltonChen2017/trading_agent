@@ -35,14 +35,20 @@ The independent review reproduced the original operational preview with exit
 exit code could be ignored. The corrected preview must exit zero and list all
 four resolved actions; any nonzero exit remains a blocker to investigate.
 
+Follow-up 2026-08-04: PR #148 added
+`verify_windows_evidence_tasks.ps1 -Scope operational` for the intentional
+four-task installation. It verifies the four operational tasks and reports the
+six omitted ML path/task checks explicitly under `SkippedChecks`; default
+scope `all` preserves the complete eight-task contract.
+
 ## 2. Owner decisions (resolved 2026-08-04)
 
 1. **Epoch model 2**: the frozen operational checkout collects evidence while
    development continues elsewhere and is not deployed into that checkout.
 2. **Mandate approved with targets unchanged**: the separately committed
    `assistant/default_mandate.json` binds the owner's approval to the exact
-   behavior fingerprint. It still needs independent review and merge before
-   the operational checkout is pinned or an epoch starts.
+   behavior fingerprint. The implementation and independent review merged as
+   PRs #146/#147.
 3. **Operator DB path**: keep `data/trading_assistant.db` as the single record.
    The operational checkout reaches the same absolute file through
    `TRADING_ASSISTANT_DB`; mixing paths would split the evidence.
@@ -65,12 +71,13 @@ its gates.
    4 operational tasks manually once. Install the additional 4 ML shadow
    tasks only if a reviewed shadow config/artifact exists and ML evidence
    collection is wanted this epoch.
-4. **Verify tasks**: inspect the four operational task definitions and check
-   each produced real output at least once. The current
-   `verify_windows_evidence_tasks.ps1` contract requires the complete set of
-   8 operational + ML tasks and is applicable only when the optional ML set
-   was installed; do not misreport its expected failure on an intentional
-   operational-only deployment as successful verification.
+4. **Verify tasks**: run
+   `verify_windows_evidence_tasks.ps1 -Scope operational` with the same
+   Python/database paths and the full current-user name
+   (`REDMOND\sheltonchen` on this host), then check each of the four tasks
+   produced real output at least once. If the optional ML task set is
+   installed, use the default `-Scope all` with its config/artifact paths
+   instead. In either scope, any failed check or nonzero exit is a blocker.
 5. **Bootstrap the ledger**: `readiness`, then `ledger-bootstrap --confirm
    bootstrap` (once), then `ledger-reconcile` — runbook §Before starting a
    paper evidence epoch.

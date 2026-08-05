@@ -157,20 +157,30 @@ powershell -NoProfile -ExecutionPolicy Bypass -File scripts/install_windows_ml_s
 Remove `-WhatIf` only after reviewing every resolved path and local scheduled
 time. Provide required environment-variable *names* through
 `-RequiredCredentialNames`; never place secret values in task arguments.
-After installation, start every task manually at least once, then run:
+After installing only the four operational tasks, start each manually once and
+run the operational verifier scope:
+
+```powershell
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify_windows_evidence_tasks.ps1 -Scope operational -RunAsUser "MACHINE\trading-agent" -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db
+```
+
+If the four optional ML tasks were also installed, start all eight manually
+once and run the default full scope:
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify_windows_evidence_tasks.ps1 -RunAsUser "MACHINE\trading-agent" -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -ConfigPath C:\path\to\shadow.json -ArtifactPath C:\path\to\artifact-dir
 ```
 
 The verifier is read-only and non-authoritative. It checks paths, credential
-presence without printing values, all eight task principals/logon types/
-actions, and last task results. Run it as the task account to verify user-scoped
-credentials; when run as another account, only machine-scoped credentials are
-accepted as visible to the target. A never-run task is reported but is not a
-successful manual-run receipt; retain Task Scheduler history, stdout/stderr,
-SQLite alerts, JSONL delivery, and heartbeat/report evidence separately before
-declaring the host operational.
+presence without printing values, selected task principals/logon types/actions,
+and last task results. `-Scope operational` checks four tasks and lists the six
+omitted ML checks explicitly in `SkippedChecks`; default scope `all` checks all
+eight and requires the ML config/artifact paths. Run it as the task account to
+verify user-scoped credentials; when run as another account, only
+machine-scoped credentials are accepted as visible to the target. A never-run
+task is reported but is not a successful manual-run receipt; retain Task
+Scheduler history, stdout/stderr, SQLite alerts, JSONL delivery, and
+heartbeat/report evidence separately before declaring the host operational.
 
 The supervisor should also:
 

@@ -262,9 +262,10 @@ previews, CLI producers, fault harness, fail-closed readiness; see
 `docs/PHASE5_DEPLOYMENT_SESSION.md` for results and the ordered owner
 session). On 2026-08-04 the owner chose model 2, approved the mandate, retained
 the existing operator database, and chose the owner's account for scheduled
-tasks. The mandate commit still requires independent review and merge; no
-scheduler installation, ledger bootstrap, or epoch action follows without the
-owner's specific direction.
+tasks. The mandate implementation and independent review merged through
+PRs #146/#147; PR #148 then added the reviewed operational-only verifier scope.
+No scheduler installation, ledger bootstrap, or epoch action follows without
+the owner's specific direction.
 
 **Phase 5 — operational deployment + epoch start (owner-heavy):**
 merge the independently reviewed approved mandate → pin the model-2
@@ -404,8 +405,9 @@ Sequencing after UI Phase 2: UI-2d is complete after independent correction.
 Automatic expiry remains a separately approved optional milestone and physical
 purge remains deferred. Phase 5 operational deployment and epoch start are
 active: the four owner decisions were made on 2026-08-04 and the mandate
-approval is in independent review. Do not begin the elevated scheduler
-installation, ledger bootstrap, or epoch actions automatically.
+approval and its independent review are merged. The operational-only verifier
+scope also merged in PR #148. Do not begin the elevated scheduler installation,
+ledger bootstrap, or epoch actions automatically.
 
 **Phase 7 — data purchases, whenever decided (independent of code):**
 membership vendor decision → Databento statistics/reference captures →

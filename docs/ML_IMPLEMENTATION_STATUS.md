@@ -404,8 +404,10 @@ from proposal, allocation, or execution authority.
 Both Windows installers now register tasks under an explicit configurable
 user, S4U or interactive logon type, and `Limited` run level. The ML installer
 adds a separate repeating supervisor; `verify_windows_evidence_tasks.ps1`
-checks all eight task identities, their user/run level/Python action and last
-result, required paths, and credential presence without displaying secrets.
+checks task identities, user/run level/Python action, last result, required
+paths, and credential presence without displaying secrets. Default scope
+`all` checks all eight tasks and requires ML paths; scope `operational` checks
+the four operational tasks and reports the six omitted ML checks explicitly.
 
 This repository change did **not** install those tasks, validate a real
 operator account or credentials, exercise external alert delivery, or produce

@@ -55,6 +55,29 @@ Behavior after correction:
 Confirmed ledger: GR7AREV-001..007 (P0–P2, all resolved). Full
 dispositions: `docs/REVIEW_2026-08-05_GR7A_TAX_REPORTING.md`.
 
+**Claude counter-review (appended to that report):** all seven findings
+independently verified — the P0 re-proven red with a fresh probe (sample
+holdings, `source="manual"`, were labelled `verified=True`), the money P1
+re-proven by measurement, and the rest by inspection; **6.5/10 accepted as
+fair**. Four generalized-instance sweeps run: float-product conversions,
+read-only surfaces calling the fetch-recording packet path, and fail-open
+`assert any(...)` assertions all came back clean; the float-product class
+does persist upstream in `tax_lots.py` itself (reaching the sell preview)
+but was **measured at 2e-12 dollars worst case — $0.00 at cent
+precision** — and is deliberately left for a future milestone rather than
+refactoring core arithmetic mid-epoch.
+
+**CRGR7A-001 (P2, resolved on the review branch):** the corrected rule
+proved the snapshot came from *a* broker but not from **the account these
+books belong to**. `reconcile_snapshot()` already refuses a foreign
+account; the report ignored that binding, so a snapshot from another
+Alpaca account could print a confident COMPLETE — or an INCOMPLETE that
+sends the owner hunting for fills that were never missing (reachable: the
+owner rotated credentials the same day). `account_binding_reason()` now
+mirrors the ledger's rule and downgrades to unverified with an explicit
+reason; four tests including a positive control and a direction-agreement
+test against the ledger authority; mutation-proven.
+
 Final validation (Windows, Python 3.13.14):
 
 - Focused: 40 passed.

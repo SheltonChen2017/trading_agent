@@ -266,6 +266,48 @@ def _totals(rows: tuple[TaxReportRow, ...]) -> TaxTotals:
     )
 
 
+def account_binding_reason(store: AssistantStore, portfolio: Any) -> str | None:
+    """Why this snapshot cannot verify THIS journal's coverage, or None.
+
+    Counter-review CRGR7A-001: `source="alpaca"` proves the snapshot came
+    from a broker, not that it came from the broker account these books
+    belong to. `portfolio_ledger.reconcile_snapshot()` already refuses a
+    snapshot whose account differs from the one bound at bootstrap; a
+    coverage claim in an accountant-facing artifact must respect the same
+    binding or it can compare one account's lots against another
+    account's shares -- reporting a confident COMPLETE, or sending the
+    owner hunting for fills that were never missing.
+
+    This mirrors that rule rather than re-deciding it. It DOWNGRADES to
+    unverified instead of raising: GR-7a's contract is that a report is
+    always produced and states its limitation, and an unverifiable
+    account is an unanswered question, not a detected gap.
+    """
+    bootstrap = store.get_system_state("ledger_bootstrap")
+    snapshot_account = str(getattr(portfolio, "account_id", None) or "").strip()
+    if isinstance(bootstrap, dict) and bootstrap.get("source") == "alpaca":
+        bound_account = str(bootstrap.get("account_id") or "").strip()
+        if not bound_account:
+            return (
+                "the portfolio journal predates account-ID binding, so this "
+                "broker snapshot cannot be proven to belong to it; share "
+                "coverage was not verified"
+            )
+        if snapshot_account != bound_account:
+            return (
+                "the connected broker account does not match the account "
+                "bound to the portfolio journal; share coverage was not "
+                "verified"
+            )
+    elif not snapshot_account:
+        return (
+            "the broker snapshot carries no account ID, so it cannot be "
+            "matched to the portfolio journal; share coverage was not "
+            "verified"
+        )
+    return None
+
+
 def _coverage_report(
     ledger: LotLedger,
     portfolio: Any | None,
@@ -425,7 +467,21 @@ def build_annual_tax_report(
         coverage=_coverage_report(
             ledger,
             portfolio,
-            unavailable_reason=coverage_unavailable_reason,
+            # CRGR7A-001: a broker snapshot only verifies THIS journal's
+            # coverage when it comes from the account the journal is bound
+            # to. Checked here (where the store is in scope) and passed
+            # through the existing unavailable-reason channel.
+            unavailable_reason=(
+                coverage_unavailable_reason
+                if coverage_unavailable_reason is not None
+                else (
+                    account_binding_reason(store, portfolio)
+                    if portfolio is not None
+                    and getattr(portfolio, "source", None)
+                    == _VERIFIED_PORTFOLIO_SOURCE
+                    else None
+                )
+            ),
         ),
     )
 

@@ -237,7 +237,15 @@ def test_a_gain_is_never_wash_sale_flagged(store):
 # --- coverage honesty ------------------------------------------------------
 
 
-def _broker_positions(shares: float, ticker: str = "AAPL"):
+# A real Alpaca snapshot always carries the account it came from
+# (`build_portfolio_snapshot_from_alpaca` sets it), and CRGR7A-001 makes
+# that identity part of the coverage claim, so the fixture supplies one.
+_BROKER_ACCOUNT = "acct-gr7a-primary"
+
+
+def _broker_positions(
+    shares: float, ticker: str = "AAPL", *, account_id: str | None = _BROKER_ACCOUNT
+):
     """A live-shaped portfolio snapshot for coverage verification tests."""
     return build_portfolio_snapshot(
         [
@@ -251,6 +259,7 @@ def _broker_positions(shares: float, ticker: str = "AAPL"):
         1_000.0,
         source="alpaca",
         account_mode="paper",
+        account_id=account_id,
     )
 
 
@@ -288,6 +297,72 @@ def test_coverage_complete_when_ledger_matches_the_broker(store):
     assert report.coverage["complete"] is True
     assert report.complete is True
     assert report.coverage["tickers"]["AAPL"]["matched"] is True
+
+
+def _bootstrap_journal(store, account_id: str = _BROKER_ACCOUNT):
+    """Bind the journal to a broker account, as the real deployment does."""
+    from assistant.portfolio_ledger import bootstrap_opening_snapshot
+
+    bootstrap_opening_snapshot(
+        store,
+        _broker_positions(0, account_id=account_id),
+        confirmation="bootstrap",
+    )
+
+
+def test_a_snapshot_from_another_broker_account_never_verifies(store):
+    """CRGR7A-001: `source="alpaca"` proves a broker, not THE broker
+    account these books belong to. Comparing one account's lots against
+    another account's shares could print a confident COMPLETE, or send the
+    owner hunting for fills that were never missing."""
+    _bootstrap_journal(store)
+    _fill(store, "b1", "AAPL", "buy", 10, 100.0, datetime(2026, 1, 5, 15, tzinfo=UTC))
+
+    foreign = _broker_positions(10, account_id="acct-someone-elses")
+    report = build_annual_tax_report(store, 2026, portfolio=foreign)
+
+    assert report.complete is False
+    assert report.coverage["verified"] is False
+    assert "does not match the account bound" in report.coverage["reason"]
+    # Not "incomplete" either: this is an unanswered question, not a
+    # detected gap, so it must not send the owner hunting for fills.
+    assert report.coverage["complete"] is None
+    assert "COVERAGE UNVERIFIED" in render_tax_report_csv(report).splitlines()[1]
+
+
+def test_a_broker_snapshot_without_an_account_id_never_verifies(store):
+    _fill(store, "b1", "AAPL", "buy", 10, 100.0, datetime(2026, 1, 5, 15, tzinfo=UTC))
+    anonymous = _broker_positions(10, account_id=None)
+    report = build_annual_tax_report(store, 2026, portfolio=anonymous)
+    assert report.complete is False
+    assert "no account ID" in report.coverage["reason"]
+
+
+def test_the_bound_account_still_verifies_normally(store):
+    """Positive control: the binding check must not blanket-refuse."""
+    _bootstrap_journal(store)
+    _fill(store, "b1", "AAPL", "buy", 10, 100.0, datetime(2026, 1, 5, 15, tzinfo=UTC))
+    _fill(store, "s1", "AAPL", "sell", 4, 150.0, datetime(2026, 2, 5, 15, tzinfo=UTC))
+
+    report = build_annual_tax_report(store, 2026, portfolio=_broker_positions(6))
+    assert report.complete is True
+    assert report.coverage["verified"] is True
+
+
+def test_binding_verdict_agrees_in_direction_with_the_ledger_authority(store):
+    """The report must not invent a second binding rule: where
+    `reconcile_snapshot` REFUSES a foreign account, the report must refuse
+    to verify (it downgrades rather than raising, by design)."""
+    from assistant.portfolio_ledger import LedgerError, reconcile_snapshot
+
+    _bootstrap_journal(store)
+    foreign = _broker_positions(10, account_id="acct-someone-elses")
+
+    with pytest.raises(LedgerError, match="does not match the account bound"):
+        reconcile_snapshot(store, foreign)
+
+    report = build_annual_tax_report(store, 2026, portfolio=foreign)
+    assert report.coverage["verified"] is False
 
 
 def test_missing_fill_history_makes_the_report_incomplete(store):

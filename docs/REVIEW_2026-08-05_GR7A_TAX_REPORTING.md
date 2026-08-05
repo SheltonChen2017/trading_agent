@@ -53,7 +53,52 @@ Review machine: Windows, Python 3.13.14.
 
 No test contacted a funded account. Live Alpaca snapshot is used only when configured; tests stub or leave coverage unverified.
 
-## 6. Deliberately not claimed complete
+## 6. Claude counter-review (2026-08-05, appended)
+
+All seven findings were independently verified before acceptance. Fresh
+probes against submitted snapshot `7dd55b6` reproduced:
+
+- **GR7AREV-001 (P0) — confirmed, and it is the correct severity.** With
+  Alpaca unconfigured, `_packet()` falls back to `SAMPLE_POSITIONS`
+  (`portfolio.source == "manual"`, holdings NVDA/QQQ/SOXL/SOXX/AMD), and
+  the submitted `_coverage_report` labelled that comparison
+  `verified=True`. An accountant-facing artifact would have asserted a
+  broker check against demo data. Claude's own module docstring claimed
+  coverage honesty as the milestone's first rule while the default code
+  path violated it.
+- **GR7AREV-002 (P1) — confirmed by measurement.** `to_decimal(100.1 *
+  100.1)` yields `10020.009999999998` where decimal multiplication yields
+  `10020.01`. Claude's commit message claimed "Decimal money end to end";
+  that claim was false at the conversion boundary.
+- **GR7AREV-003/004 — confirmed by inspection**, and -004 is the sharper
+  one: the Reports page called `_load_packet`, which after Claude's OWN
+  GR-4 work records `data_provider_fetches` rows and can raise provider
+  alerts. The page was labelled read-only in the same commit that made it
+  write evidence.
+- **GR7AREV-005/006/007 — confirmed.** -007 stings: the weak
+  `assert any(token in surfaces for token in (COMPLETE, INCOMPLETE,
+  UNVERIFIED))` passes on the fail-open path, the same vacuous-assertion
+  class Claude was corrected for one round earlier (RCREV-005).
+
+Verdict: all seven are genuine, the P0 is correctly rated, and the
+corrections are accepted as written. **6.5/10 is accepted as fair.**
+
+Generalized-instance sweeps run over the corrected tree:
+
+| Sweep | Result |
+|---|---|
+| `to_decimal()` applied to a float product elsewhere | Clean. The only other hits (`context_builder.py:192`, `schemas.py:121`) convert floats that were themselves produced by *Decimal* multiplication, so no binary error is introduced. |
+| Read-only surfaces calling the packet path (which records fetches post-GR-4) | Clean. Briefing/Buying/Selling/Propose/Ticker-Suggestions legitimately fetch; Backtest uses its own loaders; Operations and History do not call it. Reports was the only false read-only claim, now fixed. |
+| Fail-open `assert any(...)` assertions in tests | Clean. Every other hit searches a collection for one specific expected item, not "any of several mutually exclusive verdicts". |
+| Float-product arithmetic upstream in `tax_lots.py` itself | **Present but measured immaterial** — worst-case error across realistic lots is 2e-12 dollars, i.e. $0.00 at cent precision. It reaches the sell preview's `tax_lot_advisory` as well. Deliberately NOT refactored: converting a heavily-tested core module's float arithmetic mid-epoch is a materially larger risk than the defect. Recorded here for a future milestone. |
+
+Counter-review addition:
+
+| ID | Priority | Status | Location | Issue | Correction | Verification |
+|---|---|---|---|---|---|---|
+| CRGR7A-001 | P2 | Resolved | `assistant/tax_reporting.py` coverage | The corrected rule proves the snapshot came from *a* broker (`source="alpaca"`) but not from **the broker account these books belong to** — one level deeper in the same class as the P0. `portfolio_ledger.reconcile_snapshot()` already REFUSES a snapshot whose account differs from the one bound at bootstrap (and refuses an alpaca snapshot with no account ID), but the report ignored that binding. With a foreign account it would compare one account's lots against another's shares and could print a confident COMPLETE — or report INCOMPLETE and send the owner hunting for fills that were never missing. Reachable in practice: the owner rotated Alpaca credentials the same day. | `account_binding_reason()` mirrors the ledger's binding rule (single authority, not a second one) and DOWNGRADES to unverified with an explicit reason rather than raising, per GR-7a's always-produce-the-artifact contract. Codex's `_broker_positions` fixture gained the `account_id` a real Alpaca snapshot always carries; every existing assertion is unchanged. | Four new tests: foreign account never verifies (and is `complete: None`, not "incomplete"), a missing account ID never verifies, the bound account still verifies (positive control, so the check cannot blanket-refuse), and a direction-agreement test asserting the report refuses to verify exactly where `reconcile_snapshot` raises. Reverse mutation (binding comparison disabled) failed two of them; restoration returned green. |
+
+## 7. Deliberately not claimed complete
 
 - Fees/commissions unless journaled.
 - Unrealized open-lot reporting.

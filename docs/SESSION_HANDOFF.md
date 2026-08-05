@@ -1,118 +1,178 @@
 # Development session handoff
 
-Prepared: 2026-08-05 (afternoon), after independent Codex review of GR-4
-including late audit follow-ups, and Claude's counter-review: all ten
-GR4REV findings independently re-verified (fresh red probes on the
-submitted snapshot for -001/-002/-008; verbatim/constructive confirmation
-for the rest), the kernel wiring checked against the GR-1 DI contracts,
-and one further member of the GR4REV-003 laundering class closed
-(CRGR4-001: the GR-5-era alert_channel_self_test check coerced its
-delegated freshness report with bool(); now structurally validated,
-mutation-proven). GR-4 data-layer honesty is complete after correction on
-`codex/review-gr4-data-honesty-20260805`. All work is
-DEV-SIDE ONLY: nothing was deployed to the frozen operational checkout,
-and `paper-epoch-001` is unaffected.
+Prepared: 2026-08-05 (evening), after GR-4 merged as PR #154 and GR-7 was
+split into sub-milestones. GR-7a (annual tax reporting) is implemented and
+pushed for review. All work is DEV-SIDE ONLY: nothing was deployed to the
+frozen operational checkout, and `paper-epoch-001` is unaffected.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
-## 1. Standing state: THE EPOCH (unchanged, do not disturb)
+## 1. Standing state: THE EPOCH (day 1 complete, do not disturb)
 
-`paper-epoch-001` is ACTIVE since 2026-08-05T18:27Z on frozen commit
+`paper-epoch-001` ACTIVE since 2026-08-05T18:27Z on frozen commit
 `8a2233c` (lineage hash `71d228d9...a9ba2`; strategy
-owner-directed-paper-policy 1.0.0; no-ml-model; approved mandate
-`693799c0...9487`). All five drills passed and are recorded in-epoch. The
-operational checkout `C:\git\trading_agent_operational` stays on `8a2233c`
-until `paper-epoch-close`; the four Interactive-logon tasks run there; the
-owner trades only via `C:\git\launch_trading_app.ps1`. Never deploy
-development commits (including this branch) to the operational checkout
-mid-epoch.
+owner-directed-paper-policy 1.0.0; model_id `no-ml-model`; approved
+mandate `693799c0...9487`). All five drills passed in-epoch.
 
-## 2. GR-4 data-layer honesty — complete after independent review
+**Session 1 of 60 is recorded.** Today's observation was captured manually
+at 14:42 PT (market closed 13:00 PT; the scheduled 16:30 run would
+otherwise have been lost if the machine were shut down first) — the books
+reconciled exactly, cash and all seven positions. Epoch-window orders:
+1 of 30. Open alerts: 0.
 
-Implementation branch: `user/claude/gr-4-data-honesty-20260805`
-(`3fa4229`, `eb33aa9`, `a4f09e3` on base `86c5f77`).
-Review branch: `codex/review-gr4-data-honesty-20260805`.
-First corrections commit: `7eef1c5`.
-Follow-up corrections close GR4REV-008..010 on this tip.
+Standing rules: the operational checkout stays on `8a2233c` until
+`paper-epoch-close`; the four Interactive-logon tasks run there; the owner
+trades only via `C:\git\launch_trading_app.ps1`; never deploy development
+commits (including this branch) to the operational checkout mid-epoch.
 
-Completed behavior after review correction:
+**Daily habit that matters:** either leave the machine on past 16:30
+local, or ask Claude to capture the observation after the close. That is
+the only recurring obligation of the 60 sessions.
 
-- Declared `PriceSource` boundary; yfinance lineage is honestly `False`.
-- Append-only `data_provider_fetches` evidence; all-empty and
-  unrequested-only responses are failures.
-- Failure-streak alert after three consecutive provider failures.
-- NYSE-calendar freshness: latest completed session required; current-date
-  bars pass only during a real open session.
-- Platform readiness threads its pinned `now` into data-integrity freshness.
-- DecisionPacket freshness fields and Briefing `DATA DEGRADED` banner,
-  including short histories that cannot compute trend.
-- Strategy proposals refuse missing/stale bars; risk-reduction proposals
-  remain available.
-- New proposals bind exact proposal-time shares; pre-submit validation
-  refuses split-shaped forward/reverse share drift before broker preflight.
-- Import-boundary-safe helper lives in `assistant/share_reconciliation.py`.
+**Known timing note (not a defect, do not change mid-epoch):** the
+observation task fires at 16:30 *local* (Pacific) = 19:30 ET. The
+installer default assumes an Eastern-time host where that is 30 minutes
+post-close. Harmless here (the close is long final), but if this host ever
+moves east of Eastern the default would fire BEFORE the close and must be
+revisited.
 
-Confirmed review ledger: GR4REV-001..010 (all P2, all resolved). Full
-dispositions are in `docs/REVIEW_2026-08-05_GR4_DATA_HONESTY.md`.
+## 2. Merged this session
 
-Final validation on the exact reviewed tree (Windows, Python 3.13.14):
+PR #154 (`codex/review-gr4-data-honesty-20260805`, second parent
+`dfc26cd`) closed the GR-4 round: implementation + Codex's ten GR4REV
+corrections + Claude's counter-review (all ten independently verified,
+three re-proven red with fresh probes, plus CRGR4-001 closing the third
+member of the delegated-`bool()` laundering family in the GR-5 alert
+self-test check). `main` is `376175e`; branches deleted local and remote.
 
-- Follow-up focused suite: **91 passed**.
-- Exact final tree: **2,798 passed / 1 skipped / 25 warnings** in 544.22s.
-- `compileall` and `git diff --check` clean.
+## 3. GR-7 split into sub-milestones (decision recorded in the action plan)
 
-Quality score for the submitted Claude GR-4 tree: **6.8/10**.
-Quality after independent review corrections: **9.5/10**.
+The archived plan's §12 lists five items — several branches of work — so
+GR-7 is split. The archived plan remains authoritative per item.
 
-## 3. Owner-dictated exploratory backtest (corrected)
+| # | Item | State |
+|---|---|---|
+| GR-7a | Annual tax reporting export | **implemented this session, awaiting review** |
+| GR-7b | Idle-cash / mandate reporting | open (small) |
+| GR-7c | Performance attribution | open |
+| GR-7d | Rebalance-to-target proposals + allocation-service fold-in | **BLOCKED ON AN OWNER DECISION** |
 
-`scripts/run_sharpest_decline_dip_2026_08_05.py` remains exploratory only.
-Review refuses underfilled horizons, keeps episode and universe baseline
-paired, prints paired diffs/beat rates, reports universe coverage, and
-discloses non-PIT adjusted yfinance history. Corrected real-data rerun:
+**GR-7d is blocked on a decision, not on code.** The archived plan asserts
+"the mandate already defines targets". It does not: the mandate defines
+*risk-shape* targets (volatility band, drawdown, time-under-water, capture
+ratios) and the policy defines *caps* (max position 5%, max exposure 50%,
+min cash 10%, max leveraged ETF 20%). A cap is not a target — curing a cap
+breach is what today's risk-reduction engine already does. Generating
+rebalance proposals requires the owner to define what the target portfolio
+IS (explicit weights, or a rule deriving them). Inventing one would be
+inventing an investment policy and asserting an allocation claim with no
+evidence behind it. The allocation design's own §6 lists the same
+unresolved decisions (candidate universe, sizing shape, sell-leg support).
 
-- Episodes: **1,698** full-horizon paired only.
-- Grid: mean +8.36%, median +4.78%, positive rate 58.2%, p5 −42.08%.
-- Hold: mean +9.12%, median +3.78%, positive rate 56.2%, p5 −43.98%.
-- Universe: mean +5.04%, median +5.40%, positive rate 74.7%.
-- Coverage: min 93 / median 102 / max 103 of 104 requested tickers.
-- Paired: grid−hold mean −0.76%, median 0.00%; hold−universe median
-  −1.39%; grid−universe median −0.30%.
-- Paired beat rates: P(hold>universe) 47.2%; P(grid>universe) 49.1%.
+Also found while scoping: the archived plan's "tax-aware sell preview"
+item is **already substantially shipped** — `assistant/proposals.py`
+surfaces `tax_lot_advisory` (lot-level realized-gain consequences) on
+risk-reduction proposals. GR-7a therefore did not re-implement it.
 
-Same-series positive rates are not beat rates. No significance, no edge
-claim, no authority. Survivorship-biased universe; `point_in_time_data=false`.
+## 4. GR-7a — annual tax reporting (this branch)
 
-## 4. What is next
+Branch `user/claude/gr-7a-tax-reporting-20260805`, based on `376175e`.
 
-1. Owner merge decision for the reviewed GR-4 branch. Under model 2 the
-   merge deploys nowhere; the operational checkout stays frozen at
-   `8a2233c`.
-2. Next action-plan items after GR-4: GR-7 product completeness (fold in
-   the allocation-service design), with GR-6 recovery/portability also
-   open. Owner decisions available: committee experiment-gate removal; ML
-   shadow tasks for a later epoch.
-3. The epoch clock runs by itself on the operational host.
+- **`assistant/tax_reporting.py` (new)** — a REPORTING layer only. Every
+  number comes from `assistant/tax_lots.py`'s already-tested machinery
+  (lot selection, holding-period classification, wash-sale flagging)
+  replayed over journal fills + journal-confirmed corporate actions, via
+  the same `fills_with_confirmed_splits()` construction proposals use.
+  Nothing re-derives a basis, a holding period, or a wash sale.
+  - `build_annual_tax_report(store, year, *, portfolio=None, now=None)`
+  - `render_tax_report_csv()` / `render_tax_report_json()`
+  - Money is Decimal end to end; `realized_pnl` is recomputed from the
+    exact decimal basis/proceeds (not converted from the float), so rows
+    sum to totals with zero drift. Exported text uses the project's
+    canonical `decimal_text`.
+- **Three honesty rules, each test-pinned:**
+  1. **Coverage lives in the artifact.** Complete / incomplete /
+     unverified is embedded in the CSV's *first lines* and in the JSON —
+     an accountant reads the file, not the terminal. `complete` is True
+     only when coverage was VERIFIED complete; unverified is not
+     completeness, it is an unanswered question.
+  2. **Wash sales are flags, never adjustments.** Basis is never modified;
+     the disclaimer states the cross-account rule this project cannot see.
+  3. **Tax years are market-local calendar years.** A sale at
+     2026-01-01T02:00Z is 2025-12-31 21:00 ET and belongs to tax year
+     2025. UTC bucketing would silently move late-December sales.
+  - An unbuildable ledger raises `TaxReportError` rather than emitting a
+    confident-looking empty report.
+- **CLI `tax-report --year N [--format csv|json] [--output PATH]
+  [--no-coverage-check]`** — read-only; exits 2 when coverage is
+  incomplete or unverified while STILL writing the artifact; a broker
+  outage during the coverage check degrades the claim instead of crashing
+  the export. Verified against the real operator database (read-only):
+  0 realized sales in 2026 so far, coverage-unverified path exercised.
+- **UI: new "Reports" page** (tenth page, between Backtest and
+  Operations) — deliberately the shared home for GR-7b/GR-7c too rather
+  than each inventing a surface. On-demand build (opening the page
+  computes nothing), coverage banner, totals + per-lot tables, CSV/JSON
+  downloads, no action-shaped controls.
+- Docs: README (ten pages, Reports page, CLI section) and the action plan
+  (split table + the GR-7d blocked rationale).
 
-## 5. Non-negotiable boundaries
+## 5. Validation (development machine, Python 3.13, exact final tree)
+
+    new: tests/test_tax_reporting.py 26 passed
+    new: tests/test_ui_reports_page.py 6 passed
+    adjacent (tax lots, corporate actions, UI feature controls,
+        import boundary): 112 passed
+    full suite: see the commit message for the exact final count
+    compileall + git diff --check: clean
+
+Reverse mutations (applied, shown red, restored):
+
+1. Treating UNVERIFIED coverage as complete → caught by FOUR tests
+   spanning the report, the CSV artifact, and both CLI paths.
+2. Bucketing the tax year in UTC instead of market-local time → caught by
+   the unit rule and the New-Year-boundary integration test.
+
+Known limits, stated for the reviewer: fees/commissions are excluded
+unless journaled (stated in the artifact's disclaimers); the report covers
+realized sales only (open-lot unrealized reporting is out of scope);
+`tax_lots.py`'s FIFO default is used and reported, not made selectable;
+and the CSV is a reconciliation aid, not a 1099-B substitute.
+
+## 6. What is next
+
+1. Codex review of this branch, then the owner's merge decision. Under
+   model 2 the merge deploys nowhere; the operational checkout stays
+   frozen at `8a2233c`.
+2. Then GR-7b (idle-cash/mandate reporting) or GR-7c (attribution) —
+   both land on the new Reports page. GR-6 recovery/portability is also
+   open. **GR-7d needs the owner's target-portfolio decision first.**
+3. Owner decisions available anytime: committee experiment-gate removal
+   (all ADR prerequisites met); ML shadow tasks for a later epoch (ML
+   tables are currently all zero, by design).
+
+## 7. Non-negotiable boundaries
 
 - Paper trading only; the epoch binds one host/commit/database/account;
   never deploy dev commits to the operational checkout mid-epoch.
-- Never synthesize a missing price; refuse or visibly degrade instead.
-- A conservative safeguard must not obstruct risk reduction — pinned by
-  the stale-bars test.
-- Exploratory backtest results are never evidence and never authorize
-  anything.
+- Reporting surfaces are read-only: they may not propose, approve, size,
+  submit, or dismiss anything.
+- An incomplete or unverified financial report must say so in the
+  artifact; never export partial data as though it were complete.
+- Wash-sale output stays advisory; basis is never adjusted here.
 - ML/LLM output stays advisory/observational; never commit credentials or
   operator data.
 
-## 6. Machine-local state
+## 8. Machine-local state
 
-Unchanged from the epoch handoff: operational checkout frozen at
-`8a2233c`; venv task interpreter; launcher + elevated wrapper regenerated
-from the reviewed bootstrap; four tasks live (OrderMonitor/Watchdog
-running with the corporate-network websocket flap falling back to
-polling). The owner's app runs via the launcher. The operator database
-was untouched by this session's development work (all tests used the
-pytest-isolated database).
+Operational checkout frozen at `8a2233c`; venv task interpreter;
+launcher + elevated wrapper generated from the reviewed bootstrap; four
+tasks live (OperationsCycle green every 10 minutes; OrderMonitor and
+Watchdog running as visible console windows — minimize, never close; the
+Alpaca websocket flaps on the corporate network and falls back to polling
+by design). The owner's Streamlit app runs detached via the launcher so no
+agent shell can terminate it. The operator database was not mutated by
+this session's development work (all tests used the pytest-isolated
+database; the only touch was the read-only `tax-report` CLI run and the
+epoch observation capture).

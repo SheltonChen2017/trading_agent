@@ -76,6 +76,12 @@ from assistant.paper_evidence import (
     start_paper_evidence_epoch,
 )
 from assistant.readiness import transaction_readiness
+from assistant.tax_reporting import (
+    TaxReportError,
+    build_annual_tax_report,
+    render_tax_report_csv,
+    render_tax_report_json,
+)
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.research_registry import underfilled_dataset_warning
 from assistant.risk_copilot import (
@@ -763,6 +769,55 @@ def command_dismiss_proposals(args, store: AssistantStore) -> None:
         "Dismissed proposals remain in the local audit history and cannot "
         "be executed."
     )
+
+
+def command_tax_report(args, store: AssistantStore) -> None:
+    """GR-7a: realized gains for one tax year, from confirmed records.
+
+    Read-only. Exits 2 when share coverage is incomplete or unverified so a
+    scripted caller notices, while STILL producing the artifact -- an
+    accountant needs to see what exists plus the stated limitation, not an
+    empty refusal. The limitation is written into the file itself, not just
+    printed here.
+    """
+    portfolio = None
+    if not args.no_coverage_check:
+        try:
+            portfolio = _packet(include_events=False, store=store).portfolio
+        except Exception as exc:
+            print(
+                "Coverage check unavailable "
+                f"({type(exc).__name__}); the report will be marked unverified."
+            )
+    try:
+        report = build_annual_tax_report(
+            store, args.year, portfolio=portfolio
+        )
+    except TaxReportError as exc:
+        raise SystemExit(f"Tax report unavailable: {exc}")
+
+    rendered = (
+        render_tax_report_csv(report)
+        if args.format == "csv"
+        else render_tax_report_json(report)
+    )
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(rendered, encoding="utf-8")
+        print(f"Wrote {args.format.upper()} tax report: {args.output}")
+    else:
+        print(rendered)
+
+    print(
+        f"\nTax year {report.tax_year}: {report.total.sale_count} realized "
+        f"sale row(s); short-term P&L {report.short_term.realized_pnl}, "
+        f"long-term P&L {report.long_term.realized_pnl}, total "
+        f"{report.total.realized_pnl}. "
+        f"{report.wash_sale_flagged_count} wash-sale flag(s) (advisory only)."
+    )
+    if not report.complete:
+        print(f"COVERAGE WARNING: {report.coverage.get('reason')}")
+        raise SystemExit(2)
 
 
 def command_readiness(args, store: AssistantStore) -> None:
@@ -1670,6 +1725,31 @@ def build_parser() -> argparse.ArgumentParser:
     committee.add_argument("--no-events", action="store_true")
     committee.add_argument("--timeout-seconds", type=float, default=30.0)
     committee.set_defaults(handler=command_committee_review)
+
+    tax_report = commands.add_parser(
+        "tax-report",
+        help=(
+            "GR-7a: realized gains/losses for one tax year from recorded "
+            "fills and journal-confirmed corporate actions. Read-only; "
+            "exits 2 when share coverage is incomplete or unverified "
+            "(the artifact is still produced and states the limitation). "
+            "Not tax advice; wash-sale entries are advisory flags only."
+        ),
+    )
+    tax_report.add_argument("--year", type=int, required=True)
+    tax_report.add_argument(
+        "--format", choices=("csv", "json"), default="csv"
+    )
+    tax_report.add_argument("--output", type=Path, default=None)
+    tax_report.add_argument(
+        "--no-coverage-check",
+        action="store_true",
+        help=(
+            "Skip the broker snapshot used to verify share coverage "
+            "(offline use). The report is then marked COVERAGE UNVERIFIED."
+        ),
+    )
+    tax_report.set_defaults(handler=command_tax_report)
 
     dismiss = commands.add_parser(
         "dismiss-proposals",

@@ -634,6 +634,22 @@ the broker has replaced it:
 python scripts/run_personal_assistant.py cancel-order tp_0123456789abcdef --confirm cancel
 ```
 
+Annual realized-gain reporting (GR-7a), read-only, from recorded fills and
+journal-confirmed corporate actions:
+
+```bash
+python scripts/run_personal_assistant.py tax-report --year 2026 \
+    --format csv --output data/reports/realized-2026.csv
+```
+
+It exits 2 when share coverage is **incomplete** (the tax-lot ledger and
+the broker disagree, so realized history is missing fills) or
+**unverified** (`--no-coverage-check`, or the broker snapshot was
+unavailable) — while still writing the artifact, because the limitation
+belongs in the file an accountant reads, not only in the terminal.
+Wash-sale entries are advisory flags; cost basis is never adjusted, since
+the rule spans accounts this project cannot see. Not tax advice.
+
 For an incident, the emergency command activates the persistent kill switch
 first and then attempts to cancel every open broker order, including orders
 not created by this app. It continues through individual failures and exits
@@ -776,7 +792,7 @@ could submit an order by accident. An override-eligible block adds a second,
 separate text box requiring an exact `OVERRIDE <SIDE> <SHARES> <TICKER>`
 phrase naming that specific order.
 
-Nine pages are selected from a left-sidebar menu, and only the selected
+Ten pages are selected from a left-sidebar menu, and only the selected
 page's body executes per rerun. Operational pages share the same SQLite
 store and policy file where applicable; research-only pages do not gain a
 write path merely by living in the same UI:
@@ -839,6 +855,15 @@ write path merely by living in the same UI:
   or a signal configuration with too little history. No multiplicity
   correction runs here, and confirmatory significance lives only in the
   frozen CLI pipeline.
+- **Reports** -- read-only owner reporting (GR-7). Today: the annual
+  realized-gain report for a chosen tax year, built from recorded fills
+  and journal-confirmed corporate actions, with short/long-term totals,
+  per-lot rows, advisory wash-sale flags, and CSV/JSON download. It
+  always states whether share coverage was verified **complete**,
+  **incomplete** (the ledger disagrees with the broker, so realized
+  history is missing fills), or **unverified** -- an incomplete export is
+  labelled as such in the file itself, not just on screen. Not tax
+  advice, and not a substitute for a broker 1099-B.
 - **Operations** -- GR-5's read-only operator dashboard: platform
   readiness, alert-delivery records, and the two explicit alert-delivery
   buttons.

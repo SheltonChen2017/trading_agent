@@ -157,7 +157,7 @@ already-merged work does not reorder the adopted next step.
 | GR-4 data-layer honesty | **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-05.** `data/price_source.py` and `assistant/data_integrity.py` provide declared provider lineage, strict recorded-fetch evidence, NYSE-session freshness, failure-streak alerts, and the GR-0 adapter. Review corrected non-session bars accepted as fresh, malformed lineage/readiness values accepted as evidence, stale short histories missing the banner, missing strategy bars looking like no rebalance, and forward-split proposal drift reaching submission. New proposals bind exact proposal-time shares and revalidation refuses a split-shaped fresh-snapshot mismatch before broker preflight; old stored proposals remain readable. The active regime and strategy-proposal fetches are recorded; quote freshness remains the execution gate's authority, current earnings reads expose unavailable values directly, and research/presentation-only historical fetches are not falsely described as provider-health evidence. Dev-side only — NOT deployed to the frozen operational checkout mid-epoch. | complete |
 | GR-5 alert delivery | ~~a real channel + delivery records + weekly self-test + operator dashboard~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: Windows toast for critical (owner decision), warnings batched to the briefing, immutable `alert_deliveries` records, escalation on failure, storage-verified weekly self-test producing the `alert_delivery` drill, readiness checks, and the Streamlit Operations tab. Review corrected a P2 gap: a durable broken-channel alert now keeps mandatory readiness failed until a later successful self-test proves recovery and acknowledges it. | complete |
 | GR-6 recovery/portability | off-machine backup restore, secrets audit, key rotation, portable scheduler, second-machine stand-up proven once | zero matches for all markers |
-| GR-7 product completeness | mandate-target rebalance proposals, tax-aware sell preview, performance attribution, annual tax export (wash sales), idle-cash management | `wash_sale`/`idle_cash`/attribution: zero hits |
+| GR-7 product completeness | **Split into sub-milestones 2026-08-05** (the archived plan's five items are far too large for one reviewed branch; one milestone per branch per CLAUDE.md §3). **GR-7a annual tax reporting** — **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-05.** Review closed sample-as-broker coverage verification, float-product money conversion, stdout artifact pollution, Reports-page provider-fetch writes, year/report desync, and coverage freeze/outage honesty. **GR-7b idle-cash/mandate reporting**, **GR-7c performance attribution** — open. **GR-7d rebalance-to-target proposals — BLOCKED ON AN OWNER DECISION** (see below), not on code. The archived plan's "tax-aware sell preview" item was found already substantially shipped: `assistant/proposals.py` surfaces `tax_lot_advisory` (lot-level realized-gain consequences) on risk-reduction proposals. | GR-7a complete after review |
 | Allocation service | delta-vs-target primitive, calibrated regime threshold, cadence, universe list, sizing | only the `strategy_evaluations` table exists |
 | Proposal-history cleanup | first milestone: `dismissed` status, preview-first dismissal CLI, History UI; optional later milestone: explicit-trigger expiry sweep; physical purge stays deferred | 19 statuses, no `dismissed`; only `prune-packets` exists (decision packets, not proposals) |
 | AI strategy authoring AS-0..AS-7 | prose → StrategySpec → compiler → evaluation plan → orchestrated backtest → dossier → registry | 0% — no `strategy_lab/`, no DSL, no Backtest tab |
@@ -337,6 +337,37 @@ operational machine waits for the epoch boundary; under model 2 they proceed
 on the development side immediately.
 
 Then: proposal-history physical purge remains deferred as before.
+
+**GR-7 — product completeness, split into sub-milestones (2026-08-05):**
+
+The archived plan (`docs/reference/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`
+§12) lists five items ordered by value-per-risk. That is several branches of
+work, so it is split here; the archived plan remains authoritative for each
+item's definition of done.
+
+| # | Item | State |
+|---|---|---|
+| GR-7a | **Annual tax reporting export** — realized gains by lot, short/long-term split, wash-sale flags, accountant-readable CSV/JSON, coverage honesty | **COMPLETE AFTER INDEPENDENT REVIEW 2026-08-05.** Pure reporting layer over `assistant/tax_lots.py`; only live `source="alpaca"` snapshots may verify coverage; sample/manual portfolios stay unverified. |
+| GR-7b | **Idle-cash / mandate reporting** — cash position measured against the approved mandate | open (small) |
+| GR-7c | **Performance attribution** — decompose return into allocation/selection/timing/cost/tax rather than the aggregate `performance.py` already reports | open |
+| GR-7d | **Rebalance-to-target proposals** (+ the `docs/reference/ALLOCATION_SERVICE_DESIGN.md` fold-in) | **BLOCKED ON AN OWNER DECISION, not on code** |
+
+**Why GR-7d is blocked.** The archived plan says "the mandate already
+defines targets; propose the deterministic trades that restore them." It
+does not. The approved mandate defines *risk-shape* targets (volatility
+band, max drawdown, time-under-water, capture ratios) and the policy
+defines *caps* (`max_position_pct` 5%, `max_total_exposure_pct` 50%,
+`min_cash_reserve_pct` 10%, `max_leveraged_etf_pct` 20%). Neither is a
+target **allocation**, and a cap is not a target: today's engine already
+proposes sells to cure a cap breach, which is the only deterministic
+"restore" that exists. Generating rebalance proposals therefore requires
+the owner to first define what the target portfolio *is* (explicit target
+weights, or a rule that derives them). Inventing one would be inventing an
+investment policy and asserting an allocation claim this project has no
+evidence for — exactly what `CLAUDE.md` §1/§6 forbid. The allocation
+design's own §6 flags the same gap (candidate universe, sizing shape, and
+sell-leg support are all listed as unresolved decisions). **Owner decision
+required before GR-7d can start; it is not an engineering blocker.**
 
 **UI-3 — interactive Backtest page (owner-requested 2026-08-04, inserted
 into this phase ahead of UI-2d at the owner's direction):**

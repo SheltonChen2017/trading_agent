@@ -109,6 +109,7 @@ _ALL_PAGES = (
     ("History", "Activate kill switch and cancel all open orders"),
     ("Ticker Suggestions", "Run suggestions"),
     ("Backtest", "Run backtest"),
+    ("Reports", "Build report"),
     ("Operations", "Deliver pending critical alerts"),
     # The Apply button only exists once an edit is pending, so Settings
     # uses its always-rendered master AI toggle as the marker instead.

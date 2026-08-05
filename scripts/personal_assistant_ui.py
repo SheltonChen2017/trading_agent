@@ -118,6 +118,12 @@ from assistant.proposal_status import (
     statuses_for_outcome_groups,
 )
 from assistant.proposals import generate_risk_reduction_proposals
+from assistant.tax_reporting import (
+    TaxReportError,
+    build_annual_tax_report,
+    render_tax_report_csv,
+    render_tax_report_json,
+)
 from assistant.portfolio_history import (
     capture_briefing_equity_snapshot,
     portfolio_performance_report,
@@ -1378,6 +1384,7 @@ _PAGE_LABELS = (
     "History",
     "Ticker Suggestions",
     "Backtest",
+    "Reports",
     "Operations",
     "Settings & Features",
 )
@@ -3388,6 +3395,155 @@ if page == "Backtest":
                     height=280,
                 )
                 st.caption(CHART_CAPTION)
+
+
+# ---------------------------------------------------------------------------
+# Reports -- GR-7's owner-facing reporting surface. STRICTLY READ-ONLY: it
+# renders records the platform already holds and never proposes, approves,
+# sizes, or submits anything. GR-7a fills it with the annual realized-gain
+# export; GR-7b/GR-7c (idle cash, performance attribution) land here too
+# rather than each inventing a new page.
+# ---------------------------------------------------------------------------
+
+if page == "Reports":
+    st.caption(
+        "Read-only reporting over records this app already holds. Nothing "
+        "here places, approves, or changes a trade. Coverage verification "
+        "uses a live broker snapshot only when Alpaca is configured; it "
+        "never treats the sample portfolio as the broker."
+    )
+
+    with st.expander("Annual realized gains (tax year)", expanded=True):
+        st.caption(
+            "Built from this app's recorded fills and journal-confirmed "
+            "corporate actions only. It is a reconciliation aid -- **not tax "
+            "advice** and not a substitute for your broker's 1099-B."
+        )
+        tax_year = st.number_input(
+            "Tax year",
+            min_value=2000,
+            max_value=2100,
+            value=_now_eastern().year,
+            step=1,
+            key="tax_report_year",
+        )
+        if st.button("Build report", key="tax_report_build"):
+            from execution.alpaca_broker import is_configured as _alpaca_configured
+            from assistant.context_builder import (
+                build_portfolio_snapshot_from_alpaca as _live_portfolio,
+            )
+
+            coverage_portfolio = None
+            coverage_note = None
+            coverage_unavailable_reason = None
+            if _alpaca_configured():
+                try:
+                    coverage_portfolio = _live_portfolio()
+                except Exception as exc:
+                    # A data/broker outage must degrade the coverage CLAIM,
+                    # not break the export (GR-4 discipline applied to
+                    # reporting). Do not fall back to SAMPLE_POSITIONS.
+                    coverage_unavailable_reason = (
+                        f"Coverage could not be verified ({type(exc).__name__}); "
+                        "the report is marked unverified."
+                    )
+                    coverage_note = coverage_unavailable_reason
+            else:
+                coverage_unavailable_reason = (
+                    "no live broker configured; share coverage was not "
+                    "verified against a broker snapshot"
+                )
+                coverage_note = coverage_unavailable_reason
+            try:
+                st.session_state["tax_report"] = build_annual_tax_report(
+                    store,
+                    int(tax_year),
+                    portfolio=coverage_portfolio,
+                    coverage_unavailable_reason=coverage_unavailable_reason,
+                )
+                st.session_state["tax_report_note"] = coverage_note
+            except TaxReportError as exc:
+                st.session_state.pop("tax_report", None)
+                st.session_state.pop("tax_report_note", None)
+                st.error(f"Tax report unavailable: {exc}")
+
+        _tax_report = st.session_state.get("tax_report")
+        if _tax_report is not None and _tax_report.tax_year != int(tax_year):
+            st.info(
+                f"Built report is for tax year {_tax_report.tax_year}. "
+                "Click Build report to refresh for the selected year."
+            )
+            _tax_report = None
+        if _tax_report is not None:
+            if st.session_state.get("tax_report_note"):
+                st.warning(st.session_state["tax_report_note"])
+            if _tax_report.complete:
+                st.success(
+                    "Coverage COMPLETE: recorded lots match the broker's "
+                    "share counts."
+                )
+            elif _tax_report.coverage.get("verified"):
+                st.error(
+                    "Coverage INCOMPLETE -- recorded lots do not match the "
+                    "broker's share counts. "
+                    f"{_tax_report.coverage.get('reason')}"
+                )
+            else:
+                st.warning(
+                    "Coverage UNVERIFIED -- this report was not checked "
+                    "against a live broker snapshot."
+                )
+
+            st.dataframe(
+                [
+                    {
+                        "Bucket": label,
+                        "Sales": totals.sale_count,
+                        "Proceeds": str(totals.proceeds),
+                        "Cost basis": str(totals.cost_basis),
+                        "Realized P&L": str(totals.realized_pnl),
+                    }
+                    for label, totals in (
+                        ("Short-term", _tax_report.short_term),
+                        ("Long-term", _tax_report.long_term),
+                        ("Total", _tax_report.total),
+                    )
+                ],
+                use_container_width=True,
+                hide_index=True,
+            )
+            st.caption(
+                f"{_tax_report.wash_sale_flagged_count} wash-sale flag(s) — "
+                "advisory only; cost basis is never adjusted here because the "
+                "rule spans accounts this app cannot see."
+            )
+
+            if _tax_report.rows:
+                st.dataframe(
+                    [row.to_dict() for row in _tax_report.rows],
+                    use_container_width=True,
+                    hide_index=True,
+                )
+            else:
+                st.info(
+                    f"No realized sales recorded in tax year "
+                    f"{_tax_report.tax_year}."
+                )
+
+            st.download_button(
+                "Download CSV",
+                data=render_tax_report_csv(_tax_report),
+                file_name=f"realized-gains-{_tax_report.tax_year}.csv",
+                mime="text/csv",
+                key="tax_report_csv",
+            )
+            st.download_button(
+                "Download JSON",
+                data=render_tax_report_json(_tax_report),
+                file_name=f"realized-gains-{_tax_report.tax_year}.json",
+                mime="application/json",
+                key="tax_report_json",
+            )
 
 
 # ---------------------------------------------------------------------------

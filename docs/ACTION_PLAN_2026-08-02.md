@@ -272,7 +272,7 @@ follow-up adds Interactive-logon host bootstrap and post-start
 ledger bootstrap or any epoch action. No such action follows without the
 owner's specific direction.
 
-**Phase 5 — operational deployment + epoch start (owner-heavy):**
+**Phase 5 — operational deployment + epoch start (COMPLETE 2026-08-05: paper-epoch-001 ACTIVE on frozen commit `8a2233c`, all four tasks running under Interactive logon, ledger bootstrapped/reconciled clean, all five drills passed and recorded in-epoch; the 60-session clock is running — see docs/SESSION_HANDOFF.md for the lineage block):**
 merge the independently reviewed approved mandate → pin the model-2
 operational checkout → elevated scheduler window under the owner's account →
 install + verify the 4 operational tasks (`-WhatIf` first) → install the

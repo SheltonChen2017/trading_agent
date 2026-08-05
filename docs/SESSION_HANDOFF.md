@@ -1,9 +1,7 @@
 # Development session handoff
 
 Prepared: 2026-08-04 after Codex independently reviewed and corrected Claude's
-Phase 5 mandate-approval branch, the owner merged both branches (PR #146,
-PR #147), and Claude counter-reviewed the review — confirming every finding
-and closing the verifier tool gap MANDREV-001 documented (CRMAND-001).
+operational-scope verifier counter-review.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
@@ -17,119 +15,108 @@ The owner made all four Phase 5 blocking decisions on 2026-08-04:
 3. keep `data/trading_assistant.db` as the single operator record; and
 4. run scheduled tasks under the owner's own account.
 
-The mandate-approval substep is **independently accepted after documentation
-correction**. `assistant/default_mandate.json` has status `approved`, owner
-`sheltonchen`, approval time `2026-08-04T22:57:09.621992+00:00`, and stored
-fingerprint
-`693799c0acb440040064eaa69a57d87c32186e63709f49ffa52f6feb39956487`.
-The reviewer independently recomputed the same fingerprint and verified that
-no fingerprinted behavior field changed from base `cb27224`.
-`allow_autonomous_execution` remains `false`; `mandate-status` reports
-`live_trading_enabled: false`.
+The mandate approval and its independent review are merged. Claude's follow-up
+added `verify_windows_evidence_tasks.ps1 -Scope operational`, giving the
+intentional four-task installation a runnable fail-closed verifier while
+default scope `all` preserves the eight-task ML-inclusive contract. This
+follow-up is **independently accepted after correction**: the runtime code was
+sound; review added executable Windows coverage and reconciled the primary
+deployment records with the new scope.
 
-Phase 5 as a whole is **not complete**. No scheduler task was installed or
-started in this review, the ledger was not bootstrapped, no evidence epoch was
-started, and no in-epoch drill was recorded. Mandate approval satisfies one
-promotion-review prerequisite only and grants no live or autonomous authority.
+Phase 5 as a whole is **not complete**. No scheduler task has been installed,
+the ledger has not been bootstrapped, no evidence epoch has started, and no
+in-epoch drill has been recorded. Mandate approval and verifier readiness do
+not grant live or autonomous authority.
 
 ## 2. Canonical Git state
 
 Repository: https://github.com/SheltonChen2017/trading_agent
 
-    origin/main and implementation base = cb27224
-    implementation branch = user/claude/mandate-approval-20260804 (pushed)
-    implementation approval commit = e8fe943
-    implementation handoff commit = f78e5ff
-    review branch = codex/review-mandate-approval-20260804 (pushed)
-    review correction = d4cd5ee
-    initial review handoff = 89ab9c6
-    publication handoff = the commit containing this file
+    origin/main and review base = eaa9c11 (post PR #148)
+    Claude implementation = 90f11ad
+    Claude merge = eaa9c11
+    review branch = codex/review-verifier-operational-scope-20260804 (pushed)
+    review correction = cd14eab
+    review handoff = the commit containing this file
 
-Both branches are now merged: the mandate branch as PR #146 (`702b98e`)
-and the review branch as PR #147 (`6a551cd`, second parent `14c9ac0` —
-topology verified). Claude's counter-review runs on
-`user/claude/verifier-operational-scope-20260804` (this branch) and adds
-CRMAND-001: `verify_windows_evidence_tasks.ps1` gained
-`-Scope all|operational` so the intentional four-task operational-only
-installation has a valid fail-closed success check ("all" preserves the
-original eight-task contract exactly), and two latent statement-position
-`( if ... )` runtime crashes were fixed — the script had never completed
-an end-to-end run before; its first successful run (operational scope,
-this host) produced the correct pre-install report. Deployment note:
-pass `-RunAsUser "REDMOND\sheltonchen"` (the full CurrentUser name) so
-credential checks evaluate. The counter-review record is appended to
-`docs/REVIEW_2026-08-04_PHASE5_MANDATE_APPROVAL.md`.
+The reviewed implementation is already on `main` through PR #148. The review
+branch contains only independent corrections and this handoff. Per the owner's
+standing workflow, branch/commit/push are required; no PR is created unless
+explicitly requested.
 
 Commit dispositions:
 
-- `e8fe943`: accepted after documentation correction. The JSON approval,
-  fingerprint, unchanged behavior, and test adaptation are correct.
-- `f78e5ff`: accepted after correction/replacement. Its unconditional
-  eight-task next step was inaccurate; this handoff replaces it.
-- `d4cd5ee`: independent review corrections and durable issue ledger.
+- `90f11ad`: accepted after correction. The verifier behavior is correct;
+  deployment documentation, executable regression coverage, and defect-count
+  wording required correction.
+- `eaa9c11`: accepted after correction. Its merge tree exactly matches
+  `90f11ad`; no conflict-only change was introduced.
+- `cd14eab`: independent review tests, documentation corrections, and durable
+  P0-P3 ledger.
 
 ## 3. Findings and corrections
 
-The full P0-P3 ledger is
-`docs/REVIEW_2026-08-04_PHASE5_MANDATE_APPROVAL.md`.
+The full ledger is
+`docs/REVIEW_2026-08-04_VERIFIER_OPERATIONAL_SCOPE.md`.
 
-- **MANDREV-001 (P2, resolved at `d4cd5ee`)**: the submitted handoff made all
-  eight scheduler tasks mandatory. Phase 5 requires four operational tasks;
-  four ML shadow tasks are additional and conditional on a reviewed
-  configuration/artifact plus the owner's decision to collect ML evidence.
-  The combined verifier currently requires all eight and is not a valid
-  success check for an intentional four-task-only installation.
-- **MANDREV-002 (P3, resolved at `d4cd5ee`)**: the README, live-promotion
-  checklist, action plan, and deployment checklist retained contradictory
-  proposed/pending-decision language. They now agree on the approved mandate,
-  resolved decisions, and still-pending owner-led operations.
-- **MANDREV-003 (P3, resolved at `d4cd5ee`)**: the human-readable mandate did
-  not enumerate the evidence and authority safeguards bound by its approval
-  fingerprint. It now lists the 60-session/30-order minimums, zero unresolved
-  items/critical alerts, research/PIT/recovery requirements, and autonomy
-  prohibition.
+- **VOSREV-001 (P2, resolved at `cd14eab`)**: the action plan, deployment
+  checklist, and handoff still described mandate review as pending and the
+  verifier as all-eight-only. They now record PRs #146-#148 and the exact
+  operational/default-all verifier usage.
+- **VOSREV-002 (P3, resolved at `cd14eab`)**: submitted automated coverage
+  only inspected PowerShell source text. A Windows-only subprocess regression
+  now executes the real verifier with no-task scheduler stubs, omits ML paths,
+  parses JSON, verifies the four checked/six skipped inventories, and proves
+  the nonzero failure path.
+- **VOSREV-003 (P3, resolved at `cd14eab`)**: the counter-review claimed two
+  pre-existing statement-position `if` crashes, but base `6a551cd` contained
+  one. The durable record now distinguishes that defect from the two new
+  conditional detail expressions written correctly with `$()` from the start.
 
 No P0 or P1 issue was found, and no review issue remains open.
 
-Submitted code quality: **8.0/10**. Corrected quality: **9.5/10**.
+Submitted quality: **8.0/10**. Corrected quality: **9.5/10**.
 
 ## 4. Validation
 
-Review machine: Windows, Python 3.13.14.
+Review machine: Windows, Python 3.13.14, Windows PowerShell 5.1.
 
-- Independent fingerprint probe: stored and computed hashes match; zero
-  behavior fields changed from `cb27224`; autonomous execution is false.
-- Mandate + platform-readiness focused suites: 29 passed in 12.55 seconds.
-- `mandate-status`: exit 0; approved; fingerprints equal;
-  `live_trading_enabled` and `allow_autonomous_execution` both false.
-- Full suite: 2,667 passed, 1 skipped, 25 warnings in 597.44 seconds.
+- Focused evidence-operations suite: 13 passed.
+- New executable verifier regression: passed on Windows; it skips explicitly
+  on non-Windows CI.
+- Direct read-only operational-scope probe: valid JSON, four absent-task
+  failures, six explicit ML skips, nonzero exit, and no credential values.
+- Full suite: 2,668 passed, 1 skipped, 25 warnings in 530.88 seconds.
 - Warnings: one existing WebSockets legacy deprecation and 24 existing
   joblib/NumPy deprecations.
 - Required `compileall`: clean.
 - `git diff --check`: clean before the handoff commit; recheck after it.
 
-The tests used isolated databases and mocked broker paths. This review did not
-exercise Task Scheduler, broker credentials, Alpaca connectivity, the operator
-database, ledger bootstrap, epoch creation, or operational drills.
+The direct probe used an existing non-database file solely to exercise the
+verifier's path/report/task behavior; it did not validate the operator
+database. The automated regression uses a temporary file and replaces
+scheduler cmdlets with read-only no-task stubs.
 
 ## 5. What is next (do not start automatically)
 
-1. Owner opens a PR from
-   `codex/review-mandate-approval-20260804` to `main` using
-   https://github.com/SheltonChen2017/trading_agent/pull/new/codex/review-mandate-approval-20260804.
-   The agent cannot create it with the currently authenticated Enterprise
-   Managed User.
-2. After merge, update the clean operational checkout to the exact merged
-   commit and rerun the full suite there.
-3. In an owner-led elevated shell, preview, inspect, install, and verify the
-   four operational tasks under the owner's account.
-4. Install the additional four ML shadow tasks only if a reviewed shadow
-   configuration/artifact exists and the owner explicitly wants ML collection
-   in this epoch. `verify_windows_evidence_tasks.ps1` currently verifies the
-   complete eight-task set.
+1. Owner merges the pushed
+   `codex/review-verifier-operational-scope-20260804` review branch using the
+   preferred Git workflow; no PR is required.
+2. Update the clean operational checkout to the final merged `main` commit and
+   rerun the full suite there.
+3. In an owner-led elevated shell, run the operational installer `-WhatIf`,
+   inspect all four resolved actions, then install and manually start the four
+   operational tasks.
+4. Run `verify_windows_evidence_tasks.ps1 -Scope operational` with the exact
+   Python/database paths and `-RunAsUser "REDMOND\sheltonchen"`. Any failed
+   check or nonzero exit remains a blocker.
 5. Follow `docs/PHASE5_DEPLOYMENT_SESSION.md` for ledger bootstrap/reconcile,
    mandate verification, `paper-epoch-start`, all five in-epoch drills, and
    the 60-session/30-order evidence window.
+
+The four ML shadow tasks remain optional for this epoch and require a reviewed
+shadow configuration/artifact plus explicit owner intent. If installed, use
+the verifier's default `-Scope all` with those paths.
 
 ## 6. Non-negotiable boundaries
 
@@ -149,29 +136,31 @@ database, ledger bootstrap, epoch creation, or operational drills.
 
 ## 7. Machine-local state
 
-Read-only checks on this machine confirmed:
+Re-measured read-only on this machine:
 
 - `C:\git\trading_agent_operational` exists, has a clean `main` worktree at
   `cb27224`, and contains ignored `assistant/my_policy.json`;
-- `C:\git\launch_trading_app.ps1` exists outside the repositories.
+- `C:\git\launch_trading_app.ps1` exists outside the repositories;
+- the four `TradingAgent-Paper-*` scheduled tasks are not installed;
+- the required paper-credential names are present in the selected owner
+  context; values were not displayed or read.
 
-The launcher and policy contents were not read. Scheduler state, credential
-presence, operator-database state, running Streamlit processes, and Alpaca
-connectivity were not inspected. Re-measure those facts rather than copying
-assumptions into a later handoff.
+The launcher and policy contents, operator database, running Streamlit
+processes, and Alpaca connectivity were not inspected. Re-measure those facts
+rather than copying assumptions into a later handoff.
 
 On resume, read in this order:
 
 1. `CLAUDE.md` and `AGENTS.md`;
 2. `docs/ACTION_PLAN_2026-08-02.md`;
 3. this handoff;
-4. `docs/REVIEW_2026-08-04_PHASE5_MANDATE_APPROVAL.md`;
+4. `docs/REVIEW_2026-08-04_VERIFIER_OPERATIONAL_SCOPE.md`;
 5. `docs/PHASE5_DEPLOYMENT_SESSION.md`; and
 6. `docs/OPERATIONS_RUNBOOK.md` before any owner-led deployment action.
 
 Suggested resume prompt: "Read the required instructions and canonical
-handoff, fetch all refs, and verify whether the pushed
-`codex/review-mandate-approval-20260804` branch has a PR or was merged.
-Preserve `d4cd5ee` and `89ab9c6`. Do not install tasks, touch the operator
-database, contact the broker, bootstrap the ledger, or start an evidence epoch
-without the owner's explicit direction."
+handoff, fetch all refs, and verify whether
+`codex/review-verifier-operational-scope-20260804` was merged. Preserve
+`cd14eab`. Do not install tasks, touch the operator database, contact the
+broker, bootstrap the ledger, or start an evidence epoch without the owner's
+explicit direction."

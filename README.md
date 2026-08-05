@@ -31,6 +31,9 @@ buy orders.
   live trading.
 - Maintains an append-only balanced portfolio journal that can be explicitly
   bootstrapped from, and reconciled against, an independent broker snapshot.
+- Records active decision-packet and strategy market-data fetches with declared
+  provider lineage, fails closed on stale/missing bars, and renders a visible
+  degradation warning instead of presenting stale regime data confidently.
 - Persists operational health alerts and verifies database backup/restore
   drills for an external process supervisor.
 - Preserves the existing signal, backtest, statistical-validation, ML, and
@@ -147,6 +150,10 @@ Important guarantees:
   order may have already been accepted), the service reconciles by looking
   the order up under its own idempotency key before concluding anything --
   see "Submission reconciliation" below.
+- Newly generated proposals bind the exact proposal-time share count. If the
+  fresh pre-submit broker snapshot differs by a split-shaped ratio, validation
+  refuses the stale intent before broker preflight and requires regeneration;
+  no price-jump heuristic is used.
 
 ## Current research status
 
@@ -853,6 +860,7 @@ records:
 - persistent daily execution reservations;
 - deduplicated durable operational alerts;
 - durable operator/reconciliation state.
+- append-only provider-fetch outcomes used by data-integrity readiness.
 
 The database and its WAL files are gitignored because they contain personal
 account state. The research registry and default policy are committed because
@@ -864,9 +872,11 @@ they define behavior and evidence, not private runtime data.
 assistant/
   schemas.py               typed DecisionPacket/PortfolioSnapshot/SignalEvidence structures
   context_builder.py       portfolio + regime + evidence DecisionPacket
+  data_integrity.py        recorded provider fetches, health alerts, readiness evidence
   policy.py                validated, versioned personal policy
   mandate.py               risk targets + fail-closed live-promotion review gate
   portfolio_ledger.py      balanced journal + broker snapshot reconciliation
+  share_reconciliation.py  pure split-shaped share-count mismatch detection
   operations.py            health, alerts, backup/restore drills
   portfolio_analytics.py   deterministic portfolio metrics and previews
   research_registry.py     file-backed evidence claims + provenance/authority checks
@@ -893,6 +903,7 @@ assistant/
 
 data/
   market_data.py           historical and synthetic price data
+  price_source.py          provider-lineage and NYSE-session freshness contracts
   event_data.py            upcoming earnings with availability metadata
   earnings_data.py         point-in-time earnings history
   analyst_data.py          analyst actions [DORMANT: rejected signal, manual-only]

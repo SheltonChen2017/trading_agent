@@ -50,16 +50,16 @@ reconcile) is built, characterization-frozen, and three-review hardened; the
 ML research/shadow stack is software-complete through monitoring and dossier;
 the LLM committee foundation is built and gated; the execution-kernel split
 (GR-1) is complete after the independently reviewed 2026-08-03 GR-1E
-assessment; GR-3 fault drills, GR-5 alert delivery, and GR-2's risk registry
-are complete and independently reviewed (2026-08-03). What does not exist is: GR-4, GR-6, GR-7,
+assessment; GR-2 through GR-5 are complete and independently reviewed. What
+does not exist is: GR-6, GR-7,
 every AI *product* plan beyond the committee (strategy
 authoring, debate, allocation service, MCP, and proposal cleanup), and — most
-importantly — **any qualifying frozen-epoch operational evidence at all**:
-four operational tasks registered but not yet accepted after their S4U launches
-were blocked by Credential Guard, zero evidence epochs, zero
-drills recorded, zero ledger bootstraps, zero broker lifecycle rows, and the
-60-session / 30-order mandate clock has never started. The scarcest resource
-on the critical path is not engineering — it is elapsed calendar time on a
+importantly — enough **elapsed frozen-epoch evidence**: `paper-epoch-001` is
+active on frozen commit `8a2233c`, the four operational tasks run under
+Interactive logon, the ledger was bootstrapped and reconciled, and all five
+required drills passed in-epoch, but the 60-session / 30-order mandate
+minimums have only just started accumulating. The scarcest resource on the
+critical path is not engineering — it is elapsed calendar time on that
 frozen runtime, plus a small number of owner decisions and data purchases.
 
 ---
@@ -154,7 +154,7 @@ already-merged work does not reorder the adopted next step.
 |---|---|---|
 | GR-2 risk-check registry | ~~ordered registry replacing the hand-written gate sequence~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: 20-check `RISK_CHECK_REGISTRY` with `applies_at` phases, exact old/new behavior preservation, runner-bound frozen inventory, registry-injection proof, and corrected terminal semantics. Implementation `03895ae`; review correction `0167c67`. | complete |
 | GR-3 fault-injection drills | ~~9 named faults + drill harness~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: 11 fault IDs / 14 behavioral tests plus an atomic hash-stamped runner. Review corrected active-epoch lineage binding, skipped/abnormal pytest fail-open behavior, the missing F4 critical alert, the absent true `submitting` restart case, partial-state assertions, and artifact atomicity. Records ambiguous_submission/restart_recovery/kill_switch rows only under exact epoch lineage or as explicit verification-only evidence. | complete |
-| GR-4 data-layer honesty | **Implemented 2026-08-05, awaiting independent review.** `data/price_source.py` (PriceSource protocol with mandatory lineage declaration; yfinance honestly non-point-in-time; NYSE-calendar bar-freshness SLA; fetch records where an all-empty response is a FAILED fetch) + `assistant/data_integrity.py` (recorded fetches in the append-only `data_provider_fetches` table, failure-streak critical alerts, and the GR-0 evidence adapter). The briefing renders a DATA DEGRADED banner on stale bars; stale bars block strategy proposals via `StaleMarketDataError` while risk-reduction never consults bars; ledger reconciliation names split-shaped share mismatches (`detect_split_like_share_mismatch`, ratio-based, never a price heuristic); GR-0's `data_integrity` dimension now derives from recorded evidence and the boolean-assertion escape hatch still raises TypeError. Dev-side only — NOT deployed to the frozen operational checkout mid-epoch. | complete pending review |
+| GR-4 data-layer honesty | **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-05.** `data/price_source.py` and `assistant/data_integrity.py` provide declared provider lineage, strict recorded-fetch evidence, NYSE-session freshness, failure-streak alerts, and the GR-0 adapter. Review corrected non-session bars accepted as fresh, malformed lineage/readiness values accepted as evidence, stale short histories missing the banner, missing strategy bars looking like no rebalance, and forward-split proposal drift reaching submission. New proposals bind exact proposal-time shares and revalidation refuses a split-shaped fresh-snapshot mismatch before broker preflight; old stored proposals remain readable. The active regime and strategy-proposal fetches are recorded; quote freshness remains the execution gate's authority, current earnings reads expose unavailable values directly, and research/presentation-only historical fetches are not falsely described as provider-health evidence. Dev-side only — NOT deployed to the frozen operational checkout mid-epoch. | complete |
 | GR-5 alert delivery | ~~a real channel + delivery records + weekly self-test + operator dashboard~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03**: Windows toast for critical (owner decision), warnings batched to the briefing, immutable `alert_deliveries` records, escalation on failure, storage-verified weekly self-test producing the `alert_delivery` drill, readiness checks, and the Streamlit Operations tab. Review corrected a P2 gap: a durable broken-channel alert now keeps mandatory readiness failed until a later successful self-test proves recovery and acknowledges it. | complete |
 | GR-6 recovery/portability | off-machine backup restore, secrets audit, key rotation, portable scheduler, second-machine stand-up proven once | zero matches for all markers |
 | GR-7 product completeness | mandate-target rebalance proposals, tax-aware sell preview, performance attribution, annual tax export (wash sales), idle-cash management | `wash_sale`/`idle_cash`/attribution: zero hits |
@@ -291,7 +291,8 @@ preference, all non-runtime):**
 **UI Phase 2 (owner-requested 2026-08-03, jumps to the front of this phase
 — the owner is paper trading daily and these directly support it)** →
 ~~committee replay corpus + CLI surface~~ (complete after independent
-correction 2026-08-05) → GR-4 data honesty → GR-7 product
+correction 2026-08-05) → ~~GR-4 data honesty~~ (complete after independent
+correction 2026-08-05) → GR-7 product
 completeness (fold in the allocation-service design here, per Codex's
 recommendation, so the app keeps one authoritative sizing path).
 

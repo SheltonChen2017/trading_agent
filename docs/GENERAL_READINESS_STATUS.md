@@ -863,10 +863,61 @@ gap by making the CLI render durable warning batches before fallible
 portfolio/data construction. Final dispositions and evidence are in
 `docs/REVIEW_2026-08-03_CLAUDE_INTEGRITY_GR2.md`.
 
-## GR-4, GR-6 .. GR-9 — not started
+## GR-4 — data-layer resilience and honesty: COMPLETE AFTER INDEPENDENT REVIEW (2026-08-05)
 
-Each requires its own gap analysis first; the plan predates the ML
-full-system additions throughout.
+The production decision-packet regime fetch and the optional leveraged-pair
+strategy fetch now use a declared `PriceSource` boundary. Yfinance declares
+`provides_point_in_time_lineage=False`; every recorded fetch preserves
+requested/returned/missing counts, a canonical timezone-aware fetch time,
+latest bar session, and a strict boolean lineage declaration in
+`data_provider_fetches`. An all-empty response is a failed fetch. Three
+consecutive failures raise one deduplicated critical operational alert.
+GR-0's `data_integrity` dimension derives freshness, provider health, and
+adjustment honesty from these rows and rejects malformed delegated values
+instead of coercing them.
+
+Daily-bar freshness uses the NYSE calendar: the latest completed session is
+required, while a current-date partial bar passes only while that real session
+is open. Weekends, holidays, pre-market dates, future dates, missing bars, and
+stale bars fail closed. The DecisionPacket carries the expected session and
+freshness verdict; the Briefing renders `DATA DEGRADED` even when stale history
+is too short to calculate trend. Missing strategy bars raise a visible
+`MarketDataUnavailableError`, stale strategy bars raise
+`StaleMarketDataError`, and neither condition touches deterministic
+risk-reduction proposal generation.
+
+Corporate-action detection is based on share-count reconciliation, never a
+price jump. Reconciliation keeps split-shaped differences as mismatches until
+the owner confirms the journal action. Every newly generated proposal also
+stores exact proposal-time shares in its impact record; pre-submit validation
+compares that value with the fresh broker snapshot and refuses a split-shaped
+forward or reverse mismatch before broker preflight. Legacy proposals without
+the additive field retain their prior validation behavior.
+
+Independent review corrected seven material failure directions: non-session
+bars accepted as fresh; non-boolean lineage persisted as truthy; malformed
+readiness verdicts coerced to pass; stale short histories missing the banner;
+missing strategy data silently returning no proposal; the strategy path
+bypassing provider-health recording; and forward splits escaping the existing
+sell-exceeds-held check. The review also corrected the separate exploratory
+dip-grid script so every reported episode has its frozen 63-session horizon.
+See `docs/REVIEW_2026-08-05_GR4_DATA_HONESTY.md`.
+
+### Deliberate scope deviations from archived plan section 9
+
+Quote freshness remains solely enforced by the execution gate and policy; a
+second SLA here would create conflicting authorities. Current earnings reads
+are not cached and already return explicit unavailable records on failure, so
+there is no stale persisted earnings value to bless. Dormant fundamentals and
+research/presentation-only historical fetches are not represented as
+production provider-health evidence. The completed scope covers the
+DecisionPacket/Briefing and the only bar-derived proposal path; it does not
+claim that every exploratory UI or research fetch is operational evidence.
+
+## GR-6 .. GR-9 — not started
+
+Each requires its own gap analysis first; the plan predates the ML full-system
+additions throughout.
 
 Known items already identified for later milestones:
 

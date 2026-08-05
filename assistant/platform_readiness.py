@@ -35,9 +35,9 @@ This module is strictly read-only. It calls ``operational_health()`` and
 never ``run_operational_check()``, which persists alerts and heartbeat
 state.
 
-Data integrity remains blocked until GR-4 supplies derived provider-health,
-freshness, and adjustment-honesty evidence. GR-0 deliberately exposes no
-boolean escape hatch that lets a caller assert those facts.
+Data integrity is derived from GR-4's recorded provider-fetch evidence.
+GR-0 still exposes no boolean escape hatch that lets a caller assert those
+facts.
 """
 from __future__ import annotations
 
@@ -313,6 +313,37 @@ def build_alert_delivery_checks(store: AssistantStore) -> tuple[ReadinessCheck, 
 
     undelivered = undelivered_critical_alerts(store)
     freshness = self_test_freshness(store)
+    # Counter-review CRGR4-001: the delegated freshness report used to be
+    # coerced with bool(...), the exact laundering GR4REV-003 removed from
+    # the data-layer checks (and the 2026-08-02 GR-0 review removed from
+    # operational checks) -- a malformed {"ok": "false"} read as a healthy
+    # self-test. Validate structurally; a malformed report fails the check
+    # with an explicit reason instead of guessing.
+    freshness_ok = (
+        isinstance(freshness, Mapping)
+        and isinstance(freshness.get("ok"), bool)
+        and isinstance(freshness.get("detail"), str)
+        and bool(str(freshness.get("detail")).strip())
+    )
+    if not freshness_ok:
+        self_test_check = ReadinessCheck(
+            name="alert_channel_self_test",
+            ok=False,
+            detail=(
+                "self-test freshness report is malformed; refusing to "
+                "treat an unreadable report as a passing self-test"
+            ),
+            mandatory=False,
+            source="alert_delivery",
+        )
+    else:
+        self_test_check = ReadinessCheck(
+            name="alert_channel_self_test",
+            ok=freshness["ok"],
+            detail=freshness["detail"],
+            mandatory=False,
+            source="alert_delivery",
+        )
     return (
         ReadinessCheck(
             name="critical_alert_delivery",
@@ -326,39 +357,126 @@ def build_alert_delivery_checks(store: AssistantStore) -> tuple[ReadinessCheck, 
             mandatory=True,
             source="alert_delivery",
         ),
-        ReadinessCheck(
-            name="alert_channel_self_test",
-            ok=bool(freshness["ok"]),
-            detail=str(freshness["detail"]),
-            mandatory=False,
-            source="alert_delivery",
-        ),
+        self_test_check,
     )
 
 
-def build_data_integrity() -> DimensionReadiness:
-    """Report the three GR-0 data checks as unavailable until GR-4.
+def build_data_integrity(
+    store: AssistantStore | None = None,
+    *,
+    now: datetime | None = None,
+) -> DimensionReadiness:
+    """GR-4: derive the three GR-0 data checks from recorded fetches.
 
-    The previous API let any caller set ``point_in_time_data=True`` and used
-    that assertion to make this dimension ready. A claim is not evidence. GR-4
-    will add a data-layer adapter that derives these checks from authenticated
-    provider records; until then all three required checks remain explicit
-    blockers.
+    The pre-GR-4 API let any caller set ``point_in_time_data=True`` and used
+    that assertion to make this dimension ready. A claim is not evidence, so
+    the checks now come from ``assistant.data_integrity``'s derivation over
+    the append-only ``data_provider_fetches`` records -- and there is still
+    no caller-settable boolean. A machine with no store (or no recorded
+    fetches, or an unreadable record table) stays blocked with an explicit
+    reason; readiness must never improve because evidence became
+    unavailable.
+
+    When ``now`` is supplied (as ``build_platform_readiness`` does), bar
+    freshness uses that same pinned instant so the report's ``checked_at``
+    and the freshness SLA cannot disagree.
     """
+    if store is not None and not isinstance(store, AssistantStore):
+        # The pre-GR-4 escape hatch was a caller passing
+        # point_in_time_data=True; the store parameter must never become a
+        # new place to smuggle an assertion. Only a real store (evidence)
+        # or None (explicitly blocked) is meaningful.
+        raise TypeError(
+            "build_data_integrity takes an AssistantStore or None; a "
+            "boolean assertion cannot make data integrity ready"
+        )
+    if store is None:
+        return _dimension(
+            DATA_INTEGRITY,
+            tuple(
+                ReadinessCheck(
+                    name=name,
+                    ok=False,
+                    detail=(
+                        "no store supplied; data-layer evidence cannot be "
+                        "derived from recorded provider fetches"
+                    ),
+                    mandatory=True,
+                    source="data_layer",
+                )
+                for name in (
+                    "price_freshness",
+                    "provider_health",
+                    "adjustment_honesty",
+                )
+            ),
+        )
+    from assistant.data_integrity import build_data_layer_evidence
+
+    try:
+        evidence = build_data_layer_evidence(store, now=now)
+    except Exception as exc:
+        return _dimension(
+            DATA_INTEGRITY,
+            tuple(
+                ReadinessCheck(
+                    name=name,
+                    ok=False,
+                    detail=(
+                        "data-layer evidence derivation failed "
+                        f"({type(exc).__name__}); refusing to guess"
+                    ),
+                    mandatory=True,
+                    source="data_layer",
+                )
+                for name in (
+                    "price_freshness",
+                    "provider_health",
+                    "adjustment_honesty",
+                )
+            ),
+        )
+    names = ("price_freshness", "provider_health", "adjustment_honesty")
+    malformed_reason: str | None = None
+    if not isinstance(evidence, Mapping):
+        malformed_reason = "data-layer evidence is not a mapping"
+    else:
+        for name in names:
+            raw = evidence.get(name)
+            if (
+                not isinstance(raw, Mapping)
+                or not isinstance(raw.get("ok"), bool)
+                or not isinstance(raw.get("detail"), str)
+            ):
+                malformed_reason = (
+                    f"data-layer evidence for {name} is malformed"
+                )
+                break
+    if malformed_reason is not None:
+        return _dimension(
+            DATA_INTEGRITY,
+            tuple(
+                ReadinessCheck(
+                    name=name,
+                    ok=False,
+                    detail=malformed_reason,
+                    mandatory=True,
+                    source="data_layer",
+                )
+                for name in names
+            ),
+        )
     return _dimension(
         DATA_INTEGRITY,
         tuple(
             ReadinessCheck(
                 name=name,
-                ok=False,
-                detail=(
-                    "verified data-layer evidence is unavailable; GR-4 must "
-                    "derive this check without an assistant-to-ml import"
-                ),
+                ok=evidence[name]["ok"],
+                detail=evidence[name]["detail"],
                 mandatory=True,
                 source="data_layer",
             )
-            for name in ("price_freshness", "provider_health", "adjustment_honesty")
+            for name in names
         ),
     )
 
@@ -719,7 +837,7 @@ def build_platform_readiness(
     )
     dimensions = (
         execution,
-        build_data_integrity(),
+        build_data_integrity(store, now=now),
         operations,
         evidence,
         build_strategy_readiness(),

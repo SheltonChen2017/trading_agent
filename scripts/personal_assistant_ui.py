@@ -141,6 +141,7 @@ from assistant.storage import AssistantStore
 from assistant.strategy_proposals import (
     CONFIGURED_LEVERAGED_PAIRS,
     MissingResearchDependencyError,
+    StrategyMarketDataError,
     generate_leveraged_pair_rebalance_proposals,
 )
 from config import (
@@ -314,6 +315,9 @@ def _load_base_packet(policy_path: str):
         use_live_alpaca=is_configured(),
         include_live_events=False,
         policy=policy,
+        # GR-4: record the market-data fetch (success or failure) so
+        # provider health and bar freshness are derived from evidence.
+        store=_store(),
     )
     return policy, packet
 
@@ -1610,6 +1614,15 @@ if page == "Briefing":
             if stress_result["position_impacts"]:
                 st.dataframe(stress_result["position_impacts"], use_container_width=True, hide_index=True)
 
+    # GR-4 definition of done: stale data must render as a VISIBLE
+    # degradation banner, never as confident numbers. The packet builder
+    # prefixes every data-staleness warning with "DATA DEGRADED:", which
+    # is the contract this banner keys on.
+    _degraded = [w for w in packet.warnings if w.startswith("DATA DEGRADED:")]
+    if _degraded:
+        for _degradation in _degraded:
+            st.error(f"🚨 {_degradation}")
+
     if packet.warnings:
         st.subheader("Warnings")
         for warning in packet.warnings:
@@ -2514,7 +2527,10 @@ if page == "Propose & Approve":
                     proposals = proposals + generate_leveraged_pair_rebalance_proposals(
                         packet, policy, pair_config, store=store
                     )
-                except MissingResearchDependencyError as exc:
+                except (
+                    MissingResearchDependencyError,
+                    StrategyMarketDataError,
+                ) as exc:
                     st.error(
                         f"{pair_config.stable_ticker}/{pair_config.leveraged_ticker} strategy check failed "
                         f"({exc}); skipping this pair."

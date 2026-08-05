@@ -13,6 +13,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from assistant.performance import Distribution
+from assistant.share_reconciliation import detect_split_like_share_mismatch
 from assistant.portfolio_ledger import (
     ACCOUNT_DIVIDEND_INCOME,
     SECURITY_ACCOUNT_PREFIX,

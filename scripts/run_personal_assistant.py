@@ -224,12 +224,16 @@ def _now_eastern() -> datetime:
         return datetime.now(timezone(timedelta(hours=-4)))
 
 
-def _packet(include_events: bool = True):
+def _packet(include_events: bool = True, store: AssistantStore | None = None):
     return build_decision_packet(
         SAMPLE_POSITIONS,
         SAMPLE_CASH,
         use_live_alpaca=is_configured(),
         include_live_events=include_events,
+        # GR-4: when a store is available, the market-data fetch is
+        # recorded (success or failure) so provider health and bar
+        # freshness derive from evidence rather than silence.
+        store=store,
     )
 
 
@@ -277,7 +281,7 @@ def command_briefing(args, store: AssistantStore) -> None:
     # delivery surface. Render them before any fallible market/account work
     # so the condition that broke the briefing cannot hide the warning too.
     _print_batched_warnings(store)
-    packet = _packet(include_events=not args.no_events)
+    packet = _packet(include_events=not args.no_events, store=store)
     packet_id = store.save_decision_packet(packet)
     history_note = None
     try:
@@ -343,7 +347,7 @@ def command_risk_check(args, store: AssistantStore) -> None:
         # obviously incomplete invocation early with a clear message.
         raise SystemExit("--benchmark and --move-pct must be given together, or not at all.")
     policy = load_policy(args.policy)
-    packet = _packet(include_events=False)
+    packet = _packet(include_events=False, store=store)
     violations = check_policy_compliance(packet.portfolio, policy)
     for violation in violations:
         print(f"  POLICY VIOLATION: {violation}")
@@ -383,7 +387,7 @@ def command_risk_check(args, store: AssistantStore) -> None:
 
 def command_propose(args, store: AssistantStore) -> None:
     policy = load_policy(args.policy)
-    packet = _packet(include_events=not args.no_events)
+    packet = _packet(include_events=not args.no_events, store=store)
     store.save_decision_packet(packet)
     tax_ledger, tax_coverage = tax_ledger_with_coverage(
         store, packet.portfolio
@@ -629,7 +633,7 @@ def command_committee_review(args, store: AssistantStore) -> None:
         )
 
     try:
-        packet = _packet(include_events=not args.no_events)
+        packet = _packet(include_events=not args.no_events, store=store)
     except Exception:
         # A configured account makes _packet() perform fallible broker/data
         # reads. Preserve the CLI contract and do not leak provider, broker,

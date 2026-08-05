@@ -337,7 +337,11 @@ def build_risk_exposure(snapshot: PortfolioSnapshot, concentration_threshold_pct
     )
 
 
-def build_market_regime(benchmark_ticker: str = "QQQ", lookback_days: int = 1764) -> MarketRegime:
+def build_market_regime(
+    benchmark_ticker: str = "QQQ",
+    lookback_days: int = 1764,
+    store=None,
+) -> MarketRegime:
     """
     Trend + volatility-regime read on a benchmark, using the same
     machinery as strategies/trend_vol_rotation.py and signals/regime.py.
@@ -345,18 +349,34 @@ def build_market_regime(benchmark_ticker: str = "QQQ", lookback_days: int = 1764
     history (there's no discovery/confirmation split for a live "what's
     today's regime" read, unlike a backtest) — a simplification worth
     knowing about, not a bug.
+
+    GR-4: when a ``store`` is supplied, the fetch is recorded in the
+    append-only provider-health table (success or failure) and a failure
+    streak raises a deduplicated operational alert. The DATA is identical
+    either way — recording never alters, fills, or synthesizes a value —
+    and the storeless path keeps working for research callers.
     """
-    try:
-        data = fetch_historical(
-            [benchmark_ticker], lookback_days=lookback_days
+    if store is not None:
+        from assistant.data_integrity import fetch_daily_bars_recorded
+
+        # The recorded path swallows the provider exception into a failed
+        # fetch record (the briefing must survive an outage), so no
+        # try/except is needed here — the outage becomes evidence.
+        data = fetch_daily_bars_recorded(
+            store, [benchmark_ticker], lookback_days
         )
-    except Exception:
-        # A read-only briefing should remain available during a market-data
-        # outage. Keep this degradation at the briefing/regime boundary:
-        # fetch_historical() is also the data source for research scripts,
-        # where swallowing a provider/API failure as an empty dataset would
-        # hide the cause and could make a broken run look like missing tickers.
-        data = {}
+    else:
+        try:
+            data = fetch_historical(
+                [benchmark_ticker], lookback_days=lookback_days
+            )
+        except Exception:
+            # A read-only briefing should remain available during a market-data
+            # outage. Keep this degradation at the briefing/regime boundary:
+            # fetch_historical() is also the data source for research scripts,
+            # where swallowing a provider/API failure as an empty dataset would
+            # hide the cause and could make a broken run look like missing tickers.
+            data = {}
     if benchmark_ticker not in data or data[benchmark_ticker].empty:
         return MarketRegime(
             benchmark_ticker=benchmark_ticker, trend=None, volatility_regime=None,
@@ -459,6 +479,7 @@ def build_decision_packet(
     use_live_alpaca: bool = False,
     include_live_events: bool = False,
     policy: TradingPolicy | None = None,
+    store=None,
 ) -> DecisionPacket:
     """
     Assembles the full read-only decision packet. This is the one
@@ -488,7 +509,7 @@ def build_decision_packet(
         snapshot = build_portfolio_snapshot(positions or [], cash or 0.0)
 
     risk = build_risk_exposure(snapshot)
-    regime = build_market_regime(benchmark_ticker)
+    regime = build_market_regime(benchmark_ticker, store=store)
     tickers = [p.ticker for p in snapshot.positions]
     signals = get_relevant_signal_evidence(tickers)
     events = get_upcoming_events(tickers, fetch_live=include_live_events)
@@ -500,6 +521,45 @@ def build_decision_packet(
         warnings.append(
             f"Market regime for {benchmark_ticker} could not be fully "
             "computed (market data unavailable or insufficient history)."
+        )
+
+    # GR-4 staleness SLA for daily bars: the regime's as_of IS the newest
+    # bar date when trend was computed. Evaluate it against the real NYSE
+    # calendar and degrade VISIBLY -- the "DATA DEGRADED:" prefix is the
+    # contract the UI banner and tests key on, and warnings are already
+    # critical facts for the committee projection, so degraded data
+    # automatically reaches every downstream consumer. Never fills or
+    # substitutes a value; the stale numbers stay visibly stale.
+    bar_freshness = None
+    freshness_derivation_failed = False
+    # A non-empty fetch always sets regime.as_of to its actual newest bar,
+    # even when history is too short to calculate trend. An empty fetch uses
+    # today's fallback date and already emits the explicit unavailable
+    # warning above; do not misrepresent that fallback as an observed bar.
+    observed_bar_date = (
+        regime.trend is not None
+        or regime.volatility_regime is not None
+        or regime.trailing_volatility_pct is not None
+        or regime.as_of != datetime.now(timezone.utc).date().isoformat()
+    )
+    if observed_bar_date:
+        from data.price_source import evaluate_bar_freshness
+
+        try:
+            bar_freshness = evaluate_bar_freshness(regime.as_of)
+        except ValueError:
+            freshness_derivation_failed = True
+    if freshness_derivation_failed:
+        warnings.append(
+            f"DATA DEGRADED: {benchmark_ticker} daily-bar freshness could "
+            "not be derived from the recorded provider outcome. "
+            "Trend/regime and bar-derived surfaces are unverified."
+        )
+    elif bar_freshness is not None and not bar_freshness.fresh:
+        warnings.append(
+            f"DATA DEGRADED: {benchmark_ticker} daily bars failed freshness "
+            f"({bar_freshness.detail}). Trend/regime and bar-derived "
+            "surfaces reflect stale or unavailable data."
         )
 
     return DecisionPacket(
@@ -516,5 +576,11 @@ def build_decision_packet(
             "portfolio_as_of": snapshot.as_of,
             "market_regime_as_of": regime.as_of,
             "research_registry_version": registry_version(),
+            "market_bars_expected_session": (
+                bar_freshness.expected_session if bar_freshness else None
+            ),
+            "market_bars_fresh": (
+                bar_freshness.fresh if bar_freshness else None
+            ),
         },
     )

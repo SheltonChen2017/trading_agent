@@ -120,6 +120,25 @@ class LeveragedPairConfig:
     lookback_days_for_signal: int = LOOKBACK_DAYS_FOR_SIGNAL
 
 
+class StrategyMarketDataError(RuntimeError):
+    """Base refusal for unavailable or stale strategy market data."""
+
+
+class MarketDataUnavailableError(StrategyMarketDataError):
+    """The provider did not return the bars required by the strategy."""
+
+
+class StaleMarketDataError(StrategyMarketDataError):
+    """GR-4: refuse to size a strategy rebalance from stale bars.
+
+    A stale bar past its SLA blocks the strategy proposals that depend on
+    it -- and ONLY them: risk-reduction proposals derive from policy and
+    the live portfolio snapshot, never from these bars, so a data outage
+    can never obstruct a legitimate risk-reducing sell. Raised loudly
+    (not a silent empty return) so the caller's surface names the refusal.
+    """
+
+
 class MissingResearchDependencyError(RuntimeError):
     """Raised when a finding this module's proposal generation relies on
     has NO matching entry in the research registry at all, OR no longer
@@ -272,7 +291,14 @@ def generate_leveraged_pair_rebalance_proposals(
     specific status this strategy requires (e.g. reclassified to
     rejected/exploratory/unavailable) -- see that error's docstring.
     """
-    proposals = _generate_leveraged_pair_rebalance_proposals(packet, policy, pair_config, ttl_minutes, market_data)
+    proposals = _generate_leveraged_pair_rebalance_proposals(
+        packet,
+        policy,
+        pair_config,
+        ttl_minutes,
+        market_data,
+        store=store,
+    )
     if store is not None:
         store.record_strategy_evaluation(
             pair_config.strategy_key,
@@ -302,6 +328,8 @@ def _generate_leveraged_pair_rebalance_proposals(
     pair_config: LeveragedPairConfig,
     ttl_minutes: int = 15,
     market_data: dict[str, pd.DataFrame] | None = None,
+    *,
+    store: AssistantStore | None = None,
 ) -> list[TradeProposal]:
     stable_ticker = pair_config.stable_ticker
     leveraged_ticker = pair_config.leveraged_ticker
@@ -329,16 +357,74 @@ def _generate_leveraged_pair_rebalance_proposals(
         return []
 
     if market_data is None:
-        market_data = fetch_historical(
-            [stable_ticker, leveraged_ticker], lookback_days=pair_config.lookback_days_for_signal
-        )
+        if store is not None:
+            from assistant.data_integrity import fetch_daily_bars_recorded
+
+            market_data = fetch_daily_bars_recorded(
+                store,
+                [stable_ticker, leveraged_ticker],
+                pair_config.lookback_days_for_signal,
+            )
+        else:
+            try:
+                market_data = fetch_historical(
+                    [stable_ticker, leveraged_ticker],
+                    lookback_days=pair_config.lookback_days_for_signal,
+                )
+            except Exception as exc:
+                raise MarketDataUnavailableError(
+                    f"{stable_ticker}/{leveraged_ticker} market data is "
+                    f"unavailable ({type(exc).__name__}); refusing to treat "
+                    "a provider failure as no rebalance"
+                ) from None
     if stable_ticker not in market_data or leveraged_ticker not in market_data:
-        return []
-    stable_close = market_data[stable_ticker]["close"]
-    leveraged_close = market_data[leveraged_ticker]["close"]
+        missing = sorted(
+            {
+                stable_ticker,
+                leveraged_ticker,
+            }
+            - set(market_data)
+        )
+        raise MarketDataUnavailableError(
+            f"{stable_ticker}/{leveraged_ticker} market data is unavailable "
+            f"for {', '.join(missing)}; refusing to treat missing bars as "
+            "no rebalance"
+        )
+    stable_frame = market_data[stable_ticker]
+    leveraged_frame = market_data[leveraged_ticker]
+    if (
+        not isinstance(stable_frame, pd.DataFrame)
+        or not isinstance(leveraged_frame, pd.DataFrame)
+        or "close" not in stable_frame
+        or "close" not in leveraged_frame
+    ):
+        raise MarketDataUnavailableError(
+            f"{stable_ticker}/{leveraged_ticker} market data is unavailable "
+            "or malformed; refusing to treat unusable bars as no rebalance"
+        )
+    stable_close = stable_frame["close"]
+    leveraged_close = leveraged_frame["close"]
     if stable_close.empty or leveraged_close.empty:
-        return []
+        raise MarketDataUnavailableError(
+            f"{stable_ticker}/{leveraged_ticker} market data is unavailable "
+            "because one or both bar series are empty; refusing to treat "
+            "empty bars as no rebalance"
+        )
     as_of = min(stable_close.index[-1], leveraged_close.index[-1])
+
+    # GR-4 staleness SLA: a rebalance sized from bars that miss the latest
+    # completed NYSE session would trade current dollars on old prices.
+    # Refuse loudly; the caller catches per-pair and risk-reduction
+    # proposals remain unaffected (they never consult these bars).
+    from data.price_source import evaluate_bar_freshness
+
+    freshness = evaluate_bar_freshness(as_of.date().isoformat())
+    if not freshness.fresh:
+        raise StaleMarketDataError(
+            f"{stable_ticker}/{leveraged_ticker} bars are stale "
+            f"({freshness.detail}); refusing to size a rebalance from "
+            "stale market data"
+        )
 
     target_leveraged_weight, label = _target_leveraged_weight(stable_close, leveraged_close, as_of, production_params)
     if target_leveraged_weight is None:

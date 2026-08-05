@@ -250,6 +250,7 @@ from assistant.execution_kernel.reconcile import (
     ReconciliationDeps,
     run_submission_reconciliation,
 )
+from assistant.share_reconciliation import detect_split_like_share_mismatch
 from assistant.kill_switch import env_kill_switch_active
 from assistant.execution_telemetry import (
     FAILURE_DATA_INTEGRITY,
@@ -402,6 +403,7 @@ def validate_proposal_for_execution(
             env_kill_switch_active=env_kill_switch_active,
             compute_policy_fingerprint=compute_policy_fingerprint,
             intent_from_dict=_intent_from_dict,
+            detect_split_like_share_mismatch=detect_split_like_share_mismatch,
             pending_buy_value_by_ticker=_pending_buy_value_by_ticker,
             resolve_earnings_days_away=_resolve_earnings_days_away,
             validate_trade_intent=validate_trade_intent,

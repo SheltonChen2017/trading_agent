@@ -5110,8 +5110,61 @@ class AssistantStore:
         authenticated record GR-0's data_integrity dimension derives its
         evidence from. Append-only: a failed fetch is history, not a
         mutable status."""
-        if not provider_id.strip() or not data_class.strip():
+        if (
+            not isinstance(provider_id, str)
+            or not provider_id.strip()
+            or not isinstance(data_class, str)
+            or not data_class.strip()
+        ):
             raise ValueError("provider_id and data_class must be non-empty")
+        _parse_aware_timestamp(fetched_at, "fetched_at")
+        for name, value in (
+            ("requested_count", requested_count),
+            ("returned_count", returned_count),
+        ):
+            if (
+                not isinstance(value, int)
+                or isinstance(value, bool)
+                or value < 0
+            ):
+                raise ValueError(f"{name} must be a non-negative integer")
+        if requested_count == 0:
+            raise ValueError("requested_count must be positive")
+        if returned_count > requested_count:
+            raise ValueError("returned_count cannot exceed requested_count")
+        if not isinstance(missing_tickers, (tuple, list)) or any(
+            not isinstance(ticker, str) or not ticker.strip()
+            for ticker in missing_tickers
+        ):
+            raise ValueError("missing_tickers must contain non-empty strings")
+        if len(set(missing_tickers)) != len(missing_tickers):
+            raise ValueError("missing_tickers must not contain duplicates")
+        if len(missing_tickers) != requested_count - returned_count:
+            raise ValueError(
+                "missing_tickers count must equal requested_count minus "
+                "returned_count"
+            )
+        if not isinstance(ok, bool):
+            raise ValueError("ok must be a boolean")
+        if not isinstance(point_in_time_lineage, bool):
+            raise ValueError("point_in_time_lineage must be a boolean")
+        if error is not None and (
+            not isinstance(error, str) or not error.strip()
+        ):
+            raise ValueError("error must be None or a non-empty string")
+        if ok:
+            if returned_count == 0 or error is not None or latest_session is None:
+                raise ValueError(
+                    "a successful provider fetch requires returned data, no "
+                    "error, and a latest_session"
+                )
+        elif returned_count != 0 or error is None or latest_session is not None:
+            raise ValueError(
+                "a failed provider fetch requires zero returned data, an "
+                "error, and no latest_session"
+            )
+        if latest_session is not None:
+            _parse_session_date(latest_session, "latest_session")
         with self._connect() as connection:
             connection.execute(
                 "INSERT INTO data_provider_fetches("

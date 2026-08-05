@@ -187,6 +187,7 @@ class ProposalValidationDeps:
     env_kill_switch_active: Callable[[], bool]
     compute_policy_fingerprint: Callable[[TradingPolicy], str]
     intent_from_dict: Callable[[dict], TradeIntent]
+    detect_split_like_share_mismatch: Callable[..., dict[str, Any] | None]
     pending_buy_value_by_ticker: Callable[[list, Any], dict[str, Decimal]]
     resolve_earnings_days_away: Callable[[str, int | None], int | None]
     validate_trade_intent: Callable[..., ValidationResult]
@@ -345,6 +346,56 @@ def run_proposal_validation(
             return deps.outcome_factory(
                 proposal=proposal, intent=intent, validation=None,
                 error="Opening new positions is disabled by policy.",
+            )
+
+    expected_impact = proposal.get("expected_impact")
+    if (
+        isinstance(expected_impact, dict)
+        and "position_shares_before" in expected_impact
+    ):
+        try:
+            proposal_shares = deps.to_decimal(
+                expected_impact["position_shares_before"],
+                name="proposal.expected_impact.position_shares_before",
+            )
+            current_shares = sum(
+                (
+                    position.exact_field("shares")
+                    for position in current_portfolio.positions
+                    if position.ticker.upper() == intent.ticker.upper()
+                ),
+                deps.decimal_factory("0"),
+            )
+            split_suspicion = deps.detect_split_like_share_mismatch(
+                proposal_shares,
+                current_shares,
+            )
+        except Exception as exc:
+            return deps.outcome_factory(
+                proposal=proposal,
+                intent=intent,
+                validation=None,
+                error=(
+                    "Could not verify proposal-time share identity: "
+                    f"{type(exc).__name__}; refusing a potentially stale "
+                    "corporate-action intent."
+                ),
+                failure_class=deps.failure_data_integrity,
+            )
+        if split_suspicion is not None:
+            return deps.outcome_factory(
+                proposal=proposal,
+                intent=intent,
+                validation=None,
+                error=(
+                    f"Share count for {intent.ticker.upper()} changed from "
+                    f"{proposal_shares} at proposal time to {current_shares} "
+                    "in the fresh broker snapshot, matching a suspected "
+                    f"{split_suspicion['ratio']} "
+                    f"{split_suspicion['direction']} split. Regenerate the "
+                    "proposal after confirming the corporate action."
+                ),
+                failure_class=deps.failure_data_integrity,
             )
 
     try:

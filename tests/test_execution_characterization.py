@@ -430,6 +430,31 @@ def test_gr1c_every_injected_seam_resolves_from_the_facade_at_call_time(
             )
         assert "Malformed stored intent: SENTINEL-intent" in str(outcome.error)
 
+    # detect_split_like_share_mismatch -- a newly added corporate-action
+    # refusal must retain GR-1C's call-time facade seam like every other
+    # runtime collaborator in the moved validation body.
+    split_proposal = _proposal("p-split-seam", side="sell")
+    split_proposal["expected_impact"] = {"position_shares_before": "10"}
+    store.save_proposal(split_proposal)
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            execution_service,
+            "detect_split_like_share_mismatch",
+            lambda recorded, current: {
+                "ratio": "SENTINEL",
+                "direction": "forward",
+            },
+        )
+        with patched_broker(_validation_recorder()):
+            outcome = validate_proposal_for_execution(
+                "p-split-seam",
+                _held_portfolio(),
+                load_policy(),
+                store,
+                now_et=NOW_ET,
+            )
+        assert "suspected SENTINEL forward split" in str(outcome.error)
+
     # _pending_buy_value_by_ticker -- consulted only for buys; AAPL is held,
     # so the no-new-positions policy does not return early.
     store.save_proposal(_proposal("p-pending", side="buy"))

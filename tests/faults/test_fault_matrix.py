@@ -302,10 +302,13 @@ def test_f5_halted_ticker_refused_but_other_risk_reducing_sell_proceeds(store, p
 
 
 def test_f6_share_count_mismatch_after_corporate_action_is_refused(store, policy):
-    # The proposal predates a split: it sells 10 shares, but the fresh
-    # snapshot shows only 5 exist.
-    store.save_proposal(make_proposal("p-f6", side="sell", shares=10))
-    post_split = _held_portfolio(held_position("AAPL", shares=5.0))
+    # The proposal predates a 2-for-1 split. The fresh snapshot now has
+    # MORE shares, so sell_exceeds_held cannot detect this; proposal-time
+    # share identity must still refuse the stale intent before broker contact.
+    proposal = make_proposal("p-f6", side="sell", shares=10)
+    proposal["expected_impact"] = {"position_shares_before": "10"}
+    store.save_proposal(proposal)
+    post_split = _held_portfolio(held_position("AAPL", shares=20.0))
     broker = _sell_broker()
 
     with scripted_broker(broker):

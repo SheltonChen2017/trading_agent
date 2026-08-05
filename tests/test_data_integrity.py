@@ -117,6 +117,27 @@ def test_bar_freshness_verdicts():
     assert not future.fresh and "future-dated" in future.detail
 
 
+@pytest.mark.parametrize(
+    ("latest_session", "now"),
+    [
+        (
+            "2026-08-08",
+            datetime(2026, 8, 8, 15, 0, tzinfo=timezone.utc),
+        ),  # Saturday
+        (
+            "2026-08-10",
+            datetime(2026, 8, 10, 12, 0, tzinfo=timezone.utc),
+        ),  # Monday before open
+    ],
+)
+def test_current_date_bar_is_fresh_only_during_a_real_open_session(
+    latest_session, now
+):
+    freshness = evaluate_bar_freshness(latest_session, now=now)
+    assert not freshness.fresh
+    assert "not an in-progress NYSE session" in freshness.detail
+
+
 # --- fetch records: honesty about what came back ---------------------------
 
 
@@ -155,6 +176,27 @@ def test_provider_exception_is_recorded_without_leaking_detail():
     assert not record.ok
     assert record.error == "RuntimeError: provider fetch failed"
     assert "secret" not in record.error
+
+
+def test_fetch_record_rejects_malformed_lineage_and_naive_time():
+    source = _FakeSource({"AAA": _bars(EXPECTED_SESSION)})
+    source.provides_point_in_time_lineage = "false"
+    with pytest.raises(ValueError, match="provides_point_in_time_lineage"):
+        build_fetch_record(
+            source,
+            ["AAA"],
+            source.data,
+            fetched_at=NOW,
+        )
+
+    source.provides_point_in_time_lineage = False
+    with pytest.raises(ValueError, match="timezone-aware"):
+        build_fetch_record(
+            source,
+            ["AAA"],
+            source.data,
+            fetched_at=NOW.replace(tzinfo=None),
+        )
 
 
 def test_yfinance_source_declares_non_point_in_time_lineage():
@@ -220,6 +262,22 @@ def test_success_breaks_the_failure_streak(store):
     assert not _open_provider_alerts(store)
 
 
+def test_provider_fetch_storage_rejects_assertion_shaped_lineage(store):
+    with pytest.raises(ValueError, match="point_in_time_lineage"):
+        store.record_provider_fetch(
+            provider_id="fake-provider",
+            data_class="bar",
+            fetched_at=NOW.isoformat(),
+            requested_count=1,
+            returned_count=1,
+            missing_tickers=(),
+            ok=True,
+            error=None,
+            point_in_time_lineage="false",
+            latest_session=EXPECTED_SESSION,
+        )
+
+
 # --- the GR-0 adapter: evidence, never assertion ---------------------------
 
 
@@ -280,6 +338,29 @@ def test_platform_readiness_dimension_derives_from_the_store(store):
     assert build_data_integrity(store).status == READY
 
 
+def test_platform_readiness_rejects_non_boolean_derived_verdicts(
+    store, monkeypatch
+):
+    import assistant.data_integrity as data_integrity
+
+    monkeypatch.setattr(
+        data_integrity,
+        "build_data_layer_evidence",
+        lambda _store: {
+            name: {"ok": "false", "detail": "malformed", "evidence": {}}
+            for name in (
+                "price_freshness",
+                "provider_health",
+                "adjustment_honesty",
+            )
+        },
+    )
+    dimension = build_data_integrity(store)
+    assert dimension.status == BLOCKED
+    assert all(check.ok is False for check in dimension.checks)
+    assert all("malformed" in check.detail for check in dimension.checks)
+
+
 # --- degradation surfaces ---------------------------------------------------
 
 
@@ -306,6 +387,25 @@ def test_stale_bars_render_a_visible_degradation_banner_warning(store, monkeypat
     assert packet.data_freshness["market_bars_fresh"] is False
     # The stale numbers are still shown as-is -- never substituted.
     assert packet.regime.trend is not None
+
+
+def test_stale_short_history_still_renders_the_degradation_banner(
+    store, monkeypatch
+):
+    import assistant.data_integrity as di
+
+    monkeypatch.setattr(
+        di,
+        "YFinanceDailyBars",
+        lambda: _FakeSource({"QQQ": _bars("2026-07-28", periods=10)}),
+    )
+    packet = build_decision_packet(_positions(), 1_000.0, store=store)
+    assert packet.regime.trend is None
+    assert any(
+        warning.startswith("DATA DEGRADED:")
+        for warning in packet.warnings
+    )
+    assert packet.data_freshness["market_bars_fresh"] is False
 
 
 def test_fresh_bars_produce_no_degradation_warning(store, monkeypatch):
@@ -374,6 +474,94 @@ def test_stale_bars_block_strategy_proposals_but_not_risk_reduction():
 
     proposals = generate_risk_reduction_proposals(packet, policy)
     assert isinstance(proposals, list)
+
+
+def test_missing_strategy_bars_are_a_visible_refusal():
+    from assistant.policy import TradingPolicy
+    from assistant.strategy_proposals import (
+        CONFIGURED_LEVERAGED_PAIRS,
+        generate_leveraged_pair_rebalance_proposals,
+    )
+
+    pair = CONFIGURED_LEVERAGED_PAIRS[0]
+    positions = [
+        {
+            "ticker": pair.stable_ticker,
+            "shares": 10,
+            "entry_price": 100.0,
+            "current_price": 100.0,
+        },
+        {
+            "ticker": pair.leveraged_ticker,
+            "shares": 10,
+            "entry_price": 20.0,
+            "current_price": 20.0,
+        },
+    ]
+    packet = build_decision_packet(positions, 1_000.0)
+    policy = TradingPolicy(
+        version="t",
+        name="t",
+        execution_mode="paper",
+        max_order_value=5_000.0,
+    )
+    with pytest.raises(RuntimeError, match="unavailable"):
+        generate_leveraged_pair_rebalance_proposals(
+            packet,
+            policy,
+            pair,
+            market_data={},
+        )
+
+
+def test_strategy_provider_failure_is_recorded_before_refusal(
+    store, monkeypatch
+):
+    import assistant.data_integrity as di
+    from assistant.policy import TradingPolicy
+    from assistant.strategy_proposals import (
+        CONFIGURED_LEVERAGED_PAIRS,
+        generate_leveraged_pair_rebalance_proposals,
+    )
+
+    pair = CONFIGURED_LEVERAGED_PAIRS[0]
+    packet = build_decision_packet(
+        [
+            {
+                "ticker": pair.stable_ticker,
+                "shares": 10,
+                "entry_price": 100.0,
+                "current_price": 100.0,
+            },
+            {
+                "ticker": pair.leveraged_ticker,
+                "shares": 10,
+                "entry_price": 20.0,
+                "current_price": 20.0,
+            },
+        ],
+        1_000.0,
+    )
+    monkeypatch.setattr(
+        di,
+        "YFinanceDailyBars",
+        lambda: _FakeSource(error=ConnectionError("down")),
+    )
+    with pytest.raises(RuntimeError, match="unavailable"):
+        generate_leveraged_pair_rebalance_proposals(
+            packet,
+            TradingPolicy(
+                version="t",
+                name="t",
+                execution_mode="paper",
+                max_order_value=5_000.0,
+            ),
+            pair,
+            store=store,
+        )
+    records = store.list_provider_fetches(provider_id="fake-provider")
+    assert len(records) == 1
+    assert records[0]["ok"] is False
 
 
 # --- split detection: share-count reconciliation, not price heuristics -----

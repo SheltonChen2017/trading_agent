@@ -531,20 +531,36 @@ def build_decision_packet(
     # automatically reaches every downstream consumer. Never fills or
     # substitutes a value; the stale numbers stay visibly stale.
     bar_freshness = None
-    if regime.trend is not None:
+    freshness_derivation_failed = False
+    # A non-empty fetch always sets regime.as_of to its actual newest bar,
+    # even when history is too short to calculate trend. An empty fetch uses
+    # today's fallback date and already emits the explicit unavailable
+    # warning above; do not misrepresent that fallback as an observed bar.
+    observed_bar_date = (
+        regime.trend is not None
+        or regime.volatility_regime is not None
+        or regime.trailing_volatility_pct is not None
+        or regime.as_of != datetime.now(timezone.utc).date().isoformat()
+    )
+    if observed_bar_date:
         from data.price_source import evaluate_bar_freshness
 
         try:
             bar_freshness = evaluate_bar_freshness(regime.as_of)
         except ValueError:
-            bar_freshness = None
-        if bar_freshness is not None and not bar_freshness.fresh:
-            warnings.append(
-                f"DATA DEGRADED: {benchmark_ticker} daily bars end "
-                f"{bar_freshness.latest_session}; expected the completed "
-                f"session {bar_freshness.expected_session}. Trend/regime "
-                "and bar-derived surfaces reflect stale data."
-            )
+            freshness_derivation_failed = True
+    if freshness_derivation_failed:
+        warnings.append(
+            f"DATA DEGRADED: {benchmark_ticker} daily-bar freshness could "
+            "not be derived from the recorded provider outcome. "
+            "Trend/regime and bar-derived surfaces are unverified."
+        )
+    elif bar_freshness is not None and not bar_freshness.fresh:
+        warnings.append(
+            f"DATA DEGRADED: {benchmark_ticker} daily bars failed freshness "
+            f"({bar_freshness.detail}). Trend/regime and bar-derived "
+            "surfaces reflect stale or unavailable data."
+        )
 
     return DecisionPacket(
         generated_at=datetime.now(timezone.utc).isoformat(),

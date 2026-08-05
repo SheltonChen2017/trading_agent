@@ -720,7 +720,7 @@ def reconcile_snapshot(
             # by share-count reconciliation only; the mismatch still
             # counts as a mismatch (fail-closed) until the split is
             # CONFIRMED as a journal action.
-            from assistant.corporate_actions import (
+            from assistant.share_reconciliation import (
                 detect_split_like_share_mismatch,
             )
 

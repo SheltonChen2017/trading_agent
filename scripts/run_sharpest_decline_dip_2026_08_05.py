@@ -83,7 +83,15 @@ def _simulate_episode(
     closes: pd.Series, opens: pd.Series, entry_index: int
 ) -> dict | None:
     """One $10k episode from entry open to trim-ratcheted liquidation."""
-    if entry_index >= len(opens):
+    # The frozen comparison is a 63-session horizon. Near the right edge,
+    # silently shortening that horizon pools one- and two-session episodes
+    # into statistics labeled "63-session" and gives them incomparable
+    # opportunity to hit the trim grid. Refuse underfilled outcomes.
+    if (
+        entry_index < 0
+        or entry_index + MAX_HOLD_SESSIONS >= len(opens)
+        or entry_index + MAX_HOLD_SESSIONS >= len(closes)
+    ):
         return None
     entry_price = opens.iloc[entry_index] * (1 + SLIP)
     if not np.isfinite(entry_price) or entry_price <= 0:
@@ -92,7 +100,7 @@ def _simulate_episode(
     reference = entry_price
     proceeds = 0.0
     trims = 0
-    last_index = min(entry_index + MAX_HOLD_SESSIONS, len(closes) - 1)
+    last_index = entry_index + MAX_HOLD_SESSIONS
     day = entry_index
     while day < last_index:
         close = closes.iloc[day]
@@ -178,7 +186,10 @@ def main() -> None:
     print("\n=== Strategy (dip + 5%-trim ratchet, 63-session cap) ===")
     _describe("grid episodes", frame["net_return_pct"])
     print(f"mean trims per episode: {frame['trims'].mean():.2f}")
-    print(f"total P&L on $10k/episode: ${(frame['net_return_pct'] / 100 * ENTRY_NOTIONAL).sum():,.0f}")
+    print(
+        "sum of independent $10k episode P&L (NOT a capital-constrained "
+        f"portfolio): ${(frame['net_return_pct'] / 100 * ENTRY_NOTIONAL).sum():,.0f}"
+    )
 
     print("\n=== Baseline (a): same picks, buy-and-hold, no grid ===")
     _describe("hold episodes", frame["hold_return_pct"])

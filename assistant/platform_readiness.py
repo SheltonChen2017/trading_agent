@@ -35,9 +35,9 @@ This module is strictly read-only. It calls ``operational_health()`` and
 never ``run_operational_check()``, which persists alerts and heartbeat
 state.
 
-Data integrity remains blocked until GR-4 supplies derived provider-health,
-freshness, and adjustment-honesty evidence. GR-0 deliberately exposes no
-boolean escape hatch that lets a caller assert those facts.
+Data integrity is derived from GR-4's recorded provider-fetch evidence.
+GR-0 still exposes no boolean escape hatch that lets a caller assert those
+facts.
 """
 from __future__ import annotations
 
@@ -403,17 +403,47 @@ def build_data_integrity(store: AssistantStore | None = None) -> DimensionReadin
                 )
             ),
         )
+    names = ("price_freshness", "provider_health", "adjustment_honesty")
+    malformed_reason: str | None = None
+    if not isinstance(evidence, Mapping):
+        malformed_reason = "data-layer evidence is not a mapping"
+    else:
+        for name in names:
+            raw = evidence.get(name)
+            if (
+                not isinstance(raw, Mapping)
+                or not isinstance(raw.get("ok"), bool)
+                or not isinstance(raw.get("detail"), str)
+            ):
+                malformed_reason = (
+                    f"data-layer evidence for {name} is malformed"
+                )
+                break
+    if malformed_reason is not None:
+        return _dimension(
+            DATA_INTEGRITY,
+            tuple(
+                ReadinessCheck(
+                    name=name,
+                    ok=False,
+                    detail=malformed_reason,
+                    mandatory=True,
+                    source="data_layer",
+                )
+                for name in names
+            ),
+        )
     return _dimension(
         DATA_INTEGRITY,
         tuple(
             ReadinessCheck(
                 name=name,
-                ok=bool(evidence[name]["ok"]),
-                detail=str(evidence[name]["detail"]),
+                ok=evidence[name]["ok"],
+                detail=evidence[name]["detail"],
                 mandatory=True,
                 source="data_layer",
             )
-            for name in ("price_freshness", "provider_health", "adjustment_honesty")
+            for name in names
         ),
     )
 

@@ -1,6 +1,9 @@
 """Deterministic portfolio-level metrics used by briefings and proposals."""
 from __future__ import annotations
 
+from decimal import Decimal
+
+from assistant.money import decimal_text
 from assistant.schemas import PortfolioSnapshot
 
 
@@ -86,6 +89,14 @@ def preview_trade_impact(
     held_value = sum(
         p.market_value for p in snapshot.positions if p.ticker.upper() == ticker_upper
     )
+    held_shares = sum(
+        (
+            p.exact_field("shares")
+            for p in snapshot.positions
+            if p.ticker.upper() == ticker_upper
+        ),
+        Decimal("0"),
+    )
     # Independent review, 2026-07-31: this used to compute existing_value
     # purely from snapshot.positions, with no adjustment for this ticker's
     # own pending (not-yet-filled) buy orders -- unlike
@@ -117,6 +128,12 @@ def preview_trade_impact(
     total = snapshot.total_equity
     return {
         "trade_value": round(trade_value, 2),
+        # Proposal-time share identity lets execution detect a split-shaped
+        # broker snapshot change even in the fail-open direction where a
+        # forward split leaves MORE than enough shares to submit the old
+        # quantity. Stored as decimal text, never reconstructed from display
+        # rounding.
+        "position_shares_before": decimal_text(held_shares),
         "position_weight_before_pct": round(existing_value / total * 100, 2) if total else 0.0,
         "position_weight_after_pct": round(post_position_value / total * 100, 2) if total else 0.0,
         "cash_before": round(snapshot.cash, 2),

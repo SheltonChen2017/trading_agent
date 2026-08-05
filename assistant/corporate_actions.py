@@ -13,6 +13,7 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from assistant.performance import Distribution
+from assistant.share_reconciliation import detect_split_like_share_mismatch
 from assistant.portfolio_ledger import (
     ACCOUNT_DIVIDEND_INCOME,
     SECURITY_ACCOUNT_PREFIX,
@@ -40,48 +41,6 @@ def _parse_ex_at(value: object) -> datetime:
     except ValueError:
         return _parse_at(value)
     return datetime.combine(parsed_date, time.min, tzinfo=_EASTERN)
-
-
-def detect_split_like_share_mismatch(
-    recorded_shares: Decimal | int | str,
-    broker_shares: Decimal | int | str,
-    *,
-    relative_tolerance: Decimal = Decimal("0.01"),
-) -> dict[str, Any] | None:
-    """GR-4: classify a share-count mismatch as split-shaped, by ratio.
-
-    A split between snapshot and submit must be DETECTED from share-count
-    reconciliation, never inferred from a price jump (a price can jump for
-    a hundred reasons; a share count multiplying by a near-integer ratio
-    has essentially one). Returns None when the counts match or the
-    mismatch is not split-shaped; otherwise a description like
-    ``{"ratio": "10:1", "direction": "forward"}`` (forward = broker now
-    holds MORE shares, e.g. 10-for-1) for the reconciliation report to
-    carry. Pure classification: it never mutates accounting state --
-    confirming a split remains a journal action, exactly as this module's
-    docstring requires.
-    """
-    recorded = Decimal(str(recorded_shares))
-    broker = Decimal(str(broker_shares))
-    if recorded <= 0 or broker <= 0 or recorded == broker:
-        return None
-    larger, smaller, direction = (
-        (broker, recorded, "forward")
-        if broker > recorded
-        else ((recorded, broker, "reverse"))
-    )
-    ratio = larger / smaller
-    nearest = ratio.to_integral_value()
-    if nearest < 2:
-        return None
-    if abs(ratio - nearest) > nearest * relative_tolerance:
-        return None
-    return {
-        "ratio": f"{int(nearest)}:1",
-        "direction": direction,
-        "recorded_shares": str(recorded),
-        "broker_shares": str(broker),
-    }
 
 
 def confirmed_distributions(

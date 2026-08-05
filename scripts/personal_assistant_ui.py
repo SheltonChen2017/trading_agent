@@ -141,7 +141,7 @@ from assistant.storage import AssistantStore
 from assistant.strategy_proposals import (
     CONFIGURED_LEVERAGED_PAIRS,
     MissingResearchDependencyError,
-    StaleMarketDataError,
+    StrategyMarketDataError,
     generate_leveraged_pair_rebalance_proposals,
 )
 from config import (
@@ -2527,7 +2527,10 @@ if page == "Propose & Approve":
                     proposals = proposals + generate_leveraged_pair_rebalance_proposals(
                         packet, policy, pair_config, store=store
                     )
-                except (MissingResearchDependencyError, StaleMarketDataError) as exc:
+                except (
+                    MissingResearchDependencyError,
+                    StrategyMarketDataError,
+                ) as exc:
                     st.error(
                         f"{pair_config.stable_ticker}/{pair_config.leveraged_ticker} strategy check failed "
                         f"({exc}); skipping this pair."

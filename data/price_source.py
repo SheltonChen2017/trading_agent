@@ -31,7 +31,7 @@ series must refuse or visibly degrade its own surface.
 from __future__ import annotations
 
 import dataclasses
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Protocol
 
 import pandas as pd
@@ -120,7 +120,19 @@ def build_fetch_record(
     error: Exception | None = None,
     fetched_at: datetime | None = None,
 ) -> ProviderFetchRecord:
-    at = (fetched_at or datetime.now(timezone.utc)).astimezone(timezone.utc)
+    provider_id = getattr(source, "provider_id", None)
+    if not isinstance(provider_id, str) or not provider_id.strip():
+        raise ValueError("PriceSource.provider_id must be a non-empty string")
+    lineage = getattr(source, "provides_point_in_time_lineage", None)
+    if not isinstance(lineage, bool):
+        raise ValueError(
+            "PriceSource.provides_point_in_time_lineage must be a boolean "
+            "declaration"
+        )
+    at = fetched_at or datetime.now(timezone.utc)
+    if at.tzinfo is None or at.utcoffset() is None:
+        raise ValueError("fetched_at must be timezone-aware")
+    at = at.astimezone(timezone.utc)
     returned = {
         ticker: frame
         for ticker, frame in (data or {}).items()
@@ -136,7 +148,7 @@ def build_fetch_record(
         ).date().isoformat()
     failed = error is not None or not returned
     return ProviderFetchRecord(
-        provider_id=source.provider_id,
+        provider_id=provider_id,
         data_class=data_class,
         fetched_at=at.isoformat(),
         requested_count=len(requested_tickers),
@@ -148,7 +160,7 @@ def build_fetch_record(
             if error is not None
             else ("provider returned no usable data" if not returned else None)
         ),
-        point_in_time_lineage=source.provides_point_in_time_lineage,
+        point_in_time_lineage=lineage,
         latest_session=latest_session,
     )
 
@@ -204,8 +216,18 @@ def evaluate_bar_freshness(
             expected_session=expected,
             detail="no bars available",
         )
-    today = at.date().isoformat()
-    if latest_session > today:
+    today_date = at.date()
+    today = today_date.isoformat()
+    try:
+        latest_date = date.fromisoformat(latest_session)
+    except (TypeError, ValueError):
+        return BarFreshness(
+            fresh=False,
+            latest_session=latest_session,
+            expected_session=expected,
+            detail=f"bars end on an invalid session date: {latest_session!r}",
+        )
+    if latest_date > today_date:
         return BarFreshness(
             fresh=False,
             latest_session=latest_session,
@@ -222,6 +244,30 @@ def evaluate_bar_freshness(
             expected_session=expected,
             detail=f"bars end {latest_session}; expected session {expected}",
         )
+    if latest_session > expected:
+        # The only valid bar later than the latest completed session is a
+        # partial bar for today's currently open NYSE session. A Saturday,
+        # holiday, or pre-market current-date row is malformed data, not
+        # evidence that the provider is extra fresh.
+        schedule = _NYSE_CALENDAR.schedule(
+            start_date=today, end_date=today
+        )
+        in_progress = (
+            not schedule.empty
+            and schedule.iloc[0]["market_open"] <= at
+            and at < schedule.iloc[0]["market_close"]
+        )
+        if latest_session != today or not in_progress:
+            return BarFreshness(
+                fresh=False,
+                latest_session=latest_session,
+                expected_session=expected,
+                detail=(
+                    f"bars end {latest_session}, which is later than the "
+                    f"latest completed session {expected} but is not an "
+                    "in-progress NYSE session"
+                ),
+            )
     return BarFreshness(
         fresh=True,
         latest_session=latest_session,

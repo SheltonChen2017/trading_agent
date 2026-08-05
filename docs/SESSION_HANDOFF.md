@@ -1,222 +1,171 @@
 # Development session handoff
 
-Prepared: 2026-08-04 (late), after Claude (a) closed the verifier-scope
-counter-review round, (b) completed EVERY non-elevated Phase 5 deployment
-step, and (c) implemented the committee replay corpus + CLI milestone,
-pushed for Codex review. The owner is AFK and asked for everything to be
-recorded here for cross-session pickup; Codex will review twice in a row.
+Prepared: 2026-08-05 after Codex reviewed and corrected Claude's complete
+recent range: the committee replay/CLI milestone and the Credential
+Guard/verifier/operational-host follow-up.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
-## 1. Verifier round closed (merged)
+## 1. Current outcome
 
-PR #148 (Claude `-Scope` fix, `90f11ad`) and PR #149 (Codex review,
-`cd14eab`/`34bd974`) are merged; `main` was `f73912a` when this session's
-work branched. Claude's counter-review of the review accepted all three
-VOSREV findings — including VOSREV-003 correcting Claude's own "two
-pre-existing crashes" over-claim (base `6a551cd` contained exactly ONE
-statement-position `if`; the second was Claude's own in-progress draft).
-Both round branches were deleted local+remote.
+The review is **accepted after correction**. The committee release-gate
+milestone is complete and independently reviewed: 69 deterministic cases run
+through the real projection/validation pipeline, their canonical content is
+SHA-256-frozen, and the CLI has a sanitized explicit unavailable state for
+gates, packet/projection, provider, schema, validation, and audit failures.
+`ENABLE_EXPERIMENTAL_COMMITTEE=1` remains mandatory; removing it is a separate
+owner-authorized reviewed decision.
 
-## 2. Phase 5: every non-elevated step is DONE; one elevated step remains
+Phase 5 is **not deployed and no evidence epoch has started**. The first
+elevated installation registered all four operational tasks, but current
+read-only measurement shows every task still uses S4U, is `Ready`, has result
+267011, and has the 1999 never-run timestamp. Credential Guard prevented the
+tasks from launching. Review added `-RequireTaskRun` so post-start verification
+cannot accept that state and hardened the host bootstrap to stop on dirty
+checkouts, Store Python aliases, or native-command failures.
 
-All four owner decisions are made and merged (model 2; mandate approved and
-fingerprint-bound; single operator DB `data/trading_assistant.db`; tasks
-under the owner's own account). Since then, this session completed the
-machine-local preparation:
+No live, funded, autonomous, model-promotion, or order authority changed.
 
-- **Operational checkout** `C:\git\trading_agent_operational` pinned to
-  `f73912a`, clean.
-- **Dedicated task interpreter**: `C:\git\trading_agent_venv` — a real
-  (non-Store-alias) Python 3.13.14 venv with the exact pinned
-  `requirements.txt`. Created because BOTH system pythons are Microsoft
-  Store zero-byte reparse aliases the installer rightly refuses, and the
-  versioned `Program Files\WindowsApps` path would break on any Store
-  auto-update mid-epoch.
-- **Full suite in the operational checkout, BOTH interpreters**: default
-  interpreter 2,668 passed / 1 skipped; venv interpreter 2,668 passed /
-  1 skipped. The exact runtime the tasks will use is validated.
-- **Installer preview (non-elevated, exit 0)**: four resolved actions, all
-  correct — venv python, operational-checkout scripts, single operator DB,
-  `RunLevel Limited`, `S4U`, alerts at
-  `C:\git\trading_agent_operational\data\alerts.jsonl` (verified
-  git-ignored, so the frozen worktree stays clean).
-- **Verifier probe (operational scope, pre-install)**: first-ever
-  end-to-end run; python/database/credential checks PASS (credentials
-  evaluate when `-RunAsUser "REDMOND\sheltonchen"` — the full name — is
-  used), the four tasks correctly report "not installed", ML checks
-  explicitly skipped, exit 1 fail-closed. Exactly the expected
-  pre-install report.
-- **2026-08-05 first elevated install — outcome and diagnosis:** the four
-  tasks INSTALLED correctly (right principal/paths/credentials) but the
-  wrapper's verification failed, exposing two latent verifier bugs and one
-  environment constraint:
-  1. Task Scheduler's never-ran sentinel is 1999-11-30 (not
-     DateTime.MinValue) and a fresh task reports LastTaskResult 267011;
-     the verifier failed every correctly installed task. FIXED on
-     `user/claude/verifier-credguard-fixes-20260805` (also tolerates
-     267009 = currently running; a genuine nonzero exit still fails).
-  2. The scheduler stores the principal UserId in SHORT form
-     ("sheltonchen") while operators pass DOMAIN\name; string comparison
-     failed. FIXED via SID normalization with fail-closed fallback.
-  3. **Credential Guard (verified running: SecurityServicesRunning
-     includes 1) blocks S4U task logons on this domain-joined machine** —
-     Start-ScheduledTask "succeeds" while the task silently never launches
-     (the Task Scheduler history log is disabled, hiding the failure). An
-     Interactive-logon probe task was proven to actually execute
-     (last_result 0). The machine-local elevated wrapper was updated to
-     install AND verify with `-TaskLogonType Interactive` (tasks run while
-     the owner is logged on; locked screen counts).
-  A new executable regression stubs a present task exactly as the field
-  reported it (short-form user + 267011 + 1999 sentinel → must pass; a
-  genuine exit-1 → must still fail); the never-run mutation was shown red
-  then green. The fixed verifier was also run against the REAL installed
-  tasks: overall Ok=true, exit 0.
-- **`scripts/setup_operational_host.ps1` (new, owner-requested):** a
-  committed, parameterized bootstrap that reproduces this machine setup on
-  another computer — operational clone, pinned-requirements venv, launcher,
-  and the Interactive-logon elevated wrapper — with an explicit
-  one-host-per-epoch EVIDENCE WARNING (a second machine must never run the
-  cadence while another host's epoch is active; moving hosts requires
-  `paper-epoch-close` first). Safety invariants pinned by
-  `tests/test_setup_operational_host.py`.
-- **Remaining owner sequence (revised):**
-  1. Merge this branch after Codex review; Claude pulls the operational
-     checkout forward (pre-epoch fast-forward is safe) so its verifier
-     carries the fixes.
-  2. Re-run `C:\git\install_operational_tasks_elevated.ps1` elevated (it
-     now reinstalls the same four tasks with Interactive logon via
-     `-Force` and verifies with the fixed, scope-aware verifier —
-     requires exit 0).
-  3. Claude drives: ledger bootstrap/reconcile → `paper-epoch-start` on
-     the frozen commit → the five in-epoch drills → the 60-session clock.
+## 2. Canonical Git state
 
-Launcher reminder: the owner's app launches default to
-`C:\git\launch_trading_app.ps1` (operational checkout + operator DB).
+Repository: https://github.com/SheltonChen2017/trading_agent
 
-## 3. New milestone implemented: committee replay corpus + CLI surface
+    origin/main = 90614b2 (committee implementation merged through PR #150)
+    review base = f73912a
+    committee implementation = 21379b4
+    committee handoff = b40dc99
+    committee merge = 90614b2
+    verifier/bootstrap implementation = e38c71a
+    review branch = codex/review-recent-claude-changes-20260805
+    review correction = eaecadf
+    milestone record = 43b0bdf
+    handoff commit = the commit containing this file
 
-Branch `user/claude/committee-corpus-cli-20260804` (based on `f73912a`),
-pushed for review. This is the action plan's next Phase 6 item ("committee
-replay corpus + CLI surface") and the ADR's remaining release-gate
-prerequisites:
+The review branch, correction, and handoff commit are pushed to `origin`; no
+pull request was created. The owner's standing workflow is branch, commit, and
+push; do not create a pull request unless explicitly requested.
 
-- **`tests/committee_corpus/cases.json`** — 69 frozen deterministic cases:
-  51 replay (every validator issue code, schema rejection shapes, provider
-  failure mapping, invalid timeouts, projection refusals, plus negative
-  controls proving rules are scoped, e.g. verdict-scoped counterargument
-  requirements and context-only research being legal in counterarguments),
-  10 injection (obeyed instructions failing shape rules, concealment
-  detection, fabricated/stuffed citations, smuggled second response,
-  inert-payload round-trips), 8 memory-poisoning (standing instructions in
-  persisted warnings/research: obeyed → rejected; payload inert; poisoned
-  facts cannot back verdicts; fabricated "memory" citations fail closed).
-  One injection case (`injection-010`) deliberately freezes the DOCUMENTED
-  lexical-filter limitation (Cyrillic-homoglyph "Sеll" passes) as a
-  measurement, per the validator's own docstring — its description says so
-  explicitly.
-- **`tests/test_committee_replay_corpus.py`** — the harness runs every
-  case through the REAL `project_committee_input` →
-  `run_committee_review` pipeline with a scripted provider (no network),
-  resolves `$WARNING_ID`/`$RESEARCH_ID`/`$EVENT_ID` placeholders against
-  the projected facts, and pins the ADR inventory minimums (≥50 replay,
-  ≥5 injection, ≥5 memory-poisoning) plus case-id uniqueness.
-- **CLI**: `committee-review <proposal-id>` in
-  `scripts/run_personal_assistant.py` — the ADR-required CLI
-  `review unavailable` surface. Double-gated like Streamlit
-  (ANTHROPIC_API_KEY AND ENABLE_EXPERIMENTAL_COMMITTEE=1); every failure
-  mode (not_configured / experiment_disabled / unknown_proposal /
-  projection_refused / provider errors / validation_rejected with issue
-  codes / audit_persistence_failed) prints exactly one
-  `Review unavailable (<code>): ...` line and exits 2; an accepted review
-  prints verdict/confidence and every cited section with source ids, plus
-  the mandatory human-approval reminder; the audit row remains a display
-  precondition and the stored proposal is untouched (advisory-only,
-  test-pinned).
-- **Deliberately NOT done**: the `ENABLE_EXPERIMENTAL_COMMITTEE` gate is
-  NOT removed. With the corpus and CLI in place every listed prerequisite
-  is satisfied, so removal is now purely a separately reviewed,
-  owner-authorized decision (recorded in the ADR status section).
-- Docs updated: ADR "Current implementation status" (2026-08-04) and the
-  action plan's Committee-release-gates row.
+Commit dispositions:
 
-## 4. Validation (development machine, Python 3.13, exact final tree)
+- `21379b4`: accepted after correction (RCREV-003 and RCREV-004).
+- `b40dc99`: accepted after correction in the cumulative final tree
+  (RCREV-006).
+- `90614b2`: accepted after correction; its merge tree exactly matches
+  `b40dc99`, with no conflict-only change.
+- `e38c71a`: accepted after correction (RCREV-001, RCREV-002, RCREV-005,
+  and RCREV-006).
+- `eaecadf`: independent review corrections and durable issue ledger.
+- `43b0bdf`: completed committee milestone record.
 
-    corpus harness: 71 passed (69 cases + 2 inventory gates) — every
-        authored expectation matched the real pipeline on the first run
-    committee CLI tests: 8 passed
-    all committee-adjacent focused suites + import boundary: 150 passed
-    full suite: 2,747 passed, 1 skipped, 25 warnings in 435.88s
-    compileall: clean; git diff --check: clean
+## 3. Findings and corrections
 
-Reverse-mutation proofs (applied, shown red, restored):
+The full P0-P4 ledger is
+`docs/REVIEW_2026-08-05_RECENT_CLAUDE_CHANGES.md`.
 
-1. Disabling the validator's missing_counterargument rule → caught by
-   FOUR corpus cases spanning all three categories (replay-004/005,
-   injection-001, poisoning-001) — the corpus exercises the real
-   validator, not a parallel reimplementation.
-2. Removing the CLI's experiment-gate check → caught by
-   `test_experiment_gate_off_is_a_clear_unavailable_state`.
+- **RCREV-001 (P2, resolved):** post-start verification accepted the same
+  never-launched 1999/267011 state exposed by Credential Guard. Added
+  `-RequireTaskRun`, exact never-run pairing, state-bound running status, and
+  generated-wrapper usage.
+- **RCREV-002 (P2, resolved):** PowerShell 5.1 native command failures and a
+  dirty operational checkout did not stop `setup_operational_host.ps1`. Added
+  explicit exit checks, cleanliness refusal, and real-interpreter validation.
+- **RCREV-003 (P2, resolved):** a live broker/data failure while building the
+  committee packet escaped as a traceback. It now exits 2 through one sanitized
+  `Review unavailable (input_unavailable)` line without a provider call.
+- **RCREV-004 (P2, resolved):** count/ID-only corpus gates allowed semantic
+  cases to be gutted silently. The complete canonical corpus now has frozen
+  SHA-256
+  `e9b569a90f267a3e0ae20d31125da9a4680f9352c3b07f733d33171d6e1577f4`.
+- **RCREV-005 (P3, resolved):** a bootstrap credential-text assertion used
+  `or True` and could never fail. It and adjacent fail-closed invariants are
+  now real assertions.
+- **RCREV-006 (P3, resolved):** action plan, handoff, ADR, runbook, and Phase 5
+  checklist disagreed about committee review and task installation. They now
+  state the measured current condition and exact next step.
 
-Known limits, stated for the reviewer: corpus expectations characterize
-current deterministic behavior (that is their purpose); the
-measured-limitation case would rightly FAIL if the lexical filter is later
-strengthened — that failure is the desired signal to re-freeze. The CLI's
-packet construction reuses `_packet()` (sample-or-live portfolio), so a
-live-credentialed machine builds the packet from Alpaca exactly like the
-briefing; tests monkeypatch it.
+No P0, P1, or P4 issue was found. No review issue remains open.
 
-## 5. Review guidance (Codex, two rounds per the owner)
+Submitted quality: **7.0/10**. Corrected quality: **9.5/10**.
 
-Review range: the implementation commit(s) on
-`user/claude/committee-corpus-cli-20260804` based on `f73912a`. Contract:
-ADR release-gate list (docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md) and the
-action plan's committee row. Adversarial attention is most useful on:
+## 4. Validation
 
-- corpus expectation correctness (any case freezing behavior that is
-  actually a defect rather than a design decision);
-- inventory-gate strength (can a case be gutted without tripping it);
-- harness fidelity (placeholders, mutation paths, provider scripting);
-- the CLI's failure-mode completeness and its read-only/advisory claims;
-  and
-- whether any wording overstates what lexical filtering proves.
+Review machine: Windows, Python 3.13.14, Windows PowerShell 5.1.
 
-## 6. What is next
+- Red-before-green review run: 5 expected failures and 4 passes.
+- Corrected narrow run: 89 passed.
+- Committee/verifier/UI/import compatibility run: 234 passed.
+- PowerShell parser: both changed scripts parse cleanly.
+- Full suite: 2,756 passed, 1 skipped, 25 warnings in 543.29 seconds.
+- Warnings: one existing WebSockets legacy deprecation and 24 existing
+  joblib/NumPy deprecations.
+- Required compileall: clean.
+- `git diff --check`: clean.
 
-1. Codex reviews this branch (twice); owner merges.
-2. Owner runs `C:\git\install_operational_tasks_elevated.ps1` elevated,
-   then Claude drives ledger bootstrap → epoch start → five drills →
-   60-session clock (§2 note on the epoch commit choice).
-3. Owner decisions newly available: remove the committee experiment gate
-   (all prerequisites now satisfied) — separately reviewed change only.
-4. Remaining Phase 6 items after this: GR-4 data honesty → GR-7 product
-   completeness (+ allocation-service fold-in).
+The tests use scripted providers, temporary databases, and scheduler cmdlet
+stubs. No test contacted Anthropic, Alpaca, or a funded account. The bootstrap
+itself was not executed because it intentionally mutates machine setup; its
+generated contract and fail-closed source invariants are tested, and both
+PowerShell scripts were parsed.
 
-## 7. Non-negotiable boundaries
+## 5. Exact next steps (do not start automatically)
+
+1. Owner merges the pushed
+   `codex/review-recent-claude-changes-20260805` branch using the preferred
+   Git workflow; no PR is required.
+2. Before any epoch action, update the clean operational checkout to the final
+   merged reviewed commit and rerun `scripts/setup_operational_host.ps1`
+   non-elevated so `C:\git\install_operational_tasks_elevated.ps1` contains the
+   corrected `-RequireTaskRun` contract.
+3. Owner runs that generated wrapper from an elevated PowerShell. It must
+   reinstall the four tasks with Interactive logon, start them, and make
+   `verify_windows_evidence_tasks.ps1 -Scope operational
+   -ExpectedTaskLogonType Interactive -RequireTaskRun` exit 0.
+4. Verify real outputs/heartbeats separately, then follow
+   `docs/PHASE5_DEPLOYMENT_SESSION.md`: ledger bootstrap/reconcile, mandate
+   verification, epoch start on the frozen commit, all five drills, and the
+   60-session/30-order clock.
+5. The next code milestone in the action plan is GR-4 data-layer honesty.
+   Committee experiment-gate removal is an available owner decision, not an
+   automatic next implementation.
+
+The optional four ML shadow tasks remain out of this deployment unless a
+reviewed config/artifact exists and the owner explicitly chooses ML evidence
+collection for the epoch.
+
+## 6. Non-negotiable boundaries
 
 - Paper trading is the only execution mode in scope.
-- Committee output is advisory only: it cannot create, approve, size,
-  submit, cancel, or replace an order; execution revalidation remains
-  mandatory after any human approval; the experiment gate stays until an
-  owner-authorized reviewed removal.
-- The epoch binds one clean commit, mandate/policy fingerprints, one
-  database, one Alpaca paper account; never run the operational cadence or
-  the owner's trading app from the moving development checkout during an
-  epoch.
-- ML/LLM output remains advisory or observational only.
+- Committee output is advisory only and cannot create, approve, size, submit,
+  cancel, or replace an order.
+- Every order still requires exact human approval and deterministic
+  revalidation; kill-switch, exposure, freshness, reconciliation, and
+  execution-gate controls remain unchanged.
+- The evidence epoch binds one clean commit, mandate/policy fingerprints, one
+  operator database, one Alpaca paper account, and one operational host.
+- Never run two operational hosts in one epoch. Close the epoch before moving
+  its host, database, or runtime.
 - Never commit credentials, operator databases, licensed data, or evidence
   artifacts.
 
-## 8. Machine-local state (re-measure, do not assume)
+## 7. Machine-local state (re-measured 2026-08-05)
 
-- `C:\git\trading_agent_operational` — clean `main` at `f73912a`.
-- `C:\git\trading_agent_venv` — pinned-requirements venv (task
-  interpreter); suite-validated.
-- `C:\git\launch_trading_app.ps1` — app launcher (operational checkout).
-- `C:\git\install_operational_tasks_elevated.ps1` — the owner's one-click
-  elevated install+start+verify script.
-- Four `TradingAgent-Paper-*` tasks NOT yet installed; Alpaca paper
-  credentials present in the owner's user scope (values never read).
-- The operator database was not mutated by this session; all tests used
-  the pytest-isolated session database.
+- `C:\git\trading_agent_operational`: clean `main` at `90614b2`.
+- `C:\git\trading_agent_venv\Scripts\python.exe`: present.
+- `C:\git\launch_trading_app.ps1`: present.
+- `C:\git\install_operational_tasks_elevated.ps1`: present but generated before
+  review correction; regenerate it after the reviewed commit reaches the
+  operational checkout.
+- All four `TradingAgent-Paper-*` tasks: installed as short user
+  `sheltonchen`, logon type S4U, state Ready, result 267011, never-run
+  timestamp. This is a failed launch state, not operational readiness.
+- Credential values, broker connectivity, and operator-database contents were
+  not read. Re-measure rather than copying assumptions.
+
+Suggested resume prompt: "Read CLAUDE.md, AGENTS.md,
+docs/ACTION_PLAN_2026-08-02.md, docs/SESSION_HANDOFF.md, and
+docs/REVIEW_2026-08-05_RECENT_CLAUDE_CHANGES.md. Fetch all refs and preserve
+`eaecadf`. Confirm whether the review branch was merged. Do not reinstall or
+start tasks, touch the operator database, contact a broker, bootstrap the
+ledger, start an evidence epoch, remove the committee gate, or begin GR-4
+without the owner's explicit direction."

@@ -9,12 +9,12 @@ Outcome: **accepted after correction**.
 Base: `86c5f77` (`origin/main`, post PR #153).
 Implementation branch tip before review: `a4f09e3`.
 Review branch: `codex/review-gr4-data-honesty-20260805`.
-Corrections commit: `7eef1c5`.
+Corrections commits: `7eef1c5` plus the follow-up commit(s) recorded below for GR4REV-008..010.
 
 | Commit | Message | Disposition |
 |---|---|---|
-| `3fa4229` | GR-4: data-layer resilience and honesty | accepted after correction (GR4REV-001..007) |
-| `eb33aa9` | Add the owner-dictated sharpest-decline dip-grid exploratory backtest | accepted after correction (GR4REV-007) |
+| `3fa4229` | GR-4: data-layer resilience and honesty | accepted after correction (GR4REV-001..006, GR4REV-008..009) |
+| `eb33aa9` | Add the owner-dictated sharpest-decline dip-grid exploratory backtest | accepted after correction (GR4REV-007, GR4REV-010) |
 | `a4f09e3` | Record GR-4 implementation state and replace the session handoff | accepted after correction in the cumulative final tree (documentation reconciled by this review) |
 
 No P0 or P1 issue was found. No live, funded, autonomous, model-promotion, or order authority was granted.
@@ -30,8 +30,11 @@ No P0 or P1 issue was found. No live, funded, autonomous, model-promotion, or or
 | GR4REV-005 | P2 | Resolved | `3fa4229` | `assistant/strategy_proposals.py` | Missing strategy bars returned `[]`, indistinguishable from "no rebalance needed". | `generate_leveraged_pair_rebalance_proposals(..., market_data={})` returned `[]`. | Plan §9.3 requires refusal of dependent surfaces rather than silent empty success. | Raise `MarketDataUnavailableError`; UI catches the strategy-market-data family. | Red then green: `test_missing_strategy_bars_are_a_visible_refusal`. |
 | GR4REV-006 | P2 | Resolved | `3fa4229` | `assistant/strategy_proposals.py`, `assistant/portfolio_analytics.py`, `assistant/execution_kernel/validate.py` | Strategy fetches bypassed recorded provider health, and forward splits escaped F6 because `sell_exceeds_held` only catches fewer shares. | F6 with 10→20 shares submitted; strategy empty-provider path wrote no fetch row. | Plan §9.2 requires split detection between snapshot and submit and recorded provider health on the production read path that sizes trades. | Record strategy fetches when a store is supplied; store proposal-time shares; refuse split-shaped share drift before broker preflight; keep the helper import-boundary-safe. | Red then green: F6 forward-split case, seam freeze, and `test_strategy_provider_failure_is_recorded_before_refusal`. |
 | GR4REV-007 | P2 | Resolved | `eb33aa9` | `scripts/run_sharpest_decline_dip_2026_08_05.py` | End-of-sample episodes silently shortened the frozen 63-session horizon and still entered labeled statistics. | `_simulate_episode(..., entry_index near end)` returned `sessions_held=1`. | Research honesty forbids pooling underfilled horizons into a frozen comparison. | Refuse underfilled episodes; reran real-data script; corrected reported counts/metrics. | Red then green: `tests/test_sharpest_decline_dip.py`; rerun reported 1,698 full-horizon episodes. |
+| GR4REV-008 | P2 | Resolved | `3fa4229` | `data/price_source.py` | A provider response containing only unrequested tickers was recorded as a successful fetch (`ok=True`). | `build_fetch_record(..., ["AAA"], {"WRONG": bars})` returned `ok=True`. | Provider health/freshness evidence must answer the requested universe. | Count and succeed only on requested tickers; spurious keys cannot launder an empty request. | Red then green: `test_spurious_ticker_response_is_not_a_successful_requested_fetch`. |
+| GR4REV-009 | P2 | Resolved | `3fa4229` | `assistant/platform_readiness.py` | `build_platform_readiness(now=...)` stamped `checked_at` from the pinned clock but evaluated bar freshness against wall clock. | Saturday-pinned report could keep Wednesday freshness ready. | The report's clock and freshness SLA must be the same instant. | Thread `now` through `build_data_integrity` into `build_data_layer_evidence`. | Red then green: `test_platform_readiness_threads_pinned_now_into_data_freshness`. |
+| GR4REV-010 | P2 | Resolved | `eb33aa9` | `scripts/run_sharpest_decline_dip_2026_08_05.py` | Pick-vs-universe conclusions used unpaired series stats; universe baseline could truncate or desync from episodes; PIT caveat omitted. | Script printed only grid−hold paired diffs; baseline used `min(... len-1)`. | Research comparisons must stay on identical observations and disclose non-PIT adjusted history. | Require paired full-horizon baselines, print hold/grid−universe paired diffs and beat rates, report coverage, label positive-rate vs beat-rate, disclose `point_in_time_data=false`. | Red then green: `tests/test_sharpest_decline_dip.py`; real-data rerun 1,698 paired episodes. |
 
-No P3/P4 issue remains open. One intentional residual is documented below: research/presentation-only historical fetches outside the DecisionPacket/strategy path are not automatically recorded as operational provider-health evidence.
+No open P0–P2 issue remains for the reviewed GR-4 scope. Intentional residuals: research/presentation-only historical fetches outside the DecisionPacket/strategy path are not automatically recorded as operational provider-health evidence; CLI briefing prints `DATA DEGRADED` as ordinary warning text rather than a Streamlit-style banner; uncommon non-integer split ratios stay ordinary share mismatches without a split-shaped hint.
 
 ## 3. Compatibility and boundary assessment
 
@@ -47,10 +50,10 @@ Checked against the rest of the app:
 
 ## 4. Quality score
 
-Submitted quality: **7.0/10**.
-Corrected quality: **9.4/10**.
+Submitted quality: **6.8/10**.
+Corrected quality: **9.5/10**.
 
-The architecture and honesty vocabulary were sound, but several fail-open edges around calendar freshness, evidence typing, missing-data surfaces, and forward-split identity had to be closed before GR-4 met its definition of done.
+The architecture and honesty vocabulary were sound, but fail-open edges around calendar freshness, evidence typing, readiness clock agreement, requested-ticker success, missing-data surfaces, forward-split identity, and unpaired research comparisons had to be closed before GR-4 met its definition of done.
 
 ## 5. Validation
 
@@ -60,7 +63,8 @@ Review machine: Windows, Python 3.13.14.
 - Corrected focused/compatibility run: 200 passed, 1 warning.
 - Broader GR-4/execution/UI/import compatibility run: 287 passed, 1 warning.
 - Corrected exploratory dip-grid real-data rerun: 1,698 full-horizon episodes; grid-hold mean −0.76%, median 0.00%; exploratory only.
-- Exact final tree: **2,795 passed / 1 skipped / 25 warnings** in 522.27s.
+- Follow-up focused suite after GR4REV-008..010: 91 passed.
+- Exact final tree: **2,798 passed / 1 skipped / 25 warnings** in 544.22s.
 - `python -m compileall -q assistant backtest data execution ml risk scripts signals strategies tests baskets.py config.py market_analytics.py` clean.
 - `git diff --check` clean.
 

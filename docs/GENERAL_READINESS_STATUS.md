@@ -894,14 +894,17 @@ compares that value with the fresh broker snapshot and refuses a split-shaped
 forward or reverse mismatch before broker preflight. Legacy proposals without
 the additive field retain their prior validation behavior.
 
-Independent review corrected seven material failure directions: non-session
+Independent review corrected ten material failure directions: non-session
 bars accepted as fresh; non-boolean lineage persisted as truthy; malformed
 readiness verdicts coerced to pass; stale short histories missing the banner;
 missing strategy data silently returning no proposal; the strategy path
-bypassing provider-health recording; and forward splits escaping the existing
-sell-exceeds-held check. The review also corrected the separate exploratory
-dip-grid script so every reported episode has its frozen 63-session horizon.
-See `docs/REVIEW_2026-08-05_GR4_DATA_HONESTY.md`.
+bypassing provider-health recording; forward splits escaping the existing
+sell-exceeds-held check; unrequested ticker keys laundering a successful
+fetch; readiness freshness ignoring a pinned report clock; and unpaired /
+truncated exploratory dip-grid comparisons. The exploratory script now keeps
+episode and universe baselines paired on the frozen 63-session horizon and
+reports paired beat rates with an explicit non-PIT caveat. See
+`docs/REVIEW_2026-08-05_GR4_DATA_HONESTY.md`.
 
 ### Deliberate scope deviations from archived plan section 9
 

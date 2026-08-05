@@ -606,8 +606,9 @@ def command_committee_review(args, store: AssistantStore) -> None:
     mandatory after any human approval. Double-gated exactly like the
     Streamlit surface (ANTHROPIC_API_KEY AND ENABLE_EXPERIMENTAL_COMMITTEE=1
     -- completing the replay corpus did not remove that gate; removal is a
-    separately owner-authorized decision). Every call, accepted or not, is
-    audit-persisted; a review that cannot be audited is unavailable.
+    separately owner-authorized decision). Every provider result, accepted or
+    not, is audit-persisted; failures before a provider call remain explicitly
+    unavailable. A review that cannot be audited is unavailable.
     """
     if not is_anthropic_committee_configured():
         _committee_unavailable(
@@ -627,7 +628,16 @@ def command_committee_review(args, store: AssistantStore) -> None:
             "unknown_proposal", f"No stored proposal {args.proposal_id!r}."
         )
 
-    packet = _packet(include_events=not args.no_events)
+    try:
+        packet = _packet(include_events=not args.no_events)
+    except Exception:
+        # A configured account makes _packet() perform fallible broker/data
+        # reads. Preserve the CLI contract and do not leak provider, broker,
+        # account, or local exception details into the unavailable surface.
+        _committee_unavailable(
+            "input_unavailable",
+            "The decision packet could not be built; no provider call was made.",
+        )
     try:
         committee_input = project_committee_input(packet, proposal)
     except ProjectionError as exc:

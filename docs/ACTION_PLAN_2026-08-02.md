@@ -55,7 +55,8 @@ are complete and independently reviewed (2026-08-03). What does not exist is: GR
 every AI *product* plan beyond the committee (strategy
 authoring, debate, allocation service, MCP, and proposal cleanup), and — most
 importantly — **any qualifying frozen-epoch operational evidence at all**:
-zero scheduled tasks installed, zero evidence epochs, zero
+four operational tasks registered but not yet accepted after their S4U launches
+were blocked by Credential Guard, zero evidence epochs, zero
 drills recorded, zero ledger bootstraps, zero broker lifecycle rows, and the
 60-session / 30-order mandate clock has never started. The scarcest resource
 on the critical path is not engineering — it is elapsed calendar time on a
@@ -142,7 +143,7 @@ already-merged work does not reorder the adopted next step.
 | Item | Remaining | Size |
 |---|---|---|
 | **GR-1E** — ~~assess the composition + recovery wrappers~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03: no extraction. The 281-line coordinator sequences extracted phases, performs ordinary control/exception/message composition, contains one broker-submission call, and contains no inline financial math, transition SQL, or broker interpretation. Recovery remains around the atomic storage primitive; the claim wrapper may try more than one candidate status. GR-1 is complete against the archived plan's intended §6.4 scope; `allocation_batch.py` debt remains open. See GENERAL_READINESS_STATUS and the GR-1E review report.** | none | complete |
-| **Committee release gates** — **corpus + CLI surface implemented 2026-08-04, awaiting independent review**: `tests/committee_corpus/cases.json` (69 frozen cases: 51 replay / 10 injection / 8 memory-poisoning) executed through the real pipeline with ADR-minimum inventory gates, plus the `committee-review` CLI command with an explicit `Review unavailable (<code>)` state for every failure mode. The `ENABLE_EXPERIMENTAL_COMMITTEE=1` gate is deliberately NOT removed — with every listed prerequisite now satisfied, removal is purely a separately reviewed, owner-authorized decision. | owner decision on gate removal after review | done pending review |
+| **Committee release gates** — **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-05**: `tests/committee_corpus/cases.json` contains 69 frozen cases (51 replay / 10 injection / 8 memory-poisoning) executed through the real pipeline, with ADR-minimum inventory gates and a canonical SHA-256 content identity so a case cannot be silently gutted while retaining its ID/category. The `committee-review` CLI gives every covered failure one explicit `Review unavailable (<code>)` line; review added the missing packet-construction failure path. The `ENABLE_EXPERIMENTAL_COMMITTEE=1` gate is deliberately NOT removed — removal is a separately reviewed, owner-authorized decision. | owner decision on gate removal | complete |
 | **ML-FS-6 real discovery/confirmation** — spec `research/ml_specs/volatility-discovery-v1.json` is review-ready; no `SpecReviewAttestation` exists | blocked on owner-designated reviewer + real PIT data | owner + data |
 
 ---
@@ -264,8 +265,12 @@ session). On 2026-08-04 the owner chose model 2, approved the mandate, retained
 the existing operator database, and chose the owner's account for scheduled
 tasks. The mandate implementation and independent review merged through
 PRs #146/#147; PR #148 then added the reviewed operational-only verifier scope.
-No scheduler installation, ledger bootstrap, or epoch action follows without
-the owner's specific direction.
+The first elevated install on 2026-08-05 registered all four operational tasks
+but Credential Guard blocked their S4U launches. The independently corrected
+follow-up adds Interactive-logon host bootstrap and post-start
+`-RequireTaskRun` verification; the owner must reinstall/start/verify before
+ledger bootstrap or any epoch action. No such action follows without the
+owner's specific direction.
 
 **Phase 5 — operational deployment + epoch start (owner-heavy):**
 merge the independently reviewed approved mandate → pin the model-2
@@ -285,7 +290,8 @@ the mandate's 60-session minimum, which requires one immutable epoch.
 preference, all non-runtime):**
 **UI Phase 2 (owner-requested 2026-08-03, jumps to the front of this phase
 — the owner is paper trading daily and these directly support it)** →
-committee replay corpus + CLI surface → GR-4 data honesty → GR-7 product
+~~committee replay corpus + CLI surface~~ (complete after independent
+correction 2026-08-05) → GR-4 data honesty → GR-7 product
 completeness (fold in the allocation-service design here, per Codex's
 recommendation, so the app keeps one authoritative sizing path).
 

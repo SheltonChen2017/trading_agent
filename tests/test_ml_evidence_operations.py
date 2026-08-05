@@ -430,10 +430,36 @@ def test_windows_verifier_accepts_a_freshly_installed_never_run_task(tmp_path):
     assert report["Ok"] is True
     assert report["FailedCheckCount"] == 0
 
+    # A post-start verification must NOT accept the same never-ran state.
+    # Credential Guard exposed exactly this failure direction: requesting a
+    # start can return without error while the task remains at 267011.
+    harness = tmp_path / "run-verifier-require-task-run.ps1"
+    harness.write_text(
+        harness_script(267011).replace(
+            "-Scope operational", "-Scope operational -RequireTaskRun"
+        ),
+        encoding="utf-8",
+    )
+    result = subprocess.run(
+        [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(harness)],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    report = json.loads(result.stdout)
+    assert result.returncode == 1
+    assert report["Ok"] is False
+    assert report["RequireTaskRun"] is True
+
+    # An inconsistent sentinel date plus a genuine error code must fail
+    # closed; only the exact 1999/267011 never-run pair is tolerated.
+    result, report = run_harness(1)
+    assert result.returncode == 1
+    assert report["Ok"] is False
+
     # A completed run's genuine nonzero exit (e.g. 1) must still FAIL --
-    # the never-run tolerance is scoped to the 1999 sentinel plus 267011,
-    # not a blanket pass. (LastRunTime is forced past the sentinel here so
-    # only the exit code decides.)
+    # this second shape uses a real run date so only the exit code decides.
     harness = tmp_path / "run-verifier-real-failure.ps1"
     harness.write_text(
         harness_script(1).replace(

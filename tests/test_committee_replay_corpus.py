@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import hashlib
 import json
 import sys
 from pathlib import Path
@@ -57,6 +58,9 @@ _CORPUS_PATH = Path(__file__).resolve().parent / "committee_corpus" / "cases.jso
 MINIMUM_REPLAY_CASES = 50
 MINIMUM_INJECTION_CASES = 5
 MINIMUM_MEMORY_POISONING_CASES = 5
+FROZEN_CORPUS_SHA256 = (
+    "e9b569a90f267a3e0ae20d31125da9a4680f9352c3b07f733d33171d6e1577f4"
+)
 
 
 def _load_cases() -> list[dict]:
@@ -87,6 +91,20 @@ def test_case_ids_are_unique_and_shaped():
         assert case["category"] in ("replay", "injection", "memory_poisoning")
         assert case["description"].strip()
         assert "expected" in case
+
+
+def test_frozen_corpus_content_identity():
+    """Counts alone permit a release-gate case to be gutted while retaining
+    its category and ID. Freeze the canonical content so any semantic corpus
+    change requires an explicit reviewed fingerprint update."""
+    canonical = json.dumps(
+        _CASES,
+        sort_keys=True,
+        separators=(",", ":"),
+        ensure_ascii=False,
+        allow_nan=False,
+    ).encode("utf-8")
+    assert hashlib.sha256(canonical).hexdigest() == FROZEN_CORPUS_SHA256
 
 
 # --- the harness ------------------------------------------------------------

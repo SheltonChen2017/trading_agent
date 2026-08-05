@@ -124,6 +124,15 @@ python scripts/run_operations_watchdog.py --database data/paper.db --interval-se
 
 ### Windows Task Scheduler
 
+On a new Windows host, `scripts/setup_operational_host.ps1` can create the
+separate operational clone, dedicated venv, launcher, and elevated installation
+wrapper. It is non-elevated and refuses a dirty operational checkout, a
+Microsoft Store Python alias, or any failed native Git/Python/pip command. Its
+generated wrapper uses Interactive logon because Credential Guard blocked S4U
+launches on the first operational host. Preparing a second host never permits
+two hosts to collect into one epoch: close the active epoch before moving the
+cadence, database, or frozen runtime.
+
 Preview the four operational tasks under the intended least-privilege account:
 
 ```powershell
@@ -161,21 +170,23 @@ After installing only the four operational tasks, start each manually once and
 run the operational verifier scope:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify_windows_evidence_tasks.ps1 -Scope operational -RunAsUser "MACHINE\trading-agent" -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify_windows_evidence_tasks.ps1 -Scope operational -RunAsUser "MACHINE\trading-agent" -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -RequireTaskRun
 ```
 
 If the four optional ML tasks were also installed, start all eight manually
 once and run the default full scope:
 
 ```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify_windows_evidence_tasks.ps1 -RunAsUser "MACHINE\trading-agent" -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -ConfigPath C:\path\to\shadow.json -ArtifactPath C:\path\to\artifact-dir
+powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify_windows_evidence_tasks.ps1 -RunAsUser "MACHINE\trading-agent" -PythonPath C:\path\to\python.exe -DatabasePath C:\path\to\paper.db -ConfigPath C:\path\to\shadow.json -ArtifactPath C:\path\to\artifact-dir -RequireTaskRun
 ```
 
 The verifier is read-only and non-authoritative. It checks paths, credential
 presence without printing values, selected task principals/logon types/actions,
 and last task results. `-Scope operational` checks four tasks and lists the six
 omitted ML checks explicitly in `SkippedChecks`; default scope `all` checks all
-eight and requires the ML config/artifact paths. Run it as the task account to
+eight and requires the ML config/artifact paths. `-RequireTaskRun` rejects the
+never-ran scheduler state and is mandatory after manually starting tasks; omit
+it only when checking registration before a first start. Run it as the task account to
 verify user-scoped credentials; when run as another account, only
 machine-scoped credentials are accepted as visible to the target. A never-run
 task is reported but is not a successful manual-run receipt; retain Task

@@ -131,6 +131,29 @@ def test_projection_refusal_is_a_clear_unavailable_state(store, monkeypatch, cap
     assert provider.calls == 0
 
 
+def test_packet_build_failure_is_a_clear_unavailable_state(
+    store, monkeypatch, capsys
+):
+    """Live packet construction can fail before projection (broker/data
+    outage). The CLI contract still requires one explicit unavailable line,
+    not a traceback or a provider call."""
+    provider = _FakeProvider(_valid_raw_review())
+    _enable_gates(monkeypatch, provider)
+    _seed_sell_proposal(store)
+
+    def _packet_failure(*, include_events=True):
+        raise RuntimeError("broker response contained sensitive detail")
+
+    monkeypatch.setattr(cli, "_packet", _packet_failure)
+    with pytest.raises(SystemExit) as excinfo:
+        cli.command_committee_review(_args(), store)
+    assert excinfo.value.code == 2
+    line = _unavailable_line(capsys)
+    assert "(input_unavailable)" in line
+    assert "sensitive detail" not in line
+    assert provider.calls == 0
+
+
 def test_provider_failure_is_a_clear_unavailable_state_with_audit(
     store, monkeypatch, capsys
 ):

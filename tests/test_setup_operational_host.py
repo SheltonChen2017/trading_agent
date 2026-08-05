@@ -56,6 +56,17 @@ def test_single_operator_database_discipline():
     assert "paper.db" not in _SCRIPT
 
 
+def test_generated_launcher_lifts_credentials_fresh_from_user_scope():
+    """Counter-review CRRC-001 (field incident 2026-08-05): a long-lived
+    parent shell hands the app the environment from when the shell started,
+    so a key rotation left the running app presenting the revoked key
+    ("unauthorized"). The generated launcher must read the user-scope
+    registry at every launch -- and never echo the values."""
+    assert 'GetEnvironmentVariable(`$credentialName, "User")' in _SCRIPT
+    assert 'Set-Item -Path "Env:`$credentialName"' in _SCRIPT
+    assert "values not shown" in _SCRIPT
+
+
 def test_embeds_no_credential_material():
     # Names of the required variables may appear in prose; values never.
     assert not re.search(r"APCA_API_KEY_ID\s*=", _SCRIPT)

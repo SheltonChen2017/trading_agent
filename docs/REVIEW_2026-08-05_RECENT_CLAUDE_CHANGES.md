@@ -66,3 +66,42 @@ their claims. Corrected-tree quality: **9.5/10**.
 - Full suite, compileall, final diff check, Python version, and final commit
   identifiers: recorded in `docs/SESSION_HANDOFF.md` after final-tree
   validation.
+
+## Claude counter-review (2026-08-05, appended)
+
+Every finding was independently re-verified against the submitted snapshots
+before acceptance:
+
+- **RCREV-003 confirmed:** at `21379b4` the committee CLI called
+  `_packet(...)` outside any try block — a broker/data exception escaped as
+  a traceback, contradicting the command's own "every failure mode prints
+  one line" promise. Genuine gap in a surface Claude had explicitly claimed
+  complete.
+- **RCREV-005 confirmed verbatim:** the submitted
+  `assert "..." or True` is unconditionally true — a vacuous safety
+  assertion Claude authored. A repository-wide sweep found no other
+  `or True`-class assertion.
+- **RCREV-001 confirmed:** zero occurrences of any post-start contract in
+  the submitted verifier; the generated wrapper started tasks and then ran
+  a verification that tolerated the never-launched state — the exact false
+  PASS shape Credential Guard produces. Claude's fix for the false-FAILURE
+  had created a false-PASS path for the wrapper's post-start use; the
+  `-RequireTaskRun` correction is the right shape.
+- **RCREV-002 confirmed with one nuance:** the three `$LASTEXITCODE`
+  matches in the submitted bootstrap all sit inside the generated wrapper's
+  here-string; the bootstrap's OWN native calls (clone, fetch, venv, pip,
+  import probe) had none, exactly as the ledger states.
+- **RCREV-004/006 accepted:** the canonical-corpus SHA-256 freeze is
+  strictly stronger than the count/ID gates, and the documentation
+  reconciliation matches measured state.
+
+Verdict: all four P2s and both P3s are genuine defects in Claude's
+submissions; the corrections are accepted as written. Focused suites
+(101 committee/bootstrap/verifier tests) re-ran green during the
+counter-review.
+
+Counter-review addition (this branch):
+
+| ID | Priority | Status | Location | Issue | Correction | Verification |
+|---|---|---|---|---|---|---|
+| CRRC-001 | P3 | Resolved | `scripts/setup_operational_host.ps1` (generated launcher) | Field incident 2026-08-05: after the owner rotated Alpaca keys, the running app kept presenting the revoked key ("unauthorized") because Windows processes inherit their parent shell's environment and never see later user-scope changes. The machine-local launcher was fixed the same day, but the REPO's generated launcher — the one that travels to other computers via the bootstrap — still lacked the fix. | The generated launcher now lifts `APCA_API_KEY_ID`/`APCA_API_SECRET_KEY` from the user-scope registry at every launch (values never displayed or persisted) and announces that it did so. | New invariant test `test_generated_launcher_lifts_credentials_fresh_from_user_scope`; reverse mutation (registry scope changed to Process) failed it and restoration returned it green; PowerShell parse clean; bootstrap invariant suite 7 passed. Full-suite results on the final tree are in the session handoff. |

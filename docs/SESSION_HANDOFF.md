@@ -1,8 +1,12 @@
 # Development session handoff
 
 Prepared: 2026-08-05 after Codex reviewed and corrected Claude's complete
-recent range: the committee replay/CLI milestone and the Credential
-Guard/verifier/operational-host follow-up.
+recent range (the committee replay/CLI milestone and the Credential
+Guard/verifier/operational-host follow-up) and Claude counter-reviewed the
+review: every finding independently re-verified against the submitted
+snapshots and accepted, plus one addition (CRRC-001) porting the same-day
+field fix for rotated-credential staleness into the repo's generated
+launcher.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
@@ -87,6 +91,17 @@ The full P0-P4 ledger is
 No P0, P1, or P4 issue was found. No review issue remains open.
 
 Submitted quality: **7.0/10**. Corrected quality: **9.5/10**.
+
+**Claude counter-review (appended to the review report):** all six findings
+re-verified red against the submitted snapshots (`21379b4`/`e38c71a`) with
+fresh probes — including confirming the exact `or True` vacuous assertion
+and the zero-occurrence post-start contract — and accepted as written; a
+repo-wide sweep found no further vacuous assertions. **CRRC-001 (P3,
+resolved on this branch):** the field incident earlier today (rotated
+Alpaca keys + inherited stale environment → "unauthorized") was fixed in
+the machine-local launcher but the repo's GENERATED launcher still lacked
+the user-scope registry lift; the bootstrap now generates it (values never
+shown), pinned by a mutation-proven invariant test.
 
 ## 4. Validation
 

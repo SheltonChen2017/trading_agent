@@ -58,6 +58,24 @@ $resolvedPython = (Resolve-Path -LiteralPath $PythonPath).Path
 $database = [IO.Path]::GetFullPath($DatabasePath)
 $currentUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name
 
+function Resolve-AccountSid {
+    # Task Scheduler stores the principal's UserId in short form
+    # ("sheltonchen") while operators pass DOMAIN\name; comparing the two
+    # as strings misreported every correctly installed task as a failed
+    # check (first field run, 2026-08-05). Normalize both to SIDs; an
+    # unresolvable name returns $null and the caller falls back to the
+    # exact string comparison (fail-closed, never fail-open).
+    param([Parameter(Mandatory = $true)][string]$AccountName)
+    try {
+        return (New-Object Security.Principal.NTAccount($AccountName)).Translate(
+            [Security.Principal.SecurityIdentifier]
+        ).Value
+    } catch {
+        return $null
+    }
+}
+$expectedRunAsSid = Resolve-AccountSid -AccountName $RunAsUser
+
 $operationalTasks = @(
     "$OperationalTaskPrefix-OperationsCycle",
     "$OperationalTaskPrefix-OrderMonitor",
@@ -142,14 +160,29 @@ foreach ($taskName in $expectedTasks) {
         continue
     }
     $info = Get-ScheduledTaskInfo -TaskName $taskName
-    $principalOk = $task.Principal.UserId -eq $RunAsUser -and `
+    $principalUserMatches = $task.Principal.UserId -eq $RunAsUser
+    if (-not $principalUserMatches -and $expectedRunAsSid) {
+        $taskSid = Resolve-AccountSid -AccountName $task.Principal.UserId
+        $principalUserMatches = ($null -ne $taskSid) -and ($taskSid -eq $expectedRunAsSid)
+    }
+    $principalOk = $principalUserMatches -and `
         $task.Principal.RunLevel -eq "Limited" -and `
         $task.Principal.LogonType -eq $ExpectedTaskLogonType
     $actions = @($task.Actions)
     $pythonOk = $actions.Count -eq 1 -and `
         $actions[0].Execute -eq $resolvedPython
-    $neverRun = $info.LastRunTime -eq [datetime]::MinValue
-    $lastResultOk = $info.LastTaskResult -eq 0 -or $neverRun
+    # Task Scheduler's "never ran" sentinel is 1999-11-30, not
+    # [datetime]::MinValue, and a not-yet-run task reports LastTaskResult
+    # 267011 (SCHED_S_TASK_HAS_NOT_RUN); a currently running task reports
+    # 267009 (SCHED_S_TASK_RUNNING). All three misreported freshly
+    # installed or in-flight tasks as failures on the first field run
+    # (2026-08-05). A genuine nonzero exit from a completed run still
+    # fails.
+    $neverRun = $info.LastRunTime -eq [datetime]::MinValue -or `
+        $info.LastRunTime.Year -lt 2000 -or `
+        $info.LastTaskResult -eq 267011
+    $currentlyRunning = $info.LastTaskResult -eq 267009
+    $lastResultOk = $info.LastTaskResult -eq 0 -or $neverRun -or $currentlyRunning
     Add-Check -Name "task:$taskName" -Ok (
         $principalOk -and $pythonOk -and $lastResultOk
     ) -Detail (

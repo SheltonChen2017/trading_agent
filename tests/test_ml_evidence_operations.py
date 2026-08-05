@@ -342,6 +342,117 @@ def test_windows_installers_use_limited_principals_and_schedule_supervisor():
     os.name != "nt",
     reason="The verifier targets Windows PowerShell and Task Scheduler.",
 )
+def test_windows_verifier_accepts_a_freshly_installed_never_run_task(tmp_path):
+    """Field failure 2026-08-05 (first install on the operational host):
+    Task Scheduler stores the principal UserId in SHORT form while the
+    operator passes DOMAIN\\name, reports LastTaskResult 267011
+    (SCHED_S_TASK_HAS_NOT_RUN) for a fresh task, and uses 1999-11-30 (not
+    DateTime.MinValue) as the never-ran sentinel. The submitted verifier
+    failed every correctly installed task on all three. This harness stubs
+    ONE present task exactly as the field reported it -- short-form user,
+    267011, 1999 sentinel -- using the real current user's two name forms
+    so the SID normalization genuinely resolves, and requires the overall
+    report to pass. A completed run's genuine nonzero exit must still
+    fail (second stub)."""
+    powershell = shutil.which("powershell")
+    assert powershell is not None, "Windows validation requires powershell.exe"
+
+    database = tmp_path / "paper.db"
+    database.touch()
+    verifier = (
+        Path(__file__).resolve().parent.parent
+        / "scripts"
+        / "verify_windows_evidence_tasks.ps1"
+    )
+
+    def ps_quote(value) -> str:
+        return "'" + str(value).replace("'", "''") + "'"
+
+    short_user = os.environ["USERNAME"]
+    full_user = f"{os.environ.get('USERDOMAIN', short_user)}\\{short_user}"
+
+    def harness_script(last_task_result: int) -> str:
+        return "\n".join(
+            (
+                "$ErrorActionPreference = 'Stop'",
+                "function Get-ScheduledTask {",
+                "    [CmdletBinding()]",
+                "    param([string]$TaskName)",
+                "    return [PSCustomObject]@{",
+                "        TaskName = $TaskName",
+                "        State = 'Ready'",
+                "        Principal = [PSCustomObject]@{",
+                f"            UserId = {ps_quote(short_user)}",
+                "            RunLevel = 'Limited'",
+                "            LogonType = 'S4U'",
+                "        }",
+                "        Actions = @([PSCustomObject]@{",
+                f"            Execute = {ps_quote(sys.executable)}",
+                "        })",
+                "    }",
+                "}",
+                "function Get-ScheduledTaskInfo {",
+                "    [CmdletBinding()]",
+                "    param([string]$TaskName)",
+                "    return [PSCustomObject]@{",
+                f"        LastTaskResult = {last_task_result}",
+                "        LastRunTime = [datetime]'1999-11-30'",
+                "        NextRunTime = $null",
+                "    }",
+                "}",
+                (
+                    f"& {ps_quote(verifier)} "
+                    f"-RunAsUser {ps_quote(full_user)} "
+                    f"-PythonPath {ps_quote(sys.executable)} "
+                    f"-DatabasePath {ps_quote(database)} "
+                    "-RequiredCredentialNames @() "
+                    "-Scope operational"
+                ),
+                "exit $LASTEXITCODE",
+            )
+        )
+
+    def run_harness(last_task_result: int):
+        harness = tmp_path / f"run-verifier-{last_task_result}.ps1"
+        harness.write_text(harness_script(last_task_result), encoding="utf-8")
+        result = subprocess.run(
+            [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(harness)],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+        return result, json.loads(result.stdout)
+
+    # 267011 = not yet run: a fresh, correctly installed task must PASS.
+    result, report = run_harness(267011)
+    assert result.returncode == 0, result.stdout
+    assert report["Ok"] is True
+    assert report["FailedCheckCount"] == 0
+
+    # A completed run's genuine nonzero exit (e.g. 1) must still FAIL --
+    # the never-run tolerance is scoped to the 1999 sentinel plus 267011,
+    # not a blanket pass. (LastRunTime is forced past the sentinel here so
+    # only the exit code decides.)
+    harness = tmp_path / "run-verifier-real-failure.ps1"
+    harness.write_text(
+        harness_script(1).replace(
+            "[datetime]'1999-11-30'", "[datetime]'2026-08-05'"
+        ),
+        encoding="utf-8",
+    )
+    result = subprocess.run(
+        [powershell, "-NoProfile", "-ExecutionPolicy", "Bypass", "-File", str(harness)],
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    report = json.loads(result.stdout)
+    assert result.returncode == 1
+    assert report["Ok"] is False
+
+
 def test_windows_operational_verifier_executes_without_ml_paths(tmp_path):
     """Exercise the real PowerShell scope instead of only inspecting source.
 

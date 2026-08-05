@@ -48,16 +48,49 @@ machine-local preparation:
   used), the four tasks correctly report "not installed", ML checks
   explicitly skipped, exit 1 fail-closed. Exactly the expected
   pre-install report.
-- **The one remaining owner action**: run
-  `C:\git\install_operational_tasks_elevated.ps1` from an elevated
-  PowerShell. It installs the four tasks, starts each once, and re-runs
-  the verifier requiring exit 0, with every path baked in. After that,
-  Claude drives: ledger bootstrap/reconcile → `paper-epoch-start` on the
-  frozen commit → the five in-epoch drills → the 60-session clock.
-  NOTE: the operational checkout sits at `f73912a`; if the owner prefers
-  the epoch commit to include the committee-corpus merge, pull it forward
-  before `paper-epoch-start` (the tasks reference scripts by path, so a
-  pre-epoch fast-forward is safe; after epoch start it is not).
+- **2026-08-05 first elevated install — outcome and diagnosis:** the four
+  tasks INSTALLED correctly (right principal/paths/credentials) but the
+  wrapper's verification failed, exposing two latent verifier bugs and one
+  environment constraint:
+  1. Task Scheduler's never-ran sentinel is 1999-11-30 (not
+     DateTime.MinValue) and a fresh task reports LastTaskResult 267011;
+     the verifier failed every correctly installed task. FIXED on
+     `user/claude/verifier-credguard-fixes-20260805` (also tolerates
+     267009 = currently running; a genuine nonzero exit still fails).
+  2. The scheduler stores the principal UserId in SHORT form
+     ("sheltonchen") while operators pass DOMAIN\name; string comparison
+     failed. FIXED via SID normalization with fail-closed fallback.
+  3. **Credential Guard (verified running: SecurityServicesRunning
+     includes 1) blocks S4U task logons on this domain-joined machine** —
+     Start-ScheduledTask "succeeds" while the task silently never launches
+     (the Task Scheduler history log is disabled, hiding the failure). An
+     Interactive-logon probe task was proven to actually execute
+     (last_result 0). The machine-local elevated wrapper was updated to
+     install AND verify with `-TaskLogonType Interactive` (tasks run while
+     the owner is logged on; locked screen counts).
+  A new executable regression stubs a present task exactly as the field
+  reported it (short-form user + 267011 + 1999 sentinel → must pass; a
+  genuine exit-1 → must still fail); the never-run mutation was shown red
+  then green. The fixed verifier was also run against the REAL installed
+  tasks: overall Ok=true, exit 0.
+- **`scripts/setup_operational_host.ps1` (new, owner-requested):** a
+  committed, parameterized bootstrap that reproduces this machine setup on
+  another computer — operational clone, pinned-requirements venv, launcher,
+  and the Interactive-logon elevated wrapper — with an explicit
+  one-host-per-epoch EVIDENCE WARNING (a second machine must never run the
+  cadence while another host's epoch is active; moving hosts requires
+  `paper-epoch-close` first). Safety invariants pinned by
+  `tests/test_setup_operational_host.py`.
+- **Remaining owner sequence (revised):**
+  1. Merge this branch after Codex review; Claude pulls the operational
+     checkout forward (pre-epoch fast-forward is safe) so its verifier
+     carries the fixes.
+  2. Re-run `C:\git\install_operational_tasks_elevated.ps1` elevated (it
+     now reinstalls the same four tasks with Interactive logon via
+     `-Force` and verifies with the fixed, scope-aware verifier —
+     requires exit 0).
+  3. Claude drives: ledger bootstrap/reconcile → `paper-epoch-start` on
+     the frozen commit → the five in-epoch drills → the 60-session clock.
 
 Launcher reminder: the owner's app launches default to
 `C:\git\launch_trading_app.ps1` (operational checkout + operator DB).

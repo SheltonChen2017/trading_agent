@@ -37,6 +37,7 @@ def test_generated_installer_uses_interactive_logon_and_real_scripts():
     # the generated wrapper must install AND verify with Interactive.
     assert "-TaskLogonType Interactive" in _SCRIPT
     assert "-ExpectedTaskLogonType Interactive" in _SCRIPT
+    assert "-RequireTaskRun" in _SCRIPT
     # Composition, not reimplementation: the wrapper calls the reviewed
     # installer and verifier from the OPERATIONAL checkout.
     assert "install_windows_operational_tasks.ps1" in _SCRIPT
@@ -59,8 +60,17 @@ def test_embeds_no_credential_material():
     # Names of the required variables may appear in prose; values never.
     assert not re.search(r"APCA_API_KEY_ID\s*=", _SCRIPT)
     assert not re.search(r"APCA_API_SECRET_KEY\s*=", _SCRIPT)
-    assert "must\n#     exist as user-scope environment variables" or True
+    assert "must\n#     exist as user-scope environment variables" in _SCRIPT
     assert "never stored in the repository" in _SCRIPT
+
+
+def test_native_failures_and_dirty_checkout_fail_closed():
+    # Windows PowerShell 5.1 does not turn native nonzero exit codes into
+    # terminating errors merely because ErrorActionPreference is Stop.
+    assert "function Assert-NativeSuccess" in _SCRIPT
+    assert _SCRIPT.count("Assert-NativeSuccess") >= 7
+    assert "status --porcelain" in _SCRIPT
+    assert "Operational checkout is dirty" in _SCRIPT
 
 
 def test_venv_interpreter_not_store_alias_rationale_present():

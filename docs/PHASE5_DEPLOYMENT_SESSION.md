@@ -41,6 +41,17 @@ four-task installation. It verifies the four operational tasks and reports the
 six omitted ML path/task checks explicitly under `SkippedChecks`; default
 scope `all` preserves the complete eight-task contract.
 
+Field update 2026-08-05: the first elevated installation registered all four
+tasks, but Credential Guard prevented the default S4U principals from actually
+launching. Review of the follow-up verifier/bootstrap fix added a mandatory
+post-start distinction: use `-RequireTaskRun` after `Start-ScheduledTask`, so
+the 1999/267011 never-ran state cannot produce a green deployment check.
+`scripts/setup_operational_host.ps1` now generates the Interactive-logon wrapper
+used on this host and fails closed on dirty checkouts, Store Python aliases, and
+native Git/Python/pip failures. The registered tasks are not yet accepted as an
+operational cadence; they must be reinstalled with Interactive logon, started,
+and verified successfully before ledger or epoch steps.
+
 ## 2. Owner decisions (resolved 2026-08-04)
 
 1. **Epoch model 2**: the frozen operational checkout collects evidence while
@@ -74,10 +85,11 @@ its gates.
 4. **Verify tasks**: run
    `verify_windows_evidence_tasks.ps1 -Scope operational` with the same
    Python/database paths and the full current-user name
-   (`REDMOND\sheltonchen` on this host), then check each of the four tasks
-   produced real output at least once. If the optional ML task set is
+   (`REDMOND\sheltonchen` on this host) and `-RequireTaskRun`; then check each
+   of the four tasks produced real output at least once. If the optional ML task set is
    installed, use the default `-Scope all` with its config/artifact paths
-   instead. In either scope, any failed check or nonzero exit is a blocker.
+   and `-RequireTaskRun` instead. In either scope, any failed check or nonzero
+   exit is a blocker.
 5. **Bootstrap the ledger**: `readiness`, then `ledger-bootstrap --confirm
    bootstrap` (once), then `ledger-reconcile` — runbook §Before starting a
    paper evidence epoch.

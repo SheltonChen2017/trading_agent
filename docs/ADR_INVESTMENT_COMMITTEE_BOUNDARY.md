@@ -100,7 +100,7 @@ Before daily model-backed use:
 - display a clear `review unavailable` state in CLI and Streamlit;
 - keep execution revalidation mandatory after any human approval.
 
-### Current implementation status (2026-08-04)
+### Current implementation status (reviewed 2026-08-05)
 
 The provider, mandatory audit persistence, exact-input UI cache binding, clear
 unavailable state, and execution isolation are implemented. The required
@@ -109,14 +109,18 @@ frozen replay/adversarial corpus now exists and is enforced:
 10 injection, 8 memory-poisoning) executed through the REAL projection/
 validation/error-mapping pipeline by `tests/test_committee_replay_corpus.py`,
 whose inventory tests pin the ADR minimums (>=50 replay plus adversarial
-categories). One injection case deliberately freezes a DOCUMENTED lexical-
+categories) and whose canonical SHA-256 assertion freezes the complete case
+content, not only IDs and category counts. One injection case deliberately freezes a DOCUMENTED lexical-
 filter limitation (a homoglyph-obfuscated directive passes the filter) as a
 measurement, not an endorsement — the architectural boundary remains the
 containment. The CLI `review unavailable` surface exists as
 `committee-review <proposal-id>` in `scripts/run_personal_assistant.py`:
-every failure mode prints one `Review unavailable (<code>): ...` line and
+every defined gate, input, provider, schema, validation, and audit failure
+prints one `Review unavailable (<code>): ...` line and
 exits 2, an accepted review prints its cited sections plus the mandatory
 human-approval reminder, and the audit row remains a display precondition.
+Independent review added the packet-construction failure path so a configured
+broker/data outage cannot escape that surface as a traceback.
 
 **The experimental gate is deliberately NOT removed by this work.** The
 Streamlit surface and CLI both still require `ANTHROPIC_API_KEY` AND the

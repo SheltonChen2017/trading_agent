@@ -26,6 +26,13 @@ param(
     [ValidateSet("Interactive", "S4U")]
     [string]$ExpectedTaskLogonType = "S4U",
 
+    # Installation verification may accept a correctly registered task that
+    # has not run yet. Post-start verification must not: Credential Guard can
+    # make Start-ScheduledTask return while an S4U task remains at the
+    # never-ran sentinel. Callers that start tasks before verifying must pass
+    # this switch so that state fails closed.
+    [switch]$RequireTaskRun,
+
     [string[]]$RequiredCredentialNames = @("APCA_API_KEY_ID", "APCA_API_SECRET_KEY"),
 
     # MANDREV-001 follow-up: Phase 5 mandates the four operational tasks;
@@ -178,11 +185,16 @@ foreach ($taskName in $expectedTasks) {
     # installed or in-flight tasks as failures on the first field run
     # (2026-08-05). A genuine nonzero exit from a completed run still
     # fails.
-    $neverRun = $info.LastRunTime -eq [datetime]::MinValue -or `
-        $info.LastRunTime.Year -lt 2000 -or `
-        $info.LastTaskResult -eq 267011
-    $currentlyRunning = $info.LastTaskResult -eq 267009
-    $lastResultOk = $info.LastTaskResult -eq 0 -or $neverRun -or $currentlyRunning
+    $neverRunTime = $info.LastRunTime -eq [datetime]::MinValue -or `
+        $info.LastRunTime.Year -lt 2000
+    # Treat only the scheduler's consistent never-run pair as benign. An
+    # impossible/corrupt combination such as a sentinel date plus exit 1
+    # remains a failure.
+    $neverRun = $neverRunTime -and $info.LastTaskResult -eq 267011
+    $currentlyRunning = $task.State -eq "Running" -and `
+        $info.LastTaskResult -eq 267009
+    $lastResultOk = $info.LastTaskResult -eq 0 -or `
+        $currentlyRunning -or ($neverRun -and -not $RequireTaskRun)
     Add-Check -Name "task:$taskName" -Ok (
         $principalOk -and $pythonOk -and $lastResultOk
     ) -Detail (
@@ -201,6 +213,7 @@ $report = [PSCustomObject]@{
     RunAsUser = $RunAsUser
     CurrentUser = $currentUser
     ExpectedTaskLogonType = $ExpectedTaskLogonType
+    RequireTaskRun = [bool]$RequireTaskRun
     Checks = $checks
     SkippedChecks = $skippedChecks
     FailedCheckCount = $failed.Count

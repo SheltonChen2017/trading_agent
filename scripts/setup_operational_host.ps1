@@ -58,6 +58,10 @@ param(
 
     [string]$ElevatedInstallerPath = "C:\git\install_operational_tasks_elevated.ps1",
 
+    # A real interpreter used only to create the dedicated venv. Override
+    # this when `python` resolves to a Microsoft Store app-execution alias.
+    [string]$BootstrapPythonPath = "python",
+
     # Account the scheduled tasks run as; defaults to the current user in
     # DOMAIN\name form (pass the FULL form -- Task Scheduler stores the
     # short form, but credential verification compares the full identity).
@@ -67,22 +71,58 @@ param(
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+function Assert-NativeSuccess {
+    param([Parameter(Mandatory = $true)][string]$Operation)
+    # Windows PowerShell 5.1 does not turn a native nonzero exit into a
+    # terminating error when ErrorActionPreference is Stop.
+    if ($LASTEXITCODE -ne 0) {
+        throw "$Operation failed with exit code $LASTEXITCODE."
+    }
+}
+
 Write-Host "== 1/4 Operational checkout: $OperationalPath =="
 if (Test-Path -LiteralPath (Join-Path $OperationalPath ".git")) {
     git -C $OperationalPath fetch --prune origin
-    git -C $OperationalPath status --short --branch
+    Assert-NativeSuccess -Operation "git fetch in the operational checkout"
     Write-Host "(existing clone left on its current commit -- if an epoch is active, do NOT move it)"
 } else {
     git clone $RepoUrl $OperationalPath
+    Assert-NativeSuccess -Operation "operational checkout clone"
 }
+$operationalStatus = @(git -C $OperationalPath status --porcelain)
+Assert-NativeSuccess -Operation "operational checkout cleanliness check"
+if ($operationalStatus.Count -gt 0) {
+    throw "Operational checkout is dirty; refusing to generate launch or scheduler wrappers."
+}
+git -C $OperationalPath status --short --branch
+Assert-NativeSuccess -Operation "operational checkout status"
 
 Write-Host "== 2/4 Task-interpreter venv: $VenvPath =="
 $venvPython = Join-Path $VenvPath "Scripts\python.exe"
 if (-not (Test-Path -LiteralPath $venvPython)) {
-    python -m venv $VenvPath
+    $bootstrapCommand = Get-Command $BootstrapPythonPath -ErrorAction Stop
+    $bootstrapPython = $bootstrapCommand.Source
+    if ([string]::IsNullOrWhiteSpace($bootstrapPython)) {
+        throw "BootstrapPythonPath did not resolve to an executable."
+    }
+    $bootstrapItem = Get-Item -LiteralPath $bootstrapPython
+    if ($bootstrapItem.Length -eq 0 -or ($bootstrapItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+        throw (
+            "BootstrapPythonPath resolves to a Microsoft Store/app-execution " +
+            "alias. Install a real Python interpreter or pass its full path."
+        )
+    }
+    & $bootstrapPython -m venv $VenvPath
+    Assert-NativeSuccess -Operation "task-interpreter venv creation"
+}
+$venvItem = Get-Item -LiteralPath $venvPython
+if ($venvItem.Length -eq 0 -or ($venvItem.Attributes -band [IO.FileAttributes]::ReparsePoint)) {
+    throw "The venv interpreter is a zero-byte/reparse alias; a real python.exe is required."
 }
 & $venvPython -m pip install --quiet -r (Join-Path $OperationalPath "requirements.txt")
+Assert-NativeSuccess -Operation "pinned requirement installation"
 & $venvPython -c "import pandas, streamlit, alpaca, yfinance, sklearn, pytest; print('venv imports OK')"
+Assert-NativeSuccess -Operation "task-interpreter import probe"
 
 Write-Host "== 3/4 Launcher: $LauncherPath =="
 @"
@@ -123,7 +163,7 @@ Start-Sleep -Seconds 10
 pwsh -NoProfile -File "$OperationalPath\scripts\verify_windows_evidence_tasks.ps1" ``
     -RunAsUser "$RunAsUser" -PythonPath "$venvPython" ``
     -DatabasePath "$OperatorDatabasePath" ``
-    -Scope operational -ExpectedTaskLogonType Interactive
+    -Scope operational -ExpectedTaskLogonType Interactive -RequireTaskRun
 if (`$LASTEXITCODE -ne 0) {
     throw "Verifier reported failures (exit `$LASTEXITCODE); do not proceed to epoch actions until it exits 0."
 }

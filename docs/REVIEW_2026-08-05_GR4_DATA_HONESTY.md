@@ -77,3 +77,39 @@ Tests used scripted providers, temporary databases, and mocked brokers. No test 
 - Adding a stale persisted earnings cache/SLA where none exists.
 - Deploying GR-4 into the frozen operational checkout mid-epoch.
 - Promoting the exploratory dip-grid result to evidence or authority.
+
+## 7. Claude counter-review (2026-08-05, appended)
+
+All ten findings were independently verified before acceptance. Fresh
+probes against submitted snapshot `3fa4229` reproduced GR4REV-001 (a
+Saturday-dated bar on a Saturday returned `fresh=True`), GR4REV-008 (a
+response containing ONLY unrequested tickers recorded `ok=True`), and the
+price-source half of GR4REV-002 (a naive `fetched_at` was accepted);
+GR4REV-003's `ok=bool(evidence[name]["ok"])` was confirmed verbatim in the
+submitted tree; GR4REV-005/007/010 were confirmed by direct inspection of
+the submitted code (silent `return []`, pooled underfilled horizons,
+unpaired baseline statistics); GR4REV-004/009 by inspection of the guard
+condition and the unthreaded `now`; and GR4REV-006 is true by construction
+(`sell_exceeds_held` can only catch a SHRUNKEN position, so a forward
+split's doubled share count sailed through F6). The corrected paired
+research metrics materially STRENGTHEN the original conclusion: with
+paired full-horizon comparisons, P(grid > universe) is 49.1% -- the
+apparent mean premium Claude reported from unpaired series was itself an
+artifact of the comparison method.
+
+The execution-kernel wiring for GR4REV-006 was checked against the GR-1
+contracts: the new `detect_split_like_share_mismatch` dependency enters
+through the frozen `ProposalValidationDeps` (call-time DI preserved), the
+guard is backward-compatible (proposals without `position_shares_before`
+skip it), both failure paths are fail-closed data-integrity refusals, and
+the characterization suite was extended rather than weakened.
+
+Verdict: all ten P2s are genuine defects in Claude's submission — the
+weakest-reviewed tree of this project (6.8/10 is accepted as fair) — and
+every correction is accepted as written.
+
+Counter-review addition (this branch):
+
+| ID | Priority | Status | Location | Issue | Correction | Verification |
+|---|---|---|---|---|---|---|
+| CRGR4-001 | P3 | Resolved | `assistant/platform_readiness.py::build_alert_delivery_checks` | The GR4REV-003 laundering class had one more member: the GR-5-era `alert_channel_self_test` check coerced the DELEGATED freshness report with `bool(freshness["ok"])`, so a malformed `{"ok": "false"}` read as a healthy self-test (fail-open, in the degrade direction). The same class was removed from operational checks by the 2026-08-02 GR-0 review and from the data layer by GR4REV-003; this site predated both sweeps. (The other remaining `bool(...)` at the strategy-readiness check coerces a locally built list and is not the delegated-value class.) | Structural validation mirroring the GR4REV-003 pattern: the report must be a Mapping with a real boolean `ok` and a non-empty string detail; anything else fails the check with an explicit "malformed ... refusing to guess" detail (still non-mandatory: an unreadable self-test report degrades, it does not halt). | New regression `test_malformed_self_test_freshness_never_reads_as_passing` covering five malformed shapes plus verbatim pass-through in both directions; reverse mutation (validation forced True) failed it and restoration returned it green. Focused alert/readiness suites 49 passed; full-suite results on the exact final tree are in the session handoff. |

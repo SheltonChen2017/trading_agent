@@ -271,6 +271,43 @@ def test_readiness_flags_a_stale_channel_self_test_without_blocking(store):
     assert checks["alert_channel_self_test"].mandatory is False
 
 
+def test_malformed_self_test_freshness_never_reads_as_passing(store, monkeypatch):
+    """Counter-review CRGR4-001: the delegated freshness report used to be
+    coerced with bool(...), so a malformed {"ok": "false"} read as a
+    HEALTHY self-test -- the identical laundering class GR4REV-003 removed
+    from the data-layer checks and the GR-0 review removed from
+    operational checks. A structurally malformed report must fail the
+    check with an explicit reason, never pass by truthiness."""
+    import assistant.alert_delivery as delivery
+
+    for malformed in (
+        {"ok": "false", "detail": "x"},
+        {"ok": 1, "detail": "x"},
+        {"ok": True, "detail": "   "},
+        {"ok": True},
+        "not a mapping",
+    ):
+        monkeypatch.setattr(
+            delivery, "self_test_freshness", lambda store, m=malformed: m
+        )
+        check = {c.name: c for c in build_alert_delivery_checks(store)}[
+            "alert_channel_self_test"
+        ]
+        assert check.ok is False, malformed
+        assert "malformed" in check.detail
+
+    # A well-formed report still passes through verbatim in both directions.
+    monkeypatch.setattr(
+        delivery,
+        "self_test_freshness",
+        lambda store: {"ok": True, "detail": "self-test fresh"},
+    )
+    check = {c.name: c for c in build_alert_delivery_checks(store)}[
+        "alert_channel_self_test"
+    ]
+    assert check.ok is True and check.detail == "self-test fresh"
+
+
 def test_delivery_failure_remains_mandatory_until_a_successful_self_test(store):
     """A broken channel cannot make the readiness surface claim green.
 

@@ -313,6 +313,37 @@ def build_alert_delivery_checks(store: AssistantStore) -> tuple[ReadinessCheck, 
 
     undelivered = undelivered_critical_alerts(store)
     freshness = self_test_freshness(store)
+    # Counter-review CRGR4-001: the delegated freshness report used to be
+    # coerced with bool(...), the exact laundering GR4REV-003 removed from
+    # the data-layer checks (and the 2026-08-02 GR-0 review removed from
+    # operational checks) -- a malformed {"ok": "false"} read as a healthy
+    # self-test. Validate structurally; a malformed report fails the check
+    # with an explicit reason instead of guessing.
+    freshness_ok = (
+        isinstance(freshness, Mapping)
+        and isinstance(freshness.get("ok"), bool)
+        and isinstance(freshness.get("detail"), str)
+        and bool(str(freshness.get("detail")).strip())
+    )
+    if not freshness_ok:
+        self_test_check = ReadinessCheck(
+            name="alert_channel_self_test",
+            ok=False,
+            detail=(
+                "self-test freshness report is malformed; refusing to "
+                "treat an unreadable report as a passing self-test"
+            ),
+            mandatory=False,
+            source="alert_delivery",
+        )
+    else:
+        self_test_check = ReadinessCheck(
+            name="alert_channel_self_test",
+            ok=freshness["ok"],
+            detail=freshness["detail"],
+            mandatory=False,
+            source="alert_delivery",
+        )
     return (
         ReadinessCheck(
             name="critical_alert_delivery",
@@ -326,13 +357,7 @@ def build_alert_delivery_checks(store: AssistantStore) -> tuple[ReadinessCheck, 
             mandatory=True,
             source="alert_delivery",
         ),
-        ReadinessCheck(
-            name="alert_channel_self_test",
-            ok=bool(freshness["ok"]),
-            detail=str(freshness["detail"]),
-            mandatory=False,
-            source="alert_delivery",
-        ),
+        self_test_check,
     )
 
 

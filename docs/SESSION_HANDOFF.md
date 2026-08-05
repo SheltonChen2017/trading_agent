@@ -1,8 +1,15 @@
 # Development session handoff
 
 Prepared: 2026-08-05 (afternoon), after independent Codex review of GR-4
-including late audit follow-ups. GR-4 data-layer honesty is complete after
-correction on `codex/review-gr4-data-honesty-20260805`. All work is
+including late audit follow-ups, and Claude's counter-review: all ten
+GR4REV findings independently re-verified (fresh red probes on the
+submitted snapshot for -001/-002/-008; verbatim/constructive confirmation
+for the rest), the kernel wiring checked against the GR-1 DI contracts,
+and one further member of the GR4REV-003 laundering class closed
+(CRGR4-001: the GR-5-era alert_channel_self_test check coerced its
+delegated freshness report with bool(); now structurally validated,
+mutation-proven). GR-4 data-layer honesty is complete after correction on
+`codex/review-gr4-data-honesty-20260805`. All work is
 DEV-SIDE ONLY: nothing was deployed to the frozen operational checkout,
 and `paper-epoch-001` is unaffected.
 

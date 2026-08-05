@@ -1,128 +1,138 @@
 # Development session handoff
 
-Prepared: 2026-08-05 (midday) — **the first paper evidence epoch is
-ACTIVE.** Phase 5 deployment completed end to end this session: review
-round merged (PR #152), tasks running, ledger bootstrapped and reconciled
-clean, epoch started on the frozen commit, and all five required drills
-passed and recorded under exact epoch lineage.
+Prepared: 2026-08-05 (afternoon), first development session after
+`paper-epoch-001` went active. GR-4 data-layer honesty is implemented and
+pushed for review, plus one owner-dictated exploratory backtest with a
+frozen spec. All work is DEV-SIDE ONLY: nothing was deployed to the frozen
+operational checkout, and the epoch is unaffected.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.
 
-## 1. THE EPOCH
+## 1. Standing state: THE EPOCH (unchanged, do not disturb)
 
-    evidence_epoch   = paper-epoch-001 (ACTIVE since 2026-08-05T18:27:04Z)
-    code_commit      = 8a2233c5e54c08a405b712e99020f05d40495186 (PR #152)
-    strategy         = owner-directed-paper-policy 1.0.0
-    model_id         = no-ml-model (no ML participates in any decision)
-    mandate          = 693799c0acb440040064eaa69a57d87c32186e63709f49ffa52f6feb39956487 (approved)
-    policy           = 66dd70e1bd74ce56e02e3f770cce7d5f68f50f3fd7eb55f202d8243c374d759f
-    broker account   = Alpaca paper 15f1e8ef-3b48-406b-80a7-2960e3098b80
-    lineage_hash     = 71d228d9ec5a948eca251958720a13e7e0f58ba5335626f50e7dc8d3a78a9ba2
+`paper-epoch-001` is ACTIVE since 2026-08-05T18:27Z on frozen commit
+`8a2233c` (lineage hash `71d228d9...a9ba2`; strategy
+owner-directed-paper-policy 1.0.0; no-ml-model; approved mandate
+`693799c0...9487`). All five drills passed and are recorded in-epoch. The
+operational checkout `C:\git\trading_agent_operational` stays on `8a2233c`
+until `paper-epoch-close`; the four Interactive-logon tasks run there; the
+owner trades only via `C:\git\launch_trading_app.ps1`. Never deploy
+development commits (including this branch) to the operational checkout
+mid-epoch.
 
-**Standing rules while the epoch is active (model 2):**
+## 2. GR-4 data-layer honesty — implemented, awaiting review
 
-- The operational checkout `C:\git\trading_agent_operational` stays on
-  `8a2233c` until `paper-epoch-close`. Development continues freely on
-  `main`/branches in the dev checkout and is simply NOT deployed there.
-- One operational host (this machine), one operator database
-  (`C:\git\customizedAgent\trading_agent\data\trading_assistant.db`), one
-  Alpaca paper account. The owner places paper trades only from this
-  machine via `C:\git\launch_trading_app.ps1`.
-- The 60-session / 30-order clock counts only observations recorded
-  inside this epoch; trades from before 18:27Z today do not count.
+Branch `user/claude/gr-4-data-honesty-20260805` (based on `86c5f77`,
+post PR #153). Contract: archived plan §9 plus GR-0's requirement that
+data_integrity derive from authenticated records with no assertion escape.
 
-## 2. What was completed this session (all verified)
+- **`data/price_source.py` (new, pure):** `PriceSource` protocol with a
+  MANDATORY `provides_point_in_time_lineage` declaration (yfinance
+  honestly False, mirroring ml/availability.py); `ProviderFetchRecord`
+  where an all-empty response is a FAILED fetch ("provider returned no
+  usable data"), never "zero matching tickers", and error text preserves
+  only the exception type (no detail leakage); NYSE-calendar bar
+  freshness: fresh = bars reach the latest COMPLETED session, an
+  in-progress session's partial bar passes, and a bar beyond today is
+  refused as future-dated (fail-closed both directions). The staleness-SLA
+  table deliberately omits "quote": order-time quote freshness stays owned
+  by the execution gate/policy (single-authority rule).
+- **`assistant/data_integrity.py` (new):** `fetch_daily_bars_recorded()`
+  records every fetch in the append-only `data_provider_fetches` table
+  (schema addition, idempotent CREATE) and raises a deduplicated CRITICAL
+  operational alert after PROVIDER_ALERT_FAILURE_STREAK=3 consecutive
+  failures; data returns exactly as fetched (never synthesized/filled).
+  `build_data_layer_evidence()` derives GR-0's three checks
+  (price_freshness / provider_health / adjustment_honesty) from those
+  records; zero records blocks everything.
+- **`assistant/platform_readiness.py`:** `build_data_integrity(store)`
+  now derives from evidence; `None` stays blocked with an explicit
+  reason; any non-store argument (e.g. the old `True` assertion) raises
+  TypeError — the pre-existing escape-hatch test passes UNCHANGED.
+- **Degradation surfaces:** `build_decision_packet(..., store=None)`
+  fetches the regime through the recorded path when a store is supplied
+  and appends a `"DATA DEGRADED:"`-prefixed warning on stale bars (the
+  prefix is the contract); the Briefing renders those as a dedicated
+  st.error banner (the plan's definition of done); data_freshness gains
+  market_bars_expected_session/market_bars_fresh. CLI `_packet()` gained
+  a store parameter and every store-bearing call site passes it.
+- **Stale bars block only their dependents:**
+  `StaleMarketDataError` in strategy_proposals refuses to size a
+  leveraged-pair rebalance from bars missing the latest completed
+  session (raised loudly; UI catches per-pair alongside
+  MissingResearchDependencyError; CLI already catches broadly).
+  Risk-reduction proposals never consult bars and are untouched — the
+  plan's risk-reduction guarantee is pinned by test.
+- **Split detection:** `detect_split_like_share_mismatch()` in
+  corporate_actions classifies a share-count mismatch as split-shaped by
+  near-integer ratio (never a price heuristic; pure; confirming a split
+  remains a journal action), and `reconcile_snapshot()` annotates
+  position mismatches with `suspected_split` while STILL counting them
+  as mismatches (fail-closed). Deferred by explicit scope decision:
+  wiring a snapshot-shares field into proposals + a registry gate check
+  for submit-time split refusal — recorded here so review can judge the
+  boundary.
+- **Test-harness ripples:** two existing tests stubbed `_packet` with the
+  old signature and were updated to accept the `store` kwarg
+  (test_committee_cli, test_alert_delivery) — stub-shape updates only, no
+  expectation changed.
 
-1. **Review round merged**: PR #152
-   (`codex/review-recent-claude-changes-20260805`, second parent
-   `f2c97cc` = Claude's counter-review tip). All six RCREV findings were
-   counter-review-confirmed red on the submitted snapshots; CRRC-001
-   added the user-scope credential lift to the generated launcher.
-   Full suite on that tree: 2,757 passed / 1 skipped / 25 warnings.
-2. **Scheduled tasks live**: the four `TradingAgent-Paper-*` tasks run
-   under Interactive logon (Credential Guard blocks S4U on this
-   domain-joined machine — diagnosis proven with an Interactive probe
-   task). OrderMonitor + Watchdog are long-running console windows in the
-   owner's session (minimize, never close). The two long-running tasks
-   were restarted after the operational checkout moved to `8a2233c`.
-3. **Wrappers regenerated from the reviewed bootstrap**
-   (`scripts/setup_operational_host.ps1` at `8a2233c`): launcher with
-   registry credential lift; elevated wrapper with
-   `-TaskLogonType Interactive` and `-RequireTaskRun` verification.
-4. **Ledger**: `readiness` exit 0 → `ledger-bootstrap --confirm
-   bootstrap` (opening snapshot hashed
-   `6b46f16e…`) → `ledger-reconcile`: **matched, 0 mismatches**
-   (AAPL 3, AMZN 8, AVGO 7, BBB 16, MSFT 5, NFLX 20 + cash).
-5. **Epoch started** (block above), `already_started: false`, exit 0.
-6. **All five required drills passed and recorded inside the epoch**:
-   - `ambiguous_submission` drill-7e0ca9abe7a118d6d8aae48a
-   - `kill_switch` drill-f70b9e987af57520780e55e5
-   - `restart_recovery` drill-b653bcf9c869efb77b7c305f
-     (fault matrix report sha256 `99db1702…`, 11/11 fault IDs)
-   - `backup_restore` via `recovery-drill`: restore verified,
-     `table_counts_match: true`
-   - `alert_delivery` via `alert-self-test --record-drill`: real Windows
-     toast delivered, storage-verified, `passed: true`
-   `paper-evidence-status paper-epoch-001`:
-   `all_required_drills_passed: true`, `lineage_consistent: true`.
-7. **Operational health**: after bootstrap + the cycle's first backup,
-   the ONLY failing check was `backup_restore_drill: never completed`,
-   and the recovery drill has now completed it. Old open alerts in the
-   table predate bootstrap (historical, deduplicated).
+Validation (exact final tree): new suite tests/test_data_integrity.py
+28 passed; adjacent focused set (platform readiness, strategy proposals,
+context builder, ledger, import boundary, schema verification)
+150 passed; full suite **2,785 passed / 1 skipped / 25 warnings** in
+439.80s; compileall and `git diff --check` clean. Reverse mutations shown
+red then restored green: (1) laundering an all-empty response into a
+success — caught by the record test plus streak tests; (2) the stale-bar
+rule silently passing — caught by FOUR tests spanning the unit rule, the
+GR-0 adapter, the briefing banner, and the strategy-proposal refusal.
 
-## 3. Expected staged states (do NOT relabel as failures)
+## 3. Owner-dictated exploratory backtest (separate commit, frozen spec)
 
-- `platform-readiness` remains nonzero: evidence needs 60 sessions/30
-  orders (day zero), strategy needs a confirmed production-authoritative
-  finding (none exists), data_integrity is blocked-by-design until GR-4,
-  and offline mode skips broker checks. This is the documented staged
-  condition.
-- `paper-evidence-status` reports `metric_error: at least two paper
-  observations are required` — correct until two session closes.
-- The PaperObservation task's `last_result` stays 1 until its first
-  post-epoch scheduled run (16:30 local daily); OperationsCycle turns
-  fully green now that ledger + backup + restore drill exist. The strict
-  verifier (`-Scope operational -ExpectedTaskLogonType Interactive
-  -RequireTaskRun`) should exit 0 after today's 16:30 observation run;
-  verify then rather than immediately.
-- Earlier field incidents, all resolved: stale-credential
-  "unauthorized" (launcher now lifts user-scope registry values), stale
-  AVGO duplicate-order block (order had actually filled; reconciled),
-  Alpaca transient 500 (self-recovered).
+`scripts/run_sharpest_decline_dip_2026_08_05.py` — the owner's "LLM scans
+for the sharpest daily decline, buy the dip, sell 5% per +5% rise"
+strategy, spec FROZEN before results (deterministic worst-1-day-return
+proxy for the LLM scan; $10k next-open entries; 5%-trim ratchet; 63-session
+cap flagged as a project addition; slippage per leg; two frozen baselines).
+Measured outcome (1,760 overlapping episodes, exploratory only, no
+significance claimed, survivorship-biased universe): the trim grid
+SUBTRACTS value vs holding the same picks (grid-hold mean −0.71%, median
+0.00%); the dip-pick's mean premium over the average stock (+8.65% vs
++5.01%) comes with a worse median (+3.68% vs +5.29%), a far worse win rate
+(56% vs 76%), and a −41% p5 tail — risk compensation flattered by
+survivorship, not evident skill. Reported to the owner with those caveats.
 
 ## 4. What is next
 
-1. **Nothing is owner-blocked.** The owner paper-trades daily via the
-   launcher; the cadence records evidence automatically. Suggested
-   check-in: `paper-evidence-status paper-epoch-001` after a few sessions.
-2. Next code milestone (dev checkout, not deployed): **GR-4 data-layer
-   honesty** per the action plan. Also available owner decisions:
-   committee experiment-gate removal (all ADR prerequisites met); ML
+1. Codex review of this branch (implementation commit + research-script
+   commit + docs commit), then the owner's merge decision. Under model 2
+   the merge deploys nowhere; the operational checkout stays frozen.
+2. Next action-plan items after GR-4: GR-7 product completeness (fold in
+   the allocation-service design), with GR-6 recovery/portability also
+   open. Owner decisions available: committee experiment-gate removal; ML
    shadow tasks for a later epoch.
-3. At the epoch boundary (60+ sessions or a deliberate close):
-   `paper-epoch-close`, then the operational checkout may move forward.
+3. The epoch clock runs by itself; first session observation lands at the
+   16:30 ET close today.
 
 ## 5. Non-negotiable boundaries
 
-- Paper trading only; `allow_autonomous_execution` remains false; every
-  order still requires exact human approval + deterministic revalidation.
-- Never deploy moving development commits into the operational checkout
-  during the epoch; never run a second operational host or cadence.
-- No manual edits to evidence tables, ever.
-- ML/LLM output stays advisory/observational; committee remains
-  experiment-gated until a separately owner-authorized removal.
-- Never commit credentials, operator databases, licensed data, or
-  evidence artifacts.
+- Paper trading only; the epoch binds one host/commit/database/account;
+  never deploy dev commits to the operational checkout mid-epoch.
+- Never synthesize a missing price; refuse or visibly degrade instead.
+- A conservative safeguard must not obstruct risk reduction — pinned by
+  the stale-bars test.
+- Exploratory backtest results are never evidence and never authorize
+  anything.
+- ML/LLM output stays advisory/observational; never commit credentials or
+  operator data.
 
-## 6. Machine-local state (re-measured this session)
+## 6. Machine-local state
 
-- `C:\git\trading_agent_operational`: clean `main` at `8a2233c` (FROZEN).
-- `C:\git\trading_agent_venv`: task interpreter, suite-validated.
-- `C:\git\launch_trading_app.ps1` + `C:\git\install_operational_tasks_elevated.ps1`:
-  regenerated from the reviewed bootstrap at `8a2233c`.
-- Four tasks installed (Interactive); OrderMonitor/Watchdog running; the
-  OrderMonitor's Alpaca websocket flaps on the corporate network and
-  falls back to polling by design.
-- The owner's Streamlit app runs via the launcher against the frozen
-  checkout and single operator DB.
+Unchanged from the epoch handoff: operational checkout frozen at
+`8a2233c`; venv task interpreter; launcher + elevated wrapper regenerated
+from the reviewed bootstrap; four tasks live (OrderMonitor/Watchdog
+running with the corporate-network websocket flap falling back to
+polling). The owner's app runs via the launcher. The operator database
+was untouched by this session's development work (all tests used the
+pytest-isolated database).

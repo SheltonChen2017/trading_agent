@@ -165,6 +165,23 @@ def test_all_empty_response_is_a_failed_fetch_not_zero_matches():
     assert record.latest_session is None
 
 
+def test_spurious_ticker_response_is_not_a_successful_requested_fetch():
+    """A provider dict that only contains unrequested keys has returned
+    zero requested tickers. That must be a failed fetch; otherwise
+    readiness can pass on evidence that never answered the request."""
+    record = build_fetch_record(
+        _FakeSource(),
+        ["AAA"],
+        {"WRONG": _bars(EXPECTED_SESSION)},
+        fetched_at=NOW,
+    )
+    assert not record.ok
+    assert record.returned_count == 0
+    assert record.missing_tickers == ("AAA",)
+    assert record.latest_session is None
+    assert record.error == "provider returned no usable data"
+
+
 def test_provider_exception_is_recorded_without_leaking_detail():
     record = build_fetch_record(
         _FakeSource(),
@@ -346,7 +363,7 @@ def test_platform_readiness_rejects_non_boolean_derived_verdicts(
     monkeypatch.setattr(
         data_integrity,
         "build_data_layer_evidence",
-        lambda _store: {
+        lambda _store, **_kwargs: {
             name: {"ok": "false", "detail": "malformed", "evidence": {}}
             for name in (
                 "price_freshness",
@@ -359,6 +376,46 @@ def test_platform_readiness_rejects_non_boolean_derived_verdicts(
     assert dimension.status == BLOCKED
     assert all(check.ok is False for check in dimension.checks)
     assert all("malformed" in check.detail for check in dimension.checks)
+
+
+def test_platform_readiness_threads_pinned_now_into_data_freshness(store):
+    from assistant.mandate import load_mandate
+    from assistant.platform_readiness import DATA_INTEGRITY, build_platform_readiness
+    from assistant.policy import load_policy
+
+    fetch_daily_bars_recorded(
+        store,
+        ["AAA"],
+        30,
+        source=_FakeSource({"AAA": _bars("2026-08-05")}),
+        now=NOW,
+    )
+    # Same evidence, wall-clock-equivalent Wednesday evening: fresh.
+    assert build_data_integrity(store, now=NOW).status == READY
+
+    # Pinned Saturday after the bars' week: checked_at and freshness SLA
+    # must both evaluate at that Saturday, so price_freshness fails closed.
+    pinned = datetime(2026, 8, 8, 15, 0, tzinfo=timezone.utc)
+    dimension = build_data_integrity(store, now=pinned)
+    freshness = next(
+        check for check in dimension.checks if check.name == "price_freshness"
+    )
+    assert freshness.ok is False
+
+    report = build_platform_readiness(
+        store,
+        load_policy(),
+        load_mandate(),
+        now=pinned,
+        check_broker=False,
+    )
+    assert report.checked_at.startswith("2026-08-08")
+    report_freshness = next(
+        check
+        for check in report.dimension(DATA_INTEGRITY).checks
+        if check.name == "price_freshness"
+    )
+    assert report_freshness.ok is False
 
 
 # --- degradation surfaces ---------------------------------------------------

@@ -336,7 +336,11 @@ def build_alert_delivery_checks(store: AssistantStore) -> tuple[ReadinessCheck, 
     )
 
 
-def build_data_integrity(store: AssistantStore | None = None) -> DimensionReadiness:
+def build_data_integrity(
+    store: AssistantStore | None = None,
+    *,
+    now: datetime | None = None,
+) -> DimensionReadiness:
     """GR-4: derive the three GR-0 data checks from recorded fetches.
 
     The pre-GR-4 API let any caller set ``point_in_time_data=True`` and used
@@ -347,6 +351,10 @@ def build_data_integrity(store: AssistantStore | None = None) -> DimensionReadin
     fetches, or an unreadable record table) stays blocked with an explicit
     reason; readiness must never improve because evidence became
     unavailable.
+
+    When ``now`` is supplied (as ``build_platform_readiness`` does), bar
+    freshness uses that same pinned instant so the report's ``checked_at``
+    and the freshness SLA cannot disagree.
     """
     if store is not None and not isinstance(store, AssistantStore):
         # The pre-GR-4 escape hatch was a caller passing
@@ -381,7 +389,7 @@ def build_data_integrity(store: AssistantStore | None = None) -> DimensionReadin
     from assistant.data_integrity import build_data_layer_evidence
 
     try:
-        evidence = build_data_layer_evidence(store)
+        evidence = build_data_layer_evidence(store, now=now)
     except Exception as exc:
         return _dimension(
             DATA_INTEGRITY,
@@ -804,7 +812,7 @@ def build_platform_readiness(
     )
     dimensions = (
         execution,
-        build_data_integrity(store),
+        build_data_integrity(store, now=now),
         operations,
         evidence,
         build_strategy_readiness(),

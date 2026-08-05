@@ -142,7 +142,6 @@ def main() -> None:
     daily_returns = closes.pct_change()
 
     episodes: list[dict] = []
-    universe_baseline: list[float] = []
     dates = closes.index
     for t in range(1, len(dates) - 2):
         row = daily_returns.iloc[t].dropna()
@@ -152,23 +151,29 @@ def main() -> None:
         worst = row.sort_index().idxmin()
         if not np.isfinite(row[worst]) or row[worst] >= 0:
             continue  # no decliner that day -- nothing matches the spec
-        ticker = str(worst)
-        episode = _simulate_episode(closes[ticker], opens[ticker], t + 1)
-        if episode is None:
+        entry_index = t + 1
+        # Same full-horizon gate as the episode: refuse truncated windows
+        # and refuse episodes whose universe baseline cannot be formed on
+        # the identical observation set.
+        if entry_index + MAX_HOLD_SESSIONS >= len(dates):
             continue
-        episode["ticker"] = ticker
-        episode["entry_date"] = dates[t + 1].date().isoformat()
-        episode["picked_decline_pct"] = round(row[worst] * 100, 2)
-        episodes.append(episode)
-
-        # Baseline (b): universe equal-weight over the same window.
-        last_index = min(t + 1 + MAX_HOLD_SESSIONS, len(dates) - 1)
-        entry_opens = opens.iloc[t + 1] * (1 + SLIP)
+        last_index = entry_index + MAX_HOLD_SESSIONS
+        entry_opens = opens.iloc[entry_index] * (1 + SLIP)
         exit_opens = opens.iloc[last_index] * (1 - SLIP)
         window = (exit_opens / entry_opens - 1) * 100
         window = window.replace([np.inf, -np.inf], np.nan).dropna()
-        if not window.empty:
-            universe_baseline.append(float(window.mean()))
+        if window.empty:
+            continue
+        ticker = str(worst)
+        episode = _simulate_episode(closes[ticker], opens[ticker], entry_index)
+        if episode is None:
+            continue
+        episode["ticker"] = ticker
+        episode["entry_date"] = dates[entry_index].date().isoformat()
+        episode["picked_decline_pct"] = round(row[worst] * 100, 2)
+        episode["universe_return_pct"] = float(window.mean())
+        episode["universe_ticker_count"] = int(len(window))
+        episodes.append(episode)
 
     frame = pd.DataFrame(episodes)
     print(f"\nEpisodes simulated: {len(frame)}")
@@ -179,7 +184,7 @@ def main() -> None:
     def _describe(label: str, series: pd.Series) -> None:
         print(
             f"{label}: mean {series.mean():+.2f}%  median {series.median():+.2f}%  "
-            f"win rate {(series > 0).mean() * 100:.1f}%  "
+            f"positive rate {(series > 0).mean() * 100:.1f}%  "
             f"p5 {series.quantile(0.05):+.2f}%  p95 {series.quantile(0.95):+.2f}%"
         )
 
@@ -187,27 +192,51 @@ def main() -> None:
     _describe("grid episodes", frame["net_return_pct"])
     print(f"mean trims per episode: {frame['trims'].mean():.2f}")
     print(
-        "sum of independent $10k episode P&L (NOT a capital-constrained "
-        f"portfolio): ${(frame['net_return_pct'] / 100 * ENTRY_NOTIONAL).sum():,.0f}"
+        "sum of overlapping $10k episode P&L (NOT a capital-constrained "
+        f"portfolio; up to ~{MAX_HOLD_SESSIONS} concurrent): "
+        f"${(frame['net_return_pct'] / 100 * ENTRY_NOTIONAL).sum():,.0f}"
     )
 
     print("\n=== Baseline (a): same picks, buy-and-hold, no grid ===")
     _describe("hold episodes", frame["hold_return_pct"])
 
     print("\n=== Baseline (b): universe average over the same windows ===")
-    baseline = pd.Series(universe_baseline)
-    _describe("universe windows", baseline)
+    _describe("universe windows", frame["universe_return_pct"])
+    print(
+        "universe coverage tickers/episode: "
+        f"min {frame['universe_ticker_count'].min()}  "
+        f"median {frame['universe_ticker_count'].median():.0f}  "
+        f"max {frame['universe_ticker_count'].max()} "
+        f"(of {len(UNIVERSE)} requested)"
+    )
 
-    print("\n=== Grid minus hold (what the 5%-trim ratchet itself adds) ===")
-    diff = frame["net_return_pct"] - frame["hold_return_pct"]
-    _describe("grid - hold", diff)
+    print("\n=== Paired diffs on identical episodes ===")
+    _describe("grid - hold", frame["net_return_pct"] - frame["hold_return_pct"])
+    _describe(
+        "hold - universe",
+        frame["hold_return_pct"] - frame["universe_return_pct"],
+    )
+    _describe(
+        "grid - universe",
+        frame["net_return_pct"] - frame["universe_return_pct"],
+    )
+    print(
+        "paired beat rates: "
+        f"P(hold>universe)="
+        f"{(frame['hold_return_pct'] > frame['universe_return_pct']).mean() * 100:.1f}%  "
+        f"P(grid>universe)="
+        f"{(frame['net_return_pct'] > frame['universe_return_pct']).mean() * 100:.1f}%"
+    )
 
     print(
         "\nHONESTY: episodes overlap heavily and are not independent; no "
         "significance is claimed. Single frozen spec, still one more look "
         "at a universe whose detectable-effect floor exceeds plausible "
-        "edges. Survivorship-biased universe. Exploratory only -- not "
-        "evidence, not a trading authorization."
+        "edges. Survivorship-biased universe. Adjusted yfinance history is "
+        "exploratory (point_in_time_data=false). Positive-rate rows above "
+        "are same-series fractions and are not a paired beat rate; use the "
+        "paired section for pick-vs-universe comparisons. Exploratory "
+        "only -- not evidence, not a trading authorization."
     )
 
 

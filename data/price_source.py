@@ -133,14 +133,18 @@ def build_fetch_record(
     if at.tzinfo is None or at.utcoffset() is None:
         raise ValueError("fetched_at must be timezone-aware")
     at = at.astimezone(timezone.utc)
+    # Success is defined only over the requested universe. Spurious keys in
+    # the provider dict must never launder an empty requested response into
+    # a successful health/freshness record.
+    requested = list(requested_tickers)
     returned = {
         ticker: frame
         for ticker, frame in (data or {}).items()
-        if isinstance(frame, pd.DataFrame) and not frame.empty
+        if ticker in requested
+        and isinstance(frame, pd.DataFrame)
+        and not frame.empty
     }
-    missing = tuple(
-        ticker for ticker in requested_tickers if ticker not in returned
-    )
+    missing = tuple(ticker for ticker in requested if ticker not in returned)
     latest_session: str | None = None
     if returned:
         latest_session = max(
@@ -151,7 +155,7 @@ def build_fetch_record(
         provider_id=provider_id,
         data_class=data_class,
         fetched_at=at.isoformat(),
-        requested_count=len(requested_tickers),
+        requested_count=len(requested),
         returned_count=len(returned),
         missing_tickers=missing,
         ok=not failed,

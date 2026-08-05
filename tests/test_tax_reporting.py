@@ -237,6 +237,23 @@ def test_a_gain_is_never_wash_sale_flagged(store):
 # --- coverage honesty ------------------------------------------------------
 
 
+def _broker_positions(shares: float, ticker: str = "AAPL"):
+    """A live-shaped portfolio snapshot for coverage verification tests."""
+    return build_portfolio_snapshot(
+        [
+            {
+                "ticker": ticker,
+                "shares": shares,
+                "entry_price": 100.0,
+                "current_price": 120.0,
+            }
+        ],
+        1_000.0,
+        source="alpaca",
+        account_mode="paper",
+    )
+
+
 def _positions(shares: float, ticker: str = "AAPL"):
     return [
         {
@@ -266,7 +283,7 @@ def test_coverage_complete_when_ledger_matches_the_broker(store):
     _fill(store, "b1", "AAPL", "buy", 10, 100.0, buy_at)
     _fill(store, "s1", "AAPL", "sell", 4, 150.0, datetime(2026, 2, 5, 15, tzinfo=UTC))
 
-    snapshot = build_portfolio_snapshot(_positions(6), 1_000.0)
+    snapshot = _broker_positions(6)
     report = build_annual_tax_report(store, 2026, portfolio=snapshot)
     assert report.coverage["complete"] is True
     assert report.complete is True
@@ -277,7 +294,7 @@ def test_missing_fill_history_makes_the_report_incomplete(store):
     """The dangerous case: the broker holds more shares than the app can
     account for, so realized history is missing sales."""
     _fill(store, "b1", "AAPL", "buy", 10, 100.0, datetime(2026, 1, 5, 15, tzinfo=UTC))
-    snapshot = build_portfolio_snapshot(_positions(25), 1_000.0)  # 15 unexplained
+    snapshot = _broker_positions(25)  # 15 unexplained
 
     report = build_annual_tax_report(store, 2026, portfolio=snapshot)
     assert report.complete is False
@@ -286,16 +303,87 @@ def test_missing_fill_history_makes_the_report_incomplete(store):
     assert report.coverage["tickers"]["AAPL"]["matched"] is False
 
 
+def test_sample_or_manual_portfolio_never_verifies_as_broker_coverage(store):
+    """Demo SAMPLE_POSITIONS are source=manual. Treating them as a broker
+    check would let an accountant read COMPLETE/INCOMPLETE under false
+    'broker' language."""
+    _fill(store, "b1", "AAPL", "buy", 10, 100.0, datetime(2026, 1, 5, 15, tzinfo=UTC))
+    sample = build_portfolio_snapshot(_positions(10), 1_000.0)
+    assert sample.source == "manual"
+    report = build_annual_tax_report(store, 2026, portfolio=sample)
+    assert report.coverage["verified"] is False
+    assert report.complete is False
+    assert "not a live broker snapshot" in report.coverage["reason"]
+    assert "COVERAGE UNVERIFIED" in render_tax_report_csv(report)
+
+
 def test_coverage_verdict_agrees_with_the_proposal_path(store):
     """The report must not invent a second coverage rule: its verdict has
     to match `tax_ledger_with_coverage()`, which proposals already use."""
     _fill(store, "b1", "AAPL", "buy", 10, 100.0, datetime(2026, 1, 5, 15, tzinfo=UTC))
     for broker_shares, expected in ((10, True), (25, False)):
-        snapshot = build_portfolio_snapshot(_positions(broker_shares), 1_000.0)
+        snapshot = _broker_positions(broker_shares)
         _, coverage = tax_ledger_with_coverage(store, snapshot)
         report = build_annual_tax_report(store, 2026, portfolio=snapshot)
         assert coverage["complete"] is expected
         assert report.coverage["complete"] is expected
+
+
+def test_decimal_money_avoids_float_product_drift(store):
+    """Converting qty*price after float multiply preserves binary error;
+    the report must multiply Decimal inputs instead."""
+    _fill(store, "b1", "NVDA", "buy", 100.1, 100.1, datetime(2026, 2, 2, 15, tzinfo=UTC))
+    _fill(
+        store, "s1", "NVDA", "sell", 100.1, 100.1, datetime(2026, 3, 3, 15, tzinfo=UTC)
+    )
+    report = build_annual_tax_report(store, 2026)
+    row = report.rows[0]
+    assert row.cost_basis == Decimal("10020.01")
+    assert row.proceeds == Decimal("10020.01")
+    assert row.realized_pnl == Decimal("0.00")
+
+
+def test_coverage_mapping_is_immutable_after_build(store):
+    snapshot = _broker_positions(0)
+    _round_trip(
+        store,
+        buy_at=datetime(2026, 1, 5, 15, tzinfo=UTC),
+        sell_at=datetime(2026, 2, 5, 15, tzinfo=UTC),
+    )
+    report = build_annual_tax_report(store, 2026, portfolio=snapshot)
+    with pytest.raises(TypeError):
+        report.coverage["complete"] = True
+    payload = report.to_dict()
+    payload["coverage"]["complete"] = True
+    assert report.coverage["complete"] is True  # original unchanged
+    assert report.complete is True
+
+
+def test_exported_sale_timestamp_is_market_local(store):
+    buy = datetime(2025, 6, 1, 14, 0, tzinfo=UTC)
+    sell = datetime(2026, 1, 1, 2, 0, tzinfo=UTC)  # 2025-12-31 21:00 ET
+    _round_trip(store, buy_at=buy, sell_at=sell)
+    report = build_annual_tax_report(store, 2025)
+    assert report.rows[0].sold_at.startswith("2025-12-31T21:00:00")
+
+
+def test_broker_outage_reason_is_embedded_in_the_artifact(store):
+    _round_trip(
+        store,
+        buy_at=datetime(2026, 1, 5, 15, tzinfo=UTC),
+        sell_at=datetime(2026, 2, 5, 15, tzinfo=UTC),
+    )
+    report = build_annual_tax_report(
+        store,
+        2026,
+        coverage_unavailable_reason=(
+            "Coverage check unavailable (RuntimeError); the report is "
+            "marked unverified."
+        ),
+    )
+    assert report.coverage["verified"] is False
+    assert "Coverage check unavailable" in report.coverage["reason"]
+    assert "Coverage check unavailable" in render_tax_report_json(report)
 
 
 def test_unbuildable_ledger_refuses_instead_of_reporting_zero(store):
@@ -321,7 +409,7 @@ def _csv_rows(text: str) -> list[list[str]]:
 
 def test_csv_states_completeness_on_the_first_lines(store):
     _fill(store, "b1", "AAPL", "buy", 10, 100.0, datetime(2026, 1, 5, 15, tzinfo=UTC))
-    snapshot = build_portfolio_snapshot(_positions(25), 1_000.0)
+    snapshot = _broker_positions(25)
     incomplete = render_tax_report_csv(
         build_annual_tax_report(store, 2026, portfolio=snapshot)
     )
@@ -361,7 +449,7 @@ def test_json_round_trips_and_carries_coverage_and_disclaimers(store):
         buy_at=datetime(2026, 1, 5, 15, tzinfo=UTC),
         sell_at=datetime(2026, 2, 5, 15, tzinfo=UTC),
     )
-    snapshot = build_portfolio_snapshot(_positions(0), 1_000.0)
+    snapshot = _broker_positions(0)
     payload = json.loads(
         render_tax_report_json(
             build_annual_tax_report(store, 2026, portfolio=snapshot)
@@ -442,6 +530,46 @@ def test_cli_writes_the_artifact_and_exits_2_when_unverified(store, tmp_path, ca
     assert "wash-sale flag(s) (advisory only)" in out
 
 
+def test_cli_stdout_json_is_pure_when_no_output_path(store, tmp_path, capsys):
+    import scripts.run_personal_assistant as cli
+
+    _round_trip(
+        store,
+        buy_at=datetime(2026, 1, 5, 15, tzinfo=UTC),
+        sell_at=datetime(2026, 2, 5, 15, tzinfo=UTC),
+    )
+    with pytest.raises(SystemExit) as excinfo:
+        cli.command_tax_report(_args(tmp_path, format="json", output=None), store)
+    assert excinfo.value.code == 2
+    captured = capsys.readouterr()
+    payload = json.loads(captured.out)
+    assert payload["tax_year"] == 2026
+    assert "COVERAGE WARNING" in captured.err
+
+
+def test_cli_never_verifies_against_sample_portfolio(
+    store, tmp_path, monkeypatch, capsys
+):
+    import scripts.run_personal_assistant as cli
+
+    _fill(store, "b1", "AAPL", "buy", 10, 100.0, datetime(2026, 1, 5, 15, tzinfo=UTC))
+    monkeypatch.setattr(cli, "is_configured", lambda: False)
+
+    def _forbidden(*_args, **_kwargs):
+        raise AssertionError("sample/decision packet must not verify tax coverage")
+
+    monkeypatch.setattr(cli, "_packet", _forbidden)
+    output = tmp_path / "2026.csv"
+    with pytest.raises(SystemExit) as excinfo:
+        cli.command_tax_report(
+            _args(tmp_path, no_coverage_check=False, output=output), store
+        )
+    assert excinfo.value.code == 2
+    text = output.read_text(encoding="utf-8")
+    assert "COVERAGE UNVERIFIED" in text
+    assert "COMPLETE:" not in text.splitlines()[1]
+
+
 def test_cli_exits_zero_only_when_coverage_is_verified_complete(
     store, tmp_path, monkeypatch, capsys
 ):
@@ -450,18 +578,18 @@ def test_cli_exits_zero_only_when_coverage_is_verified_complete(
     _fill(store, "b1", "AAPL", "buy", 10, 100.0, datetime(2026, 1, 5, 15, tzinfo=UTC))
     _fill(store, "s1", "AAPL", "sell", 4, 150.0, datetime(2026, 2, 5, 15, tzinfo=UTC))
 
-    class _Packet:
-        portfolio = build_portfolio_snapshot(_positions(6), 1_000.0)
-
+    monkeypatch.setattr(cli, "is_configured", lambda: True)
     monkeypatch.setattr(
-        cli, "_packet", lambda include_events=False, store=None: _Packet()
+        "assistant.context_builder.build_portfolio_snapshot_from_alpaca",
+        lambda: _broker_positions(6),
     )
     cli.command_tax_report(
         _args(tmp_path, no_coverage_check=False, format="json"), store
     )
-    out = capsys.readouterr().out
-    assert "COVERAGE WARNING" not in out
-    assert '"complete": true' in out
+    captured = capsys.readouterr()
+    assert "COVERAGE WARNING" not in captured.out
+    assert "COVERAGE WARNING" not in captured.err
+    assert json.loads(captured.out)["complete"] is True
 
 
 def test_cli_survives_a_broker_outage_and_marks_the_report_unverified(
@@ -471,13 +599,19 @@ def test_cli_survives_a_broker_outage_and_marks_the_report_unverified(
     or silently assert completeness."""
     import scripts.run_personal_assistant as cli
 
-    def _explode(include_events=False, store=None):
+    monkeypatch.setattr(cli, "is_configured", lambda: True)
+
+    def _explode():
         raise RuntimeError("broker unavailable")
 
-    monkeypatch.setattr(cli, "_packet", _explode)
+    monkeypatch.setattr(
+        "assistant.context_builder.build_portfolio_snapshot_from_alpaca",
+        _explode,
+    )
     with pytest.raises(SystemExit) as excinfo:
         cli.command_tax_report(_args(tmp_path, no_coverage_check=False), store)
     assert excinfo.value.code == 2
-    out = capsys.readouterr().out
-    assert "Coverage check unavailable" in out
-    assert "COVERAGE UNVERIFIED" in out
+    captured = capsys.readouterr()
+    assert "Coverage check unavailable" in captured.err
+    assert "COVERAGE UNVERIFIED" in captured.out
+    assert "Coverage check unavailable" in captured.out

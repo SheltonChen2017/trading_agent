@@ -15,7 +15,9 @@ Three honesty rules the export exists to satisfy:
     built from incomplete fill history is the dangerous case (an
     accountant reads the file, not the terminal), so coverage status and
     its per-ticker evidence are embedded in both the JSON and the CSV,
-    and an incomplete report says so on its first line.
+    and an incomplete report says so on its first line. Only a live
+    broker portfolio snapshot (`source="alpaca"`) may verify coverage;
+    sample/manual positions never count as a broker check.
   * **Wash-sale entries are flags, never adjustments.** The real rule
     turns on "substantially identical" securities across every account
     the taxpayer controls, which this project cannot see. Basis is never
@@ -23,7 +25,9 @@ Three honesty rules the export exists to satisfy:
   * **The tax year is a market-timezone calendar year.** A sale at
     2026-01-01T02:00Z happened 2025-12-31 21:00 in New York and belongs
     to tax year 2025. Bucketing on the raw UTC date would silently move
-    late-December sales into the wrong year.
+    late-December sales into the wrong year. Exported timestamps are
+    likewise rendered in market-local time so the date column and the
+    year banner agree.
 
 This is not tax advice, and it is not a substitute for broker 1099-B
 forms; it is a reconciliation aid built from this app's own records.
@@ -36,7 +40,8 @@ import io
 import json
 from datetime import datetime, timezone
 from decimal import Decimal
-from typing import Any
+from types import MappingProxyType
+from typing import Any, Mapping
 from zoneinfo import ZoneInfo
 
 from assistant.corporate_actions import fills_with_confirmed_splits
@@ -51,6 +56,11 @@ TAX_YEAR_TIMEZONE = ZoneInfo("America/New_York")
 
 SHORT_TERM = "short"
 LONG_TERM = "long"
+
+# Only a live broker snapshot may claim verified share coverage. Manual /
+# sample portfolios are useful for demos but must never be labeled as a
+# broker match in an accountant-facing artifact.
+_VERIFIED_PORTFOLIO_SOURCE = "alpaca"
 
 DISCLAIMERS: tuple[str, ...] = (
     "Built from this application's own recorded fills and journal-confirmed "
@@ -132,6 +142,26 @@ class TaxTotals:
         }
 
 
+def _freeze_mapping(value: Mapping[str, Any]) -> MappingProxyType:
+    frozen: dict[str, Any] = {}
+    for key, item in value.items():
+        if isinstance(item, Mapping):
+            frozen[key] = _freeze_mapping(item)
+        else:
+            frozen[key] = item
+    return MappingProxyType(frozen)
+
+
+def _thaw_mapping(value: Mapping[str, Any]) -> dict[str, Any]:
+    thawed: dict[str, Any] = {}
+    for key, item in value.items():
+        if isinstance(item, Mapping):
+            thawed[key] = _thaw_mapping(item)
+        else:
+            thawed[key] = item
+    return thawed
+
+
 @dataclasses.dataclass(frozen=True)
 class AnnualTaxReport:
     tax_year: int
@@ -142,7 +172,7 @@ class AnnualTaxReport:
     long_term: TaxTotals
     total: TaxTotals
     wash_sale_flagged_count: int
-    coverage: dict[str, Any]
+    coverage: Mapping[str, Any]
     disclaimers: tuple[str, ...] = DISCLAIMERS
 
     @property
@@ -161,7 +191,7 @@ class AnnualTaxReport:
             "generated_at": self.generated_at,
             "lot_method": self.lot_method,
             "complete": self.complete,
-            "coverage": self.coverage,
+            "coverage": _thaw_mapping(self.coverage),
             "short_term": self.short_term.to_dict(),
             "long_term": self.long_term.to_dict(),
             "total": self.total.to_dict(),
@@ -189,27 +219,37 @@ def _parse_at(value: Any, field: str) -> datetime:
     return parsed
 
 
+def _market_local_text(value: Any, field: str) -> str:
+    return _parse_at(value, field).astimezone(TAX_YEAR_TIMEZONE).isoformat()
+
+
 def tax_year_of(sold_at: datetime) -> int:
     """The tax year a sale falls in, in market-local time."""
     return _parse_at(sold_at, "sold_at").astimezone(TAX_YEAR_TIMEZONE).year
 
 
 def _row_from_component(component: RealizedComponent) -> TaxReportRow:
+    # Multiply the Decimal-converted per-share inputs. Converting the float
+    # product `qty * price` after the fact preserves binary rounding error
+    # (100.1 * 100.1 -> 10020.009999999998) and would export the wrong cent.
     quantity = to_decimal(component.qty, name="component.qty")
-    cost_basis = to_decimal(component.cost_basis, name="component.cost_basis")
-    proceeds = to_decimal(component.proceeds, name="component.proceeds")
+    cost_per_share = to_decimal(
+        component.cost_per_share, name="component.cost_per_share"
+    )
+    proceeds_per_share = to_decimal(
+        component.proceeds_per_share, name="component.proceeds_per_share"
+    )
+    cost_basis = quantity * cost_per_share
+    proceeds = quantity * proceeds_per_share
     return TaxReportRow(
         ticker=component.ticker,
         lot_id=component.lot_id,
         quantity=quantity,
-        acquired_at=_parse_at(component.acquired_at, "acquired_at").isoformat(),
-        sold_at=_parse_at(component.sold_at, "sold_at").isoformat(),
+        acquired_at=_market_local_text(component.acquired_at, "acquired_at"),
+        sold_at=_market_local_text(component.sold_at, "sold_at"),
         holding_period=LONG_TERM if component.long_term else SHORT_TERM,
         cost_basis=cost_basis,
         proceeds=proceeds,
-        # Recomputed from the exact decimal basis/proceeds rather than
-        # converting the float `realized_pnl`, so the exported rows sum
-        # to the exported totals with no rounding drift.
         realized_pnl=proceeds - cost_basis,
         wash_sale_suspected=bool(component.wash_sale_suspected),
     )
@@ -226,7 +266,12 @@ def _totals(rows: tuple[TaxReportRow, ...]) -> TaxTotals:
     )
 
 
-def _coverage_report(ledger: LotLedger, portfolio: Any | None) -> dict[str, Any]:
+def _coverage_report(
+    ledger: LotLedger,
+    portfolio: Any | None,
+    *,
+    unavailable_reason: str | None = None,
+) -> Mapping[str, Any]:
     """Share-coverage verdict using the same comparison proposals use.
 
     Deliberately NOT reusing `tax_ledger_with_coverage()` itself: that
@@ -235,9 +280,20 @@ def _coverage_report(ledger: LotLedger, portfolio: Any | None) -> dict[str, Any]
     must still be produced and labelled. The comparison rule below is the
     same one, and `tests/test_tax_reporting.py` pins that the two verdicts
     agree.
+
+    Sample/manual portfolios never verify: only `source="alpaca"` may
+    claim a broker match.
     """
+    if unavailable_reason is not None:
+        payload = {
+            "complete": None,
+            "verified": False,
+            "reason": unavailable_reason,
+            "tickers": {},
+        }
+        return _freeze_mapping(payload)
     if portfolio is None:
-        return {
+        payload = {
             "complete": None,
             "verified": False,
             "reason": (
@@ -246,8 +302,24 @@ def _coverage_report(ledger: LotLedger, portfolio: Any | None) -> dict[str, Any]
             ),
             "tickers": {},
         }
+        return _freeze_mapping(payload)
+    source = getattr(portfolio, "source", None)
+    if source != _VERIFIED_PORTFOLIO_SOURCE:
+        payload = {
+            "complete": None,
+            "verified": False,
+            "reason": (
+                f"portfolio source {source!r} is not a live broker snapshot; "
+                "share coverage was not verified against the broker"
+            ),
+            "tickers": {},
+            "portfolio_source": source,
+        }
+        return _freeze_mapping(payload)
     details: dict[str, dict[str, Any]] = {}
     complete = True
+    under = False
+    over = False
     portfolio_tickers = {p.ticker.upper() for p in portfolio.positions}
     lot_tickers = {lot.ticker for lot in ledger.open_lots}
     for ticker in sorted(portfolio_tickers | lot_tickers):
@@ -264,24 +336,41 @@ def _coverage_report(ledger: LotLedger, portfolio: Any | None) -> dict[str, Any]
         )
         matched = abs(broker_shares - ledger_shares) <= Decimal("0.00000001")
         details[ticker] = {
-            "broker_shares": str(broker_shares),
-            "ledger_shares": str(ledger_shares),
+            "broker_shares": decimal_text(broker_shares),
+            "ledger_shares": decimal_text(ledger_shares),
             "matched": matched,
         }
-        complete = complete and matched
-    return {
+        if not matched:
+            complete = False
+            if broker_shares > ledger_shares:
+                under = True
+            if broker_shares < ledger_shares:
+                over = True
+    if complete:
+        reason: str | None = None
+    elif under and over:
+        reason = (
+            "tax-lot shares do not match the broker snapshot (some tickers "
+            "under-accounted, some over-accounted); this report is INCOMPLETE"
+        )
+    elif under:
+        reason = (
+            "tax-lot shares are below the broker snapshot; realized history "
+            "is missing fills and this report is INCOMPLETE"
+        )
+    else:
+        reason = (
+            "tax-lot shares exceed the broker snapshot; this report is "
+            "INCOMPLETE"
+        )
+    payload = {
         "complete": complete,
         "verified": True,
-        "reason": (
-            None
-            if complete
-            else (
-                "tax-lot shares do not match the portfolio snapshot; realized "
-                "history is missing fills and this report is INCOMPLETE"
-            )
-        ),
+        "reason": reason,
         "tickers": details,
+        "portfolio_source": source,
     }
+    return _freeze_mapping(payload)
 
 
 def build_annual_tax_report(
@@ -289,14 +378,17 @@ def build_annual_tax_report(
     tax_year: int,
     *,
     portfolio: Any | None = None,
+    coverage_unavailable_reason: str | None = None,
     now: datetime | None = None,
 ) -> AnnualTaxReport:
     """Realized gains for one tax year, from confirmed records only.
 
-    `portfolio` is an optional `PortfolioSnapshot`. Supplying it lets the
-    report VERIFY that the lot ledger accounts for every share the broker
-    reports; omitting it leaves coverage explicitly unverified rather than
-    assumed good.
+    `portfolio` is an optional `PortfolioSnapshot`. Only a live broker
+    snapshot (`source="alpaca"`) verifies that the lot ledger accounts for
+    every share the broker reports. Omitting it, or supplying a
+    sample/manual portfolio, leaves coverage explicitly unverified rather
+    than assumed good. `coverage_unavailable_reason` records a distinct
+    outage/unavailable claim when a live check was attempted and failed.
 
     Raises `TaxReportError` when the ledger itself cannot be built (bad
     fill history, unbalanced splits) -- an unusable ledger must not
@@ -330,7 +422,11 @@ def build_annual_tax_report(
         long_term=_totals(long_rows),
         total=_totals(rows),
         wash_sale_flagged_count=sum(1 for row in rows if row.wash_sale_suspected),
-        coverage=_coverage_report(ledger, portfolio),
+        coverage=_coverage_report(
+            ledger,
+            portfolio,
+            unavailable_reason=coverage_unavailable_reason,
+        ),
     )
 
 
@@ -350,10 +446,10 @@ def render_tax_report_csv(report: AnnualTaxReport) -> str:
             "-- realized history is missing fills"
         )
     else:
-        status = (
-            "COVERAGE UNVERIFIED: no portfolio snapshot was supplied, so this "
-            "report was not checked against the broker's share counts"
+        detail = report.coverage.get("reason") or (
+            "no live broker snapshot verified these share counts"
         )
+        status = f"COVERAGE UNVERIFIED: {detail}"
     writer.writerow([f"Realized gains and losses -- tax year {report.tax_year}"])
     writer.writerow([status])
     writer.writerow([f"Generated at {report.generated_at} (lot method: {report.lot_method})"])

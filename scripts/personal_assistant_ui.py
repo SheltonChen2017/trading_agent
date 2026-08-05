@@ -3408,7 +3408,9 @@ if page == "Backtest":
 if page == "Reports":
     st.caption(
         "Read-only reporting over records this app already holds. Nothing "
-        "here places, approves, or changes a trade."
+        "here places, approves, or changes a trade. Coverage verification "
+        "uses a live broker snapshot only when Alpaca is configured; it "
+        "never treats the sample portfolio as the broker."
     )
 
     with st.expander("Annual realized gains (tax year)", expanded=True):
@@ -3426,28 +3428,52 @@ if page == "Reports":
             key="tax_report_year",
         )
         if st.button("Build report", key="tax_report_build"):
-            try:
-                _, reports_packet = _load_packet(policy_path, include_events=False)
-                coverage_portfolio = reports_packet.portfolio
-                coverage_note = None
-            except Exception as exc:
-                # A data/broker outage must degrade the coverage CLAIM, not
-                # break the export (GR-4 discipline applied to reporting).
-                coverage_portfolio = None
-                coverage_note = (
-                    f"Coverage could not be verified ({type(exc).__name__}); "
-                    "the report is marked unverified."
+            from execution.alpaca_broker import is_configured as _alpaca_configured
+            from assistant.context_builder import (
+                build_portfolio_snapshot_from_alpaca as _live_portfolio,
+            )
+
+            coverage_portfolio = None
+            coverage_note = None
+            coverage_unavailable_reason = None
+            if _alpaca_configured():
+                try:
+                    coverage_portfolio = _live_portfolio()
+                except Exception as exc:
+                    # A data/broker outage must degrade the coverage CLAIM,
+                    # not break the export (GR-4 discipline applied to
+                    # reporting). Do not fall back to SAMPLE_POSITIONS.
+                    coverage_unavailable_reason = (
+                        f"Coverage could not be verified ({type(exc).__name__}); "
+                        "the report is marked unverified."
+                    )
+                    coverage_note = coverage_unavailable_reason
+            else:
+                coverage_unavailable_reason = (
+                    "no live broker configured; share coverage was not "
+                    "verified against a broker snapshot"
                 )
+                coverage_note = coverage_unavailable_reason
             try:
                 st.session_state["tax_report"] = build_annual_tax_report(
-                    store, int(tax_year), portfolio=coverage_portfolio
+                    store,
+                    int(tax_year),
+                    portfolio=coverage_portfolio,
+                    coverage_unavailable_reason=coverage_unavailable_reason,
                 )
                 st.session_state["tax_report_note"] = coverage_note
             except TaxReportError as exc:
                 st.session_state.pop("tax_report", None)
+                st.session_state.pop("tax_report_note", None)
                 st.error(f"Tax report unavailable: {exc}")
 
         _tax_report = st.session_state.get("tax_report")
+        if _tax_report is not None and _tax_report.tax_year != int(tax_year):
+            st.info(
+                f"Built report is for tax year {_tax_report.tax_year}. "
+                "Click Build report to refresh for the selected year."
+            )
+            _tax_report = None
         if _tax_report is not None:
             if st.session_state.get("tax_report_note"):
                 st.warning(st.session_state["tax_report_note"])
@@ -3459,13 +3485,13 @@ if page == "Reports":
             elif _tax_report.coverage.get("verified"):
                 st.error(
                     "Coverage INCOMPLETE -- recorded lots do not match the "
-                    "broker's share counts, so realized history is missing "
-                    f"fills. {_tax_report.coverage.get('reason')}"
+                    "broker's share counts. "
+                    f"{_tax_report.coverage.get('reason')}"
                 )
             else:
                 st.warning(
                     "Coverage UNVERIFIED -- this report was not checked "
-                    "against the broker's share counts."
+                    "against a live broker snapshot."
                 )
 
             st.dataframe(

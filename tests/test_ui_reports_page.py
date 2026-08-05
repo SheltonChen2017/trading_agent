@@ -153,14 +153,27 @@ def test_page_states_coverage_and_keeps_wash_sale_wording_advisory(
         + [str(e.value) for e in app.error]
         + [str(s.value) for s in app.success]
     )
-    # Exactly one coverage verdict must be stated -- never silence.
-    assert any(
-        token in surfaces
-        for token in ("Coverage COMPLETE", "Coverage INCOMPLETE", "Coverage UNVERIFIED")
-    )
+    # Without a live broker, Build must stay UNVERIFIED -- never COMPLETE
+    # against SAMPLE_POSITIONS.
+    assert "Coverage UNVERIFIED" in surfaces
+    assert "Coverage COMPLETE" not in surfaces
     captions = " ".join(str(c.value) for c in app.caption)
     assert "advisory only" in captions
     assert "cost basis is never adjusted" in captions.lower()
+
+
+def test_building_the_report_does_not_write_provider_fetch_rows(seeded_round_trip):
+    store = seeded_round_trip
+    with store._connect() as connection:
+        before = connection.execute(
+            "SELECT COUNT(*) FROM data_provider_fetches"
+        ).fetchone()[0]
+    _build_2026(_reports_app())
+    with store._connect() as connection:
+        after = connection.execute(
+            "SELECT COUNT(*) FROM data_provider_fetches"
+        ).fetchone()[0]
+    assert after == before
 
 
 def test_report_is_downloadable_in_both_formats(seeded_round_trip):

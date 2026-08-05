@@ -779,19 +779,37 @@ def command_tax_report(args, store: AssistantStore) -> None:
     accountant needs to see what exists plus the stated limitation, not an
     empty refusal. The limitation is written into the file itself, not just
     printed here.
+
+    Sample/manual portfolios never verify coverage. Only a live Alpaca
+    snapshot may claim a broker match.
     """
+    import sys
+
+    from assistant.context_builder import build_portfolio_snapshot_from_alpaca
+
     portfolio = None
+    coverage_unavailable_reason = None
     if not args.no_coverage_check:
-        try:
-            portfolio = _packet(include_events=False, store=store).portfolio
-        except Exception as exc:
-            print(
-                "Coverage check unavailable "
-                f"({type(exc).__name__}); the report will be marked unverified."
+        if not is_configured():
+            coverage_unavailable_reason = (
+                "no live broker configured; share coverage was not verified "
+                "against a broker snapshot"
             )
+        else:
+            try:
+                portfolio = build_portfolio_snapshot_from_alpaca()
+            except Exception as exc:
+                coverage_unavailable_reason = (
+                    "Coverage check unavailable "
+                    f"({type(exc).__name__}); the report is marked unverified."
+                )
+                print(coverage_unavailable_reason, file=sys.stderr)
     try:
         report = build_annual_tax_report(
-            store, args.year, portfolio=portfolio
+            store,
+            args.year,
+            portfolio=portfolio,
+            coverage_unavailable_reason=coverage_unavailable_reason,
         )
     except TaxReportError as exc:
         raise SystemExit(f"Tax report unavailable: {exc}")
@@ -801,22 +819,31 @@ def command_tax_report(args, store: AssistantStore) -> None:
         if args.format == "csv"
         else render_tax_report_json(report)
     )
-    if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(rendered, encoding="utf-8")
-        print(f"Wrote {args.format.upper()} tax report: {args.output}")
-    else:
-        print(rendered)
-
-    print(
-        f"\nTax year {report.tax_year}: {report.total.sale_count} realized "
+    summary = (
+        f"Tax year {report.tax_year}: {report.total.sale_count} realized "
         f"sale row(s); short-term P&L {report.short_term.realized_pnl}, "
         f"long-term P&L {report.long_term.realized_pnl}, total "
         f"{report.total.realized_pnl}. "
         f"{report.wash_sale_flagged_count} wash-sale flag(s) (advisory only)."
     )
+    if args.output:
+        args.output.parent.mkdir(parents=True, exist_ok=True)
+        args.output.write_text(rendered, encoding="utf-8")
+        print(f"Wrote {args.format.upper()} tax report: {args.output}")
+        print(summary)
+        if not report.complete:
+            print(f"COVERAGE WARNING: {report.coverage.get('reason')}")
+            raise SystemExit(2)
+        return
+
+    # Keep stdout as the pure artifact for scripted/accountant consumers.
+    print(rendered)
+    print(summary, file=sys.stderr)
     if not report.complete:
-        print(f"COVERAGE WARNING: {report.coverage.get('reason')}")
+        print(
+            f"COVERAGE WARNING: {report.coverage.get('reason')}",
+            file=sys.stderr,
+        )
         raise SystemExit(2)
 
 

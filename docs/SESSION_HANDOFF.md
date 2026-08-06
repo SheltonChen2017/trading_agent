@@ -5,7 +5,18 @@ of Claude's GR-7c performance attribution on
 `user/grok/review-gr7c-attribution-20260806`.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
-model, or session change. This file completely replaces the prior handoff.
+model, or session change. This file completely replaces the prior handoff
+**and is therefore the wrong place for anything durable.**
+
+> **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions
+> (`require_earnings_data`, the epoch re-bind, the SPY benchmark),
+> machine-local operational knowledge (the launch script, the elevated
+> task-swap script, the non-elevated `Disable` gotcha, where backups land),
+> and engineering watch items live there because this file is rewritten
+> every round. On 2026-08-06 the same seven facts were dropped by one
+> rewrite, restored, and dropped again by the next — restoring them here a
+> third time would have failed the same way. Do not copy them back into
+> this file; link to them.
 
 ## 1. Standing state: THE EPOCH (do not disturb)
 
@@ -37,10 +48,26 @@ Surfaces: `assistant/attribution.py`, CLI `attribution`, storage
 (ACTION_PLAN scoped to module + CLI). Sample remains insufficient until
 ≥20 independent sessions.
 
+Claude then counter-reviewed those corrections (§6 of the ledger). All five
+findings accepted. Two worth naming: GR7CREV-002 was worse than a silent
+clamp — the code clamped under a comment claiming it would "clamp **and
+report**", and it did not report; and GR7CREV-004 was self-inflicted drift,
+help text left describing the sufficiency model that had been superseded.
+
+| ID | Pri | Result |
+|---|---|---|
+| CFPS-GR7C-001 | P2 | **Fixed.** Skipping a valuation point dropped its external cash flow, silently reintroducing deposit-as-gain: the chain links across the gap and reads the deposit's equity jump as return. Reproduced at **+100%** on an account doubled purely by a deposit. Originally my own defect (the pre-existing "no benchmark close" skip had it); the new `cash > equity` skip widened it. All skip sites now refuse the report when a dropped point carried a non-zero or unreadable flow. |
+| CFPS-GR7C-002 | P2 | **Fixed (structurally).** The seven durable facts restored into this handoff one round earlier were dropped again by the next rewrite. Rather than restore them a third time, they now live in `docs/OPERATIONAL_FACTS.md`, which is append-and-amend, and this file links to it. |
+
 ## 3. Validation (exact final tree)
 
-- Focused: **35 passed**.
-- Full suite: **2947 passed / 0 skipped / 25 warnings**.
+Review tree (`58a10ab`): focused **35 passed**; full suite **2947 passed /
+0 skipped / 25 warnings**.
+
+Counter-reviewed tree (current):
+
+- `test_attribution` **30 passed**.
+- Full suite: **2950 passed / 0 failed / 0 skipped / 25 warnings** (618s).
 - `compileall` clean; `git diff --check` clean.
 - Nothing deployed; ops checkout stays at `9a91498`.
 

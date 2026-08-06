@@ -515,3 +515,98 @@ def test_weight_uses_beginning_of_period_not_an_average_including_the_end():
     )
     assert Decimal(decomposition["allocation_pct"]) == Decimal("-5")
     assert Decimal(decomposition["selection_pct"]) == Decimal("0")
+
+
+def _cli_args(**overrides):
+    from types import SimpleNamespace
+
+    base = dict(
+        benchmark="SPY",
+        account_key=None,
+        limit=500,
+        minimum_observations=2,
+        json=True,
+    )
+    base.update(overrides)
+    return SimpleNamespace(**base)
+
+
+class _SnapshotStore:
+    """Only what command_attribution reads."""
+
+    def __init__(self, rows):
+        self._rows = rows
+
+    def list_portfolio_equity_account_keys(self):
+        return sorted({row["account_key"] for row in self._rows})
+
+    def list_portfolio_equity_snapshots(self, account_key, *, limit=10_000):
+        return [r for r in self._rows if r["account_key"] == account_key][:limit]
+
+
+def _snapshot_row(session, equity, cash, close, flow="0", key="alpaca:paper:x"):
+    return {
+        "account_key": key,
+        "session_date": session,
+        "captured_at": f"{session}T21:00:00+00:00",
+        "total_equity": str(equity),
+        "cash": str(cash),
+        "net_external_flow": flow,
+        "benchmarks": {"SPY": str(close)} if close is not None else {},
+    }
+
+
+def test_cli_refuses_when_a_skipped_snapshot_carried_an_external_flow():
+    """Counter-review of GR7CREV-002's fix, and of my own earlier skip path.
+
+    Skipping a valuation point silently reintroduces the deposit-as-gain
+    error: the chain links across the gap, so the equity jump the deposit
+    caused is read as return. Verified -- dropping a point whose $100
+    deposit doubled equity reports +100%.
+
+    Refusing is the only honest option. Publishing a performance number that
+    is mostly a bank transfer would be worse than publishing nothing.
+    """
+    import scripts.run_personal_assistant as cli
+
+    rows = [
+        _snapshot_row("2026-01-02", 100, 50, 400),
+        # Middle point is skipped (no benchmark close) AND carried a deposit.
+        _snapshot_row("2026-01-03", 200, 150, None, flow="100"),
+        _snapshot_row("2026-01-04", 200, 100, 400),
+    ]
+    with pytest.raises(SystemExit, match="carried external cash"):
+        cli.command_attribution(_cli_args(), store=_SnapshotStore(rows))
+
+
+def test_cli_still_reports_when_the_skipped_snapshot_had_no_flow():
+    """Guards against 'fixing' the above by refusing on every skip. A
+    snapshot missing only its benchmark close is droppable -- the chain
+    stays honest because no money moved."""
+    import scripts.run_personal_assistant as cli
+
+    rows = [
+        _snapshot_row("2026-01-02", 100, 50, 400),
+        _snapshot_row("2026-01-03", 105, 50, None),
+        _snapshot_row("2026-01-05", 110, 55, 440),
+    ]
+    cli.command_attribution(_cli_args(), store=_SnapshotStore(rows))
+
+
+def test_cli_never_pools_two_accounts_into_one_return_series():
+    """The operator database holds both the live paper account and
+    `manual:manual` sample rows. Blending them would attribute one
+    portfolio's return to another's allocation."""
+    import scripts.run_personal_assistant as cli
+
+    rows = [
+        _snapshot_row("2026-01-02", 100, 50, 400),
+        _snapshot_row("2026-01-03", 110, 55, 440),
+        _snapshot_row("2026-01-02", 999, 999, 400, key="manual:manual"),
+    ]
+    store = _SnapshotStore(rows)
+    # Both keys exist, but only one is a broker account, so it is chosen
+    # without needing --account-key.
+    cli.command_attribution(_cli_args(), store=store)
+    with pytest.raises(SystemExit, match="no snapshots for"):
+        cli.command_attribution(_cli_args(account_key="nope"), store=store)

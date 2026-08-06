@@ -53,3 +53,38 @@ Windows, Python 3.13.
 - `compileall` clean; `git diff --check` clean.
 
 Nothing deployed mid-epoch.
+
+## 6. Claude counter-review of this review
+
+All five findings **accepted**. Two deserve specific acknowledgement:
+
+- **GR7CREV-002 was worse than "a silent clamp".** The submitted code
+  clamped `max(0.0, equity - cash)` under a comment that claimed it would
+  "clamp **and report**". It did not report. A comment asserting a
+  guarantee the code does not provide is the specific thing CLAUDE.md §8
+  forbids, and it would have persuaded the next reader not to look.
+- **GR7CREV-004** was self-inflicted drift: the `--minimum-observations`
+  help text was written before sufficiency changed from valuation points to
+  sessions and was never updated, so the CLI documented the superseded
+  model. Grok also correctly reused the existing `_positive_int` helper
+  rather than adding a parallel validator — verified it exists and is the
+  same one `--stale-after-seconds` uses.
+
+GR7CREV-001/003/005 confirmed as described. The `w > 1` case in 005 is real:
+`(w-1)*R_b` is *positive* under leverage when the benchmark rises, and
+calling that "cash drag" inverts the narrative for an account holding
+negative cash.
+
+### Residual finding from this counter-review
+
+| ID | Priority | Status | Issue | Correction |
+|---|---|---|---|---|
+| CFPS-GR7C-001 | P2 | Resolved | **Skipping a valuation point drops its external cash flow, silently reintroducing the deposit-as-gain error.** The chain links across the gap, so the equity jump the deposit caused is read as return. Reproduced: dropping a point whose $100 deposit doubled equity reports **+100%** where the honest answer is 0%. This hole is **originally mine** — the pre-existing "no benchmark close" skip had it — and GR7CREV-002's new `cash > equity` skip widened it. Narrow to reach, severe when reached: a performance report whose headline number is mostly a bank transfer. | All three skip sites now route through `_note_skip`, which inspects the snapshot's `net_external_flow`. Any skipped point carrying a non-zero — or unreadable — flow refuses the whole report rather than publishing a return it cannot stand behind. A skip with no flow still proceeds, since no money moved and the chain stays honest. |
+
+Also added: a test that the CLI never pools two account keys into one
+return series (the operator database holds both the live paper account and
+`manual:manual` sample rows), which was implemented but unpinned.
+
+Mutation result: removing the refusal fails
+`test_cli_refuses_when_a_skipped_snapshot_carried_an_external_flow`;
+restored green.

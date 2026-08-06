@@ -34,7 +34,7 @@ from assistant.attribution import (
     evaluate_attribution,
 )
 from assistant.cash_reporting import CashReportError, evaluate_idle_cash
-from assistant.money import to_decimal as _to_decimal_money
+from assistant.money import decimal_text, to_decimal as _to_decimal_money
 from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
     PolicyOverridableBlockError,
@@ -561,12 +561,32 @@ def command_attribution(args, store: AssistantStore) -> None:
     rows = store.list_portfolio_equity_snapshots(account_key, limit=args.limit)
     points: list[AttributionPoint] = []
     skipped: list[str] = []
+    # Skipping a snapshot that carried an external flow silently REINTRODUCES
+    # the deposit-as-gain error: the chain then links across the gap and reads
+    # the deposit's equity jump as return. Verified -- dropping a point whose
+    # $100 deposit doubled equity reports +100%. Any such skip must refuse the
+    # whole report rather than publish a return that is mostly someone's bank
+    # transfer.
+    dropped_flow_reasons: list[str] = []
+
+    def _note_skip(reason: str, raw_flow: object) -> None:
+        skipped.append(reason)
+        try:
+            flow = _to_decimal_money(raw_flow or "0", name="net_external_flow")
+        except ValueError:
+            # Unparseable: cannot prove it was zero, so treat as material.
+            dropped_flow_reasons.append(f"{reason} (flow unreadable)")
+            return
+        if flow != 0:
+            dropped_flow_reasons.append(f"{reason} (flow {decimal_text(flow)})")
+
     for row in rows:
         benchmarks = row.get("benchmarks") or {}
         close = benchmarks.get(args.benchmark)
         if close is None:
-            skipped.append(
-                f"{row['session_date']}: no {args.benchmark} close recorded"
+            _note_skip(
+                f"{row['session_date']}: no {args.benchmark} close recorded",
+                row.get("net_external_flow"),
             )
             continue
         try:
@@ -576,9 +596,10 @@ def command_attribution(args, store: AssistantStore) -> None:
             # report "all cash" for a corrupt snapshot and hide the defect.
             invested = equity - cash
             if invested < 0:
-                skipped.append(
+                _note_skip(
                     f"{row['session_date']}: cash exceeds equity "
-                    f"(cash={cash}, equity={equity})"
+                    f"(cash={cash}, equity={equity})",
+                    row.get("net_external_flow"),
                 )
                 continue
             points.append(
@@ -599,8 +620,15 @@ def command_attribution(args, store: AssistantStore) -> None:
                 )
             )
         except (ValueError, AttributionError) as exc:
-            skipped.append(f"{row['session_date']}: {exc}")
+            _note_skip(f"{row['session_date']}: {exc}", row.get("net_external_flow"))
 
+    if dropped_flow_reasons:
+        raise SystemExit(
+            "Cannot attribute: skipped snapshot(s) carried external cash "
+            "flows, and omitting them would report the deposit or withdrawal "
+            "as investment return. Fix or exclude the period explicitly. "
+            + "; ".join(dropped_flow_reasons[:5])
+        )
     if len(points) < 2:
         raise SystemExit(
             f"Cannot attribute: {len(points)} usable valuation point(s) from "

@@ -266,6 +266,47 @@ def _totals(rows: tuple[TaxReportRow, ...]) -> TaxTotals:
     )
 
 
+def account_binding_reason(store: AssistantStore, portfolio: Any) -> str | None:
+    """Why this snapshot cannot verify THIS journal's coverage, or None.
+
+    Counter-review CRGR7A-001: `source="alpaca"` proves the snapshot came
+    from a broker, not that it came from the broker account these books
+    belong to. The ledger already refuses a foreign or unbound account;
+    coverage claims must use that same authority or they can compare one
+    account's lots against another's shares.
+
+    Downgrades to unverified instead of raising: GR-7a's contract is that
+    a report is always produced and states its limitation.
+    """
+    from assistant.portfolio_ledger import alpaca_account_binding_block_reason
+
+    block = alpaca_account_binding_block_reason(store, portfolio)
+    if block is None:
+        return None
+    if block == "unbound_journal":
+        return (
+            "the portfolio journal predates account-ID binding, so this "
+            "broker snapshot cannot be proven to belong to it; share "
+            "coverage was not verified"
+        )
+    if block == "account_mismatch":
+        return (
+            "the connected broker account does not match the account "
+            "bound to the portfolio journal; share coverage was not "
+            "verified"
+        )
+    if block == "missing_account_id":
+        return (
+            "the broker snapshot carries no account ID, so it cannot be "
+            "matched to the portfolio journal; share coverage was not "
+            "verified"
+        )
+    return (
+        f"broker account binding could not be verified ({block}); share "
+        "coverage was not verified"
+    )
+
+
 def _coverage_report(
     ledger: LotLedger,
     portfolio: Any | None,
@@ -425,7 +466,21 @@ def build_annual_tax_report(
         coverage=_coverage_report(
             ledger,
             portfolio,
-            unavailable_reason=coverage_unavailable_reason,
+            # CRGR7A-001: a broker snapshot only verifies THIS journal's
+            # coverage when it comes from the account the journal is bound
+            # to. Checked here (where the store is in scope) and passed
+            # through the existing unavailable-reason channel.
+            unavailable_reason=(
+                coverage_unavailable_reason
+                if coverage_unavailable_reason is not None
+                else (
+                    account_binding_reason(store, portfolio)
+                    if portfolio is not None
+                    and getattr(portfolio, "source", None)
+                    == _VERIFIED_PORTFOLIO_SOURCE
+                    else None
+                )
+            ),
         ),
     )
 

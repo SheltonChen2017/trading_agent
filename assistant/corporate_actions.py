@@ -18,6 +18,7 @@ from assistant.share_reconciliation import detect_split_like_share_mismatch
 from assistant.portfolio_ledger import (
     ACCOUNT_DIVIDEND_INCOME,
     SECURITY_ACCOUNT_PREFIX,
+    SHARE_TOLERANCE,
 )
 from assistant.storage import AssistantStore
 from assistant.tax_lots import Fill, LotEvent, Split, TaxLotError, build_ledger
@@ -214,18 +215,39 @@ def tax_ledger_with_coverage(
     }
     lot_tickers = {lot.ticker for lot in ledger.open_lots}
     for ticker in sorted(portfolio_tickers | lot_tickers):
-        broker_shares = sum(
-            (
-                Decimal(str(position.shares))
-                for position in portfolio.positions
-                if position.ticker.upper() == ticker
-            ),
-            Decimal("0"),
-        )
-        ledger_shares = Decimal(str(ledger.shares_held(ticker)))
-        matched = (
-            abs(broker_shares - ledger_shares) <= Decimal("0.00000001")
-        )
+        # Same InvalidOperation escape class as FPS-001: raw Decimal(str(...))
+        # raises ArithmeticError, which this function does not catch. Shares
+        # are normally floats from the broker snapshot, but a corrupt or
+        # hand-built portfolio must degrade to incomplete coverage — not a
+        # traceback in the Reports page.
+        try:
+            broker_shares = sum(
+                (
+                    to_decimal(
+                        position.shares, name=f"{ticker} broker shares"
+                    )
+                    for position in portfolio.positions
+                    if position.ticker.upper() == ticker
+                ),
+                Decimal("0"),
+            )
+            ledger_shares = to_decimal(
+                ledger.shares_held(ticker), name=f"{ticker} ledger shares"
+            )
+        except ValueError as exc:
+            return None, {
+                "complete": False,
+                "reason": str(exc),
+                "tickers": details,
+            }
+        # SHARE_TOLERANCE, not a bare literal: portfolio_ledger owns this
+        # rule and PUBLISHES its value into the durable reconciliation record
+        # ("tolerances.shares"). A local copy means tuning the constant --
+        # e.g. for fractional shares -- would silently move ledger
+        # reconciliation while leaving this coverage gate on the old value,
+        # so the tax surface would disagree with the record that declares the
+        # tolerance.
+        matched = abs(broker_shares - ledger_shares) <= SHARE_TOLERANCE
         details[ticker] = {
             "broker_shares": str(broker_shares),
             "ledger_shares": str(ledger_shares),

@@ -489,8 +489,9 @@ def _slice_metrics(frame: pd.DataFrame, candidate: str) -> dict[str, Any]:
             # metric actually used. brier_score/mean_absolute_error drop
             # non-finite pairs, so reporting only the former lets a slice the
             # model mostly FAILED to predict display a strong score over its
-            # few easy survivors. ml/monitoring_reports.py's slice reporting
-            # already publishes both; this one did not.
+            # few easy survivors. Match the fold-summary discipline
+            # (evaluated_validation_row_count), not monitoring_reports' date
+            # sufficiency counts — those answer a different question.
             groups[str(value)] = {
                 "event_count": int(len(group)),
                 "scored_event_count": usable_pair_count(actual, predicted),

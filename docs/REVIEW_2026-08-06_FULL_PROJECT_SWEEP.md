@@ -214,3 +214,11 @@ No test contacted a funded account. No proposal, approval, sizing,
 submission, execution, or broker path was modified. The operational
 checkout stays frozen at `9a91498` under `paper-epoch-002`; nothing here is
 deployed.
+
+## 9. Independent review (2026-08-06, appended)
+
+Independent confirmation of FPS-001/002/004 and of the §5 dismissals is
+recorded in `docs/REVIEW_2026-08-06_FULL_PROJECT_SWEEP_INDEPENDENT.md`.
+Corrections: residual share-conversion escape in `tax_ledger_with_coverage`
+(GFPS-001), comment honesty on monitoring_reports (GFPS-002), and
+post-merge handoff cleanup (GFPS-003 / PR #160).

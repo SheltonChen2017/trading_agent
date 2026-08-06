@@ -144,29 +144,46 @@ State after the epoch swap (§2a), all four tasks enabled:
   denied". Use `C:\git\epoch_swap_tasks_elevated.ps1 -Action Disable|Enable`
   (machine-local, not in the repo).
 
-## 4a. Full-project review (2026-08-06, later the same day)
+## 4a. Full-project review (2026-08-06) — independently accepted after correction
 
-Owner asked for a module-by-module sweep — the first since 2026-07-30, and
-**378 commits** of ~62K production lines. Branch
-`user/claude/full-project-sweep-20260806`, commit `87593f8`, pushed; PR not
-opened. Ledger: `docs/REVIEW_2026-08-06_FULL_PROJECT_SWEEP.md`.
+Owner asked for a module-by-module sweep — the first since 2026-07-30
+(~378 commits). Claude branch `user/claude/full-project-sweep-20260806`
+(`87593f8` / `30276ff`) merged as PR #160 (`80bebbb`). Independent review
+on `user/grok/review-full-project-sweep-20260806`. Ledgers:
+`docs/REVIEW_2026-08-06_FULL_PROJECT_SWEEP.md` (Claude) and
+`docs/REVIEW_2026-08-06_FULL_PROJECT_SWEEP_INDEPENDENT.md` (this pass).
+
+| ID | Pri | Independent verdict |
+|---|---|---|
+| FPS-001 | P2 | **Confirmed fixed** (dividend/split `to_decimal`). |
+| FPS-004 | P2 | **Confirmed fixed** (`scored_event_count`). |
+| FPS-002 | P3 | **Confirmed fixed** (skip removed). |
+| FPS-003 | P2 | **Still open** (intermittent UI chrome; do not treat green suite as closure). |
+| GFPS-001 | P2 | **Fixed this review.** Residual `Decimal(str(shares))` in `tax_ledger_with_coverage` coverage loop — same InvalidOperation escape class. |
+| GFPS-002 | P3 | **Fixed this review.** Misleading monitoring_reports analogy in FPS-004 comment. |
+| GFPS-003 | P3 | **Fixed this review.** Handoff still said “open PR” after merge. |
+
+Claude quality: **8.8/10 submitted; 9.5/10 after independent correction**.
+
+Both original P2s remain evidence-integrity defects, not execution defects.
+§5 false alarms and the `require_earnings_data=false` recommendation were
+re-checked and accepted.
+
+Claude then counter-reviewed the independent pass. All three GFPS
+corrections **accepted**; GFPS-001 was mutation-verified rather than taken
+on inspection (swapping only the conversion back, with the new guard left
+intact, still fails — so `to_decimal` is the load-bearing part).
 
 | ID | Pri | Result |
 |---|---|---|
-| FPS-001 | P2 | **Fixed.** `assistant/corporate_actions.py` bypassed `money.to_decimal` at three sites; `decimal.InvalidOperation` is an `ArithmeticError`, not a `ValueError`, so malformed journal metadata escaped both handlers and would traceback in the Streamlit/CLI callers of `tax_ledger_with_coverage` instead of reporting "unavailable". Malformed/missing split ratio now fails closed. |
-| FPS-004 | P2 | **Fixed.** `ml/earnings_experiments._slice_metrics` printed `event_count = len(group)` beside metrics that silently drop non-finite pairs, so a slice the model mostly failed on showed a strong score over its few survivors. Added `usable_pair_count()` + `scored_event_count`. |
-| FPS-002 | P3 | **Fixed.** A permanently-skipped parametrized case in `test_ml_experiments.py`; the case passes as written. Suite skip count 1 → 0. |
-| FPS-003 | P2 | **OPEN.** `test_ui_chrome.py::test_app_title_is_trading_assistant` failed with `RuntimeError` on the pre-existing `main` baseline. **Intermittent, not order-dependent** — passes alone, with all 46 UI tests, and after the credential-mutating broker modules; did not reproduce on two later full runs. Disproven: the 3s `AppTest` default (already 60), live Alpaca calls (conftest clears creds), credential leakage from `test_alpaca_broker.py`. Not yet ruled out: `st.cache_data` global state, load-related timeout. **A single green suite is not evidence it is gone.** |
+| CFPS-001 | P3 | **Fixed.** Same escape class one module further out, missed by BOTH passes: `share_reconciliation.detect_split_like_share_mismatch` used raw `Decimal(str(...))` on parameters typed to accept `str`. Decimal-specific sharp edge: `Decimal(str(x))` accepts "NaN"/"Infinity", and **ordering comparisons on a Decimal NaN RAISE** instead of returning False like float — so the function's own `recorded <= 0` guard is not safe. Not currently reachable (its one live caller passes validated Decimals inside a fail-closed try/except), but it is re-exported for presentation, which is exactly where GFPS-001 was a real traceback. |
+| CFPS-002 | P3 | **Fixed.** The broker-vs-ledger share tolerance was defined three times — `SHARE_TOLERANCE` in `portfolio_ledger` (which publishes it into the durable reconciliation record as `tolerances.shares`) plus bare literals in `corporate_actions` and `tax_reporting`. Tuning it would have moved ledger reconciliation while leaving both tax surfaces on the old value. Now a single definition, pinned by a source-level test. |
 
-Both P2s are evidence-integrity defects, not execution defects — neither
-could submit, size, or mis-price an order.
-
-Reverse mutation recorded for both code fixes. Coverage was class-driven,
-not line-by-line; §7 of the review names what was deliberately **not**
-cleared (`ml/databento_source`/`_authoritative` bulk, `run_ml_shadow`, the
-one-off research scripts, `ai_advisor`, `platform_readiness`,
-`risk_copilot`, `strategy_proposals`, `execution_telemetry`,
-`alert_delivery`, most of `storage.py`).
+**Pattern worth watching:** this is the *third consecutive pass* to find
+another raw `Decimal(str(...))` on a share or money field. The remaining
+raw sites (`alpaca_broker`, `execution_telemetry`, `portfolio_ledger`,
+`databento_authoritative`) were checked and are each already inside their
+own try/except conversion helpers — not part of this class.
 
 ## 4b. Owner decision recorded: `require_earnings_data` stays `false`
 
@@ -191,36 +208,30 @@ Ops/singleton round (`a947146`):
   resilience 30).
 - Full suite: **2876 passed / 1 skipped / 25 warnings** (588s).
 
-Full-project sweep (`87593f8`, later the same day):
+Full-project sweep (`87593f8`, Claude):
 
 - Full suite: **2888 passed / 0 failed / 0 skipped / 25 warnings** (450s).
-  Skip count reaching zero is FPS-002.
+
+Independent FPS review (this branch, after GFPS-001..003):
+
+- Focused related modules: **123 passed**.
+- Full suite: **2892 passed / 0 failed / 0 skipped / 25 warnings** (621s) after Claude's counter-review; Grok's tree was 2889.
 - `compileall` clean; `git diff --check` clean.
-- No funded-account contact. Nothing from either round is deployed; the
-  operational checkout stays frozen at `9a91498`.
+- No funded-account contact; nothing deployed mid-epoch.
 
 ## 6. What is next
 
 1. §2 resolved and executed 2026-08-06. Nothing outstanding.
-2. **Confirm the first `paper-epoch-002` session lands** at the 16:30
-   capture on 2026-08-06. This is the one step not yet verified — the
-   lineage gate was exercised directly and passed, but no observation has
-   actually been written under the new epoch yet.
-3. Owner: nothing outstanding on duplicate processes (resolved on their
-   own); re-check PIDs rather than assuming, since the cause is unknown
-   (CCCROPS-002). The singleton is now live and should make a recurrence
-   visible as a refusal rather than as silent duplication.
+2. **Confirm the first `paper-epoch-002` session** — lineage gate was
+   exercised; verify an observation row exists under the new epoch.
+3. Owner: re-check long-runner PIDs if duplication recurs (CCCROPS-002);
+   singleton is live on the operational checkout.
 4. Roadmap: GR-7b / GR-7c / GR-6, or GR-7d owner decision — unchanged.
-5. The operational checkout is pinned at `9a91498` again. Development
-   continues un-deployed; the next deploy waits for the next epoch
-   boundary or an explicit owner authorization.
-6. **Open PR for `user/claude/full-project-sweep-20260806` (`87593f8`)** —
-   pushed, not merged. `gh` cannot create PRs on this repo (Enterprise
-   Managed User), so the owner opens it.
-7. **FPS-003 remains open** (§4a). Because it is intermittent, the way to
-   make progress is to capture the full traceback the next time a full
-   suite fails — the original baseline run was piped through `tail`, which
-   discarded it. Do not treat a green suite as closure.
+5. Development continues un-deployed; next deploy waits for the next
+   epoch boundary or explicit owner authorization. Operational checkout
+   pinned at `9a91498`.
+6. **FPS-003 remains open.** Capture the full traceback the next time a
+   full suite fails that test — do not treat a green suite as closure.
 
 ## 7. Non-negotiable boundaries
 

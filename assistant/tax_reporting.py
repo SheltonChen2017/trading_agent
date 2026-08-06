@@ -46,6 +46,7 @@ from zoneinfo import ZoneInfo
 
 from assistant.corporate_actions import fills_with_confirmed_splits
 from assistant.money import decimal_text, to_decimal
+from assistant.portfolio_ledger import SHARE_TOLERANCE
 from assistant.storage import AssistantStore
 from assistant.tax_lots import LotLedger, RealizedComponent, TaxLotError, build_ledger
 
@@ -375,7 +376,8 @@ def _coverage_report(
         ledger_shares = to_decimal(
             ledger.shares_held(ticker), name=f"{ticker}.ledger_shares"
         )
-        matched = abs(broker_shares - ledger_shares) <= Decimal("0.00000001")
+        # Third copy of the same rule; see the note in corporate_actions.
+        matched = abs(broker_shares - ledger_shares) <= SHARE_TOLERANCE
         details[ticker] = {
             "broker_shares": decimal_text(broker_shares),
             "ledger_shares": decimal_text(ledger_shares),

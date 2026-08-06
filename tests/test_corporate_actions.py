@@ -229,3 +229,104 @@ def test_valid_split_posting_still_converts():
         _PostingStore([_split_posting({"corporate_action": "split", "ratio": "4"})])
     )
     assert [s.ratio for s in splits] == [4.0]
+
+
+def test_malformed_broker_shares_degrade_coverage_instead_of_traceback(monkeypatch):
+    """Residual FPS-001 class: coverage share math used raw Decimal(str(...)).
+
+    InvalidOperation is not a ValueError, so a corrupt portfolio.shares value
+    escaped tax_ledger_with_coverage and would traceback in Reports/CLI.
+    """
+    from assistant import corporate_actions as ca
+
+    class _Ledger:
+        open_lots = [SimpleNamespace(ticker="AAPL")]
+
+        def shares_held(self, ticker: str) -> float:
+            return 10.0
+
+    monkeypatch.setattr(ca, "fills_with_confirmed_splits", lambda store: [])
+    monkeypatch.setattr(ca, "build_ledger", lambda fills: _Ledger())
+    portfolio = SimpleNamespace(
+        positions=[SimpleNamespace(ticker="AAPL", shares="not-a-number")]
+    )
+
+    ledger, coverage = ca.tax_ledger_with_coverage(object(), portfolio)
+
+    assert ledger is None
+    assert coverage["complete"] is False
+    assert "broker shares" in coverage["reason"]
+
+
+def test_share_mismatch_detection_rejects_non_finite_and_malformed_input():
+    """CFPS-001. Raw `Decimal(str(x))` accepts the literals "NaN" and
+    "Infinity", and -- unlike float -- ORDERING COMPARISONS ON A DECIMAL NaN
+    RAISE InvalidOperation rather than returning False. So the `recorded <= 0`
+    guard inside this helper is not the safe check it appears to be, and an
+    ArithmeticError is not catchable as ValueError by callers.
+
+    The one live caller (execution validation) passes validated Decimals
+    inside a try/except, so this is defense in depth -- but the signature
+    accepts `str`, and the helper is re-exported for presentation, which is
+    exactly the surface where the same class was a real traceback (GFPS-001).
+    """
+    from decimal import Decimal, InvalidOperation
+
+    import pytest
+
+    from assistant.share_reconciliation import detect_split_like_share_mismatch
+
+    # The trap this guards, stated as an executable fact.
+    with pytest.raises(InvalidOperation):
+        _ = Decimal("NaN") <= 0
+    assert (float("nan") <= 0) is False
+
+    for bad in ("not-a-number", float("nan"), float("inf"), float("-inf")):
+        with pytest.raises(ValueError):
+            detect_split_like_share_mismatch(bad, 100)
+        with pytest.raises(ValueError):
+            detect_split_like_share_mismatch(100, bad)
+
+
+def test_share_mismatch_detection_still_classifies_a_real_split():
+    """Guards against 'fixing' the above by rejecting everything."""
+    from assistant.share_reconciliation import detect_split_like_share_mismatch
+
+    assert detect_split_like_share_mismatch(100, 400) == {
+        "ratio": "4:1",
+        "direction": "forward",
+        "recorded_shares": "100",
+        "broker_shares": "400",
+    }
+    assert detect_split_like_share_mismatch(100, 101) is None
+
+
+def test_share_match_tolerance_has_a_single_definition():
+    """CFPS-002. The same broker-vs-ledger share tolerance was written three
+    times: SHARE_TOLERANCE in portfolio_ledger (which PUBLISHES it into the
+    durable reconciliation record as "tolerances.shares"), plus bare literals
+    in corporate_actions and tax_reporting. Tuning the constant -- e.g. for
+    fractional shares -- would have moved ledger reconciliation while leaving
+    both tax surfaces on the old value.
+
+    Source-level because the invariant is "there is exactly one definition",
+    which no runtime call can observe.
+    """
+    import re
+    from pathlib import Path
+
+    from assistant.portfolio_ledger import SHARE_TOLERANCE
+
+    root = Path(__file__).resolve().parent.parent
+    offenders = []
+    for module in ("assistant/corporate_actions.py", "assistant/tax_reporting.py"):
+        source = (root / module).read_text(encoding="utf-8")
+        for number, line in enumerate(source.splitlines(), start=1):
+            if re.search(r'Decimal\(\s*["\']0\.0{5,}1["\']\s*\)', line):
+                offenders.append(f"{module}:{number}: {line.strip()}")
+
+    assert not offenders, (
+        "share tolerance must come from portfolio_ledger.SHARE_TOLERANCE, not "
+        f"a local literal: {offenders}"
+    )
+    assert str(SHARE_TOLERANCE) == "1E-8"

@@ -283,20 +283,17 @@ frozen commit → run all 5 drills inside it → let the 60-session clock run.
 From here on, the machine collects evidence while development continues
 un-deployed under model-2 discipline. Note: the owner's informal paper trading
 does not substitute for formal epoch evidence. **Owner ops/UI hygiene
-(2026-08-05, accepted after independent review on
-`codex/review-ops-hardening-ui-20260805`; PR #157 merged):** entry-point
-`resolve_policy_path()`, CLI/UI wiring so `my_policy.json` loads without
-retyping, task self-heal + battery-guard clearing, and UI chrome rename —
-does **not** reorder the roadmap. Claude's post-merge CROPS-003 follow-up
-(`6f9a82a`) was independently reviewed 2026-08-06: AST invariant accepted
-after shape tightening; live host showed duplicate long-runners despite
-`IgnoreNew`, so a process-level singleton was added in development (deploy
-deferred mid-epoch). Open owner decision remains: epoch lineage is still
-bound to `default_policy.json` while live trading uses `my_policy.json`;
-do not deploy mid-epoch under option B. See
-`docs/REVIEW_2026-08-05_OPS_HARDENING_UI.md`,
-`docs/REVIEW_2026-08-06_CROPS003_OPS_FOLLOWUP.md`, and
-`docs/SESSION_HANDOFF.md` §2.
+(2026-08-05 → 2026-08-06):** policy-path resolution, task self-heal,
+singleton, and UI chrome are merged (PRs #157–#159). **Epoch re-bind
+executed 2026-08-06:** `paper-epoch-001` closed; `paper-epoch-002` active on
+frozen commit `9a91498` bound to `my_policy.json`. **Full-project sweep
+(2026-08-06, PR #160 / `87593f8`):** independently accepted after correction
+— FPS-001/004 evidence-integrity fixes confirmed; residual
+`tax_ledger_with_coverage` share conversion closed (GFPS-001); FPS-003
+intermittent UI chrome left open. Does **not** reorder the roadmap. See
+`docs/REVIEW_2026-08-06_FULL_PROJECT_SWEEP.md`,
+`docs/REVIEW_2026-08-06_FULL_PROJECT_SWEEP_INDEPENDENT.md`, and
+`docs/SESSION_HANDOFF.md`.
 (from 2026-08-03) already accumulates real order/telemetry/ledger data before
 any formal epoch; that data informs execution realism but does not count toward
 the mandate's 60-session minimum, which requires one immutable epoch.

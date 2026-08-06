@@ -12,6 +12,7 @@ from decimal import Decimal
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from assistant.money import to_decimal
 from assistant.performance import Distribution
 from assistant.share_reconciliation import detect_split_like_share_mismatch
 from assistant.portfolio_ledger import (
@@ -91,8 +92,20 @@ def confirmed_distributions(
             )
             continue
         try:
-            per_share = float(Decimal(str(metadata["amount_per_share"])))
-            gross_cash = float(abs(Decimal(str(posting["amount"]))))
+            # to_decimal, not Decimal(str(...)): a malformed value raises
+            # decimal.InvalidOperation, which is an ArithmeticError and so
+            # escapes the `except (ValueError, KeyError)` below -- turning
+            # this module's documented "reported as unavailable" contract
+            # into an uncaught traceback in the UI and CLI callers of
+            # tax_ledger_with_coverage(). to_decimal normalizes that to
+            # ValueError and additionally rejects NaN/Infinity, which are
+            # legal Decimal literals.
+            per_share = float(
+                to_decimal(metadata["amount_per_share"], name="amount_per_share")
+            )
+            gross_cash = float(
+                abs(to_decimal(posting["amount"], name="dividend amount"))
+            )
             result.append(
                 Distribution(
                     ticker=action_ticker,
@@ -131,10 +144,21 @@ def confirmed_splits(store: AssistantStore) -> list[Split]:
         account = str(posting.get("account") or "")
         if not account.startswith(SECURITY_ACCOUNT_PREFIX):
             continue
+        # A malformed ratio must NOT be skipped: dropping a split silently
+        # would leave every later share count and cost basis wrong. Raising
+        # is the fail-closed direction -- tax_ledger_with_coverage() catches
+        # ValueError and reports the ledger as incomplete, which is exactly
+        # the designed degradation. to_decimal also folds the missing-key
+        # case into the same ValueError instead of a bare KeyError.
         result.append(
             Split(
                 ticker=account[len(SECURITY_ACCOUNT_PREFIX) :],
-                ratio=float(Decimal(str(metadata["ratio"]))),
+                ratio=float(
+                    to_decimal(
+                        metadata.get("ratio"),
+                        name=f"split ratio for {posting['external_id']}",
+                    )
+                ),
                 at=_parse_at(posting["occurred_at"]),
                 action_id=str(posting["external_id"]),
             )

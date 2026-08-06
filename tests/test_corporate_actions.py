@@ -5,8 +5,13 @@ from datetime import date
 from types import SimpleNamespace
 
 import pandas as pd
+import pytest
 
-from assistant.corporate_actions import confirmed_distributions
+from assistant.corporate_actions import confirmed_distributions, confirmed_splits
+from assistant.portfolio_ledger import (
+    ACCOUNT_DIVIDEND_INCOME,
+    SECURITY_ACCOUNT_PREFIX,
+)
 from assistant.portfolio_ledger import record_dividend
 from assistant.storage import AssistantStore
 from data.corporate_actions import (
@@ -104,3 +109,123 @@ def test_confirmed_dividends_convert_to_performance_distributions(tmp_path):
     assert distributions[0].ex_at.tzinfo is not None
     assert unavailable[0]["ticker"] == "KO"
     assert "lacks" in unavailable[0]["reason"]
+
+
+class _PostingStore:
+    """Minimal store exposing only what these readers consume.
+
+    Deliberately NOT built through record_dividend()/record_split(): those
+    writers emit canonical decimal text, so they cannot produce the input
+    this test is about. The malformed row stands in for a hand-edited
+    journal, a future importer, or storage corruption -- exactly the cases
+    the module's docstring promises to report rather than crash on.
+    """
+
+    def __init__(self, postings):
+        self._postings = postings
+
+    def list_journal_postings(self):
+        return self._postings
+
+
+def _dividend_posting(*, amount_per_share="0.25", amount="-5.00"):
+    return {
+        "transaction_id": "txn-div",
+        "source": "corporate_action",
+        "account": ACCOUNT_DIVIDEND_INCOME,
+        "external_id": "dividend:aapl-1",
+        "amount": amount,
+        "occurred_at": "2026-08-01T14:00:00+00:00",
+        "metadata": {
+            "ticker": "AAPL",
+            "ex_date": "2026-07-10",
+            "amount_per_share": amount_per_share,
+        },
+    }
+
+
+def _split_posting(metadata):
+    return {
+        "transaction_id": "txn-split",
+        "source": "corporate_action",
+        "account": f"{SECURITY_ACCOUNT_PREFIX}AAPL",
+        "external_id": "split:aapl-1",
+        "occurred_at": "2026-08-01T14:00:00+00:00",
+        "metadata": metadata,
+    }
+
+
+@pytest.mark.parametrize(
+    "posting",
+    [
+        _dividend_posting(amount_per_share="N/A"),
+        _dividend_posting(amount="not-a-number"),
+        # NaN and Infinity are LEGAL Decimal literals, so they survive the
+        # conversion; to_decimal rejects them for non-finiteness instead.
+        _dividend_posting(amount_per_share="NaN"),
+        _dividend_posting(amount_per_share="Infinity"),
+    ],
+    ids=["bad_per_share", "bad_gross_amount", "nan_per_share", "inf_per_share"],
+)
+def test_malformed_dividend_decimals_are_reported_unavailable_not_raised(posting):
+    """`Decimal(str(x))` raises decimal.InvalidOperation on malformed text.
+
+    InvalidOperation is an ArithmeticError, NOT a ValueError, so it slipped
+    straight through this function's `except (ValueError, KeyError)` and
+    surfaced as an uncaught traceback in the Streamlit and CLI callers of
+    tax_ledger_with_coverage(). assistant.money.to_decimal exists to
+    normalize exactly that.
+    """
+    distributions, unavailable = confirmed_distributions(_PostingStore([posting]))
+
+    assert distributions == []
+    assert len(unavailable) == 1
+    assert unavailable[0]["ticker"] == "AAPL"
+    assert "invalid confirmed dividend metadata" in unavailable[0]["reason"]
+
+
+def test_empty_amount_per_share_is_caught_by_the_missing_field_guard():
+    """Not the same path: an empty string is falsy, so it never reaches the
+    decimal conversion. Pinned so the two reasons stay distinguishable."""
+    distributions, unavailable = confirmed_distributions(
+        _PostingStore([_dividend_posting(amount_per_share="")])
+    )
+    assert distributions == []
+    assert "lacks ex_date or amount_per_share" in unavailable[0]["reason"]
+
+
+def test_valid_dividend_posting_still_converts():
+    """Guards against 'fixing' the above by rejecting everything."""
+    distributions, unavailable = confirmed_distributions(
+        _PostingStore([_dividend_posting()])
+    )
+    assert unavailable == []
+    assert [d.amount_per_share for d in distributions] == [0.25]
+
+
+@pytest.mark.parametrize(
+    "metadata",
+    [
+        {"corporate_action": "split", "ratio": "four-for-one"},
+        {"corporate_action": "split"},
+    ],
+    ids=["malformed_ratio", "missing_ratio"],
+)
+def test_unreadable_split_ratio_fails_closed_as_valueerror(metadata):
+    """A split whose ratio cannot be read must NOT be silently skipped --
+    dropping it would leave every later share count and cost basis wrong.
+
+    Raising is the fail-closed direction: tax_ledger_with_coverage()
+    catches ValueError and reports the ledger incomplete. The bug was that
+    a malformed (as opposed to missing) ratio raised InvalidOperation,
+    which that caller does not catch.
+    """
+    with pytest.raises(ValueError):
+        confirmed_splits(_PostingStore([_split_posting(metadata)]))
+
+
+def test_valid_split_posting_still_converts():
+    splits = confirmed_splits(
+        _PostingStore([_split_posting({"corporate_action": "split", "ratio": "4"})])
+    )
+    assert [s.ratio for s in splits] == [4.0]

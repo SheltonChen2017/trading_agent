@@ -32,6 +32,7 @@ from ml.evaluation import (
     log_loss,
     mean_absolute_error,
     pinball_loss,
+    usable_pair_count,
 )
 from ml.experiment_contracts import ExperimentSpec
 from ml.hashing import hash_payload
@@ -484,7 +485,17 @@ def _slice_metrics(frame: pd.DataFrame, candidate: str) -> dict[str, Any]:
                 if classifier
                 else mean_absolute_error(actual, predicted)
             )
-            groups[str(value)] = {"event_count": int(len(group)), "primary_metric": metric}
+            # event_count is the slice's size; scored_event_count is what the
+            # metric actually used. brier_score/mean_absolute_error drop
+            # non-finite pairs, so reporting only the former lets a slice the
+            # model mostly FAILED to predict display a strong score over its
+            # few easy survivors. ml/monitoring_reports.py's slice reporting
+            # already publishes both; this one did not.
+            groups[str(value)] = {
+                "event_count": int(len(group)),
+                "scored_event_count": usable_pair_count(actual, predicted),
+                "primary_metric": metric,
+            }
         result[dimension] = groups
     return result
 

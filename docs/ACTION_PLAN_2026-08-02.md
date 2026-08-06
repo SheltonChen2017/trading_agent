@@ -360,7 +360,7 @@ item's definition of done.
 | # | Item | State |
 |---|---|---|
 | GR-7a | **Annual tax reporting export** — realized gains by lot, short/long-term split, wash-sale flags, accountant-readable CSV/JSON, coverage honesty | **COMPLETE AFTER INDEPENDENT REVIEW 2026-08-05.** Pure reporting layer over `assistant/tax_lots.py`; only live `source="alpaca"` snapshots may verify coverage; sample/manual portfolios stay unverified. |
-| GR-7b | **Idle-cash / mandate reporting** — cash position measured against the approved mandate | open (small) |
+| GR-7b | **Idle-cash / mandate reporting** — cash position measured against the approved mandate | **IMPLEMENTED 2026-08-06, AWAITING INDEPENDENT REVIEW.** `assistant/cash_reporting.py` (pure, read-only), CLI `idle-cash`, and a Reports-page panel. Measures cash against BOTH policy bounds (`min_cash_reserve_pct` floor, `max_total_exposure_pct` ceiling, and which one binds) and the mandate's volatility objective — the mandate has no cash field, so the bridge is the volatility the invested fraction would need to carry to reach the floor. Surfaces that the policy ceiling may make the mandate structurally unreachable regardless of cash. Refuses on non-positive or non-finite equity; an unmeasured volatility is reported absent, never defaulted to zero. |
 | GR-7c | **Performance attribution** — decompose return into allocation/selection/timing/cost/tax rather than the aggregate `performance.py` already reports | open |
 | GR-7d | **Rebalance-to-target proposals** (+ the `docs/reference/ALLOCATION_SERVICE_DESIGN.md` fold-in) | **BLOCKED ON AN OWNER DECISION, not on code** |
 

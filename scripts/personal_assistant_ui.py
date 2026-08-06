@@ -3629,6 +3629,89 @@ if page == "Reports":
                 key="tax_report_json",
             )
 
+    # GR-7b. Renders on load rather than behind a button: idle cash is a
+    # standing condition, not a report you ask for, and the whole point is
+    # that it was previously invisible. No button here can place a trade.
+    with st.expander("Idle cash vs policy and mandate", expanded=True):
+        from assistant.cash_reporting import CashReportError, evaluate_idle_cash
+        from assistant.mandate import load_mandate as _load_mandate
+
+        # _load_packet is cached, so this reuses the SAME base account
+        # snapshot every other page in this rerun sees rather than issuing a
+        # second broker fetch (the invariant _load_base_packet exists to
+        # protect). include_events=False: earnings dates are irrelevant to a
+        # cash measurement and would be a live call for nothing.
+        try:
+            _cash_policy, _cash_packet = _load_packet(policy_path, False)
+            _cash = evaluate_idle_cash(
+                _cash_packet.portfolio, _cash_policy, _load_mandate()
+            )
+        except CashReportError as _cash_error:
+            st.warning(f"Idle-cash report unavailable: {_cash_error}")
+        else:
+            _totals = _cash["totals"]
+            _bounds = _cash["policy_bounds"]
+            _objective = _cash["mandate_objective"]
+
+            if not _cash["exact_numerics"]:
+                st.caption(
+                    "Figures derive from display-rounded values rather than "
+                    "exact broker decimals."
+                )
+            _left, _middle, _right = st.columns(3)
+            _left.metric("Cash", f"${float(_totals['cash']):,.0f}", f"{_totals['cash_pct']}%")
+            _middle.metric(
+                "Invested", f"${float(_totals['invested']):,.0f}", f"{_totals['invested_pct']}%"
+            )
+            _right.metric(
+                "Policy headroom", f"${float(_bounds['policy_headroom']):,.0f}"
+            )
+
+            if _bounds["reserve_floor_breached"]:
+                st.error(
+                    "Cash is BELOW the policy reserve floor of "
+                    f"${float(_bounds['reserve_floor']):,.0f}."
+                )
+            st.caption(
+                f"Headroom is limited by **{_bounds['binding_constraint'].replace('_', ' ')}** "
+                "— the room the policy leaves, not a suggestion to use it."
+            )
+
+            _band = (
+                f"{_objective['target_annualized_volatility_min_pct']}–"
+                f"{_objective['target_annualized_volatility_max_pct']}%"
+            )
+            _measured = _objective["measured"]
+            if _measured["available"]:
+                _verdict = "inside" if _measured["within_mandate_band"] else "outside"
+                st.write(
+                    f"Mandate volatility band {_band}: measured "
+                    f"{_measured['annualized_volatility_pct']}% is **{_verdict}** the band."
+                )
+            else:
+                st.write(
+                    f"Mandate volatility band {_band}: "
+                    f"{_measured['unavailable_reason']}."
+                )
+            if _objective["required_invested_volatility_pct"] is not None:
+                st.write(
+                    f"At {_totals['invested_pct']}% invested, holdings would need "
+                    f"**{_objective['required_invested_volatility_pct']}%** annualized "
+                    "volatility to reach the mandate floor"
+                    + (
+                        f" — and **{_objective['required_invested_volatility_at_policy_ceiling_pct']}%** "
+                        "even at the policy's own exposure ceiling."
+                        if _objective["required_invested_volatility_at_policy_ceiling_pct"]
+                        else "."
+                    )
+                )
+            else:
+                st.write(
+                    "Required-volatility figure unavailable: "
+                    f"{_objective['required_unavailable_reason']}."
+                )
+            st.caption(_objective["required_assumption"])
+
 
 # ---------------------------------------------------------------------------
 # Operations -- GR-5's single operator dashboard. STRICTLY READ-ONLY except

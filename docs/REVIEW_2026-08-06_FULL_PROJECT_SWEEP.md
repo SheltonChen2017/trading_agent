@@ -12,10 +12,18 @@ Python across nine packages, plus the test suite.
 
 ## 1. Headline
 
-No P0. No P1. **One confirmed P2 defect, fixed.** One P3 test-hygiene
-issue, fixed. One P2 test-reliability issue **open and characterized but
-not root-caused** (§4). Several candidates investigated and classified as
-false alarms (§5) — recorded so the next reviewer does not re-derive them.
+No P0. No P1. **Two confirmed P2 defects, both fixed** — one in the
+corporate-action reader (FPS-001), one in ML slice reporting (FPS-004).
+One P3 test-hygiene issue, fixed (FPS-002). One P2 test-reliability issue
+**open and characterized but not root-caused** (FPS-003, §4). Several
+candidates investigated and classified as false alarms (§5) — recorded so
+the next reviewer does not re-derive them.
+
+Both P2s are evidence-integrity defects rather than execution defects:
+neither could submit, size, or mis-price an order. Each made a *report*
+claim more than the data behind it supported — the first by crashing where
+it promised to degrade, the second by printing a sample count the metric
+had not actually used.
 
 The codebase is in materially better shape than the commit count suggests.
 Repeated adversarial review rounds have left dense, accurate safety

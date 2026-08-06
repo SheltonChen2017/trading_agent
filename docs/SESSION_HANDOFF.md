@@ -144,14 +144,60 @@ State after the epoch swap (§2a), all four tasks enabled:
   denied". Use `C:\git\epoch_swap_tasks_elevated.ps1 -Action Disable|Enable`
   (machine-local, not in the repo).
 
+## 4a. Full-project review (2026-08-06, later the same day)
+
+Owner asked for a module-by-module sweep — the first since 2026-07-30, and
+**378 commits** of ~62K production lines. Branch
+`user/claude/full-project-sweep-20260806`, commit `87593f8`, pushed; PR not
+opened. Ledger: `docs/REVIEW_2026-08-06_FULL_PROJECT_SWEEP.md`.
+
+| ID | Pri | Result |
+|---|---|---|
+| FPS-001 | P2 | **Fixed.** `assistant/corporate_actions.py` bypassed `money.to_decimal` at three sites; `decimal.InvalidOperation` is an `ArithmeticError`, not a `ValueError`, so malformed journal metadata escaped both handlers and would traceback in the Streamlit/CLI callers of `tax_ledger_with_coverage` instead of reporting "unavailable". Malformed/missing split ratio now fails closed. |
+| FPS-004 | P2 | **Fixed.** `ml/earnings_experiments._slice_metrics` printed `event_count = len(group)` beside metrics that silently drop non-finite pairs, so a slice the model mostly failed on showed a strong score over its few survivors. Added `usable_pair_count()` + `scored_event_count`. |
+| FPS-002 | P3 | **Fixed.** A permanently-skipped parametrized case in `test_ml_experiments.py`; the case passes as written. Suite skip count 1 → 0. |
+| FPS-003 | P2 | **OPEN.** `test_ui_chrome.py::test_app_title_is_trading_assistant` failed with `RuntimeError` on the pre-existing `main` baseline. **Intermittent, not order-dependent** — passes alone, with all 46 UI tests, and after the credential-mutating broker modules; did not reproduce on two later full runs. Disproven: the 3s `AppTest` default (already 60), live Alpaca calls (conftest clears creds), credential leakage from `test_alpaca_broker.py`. Not yet ruled out: `st.cache_data` global state, load-related timeout. **A single green suite is not evidence it is gone.** |
+
+Both P2s are evidence-integrity defects, not execution defects — neither
+could submit, size, or mis-price an order.
+
+Reverse mutation recorded for both code fixes. Coverage was class-driven,
+not line-by-line; §7 of the review names what was deliberately **not**
+cleared (`ml/databento_source`/`_authoritative` bulk, `run_ml_shadow`, the
+one-off research scripts, `ai_advisor`, `platform_readiness`,
+`risk_copilot`, `strategy_proposals`, `execution_telemetry`,
+`alert_delivery`, most of `storage.py`).
+
+## 4b. Owner decision recorded: `require_earnings_data` stays `false`
+
+Measured, not assumed, against the account's real holdings on 2026-08-06:
+the feed resolves 5/7 (AAPL, AMZN, AVGO, MSFT, NFLX) and fails on **NVDL**
+and **BBB**. Those two failures are structurally different and the policy
+**cannot distinguish them**: NVDL is a leveraged ETF with no earnings event
+at all, while BBB is a small cap whose real earnings the provider does not
+carry. Setting the flag `true` would permanently block every ETF buy —
+including the SOXX/SOXL-style strategy — while correctly blocking BBB.
+
+Leave it `false` until "not a single-name equity" is separable from
+"earnings exist but are not visible". Residual exposure is BBB-like names:
+real earnings, invisible to the feed, silently unchecked. Risk-reducing
+SELLs are exempt either way.
+
 ## 5. Validation (exact final tree)
+
+Ops/singleton round (`a947146`):
 
 - Focused: **36 passed** (singleton 6, policy path / UI chrome / task
   resilience 30).
-- Full suite: **2876 passed / 1 skipped / 25 warnings** (588s) — one more
-  than the Codex tree, which is the added CCCROPS-001 regression test.
+- Full suite: **2876 passed / 1 skipped / 25 warnings** (588s).
+
+Full-project sweep (`87593f8`, later the same day):
+
+- Full suite: **2888 passed / 0 failed / 0 skipped / 25 warnings** (450s).
+  Skip count reaching zero is FPS-002.
 - `compileall` clean; `git diff --check` clean.
-- No funded-account contact. Singleton not deployed to operational checkout.
+- No funded-account contact. Nothing from either round is deployed; the
+  operational checkout stays frozen at `9a91498`.
 
 ## 6. What is next
 
@@ -168,6 +214,13 @@ State after the epoch swap (§2a), all four tasks enabled:
 5. The operational checkout is pinned at `9a91498` again. Development
    continues un-deployed; the next deploy waits for the next epoch
    boundary or an explicit owner authorization.
+6. **Open PR for `user/claude/full-project-sweep-20260806` (`87593f8`)** —
+   pushed, not merged. `gh` cannot create PRs on this repo (Enterprise
+   Managed User), so the owner opens it.
+7. **FPS-003 remains open** (§4a). Because it is intermittent, the way to
+   make progress is to capture the full traceback the next time a full
+   suite fails — the original baseline run was piped through `tail`, which
+   discarded it. Do not treat a green suite as closure.
 
 ## 7. Non-negotiable boundaries
 

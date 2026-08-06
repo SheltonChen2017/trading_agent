@@ -10,6 +10,8 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
+from assistant.money import to_decimal
+
 
 def detect_split_like_share_mismatch(
     recorded_shares: Decimal | int | str,
@@ -22,9 +24,23 @@ def detect_split_like_share_mismatch(
     This is detection, not confirmation. A matching result must still refuse
     the stale intent or remain a reconciliation mismatch until the corporate
     action is independently confirmed.
+
+    Conversion goes through ``to_decimal`` for the reason FPS-001/GFPS-001
+    established, plus one specific to Decimal: raw ``Decimal(str(x))`` accepts
+    the literals "NaN" and "Infinity", and **ordering comparisons on a Decimal
+    NaN RAISE ``InvalidOperation``** rather than returning False the way float
+    NaN does. So `recorded <= 0` below is not the safe guard it looks like.
+    ``to_decimal`` rejects non-finite and malformed input up front as a plain
+    ``ValueError``.
+
+    The single live caller (execution validation) already passes validated
+    Decimals inside a try/except, so this is defense in depth -- but the
+    signature invites ``str``, and this helper is re-exported by
+    ``assistant.corporate_actions`` for presentation, which is exactly the
+    surface where GFPS-001 was a real traceback.
     """
-    recorded = Decimal(str(recorded_shares))
-    broker = Decimal(str(broker_shares))
+    recorded = to_decimal(recorded_shares, name="recorded_shares")
+    broker = to_decimal(broker_shares, name="broker_shares")
     if recorded <= 0 or broker <= 0 or recorded == broker:
         return None
     larger, smaller, direction = (

@@ -18,6 +18,7 @@ from assistant.share_reconciliation import detect_split_like_share_mismatch
 from assistant.portfolio_ledger import (
     ACCOUNT_DIVIDEND_INCOME,
     SECURITY_ACCOUNT_PREFIX,
+    SHARE_TOLERANCE,
 )
 from assistant.storage import AssistantStore
 from assistant.tax_lots import Fill, LotEvent, Split, TaxLotError, build_ledger
@@ -239,9 +240,14 @@ def tax_ledger_with_coverage(
                 "reason": str(exc),
                 "tickers": details,
             }
-        matched = (
-            abs(broker_shares - ledger_shares) <= Decimal("0.00000001")
-        )
+        # SHARE_TOLERANCE, not a bare literal: portfolio_ledger owns this
+        # rule and PUBLISHES its value into the durable reconciliation record
+        # ("tolerances.shares"). A local copy means tuning the constant --
+        # e.g. for fractional shares -- would silently move ledger
+        # reconciliation while leaving this coverage gate on the old value,
+        # so the tax surface would disagree with the record that declares the
+        # tolerance.
+        matched = abs(broker_shares - ledger_shares) <= SHARE_TOLERANCE
         details[ticker] = {
             "broker_shares": str(broker_shares),
             "ledger_shares": str(ledger_shares),

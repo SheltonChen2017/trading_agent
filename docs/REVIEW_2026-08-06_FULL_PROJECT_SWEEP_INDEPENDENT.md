@@ -59,3 +59,56 @@ Review machine: Windows, Python 3.13.
 - `compileall` clean; `git diff --check` clean.
 
 No funded-account contact. Operational checkout stays at `9a91498`.
+
+## 6. Claude counter-review of this review
+
+All three Grok corrections **accepted**. GFPS-001 was verified rather than
+taken on inspection: with only the conversion swapped back to
+`Decimal(str(...))` and the new `except ValueError` guard left intact, the
+added test fails with `InvalidOperation` at the conversion line — so
+`to_decimal` is the load-bearing part, not the guard. Restored green.
+
+GFPS-001 is a fair hit. Claude *did* read those two lines during the sweep
+and reasoned about NaN — correctly concluding NaN fails closed, since
+`Decimal('NaN')` compares False and yields `matched=False`. What Claude did
+not consider was non-numeric input, which is the other half of the same
+class. Incomplete analysis, not wrong analysis. Worth noting that
+`tax_reporting.py` already used `to_decimal` for the identical conversion,
+so `corporate_actions` was the outlier and Grok's fix restores an existing
+house pattern rather than inventing one.
+
+GFPS-002 is correct: `monitoring_reports.py` does not publish a
+scored-vs-raw denominator, because it does not drop anything — it lets a
+NaN propagate visibly into the MAE. The review document said this
+accurately; the code comment did not, and the comment is what a future
+reader meets first.
+
+### Residual findings from this counter-review
+
+| ID | Priority | Status | Issue | Correction |
+|---|---|---|---|---|
+| CFPS-001 | P3 | Resolved | Same escape class as FPS-001/GFPS-001, one module further out and **missed by both passes**: `share_reconciliation.detect_split_like_share_mismatch` converts with raw `Decimal(str(...))` on parameters whose type hints explicitly accept `str`. It raises `InvalidOperation` on non-numeric text, NaN, and Infinity. The sharp part is Decimal-specific: `Decimal(str(x))` **accepts the literals "NaN"/"Infinity"**, and **ordering comparisons on a Decimal NaN RAISE** rather than returning False as float does — so the `recorded <= 0` guard inside the function is not the safe check it looks like. **Not currently reachable**: the one live caller (execution validation) passes already-validated Decimals inside a `try/except Exception` that fails closed. But the module is re-exported by `corporate_actions` explicitly "for corporate-action presentation" — the exact surface where GFPS-001 was a real traceback. | `to_decimal` for both parameters. Regression test pins the Decimal-NaN-raises trap as an executable fact. |
+| CFPS-002 | P3 | Resolved | The broker-vs-ledger share tolerance was defined **three times**: `SHARE_TOLERANCE` in `portfolio_ledger` — which *publishes* its value into the durable reconciliation record as `tolerances.shares` — plus bare `Decimal("0.00000001")` literals in `corporate_actions` and `tax_reporting`. Tuning the constant (e.g. for fractional shares) would move ledger reconciliation while silently leaving both tax surfaces on the old value, so the tax coverage gate would disagree with the record that declares the tolerance. CLAUDE.md §8: consolidate an authoritative rule so it cannot drift. | Both literals now import `SHARE_TOLERANCE`. Source-level test asserts no local literal returns, since "exactly one definition" is not runtime-observable. |
+
+Both are P3 and neither is a live bug — same classification Claude applied
+to FPS-001 and Grok applied to GFPS-001, all four being defense-in-depth
+against inputs the current writers cannot produce. Recorded so the pattern
+is visible: this is now the **third** consecutive pass to find another
+`Decimal(str(...))` on a share or money field. The remaining raw sites
+(`alpaca_broker`, `execution_telemetry`, `portfolio_ledger`,
+`databento_authoritative`) are each already wrapped in their own
+`try/except` conversion helpers and were checked; they are not part of this
+class.
+
+Mutation results: reverting CFPS-001 fails
+`test_share_mismatch_detection_rejects_non_finite_and_malformed_input`
+(`InvalidOperation`); reverting CFPS-002 fails
+`test_share_match_tolerance_has_a_single_definition`. Both restored green.
+
+Validation on the exact counter-reviewed tree: **2892 passed / 0 failed /
+0 skipped / 25 warnings** (621s). `compileall` clean; `git diff --check`
+clean. Grok's tree was 2889; the three added tests account for the
+difference.
+
+FPS-003 remains open and unchanged. Grok correctly declined to re-root-cause
+it rather than closing it on a green run.

@@ -169,6 +169,22 @@ Both original P2s remain evidence-integrity defects, not execution defects.
 §5 false alarms and the `require_earnings_data=false` recommendation were
 re-checked and accepted.
 
+Claude then counter-reviewed the independent pass. All three GFPS
+corrections **accepted**; GFPS-001 was mutation-verified rather than taken
+on inspection (swapping only the conversion back, with the new guard left
+intact, still fails — so `to_decimal` is the load-bearing part).
+
+| ID | Pri | Result |
+|---|---|---|
+| CFPS-001 | P3 | **Fixed.** Same escape class one module further out, missed by BOTH passes: `share_reconciliation.detect_split_like_share_mismatch` used raw `Decimal(str(...))` on parameters typed to accept `str`. Decimal-specific sharp edge: `Decimal(str(x))` accepts "NaN"/"Infinity", and **ordering comparisons on a Decimal NaN RAISE** instead of returning False like float — so the function's own `recorded <= 0` guard is not safe. Not currently reachable (its one live caller passes validated Decimals inside a fail-closed try/except), but it is re-exported for presentation, which is exactly where GFPS-001 was a real traceback. |
+| CFPS-002 | P3 | **Fixed.** The broker-vs-ledger share tolerance was defined three times — `SHARE_TOLERANCE` in `portfolio_ledger` (which publishes it into the durable reconciliation record as `tolerances.shares`) plus bare literals in `corporate_actions` and `tax_reporting`. Tuning it would have moved ledger reconciliation while leaving both tax surfaces on the old value. Now a single definition, pinned by a source-level test. |
+
+**Pattern worth watching:** this is the *third consecutive pass* to find
+another raw `Decimal(str(...))` on a share or money field. The remaining
+raw sites (`alpaca_broker`, `execution_telemetry`, `portfolio_ledger`,
+`databento_authoritative`) were checked and are each already inside their
+own try/except conversion helpers — not part of this class.
+
 ## 4b. Owner decision recorded: `require_earnings_data` stays `false`
 
 Measured, not assumed, against the account's real holdings on 2026-08-06:
@@ -199,7 +215,7 @@ Full-project sweep (`87593f8`, Claude):
 Independent FPS review (this branch, after GFPS-001..003):
 
 - Focused related modules: **123 passed**.
-- Full suite: **2889 passed / 0 skipped / 25 warnings**.
+- Full suite: **2892 passed / 0 failed / 0 skipped / 25 warnings** (621s) after Claude's counter-review; Grok's tree was 2889.
 - `compileall` clean; `git diff --check` clean.
 - No funded-account contact; nothing deployed mid-epoch.
 

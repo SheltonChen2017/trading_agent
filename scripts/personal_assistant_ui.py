@@ -659,6 +659,37 @@ def _load_packet(policy_path: str, include_events: bool):
     return policy, enriched
 
 
+@st.cache_data(ttl=_PACKET_CACHE_TTL_SECONDS)
+def _load_readonly_portfolio():
+    """Account snapshot for STRICTLY READ-ONLY reporting surfaces.
+
+    Two constraints pull in opposite directions and both are real:
+
+    * `_load_base_packet()` calls `build_decision_packet(store=_store())`,
+      which records GR-4 `data_provider_fetches` evidence. A reporting page
+      must not write, so those surfaces cannot use it (independent review,
+      2026-08-06, GR7BREV-002 -- the same defect GR-7a's tax Build had).
+    * But dropping the shared cache entirely reintroduces a live broker
+      call on EVERY rerun of the page, and lets Reports disagree with
+      Briefing about the same account in the same session -- precisely the
+      invariant `_load_base_packet` was created to protect after two tabs
+      were once found showing two different snapshots.
+
+    Cached AND store-free satisfies both. It shares the packet TTL and is
+    cleared by the same `st.cache_data.clear()` the Refresh buttons call,
+    so a deliberate refresh still re-fetches.
+    """
+    from assistant.context_builder import build_portfolio_snapshot
+    from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
+    from execution.alpaca_broker import is_configured
+
+    if is_configured():
+        return build_portfolio_snapshot_from_alpaca()
+    return build_portfolio_snapshot(
+        SAMPLE_POSITIONS, SAMPLE_CASH, source="manual", account_mode="manual"
+    )
+
+
 # Coarse rounding granularity for cash/equity/buying_power in the
 # portfolio-context payload (GPT review, 2026-07-31) -- see
 # _portfolio_context_payload()'s docstring for why these are banded
@@ -3628,6 +3659,97 @@ if page == "Reports":
                 mime="application/json",
                 key="tax_report_json",
             )
+
+    # GR-7b. Renders on load rather than behind a button: idle cash is a
+    # standing condition, not a report you ask for, and the whole point is
+    # that it was previously invisible. No button here can place a trade.
+    # Portfolio comes from a live Alpaca snapshot (or sample) — never
+    # _load_packet, which records GR-4 provider-fetch rows and would break
+    # this page's read-only contract the same way tax Build used to.
+    with st.expander("Idle cash vs policy and mandate", expanded=True):
+        from assistant.cash_reporting import CashReportError, evaluate_idle_cash
+        from assistant.mandate import load_mandate as _load_mandate
+
+        try:
+            _cash_policy = load_policy(policy_path)
+            # Cached and store-free: read-only like the review required,
+            # without a live broker call on every rerun of this page or a
+            # snapshot that disagrees with Briefing. See
+            # _load_readonly_portfolio().
+            _cash_portfolio = _load_readonly_portfolio()
+            _cash = evaluate_idle_cash(
+                _cash_portfolio, _cash_policy, _load_mandate()
+            )
+        except CashReportError as _cash_error:
+            st.warning(f"Idle-cash report unavailable: {_cash_error}")
+        except Exception as _cash_error:
+            st.warning(
+                f"Idle-cash report unavailable ({type(_cash_error).__name__}): "
+                f"{_cash_error}"
+            )
+        else:
+            _totals = _cash["totals"]
+            _bounds = _cash["policy_bounds"]
+            _objective = _cash["mandate_objective"]
+
+            if not _cash["exact_numerics"]:
+                st.caption(
+                    "Figures derive from display-rounded values rather than "
+                    "exact broker decimals."
+                )
+            _left, _middle, _right = st.columns(3)
+            _left.metric("Cash", f"${float(_totals['cash']):,.0f}", f"{_totals['cash_pct']}%")
+            _middle.metric(
+                "Invested", f"${float(_totals['invested']):,.0f}", f"{_totals['invested_pct']}%"
+            )
+            _right.metric(
+                "Policy headroom", f"${float(_bounds['policy_headroom']):,.0f}"
+            )
+
+            if _bounds["reserve_floor_breached"]:
+                st.error(
+                    "Cash is BELOW the policy reserve floor of "
+                    f"${float(_bounds['reserve_floor']):,.0f}."
+                )
+            st.caption(
+                f"Headroom is limited by **{_bounds['binding_constraint'].replace('_', ' ')}** "
+                "— the room the policy leaves, not a suggestion to use it."
+            )
+
+            _band = (
+                f"{_objective['target_annualized_volatility_min_pct']}–"
+                f"{_objective['target_annualized_volatility_max_pct']}%"
+            )
+            _measured = _objective["measured"]
+            if _measured["available"]:
+                _verdict = "inside" if _measured["within_mandate_band"] else "outside"
+                st.write(
+                    f"Mandate volatility band {_band}: measured "
+                    f"{_measured['annualized_volatility_pct']}% is **{_verdict}** the band."
+                )
+            else:
+                st.write(
+                    f"Mandate volatility band {_band}: "
+                    f"{_measured['unavailable_reason']}."
+                )
+            if _objective["required_invested_volatility_pct"] is not None:
+                st.write(
+                    f"At {_totals['invested_pct']}% invested, holdings would need "
+                    f"**{_objective['required_invested_volatility_pct']}%** annualized "
+                    "volatility to reach the mandate floor"
+                    + (
+                        f" — and **{_objective['required_invested_volatility_at_policy_ceiling_pct']}%** "
+                        "even at the policy's own exposure ceiling."
+                        if _objective["required_invested_volatility_at_policy_ceiling_pct"]
+                        else "."
+                    )
+                )
+            else:
+                st.write(
+                    "Required-volatility figure unavailable: "
+                    f"{_objective['required_unavailable_reason']}."
+                )
+            st.caption(_objective["required_assumption"])
 
 
 # ---------------------------------------------------------------------------

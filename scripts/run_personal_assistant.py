@@ -22,7 +22,12 @@ from assistant.llm.anthropic_provider import (
 from assistant.llm.committee_service import run_committee_review_and_record
 from assistant.platform_readiness import BLOCKED, build_platform_readiness
 from assistant.runtime_identity import RuntimeIdentityError, current_commit
-from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
+from assistant.context_builder import (
+    build_decision_packet,
+    build_portfolio_snapshot,
+    build_portfolio_snapshot_from_alpaca,
+)
+from assistant.cash_reporting import CashReportError, evaluate_idle_cash
 from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
     PolicyOverridableBlockError,
@@ -412,6 +417,102 @@ def command_risk_check(args, store: AssistantStore) -> None:
             beta = impact["beta"] if impact["beta"] is not None else "n/a"
             estimated = f"${impact['estimated_impact']:,.2f}" if impact["estimated_impact"] is not None else "n/a"
             print(f"  {impact['ticker']}: beta={beta} estimated_impact={estimated}")
+
+
+def command_idle_cash(args, store: AssistantStore) -> None:
+    """GR-7b. Read-only: measures cash, never proposes deploying it.
+
+    Deliberately does NOT call ``_packet(..., store=store)``: that path
+    records GR-4 provider-fetch rows. A reporting command must leave the
+    operator database unchanged, including evidence tables. Portfolio comes
+    from a live Alpaca snapshot when configured, otherwise the sample
+    portfolio — never a decision-packet rebuild that writes.
+    """
+    del store  # kept in the handler signature; unused on purpose
+    policy = load_policy(_cli_policy_path(args))
+    mandate = load_mandate(args.mandate)
+    # A broker outage must degrade the REPORT, not dump a traceback on the
+    # operator -- the same rule GR-7a's Reports page already applies to
+    # coverage verification, and the same guard the UI sibling of this
+    # panel carries. Without this, `idle-cash` during an Alpaca incident
+    # ends in a stack trace, which in a scheduled context is
+    # indistinguishable from the tool itself being broken.
+    try:
+        if is_configured():
+            portfolio = build_portfolio_snapshot_from_alpaca()
+        else:
+            portfolio = build_portfolio_snapshot(
+                SAMPLE_POSITIONS, SAMPLE_CASH, source="manual", account_mode="manual"
+            )
+    except Exception as exc:
+        raise SystemExit(
+            f"Cannot report idle cash: portfolio snapshot unavailable "
+            f"({type(exc).__name__}: {exc})"
+        ) from exc
+    try:
+        report = evaluate_idle_cash(
+            portfolio,
+            policy,
+            mandate,
+            measured_annualized_volatility_pct=args.measured_volatility_pct,
+        )
+    except CashReportError as exc:
+        raise SystemExit(f"Cannot report idle cash: {exc}") from exc
+
+    if args.json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return
+
+    totals = report["totals"]
+    bounds = report["policy_bounds"]
+    objective = report["mandate_objective"]
+    print(f"Idle-cash report ({report['as_of']}, {report['account_mode']})")
+    if not report["exact_numerics"]:
+        print("  ! figures derive from display-rounded values, not exact broker decimals")
+    print(
+        f"  equity ${totals['total_equity']} = cash ${totals['cash']} "
+        f"({totals['cash_pct']}%) + invested ${totals['invested']} "
+        f"({totals['invested_pct']}%)"
+    )
+    print(
+        f"  policy: reserve floor ${bounds['reserve_floor']} "
+        f"({bounds['min_cash_reserve_pct']}%), exposure ceiling "
+        f"${bounds['exposure_ceiling']} ({bounds['max_total_exposure_pct']}%)"
+    )
+    if bounds["reserve_floor_breached"]:
+        print(f"  ! cash is BELOW the reserve floor by ${bounds['cash_above_reserve'].lstrip('-')}")
+    print(
+        f"  headroom ${bounds['policy_headroom']} "
+        f"(limited by {bounds['binding_constraint']}) -- room the policy "
+        "leaves, not a suggestion to use it"
+    )
+    band = (
+        f"{objective['target_annualized_volatility_min_pct']}-"
+        f"{objective['target_annualized_volatility_max_pct']}%"
+    )
+    measured = objective["measured"]
+    if measured["available"]:
+        verdict = "inside" if measured["within_mandate_band"] else "OUTSIDE"
+        print(
+            f"  mandate volatility band {band}: measured "
+            f"{measured['annualized_volatility_pct']}% is {verdict} the band"
+        )
+    else:
+        print(f"  mandate volatility band {band}: {measured['unavailable_reason']}")
+    if objective["required_invested_volatility_pct"] is not None:
+        print(
+            f"  at {totals['invested_pct']}% invested, holdings would need "
+            f"{objective['required_invested_volatility_pct']}% volatility to reach "
+            f"the {objective['target_annualized_volatility_min_pct']}% floor"
+        )
+    else:
+        print(f"  required-volatility figure unavailable: {objective['required_unavailable_reason']}")
+    if objective["required_invested_volatility_at_policy_ceiling_pct"] is not None:
+        print(
+            "  even at the policy exposure ceiling it would need "
+            f"{objective['required_invested_volatility_at_policy_ceiling_pct']}%"
+        )
+    print("  reporting only; no order was created, sized, or approved")
 
 
 def command_propose(args, store: AssistantStore) -> None:
@@ -1755,6 +1856,27 @@ def build_parser() -> argparse.ArgumentParser:
     kill_switch.add_argument("state", choices=("on", "off", "status"))
     kill_switch.add_argument("--reason")
     kill_switch.set_defaults(handler=command_kill_switch)
+
+    idle_cash = commands.add_parser(
+        "idle-cash",
+        help=(
+            "GR-7b: report cash against the policy's reserve floor and "
+            "exposure ceiling, and against the mandate's volatility target. "
+            "Read-only."
+        ),
+    )
+    idle_cash.add_argument(
+        "--measured-volatility-pct",
+        type=float,
+        default=None,
+        help=(
+            "Observed annualized portfolio volatility, when one has actually "
+            "been measured. Omitted means the report says so explicitly "
+            "rather than assuming zero."
+        ),
+    )
+    idle_cash.add_argument("--json", action="store_true")
+    idle_cash.set_defaults(handler=command_idle_cash)
 
     backup = commands.add_parser("backup-db", help="Create a consistent SQLite backup.")
     backup.add_argument("destination", nargs="?", type=Path)

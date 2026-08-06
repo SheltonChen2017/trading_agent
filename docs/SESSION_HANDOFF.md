@@ -16,22 +16,39 @@ clean. Never deploy development commits mid-epoch.
 Session 1 of 60 recorded (`paperobs-94882d5da9668087e99355c5`). Do not
 assume later sessions without re-checking the operator database.
 
-## 2. OPEN OWNER DECISION — epoch bound to the wrong policy file
+## 2. OWNER DECISION MADE (2026-08-06): option B — keep the epoch
 
-Unchanged from 2026-08-05:
+The owner chose to keep `paper-epoch-001` frozen and select
+`my_policy.json` manually in the sidebar at each launch, rather than
+re-binding the epoch. Do not deploy the policy-default resolver or the
+process singleton to the operational checkout without a new, explicit
+authorization.
 
-| Thing | Policy |
-|---|---|
-| `paper-epoch-001` lineage | `assistant/default_policy.json` |
-| What the owner actually trades under | `assistant/my_policy.json` |
+| Thing | Policy | Fingerprint | `allow_new_positions` |
+|---|---|---|---|
+| `paper-epoch-001` lineage | `assistant/default_policy.json` | `66dd70e1…` | **False** |
+| What the owner actually trades under | `assistant/my_policy.json` | `4a942cbc…` | **True** |
 
-Options:
+Verified 2026-08-06 against the operator database and both checkouts.
 
-- **A (recommended): re-bind now.** Close epoch, deploy merged tip to the
-  operational checkout, start `paper-epoch-002` under the resolved personal
-  policy.
-- **B: keep the epoch.** Stay on `8a2233c` until the natural boundary; do
-  not deploy policy-default or singleton changes mid-epoch.
+**Consequence of B, stated plainly so nobody rediscovers it later.** The
+scheduled `PaperObservation` task passes no `--policy`, and the frozen
+checkout's eager argparse default is `default_policy.json` — so session
+capture keeps matching the epoch's bound fingerprint and keeps succeeding.
+Meanwhile the owner's manual trading happens under `my_policy.json`. The
+epoch therefore accumulates sessions whose recorded lineage names a policy
+that **forbids the very buys being made**.
+
+That is tolerable for paper operation and it is the owner's call, but
+`paper-epoch-001` must not later be cited as prospective evidence for
+trading under the personal policy. It is evidence for `default_policy.json`
+by its own lineage, and for nothing else. The first epoch that can honestly
+support the personal policy is the one started after the resolver is
+deployed.
+
+`my_policy.json` is gitignored and exists independently in **both**
+checkouts (identical, 1,579 bytes), so the manual sidebar selection works
+today without any deploy.
 
 ## 3. Latest review outcome (2026-08-06)
 
@@ -96,7 +113,9 @@ the post-merge counter-follow-up pass.
 
 ## 6. What is next
 
-1. Owner decision on §2 (epoch re-bind A vs B).
+1. §2 decided (option B, 2026-08-06). Nothing outstanding; deploy of the
+   resolver and singleton waits for the next epoch boundary or an explicit
+   owner authorization.
 2. Owner: nothing outstanding on duplicate processes (resolved on their
    own); re-check PIDs rather than assuming, since the cause is unknown
    (CCCROPS-002).

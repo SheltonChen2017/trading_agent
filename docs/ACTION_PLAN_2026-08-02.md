@@ -282,6 +282,16 @@ ledger bootstrap/reconcile → start the first paper evidence epoch on the
 frozen commit → run all 5 drills inside it → let the 60-session clock run.
 From here on, the machine collects evidence while development continues
 un-deployed under model-2 discipline. Note: the owner's informal paper trading
+does not substitute for formal epoch evidence. **Owner ops/UI hygiene
+(2026-08-05, accepted after independent review on
+`codex/review-ops-hardening-ui-20260805`):** entry-point
+`resolve_policy_path()`, CLI/UI wiring so `my_policy.json` loads without
+retyping, task self-heal + battery-guard clearing, and UI chrome rename —
+does **not** reorder the roadmap. Open owner decision remains: epoch lineage
+is still bound to `default_policy.json` while live trading uses
+`my_policy.json`; do not deploy this change mid-epoch under option B (keep
+epoch). See `docs/REVIEW_2026-08-05_OPS_HARDENING_UI.md` and
+`docs/SESSION_HANDOFF.md` §2.
 (from 2026-08-03) already accumulates real order/telemetry/ledger data before
 any formal epoch; that data informs execution realism but does not count toward
 the mandate's 60-session minimum, which requires one immutable epoch.

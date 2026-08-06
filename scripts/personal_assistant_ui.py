@@ -81,9 +81,11 @@ from assistant.similarity_evidence import compute_similarity_evidence, format_ev
 from assistant.ticker_verification import partition_by_universe, verify_tickers
 from assistant.policy import (
     DEFAULT_POLICY_PATH,
+    POLICY_PATH_ENV_VAR,
     compute_policy_fingerprint,
     load_policy,
     policy_with_updated_flags,
+    resolve_policy_path,
     save_policy,
 )
 from assistant.llm import PrivacyMode, ProjectionError, ReviewStatus, project_committee_input
@@ -176,7 +178,7 @@ from execution.alpaca_broker import is_configured
 from market_analytics import classify_trend
 
 st.set_page_config(
-    page_title="Personal Trading Assistant",
+    page_title="Trading Assistant",
     page_icon="\U0001F4C8",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -190,8 +192,70 @@ st.set_page_config(
 # because Streamlit's hashed classes change between releases. A selector that
 # stops matching after an upgrade silently does nothing, which is the correct
 # failure mode for decoration -- the app still renders, just plainer.
+#
+# This is the ONE style block. Typography lives here too rather than in a
+# second injection, so a weight or a letter-spacing cannot be set twice and
+# silently drift apart.
+#
+# The type stack is entirely system-local: no @import, no CDN, no webfont.
+# The operational host has to render identically with the network down, and
+# a blocked font request would fall back to different metrics without
+# saying so.
+#
+# Colour is deliberately NOT restyled here: the red/green status badges and
+# refusal messages carry safety meaning and must stay exactly as loud as
+# they are (intensity lives in .streamlit/config.toml).
 _UI_POLISH_CSS = """
 <style>
+:root {
+    --ta-sans: "Segoe UI Variable Text", "Segoe UI", Inter, -apple-system,
+        BlinkMacSystemFont, system-ui, "Helvetica Neue", Arial, sans-serif;
+    --ta-display: "Segoe UI Variable Display", "Segoe UI", Inter,
+        -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
+    --ta-mono: "Cascadia Mono", "Cascadia Code", "JetBrains Mono", "SF Mono",
+        Consolas, "Liberation Mono", monospace;
+}
+
+html, body, [class*="css"], .stMarkdown, .stButton button,
+.stTextInput input, .stSelectbox, .stMultiSelect, .stRadio, .stCheckbox,
+[data-testid="stDataFrame"] {
+    font-family: var(--ta-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Headings carry the display cut and a tighter optical fit; body copy gets
+   a longer measure-friendly leading. */
+h1, h2, h3, h4 { font-family: var(--ta-display); }
+h1 { font-weight: 640; letter-spacing: -0.025em; line-height: 1.14; }
+h2 { font-weight: 620; letter-spacing: -0.015em; }
+h3 { font-weight: 600; letter-spacing: -0.015em; }
+p, li, label { line-height: 1.6; }
+
+code, pre, kbd, samp, [data-testid="stCodeBlock"] {
+    font-family: var(--ta-mono);
+    font-variant-ligatures: none;
+    font-size: 0.86rem;
+}
+
+[data-testid="stCaptionContainer"] {
+    font-size: 0.82rem;
+    line-height: 1.5;
+    opacity: 0.78;
+}
+
+/* Sidebar as a quieter rail: smaller body, section headers as small caps
+   rather than full-size headings competing with the page title. */
+section[data-testid="stSidebar"] { font-size: 0.93rem; }
+section[data-testid="stSidebar"] h2 {
+    font-size: 0.74rem;
+    font-weight: 650;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+    opacity: 0.68;
+}
+.stRadio [role="radiogroup"] label { padding: 0.10rem 0; }
+
 /* Streamlit reserves a large empty band above the title; reclaiming it puts
    the portfolio above the fold on a laptop. */
 [data-testid="stAppViewContainer"] > .main .block-container {
@@ -213,6 +277,7 @@ code, pre {
 }
 
 [data-testid="stMetricValue"] {
+    font-family: var(--ta-display);
     font-weight: 650;
     letter-spacing: -0.015em;
 }
@@ -238,9 +303,6 @@ code, pre {
 .stTabs [aria-selected="true"] {
     font-weight: 680;
 }
-
-h1 { letter-spacing: -0.025em; }
-h2, h3 { letter-spacing: -0.015em; }
 
 /* Expanders read as grouped panels rather than floating rules. */
 [data-testid="stExpander"] details {
@@ -1350,7 +1412,7 @@ def _allocation_input_signature(
 
 title_col, badge_col = st.columns([4, 1])
 with title_col:
-    st.title("Personal Trading Assistant")
+    st.title("Trading Assistant")
     st.caption(
         "Click-around front end over the same deterministic code the CLI uses. "
         "Nothing here computes financial numbers itself -- it only displays what "
@@ -1403,7 +1465,29 @@ with st.sidebar:
     # Policy context is deliberately separated from navigation: choosing a
     # page never changes which policy file governs proposals, and vice versa.
     st.header("Settings")
-    policy_path = st.text_input("Policy file", value=str(DEFAULT_POLICY_PATH))
+    # Seeded from resolve_policy_path() so the owner's own policy loads
+    # without retyping it every session. The resolved file is NAMED below
+    # rather than merely applied: a default that silently decides which
+    # policy governs proposals would be a hidden financial default, and
+    # this policy is the more permissive of the two.
+    try:
+        _resolved_policy_path = resolve_policy_path()
+        _policy_resolution_error = None
+    except FileNotFoundError as exc:
+        # A stray TRADING_ASSISTANT_POLICY must not make the app unloadable.
+        # Continue the implicit chain (personal -> committed default) rather
+        # than hard-coding the committed baseline and skipping my_policy.
+        # use_env=False rather than popping the variable: os.environ is
+        # process-global and shared across Streamlit's per-session threads.
+        _policy_resolution_error = str(exc)
+        _resolved_policy_path = resolve_policy_path(use_env=False)
+    policy_path = st.text_input("Policy file", value=str(_resolved_policy_path))
+    if _policy_resolution_error is not None:
+        st.warning(
+            f"{_policy_resolution_error} Falling back to "
+            f"`{Path(_resolved_policy_path).name}`."
+        )
+    st.caption(f"Active file: `{Path(policy_path).name}`")
     # Default seeded from the Settings & Features preference; the per-run
     # choice here still wins once touched (design section 3.1: expose the
     # default centrally while retaining a per-run choice).

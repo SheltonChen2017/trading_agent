@@ -11,12 +11,71 @@ import dataclasses
 import hashlib
 import json
 import math
+import os
 from pathlib import Path
 from typing import Literal
 
 from config import MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
 
 DEFAULT_POLICY_PATH = Path(__file__).resolve().parent / "default_policy.json"
+PERSONAL_POLICY_PATH = Path(__file__).resolve().parent / "my_policy.json"
+POLICY_PATH_ENV_VAR = "TRADING_ASSISTANT_POLICY"
+
+
+def resolve_policy_path(
+    explicit: str | Path | None = None, *, use_env: bool = True
+) -> Path:
+    """Resolve which policy file an *entry point* should load.
+
+    Precedence, highest first:
+
+    1. ``explicit`` -- a ``--policy`` flag, or a path the owner typed into
+       the UI;
+    2. the ``TRADING_ASSISTANT_POLICY`` environment variable;
+    3. ``assistant/my_policy.json``, when that file exists;
+    4. ``assistant/default_policy.json``.
+
+    Levels 1 and 2 are the caller *naming* a file, so a missing file raises
+    instead of falling back. Silently loading a different policy than the
+    one asked for is precisely the hidden-default-that-changes-financial-
+    behavior hazard this resolver has to avoid. Only the 3 -> 4 step falls
+    back, and it falls toward the committed conservative baseline, never
+    toward a more permissive file.
+
+    Scope is deliberately narrow. ``load_policy()`` keeps
+    ``DEFAULT_POLICY_PATH`` as its own default: library code and tests must
+    not change behavior depending on whether an untracked personal policy
+    happens to exist on a particular machine.
+
+    Evidence-epoch note: the resolved file's fingerprint is bound into the
+    active epoch lineage, so changing *which* file resolves is detected by
+    the runtime-lineage check in the observation path and refused outright
+    rather than silently absorbed into the evidence.
+    """
+    if explicit is not None:
+        candidate = Path(explicit).expanduser()
+        if not candidate.is_file():
+            raise FileNotFoundError(f"Policy file not found: {candidate}")
+        return candidate
+
+    # use_env=False lets a caller that has ALREADY reported a broken
+    # environment variable continue down the rest of the chain, without
+    # mutating os.environ to do it. Process-global state is shared across
+    # Streamlit's per-session threads, so a pop/restore in a render path
+    # is visible to concurrent reruns; a parameter is not.
+    env_value = os.environ.get(POLICY_PATH_ENV_VAR, "").strip() if use_env else ""
+    if env_value:
+        candidate = Path(env_value).expanduser()
+        if not candidate.is_file():
+            raise FileNotFoundError(
+                f"{POLICY_PATH_ENV_VAR} names a policy file that does not "
+                f"exist: {candidate}"
+            )
+        return candidate
+
+    if PERSONAL_POLICY_PATH.is_file():
+        return PERSONAL_POLICY_PATH
+    return DEFAULT_POLICY_PATH
 
 
 @dataclasses.dataclass(frozen=True)

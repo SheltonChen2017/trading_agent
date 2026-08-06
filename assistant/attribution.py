@@ -244,11 +244,33 @@ def evaluate_attribution(
                 "amount": None,
                 "unavailable_reason": f"{name} was not supplied",
             }
+        # Same class as GR7BREV-003: callers catch AttributionError, not the
+        # raw ValueError to_decimal raises on NaN/Inf.
+        try:
+            amount = to_decimal(value, name=name)
+        except ValueError as exc:
+            raise AttributionError(str(exc)) from exc
         return {
             "available": True,
-            "amount": decimal_text(to_decimal(value, name=name)),
+            "amount": decimal_text(amount),
             "unavailable_reason": None,
         }
+
+    average_weight_pct = (average_invested_weight * Decimal("100")).quantize(
+        Decimal("0.01")
+    )
+    if average_invested_weight <= Decimal("1"):
+        allocation_meaning = (
+            "Cash drag: the return given up by holding cash against a "
+            "fully-invested benchmark. Equal to (w-1)*R_benchmark; negative "
+            "when underinvested and the benchmark rose."
+        )
+    else:
+        allocation_meaning = (
+            "Invested-weight effect vs a fully-invested benchmark: "
+            "(w-1)*R_benchmark. Average invested weight exceeded 100% of "
+            "equity (e.g. negative cash / leverage), so this is not cash drag."
+        )
 
     return {
         "period": {
@@ -263,23 +285,18 @@ def evaluate_attribution(
             "active_pct": decimal_text(_q(active_pct)),
         },
         "decomposition": {
-            "average_invested_weight_pct": decimal_text(
-                (average_invested_weight * Decimal("100")).quantize(Decimal("0.01"))
-            ),
+            "average_invested_weight_pct": decimal_text(average_weight_pct),
             "allocation_pct": decimal_text(_q(allocation_pct)),
             "selection_pct": decimal_text(_q(selection_pct)),
             "reconciles": True,
             "reconciliation_tolerance_pct": decimal_text(
                 RECONCILIATION_TOLERANCE_PCT
             ),
-            "allocation_meaning": (
-                "Cash drag: the return given up by holding cash against a "
-                "fully-invested benchmark. Negative when the benchmark rose."
-            ),
+            "allocation_meaning": allocation_meaning,
             "selection_meaning": (
                 "RESIDUAL, not a skill measurement. Everything active return "
-                "contains that cash drag does not explain -- stock picking, "
-                "but equally leverage, concentration, and the "
+                "contains that the invested-weight effect does not explain -- "
+                "stock picking, but equally leverage, concentration, and the "
                 "cash-earns-zero approximation."
             ),
         },

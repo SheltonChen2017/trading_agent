@@ -572,16 +572,21 @@ def command_attribution(args, store: AssistantStore) -> None:
         try:
             equity = float(_to_decimal_money(row["total_equity"], name="total_equity"))
             cash = float(_to_decimal_money(row["cash"], name="cash"))
+            # Do not silently clamp cash > equity to invested=0: that would
+            # report "all cash" for a corrupt snapshot and hide the defect.
+            invested = equity - cash
+            if invested < 0:
+                skipped.append(
+                    f"{row['session_date']}: cash exceeds equity "
+                    f"(cash={cash}, equity={equity})"
+                )
+                continue
             points.append(
                 AttributionPoint(
                     at=datetime.fromisoformat(str(row["captured_at"])),
                     session_date=str(row.get("session_date") or "") or None,
                     total_equity=equity,
-                    # Invested is derived, not stored: equity minus cash. A
-                    # negative would mean cash exceeds equity (margin), which
-                    # this single-bucket model does not represent, so clamp
-                    # and report rather than emit a negative weight.
-                    invested_value=max(0.0, equity - cash),
+                    invested_value=invested,
                     benchmark_close=float(
                         _to_decimal_money(close, name=f"{args.benchmark} close")
                     ),
@@ -2026,12 +2031,20 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="Which recorded account to attribute; required when several exist.",
     )
-    attribution.add_argument("--limit", type=int, default=500)
+    attribution.add_argument(
+        "--limit",
+        type=_positive_int,
+        default=500,
+        help="Maximum recent equity snapshots to load (positive integer).",
+    )
     attribution.add_argument(
         "--minimum-observations",
-        type=int,
+        type=_positive_int,
         default=DEFAULT_MINIMUM_OBSERVATIONS,
-        help="Valuation points below which the report declares itself insufficient.",
+        help=(
+            "Independent market sessions below which the report declares "
+            "itself insufficient (not raw valuation-point count)."
+        ),
     )
     attribution.add_argument("--json", action="store_true")
     attribution.set_defaults(handler=command_attribution)

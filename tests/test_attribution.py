@@ -329,6 +329,154 @@ def test_selection_is_labelled_a_residual_not_a_skill_measurement():
     assert "leverage" in meaning
 
 
+def test_nan_realized_cost_refuses_as_attribution_error():
+    """Callers catch AttributionError; a raw ValueError from to_decimal would
+    traceback through the CLI the same way GR-7b's measured-vol path did."""
+    with pytest.raises(AttributionError, match="realized_cost"):
+        evaluate_attribution(
+            _series([(100.0, 50.0, 400.0), (105.0, 55.0, 440.0)]),
+            realized_cost=float("nan"),
+            minimum_observations=2,
+        )
+
+
+def test_overinvested_weight_does_not_claim_cash_drag():
+    """w > 1 is leverage / negative cash, not underinvestment. Labelling that
+    allocation term 'cash drag' would invert the meaning."""
+    report = evaluate_attribution(
+        _series([(100.0, 150.0, 400.0), (110.0, 160.0, 440.0)]),
+        minimum_observations=2,
+    )
+    meaning = report["decomposition"]["allocation_meaning"].lower()
+    assert meaning.startswith("invested-weight effect")
+    assert "so this is not cash drag" in meaning
+    assert report["decomposition"]["average_invested_weight_pct"] == "150"
+
+
+def test_attribution_cli_leaves_execution_and_evidence_tables_untouched(tmp_path):
+    """CLAUDE.md section 9: read-only commands must be proven read-only."""
+    from types import SimpleNamespace
+
+    import scripts.run_personal_assistant as cli
+    from assistant.storage import AssistantStore
+
+    store = AssistantStore(tmp_path / "assistant.db")
+    account_key = "paper:test"
+    for index in range(3):
+        store.append_portfolio_equity_snapshot(
+            {
+                "account_key": account_key,
+                "session_date": f"2026-01-0{index + 2}",
+                "captured_at": (
+                    _START + timedelta(days=index)
+                ).isoformat(),
+                "total_equity": "100",
+                "cash": "50",
+                "net_external_flow": "0",
+                "benchmarks": {"SPY": str(400 + index)},
+            }
+        )
+
+    tables = (
+        "trade_proposals",
+        "broker_orders",
+        "broker_order_events",
+        "execution_reservations",
+        "execution_telemetry_events",
+        "decision_packets",
+        "paper_account_observations",
+        "paper_evidence_epochs",
+        "journal_transactions",
+        "data_provider_fetches",
+    )
+
+    def counts():
+        with store._connect() as connection:
+            return {
+                name: connection.execute(f"SELECT COUNT(*) FROM {name}").fetchone()[0]
+                for name in tables
+            }
+
+    before = counts()
+    cli.command_attribution(
+        SimpleNamespace(
+            account_key=account_key,
+            benchmark="SPY",
+            limit=500,
+            minimum_observations=2,
+            json=True,
+        ),
+        store=store,
+    )
+    assert counts() == before
+
+
+def test_attribution_cli_skips_cash_exceeding_equity_instead_of_clamping(tmp_path):
+    """Silent clamp to invested=0 would report all-cash for a corrupt row."""
+    from types import SimpleNamespace
+
+    import scripts.run_personal_assistant as cli
+    from assistant.storage import AssistantStore
+
+    store = AssistantStore(tmp_path / "assistant.db")
+    account_key = "paper:test"
+    store.append_portfolio_equity_snapshot(
+        {
+            "account_key": account_key,
+            "session_date": "2026-01-02",
+            "captured_at": _START.isoformat(),
+            "total_equity": "100",
+            "cash": "50",
+            "net_external_flow": "0",
+            "benchmarks": {"SPY": "400"},
+        }
+    )
+    store.append_portfolio_equity_snapshot(
+        {
+            "account_key": account_key,
+            "session_date": "2026-01-03",
+            "captured_at": (_START + timedelta(days=1)).isoformat(),
+            "total_equity": "100",
+            "cash": "150",
+            "net_external_flow": "0",
+            "benchmarks": {"SPY": "410"},
+        }
+    )
+    store.append_portfolio_equity_snapshot(
+        {
+            "account_key": account_key,
+            "session_date": "2026-01-04",
+            "captured_at": (_START + timedelta(days=2)).isoformat(),
+            "total_equity": "105",
+            "cash": "50",
+            "net_external_flow": "0",
+            "benchmarks": {"SPY": "420"},
+        }
+    )
+
+    # Only two usable points remain; with minimum_observations=2 the report
+    # still builds, and the corrupt middle row must appear in skipped.
+    import io
+    import contextlib
+
+    buf = io.StringIO()
+    with contextlib.redirect_stdout(buf):
+        cli.command_attribution(
+            SimpleNamespace(
+                account_key=account_key,
+                benchmark="SPY",
+                limit=500,
+                minimum_observations=2,
+                json=True,
+            ),
+            store=store,
+        )
+    import json
+
+    payload = json.loads(buf.getvalue())
+    assert any("cash exceeds equity" in item for item in payload["skipped_snapshots"])
+
+
 def test_benchmark_defaults_to_the_ticker_the_epoch_already_binds():
     """paper_evidence writes benchmark_ticker=SPY into every observation.
     A different default here would put two benchmarks in one epoch."""

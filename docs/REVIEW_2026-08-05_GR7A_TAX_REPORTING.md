@@ -98,10 +98,25 @@ Counter-review addition:
 |---|---|---|---|---|---|---|
 | CRGR7A-001 | P2 | Resolved | `assistant/tax_reporting.py` coverage | The corrected rule proves the snapshot came from *a* broker (`source="alpaca"`) but not from **the broker account these books belong to** — one level deeper in the same class as the P0. `portfolio_ledger.reconcile_snapshot()` already REFUSES a snapshot whose account differs from the one bound at bootstrap (and refuses an alpaca snapshot with no account ID), but the report ignored that binding. With a foreign account it would compare one account's lots against another's shares and could print a confident COMPLETE — or report INCOMPLETE and send the owner hunting for fills that were never missing. Reachable in practice: the owner rotated Alpaca credentials the same day. | `account_binding_reason()` mirrors the ledger's binding rule (single authority, not a second one) and DOWNGRADES to unverified with an explicit reason rather than raising, per GR-7a's always-produce-the-artifact contract. Codex's `_broker_positions` fixture gained the `account_id` a real Alpaca snapshot always carries; every existing assertion is unchanged. | Four new tests: foreign account never verifies (and is `complete: None`, not "incomplete"), a missing account ID never verifies, the bound account still verifies (positive control, so the check cannot blanket-refuse), and a direction-agreement test asserting the report refuses to verify exactly where `reconcile_snapshot` raises. Reverse mutation (binding comparison disabled) failed two of them; restoration returned green. |
 
-## 7. Deliberately not claimed complete
+## 7. Codex counter-counter-review (2026-08-05, appended)
+
+| Commit | Disposition |
+|---|---|
+| `e3029ea` Counter-review GR-7a / CRGR7A-001 | accepted after correction (CCRGR7A-001) |
+| `05e862c` Add HOW_TO_USE.md | accepted after correction (CCRGR7A-002) |
+
+| ID | Priority | Status | Location | Issue | Correction | Verification |
+|---|---|---|---|---|---|---|
+| CCRGR7A-001 | P2 | Resolved | `account_binding_reason` vs `reconcile_snapshot` | CRGR7A-001 correctly required account binding, but re-implemented the bootstrap/account comparison beside the ledger gate — the same dual-authority drift class the finding itself warned about. | Extracted `alpaca_account_binding_block_reason()` into `portfolio_ledger.py`; reconcile raises from that helper; tax coverage maps its codes to unverified reasons. | `test_binding_uses_the_shared_ledger_helper` plus direction-agreement and foreign-account tests green. |
+| CCRGR7A-002 | P3 | Resolved | `HOW_TO_USE.md` / `README.md` | Owner guide omitted several UNVERIFIED causes and was not linked from README, so the new entrypoint was easy to miss. | Clarified UNVERIFIED causes; linked HOW_TO_USE from README. | Doc inspection. |
+
+Claude's confirmation of GR7AREV-001..007 and the CRGR7A-001 defect class are accepted. The float-product residual in `tax_lots.py` remains deliberately deferred (measured immaterial at cent precision).
+
+## 8. Deliberately not claimed complete
 
 - Fees/commissions unless journaled.
 - Unrealized open-lot reporting.
 - Selectable lot methods beyond the ledger default.
 - Treating this export as a 1099-B substitute.
 - GR-7b/GR-7c/GR-7d.
+- Refactoring `tax_lots.py` float arithmetic mid-epoch.

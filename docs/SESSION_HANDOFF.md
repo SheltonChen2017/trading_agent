@@ -9,46 +9,81 @@ model, or session change. This file completely replaces the prior handoff.
 
 ## 1. Standing state: THE EPOCH (do not disturb)
 
-`paper-epoch-001` ACTIVE since 2026-08-05T18:27Z on frozen commit
-`8a2233c`. Operational checkout verified this session still at that commit,
-clean. Never deploy development commits mid-epoch.
+`paper-epoch-002` ACTIVE since 2026-08-06T17:55Z on frozen commit
+`9a91498`, bound to `my_policy.json` (`4a942cbc…`). The operational
+checkout is now pinned there. **Never deploy development commits
+mid-epoch** — the next deploy waits for the next epoch boundary.
 
-Session 1 of 60 recorded (`paperobs-94882d5da9668087e99355c5`). Do not
-assume later sessions without re-checking the operator database.
+`paper-epoch-001` is CLOSED (2026-08-06T17:55Z) with one observation,
+retained as a plumbing shakedown only. See §2.
 
-## 2. OWNER DECISION MADE (2026-08-06): option B — keep the epoch
+Sessions recorded under `paper-epoch-002`: expect the first at the 16:30
+capture on 2026-08-06. Do not assume any count without re-checking
+`paper_account_observations` in the operator database.
 
-The owner chose to keep `paper-epoch-001` frozen and select
-`my_policy.json` manually in the sidebar at each launch, rather than
-re-binding the epoch. Do not deploy the policy-default resolver or the
-process singleton to the operational checkout without a new, explicit
-authorization.
+## 2. RESOLVED (2026-08-06): epoch re-bound to the personal policy
 
-| Thing | Policy | Fingerprint | `allow_new_positions` |
-|---|---|---|---|
-| `paper-epoch-001` lineage | `assistant/default_policy.json` | `66dd70e1…` | **False** |
-| What the owner actually trades under | `assistant/my_policy.json` | `4a942cbc…` | **True** |
+The owner initially chose option B (keep the epoch, select the policy by
+hand), then reversed to **option A** once the evidence consequence was
+spelled out. Executed the same morning. The policy/lineage mismatch that
+sat open since 2026-08-05 is **closed**.
 
-Verified 2026-08-06 against the operator database and both checkouts.
+| | `paper-epoch-001` (closed) | `paper-epoch-002` (active) |
+|---|---|---|
+| Policy | `default_policy.json` | **`my_policy.json`** |
+| Policy fingerprint | `66dd70e1…` | **`4a942cbc…`** |
+| `allow_new_positions` | False | **True** |
+| Code commit | `8a2233c` | **`9a91498`** |
+| Sessions | 1 (discarded) | collecting |
+| Strategy / model | `owner-directed-paper-policy` 1.0.0 / `no-ml-model` | identical |
 
-**Consequence of B, stated plainly so nobody rediscovers it later.** The
-scheduled `PaperObservation` task passes no `--policy`, and the frozen
-checkout's eager argparse default is `default_policy.json` — so session
-capture keeps matching the epoch's bound fingerprint and keeps succeeding.
-Meanwhile the owner's manual trading happens under `my_policy.json`. The
-epoch therefore accumulates sessions whose recorded lineage names a policy
-that **forbids the very buys being made**.
+Mandate fingerprint and broker account are unchanged across both, so the
+only deliberate lineage differences are the policy and the code commit.
 
-That is tolerable for paper operation and it is the owner's call, but
-`paper-epoch-001` must not later be cited as prospective evidence for
-trading under the personal policy. It is evidence for `default_policy.json`
-by its own lineage, and for nothing else. The first epoch that can honestly
-support the personal policy is the one started after the resolver is
-deployed.
+**Why the reversal.** Under B the scheduled `PaperObservation` task — which
+passes no `--policy` — kept resolving `default_policy.json` and kept
+matching epoch-001's bound fingerprint, so capture would have succeeded for
+60 sessions while the owner traded under `my_policy.json`. The epoch would
+have accumulated a full record whose own lineage named a policy forbidding
+the buys it contained: unusable as evidence for the strategy actually being
+run. The cost of fixing it was **one** discarded session against roughly
+three months of unusable record, and delay to first citable evidence
+(≈October vs ≈February).
 
-`my_policy.json` is gitignored and exists independently in **both**
-checkouts (identical, 1,579 bytes), so the manual sidebar selection works
-today without any deploy.
+`paper-epoch-001` is retained as a closed plumbing shakedown. Do not cite
+it as prospective evidence for anything.
+
+## 2a. Deploy performed 2026-08-06 (epoch boundary)
+
+The operational checkout advanced `8a2233c` → `9a91498` — the designed
+moment under epoch model 2, not a mid-epoch deploy. Sequence, all verified:
+
+1. Four `TradingAgent-Paper-*` tasks stopped and **disabled** via
+   `C:\git\epoch_swap_tasks_elevated.ps1` (machine-local, elevated). On this
+   host a non-elevated `Stop-ScheduledTask` succeeds but `Disable` returns
+   "Access is denied", so a stopped long-runner is restarted by its
+   5-minute heal trigger — disabling is what actually holds them down.
+2. Streamlit stopped; verified no Python process held the operator DB.
+3. Verified backup: `data/backups/trading_assistant-20260806T175415Z.db`.
+4. `git pull --ff-only` to `9a91498`; clean; resolver, `process_singleton`,
+   `_HELD` fix and `my_policy.json` all confirmed present in the deployed
+   tree.
+5. Confirmed `resolve_policy_path()` returns `my_policy.json` /
+   `4a942cbc…` **before** closing anything.
+6. `paper-epoch-close paper-epoch-001`, then `paper-epoch-start
+   paper-epoch-002` reusing 001's strategy and model identifiers.
+7. `_active_runtime_lineage()` exercised with the exact argument shape the
+   scheduled task produces (`policy=None`, default mandate): **PASS**.
+8. Tasks re-enabled, long-runners started, app relaunched.
+
+`requirements.txt` was unchanged across the range, so no dependency install
+was needed. The `storage.py` additions in the range are the GR-7a schema
+migrations, applied idempotently on first open.
+
+The process singleton is now **live**: `data/locks/order-monitor.lock` and
+`data/locks/operations-watchdog.lock` are held by the running workers,
+which is direct evidence the deployed code — not the old tree — is what is
+executing. `data/locks/` is gitignored.
 
 ## 3. Latest review outcome (2026-08-06)
 
@@ -85,22 +120,29 @@ the post-merge counter-follow-up pass.
 
 ## 4. Machine state (verified 2026-08-06)
 
-- Tasks registered; OrderMonitor/Watchdog Running; heal trigger present;
-  `MultipleInstances=IgnoreNew` present.
-- **Duplicate long-runners observed** against the shared operator DB
-  (`monitor-orders` and `watchdog` each twice, ~09:35 local). **Re-checked
-  ~10:05: the duplicates are gone** — one `monitor-orders` (PID 7804) and
-  one `watchdog` (PID 5180) remain, both still from 09:34:59. No manual
-  collapse is outstanding; re-check PIDs before assuming a healthy pair.
-  The singleton lock is in the development tree only until an authorized
-  deploy, so the exposure remains live on `8a2233c`.
+State after the epoch swap (§2a), all four tasks enabled:
+
+- OrderMonitor `Running` (PID 1088), Watchdog `Running` (PID 41008), both
+  started 10:56:34 — exactly one of each. OperationsCycle and
+  PaperObservation `Ready`; next capture 16:30.
+- **Process singleton is live.** `data/locks/order-monitor.lock` and
+  `data/locks/operations-watchdog.lock` are held by the running workers.
+  Their existence is the direct evidence that the deployed tree — not the
+  previous one — is what is executing.
+- Streamlit relaunched 10:56 from the operational checkout via
+  `C:\git\launch_trading_app.ps1` (health `ok` on 8501). It now seeds
+  `my_policy.json` by itself; **no manual sidebar change is needed any
+  more.**
+- Earlier the same morning, duplicate long-runners were observed (~09:35)
+  and had resolved on their own by ~10:05; cause never established
+  (CCCROPS-002). A recurrence should now surface as a singleton refusal
+  rather than silent duplication.
 - Self-heal can restart a dead task; it cannot guarantee single-process
   uniqueness without the process lock.
-- Streamlit app relaunched 09:54 from the operational checkout via
-  `C:\git\launch_trading_app.ps1` for the owner's 30-trade / 60-session
-  run. Note it seeds `default_policy.json` (the `my_policy.json` default is
-  development-only), so the sidebar must be pointed at `my_policy.json` for
-  buys — which is the §2 decision in miniature.
+- On this host, modifying these tasks requires elevation: a non-elevated
+  `Stop-ScheduledTask` works but `Disable-ScheduledTask` returns "Access is
+  denied". Use `C:\git\epoch_swap_tasks_elevated.ps1 -Action Disable|Enable`
+  (machine-local, not in the repo).
 
 ## 5. Validation (exact final tree)
 
@@ -113,15 +155,19 @@ the post-merge counter-follow-up pass.
 
 ## 6. What is next
 
-1. §2 decided (option B, 2026-08-06). Nothing outstanding; deploy of the
-   resolver and singleton waits for the next epoch boundary or an explicit
-   owner authorization.
-2. Owner: nothing outstanding on duplicate processes (resolved on their
+1. §2 resolved and executed 2026-08-06. Nothing outstanding.
+2. **Confirm the first `paper-epoch-002` session lands** at the 16:30
+   capture on 2026-08-06. This is the one step not yet verified — the
+   lineage gate was exercised directly and passed, but no observation has
+   actually been written under the new epoch yet.
+3. Owner: nothing outstanding on duplicate processes (resolved on their
    own); re-check PIDs rather than assuming, since the cause is unknown
-   (CCCROPS-002).
-3. Roadmap: GR-7b / GR-7c / GR-6, or GR-7d owner decision — unchanged.
-4. Deploy singleton + policy-default only at epoch boundary (or with
-   explicit owner deploy authorization).
+   (CCCROPS-002). The singleton is now live and should make a recurrence
+   visible as a refusal rather than as silent duplication.
+4. Roadmap: GR-7b / GR-7c / GR-6, or GR-7d owner decision — unchanged.
+5. The operational checkout is pinned at `9a91498` again. Development
+   continues un-deployed; the next deploy waits for the next epoch
+   boundary or an explicit owner authorization.
 
 ## 7. Non-negotiable boundaries
 

@@ -1,7 +1,8 @@
 # Development session handoff
 
-Prepared: 2026-08-06 afternoon, after independent review and correction of
-Claude's GR-7b idle-cash reporting on
+Prepared: 2026-08-06 afternoon. Covers GR-7b idle-cash reporting through
+all three passes — Claude's implementation, the independent review and its
+corrections, and Claude's counter-review of those corrections — all on
 `user/grok/review-gr7b-idle-cash-20260806`.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
@@ -35,11 +36,32 @@ Surfaces after correction: `assistant/cash_reporting.py`, CLI `idle-cash`,
 Reports expander — portfolio from Alpaca/sample only; no provider-fetch
 writes; no action-shaped fields.
 
+Claude then counter-reviewed those corrections (§6 of the ledger). All four
+findings accepted; GR7BREV-001/002 were **reproduced**, not accepted on
+inspection — the original `_packet(store=…)` call really did take
+`data_provider_fetches` from 0 rows to 1, and the submitted read-only test
+missed it because it monkeypatched `_packet` itself.
+
+| ID | Pri | Result |
+|---|---|---|
+| CFPS-GR7B-001 | P2 | **Fixed.** The GR7BREV-001 fix left `build_portfolio_snapshot_from_alpaca()` outside every guard in the CLI while the UI sibling got an `except Exception`. A configured account plus a broker outage exited with an uncaught `RuntimeError`. GR-7a already set the rule: an outage degrades the report, it does not break it. |
+| CFPS-GR7B-002 | P2 | **Fixed.** The GR7BREV-002 fix removed the write (correct) but also the shared cache, so the panel made a live broker call on every rerun of a page carrying an interactive widget, and could disagree with Briefing about the same account in one session — the invariant `_load_base_packet` exists to protect. New `_load_readonly_portfolio()` is cached **and** store-free. |
+| CFPS-GR7B-003 | P2 | **Fixed.** This handoff had been trimmed from ~250 lines to 33 net, dropping six load-bearing facts. Restored as §3a/§3b below rather than reverting the trim. |
+
 ## 3. Validation (exact final tree)
 
-- Focused: **33 passed**.
-- Full suite: **2917 passed / 0 skipped / 25 warnings**.
+Review tree (`99889a2`): focused **33 passed**; full suite **2917 passed /
+0 skipped / 25 warnings**.
+
+Counter-reviewed tree (`5a6456f`, current):
+
+- `test_cash_reporting` **28 passed**.
+- Full suite: **2920 passed / 0 failed / 0 skipped / 25 warnings** (425s).
+  The three added tests account for the difference from 2917.
 - `compileall` clean; `git diff --check` clean.
+- Live CLI smoke run against the paper account behaves correctly
+  (82.88% cash; 70.1% volatility required at current exposure, 24% at the
+  policy ceiling).
 - Nothing deployed; ops checkout stays at `9a91498`.
 
 ## 3a. Owner decisions on record (do not re-derive)

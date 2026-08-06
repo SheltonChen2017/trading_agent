@@ -1072,6 +1072,22 @@ class AssistantStore:
             "payload_hash": payload_hash,
         }
 
+    def list_portfolio_equity_account_keys(self) -> list[str]:
+        """Distinct account keys with recorded equity snapshots.
+
+        Read-only discovery so a reporting command can find the account
+        without a live broker call (which would both cost a round trip and
+        write GR-4 provider evidence from a read-only surface). Sorted for
+        deterministic output; an empty list means nothing has been captured
+        yet, which the caller must report rather than treat as one account.
+        """
+        with self._connect() as connection:
+            rows = connection.execute(
+                "SELECT DISTINCT account_key FROM portfolio_equity_snapshots "
+                "ORDER BY account_key"
+            ).fetchall()
+        return [str(row["account_key"]) for row in rows]
+
     def list_portfolio_equity_snapshots(
         self,
         account_key: str,

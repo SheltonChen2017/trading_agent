@@ -48,6 +48,10 @@ from assistant.operations import (
     run_backup_restore_drill,
     run_operational_check,
 )
+from assistant.process_singleton import (
+    ProcessSingletonError,
+    acquire_process_singleton,
+)
 from assistant.order_reconciler import (
     cancel_all_open_orders,
     cancel_assistant_order,
@@ -580,6 +584,13 @@ def command_sync_orders(args, store: AssistantStore) -> None:
 
 
 def command_monitor_orders(args, store: AssistantStore) -> None:
+    # IgnoreNew only covers Task Scheduler instances. An orphaned console
+    # process leaves the scheduler free to start a second worker; refuse
+    # here before touching the broker or the shared operator database.
+    try:
+        acquire_process_singleton(args.database, "order-monitor")
+    except ProcessSingletonError as exc:
+        raise SystemExit(f"Order monitor already running: {exc}") from exc
     policy = load_policy(_cli_policy_path(args))
     print("Running startup reconciliation, then listening for Alpaca trade updates.")
     monitor_orders(

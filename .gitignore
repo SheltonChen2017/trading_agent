@@ -15,6 +15,7 @@ data/*.db-wal
 data/backups/
 data/drill_evidence/
 data/research_reports/
+data/locks/
 
 # Machine-local runtime artifacts (AP-2, ACTION_PLAN 2026-08-02). The
 # documented operational commands write inside the repository -- the

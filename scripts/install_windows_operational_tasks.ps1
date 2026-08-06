@@ -173,7 +173,10 @@ $cycleTrigger = New-ScheduledTaskTrigger `
 # while the task is healthy does not start a second process. It can still
 # update LastRunTime/LastTaskResult with an "already running" HRESULT, so
 # verify_windows_evidence_tasks.ps1 treats State=Running as healthy even
-# when the latest heal tick was refused.
+# when the latest heal tick was refused. IgnoreNew is necessary but not
+# sufficient: an orphaned console process can leave the scheduler free to
+# start a second worker. Long-runners also take a process-level singleton
+# lock in Python (assistant/process_singleton.py).
 $selfHealTrigger = New-ScheduledTaskTrigger `
     -Once `
     -At ((Get-Date).AddMinutes(1)) `

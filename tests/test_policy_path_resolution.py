@@ -181,18 +181,31 @@ def test_cli_parser_survives_a_broken_policy_env_and_honors_explicit_policy(
     assert omitted.policy is None
 
 
+def _is_cli_policy_path_call(node) -> bool:
+    """True only for the exact form ``_cli_policy_path(args)``."""
+    import ast
+
+    if not (
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "_cli_policy_path"
+    ):
+        return False
+    if len(node.args) != 1 or node.keywords:
+        return False
+    arg = node.args[0]
+    return isinstance(arg, ast.Name) and arg.id == "args"
+
+
 def test_every_cli_load_policy_call_goes_through_the_resolver():
-    """OPSREV-006 generalized. The behavioural tests prove the handlers that
-    they exercise; they cannot prove the NEXT handler someone adds.
+    """OPSREV-006 / CROPS-003. Behavioural tests cover exercised handlers;
+    this AST guard pins every CLI ``load_policy`` site so a future handler
+    cannot silently reintroduce ``load_policy(args.policy)`` under the lazy
+    ``--policy`` default.
 
-    `--policy` defaults to None, so a new `load_policy(args.policy)` would
-    pass None straight into `Path()` and raise TypeError — but only on the
-    one command that happened to be exercised. That is precisely how the
-    original regression reached a green focused run and failed the full
-    suite.
-
-    An AST check is the right tool here: the defect is a wrong ARGUMENT to a
-    correct function, which `load_policy` itself cannot observe.
+    Codex review of CROPS-003 tightened the shape check: the call must be
+    exactly ``_cli_policy_path(args)``, not an arbitrary expression that
+    merely names the helper.
     """
     import ast
 
@@ -212,19 +225,15 @@ def test_every_cli_load_policy_call_goes_through_the_resolver():
         if not (isinstance(func, ast.Name) and func.id == "load_policy"):
             continue
         seen += 1
-        if not node.args:
-            offenders.append((node.lineno, "load_policy() with no argument"))
+        if len(node.args) != 1 or node.keywords:
+            offenders.append((node.lineno, ast.unparse(node)))
             continue
-        arg = node.args[0]
-        resolved = (
-            isinstance(arg, ast.Call)
-            and isinstance(arg.func, ast.Name)
-            and arg.func.id == "_cli_policy_path"
-        )
-        if not resolved:
-            offenders.append((node.lineno, ast.unparse(arg)))
+        if not _is_cli_policy_path_call(node.args[0]):
+            offenders.append((node.lineno, ast.unparse(node.args[0])))
 
-    assert seen, "expected load_policy call sites in the CLI"
+    # Floor, not exact equality: new handlers may add sites, but shrinking
+    # below the reviewed count would mean sites were deleted unnoticed.
+    assert seen >= 13, f"expected at least 13 CLI load_policy sites, found {seen}"
     assert not offenders, (
         "every CLI load_policy() must take _cli_policy_path(args); "
         f"offending sites: {offenders}"

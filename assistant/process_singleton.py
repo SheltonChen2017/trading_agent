@@ -20,6 +20,19 @@ class ProcessSingletonError(RuntimeError):
     """Another process already holds the named singleton lock."""
 
 
+# Holding the lock is a property of the PROCESS, not of whatever local
+# variable a caller happens to keep. Both production call sites discard the
+# returned object (`acquire_process_singleton(db, "order-monitor")`), so
+# without an owning reference here the object becomes unreachable, CPython
+# closes the file handle in its finalizer, and the OS drops the lock while
+# the worker keeps running -- silently restoring the duplicate-worker
+# condition this module exists to prevent. `atexit.register` below happens
+# to keep the object alive as a side effect, but that is incidental: the
+# registration reads as "release on exit", so removing it (the OS releases
+# file locks on process exit anyway) looks safe and is not.
+_HELD: dict[Path, "ProcessSingleton"] = {}
+
+
 def lock_path_for(database: str | Path, name: str) -> Path:
     """Place locks beside the operator database, never inside git."""
     if not name or any(ch in name for ch in ("/", "\\", "..")):
@@ -61,6 +74,8 @@ class ProcessSingleton:
             ) from exc
         self._fh = fh
         self._held = True
+        # Explicit process-scoped ownership; see _HELD.
+        _HELD[self.lock_path] = self
         atexit.register(self.release)
 
     def release(self) -> None:
@@ -69,6 +84,8 @@ class ProcessSingleton:
         fh = self._fh
         self._fh = None
         self._held = False
+        if _HELD.get(self.lock_path) is self:
+            del _HELD[self.lock_path]
         try:
             fh.seek(0)
             if sys.platform == "win32":

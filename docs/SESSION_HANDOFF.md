@@ -45,9 +45,23 @@ self-heal observation notes). **Accepted after correction.**
 | CCROPS-002 | P1 | Live duplicate OrderMonitor/Watchdog processes despite IgnoreNew; process-level singleton added in code (deploy deferred) |
 | CCROPS-003 | P3 | Stale "push/PR still needed" handoff text removed |
 
+Claude then counter-reviewed the Codex correction (`e3c2433`):
+
+| ID | Pri | Result |
+|---|---|---|
+| CCCROPS-001 | P2 | **Fixed.** Both call sites discard the returned `ProcessSingleton`, so the lock held only because `atexit.register` incidentally kept the object reachable. Dropping that line — which reads as redundant, since the OS releases file locks on exit — silently released the lock after GC while the worker ran on. All 5 submitted tests passed under that mutation, because every one binds the result to a local and no caller does. Module-level `_HELD` registry now owns it; regression test reproduces the call-site shape across a real process boundary. |
+| CCCROPS-002 | P3 | Open (documented). Duplicate-worker observation credible; asserted mechanism not established — the pairs started 9s apart, both parented to the Task Scheduler service, matching neither the heal interval nor a logon. |
+| CCCROPS-003 | P3 | Open (documented). Singleton refusal is a new non-zero `LastTaskResult` the verifier treats as failure; only reachable under an orphan, where failing is defensible. |
+| CCCROPS-004 | P3 | Open (documented). `lock_path_for` name validation narrower than its docstring (`order:stream` → NTFS ADS; `D:evil` escapes). Unreachable today — literals only. |
+
+Verified empirically, not accepted on inspection: cross-process exclusion
+on Windows **and** lock release after a hard kill. The second matters — a
+lock surviving a killed process would have bricked self-heal permanently.
+
 Ledger: `docs/REVIEW_2026-08-06_CROPS003_OPS_FOLLOWUP.md`.
 
 Claude follow-up quality: **8.5/10 submitted; 9.4/10 corrected**.
+Codex correction quality: **8.5/10 submitted; 9.4/10 counter-corrected**.
 
 Ops-hardening / UI chrome round (PR #157) remains accepted; this review is
 the post-merge counter-follow-up pass.
@@ -57,23 +71,35 @@ the post-merge counter-follow-up pass.
 - Tasks registered; OrderMonitor/Watchdog Running; heal trigger present;
   `MultipleInstances=IgnoreNew` present.
 - **Duplicate long-runners observed** against the shared operator DB
-  (`monitor-orders` and `watchdog` each twice, ~09:35 local). Owner should
-  manually collapse to one pair; the new singleton lock is in the
-  development tree only until an authorized deploy.
+  (`monitor-orders` and `watchdog` each twice, ~09:35 local). **Re-checked
+  ~10:05: the duplicates are gone** — one `monitor-orders` (PID 7804) and
+  one `watchdog` (PID 5180) remain, both still from 09:34:59. No manual
+  collapse is outstanding; re-check PIDs before assuming a healthy pair.
+  The singleton lock is in the development tree only until an authorized
+  deploy, so the exposure remains live on `8a2233c`.
 - Self-heal can restart a dead task; it cannot guarantee single-process
   uniqueness without the process lock.
+- Streamlit app relaunched 09:54 from the operational checkout via
+  `C:\git\launch_trading_app.ps1` for the owner's 30-trade / 60-session
+  run. Note it seeds `default_policy.json` (the `my_policy.json` default is
+  development-only), so the sidebar must be pointed at `my_policy.json` for
+  buys — which is the §2 decision in miniature.
 
 ## 5. Validation (exact final tree)
 
-- Focused: **32 passed** (singleton, policy path, task resilience, import boundary).
-- Full suite: **2875 passed / 1 skipped / 25 warnings**.
+- Focused: **36 passed** (singleton 6, policy path / UI chrome / task
+  resilience 30).
+- Full suite: **2876 passed / 1 skipped / 25 warnings** (588s) — one more
+  than the Codex tree, which is the added CCCROPS-001 regression test.
 - `compileall` clean; `git diff --check` clean.
 - No funded-account contact. Singleton not deployed to operational checkout.
 
 ## 6. What is next
 
 1. Owner decision on §2 (epoch re-bind A vs B).
-2. Owner: collapse duplicate long-runner processes on this host.
+2. Owner: nothing outstanding on duplicate processes (resolved on their
+   own); re-check PIDs rather than assuming, since the cause is unknown
+   (CCCROPS-002).
 3. Roadmap: GR-7b / GR-7c / GR-6, or GR-7d owner decision — unchanged.
 4. Deploy singleton + policy-default only at epoch boundary (or with
    explicit owner deploy authorization).

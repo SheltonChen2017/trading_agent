@@ -365,6 +365,18 @@ def test_binding_verdict_agrees_in_direction_with_the_ledger_authority(store):
     assert report.coverage["verified"] is False
 
 
+def test_binding_uses_the_shared_ledger_helper(store):
+    """CCRGR7A-001: coverage must not re-decide bootstrap/account locally."""
+    from assistant import portfolio_ledger as ledger
+    from assistant import tax_reporting as reporting
+
+    source = Path(reporting.__file__).read_text(encoding="utf-8")
+    assert "alpaca_account_binding_block_reason" in source
+    assert 'get_system_state("ledger_bootstrap")' not in source
+    ledger_source = Path(ledger.__file__).read_text(encoding="utf-8")
+    assert "def alpaca_account_binding_block_reason" in ledger_source
+
+
 def test_missing_fill_history_makes_the_report_incomplete(store):
     """The dangerous case: the broker holds more shares than the app can
     account for, so realized history is missing sales."""

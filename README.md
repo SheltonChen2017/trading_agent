@@ -10,6 +10,10 @@ alpha. Its production workflow therefore generates exposure-reducing
 proposals from policy breaches; rejected or exploratory signals cannot create
 buy orders.
 
+For day-to-day operation (launcher, core pages, tax report, scheduled tasks,
+troubleshooting), start with [`HOW_TO_USE.md`](HOW_TO_USE.md). This README
+remains the project map and setup reference.
+
 ## What it does
 
 - Reads positions, cash, buying power, and open orders from Alpaca, or uses an

@@ -206,9 +206,10 @@ Read the **coverage line at the top of the file** before using it:
 - **INCOMPLETE** — they do not, so realized history is missing fills. The
   file is still produced, clearly labelled; do not hand it to an
   accountant as-is.
-- **UNVERIFIED** — coverage could not be checked (no broker snapshot, or
-  the snapshot came from a different Alpaca account than your books are
-  bound to).
+- **UNVERIFIED** — coverage could not be checked (no live broker
+  configured, broker outage, sample/manual portfolio, missing account ID,
+  or a snapshot from a different Alpaca account than your books are bound
+  to).
 
 Wash-sale entries are **flags, never adjustments** — the real rule spans
 every account you control, which this app cannot see. This is a

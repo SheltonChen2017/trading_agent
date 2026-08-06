@@ -271,41 +271,40 @@ def account_binding_reason(store: AssistantStore, portfolio: Any) -> str | None:
 
     Counter-review CRGR7A-001: `source="alpaca"` proves the snapshot came
     from a broker, not that it came from the broker account these books
-    belong to. `portfolio_ledger.reconcile_snapshot()` already refuses a
-    snapshot whose account differs from the one bound at bootstrap; a
-    coverage claim in an accountant-facing artifact must respect the same
-    binding or it can compare one account's lots against another
-    account's shares -- reporting a confident COMPLETE, or sending the
-    owner hunting for fills that were never missing.
+    belong to. The ledger already refuses a foreign or unbound account;
+    coverage claims must use that same authority or they can compare one
+    account's lots against another's shares.
 
-    This mirrors that rule rather than re-deciding it. It DOWNGRADES to
-    unverified instead of raising: GR-7a's contract is that a report is
-    always produced and states its limitation, and an unverifiable
-    account is an unanswered question, not a detected gap.
+    Downgrades to unverified instead of raising: GR-7a's contract is that
+    a report is always produced and states its limitation.
     """
-    bootstrap = store.get_system_state("ledger_bootstrap")
-    snapshot_account = str(getattr(portfolio, "account_id", None) or "").strip()
-    if isinstance(bootstrap, dict) and bootstrap.get("source") == "alpaca":
-        bound_account = str(bootstrap.get("account_id") or "").strip()
-        if not bound_account:
-            return (
-                "the portfolio journal predates account-ID binding, so this "
-                "broker snapshot cannot be proven to belong to it; share "
-                "coverage was not verified"
-            )
-        if snapshot_account != bound_account:
-            return (
-                "the connected broker account does not match the account "
-                "bound to the portfolio journal; share coverage was not "
-                "verified"
-            )
-    elif not snapshot_account:
+    from assistant.portfolio_ledger import alpaca_account_binding_block_reason
+
+    block = alpaca_account_binding_block_reason(store, portfolio)
+    if block is None:
+        return None
+    if block == "unbound_journal":
+        return (
+            "the portfolio journal predates account-ID binding, so this "
+            "broker snapshot cannot be proven to belong to it; share "
+            "coverage was not verified"
+        )
+    if block == "account_mismatch":
+        return (
+            "the connected broker account does not match the account "
+            "bound to the portfolio journal; share coverage was not "
+            "verified"
+        )
+    if block == "missing_account_id":
         return (
             "the broker snapshot carries no account ID, so it cannot be "
             "matched to the portfolio journal; share coverage was not "
             "verified"
         )
-    return None
+    return (
+        f"broker account binding could not be verified ({block}); share "
+        "coverage was not verified"
+    )
 
 
 def _coverage_report(

@@ -650,6 +650,52 @@ def record_fee(
     return post_transaction(store, transaction)
 
 
+def alpaca_account_binding_block_reason(
+    store: AssistantStore,
+    snapshot: Any,
+    *,
+    allow_unbound_alpaca: bool = False,
+) -> str | None:
+    """Stable binding-block code, or None when the snapshot may bind.
+
+    Codes:
+      - ``unbound_journal``: Alpaca journal exists but predates account-ID binding
+      - ``account_mismatch``: snapshot account differs from the bound account
+      - ``missing_account_id``: Alpaca snapshot carries no account ID
+
+    ``reconcile_snapshot`` and tax-report coverage both consume this helper
+    so the accountant-facing report cannot drift from the ledger gate.
+    """
+    bootstrap = store.get_system_state("ledger_bootstrap")
+    snapshot_account = str(getattr(snapshot, "account_id", None) or "").strip()
+    source = getattr(snapshot, "source", None)
+    if isinstance(bootstrap, dict) and bootstrap.get("source") == "alpaca":
+        bound_account = str(bootstrap.get("account_id") or "").strip()
+        if not bound_account and not allow_unbound_alpaca:
+            return "unbound_journal"
+        if bound_account and snapshot_account != bound_account:
+            return "account_mismatch"
+    elif source == "alpaca" and not snapshot_account:
+        return "missing_account_id"
+    return None
+
+
+_BINDING_LEDGER_ERRORS = {
+    "unbound_journal": (
+        "The existing Alpaca journal predates account-ID binding. "
+        "Run ledger-bind-account to migrate it only after verifying "
+        "the connected broker account."
+    ),
+    "account_mismatch": (
+        "Connected Alpaca account does not match the account bound "
+        "to the portfolio journal."
+    ),
+    "missing_account_id": (
+        "Alpaca reconciliation requires the connected broker account ID"
+    ),
+}
+
+
 def reconcile_snapshot(
     store: AssistantStore,
     snapshot: PortfolioSnapshot,
@@ -661,25 +707,11 @@ def reconcile_snapshot(
     reconciled_at = now or datetime.now(timezone.utc)
     if reconciled_at.tzinfo is None:
         raise LedgerError("reconciliation time must be timezone-aware")
-    bootstrap = store.get_system_state("ledger_bootstrap")
-    if isinstance(bootstrap, dict) and bootstrap.get("source") == "alpaca":
-        bound_account_id = str(bootstrap.get("account_id") or "").strip()
-        current_account_id = str(snapshot.account_id or "").strip()
-        if not bound_account_id and not _allow_unbound_alpaca:
-            raise LedgerError(
-                "The existing Alpaca journal predates account-ID binding. "
-                "Run ledger-bind-account to migrate it only after verifying "
-                "the connected broker account."
-            )
-        if bound_account_id and current_account_id != bound_account_id:
-            raise LedgerError(
-                "Connected Alpaca account does not match the account bound "
-                "to the portfolio journal."
-            )
-    elif snapshot.source == "alpaca" and not snapshot.account_id:
-        raise LedgerError(
-            "Alpaca reconciliation requires the connected broker account ID"
-        )
+    binding_block = alpaca_account_binding_block_reason(
+        store, snapshot, allow_unbound_alpaca=_allow_unbound_alpaca
+    )
+    if binding_block is not None:
+        raise LedgerError(_BINDING_LEDGER_ERRORS[binding_block])
     balances = ledger_balances(store)
     ledger_cash = balances["cash"]
     broker_cash = _decimal(snapshot.cash, "snapshot.cash")

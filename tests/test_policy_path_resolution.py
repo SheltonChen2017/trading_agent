@@ -181,6 +181,56 @@ def test_cli_parser_survives_a_broken_policy_env_and_honors_explicit_policy(
     assert omitted.policy is None
 
 
+def test_every_cli_load_policy_call_goes_through_the_resolver():
+    """OPSREV-006 generalized. The behavioural tests prove the handlers that
+    they exercise; they cannot prove the NEXT handler someone adds.
+
+    `--policy` defaults to None, so a new `load_policy(args.policy)` would
+    pass None straight into `Path()` and raise TypeError — but only on the
+    one command that happened to be exercised. That is precisely how the
+    original regression reached a green focused run and failed the full
+    suite.
+
+    An AST check is the right tool here: the defect is a wrong ARGUMENT to a
+    correct function, which `load_policy` itself cannot observe.
+    """
+    import ast
+
+    source = (
+        Path(__file__).resolve().parent.parent
+        / "scripts"
+        / "run_personal_assistant.py"
+    ).read_text(encoding="utf-8")
+    tree = ast.parse(source)
+
+    offenders = []
+    seen = 0
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Call):
+            continue
+        func = node.func
+        if not (isinstance(func, ast.Name) and func.id == "load_policy"):
+            continue
+        seen += 1
+        if not node.args:
+            offenders.append((node.lineno, "load_policy() with no argument"))
+            continue
+        arg = node.args[0]
+        resolved = (
+            isinstance(arg, ast.Call)
+            and isinstance(arg.func, ast.Name)
+            and arg.func.id == "_cli_policy_path"
+        )
+        if not resolved:
+            offenders.append((node.lineno, ast.unparse(arg)))
+
+    assert seen, "expected load_policy call sites in the CLI"
+    assert not offenders, (
+        "every CLI load_policy() must take _cli_policy_path(args); "
+        f"offending sites: {offenders}"
+    )
+
+
 def test_cli_handlers_resolve_none_policy_without_going_through_main(
     isolated_paths, monkeypatch
 ):

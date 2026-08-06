@@ -48,6 +48,7 @@ frozen commit `8a2233c` was not deployed to or altered.
 | OPSREV-006 | P1 | Resolved | `run_personal_assistant.py` | After OPSREV-001, handlers that call `load_policy(args.policy)` still saw `None` when invoked after `parse_args()` without `main()` (suite regression on epoch lineage). | `_cli_policy_path(args)` used by `main()` and every `load_policy` call site. | `test_cli_handlers_resolve_none_policy_without_going_through_main`; `test_active_epoch_rejects_changed_runtime_lineage` |
 | CROPS-001 | P3 | Resolved | `policy.py` / UI | Env fallback mutated `os.environ` (pop/restore) in a Streamlit render path shared across session threads. | `resolve_policy_path(..., use_env=False)`; UI no longer mutates environ. | `test_use_env_false_skips_the_variable_without_touching_os_environ` |
 | CROPS-002 | P3 | Open (documented) | verifier | `State=Running` cannot detect a crash-loop; self-heal makes a looping task look healthier. | No code change — Watchdog DB heartbeat is the correct detector. | Documented only |
+| CROPS-003 | P2 | Resolved | `tests/test_policy_path_resolution.py` | OPSREV-006 converted all 13 `load_policy(args.policy)` sites and added a unit test of `_cli_policy_path` itself, but nothing pinned the **invariant**. Since `--policy` defaults to `None`, a newly added handler writing `load_policy(args.policy)` would raise `TypeError` only on the one command that happened to be exercised — which is exactly how the original regression passed a green focused run and failed the full suite. The fix was complete; its coverage was not. | Added `test_every_cli_load_policy_call_goes_through_the_resolver`, an AST walk asserting every `load_policy` call in the CLI takes `_cli_policy_path(args)`. Source-level is correct here: the defect is a wrong *argument* to a correct function, which `load_policy` cannot observe. | Reverse mutation reintroducing the bug at exactly ONE of the 13 sites: DETECTED (the two behavioural tests were also re-proven load-bearing against the helper mutation). Restored and re-verified green. |
 
 ## 3. Claude counter-review (incorporated)
 
@@ -91,14 +92,30 @@ Review machine: Windows, Python 3.13.
 - Exact final tree: **2869 passed / 1 skipped / 25 warnings**.
 - `compileall` clean; `git diff --check` clean.
 
-No test contacted a funded account. Self-heal **recovery** remains
-unproven end to end (terminate-and-watch declined). Typography was not
-visually inspected.
+No test contacted a funded account. Typography was not visually inspected.
+
+Self-heal recovery was originally recorded here as unproven end to end,
+because deliberately terminating a live task to watch it return was
+declined by the sandbox. **It has since been observed in production on the
+review host, unplanned.** At 18:28 local, OrderMonitor and Watchdog were
+running as the PIDs started 16:56:25. At 18:51 both were running as new
+PIDs started **18:48:25** — they died in that window and the 5-minute
+repeating trigger restored both within its interval, with the tasks back
+to `State=Running`. That is the whole mechanism exercised for real:
+death, tick, restart.
+
+Two caveats keep this honest. The cause of death was not captured (the
+host has been losing console-hosted processes to `0xC000013A` all
+session), and recovery was observed once, not measured for reliability.
+What is now established is that the trigger does restart a dead
+long-runner unattended — which is exactly what the logon-only
+configuration could not do.
 
 ## 7. What is deliberately not claimed
 
-- End-to-end kill-and-recover of OrderMonitor/Watchdog.
 - Visual QA of the typography block.
+- Reliability of self-heal beyond the single observed recovery, and the
+  cause of the deaths that keep occurring on this host.
 - Resolution of the open owner decision to re-bind `paper-epoch-001` to
   `my_policy.json` (handoff §2 options A/B).
 - Any change to the frozen operational checkout at `8a2233c`.

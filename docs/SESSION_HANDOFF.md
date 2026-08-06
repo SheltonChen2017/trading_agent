@@ -112,7 +112,14 @@ PaperObservation `Ready`, next heal tick scheduled, no task interrupted.
 Live tasks after a heal tick report `LastTaskResult=0x800710E0` while
 `State=Running` — the verifier correction matches that observation.
 
-NOT verified end to end: an actual kill-and-recover cycle.
+Kill-and-recover IS now verified, by unplanned production observation
+rather than by a deliberate test: at 18:28 local both monitors ran as the
+PIDs started 16:56:25; at 18:51 both ran as new PIDs started 18:48:25,
+restored by the 5-minute trigger and back to `State=Running`. The cause of
+death was not captured, and reliability beyond this single recovery is not
+measured. This host has been losing console-hosted processes to
+`0xC000013A` throughout the session — the change did not stop the deaths,
+it stopped them from being silent and permanent.
 
 ## 5. Validation (exact final tree)
 

@@ -27,7 +27,14 @@ from assistant.context_builder import (
     build_portfolio_snapshot,
     build_portfolio_snapshot_from_alpaca,
 )
+from assistant.attribution import (
+    DEFAULT_MINIMUM_OBSERVATIONS,
+    AttributionError,
+    AttributionPoint,
+    evaluate_attribution,
+)
 from assistant.cash_reporting import CashReportError, evaluate_idle_cash
+from assistant.money import to_decimal as _to_decimal_money
 from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
     PolicyOverridableBlockError,
@@ -512,6 +519,134 @@ def command_idle_cash(args, store: AssistantStore) -> None:
             "  even at the policy exposure ceiling it would need "
             f"{objective['required_invested_volatility_at_policy_ceiling_pct']}%"
         )
+    print("  reporting only; no order was created, sized, or approved")
+
+
+def command_attribution(args, store: AssistantStore) -> None:
+    """GR-7c. Read-only: reads recorded equity snapshots, writes nothing.
+
+    Every input comes from `portfolio_equity_snapshots`, which the
+    observation path already records. This command deliberately does not
+    fetch prices or rebuild a decision packet -- attribution over a period
+    must use the values captured DURING that period, not today's view of
+    them, and a fetch here would also write provider evidence from a
+    reporting command (GR7BREV-001/002).
+    """
+    # One account per report, never pooled. The operator database holds both
+    # the live paper account and `manual:manual` rows from sample-portfolio
+    # runs; attributing across them would blend two different portfolios
+    # into one return series.
+    available_keys = store.list_portfolio_equity_account_keys()
+    if not available_keys:
+        raise SystemExit("Cannot attribute: no equity snapshots recorded yet.")
+    if args.account_key:
+        account_key = args.account_key
+        if account_key not in available_keys:
+            raise SystemExit(
+                f"Cannot attribute: no snapshots for {account_key!r}. "
+                f"Available: {', '.join(available_keys)}"
+            )
+    else:
+        broker_keys = [key for key in available_keys if not key.startswith("manual:")]
+        if len(broker_keys) == 1:
+            account_key = broker_keys[0]
+        elif len(available_keys) == 1:
+            account_key = available_keys[0]
+        else:
+            raise SystemExit(
+                "Cannot attribute: several accounts have snapshots; pass "
+                f"--account-key. Available: {', '.join(available_keys)}"
+            )
+
+    rows = store.list_portfolio_equity_snapshots(account_key, limit=args.limit)
+    points: list[AttributionPoint] = []
+    skipped: list[str] = []
+    for row in rows:
+        benchmarks = row.get("benchmarks") or {}
+        close = benchmarks.get(args.benchmark)
+        if close is None:
+            skipped.append(
+                f"{row['session_date']}: no {args.benchmark} close recorded"
+            )
+            continue
+        try:
+            equity = float(_to_decimal_money(row["total_equity"], name="total_equity"))
+            cash = float(_to_decimal_money(row["cash"], name="cash"))
+            points.append(
+                AttributionPoint(
+                    at=datetime.fromisoformat(str(row["captured_at"])),
+                    session_date=str(row.get("session_date") or "") or None,
+                    total_equity=equity,
+                    # Invested is derived, not stored: equity minus cash. A
+                    # negative would mean cash exceeds equity (margin), which
+                    # this single-bucket model does not represent, so clamp
+                    # and report rather than emit a negative weight.
+                    invested_value=max(0.0, equity - cash),
+                    benchmark_close=float(
+                        _to_decimal_money(close, name=f"{args.benchmark} close")
+                    ),
+                    flow=float(
+                        _to_decimal_money(
+                            row.get("net_external_flow") or "0",
+                            name="net_external_flow",
+                        )
+                    ),
+                )
+            )
+        except (ValueError, AttributionError) as exc:
+            skipped.append(f"{row['session_date']}: {exc}")
+
+    if len(points) < 2:
+        raise SystemExit(
+            f"Cannot attribute: {len(points)} usable valuation point(s) from "
+            f"{len(rows)} snapshot(s)."
+            + (f" Skipped: {'; '.join(skipped[:5])}" if skipped else "")
+        )
+
+    try:
+        report = evaluate_attribution(
+            points,
+            benchmark_ticker=args.benchmark,
+            minimum_observations=args.minimum_observations,
+        )
+    except AttributionError as exc:
+        raise SystemExit(f"Cannot attribute: {exc}") from exc
+
+    report["skipped_snapshots"] = skipped
+    if args.json:
+        print(json.dumps(report, indent=2, sort_keys=True, default=str))
+        return
+
+    period = report["period"]
+    returns = report["returns"]
+    decomposition = report["decomposition"]
+    sufficiency = report["sample_sufficiency"]
+    print(
+        f"Attribution vs {report['benchmark_ticker']} "
+        f"({period['start'][:10]} to {period['end'][:10]}, "
+        f"{period['span_days']:.1f} days)"
+    )
+    if not sufficiency["sufficient"]:
+        print(
+            f"  ! INSUFFICIENT SAMPLE: {sufficiency['independent_count']} of "
+            f"{sufficiency['required_count']} independent "
+            f"{sufficiency['independent_observation_unit']}s required "
+            f"({sufficiency['valuation_point_count']} raw valuation points)"
+        )
+        for reason in sufficiency["insufficiency_reasons"]:
+            print(f"    - {reason}")
+    print(
+        f"  portfolio {returns['portfolio_pct']}%  vs benchmark "
+        f"{returns['benchmark_pct']}%  = active {returns['active_pct']}%"
+    )
+    print(
+        f"  cash drag (allocation): {decomposition['allocation_pct']}%  "
+        f"at {decomposition['average_invested_weight_pct']}% average invested"
+    )
+    print(f"  residual (selection):   {decomposition['selection_pct']}%")
+    print("    " + decomposition["selection_meaning"])
+    if skipped:
+        print(f"  skipped {len(skipped)} snapshot(s); first: {skipped[0]}")
     print("  reporting only; no order was created, sized, or approved")
 
 
@@ -1877,6 +2012,29 @@ def build_parser() -> argparse.ArgumentParser:
     )
     idle_cash.add_argument("--json", action="store_true")
     idle_cash.set_defaults(handler=command_idle_cash)
+
+    attribution = commands.add_parser(
+        "attribution",
+        help=(
+            "GR-7c: decompose return vs the benchmark into cash drag and a "
+            "labelled residual, from recorded equity snapshots. Read-only."
+        ),
+    )
+    attribution.add_argument("--benchmark", default="SPY")
+    attribution.add_argument(
+        "--account-key",
+        default=None,
+        help="Which recorded account to attribute; required when several exist.",
+    )
+    attribution.add_argument("--limit", type=int, default=500)
+    attribution.add_argument(
+        "--minimum-observations",
+        type=int,
+        default=DEFAULT_MINIMUM_OBSERVATIONS,
+        help="Valuation points below which the report declares itself insufficient.",
+    )
+    attribution.add_argument("--json", action="store_true")
+    attribution.set_defaults(handler=command_attribution)
 
     backup = commands.add_parser("backup-db", help="Create a consistent SQLite backup.")
     backup.add_argument("destination", nargs="?", type=Path)

@@ -3632,22 +3632,40 @@ if page == "Reports":
     # GR-7b. Renders on load rather than behind a button: idle cash is a
     # standing condition, not a report you ask for, and the whole point is
     # that it was previously invisible. No button here can place a trade.
+    # Portfolio comes from a live Alpaca snapshot (or sample) — never
+    # _load_packet, which records GR-4 provider-fetch rows and would break
+    # this page's read-only contract the same way tax Build used to.
     with st.expander("Idle cash vs policy and mandate", expanded=True):
         from assistant.cash_reporting import CashReportError, evaluate_idle_cash
+        from assistant.context_builder import (
+            build_portfolio_snapshot as _build_manual_portfolio,
+        )
         from assistant.mandate import load_mandate as _load_mandate
+        from assistant.sample_portfolio import SAMPLE_CASH as _SAMPLE_CASH
+        from assistant.sample_portfolio import SAMPLE_POSITIONS as _SAMPLE_POSITIONS
+        from execution.alpaca_broker import is_configured as _alpaca_configured
 
-        # _load_packet is cached, so this reuses the SAME base account
-        # snapshot every other page in this rerun sees rather than issuing a
-        # second broker fetch (the invariant _load_base_packet exists to
-        # protect). include_events=False: earnings dates are irrelevant to a
-        # cash measurement and would be a live call for nothing.
         try:
-            _cash_policy, _cash_packet = _load_packet(policy_path, False)
+            _cash_policy = load_policy(policy_path)
+            if _alpaca_configured():
+                _cash_portfolio = build_portfolio_snapshot_from_alpaca()
+            else:
+                _cash_portfolio = _build_manual_portfolio(
+                    _SAMPLE_POSITIONS,
+                    _SAMPLE_CASH,
+                    source="manual",
+                    account_mode="manual",
+                )
             _cash = evaluate_idle_cash(
-                _cash_packet.portfolio, _cash_policy, _load_mandate()
+                _cash_portfolio, _cash_policy, _load_mandate()
             )
         except CashReportError as _cash_error:
             st.warning(f"Idle-cash report unavailable: {_cash_error}")
+        except Exception as _cash_error:
+            st.warning(
+                f"Idle-cash report unavailable ({type(_cash_error).__name__}): "
+                f"{_cash_error}"
+            )
         else:
             _totals = _cash["totals"]
             _bounds = _cash["policy_bounds"]

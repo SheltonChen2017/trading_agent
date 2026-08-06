@@ -172,10 +172,21 @@ def evaluate_idle_cash(
         ),
     }
     if measured_annualized_volatility_pct is not None:
-        observed = to_decimal(
-            measured_annualized_volatility_pct,
-            name="measured_annualized_volatility_pct",
-        )
+        # ValueError from to_decimal (NaN/Inf/malformed) must become
+        # CashReportError: callers only catch that type, and a traceback
+        # from --measured-volatility-pct would be worse than a refusal.
+        try:
+            observed = to_decimal(
+                measured_annualized_volatility_pct,
+                name="measured_annualized_volatility_pct",
+            )
+        except ValueError as exc:
+            raise CashReportError(str(exc)) from exc
+        if observed < 0:
+            raise CashReportError(
+                "measured_annualized_volatility_pct must be non-negative, "
+                f"got {decimal_text(observed)}"
+            )
         measured["annualized_volatility_pct"] = decimal_text(observed)
         measured["within_mandate_band"] = bool(
             mandate_floor <= observed <= mandate_ceiling

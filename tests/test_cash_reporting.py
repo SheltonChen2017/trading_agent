@@ -149,6 +149,21 @@ def test_measured_volatility_band_boundaries_are_inclusive(observed, inside):
 
 
 @pytest.mark.parametrize(
+    "bad", [float("nan"), float("inf"), -0.1], ids=["nan", "inf", "negative"]
+)
+def test_unusable_measured_volatility_refuses_as_cash_report_error(bad):
+    """Callers only catch CashReportError. A raw ValueError from to_decimal
+    on --measured-volatility-pct would traceback through the CLI/UI."""
+    with pytest.raises(CashReportError):
+        evaluate_idle_cash(
+            _snapshot(50_000.0, [_position("AAPL", 50_000.0)], 100_000.0),
+            _policy(),
+            _MANDATE,
+            measured_annualized_volatility_pct=bad,
+        )
+
+
+@pytest.mark.parametrize(
     "equity", [0.0, -1.0], ids=["zero_equity", "negative_equity"]
 )
 def test_non_positive_equity_refuses_instead_of_dividing(equity):
@@ -268,9 +283,9 @@ def test_headroom_is_bounded_by_whichever_limit_binds_first():
 def test_idle_cash_cli_leaves_execution_and_evidence_tables_untouched(tmp_path, monkeypatch):
     """CLAUDE.md section 9 requires read-only commands to be proven read-only.
 
-    `propose` deliberately saves a decision packet; this command deliberately
-    does not, so a reporting run cannot pollute the evidence the epoch is
-    accumulating.
+    Includes GR-4 provider-fetch evidence: the submitted implementation called
+    `_packet(..., store=store)`, which records data_provider_fetches and would
+    have passed a test that only mocked `_packet` away.
     """
     from types import SimpleNamespace
 
@@ -288,6 +303,7 @@ def test_idle_cash_cli_leaves_execution_and_evidence_tables_untouched(tmp_path, 
         "paper_account_observations",
         "paper_evidence_epochs",
         "journal_transactions",
+        "data_provider_fetches",
     )
 
     def counts():
@@ -297,12 +313,13 @@ def test_idle_cash_cli_leaves_execution_and_evidence_tables_untouched(tmp_path, 
                 for name in tables
             }
 
-    packet = SimpleNamespace(
-        portfolio=_snapshot(
-            87_000.0, [_position("AAPL", 13_000.0)], 100_000.0
-        )
+    portfolio = _snapshot(87_000.0, [_position("AAPL", 13_000.0)], 100_000.0)
+    monkeypatch.setattr(cli, "is_configured", lambda: False)
+    monkeypatch.setattr(
+        cli,
+        "build_portfolio_snapshot",
+        lambda *args, **kwargs: portfolio,
     )
-    monkeypatch.setattr(cli, "_packet", lambda include_events=True, store=None: packet)
 
     before = counts()
     cli.command_idle_cash(
@@ -324,8 +341,12 @@ def test_idle_cash_cli_refuses_a_broken_snapshot_instead_of_printing_zero(tmp_pa
     from assistant.storage import AssistantStore
 
     store = AssistantStore(tmp_path / "assistant.db")
-    packet = SimpleNamespace(portfolio=_snapshot(0.0, [], 0.0))
-    monkeypatch.setattr(cli, "_packet", lambda include_events=True, store=None: packet)
+    monkeypatch.setattr(cli, "is_configured", lambda: False)
+    monkeypatch.setattr(
+        cli,
+        "build_portfolio_snapshot",
+        lambda *args, **kwargs: _snapshot(0.0, [], 0.0),
+    )
 
     with pytest.raises(SystemExit, match="Cannot report idle cash"):
         cli.command_idle_cash(
@@ -333,6 +354,36 @@ def test_idle_cash_cli_refuses_a_broken_snapshot_instead_of_printing_zero(tmp_pa
                 policy=None,
                 mandate=str(DEFAULT_POLICY_PATH.parent / "default_mandate.json"),
                 measured_volatility_pct=None,
+                json=True,
+            ),
+            store=store,
+        )
+
+
+def test_idle_cash_cli_refuses_nan_measured_volatility_without_traceback(
+    tmp_path, monkeypatch
+):
+    from types import SimpleNamespace
+
+    import scripts.run_personal_assistant as cli
+    from assistant.storage import AssistantStore
+
+    store = AssistantStore(tmp_path / "assistant.db")
+    monkeypatch.setattr(cli, "is_configured", lambda: False)
+    monkeypatch.setattr(
+        cli,
+        "build_portfolio_snapshot",
+        lambda *args, **kwargs: _snapshot(
+            50_000.0, [_position("AAPL", 50_000.0)], 100_000.0
+        ),
+    )
+
+    with pytest.raises(SystemExit, match="Cannot report idle cash"):
+        cli.command_idle_cash(
+            SimpleNamespace(
+                policy=None,
+                mandate=str(DEFAULT_POLICY_PATH.parent / "default_mandate.json"),
+                measured_volatility_pct=float("nan"),
                 json=True,
             ),
             store=store,
@@ -369,3 +420,31 @@ def test_reports_page_renders_the_idle_cash_panel_without_exception():
     assert "Mandate volatility band" in rendered
     # The honesty caveat must travel with the number, not be dropped in the UI.
     assert "not a forecast" in rendered and "not a recommendation" in rendered
+
+
+def test_reports_idle_cash_panel_does_not_write_provider_fetch_rows(tmp_path, monkeypatch):
+    """Reports claims read-only; using _load_packet would record GR-4 fetches."""
+    from pathlib import Path
+
+    from streamlit.testing.v1 import AppTest
+
+    import scripts.personal_assistant_ui as ui
+    from assistant.storage import AssistantStore
+
+    store = AssistantStore(tmp_path / "assistant.db")
+    monkeypatch.setattr(ui, "_store", lambda: store)
+    monkeypatch.setattr(ui, "is_configured", lambda: False)
+
+    def counts():
+        with store._connect() as connection:
+            return connection.execute(
+                "SELECT COUNT(*) FROM data_provider_fetches"
+            ).fetchone()[0]
+
+    before = counts()
+    app_path = Path(__file__).resolve().parents[1] / "scripts" / "personal_assistant_ui.py"
+    app = AppTest.from_file(str(app_path), default_timeout=90)
+    app.session_state["nav_page"] = "Reports"
+    app.run()
+    assert not app.exception
+    assert counts() == before

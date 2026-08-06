@@ -22,7 +22,11 @@ from assistant.llm.anthropic_provider import (
 from assistant.llm.committee_service import run_committee_review_and_record
 from assistant.platform_readiness import BLOCKED, build_platform_readiness
 from assistant.runtime_identity import RuntimeIdentityError, current_commit
-from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca
+from assistant.context_builder import (
+    build_decision_packet,
+    build_portfolio_snapshot,
+    build_portfolio_snapshot_from_alpaca,
+)
 from assistant.cash_reporting import CashReportError, evaluate_idle_cash
 from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
@@ -418,15 +422,24 @@ def command_risk_check(args, store: AssistantStore) -> None:
 def command_idle_cash(args, store: AssistantStore) -> None:
     """GR-7b. Read-only: measures cash, never proposes deploying it.
 
-    Deliberately does NOT save the decision packet the way `propose` does --
-    a reporting command must leave execution and evidence tables untouched.
+    Deliberately does NOT call ``_packet(..., store=store)``: that path
+    records GR-4 provider-fetch rows. A reporting command must leave the
+    operator database unchanged, including evidence tables. Portfolio comes
+    from a live Alpaca snapshot when configured, otherwise the sample
+    portfolio — never a decision-packet rebuild that writes.
     """
+    del store  # kept in the handler signature; unused on purpose
     policy = load_policy(_cli_policy_path(args))
     mandate = load_mandate(args.mandate)
-    packet = _packet(include_events=False, store=store)
+    if is_configured():
+        portfolio = build_portfolio_snapshot_from_alpaca()
+    else:
+        portfolio = build_portfolio_snapshot(
+            SAMPLE_POSITIONS, SAMPLE_CASH, source="manual", account_mode="manual"
+        )
     try:
         report = evaluate_idle_cash(
-            packet.portfolio,
+            portfolio,
             policy,
             mandate,
             measured_annualized_volatility_pct=args.measured_volatility_pct,

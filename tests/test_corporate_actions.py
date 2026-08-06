@@ -229,3 +229,30 @@ def test_valid_split_posting_still_converts():
         _PostingStore([_split_posting({"corporate_action": "split", "ratio": "4"})])
     )
     assert [s.ratio for s in splits] == [4.0]
+
+
+def test_malformed_broker_shares_degrade_coverage_instead_of_traceback(monkeypatch):
+    """Residual FPS-001 class: coverage share math used raw Decimal(str(...)).
+
+    InvalidOperation is not a ValueError, so a corrupt portfolio.shares value
+    escaped tax_ledger_with_coverage and would traceback in Reports/CLI.
+    """
+    from assistant import corporate_actions as ca
+
+    class _Ledger:
+        open_lots = [SimpleNamespace(ticker="AAPL")]
+
+        def shares_held(self, ticker: str) -> float:
+            return 10.0
+
+    monkeypatch.setattr(ca, "fills_with_confirmed_splits", lambda store: [])
+    monkeypatch.setattr(ca, "build_ledger", lambda fills: _Ledger())
+    portfolio = SimpleNamespace(
+        positions=[SimpleNamespace(ticker="AAPL", shares="not-a-number")]
+    )
+
+    ledger, coverage = ca.tax_ledger_with_coverage(object(), portfolio)
+
+    assert ledger is None
+    assert coverage["complete"] is False
+    assert "broker shares" in coverage["reason"]

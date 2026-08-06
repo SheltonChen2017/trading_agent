@@ -214,15 +214,31 @@ def tax_ledger_with_coverage(
     }
     lot_tickers = {lot.ticker for lot in ledger.open_lots}
     for ticker in sorted(portfolio_tickers | lot_tickers):
-        broker_shares = sum(
-            (
-                Decimal(str(position.shares))
-                for position in portfolio.positions
-                if position.ticker.upper() == ticker
-            ),
-            Decimal("0"),
-        )
-        ledger_shares = Decimal(str(ledger.shares_held(ticker)))
+        # Same InvalidOperation escape class as FPS-001: raw Decimal(str(...))
+        # raises ArithmeticError, which this function does not catch. Shares
+        # are normally floats from the broker snapshot, but a corrupt or
+        # hand-built portfolio must degrade to incomplete coverage — not a
+        # traceback in the Reports page.
+        try:
+            broker_shares = sum(
+                (
+                    to_decimal(
+                        position.shares, name=f"{ticker} broker shares"
+                    )
+                    for position in portfolio.positions
+                    if position.ticker.upper() == ticker
+                ),
+                Decimal("0"),
+            )
+            ledger_shares = to_decimal(
+                ledger.shares_held(ticker), name=f"{ticker} ledger shares"
+            )
+        except ValueError as exc:
+            return None, {
+                "complete": False,
+                "reason": str(exc),
+                "tickers": details,
+            }
         matched = (
             abs(broker_shares - ledger_shares) <= Decimal("0.00000001")
         )

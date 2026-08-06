@@ -32,7 +32,11 @@ from assistant.execution_service import (
     recover_stale_reconciliation,
 )
 import config
-from assistant.policy import compute_policy_fingerprint, load_policy
+from assistant.policy import (
+    compute_policy_fingerprint,
+    load_policy,
+    resolve_policy_path,
+)
 from assistant.mandate import (
     compute_mandate_fingerprint,
     evaluate_live_promotion,
@@ -157,6 +161,21 @@ def _current_commit(*, require_clean: bool) -> str:
         raise SystemExit(str(exc)) from exc
 
 
+def _cli_policy_path(args) -> str:
+    """Resolve the governing policy path for a CLI invocation.
+
+    ``--policy`` defaults to ``None`` so parser construction cannot raise on
+    a broken ``TRADING_ASSISTANT_POLICY``. ``main()`` binds the path before
+    dispatch, but tests (and any direct handler call) still see ``None``
+    after ``parse_args()``. Resolving here keeps handlers usable without
+    reintroducing the eager argparse default.
+    """
+    raw = getattr(args, "policy", None)
+    if raw is None:
+        return str(resolve_policy_path())
+    return str(Path(raw).expanduser())
+
+
 def _active_runtime_lineage(
     store: AssistantStore, args
 ) -> dict[str, str]:
@@ -165,7 +184,7 @@ def _active_runtime_lineage(
         raise SystemExit("No active paper evidence epoch.")
     recorded = epoch["lineage"]
     mandate = load_mandate(args.mandate)
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     if not is_configured():
         raise SystemExit(
             "Alpaca paper credentials are required to verify evidence lineage."
@@ -352,7 +371,7 @@ def command_risk_check(args, store: AssistantStore) -> None:
         # _positive_int's role for --stale-after-seconds: catches an
         # obviously incomplete invocation early with a clear message.
         raise SystemExit("--benchmark and --move-pct must be given together, or not at all.")
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     packet = _packet(include_events=False, store=store)
     violations = check_policy_compliance(packet.portfolio, policy)
     for violation in violations:
@@ -392,7 +411,7 @@ def command_risk_check(args, store: AssistantStore) -> None:
 
 
 def command_propose(args, store: AssistantStore) -> None:
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     packet = _packet(include_events=not args.no_events, store=store)
     store.save_decision_packet(packet)
     tax_ledger, tax_coverage = tax_ledger_with_coverage(
@@ -477,7 +496,7 @@ def command_list(args, store: AssistantStore) -> None:
 def command_approve(args, store: AssistantStore) -> None:
     if not is_configured():
         raise SystemExit("Alpaca paper credentials are required for approval execution.")
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     portfolio = build_portfolio_snapshot_from_alpaca()
     try:
         order = execute_approved_paper_proposal(
@@ -551,7 +570,7 @@ def command_prune_packets(args, store: AssistantStore) -> None:
 
 
 def command_sync_orders(args, store: AssistantStore) -> None:
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     result = reconcile_nonterminal_orders(
         store,
         cancel_stale=args.cancel_stale,
@@ -561,7 +580,7 @@ def command_sync_orders(args, store: AssistantStore) -> None:
 
 
 def command_monitor_orders(args, store: AssistantStore) -> None:
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     print("Running startup reconciliation, then listening for Alpaca trade updates.")
     monitor_orders(
         store,
@@ -848,7 +867,7 @@ def command_tax_report(args, store: AssistantStore) -> None:
 
 
 def command_readiness(args, store: AssistantStore) -> None:
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     report = transaction_readiness(store, policy, check_broker=not args.offline)
     print(json.dumps(report, indent=2, sort_keys=True))
     if not report["ready"]:
@@ -862,7 +881,7 @@ def command_platform_readiness(args, store: AssistantStore) -> None:
     can react, but prints every dimension either way -- a blocked dimension
     must never suppress the others.
     """
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     mandate = load_mandate(args.mandate)
     report = build_platform_readiness(
         store, policy, mandate, check_broker=not args.offline
@@ -1002,7 +1021,7 @@ def command_ledger_split(args, store: AssistantStore) -> None:
             "Alpaca paper credentials are required to reconcile fills before "
             "recording a split."
         )
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     order_reconciliation = reconcile_nonterminal_orders(
         store,
         max_order_age_minutes=policy.max_order_age_minutes,
@@ -1083,7 +1102,7 @@ def command_ledger_fee(args, store: AssistantStore) -> None:
 
 
 def command_operations_check(args, store: AssistantStore) -> None:
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     report = run_operational_check(
         store, policy, check_broker=not args.offline
     )
@@ -1226,7 +1245,7 @@ def command_paper_epoch_start(args, store: AssistantStore) -> None:
             "Refusing to start paper evidence against a live account."
         )
     mandate = load_mandate(args.mandate)
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     lineage = build_paper_lineage(
         code_commit=_current_commit(require_clean=True),
         mandate_fingerprint=compute_mandate_fingerprint(mandate),
@@ -1289,7 +1308,7 @@ def command_paper_observation(args, store: AssistantStore) -> None:
     session_date = session[0]
     try:
         lineage = _active_runtime_lineage(store, args)
-        policy = load_policy(args.policy)
+        policy = load_policy(_cli_policy_path(args))
         order_report = reconcile_nonterminal_orders(
             store,
             cancel_stale=args.cancel_stale,
@@ -1382,7 +1401,7 @@ def command_operations_cycle(args, store: AssistantStore) -> None:
         raise SystemExit(
             "Alpaca paper credentials are required for an operational cycle."
         )
-    policy = load_policy(args.policy)
+    policy = load_policy(_cli_policy_path(args))
     try:
         order_report = reconcile_nonterminal_orders(
             store,
@@ -1506,7 +1525,14 @@ def build_parser() -> argparse.ArgumentParser:
     )
     parser.add_argument(
         "--policy",
-        default=str(Path(__file__).resolve().parent.parent / "assistant" / "default_policy.json"),
+        default=None,
+        help=(
+            "Policy file governing proposals. When omitted, resolves via "
+            "TRADING_ASSISTANT_POLICY, then assistant/my_policy.json when "
+            "present, otherwise assistant/default_policy.json. The path is "
+            "resolved after argument parsing so a bad environment default "
+            "cannot block --help or an explicit --policy."
+        ),
     )
     parser.add_argument(
         "--mandate",
@@ -2090,6 +2116,13 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main() -> None:
     args = build_parser().parse_args()
+    # Resolve after parse so a broken TRADING_ASSISTANT_POLICY cannot brick
+    # --help or an explicit --policy. Handlers also call _cli_policy_path
+    # so direct test invocations with default=None stay safe.
+    try:
+        args.policy = _cli_policy_path(args)
+    except FileNotFoundError as exc:
+        raise SystemExit(f"Policy resolution failed: {exc}") from exc
     # verify-db-schema declares needs_store=False: constructing the store
     # would migrate the database before the handler runs, making read-only
     # verification of a pre-migration database impossible.

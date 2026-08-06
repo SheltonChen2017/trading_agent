@@ -48,6 +48,27 @@ Alpaca paper credentials (set them as Windows user environment variables)
 and `assistant/my_policy.json` if you use a custom policy. **Only one
 computer may run the scheduled tasks during an evidence epoch** — see §6.
 
+### Which policy file loads
+
+The policy file decides what the app is allowed to propose, so the app
+picks one in a fixed order and always tells you which one won:
+
+1. a path you type into the sidebar's **Policy file** box, or pass as
+   `--policy` on the command line;
+2. the `TRADING_ASSISTANT_POLICY` environment variable;
+3. `assistant/my_policy.json`, if that file exists;
+4. `assistant/default_policy.json` otherwise.
+
+Levels 1 and 2 name a file explicitly, so if it is missing you get an
+error rather than a different policy — quietly loading a *more permissive*
+policy than the one you asked for is exactly the failure worth refusing.
+The sidebar shows the active file name under the box; check it before
+approving anything, because `my_policy.json` allows new positions and the
+committed default does not.
+
+A fresh clone has no `my_policy.json` and starts on the conservative
+committed default. That is intended, not a setup error.
+
 ---
 
 ## 2. The four core modules
@@ -220,7 +241,9 @@ reconciliation aid, not tax advice, and not a 1099-B substitute.
 ## 6. What runs in the background
 
 Four Windows scheduled tasks run out of the frozen checkout. Two of them
-appear as console windows — **minimize them, never close them**.
+appear as console windows. Minimizing them is still the tidy habit, but
+closing one is no longer an outage: both re-check every 5 minutes and
+restart themselves if they are not running.
 
 | Task | Cadence | Job |
 |---|---|---|
@@ -232,7 +255,8 @@ appear as console windows — **minimize them, never close them**.
 **The one recurring obligation:** the observation fires at 16:30 local. If
 you shut the machine down before then, that day does not count toward the
 60 — so either leave it running past 16:30, or ask Claude to capture the
-observation after the close (it takes seconds).
+observation after the close (it takes seconds). Running on battery is
+fine; the tasks used to skip on battery power and no longer do.
 
 The evidence epoch itself is a database record: it survives reboots and
 never needs re-activating. The frozen checkout must not be updated until
@@ -250,6 +274,8 @@ the epoch is closed.
 | Ledger reconciliation mismatch after a dividend or split | Real cash/shares arrived that your books do not explain | Record it with `ledger-dividend` / `ledger-split` — never edit tables by hand |
 | `platform-readiness` exits non-zero | Expected for months: evidence needs 60 sessions and strategy readiness needs a confirmed finding | Not a fault; do not "fix" it |
 | A refusal you did not expect | The gate found a real rule breach | Read the message — it names the exact rule |
+| A buy is refused as policy-ineligible | The conservative default policy is loaded, which forbids new positions | Check the file name under the sidebar's Policy file box (see §1) |
+| A console task window vanished | It was closed or Ctrl+C'd | Nothing to do — it restarts itself within 5 minutes |
 
 A refusal is the system working. The dangerous outcome is a trade that
 goes through when it should not have.

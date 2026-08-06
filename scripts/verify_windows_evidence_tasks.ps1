@@ -191,9 +191,13 @@ foreach ($taskName in $expectedTasks) {
     # impossible/corrupt combination such as a sentinel date plus exit 1
     # remains a failure.
     $neverRun = $neverRunTime -and $info.LastTaskResult -eq 267011
-    $currentlyRunning = $task.State -eq "Running" -and `
-        $info.LastTaskResult -eq 267009
+    # A healthy long-runner with a repeating self-heal trigger can show
+    # LastTaskResult=0x800710E0 (already running / ignored start) after a
+    # heal tick. Process identity is State=Running; requiring 267009 alone
+    # false-fails the verifier while OrderMonitor/Watchdog are alive.
+    $currentlyRunning = $task.State -eq "Running"
     $lastResultOk = $info.LastTaskResult -eq 0 -or `
+        $info.LastTaskResult -eq 267009 -or `
         $currentlyRunning -or ($neverRun -and -not $RequireTaskRun)
     Add-Check -Name "task:$taskName" -Ok (
         $principalOk -and $pythonOk -and $lastResultOk

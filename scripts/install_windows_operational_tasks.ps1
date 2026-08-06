@@ -19,6 +19,10 @@ param(
     [ValidateRange(5, 60)]
     [int]$OperationsCycleMinutes = 10,
 
+    # How often the long-running tasks re-check that they are still alive.
+    [ValidateRange(1, 60)]
+    [int]$LongRunningHealMinutes = 5,
+
     [datetime]$PaperObservationLocalTime = [datetime]::Today.AddHours(16).AddMinutes(30),
 
     [string]$AlertsJsonlPath
@@ -154,11 +158,32 @@ $cycleTrigger = New-ScheduledTaskTrigger `
     -At ((Get-Date).AddMinutes(1)) `
     -RepetitionInterval (New-TimeSpan -Minutes $OperationsCycleMinutes) `
     -RepetitionDuration (New-TimeSpan -Days 3650)
+# The startup/logon trigger fires exactly ONCE per boot or logon. On its
+# own that makes a long-running task unrecoverable: the two console-hosted
+# tasks were observed terminating with 0xC000013A (STATUS_CONTROL_C_EXIT)
+# when their windows were closed, and nothing ever restarted them --
+# RestartCount does not cover that exit, because Task Scheduler treats a
+# console-close as the task being stopped rather than failing. Order-stream
+# monitoring and the health heartbeat then stayed silently dead until
+# somebody noticed by hand, and the Watchdog is precisely the component
+# that would otherwise have raised the alarm.
+#
+# The repeating companion trigger below is the recovery path. It composes
+# with MultipleInstances=IgnoreNew already set in $longSettings: a tick
+# while the task is healthy does not start a second process. It can still
+# update LastRunTime/LastTaskResult with an "already running" HRESULT, so
+# verify_windows_evidence_tasks.ps1 treats State=Running as healthy even
+# when the latest heal tick was refused.
+$selfHealTrigger = New-ScheduledTaskTrigger `
+    -Once `
+    -At ((Get-Date).AddMinutes(1)) `
+    -RepetitionInterval (New-TimeSpan -Minutes $LongRunningHealMinutes) `
+    -RepetitionDuration (New-TimeSpan -Days 3650)
 $longRunningTrigger = if ($TaskLogonType -eq "S4U") {
-    New-ScheduledTaskTrigger -AtStartup
+    @((New-ScheduledTaskTrigger -AtStartup), $selfHealTrigger)
 }
 else {
-    New-ScheduledTaskTrigger -AtLogOn -User $RunAsUser
+    @((New-ScheduledTaskTrigger -AtLogOn -User $RunAsUser), $selfHealTrigger)
 }
 $observationTrigger = New-ScheduledTaskTrigger `
     -Weekly `
@@ -166,17 +191,28 @@ $observationTrigger = New-ScheduledTaskTrigger `
     -DaysOfWeek Monday, Tuesday, Wednesday, Thursday, Friday `
     -At $PaperObservationLocalTime
 
+# AllowStartIfOnBatteries / DontStopIfGoingOnBatteries are not conveniences.
+# New-ScheduledTaskSettingsSet defaults BOTH battery guards to on, which on
+# a laptop means unplugging the machine stops order monitoring, the health
+# heartbeat, and the reconciliation cycle -- and the observation that makes
+# a session count toward the evidence epoch simply never runs. An evidence
+# gap caused by a power cable is indistinguishable, after the fact, from an
+# evidence gap caused by a defect.
 $shortSettings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
     -MultipleInstances IgnoreNew `
     -RestartCount 3 `
     -RestartInterval (New-TimeSpan -Minutes 1) `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
     -ExecutionTimeLimit (New-TimeSpan -Minutes 8)
 $longSettings = New-ScheduledTaskSettingsSet `
     -StartWhenAvailable `
     -MultipleInstances IgnoreNew `
     -RestartCount 10 `
     -RestartInterval (New-TimeSpan -Minutes 1) `
+    -AllowStartIfOnBatteries `
+    -DontStopIfGoingOnBatteries `
     -ExecutionTimeLimit ([TimeSpan]::Zero)
 $principal = New-ScheduledTaskPrincipal `
     -UserId $RunAsUser `

@@ -659,6 +659,37 @@ def _load_packet(policy_path: str, include_events: bool):
     return policy, enriched
 
 
+@st.cache_data(ttl=_PACKET_CACHE_TTL_SECONDS)
+def _load_readonly_portfolio():
+    """Account snapshot for STRICTLY READ-ONLY reporting surfaces.
+
+    Two constraints pull in opposite directions and both are real:
+
+    * `_load_base_packet()` calls `build_decision_packet(store=_store())`,
+      which records GR-4 `data_provider_fetches` evidence. A reporting page
+      must not write, so those surfaces cannot use it (independent review,
+      2026-08-06, GR7BREV-002 -- the same defect GR-7a's tax Build had).
+    * But dropping the shared cache entirely reintroduces a live broker
+      call on EVERY rerun of the page, and lets Reports disagree with
+      Briefing about the same account in the same session -- precisely the
+      invariant `_load_base_packet` was created to protect after two tabs
+      were once found showing two different snapshots.
+
+    Cached AND store-free satisfies both. It shares the packet TTL and is
+    cleared by the same `st.cache_data.clear()` the Refresh buttons call,
+    so a deliberate refresh still re-fetches.
+    """
+    from assistant.context_builder import build_portfolio_snapshot
+    from assistant.sample_portfolio import SAMPLE_CASH, SAMPLE_POSITIONS
+    from execution.alpaca_broker import is_configured
+
+    if is_configured():
+        return build_portfolio_snapshot_from_alpaca()
+    return build_portfolio_snapshot(
+        SAMPLE_POSITIONS, SAMPLE_CASH, source="manual", account_mode="manual"
+    )
+
+
 # Coarse rounding granularity for cash/equity/buying_power in the
 # portfolio-context payload (GPT review, 2026-07-31) -- see
 # _portfolio_context_payload()'s docstring for why these are banded
@@ -3637,25 +3668,15 @@ if page == "Reports":
     # this page's read-only contract the same way tax Build used to.
     with st.expander("Idle cash vs policy and mandate", expanded=True):
         from assistant.cash_reporting import CashReportError, evaluate_idle_cash
-        from assistant.context_builder import (
-            build_portfolio_snapshot as _build_manual_portfolio,
-        )
         from assistant.mandate import load_mandate as _load_mandate
-        from assistant.sample_portfolio import SAMPLE_CASH as _SAMPLE_CASH
-        from assistant.sample_portfolio import SAMPLE_POSITIONS as _SAMPLE_POSITIONS
-        from execution.alpaca_broker import is_configured as _alpaca_configured
 
         try:
             _cash_policy = load_policy(policy_path)
-            if _alpaca_configured():
-                _cash_portfolio = build_portfolio_snapshot_from_alpaca()
-            else:
-                _cash_portfolio = _build_manual_portfolio(
-                    _SAMPLE_POSITIONS,
-                    _SAMPLE_CASH,
-                    source="manual",
-                    account_mode="manual",
-                )
+            # Cached and store-free: read-only like the review required,
+            # without a live broker call on every rerun of this page or a
+            # snapshot that disagrees with Briefing. See
+            # _load_readonly_portfolio().
+            _cash_portfolio = _load_readonly_portfolio()
             _cash = evaluate_idle_cash(
                 _cash_portfolio, _cash_policy, _load_mandate()
             )

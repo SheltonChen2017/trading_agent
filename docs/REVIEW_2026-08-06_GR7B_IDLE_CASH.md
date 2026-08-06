@@ -51,3 +51,42 @@ Windows, Python 3.13.
 - `compileall` clean; `git diff --check` clean.
 
 Nothing deployed mid-epoch.
+
+## 6. Claude counter-review of this review
+
+All four findings **accepted and confirmed**, three of them empirically
+rather than on inspection:
+
+- **GR7BREV-001 reproduced.** Running the original
+  `_packet(include_events=False, store=store)` against a fresh database
+  took `data_provider_fetches` from 0 rows to 1. The read-only claim in the
+  submitted docstring was simply false. The submitted test could not see it
+  because it monkeypatched `_packet` itself — the exact defect class this
+  session has been catching in others: a test that mocks the component
+  doing the damage proves nothing about the real path.
+- **GR7BREV-002 confirmed at the source.** `_load_base_packet` calls
+  `build_decision_packet(store=_store())`, so the Reports panel did write
+  provider evidence. This repeated a defect GR-7a had already fixed **on
+  the same page**, which makes it the more embarrassing of the two.
+- **GR7BREV-003/004 confirmed.** `CashReportError` subclasses `ValueError`,
+  so `except CashReportError` cannot catch the parent that `to_decimal`
+  raises; a bad `--measured-volatility-pct` escaped. Negative volatility is
+  physically meaningless and was accepted as a valid measurement.
+
+### Residual findings from this counter-review
+
+| ID | Priority | Status | Issue | Correction |
+|---|---|---|---|---|
+| CFPS-GR7B-001 | P2 | Resolved | The fix for GR7BREV-001 left `build_portfolio_snapshot_from_alpaca()` **outside every guard** in the CLI, while the UI sibling was given an `except Exception`. Reproduced: a configured account plus a broker outage exits with an uncaught `RuntimeError` traceback instead of a refusal. GR-7a already set the rule that a data/broker outage must degrade the report rather than break it. | Guard the snapshot acquisition; exit with a stated reason. Regression test simulates a 503. |
+| CFPS-GR7B-002 | P2 | Resolved | Removing `_load_packet` correctly removed the write but also removed the **shared cache**, so the panel issued a live broker call on every rerun of the Reports page (which carries an interactive tax-year widget) and could show a snapshot disagreeing with Briefing in the same session — the precise invariant `_load_base_packet` was created to protect after two tabs were once found showing different snapshots. | New `_load_readonly_portfolio()`: cached **and** store-free, so read-only and consistency both hold. Two tests pin the decorator/no-store shape and the panel's use of it. |
+| CFPS-GR7B-003 | P2 | Resolved | The handoff was trimmed from ~250 lines to 33 net, dropping six load-bearing facts: the **`require_earnings_data` owner decision recorded the same day**, the machine-local epoch-swap script, the non-elevated `Disable` "Access is denied" gotcha, the singleton lock evidence, the backup location (and that GR-6's off-machine requirement is unmet), and how to launch the app at all. CLAUDE.md §12 makes this file the thing that lets a computer switch require only `git pull`. | Restored compactly as §3a (owner decisions) and §3b (machine-local facts) rather than reverting the trim, which was otherwise an improvement. |
+
+Mutation results: removing the CLI guard fails
+`test_idle_cash_cli_degrades_when_the_broker_snapshot_fails`; dropping the
+cache decorator fails
+`test_readonly_portfolio_loader_is_cached_and_takes_no_store`. Both
+restored green.
+
+The FEATURE_MILESTONE_RECORD entry added by this review is appropriate:
+GR-7b now has both a completed definition of done and an independent
+review, which is what CLAUDE.md §12 requires before recording.

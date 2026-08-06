@@ -42,6 +42,49 @@ writes; no action-shaped fields.
 - `compileall` clean; `git diff --check` clean.
 - Nothing deployed; ops checkout stays at `9a91498`.
 
+## 3a. Owner decisions on record (do not re-derive)
+
+**`require_earnings_data` stays `false`** (2026-08-06, measured not
+assumed). The feed resolved 5/7 of the account's holdings; the two failures
+are structurally different and the policy **cannot tell them apart** —
+`NVDL` is a leveraged ETF with no earnings event at all, while `BBB` is a
+small cap whose real earnings the provider does not carry. Setting it
+`true` would permanently block every ETF buy — including the SOXX/SOXL-style
+strategy — while correctly blocking BBB. Residual exposure is BBB-like
+names: real earnings, invisible to the feed, silently unchecked.
+Risk-reducing SELLs are exempt either way.
+
+**Epoch re-bind (option A)** was chosen and executed 2026-08-06 after the
+owner reversed an earlier option-B decision; `paper-epoch-001` was closed
+with one observation rather than accumulating 60 sessions under a policy
+its own lineage forbade.
+
+## 3b. Machine-local operational facts
+
+Not derivable from the repository, and expensive to rediscover.
+
+- **Launch the app only via `C:\git\launch_trading_app.ps1`.** It pins the
+  operational checkout, sets `TRADING_ASSISTANT_DB`, and re-reads Alpaca
+  credentials from the USER-scope registry at every launch — a long-lived
+  shell otherwise hands the app a revoked key (observed after the
+  2026-08-05 rotation).
+- **`C:\git\epoch_swap_tasks_elevated.ps1`** (machine-local, elevated)
+  disables/enables the four `TradingAgent-Paper-*` tasks for a deploy. On
+  this host a non-elevated `Stop-ScheduledTask` **succeeds** while
+  `Disable-ScheduledTask` returns "Access is denied" — so a merely stopped
+  long-runner is restarted by its own 5-minute heal trigger. Disabling is
+  what actually holds them down.
+- **The process singleton is live.** `data/locks/order-monitor.lock` and
+  `data/locks/operations-watchdog.lock` being held is the direct evidence
+  that the deployed tree, not the previous one, is executing.
+  `data/locks/` is gitignored.
+- **Backups land in `data/backups/`** — on the SAME disk as the operator
+  database. GR-6's off-machine requirement is NOT met; a drive failure
+  currently loses the running epoch.
+- This host keeps losing console-hosted processes to `0xC000013A`. The
+  scheduled tasks self-heal; **the Streamlit app does not**, because
+  nothing supervises it.
+
 ## 4. What is next
 
 1. Confirm `paper-epoch-002` observation rows as sessions accumulate.
@@ -51,6 +94,16 @@ writes; no action-shaped fields.
    make the mandate vol floor structurally unreachable; that is not an
    engineering fix.
 4. FPS-003 intermittent UI chrome title test remains open from earlier.
+   Severity now looks **overstated at P2**: it has passed every full run
+   since (5+), and the likely cause is contention during a ~2,900-test run.
+   Do NOT close it on a green suite — capture the full traceback the next
+   time a full run fails, since the original was lost to a `tail` pipe.
+5. **Watch the `Decimal(str(...))` pattern.** Three consecutive review
+   passes each found another raw conversion on a share or money field
+   (FPS-001 → GFPS-001 → CFPS-001). The remaining raw sites sit inside
+   their own try/except helpers, but if a fourth appears the answer is a
+   lint/AST guard banning bare `Decimal(str(...))` outside
+   `assistant/money.py`, not another point fix.
 
 ## 5. Non-negotiable boundaries
 

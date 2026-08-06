@@ -448,3 +448,104 @@ def test_reports_idle_cash_panel_does_not_write_provider_fetch_rows(tmp_path, mo
     app.run()
     assert not app.exception
     assert counts() == before
+
+def test_idle_cash_cli_degrades_when_the_broker_snapshot_fails(monkeypatch):
+    """Counter-review of GR7BREV-001's fix. Closing the provider-fetch write
+    left `build_portfolio_snapshot_from_alpaca()` outside every guard, so a
+    broker outage on a CONFIGURED account ended in a traceback rather than a
+    refusal -- while the UI sibling of this panel was given exactly that
+    guard. GR-7a already set the rule: an outage must degrade the report,
+    not break it.
+    """
+    from types import SimpleNamespace
+
+    import scripts.run_personal_assistant as cli
+
+    def _outage():
+        raise RuntimeError("alpaca: 503 service unavailable")
+
+    monkeypatch.setattr(cli, "is_configured", lambda: True)
+    monkeypatch.setattr(cli, "build_portfolio_snapshot_from_alpaca", _outage)
+
+    with pytest.raises(SystemExit, match="portfolio snapshot unavailable"):
+        cli.command_idle_cash(
+            SimpleNamespace(
+                policy=None,
+                mandate=str(DEFAULT_POLICY_PATH.parent / "default_mandate.json"),
+                measured_volatility_pct=None,
+                json=True,
+            ),
+            store=None,
+        )
+
+
+def test_readonly_portfolio_loader_is_cached_and_takes_no_store():
+    """Counter-review of GR7BREV-002's fix. Dropping `_load_packet` removed
+    the write (correct) but also removed the shared cache, reintroducing a
+    live broker call on every rerun of the Reports page and allowing that
+    page to disagree with Briefing about the same account in the same
+    session -- the invariant `_load_base_packet` exists to protect.
+
+    Source-level: 'is decorated with st.cache_data' and 'never passes a
+    store' are structural properties no single call can observe.
+    """
+    import ast
+    from pathlib import Path
+
+    source = (
+        Path(__file__).resolve().parents[1] / "scripts" / "personal_assistant_ui.py"
+    ).read_text(encoding="utf-8")
+    tree = ast.parse(source)
+
+    loader = next(
+        (
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.FunctionDef)
+            and node.name == "_load_readonly_portfolio"
+        ),
+        None,
+    )
+    assert loader is not None, "the read-only portfolio loader must exist"
+
+    decorators = [ast.unparse(d) for d in loader.decorator_list]
+    assert any("cache_data" in d for d in decorators), (
+        f"read-only portfolio loader must be cached, got {decorators}"
+    )
+    # A store anywhere in the EXECUTABLE body would put the provider-fetch
+    # write back. The docstring is excluded deliberately: it explains the
+    # `store=_store()` call this loader exists to avoid, and matching on it
+    # would make the test fail for describing the bug it guards.
+    statements = [
+        node
+        for node in loader.body
+        if not (
+            isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
+        )
+    ]
+    body = "\n".join(ast.unparse(node) for node in statements)
+    assert "_store()" not in body and "store=" not in body, (
+        f"the read-only loader must never reach a store; body was:\n{body}"
+    )
+
+
+def test_idle_cash_panel_uses_the_cached_readonly_loader():
+    """Pins the wiring, not just the helper: a future edit that inlines a
+    bare build_portfolio_snapshot_from_alpaca() call back into the panel
+    would restore the per-rerun fetch without failing anything else."""
+    import re
+    from pathlib import Path
+
+    source = (
+        Path(__file__).resolve().parents[1] / "scripts" / "personal_assistant_ui.py"
+    ).read_text(encoding="utf-8")
+    panel = re.search(
+        r"# GR-7b\. Renders on load.*?(?=^# -{20,})", source, re.DOTALL | re.MULTILINE
+    )
+    assert panel is not None, "could not locate the GR-7b panel"
+    body = panel.group(0)
+    assert "_load_readonly_portfolio()" in body
+    assert "build_portfolio_snapshot_from_alpaca(" not in body, (
+        "the panel must go through the cached read-only loader"
+    )
+    assert "_load_packet(" not in body, "the panel must not use the writing loader"

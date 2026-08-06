@@ -431,12 +431,24 @@ def command_idle_cash(args, store: AssistantStore) -> None:
     del store  # kept in the handler signature; unused on purpose
     policy = load_policy(_cli_policy_path(args))
     mandate = load_mandate(args.mandate)
-    if is_configured():
-        portfolio = build_portfolio_snapshot_from_alpaca()
-    else:
-        portfolio = build_portfolio_snapshot(
-            SAMPLE_POSITIONS, SAMPLE_CASH, source="manual", account_mode="manual"
-        )
+    # A broker outage must degrade the REPORT, not dump a traceback on the
+    # operator -- the same rule GR-7a's Reports page already applies to
+    # coverage verification, and the same guard the UI sibling of this
+    # panel carries. Without this, `idle-cash` during an Alpaca incident
+    # ends in a stack trace, which in a scheduled context is
+    # indistinguishable from the tool itself being broken.
+    try:
+        if is_configured():
+            portfolio = build_portfolio_snapshot_from_alpaca()
+        else:
+            portfolio = build_portfolio_snapshot(
+                SAMPLE_POSITIONS, SAMPLE_CASH, source="manual", account_mode="manual"
+            )
+    except Exception as exc:
+        raise SystemExit(
+            f"Cannot report idle cash: portfolio snapshot unavailable "
+            f"({type(exc).__name__}: {exc})"
+        ) from exc
     try:
         report = evaluate_idle_cash(
             portfolio,

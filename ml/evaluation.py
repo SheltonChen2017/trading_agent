@@ -74,6 +74,21 @@ def _finite_pairs(
     return a[mask], p[mask]
 
 
+def usable_pair_count(actual: Sequence[float], predicted: Sequence[float]) -> int:
+    """How many observations a metric over these two series ACTUALLY scores.
+
+    Every scalar metric in this module drops non-finite pairs via
+    ``_finite_pairs``. A report that prints a raw row count beside such a
+    metric overstates the evidence behind it: a model that fails to predict
+    the hard cases has those cases silently removed from its own score, so
+    the number improves as coverage worsens. Callers must publish this
+    count next to the metric -- the same discipline the fold summaries
+    already use with ``evaluated_validation_row_count``.
+    """
+    a, _ = _finite_pairs(actual, predicted)
+    return int(a.size)
+
+
 def qlike_loss(actual_volatility: Sequence[float], predicted_volatility: Sequence[float]) -> float | None:
     """QLIKE loss (doc 8.3's primary volatility metric).
 

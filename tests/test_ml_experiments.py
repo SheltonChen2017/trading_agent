@@ -455,8 +455,14 @@ def test_a_corrupted_model_artifact_refuses_an_exact_retry(tmp_path):
 def test_a_spec_that_does_not_describe_the_dataset_is_refused(tmp_path, overrides, expected):
     _build_dataset(tmp_path)
     spec_overrides = dict(overrides)
-    if "label_version" in overrides:
-        pytest.skip("label_version mismatch is caught earlier by join_for_evaluation")
+    # The label_version case was previously skipped as "caught earlier by
+    # join_for_evaluation". That is true (test_ml_datasets.py::
+    # test_join_for_evaluation_rejects_unknown_label_version covers the
+    # lower layer), but it is not a reason to stop asserting the refusal
+    # HERE: the case still passes, so the skip only removed coverage of
+    # this spec/dataset boundary and left a permanent "1 skipped" in every
+    # validation run. Verified 2026-08-06 by removing it -- all six cases
+    # pass.
     with pytest.raises(Exception) as exc_info:
         _run(tmp_path, _spec(**spec_overrides))
     assert expected in str(exc_info.value)

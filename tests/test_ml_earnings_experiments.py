@@ -392,3 +392,63 @@ def test_thin_first_fold_reports_fit_refusal_not_a_model(tmp_path):
 
 def record_artifacts(directory: Path, experiment_id: str) -> list[Path]:
     return list(directory.glob(f"{experiment_id}.*.joblib"))
+
+
+def test_failure_slices_report_the_count_the_metric_actually_scored():
+    """A slice metric must publish its own denominator.
+
+    brier_score()/mean_absolute_error() drop non-finite pairs, so a slice
+    the model mostly FAILED to predict would otherwise display a strong
+    score beside the full event_count -- the score improving precisely as
+    coverage got worse. ml/monitoring_reports.py's slice reporting already
+    publishes row_count alongside its sufficiency verdict; this one only
+    reported the raw size.
+    """
+    from ml.earnings_experiments import _slice_metrics
+
+    # Ten events in one slice; the model produced a usable probability for
+    # only three of them, and those three are the easy ones.
+    frame = pd.DataFrame(
+        {
+            "ticker": ["AAA"] * 10,
+            "industry": ["tech"] * 10,
+            "year": ["2026"] * 10,
+            "volatility_regime": ["low"] * 10,
+            "release_timing": ["after_close"] * 10,
+            "actual_downside_tail": [1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0, 1.0, 0.0],
+            "prediction_logistic_downside_tail": [
+                0.9, 0.1, np.nan, np.nan, np.nan,
+                np.nan, np.nan, np.nan, np.nan, 0.1,
+            ],
+        }
+    )
+
+    slices = _slice_metrics(frame, "logistic_downside_tail")
+    bucket = slices["ticker"]["AAA"]
+
+    assert bucket["event_count"] == 10
+    assert bucket["scored_event_count"] == 3, (
+        "the metric scored three pairs; reporting only event_count=10 beside "
+        "it overstates the evidence sevenfold"
+    )
+    assert bucket["primary_metric"] is not None
+    assert bucket["scored_event_count"] < bucket["event_count"]
+
+
+def test_fully_scored_slice_reports_equal_counts():
+    """Guards against 'fixing' the above with a constant."""
+    from ml.earnings_experiments import _slice_metrics
+
+    frame = pd.DataFrame(
+        {
+            "ticker": ["BBB"] * 4,
+            "industry": ["tech"] * 4,
+            "year": ["2026"] * 4,
+            "volatility_regime": ["low"] * 4,
+            "release_timing": ["after_close"] * 4,
+            "actual_downside_tail": [1.0, 0.0, 1.0, 0.0],
+            "prediction_logistic_downside_tail": [0.8, 0.2, 0.7, 0.3],
+        }
+    )
+    bucket = _slice_metrics(frame, "logistic_downside_tail")["ticker"]["BBB"]
+    assert bucket["event_count"] == bucket["scored_event_count"] == 4

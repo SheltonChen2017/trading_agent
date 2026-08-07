@@ -1,0 +1,27 @@
+{
+  "version": "1.0.0",
+  "name": "Conservative personal equity and ETF mandate",
+  "status": "approved",
+  "approved_at": "2026-08-04T22:57:09.621992+00:00",
+  "approved_by": "sheltonchen",
+  "approved_fingerprint": "693799c0acb440040064eaa69a57d87c32186e63709f49ffa52f6feb39956487",
+  "target_annualized_volatility_min_pct": 12.0,
+  "target_annualized_volatility_max_pct": 18.0,
+  "max_drawdown_pct": 25.0,
+  "max_time_under_water_sessions": 180,
+  "max_downside_capture_pct": 70.0,
+  "min_upside_capture_pct": 70.0,
+  "min_paper_sessions": 60,
+  "min_paper_orders": 30,
+  "max_unreconciled_items": 0,
+  "max_critical_alerts": 0,
+  "require_reproduced_research": true,
+  "require_point_in_time_data": true,
+  "require_backup_restore_drill": true,
+  "permitted_instruments": [
+    "equity",
+    "etf"
+  ],
+  "allow_autonomous_execution": false,
+  "notes": "Owner-approved 2026-08-04 with targets unchanged from the proposed defaults derived from docs/MANDATE.md. The approved_fingerprint binds this approval to the exact behavior fields; any change to them requires a new reviewed approval."
+}

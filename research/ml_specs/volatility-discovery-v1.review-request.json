@@ -1,0 +1,10 @@
+{
+  "schema_version": "1",
+  "spec_path": "research/ml_specs/volatility-discovery-v1.json",
+  "review_status": "review_required",
+  "required_review_scope": "research_behavior_and_gates",
+  "reviewer": null,
+  "reviewed_at": null,
+  "spec_hash": "d3cf25d1ec06c5573a229d2504425656a51ba59f5f344835fd27c0b2612030ac",
+  "notes": "Review feature availability, historical-universe identity, ceiling, folds, baselines, multiplicity dimensions, and failure slices before creating an approved attestation. This request is not an approval."
+}

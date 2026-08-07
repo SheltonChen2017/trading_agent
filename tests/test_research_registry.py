@@ -1,0 +1,499 @@
+"""
+Tests for assistant/research_registry.py's provenance enforcement (GPT
+review finding #8, 2026-07-29). Run with: python -m pytest tests/ -v
+(or `python tests/test_research_registry.py` for a quick manual check).
+"""
+import json
+import sys
+import tempfile
+
+import pytest
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from assistant.research_registry import (
+    DEFAULT_REGISTRY_PATH,
+    REQUIRED_PROVENANCE_FIELDS,
+    is_production_authoritative,
+    load_research_findings,
+    summarize_evidence_authority,
+    underfilled_dataset_warning,
+)
+from assistant.schemas import EvidenceStatus, FindingProvenance, SignalEvidence
+
+
+def _write_registry(tmp_dir: Path, findings: list[dict]) -> Path:
+    path = tmp_dir / "findings.json"
+    path.write_text(json.dumps({"version": "test", "updated_at": "2026-07-29", "findings": findings}), encoding="utf-8")
+    return path
+
+
+_VALID_PROVENANCE = {
+    "actual_start_date": "2019-07-22",
+    "actual_end_date": "2026-07-28",
+    "actual_row_count": 1764,
+    "requested_lookback_sessions": 1764,
+    "actual_lookback_sessions": 1764,
+    "entry_timing": "next_open",
+    "data_fetched_at": "2026-07-28T14:53:45+00:00",
+    "reproduced_after_data_loader_fix": False,
+}
+
+
+def test_confirmed_finding_without_provenance_is_rejected():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _write_registry(Path(tmp), [
+            {
+                "label": "Test finding",
+                "claim": "Beats a baseline",
+                "status": "confirmed",
+                "detail": "...",
+                "source": "test",
+                "relevant_tickers": [],
+            }
+        ])
+        try:
+            load_research_findings(path)
+            assert False, "expected a confirmed finding with no provenance to be rejected"
+        except ValueError as exc:
+            assert "no provenance" in str(exc)
+
+
+def test_promising_unconfirmed_finding_without_provenance_is_rejected():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _write_registry(Path(tmp), [
+            {
+                "label": "Test finding",
+                "claim": "Beats a baseline",
+                "status": "promising_unconfirmed",
+                "detail": "...",
+                "source": "test",
+                "relevant_tickers": [],
+            }
+        ])
+        try:
+            load_research_findings(path)
+            assert False, "expected a promising_unconfirmed finding with no provenance to be rejected"
+        except ValueError as exc:
+            assert "no provenance" in str(exc)
+
+
+def test_confirmed_finding_missing_one_required_provenance_field_is_rejected():
+    incomplete = dict(_VALID_PROVENANCE)
+    del incomplete["entry_timing"]
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _write_registry(Path(tmp), [
+            {
+                "label": "Test finding",
+                "claim": "Beats a baseline",
+                "status": "confirmed",
+                "detail": "...",
+                "source": "test",
+                "relevant_tickers": [],
+                "provenance": incomplete,
+            }
+        ])
+        try:
+            load_research_findings(path)
+            assert False, "expected missing entry_timing to be rejected"
+        except ValueError as exc:
+            assert "entry_timing" in str(exc)
+
+
+def test_rejected_finding_never_requires_provenance():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _write_registry(Path(tmp), [
+            {
+                "label": "Test finding",
+                "claim": "Beats a baseline",
+                "status": "rejected",
+                "detail": "...",
+                "source": "test",
+                "relevant_tickers": [],
+            }
+        ])
+        findings = load_research_findings(path)  # must not raise
+        assert findings[0].provenance is None
+
+
+def test_exploratory_and_unavailable_findings_never_require_provenance():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _write_registry(Path(tmp), [
+            {
+                "label": "Exploratory finding",
+                "claim": "...",
+                "status": "exploratory",
+                "detail": "...",
+                "source": "test",
+                "relevant_tickers": [],
+            },
+            {
+                "label": "Unavailable finding",
+                "claim": "...",
+                "status": "unavailable",
+                "detail": "...",
+                "source": "test",
+                "relevant_tickers": [],
+            },
+        ])
+        findings = load_research_findings(path)  # must not raise
+        assert len(findings) == 2
+
+
+def test_confirmed_finding_with_complete_provenance_loads_and_serializes_correctly():
+    with tempfile.TemporaryDirectory() as tmp:
+        path = _write_registry(Path(tmp), [
+            {
+                "label": "Test finding",
+                "claim": "Beats a baseline",
+                "status": "confirmed",
+                "detail": "...",
+                "source": "test",
+                "relevant_tickers": ["SOXX", "SOXL"],
+                "provenance": _VALID_PROVENANCE,
+            }
+        ])
+        findings = load_research_findings(path)
+        assert len(findings) == 1
+        prov = findings[0].provenance
+        assert prov is not None
+        # Row counts and date ranges must retain their real types, not
+        # get silently stringified/rounded during parsing.
+        assert prov.actual_row_count == 1764
+        assert isinstance(prov.actual_row_count, int)
+        assert prov.actual_start_date == "2019-07-22"
+        assert prov.actual_end_date == "2026-07-28"
+        assert prov.requested_lookback_sessions == 1764
+        assert prov.actual_lookback_sessions == 1764
+
+
+def test_underfilled_dataset_warning_flags_short_history():
+    prov = FindingProvenance(**{**_VALID_PROVENANCE, "requested_lookback_sessions": 1764, "actual_lookback_sessions": 907})
+    warning = underfilled_dataset_warning(prov)
+    assert warning is not None
+    assert "907" in warning
+    assert "1764" in warning
+
+
+def test_underfilled_dataset_warning_silent_when_coverage_is_adequate():
+    prov = FindingProvenance(**_VALID_PROVENANCE)  # requested == actual
+    assert underfilled_dataset_warning(prov) is None
+
+
+def test_underfilled_dataset_warning_silent_when_not_checkable():
+    prov = FindingProvenance(actual_start_date="2020-01-01")  # no lookback fields at all
+    assert underfilled_dataset_warning(prov) is None
+
+
+def test_finding_not_reproduced_after_data_loader_fix_is_not_production_authoritative():
+    prov = FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": False})
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+        relevant_tickers=[], provenance=prov,
+    )
+    assert is_production_authoritative(finding) is False
+
+
+def test_finding_reproduced_after_data_loader_fix_is_production_authoritative():
+    prov = FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": True})
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+        relevant_tickers=[], provenance=prov,
+    )
+    assert is_production_authoritative(finding) is True
+
+
+def test_rejected_finding_is_always_production_authoritative_regardless_of_provenance():
+    # A REJECTED verdict makes no positive production claim to distrust --
+    # it's authoritative (in the sense of "don't act on this") with or
+    # without provenance.
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.REJECTED, detail="...", source="test",
+        relevant_tickers=[], provenance=None,
+    )
+    assert is_production_authoritative(finding) is True
+
+
+def test_default_registry_loads_without_error_and_confirmed_findings_all_have_provenance():
+    # Regression pin: the real, shipped research_findings.json must
+    # satisfy its own new provenance requirement (finding #8) -- every
+    # confirmed/promising_unconfirmed entry in the live registry needs
+    # provenance, not just the temp fixtures above.
+    findings = load_research_findings(DEFAULT_REGISTRY_PATH)
+    assert len(findings) > 0
+    for finding in findings:
+        if finding.status in (EvidenceStatus.CONFIRMED, EvidenceStatus.PROMISING_UNCONFIRMED):
+            assert finding.provenance is not None, f"{finding.label!r} is missing provenance"
+            for field in REQUIRED_PROVENANCE_FIELDS:
+                assert getattr(finding.provenance, field) is not None, f"{finding.label!r} missing {field}"
+
+
+def test_default_registry_none_of_the_confirmed_findings_are_currently_production_authoritative():
+    # Honest state as of this pass: none of the real registry's
+    # confirmed/promising findings have been RE-RUN under the corrected
+    # data loader (only their data coverage was freshly checked) -- so
+    # none should currently report as production-authoritative.
+    findings = load_research_findings(DEFAULT_REGISTRY_PATH)
+    strong_findings = [f for f in findings if f.status in (EvidenceStatus.CONFIRMED, EvidenceStatus.PROMISING_UNCONFIRMED)]
+    assert len(strong_findings) > 0
+    assert all(not is_production_authoritative(f) for f in strong_findings)
+
+
+def test_display_status_unqualified_when_production_authoritative():
+    prov = FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": True})
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+        relevant_tickers=[], provenance=prov,
+    )
+    assert finding.production_authoritative is True
+    assert finding.display_status == "confirmed"
+
+
+def test_display_status_qualified_when_not_production_authoritative():
+    # GPT review, 2026-07-29: a confirmed/promising finding that is not
+    # production_authoritative must never display as a bare "confirmed" --
+    # the historical status label is preserved, but an explicit qualifier
+    # is appended so a runtime consumer (CLI briefing, Streamlit UI)
+    # cannot show it unqualified.
+    prov = FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": False})
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+        relevant_tickers=[], provenance=prov,
+    )
+    assert finding.production_authoritative is False
+    assert finding.display_status.startswith("confirmed")
+    assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in finding.display_status
+
+
+def test_display_status_unqualified_for_rejected_regardless_of_provenance():
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.REJECTED, detail="...", source="test",
+        relevant_tickers=[], provenance=None,
+    )
+    assert finding.production_authoritative is True
+    assert finding.display_status == "rejected"
+
+
+def test_to_dict_serializes_computed_authority_fields():
+    # GPT review, 2026-07-29: production authority must reach every JSON
+    # consumer (audit log, UI, briefing), not just be computable in memory.
+    prov = FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": False})
+    finding = SignalEvidence(
+        label="Test", claim="...", status=EvidenceStatus.CONFIRMED, detail="...", source="test",
+        relevant_tickers=[], provenance=prov,
+    )
+    from assistant.schemas import _to_dict
+
+    serialized = _to_dict(finding)
+    assert serialized["production_authoritative"] is False
+    assert "NOT CURRENTLY PRODUCTION-AUTHORITATIVE" in serialized["display_status"]
+    assert serialized["status"] == "confirmed"  # historical label preserved, not destroyed
+
+
+def _reproduced_provenance() -> FindingProvenance:
+    return FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": True})
+
+
+def _unreproduced_provenance() -> FindingProvenance:
+    return FindingProvenance(**{**_VALID_PROVENANCE, "reproduced_after_data_loader_fix": False})
+
+
+def test_summarize_evidence_authority_separates_historical_verdicts_from_current_authority():
+    # GPT review, 2026-07-30: the Streamlit evidence summary used to
+    # aggregate by raw `status` (e.g. "2 confirmed / 1 rejected") even
+    # when both confirmed findings were explicitly NOT production-
+    # authoritative -- directly contradicting the individual rows below
+    # it, which correctly used display_status. This helper must never
+    # let that happen: the historical verdict tally and the
+    # current-authority tally are reported SEPARATELY.
+    findings = [
+        SignalEvidence(
+            label="Confirmed and reproduced", claim="...", status=EvidenceStatus.CONFIRMED,
+            detail="...", source="test", relevant_tickers=[], provenance=_reproduced_provenance(),
+        ),
+        SignalEvidence(
+            label="Confirmed but unreproduced", claim="...", status=EvidenceStatus.CONFIRMED,
+            detail="...", source="test", relevant_tickers=[], provenance=_unreproduced_provenance(),
+        ),
+        SignalEvidence(
+            label="Promising but unreproduced", claim="...", status=EvidenceStatus.PROMISING_UNCONFIRMED,
+            detail="...", source="test", relevant_tickers=[], provenance=_unreproduced_provenance(),
+        ),
+        SignalEvidence(
+            label="Rejected", claim="...", status=EvidenceStatus.REJECTED,
+            detail="...", source="test", relevant_tickers=[], provenance=None,
+        ),
+    ]
+    summary = summarize_evidence_authority(findings)
+
+    # Historical verdict tally is untouched/never destroyed.
+    assert summary["verdict_counts"] == {"confirmed": 2, "promising_unconfirmed": 1, "rejected": 1}
+
+    # Current authority tally: 2 of the 4 (the unreproduced confirmed AND
+    # the unreproduced promising) are NOT production-authoritative. The
+    # reproduced confirmed and the rejected finding both count as
+    # authoritative (a rejected verdict makes no positive claim to
+    # distrust).
+    assert summary["non_authoritative_count"] == 2
+    assert set(summary["non_authoritative_labels"]) == {"Confirmed but unreproduced", "Promising but unreproduced"}
+
+
+def test_summarize_evidence_authority_all_reproduced_has_zero_non_authoritative():
+    findings = [
+        SignalEvidence(
+            label="Confirmed and reproduced", claim="...", status=EvidenceStatus.CONFIRMED,
+            detail="...", source="test", relevant_tickers=[], provenance=_reproduced_provenance(),
+        ),
+        SignalEvidence(
+            label="Rejected", claim="...", status=EvidenceStatus.REJECTED,
+            detail="...", source="test", relevant_tickers=[], provenance=None,
+        ),
+    ]
+    summary = summarize_evidence_authority(findings)
+    assert summary["non_authoritative_count"] == 0
+    assert summary["non_authoritative_labels"] == []
+
+
+def test_default_registry_flags_the_known_underfilled_nvdl_dataset():
+    # Regression pin for the real underfilled-dataset case found while
+    # implementing finding #8: NVDA/NVDL has substantially less history
+    # than the other pairs in the 3-pair validation finding.
+    findings = load_research_findings(DEFAULT_REGISTRY_PATH)
+    three_pair = next(f for f in findings if "3-pair validation" in f.label)
+    assert three_pair.provenance is not None
+    warning = underfilled_dataset_warning(three_pair.provenance)
+    assert warning is not None
+
+
+def test_default_registry_does_not_depend_on_ephemeral_scratchpad_sources():
+    raw = json.loads(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8"))
+    scratchpad_sources = [
+        item["source"]
+        for item in raw["findings"]
+        if "scratchpad" in item.get("source", "").lower()
+    ]
+    assert scratchpad_sources == [], (
+        "The versioned evidence registry must point to durable, reviewable "
+        f"artifacts, not local scratchpad files: {scratchpad_sources}"
+    )
+
+
+def test_readme_reports_the_live_registry_version():
+    import re
+
+    raw = json.loads(DEFAULT_REGISTRY_PATH.read_text(encoding="utf-8"))
+    readme = (Path(__file__).resolve().parent.parent / "README.md").read_text(
+        encoding="utf-8"
+    )
+    match = re.search(r"research_findings\.json` version ([0-9.]+)", readme)
+    assert match is not None
+    assert match.group(1) == str(raw["version"])
+
+
+if __name__ == "__main__":
+    test_confirmed_finding_without_provenance_is_rejected()
+    test_promising_unconfirmed_finding_without_provenance_is_rejected()
+    test_confirmed_finding_missing_one_required_provenance_field_is_rejected()
+    test_rejected_finding_never_requires_provenance()
+    test_exploratory_and_unavailable_findings_never_require_provenance()
+    test_confirmed_finding_with_complete_provenance_loads_and_serializes_correctly()
+    test_underfilled_dataset_warning_flags_short_history()
+    test_underfilled_dataset_warning_silent_when_coverage_is_adequate()
+    test_underfilled_dataset_warning_silent_when_not_checkable()
+    test_finding_not_reproduced_after_data_loader_fix_is_not_production_authoritative()
+    test_finding_reproduced_after_data_loader_fix_is_production_authoritative()
+    test_rejected_finding_is_always_production_authoritative_regardless_of_provenance()
+    test_default_registry_loads_without_error_and_confirmed_findings_all_have_provenance()
+    test_default_registry_none_of_the_confirmed_findings_are_currently_production_authoritative()
+    test_display_status_unqualified_when_production_authoritative()
+    test_display_status_qualified_when_not_production_authoritative()
+    test_display_status_unqualified_for_rejected_regardless_of_provenance()
+    test_to_dict_serializes_computed_authority_fields()
+    test_summarize_evidence_authority_separates_historical_verdicts_from_current_authority()
+    test_summarize_evidence_authority_all_reproduced_has_zero_non_authoritative()
+    test_default_registry_flags_the_known_underfilled_nvdl_dataset()
+    print("All research registry tests passed.")
+
+
+def _provenance_set_definitions(source: str) -> list[int]:
+    """Line numbers in `source` that DEFINE the provenance status set.
+
+    Extracted so the detector is testable against synthetic source. Widening
+    it from `ast.Assign` to also cover `ast.AnnAssign` was unverifiable on the
+    repo scan alone: the one real definition is a plain assignment, so
+    narrowing it back passed the entire suite. Annotated assignments are used
+    throughout this codebase (`IN_FLIGHT_INTENT_STATUSES: tuple[str, ...] =
+    ...`), so a re-introduced duplicate written that way is exactly the form
+    most likely to slip through (2026-07-30).
+    """
+    import ast
+
+    found = []
+    for node in ast.walk(ast.parse(source)):
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+        else:
+            continue
+        for target in targets:
+            if getattr(target, "id", "").lstrip("_") == "STATUSES_REQUIRING_PROVENANCE":
+                found.append(node.lineno)
+    return found
+
+
+@pytest.mark.parametrize(
+    "snippet",
+    [
+        "STATUSES_REQUIRING_PROVENANCE = frozenset({A, B})",
+        "_STATUSES_REQUIRING_PROVENANCE = {A, B}",
+        # Annotated -- an ast.AnnAssign, invisible to an Assign-only walk.
+        "STATUSES_REQUIRING_PROVENANCE: frozenset[str] = frozenset({A})",
+        "_STATUSES_REQUIRING_PROVENANCE: tuple[str, ...] = (A, B)",
+    ],
+)
+def test_the_definition_detector_sees_every_assignment_form(snippet):
+    assert _provenance_set_definitions(snippet), (
+        "this defines the provenance set but the detector does not see it"
+    )
+
+
+def test_the_definition_detector_ignores_reads_and_imports():
+    """Importing or reading the set is correct usage, not a second definition."""
+    assert _provenance_set_definitions(
+        "from assistant.schemas import STATUSES_REQUIRING_PROVENANCE\n"
+        "if status in STATUSES_REQUIRING_PROVENANCE: pass"
+    ) == []
+
+
+def test_the_provenance_status_set_has_exactly_one_definition():
+    """schemas.py and research_registry.py each kept their own copy, hand-synced
+    via a comment. A status added to one and not the other would require
+    provenance in one layer and not the other -- the drift a duplicated safety
+    rule always produces (2026-07-30). A source test because the defect is a
+    second definition existing, which no behavioural assertion can see.
+    """
+    from pathlib import Path
+
+    repo = Path(__file__).resolve().parent.parent
+    definitions = []
+    for path in (repo / "assistant").rglob("*.py"):
+        for lineno in _provenance_set_definitions(path.read_text(encoding="utf-8")):
+            definitions.append(f"{path.relative_to(repo).as_posix()}:{lineno}")
+    assert len(definitions) == 1, (
+        f"expected exactly one definition of the provenance status set, found: {definitions}"
+    )
+    assert definitions[0].startswith("assistant/schemas.py"), (
+        f"it must live in schemas.py, the layer both others import from; found {definitions[0]}"
+    )
+
+
+def test_both_layers_agree_on_which_statuses_need_provenance():
+    from assistant import research_registry
+    from assistant.schemas import STATUSES_REQUIRING_PROVENANCE
+
+    assert (
+        research_registry.STATUSES_REQUIRING_PROVENANCE
+        is STATUSES_REQUIRING_PROVENANCE
+    ), "the registry must reuse the shared set, not re-derive an equal one"

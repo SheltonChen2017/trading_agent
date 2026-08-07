@@ -1,0 +1,310 @@
+"""
+The significance test's own false-positive rate, measured rather than assumed.
+
+Every verdict in this project rests on one function, so the function's
+error rate is worth pinning like any other behaviour. These tests feed it
+PURE NOISE -- data whose true mean edge is exactly zero -- and assert it
+says "not significant" about as often as its threshold promises.
+
+Background (2026-07-30): a candidate-signal run surfaced two defects here.
+
+1. `block_length >= n_dates` made every circular resample a ROTATION of the
+   whole date set, so the CI collapsed to zero width and p was exactly 0.0
+   for any nonzero mean. The old guard `n_dates < max(5, block_length)` is
+   strict, so exact equality passed straight through it. This fired on real
+   project data: a VIX-spike cell with block_length=15 and n_dates=15
+   reported a +0.013% mean edge as significant at p=0.0.
+
+2. Even away from that corner the test was anti-conservative at small
+   `n_dates` and when the block consumed too much of the sample -- 18.5%
+   false positives at 31 dates/block 10, and 16.7% at 50 dates/block 20,
+   against a nominal 5%.
+
+Both now return a `refusal_reason` instead of a number unless there are at
+least 50 dates and 10 full blocks. Note the direction of the original error:
+it made significance EASIER, so it never produced a false REJECTION --
+previously-recorded rejections are unaffected.
+"""
+from __future__ import annotations
+
+import numpy as np
+import pandas as pd
+import pytest
+
+from backtest.engine import (
+    MIN_BLOCK_BOOTSTRAP_BLOCKS,
+    MIN_BLOCK_BOOTSTRAP_DATES,
+    _min_detectable_effect_pct,
+    bonferroni_threshold,
+    bootstrap_daily_edge_significance_by_block,
+    bootstrap_edge_significance_by_block,
+    out_of_sample_significance_by_block,
+    recommended_n_bootstrap,
+)
+
+BOTH_VARIANTS = (
+    bootstrap_edge_significance_by_block,
+    bootstrap_daily_edge_significance_by_block,
+)
+
+
+def _dates(n_dates: int, per_date: int) -> pd.Series:
+    days = pd.to_datetime("2020-01-01") + pd.to_timedelta(np.arange(n_dates), unit="D")
+    return pd.Series(np.repeat(days, per_date))
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_a_block_as_long_as_the_sample_is_refused(fn):
+    """THE regression: this exact shape reported a ~0% edge as p=0.0.
+
+    Reproduced with a deliberately tiny constant drift -- an edge nobody
+    would call real -- so a returned p-value cannot be explained away as a
+    genuinely strong effect.
+    """
+    n_dates = 12
+    edges = pd.Series(np.full(n_dates * 4, 0.013))
+    stats = fn(edges, _dates(n_dates, 4), block_length=n_dates)
+
+    assert stats["p_value"] is None, (
+        "block_length == n_dates yields a zero-width CI and p=0 for any nonzero "
+        "mean; it must be refused, not reported"
+    )
+    assert stats["refusal_reason"], "a refusal must say why"
+    assert "full blocks" in stats["refusal_reason"]
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_fewer_than_ten_full_blocks_is_refused(fn):
+    """The measured 50-date boundary was still anti-conservative with
+    block lengths that left only 2.5-5 full blocks."""
+    stats = fn(pd.Series(np.full(80, 0.5)), _dates(20, 4), block_length=3)
+    assert stats["p_value"] is None
+    assert "10 full blocks" in stats["refusal_reason"]
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_too_few_dates_is_refused_at_every_block_length(fn):
+    """At n_dates=31 the measured false-positive rate was 3.5-6.5x nominal
+    for every block length tried, so no choice of block rescues it."""
+    rng = np.random.default_rng(0)
+    edges = pd.Series(rng.normal(0, 3.0, size=31 * 10))
+    for block_length in (2, 5, 10, 15):
+        stats = fn(edges, _dates(31, 10), block_length=block_length)
+        assert stats["p_value"] is None, f"block_length={block_length} should be refused"
+        assert stats["refusal_reason"]
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_enough_dates_still_produces_a_p_value(fn):
+    """The guard must not swallow the cases the toolkit exists to serve.
+
+    At 400 dates the method measured essentially exact (5.00% observed at a
+    nominal 5%), so this is the regime it should keep answering in.
+    """
+    rng = np.random.default_rng(1)
+    edges = pd.Series(rng.normal(0, 3.0, size=400 * 3))
+    stats = fn(edges, _dates(400, 3), block_length=10)
+
+    assert stats["refusal_reason"] is None
+    assert stats["p_value"] is not None
+    assert stats["ci_low"] < stats["ci_high"], "a real CI must have width"
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_fifty_dates_only_accepts_a_block_with_ten_full_repetitions(fn):
+    rng = np.random.default_rng(11)
+    edges = pd.Series(rng.normal(0, 3.0, size=50 * 4))
+    date_col = _dates(50, 4)
+
+    accepted = fn(edges, date_col, block_length=5, n_bootstrap=200)
+    refused = fn(edges, date_col, block_length=10, n_bootstrap=200)
+
+    assert accepted["p_value"] is not None
+    assert accepted["refusal_reason"] is None
+    assert refused["p_value"] is None
+    assert "10 full blocks" in refused["refusal_reason"]
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_false_positive_rate_on_pure_noise_is_near_nominal(fn):
+    """The test that keeps the rest honest.
+
+    60 independent pure-noise trials at a shape the guard permits. A
+    calibrated test rejects ~5% of the time at alpha=0.05; the old code at
+    small n_dates hit 18-27%. The bound is deliberately loose (<=20%)
+    because 60 trials is a coarse estimate -- it is set to catch a
+    calibration COLLAPSE, not to police a few percentage points.
+    """
+    rng = np.random.default_rng(7)
+    date_col = _dates(120, 5)
+    false_positives = 0
+    trials = 60
+    for _ in range(trials):
+        edges = pd.Series(rng.normal(0, 3.0, size=120 * 5))
+        stats = fn(edges, date_col, block_length=10, n_bootstrap=400)
+        if stats["p_value"] is not None and stats["p_value"] < 0.05:
+            false_positives += 1
+
+    rate = false_positives / trials
+    assert rate <= 0.15, (
+        f"false-positive rate on pure noise is {rate:.0%} against a nominal 5% -- "
+        "the block bootstrap has lost calibration"
+    )
+
+
+def test_resample_count_keeps_the_p_floor_below_the_threshold():
+    """The percentile bootstrap cannot return a non-zero p below 2/n_bootstrap.
+
+    At the historical fixed 2000 that floor is 0.001, while Bonferroni pushes
+    the threshold down as a run widens -- 0.003125 at 16 cells left only three
+    distinct p-values underneath it, so "significant" became a rounding
+    artifact rather than a measurement. n_bootstrap now scales with n_tests.
+    """
+    for n_tests in (6, 16, 20, 32):
+        n_bootstrap = recommended_n_bootstrap(n_tests)
+        p_floor = 2 / n_bootstrap
+        threshold = bonferroni_threshold(n_tests)
+        assert p_floor * 10 <= threshold, (
+            f"n_tests={n_tests}: p-value floor {p_floor} leaves fewer than 10 "
+            f"resolvable steps below threshold {threshold}"
+        )
+
+
+def test_the_by_block_entry_point_actually_uses_the_scaled_count(monkeypatch):
+    """Pins the WIRING, not just the formula.
+
+    Added after a mutation survived: replacing the auto-default with a
+    hardcoded 2000 inside out_of_sample_significance_by_block() broke nothing,
+    because every other test here exercises recommended_n_bootstrap() in
+    isolation. A correct helper nobody calls is not a fix.
+    """
+    import backtest.engine as engine
+
+    seen: list[int] = []
+
+    def spy(edge_values, dates, block_length, n_bootstrap=2000, seed=0):
+        seen.append(n_bootstrap)
+        return {
+            "n": 10, "n_dates": 10, "block_length": block_length,
+            "mean": 0.0, "ci_low": -1.0, "ci_high": 1.0, "p_value": 0.5,
+            "refusal_reason": None,
+        }
+
+    monkeypatch.setattr(engine, "bootstrap_edge_significance_by_block", spy)
+    monkeypatch.setattr(engine, "bootstrap_daily_edge_significance_by_block", spy)
+
+    days = 400
+    returns = np.full(days, 0.0005)
+    volume = np.full(days, 1_000_000.0)
+    for idx in range(30, 350, 15):
+        returns[idx] = -0.08
+        volume[idx] = 4_000_000.0
+    close = 100 * np.cumprod(1 + returns)
+    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
+    frame = pd.DataFrame(
+        {"open": close, "high": close * 1.001, "low": close * 0.999,
+         "close": close, "volume": volume},
+        index=dates,
+    )
+
+    engine.out_of_sample_significance_by_block(
+        {"A": frame, "B": frame}, hold_days=5, slippage_pct=0.0, n_tests=16,
+    )
+
+    assert seen, "the bootstrap was never called -- test setup produced no signals"
+    expected = recommended_n_bootstrap(16)
+    assert expected > 2000, "guard the guard: n_tests=16 must scale above the floor"
+    assert set(seen) == {expected}, (
+        f"entry point passed {sorted(set(seen))} but n_tests=16 requires {expected}; "
+        "the scaled default is not wired through"
+    )
+
+
+def test_narrow_runs_are_not_made_slower():
+    """A single-signal run already resolved its threshold fine; scaling it up
+    would just cost runtime for no gain."""
+    assert recommended_n_bootstrap(2) == 2000
+
+
+def test_the_cap_binds_on_very_wide_runs_and_that_is_documented():
+    """Honest limit: past ~64 cells the runtime cap wins and resolution
+    degrades again. Pinned so it is a known tradeoff rather than a surprise --
+    a run that wide should reduce its cell count, not lean on the bootstrap.
+    """
+    assert recommended_n_bootstrap(200) == 20000
+    assert 2 / 20000 > bonferroni_threshold(200) / 10
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+@pytest.mark.parametrize(
+    ("name", "kwargs"),
+    [
+        ("block_length", {"block_length": 0}),
+        ("block_length", {"block_length": 1.5}),
+        ("n_bootstrap", {"block_length": 5, "n_bootstrap": 0}),
+    ],
+)
+def test_invalid_resampling_parameters_fail_clearly(fn, name, kwargs):
+    with pytest.raises(ValueError, match=name):
+        fn(pd.Series(np.ones(60)), _dates(60, 1), **kwargs)
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_nonfinite_edges_and_missing_dates_are_excluded(fn):
+    edges = pd.Series(np.linspace(-1, 1, 62))
+    dates = _dates(62, 1)
+    edges.iloc[0] = np.inf
+    dates.iloc[1] = pd.NaT
+
+    stats = fn(edges, dates, block_length=5, n_bootstrap=200)
+
+    assert stats["n"] == 60
+    assert stats["n_dates"] == 60
+    assert stats["p_value"] is not None
+
+
+@pytest.mark.parametrize("fn", BOTH_VARIANTS)
+def test_misaligned_edges_and_dates_are_rejected(fn):
+    with pytest.raises(ValueError, match="same length"):
+        fn(pd.Series(np.ones(60)), _dates(59, 1), block_length=5)
+
+
+def test_minimum_detectable_effect_includes_target_power():
+    # A symmetric [-1.96, 1.96] interval implies SE ~= 1. At alpha=.05
+    # and 80% power the normal approximation is 1.96 + 0.842 = 2.802.
+    assert _min_detectable_effect_pct(-1.96, 1.96, 0.05) == 2.802
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        {"n_tests": 0},
+        {"n_tests": 2, "alpha": 0},
+        {"n_tests": 2, "floor": 0},
+        {"n_tests": 2, "floor": 3000, "cap": 2000},
+    ],
+)
+def test_recommended_resample_count_rejects_invalid_configuration(kwargs):
+    with pytest.raises(ValueError):
+        recommended_n_bootstrap(**kwargs)
+
+
+@pytest.mark.parametrize("block_lengths", [(), (0, 5), (5, 5), (10, 5)])
+def test_by_block_entry_point_rejects_ambiguous_block_sweeps(block_lengths):
+    with pytest.raises(ValueError, match="block_lengths"):
+        out_of_sample_significance_by_block({}, block_lengths=block_lengths)
+
+
+def test_min_dates_constant_is_not_quietly_lowered():
+    """The threshold is a measured value, not a tunable.
+
+    Lowering it re-opens the regime where the measured error rate was
+    3.5-6.5x nominal, so it should require editing this assertion and the
+    measurements in _block_bootstrap_refusal's docstring together.
+    """
+    assert MIN_BLOCK_BOOTSTRAP_DATES == 50
+    assert MIN_BLOCK_BOOTSTRAP_BLOCKS == 10
+
+
+if __name__ == "__main__":
+    raise SystemExit(pytest.main([__file__, "-q"]))

@@ -1,0 +1,58 @@
+# Streamlit theme for scripts/personal_assistant_ui.py.
+#
+# Cosmetic only -- nothing here changes a number, a check, or a gate.
+#
+# Two deliberate constraints:
+#
+# 1. Typography, radii and borders live in [theme]; COLOURS live in
+#    [theme.light]/[theme.dark]. Setting explicit colours in [theme] alone
+#    would pin the app to one mode and defeat the user's light/dark toggle.
+#    This way the app looks intentional in both.
+# 2. No web fonts. The font stack is system-only, so the UI renders identically
+#    with no network and adds no external request to a tool that handles
+#    account data.
+#
+# The palette is deliberately restrained -- near-neutral surfaces, one accent.
+# Red/orange/green are left near Streamlit's defaults ON PURPOSE: this app uses
+# st.error/st.warning for policy breaches and unresolved broker states, and
+# muting those to fit a colour scheme would make a safety signal quieter. A
+# trading UI should be calm everywhere EXCEPT where it is telling you something
+# is wrong.
+
+[theme]
+font = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+headingFont = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
+codeFont = "'JetBrains Mono', 'Cascadia Mono', Consolas, 'SF Mono', Menlo, monospace"
+
+# 15px rather than the 16px default: this is a dense analytical dashboard, and
+# the tighter base lets a briefing fit without scrolling past the risk section.
+baseFontSize = 15
+headingFontWeights = [700, 650, 600]
+
+baseRadius = "0.5rem"
+buttonRadius = "0.5rem"
+showWidgetBorder = true
+
+[theme.light]
+primaryColor = "#4F6BED"
+backgroundColor = "#FCFCFD"
+secondaryBackgroundColor = "#F2F4F8"
+textColor = "#1A1D26"
+borderColor = "#E3E6EC"
+linkColor = "#3B57D8"
+
+[theme.dark]
+primaryColor = "#8098F7"
+backgroundColor = "#0F1117"
+secondaryBackgroundColor = "#171A23"
+textColor = "#E6E8EE"
+borderColor = "#272B36"
+linkColor = "#93A6F9"
+
+[theme.light.sidebar]
+backgroundColor = "#F5F7FA"
+borderColor = "#E3E6EC"
+
+[theme.dark.sidebar]
+backgroundColor = "#12141B"
+borderColor = "#272B36"

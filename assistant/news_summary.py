@@ -68,11 +68,26 @@ def _known_tickers() -> set[str]:
 
 
 def summarize_news_for_ticker(ticker: str, headlines: list[dict]) -> str | None:
+    """Backward-compatible wrapper: the summary, or None.
+
+    Prefer `summarize_news_for_ticker_with_reason` in any UI. Returning a
+    bare None makes "disabled", "call failed" and "the guard withheld it"
+    indistinguishable, which is exactly how a working feature came to look
+    broken (owner report, 2026-08-07).
+    """
+    return summarize_news_for_ticker_with_reason(ticker, headlines)[0]
+
+
+def summarize_news_for_ticker_with_reason(
+    ticker: str, headlines: list[dict]
+) -> tuple[str | None, str | None]:
     """AI-generated 2-3 sentence summary of what the headlines say might
-    affect the ticker's price. Returns None (never raises) if
-    ANTHROPIC_API_KEY isn't set, there are no headlines, the API call fails,
-    or the response fails the deterministic output guard -- callers should
-    fall back to displaying the raw headlines.
+    affect the ticker's price.
+
+    Returns ``(summary, None)`` on success, or ``(None, reason)`` when the
+    summary is unavailable -- never raises. Reasons are fixed labels (no
+    withheld model prose, no provider exception text). Callers should fall
+    back to displaying the raw headlines.
 
     The guard (ai_advisor._reject_unsafe_prose) is the same one the other
     free-text AI surfaces use. This function previously returned the model's
@@ -102,8 +117,10 @@ def summarize_news_for_ticker(ticker: str, headlines: list[dict]) -> str | None:
     _reject_unsafe_prose's own limitations note -- which is why the raw
     headlines stay the primary UI surface and this summary is only ever an
     addition to them."""
-    if not headlines or not is_ai_summary_configured():
-        return None
+    if not headlines:
+        return None, "no headlines were available to summarize"
+    if not is_ai_summary_configured():
+        return None, "ANTHROPIC_API_KEY is not set"
 
     import anthropic
 
@@ -126,11 +143,13 @@ def summarize_news_for_ticker(ticker: str, headlines: list[dict]) -> str | None:
             messages=[{"role": "user", "content": f"Ticker: {ticker}\n\n{headline_block}"}],
         )
         text = next((block.text for block in response.content if block.type == "text"), None)
-    except Exception:
-        return None
+    except Exception as exc:
+        # The exception TYPE only: a provider message can echo attacker-
+        # influenceable headline text back into the UI.
+        return None, f"the model call failed ({type(exc).__name__})"
 
     if not text:
-        return None
+        return None, "the model returned no text"
     # Imported here rather than at module scope to keep this module's
     # "headline fetching needs no API key and no heavy imports" property.
     import re
@@ -148,6 +167,17 @@ def summarize_news_for_ticker(ticker: str, headlines: list[dict]) -> str | None:
     known = _known_tickers()
     headline_tokens = set(re.findall(r"\b[A-Z]{1,5}\b", headline_block))
     allowed_tickers = {ticker.upper()} | (headline_tokens & known)
-    if _reject_unsafe_prose(text, allowed_tickers, source_text=headline_block) is not None:
-        return None
-    return text
+    verdict = _reject_unsafe_prose(text, allowed_tickers, source_text=headline_block)
+    if verdict is not None:
+        # The VERDICT travels, never the rejected prose -- surfacing the text
+        # the guard refused would defeat the guard. The verdict strings are
+        # fixed, model-independent labels.
+        #
+        # This is the common case for a portfolio held outside
+        # `config.UNIVERSE`: `allowed_tickers` is built from that research
+        # universe, so a summary naming any peer company is withheld. Measured
+        # 2026-08-07 on the owner's own holdings: 7 of 8 tickers withheld,
+        # while AAPL/MSFT passed 10/10. Silence made that look like a broken
+        # feature rather than a working control.
+        return None, f"withheld by the output guard: {verdict}"
+    return text, None

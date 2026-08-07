@@ -653,7 +653,11 @@ def _reject_unsafe_prose(
         return "mentions a ticker outside the verified candidate set"
     unsupported = _unsupported_numbers(text, source_text)
     if unsupported:
-        return f"cites number(s) absent from the source data: {', '.join(unsupported[:5])}"
+        # Fixed label only -- never interpolate the unsupported tokens.
+        # Those tokens are extracted from the rejected model text; putting
+        # them in a UI- or log-facing reason would partially surface the
+        # fabrication this check exists to suppress (CNEWS-001, 2026-08-07).
+        return "cites number(s) absent from the source data"
     return None
 
 

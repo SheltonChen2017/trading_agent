@@ -85,6 +85,65 @@ Not derivable from the repository, and expensive to rediscover.
 
 ---
 
+### QuantConnect: results may leave, data may not (2026-08-07)
+
+QuantConnect's terms forbid exporting site content "in raw form, such as
+CSV, API, FTP, or other formats", and download licences are "for the
+licensed organization's internal LEAN use only and cannot be redistributed
+or converted in any format".
+
+So the tempting integration — pull their survivorship-free universe into
+this project's `{ticker: DataFrame}` pipeline and run the existing
+significance toolkit on it — is **not permitted**, however well it would
+fit. `research/quantconnect.py` enforces this with an endpoint allowlist
+rather than a comment: market-data paths are structurally unreachable, so a
+new endpoint QuantConnect adds does not become callable merely because
+nobody remembered to forbid it.
+
+What may come home is an algorithm's **own results** — statistics, charts,
+its own orders. That is enough for the thing the local backtest page
+cannot do: `backtest/interactive` states it applies no multiple-comparison
+correction because "every parameter tweak is another uncounted look". Runs
+driven through the API are countable by construction.
+
+Credentials: `QC_USER_ID` / `QC_API_TOKEN`, environment only, never
+literals. The token is never transmitted — auth sends
+`sha256(f"{token}:{unix_ts}")` with the timestamp as nonce.
+
+Every authenticated call is an HTTP **POST** (including `authenticate`
+with `{}`). A missing in-band `success: true` is failure. The allowlist
+uses exact match for `authenticate` and slash-terminated prefixes
+elsewhere, and rejects `..` / `\` / scheme-shaped paths so
+`backtests/../data/read` cannot bypass the licence boundary.
+
+### AI news summaries are often withheld for held names (2026-08-07)
+
+`summarize_news_for_ticker` builds `allowed_tickers` as
+`{query_ticker} ∪ (headline_tokens ∩ known)`, where `known` is
+`config.UNIVERSE ∪ LEVERAGED_ETF_TICKERS ∪ BASKETS`. A summary that names
+any other ticker (a peer company not present in both the headlines and
+`known`) is refused as "mentions a ticker outside the verified candidate
+set".
+
+**Measured on the owner's real holdings: 7 of 8 tickers withheld**, while
+AAPL and MSFT summaries passed repeatedly. The guard is behaving correctly
+— news is third-party text and therefore an injection surface — but for
+this portfolio the common outcome is refusal, so the feature looked broken
+when refusals were silent.
+
+Do not invent the membership story: several held names (for example AFRM,
+AEP, SPCX) are already in `UNIVERSE`, and NVDL is already in
+`LEVERAGED_ETF_TICKERS`. Withholding is driven by *peer mentions in the
+summary*, not by "the holding itself is unknown to the project".
+
+The *silence* was fixed 2026-08-07: every refusal path now returns a fixed
+reason label and the UI prints it, so a withheld summary no longer looks
+identical to a disabled feature. Invented figures must not travel inside
+that reason (CNEWS-001). **The allowlist scope is an open owner decision**:
+should held tickers and recognized ETFs widen what a summary may name, or
+stay as-is? That widens a safety control and should be reviewed, not
+quietly changed.
+
 ## 3. Standing engineering watch items
 
 - **`Decimal(str(...))` on money or share fields.** Three consecutive review

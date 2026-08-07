@@ -261,6 +261,23 @@ class QuantConnectClient:
             ) from exc
         if not isinstance(decoded, dict):
             raise QuantConnectError(f"{path} returned {type(decoded).__name__}, expected an object")
+        # CQC-001, OPEN AND UNVERIFIED (2026-08-07). Requiring `success is
+        # True` is fail-closed and deliberate: QuantConnect signals failure
+        # in-band with HTTP 200, so a missing field must not read as success.
+        # BUT no live call has ever been made from this project, so whether
+        # every endpoint actually sets `success` is an ASSUMPTION, not a
+        # verified contract.
+        #
+        # If a real call fails here with "no reason given" on an otherwise
+        # sensible HTTP 200 body, suspect this line before suspecting the
+        # credentials. Most likely on read_backtest / list_backtests rather
+        # than authenticate, which QuantConnect documents as returning
+        # `success`. A clean authenticate() is therefore NOT proof this
+        # assumption holds.
+        #
+        # Do not loosen it on a hunch: trading a visible refusal for a silent
+        # wrong answer is the worse failure. Confirm the real response shape
+        # first, then relax it for that endpoint with the evidence recorded.
         if status >= 400 or decoded.get("success") is not True:
             errors = decoded.get("errors") or decoded.get("messages") or []
             raise QuantConnectError(

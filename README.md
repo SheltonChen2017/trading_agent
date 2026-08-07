@@ -393,6 +393,15 @@ Verify without running a backtest:
 python -c "from research.quantconnect import QuantConnectClient; print(QuantConnectClient().authenticate())"
 ```
 
+**Known caveat on first real use (CQC-001).** The client refuses any
+response lacking `success: true`. That is deliberate — QuantConnect reports
+failure in-band with HTTP 200 — but no live call has ever been made from
+this project, so it is an unverified assumption. If a call fails with
+`failed (HTTP 200): no reason given` on a body that looks fine, suspect that
+check rather than your credentials, and see
+`docs/OPERATIONAL_FACTS.md`. A clean `authenticate()` does not prove it
+holds for `read_backtest` / `list_backtests`.
+
 The token is never transmitted: authentication sends
 `sha256(f"{token}:{unix_timestamp}")` with the timestamp as a nonce, so each
 request carries a different signature.

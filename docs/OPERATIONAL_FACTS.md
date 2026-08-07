@@ -144,6 +144,31 @@ should held tickers and recognized ETFs widen what a summary may name, or
 stay as-is? That widens a safety control and should be reviewed, not
 quietly changed.
 
+### CQC-001: the QuantConnect success check is unverified (2026-08-07)
+
+`research/quantconnect.py` refuses any response whose body does not carry
+`success: true`. That is fail-closed and correct in principle — QuantConnect
+signals failure in-band with HTTP 200, so treating a missing field as
+success would be fail-open.
+
+**But no live call has ever been made from this project.** Whether every
+endpoint sets `success` is an assumption, not a verified contract. If a real
+call fails with `"failed (HTTP 200): no reason given"` on an otherwise
+sensible body, **suspect that check before suspecting the credentials.**
+
+Expect it on `read_backtest` / `list_backtests` rather than `authenticate`,
+which QuantConnect documents as returning `success` — so a clean
+`authenticate()` does **not** prove the assumption holds for the endpoints
+that matter.
+
+Dormant until someone deliberately points the client at QuantConnect: the
+module has no UI wiring, nothing calls it automatically, and it is not in
+the frozen operational checkout. It cannot affect the app or the running
+epoch.
+
+Do not loosen it speculatively. Confirm the real response shape, then relax
+it for that specific endpoint with the observed body recorded.
+
 ## 3. Standing engineering watch items
 
 - **`Decimal(str(...))` on money or share fields.** Three consecutive review

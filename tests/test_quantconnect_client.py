@@ -316,3 +316,30 @@ def test_client_cannot_reach_execution_authority():
         "the QuantConnect research client must not reach execution, "
         f"proposal, risk, or ML code: {offenders}"
     )
+
+
+def test_the_unverified_success_assumption_is_documented_where_it_will_bite():
+    """CQC-001. The `success is True` requirement is fail-closed and correct,
+    but no live call has ever been made from this project, so whether every
+    endpoint sets that field is an assumption rather than a verified
+    contract.
+
+    An undocumented assumption of this kind costs a debugging session: a
+    valid response refused as "no reason given" reads as a credential
+    problem. Pinned in three places because three different readers hit it —
+    whoever debugs the failure (the code), whoever sets it up (the README),
+    and whoever inherits the project (the durable facts).
+    """
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    for relative in (
+        "research/quantconnect.py",
+        "README.md",
+        "docs/OPERATIONAL_FACTS.md",
+    ):
+        text = (root / relative).read_text(encoding="utf-8")
+        assert "CQC-001" in text, f"{relative} must record the open assumption"
+        assert "no reason given" in text, (
+            f"{relative} must name the symptom, so the failure is recognizable"
+        )

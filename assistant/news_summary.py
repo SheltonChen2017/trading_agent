@@ -82,10 +82,12 @@ def summarize_news_for_ticker_with_reason(
     ticker: str, headlines: list[dict]
 ) -> tuple[str | None, str | None]:
     """AI-generated 2-3 sentence summary of what the headlines say might
-    affect the ticker's price. Returns None (never raises) if
-    ANTHROPIC_API_KEY isn't set, there are no headlines, the API call fails,
-    or the response fails the deterministic output guard -- callers should
-    fall back to displaying the raw headlines.
+    affect the ticker's price.
+
+    Returns ``(summary, None)`` on success, or ``(None, reason)`` when the
+    summary is unavailable -- never raises. Reasons are fixed labels (no
+    withheld model prose, no provider exception text). Callers should fall
+    back to displaying the raw headlines.
 
     The guard (ai_advisor._reject_unsafe_prose) is the same one the other
     free-text AI surfaces use. This function previously returned the model's

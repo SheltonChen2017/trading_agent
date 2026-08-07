@@ -61,10 +61,24 @@ def test_generated_launcher_lifts_credentials_fresh_from_user_scope():
     parent shell hands the app the environment from when the shell started,
     so a key rotation left the running app presenting the revoked key
     ("unauthorized"). The generated launcher must read the user-scope
-    registry at every launch -- and never echo the values."""
+    registry at every launch -- and never echo the values.
+
+    ANTHROPIC_API_KEY joined the lift list 2026-08-07: it was set at user
+    scope, every check reported it configured, and the app still showed no
+    AI features because the launcher only lifted the Alpaca names.
+    """
     assert 'GetEnvironmentVariable(`$credentialName, "User")' in _SCRIPT
     assert 'Set-Item -Path "Env:`$credentialName"' in _SCRIPT
     assert "values not shown" in _SCRIPT
+    assert 'APCA_API_KEY_ID' in _SCRIPT
+    assert 'APCA_API_SECRET_KEY' in _SCRIPT
+    assert 'ANTHROPIC_API_KEY' in _SCRIPT
+    # The foreach array is the load-bearing list -- prose mentioning a name
+    # is not enough.
+    assert (
+        '@("APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ANTHROPIC_API_KEY")'
+        in _SCRIPT
+    )
 
 
 def test_embeds_no_credential_material():

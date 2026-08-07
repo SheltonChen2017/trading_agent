@@ -116,25 +116,32 @@ uses exact match for `authenticate` and slash-terminated prefixes
 elsewhere, and rejects `..` / `\` / scheme-shaped paths so
 `backtests/../data/read` cannot bypass the licence boundary.
 
-### AI news summaries are withheld for most of the owner's holdings (2026-08-07)
+### AI news summaries are often withheld for held names (2026-08-07)
 
-`summarize_news_for_ticker` builds its allowed-ticker set from
-`config.UNIVERSE` — 104 names chosen for research-scan coverage. Most of
-what the account actually holds is not in it (NVDL, QQQM, BBB, AFRM, AEP,
-SPCX), so any summary naming a peer company is refused as "mentions a
-ticker outside the verified candidate set".
+`summarize_news_for_ticker` builds `allowed_tickers` as
+`{query_ticker} ∪ (headline_tokens ∩ known)`, where `known` is
+`config.UNIVERSE ∪ LEVERAGED_ETF_TICKERS ∪ BASKETS`. A summary that names
+any other ticker (a peer company not present in both the headlines and
+`known`) is refused as "mentions a ticker outside the verified candidate
+set".
 
-**Measured on the real holdings: 7 of 8 tickers withheld**, while AAPL and
-MSFT passed 10/10. The guard is behaving correctly — news is third-party
-text and therefore an injection surface — but its allowlist is scoped to the
-wrong population, so the feature effectively does not work for this
-portfolio.
+**Measured on the owner's real holdings: 7 of 8 tickers withheld**, while
+AAPL and MSFT summaries passed repeatedly. The guard is behaving correctly
+— news is third-party text and therefore an injection surface — but for
+this portfolio the common outcome is refusal, so the feature looked broken
+when refusals were silent.
 
-The *silence* was fixed 2026-08-07: every refusal path now returns a reason
-and the UI prints it, so a withheld summary no longer looks identical to a
-disabled feature. **The scope is an open owner decision**: should the
-allowlist include currently-held tickers and recognized ETFs rather than
-only `UNIVERSE`? That widens a safety control and should be reviewed, not
+Do not invent the membership story: several held names (for example AFRM,
+AEP, SPCX) are already in `UNIVERSE`, and NVDL is already in
+`LEVERAGED_ETF_TICKERS`. Withholding is driven by *peer mentions in the
+summary*, not by "the holding itself is unknown to the project".
+
+The *silence* was fixed 2026-08-07: every refusal path now returns a fixed
+reason label and the UI prints it, so a withheld summary no longer looks
+identical to a disabled feature. Invented figures must not travel inside
+that reason (CNEWS-001). **The allowlist scope is an open owner decision**:
+should held tickers and recognized ETFs widen what a summary may name, or
+stay as-is? That widens a safety control and should be reviewed, not
 quietly changed.
 
 ## 3. Standing engineering watch items

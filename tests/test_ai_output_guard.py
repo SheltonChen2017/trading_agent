@@ -413,6 +413,22 @@ def test_the_withheld_prose_never_travels_with_the_reason():
     assert "should buy" not in reason
 
 
+def test_invented_numbers_do_not_travel_with_the_refusal_reason():
+    """CNEWS-001: the unsupported-number verdict used to interpolate the
+    model-invented figures into the reason string. Those tokens are the
+    fabrication class most likely to mislead; putting them in the UI caption
+    partially defeated the guard this refusal surface claims to report.
+    """
+    summary, reason = _summarize_with_reason_saying(
+        "Revenue jumped 847% after the product launch."
+    )
+    assert summary is None
+    assert reason is not None
+    assert "withheld by the output guard" in reason
+    assert "cites number(s) absent from the source data" in reason
+    assert "847" not in reason
+
+
 def test_missing_credentials_and_missing_headlines_are_distinguishable():
     """Three different causes must not collapse into one blank surface."""
     import os

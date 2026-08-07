@@ -104,6 +104,14 @@ Not derivable from the repository, and expensive to rediscover.
   and commands use store-free, cached loaders
   (`_load_readonly_portfolio`). This defect has now appeared on the Reports
   page twice (GR-7a, then GR7BREV-002).
+- **Averaging across irregularly-sampled rows.** The operator captures
+  equity an arbitrary number of times per day, so any flat mean over
+  snapshots silently weights each day by how often the app was running. This
+  produced a real 2.3-point error in GR-7c's average invested weight
+  (5.71% reported vs 8.00% session-equalized) before it was caught. Any
+  future metric that averages over `portfolio_equity_snapshots` must
+  equalize by session first, and should use the same independent unit its
+  own sufficiency check declares.
 - **FPS-003**, the intermittent `test_app_title_is_trading_assistant`
   failure, remains open. Severity looks overstated at P2 — it has passed
   every full run since. **Do not close it on a green suite**; capture the

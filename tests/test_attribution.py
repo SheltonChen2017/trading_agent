@@ -154,9 +154,16 @@ def test_components_reconcile_with_active_return_across_a_longer_series():
     total = Decimal(decomposition["allocation_pct"]) + Decimal(
         decomposition["selection_pct"]
     )
-    assert abs(total - Decimal(report["returns"]["active_pct"])) <= Decimal(
-        decomposition["reconciliation_tolerance_pct"]
-    )
+    # The module's own `reconciles` flag is computed on UNROUNDED values and
+    # is the real guarantee. This assertion sums the REPORTED values, which
+    # are quantized to 4dp, so it must allow for that rounding: three
+    # independently rounded figures can each be off by 5e-5, which exceeds
+    # the module's 1e-4 tolerance in the worst case. Reusing that tolerance
+    # here would be a test that passes on today's numbers and fails on some
+    # future input for a reason unrelated to the invariant -- exactly the
+    # kind of intermittent failure this project already has one of.
+    rounding_slack = Decimal("0.0002")
+    assert abs(total - Decimal(report["returns"]["active_pct"])) <= rounding_slack
     assert decomposition["reconciles"] is True
 
 
@@ -610,3 +617,74 @@ def test_cli_never_pools_two_accounts_into_one_return_series():
     cli.command_attribution(_cli_args(), store=store)
     with pytest.raises(SystemExit, match="no snapshots for"):
         cli.command_attribution(_cli_args(account_key="nope"), store=store)
+
+
+def test_weight_is_equalized_by_session_not_biased_by_capture_frequency():
+    """Found on the live account during a fresh-eyes pass.
+
+    The operator captures equity an arbitrary number of times per day, so a
+    flat mean over valuation points weights each day by how often the app
+    happened to be running. On the real data 2026-08-03 supplied 27 of 49
+    captures at 0.88% invested, pulling the reported average weight to 5.71%
+    where the session-equalized figure is 8.00% -- a 2.3-point error that
+    flows straight into cash drag, since allocation = (w-1)*R_benchmark.
+
+    Here: session A is captured nine times at 0% invested, session B once at
+    100%. Two sessions, so the honest average is 50%. A flat point mean gives
+    10% -- reporting a portfolio as nearly all cash when it spent half its
+    sessions fully invested.
+    """
+    points = [
+        AttributionPoint(
+            at=_START + timedelta(hours=index),
+            total_equity=100.0,
+            invested_value=0.0,
+            benchmark_close=400.0,
+            session_date="2026-01-02",
+        )
+        for index in range(9)
+    ]
+    points.append(
+        AttributionPoint(
+            at=_START + timedelta(hours=9),
+            total_equity=100.0,
+            invested_value=100.0,
+            benchmark_close=400.0,
+            session_date="2026-01-05",
+        )
+    )
+    # A trailing point so the two weighted sessions are both begin-of-period.
+    points.append(
+        AttributionPoint(
+            at=_START + timedelta(hours=10),
+            total_equity=110.0,
+            invested_value=110.0,
+            benchmark_close=440.0,
+            session_date="2026-01-06",
+        )
+    )
+
+    report = evaluate_attribution(points, minimum_observations=1)
+    assert report["decomposition"]["average_invested_weight_pct"] == "50", (
+        "nine captures of one session must not outvote one capture of another"
+    )
+
+
+def test_single_capture_per_session_is_unchanged_by_equalization():
+    """Guards against 'fixing' the above in a way that distorts the ordinary
+    case: with one capture per session, equalizing is a no-op."""
+    report = evaluate_attribution(
+        [
+            AttributionPoint(
+                at=_START + timedelta(days=index),
+                total_equity=100.0,
+                invested_value=invested,
+                benchmark_close=400.0,
+                session_date=f"2026-01-{2 + index:02d}",
+            )
+            for index, invested in enumerate([20.0, 40.0, 60.0, 99.0])
+        ],
+        minimum_observations=1,
+    )
+    # Begin-of-period weights are 20/40/60 (the last point starts no period).
+    assert report["decomposition"]["average_invested_weight_pct"] == "40"

@@ -54,6 +54,55 @@ would put two benchmarks in one epoch and leave a later reader unable to say
 which was authoritative. QQQ remains available as an optional *diagnostic*
 for separating a tech style bet from selection — never as the record.
 
+### GR-7d rebalance target: equal-weight UNIVERSE, wide band (2026-08-06)
+
+The decision that unblocked GR-7d. The action plan had recorded it as
+blocked on an owner decision, not on code, because **a cap is not a
+target**: the mandate defines risk-shape targets and the policy defines
+caps, and neither is a target allocation. Deriving one in code would have
+been inventing an investment policy.
+
+Owner chose, after seeing the feasibility arithmetic:
+
+- **Target set** — equal weight across all 104 `config.UNIVERSE` tickers,
+  scaled to the policy's `max_total_exposure_pct` ceiling (0.48% each at
+  the current 50% ceiling). Chosen because equal weight asserts the least:
+  no security selection and no sector view, which is the honest default
+  given seven-plus candidate signals tested and zero confirmed.
+- **Band** — ±25% *relative* drift, boundary inclusive.
+- **Both directions** — sells to trim overweight, not buy-only.
+- **Report-only first** — drift measurement and a read-only CLI this
+  milestone; proposal generation is a separate, separately reviewed
+  milestone. The owner reads real numbers before any proposal code exists.
+
+Three facts that decided the shape, all measured rather than assumed:
+
+1. The union of all 16 `config.BASKETS` **is exactly `UNIVERSE`** (104
+   names, 152 slots) — baskets are not a subset, so "use BASKETS" and "use
+   UNIVERSE" are the same target.
+2. 30 tickers sit in 2–4 baskets each. Weighting by basket membership would
+   hand mega-cap tech 4× a utility's weight on curation density alone —
+   an allocation claim with no evidence, so it was rejected.
+3. `risk/execution_gate.py::_check_basket_concentration` caps **every**
+   basket at `max_basket_pct`, and because baskets overlap, a target can
+   breach a basket it was not aiming at (`semiconductors` is bound by
+   *tech*, not by itself). Equal-weighting all 104 clears this easily
+   (worst basket 12% against a 40% cap); single-basket targets do not.
+
+**Known unresolved conflict, deliberately left visible.** Real holdings sit
+outside the target set — NVDL and BBB, plus the SOXX/SOXL pair that
+`CONFIGURED_LEVERAGED_PAIRS` exists to trade. A UNIVERSE-derived target
+gives all of them an implied 0% target, i.e. "exit entirely", which puts
+the rebalance target in direct conflict with a deliberately configured
+strategy. The report surfaces these as `held_not_in_target` rows and
+decides nothing. **This must be resolved before any proposal-generating
+slice ships**, or the two components will propose opposite trades.
+
+Also standing: the target is scaled to the exposure *ceiling*, so the
+target portfolio sits at the cap with zero headroom — ordinary upward drift
+then reads as a `max_total_exposure_pct` breach. The CLI says so on every
+run. Lowering the target below the ceiling is an open owner option.
+
 ---
 
 ## 2. Machine-local operational facts

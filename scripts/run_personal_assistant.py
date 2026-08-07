@@ -34,6 +34,11 @@ from assistant.attribution import (
     evaluate_attribution,
 )
 from assistant.cash_reporting import CashReportError, evaluate_idle_cash
+from assistant.rebalance import (
+    RebalanceReportError,
+    evaluate_rebalance_drift,
+    target_weights_equal,
+)
 from assistant.money import decimal_text, to_decimal as _to_decimal_money
 from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
@@ -520,6 +525,110 @@ def command_idle_cash(args, store: AssistantStore) -> None:
             f"{objective['required_invested_volatility_at_policy_ceiling_pct']}%"
         )
     print("  reporting only; no order was created, sized, or approved")
+
+
+def command_rebalance_report(args, store: AssistantStore) -> None:
+    """GR-7d (report-only slice). Read-only: measures drift, proposes nothing.
+
+    Deliberately does NOT call ``_packet(..., store=store)``: that path
+    records GR-4 provider-fetch rows, and a reporting command must leave the
+    operator database unchanged, including evidence tables. Same rule and
+    same shape as ``command_idle_cash`` above.
+
+    The target set and band come from ``config`` (owner decision,
+    2026-08-06); the exposure the target is scaled to comes from the active
+    policy's ceiling, so editing the policy cannot leave the target silently
+    describing a different portfolio than the one the policy permits.
+    """
+    del store  # kept in the handler signature; unused on purpose
+    policy = load_policy(_cli_policy_path(args))
+    try:
+        if is_configured():
+            portfolio = build_portfolio_snapshot_from_alpaca()
+        else:
+            portfolio = build_portfolio_snapshot(
+                SAMPLE_POSITIONS, SAMPLE_CASH, source="manual", account_mode="manual"
+            )
+    except Exception as exc:
+        raise SystemExit(
+            f"Cannot report rebalance drift: portfolio snapshot unavailable "
+            f"({type(exc).__name__}: {exc})"
+        ) from exc
+
+    exposure_pct = args.target_exposure_pct
+    if exposure_pct is None:
+        exposure_pct = policy.max_total_exposure_pct * 100
+    try:
+        targets = target_weights_equal(config.REBALANCE_TARGET_TICKERS, exposure_pct)
+        report = evaluate_rebalance_drift(
+            portfolio, targets, band_pct=args.band_pct
+        )
+    except RebalanceReportError as exc:
+        raise SystemExit(f"Cannot report rebalance drift: {exc}") from exc
+
+    if args.json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return
+
+    totals = report["totals"]
+    counts = report["counts"]
+    print(f"Rebalance drift report ({report['as_of']}, {report['account_mode']})")
+    if not report["exact_numerics"]:
+        print("  ! figures derive from display-rounded values, not exact broker decimals")
+    print(
+        f"  equity ${totals['total_equity']} = cash ${totals['cash']} + invested "
+        f"${totals['invested']} ({totals['invested_pct']}%)"
+    )
+    print(
+        f"  target: {totals['target_ticker_count']} tickers, equal weight, "
+        f"{totals['target_invested_pct']}% invested; band +/-{report['band_pct']}% relative"
+    )
+    # The exposure ceiling doubles as the target, so the target portfolio sits
+    # exactly at the cap with no headroom: ordinary upward drift then reads as
+    # a total-exposure breach. Said out loud rather than discovered later.
+    ceiling_pct = policy.max_total_exposure_pct * 100
+    if _to_decimal_money(totals["target_invested_pct"]) >= _to_decimal_money(ceiling_pct):
+        print(
+            f"  ! target invested equals the policy exposure ceiling ({ceiling_pct}%), "
+            "so the target portfolio has zero headroom above it"
+        )
+    print(
+        f"  inside band {counts['inside_band']}, underweight {counts['underweight']}, "
+        f"overweight {counts['overweight']}, held-but-not-in-target "
+        f"{counts['held_not_in_target']}"
+    )
+
+    drifted = [row for row in report["rows"] if row["status"] != "inside_band"]
+    untargeted = [row for row in drifted if row["status"] == "held_not_in_target"]
+    if untargeted:
+        print(
+            "\n  HELD BUT NOT IN THE TARGET SET -- an implied 0% target means "
+            "exiting the entire position, which is a far larger statement than "
+            "routine drift. Resolve deliberately; the report decides nothing."
+        )
+        for row in untargeted:
+            print(
+                f"    {row['ticker']:<6} held ${row['current_value']} "
+                f"({row['current_pct']}% of equity)"
+            )
+
+    banded = [row for row in drifted if row["status"] != "held_not_in_target"]
+    if banded:
+        print(f"\n  OUTSIDE THE BAND ({len(banded)} of {totals['target_ticker_count']} targeted):")
+        for row in sorted(banded, key=lambda r: r["ticker"])[: args.limit]:
+            print(
+                f"    {row['ticker']:<6} {row['status']:<12} "
+                f"target {row['target_pct']}% (${row['target_value']}) vs "
+                f"current {row['current_pct']}% (${row['current_value']}), "
+                f"drift {row['drift_ratio_pct']}%"
+            )
+        if len(banded) > args.limit:
+            print(f"    ... {len(banded) - args.limit} more not shown (--limit {args.limit})")
+
+    print(
+        "\n  reporting only; no order was created, sized, or approved, and no "
+        "share count was computed"
+    )
 
 
 def command_attribution(args, store: AssistantStore) -> None:
@@ -2045,6 +2154,42 @@ def build_parser() -> argparse.ArgumentParser:
     )
     idle_cash.add_argument("--json", action="store_true")
     idle_cash.set_defaults(handler=command_idle_cash)
+
+    rebalance_report = commands.add_parser(
+        "rebalance-report",
+        help=(
+            "GR-7d: report how far each holding has drifted from the "
+            "owner-chosen equal-weight target. Read-only; proposes nothing "
+            "and computes no share counts."
+        ),
+    )
+    rebalance_report.add_argument(
+        "--band-pct",
+        type=float,
+        default=config.REBALANCE_BAND_PCT,
+        help=(
+            "Relative drift tolerance in percent. Inclusive: a position "
+            f"exactly at the edge is inside the band. Default "
+            f"{config.REBALANCE_BAND_PCT}."
+        ),
+    )
+    rebalance_report.add_argument(
+        "--target-exposure-pct",
+        type=float,
+        default=None,
+        help=(
+            "Percent of equity the equal-weight target totals. Defaults to "
+            "the active policy's max_total_exposure_pct ceiling."
+        ),
+    )
+    rebalance_report.add_argument(
+        "--limit",
+        type=_positive_int,
+        default=20,
+        help="Maximum drifted rows to print (default 20). Ignored with --json.",
+    )
+    rebalance_report.add_argument("--json", action="store_true")
+    rebalance_report.set_defaults(handler=command_rebalance_report)
 
     attribution = commands.add_parser(
         "attribution",

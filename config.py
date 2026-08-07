@@ -324,6 +324,45 @@ YIELD_CURVE_Z_THRESHOLD = 2.0      # proxy = short - long (rises as the curve fl
 # Presence in this list is NOT an allocation authorization.
 DEFENSIVE_CARRY_TICKERS = ["TLT", "IEF", "SHY", "GLD"]
 
+# --- GR-7d rebalance target set (owner decision, 2026-08-06) -------------
+# The explicit ticker list the rebalance DRIFT REPORT measures against
+# (assistant/rebalance.py). Owner-chosen: equal weight across the whole
+# research universe, scaled to the policy's total-exposure ceiling, with a
+# wide relative band.
+#
+# Deliberately its OWN NAME rather than passing config.UNIVERSE straight
+# through, per docs/reference/ALLOCATION_SERVICE_DESIGN.md section 6 ("a new,
+# explicit config list ... rather than assuming the full UNIVERSE or an
+# existing basket is automatically in scope for automated allocation"). It is
+# defined FROM UNIVERSE so the two cannot silently disagree, and pinned by
+# tests/test_rebalance.py so that a UNIVERSE edit made for RESEARCH reasons
+# cannot quietly enlarge the target portfolio: adding a ticker to UNIVERSE
+# fails that pinning test and forces a deliberate decision here instead.
+#
+# Presence in this list is NOT an allocation authorization -- same discipline
+# as DEFENSIVE_CARRY_TICKERS above. Equal weight is not a claim that equal
+# weight is optimal; it is the weighting that asserts the least (no security
+# selection, no sector view), which is the honest default given this
+# project's research record. Nothing derived from this list may be cited as
+# evidence of edge, and the report it feeds proposes nothing.
+#
+# KNOWN CONFLICT, deliberately left visible rather than papered over: real
+# holdings sit OUTSIDE this list (NVDL and BBB as of 2026-08-06), and
+# CONFIGURED_LEVERAGED_PAIRS trades SOXX/SOXL, none of which are in UNIVERSE.
+# Those appear in the report as `held_not_in_target` rows with an implied 0%
+# target. That is a finding for the owner to resolve, not something the
+# report resolves on its own.
+REBALANCE_TARGET_TICKERS = list(UNIVERSE)
+
+# Relative drift tolerance, in percent, before a position is reported as
+# having drifted. 25 means "within +/-25% of its own target weight is inside
+# the band". Wide on purpose: this project's own rotation research found a
+# wide rebalance band produced materially less realised tax for equivalent
+# performance (see docs/reference/GENERAL_READINESS_IMPLEMENTATION_PLAN.md
+# section 12.2 item 1). The boundary is inclusive -- exactly at the edge is
+# inside the band.
+REBALANCE_BAND_PCT = 25.0
+
 # Market regime classifier (signals/regime.py) — momentum showed a real,
 # statistically significant sign-flip between two multi-year eras of the
 # ~7-year test window (2026-07 finding), consistent with the documented

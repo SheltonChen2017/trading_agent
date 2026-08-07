@@ -185,12 +185,41 @@ def evaluate_attribution(
     # against its own consequence. With 50% invested into a +10% benchmark,
     # the honest answer is exactly -5, which averaging the endpoint in
     # quietly turns into -4.81.
-    weights = [
-        to_decimal(point.invested_value, name="invested_value")
-        / to_decimal(point.total_equity, name="total_equity")
-        for point in ordered[:-1]
+    # Two corrections layered here, both learned the hard way.
+    #
+    # 1. BEGINNING-of-period weights only: each point's weight is the
+    #    allocation in force during the period that FOLLOWS it, so the final
+    #    point is excluded. Including it folds the period's own return back
+    #    into the weight -- a portfolio that rose because it was invested
+    #    shows a higher weight *because* it rose.
+    #
+    # 2. EQUALIZED BY SESSION, not a flat mean over points. The operator
+    #    captures equity an arbitrary number of times per day, so a flat mean
+    #    weights each day by how often the app happened to be running. On the
+    #    live account this was not academic: 2026-08-03 contributed 27 of 49
+    #    captures at 0.88% invested, dragging the reported average to 5.71%
+    #    where the session-equalized figure is 8.00% -- a 2.3-point error
+    #    that flows straight into cash drag, since allocation = (w-1)*R_b.
+    #    The session is already this module's declared independent unit; the
+    #    weight must use the same unit or the two disagree.
+    per_session: dict[str, list[Decimal]] = {}
+    for point in ordered[:-1]:
+        weight = to_decimal(
+            point.invested_value, name="invested_value"
+        ) / to_decimal(point.total_equity, name="total_equity")
+        key = (
+            point.session_date
+            if point.session_date is not None
+            else f"unknown-at-{point.at.isoformat()}"
+        )
+        per_session.setdefault(key, []).append(weight)
+    session_means = [
+        sum(values, Decimal("0")) / Decimal(len(values))
+        for values in per_session.values()
     ]
-    average_invested_weight = sum(weights, Decimal("0")) / Decimal(len(weights))
+    average_invested_weight = sum(session_means, Decimal("0")) / Decimal(
+        len(session_means)
+    )
 
     active_pct = portfolio_pct - benchmark_pct
     allocation_pct = (average_invested_weight - Decimal("1")) * benchmark_pct

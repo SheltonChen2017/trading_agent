@@ -77,8 +77,24 @@ Not derivable from the repository, and expensive to rediscover.
   gitignored.
 - **Backups land in `data/backups/` — the SAME disk as the operator
   database.** GR-6's off-machine requirement is **not** met. A drive failure
-  currently loses the running epoch. This is the smallest high-value slice
-  of GR-6 and is worth doing before the rest of it.
+  currently loses the running epoch.
+  **This slice is BLOCKED on this host, not merely unbuilt (owner, 2026-08-07).**
+  This is a corporate-managed computer and the owner is not permitted to
+  upload from it, so every cloud destination is out — including the two
+  sitting right there in the profile directory. Do not propose them:
+  `C:\Users\<user>\OneDrive - Microsoft` is the **employer's tenant**, and a
+  copy of the operator database carries broker account identifiers and the
+  full position history, so replicating it there would be wrong even if
+  uploading were permitted. Personal OneDrive is equally barred by the host
+  rule. Google Drive is not installed, and installing it would not change the
+  rule.
+  What remains available, if the owner wants this later, is **physical**
+  rather than cloud: an external USB drive or SD card is off-machine without
+  an upload. A second internal volume would not help — `Get-PSDrive` shows
+  only `C:` on this host, and a same-disk copy is what already exists.
+  Until then the honest statement is that the running epoch survives file
+  corruption and accidental deletion (the local backup and its restore drill
+  do cover those) but **not** loss of the machine or its disk.
 - **This host keeps losing console-hosted processes** to `0xC000013A`
   (console-close). The scheduled tasks self-heal via their repeating
   trigger; **the Streamlit app does not**, because nothing supervises it.

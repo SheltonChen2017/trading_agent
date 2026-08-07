@@ -57,8 +57,8 @@ held names / ETFs (see OPERATIONAL_FACTS). Do not widen silently.
 1. Owner sets QC credentials and runs one live `authenticate()` (watch CQC-001).
 2. Owner decision: news allowlist scope for holdings vs UNIVERSE/known.
 3. Next research milestone: look-counting registry over QC runs.
-4. **GR-6** off-machine backup remains the highest-value small ops item.
-5. Roadmap: GR-6, or GR-7d owner decision (rebalance targets).
+4. **GR-6** off-machine backup is **blocked on this host** (owner, 2026-08-07): corporate machine, no uploads permitted, so no cloud destination is available. Only a physical medium would qualify. See `docs/OPERATIONAL_FACTS.md` §2. Do not re-propose OneDrive.
+5. Roadmap: the remaining GR-6 items that need no off-machine copy (secrets audit, key rotation, portable scheduler), or GR-7d owner decision (rebalance targets).
 6. FPS-003 intermittent UI chrome title test remains open.
 
 ## 5. Non-negotiable boundaries

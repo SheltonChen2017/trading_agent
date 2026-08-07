@@ -1,22 +1,17 @@
 # Development session handoff
 
-Prepared: 2026-08-06 late afternoon, after independent review and correction
-of Claude's GR-7c performance attribution on
-`user/grok/review-gr7c-attribution-20260806`.
+Prepared: 2026-08-07, after independent review and correction of Claude's
+GR-7c follow-ups (cash-flow skip + capture-frequency weight bias) on
+`user/grok/review-gr7c-weight-bias-20260807`.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff
 **and is therefore the wrong place for anything durable.**
 
-> **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions
-> (`require_earnings_data`, the epoch re-bind, the SPY benchmark),
-> machine-local operational knowledge (the launch script, the elevated
-> task-swap script, the non-elevated `Disable` gotcha, where backups land),
-> and engineering watch items live there because this file is rewritten
-> every round. On 2026-08-06 the same seven facts were dropped by one
-> rewrite, restored, and dropped again by the next — restoring them here a
-> third time would have failed the same way. Do not copy them back into
-> this file; link to them.
+> **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
+> machine-local operational knowledge, and engineering watch items live
+> there because this file is rewritten every round. Do not copy them back
+> into this file; link to them.
 
 ## 1. Standing state: THE EPOCH (do not disturb)
 
@@ -26,48 +21,32 @@ model, or session change. This file completely replaces the prior handoff
 
 `paper-epoch-001` is CLOSED (plumbing shakedown only; do not cite).
 
-## 2. Latest outcome — GR-7c accepted after correction
+## 2. Latest outcome — GR-7c follow-ups accepted after correction
 
-Claude tip `1da4154` decomposes active return vs SPY into invested-weight
-effect (cash drag when underinvested) and a labelled residual. **Accepted
-after correction.**
-
-| ID | Pri | Result |
-|---|---|---|
-| GR7CREV-001 | P2 | NaN cost/tax raised `ValueError` not `AttributionError` |
-| GR7CREV-002 | P2 | CLI clamped cash>equity to invested=0 (hid corrupt rows) |
-| GR7CREV-003 | P2 | Missing CLI read-only regression |
-| GR7CREV-004 | P3 | Help text said valuation points; limit not positive-checked |
-| GR7CREV-005 | P3 | "Cash drag" label lied when average weight > 100% |
-
-Ledger: `docs/REVIEW_2026-08-06_GR7C_ATTRIBUTION.md`.
-Claude quality: **8.5/10 submitted; 9.5/10 corrected**.
-
-Surfaces: `assistant/attribution.py`, CLI `attribution`, storage
-`list_portfolio_equity_account_keys()`. No Reports UI in this milestone
-(ACTION_PLAN scoped to module + CLI). Sample remains insufficient until
-≥20 independent sessions.
-
-Claude then counter-reviewed those corrections (§6 of the ledger). All five
-findings accepted. Two worth naming: GR7CREV-002 was worse than a silent
-clamp — the code clamped under a comment claiming it would "clamp **and
-report**", and it did not report; and GR7CREV-004 was self-inflicted drift,
-help text left describing the sufficiency model that had been superseded.
+Claude tip `6cebe09` (merged via PR #164 as `fbc9ed2`) session-equalizes
+the average invested weight. Prior counter-review `0e84c40` (PR #163)
+refuses skips that drop external cash flows. **Both accepted after
+correction.**
 
 | ID | Pri | Result |
 |---|---|---|
-| CFPS-GR7C-001 | P2 | **Fixed.** Skipping a valuation point dropped its external cash flow, silently reintroducing deposit-as-gain: the chain links across the gap and reads the deposit's equity jump as return. Reproduced at **+100%** on an account doubled purely by a deposit. Originally my own defect (the pre-existing "no benchmark close" skip had it); the new `cash > equity` skip widened it. All skip sites now refuse the report when a dropped point carried a non-zero or unreadable flow. |
-| CFPS-GR7C-002 | P2 | **Fixed (structurally).** The seven durable facts restored into this handoff one round earlier were dropped again by the next rewrite. Rather than restore them a third time, they now live in `docs/OPERATIONAL_FACTS.md`, which is append-and-amend, and this file links to it. |
+| GR7CFOLLOW-001 | P1 | **Fixed.** Snapshots store post-flow equity; attribution fed it to TWR as pre-flow. Pure deposit series reported **+33.3333%** into selection. Now `value_before_flow = total_equity - flow`, matching `portfolio_performance_report`. |
+| GR7CFOLLOW-002 | P3 | **Fixed.** Payload now declares `average_invested_weight_method` / `_unit`. |
+| GR7CFOLLOW-003 | P3 | **Fixed.** Human CLI no longer hardcodes "cash drag" when weight > 100%. |
+
+Ledger: `docs/REVIEW_2026-08-07_GR7C_WEIGHT_BIAS.md`.
+Claude quality: **8/10 submitted; 9.5/10 corrected**.
+
+Prior GR-7c acceptance (`58a10ab`, ledger
+`docs/REVIEW_2026-08-06_GR7C_ATTRIBUTION.md`) remains in force for
+GR7CREV-001..005. CFPS-GR7C-001 skip refusal retained; it was necessary
+but not sufficient without GR7CFOLLOW-001.
 
 ## 3. Validation (exact final tree)
 
-Review tree (`58a10ab`): focused **35 passed**; full suite **2947 passed /
-0 skipped / 25 warnings**.
-
-Counter-reviewed tree (current):
-
-- `test_attribution` **30 passed**.
-- Full suite: **2950 passed / 0 failed / 0 skipped / 25 warnings** (618s).
+- Focused `test_attribution`: **35 passed**.
+- Mutation: old wiring fails deposit tests at `33.3333`; restored green.
+- Full suite: **2955 passed / 0 failed / 0 skipped / 25 warnings**.
 - `compileall` clean; `git diff --check` clean.
 - Nothing deployed; ops checkout stays at `9a91498`.
 
@@ -75,7 +54,7 @@ Counter-reviewed tree (current):
 
 1. Confirm `paper-epoch-002` observation accumulation.
 2. Roadmap: **GR-6**, or **GR-7d** owner decision (rebalance targets).
-   GR-7a/b/c reporting trio is complete after review.
+   GR-7a/b/c reporting trio is complete after this follow-up review.
 3. Optional later: surface attribution on the Reports page (not required
    for GR-7c DoD as scoped).
 4. FPS-003 intermittent UI chrome title test remains open from earlier.
@@ -87,3 +66,5 @@ Counter-reviewed tree (current):
 - Reports/CLI reporting must not write provider-fetch or execution evidence.
 - Incomplete/insufficient samples must say so in the artifact.
 - Selection residual is not a skill claim.
+- Snapshot `total_equity` is post-flow; subtract `net_external_flow` before
+  any `Observation.value_before_flow` mapping.

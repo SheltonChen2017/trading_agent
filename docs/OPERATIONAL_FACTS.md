@@ -112,6 +112,13 @@ Not derivable from the repository, and expensive to rediscover.
   future metric that averages over `portfolio_equity_snapshots` must
   equalize by session first, and should use the same independent unit its
   own sufficiency check declares.
+- **`portfolio_equity_snapshots.total_equity` is post-flow.** The broker
+  equity already includes deposits/withdrawals recorded in
+  `net_external_flow`. `portfolio_performance_report` subtracts flow before
+  computing the period return. Any caller that feeds snapshot equity into
+  `Observation.value_before_flow` without subtracting flow credits deposits
+  as return (GR7CFOLLOW-001: attribution reported ~+33% on a pure deposit
+  series). Invested weight still uses post-flow equity.
 - **FPS-003**, the intermittent `test_app_title_is_trading_assistant`
   failure, remains open. Severity looks overstated at P2 — it has passed
   every full run since. **Do not close it on a green suite**; capture the

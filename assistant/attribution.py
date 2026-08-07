@@ -69,12 +69,17 @@ class AttributionError(ValueError):
 class AttributionPoint:
     """One valuation point: the portfolio, its invested share, the benchmark.
 
-    ``flow`` follows ``performance.Observation`` exactly -- money added
-    (positive) or removed (negative) AT this timestamp, applied after
-    ``total_equity`` is read. Keeping the same convention is what lets the
-    portfolio return reuse the flow-aware chain-linking in
-    ``time_weighted_return`` instead of re-deriving it and getting a deposit
-    confused with a gain.
+    ``total_equity`` and ``invested_value`` follow ``portfolio_equity_snapshots``:
+    they are the broker values AFTER any external cash flow at this capture.
+    ``flow`` is net external money added (positive) or removed (negative) since
+    the prior capture — the same field ``portfolio_performance_report``
+    subtracts from current equity before computing the period return.
+
+    TWR therefore uses ``value_before_flow = total_equity - flow``. Treating
+    post-flow equity as if it were already ``Observation.value_before_flow``
+    would credit deposits as portfolio return (and dump them into the
+    selection residual). Invested weight still divides by post-flow equity:
+    that is the capital in force for the period that follows the capture.
     """
 
     at: datetime
@@ -113,6 +118,15 @@ class AttributionPoint:
         if self.invested_value < 0:
             raise AttributionError(
                 f"invested_value cannot be negative, got {self.invested_value!r}"
+            )
+        # Post-flow equity minus the recorded flow is the pre-flow level TWR
+        # needs. A withdrawal larger than the stated equity (or a corrupt
+        # deposit larger than equity with the wrong sign) cannot be attributed.
+        pre_flow = self.total_equity - self.flow
+        if pre_flow < 0:
+            raise AttributionError(
+                "total_equity - flow cannot be negative "
+                f"(total_equity={self.total_equity!r}, flow={self.flow!r})"
             )
 
 
@@ -158,10 +172,13 @@ def evaluate_attribution(
         raise AttributionError("valuation points must have distinct timestamps")
 
     try:
+        # Snapshots record POST-flow equity. Observation wants PRE-flow.
         portfolio_pct = _twr_pct(
             [
                 Observation(
-                    at=point.at, value_before_flow=point.total_equity, flow=point.flow
+                    at=point.at,
+                    value_before_flow=point.total_equity - point.flow,
+                    flow=point.flow,
                 )
                 for point in ordered
             ]
@@ -177,21 +194,15 @@ def evaluate_attribution(
     except PerformanceError as exc:
         raise AttributionError(f"return series is not usable: {exc}") from exc
 
-    # BEGINNING-of-period weights only: each point's weight is the allocation
-    # in force during the period that FOLLOWS it, so the final point is
-    # excluded. Including it would fold the period's own return back into the
-    # weight -- a portfolio that rose because it was invested would show a
-    # higher weight *because* it rose, and cash drag would be measured partly
-    # against its own consequence. With 50% invested into a +10% benchmark,
-    # the honest answer is exactly -5, which averaging the endpoint in
-    # quietly turns into -4.81.
     # Two corrections layered here, both learned the hard way.
     #
     # 1. BEGINNING-of-period weights only: each point's weight is the
     #    allocation in force during the period that FOLLOWS it, so the final
     #    point is excluded. Including it folds the period's own return back
     #    into the weight -- a portfolio that rose because it was invested
-    #    shows a higher weight *because* it rose.
+    #    shows a higher weight *because* it rose. With 50% invested into a
+    #    +10% benchmark, the honest answer is exactly -5; averaging the
+    #    endpoint in quietly turns into -4.81.
     #
     # 2. EQUALIZED BY SESSION, not a flat mean over points. The operator
     #    captures equity an arbitrary number of times per day, so a flat mean
@@ -315,6 +326,10 @@ def evaluate_attribution(
         },
         "decomposition": {
             "average_invested_weight_pct": decimal_text(average_weight_pct),
+            "average_invested_weight_method": (
+                "session_equalized_beginning_of_period"
+            ),
+            "average_invested_weight_unit": "market session",
             "allocation_pct": decimal_text(_q(allocation_pct)),
             "selection_pct": decimal_text(_q(selection_pct)),
             "reconciles": True,

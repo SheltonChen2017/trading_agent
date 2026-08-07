@@ -654,6 +654,30 @@ belongs in the file an accountant reads, not only in the terminal.
 Wash-sale entries are advisory flags; cost basis is never adjusted, since
 the rule spans accounts this project cannot see. Not tax advice.
 
+Rebalance drift reporting (GR-7d), read-only, measuring each holding
+against the owner-chosen target weighting:
+
+```bash
+python scripts/run_personal_assistant.py rebalance-report
+```
+
+The target is an **owner decision**, not something the code derives: the
+mandate defines risk-shape targets and the policy defines caps, and a cap
+is not a target allocation. The current decision (2026-08-06, recorded in
+`docs/OPERATIONAL_FACTS.md`) is equal weight across
+`config.REBALANCE_TARGET_TICKERS` scaled to the policy's
+`max_total_exposure_pct` ceiling, with a wide `±REBALANCE_BAND_PCT`
+relative band whose boundary is inclusive. Equal weight is not a claim that
+equal weight is optimal; it is the weighting that asserts the least — no
+security selection and no sector view.
+
+The command **proposes nothing and computes no share counts**; converting a
+dollar gap into an order is a separate, separately reviewed milestone. A
+holding absent from the target set is reported as `held_not_in_target`
+rather than omitted, because its implied 0% target means exiting the whole
+position — a far larger statement than routine drift, and one that
+currently conflicts with the deliberately configured SOXX/SOXL pair.
+
 For an incident, the emergency command activates the persistent kill switch
 first and then attempts to cancel every open broker order, including orders
 not created by this app. It continues through individual failures and exits

@@ -132,6 +132,45 @@ Not derivable from the repository, and expensive to rediscover.
   (console-close). The scheduled tasks self-heal via their repeating
   trigger; **the Streamlit app does not**, because nothing supervises it.
 
+### There are TWO machines, and only one may run the cadence (2026-08-06)
+
+The epoch host described above is **not** the only development machine.
+Everything in this section is host-specific; re-measure rather than assume
+which one you are on. `whoami` distinguishes them.
+
+- **Epoch host** (`REDMOND\sheltonchen`) — runs `paper-epoch-002`. The four
+  `TradingAgent-Paper-*` tasks are installed and ENABLED here. This is the
+  only host that may run the operational cadence.
+- **Second host** (`HARRY_MELODY\shelt`) — stood up 2026-08-06 as a
+  development machine. It has its own `C:\git\trading_agent_operational`
+  (pinned clone) and `C:\git\trading_agent_venv` (pinned-requirements venv,
+  full suite green), and the same four scheduled tasks **installed but
+  DISABLED**.
+
+**Why they are disabled, and why it matters.** Both hosts read the same
+`APCA_API_KEY_ID`/`APCA_API_SECRET_KEY` from their own user registry, and
+those credentials point at the **same Alpaca paper account** — the one
+`paper-epoch-002` is accumulating evidence on. Two hosts running
+`monitor-orders`/`operations-cycle`/`watchdog` against one account means
+duplicate reconciliation and competing cancellation against live epoch
+evidence. The second host was therefore deliberately left with **no ledger
+bootstrap and no epoch**; `paper-evidence-status` there correctly reports
+"Paper evidence epoch not found". Do not bootstrap or start an epoch on the
+second host while `paper-epoch-002` is active on the first.
+
+The non-elevated `Disable` gotcha above reproduced exactly on the second
+host: `Stop-ScheduledTask` succeeded unelevated while `Disable-ScheduledTask`
+returned "Access is denied", and `OperationsCycle` would have restarted on
+its own 10-minute trigger. Disabling required an elevated shell, and
+`powershell.exe` there also refuses unsigned local scripts by default —
+`-ExecutionPolicy Bypass` on the invocation is needed, not a machine-wide
+policy change.
+
+This standup is real evidence toward **GR-6**'s "second-machine stand-up
+proven once" marker (pinned checkout, dedicated interpreter, full suite,
+installer preview and verifier round-tripped). It is not evidence toward any
+epoch, and it did not start one.
+
 ---
 
 ## 3. Standing engineering watch items

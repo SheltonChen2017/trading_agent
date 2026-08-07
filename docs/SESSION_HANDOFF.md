@@ -1,88 +1,117 @@
 # Development session handoff
 
-Prepared: 2026-08-06 late afternoon, after independent review and correction
-of Claude's GR-7c performance attribution on
-`user/grok/review-gr7c-attribution-20260806`.
+Prepared: 2026-08-06 evening, after a session on the **second machine**
+(`HARRY_MELODY\shelt`) that stood that host up as a development standby and
+implemented the GR-7d report-only slice on
+`user/claude/gr-7d-rebalance-targets-20260806`.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff
 **and is therefore the wrong place for anything durable.**
 
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions
-> (`require_earnings_data`, the epoch re-bind, the SPY benchmark),
-> machine-local operational knowledge (the launch script, the elevated
-> task-swap script, the non-elevated `Disable` gotcha, where backups land),
-> and engineering watch items live there because this file is rewritten
-> every round. On 2026-08-06 the same seven facts were dropped by one
-> rewrite, restored, and dropped again by the next — restoring them here a
-> third time would have failed the same way. Do not copy them back into
-> this file; link to them.
+> (`require_earnings_data`, the epoch re-bind, the SPY benchmark, and now
+> the GR-7d rebalance target), machine-local operational knowledge (the
+> launch script, the elevated task-swap script, the non-elevated `Disable`
+> gotcha, where backups land, **and the fact that there are now two
+> machines**), and engineering watch items live there because this file is
+> rewritten every round. Do not copy them back into this file; link to it.
 
 ## 1. Standing state: THE EPOCH (do not disturb)
 
 `paper-epoch-002` ACTIVE since 2026-08-06T17:55Z on frozen commit
-`9a91498`, bound to `my_policy.json`. Operational checkout pinned there.
-**Never deploy development commits mid-epoch.**
+`9a91498`, bound to `my_policy.json`. Operational checkout on the **epoch
+host** (`REDMOND\sheltonchen`) pinned there. **Never deploy development
+commits mid-epoch.**
 
 `paper-epoch-001` is CLOSED (plumbing shakedown only; do not cite).
 
-## 2. Latest outcome — GR-7c accepted after correction
+**New this round:** a second machine now exists and shares the same Alpaca
+paper account. Its four scheduled tasks are installed but DISABLED, and it
+has no ledger bootstrap and no epoch, deliberately. See
+`docs/OPERATIONAL_FACTS.md` §2 before touching either host's scheduler.
 
-Claude tip `1da4154` decomposes active return vs SPY into invested-weight
-effect (cash drag when underinvested) and a labelled residual. **Accepted
-after correction.**
+## 2. This round's work — GR-7d unblocked and split
 
-| ID | Pri | Result |
-|---|---|---|
-| GR7CREV-001 | P2 | NaN cost/tax raised `ValueError` not `AttributionError` |
-| GR7CREV-002 | P2 | CLI clamped cash>equity to invested=0 (hid corrupt rows) |
-| GR7CREV-003 | P2 | Missing CLI read-only regression |
-| GR7CREV-004 | P3 | Help text said valuation points; limit not positive-checked |
-| GR7CREV-005 | P3 | "Cash drag" label lied when average weight > 100% |
+GR-7d was blocked on an owner decision, not on code: a cap is not a target,
+and neither the mandate nor the policy contains a target allocation.
 
-Ledger: `docs/REVIEW_2026-08-06_GR7C_ATTRIBUTION.md`.
-Claude quality: **8.5/10 submitted; 9.5/10 corrected**.
+**Owner decided (2026-08-06)**, recorded durably in `OPERATIONAL_FACTS.md`
+§1: equal weight across all 104 `UNIVERSE` tickers scaled to the policy
+exposure ceiling; ±25% relative band, inclusive; both directions;
+**report-only first**.
 
-Surfaces: `assistant/attribution.py`, CLI `attribution`, storage
-`list_portfolio_equity_account_keys()`. No Reports UI in this milestone
-(ACTION_PLAN scoped to module + CLI). Sample remains insufficient until
-≥20 independent sessions.
+Three measurements drove the shape — the union of all 16 `BASKETS` is
+*exactly* `UNIVERSE`; 30 tickers sit in 2–4 baskets so membership-weighting
+would be an evidence-free mega-cap tilt; and `_check_basket_concentration`
+caps every basket, so overlapping baskets make single-basket targets breach
+a basket they never aimed at.
 
-Claude then counter-reviewed those corrections (§6 of the ledger). All five
-findings accepted. Two worth naming: GR7CREV-002 was worse than a silent
-clamp — the code clamped under a comment claiming it would "clamp **and
-report**", and it did not report; and GR7CREV-004 was self-inflicted drift,
-help text left describing the sufficiency model that had been superseded.
+**Implemented (awaiting independent review):**
 
-| ID | Pri | Result |
-|---|---|---|
-| CFPS-GR7C-001 | P2 | **Fixed.** Skipping a valuation point dropped its external cash flow, silently reintroducing deposit-as-gain: the chain links across the gap and reads the deposit's equity jump as return. Reproduced at **+100%** on an account doubled purely by a deposit. Originally my own defect (the pre-existing "no benchmark close" skip had it); the new `cash > equity` skip widened it. All skip sites now refuse the report when a dropped point carried a non-zero or unreadable flow. |
-| CFPS-GR7C-002 | P2 | **Fixed (structurally).** The seven durable facts restored into this handoff one round earlier were dropped again by the next rewrite. Rather than restore them a third time, they now live in `docs/OPERATIONAL_FACTS.md`, which is append-and-amend, and this file links to it. |
+- `assistant/rebalance.py` — pure Decimal drift math, no float in money
+  paths, presentation rounding applied strictly *after* classification.
+- `config.REBALANCE_TARGET_TICKERS` / `REBALANCE_BAND_PCT` — the explicit
+  named list `ALLOCATION_SERVICE_DESIGN.md` §6 asked for, defined *from*
+  `UNIVERSE` and pinned by a test so a research edit cannot silently
+  enlarge the target portfolio.
+- CLI `rebalance-report` — read-only, no `_packet(store=...)`, degrades on
+  broker outage.
 
-## 3. Validation (exact final tree)
+**Deliberately NOT implemented:** proposal generation, share counts, batch
+execution, any UI surface.
 
-Review tree (`58a10ab`): focused **35 passed**; full suite **2947 passed /
-0 skipped / 25 warnings**.
+## 3. Validation (exact final tree, commit `e973113`)
 
-Counter-reviewed tree (current):
-
-- `test_attribution` **30 passed**.
-- Full suite: **2950 passed / 0 failed / 0 skipped / 25 warnings** (618s).
+- `tests/test_rebalance.py` **54 passed**.
+- Full suite **3004 passed / 0 failed / 0 skipped / 25 warnings** (249s).
 - `compileall` clean; `git diff --check` clean.
-- Nothing deployed; ops checkout stays at `9a91498`.
+- Second host, operational checkout at `63d38a8`: full suite **2950 passed
+  / 0 failed / 0 skipped**.
+- **Six reverse mutations applied, all caught**, tree restored and verified.
+  One (a zero-target row falling through to "inside band") was **NOT**
+  caught on the first pass and exposed a real coverage gap; two tests were
+  added and it is caught now.
 
-## 4. What is next
+## 4. Review guidance
 
-1. Confirm `paper-epoch-002` observation accumulation.
-2. Roadmap: **GR-6**, or **GR-7d** owner decision (rebalance targets).
-   GR-7a/b/c reporting trio is complete after review.
-3. Optional later: surface attribution on the Reports page (not required
-   for GR-7c DoD as scoped).
-4. FPS-003 intermittent UI chrome title test remains open from earlier.
+Range: the single commit `e973113` on
+`user/claude/gr-7d-rebalance-targets-20260806`, based on `63d38a8`.
+Adversarial attention is most useful on:
 
-## 5. Non-negotiable boundaries
+- whether any emitted field is action-shaped (the report must propose
+  nothing, and computes no share counts on purpose);
+- the zero-target / undefined-relative-drift branches, which are the
+  fail-open direction and were the weakest tested area;
+- band-boundary inclusivity and that classification never reads a rounded
+  value;
+- the read-only claim — the GR-4 provider-fetch write defect has now
+  appeared on reporting surfaces twice (GR-7a, GR-7b); and
+- whether the documented residual (equal weights cannot sum exactly to 50%
+  across 104 names) is handled honestly rather than papered over.
+
+## 5. What is next
+
+1. **Resolve the target-vs-strategy conflict before any GR-7d proposal
+   slice.** SOXX/SOXL (traded by `CONFIGURED_LEVERAGED_PAIRS`), NVDL and
+   BBB are absent from `UNIVERSE`, so the target implies exiting positions
+   another configured component exists to hold. Two components would
+   propose opposite trades. This is an owner decision, not a code fix.
+2. Open owner option: the target sits exactly at the exposure ceiling, so
+   it has zero headroom and ordinary upward drift reads as a
+   `max_total_exposure_pct` breach. Lowering the target below the ceiling
+   is available.
+3. Confirm `paper-epoch-002` observation accumulation on the epoch host.
+4. Roadmap: **GR-6** (the second-machine standup above is real evidence
+   toward its "stand-up proven once" marker; off-machine backup remains the
+   smallest high-value slice), then GR-7d-propose once item 1 is resolved.
+5. FPS-003 intermittent UI chrome title test remains open from earlier.
+
+## 6. Non-negotiable boundaries
 
 - Paper only; never deploy mid-epoch.
+- Only the epoch host runs the operational cadence. Two hosts share one
+  Alpaca paper account.
 - Reporting may not propose/approve/size/submit/dismiss.
 - Reports/CLI reporting must not write provider-fetch or execution evidence.
 - Incomplete/insufficient samples must say so in the artifact.

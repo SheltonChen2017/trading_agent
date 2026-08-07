@@ -42,6 +42,50 @@ Prior GR-7c acceptance (`58a10ab`, ledger
 GR7CREV-001..005. CFPS-GR7C-001 skip refusal retained; it was necessary
 but not sufficient without GR7CFOLLOW-001.
 
+## 2a. New: QuantConnect research client (QC-1) — NOT yet reviewed
+
+Branch `user/claude/qc-api-client-20260807`. New module
+`research/quantconnect.py` + `tests/test_quantconnect_client.py` (28 tests,
+all offline).
+
+**Why.** The binding constraint on research is breadth, not statistics: a
+hand-written 104-ticker universe with a measured 2–4% minimum detectable
+effect, against real edges under 1%. QuantConnect supplies a
+survivorship-free, point-in-time-corrected universe of thousands.
+
+**The licence boundary, which shaped the whole design.** QuantConnect's
+terms forbid exporting site content "in raw form, such as CSV, API, FTP, or
+other formats"; download licences are "for the licensed organization's
+internal LEAN use only and cannot be redistributed or converted in any
+format". So the obvious integration — pull their universe into this
+project's `{ticker: DataFrame}` pipeline and run the existing significance
+toolkit — is **not permitted**. Verified against their published terms
+before any code was written.
+
+What may come home is an algorithm's **own results**: statistics, charts,
+its own orders. Enforced by an endpoint allowlist, not a comment, so a
+market-data endpoint QuantConnect adds later is not callable by default.
+
+**What it unlocks.** `backtest/interactive` admits it applies no
+multiple-comparison correction because "every parameter tweak is another
+uncounted look" — uncountable when a human twiddles a widget. Runs driven
+through the API are countable by construction. That look-counting registry
+is the **next** milestone; this one is the transport it needs.
+
+**Credentials.** `QC_USER_ID` / `QC_API_TOKEN`, environment only, never
+literals; `__repr__` redacts the token. The token is never transmitted —
+auth sends `sha256(f"{token}:{unix_ts}")` with the timestamp as nonce.
+Setup instructions in README §"Configure QuantConnect".
+
+**Not done, deliberately:** no live call has ever been made — there are no
+credentials on this machine yet, so every test injects transport and clock
+and runs offline. The auth algorithm is verified against independently
+recomputed vectors, not against QuantConnect. **First real call is
+unproven** and should be `authenticate()`.
+
+Mutation verified: removing the endpoint allowlist fails 5 tests; trusting
+HTTP 200 while ignoring `success:false` fails 1.
+
 ## 3. Validation (exact final tree)
 
 - Focused `test_attribution`: **35 passed**.
@@ -52,7 +96,12 @@ but not sufficient without GR7CFOLLOW-001.
 
 ## 4. What is next
 
-1. Confirm `paper-epoch-002` observation accumulation.
+1. **QC-1 needs independent review** and a first live `authenticate()`
+   once `QC_USER_ID` / `QC_API_TOKEN` are set (README has the commands).
+2. **GR-6 off-machine backup remains the highest-value small item** — the
+   epoch's evidence still lives on one disk (`data/backups/` is the same
+   drive as the database). See `docs/OPERATIONAL_FACTS.md` §2.
+3. Confirm `paper-epoch-002` observation accumulation.
 2. Roadmap: **GR-6**, or **GR-7d** owner decision (rebalance targets).
    GR-7a/b/c reporting trio is complete after this follow-up review.
 3. Optional later: surface attribution on the Reports page (not required
@@ -66,5 +115,8 @@ but not sufficient without GR7CFOLLOW-001.
 - Reports/CLI reporting must not write provider-fetch or execution evidence.
 - Incomplete/insufficient samples must say so in the artifact.
 - Selection residual is not a skill claim.
+- **QuantConnect raw market data must never enter this repository.** Results
+  only; the endpoint allowlist in `research/quantconnect.py` is the
+  enforcement, and weakening it breaks their licence.
 - Snapshot `total_equity` is post-flow; subtract `net_external_flow` before
   any `Observation.value_before_flow` mapping.

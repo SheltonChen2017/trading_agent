@@ -355,6 +355,58 @@ PAPER_TRADING = True
 Without credentials, briefings and proposals use
 `assistant/sample_portfolio.py` and clearly identify the source as `manual`.
 
+## Configure QuantConnect (research only, optional)
+
+`research/quantconnect.py` drives backtests on QuantConnect's cloud and
+brings the **results** home. It is research-only: it cannot create, size,
+approve, or submit an order, and it is not reachable from any code that
+can.
+
+Get both values from your QuantConnect account page — the user id is shown
+in account settings; the API token is requested from the security section
+(they email it to you).
+
+**Persist them for this machine (recommended)** so scheduled tasks and new
+shells both see them:
+
+```powershell
+[Environment]::SetEnvironmentVariable("QC_USER_ID", "123456", "User")
+[Environment]::SetEnvironmentVariable("QC_API_TOKEN", "your-token", "User")
+```
+
+Open a **new** shell afterwards — a running process keeps the environment it
+started with. For one session only:
+
+```powershell
+$env:QC_USER_ID = "123456"
+$env:QC_API_TOKEN = "your-token"
+```
+
+```bash
+export QC_USER_ID="123456"
+export QC_API_TOKEN="your-token"
+```
+
+Verify without running a backtest:
+
+```powershell
+python -c "from research.quantconnect import QuantConnectClient; print(QuantConnectClient().authenticate())"
+```
+
+The token is never transmitted: authentication sends
+`sha256(f"{token}:{unix_timestamp}")` with the timestamp as a nonce, so each
+request carries a different signature.
+
+**What this deliberately cannot do.** QuantConnect's terms forbid exporting
+site content "in raw form, such as CSV, API, FTP, or other formats", and
+download licences are "for the licensed organization's internal LEAN use
+only and cannot be redistributed or converted in any format". So their
+market data cannot be pulled into this project's `{ticker: DataFrame}`
+pipeline, however well it would fit. The client enforces this with an
+endpoint allowlist rather than a comment — market-data paths are
+structurally unreachable, so an endpoint QuantConnect adds later does not
+become callable by default.
+
 ## Personal policy
 
 The default versioned policy is
@@ -925,6 +977,8 @@ assistant/
   news_summary.py          recent news, optional Claude-summarized (ANTHROPIC_API_KEY)
   ai_advisor.py            optional LLM notes, output-validated so it can never advise an allocation
   llm/                     read-only committee contracts, privacy projection, provider boundary, validators
+research/
+  quantconnect.py          QuantConnect cloud client -- RESULTS only, allowlisted endpoints, no execution reach
   ticker_verification.py   confirms a ticker is real/liquid before it enters a cart
   similarity_evidence.py   deterministic co-movement evidence behind "similar tickers"
   recommended_stocks.py    not-currently-held candidates surfaced in the Briefing tab (exploration only)

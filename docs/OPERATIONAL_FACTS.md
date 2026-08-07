@@ -85,6 +85,31 @@ Not derivable from the repository, and expensive to rediscover.
 
 ---
 
+### QuantConnect: results may leave, data may not (2026-08-07)
+
+QuantConnect's terms forbid exporting site content "in raw form, such as
+CSV, API, FTP, or other formats", and download licences are "for the
+licensed organization's internal LEAN use only and cannot be redistributed
+or converted in any format".
+
+So the tempting integration — pull their survivorship-free universe into
+this project's `{ticker: DataFrame}` pipeline and run the existing
+significance toolkit on it — is **not permitted**, however well it would
+fit. `research/quantconnect.py` enforces this with an endpoint allowlist
+rather than a comment: market-data paths are structurally unreachable, so a
+new endpoint QuantConnect adds does not become callable merely because
+nobody remembered to forbid it.
+
+What may come home is an algorithm's **own results** — statistics, charts,
+its own orders. That is enough for the thing the local backtest page
+cannot do: `backtest/interactive` states it applies no multiple-comparison
+correction because "every parameter tweak is another uncounted look". Runs
+driven through the API are countable by construction.
+
+Credentials: `QC_USER_ID` / `QC_API_TOKEN`, environment only, never
+literals. The token is never transmitted — auth sends
+`sha256(f"{token}:{unix_ts}")` with the timestamp as nonce.
+
 ## 3. Standing engineering watch items
 
 - **`Decimal(str(...))` on money or share fields.** Three consecutive review

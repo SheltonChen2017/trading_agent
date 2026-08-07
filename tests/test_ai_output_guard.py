@@ -94,6 +94,28 @@ def _summarize_with_model_saying(text: str):
             os.environ.pop("ANTHROPIC_API_KEY", None)
 
 
+def _summarize_with_reason_saying(text: str):
+    """Same harness as _summarize_with_model_saying, returning (summary, reason)."""
+    from assistant import news_summary
+
+    real_module = sys.modules.get("anthropic")
+    had_key = "ANTHROPIC_API_KEY" in os.environ
+    previous_key = os.environ.get("ANTHROPIC_API_KEY")
+    sys.modules["anthropic"] = _FakeAnthropicModule(text)
+    os.environ["ANTHROPIC_API_KEY"] = "test-key"
+    try:
+        return news_summary.summarize_news_for_ticker_with_reason("NVDA", _HEADLINES)
+    finally:
+        if real_module is not None:
+            sys.modules["anthropic"] = real_module
+        else:
+            sys.modules.pop("anthropic", None)
+        if had_key:
+            os.environ["ANTHROPIC_API_KEY"] = previous_key
+        else:
+            os.environ.pop("ANTHROPIC_API_KEY", None)
+
+
 # --- integration: summarize_news_for_ticker() actually applies the guard ---
 
 def test_news_summary_rejects_explicit_trade_advice():
@@ -357,3 +379,72 @@ def test_an_injected_headline_still_cannot_produce_trade_advice():
     assert _summarize_headlines_with_model_saying(
         injected, "You should buy NVDA immediately."
     ) is None
+
+
+# --- a refusal must say it refused (owner report, 2026-08-07) -------------
+
+def test_guard_rejection_reports_a_reason_instead_of_bare_none():
+    """The defect this closes: a withheld summary and a disabled feature
+    looked identical in the UI -- nothing rendered either way.
+
+    Measured on the owner's real holdings: 7 of 8 tickers were withheld by
+    the guard (their `allowed_tickers` set is built from `config.UNIVERSE`,
+    which most of what they hold is not in), while AAPL/MSFT passed 10/10.
+    So the common case for a real portfolio was silence, and a working
+    safety control read as a broken feature.
+    """
+    from assistant import news_summary
+
+    summary, reason = _summarize_with_reason_saying("You should buy NVDA now.")
+    assert summary is None
+    assert reason is not None
+    assert "withheld by the output guard" in reason
+
+
+def test_the_withheld_prose_never_travels_with_the_reason():
+    """Surfacing the text the guard refused would defeat the guard. Only the
+    fixed verdict label may reach the UI."""
+    from assistant import news_summary
+
+    poisoned = "You should buy NVDA now. SECRETMARKER should not appear."
+    summary, reason = _summarize_with_reason_saying(poisoned)
+    assert summary is None
+    assert "SECRETMARKER" not in reason
+    assert "should buy" not in reason
+
+
+def test_missing_credentials_and_missing_headlines_are_distinguishable():
+    """Three different causes must not collapse into one blank surface."""
+    import os
+
+    from assistant import news_summary
+
+    previous = os.environ.pop("ANTHROPIC_API_KEY", None)
+    try:
+        _, no_headlines = news_summary.summarize_news_for_ticker_with_reason("NVDA", [])
+        _, no_key = news_summary.summarize_news_for_ticker_with_reason("NVDA", _HEADLINES)
+    finally:
+        if previous is not None:
+            os.environ["ANTHROPIC_API_KEY"] = previous
+
+    assert "no headlines" in no_headlines
+    assert "ANTHROPIC_API_KEY" in no_key
+    assert no_headlines != no_key
+
+
+def test_accepted_summary_carries_no_reason():
+    """Guards against 'fixing' this by always reporting a problem."""
+    from assistant import news_summary
+
+    summary, reason = _summarize_with_reason_saying(
+        "Analysts discussed the company's quarterly results."
+    )
+    assert summary is not None
+    assert reason is None
+
+
+def test_the_wrapper_still_returns_a_bare_summary():
+    """Existing callers and tests keep working."""
+    from assistant import news_summary
+
+    assert _summarize_with_model_saying("Analysts discussed quarterly results.") is not None

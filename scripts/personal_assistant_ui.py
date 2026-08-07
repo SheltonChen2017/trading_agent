@@ -74,7 +74,11 @@ from assistant.ai_advisor import (
     review_allocation_plan,
     suggest_similar_tickers,
 )
-from assistant.news_summary import fetch_recent_news, is_ai_summary_configured, summarize_news_for_ticker
+from assistant.news_summary import (
+    fetch_recent_news,
+    is_ai_summary_configured,
+    summarize_news_for_ticker_with_reason,
+)
 from assistant.macro_context import build_descriptive_macro_context
 from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calendar_configured
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
@@ -2016,7 +2020,11 @@ if page == "Buying":
                 price_targets = latest_price_targets_by_firm(ticker)
                 hold_range = historical_hold_period_range(ticker, data, hold_days=20)
                 news = fetch_recent_news(ticker)
-                news_summary = summarize_news_for_ticker(ticker, news) if want_ai_summary else None
+                news_summary, news_summary_reason = (
+                    summarize_news_for_ticker_with_reason(ticker, news)
+                    if want_ai_summary
+                    else (None, None)
+                )
                 results[ticker] = {
                     "own_trend": own_trend,
                     "own_vol": own_vol,
@@ -2028,6 +2036,7 @@ if page == "Buying":
                     "hold_range": hold_range,
                     "news": news,
                     "news_summary": news_summary,
+                    "news_summary_reason": news_summary_reason,
                     "earnings": earnings_by_ticker.get(ticker, {"available": False}),
                 }
             except Exception as exc:
@@ -2506,6 +2515,13 @@ if page == "Buying":
                 if result["news_summary"]:
                     st.info(result["news_summary"])
                     st.caption("AI-generated summary of the headlines below -- not a price prediction or recommendation.")
+                elif result.get("news_summary_reason"):
+                    # A refusal must SAY it refused. Showing nothing made
+                    # "disabled", "call failed" and "the output guard withheld
+                    # this" indistinguishable, so a working control read as a
+                    # broken feature (owner report, 2026-08-07). The reason is
+                    # a fixed label; the withheld prose is never shown.
+                    st.caption(f"AI summary unavailable -- {result['news_summary_reason']}.")
                 elif want_ai_summary and not ai_news_available:
                     st.caption("AI summary skipped -- ANTHROPIC_API_KEY not set.")
                 for item in result["news"]:

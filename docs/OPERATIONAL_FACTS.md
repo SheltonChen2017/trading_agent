@@ -116,6 +116,27 @@ uses exact match for `authenticate` and slash-terminated prefixes
 elsewhere, and rejects `..` / `\` / scheme-shaped paths so
 `backtests/../data/read` cannot bypass the licence boundary.
 
+### AI news summaries are withheld for most of the owner's holdings (2026-08-07)
+
+`summarize_news_for_ticker` builds its allowed-ticker set from
+`config.UNIVERSE` — 104 names chosen for research-scan coverage. Most of
+what the account actually holds is not in it (NVDL, QQQM, BBB, AFRM, AEP,
+SPCX), so any summary naming a peer company is refused as "mentions a
+ticker outside the verified candidate set".
+
+**Measured on the real holdings: 7 of 8 tickers withheld**, while AAPL and
+MSFT passed 10/10. The guard is behaving correctly — news is third-party
+text and therefore an injection surface — but its allowlist is scoped to the
+wrong population, so the feature effectively does not work for this
+portfolio.
+
+The *silence* was fixed 2026-08-07: every refusal path now returns a reason
+and the UI prints it, so a withheld summary no longer looks identical to a
+disabled feature. **The scope is an open owner decision**: should the
+allowlist include currently-held tickers and recognized ETFs rather than
+only `UNIVERSE`? That widens a safety control and should be reviewed, not
+quietly changed.
+
 ## 3. Standing engineering watch items
 
 - **`Decimal(str(...))` on money or share fields.** Three consecutive review

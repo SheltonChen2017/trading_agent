@@ -13,8 +13,7 @@ how the project can drive backtests there and bring the RESULTS home.
    submit, cancel, or replace an order, and nothing here may be reachable
    from code that can. This module must never import ``assistant``,
    ``execution``, ``risk``, or storage. Pinned by
-   ``tests/test_quantconnect_client.py`` and the shared import-boundary
-   walker, the same way ``backtest.interactive`` is.
+   ``tests/test_quantconnect_client.py``.
 
 2. *No raw market data leaves QuantConnect.* Their terms are explicit:
    "Users shall not export any part of the Site in raw form, such as CSV,
@@ -44,13 +43,15 @@ token itself is never transmitted:
     header  = "Basic " + base64(f"{user_id}:{hashed}")
 
 plus a ``Timestamp`` header carrying the same unix timestamp, which acts as
-the nonce.
+the nonce. Every call is an HTTP POST (including ``authenticate`` with an
+empty JSON object), matching QuantConnect's documented API contract.
 """
 from __future__ import annotations
 
 import base64
 import hashlib
 import json
+import math
 import os
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
@@ -65,8 +66,12 @@ API_TOKEN_ENV_VAR = "QC_API_TOKEN"
 # denylist: a new market-data endpoint added to QuantConnect must not become
 # reachable here merely because nobody remembered to forbid it. Results,
 # projects, compiles and backtests only.
+#
+# ``authenticate`` is exact-match only. The others are directory prefixes
+# (must end with "/"), so ``backtests/../data/read`` cannot sneak through a
+# startswith check after URL normalization.
+_ALLOWED_EXACT_PATHS = frozenset({"authenticate"})
 _ALLOWED_PATH_PREFIXES = (
-    "authenticate",
     "projects/",
     "files/",
     "compile/",
@@ -148,20 +153,46 @@ def build_auth_headers(
 
 
 def _assert_allowed(path: str) -> None:
-    cleaned = path.lstrip("/")
-    if not any(cleaned.startswith(prefix) for prefix in _ALLOWED_PATH_PREFIXES):
+    if not isinstance(path, str) or not path.strip():
+        raise QuantConnectError(f"path must be a non-empty string, got {path!r}")
+    cleaned = path.strip().lstrip("/")
+    # Refuse traversal and alternate separators before any prefix check.
+    # ``backtests/../data/read`` would otherwise pass startswith("backtests/")
+    # and become a market-data URL after client or server normalization.
+    if (
+        ".." in cleaned
+        or "\\" in cleaned
+        or "://" in cleaned
+        or "\x00" in cleaned
+        or "//" in cleaned
+    ):
         raise QuantConnectError(
             f"path {path!r} is not on this client's allowlist. Market-data "
             "endpoints are deliberately unreachable: QuantConnect's licence "
             "forbids exporting raw data, and this project must not convert "
             "it into local frames."
         )
+    if cleaned in _ALLOWED_EXACT_PATHS:
+        return
+    if any(cleaned.startswith(prefix) for prefix in _ALLOWED_PATH_PREFIXES):
+        return
+    raise QuantConnectError(
+        f"path {path!r} is not on this client's allowlist. Market-data "
+        "endpoints are deliberately unreachable: QuantConnect's licence "
+        "forbids exporting raw data, and this project must not convert "
+        "it into local frames."
+    )
 
 
 def _default_transport(
     url: str, payload: bytes | None, headers: Mapping[str, str], timeout: float
 ) -> tuple[int, bytes]:
-    req = request.Request(url, data=payload, headers=dict(headers))
+    # QuantConnect documents every authenticated call as POST, including
+    # authenticate with an empty JSON object. urllib.Request with data=None
+    # is GET, which is not the documented contract.
+    req = request.Request(
+        url, data=payload if payload is not None else b"{}", headers=dict(headers), method="POST"
+    )
     try:
         with request.urlopen(req, timeout=timeout) as response:
             return response.getcode(), response.read()
@@ -188,6 +219,13 @@ class QuantConnectClient:
         clock: Callable[[], int] | None = None,
         timeout: float = 30.0,
     ) -> None:
+        if (
+            isinstance(timeout, bool)
+            or not isinstance(timeout, (int, float))
+            or not math.isfinite(timeout)
+            or timeout <= 0
+        ):
+            raise QuantConnectError(f"timeout must be a positive finite number, got {timeout!r}")
         self._credentials = credentials or QuantConnectCredentials.from_env()
         self._base_url = base_url.rstrip("/")
         self._transport = transport or _default_transport
@@ -197,21 +235,22 @@ class QuantConnectClient:
             import time
 
             self._clock = lambda: int(time.time())
-        self._timeout = timeout
+        self._timeout = float(timeout)
 
     def request(self, path: str, payload: dict[str, Any] | None = None) -> dict[str, Any]:
-        """One allowlisted call. Returns the decoded JSON body.
+        """One allowlisted POST. Returns the decoded JSON body.
 
         QuantConnect signals failure in-band with ``success: false`` and an
         ``errors`` list, so a 200 is not sufficient evidence of success and
-        is not treated as such here.
+        is not treated as such here. A missing ``success`` field is also
+        refusal — fail closed rather than invent a default.
         """
         _assert_allowed(path)
         headers = build_auth_headers(self._credentials, self._clock())
-        body: bytes | None = None
-        if payload is not None:
-            body = json.dumps(payload).encode("utf-8")
-            headers["Content-Type"] = "application/json"
+        # Always POST with a JSON body. Empty object for no-arg endpoints
+        # (authenticate), matching QuantConnect's curl examples.
+        body = json.dumps({} if payload is None else payload).encode("utf-8")
+        headers["Content-Type"] = "application/json"
         url = f"{self._base_url}/{path.lstrip('/')}"
         status, raw = self._transport(url, body, headers, self._timeout)
         try:
@@ -222,7 +261,7 @@ class QuantConnectClient:
             ) from exc
         if not isinstance(decoded, dict):
             raise QuantConnectError(f"{path} returned {type(decoded).__name__}, expected an object")
-        if status >= 400 or decoded.get("success") is False:
+        if status >= 400 or decoded.get("success") is not True:
             errors = decoded.get("errors") or decoded.get("messages") or []
             raise QuantConnectError(
                 f"{path} failed (HTTP {status}): {'; '.join(str(e) for e in errors) or 'no reason given'}"
@@ -235,8 +274,15 @@ class QuantConnectClient:
 
     def read_backtest(self, project_id: int, backtest_id: str) -> dict[str, Any]:
         """Statistics and metadata for one backtest -- results, not data."""
+        if not isinstance(project_id, int) or isinstance(project_id, bool):
+            raise QuantConnectError(f"project_id must be an int, got {project_id!r}")
+        if not isinstance(backtest_id, str) or not backtest_id.strip():
+            raise QuantConnectError(
+                f"backtest_id must be a non-empty string, got {backtest_id!r}"
+            )
         return self.request(
-            "backtests/read", {"projectId": int(project_id), "backtestId": str(backtest_id)}
+            "backtests/read",
+            {"projectId": project_id, "backtestId": backtest_id.strip()},
         )
 
     def list_backtests(self, project_id: int) -> dict[str, Any]:
@@ -246,4 +292,6 @@ class QuantConnectClient:
         number of runs against a project IS the search count that
         `backtest/interactive` currently admits it cannot measure.
         """
-        return self.request("backtests/list", {"projectId": int(project_id)})
+        if not isinstance(project_id, int) or isinstance(project_id, bool):
+            raise QuantConnectError(f"project_id must be an int, got {project_id!r}")
+        return self.request("backtests/list", {"projectId": project_id})

@@ -110,6 +110,12 @@ Credentials: `QC_USER_ID` / `QC_API_TOKEN`, environment only, never
 literals. The token is never transmitted — auth sends
 `sha256(f"{token}:{unix_ts}")` with the timestamp as nonce.
 
+Every authenticated call is an HTTP **POST** (including `authenticate`
+with `{}`). A missing in-band `success: true` is failure. The allowlist
+uses exact match for `authenticate` and slash-terminated prefixes
+elsewhere, and rejects `..` / `\` / scheme-shaped paths so
+`backtests/../data/read` cannot bypass the licence boundary.
+
 ## 3. Standing engineering watch items
 
 - **`Decimal(str(...))` on money or share fields.** Three consecutive review

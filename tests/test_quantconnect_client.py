@@ -115,6 +115,14 @@ def test_credentials_load_from_the_environment():
         "/data/prices",
         "live/read",
         "object/store/read",
+        "authenticateX",
+        "backtests/../data/read",
+        "projects/../../data/read",
+        "files\\read",
+        "https://evil.example/data/read",
+        "backtests//evil",
+        "",
+        "   ",
     ],
 )
 def test_market_data_and_unlisted_endpoints_are_unreachable(path):
@@ -126,9 +134,12 @@ def test_market_data_and_unlisted_endpoints_are_unreachable(path):
     would breach that. The allowlist makes the boundary structural rather
     than a matter of remembering -- a new market-data endpoint added by
     QuantConnect does not become reachable merely because nobody forbade it.
+
+    Prefix matching alone is not enough: ``backtests/../data/read`` must
+    also refuse, or URL normalization would bypass the licence boundary.
     """
     client = QuantConnectClient(_CREDS, transport=_fake_transport(), clock=lambda: 1)
-    with pytest.raises(QuantConnectError, match="allowlist"):
+    with pytest.raises(QuantConnectError, match="allowlist|non-empty"):
         client.request(path)
 
 
@@ -152,6 +163,14 @@ def test_in_band_failure_is_not_treated_as_success():
     client = QuantConnectClient(_CREDS, transport=transport, clock=lambda: 1)
     with pytest.raises(QuantConnectError, match="Hash doesn't match"):
         client.authenticate()
+
+
+def test_missing_success_field_is_not_treated_as_success():
+    """Fail closed: a 200 body without success:true is not evidence of OK."""
+    transport = _fake_transport(status=200, body={"backtests": []})
+    client = QuantConnectClient(_CREDS, transport=transport, clock=lambda: 1)
+    with pytest.raises(QuantConnectError, match="no reason given"):
+        client.list_backtests(1)
 
 
 def test_http_error_status_refuses():
@@ -184,7 +203,85 @@ def test_request_sends_auth_headers_and_the_expected_url():
     assert sent["url"] == "https://example.test/api/v2/backtests/read"
     assert sent["headers"]["Timestamp"] == "1700000000"
     assert sent["headers"]["Authorization"].startswith("Basic ")
+    assert sent["headers"]["Content-Type"] == "application/json"
     assert json.loads(sent["data"]) == {"projectId": 7, "backtestId": "bt-1"}
+
+
+def test_authenticate_posts_empty_json_object():
+    """QuantConnect documents every call as POST, including authenticate.
+
+    urllib.Request with data=None is GET. The first live authenticate() would
+    have failed against the documented contract.
+    """
+    capture: list[dict] = []
+    client = QuantConnectClient(
+        _CREDS, transport=_fake_transport(capture=capture), clock=lambda: 1
+    )
+    client.authenticate()
+    assert json.loads(capture[0]["data"]) == {}
+    assert capture[0]["headers"]["Content-Type"] == "application/json"
+
+
+def test_default_transport_uses_post_even_without_payload():
+    """Pin the urllib Request method, not only the injected fake transport."""
+    import research.quantconnect as qc
+
+    seen: list[object] = []
+
+    class _FakeResponse:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+        def getcode(self):
+            return 200
+
+        def read(self):
+            return b'{"success": true}'
+
+    def fake_urlopen(req, timeout=None):
+        seen.append(req)
+        return _FakeResponse()
+
+    monkey_request = qc.request
+    original = monkey_request.urlopen
+    monkey_request.urlopen = fake_urlopen
+    try:
+        status, raw = qc._default_transport(
+            "https://example.test/api/v2/authenticate",
+            None,
+            {"Authorization": "Basic x", "Timestamp": "1"},
+            5.0,
+        )
+    finally:
+        monkey_request.urlopen = original
+
+    assert status == 200
+    assert json.loads(raw)["success"] is True
+    assert seen[0].get_method() == "POST"
+    assert seen[0].data == b"{}"
+
+
+@pytest.mark.parametrize("bad", [True, "7", 7.5, None])
+def test_read_backtest_rejects_non_int_project_id(bad):
+    client = QuantConnectClient(_CREDS, transport=_fake_transport(), clock=lambda: 1)
+    with pytest.raises(QuantConnectError, match="project_id"):
+        client.read_backtest(project_id=bad, backtest_id="bt-1")
+
+
+@pytest.mark.parametrize("bad", ["", "  ", None, 12])
+def test_read_backtest_rejects_blank_backtest_id(bad):
+    client = QuantConnectClient(_CREDS, transport=_fake_transport(), clock=lambda: 1)
+    with pytest.raises(QuantConnectError, match="backtest_id"):
+        client.read_backtest(project_id=1, backtest_id=bad)
+
+
+@pytest.mark.parametrize("bad", [0, -1, float("nan"), float("inf"), True, "30"])
+def test_invalid_timeout_refuses(bad):
+    with pytest.raises(QuantConnectError, match="timeout"):
+        QuantConnectClient(_CREDS, transport=_fake_transport(), clock=lambda: 1, timeout=bad)
 
 
 # --- architectural boundary ----------------------------------------------

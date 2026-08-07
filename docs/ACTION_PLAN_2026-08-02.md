@@ -163,6 +163,7 @@ already-merged work does not reorder the adopted next step.
 | AI strategy authoring AS-0..AS-7 | prose → StrategySpec → compiler → evaluation plan → orchestrated backtest → dossier → registry | 0% — no `strategy_lab/`, no DSL, no Backtest tab |
 | AI debate surface | `assistant/ai_debate.py` parallel-framing design | 0%; its own doc questions whether the safe version is worth building |
 | MCP read-only server | `mcp_bridge/` + 9 tools | 0%; GR-5's dashboard prerequisite is now satisfied, but the §3.6 activation gate still fails because the broader GR list is incomplete, no five-question preceding-month need is recorded, and higher-leverage work remains open. |
+| QC-1 QuantConnect research client | allowlisted results-only cloud transport (`research/quantconnect.py`); no raw market-data export path | **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-07.** Review forced POST-for-all (including authenticate), hardened allowlist against prefix/`../` bypass, required in-band `success is True`, and rejected bad ids/timeouts. Live `authenticate()` still unproven until credentials are set. Look-counting registry is the next QC milestone. |
 
 ---
 

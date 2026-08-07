@@ -9,6 +9,7 @@ the components match, which is what makes the reconciliation meaningful.
 """
 from __future__ import annotations
 
+import json
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -118,19 +119,42 @@ def test_cash_drag_is_zero_when_the_benchmark_did_not_move():
 def test_a_deposit_is_not_counted_as_a_gain():
     """The single most common way a hand-rolled return calculation goes
     wrong. Equity doubles purely because money was added; the return must
-    stay 0."""
+    stay 0.
+
+    Convention matches ``portfolio_equity_snapshots``: ``total_equity`` is
+    POST-flow broker equity, and ``flow`` is the deposit that produced it.
+    Passing that equity straight into ``Observation.value_before_flow``
+    (the pre-fix wiring) reported about +33% on a three-point deposit-only
+    series and dumped it into selection.
+    """
     points = [
         AttributionPoint(
             at=_START, total_equity=100.0, invested_value=100.0,
-            benchmark_close=400.0, flow=100.0,
+            benchmark_close=400.0,
         ),
         AttributionPoint(
             at=_START + timedelta(days=1), total_equity=200.0,
+            invested_value=200.0, benchmark_close=400.0, flow=100.0,
+        ),
+        AttributionPoint(
+            at=_START + timedelta(days=2), total_equity=200.0,
             invested_value=200.0, benchmark_close=400.0,
         ),
     ]
     report = evaluate_attribution(points, minimum_observations=2)
     assert report["returns"]["portfolio_pct"] == "0"
+    assert report["decomposition"]["selection_pct"] == "0"
+
+
+def test_post_flow_equity_minus_flow_cannot_go_negative():
+    with pytest.raises(AttributionError, match="total_equity - flow"):
+        AttributionPoint(
+            at=_START,
+            total_equity=100.0,
+            invested_value=0.0,
+            benchmark_close=400.0,
+            flow=150.0,
+        )
 
 
 def test_components_reconcile_with_active_return_across_a_longer_series():
@@ -619,6 +643,49 @@ def test_cli_never_pools_two_accounts_into_one_return_series():
         cli.command_attribution(_cli_args(account_key="nope"), store=store)
 
 
+def test_cli_deposit_on_kept_snapshot_is_not_counted_as_return():
+    """GR7CFOLLOW-001: the kept path must match portfolio_performance_report.
+
+    Snapshots store post-flow equity. A $100 deposit that doubles the account
+    must report 0% portfolio return, not ~+33% dumped into selection.
+    """
+    import io
+    from contextlib import redirect_stdout
+
+    import scripts.run_personal_assistant as cli
+
+    rows = [
+        _snapshot_row("2026-01-02", 100, 0, 400),
+        _snapshot_row("2026-01-03", 200, 100, 400, flow="100"),
+        _snapshot_row("2026-01-04", 200, 100, 400),
+    ]
+    buffer = io.StringIO()
+    with redirect_stdout(buffer):
+        cli.command_attribution(_cli_args(json=True), store=_SnapshotStore(rows))
+    report = json.loads(buffer.getvalue())
+    assert report["returns"]["portfolio_pct"] == "0"
+    assert report["decomposition"]["selection_pct"] == "0"
+    assert (
+        report["decomposition"]["average_invested_weight_method"]
+        == "session_equalized_beginning_of_period"
+    )
+
+
+def test_human_cli_does_not_call_leverage_cash_drag(capsys):
+    """GR7CFOLLOW-003: non-JSON output must follow allocation_meaning."""
+    import scripts.run_personal_assistant as cli
+
+    rows = [
+        _snapshot_row("2026-01-02", 100, -20, 400),  # invested 120 > equity
+        _snapshot_row("2026-01-03", 110, -20, 440),
+    ]
+    cli.command_attribution(_cli_args(json=False), store=_SnapshotStore(rows))
+    text = capsys.readouterr().out
+    assert "cash drag" not in text
+    assert "invested-weight effect" in text
+    assert "session_equalized_beginning_of_period" in text
+
+
 def test_weight_is_equalized_by_session_not_biased_by_capture_frequency():
     """Found on the live account during a fresh-eyes pass.
 
@@ -668,6 +735,11 @@ def test_weight_is_equalized_by_session_not_biased_by_capture_frequency():
     assert report["decomposition"]["average_invested_weight_pct"] == "50", (
         "nine captures of one session must not outvote one capture of another"
     )
+    assert (
+        report["decomposition"]["average_invested_weight_method"]
+        == "session_equalized_beginning_of_period"
+    )
+    assert report["decomposition"]["average_invested_weight_unit"] == "market session"
 
 
 def test_single_capture_per_session_is_unchanged_by_equalization():

@@ -7,6 +7,7 @@ import math
 import os
 import sys
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -672,9 +673,17 @@ def command_attribution(args, store: AssistantStore) -> None:
         f"  portfolio {returns['portfolio_pct']}%  vs benchmark "
         f"{returns['benchmark_pct']}%  = active {returns['active_pct']}%"
     )
+    # Do not hardcode "cash drag": when average weight > 100% the payload's
+    # allocation_meaning correctly refuses that label (GR7CREV-005).
+    allocation_label = (
+        "cash drag"
+        if Decimal(decomposition["average_invested_weight_pct"]) <= Decimal("100")
+        else "invested-weight effect"
+    )
     print(
-        f"  cash drag (allocation): {decomposition['allocation_pct']}%  "
-        f"at {decomposition['average_invested_weight_pct']}% average invested"
+        f"  {allocation_label} (allocation): {decomposition['allocation_pct']}%  "
+        f"at {decomposition['average_invested_weight_pct']}% average invested "
+        f"({decomposition['average_invested_weight_method']})"
     )
     print(f"  residual (selection):   {decomposition['selection_pct']}%")
     print("    " + decomposition["selection_meaning"])

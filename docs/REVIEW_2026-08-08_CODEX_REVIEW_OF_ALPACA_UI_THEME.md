@@ -1,14 +1,19 @@
 # Codex review of Claude's Alpaca UI theme
 
-Date: 2026-08-08  
-Status: **changes requested — 0 P0, 0 P1, 4 P2, 1 P3 open**  
-Reviewer: Codex  
+Date: 2026-08-08
+
+Status: **changes requested — 0 P0, 0 P1, 4 P2, 1 P3 open**
+
+Reviewer: Codex
+
 Review branch: `codex/review-claude-alpaca-ui-theme-20260808`
 
 ## 1. Scope and commit dispositions
 
-Base: `8f4257b` (`main`, PR #173)  
-Claude branch: `user/claude/alpaca-ui-theme-20260808`  
+Base: `8f4257b` (`main`, PR #173)
+
+Claude branch: `user/claude/alpaca-ui-theme-20260808`
+
 Reviewed head: `85566b3`
 
 Every commit in `8f4257b..85566b3` was reviewed separately and in the
@@ -29,7 +34,8 @@ order, policy write, or broker mutation was requested.
 
 ### AUI-001 — P2 — checked and focused controls use a 1.41:1 indicator
 
-**Status:** Open.  
+**Status:** Open.
+
 **Files:** `.streamlit/config.toml:52`, `.streamlit/config.toml:60`,
 `scripts/ui_theme.py:278`.
 
@@ -55,7 +61,8 @@ https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast
 
 ### AUI-002 — P2 — ordinary warning messages do not get a distinct typeface
 
-**Status:** Open.  
+**Status:** Open.
+
 **File:** `scripts/ui_theme.py:204` and `scripts/ui_theme.py:243`.
 
 The owner explicitly requested different fonts to separate warnings, titles,
@@ -73,7 +80,8 @@ bold alert fragments would use mono.
 
 ### AUI-003 — P2 — the rounded-card requirement is only partially implemented
 
-**Status:** Open.  
+**Status:** Open.
+
 **File:** `scripts/ui_theme.py:158` through `scripts/ui_theme.py:176`.
 
 The stylesheet says it coats “every block,” but it can only style an
@@ -93,7 +101,8 @@ uncontrolled nesting.
 
 ### AUI-004 — P2 — the branch records a warning contrast result below WCAG AA
 
-**Status:** Open.  
+**Status:** Open.
+
 **Files:** `scripts/ui_theme.py:204`, `docs/SESSION_HANDOFF.md:128`.
 
 The handoff records a worst-case normal-text contrast of **4.49:1** against a
@@ -115,7 +124,8 @@ https://www.w3.org/WAI/WCAG20/Understanding/contrast-minimum.html
 
 ### AUI-005 — P3 — two configured heading weights are invalid in Streamlit
 
-**Status:** Open.  
+**Status:** Open.
+
 **File:** `.streamlit/config.toml:43`.
 
 `headingFontWeights = [700, 660, 620]` is accepted by TOML parsing but rejected

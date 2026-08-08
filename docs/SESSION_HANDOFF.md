@@ -8,18 +8,23 @@ computer, model, or session change. This is the canonical current-state
 handoff. Durable standing rules and operational facts remain in their linked
 authority documents so rewriting this state summary does not erase them.
 
-> **Current development state:** `main` is `24d0cb2` (PR #171), which merged
-> Codex's 42-finding correction batch. Claude's pushed, unmerged counter-review
-> branch has delivery head `5b050cd`; its production-change head is `6e653ba`.
-> Codex independently accepted that six-commit series after correction on
-> `codex/review-claude-counter-review-20260808`; correction commit `d6e65c1`
-> is **local-only and not pushed**. The review found CCR-001 (P2) and CCR-002
-> through CCR-004 (P3); all four are fixed, with **0 open findings** from this
-> round. Final validation is **3203 passed, 0 failed, 0 skipped, 26 suite
-> warnings**, plus one host-only pytest cache-permission warning on the exact
-> post-handoff rerun. Under Python 3.12.13, compileall, every PowerShell parse,
-> and `git diff --check` passed. Another computer cannot fetch `d6e65c1` until
-> the owner authorizes a push. Nothing was deployed.
+> **Current development state:** `main` is `dabdd56` (PR #172), which merged
+> Codex's review of Claude's counter-review. Everything from the whole-codebase
+> sweep through that review is now **on `main` and fetchable**: the Claude
+> counter-review (`5b050cd` and its ancestors, PR #171 base `24d0cb2`) and the
+> Codex correction and handoff commits (`d6e65c1`, `4c501cf`).
+>
+> Codex's review found CCR-001 (P2) and CCR-002/003/004 (P3) against Claude's
+> work; all four are fixed and independently re-verified by Claude in this
+> round. Validation on the merged tree: **3203 passed, 0 failed, 0 skipped**
+> (reproduced independently on Python 3.14.6; Codex ran 3.12.13).
+>
+> **CCR-005 (this round):** the block above previously asserted that two of
+> the commits listed there were still unpushed and unmerged. Both statements
+> were true when written and false the moment PR #172 landed them. Deliberately
+> paraphrased rather than quoted: an automated guard now flags a reachability
+> claim sitting beside a commit hash, and it cannot tell a live claim from a
+> quoted historical one. See §0.
 
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
 > machine-local operational knowledge, and engineering watch items live

@@ -63,3 +63,49 @@ filed return.
 
 Final issue state: **0 P0, 0 P1, 0 P2, and 0 P3 open** from this review.
 `paper-epoch-002` was not contacted or changed.
+
+
+## Claude counter-review of this review — 2026-08-08
+
+Outcome: **accepted.** All four CCR findings verified; one residual (CCR-005).
+
+### Verification of CCR-001..004
+
+| ID | Independent check | Verdict |
+|---|---|---|
+| CCR-001 | `same_day_open_to_close` with `hold_days=0` now returns 30 rows (documented contract restored), while `same_close` and `next_open` still refuse a negative horizon | **confirmed and correctly narrowed** — my guard was over-broad and the fix does not reopen the backward-shift hole |
+| CCR-002 | my regex returned **nothing at all** from the canonical handoff | **confirmed, and worse than stated.** `test_exactly_one_epoch_is_described_as_active_across_current_documents` was passing *vacuously* — it found zero active epochs, so there was nothing to disagree about. A test passing for the wrong reason is the exact class I had been flagging in others' work. The repaired parser finds epoch-002 in both handoff and plan, correctly ignores "was active" and "deactivated", and now fails on an injected cross-document disagreement |
+| CCR-003 | new-file creation implicit; overwriting an existing policy now raises without CAS values or explicit `allow_unchecked_overwrite=True` | **confirmed.** This acts on the observation I recorded and declined to act on. Codex's call was the better one — the shape now matches the `_reject_unsafe_prose` precedent I had cited as the counter-example |
+| CCR-004 | the artifact was added in `5b050cd`, so the range it documented (`24d0cb2..6e653ba`) **excluded the document itself**; the handoff read `3180` where the final tree was `3198`; the inherited local-only banner was stale | **confirmed on every sub-claim.** Note the failure mode: I *machine-checked* that artifact's metadata and the check passed, because it verified the range against itself. Verifying a claim against its own premise is not verification |
+
+Full suite reproduced independently: **3203 passed, 0 failed, 0 skipped** on
+Python 3.14.6 (Codex ran 3.12.13).
+
+### CCR-005 (P3, fixed here)
+
+CCR-004's own correction went stale on merge. The handoff written in `4c501cf`
+stated that the Claude delivery head was unmerged and that the Codex correction
+commit was local-only and unfetchable; PR #172 landed both, and it also moved
+`main` off the `24d0cb2` the same block named.
+
+This is the **third** instance of one class:
+
+1. Claude's handoff said "local only, not pushed" after pushing;
+2. Codex's line-by-line review merged with all 24 findings still `Open`
+   (CCX-004);
+3. Codex's fix for that merged still describing its own commits as unmerged.
+
+It is structural rather than careless. **Any statement about push or merge
+state, written in the commit being pushed or merged, is false by construction
+the moment it lands** — so no amount of care at writing time prevents it. It
+needs a check that runs *after* the merge.
+
+Correction: handoff facts restated against `dabdd56`, plus a new guard that
+resolves every commit hash appearing beside a local-only / unpushed / unmerged
+/ cannot-fetch claim and fails if git says it is reachable from HEAD.
+
+The guard immediately earned its keep by catching my own correction note,
+which *quoted* the stale phrasing next to a hash — it cannot distinguish a live
+claim from a historical quotation. Rather than weaken it, the note is
+paraphrased and says so. Verified load-bearing: reintroducing the claim fails
+it; removed, it passes. Skips cleanly outside a git checkout.

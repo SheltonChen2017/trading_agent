@@ -1,11 +1,32 @@
 # Development session handoff
 
-Prepared: 2026-08-07, after a full-codebase sweep and the fix of every
-finding it produced, on `user/claude/full-codebase-sweep-20260807`.
+Prepared: 2026-08-08, after Codex combined both consecutive whole-codebase
+finding lists and corrected every finding in discovery order, on
+`codex/fix-combined-code-scan-findings-20260808`.
 
 Audience: Codex, Claude Code, Grok, and the repository owner after a
-computer, model, or session change. This file completely replaces the prior
-handoff **and is therefore the wrong place for anything durable.**
+computer, model, or session change. This is the canonical current-state
+handoff. Durable standing rules and operational facts remain in their linked
+authority documents so rewriting this state summary does not erase them.
+
+> **Codex correction addendum (2026-08-08, current development state):** At
+> owner instruction, Codex combined Claude's `FCS-001..018` list and Codex's
+> `CXL-001..024` list in their discovery order, then processed all 42 entries.
+> The correction authority is
+> `docs/REVIEW_2026-08-08_COMBINED_SCAN_FIX_LEDGER.md`: every entry is now
+> independently verified, superseded by its broader correction, or fixed with
+> regression evidence. Final validation is **3166 passed, 0 failed, 26
+> warnings** under Python 3.12.13; byte-compilation, every PowerShell parse,
+> and `git diff --check` also passed. The correction branch is
+> `codex/fix-combined-code-scan-findings-20260808`, based on `a48bb852`.
+> Correction commit `e313836` is **accepted after correction** against that
+> baseline: 0 P0, 0 P1, 0 P2, and 0 P3 findings remain open in this batch.
+> This branch and its commits are **local-only and not pushed**; another
+> computer cannot retrieve them with `git fetch` until the owner authorizes a
+> push. The next step is owner review and, if accepted, explicit push/merge
+> authorization. `paper-epoch-002` remains on the separate frozen computer at
+> `9a91498`; this development tree was not deployed and must not be deployed
+> into the active epoch.
 
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
 > machine-local operational knowledge, and engineering watch items live

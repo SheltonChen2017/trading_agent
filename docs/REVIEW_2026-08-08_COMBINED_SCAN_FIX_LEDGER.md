@@ -97,3 +97,52 @@ merely because a related earlier row was marked fixed.
   and an assertion that rejected the new hidden atomic-publication markers.
   Those tests were corrected without weakening production safeguards; the
   full suite was then rerun from scratch to the green result above.
+
+## Claude counter-review of the Codex corrections — 2026-08-08
+
+Outcome: **accepted after correction.** Every CXL fix I verified holds. Two
+residuals found, both fixed here.
+
+### Independent verification
+
+Reproduced against the merged tree rather than taken from the ledger:
+
+| ID | Independent check | Result |
+|---|---|---|
+| CXL-002 | the reported scenario (equity 10k / cash 9k / buying power 1k / 10% reserve) | headroom now **0**, matching `min(cash, buying_power)` minus reserve; `committed_capital_complete` correctly **False** when open orders are unavailable; no new key trips the action-shape guard |
+| CXL-008 | exact replay vs conflicting amount under one `external_id` | replay is a no-op; the conflicting $5,000 correction now raises `LedgerError` and cash stays 500 |
+| CXL-009 | `list_fills` source path | remainder recovered from cumulative-minus-incremental notional; impossible remainders refused |
+| CXL-012 | flat 20-row window then one move | `return_zscore` and `volume_zscore` are `NaN`, signal filtered |
+| CXL-022 | ML `status` with a nonexistent config and database | `FileNotFoundError`, and **no database created** |
+| CXL-001 | the reported leap-day acquisition | 2024-02-29 → first long-term 2025-03-01, correct |
+| Full suite | independent run, Python **3.14.6** | **3166 passed / 0 failed / 0 skipped**, reproducing Codex's count from 3.12.13 |
+
+**`tests/test_scanner.py` was not weakened.** The fixture changed from
+perfectly flat volume to realistic variation because the old fixture was
+passing *because of the bug*: flat volume produced an infinite volume z-score,
+which is what satisfied the volume-confirmation branch. The replacement makes
+the spike stand out against real variation, which is a stronger fixture.
+
+### Residual findings
+
+| ID | Pri | Location | Issue | Correction | Verification |
+|---|---|---|---|---|---|
+| CCX-001 | P3 | `assistant/tax_lots.py::_one_year_on` | CXL-001 fixed the 29-February **acquisition** but kept the boundary anchored on the acquisition date, which leaves the mirror case wrong in the opposite direction: buying **28 Feb 2023** puts a 29 February *inside* the window, and the anniversary rule made the lot long-term on 2024-02-29 when counting from 2024-03-01 reaches one year only on 2024-03-01. One day **early** — the fail-open direction, understating tax on the same accountant-facing export. Pre-existing, not introduced by CXL-001, but inside the class CXL-001 addressed. | Anchor on the day counting actually starts (`acquired + 1 day`) and take its first anniversary. One rule replaces two special cases and covers both leap positions. | 9 leap positions checked against a Pub 550 helper derived independently of the implementation (and guarded by the IRS's own worked example: buy 5 Feb 2020 → long-term 6 Feb 2021). 20 tests added. Reverse mutation to the acquisition-date anchor: **19 fail**, restored green. |
+| CCX-002 | P3 | `tests/test_active_document_consistency.py` | The new guard asserted the **current** epoch by name (`paper-epoch-002` has been active since 2026-08-06). Rolling to epoch-003 is expected and would fail the suite, and the obvious fix is to edit the assertion — so the guard enforced today's state rather than preventing contradiction, and would be weakened every time reality moved. | Assert the **relationship** instead: no document may call one epoch both active and closed; current documents may not disagree about which epoch is active; the sweep record may carry only one headline count. Literal strings are now only known-stale phrases that should never be true again. | Simulated an epoch-003 roll: the original assertion fails, the rewrite passes. Injected a contradictory "epoch-003 is CLOSED" line: the rewrite catches it. 4 tests. |
+
+### Assessment of the correction batch
+
+The mutation discipline is real — the ledger records a dangerous-direction
+mutation per finding, and the two I re-ran (CXL-001's and the scanner's)
+behaved as recorded. CXL-014's shared create-exclusive publisher
+(`ml/immutable_io.py`) is the right consolidation: five separate TOCTOU
+findings collapsed into one primitive rather than five point fixes, which is
+the generalization step this project's process asks for.
+
+One disagreement of judgement, recorded rather than acted on: the batch reports
+**0 P1**, which is defensible under the project's execution-centric P1
+definition. But CXL-008 and CXL-009 produced *wrong durable financial state* —
+a silently discarded correction leaving cash at $500, and undercounted shares
+flowing into the accountant-facing tax report. "Another defect likely to cause
+severe harm" is in the P1 list. Their sequencing was right regardless of label,
+so this changes nothing about the outcome.

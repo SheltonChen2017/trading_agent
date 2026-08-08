@@ -11,7 +11,7 @@ gain, or nothing. These tests pin that distinction.
 from __future__ import annotations
 
 import tempfile
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -23,6 +23,7 @@ from assistant.tax_lots import (
     LIFO,
     MARKET_TIMEZONE,
     SPECIFIC,
+    _long_term_date,
     Fill,
     Split,
     TaxLotError,
@@ -781,3 +782,75 @@ def test_decimal_sum_avoids_binary_float_accumulation_error():
     # 0.1 + 0.1 + 0.1 != 0.3 in raw binary float.
     assert 0.1 + 0.1 + 0.1 != 0.3  # the drift this helper avoids
     assert _decimal_sum([0.1, 0.1, 0.1]) == 0.3
+
+
+# --------------------------------------------------------------------------
+# CCX-001: the holding-period boundary must be right at EVERY leap position.
+#
+# CXL-001 corrected a 29-February ACQUISITION (which FCS-016 had left one day
+# late). Anchoring the boundary on the acquisition date left the mirror case
+# wrong in the opposite direction: a 28 February purchase puts a 29 February
+# INSIDE the window, and the naive anniversary made the lot long-term one day
+# EARLY -- which understates tax on the same accountant-facing export.
+#
+# Both are the same rule once it is anchored on the day counting starts:
+# Pub 550 says begin counting the day AFTER acquisition, and its worked
+# example (buy 5 Feb 2020, long-term 6 Feb 2021) fixes the shape. So the first
+# long-term date is the first anniversary of `acquired + 1 day`.
+# --------------------------------------------------------------------------
+
+def _pub550_first_long_term(acquired: date) -> date:
+    """The rule, derived independently of the implementation under test."""
+    first_counted = acquired + timedelta(days=1)
+    try:
+        return first_counted.replace(year=first_counted.year + 1)
+    except ValueError:
+        return date(first_counted.year + 1, 3, 1)
+
+
+def test_pub550_helper_reproduces_the_irs_worked_example():
+    """Guard the guard: if this drifts, every case below is meaningless."""
+    assert _pub550_first_long_term(date(2020, 2, 5)) == date(2021, 2, 6)
+
+
+@pytest.mark.parametrize(
+    "acquired",
+    [
+        date(2024, 2, 29),   # CXL-001: acquisition ON the leap day
+        date(2023, 2, 28),   # CCX-001: leap day INSIDE the window
+        date(2024, 2, 28),   # counting starts on 29 Feb
+        date(2025, 2, 28),   # ordinary non-leap February
+        date(2025, 3, 10),   # ordinary
+        date(2024, 12, 31),  # year boundary
+        date(2024, 3, 1),
+        date(2023, 3, 1),
+        date(2020, 2, 5),    # the IRS example itself
+    ],
+)
+def test_the_long_term_boundary_matches_the_federal_rule(acquired):
+    expected = _pub550_first_long_term(acquired)
+    acquired_at = datetime(
+        acquired.year, acquired.month, acquired.day, 15, 0, tzinfo=MARKET_TIMEZONE
+    )
+    assert is_long_term(acquired_at, acquired_at + timedelta(days=0)) is False
+    # The day before the boundary is short; the boundary itself is long.
+    last_short = datetime.combine(
+        expected - timedelta(days=1), time(20, 0), tzinfo=MARKET_TIMEZONE
+    )
+    first_long = datetime.combine(expected, time(9, 30), tzinfo=MARKET_TIMEZONE)
+    assert is_long_term(acquired_at, last_short) is False, f"{acquired}: {expected}"
+    assert is_long_term(acquired_at, first_long) is True, f"{acquired}: {expected}"
+
+
+@pytest.mark.parametrize(
+    "acquired", [date(2024, 2, 29), date(2023, 2, 28), date(2025, 3, 10)]
+)
+def test_the_countdown_and_the_classification_share_one_boundary(acquired):
+    """`_long_term_date` must move with `_one_year_on`, at leap positions too."""
+    acquired_at = datetime(
+        acquired.year, acquired.month, acquired.day, 15, 0, tzinfo=MARKET_TIMEZONE
+    )
+    first_long = _long_term_date(acquired_at)
+    assert first_long.date() == _pub550_first_long_term(acquired)
+    assert is_long_term(acquired_at, first_long) is True
+    assert is_long_term(acquired_at, first_long - timedelta(seconds=1)) is False

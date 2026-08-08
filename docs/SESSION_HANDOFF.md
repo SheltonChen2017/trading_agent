@@ -35,6 +35,35 @@ authority documents so rewriting this state summary does not erase them.
 > they are the generalizable lessons, and they matter more than any
 > individual fix.
 
+## 0. Latest round — Claude counter-review of the Codex corrections (2026-08-08)
+
+`main` is `24d0cb2` (PR #171): Codex's line-by-line review (CXL-001..024) and
+its combined correction batch for all 42 ordered findings.
+
+**Counter-review outcome: accepted after correction.** Branch
+`user/claude/counter-review-codex-scan-20260808`. Details in
+`docs/REVIEW_2026-08-08_COMBINED_SCAN_FIX_LEDGER.md`.
+
+- Independently reproduced CXL-001/002/008/009/012/022 against the merged
+  tree; all hold. Full suite reproduces Codex's **3166** on Python 3.14.6
+  (they ran 3.12.13).
+- `tests/test_scanner.py` was **not** weakened — its old fixture was passing
+  *because* of the infinite z-score it now rejects.
+- **CCX-001 (P3, fixed):** CXL-001 corrected a 29-Feb *acquisition* but left
+  the mirror case — a 29 Feb *inside* the window — one day **early**, the
+  fail-open direction on the accountant-facing export. Boundary now anchors
+  on `acquired + 1 day`; 9 leap positions checked against a Pub 550 helper
+  guarded by the IRS's own worked example. Reverse mutation: 19 fail.
+- **CCX-002 (P3, fixed):** the new doc-consistency guard pinned the *current*
+  epoch by name, so the next epoch roll would fail the suite and be "fixed"
+  by editing the assertion. Rewritten to assert relationships.
+- Judgement disagreement, recorded not acted on: the batch reports 0 P1, but
+  CXL-008/009 produced wrong durable financial state. Sequencing was right
+  regardless of the label.
+
+Final tree: **3180 passed / 0 failed / 0 skipped / 25 warnings**; compileall
+and `git diff --check` clean. Nothing deployed.
+
 ## 1. Standing state: THE EPOCH (do not disturb)
 
 `paper-epoch-002` ACTIVE since 2026-08-06T17:55Z on frozen commit

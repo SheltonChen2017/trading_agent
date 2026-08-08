@@ -240,14 +240,29 @@ def _one_year_on(acquired_at: datetime) -> date:
     first long-term date: the holding-period count starts on 1 March in the
     acquisition year and includes the disposition date (CXL-001).
     """
-    acquired = _market_date(acquired_at)
+    # Derived from the day counting actually STARTS on, not from the
+    # acquisition date. Pub 550: "begin counting on the date after the day you
+    # acquired the property", and its worked example (buy 5 Feb, long term on
+    # 6 Feb the next year) fixes the shape: the first long-term date is the
+    # first anniversary of `acquired + 1 day`, and the last short-term date is
+    # the day before that.
+    #
+    # CXL-001 corrected a 29-February ACQUISITION, which this reproduces. But
+    # anchoring on the acquisition date left the mirror case wrong in the
+    # opposite direction (CCX-001): buying 28 Feb 2023 put a 29 February
+    # INSIDE the holding window, and `replace(year=+1)` made 29 Feb 2024 the
+    # first long-term date when counting from 1 Mar 2023 reaches one year only
+    # on 1 Mar 2024. That direction understates tax, on the same
+    # accountant-facing export. Anchoring on the count's first day handles
+    # both leap positions with one rule instead of two special cases.
+    first_counted_day = _market_date(acquired_at) + timedelta(days=1)
     try:
-        return acquired.replace(year=acquired.year + 1)
+        first_long_term = first_counted_day.replace(year=first_counted_day.year + 1)
     except ValueError:
-        # 29 February has no literal anniversary in a non-leap year. Treating
-        # 1 March as the last short-term date would count the first day twice
-        # and delay long-term treatment until 2 March.
-        return acquired.replace(year=acquired.year + 1, month=2, day=28)
+        # Counting began on 29 February; the next year has no such date, so
+        # the anniversary falls on 1 March.
+        first_long_term = date(first_counted_day.year + 1, 3, 1)
+    return first_long_term - timedelta(days=1)
 
 
 def is_long_term(acquired_at: datetime, sold_at: datetime) -> bool:

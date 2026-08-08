@@ -288,6 +288,23 @@ it for that specific endpoint with the observed body recorded.
   re-read. `UNRESOLVED_BROKER_STATE_STATUSES` is the predicate. Pinned by an
   AST test over every broad handler around
   `execute_approved_paper_proposal`.
+- **A leap day can sit on either side of a holding period.** 2026-08-07/08
+  (FCS-016 → CXL-001 → CCX-001; three passes, three answers). Anchor the
+  boundary on the day counting STARTS -- `acquired + 1 day` -- and take its
+  first anniversary. Anchoring on the acquisition date needs two special cases
+  and gets one of them wrong whichever way you write it: acquisition ON 29 Feb
+  came out a day late, and 29 Feb INSIDE the window came out a day early. Test
+  every leap position, not the one that was reported, and derive the expected
+  value from Pub 550's own worked example (buy 5 Feb 2020 → long-term 6 Feb
+  2021) rather than from the implementation.
+- **A consistency test must assert relationships, not current values.**
+  2026-08-08 (CCX-002). A doc guard that pinned the CURRENT epoch by name
+  would have failed the suite on the next legitimate epoch roll, and the
+  obvious fix would have been to edit the assertion -- so it would enforce
+  today's state and be weakened every time reality moved. Assert instead that
+  no document calls one epoch both active and closed, and that current
+  documents do not disagree about which epoch is active. Literal strings are
+  safe only for known-stale phrases that should never be true again.
 - **A boundary test whose inputs cannot fail the bug.** 2026-08-07 (FCS-016):
   `tax_lots.is_long_term` compares timestamps where the rule is date-based, so
   a sale on the one-year anniversary at a later time of day than the purchase

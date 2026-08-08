@@ -19,6 +19,8 @@ callers and tests need no changes.
 """
 from __future__ import annotations
 
+import math
+
 import pandas as pd
 
 from config import BACKTEST_HOLD_DAYS, SLIPPAGE_PCT
@@ -28,6 +30,15 @@ def classify_trend(close: pd.Series, as_of: pd.Timestamp, lookback_days: int = 2
     """"uptrend" if `close` at `as_of` is at/above its own trailing
     `lookback_days` moving average, else "downtrend". None if there isn't
     enough trailing history yet."""
+    # CCX-003: a non-positive lookback slid straight through. `idx < -1` is
+    # False, the window slice comes back empty, its mean is NaN, and
+    # `close >= NaN` is False -- so the function returned a confident
+    # "downtrend" computed from no data at all. A trend label is an input to
+    # strategy sizing; fabricating one is worse than refusing.
+    if isinstance(lookback_days, bool) or not isinstance(lookback_days, int):
+        raise ValueError(f"lookback_days must be an int, got {lookback_days!r}")
+    if lookback_days < 1:
+        raise ValueError(f"lookback_days must be at least 1, got {lookback_days}")
     if as_of not in close.index:
         return None
     idx = close.index.get_loc(as_of)
@@ -65,6 +76,31 @@ def run_baseline_forward_returns(
     if entry_timing not in ("same_close", "next_open", "same_day_open_to_close"):
         raise ValueError(
             f"entry_timing must be 'same_close', 'next_open', or 'same_day_open_to_close', got {entry_timing!r}"
+        )
+    # CCX-003: a negative `hold_days` turns every `shift(-hold_days)` into a
+    # BACKWARD shift, so the "forward" price is a PAST price and the baseline
+    # silently reports the inverse of the return it claims to measure (+6.93%
+    # became -7.08% on a monotonically rising fixture). This is the control
+    # group a signal's edge is judged against, so inverting it can reverse a
+    # research conclusion -- the same failure mode as the decline-grid
+    # comparator (CXL-013), which was rated P2.
+    # `same_day_open_to_close` never reads the horizon; preserve that public
+    # contract instead of rejecting a value that is explicitly ignored
+    # (CCR-001). The other two modes do shift by the horizon and must refuse a
+    # zero/negative/non-integer value so they cannot point backward.
+    if entry_timing != "same_day_open_to_close":
+        if isinstance(hold_days, bool) or not isinstance(hold_days, int):
+            raise ValueError(f"hold_days must be an int, got {hold_days!r}")
+        if hold_days < 1:
+            raise ValueError(f"hold_days must be at least 1, got {hold_days}")
+    if (
+        isinstance(slippage_pct, bool)
+        or not isinstance(slippage_pct, (int, float))
+        or not math.isfinite(slippage_pct)
+        or slippage_pct < 0
+    ):
+        raise ValueError(
+            f"slippage_pct must be a non-negative finite number, got {slippage_pct!r}"
         )
 
     frames = []

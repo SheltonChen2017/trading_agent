@@ -97,3 +97,225 @@ merely because a related earlier row was marked fixed.
   and an assertion that rejected the new hidden atomic-publication markers.
   Those tests were corrected without weakening production safeguards; the
   full suite was then rerun from scratch to the green result above.
+
+## Claude counter-review of the Codex corrections — 2026-08-08
+
+> **Reviewing this?** Use the standalone artifact
+> `docs/REVIEW_2026-08-08_CLAUDE_COUNTER_REVIEW.md` — same content in the
+> project's review shape, with the commit range, reproduction commands, and a
+> section naming the judgement calls worth attacking. What follows is the
+> working narrative kept beside the batch it corrects.
+
+> **Codex review complete:** Claude's counter-review was accepted after three
+> additional corrections: the same-day baseline mode again ignores its unused
+> horizon, the epoch-consistency parser recognizes status case variants, and
+> unchecked replacement of an existing authoritative policy now requires an
+> explicit escape hatch. See
+> `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_CLAUDE_COUNTER_REVIEW.md`.
+> Final corrected tree: **3203 passed** under Python 3.12.13; compileall,
+> PowerShell parsing, and `git diff --check` clean.
+
+Outcome: **accepted after correction.** Every CXL fix I verified holds. Two
+residuals found, both fixed here.
+
+### Independent verification — complete coverage of all 24 CXL fixes
+
+The first version of this section covered 6 of 24 and said "accepted after
+correction", which claimed more than it had checked. Every CXL fix is now
+verified. Method per row: **B** = behavioural reproduction against the merged
+tree, **S** = source-path proof.
+
+| ID | How | Result |
+|---|---|---|
+| CXL-001 | B | 2024-02-29 → first long-term 2025-03-01, correct. Mirror case wrong → **CCX-001** below |
+| CXL-002 | B | headroom **0**, matching `min(cash, buying_power)` minus reserve; completeness **False** when open orders unavailable; no new key trips the action-shape guard |
+| CXL-003 | B | a raising `fetch_upcoming_earnings` no longer propagates — 6 records returned as unavailable, risk reduction unobstructed |
+| CXL-004 | B | via the real UI call shape (`expected_fingerprint`/`expected_version`) the stale writer is refused with `PolicyWriteConflictError` and `allow_new_positions` stays False |
+| CXL-005 | S+B | contradictions removed; its guard rewritten → **CCX-002** below |
+| CXL-006 | S | the demanded regressions exist: `test_list_limit_rejects_non_positive_values`, `test_invalid_tax_years_are_refused`, `test_atomic_tax_artifact_failure_preserves_existing_destination` |
+| CXL-007 | B | `partially_filled(4)` → `cancel_pending(4)` → delayed `partially_filled(4)` leaves the status **cancel_pending** |
+| CXL-008 | B | exact replay is a no-op; a conflicting $5,000 correction raises `LedgerError`; cash stays 500 |
+| CXL-009 | S | remainder recovered from cumulative-minus-incremental notional; impossible remainders refused |
+| CXL-010 | B | two barrier-synchronised bootstraps of different snapshots → one winner, **1** transaction, one snapshot's cash |
+| CXL-011 | B | omitted ids no longer flag a wash sale; a genuine replacement still does; duplicate explicit ids stay distinguishable |
+| CXL-012 | B | flat window → `NaN` both scores, signal filtered |
+| CXL-013 | B | terminal-close exit values at close (**+100%**) vs open (**−50%**); `exit_price_column` is required keyword-only, so a caller cannot default into the wrong convention |
+| CXL-014 | B | two conflicting concurrent writers → exactly **1** winner, loser gets `ImmutableFileConflictError`, identical retry idempotent |
+| CXL-015..017 | S | all five ML writers routed through `ml/immutable_io.py`; **zero** remaining `os.replace(` in `artifacts`, `databento_source`, `datasets`, `experiments`, `research_orchestration`; per-dataset/experiment `exclusive_file_lock` present |
+| CXL-018 | S | coverage bounded, `shadow_duplicate_outcomes` blocker present, unique expected identities matched |
+| CXL-019 | S | failures joined to `alert.details.run_id`; an unrelated alert no longer covers a failed run |
+| CXL-020 | S | producer writes a versioned `uncertainty` block (`prediction_interval_daily_pct`, `threshold_probability`, `threshold_probability_label`, ceiling, lineage); monitoring reads exactly those with legacy fallbacks — producer and consumer now agree |
+| CXL-021 | S | exact as-of row, NYSE-session membership, and consecutive-session window all required |
+| CXL-022 | B | `FileNotFoundError` and **no database created** |
+| CXL-023 | S | `$UserScopeCredentialNames` centralises all five keys including Finnhub and Databento |
+| CXL-024 | S | `Convert-EasternClockToLocal` applies the date's Eastern and host DST rules |
+
+Full suite reproduced independently: **3166 passed** on Python 3.14.6 (Codex
+ran 3.12.13).
+
+### Detail on the checks worth recording
+
+| ID | Independent check | Result |
+|---|---|---|
+| CXL-002 | the reported scenario (equity 10k / cash 9k / buying power 1k / 10% reserve) | headroom now **0**, matching `min(cash, buying_power)` minus reserve; `committed_capital_complete` correctly **False** when open orders are unavailable; no new key trips the action-shape guard |
+| CXL-008 | exact replay vs conflicting amount under one `external_id` | replay is a no-op; the conflicting $5,000 correction now raises `LedgerError` and cash stays 500 |
+| CXL-009 | `list_fills` source path | remainder recovered from cumulative-minus-incremental notional; impossible remainders refused |
+| CXL-012 | flat 20-row window then one move | `return_zscore` and `volume_zscore` are `NaN`, signal filtered |
+| CXL-022 | ML `status` with a nonexistent config and database | `FileNotFoundError`, and **no database created** |
+| CXL-001 | the reported leap-day acquisition | 2024-02-29 → first long-term 2025-03-01, correct |
+| Full suite | independent run, Python **3.14.6** | **3166 passed / 0 failed / 0 skipped**, reproducing Codex's count from 3.12.13 |
+
+**`tests/test_scanner.py` was not weakened.** The fixture changed from
+perfectly flat volume to realistic variation because the old fixture was
+passing *because of the bug*: flat volume produced an infinite volume z-score,
+which is what satisfied the volume-confirmation branch. The replacement makes
+the spike stand out against real variation, which is a stronger fixture.
+
+### Residual findings
+
+| ID | Pri | Location | Issue | Correction | Verification |
+|---|---|---|---|---|---|
+| CCX-001 | P3 | `assistant/tax_lots.py::_one_year_on` | CXL-001 fixed the 29-February **acquisition** but kept the boundary anchored on the acquisition date, which leaves the mirror case wrong in the opposite direction: buying **28 Feb 2023** puts a 29 February *inside* the window, and the anniversary rule made the lot long-term on 2024-02-29 when counting from 2024-03-01 reaches one year only on 2024-03-01. One day **early** — the fail-open direction, understating tax on the same accountant-facing export. Pre-existing, not introduced by CXL-001, but inside the class CXL-001 addressed. | Anchor on the day counting actually starts (`acquired + 1 day`) and take its first anniversary. One rule replaces two special cases and covers both leap positions. | 9 leap positions checked against a Pub 550 helper derived independently of the implementation (and guarded by the IRS's own worked example: buy 5 Feb 2020 → long-term 6 Feb 2021). 20 tests added. Reverse mutation to the acquisition-date anchor: **19 fail**, restored green. |
+| CCX-002 | P3 | `tests/test_active_document_consistency.py` | The new guard asserted the **current** epoch by name (`paper-epoch-002` has been active since 2026-08-06). Rolling to epoch-003 is expected and would fail the suite, and the obvious fix is to edit the assertion — so the guard enforced today's state rather than preventing contradiction, and would be weakened every time reality moved. | Assert the **relationship** instead: no document may call one epoch both active and closed; current documents may not disagree about which epoch is active; the sweep record may carry only one headline count. Literal strings are now only known-stale phrases that should never be true again. | Simulated an epoch-003 roll: the original assertion fails, the rewrite passes. Injected a contradictory "epoch-003 is CLOSED" line: the rewrite catches it. 4 tests. |
+
+### Rows 1-18: Codex's dispositions on the FCS findings
+
+The coverage table above is the 24 CXL fixes. The combined ledger has **42**
+rows; rows 1-18 are Codex's dispositions on my own FCS findings (13 "Verified",
+5 "Superseded"). Those were not checked until now, and they matter because the
+correction batch rewrote files my fixes live in.
+
+All 13 "Verified" dispositions hold on the merged tree. **231 focused tests
+pass** across `test_strategy_proposals`, `test_decimal_conversion_guard`,
+`test_risk_check_registry`, `test_execution_telemetry`,
+`test_quantconnect_client`, `test_operations`, `test_personal_assistant_ui`,
+`test_ml_earnings_experiments`, and `test_ml_availability`. The FCS-005 AST
+lint's allowlist was not widened (still 5 entries), so no new bare
+`Decimal(str(...))` slipped in with the batch.
+
+**FCS-018 carried the highest regression risk** -- the Streamlit UI was
+substantially rewritten for CXL-003 and CXL-022 -- so it was re-mutated rather
+than just re-run: disabling `_submission_outcome_is_unresolved` on the MERGED
+tree still fails `test_the_unknown_branch_never_claims_the_order_was_not_submitted`.
+The P1 guard survived the rewrite and is still load-bearing.
+
+The 5 "Superseded" dispositions are self-evidently correct: each names the CXL
+finding that replaced it, and all five of those are verified above.
+
+### The deferred candidates (CCX-003)
+
+§5 of the line-by-line review marks the root Python modules and `risk/`
+"Complete" while recording candidates "deferred pending caller/test
+cross-check". They were never described, so nobody could act on them, and
+"Complete" overstated closure for those directories. The cross-check was done:
+
+- **`risk/`: resolves clean.** All nine numeric limit parameters on
+  `validate_trade_intent` are covered by `TradingPolicy.validate()`; there is
+  no uncovered gate parameter. Recorded so this is not re-derived a third time.
+- **Root modules: both candidates are real, and are fixed here as CCX-003.**
+  `classify_trend` accepted a non-positive `lookback_days` and answered a
+  confident `"downtrend"` computed from an EMPTY window (`idx < -1` is False,
+  the slice is empty, its mean is NaN, and `close >= NaN` is False).
+  `run_baseline_forward_returns` accepted a negative `hold_days`, which turns
+  every `shift(-hold_days)` into a BACKWARD shift, so the "forward" price is a
+  past price: on a monotonically rising fixture the baseline reported
+  **-7.08%** where the true forward return was **+6.93%**.
+
+  P3 -- neither is reachable from the execution path, since production callers
+  pass the frozen 200-session lookback and the baseline runner is
+  research-only. But the second inverts the control group a signal's edge is
+  judged against, which is the same failure mode as the decline-grid
+  comparator (CXL-013), rated P2. Fixed with type and range validation; 16
+  tests; reverse mutation removing both positivity guards fails 6.
+
+### CCX-004: the finding document contradicted its own fixes
+
+Asked a fourth time whether every finding had been reviewed, the count itself
+finally checked out — the 24 CXL rows plus the 18 FCS dispositions are the
+whole set, and there is no CXL-025 or beyond. But the check surfaced something
+the count could not: **I had been reading a pre-merge copy of the line-by-line
+review.** In the merged version, all 24 rows still read `Open` /
+"Pending owner instruction", §1 still said "All 24 remain open pending the
+owner's assessment", and §3's disposition on the FCS findings was still marked
+provisional — in a document merged in the **same commit** as the fixes for
+every finding it records.
+
+That is exactly the active-document contradiction this review filed as
+CXL-005, reproduced inside the document that reported it.
+
+Corrected here: the 24 disposition fields now read `Fixed` and point at this
+ledger, §1 carries a dated status block, and §3 is finalized with what became
+of each reopened item. **The findings, evidence and severities are untouched**
+— this is the historical record of what was found, and only the disposition
+fields were stale.
+
+The durable half matters more than the edit. My own CCX-002 rewrite of
+`tests/test_active_document_consistency.py` covered plans, readiness and the
+runbook but **not the finding ledgers**, so it would not have caught this
+either. The guard now cross-checks ledgers against each other: a finding may
+not be `Open` in one document while another records it corrected, and a
+headline count may not claim everything is open while the rows beneath it
+record fixes. Verified by reverting three rows to the state Codex actually
+merged — the guard fails; restored, it passes.
+
+### Scope audit: what neither review actually covered (clean)
+
+A fifth "did you review all of it?" prompted auditing the **scope statement**
+rather than the findings inside it — a review's completeness is bounded by its
+inventory, and nobody had checked that inventory.
+
+The Python and PowerShell counts hold: exactly **four** PowerShell modules
+exist, matching §1's claim, and the Python counts match the baseline plus what
+has been added since.
+
+But §1's scope is "Python modules, PowerShell operational modules, and the
+Markdown documents". **Ten logic-bearing configuration and data files sit
+outside it**, and outside both of Claude's sweeps too — including the two that
+carry authoritative values. Checked here for the first time:
+
+| File | Check | Result |
+|---|---|---|
+| `assistant/default_mandate.json` | recompute `compute_mandate_fingerprint` against the stored `approved_fingerprint` | **match** — the owner's 2026-08-04 approval is still valid and no behavior field has drifted |
+| `assistant/default_policy.json` | every cap against the values `docs/MANDATE.md` §2 states | all five exact |
+| `assistant/research_findings.json` | the registry `strategy_proposals` gates on at proposal time | both relied-upon findings present with the required CONFIRMED status; both correctly flagged non-authoritative, which is the disclosure path rather than a block. 17 findings / 13 rejected / 2 confirmed / 1 promising / 1 exploratory — consistent with `GENERAL_READINESS_STATUS` |
+| `tests/committee_corpus/cases.json` | frozen canonical SHA-256 content identity | holds (72 tests) |
+| `.github/workflows/tests.yml` | the FCS-011 matrix change | `3.12, 3.13, 3.14` present |
+| `.streamlit/config.toml`, `my_policy.example.json`, `ml_shadow_volatility_config.example.json`, `research/ml_specs/*.json` | inspected | no authoritative value; examples and preregistered specs |
+
+**No defect found.** Recorded because a negative result from a systematic
+sweep is evidence, and because the next reviewer should know this surface
+exists: a wrong number in `default_policy.json` or a flipped status in
+`research_findings.json` would change what the machine permits or proposes,
+and neither file is reached by a review scoped to `*.py` and `*.ps1`.
+
+### Observation, not a finding
+
+`save_policy`'s compare-and-swap is **opt-in**: `expected_fingerprint` and
+`expected_version` default to `None` and the CAS is skipped when both are
+omitted. The sole production caller passes them, so CXL-004 is genuinely
+closed. Recorded only because this repository made the opposite call in a
+directly analogous place — `_reject_unsafe_prose`'s `source_text` was made
+required keyword-only precisely so "a new prose surface that forgets
+grounding fails with a TypeError rather than shipping an unchecked number".
+A new policy writer that forgets loses stale-write protection on
+authoritative trading policy silently instead. Codex documented the choice
+("bootstrap and controlled test callers may omit both values"), so this is a
+considered trade-off rather than an oversight, and it is left as the author
+made it.
+
+### Assessment of the correction batch
+
+The mutation discipline is real — the ledger records a dangerous-direction
+mutation per finding, and the two I re-ran (CXL-001's and the scanner's)
+behaved as recorded. CXL-014's shared create-exclusive publisher
+(`ml/immutable_io.py`) is the right consolidation: five separate TOCTOU
+findings collapsed into one primitive rather than five point fixes, which is
+the generalization step this project's process asks for.
+
+One disagreement of judgement, recorded rather than acted on: the batch reports
+**0 P1**, which is defensible under the project's execution-centric P1
+definition. But CXL-008 and CXL-009 produced *wrong durable financial state* —
+a silently discarded correction leaving cash at $500, and undercounted shares
+flowing into the accountant-facing tax report. "Another defect likely to cause
+severe harm" is in the P1 list. Their sequencing was right regardless of label,
+so this changes nothing about the outcome.

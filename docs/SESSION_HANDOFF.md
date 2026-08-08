@@ -1,39 +1,60 @@
 # Development session handoff
 
-Prepared: 2026-08-08, after Codex combined both consecutive whole-codebase
-finding lists and corrected every finding in discovery order, on
-`codex/fix-combined-code-scan-findings-20260808`.
+Prepared: 2026-08-08, after Codex independently reviewed Claude's
+counter-review of the combined whole-codebase correction batch.
 
 Audience: Codex, Claude Code, Grok, and the repository owner after a
 computer, model, or session change. This is the canonical current-state
 handoff. Durable standing rules and operational facts remain in their linked
 authority documents so rewriting this state summary does not erase them.
 
-> **Codex correction addendum (2026-08-08, current development state):** At
-> owner instruction, Codex combined Claude's `FCS-001..018` list and Codex's
-> `CXL-001..024` list in their discovery order, then processed all 42 entries.
-> The correction authority is
-> `docs/REVIEW_2026-08-08_COMBINED_SCAN_FIX_LEDGER.md`: every entry is now
-> independently verified, superseded by its broader correction, or fixed with
-> regression evidence. Final validation is **3166 passed, 0 failed, 26
-> warnings** under Python 3.12.13; byte-compilation, every PowerShell parse,
-> and `git diff --check` also passed. The correction branch is
-> `codex/fix-combined-code-scan-findings-20260808`, based on `a48bb852`.
-> Correction commit `e313836` is **accepted after correction** against that
-> baseline: 0 P0, 0 P1, 0 P2, and 0 P3 findings remain open in this batch.
-> This branch and its commits are **local-only and not pushed**; another
-> computer cannot retrieve them with `git fetch` until the owner authorizes a
-> push. The next step is owner review and, if accepted, explicit push/merge
-> authorization. `paper-epoch-002` remains on the separate frozen computer at
-> `9a91498`; this development tree was not deployed and must not be deployed
-> into the active epoch.
+> **Current development state:** `main` is `24d0cb2` (PR #171), which merged
+> Codex's 42-finding correction batch. Claude's pushed, unmerged counter-review
+> branch has delivery head `5b050cd`; its production-change head is `6e653ba`.
+> Codex independently accepted that six-commit series after correction on
+> `codex/review-claude-counter-review-20260808`; correction commit `d6e65c1`
+> is **local-only and not pushed**. The review found CCR-001 (P2) and CCR-002
+> through CCR-004 (P3); all four are fixed, with **0 open findings** from this
+> round. Final validation is **3203 passed, 0 failed, 0 skipped, 26 suite
+> warnings**, plus one host-only pytest cache-permission warning on the exact
+> post-handoff rerun. Under Python 3.12.13, compileall, every PowerShell parse,
+> and `git diff --check` passed. Another computer cannot fetch `d6e65c1` until
+> the owner authorizes a push. Nothing was deployed.
 
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
 > machine-local operational knowledge, and engineering watch items live
 > there because this file is rewritten every round. Do not copy them back
-> into this file; link to them. **Seven watch items were added this round** —
-> they are the generalizable lessons, and they matter more than any
-> individual fix.
+> into this file; link to them.
+
+## 0. Latest round — Codex review of Claude's counter-review (2026-08-08)
+
+Review artifact:
+`docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_CLAUDE_COUNTER_REVIEW.md`.
+Claude's source artifact remains
+`docs/REVIEW_2026-08-08_CLAUDE_COUNTER_REVIEW.md`.
+
+Outcome: **accepted after correction**.
+
+- Claude's CCX-001 tax correction is accepted. It follows the current IRS
+  rule: count from the day after acquisition and include the disposition day.
+  Broker tax records and a qualified tax professional remain authoritative
+  for a filed return.
+- CCR-001 (P2): same-day open-to-close baseline mode again ignores its unused
+  `hold_days`; the two modes that use a forward horizon still reject invalid
+  values.
+- CCR-002 (P3): active/closed epoch parsing is now case-insensitive, so the
+  canonical handoff's uppercase `ACTIVE` is included in contradiction checks.
+- CCR-003 (P3): replacing an existing authoritative policy requires its
+  expected fingerprint/version or explicit `allow_unchecked_overwrite=True`;
+  a future caller cannot silently forget stale-writer protection.
+- CCR-004 (P3): the review artifacts and this handoff distinguish Claude's
+  implementation head `6e653ba` from delivery head `5b050cd`, and record the
+  actual branch, merge, push, and test state.
+
+Focused restored tree: **194 passed**. Reverse mutations produced the intended
+3, 1, and 1 failures for CCR-001 through CCR-003. Full tree: **3203 passed**.
+No broker, execution, scheduler, ML authority, or evidence-epoch behavior was
+changed.
 
 ## 1. Standing state: THE EPOCH (do not disturb)
 
@@ -59,7 +80,9 @@ in two pull requests. Base was `011ae5c` (`main`, post PR #168).
   anything was built or deployed from `main` in that gap. Nothing was;
   the operational checkout never left `9a91498`.
 
-`main` is now `ceeddac` and contains all eighteen fixes.
+At the conclusion of that historical round, `main` was `ceeddac` and
+contained all eighteen fixes. The current `main` state is recorded at the
+top of this handoff.
 
 Ledger: `docs/REVIEW_2026-08-07_FULL_CODEBASE_SWEEP.md`; findings in §2,
 **corrections and their verification in §2b**, honest coverage in §3.
@@ -200,6 +223,24 @@ above, so "all findings fixed" means every finding *this sweep produced* —
 not that the codebase is clean.
 
 ## 5. What is next
+
+1. The owner reviews local correction commit `d6e65c1`. Push or merge only
+   after explicit authorization. Until then, another computer cannot fetch
+   this review or its fixes.
+2. After this counter-review closes, place development work on hold while
+   `paper-epoch-002` continues running daily on its separate stable machine.
+   Monitor the epoch operationally and read-only; do not deploy development
+   commits into the frozen epoch checkout.
+3. **FCS-016 changes a value in an accountant-facing export.** A tax report
+   generated before the correction may disagree with a regenerated one for a
+   sale on a one-year anniversary. Broker records and a qualified tax
+   professional remain authoritative for a filed return.
+4. Existing owner decisions and operational blockers remain in
+   `docs/OPERATIONAL_FACTS.md`. No later action-plan milestone starts merely
+   because this review is complete; use `docs/ACTION_PLAN_2026-08-02.md` as
+   the sequencing authority when the owner resumes development.
+
+### Historical next steps from the preceding sweep (superseded)
 
 1. **Independent review of all 18 fixes is IN PROGRESS** (owner sent them to
    GPT/Codex, 2026-08-07). FCS-018 is the one to read first. Nothing here has

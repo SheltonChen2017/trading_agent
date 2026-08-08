@@ -295,6 +295,7 @@ def save_policy(
     *,
     expected_fingerprint: str | None = None,
     expected_version: str | None = None,
+    allow_unchecked_overwrite: bool = False,
 ) -> None:
     """Validate, then compare-and-swap the policy as atomic JSON.
 
@@ -307,7 +308,10 @@ def save_policy(
     UI/editor callers pass both expected values from the policy they rendered.
     An OS file lock serializes comparison and replacement, so a stale tab
     cannot restore an authoritative flag changed by another writer (CXL-004).
-    Bootstrap and controlled test callers may omit both values.
+    Creating a new path needs no comparison. Replacing an existing policy
+    without comparison requires the deliberately explicit
+    ``allow_unchecked_overwrite=True`` escape hatch for controlled recovery or
+    tests; merely forgetting the expected values fails loudly (CCR-003).
     """
     import uuid
 
@@ -315,6 +319,12 @@ def save_policy(
     if (expected_fingerprint is None) != (expected_version is None):
         raise ValueError(
             "expected_fingerprint and expected_version must be supplied together"
+        )
+    if not isinstance(allow_unchecked_overwrite, bool):
+        raise ValueError("allow_unchecked_overwrite must be a bool")
+    if allow_unchecked_overwrite and expected_fingerprint is not None:
+        raise ValueError(
+            "allow_unchecked_overwrite cannot be combined with expected policy values"
         )
     destination = Path(path)
     serialized = json.dumps(policy.to_dict(), indent=2) + "\n"
@@ -337,6 +347,16 @@ def save_policy(
         ) from exc
     temp_path = destination.with_name(f".{destination.name}.{uuid.uuid4().hex}.tmp")
     try:
+        if (
+            destination.exists()
+            and expected_fingerprint is None
+            and not allow_unchecked_overwrite
+        ):
+            raise ValueError(
+                "expected_fingerprint and expected_version are required when "
+                "overwriting an existing policy; pass "
+                "allow_unchecked_overwrite=True only for controlled recovery"
+            )
         if expected_fingerprint is not None:
             try:
                 current = load_policy(destination)

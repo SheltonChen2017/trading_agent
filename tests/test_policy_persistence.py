@@ -99,6 +99,21 @@ def test_flag_update_result_passes_validation():
 # --------------------------------------------------------------------------
 
 
+def test_existing_policy_cannot_be_overwritten_without_an_explicit_write_mode(
+    tmp_path: Path,
+):
+    """CCR-003: forgetting CAS must fail instead of silently disabling it."""
+    target = tmp_path / "policy.json"
+    initial = _policy(allow_new_positions=True)
+    target.write_text(json.dumps(initial.to_dict(), indent=2) + "\n", encoding="utf-8")
+    replacement = policy_with_updated_flags(initial, allow_new_positions=False)
+
+    with pytest.raises(ValueError, match="expected_fingerprint"):
+        save_policy(replacement, target)
+
+    assert load_policy(target) == initial
+
+
 def test_save_then_load_round_trips_identically(tmp_path: Path):
     policy = policy_with_updated_flags(_policy(), allow_new_positions=True)
     target = tmp_path / "policy.json"
@@ -113,7 +128,11 @@ def test_save_overwrites_atomically_and_leaves_no_temp_file(tmp_path: Path):
     save_policy(_policy(), target)
     original_content = target.read_text(encoding="utf-8")
 
-    save_policy(policy_with_updated_flags(_policy(), allow_new_positions=True), target)
+    save_policy(
+        policy_with_updated_flags(_policy(), allow_new_positions=True),
+        target,
+        allow_unchecked_overwrite=True,
+    )
     assert target.read_text(encoding="utf-8") != original_content
     # os.replace semantics: the temp staging file must not linger. The stable
     # lock file remains so OS-level writer serialization has one inode.

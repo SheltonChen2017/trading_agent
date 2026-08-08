@@ -8,11 +8,17 @@ computer, model, or session change. This is the canonical current-state
 handoff. Durable standing rules and operational facts remain in their linked
 authority documents so rewriting this state summary does not erase them.
 
-> **Current development state:** `main` is `dabdd56` (PR #172), which merged
+> **Current development state:** `main` is `8f4257b` (PR #173), which merged
+> Claude's second counter-review round. `dabdd56` (PR #172) before it merged
 > Codex's review of Claude's counter-review. Everything from the whole-codebase
-> sweep through that review is now **on `main` and fetchable**: the Claude
+> sweep through those reviews is now **on `main` and fetchable**: the Claude
 > counter-review (`5b050cd` and its ancestors, PR #171 base `24d0cb2`) and the
 > Codex correction and handoff commits (`d6e65c1`, `4c501cf`).
+>
+> **Work in progress on a branch:** an owner-requested Alpaca-style UI restyle
+> lives on `user/claude/alpaca-ui-theme-20260808`. It is presentation only --
+> CSS and a Streamlit theme file. Push and PR await the owner's instruction.
+> See §0.
 >
 > Codex's review found CCR-001 (P2) and CCR-002/003/004 (P3) against Claude's
 > work; all four are fixed and independently re-verified by Claude in this
@@ -31,7 +37,80 @@ authority documents so rewriting this state summary does not erase them.
 > there because this file is rewritten every round. Do not copy them back
 > into this file; link to them.
 
-## 0. Latest round — Codex review of Claude's counter-review (2026-08-08)
+## 0. Latest round — Alpaca-style UI restyle (2026-08-08)
+
+Owner request, verbatim: apply an Alpaca-style UI to all menus and warning
+messages; coat each block in a rounded card; use different fonts to separate
+warnings, titles and menu descriptions.
+
+**Scope: presentation only.** No financial value, validation, policy decision,
+gate, broker call, or evidence-epoch behaviour was touched. The change is one
+CSS string plus Streamlit colour tokens.
+
+Files: `scripts/ui_theme.py` (new, the whole stylesheet and its rationale),
+`.streamlit/config.toml` (palette), `scripts/personal_assistant_ui.py` (the
+148-line inline `_UI_POLISH_CSS` block replaced by an import and a single
+injection), `tests/test_ui_theme.py` (new, 6 guards).
+
+The palette was **sampled from alpaca.markets, not recalled**: brand yellow
+`#FCD72B`, near-black ink, off-white page, Alpaca's purple/lavender for links,
+8-10px panels with pill buttons. Alpaca's own faces (BROmega, Formular) are
+proprietary, so the stack stays system-local — the operational host must render
+identically with the network down.
+
+### Two safety decisions inside a cosmetic change
+
+1. **Brand yellow is confined to chrome and never used for status.** Alpaca's
+   signature colour is also warning-colour, and this page renders 38
+   `st.warning` and 35 `st.error` calls whose severity is load-bearing. Yellow
+   therefore appears only on filled primary buttons, the active-nav pill and
+   the focus ring. For the same reason the active-nav marker deliberately has
+   **no coloured left bar**: a 4px left rule is reserved app-wide for alert
+   severity, and duplicating that shape in the navigation would teach the eye
+   to read one signal as two different things.
+
+2. **Alert cards are never tinted, and that was measured rather than assumed.**
+   Tinting an alert background with `currentColor` looks better and is wrong:
+   `currentColor` IS the text colour, so the fill drags the surface toward the
+   text and eats its own contrast. Worst-case light-mode contrast:
+
+   | tint | 12% | 8% | 6% | 4% | none |
+   |---|---|---|---|---|---|
+   | ratio | 3.42 | 3.75 | 3.93 | 4.11 | **4.49** |
+
+   The 12% version I first shipped was **worse than the Streamlit default it
+   replaced** (4.22) on `st.error` and `st.warning` specifically. Shipping no
+   tint beats the stock theme on every severity: error 4.28 → **4.93**, warning
+   4.45 → **4.49**, success 4.22 → **4.58**, info 6.25 → **7.01**. Severity is
+   carried by the 4px rule and the text colour, neither of which costs
+   contrast.
+
+### Verified, not assumed
+
+- Streamlit 1.60 encodes alert severity **only** in its `st-emotion-cache-*`
+  hash, which churns between releases, so severity is drawn with
+  `currentColor` and no selector depends on a generated class. The old theme
+  violated its own stated rule here via a `[class*="css"]` selector; that is
+  now gone.
+- Streamlit 1.60 exposes **no** `data-theme` attribute, no theme custom
+  property, and leaves `color-scheme: normal`. A `prefers-color-scheme` block
+  would therefore track the OS rather than Streamlit and paint dark cards onto
+  a light page for anyone using Streamlit's own theme menu. Surfaces are
+  consequently mode-agnostic: they lift the page colour by 5% white, which is
+  the correct direction in both modes. Confirmed by forcing Light while the OS
+  stayed dark.
+- All six new tests were reverse-mutated: each fails when its invariant is
+  broken and passes when restored, with both touched files verified restored
+  byte-for-byte by SHA-256.
+
+### Known limitation
+
+Worst-case contrast is 4.49 against a WCAG AA target of 4.50. Closing that last
+0.01 would require overriding Streamlit's per-severity text colours, which is
+only reachable through the hashed classes above — a fragile dependency traded
+for a rounding-error gain. Recorded rather than silently accepted.
+
+## 0.1 Preceding round — Codex review of Claude's counter-review (2026-08-08)
 
 Review artifact:
 `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_CLAUDE_COUNTER_REVIEW.md`.

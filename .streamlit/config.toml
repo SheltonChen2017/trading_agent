@@ -2,57 +2,72 @@
 #
 # Cosmetic only -- nothing here changes a number, a check, or a gate.
 #
-# Two deliberate constraints:
+# Palette sampled from alpaca.markets rather than recalled: brand yellow
+# #FCD72B, near-black ink, off-white page, muted grey secondary text, and the
+# purple/lavender Alpaca uses for links. The card system, type scale and the
+# rest of the chrome live in scripts/ui_theme.py; this file carries only what
+# the stylesheet cannot reach (Streamlit's own colour tokens).
+#
+# Three deliberate constraints:
 #
 # 1. Typography, radii and borders live in [theme]; COLOURS live in
 #    [theme.light]/[theme.dark]. Setting explicit colours in [theme] alone
 #    would pin the app to one mode and defeat the user's light/dark toggle.
 #    This way the app looks intentional in both.
-# 2. No web fonts. The font stack is system-only, so the UI renders identically
-#    with no network and adds no external request to a tool that handles
-#    account data.
+# 2. No web fonts. Alpaca's own faces (BROmega, Formular) are proprietary and
+#    not installable here, so the stack is system-only: the UI renders
+#    identically with no network and adds no external request to a tool that
+#    handles account data.
+# 3. BRAND YELLOW IS NOT A STATUS COLOUR. primaryColor is yellow because that
+#    is the brand, and Streamlit uses it for filled buttons and selection
+#    chrome. It is deliberately NOT used for links -- yellow text on either
+#    background fails contrast -- so linkColor is Alpaca's purple in light mode
+#    and its lavender in dark.
 #
-# The palette is deliberately restrained -- near-neutral surfaces, one accent.
 # Red/orange/green are left near Streamlit's defaults ON PURPOSE: this app uses
 # st.error/st.warning for policy breaches and unresolved broker states, and
-# muting those to fit a colour scheme would make a safety signal quieter. A
-# trading UI should be calm everywhere EXCEPT where it is telling you something
-# is wrong.
+# muting those to fit a colour scheme would make a safety signal quieter. That
+# matters more than usual here, because the brand accent is itself yellow: see
+# the safety note in scripts/ui_theme.py for why the yellow is confined to
+# chrome that never carries severity. A trading UI should be calm everywhere
+# EXCEPT where it is telling you something is wrong.
 
 [theme]
-font = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
-headingFont = "Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif"
-codeFont = "'JetBrains Mono', 'Cascadia Mono', Consolas, 'SF Mono', Menlo, monospace"
+font = "'Segoe UI Variable Text', 'Segoe UI', Inter, -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', Arial, sans-serif"
+headingFont = "'Segoe UI Variable Display', 'Segoe UI Semibold', Inter, -apple-system, BlinkMacSystemFont, Roboto, 'Helvetica Neue', sans-serif"
+codeFont = "'Cascadia Mono', 'JetBrains Mono', Consolas, 'SF Mono', Menlo, monospace"
 
 # 15px rather than the 16px default: this is a dense analytical dashboard, and
 # the tighter base lets a briefing fit without scrolling past the risk section.
 baseFontSize = 15
-headingFontWeights = [700, 650, 600]
+headingFontWeights = [700, 660, 620]
 
-baseRadius = "0.5rem"
-buttonRadius = "0.5rem"
+# "Curly edged" per the brief. 12px matches the card radius in ui_theme.py;
+# buttons are pilled there, as on Alpaca's own controls.
+baseRadius = "0.75rem"
+buttonRadius = "999px"
 showWidgetBorder = true
 
 [theme.light]
-primaryColor = "#4F6BED"
-backgroundColor = "#FCFCFD"
-secondaryBackgroundColor = "#F2F4F8"
-textColor = "#1A1D26"
-borderColor = "#E3E6EC"
-linkColor = "#3B57D8"
+primaryColor = "#FCD72B"
+backgroundColor = "#F7F7F7"
+secondaryBackgroundColor = "#FFFFFF"
+textColor = "#010101"
+borderColor = "#E4E4E4"
+linkColor = "#461D9C"
 
 [theme.dark]
-primaryColor = "#8098F7"
-backgroundColor = "#0F1117"
-secondaryBackgroundColor = "#171A23"
-textColor = "#E6E8EE"
-borderColor = "#272B36"
-linkColor = "#93A6F9"
+primaryColor = "#FCD72B"
+backgroundColor = "#0B0B0C"
+secondaryBackgroundColor = "#141416"
+textColor = "#F7F7F7"
+borderColor = "#262629"
+linkColor = "#C7ADFF"
 
 [theme.light.sidebar]
-backgroundColor = "#F5F7FA"
-borderColor = "#E3E6EC"
+backgroundColor = "#FFFFFF"
+borderColor = "#E4E4E4"
 
 [theme.dark.sidebar]
-backgroundColor = "#12141B"
-borderColor = "#272B36"
+backgroundColor = "#101012"
+borderColor = "#262629"

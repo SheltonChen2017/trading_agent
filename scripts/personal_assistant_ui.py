@@ -182,6 +182,7 @@ from data.event_data import fetch_upcoming_earnings
 from data.market_data import fetch_historical, generate_synthetic
 from execution.alpaca_broker import is_configured
 from market_analytics import classify_trend
+from scripts.ui_theme import THEME_CSS
 
 st.set_page_config(
     page_title="Trading Assistant",
@@ -190,154 +191,14 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# Presentation only. Everything below is CSS -- it cannot change a number, a
-# validation, or a gate. Colours/typography live in .streamlit/config.toml;
-# this covers what the theme config cannot reach.
+# Presentation only. THEME_CSS is a string constant: it cannot change a
+# number, a validation, a policy decision, or an execution gate.
 #
-# Selectors use data-testid attributes rather than generated class names,
-# because Streamlit's hashed classes change between releases. A selector that
-# stops matching after an upgrade silently does nothing, which is the correct
-# failure mode for decoration -- the app still renders, just plainer.
-#
-# This is the ONE style block. Typography lives here too rather than in a
-# second injection, so a weight or a letter-spacing cannot be set twice and
-# silently drift apart.
-#
-# The type stack is entirely system-local: no @import, no CDN, no webfont.
-# The operational host has to render identically with the network down, and
-# a blocked font request would fall back to different metrics without
-# saying so.
-#
-# Colour is deliberately NOT restyled here: the red/green status badges and
-# refusal messages carry safety meaning and must stay exactly as loud as
-# they are (intensity lives in .streamlit/config.toml).
-_UI_POLISH_CSS = """
-<style>
-:root {
-    --ta-sans: "Segoe UI Variable Text", "Segoe UI", Inter, -apple-system,
-        BlinkMacSystemFont, system-ui, "Helvetica Neue", Arial, sans-serif;
-    --ta-display: "Segoe UI Variable Display", "Segoe UI", Inter,
-        -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    --ta-mono: "Cascadia Mono", "Cascadia Code", "JetBrains Mono", "SF Mono",
-        Consolas, "Liberation Mono", monospace;
-}
-
-html, body, [class*="css"], .stMarkdown, .stButton button,
-.stTextInput input, .stSelectbox, .stMultiSelect, .stRadio, .stCheckbox,
-[data-testid="stDataFrame"] {
-    font-family: var(--ta-sans);
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-}
-
-/* Headings carry the display cut and a tighter optical fit; body copy gets
-   a longer measure-friendly leading. */
-h1, h2, h3, h4 { font-family: var(--ta-display); }
-h1 { font-weight: 640; letter-spacing: -0.025em; line-height: 1.14; }
-h2 { font-weight: 620; letter-spacing: -0.015em; }
-h3 { font-weight: 600; letter-spacing: -0.015em; }
-p, li, label { line-height: 1.6; }
-
-code, pre, kbd, samp, [data-testid="stCodeBlock"] {
-    font-family: var(--ta-mono);
-    font-variant-ligatures: none;
-    font-size: 0.86rem;
-}
-
-[data-testid="stCaptionContainer"] {
-    font-size: 0.82rem;
-    line-height: 1.5;
-    opacity: 0.78;
-}
-
-/* Sidebar as a quieter rail: smaller body, section headers as small caps
-   rather than full-size headings competing with the page title. */
-section[data-testid="stSidebar"] { font-size: 0.93rem; }
-section[data-testid="stSidebar"] h2 {
-    font-size: 0.74rem;
-    font-weight: 650;
-    letter-spacing: 0.10em;
-    text-transform: uppercase;
-    opacity: 0.68;
-}
-.stRadio [role="radiogroup"] label { padding: 0.10rem 0; }
-
-/* Streamlit reserves a large empty band above the title; reclaiming it puts
-   the portfolio above the fold on a laptop. */
-[data-testid="stAppViewContainer"] > .main .block-container {
-    padding-top: 2.2rem;
-    padding-bottom: 3rem;
-    max-width: 1500px;
-}
-
-/* THE ONE THAT IS NOT PURELY DECORATIVE: tabular figures.
-   Proportional digits make $3,500.00 and $6,400.00 different widths, so a
-   column of money does not line up and misreading a magnitude gets easier.
-   Every financial terminal uses fixed-width digits for this reason. */
-[data-testid="stMetricValue"],
-[data-testid="stTable"] td,
-[data-testid="stDataFrame"] div[role="gridcell"],
-code, pre {
-    font-variant-numeric: tabular-nums;
-    font-feature-settings: "tnum" 1;
-}
-
-[data-testid="stMetricValue"] {
-    font-family: var(--ta-display);
-    font-weight: 650;
-    letter-spacing: -0.015em;
-}
-[data-testid="stMetricLabel"] {
-    opacity: 0.72;
-    font-size: 0.82rem;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-}
-
-/* Tabs: a quiet rail with a solid active marker, instead of the default
-   heavier chrome. */
-.stTabs [data-baseweb="tab-list"] {
-    gap: 0.35rem;
-    border-bottom: 1px solid rgba(128, 138, 160, 0.22);
-}
-.stTabs [data-baseweb="tab"] {
-    height: 2.6rem;
-    padding: 0 0.95rem;
-    font-weight: 550;
-    letter-spacing: 0.005em;
-}
-.stTabs [aria-selected="true"] {
-    font-weight: 680;
-}
-
-/* Expanders read as grouped panels rather than floating rules. */
-[data-testid="stExpander"] details {
-    border: 1px solid rgba(128, 138, 160, 0.22);
-    border-radius: 0.6rem;
-}
-[data-testid="stExpander"] summary { font-weight: 560; }
-
-/* Alerts: slightly tighter, and given a left rule so severity is legible at a
-   glance while scanning. Colour intensity is untouched -- see config.toml. */
-[data-testid="stAlert"] {
-    border-radius: 0.55rem;
-    border-left-width: 4px;
-    border-left-style: solid;
-    padding-top: 0.7rem;
-    padding-bottom: 0.7rem;
-}
-
-section[data-testid="stSidebar"] {
-    border-right: 1px solid rgba(128, 138, 160, 0.2);
-}
-
-/* Dataframes: lighter grid, so the numbers carry the emphasis. */
-[data-testid="stDataFrame"] { border-radius: 0.55rem; overflow: hidden; }
-
-hr { margin: 1.1rem 0; opacity: 0.35; }
-</style>
-"""
-st.markdown(_UI_POLISH_CSS, unsafe_allow_html=True)
+# The stylesheet itself lives in scripts/ui_theme.py, which carries the full
+# rationale -- in particular WHY Alpaca's brand yellow is confined to chrome
+# and never used for status, given that this page renders 38 st.warning and
+# 35 st.error calls whose severity is load-bearing.
+st.markdown(THEME_CSS, unsafe_allow_html=True)
 
 
 def _now_eastern() -> datetime:

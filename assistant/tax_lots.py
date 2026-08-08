@@ -43,10 +43,20 @@ from __future__ import annotations
 
 import dataclasses
 import math
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
+from zoneinfo import ZoneInfo
 
 from assistant.money import to_decimal
+
+# The single timezone every date-valued tax judgement is made in. A holding
+# period is a rule about TRADE DATES, and for US equities the trade date is the
+# exchange-local one -- so the boundary has to be evaluated in the same zone the
+# report prints its dates in and assigns its tax year in. `tax_reporting`
+# imports this rather than defining its own, so the printed date and the
+# long/short classification cannot drift apart (FCS-016: they had, and the
+# exported row could read "acquired 2025-03-10, sold 2026-03-10, LONG-TERM").
+MARKET_TIMEZONE = ZoneInfo("America/New_York")
 
 # Selection methods. "specific" requires the caller to name lot ids.
 FIFO = "fifo"          # oldest first -- the US default when you elect nothing
@@ -216,25 +226,47 @@ class LotLedger:
         return _decimal_sum(r.realized_pnl for r in rows)
 
 
+def _market_date(value: datetime) -> date:
+    """The exchange-local calendar date a timestamp belongs to."""
+    return value.astimezone(MARKET_TIMEZONE).date()
+
+
+def _one_year_on(acquired_at: datetime) -> date:
+    """The last market-local DATE that is still short term.
+
+    A sale on this date is exactly one year and therefore short; the position
+    becomes long term on the following day.
+    """
+    acquired = _market_date(acquired_at)
+    try:
+        return acquired.replace(year=acquired.year + 1)
+    except ValueError:
+        # 29 February -> the following year has no 29th; the boundary falls on
+        # 1 March, which is what adding a day to 28 February gives.
+        return acquired.replace(year=acquired.year + 1, month=3, day=1)
+
+
 def is_long_term(acquired_at: datetime, sold_at: datetime) -> bool:
     """
     True when the holding period exceeds one year.
 
     The US rule counts from the day AFTER acquisition, so a position bought
     2025-03-10 and sold exactly 2026-03-10 is still SHORT term; it becomes long
-    term on 2026-03-11. Implemented as a strict comparison against the same
-    calendar date one year later rather than as "> 365 days", so leap years do
-    not shift the boundary by a day.
+    term on 2026-03-11. Compared as the same calendar date one year later
+    rather than as "> 365 days", so leap years do not shift the boundary.
+
+    DATES, not timestamps, and market-local dates specifically (FCS-016). This
+    compared full timestamps until 2026-08-07, which made an anniversary sale
+    later in the day than the purchase long term -- contradicting the rule
+    stated in the paragraph above. Comparing raw UTC dates is not enough
+    either: `tax_reporting` prints `sold_at` and assigns the tax year in
+    ``MARKET_TIMEZONE``, so a 00:30Z sale (the previous evening in New York)
+    would still be classified against the wrong day and the exported row would
+    contradict itself.
     """
     if sold_at <= acquired_at:
         return False
-    try:
-        one_year_on = acquired_at.replace(year=acquired_at.year + 1)
-    except ValueError:
-        # 29 February -> the following year has no 29th; the boundary falls on
-        # 1 March, which is what adding a day to 28 February gives.
-        one_year_on = acquired_at.replace(year=acquired_at.year + 1, month=3, day=1)
-    return sold_at > one_year_on
+    return _market_date(sold_at) > _one_year_on(acquired_at)
 
 
 def _sort_key_for(method: str):
@@ -579,7 +611,15 @@ def unrealized_by_lot(ledger: LotLedger, ticker: str, price: float) -> list[dict
 
 
 def _long_term_date(acquired_at: datetime) -> datetime:
-    try:
-        return acquired_at.replace(year=acquired_at.year + 1) + timedelta(days=1)
-    except ValueError:
-        return acquired_at.replace(year=acquired_at.year + 1, month=3, day=1) + timedelta(days=1)
+    """First instant the lot is long term: market-local midnight the day after
+    the last short-term date.
+
+    Derived from ``_one_year_on`` so the countdown and ``is_long_term`` cannot
+    disagree. They did until 2026-08-07: this used ``replace(year=+1) + 1 day``
+    against a timestamp while the classifier compared ``replace(year=+1)``, so
+    the countdown could report "1 day to go" for a lot already called long.
+    """
+    first_long_day = _one_year_on(acquired_at) + timedelta(days=1)
+    return datetime.combine(
+        first_long_day, datetime.min.time(), tzinfo=MARKET_TIMEZONE
+    )

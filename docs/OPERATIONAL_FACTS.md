@@ -232,13 +232,24 @@ it for that specific endpoint with the observed body recorded.
   cheap: run the sweep, then read each hit **beside its sibling**, because the
   scan alone cannot tell a guarded site from an unguarded one.
 - **A narrow `except` clause in the UI can suppress risk reduction.** Same
-  finding. `scripts/personal_assistant_ui.py` catches only
+  finding; **fixed 2026-08-07**, the rule is what outlives it.
+  `scripts/personal_assistant_ui.py` caught only
   `MissingResearchDependencyError` / `StrategyMarketDataError` around the
-  strategy generator, while the CLI catches `Exception`. Anything else escapes
-  and the already-computed risk-reduction proposals are never rendered or
+  strategy generator, while the CLI caught `Exception`. Anything else escaped
+  and the already-computed risk-reduction proposals were never rendered or
   saved. Whenever an optional feature shares a handler with risk-reduction
   proposals, the optional feature's failure must not take the mandatory one
-  down with it.
+  down with it — and the handler must catch `Exception`, because the failure
+  mode is by definition the exception nobody predicted (here a
+  `ZeroDivisionError` from a module whose declared error types are all about
+  market data). Pinned by an AST test over both entry points.
+  Related severity lesson: the first write-up of this finding claimed a NaN
+  price was reachable. It is not — `context_builder.build_portfolio_snapshot`
+  rejects non-finite prices and the Alpaca builder delegates to it. The
+  reproduction had constructed a `PortfolioPosition` directly, bypassing the
+  boundary. **A repro that hand-builds a domain object may be skipping the
+  validation the real path performs; check which constructor production
+  actually uses before assigning severity.**
 - **Counting rows a metric did not score.** FPS-004 fixed this in
   `ml/earnings_experiments.py::_slice_metrics` and added
   `ml/evaluation.py::usable_pair_count()` for it. 2026-08-07 (FCS-002) found
@@ -250,6 +261,17 @@ it for that specific endpoint with the observed body recorded.
   0.1500 → 0.0600 → 0.0300 → 0.0150. `ml/volatility_evaluation.py:405-406` is
   the correct house pattern — publish `row_count` **and** `usable_row_count`,
   and compute on `[usable]`.
+- **Freshness checks without a lower bound read a future timestamp as fresh.**
+  2026-08-07 (FCS-017). `now - at <= limit` is True for any `at` in the future,
+  so clock skew, a timezone misconfiguration, or a hand-inserted row makes a
+  stale control look current. This codebase writes the check **both ways**:
+  `operations.py:304`, `alert_delivery.py:412` and
+  `evidence_operations.py:125,358,375` guard with `timedelta(0) <= …`, while
+  `operations.py:117,156,184` and `readiness.py:191` do not — including two
+  checks (`backup age`, `restore-drill age`) that `evidence_operations`
+  evaluates fail-closed over the *same facts*, so the platform can report the
+  backup fresh and stale at once depending which report you read. Always write
+  `timedelta(0) <= now - at <= limit`.
 - **A boundary test whose inputs cannot fail the bug.** 2026-08-07 (FCS-016):
   `tax_lots.is_long_term` compares timestamps where the rule is date-based, so
   a sale on the one-year anniversary at a later time of day than the purchase

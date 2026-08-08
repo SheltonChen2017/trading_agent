@@ -213,6 +213,36 @@ cross-check". They were never described, so nobody could act on them, and
   comparator (CXL-013), rated P2. Fixed with type and range validation; 16
   tests; reverse mutation removing both positivity guards fails 6.
 
+### CCX-004: the finding document contradicted its own fixes
+
+Asked a fourth time whether every finding had been reviewed, the count itself
+finally checked out — the 24 CXL rows plus the 18 FCS dispositions are the
+whole set, and there is no CXL-025 or beyond. But the check surfaced something
+the count could not: **I had been reading a pre-merge copy of the line-by-line
+review.** In the merged version, all 24 rows still read `Open` /
+"Pending owner instruction", §1 still said "All 24 remain open pending the
+owner's assessment", and §3's disposition on the FCS findings was still marked
+provisional — in a document merged in the **same commit** as the fixes for
+every finding it records.
+
+That is exactly the active-document contradiction this review filed as
+CXL-005, reproduced inside the document that reported it.
+
+Corrected here: the 24 disposition fields now read `Fixed` and point at this
+ledger, §1 carries a dated status block, and §3 is finalized with what became
+of each reopened item. **The findings, evidence and severities are untouched**
+— this is the historical record of what was found, and only the disposition
+fields were stale.
+
+The durable half matters more than the edit. My own CCX-002 rewrite of
+`tests/test_active_document_consistency.py` covered plans, readiness and the
+runbook but **not the finding ledgers**, so it would not have caught this
+either. The guard now cross-checks ledgers against each other: a finding may
+not be `Open` in one document while another records it corrected, and a
+headline count may not claim everything is open while the rows beneath it
+record fixes. Verified by reverting three rows to the state Codex actually
+merged — the guard fails; restored, it passes.
+
 ### Observation, not a finding
 
 `save_policy`'s compare-and-swap is **opt-in**: `expected_fingerprint` and

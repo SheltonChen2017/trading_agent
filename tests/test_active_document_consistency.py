@@ -97,3 +97,58 @@ def test_the_sweep_record_carries_one_finding_count_and_status():
     # Exactly one headline count, whatever it says.
     headlines = re.findall(r"ALL (\w+) findings were fixed", review)
     assert len(set(headlines)) <= 1, f"conflicting headline counts: {headlines}"
+
+
+def _finding_statuses(name: str) -> dict[str, str]:
+    """Every `| ID | Pri | Status |` row in a finding ledger."""
+    raw = (ROOT / "docs" / name).read_text(encoding="utf-8")
+    return {
+        match.group(1): match.group(2)
+        for match in re.finditer(r"^\| ((?:CXL|FCS|CCX)-\d+) \| \*{0,2}P\d\*{0,2} \| \*{0,2}(\w+)\*{0,2} \|", raw, re.M)
+    }
+
+
+def test_no_finding_is_open_in_one_ledger_and_fixed_in_another():
+    """CCX-004. The gap that made this guard necessary in the first place.
+
+    Codex's line-by-line review was merged in the SAME commit as the fixes for
+    every finding it recorded, with all 24 rows still reading "Open" and
+    "Pending owner instruction". That is precisely the active-document
+    contradiction the review itself filed as CXL-005 -- reproduced inside the
+    document that reported it.
+
+    The first version of this guard checked plans, readiness and the runbook
+    but not the finding ledgers, so it would not have caught it. Cross-check
+    the ledgers against each other: a finding may not be Open in one place and
+    Fixed in another.
+    """
+    review = _finding_statuses("REVIEW_2026-08-07_CODEX_LINE_BY_LINE.md")
+    combined = (ROOT / "docs" / "REVIEW_2026-08-08_COMBINED_SCAN_FIX_LEDGER.md").read_text(
+        encoding="utf-8"
+    )
+    assert review, "no finding rows parsed; the ledger format changed"
+    contradictions = [
+        f"{finding} is '{status}' in the line-by-line review but the combined "
+        "ledger records it corrected"
+        for finding, status in review.items()
+        if status.lower() == "open"
+        and re.search(rf"\| {finding} \|[^\n]*Fixed", combined)
+    ]
+    assert not contradictions, "; ".join(contradictions)
+
+
+def test_a_finding_ledger_does_not_claim_everything_is_open_while_listing_fixes():
+    """A headline count must agree with the rows beneath it."""
+    for name in (
+        "REVIEW_2026-08-07_CODEX_LINE_BY_LINE.md",
+        "REVIEW_2026-08-07_FULL_CODEBASE_SWEEP.md",
+    ):
+        statuses = _finding_statuses(name)
+        if not statuses:
+            continue
+        text = _text(name)
+        claims_all_open = re.search(r"All \d+ remain open", text)
+        any_fixed = any(v.lower() == "fixed" for v in statuses.values())
+        assert not (claims_all_open and any_fixed), (
+            f"{name} says everything is open while its own rows record fixes"
+        )

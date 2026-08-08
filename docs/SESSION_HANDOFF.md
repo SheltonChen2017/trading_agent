@@ -51,6 +51,12 @@ its combined correction batch for all 42 ordered findings.
   get here: the first pass covered 6 of 24 and still said "accepted", the
   second covered 24 of 42. Full suite reproduces Codex's **3166** on Python
   3.14.6 (they ran 3.12.13).
+- **CCX-004 (P3, fixed):** the line-by-line review was merged in the same
+  commit as its own fixes with all 24 rows still reading `Open` — the CXL-005
+  contradiction inside the document that reported it. Dispositions reconciled
+  (findings and severities untouched), and the consistency guard now
+  cross-checks finding ledgers against each other, which my CCX-002 rewrite
+  did not.
 - **CCX-003 (P3, fixed):** the candidates §5 recorded as "deferred" but never
   described, so nobody could act on them while the directory read "Complete".
   `risk/` resolves clean; both root-module candidates were real —

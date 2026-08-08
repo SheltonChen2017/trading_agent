@@ -1,96 +1,133 @@
 # Development session handoff
 
-Prepared: 2026-08-07, after a full-codebase sweep on
-`user/claude/full-codebase-sweep-20260807`.
+Prepared: 2026-08-07, after a full-codebase sweep and the fix of every
+finding it produced, on `user/claude/full-codebase-sweep-20260807`.
 
-Audience: Codex, Claude Code, and the repository owner after a computer,
-model, or session change. This file completely replaces the prior handoff
-**and is therefore the wrong place for anything durable.**
+Audience: Codex, Claude Code, Grok, and the repository owner after a
+computer, model, or session change. This file completely replaces the prior
+handoff **and is therefore the wrong place for anything durable.**
 
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
 > machine-local operational knowledge, and engineering watch items live
 > there because this file is rewritten every round. Do not copy them back
-> into this file; link to them. Six watch items were added this round.
+> into this file; link to them. **Six watch items were added this round** —
+> they are the generalizable lessons, and they matter more than any
+> individual fix.
 
 ## 1. Standing state: THE EPOCH (do not disturb)
 
 `paper-epoch-002` ACTIVE since 2026-08-06T17:55Z on frozen commit
 `9a91498`, bound to `my_policy.json`. Operational checkout pinned there.
 **Never deploy development commits mid-epoch.** Nothing this round is
-deployed.
+deployed; the operational checkout is untouched.
 
 `paper-epoch-001` is CLOSED (plumbing shakedown only; do not cite).
 
-## 2. Latest outcome — full-codebase sweep; 2 of 4 P2s fixed
+## 2. What happened this round
 
-Owner asked for a whole-repository scan for flaws, defects, bugs, orphans
-and inconsistencies, then for the two highest-consequence defects to be
-fixed. Branch `user/claude/full-codebase-sweep-20260807`.
+The owner asked for a whole-repository scan for flaws, defects, bugs,
+orphans and inconsistencies, then for every defect found to be fixed.
 
-Ledger: `docs/REVIEW_2026-08-07_FULL_CODEBASE_SWEEP.md` (FCS-001..017).
-**0 P0, 0 P1, 4 P2, 13 P3.** All four P2s reproduced.
-**FCS-001 and FCS-016 are FIXED with red/green + reverse-mutation evidence.
-FCS-002, FCS-003 and all thirteen P3s are recorded but UNFIXED**, and no
-independent reviewer has confirmed the two fixes.
+Branch: `user/claude/full-codebase-sweep-20260807` — local only, not pushed.
+Ledger: `docs/REVIEW_2026-08-07_FULL_CODEBASE_SWEEP.md`; findings in §2,
+**corrections and their verification in §2b**, honest coverage in §3.
 
-| ID | Pri | Summary |
+**0 P0 · 0 P1 · 4 P2 · 13 P3 · all 17 fixed · none independently reviewed.**
+
+### The four P2s
+
+| ID | What was wrong | Fix |
 |---|---|---|
-| FCS-001 | P2 | **FIXED.** `strategy_proposals.py` divided by `current_price` unguarded (4 sites); the UI's narrow `except` let the resulting `ZeroDivisionError` **suppress already-computed risk-reduction sells**. Both legs' prices are now validated (new `StrategyPositionDataError`, a `StrategyMarketDataError` subclass so existing callers already catch it) and the UI handler is widened to `Exception`, matching the CLI. Severity correction found while fixing: NaN is NOT reachable (the snapshot builder rejects non-finite prices on both production paths); **zero/negative** is. |
-| FCS-016 | P2 | **FIXED.** `tax_lots.is_long_term` compared **timestamps** where its own docstring and the IRS rule are **date**-based: a sale on the one-year anniversary at a later time of day than the purchase is classified long-term when it is short-term. Understates tax in the accountant-facing GR-7a export. Both existing boundary tests use the same time-of-day for buy and sell — the one case the bug cannot fail — which is why three rounds missed it. Now compares market-local dates from one shared `_one_year_on()`; `MARKET_TIMEZONE` is defined once in `tax_lots` and imported by `tax_reporting`. |
-| FCS-002 | P2 | `earnings_experiments.calibration_error` divides scored-pair numerator by raw `len(actual)`; the metric improves as coverage worsens (0.1500 → 0.0150 measured). FPS-004 class, same module. |
-| FCS-003 | P2 | `research/quantconnect._assert_allowed` accepts percent-encoded traversal (`backtests/%2e%2e/data/read`). Licence-boundary control; module dormant. |
-| FCS-004..015 | P3 | cash-report headroom ignores pending buys; 4th bare `Decimal(str())`; dead `worst_case_fill_price`; undocumented 4th risk-check scatter point; mixed pct/fraction units on the gate; telemetry decision≡arrival price; stale doc line counts; Python 3.14 vs 3.12/3.13 CI; dead `_non_negative_int` + unbounded `list --limit -1`; non-atomic tax-report write; 6 orphan symbols; `save_policy` temp-name race. |
+| FCS-001 | `strategy_proposals` divided by `current_price` unguarded at four sites, while the sibling `proposals.py` has guarded that exact idiom since 2026-07-29. The UI caught only two narrow exception types, so the `ZeroDivisionError` escaped and **suppressed risk-reduction sells already computed in the same handler**. | Both legs validated → new `StrategyPositionDataError`, a `StrategyMarketDataError` subclass so existing callers already catch it. UI handler widened to `Exception`, matching the CLI. |
+| FCS-016 | `tax_lots.is_long_term` compared **timestamps** where its own docstring and the IRS rule are **date**-based, and judged in UTC while `tax_reporting` prints and buckets in Eastern. An exported row could read `acquired 2025-03-10, sold 2026-03-10, LONG-TERM`. | One `_one_year_on()` comparing market-local dates; `MARKET_TIMEZONE` defined once in `tax_lots` and imported by `tax_reporting`. |
+| FCS-002 | `calibration_error` divided a finite-pair numerator by the raw row count, so the reported error improved as coverage worsened (0.1500 → 0.0150 measured). | All five classification metrics scored on the same finite pairs; both counts published. Also closed a second half found while fixing: `NaN >= threshold` scored a declined prediction as a confident negative. |
+| FCS-003 | The QuantConnect allowlist accepted percent-encoded traversal, one day after being hardened against the literal form. | Double percent-decode before the check, plus outright rejection of `%`. |
 
-Prior ledgers verified genuinely closed: all four 2026-07-30 P1s are fixed
-in code (checked, not assumed).
+### The thirteen P3s
 
-## 3. Validation
+`FCS-004` headroom nets out committed capital · `FCS-005` AST lint banning
+bare `Decimal(str(...))` — the guard `OPERATIONAL_FACTS` §3 demanded after a
+fourth occurrence · `FCS-006` dead float `worst_case_fill_price` removed,
+rationale relocated and corrected · `FCS-007` fourth risk-check scatter point
+documented · `FCS-008` the gate's mixed pct/fraction units documented at the
+signature and pinned · `FCS-009` telemetry states that decision and arrival
+price are one observation · `FCS-010` stale doc line counts · `FCS-011` CI
+gains Python 3.14 · `FCS-012` unwired validator applied; `list --limit -1` no
+longer unbounded · `FCS-013` atomic tax-report write · `FCS-014` orphans ·
+`FCS-015` `save_policy` temp-name race · `FCS-017` four freshness checks no
+longer read a future timestamp as fresh.
 
-- Base tree `011ae5c` before any change: **3015 passed / 0 failed / 0 skipped
-  / 25 warnings** (257s).
-- **Exact final tree: 3041 passed / 0 failed / 0 skipped / 25 warnings**
-  (352s). The +26 is exactly the tests the two fixes added (18 in
-  `test_tax_lots.py`, 8 in `test_strategy_proposals.py`); no pre-existing test
-  changed its result.
+### Two corrections I made to my own findings
+
+Recorded because a review that only sharpens other people's work is not being
+run honestly.
+
+1. **FCS-001's severity was overstated.** The first write-up claimed NaN was
+   reachable. It is not — `build_portfolio_snapshot` rejects non-finite
+   prices and the Alpaca builder delegates to it; the reproduction had
+   hand-built a `PortfolioPosition` and bypassed that boundary. **Zero and
+   negative** are the reachable trigger.
+2. **FCS-016's first fix guidance was wrong.** "Compare `.date()` values" was
+   tested and still returns long-term on the UTC/Eastern case. The comparison
+   has to use market-local dates.
+
+## 3. Validation (exact final tree)
+
+- Base `011ae5c` before any change: **3015 passed / 0 failed / 0 skipped /
+  25 warnings**.
+- **Final tree: 3085 passed / 0 failed / 0 skipped / 25 warnings** (347s).
+  The +70 over baseline is entirely new regression tests; **no pre-existing
+  test changed its result**, which is the claim that matters.
 - `compileall` clean; `git diff --check` clean.
-- Reverse mutations, applied in the fixed code's own location and restored:
-  FCS-016 → **8 fail** (and both ORIGINAL boundary tests still passed, which
-  is their insensitivity made executable); FCS-001 → **7 fail**.
-- Run on **Python 3.14.6**; CI covers only 3.12/3.13 (FCS-011).
+- Reverse mutations, each applied in the fixed code's own location and then
+  restored: FCS-016 → **8 fail**, and **both original boundary tests still
+  passed**, which is their insensitivity made executable; FCS-001 → **7
+  fail**; FCS-002 → **1 fail**; FCS-003 → **5 fail** with both layers
+  removed, **1** with only the `%` rule removed, **0 with only the decoding
+  removed** — recorded because it shows which layer carries which input;
+  FCS-004 → **1 fail**.
+- Run on **Python 3.14.6**. CI now covers 3.12/3.13/3.14 (FCS-011), but the
+  3.14 job has never executed — it will on first push.
 - FPS-003 did not reproduce. It stays open — a green run is not evidence.
 
-## 4. Coverage honesty — this sweep was NOT exhaustive
+## 4. Coverage honesty — the sweep was NOT exhaustive
 
-All 199 production modules received mechanical AST coverage (unguarded
+All 199 production modules received mechanical AST coverage: unguarded
 division, `except: pass`, SQL interpolation, non-atomic artifact writes,
-naive datetimes, mutable defaults, `Decimal(str())`, `or 0`, full orphan
-graph). Only ~35 were read line by line; ~45K of 62K lines were not.
+naive datetimes, mutable defaults, `Decimal(str())`, `or 0`, freshness
+bounds, the FPS-004 count-vs-denominator class, and a full orphan graph.
 
-**Not read at line level:** most of `ml/`, most of `scripts/`, the bulk of
+**Only ~35 modules were read line by line; roughly 44K of 62K lines were
+not.** Not read: most of `ml/`, most of `scripts/`, the bulk of
 `storage.py`, `personal_assistant_ui.py`, `backtest/engine.py`,
-`portfolio_ledger`, `paper_evidence`, `tax_reporting`,
-`operations`, `assistant/llm/*`, `signals/`, `strategies/`. See §3 of the
-review for the full table. Every P2 was found by a scan flagging candidates
-**plus** a read of the flagged site beside its correct sibling; that pairing
-has not been applied to the packages above.
+`portfolio_ledger`, `paper_evidence`, `tax_reporting` beyond its row and
+coverage layer, `operations` beyond its freshness checks, `assistant/llm/*`,
+`signals/`, `strategies/`.
+
+Every P2 was found by a scan flagging candidates **plus** reading the flagged
+site beside its correct sibling. That pairing has not reached the packages
+above, so "all findings fixed" means every finding *this sweep produced* —
+not that the codebase is clean.
 
 ## 5. What is next
 
-1. **Independent review of the two fixes** (FCS-001, FCS-016). Neither has
-   been reviewed by anyone but their author. Note FCS-016 changes a value in
-   an accountant-facing export, so a previously generated tax report may
-   disagree with a regenerated one — that is the fix working, but the owner
-   should know before regenerating anything already sent.
-2. **FCS-002**, then **FCS-003**, then **FCS-017**. FCS-005 should become the
-   AST lint `OPERATIONAL_FACTS` §3 has now been triggered into requiring.
-3. Continue the sweep over the packages listed in §4.
-4. Owner sets QC credentials and runs one live `authenticate()` (watch CQC-001).
+1. **Independent review of all 17 fixes.** None has been reviewed by anyone
+   but its author, and this round produced two self-corrections.
+2. **FCS-016 changes a value in an accountant-facing export.** A tax report
+   generated before today may disagree with a regenerated one for any sale on
+   a one-year anniversary — previously long-term, correctly short-term, so
+   the earlier file understated tax. If one has already been sent, say so.
+3. Continue the sweep over the packages in §4, using the scan-then-read
+   pairing that produced every P2.
+4. Owner sets QC credentials and runs one live `authenticate()` (watch
+   CQC-001 in `OPERATIONAL_FACTS`).
 5. Owner decision: news allowlist scope for holdings vs UNIVERSE/known.
-6. **GR-6** off-machine backup is **blocked on this host** (owner, 2026-08-07):
-   corporate machine, no uploads permitted. Only a physical medium would
-   qualify. See `docs/OPERATIONAL_FACTS.md` §2. Do not re-propose OneDrive.
-7. Roadmap unchanged: remaining GR-6 items needing no off-machine copy, or
-   the GR-7d owner decision (rebalance targets).
+6. **GR-6** off-machine backup is **blocked on this host** (owner,
+   2026-08-07): corporate machine, no uploads permitted. Only a physical
+   medium qualifies. See `docs/OPERATIONAL_FACTS.md` §2. Do not re-propose
+   OneDrive.
+7. Roadmap otherwise unchanged: remaining GR-6 items needing no off-machine
+   copy, or the GR-7d owner decision (rebalance targets).
 
 ## 6. Non-negotiable boundaries
 
@@ -108,3 +145,5 @@ has not been applied to the packages above.
   invented figures.
 - **An optional feature's failure must never suppress a risk-reducing
   proposal** (FCS-001).
+- **A metric's denominator must be the observations it actually scored**
+  (FPS-004, FCS-002).

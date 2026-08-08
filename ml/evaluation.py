@@ -63,15 +63,29 @@ def _plain_report_json(value: Any) -> Any:
     return value
 
 
-def _finite_pairs(
+def finite_pairs(
     actual: Sequence[float], predicted: Sequence[float]
 ) -> tuple[np.ndarray, np.ndarray]:
+    """The observation pairs a metric over these two series can actually score.
+
+    Public so a caller building a COMPOSITE metric scores exactly the rows the
+    scalar metrics here score. `_classification_metrics` in
+    `ml/earnings_experiments.py` did not, and mixed a finite-pair numerator
+    with an all-rows denominator (FCS-002); `usable_pair_count` alone was not
+    enough because that caller needs the filtered values, not just the count.
+    """
     a = np.asarray(actual, dtype=float)
     p = np.asarray(predicted, dtype=float)
     if a.shape != p.shape:
         raise EvaluationError("actual and predicted must have the same shape")
     mask = np.isfinite(a) & np.isfinite(p)
     return a[mask], p[mask]
+
+
+# Legacy private name, kept as an alias to the SAME function object -- the
+# pattern this repository already uses for ProposalClaimLostError and
+# transition_pre_broker_claim.
+_finite_pairs = finite_pairs
 
 
 def usable_pair_count(actual: Sequence[float], predicted: Sequence[float]) -> int:

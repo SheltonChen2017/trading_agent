@@ -11,6 +11,8 @@ import os
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import execution.alpaca_broker as broker
@@ -617,3 +619,42 @@ def test_normalize_order_tolerates_a_broker_object_without_chain_fields():
     normalized = _normalize_order(minimal)
     assert normalized["replaces"] is None
     assert normalized["replaced_by"] is None
+
+
+# --------------------------------------------------------------------------
+# FCS-005: a non-finite quote must refuse, not propagate.
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "bad", [float("nan"), float("inf"), float("-inf"), None, "not a number"]
+)
+def test_a_non_finite_quote_component_refuses(bad):
+    from execution.alpaca_broker import QuoteUnavailable, _required_decimal
+
+    with pytest.raises(QuoteUnavailable):
+        _required_decimal(bad, "bid price")
+
+
+def test_a_usable_quote_component_converts_exactly():
+    from decimal import Decimal
+
+    from execution.alpaca_broker import _required_decimal
+
+    # Through str(), so the human-visible value is preserved rather than the
+    # float's binary expansion.
+    assert _required_decimal(0.1, "bid price") == Decimal("0.1")
+    assert _required_decimal("123.456", "ask price") == Decimal("123.456")
+
+
+def test_the_decimal_nan_comparison_trap_is_what_this_guards():
+    """Without the guard, `bid_decimal > 0` RAISES on a NaN bid.
+
+    Not a hypothetical: that comparison is the next statement after the
+    conversion in get_latest_quote, and InvalidOperation is an
+    ArithmeticError, so it escapes `except ValueError` all the way out.
+    """
+    from decimal import Decimal, InvalidOperation
+
+    unguarded = Decimal(str(float("nan")))  # what the code used to do
+    with pytest.raises(InvalidOperation):
+        unguarded > 0

@@ -426,3 +426,32 @@ def test_legacy_attempt_does_not_invent_a_failure_class(tmp_path):
         "field": "validation.failure_class",
         "reason": "validation event predates failure classification",
     } in materialized["unavailable_fields"]
+
+
+# --------------------------------------------------------------------------
+# FCS-009: the record must not imply a delay-cost measurement it cannot make.
+# --------------------------------------------------------------------------
+
+def test_decision_and_arrival_price_are_declared_to_be_one_observation():
+    """Both fields come from the same validation-time quote.
+
+    `reference_price` is assigned from `quote.get("price_decimal",
+    quote["price"])`, which is what the telemetry quote payload's `price` is
+    built from -- so implementation shortfall's DELAY component is identically
+    zero by construction. ML-9 is gated on this dataset being representative;
+    a silent zero would teach that gate there is nothing to model.
+    """
+    import inspect
+
+    from assistant.execution_kernel import validate as validate_module
+
+    validate_source = inspect.getsource(validate_module)
+    assert 'reference_price = quote.get("price_decimal", quote["price"])' in validate_source, (
+        "the provenance this test reasons about changed; re-check whether "
+        "decision and arrival are still the same observation"
+    )
+
+    telemetry_source = inspect.getsource(materialize_execution_attempt)
+    assert '"decision_and_arrival_are_the_same_observation": True' in telemetry_source
+    assert '"delay_cost_measurable": False' in telemetry_source
+    assert '"field": "delay_cost"' in telemetry_source

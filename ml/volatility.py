@@ -195,14 +195,6 @@ def annualize_pct(daily_volatility_pct: float) -> float:
     return float(daily_volatility_pct * math.sqrt(252))
 
 
-def _clean_returns(daily_returns: pd.Series) -> pd.Series:
-    return (
-        pd.to_numeric(daily_returns, errors="coerce")
-        .replace([np.inf, -np.inf], np.nan)
-        .dropna()
-    )
-
-
 def forecast_trailing_baseline(
     daily_returns: pd.Series, *, horizon_sessions: int = PRIMARY_HORIZON_SESSIONS
 ) -> float | None:

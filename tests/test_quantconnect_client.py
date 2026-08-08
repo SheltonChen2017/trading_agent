@@ -343,3 +343,63 @@ def test_the_unverified_success_assumption_is_documented_where_it_will_bite():
         assert "no reason given" in text, (
             f"{relative} must name the symptom, so the failure is recognizable"
         )
+
+
+# --------------------------------------------------------------------------
+# FCS-003: percent-encoded traversal must not bypass the licence boundary.
+#
+# QCREV-002 hardened this against a literal `backtests/../data/read` on
+# 2026-08-07. The encoded twin `backtests/%2e%2e/data/read` still passed:
+# urllib does not normalize what we hand it, but servers and CDNs routinely
+# decode-then-route, so the request would have reached a market-data endpoint.
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "backtests/../data/read",
+        "backtests/%2e%2e/data/read",
+        "backtests/%2E%2E/data/read",
+        "backtests/.%2e/data/read",
+        "backtests/%252e%252e/data/read",  # double-encoded
+        "backtests/%2f../data/read",
+        "backtests/%5c../data/read",       # encoded backslash
+        "data/read",
+        "data/%2e%2e/backtests/read",
+    ],
+)
+def test_encoded_traversal_cannot_reach_a_market_data_endpoint(path):
+    from research.quantconnect import QuantConnectError, _assert_allowed
+
+    with pytest.raises(QuantConnectError):
+        _assert_allowed(path)
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "authenticate",
+        "backtests/read",
+        "backtests/list",
+        "projects/create",
+        "files/read",
+        "compile/create",
+        "optimizations/read",
+    ],
+)
+def test_the_hardening_still_permits_every_allowlisted_endpoint(path):
+    from research.quantconnect import _assert_allowed
+
+    _assert_allowed(path)  # must not raise
+
+
+def test_a_percent_sign_in_a_path_is_refused_outright():
+    """Parameters travel in the JSON body; no allowlisted path needs an escape.
+
+    Refusing '%' is what makes this robust against encodings nobody has
+    thought of yet, rather than against the two that were reported.
+    """
+    from research.quantconnect import QuantConnectError, _assert_allowed
+
+    with pytest.raises(QuantConnectError):
+        _assert_allowed("backtests/read%20now")

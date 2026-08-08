@@ -13,9 +13,14 @@ jobs:
       # The pinned stack sets the actual floor: pandas 3.0.5 requires 3.11+
       # and numpy 2.5.1 requires 3.12+. Test every supported minor rather than
       # adding jobs that can never finish dependency installation.
+      #
+      # 3.14 added 2026-08-07 (FCS-011): the development host runs 3.14.6, so
+      # every validation figure in docs/ is produced on an interpreter CI was
+      # not exercising. A green local suite on an untested minor is not the
+      # evidence those reports claim to be.
       fail-fast: false
       matrix:
-        python-version: ["3.12", "3.13"]
+        python-version: ["3.12", "3.13", "3.14"]
     name: tests (py${{ matrix.python-version }})
     steps:
       - uses: actions/checkout@v4

@@ -103,6 +103,33 @@ def _optional_decimal_text(value: Any) -> str | None:
     return format(parsed, "f") if parsed.is_finite() else None
 
 
+class QuoteUnavailable(RuntimeError):
+    """The broker returned a quote this code refuses to price against."""
+
+
+def _required_decimal(value: Any, name: str) -> Decimal:
+    """A finite Decimal, or refuse (FCS-005).
+
+    The guarded counterpart to ``_optional_decimal_text`` for values that have
+    no meaningful "absent" answer -- a quote with no usable bid cannot be
+    priced at all, so returning None would only move the failure somewhere
+    less obvious.
+
+    Deliberately local rather than importing ``assistant.money.to_decimal``:
+    ``execution/`` has no ``assistant`` imports at all today, and this package
+    is the one ``assistant`` defers an import INTO. Same pattern as the three
+    other guarded conversion helpers in this repository, and allowlisted for
+    that reason in ``tests/test_decimal_conversion_guard.py``.
+    """
+    try:
+        parsed = Decimal(str(value))
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise QuoteUnavailable(f"{name} is not a number: {value!r}") from exc
+    if not parsed.is_finite():
+        raise QuoteUnavailable(f"{name} is not finite: {value!r}")
+    return parsed
+
+
 def _optional_iso(value: Any) -> str | None:
     if value is None:
         return None
@@ -270,8 +297,16 @@ def get_latest_quote(ticker: str) -> dict:
     client = StockHistoricalDataClient(key, secret)
     quotes = client.get_stock_latest_quote(StockLatestQuoteRequest(symbol_or_symbols=[ticker]))
     quote = quotes[ticker]
-    bid_decimal = Decimal(str(quote.bid_price))
-    ask_decimal = Decimal(str(quote.ask_price))
+    # FCS-005: through the guarded helper, never a bare Decimal(str(...)).
+    # A NaN bid parses fine and then RAISES InvalidOperation on the `> 0`
+    # comparison two lines down -- an ArithmeticError, so it escapes every
+    # `except ValueError` on the way out. An Infinity bid parses, passes
+    # `> 0`, and propagates as the literal string "Infinity" into the
+    # reference price. Neither is hypothetical: `_optional_float` in this same
+    # module already filters non-finite broker values, so this file has always
+    # assumed they occur.
+    bid_decimal = _required_decimal(quote.bid_price, f"{ticker} bid price")
+    ask_decimal = _required_decimal(quote.ask_price, f"{ticker} ask price")
     bid, ask = float(bid_decimal), float(ask_decimal)
     if bid_decimal > 0 and ask_decimal > 0:
         price_decimal = (bid_decimal + ask_decimal) / Decimal("2")

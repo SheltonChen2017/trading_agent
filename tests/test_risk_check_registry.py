@@ -293,3 +293,66 @@ def test_every_violation_code_used_by_a_check_exists():
         "earnings_blackout",
     ):
         assert any(check.name == critical for check in RISK_CHECK_REGISTRY)
+
+
+# --------------------------------------------------------------------------
+# FCS-008: pin the mixed unit convention on validate_trade_intent's limits.
+#
+# Three of the five limit parameters are FRACTIONS the gate multiplies by 100;
+# two are already PERCENTS. All five are named `*_pct` and typed `float`, and
+# the single caller compensates by hand on exactly two lines. Behavioural
+# tests catch the dangerous direction today, but nothing states the convention
+# where a new caller would read it -- and GR-2 built
+# `checks_for_phase("proposal")` precisely so a second caller would exist.
+# --------------------------------------------------------------------------
+
+def test_the_gate_treats_basket_and_leveraged_limits_as_percent():
+    """40.0 means 40%, not 4000%."""
+    portfolio = _portfolio()
+    intent = _intent(shares=10)
+    permissive = validate_trade_intent(
+        intent, portfolio, 100.0,
+        max_basket_pct=40.0, max_leveraged_etf_pct=20.0,
+    )
+    assert not any(
+        "basket concentration limit" in v or "leveraged-ETF limit" in v
+        for v in permissive.violations
+    ), permissive.violations
+
+
+def test_the_gate_treats_position_and_exposure_limits_as_fractions():
+    """0.05 means 5%; passing 5.0 would be a 500% cap.
+
+    The fail-OPEN direction is the one that matters: a caller copying the
+    `* 100` from the basket line onto this parameter turns a 5% per-position
+    limit into 500%.
+    """
+    portfolio = _portfolio()
+    intent = _intent(shares=100)  # $10,000 of a $100,000 account == 10%
+    over = validate_trade_intent(
+        intent, portfolio, 100.0, max_position_pct=0.05,
+    )
+    assert any("per-position limit" in v for v in over.violations), over.violations
+    under = validate_trade_intent(
+        intent, portfolio, 100.0, max_position_pct=5.0,
+    )
+    assert not any("per-position limit" in v for v in under.violations), (
+        "max_position_pct=5.0 is a 500% cap. If this ever starts refusing, "
+        "the unit convention changed and every caller must be revisited "
+        "(FCS-008)"
+    )
+
+
+def test_the_unit_convention_is_documented_at_the_signature():
+    """A future caller must meet the convention where the parameters are.
+
+    The two behavioural tests above pin what the gate DOES; this pins that a
+    reader is told, because the names (`*_pct` on all five) actively mislead.
+    """
+    import inspect
+
+    source = inspect.getsource(validate_trade_intent)
+    header = source[: source.index(") -> ValidationResult")]
+    assert "FCS-008" in header
+    assert "max_basket_pct: float = 40.0,  # PERCENT" in header
+    assert "max_position_pct: float = MAX_POSITION_PCT,  # fraction" in header

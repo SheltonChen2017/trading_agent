@@ -56,6 +56,7 @@ import os
 from dataclasses import dataclass
 from typing import Any, Callable, Mapping
 from urllib import error, request
+from urllib.parse import unquote
 
 API_BASE = "https://www.quantconnect.com/api/v2"
 
@@ -156,15 +157,31 @@ def _assert_allowed(path: str) -> None:
     if not isinstance(path, str) or not path.strip():
         raise QuantConnectError(f"path must be a non-empty string, got {path!r}")
     cleaned = path.strip().lstrip("/")
-    # Refuse traversal and alternate separators before any prefix check.
-    # ``backtests/../data/read`` would otherwise pass startswith("backtests/")
-    # and become a market-data URL after client or server normalization.
+    # FCS-003: decode percent-escapes BEFORE the traversal check, and reject a
+    # literal '%' outright. `urllib` does not normalize what we hand it, but
+    # servers and CDNs routinely decode-then-route, so `backtests/%2e%2e/data/
+    # read` reached a market-data URL while passing a check that only looked
+    # for a literal '..'. The earlier hardening closed the literal form the day
+    # before and missed its encoded twin.
+    #
+    # No allowlisted endpoint needs a percent sign in its PATH (parameters
+    # travel in the JSON body), so refusing '%' is both sufficient and the
+    # narrowest rule that cannot be out-argued by a new encoding: repeated
+    # decoding, overlong UTF-8, and mixed-case escapes are all covered by
+    # never accepting the escape character at all.
+    decoded = unquote(unquote(cleaned))
     if (
-        ".." in cleaned
+        "%" in cleaned
+        or ".." in cleaned
+        or ".." in decoded
         or "\\" in cleaned
+        or "\\" in decoded
         or "://" in cleaned
+        or "://" in decoded
         or "\x00" in cleaned
+        or "\x00" in decoded
         or "//" in cleaned
+        or "//" in decoded
     ):
         raise QuantConnectError(
             f"path {path!r} is not on this client's allowlist. Market-data "

@@ -119,6 +119,20 @@ three other files:
   decides what to *permit*) — by design, but a real second source of
   concentration-limit logic that could drift out of sync with the real
   gate over time.
+- `assistant/risk_copilot.py::check_policy_compliance()` — **added
+  2026-08-07 (FCS-007); this list said "three" for nine months while a
+  fourth existed.** A complete float re-implementation of five policy caps
+  (per-position, basket, leveraged-ETF, total exposure, and the cash-reserve
+  floor), reachable from both the CLI (`run_personal_assistant.py`) and the
+  UI (`personal_assistant_ui.py`). Unlike the three above it is not an input
+  to the gate or a suggestion heuristic — it answers "am I in breach right
+  now?", and its own docstring positions it as *"an actual policy-bound
+  answer"*, which is exactly the framing that makes silent drift from
+  `validate_trade_intent()` costly. It reads the same `TradingPolicy` fields
+  but computes in float and treats all five as fractions, whereas the gate's
+  own signature takes two of them as percents (see FCS-008 and the comment
+  block at `risk/execution_gate.py`'s signature). Consolidating it belongs
+  with the rest of this item, not ahead of it.
 
 **Gate-side consolidation DONE AND INDEPENDENTLY REVIEWED 2026-08-03
 (GR-2)**: the

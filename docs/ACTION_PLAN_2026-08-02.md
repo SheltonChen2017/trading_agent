@@ -70,13 +70,13 @@ frozen runtime, plus a small number of owner decisions and data purchases.
 
 | Item | Where | Review state |
 |---|---|---|
-| GR-0 five-dimension platform readiness (never averaged; fail-closed) | `assistant/platform_readiness.py` (683 lines), CLI `platform-readiness` | independently reviewed |
+| GR-0 five-dimension platform readiness (never averaged; fail-closed) | `assistant/platform_readiness.py` (778 lines as of 2026-08-07), CLI `platform-readiness` | independently reviewed |
 | GR-1A execution characterization freeze (5 public entry points, atomic-claim pin, 4-writer contention) | `tests/test_execution_characterization.py` | independently reviewed |
 | GR-1A/B helper + orchestration extraction (7 kernel modules) | `assistant/execution_kernel/{claim,revalidate,submit,outcomes,errors,intents,validate}.py` | independently reviewed |
 | GR-1C validation orchestration behind complete call-time DI (15-field frozen `ProposalValidationDeps`; kernel body has zero module-global runtime reads, symtable-pinned) | `assistant/execution_kernel/validate.py` | three review rounds, closed at PR #112 |
 | GR-1D manual reconciliation behind complete call-time DI (13-field frozen `ReconciliationDeps`; kernel body has zero module-global runtime reads, symtable-pinned) | `assistant/execution_kernel/reconcile.py` | merged as PR #120; independently accepted at `2f37210` |
 | Execution-kernel import boundary: no direct or transitive path from kernel/assistant/execution/risk roots into `ml` or proposal generation | `tests/test_ml_import_boundary.py` (transitive graph walk, fails closed on unresolvable imports) | reviewed |
-| Order lifecycle: idempotent submission, ambiguous-outcome reconciliation, replacement chains, absence-age grace, reservation accounting, telemetry-before-submission | `assistant/execution_service.py` (facade, 952 lines), `assistant/order_lifecycle.py`, `assistant/order_reconciler.py` | multiple review rounds |
+| Order lifecycle: idempotent submission, ambiguous-outcome reconciliation, replacement chains, absence-age grace, reservation accounting, telemetry-before-submission | `assistant/execution_service.py` (facade, 900 lines as of 2026-08-07), `assistant/order_lifecycle.py`, `assistant/order_reconciler.py` | multiple review rounds |
 | Risk-metrics consolidation (`max_drawdown_pct` single source) | `backtest/risk_metrics.py` | closed in ARCHITECTURE_DEBT |
 
 ### 2.2 ML stack (all **observation-only**, promotion-blocked by design)

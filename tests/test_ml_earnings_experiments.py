@@ -452,3 +452,83 @@ def test_fully_scored_slice_reports_equal_counts():
     )
     bucket = _slice_metrics(frame, "logistic_downside_tail")["ticker"]["BBB"]
     assert bucket["event_count"] == bucket["scored_event_count"] == 4
+
+
+# --------------------------------------------------------------------------
+# FCS-002: a metric's denominator must be the observations it actually scored.
+#
+# FPS-004 fixed exactly this in `_slice_metrics` and added
+# `ml.evaluation.usable_pair_count()` for it. `_classification_metrics` was
+# never brought along: `calibration_error` summed bin counts (which
+# `calibration_curve` builds from finite pairs only) and divided by
+# `len(actual)` (every row), so the reported error shrank toward zero as
+# coverage got worse -- the same direction FPS-004 named. precision/recall
+# additionally scored a NaN probability as a confident negative, because
+# `NaN >= threshold` is False.
+# --------------------------------------------------------------------------
+
+def _classification_metrics_for(actual, probability, *, threshold=0.5, bins=10):
+    from ml.earnings_experiments import _classification_metrics
+
+    return _classification_metrics(
+        np.asarray(actual, dtype=float),
+        np.asarray(probability, dtype=float),
+        threshold=threshold,
+        bins=bins,
+    )
+
+
+def test_calibration_error_denominator_is_the_scored_events_not_every_row():
+    """Four scored predictions must give the same error however many NaNs sit beside them."""
+    actual = [1.0, 0.0, 1.0, 0.0]
+    probability = [0.9, 0.1, 0.8, 0.2]
+    baseline = _classification_metrics_for(actual, probability)["calibration_error"]
+
+    for padding in (6, 16, 36):
+        padded_actual = actual + [0.0] * padding
+        padded_probability = probability + [float("nan")] * padding
+        metrics = _classification_metrics_for(padded_actual, padded_probability)
+        assert metrics["calibration_error"] == pytest.approx(baseline), padding
+        assert metrics["scored_event_count"] == 4
+        assert metrics["event_count"] == 4 + padding
+
+
+def test_classification_metrics_publish_both_counts():
+    metrics = _classification_metrics_for(
+        [1.0, 0.0, 1.0], [0.9, 0.1, float("nan")]
+    )
+    assert metrics["event_count"] == 3
+    assert metrics["scored_event_count"] == 2
+
+
+def test_precision_and_recall_ignore_unscored_events():
+    """A missing probability is not a confident negative prediction.
+
+    `NaN >= threshold` is False, so an unscored event used to land in the
+    recall denominator as a miss -- penalising the model for events it
+    explicitly declined to predict, while the Brier score for those same
+    events was dropped.
+    """
+    actual = [1.0, 1.0]
+    scored_only = _classification_metrics_for(actual, [0.9, 0.9])
+    with_unscored = _classification_metrics_for(
+        actual + [1.0, 1.0], [0.9, 0.9, float("nan"), float("nan")]
+    )
+    assert scored_only["recall"] == 1.0
+    assert with_unscored["recall"] == 1.0
+    assert with_unscored["scored_event_count"] == 2
+    assert with_unscored["event_count"] == 4
+
+
+def test_a_fold_publishes_the_scored_event_count_beside_its_raw_count():
+    """`candidate_evaluated_event_count` is a raw len(); its scored twin must exist."""
+    import inspect
+
+    from ml import earnings_experiments
+
+    source = inspect.getsource(earnings_experiments)
+    assert "candidate_evaluated_event_count" in source
+    assert "candidate_scored_event_count" in source, (
+        "a raw evaluated-event count must be published beside the count the "
+        "metrics actually scored (FPS-004 / FCS-002)"
+    )

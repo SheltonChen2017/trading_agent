@@ -558,3 +558,43 @@ def test_a_realistic_feature_frame_with_missing_early_rows_can_be_bound():
 def test_non_scalar_values_are_still_rejected():
     with pytest.raises(AvailabilityError, match="JSON scalar"):
         hash_feature_value({"nested": 1})
+
+
+# --------------------------------------------------------------------------
+# FCS-014: PointInTimeSource had zero references anywhere -- a Protocol that
+# nothing checks against is documentation, not a contract. This test is the
+# reference: it makes the concrete source structurally conform, so adding a
+# method to the Protocol (or dropping one from the implementation) fails here
+# instead of being discovered when a second source is written.
+# --------------------------------------------------------------------------
+
+def test_the_yfinance_source_structurally_satisfies_the_pit_protocol():
+    import inspect
+
+    from ml.availability import PointInTimeSource, RetroactivelyAdjustedSource
+
+    source = RetroactivelyAdjustedSource()
+    for name, declared in inspect.getmembers(
+        PointInTimeSource, predicate=inspect.isfunction
+    ):
+        if name.startswith("_"):
+            continue
+        assert hasattr(source, name), (
+            f"RetroactivelyAdjustedSource is missing {name}(), which "
+            "PointInTimeSource declares"
+        )
+        assert inspect.signature(getattr(source, name)) == inspect.signature(
+            getattr(PointInTimeSource, name)
+        ).replace(
+            parameters=[
+                p
+                for p in inspect.signature(getattr(PointInTimeSource, name))
+                .parameters.values()
+                if p.name != "self"
+            ]
+        ), f"{name}() signature diverges from the protocol"
+    for attribute in ("source_id", "provides_point_in_time_lineage"):
+        assert hasattr(source, attribute), attribute
+    assert source.provides_point_in_time_lineage is False, (
+        "the yfinance path must never claim point-in-time lineage"
+    )

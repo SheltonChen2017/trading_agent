@@ -243,6 +243,36 @@ headline count may not claim everything is open while the rows beneath it
 record fixes. Verified by reverting three rows to the state Codex actually
 merged — the guard fails; restored, it passes.
 
+### Scope audit: what neither review actually covered (clean)
+
+A fifth "did you review all of it?" prompted auditing the **scope statement**
+rather than the findings inside it — a review's completeness is bounded by its
+inventory, and nobody had checked that inventory.
+
+The Python and PowerShell counts hold: exactly **four** PowerShell modules
+exist, matching §1's claim, and the Python counts match the baseline plus what
+has been added since.
+
+But §1's scope is "Python modules, PowerShell operational modules, and the
+Markdown documents". **Ten logic-bearing configuration and data files sit
+outside it**, and outside both of Claude's sweeps too — including the two that
+carry authoritative values. Checked here for the first time:
+
+| File | Check | Result |
+|---|---|---|
+| `assistant/default_mandate.json` | recompute `compute_mandate_fingerprint` against the stored `approved_fingerprint` | **match** — the owner's 2026-08-04 approval is still valid and no behavior field has drifted |
+| `assistant/default_policy.json` | every cap against the values `docs/MANDATE.md` §2 states | all five exact |
+| `assistant/research_findings.json` | the registry `strategy_proposals` gates on at proposal time | both relied-upon findings present with the required CONFIRMED status; both correctly flagged non-authoritative, which is the disclosure path rather than a block. 17 findings / 13 rejected / 2 confirmed / 1 promising / 1 exploratory — consistent with `GENERAL_READINESS_STATUS` |
+| `tests/committee_corpus/cases.json` | frozen canonical SHA-256 content identity | holds (72 tests) |
+| `.github/workflows/tests.yml` | the FCS-011 matrix change | `3.12, 3.13, 3.14` present |
+| `.streamlit/config.toml`, `my_policy.example.json`, `ml_shadow_volatility_config.example.json`, `research/ml_specs/*.json` | inspected | no authoritative value; examples and preregistered specs |
+
+**No defect found.** Recorded because a negative result from a systematic
+sweep is evidence, and because the next reviewer should know this surface
+exists: a wrong number in `default_policy.json` or a flipped status in
+`research_findings.json` would change what the machine permits or proposes,
+and neither file is reached by a review scoped to `*.py` and `*.ps1`.
+
 ### Observation, not a finding
 
 `save_policy`'s compare-and-swap is **opt-in**: `expected_fingerprint` and

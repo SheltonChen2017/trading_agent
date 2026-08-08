@@ -51,6 +51,13 @@ its combined correction batch for all 42 ordered findings.
   get here: the first pass covered 6 of 24 and still said "accepted", the
   second covered 24 of 42. Full suite reproduces Codex's **3166** on Python
   3.14.6 (they ran 3.12.13).
+- **Scope audit (clean, no finding):** both reviews were scoped to `*.py` and
+  `*.ps1`. Ten logic-bearing config/data files sat outside that — including
+  `default_mandate.json` and `default_policy.json`. Checked: the mandate's
+  approved fingerprint still recomputes to its stored value, every policy cap
+  matches `MANDATE.md`, the research registry's gated findings carry the
+  required status, and the committee corpus identity holds. Recorded so the
+  next reviewer knows the surface exists.
 - **CCX-004 (P3, fixed):** the line-by-line review was merged in the same
   commit as its own fixes with all 24 rows still reading `Open` — the CXL-005
   contradiction inside the document that reported it. Dispositions reconciled

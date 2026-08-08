@@ -103,6 +103,28 @@ identically with the network down.
   broken and passes when restored, with both touched files verified restored
   byte-for-byte by SHA-256.
 
+### Validation (exact final tree)
+
+Restyle commit `8ac6c33` on `user/claude/alpaca-ui-theme-20260808`, branched
+from `main` at `8f4257b`.
+
+- Full suite: **3210 passed, 0 failed, 0 skipped**, 25 warnings, 277.91s,
+  Python 3.14.6. Previous baseline was 3204; the 6 added are the new theme
+  guards. Run on the committed tree, after the last edit, not before it.
+- `compileall` clean across every production package, tests and the root
+  modules named by the repository workflow.
+- `git diff --check` clean (only the expected LF-to-CRLF checkout notices).
+- Reverse mutation: all 6 new guards fail when their invariant is broken and
+  pass when restored; both touched files verified restored by SHA-256.
+- `tests/test_active_document_consistency.py`: 8 passed after this file was
+  rewritten.
+
+**Not covered by tests.** Contrast ratios, font fallback on a machine lacking
+the Segoe UI Variable faces, and the rendered appearance itself were verified
+by hand in a browser against a throwaway harness and the real app; none of
+that is reproducible in CI. The guards forbid the specific constructs that
+caused the measured failures — they do not re-measure.
+
 ### Known limitation
 
 Worst-case contrast is 4.49 against a WCAG AA target of 4.50. Closing that last

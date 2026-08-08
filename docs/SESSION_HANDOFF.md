@@ -28,10 +28,17 @@ deployed; the operational checkout is untouched.
 The owner asked for a whole-repository scan for flaws, defects, bugs,
 orphans and inconsistencies, then for every defect found to be fixed.
 
-Branch: `user/claude/full-codebase-sweep-20260807`, **pushed to `origin`**
-(verified present on the remote — another computer can
-`git fetch` and resume from it). **Not merged; no pull request opened.**
-Base is `011ae5c` (`main`, post PR #168).
+Branch: `user/claude/full-codebase-sweep-20260807`, **merged to `main`**
+in two pull requests. Base was `011ae5c` (`main`, post PR #168).
+
+- **PR #169** merged the sweep record and the seventeen P0-free findings.
+- **PR #170** merged `c1df1d0`, the **P1** (FCS-018), which landed on the
+  branch *after* #169 was created. For a short window `main` therefore
+  carried every P2/P3 fix while still missing the P1 — worth knowing if
+  anything was built or deployed from `main` in that gap. Nothing was;
+  the operational checkout never left `9a91498`.
+
+`main` is now `ceeddac` and contains all eighteen fixes.
 
 Ledger: `docs/REVIEW_2026-08-07_FULL_CODEBASE_SWEEP.md`; findings in §2,
 **corrections and their verification in §2b**, honest coverage in §3.
@@ -46,7 +53,7 @@ Commits, oldest first:
 | `05f82c8` | FCS-001 and FCS-016 fixed; FCS-017 recorded |
 | `4e85dc2` | The remaining fifteen fixed; handoff rewritten |
 | `adef540` | Handoff records the branch is on the remote |
-| _(this commit)_ | **FCS-018 (P1)** found and fixed; four P1-class invariants re-derived |
+| `c1df1d0` | **FCS-018 (P1)** found and fixed; four P1-class invariants re-derived |
 
 **0 P0 · 1 P1 · 4 P2 · 13 P3 · all 18 fixed · none independently reviewed.**
 
@@ -173,9 +180,15 @@ not that the codebase is clean.
 
 ## 5. What is next
 
-1. **Independent review of all 18 fixes**, FCS-018 first. None has been
-   reviewed by anyone but its author, and this round produced two
-   self-corrections plus one severity upgrade after owner challenge.
+1. **Independent review of all 18 fixes is IN PROGRESS** (owner sent them to
+   GPT/Codex, 2026-08-07). FCS-018 is the one to read first. Nothing here has
+   been reviewed by anyone but its author, and this round produced two
+   self-corrections plus one severity upgrade after the owner challenged a
+   "no P1" headline — so treat the ledger as author-verified, not reviewed.
+   When the feedback arrives, follow the `external-review-response` workflow:
+   verify each finding before fixing it, classify it confirmed / partially
+   correct / false alarm, search for generalized instances, and mutation-check
+   every regression test.
 2. **FCS-016 changes a value in an accountant-facing export.** A tax report
    generated before today may disagree with a regenerated one for any sale on
    a one-year anniversary — previously long-term, correctly short-term, so

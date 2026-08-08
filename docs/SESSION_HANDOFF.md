@@ -44,11 +44,19 @@ its combined correction batch for all 42 ordered findings.
 `user/claude/counter-review-codex-scan-20260808`. Details in
 `docs/REVIEW_2026-08-08_COMBINED_SCAN_FIX_LEDGER.md`.
 
-- **All 24 CXL fixes verified** — 14 behaviourally against the merged tree,
-  10 by source path; see the coverage table in the fix ledger. The first pass
-  of this counter-review covered only 6 and still said "accepted", which
-  claimed more than it had checked. Full suite reproduces Codex's **3166** on
-  Python 3.14.6 (they ran 3.12.13).
+- **All 42 ordered ledger rows verified.** The 24 CXL fixes (14
+  behaviourally, 10 by source path) *and* rows 1-18, Codex's dispositions on
+  the FCS findings — 231 focused tests, with FCS-018 re-mutated on the merged
+  tree because the UI was rewritten around it. It took two owner challenges to
+  get here: the first pass covered 6 of 24 and still said "accepted", the
+  second covered 24 of 42. Full suite reproduces Codex's **3166** on Python
+  3.14.6 (they ran 3.12.13).
+- **CCX-003 (P3, fixed):** the candidates §5 recorded as "deferred" but never
+  described, so nobody could act on them while the directory read "Complete".
+  `risk/` resolves clean; both root-module candidates were real —
+  `classify_trend` answered "downtrend" from an empty window, and a negative
+  `hold_days` made the research baseline report **-7.08%** where the true
+  forward return was **+6.93%**.
 - `tests/test_scanner.py` was **not** weakened — its old fixture was passing
   *because* of the infinite z-score it now rejects.
 - **CCX-001 (P3, fixed):** CXL-001 corrected a 29-Feb *acquisition* but left

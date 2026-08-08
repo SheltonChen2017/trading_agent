@@ -163,6 +163,56 @@ the spike stand out against real variation, which is a stronger fixture.
 | CCX-001 | P3 | `assistant/tax_lots.py::_one_year_on` | CXL-001 fixed the 29-February **acquisition** but kept the boundary anchored on the acquisition date, which leaves the mirror case wrong in the opposite direction: buying **28 Feb 2023** puts a 29 February *inside* the window, and the anniversary rule made the lot long-term on 2024-02-29 when counting from 2024-03-01 reaches one year only on 2024-03-01. One day **early** — the fail-open direction, understating tax on the same accountant-facing export. Pre-existing, not introduced by CXL-001, but inside the class CXL-001 addressed. | Anchor on the day counting actually starts (`acquired + 1 day`) and take its first anniversary. One rule replaces two special cases and covers both leap positions. | 9 leap positions checked against a Pub 550 helper derived independently of the implementation (and guarded by the IRS's own worked example: buy 5 Feb 2020 → long-term 6 Feb 2021). 20 tests added. Reverse mutation to the acquisition-date anchor: **19 fail**, restored green. |
 | CCX-002 | P3 | `tests/test_active_document_consistency.py` | The new guard asserted the **current** epoch by name (`paper-epoch-002` has been active since 2026-08-06). Rolling to epoch-003 is expected and would fail the suite, and the obvious fix is to edit the assertion — so the guard enforced today's state rather than preventing contradiction, and would be weakened every time reality moved. | Assert the **relationship** instead: no document may call one epoch both active and closed; current documents may not disagree about which epoch is active; the sweep record may carry only one headline count. Literal strings are now only known-stale phrases that should never be true again. | Simulated an epoch-003 roll: the original assertion fails, the rewrite passes. Injected a contradictory "epoch-003 is CLOSED" line: the rewrite catches it. 4 tests. |
 
+### Rows 1-18: Codex's dispositions on the FCS findings
+
+The coverage table above is the 24 CXL fixes. The combined ledger has **42**
+rows; rows 1-18 are Codex's dispositions on my own FCS findings (13 "Verified",
+5 "Superseded"). Those were not checked until now, and they matter because the
+correction batch rewrote files my fixes live in.
+
+All 13 "Verified" dispositions hold on the merged tree. **231 focused tests
+pass** across `test_strategy_proposals`, `test_decimal_conversion_guard`,
+`test_risk_check_registry`, `test_execution_telemetry`,
+`test_quantconnect_client`, `test_operations`, `test_personal_assistant_ui`,
+`test_ml_earnings_experiments`, and `test_ml_availability`. The FCS-005 AST
+lint's allowlist was not widened (still 5 entries), so no new bare
+`Decimal(str(...))` slipped in with the batch.
+
+**FCS-018 carried the highest regression risk** -- the Streamlit UI was
+substantially rewritten for CXL-003 and CXL-022 -- so it was re-mutated rather
+than just re-run: disabling `_submission_outcome_is_unresolved` on the MERGED
+tree still fails `test_the_unknown_branch_never_claims_the_order_was_not_submitted`.
+The P1 guard survived the rewrite and is still load-bearing.
+
+The 5 "Superseded" dispositions are self-evidently correct: each names the CXL
+finding that replaced it, and all five of those are verified above.
+
+### The deferred candidates (CCX-003)
+
+§5 of the line-by-line review marks the root Python modules and `risk/`
+"Complete" while recording candidates "deferred pending caller/test
+cross-check". They were never described, so nobody could act on them, and
+"Complete" overstated closure for those directories. The cross-check was done:
+
+- **`risk/`: resolves clean.** All nine numeric limit parameters on
+  `validate_trade_intent` are covered by `TradingPolicy.validate()`; there is
+  no uncovered gate parameter. Recorded so this is not re-derived a third time.
+- **Root modules: both candidates are real, and are fixed here as CCX-003.**
+  `classify_trend` accepted a non-positive `lookback_days` and answered a
+  confident `"downtrend"` computed from an EMPTY window (`idx < -1` is False,
+  the slice is empty, its mean is NaN, and `close >= NaN` is False).
+  `run_baseline_forward_returns` accepted a negative `hold_days`, which turns
+  every `shift(-hold_days)` into a BACKWARD shift, so the "forward" price is a
+  past price: on a monotonically rising fixture the baseline reported
+  **-7.08%** where the true forward return was **+6.93%**.
+
+  P3 -- neither is reachable from the execution path, since production callers
+  pass the frozen 200-session lookback and the baseline runner is
+  research-only. But the second inverts the control group a signal's edge is
+  judged against, which is the same failure mode as the decline-grid
+  comparator (CXL-013), rated P2. Fixed with type and range validation; 16
+  tests; reverse mutation removing both positivity guards fails 6.
+
 ### Observation, not a finding
 
 `save_policy`'s compare-and-swap is **opt-in**: `expected_fingerprint` and

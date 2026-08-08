@@ -1,7 +1,7 @@
 # Development session handoff
 
-Prepared: 2026-08-08, after Codex independently reviewed Claude's
-counter-review of the combined whole-codebase correction batch.
+Prepared: 2026-08-08, after Codex independently reviewed Claude's Alpaca-style
+UI restyle and requested corrections.
 
 Audience: Codex, Claude Code, Grok, and the repository owner after a
 computer, model, or session change. This is the canonical current-state
@@ -15,10 +15,13 @@ authority documents so rewriting this state summary does not erase them.
 > counter-review (`5b050cd` and its ancestors, PR #171 base `24d0cb2`) and the
 > Codex correction and handoff commits (`d6e65c1`, `4c501cf`).
 >
-> **Work in progress on a branch:** an owner-requested Alpaca-style UI restyle
-> lives on `user/claude/alpaca-ui-theme-20260808`. It is presentation only --
-> CSS and a Streamlit theme file. Push and PR await the owner's instruction.
-> See §0.
+> **Latest review state:** Claude's owner-requested Alpaca-style UI restyle is
+> at `85566b3` on `user/claude/alpaca-ui-theme-20260808`, based on `8f4257b`.
+> Codex reviewed both commits on
+> `codex/review-claude-alpaca-ui-theme-20260808`; review record `c8d0173`
+> requests changes with **0 P0, 0 P1, 4 P2, and 1 P3 open**. The theme has not
+> been accepted or merged. See §0 and
+> `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_ALPACA_UI_THEME.md`.
 >
 > Codex's review found CCR-001 (P2) and CCR-002/003/004 (P3) against Claude's
 > work; all four are fixed and independently re-verified by Claude in this
@@ -38,6 +41,37 @@ authority documents so rewriting this state summary does not erase them.
 > into this file; link to them.
 
 ## 0. Latest round — Alpaca-style UI restyle (2026-08-08)
+
+### Independent review outcome
+
+**Changes requested.** Codex reviewed `8ac6c33` and `85566b3` separately and
+in the cumulative tree. Both are rejected pending correction.
+
+- AUI-001 (P2): checked policy controls, selected radios, and the forced
+  light-mode focus outline use the white/yellow or yellow/page pair at about
+  1.41:1 instead of the 3:1 non-text contrast requirement.
+- AUI-002 (P2): ordinary warnings use the same text family as body/menu copy;
+  only an optional bold lead-in receives the promised distinct warning font.
+- AUI-003 (P2): several logical sections remain flat because the CSS only
+  cards a bordered wrapper that most sections do not create.
+- AUI-004 (P2): the branch's own 4.49:1 worst-case warning measurement is
+  below the 4.50:1 normal-text requirement and may not be rounded up.
+- AUI-005 (P3): Streamlit rejects heading weights 660 and 620 at runtime and
+  repeatedly falls back while logging warnings.
+
+Independent validation on reviewed head `85566b3`: **3210 passed, 0 failed,
+0 skipped, 27 warnings** under Python 3.12.13 (26 suite/dependency warnings
+plus one host-only pytest cache warning); 33 focused UI/document tests passed;
+`compileall` for scripts/tests and `git diff --check` passed. Light and dark
+rendering, the complete sample briefing, Settings & Features, computed DOM
+styles, control contrast, and browser-console diagnostics were inspected.
+The green source tests do not cover the five rendered/configuration findings.
+
+No correction has been applied yet. Do not merge or deploy the theme until
+AUI-001 through AUI-005 are fixed and counter-reviewed. No feature-milestone
+record was added.
+
+### Claude's implementation record
 
 Owner request, verbatim: apply an Alpaca-style UI to all menus and warning
 messages; coat each block in a rounded card; use different fonts to separate

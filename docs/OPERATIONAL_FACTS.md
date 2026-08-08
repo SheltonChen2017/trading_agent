@@ -272,6 +272,22 @@ it for that specific endpoint with the observed body recorded.
   evaluates fail-closed over the *same facts*, so the platform can report the
   backup fresh and stale at once depending which report you read. Always write
   `timedelta(0) <= now - at <= limit`.
+- **"Not submitted" is a claim about the broker, and most callers cannot make
+  it.** 2026-08-07 (FCS-018, the only P1 of that sweep). A raising submit does
+  not prove rejection -- the response can be lost after the broker accepted --
+  so the kernel leaves the proposal in `submission_unknown`, keeps the
+  reservation, and raises a message beginning *"Could not confirm whether the
+  order ... was accepted"*. The Streamlit approval handler prefixed that with
+  `Order not submitted:`, producing a sentence that contradicted itself and
+  pointed the operator at the obvious wrong move: place the trade by hand at
+  the broker, outside every guard this codebase has. Both submit buttons had
+  drifted the same way; the CLI had not, because it lets the exception
+  propagate untouched.
+  The rule: **decide submitted-vs-unknown from the DURABLE proposal status,
+  never from exception text**, and fail toward UNKNOWN when the row cannot be
+  re-read. `UNRESOLVED_BROKER_STATE_STATUSES` is the predicate. Pinned by an
+  AST test over every broad handler around
+  `execute_approved_paper_proposal`.
 - **A boundary test whose inputs cannot fail the bug.** 2026-08-07 (FCS-016):
   `tax_lots.is_long_term` compares timestamps where the rule is date-based, so
   a sale on the one-year anniversary at a later time of day than the purchase

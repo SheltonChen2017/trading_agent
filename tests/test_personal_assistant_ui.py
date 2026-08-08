@@ -18,6 +18,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+import pytest
 import streamlit as st
 
 import scripts.personal_assistant_ui as ui
@@ -589,3 +590,126 @@ if __name__ == "__main__":
     test_load_packet_no_events_never_calls_the_live_events_function()
     test_briefing_tab_persists_both_base_and_enriched_variants_regardless_of_order()
     print("All personal_assistant_ui tests passed.")
+
+
+# --------------------------------------------------------------------------
+# FCS-018: an ambiguous submission must never be reported as a definite
+# non-submission.
+#
+# The execution kernel is scrupulous about this: a raising submit does NOT
+# prove the broker rejected the order, so it leaves the proposal in
+# `submission_unknown`, keeps the reservation, and raises a message that
+# begins "Could not confirm whether the order ... was accepted". The UI then
+# prefixed that with "Order not submitted:", re-asserting in the sentence a
+# human reads the very thing the kernel refuses to assert.
+# --------------------------------------------------------------------------
+
+class _StubStore:
+    def __init__(self, status):
+        self._status = status
+        self.raise_on_read = False
+
+    def get_proposal(self, proposal_id):
+        if self.raise_on_read:
+            raise RuntimeError("database unavailable")
+        return None if self._status is None else {"status": self._status}
+
+
+@pytest.mark.parametrize(
+    "status",
+    ["submitting", "submission_unknown", "reconciling", "broker_accepted",
+     "partially_filled", "cancel_pending", "executed"],
+)
+def test_an_unresolved_broker_state_is_reported_as_unknown(status):
+    assert ui._submission_outcome_is_unresolved(_StubStore(status), "tp_1") is True
+
+
+@pytest.mark.parametrize(
+    "status", ["blocked", "validation_failed", "submission_failed", "expired"]
+)
+def test_a_genuinely_failed_attempt_is_not_reported_as_unknown(status):
+    assert ui._submission_outcome_is_unresolved(_StubStore(status), "tp_1") is False
+
+
+def test_an_unreadable_proposal_fails_toward_unknown():
+    """If we cannot tell, we must not claim the order did not reach the broker."""
+    store = _StubStore("submission_failed")
+    store.raise_on_read = True
+    assert ui._submission_outcome_is_unresolved(store, "tp_1") is True
+    assert ui._submission_outcome_is_unresolved(_StubStore(None), "tp_1") is True
+
+
+def test_the_unknown_branch_never_claims_the_order_was_not_submitted(monkeypatch):
+    """The exact string that misled: 'Order not submitted' on an unknown outcome."""
+    shown: list[tuple[str, str]] = []
+    monkeypatch.setattr(ui.st, "error", lambda m, **k: shown.append(("error", m)))
+    monkeypatch.setattr(ui.st, "warning", lambda m, **k: shown.append(("warning", m)))
+
+    kernel_message = (
+        "Could not confirm whether the order for tp_abc was accepted after "
+        "the submission raised (Timeout)."
+    )
+    ui._render_submission_failure(
+        _StubStore("submission_unknown"), "tp_abc", RuntimeError(kernel_message)
+    )
+    rendered = " ".join(text for _, text in shown)
+    assert "UNKNOWN" in rendered
+    assert "do not resubmit" in rendered.lower()
+    assert "not submitted" not in rendered.lower(), (
+        "an ambiguous submission must not be described as a non-submission "
+        "(FCS-018)"
+    )
+    assert kernel_message in rendered, "the kernel's own wording must survive"
+
+
+def test_a_real_failure_still_says_the_order_was_not_submitted(monkeypatch):
+    """The fix must not blur the honest negative in the other direction."""
+    shown: list[str] = []
+    monkeypatch.setattr(ui.st, "error", lambda m, **k: shown.append(m))
+    monkeypatch.setattr(ui.st, "warning", lambda m, **k: shown.append(m))
+    ui._render_submission_failure(
+        _StubStore("blocked"), "tp_abc", RuntimeError("Execution gate blocked it")
+    )
+    assert any("Order not submitted" in m for m in shown)
+
+
+def test_both_submit_paths_route_through_the_honest_reporter():
+    """The override path reaches the broker too, so it can end ambiguous too.
+
+    Source-level because both call sites live inside a Streamlit render
+    function that a unit test cannot cheaply drive; the reporter's own
+    behaviour is covered behaviourally above. The ordinary and override
+    buttons diverged once already, which is the whole finding.
+    """
+    import ast
+
+    source = (
+        Path(__file__).resolve().parent.parent
+        / "scripts" / "personal_assistant_ui.py"
+    ).read_text(encoding="utf-8")
+    tree = ast.parse(source)
+
+    offenders = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Try):
+            continue
+        body = ast.unparse(node.body)
+        if "execute_approved_paper_proposal" not in body:
+            continue
+        for handler in node.handlers:
+            caught = ast.unparse(handler.type) if handler.type else "bare"
+            # Only the broad handler matters: the narrow
+            # PolicyOverridableBlockError one is a pre-broker refusal and may
+            # honestly say "not submitted".
+            if caught not in ("Exception", "bare"):
+                continue
+            rendered = ast.unparse(handler.body)
+            if "_render_submission_failure" not in rendered:
+                offenders.append(f"line {handler.lineno}: {rendered[:80]}")
+
+    assert not offenders, (
+        "a broad handler around execute_approved_paper_proposal must report "
+        "through _render_submission_failure -- claiming 'Order not submitted' "
+        "on an ambiguous outcome can send the operator to place the trade by "
+        "hand at the broker (FCS-018): " + "; ".join(offenders)
+    )

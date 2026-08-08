@@ -10,7 +10,7 @@ handoff **and is therefore the wrong place for anything durable.**
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
 > machine-local operational knowledge, and engineering watch items live
 > there because this file is rewritten every round. Do not copy them back
-> into this file; link to them. **Six watch items were added this round** —
+> into this file; link to them. **Seven watch items were added this round** —
 > they are the generalizable lessons, and they matter more than any
 > individual fix.
 
@@ -29,7 +29,7 @@ The owner asked for a whole-repository scan for flaws, defects, bugs,
 orphans and inconsistencies, then for every defect found to be fixed.
 
 Branch: `user/claude/full-codebase-sweep-20260807`, **pushed to `origin`**
-(tip `4e85dc2`, verified present on the remote — another computer can
+(verified present on the remote — another computer can
 `git fetch` and resume from it). **Not merged; no pull request opened.**
 Base is `011ae5c` (`main`, post PR #168).
 
@@ -45,8 +45,33 @@ Commits, oldest first:
 | `38373d3` | FCS-016's timezone dimension + corrected fix guidance |
 | `05f82c8` | FCS-001 and FCS-016 fixed; FCS-017 recorded |
 | `4e85dc2` | The remaining fifteen fixed; handoff rewritten |
+| `adef540` | Handoff records the branch is on the remote |
+| _(this commit)_ | **FCS-018 (P1)** found and fixed; four P1-class invariants re-derived |
 
-**0 P0 · 0 P1 · 4 P2 · 13 P3 · all 17 fixed · none independently reviewed.**
+**0 P0 · 1 P1 · 4 P2 · 13 P3 · all 18 fixed · none independently reviewed.**
+
+### The P1 — FCS-018
+
+The owner challenged an earlier "no P1 found" headline. That challenge was
+right, and a second pass aimed at P1 classes found one.
+
+Both Streamlit approval handlers rendered `Order not submitted: {exc}`. A
+raising submit does **not** prove the broker rejected the order — the
+response can be lost after acceptance — which is why the kernel leaves the
+proposal in `submission_unknown`, keeps the reservation, and raises a message
+that begins *"Could not confirm whether the order … was accepted"*. The
+operator read a definite negative prefixed onto its own contradiction.
+
+P1 rather than P2 because *incorrect broker outcome* and *duplicate orders*
+are both in the P1 definition. The machine cannot itself duplicate — the
+`submission_unknown` status holds the ticker/side slot — but the defect acts
+on the **human**, and an operator told the order was not submitted has an
+obvious next move: place it by hand at the broker, outside every guard here.
+
+Fixed by `_render_submission_failure()`, which decides from the **durable
+proposal status** the kernel already wrote (never the exception text) and
+fails toward UNKNOWN when the row cannot be re-read. The CLI never had this
+defect — it lets the exception propagate untouched.
 
 ### The four P2s
 
@@ -89,8 +114,8 @@ run honestly.
 
 - Base `011ae5c` before any change: **3015 passed / 0 failed / 0 skipped /
   25 warnings**.
-- **Final tree: 3085 passed / 0 failed / 0 skipped / 25 warnings** (347s).
-  The +70 over baseline is entirely new regression tests; **no pre-existing
+- **Final tree: 3100 passed / 0 failed / 0 skipped / 25 warnings** (261s).
+  The +85 over baseline is entirely new regression tests; **no pre-existing
   test changed its result**, which is the claim that matters.
 - `compileall` clean; `git diff --check` clean.
 - Reverse mutations, each applied in the fixed code's own location and then
@@ -99,10 +124,33 @@ run honestly.
   fail**; FCS-002 → **1 fail**; FCS-003 → **5 fail** with both layers
   removed, **1** with only the `%` rule removed, **0 with only the decoding
   removed** — recorded because it shows which layer carries which input;
-  FCS-004 → **1 fail**.
+  FCS-004 → **1 fail**; FCS-018 (unknown branch disabled) → **1 fail**.
 - Run on **Python 3.14.6**. CI now covers 3.12/3.13/3.14 (FCS-011), but the
   3.14 job has never executed — it will on first push.
 - FPS-003 did not reproduce. It stays open — a green run is not evidence.
+
+### The four P1-class invariants, re-derived not inherited
+
+The previous round took these from the 2026-08-06 sweep. This round walked
+them against the current tree:
+
+| Invariant | Result |
+|---|---|
+| Every production proposal-status write is fenced | **holds** — 14 `update_proposal_status_if_current` call sites, **0** unfenced |
+| Reservations release exactly once | **holds** — one `reserve_execution_budget` site, one `release_execution_reservation`, three `mark_submission_failed_and_release`, all through atomic primitives |
+| No execution-capable module reaches `ml`/LLM | **holds** — 54 roots walked, 0 unresolvable import forms; the ADR direction (LLM → execution) is 0 across 13 advisory roots |
+| Ledger double-entry | **holds** — validated at write *and* re-derived as a trial balance on every read |
+
+Also re-verified directly: `reclaim_stale_status` is the one atomic primitive
+without `BEGIN IMMEDIATE`, and it is **correct anyway** — its conditional
+UPDATE is a compare-and-swap, with a 30s busy timeout under WAL. Do not
+"fix" it.
+
+One apparent violation was a **false alarm**: `recommended_stocks →
+ai_advisor`. My root set treated every `assistant.*` module as
+execution-capable; the project classifies `recommended_stocks` as a
+*proposal-generation* module, which is correctly allowed to use the advisor
+and is not reachable from any order path.
 
 ## 4. Coverage honesty — the sweep was NOT exhaustive
 
@@ -125,8 +173,9 @@ not that the codebase is clean.
 
 ## 5. What is next
 
-1. **Independent review of all 17 fixes.** None has been reviewed by anyone
-   but its author, and this round produced two self-corrections.
+1. **Independent review of all 18 fixes**, FCS-018 first. None has been
+   reviewed by anyone but its author, and this round produced two
+   self-corrections plus one severity upgrade after owner challenge.
 2. **FCS-016 changes a value in an accountant-facing export.** A tax report
    generated before today may disagree with a regenerated one for any sale on
    a one-year anniversary — previously long-term, correctly short-term, so

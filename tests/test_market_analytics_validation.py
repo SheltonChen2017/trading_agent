@@ -81,6 +81,20 @@ def test_a_non_positive_hold_is_refused_by_the_baseline_runner(hold_days):
         run_baseline_forward_returns({"X": _frame(close)}, hold_days=hold_days)
 
 
+@pytest.mark.parametrize("ignored_hold_days", [0, -1, -5])
+def test_same_day_mode_does_not_validate_its_ignored_horizon(ignored_hold_days):
+    """CCR-001: this mode uses today's open and close, never `hold_days`."""
+    close = _series()
+    result = run_baseline_forward_returns(
+        {"X": _frame(close)},
+        hold_days=ignored_hold_days,
+        slippage_pct=0.0,
+        entry_timing="same_day_open_to_close",
+    )
+    assert len(result) == len(close)
+    assert (result["net_return_pct"] == 0.0).all()
+
+
 @pytest.mark.parametrize("slippage", [-0.01, float("nan"), float("inf"), True])
 def test_an_unusable_slippage_is_refused(slippage):
     close = _series()

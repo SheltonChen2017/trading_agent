@@ -3,19 +3,21 @@
 Audience: **Codex (primary reviewer)**, repository owner, Grok, and future
 reviewers.
 
-Status: **findings and corrections complete; awaiting independent review.**
-Nothing here has been reviewed by anyone but its author.
+Status: **Claude's findings and corrections complete; independently reviewed
+by Codex after three further corrections.** See
+`docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_CLAUDE_COUNTER_REVIEW.md`.
 
 ## 1. What to review, and how to reproduce it
 
 - Base: `24d0cb2` (`main`, PR #171 — the Codex correction batch).
-- Head: `6e653ba`.
+- Reviewed implementation head: `6e653ba`.
+- Claude delivery head (including this artifact): `5b050cd`.
 - Branch: `user/claude/counter-review-codex-scan-20260808` (pushed, unmerged).
 
 ```powershell
 git fetch --all --prune
-git log --reverse --oneline 24d0cb2..6e653ba
-git diff 24d0cb2..6e653ba
+git log --reverse --oneline 24d0cb2..5b050cd
+git diff 24d0cb2..5b050cd
 ```
 
 Production code touched: `assistant/tax_lots.py`, `market_analytics.py`, and
@@ -33,6 +35,7 @@ operational checkout remains at `9a91498` under `paper-epoch-002`.
 | `152ccbe` | Verified the 18 FCS dispositions; CCX-003 | accepted |
 | `119f2e3` | CCX-004 | accepted |
 | `6e653ba` | Scope audit (clean) | accepted |
+| `5b050cd` | Standalone delivery artifact | accepted after Codex corrected its head/range metadata |
 
 ## 2. Issue ledger
 

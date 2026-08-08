@@ -84,10 +84,15 @@ def run_baseline_forward_returns(
     # group a signal's edge is judged against, so inverting it can reverse a
     # research conclusion -- the same failure mode as the decline-grid
     # comparator (CXL-013), which was rated P2.
-    if isinstance(hold_days, bool) or not isinstance(hold_days, int):
-        raise ValueError(f"hold_days must be an int, got {hold_days!r}")
-    if hold_days < 1:
-        raise ValueError(f"hold_days must be at least 1, got {hold_days}")
+    # `same_day_open_to_close` never reads the horizon; preserve that public
+    # contract instead of rejecting a value that is explicitly ignored
+    # (CCR-001). The other two modes do shift by the horizon and must refuse a
+    # zero/negative/non-integer value so they cannot point backward.
+    if entry_timing != "same_day_open_to_close":
+        if isinstance(hold_days, bool) or not isinstance(hold_days, int):
+            raise ValueError(f"hold_days must be an int, got {hold_days!r}")
+        if hold_days < 1:
+            raise ValueError(f"hold_days must be at least 1, got {hold_days}")
     if (
         isinstance(slippage_pct, bool)
         or not isinstance(slippage_pct, (int, float))

@@ -34,12 +34,28 @@ def _text(name: str) -> str:
 def _active_epochs(text: str) -> set[str]:
     """Epoch ids the document asserts are currently ACTIVE."""
     return set(
-        re.findall(r"`(paper-epoch-\d+)` (?:is|has been) [Aa]ctive", text)
+        re.findall(
+            r"`(paper-epoch-\d+)` (?:(?:is|has been) )?active",
+            text,
+            flags=re.IGNORECASE,
+        )
     )
 
 
 def _closed_epochs(text: str) -> set[str]:
-    return set(re.findall(r"`(paper-epoch-\d+)` (?:is|was) CLOSED", text))
+    return set(
+        re.findall(
+            r"`(paper-epoch-\d+)` (?:(?:is|was) )?closed",
+            text,
+            flags=re.IGNORECASE,
+        )
+    )
+
+
+def test_epoch_status_parser_is_case_insensitive():
+    """CCR-002: the canonical handoff deliberately spells status `ACTIVE`."""
+    assert _active_epochs("`paper-epoch-003` ACTIVE") == {"paper-epoch-003"}
+    assert _closed_epochs("`paper-epoch-002` closed") == {"paper-epoch-002"}
 
 
 def test_no_document_calls_the_same_epoch_both_active_and_closed():

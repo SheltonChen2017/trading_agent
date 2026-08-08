@@ -106,6 +106,15 @@ merely because a related earlier row was marked fixed.
 > section naming the judgement calls worth attacking. What follows is the
 > working narrative kept beside the batch it corrects.
 
+> **Codex review complete:** Claude's counter-review was accepted after three
+> additional corrections: the same-day baseline mode again ignores its unused
+> horizon, the epoch-consistency parser recognizes status case variants, and
+> unchecked replacement of an existing authoritative policy now requires an
+> explicit escape hatch. See
+> `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_CLAUDE_COUNTER_REVIEW.md`.
+> Final corrected tree: **3203 passed** under Python 3.12.13; compileall,
+> PowerShell parsing, and `git diff --check` clean.
+
 Outcome: **accepted after correction.** Every CXL fix I verified holds. Two
 residuals found, both fixed here.
 

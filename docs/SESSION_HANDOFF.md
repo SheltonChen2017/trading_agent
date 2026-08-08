@@ -28,9 +28,23 @@ deployed; the operational checkout is untouched.
 The owner asked for a whole-repository scan for flaws, defects, bugs,
 orphans and inconsistencies, then for every defect found to be fixed.
 
-Branch: `user/claude/full-codebase-sweep-20260807` — local only, not pushed.
+Branch: `user/claude/full-codebase-sweep-20260807`, **pushed to `origin`**
+(tip `4e85dc2`, verified present on the remote — another computer can
+`git fetch` and resume from it). **Not merged; no pull request opened.**
+Base is `011ae5c` (`main`, post PR #168).
+
 Ledger: `docs/REVIEW_2026-08-07_FULL_CODEBASE_SWEEP.md`; findings in §2,
 **corrections and their verification in §2b**, honest coverage in §3.
+
+Commits, oldest first:
+
+| Commit | Contents |
+|---|---|
+| `f2e1c2d` | Sweep recorded: FCS-001..015, documentation only, nothing fixed |
+| `32e2751` | FCS-016 added (tax_lots anniversary misclassification) |
+| `38373d3` | FCS-016's timezone dimension + corrected fix guidance |
+| `05f82c8` | FCS-001 and FCS-016 fixed; FCS-017 recorded |
+| `4e85dc2` | The remaining fifteen fixed; handoff rewritten |
 
 **0 P0 · 0 P1 · 4 P2 · 13 P3 · all 17 fixed · none independently reviewed.**
 

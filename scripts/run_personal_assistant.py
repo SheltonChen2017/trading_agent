@@ -8,6 +8,7 @@ import os
 import sys
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
+import uuid
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -1079,6 +1080,35 @@ def command_dismiss_proposals(args, store: AssistantStore) -> None:
     )
 
 
+def _write_artifact_atomically(destination: Path, payload: str) -> None:
+    """Write a file the reader will treat as authoritative, or write nothing.
+
+    FCS-013. `Path.write_text` is not atomic: a crash, a full disk, or a
+    killed console (this host loses console-hosted processes to 0xC000013A --
+    see docs/OPERATIONAL_FACTS.md §2) leaves a TRUNCATED file. For a tax
+    export that matters more than usual, because a half-written CSV is still
+    a syntactically valid CSV with fewer rows, and the coverage statement the
+    report relies on to disclose its own limits can itself be cut off.
+
+    `backtest/research_report.write_research_report` was hardened for the same
+    reason on 2026-07-31; this is that discipline applied to the artifact that
+    actually leaves the machine. The uuid in the temp name keeps two
+    concurrent writers off each other's scratch file -- the deterministic
+    `.tmp` sibling was the other half of that finding.
+
+    Overwriting IS permitted here, unlike a research report: re-running
+    `tax-report` for the same year after journaling more fills is a normal
+    thing to do, and the artifact is derived, not evidence.
+    """
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    temp = destination.with_name(f".{destination.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        temp.write_text(payload, encoding="utf-8")
+        os.replace(temp, destination)
+    finally:
+        temp.unlink(missing_ok=True)
+
+
 def command_tax_report(args, store: AssistantStore) -> None:
     """GR-7a: realized gains for one tax year, from confirmed records.
 
@@ -1135,8 +1165,7 @@ def command_tax_report(args, store: AssistantStore) -> None:
         f"{report.wash_sale_flagged_count} wash-sale flag(s) (advisory only)."
     )
     if args.output:
-        args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(rendered, encoding="utf-8")
+        _write_artifact_atomically(args.output, rendered)
         print(f"Wrote {args.format.upper()} tax report: {args.output}")
         print(summary)
         if not report.complete:
@@ -1868,7 +1897,10 @@ def build_parser() -> argparse.ArgumentParser:
 
     list_parser = commands.add_parser("list")
     list_parser.add_argument("--status")
-    list_parser.add_argument("--limit", type=int, default=20)
+    # FCS-012: _positive_int, not bare int. SQLite treats LIMIT -1 as
+    # unbounded, so `list --limit -1` silently returned every row while the
+    # sibling `list-alerts --limit` was already validated.
+    list_parser.add_argument("--limit", type=_positive_int, default=20)
     list_parser.set_defaults(handler=command_list)
 
     approve = commands.add_parser("approve")
@@ -2130,7 +2162,11 @@ def build_parser() -> argparse.ArgumentParser:
             "Not tax advice; wash-sale entries are advisory flags only."
         ),
     )
-    tax_report.add_argument("--year", type=int, required=True)
+    # FCS-012: a tax year is a non-negative integer; assistant/tax_reporting
+    # rejects anything outside 1900..2200 anyway, so catch it at the CLI
+    # boundary with the validator that was written for exactly this and never
+    # wired to anything.
+    tax_report.add_argument("--year", type=_non_negative_int, required=True)
     tax_report.add_argument(
         "--format", choices=("csv", "json"), default="csv"
     )

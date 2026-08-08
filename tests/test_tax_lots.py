@@ -21,6 +21,7 @@ from assistant.tax_lots import (
     FIFO,
     HIFO,
     LIFO,
+    MARKET_TIMEZONE,
     SPECIFIC,
     Fill,
     Split,
@@ -197,6 +198,80 @@ def test_a_leap_day_acquisition_does_not_shift_the_boundary():
     acquired = datetime(2024, 2, 29, 15, 0, tzinfo=timezone.utc)
     assert is_long_term(acquired, datetime(2025, 3, 1, 15, 0, tzinfo=timezone.utc)) is False
     assert is_long_term(acquired, datetime(2025, 3, 2, 15, 0, tzinfo=timezone.utc)) is True
+
+
+# FCS-016. The two tests above are correct but INSENSITIVE: each uses 15:00 for
+# the buy AND the sell, which is the single alignment where a timestamp
+# comparison agrees with the date rule the docstring states. They passed green
+# through three review rounds while the implementation misclassified every
+# anniversary sale made later in the day than the purchase. The boundary must
+# be straddled in every dimension the implementation reads -- time of day, and
+# the timezone the dates are actually reported in.
+
+@pytest.mark.parametrize("sell_hour", [0, 9, 14, 15, 16, 20, 23])
+def test_an_anniversary_sale_is_short_term_at_every_time_of_day(sell_hour):
+    """One year exactly is SHORT term whatever o'clock the sale happens."""
+    acquired = datetime(2025, 3, 10, 15, 0, tzinfo=timezone.utc)
+    sold = datetime(2026, 3, 10, sell_hour, 0, tzinfo=timezone.utc)
+    assert is_long_term(acquired, sold) is False
+
+
+@pytest.mark.parametrize("sell_hour", [0, 9, 14, 15, 16, 20, 23])
+def test_a_leap_day_anniversary_sale_is_short_term_at_every_time_of_day(sell_hour):
+    acquired = datetime(2024, 2, 29, 15, 0, tzinfo=timezone.utc)
+    sold = datetime(2025, 3, 1, sell_hour, 0, tzinfo=timezone.utc)
+    assert is_long_term(acquired, sold) is False
+
+
+def test_the_day_after_the_anniversary_is_long_term_at_every_time_of_day():
+    """The other side of the boundary must not be over-corrected into short."""
+    acquired = datetime(2025, 3, 10, 15, 0, tzinfo=timezone.utc)
+    for hour in (14, 18, 23):  # 09:00-19:00 ET on 2026-03-11
+        sold = datetime(2026, 3, 11, hour, 0, tzinfo=timezone.utc)
+        assert is_long_term(acquired, sold) is True, hour
+
+
+def test_holding_period_uses_market_local_dates_not_utc():
+    """The boundary must agree with the dates tax_reporting actually prints.
+
+    2026-03-11 00:30Z is 20:30 ET on 2026-03-10, so the exported row reads
+    acquired 2025-03-10 / sold 2026-03-10 -- exactly one year. Comparing raw
+    UTC dates still calls that long-term, which would make the artifact
+    self-contradictory on its face.
+    """
+    acquired = datetime(2025, 3, 10, 14, 30, tzinfo=timezone.utc)  # 10:30 ET
+    sold = datetime(2026, 3, 11, 0, 30, tzinfo=timezone.utc)  # 20:30 ET, 03-10
+    assert sold.astimezone(MARKET_TIMEZONE).date().isoformat() == "2026-03-10"
+    assert is_long_term(acquired, sold) is False
+
+
+def test_an_acquisition_late_in_utc_but_same_et_day_keeps_its_boundary():
+    """The mirror case: the ACQUISITION crosses the UTC date line, not the sale."""
+    acquired = datetime(2025, 3, 11, 1, 0, tzinfo=timezone.utc)  # 21:00 ET, 03-10
+    assert acquired.astimezone(MARKET_TIMEZONE).date().isoformat() == "2025-03-10"
+    # One year on in market-local terms is 2026-03-10; that day is still short.
+    assert is_long_term(acquired, datetime(2026, 3, 10, 20, 0, tzinfo=timezone.utc)) is False
+    assert is_long_term(acquired, datetime(2026, 3, 11, 20, 0, tzinfo=timezone.utc)) is True
+
+
+def test_days_to_long_term_agrees_with_the_classification():
+    """The countdown and the classification must derive from ONE boundary.
+
+    `_long_term_date` implemented `replace(year=+1) + 1 day` while
+    `is_long_term` compared against `replace(year=+1)`, so the countdown could
+    say "1 day to go" for a lot that the classifier already called long.
+    """
+    now = datetime.now(timezone.utc)
+    for offset_days in (0, 1, 2, 30, 364, 365, 366, 367, 400):
+        acquired = now - timedelta(days=offset_days)
+        ledger = build_ledger([Fill("KO", "buy", 1, 50.0, acquired, fill_id="k1")])
+        row = unrealized_by_lot(ledger, "KO", 55.0)[0]
+        classified_long = is_long_term(acquired, now)
+        assert row["term_if_sold_now"] == ("long" if classified_long else "short"), offset_days
+        if classified_long:
+            assert row["days_to_long_term"] == 0, offset_days
+        else:
+            assert row["days_to_long_term"] >= 0, offset_days
 
 
 def test_selling_before_buying_is_never_long_term():

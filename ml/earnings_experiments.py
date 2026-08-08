@@ -28,6 +28,7 @@ from ml.evaluation import (
     beats_baseline_in_multiple_folds,
     brier_score,
     calibration_curve,
+    finite_pairs,
     interval_coverage,
     log_loss,
     mean_absolute_error,
@@ -416,25 +417,53 @@ def _classification_metrics(
     threshold: float,
     bins: int,
 ) -> dict[str, Any]:
-    predicted = probability >= threshold
-    positives = actual == 1
+    # FCS-002: score every metric on the SAME observations. brier_score,
+    # log_loss and calibration_curve all drop non-finite pairs internally, so
+    # mixing them with all-rows arithmetic published a number the data did not
+    # support in two different ways:
+    #
+    #   * `calibration_error` summed bin counts (finite pairs) and divided by
+    #     `len(actual)` (every row), so the reported error fell toward zero as
+    #     coverage got worse -- with four good predictions held fixed it read
+    #     0.1500 / 0.0600 / 0.0300 / 0.0150 as 0 / 6 / 16 / 36 NaNs were added.
+    #     That is FPS-004's exact failure direction; this is the same class in
+    #     the same module.
+    #   * `NaN >= threshold` is False, so an event the model DECLINED to
+    #     predict entered precision/recall as a confident negative -- penalised
+    #     in recall while being dropped from its own Brier score.
+    #
+    # Both counts are published, matching the convention the fold summaries
+    # (`validation_row_count` / `evaluated_validation_row_count`) already use.
+    scored_actual, scored_probability = finite_pairs(actual, probability)
+    predicted = scored_probability >= threshold
+    positives = scored_actual == 1
     true_positive = int(np.sum(predicted & positives))
     predicted_positive = int(np.sum(predicted))
     actual_positive = int(np.sum(positives))
-    curve = calibration_curve(actual, probability, n_bins=bins)
-    calibration_error = sum(
-        row["count"] * abs(row["mean_predicted"] - row["observed_frequency"])
-        for row in curve
-        if row["count"]
-    ) / len(actual)
+    curve = calibration_curve(scored_actual, scored_probability, n_bins=bins)
+    scored_event_count = int(scored_actual.size)
+    calibration_error = (
+        sum(
+            row["count"] * abs(row["mean_predicted"] - row["observed_frequency"])
+            for row in curve
+            if row["count"]
+        )
+        / scored_event_count
+    ) if scored_event_count else None
     return {
-        "brier_score": brier_score(actual, probability),
-        "log_loss": log_loss(actual, probability),
+        "brier_score": brier_score(scored_actual, scored_probability),
+        "log_loss": log_loss(scored_actual, scored_probability),
         "probability_threshold": threshold,
         "precision": true_positive / predicted_positive if predicted_positive else None,
         "recall": true_positive / actual_positive if actual_positive else None,
-        "calibration_error": float(calibration_error),
+        "calibration_error": (
+            float(calibration_error) if calibration_error is not None else None
+        ),
         "calibration_curve": curve,
+        # The denominator every metric above actually used, beside the raw
+        # count. A reader must be able to tell them apart.
+        "event_count": int(np.asarray(actual, dtype=float).size),
+        "scored_event_count": scored_event_count,
     }
 
 
@@ -669,13 +698,20 @@ def run_earnings_task(
             metrics[f"{candidate}_calibration_error"] = candidate_metrics[
                 "calibration_error"
             ]
+            # FCS-002: the denominator these five metrics actually used.
+            metrics[f"{candidate}_scored_event_count"] = candidate_metrics[
+                "scored_event_count"
+            ]
         downside_metrics = _classification_metrics(
             actual_downside,
             predictions[CANDIDATES[1]],
             threshold=config.classification_probability_threshold,
             bins=spec.research_gate.required_calibration_bins,
         )
-        for name in ("brier_score", "log_loss", "precision", "recall", "calibration_error"):
+        for name in (
+            "brier_score", "log_loss", "precision", "recall",
+            "calibration_error", "scored_event_count",
+        ):
             short = "brier" if name == "brier_score" else name
             metrics[f"{CANDIDATES[1]}_{short}"] = downside_metrics[name]
 
@@ -693,6 +729,16 @@ def run_earnings_task(
             actual_absolute, predictions[CANDIDATES[2]]
         )
         metrics["candidate_evaluated_event_count"] = len(validation_eval)
+        # FCS-002: `candidate_evaluated_event_count` is the raw validation row
+        # count. Every classification metric above drops non-finite pairs, and
+        # the quantile MAE/coverage/pinball metrics do too, so a fold whose
+        # model declined to predict the hard events would otherwise show strong
+        # scores beside a comfortable-looking event count. Publish the count
+        # the scoring actually used, the same way the fold summaries publish
+        # `evaluated_validation_row_count` beside `validation_row_count`.
+        metrics["candidate_scored_event_count"] = usable_pair_count(
+            actual_absolute, predictions[CANDIDATES[2]]
+        )
         metrics["fit_error"] = None
 
         validation_eval["absolute_gap"] = actual_absolute

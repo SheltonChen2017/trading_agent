@@ -65,13 +65,6 @@ class GapWindow:
         return dataclasses.asdict(self)
 
 
-def _sessions_between(start: pd.Timestamp, end: pd.Timestamp) -> pd.DatetimeIndex:
-    schedule = _NYSE.schedule(
-        start_date=start.strftime("%Y-%m-%d"), end_date=end.strftime("%Y-%m-%d")
-    )
-    return pd.DatetimeIndex(schedule.index).normalize()
-
-
 def classify_release_timing(announced_at: pd.Timestamp) -> str:
     """"after_close", "before_open", or "intraday" from a release timestamp."""
     announced_at = pd.Timestamp(announced_at)

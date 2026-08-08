@@ -12,7 +12,7 @@ purpose is stopping trading:
    that silently ignores the most natural way to set it is worse than no
    control, because it is trusted.
 2. Nine copies of a rule drift. This project has already extracted
-   ``worst_case_fill_price`` for exactly that reason.
+   ``worst_case_fill_price_decimal`` for exactly that reason.
 
 Resolved fail-CLOSED: anything set that is not an explicit, recognised "off"
 value engages the switch. A typo therefore halts trading rather than quietly

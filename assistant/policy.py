@@ -293,10 +293,22 @@ def save_policy(policy: TradingPolicy, path: str | Path) -> None:
     one). Validation runs BEFORE any filesystem effect: an invalid policy
     must leave the existing file byte-identical."""
     import os
+    import uuid
 
     policy.validate()
     destination = Path(path)
     serialized = json.dumps(policy.to_dict(), indent=2) + "\n"
-    temp_path = destination.with_name(destination.name + ".tmp")
-    temp_path.write_text(serialized, encoding="utf-8")
-    os.replace(temp_path, destination)
+    # FCS-015: uuid-suffixed temp name. A deterministic `.tmp` sibling races
+    # between two concurrent writers (two browser tabs both saving policy):
+    # both write the same scratch file, so the second clobbers the first's
+    # content before either replace() runs. os.replace keeps the DESTINATION
+    # untorn either way, so this is a lost update rather than corruption --
+    # but it is the same temp-name race fixed in backtest/research_report.py
+    # on 2026-07-31, and the fix was never generalized. Cleaned up in a
+    # finally so a failed write leaves no litter beside the policy file.
+    temp_path = destination.with_name(f".{destination.name}.{uuid.uuid4().hex}.tmp")
+    try:
+        temp_path.write_text(serialized, encoding="utf-8")
+        os.replace(temp_path, destination)
+    finally:
+        temp_path.unlink(missing_ok=True)

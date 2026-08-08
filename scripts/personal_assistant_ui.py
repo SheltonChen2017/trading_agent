@@ -152,8 +152,9 @@ from assistant.stock_lookup import (
 from assistant.storage import AssistantStore
 from assistant.strategy_proposals import (
     CONFIGURED_LEVERAGED_PAIRS,
-    MissingResearchDependencyError,
-    StrategyMarketDataError,
+    # The two strategy exception types are deliberately no longer imported:
+    # the handler below catches `Exception` (FCS-001), so naming a narrow pair
+    # here would only invite someone to reinstate the narrow catch.
     generate_leveraged_pair_rebalance_proposals,
 )
 from config import (
@@ -2665,10 +2666,16 @@ if page == "Propose & Approve":
                     proposals = proposals + generate_leveraged_pair_rebalance_proposals(
                         packet, policy, pair_config, store=store
                     )
-                except (
-                    MissingResearchDependencyError,
-                    StrategyMarketDataError,
-                ) as exc:
+                # FCS-001: `Exception`, matching the CLI's own handler, NOT the
+                # two declared strategy error types. `proposals` already holds
+                # the RISK-REDUCTION sells computed above; anything escaping
+                # here aborts the whole block, so they are never written to
+                # session state and never saved -- an optional strategy check
+                # silently suppressing a risk-reducing sell. That is exactly
+                # what a ZeroDivisionError from an unpriced leg did. The
+                # narrower tuple only ever protected against the failures
+                # somebody had already predicted, which is the wrong set.
+                except Exception as exc:
                     st.error(
                         f"{pair_config.stable_ticker}/{pair_config.leveraged_ticker} strategy check failed "
                         f"({exc}); skipping this pair."

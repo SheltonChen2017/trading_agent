@@ -447,6 +447,14 @@ def materialize_execution_attempt(store: AssistantStore, attempt_id: str) -> dic
     unavailable.extend([
         {"field": "recent_volume", "reason": "not provided by the current quote source"},
         {"field": "liquidity_bucket", "reason": "not derivable without volume/depth data"},
+        # FCS-009: listed as unavailable rather than published as a zero.
+        {
+            "field": "delay_cost",
+            "reason": (
+                "decision and arrival price derive from one validation-time "
+                "quote; no second quote is taken at dispatch"
+            ),
+        },
     ])
     intent = validation_payload.get("intent") or proposal.get("intent")
     limit_distance = _limit_distance(intent, quote.get("price"))
@@ -484,6 +492,25 @@ def materialize_execution_attempt(store: AssistantStore, attempt_id: str) -> dic
         "prices": {
             "decision": validation_payload.get("reference_price"),
             "arrival": quote.get("price"),
+            # FCS-009: `decision` and `arrival` are the SAME observation, not
+            # two measurements. `reference_price` is assigned from
+            # `quote.get("price_decimal", quote["price"])` in
+            # execution_kernel/validate.py, which is exactly what the quote
+            # payload's `price` is built from -- so implementation shortfall's
+            # DELAY component (decision -> arrival) is identically zero here by
+            # construction, an artifact of the schema rather than a fact about
+            # execution. Measuring it needs a second quote taken at dispatch,
+            # which this project does not currently take. Stated in the record
+            # itself because ML-9 is explicitly gated on this dataset being
+            # representative, and a silent zero would train that gate to
+            # believe there is no delay cost to model. Same discipline as the
+            # `recent_volume` / `liquidity_bucket` unavailability notes.
+            "decision_and_arrival_are_the_same_observation": True,
+            "delay_cost_measurable": False,
+            "delay_cost_unavailable_reason": (
+                "decision and arrival price derive from one validation-time "
+                "quote; no second quote is taken at dispatch"
+            ),
             "fills": [fill.get("incremental_price") or fill.get("cumulative_avg_price") for fill in fills],
             "limit_distance": limit_distance,
         },

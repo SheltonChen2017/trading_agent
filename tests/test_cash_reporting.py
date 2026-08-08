@@ -9,6 +9,7 @@ is action-shaped.
 """
 from __future__ import annotations
 
+import dataclasses
 from decimal import Decimal
 
 import pytest
@@ -549,3 +550,71 @@ def test_idle_cash_panel_uses_the_cached_readonly_loader():
         "the panel must go through the cached read-only loader"
     )
     assert "_load_packet(" not in body, "the panel must not use the writing loader"
+
+
+# --------------------------------------------------------------------------
+# FCS-004: headroom must net out capital already committed to working orders.
+#
+# risk/execution_gate.py folds pending buys into BOTH bounds -- the cash check
+# via min(cash, buying_power), the exposure check via total_pending_buy_value.
+# This report used raw cash and raw market value, so it advertised room the
+# gate would refuse. Third recurrence of the class already fixed in
+# allocation_proposals.build_allocation_plan and
+# portfolio_analytics.preview_trade_impact.
+# --------------------------------------------------------------------------
+
+def _snapshot_with_open_orders(cash, positions, equity, open_orders):
+    snapshot = _snapshot(cash, positions, equity)
+    return dataclasses.replace(snapshot, open_orders=list(open_orders))
+
+
+def test_headroom_nets_out_capital_already_committed_to_working_orders():
+    working = [
+        {"ticker": "MSFT", "side": "buy", "shares": 10, "limit_price": 400.0},
+    ]  # $4,000 already spoken for
+    without = evaluate_idle_cash(
+        _snapshot(87_000.0, [_position("AAPL", 13_000.0)], 100_000.0),
+        _policy(), _MANDATE,
+    )["policy_bounds"]
+    with_orders = evaluate_idle_cash(
+        _snapshot_with_open_orders(
+            87_000.0, [_position("AAPL", 13_000.0)], 100_000.0, working
+        ),
+        _policy(), _MANDATE,
+    )["policy_bounds"]
+
+    assert with_orders["capital_already_committed"] == "4000"
+    assert Decimal(with_orders["policy_headroom"]) == (
+        Decimal(without["policy_headroom"]) - Decimal("4000")
+    )
+    assert with_orders["policy_headroom_basis"] == "net_of_committed_capital"
+    assert with_orders["committed_capital_complete"] is True
+
+
+def test_a_commitment_of_unknowable_value_is_disclosed_not_counted_as_zero():
+    """A bare market order carries no notional and no limit price.
+
+    Counting it as zero would silently overstate headroom -- the same
+    fail-open the estimator was written to avoid for the UI preview.
+    """
+    working = [{"ticker": "MSFT", "side": "buy", "shares": 10}]
+    bounds = evaluate_idle_cash(
+        _snapshot_with_open_orders(
+            87_000.0, [_position("AAPL", 13_000.0)], 100_000.0, working
+        ),
+        _policy(), _MANDATE,
+    )["policy_bounds"]
+    assert bounds["committed_capital_complete"] is False
+    assert bounds["capital_already_committed_unknown_tickers"] == ("MSFT",)
+
+
+def test_sell_orders_do_not_reduce_headroom():
+    """Only BUYs consume deployable room; a pending sell releases it."""
+    working = [{"ticker": "AAPL", "side": "sell", "shares": 10, "limit_price": 400.0}]
+    bounds = evaluate_idle_cash(
+        _snapshot_with_open_orders(
+            87_000.0, [_position("AAPL", 13_000.0)], 100_000.0, working
+        ),
+        _policy(), _MANDATE,
+    )["policy_bounds"]
+    assert bounds["capital_already_committed"] == "0"

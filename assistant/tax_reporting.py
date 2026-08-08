@@ -42,18 +42,28 @@ from datetime import datetime, timezone
 from decimal import Decimal
 from types import MappingProxyType
 from typing import Any, Mapping
-from zoneinfo import ZoneInfo
 
 from assistant.corporate_actions import fills_with_confirmed_splits
 from assistant.money import decimal_text, to_decimal
 from assistant.portfolio_ledger import SHARE_TOLERANCE
 from assistant.storage import AssistantStore
-from assistant.tax_lots import LotLedger, RealizedComponent, TaxLotError, build_ledger
+from assistant.tax_lots import (
+    MARKET_TIMEZONE,
+    LotLedger,
+    RealizedComponent,
+    TaxLotError,
+    build_ledger,
+)
 
 # US tax years are calendar years in the taxpayer's local time; this
 # project's trading clock is the US market's, so sales are bucketed in
 # Eastern time rather than UTC (see the module docstring).
-TAX_YEAR_TIMEZONE = ZoneInfo("America/New_York")
+# One definition, imported rather than restated (FCS-016). The zone that
+# decides a sale's tax year is the same zone that decides whether its holding
+# period crossed one year; defining it twice let `is_long_term` judge in UTC
+# while this module printed and bucketed in New York, so an exported row could
+# read "acquired 2025-03-10, sold 2026-03-10, LONG-TERM".
+TAX_YEAR_TIMEZONE = MARKET_TIMEZONE
 
 SHORT_TERM = "short"
 LONG_TERM = "long"

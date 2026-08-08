@@ -460,11 +460,13 @@ def verify_execution_authorization(
     _consumed_authorization_tokens[authorization.token] = authorization.expires_at
 
 
-def worst_case_fill_price(intent: TradeIntent, reference_price: float) -> float:
+def worst_case_fill_price_decimal(
+    intent: TradeIntent, reference_price: MoneyInput
+) -> Decimal:
     """
     The most expensive price `intent` could actually fill at -- what every
-    dollar-denominated risk check should be priced against, rather than the
-    current quote.
+    dollar-denominated risk check is priced against, rather than the current
+    quote.
 
     A BUY limit order can fill anywhere up to its limit price, so pricing its
     risk at the quote understates every dollar cap whenever limit_price >
@@ -479,26 +481,19 @@ def worst_case_fill_price(intent: TradeIntent, reference_price: float) -> float:
     sells at a worst case could newly block an exposure-REDUCING order, the
     one direction this gate must never obstruct.
 
-    Shared by validate_trade_intent() and allocation_batch's
-    preflight_allocation_batch() (which reserves cash per approved leg) so the
-    two cannot drift apart -- they underestimated identically before this
-    existed. Falls back to `reference_price` unchanged for market orders, for
-    a missing/non-finite limit price, and whenever the limit is at or below
-    the quote; a non-finite reference_price is returned as-is so the caller's
-    own INVALID_REFERENCE_PRICE check still fires rather than being masked.
+    Shared by validate_trade_intent(), execution_kernel/submit.py's daily
+    budget notional, and allocation_batch's preflight_allocation_batch()
+    (which reserves cash per approved leg) so the three cannot drift apart --
+    they underestimated identically before this existed.
+
+    Returns `reference_price` unchanged for market orders, for a SELL, and
+    for a missing or unparseable limit price; `max(reference, limit)`
+    otherwise. A non-finite `reference_price` RAISES here via to_decimal
+    rather than being passed through -- the float wrapper that used to
+    swallow it and defer to the caller's INVALID_REFERENCE_PRICE check was
+    removed as dead code on 2026-08-07 (FCS-006), and every live caller
+    validates the reference price before reaching this function.
     """
-    try:
-        return float(worst_case_fill_price_decimal(intent, reference_price))
-    except ValueError:
-        # Preserve the helper's historical contract for corrupt reference
-        # values: the caller's INVALID_REFERENCE_PRICE check owns rejection.
-        return reference_price
-
-
-def worst_case_fill_price_decimal(
-    intent: TradeIntent, reference_price: MoneyInput
-) -> Decimal:
-    """Exact counterpart used by every dollar-denominated safety check."""
     reference = to_decimal(reference_price, name="reference_price")
     limit = (
         decimal_or_none(intent.limit_price)
@@ -1272,10 +1267,26 @@ def validate_trade_intent(
     earnings_days_away: int | None = None,
     bid_price: float | None = None,
     ask_price: float | None = None,
-    max_position_pct: float = MAX_POSITION_PCT,
-    max_total_exposure_pct: float = MAX_TOTAL_EXPOSURE_PCT,
-    max_basket_pct: float = 40.0,
-    max_leveraged_etf_pct: float = 20.0,
+    # FCS-008 -- UNITS ARE NOT UNIFORM ACROSS THESE FIVE. Read before adding a
+    # caller; the names give you no help at all.
+    #
+    #   FRACTION of equity (0.05 == 5%), multiplied by 100 inside the gate:
+    #       max_position_pct, max_total_exposure_pct, min_cash_reserve_pct
+    #   PERCENT already (40.0 == 40%), compared as-is:
+    #       max_basket_pct, max_leveraged_etf_pct
+    #
+    # `TradingPolicy` stores ALL FIVE as fractions, so the only caller
+    # (`execution_kernel/validate.py`) hand-multiplies exactly the middle two
+    # by 100. Get it wrong in the fraction direction and a cap becomes 100x
+    # too LOOSE -- a 5% per-position limit turns into 500%. Two tests catch
+    # that today (verified by mutation), but nothing catches it at the
+    # signature, and GR-2 deliberately created `checks_for_phase("proposal")`
+    # as a future second caller. If you consolidate the scatter points named
+    # in docs/ARCHITECTURE_DEBT.md §2, normalise these to one unit first.
+    max_position_pct: float = MAX_POSITION_PCT,  # fraction
+    max_total_exposure_pct: float = MAX_TOTAL_EXPOSURE_PCT,  # fraction
+    max_basket_pct: float = 40.0,  # PERCENT
+    max_leveraged_etf_pct: float = 20.0,  # PERCENT
     max_stale_price_minutes: float = 15.0,
     max_slippage_pct: float = 1.0,
     max_spread_pct: float = 0.5,

@@ -188,7 +188,10 @@ def transaction_readiness(
     )
     reconciliation_fresh = (
         reconciled_at is not None
-        and now - reconciled_at <= timedelta(minutes=max_reconciliation_age_minutes)
+        # FCS-017: a future-dated reconciliation must not read as fresh.
+        and timedelta(0)
+        <= now - reconciled_at
+        <= timedelta(minutes=max_reconciliation_age_minutes)
         and int(last_reconciliation.get("error_count", 0)) == 0
     )
     checks.append(

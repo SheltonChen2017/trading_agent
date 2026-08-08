@@ -112,9 +112,14 @@ def operational_health(
         if isinstance(latest_reconciliation, dict)
         else None
     )
+    # FCS-017: lower bound too. `now - at <= limit` is True for ANY future
+    # timestamp, so clock skew or a hand-inserted row made a stale control read
+    # as fresh. `_should_create_backup` below and every check in
+    # ml/evidence_operations.py already guard this; these three did not.
     reconciliation_ok = (
         reconciliation_at is not None
-        and now - reconciliation_at
+        and timedelta(0)
+        <= now - reconciliation_at
         <= timedelta(minutes=max_ledger_reconciliation_age_minutes)
         and bool(latest_reconciliation.get("matched"))
     )
@@ -153,7 +158,7 @@ def operational_health(
             backup_integrity = [f"verification failed: {exc}"]
     backup_ok = (
         backup_at is not None
-        and now - backup_at <= timedelta(hours=max_backup_age_hours)
+        and timedelta(0) <= now - backup_at <= timedelta(hours=max_backup_age_hours)  # FCS-017
         and backup_path is not None
         and backup_path.exists()
         and backup_integrity == ["ok"]
@@ -181,7 +186,7 @@ def operational_health(
     )
     drill_ok = (
         drill_at is not None
-        and now - drill_at <= timedelta(days=max_restore_drill_age_days)
+        and timedelta(0) <= now - drill_at <= timedelta(days=max_restore_drill_age_days)  # FCS-017
         and bool(drill.get("passed"))
     )
     checks.append(

@@ -39,6 +39,7 @@ from typing import Any
 from assistant.mandate import PortfolioMandate
 from assistant.money import decimal_text, to_decimal
 from assistant.policy import TradingPolicy
+from assistant.portfolio_analytics import estimate_pending_buy_value_by_ticker
 from assistant.schemas import PortfolioSnapshot
 
 # The invested fraction below which `required_invested_volatility_pct` stops
@@ -108,16 +109,48 @@ def evaluate_idle_cash(
     cash_above_reserve = cash - reserve_floor
     unused_exposure_capacity = exposure_ceiling - invested
 
+    # FCS-004: pending BUY orders have already spoken for some of this room.
+    # `risk/execution_gate.py` folds them into both bounds -- the cash check
+    # uses `min(cash, buying_power)` (buying_power nets broker holds out) and
+    # the exposure check adds `total_pending_buy_value` to invested value. This
+    # report used raw cash and raw market value, so it advertised headroom the
+    # gate would refuse. Third recurrence of the class already fixed in
+    # `allocation_proposals.build_allocation_plan` and
+    # `portfolio_analytics.preview_trade_impact`.
+    #
+    # Estimated WITHOUT a live quote call, exactly like the UI preview: a
+    # read-only report must not fire a network request per pending order. An
+    # order whose value cannot be determined from the order itself is reported
+    # as unknown rather than counted as zero, so a reader can tell an
+    # incomplete projection from a complete one.
+    # Named "committed capital" rather than anything containing "buy"/"order":
+    # `test_report_carries_no_action_shaped_field` lexically forbids those in a
+    # reporting payload's KEYS, and it is right to -- these figures describe
+    # money already spoken for, which is state, not an instruction. The guard
+    # caught the first naming attempt; that is the guard working.
+    committed_by_ticker, committed_unknown = estimate_pending_buy_value_by_ticker(
+        list(snapshot.open_orders)
+    )
+    committed_capital = sum(
+        (
+            to_decimal(value, name="committed capital")
+            for value in committed_by_ticker.values()
+        ),
+        Decimal("0"),
+    )
+    cash_above_reserve_net = cash_above_reserve - committed_capital
+    unused_exposure_capacity_net = unused_exposure_capacity - committed_capital
+
     # What actually limits further deployment is whichever bound binds
     # first. This is a measurement of headroom, NOT a suggested order size:
     # it says how much room the policy leaves, not that the room should be
     # used.
-    headroom = min(cash_above_reserve, unused_exposure_capacity)
+    headroom = min(cash_above_reserve_net, unused_exposure_capacity_net)
     if headroom < 0:
         headroom = Decimal("0")
     binding_constraint = (
         "cash_reserve_floor"
-        if cash_above_reserve <= unused_exposure_capacity
+        if cash_above_reserve_net <= unused_exposure_capacity_net
         else "exposure_ceiling"
     )
 
@@ -222,7 +255,23 @@ def evaluate_idle_cash(
             "cash_above_reserve": decimal_text(cash_above_reserve),
             "reserve_floor_breached": bool(cash_above_reserve < 0),
             "unused_exposure_capacity": decimal_text(unused_exposure_capacity),
+            # FCS-004. Both bounds are published twice: before pending orders
+            # (what the account holds) and after (what the execution gate would
+            # actually permit). `policy_headroom` is the AFTER figure, because
+            # that is the question a reader is really asking.
+            "capital_already_committed": decimal_text(committed_capital),
+            "capital_already_committed_unknown_tickers": tuple(
+                sorted(committed_unknown)
+            ),
+            "committed_capital_complete": not committed_unknown,
+            "cash_above_reserve_net_of_commitments": decimal_text(
+                cash_above_reserve_net
+            ),
+            "unused_exposure_capacity_net_of_commitments": decimal_text(
+                unused_exposure_capacity_net
+            ),
             "policy_headroom": decimal_text(headroom),
+            "policy_headroom_basis": "net_of_committed_capital",
             "binding_constraint": binding_constraint,
         },
         "mandate_objective": {

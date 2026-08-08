@@ -188,8 +188,12 @@ it for that specific endpoint with the observed body recorded.
 ## 3. Standing engineering watch items
 
 - **`Decimal(str(...))` on money or share fields.** Three consecutive review
-  passes each found another one (FPS-001 → GFPS-001 → CFPS-001). All known
-  remaining raw sites sit inside their own `try/except` conversion helpers.
+  passes each found another one (FPS-001 → GFPS-001 → CFPS-001). **A fourth
+  appeared 2026-08-07 (FCS-005): `execution/alpaca_broker.py:273-274`, bare,
+  outside any conversion helper — so the earlier claim that every remaining
+  `alpaca_broker` site is wrapped was describing line 100, a different
+  function.** The trigger condition below has therefore been met: build the
+  guard, do not point-fix a fifth.
   If a fourth appears, the answer is a lint or AST guard banning bare
   `Decimal(str(...))` outside `assistant/money.py` — not another point fix.
   The trap is that `InvalidOperation` is an `ArithmeticError`, so it escapes
@@ -219,6 +223,65 @@ it for that specific endpoint with the observed body recorded.
   `Observation.value_before_flow` without subtracting flow credits deposits
   as return (GR7CFOLLOW-001: attribution reported ~+33% on a pure deposit
   series). Invested weight still uses post-flow equity.
+- **A guard added to one generator is not added to its sibling.** 2026-08-07
+  (FCS-001): `assistant/proposals.py` has guarded
+  `int(<dollars> / position.current_price)` against zero/NaN since 2026-07-29,
+  with a comment naming the crash. `assistant/strategy_proposals.py` — written
+  later, same idiom, four sites — never got it. An AST sweep for
+  `int(<expr>/<expr>)` finds exactly six sites repo-wide, so re-checking is
+  cheap: run the sweep, then read each hit **beside its sibling**, because the
+  scan alone cannot tell a guarded site from an unguarded one.
+- **A narrow `except` clause in the UI can suppress risk reduction.** Same
+  finding; **fixed 2026-08-07**, the rule is what outlives it.
+  `scripts/personal_assistant_ui.py` caught only
+  `MissingResearchDependencyError` / `StrategyMarketDataError` around the
+  strategy generator, while the CLI caught `Exception`. Anything else escaped
+  and the already-computed risk-reduction proposals were never rendered or
+  saved. Whenever an optional feature shares a handler with risk-reduction
+  proposals, the optional feature's failure must not take the mandatory one
+  down with it — and the handler must catch `Exception`, because the failure
+  mode is by definition the exception nobody predicted (here a
+  `ZeroDivisionError` from a module whose declared error types are all about
+  market data). Pinned by an AST test over both entry points.
+  Related severity lesson: the first write-up of this finding claimed a NaN
+  price was reachable. It is not — `context_builder.build_portfolio_snapshot`
+  rejects non-finite prices and the Alpaca builder delegates to it. The
+  reproduction had constructed a `PortfolioPosition` directly, bypassing the
+  boundary. **A repro that hand-builds a domain object may be skipping the
+  validation the real path performs; check which constructor production
+  actually uses before assigning severity.**
+- **Counting rows a metric did not score.** FPS-004 fixed this in
+  `ml/earnings_experiments.py::_slice_metrics` and added
+  `ml/evaluation.py::usable_pair_count()` for it. 2026-08-07 (FCS-002) found
+  the same class *twice more in the same module*: `calibration_error` divides
+  a numerator over finite pairs by `len(actual)` (raw), and
+  `candidate_evaluated_event_count` is a raw `len()` beside five
+  pair-dropping metrics. Measured: holding four good predictions fixed and
+  adding NaN predictions, the reported calibration error falls
+  0.1500 → 0.0600 → 0.0300 → 0.0150. `ml/volatility_evaluation.py:405-406` is
+  the correct house pattern — publish `row_count` **and** `usable_row_count`,
+  and compute on `[usable]`.
+- **Freshness checks without a lower bound read a future timestamp as fresh.**
+  2026-08-07 (FCS-017). `now - at <= limit` is True for any `at` in the future,
+  so clock skew, a timezone misconfiguration, or a hand-inserted row makes a
+  stale control look current. This codebase writes the check **both ways**:
+  `operations.py:304`, `alert_delivery.py:412` and
+  `evidence_operations.py:125,358,375` guard with `timedelta(0) <= …`, while
+  `operations.py:117,156,184` and `readiness.py:191` do not — including two
+  checks (`backup age`, `restore-drill age`) that `evidence_operations`
+  evaluates fail-closed over the *same facts*, so the platform can report the
+  backup fresh and stale at once depending which report you read. Always write
+  `timedelta(0) <= now - at <= limit`.
+- **A boundary test whose inputs cannot fail the bug.** 2026-08-07 (FCS-016):
+  `tax_lots.is_long_term` compares timestamps where the rule is date-based, so
+  a sale on the one-year anniversary at a later time of day than the purchase
+  is wrongly long-term. Both existing boundary tests
+  (`tests/test_tax_lots.py:189-199`) use **15:00 for the buy and 15:00 for the
+  sell** — the single alignment where the buggy comparison agrees with the
+  correct one. Three review rounds read a green test named
+  `test_one_year_exactly_is_still_short_term` and moved on. When a test names
+  a boundary, check that its inputs actually straddle it in every dimension
+  the implementation reads (here: time-of-day, not just date).
 - **FPS-003**, the intermittent `test_app_title_is_trading_assistant`
   failure, remains open. Severity looks overstated at P2 — it has passed
   every full run since. **Do not close it on a green suite**; capture the

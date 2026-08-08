@@ -547,7 +547,7 @@ as GR-1C). The mechanical pre/post facade-surface comparison shows nothing
 removed and exactly two additions (`ReconciliationDeps`,
 `run_submission_reconciliation`, both the exact kernel objects). The atomic
 claim and every conditional transition remain `AssistantStore` operations.
-`execution_service.py` is now 952 lines (from 1,094); `reconcile.py` was 269 at implementation (279 after the GR-3 review routed its mismatch halts through `activate_reconciliation_halt`).
+`execution_service.py` was 952 lines at GR-1D (from 1,094) and is 900 as of 2026-08-07; `reconcile.py` was 269 at implementation, 279 after the GR-3 review routed its mismatch halts through `activate_reconciliation_halt`, and is 258 today. **These are measurements, not gates** (FCS-010): they drift with ordinary edits, and the GR-1E adjudication below rests on the FUNCTION sizes, which are unchanged.
 
 ### GR-1D mutation results
 
@@ -599,7 +599,7 @@ the function contains 54 statement nodes, 49 call nodes, and 28 distinct call
 expressions. Those calls include kernel phases, gate and telemetry seams,
 ordinary constructors/formatters, and exactly one broker submission call.
 
-#### What the facade actually contains (952 lines)
+#### What the facade actually contains (952 lines at GR-1E; 900 as of 2026-08-07 -- the difference left the module docstring in GR-4 commit `7eef1c5`, and every function size below is unchanged)
 
 | Segment | Lines | Of which executable code |
 |---|---|---|

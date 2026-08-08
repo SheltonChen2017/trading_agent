@@ -56,6 +56,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import math
 from datetime import datetime, timedelta, timezone
 
 import pandas as pd
@@ -126,6 +127,29 @@ class StrategyMarketDataError(RuntimeError):
 
 class MarketDataUnavailableError(StrategyMarketDataError):
     """The provider did not return the bars required by the strategy."""
+
+
+class StrategyPositionDataError(StrategyMarketDataError):
+    """A held leg carries no usable price, so a rebalance cannot be sized.
+
+    FCS-001. Sizing divides by ``position.current_price`` at four sites. A
+    zero, negative, or non-finite price made those raise ZeroDivisionError or
+    ``ValueError: cannot convert float NaN to integer`` -- exceptions this
+    module never declares, so the Streamlit caller (which caught only
+    ``MissingResearchDependencyError`` and ``StrategyMarketDataError``) let
+    them escape its handler and never rendered the RISK-REDUCTION proposals it
+    had already computed in the same block. An optional strategy check must
+    never be able to suppress a risk-reducing sell.
+
+    ``assistant/proposals.py`` has guarded the identical idiom since
+    2026-07-29; that guard was simply never generalized to this module.
+
+    Deliberately a ``StrategyMarketDataError`` subclass so both existing
+    callers already catch it -- a new top-level exception type would be a new
+    escape of exactly the kind this fixes. Raised loudly rather than returning
+    ``[]``: "we could not check" is not "no rebalance needed", the same
+    distinction GR-4 draws for missing bars.
+    """
 
 
 class StaleMarketDataError(StrategyMarketDataError):
@@ -355,6 +379,22 @@ def _generate_leveraged_pair_rebalance_proposals(
     combined_value = stable_position.market_value + leveraged_position.market_value
     if combined_value <= 0:
         return []
+
+    # FCS-001: validate BOTH legs' prices before any sizing arithmetic.
+    # `combined_value` guards market_value, not current_price -- and those are
+    # separate broker fields, so a halted or unpriced leg can carry a stale
+    # non-zero market_value alongside a zero/NaN price. math.isfinite, not just
+    # `<= 0`: every ordered comparison against NaN is False, so a bare
+    # positivity check passes it straight through to `int(x / NaN)`.
+    for position in (stable_position, leveraged_position):
+        price = position.current_price
+        if not isinstance(price, (int, float)) or isinstance(price, bool) or (
+            not math.isfinite(price) or price <= 0
+        ):
+            raise StrategyPositionDataError(
+                f"{position.ticker} has no usable current price ({price!r}); "
+                "refusing to size a rebalance from an unpriced or halted leg"
+            )
 
     if market_data is None:
         if store is not None:

@@ -3,6 +3,7 @@ rebalance proposal generator. Uses hand-injected market_data (no
 network) so results are deterministic and independently verifiable
 against the same underlying regime/vol-target functions the generator
 itself calls."""
+import dataclasses
 import sys
 from pathlib import Path
 
@@ -10,15 +11,26 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import numpy as np
 import pandas as pd
+import pytest
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import TradingPolicy
-from assistant.schemas import DecisionPacket, EvidenceStatus, FindingProvenance, MarketRegime, SignalEvidence
+from assistant.schemas import (
+    DecisionPacket,
+    EvidenceStatus,
+    FindingProvenance,
+    MarketRegime,
+    PortfolioPosition,
+    PortfolioSnapshot,
+    SignalEvidence,
+)
 import assistant.strategy_proposals as strategy_proposals
 from assistant.strategy_proposals import (
     LEVERAGED_TICKER,
     PRODUCTION_PARAMS,
     STABLE_TICKER,
+    StrategyMarketDataError,
+    StrategyPositionDataError,
     generate_soxx_soxl_rebalance_proposals,
 )
 from market_analytics import classify_trend
@@ -486,6 +498,152 @@ def test_no_store_given_does_not_raise():
     market_data = _market_data()
     packet = _packet([])
     assert generate_soxx_soxl_rebalance_proposals(packet, _policy(), market_data=market_data) == []
+
+
+# --------------------------------------------------------------------------
+# FCS-016 sibling class: unusable position prices (FCS-001)
+#
+# assistant/proposals.py has guarded `int(<dollars> / position.current_price)`
+# against zero/NaN since 2026-07-29, with a comment naming the crash. This
+# module -- written later, same idiom, four sites -- never got the guard, so a
+# halted or unpriced leg raised ZeroDivisionError / ValueError. The CLI catches
+# Exception and degrades, but the Streamlit handler caught only two narrow
+# types, so the escape SUPPRESSED risk-reduction sell proposals that had
+# already been computed in the same handler.
+# --------------------------------------------------------------------------
+
+def _packet_with_leveraged_price(price: float) -> DecisionPacket:
+    """Both legs held and far outside the band, but one leg has no usable price."""
+    return _packet(
+        [
+            {"ticker": STABLE_TICKER, "shares": 100, "entry_price": 50.0, "current_price": 50.0},
+            {"ticker": LEVERAGED_TICKER, "shares": 100, "entry_price": 20.0, "current_price": price},
+        ]
+    )
+
+
+# Zero and negative only. NaN/Infinity are rejected upstream by
+# context_builder.build_portfolio_snapshot -- which the live Alpaca builder
+# delegates to -- so they cannot reach this generator through either
+# production path. Zero and negative ARE finite, pass that boundary, and are
+# what a halted or unpriced leg actually looks like; both proposals.py and
+# allocation_proposals.py guard `price <= 0` for the same reason.
+@pytest.mark.parametrize("bad_price", [0.0, -5.0])
+def test_an_unusable_leveraged_price_refuses_instead_of_crashing(bad_price):
+    packet = _packet_with_leveraged_price(bad_price)
+    with pytest.raises(StrategyPositionDataError) as excinfo:
+        generate_soxx_soxl_rebalance_proposals(
+            packet, _policy(), market_data=_market_data()
+        )
+    assert LEVERAGED_TICKER in str(excinfo.value)
+
+
+@pytest.mark.parametrize("bad_price", [0.0, -5.0])
+def test_an_unusable_stable_price_refuses_instead_of_crashing(bad_price):
+    packet = _packet(
+        [
+            {"ticker": STABLE_TICKER, "shares": 100, "entry_price": 50.0, "current_price": bad_price},
+            {"ticker": LEVERAGED_TICKER, "shares": 100, "entry_price": 20.0, "current_price": 20.0},
+        ]
+    )
+    with pytest.raises(StrategyPositionDataError) as excinfo:
+        generate_soxx_soxl_rebalance_proposals(
+            packet, _policy(), market_data=_market_data()
+        )
+    assert STABLE_TICKER in str(excinfo.value)
+
+
+@pytest.mark.parametrize("bad_price", [float("nan"), float("inf")])
+def test_a_non_finite_price_is_refused_if_the_snapshot_boundary_is_bypassed(bad_price):
+    """Defense in depth for a snapshot that did NOT come from the builder.
+
+    `build_portfolio_snapshot` rejects non-finite prices, so neither live
+    production path can deliver one here. A `PortfolioSnapshot` assembled
+    directly -- a deserialized stored packet, a fixture, a future caller --
+    carries no such guarantee, and `PortfolioPosition` has no `__post_init__`
+    of its own. The guard must not depend on someone else having validated.
+    """
+    snapshot = PortfolioSnapshot(
+        positions=[
+            PortfolioPosition(
+                ticker=STABLE_TICKER, shares=100.0, entry_price=50.0,
+                current_price=50.0, market_value=5_000.0,
+                unrealized_pnl_pct=0.0, is_leveraged_etf=False,
+            ),
+            PortfolioPosition(
+                ticker=LEVERAGED_TICKER, shares=100.0, entry_price=20.0,
+                current_price=bad_price, market_value=8_000.0,
+                unrealized_pnl_pct=0.0, is_leveraged_etf=True,
+            ),
+        ],
+        cash=5_000.0, total_equity=18_000.0, as_of="2026-08-07",
+        source="alpaca", account_mode="paper",
+    )
+    packet = dataclasses.replace(_packet([]), portfolio=snapshot)
+    with pytest.raises(StrategyPositionDataError):
+        generate_soxx_soxl_rebalance_proposals(
+            packet, _policy(), market_data=_market_data()
+        )
+
+
+def test_the_refusal_is_a_type_both_existing_handlers_already_catch():
+    """The refusal must not be a NEW escape for the callers that already exist.
+
+    The UI catches (MissingResearchDependencyError, StrategyMarketDataError);
+    raising anything outside that tuple is what caused FCS-001 in the first
+    place.
+    """
+    assert issubclass(StrategyPositionDataError, StrategyMarketDataError)
+
+
+def test_both_entry_points_catch_broadly_around_the_strategy_generator():
+    """No strategy-side exception may suppress risk-reduction proposals.
+
+    Source-level rather than behavioural on purpose: the invariant is a
+    property of a CALL SITE's handler breadth, and the two call sites live
+    inside a Streamlit script and an argparse command whose surrounding
+    machinery a unit test cannot cheaply stand up. The behavioural half --
+    that the generator no longer raises an uncaught type -- is covered by the
+    tests above.
+
+    Both handlers must catch `Exception`, because the failure mode is
+    precisely an exception nobody predicted: FCS-001 was a ZeroDivisionError
+    from a module whose declared error types are all about market data.
+    """
+    import ast
+
+    repository_root = Path(__file__).resolve().parent.parent
+    for relative in (
+        "scripts/personal_assistant_ui.py",
+        "scripts/run_personal_assistant.py",
+    ):
+        tree = ast.parse((repository_root / relative).read_text(encoding="utf-8"))
+        guarded = []
+        for node in ast.walk(tree):
+            if not isinstance(node, ast.Try):
+                continue
+            body = ast.unparse(node.body)
+            if "generate_leveraged_pair_rebalance_proposals" not in body:
+                continue
+            caught = set()
+            for handler in node.handlers:
+                if handler.type is None:
+                    caught.add("bare")
+                    continue
+                names = (
+                    handler.type.elts
+                    if isinstance(handler.type, ast.Tuple)
+                    else [handler.type]
+                )
+                caught.update(ast.unparse(name) for name in names)
+            guarded.append(caught)
+        assert guarded, f"{relative}: no try/except wraps the strategy generator"
+        for caught in guarded:
+            assert "Exception" in caught or "bare" in caught, (
+                f"{relative}: the strategy generator is guarded by {sorted(caught)}, "
+                "which lets an unforeseen exception escape and suppress the "
+                "risk-reduction proposals computed in the same handler (FCS-001)"
+            )
 
 
 if __name__ == "__main__":

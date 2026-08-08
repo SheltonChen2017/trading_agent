@@ -250,6 +250,16 @@ it for that specific endpoint with the observed body recorded.
   0.1500 → 0.0600 → 0.0300 → 0.0150. `ml/volatility_evaluation.py:405-406` is
   the correct house pattern — publish `row_count` **and** `usable_row_count`,
   and compute on `[usable]`.
+- **A boundary test whose inputs cannot fail the bug.** 2026-08-07 (FCS-016):
+  `tax_lots.is_long_term` compares timestamps where the rule is date-based, so
+  a sale on the one-year anniversary at a later time of day than the purchase
+  is wrongly long-term. Both existing boundary tests
+  (`tests/test_tax_lots.py:189-199`) use **15:00 for the buy and 15:00 for the
+  sell** — the single alignment where the buggy comparison agrees with the
+  correct one. Three review rounds read a green test named
+  `test_one_year_exactly_is_still_short_term` and moved on. When a test names
+  a boundary, check that its inputs actually straddle it in every dimension
+  the implementation reads (here: time-of-day, not just date).
 - **FPS-003**, the intermittent `test_app_title_is_trading_assistant`
   failure, remains open. Severity looks overstated at P2 — it has passed
   every full run since. **Do not close it on a green suite**; capture the

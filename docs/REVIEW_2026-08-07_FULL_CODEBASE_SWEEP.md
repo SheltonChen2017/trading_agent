@@ -19,11 +19,10 @@ the operational checkout stays frozen at `9a91498` under `paper-epoch-002`.
 
 ## 1. Headline
 
-**No P0. No P1. Three confirmed P2 defects, all reproduced. Thirteen P3.**
+**No P0. No P1. Four confirmed P2 defects, all reproduced. Twelve P3.**
 
-The two P2s that matter most are both *recurrences of classes this project
-has already fixed elsewhere*, at sites the earlier fix was never generalized
-to:
+Two of the P2s are *recurrences of classes this project has already fixed
+elsewhere*, at sites the earlier fix was never generalized to:
 
 - **FCS-001** — `assistant/strategy_proposals.py` divides by
   `position.current_price` with no finiteness guard, where the sibling
@@ -39,6 +38,17 @@ to:
   `usable_pair_count()` — the helper created to prevent it — exists and is
   not used here.
 
+The fourth, **FCS-016**, is the only *arithmetically wrong* value found:
+`assistant/tax_lots.py::is_long_term` compares timestamps where its own
+docstring and the IRS rule are date-based, so a sale on the one-year
+anniversary at a later time of day than the purchase is classified
+**long-term when it is short-term** — understating tax in the
+accountant-facing GR-7a export, on precisely the "hold one year, then sell"
+behaviour a tax-aware holder deliberately creates. Both existing boundary
+tests use the same time-of-day for buy and sell, which is the one case where
+the buggy comparison agrees with the correct one; that is why three review
+rounds passed over it.
+
 The first prior ledger is genuinely closed: all four 2026-07-30 P1s were
 verified fixed in code, not assumed (§4).
 
@@ -49,6 +59,7 @@ verified fixed in code, not assumed (§4).
 | FCS-001 | **P2** | Open | `assistant/strategy_proposals.py:452,454,465,466`; handler `scripts/personal_assistant_ui.py:2668` | Order sizing computes `int(policy.max_order_value / leveraged_position.current_price)` with no finiteness/positivity guard. `PortfolioPosition` has no `__post_init__`, so a zero or NaN `current_price` beside a stale non-zero `market_value` is constructible from a broker snapshot. The CLI catches `Exception` and degrades; the **UI catches only `MissingResearchDependencyError` and `StrategyMarketDataError`**, so the exception escapes, `st.session_state["current_proposals"]` is never assigned, and `store.save_proposal` never runs. | Reproduced end to end. `current_price=0.0`: risk-reduction generator returns `[('sell', 25, 'SOXX')]`, strategy generator raises `ZeroDivisionError`, UI handler does not catch. `current_price=NaN`: `ValueError: cannot convert float NaN to integer`. `tests/test_strategy_proposals.py` has 18 tests, none covering either input. | A data-quality fault in an **optional strategy** feature obstructs an already-computed **risk-reducing sell** — the exact direction CLAUDE.md §5 forbids. `assistant/proposals.py:59-70` already guards the identical idiom, citing this failure (independent review, 2026-07-29); the guard was never generalized. |
 | FCS-002 | **P2** | Open | `ml/earnings_experiments.py:425-429` (and `:695`) | `calibration_error = Σ_bins count·\|mean_pred − obs_freq\| / len(actual)`. `calibration_curve` calls `_finite_pairs` (`ml/evaluation.py:196`), so the bin counts sum to **finite pairs only**, while the denominator is the **raw** array length. The metric therefore shrinks toward zero as coverage worsens. Separately, `:695` publishes `candidate_evaluated_event_count = len(validation_eval)` beside `brier_score`, `log_loss`, `precision`, `recall`, and `calibration_error`, all of which drop non-finite pairs. | Quantified: 10 events / 4 finite predictions → reported 0.0600 vs correct 0.1500 (2.5× understated). Holding the same four good predictions fixed and adding NaNs: 4 events → 0.1500, 10 → 0.0600, 20 → 0.0300, 40 → 0.0150. | This is FPS-004's exact failure direction ("the number improves as coverage gets worse") in the same module, and CLAUDE.md §6 makes calibration the measurement that governs whether a probability may ever be called calibrated. `ml/volatility_evaluation.py:404-406` shows the correct house pattern (publishes both `row_count` and `usable_row_count`, computes on `[usable]`). |
 | FCS-003 | **P2** | Open | `research/quantconnect.py:155-184` | `_assert_allowed` rejects literal `..`, `\`, `//`, `://` but not their percent-encoded forms. `urllib` does not normalize, and servers/CDNs routinely decode-then-route. | Executable: `backtests/../data/read` → rejected; `backtests/%2e%2e/data/read`, `backtests/%2E%2E/data/read`, `backtests/.%2e/data/read` → **ALLOWED**. | `docs/SESSION_HANDOFF.md` §5 designates this allowlist as *the* enforcement of the QuantConnect licence boundary, and QCREV-002 hardened this exact function against this exact bypass class one day earlier. Dormant module (no caller, no credentials, not in the frozen checkout), so defense-in-depth rather than a live breach. Fix: `unquote()` before checking, or reject `%` outright — no allowlisted endpoint needs it. |
+| FCS-016 | **P2** | Open | `assistant/tax_lots.py:219-237` (`is_long_term`), `:581-585` (`_long_term_date`) | `is_long_term` builds `one_year_on = acquired_at.replace(year=+1)` — a full **timestamp** — then returns `sold_at > one_year_on`. Its own docstring states the rule is date-based: *"a position bought 2025-03-10 and sold exactly 2026-03-10 is still SHORT term; it becomes long term on 2026-03-11."* So any sale on the anniversary **date** at a later time of day than the purchase is classified long-term. Same defect on the leap-day branch. Separately, `_long_term_date` (which drives `days_to_long_term`) implements a *different* boundary — `replace(year=+1) + 1 day` — so the countdown and the classification disagree by up to a day. | Reproduced. Acquired 2025-03-10 15:00Z: sold 2026-03-10 at 09:00 → False, 15:00 → False, **16:00 → True (wrong)**, 20:00 → True (wrong). Leap day identical: acquired 2024-02-29 15:00Z, sold 2025-03-01 16:00 → True (wrong). A date-based comparison returns the documented answer at every time of day. | `RealizedComponent.long_term` flows into `assistant/tax_reporting.py:251` (`holding_period=LONG_TERM if …`) and the short/long totals at `:465`, i.e. the **CSV/JSON that goes to an accountant**, and into the pre-sale `tax_lot_advisory` on risk-reduction proposals. The failure direction is the harmful one: it understates tax and tells the user "long" on the anniversary, encouraging the sale. **Why three rounds missed it:** `tests/test_tax_lots.py:189-199`'s two boundary tests both use 15:00 for buy *and* sell — the single case where the timestamp comparison agrees with the date rule, so the tests cannot distinguish the correct implementation from this one. Fix: compare `.date()` values, and derive `_long_term_date` from the same boundary. |
 | FCS-004 | P3 | Open | `assistant/cash_reporting.py:98-122` | `policy_headroom` is computed from raw `snapshot.cash` and `sum(market_value)`; the module never reads `snapshot.open_orders` or `snapshot.buying_power`, both present on the dataclass. `risk/execution_gate.py` folds pending buys into both bounds — `min(cash, buying_power)` at `:857-868` and `equity − cash + total_pending_buy_value` at `:894-898`. Headroom therefore overstates deployable room by the pending-buy amount. | `grep buying_power\|open_orders assistant/cash_reporting.py` → no matches. | Third recurrence of the class already fixed in `allocation_proposals.build_allocation_plan` and `portfolio_analytics.preview_trade_impact` (2026-07-31, P1 #3). GR-7b's definition of done is "cash measured against the policy's bounds"; the gate's bounds include pending orders. |
 | FCS-005 | P3 | Open | `execution/alpaca_broker.py:273-274` | `bid_decimal = Decimal(str(quote.bid_price))` — bare, outside any conversion helper. Verified: `Decimal('NaN') > 0` **raises** `InvalidOperation`; `Decimal('Infinity')` passes `> 0` and propagates as `price_decimal="Infinity"`. Currently fail-closed at every consumer (`validate.py:446` `except Exception`, `decimal_or_none`, `math.isfinite` in `allocation_proposals`), so latent, not live. | Verified in the interpreter. `_optional_float` in the same file already guards `math.isfinite`, so the codebase expects non-finite broker values. | Fourth occurrence of the `OPERATIONAL_FACTS` §3 watch class, whose own instruction is that a fourth means "a lint or AST guard banning bare `Decimal(str(...))` outside `assistant/money.py` — not another point fix". It also falsifies the counter-review's claim that the remaining `alpaca_broker` site is "wrapped in its own try/except conversion helper" — that describes line 100, a different function. |
 | FCS-006 | P3 | Open | `risk/execution_gate.py:463` | `worst_case_fill_price` (float) has **zero references repo-wide including tests**; all three live sites use `worst_case_fill_price_decimal`. It is a float money function in an authoritative-money module, and it carries the canonical 26-line rationale for the worst-case-fill rule while the live function has a one-line docstring. Its own text claims "Shared by validate_trade_intent() and preflight_allocation_batch() so the two cannot drift apart" — no longer true of this function. | AST reference count = 0 across all 199 production modules and 155 test modules. | CLAUDE.md §8 forbids "comments claiming guarantees that are not enforced by code and tests". A future editor of the live `_decimal` function will not see the rationale. |
@@ -70,9 +81,9 @@ same honesty CLAUDE.md §10 and the 2026-08-06 sweep §7 require.
 | Depth | What | Scope |
 |---|---|---|
 | **All 199 production modules** | AST/structural scans for: `int(<expr>/<expr>)` division class; `except: pass`; SQL string interpolation; artifact writes without an atomic publish; naive `datetime` construction; mutable class/argument defaults; `Decimal(str(...))`; `or 0` zero substitution; plus a complete import-graph and symbol-reference orphan analysis | complete, mechanical |
-| **~35 modules read line-by-line** | all of `assistant/execution_kernel/`; `policy`, `proposal_status`, `order_lifecycle`, `order_reconciler`, `proposals`, `strategy_proposals`, `portfolio_analytics`, `attribution`, `cash_reporting`, `alert_delivery`, `execution_telemetry`, `risk_copilot`, `news_summary`, `money`, `kill_switch`, `share_reconciliation`, `process_singleton`, `runtime_identity`, `sample_portfolio`; `research/quantconnect`; most of `execution/alpaca_broker`; core of `data/` | ~10K of 62K lines |
+| **~35 modules read line-by-line** | all of `assistant/execution_kernel/`; `policy`, `proposal_status`, `order_lifecycle`, `order_reconciler`, `proposals`, `strategy_proposals`, `portfolio_analytics`, `attribution`, `cash_reporting`, `alert_delivery`, `execution_telemetry`, `risk_copilot`, `news_summary`, `money`, `kill_switch`, `share_reconciliation`, `process_singleton`, `runtime_identity`, `sample_portfolio`, `tax_lots`; `research/quantconnect`; most of `execution/alpaca_broker`; core of `data/` | ~10K of 62K lines |
 | **Partial (risk-selected regions)** | `execution_service` (the 210-line coordinator), `risk/execution_gate` (cap checks, worst-case fill, `decimal_or_none`), `platform_readiness` (severity/mandatory derivation), `ai_advisor` (the shared output guard), `allocation_batch`, `context_builder`, `performance`, `storage`, `schemas`, `ml/evaluation`, `ml/volatility_evaluation`, `ml/earnings_experiments`, `backtest/research_report`, `backtest/risk_metrics` | — |
-| **Not read at line level** | most of `ml/` (37 modules, 18.8K lines); most of `scripts/` (49 modules, 12.8K lines); the bulk of `storage.py` (5,264), `personal_assistant_ui.py` (3,942), `backtest/engine.py` (1,540); `portfolio_ledger`, `paper_evidence`, `tax_lots`, `tax_reporting`, `operations`, `assistant/llm/*`, `signals/` (19), `strategies/` (6) | ~45K lines |
+| **Not read at line level** | most of `ml/` (37 modules, 18.8K lines); most of `scripts/` (49 modules, 12.8K lines); the bulk of `storage.py` (5,264), `personal_assistant_ui.py` (3,942), `backtest/engine.py` (1,540); `portfolio_ledger`, `paper_evidence`, `tax_reporting`, `operations`, `assistant/llm/*`, `signals/` (19), `strategies/` (6) | ~44K lines |
 
 **Absence from the ledger is not clearance for anything in the last row.**
 Both P2s came from a scan flagging candidate sites *plus* a read: the
@@ -165,14 +176,18 @@ LLM-authority path was modified.
    future strategy-side exception from suppressing risk-reduction proposals.
    Regression test with `current_price` of `0.0` and `NaN`, asserting the
    risk-reduction proposals still render.
-2. **FCS-002** — divide by `usable_pair_count(...)`, and publish
+2. **FCS-016** — compare dates, not timestamps; derive `_long_term_date` from
+   the same boundary. **Rewrite both existing boundary tests to vary the sell
+   time-of-day** — as written they cannot fail on this bug, and leaving them
+   unchanged would let the fix land with no red/green evidence.
+3. **FCS-002** — divide by `usable_pair_count(...)`, and publish
    `scored_event_count` beside `candidate_evaluated_event_count`, matching
    `ml/volatility_evaluation.py`.
-3. **FCS-003** — `unquote()` before the allowlist check, or reject `%`.
-4. **FCS-005** — per `OPERATIONAL_FACTS` §3, this fourth occurrence calls for
+4. **FCS-003** — `unquote()` before the allowlist check, or reject `%`.
+5. **FCS-005** — per `OPERATIONAL_FACTS` §3, this fourth occurrence calls for
    the AST guard banning bare `Decimal(str(...))` outside `assistant/money.py`,
    not another point fix.
-5. The remaining P3s in any order; FCS-010/FCS-011 are documentation-only.
+6. The remaining P3s in any order; FCS-010/FCS-011 are documentation-only.
 
 ## 9. What this sweep did not do
 

@@ -197,6 +197,7 @@ def simulate_episode(
     n_buys, n_sells = 1, 0
     position_cap = initial_notional * position_cap_multiple
     outcome = None
+    exit_price_column = None
     exit_idx = entry_idx
 
     j = entry_idx
@@ -204,8 +205,10 @@ def simulate_episode(
         avg_cost = cost_basis_dollars / shares if shares > 0 else None
         if avg_cost is not None and close.iloc[j] / avg_cost - 1 <= -stop_loss_pct / 100:
             outcome = "stop_loss"
-            exit_idx = j + 1 if j + 1 < n else j
-            fill_price = _fill(float((open_ if j + 1 < n else close).iloc[exit_idx]), buying=False)
+            has_next_session = j + 1 < n
+            exit_idx = j + 1 if has_next_session else j
+            exit_price_column = "open" if has_next_session else "close"
+            fill_price = _fill(float(df[exit_price_column].iloc[exit_idx]), buying=False)
             cash_in += shares * fill_price
             n_sells += 1
             shares = 0.0
@@ -213,8 +216,10 @@ def simulate_episode(
 
         if j - entry_idx >= max_hold_days:
             outcome = "max_hold"
-            exit_idx = j + 1 if j + 1 < n else j
-            fill_price = _fill(float((open_ if j + 1 < n else close).iloc[exit_idx]), buying=False)
+            has_next_session = j + 1 < n
+            exit_idx = j + 1 if has_next_session else j
+            exit_price_column = "open" if has_next_session else "close"
+            fill_price = _fill(float(df[exit_price_column].iloc[exit_idx]), buying=False)
             cash_in += shares * fill_price
             n_sells += 1
             shares = 0.0
@@ -225,6 +230,7 @@ def simulate_episode(
             if j + 1 >= n:
                 outcome = "forced_end_no_more_data"
                 exit_idx = j
+                exit_price_column = "close"
                 fill_price = _fill(float(close.iloc[j]), buying=False)
                 cash_in += shares * fill_price
                 n_sells += 1
@@ -244,6 +250,7 @@ def simulate_episode(
             if shares * reference_price <= 1.0:
                 outcome = "fully_sold"
                 exit_idx = j + 1
+                exit_price_column = "open"
                 shares = 0.0
                 break
         elif move <= -trigger_pct:
@@ -269,6 +276,7 @@ def simulate_episode(
         # Ran off the end of available data still holding shares.
         outcome = "forced_end_no_more_data"
         last_idx = min(exit_idx, n - 1)
+        exit_price_column = "close"
         fill_price = _fill(float(close.iloc[last_idx]), buying=False)
         cash_in += shares * fill_price
         n_sells += 1
@@ -289,6 +297,7 @@ def simulate_episode(
         "net_return_pct": round(net_return_pct, 3),
         "hold_days": exit_idx - entry_idx,
         "outcome": outcome,
+        "exit_price_column": exit_price_column,
     }
 
 
@@ -298,21 +307,24 @@ def simulate_buy_and_hold(
     exit_idx: int,
     initial_notional: float = INITIAL_NOTIONAL,
     slippage_pct: float = 0.0015,
+    *,
+    exit_price_column: str,
 ) -> float:
     """
     Net return (%) of simply buying at entry_idx's open and selling at
-    exit_idx's own price column (open, matching how the episode's own
-    forced/triggered exits are priced) -- no rebalancing at all. This is
+    the explicitly supplied exit price column, matching the episode's own
+    forced/triggered exit -- no rebalancing at all. This is
     the baseline the grid strategy's edge is measured against: does the
     active buy-the-dip/sell-the-rally ladder actually add value over
     just holding the SAME entry through the SAME window, or is any
     apparent profit just this ticker's own reversal/bounce doing the
     work regardless of how it's traded?
     """
+    if exit_price_column not in {"open", "close"}:
+        raise ValueError("exit_price_column must be 'open' or 'close'")
     entry_fill = float(df["open"].iloc[entry_idx]) * (1 + slippage_pct)
-    exit_col = "open" if exit_idx < len(df) else "close"
     exit_idx = min(exit_idx, len(df) - 1)
-    exit_fill = float(df[exit_col].iloc[exit_idx]) * (1 - slippage_pct)
+    exit_fill = float(df[exit_price_column].iloc[exit_idx]) * (1 - slippage_pct)
     return (exit_fill - entry_fill) / entry_fill * 100
 
 
@@ -357,6 +369,7 @@ def run_decline_grid_backtest(
             baseline_pct = simulate_buy_and_hold(
                 df, entry_idx_actual, exit_idx_actual,
                 initial_notional=initial_notional, slippage_pct=slippage_pct,
+                exit_price_column=episode["exit_price_column"],
             )
             episode["ticker"] = ticker
             episode["buy_and_hold_baseline_pct"] = round(baseline_pct, 3)

@@ -917,10 +917,13 @@ production provider-health evidence. The completed scope covers the
 DecisionPacket/Briefing and the only bar-derived proposal path; it does not
 claim that every exploratory UI or research fetch is operational evidence.
 
-## GR-6 .. GR-9 — not started
+## GR-6 .. GR-9 — mixed state
 
-Each requires its own gap analysis first; the plan predates the ML full-system
-additions throughout.
+GR-6 is incomplete and its off-machine backup proof is blocked on an approved
+physical transfer medium for the corporate host. GR-7a through GR-7c are
+complete and independently reviewed; GR-7d is blocked on the owner's target-
+weight decision. GR-8 and GR-9 have not started. See the go-to action plan and
+session handoff for the current sequencing and epoch state.
 
 Known items already identified for later milestones:
 

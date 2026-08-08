@@ -33,7 +33,6 @@ import io
 import json
 import os
 import re
-import tempfile
 from pathlib import Path
 from typing import Any, Mapping, Sequence
 
@@ -50,6 +49,11 @@ from ml.availability import (
 )
 from ml.contracts import DatasetManifest
 from ml.hashing import canonical_json, hash_bytes
+from ml.immutable_io import (
+    ImmutableFileConflictError,
+    exclusive_file_lock,
+    publish_immutable_bytes,
+)
 from ml.labels import LabelRow
 
 REQUIRED_KEY_COLUMNS = ("as_of_session", "ticker")
@@ -557,29 +561,14 @@ def build_dataset_manifest(
     )
 
 
-def _atomic_write_bytes(directory: Path, filename: str, data: bytes) -> None:
-    directory.mkdir(parents=True, exist_ok=True)
+def _atomic_write_bytes(directory: Path, filename: str, data: bytes) -> bool:
     destination = directory / filename
-    if destination.exists():
-        if destination.read_bytes() == data:
-            return
-        raise DatasetError(f"refusing to overwrite immutable dataset file {destination}")
-    fd, tmp_name = tempfile.mkstemp(dir=directory, prefix=f".{filename}.", suffix=".tmp")
-    tmp_path = Path(tmp_name)
     try:
-        with os.fdopen(fd, "wb") as handle:
-            handle.write(data)
-            handle.flush()
-            os.fsync(handle.fileno())
-        if destination.exists():
-            if destination.read_bytes() == data:
-                tmp_path.unlink(missing_ok=True)
-                return
-            raise DatasetError(f"refusing to overwrite immutable dataset file {destination}")
-        os.replace(tmp_path, destination)
-    except BaseException:
-        tmp_path.unlink(missing_ok=True)
-        raise
+        return publish_immutable_bytes(destination, data)
+    except ImmutableFileConflictError as exc:
+        raise DatasetError(
+            f"refusing to overwrite immutable dataset file {destination}"
+        ) from exc
 
 
 def _preflight_immutable_writes(
@@ -684,9 +673,35 @@ def save_dataset(
         filename = f"{manifest.dataset_id}.{name}.csv.gz"
         payloads[filename] = data
         written[name] = str(directory / filename)
-    _preflight_immutable_writes(directory, payloads)
-    for filename, data in payloads.items():
-        _atomic_write_bytes(directory, filename, data)
+    directory.mkdir(parents=True, exist_ok=True)
+    lock_path = directory / f".{manifest.dataset_id}.dataset.lock"
+    commit_path = directory / f".{manifest.dataset_id}.dataset.commit.json"
+    commit_bytes = canonical_json(
+        {
+            "dataset_id": manifest.dataset_id,
+            "members": {
+                filename: hash_bytes(data)
+                for filename, data in sorted(payloads.items())
+            },
+        }
+    ).encode("utf-8")
+    with exclusive_file_lock(lock_path):
+        if commit_path.exists() and commit_path.read_bytes() != commit_bytes:
+            raise DatasetError(
+                f"refusing to overwrite immutable dataset set {manifest.dataset_id!r}"
+            )
+        _preflight_immutable_writes(directory, payloads)
+        created: list[Path] = []
+        try:
+            for filename, data in payloads.items():
+                if _atomic_write_bytes(directory, filename, data):
+                    created.append(directory / filename)
+            if publish_immutable_bytes(commit_path, commit_bytes):
+                created.append(commit_path)
+        except BaseException:
+            for path in reversed(created):
+                path.unlink(missing_ok=True)
+            raise
     return written
 
 
@@ -701,6 +716,12 @@ def load_dataset(
     manifest_path = directory / f"{dataset_id}.manifest.json"
     features_path = directory / f"{dataset_id}.features.csv.gz"
     labels_path = directory / f"{dataset_id}.labels.csv.gz"
+    lock_path = directory / f".{dataset_id}.dataset.lock"
+    commit_path = directory / f".{dataset_id}.dataset.commit.json"
+    if lock_path.exists() and not commit_path.exists():
+        raise DatasetError(
+            f"dataset {dataset_id!r} is incomplete; commit marker is missing"
+        )
 
     manifest = DatasetManifest.from_dict(
         json.loads(manifest_path.read_text(encoding="utf-8"))

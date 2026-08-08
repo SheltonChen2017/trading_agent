@@ -22,7 +22,7 @@ def _series_with_final_day_move(
     returns = rng.normal(loc=0.0, scale=base_volatility, size=days)
     returns[-1] = final_return
     close = 100 * np.cumprod(1 + returns)
-    volume = np.full(days, 1_000_000.0)
+    volume = rng.normal(loc=1_000_000.0, scale=20_000.0, size=days)
     volume[-1] = final_volume
     dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
     return pd.DataFrame(

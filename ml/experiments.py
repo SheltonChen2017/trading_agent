@@ -189,38 +189,18 @@ def _atomic_write(directory: Path, filename: str, data: bytes) -> Path:
     """Immutable write: an existing byte-identical file is a no-op (so an
     exact rerun is idempotent), a differing one is refused (so a conflicting
     rerun cannot silently overwrite an earlier run's evidence)."""
-    import os
-    import tempfile
-
     _require_safe_output_name(filename)
-    directory.mkdir(parents=True, exist_ok=True)
     destination = directory / filename
-    if destination.exists():
-        if destination.read_bytes() == data:
-            return destination
+    try:
+        from ml.immutable_io import publish_immutable_bytes
+
+        publish_immutable_bytes(destination, data)
+    except ValueError as exc:
         raise ExperimentError(
             f"refusing to overwrite existing experiment output {destination} with "
             "different content; a rerun that changes results must use a new "
             "experiment_id"
-        )
-    fd, tmp_name = tempfile.mkstemp(dir=directory, prefix=f".{filename}.", suffix=".tmp")
-    tmp_path = Path(tmp_name)
-    try:
-        with os.fdopen(fd, "wb") as handle:
-            handle.write(data)
-            handle.flush()
-            os.fsync(handle.fileno())
-        if destination.exists():
-            if destination.read_bytes() == data:
-                tmp_path.unlink(missing_ok=True)
-                return destination
-            raise ExperimentError(
-                f"refusing to overwrite existing experiment output {destination}"
-            )
-        os.replace(tmp_path, destination)
-    except BaseException:
-        tmp_path.unlink(missing_ok=True)
-        raise
+        ) from exc
     return destination
 
 
@@ -1043,7 +1023,7 @@ def _run_ranker_task(
     return fold_metrics, fitted_models, aggregate
 
 
-def run_experiment(
+def _run_experiment_impl(
     spec: ExperimentSpec,
     dataset_directory: Path,
     output_directory: Path,
@@ -1276,6 +1256,55 @@ def run_experiment(
         canonical_json(record.to_dict()).encode("utf-8"),
     )
     return record
+
+
+def run_experiment(
+    spec: ExperimentSpec,
+    dataset_directory: Path,
+    output_directory: Path,
+    code_commit: str,
+    **kwargs: Any,
+) -> ExperimentRunRecord:
+    """Publish one experiment's complete evidence set under one owner lock."""
+    from ml.immutable_io import exclusive_file_lock, publish_immutable_bytes
+
+    output_directory = Path(output_directory)
+    output_directory.mkdir(parents=True, exist_ok=True)
+    lock_path = output_directory / f".{spec.experiment_id}.experiment.lock"
+    commit_path = output_directory / f".{spec.experiment_id}.experiment.commit.json"
+    with exclusive_file_lock(lock_path):
+        before = set(output_directory.glob(f"{spec.experiment_id}.*"))
+        commit_existed = commit_path.exists()
+        try:
+            record = _run_experiment_impl(
+                spec,
+                dataset_directory,
+                output_directory,
+                code_commit,
+                **kwargs,
+            )
+            members = {
+                path.name: hash_bytes(path.read_bytes())
+                for path in sorted(output_directory.glob(f"{spec.experiment_id}.*"))
+                if path.is_file()
+            }
+            publish_immutable_bytes(
+                commit_path,
+                canonical_json(
+                    {
+                        "experiment_id": spec.experiment_id,
+                        "run_hash": record.run_hash,
+                        "members": members,
+                    }
+                ).encode("utf-8"),
+            )
+            return record
+        except BaseException:
+            for path in set(output_directory.glob(f"{spec.experiment_id}.*")) - before:
+                path.unlink(missing_ok=True)
+            if not commit_existed:
+                commit_path.unlink(missing_ok=True)
+            raise
 
 
 def _limitations(spec: ExperimentSpec, manifest: Any) -> tuple[str, ...]:

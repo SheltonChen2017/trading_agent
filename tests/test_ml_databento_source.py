@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import threading
 from pathlib import Path
 
 import pandas as pd
@@ -17,6 +19,7 @@ from ml.databento_source import (
     estimate_daily_bars_cost,
     fetch_daily_bars_snapshot,
     normalize_daily_bars,
+    write_immutable_bytes,
 )
 from scripts import run_databento_ingest
 
@@ -47,6 +50,52 @@ def _request() -> DailyBarsRequest:
     return DailyBarsRequest(
         tickers=("NVDA", "MSFT"), start="2026-07-29", end="2026-07-31"
     )
+
+
+def test_conflicting_concurrent_databento_evidence_writers_have_one_winner(
+    tmp_path, monkeypatch
+):
+    path = tmp_path / "shared.dbn"
+    both_reached_publish = threading.Barrier(2)
+    real_replace = os.replace
+
+    def synchronized_replace(source, destination):
+        both_reached_publish.wait(timeout=5)
+        return real_replace(source, destination)
+
+    monkeypatch.setattr(databento_source_module.os, "replace", synchronized_replace)
+    outcomes = []
+    lock = threading.Lock()
+
+    def write(payload):
+        try:
+            write_immutable_bytes(path, payload)
+            outcome = "saved"
+        except DatabentoSourceError:
+            outcome = "conflict"
+        with lock:
+            outcomes.append(outcome)
+
+    threads = [
+        threading.Thread(target=write, args=(payload,))
+        for payload in (b"first-paid-evidence", b"second-paid-evidence")
+    ]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=10)
+
+    assert all(not thread.is_alive() for thread in threads)
+    assert sorted(outcomes) == ["conflict", "saved"]
+    assert path.read_bytes() in {b"first-paid-evidence", b"second-paid-evidence"}
+    assert not list(tmp_path.glob("*.tmp"))
+
+
+def test_identical_databento_evidence_retry_is_idempotent(tmp_path):
+    path = tmp_path / "same.manifest.json"
+    write_immutable_bytes(path, b"same-evidence")
+    write_immutable_bytes(path, b"same-evidence")
+    assert path.read_bytes() == b"same-evidence"
 
 
 class _FakeStore:

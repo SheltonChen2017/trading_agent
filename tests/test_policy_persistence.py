@@ -10,11 +10,13 @@ from __future__ import annotations
 
 import dataclasses
 import json
+import threading
 from pathlib import Path
 
 import pytest
 
 from assistant.policy import (
+    PolicyWriteConflictError,
     TradingPolicy,
     bump_policy_version,
     compute_policy_fingerprint,
@@ -113,8 +115,12 @@ def test_save_overwrites_atomically_and_leaves_no_temp_file(tmp_path: Path):
 
     save_policy(policy_with_updated_flags(_policy(), allow_new_positions=True), target)
     assert target.read_text(encoding="utf-8") != original_content
-    # os.replace semantics: the temp staging file must not linger.
-    assert list(tmp_path.iterdir()) == [target]
+    # os.replace semantics: the temp staging file must not linger. The stable
+    # lock file remains so OS-level writer serialization has one inode.
+    assert {path.name for path in tmp_path.iterdir()} == {
+        ".policy.json.policy.lock",
+        "policy.json",
+    }
     # And the result is complete, parseable JSON with the new flag.
     assert json.loads(target.read_text(encoding="utf-8"))["allow_new_positions"] is True
 
@@ -130,7 +136,80 @@ def test_invalid_policy_is_refused_before_any_filesystem_effect(tmp_path: Path):
     with pytest.raises(ValueError):
         save_policy(corrupt, target)
     assert target.read_bytes() == before
-    assert list(tmp_path.iterdir()) == [target]
+    assert {path.name for path in tmp_path.iterdir()} == {
+        ".policy.json.policy.lock",
+        "policy.json",
+    }
+
+
+def test_stale_policy_writer_is_refused_instead_of_reenabling_positions(tmp_path: Path):
+    target = tmp_path / "policy.json"
+    initial = _policy(allow_new_positions=True)
+    save_policy(initial, target)
+    tab_a = load_policy(target)
+    tab_b = load_policy(target)
+
+    disabled = policy_with_updated_flags(tab_a, allow_new_positions=False)
+    save_policy(
+        disabled,
+        target,
+        expected_fingerprint=compute_policy_fingerprint(tab_a),
+        expected_version=tab_a.version,
+    )
+
+    stale_strategy_edit = policy_with_updated_flags(
+        tab_b, enable_strategy_proposals=True
+    )
+    with pytest.raises(PolicyWriteConflictError, match="changed since it was loaded"):
+        save_policy(
+            stale_strategy_edit,
+            target,
+            expected_fingerprint=compute_policy_fingerprint(tab_b),
+            expected_version=tab_b.version,
+        )
+
+    final = load_policy(target)
+    assert final.allow_new_positions is False
+    assert final.enable_strategy_proposals is False
+    assert final == disabled
+
+
+def test_concurrent_policy_writers_cannot_both_commit_the_same_base(tmp_path: Path):
+    target = tmp_path / "policy.json"
+    initial = _policy(allow_new_positions=True)
+    save_policy(initial, target)
+    expected_fingerprint = compute_policy_fingerprint(initial)
+    barrier = threading.Barrier(2)
+    outcomes: list[str] = []
+
+    candidates = (
+        policy_with_updated_flags(initial, allow_new_positions=False),
+        policy_with_updated_flags(initial, enable_strategy_proposals=True),
+    )
+
+    def writer(candidate: TradingPolicy) -> None:
+        barrier.wait()
+        try:
+            save_policy(
+                candidate,
+                target,
+                expected_fingerprint=expected_fingerprint,
+                expected_version=initial.version,
+            )
+        except PolicyWriteConflictError:
+            outcomes.append("conflict")
+        else:
+            outcomes.append("saved")
+
+    threads = [threading.Thread(target=writer, args=(candidate,)) for candidate in candidates]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=5)
+
+    assert all(not thread.is_alive() for thread in threads)
+    assert sorted(outcomes) == ["conflict", "saved"]
+    assert load_policy(target) in candidates
 
 
 def test_saved_default_policy_shape_matches_the_checked_in_file_shape():

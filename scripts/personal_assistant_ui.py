@@ -57,6 +57,7 @@ from assistant.allocation_proposals import (
     generate_allocation_buy_proposals,
 )
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca, get_upcoming_events
+from assistant.schemas import EvidenceStatus, UpcomingEvent
 from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
     PolicyOverridableBlockError,
@@ -402,7 +403,23 @@ def _load_live_events_for_tickers(tickers: tuple[str, ...]) -> list:
     separately (and much more cheaply -- this is a single earnings-
     calendar lookup, not an account/quote/regime fetch) so requesting
     events never triggers a second account fetch."""
-    return get_upcoming_events(list(tickers), fetch_live=True)
+    try:
+        return get_upcoming_events(list(tickers), fetch_live=True)
+    except Exception:
+        # Last-resort presentation boundary. Context construction already
+        # degrades known provider failures, but an unforeseen optional-event
+        # bug must still not stop the Propose & Approve page before its
+        # deterministic risk-reduction proposals are computed (CXL-003).
+        return [
+            UpcomingEvent(
+                ticker=ticker,
+                event_type="earnings",
+                days_away=None,
+                status=EvidenceStatus.UNAVAILABLE,
+                source="optional_enrichment_failed",
+            )
+            for ticker in tickers
+        ]
 
 
 _HOLDING_ANALYSIS_CACHE_TTL_SECONDS = 300
@@ -3787,19 +3804,28 @@ if page == "Reports":
             _middle.metric(
                 "Invested", f"${float(_totals['invested']):,.0f}", f"{_totals['invested_pct']}%"
             )
-            _right.metric(
-                "Policy headroom", f"${float(_bounds['policy_headroom']):,.0f}"
-            )
+            if _bounds["policy_headroom"] is None:
+                _right.metric("Policy headroom", "Unavailable")
+            else:
+                _right.metric(
+                    "Policy headroom", f"${float(_bounds['policy_headroom']):,.0f}"
+                )
 
             if _bounds["reserve_floor_breached"]:
                 st.error(
                     "Cash is BELOW the policy reserve floor of "
                     f"${float(_bounds['reserve_floor']):,.0f}."
                 )
-            st.caption(
-                f"Headroom is limited by **{_bounds['binding_constraint'].replace('_', ' ')}** "
-                "— the room the policy leaves, not a suggestion to use it."
-            )
+            if _bounds["binding_constraint"] is None:
+                st.warning(
+                    "Exact policy headroom is unavailable: "
+                    f"{_bounds['policy_headroom_unavailable_reason']}."
+                )
+            else:
+                st.caption(
+                    f"Headroom is limited by **{_bounds['binding_constraint'].replace('_', ' ')}** "
+                    "— the room the policy leaves, not a suggestion to use it."
+                )
 
             _band = (
                 f"{_objective['target_annualized_volatility_min_pct']}–"
@@ -4119,7 +4145,12 @@ if page == "Settings & Features":
                         allow_new_positions=proposed_allow_new,
                         enable_strategy_proposals=proposed_enable_strategy,
                     )
-                    save_policy(updated_policy, policy_path)
+                    save_policy(
+                        updated_policy,
+                        policy_path,
+                        expected_fingerprint=active_fingerprint,
+                        expected_version=settings_policy.version,
+                    )
                 except Exception as exc:
                     st.error(f"Policy update refused; the file was not changed: {exc}")
                 else:

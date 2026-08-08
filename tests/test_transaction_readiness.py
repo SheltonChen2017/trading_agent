@@ -239,6 +239,71 @@ def test_a_lower_cumulative_fill_is_journaled_but_never_projected():
         assert store.get_proposal("tp-ready")["status"] == "filled"
 
 
+def test_delayed_partial_fill_never_regresses_cancel_pending_state_or_event_time():
+    with tempfile.TemporaryDirectory() as temp:
+        store = AssistantStore(Path(temp) / "assistant.db")
+        store.save_proposal(_proposal())
+        journal_broker_order_update(
+            store,
+            "tp-ready",
+            _order(
+                "partially_filled",
+                filled_qty=4,
+                updated_at="2026-07-29T15:00:00+00:00",
+            ),
+            event_type="partial_fill",
+            external_event_id="partial-4",
+        )
+        journal_broker_order_update(
+            store,
+            "tp-ready",
+            _order(
+                "pending_cancel",
+                filled_qty=4,
+                updated_at="2026-07-29T15:02:00+00:00",
+            ),
+            event_type="pending_cancel",
+            external_event_id="cancel-pending",
+        )
+
+        equal_late = journal_broker_order_update(
+            store,
+            "tp-ready",
+            _order(
+                "partially_filled",
+                filled_qty=4,
+                updated_at="2026-07-29T15:01:00+00:00",
+            ),
+            event_type="partial_fill",
+            external_event_id="partial-4-delayed",
+        )
+        after_equal = store.get_proposal("tp-ready")
+        assert equal_late["broker_event_inserted"] is True
+        assert equal_late["broker_event_projected"] is False
+        assert after_equal["status"] == "cancel_pending"
+        assert after_equal["last_broker_event_at"] == "2026-07-29T15:02:00+00:00"
+
+        # A genuinely larger cumulative fill still advances the quantity, but
+        # it cannot erase the outstanding cancellation request or move the
+        # last-event clock backward merely because delivery was delayed.
+        greater_late = journal_broker_order_update(
+            store,
+            "tp-ready",
+            _order(
+                "partially_filled",
+                filled_qty=6,
+                updated_at="2026-07-29T15:01:30+00:00",
+            ),
+            event_type="partial_fill",
+            external_event_id="partial-6-delayed",
+        )
+        final = store.get_proposal("tp-ready")
+        assert greater_late["broker_event_projected"] is True
+        assert final["status"] == "cancel_pending"
+        assert final["broker_order"]["filled_qty"] == 6
+        assert final["last_broker_event_at"] == "2026-07-29T15:02:00+00:00"
+
+
 def test_identity_mismatch_activates_persistent_kill_switch():
     with tempfile.TemporaryDirectory() as temp:
         store = AssistantStore(Path(temp) / "assistant.db")

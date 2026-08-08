@@ -32,7 +32,7 @@ def _flat_series_with_shock(days: int, shock_index: int, shock_return: float, ba
     returns = rng.normal(loc=0.0, scale=base_volatility, size=days)
     returns[shock_index] = shock_return
     close = 100 * np.cumprod(1 + returns)
-    volume = np.full(days, 1_000_000.0)
+    volume = 1_000_000.0 * (1 + rng.normal(0.0, 0.02, size=days))
     volume[shock_index] = 4_000_000.0
     dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
     return pd.DataFrame(
@@ -46,7 +46,7 @@ def _flat_series_with_two_shocks(
 ) -> pd.DataFrame:
     rng = np.random.default_rng(0)
     returns = rng.normal(loc=0.0, scale=base_volatility, size=days)
-    volume = np.full(days, 1_000_000.0)
+    volume = 1_000_000.0 * (1 + rng.normal(0.0, 0.02, size=days))
     for idx in (early_index, late_index):
         returns[idx] = shock_return
         volume[idx] = 4_000_000.0

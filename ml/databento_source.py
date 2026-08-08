@@ -34,6 +34,7 @@ from ml.availability import (
 )
 from ml.contracts import freeze_json
 from ml.hashing import canonical_json, hash_bytes, hash_payload
+from ml.immutable_io import ImmutableFileConflictError, publish_immutable_bytes
 from ml.shadow import trading_sessions
 
 DATABENTO_API_KEY_ENV = "DATABENTO_API_KEY"
@@ -506,26 +507,12 @@ def _gap_session_count(frames: Mapping[str, pd.DataFrame]) -> int:
 
 
 def write_immutable_bytes(path: Path, data: bytes) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists():
-        raise DatabentoSourceError(f"refusing to overwrite immutable snapshot {path}")
-    file_descriptor, temporary_name = tempfile.mkstemp(
-        dir=path.parent, prefix=f".{path.name}.", suffix=".tmp"
-    )
-    temporary = Path(temporary_name)
     try:
-        with os.fdopen(file_descriptor, "wb") as handle:
-            handle.write(data)
-            handle.flush()
-            os.fsync(handle.fileno())
-        if path.exists():
-            raise DatabentoSourceError(
-                f"refusing to overwrite immutable snapshot {path}"
-            )
-        os.replace(temporary, path)
-    except BaseException:
-        temporary.unlink(missing_ok=True)
-        raise
+        publish_immutable_bytes(path, data)
+    except ImmutableFileConflictError as exc:
+        raise DatabentoSourceError(
+            f"refusing to overwrite immutable snapshot {path}"
+        ) from exc
 
 
 def close_dbn_store(store: Any) -> None:

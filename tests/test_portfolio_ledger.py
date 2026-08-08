@@ -1,5 +1,6 @@
 import sys
 import sqlite3
+import threading
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -129,6 +130,76 @@ def test_bootstrap_sync_and_reconcile_are_idempotent(tmp_path):
     )
     assert report["matched"] is True
     assert store.get_latest_ledger_reconciliation()["matched"] is True
+
+
+def test_bootstrap_rolls_back_journal_when_state_write_fails(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    with store._connect() as connection:
+        connection.execute(
+            """
+            CREATE TRIGGER reject_ledger_bootstrap_state
+            BEFORE INSERT ON system_state
+            WHEN NEW.state_key = 'ledger_bootstrap'
+            BEGIN
+                SELECT RAISE(ABORT, 'injected bootstrap state failure');
+            END
+            """
+        )
+
+    with pytest.raises(sqlite3.IntegrityError, match="injected bootstrap"):
+        bootstrap_opening_snapshot(
+            store,
+            _snapshot(),
+            confirmation="bootstrap",
+            now=datetime(2026, 7, 29, 10, tzinfo=timezone.utc),
+        )
+
+    assert store.get_system_state("ledger_bootstrap") is None
+    assert store.list_journal_postings() == []
+
+
+def test_concurrent_different_bootstraps_have_one_atomic_winner(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    original_get_system_state = store.get_system_state
+    both_passed_preflight = threading.Barrier(2)
+
+    def synchronized_get_system_state(key, default=None):
+        if key == "ledger_bootstrap":
+            both_passed_preflight.wait(timeout=5)
+        return original_get_system_state(key, default)
+
+    store.get_system_state = synchronized_get_system_state
+    snapshots = [_snapshot(cash=1000.0), _snapshot(cash=2000.0)]
+    results = []
+    result_lock = threading.Lock()
+
+    def bootstrap(snapshot):
+        try:
+            state = bootstrap_opening_snapshot(
+                store,
+                snapshot,
+                confirmation="bootstrap",
+                now=datetime(2026, 7, 29, 10, tzinfo=timezone.utc),
+            )
+            result = ("saved", state)
+        except LedgerError as exc:
+            result = ("rejected", str(exc))
+        with result_lock:
+            results.append(result)
+
+    threads = [threading.Thread(target=bootstrap, args=(snapshot,)) for snapshot in snapshots]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=10)
+
+    assert all(not thread.is_alive() for thread in threads)
+    assert sorted(result[0] for result in results) == ["rejected", "saved"]
+    store.get_system_state = original_get_system_state
+    postings = store.list_journal_postings()
+    assert {row["transaction_id"] for row in postings} == {
+        f"opening-{store.get_system_state('ledger_bootstrap')['snapshot_hash'][:24]}"
+    }
 
 
 def test_reconciliation_records_cash_and_position_mismatches(tmp_path):
@@ -472,6 +543,112 @@ def test_record_cash_transfer_deposit_and_withdrawal_are_idempotent(tmp_path):
             store, external_id="deposit-zero", amount=0,
             occurred_at="2026-07-29T12:00:00+00:00", description="Zero transfer",
         )
+
+
+def test_conflicting_external_id_is_rejected_not_treated_as_a_retry(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    assert record_cash_transfer(
+        store,
+        external_id="bank-1",
+        amount=500.0,
+        occurred_at="2026-07-29T10:00:00+00:00",
+        description="Deposit",
+    )
+
+    with pytest.raises(LedgerError, match="external_id.*different content"):
+        record_cash_transfer(
+            store,
+            external_id="bank-1",
+            amount=5_000.0,
+            occurred_at="2026-07-29T10:00:00+00:00",
+            description="Deposit",
+        )
+
+    assert ledger_balances(store)["cash"] == Decimal("500")
+
+
+def test_dividend_and_fee_external_ids_reject_changed_content(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    assert record_dividend(
+        store,
+        external_id="div-conflict",
+        ticker="AAPL",
+        gross_amount=10,
+        occurred_at="2026-07-29T10:00:00+00:00",
+    )
+    with pytest.raises(LedgerError, match="different content"):
+        record_dividend(
+            store,
+            external_id="div-conflict",
+            ticker="AAPL",
+            gross_amount=20,
+            occurred_at="2026-07-29T10:00:00+00:00",
+        )
+
+    assert record_fee(
+        store,
+        external_id="fee-conflict",
+        amount=1,
+        occurred_at="2026-07-29T11:00:00+00:00",
+        description="Regulatory fee",
+    )
+    with pytest.raises(LedgerError, match="different content"):
+        record_fee(
+            store,
+            external_id="fee-conflict",
+            amount=2,
+            occurred_at="2026-07-29T11:00:00+00:00",
+            description="Regulatory fee",
+        )
+
+
+def test_split_external_id_rejects_a_changed_ratio(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    bootstrap_opening_snapshot(
+        store,
+        _snapshot(shares=2),
+        confirmation="bootstrap",
+        now=datetime(2026, 7, 29, 9, 0, tzinfo=timezone.utc),
+    )
+    assert record_split(
+        store,
+        external_id="split-conflict",
+        ticker="AAPL",
+        ratio=4,
+        occurred_at="2026-07-30T09:00:00+00:00",
+    )
+    with pytest.raises(LedgerError, match="different content"):
+        record_split(
+            store,
+            external_id="split-conflict",
+            ticker="AAPL",
+            ratio=3,
+            occurred_at="2026-07-30T09:00:00+00:00",
+        )
+
+
+def test_app_fill_external_id_rejects_changed_execution_content(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 7, 29, 9, 0, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(
+        store, _snapshot(shares=0), confirmation="bootstrap", now=boot_at
+    )
+    fill = {
+        "ticker": "AAPL",
+        "side": "buy",
+        "qty": 1,
+        "price": 100,
+        "at": (boot_at + timedelta(hours=1)).isoformat(),
+        "fill_id": "fill-conflict",
+        "order_id": "order-1",
+        "proposal_id": "proposal-1",
+    }
+    store.list_fills = lambda: [fill]
+    assert sync_app_fills(store)["inserted"] == 1
+
+    store.list_fills = lambda: [{**fill, "price": 200}]
+    with pytest.raises(LedgerError, match="different content"):
+        sync_app_fills(store)
 
 
 def test_record_dividend(tmp_path):

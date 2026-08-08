@@ -144,7 +144,14 @@ Write-Host "== 3/4 Launcher: $LauncherPath =="
 # still showed no AI features -- because the launcher only lifted the two
 # Alpaca names, so the key never reached the process. A credential this
 # script does not lift is invisible to the app no matter where it is stored.
-foreach (`$credentialName in @("APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ANTHROPIC_API_KEY")) {
+`$UserScopeCredentialNames = @(
+    "APCA_API_KEY_ID",
+    "APCA_API_SECRET_KEY",
+    "ANTHROPIC_API_KEY",
+    "FINNHUB_API_KEY",
+    "DATABENTO_API_KEY"
+)
+foreach (`$credentialName in `$UserScopeCredentialNames) {
     `$currentValue = [Environment]::GetEnvironmentVariable(`$credentialName, "User")
     if (-not [string]::IsNullOrWhiteSpace(`$currentValue)) {
         Set-Item -Path "Env:`$credentialName" -Value `$currentValue
@@ -153,7 +160,7 @@ foreach (`$credentialName in @("APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ANTHRO
 Set-Location "$OperationalPath"
 Write-Host "Operational checkout:" (git rev-parse --short HEAD) "|" (git rev-parse --abbrev-ref HEAD)
 Write-Host "Operator database:  `$env:TRADING_ASSISTANT_DB"
-Write-Host "Credentials:        Alpaca + Anthropic loaded fresh from user scope (values not shown)"
+Write-Host "Credentials:        Supported provider keys loaded fresh from user scope (values not shown)"
 & "$venvPython" -m streamlit run scripts\personal_assistant_ui.py
 "@ | Set-Content -LiteralPath $LauncherPath -Encoding utf8
 

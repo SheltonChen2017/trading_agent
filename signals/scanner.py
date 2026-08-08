@@ -50,11 +50,15 @@ def compute_features(df: pd.DataFrame, window: int = ROLLING_WINDOW, return_mode
 
     rolling_mean = out["return_pct"].shift(1).rolling(window).mean()
     rolling_std = out["return_pct"].shift(1).rolling(window).std()
-    out["return_zscore"] = (out["return_pct"] - rolling_mean) / rolling_std
+    out["return_zscore"] = (
+        (out["return_pct"] - rolling_mean) / rolling_std.where(rolling_std > 0)
+    )
 
     vol_mean = out["volume"].shift(1).rolling(window).mean()
     vol_std = out["volume"].shift(1).rolling(window).std()
-    out["volume_zscore"] = (out["volume"] - vol_mean) / vol_std
+    out["volume_zscore"] = (
+        (out["volume"] - vol_mean) / vol_std.where(vol_std > 0)
+    )
 
     return out
 

@@ -6,6 +6,8 @@ guessed holdings, and that refusals be visible rather than silently dropped.
 """
 from __future__ import annotations
 
+from datetime import date, timedelta
+
 import numpy as np
 import pandas as pd
 import pytest
@@ -23,17 +25,21 @@ from ml.portfolio_experiments import (
     summarize_portfolio_targets,
     targets_to_frame,
 )
+from ml.shadow import trading_sessions
 
 _START = "2026-01-01"
 
 
 def _sessions(n: int) -> list[str]:
-    return [str(d.date()) for d in pd.bdate_range(_START, periods=n)]
+    start = date.fromisoformat(_START)
+    sessions = trading_sessions(start, start + timedelta(days=n * 2))
+    assert len(sessions) >= n
+    return [str(session) for session in sessions[:n]]
 
 
 def _prices(n: int, *, seed: int = 0, daily_vol: float = 0.02) -> pd.Series:
     rng = np.random.default_rng(seed)
-    index = pd.bdate_range(_START, periods=n)
+    index = pd.DatetimeIndex(_sessions(n))
     return pd.Series(100.0 * np.cumprod(1 + rng.normal(0, daily_vol, n)), index=index)
 
 

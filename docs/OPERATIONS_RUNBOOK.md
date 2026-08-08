@@ -366,8 +366,9 @@ tests, and abnormal pytest exits fail closed.
 | F10 (regression 2026-08-02) | pytest sessions are pinned away from the operator database |
 | F11 (regression 2026-08-02) | no brokerage credentials reach the test suite; live calls impossible |
 
-`alert_delivery` remains unproducible until GR-5 ships a real channel;
-`backup_restore` keeps its dedicated `recovery-drill` producer above.
+`alert_delivery` is produced by GR-5's storage-verified weekly channel self-
+test and is visible in the Operations surface. `backup_restore` keeps its
+dedicated `recovery-drill` producer above.
 
 The recovery drill creates a consistent backup, restores it to a temporary
 database, runs SQLite integrity checks on both copies, and compares every

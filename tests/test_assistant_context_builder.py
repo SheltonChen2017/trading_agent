@@ -205,6 +205,38 @@ def test_get_upcoming_events_are_unavailable_without_a_calendar_feed():
     assert all(e.status == EvidenceStatus.UNAVAILABLE for e in events)
 
 
+def test_unexpected_optional_earnings_failure_degrades_to_unavailable(monkeypatch):
+    import data.corporate_actions as corporate_actions
+    import data.event_data as event_data
+
+    def provider_down(_tickers):
+        raise RuntimeError("provider down")
+
+    monkeypatch.setattr(event_data, "fetch_upcoming_earnings", provider_down)
+    monkeypatch.setattr(
+        corporate_actions,
+        "fetch_upcoming_ex_dividends",
+        lambda tickers: {
+            ticker: {
+                "available": False,
+                "days_away": None,
+                "event_date": None,
+                "source": "test",
+                "fetched_at": None,
+            }
+            for ticker in tickers
+        },
+    )
+    monkeypatch.setattr(event_data, "upcoming_quad_witching_dates", lambda: [])
+
+    events = get_upcoming_events(["AAPL"], fetch_live=True)
+
+    earnings = next(event for event in events if event.event_type == "earnings")
+    assert earnings.ticker == "AAPL"
+    assert earnings.status == EvidenceStatus.UNAVAILABLE
+    assert earnings.days_away is None
+
+
 def test_decision_packet_to_dict_is_json_serializable():
     import json
     positions = [{"ticker": "AAA", "shares": 1, "entry_price": 10.0, "current_price": 11.0}]

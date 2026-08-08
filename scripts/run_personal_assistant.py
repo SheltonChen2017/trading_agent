@@ -428,7 +428,7 @@ def command_risk_check(args, store: AssistantStore) -> None:
             print(f"  {impact['ticker']}: beta={beta} estimated_impact={estimated}")
 
 
-def command_idle_cash(args, store: AssistantStore) -> None:
+def command_idle_cash(args, store: AssistantStore | None = None) -> None:
     """GR-7b. Read-only: measures cash, never proposes deploying it.
 
     Deliberately does NOT call ``_packet(..., store=store)``: that path
@@ -437,7 +437,7 @@ def command_idle_cash(args, store: AssistantStore) -> None:
     from a live Alpaca snapshot when configured, otherwise the sample
     portfolio — never a decision-packet rebuild that writes.
     """
-    del store  # kept in the handler signature; unused on purpose
+    del store  # deliberately unused; this report needs no database
     policy = load_policy(_cli_policy_path(args))
     mandate = load_mandate(args.mandate)
     # A broker outage must degrade the REPORT, not dump a traceback on the
@@ -490,11 +490,17 @@ def command_idle_cash(args, store: AssistantStore) -> None:
     )
     if bounds["reserve_floor_breached"]:
         print(f"  ! cash is BELOW the reserve floor by ${bounds['cash_above_reserve'].lstrip('-')}")
-    print(
-        f"  headroom ${bounds['policy_headroom']} "
-        f"(limited by {bounds['binding_constraint']}) -- room the policy "
-        "leaves, not a suggestion to use it"
-    )
+    if bounds["policy_headroom"] is None:
+        print(
+            "  headroom unavailable -- "
+            f"{bounds['policy_headroom_unavailable_reason']}"
+        )
+    else:
+        print(
+            f"  headroom ${bounds['policy_headroom']} "
+            f"(limited by {bounds['binding_constraint']}) -- room the policy "
+            "leaves, not a suggestion to use it"
+        )
     band = (
         f"{objective['target_annualized_volatility_min_pct']}-"
         f"{objective['target_annualized_volatility_max_pct']}%"
@@ -1901,7 +1907,7 @@ def build_parser() -> argparse.ArgumentParser:
     # unbounded, so `list --limit -1` silently returned every row while the
     # sibling `list-alerts --limit` was already validated.
     list_parser.add_argument("--limit", type=_positive_int, default=20)
-    list_parser.set_defaults(handler=command_list)
+    list_parser.set_defaults(handler=command_list, read_only_store=True)
 
     approve = commands.add_parser("approve")
     approve.add_argument("proposal_id")
@@ -2049,14 +2055,14 @@ def build_parser() -> argparse.ArgumentParser:
             "execution blockers; offline never means verified."
         ),
     )
-    platform.set_defaults(handler=command_platform_readiness)
+    platform.set_defaults(handler=command_platform_readiness, read_only_store=True)
 
     readiness.add_argument(
         "--offline",
         action="store_true",
         help="Skip the live broker-account check; all local checks still run.",
     )
-    readiness.set_defaults(handler=command_readiness)
+    readiness.set_defaults(handler=command_readiness, read_only_store=True)
 
     kill_switch = commands.add_parser(
         "kill-switch",
@@ -2085,7 +2091,7 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     idle_cash.add_argument("--json", action="store_true")
-    idle_cash.set_defaults(handler=command_idle_cash)
+    idle_cash.set_defaults(handler=command_idle_cash, needs_store=False)
 
     attribution = commands.add_parser(
         "attribution",
@@ -2116,7 +2122,7 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     attribution.add_argument("--json", action="store_true")
-    attribution.set_defaults(handler=command_attribution)
+    attribution.set_defaults(handler=command_attribution, read_only_store=True)
 
     backup = commands.add_parser("backup-db", help="Create a consistent SQLite backup.")
     backup.add_argument("destination", nargs="?", type=Path)
@@ -2179,7 +2185,7 @@ def build_parser() -> argparse.ArgumentParser:
             "(offline use). The report is then marked COVERAGE UNVERIFIED."
         ),
     )
-    tax_report.set_defaults(handler=command_tax_report)
+    tax_report.set_defaults(handler=command_tax_report, read_only_store=True)
 
     dismiss = commands.add_parser(
         "dismiss-proposals",
@@ -2344,7 +2350,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     list_alerts.add_argument("--all", action="store_true")
     list_alerts.add_argument("--limit", type=_positive_int, default=100)
-    list_alerts.set_defaults(handler=command_list_alerts)
+    list_alerts.set_defaults(handler=command_list_alerts, read_only_store=True)
 
     deliver_alerts = commands.add_parser(
         "deliver-alerts",
@@ -2487,7 +2493,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="Attest that the report was independently reproduced.",
     )
-    promotion.set_defaults(handler=command_promotion_status)
+    promotion.set_defaults(handler=command_promotion_status, read_only_store=True)
     return parser
 
 
@@ -2506,7 +2512,10 @@ def main() -> None:
     if not getattr(args, "needs_store", True):
         args.handler(args)
         return
-    store = AssistantStore(args.database)
+    store = AssistantStore(
+        args.database,
+        read_only=getattr(args, "read_only_store", False),
+    )
     args.handler(args, store)
 
 

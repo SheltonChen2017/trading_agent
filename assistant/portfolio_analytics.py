@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from decimal import Decimal
 
-from assistant.money import decimal_text
+from assistant.money import decimal_text, to_decimal
 from assistant.schemas import PortfolioSnapshot
 
 
@@ -26,7 +26,7 @@ def estimate_pending_buy_value_by_ticker(open_orders: list[dict]) -> tuple[dict[
     since allocation_proposals.py itself imports from this module
     (independent review, 2026-07-31).
     """
-    totals: dict[str, float] = {}
+    totals_decimal: dict[str, Decimal] = {}
     unknown: set[str] = set()
     for order in open_orders:
         if str(order.get("side", "")).lower() != "buy":
@@ -35,17 +35,83 @@ def estimate_pending_buy_value_by_ticker(open_orders: list[dict]) -> tuple[dict[
         if not ticker:
             continue
         ticker = ticker.upper()
+        raw_filled = order.get("filled_qty")
+        try:
+            filled_qty = (
+                to_decimal(raw_filled, name=f"{ticker} pending filled_qty")
+                if raw_filled is not None
+                else Decimal("0")
+            )
+        except ValueError:
+            # Retain the full order when progress is malformed, and mark the
+            # result incomplete so it cannot be published as exact.
+            filled_qty = Decimal("0")
+            unknown.add(ticker)
+        if filled_qty < 0:
+            filled_qty = Decimal("0")
+            unknown.add(ticker)
+
         notional = order.get("notional")
-        if notional:
-            totals[ticker] = totals.get(ticker, 0.0) + float(notional)
+        if notional is not None:
+            try:
+                value = to_decimal(notional, name=f"{ticker} pending notional")
+            except ValueError:
+                unknown.add(ticker)
+                continue
+            if value <= 0:
+                unknown.add(ticker)
+                continue
+            raw_fill_price = order.get("filled_avg_price")
+            if filled_qty > 0 and raw_fill_price is not None:
+                try:
+                    fill_price = to_decimal(
+                        raw_fill_price, name=f"{ticker} pending filled_avg_price"
+                    )
+                except ValueError:
+                    fill_price = Decimal("0")
+                    unknown.add(ticker)
+                if fill_price > 0:
+                    value = max(Decimal("0"), value - filled_qty * fill_price)
+                else:
+                    unknown.add(ticker)
+            totals_decimal[ticker] = totals_decimal.get(ticker, Decimal("0")) + value
             continue
-        shares = order.get("shares")
-        limit_price = order.get("limit_price")
-        if shares and limit_price:
-            totals[ticker] = totals.get(ticker, 0.0) + float(shares) * float(limit_price)
+
+        raw_shares = order.get("shares")
+        if raw_shares is None:
+            unknown.add(ticker)
             continue
-        unknown.add(ticker)
-    return totals, unknown
+        try:
+            shares = to_decimal(raw_shares, name=f"{ticker} pending shares")
+        except ValueError:
+            unknown.add(ticker)
+            continue
+        remaining_shares = shares - filled_qty
+        if shares <= 0:
+            unknown.add(ticker)
+            continue
+        if remaining_shares <= 0:
+            continue
+
+        raw_limit_price = order.get("limit_price")
+        if raw_limit_price is None:
+            unknown.add(ticker)
+            continue
+        try:
+            limit_price = to_decimal(
+                raw_limit_price, name=f"{ticker} pending limit_price"
+            )
+        except ValueError:
+            unknown.add(ticker)
+            continue
+        if limit_price <= 0:
+            unknown.add(ticker)
+            continue
+        totals_decimal[ticker] = (
+            totals_decimal.get(ticker, Decimal("0"))
+            + remaining_shares * limit_price
+        )
+    return ({ticker: float(value) for ticker, value in totals_decimal.items()}, unknown)
 
 
 def compute_portfolio_analytics(snapshot: PortfolioSnapshot) -> dict:

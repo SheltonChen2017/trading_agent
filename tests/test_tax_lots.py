@@ -196,17 +196,16 @@ def test_one_year_exactly_is_still_short_term():
 
 def test_a_leap_day_acquisition_does_not_shift_the_boundary():
     acquired = datetime(2024, 2, 29, 15, 0, tzinfo=timezone.utc)
-    assert is_long_term(acquired, datetime(2025, 3, 1, 15, 0, tzinfo=timezone.utc)) is False
-    assert is_long_term(acquired, datetime(2025, 3, 2, 15, 0, tzinfo=timezone.utc)) is True
+    assert is_long_term(acquired, datetime(2025, 2, 28, 15, 0, tzinfo=timezone.utc)) is False
+    assert is_long_term(acquired, datetime(2025, 3, 1, 15, 0, tzinfo=timezone.utc)) is True
 
 
-# FCS-016. The two tests above are correct but INSENSITIVE: each uses 15:00 for
-# the buy AND the sell, which is the single alignment where a timestamp
-# comparison agrees with the date rule the docstring states. They passed green
-# through three review rounds while the implementation misclassified every
-# anniversary sale made later in the day than the purchase. The boundary must
-# be straddled in every dimension the implementation reads -- time of day, and
-# the timezone the dates are actually reported in.
+# FCS-016/CXL-001. The ordinary-date test above was insensitive to the old
+# timestamp bug because buy and sell used the same time. The original leap-day
+# expectation was itself wrong and pinned a second defect: it made 1 March the
+# last short-term day instead of the first long-term day. The boundary must be
+# straddled in every dimension the implementation reads -- date, time of day,
+# and the timezone the dates are actually reported in.
 
 @pytest.mark.parametrize("sell_hour", [0, 9, 14, 15, 16, 20, 23])
 def test_an_anniversary_sale_is_short_term_at_every_time_of_day(sell_hour):
@@ -217,10 +216,25 @@ def test_an_anniversary_sale_is_short_term_at_every_time_of_day(sell_hour):
 
 
 @pytest.mark.parametrize("sell_hour", [0, 9, 14, 15, 16, 20, 23])
-def test_a_leap_day_anniversary_sale_is_short_term_at_every_time_of_day(sell_hour):
+def test_a_leap_day_first_long_term_date_is_stable_across_local_time(sell_hour):
     acquired = datetime(2024, 2, 29, 15, 0, tzinfo=timezone.utc)
-    sold = datetime(2025, 3, 1, sell_hour, 0, tzinfo=timezone.utc)
-    assert is_long_term(acquired, sold) is False
+    sold = datetime(2025, 3, 1, sell_hour, 0, tzinfo=MARKET_TIMEZONE)
+    assert is_long_term(acquired, sold) is True
+
+
+def test_leap_day_boundary_propagates_to_the_sale_advisory():
+    acquired = datetime(2024, 2, 29, 15, 0, tzinfo=timezone.utc)
+    sold = datetime(2025, 3, 1, 15, 0, tzinfo=timezone.utc)
+    ledger = build_ledger(
+        [Fill("KO", "buy", 1, 50.0, acquired, fill_id="leap-buy")]
+    )
+
+    advisory = compare_sale_bases(ledger, "KO", qty=1, price=55.0, when=sold)
+
+    assert advisory["available"] is True
+    assert advisory["methods"][FIFO]["lots"][0]["term"] == "long"
+    assert advisory["methods"][FIFO]["long_term_pnl"] == 5.0
+    assert advisory["methods"][FIFO]["short_term_pnl"] == 0.0
 
 
 def test_the_day_after_the_anniversary_is_long_term_at_every_time_of_day():
@@ -512,6 +526,66 @@ def test_list_fills_does_not_double_count_an_order_seen_both_ways():
         assert sum(f["qty"] for f in fills) == 2.0
 
 
+def test_list_fills_recovers_mixed_stream_and_cumulative_remainder():
+    from assistant.order_lifecycle import journal_broker_order_update
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = AssistantStore(Path(temp) / "a.db")
+        store.save_proposal(_proposal("p1", "AAPL", "buy", 10))
+        partial = {
+            "order_id": "o1", "client_order_id": "idem-p1", "ticker": "AAPL",
+            "shares": 10.0, "side": "buy", "type": "market", "limit_price": None,
+            "time_in_force": "day", "status": "partially_filled", "filled_qty": 4.0,
+            "filled_avg_price": 100.0, "submitted_at": DAY1.isoformat(), "updated_at": None,
+        }
+        journal_broker_order_update(
+            store, "p1", partial, event_type="fill", event_at=DAY1.isoformat(),
+            external_event_id="stream-4", fill_qty=4.0, fill_price=100.0,
+        )
+        final = dict(
+            partial,
+            status="filled",
+            filled_qty=10.0,
+            filled_avg_price=110.0,
+        )
+        journal_broker_order_update(
+            store, "p1", final, event_type="poll_reconciliation",
+            event_at=DAY2.isoformat(), external_event_id="poll-10",
+        )
+
+        fills = store.list_fills()
+
+        assert [fill["qty"] for fill in fills] == [4.0, 6.0]
+        assert sum(fill["qty"] * fill["price"] for fill in fills) == pytest.approx(1100.0)
+        assert fills[1]["fill_id"] == "o1-cumulative-remainder"
+
+
+def test_list_fills_refuses_an_impossible_mixed_fill_basis():
+    from assistant.order_lifecycle import journal_broker_order_update
+
+    with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
+        store = AssistantStore(Path(temp) / "a.db")
+        store.save_proposal(_proposal("p1", "AAPL", "buy", 10))
+        partial = {
+            "order_id": "o1", "client_order_id": "idem-p1", "ticker": "AAPL",
+            "shares": 10.0, "side": "buy", "type": "market", "limit_price": None,
+            "time_in_force": "day", "status": "partially_filled", "filled_qty": 4.0,
+            "filled_avg_price": 200.0, "submitted_at": DAY1.isoformat(), "updated_at": None,
+        }
+        journal_broker_order_update(
+            store, "p1", partial, event_type="fill", event_at=DAY1.isoformat(),
+            external_event_id="stream-4", fill_qty=4.0, fill_price=200.0,
+        )
+        final = dict(partial, status="filled", filled_qty=10.0, filled_avg_price=50.0)
+        journal_broker_order_update(
+            store, "p1", final, event_type="poll_reconciliation",
+            event_at=DAY2.isoformat(), external_event_id="poll-impossible",
+        )
+
+        with pytest.raises(ValueError, match="cannot reconcile cumulative fill basis"):
+            store.list_fills()
+
+
 def test_list_fills_is_empty_on_a_fresh_database():
     with tempfile.TemporaryDirectory(ignore_cleanup_errors=True) as temp:
         store = AssistantStore(Path(temp) / "a.db")
@@ -575,6 +649,29 @@ def test_selling_the_entire_position_at_a_loss_is_not_a_wash_sale():
     loss = next(r for r in ledger.realized if r.realized_pnl < 0)
     assert loss.wash_sale_suspected is False
     assert ledger.shares_held("AAPL") == 0
+
+
+def test_omitted_fill_ids_do_not_make_the_original_buy_a_replacement():
+    ledger = build_ledger([
+        Fill("AAPL", "buy", 1, 100.0, DAY1),
+        Fill("AAPL", "sell", 1, 90.0, DAY2),
+    ])
+
+    loss = next(row for row in ledger.realized if row.realized_pnl < 0)
+    assert loss.wash_sale_suspected is False
+
+
+def test_duplicate_buy_fill_ids_do_not_hide_a_real_replacement_lot():
+    ledger = build_ledger([
+        Fill("AAPL", "buy", 1, 100.0, DAY1, fill_id="duplicate"),
+        Fill("AAPL", "buy", 1, 92.0, DAY2, fill_id="duplicate"),
+        Fill("AAPL", "sell", 1, 90.0, DAY3, fill_id="sale"),
+    ])
+
+    loss = next(row for row in ledger.realized if row.realized_pnl < 0)
+    assert loss.lot_id == "duplicate"
+    assert loss.wash_sale_suspected is True
+    assert [lot.lot_id for lot in ledger.open_for("AAPL")] == ["duplicate#2"]
 
 if __name__ == "__main__":
     raise SystemExit(pytest.main([__file__, "-q"]))

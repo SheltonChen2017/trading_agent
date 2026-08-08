@@ -25,7 +25,8 @@ import scripts.personal_assistant_ui as ui
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import DEFAULT_POLICY_PATH, TradingPolicy, compute_policy_fingerprint
 from assistant.proposal_status import STATUSES
-from assistant.schemas import DecisionPacket, MarketRegime
+from assistant.schemas import DecisionPacket, EvidenceStatus, MarketRegime
+from assistant.proposals import generate_risk_reduction_proposals
 from scripts.personal_assistant_ui import (
     _PERSISTENT_PAGE_WIDGET_KEYS,
     _allocation_input_signature,
@@ -494,6 +495,59 @@ def test_load_packet_no_events_never_calls_the_live_events_function():
     try:
         _load_packet(str(DEFAULT_POLICY_PATH), False)
         assert events_calls == []
+    finally:
+        ui.build_decision_packet = original_build
+        ui.get_upcoming_events = original_get_events
+        st.cache_data.clear()
+
+
+def test_optional_event_failure_cannot_hide_risk_reduction_proposals():
+    original_build = ui.build_decision_packet
+    original_get_events = ui.get_upcoming_events
+
+    def build_breached_packet(*args, **kwargs):
+        snapshot = build_portfolio_snapshot(
+            [{
+                "ticker": "AAPL",
+                "shares": 100,
+                "entry_price": 100.0,
+                "current_price": 100.0,
+            }],
+            cash=0.0,
+        )
+        return DecisionPacket(
+            generated_at="event-failure-packet",
+            portfolio=snapshot,
+            risk=build_risk_exposure(snapshot),
+            regime=MarketRegime(
+                benchmark_ticker="QQQ",
+                trend=None,
+                volatility_regime=None,
+                trailing_volatility_pct=None,
+                as_of="2026-08-08",
+            ),
+            signals=[],
+            upcoming_events=[],
+            warnings=[],
+            policy_version="test",
+        )
+
+    ui.build_decision_packet = build_breached_packet
+    ui.get_upcoming_events = lambda *_args, **_kwargs: (_ for _ in ()).throw(
+        RuntimeError("provider down")
+    )
+    st.cache_data.clear()
+    try:
+        policy, packet = _load_packet(str(DEFAULT_POLICY_PATH), True)
+        proposals = generate_risk_reduction_proposals(packet, policy)
+
+        assert len(proposals) == 1
+        assert proposals[0].intent.side == "sell"
+        assert packet.upcoming_events
+        assert all(
+            event.status == EvidenceStatus.UNAVAILABLE
+            for event in packet.upcoming_events
+        )
     finally:
         ui.build_decision_packet = original_build
         ui.get_upcoming_events = original_get_events

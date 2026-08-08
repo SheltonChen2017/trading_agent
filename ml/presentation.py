@@ -448,7 +448,15 @@ def build_observation(
             "it is not reconstructed from realized outcomes or the evaluation report"
         )
 
-    probability = uncertainty.get("probability_above_ceiling")
+    probability = uncertainty.get(
+        "threshold_probability", uncertainty.get("probability_above_ceiling")
+    )
+    probability_label = uncertainty.get(
+        "threshold_probability_label",
+        "calibrated_probability"
+        if "probability_above_ceiling" in uncertainty
+        else None,
+    )
     calibration_value = uncertainty.get("calibration_status")
     calibration = (
         calibration_value
@@ -465,7 +473,8 @@ def build_observation(
     if (
         available
         and probability is not None
-        and calibration == "calibrated_prospectively"
+        and probability_label == "calibrated_probability"
+        and calibration in {"calibrated", "calibrated_prospectively"}
     ):
         probability_text = f"{float(probability):.6f}"
     else:
@@ -607,7 +616,8 @@ def build_presentation(
         blockers.append("prospective_prediction_interval_unavailable")
     if any(
         item.get("threshold_probability") == UNAVAILABLE
-        or item.get("calibration_status") != "calibrated_prospectively"
+        or item.get("calibration_status")
+        not in {"calibrated", "calibrated_prospectively"}
         for item in observations
     ):
         blockers.append("threshold_probability_calibration_not_measured")

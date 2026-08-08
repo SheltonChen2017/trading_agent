@@ -370,3 +370,30 @@ def test_cli_read_only_verify_does_not_create_a_missing_database(
     with pytest.raises(FileNotFoundError):
         personal_assistant_cli.main()
     assert not db_path.exists()
+
+
+def test_read_only_store_refuses_missing_database_without_creating_it(tmp_path):
+    db_path = tmp_path / "missing" / "assistant.db"
+    with pytest.raises(FileNotFoundError, match="read-only database does not exist"):
+        AssistantStore(db_path, read_only=True)
+    assert not db_path.exists()
+    assert not db_path.parent.exists()
+
+
+def test_read_only_store_does_not_migrate_an_old_schema(tmp_path):
+    db_path = tmp_path / "old.db"
+    with sqlite3.connect(db_path) as connection:
+        connection.execute("CREATE TABLE legacy_only(value TEXT)")
+    before = db_path.read_bytes()
+
+    store = AssistantStore(db_path, read_only=True)
+    with store._connect() as connection:
+        tables = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+
+    assert tables == {"legacy_only"}
+    assert db_path.read_bytes() == before

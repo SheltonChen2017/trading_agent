@@ -211,6 +211,37 @@ def test_duplicate_sessions_are_refused():
         _build(close_by_ticker=prices)
 
 
+def test_missing_exact_as_of_row_is_refused_instead_of_using_stale_close():
+    prices = {
+        "AAA": _prices(start="2026-02-27"),
+        "BBB": _prices(start="2026-02-27", seed=1),
+    }
+    prices = {
+        ticker: series.drop(pd.Timestamp(_AS_OF))
+        for ticker, series in prices.items()
+    }
+    with pytest.raises(PortfolioVolatilityError, match="exact common price row"):
+        _build(close_by_ticker=prices)
+
+
+def test_weekend_as_of_session_is_refused():
+    with pytest.raises(PortfolioVolatilityError, match="not an NYSE trading session"):
+        _build(
+            as_of_session="2026-03-01",
+            close_by_ticker=_universe(),
+        )
+
+
+def test_missing_exchange_session_inside_forward_window_is_refused():
+    prices = _universe()
+    prices = {
+        ticker: series.drop(series.index[5])
+        for ticker, series in prices.items()
+    }
+    with pytest.raises(PortfolioVolatilityError, match="canonical consecutive"):
+        _build(close_by_ticker=prices)
+
+
 # --- unit convention (plan 9.3) ---------------------------------------------
 
 

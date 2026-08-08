@@ -6,6 +6,7 @@ outcomes, portfolio captures, or trading state.
 """
 from __future__ import annotations
 
+from collections import Counter
 import dataclasses
 import math
 from datetime import datetime, timedelta, timezone
@@ -280,6 +281,10 @@ def build_evidence_operations_report(
         run_id = str(run.get("run_id"))
         run_predictions = predictions_by_run.get(run_id, [])
         actual_subjects = {str(row.get("subject_key")) for row in run_predictions}
+        subject_counts = Counter(str(row.get("subject_key")) for row in run_predictions)
+        duplicate_subjects = sorted(
+            subject for subject, count in subject_counts.items() if count > 1
+        )
         try:
             declared_count = int(run.get("prediction_count"))
         except (TypeError, ValueError):
@@ -289,6 +294,7 @@ def build_evidence_operations_report(
         if (
             missing_subjects
             or unexpected_subjects
+            or duplicate_subjects
             or declared_count != len(run_predictions)
         ):
             incomplete_attempts.append({
@@ -298,6 +304,7 @@ def build_evidence_operations_report(
                 "stored_prediction_count": len(run_predictions),
                 "missing_subjects": missing_subjects,
                 "unexpected_subjects": unexpected_subjects,
+                "duplicate_subjects": duplicate_subjects,
             })
     checks.append(_check(
         "ml_prediction_attempt_completeness",

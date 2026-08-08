@@ -73,12 +73,24 @@ def test_generated_launcher_lifts_credentials_fresh_from_user_scope():
     assert 'APCA_API_KEY_ID' in _SCRIPT
     assert 'APCA_API_SECRET_KEY' in _SCRIPT
     assert 'ANTHROPIC_API_KEY' in _SCRIPT
+    assert 'FINNHUB_API_KEY' in _SCRIPT
+    assert 'DATABENTO_API_KEY' in _SCRIPT
     # The foreach array is the load-bearing list -- prose mentioning a name
     # is not enough.
-    assert (
-        '@("APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ANTHROPIC_API_KEY")'
-        in _SCRIPT
+    match = re.search(
+        r"`\$UserScopeCredentialNames\s*=\s*@\((.*?)\)\s*foreach",
+        _SCRIPT,
+        re.DOTALL,
     )
+    assert match
+    assert set(re.findall(r'"([A-Z0-9_]+)"', match.group(1))) == {
+        "APCA_API_KEY_ID",
+        "APCA_API_SECRET_KEY",
+        "ANTHROPIC_API_KEY",
+        "FINNHUB_API_KEY",
+        "DATABENTO_API_KEY",
+    }
+    assert "foreach (`$credentialName in `$UserScopeCredentialNames)" in _SCRIPT
 
 
 def test_embeds_no_credential_material():

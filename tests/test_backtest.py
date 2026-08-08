@@ -52,7 +52,7 @@ def _series_with_shock_and_known_forward_move(
             returns[shock_index + i] = forward_daily_return
 
     close = 100 * np.cumprod(1 + returns)
-    volume = np.full(days, 1_000_000.0)
+    volume = 1_000_000.0 * (1 + rng.normal(0.0, 0.02, size=days))
     volume[shock_index] = 4_000_000.0
 
     dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
@@ -479,7 +479,7 @@ def _series_with_two_shocks(
     drift) at different points in time, for testing date-based splitting."""
     rng = np.random.default_rng(0)
     returns = rng.normal(loc=0.0, scale=0.002, size=days)
-    volume = np.full(days, 1_000_000.0)
+    volume = 1_000_000.0 * (1 + rng.normal(0.0, 0.02, size=days))
     for idx in (early_index, late_index):
         returns[idx] = shock_return
         volume[idx] = 4_000_000.0
@@ -557,7 +557,7 @@ def test_out_of_sample_baseline_comparison_uses_period_specific_baseline():
         rng.normal(loc=0.004, scale=0.0005, size=regime_change_idx),
         rng.normal(loc=-0.004, scale=0.0005, size=days - regime_change_idx),
     ])
-    volume = np.full(days, 1_000_000.0)
+    volume = 1_000_000.0 * (1 + rng.normal(0.0, 0.02, size=days))
     shock_idx = 25  # well within the discovery (positive-drift) region
     returns[shock_idx] = -0.08
     volume[shock_idx] = 4_000_000.0
@@ -731,7 +731,7 @@ def test_out_of_sample_significance_flags_discovery_only_effect_correctly():
     days = 600
     rng = np.random.default_rng(2)
     returns = rng.normal(loc=0.0, scale=0.002, size=days)
-    volume = np.full(days, 1_000_000.0)
+    volume = 1_000_000.0 * (1 + rng.normal(0.0, 0.02, size=days))
 
     # Discovery-period shocks (well within the first 60% of 600 days):
     # strong, consistent, low-noise bounce every time.

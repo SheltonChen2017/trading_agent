@@ -8,6 +8,7 @@ import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -313,6 +314,14 @@ def test_windows_installers_use_limited_principals_and_schedule_supervisor():
     assert "$task.Principal.LogonType -eq $ExpectedTaskLogonType" in verifier
     assert "not verifiable: rerun as $RunAsUser" in verifier
     assert "ProductionAuthoritative = $false" in verifier
+    assert "[datetime]$PaperObservationLocalTime = [datetime]::MinValue" in operational
+    assert "function Convert-EasternClockToLocal" in operational
+    assert 'FindSystemTimeZoneById("Eastern Standard Time")' in operational
+    assert "ConvertTimeToUtc($easternClock, $eastern).ToLocalTime()" in operational
+    assert (
+        "$PaperObservationLocalTime = Convert-EasternClockToLocal -Hour 16 -Minute 30"
+        in operational
+    )
     # MANDREV-001 follow-up: an operational-only (four-task) installation
     # must have a valid fail-closed success check. Scope "all" keeps the
     # original eight-task contract and still hard-requires the ML
@@ -336,6 +345,26 @@ def test_windows_installers_use_limited_principals_and_schedule_supervisor():
         "use the $( ... ) subexpression form"
     )
     assert "-Detail $(" in verifier
+
+
+@pytest.mark.parametrize(
+    ("day", "utc_hour"),
+    [("2026-01-15", 21), ("2026-07-15", 20)],
+)
+@pytest.mark.parametrize(
+    "host_zone",
+    ["America/Los_Angeles", "America/New_York", "UTC", "Asia/Tokyo"],
+)
+def test_market_clock_conversion_is_after_close_across_host_zones_and_dst(
+    day, utc_hour, host_zone
+):
+    eastern = ZoneInfo("America/New_York")
+    market_clock = datetime.fromisoformat(f"{day}T16:30:00").replace(tzinfo=eastern)
+    converted = market_clock.astimezone(ZoneInfo(host_zone))
+
+    assert converted.astimezone(eastern).strftime("%H:%M") == "16:30"
+    assert converted.astimezone(timezone.utc).hour == utc_hour
+    assert (market_clock.hour, market_clock.minute) > (16, 0)
 
 
 @pytest.mark.skipif(

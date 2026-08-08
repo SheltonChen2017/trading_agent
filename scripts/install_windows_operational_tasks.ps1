@@ -23,7 +23,7 @@ param(
     [ValidateRange(1, 60)]
     [int]$LongRunningHealMinutes = 5,
 
-    [datetime]$PaperObservationLocalTime = [datetime]::Today.AddHours(16).AddMinutes(30),
+    [datetime]$PaperObservationLocalTime = [datetime]::MinValue,
 
     [string]$AlertsJsonlPath
 )
@@ -81,6 +81,19 @@ function Quote-TaskArgument {
     return '"' + $Value.Replace('"', '\"') + '"'
 }
 
+function Convert-EasternClockToLocal {
+    param(
+        [Parameter(Mandatory = $true)][int]$Hour,
+        [Parameter(Mandatory = $true)][int]$Minute
+    )
+    $eastern = [TimeZoneInfo]::FindSystemTimeZoneById("Eastern Standard Time")
+    $easternClock = [datetime]::SpecifyKind(
+        [datetime]::Today.AddHours($Hour).AddMinutes($Minute),
+        [DateTimeKind]::Unspecified
+    )
+    return [TimeZoneInfo]::ConvertTimeToUtc($easternClock, $eastern).ToLocalTime()
+}
+
 if (-not $RepositoryPath) {
     $RepositoryPath = Split-Path -Parent $PSScriptRoot
 }
@@ -102,6 +115,13 @@ foreach ($requiredPath in @($assistantScript, $watchdogScript)) {
     if (-not (Test-Path -LiteralPath $requiredPath -PathType Leaf)) {
         throw "Required script does not exist: $requiredPath"
     }
+}
+
+# The evidence capture is defined by the NYSE clock, not by the host's wall
+# clock. 16:30 Eastern is after both the normal 16:00 close and 13:00 half-day
+# close; TimeZoneInfo applies the date's Eastern and local DST rules.
+if ($PaperObservationLocalTime -eq [datetime]::MinValue) {
+    $PaperObservationLocalTime = Convert-EasternClockToLocal -Hour 16 -Minute 30
 }
 
 $databaseArgument = Quote-TaskArgument $database

@@ -235,15 +235,19 @@ def _one_year_on(acquired_at: datetime) -> date:
     """The last market-local DATE that is still short term.
 
     A sale on this date is exactly one year and therefore short; the position
-    becomes long term on the following day.
+    becomes long term on the following day. For a 29 February acquisition,
+    the next year's 28 February is the last short-term date and 1 March is the
+    first long-term date: the holding-period count starts on 1 March in the
+    acquisition year and includes the disposition date (CXL-001).
     """
     acquired = _market_date(acquired_at)
     try:
         return acquired.replace(year=acquired.year + 1)
     except ValueError:
-        # 29 February -> the following year has no 29th; the boundary falls on
-        # 1 March, which is what adding a day to 28 February gives.
-        return acquired.replace(year=acquired.year + 1, month=3, day=1)
+        # 29 February has no literal anniversary in a non-leap year. Treating
+        # 1 March as the last short-term date would count the first day twice
+        # and delay long-term treatment until 2 March.
+        return acquired.replace(year=acquired.year + 1, month=2, day=28)
 
 
 def is_long_term(acquired_at: datetime, sold_at: datetime) -> bool:
@@ -356,8 +360,9 @@ def build_ledger(
     open_lots: list[OpenLot] = []
     realized: list[RealizedComponent] = []
     counter = 0
+    used_lot_ids: set[str] = set()
+    buy_events: list[tuple[Fill, str]] = []
 
-    fill_events = [event for event in fills if isinstance(event, Fill)]
     for fill in sorted(
         fills,
         key=lambda event: (
@@ -382,9 +387,19 @@ def build_ledger(
             continue
         if fill.side == "buy":
             counter += 1
+            base_lot_id = (
+                str(fill.fill_id).strip() if fill.fill_id else f"lot-{counter}"
+            )
+            lot_id = base_lot_id
+            duplicate_number = 2
+            while lot_id in used_lot_ids:
+                lot_id = f"{base_lot_id}#{duplicate_number}"
+                duplicate_number += 1
+            used_lot_ids.add(lot_id)
+            buy_events.append((fill, lot_id))
             open_lots.append(
                 OpenLot(
-                    lot_id=fill.fill_id or f"lot-{counter}",
+                    lot_id=lot_id,
                     ticker=ticker,
                     qty=fill.qty,
                     cost_per_share=fill.price,
@@ -420,12 +435,12 @@ def build_ledger(
             else:
                 open_lots[index] = dataclasses.replace(lot, qty=remaining)
 
-    realized = _flag_wash_sales(realized, fill_events)
+    realized = _flag_wash_sales(realized, buy_events)
     return LotLedger(tuple(open_lots), tuple(realized), method)
 
 
 def _flag_wash_sales(
-    realized: list[RealizedComponent], fills: list[Fill]
+    realized: list[RealizedComponent], buys: list[tuple[Fill, str]]
 ) -> tuple[RealizedComponent, ...]:
     """
     Mark realized LOSSES that have a purchase of the same ticker within
@@ -450,9 +465,8 @@ def _flag_wash_sales(
         ).add(component.lot_id)
 
     buys_by_ticker: dict[str, list[tuple[datetime, str]]] = {}
-    for fill in fills:
-        if fill.side == "buy":
-            buys_by_ticker.setdefault(fill.ticker.upper(), []).append((fill.at, fill.fill_id))
+    for fill, lot_id in buys:
+        buys_by_ticker.setdefault(fill.ticker.upper(), []).append((fill.at, lot_id))
 
     window = timedelta(days=WASH_SALE_WINDOW_DAYS)
     flagged = []

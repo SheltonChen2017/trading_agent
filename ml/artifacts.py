@@ -15,7 +15,6 @@ from __future__ import annotations
 import io
 import json
 import os
-import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -23,6 +22,7 @@ import joblib
 
 from ml.contracts import ModelManifest
 from ml.hashing import canonical_json, hash_bytes
+from ml.immutable_io import ImmutableFileConflictError, publish_immutable_bytes
 
 
 class ArtifactError(ValueError):
@@ -45,34 +45,13 @@ def _safe_filename(filename: str) -> str:
 
 def _atomic_write_bytes(directory: Path, filename: str, data: bytes) -> None:
     filename = _safe_filename(filename)
-    directory.mkdir(parents=True, exist_ok=True)
     destination = directory / filename
-    if destination.exists():
-        if destination.read_bytes() == data:
-            return
+    try:
+        publish_immutable_bytes(destination, data)
+    except ImmutableFileConflictError as exc:
         raise ArtifactError(
             f"refusing to overwrite immutable artifact file {destination}"
-        )
-    fd, tmp_name = tempfile.mkstemp(dir=directory, prefix=f".{filename}.", suffix=".tmp")
-    tmp_path = Path(tmp_name)
-    try:
-        with os.fdopen(fd, "wb") as handle:
-            handle.write(data)
-            handle.flush()
-            os.fsync(handle.fileno())
-        # Recheck after serialization in case another writer created the same
-        # versioned path while this writer was preparing its temporary file.
-        if destination.exists():
-            if destination.read_bytes() == data:
-                tmp_path.unlink(missing_ok=True)
-                return
-            raise ArtifactError(
-                f"refusing to overwrite immutable artifact file {destination}"
-            )
-        os.replace(tmp_path, destination)
-    except BaseException:
-        tmp_path.unlink(missing_ok=True)
-        raise
+        ) from exc
 
 
 def save_model_artifact(model: Any, *, directory: Path, filename: str) -> str:

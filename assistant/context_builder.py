@@ -423,36 +423,59 @@ def get_upcoming_events(tickers: list[str], fetch_live: bool = False) -> list[Up
             upcoming_quad_witching_dates,
         )
 
-        raw = fetch_upcoming_earnings(tickers)
-        dividends = fetch_upcoming_ex_dividends(tickers)
-        events = [
-            UpcomingEvent(
-                ticker=t,
-                event_type="earnings",
-                days_away=raw[t]["days_away"],
-                status=EvidenceStatus.EXPLORATORY if raw[t]["available"] else EvidenceStatus.UNAVAILABLE,
-                event_date=raw[t]["event_date"],
-                source=raw[t]["source"],
-                fetched_at=raw[t]["fetched_at"],
-            )
-            for t in tickers
-        ]
-        events.extend(
-            UpcomingEvent(
-                ticker=t,
-                event_type="ex_dividend",
-                days_away=dividends[t]["days_away"],
-                status=(
-                    EvidenceStatus.EXPLORATORY
-                    if dividends[t]["available"]
-                    else EvidenceStatus.UNAVAILABLE
-                ),
-                event_date=dividends[t]["event_date"],
-                source=dividends[t]["source"],
-                fetched_at=dividends[t]["fetched_at"],
-            )
-            for t in tickers
-        )
+        # CXL-003: these feeds are optional presentation enrichment. A new
+        # provider exception class, malformed response, or outage must become
+        # explicit UNAVAILABLE evidence, never abort packet construction and
+        # suppress deterministic risk-reduction proposals.
+        try:
+            raw = fetch_upcoming_earnings(tickers)
+        except Exception:
+            raw = {}
+        try:
+            dividends = fetch_upcoming_ex_dividends(tickers)
+        except Exception:
+            dividends = {}
+
+        def provider_event(ticker: str, event_type: str, records: dict) -> UpcomingEvent:
+            record = records.get(ticker) or records.get(ticker.upper())
+            if not isinstance(record, dict):
+                return UpcomingEvent(
+                    ticker=ticker,
+                    event_type=event_type,
+                    days_away=None,
+                    status=EvidenceStatus.UNAVAILABLE,
+                    source="provider_unavailable",
+                )
+            try:
+                available = bool(record["available"])
+                return UpcomingEvent(
+                    ticker=ticker,
+                    event_type=event_type,
+                    days_away=record.get("days_away"),
+                    status=(
+                        EvidenceStatus.EXPLORATORY
+                        if available
+                        else EvidenceStatus.UNAVAILABLE
+                    ),
+                    event_date=record.get("event_date"),
+                    source=record.get("source"),
+                    fetched_at=record.get("fetched_at"),
+                )
+            except (KeyError, TypeError, ValueError):
+                return UpcomingEvent(
+                    ticker=ticker,
+                    event_type=event_type,
+                    days_away=None,
+                    status=EvidenceStatus.UNAVAILABLE,
+                    source="provider_malformed",
+                )
+
+        events = [provider_event(t, "earnings", raw) for t in tickers]
+        events.extend(provider_event(t, "ex_dividend", dividends) for t in tickers)
+        try:
+            calendar_events = upcoming_quad_witching_dates()
+        except Exception:
+            calendar_events = []
         events.extend(
             UpcomingEvent(
                 ticker=event["ticker"],
@@ -463,7 +486,7 @@ def get_upcoming_events(tickers: list[str], fetch_live: bool = False) -> list[Up
                 source=event["source"],
                 fetched_at=event["fetched_at"],
             )
-            for event in upcoming_quad_witching_dates()
+            for event in calendar_events
         )
         return events
     return [

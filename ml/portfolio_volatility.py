@@ -41,6 +41,7 @@ import pandas as pd
 
 from assistant.money import to_decimal
 from ml.hashing import hash_payload
+from ml.shadow import is_trading_session, trading_sessions
 
 TRADING_SESSIONS_PER_YEAR = 252
 CASH_TICKER = "__CASH__"
@@ -352,16 +353,19 @@ def build_frozen_weight_targets(
     if frame.index.has_duplicates:
         raise PortfolioVolatilityError("price series contain duplicate sessions")
 
+    if not is_trading_session(as_of_session):
+        raise PortfolioVolatilityError(
+            f"as_of_session {as_of_session} is not an NYSE trading session"
+        )
     as_of_timestamp = pd.Timestamp(as_of_session)
+    if as_of_timestamp not in frame.index:
+        raise PortfolioVolatilityError(
+            f"no exact common price row for as_of_session {as_of_session}"
+        )
     future = frame[frame.index > as_of_timestamp]
     # horizon_sessions RETURNS require horizon_sessions+1 closes, the first of
     # which is the as-of close itself.
-    base = frame[frame.index <= as_of_timestamp]
-    if base.empty:
-        raise PortfolioVolatilityError(
-            f"no price history at or before {as_of_session}"
-        )
-    window = pd.concat([base.iloc[[-1]], future.iloc[:horizon_sessions]])
+    window = pd.concat([frame.loc[[as_of_timestamp]], future.iloc[:horizon_sessions]])
     if len(window) < horizon_sessions + 1:
         raise PortfolioVolatilityError(
             f"only {len(window) - 1} forward sessions available after {as_of_session}; "
@@ -372,6 +376,14 @@ def build_frozen_weight_targets(
         raise PortfolioVolatilityError(
             "a held security has missing or non-positive prices inside the forecast "
             "window; refusing rather than dropping it"
+        )
+    expected_sessions = trading_sessions(
+        as_of_timestamp.date(), window.index[-1].date()
+    )
+    actual_sessions = tuple(window.index.date)
+    if actual_sessions != expected_sessions[: horizon_sessions + 1]:
+        raise PortfolioVolatilityError(
+            "price window is not the canonical consecutive NYSE session sequence"
         )
 
     returns = window.pct_change(fill_method=None).dropna(how="any")

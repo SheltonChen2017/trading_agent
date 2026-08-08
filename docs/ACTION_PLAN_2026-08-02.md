@@ -50,16 +50,16 @@ reconcile) is built, characterization-frozen, and three-review hardened; the
 ML research/shadow stack is software-complete through monitoring and dossier;
 the LLM committee foundation is built and gated; the execution-kernel split
 (GR-1) is complete after the independently reviewed 2026-08-03 GR-1E
-assessment; GR-2 through GR-5 are complete and independently reviewed. What
-does not exist is: GR-6, GR-7,
-every AI *product* plan beyond the committee (strategy
-authoring, debate, allocation service, MCP, and proposal cleanup), and — most
-importantly — enough **elapsed frozen-epoch evidence**: `paper-epoch-001` is
-active on frozen commit `8a2233c`, the four operational tasks run under
-Interactive logon, the ledger was bootstrapped and reconciled, and all five
-required drills passed in-epoch, but the 60-session / 30-order mandate
-minimums have only just started accumulating. The scarcest resource on the
-critical path is not engineering — it is elapsed calendar time on that
+assessment; GR-2 through GR-5 are complete and independently reviewed. GR-7a
+through GR-7c are also complete. What remains incomplete is GR-6, GR-7d, the
+allocation service, every AI *product* plan beyond the committee (strategy
+authoring, debate, and MCP), and — most importantly — enough **elapsed frozen-
+epoch evidence**: `paper-epoch-001` is
+closed, and `paper-epoch-002` has been active since 2026-08-06 on a separate
+stable computer at frozen commit `9a91498`, bound to `my_policy.json`.
+Development changes in this checkout are not deployed into that epoch. The
+60-session / 30-order mandate minimums are accumulating there. The scarcest
+resource on the critical path is not engineering — it is elapsed calendar time on that
 frozen runtime, plus a small number of owner decisions and data purchases.
 
 ---
@@ -159,8 +159,8 @@ already-merged work does not reorder the adopted next step.
 | GR-6 recovery/portability | off-machine backup restore, secrets audit, key rotation, portable scheduler, second-machine stand-up proven once | zero matches for all markers |
 | GR-7 product completeness | **Split into sub-milestones 2026-08-05** (the archived plan's five items are far too large for one reviewed branch; one milestone per branch per CLAUDE.md §3). **GR-7a annual tax reporting** — **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-05.** Review closed sample-as-broker coverage verification, float-product money conversion, stdout artifact pollution, Reports-page provider-fetch writes, year/report desync, and coverage freeze/outage honesty. **GR-7b idle-cash/mandate reporting** — **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-06.** Review closed CLI/UI provider-fetch writes on a claimed read-only surface, NaN measured-vol traceback, and negative measured vol. **GR-7c performance attribution** — **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-06; follow-ups (cash-flow skip + session-equalized weight) independently reviewed after correction 2026-08-07.** Single-bucket SPY cash-drag / residual; session sufficiency; review closed silent cash>equity clamp, NaN cost typing, read-only proof, overinvested label honesty, post-flow equity TWR wiring (deposit-as-return), weight-method disclosure, and human-CLI cash-drag hardcoding. **GR-7d rebalance-to-target proposals — BLOCKED ON AN OWNER DECISION** (see below), not on code. The archived plan's "tax-aware sell preview" item was found already substantially shipped: `assistant/proposals.py` surfaces `tax_lot_advisory` (lot-level realized-gain consequences) on risk-reduction proposals. | GR-7a/b/c complete after review |
 | Allocation service | delta-vs-target primitive, calibrated regime threshold, cadence, universe list, sizing | only the `strategy_evaluations` table exists |
-| Proposal-history cleanup | first milestone: `dismissed` status, preview-first dismissal CLI, History UI; optional later milestone: explicit-trigger expiry sweep; physical purge stays deferred | 19 statuses, no `dismissed`; only `prune-packets` exists (decision packets, not proposals) |
-| AI strategy authoring AS-0..AS-7 | prose → StrategySpec → compiler → evaluation plan → orchestrated backtest → dossier → registry | 0% — no `strategy_lab/`, no DSL, no Backtest tab |
+| Proposal-history cleanup | `dismissed` status, preview-first dismissal CLI, and History UI are complete as UI-2d; optional explicit-trigger expiry and physical purge remain separately deferred | first milestone complete; automatic expiry/purge not built |
+| AI strategy authoring AS-0..AS-7 | prose → StrategySpec → compiler → evaluation plan → orchestrated backtest → dossier → registry | 0% of strategy authoring — no `strategy_lab/` or DSL. The separate read-only UI-3 Backtest page is complete and must not be confused with this authoring pipeline. |
 | AI debate surface | `assistant/ai_debate.py` parallel-framing design | 0%; its own doc questions whether the safe version is worth building |
 | MCP read-only server | `mcp_bridge/` + 9 tools | 0%; GR-5's dashboard prerequisite is now satisfied, but the §3.6 activation gate still fails because the broader GR list is incomplete, no five-question preceding-month need is recorded, and higher-leverage work remains open. |
 | QC-1 QuantConnect research client | allowlisted results-only cloud transport (`research/quantconnect.py`); no raw market-data export path | **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-07.** Review forced POST-for-all (including authenticate), hardened allowlist against prefix/`../` bypass, required in-band `success is True`, and rejected bad ids/timeouts. Live `authenticate()` still unproven until credentials are set. Look-counting registry is the next QC milestone. |
@@ -273,7 +273,10 @@ follow-up adds Interactive-logon host bootstrap and post-start
 ledger bootstrap or any epoch action. No such action follows without the
 owner's specific direction.
 
-**Phase 5 — operational deployment + epoch start (COMPLETE 2026-08-05: paper-epoch-001 ACTIVE on frozen commit `8a2233c`, all four tasks running under Interactive logon, ledger bootstrapped/reconciled clean, all five drills passed and recorded in-epoch; the 60-session clock is running — see docs/SESSION_HANDOFF.md for the lineage block):**
+**Phase 5 — operational deployment + epoch start (COMPLETE; initial
+`paper-epoch-001` shakedown closed, current `paper-epoch-002` active since
+2026-08-06 on the separate frozen operational computer at `9a91498`; see
+`docs/SESSION_HANDOFF.md` for the current lineage block):**
 merge the independently reviewed approved mandate → pin the model-2
 operational checkout → elevated scheduler window under the owner's account →
 install + verify the 4 operational tasks (`-WhatIf` first) → install the

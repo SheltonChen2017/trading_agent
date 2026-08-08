@@ -45,3 +45,4 @@ artifacts/
 # never accidentally committed or conflict with a repo update (GPT
 # review, 2026-07-28).
 assistant/my_policy.json
+*.policy.lock

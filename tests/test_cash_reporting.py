@@ -10,6 +10,7 @@ is action-shaped.
 from __future__ import annotations
 
 import dataclasses
+from datetime import datetime
 from decimal import Decimal
 
 import pytest
@@ -18,6 +19,7 @@ from assistant.cash_reporting import CashReportError, evaluate_idle_cash
 from assistant.mandate import PortfolioMandate
 from assistant.policy import load_policy, DEFAULT_POLICY_PATH
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
+from risk.execution_gate import TradeIntent, validate_trade_intent
 
 _MANDATE = PortfolioMandate(
     version="test-1",
@@ -267,16 +269,18 @@ def test_report_carries_no_action_shaped_field():
 def test_headroom_is_bounded_by_whichever_limit_binds_first():
     """When cash is the scarcer resource the report must say so, otherwise
     'headroom' would overstate what policy actually permits."""
-    # Only 12k cash against a 10k floor => 2k above reserve, while the
-    # exposure ceiling still leaves 38k of room.
+    # Only 12k cash against a 10k floor => 2k above reserve. Use a snapshot
+    # whose cash plus positions equals equity; the execution gate derives
+    # filled exposure as equity-cash and must not be tested against an
+    # internally contradictory account shape.
     report = evaluate_idle_cash(
-        _snapshot(12_000.0, [_position("AAPL", 12_000.0)], 100_000.0),
-        _policy(),
+        _snapshot(12_000.0, [_position("AAPL", 88_000.0)], 100_000.0),
+        _policy(max_total_exposure_pct=1.0),
         _MANDATE,
     )
     bounds = report["policy_bounds"]
     assert bounds["cash_above_reserve"] == "2000"
-    assert bounds["unused_exposure_capacity"] == "38000"
+    assert bounds["unused_exposure_capacity"] == "12000"
     assert bounds["policy_headroom"] == "2000"
     assert bounds["binding_constraint"] == "cash_reserve_floor"
 
@@ -587,8 +591,117 @@ def test_headroom_nets_out_capital_already_committed_to_working_orders():
     assert Decimal(with_orders["policy_headroom"]) == (
         Decimal(without["policy_headroom"]) - Decimal("4000")
     )
-    assert with_orders["policy_headroom_basis"] == "net_of_committed_capital"
+    assert with_orders["policy_headroom_basis"] == "execution_gate_equivalent"
     assert with_orders["committed_capital_complete"] is True
+
+
+def test_buying_power_is_the_cash_bound_used_by_the_execution_gate():
+    snapshot = dataclasses.replace(
+        _snapshot(9_000.0, [_position("AAPL", 1_000.0)], 10_000.0),
+        buying_power=1_000.0,
+    )
+
+    bounds = evaluate_idle_cash(snapshot, _policy(), _MANDATE)["policy_bounds"]
+
+    assert bounds["available_capital_at_gate"] == "1000"
+    assert bounds["cash_above_reserve_at_gate"] == "0"
+    assert bounds["policy_headroom"] == "0"
+    assert bounds["binding_constraint"] == "cash_reserve_floor"
+
+
+def test_unavailable_open_orders_make_exact_policy_headroom_unavailable():
+    snapshot = dataclasses.replace(
+        _snapshot(9_000.0, [_position("AAPL", 1_000.0)], 10_000.0),
+        open_orders=[],
+        open_orders_available=False,
+    )
+
+    bounds = evaluate_idle_cash(snapshot, _policy(), _MANDATE)["policy_bounds"]
+
+    assert bounds["committed_capital_complete"] is False
+    assert bounds["policy_headroom"] is None
+    assert bounds["binding_constraint"] is None
+    assert "unavailable" in bounds["policy_headroom_unavailable_reason"]
+
+
+def test_partial_fill_counts_only_the_unfilled_limit_order_remainder():
+    working = [{
+        "ticker": "MSFT",
+        "side": "buy",
+        "shares": 10,
+        "filled_qty": 4,
+        "limit_price": 400.0,
+    }]
+
+    bounds = evaluate_idle_cash(
+        _snapshot_with_open_orders(
+            87_000.0, [_position("AAPL", 13_000.0)], 100_000.0, working
+        ),
+        _policy(),
+        _MANDATE,
+    )["policy_bounds"]
+
+    assert bounds["capital_already_committed"] == "2400"
+    assert bounds["committed_capital_complete"] is True
+
+
+def test_negative_pending_notional_cannot_increase_reported_headroom():
+    malformed = [{
+        "ticker": "MSFT",
+        "side": "buy",
+        "notional": -4_000.0,
+    }]
+
+    bounds = evaluate_idle_cash(
+        _snapshot_with_open_orders(
+            87_000.0, [_position("AAPL", 13_000.0)], 100_000.0, malformed
+        ),
+        _policy(),
+        _MANDATE,
+    )["policy_bounds"]
+
+    assert bounds["capital_already_committed"] == "0"
+    assert bounds["committed_capital_complete"] is False
+    assert bounds["capital_already_committed_unknown_tickers"] == ("MSFT",)
+    assert bounds["policy_headroom"] is None
+
+
+def test_reported_headroom_matches_execution_gate_boundary():
+    working = [{"ticker": "MSFT", "side": "buy", "notional": 1_000.0}]
+    snapshot = dataclasses.replace(
+        _snapshot_with_open_orders(
+            7_000.0, [_position("AAPL", 3_000.0)], 10_000.0, working
+        ),
+        buying_power=6_000.0,
+    )
+    policy = _policy(max_position_pct=1.0)
+    bounds = evaluate_idle_cash(snapshot, policy, _MANDATE)["policy_bounds"]
+    assert bounds["policy_headroom"] == "1000"
+
+    at_limit = validate_trade_intent(
+        TradeIntent(ticker="KO", side="buy", shares=1_000),
+        snapshot,
+        reference_price=1.0,
+        now=datetime(2026, 8, 3, 10, 0),  # Monday during market hours
+        max_position_pct=1.0,
+        max_total_exposure_pct=policy.max_total_exposure_pct,
+        min_cash_reserve_pct=policy.min_cash_reserve_pct,
+        pending_buy_value_by_ticker={"MSFT": 1_000.0},
+    )
+    over_limit = validate_trade_intent(
+        TradeIntent(ticker="KO", side="buy", shares=1_001),
+        snapshot,
+        reference_price=1.0,
+        now=datetime(2026, 8, 3, 10, 0),
+        max_position_pct=1.0,
+        max_total_exposure_pct=policy.max_total_exposure_pct,
+        min_cash_reserve_pct=policy.min_cash_reserve_pct,
+        pending_buy_value_by_ticker={"MSFT": 1_000.0},
+    )
+
+    assert at_limit.approved is True
+    assert over_limit.approved is False
+    assert any("total-exposure limit" in text for text in over_limit.violations)
 
 
 def test_a_commitment_of_unknowable_value_is_disclosed_not_counted_as_zero():

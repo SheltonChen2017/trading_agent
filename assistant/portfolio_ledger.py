@@ -17,7 +17,11 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from assistant.schemas import PortfolioSnapshot
-from assistant.storage import AssistantStore
+from assistant.storage import (
+    AssistantStore,
+    JournalTransactionConflictError,
+    LedgerBootstrapConflictError,
+)
 
 USD = "USD"
 BALANCE_TOLERANCE = Decimal("0.000001")
@@ -173,15 +177,18 @@ def post_transaction(
     store: AssistantStore, transaction: JournalTransaction
 ) -> bool:
     transaction.validate()
-    return store.append_journal_transaction(
-        transaction_id=transaction.transaction_id,
-        occurred_at=transaction.occurred_at,
-        source=transaction.source,
-        external_id=transaction.external_id,
-        description=transaction.description,
-        postings=[posting.to_dict() for posting in transaction.postings],
-        metadata=transaction.metadata,
-    )
+    try:
+        return store.append_journal_transaction(
+            transaction_id=transaction.transaction_id,
+            occurred_at=transaction.occurred_at,
+            source=transaction.source,
+            external_id=transaction.external_id,
+            description=transaction.description,
+            postings=[posting.to_dict() for posting in transaction.postings],
+            metadata=transaction.metadata,
+        )
+    except JournalTransactionConflictError as exc:
+        raise LedgerError(str(exc)) from exc
 
 
 def ledger_balances(store: AssistantStore) -> dict[str, Any]:
@@ -300,9 +307,6 @@ def bootstrap_opening_snapshot(
         postings=tuple(postings),
         metadata=snapshot_material,
     )
-    inserted = post_transaction(store, transaction)
-    if not inserted:
-        raise LedgerError("opening snapshot already exists")
     state = {
         "bootstrapped_at": occurred.isoformat(),
         "snapshot_as_of": snapshot.as_of,
@@ -311,7 +315,20 @@ def bootstrap_opening_snapshot(
         "account_id": snapshot.account_id,
         "snapshot_hash": digest,
     }
-    store.set_system_state("ledger_bootstrap", state)
+    transaction.validate()
+    try:
+        store.bootstrap_portfolio_ledger(
+            transaction_id=transaction.transaction_id,
+            occurred_at=transaction.occurred_at,
+            source=transaction.source,
+            external_id=transaction.external_id,
+            description=transaction.description,
+            postings=[posting.to_dict() for posting in transaction.postings],
+            metadata=transaction.metadata,
+            bootstrap_state=state,
+        )
+    except LedgerBootstrapConflictError as exc:
+        raise LedgerError(str(exc)) from exc
     return state
 
 
@@ -405,6 +422,42 @@ def sync_app_fills(store: AssistantStore) -> dict[str, Any]:
             continue
         external_id = f"app_fill:{fill['fill_id']}"
         if external_id in existing_external_ids:
+            existing = store.get_journal_transaction_by_external_id(external_id)
+            ticker = str(fill["ticker"]).upper()
+            side = str(fill["side"]).lower()
+            qty = _decimal(fill["qty"], "fill.qty")
+            price = _decimal(fill["price"], "fill.price")
+            expected_metadata = {
+                "fill_id": str(fill["fill_id"]),
+                "order_id": fill.get("order_id"),
+                "proposal_id": fill.get("proposal_id"),
+                "ticker": ticker,
+                "side": side,
+                "qty": _decimal_text(qty),
+                "price": _decimal_text(price),
+                "fees_included": False,
+            }
+            expected_header = (
+                _transaction_id(external_id),
+                _parse_at(fill["at"], "fill.at").isoformat(),
+                "assistant_broker_event",
+                external_id,
+                f"{side.upper()} {qty} {ticker} @ {price}",
+                expected_metadata,
+            )
+            actual_header = (
+                existing["transaction_id"],
+                existing["occurred_at"],
+                existing["source"],
+                existing["external_id"],
+                existing["description"],
+                existing["metadata"],
+            )
+            if actual_header != expected_header:
+                raise LedgerError(
+                    f"journal external_id {external_id!r} already exists "
+                    "with different content"
+                )
             duplicates += 1
             continue
         balances = ledger_balances(store)
@@ -540,11 +593,49 @@ def record_split(
     effective_at = _parse_at(occurred_at)
     expected_external_id = f"split:{external_id}"
     postings = store.list_journal_postings()
-    if any(
-        posting["external_id"] == expected_external_id
-        for posting in postings
-    ):
-        return False
+    existing_split = store.get_journal_transaction_by_external_id(
+        expected_external_id
+    )
+    if existing_split is not None:
+        existing_metadata = existing_split["metadata"]
+        try:
+            pre_split = _decimal(
+                existing_metadata["pre_split_shares"],
+                "stored pre_split_shares",
+            )
+        except (KeyError, LedgerError) as exc:
+            raise LedgerError(
+                f"journal external_id {expected_external_id!r} already exists "
+                "with different content"
+            ) from exc
+        post_split = pre_split * split_ratio
+        retry_metadata = {
+            "ticker": normalized_ticker,
+            "corporate_action": "split",
+            "ratio": _decimal_text(split_ratio),
+            "pre_split_shares": _decimal_text(pre_split),
+            "post_split_shares": _decimal_text(post_split),
+            "cash_in_lieu_included": False,
+        }
+        retry = JournalTransaction(
+            transaction_id=_transaction_id(expected_external_id),
+            occurred_at=effective_at.isoformat(),
+            source="corporate_action",
+            external_id=expected_external_id,
+            description=(
+                f"Confirmed {split_ratio}:1 share adjustment for {normalized_ticker}"
+            ),
+            postings=(
+                Posting(
+                    _security_account(normalized_ticker),
+                    Decimal("0"),
+                    quantity=post_split - pre_split,
+                    metadata=retry_metadata,
+                ),
+            ),
+            metadata=retry_metadata,
+        )
+        return post_transaction(store, retry)
     security_account = _security_account(normalized_ticker)
     # Independent review, 2026-07-31: held_at_effective below only sums
     # postings ALREADY in the journal -- if ledger-sync hasn't caught up on

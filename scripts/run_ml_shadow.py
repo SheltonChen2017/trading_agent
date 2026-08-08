@@ -363,7 +363,7 @@ def _fail_claimed_run(
     if run.get("status") != "claimed":
         return
     predictions = store.list_ml_predictions(shadow_run_id=str(run["run_id"]))
-    store.complete_ml_shadow_run(
+    failed_run = store.complete_ml_shadow_run(
         str(run["run_id"]),
         status="failed",
         prediction_count=len(predictions),
@@ -372,6 +372,19 @@ def _fail_claimed_run(
             "kind": _failure_kind(error),
             "exception_type": type(error).__name__,
             "detail": str(error),
+        },
+    )
+    store.upsert_operational_alert(
+        fingerprint=f"ml_shadow_run_failure:{run['run_id']}",
+        severity="warning",
+        category="ml_shadow",
+        message=f"shadow run failed: {_failure_kind(error)}",
+        details={
+            "kind": _failure_kind(error),
+            "run_id": str(run["run_id"]),
+            "evidence_epoch": failed_run.get("evidence_epoch"),
+            "schedule_key": failed_run.get("schedule_key"),
+            "exception_type": type(error).__name__,
         },
     )
 
@@ -1040,10 +1053,12 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
-    store = AssistantStore(args.database)
     config: ShadowRuntimeConfig | None = None
+    store = None if args.command == "status" else AssistantStore(args.database)
     try:
         config, _payload = load_shadow_config(args.config)
+        if store is None:
+            store = AssistantStore(args.database, read_only=True)
         if args.command == "register":
             summary = command_register(store, config, args.artifact_dir)
         elif args.command == "predict":

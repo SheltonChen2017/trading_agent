@@ -235,18 +235,32 @@ def _coverage(
     expected_subjects: Sequence[str],
     gate: ShadowMonitoringGate | None,
 ) -> dict[str, Any]:
-    expected = len(runs) * len(tuple(expected_subjects))
-    available = sum(bool(row.get("available")) for row in predictions)
-    refused = len(predictions) - available
+    scheduled_dates = {str(row.get("scheduled_for", ""))[:10] for row in runs}
+    expected_identities = {
+        (session, str(subject))
+        for session in scheduled_dates
+        for subject in expected_subjects
+    }
+    unique_predictions: dict[tuple[str, str], Mapping[str, Any]] = {}
+    for row in predictions:
+        identity = (str(row.get("as_of_session")), str(row.get("subject_key")))
+        unique_predictions.setdefault(identity, row)
+    matched = {
+        identity: row
+        for identity, row in unique_predictions.items()
+        if identity in expected_identities
+    }
+    expected = len(expected_identities)
+    available = sum(bool(row.get("available")) for row in matched.values())
+    refused = len(matched) - available
     reasons = Counter(
         str(reason)
-        for row in predictions
+        for row in matched.values()
         if not row.get("available")
         for reason in (row.get("refusal_reasons") or ())
     )
-    scheduled_dates = {str(row.get("scheduled_for", ""))[:10] for row in runs}
-    prediction_coverage = len(predictions) / expected if expected else None
-    refusal_fraction = refused / len(predictions) if predictions else None
+    prediction_coverage = len(matched) / expected if expected else None
+    refusal_fraction = refused / len(matched) if matched else None
     sufficient = bool(
         gate
         and len(scheduled_dates) >= gate.minimum_unique_dates
@@ -272,7 +286,9 @@ def _coverage(
         "scheduled_attempt_count": len(runs),
         "unique_scheduled_date_count": len(scheduled_dates),
         "expected_subject_attempt_count": expected,
-        "recorded_subject_attempt_count": len(predictions),
+        "recorded_subject_attempt_count": len(matched),
+        "raw_prediction_row_count": len(predictions),
+        "duplicate_or_unexpected_row_count": len(predictions) - len(matched),
         "available_count": available,
         "refused_count": refused,
         "prediction_coverage": round(prediction_coverage, 6) if prediction_coverage is not None else None,
@@ -466,8 +482,16 @@ def _output_drift(
 
 def _matured_rows(
     predictions: Sequence[Mapping[str, Any]], outcomes: Sequence[Mapping[str, Any]]
-) -> list[dict[str, Any]]:
-    by_id = {str(row.get("prediction_id")): row for row in outcomes}
+) -> tuple[list[dict[str, Any]], list[str]]:
+    outcome_counts = Counter(str(row.get("prediction_id")) for row in outcomes)
+    duplicate_outcome_ids = sorted(
+        identifier for identifier, count in outcome_counts.items() if count > 1
+    )
+    by_id = {
+        str(row.get("prediction_id")): row
+        for row in outcomes
+        if outcome_counts[str(row.get("prediction_id"))] == 1
+    }
     result: list[dict[str, Any]] = []
     for prediction in predictions:
         outcome = by_id.get(str(prediction.get("prediction_id")))
@@ -493,7 +517,7 @@ def _matured_rows(
                 "event_category": str(_context(prediction).get("event_category", "unavailable")),
             }
         )
-    return result
+    return result, duplicate_outcome_ids
 
 
 def _qlike(actual: float, predicted: float) -> float:
@@ -625,9 +649,26 @@ def _calibration(
                     lower <= row["actual"] <= upper
                 )
         probability = _finite(
-            uncertainty.get("calibrated_probability_above_mandate_ceiling")
+            uncertainty.get(
+                "threshold_probability",
+                uncertainty.get("calibrated_probability_above_mandate_ceiling"),
+            )
         )
-        if probability is not None and 0 <= probability <= 1 and gate and gate.mandate_ceiling_daily_pct is not None:
+        is_calibrated = (
+            uncertainty.get(
+                "threshold_probability_label",
+                "calibrated_probability"
+                if "calibrated_probability_above_mandate_ceiling" in uncertainty
+                else None,
+            )
+            == "calibrated_probability"
+            and (
+                uncertainty.get("calibration_status")
+                in {"calibrated", "calibrated_prospectively"}
+                or "calibrated_probability_above_mandate_ceiling" in uncertainty
+            )
+        )
+        if probability is not None and is_calibrated and 0 <= probability <= 1 and gate and gate.mandate_ceiling_daily_pct is not None:
             probability_rows.append(
                 (row["session"], probability, float(row["actual"] > gate.mandate_ceiling_daily_pct))
             )
@@ -770,6 +811,15 @@ def _outcome_underfill(
 def _operations(runs: Sequence[Mapping[str, Any]], alerts: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     failures = [row for row in runs if row.get("status") == "failed"]
     unresolved = [row for row in alerts if row.get("status") == "open"]
+    alerted_run_ids = {
+        str((row.get("details") or {}).get("run_id"))
+        for row in alerts
+        if isinstance(row.get("details"), Mapping)
+        and (row.get("details") or {}).get("run_id")
+    }
+    untracked = [
+        row for row in failures if str(row.get("run_id")) not in alerted_run_ids
+    ]
     return {
         "failed_run_count": len(failures),
         "failed_runs": failures,
@@ -777,8 +827,9 @@ def _operations(runs: Sequence[Mapping[str, Any]], alerts: Sequence[Mapping[str,
         "historical_incidents": list(alerts),
         "unresolved_incident_count": len(unresolved),
         "unresolved_incidents": unresolved,
-        "untracked_failed_run_count": len(failures) if failures and not alerts else 0,
-        "clean": not unresolved and (not failures or bool(alerts)),
+        "untracked_failed_run_count": len(untracked),
+        "untracked_failed_runs": untracked,
+        "clean": not unresolved and not untracked,
         "note": "Historical incidents remain visible after later successful runs.",
     }
 
@@ -851,7 +902,7 @@ def build_epoch_monitoring_report(
     )
     feature_drift = _feature_drift(predictions, feature_reference, gate)
     output_drift = _output_drift(predictions, gate)
-    matured = _matured_rows(predictions, outcomes)
+    matured, duplicate_outcome_ids = _matured_rows(predictions, outcomes)
     realized, baselines = _realized_and_baselines(matured, gate)
     calibration = _calibration(matured, gate)
     slices = _failure_slices(matured, gate)
@@ -884,8 +935,15 @@ def build_epoch_monitoring_report(
         blockers.append("interval_coverage_insufficient_or_unacceptable")
     if not calibration["ceiling_probability"]["sample_sufficiency"]["sufficient"]:
         blockers.append("calibration_insufficient_or_unacceptable")
-    if lineage["requires_new_evidence_epoch"] or lineage["clock_error_count"] or lineage["invalid_lineage_count"]:
+    if (
+        lineage["requires_new_evidence_epoch"]
+        or lineage["duplicate_generation_count"]
+        or lineage["clock_error_count"]
+        or lineage["invalid_lineage_count"]
+    ):
         blockers.append("shadow_lineage_inconsistent")
+    if duplicate_outcome_ids:
+        blockers.append("shadow_duplicate_outcomes")
     if not underfill["complete"]:
         blockers.append("matured_outcome_underfill")
     if not operations["clean"]:
@@ -909,6 +967,8 @@ def build_epoch_monitoring_report(
         "frozen_baseline_performance": baselines,
         "failure_slices": slices,
         "lineage_consistency": lineage,
+        "duplicate_outcome_count": len(duplicate_outcome_ids),
+        "duplicate_outcome_ids": duplicate_outcome_ids[:100],
         "target_outcome_underfill": underfill,
         "operational_failures": operations,
         "promotion_blockers": list(dict.fromkeys(blockers)),

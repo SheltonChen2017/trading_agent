@@ -16,10 +16,15 @@ from pathlib import Path
 from typing import Literal
 
 from config import MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
+from assistant.process_singleton import ProcessSingleton, ProcessSingletonError
 
 DEFAULT_POLICY_PATH = Path(__file__).resolve().parent / "default_policy.json"
 PERSONAL_POLICY_PATH = Path(__file__).resolve().parent / "my_policy.json"
 POLICY_PATH_ENV_VAR = "TRADING_ASSISTANT_POLICY"
+
+
+class PolicyWriteConflictError(RuntimeError):
+    """The policy changed after the caller loaded its editing base."""
 
 
 def resolve_policy_path(
@@ -284,18 +289,33 @@ def policy_with_updated_flags(
     return updated
 
 
-def save_policy(policy: TradingPolicy, path: str | Path) -> None:
-    """Validate, then atomically write the policy as JSON.
+def save_policy(
+    policy: TradingPolicy,
+    path: str | Path,
+    *,
+    expected_fingerprint: str | None = None,
+    expected_version: str | None = None,
+) -> None:
+    """Validate, then compare-and-swap the policy as atomic JSON.
 
     Atomic via write-to-temp-then-os.replace in the destination directory,
     so a crash mid-write can never leave a half-written policy file that a
     later load_policy() would reject (or worse, a truncated-but-parseable
     one). Validation runs BEFORE any filesystem effect: an invalid policy
-    must leave the existing file byte-identical."""
-    import os
+    must leave the existing file byte-identical.
+
+    UI/editor callers pass both expected values from the policy they rendered.
+    An OS file lock serializes comparison and replacement, so a stale tab
+    cannot restore an authoritative flag changed by another writer (CXL-004).
+    Bootstrap and controlled test callers may omit both values.
+    """
     import uuid
 
     policy.validate()
+    if (expected_fingerprint is None) != (expected_version is None):
+        raise ValueError(
+            "expected_fingerprint and expected_version must be supplied together"
+        )
     destination = Path(path)
     serialized = json.dumps(policy.to_dict(), indent=2) + "\n"
     # FCS-015: uuid-suffixed temp name. A deterministic `.tmp` sibling races
@@ -306,9 +326,34 @@ def save_policy(policy: TradingPolicy, path: str | Path) -> None:
     # but it is the same temp-name race fixed in backtest/research_report.py
     # on 2026-07-31, and the fix was never generalized. Cleaned up in a
     # finally so a failed write leaves no litter beside the policy file.
+    lock = ProcessSingleton(
+        destination.with_name(f".{destination.name}.policy.lock")
+    )
+    try:
+        lock.acquire()
+    except ProcessSingletonError as exc:
+        raise PolicyWriteConflictError(
+            "another policy writer is active; reload before trying again"
+        ) from exc
     temp_path = destination.with_name(f".{destination.name}.{uuid.uuid4().hex}.tmp")
     try:
+        if expected_fingerprint is not None:
+            try:
+                current = load_policy(destination)
+            except FileNotFoundError as exc:
+                raise PolicyWriteConflictError(
+                    "the policy was removed after it was loaded; reload before saving"
+                ) from exc
+            if (
+                compute_policy_fingerprint(current) != expected_fingerprint
+                or current.version != expected_version
+            ):
+                raise PolicyWriteConflictError(
+                    "the policy changed since it was loaded; reload and review the "
+                    "new values before saving"
+                )
         temp_path.write_text(serialized, encoding="utf-8")
         os.replace(temp_path, destination)
     finally:
         temp_path.unlink(missing_ok=True)
+        lock.release()

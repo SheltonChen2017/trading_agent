@@ -148,6 +148,52 @@ def test_overlapping_ticker_rows_count_as_three_dates_not_six():
     assert report["independent_observation_unit"] == "unique_as_of_session"
 
 
+def test_duplicate_predictions_cannot_inflate_coverage_and_are_blocking():
+    sessions = ("2026-01-05", "2026-01-06", "2026-01-07")
+    predictions = [_prediction(session, "A") for session in sessions]
+    predictions.extend([dict(predictions[0]), dict(predictions[0])])
+    report = build_epoch_monitoring_report(
+        evidence_epoch=EPOCH,
+        lineage_hash="b" * 64,
+        predictions=predictions,
+        outcomes=[_outcome(row) for row in predictions[:3]],
+        runs=[_run(session) for session in sessions],
+        operational_alerts=[],
+        expected_subjects=("A",),
+        feature_reference=_reference(),
+        gate=_gate(),
+        as_of="2026-03-01T00:00:00+00:00",
+    )
+
+    assert report["coverage"]["prediction_coverage"] == 1.0
+    assert report["coverage"]["recorded_subject_attempt_count"] == 3
+    assert report["lineage_consistency"]["duplicate_generation_count"] == 1
+    assert "shadow_lineage_inconsistent" in report["promotion_blockers"]
+
+
+def test_duplicate_outcomes_are_excluded_and_block_monitoring():
+    sessions = ("2026-01-05", "2026-01-06", "2026-01-07")
+    predictions = [_prediction(session, "A") for session in sessions]
+    outcomes = [_outcome(row) for row in predictions]
+    outcomes.append(_outcome(predictions[0], actual=9.0))
+    report = build_epoch_monitoring_report(
+        evidence_epoch=EPOCH,
+        lineage_hash="b" * 64,
+        predictions=predictions,
+        outcomes=outcomes,
+        runs=[_run(session) for session in sessions],
+        operational_alerts=[],
+        expected_subjects=("A",),
+        feature_reference=_reference(),
+        gate=_gate(),
+        as_of="2026-03-01T00:00:00+00:00",
+    )
+
+    assert report["duplicate_outcome_count"] == 1
+    assert "shadow_duplicate_outcomes" in report["promotion_blockers"]
+    assert report["realized_error"]["independent_unique_date_count"] == 2
+
+
 def test_two_epochs_cannot_be_pooled_into_one_monitoring_report():
     first = _prediction("2026-01-05", "A")
     second = _prediction("2026-01-06", "A", epoch="epoch-b")
@@ -268,6 +314,31 @@ def test_historical_incident_remains_visible_after_later_successful_runs():
     assert operations["historical_incident_count"] == 1
     assert operations["unresolved_incident_count"] == 0
     assert operations["clean"]
+
+
+def test_unrelated_alert_does_not_cover_a_failed_shadow_run():
+    sessions = ("2026-01-05", "2026-01-06", "2026-01-07")
+    predictions = [_prediction(session, "A") for session in sessions]
+    unrelated = {
+        "status": "acknowledged",
+        "category": "ml_shadow",
+        "details": {"run_id": "some-other-run"},
+    }
+    report = build_epoch_monitoring_report(
+        evidence_epoch=EPOCH,
+        lineage_hash="b" * 64,
+        predictions=predictions,
+        outcomes=[_outcome(row) for row in predictions],
+        runs=[_run(sessions[0], status="failed"), *[_run(s) for s in sessions[1:]]],
+        operational_alerts=[unrelated],
+        expected_subjects=("A",),
+        feature_reference=_reference(),
+        gate=_gate(),
+        as_of="2026-03-01T00:00:00+00:00",
+    )
+
+    assert report["operational_failures"]["untracked_failed_run_count"] == 1
+    assert "shadow_operational_incidents_present" in report["promotion_blockers"]
 
 
 def test_missing_confirmation_economics_calibration_and_lineage_are_blockers():

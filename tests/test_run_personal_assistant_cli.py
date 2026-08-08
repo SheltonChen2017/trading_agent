@@ -79,6 +79,24 @@ def test_recover_stale_rejects_non_integer():
         assert exc.code != 0
 
 
+@pytest.mark.parametrize("bad_limit", ["0", "-1"])
+def test_list_limit_rejects_non_positive_values(bad_limit):
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(["list", "--limit", bad_limit])
+
+
+def test_list_limit_accepts_a_positive_value():
+    assert build_parser().parse_args(["list", "--limit", "1"]).limit == 1
+
+
+def test_tax_report_year_rejects_negative_and_uses_non_negative_guard():
+    with pytest.raises(SystemExit):
+        build_parser().parse_args(["tax-report", "--year", "-1"])
+    assert build_parser().parse_args(
+        ["tax-report", "--year", "0"]
+    ).year == 0
+
+
 def test_production_foundation_commands_parse():
     assert (
         build_parser().parse_args(

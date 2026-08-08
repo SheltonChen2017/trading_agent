@@ -14,10 +14,10 @@ suite. Previous full sweeps: `docs/REVIEW_2026-07-30_FULL_CODEBASE.md`
 (0 P0 / 0 P1 / 2 P2 fixed, 1 P2 open).
 
 **Findings were recorded before any fix.** Commits `f2e1c2d`, `32e2751` and
-`38373d3` are documentation only; the two highest-consequence P2s were then
-fixed in a later commit on the same branch (see their ledger rows). Everything else remains open and
-unfixed. Nothing is deployed; the operational checkout stays frozen at
-`9a91498` under `paper-epoch-002`.
+`38373d3` are documentation only. Later commits on the same branch fixed all
+seventeen findings then known; FCS-018 was subsequently found and fixed as an
+eighteenth finding. See the ledger rows and §2b. Nothing is deployed; the
+operational checkout stays frozen at `9a91498` under `paper-epoch-002`.
 
 ## 1. Headline
 
@@ -27,8 +27,11 @@ unfixed. Nothing is deployed; the operational checkout stays frozen at
 > headline. That challenge was correct, and §3's coverage limits are the
 > reason it was warranted -- the first pass had not read the approval flow.
 
-**Status: ALL SEVENTEEN findings are FIXED on this branch.** Corrections and
-their verification are in §2b. No finding has had an independent review.
+**Status at the end of this sweep: ALL EIGHTEEN findings were fixed on the
+branch.** Corrections and their verification are in §2b. Codex's later
+independent review accepted the core corrections but found residual and
+test-evidence issues; those are tracked as CXL findings in
+`docs/REVIEW_2026-08-07_CODEX_LINE_BY_LINE.md` and the ordered combined ledger.
 
 Two of the P2s are *recurrences of classes this project has already fixed
 elsewhere*, at sites the earlier fix was never generalized to:
@@ -197,7 +200,7 @@ Windows, Python **3.14.6** (note FCS-011 — CI covers 3.12/3.13 only).
 - Full suite after the first two fixes (FCS-001 / FCS-016): **3041 passed,
   0 failed, 0 skipped, 25 warnings** (352s) -- the +26 exactly the tests those
   two added.
-- Full suite on the **exact final tree**, all seventeen fixed: **3085 passed,
+- Full suite before FCS-018, with the first seventeen fixed: **3085 passed,
   0 failed, 0 skipped, 25 warnings** (347s). The +70 over baseline is entirely
   new regression tests; **no pre-existing test changed its result**, which is
   the claim that matters -- every fix is additive to the existing contract.
@@ -245,11 +248,12 @@ LLM-authority path was modified.
 
 ## 9. What this sweep did not do
 
-It did not read `ml/`, `storage.py`, `personal_assistant_ui.py`,
-`backtest/engine.py`, or `scripts/` at line level (§3). Only FCS-001 and
-FCS-016 carry a correction and red/green verification; **FCS-002, FCS-003 and
-all twelve P3s are recorded but unfixed**, and no reviewer has independently
-confirmed the two fixes. It did not review the test
+The initial scan did not read `ml/`, `storage.py`, `personal_assistant_ui.py`,
+`backtest/engine.py`, or `scripts/` at line level (§3). Those areas were later
+covered by Codex's line-by-line continuation. At the first documentation-only
+snapshot, only FCS-001 and FCS-016 had correction evidence; FCS-002, FCS-003,
+and the P3s were still unfixed. They were corrected later on the branch, as
+§2b records. The initial scan did not review the test
 suite for weak assertions beyond noting that `tests/test_strategy_proposals.py`
 has no coverage for the FCS-001 inputs. And it grants no authority: nothing
 here changes what the machine may do.

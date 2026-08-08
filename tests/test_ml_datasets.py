@@ -2,8 +2,12 @@
 features/labels-stay-separate rule, and hash-verified atomic persistence."""
 from __future__ import annotations
 
+import os
+import threading
 import pandas as pd
 import pytest
+
+import ml.datasets as datasets_module
 
 from ml.datasets import (
     DatasetError,
@@ -323,6 +327,80 @@ def test_conflicting_member_is_detected_before_any_new_member_is_written(tmp_pat
     with pytest.raises(DatasetError, match="refusing to overwrite"):
         save_dataset(features_df, labels_df, manifest, directory=tmp_path)
     assert not (tmp_path / "ds-test-1.features.csv.gz").exists()
+
+
+def test_failed_dataset_member_publish_rolls_back_the_whole_new_set(
+    tmp_path, monkeypatch
+):
+    sessions = _sessions(3)
+    features_df, labels_df = assemble_dataset_frames(
+        {"AAA": _features_frame("AAA", sessions)},
+        {"AAA": _label_rows("AAA", sessions, "v1")},
+    )
+    manifest = build_dataset_manifest(**_manifest_kwargs(features_df, labels_df))
+    real_write = datasets_module._atomic_write_bytes
+
+    def fail_labels(directory, filename, data):
+        if filename.endswith(".labels.csv.gz"):
+            raise OSError("injected dataset member failure")
+        return real_write(directory, filename, data)
+
+    monkeypatch.setattr(datasets_module, "_atomic_write_bytes", fail_labels)
+    with pytest.raises(OSError, match="injected dataset member failure"):
+        save_dataset(features_df, labels_df, manifest, directory=tmp_path)
+
+    assert not list(tmp_path.glob("ds-test-1.*"))
+
+
+def test_conflicting_concurrent_dataset_sets_have_one_coherent_winner(
+    tmp_path, monkeypatch
+):
+    sessions = _sessions(3)
+    contenders = []
+    for ticker in ("AAA", "BBB"):
+        features_df, labels_df = assemble_dataset_frames(
+            {ticker: _features_frame(ticker, sessions)},
+            {ticker: _label_rows(ticker, sessions, "v1")},
+        )
+        manifest = build_dataset_manifest(
+            **_manifest_kwargs(features_df, labels_df, dataset_id="shared-ds")
+        )
+        contenders.append((features_df, labels_df, manifest))
+
+    publish_pair = threading.Barrier(2)
+    real_replace = os.replace
+
+    def synchronized_replace(source, destination):
+        publish_pair.wait(timeout=5)
+        return real_replace(source, destination)
+
+    monkeypatch.setattr(datasets_module.os, "replace", synchronized_replace)
+    outcomes = []
+    lock = threading.Lock()
+
+    def save(contender):
+        try:
+            save_dataset(*contender, directory=tmp_path)
+            outcome = ("saved", None)
+        except Exception as exc:
+            outcome = ("rejected", type(exc))
+        with lock:
+            outcomes.append(outcome)
+
+    threads = [threading.Thread(target=save, args=(contender,)) for contender in contenders]
+    for thread in threads:
+        thread.start()
+    for thread in threads:
+        thread.join(timeout=10)
+
+    assert all(not thread.is_alive() for thread in threads)
+    assert sorted(item[0] for item in outcomes) == ["rejected", "saved"]
+    assert next(item[1] for item in outcomes if item[0] == "rejected") is DatasetError
+    loaded_features, _, loaded_manifest = load_dataset(tmp_path, "shared-ds")
+    assert set(loaded_features["ticker"]) in ({"AAA"}, {"BBB"})
+    assert loaded_manifest.dataset_hash in {
+        contender[2].dataset_hash for contender in contenders
+    }
 
 
 def test_multiple_datasets_coexist_in_one_directory(tmp_path):

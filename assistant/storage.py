@@ -22,10 +22,12 @@ from typing import Any
 from zoneinfo import ZoneInfo
 
 from assistant.proposal_status import (
+    CANCEL_PENDING,
     DISMISSED,
     DISMISSIBLE_SOURCE_STATUSES,
     EXPIRED,
     FILLED,
+    PARTIALLY_FILLED,
     STATUSES,
     UNRESOLVED_BROKER_STATE_STATUSES,
 )
@@ -36,6 +38,14 @@ DEFAULT_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "trading_ass
 # Trading days in this project are Eastern-market days (see
 # get_execution_budget_usage), not UTC days.
 _EASTERN = ZoneInfo("America/New_York")
+
+
+class JournalTransactionConflictError(ValueError):
+    """An external journal identity was reused for different content."""
+
+
+class LedgerBootstrapConflictError(ValueError):
+    """The portfolio journal cannot accept another opening bootstrap."""
 
 # ML-LR-6 plan 12.2's minimum lineage. Every one of these can change WITHOUT
 # any code change -- a re-fit model, a new report, a swapped provider, an
@@ -326,10 +336,17 @@ class DuplicateIntentConflict(Exception):
 
 
 class AssistantStore:
-    def __init__(self, path: str | Path | None = None):
+    def __init__(self, path: str | Path | None = None, *, read_only: bool = False):
         self.path = Path(path) if path is not None else configured_db_path()
-        self.path.parent.mkdir(parents=True, exist_ok=True)
-        self._initialize()
+        self.read_only = bool(read_only)
+        if self.read_only:
+            if not self.path.is_file():
+                raise FileNotFoundError(
+                    f"read-only database does not exist: {self.path}"
+                )
+        else:
+            self.path.parent.mkdir(parents=True, exist_ok=True)
+            self._initialize()
 
     @staticmethod
     def _open_database(path: str | Path) -> sqlite3.Connection:
@@ -340,9 +357,24 @@ class AssistantStore:
         connection.execute("PRAGMA busy_timeout=30000")
         return connection
 
+    @staticmethod
+    def _open_database_read_only(path: str | Path) -> sqlite3.Connection:
+        resolved = Path(path).resolve().as_posix()
+        connection = sqlite3.connect(
+            f"file:{resolved}?mode=ro", uri=True, timeout=30.0
+        )
+        connection.row_factory = sqlite3.Row
+        connection.execute("PRAGMA foreign_keys=ON")
+        connection.execute("PRAGMA busy_timeout=30000")
+        return connection
+
     @contextmanager
     def _connect(self):
-        connection = self._open_database(self.path)
+        connection = (
+            self._open_database_read_only(self.path)
+            if self.read_only
+            else self._open_database(self.path)
+        )
         try:
             yield connection
             connection.commit()
@@ -3400,7 +3432,19 @@ class AssistantStore:
                 # otherwise-forbidden transition.
                 current_filled = incoming_filled = 0.0
             status_allows_projection = row["status"] in expected_current_statuses
-            quantity_allows_projection = incoming_filled >= current_filled
+            cancel_fill_progress = (
+                row["status"] == CANCEL_PENDING
+                and new_proposal_status == PARTIALLY_FILLED
+            )
+            # An equal cumulative partial fill contains no new execution fact.
+            # Once cancellation is pending it must not erase that durable
+            # state. A larger fill may still arrive while cancellation races
+            # the market; project its quantity but retain CANCEL_PENDING.
+            quantity_allows_projection = (
+                incoming_filled > current_filled
+                if cancel_fill_progress
+                else incoming_filled >= current_filled
+            )
             if not status_allows_projection or not quantity_allows_projection:
                 connection.commit()
                 proposal["broker_event_inserted"] = cursor.rowcount == 1
@@ -3411,8 +3455,25 @@ class AssistantStore:
             for field in preserve_if_set:
                 if proposal.get(field):
                     effective_updates.pop(field, None)
+            current_event_at = proposal.get("last_broker_event_at")
+            incoming_event_at = effective_updates.get("last_broker_event_at")
+            if current_event_at and incoming_event_at:
+                try:
+                    if _parse_aware_timestamp(
+                        incoming_event_at, "last_broker_event_at"
+                    ) < _parse_aware_timestamp(
+                        current_event_at, "stored last_broker_event_at"
+                    ):
+                        effective_updates.pop("last_broker_event_at", None)
+                except ValueError:
+                    # Never replace a usable stored clock with a malformed
+                    # delayed timestamp.
+                    effective_updates.pop("last_broker_event_at", None)
             proposal.update(effective_updates)
-            proposal["status"] = new_proposal_status
+            projected_status = (
+                CANCEL_PENDING if cancel_fill_progress else new_proposal_status
+            )
+            proposal["status"] = projected_status
             connection.execute(
                 """
                 UPDATE broker_orders
@@ -3433,7 +3494,7 @@ class AssistantStore:
                 WHERE proposal_id = ?
                 """,
                 (
-                    new_proposal_status,
+                    projected_status,
                     json.dumps(proposal, sort_keys=True, default=str),
                     now,
                     proposal_id,
@@ -4124,6 +4185,25 @@ class AssistantStore:
         this method owns atomic persistence and external-id idempotency.
         """
         now = datetime.now(timezone.utc).isoformat()
+        metadata_json = json.dumps(metadata or {}, sort_keys=True, default=str)
+        posting_rows = [
+            (
+                posting["account"],
+                posting.get("asset", "USD"),
+                str(posting["amount"]),
+                (
+                    str(posting.get("quantity"))
+                    if posting.get("quantity") is not None
+                    else None
+                ),
+                json.dumps(
+                    posting.get("metadata") or {},
+                    sort_keys=True,
+                    default=str,
+                ),
+            )
+            for posting in postings
+        ]
         connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
@@ -4141,11 +4221,54 @@ class AssistantStore:
                     source,
                     external_id,
                     description,
-                    json.dumps(metadata or {}, sort_keys=True, default=str),
+                    metadata_json,
                     now,
                 ),
             )
             if cursor.rowcount != 1:
+                existing = connection.execute(
+                    """
+                    SELECT transaction_id, occurred_at, source, external_id,
+                           description, metadata_json
+                    FROM journal_transactions
+                    WHERE external_id = ?
+                    """,
+                    (external_id,),
+                ).fetchone()
+                stored_postings = connection.execute(
+                    """
+                    SELECT account, asset, amount, quantity, metadata_json
+                    FROM journal_postings
+                    WHERE transaction_id = ?
+                    ORDER BY posting_id ASC
+                    """,
+                    (existing["transaction_id"],),
+                ).fetchall()
+                existing_header = (
+                    existing["transaction_id"],
+                    existing["occurred_at"],
+                    existing["source"],
+                    existing["external_id"],
+                    existing["description"],
+                    existing["metadata_json"],
+                )
+                incoming_header = (
+                    transaction_id,
+                    occurred_at,
+                    source,
+                    external_id,
+                    description,
+                    metadata_json,
+                )
+                existing_postings = [tuple(row) for row in stored_postings]
+                if (
+                    existing_header != incoming_header
+                    or existing_postings != posting_rows
+                ):
+                    raise JournalTransactionConflictError(
+                        f"journal external_id {external_id!r} already exists "
+                        "with different content"
+                    )
                 connection.commit()
                 return False
             connection.executemany(
@@ -4158,21 +4281,101 @@ class AssistantStore:
                 [
                     (
                         transaction_id,
-                        posting["account"],
-                        posting.get("asset", "USD"),
-                        posting["amount"],
-                        posting.get("quantity"),
-                        json.dumps(
-                            posting.get("metadata") or {},
-                            sort_keys=True,
-                            default=str,
-                        ),
+                        *posting_row,
                     )
-                    for posting in postings
+                    for posting_row in posting_rows
                 ],
             )
             connection.commit()
             return True
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+
+    def bootstrap_portfolio_ledger(
+        self,
+        *,
+        transaction_id: str,
+        occurred_at: str,
+        source: str,
+        external_id: str,
+        description: str,
+        postings: list[dict[str, Any]],
+        metadata: dict[str, Any],
+        bootstrap_state: dict[str, Any],
+    ) -> None:
+        """Atomically create the sole opening transaction and bootstrap marker."""
+        now = datetime.now(timezone.utc).isoformat()
+        metadata_json = json.dumps(metadata, sort_keys=True, default=str)
+        posting_rows = [
+            (
+                transaction_id,
+                posting["account"],
+                posting.get("asset", "USD"),
+                str(posting["amount"]),
+                (
+                    str(posting.get("quantity"))
+                    if posting.get("quantity") is not None
+                    else None
+                ),
+                json.dumps(
+                    posting.get("metadata") or {},
+                    sort_keys=True,
+                    default=str,
+                ),
+            )
+            for posting in postings
+        ]
+        connection = self._open_database(self.path)
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            has_state = connection.execute(
+                "SELECT 1 FROM system_state WHERE state_key = 'ledger_bootstrap'"
+            ).fetchone()
+            has_journal = connection.execute(
+                "SELECT 1 FROM journal_transactions LIMIT 1"
+            ).fetchone()
+            if has_state is not None or has_journal is not None:
+                raise LedgerBootstrapConflictError(
+                    "cannot bootstrap a non-empty or previously bootstrapped "
+                    "portfolio journal"
+                )
+            connection.execute(
+                """
+                INSERT INTO journal_transactions(
+                    transaction_id, occurred_at, source, external_id,
+                    description, metadata_json, created_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    transaction_id,
+                    occurred_at,
+                    source,
+                    external_id,
+                    description,
+                    metadata_json,
+                    now,
+                ),
+            )
+            connection.executemany(
+                """
+                INSERT INTO journal_postings(
+                    transaction_id, account, asset, amount, quantity,
+                    metadata_json
+                ) VALUES (?, ?, ?, ?, ?, ?)
+                """,
+                posting_rows,
+            )
+            connection.execute(
+                """
+                INSERT INTO system_state(state_key, value_json, updated_at)
+                VALUES ('ledger_bootstrap', ?, ?)
+                """,
+                (json.dumps(bootstrap_state, sort_keys=True), now),
+            )
+            connection.commit()
         except Exception:
             connection.rollback()
             raise
@@ -4210,6 +4413,50 @@ class AssistantStore:
             }
             for row in rows
         ]
+
+    def get_journal_transaction_by_external_id(
+        self, external_id: str
+    ) -> dict[str, Any] | None:
+        """Return one complete immutable transaction for retry validation."""
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT transaction_id, occurred_at, source, external_id,
+                       description, metadata_json
+                FROM journal_transactions
+                WHERE external_id = ?
+                """,
+                (external_id,),
+            ).fetchone()
+            if row is None:
+                return None
+            postings = connection.execute(
+                """
+                SELECT account, asset, amount, quantity, metadata_json
+                FROM journal_postings
+                WHERE transaction_id = ?
+                ORDER BY posting_id ASC
+                """,
+                (row["transaction_id"],),
+            ).fetchall()
+        return {
+            "transaction_id": row["transaction_id"],
+            "occurred_at": row["occurred_at"],
+            "source": row["source"],
+            "external_id": row["external_id"],
+            "description": row["description"],
+            "metadata": json.loads(row["metadata_json"]),
+            "postings": tuple(
+                {
+                    "account": posting["account"],
+                    "asset": posting["asset"],
+                    "amount": posting["amount"],
+                    "quantity": posting["quantity"],
+                    "metadata": json.loads(posting["metadata_json"]),
+                }
+                for posting in postings
+            ),
+        }
 
     def record_ledger_reconciliation(
         self,
@@ -4847,11 +5094,11 @@ class AssistantStore:
         incremental fills (`fill_qty`/`fill_price` -- one event per execution),
         while POLL reconciliation only ever sees the broker's cumulative
         `filled_qty`/`filled_avg_price`. Incremental values are preferred when
-        present. For an order seen only through polling, one fill is emitted at
-        the final cumulative quantity and average price: exactly right for a
-        single-fill order, and for an order filled in several pieces it collapses
-        them into one lot at the average -- which is what brokers report as the
-        lot anyway, so no basis information is lost.
+        present. When a stream disconnects after early fills and polling later
+        observes a larger cumulative total, the missing remainder is recovered
+        from cumulative notional minus known incremental notional (CXL-009).
+        An impossible remainder is refused rather than silently dropped. For a
+        polling-only order, one averaged fill is emitted.
 
         IMPORTANT: covers only fills this app placed and journaled. Positions
         bought before the app existed, or through the Alpaca UI, produce no
@@ -4874,6 +5121,7 @@ class AssistantStore:
         fills: list[dict[str, Any]] = []
         cumulative_only: dict[str, dict[str, Any]] = {}
         saw_incremental: set[str] = set()
+        incremental_totals: dict[str, tuple[Decimal, Decimal]] = {}
 
         for row in rows:
             intent = {}
@@ -4885,27 +5133,85 @@ class AssistantStore:
 
             qty, price = row["fill_qty"], row["fill_price"]
             if qty and price:
+                qty_decimal = to_decimal(qty, name="incremental fill quantity")
+                price_decimal = to_decimal(price, name="incremental fill price")
+                if qty_decimal <= 0 or price_decimal <= 0:
+                    raise ValueError(
+                        f"invalid incremental fill for order {row['order_id']}"
+                    )
                 saw_incremental.add(row["order_id"])
+                prior_qty, prior_notional = incremental_totals.get(
+                    row["order_id"], (Decimal("0"), Decimal("0"))
+                )
+                incremental_totals[row["order_id"]] = (
+                    prior_qty + qty_decimal,
+                    prior_notional + qty_decimal * price_decimal,
+                )
                 fills.append({
-                    "ticker": ticker, "side": side, "qty": float(qty), "price": float(price),
+                    "ticker": ticker, "side": side,
+                    "qty": float(qty_decimal), "price": float(price_decimal),
                     "at": row["event_at"], "fill_id": row["event_id"],
                     "order_id": row["order_id"], "proposal_id": row["proposal_id"],
                 })
                 continue
 
             if row["filled_qty"] and row["filled_avg_price"]:
-                # Keep the LAST cumulative snapshot per order; only used if no
-                # incremental events ever arrived for that order.
+                cumulative_qty = to_decimal(
+                    row["filled_qty"], name="cumulative filled quantity"
+                )
+                cumulative_price = to_decimal(
+                    row["filled_avg_price"], name="cumulative average fill price"
+                )
+                if cumulative_qty <= 0 or cumulative_price <= 0:
+                    raise ValueError(
+                        f"invalid cumulative fill for order {row['order_id']}"
+                    )
+                prior = cumulative_only.get(row["order_id"])
+                if prior is not None and cumulative_qty < prior["_qty_decimal"]:
+                    continue
                 cumulative_only[row["order_id"]] = {
                     "ticker": ticker, "side": side,
-                    "qty": float(row["filled_qty"]), "price": float(row["filled_avg_price"]),
+                    "qty": float(cumulative_qty), "price": float(cumulative_price),
                     "at": row["event_at"], "fill_id": f"{row['order_id']}-cumulative",
                     "order_id": row["order_id"], "proposal_id": row["proposal_id"],
+                    "_qty_decimal": cumulative_qty,
+                    "_price_decimal": cumulative_price,
                 }
 
         for order_id, fill in cumulative_only.items():
+            cumulative_qty = fill.pop("_qty_decimal")
+            cumulative_price = fill.pop("_price_decimal")
             if order_id not in saw_incremental:
                 fills.append(fill)
+                continue
+            incremental_qty, incremental_notional = incremental_totals[order_id]
+            if cumulative_qty < incremental_qty:
+                continue
+            cumulative_notional = cumulative_qty * cumulative_price
+            if cumulative_qty == incremental_qty:
+                if abs(cumulative_notional - incremental_notional) > Decimal("0.01"):
+                    raise ValueError(
+                        f"cannot reconcile cumulative fill basis for order {order_id}"
+                    )
+                continue
+            remainder_qty = cumulative_qty - incremental_qty
+            remainder_notional = cumulative_notional - incremental_notional
+            if remainder_notional <= 0:
+                raise ValueError(
+                    f"cannot reconcile cumulative fill basis for order {order_id}"
+                )
+            fills.append(
+                {
+                    "ticker": fill["ticker"],
+                    "side": fill["side"],
+                    "qty": float(remainder_qty),
+                    "price": float(remainder_notional / remainder_qty),
+                    "at": fill["at"],
+                    "fill_id": f"{order_id}-cumulative-remainder",
+                    "order_id": order_id,
+                    "proposal_id": fill["proposal_id"],
+                }
+            )
 
         fills.sort(key=lambda f: (f["at"], f["fill_id"]))
         return fills

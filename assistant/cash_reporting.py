@@ -83,6 +83,7 @@ def evaluate_idle_cash(
     try:
         total_equity = snapshot.total_equity_exact_decimal
         cash = snapshot.cash_exact_decimal
+        buying_power = snapshot.buying_power_exact_decimal
         invested = sum(
             (position.exact_field("market_value") for position in snapshot.positions),
             Decimal("0"),
@@ -109,14 +110,12 @@ def evaluate_idle_cash(
     cash_above_reserve = cash - reserve_floor
     unused_exposure_capacity = exposure_ceiling - invested
 
-    # FCS-004: pending BUY orders have already spoken for some of this room.
-    # `risk/execution_gate.py` folds them into both bounds -- the cash check
-    # uses `min(cash, buying_power)` (buying_power nets broker holds out) and
-    # the exposure check adds `total_pending_buy_value` to invested value. This
-    # report used raw cash and raw market value, so it advertised headroom the
-    # gate would refuse. Third recurrence of the class already fixed in
-    # `allocation_proposals.build_allocation_plan` and
-    # `portfolio_analytics.preview_trade_impact`.
+    # FCS-004/CXL-002: pending BUY orders have already spoken for exposure.
+    # The execution gate treats cash and exposure differently: buying power
+    # tightens the cash bound because broker holds are already reflected there,
+    # while the still-unfilled order remainder is added exactly once to the
+    # exposure bound. Subtracting the commitment from both bounds double-counts
+    # it when buying power is available.
     #
     # Estimated WITHOUT a live quote call, exactly like the UI preview: a
     # read-only report must not fire a network request per pending order. An
@@ -138,21 +137,39 @@ def evaluate_idle_cash(
         ),
         Decimal("0"),
     )
-    cash_above_reserve_net = cash_above_reserve - committed_capital
-    unused_exposure_capacity_net = unused_exposure_capacity - committed_capital
+    available_capital_at_gate = (
+        min(cash, buying_power) if buying_power is not None else cash
+    )
+    cash_above_reserve_at_gate = available_capital_at_gate - reserve_floor
+    # Match risk.execution_gate exactly: filled exposure is equity minus real
+    # cash, and only the still-pending remainder is added here.
+    invested_at_gate = total_equity - cash + committed_capital
+    unused_exposure_capacity_net = exposure_ceiling - invested_at_gate
+    committed_complete = bool(snapshot.open_orders_available) and not committed_unknown
 
     # What actually limits further deployment is whichever bound binds
     # first. This is a measurement of headroom, NOT a suggested order size:
     # it says how much room the policy leaves, not that the room should be
     # used.
-    headroom = min(cash_above_reserve_net, unused_exposure_capacity_net)
-    if headroom < 0:
-        headroom = Decimal("0")
-    binding_constraint = (
-        "cash_reserve_floor"
-        if cash_above_reserve_net <= unused_exposure_capacity_net
-        else "exposure_ceiling"
-    )
+    if committed_complete:
+        headroom = max(
+            Decimal("0"),
+            min(cash_above_reserve_at_gate, unused_exposure_capacity_net),
+        )
+        binding_constraint = (
+            "cash_reserve_floor"
+            if cash_above_reserve_at_gate <= unused_exposure_capacity_net
+            else "exposure_ceiling"
+        )
+        headroom_unavailable_reason = None
+    else:
+        headroom = None
+        binding_constraint = None
+        headroom_unavailable_reason = (
+            "open-order state is unavailable"
+            if not snapshot.open_orders_available
+            else "one or more pending commitments cannot be valued safely"
+        )
 
     invested_fraction = invested / total_equity
     mandate_floor = to_decimal(
@@ -263,15 +280,18 @@ def evaluate_idle_cash(
             "capital_already_committed_unknown_tickers": tuple(
                 sorted(committed_unknown)
             ),
-            "committed_capital_complete": not committed_unknown,
+            "committed_capital_complete": committed_complete,
+            "available_capital_at_gate": decimal_text(available_capital_at_gate),
+            "cash_above_reserve_at_gate": decimal_text(cash_above_reserve_at_gate),
             "cash_above_reserve_net_of_commitments": decimal_text(
-                cash_above_reserve_net
+                cash_above_reserve_at_gate
             ),
             "unused_exposure_capacity_net_of_commitments": decimal_text(
                 unused_exposure_capacity_net
             ),
-            "policy_headroom": decimal_text(headroom),
-            "policy_headroom_basis": "net_of_committed_capital",
+            "policy_headroom": decimal_text(headroom) if headroom is not None else None,
+            "policy_headroom_basis": "execution_gate_equivalent",
+            "policy_headroom_unavailable_reason": headroom_unavailable_reason,
             "binding_constraint": binding_constraint,
         },
         "mandate_objective": {

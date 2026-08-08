@@ -9,8 +9,6 @@ from __future__ import annotations
 
 import dataclasses
 import json
-import os
-import tempfile
 from datetime import datetime
 from pathlib import Path
 from types import MappingProxyType
@@ -25,6 +23,11 @@ from ml.experiment_contracts import (
 )
 from ml.experiments import run_experiment
 from ml.hashing import canonical_json, hash_bytes, hash_payload
+from ml.immutable_io import (
+    ImmutableFileConflictError,
+    exclusive_file_lock,
+    publish_immutable_bytes,
+)
 
 ORCHESTRATION_SCHEMA_VERSION = "1"
 
@@ -67,56 +70,23 @@ def _read_json(path: Path, name: str) -> dict[str, Any]:
     return payload
 
 
-def _write_immutable_json(path: Path, payload: Mapping[str, Any]) -> None:
+def _write_immutable_json(path: Path, payload: Mapping[str, Any]) -> bool:
     data = canonical_json(dict(payload)).encode("utf-8")
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists():
-        if path.read_bytes() == data:
-            return
-        raise ResearchOrchestrationError(f"refusing to overwrite immutable artifact {path}")
-    file_descriptor, temp_name = tempfile.mkstemp(
-        dir=path.parent, prefix=f".{path.name}.", suffix=".tmp"
-    )
-    temp_path = Path(temp_name)
     try:
-        with os.fdopen(file_descriptor, "wb") as handle:
-            handle.write(data)
-            handle.flush()
-            os.fsync(handle.fileno())
-        if path.exists():
-            if path.read_bytes() == data:
-                temp_path.unlink(missing_ok=True)
-                return
-            raise ResearchOrchestrationError(
-                f"refusing to overwrite immutable artifact {path}"
-            )
-        os.replace(temp_path, path)
-    except BaseException:
-        temp_path.unlink(missing_ok=True)
-        raise
+        return publish_immutable_bytes(Path(path), data)
+    except ImmutableFileConflictError as exc:
+        raise ResearchOrchestrationError(
+            f"refusing to overwrite immutable artifact {path}"
+        ) from exc
 
 
-def _write_immutable_bytes(path: Path, data: bytes) -> None:
-    path = Path(path)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    if path.exists():
-        if path.read_bytes() == data:
-            return
-        raise ResearchOrchestrationError(f"refusing to overwrite immutable artifact {path}")
-    file_descriptor, temp_name = tempfile.mkstemp(
-        dir=path.parent, prefix=f".{path.name}.", suffix=".tmp"
-    )
-    temp_path = Path(temp_name)
+def _write_immutable_bytes(path: Path, data: bytes) -> bool:
     try:
-        with os.fdopen(file_descriptor, "wb") as handle:
-            handle.write(data)
-            handle.flush()
-            os.fsync(handle.fileno())
-        os.replace(temp_path, path)
-    except BaseException:
-        temp_path.unlink(missing_ok=True)
-        raise
+        return publish_immutable_bytes(Path(path), data)
+    except ImmutableFileConflictError as exc:
+        raise ResearchOrchestrationError(
+            f"refusing to overwrite immutable artifact {path}"
+        ) from exc
 
 
 @dataclasses.dataclass(frozen=True)
@@ -225,26 +195,40 @@ def materialize_content_addressed_dataset(
         f"{dataset_id}.universe.csv.gz",
         f"{dataset_id}.manifest.json",
     )
-    for filename in filenames:
-        source = Path(source_directory) / filename
+    lock_path = destination / ".research-dataset.lock"
+    with exclusive_file_lock(lock_path):
+        created: list[Path] = []
         try:
-            data = source.read_bytes()
-        except OSError as exc:
-            raise ResearchOrchestrationError(
-                f"authoritative dataset artifact is missing: {source}"
-            ) from exc
-        _write_immutable_bytes(destination / filename, data)
-    _, _, verified = load_dataset(destination, dataset_id)
-    if verified != manifest:
-        raise ResearchOrchestrationError("content-addressed dataset replay changed its manifest")
-    address = ContentAddressedDataset(
-        dataset_id=dataset_id,
-        dataset_hash=manifest.dataset_hash,
-        manifest_hash=hash_payload(manifest.to_dict()),
-        directory=manifest.dataset_hash,
-        point_in_time_data=True,
-    )
-    _write_immutable_json(destination / "content-address.json", address.to_dict())
+            for filename in filenames:
+                source = Path(source_directory) / filename
+                try:
+                    data = source.read_bytes()
+                except OSError as exc:
+                    raise ResearchOrchestrationError(
+                        f"authoritative dataset artifact is missing: {source}"
+                    ) from exc
+                target = destination / filename
+                if _write_immutable_bytes(target, data):
+                    created.append(target)
+            _, _, verified = load_dataset(destination, dataset_id)
+            if verified != manifest:
+                raise ResearchOrchestrationError(
+                    "content-addressed dataset replay changed its manifest"
+                )
+            address = ContentAddressedDataset(
+                dataset_id=dataset_id,
+                dataset_hash=manifest.dataset_hash,
+                manifest_hash=hash_payload(manifest.to_dict()),
+                directory=manifest.dataset_hash,
+                point_in_time_data=True,
+            )
+            address_path = destination / "content-address.json"
+            if _write_immutable_json(address_path, address.to_dict()):
+                created.append(address_path)
+        except BaseException:
+            for path in reversed(created):
+                path.unlink(missing_ok=True)
+            raise
     return address
 
 
@@ -401,8 +385,16 @@ def prepare_confirmation_request(
         confirmation_dataset_hash=confirmation_manifest.dataset_hash,
         requested_at=created_at,
     )
-    _write_immutable_json(spec_output_path, confirmation.to_dict())
-    _write_immutable_json(request_output_path, request.to_dict())
+    created: list[Path] = []
+    try:
+        if _write_immutable_json(spec_output_path, confirmation.to_dict()):
+            created.append(Path(spec_output_path))
+        if _write_immutable_json(request_output_path, request.to_dict()):
+            created.append(Path(request_output_path))
+    except BaseException:
+        for path in reversed(created):
+            path.unlink(missing_ok=True)
+        raise
     return confirmation, request
 
 

@@ -15,6 +15,7 @@ from assistant.storage import AssistantStore
 from ml.artifacts import save_model_artifact, save_model_manifest
 from ml.contracts import ModelManifest
 from ml.hashing import hash_bytes
+from ml.presentation import UNAVAILABLE, build_observation
 from ml.shadow import (
     build_lineage,
     epoch_key,
@@ -342,6 +343,12 @@ def test_predict_resume_mature_monitor_is_idempotent_and_non_authoritative(tmp_p
     predictions = store.list_ml_predictions(shadow_run_id=run["run_id"])
     assert len(predictions) == 2
     prospective = predictions[0]["prediction"]["prospective_contract"]
+    stored_uncertainty = predictions[0]["prediction"]["uncertainty"]
+    assert stored_uncertainty["schema_version"] == "1.0"
+    assert stored_uncertainty["prediction_interval_daily_pct"]
+    assert stored_uncertainty["threshold_probability_label"] == "experimental_probability"
+    observation = build_observation(predictions[0], evidence_epoch=evidence_epoch)
+    assert observation.prediction_interval != UNAVAILABLE
     assert prospective["point_estimate"]["unit"] == "daily_return_standard_deviation_pct"
     assert prospective["prediction_interval"]["lower"] <= prospective["point_estimate"]["value"]
     assert prospective["prediction_interval"]["upper"] >= prospective["point_estimate"]["value"]

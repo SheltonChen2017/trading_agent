@@ -971,7 +971,14 @@ def build_volatility_prediction(
             "mandate_ceiling_daily_pct": uncertainty["ceiling_daily_pct"],
         },
         uncertainty={
+            "schema_version": "1.0",
             "status": "available",
+            "prediction_interval_daily_pct": uncertainty[
+                "prediction_interval_daily_pct"
+            ],
+            "threshold_probability": uncertainty["threshold_probability"],
+            "threshold_probability_label": uncertainty["probability_label"],
+            "mandate_ceiling_daily_pct": uncertainty["ceiling_daily_pct"],
             "evaluation_report_hash": manifest.evaluation_report_hash,
             "prospective_profile_hash": uncertainty["profile_hash"],
             "calibration_status": uncertainty["calibration_status"],

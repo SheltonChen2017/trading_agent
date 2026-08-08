@@ -28,7 +28,7 @@ def _dip_series(days: int = 60) -> pd.DataFrame:
     rng = np.random.default_rng(0)
     returns = rng.normal(0.0, 0.002, size=days)
     returns[-1] = -0.08
-    volume = np.full(days, 1_000_000.0)
+    volume = 1_000_000.0 * (1 + rng.normal(0.0, 0.02, size=days))
     volume[-1] = 4_000_000.0
 
     close = 100 * np.cumprod(1 + returns)

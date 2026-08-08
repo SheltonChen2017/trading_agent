@@ -150,6 +150,18 @@ def test_realized_row_matches_the_lot_ledger_exactly(store):
     assert row.wash_sale_suspected is False
 
 
+def test_leap_day_holding_period_is_long_term_on_march_first(store):
+    buy = datetime(2024, 2, 29, 15, 0, tzinfo=UTC)
+    sell = datetime(2025, 3, 1, 15, 0, tzinfo=UTC)
+    _round_trip(store, buy_at=buy, sell_at=sell)
+
+    report = build_annual_tax_report(store, 2025)
+
+    assert report.rows[0].holding_period == LONG_TERM
+    assert report.long_term.sale_count == 1
+    assert report.short_term.sale_count == 0
+
+
 def test_short_and_long_term_are_split_and_totals_sum_exactly(store):
     # Short-term: bought and sold inside a year, at a loss.
     _fill(store, "b-short", "MSFT", "buy", 5, 200.0, datetime(2026, 2, 2, 15, tzinfo=UTC))
@@ -615,6 +627,25 @@ def test_cli_writes_the_artifact_and_exits_2_when_unverified(store, tmp_path, ca
     out = capsys.readouterr().out
     assert "COVERAGE WARNING" in out
     assert "wash-sale flag(s) (advisory only)" in out
+
+
+def test_atomic_tax_artifact_failure_preserves_existing_destination(
+    tmp_path, monkeypatch
+):
+    import scripts.run_personal_assistant as cli
+
+    destination = tmp_path / "tax.csv"
+    destination.write_text("known-good\n", encoding="utf-8")
+
+    def fail_replace(_source, _destination):
+        raise OSError("simulated replace failure")
+
+    monkeypatch.setattr(cli.os, "replace", fail_replace)
+    with pytest.raises(OSError, match="simulated replace failure"):
+        cli._write_artifact_atomically(destination, "new-report\n")
+
+    assert destination.read_text(encoding="utf-8") == "known-good\n"
+    assert list(tmp_path.iterdir()) == [destination]
 
 
 def test_cli_stdout_json_is_pure_when_no_output_path(store, tmp_path, capsys):

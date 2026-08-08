@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
+import ml.experiments as experiments_module
 from ml.artifacts import load_model_artifact, load_model_manifest
 from ml.datasets import assemble_dataset_frames, build_dataset_manifest, save_dataset
 from ml.experiment_contracts import (
@@ -408,6 +409,21 @@ def test_the_frozen_spec_is_persisted_beside_the_report(tmp_path):
     assert ExperimentSpec.from_dict(persisted).spec_hash == spec.spec_hash
 
 
+def test_failed_experiment_publication_rolls_back_new_evidence_set(
+    tmp_path, monkeypatch
+):
+    _build_dataset(tmp_path)
+
+    def fail_models(**_kwargs):
+        raise OSError("injected model publication failure")
+
+    monkeypatch.setattr(experiments_module, "_save_and_verify_models", fail_models)
+    with pytest.raises(OSError, match="injected model publication failure"):
+        _run(tmp_path, _spec())
+
+    assert not list((tmp_path / "out").glob("vol-discovery-v1.*"))
+
+
 def test_model_artifacts_have_verified_manifests_and_training_transforms(tmp_path):
     _build_dataset(tmp_path)
     record = _run(tmp_path, _spec())
@@ -743,8 +759,11 @@ def test_the_runner_creates_no_execution_or_registry_state(tmp_path):
     written = {p.name for p in (tmp_path / "out").iterdir()}
     # Only report/spec/run manifests and model artifacts.
     for name in written:
-        assert name.startswith("vol-discovery-v1."), name
-        assert name.endswith((".json", ".joblib")), name
+        assert name.startswith("vol-discovery-v1.") or name in {
+            ".vol-discovery-v1.experiment.lock",
+            ".vol-discovery-v1.experiment.commit.json",
+        }, name
+        assert name.endswith((".json", ".joblib", ".lock")), name
     assert not list(tmp_path.rglob("*.db"))
     assert not list(tmp_path.rglob("research_findings.json"))
 

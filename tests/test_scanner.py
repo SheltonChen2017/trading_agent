@@ -24,7 +24,7 @@ def _flat_series_with_shock(days: int, shock_index: int, shock_return: float) ->
     returns[shock_index] = shock_return
 
     close = 100 * np.cumprod(1 + returns)
-    volume = np.full(days, 1_000_000.0)
+    volume = rng.normal(loc=1_000_000.0, scale=20_000.0, size=days)
     volume[shock_index] = 4_000_000.0  # volume spike confirms the move
 
     dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days + 5)[-days:]
@@ -158,6 +158,45 @@ def test_compute_features_rejects_unsupported_return_mode():
         assert False, "expected an unsupported return_mode to be rejected"
     except ValueError:
         pass
+
+
+def test_zero_rolling_std_makes_price_and_volume_scores_unavailable():
+    dates = pd.bdate_range("2026-01-01", periods=22)
+    close = np.array([100.0] * 21 + [90.0])
+    volume = np.array([1_000_000.0] * 21 + [4_000_000.0])
+    df = pd.DataFrame(
+        {
+            "open": close,
+            "high": close,
+            "low": close,
+            "close": close,
+            "volume": volume,
+        },
+        index=dates,
+    )
+
+    features = compute_features(df, window=20)
+    assert pd.isna(features.iloc[-1]["return_zscore"])
+    assert pd.isna(features.iloc[-1]["volume_zscore"])
+    assert scan_dips_and_ups({"FLAT": df}).empty
+
+
+def test_zero_rolling_std_makes_signed_macro_score_unavailable():
+    dates = pd.bdate_range("2026-01-01", periods=22)
+    values = np.array([-0.1] * 21 + [0.1])
+    df = pd.DataFrame(
+        {
+            "open": values,
+            "high": values,
+            "low": values,
+            "close": values,
+            "volume": 0.0,
+        },
+        index=dates,
+    )
+
+    features = compute_features(df, window=20, return_mode="diff")
+    assert pd.isna(features.iloc[-1]["return_zscore"])
 
 
 if __name__ == "__main__":

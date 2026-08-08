@@ -22,7 +22,10 @@ claim), never one that must stay true.
 from __future__ import annotations
 
 import re
+import subprocess
 from pathlib import Path
+
+import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -168,3 +171,50 @@ def test_a_finding_ledger_does_not_claim_everything_is_open_while_listing_fixes(
         assert not (claims_all_open and any_fixed), (
             f"{name} says everything is open while its own rows record fixes"
         )
+
+
+def _repository_commits_claimed_unreachable(text: str) -> list[str]:
+    """Commit hashes a document asserts are local-only / unpushed / unmerged.
+
+    Matches a short hash in backticks within one clause of an unreachability
+    claim, in either order ("`abc1234` is local-only", "local-only: `abc1234`").
+    """
+    claim = r"(?:local[- ]only|not pushed|unpushed|unmerged|cannot fetch)"
+    near = rf"(?:`([0-9a-f]{{7,40}})`[^.]{{0,80}}?{claim}|{claim}[^.]{{0,80}}?`([0-9a-f]{{7,40}})`)"
+    return [a or b for a, b in re.findall(near, text, flags=re.IGNORECASE)]
+
+
+def test_no_document_calls_a_merged_commit_unreachable():
+    """CCR-005. Reachability claims go stale the instant they are merged.
+
+    This has now happened three times: Claude's handoff said "local only, not
+    pushed" after pushing; Codex's line-by-line review was merged with all 24
+    findings still "Open" (CCX-004); and Codex's fix for THAT was itself merged
+    still saying its own commits were local-only and unmerged.
+
+    It is structural, not carelessness. **Any statement about push or merge
+    state, written in the commit that is being pushed or merged, is false by
+    construction the moment it lands.** So it cannot be fixed by being more
+    careful -- it needs a check that runs after the merge, which is this one.
+
+    Skips when git is unavailable so the suite stays runnable from an export.
+    """
+    try:
+        subprocess.run(
+            ["git", "rev-parse", "--verify", "HEAD"],
+            cwd=ROOT, capture_output=True, check=True,
+        )
+    except (OSError, subprocess.CalledProcessError):  # pragma: no cover
+        pytest.skip("not a git checkout")
+
+    stale: list[str] = []
+    for name in ("SESSION_HANDOFF.md", "ACTION_PLAN_2026-08-02.md"):
+        text = _text(name)
+        for commit in _repository_commits_claimed_unreachable(text):
+            reachable = subprocess.run(
+                ["git", "merge-base", "--is-ancestor", commit, "HEAD"],
+                cwd=ROOT, capture_output=True,
+            )
+            if reachable.returncode == 0:
+                stale.append(f"{name} calls {commit} unreachable, but it is in HEAD")
+    assert not stale, "; ".join(stale)

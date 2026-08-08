@@ -103,9 +103,42 @@ merely because a related earlier row was marked fixed.
 Outcome: **accepted after correction.** Every CXL fix I verified holds. Two
 residuals found, both fixed here.
 
-### Independent verification
+### Independent verification — complete coverage of all 24 CXL fixes
 
-Reproduced against the merged tree rather than taken from the ledger:
+The first version of this section covered 6 of 24 and said "accepted after
+correction", which claimed more than it had checked. Every CXL fix is now
+verified. Method per row: **B** = behavioural reproduction against the merged
+tree, **S** = source-path proof.
+
+| ID | How | Result |
+|---|---|---|
+| CXL-001 | B | 2024-02-29 → first long-term 2025-03-01, correct. Mirror case wrong → **CCX-001** below |
+| CXL-002 | B | headroom **0**, matching `min(cash, buying_power)` minus reserve; completeness **False** when open orders unavailable; no new key trips the action-shape guard |
+| CXL-003 | B | a raising `fetch_upcoming_earnings` no longer propagates — 6 records returned as unavailable, risk reduction unobstructed |
+| CXL-004 | B | via the real UI call shape (`expected_fingerprint`/`expected_version`) the stale writer is refused with `PolicyWriteConflictError` and `allow_new_positions` stays False |
+| CXL-005 | S+B | contradictions removed; its guard rewritten → **CCX-002** below |
+| CXL-006 | S | the demanded regressions exist: `test_list_limit_rejects_non_positive_values`, `test_invalid_tax_years_are_refused`, `test_atomic_tax_artifact_failure_preserves_existing_destination` |
+| CXL-007 | B | `partially_filled(4)` → `cancel_pending(4)` → delayed `partially_filled(4)` leaves the status **cancel_pending** |
+| CXL-008 | B | exact replay is a no-op; a conflicting $5,000 correction raises `LedgerError`; cash stays 500 |
+| CXL-009 | S | remainder recovered from cumulative-minus-incremental notional; impossible remainders refused |
+| CXL-010 | B | two barrier-synchronised bootstraps of different snapshots → one winner, **1** transaction, one snapshot's cash |
+| CXL-011 | B | omitted ids no longer flag a wash sale; a genuine replacement still does; duplicate explicit ids stay distinguishable |
+| CXL-012 | B | flat window → `NaN` both scores, signal filtered |
+| CXL-013 | B | terminal-close exit values at close (**+100%**) vs open (**−50%**); `exit_price_column` is required keyword-only, so a caller cannot default into the wrong convention |
+| CXL-014 | B | two conflicting concurrent writers → exactly **1** winner, loser gets `ImmutableFileConflictError`, identical retry idempotent |
+| CXL-015..017 | S | all five ML writers routed through `ml/immutable_io.py`; **zero** remaining `os.replace(` in `artifacts`, `databento_source`, `datasets`, `experiments`, `research_orchestration`; per-dataset/experiment `exclusive_file_lock` present |
+| CXL-018 | S | coverage bounded, `shadow_duplicate_outcomes` blocker present, unique expected identities matched |
+| CXL-019 | S | failures joined to `alert.details.run_id`; an unrelated alert no longer covers a failed run |
+| CXL-020 | S | producer writes a versioned `uncertainty` block (`prediction_interval_daily_pct`, `threshold_probability`, `threshold_probability_label`, ceiling, lineage); monitoring reads exactly those with legacy fallbacks — producer and consumer now agree |
+| CXL-021 | S | exact as-of row, NYSE-session membership, and consecutive-session window all required |
+| CXL-022 | B | `FileNotFoundError` and **no database created** |
+| CXL-023 | S | `$UserScopeCredentialNames` centralises all five keys including Finnhub and Databento |
+| CXL-024 | S | `Convert-EasternClockToLocal` applies the date's Eastern and host DST rules |
+
+Full suite reproduced independently: **3166 passed** on Python 3.14.6 (Codex
+ran 3.12.13).
+
+### Detail on the checks worth recording
 
 | ID | Independent check | Result |
 |---|---|---|
@@ -129,6 +162,21 @@ the spike stand out against real variation, which is a stronger fixture.
 |---|---|---|---|---|---|
 | CCX-001 | P3 | `assistant/tax_lots.py::_one_year_on` | CXL-001 fixed the 29-February **acquisition** but kept the boundary anchored on the acquisition date, which leaves the mirror case wrong in the opposite direction: buying **28 Feb 2023** puts a 29 February *inside* the window, and the anniversary rule made the lot long-term on 2024-02-29 when counting from 2024-03-01 reaches one year only on 2024-03-01. One day **early** — the fail-open direction, understating tax on the same accountant-facing export. Pre-existing, not introduced by CXL-001, but inside the class CXL-001 addressed. | Anchor on the day counting actually starts (`acquired + 1 day`) and take its first anniversary. One rule replaces two special cases and covers both leap positions. | 9 leap positions checked against a Pub 550 helper derived independently of the implementation (and guarded by the IRS's own worked example: buy 5 Feb 2020 → long-term 6 Feb 2021). 20 tests added. Reverse mutation to the acquisition-date anchor: **19 fail**, restored green. |
 | CCX-002 | P3 | `tests/test_active_document_consistency.py` | The new guard asserted the **current** epoch by name (`paper-epoch-002` has been active since 2026-08-06). Rolling to epoch-003 is expected and would fail the suite, and the obvious fix is to edit the assertion — so the guard enforced today's state rather than preventing contradiction, and would be weakened every time reality moved. | Assert the **relationship** instead: no document may call one epoch both active and closed; current documents may not disagree about which epoch is active; the sweep record may carry only one headline count. Literal strings are now only known-stale phrases that should never be true again. | Simulated an epoch-003 roll: the original assertion fails, the rewrite passes. Injected a contradictory "epoch-003 is CLOSED" line: the rewrite catches it. 4 tests. |
+
+### Observation, not a finding
+
+`save_policy`'s compare-and-swap is **opt-in**: `expected_fingerprint` and
+`expected_version` default to `None` and the CAS is skipped when both are
+omitted. The sole production caller passes them, so CXL-004 is genuinely
+closed. Recorded only because this repository made the opposite call in a
+directly analogous place — `_reject_unsafe_prose`'s `source_text` was made
+required keyword-only precisely so "a new prose surface that forgets
+grounding fails with a TypeError rather than shipping an unchecked number".
+A new policy writer that forgets loses stale-write protection on
+authoritative trading policy silently instead. Codex documented the choice
+("bootstrap and controlled test callers may omit both values"), so this is a
+considered trade-off rather than an oversight, and it is left as the author
+made it.
 
 ### Assessment of the correction batch
 

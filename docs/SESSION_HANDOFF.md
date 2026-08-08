@@ -44,9 +44,11 @@ its combined correction batch for all 42 ordered findings.
 `user/claude/counter-review-codex-scan-20260808`. Details in
 `docs/REVIEW_2026-08-08_COMBINED_SCAN_FIX_LEDGER.md`.
 
-- Independently reproduced CXL-001/002/008/009/012/022 against the merged
-  tree; all hold. Full suite reproduces Codex's **3166** on Python 3.14.6
-  (they ran 3.12.13).
+- **All 24 CXL fixes verified** — 14 behaviourally against the merged tree,
+  10 by source path; see the coverage table in the fix ledger. The first pass
+  of this counter-review covered only 6 and still said "accepted", which
+  claimed more than it had checked. Full suite reproduces Codex's **3166** on
+  Python 3.14.6 (they ran 3.12.13).
 - `tests/test_scanner.py` was **not** weakened — its old fixture was passing
   *because* of the infinite z-score it now rejects.
 - **CCX-001 (P3, fixed):** CXL-001 corrected a 29-Feb *acquisition* but left

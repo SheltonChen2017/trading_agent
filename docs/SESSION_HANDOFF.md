@@ -1,8 +1,7 @@
 # Development session handoff
 
-Prepared: 2026-08-07, after independent review and correction of Claude's
-QC-1 counter-review plus news-summary refusal honesty on
-`user/grok/review-qc1-api-client-20260807`.
+Prepared: 2026-08-07, after a full-codebase sweep on
+`user/claude/full-codebase-sweep-20260807`.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff
@@ -11,57 +10,77 @@ model, or session change. This file completely replaces the prior handoff
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
 > machine-local operational knowledge, and engineering watch items live
 > there because this file is rewritten every round. Do not copy them back
-> into this file; link to them.
+> into this file; link to them. Three watch items were added this round.
 
 ## 1. Standing state: THE EPOCH (do not disturb)
 
 `paper-epoch-002` ACTIVE since 2026-08-06T17:55Z on frozen commit
 `9a91498`, bound to `my_policy.json`. Operational checkout pinned there.
-**Never deploy development commits mid-epoch.**
+**Never deploy development commits mid-epoch.** Nothing this round is
+deployed.
 
 `paper-epoch-001` is CLOSED (plumbing shakedown only; do not cite).
 
-## 2. Latest outcome — QC counter-review + news refusal honesty accepted after correction
+## 2. Latest outcome — full-codebase sweep, findings documented, NOT fixed
 
-Claude tip `d6ba2b4` (on top of independent QC-1 acceptance `2314d0b`):
+Owner asked for a whole-repository scan for flaws, defects, bugs, orphans
+and inconsistencies. Branch `user/claude/full-codebase-sweep-20260807`
+contains **documentation only — no code change**.
 
-1. Counter-reviewed QCREV-001..005 — all accepted; CQC-001 left open as
-   documented fail-closed watch item (live `success:true` unverified).
-2. News summaries now return a **reason** when withheld/unavailable; Buying
-   UI prints it. Launcher lifts `ANTHROPIC_API_KEY`.
-3. **Accepted after correction** of reason-string leakage and docs.
+Ledger: `docs/REVIEW_2026-08-07_FULL_CODEBASE_SWEEP.md` (FCS-001..015).
+**0 P0, 0 P1, 3 P2, 12 P3.** All three P2s reproduced.
 
-| ID | Pri | Result |
+| ID | Pri | Summary |
 |---|---|---|
-| CNEWS-001 | P1 | Unsupported-number verdict embedded invented figures (`847`) in UI reason — fixed to fixed label only |
-| CNEWS-002 | P2 | Launcher Anthropic lift had no regression pin — asserted |
-| CNEWS-003 | P3 | OPERATIONAL_FACTS misstated ticker membership; `with_reason` docstring still said “Returns None” |
+| FCS-001 | P2 | `strategy_proposals.py` divides by `current_price` unguarded (4 sites); the UI's narrow `except` lets the resulting `ZeroDivisionError`/`ValueError` **suppress already-computed risk-reduction sells**. Reproduced. |
+| FCS-002 | P2 | `earnings_experiments.calibration_error` divides scored-pair numerator by raw `len(actual)`; the metric improves as coverage worsens (0.1500 → 0.0150 measured). FPS-004 class, same module. |
+| FCS-003 | P2 | `research/quantconnect._assert_allowed` accepts percent-encoded traversal (`backtests/%2e%2e/data/read`). Licence-boundary control; module dormant. |
+| FCS-004..015 | P3 | cash-report headroom ignores pending buys; 4th bare `Decimal(str())`; dead `worst_case_fill_price`; undocumented 4th risk-check scatter point; mixed pct/fraction units on the gate; telemetry decision≡arrival price; stale doc line counts; Python 3.14 vs 3.12/3.13 CI; dead `_non_negative_int` + unbounded `list --limit -1`; non-atomic tax-report write; 6 orphan symbols; `save_policy` temp-name race. |
 
-Ledgers: `docs/REVIEW_2026-08-07_QC1_API_CLIENT.md`,
-`docs/REVIEW_2026-08-07_QC1_COUNTER_NEWS.md`.
-Claude quality this tip: **8/10 submitted; 9.5/10 corrected**.
+Prior ledgers verified genuinely closed: all four 2026-07-30 P1s are fixed
+in code (checked, not assumed).
 
-Owner decision still open: whether news allowlist scope should widen for
-held names / ETFs (see OPERATIONAL_FACTS). Do not widen silently.
+## 3. Validation (base tree `011ae5c`, unchanged)
 
-## 3. Validation (exact final tree)
+- Full suite: **3015 passed / 0 failed / 0 skipped / 25 warnings** (257s).
+  Note: run on **Python 3.14.6**; CI covers only 3.12/3.13 (FCS-011).
+  Handoff-to-handoff count moved 3014 → 3015; reconcile when convenient.
+- FPS-003 did not reproduce. It stays open — a green run is not evidence.
+- FCS-008 mutation applied, detected by 2 tests, reverted; worktree verified
+  clean afterwards.
+- No code changed, so no post-change re-run is claimed.
 
-- Focused guard + launcher + QC: **91 passed**.
-- Mutation: number interpolation fails CNEWS-001; restored green.
-- Full suite: **3014 passed / 0 failed / 0 skipped / 25 warnings**.
-- `compileall` clean; review diffs `--check` clean.
-- Nothing deployed; ops checkout stays at `9a91498`.
+## 4. Coverage honesty — this sweep was NOT exhaustive
 
-## 4. What is next
+All 199 production modules received mechanical AST coverage (unguarded
+division, `except: pass`, SQL interpolation, non-atomic artifact writes,
+naive datetimes, mutable defaults, `Decimal(str())`, `or 0`, full orphan
+graph). Only ~35 were read line by line; ~45K of 62K lines were not.
 
-1. Owner sets QC credentials and runs one live `authenticate()` (watch CQC-001).
-2. Owner decision: news allowlist scope for holdings vs UNIVERSE/known.
-3. Next research milestone: look-counting registry over QC runs.
-4. **GR-6** off-machine backup is **blocked on this host** (owner, 2026-08-07): corporate machine, no uploads permitted, so no cloud destination is available. Only a physical medium would qualify. See `docs/OPERATIONAL_FACTS.md` §2. Do not re-propose OneDrive.
-5. Roadmap: the remaining GR-6 items that need no off-machine copy (secrets audit, key rotation, portable scheduler), or GR-7d owner decision (rebalance targets).
-6. FPS-003 intermittent UI chrome title test remains open.
+**Not read at line level:** most of `ml/`, most of `scripts/`, the bulk of
+`storage.py`, `personal_assistant_ui.py`, `backtest/engine.py`,
+`portfolio_ledger`, `paper_evidence`, `tax_lots`, `tax_reporting`,
+`operations`, `assistant/llm/*`, `signals/`, `strategies/`. See §3 of the
+review for the full table. Both P2s were found by a scan flagging candidates
+**plus** a read; that pairing has not been applied to the packages above.
 
-## 5. Non-negotiable boundaries
+## 5. What is next
+
+1. **Fix branch for FCS-001 first** — guard the four divisions *and* widen
+   the UI handler; regression-test with `current_price` of `0.0` and `NaN`
+   asserting risk-reduction proposals still render.
+2. FCS-002, then FCS-003. FCS-005 should become the AST lint
+   `OPERATIONAL_FACTS` §3 has now been triggered into requiring.
+3. Continue the sweep over the packages listed in §4.
+4. Owner sets QC credentials and runs one live `authenticate()` (watch CQC-001).
+5. Owner decision: news allowlist scope for holdings vs UNIVERSE/known.
+6. **GR-6** off-machine backup is **blocked on this host** (owner, 2026-08-07):
+   corporate machine, no uploads permitted. Only a physical medium would
+   qualify. See `docs/OPERATIONAL_FACTS.md` §2. Do not re-propose OneDrive.
+7. Roadmap unchanged: remaining GR-6 items needing no off-machine copy, or
+   the GR-7d owner decision (rebalance targets).
+
+## 6. Non-negotiable boundaries
 
 - Paper only; never deploy mid-epoch.
 - Reporting may not propose/approve/size/submit/dismiss.
@@ -70,8 +89,10 @@ held names / ETFs (see OPERATIONAL_FACTS). Do not widen silently.
 - Selection residual is not a skill claim.
 - **QuantConnect raw market data must never enter this repository.** Results
   only; the endpoint allowlist in `research/quantconnect.py` is the
-  enforcement, and weakening it breaks their licence.
+  enforcement, and weakening it breaks their licence (see FCS-003).
 - Snapshot `total_equity` is post-flow; subtract `net_external_flow` before
   any `Observation.value_before_flow` mapping.
 - AI refusal reasons must be fixed labels — never withheld model prose or
   invented figures.
+- **An optional feature's failure must never suppress a risk-reducing
+  proposal** (FCS-001).

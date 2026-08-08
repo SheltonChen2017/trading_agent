@@ -1001,6 +1001,48 @@ def _committee_result_for_input(
     return cached.get("result")
 
 
+def _submission_outcome_is_unresolved(store: AssistantStore, proposal_id: str) -> bool:
+    """Did this attempt leave the broker outcome genuinely UNKNOWN? (FCS-018)
+
+    Read from the durable status the kernel already wrote, never parsed out
+    of the exception text -- `docs/SESSION_HANDOFF.md` and
+    `execution_service`'s own history both make broker reconciliation the
+    authority for an ambiguous submission, and a message string is not that.
+
+    Fails toward "unresolved" when the proposal cannot be re-read: if we
+    cannot tell, the operator must not be told the order definitely did not
+    reach the broker.
+    """
+    try:
+        current = store.get_proposal(proposal_id)
+    except Exception:
+        return True
+    if current is None:
+        return True
+    return current.get("status") in UNRESOLVED_BROKER_STATE_STATUSES
+
+
+def _render_submission_failure(
+    store: AssistantStore, proposal_id: str, exc: Exception
+) -> None:
+    """Report a raising submit without over-claiming what the broker did."""
+    if _submission_outcome_is_unresolved(store, proposal_id):
+        st.error(
+            f"**Order outcome UNKNOWN — do not resubmit.** {exc}"
+        )
+        st.warning(
+            "The submission raised, but that does not prove the broker "
+            "rejected it: the response can be lost after an order was "
+            "accepted. This proposal is held in an unresolved state with its "
+            "budget still reserved, and it keeps this ticker/side locked "
+            "against a duplicate order. Reconcile it (Operations tab, or "
+            "`reconcile-submission`) before taking any further action, and "
+            "check the broker directly before placing this trade by hand."
+        )
+        return
+    st.error(f"Order not submitted: {exc}")
+
+
 def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path: str, portfolio, packet: DecisionPacket) -> None:
     """One proposal card with the typed-confirmation approve flow.
     Shared by the Selling, Propose & Approve, and Buying pages --
@@ -1312,7 +1354,22 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                 except Exception as exc:
                     st.session_state.pop(override_key, None)
                     st.session_state.pop(override_confirm_key, None)
-                    st.error(f"Order not submitted: {exc}")
+                    # FCS-018. "Order not submitted" is a claim about the
+                    # BROKER, and this handler cannot make it: a raising
+                    # submit may mean the order was rejected, or it may mean
+                    # the response was lost after the broker accepted it. The
+                    # kernel is scrupulous about that distinction -- it leaves
+                    # the proposal in `submission_unknown`, keeps the
+                    # reservation, and raises a message that literally begins
+                    # "Could not confirm whether the order ... was accepted".
+                    # Prefixing that with "Order not submitted:" re-asserted
+                    # the very thing nineteen review rounds refused to assert,
+                    # in the one sentence a human actually reads before
+                    # deciding what to do next.
+                    #
+                    # The durable status is the authority, not the exception
+                    # text: the kernel has already written it before raising.
+                    _render_submission_failure(store, proposal_id, exc)
 
         conditions_changed_key = f"override_conditions_changed_{proposal_id}"
         if st.session_state.get(override_key):
@@ -1393,11 +1450,16 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                             # list on the rerun this triggers.
                             st.session_state[conditions_changed_key] = True
                             st.rerun()
+                        # Correct as a definite negative: PolicyOverridableBlockError
+                        # is raised by the gate BEFORE any broker contact.
                         st.error(f"Order not submitted: {exc}")
                     except Exception as exc:
                         st.session_state.pop(override_key, None)
                         st.session_state.pop(override_confirm_key, None)
-                        st.error(f"Order not submitted: {exc}")
+                        # FCS-018, second site. The override submit path can
+                        # reach the broker exactly like the ordinary one, so
+                        # it can end ambiguous exactly like the ordinary one.
+                        _render_submission_failure(store, proposal_id, exc)
 
 
 def _allocation_input_signature(

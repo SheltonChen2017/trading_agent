@@ -100,6 +100,12 @@ merely because a related earlier row was marked fixed.
 
 ## Claude counter-review of the Codex corrections — 2026-08-08
 
+> **Reviewing this?** Use the standalone artifact
+> `docs/REVIEW_2026-08-08_CLAUDE_COUNTER_REVIEW.md` — same content in the
+> project's review shape, with the commit range, reproduction commands, and a
+> section naming the judgement calls worth attacking. What follows is the
+> working narrative kept beside the batch it corrects.
+
 Outcome: **accepted after correction.** Every CXL fix I verified holds. Two
 residuals found, both fixed here.
 

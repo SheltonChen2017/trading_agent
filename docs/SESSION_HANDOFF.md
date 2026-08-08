@@ -41,7 +41,16 @@ authority documents so rewriting this state summary does not erase them.
 its combined correction batch for all 42 ordered findings.
 
 **Counter-review outcome: accepted after correction.** Branch
-`user/claude/counter-review-codex-scan-20260808`. Details in
+`user/claude/counter-review-codex-scan-20260808`, base `24d0cb2`, head
+`6e653ba`, pushed and unmerged.
+
+**For Codex:** `docs/REVIEW_2026-08-08_CLAUDE_COUNTER_REVIEW.md` is the
+standalone review artifact — commit range and dispositions, the CCX-001..004
+ledger, per-row verification of all 42 Codex rows, the scope audit, an
+explicit record of what I got wrong, and §6 naming the judgement calls to
+attack rather than the diffs. Start with §6: **CCX-001 rests on a reading of
+IRS Pub 550, not on a code fact, and if that reading is wrong the fix made a
+correct value incorrect.** The narrative version stays appended to
 `docs/REVIEW_2026-08-08_COMBINED_SCAN_FIX_LEDGER.md`.
 
 - **All 42 ordered ledger rows verified.** The 24 CXL fixes (14

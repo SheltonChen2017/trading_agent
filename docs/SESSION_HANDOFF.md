@@ -15,9 +15,9 @@ authority documents so rewriting this state summary does not erase them.
 > branch is `user/claude/engine-m2-notifications-20260809` at `5ff39ed`
 > (implementation `8f5acb7`). The independent review branch is
 > `codex/review-gr7d-m2-notifications-20260809`; correction `c314245` plus
-> the documentation commit carrying this handoff are the durable resume
-> points. The review branch must be pushed before another computer can fetch
-> those corrections.
+> review/handoff commit `bc1c603` are the durable resume points. The branch
+> is pushed at `origin/codex/review-gr7d-m2-notifications-20260809`; another
+> computer can fetch the complete review history.
 >
 > **Newest state:** both M2 commits have explicit dispositions in
 > `docs/REVIEW_2026-08-09_GR7D_M2_NOTIFICATIONS.md`. Independent review

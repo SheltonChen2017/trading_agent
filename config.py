@@ -324,6 +324,55 @@ YIELD_CURVE_Z_THRESHOLD = 2.0      # proxy = short - long (rises as the curve fl
 # Presence in this list is NOT an allocation authorization.
 DEFENSIVE_CARRY_TICKERS = ["TLT", "IEF", "SHY", "GLD"]
 
+# --- Three-sleeve engine (docs/reference/THREE_SLEEVE_ENGINE_PLAN.md,
+# --- owner-adopted 2026-08-09) ---------------------------------------
+# The owner's stated allocation preference, recorded as data. These lists
+# and thresholds are NOT validated research and NOT an allocation
+# authorization (same convention as DEFENSIVE_CARRY_TICKERS above);
+# membership only means "the sleeve report watches this name". Verified
+# 2026-08-09 via fetch_historical: all names below resolve with a full
+# 400/400 requested trading sessions of real history.
+#
+# Sleeve 1 -- dividend income. JEPI/JEPQ are diversified covered-call
+# funds; NVDY is a SINGLE-STOCK synthetic covered-call ETF on NVDA and
+# behaves nothing like the other two (NAV-erosion risk, one-issuer
+# exposure). The report names that overlap explicitly -- see
+# SINGLE_STOCK_INCOME_ETF_UNDERLYING below.
+DIVIDEND_INCOME_TICKERS = ["JEPQ", "JEPI", "NVDY"]
+
+# Sleeve 2 -- semiconductor/tech growth rotation, per-lot thresholds.
+# Five researched semis/tech names plus one diversified semiconductor ETF
+# anchor (owner delegated the list to recommended defaults, 2026-08-09).
+GROWTH_ROTATION_TICKERS = ["NVDA", "AMD", "AVGO", "TSM", "MSFT", "SOXX"]
+
+# Sleeve 3 -- dividend-income reinvestment destinations. MUST stay a
+# subset of LEVERAGED_ETF_TICKERS so leveraged-exposure accounting and
+# the max_leveraged_etf_pct policy cap automatically cover every name
+# here (regression-tested; adding a non-leveraged name would silently
+# exempt it from the cap's accounting).
+DIVIDEND_REINVEST_TICKERS = ["NVDL", "SOXL", "TQQQ"]
+
+# Income ETFs whose distributions derive from ONE issuer's stock.
+# Disclosure mapping only -- deliberately NOT merged into
+# LEVERAGED_ETF_UNDERLYING, because that map feeds leveraged-exposure
+# policy accounting and NVDY is not a leveraged ETF; adding it there
+# would change max_leveraged_etf_pct enforcement, which is a policy
+# behavior change this config must not smuggle in.
+SINGLE_STOCK_INCOME_ETF_UNDERLYING = {"NVDY": "NVDA"}
+
+# Engine thresholds. Exact boundaries, owner-adopted 2026-08-09:
+# - dividend sleeve warns when its share of total equity is below 10.00%
+#   (low end of the owner's 10-15% range: max_position_pct 5% means a 15%
+#   sleeve needs all three names at cap with zero slack);
+# - a growth lot at or above +5.00% unrealized crosses the gain-review
+#   threshold; at or below -10.00% it crosses the decline-review
+#   threshold. Per-LOT basis (cost_per_share), never average cost --
+#   averaging down creates a new lot with its own thresholds and leaves
+#   existing lots' references untouched.
+DIVIDEND_SLEEVE_FLOOR_PCT = 10.0
+GROWTH_GAIN_REVIEW_THRESHOLD_PCT = 5.0
+GROWTH_DECLINE_REVIEW_THRESHOLD_PCT = -10.0
+
 # Market regime classifier (signals/regime.py) — momentum showed a real,
 # statistically significant sign-flip between two multi-year eras of the
 # ~7-year test window (2026-07 finding), consistent with the documented

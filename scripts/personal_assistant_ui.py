@@ -3723,6 +3723,129 @@ if page == "Reports":
                 )
             st.caption(_objective["required_assumption"])
 
+    # Three-sleeve engine, M1 (docs/reference/THREE_SLEEVE_ENGINE_PLAN.md).
+    # Renders on load like idle cash: sleeve drift and threshold crossings
+    # are standing conditions, not reports you ask for. Same read-only
+    # contract -- fills and journal postings are records this app already
+    # holds, and the portfolio comes from _load_readonly_portfolio(), never
+    # a packet rebuild that writes provider-fetch rows.
+    with st.expander("Three-sleeve engine status", expanded=True):
+        from assistant.corporate_actions import (
+            fills_with_confirmed_splits as _engine_fills,
+        )
+        from assistant.sleeve_report import (
+            SleeveReportError as _SleeveReportError,
+            evaluate_sleeves as _evaluate_sleeves,
+        )
+        from assistant.tax_lots import (
+            TaxLotError as _EngineLotError,
+            build_ledger as _build_lot_ledger,
+        )
+
+        st.caption(
+            "Measures the portfolio against the owner's stated three-sleeve "
+            "preference (dividend income floor, per-lot growth review "
+            "thresholds, dividend-to-leveraged reinvestment). A preference "
+            "on record, **not validated research** — and nothing here "
+            "places, approves, or changes a trade."
+        )
+        try:
+            _sleeve_portfolio = _load_readonly_portfolio()
+            _sleeve_ledger = _build_lot_ledger(_engine_fills(store))
+            _sleeves = _evaluate_sleeves(
+                _sleeve_portfolio, _sleeve_ledger, store.list_journal_postings()
+            )
+        except _SleeveReportError as _sleeve_error:
+            st.warning(f"Sleeve report unavailable: {_sleeve_error}")
+        except (_EngineLotError, ValueError, KeyError) as _sleeve_error:
+            st.warning(
+                "Sleeve report unavailable: recorded fills cannot be replayed "
+                f"into lots ({_sleeve_error})"
+            )
+        except Exception as _sleeve_error:
+            st.warning(
+                f"Sleeve report unavailable ({type(_sleeve_error).__name__}): "
+                f"{_sleeve_error}"
+            )
+        else:
+            _dividend = _sleeves["dividend_sleeve"]
+            _growth = _sleeves["growth_sleeve"]
+            _reinvest = _sleeves["reinvest_sleeve"]
+            _income = _sleeves["dividend_income"]
+            _engine = _sleeves["engine"]
+
+            _c1, _c2, _c3, _c4 = st.columns(4)
+            _c1.metric(
+                "Dividend sleeve",
+                f"{_dividend['pct_of_equity']}%",
+                f"floor {_engine['floor_pct']}%",
+            )
+            _c2.metric("Lots at gain review", _growth["lots_at_gain_review"])
+            _c3.metric(
+                "Lots at decline review", _growth["lots_at_decline_review"]
+            )
+            _c4.metric("Reinvest sleeve", f"{_reinvest['pct_of_equity']}%")
+
+            if _dividend["floor_status"] == "below_floor":
+                st.warning(
+                    f"Dividend sleeve ({_dividend['pct_of_equity']}% of "
+                    "equity) is BELOW the stated floor of "
+                    f"{_engine['floor_pct']}%."
+                )
+            for _position in _growth["positions"]:
+                if _position["lot_coverage"] != "full":
+                    st.warning(
+                        f"{_position['ticker']}: lot coverage is "
+                        f"{_position['lot_coverage']} — "
+                        f"{_position['coverage_reason']}"
+                    )
+            _crossed = [
+                (_position["ticker"], _lot)
+                for _position in _growth["positions"]
+                for _lot in _position["lots"]
+                if _lot["crossed_gain_review_threshold"]
+                or _lot["crossed_decline_review_threshold"]
+            ]
+            if _crossed:
+                st.write("Lots at a review threshold (per-lot basis):")
+                st.dataframe(
+                    [
+                        {
+                            "Ticker": _ticker,
+                            "Lot": _lot["lot_id"],
+                            "Unrealized %": _lot["unrealized_pnl_pct"],
+                            "Unrealized $": _lot["unrealized_pnl"],
+                            "Review": (
+                                "gain"
+                                if _lot["crossed_gain_review_threshold"]
+                                else "decline"
+                            ),
+                            "Term if disposed now": _lot["term_if_sold_now"],
+                            "Days to long-term": _lot["days_to_long_term"],
+                        }
+                        for _ticker, _lot in _crossed
+                    ],
+                    width="stretch",
+                )
+                st.caption(
+                    "Tax mechanism (owner-mandated): a short-term lot near "
+                    "its long-term date may be worth the wait — the term and "
+                    "countdown above are the decision inputs. Classification "
+                    "and dates only; no bracket is estimated."
+                )
+            else:
+                st.caption("No lot is at a review threshold right now.")
+            st.write(
+                f"Confirmed dividend income ${_income['confirmed_total']} "
+                f"across {_income['posting_count']} posting(s). "
+                f"{_income['note']}."
+            )
+            for _overlap in _sleeves["single_issuer_overlap"]:
+                st.warning(
+                    f"Single-issuer overlap on {_overlap['issuer']}: "
+                    + "; ".join(_overlap["routes"])
+                )
+
 
 # ---------------------------------------------------------------------------
 # Operations -- GR-5's single operator dashboard. STRICTLY READ-ONLY except

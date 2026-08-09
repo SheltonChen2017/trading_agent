@@ -1562,38 +1562,40 @@ if page == "Briefing":
             + st.session_state["portfolio_history_error"]
         )
 
-    st.subheader(f"Market regime ({packet.regime.benchmark_ticker})")
-    st.write(f"Trend: **{packet.regime.trend or 'unavailable'}** / Volatility: **{packet.regime.volatility_regime or 'unavailable'}**"
-             + (f" (trailing {packet.regime.trailing_volatility_pct}% daily std, as of {packet.regime.as_of})" if packet.regime.trailing_volatility_pct is not None else ""))
+    with st.container(border=True):
+        st.subheader(f"Market regime ({packet.regime.benchmark_ticker})")
+        st.write(f"Trend: **{packet.regime.trend or 'unavailable'}** / Volatility: **{packet.regime.volatility_regime or 'unavailable'}**"
+                 + (f" (trailing {packet.regime.trailing_volatility_pct}% daily std, as of {packet.regime.as_of})" if packet.regime.trailing_volatility_pct is not None else ""))
 
-    st.subheader("Risk exposure")
-    risk_col1, risk_col2, risk_col3 = st.columns(3)
-    risk_col1.metric("Largest single position", f"{packet.risk.largest_single_position_pct}%")
-    risk_col2.metric("Leveraged ETF exposure", f"{packet.risk.leveraged_etf_exposure_pct}%")
-    risk_col3.metric("Invested", f"{packet.analytics['invested_pct']:.1f}%")
-    if packet.risk.basket_exposure_pct:
-        st.write("Basket exposure (overlapping, doesn't sum to 100%):")
-        st.dataframe(
-            [{"Basket": b, "% of equity": pct} for b, pct in sorted(packet.risk.basket_exposure_pct.items(), key=lambda kv: -kv[1])],
-            use_container_width=True,
-            hide_index=True,
-        )
-    else:
-        st.caption("No basket exposure -- no positions held.")
+    with st.container(border=True):
+        st.subheader("Risk exposure")
+        risk_col1, risk_col2, risk_col3 = st.columns(3)
+        risk_col1.metric("Largest single position", f"{packet.risk.largest_single_position_pct}%")
+        risk_col2.metric("Leveraged ETF exposure", f"{packet.risk.leveraged_etf_exposure_pct}%")
+        risk_col3.metric("Invested", f"{packet.analytics['invested_pct']:.1f}%")
+        if packet.risk.basket_exposure_pct:
+            st.write("Basket exposure (overlapping, doesn't sum to 100%):")
+            st.dataframe(
+                [{"Basket": b, "% of equity": pct} for b, pct in sorted(packet.risk.basket_exposure_pct.items(), key=lambda kv: -kv[1])],
+                use_container_width=True,
+                hide_index=True,
+            )
+        else:
+            st.caption("No basket exposure -- no positions held.")
 
-    for policy_violation in check_policy_compliance(packet.portfolio, policy):
-        st.error(f"Policy violation: {policy_violation}")
-    if not packet.risk.concentration_warnings:
-        # Only show this caption in the "all clear" case -- when
-        # concentration_warnings IS non-empty, its content already appears
-        # once in the "Warnings" section below (packet.warnings includes
-        # risk.concentration_warnings verbatim, see context_builder.py) and
-        # once as a Policy violation above if it also breaches the active
-        # policy; showing it a third time here via check_concentration()
-        # was pure duplication (GPT review, 2026-07-28, reproduced).
-        st.caption("Informational summary (not a policy-compliance check): " + check_concentration(packet.risk))
-    for cluster_warning in find_correlated_clusters(packet.portfolio):
-        st.warning(cluster_warning)
+        for policy_violation in check_policy_compliance(packet.portfolio, policy):
+            st.error(f"Policy violation: {policy_violation}")
+        if not packet.risk.concentration_warnings:
+            # Only show this caption in the "all clear" case -- when
+            # concentration_warnings IS non-empty, its content already appears
+            # once in the "Warnings" section below (packet.warnings includes
+            # risk.concentration_warnings verbatim, see context_builder.py) and
+            # once as a Policy violation above if it also breaches the active
+            # policy; showing it a third time here via check_concentration()
+            # was pure duplication (GPT review, 2026-07-28, reproduced).
+            st.caption("Informational summary (not a policy-compliance check): " + check_concentration(packet.risk))
+        for cluster_warning in find_correlated_clusters(packet.portfolio):
+            st.warning(cluster_warning)
     with st.expander("Descriptive macro context"):
         st.caption(
             "Credit/yield proxies are shown as context only. Their predictive "
@@ -1691,161 +1693,168 @@ if page == "Briefing":
             st.error(f"🚨 {_degradation}")
 
     if packet.warnings:
-        st.subheader("Warnings")
-        for warning in packet.warnings:
-            st.warning(warning)
+        with st.container(border=True):
+            st.subheader("Warnings")
+            for warning in packet.warnings:
+                st.warning(warning)
 
-    if packet.portfolio.positions:
-        st.subheader("Positions")
-        st.dataframe(
-            [
-                {
-                    "Ticker": p.ticker,
-                    "Shares": p.shares,
-                    "Current price": p.current_price,
-                    "Market value": p.market_value,
-                    "Unrealized P&L %": p.unrealized_pnl_pct,
-                    "Leveraged ETF": p.is_leveraged_etf,
-                }
-                for p in packet.portfolio.positions
-            ],
-            use_container_width=True,
-            hide_index=True,
-        )
-        st.caption(f"Unrealized P&L: ${packet.analytics['unrealized_pnl']:,.2f}")
-    else:
-        st.subheader("Positions")
-        st.caption("No positions held.")
-
-    if packet.portfolio.positions:
-        st.subheader("Holdings analysis")
-        st.caption(
-            "Per-position trend/volatility and this project's own evidence-labeled findings for each "
-            "ticker you actually hold -- not a price prediction, just what's known and what currently "
-            "applies to your account."
-        )
-        for position in packet.portfolio.positions:
-            with st.container(border=True):
-                st.write(f"**{position.ticker}** -- {position.shares:g} sh, ${position.market_value:,.2f} ({position.unrealized_pnl_pct:+.1f}% unrealized)")
-                # One cached call per ticker for BOTH the trend/volatility
-                # figures and the evidence lookup -- see
-                # _load_holding_analysis() for why this must not re-fetch on
-                # every rerun.
-                try:
-                    analysis = _load_holding_analysis(position.ticker, _regime_fields(packet.regime))
-                except Exception as exc:
-                    st.caption(f"Could not load trend/volatility/evidence: {exc}")
-                    continue
-                trend_str = analysis["trend"] or "unavailable"
-                vol = analysis["volatility"]
-                vol_str = f"{vol:.2f}% trailing daily std" if vol is not None else "unavailable"
-                st.write(f"Trend (200-day): **{trend_str}** -- Volatility (20d/60d blend): **{vol_str}**")
-
-                explanation = analysis["explanation"]
-                ticker_specific = [e for e in explanation["historical_evidence"] if e["ticker_specific"]]
-                if ticker_specific:
-                    for e in ticker_specific:
-                        st.write(f"**[{e['display_status']}]** {e['label']} -- {e['claim']}")
-                        if e.get("dataset_warning"):
-                            st.warning(e["dataset_warning"])
-                else:
-                    st.caption(f"No {position.ticker}-specific research exists in this project.")
-                if explanation["triggered_today"]:
-                    for trig in explanation["triggered_today"]:
-                        st.caption(f"Signal firing today: {trig['rule']} ({trig['direction']})")
-        st.caption("For price targets, news, and the full history/best-worst range for any holding, look it up in the Buying page.")
-
-    if packet.portfolio.open_orders:
-        st.subheader("Open orders")
-        st.dataframe(packet.portfolio.open_orders, use_container_width=True, hide_index=True)
-
-    if packet.upcoming_events:
-        st.subheader("Upcoming events")
-        for event in sorted(packet.upcoming_events, key=lambda e: e.event_date or "~"):
-            if event.event_date:
-                st.write(f"**{event.ticker}**: {event.event_type} on {event.event_date} ({event.days_away} day(s)) [{event.status.value}]")
-            else:
-                st.caption(f"{event.ticker}: {event.event_type} date unavailable [{event.status.value}]")
-
-    if packet.signals:
-        # Historical verdicts and current authority are reported as TWO
-        # separate tallies, never one aggregate (GPT review, 2026-07-30):
-        # aggregating by raw `status` could print "2 confirmed" right
-        # above rows that correctly show those same 2 findings as
-        # non-authoritative -- contradicting itself.
-        evidence_summary = summarize_evidence_authority(packet.signals)
-        st.subheader(f"Research evidence relevant to your holdings ({len(packet.signals)} findings)")
-        st.caption(
-            "Historical verdicts: "
-            + " / ".join(f"{count} {status}" for status, count in sorted(evidence_summary["verdict_counts"].items()))
-        )
-        if evidence_summary["non_authoritative_count"]:
-            st.caption(
-                f"Current authority: {evidence_summary['non_authoritative_count']} "
-                "unreproduced/non-authoritative (see the qualifier on each row below)"
-            )
-        for finding in packet.signals:
-            # display_status appends an explicit qualifier for a
-            # confirmed/promising finding that isn't currently
-            # production-authoritative -- never shown as a bare
-            # "[confirmed]" in that case (GPT review, 2026-07-29).
-            st.write(f"**[{finding.display_status}]** {finding.label} -- {finding.claim}")
-            st.caption(finding.detail)
-            if finding.provenance is not None:
-                dataset_warning = underfilled_dataset_warning(finding.provenance)
-                if dataset_warning:
-                    st.warning(dataset_warning)
-
-    st.divider()
-    st.subheader("Recommended stocks to explore (not held, not a proposal)")
-    st.caption(
-        "Purely informational/exploratory -- these are NOT held positions and NOT trade proposals. "
-        "Presence here is NOT an allocation authorization (same convention as config.DEFENSIVE_CARRY_TICKERS). "
-        "\"Most actively traded\" reflects trading VOLUME and price movement, NOT buy-vs-sell order flow -- "
-        "no legitimate retail-accessible data source provides true order imbalance."
-    )
-    if st.button("Refresh recommended stocks", key="refresh_recommended"):
-        _load_recommended_tickers.clear()
-    held_tickers_tuple = tuple(sorted({p.ticker.upper() for p in packet.portfolio.positions}))
-    briefing_ai_on = _ai_feature_enabled("ai_pref_similar_tickers")
-    recommended_tickers, dropped_candidates, curated_note = _load_recommended_tickers(
-        held_tickers_tuple, briefing_ai_on
-    )
-    if dropped_candidates:
-        st.caption(
-            f"{len(dropped_candidates)} candidate ticker(s) could not be verified against real market data "
-            "and were omitted."
-        )
-    for category, label in [
-        ("most_active", "Most actively traded today"),
-        ("recent_ipo", "Recent IPOs"),
-        ("ai_suggested", "Claude suggestions with measured comparison (not a validated similarity recommender)"),
-    ]:
-        items = [r for r in recommended_tickers if r.reason_category == category]
-        if not items:
-            if category == "recent_ipo" and not is_ipo_calendar_configured():
-                st.caption("IPO calendar unavailable -- FINNHUB_API_KEY is not set. Sign up for a free Finnhub account and set this env var to enable it.")
-            elif category == "ai_suggested" and not briefing_ai_on:
-                st.caption(
-                    "Claude suggestions are off (optional AI features are disabled -- "
-                    "enable them in Settings & Features)."
-                )
-            elif category == "ai_suggested" and not held_tickers_tuple:
-                st.caption("No current holdings to base similarity suggestions on.")
-            continue
-        with st.expander(f"{label} ({len(items)})"):
+    with st.container(border=True):
+        if packet.portfolio.positions:
+            st.subheader("Positions")
             st.dataframe(
-                [{"Ticker": r.ticker, "Detail": r.detail} for r in items],
+                [
+                    {
+                        "Ticker": p.ticker,
+                        "Shares": p.shares,
+                        "Current price": p.current_price,
+                        "Market value": p.market_value,
+                        "Unrealized P&L %": p.unrealized_pnl_pct,
+                        "Leveraged ETF": p.is_leveraged_etf,
+                    }
+                    for p in packet.portfolio.positions
+                ],
                 use_container_width=True,
                 hide_index=True,
             )
+            st.caption(f"Unrealized P&L: ${packet.analytics['unrealized_pnl']:,.2f}")
+        else:
+            st.subheader("Positions")
+            st.caption("No positions held.")
 
-    if curated_note:
+    if packet.portfolio.positions:
+        with st.container(border=True):
+            st.subheader("Holdings analysis")
+            st.caption(
+                "Per-position trend/volatility and this project's own evidence-labeled findings for each "
+                "ticker you actually hold -- not a price prediction, just what's known and what currently "
+                "applies to your account."
+            )
+            for position in packet.portfolio.positions:
+                with st.container(border=True):
+                    st.write(f"**{position.ticker}** -- {position.shares:g} sh, ${position.market_value:,.2f} ({position.unrealized_pnl_pct:+.1f}% unrealized)")
+                    # One cached call per ticker for BOTH the trend/volatility
+                    # figures and the evidence lookup -- see
+                    # _load_holding_analysis() for why this must not re-fetch on
+                    # every rerun.
+                    try:
+                        analysis = _load_holding_analysis(position.ticker, _regime_fields(packet.regime))
+                    except Exception as exc:
+                        st.caption(f"Could not load trend/volatility/evidence: {exc}")
+                        continue
+                    trend_str = analysis["trend"] or "unavailable"
+                    vol = analysis["volatility"]
+                    vol_str = f"{vol:.2f}% trailing daily std" if vol is not None else "unavailable"
+                    st.write(f"Trend (200-day): **{trend_str}** -- Volatility (20d/60d blend): **{vol_str}**")
+
+                    explanation = analysis["explanation"]
+                    ticker_specific = [e for e in explanation["historical_evidence"] if e["ticker_specific"]]
+                    if ticker_specific:
+                        for e in ticker_specific:
+                            st.write(f"**[{e['display_status']}]** {e['label']} -- {e['claim']}")
+                            if e.get("dataset_warning"):
+                                st.warning(e["dataset_warning"])
+                    else:
+                        st.caption(f"No {position.ticker}-specific research exists in this project.")
+                    if explanation["triggered_today"]:
+                        for trig in explanation["triggered_today"]:
+                            st.caption(f"Signal firing today: {trig['rule']} ({trig['direction']})")
+            st.caption("For price targets, news, and the full history/best-worst range for any holding, look it up in the Buying page.")
+
+    if packet.portfolio.open_orders:
+        with st.container(border=True):
+            st.subheader("Open orders")
+            st.dataframe(packet.portfolio.open_orders, use_container_width=True, hide_index=True)
+
+    if packet.upcoming_events:
+        with st.container(border=True):
+            st.subheader("Upcoming events")
+            for event in sorted(packet.upcoming_events, key=lambda e: e.event_date or "~"):
+                if event.event_date:
+                    st.write(f"**{event.ticker}**: {event.event_type} on {event.event_date} ({event.days_away} day(s)) [{event.status.value}]")
+                else:
+                    st.caption(f"{event.ticker}: {event.event_type} date unavailable [{event.status.value}]")
+
+    if packet.signals:
+        with st.container(border=True):
+            # Historical verdicts and current authority are reported as TWO
+            # separate tallies, never one aggregate (GPT review, 2026-07-30):
+            # aggregating by raw `status` could print "2 confirmed" right
+            # above rows that correctly show those same 2 findings as
+            # non-authoritative -- contradicting itself.
+            evidence_summary = summarize_evidence_authority(packet.signals)
+            st.subheader(f"Research evidence relevant to your holdings ({len(packet.signals)} findings)")
+            st.caption(
+                "Historical verdicts: "
+                + " / ".join(f"{count} {status}" for status, count in sorted(evidence_summary["verdict_counts"].items()))
+            )
+            if evidence_summary["non_authoritative_count"]:
+                st.caption(
+                    f"Current authority: {evidence_summary['non_authoritative_count']} "
+                    "unreproduced/non-authoritative (see the qualifier on each row below)"
+                )
+            for finding in packet.signals:
+                # display_status appends an explicit qualifier for a
+                # confirmed/promising finding that isn't currently
+                # production-authoritative -- never shown as a bare
+                # "[confirmed]" in that case (GPT review, 2026-07-29).
+                st.write(f"**[{finding.display_status}]** {finding.label} -- {finding.claim}")
+                st.caption(finding.detail)
+                if finding.provenance is not None:
+                    dataset_warning = underfilled_dataset_warning(finding.provenance)
+                    if dataset_warning:
+                        st.warning(dataset_warning)
+
+        st.divider()
+    with st.container(border=True):
+        st.subheader("Recommended stocks to explore (not held, not a proposal)")
         st.caption(
-            "AI commentary on the list above -- unverified prose, not a validated fact or a "
-            "recommendation. Cross-check against the tables above before acting on it."
+            "Purely informational/exploratory -- these are NOT held positions and NOT trade proposals. "
+            "Presence here is NOT an allocation authorization (same convention as config.DEFENSIVE_CARRY_TICKERS). "
+            "\"Most actively traded\" reflects trading VOLUME and price movement, NOT buy-vs-sell order flow -- "
+            "no legitimate retail-accessible data source provides true order imbalance."
         )
-        st.info(curated_note)
+        if st.button("Refresh recommended stocks", key="refresh_recommended"):
+            _load_recommended_tickers.clear()
+        held_tickers_tuple = tuple(sorted({p.ticker.upper() for p in packet.portfolio.positions}))
+        briefing_ai_on = _ai_feature_enabled("ai_pref_similar_tickers")
+        recommended_tickers, dropped_candidates, curated_note = _load_recommended_tickers(
+            held_tickers_tuple, briefing_ai_on
+        )
+        if dropped_candidates:
+            st.caption(
+                f"{len(dropped_candidates)} candidate ticker(s) could not be verified against real market data "
+                "and were omitted."
+            )
+        for category, label in [
+            ("most_active", "Most actively traded today"),
+            ("recent_ipo", "Recent IPOs"),
+            ("ai_suggested", "Claude suggestions with measured comparison (not a validated similarity recommender)"),
+        ]:
+            items = [r for r in recommended_tickers if r.reason_category == category]
+            if not items:
+                if category == "recent_ipo" and not is_ipo_calendar_configured():
+                    st.caption("IPO calendar unavailable -- FINNHUB_API_KEY is not set. Sign up for a free Finnhub account and set this env var to enable it.")
+                elif category == "ai_suggested" and not briefing_ai_on:
+                    st.caption(
+                        "Claude suggestions are off (optional AI features are disabled -- "
+                        "enable them in Settings & Features)."
+                    )
+                elif category == "ai_suggested" and not held_tickers_tuple:
+                    st.caption("No current holdings to base similarity suggestions on.")
+                continue
+            with st.expander(f"{label} ({len(items)})"):
+                st.dataframe(
+                    [{"Ticker": r.ticker, "Detail": r.detail} for r in items],
+                    use_container_width=True,
+                    hide_index=True,
+                )
+
+        if curated_note:
+            st.caption(
+                "AI commentary on the list above -- unverified prose, not a validated fact or a "
+                "recommendation. Cross-check against the tables above before acting on it."
+            )
+            st.info(curated_note)
 
 if page == "Buying":
     st.caption(
@@ -3899,173 +3908,178 @@ if page == "Operations":
 
     ops_store = _store()
 
-    st.subheader("Critical alert delivery")
-    undelivered = undelivered_critical_alerts(ops_store)
-    freshness = self_test_freshness(ops_store)
-    delivery_columns = st.columns(2)
-    with delivery_columns[0]:
-        if undelivered:
-            st.error(
-                f"{len(undelivered)} critical alert(s) have NOT been delivered: "
-                + ", ".join(sorted(a["fingerprint"] for a in undelivered))
-            )
-        else:
-            st.success("Every open critical alert has a recorded delivery.")
-    with delivery_columns[1]:
-        (st.success if freshness["ok"] else st.warning)(
-            f"Channel self-test: {freshness['detail']}"
-        )
-
-    action_columns = st.columns(2)
-    with action_columns[0]:
-        if st.button("Deliver pending critical alerts", key="ops_deliver"):
-            report = deliver_pending_alerts(ops_store, WindowsToastChannel())
-            if report["healthy"]:
-                st.success(f"Delivered {len(report['delivered'])} alert(s).")
-            else:
+    with st.container(border=True):
+        st.subheader("Critical alert delivery")
+        undelivered = undelivered_critical_alerts(ops_store)
+        freshness = self_test_freshness(ops_store)
+        delivery_columns = st.columns(2)
+        with delivery_columns[0]:
+            if undelivered:
                 st.error(
-                    f"{len(report['failed'])} delivery failure(s): "
-                    + report["failed"][0]["detail"][:200]
+                    f"{len(undelivered)} critical alert(s) have NOT been delivered: "
+                    + ", ".join(sorted(a["fingerprint"] for a in undelivered))
                 )
-            st.rerun()
-    with action_columns[1]:
-        if st.button("Run channel self-test (sends a real toast)", key="ops_selftest"):
-            result = run_channel_self_test(ops_store, WindowsToastChannel())
-            if result["passed"]:
-                st.success("Self-test delivered and verified from the delivery record.")
             else:
-                st.error(f"Self-test FAILED: {result['delivery']['detail'][:200]}")
-            st.rerun()
+                st.success("Every open critical alert has a recorded delivery.")
+        with delivery_columns[1]:
+            (st.success if freshness["ok"] else st.warning)(
+                f"Channel self-test: {freshness['detail']}"
+            )
 
-    st.subheader("Open alerts")
-    open_alerts = ops_store.list_operational_alerts(status="open", limit=50)
-    if not open_alerts:
-        st.success("No open operational alerts.")
-    else:
-        st.dataframe(
-            [
-                {
-                    "severity": alert["severity"],
-                    "category": alert["category"],
-                    "message": alert["message"][:120],
-                    "occurrences": alert["occurrences"],
-                    "last seen": alert["last_seen_at"],
-                    "delivered": bool(
-                        ops_store.latest_successful_delivery(
-                            alert["fingerprint"],
-                            min_occurrences=alert["occurrences"],
-                        )
-                    ),
-                }
-                for alert in open_alerts
-            ],
-            width="stretch",
-            hide_index=True,
-        )
-    batched = pending_briefing_alerts(ops_store)
-    st.caption(
-        f"{len(batched)} warning-level alert(s) are batched for the daily "
-        "briefing rather than interrupting you (owner routing decision)."
-    )
+        action_columns = st.columns(2)
+        with action_columns[0]:
+            if st.button("Deliver pending critical alerts", key="ops_deliver"):
+                report = deliver_pending_alerts(ops_store, WindowsToastChannel())
+                if report["healthy"]:
+                    st.success(f"Delivered {len(report['delivered'])} alert(s).")
+                else:
+                    st.error(
+                        f"{len(report['failed'])} delivery failure(s): "
+                        + report["failed"][0]["detail"][:200]
+                    )
+                st.rerun()
+        with action_columns[1]:
+            if st.button("Run channel self-test (sends a real toast)", key="ops_selftest"):
+                result = run_channel_self_test(ops_store, WindowsToastChannel())
+                if result["passed"]:
+                    st.success("Self-test delivered and verified from the delivery record.")
+                else:
+                    st.error(f"Self-test FAILED: {result['delivery']['detail'][:200]}")
+                st.rerun()
 
-    st.subheader("Recent delivery attempts")
-    deliveries = ops_store.list_alert_deliveries(limit=20)
-    if not deliveries:
-        st.info("No delivery attempt has been recorded yet.")
-    else:
-        st.dataframe(
-            [
-                {
-                    "outcome": record["outcome"],
-                    "channel": record["channel"],
-                    "severity": record["severity"],
-                    "fingerprint": record["fingerprint"],
-                    "attempted": record["attempted_at"],
-                    "detail": record["detail"][:80],
-                }
-                for record in deliveries
-            ],
-            width="stretch",
-            hide_index=True,
-        )
-
-    st.subheader("Platform readiness")
-    try:
-        from assistant.mandate import load_mandate
-        from assistant.platform_readiness import build_platform_readiness
-
-        readiness_report = build_platform_readiness(
-            ops_store,
-            load_policy(policy_path),
-            load_mandate(),
-            check_broker=False,
-        ).to_dict()
-        st.dataframe(
-            [
-                {
-                    "dimension": dimension["name"],
-                    "status": dimension["status"],
-                    "explanation": dimension["explanation"][:160],
-                }
-                for dimension in readiness_report["dimensions"]
-            ],
-            width="stretch",
-            hide_index=True,
-        )
+    with st.container(border=True):
+        st.subheader("Open alerts")
+        open_alerts = ops_store.list_operational_alerts(status="open", limit=50)
+        if not open_alerts:
+            st.success("No open operational alerts.")
+        else:
+            st.dataframe(
+                [
+                    {
+                        "severity": alert["severity"],
+                        "category": alert["category"],
+                        "message": alert["message"][:120],
+                        "occurrences": alert["occurrences"],
+                        "last seen": alert["last_seen_at"],
+                        "delivered": bool(
+                            ops_store.latest_successful_delivery(
+                                alert["fingerprint"],
+                                min_occurrences=alert["occurrences"],
+                            )
+                        ),
+                    }
+                    for alert in open_alerts
+                ],
+                width="stretch",
+                hide_index=True,
+            )
+        batched = pending_briefing_alerts(ops_store)
         st.caption(
-            "Offline evaluation (no broker calls). Dimensions are scored "
-            "independently and never averaged."
-        )
-    except Exception as exc:  # readiness must never break the dashboard
-        st.warning(f"Readiness report unavailable: {exc}")
-
-    st.subheader("Operational state")
-    heartbeat = ops_store.get_system_state("operations_heartbeat", default={})
-    last_backup = ops_store.get_system_state("last_database_backup", default={})
-    epoch = ops_store.get_active_paper_evidence_epoch()
-    state_columns = st.columns(3)
-    with state_columns[0]:
-        st.metric(
-            "Last health heartbeat",
-            (heartbeat or {}).get("at", "never")[:19],
-            help="Written by the operations watchdog/cycle.",
-        )
-    with state_columns[1]:
-        st.metric(
-            "Last verified backup",
-            (last_backup or {}).get("completed_at", "never")[:19],
-        )
-    with state_columns[2]:
-        st.metric(
-            "Active evidence epoch",
-            epoch["evidence_epoch"] if epoch else "none",
-            help="A formal paper-evidence epoch is required for promotion evidence.",
-        )
-    drills = ops_store.list_operational_drills(limit=10)
-    if drills:
-        st.caption("Most recent operational drills")
-        st.dataframe(
-            [
-                {
-                    "drill": drill["drill_type"],
-                    "passed": bool(drill["passed"]),
-                    "performed": drill["performed_at"][:19],
-                    "epoch": drill.get("evidence_epoch") or "verification-only",
-                }
-                for drill in drills
-            ],
-            width="stretch",
-            hide_index=True,
+            f"{len(batched)} warning-level alert(s) are batched for the daily "
+            "briefing rather than interrupting you (owner routing decision)."
         )
 
+    with st.container(border=True):
+        st.subheader("Recent delivery attempts")
+        deliveries = ops_store.list_alert_deliveries(limit=20)
+        if not deliveries:
+            st.info("No delivery attempt has been recorded yet.")
+        else:
+            st.dataframe(
+                [
+                    {
+                        "outcome": record["outcome"],
+                        "channel": record["channel"],
+                        "severity": record["severity"],
+                        "fingerprint": record["fingerprint"],
+                        "attempted": record["attempted_at"],
+                        "detail": record["detail"][:80],
+                    }
+                    for record in deliveries
+                ],
+                width="stretch",
+                hide_index=True,
+            )
 
-# ---------------------------------------------------------------------------
-# Settings & Features -- three distinct control classes
-# (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md sections 2-3): UI preferences
-# (session-state toggles), authoritative trading policy (protected workflow,
-# typed confirmation, new fingerprint), and read-only credential/safety status
-# (never editable here, never shows a secret value).
-# ---------------------------------------------------------------------------
+    with st.container(border=True):
+        st.subheader("Platform readiness")
+        try:
+            from assistant.mandate import load_mandate
+            from assistant.platform_readiness import build_platform_readiness
+
+            readiness_report = build_platform_readiness(
+                ops_store,
+                load_policy(policy_path),
+                load_mandate(),
+                check_broker=False,
+            ).to_dict()
+            st.dataframe(
+                [
+                    {
+                        "dimension": dimension["name"],
+                        "status": dimension["status"],
+                        "explanation": dimension["explanation"][:160],
+                    }
+                    for dimension in readiness_report["dimensions"]
+                ],
+                width="stretch",
+                hide_index=True,
+            )
+            st.caption(
+                "Offline evaluation (no broker calls). Dimensions are scored "
+                "independently and never averaged."
+            )
+        except Exception as exc:  # readiness must never break the dashboard
+            st.warning(f"Readiness report unavailable: {exc}")
+
+    with st.container(border=True):
+        st.subheader("Operational state")
+        heartbeat = ops_store.get_system_state("operations_heartbeat", default={})
+        last_backup = ops_store.get_system_state("last_database_backup", default={})
+        epoch = ops_store.get_active_paper_evidence_epoch()
+        state_columns = st.columns(3)
+        with state_columns[0]:
+            st.metric(
+                "Last health heartbeat",
+                (heartbeat or {}).get("at", "never")[:19],
+                help="Written by the operations watchdog/cycle.",
+            )
+        with state_columns[1]:
+            st.metric(
+                "Last verified backup",
+                (last_backup or {}).get("completed_at", "never")[:19],
+            )
+        with state_columns[2]:
+            st.metric(
+                "Active evidence epoch",
+                epoch["evidence_epoch"] if epoch else "none",
+                help="A formal paper-evidence epoch is required for promotion evidence.",
+            )
+        drills = ops_store.list_operational_drills(limit=10)
+        if drills:
+            st.caption("Most recent operational drills")
+            st.dataframe(
+                [
+                    {
+                        "drill": drill["drill_type"],
+                        "passed": bool(drill["passed"]),
+                        "performed": drill["performed_at"][:19],
+                        "epoch": drill.get("evidence_epoch") or "verification-only",
+                    }
+                    for drill in drills
+                ],
+                width="stretch",
+                hide_index=True,
+            )
+
+
+    # ---------------------------------------------------------------------------
+    # Settings & Features -- three distinct control classes
+    # (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md sections 2-3): UI preferences
+    # (session-state toggles), authoritative trading policy (protected workflow,
+    # typed confirmation, new fingerprint), and read-only credential/safety status
+    # (never editable here, never shows a secret value).
+    # ---------------------------------------------------------------------------
 
 if page == "Settings & Features":
     st.caption(
@@ -4080,233 +4094,238 @@ if page == "Settings & Features":
     # ------------------------------------------------------------------ #
     # 1. Authoritative trading policy (protected workflow)               #
     # ------------------------------------------------------------------ #
-    st.subheader("Trading policy (authoritative — protected workflow)")
-    try:
-        settings_policy = load_policy(policy_path)
-        settings_policy_error = None
-    except Exception as exc:
-        settings_policy = None
-        settings_policy_error = str(exc)
-    if settings_policy is None:
-        st.error(f"The selected policy file could not be loaded: {settings_policy_error}")
-    else:
-        active_fingerprint = compute_policy_fingerprint(settings_policy)
-        _sync_policy_editor_state(st.session_state, policy_path, settings_policy)
-        st.caption(
-            f"Active policy: **{settings_policy.name}** v{settings_policy.version} "
-            f"({settings_policy.execution_mode}) — fingerprint `{active_fingerprint[:16]}…` — "
-            f"file: `{policy_path}`"
-        )
-        update_notice = st.session_state.pop("policy_update_notice", None)
-        if update_notice is not None:
-            st.success(
-                f"Policy updated and saved: v{update_notice['old_version']} → "
-                f"v{update_notice['new_version']}, fingerprint "
-                f"`{update_notice['old_fingerprint'][:16]}…` → "
-                f"`{update_notice['new_fingerprint'][:16]}…`."
-            )
-            st.warning(
-                "Proposals created before this change can no longer execute. "
-                "Regenerate anything you still want on the Selling or "
-                "Propose & Approve page."
-            )
-        proposed_allow_new = st.checkbox(
-            "Allow new positions (exposure-increasing buys become policy-eligible)",
-            key="policy_edit_allow_new_positions",
-            help="Authoritative policy, not a preference. Changing it requires the "
-            "typed confirmation below. It does NOT bypass position, exposure, cash, "
-            "freshness, earnings, duplicate-order, kill-switch, or approval controls "
-            "-- it only stops the blanket refusal of buys that would open a new position.",
-        )
-        proposed_enable_strategy = st.checkbox(
-            "Enable leveraged-pair strategy proposals by default",
-            key="policy_edit_enable_strategy",
-            help="Sets the durable default for the Propose & Approve page's per-run "
-            "checkbox. Configured leveraged-pair strategies carry NO confirmed, "
-            "production-authoritative evidence -- enabling only allows the "
-            "deterministic generator to be checked; it approves nothing.",
-        )
-        pending_policy_change = (
-            proposed_allow_new != settings_policy.allow_new_positions
-            or proposed_enable_strategy != settings_policy.enable_strategy_proposals
-        )
-        if pending_policy_change:
-            st.warning(
-                "Applying this change writes the policy file atomically, bumps the "
-                "policy version, and produces a NEW policy fingerprint. **Every "
-                "pending proposal created under the current fingerprint will refuse "
-                "to execute and must be regenerated.** That refusal is deliberate: "
-                "an approval given under one policy must not authorize execution "
-                "under another."
-            )
-            policy_confirm_phrase = st.text_input(
-                'Type exactly "UPDATE POLICY" to enable the apply button',
-                key="policy_edit_confirm_phrase",
-            )
-            if st.button(
-                "Apply policy change",
-                type="primary",
-                disabled=policy_confirm_phrase.strip() != "UPDATE POLICY",
-            ):
-                try:
-                    updated_policy = policy_with_updated_flags(
-                        settings_policy,
-                        allow_new_positions=proposed_allow_new,
-                        enable_strategy_proposals=proposed_enable_strategy,
-                    )
-                    save_policy(
-                        updated_policy,
-                        policy_path,
-                        expected_fingerprint=active_fingerprint,
-                        expected_version=settings_policy.version,
-                    )
-                except Exception as exc:
-                    st.error(f"Policy update refused; the file was not changed: {exc}")
-                else:
-                    st.cache_data.clear()
-                    new_fingerprint = compute_policy_fingerprint(updated_policy)
-                    st.session_state["policy_update_notice"] = {
-                        "old_version": settings_policy.version,
-                        "new_version": updated_policy.version,
-                        "old_fingerprint": active_fingerprint,
-                        "new_fingerprint": new_fingerprint,
-                    }
-                    # Earlier parts of this page (editor seed, status panel)
-                    # already rendered against the old policy. Rerun
-                    # immediately so the editor, proposal defaults, and
-                    # read-only status all agree with the policy that was
-                    # just persisted.
-                    st.rerun()
+    with st.container(border=True):
+        st.subheader("Trading policy (authoritative — protected workflow)")
+        try:
+            settings_policy = load_policy(policy_path)
+            settings_policy_error = None
+        except Exception as exc:
+            settings_policy = None
+            settings_policy_error = str(exc)
+        if settings_policy is None:
+            st.error(f"The selected policy file could not be loaded: {settings_policy_error}")
         else:
-            st.caption("No policy change selected — the values above match the active policy.")
+            active_fingerprint = compute_policy_fingerprint(settings_policy)
+            _sync_policy_editor_state(st.session_state, policy_path, settings_policy)
+            st.caption(
+                f"Active policy: **{settings_policy.name}** v{settings_policy.version} "
+                f"({settings_policy.execution_mode}) — fingerprint `{active_fingerprint[:16]}…` — "
+                f"file: `{policy_path}`"
+            )
+            update_notice = st.session_state.pop("policy_update_notice", None)
+            if update_notice is not None:
+                st.success(
+                    f"Policy updated and saved: v{update_notice['old_version']} → "
+                    f"v{update_notice['new_version']}, fingerprint "
+                    f"`{update_notice['old_fingerprint'][:16]}…` → "
+                    f"`{update_notice['new_fingerprint'][:16]}…`."
+                )
+                st.warning(
+                    "Proposals created before this change can no longer execute. "
+                    "Regenerate anything you still want on the Selling or "
+                    "Propose & Approve page."
+                )
+            proposed_allow_new = st.checkbox(
+                "Allow new positions (exposure-increasing buys become policy-eligible)",
+                key="policy_edit_allow_new_positions",
+                help="Authoritative policy, not a preference. Changing it requires the "
+                "typed confirmation below. It does NOT bypass position, exposure, cash, "
+                "freshness, earnings, duplicate-order, kill-switch, or approval controls "
+                "-- it only stops the blanket refusal of buys that would open a new position.",
+            )
+            proposed_enable_strategy = st.checkbox(
+                "Enable leveraged-pair strategy proposals by default",
+                key="policy_edit_enable_strategy",
+                help="Sets the durable default for the Propose & Approve page's per-run "
+                "checkbox. Configured leveraged-pair strategies carry NO confirmed, "
+                "production-authoritative evidence -- enabling only allows the "
+                "deterministic generator to be checked; it approves nothing.",
+            )
+            pending_policy_change = (
+                proposed_allow_new != settings_policy.allow_new_positions
+                or proposed_enable_strategy != settings_policy.enable_strategy_proposals
+            )
+            if pending_policy_change:
+                st.warning(
+                    "Applying this change writes the policy file atomically, bumps the "
+                    "policy version, and produces a NEW policy fingerprint. **Every "
+                    "pending proposal created under the current fingerprint will refuse "
+                    "to execute and must be regenerated.** That refusal is deliberate: "
+                    "an approval given under one policy must not authorize execution "
+                    "under another."
+                )
+                policy_confirm_phrase = st.text_input(
+                    'Type exactly "UPDATE POLICY" to enable the apply button',
+                    key="policy_edit_confirm_phrase",
+                )
+                if st.button(
+                    "Apply policy change",
+                    type="primary",
+                    disabled=policy_confirm_phrase.strip() != "UPDATE POLICY",
+                ):
+                    try:
+                        updated_policy = policy_with_updated_flags(
+                            settings_policy,
+                            allow_new_positions=proposed_allow_new,
+                            enable_strategy_proposals=proposed_enable_strategy,
+                        )
+                        save_policy(
+                            updated_policy,
+                            policy_path,
+                            expected_fingerprint=active_fingerprint,
+                            expected_version=settings_policy.version,
+                        )
+                    except Exception as exc:
+                        st.error(f"Policy update refused; the file was not changed: {exc}")
+                    else:
+                        st.cache_data.clear()
+                        new_fingerprint = compute_policy_fingerprint(updated_policy)
+                        st.session_state["policy_update_notice"] = {
+                            "old_version": settings_policy.version,
+                            "new_version": updated_policy.version,
+                            "old_fingerprint": active_fingerprint,
+                            "new_fingerprint": new_fingerprint,
+                        }
+                        # Earlier parts of this page (editor seed, status panel)
+                        # already rendered against the old policy. Rerun
+                        # immediately so the editor, proposal defaults, and
+                        # read-only status all agree with the policy that was
+                        # just persisted.
+                        st.rerun()
+            else:
+                st.caption("No policy change selected — the values above match the active policy.")
 
-    # ------------------------------------------------------------------ #
-    # 2. UI preferences (session-state; never authority)                 #
-    # ------------------------------------------------------------------ #
-    st.divider()
-    st.subheader("UI preferences (this session)")
-    st.checkbox(
-        "Fetch live earnings events by default",
-        key=_pref_widget_key("pref_include_events_default"),
-        value=bool(st.session_state.get("pref_include_events_default", False)),
-        on_change=_sync_pref_from_widget,
-        args=("pref_include_events_default",),
-        help="Seeds the sidebar checkbox's default. The sidebar's per-run choice "
-        "still wins once you touch it. Missing event data is always shown as "
-        "honestly unavailable, never guessed.",
-    )
-
-    st.subheader("Optional AI features (this session; every call still needs its own click)")
-    anthropic_configured = is_ai_advisor_configured()
-    st.caption(
-        f"Anthropic credential: **{'Configured' if anthropic_configured else 'Not configured'}** "
-        "(presence only — the key value is never displayed, stored, or accepted here). "
-        "Credential presence makes features available; it never triggers a call by itself."
-    )
-    st.checkbox(
-        "Enable optional AI features (master)",
-        key=_pref_widget_key(_AI_MASTER_PREF_KEY),
-        value=bool(st.session_state.get(_AI_MASTER_PREF_KEY, False)),
-        on_change=_sync_pref_from_widget,
-        args=(_AI_MASTER_PREF_KEY,),
-        help="Master gate over every optional LLM surface. Off means no AI control "
-        "is offered anywhere; deterministic content is completely unaffected either way.",
-    )
-    master_on = bool(st.session_state.get(_AI_MASTER_PREF_KEY, False))
-    for pref_key, pref_label, pref_boundary in _AI_FEATURE_PREFS:
+        # ------------------------------------------------------------------ #
+        # 2. UI preferences (session-state; never authority)                 #
+        # ------------------------------------------------------------------ #
+        st.divider()
+    with st.container(border=True):
+        st.subheader("UI preferences (this session)")
         st.checkbox(
-            pref_label,
-            key=_pref_widget_key(pref_key),
-            value=bool(st.session_state.get(pref_key, False)),
+            "Fetch live earnings events by default",
+            key=_pref_widget_key("pref_include_events_default"),
+            value=bool(st.session_state.get("pref_include_events_default", False)),
             on_change=_sync_pref_from_widget,
-            args=(pref_key,),
-            disabled=not master_on,
-            help=pref_boundary
-            + (" (Enable the master toggle above first.)" if not master_on else ""),
+            args=("pref_include_events_default",),
+            help="Seeds the sidebar checkbox's default. The sidebar's per-run choice "
+            "still wins once you touch it. Missing event data is always shown as "
+            "honestly unavailable, never guessed.",
         )
 
-    # ------------------------------------------------------------------ #
-    # 3. Read-only status (data sources + safety)                        #
-    # ------------------------------------------------------------------ #
-    st.divider()
-    st.subheader("Data-source status (read-only)")
-    provider_rows = [
-        {
-            "Provider": "Alpaca paper trading",
-            "Status": "Configured" if is_configured() else "Not configured",
-            "Notes": "Portfolio, quotes, and paper order routing. Unconfigured = sample portfolio.",
-        },
-        {
-            "Provider": "Finnhub IPO calendar",
-            "Status": "Configured" if is_ipo_calendar_configured() else "Not configured",
-            "Notes": "Recent-IPO suggestion lane (FINNHUB_API_KEY).",
-        },
-        {
-            "Provider": "Databento research ingestion",
-            "Status": "Configured" if os.environ.get("DATABENTO_API_KEY") else "Not configured",
-            "Notes": "Licensed research data. Availability here never starts a download -- "
-            "downloads remain explicit CLI commands with a cost estimate and cap.",
-        },
-        {
-            "Provider": "Anthropic optional AI",
-            "Status": "Configured" if anthropic_configured else "Not configured",
-            "Notes": "Optional advisory features only (ANTHROPIC_API_KEY). No proposal authority.",
-        },
-    ]
-    st.dataframe(provider_rows, use_container_width=True, hide_index=True)
-
-    st.subheader("Safety status (read-only — sourced from the enforcing code, not re-computed here)")
-    # Each row reads the SAME function/state the execution path enforces with,
-    # so this panel cannot disagree with enforcement (the platform-readiness /
-    # fake-staleness lessons: a status display that re-implements its check
-    # eventually drifts from the check).
-    persistent_kill = store.get_kill_switch()
-    env_kill = env_kill_switch_active()
-    safety_rows = [
-        {
-            "Control": "Trading mode (config.PAPER_TRADING)",
-            "State": "PAPER" if PAPER_TRADING else "LIVE (verify immediately)",
-            "Detail": "Cannot be changed from this app, deliberately.",
-        },
-        {
-            "Control": "Environment kill switch",
-            "State": "ENGAGED" if env_kill else "off",
-            "Detail": "assistant.kill_switch.env_kill_switch_active() -- the same "
-            "call execution makes.",
-        },
-        {
-            "Control": "Persistent kill switch",
-            "State": "ENGAGED" if persistent_kill.get("active") else "off",
-            "Detail": (
-                f"Reason: {persistent_kill.get('reason') or '—'} "
-                "(store.get_kill_switch(), the same read execution makes)."
-            ),
-        },
-        {
-            "Control": "Active policy",
-            "State": (
-                f"{settings_policy.name} v{settings_policy.version} "
-                f"({settings_policy.execution_mode})"
-                if settings_policy is not None
-                else "UNLOADABLE — see error above"
-            ),
-            "Detail": (
-                f"Fingerprint {compute_policy_fingerprint(settings_policy)[:16]}… "
-                "(compute_policy_fingerprint, the same function approval binds to)."
-                if settings_policy is not None
-                else "Fix the policy file before trading."
-            ),
-        },
-        {
-            "Control": "Per-order human approval",
-            "State": "REQUIRED (structural)",
-            "Detail": "Typed approval phrase per proposal; overrides need the separate "
-            "order-specific phrase. No batch or autonomous approval exists.",
-        },
-    ]
-    st.dataframe(safety_rows, use_container_width=True, hide_index=True)
-    if (env_kill or persistent_kill.get("active")):
-        st.error(
-            "A kill switch is ENGAGED — execution will refuse orders until it is "
-            "cleared through the CLI kill-switch workflow."
+    with st.container(border=True):
+        st.subheader("Optional AI features (this session; every call still needs its own click)")
+        anthropic_configured = is_ai_advisor_configured()
+        st.caption(
+            f"Anthropic credential: **{'Configured' if anthropic_configured else 'Not configured'}** "
+            "(presence only — the key value is never displayed, stored, or accepted here). "
+            "Credential presence makes features available; it never triggers a call by itself."
         )
+        st.checkbox(
+            "Enable optional AI features (master)",
+            key=_pref_widget_key(_AI_MASTER_PREF_KEY),
+            value=bool(st.session_state.get(_AI_MASTER_PREF_KEY, False)),
+            on_change=_sync_pref_from_widget,
+            args=(_AI_MASTER_PREF_KEY,),
+            help="Master gate over every optional LLM surface. Off means no AI control "
+            "is offered anywhere; deterministic content is completely unaffected either way.",
+        )
+        master_on = bool(st.session_state.get(_AI_MASTER_PREF_KEY, False))
+        for pref_key, pref_label, pref_boundary in _AI_FEATURE_PREFS:
+            st.checkbox(
+                pref_label,
+                key=_pref_widget_key(pref_key),
+                value=bool(st.session_state.get(pref_key, False)),
+                on_change=_sync_pref_from_widget,
+                args=(pref_key,),
+                disabled=not master_on,
+                help=pref_boundary
+                + (" (Enable the master toggle above first.)" if not master_on else ""),
+            )
+
+        # ------------------------------------------------------------------ #
+        # 3. Read-only status (data sources + safety)                        #
+        # ------------------------------------------------------------------ #
+        st.divider()
+    with st.container(border=True):
+        st.subheader("Data-source status (read-only)")
+        provider_rows = [
+            {
+                "Provider": "Alpaca paper trading",
+                "Status": "Configured" if is_configured() else "Not configured",
+                "Notes": "Portfolio, quotes, and paper order routing. Unconfigured = sample portfolio.",
+            },
+            {
+                "Provider": "Finnhub IPO calendar",
+                "Status": "Configured" if is_ipo_calendar_configured() else "Not configured",
+                "Notes": "Recent-IPO suggestion lane (FINNHUB_API_KEY).",
+            },
+            {
+                "Provider": "Databento research ingestion",
+                "Status": "Configured" if os.environ.get("DATABENTO_API_KEY") else "Not configured",
+                "Notes": "Licensed research data. Availability here never starts a download -- "
+                "downloads remain explicit CLI commands with a cost estimate and cap.",
+            },
+            {
+                "Provider": "Anthropic optional AI",
+                "Status": "Configured" if anthropic_configured else "Not configured",
+                "Notes": "Optional advisory features only (ANTHROPIC_API_KEY). No proposal authority.",
+            },
+        ]
+        st.dataframe(provider_rows, use_container_width=True, hide_index=True)
+
+    with st.container(border=True):
+        st.subheader("Safety status (read-only — sourced from the enforcing code, not re-computed here)")
+        # Each row reads the SAME function/state the execution path enforces with,
+        # so this panel cannot disagree with enforcement (the platform-readiness /
+        # fake-staleness lessons: a status display that re-implements its check
+        # eventually drifts from the check).
+        persistent_kill = store.get_kill_switch()
+        env_kill = env_kill_switch_active()
+        safety_rows = [
+            {
+                "Control": "Trading mode (config.PAPER_TRADING)",
+                "State": "PAPER" if PAPER_TRADING else "LIVE (verify immediately)",
+                "Detail": "Cannot be changed from this app, deliberately.",
+            },
+            {
+                "Control": "Environment kill switch",
+                "State": "ENGAGED" if env_kill else "off",
+                "Detail": "assistant.kill_switch.env_kill_switch_active() -- the same "
+                "call execution makes.",
+            },
+            {
+                "Control": "Persistent kill switch",
+                "State": "ENGAGED" if persistent_kill.get("active") else "off",
+                "Detail": (
+                    f"Reason: {persistent_kill.get('reason') or '—'} "
+                    "(store.get_kill_switch(), the same read execution makes)."
+                ),
+            },
+            {
+                "Control": "Active policy",
+                "State": (
+                    f"{settings_policy.name} v{settings_policy.version} "
+                    f"({settings_policy.execution_mode})"
+                    if settings_policy is not None
+                    else "UNLOADABLE — see error above"
+                ),
+                "Detail": (
+                    f"Fingerprint {compute_policy_fingerprint(settings_policy)[:16]}… "
+                    "(compute_policy_fingerprint, the same function approval binds to)."
+                    if settings_policy is not None
+                    else "Fix the policy file before trading."
+                ),
+            },
+            {
+                "Control": "Per-order human approval",
+                "State": "REQUIRED (structural)",
+                "Detail": "Typed approval phrase per proposal; overrides need the separate "
+                "order-specific phrase. No batch or autonomous approval exists.",
+            },
+        ]
+        st.dataframe(safety_rows, use_container_width=True, hide_index=True)
+        if (env_kill or persistent_kill.get("active")):
+            st.error(
+                "A kill switch is ENGAGED — execution will refuse orders until it is "
+                "cleared through the CLI kill-switch workflow."
+            )

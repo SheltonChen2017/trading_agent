@@ -11,6 +11,7 @@ are not cosmetic and are the reason this file exists:
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 from streamlit.testing.v1 import AppTest
@@ -66,8 +67,19 @@ def test_typography_block_is_injected_without_a_remote_font_request():
     css = "\n".join(styles)
     assert "font-family" in css
     assert "tabular-nums" in css
+    # data: URIs are self-contained by definition and make no network
+    # request -- but an inline SVG's MANDATORY xmlns identifier contains
+    # the literal "http://www.w3.org/2000/svg" (AUI-001's ink tick), which
+    # tripped the plain substring scan. Strip data: URI bodies first, then
+    # apply the remote scan to everything else AND forbid any remaining
+    # url() outright -- a non-data url() is an external fetch regardless of
+    # scheme, so this is STRICTER than the original check, not weaker.
+    scannable = re.sub(r"url\((['\"]?)data:[^)]*\)", "url(DATA_URI)", css)
+    assert not re.search(r"url\((?!DATA_URI\))", scannable), (
+        "a non-data url() would make rendering depend on an external fetch"
+    )
     for remote in ("@import", "https://", "http://", "fonts.googleapis", "cdn"):
-        assert remote not in css, f"typography block reaches out to {remote!r}"
+        assert remote not in scannable, f"typography block reaches out to {remote!r}"
 
 
 def test_sidebar_policy_field_defaults_to_the_resolved_policy(tmp_path, monkeypatch):

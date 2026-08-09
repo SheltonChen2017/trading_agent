@@ -301,6 +301,15 @@ def test_days_to_long_term_counts_down():
     assert 60 <= row["days_to_long_term"] <= 67, row["days_to_long_term"]
 
 
+def test_unrealized_lot_reports_the_first_long_term_date_including_leap_day():
+    acquired = datetime(2024, 2, 29, 15, 0, tzinfo=timezone.utc)
+    ledger = build_ledger(
+        [Fill("KO", "buy", 1, 50.0, acquired, fill_id="leap-date")]
+    )
+    row = unrealized_by_lot(ledger, "KO", 55.0)[0]
+    assert row["first_long_term_date"] == "2025-03-01"
+
+
 def test_a_long_held_lot_reports_long_term_and_zero_countdown():
     acquired = datetime.now(timezone.utc) - timedelta(days=400)
     ledger = build_ledger([Fill("KO", "buy", 1, 50.0, acquired, fill_id="k1")])

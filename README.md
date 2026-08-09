@@ -188,9 +188,12 @@ As of the current registry (`research_findings.json` version 1.5.0):
   can never re-lever once trimmed, so it structurally misses upside in an
   extended bull market); and the three-sleeve engine's original growth rule
   (+5% any-term full exit / -10% add -- structurally stranded 95-99% of
-  days in cash for 3.29% after-tax CAGR vs 48.14% holding the same names;
-  rejected on a single descriptive window and revised to a long-term-gated
-  trim before any notification code encoded it).
+  days in cash for a 3.29% modeled after-tax-proxy CAGR vs 48.14% holding
+  the same names; rejected on a single descriptive window and revised to a
+  long-term-gated trim before any notification code encoded it). The proxy
+  uses dividend-adjusted prices, so it does not separately model dividend
+  tax timing/classification and must not be read as an accountant-grade
+  after-tax return.
 - **Confirmed**: SOXX/SOXL trend/volatility rotation's **drawdown-reduction**
   claim (materially lower max drawdown across confirmation, walk-forward,
   sensitivity, and tax/cost checks -- a risk result, not an excess-return

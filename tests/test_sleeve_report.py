@@ -159,6 +159,29 @@ def test_default_fifty_percent_boundary_is_inclusive_for_a_long_term_lot():
     assert below["growth_sleeve"]["lots_awaiting_long_term"] == 0
 
 
+def test_threshold_verdicts_never_use_the_rounded_display_percentage():
+    """Values just inside either boundary used to round outward and cross.
+
+    +49.999% is below +50% and -9.999% is above -10%, even though both
+    values would display as their respective threshold at two decimals.
+    """
+    ledger = build_ledger([_buy("NVDA", 10, 100.0, days_ago=400)])
+
+    gain = evaluate_sleeves(
+        _snapshot([_position("NVDA", 10, 149.999)]), ledger, []
+    )
+    gain_lot = gain["growth_sleeve"]["positions"][0]["lots"][0]
+    assert gain_lot["unrealized_pnl_pct"] == pytest.approx(49.999)
+    assert gain_lot["crossed_gain_review_threshold"] is False
+
+    decline = evaluate_sleeves(
+        _snapshot([_position("NVDA", 10, 90.001)]), ledger, []
+    )
+    decline_lot = decline["growth_sleeve"]["positions"][0]["lots"][0]
+    assert decline_lot["unrealized_pnl_pct"] == pytest.approx(-9.999)
+    assert decline_lot["crossed_decline_review_threshold"] is False
+
+
 def test_gate_off_counts_a_short_term_lot_as_crossed():
     """gain_requires_long_term=False restores ungated semantics, and the
     awaiting field then never fires."""
@@ -221,6 +244,7 @@ def test_every_lot_row_carries_the_tax_mechanism_fields():
     lot = report["growth_sleeve"]["positions"][0]["lots"][0]
     assert lot["term_if_sold_now"] == "short"
     assert 0 < lot["days_to_long_term"] <= 30
+    assert lot["first_long_term_date"]
     # +10% is far below the revision-2 threshold: neither crossed nor
     # awaiting -- proximity to the gate is not the same as price crossing.
     assert lot["crossed_gain_review_threshold"] is False
@@ -319,6 +343,17 @@ def test_invalid_price_degrades_that_position_loudly_not_the_report():
     assert by_ticker["AMD"]["lot_coverage"] == "none"  # AMD still reported
 
 
+def test_missing_current_price_degrades_the_position_without_a_traceback():
+    position = _position("NVDA", 10, 100.0)
+    position.current_price = None
+    report = evaluate_sleeves(
+        _snapshot([position], total_equity=50_000.0), _EMPTY_LEDGER, []
+    )
+    row = report["growth_sleeve"]["positions"][0]
+    assert row["lot_coverage"] == "unavailable"
+    assert "finite decimal number" in row["coverage_reason"]
+
+
 # ---------------------------------------------------------------------------
 # Refusals
 # ---------------------------------------------------------------------------
@@ -349,6 +384,9 @@ def test_unusable_equity_refuses_the_report(equity):
         {"gain_trim_fraction": -0.5},
         {"gain_trim_fraction": math.nan},
         {"gain_trim_fraction": True},
+        {"gain_requires_long_term": "false"},
+        {"gain_requires_long_term": 1},
+        {"floor_pct": None},
     ],
 )
 def test_nonsense_thresholds_are_rejected(kwargs):
@@ -414,6 +452,21 @@ def test_positive_income_posting_refuses_rather_than_misstating():
     counting it either way would misstate income, so the report refuses."""
     with pytest.raises(SleeveReportError):
         evaluate_sleeves(_snapshot([]), _EMPTY_LEDGER, [_dividend_posting("50")])
+
+
+@pytest.mark.parametrize(
+    "posting",
+    [
+        {"account": "INCOME:DIVIDENDS", "metadata": {}},
+        {"account": "INCOME:DIVIDENDS", "amount": "NaN", "metadata": {}},
+        {"account": "INCOME:DIVIDENDS", "amount": "-10", "metadata": "JEPQ"},
+    ],
+)
+def test_malformed_income_posting_refuses_with_the_report_error(posting):
+    """The CLI catches SleeveReportError; malformed journal data must not
+    escape as KeyError/ValueError or be mislabeled as a lot-replay failure."""
+    with pytest.raises(SleeveReportError, match="dividend|journal"):
+        evaluate_sleeves(_snapshot([]), _EMPTY_LEDGER, [posting])
 
 
 def test_m1_carries_no_reinvestable_budget_field():
@@ -521,6 +574,20 @@ def test_report_carries_no_action_shaped_field():
         if any(word in key.rsplit(".", 1)[-1].lower() for word in forbidden)
     ]
     assert not offending, offending
+
+
+def test_reports_panel_does_not_describe_its_measurement_as_a_proposal():
+    """M1 is reporting-only; presentation text may describe the recorded
+    rule but must not turn the panel itself into a trade proposal."""
+    from pathlib import Path
+
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "scripts"
+        / "personal_assistant_ui.py"
+    ).read_text(encoding="utf-8")
+    assert "review proposes trimming" not in source
+    assert "this panel only " in source and "reports the state" in source
 
 
 def test_report_is_json_serializable_as_is():

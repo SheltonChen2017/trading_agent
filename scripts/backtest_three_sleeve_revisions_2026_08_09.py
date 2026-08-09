@@ -12,7 +12,10 @@ dips, tax-aware) while repairing the structural stranding.
 
 Same realism: next-open fills, 37%/15% annual tax netting with carryforward,
 terminal liquidation taxed, 3% cash yield, dividend-adjusted prices, 5-unit
-cap per ticker. Same names, same 7 years. Descriptive design guidance --
+cap per ticker. The tax numbers are MODELED PROXIES: dividend adjustments
+enter price gains, real dividend tax timing/classification is absent, and
+the script's >365-day shortcut can differ from the app's calendar-correct
+tax authority at leap/year boundaries. Same names, same 7 years. Descriptive design guidance --
 every number here is an uncounted look at hindsight-picked winners; the
 chosen rule must be frozen and tested prospectively in the paper epoch.
 """

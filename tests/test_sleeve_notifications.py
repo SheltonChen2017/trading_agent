@@ -12,9 +12,11 @@ The dangerous failure directions for a notification layer:
 """
 from __future__ import annotations
 
+import sqlite3
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
+import pandas as pd
 import pytest
 
 import config
@@ -29,6 +31,7 @@ from assistant.sleeve_notifications import (
     alert_fingerprint,
     derive_reentry_references,
     evaluate_watch_transitions,
+    _recorded_close_fetcher,
     run_sleeve_notification_cycle,
 )
 from assistant.sleeve_report import evaluate_sleeves
@@ -142,6 +145,18 @@ def test_awaiting_long_term_notifies_once_and_upgrades_to_gain_review():
     assert _states_by_key(day3)[("n1", AWAITING_LONG_TERM)]["active"] is False
 
 
+def test_gain_notification_carries_decimal_money_and_names_it_in_message():
+    """Plan section 4 requires gain notifications, not only reports, to
+    carry the lot's unrealized gain through a decimal-safe money field."""
+    fills = [_buy("NVDA", 10, 100.0, days_ago=400, fill_id="n1")]
+    activation = _evaluate(
+        _report([_position("NVDA", 10, 160.0)], fills)
+    ).activations[0]
+
+    assert activation.details["unrealized_pnl_money"] == "600"
+    assert "$600.00" in activation.message
+
+
 def test_decline_crossing_notifies_once():
     fills = [_buy("AMD", 10, 100.0, days_ago=30, fill_id="a1")]
     report = _report([_position("AMD", 10, 88.0)], fills)  # -12%
@@ -184,6 +199,28 @@ def test_vanished_lot_with_broken_coverage_alerts_coverage_lost_once():
 
     day3 = _evaluate(blind, prior=day2.states)
     assert day3.activations == []  # still blind: already notified
+
+
+def test_vanished_lot_under_partial_coverage_is_not_assumed_disposed():
+    """Partial coverage is explicitly incomplete. If one of two tracked
+    lots vanishes while the broker still holds both lots' share count, the
+    evaluator cannot prove a disposal and must surface blindness."""
+    complete = [
+        _buy("AMD", 10, 100.0, days_ago=40, fill_id="a1"),
+        _buy("AMD", 10, 90.0, days_ago=30, fill_id="a2"),
+    ]
+    day1 = _evaluate(_report([_position("AMD", 20, 88.0)], complete))
+
+    partial = _report(
+        [_position("AMD", 20, 88.0)],
+        [complete[0]],
+    )
+    assert partial["growth_sleeve"]["positions"][0]["lot_coverage"] == "partial"
+    day2 = _evaluate(partial, prior=day1.states)
+
+    alerts = [a for a in day2.activations if a.kind == COVERAGE_LOST]
+    assert len(alerts) == 1
+    assert alerts[0].watch_key == "a2"
 
 
 def test_coverage_healing_flips_inactive_and_rebreak_realerts():
@@ -381,6 +418,85 @@ def test_cycle_recross_reopens_the_same_fingerprint(tmp_path):
         len([a for a in store.list_operational_alerts(status="open")
              if a["category"] == ALERT_CATEGORY]) == 1
     )
+
+
+def test_cycle_does_not_create_reentry_watch_for_broker_held_ticker(
+    tmp_path, monkeypatch
+):
+    """A closed application ledger does not make a ticker flat when the
+    broker snapshot still holds shares acquired outside the journal."""
+    store = AssistantStore(tmp_path / "externally-held.db")
+    fills = [
+        _buy("NVDA", 10, 100.0, days_ago=200, fill_id="n1"),
+        _sell("NVDA", 10, 170.0, days_ago=10, fill_id="s1"),
+    ]
+    monkeypatch.setattr(
+        "assistant.corporate_actions.fills_with_confirmed_splits",
+        lambda _store: fills,
+    )
+    fetched = []
+
+    result = run_sleeve_notification_cycle(
+        store,
+        snapshot=_snapshot([_position("NVDA", 5, 150.0)]),
+        now=_NOW,
+        price_fetcher=(
+            lambda tickers: fetched.extend(tickers)
+            or {"NVDA": Decimal("150")}
+        ),
+    )
+
+    assert fetched == []
+    assert not [a for a in result["activations"] if a["kind"] == REENTRY_DECLINE]
+
+
+def test_default_reentry_fetcher_refuses_stale_close(tmp_path, monkeypatch):
+    """A recorded provider fetch may succeed while returning an old bar;
+    M2 must not turn that stale close into a threshold crossing."""
+    store = AssistantStore(tmp_path / "stale-close.db")
+    stale = pd.DataFrame(
+        {"close": [150.0]}, index=pd.DatetimeIndex(["2026-08-05"])
+    )
+
+    monkeypatch.setattr(
+        "assistant.data_integrity.fetch_daily_bars_recorded",
+        lambda *args, **kwargs: {"NVDA": stale},
+    )
+
+    assert _recorded_close_fetcher(store, now=_NOW)(["NVDA"]) == {}
+
+
+def test_alert_and_watch_state_commit_rolls_back_together(tmp_path):
+    """A failed state replacement must not leave an alert published with
+    no active state, because the next run would count/re-open it again."""
+    store = AssistantStore(tmp_path / "atomic-cycle.db")
+    alert = {
+        "fingerprint": "sleeve:gain_review:n1",
+        "severity": "warning",
+        "category": ALERT_CATEGORY,
+        "message": "crossed",
+        "details": {},
+    }
+    duplicate_states = [
+        {
+            "watch_key": "n1",
+            "kind": GAIN_REVIEW,
+            "ticker": "NVDA",
+            "active": True,
+            "first_active_at": _NOW_ISO,
+            "last_transition_at": _NOW_ISO,
+            "last_evaluated_at": _NOW_ISO,
+            "details": {},
+        }
+    ] * 2
+
+    with pytest.raises(sqlite3.IntegrityError):
+        store.commit_sleeve_notification_cycle(
+            alerts=[alert], states=duplicate_states, seen_at=_NOW_ISO
+        )
+
+    assert store.list_operational_alerts(status=None) == []
+    assert store.list_sleeve_watch_states() == []
 
 
 def test_cycle_writes_only_its_own_tables(tmp_path):

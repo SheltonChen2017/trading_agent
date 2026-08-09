@@ -226,6 +226,14 @@ def _growth_positions(
             # unrounded value, and use that same value for both verdicts.
             exact_pct = (exact_price - basis) / basis * Decimal("100")
             annotated["unrealized_pnl_pct"] = float(exact_pct)
+            # Keep the legacy float display field from unrealized_by_lot,
+            # but also publish the plan-mandated decimal money path. M2
+            # notifications consume this exact-text field rather than
+            # round-tripping the display float back into accounting data.
+            quantity = to_decimal(lot["qty"], name=f"{ticker} lot quantity")
+            annotated["unrealized_pnl_money"] = _money(
+                (exact_price - basis) * quantity
+            )
             price_met = exact_pct >= gain_threshold_pct
             # Revision 2: the long-term gate is part of the RULE, not a
             # footnote. A lot above the price threshold but still short-term

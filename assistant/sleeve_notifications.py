@@ -73,9 +73,10 @@ COVERAGE_LOST = "coverage_lost"
 _LOT_KINDS = (GAIN_REVIEW, AWAITING_LONG_TERM, DECLINE_REVIEW)
 
 # Coverage values under which a vanished lot means "we can no longer see",
-# as opposed to "it was sold". `full`/`partial` positions still replay lots,
-# so a missing lot there is a disposal, not blindness.
-_BROKEN_COVERAGE = ("none", "unavailable")
+# as opposed to "it was sold". Partial coverage explicitly says the journal
+# cannot account for all broker-held shares, so it cannot prove that a
+# vanished tracked lot was disposed either.
+_BROKEN_COVERAGE = ("none", "partial", "unavailable")
 
 
 def alert_fingerprint(kind: str, watch_key: str) -> str:
@@ -110,16 +111,20 @@ def _lot_states(lot: Mapping[str, Any]) -> dict[str, bool]:
 
 def _lot_message(kind: str, ticker: str, lot: Mapping[str, Any], engine: Mapping[str, Any]) -> str:
     pct = lot["unrealized_pnl_pct"]
+    money = to_decimal(lot["unrealized_pnl_money"], name="unrealized lot gain")
+    money_display = f"${money:,.2f}"
     if kind == GAIN_REVIEW:
         return (
-            f"{ticker} lot {lot['lot_id']} is {pct:+.2f}% and long-term "
+            f"{ticker} lot {lot['lot_id']} is {pct:+.2f}% "
+            f"({money_display}) and long-term "
             f"(gain review; recorded trim fraction "
             f"{engine['gain_review_trim_fraction']}). Long-term since "
             f"{lot['first_long_term_date']}."
         )
     if kind == AWAITING_LONG_TERM:
         return (
-            f"{ticker} lot {lot['lot_id']} is {pct:+.2f}%, above the gain "
+            f"{ticker} lot {lot['lot_id']} is {pct:+.2f}% "
+            f"({money_display}), above the gain "
             f"threshold but short-term; the gate holds for "
             f"{lot['days_to_long_term']} more day(s) (long-term on "
             f"{lot['first_long_term_date']})."
@@ -216,6 +221,7 @@ def evaluate_watch_transitions(
                     lambda k=kind, t=ticker, l=lot: (
                         _lot_message(k, t, l, engine),
                         {
+                            "unrealized_pnl_money": l["unrealized_pnl_money"],
                             "unrealized_pnl_pct": l["unrealized_pnl_pct"],
                             "term_if_sold_now": l["term_if_sold_now"],
                             "days_to_long_term": l["days_to_long_term"],
@@ -386,17 +392,18 @@ def run_sleeve_notification_cycle(
     ledger = build_ledger(fills)
     report = evaluate_sleeves(snapshot, ledger, store.list_journal_postings())
 
+    held_tickers = {position.ticker.upper() for position in snapshot.positions}
     flat_growth = [
         ticker
         for ticker in config.GROWTH_ROTATION_TICKERS
-        if not ledger.open_for(ticker)
+        if not ledger.open_for(ticker) and ticker.upper() not in held_tickers
     ]
     references = derive_reentry_references(
         fills, flat_growth_tickers=flat_growth
     )
     prices: dict[str, Decimal] = {}
     if references:
-        fetch = price_fetcher or _recorded_close_fetcher(store)
+        fetch = price_fetcher or _recorded_close_fetcher(store, now=at)
         try:
             prices = dict(fetch(sorted(references)))
         except Exception:
@@ -412,16 +419,22 @@ def run_sleeve_notification_cycle(
         reentry_prices=prices,
         now_iso=now_iso,
     )
-    for activation in evaluation.activations:
-        store.upsert_operational_alert(
-            fingerprint=alert_fingerprint(activation.kind, activation.watch_key),
-            severity=WARNING_SEVERITY,
-            category=ALERT_CATEGORY,
-            message=activation.message,
-            details=activation.details,
-            seen_at=now_iso,
-        )
-    store.save_sleeve_watch_states(evaluation.states)
+    store.commit_sleeve_notification_cycle(
+        alerts=[
+            {
+                "fingerprint": alert_fingerprint(
+                    activation.kind, activation.watch_key
+                ),
+                "severity": WARNING_SEVERITY,
+                "category": ALERT_CATEGORY,
+                "message": activation.message,
+                "details": activation.details,
+            }
+            for activation in evaluation.activations
+        ],
+        states=evaluation.states,
+        seen_at=now_iso,
+    )
     return {
         "activations": [
             {
@@ -440,21 +453,33 @@ def run_sleeve_notification_cycle(
 
 def _recorded_close_fetcher(
     store: AssistantStore,
+    *,
+    now: datetime | None = None,
 ) -> Callable[[list[str]], Mapping[str, Decimal]]:
-    """Latest closes for unheld tickers, through the GR-4 recorded path."""
+    """Fresh closes for unheld tickers, through the GR-4 recorded path."""
 
     def fetch(tickers: list[str]) -> Mapping[str, Decimal]:
         from assistant.data_integrity import fetch_daily_bars_recorded
+        from data.price_source import evaluate_bar_freshness
 
-        bars = fetch_daily_bars_recorded(store, list(tickers), 10)
+        at = now or datetime.now(timezone.utc)
+        bars = fetch_daily_bars_recorded(
+            store, list(tickers), 10, now=at
+        )
         prices: dict[str, Decimal] = {}
         for ticker, frame in bars.items():
             if frame is None or len(frame) == 0:
                 continue
+            try:
+                latest_session = frame.index.max().date().isoformat()
+            except (AttributeError, TypeError, ValueError):
+                continue
+            if not evaluate_bar_freshness(latest_session, now=at).fresh:
+                continue
             close = frame["close"].iloc[-1]
             try:
                 prices[ticker.upper()] = to_decimal(
-                    float(close), name=f"{ticker} close"
+                    close, name=f"{ticker} close"
                 )
             except ValueError:
                 continue  # a non-finite close is "no price", handled upstream

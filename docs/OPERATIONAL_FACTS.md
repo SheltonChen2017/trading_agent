@@ -60,6 +60,56 @@ for separating a tech style bet from selection — never as the record.
 
 Not derivable from the repository, and expensive to rediscover.
 
+### There are TWO machines, and only one may run the cadence (2026-08-06; re-verified 2026-08-09)
+
+Recorded 2026-08-06 on the branch
+`user/claude/gr-7d-rebalance-targets-20260806` and never merged, so `main`
+carried no trace of it — the second-host session then spent effort
+re-deriving why its own `trading_agent_operational` clone looked "stale"
+and its launch script was "missing". Ported here 2026-08-09 with every
+machine-local claim re-verified on the second host rather than copied.
+
+Everything in this section is host-specific; re-measure rather than assume
+which one you are on. `whoami` distinguishes them.
+
+- **Epoch host** (`REDMOND\sheltonchen`) — runs `paper-epoch-002`. The four
+  `TradingAgent-Paper-*` tasks are installed and ENABLED here. This is the
+  only host that may run the operational cadence. The bullets below this
+  section (launch script, epoch-swap script, lock files, backups) describe
+  THIS host.
+- **Second host** (`HARRY_MELODY\shelt`) — stood up 2026-08-06 as a
+  development machine. It has its own `C:\git\trading_agent_operational`
+  (pinned clone — at the epoch-era merge base, NOT tracking `main`; that
+  lag is by design, not drift) and `C:\git\trading_agent_venv`
+  (pinned-requirements venv, full suite green at standup), and the same
+  four scheduled tasks **installed but DISABLED** (re-verified 2026-08-09:
+  all four report `Disabled`). `C:\git\launch_trading_app.ps1` exists only
+  on the epoch host; its absence on the second host is expected.
+
+**Why they are disabled, and why it matters.** Both hosts read the same
+`APCA_API_KEY_ID`/`APCA_API_SECRET_KEY` from their own user registry, and
+those credentials point at the **same Alpaca paper account** — the one
+`paper-epoch-002` is accumulating evidence on. Two hosts running
+`monitor-orders`/`operations-cycle`/`watchdog` against one account means
+duplicate reconciliation and competing cancellation against live epoch
+evidence. The second host was therefore deliberately left with **no ledger
+bootstrap and no epoch**; `paper-evidence-status` there correctly reports
+"Paper evidence epoch not found". Do not bootstrap or start an epoch on the
+second host while `paper-epoch-002` is active on the first.
+
+The non-elevated `Disable` gotcha (below, epoch host) reproduced exactly on
+the second host: `Stop-ScheduledTask` succeeded unelevated while
+`Disable-ScheduledTask` returned "Access is denied", and `OperationsCycle`
+would have restarted on its own trigger. Disabling required an elevated
+shell, and `powershell.exe` there also refuses unsigned local scripts by
+default — `-ExecutionPolicy Bypass` on the invocation is needed, not a
+machine-wide policy change.
+
+The 2026-08-06 standup is real evidence toward **GR-6**'s "second-machine
+stand-up proven once" marker (pinned checkout, dedicated interpreter, full
+suite, installer preview and verifier round-tripped). It is not evidence
+toward any epoch, and it did not start one.
+
 - **Launch the app only via `C:\git\launch_trading_app.ps1`.** It pins the
   operational checkout, sets `TRADING_ASSISTANT_DB`, and re-reads Alpaca
   credentials from the **user-scope registry** at every launch. A long-lived

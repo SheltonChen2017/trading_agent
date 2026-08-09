@@ -143,6 +143,7 @@ def evaluate_watch_transitions(
     reentry_references: Mapping[str, Decimal],
     reentry_prices: Mapping[str, Decimal],
     now_iso: str,
+    disposed_lot_ids: frozenset[str] = frozenset(),
 ) -> WatchEvaluation:
     """Pure transition evaluation: (report, prior state) -> (alerts, state).
 
@@ -238,6 +239,15 @@ def evaluate_watch_transitions(
         if kind in _LOT_KINDS and watch_key not in current_lot_keys:
             vanished.setdefault(watch_key, prior["ticker"])
     for watch_key, ticker in sorted(vanished.items()):
+        if watch_key in disposed_lot_ids:
+            # Counter-review of M2REV-001: the replay PROVES this lot was
+            # consumed by a sell (a realized component names it), so its
+            # disappearance is a disposal under ANY coverage value. Without
+            # this, a position that mixes app-recorded and pre-app shares
+            # (partial forever) would raise a false blindness alert on
+            # every legitimate sale. Only an UNEXPLAINED vanish under
+            # broken coverage is blindness.
+            continue
         coverage = coverage_by_ticker.get(ticker)
         if coverage in _BROKEN_COVERAGE:
             emit(
@@ -418,6 +428,9 @@ def run_sleeve_notification_cycle(
         reentry_references=references,
         reentry_prices=prices,
         now_iso=now_iso,
+        disposed_lot_ids=frozenset(
+            component.lot_id for component in ledger.realized
+        ),
     )
     store.commit_sleeve_notification_cycle(
         alerts=[

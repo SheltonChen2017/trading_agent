@@ -69,7 +69,7 @@ the window in cash.
   ticker drawdown −38% vs buy-and-hold's −66%);
 - LONG-TERM-GATING the trim was 0.55 CAGR point higher in this run (26.33%
   vs 25.78% ungated), and the observed run realized no short-term gains;
-  only scheduled gain-review trims are structurally gated â€” a terminal or
+  only scheduled gain-review trims are structurally gated — a terminal or
   owner-directed liquidation can still realize a short-term result; and
 - the trim threshold is insensitive (+50 vs +100 within 0.1 CAGR point),
   i.e. not a knife-edge fit.

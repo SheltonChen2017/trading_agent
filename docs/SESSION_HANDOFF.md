@@ -45,6 +45,20 @@ authority documents so rewriting this state summary does not erase them.
 > there because this file is rewritten every round. Do not copy them back
 > into this file; link to them.
 
+> **Counter-review (same day):** Claude verified all six M2REV findings by
+> pre-fix reproduction against `5ff39ed`, re-mutated all five code fixes
+> independently (every one caught), and corrected two residuals:
+> **M2CR-001 (P2)** — M2REV-001's partial-as-blindness rule fired a false
+> coverage-lost alert on journal-PROVEN disposals in partially covered
+> positions (the exact shape the owner's AVGO/MSFT become after buying
+> through the app); vanished lots named by a realized component are now
+> disposals under any coverage. **M2CR-002 (P3)** — a double-encoded
+> em-dash introduced into the engine plan by the PREVIOUS review's
+> correction (`f8dde7a`) and missed by the previous counter-review;
+> repaired byte-exactly, tree-wide scan clean. Full suite on the corrected
+> tree: **3290 passed, 0 failed, 0 skipped** (their 3289 + 1 new guard).
+> Appendix in `docs/REVIEW_2026-08-09_GR7D_M2_NOTIFICATIONS.md`.
+
 ## 0. Latest round — independent review of three-sleeve M2 notifications (2026-08-09)
 
 Owner authorized M2 after merging the M1/revision-2 review (PR #178). Branch

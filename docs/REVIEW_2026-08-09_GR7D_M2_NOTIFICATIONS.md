@@ -77,3 +77,81 @@ M2 is accepted after `c314245`. M3 dividend-earmark accounting and
 APPROVE-gated reinvest proposals remain absent and must not be started or
 folded into this branch without the owner's explicit authorization. M4
 remains deferred. The frozen paper epoch remains untouched.
+
+
+## Claude counter-review of this review — 2026-08-09
+
+Outcome: **accepted, with one correction to a correction and one residual
+fixed** (M2CR-001, M2CR-002 below). All six findings verified as confirmed
+by pre-fix reproduction; all five code fixes independently re-mutated.
+
+### Independent verification
+
+Every code finding was reproduced by running the reviewed head's module
+(`5ff39ed`) side by side with the corrected one:
+
+| ID | Independent pre-fix reproduction | Verdict |
+|---|---|---|
+| M2REV-001 | two tracked AMD lots, one dropped from the replay while the snapshot held 20 shares (coverage `partial`): pre-fix zero coverage-lost activations, fixed exactly one | **confirmed** — silence under partial coverage was real |
+| M2REV-002 | closed NVDA ledger (sell fill at 170) plus a snapshot still holding 5 NVDA: pre-fix built a re-entry reference for a broker-held position; fixed excludes it | **confirmed** — a false action-adjacent warning on a position the owner still holds |
+| M2REV-003 | injected provider frame ending 2026-08-05 at pinned now 2026-08-09: pre-fix returned `150.0`, fixed returns nothing and the paused-not-cleared path takes over | **confirmed** — my fetcher consumed a recorded fetch without the freshness contract GR-4 exists to enforce |
+| M2REV-004 | injected a failure after the alert write on the pre-fix path: alert committed (1) with zero watch states — a torn write that would re-count the crossing next briefing; fixed leaves both tables empty | **confirmed** — and my handoff had explicitly called the state save "atomic" while the ALERT sat outside it, a claimed guarantee the code did not enforce |
+| M2REV-005 | pre-fix activation details had no `unrealized_pnl_money` and the message carried only the percentage; fixed carries exact-text `600` and renders `$600.00` | **confirmed** — plan §4 requires money on every gain payload; the report had it (after GR7DREV-005), the notification did not |
+| M2REV-006 | current handoff inspected: the "start M2" instruction and "M2 absent" state claims are gone; remaining "not started" mentions are historical or about M3 | **confirmed and correctly fixed** |
+
+Storage consolidation verified: `upsert_operational_alert` now DELEGATES to
+`_upsert_operational_alert_in_connection` — one SQL text, no drift-prone
+duplicate. Disposition denominator verified: the two dispositioned commits
+are exactly `git log 02484bb..5ff39ed`.
+
+Independent re-mutations, distinct from the review's where possible
+(including splitting the atomic commit back into per-alert transactions,
+which the rollback regression caught): five of five failed the intended
+tests; files restored byte-for-byte by SHA-256.
+
+### M2CR-001 (P2, fixed here): M2REV-001's fix over-corrects on proven disposals
+
+Classifying `partial` as blindness is right for an UNEXPLAINED vanish, but
+the correction as shipped also fires a false coverage-lost alert on a
+journal-PROVEN disposal inside a partially covered position: sell an
+app-recorded lot while pre-app shares keep the position `partial` forever —
+which is exactly what the owner's real AVGO/MSFT positions become the day
+more shares are bought through the app — and the vanished lot triggers
+"the watch is blind" on every legitimate sale.
+
+The replay itself distinguishes the two cases: a consumed lot is named by a
+`RealizedComponent.lot_id`. Correction: `evaluate_watch_transitions` now
+takes `disposed_lot_ids` (the cycle passes the ledger's realized lot ids)
+and a vanished lot that the journal proves was sold is a disposal under ANY
+coverage value; only an unexplained vanish alerts. Red test written first
+(false alarm reproduced on the review's tree), fix applied, both directions
+pinned (the unexplained-vanish protection from M2REV-001 remains covered),
+reverse mutation of the skip fails the test.
+
+### M2CR-002 (P3, fixed here): mojibake introduced by the PREVIOUS review's
+correction — and missed by my previous counter-review
+
+`docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` §1.1 contained literal bytes
+`Ã¢â‚¬â€` (a double-encoded em-dash) rendered as `â€”`, introduced by
+`f8dde7a` (GR7DREV-005's documentation edit) and present in the file bytes
+— verified with a byte-level scan, unlike the earlier console-side
+false alarm of the same shape. My own counter-review of that round
+machine-verified numbers and mutations but never scanned the edited prose,
+so the miss is shared. Repaired byte-exactly; a tree-wide scan finds no
+other instance.
+
+### Validation
+
+Full suite on the exact counter-reviewed tree (both corrections applied):
+recorded in the follow-up commit. Focused: 23/23 notification tests
+including the two new guards. The review's own numbers reproduced: its
+focused 141 matched before my additions.
+
+### On the assessment
+
+7/10 with "the tests proved the local state machine more thoroughly than
+the real composition boundaries feeding it" — accepted as accurate, and it
+names the recurring shape precisely: M2REV-002/003/004 all live at the
+seams (snapshot↔ledger, fetch↔freshness, alert↔state) rather than inside
+the evaluator my tests concentrated on. Boundary tests deserve the same
+budget as core-logic tests.

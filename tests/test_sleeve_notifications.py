@@ -223,6 +223,57 @@ def test_vanished_lot_under_partial_coverage_is_not_assumed_disposed():
     assert alerts[0].watch_key == "a2"
 
 
+def test_proven_disposal_under_partial_coverage_does_not_cry_blindness():
+    """Counter-review of M2REV-001: classifying `partial` as blindness must
+    not turn a PROVEN disposal into a false coverage-lost alert.
+
+    A position that mixes app-recorded and pre-app shares is partial
+    FOREVER (the owner's actual AVGO/MSFT will be, after buying more
+    through the app). Selling an app-recorded lot there is normal life,
+    and the replay PROVES it: the ledger's realized components name the
+    consumed lot_id. A vanished lot with a realized record is a disposal
+    under any coverage; only an UNEXPLAINED vanish is blindness."""
+    fills = [
+        _buy("AMD", 10, 100.0, days_ago=40, fill_id="a1"),
+        _buy("AMD", 10, 90.0, days_ago=30, fill_id="a2"),
+    ]
+    # Broker holds 30: the 20 app-recorded plus 10 pre-app -> partial.
+    day1 = _evaluate(_report([_position("AMD", 30, 88.0)], fills))
+    assert ("a1", DECLINE_REVIEW) in _states_by_key(day1)
+
+    # Sell lot a1 THROUGH the journal: FIFO consumes a1, a2 stays open.
+    sold = fills + [_sell("AMD", 10, 95.0, days_ago=1, fill_id="a1-out")]
+    ledger = build_ledger(sold)
+    report = evaluate_sleeves(_snapshot([_position("AMD", 20, 88.0)]), ledger, [])
+    assert report["growth_sleeve"]["positions"][0]["lot_coverage"] == "partial"
+
+    day2 = evaluate_watch_transitions(
+        report,
+        prior_states=day1.states,
+        reentry_references={},
+        reentry_prices={},
+        now_iso=_NOW_ISO,
+        disposed_lot_ids=frozenset(
+            component.lot_id for component in ledger.realized
+        ),
+    )
+    false_alarms = [a for a in day2.activations if a.kind == COVERAGE_LOST]
+    assert false_alarms == [], (
+        "a journal-proven disposal was reported as coverage loss"
+    )
+    # And the unexplained-vanish protection stays: same partial position,
+    # same vanished lot, but NO realized record naming it -> still alerts.
+    day2_unexplained = evaluate_watch_transitions(
+        report,
+        prior_states=day1.states,
+        reentry_references={},
+        reentry_prices={},
+        now_iso=_NOW_ISO,
+        disposed_lot_ids=frozenset(),
+    )
+    assert [a.kind for a in day2_unexplained.activations if a.kind == COVERAGE_LOST]
+
+
 def test_coverage_healing_flips_inactive_and_rebreak_realerts():
     fills = [_buy("AMD", 10, 100.0, days_ago=30, fill_id="a1")]
     tracked = _evaluate(_report([_position("AMD", 10, 88.0)], fills))

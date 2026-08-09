@@ -1,52 +1,80 @@
 # Development session handoff
 
-Prepared: 2026-08-09, after the three-sleeve engine's growth rule was
-REVISED on measured backtest evidence (revision 2, §0) — same day the
-engine was adopted and M1 merged (§0.05). The Alpaca UI restyle remains
-unmerged with Codex's AUI-001..005 corrections outstanding (§0.1).
+Prepared: 2026-08-09, after Codex independently reviewed and corrected the
+merged three-sleeve M1 / revision-2 delivery. M1 is accepted; M2 is not
+started. The original GR-7d target-rebalance shape remains superseded, not
+completed.
 
 Audience: Codex, Claude Code, Grok, and the repository owner after a
 computer, model, or session change. This is the canonical current-state
 handoff. Durable standing rules and operational facts remain in their linked
 authority documents so rewriting this state summary does not erase them.
 
-> **Current development state:** `main` is `d3eb921` (PR #174), which merged
-> Codex's review of the Alpaca UI theme. Before it: `8f4257b` (PR #173,
-> Claude's second counter-review round) and `dabdd56` (PR #172, Codex's
-> review of Claude's counter-review). Everything from the whole-codebase
-> sweep through those reviews is **on `main` and fetchable**.
+> **Current development state:** `main` / `origin/main` is `f68251b` (PR
+> #177), which contains PR #175's two-machine operational facts, PR #176's
+> three-sleeve M1, and revision 2. The independent review branch is
+> `codex/review-gr7d-three-sleeve-20260809`; correction `f8dde7a` and review
+> documentation `b34c6e3` / validation record `ab8fa9c` are the durable
+> resume points on that branch.
 >
-> **Newest state:** M1 and the two-machines facts merged as PR #176 and
-> PR #175. The engine's growth rule was then revised on measured evidence
-> (revision 2, §0) on `user/claude/engine-rev2-lt-trim-20260809`, awaiting
-> independent review together with M1's already-merged code.
+> **Newest state:** all nine commits from `d3eb921..f68251b` have explicit
+> dispositions in `docs/REVIEW_2026-08-09_GR7D_THREE_SLEEVE_ENGINE.md`.
+> Independent review found and fixed five P2 issues and one P3 issue. Final
+> state: **0 P0, 0 P1, 0 P2, and 0 P3 open**. M1 is accepted after
+> correction; M2 notifications, M3 earmarks/proposals, and M4 remain absent.
 >
-> **Theme review state:** Claude's owner-requested Alpaca-style UI restyle is
-> at `85566b3` on `user/claude/alpaca-ui-theme-20260808`, based on `8f4257b`.
-> Codex reviewed both commits on
-> `codex/review-claude-alpaca-ui-theme-20260808`; review record `c8d0173`
-> requests changes with **0 P0, 0 P1, 4 P2, and 1 P3 open**. The theme has not
-> been accepted or merged. See §0.1 and
-> `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_ALPACA_UI_THEME.md`.
+> **Validation:** final exact-tree suite **3267 passed, 0 failed, 0 skipped**,
+> 26 warnings on Python 3.12.13; 180 focused sleeve/tax/registry/UI tests;
+> compileall and `git diff --check` clean. Seven reverse-mutation failures
+> across the corrected contracts were observed and every mutation restored.
 >
-> Codex's review found CCR-001 (P2) and CCR-002/003/004 (P3) against Claude's
-> work; all four are fixed and independently re-verified by Claude in this
-> round. Validation on the merged tree: **3203 passed, 0 failed, 0 skipped**
-> (reproduced independently on Python 3.14.6; Codex ran 3.12.13).
+> **Operational boundary:** `paper-epoch-002` remains active on the other
+> computer at frozen commit `9a91498`. This review made no broker call,
+> deployment, scheduler, policy, epoch, ML/LLM-authority, or execution change.
 >
-> **CCR-005 (this round):** the block above previously asserted that two of
-> the commits listed there were still unpushed and unmerged. Both statements
-> were true when written and false the moment PR #172 landed them. Deliberately
-> paraphrased rather than quoted: an automated guard now flags a reachability
-> claim sitting beside a commit hash, and it cannot tell a live claim from a
-> quoted historical one. See §0.
+> **Recommended next step:** stop here for the owner's review. If authorized,
+> start three-sleeve M2 durable batched notifications on a new branch from the
+> accepted review head. Do not deploy development changes to the frozen epoch.
 
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
 > machine-local operational knowledge, and engineering watch items live
 > there because this file is rewritten every round. Do not copy them back
 > into this file; link to them.
 
-## 0. Latest round — Engine revision 2: LT-gated trim-half (2026-08-09)
+## 0. Latest round — independent GR-7d replacement / three-sleeve M1 review (2026-08-09)
+
+Codex reviewed the documentation before code, then examined every commit and
+every changed module from base `d3eb921` through merged head `f68251b`. The
+ordered commits were `77cb814`, `1dcb41e`, `542377d`, `1183ae7`, `8742f63`,
+`997bcd5`, `6fe8af0`, `31a51f7`, and `f68251b`; all are accepted, with the M1,
+revision-2, validation, and merge commits accepted after correction. Full
+dispositions and evidence are in
+`docs/REVIEW_2026-08-09_GR7D_THREE_SLEEVE_ENGINE.md`.
+
+Correction `f8dde7a` closes:
+
+- GR7DREV-001 (P2): exact +50%/−10% crossings no longer compare a rounded
+  display percentage; +49.999% and −9.999% remain inside their boundaries.
+- GR7DREV-002 (P2): every lot now carries the leap-day-correct first long-term
+  date as well as term and countdown, and CLI/UI surfaces display it.
+- GR7DREV-003/004 (P2): the gate must be a real bool; malformed thresholds,
+  missing prices, and corrupt dividend journal rows fail/degrade through the
+  report's declared boundary instead of truthiness coercion, traceback, or a
+  misleading lot-replay diagnosis.
+- GR7DREV-005 (P2): the dated backtests, registry, README, config, plan, and
+  handoff now call their tax outputs modeled proxies. Dividend-adjusted prices
+  do not separately model dividend tax, and the dated scripts' `>365 days`
+  shortcut is not the app's calendar/leap-day authority. The full-exit
+  cash-stranding conclusion remains descriptive; no result was promoted.
+- GR7DREV-006 (P3): the Reports panel describes the trim fraction as recorded
+  rule metadata rather than saying the observation panel proposes a trade.
+
+M1's completed function is recorded in `docs/FEATURE_MILESTONE_RECORD.md` in
+the required technical/plain-language pair. The action plan now marks M1
+complete after review and M2 not started. Correction tests were reverse-
+mutation-proven, and final validation is in the current-state block above.
+
+## 0.01 Earlier same day — Engine revision 2: LT-gated trim-half (2026-08-09)
 
 The owner asked "would this strategy work?" BEFORE M2 encoded the adopted
 thresholds, and directed a backtest ahead of Codex review so review would
@@ -56,19 +84,24 @@ adopted my recommended revision. Full evidence chain:
 - **Backtest** (frozen as `scripts/backtest_three_sleeve_rule_2026_08_09.py`
   and `scripts/backtest_three_sleeve_revisions_2026_08_09.py`; registry
   entry in `assistant/research_findings.json` v1.5.0, README updated): the
-  +5% any-term full exit produced **3.29%** after-tax CAGR vs **48.14%**
+  +5% any-term full exit produced a **3.29%** modeled after-tax-proxy CAGR vs **48.14%**
   buy-and-hold on the same six names and bankroll over ~7 years (next-open
   fills, 37%/15% annual tax netting, terminal liquidation taxed both
   sides, 3% cash yield). Structural cause: 95-99% of days in cash; at 0%
   cash yield the rule made 0.30%. Every full-exit variant stranded; a
-  trim-half family rode (~26%); LONG-TERM-GATING the trim was costless and
-  eliminates short-term gains by construction; threshold insensitive
+  trim-half family rode (~26%); LONG-TERM-GATING was 0.55 CAGR point higher
+  in this run and scheduled gain-review trims cannot realize short-term gains;
+  threshold insensitive
   (+50 vs +100 within 0.1 point). The simulator was verified against
   hand-computed synthetic paths (flat preserves bankroll to the cent;
   riser's single exit matches next-open arithmetic to the dollar) before
   any real-data run. Caveats recorded everywhere the numbers appear: one
   window, hindsight-selected names, uncounted variant grid — design
-  guidance, not a finding.
+  guidance, not a finding. The tax figures are only proxies because
+  dividend-adjusted prices fold distributions into price gains without
+  separately modeling dividend tax timing/classification, and the dated
+  scripts use a simplified >365-day term check rather than the app's
+  calendar/leap-day-correct authority.
 - **Owner decision (revision 2):** gain review becomes **long-term-gated
   trim-half at +50%** on the lot's own basis; a price-met-but-short-term
   lot is a distinct "awaiting long-term" state carrying the countdown,
@@ -165,6 +198,10 @@ snapshot. Next milestone is M2 (threshold notifications) -- NOT started, per
 one-milestone-per-branch discipline.
 
 ## 0.1 Prior round — Alpaca-style UI restyle (2026-08-08)
+
+> **Historical pre-merge record.** The changes-requested state below was true
+> during that review. It was corrected and merged by PR #174 at `d3eb921`;
+> there are no open AUI-001..005 findings in the current tree.
 
 ### Independent review outcome
 
@@ -488,21 +525,18 @@ not that the codebase is clean.
 
 ## 5. What is next
 
-1. The owner reviews local correction commit `d6e65c1`. Push or merge only
-   after explicit authorization. Until then, another computer cannot fetch
-   this review or its fixes.
-2. After this counter-review closes, place development work on hold while
-   `paper-epoch-002` continues running daily on its separate stable machine.
-   Monitor the epoch operationally and read-only; do not deploy development
-   commits into the frozen epoch checkout.
-3. **FCS-016 changes a value in an accountant-facing export.** A tax report
-   generated before the correction may disagree with a regenerated one for a
-   sale on a one-year anniversary. Broker records and a qualified tax
-   professional remain authoritative for a filed return.
-4. Existing owner decisions and operational blockers remain in
-   `docs/OPERATIONAL_FACTS.md`. No later action-plan milestone starts merely
-   because this review is complete; use `docs/ACTION_PLAN_2026-08-02.md` as
-   the sequencing authority when the owner resumes development.
+1. The owner reviews the accepted M1 result and Codex correction/review commits
+   `f8dde7a`, `b34c6e3`, and `ab8fa9c` on
+   `codex/review-gr7d-three-sleeve-20260809`.
+2. If the owner authorizes more implementation, M2 durable batched threshold
+   notifications is the next three-sleeve milestone. Start it on a new branch;
+   do not fold M3 earmark/proposal work into it.
+3. `paper-epoch-002` continues daily on its separate stable machine at frozen
+   `9a91498`. Monitor it operationally and read-only; do not deploy the review
+   branch or later development commits into that checkout.
+4. ML remains disabled. Existing owner decisions and machine facts remain in
+   `docs/OPERATIONAL_FACTS.md`; the action plan remains the sequencing
+   authority.
 
 ### Historical next steps from the preceding sweep (superseded)
 

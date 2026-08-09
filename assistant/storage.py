@@ -698,6 +698,17 @@ class AssistantStore:
                     evidence_json TEXT NOT NULL,
                     evidence_hash TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS sleeve_watch_states (
+                    watch_key TEXT NOT NULL,
+                    kind TEXT NOT NULL,
+                    ticker TEXT NOT NULL,
+                    active INTEGER NOT NULL,
+                    first_active_at TEXT,
+                    last_transition_at TEXT NOT NULL,
+                    last_evaluated_at TEXT NOT NULL,
+                    details_json TEXT NOT NULL,
+                    PRIMARY KEY (watch_key, kind)
+                );
                 CREATE INDEX IF NOT EXISTS idx_proposals_status
                     ON trade_proposals(status, created_at);
                 CREATE INDEX IF NOT EXISTS idx_broker_events_order_at
@@ -4499,6 +4510,160 @@ class AssistantStore:
             ).fetchone()
         return None if row is None else json.loads(row["payload_json"])
 
+    def list_sleeve_watch_states(self) -> list[dict[str, Any]]:
+        """Durable three-sleeve notification state (M2), one row per
+        (watch_key, kind). Deterministic order for stable evaluation."""
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT watch_key, kind, ticker, active, first_active_at,
+                       last_transition_at, last_evaluated_at, details_json
+                FROM sleeve_watch_states
+                ORDER BY watch_key, kind
+                """
+            ).fetchall()
+        return [
+            {
+                "watch_key": row["watch_key"],
+                "kind": row["kind"],
+                "ticker": row["ticker"],
+                "active": bool(row["active"]),
+                "first_active_at": row["first_active_at"],
+                "last_transition_at": row["last_transition_at"],
+                "last_evaluated_at": row["last_evaluated_at"],
+                "details": json.loads(row["details_json"]),
+            }
+            for row in rows
+        ]
+
+    def save_sleeve_watch_states(self, rows: list[dict[str, Any]]) -> None:
+        """Replace the whole watch-state set atomically.
+
+        The evaluator always produces the COMPLETE next state (carrying
+        forward `first_active_at` for rows it keeps), so full replacement in
+        one transaction cannot half-apply: a crash leaves either the prior
+        set or the next set, never a mix that would re-notify or suppress.
+        """
+        payload = [
+            (
+                row["watch_key"],
+                row["kind"],
+                row["ticker"],
+                1 if row["active"] else 0,
+                row.get("first_active_at"),
+                row["last_transition_at"],
+                row["last_evaluated_at"],
+                json.dumps(row.get("details", {}), sort_keys=True, default=str),
+            )
+            for row in rows
+        ]
+        with self._connect() as connection:
+            connection.execute("DELETE FROM sleeve_watch_states")
+            connection.executemany(
+                """
+                INSERT INTO sleeve_watch_states(
+                    watch_key, kind, ticker, active, first_active_at,
+                    last_transition_at, last_evaluated_at, details_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                payload,
+            )
+
+    def commit_sleeve_notification_cycle(
+        self,
+        *,
+        alerts: list[dict[str, Any]],
+        states: list[dict[str, Any]],
+        seen_at: str,
+    ) -> None:
+        """Atomically publish M2 transitions and their complete next state.
+
+        The alert is the externally visible consequence of a state
+        transition. Committing it separately from the state would let a
+        crash publish the alert while leaving the watch inactive; the next
+        briefing would then count and reopen the same crossing. Both tables
+        therefore advance, or neither does.
+        """
+        state_payload = [
+            (
+                row["watch_key"],
+                row["kind"],
+                row["ticker"],
+                1 if row["active"] else 0,
+                row.get("first_active_at"),
+                row["last_transition_at"],
+                row["last_evaluated_at"],
+                json.dumps(
+                    row.get("details", {}), sort_keys=True, default=str
+                ),
+            )
+            for row in states
+        ]
+        with self._connect() as connection:
+            for alert in alerts:
+                self._upsert_operational_alert_in_connection(
+                    connection,
+                    fingerprint=alert["fingerprint"],
+                    severity=alert["severity"],
+                    category=alert["category"],
+                    message=alert["message"],
+                    details=alert.get("details"),
+                    seen_at=seen_at,
+                )
+            connection.execute("DELETE FROM sleeve_watch_states")
+            connection.executemany(
+                """
+                INSERT INTO sleeve_watch_states(
+                    watch_key, kind, ticker, active, first_active_at,
+                    last_transition_at, last_evaluated_at, details_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                state_payload,
+            )
+
+    def _upsert_operational_alert_in_connection(
+        self,
+        connection: sqlite3.Connection,
+        *,
+        fingerprint: str,
+        severity: str,
+        category: str,
+        message: str,
+        details: dict[str, Any] | None,
+        seen_at: str,
+    ) -> sqlite3.Row:
+        connection.execute(
+            """
+            INSERT INTO operational_alerts(
+                fingerprint, severity, category, message, details_json,
+                status, occurrences, first_seen_at, last_seen_at,
+                acknowledged_at
+            ) VALUES (?, ?, ?, ?, ?, 'open', 1, ?, ?, NULL)
+            ON CONFLICT(fingerprint) DO UPDATE SET
+                severity = excluded.severity,
+                category = excluded.category,
+                message = excluded.message,
+                details_json = excluded.details_json,
+                status = 'open',
+                occurrences = operational_alerts.occurrences + 1,
+                last_seen_at = excluded.last_seen_at,
+                acknowledged_at = NULL
+            """,
+            (
+                fingerprint,
+                severity,
+                category,
+                message,
+                json.dumps(details or {}, sort_keys=True, default=str),
+                seen_at,
+                seen_at,
+            ),
+        )
+        return connection.execute(
+            "SELECT * FROM operational_alerts WHERE fingerprint = ?",
+            (fingerprint,),
+        ).fetchone()
+
     def upsert_operational_alert(
         self,
         *,
@@ -4511,37 +4676,15 @@ class AssistantStore:
     ) -> dict[str, Any]:
         now = seen_at or datetime.now(timezone.utc).isoformat()
         with self._connect() as connection:
-            connection.execute(
-                """
-                INSERT INTO operational_alerts(
-                    fingerprint, severity, category, message, details_json,
-                    status, occurrences, first_seen_at, last_seen_at,
-                    acknowledged_at
-                ) VALUES (?, ?, ?, ?, ?, 'open', 1, ?, ?, NULL)
-                ON CONFLICT(fingerprint) DO UPDATE SET
-                    severity = excluded.severity,
-                    category = excluded.category,
-                    message = excluded.message,
-                    details_json = excluded.details_json,
-                    status = 'open',
-                    occurrences = operational_alerts.occurrences + 1,
-                    last_seen_at = excluded.last_seen_at,
-                    acknowledged_at = NULL
-                """,
-                (
-                    fingerprint,
-                    severity,
-                    category,
-                    message,
-                    json.dumps(details or {}, sort_keys=True, default=str),
-                    now,
-                    now,
-                ),
+            row = self._upsert_operational_alert_in_connection(
+                connection,
+                fingerprint=fingerprint,
+                severity=severity,
+                category=category,
+                message=message,
+                details=details,
+                seen_at=now,
             )
-            row = connection.execute(
-                "SELECT * FROM operational_alerts WHERE fingerprint = ?",
-                (fingerprint,),
-            ).fetchone()
         return self._operational_alert_row(row)
 
     def list_operational_alerts(

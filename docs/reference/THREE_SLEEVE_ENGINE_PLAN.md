@@ -69,7 +69,7 @@ the window in cash.
   ticker drawdown −38% vs buy-and-hold's −66%);
 - LONG-TERM-GATING the trim was 0.55 CAGR point higher in this run (26.33%
   vs 25.78% ungated), and the observed run realized no short-term gains;
-  only scheduled gain-review trims are structurally gated â€” a terminal or
+  only scheduled gain-review trims are structurally gated — a terminal or
   owner-directed liquidation can still realize a short-term result; and
 - the trim threshold is insensitive (+50 vs +100 within 0.1 CAGR point),
   i.e. not a knife-edge fit.
@@ -293,3 +293,16 @@ two clicks. Revisit only on explicit owner request.
   fund decline-review adds before leveraged reinvestment. Decline review,
   per-lot basis, floor, and every safety boundary unchanged. M1 report
   semantics updated in the same change.
+- 2026-08-09 (M2 complete after independent review) — threshold
+  notifications per §5 M2: durable `(watch_key, kind)` transition state in
+  `sleeve_watch_states`, WARNING alerts through the GR-5 briefing batch on
+  inactive→active transitions only (an acknowledged alert is never
+  re-opened by an unchanged condition), awaiting-long-term notified once
+  with its countdown, re-entry watch from the journal's last disposal fill
+  through the GR-4 recorded price path (unavailable price pauses the
+  watch, never clears it), coverage loss surfaced rather than silent, and
+  briefing-level failure isolation.
+  Independent review at correction `c314245` added one-transaction alert
+  plus watch-state publication, treated partial lot coverage as blindness,
+  excluded broker-held tickers from flat re-entry, rejected stale closes,
+  and carried exact-text unrealized money in gain/awaiting notifications.

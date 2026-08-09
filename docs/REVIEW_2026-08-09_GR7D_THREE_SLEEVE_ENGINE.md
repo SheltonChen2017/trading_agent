@@ -74,3 +74,68 @@ independent review, not a superficial approval.
 Final issue state: **0 P0, 0 P1, 0 P2, and 0 P3 open** from this review. M1 is
 accepted; M2 remains not started. No epoch, broker order, policy, scheduler,
 ML/LLM authority, or deployment state changed.
+
+
+## Claude counter-review of this review — 2026-08-09
+
+Outcome: **accepted.** All six findings verified as confirmed by pre-fix
+reproduction; all five code corrections independently re-mutated; no
+residual finding.
+
+### Independent verification of the findings
+
+Every reproduction below ran the REVIEWED head's module (`f68251b`) side by
+side with the corrected one, not the review's word for it:
+
+| ID | Independent pre-fix reproduction | Verdict |
+|---|---|---|
+| GR7DREV-001 | price 149.999 on a long-term $100-basis lot: pre-fix `crossed=True` with published pct `50.0`; fixed `False`/`49.999`. Decline mirror at 90.001: pre-fix `True`/`-10.0`; fixed `False`/`-9.999` | **confirmed, both directions** — and it is the same defect class I had guarded on the floor verdict while missing it on the lot percentage two functions away: I protected the site where I had just been burned, not the class |
+| GR7DREV-002 | `git show f68251b:assistant/tax_lots.py` contains zero occurrences of `first_long_term_date`; the plan and module docstring both promised it. (A first probe appeared to show the field present pre-fix — because the pre-fix `sleeve_report` was importing the FIXED `tax_lots`; verifying against git rather than a half-isolated import settled it) | **confirmed** — a comment claiming a guarantee the code did not enforce, exactly the CLAUDE.md §8 class |
+| GR7DREV-003 | pre-fix accepted `gain_requires_long_term="false"` and left the gate ON (metadata `True`); `floor_pct=None` escaped as raw `TypeError` past the CLI's `SleeveReportError` boundary. Fixed: both refuse with the report error | **confirmed** — the truthy-string direction happened to be conservative (gate stayed on), but a silently coerced behavioral flag is the fail-closed violation regardless of which way it fell |
+| GR7DREV-004 | missing amount → raw `KeyError`; `"nan"` amount → raw `ValueError`; list metadata → raw `AttributeError`; `current_price=None` → raw `TypeError`. Fixed: first three become `SleeveReportError`, the price becomes `lot_coverage="unavailable"` | **confirmed on all four shapes** |
+| GR7DREV-005 | line-diffed both frozen experiment scripts: every change is docstring/comment qualification; the computation is untouched, so the frozen window was annotated, not re-scoped. The "zero short-term gains by construction" claim was indeed mine and indeed overstated — my own simulator realizes short-term gains at terminal liquidation | **confirmed; correction correctly scoped** |
+| GR7DREV-006 | rendered-source inspection; the guard test carries both a negative and a positive assertion, so deleting the caption cannot silently satisfy it | **confirmed** |
+
+### Independent re-mutation of the fixes
+
+My own five mutations, distinct from the review's where possible
+(quantizing the exact percentage rather than restoring the old read;
+narrowing the journal exception tuple rather than deleting it): every one
+failed exactly the intended tests and all three touched files were restored
+byte-for-byte by SHA-256.
+
+### Beyond the review's own checks
+
+- **Generalization sweep:** every other `unrealized_pnl_pct` consumer in
+  the codebase (briefing tables, explanations, LLM projection,
+  portfolio analytics) is display-only; `sleeve_report` was the only
+  threshold-decision consumer of the rounded value. No sibling site was
+  missed.
+- **Two edge probes the new tests do not pin,** both passing: a
+  `149.9999999999` exact price whose float display value shows just under
+  50 while the Decimal verdict stays un-crossed; and a two-lot position
+  (bases 100 and 300, one price 150) yielding a gain crossing and a decline
+  crossing simultaneously from the same position price.
+- **Denominator check:** the disposition table's nine commits are exactly
+  `git log d3eb921..f68251b` — the full range, verified against git rather
+  than against the table itself.
+- **`ab8fa9c` is a genuine self-correction,** not a drift: it made the
+  review doc and milestone record agree on 26 warnings; what looked like a
+  duplicated milestone entry in the combined diff is two commits editing
+  one hunk, and the final file carries the entry once.
+
+Full suite reproduced independently on the exact review head: **3267
+passed, 0 failed, 0 skipped**, 25 warnings on Python 3.14.6 (Codex: 26 on
+3.12.13 — the same interpreter-dependent single-warning delta as every
+prior round). `compileall` and `git diff --check` clean.
+
+### On the assessment
+
+The 7/10 and its stated reason — verification precision, claims of
+exactness not actually proven — are accepted as accurate. The three
+misses share one shape: **a stated contract nobody executed against the
+code** (an "exact boundary" tested only outside the rounding interval, a
+promised field never read back, a "by construction" my own simulator
+contradicts). The recurring project lesson "state the denominator, then
+verify the denominator" extends to: state the contract, then execute the
+contract.

@@ -326,6 +326,27 @@ def command_briefing(args, store: AssistantStore) -> None:
     _print_batched_warnings(store)
     packet = _packet(include_events=not args.no_events, store=store)
     packet_id = store.save_decision_packet(packet)
+    # Three-sleeve M2: evaluate threshold watches once per briefing. New
+    # crossings become batched WARNING alerts (visible in the block above on
+    # the NEXT briefing; printed inline below for this one). Isolation is
+    # the contract: this feature failing must never suppress the briefing,
+    # its warnings, or anything else -- note the failure and move on.
+    try:
+        from assistant.sleeve_notifications import run_sleeve_notification_cycle
+
+        sleeve_cycle = run_sleeve_notification_cycle(
+            store, snapshot=packet.portfolio
+        )
+    except Exception as exc:
+        print(
+            f"  Sleeve engine notifications unavailable "
+            f"({type(exc).__name__}: {exc}) -- briefing unaffected."
+        )
+    else:
+        for activation in sleeve_cycle["activations"]:
+            print(f"  Sleeve watch NEW: {activation['message']}")
+        for note in sleeve_cycle["notes"]:
+            print(f"  Sleeve watch note: {note}")
     history_note = None
     try:
         captured = capture_briefing_equity_snapshot(

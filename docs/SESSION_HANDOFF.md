@@ -1,8 +1,8 @@
 # Development session handoff
 
-Prepared: 2026-08-09, after Codex independently reviewed and corrected the
-merged three-sleeve M1 / revision-2 delivery. M1 is accepted; M2 is not
-started. The original GR-7d target-rebalance shape remains superseded, not
+Prepared: 2026-08-09, after three-sleeve M2 (threshold notifications) was
+implemented on its own branch (section 0). The M1/revision-2 review is
+merged (PR #178). The original GR-7d target-rebalance shape remains superseded, not
 completed.
 
 Audience: Codex, Claude Code, Grok, and the repository owner after a
@@ -50,7 +50,68 @@ authority documents so rewriting this state summary does not erase them.
 > there because this file is rewritten every round. Do not copy them back
 > into this file; link to them.
 
-## 0. Latest round — independent GR-7d replacement / three-sleeve M1 review (2026-08-09)
+## 0. Latest round — three-sleeve M2: threshold notifications (2026-08-09)
+
+Owner authorized M2 after merging the M1/revision-2 review (PR #178). Branch
+`user/claude/engine-m2-notifications-20260809` from `main` `02484bb`.
+
+What M2 is: the engine's crossings become WARNING-severity operational
+alerts delivered through the existing GR-5 briefing batch. The core design
+fact: `upsert_operational_alert` RE-OPENS an acknowledged alert on every
+upsert, so unconditional daily evaluation would un-acknowledge the same
+crossing every morning. M2 therefore keeps one durable row per
+`(watch_key, kind)` in the new `sleeve_watch_states` table and upserts ONLY
+on an inactive→active transition — first crossing alerts once, an unchanged
+condition is silent, a cleared-then-recrossed condition re-opens the same
+fingerprint with occurrences+1.
+
+- `assistant/sleeve_notifications.py` (new): pure
+  `evaluate_watch_transitions()` over (report, prior state, re-entry
+  refs/prices); kinds `gain_review` / `awaiting_long_term` /
+  `decline_review` / `reentry_decline` / `coverage_lost`. Re-entry
+  (decision #3) derives its reference from the journal's LAST DISPOSAL
+  FILL price — stateless, cannot drift from accounting truth — and prices
+  unheld tickers through GR-4's `fetch_daily_bars_recorded` (lineage +
+  streak alerting); an unavailable price PAUSES the watch with an explicit
+  note, never clears it. A vanished lot with broken position coverage
+  surfaces `coverage_lost` once (deduped per lot, not per kind row); a
+  vanished lot with healthy coverage is a disposal and just drops its
+  rows.
+- `assistant/storage.py`: `sleeve_watch_states` table (idempotent CREATE,
+  covered by fresh + dropped-table migration tests) and
+  list/save methods; save is atomic full-replacement so a crash leaves
+  either the prior or the next state set, never a re-notifying mix.
+- `scripts/run_personal_assistant.py` `briefing`: runs the cycle after the
+  packet, prints new activations/notes inline; the whole step is wrapped
+  so its failure costs one printed line and never the briefing, its
+  warnings, or anything else (behaviorally tested).
+- `tests/test_sleeve_notifications.py`: 17 tests — transition semantics
+  (once/silent/re-arm), awaiting-once + gate-opening upgrade, disposal vs
+  coverage-loss, re-entry inclusive boundary (trigger exactly at
+  reference×0.90), paused-not-cleared on missing price, end-to-end
+  anti-nag (acknowledged alert STAYS acknowledged on day two),
+  same-fingerprint re-open with occurrences 2, whole-database
+  write-surface proof (only watch state + alerts + provider fetches),
+  briefing failure isolation, fresh + pre-migration schema. Five reverse
+  mutations (anti-nag dropped, re-arm dropped, missing-price clears,
+  coverage silenced, isolation narrowed) each failed the intended tests;
+  files restored byte-for-byte by SHA-256.
+
+One defect found and fixed during implementation, before commit: the
+coverage-restored loop could fire an activation with an EMPTY message when
+coverage broke a second time after the lot's threshold rows were dropped;
+and the first vanished-lot pass alerted once per kind row (three alerts for
+one blind lot) until deduped per lot.
+
+Not in M2 (deliberate): M3 earmark accounting and reinvest proposals; any
+notification of anything outside the three-sleeve engine; any change to
+alert routing severities. No execution, policy, gate, scheduler, ML, or
+epoch surface changed.
+
+Validation and branch/commit identifiers: recorded in the follow-up commit
+after the implementation commit exists (same convention as prior rounds).
+
+## 0.1 Prior round — independent GR-7d replacement / three-sleeve M1 review (2026-08-09)
 
 Codex reviewed the documentation before code, then examined every commit and
 every changed module from base `d3eb921` through merged head `f68251b`. The

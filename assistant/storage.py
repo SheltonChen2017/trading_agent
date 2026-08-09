@@ -698,6 +698,17 @@ class AssistantStore:
                     evidence_json TEXT NOT NULL,
                     evidence_hash TEXT NOT NULL
                 );
+                CREATE TABLE IF NOT EXISTS sleeve_watch_states (
+                    watch_key TEXT NOT NULL,
+                    kind TEXT NOT NULL,
+                    ticker TEXT NOT NULL,
+                    active INTEGER NOT NULL,
+                    first_active_at TEXT,
+                    last_transition_at TEXT NOT NULL,
+                    last_evaluated_at TEXT NOT NULL,
+                    details_json TEXT NOT NULL,
+                    PRIMARY KEY (watch_key, kind)
+                );
                 CREATE INDEX IF NOT EXISTS idx_proposals_status
                     ON trade_proposals(status, created_at);
                 CREATE INDEX IF NOT EXISTS idx_broker_events_order_at
@@ -4498,6 +4509,65 @@ class AssistantStore:
                 """
             ).fetchone()
         return None if row is None else json.loads(row["payload_json"])
+
+    def list_sleeve_watch_states(self) -> list[dict[str, Any]]:
+        """Durable three-sleeve notification state (M2), one row per
+        (watch_key, kind). Deterministic order for stable evaluation."""
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT watch_key, kind, ticker, active, first_active_at,
+                       last_transition_at, last_evaluated_at, details_json
+                FROM sleeve_watch_states
+                ORDER BY watch_key, kind
+                """
+            ).fetchall()
+        return [
+            {
+                "watch_key": row["watch_key"],
+                "kind": row["kind"],
+                "ticker": row["ticker"],
+                "active": bool(row["active"]),
+                "first_active_at": row["first_active_at"],
+                "last_transition_at": row["last_transition_at"],
+                "last_evaluated_at": row["last_evaluated_at"],
+                "details": json.loads(row["details_json"]),
+            }
+            for row in rows
+        ]
+
+    def save_sleeve_watch_states(self, rows: list[dict[str, Any]]) -> None:
+        """Replace the whole watch-state set atomically.
+
+        The evaluator always produces the COMPLETE next state (carrying
+        forward `first_active_at` for rows it keeps), so full replacement in
+        one transaction cannot half-apply: a crash leaves either the prior
+        set or the next set, never a mix that would re-notify or suppress.
+        """
+        payload = [
+            (
+                row["watch_key"],
+                row["kind"],
+                row["ticker"],
+                1 if row["active"] else 0,
+                row.get("first_active_at"),
+                row["last_transition_at"],
+                row["last_evaluated_at"],
+                json.dumps(row.get("details", {}), sort_keys=True, default=str),
+            )
+            for row in rows
+        ]
+        with self._connect() as connection:
+            connection.execute("DELETE FROM sleeve_watch_states")
+            connection.executemany(
+                """
+                INSERT INTO sleeve_watch_states(
+                    watch_key, kind, ticker, active, first_active_at,
+                    last_transition_at, last_evaluated_at, details_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                payload,
+            )
 
     def upsert_operational_alert(
         self,

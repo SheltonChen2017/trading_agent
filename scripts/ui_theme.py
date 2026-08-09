@@ -204,7 +204,16 @@ code, pre {
 [data-testid="stAlertContainer"] {
     border-radius: var(--ta-card-radius);
     padding: 0.80rem 1rem;
-    font-family: var(--ta-text);
+    /* AUI-002: the ENTIRE alert speaks in the machine voice, not only a
+       bold lead-in. The owner asked for warnings to carry a distinct font;
+       most st.warning calls pass plain strings with no strong/b fragment,
+       so scoping mono to descendants left ordinary warnings in the body
+       face. Every severity message is now mono at a slightly smaller size:
+       unmistakable against body copy (text face) and titles (display). */
+    font-family: var(--ta-mono);
+    font-variant-ligatures: none;
+    font-size: 0.85rem;
+    line-height: 1.55;
     font-weight: 500;
 
     /* NO SEVERITY TINT ON THE BACKGROUND, AND THAT IS A MEASURED DECISION.
@@ -234,17 +243,42 @@ code, pre {
     border-left: 4px solid currentColor;
 }
 
-/* THE WARNING VOICE. The codebase already bolds the critical lead-in of its
-   safety messages ("**Order outcome UNKNOWN - do not resubmit.**"). Rendering
-   that lead-in in the mono face makes an alert unmistakable against body copy
-   at a glance -- requirement 3, and the reason severity gets its own family.
-   Deliberately NOT text-transform:uppercase; these strings are safety copy and
-   are left exactly as the code wrote them. */
+/* Bold lead-ins ("**Order outcome UNKNOWN - do not resubmit.**") keep extra
+   weight inside the now-uniform mono voice. Deliberately NOT uppercase;
+   these strings are safety copy and are left exactly as the code wrote
+   them. */
 [data-testid="stAlertContainer"] strong,
 [data-testid="stAlertContainer"] b {
-    font-family: var(--ta-mono);
     font-weight: 700;
     letter-spacing: -0.01em;
+}
+
+/* AUI-004: alert text is DARKENED 12% toward black, per severity, on the
+   markdown CHILD of the container -- and the child is the load-bearing
+   choice. The severity colour is set ON the container by Streamlit; a
+   colour override THERE would race its emotion class and, worse,
+   `currentColor` inside a `color:` declaration resolves against the
+   PARENT, which would collapse every severity into one grey. On the child,
+   currentColor is the inherited severity colour, so each severity keeps
+   its hue, and the container's 4px border stays at the undarkened
+   severity colour (non-text contrast needs only 3:1).
+
+   Why darken at all: Streamlit's light-mode warning text #926C05 tops out
+   at ~4.50:1 against PURE WHITE -- no background exists that gives margin,
+   so the review's 4.49-vs-4.50 coin-flip could never be fixed from the
+   background side. Computed from the measured severity palette (light:
+   #BD4043/#926C05/#0054A3/#158237; dark: #FF6C6C/#5CE488 measured, the
+   two remaining dark severities are far lighter and slacker):
+
+       keep 100% -> light worst 4.49 (FAILS)   dark worst 6.50
+       keep  88% -> light worst 5.51           dark worst 5.09
+       keep  82% -> light worst 6.07           dark worst 4.51 (thin)
+
+   88%/12% maximises the MINIMUM across both modes. The arithmetic is
+   pinned by a deterministic regression test; a browser without color-mix()
+   keeps today's 4.49 -- degraded, never broken. */
+[data-testid="stAlertContainer"] [data-testid="stMarkdownContainer"] {
+    color: color-mix(in srgb, currentColor 88%, #000000);
 }
 
 /* ====================================================================
@@ -275,9 +309,45 @@ code, pre {
     padding-right: 1.15rem;
 }
 
+/* AUI-001 (focus): a yellow-only ring measures ~1.41:1 against a light
+   page -- the keyboard user's location indicator effectively vanished in
+   light mode. The indicator is now a DUAL ring: a 2px ink ring hugging the
+   element plus the 2px brand ring outside it. In light mode the ink ring
+   carries the >=3:1 non-text contrast; in dark mode the brand ring does
+   (yellow on near-black ~10:1); and ink-vs-yellow contrast (~9.7:1) keeps
+   the composite visible against ANY intermediate surface. Mode-agnostic by
+   construction, like every surface in this theme, because Streamlit 1.60
+   exposes nothing to branch on. */
 :focus-visible {
     outline: 2px solid var(--ta-brand) !important;
-    outline-offset: 2px;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 2px var(--ta-brand-ink) !important;
+}
+
+/* AUI-001 (state indicators): Streamlit draws the checkbox tick and radio
+   dot in white on the primaryColor fill -- white on brand yellow is
+   ~1.41:1, on the checkbox that gates exposure-increasing policy
+   eligibility. The mark is repainted in ink on the same yellow (~9.7:1 in
+   both modes). Two implementations are covered because baseweb has shipped
+   both: an inline SVG child (fill/stroke repaint) and a background-image
+   tick (replaced wholesale with an ink tick). Selectors use stable
+   data-testid/data-baseweb/ARIA hooks only; if a future Streamlit changes
+   this DOM, the rules stop matching and the default rendering returns --
+   degraded, visible, and caught by the next review pass. */
+[data-testid="stCheckbox"] label[data-baseweb="checkbox"] svg,
+[data-testid="stCheckbox"] label[data-baseweb="checkbox"] svg path {
+    fill: var(--ta-brand-ink) !important;
+    stroke: var(--ta-brand-ink) !important;
+}
+[data-testid="stCheckbox"] label[data-baseweb="checkbox"]:has(input[type="checkbox"]:checked) > span:first-of-type {
+    background-color: var(--ta-brand) !important;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 17 13'%3E%3Cpath d='M6.5 12.2 0.8 6.5l1.6-1.6 4.1 4.1L14.6 0.9l1.6 1.6z' fill='%23101010'/%3E%3C/svg%3E") !important;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 0.75rem;
+}
+[data-testid="stRadio"] label:has(input[type="radio"]:checked) > div:first-of-type > div {
+    background-color: var(--ta-brand-ink) !important;
 }
 
 /* ====================================================================

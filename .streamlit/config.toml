@@ -40,7 +40,12 @@ codeFont = "'Cascadia Mono', 'JetBrains Mono', Consolas, 'SF Mono', Menlo, monos
 # 15px rather than the 16px default: this is a dense analytical dashboard, and
 # the tighter base lets a briefing fit without scrolling past the risk section.
 baseFontSize = 15
-headingFontWeights = [700, 660, 620]
+# AUI-005: Streamlit 1.60 validates these at RUNTIME to 100-step values in
+# 100..900 -- 660/620 parsed as TOML but were rejected in the browser with a
+# console warning on every rerun, then fell back to defaults. The finer
+# variable-font weights (660/620) live in scripts/ui_theme.py's CSS, which
+# has no such restriction; this list must stay coarse and valid.
+headingFontWeights = [700, 600, 600]
 
 # "Curly edged" per the brief. 12px matches the card radius in ui_theme.py;
 # buttons are pilled there, as on Alpaca's own controls.

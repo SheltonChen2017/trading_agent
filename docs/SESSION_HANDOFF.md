@@ -59,7 +59,60 @@ authority documents so rewriting this state summary does not erase them.
 > tree: **3290 passed, 0 failed, 0 skipped** (their 3289 + 1 new guard).
 > Appendix in `docs/REVIEW_2026-08-09_GR7D_M2_NOTIFICATIONS.md`.
 
-## 0. Latest round — independent review of three-sleeve M2 notifications (2026-08-09)
+## 0. Latest round — AUI-001..005 theme corrections (2026-08-09)
+
+Owner authorized the last open queue item. Branch
+`user/claude/aui-fixes-20260809` from `main` `8858c03`. All five findings
+from `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_ALPACA_UI_THEME.md` are
+corrected; that document's ledger now carries per-finding fix records (§5)
+and an honest not-covered section (§6).
+
+- **AUI-001**: tick/radio dot repainted in ink on brand yellow (~9.7:1 both
+  modes, both baseweb mark implementations covered via stable
+  testid/baseweb/ARIA selectors); focus is a DUAL ring (ink + brand) so
+  each mode gets its ≥3:1 from one of the rings, mode-agnostically.
+- **AUI-002**: the entire alert container speaks mono — a plain
+  `st.warning` with no bold fragment is now typographically distinct from
+  body and titles.
+- **AUI-003**: nineteen sections wrapped in `st.container(border=True)`
+  (Settings & Features ×5, Operations ×5, Briefing ×9) via a
+  safety-checked transformer (anchored first lines, triple-quote scan,
+  dedent verification). Pages whose sections are already carded elements
+  were deliberately left; recorded in the review doc.
+- **AUI-004**: root cause — light warning `#926C05` caps at ~4.50:1 on pure
+  white, so backgrounds could never give margin. Alert text darkens 12%
+  toward black per severity via `color-mix` on the markdown CHILD
+  (container placement would collapse severity hues). Worst cases: light
+  5.51, dark 5.09. The demanded reproducible measurement is now a
+  deterministic test parsing the live config/stylesheet.
+- **AUI-005**: `headingFontWeights` → `[700, 600, 600]`; fine weights stay
+  CSS-only.
+
+New coverage: `tests/test_ui_pages_smoke.py` renders ALL TEN navigation
+pages end-to-end in AppTest with no exception, deterministically (env
+cleared, provider fetches stubbed to the degraded path, temp store) — the
+behavioral guard for the 19-section re-indentation. `tests/test_ui_theme.py`
+grew 6 AUI guards (12 total). One pre-existing guard was REFINED, not
+weakened: the no-remote-font scan tripped on the mandatory
+`xmlns='http://www.w3.org/2000/svg'` inside AUI-001's self-contained ink
+data URI; it now strips data: URI bodies and additionally forbids ANY
+non-data `url()` — stricter than before, and an injected real remote URL
+was verified caught.
+
+Mutation note, disclosed: the first mutation sweep reported the AUI-002
+mutation surviving; isolated re-runs showed the test catches it, and a
+write-visibility assert added to the harness made all seven mutations
+report load-bearing. Harness artifact, not a weak test.
+
+Not covered (stated plainly): pytest cannot render CSS. The repainted
+marks, dual focus ring, mono alerts, and darkened text are pinned as
+constructs and arithmetic; browser-side confirmation (computed styles,
+console warnings for AUI-005) needs the next browser-equipped review pass.
+
+Validation and branch/commit identifiers: recorded in the follow-up commit
+after the implementation commit exists.
+
+## 0.05 Prior round — independent review of three-sleeve M2 notifications (2026-08-09)
 
 Owner authorized M2 after merging the M1/revision-2 review (PR #178). Branch
 `user/claude/engine-m2-notifications-20260809` from `main` `02484bb`, with

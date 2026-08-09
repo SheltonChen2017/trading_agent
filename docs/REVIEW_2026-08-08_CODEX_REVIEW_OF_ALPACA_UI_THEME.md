@@ -2,7 +2,7 @@
 
 Date: 2026-08-08
 
-Status: **changes requested — 0 P0, 0 P1, 4 P2, 1 P3 open**
+Status: **corrections delivered 2026-08-09 — 0 P0, 0 P1, 0 P2, 0 P3 open; see §5** (was: changes requested, 4 P2 / 1 P3)
 
 Reviewer: Codex
 
@@ -34,7 +34,7 @@ order, policy write, or broker mutation was requested.
 
 ### AUI-001 — P2 — checked and focused controls use a 1.41:1 indicator
 
-**Status:** Open.
+**Status:** Fixed — see §5 (2026-08-09).
 
 **Files:** `.streamlit/config.toml:52`, `.streamlit/config.toml:60`,
 `scripts/ui_theme.py:278`.
@@ -61,7 +61,7 @@ https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast
 
 ### AUI-002 — P2 — ordinary warning messages do not get a distinct typeface
 
-**Status:** Open.
+**Status:** Fixed — see §5 (2026-08-09).
 
 **File:** `scripts/ui_theme.py:204` and `scripts/ui_theme.py:243`.
 
@@ -80,7 +80,7 @@ bold alert fragments would use mono.
 
 ### AUI-003 — P2 — the rounded-card requirement is only partially implemented
 
-**Status:** Open.
+**Status:** Fixed — see §5 (2026-08-09).
 
 **File:** `scripts/ui_theme.py:158` through `scripts/ui_theme.py:176`.
 
@@ -101,7 +101,7 @@ uncontrolled nesting.
 
 ### AUI-004 — P2 — the branch records a warning contrast result below WCAG AA
 
-**Status:** Open.
+**Status:** Fixed — see §5 (2026-08-09).
 
 **Files:** `scripts/ui_theme.py:204`, `docs/SESSION_HANDOFF.md:128`.
 
@@ -124,7 +124,7 @@ https://www.w3.org/WAI/WCAG20/Understanding/contrast-minimum.html
 
 ### AUI-005 — P3 — two configured heading weights are invalid in Streamlit
 
-**Status:** Open.
+**Status:** Fixed — see §5 (2026-08-09).
 
 **File:** `.streamlit/config.toml:43`.
 
@@ -169,3 +169,30 @@ carded. Correct AUI-001 through AUI-005, add regression coverage that observes
 the rendered consequences, rerun the full suite, and request counter-review.
 
 No feature-milestone entry is warranted while these findings remain open.
+
+
+## 5. Correction record — 2026-08-09 (Claude)
+
+Branch `user/claude/aui-fixes-20260809` (theme merged to `main` via PR #174
+before these corrections; fixes applied against current `main`).
+
+| ID | Correction | Verification |
+|---|---|---|
+| AUI-001 | The tick and radio dot are repainted in ink (`#101010`) on the brand-yellow fill (~9.7:1 both modes), covering both baseweb mark implementations (inline-SVG repaint and a replacement ink-tick `background-image` behind `:has(input:checked)`); the focus indicator is now a DUAL ring — 2px ink hugging the element plus the 2px brand ring outside — so light mode gets its ≥3:1 from the ink ring and dark mode from the brand ring, mode-agnostically. | Arithmetic guard pins ink-on-brand ≥3:1; construct guards pin the checked-state overrides and the dual ring; reverse mutations (tick override retargeted, ink ring deleted) fail the guards. Rendered-DOM verification remains browser-side (§6). |
+| AUI-002 | The ENTIRE alert container now speaks mono (0.85rem, ligatures off) — a plain `st.warning("...")` with no bold fragment is unmistakable against body copy and titles; bold lead-ins keep extra weight inside the same voice. | Guard asserts the mono family sits on the container rule itself; the body-face reverse mutation fails it. |
+| AUI-003 | Nineteen logical sections wrapped in `st.container(border=True)`: all five named Settings & Features sections, all five Operations sections, and nine Briefing sections (regime, risk exposure, warnings, positions if/else, holdings, open orders, events, research evidence, recommended). Sections on other pages whose content is already a carded element (forms, dataframes, expanders) were deliberately left unwrapped — the review itself warns against blanket carding. | Source guard pins per-page wrapper counts (≥5/≥5/≥8); a NEW ten-page AppTest smoke (`tests/test_ui_pages_smoke.py`) renders every navigation page end-to-end with no exception, deterministically (no network, no broker, temp store) — the behavioral guard for the re-indentation. Unwrapping one section fails the count guard. |
+| AUI-004 | Root cause established from the palette: light-mode warning text `#926C05` tops out at ~4.50:1 against PURE WHITE, so no background could give margin. Alert text is darkened 12% toward black per severity via `color-mix` on the alert's MARKDOWN CHILD (on the container, `currentColor` in a `color:` declaration resolves against the parent and would collapse severity hues). Computed worst cases: light 5.51, dark 5.09 — real margin both modes; severity borders stay at the undarkened hue (non-text, ≥3:1). Browsers without `color-mix` keep today's 4.49 — degraded, never broken. | The demanded reproducible measurement is now a deterministic test replicating the arithmetic end-to-end from the LIVE config and stylesheet (page colours, lift alpha, mix ratio all parsed, floor 4.60), using DOM-measured severity colours cross-confirmed against the bundled palette. Reverse mutations (rule deleted; mix weakened to 100%) fail it, as does moving the rule off the child. |
+| AUI-005 | `headingFontWeights` → `[700, 600, 600]` (valid 100-step values); the finer 660/620 weights remain CSS-only where no such restriction exists. | Config guard asserts every weight is a 100-step value in 100..900; restoring 660/620 fails it. |
+
+## 6. Honestly not covered
+
+pytest cannot render CSS: the tick/dot/focus repaint and the mono/darkened
+alert text are pinned as constructs and arithmetic, not as rendered pixels.
+The browser-side confirmation that closed the original findings' evidence
+loop (computed styles, console warnings) should be repeated by the next
+browser-equipped review pass. One harness note for reviewers: the first
+mutation sweep reported the AUI-002 mutation as surviving; isolated re-runs
+showed the test DOES catch it, and a write-visibility assert added to the
+harness made all seven mutations report load-bearing — the initial report
+was a harness artifact, not a weak test, and is disclosed here rather than
+silently rerun.

@@ -108,8 +108,15 @@ notification of anything outside the three-sleeve engine; any change to
 alert routing severities. No execution, policy, gate, scheduler, ML, or
 epoch surface changed.
 
-Validation and branch/commit identifiers: recorded in the follow-up commit
-after the implementation commit exists (same convention as prior rounds).
+Validation on the exact M2 tree (commit `8f5acb7`, branch
+`user/claude/engine-m2-notifications-20260809`, base `main` `02484bb`):
+**3284 passed, 0 failed, 0 skipped**, 25 warnings, 287.44s, Python 3.14.6
+(post-review baseline 3267 + the 17 new notification tests); `compileall`
+clean across every workflow-named package; `git diff --check` clean;
+document-consistency guards green after this handoff edit; live briefing
+smoke against the scratch database ran the cycle silently and correctly
+(no lots -> no watches -> no lines, no failure note). Awaiting independent
+review; M3 not started.
 
 ## 0.1 Prior round — independent GR-7d replacement / three-sleeve M1 review (2026-08-09)
 

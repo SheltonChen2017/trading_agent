@@ -7,6 +7,20 @@ plan's "rebalance-to-target proposals" shape — the owner defined an engine of
 their own instead, and this plan records that engine exactly rather than
 relabelling it. GR-7d's original shape is superseded, not silently completed.
 
+**Prior-decision disclosure (found 2026-08-09, after adoption).** The owner
+had already decided GR-7d once before, differently: on 2026-08-06 they chose
+an equal-weight target across all `UNIVERSE` names with a ±25% relative band,
+and a report-only drift slice was implemented (`assistant/rebalance.py`, 639
+test lines) on `user/claude/gr-7d-rebalance-targets-20260806` — which was
+never merged, so `main` still said "blocked" and neither the owner nor the
+2026-08-09 session remembered it when this engine was adopted. Under the
+instruction hierarchy the later explicit decision governs: **this plan
+supersedes the 2026-08-06 equal-weight decision as well**, surfaced to the
+owner the same day. The branch stays unmerged and undeleted as the archived
+record of that alternative; its two-machines operational facts were ported
+to `docs/OPERATIONAL_FACTS.md` separately because they are true regardless
+of which allocation shape governs.
+
 Audience: repository owner, Claude Code, Codex, and future reviewers.
 
 ## 1. The engine, in the owner's words (2026-08-09)

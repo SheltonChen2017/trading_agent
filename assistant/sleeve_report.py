@@ -21,9 +21,17 @@ is exactly the lens ``assistant/tax_lots.py`` documents as hiding real
 money. Per-lot rows come from that module's already-reviewed
 ``unrealized_by_lot``, which also carries the tax-reduction mechanism the
 owner mandated (2026-08-09): term-if-sold-now, days to long term, and the
-first long-term date, so a crossing can be weighed against the tax
-consequence of acting on it now. Classification and dates only -- this
-module never invents a tax bracket.
+first long-term date. Classification and dates only -- this module never
+invents a tax bracket.
+
+REVISION 2 (owner-adopted 2026-08-09, after a measured backtest rejected
+the +5% any-term full exit): gain review is now LONG-TERM-GATED and a
+TRIM, not an exit. A lot at or above the price threshold but still
+short-term is a distinct state -- ``gain_threshold_met_awaiting_long_term``
+-- whose content is the countdown, and it is deliberately NOT counted as
+crossed: collapsing the two states would reintroduce short-term sales
+through an eager reader. The trim fraction is engine metadata here; the
+report still proposes nothing.
 
 Coverage honesty: lots exist only for fills this application recorded.
 A growth position whose snapshot shares disagree with its ledger lots is
@@ -145,10 +153,12 @@ def _growth_positions(
     growth_tickers: Iterable[str],
     gain_threshold_pct: float,
     decline_threshold_pct: float,
-) -> tuple[list[dict[str, Any]], int, int]:
+    gain_requires_long_term: bool,
+) -> tuple[list[dict[str, Any]], int, int, int]:
     positions: list[dict[str, Any]] = []
     gain_crossings = 0
     decline_crossings = 0
+    awaiting_long_term = 0
     wanted = {t.upper() for t in growth_tickers}
     for position in snapshot.positions:
         ticker = position.ticker.upper()
@@ -201,9 +211,23 @@ def _growth_positions(
         for lot in lots:
             pct = lot["unrealized_pnl_pct"]
             annotated = dict(lot)
-            annotated["crossed_gain_review_threshold"] = pct >= gain_threshold_pct
+            price_met = pct >= gain_threshold_pct
+            # Revision 2: the long-term gate is part of the RULE, not a
+            # footnote. A lot above the price threshold but still short-term
+            # has NOT crossed gain review -- it is "awaiting long-term", a
+            # distinct state whose whole content is the countdown the tax
+            # mechanism already computes (days_to_long_term). Collapsing the
+            # two states into one flag would reintroduce short-term sales
+            # through the back door of an eager reader.
+            is_long_term = lot["term_if_sold_now"] == "long"
+            crossed_gain = price_met and (is_long_term or not gain_requires_long_term)
+            annotated["crossed_gain_review_threshold"] = crossed_gain
+            annotated["gain_threshold_met_awaiting_long_term"] = (
+                price_met and gain_requires_long_term and not is_long_term
+            )
             annotated["crossed_decline_review_threshold"] = pct <= decline_threshold_pct
-            gain_crossings += annotated["crossed_gain_review_threshold"]
+            gain_crossings += crossed_gain
+            awaiting_long_term += annotated["gain_threshold_met_awaiting_long_term"]
             decline_crossings += annotated["crossed_decline_review_threshold"]
             annotated_lots.append(annotated)
 
@@ -217,7 +241,7 @@ def _growth_positions(
         )
         positions.append(row)
     positions.sort(key=lambda row: row["ticker"])
-    return positions, gain_crossings, decline_crossings
+    return positions, gain_crossings, decline_crossings, awaiting_long_term
 
 
 def _single_issuer_overlap(
@@ -259,6 +283,8 @@ def evaluate_sleeves(
     reinvest_tickers: Iterable[str] = tuple(config.DIVIDEND_REINVEST_TICKERS),
     floor_pct: float = config.DIVIDEND_SLEEVE_FLOOR_PCT,
     gain_threshold_pct: float = config.GROWTH_GAIN_REVIEW_THRESHOLD_PCT,
+    gain_requires_long_term: bool = config.GROWTH_GAIN_REVIEW_REQUIRES_LONG_TERM,
+    gain_trim_fraction: float = config.GROWTH_GAIN_REVIEW_TRIM_FRACTION,
     decline_threshold_pct: float = config.GROWTH_DECLINE_REVIEW_THRESHOLD_PCT,
     income_underlying: Mapping[str, str] | None = None,
     leveraged_underlying: Mapping[str, str] | None = None,
@@ -292,6 +318,19 @@ def evaluate_sleeves(
         )
     if floor_pct < 0:
         raise SleeveReportError(f"floor_pct must be >= 0, got {floor_pct!r}")
+    # Trim fraction is presentation metadata in M1 (the report proposes
+    # nothing), but a nonsense value would still be repeated into every
+    # notification and CLI line downstream, so it is validated as strictly
+    # as a behavioral input: a fraction of a lot must be in (0, 1].
+    if (
+        not isinstance(gain_trim_fraction, float)
+        or not math.isfinite(gain_trim_fraction)
+        or not 0 < gain_trim_fraction <= 1
+    ):
+        raise SleeveReportError(
+            f"gain_trim_fraction must be a float in (0, 1], got "
+            f"{gain_trim_fraction!r}"
+        )
 
     try:
         total_equity = snapshot.total_equity_exact_decimal
@@ -313,13 +352,14 @@ def evaluate_sleeves(
     reinvest_rows, reinvest_total = _holding_rows(
         snapshot, reinvest_tickers, total_equity
     )
-    growth_rows, gain_crossings, decline_crossings = _growth_positions(
+    growth_rows, gain_crossings, decline_crossings, awaiting_lt = _growth_positions(
         snapshot,
         ledger,
         total_equity,
         growth_tickers=growth_tickers,
         gain_threshold_pct=gain_threshold_pct,
         decline_threshold_pct=decline_threshold_pct,
+        gain_requires_long_term=gain_requires_long_term,
     )
 
     return {
@@ -330,12 +370,15 @@ def evaluate_sleeves(
         "engine": {
             "plan": "docs/reference/THREE_SLEEVE_ENGINE_PLAN.md",
             "authority": (
-                "owner-stated preference (2026-08-09); not validated research"
+                "owner-stated preference (2026-08-09, revision 2); "
+                "not validated research"
             ),
             "floor_pct": decimal_text(floor),
             "gain_review_threshold_pct": decimal_text(
                 to_decimal(gain_threshold_pct, name="gain_threshold_pct")
             ),
+            "gain_review_requires_long_term": bool(gain_requires_long_term),
+            "gain_review_trim_fraction": gain_trim_fraction,
             "decline_review_threshold_pct": decimal_text(
                 to_decimal(decline_threshold_pct, name="decline_threshold_pct")
             ),
@@ -361,6 +404,7 @@ def evaluate_sleeves(
                 t.upper() for t in growth_tickers if t.upper() not in held
             ),
             "lots_at_gain_review": gain_crossings,
+            "lots_awaiting_long_term": awaiting_lt,
             "lots_at_decline_review": decline_crossings,
         },
         "reinvest_sleeve": {

@@ -1,7 +1,8 @@
 # Development session handoff
 
-Prepared: 2026-08-09, after the owner adopted the three-sleeve engine and its
-M1 sleeve report was implemented (§0). The Alpaca UI restyle remains
+Prepared: 2026-08-09, after the three-sleeve engine's growth rule was
+REVISED on measured backtest evidence (revision 2, §0) — same day the
+engine was adopted and M1 merged (§0.05). The Alpaca UI restyle remains
 unmerged with Codex's AUI-001..005 corrections outstanding (§0.1).
 
 Audience: Codex, Claude Code, Grok, and the repository owner after a
@@ -15,9 +16,10 @@ authority documents so rewriting this state summary does not erase them.
 > review of Claude's counter-review). Everything from the whole-codebase
 > sweep through those reviews is **on `main` and fetchable**.
 >
-> **Newest work:** the owner-adopted three-sleeve engine's M1 is on
-> `user/claude/engine-m1-sleeve-report-20260809` (see §0), awaiting
-> independent review.
+> **Newest state:** M1 and the two-machines facts merged as PR #176 and
+> PR #175. The engine's growth rule was then revised on measured evidence
+> (revision 2, §0) on `user/claude/engine-rev2-lt-trim-20260809`, awaiting
+> independent review together with M1's already-merged code.
 >
 > **Theme review state:** Claude's owner-requested Alpaca-style UI restyle is
 > at `85566b3` on `user/claude/alpaca-ui-theme-20260808`, based on `8f4257b`.
@@ -44,7 +46,64 @@ authority documents so rewriting this state summary does not erase them.
 > there because this file is rewritten every round. Do not copy them back
 > into this file; link to them.
 
-## 0. Latest round — Three-sleeve engine adopted; M1 sleeve report (2026-08-09)
+## 0. Latest round — Engine revision 2: LT-gated trim-half (2026-08-09)
+
+The owner asked "would this strategy work?" BEFORE M2 encoded the adopted
+thresholds, and directed a backtest ahead of Codex review so review would
+see completed code. The backtest rejected the adopted rule; the owner then
+adopted my recommended revision. Full evidence chain:
+
+- **Backtest** (frozen as `scripts/backtest_three_sleeve_rule_2026_08_09.py`
+  and `scripts/backtest_three_sleeve_revisions_2026_08_09.py`; registry
+  entry in `assistant/research_findings.json` v1.5.0, README updated): the
+  +5% any-term full exit produced **3.29%** after-tax CAGR vs **48.14%**
+  buy-and-hold on the same six names and bankroll over ~7 years (next-open
+  fills, 37%/15% annual tax netting, terminal liquidation taxed both
+  sides, 3% cash yield). Structural cause: 95-99% of days in cash; at 0%
+  cash yield the rule made 0.30%. Every full-exit variant stranded; a
+  trim-half family rode (~26%); LONG-TERM-GATING the trim was costless and
+  eliminates short-term gains by construction; threshold insensitive
+  (+50 vs +100 within 0.1 point). The simulator was verified against
+  hand-computed synthetic paths (flat preserves bankroll to the cent;
+  riser's single exit matches next-open arithmetic to the dollar) before
+  any real-data run. Caveats recorded everywhere the numbers appear: one
+  window, hindsight-selected names, uncounted variant grid — design
+  guidance, not a finding.
+- **Owner decision (revision 2):** gain review becomes **long-term-gated
+  trim-half at +50%** on the lot's own basis; a price-met-but-short-term
+  lot is a distinct "awaiting long-term" state carrying the countdown,
+  never a crossing. Decline review (−10% per-lot adds), floor, re-entry,
+  and notification-not-automatic stance unchanged. M3 dividend income now
+  funds pending decline-review adds BEFORE leveraged reinvestment
+  (addresses measured idle-cash drag and the NVDY→NVDL single-issuer
+  pipe). Recorded in `docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` §1.1 +
+  change control.
+- **Code (branch `user/claude/engine-rev2-lt-trim-20260809`):** config
+  gains `GROWTH_GAIN_REVIEW_REQUIRES_LONG_TERM=True` and
+  `GROWTH_GAIN_REVIEW_TRIM_FRACTION=0.5`, threshold 5.0→50.0;
+  `assistant/sleeve_report.py` implements the gate and the awaiting state
+  (`gain_threshold_met_awaiting_long_term`, `lots_awaiting_long_term`) and
+  validates the trim fraction in (0,1]; CLI and Reports panel render the
+  gate, trim fraction, and countdown. Tests: 37→47 (gate both directions,
+  exact +50.00 boundary, awaiting-vs-crossed distinction, trim-fraction
+  validation incl. bool rejection, config shape invariants); four reverse
+  mutations (gate dropped, awaiting collapsed, boundary made exclusive,
+  trim validation dropped) each failed the intended tests, module restored
+  byte-for-byte by SHA-256.
+
+M2 remains not started; its notification semantics are now specified
+against revision 2 in the plan's §5.
+
+Validation on the exact revision-2 tree (commit `6fe8af0`, branch
+`user/claude/engine-rev2-lt-trim-20260809`, base `main` `997bcd5`):
+**3257 passed, 0 failed, 0 skipped**, 25 warnings, 270.08s, Python 3.14.6
+(post-merge baseline 3247 + 10 new); `compileall` clean across every
+workflow-named package; `git diff --check` clean; document-consistency,
+sleeve, and registry guards re-run green after the final docs edit;
+read-only CLI smoke against a scratch database plus the live Alpaca paper
+snapshot rendered the revised gate/trim/countdown lines.
+
+## 0.05 Same day, earlier — Three-sleeve engine adopted; M1 sleeve report (2026-08-09)
 
 The owner adopted a personal allocation engine and delegated its open design
 decisions to recommended defaults, keeping the tax-consequence mechanism as a

@@ -1,26 +1,30 @@
 # Development session handoff
 
-Prepared: 2026-08-08, after Codex independently reviewed Claude's Alpaca-style
-UI restyle and requested corrections.
+Prepared: 2026-08-09, after the owner adopted the three-sleeve engine and its
+M1 sleeve report was implemented (§0). The Alpaca UI restyle remains
+unmerged with Codex's AUI-001..005 corrections outstanding (§0.1).
 
 Audience: Codex, Claude Code, Grok, and the repository owner after a
 computer, model, or session change. This is the canonical current-state
 handoff. Durable standing rules and operational facts remain in their linked
 authority documents so rewriting this state summary does not erase them.
 
-> **Current development state:** `main` is `8f4257b` (PR #173), which merged
-> Claude's second counter-review round. `dabdd56` (PR #172) before it merged
-> Codex's review of Claude's counter-review. Everything from the whole-codebase
-> sweep through those reviews is now **on `main` and fetchable**: the Claude
-> counter-review (`5b050cd` and its ancestors, PR #171 base `24d0cb2`) and the
-> Codex correction and handoff commits (`d6e65c1`, `4c501cf`).
+> **Current development state:** `main` is `d3eb921` (PR #174), which merged
+> Codex's review of the Alpaca UI theme. Before it: `8f4257b` (PR #173,
+> Claude's second counter-review round) and `dabdd56` (PR #172, Codex's
+> review of Claude's counter-review). Everything from the whole-codebase
+> sweep through those reviews is **on `main` and fetchable**.
 >
-> **Latest review state:** Claude's owner-requested Alpaca-style UI restyle is
+> **Newest work:** the owner-adopted three-sleeve engine's M1 is on
+> `user/claude/engine-m1-sleeve-report-20260809` (see §0), awaiting
+> independent review.
+>
+> **Theme review state:** Claude's owner-requested Alpaca-style UI restyle is
 > at `85566b3` on `user/claude/alpaca-ui-theme-20260808`, based on `8f4257b`.
 > Codex reviewed both commits on
 > `codex/review-claude-alpaca-ui-theme-20260808`; review record `c8d0173`
 > requests changes with **0 P0, 0 P1, 4 P2, and 1 P3 open**. The theme has not
-> been accepted or merged. See §0 and
+> been accepted or merged. See §0.1 and
 > `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_ALPACA_UI_THEME.md`.
 >
 > Codex's review found CCR-001 (P2) and CCR-002/003/004 (P3) against Claude's
@@ -40,7 +44,68 @@ authority documents so rewriting this state summary does not erase them.
 > there because this file is rewritten every round. Do not copy them back
 > into this file; link to them.
 
-## 0. Latest round — Alpaca-style UI restyle (2026-08-08)
+## 0. Latest round — Three-sleeve engine adopted; M1 sleeve report (2026-08-09)
+
+The owner adopted a personal allocation engine and delegated its open design
+decisions to recommended defaults, keeping the tax-consequence mechanism as a
+standing requirement. `docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` records
+the engine verbatim, the four resolved decisions, milestones M1-M4, and the
+unweakened safety boundaries. This also resolves the GR-7d owner-decision
+blocker — **superseded, not completed**: the owner chose this engine instead
+of rebalance-to-target; the action plan's GR-7d row and §8 blocker paragraph
+carry the resolution note.
+
+M1 (read-only sleeve status report) is implemented on
+`user/claude/engine-m1-sleeve-report-20260809` (branched from `main`
+`d3eb921`):
+
+- `config.py`: `DIVIDEND_INCOME_TICKERS` (JEPQ/JEPI/NVDY),
+  `GROWTH_ROTATION_TICKERS` (NVDA/AMD/AVGO/TSM/MSFT/SOXX),
+  `DIVIDEND_REINVEST_TICKERS` (NVDL/SOXL/TQQQ — regression-tested subset of
+  `LEVERAGED_ETF_TICKERS`), `SINGLE_STOCK_INCOME_ETF_UNDERLYING`
+  (NVDY→NVDA, disclosure only — deliberately NOT in leveraged accounting),
+  floor 10.00%, gain review +5.00%, decline review −10.00%. All twelve
+  tickers verified against real fetched history (400/400 sessions each).
+- `assistant/sleeve_report.py` (new): pure `evaluate_sleeves()` over
+  snapshot + lot ledger + journal postings. Per-LOT thresholds via the
+  reviewed `unrealized_by_lot` (which carries the owner-mandated tax
+  mechanism: term-if-sold-now, days-to-long-term). Floor verdict compared
+  UNROUNDED so a 9.9995% display-rounding to "10" cannot flip it. Lot
+  coverage honesty: none/partial/unavailable positions carry both share
+  counts and a reason; income summed (negated) from `INCOME:DIVIDENDS`
+  postings with an explicit unattributed bucket; positive income posting
+  refuses the report. Deliberately NO reinvestable-budget field until M3's
+  earmark records exist.
+- CLI `sleeve-report` (`read_only_store=True`, `--json`) and a Reports-page
+  panel, both mirroring the idle-cash degradation pattern.
+- `tests/test_sleeve_report.py`: 37 tests — exact boundaries (+5.00 /
+  −10.00 / floor at exactly 10.00 and at display-rounded 9.9995), per-lot
+  vs average-cost pinning, coverage honesty, income sign/attribution,
+  overlap disclosure, action-shaped-key lexical guard, JSON
+  serializability, config invariants, and a whole-database CLI read-only
+  proof. Four reverse mutations (exclusive boundary, rounded floor
+  verdict, unnegated income, silent no-lot skip) each failed exactly the
+  intended tests; module restored byte-for-byte by SHA-256.
+
+Live smoke against the real paper account: floor warning fires (dividend
+sleeve 0%), AVGO/MSFT correctly report `lot_coverage: none` (positions
+predate app fill records), reinvest sleeve 2%.
+
+Not in M1 (deliberate): notifications (M2), earmark/budget accounting and
+reinvest proposals (M3), prepared exit proposals (M4, deferred). No
+execution, policy, gate, scheduler, ML, or epoch surface changed.
+
+Validation on the exact implementation tree (commit `77cb814`, branch
+`user/claude/engine-m1-sleeve-report-20260809`, base `main` `d3eb921`):
+**3247 passed, 0 failed, 0 skipped**, 25 warnings, 279.73s, Python 3.14.6
+(baseline 3210 + the 37 new sleeve tests). `compileall` clean across every
+workflow-named package; `git diff --check` clean. Focused neighbor suites
+(sleeve/tax-report/cash-report/tax-lots) 205 passed. Live-account CLI smoke
+succeeded read-only against a scratch database plus the real Alpaca paper
+snapshot. Next milestone is M2 (threshold notifications) -- NOT started, per
+one-milestone-per-branch discipline.
+
+## 0.1 Prior round — Alpaca-style UI restyle (2026-08-08)
 
 ### Independent review outcome
 
@@ -166,7 +231,7 @@ Worst-case contrast is 4.49 against a WCAG AA target of 4.50. Closing that last
 only reachable through the hashed classes above — a fragile dependency traded
 for a rounding-error gain. Recorded rather than silently accepted.
 
-## 0.1 Preceding round — Codex review of Claude's counter-review (2026-08-08)
+## 0.2 Preceding round — Codex review of Claude's counter-review (2026-08-08)
 
 Review artifact:
 `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_CLAUDE_COUNTER_REVIEW.md`.

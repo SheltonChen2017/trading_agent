@@ -1115,6 +1115,114 @@ def _write_artifact_atomically(destination: Path, payload: str) -> None:
         temp.unlink(missing_ok=True)
 
 
+def command_sleeve_report(args, store: AssistantStore) -> None:
+    """Three-sleeve engine status (M1, THREE_SLEEVE_ENGINE_PLAN).
+
+    Read-only measurement of the portfolio against the owner's stated
+    sleeve preference: it opens the store read-only for recorded fills and
+    journal postings, fetches a live snapshot when Alpaca is configured,
+    and never proposes, sizes, approves, or submits anything.
+    """
+    from assistant.corporate_actions import fills_with_confirmed_splits
+    from assistant.sleeve_report import SleeveReportError, evaluate_sleeves
+    from assistant.tax_lots import TaxLotError, build_ledger
+
+    # Same degradation rule as idle-cash: a broker outage must fail the
+    # REPORT with a sentence, not dump a traceback on the operator.
+    try:
+        if is_configured():
+            portfolio = build_portfolio_snapshot_from_alpaca()
+        else:
+            portfolio = build_portfolio_snapshot(
+                SAMPLE_POSITIONS, SAMPLE_CASH, source="manual", account_mode="manual"
+            )
+    except Exception as exc:
+        raise SystemExit(
+            f"Cannot report sleeves: portfolio snapshot unavailable "
+            f"({type(exc).__name__}: {exc})"
+        ) from exc
+    try:
+        ledger = build_ledger(fills_with_confirmed_splits(store))
+    except (TaxLotError, ValueError, KeyError) as exc:
+        # Corrupt recorded fills must refuse the whole report: per-lot
+        # threshold review over a partial replay would be read as fact.
+        raise SystemExit(
+            f"Cannot report sleeves: recorded fills cannot be replayed into "
+            f"lots ({exc})"
+        ) from exc
+    try:
+        report = evaluate_sleeves(portfolio, ledger, store.list_journal_postings())
+    except SleeveReportError as exc:
+        raise SystemExit(f"Cannot report sleeves: {exc}") from exc
+
+    if args.json:
+        print(json.dumps(report, indent=2, sort_keys=True))
+        return
+
+    dividend = report["dividend_sleeve"]
+    growth = report["growth_sleeve"]
+    reinvest = report["reinvest_sleeve"]
+    income = report["dividend_income"]
+    print(
+        f"Sleeve report ({report['as_of']}, {report['account_mode']}, "
+        f"source {report['portfolio_source']})"
+    )
+    print(f"  equity ${report['total_equity']}")
+    print(
+        f"  dividend sleeve ${dividend['total_market_value']} "
+        f"({dividend['pct_of_equity']}% of equity, floor "
+        f"{report['engine']['floor_pct']}%): {dividend['floor_status']}"
+    )
+    if dividend["floor_status"] == "below_floor":
+        print("  ! dividend sleeve is BELOW the owner's stated floor")
+    print(
+        f"  growth sleeve: {len(growth['positions'])} position(s); "
+        f"{growth['lots_at_gain_review']} lot(s) at gain review "
+        f"(>= {report['engine']['gain_review_threshold_pct']}%), "
+        f"{growth['lots_at_decline_review']} at decline review "
+        f"(<= {report['engine']['decline_review_threshold_pct']}%)"
+    )
+    for position in growth["positions"]:
+        if position["lot_coverage"] != "full":
+            print(
+                f"  ! {position['ticker']} lot coverage is "
+                f"{position['lot_coverage']}: {position['coverage_reason']}"
+            )
+        for lot in position["lots"]:
+            if lot["crossed_gain_review_threshold"]:
+                term = lot["term_if_sold_now"]
+                tail = (
+                    ""
+                    if term == "long"
+                    else f"; long-term in {lot['days_to_long_term']} day(s)"
+                )
+                print(
+                    f"    {position['ticker']} lot {lot['lot_id']}: "
+                    f"{lot['unrealized_pnl_pct']:+.2f}% "
+                    f"(${lot['unrealized_pnl']:+,.2f}), {term}-term if "
+                    f"disposed now{tail}"
+                )
+            elif lot["crossed_decline_review_threshold"]:
+                print(
+                    f"    {position['ticker']} lot {lot['lot_id']}: "
+                    f"{lot['unrealized_pnl_pct']:+.2f}% "
+                    f"(${lot['unrealized_pnl']:+,.2f})"
+                )
+    print(
+        f"  reinvest sleeve ${reinvest['total_market_value']} "
+        f"({reinvest['pct_of_equity']}% of equity)"
+    )
+    print(
+        f"  confirmed dividend income ${income['confirmed_total']} across "
+        f"{income['posting_count']} posting(s) -- {income['note']}"
+    )
+    for overlap in report["single_issuer_overlap"]:
+        print(
+            f"  ! single-issuer overlap on {overlap['issuer']}: "
+            + "; ".join(overlap["routes"])
+        )
+
+
 def command_tax_report(args, store: AssistantStore) -> None:
     """GR-7a: realized gains for one tax year, from confirmed records.
 
@@ -2092,6 +2200,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     idle_cash.add_argument("--json", action="store_true")
     idle_cash.set_defaults(handler=command_idle_cash, needs_store=False)
+
+    sleeve = commands.add_parser(
+        "sleeve-report",
+        help=(
+            "Three-sleeve engine status: dividend-sleeve floor, per-lot "
+            "gain/decline review thresholds with tax term, reinvest sleeve, "
+            "and confirmed dividend income. Owner preference, not research. "
+            "Read-only."
+        ),
+    )
+    sleeve.add_argument("--json", action="store_true")
+    sleeve.set_defaults(handler=command_sleeve_report, read_only_store=True)
 
     attribution = commands.add_parser(
         "attribution",

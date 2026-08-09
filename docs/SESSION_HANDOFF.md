@@ -109,8 +109,15 @@ marks, dual focus ring, mono alerts, and darkened text are pinned as
 constructs and arithmetic; browser-side confirmation (computed styles,
 console warnings for AUI-005) needs the next browser-equipped review pass.
 
-Validation and branch/commit identifiers: recorded in the follow-up commit
-after the implementation commit exists.
+Validation on the exact AUI-fixes tree (commit `00ba5a0`, branch
+`user/claude/aui-fixes-20260809`, base `main` `8858c03`): **3306 passed,
+0 failed, 0 skipped**, 25 warnings, 272.02s, Python 3.14.6 (baseline 3290 +
+6 theme guards + 10 page smokes); `compileall` and `git diff --check`
+clean; seven reverse mutations all load-bearing after the harness gained
+its write-visibility assert; the refined no-remote-font guard verified to
+catch an injected real remote url(). Awaiting independent browser-equipped
+review; every engine milestone through M2 and every review round before
+this one is merged.
 
 ## 0.05 Prior round — independent review of three-sleeve M2 notifications (2026-08-09)
 

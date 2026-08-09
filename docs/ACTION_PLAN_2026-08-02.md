@@ -366,7 +366,7 @@ item's definition of done.
 | GR-7a | **Annual tax reporting export** — realized gains by lot, short/long-term split, wash-sale flags, accountant-readable CSV/JSON, coverage honesty | **COMPLETE AFTER INDEPENDENT REVIEW 2026-08-05.** Pure reporting layer over `assistant/tax_lots.py`; only live `source="alpaca"` snapshots may verify coverage; sample/manual portfolios stay unverified. |
 | GR-7b | **Idle-cash / mandate reporting** — cash position measured against the approved mandate | **COMPLETE AFTER INDEPENDENT REVIEW 2026-08-06.** Pure `assistant/cash_reporting.py`; CLI `idle-cash` and Reports panel use Alpaca/sample snapshots only (no provider-fetch writes); mandate bridge is descriptive required invested volatility; refuses unusable measured vol. |
 | GR-7c | **Performance attribution** — decompose return into allocation/selection/timing/cost/tax rather than the aggregate `performance.py` already reports | **COMPLETE AFTER INDEPENDENT REVIEW 2026-08-06; follow-ups reviewed after correction 2026-08-07.** `assistant/attribution.py` + CLI `attribution`. Single SPY bucket; sector allocation undefined without mandate weights; selection is a labelled residual; cost/tax already-inside, never re-deducted; session-based sufficiency; session-equalized BoP weight; post-flow snapshot equity mapped correctly into TWR. |
-| GR-7d | **Rebalance-to-target proposals** (+ the `docs/reference/ALLOCATION_SERVICE_DESIGN.md` fold-in) | **OWNER DECISION MADE 2026-08-09 — superseded, not completed.** The owner defined a three-sleeve engine of their own (dividend-income floor, per-lot growth review thresholds, dividend-to-leveraged reinvestment) instead of target-weight rebalancing. `docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` is the authoritative plan; its M1 (read-only sleeve report) is implemented on `user/claude/engine-m1-sleeve-report-20260809`. The original rebalance-to-target shape is not scheduled. |
+| GR-7d | **Rebalance-to-target proposals** (+ the `docs/reference/ALLOCATION_SERVICE_DESIGN.md` fold-in) | **SUPERSEDED, NOT COMPLETED.** The owner adopted the three-sleeve engine instead. Its M1 read-only report and revision-2 long-term-gated gain state are **complete after independent review 2026-08-09** at merged implementation `f68251b` plus correction `f8dde7a`; see `docs/REVIEW_2026-08-09_GR7D_THREE_SLEEVE_ENGINE.md`. The original target-weight shape is not scheduled; three-sleeve M2 notifications are next but not started. |
 
 **Why GR-7d is blocked.** The archived plan says "the mandate already
 defines targets; propose the deterministic trades that restore them." It
@@ -394,6 +394,9 @@ That preference is recorded verbatim in
 `docs/reference/THREE_SLEEVE_ENGINE_PLAN.md`, which now governs this
 workstream. The engine is explicitly an owner preference, not validated
 research, and every milestone of it stays notification- or APPROVE-gated.
+M1 is complete after independent review at `f68251b` plus `f8dde7a`; the next
+authorized milestone in this workstream is M2's durable batched notifications,
+which remains not started and requires its own branch and review.
 
 **UI-3 — interactive Backtest page (owner-requested 2026-08-04, inserted
 into this phase ahead of UI-2d at the owner's direction):**

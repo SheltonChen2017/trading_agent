@@ -50,7 +50,16 @@ prices; dated experiment scripts under `scripts/`, registry entry in
 `assistant/research_findings.json`). Findings, all structural rather than
 marginal:
 
-- the adopted +5% any-term full exit produced **3.29%** after-tax CAGR vs
+The after-tax figures are explicitly **modeled proxies**, not tax-accounting
+results: auto-adjusted prices fold dividends into price return, so the scripts
+do not separately model dividend tax timing/classification, and their simple
+`>365 days` term test can differ from the app's calendar/leap-day-correct tax
+authority at boundary dates. Those limitations weaken the tax-number precision,
+not the observed structural fact that the full-exit rule spent almost all of
+the window in cash.
+
+- the adopted +5% any-term full exit produced a **3.29%** modeled
+  after-tax-proxy CAGR vs
   **48.14%** for buy-and-hold — the rule sat in cash 95-99% of all days,
   and at 0% cash yield its CAGR was 0.30%;
 - EVERY full-exit variant strands (+50 any-term 6.5%; long-term-gated full
@@ -58,8 +67,10 @@ marginal:
   arrives in a trending name;
 - trimming HALF the lot instead of exiting repairs it (~26% CAGR, worst
   ticker drawdown −38% vs buy-and-hold's −66%);
-- LONG-TERM-GATING the trim costs nothing (26.33% vs 25.78% ungated) and
-  realizes **zero short-term gains by construction**; and
+- LONG-TERM-GATING the trim was 0.55 CAGR point higher in this run (26.33%
+  vs 25.78% ungated), and the observed run realized no short-term gains;
+  only scheduled gain-review trims are structurally gated â€” a terminal or
+  owner-directed liquidation can still realize a short-term result; and
 - the trim threshold is insensitive (+50 vs +100 within 0.1 CAGR point),
   i.e. not a knife-edge fit.
 

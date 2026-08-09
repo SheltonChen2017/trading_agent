@@ -3,7 +3,8 @@ growth-rotation rule (+5% any-term full exit / -10% add) vs buy-and-hold.
 
 NOT a research finding -- descriptive evidence for the owner's question
 "would this strategy work?", produced BEFORE M2 encoded any threshold.
-Its result (rule 3.29% after-tax CAGR vs 48.14% buy-and-hold; 95-99% of
+Its result (rule 3.29% modeled after-tax proxy CAGR vs 48.14% buy-and-hold;
+95-99% of
 days in cash) drove the section-1.1 revision recorded in
 docs/reference/THREE_SLEEVE_ENGINE_PLAN.md and the rejected-status entry
 in assistant/research_findings.json. Run from the repository root; do not
@@ -22,13 +23,16 @@ REALISM CHOICES (project standards, stated not hidden):
   - signals on daily CLOSE, fills at NEXT day's OPEN (entry_timing =
     next_open -- the timing fix that flipped a prior project finding);
   - prices are yfinance auto_adjust=True, so dividends are folded into
-    price for BOTH strategies (approximate total return);
+    price for BOTH strategies (approximate total return). Consequently the
+    tax result is only a MODELED PROXY: dividend adjustments enter price
+    gains, while real dividend tax timing/classification is not modeled;
   - per-ticker bankroll of MAX_UNITS x UNIT dollars; undeployed cash earns
     CASH_YIELD (flat approximation, sensitivity at 0%);
   - annual tax netting with loss carryforward: short-term net gains 37%,
-    long-term (held > 365 days) 15%; terminal liquidation at the final
+    long-term (approximated here as held > 365 days) 15%; terminal liquidation at the final
     close taxed the same way. Buy-and-hold pays its single long-term tax
-    at that same terminal liquidation;
+    at that same terminal liquidation. The >365 shortcut can disagree with
+    the app's calendar- and leap-day-correct tax-lot authority at boundaries;
   - no commissions (Alpaca); no bid/ask spread model (noted caveat).
 
 WHAT THIS IS NOT: not purged/walk-forward research, not a multiplicity-

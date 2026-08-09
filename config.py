@@ -362,7 +362,7 @@ SINGLE_STOCK_INCOME_ETF_UNDERLYING = {"NVDY": "NVDA"}
 
 # Engine thresholds. Exact boundaries. REVISION 2, owner-adopted
 # 2026-08-09 after a measured backtest rejected revision 1's +5% any-term
-# full exit (3.29% after-tax CAGR vs 48.14% buy-and-hold on the same six
+# full exit (3.29% modeled after-tax-proxy CAGR vs 48.14% buy-and-hold on the same six
 # names over 7y -- the rule stranded 95-99% of days in cash; see the
 # dated scripts/backtest_three_sleeve_* experiment scripts and the
 # research_findings.json entry). The revised gain review:
@@ -371,8 +371,10 @@ SINGLE_STOCK_INCOME_ETF_UNDERLYING = {"NVDY": "NVDA"}
 # - fires only once the lot is LONG-TERM (the tax mechanism made binding:
 #   a scheduled sale can never realize a short-term gain); and
 # - proposes trimming HALF the lot, never exiting it, so a winner keeps
-#   running -- measured 26.33% vs 3.29% CAGR, with zero short-term gains
-#   and threshold-insensitivity (+50 vs +100 within 0.1 CAGR point).
+#   running -- measured 26.33% vs 3.29% CAGR in that descriptive run, with
+#   no short-term gains observed and threshold-insensitivity (+50 vs +100
+#   within 0.1 CAGR point). Dividend-adjusted prices make the tax result a
+#   proxy, not an accountant-grade after-tax return; see the dated scripts.
 #
 # Unchanged by revision 2:
 # - dividend sleeve warns below 10.00% of total equity (low end of the

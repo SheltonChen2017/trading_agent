@@ -1199,7 +1199,8 @@ def command_sleeve_report(args, store: AssistantStore) -> None:
                     f"    {position['ticker']} lot {lot['lot_id']}: "
                     f"{lot['unrealized_pnl_pct']:+.2f}% "
                     f"(${lot['unrealized_pnl']:+,.2f}), "
-                    f"{lot['term_if_sold_now']}-term if disposed now -- "
+                    f"{lot['term_if_sold_now']}-term if disposed now "
+                    f"(first long-term date {lot['first_long_term_date']}) -- "
                     f"gain review (trim fraction {trim})"
                 )
             elif lot["gain_threshold_met_awaiting_long_term"]:
@@ -1208,7 +1209,8 @@ def command_sleeve_report(args, store: AssistantStore) -> None:
                     f"{lot['unrealized_pnl_pct']:+.2f}% "
                     f"(${lot['unrealized_pnl']:+,.2f}) -- above threshold, "
                     f"long-term in {lot['days_to_long_term']} day(s); the "
-                    f"gate holds until then"
+                    f"first long-term date is {lot['first_long_term_date']}; "
+                    f"the gate holds until then"
                 )
             elif lot["crossed_decline_review_threshold"]:
                 print(

@@ -3843,6 +3843,7 @@ if page == "Reports":
                             "Review": _label,
                             "Term if disposed now": _lot["term_if_sold_now"],
                             "Days to long-term": _lot["days_to_long_term"],
+                            "First long-term date": _lot["first_long_term_date"],
                         }
                         for _ticker, _lot, _label in _flagged
                     ],
@@ -3852,10 +3853,10 @@ if page == "Reports":
                     "Revision 2: the long-term gate is part of the rule — a "
                     "lot above the price threshold but still short-term has "
                     "NOT crossed gain review; its countdown shows when the "
-                    "gate opens, and the review proposes trimming "
-                    f"{_engine['gain_review_trim_fraction']} of the lot, "
-                    "never exiting it. Classification and dates only; no "
-                    "bracket is estimated, and nothing here is a proposal."
+                    "gate opens. The recorded rule's trim fraction is "
+                    f"{_engine['gain_review_trim_fraction']}; this panel only "
+                    "reports the state. Classification and dates only; no "
+                    "bracket is estimated and no trade is proposed."
                 )
             else:
                 st.caption("No lot is at or near a review threshold right now.")

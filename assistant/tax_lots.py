@@ -634,6 +634,7 @@ def unrealized_by_lot(ledger: LotLedger, ticker: str, price: float) -> list[dict
             "days_to_long_term": max(
                 0, (_long_term_date(lot.acquired_at) - now).days
             ) if not lot.is_long_term_if_sold(now) else 0,
+            "first_long_term_date": _long_term_date(lot.acquired_at).date().isoformat(),
         }
         for lot in ledger.open_for(ticker)
     ]

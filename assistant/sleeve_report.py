@@ -47,7 +47,6 @@ invite acting on it.
 """
 from __future__ import annotations
 
-import math
 from decimal import Decimal
 from typing import Any, Iterable, Mapping
 
@@ -128,6 +127,11 @@ def _dividend_income(journal_postings: Iterable[Mapping[str, Any]]) -> dict[str,
             )
         total += amount
         metadata = posting.get("metadata") or {}
+        if not isinstance(metadata, Mapping):
+            raise SleeveReportError(
+                "dividend posting metadata must be an object, got "
+                f"{type(metadata).__name__}"
+            )
         ticker = str(metadata.get("ticker") or "").upper()
         if ticker:
             by_ticker[ticker] = by_ticker.get(ticker, Decimal("0")) + amount
@@ -151,8 +155,8 @@ def _growth_positions(
     total_equity: Decimal,
     *,
     growth_tickers: Iterable[str],
-    gain_threshold_pct: float,
-    decline_threshold_pct: float,
+    gain_threshold_pct: Decimal,
+    decline_threshold_pct: Decimal,
     gain_requires_long_term: bool,
 ) -> tuple[list[dict[str, Any]], int, int, int]:
     positions: list[dict[str, Any]] = []
@@ -172,8 +176,9 @@ def _growth_positions(
             "snapshot_shares": position.shares,
         }
         try:
-            lots = unrealized_by_lot(ledger, ticker, position.current_price)
-        except TaxLotError as exc:
+            exact_price = position.exact_field("current_price")
+            lots = unrealized_by_lot(ledger, ticker, float(exact_price))
+        except (TaxLotError, ValueError, TypeError) as exc:
             # A bad price must degrade THIS position's lot view loudly, not
             # crash the report or silently show the position lot-less.
             row.update(
@@ -209,9 +214,19 @@ def _growth_positions(
 
         annotated_lots = []
         for lot in lots:
-            pct = lot["unrealized_pnl_pct"]
             annotated = dict(lot)
-            price_met = pct >= gain_threshold_pct
+            basis = to_decimal(
+                lot["cost_per_share"], name=f"{ticker} lot cost_per_share"
+            )
+            # `unrealized_by_lot` rounds its display percentage to two
+            # places. Comparing that rounded number would move both exact
+            # boundaries in the dangerous direction: +49.999% would become
+            # +50.00% and -9.999% would become -10.00%. Recompute from the
+            # preserved snapshot price and the lot's own basis, publish the
+            # unrounded value, and use that same value for both verdicts.
+            exact_pct = (exact_price - basis) / basis * Decimal("100")
+            annotated["unrealized_pnl_pct"] = float(exact_pct)
+            price_met = exact_pct >= gain_threshold_pct
             # Revision 2: the long-term gate is part of the RULE, not a
             # footnote. A lot above the price threshold but still short-term
             # has NOT crossed gain review -- it is "awaiting long-term", a
@@ -225,7 +240,9 @@ def _growth_positions(
             annotated["gain_threshold_met_awaiting_long_term"] = (
                 price_met and gain_requires_long_term and not is_long_term
             )
-            annotated["crossed_decline_review_threshold"] = pct <= decline_threshold_pct
+            annotated["crossed_decline_review_threshold"] = (
+                exact_pct <= decline_threshold_pct
+            )
             gain_crossings += crossed_gain
             awaiting_long_term += annotated["gain_threshold_met_awaiting_long_term"]
             decline_crossings += annotated["crossed_decline_review_threshold"]
@@ -301,31 +318,44 @@ def evaluate_sleeves(
     Failing loudly is correct: a sleeve report derived from broken inputs
     would be read as fact.
     """
-    for name, value in (
-        ("floor_pct", floor_pct),
-        ("gain_threshold_pct", gain_threshold_pct),
-        ("decline_threshold_pct", decline_threshold_pct),
-    ):
-        if not math.isfinite(value):
-            raise SleeveReportError(f"{name} must be finite, got {value!r}")
-    if gain_threshold_pct <= 0:
+    try:
+        floor = to_decimal(floor_pct, name="floor_pct")
+        gain_threshold = to_decimal(
+            gain_threshold_pct, name="gain_threshold_pct"
+        )
+        decline_threshold = to_decimal(
+            decline_threshold_pct, name="decline_threshold_pct"
+        )
+    except ValueError as exc:
+        raise SleeveReportError(str(exc)) from exc
+    if gain_threshold <= 0:
         raise SleeveReportError(
             f"gain_threshold_pct must be positive, got {gain_threshold_pct!r}"
         )
-    if decline_threshold_pct >= 0:
+    if decline_threshold >= 0:
         raise SleeveReportError(
             f"decline_threshold_pct must be negative, got {decline_threshold_pct!r}"
         )
-    if floor_pct < 0:
+    if floor < 0:
         raise SleeveReportError(f"floor_pct must be >= 0, got {floor_pct!r}")
+    if not isinstance(gain_requires_long_term, bool):
+        raise SleeveReportError(
+            "gain_requires_long_term must be a bool, got "
+            f"{gain_requires_long_term!r}"
+        )
     # Trim fraction is presentation metadata in M1 (the report proposes
     # nothing), but a nonsense value would still be repeated into every
     # notification and CLI line downstream, so it is validated as strictly
     # as a behavioral input: a fraction of a lot must be in (0, 1].
+    try:
+        trim_fraction = to_decimal(
+            gain_trim_fraction, name="gain_trim_fraction"
+        )
+    except ValueError as exc:
+        raise SleeveReportError(str(exc)) from exc
     if (
         not isinstance(gain_trim_fraction, float)
-        or not math.isfinite(gain_trim_fraction)
-        or not 0 < gain_trim_fraction <= 1
+        or not Decimal("0") < trim_fraction <= Decimal("1")
     ):
         raise SleeveReportError(
             f"gain_trim_fraction must be a float in (0, 1], got "
@@ -344,23 +374,35 @@ def evaluate_sleeves(
 
     held = {p.ticker.upper() for p in snapshot.positions}
 
-    dividend_rows, dividend_total = _holding_rows(
-        snapshot, dividend_tickers, total_equity
-    )
-    dividend_pct = dividend_total / total_equity * Decimal("100")
-    floor = to_decimal(floor_pct, name="floor_pct")
-    reinvest_rows, reinvest_total = _holding_rows(
-        snapshot, reinvest_tickers, total_equity
-    )
-    growth_rows, gain_crossings, decline_crossings, awaiting_lt = _growth_positions(
-        snapshot,
-        ledger,
-        total_equity,
-        growth_tickers=growth_tickers,
-        gain_threshold_pct=gain_threshold_pct,
-        decline_threshold_pct=decline_threshold_pct,
-        gain_requires_long_term=gain_requires_long_term,
-    )
+    try:
+        dividend_rows, dividend_total = _holding_rows(
+            snapshot, dividend_tickers, total_equity
+        )
+        dividend_pct = dividend_total / total_equity * Decimal("100")
+        reinvest_rows, reinvest_total = _holding_rows(
+            snapshot, reinvest_tickers, total_equity
+        )
+        growth_rows, gain_crossings, decline_crossings, awaiting_lt = (
+            _growth_positions(
+                snapshot,
+                ledger,
+                total_equity,
+                growth_tickers=growth_tickers,
+                gain_threshold_pct=gain_threshold,
+                decline_threshold_pct=decline_threshold,
+                gain_requires_long_term=gain_requires_long_term,
+            )
+        )
+    except ValueError as exc:
+        raise SleeveReportError(f"snapshot position value is not usable: {exc}") from exc
+    try:
+        dividend_income = _dividend_income(journal_postings)
+    except SleeveReportError:
+        raise
+    except (KeyError, TypeError, ValueError) as exc:
+        raise SleeveReportError(
+            f"journal dividend income is not usable: {exc}"
+        ) from exc
 
     return {
         "as_of": snapshot.as_of,
@@ -374,14 +416,10 @@ def evaluate_sleeves(
                 "not validated research"
             ),
             "floor_pct": decimal_text(floor),
-            "gain_review_threshold_pct": decimal_text(
-                to_decimal(gain_threshold_pct, name="gain_threshold_pct")
-            ),
-            "gain_review_requires_long_term": bool(gain_requires_long_term),
+            "gain_review_threshold_pct": decimal_text(gain_threshold),
+            "gain_review_requires_long_term": gain_requires_long_term,
             "gain_review_trim_fraction": gain_trim_fraction,
-            "decline_review_threshold_pct": decimal_text(
-                to_decimal(decline_threshold_pct, name="decline_threshold_pct")
-            ),
+            "decline_review_threshold_pct": decimal_text(decline_threshold),
             "threshold_basis": "per_lot_cost_per_share",
         },
         "dividend_sleeve": {
@@ -417,7 +455,7 @@ def evaluate_sleeves(
                 t.upper() for t in reinvest_tickers if t.upper() not in held
             ),
         },
-        "dividend_income": _dividend_income(journal_postings),
+        "dividend_income": dividend_income,
         "single_issuer_overlap": _single_issuer_overlap(
             snapshot,
             income_underlying=(

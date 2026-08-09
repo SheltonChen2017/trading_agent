@@ -1175,12 +1175,17 @@ def command_sleeve_report(args, store: AssistantStore) -> None:
     )
     if dividend["floor_status"] == "below_floor":
         print("  ! dividend sleeve is BELOW the owner's stated floor")
+    engine = report["engine"]
+    gate = " long-term" if engine["gain_review_requires_long_term"] else ""
+    trim = engine["gain_review_trim_fraction"]
     print(
         f"  growth sleeve: {len(growth['positions'])} position(s); "
-        f"{growth['lots_at_gain_review']} lot(s) at gain review "
-        f"(>= {report['engine']['gain_review_threshold_pct']}%), "
+        f"{growth['lots_at_gain_review']} lot(s) at{gate} gain review "
+        f"(>= {engine['gain_review_threshold_pct']}%, trim fraction {trim}), "
+        f"{growth['lots_awaiting_long_term']} above threshold awaiting "
+        f"long-term, "
         f"{growth['lots_at_decline_review']} at decline review "
-        f"(<= {report['engine']['decline_review_threshold_pct']}%)"
+        f"(<= {engine['decline_review_threshold_pct']}%)"
     )
     for position in growth["positions"]:
         if position["lot_coverage"] != "full":
@@ -1190,23 +1195,26 @@ def command_sleeve_report(args, store: AssistantStore) -> None:
             )
         for lot in position["lots"]:
             if lot["crossed_gain_review_threshold"]:
-                term = lot["term_if_sold_now"]
-                tail = (
-                    ""
-                    if term == "long"
-                    else f"; long-term in {lot['days_to_long_term']} day(s)"
-                )
                 print(
                     f"    {position['ticker']} lot {lot['lot_id']}: "
                     f"{lot['unrealized_pnl_pct']:+.2f}% "
-                    f"(${lot['unrealized_pnl']:+,.2f}), {term}-term if "
-                    f"disposed now{tail}"
+                    f"(${lot['unrealized_pnl']:+,.2f}), "
+                    f"{lot['term_if_sold_now']}-term if disposed now -- "
+                    f"gain review (trim fraction {trim})"
+                )
+            elif lot["gain_threshold_met_awaiting_long_term"]:
+                print(
+                    f"    {position['ticker']} lot {lot['lot_id']}: "
+                    f"{lot['unrealized_pnl_pct']:+.2f}% "
+                    f"(${lot['unrealized_pnl']:+,.2f}) -- above threshold, "
+                    f"long-term in {lot['days_to_long_term']} day(s); the "
+                    f"gate holds until then"
                 )
             elif lot["crossed_decline_review_threshold"]:
                 print(
                     f"    {position['ticker']} lot {lot['lot_id']}: "
                     f"{lot['unrealized_pnl_pct']:+.2f}% "
-                    f"(${lot['unrealized_pnl']:+,.2f})"
+                    f"(${lot['unrealized_pnl']:+,.2f}) -- decline review"
                 )
     print(
         f"  reinvest sleeve ${reinvest['total_market_value']} "

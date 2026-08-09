@@ -360,17 +360,33 @@ DIVIDEND_REINVEST_TICKERS = ["NVDL", "SOXL", "TQQQ"]
 # behavior change this config must not smuggle in.
 SINGLE_STOCK_INCOME_ETF_UNDERLYING = {"NVDY": "NVDA"}
 
-# Engine thresholds. Exact boundaries, owner-adopted 2026-08-09:
-# - dividend sleeve warns when its share of total equity is below 10.00%
-#   (low end of the owner's 10-15% range: max_position_pct 5% means a 15%
-#   sleeve needs all three names at cap with zero slack);
-# - a growth lot at or above +5.00% unrealized crosses the gain-review
-#   threshold; at or below -10.00% it crosses the decline-review
-#   threshold. Per-LOT basis (cost_per_share), never average cost --
-#   averaging down creates a new lot with its own thresholds and leaves
-#   existing lots' references untouched.
+# Engine thresholds. Exact boundaries. REVISION 2, owner-adopted
+# 2026-08-09 after a measured backtest rejected revision 1's +5% any-term
+# full exit (3.29% after-tax CAGR vs 48.14% buy-and-hold on the same six
+# names over 7y -- the rule stranded 95-99% of days in cash; see the
+# dated scripts/backtest_three_sleeve_* experiment scripts and the
+# research_findings.json entry). The revised gain review:
+#
+# - fires only at or above +50.00% unrealized on the LOT'S OWN basis;
+# - fires only once the lot is LONG-TERM (the tax mechanism made binding:
+#   a scheduled sale can never realize a short-term gain); and
+# - proposes trimming HALF the lot, never exiting it, so a winner keeps
+#   running -- measured 26.33% vs 3.29% CAGR, with zero short-term gains
+#   and threshold-insensitivity (+50 vs +100 within 0.1 CAGR point).
+#
+# Unchanged by revision 2:
+# - dividend sleeve warns below 10.00% of total equity (low end of the
+#   owner's 10-15% range: max_position_pct 5% means a 15% sleeve needs
+#   all three names at cap with zero slack);
+# - a lot at or below -10.00% crosses the decline-review threshold
+#   (measured harmless-to-good across every variant);
+# - per-LOT basis (cost_per_share), never average cost -- averaging down
+#   creates a new lot with its own thresholds and leaves existing lots'
+#   references untouched.
 DIVIDEND_SLEEVE_FLOOR_PCT = 10.0
-GROWTH_GAIN_REVIEW_THRESHOLD_PCT = 5.0
+GROWTH_GAIN_REVIEW_THRESHOLD_PCT = 50.0
+GROWTH_GAIN_REVIEW_REQUIRES_LONG_TERM = True
+GROWTH_GAIN_REVIEW_TRIM_FRACTION = 0.5
 GROWTH_DECLINE_REVIEW_THRESHOLD_PCT = -10.0
 
 # Market regime classifier (signals/regime.py) — momentum showed a real,

@@ -173,7 +173,7 @@ versioned, labeled independently by `EvidenceStatus`
 strategy can carry a confirmed claim and a rejected claim at the same time
 (see SOXX/SOXL below).
 
-As of the current registry (`research_findings.json` version 1.4.1):
+As of the current registry (`research_findings.json` version 1.5.0):
 
 - **Rejected** (did not survive full confirmation and dependence-aware
   testing): the original z-score scanner; cross-sectional momentum (12-1
@@ -182,11 +182,15 @@ As of the current registry (`research_findings.json` version 1.4.1):
   analyst price-target consensus gap; cross-asset macro signals (VIX spike,
   credit spread, yield curve); QQQ/TQQQ regime rotation; SOXX/SOXL rotation's
   **excess-return** claim (the pre-tax edge disappeared once realistic
-  short-term capital-gains tax was modeled); and Kelly-criterion sizing with
+  short-term capital-gains tax was modeled); Kelly-criterion sizing with
   a one-way profit ratchet (looked like a breakthrough on one
   discovery/confirmation split, then failed walk-forward validation -- it
   can never re-lever once trimmed, so it structurally misses upside in an
-  extended bull market).
+  extended bull market); and the three-sleeve engine's original growth rule
+  (+5% any-term full exit / -10% add -- structurally stranded 95-99% of
+  days in cash for 3.29% after-tax CAGR vs 48.14% holding the same names;
+  rejected on a single descriptive window and revised to a long-term-gated
+  trim before any notification code encoded it).
 - **Confirmed**: SOXX/SOXL trend/volatility rotation's **drawdown-reduction**
   claim (materially lower max drawdown across confirmation, walk-forward,
   sensitivity, and tax/cost checks -- a risk result, not an excess-return

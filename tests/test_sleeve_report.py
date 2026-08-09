@@ -96,19 +96,22 @@ def _dividend_posting(amount: str, ticker: str | None = "JEPQ") -> dict:
 # ---------------------------------------------------------------------------
 
 
-def test_gain_review_threshold_is_inclusive_at_exactly_five_percent():
-    """Cost 100, price 105 -> exactly +5.00%: crossed. Price 104.99: not."""
+def test_gain_review_threshold_is_inclusive_at_the_exact_boundary():
+    """Generic inclusivity, gate off: cost 100, threshold +5, price 105 ->
+    exactly +5.00% is crossed; 104.99 is not."""
     ledger = build_ledger([_buy("NVDA", 10, 100.0, days_ago=30)])
 
     at_boundary = evaluate_sleeves(
-        _snapshot([_position("NVDA", 10, 105.0)]), ledger, []
+        _snapshot([_position("NVDA", 10, 105.0)]), ledger, [],
+        gain_threshold_pct=5.0, gain_requires_long_term=False,
     )
     lots = at_boundary["growth_sleeve"]["positions"][0]["lots"]
     assert lots[0]["crossed_gain_review_threshold"] is True
     assert at_boundary["growth_sleeve"]["lots_at_gain_review"] == 1
 
     below = evaluate_sleeves(
-        _snapshot([_position("NVDA", 10, 104.99)]), ledger, []
+        _snapshot([_position("NVDA", 10, 104.99)]), ledger, [],
+        gain_threshold_pct=5.0, gain_requires_long_term=False,
     )
     assert (
         below["growth_sleeve"]["positions"][0]["lots"][0][
@@ -117,6 +120,56 @@ def test_gain_review_threshold_is_inclusive_at_exactly_five_percent():
         is False
     )
     assert below["growth_sleeve"]["lots_at_gain_review"] == 0
+
+
+def test_default_gain_review_is_fifty_percent_and_long_term_gated():
+    """Revision 2 defaults. A +55% lot that is 340 days old has NOT crossed
+    gain review -- it is 'awaiting long-term', with the countdown as its
+    content. The same lot at 400 days old crosses.
+
+    Collapsing these two states is the dangerous direction: it would
+    reintroduce short-term sales through an eager reader of the flag.
+    """
+    young = build_ledger([_buy("NVDA", 10, 100.0, days_ago=340)])
+    report = evaluate_sleeves(_snapshot([_position("NVDA", 10, 155.0)]), young, [])
+    lot = report["growth_sleeve"]["positions"][0]["lots"][0]
+    assert lot["crossed_gain_review_threshold"] is False
+    assert lot["gain_threshold_met_awaiting_long_term"] is True
+    assert 0 < lot["days_to_long_term"] <= 30
+    assert report["growth_sleeve"]["lots_at_gain_review"] == 0
+    assert report["growth_sleeve"]["lots_awaiting_long_term"] == 1
+
+    seasoned = build_ledger([_buy("NVDA", 10, 100.0, days_ago=400)])
+    report = evaluate_sleeves(_snapshot([_position("NVDA", 10, 155.0)]), seasoned, [])
+    lot = report["growth_sleeve"]["positions"][0]["lots"][0]
+    assert lot["crossed_gain_review_threshold"] is True
+    assert lot["gain_threshold_met_awaiting_long_term"] is False
+    assert lot["term_if_sold_now"] == "long"
+    assert report["growth_sleeve"]["lots_at_gain_review"] == 1
+    assert report["growth_sleeve"]["lots_awaiting_long_term"] == 0
+
+
+def test_default_fifty_percent_boundary_is_inclusive_for_a_long_term_lot():
+    """Exactly +50.00% on a long-term lot crosses; 149.99 does not."""
+    ledger = build_ledger([_buy("NVDA", 10, 100.0, days_ago=400)])
+    at_boundary = evaluate_sleeves(_snapshot([_position("NVDA", 10, 150.0)]), ledger, [])
+    assert at_boundary["growth_sleeve"]["lots_at_gain_review"] == 1
+    below = evaluate_sleeves(_snapshot([_position("NVDA", 10, 149.99)]), ledger, [])
+    assert below["growth_sleeve"]["lots_at_gain_review"] == 0
+    assert below["growth_sleeve"]["lots_awaiting_long_term"] == 0
+
+
+def test_gate_off_counts_a_short_term_lot_as_crossed():
+    """gain_requires_long_term=False restores ungated semantics, and the
+    awaiting field then never fires."""
+    ledger = build_ledger([_buy("NVDA", 10, 100.0, days_ago=30)])
+    report = evaluate_sleeves(
+        _snapshot([_position("NVDA", 10, 155.0)]), ledger, [],
+        gain_requires_long_term=False,
+    )
+    lot = report["growth_sleeve"]["positions"][0]["lots"][0]
+    assert lot["crossed_gain_review_threshold"] is True
+    assert lot["gain_threshold_met_awaiting_long_term"] is False
 
 
 def test_decline_review_threshold_is_inclusive_at_exactly_minus_ten_percent():
@@ -147,7 +200,10 @@ def test_thresholds_are_per_lot_not_average_cost():
             _buy("MSFT", 10, 90.0, days_ago=30, fill_id="b"),
         ]
     )
-    report = evaluate_sleeves(_snapshot([_position("MSFT", 20, 96.0)]), ledger, [])
+    report = evaluate_sleeves(
+        _snapshot([_position("MSFT", 20, 96.0)]), ledger, [],
+        gain_threshold_pct=5.0, gain_requires_long_term=False,
+    )
     lots = report["growth_sleeve"]["positions"][0]["lots"]
     by_cost = {lot["cost_per_share"]: lot for lot in lots}
     assert by_cost[100.0]["crossed_gain_review_threshold"] is False
@@ -155,15 +211,20 @@ def test_thresholds_are_per_lot_not_average_cost():
     assert report["growth_sleeve"]["lots_at_gain_review"] == 1
 
 
-def test_gain_review_carries_the_tax_mechanism_fields():
-    """Owner mandate (2026-08-09): every gain crossing shows term and the
-    long-term countdown so the tax consequence is visible before acting."""
+def test_every_lot_row_carries_the_tax_mechanism_fields():
+    """Owner mandate (2026-08-09): term and the long-term countdown ride on
+    every lot row, crossed or not, so the tax consequence is visible before
+    acting. Under revision 2 the gate CONSUMES these fields; they must
+    still be present for a reader."""
     ledger = build_ledger([_buy("NVDA", 10, 100.0, days_ago=340)])
     report = evaluate_sleeves(_snapshot([_position("NVDA", 10, 110.0)]), ledger, [])
     lot = report["growth_sleeve"]["positions"][0]["lots"][0]
-    assert lot["crossed_gain_review_threshold"] is True
     assert lot["term_if_sold_now"] == "short"
     assert 0 < lot["days_to_long_term"] <= 30
+    # +10% is far below the revision-2 threshold: neither crossed nor
+    # awaiting -- proximity to the gate is not the same as price crossing.
+    assert lot["crossed_gain_review_threshold"] is False
+    assert lot["gain_threshold_met_awaiting_long_term"] is False
 
 
 # ---------------------------------------------------------------------------
@@ -222,15 +283,15 @@ def test_position_with_no_lots_reports_none_coverage_not_zero_crossings():
 
 
 def test_partial_lot_coverage_reports_both_share_counts():
-    ledger = build_ledger([_buy("NVDA", 4, 100.0, days_ago=30)])
-    report = evaluate_sleeves(_snapshot([_position("NVDA", 10, 120.0)]), ledger, [])
+    ledger = build_ledger([_buy("NVDA", 4, 100.0, days_ago=400)])
+    report = evaluate_sleeves(_snapshot([_position("NVDA", 10, 160.0)]), ledger, [])
     position = report["growth_sleeve"]["positions"][0]
     assert position["lot_coverage"] == "partial"
     assert position["snapshot_shares"] == 10
     assert position["ledger_lot_shares"] == 4
     assert "10" in position["coverage_reason"]
     assert "4" in position["coverage_reason"]
-    # The covered lot is still reviewed.
+    # The covered lot is still reviewed (+60%, long-term -> crossed).
     assert position["lots"][0]["crossed_gain_review_threshold"] is True
 
 
@@ -283,11 +344,25 @@ def test_unusable_equity_refuses_the_report(equity):
         {"floor_pct": -1.0},
         {"floor_pct": math.nan},
         {"gain_threshold_pct": math.inf},
+        {"gain_trim_fraction": 0.0},
+        {"gain_trim_fraction": 1.5},
+        {"gain_trim_fraction": -0.5},
+        {"gain_trim_fraction": math.nan},
+        {"gain_trim_fraction": True},
     ],
 )
 def test_nonsense_thresholds_are_rejected(kwargs):
     with pytest.raises(SleeveReportError):
         evaluate_sleeves(_snapshot([]), _EMPTY_LEDGER, [], **kwargs)
+
+
+def test_trim_fraction_of_exactly_one_is_a_full_exit_and_allowed():
+    """1.0 is the boundary: 'trim the whole lot' is a legal (if unwise)
+    owner preference; 0.0 -- 'trim nothing' -- is meaningless and refused."""
+    report = evaluate_sleeves(
+        _snapshot([]), _EMPTY_LEDGER, [], gain_trim_fraction=1.0
+    )
+    assert report["engine"]["gain_review_trim_fraction"] == 1.0
 
 
 # ---------------------------------------------------------------------------
@@ -417,13 +492,17 @@ def test_report_carries_no_action_shaped_field():
         [
             _buy("NVDA", 10, 100.0, days_ago=340),
             _buy("AMD", 10, 100.0, days_ago=30),
+            _buy("TSM", 10, 100.0, days_ago=400),
         ]
     )
+    # Fixture exercises every revision-2 state at once: NVDA +55% short-term
+    # (awaiting), AMD -15% (decline), TSM +60% long-term (crossed).
     report = evaluate_sleeves(
         _snapshot(
             [
-                _position("NVDA", 10, 110.0),
+                _position("NVDA", 10, 155.0),
                 _position("AMD", 10, 85.0),
+                _position("TSM", 10, 160.0),
                 _position("JEPQ", 100, 10.0),
                 _position("NVDY", 100, 13.0),
                 _position("NVDL", 20, 36.0),
@@ -432,6 +511,9 @@ def test_report_carries_no_action_shaped_field():
         ledger,
         [_dividend_posting("-50"), _dividend_posting("-10", ticker=None)],
     )
+    assert report["growth_sleeve"]["lots_at_gain_review"] == 1
+    assert report["growth_sleeve"]["lots_awaiting_long_term"] == 1
+    assert report["growth_sleeve"]["lots_at_decline_review"] == 1
     forbidden = ("buy", "sell", "order", "recommend", "suggest", "should", "trade")
     offending = [
         key
@@ -455,6 +537,11 @@ def test_engine_metadata_names_preference_not_research():
     report = evaluate_sleeves(_snapshot([]), _EMPTY_LEDGER, [])
     assert "not validated research" in report["engine"]["authority"]
     assert report["engine"]["threshold_basis"] == "per_lot_cost_per_share"
+    # Revision 2 metadata: the gate and the trim fraction are part of the
+    # rule's identity and must ride with every report.
+    assert report["engine"]["gain_review_requires_long_term"] is True
+    assert report["engine"]["gain_review_trim_fraction"] == 0.5
+    assert report["engine"]["gain_review_threshold_pct"] == "50"
 
 
 # ---------------------------------------------------------------------------
@@ -537,6 +624,19 @@ def test_sleeve_lists_do_not_overlap_each_other():
     assert not dividend & growth
     assert not dividend & reinvest
     assert not growth & reinvest
+
+
+def test_engine_config_values_are_shaped_like_the_rule():
+    """Types and ranges only -- the VALUES are owner preference and may
+    change; the shape may not. A trim fraction outside (0, 1], a
+    non-positive gain threshold, a non-negative decline threshold, or a
+    non-bool gate would each silently corrupt every downstream consumer."""
+    assert isinstance(config.GROWTH_GAIN_REVIEW_REQUIRES_LONG_TERM, bool)
+    assert isinstance(config.GROWTH_GAIN_REVIEW_TRIM_FRACTION, float)
+    assert 0 < config.GROWTH_GAIN_REVIEW_TRIM_FRACTION <= 1
+    assert config.GROWTH_GAIN_REVIEW_THRESHOLD_PCT > 0
+    assert config.GROWTH_DECLINE_REVIEW_THRESHOLD_PCT < 0
+    assert config.DIVIDEND_SLEEVE_FLOOR_PCT >= 0
 
 
 def test_single_stock_income_map_is_not_in_leveraged_accounting():

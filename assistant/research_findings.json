@@ -1,202 +1,217 @@
 {
-  "version": "1.4.1",
-  "updated_at": "2026-07-30",
-  "findings": [
-    {
-      "label": "Original z-score dip/up scanner",
-      "claim": "Beats a random-day baseline out-of-sample",
-      "status": "rejected",
-      "detail": "0/32 basket x direction cells significant at 2-year or 7-year lookback across the full 104-ticker universe.",
-      "source": "README: signal findings",
-      "relevant_tickers": []
-    },
-    {
-      "label": "Cross-sectional momentum (12-1 month)",
-      "claim": "Beats a random-day baseline out-of-sample",
-      "status": "rejected",
-      "detail": "The row-level result disappeared after block bootstrap accounted for cross-sectional and serial dependence.",
-      "source": "scripts/run_momentum_block_significance.py",
-      "relevant_tickers": []
-    },
-    {
-      "label": "Relative, breakout, PEAD, fundamentals, and analyst-rating signals",
-      "claim": "Beats a random-day baseline out-of-sample",
-      "status": "rejected",
-      "detail": "No tested direction survived confirmation-only, dependence-aware significance testing.",
-      "source": "README: signal findings",
-      "relevant_tickers": []
-    },
-    {
-      "label": "Analyst price-target consensus gap",
-      "claim": "Beats a random-day baseline out-of-sample",
-      "status": "rejected",
-      "detail": "0/2 confirmation-period primary cells significant. The 'dip' leg fired on ~69 tickers/day on average (structural optimism bias in sell-side targets); the 'up' leg showed a discovery-to-confirmation sign flip.",
-      "source": "signals/analyst_target.py",
-      "relevant_tickers": []
-    },
-    {
-      "label": "Cross-asset macro signals (VIX spike, credit spread, yield curve)",
-      "claim": "Beats a random-day baseline out-of-sample",
-      "status": "rejected",
-      "detail": "0/2 confirmation-period primary cells significant for all three signals under same_close (unrealistic) entry timing. Credit spread's 'up' leg looked strongly significant in discovery (p<0.001) but flipped to a small non-significant edge in confirmation. Re-checked 2026-07-26 under realistic next_open entry timing: VIX and yield curve unchanged (still rejected); credit spread's DIP leg flipped from non-significant (p=0.128) to significant (p=0.0, mean edge +1.39%) in confirmation. NOT elevated to confirmed/promising -- testing both timings without pre-registering which one counts is an uncorrected extra look (same multiple-testing risk this project's own by-block docstring warns about for weighting/block-length variants). Treat as an unconfirmed anomaly pending a dedicated, properly-scoped re-test (block-length sensitivity, trade_weighted comparison, and ideally a fresh discovery/confirmation split with next_open pre-registered as the only timing tested) before trusting it. THRESHOLD CORRECTION (2026-07-29): the script that produced the next_open re-check (scripts/run_execution_timing_revalidation.py) was passing the per-signal default n_tests=2 while scanning 5 signals x 2 entry timings x 2 directions = 20 cells in one pass, so its Bonferroni threshold was 0.025 when it should have been 0.05/20 = 0.0025 -- 10x too lenient, in the direction that manufactures false positives. Fixed (the denominator is now derived from the run list, pinned by tests/test_significance_multiplicity.py). This does NOT change the verdict here: the dip leg's confirmation p was below the 2000-resample bootstrap's resolution (reported 0.0, i.e. p<0.0005) and so clears the corrected threshold too, and no other recorded confirmation-period p-value falls in the affected [0.0025, 0.025] window. The anomaly therefore still stands exactly as described above -- unconfirmed, pending the dedicated re-test, and NOT elevated -- for the pre-registration reason already stated, not for a threshold reason. DOWNGRADED 2026-07-30 -- the evidence is now believed to be a measurement artifact, and the dedicated re-test is no longer worth running as specified. The entire case rested on 'p was below the 2000-resample bootstrap's resolution (reported 0.0)'. The block bootstrap was then calibrated directly against pure noise (true mean edge exactly zero) at this finding's own shape -- 31 signal dates, ~100 rows/date, primary block_length=10 -- and it returns exactly p=0.0 on 7% of pure-noise trials under an assumption-free i.i.d. null, and 15.5% under a persistent-common-factor null. Its false-positive rate at the 0.00833 threshold was 10% (12x nominal) and 18.5% respectively. So 'p=0.0 at 31 dates' is roughly what a coin-flip produces one run in seven, not evidence of an edge. Two structural causes, both now fixed in backtest/engine.py: longer blocks were MORE anti-conservative rather than less (12.5% -> 18.5% -> 29% across block lengths 5/10/15), and below ~50 signal dates no block length is calibrated at all (3.5-6.5x nominal), so bootstrap_edge_significance_by_block()/bootstrap_daily_edge_significance_by_block() now REFUSE to emit a p-value in that regime and return a refusal_reason instead. Re-running this signal today produces no p-value at all rather than p=0.0. NOTE THE DIRECTION: the defect made significance EASIER, never harder, so no REJECTED verdict anywhere in this registry is affected -- only positive results at small n_dates are, and this is the only one. A separate re-run on the 2026-07-30 snapshot also showed the YIELD CURVE 'up' leg reading p=0.003 against a 0.00833 threshold; that is likewise inside the uncalibrated regime (n_dates=28) and is a repeated look at an already-rejected hypothesis, so it was deliberately NOT recorded as a finding. See tests/test_block_bootstrap_calibration.py.",
-      "source": "scripts/run_macro_signals_significance_check.py; scripts/run_execution_timing_revalidation.py",
-      "relevant_tickers": []
-    },
-    {
-      "label": "Momentum (12-1 month) and analyst price-target gap under realistic next_open timing",
-      "claim": "Beats a random-day baseline out-of-sample",
-      "status": "rejected",
-      "detail": "Re-checked 2026-07-26 under next_open entry timing (previously only tested under same_close): both remain 0/2 confirmation-period primary cells significant, materially unchanged from the same_close result. Closes the entry-price look-ahead gap from memory:project_execution_realism_gaps for these two signals.",
-      "source": "scripts/run_execution_timing_revalidation.py",
-      "relevant_tickers": []
-    },
-    {
-      "label": "QQQ/TQQQ trend+volatility regime rotation",
-      "claim": "Beats 50/50 buy-and-hold on both CAGR and drawdown",
-      "status": "rejected",
-      "detail": "The apparent result depended on a corrected same-close look-ahead bug and did not survive the main confirmation on CAGR.",
-      "source": "strategies/trend_vol_rotation.py",
-      "relevant_tickers": [
-        "QQQ",
-        "QQQM",
-        "TQQQ"
-      ]
-    },
-    {
-      "label": "SOXX/SOXL trend+volatility regime rotation — return",
-      "claim": "Beats 50/50 buy-and-hold on after-tax CAGR",
-      "status": "rejected",
-      "detail": "The pre-tax return advantage disappeared after the modeled short-term capital-gains tax.",
-      "source": "strategies/trend_vol_rotation.py",
-      "relevant_tickers": [
-        "SOXX",
-        "SOXL"
-      ]
-    },
-    {
-      "label": "SOXX/SOXL trend+volatility regime rotation — drawdown",
-      "claim": "Reduces maximum drawdown versus 50/50 buy-and-hold",
-      "status": "confirmed",
-      "detail": "Maximum drawdown remained materially lower across confirmation, walk-forward, sensitivity, and tax/cost checks. This is a risk result, not a confirmed excess-return result.",
-      "source": "strategies/trend_vol_rotation.py",
-      "relevant_tickers": [
-        "SOXX",
-        "SOXL"
-      ],
-      "provenance": {
-        "actual_start_date": "2019-07-22",
-        "actual_end_date": "2026-07-28",
-        "actual_row_count": 1764,
-        "requested_lookback_sessions": 1764,
-        "actual_lookback_sessions": 1764,
-        "entry_timing": "next_open",
-        "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
-        "reproduced_after_data_loader_fix": false
-      }
-    },
-    {
-      "label": "Kelly-criterion sizing with one-way profit ratchet",
-      "claim": "Improves risk-adjusted return over plain inverse-volatility targeting",
-      "status": "rejected",
-      "detail": "Looked like a breakthrough on a single discovery/confirmation split but failed walk-forward validation. Structural flaw: the one-way ratchet can never re-lever once trimmed, so it structurally misses upside in an extended bull market. Kelly sizing itself (signed mean/variance) is a genuine improvement over inverse-vol targeting; the ratchet is the part that broke.",
-      "source": "strategies/kelly_rotation.py; scripts/run_kelly_ratchet_walkforward_soxx_soxl.py",
-      "relevant_tickers": [
-        "SOXX",
-        "SOXL"
-      ]
-    },
-    {
-      "label": "Wide rebalance band vs. tight/continuous vol-targeting",
-      "claim": "Reduces tax/turnover cost without giving up performance",
-      "status": "confirmed",
-      "detail": "~89% less tax/turnover for essentially the same performance as continuous vol-targeting.",
-      "source": "strategies/vol_target_rotation.py; scripts/run_idea_comparison_soxx_soxl.py",
-      "relevant_tickers": [
-        "SOXX",
-        "SOXL"
-      ],
-      "provenance": {
-        "actual_start_date": "2019-07-22",
-        "actual_end_date": "2026-07-28",
-        "actual_row_count": 1764,
-        "requested_lookback_sessions": 1764,
-        "actual_lookback_sessions": 1764,
-        "entry_timing": "next_open",
-        "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
-        "reproduced_after_data_loader_fix": false
-      }
-    },
-    {
-      "label": "Volatility-targeted leveraged-ETF rotation — 3-pair validation",
-      "claim": "The vol-targeting rotation mechanism generalizes beyond SOXX/SOXL",
-      "status": "promising_unconfirmed",
-      "detail": "Same continuous inverse-vol-targeted weighting tested on SPY/UPRO and NVDA/NVDL in addition to SOXX/SOXL, at the user's request, as production candidates. Backtested/designed only -- not yet in live/paper trading. NVDL has substantially less real history than the other two pairs (see provenance: 907 rows vs. the 1764 requested) -- the NVDA/NVDL leg of this result is based on a materially shorter, less statistically meaningful window than SOXX/SOXL or SPY/UPRO.",
-      "source": "scripts/run_vol_target_rotation_spy_upro.py; scripts/run_vol_target_rotation_nvda_nvdl.py; scripts/run_vol_target_rotation_soxx_soxl.py",
-      "relevant_tickers": [
-        "SOXX",
-        "SOXL",
-        "SPY",
-        "UPRO",
-        "NVDA",
-        "NVDL"
-      ],
-      "provenance": {
-        "actual_start_date": "2022-12-13",
-        "actual_end_date": "2026-07-28",
-        "actual_row_count": 907,
-        "requested_lookback_sessions": 1764,
-        "actual_lookback_sessions": 907,
-        "entry_timing": "next_open",
-        "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
-        "reproduced_after_data_loader_fix": false
-      }
-    },
-    {
-      "label": "Defensive-carry sleeve (TLT/IEF/SHY/GLD) blended into an equal-weight UNIVERSE portfolio",
-      "claim": "Reduces combined-portfolio drawdown/expected-shortfall vs. an equal-weight UNIVERSE baseline without giving up more upside than downside, relative to SPY",
-      "status": "exploratory",
-      "detail": "scripts/run_defensive_carry_probe.py, single 2019-07-22 to 2026-07-28 lookback window (1762-1763 sessions), no walk-forward or out-of-sample split yet. Carry-basket correlation to the UNIVERSE baseline was 0.041 and to SPY was 0.009 (near-zero, as expected for Treasuries/gold vs. equities); per-ticker vs SPY: TLT -0.121, IEF -0.078, SHY -0.009, GLD 0.134. The UNIVERSE-only baseline itself runs hot relative to SPY (downside_capture_pct 118.2, upside_capture_pct 120.8 -- this project's universe is semiconductor/tech-heavy). Blending in the carry basket monotonically reduced both max_drawdown_pct (-35.1% at 0% carry -> -26.7% at 30% carry) and expected_shortfall_pct_95 (-3.50% -> -2.70%) as the carry weight increased from 0% to 30%, while narrowing both capture ratios toward 100% (downside_capture_pct 118.2 -> 92.4%, upside_capture_pct 120.8 -> 95.1%). At the 30%-carry weight, downside capture (92.4%) was slightly BELOW upside capture (95.1%) -- a mildly asymmetric, favorable result on this single window -- but this is one lookback window with no significance testing, no walk-forward confirmation, and 3 candidate weights tested alongside the 0% baseline (a small multiple-comparisons surface). Not a recommendation and not a live/paper allocation change.",
-      "source": "scripts/run_defensive_carry_probe.py",
-      "relevant_tickers": [
-        "TLT",
-        "IEF",
-        "SHY",
-        "GLD"
-      ]
-    },
-    {
-      "label": "Idiosyncratic volatility (low-vol anomaly proxy, residualized vs QQQ)",
-      "claim": "Low idiosyncratic volatility predicts positive forward returns",
-      "status": "rejected",
-      "detail": "Regressed each stock against QQQ monthly, ranked by residual volatility. Commit 8605f0e: 'Clean rejection' under the project's full out-of-sample + confirmation-only + block-bootstrap rigor bar, under a pre-registered shared n_tests=4 Bonferroni correction across the four-signal family tested together.",
-      "source": "commit 8605f0e; signals/idio_vol.py",
-      "relevant_tickers": []
-    },
-    {
-      "label": "Variance risk premium (VIX^2 minus realized QQQ variance)",
-      "claim": "The realized-vs-implied variance gap predicts forward returns/regime",
-      "status": "rejected",
-      "detail": "A portfolio-exposure/regime signal, not a per-ticker one. Commit 8605f0e: the first pass at a 7-year lookback was underpowered (9-13 confirmation observations); extended to ~26 years (QQQ/VIX real history back to 2000) for what the commit calls an 'adequately-powered, genuine rejection', under the same pre-registered n_tests=4 Bonferroni correction.",
-      "source": "commit 8605f0e; signals/variance_risk_premium.py",
-      "relevant_tickers": [
-        "QQQ"
-      ]
-    },
-    {
-      "label": "Residual momentum (12-1 formation, ranked by residual return vs QQQ)",
-      "claim": "Residualizing standard cross-sectional momentum against QQQ rescues the already-rejected raw-momentum signal",
-      "status": "rejected",
-      "detail": "Standard 12-1 cross-sectional momentum was already rejected in this project after three separate statistical traps were caught on it (see the project's other momentum finding). Commit 8605f0e: 'residualizing did not rescue it... explicitly the final momentum-family test per the source recommendation', under the same pre-registered n_tests=4 Bonferroni correction.",
-      "source": "commit 8605f0e; signals/residual_momentum.py",
-      "relevant_tickers": []
-    },
-    {
-      "label": "Overnight-gap reversal (today's open vs yesterday's close)",
-      "claim": "A stock's overnight gap partially reverses during the following trading day",
-      "status": "rejected",
-      "detail": "Required new backtest infrastructure -- entry_timing='same_day_open_to_close' added to run_backtest()/run_baseline_forward_returns() as a small additive third branch alongside same_close/next_open (kept in the codebase as generic infrastructure after this signal's removal -- it doesn't touch prior behavior and has its own independent test coverage). Commit 8605f0e's opening statement covers all four signals in this family as rejected under the project's full out-of-sample + confirmation-only + block-bootstrap rigor bar with the same pre-registered n_tests=4 Bonferroni correction; unlike the other three, the commit message doesn't restate a signal-specific numeric result for this one beyond that shared statement -- recorded here on that basis without inventing a more specific figure the source doesn't provide.",
-      "source": "commit 8605f0e; signals/overnight_gap.py",
-      "relevant_tickers": []
-    }
-  ]
+ "version": "1.5.0",
+ "updated_at": "2026-08-09",
+ "findings": [
+  {
+   "label": "Original z-score dip/up scanner",
+   "claim": "Beats a random-day baseline out-of-sample",
+   "status": "rejected",
+   "detail": "0/32 basket x direction cells significant at 2-year or 7-year lookback across the full 104-ticker universe.",
+   "source": "README: signal findings",
+   "relevant_tickers": []
+  },
+  {
+   "label": "Cross-sectional momentum (12-1 month)",
+   "claim": "Beats a random-day baseline out-of-sample",
+   "status": "rejected",
+   "detail": "The row-level result disappeared after block bootstrap accounted for cross-sectional and serial dependence.",
+   "source": "scripts/run_momentum_block_significance.py",
+   "relevant_tickers": []
+  },
+  {
+   "label": "Relative, breakout, PEAD, fundamentals, and analyst-rating signals",
+   "claim": "Beats a random-day baseline out-of-sample",
+   "status": "rejected",
+   "detail": "No tested direction survived confirmation-only, dependence-aware significance testing.",
+   "source": "README: signal findings",
+   "relevant_tickers": []
+  },
+  {
+   "label": "Analyst price-target consensus gap",
+   "claim": "Beats a random-day baseline out-of-sample",
+   "status": "rejected",
+   "detail": "0/2 confirmation-period primary cells significant. The 'dip' leg fired on ~69 tickers/day on average (structural optimism bias in sell-side targets); the 'up' leg showed a discovery-to-confirmation sign flip.",
+   "source": "signals/analyst_target.py",
+   "relevant_tickers": []
+  },
+  {
+   "label": "Cross-asset macro signals (VIX spike, credit spread, yield curve)",
+   "claim": "Beats a random-day baseline out-of-sample",
+   "status": "rejected",
+   "detail": "0/2 confirmation-period primary cells significant for all three signals under same_close (unrealistic) entry timing. Credit spread's 'up' leg looked strongly significant in discovery (p<0.001) but flipped to a small non-significant edge in confirmation. Re-checked 2026-07-26 under realistic next_open entry timing: VIX and yield curve unchanged (still rejected); credit spread's DIP leg flipped from non-significant (p=0.128) to significant (p=0.0, mean edge +1.39%) in confirmation. NOT elevated to confirmed/promising -- testing both timings without pre-registering which one counts is an uncorrected extra look (same multiple-testing risk this project's own by-block docstring warns about for weighting/block-length variants). Treat as an unconfirmed anomaly pending a dedicated, properly-scoped re-test (block-length sensitivity, trade_weighted comparison, and ideally a fresh discovery/confirmation split with next_open pre-registered as the only timing tested) before trusting it. THRESHOLD CORRECTION (2026-07-29): the script that produced the next_open re-check (scripts/run_execution_timing_revalidation.py) was passing the per-signal default n_tests=2 while scanning 5 signals x 2 entry timings x 2 directions = 20 cells in one pass, so its Bonferroni threshold was 0.025 when it should have been 0.05/20 = 0.0025 -- 10x too lenient, in the direction that manufactures false positives. Fixed (the denominator is now derived from the run list, pinned by tests/test_significance_multiplicity.py). This does NOT change the verdict here: the dip leg's confirmation p was below the 2000-resample bootstrap's resolution (reported 0.0, i.e. p<0.0005) and so clears the corrected threshold too, and no other recorded confirmation-period p-value falls in the affected [0.0025, 0.025] window. The anomaly therefore still stands exactly as described above -- unconfirmed, pending the dedicated re-test, and NOT elevated -- for the pre-registration reason already stated, not for a threshold reason. DOWNGRADED 2026-07-30 -- the evidence is now believed to be a measurement artifact, and the dedicated re-test is no longer worth running as specified. The entire case rested on 'p was below the 2000-resample bootstrap's resolution (reported 0.0)'. The block bootstrap was then calibrated directly against pure noise (true mean edge exactly zero) at this finding's own shape -- 31 signal dates, ~100 rows/date, primary block_length=10 -- and it returns exactly p=0.0 on 7% of pure-noise trials under an assumption-free i.i.d. null, and 15.5% under a persistent-common-factor null. Its false-positive rate at the 0.00833 threshold was 10% (12x nominal) and 18.5% respectively. So 'p=0.0 at 31 dates' is roughly what a coin-flip produces one run in seven, not evidence of an edge. Two structural causes, both now fixed in backtest/engine.py: longer blocks were MORE anti-conservative rather than less (12.5% -> 18.5% -> 29% across block lengths 5/10/15), and below ~50 signal dates no block length is calibrated at all (3.5-6.5x nominal), so bootstrap_edge_significance_by_block()/bootstrap_daily_edge_significance_by_block() now REFUSE to emit a p-value in that regime and return a refusal_reason instead. Re-running this signal today produces no p-value at all rather than p=0.0. NOTE THE DIRECTION: the defect made significance EASIER, never harder, so no REJECTED verdict anywhere in this registry is affected -- only positive results at small n_dates are, and this is the only one. A separate re-run on the 2026-07-30 snapshot also showed the YIELD CURVE 'up' leg reading p=0.003 against a 0.00833 threshold; that is likewise inside the uncalibrated regime (n_dates=28) and is a repeated look at an already-rejected hypothesis, so it was deliberately NOT recorded as a finding. See tests/test_block_bootstrap_calibration.py.",
+   "source": "scripts/run_macro_signals_significance_check.py; scripts/run_execution_timing_revalidation.py",
+   "relevant_tickers": []
+  },
+  {
+   "label": "Momentum (12-1 month) and analyst price-target gap under realistic next_open timing",
+   "claim": "Beats a random-day baseline out-of-sample",
+   "status": "rejected",
+   "detail": "Re-checked 2026-07-26 under next_open entry timing (previously only tested under same_close): both remain 0/2 confirmation-period primary cells significant, materially unchanged from the same_close result. Closes the entry-price look-ahead gap from memory:project_execution_realism_gaps for these two signals.",
+   "source": "scripts/run_execution_timing_revalidation.py",
+   "relevant_tickers": []
+  },
+  {
+   "label": "QQQ/TQQQ trend+volatility regime rotation",
+   "claim": "Beats 50/50 buy-and-hold on both CAGR and drawdown",
+   "status": "rejected",
+   "detail": "The apparent result depended on a corrected same-close look-ahead bug and did not survive the main confirmation on CAGR.",
+   "source": "strategies/trend_vol_rotation.py",
+   "relevant_tickers": [
+    "QQQ",
+    "QQQM",
+    "TQQQ"
+   ]
+  },
+  {
+   "label": "SOXX/SOXL trend+volatility regime rotation \u2014 return",
+   "claim": "Beats 50/50 buy-and-hold on after-tax CAGR",
+   "status": "rejected",
+   "detail": "The pre-tax return advantage disappeared after the modeled short-term capital-gains tax.",
+   "source": "strategies/trend_vol_rotation.py",
+   "relevant_tickers": [
+    "SOXX",
+    "SOXL"
+   ]
+  },
+  {
+   "label": "SOXX/SOXL trend+volatility regime rotation \u2014 drawdown",
+   "claim": "Reduces maximum drawdown versus 50/50 buy-and-hold",
+   "status": "confirmed",
+   "detail": "Maximum drawdown remained materially lower across confirmation, walk-forward, sensitivity, and tax/cost checks. This is a risk result, not a confirmed excess-return result.",
+   "source": "strategies/trend_vol_rotation.py",
+   "relevant_tickers": [
+    "SOXX",
+    "SOXL"
+   ],
+   "provenance": {
+    "actual_start_date": "2019-07-22",
+    "actual_end_date": "2026-07-28",
+    "actual_row_count": 1764,
+    "requested_lookback_sessions": 1764,
+    "actual_lookback_sessions": 1764,
+    "entry_timing": "next_open",
+    "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
+    "reproduced_after_data_loader_fix": false
+   }
+  },
+  {
+   "label": "Kelly-criterion sizing with one-way profit ratchet",
+   "claim": "Improves risk-adjusted return over plain inverse-volatility targeting",
+   "status": "rejected",
+   "detail": "Looked like a breakthrough on a single discovery/confirmation split but failed walk-forward validation. Structural flaw: the one-way ratchet can never re-lever once trimmed, so it structurally misses upside in an extended bull market. Kelly sizing itself (signed mean/variance) is a genuine improvement over inverse-vol targeting; the ratchet is the part that broke.",
+   "source": "strategies/kelly_rotation.py; scripts/run_kelly_ratchet_walkforward_soxx_soxl.py",
+   "relevant_tickers": [
+    "SOXX",
+    "SOXL"
+   ]
+  },
+  {
+   "label": "Wide rebalance band vs. tight/continuous vol-targeting",
+   "claim": "Reduces tax/turnover cost without giving up performance",
+   "status": "confirmed",
+   "detail": "~89% less tax/turnover for essentially the same performance as continuous vol-targeting.",
+   "source": "strategies/vol_target_rotation.py; scripts/run_idea_comparison_soxx_soxl.py",
+   "relevant_tickers": [
+    "SOXX",
+    "SOXL"
+   ],
+   "provenance": {
+    "actual_start_date": "2019-07-22",
+    "actual_end_date": "2026-07-28",
+    "actual_row_count": 1764,
+    "requested_lookback_sessions": 1764,
+    "actual_lookback_sessions": 1764,
+    "entry_timing": "next_open",
+    "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
+    "reproduced_after_data_loader_fix": false
+   }
+  },
+  {
+   "label": "Volatility-targeted leveraged-ETF rotation \u2014 3-pair validation",
+   "claim": "The vol-targeting rotation mechanism generalizes beyond SOXX/SOXL",
+   "status": "promising_unconfirmed",
+   "detail": "Same continuous inverse-vol-targeted weighting tested on SPY/UPRO and NVDA/NVDL in addition to SOXX/SOXL, at the user's request, as production candidates. Backtested/designed only -- not yet in live/paper trading. NVDL has substantially less real history than the other two pairs (see provenance: 907 rows vs. the 1764 requested) -- the NVDA/NVDL leg of this result is based on a materially shorter, less statistically meaningful window than SOXX/SOXL or SPY/UPRO.",
+   "source": "scripts/run_vol_target_rotation_spy_upro.py; scripts/run_vol_target_rotation_nvda_nvdl.py; scripts/run_vol_target_rotation_soxx_soxl.py",
+   "relevant_tickers": [
+    "SOXX",
+    "SOXL",
+    "SPY",
+    "UPRO",
+    "NVDA",
+    "NVDL"
+   ],
+   "provenance": {
+    "actual_start_date": "2022-12-13",
+    "actual_end_date": "2026-07-28",
+    "actual_row_count": 907,
+    "requested_lookback_sessions": 1764,
+    "actual_lookback_sessions": 907,
+    "entry_timing": "next_open",
+    "data_fetched_at": "2026-07-28T14:53:45.975519+00:00",
+    "reproduced_after_data_loader_fix": false
+   }
+  },
+  {
+   "label": "Defensive-carry sleeve (TLT/IEF/SHY/GLD) blended into an equal-weight UNIVERSE portfolio",
+   "claim": "Reduces combined-portfolio drawdown/expected-shortfall vs. an equal-weight UNIVERSE baseline without giving up more upside than downside, relative to SPY",
+   "status": "exploratory",
+   "detail": "scripts/run_defensive_carry_probe.py, single 2019-07-22 to 2026-07-28 lookback window (1762-1763 sessions), no walk-forward or out-of-sample split yet. Carry-basket correlation to the UNIVERSE baseline was 0.041 and to SPY was 0.009 (near-zero, as expected for Treasuries/gold vs. equities); per-ticker vs SPY: TLT -0.121, IEF -0.078, SHY -0.009, GLD 0.134. The UNIVERSE-only baseline itself runs hot relative to SPY (downside_capture_pct 118.2, upside_capture_pct 120.8 -- this project's universe is semiconductor/tech-heavy). Blending in the carry basket monotonically reduced both max_drawdown_pct (-35.1% at 0% carry -> -26.7% at 30% carry) and expected_shortfall_pct_95 (-3.50% -> -2.70%) as the carry weight increased from 0% to 30%, while narrowing both capture ratios toward 100% (downside_capture_pct 118.2 -> 92.4%, upside_capture_pct 120.8 -> 95.1%). At the 30%-carry weight, downside capture (92.4%) was slightly BELOW upside capture (95.1%) -- a mildly asymmetric, favorable result on this single window -- but this is one lookback window with no significance testing, no walk-forward confirmation, and 3 candidate weights tested alongside the 0% baseline (a small multiple-comparisons surface). Not a recommendation and not a live/paper allocation change.",
+   "source": "scripts/run_defensive_carry_probe.py",
+   "relevant_tickers": [
+    "TLT",
+    "IEF",
+    "SHY",
+    "GLD"
+   ]
+  },
+  {
+   "label": "Idiosyncratic volatility (low-vol anomaly proxy, residualized vs QQQ)",
+   "claim": "Low idiosyncratic volatility predicts positive forward returns",
+   "status": "rejected",
+   "detail": "Regressed each stock against QQQ monthly, ranked by residual volatility. Commit 8605f0e: 'Clean rejection' under the project's full out-of-sample + confirmation-only + block-bootstrap rigor bar, under a pre-registered shared n_tests=4 Bonferroni correction across the four-signal family tested together.",
+   "source": "commit 8605f0e; signals/idio_vol.py",
+   "relevant_tickers": []
+  },
+  {
+   "label": "Variance risk premium (VIX^2 minus realized QQQ variance)",
+   "claim": "The realized-vs-implied variance gap predicts forward returns/regime",
+   "status": "rejected",
+   "detail": "A portfolio-exposure/regime signal, not a per-ticker one. Commit 8605f0e: the first pass at a 7-year lookback was underpowered (9-13 confirmation observations); extended to ~26 years (QQQ/VIX real history back to 2000) for what the commit calls an 'adequately-powered, genuine rejection', under the same pre-registered n_tests=4 Bonferroni correction.",
+   "source": "commit 8605f0e; signals/variance_risk_premium.py",
+   "relevant_tickers": [
+    "QQQ"
+   ]
+  },
+  {
+   "label": "Residual momentum (12-1 formation, ranked by residual return vs QQQ)",
+   "claim": "Residualizing standard cross-sectional momentum against QQQ rescues the already-rejected raw-momentum signal",
+   "status": "rejected",
+   "detail": "Standard 12-1 cross-sectional momentum was already rejected in this project after three separate statistical traps were caught on it (see the project's other momentum finding). Commit 8605f0e: 'residualizing did not rescue it... explicitly the final momentum-family test per the source recommendation', under the same pre-registered n_tests=4 Bonferroni correction.",
+   "source": "commit 8605f0e; signals/residual_momentum.py",
+   "relevant_tickers": []
+  },
+  {
+   "label": "Overnight-gap reversal (today's open vs yesterday's close)",
+   "claim": "A stock's overnight gap partially reverses during the following trading day",
+   "status": "rejected",
+   "detail": "Required new backtest infrastructure -- entry_timing='same_day_open_to_close' added to run_backtest()/run_baseline_forward_returns() as a small additive third branch alongside same_close/next_open (kept in the codebase as generic infrastructure after this signal's removal -- it doesn't touch prior behavior and has its own independent test coverage). Commit 8605f0e's opening statement covers all four signals in this family as rejected under the project's full out-of-sample + confirmation-only + block-bootstrap rigor bar with the same pre-registered n_tests=4 Bonferroni correction; unlike the other three, the commit message doesn't restate a signal-specific numeric result for this one beyond that shared statement -- recorded here on that basis without inventing a more specific figure the source doesn't provide.",
+   "source": "commit 8605f0e; signals/overnight_gap.py",
+   "relevant_tickers": []
+  },
+  {
+   "label": "Three-sleeve growth rule v1 (+5% any-term full exit / -10% add, per lot)",
+   "claim": "Selling every lot at +5% and re-entering/adding at -10% captures semis/tech upside while limiting drawdown",
+   "status": "rejected",
+   "detail": "scripts/backtest_three_sleeve_rule_2026_08_09.py and scripts/backtest_three_sleeve_revisions_2026_08_09.py, single ~7-year window (1764 sessions to 2026-08-08), NVDA/AMD/AVGO/TSM/MSFT/SOXX, next-open fills, 37%/15% annual tax netting with carryforward, terminal liquidation taxed on both sides, 3% cash yield. Result: 3.29% after-tax CAGR vs 48.14% buy-and-hold on identical names and bankroll; the rule held any lot on only 0.6-5.1% of days (NVDA traded 3 times in 7 years) and at 0% cash yield its CAGR was 0.30% -- the return was almost entirely cash yield. Structural, not marginal: every full-exit variant stranded (+50 any-term 6.5%; long-term-gated full exits ~10.7%) because -10%-from-disposal re-entry rarely arrives in a trending name. The rejection is a time-in-market arithmetic result, robust across start years 2020-2024 and a 3x2 threshold grid. IMPORTANT LIMITS: one historical window; candidate names selected in 2026 with knowledge of their success, so the absolute buy-and-hold figures are survivorship-inflated and are NOT expected returns; the revision-variant grid (trim-half ~26% CAGR, long-term-gated trim costless, accumulator 35.9%) is uncounted exploratory design guidance that informed the owner's revision-2 preference (LT-gated trim-half at +50%, docs/reference/THREE_SLEEVE_ENGINE_PLAN.md section 1.1) and is NOT itself a confirmed finding.",
+   "source": "scripts/backtest_three_sleeve_rule_2026_08_09.py; scripts/backtest_three_sleeve_revisions_2026_08_09.py; docs/reference/THREE_SLEEVE_ENGINE_PLAN.md section 1.1",
+   "relevant_tickers": [
+    "NVDA",
+    "AMD",
+    "AVGO",
+    "TSM",
+    "MSFT",
+    "SOXX"
+   ]
+  }
+ ]
 }

@@ -39,31 +39,88 @@ Plus one standing owner instruction, same date: **keep the tax-reduction
 mechanism** — the tax-consequence surfacing described in §4 is a first-class
 requirement of every milestone, not an optional annotation.
 
+## 1.1 REVISION 2 — the growth rule, revised on measured evidence
+(owner-adopted 2026-08-09, same day, after the backtest)
+
+Before M2 encoded anything, the §1.2 rule was backtested against
+buy-and-hold on the six candidate names over the project-standard ~7-year
+window (next-open fills, 37%/15% annual tax netting with carryforward,
+terminal liquidation taxed on both sides, 3% cash yield, dividend-adjusted
+prices; dated experiment scripts under `scripts/`, registry entry in
+`assistant/research_findings.json`). Findings, all structural rather than
+marginal:
+
+- the adopted +5% any-term full exit produced **3.29%** after-tax CAGR vs
+  **48.14%** for buy-and-hold — the rule sat in cash 95-99% of all days,
+  and at 0% cash yield its CAGR was 0.30%;
+- EVERY full-exit variant strands (+50 any-term 6.5%; long-term-gated full
+  exits ~10.7%): once fully out, re-entry at −10% from disposal rarely
+  arrives in a trending name;
+- trimming HALF the lot instead of exiting repairs it (~26% CAGR, worst
+  ticker drawdown −38% vs buy-and-hold's −66%);
+- LONG-TERM-GATING the trim costs nothing (26.33% vs 25.78% ungated) and
+  realizes **zero short-term gains by construction**; and
+- the trim threshold is insensitive (+50 vs +100 within 0.1 CAGR point),
+  i.e. not a knife-edge fit.
+
+**The owner therefore revised rule 2 to: LONG-TERM-GATED TRIM-HALF AT
++50%.** A gain review fires only when a lot is at or above +50% on its own
+basis AND past its long-term date, and it proposes trimming HALF the lot,
+never exiting it. A lot above the price threshold but still short-term is a
+distinct reported state — "awaiting long-term", whose content is the
+days-to-long-term countdown — and is deliberately NOT a crossing. The −10%
+decline review, per-lot basis, re-entry rule, floor, and
+notification-not-automatic stance are unchanged.
+
+Also revised for M3 by the same decision: **dividend income funds pending
+decline-review adds first**; leveraged-ETF reinvestment happens only when
+no dip-add is waiting. This addresses the measured drag of trim proceeds
+idling in cash and breaks the NVDY→NVDL single-issuer pipeline (§3).
+
+The backtest numbers are DESIGN GUIDANCE, not a research finding: one
+window, hindsight-selected names, eight uncounted variant looks. What was
+adopted is the structure (trim + gate + dip-adds), not a performance claim.
+The revised rule earns prospective evidence in paper like everything else.
+
+### 1.2 Original rule 2 as first adopted (superseded by §1.1, kept for the
+record)
+
++5% was the gain-review threshold: if price grew past 105% of a lot's
+buying price, the owner intended to sell the lot. Rejected by measurement
+the same day — see §1.1.
+
 ## 2. Resolved design decisions (owner delegated to recommended defaults,
 2026-08-09)
 
 | # | Decision | Resolution |
 |---|---|---|
 | 1 | Growth-sleeve candidate list | `NVDA, AMD, AVGO, TSM, MSFT, SOXX` — five researched semis/tech names plus one diversified semiconductor ETF anchor. Owner may edit the config list at any time; the list is data, not code. |
-| 2 | Threshold basis | **Per-lot**, never average cost. Each lot carries its own +5%/−10% reference (its `cost_per_share`), which cleanly defines what happens after averaging down: the new lot gets its own thresholds and the old lot keeps its own. Matches how `assistant/tax_lots.py` already models the portfolio, and average cost is exactly the lens that module's docstring warns "hides real money". |
-| 3 | Re-entry after a gain-review exit | The name **stays in the candidate list**; a fresh decline-review notification requires a −10% move measured from the exit lot's disposal price recorded at sale time (a fresh setup), not from the original basis. Prevents the rule from silently draining the growth sleeve to cash with no way back in. Implemented in M2 (it is notification state, not report state). |
+| 2 | Threshold basis | **Per-lot**, never average cost. Each lot carries its own gain/decline reference (its `cost_per_share`), which cleanly defines what happens after averaging down: the new lot gets its own thresholds and the old lot keeps its own. Matches how `assistant/tax_lots.py` already models the portfolio, and average cost is exactly the lens that module's docstring warns "hides real money". Unchanged by revision 2. |
+| 3 | Re-entry after a gain-review disposal | The name **stays in the candidate list**; a fresh decline-review notification requires a −10% move measured from the disposal price recorded at sale time (a fresh setup), not from the original basis. Under revision 2 a gain review trims rather than exits, so full flatness is rarer — the rule still matters for the remainder path and for owner-initiated exits. Implemented in M2 (it is notification state, not report state). |
 | 4 | Dividend-sleeve floor | **Warn below 10.00%** of total equity — the low end of the owner's 10-15% range, chosen because `max_position_pct` (5%) means a 15% sleeve requires all three candidate names at cap exactly, with zero slack. One number, exact boundary, no range logic. |
 
 ## 3. What this engine is, and is not
 
 These targets and thresholds are the **owner's stated preference**. Nothing
 in this plan or its implementation may describe them as validated, optimal,
-researched, or evidence-backed — no such evidence exists, and the +5%/−10%
-rule in particular runs **counter** to this project's strongest confirmed
-finding (the wide-rebalance-band tax result). That tension is deliberate and
-owner-acknowledged: the paper epoch is where the rule gets tested honestly.
-The reporting layer must therefore make the rule's costs visible (§4), never
-hide them.
+researched, or evidence-backed. Revision 2 was *informed by* a descriptive
+backtest (§1.1), which is design guidance — one window, hindsight names,
+uncounted variant looks — not confirmation under this project's rigor bar.
+The original +5%/−10% rule ran counter to the project's strongest confirmed
+finding (the wide-rebalance-band tax result); the measured backtest agreed,
+and revision 2 realigned the rule with that finding. The paper epoch is
+where the revised rule earns prospective evidence.
 
-Known, disclosed characteristics the owner accepted on adoption:
+Known, disclosed characteristics the owner accepted:
 
-- Every +5% exit is a short-term gain by construction unless the lot
-  happens to be past its long-term date.
+- Under revision 2 a scheduled gain review can never realize a short-term
+  gain (the long-term gate is part of the rule). Owner-initiated sales
+  outside the rule can still be short-term; the report's term/countdown
+  fields exist so that consequence is visible first.
+- Trim proceeds idle at cash yield until a decline review or the M3
+  dividend-routing deploys them — the measured cost of trimming versus
+  never selling (~26% vs ~36% CAGR in the backtest window) is accepted as
+  the price of a profit-taking discipline.
 - NVDY is a single-stock synthetic covered-call ETF (NVDA), not a
   diversified income fund like JEPI/JEPQ; NVDY income buying NVDL (NVDA 2x)
   concentrates a single issuer on both sides of the dividend pipeline. The
@@ -83,9 +140,14 @@ MUST carry, per lot:
   owner's marginal rate is out of scope; naming the term and the date the
   term changes is the mechanism.
 
-Intent: when a lot crosses +5% at day 340, the owner sees "short-term;
-long-term in 26 days" next to the gain and can choose to wait. The engine
-never makes that choice.
+Intent as originally adopted: when a lot crossed the threshold at day 340,
+the owner saw "short-term; long-term in 26 days" next to the gain and could
+choose to wait. **Revision 2 promoted this mechanism from advisory to
+binding**: the long-term gate means a scheduled gain review cannot exist
+for a short-term lot, and the "awaiting long-term" report state carries the
+same countdown. The fields remain on every lot row so owner-initiated
+sales outside the rule still see their tax consequence first. The engine
+still never makes the choice.
 
 ## 5. Milestones (one branch each; stop for independent review between)
 
@@ -106,7 +168,10 @@ list is never an allocation authorization, same convention as
   would change `max_leveraged_etf_pct` enforcement, a policy behavior
   change this milestone must not make)
 - `DIVIDEND_SLEEVE_FLOOR_PCT = 10.0`
-- `GROWTH_GAIN_REVIEW_THRESHOLD_PCT = 5.0`
+- `GROWTH_GAIN_REVIEW_THRESHOLD_PCT` — `5.0` at first adoption; **`50.0`
+  under §1.1 revision 2**
+- `GROWTH_GAIN_REVIEW_REQUIRES_LONG_TERM = True` (added by revision 2)
+- `GROWTH_GAIN_REVIEW_TRIM_FRACTION = 0.5` (added by revision 2)
 - `GROWTH_DECLINE_REVIEW_THRESHOLD_PCT = -10.0`
 
 New module `assistant/sleeve_report.py`, shaped like
@@ -117,9 +182,13 @@ contracts; store access only in a thin composition helper):
   (decimal path), floor check at exactly 10.00% (below → warn field, at or
   above → clear), names in the candidate list not currently held;
 - growth sleeve: per-lot rows via `unrealized_by_lot` for each held
-  candidate, each row carrying `crossed_gain_threshold` /
-  `crossed_decline_threshold` booleans (exact boundary: `>= +5.00` /
-  `<= −10.00` on the lot's `unrealized_pnl_pct`) plus the §4 tax fields;
+  candidate, each row carrying the crossed-gain / crossed-decline review
+  booleans (exact, inclusive boundaries on the lot's `unrealized_pnl_pct`)
+  plus the §4 tax fields. Under §1.1 revision 2 a gain crossing
+  additionally requires the lot to be long-term, and a price-met-but-
+  short-term lot is reported as the distinct
+  `gain_threshold_met_awaiting_long_term` state with its countdown —
+  never as crossed;
 - lot-coverage honesty: a growth position whose snapshot shares disagree
   with its ledger lots (or that has no lots at all — bought outside the
   app or before ledger bootstrap) is listed explicitly with both numbers
@@ -158,22 +227,28 @@ proposals, any write path.
 
 Gain/decline crossings become warnings batched into the daily briefing via
 the GR-5 path, with durable first-crossing-per-lot state so a crossing
-alerts once rather than daily. Decline-review re-entry state (decision #3)
-lives here. Notification failure must never suppress any other briefing
-content, and a lot that loses data coverage mid-stream must surface as
-"coverage lost", not as silence.
+alerts once rather than daily. Under §1.1 revision 2, gain notifications
+fire only for long-term-gated crossings and describe a trim of
+`GROWTH_GAIN_REVIEW_TRIM_FRACTION`; a lot entering "awaiting long-term"
+may notify once with its countdown, and MUST NOT re-notify daily while
+waiting. Decline-review re-entry state (decision #3) lives here.
+Notification failure must never suppress any other briefing content, and a
+lot that loses data coverage mid-stream must surface as "coverage lost",
+not as silence.
 
 ### M3 — dividend → reinvest proposals (earmark accounting)
 
-Confirmed dividend income becomes an APPROVE-gated buy proposal for an
-owner-chosen ticker from `DIVIDEND_REINVEST_TICKERS`, through the existing
-proposal pipeline with `max_leveraged_etf_pct` untouched as the backstop.
-Earmark records make each dividend dollar spendable exactly once:
-earmarked at proposal creation, released exactly once on
-rejection/cancel/expiry, consumed on fill — same reservation discipline and
-terminal-path tests as the existing budget code. Never auto-submitted.
+Revised by §1.1: confirmed dividend income funds **pending decline-review
+adds first**; only when no dip-add is waiting does it become an
+APPROVE-gated buy proposal for an owner-chosen ticker from
+`DIVIDEND_REINVEST_TICKERS`, through the existing proposal pipeline with
+`max_leveraged_etf_pct` untouched as the backstop. Earmark records make
+each dividend dollar spendable exactly once: earmarked at proposal
+creation, released exactly once on rejection/cancel/expiry, consumed on
+fill — same reservation discipline and terminal-path tests as the existing
+budget code. Never auto-submitted.
 
-### M4 — prepared gain-review exit proposals — DEFERRED BY DEFAULT
+### M4 — prepared gain-review trim proposals — DEFERRED BY DEFAULT
 
 Not scheduled. The Selling page plus M2's notification (with §4 tax fields)
 keeps a human squarely between the rule and every taxable event at a cost of
@@ -201,3 +276,9 @@ two clicks. Revisit only on explicit owner request.
 - 2026-08-09 — created; owner adopted the engine and delegated decisions
   1-4 to recommended defaults, keeping the tax-reduction mechanism as a
   standing requirement. M1 scheduled.
+- 2026-08-09 (same day, revision 2) — after the measured backtest rejected
+  the +5% any-term full exit (§1.1), the owner revised the gain review to
+  a long-term-gated trim-half at +50% and rerouted M3 dividend income to
+  fund decline-review adds before leveraged reinvestment. Decline review,
+  per-lot basis, floor, and every safety boundary unchanged. M1 report
+  semantics updated in the same change.

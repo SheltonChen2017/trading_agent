@@ -3774,17 +3774,32 @@ if page == "Reports":
             _income = _sleeves["dividend_income"]
             _engine = _sleeves["engine"]
 
-            _c1, _c2, _c3, _c4 = st.columns(4)
+            _c1, _c2, _c3, _c4, _c5 = st.columns(5)
             _c1.metric(
                 "Dividend sleeve",
                 f"{_dividend['pct_of_equity']}%",
                 f"floor {_engine['floor_pct']}%",
             )
-            _c2.metric("Lots at gain review", _growth["lots_at_gain_review"])
+            _c2.metric(
+                "Lots at gain review",
+                _growth["lots_at_gain_review"],
+                (
+                    f"LT-gated trim {_engine['gain_review_trim_fraction']}"
+                    if _engine["gain_review_requires_long_term"]
+                    else f"trim {_engine['gain_review_trim_fraction']}"
+                ),
+                delta_color="off",
+            )
             _c3.metric(
+                "Awaiting long-term",
+                _growth["lots_awaiting_long_term"],
+                "above threshold, gate holds",
+                delta_color="off",
+            )
+            _c4.metric(
                 "Lots at decline review", _growth["lots_at_decline_review"]
             )
-            _c4.metric("Reinvest sleeve", f"{_reinvest['pct_of_equity']}%")
+            _c5.metric("Reinvest sleeve", f"{_reinvest['pct_of_equity']}%")
 
             if _dividend["floor_status"] == "below_floor":
                 st.warning(
@@ -3799,15 +3814,25 @@ if page == "Reports":
                         f"{_position['lot_coverage']} — "
                         f"{_position['coverage_reason']}"
                     )
-            _crossed = [
-                (_position["ticker"], _lot)
+            def _review_label(lot) -> str | None:
+                if lot["crossed_gain_review_threshold"]:
+                    return (
+                        f"gain — trim {_engine['gain_review_trim_fraction']}"
+                    )
+                if lot["gain_threshold_met_awaiting_long_term"]:
+                    return "gain met — awaiting long-term"
+                if lot["crossed_decline_review_threshold"]:
+                    return "decline"
+                return None
+
+            _flagged = [
+                (_position["ticker"], _lot, _label)
                 for _position in _growth["positions"]
                 for _lot in _position["lots"]
-                if _lot["crossed_gain_review_threshold"]
-                or _lot["crossed_decline_review_threshold"]
+                if (_label := _review_label(_lot)) is not None
             ]
-            if _crossed:
-                st.write("Lots at a review threshold (per-lot basis):")
+            if _flagged:
+                st.write("Lots at or near a review threshold (per-lot basis):")
                 st.dataframe(
                     [
                         {
@@ -3815,26 +3840,25 @@ if page == "Reports":
                             "Lot": _lot["lot_id"],
                             "Unrealized %": _lot["unrealized_pnl_pct"],
                             "Unrealized $": _lot["unrealized_pnl"],
-                            "Review": (
-                                "gain"
-                                if _lot["crossed_gain_review_threshold"]
-                                else "decline"
-                            ),
+                            "Review": _label,
                             "Term if disposed now": _lot["term_if_sold_now"],
                             "Days to long-term": _lot["days_to_long_term"],
                         }
-                        for _ticker, _lot in _crossed
+                        for _ticker, _lot, _label in _flagged
                     ],
                     width="stretch",
                 )
                 st.caption(
-                    "Tax mechanism (owner-mandated): a short-term lot near "
-                    "its long-term date may be worth the wait — the term and "
-                    "countdown above are the decision inputs. Classification "
-                    "and dates only; no bracket is estimated."
+                    "Revision 2: the long-term gate is part of the rule — a "
+                    "lot above the price threshold but still short-term has "
+                    "NOT crossed gain review; its countdown shows when the "
+                    "gate opens, and the review proposes trimming "
+                    f"{_engine['gain_review_trim_fraction']} of the lot, "
+                    "never exiting it. Classification and dates only; no "
+                    "bracket is estimated, and nothing here is a proposal."
                 )
             else:
-                st.caption("No lot is at a review threshold right now.")
+                st.caption("No lot is at or near a review threshold right now.")
             st.write(
                 f"Confirmed dividend income ${_income['confirmed_total']} "
                 f"across {_income['posting_count']} posting(s). "

@@ -62,7 +62,7 @@ independent review, not a superficial approval.
   baseline and the 30 selected registry tests.
 - Corrected focused tree: **180 passed** across sleeve reporting, tax lots,
   research registry, and the real Reports-page AppTest.
-- Final repository suite: **3267 passed, 0 failed, 0 skipped**, 25 warnings,
+- Final repository suite: **3267 passed, 0 failed, 0 skipped**, 26 warnings,
   under Python 3.12.13.
 - Reverse mutations: rounded threshold 1 intended failure; missing date 1;
   gate type 2; proposal wording 1; journal error translation 2. Every mutation

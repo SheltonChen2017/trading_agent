@@ -94,6 +94,15 @@ adopted my recommended revision. Full evidence chain:
 M2 remains not started; its notification semantics are now specified
 against revision 2 in the plan's §5.
 
+Validation on the exact revision-2 tree (commit `6fe8af0`, branch
+`user/claude/engine-rev2-lt-trim-20260809`, base `main` `997bcd5`):
+**3257 passed, 0 failed, 0 skipped**, 25 warnings, 270.08s, Python 3.14.6
+(post-merge baseline 3247 + 10 new); `compileall` clean across every
+workflow-named package; `git diff --check` clean; document-consistency,
+sleeve, and registry guards re-run green after the final docs edit;
+read-only CLI smoke against a scratch database plus the live Alpaca paper
+snapshot rendered the revised gate/trim/countdown lines.
+
 ## 0.05 Same day, earlier — Three-sleeve engine adopted; M1 sleeve report (2026-08-09)
 
 The owner adopted a personal allocation engine and delegated its open design

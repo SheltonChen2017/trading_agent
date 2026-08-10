@@ -60,26 +60,50 @@ for separating a tech style bet from selection — never as the record.
 
 Not derivable from the repository, and expensive to rediscover.
 
-### `paper-epoch-002` is active in storage but stalled (measured 2026-08-10)
+### `paper-epoch-003` is active; the AP-6 swap was executed (2026-08-10)
 
-On the epoch host, `paper-epoch-002` remains the active durable epoch at
-frozen commit `9a91498`, but it is **not accumulating mandate evidence**. It
-has one captured session (2026-08-06), zero epoch orders, and zero of five
-required drills. Every scheduled post-close observation since 2026-08-07 has
-failed closed because three post-bootstrap Alpaca CAT fees are absent from the
-journal, producing the exact $0.03 cash mismatch. A critical
-`scheduled-paper-observation-failure` alert is open. This measured state
-supersedes earlier wording that the epoch was simply "accumulating evidence."
+The AP-6 stall (three uningested post-bootstrap CAT fees, $0.03 cash
+mismatch, every capture since 2026-08-07 refused) was repaired by the
+owner-authorized epoch swap on 2026-08-10, executed in the required order:
+tasks disabled (elevated script, UAC-approved) → `paper-epoch-002` closed at
+19:25:50Z on its frozen `9a91498` runtime (single-observation record
+retained) → operational checkout fast-forwarded to merged `ef05dc1`
+(PR #182) → `ledger-reconcile` **matched on its first run** (the three fees
+posted exactly once at their true `created_at` times; ledger cash
+74389.30 = broker) → readiness green → `paper-epoch-003` started at
+19:27:21Z with identical mandate/policy/strategy/model lineage → **all five
+required drills passed and recorded under epoch-003** → tasks re-enabled and
+verified by a manual green operations-cycle (3 fee duplicates on idempotent
+replay, healthy, exit 0). All seven stale alerts were acknowledged after
+their causes were verified resolved; **0 open alerts**.
 
-The independently corrected ingestion fix (`a8174b9`, counter-review
-accepted at `4355347`) is pushed to
-`origin/codex/review-epoch-activity-ingestion-20260810`; it is not merged or
-deployed. Do not claim the $0.03 has self-healed until an owner-authorized
-deployment runs `ledger-reconcile` against the operational database and
-returns matched. The required swap order is: disable tasks, close epoch-002
-on its frozen runtime, deploy the reviewed merge, reconcile to matched books,
-run readiness, start epoch-003, run all five drills, then re-enable and verify
-the tasks.
+Independent read-only review on the epoch host confirmed epoch-003's start
+row and all five drill rows bind exact commit `ef05dc1`. It also confirmed
+**0 epoch-003 observations** at review time. Therefore the application
+summary's `lineage_consistent: true` is not observation evidence yet (the
+empty observation set satisfies that check vacuously). The first successful
+scheduled post-close observation is still required to prove the deployed
+cadence and observation lineage and to start the 60-session / 30-order clock.
+The PaperObservation task was enabled and Ready, with its next scheduled run
+at 16:30 Pacific on 2026-08-10; its previous recorded result belonged to the
+pre-swap stalled epoch.
+
+The elevated swap helper left two machine-local evidence files in the
+development checkout: `data/swap_disable_result_20260810.json` (695 bytes,
+SHA-256 `91E06EA25D18882C36CBF0E1FBA338E1D926AC63392FB4CA18C3E38FB5E24321`)
+and `data/swap_enable_result_20260810.json` (679 bytes, SHA-256
+`E8E6B09631C781ED11A8B5419FD8D20D66DCABD1808583CA114181712E32B5BE`).
+They contain only per-task state/results, no account or credential fields.
+They are preserved locally and covered by the narrow
+`data/swap_*_result_*.json` ignore rule; do not commit their contents.
+
+Standing watch (from the counter-review): a post-bootstrap `JNLC` paper-cash
+top-up or an AEP dividend will **fail closed by design** until a reviewed
+handler exists. When that happens the operations-cycle still completes its
+backup/health work before failing; the fix is a small, separately reviewed
+handler (dividends → `record_dividend`, transfers → `record_cash_transfer`),
+never a manual compensating entry (the sync re-reads broker rows and would
+keep refusing) and never a widened tolerance.
 
 ### There are TWO machines, and only one may run the cadence (2026-08-06; re-verified 2026-08-09)
 
@@ -93,8 +117,8 @@ machine-local claim re-verified on the second host rather than copied.
 Everything in this section is host-specific; re-measure rather than assume
 which one you are on. `whoami` distinguishes them.
 
-- **Epoch host** (`REDMOND\sheltonchen`) — retains the active-but-stalled
-  `paper-epoch-002`. The four
+- **Epoch host** (`REDMOND\sheltonchen`) — runs the active
+  `paper-epoch-003` (at `ef05dc1` since 2026-08-10). The four
   `TradingAgent-Paper-*` tasks are installed and ENABLED here. This is the
   only host that may run the operational cadence. The bullets below this
   section (launch script, epoch-swap script, lock files, backups) describe
@@ -111,13 +135,14 @@ which one you are on. `whoami` distinguishes them.
 **Why they are disabled, and why it matters.** Both hosts read the same
 `APCA_API_KEY_ID`/`APCA_API_SECRET_KEY` from their own user registry, and
 those credentials point at the **same Alpaca paper account** — the one bound
-to active-but-stalled `paper-epoch-002`. Two hosts running
+to the active `paper-epoch-003`. Two hosts running
 `monitor-orders`/`operations-cycle`/`watchdog` against one account means
 duplicate reconciliation and competing cancellation against live epoch
 evidence. The second host was therefore deliberately left with **no ledger
 bootstrap and no epoch**; `paper-evidence-status` there correctly reports
 "Paper evidence epoch not found". Do not bootstrap or start an epoch on the
-second host while `paper-epoch-002` is active on the first.
+second host while any epoch-host evidence epoch is active (currently
+`paper-epoch-003`).
 
 The non-elevated `Disable` gotcha (below, epoch host) reproduced exactly on
 the second host: `Stop-ScheduledTask` succeeded unelevated while
@@ -250,9 +275,9 @@ which QuantConnect documents as returning `success` — so a clean
 that matter.
 
 Dormant until someone deliberately points the client at QuantConnect: the
-module has no UI wiring, nothing calls it automatically, and it is not in
-the frozen operational checkout. It cannot affect the app or the running
-epoch.
+module is present in deployed `ef05dc1`, but has no UI wiring and nothing
+calls it automatically. Without a deliberate caller and configured
+credentials it cannot affect the app or the running epoch.
 
 Do not loosen it speculatively. Confirm the real response shape, then relax
 it for that specific endpoint with the observed body recorded.

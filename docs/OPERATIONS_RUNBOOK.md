@@ -51,6 +51,14 @@ start before the upgraded ledger reconciles:
 5. Run `readiness`, then start the new epoch on the exact deployed commit.
 6. Run all five required drills, re-enable the tasks, and verify they execute.
 
+A green manual `operations-cycle` proves the recurring reconciliation,
+backup, health, and alert path after the swap. It does **not** prove the
+post-close evidence cadence. Before describing mandate evidence as
+accumulating, verify the first scheduled `paper-observation` completed under
+the new epoch, created its observation/capture manifest, and bound the exact
+deployed lineage. With zero observations, a summary field such as
+`lineage_consistent: true` may only mean there was no row to contradict it.
+
 An epoch created before broker-account lineage was introduced cannot be
 continued under the stronger schema. Close it, complete any required legacy
 `ledger-bind-account` migration, commit the upgraded runtime, and start a new

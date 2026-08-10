@@ -1,253 +1,225 @@
 # Development session handoff
 
-Prepared: 2026-08-10, after Codex independently reviewed and corrected
-Claude's broker-activity ingestion fix for the stalled paper evidence epoch,
-and Claude counter-reviewed the correction. **Counter-review outcome:
-accepted in full — all seven findings confirmed, none a false alarm, no
-correction to the correction required.** See section 5a and the review
-report's §6 for the live-endpoint evidence and reverse-mutation record.
+Prepared: 2026-08-10 after Codex independently reviewed Claude's Epoch 3
+establishment record and corrected the durable documentation.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
-model, or session change. This file completely replaces the previous session
-handoff. Durable owner decisions and machine-local facts live in
-`docs/OPERATIONAL_FACTS.md`; sequencing authority lives in
-`docs/ACTION_PLAN_2026-08-02.md`.
+model, or session change. This file completely replaces the prior handoff.
+Durable machine facts live in `docs/OPERATIONAL_FACTS.md`; sequencing
+authority lives in `docs/ACTION_PLAN_2026-08-02.md`.
 
 ## 0. Read this first — exact current state
 
-- Repository: `C:\git\customizedAgent\trading_agent` on this development
-  computer.
-- Active branch: `codex/review-epoch-activity-ingestion-20260810`.
-- Review base: merged `main` / `origin/main` at `e871f2f` (PR #181).
-- Claude submission: branch
-  `user/claude/broker-activity-ingestion-20260810`, implementation `f10b47d`,
-  handoff `8f922a9`. That branch is on the remote at `8f922a9`.
-- Codex correction: `a8174b9` — `Correct broker activity epoch recovery`.
+- Repository: `C:\git\customizedAgent\trading_agent`.
+- Merged base and deployed operational commit: `ef05dc1` (PR #182,
+  `origin/main`).
+- Claude submission branch:
+  `user/claude/epoch-003-swap-record-20260810`.
+- Claude submission: `29909f4` — documentation-only record of the executed
+  Epoch 3 swap. The branch is pushed at
+  `origin/user/claude/epoch-003-swap-record-20260810`.
+- Independent review branch:
+  `codex/review-epoch-003-establishment-20260810`.
+- Review correction: `2739e76` — operational-document and runtime-artifact
+  hygiene corrections.
 - Review report:
-  `docs/REVIEW_2026-08-10_EPOCH_ACTIVITY_INGESTION.md`.
-- Final review status: **accepted after correction; 0 P0, 0 P1, 0 P2,
-  and 0 P3 open**.
-- The Codex correction is committed in this checkout at `a8174b9`.
-- The review branch is pushed:
-  `origin/codex/review-epoch-activity-ingestion-20260810` is tip-equal to
-  local HEAD at counter-review commit `4355347` (verified by hash), so
-  another computer can fetch the complete review history. It is NOT merged
-  and NOT deployed.
-- Review made no broker call, operational-database mutation, scheduler
-  change, epoch close/start, deployment, policy change, order submission,
-  or live-trading change.
+  `docs/REVIEW_2026-08-10_EPOCH_003_ESTABLISHMENT.md`.
+- Final disposition: **accepted after correction**. No production or test
+  behavior was submitted by Claude; the review found documentation and
+  machine-local artifact defects only.
+- Remote state: the Claude submission is pushed. The Codex review branch and
+  commits are **local-only and not merged** unless a later Git check proves
+  otherwise. Another computer cannot retrieve the review corrections yet.
+- Worktree: the two swap-result JSON files remain present locally but are now
+  intentionally ignored and must not be deleted or committed.
 
-## 1. What was reviewed and the disposition of every commit
+No push, merge, deployment, scheduler change, broker call, order submission,
+operator-database mutation, policy change, or epoch transition was authorized
+or performed by Codex during this review.
 
-The ordered range `e871f2f..8f922a9` and its cumulative tree were reviewed.
+## 1. Operational truth — Epoch 3 is established, first observation pending
 
-| Commit | Disposition | Summary |
+Read-only inspection on the epoch host independently confirmed:
+
+- `paper-epoch-001` and `paper-epoch-002` are closed.
+- `paper-epoch-003` is the only active epoch. It started at
+  `2026-08-10T19:27:21.886685+00:00` and binds exact deployed commit
+  `ef05dc1`, strategy `owner-directed-paper-policy` version `1.0.0`, and
+  model `no-ml-model`.
+- All five required drills exist exactly once under epoch-003, passed, and
+  bind `ef05dc1`: `alert_delivery`, `ambiguous_submission`,
+  `backup_restore`, `kill_switch`, and `restart_recovery`.
+- Epoch-003 has **0 observations and 0 epoch orders**. Its start and drill
+  lineage are verified. Observation lineage is not yet measurable; the
+  application's `lineage_consistent: true` result is vacuous when no
+  observation rows exist.
+- The AP-6 reconciliation repair worked operationally: the three supported
+  broker-fee activities were journaled exactly once and the ledger matched
+  broker cash. A later manual operations-cycle replay treated all three as
+  duplicates and completed healthy.
+- There are zero open alerts. The alert-delivery self-test row was
+  acknowledged separately, and seven stale pre-swap alerts were also
+  acknowledged.
+- The operational checkout is clean at `ef05dc1`; its tree is identical to
+  the independently reviewed tip, and `requirements.txt` did not change.
+- All four `TradingAgent-Paper-*` tasks are enabled. OperationsCycle last
+  completed successfully. OrderMonitor and Watchdog were running at review
+  time. PaperObservation was enabled and Ready, with its first post-swap
+  scheduled run due at 16:30 Pacific on 2026-08-10; its recorded prior
+  failure belonged to the stalled pre-swap epoch.
+
+Therefore the swap and Epoch 3 establishment are complete, but the evidence
+clock has not started. Do not describe mandate evidence as accumulating until
+the first successful post-close observation and capture manifest are verified
+under epoch-003. The operational next step is read-only verification of that
+scheduled result after it runs; do not manually create evidence.
+
+## 2. What Claude changed and commit disposition
+
+The exact reviewed range is `ef05dc1..29909f4`. It contains one commit and
+changes only four documentation files.
+
+| Commit | Disposition | Review result |
 |---|---|---|
-| `f10b47d` | **Accepted after correction** | Correct diagnosis and architecture, but three P2 implementation defects and one P3 input-boundary defect required `a8174b9`. |
-| `8f922a9` | **Accepted after correction** | Correct incident evidence, but API/recovery claims, severity, deployment wording, and next-step ordering required documentation correction. |
+| `29909f4` | **Accepted after correction** | Correctly recorded the executed swap, matched books, active epoch, drills, enabled tasks, and resolved alerts. It also retained obsolete Epoch 2/deployment instructions, published a shortened broker-account identifier, overstated zero-observation lineage, and left several current-document/artifact-hygiene inconsistencies. |
 
-Correction `a8174b9` preserves Claude's intended design: a bounded direct
-Alpaca REST read, idempotent fee journal entries, FILL exclusion, and
-fail-closed unsupported post-bootstrap activities. The correction changes
-four behaviors:
+The correction `2739e76` did not alter trading code, schemas, policies,
+scheduler state, or the operator database. It:
 
-1. It accepts Alpaca's published non-trade response shape. `created_at` and
-   `status` are useful extensions but are not required by the published
-   schema. Missing `created_at` is accepted only when the caller proves it
-   queried with Alpaca's exclusive `after` bound exactly equal to bootstrap;
-   the ledger does not guess timestamp meaning from an activity ID.
-2. It queries exactly after bootstrap and skips every pre-bootstrap non-trade
-   row before activity-type handling. An opening-balance dividend, interest,
-   or transfer can no longer poison the first reconciliation.
-3. An unsupported post-bootstrap activity still fails `operations-cycle`,
-   but snapshot reconciliation, verified backup, operational health, and the
-   critical alert run before the original error is re-raised.
-   `paper-observation` still stops immediately and writes no evidence.
-4. `page_size` now requires a real non-bool integer from 1 through 100; bool,
-   fractional, and string values are not silently coerced.
+1. distinguishes a successful epoch start/manual operations cycle from the
+   still-pending first scheduled post-close observation;
+2. corrects stale GR-4 and QuantConnect deployment claims and the second-host
+   Epoch 2 prohibition;
+3. preserves but narrowly ignores the machine-local swap-result files; and
+4. adds runbook guidance against treating empty-set lineage as evidence.
 
-## 2. Prioritized review findings
+This handoff and its regression guard separately remove the superseded swap
+workflow and the account-ID fragment from the canonical resume state.
 
-The complete evidence and red/green record is in the review report. Summary:
+## 3. Prioritized findings
+
+The complete ledger, evidence, correction, and validation are in the review
+report. Final summary:
 
 | ID | Priority | Final state | Finding |
 |---|---|---|---|
-| EPOCHR-001 | P2 | Closed in `a8174b9` | Required undocumented Alpaca `created_at` and `status`, rejecting a published-success shape. |
-| EPOCHR-002 | P2 | Closed in `a8174b9` | Thirty-day overlap plus type-before-cutoff ordering let pre-bootstrap non-fee activity block reconciliation. |
-| EPOCHR-003 | P2 | Closed in `a8174b9` | Activity failure suppressed snapshot reconciliation, backup, and health in `operations-cycle`. |
-| EPOCHR-004 | P2 | Closed in docs | Deployment/epoch instructions were in the wrong order and falsely implied deployment closes durable epoch state. |
-| EPOCHR-005 | P3 | Closed in `a8174b9` | `page_size` silently coerced bools, floats, and strings. |
-| EPOCHR-006 | P3 | Closed | Comments falsely said a manual journal entry could acknowledge an unsupported broker activity. |
-| EPOCHR-007 | P3 | Closed | AP-6 severity and active/stalled epoch wording contradicted repository definitions and measured state. |
+| E3R-001 | P2 | Closed | The canonical handoff retained an entire obsolete “epoch-002 active; deploy and start epoch-003 next” workflow after recording that the swap had already run. |
+| E3R-002 | P2 | Closed in the current tree; historical commit remains on remote | The handoff published a shortened broker-account identifier, contrary to the explicit confidentiality boundary. |
+| E3R-003 | P3 | Closed | `lineage_consistent: true` and “active and healthy” wording overstated evidence with zero epoch-003 observations. |
+| E3R-004 | P3 | Closed | Current docs still said GR-4/QuantConnect were absent from the frozen checkout and prohibited a second-host epoch only while epoch-002 was active. |
+| E3R-005 | P3 | Closed | Two swap-result files were untracked; they are now preserved under a narrow ignore rule with regression coverage. |
 
-No P0 or P1 issue was found. AP-6 is P2: it caused incorrect durable ledger
-state and missing recovery, but no unsafe execution, duplicate order, broken
-atomicity, false broker outcome, immediate secret exposure, or live-authority
-escape.
+No P0 or P1 issue was found. There is no indication of unsafe execution,
+duplicate orders, broken atomicity, incorrect broker outcome, live-authority
+escape, credential exposure, or operator-data corruption. The shortened
+account identifier was not a credential and does not authorize access, but it
+should never have been placed in the handoff. Because `29909f4` is already
+pushed, that fragment remains in remote Git history unless the owner later
+authorizes history rewriting; no such rewrite was performed or recommended as
+necessary for access security.
 
-Claude's quality for this round is **6/10**. The operational diagnosis was
-excellent: all 16 fills were reconciled, three post-bootstrap CAT fees were
-isolated to the exact $0.03, and widening the tolerance was correctly
-rejected. The architectural direction was also right. The score is held down
-by three material code paths that made the submission unsuitable to deploy
-without review correction, plus an unsafe deployment sequence in the handoff.
+**Counter-review (Claude, same day): accepted — all five findings
+confirmed, none a false alarm.** Full record in the review report §8. Two
+additions: (1) historical context on E3R-002 — `git log -S` shows the FULL
+dashed account identifier was already committed to the handoff at `bf5d5ce`
+(2026-08-05) and removed at `a4f09e3`, both long pushed on `main`, so the
+`29909f4` fragment added no marginal remote-history exposure (conclusion
+unchanged: not a credential, no rewrite required); (2) the new account-id
+guard was extended (E3CR-001) because the generalized-instance search showed
+it scanned only the handoff and could never match the worse full-identifier
+shape — it now scans all four current-state documents for both shapes,
+mutation-verified. Codex's two other guards were reverse-mutated and proved
+load-bearing. A single uninterrupted full-suite run on the final tree
+passed (count recorded below in Validation).
 
-## 3. Operational truth — epoch-002 is active but stalled
+## 4. Local evidence that must be preserved
 
-The following was measured by Claude read-only on the separate epoch host;
-Codex did not repeat the broker/database inspection:
+The development checkout contains two ignored, machine-local outputs from the
+owner-authorized elevated task swap:
 
-- `paper-epoch-002` remains the active durable epoch, frozen at commit
-  `9a91498` and bound to `my_policy.json`.
-- It has exactly **1 captured session (2026-08-06), 0 epoch orders, and 0 of
-  5 required drills**.
-- Every post-close observation since 2026-08-07 has failed closed on ledger
-  reconciliation, so the 60-session / 30-order mandate evidence is **not
-  accumulating**.
-- Ledger cash is $74,389.33 versus broker cash $74,389.30. Three Alpaca CAT
-  fees posted after the 2026-08-05 bootstrap explain the exact $0.03. Two
-  earlier fees were already inside opening cash. All 16 broker fills matched.
-- A critical `scheduled-paper-observation-failure` alert is open.
-- The account holds AEP, so future dividends are a real unsupported activity
-  case. They must continue to fail closed until a deliberate reviewed handler
-  exists. A separate manual dividend posting does not acknowledge the broker
-  activity and will not unblock this sync.
-- The reviewed fix has not run against the operator database. The statement
-  that it will self-heal $0.03 is an implementation expectation, not completed
-  operational evidence.
+| File | Size | SHA-256 |
+|---|---:|---|
+| `data/swap_disable_result_20260810.json` | 695 bytes | `91E06EA25D18882C36CBF0E1FBA338E1D926AC63392FB4CA18C3E38FB5E24321` |
+| `data/swap_enable_result_20260810.json` | 679 bytes | `E8E6B09631C781ED11A8B5419FD8D20D66DCABD1808583CA114181712E32B5BE` |
 
-Standing host details, task permissions, credential-lift behavior, local-only
-backup limitations, and the second-host prohibition are maintained in
-`docs/OPERATIONAL_FACTS.md`. In particular, only the epoch host may run the
-cadence; the second computer's four scheduled tasks must stay disabled while
-the same Alpaca paper account is bound to the epoch host.
+The files contain only four task-result rows apiece and no account or
+credential fields. Do not stage, delete, move, or print their contents. Their
+hashes and sizes are sufficient for the repository record.
 
-## 4. Required owner-authorized epoch swap sequence
-
-Nothing below has been performed. The next useful step is owner authorization
-to push and merge this accepted review. Deployment is a separate owner action.
-When deployment is authorized, preserve this exact order:
-
-1. On the epoch host, disable all four `TradingAgent-Paper-*` tasks using the
-   elevated machine-local swap procedure. Merely stopping them is not enough;
-   triggers can restart them.
-2. While the frozen `9a91498` runtime is still present, explicitly close
-   `paper-epoch-002`. Deployment does not close stored epoch state.
-3. Deploy only the merged, independently reviewed AP-6 tree. Do not deploy a
-   local review branch directly.
-4. Run `ledger-reconcile` against the operational database. Require
-   `matched: true`; verify the three CAT fees were inserted once and the cash
-   mismatch is zero. Stop if any unsupported activity or mismatch remains.
-5. Run readiness on the exact deployed commit.
-6. Start `paper-epoch-003` with the intended strategy/model/policy lineage.
-   Do not start it before step 4 succeeds.
-7. Run all five required drills inside epoch-003.
-8. Re-enable all four scheduled tasks and verify actual execution/heartbeats,
-   not merely task existence.
-
-Closing an epoch does not delete positions, cash, journal entries, tax lots,
-orders, or prior evidence. Evidence from epoch-002 cannot be pooled with
-epoch-003 to satisfy mandate thresholds.
-
-## 5. Validation on the corrected tree
+## 5. Validation
 
 Environment: Windows, repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
 
-- Submitted focused baseline: 100 passed in 14.98s (Claude's record).
-- New regression run on the uncorrected tree: 7 failures as intended in
-  17.02s.
-- Final affected files: **107 passed** in 13.02s.
-- Full suite collection: **3334 tests**.
-- Full suite, deterministic file batches: **3334 passed, 0 failed, 0
-  skipped** — 1045 in 124.41s; 1025 in 214.14s; 990 in 131.50s; 274 in
-  215.19s. There were 25 existing dependency deprecation warnings.
-- Two monolithic runs timed out at the desktop command-channel boundary at
-  120s and 600s without a test failure; they are not counted as passes. The
-  four successful batches cover the exact collection once.
+- Red baseline on Claude's tree: **3 failed, 8 passed** across the two
+  focused files. The failures were exactly the stale handoff, account-ID
+  fragment, and unignored swap artifacts.
+- Final focused regressions: **11 passed** in 0.31s.
+- Broader five-file documentation-consumer batch: **101 passed** in 3.83s.
+- Full collection: **3,336 tests**.
+- Full suite, exact deterministic coverage: **3,336 passed, 0 failed, 0
+  skipped** — top-level A–F 1,032 in 180.76s; G–M 1,025 in 150.68s; N–S
+  990 in 112.66s; T–Z 274 in 143.49s; nested fault matrix 15 in 6.45s.
+  There were 25 existing dependency deprecation warnings.
 - Repository-prescribed `compileall`: clean.
-- `git diff --check`: clean apart from expected LF-to-CRLF checkout notices.
-- Active-document consistency: **8 passed** in 0.18s. The broader four-file
-  documentation-consumer batch: **98 passed** in 4.17s.
-- Narrow non-printing secret-shape scan of the README/docs diff: clean.
+- `git diff --check`: clean apart from expected checkout line-ending
+  notices.
+- Both swap-result paths resolve to the narrow `.gitignore` rule.
+- Non-printing secret-shape scan of the review diff: zero matches.
+- Counter-review (final tree, including the extended account-id guard):
+  single uninterrupted full-suite run **3,336 passed, 0 failed, 25
+  warnings** in 756.33s; focused document suites green; four reverse
+  mutations (two Codex guards, the extended guard against the full
+  `bf5d5ce`-shape identifier, and a stale-instruction reinsertion) each
+  turned exactly the intended test red before restoration.
 
-No live Alpaca end-to-end test was performed. Provider-contract conclusions
-come from Alpaca's official account-activities reference and OpenAPI schema,
-linked in the review report.
+No live Alpaca call or mutating operational test was part of this
+documentation-only review or its counter-review.
 
-## 5a. Counter-review (Claude, same day) — accepted in full
+## 6. Definition of done and next step
 
-Claude counter-reviewed `a8174b9` and `74dd309` per
-`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`. Both commits: **accepted**.
-Full record in `docs/REVIEW_2026-08-10_EPOCH_ACTIVITY_INGESTION.md` §6.
+Epoch 3 establishment is genuinely complete: the prior epoch was closed, the
+reviewed merge was deployed, books reconciled, the new epoch was started on
+the exact merge, all five drills passed, tasks were restored, and alerts were
+cleared. It is **not** yet correct to call the evidence cadence demonstrated
+or the 60-session threshold underway because epoch-003 has no observation.
 
-- **All seven EPOCHR findings confirmed; none downgraded.** EPOCHR-002 was
-  strengthened with live read-only endpoint evidence Codex did not have:
-  (a) the account's full activity history contains a `JNLC +$100,000`
-  funding journal created 2026-07-26, inside the submitted 30-day window —
-  with the submitted type-before-cutoff ordering, the first production run
-  would have refused on the account's own funding deposit, so the submitted
-  fix was dead on arrival; (b) `after=<bootstrap instant>` returned exactly
-  the three post-bootstrap CAT fees (including the 08-05-dated fee created
-  08-06T00:06Z) and nothing earlier, live-proving Alpaca's `after` is an
-  exclusive creation-time bound, the claim the corrected exact-bootstrap
-  window depends on.
-- **Four reverse mutations** proved the corrected guards load-bearing
-  (cutoff-before-type ordering, +1µs surrogate, operations-cycle
-  failure-preservation, strict `page_size`); each turned exactly its
-  intended test red, and the restored tree re-verified green (107 focused).
-- **Single uninterrupted full-suite run** on the exact corrected tree:
-  **3334 passed, 0 failed, 25 warnings** (the same pre-existing dependency
-  deprecations) — closing the review's monolithic-run gap left by its
-  batched validation.
-- **Two P3 watch items recorded** (review report §6): CR-W1 — a
-  surrogate-journaled fee whose row later gains `created_at` would raise a
-  loud content conflict on re-sync (fail-closed, correct direction); CR-W2 —
-  a future post-bootstrap paper-cash top-up (`JNLC`) fails closed by design
-  until a small reviewed handler maps it to `record_cash_transfer`.
-- Counter-review made no broker mutation (two read-only activity GETs), no
-  operational-database access, and no epoch, scheduler, policy, or
-  deployment action.
+Exact operational next step: after the scheduled PaperObservation has had an
+opportunity to run, inspect task result, open alerts, epoch-003 observation
+count, capture manifest, and exact observation lineage read-only. If it
+failed, diagnose and review before any mutation. If it succeeded, leave the
+frozen operational checkout alone and let evidence accumulate.
 
-## 6. Documentation synchronized in this round
+Development may continue in the separate development checkout under model-2
+discipline. The action plan leaves remaining Phase 6 product work to owner
+preference; do not infer authorization for M3, GR-6, GR-7d, strategy
+authoring, ML promotion, or another deployment from this review.
 
-- `docs/REVIEW_2026-08-10_EPOCH_ACTIVITY_INGESTION.md` — full commit
-  dispositions, P0-P3 ledger, provider evidence, validation, and rating.
-- `docs/ACTION_PLAN_2026-08-02.md` — AP-6 accepted-after-correction state,
-  P2 severity, stalled epoch, and exact owner deployment sequence.
-- `docs/OPERATIONAL_FACTS.md` — durable active-but-stalled machine fact and
-  no-unverified-self-heal warning.
-- `docs/OPERATIONS_RUNBOOK.md` — close-before-deploy and
-  reconcile-before-new-epoch procedure; operations-cycle failure isolation.
-- `README.md` — fee activity sync and unsupported-activity behavior.
-- `docs/FEATURE_MILESTONE_RECORD.md` — exactly two-paragraph completed AP-6
-  record.
-- This canonical handoff replaces the stale AUI-first handoff.
+## 7. Non-negotiable boundaries
 
-## 7. Unchanged boundaries and later work
-
-- Paper only. Live trading remains prohibited.
-- No LLM/ML component gains proposal, approval, sizing, or execution
-  authority.
-- Unsupported broker activity types remain intentionally unimplemented; do
-  not add dividend/interest/corporate-action accounting casually.
-- Three-sleeve M3 dividend-earmark accounting and APPROVE-gated reinvestment
-  proposals remain absent and unauthorized.
-- GR-6 off-machine backup remains blocked on the corporate epoch host except
-  for a permitted physical device; do not suggest corporate or personal cloud
-  upload.
-- The current critical path is restoring a clean frozen evidence epoch, not
-  starting another development milestone on the operational checkout.
+- Paper only; live trading remains prohibited.
+- Only the epoch host may run the cadence against the bound paper account.
+- Do not deploy development changes into epoch-003 or change its policy,
+  strategy, model, code, scheduler, or account lineage without an explicit
+  owner-authorized epoch transition.
+- Do not manually insert observations, drills, ledger rows, or alert state.
+- A future post-bootstrap paper-cash top-up (`JNLC`) or dividend remains a
+  deliberate fail-closed case until a separately reviewed handler exists.
+- LLM/ML output remains observational and cannot approve, size, submit, or
+  promote trades.
+- This review did not re-prove execution safety paths because the submission
+  changed documentation only; the deployed tree remains the previously
+  independently reviewed `ef05dc1` tree.
 
 ## 8. Required reading order on resume
 
 1. `CLAUDE.md` and `AGENTS.md`.
-2. `docs/OPERATIONAL_FACTS.md`.
-3. `docs/ACTION_PLAN_2026-08-02.md`.
-4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` and
+2. `docs/SESSION_HANDOFF.md`.
+3. `docs/OPERATIONAL_FACTS.md`.
+4. `docs/ACTION_PLAN_2026-08-02.md`.
+5. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` and
    `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`.
-5. `docs/REVIEW_2026-08-10_EPOCH_ACTIVITY_INGESTION.md`.
-6. `docs/OPERATIONS_RUNBOOK.md`.
-7. `docs/FEATURE_MILESTONE_RECORD.md`.
+6. `docs/REVIEW_2026-08-10_EPOCH_003_ESTABLISHMENT.md`.
+7. `docs/OPERATIONS_RUNBOOK.md`.
 
 Before acting, run:
 
@@ -257,28 +229,29 @@ git log -8 --oneline --decorate
 git branch -vv
 ```
 
-Expected branch in this checkout is
-`codex/review-epoch-activity-ingestion-20260810`, containing Claude's
-`f10b47d`, `8f922a9`, then correction `a8174b9` and the documentation commit
-that contains this handoff. If the branch is absent on another computer, the
-remote-availability warning remains true; do not reconstruct the correction
-from chat memory.
+Expected local branch is
+`codex/review-epoch-003-establishment-20260810`, containing Claude's
+`29909f4`, review correction `2739e76`, and the handoff/review-document commit
+that contains this file. The review branch is not remotely available until
+the owner explicitly authorizes and verifies a push.
 
 ## 9. Copyable resume prompt
 
 ```text
-Read CLAUDE.md, AGENTS.md, docs/OPERATIONAL_FACTS.md,
-docs/ACTION_PLAN_2026-08-02.md, docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md,
-docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, docs/SESSION_HANDOFF.md,
-and docs/REVIEW_2026-08-10_EPOCH_ACTIVITY_INGESTION.md completely. Confirm
-branch, HEAD, remote reachability, and worktree state before acting. The
-latest work is the accepted-after-correction AP-6 broker-activity review on
-branch codex/review-epoch-activity-ingestion-20260810. The branch has no
-upstream; correction a8174b9 closes all findings. Do not push, merge, deploy,
-touch the operator database, or close/start an epoch without explicit owner
+Read CLAUDE.md, AGENTS.md, docs/SESSION_HANDOFF.md,
+docs/OPERATIONAL_FACTS.md, docs/ACTION_PLAN_2026-08-02.md,
+docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md,
+docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md,
+docs/REVIEW_2026-08-10_EPOCH_003_ESTABLISHMENT.md, and
+docs/OPERATIONS_RUNBOOK.md completely. Confirm branch, HEAD, remote
+reachability, and worktree state before acting. Claude's documentation-only
+Epoch 3 record 29909f4 was accepted after correction on local review branch
+codex/review-epoch-003-establishment-20260810; correction 2739e76 closes the
+operational-record and artifact-hygiene findings. paper-epoch-003 is active
+on the epoch host at deployed ef05dc1 with drills 5/5, but the independent
+review measured zero epoch-003 observations. Verify the first scheduled
+post-close observation read-only before saying evidence is accumulating. Do
+not push, merge, deploy, alter scheduled tasks, call the broker, mutate the
+operator database, or close/start an epoch without explicit owner
 authorization.
-paper-epoch-002 remains active in storage but stalled at frozen 9a91498 with
-one session and no accumulating mandate evidence. If deployment is authorized,
-follow the close-before-deploy, reconcile-before-epoch-003 sequence in the
-handoff and runbook exactly.
 ```

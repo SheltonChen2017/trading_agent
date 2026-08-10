@@ -85,6 +85,15 @@ before the 24-hour health limit. It exits nonzero on a ledger mismatch or
 unhealthy result. Exceptions create a deduplicated critical SQLite alert and,
 when configured, append it to the JSONL delivery boundary.
 
+The reviewed broker-activity mapping is intentionally narrow: USD fees,
+plain legacy or explicit `CDIV` cash dividends, CSD deposits, and CSW
+withdrawals. Dividend classification is stored as unknown, and dividend/cash
+flows use the broker activity/settlement date for accounting while
+`created_at` remains the post-bootstrap inclusion boundary. Reject stock
+dividends (`SDIV`), substitute payments (`SPD`), generic JNLC journals,
+non-USD amounts, interest, and unimplemented corporate-action/tax variants.
+Do not turn a generic cash journal into contributed capital by assumption.
+
 `paper-observation` is post-close and scheduler-idempotent: a retry returns
 the already-recorded immutable observation. It skips weekends and exchange
 holidays, refuses pre-close capture, requires a matching reconciliation no

@@ -119,6 +119,28 @@ def test_current_handoff_does_not_retain_superseded_epoch_swap_instructions():
         )
 
 
+def test_current_dividend_handler_guidance_is_reviewed_and_date_correct():
+    """CR-W2 review must replace its unsafe submitted accounting guidance."""
+    for name in (
+        "SESSION_HANDOFF.md",
+        "ACTION_PLAN_2026-08-02.md",
+        "OPERATIONAL_FACTS.md",
+        "OPERATIONS_RUNBOOK.md",
+    ):
+        text = _text(name)
+        for stale in (
+            "2026-09-09",
+            "08-09 ex-date",
+            "JNLC`/`CSD`/`CSW` → `record_cash_transfer",
+        ):
+            assert stale not in text, f"{name} retains stale CR-W2 claim {stale!r}"
+
+    handoff = _text("SESSION_HANDOFF.md")
+    assert "awaiting independent review" not in handoff
+    assert "2026-09-10" in handoff
+    assert "JNLC" in handoff and "fail" in handoff.lower()
+
+
 def test_current_documents_do_not_publish_account_identifiers():
     """Even shortened broker account identifiers are machine-local facts.
 

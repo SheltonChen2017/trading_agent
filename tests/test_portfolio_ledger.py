@@ -1,7 +1,7 @@
 import sys
 import sqlite3
 import threading
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 
@@ -9,6 +9,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from assistant.tax_lots import MARKET_TIMEZONE
 from assistant.portfolio_ledger import (
     ACCOUNT_CASH,
     ACCOUNT_CONTRIBUTED_CAPITAL,
@@ -19,6 +20,9 @@ from assistant.portfolio_ledger import (
     JournalTransaction,
     LedgerError,
     Posting,
+    _ACTIVITY_EXTERNAL_ID_PREFIXES,
+    _HANDLED_ACTIVITY_TYPES,
+    _assert_broker_activity_id_not_retyped,
     _fill_transaction,
     bind_legacy_alpaca_account,
     bootstrap_opening_snapshot,
@@ -960,22 +964,25 @@ def test_sync_broker_activities_rejects_an_unverified_created_after_bound(tmp_pa
 
 
 def test_sync_broker_activities_refuses_unknown_activity_types(tmp_path):
-    # A dividend (AEP is in the account) must block evidence capture
-    # loudly, not be skipped into a silent cash drift. The recognized fee
-    # in the same batch is still journaled: posting is idempotent, so no
-    # work is lost, and the observation stays blocked until the sync is
-    # deliberately extended to support the activity.
+    # Contract update 2026-08-10: plain DIV was this test's original
+    # unknown-type example; it is now deliberately handled (see the DIV
+    # tests below), so INT stands in as the unhandled case. The invariant
+    # this test pins is unchanged: an unrecognized activity must block
+    # evidence capture loudly, not be skipped into a silent cash drift,
+    # while the recognized fee in the same batch is still journaled --
+    # posting is idempotent, so no work is lost, and the observation stays
+    # blocked until the sync is deliberately extended.
     store, _ = _bootstrapped_store(tmp_path)
-    dividend = {
-        "id": "div::1",
-        "activity_type": "DIV",
+    interest = {
+        "id": "int::1",
+        "activity_type": "INT",
         "created_at": "2026-07-29T12:00:00Z",
         "date": "2026-07-29",
         "net_amount": "12.48",
         "status": "executed",
     }
-    with pytest.raises(LedgerError, match="unhandled activity type DIV"):
-        sync_broker_activities(store, [_fee_activity(), dividend])
+    with pytest.raises(LedgerError, match="unhandled activity type INT"):
+        sync_broker_activities(store, [_fee_activity(), interest])
     assert ledger_balances(store)["cash"] == Decimal("999.99")
 
 
@@ -1046,3 +1053,445 @@ def test_sync_broker_activities_restores_reconciliation_match(tmp_path):
     after = reconcile_snapshot(store, broker_now)
     assert after["matched"] is True
     assert ledger_balances(store)["cash"] == Decimal("999.97")
+
+
+# --- DIV / cash-movement handling in sync_broker_activities (2026-08-10) ---
+# Motivating deadline: the account bought 39 AEP on 2026-08-07, before the
+# 2026-08-10 record/ex-date, so a $37.05 cash dividend is scheduled to arrive
+# as a DIV activity on the 2026-09-10 pay date. Without a handler it fails and
+# stalls the epoch exactly like the CAT fees did (watch item CR-W2).
+
+
+def _div_activity(**overrides):
+    activity = {
+        "id": "20260910000000000::div-aep",
+        "activity_type": "DIV",
+        "created_at": "2026-07-29T11:30:00Z",
+        "date": "2026-07-29",
+        "net_amount": "37.05",
+        "per_share_amount": "0.95",
+        "qty": "39",
+        "symbol": "AEP",
+        "status": "executed",
+    }
+    activity.update(overrides)
+    return activity
+
+
+def test_sync_broker_activities_posts_a_plain_dividend_idempotently(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    report = sync_broker_activities(store, [_div_activity()])
+    assert report["inserted"] == 1
+    assert report["by_type"] == {"DIV": {"inserted": 1, "duplicates": 0}}
+    assert ledger_balances(store)["cash"] == Decimal("1037.05")
+    income = _postings_for_account(store, ACCOUNT_DIVIDEND_INCOME)
+    assert len(income) == 1
+    assert Decimal(income[0]["amount"]) == Decimal("-37.05")
+    transaction = store.get_journal_transaction_by_external_id(
+        "dividend:20260910000000000::div-aep"
+    )
+    assert transaction["metadata"]["tax_classification"] == "unknown"
+    assert transaction["metadata"]["ticker"] == "AEP"
+    assert "pay_date" not in transaction["metadata"]
+    # Market-local midnight (DHCR-001), which is 04:00Z during EDT.
+    assert transaction["occurred_at"] == "2026-07-29T04:00:00+00:00"
+    assert _market_local_date(transaction["occurred_at"]) == "2026-07-29"
+    replay = sync_broker_activities(store, [_div_activity()])
+    assert replay["duplicates"] == 1
+    assert ledger_balances(store)["cash"] == Decimal("1037.05")
+
+
+def test_sync_broker_activities_dividend_without_optional_fields(tmp_path):
+    # Alpaca's published schema does not promise per_share_amount/qty.
+    store, _ = _bootstrapped_store(tmp_path)
+    minimal = _div_activity()
+    for optional in ("per_share_amount", "qty", "status", "date"):
+        minimal.pop(optional)
+    report = sync_broker_activities(store, [minimal])
+    assert report["inserted"] == 1
+    assert ledger_balances(store)["cash"] == Decimal("1037.05")
+
+
+def test_sync_broker_activities_refuses_malformed_dividends(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    cases = [
+        (_div_activity(net_amount="-37.05"), "non-positive net_amount"),
+        (_div_activity(net_amount="0"), "non-positive net_amount"),
+        (_div_activity(symbol=None), "missing its symbol"),
+        (_div_activity(symbol="BAD:TICKER"), "invalid ticker"),
+        # per_share x qty must reconcile with the cash amount; a broker row
+        # that contradicts its own arithmetic is refused, not averaged.
+        (_div_activity(per_share_amount="0.50"), "does not match"),
+        (_div_activity(qty="banana"), "must be numeric"),
+    ]
+    for activity, match in cases:
+        with pytest.raises(LedgerError, match=match):
+            sync_broker_activities(store, [activity])
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_sync_broker_activities_posts_cash_movements_with_signed_amounts(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    deposit = {
+        "id": "csd::top-up",
+        "activity_type": "CSD",
+        "created_at": "2026-07-29T12:00:00Z",
+        "net_amount": "500",
+        "status": "executed",
+    }
+    withdrawal = {
+        "id": "csw::out",
+        "activity_type": "CSW",
+        "created_at": "2026-07-29T12:30:00Z",
+        "net_amount": "-200",
+        "status": "executed",
+    }
+    report = sync_broker_activities(store, [deposit, withdrawal])
+    assert report["inserted"] == 2
+    assert report["by_type"] == {
+        "CSD": {"inserted": 1, "duplicates": 0},
+        "CSW": {"inserted": 1, "duplicates": 0},
+    }
+    balances = ledger_balances(store)
+    assert balances["cash"] == Decimal("1300")
+    capital = _postings_for_account(store, ACCOUNT_CONTRIBUTED_CAPITAL)
+    assert sorted(Decimal(row["amount"]) for row in capital) == [
+        Decimal("-500"),
+        Decimal("200"),
+    ]
+    assert sync_broker_activities(store, [deposit, withdrawal])["duplicates"] == 2
+
+
+def test_sync_broker_activities_refuses_wrong_sign_cash_movements(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    cases = [
+        ({"id": "csd::neg", "activity_type": "CSD", "created_at": "2026-07-29T12:00:00Z", "net_amount": "-10"}, "negative net_amount"),
+        ({"id": "csw::pos", "activity_type": "CSW", "created_at": "2026-07-29T12:00:00Z", "net_amount": "10"}, "positive net_amount"),
+        ({"id": "csd::zero", "activity_type": "CSD", "created_at": "2026-07-29T12:00:00Z", "net_amount": "0"}, "zero net_amount"),
+    ]
+    for activity, match in cases:
+        with pytest.raises(LedgerError, match=match):
+            sync_broker_activities(store, [activity])
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_sync_broker_activities_still_refuses_deliberately_excluded_types(tmp_path):
+    # INT, the DIV* variants, and JNLS stay fail-closed on purpose: each
+    # needs its own reviewed accounting/tax treatment before ingestion.
+    store, _ = _bootstrapped_store(tmp_path)
+    for activity_type in ("INT", "DIVNRA", "DIVROC", "DIVCGL", "JNLC", "JNLS", "PTC"):
+        activity = {
+            "id": f"x::{activity_type}",
+            "activity_type": activity_type,
+            "created_at": "2026-07-29T12:00:00Z",
+            "net_amount": "1.23",
+        }
+        with pytest.raises(LedgerError, match=f"unhandled activity type {activity_type}"):
+            sync_broker_activities(store, [activity])
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_sync_broker_activities_one_bad_row_still_reports_and_posts_good_rows(tmp_path):
+    # The dispatch collects per-row refusals instead of aborting mid-loop:
+    # the good fee and dividend post (idempotently), and the final error
+    # lists the bad row so the operator sees everything at once.
+    store, _ = _bootstrapped_store(tmp_path)
+    good_fee = _fee_activity()
+    good_div = _div_activity()
+    bad = _div_activity(activity_id="div::bad", net_amount="-1")
+    bad["id"] = "div::bad"
+    with pytest.raises(LedgerError, match="non-positive net_amount"):
+        sync_broker_activities(store, [good_fee, good_div, bad])
+    assert ledger_balances(store)["cash"] == Decimal("1037.04")
+
+
+def test_sync_broker_activities_restores_reconciliation_after_dividend(tmp_path):
+    # Miniature of the 2026-09-10 scenario: the broker credits the AEP
+    # dividend; before the sync the books mismatch by the full amount,
+    # after it they match exactly.
+    store, _ = _bootstrapped_store(tmp_path, cash=1000.0)
+    broker_now = _snapshot(cash=1037.05)
+    before = reconcile_snapshot(store, broker_now)
+    assert before["matched"] is False
+    report = sync_broker_activities(store, [_div_activity()])
+    assert report["inserted"] == 1
+    after = reconcile_snapshot(store, broker_now)
+    assert after["matched"] is True
+
+
+def test_sync_broker_activities_uses_the_economic_date_for_dividends(tmp_path):
+    """Creation time is a fetch boundary, not the dividend's tax/accounting date."""
+    store, boot_at = _bootstrapped_store(tmp_path)
+    dividend = _div_activity(
+        created_at=None,
+        date="2026-12-31",
+        id="20270101010000000::year-boundary-div",
+    )
+    dividend.pop("created_at")
+
+    sync_broker_activities(store, [dividend], created_after=boot_at)
+
+    transaction = store.get_journal_transaction_by_external_id(
+        "dividend:20270101010000000::year-boundary-div"
+    )
+    # 05:00Z during EST -- market-local midnight, not UTC midnight.
+    assert transaction["occurred_at"] == "2026-12-31T05:00:00+00:00"
+    assert _market_local_date(transaction["occurred_at"]) == "2026-12-31"
+
+
+def test_sync_broker_activities_uses_the_economic_date_for_cash_flows(tmp_path):
+    """A deposit must land in its real return interval, not at bootstrap."""
+    store, boot_at = _bootstrapped_store(tmp_path)
+    deposit = {
+        "id": "20270101010000000::year-boundary-deposit",
+        "activity_type": "CSD",
+        "date": "2026-12-31",
+        "net_amount": "500",
+    }
+
+    sync_broker_activities(store, [deposit], created_after=boot_at)
+
+    transaction = store.get_journal_transaction_by_external_id(
+        "cash_transfer:20270101010000000::year-boundary-deposit"
+    )
+    assert transaction["occurred_at"] == "2026-12-31T05:00:00+00:00"
+    assert _market_local_date(transaction["occurred_at"]) == "2026-12-31"
+
+
+@pytest.mark.parametrize("subtype_field", ["activity_sub_type", "activity_subtype"])
+@pytest.mark.parametrize("subtype", ["SDIV", "SPD"])
+def test_sync_broker_activities_refuses_non_cash_dividend_subtypes(
+    tmp_path, subtype_field, subtype
+):
+    """Stock dividends and substitute payments need different accounting."""
+    store, _ = _bootstrapped_store(tmp_path)
+    activity = _div_activity()
+    activity[subtype_field] = subtype
+    with pytest.raises(LedgerError, match="unsupported DIV subtype"):
+        sync_broker_activities(store, [activity])
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_sync_broker_activities_accepts_an_explicit_cash_dividend_subtype(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    report = sync_broker_activities(
+        store, [_div_activity(activity_subtype="CDIV")]
+    )
+    assert report["inserted"] == 1
+    assert ledger_balances(store)["cash"] == Decimal("1037.05")
+
+
+def test_sync_broker_activities_refuses_generic_cash_journals(tmp_path):
+    """JNLC identifies cash, but not whether it is contributed capital."""
+    store, _ = _bootstrapped_store(tmp_path)
+    journal = {
+        "id": "jnlc::broker-adjustment",
+        "activity_type": "JNLC",
+        "created_at": "2026-07-29T12:00:00Z",
+        "net_amount": "4.81",
+        "description": "Broker cash adjustment",
+    }
+    with pytest.raises(LedgerError, match="unhandled activity type JNLC"):
+        sync_broker_activities(store, [journal])
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+@pytest.mark.parametrize("activity", [
+    _div_activity(currency="EUR"),
+    {
+        "id": "csd::eur",
+        "activity_type": "CSD",
+        "created_at": "2026-07-29T12:00:00Z",
+        "net_amount": "10",
+        "currency": "EUR",
+    },
+])
+def test_sync_broker_activities_refuses_non_usd_money(activity, tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    with pytest.raises(LedgerError, match="currency"):
+        sync_broker_activities(store, [activity])
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_sync_broker_activities_rejects_cross_type_broker_id_reuse(tmp_path):
+    """One immutable broker activity ID may produce exactly one journal event."""
+    store, _ = _bootstrapped_store(tmp_path)
+    shared_id = "20260729113000000::shared-broker-id"
+    sync_broker_activities(store, [_fee_activity(activity_id=shared_id)])
+
+    with pytest.raises(LedgerError, match="already journaled as FEE"):
+        sync_broker_activities(
+            store, [_div_activity(id=shared_id)]
+        )
+
+    assert ledger_balances(store)["cash"] == Decimal("999.99")
+
+
+def test_sync_broker_activities_preflights_cross_type_ids_before_posting(tmp_path):
+    """A contradictory response must not persist whichever row appeared first."""
+    store, _ = _bootstrapped_store(tmp_path)
+    shared_id = "20260729113000000::same-response-id"
+    fee = _fee_activity(activity_id=shared_id)
+    dividend = _div_activity(id=shared_id)
+
+    with pytest.raises(LedgerError, match="conflicting activity types"):
+        sync_broker_activities(store, [fee, dividend])
+
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+# --- Counter-review corrections DHCR-001/002 (2026-08-10) ---------------
+# The review correctly replaced fetch timestamps with the provider's
+# economic date, but stamped that date at UTC midnight -- which is the
+# PREVIOUS evening in New York. Every consumer of these rows buckets in
+# market-local time, so UTC midnight lands on the wrong side of two
+# boundaries. These tests pin the corrected semantics through the real
+# consumers rather than through a literal alone.
+
+
+def _market_local_date(occurred_at):
+    """The calendar day an occurred_at stamp falls on in the market's zone."""
+    return (
+        datetime.fromisoformat(str(occurred_at))
+        .astimezone(MARKET_TIMEZONE)
+        .date()
+        .isoformat()
+    )
+
+
+@pytest.mark.parametrize(
+    "activity_date, expected_utc",
+    [
+        ("2026-08-12", "2026-08-12T04:00:00+00:00"),  # EDT, UTC-4
+        ("2026-12-15", "2026-12-15T05:00:00+00:00"),  # EST, UTC-5
+    ],
+)
+def test_activity_dates_are_stamped_at_market_local_midnight(
+    tmp_path, activity_date, expected_utc
+):
+    """Both sides of the DST boundary land on the right market-local day."""
+    store, boot_at = _bootstrapped_store(tmp_path)
+    deposit = {
+        "id": f"csd::{activity_date}",
+        "activity_type": "CSD",
+        "created_at": f"{activity_date}T23:00:00Z",
+        "date": activity_date,
+        "net_amount": "500",
+    }
+    sync_broker_activities(store, [deposit], created_after=boot_at)
+    transaction = store.get_journal_transaction_by_external_id(
+        f"cash_transfer:csd::{activity_date}"
+    )
+    assert transaction["occurred_at"] == expected_utc
+    assert _market_local_date(transaction["occurred_at"]) == activity_date
+
+
+def test_a_winter_deposit_lands_in_its_own_session_return_interval(tmp_path):
+    """DHCR-001: the external-flow window is bounded by real capture instants.
+
+    `paper_evidence._net_external_flow` sums transfers in
+    (previous capture, this capture]. The scheduled capture is 16:30
+    Pacific, which under US STANDARD time is 00:30Z the following calendar
+    day. A deposit stamped at UTC midnight therefore falls 30 minutes
+    BEFORE the prior session's capture and is counted in that session's
+    return interval instead of its own -- the deposit-as-return hazard
+    GR-7c already had to close once. Market-local midnight is inside the
+    correct window year-round.
+    """
+    from zoneinfo import ZoneInfo
+
+    from assistant.paper_evidence import _net_external_flow
+
+    pacific = ZoneInfo("America/Los_Angeles")
+
+    def capture(day):  # the scheduled post-close capture instant
+        return datetime.combine(
+            day, datetime.min.time(), pacific
+        ).replace(hour=16, minute=30).astimezone(timezone.utc)
+
+    session = date(2026, 12, 15)
+    previous_session = date(2026, 12, 14)
+
+    store, boot_at = _bootstrapped_store(tmp_path)
+    sync_broker_activities(
+        store,
+        [
+            {
+                "id": "csd::winter-deposit",
+                "activity_type": "CSD",
+                "created_at": "2026-12-15T14:00:00Z",
+                "date": session.isoformat(),
+                "net_amount": "500",
+            }
+        ],
+        created_after=boot_at,
+    )
+
+    own_interval = _net_external_flow(
+        store, after=capture(previous_session), through=capture(session)
+    )
+    previous_interval = _net_external_flow(
+        store,
+        after=capture(date(2026, 12, 11)),
+        through=capture(previous_session),
+    )
+    assert own_interval == Decimal("500")
+    assert previous_interval == Decimal("0")
+
+
+def test_a_new_year_dividend_is_bucketed_into_the_correct_tax_year(tmp_path):
+    """DHCR-001: `tax_year_of` converts to market time before taking .year.
+
+    A 2027-01-01 activity stamped at UTC midnight reads as 2026-12-31
+    19:00 in New York and buckets into tax year 2026 -- exactly the
+    hazard `assistant/tax_reporting.py`'s own docstring warns about.
+    Dividend income does not reach that report today; this pins the
+    timestamp so it stays correct when it does.
+    """
+    from assistant.tax_reporting import tax_year_of
+
+    store, boot_at = _bootstrapped_store(tmp_path)
+    sync_broker_activities(
+        store,
+        [_div_activity(id="div::new-year", date="2027-01-01", created_at="2027-01-02T00:06:00Z")],
+        created_after=boot_at,
+    )
+    transaction = store.get_journal_transaction_by_external_id(
+        "dividend:div::new-year"
+    )
+    occurred = datetime.fromisoformat(transaction["occurred_at"])
+    assert tax_year_of(occurred) == 2027
+    assert _market_local_date(occurred) == "2027-01-01"
+
+
+def test_the_ledger_and_tax_modules_share_one_market_timezone():
+    """FCS-016: the zone that stamps a date must be the zone that buckets it."""
+    from assistant.tax_reporting import TAX_YEAR_TIMEZONE
+
+    assert MARKET_TIMEZONE is TAX_YEAR_TIMEZONE
+
+
+def test_every_handled_activity_type_declares_an_external_id_prefix(tmp_path):
+    """DHCR-002: a handled type with no prefix would raise KeyError.
+
+    KeyError is not a LedgerError, so it escapes the per-row refusal
+    handler as an unhandled crash instead of a clean fail-closed refusal.
+    Deriving the handled set from the prefix map makes the drift
+    impossible; this pins that relationship.
+    """
+    assert set(_ACTIVITY_EXTERNAL_ID_PREFIXES) == set(_HANDLED_ACTIVITY_TYPES)
+    store = AssistantStore(tmp_path / "assistant.db")
+    for activity_type in _HANDLED_ACTIVITY_TYPES:
+        # Must not raise KeyError for any type the loop will accept.
+        _assert_broker_activity_id_not_retyped(
+            store, activity_type=activity_type, activity_id="probe"
+        )
+
+
+def test_an_undeclared_handled_type_refuses_cleanly_instead_of_crashing(tmp_path):
+    """A future type added to the handled set without a prefix fails closed."""
+    store = AssistantStore(tmp_path / "assistant.db")
+    with pytest.raises(LedgerError, match="no external-id prefix is declared"):
+        _assert_broker_activity_id_not_retyped(
+            store, activity_type="INT", activity_id="probe"
+        )

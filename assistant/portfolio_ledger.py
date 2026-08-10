@@ -17,6 +17,10 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from assistant.schemas import PortfolioSnapshot
+# One definition, imported rather than restated (FCS-016). The zone that
+# decides an activity date's tax year and return interval must be the same
+# zone this module stamps that date with, or the two disagree silently.
+from assistant.tax_lots import MARKET_TIMEZONE
 from assistant.storage import (
     AssistantStore,
     JournalTransactionConflictError,
@@ -745,7 +749,29 @@ def record_fee(
 # Everything else fails closed: the sync raises, the calling observation
 # refuses to capture evidence, and the operator gets the exact unhandled
 # rows instead of a slowly drifting cash mismatch.
-_HANDLED_ACTIVITY_TYPES = frozenset({"FEE"})
+# FEE -> record_fee, DIV -> record_dividend, and explicit deposits/withdrawals
+# -> record_cash_transfer. Deliberately NOT handled, so they keep
+# failing closed: INT (never observed on this paper account; no
+# INCOME:INTEREST account or agreed treatment exists yet), every DIV*
+# variant (DIVNRA/DIVROC/DIVCGL/...: withholding, return-of-capital, and
+# capital-gain distributions each need their own reviewed tax treatment),
+# JNLC (a generic cash journal does not prove contributed-capital treatment),
+# and JNLS (a securities journal moves shares, not cash).
+# The external-id prefix each handled type journals under. This is the
+# single source of the handled set (counter-review DHCR-002): the
+# cross-type reuse guard must have a prefix for every type the loop
+# accepts, and a hand-maintained second literal would let a future type be
+# accepted with no prefix -- raising KeyError, which is NOT a LedgerError
+# and so escapes the per-row refusal handler as an unhandled crash instead
+# of a clean fail-closed refusal.
+_ACTIVITY_EXTERNAL_ID_PREFIXES = {
+    "FEE": "fee:",
+    "DIV": "dividend:",
+    "CSD": "cash_transfer:",
+    "CSW": "cash_transfer:",
+}
+_HANDLED_ACTIVITY_TYPES = frozenset(_ACTIVITY_EXTERNAL_ID_PREFIXES)
+_CASH_TRANSFER_ACTIVITY_TYPES = frozenset({"CSD", "CSW"})
 # Trade activities are deliberately NOT ingested here: fills enter the
 # journal through the app's own fill records (sync_app_fills), and a fill
 # the app never saw surfaces as a share-quantity mismatch in
@@ -780,13 +806,192 @@ def _activity_posted_at(
     )
 
 
+def _activity_occurred_at(
+    activity: dict[str, Any], *, activity_type: str, posted_at: datetime
+) -> datetime:
+    """Return the economic date for income/cash flow attribution.
+
+    ``created_at`` (or its bootstrap-bound surrogate) proves that the row
+    belongs after the opening snapshot. It is not necessarily the date on
+    which a dividend or external cash flow belongs in accounting/performance
+    reports. Alpaca's published NTA ``date`` is the activity/settlement date;
+    prefer it for DIV/CSD/CSW while retaining creation time for fees. When
+    neither economic date nor a real creation timestamp exists, refuse these
+    financial types rather than assigning every future event to bootstrap.
+    """
+    if activity_type == "FEE":
+        return posted_at
+    raw_date = activity.get("date")
+    if raw_date not in (None, ""):
+        normalized = _corporate_date(str(raw_date), "activity date")
+        try:
+            activity_date = date.fromisoformat(normalized)
+        except ValueError:
+            return _parse_at(normalized, "activity date")
+        # Market-local midnight, NOT UTC midnight (counter-review
+        # DHCR-001). A bare activity date means "this happened on calendar
+        # day D in the US market", and every consumer that buckets these
+        # rows does so in market-local time: `tax_year_of()` converts to
+        # MARKET_TIMEZONE before taking `.year`, and the external-flow
+        # windows in paper_evidence/portfolio_history are bounded by real
+        # post-close capture instants. UTC midnight is the PREVIOUS
+        # evening in New York, so it lands on the wrong side of both
+        # boundaries: a 2027-01-01 flow bucketed as tax year 2026, and --
+        # under US standard time, when the 16:30 Pacific capture falls at
+        # 00:30Z the next day -- a flow attributed to the previous
+        # session's return interval. Market-local midnight is correct on
+        # both axes year-round.
+        return datetime.combine(
+            activity_date, datetime.min.time(), MARKET_TIMEZONE
+        ).astimezone(timezone.utc)
+    if activity.get("created_at") not in (None, ""):
+        return posted_at
+    raise LedgerError(
+        f"{activity_type} requires an activity date or real created_at; "
+        "the bootstrap-bound timestamp surrogate is not an economic date"
+    )
+
+
+def _broker_activity_subtype(activity: dict[str, Any]) -> str:
+    """Normalize legacy/current subtype spellings and reject disagreement."""
+    values = {
+        str(activity.get(field) or "").strip().upper()
+        for field in ("activity_sub_type", "activity_subtype")
+        if str(activity.get(field) or "").strip()
+    }
+    if len(values) > 1:
+        raise LedgerError("activity carries conflicting subtype fields")
+    return next(iter(values), "")
+
+
+def _assert_broker_activity_id_not_retyped(
+    store: AssistantStore, *, activity_type: str, activity_id: str
+) -> None:
+    """One immutable broker activity ID may map to one accounting event."""
+    expected_prefix = _ACTIVITY_EXTERNAL_ID_PREFIXES.get(activity_type)
+    if expected_prefix is None:
+        raise LedgerError(
+            f"no external-id prefix is declared for handled activity type "
+            f"{activity_type}; refusing to journal it"
+        )
+    for existing_type, prefix in (
+        ("FEE", "fee:"),
+        ("DIV", "dividend:"),
+        ("cash transfer", "cash_transfer:"),
+    ):
+        if prefix == expected_prefix:
+            continue
+        if store.get_journal_transaction_by_external_id(prefix + activity_id):
+            raise LedgerError(
+                f"broker activity id {activity_id!r} is already journaled as "
+                f"{existing_type}; refusing to reinterpret it as {activity_type}"
+            )
+
+
+def _post_broker_activity(
+    store: AssistantStore,
+    *,
+    activity: dict[str, Any],
+    activity_type: str,
+    activity_id: str,
+    net_amount: Decimal,
+    posted_at: datetime,
+) -> bool:
+    """Journal one recognized broker activity; True when newly inserted.
+
+    Raises LedgerError for any shape this dispatch does not positively
+    recognize (wrong sign for the type, missing symbol, inconsistent
+    per-share arithmetic, ...). The caller collects that refusal into the
+    fail-closed unhandled list rather than aborting the whole sync, so the
+    operator sees every problem row in one error.
+    """
+    description = str(activity.get("description") or "").strip()
+    sub_type = _broker_activity_subtype(activity)
+    raw_currency = str(activity.get("currency") or "").strip().upper()
+    if raw_currency and raw_currency != USD:
+        raise LedgerError(
+            f"{activity_type} currency is {raw_currency}, not supported {USD}"
+        )
+    _assert_broker_activity_id_not_retyped(
+        store, activity_type=activity_type, activity_id=activity_id
+    )
+    occurred_at = _activity_occurred_at(
+        activity, activity_type=activity_type, posted_at=posted_at
+    ).isoformat()
+    if activity_type == "FEE":
+        if net_amount >= 0:
+            # A fee credit/reversal is a shape this sync has never seen;
+            # refuse rather than guess its accounting treatment.
+            raise LedgerError(f"FEE with non-negative net_amount {net_amount}")
+        return record_fee(
+            store,
+            external_id=activity_id,
+            amount=-net_amount,
+            occurred_at=occurred_at,
+            description=description or f"Broker {sub_type or 'FEE'} fee",
+        )
+    if activity_type == "DIV":
+        # Plain legacy cash dividend or explicit CDIV only. Current Alpaca
+        # activity contracts also use DIV for SDIV (stock) and SPD
+        # (substitute payment), which require different accounting/tax paths.
+        if sub_type not in ("", "CDIV"):
+            raise LedgerError(f"unsupported DIV subtype {sub_type}")
+        if net_amount <= 0:
+            raise LedgerError(f"DIV with non-positive net_amount {net_amount}")
+        symbol = str(activity.get("symbol") or "").strip().upper()
+        if not symbol:
+            raise LedgerError("DIV activity is missing its symbol")
+        extras: dict[str, Any] = {}
+        raw_per_share = activity.get("per_share_amount")
+        if raw_per_share not in (None, ""):
+            extras["amount_per_share"] = _decimal(
+                raw_per_share, "DIV per_share_amount"
+            )
+        raw_qty = activity.get("qty")
+        if raw_qty not in (None, ""):
+            extras["shares_entitled"] = _decimal(raw_qty, "DIV qty")
+        # tax_classification stays "unknown": the broker feed does not say
+        # qualified vs ordinary, and inventing a tax fact here would flow
+        # straight into the annual tax report.
+        return record_dividend(
+            store,
+            external_id=activity_id,
+            ticker=symbol,
+            gross_amount=net_amount,
+            occurred_at=occurred_at,
+            tax_classification="unknown",
+            **extras,
+        )
+    if activity_type in _CASH_TRANSFER_ACTIVITY_TYPES:
+        if net_amount == 0:
+            raise LedgerError(f"{activity_type} with zero net_amount")
+        if activity_type == "CSD" and net_amount < 0:
+            raise LedgerError("CSD (deposit) with negative net_amount")
+        if activity_type == "CSW" and net_amount > 0:
+            raise LedgerError("CSW (withdrawal) with positive net_amount")
+        return record_cash_transfer(
+            store,
+            external_id=activity_id,
+            amount=net_amount,
+            occurred_at=occurred_at,
+            description=description
+            or f"Broker {activity_type} cash movement",
+        )
+    raise LedgerError(f"no journal mapping for activity type {activity_type}")
+
+
 def sync_broker_activities(
     store: AssistantStore,
     activities: Any,
     *,
     created_after: datetime | None = None,
 ) -> dict[str, Any]:
-    """Journal broker non-trade activities (currently fees) idempotently.
+    """Journal broker non-trade activities idempotently.
+
+    Handled: FEE, plain DIV (cash dividend, tax classification recorded as
+    unknown), and explicit CSD/CSW cash movements. Everything else fails
+    closed -- see _HANDLED_ACTIVITY_TYPES for what is deliberately excluded
+    and why.
 
     ``activities`` is the raw list from the broker's account-activities
     feed (execution.alpaca_broker.list_account_activities); passing it in
@@ -819,10 +1024,25 @@ def sync_broker_activities(
             raise LedgerError(
                 "activity created-after bound must match the ledger bootstrap"
             )
+    activity_rows = list(activities)
+    types_by_id: dict[str, str] = {}
+    for activity in activity_rows:
+        if not isinstance(activity, dict) or not activity.get("id"):
+            continue
+        activity_id = str(activity["id"])
+        activity_type = str(activity.get("activity_type") or "").upper()
+        previous_type = types_by_id.setdefault(activity_id, activity_type)
+        if previous_type != activity_type:
+            raise LedgerError(
+                f"broker activity id {activity_id!r} appears with conflicting "
+                f"activity types {previous_type or '(missing)'} and "
+                f"{activity_type or '(missing)'}"
+            )
     inserted = 0
     duplicates = 0
     skipped_pre_bootstrap = 0
     trade_activities_skipped = 0
+    by_type: dict[str, dict[str, int]] = {}
     unhandled: list[dict[str, Any]] = []
 
     def _refuse(activity: Any, reason: str) -> None:
@@ -837,7 +1057,7 @@ def sync_broker_activities(
             }
         )
 
-    for activity in activities:
+    for activity in activity_rows:
         if not isinstance(activity, dict):
             _refuse(activity, f"activity is not an object: {type(activity).__name__}")
             continue
@@ -875,25 +1095,27 @@ def sync_broker_activities(
         except LedgerError:
             _refuse(activity, "activity net_amount is missing or not numeric")
             continue
-        if net_amount >= 0:
-            # A fee credit/reversal is a shape this sync has never seen;
-            # refuse rather than guess its accounting treatment.
-            _refuse(activity, f"FEE with non-negative net_amount {net_amount}")
+        try:
+            newly_inserted = _post_broker_activity(
+                store,
+                activity=activity,
+                activity_type=activity_type,
+                activity_id=str(activity_id),
+                net_amount=net_amount,
+                posted_at=posted_at,
+            )
+        except LedgerError as exc:
+            _refuse(activity, str(exc))
             continue
-        description = str(activity.get("description") or "").strip()
-        sub_type = str(activity.get("activity_sub_type") or "").strip()
-        if not description:
-            description = f"Broker {sub_type or activity_type} fee"
-        if record_fee(
-            store,
-            external_id=str(activity_id),
-            amount=-net_amount,
-            occurred_at=posted_at.isoformat(),
-            description=description,
-        ):
+        type_counts = by_type.setdefault(
+            activity_type, {"inserted": 0, "duplicates": 0}
+        )
+        if newly_inserted:
             inserted += 1
+            type_counts["inserted"] += 1
         else:
             duplicates += 1
+            type_counts["duplicates"] += 1
 
     if unhandled:
         # Recognized fees above are already journaled (each idempotently),
@@ -906,6 +1128,7 @@ def sync_broker_activities(
     return {
         "inserted": inserted,
         "duplicates": duplicates,
+        "by_type": by_type,
         "skipped_pre_bootstrap": skipped_pre_bootstrap,
         "trade_activities_skipped": trade_activities_skipped,
         "activities_seen": inserted

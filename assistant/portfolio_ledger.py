@@ -17,6 +17,10 @@ from decimal import Decimal, InvalidOperation
 from typing import Any
 
 from assistant.schemas import PortfolioSnapshot
+# One definition, imported rather than restated (FCS-016). The zone that
+# decides an activity date's tax year and return interval must be the same
+# zone this module stamps that date with, or the two disagree silently.
+from assistant.tax_lots import MARKET_TIMEZONE
 from assistant.storage import (
     AssistantStore,
     JournalTransactionConflictError,
@@ -753,7 +757,20 @@ def record_fee(
 # capital-gain distributions each need their own reviewed tax treatment),
 # JNLC (a generic cash journal does not prove contributed-capital treatment),
 # and JNLS (a securities journal moves shares, not cash).
-_HANDLED_ACTIVITY_TYPES = frozenset({"FEE", "DIV", "CSD", "CSW"})
+# The external-id prefix each handled type journals under. This is the
+# single source of the handled set (counter-review DHCR-002): the
+# cross-type reuse guard must have a prefix for every type the loop
+# accepts, and a hand-maintained second literal would let a future type be
+# accepted with no prefix -- raising KeyError, which is NOT a LedgerError
+# and so escapes the per-row refusal handler as an unhandled crash instead
+# of a clean fail-closed refusal.
+_ACTIVITY_EXTERNAL_ID_PREFIXES = {
+    "FEE": "fee:",
+    "DIV": "dividend:",
+    "CSD": "cash_transfer:",
+    "CSW": "cash_transfer:",
+}
+_HANDLED_ACTIVITY_TYPES = frozenset(_ACTIVITY_EXTERNAL_ID_PREFIXES)
 _CASH_TRANSFER_ACTIVITY_TYPES = frozenset({"CSD", "CSW"})
 # Trade activities are deliberately NOT ingested here: fills enter the
 # journal through the app's own fill records (sync_app_fills), and a fill
@@ -811,7 +828,22 @@ def _activity_occurred_at(
             activity_date = date.fromisoformat(normalized)
         except ValueError:
             return _parse_at(normalized, "activity date")
-        return datetime.combine(activity_date, datetime.min.time(), timezone.utc)
+        # Market-local midnight, NOT UTC midnight (counter-review
+        # DHCR-001). A bare activity date means "this happened on calendar
+        # day D in the US market", and every consumer that buckets these
+        # rows does so in market-local time: `tax_year_of()` converts to
+        # MARKET_TIMEZONE before taking `.year`, and the external-flow
+        # windows in paper_evidence/portfolio_history are bounded by real
+        # post-close capture instants. UTC midnight is the PREVIOUS
+        # evening in New York, so it lands on the wrong side of both
+        # boundaries: a 2027-01-01 flow bucketed as tax year 2026, and --
+        # under US standard time, when the 16:30 Pacific capture falls at
+        # 00:30Z the next day -- a flow attributed to the previous
+        # session's return interval. Market-local midnight is correct on
+        # both axes year-round.
+        return datetime.combine(
+            activity_date, datetime.min.time(), MARKET_TIMEZONE
+        ).astimezone(timezone.utc)
     if activity.get("created_at") not in (None, ""):
         return posted_at
     raise LedgerError(
@@ -836,12 +868,12 @@ def _assert_broker_activity_id_not_retyped(
     store: AssistantStore, *, activity_type: str, activity_id: str
 ) -> None:
     """One immutable broker activity ID may map to one accounting event."""
-    expected_prefix = {
-        "FEE": "fee:",
-        "DIV": "dividend:",
-        "CSD": "cash_transfer:",
-        "CSW": "cash_transfer:",
-    }[activity_type]
+    expected_prefix = _ACTIVITY_EXTERNAL_ID_PREFIXES.get(activity_type)
+    if expected_prefix is None:
+        raise LedgerError(
+            f"no external-id prefix is declared for handled activity type "
+            f"{activity_type}; refusing to journal it"
+        )
     for existing_type, prefix in (
         ("FEE", "fee:"),
         ("DIV", "dividend:"),

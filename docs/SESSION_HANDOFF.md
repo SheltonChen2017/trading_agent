@@ -1,6 +1,8 @@
 # Session handoff — reviewed broker dividend handler
 
-Prepared: 2026-08-10, after independent review and correction
+Prepared: 2026-08-10, after independent review and correction, then
+Claude's counter-review (section 1a), which **accepted all six findings**
+and **corrected two residual defects inside the correction itself**.
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
@@ -48,6 +50,62 @@ Final issue state: **0 P0, 0 P1, 0 P2, and 0 P3 open**.
 
 Full evidence and corrections are in
 `docs/REVIEW_2026-08-10_BROKER_DIVIDEND_HANDLER.md`.
+
+## 1a. Counter-review (Claude, same day) — accepted, two residuals fixed
+
+Claude restored the submitted `25a2e7b` ledger in place and ran the
+review's regressions against it: **all eleven intended cases failed red**,
+so every finding is independently confirmed. The real tree was restored
+from a byte copy and re-verified green. `DHREV-006` was settled decisively
+and without relying on either party's source: **2026-08-09 is a Sunday**,
+so it cannot be an ex-dividend date — Claude's submitted dates came from
+`yfinance`'s `calendar` field, which was one day early on both dates, and
+the issuer dates (Monday 2026-08-10 record/ex, Thursday 2026-09-10
+payable) are correct.
+
+Two residual defects were then found **inside the correction** and fixed
+in the counter-review commit:
+
+- **DHCR-001 (P2)** — the correction rightly replaced fetch timestamps
+  with the provider's activity date, but stamped that bare date at **UTC**
+  midnight, which is the previous evening in New York. Every consumer
+  buckets in market-local time, so it lands on the wrong side of two
+  boundaries, both reproduced rather than reasoned about: (1) under US
+  **standard time** the 16:30 Pacific capture falls at `00:30Z` the next
+  day, so a flow dated `D` stamped `D 00:00Z` is counted in the
+  **previous session's** return interval by
+  `paper_evidence._net_external_flow` — the deposit-as-return hazard GR-7c
+  already closed once; (2) `tax_year_of(2027-01-01T00:00:00+00:00)`
+  returns **2026**, exactly the failure `tax_reporting.py`'s own docstring
+  warns about. Fixed by stamping market-local midnight using
+  `MARKET_TIMEZONE` imported from `assistant.tax_lots` — one definition,
+  imported rather than restated (FCS-016), so the zone that stamps a date
+  is provably the zone that buckets it. New coverage: DST-parametrized
+  stamping (EDT/EST), plus behavioral tests through the real
+  `_net_external_flow` and `tax_year_of` consumers.
+- **DHCR-002 (P3)** — `_assert_broker_activity_id_not_retyped` indexed a
+  hand-maintained literal dict by activity type, which had to stay in sync
+  with a separate handled-types literal. A future type added without a
+  prefix raises `KeyError`, which is **not** a `LedgerError` and so
+  escapes the per-row refusal handler as an unhandled crash instead of a
+  clean fail-closed refusal. Fixed by deriving `_HANDLED_ACTIVITY_TYPES`
+  from `_ACTIVITY_EXTERNAL_ID_PREFIXES` (drift now structurally
+  impossible) and refusing with a `LedgerError`.
+
+Four mutations, each restored and re-verified: reverting to UTC midnight
+turns 7 tests red including both behavioral consumer tests; restoring the
+hard dict index reproduces the `KeyError`; removing Codex's cross-type ID
+guard and disabling its DIV subtype gate each turn their own tests red,
+proving those guards load-bearing.
+
+**CR-W3 (new watch item, recorded not fixed):** the DIV subtype allowlist
+accepts only an absent subtype or explicit `CDIV`. No `DIV` activity has
+ever appeared on this account, so the subtype the real AEP payment will
+carry is unverified. If it carries anything else, that night's observation
+fails closed and **names the subtype in the refusal**, and the fix is a
+small reviewed allowlist addition. Over-refusing is the correct failure
+direction, but expect it as a possibility around 2026-09-10 rather than
+be surprised by it.
 
 ## 2. Completed behavior and deliberate limitations
 
@@ -122,6 +180,20 @@ Environment: Windows, repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
 - Non-printing secret-shape scan of every changed file: zero matches.
 
 No validation made a live Alpaca request or mutated the operational database.
+
+**Counter-review validation (final tree).** Single uninterrupted full-suite
+run: **3,364 passed, 0 failed, 25 warnings** in 698.62s — Codex's 3,357
+plus the seven counter-review regressions. Ledger suite 63 passed.
+Import-boundary and decimal-guard suites re-run because this correction adds
+a package dependency (`assistant.portfolio_ledger` → `assistant.tax_lots`
+for `MARKET_TIMEZONE`): **11 passed**. `compileall` clean; `git diff --check`
+clean. The full-suite run covered the final *code* tree; the documentation
+edits that followed touch only documents, and all four document-reading
+suites were re-run afterwards (**43 passed**), so no assertion is validated
+against a stale tree. Red baseline: the submitted `25a2e7b` ledger was
+restored in place and the review's regressions run against it — 11 failed,
+1 passed (the explicit-CDIV case, which correctly passes on both trees) —
+then restored from a byte copy and re-verified green.
 
 ## 5. Exact next step
 

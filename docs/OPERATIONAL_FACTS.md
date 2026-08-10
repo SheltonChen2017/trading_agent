@@ -119,6 +119,21 @@ operational alert record, not evidence of a current book mismatch. Codex did
 not acknowledge or otherwise mutate it. The first scheduled epoch-003
 PaperObservation remained due at 16:30 Pacific.
 
+Counter-review (Claude, same day) accepted all six review findings and
+corrected two residual defects in the correction itself: economic dates are
+now stamped at **market-local** midnight rather than UTC midnight (UTC
+midnight is the previous evening in New York, which misattributed winter
+cash flows to the previous session's return interval and a New-Year event
+to the prior tax year), and a prefix-map `KeyError` that escaped the
+fail-closed refusal handler is gone. Details in the review report §7.
+
+**CR-W3 (new watch item):** the DIV subtype allowlist accepts only an
+absent subtype or explicit `CDIV`, and no `DIV` activity has ever appeared
+on this account, so the subtype the real AEP payment carries is unverified.
+If it differs, that night's observation fails closed and names the subtype
+in the refusal message; the fix is a small reviewed allowlist addition.
+Expect this as a possibility around 2026-09-10.
+
 Standing watch until epoch-004 deployment: the AEP cash dividend and every
 post-bootstrap JNLC/CSD/CSW activity still fail closed on deployed `ef05dc1`.
 After deployment, plain cash dividends and explicit CSD/CSW movements are

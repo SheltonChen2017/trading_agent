@@ -1,7 +1,7 @@
 import sys
 import sqlite3
 import threading
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
 from pathlib import Path
 
@@ -9,6 +9,7 @@ import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
+from assistant.tax_lots import MARKET_TIMEZONE
 from assistant.portfolio_ledger import (
     ACCOUNT_CASH,
     ACCOUNT_CONTRIBUTED_CAPITAL,
@@ -19,6 +20,9 @@ from assistant.portfolio_ledger import (
     JournalTransaction,
     LedgerError,
     Posting,
+    _ACTIVITY_EXTERNAL_ID_PREFIXES,
+    _HANDLED_ACTIVITY_TYPES,
+    _assert_broker_activity_id_not_retyped,
     _fill_transaction,
     bind_legacy_alpaca_account,
     bootstrap_opening_snapshot,
@@ -1089,7 +1093,9 @@ def test_sync_broker_activities_posts_a_plain_dividend_idempotently(tmp_path):
     assert transaction["metadata"]["tax_classification"] == "unknown"
     assert transaction["metadata"]["ticker"] == "AEP"
     assert "pay_date" not in transaction["metadata"]
-    assert transaction["occurred_at"] == "2026-07-29T00:00:00+00:00"
+    # Market-local midnight (DHCR-001), which is 04:00Z during EDT.
+    assert transaction["occurred_at"] == "2026-07-29T04:00:00+00:00"
+    assert _market_local_date(transaction["occurred_at"]) == "2026-07-29"
     replay = sync_broker_activities(store, [_div_activity()])
     assert replay["duplicates"] == 1
     assert ledger_balances(store)["cash"] == Decimal("1037.05")
@@ -1228,7 +1234,9 @@ def test_sync_broker_activities_uses_the_economic_date_for_dividends(tmp_path):
     transaction = store.get_journal_transaction_by_external_id(
         "dividend:20270101010000000::year-boundary-div"
     )
-    assert transaction["occurred_at"] == "2026-12-31T00:00:00+00:00"
+    # 05:00Z during EST -- market-local midnight, not UTC midnight.
+    assert transaction["occurred_at"] == "2026-12-31T05:00:00+00:00"
+    assert _market_local_date(transaction["occurred_at"]) == "2026-12-31"
 
 
 def test_sync_broker_activities_uses_the_economic_date_for_cash_flows(tmp_path):
@@ -1246,7 +1254,8 @@ def test_sync_broker_activities_uses_the_economic_date_for_cash_flows(tmp_path):
     transaction = store.get_journal_transaction_by_external_id(
         "cash_transfer:20270101010000000::year-boundary-deposit"
     )
-    assert transaction["occurred_at"] == "2026-12-31T00:00:00+00:00"
+    assert transaction["occurred_at"] == "2026-12-31T05:00:00+00:00"
+    assert _market_local_date(transaction["occurred_at"]) == "2026-12-31"
 
 
 @pytest.mark.parametrize("subtype_field", ["activity_sub_type", "activity_subtype"])
@@ -1329,3 +1338,160 @@ def test_sync_broker_activities_preflights_cross_type_ids_before_posting(tmp_pat
         sync_broker_activities(store, [fee, dividend])
 
     assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+# --- Counter-review corrections DHCR-001/002 (2026-08-10) ---------------
+# The review correctly replaced fetch timestamps with the provider's
+# economic date, but stamped that date at UTC midnight -- which is the
+# PREVIOUS evening in New York. Every consumer of these rows buckets in
+# market-local time, so UTC midnight lands on the wrong side of two
+# boundaries. These tests pin the corrected semantics through the real
+# consumers rather than through a literal alone.
+
+
+def _market_local_date(occurred_at):
+    """The calendar day an occurred_at stamp falls on in the market's zone."""
+    return (
+        datetime.fromisoformat(str(occurred_at))
+        .astimezone(MARKET_TIMEZONE)
+        .date()
+        .isoformat()
+    )
+
+
+@pytest.mark.parametrize(
+    "activity_date, expected_utc",
+    [
+        ("2026-08-12", "2026-08-12T04:00:00+00:00"),  # EDT, UTC-4
+        ("2026-12-15", "2026-12-15T05:00:00+00:00"),  # EST, UTC-5
+    ],
+)
+def test_activity_dates_are_stamped_at_market_local_midnight(
+    tmp_path, activity_date, expected_utc
+):
+    """Both sides of the DST boundary land on the right market-local day."""
+    store, boot_at = _bootstrapped_store(tmp_path)
+    deposit = {
+        "id": f"csd::{activity_date}",
+        "activity_type": "CSD",
+        "created_at": f"{activity_date}T23:00:00Z",
+        "date": activity_date,
+        "net_amount": "500",
+    }
+    sync_broker_activities(store, [deposit], created_after=boot_at)
+    transaction = store.get_journal_transaction_by_external_id(
+        f"cash_transfer:csd::{activity_date}"
+    )
+    assert transaction["occurred_at"] == expected_utc
+    assert _market_local_date(transaction["occurred_at"]) == activity_date
+
+
+def test_a_winter_deposit_lands_in_its_own_session_return_interval(tmp_path):
+    """DHCR-001: the external-flow window is bounded by real capture instants.
+
+    `paper_evidence._net_external_flow` sums transfers in
+    (previous capture, this capture]. The scheduled capture is 16:30
+    Pacific, which under US STANDARD time is 00:30Z the following calendar
+    day. A deposit stamped at UTC midnight therefore falls 30 minutes
+    BEFORE the prior session's capture and is counted in that session's
+    return interval instead of its own -- the deposit-as-return hazard
+    GR-7c already had to close once. Market-local midnight is inside the
+    correct window year-round.
+    """
+    from zoneinfo import ZoneInfo
+
+    from assistant.paper_evidence import _net_external_flow
+
+    pacific = ZoneInfo("America/Los_Angeles")
+
+    def capture(day):  # the scheduled post-close capture instant
+        return datetime.combine(
+            day, datetime.min.time(), pacific
+        ).replace(hour=16, minute=30).astimezone(timezone.utc)
+
+    session = date(2026, 12, 15)
+    previous_session = date(2026, 12, 14)
+
+    store, boot_at = _bootstrapped_store(tmp_path)
+    sync_broker_activities(
+        store,
+        [
+            {
+                "id": "csd::winter-deposit",
+                "activity_type": "CSD",
+                "created_at": "2026-12-15T14:00:00Z",
+                "date": session.isoformat(),
+                "net_amount": "500",
+            }
+        ],
+        created_after=boot_at,
+    )
+
+    own_interval = _net_external_flow(
+        store, after=capture(previous_session), through=capture(session)
+    )
+    previous_interval = _net_external_flow(
+        store,
+        after=capture(date(2026, 12, 11)),
+        through=capture(previous_session),
+    )
+    assert own_interval == Decimal("500")
+    assert previous_interval == Decimal("0")
+
+
+def test_a_new_year_dividend_is_bucketed_into_the_correct_tax_year(tmp_path):
+    """DHCR-001: `tax_year_of` converts to market time before taking .year.
+
+    A 2027-01-01 activity stamped at UTC midnight reads as 2026-12-31
+    19:00 in New York and buckets into tax year 2026 -- exactly the
+    hazard `assistant/tax_reporting.py`'s own docstring warns about.
+    Dividend income does not reach that report today; this pins the
+    timestamp so it stays correct when it does.
+    """
+    from assistant.tax_reporting import tax_year_of
+
+    store, boot_at = _bootstrapped_store(tmp_path)
+    sync_broker_activities(
+        store,
+        [_div_activity(id="div::new-year", date="2027-01-01", created_at="2027-01-02T00:06:00Z")],
+        created_after=boot_at,
+    )
+    transaction = store.get_journal_transaction_by_external_id(
+        "dividend:div::new-year"
+    )
+    occurred = datetime.fromisoformat(transaction["occurred_at"])
+    assert tax_year_of(occurred) == 2027
+    assert _market_local_date(occurred) == "2027-01-01"
+
+
+def test_the_ledger_and_tax_modules_share_one_market_timezone():
+    """FCS-016: the zone that stamps a date must be the zone that buckets it."""
+    from assistant.tax_reporting import TAX_YEAR_TIMEZONE
+
+    assert MARKET_TIMEZONE is TAX_YEAR_TIMEZONE
+
+
+def test_every_handled_activity_type_declares_an_external_id_prefix(tmp_path):
+    """DHCR-002: a handled type with no prefix would raise KeyError.
+
+    KeyError is not a LedgerError, so it escapes the per-row refusal
+    handler as an unhandled crash instead of a clean fail-closed refusal.
+    Deriving the handled set from the prefix map makes the drift
+    impossible; this pins that relationship.
+    """
+    assert set(_ACTIVITY_EXTERNAL_ID_PREFIXES) == set(_HANDLED_ACTIVITY_TYPES)
+    store = AssistantStore(tmp_path / "assistant.db")
+    for activity_type in _HANDLED_ACTIVITY_TYPES:
+        # Must not raise KeyError for any type the loop will accept.
+        _assert_broker_activity_id_not_retyped(
+            store, activity_type=activity_type, activity_id="probe"
+        )
+
+
+def test_an_undeclared_handled_type_refuses_cleanly_instead_of_crashing(tmp_path):
+    """A future type added to the handled set without a prefix fails closed."""
+    store = AssistantStore(tmp_path / "assistant.db")
+    with pytest.raises(LedgerError, match="no external-id prefix is declared"):
+        _assert_broker_activity_id_not_retyped(
+            store, activity_type="INT", activity_id="probe"
+        )

@@ -14,12 +14,62 @@ during the Alpaca restyle, not because it seemed plausible.
 from __future__ import annotations
 
 import re
+from functools import lru_cache
 from pathlib import Path
 
 from scripts.ui_theme import THEME_CSS
 
 ROOT = Path(__file__).resolve().parents[1]
 UI_SCRIPT = ROOT / "scripts" / "personal_assistant_ui.py"
+
+# Test ids the stylesheet keeps on purpose even though the pinned Streamlit
+# does not emit them. Each entry needs a reason, and the list must shrink
+# rather than grow: an undeclared dead selector is the defect that AUI-003
+# and the counter-review's stCodeBlock finding both were.
+LEGACY_ONLY_TEST_IDS = frozenset(
+    {
+        # Streamlit <=1.5x wrapped st.container(border=True) in this element.
+        # Harmless beside the current stLayoutWrapper rule and retained so an
+        # older supported runtime still gets the panel treatment.
+        "stVerticalBlockBorderWrapper",
+    }
+)
+
+# Comments may contain braces and CSS-looking prose, so strip them before any
+# rule-level parsing.
+_CSS_RULES_ONLY = re.sub(r"/\*.*?\*/", "", THEME_CSS, flags=re.S)
+
+
+def _rule_body(selector_pattern: str) -> str | None:
+    """Declaration block of the first rule whose SELECTOR matches the pattern.
+
+    Asserting on a rule's body is what separates "the selector exists" from
+    "the selector still paints what it promised".
+    """
+    for rule in re.finditer(r"([^{}]+)\{([^{}]*)\}", _CSS_RULES_ONLY, re.S):
+        if re.search(selector_pattern, rule.group(1), re.S):
+            return rule.group(2)
+    return None
+
+
+@lru_cache(maxsize=1)
+def _installed_streamlit_frontend_text() -> str:
+    """Concatenated JS of the installed Streamlit frontend bundle.
+
+    Read from the installed distribution rather than a recorded copy, so the
+    assertion tracks whatever version requirements.txt actually pins.
+    """
+    import streamlit
+
+    static = Path(streamlit.__file__).resolve().parent / "static"
+    assert static.is_dir(), (
+        f"the installed Streamlit has no frontend bundle at {static}; the "
+        "theme's DOM assumptions cannot be checked"
+    )
+    return "\n".join(
+        path.read_text(encoding="utf-8", errors="replace")
+        for path in sorted(static.rglob("*.js"))
+    )
 
 
 def test_no_background_is_tinted_with_the_text_colour():
@@ -207,6 +257,89 @@ def test_aui_001_selectors_target_streamlit_160_visible_widget_nodes():
     assert re.search(
         r'\[data-testid="stRadioOption"\]\[data-focus-visible\]',
         THEME_CSS,
+    )
+
+
+def test_aui_001_live_rules_paint_the_mark_in_ink_not_white():
+    """Selector SHAPE is not the accessibility guarantee -- the COLOUR is.
+
+    Counter-review mutation evidence (2026-08-09): repainting the checkbox
+    tick white, repainting the radio dot white, or dropping the ink half of
+    the dual focus ring each left the whole theme suite green. Every one of
+    those mutations reintroduces precisely the 1.41:1 indicator AUI-001
+    exists to remove -- on the checkbox that gates exposure-increasing
+    policy, and on the navigation.
+
+    The older guard's colour assertions cannot catch them, because they are
+    satisfied by the legacy BaseWeb block, and the pinned Streamlit emits no
+    data-baseweb attribute at all. So the colours are pinned here, on the
+    rules that were measured in the rendered DOM to be the ones that paint.
+    """
+    tick = _rule_body(r'label\[data-selected\][^,{]*>\s*div:first-of-type\s+svg')
+    assert tick is not None, "no rule repaints the visible React-Aria tick"
+    assert "stroke: var(--ta-brand-ink)" in tick, (
+        "the visible checkbox tick is no longer stroked in ink -- a white "
+        "tick on brand yellow is the measured 1.41:1 defect"
+    )
+
+    dot = _rule_body(r'\[data-testid="stRadioOption"\]\[data-selected\]')
+    assert dot is not None, "no rule repaints the selected radio dot"
+    assert "background-color: var(--ta-brand-ink)" in dot, (
+        "the selected navigation dot is no longer filled in ink"
+    )
+
+    focus = _rule_body(r'label\[data-focus-visible\]')
+    assert focus is not None, "no React-Aria focus rule reaches the visible box"
+    assert "outline: 2px solid var(--ta-brand)" in focus, (
+        "the brand half of the dual focus ring is gone"
+    )
+    assert "box-shadow: 0 0 0 2px var(--ta-brand-ink)" in focus, (
+        "the ink half of the dual focus ring is gone -- that half is what "
+        "carries >=3:1 in light mode, where the brand ring measures ~1.41:1"
+    )
+
+
+def test_every_theme_test_id_is_emitted_by_the_installed_streamlit():
+    """The guard for the defect class this whole round kept shipping.
+
+    Twice now a correction was accepted from source structure alone and did
+    nothing in the browser: AUI-001/002 styled nodes that do not receive the
+    rendered mark, and AUI-003 styled ``stVerticalBlockBorderWrapper``, a
+    test id Streamlit 1.60 never emits. Every other guard in this file greps
+    our OWN stylesheet, so none of them can fail for that reason -- the
+    stated backstop was "caught by the next review pass," which demonstrably
+    missed it twice.
+
+    This test compares the stylesheet against the INSTALLED Streamlit
+    frontend instead. A pinned-version bump that renames or removes a hook
+    fails here, on the commit that changes it, rather than silently
+    un-styling the app until somebody opens a browser.
+
+    It cannot prove a selector's node PATH is right -- only a rendered DOM
+    can, and that evidence belongs in the review record. It does prove the
+    hook still exists at all, which is where both misses started.
+
+    Keeping a deliberately dead selector is allowed, but it has to be
+    declared in ``LEGACY_ONLY_TEST_IDS`` and justified, so dead selectors
+    cannot accumulate unnoticed the way these did.
+    """
+    frontend = _installed_streamlit_frontend_text()
+    targeted = set(re.findall(r'data-testid="([^"]+)"', THEME_CSS))
+    assert targeted, "the stylesheet targets no test ids at all -- parsing broke"
+
+    missing = {
+        test_id
+        for test_id in targeted
+        if not re.search(
+            r"(?<![A-Za-z0-9_])" + re.escape(test_id) + r"(?![A-Za-z0-9_])", frontend
+        )
+    }
+    undeclared = missing - LEGACY_ONLY_TEST_IDS
+    assert not undeclared, (
+        "these test ids are styled but the installed Streamlit never emits "
+        f"them, so the rules are dead: {sorted(undeclared)}. Either retarget "
+        "them at the current hook or declare them in LEGACY_ONLY_TEST_IDS "
+        "with the reason."
     )
 
 

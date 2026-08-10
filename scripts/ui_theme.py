@@ -136,7 +136,7 @@ p, li, label { line-height: 1.62; }
     opacity: 0.70;
 }
 
-code, pre, kbd, samp, [data-testid="stCodeBlock"] {
+code, pre, kbd, samp, [data-testid="stCode"] {
     font-family: var(--ta-mono);
     font-variant-ligatures: none;
     font-size: 0.86rem;
@@ -347,8 +347,17 @@ code, pre {
    and stopped two divs short of the radio dot, so it did not repair the
    rendered controls. The current selectors start from stable Streamlit
    test IDs and React-Aria state attributes, then follow the exact visible
-   mark path. The legacy BaseWeb SVG/background rules remain as degradation
-   coverage for older supported markup. */
+   mark path.
+
+   The legacy BaseWeb block below matches NOTHING on the pinned Streamlit:
+   1.60.0 emits no data-baseweb attribute anywhere (measured in the rendered
+   app -- zero such attributes on any page). It is kept only for older
+   markup, and it must never be mistaken for the active guarantee. That
+   distinction is load-bearing, because the ink tick data-URI asserted by
+   the older AUI-001 guard lives in that dead block: a test satisfied only
+   by these rules proves nothing about what the operator sees. The rules
+   that actually paint the visible mark are the React-Aria ones above, and
+   their colours are pinned separately. */
 
 /* Streamlit 1.60 React-Aria checkbox: label > hidden span + visible box. */
 [data-testid="stCheckbox"] label[data-selected] > div:first-of-type {
@@ -457,11 +466,11 @@ section[data-testid="stSidebar"] .stRadio [role="radiogroup"] label:has(input:ch
     opacity: 0.70;
 }
 
-.stTabs [data-baseweb="tab-list"] {
+.stTabs [role="tablist"] {
     gap: 0.3rem;
     border-bottom: 1px solid var(--ta-hairline);
 }
-.stTabs [data-baseweb="tab"] {
+.stTabs [data-testid="stTab"] {
     height: 2.6rem;
     padding: 0 1rem;
     font-family: var(--ta-text);

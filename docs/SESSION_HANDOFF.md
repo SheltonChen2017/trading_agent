@@ -1,7 +1,11 @@
 # Development session handoff
 
 Prepared: 2026-08-10, after Codex independently reviewed and corrected
-Claude's broker-activity ingestion fix for the stalled paper evidence epoch.
+Claude's broker-activity ingestion fix for the stalled paper evidence epoch,
+and Claude counter-reviewed the correction. **Counter-review outcome:
+accepted in full — all seven findings confirmed, none a false alarm, no
+correction to the correction required.** See section 5a and the review
+report's §6 for the live-endpoint evidence and reverse-mutation record.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the previous session
@@ -168,6 +172,40 @@ Environment: Windows, repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
 No live Alpaca end-to-end test was performed. Provider-contract conclusions
 come from Alpaca's official account-activities reference and OpenAPI schema,
 linked in the review report.
+
+## 5a. Counter-review (Claude, same day) — accepted in full
+
+Claude counter-reviewed `a8174b9` and `74dd309` per
+`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`. Both commits: **accepted**.
+Full record in `docs/REVIEW_2026-08-10_EPOCH_ACTIVITY_INGESTION.md` §6.
+
+- **All seven EPOCHR findings confirmed; none downgraded.** EPOCHR-002 was
+  strengthened with live read-only endpoint evidence Codex did not have:
+  (a) the account's full activity history contains a `JNLC +$100,000`
+  funding journal created 2026-07-26, inside the submitted 30-day window —
+  with the submitted type-before-cutoff ordering, the first production run
+  would have refused on the account's own funding deposit, so the submitted
+  fix was dead on arrival; (b) `after=<bootstrap instant>` returned exactly
+  the three post-bootstrap CAT fees (including the 08-05-dated fee created
+  08-06T00:06Z) and nothing earlier, live-proving Alpaca's `after` is an
+  exclusive creation-time bound, the claim the corrected exact-bootstrap
+  window depends on.
+- **Four reverse mutations** proved the corrected guards load-bearing
+  (cutoff-before-type ordering, +1µs surrogate, operations-cycle
+  failure-preservation, strict `page_size`); each turned exactly its
+  intended test red, and the restored tree re-verified green (107 focused).
+- **Single uninterrupted full-suite run** on the exact corrected tree:
+  **3334 passed, 0 failed, 25 warnings** (the same pre-existing dependency
+  deprecations) — closing the review's monolithic-run gap left by its
+  batched validation.
+- **Two P3 watch items recorded** (review report §6): CR-W1 — a
+  surrogate-journaled fee whose row later gains `created_at` would raise a
+  loud content conflict on re-sync (fail-closed, correct direction); CR-W2 —
+  a future post-bootstrap paper-cash top-up (`JNLC`) fails closed by design
+  until a small reviewed handler maps it to `record_cash_transfer`.
+- Counter-review made no broker mutation (two read-only activity GETs), no
+  operational-database access, and no epoch, scheduler, policy, or
+  deployment action.
 
 ## 6. Documentation synchronized in this round
 

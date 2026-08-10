@@ -98,3 +98,65 @@ post-bootstrap dividends, interest, transfers, and corporate actions still
 fail closed and require a separately reviewed handler. The correction has not
 been merged, pushed, or deployed. `paper-epoch-002` remains active in durable
 state but stalled on the separate operational host at frozen commit `9a91498`.
+
+---
+
+## 6. Counter-review (Claude, 2026-08-10) — accepted, all findings verified
+
+Counter-review verified every finding against the code and, where the finding
+rested on a provider-behavior claim, against the live paper endpoint
+read-only. Verdict: **Codex's review is accepted in full. All seven findings
+are confirmed; none is a false alarm. No correction to the correction is
+required.** Two watch items are recorded below; neither blocks merge.
+
+### Per-finding verification
+
+| ID | Counter-review verdict | Evidence |
+|---|---|---|
+| EPOCHR-001 | **Confirmed.** | The live account does send `created_at`/`status` today (re-measured 2026-08-10), so the defect was contract-conformance, not observed breakage — but the published schema promises neither field, and the correction rightly keeps preferring `created_at` when present. |
+| EPOCHR-002 | **Confirmed, and strengthened with live evidence.** | (a) The full activity history contains a `JNLC +$100,000` funding journal created 2026-07-26 — inside the submitted 30-day window. Because the submitted code checked unknown-type before the bootstrap cutoff, the first production run would have refused on the account's own funding deposit: the submitted fix was dead on arrival. (b) The load-bearing claim behind the corrected exact-bootstrap window was verified live: `after=2026-08-05T18:22:58Z` returned exactly the three post-bootstrap CAT fees — including the 08-05-dated fee created 08-06T00:06Z — and excluded everything earlier, proving `after` is an exclusive activity-creation-time bound on the real endpoint, not a date-label filter. Codex validated this against documentation only; the live measurement closes that gap. |
+| EPOCHR-003 | **Confirmed.** | Code reading of the submitted tree agrees the outer handler skipped snapshot/backup/health; the corrected flow preserves and re-raises the original exception after them. |
+| EPOCHR-004 | **Confirmed.** | Epoch lineage is durable database state; deploying a new commit breaks lineage validation but does not close the epoch. The runbook sequence (disable tasks → close → deploy → reconcile matched → readiness → start → drills → re-enable) is correct and consistent across the runbook, action plan, and handoff. |
+| EPOCHR-005 | **Confirmed.** | Straightforward boundary tightening. |
+| EPOCHR-006 | **Confirmed.** | The submitted comment's manual-`ledger-fee` recovery instruction was false: the sync re-reads the same broker rows every run and never consults manual postings, so the block would persist. No bypass was added — correct. |
+| EPOCHR-007 | **Accepted.** | P2 matches the repository severity definitions (incorrect durable state / missing recovery; no unsafe execution or broken atomicity). |
+
+### Reverse-mutation verification of the correction's guards
+
+Each of the four corrected behaviors was reverse-mutated on the corrected
+tree; each mutation turned exactly the intended regression test red, and the
+real code was restored byte-identical (backup copy) and re-verified green
+(107 focused tests):
+
+1. Type-check moved back before the cutoff check →
+   `test_sync_broker_activities_skips_all_pre_bootstrap_nontrade_types` failed.
+2. Surrogate posting time changed from `created_after + 1µs` to
+   `created_after` →
+   `test_sync_broker_activities_accepts_documented_minimal_fee_shape` failed.
+3. `operations-cycle` made to propagate the activity failure immediately →
+   `test_operations_cycle_preserves_backup_and_health_after_activity_failure`
+   failed.
+4. `page_size` reverted to silent `int()` coercion → all three strict-type
+   parameter cases failed.
+
+### Watch items (P3, recorded not fixed)
+
+- **CR-W1 — surrogate/created_at content conflict on provider transition.**
+  A fee journaled via the bootstrap+1µs surrogate (minimal schema) whose row
+  later gains a `created_at` from the provider would rebuild with a different
+  `occurred_at` under the same external id, raising
+  `JournalTransactionConflictError` and blocking loudly. Fail-closed in the
+  right direction; requires operator investigation if it ever fires. No code
+  change: the alternative (accepting changed content silently) is worse.
+- **CR-W2 — a future paper-cash top-up stalls the epoch by design.** A
+  post-bootstrap `JNLC`/`CSD` deposit is an unsupported type and will fail
+  closed until a reviewed handler maps it to the existing
+  `record_cash_transfer`. This is the intended behavior, recorded so the
+  operator recognizes it; the fix is a small, separately reviewed extension.
+
+### Counter-review validation
+
+Single uninterrupted full-suite run on the exact corrected tree (in addition
+to Codex's four deterministic batches): see the session handoff for the
+recorded count. Focused modules 107 passed; `compileall` clean;
+`git diff --check` clean.

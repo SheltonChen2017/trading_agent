@@ -119,15 +119,37 @@ def test_current_handoff_does_not_retain_superseded_epoch_swap_instructions():
         )
 
 
-def test_current_handoff_does_not_publish_account_identifier_fragments():
-    """Even shortened broker account identifiers are machine-local facts."""
-    handoff = _text("SESSION_HANDOFF.md")
-    fragment = re.search(
-        r"(?:broker\s+)?account\s+`?[0-9a-f]{8,}(?:…|\.\.\.)",
-        handoff,
-        flags=re.IGNORECASE,
-    )
-    assert fragment is None, "SESSION_HANDOFF.md contains an account identifier fragment"
+def test_current_documents_do_not_publish_account_identifiers():
+    """Even shortened broker account identifiers are machine-local facts.
+
+    Counter-review extension (E3CR, 2026-08-10): the original guard scanned
+    only the handoff and only the ellipsis-shortened shape, but the WORSE
+    historical case was the FULL dashed identifier committed to the handoff
+    at `bf5d5ce` (2026-08-05) -- which the fragment regex never matched.
+    Scan every current-state document for both shapes. The full-UUID check
+    is unconditional because a dashed UUID has no legitimate reason to
+    appear in these documents; the hex-fragment check stays anchored to the
+    word "account" so ordinary commit hashes keep passing.
+    """
+    for name in (
+        "SESSION_HANDOFF.md",
+        "ACTION_PLAN_2026-08-02.md",
+        "OPERATIONAL_FACTS.md",
+        "OPERATIONS_RUNBOOK.md",
+    ):
+        text = _text(name)
+        fragment = re.search(
+            r"(?:broker\s+)?account\s+`?[0-9a-f]{8,}(?:…|\.\.\.)",
+            text,
+            flags=re.IGNORECASE,
+        )
+        assert fragment is None, f"{name} contains an account identifier fragment"
+        full_id = re.search(
+            r"\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b",
+            text,
+            flags=re.IGNORECASE,
+        )
+        assert full_id is None, f"{name} contains a full dashed identifier"
 
 
 def test_the_sweep_record_carries_one_finding_count_and_status():

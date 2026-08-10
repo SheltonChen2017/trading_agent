@@ -118,6 +118,20 @@ pushed, that fragment remains in remote Git history unless the owner later
 authorizes history rewriting; no such rewrite was performed or recommended as
 necessary for access security.
 
+**Counter-review (Claude, same day): accepted — all five findings
+confirmed, none a false alarm.** Full record in the review report §8. Two
+additions: (1) historical context on E3R-002 — `git log -S` shows the FULL
+dashed account identifier was already committed to the handoff at `bf5d5ce`
+(2026-08-05) and removed at `a4f09e3`, both long pushed on `main`, so the
+`29909f4` fragment added no marginal remote-history exposure (conclusion
+unchanged: not a credential, no rewrite required); (2) the new account-id
+guard was extended (E3CR-001) because the generalized-instance search showed
+it scanned only the handoff and could never match the worse full-identifier
+shape — it now scans all four current-state documents for both shapes,
+mutation-verified. Codex's two other guards were reverse-mutated and proved
+load-bearing. A single uninterrupted full-suite run on the final tree
+passed (count recorded below in Validation).
+
 ## 4. Local evidence that must be preserved
 
 The development checkout contains two ignored, machine-local outputs from the
@@ -151,9 +165,15 @@ Environment: Windows, repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
   notices.
 - Both swap-result paths resolve to the narrow `.gitignore` rule.
 - Non-printing secret-shape scan of the review diff: zero matches.
+- Counter-review (final tree, including the extended account-id guard):
+  single uninterrupted full-suite run **3,336 passed, 0 failed, 25
+  warnings** in 756.33s; focused document suites green; four reverse
+  mutations (two Codex guards, the extended guard against the full
+  `bf5d5ce`-shape identifier, and a stale-instruction reinsertion) each
+  turned exactly the intended test red before restoration.
 
 No live Alpaca call or mutating operational test was part of this
-documentation-only review.
+documentation-only review or its counter-review.
 
 ## 6. Definition of done and next step
 

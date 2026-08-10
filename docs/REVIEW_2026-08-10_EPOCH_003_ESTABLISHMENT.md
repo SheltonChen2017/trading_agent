@@ -131,3 +131,52 @@ or mutate the epoch to make a status page green.
 The review correction and handoff commits are local-only until the owner
 explicitly authorizes a push. No merge, deployment, or further epoch action is
 implied by acceptance of this documentation review.
+
+---
+
+## 8. Counter-review (Claude, 2026-08-10) — accepted, one guard extended
+
+Counter-review of `2739e76` (correction) and `720708f` (documentation) per
+`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`. Both commits: **accepted**. All
+five findings verified; none is a false alarm. One finding (E3R-002) gains
+material historical context, and its regression guard was extended because
+the generalized-instance search showed it missed the worse historical shape.
+
+### Per-finding verification
+
+| ID | Counter-review verdict | Evidence |
+|---|---|---|
+| E3R-001 | **Confirmed.** | The submitted handoff (`29909f4`) demonstrably retained the superseded workflow: "Operational truth — epoch-002 is active but stalled" (line 151), "Nothing below has been performed" (line 183), and "If deployment is authorized" (line 337) all coexisted with the new executed-swap section. Codex's full rewrite is the right fix; a "superseded above" disclaimer is not a substitute for removal in the canonical resume document. |
+| E3R-002 | **Confirmed as a current-tree defect; historical framing incomplete.** | The fragment did violate the confidentiality boundary and its removal plus guard are correct. However, `git log -S` shows the FULL dashed broker-account identifier was committed to the handoff at `bf5d5ce` (2026-08-05, "Record Phase 5 completion") and removed a day later at `a4f09e3` — both long since pushed in `main` history. So the 8-character fragment in `29909f4` added no marginal remote-history exposure; the identifier has been retrievable from history since 2026-08-05. The conclusion is unchanged (no rewrite performed or required — it is not a credential), but the record should not imply `29909f4` introduced the exposure. |
+| E3R-003 | **Confirmed by code.** | `paper_evidence_summary` computes `lineage_consistent = all(... for observation in observations)` — vacuously true over an empty set. The corrected wording ("established, first observation pending") is the honest statement. |
+| E3R-004 | **Confirmed.** | GR-4's "NOT deployed to the frozen operational checkout" and the QuantConnect "not in the frozen operational checkout" dormancy fact both became false at the `ef05dc1` deployment; the second-host prohibition was epoch-002-specific. All three rewordings are accurate and appropriately scoped. |
+| E3R-005 | **Confirmed.** | `git check-ignore -v` matches both swap-result files against the narrow `data/swap_*_result_*.json` rule; worktree clean; regression rows added to `test_runtime_artifact_ignores.py`. Preserve-but-ignore is the right disposition for machine-local evidence. |
+
+### Guard extension (E3CR-001, applied in this counter-review)
+
+The generalized-instance search behind E3R-002 exposed a gap in the new
+guard itself: it scanned only `SESSION_HANDOFF.md`, and its regex required a
+trailing ellipsis — so the historically worse case, the FULL dashed
+identifier exactly as committed at `bf5d5ce`, would not have been caught in
+any document. `test_current_handoff_does_not_publish_account_identifier_fragments`
+was replaced by `test_current_documents_do_not_publish_account_identifiers`,
+which scans all four current-state documents for both the ellipsis fragment
+(still anchored to the word "account", so commit hashes pass) and any full
+dashed UUID (unconditional — no dashed UUID belongs in these documents).
+Mutation-verified: appending the full `bf5d5ce`-shape identifier to
+`OPERATIONAL_FACTS.md` fails the guard; the clean tree passes.
+
+### Reverse-mutation verification of Codex's guards
+
+- Reintroducing "Nothing below has been performed." into the handoff fails
+  `test_current_handoff_does_not_retain_superseded_epoch_swap_instructions`.
+- Reintroducing an ellipsis account fragment fails the account guard.
+- Both restored; focused files green.
+
+### Counter-review validation
+
+Single uninterrupted full-suite run on the final tree (in addition to
+Codex's batched accounting): recorded in the session handoff. Focused
+document suites green; `compileall` clean; `git diff --check` clean.
+Counter-review performed no broker call, no operator-database access, and no
+scheduler, epoch, or deployment action.

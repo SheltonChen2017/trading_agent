@@ -65,6 +65,7 @@ def operational_health(
     max_restore_drill_age_days: float = 30.0,
 ) -> dict[str, Any]:
     """Build a health report without changing execution authority."""
+    explicit_now = now
     now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise OperationsError("now must be timezone-aware")
@@ -107,6 +108,15 @@ def operational_health(
     ]
 
     latest_reconciliation = store.get_latest_ledger_reconciliation()
+    # AP-7: compare a row with a clock captured *after* reading that row.
+    # The scheduled processes overlap, so a second process may commit between
+    # this function's entry clock and this query. Reusing the entry clock made
+    # that valid concurrent row look future-dated. An explicitly supplied
+    # clock remains frozen for deterministic/as-of evaluation and continues
+    # to reject genuinely future-dated state.
+    reconciliation_checked_at = (
+        explicit_now or datetime.now(timezone.utc)
+    )
     reconciliation_at = _parse_timestamp(
         latest_reconciliation.get("reconciled_at")
         if isinstance(latest_reconciliation, dict)
@@ -116,10 +126,14 @@ def operational_health(
     # timestamp, so clock skew or a hand-inserted row made a stale control read
     # as fresh. `_should_create_backup` below and every check in
     # ml/evidence_operations.py already guard this; these three did not.
+    reconciliation_age = (
+        None
+        if reconciliation_at is None
+        else reconciliation_checked_at - reconciliation_at
+    )
     reconciliation_ok = (
         reconciliation_at is not None
-        and timedelta(0)
-        <= now - reconciliation_at
+        and timedelta(0) <= reconciliation_age
         <= timedelta(minutes=max_ledger_reconciliation_age_minutes)
         and bool(latest_reconciliation.get("matched"))
     )
@@ -132,6 +146,7 @@ def operational_health(
                 if reconciliation_at is None
                 else (
                     f"at={reconciliation_at.isoformat()}, "
+                    f"age_seconds={reconciliation_age.total_seconds():.6f}, "
                     f"matched={latest_reconciliation.get('matched')}, "
                     f"mismatches={latest_reconciliation.get('mismatch_count')}"
                 )
@@ -156,9 +171,11 @@ def operational_health(
             backup_integrity = store.verify_database_file(backup_path)
         except Exception as exc:
             backup_integrity = [f"verification failed: {exc}"]
+    backup_checked_at = explicit_now or datetime.now(timezone.utc)
+    backup_age = None if backup_at is None else backup_checked_at - backup_at
     backup_ok = (
         backup_at is not None
-        and timedelta(0) <= now - backup_at <= timedelta(hours=max_backup_age_hours)  # FCS-017
+        and timedelta(0) <= backup_age <= timedelta(hours=max_backup_age_hours)  # FCS-017/AP-7
         and backup_path is not None
         and backup_path.exists()
         and backup_integrity == ["ok"]
@@ -171,7 +188,9 @@ def operational_health(
                 "never completed"
                 if backup_at is None
                 else (
-                    f"at={backup_at.isoformat()}, path={backup_path}, "
+                    f"at={backup_at.isoformat()}, "
+                    f"age_seconds={backup_age.total_seconds():.6f}, "
+                    f"path={backup_path}, "
                     f"integrity={backup_integrity}"
                 )
             ),
@@ -184,9 +203,11 @@ def operational_health(
     drill_at = _parse_timestamp(
         drill.get("completed_at") if isinstance(drill, dict) else None
     )
+    drill_checked_at = explicit_now or datetime.now(timezone.utc)
+    drill_age = None if drill_at is None else drill_checked_at - drill_at
     drill_ok = (
         drill_at is not None
-        and timedelta(0) <= now - drill_at <= timedelta(days=max_restore_drill_age_days)  # FCS-017
+        and timedelta(0) <= drill_age <= timedelta(days=max_restore_drill_age_days)  # FCS-017/AP-7
         and bool(drill.get("passed"))
     )
     checks.append(
@@ -196,16 +217,21 @@ def operational_health(
             (
                 "never completed"
                 if drill_at is None
-                else f"at={drill_at.isoformat()}, passed={drill.get('passed')}"
+                else (
+                    f"at={drill_at.isoformat()}, "
+                    f"age_seconds={drill_age.total_seconds():.6f}, "
+                    f"passed={drill.get('passed')}"
+                )
             ),
             severity="warning",
             category="recovery",
         )
     )
 
+    report_checked_at = explicit_now or datetime.now(timezone.utc)
     return {
         "healthy": all(check["ok"] for check in checks),
-        "checked_at": now.isoformat(),
+        "checked_at": report_checked_at.isoformat(),
         "checks": checks,
         "transaction_readiness": readiness,
     }

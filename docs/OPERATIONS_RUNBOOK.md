@@ -39,6 +39,18 @@ python scripts/run_personal_assistant.py --database data/paper.db paper-epoch-cl
 Commit the change and start a new epoch. Do not combine observations from
 different epochs to satisfy a promotion threshold.
 
+When replacing a frozen runtime to repair a stalled active epoch, use this
+order. Deployment does not close durable epoch state, and a new epoch must not
+start before the upgraded ledger reconciles:
+
+1. Disable all scheduled operational tasks; stopping them is insufficient on
+   the epoch host because their triggers can restart them.
+2. Close the old epoch while its frozen runtime is still checked out.
+3. Deploy only the merged, independently reviewed replacement commit.
+4. Run `ledger-reconcile`; require `matched: true` before proceeding.
+5. Run `readiness`, then start the new epoch on the exact deployed commit.
+6. Run all five required drills, re-enable the tasks, and verify they execute.
+
 An epoch created before broker-account lineage was introduced cannot be
 continued under the stronger schema. Close it, complete any required legacy
 `ledger-bind-account` migration, commit the upgraded runtime, and start a new
@@ -56,12 +68,14 @@ epoch bound to the verified account.
 | ML evidence supervisor | Every 15 minutes | `run_ml_evidence_supervisor.py` |
 
 `operations-cycle` runs order reconciliation, idempotent fill-to-ledger sync,
-broker-versus-ledger reconciliation, conditional verified backup, and the
-operational health check in that order. Backups default to a 20-hour maximum
-age, leaving margin before the 24-hour health limit. It exits nonzero on a
-ledger mismatch or unhealthy result. Exceptions create a deduplicated
-critical SQLite alert and, when configured, append it to the JSONL delivery
-boundary.
+broker-activity sync, broker-versus-ledger reconciliation, conditional
+verified backup, and the operational health check in that order. An
+unsupported broker activity remains a failing result, but snapshot
+reconciliation, backup, health, and the critical alert still run before that
+failure returns. Backups default to a 20-hour maximum age, leaving margin
+before the 24-hour health limit. It exits nonzero on a ledger mismatch or
+unhealthy result. Exceptions create a deduplicated critical SQLite alert and,
+when configured, append it to the JSONL delivery boundary.
 
 `paper-observation` is post-close and scheduler-idempotent: a retry returns
 the already-recorded immutable observation. It skips weekends and exchange

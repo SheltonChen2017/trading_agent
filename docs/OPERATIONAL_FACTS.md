@@ -112,12 +112,41 @@ record/ex-date 2026-08-10, payable **2026-09-10**, $0.95 per eligible share.
 
 Read-only re-measurement at 15:21 Pacific found epoch-003 still active at
 `ef05dc1`, 0 observations, 5/5 drills, and a current healthy operations
-heartbeat with the latest reconciliation matched at zero mismatches. There is
-**one open critical `portfolio_accounting` alert** whose message itself
-records a matched, zero-mismatch reconciliation; it is a retained/reopened
-operational alert record, not evidence of a current book mismatch. Codex did
-not acknowledge or otherwise mutate it. The first scheduled epoch-003
-PaperObservation remained due at 16:30 Pacific.
+heartbeat with the latest reconciliation matched at zero mismatches.
+
+### The open critical `portfolio_accounting` alert is a negative-age race (AP-7)
+
+Measured read-only 2026-08-10 16:40 Pacific. The earlier description of this
+alert as a merely "retained/reopened record" was **wrong** — it was actively
+re-raised at 21:52:22Z by a real check failure with a false cause:
+
+```
+message      portfolio_ledger_reconciliation: at=2026-08-10T21:52:22.602589+00:00,
+             matched=True, mismatches=0
+details      "ok": false, "severity": "critical"
+last_seen_at 2026-08-10T21:52:21.515505+00:00      <-- 1.087s BEFORE the reconciliation
+occurrences  1885   first_seen 2026-08-05T17:51:42Z
+```
+
+`assistant/operations.py` requires **freshness AND matched**:
+`timedelta(0) <= now - reconciliation_at <= limit and matched`. The lower
+bound is deliberate (FCS-017, so a future-dated row cannot read as fresh),
+but the check's `now` is captured at entry while a **concurrent** process
+writes the reconciliation a moment later — OperationsCycle runs every 10
+minutes and Watchdog/OrderMonitor every 5, so the overlap recurs. The age
+goes negative, the conjunct fails, and the alert prints
+`matched=True, mismatches=0`, which reads as self-contradictory because the
+detail string never names which conjunct failed.
+
+The books are fine: five consecutive matched, zero-mismatch reconciliations
+through 23:32Z, and the epoch-003 observation carries
+`ledger_mismatch_count: 0`. The failure direction is conservative (a false
+alarm, not a missed one), but an open critical alert **feeds the
+`promotion-status` gate** (`critical_alerts` counts open criticals) and
+makes `operations-cycle` exit nonzero. `paper-observation` does not run this
+check, which is why evidence capture was unaffected. Do not acknowledge it
+as "resolved" without fixing the cause — it will re-raise on the next
+overlap.
 
 Counter-review (Claude, same day) accepted all six review findings and
 corrected two residual defects in the correction itself: economic dates are

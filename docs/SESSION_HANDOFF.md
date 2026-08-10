@@ -162,6 +162,45 @@ requires explicit owner authorization and the full runbook sequence for an
 epoch-004 transition. Until then, deployed `ef05dc1` still refuses DIV,
 JNLC, CSD, and CSW. After deployment, JNLC will continue to refuse by design.
 
+## 3a. First epoch-003 observation VERIFIED (read-only, 16:40 Pacific)
+
+The evidence clock has started. Measured, not assumed:
+
+- **Scheduler:** `TradingAgent-Paper-PaperObservation` last ran
+  `2026-08-10 16:30:00` Pacific with `LastTaskResult 0`, 0 missed runs,
+  next run 2026-08-11 16:30. `OperationsCycle` last result 0.
+  `OrderMonitor`/`Watchdog` report `0x800710E0` (a new instance refused
+  because one is already running) — the expected steady state for the two
+  singleton-guarded long-runners, not a failure.
+- **Evidence:** `paper_sessions: 1` (2026-08-10), `missing_sessions: []`,
+  `paper_orders: 0`, drills 5/5, epoch active at `ef05dc1`.
+- **Lineage is genuinely bound, not vacuous.** The observation's
+  `payload_json` carries `lineage_hash`
+  `54b083d25246cc6b…` stamped **at capture**, equal to epoch-003's own
+  lineage hash. This closes E3R-003's caveat: `lineage_consistent: true`
+  now compares a real stored value rather than ranging over an empty set.
+- **Books at capture:** observation records `ledger_mismatch_count: 0`,
+  `ledger_reconciled_at 2026-08-10T23:30:05Z`, cash `74389.30`,
+  total equity `100018.2148`, benchmark SPY, `net_external_flow 0`.
+  The five most recent reconciliation runs are all matched / 0 mismatches.
+- **Deployed code is what is executing.** Both long-runners started
+  `2026-08-10 12:31:01` Pacific — after the 12:26 deploy — from
+  `C:\git\trading_agent_operational` at `ef05dc1`. (The `data/locks/*`
+  file mtimes still read 2026-08-06; that is a stale *file* mtime on
+  re-acquisition, not a stale process. Verify process start time, not lock
+  mtime.)
+- **AP-7 found:** the one open critical alert is a false positive from a
+  negative-age race, not a book problem. Full analysis in
+  `docs/OPERATIONAL_FACTS.md` and action-plan defect **AP-7**. It is
+  deployed code inside the active epoch, so it was **not** fixed; the
+  recommendation is to bundle a reviewed fix with the CR-W2 handler so one
+  epoch-004 roll covers both. Do not acknowledge the alert as resolved
+  first — it re-raises on the next scheduler overlap.
+
+Nothing was mutated: no observation, drill, ledger row, alert
+acknowledgement, scheduler change, or broker order. Reads used the
+operational checkout's own code and `sqlite3` read-only URI mode.
+
 ## 4. Validation
 
 Environment: Windows, repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
@@ -209,11 +248,9 @@ then restored from a byte copy and re-verified green.
    while the epoch-003 session count is still low, since rolling discards
    the sessions accumulated so far. Deployment and epoch transition remain
    explicit owner instructions.
-3. Operationally, verify the first scheduled epoch-003 observation
-   read-only after it runs (due 16:30 Pacific; it had not yet run at the
-   time of this counter-review). Do not manually create evidence or
-   acknowledge the retained `portfolio_accounting` alert as part of
-   development work.
+3. ~~Verify the first scheduled epoch-003 observation read-only after it
+   runs.~~ **Done — see section 3a. It succeeded; the evidence clock has
+   started.**
 
 ## 6. Non-negotiable boundaries
 

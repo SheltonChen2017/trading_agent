@@ -105,6 +105,31 @@ def test_current_documents_do_not_call_completed_work_unstarted():
         )
 
 
+def test_current_handoff_does_not_retain_superseded_epoch_swap_instructions():
+    """A completed epoch swap must replace, not merely precede, its old plan."""
+    handoff = _text("SESSION_HANDOFF.md")
+    for stale in (
+        "Operational truth — epoch-002 is active but stalled",
+        "Nothing below has been performed.",
+        "paper-epoch-002 remains active in storage but stalled",
+        "If deployment is authorized",
+    ):
+        assert stale not in handoff, (
+            f"the current handoff retains a superseded epoch-swap instruction: {stale!r}"
+        )
+
+
+def test_current_handoff_does_not_publish_account_identifier_fragments():
+    """Even shortened broker account identifiers are machine-local facts."""
+    handoff = _text("SESSION_HANDOFF.md")
+    fragment = re.search(
+        r"(?:broker\s+)?account\s+`?[0-9a-f]{8,}(?:…|\.\.\.)",
+        handoff,
+        flags=re.IGNORECASE,
+    )
+    assert fragment is None, "SESSION_HANDOFF.md contains an account identifier fragment"
+
+
 def test_the_sweep_record_carries_one_finding_count_and_status():
     review = _text("REVIEW_2026-08-07_FULL_CODEBASE_SWEEP.md")
     for stale in (

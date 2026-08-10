@@ -163,6 +163,7 @@ code, pre {
 [data-testid="stDataFrame"],
 [data-testid="stTable"],
 [data-testid="stForm"],
+[data-testid="stLayoutWrapper"] > [data-testid="stVerticalBlock"],
 [data-testid="stVerticalBlockBorderWrapper"] {
     border-radius: var(--ta-card-radius);
     border: 1px solid var(--ta-hairline);
@@ -171,6 +172,7 @@ code, pre {
 }
 
 [data-testid="stForm"],
+[data-testid="stLayoutWrapper"] > [data-testid="stVerticalBlock"],
 [data-testid="stVerticalBlockBorderWrapper"] {
     border-radius: var(--ta-panel-radius);
     padding: 1.05rem 1.15rem;
@@ -278,6 +280,14 @@ code, pre {
    pinned by a deterministic regression test; a browser without color-mix()
    keeps today's 4.49 -- degraded, never broken. */
 [data-testid="stAlertContainer"] [data-testid="stMarkdownContainer"] {
+    /* StreamlitMarkdown explicitly applies the ordinary body family and
+       size at its root, so the container's font is not inherited in the
+       rendered alert. Repeat the warning voice on the actual text node. */
+    font-family: var(--ta-mono);
+    font-variant-ligatures: none;
+    font-size: 0.85rem;
+    line-height: 1.55;
+    font-weight: 500;
     color: color-mix(in srgb, currentColor 88%, #000000);
 }
 
@@ -328,12 +338,43 @@ code, pre {
    dot in white on the primaryColor fill -- white on brand yellow is
    ~1.41:1, on the checkbox that gates exposure-increasing policy
    eligibility. The mark is repainted in ink on the same yellow (~9.7:1 in
-   both modes). Two implementations are covered because baseweb has shipped
-   both: an inline SVG child (fill/stroke repaint) and a background-image
-   tick (replaced wholesale with an ink tick). Selectors use stable
-   data-testid/data-baseweb/ARIA hooks only; if a future Streamlit changes
-   this DOM, the rules stop matching and the default rendering returns --
-   degraded, visible, and caught by the next review pass. */
+   both modes).
+
+   Streamlit 1.60's current React-Aria widgets put the input inside a
+   visually-hidden span, expose state on the LABEL as data-selected /
+   data-focus-visible, and render the visible mark in following divs. The
+   first AUI correction targeted the hidden span / a legacy BaseWeb label
+   and stopped two divs short of the radio dot, so it did not repair the
+   rendered controls. The current selectors start from stable Streamlit
+   test IDs and React-Aria state attributes, then follow the exact visible
+   mark path. The legacy BaseWeb SVG/background rules remain as degradation
+   coverage for older supported markup. */
+
+/* Streamlit 1.60 React-Aria checkbox: label > hidden span + visible box. */
+[data-testid="stCheckbox"] label[data-selected] > div:first-of-type {
+    background-color: var(--ta-brand) !important;
+}
+[data-testid="stCheckbox"] label[data-selected] > div:first-of-type svg,
+[data-testid="stCheckbox"] label[data-selected] > div:first-of-type svg * {
+    fill: none !important;
+    stroke: var(--ta-brand-ink) !important;
+}
+
+/* Streamlit 1.60 React-Aria radio: label > column > row > ring > dot. */
+[data-testid="stRadioOption"][data-selected] > div:first-of-type > div:first-of-type > div:first-of-type > div:first-of-type {
+    background-color: var(--ta-brand-ink) !important;
+}
+
+/* React-Aria moves :focus-visible onto label state. Put the dual ring on
+   the VISIBLE checkbox box / radio ring, not its off-screen input. */
+[data-testid="stCheckbox"] label[data-focus-visible] > div:first-of-type,
+[data-testid="stRadioOption"][data-focus-visible] > div:first-of-type > div:first-of-type > div:first-of-type {
+    outline: 2px solid var(--ta-brand) !important;
+    outline-offset: 3px;
+    box-shadow: 0 0 0 2px var(--ta-brand-ink) !important;
+}
+
+/* Legacy BaseWeb checkbox variants. */
 [data-testid="stCheckbox"] label[data-baseweb="checkbox"] svg,
 [data-testid="stCheckbox"] label[data-baseweb="checkbox"] svg path {
     fill: var(--ta-brand-ink) !important;
@@ -345,9 +386,6 @@ code, pre {
     background-repeat: no-repeat;
     background-position: center;
     background-size: 0.75rem;
-}
-[data-testid="stRadio"] label:has(input[type="radio"]:checked) > div:first-of-type > div {
-    background-color: var(--ta-brand-ink) !important;
 }
 
 /* ====================================================================

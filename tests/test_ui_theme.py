@@ -173,11 +173,41 @@ def test_aui_001_state_indicator_marks_meet_non_text_contrast():
     # The constructs whose absence was the defect:
     assert ":has(input[type=\"checkbox\"]:checked)" in THEME_CSS
     assert "fill='%23101010'" in THEME_CSS  # the ink tick data-URI
-    assert ":has(input[type=\"radio\"]:checked)" in THEME_CSS
+    assert '[data-testid="stRadioOption"][data-selected]' in THEME_CSS
     # Dual-ring focus: brand outline plus ink box-shadow in one rule.
     focus = re.search(r":focus-visible\s*\{[^}]*\}", THEME_CSS, re.S)
     assert focus and "var(--ta-brand)" in focus.group(0)
     assert "var(--ta-brand-ink)" in focus.group(0)
+
+
+def test_aui_001_selectors_target_streamlit_160_visible_widget_nodes():
+    """The installed Streamlit 1.60 widgets are React-Aria labels.
+
+    The checked input lives in a visually-hidden ``span`` while the visible
+    checkbox/radio marks are nested ``div`` siblings.  State and focus are
+    reflected on the labels as ``data-selected`` / ``data-focus-visible``.
+    A selector aimed at the hidden span, a legacy-only ``data-baseweb``
+    label, or the radio row cannot repair the rendered indicator.
+    """
+    assert re.search(
+        r'\[data-testid="stCheckbox"\]\s+label\[data-selected\][^{,]*'
+        r'>\s*div:first-of-type',
+        THEME_CSS,
+    ), "the checked checkbox rule does not reach Streamlit 1.60's visible box"
+    assert re.search(
+        r'\[data-testid="stRadioOption"\]\[data-selected\][^{,]*'
+        r'>\s*div:first-of-type\s*>\s*div:first-of-type\s*'
+        r'>\s*div:first-of-type\s*>\s*div:first-of-type',
+        THEME_CSS,
+    ), "the selected-radio rule does not reach the inner dot"
+    assert re.search(
+        r'\[data-testid="stCheckbox"\]\s+label\[data-focus-visible\]',
+        THEME_CSS,
+    )
+    assert re.search(
+        r'\[data-testid="stRadioOption"\]\[data-focus-visible\]',
+        THEME_CSS,
+    )
 
 
 def test_aui_002_plain_alert_text_gets_the_mono_face():
@@ -191,6 +221,17 @@ def test_aui_002_plain_alert_text_gets_the_mono_face():
     assert container is not None
     assert "font-family: var(--ta-mono)" in container.group(0), (
         "plain alerts would fall back to the body face again"
+    )
+    markdown = re.search(
+        r'\[data-testid="stAlertContainer"\]\s+'
+        r'\[data-testid="stMarkdownContainer"\]\s*\{[^}]*\}',
+        THEME_CSS,
+        re.S,
+    )
+    assert markdown is not None
+    assert "font-family: var(--ta-mono)" in markdown.group(0), (
+        "StreamlitMarkdown sets its own body face, so container inheritance "
+        "does not give rendered alert text the warning voice"
     )
 
 
@@ -282,6 +323,18 @@ def test_aui_003_flagged_pages_wrap_their_sections_in_bordered_containers():
     assert page_block("Settings & Features").count("st.container(border=True)") >= 5
     assert page_block("Operations").count("st.container(border=True)") >= 5
     assert page_block("Briefing").count("st.container(border=True)") >= 8
+
+
+def test_aui_003_targets_streamlit_160_bordered_vertical_blocks():
+    """Streamlit 1.60 renders ``st.container(border=True)`` as a vertical
+    block directly under ``stLayoutWrapper``. It does not emit the older
+    ``stVerticalBlockBorderWrapper`` test id, so that selector may remain as
+    a compatibility fallback but cannot be the only themed card selector.
+    """
+    current_dom_selector = (
+        '[data-testid="stLayoutWrapper"] > [data-testid="stVerticalBlock"]'
+    )
+    assert current_dom_selector in THEME_CSS
 
 
 def test_the_theme_has_exactly_one_injection_point():

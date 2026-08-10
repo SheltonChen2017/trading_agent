@@ -17,13 +17,15 @@ published at exact commit `25a2e7b`. The active checkout is the review branch
 `codex/review-broker-dividend-handler-20260810`, with correction commit
 `a6770f7` followed by the documentation/handoff commit containing this file.
 
-**REMOTE WARNING:** The review branch exists only in this checkout. The owner
-has not authorized publication. A different computer will not receive these
-corrections from an ordinary fetch until the branch is published. Do not
-recreate the corrections from memory; continue on this exact history after it
-is made available.
+**REMOTE STATE (updated after counter-review):** the review branch is now
+**published** at `origin/codex/review-broker-dividend-handler-20260810`,
+tip-verified equal to local `HEAD` at counter-review commit `cf9cdc2`
+(hash-compared), so another computer receives the review *and* counter-review
+history from an ordinary fetch. Pushed under the owner's standing
+git-management grant. It is **not merged and not deployed**; merge and any
+epoch action remain explicit owner decisions.
 
-No push, merge, pull request, deployment, scheduler change, broker call,
+No merge, pull request, deployment, scheduler change, broker call,
 order submission, operator-database mutation, policy change, alert
 acknowledgement, or epoch transition was authorized or performed by Codex in
 this review. The two ignored local swap-result JSON files remain machine-local
@@ -197,13 +199,21 @@ then restored from a byte copy and re-verified green.
 
 ## 5. Exact next step
 
-1. Commit this review report, milestone record, regression guard, and handoff
-   separately from correction `a6770f7`.
-2. Stop. Publication, merge, deployment, and epoch transition require the
-   owner's explicit instruction.
-3. Operationally, verify the first scheduled epoch-003 observation read-only
-   after it runs. Do not manually create evidence or acknowledge the retained
-   alert as part of this development review.
+1. ~~Commit the review report, milestone record, regression guard, and
+   handoff separately from correction `a6770f7`.~~ **Done** (`a36d75d`),
+   followed by the counter-review commit `cf9cdc2`; the branch is pushed.
+2. **Owner decision: merge.** Then, separately, authorize the epoch-004
+   roll — the full runbook sequence (disable tasks → close epoch-003 →
+   deploy the merged tree → `ledger-reconcile` matched → readiness → start
+   epoch-004 → five drills → re-enable) — **before 2026-09-10**, ideally
+   while the epoch-003 session count is still low, since rolling discards
+   the sessions accumulated so far. Deployment and epoch transition remain
+   explicit owner instructions.
+3. Operationally, verify the first scheduled epoch-003 observation
+   read-only after it runs (due 16:30 Pacific; it had not yet run at the
+   time of this counter-review). Do not manually create evidence or
+   acknowledge the retained `portfolio_accounting` alert as part of
+   development work.
 
 ## 6. Non-negotiable boundaries
 

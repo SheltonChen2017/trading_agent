@@ -915,12 +915,56 @@ def test_sync_broker_activities_skips_fees_already_in_opening_cash(tmp_path):
     assert ledger_balances(store)["cash"] == Decimal("999.99")
 
 
+def test_sync_broker_activities_skips_all_pre_bootstrap_nontrade_types(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    dividend = {
+        "id": "20260729090000000::div-before",
+        "activity_type": "DIV",
+        "created_at": "2026-07-29T09:00:00Z",
+        "date": "2026-07-29",
+        "net_amount": "12.48",
+    }
+    report = sync_broker_activities(store, [dividend])
+    assert report["skipped_pre_bootstrap"] == 1
+    assert report["inserted"] == 0
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_sync_broker_activities_accepts_documented_minimal_fee_shape(tmp_path):
+    store, boot_at = _bootstrapped_store(tmp_path)
+    activity = _fee_activity(
+        activity_id="20260729110000000::fee-minimal",
+        created_at=None,
+    )
+    for undocumented_field in ("created_at", "status", "currency"):
+        activity.pop(undocumented_field, None)
+
+    report = sync_broker_activities(
+        store, [activity], created_after=boot_at
+    )
+
+    assert report["inserted"] == 1
+    assert ledger_balances(store)["cash"] == Decimal("999.99")
+
+
+def test_sync_broker_activities_rejects_an_unverified_created_after_bound(tmp_path):
+    store, boot_at = _bootstrapped_store(tmp_path)
+    activity = _fee_activity(created_at=None)
+    activity.pop("created_at")
+    with pytest.raises(LedgerError, match="must match the ledger bootstrap"):
+        sync_broker_activities(
+            store,
+            [activity],
+            created_after=boot_at + timedelta(seconds=1),
+        )
+
+
 def test_sync_broker_activities_refuses_unknown_activity_types(tmp_path):
     # A dividend (AEP is in the account) must block evidence capture
     # loudly, not be skipped into a silent cash drift. The recognized fee
     # in the same batch is still journaled: posting is idempotent, so no
-    # work is lost, and the observation stays blocked until the operator
-    # records the dividend manually or the sync is extended.
+    # work is lost, and the observation stays blocked until the sync is
+    # deliberately extended to support the activity.
     store, _ = _bootstrapped_store(tmp_path)
     dividend = {
         "id": "div::1",
@@ -941,8 +985,11 @@ def test_sync_broker_activities_refuses_malformed_fees(tmp_path):
         (_fee_activity(net_amount="0.01"), "non-negative net_amount"),
         (_fee_activity(net_amount="0"), "non-negative net_amount"),
         (_fee_activity(net_amount=None), "not numeric"),
-        (_fee_activity(created_at=None), "created_at is missing"),
-        (_fee_activity(created_at="2026-07-29T11:00:00"), "created_at is missing or not ISO"),
+        (
+            _fee_activity(activity_id="not-a-timestamped-id", created_at=None),
+            "posting time is missing",
+        ),
+        (_fee_activity(created_at="2026-07-29T11:00:00"), "must include a timezone"),
         (_fee_activity(status="correction"), "not executed"),
         (_fee_activity(activity_id=None), "missing its broker id"),
     ]

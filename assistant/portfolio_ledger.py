@@ -12,7 +12,7 @@ import dataclasses
 import hashlib
 import json
 import uuid
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -754,8 +754,37 @@ _HANDLED_ACTIVITY_TYPES = frozenset({"FEE"})
 _TRADE_ACTIVITY_TYPES = frozenset({"FILL"})
 
 
+def _activity_posted_at(
+    activity: dict[str, Any], *, created_after: datetime | None
+) -> datetime:
+    """Return a defensible journal time for a non-trade activity.
+
+    Alpaca's published non-trade activity schema does not include
+    ``created_at``. When that useful extension is absent, accept the row
+    only if the caller fetched it with Alpaca's documented exclusive
+    ``after`` bound. One microsecond after that bound is a deterministic,
+    conservative journal time; the opaque activity ID is never treated as
+    a timestamp contract.
+    """
+    raw_created_at = activity.get("created_at")
+    if raw_created_at not in (None, ""):
+        return _parse_at(raw_created_at, "activity created_at")
+
+    if created_after is not None:
+        if created_after.tzinfo is None:
+            raise LedgerError("activity created-after bound must include a timezone")
+        return created_after + timedelta(microseconds=1)
+    raise LedgerError(
+        "activity posting time is missing: no parseable created_at or "
+        "verified broker created-after bound"
+    )
+
+
 def sync_broker_activities(
-    store: AssistantStore, activities: Any
+    store: AssistantStore,
+    activities: Any,
+    *,
+    created_after: datetime | None = None,
 ) -> dict[str, Any]:
     """Journal broker non-trade activities (currently fees) idempotently.
 
@@ -763,15 +792,17 @@ def sync_broker_activities(
     feed (execution.alpaca_broker.list_account_activities); passing it in
     keeps this module free of broker imports and the fetch mockable.
 
-    Cutoff semantics: an activity's cash impact happens at its
-    ``created_at`` posting time, NOT its ``date`` label. The 2026-08
+    Cutoff semantics: an activity's cash impact happens at its posting
+    time, NOT its ``date`` label. Prefer Alpaca's ``created_at`` extension;
+    otherwise require the documented exclusive ``after`` query bound.
+    The 2026-08
     incident that motivated this sync: a CAT fee dated 08-05 posted at
     08-06T00:06Z, after the 08-05T18:22Z opening snapshot -- so it was
     missing from the journal, while the fees POSTED before bootstrap were
     already baked into opening cash. Filtering on ``date`` would have
     mis-bucketed that fee and double-posted the earlier ones. Activities
     posted at or before the bootstrap instant are therefore skipped, and
-    an activity without a parseable ``created_at`` fails closed.
+    an activity without either supported timestamp shape fails closed.
     """
     bootstrap = store.get_system_state("ledger_bootstrap")
     if not isinstance(bootstrap, dict) or not bootstrap.get("bootstrapped_at"):
@@ -779,6 +810,15 @@ def sync_broker_activities(
             "bootstrap the portfolio journal before syncing broker activities"
         )
     cutoff = _parse_at(bootstrap["bootstrapped_at"], "ledger bootstrapped_at")
+    if created_after is not None:
+        if not isinstance(created_after, datetime) or created_after.tzinfo is None:
+            raise LedgerError(
+                "activity created-after bound must be a timezone-aware datetime"
+            )
+        if created_after != cutoff:
+            raise LedgerError(
+                "activity created-after bound must match the ledger bootstrap"
+            )
     inserted = 0
     duplicates = 0
     skipped_pre_bootstrap = 0
@@ -805,27 +845,30 @@ def sync_broker_activities(
         if activity_type in _TRADE_ACTIVITY_TYPES:
             trade_activities_skipped += 1
             continue
-        if activity_type not in _HANDLED_ACTIVITY_TYPES:
-            _refuse(activity, f"unhandled activity type {activity_type or '(missing)'}")
-            continue
         activity_id = activity.get("id")
         if not activity_id:
             _refuse(activity, "activity is missing its broker id")
             continue
         try:
-            posted_at = _parse_at(
-                activity.get("created_at") or "", "activity created_at"
+            posted_at = _activity_posted_at(
+                activity, created_after=created_after
             )
-        except LedgerError:
-            _refuse(activity, "activity created_at is missing or not ISO-8601")
+        except LedgerError as exc:
+            _refuse(activity, str(exc))
             continue
         if posted_at <= cutoff:
-            # Already inside the opening-snapshot cash balance.
+            # Every pre-bootstrap non-trade activity is already inside the
+            # opening snapshot, including types this sync does not yet know
+            # how to journal after bootstrap.
             skipped_pre_bootstrap += 1
             continue
-        status = str(activity.get("status") or "").lower()
-        if status != "executed":
-            _refuse(activity, f"activity status is {status or '(missing)'}, not executed")
+        if activity_type not in _HANDLED_ACTIVITY_TYPES:
+            _refuse(activity, f"unhandled activity type {activity_type or '(missing)'}")
+            continue
+        raw_status = activity.get("status")
+        status = str(raw_status or "").lower()
+        if raw_status is not None and status != "executed":
+            _refuse(activity, f"activity status is {status or '(empty)'}, not executed")
             continue
         try:
             net_amount = _decimal(activity.get("net_amount"), "activity net_amount")
@@ -855,8 +898,7 @@ def sync_broker_activities(
     if unhandled:
         # Recognized fees above are already journaled (each idempotently),
         # so raising here loses no work; it blocks evidence capture until
-        # the operator records the listed rows via the manual ledger
-        # commands or extends this sync deliberately.
+        # support for the listed activity types is deliberately added.
         raise LedgerError(
             "broker activities require manual review before evidence "
             f"capture can proceed: {json.dumps(unhandled, sort_keys=True)}"

@@ -726,3 +726,9 @@ def test_list_account_activities_rejects_out_of_range_page_size():
         broker.list_account_activities(page_size=0)
     with pytest.raises(ValueError, match="page_size"):
         broker.list_account_activities(page_size=101)
+
+
+@pytest.mark.parametrize("page_size", [True, 1.5, "2"])
+def test_list_account_activities_requires_a_real_integer_page_size(page_size):
+    with pytest.raises((TypeError, ValueError), match="page_size"):
+        broker.list_account_activities(page_size=page_size)

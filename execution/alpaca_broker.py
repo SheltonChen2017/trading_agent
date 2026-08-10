@@ -439,12 +439,14 @@ def list_account_activities(
     """
     from urllib.parse import urlencode
 
-    if not 1 <= int(page_size) <= 100:
+    if isinstance(page_size, bool) or not isinstance(page_size, int):
+        raise TypeError(f"page_size must be an integer, got {page_size!r}")
+    if not 1 <= page_size <= 100:
         raise ValueError(f"page_size must be 1..100, got {page_size!r}")
     activities: list[dict] = []
     page_token: str | None = None
     for _ in range(_ACTIVITIES_MAX_PAGES):
-        params: dict[str, str] = {"page_size": str(int(page_size))}
+        params: dict[str, str] = {"page_size": str(page_size)}
         if after is not None:
             params["after"] = str(after)
         if page_token is not None:
@@ -465,7 +467,7 @@ def list_account_activities(
                     "paginate on an unidentifiable cursor"
                 )
         activities.extend(page)
-        if len(page) < int(page_size):
+        if len(page) < page_size:
             return activities
         next_token = str(page[-1]["id"])
         if next_token == page_token:

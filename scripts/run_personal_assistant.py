@@ -1408,12 +1408,10 @@ def command_mandate_status(args, store: AssistantStore) -> None:
 def _sync_broker_activities_from_alpaca(store: AssistantStore) -> dict:
     """Fetch broker account activities and journal the recognized ones.
 
-    The server-side ``after`` filter is only a bandwidth bound, not the
-    correctness boundary: Alpaca does not document whether it filters on
-    the activity's date label or its posting time, so the fetch window
-    starts 30 days before the ledger bootstrap and
-    sync_broker_activities() applies the authoritative created_at cutoff
-    locally. Idempotent posting makes the overlap free.
+    Alpaca documents ``after`` as an exclusive activity-creation bound, so
+    fetch exactly from the ledger bootstrap instant. The ledger repeats the
+    cutoff locally as a defensive boundary, but a broad overlap must not
+    pull already-capitalized dividends or transfers into fail-closed review.
     """
     after = None
     bootstrap = store.get_system_state("ledger_bootstrap")
@@ -1421,9 +1419,11 @@ def _sync_broker_activities_from_alpaca(store: AssistantStore) -> dict:
         bootstrapped_at = datetime.fromisoformat(
             str(bootstrap["bootstrapped_at"]).replace("Z", "+00:00")
         )
-        after = (bootstrapped_at - timedelta(days=30)).isoformat()
+        after = bootstrapped_at.isoformat()
     activities = list_account_activities(after=after)
-    return sync_broker_activities(store, activities)
+    return sync_broker_activities(
+        store, activities, created_after=bootstrapped_at if after else None
+    )
 
 
 def command_ledger_bootstrap(args, store: AssistantStore) -> None:
@@ -1901,7 +1901,19 @@ def command_operations_cycle(args, store: AssistantStore) -> None:
             max_order_age_minutes=policy.max_order_age_minutes,
         )
         fill_report = sync_app_fills(store)
-        activity_report = _sync_broker_activities_from_alpaca(store)
+        activity_error: BaseException | None = None
+        try:
+            activity_report = _sync_broker_activities_from_alpaca(store)
+        except (Exception, SystemExit) as exc:
+            # Unsupported post-bootstrap activity must still fail the cycle,
+            # but it must not suppress the independent recovery backup and
+            # health checks that make the failure diagnosable and recoverable.
+            activity_error = exc
+            activity_report = {
+                "failed": True,
+                "error_type": type(exc).__name__,
+                "error": str(exc),
+            }
         snapshot = build_portfolio_snapshot_from_alpaca()
         reconciliation = reconcile_snapshot(store, snapshot)
         backup = ensure_recent_database_backup(
@@ -1914,6 +1926,8 @@ def command_operations_cycle(args, store: AssistantStore) -> None:
         )
         if args.alerts_jsonl and health["alerts"]:
             append_alerts_jsonl(health["alerts"], args.alerts_jsonl)
+        if activity_error is not None:
+            raise activity_error
     except (Exception, SystemExit) as exc:
         alert = store.upsert_operational_alert(
             fingerprint="scheduled-operations-cycle-failure",

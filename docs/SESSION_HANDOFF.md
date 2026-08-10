@@ -28,10 +28,11 @@ handoff. Durable owner decisions and machine-local facts live in
 - Final review status: **accepted after correction; 0 P0, 0 P1, 0 P2,
   and 0 P3 open**.
 - The Codex correction is committed in this checkout at `a8174b9`.
-- The active review branch has no upstream and has not been pushed or merged.
-  It is not deployable from another computer until the owner
-  explicitly authorizes a push. Do not claim cross-computer transfer is
-  complete merely because this handoff is committed locally.
+- The review branch is pushed:
+  `origin/codex/review-epoch-activity-ingestion-20260810` is tip-equal to
+  local HEAD at counter-review commit `4355347` (verified by hash), so
+  another computer can fetch the complete review history. It is NOT merged
+  and NOT deployed.
 - Review made no broker call, operational-database mutation, scheduler
   change, epoch close/start, deployment, policy change, order submission,
   or live-trading change.

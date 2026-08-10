@@ -71,8 +71,9 @@ journal, producing the exact $0.03 cash mismatch. A critical
 `scheduled-paper-observation-failure` alert is open. This measured state
 supersedes earlier wording that the epoch was simply "accumulating evidence."
 
-The independently corrected ingestion fix is local-only at `a8174b9` on
-`codex/review-epoch-activity-ingestion-20260810`; it is not merged, pushed, or
+The independently corrected ingestion fix (`a8174b9`, counter-review
+accepted at `4355347`) is pushed to
+`origin/codex/review-epoch-activity-ingestion-20260810`; it is not merged or
 deployed. Do not claim the $0.03 has self-healed until an owner-authorized
 deployment runs `ledger-reconcile` against the operational database and
 returns matched. The required swap order is: disable tasks, close epoch-002

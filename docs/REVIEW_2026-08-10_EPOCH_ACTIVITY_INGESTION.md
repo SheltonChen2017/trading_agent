@@ -19,9 +19,11 @@ cumulative tree were reviewed; no commit was skipped.
 | `f10b47d` — Ingest broker non-trade activities so CAT fees stop stalling the epoch | **Accepted after correction** | The diagnosis, bounded REST pagination, idempotent fee posting, FILL exclusion, and fail-closed handling of unsupported post-bootstrap activity are sound. Three material defects and one minor boundary defect remained: the parser required fields outside Alpaca's published non-trade schema; a 30-day overlap let pre-bootstrap dividends block reconciliation; activity failure suppressed backup and health; and `page_size` coerced bools, floats, and strings. Corrected in `a8174b9`. |
 | `8f922a9` — Record the epoch-stall diagnosis and activity-ingestion fix in the handoff | **Accepted after correction** | It accurately records the observed $0.03 CAT-fee mismatch and fail-closed evidence stall. Its API claims, manual-recovery statement, severity, deployment wording, and next-step sequence were inaccurate or stale. Corrected in the documentation commit containing this report. |
 
-Review correction `a8174b9` is local-only. The branch has not been pushed or
-merged; another computer cannot retrieve the correction until the owner
-explicitly authorizes a push. No broker call, database mutation, scheduler
+Review correction `a8174b9` was local-only when this report was written;
+after counter-review acceptance the branch was pushed to
+`origin/codex/review-epoch-activity-ingestion-20260810` under the owner's
+standing git-management grant (see §6; still not merged or deployed).
+No broker call, database mutation, scheduler
 change, epoch action, deployment, or policy change was performed by review.
 
 ## 2. Prioritized issue ledger

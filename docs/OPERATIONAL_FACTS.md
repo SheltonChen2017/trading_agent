@@ -97,6 +97,14 @@ They contain only per-task state/results, no account or credential fields.
 They are preserved locally and covered by the narrow
 `data/swap_*_result_*.json` ignore rule; do not commit their contents.
 
+Update 2026-08-10 (development only, NOT deployed): the CR-W2 handler for
+`DIV`/`JNLC`/`CSD`/`CSW` is implemented on
+`user/claude/broker-dividend-handler-20260810`, awaiting independent review.
+Until it is reviewed, merged, and deployed via an owner-triggered epoch roll
+(epoch-004), the watch below remains the OPERATIONAL truth for the running
+epoch — the deployed `ef05dc1` still fails closed on those types. Deadline:
+the AEP dividend pays 2026-09-09.
+
 Standing watch (from the counter-review): a post-bootstrap `JNLC` paper-cash
 top-up or an AEP dividend will **fail closed by design** until a reviewed
 handler exists. When that happens the operations-cycle still completes its

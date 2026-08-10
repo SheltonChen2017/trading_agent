@@ -1,7 +1,60 @@
 # Development session handoff
 
 Prepared: 2026-08-10 after Codex independently reviewed Claude's Epoch 3
-establishment record and corrected the durable documentation.
+establishment record and corrected the durable documentation. Updated the
+same day: PR #183 (that review + Claude's accepted counter-review) is
+merged, and Claude has implemented the CR-W2 dividend/cash-movement handler
+on a branch — see section 0a. That handler is **awaiting independent
+review and is NOT deployed**.
+
+## 0a. Newest round — DIV/JNLC/CSD/CSW handler built (awaiting review)
+
+Owner-authorized 2026-08-10, motivated by a hard deadline: the account
+bought 39 AEP on 2026-08-07, before the 2026-08-09 ex-dividend date, so a
+~$37 cash dividend arrives as a `DIV` activity on the **2026-09-09** pay
+date — which would fail closed and stall epoch-003 at roughly 20 sessions.
+
+Branch `user/claude/broker-dividend-handler-20260810` off merged `main`
+(`c36b615`). One file of production code changed
+(`assistant/portfolio_ledger.py`) plus its tests:
+
+- `sync_broker_activities` now dispatches through a new
+  `_post_broker_activity` helper: `FEE` → `record_fee` (unchanged
+  behavior), plain `DIV` → `record_dividend` (positive amount and symbol
+  required; optional `per_share_amount`/`qty` passed through so the
+  existing per-share × entitled ≈ gross consistency check applies;
+  `tax_classification` recorded as **unknown** — the broker feed does not
+  say qualified vs ordinary, and inventing a tax fact would flow into the
+  annual tax report), and `JNLC`/`CSD`/`CSW` → `record_cash_transfer`
+  (signed amounts; CSD must be positive, CSW negative, zero refused).
+- Deliberately still fail-closed, with the rationale in code: `INT` (never
+  observed here; no INCOME:INTEREST account or agreed treatment), every
+  `DIV*` variant (withholding/return-of-capital/capital-gain distributions
+  each need reviewed tax treatment), and `JNLS` (moves shares, not cash).
+- Per-row refusals are now collected instead of aborting mid-loop, so one
+  malformed row still lets recognized rows post idempotently and the final
+  error lists every problem row at once. The report gained a `by_type`
+  breakdown.
+- One existing test was updated for the contract change (its unknown-type
+  example was `DIV`, which is now handled; `INT` stands in and the
+  partial-progress invariant it pinned is unchanged). Eight new tests
+  cover: dividend idempotency + metadata, minimal published schema,
+  malformed dividends (negative/zero/missing symbol/bad ticker/
+  inconsistent per-share arithmetic), signed cash movements + replay,
+  wrong-sign refusals, excluded types, bad-row-among-good aggregation, and
+  the reconciliation-restore miniature of the 2026-09-09 scenario.
+- Four reverse mutations each turned exactly the intended test red
+  (negative-DIV acceptance, dropped per-share consistency inputs, dropped
+  cash sign checks, invented "qualified" classification); restored and
+  re-verified green. Validation on the final tree is recorded at the end
+  of this section's round in the action plan entry.
+
+No CLI, schema, or migration changes — the sync path was already wired
+into `paper-observation`, `operations-cycle`, and `ledger-reconcile`.
+Nothing operational changed: epoch-003 continues on `ef05dc1`. After
+review and merge, deploying this handler requires the owner-triggered
+epoch roll to epoch-004 (same runbook sequence as the AP-6 swap), ideally
+while the session count is still near zero and well before 2026-09-09.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the prior handoff.

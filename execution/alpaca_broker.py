@@ -388,6 +388,97 @@ def cancel_order(order_id: str) -> dict:
     return {"order_id": str(order_id), "status": "pending_cancel"}
 
 
+_ACTIVITIES_MAX_PAGES = 100
+
+
+def _account_activities_base_url() -> str:
+    return (
+        "https://paper-api.alpaca.markets"
+        if PAPER_TRADING
+        else "https://api.alpaca.markets"
+    )
+
+
+def _http_get_json(url: str) -> Any:
+    """Authenticated GET against the Alpaca REST API.
+
+    The pinned alpaca-py release does not expose the account-activities
+    endpoint at all (no request class, no client method), so this module
+    calls it directly over HTTPS with the same environment credentials the
+    SDK client uses. Stdlib only -- no new dependency.
+    """
+    if not is_configured():
+        raise AlpacaNotConfigured(
+            "APCA_API_KEY_ID / APCA_API_SECRET_KEY are not set; cannot read "
+            "account activities."
+        )
+    import json
+    import urllib.request
+
+    request = urllib.request.Request(
+        url,
+        headers={
+            "APCA-API-KEY-ID": os.environ["APCA_API_KEY_ID"],
+            "APCA-API-SECRET-KEY": os.environ["APCA_API_SECRET_KEY"],
+        },
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return json.loads(response.read())
+
+
+def list_account_activities(
+    *, after: str | None = None, page_size: int = 100
+) -> list[dict]:
+    """Every account activity (fills, fees, dividends, ...) as raw dicts.
+
+    Amount fields stay exactly as the broker sent them (decimal strings),
+    so the ledger can convert without a float round-trip. Pagination uses
+    the documented page_token cursor (the id of the last row of the
+    previous page); a bounded page count turns a broker-side cursor defect
+    into a loud failure instead of an unbounded request loop.
+    """
+    from urllib.parse import urlencode
+
+    if not 1 <= int(page_size) <= 100:
+        raise ValueError(f"page_size must be 1..100, got {page_size!r}")
+    activities: list[dict] = []
+    page_token: str | None = None
+    for _ in range(_ACTIVITIES_MAX_PAGES):
+        params: dict[str, str] = {"page_size": str(int(page_size))}
+        if after is not None:
+            params["after"] = str(after)
+        if page_token is not None:
+            params["page_token"] = page_token
+        url = (
+            f"{_account_activities_base_url()}/v2/account/activities"
+            f"?{urlencode(params)}"
+        )
+        page = _http_get_json(url)
+        if not isinstance(page, list):
+            raise RuntimeError(
+                f"unexpected account-activities response shape: {type(page).__name__}"
+            )
+        for row in page:
+            if not isinstance(row, dict) or not row.get("id"):
+                raise RuntimeError(
+                    "account activity row is missing its id; refusing to "
+                    "paginate on an unidentifiable cursor"
+                )
+        activities.extend(page)
+        if len(page) < int(page_size):
+            return activities
+        next_token = str(page[-1]["id"])
+        if next_token == page_token:
+            raise RuntimeError(
+                "account-activities pagination cursor did not advance"
+            )
+        page_token = next_token
+    raise RuntimeError(
+        f"account activities exceeded {_ACTIVITIES_MAX_PAGES} pages; refusing "
+        "to continue an unbounded fetch"
+    )
+
+
 def run_trade_update_stream(
     callback: Callable[[dict], Any], stop_event: Event | None = None
 ) -> None:

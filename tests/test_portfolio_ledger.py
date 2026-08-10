@@ -30,6 +30,7 @@ from assistant.portfolio_ledger import (
     record_fee,
     record_split,
     sync_app_fills,
+    sync_broker_activities,
 )
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
 from assistant.storage import AssistantStore
@@ -835,3 +836,166 @@ def test_record_fee(tmp_path):
             store, external_id="fee-bad", amount=-1,
             occurred_at="2026-07-29T11:00:00+00:00", description="Bad fee",
         )
+
+
+# --- sync_broker_activities() (broker-activity ingestion, 2026-08-10) ---
+# Motivating incident: Alpaca posts CAT fees on paper accounts as
+# non-trade account activities, which nothing ingested, so the ledger
+# drifted 1 cent per fee day and nightly reconciliation failed forever
+# with an unexplained cash mismatch (74389.33 ledger vs 74389.30 broker).
+
+
+def _fee_activity(
+    activity_id="20260729000000000::fee-a",
+    created_at="2026-07-29T11:00:00Z",
+    net_amount="-0.01",
+    **overrides,
+):
+    activity = {
+        "id": activity_id,
+        "activity_type": "FEE",
+        "activity_sub_type": "CAT",
+        "created_at": created_at,
+        "currency": "USD",
+        "date": "2026-07-28",
+        "description": "CAT fee for proceed of 2 trades on 2026-07-28",
+        "net_amount": net_amount,
+        "status": "executed",
+    }
+    activity.update(overrides)
+    return activity
+
+
+def _bootstrapped_store(tmp_path, cash=1000.0):
+    store = AssistantStore(tmp_path / "assistant.db")
+    boot_at = datetime(2026, 7, 29, 10, tzinfo=timezone.utc)
+    bootstrap_opening_snapshot(
+        store, _snapshot(cash=cash), confirmation="bootstrap", now=boot_at
+    )
+    return store, boot_at
+
+
+def test_sync_broker_activities_posts_fees_idempotently(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    activities = [_fee_activity()]
+    first = sync_broker_activities(store, activities)
+    assert first["inserted"] == 1
+    assert first["duplicates"] == 0
+    assert ledger_balances(store)["cash"] == Decimal("999.99")
+    replay = sync_broker_activities(store, activities)
+    assert replay["inserted"] == 0
+    assert replay["duplicates"] == 1
+    assert ledger_balances(store)["cash"] == Decimal("999.99")
+    fee_postings = _postings_for_account(store, ACCOUNT_FEES)
+    assert len(fee_postings) == 1
+    assert Decimal(fee_postings[0]["amount"]) == Decimal("0.01")
+
+
+def test_sync_broker_activities_skips_fees_already_in_opening_cash(tmp_path):
+    # The double-posting trap: an activity POSTED at or before the
+    # bootstrap instant is already inside opening cash, even when its
+    # date label is later. Re-posting it would push the ledger BELOW the
+    # broker, the opposite failure of the one this sync fixes.
+    store, boot_at = _bootstrapped_store(tmp_path)
+    report = sync_broker_activities(
+        store,
+        [
+            _fee_activity(
+                activity_id="a::before", created_at="2026-07-29T09:00:00Z"
+            ),
+            _fee_activity(
+                activity_id="a::exactly-at-boot",
+                created_at=boot_at.isoformat(),
+            ),
+            _fee_activity(activity_id="a::after", created_at="2026-07-29T10:00:01Z"),
+        ],
+    )
+    assert report["skipped_pre_bootstrap"] == 2
+    assert report["inserted"] == 1
+    assert ledger_balances(store)["cash"] == Decimal("999.99")
+
+
+def test_sync_broker_activities_refuses_unknown_activity_types(tmp_path):
+    # A dividend (AEP is in the account) must block evidence capture
+    # loudly, not be skipped into a silent cash drift. The recognized fee
+    # in the same batch is still journaled: posting is idempotent, so no
+    # work is lost, and the observation stays blocked until the operator
+    # records the dividend manually or the sync is extended.
+    store, _ = _bootstrapped_store(tmp_path)
+    dividend = {
+        "id": "div::1",
+        "activity_type": "DIV",
+        "created_at": "2026-07-29T12:00:00Z",
+        "date": "2026-07-29",
+        "net_amount": "12.48",
+        "status": "executed",
+    }
+    with pytest.raises(LedgerError, match="unhandled activity type DIV"):
+        sync_broker_activities(store, [_fee_activity(), dividend])
+    assert ledger_balances(store)["cash"] == Decimal("999.99")
+
+
+def test_sync_broker_activities_refuses_malformed_fees(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    cases = [
+        (_fee_activity(net_amount="0.01"), "non-negative net_amount"),
+        (_fee_activity(net_amount="0"), "non-negative net_amount"),
+        (_fee_activity(net_amount=None), "not numeric"),
+        (_fee_activity(created_at=None), "created_at is missing"),
+        (_fee_activity(created_at="2026-07-29T11:00:00"), "created_at is missing or not ISO"),
+        (_fee_activity(status="correction"), "not executed"),
+        (_fee_activity(activity_id=None), "missing its broker id"),
+    ]
+    for activity, match in cases:
+        with pytest.raises(LedgerError, match=match):
+            sync_broker_activities(store, [activity])
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_sync_broker_activities_skips_trade_activities(tmp_path):
+    # Fills reach the journal through the app's own fill records; a fill
+    # the app never saw must surface as a share mismatch in
+    # reconcile_snapshot, not be absorbed from the broker feed here.
+    store, _ = _bootstrapped_store(tmp_path)
+    fill = {
+        "id": "fill::1",
+        "activity_type": "FILL",
+        "transaction_time": "2026-07-29T14:00:00Z",
+        "price": "100.0",
+        "qty": "1",
+        "side": "buy",
+        "symbol": "AAPL",
+    }
+    report = sync_broker_activities(store, [fill])
+    assert report["trade_activities_skipped"] == 1
+    assert report["inserted"] == 0
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_sync_broker_activities_requires_bootstrap(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    with pytest.raises(LedgerError, match="bootstrap the portfolio journal"):
+        sync_broker_activities(store, [_fee_activity()])
+
+
+def test_sync_broker_activities_restores_reconciliation_match(tmp_path):
+    # Miniature of the real incident: three post-bootstrap CAT fees the
+    # broker already deducted. Before the sync the reconciliation must
+    # fail (0.03 > CASH_TOLERANCE); after it, match exactly.
+    store, _ = _bootstrapped_store(tmp_path, cash=1000.0)
+    broker_now = _snapshot(cash=999.97)
+    before = reconcile_snapshot(store, broker_now)
+    assert before["matched"] is False
+    assert before["mismatches"][0]["kind"] == "cash"
+    fees = [
+        _fee_activity(
+            activity_id=f"cat::{day}",
+            created_at=f"2026-07-{day}T00:06:00Z",
+        )
+        for day in (30, 31)
+    ] + [_fee_activity(activity_id="cat::aug", created_at="2026-08-01T00:06:00Z")]
+    report = sync_broker_activities(store, fees)
+    assert report["inserted"] == 3
+    after = reconcile_snapshot(store, broker_now)
+    assert after["matched"] is True
+    assert ledger_balances(store)["cash"] == Decimal("999.97")

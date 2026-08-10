@@ -82,6 +82,7 @@ from assistant.portfolio_ledger import (
     record_split,
     reconcile_snapshot,
     sync_app_fills,
+    sync_broker_activities,
 )
 from assistant.macro_context import build_descriptive_macro_context
 from assistant.portfolio_history import (
@@ -121,7 +122,11 @@ from assistant.storage import (
 )
 from assistant.strategy_proposals import CONFIGURED_LEVERAGED_PAIRS, generate_leveraged_pair_rebalance_proposals
 from backtest.research_report import verify_research_report
-from execution.alpaca_broker import get_account, is_configured
+from execution.alpaca_broker import (
+    get_account,
+    is_configured,
+    list_account_activities,
+)
 
 
 _REPOSITORY_ROOT = Path(__file__).resolve().parent.parent
@@ -1400,6 +1405,27 @@ def command_mandate_status(args, store: AssistantStore) -> None:
     print(json.dumps(payload, indent=2, sort_keys=True))
 
 
+def _sync_broker_activities_from_alpaca(store: AssistantStore) -> dict:
+    """Fetch broker account activities and journal the recognized ones.
+
+    The server-side ``after`` filter is only a bandwidth bound, not the
+    correctness boundary: Alpaca does not document whether it filters on
+    the activity's date label or its posting time, so the fetch window
+    starts 30 days before the ledger bootstrap and
+    sync_broker_activities() applies the authoritative created_at cutoff
+    locally. Idempotent posting makes the overlap free.
+    """
+    after = None
+    bootstrap = store.get_system_state("ledger_bootstrap")
+    if isinstance(bootstrap, dict) and bootstrap.get("bootstrapped_at"):
+        bootstrapped_at = datetime.fromisoformat(
+            str(bootstrap["bootstrapped_at"]).replace("Z", "+00:00")
+        )
+        after = (bootstrapped_at - timedelta(days=30)).isoformat()
+    activities = list_account_activities(after=after)
+    return sync_broker_activities(store, activities)
+
+
 def command_ledger_bootstrap(args, store: AssistantStore) -> None:
     if not is_configured():
         raise SystemExit(
@@ -1430,6 +1456,7 @@ def command_ledger_reconcile(args, store: AssistantStore) -> None:
         )
     if not args.no_sync:
         sync_app_fills(store)
+        _sync_broker_activities_from_alpaca(store)
     snapshot = build_portfolio_snapshot_from_alpaca()
     report = reconcile_snapshot(store, snapshot)
     print(json.dumps(report, indent=2, sort_keys=True))
@@ -1778,6 +1805,7 @@ def command_paper_observation(args, store: AssistantStore) -> None:
             max_order_age_minutes=policy.max_order_age_minutes,
         )
         fill_report = sync_app_fills(store)
+        activity_report = _sync_broker_activities_from_alpaca(store)
         snapshot = build_portfolio_snapshot_from_alpaca()
         reconciliation = reconcile_snapshot(store, snapshot)
         if not reconciliation["matched"]:
@@ -1820,6 +1848,7 @@ def command_paper_observation(args, store: AssistantStore) -> None:
             {
                 "order_reconciliation": order_report,
                 "fill_sync": fill_report,
+                "activity_sync": activity_report,
                 "ledger_reconciliation": reconciliation,
                 "paper_observation": observation,
             },
@@ -1872,6 +1901,7 @@ def command_operations_cycle(args, store: AssistantStore) -> None:
             max_order_age_minutes=policy.max_order_age_minutes,
         )
         fill_report = sync_app_fills(store)
+        activity_report = _sync_broker_activities_from_alpaca(store)
         snapshot = build_portfolio_snapshot_from_alpaca()
         reconciliation = reconcile_snapshot(store, snapshot)
         backup = ensure_recent_database_backup(
@@ -1898,6 +1928,7 @@ def command_operations_cycle(args, store: AssistantStore) -> None:
     result = {
         "order_reconciliation": order_report,
         "fill_sync": fill_report,
+        "activity_sync": activity_report,
         "ledger_reconciliation": reconciliation,
         "backup": backup,
         "health": health,

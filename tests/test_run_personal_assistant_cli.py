@@ -451,3 +451,114 @@ if __name__ == "__main__":
     test_command_risk_check_rejects_benchmark_without_move_pct()
     test_command_risk_check_rejects_move_pct_without_benchmark()
     print("All run_personal_assistant CLI tests passed.")
+
+
+# --- broker-activity ingestion ordering (2026-08-10): CAT fees arrive as
+# non-trade account activities, which nothing ingested, so the nightly
+# reconciliation drifted 1 cent per fee day and failed forever. These
+# tests pin the repaired pipeline order: broker orders reconcile, app
+# fills sync, broker activities sync, and only THEN is the snapshot
+# reconciled -- so the reconciliation judges books that already contain
+# every fee the broker deducted.
+
+
+def test_ledger_reconcile_syncs_fills_and_activities_before_reconciling(
+    monkeypatch, capsys
+):
+    calls = []
+    store = object()
+    args = SimpleNamespace(no_sync=False)
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_app_fills",
+        lambda actual_store: calls.append(("fills", actual_store)),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "_sync_broker_activities_from_alpaca",
+        lambda actual_store: calls.append(("activities", actual_store)),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "build_portfolio_snapshot_from_alpaca",
+        lambda: calls.append(("snapshot", None)) or "snapshot",
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "reconcile_snapshot",
+        lambda actual_store, snapshot: (
+            calls.append(("reconcile", actual_store)),
+            {"matched": True},
+        )[1],
+    )
+
+    personal_assistant_cli.command_ledger_reconcile(args, store)
+
+    assert calls == [
+        ("fills", store),
+        ("activities", store),
+        ("snapshot", None),
+        ("reconcile", store),
+    ]
+
+
+def test_ledger_reconcile_no_sync_skips_both_syncs(monkeypatch, capsys):
+    calls = []
+    args = SimpleNamespace(no_sync=True)
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_app_fills",
+        lambda actual_store: calls.append("fills"),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "_sync_broker_activities_from_alpaca",
+        lambda actual_store: calls.append("activities"),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "build_portfolio_snapshot_from_alpaca",
+        lambda: "snapshot",
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "reconcile_snapshot",
+        lambda actual_store, snapshot: {"matched": True},
+    )
+
+    personal_assistant_cli.command_ledger_reconcile(args, object())
+
+    assert calls == []
+
+
+def test_sync_broker_activities_from_alpaca_windows_the_fetch(monkeypatch):
+    # The server-side `after` filter is a bandwidth bound only; the helper
+    # must start it 30 days before the ledger bootstrap so ambiguous
+    # broker filter semantics (date label vs posting time) cannot drop an
+    # activity the authoritative local created_at cutoff would keep.
+    captured = {}
+
+    class FakeStore:
+        def get_system_state(self, key, default=None):
+            assert key == "ledger_bootstrap"
+            return {"bootstrapped_at": "2026-08-05T18:22:58+00:00"}
+
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "list_account_activities",
+        lambda *, after=None: captured.setdefault("after", after) and []
+        or [],
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_broker_activities",
+        lambda store, activities: {"inserted": 0, "activities": activities},
+    )
+
+    result = personal_assistant_cli._sync_broker_activities_from_alpaca(
+        FakeStore()
+    )
+    assert captured["after"] == "2026-07-06T18:22:58+00:00"
+    assert result["inserted"] == 0

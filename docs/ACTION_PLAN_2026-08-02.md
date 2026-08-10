@@ -54,21 +54,21 @@ assessment; GR-2 through GR-5 are complete and independently reviewed. GR-7a
 through GR-7c are also complete. What remains incomplete is GR-6, GR-7d, the
 allocation service, every AI *product* plan beyond the committee (strategy
 authoring, debate, and MCP), and — most importantly — enough **elapsed frozen-
-epoch evidence**: `paper-epoch-001` is closed, and `paper-epoch-002` has been
-active in durable storage since 2026-08-06 on a separate stable computer at
-frozen commit `9a91498`, bound to `my_policy.json`.
+epoch evidence**: `paper-epoch-001` and `paper-epoch-002` are closed, and
+`paper-epoch-003` is active since 2026-08-10 on the epoch host at deployed
+commit `ef05dc1`, bound to `my_policy.json`.
 Development changes in this checkout are not deployed into that epoch.
-**Measured 2026-08-10: epoch-002 is STALLED at 1 session** — every nightly
-capture since 2026-08-07 fails closed on a growing ledger cash mismatch
-caused by uningested broker CAT fees (defect AP-6 below). The fix is
-**accepted after independent correction** at `a8174b9` on branch
-`codex/review-epoch-activity-ingestion-20260810`, and Claude's counter-review
-(2026-08-10) **accepted the correction in full** — all seven findings
-confirmed (EPOCHR-002 strengthened with live endpoint evidence: a
-pre-bootstrap JNLC funding journal sat inside the submitted 30-day window,
-and Alpaca's `after` bound was live-verified as exclusive creation-time).
-The branch has not been merged or deployed. The 60-session / 30-order minimums are NOT
-currently accumulating. The scarcest
+**Update 2026-08-10 (executed):** epoch-002 stalled at 1 session on
+uningested broker CAT fees (defect AP-6 below). The fix was independently
+corrected (`a8174b9`), counter-reviewed and accepted in full, merged as
+**PR #182** (`ef05dc1`), and the owner-authorized epoch swap was executed
+the same day: epoch-002 **closed**, the merged tree **deployed**,
+`ledger-reconcile` **matched on the first run** (the three CAT fees posted
+exactly once), and **`paper-epoch-003` is active** at `ef05dc1` with the
+same mandate/policy/strategy/model lineage, **all five required drills
+passed and recorded**, tasks re-enabled, a manual operations-cycle green,
+and zero open alerts. The 60-session / 30-order minimums accumulate again
+from the first post-swap capture. The scarcest
 resource on the critical path is not engineering — it is elapsed calendar time on that
 frozen runtime, plus a small number of owner decisions and data purchases.
 
@@ -164,7 +164,7 @@ already-merged work does not reorder the adopted next step.
 | **GR-1E** — ~~assess the composition + recovery wrappers~~ **COMPLETE AND INDEPENDENTLY REVIEWED 2026-08-03: no extraction. The 281-line coordinator sequences extracted phases, performs ordinary control/exception/message composition, contains one broker-submission call, and contains no inline financial math, transition SQL, or broker interpretation. Recovery remains around the atomic storage primitive; the claim wrapper may try more than one candidate status. GR-1 is complete against the archived plan's intended §6.4 scope; `allocation_batch.py` debt remains open. See GENERAL_READINESS_STATUS and the GR-1E review report.** | none | complete |
 | **Committee release gates** — **COMPLETE AND INDEPENDENTLY REVIEWED AFTER CORRECTION 2026-08-05**: `tests/committee_corpus/cases.json` contains 69 frozen cases (51 replay / 10 injection / 8 memory-poisoning) executed through the real pipeline, with ADR-minimum inventory gates and a canonical SHA-256 content identity so a case cannot be silently gutted while retaining its ID/category. The `committee-review` CLI gives every covered failure one explicit `Review unavailable (<code>)` line; review added the missing packet-construction failure path. The `ENABLE_EXPERIMENTAL_COMMITTEE=1` gate is deliberately NOT removed — removal is a separately reviewed, owner-authorized decision. | owner decision on gate removal | complete |
 | **ML-FS-6 real discovery/confirmation** — spec `research/ml_specs/volatility-discovery-v1.json` is review-ready; no `SpecReviewAttestation` exists | blocked on owner-designated reviewer + real PIT data | owner + data |
-| **Broker-activity ingestion (AP-6 fix)** — **COMPLETE AFTER INDEPENDENT CORRECTION 2026-08-10** at `a8174b9`: paginated raw-REST `list_account_activities()` in `execution/alpaca_broker.py` (pinned alpaca-py lacks the endpoint); fail-closed `sync_broker_activities()` in `assistant/portfolio_ledger.py`; idempotent FEE journaling; exact bootstrap-bound fetch and local pre-bootstrap exclusion; published minimal-response compatibility; unsupported post-bootstrap types still refuse; `operations-cycle` preserves reconciliation, backup, health, and alert work before returning the failure. Review closed 3 P2 implementation findings, 1 P2 deployment-procedure finding, and 3 P3 findings. Counter-review (Claude, 2026-08-10) accepted all findings with live endpoint verification and four reverse mutations proving the corrected guards load-bearing; two P3 watch items recorded (surrogate/`created_at` content conflict on provider transition; a future paper-cash top-up fails closed until a reviewed `JNLC` handler exists). | Owner may authorize push/merge, then explicitly close epoch-002 before deploying. After deployment, reconcile to matched books before starting epoch-003 and running all five drills. | review complete; owner deployment decision |
+| **Broker-activity ingestion (AP-6 fix)** — **COMPLETE AFTER INDEPENDENT CORRECTION 2026-08-10** at `a8174b9`: paginated raw-REST `list_account_activities()` in `execution/alpaca_broker.py` (pinned alpaca-py lacks the endpoint); fail-closed `sync_broker_activities()` in `assistant/portfolio_ledger.py`; idempotent FEE journaling; exact bootstrap-bound fetch and local pre-bootstrap exclusion; published minimal-response compatibility; unsupported post-bootstrap types still refuse; `operations-cycle` preserves reconciliation, backup, health, and alert work before returning the failure. Review closed 3 P2 implementation findings, 1 P2 deployment-procedure finding, and 3 P3 findings. Counter-review (Claude, 2026-08-10) accepted all findings with live endpoint verification and four reverse mutations proving the corrected guards load-bearing; two P3 watch items recorded (surrogate/`created_at` content conflict on provider transition; a future paper-cash top-up fails closed until a reviewed `JNLC` handler exists). **Merged as PR #182 and DEPLOYED 2026-08-10: the full swap sequence executed — epoch-002 closed, `ledger-reconcile` matched first-run, epoch-003 active at `ef05dc1`, 5/5 drills recorded, tasks re-enabled, cycle green, 0 open alerts.** | none — complete and operational; watch items CR-W1/CR-W2 stand | complete |
 
 ---
 
@@ -206,7 +206,7 @@ already-merged work does not reorder the adopted next step.
 | AP-2 | P2 | **`.gitignore` gap**: ML runtime writes `artifacts/shadow.json`, `artifacts/model/`, `artifacts/{datasets,experiments,reviews}/` — none ignored. First scheduled run dirties the worktree, and evidence capture **refuses a dirty worktree** → silent cadence failure. | **Resolved and reviewed 2026-08-03:** `artifacts/` is ignored wholesale and enforced through `git check-ignore` regression coverage. |
 | AP-3 | P3 | 118 `portfolio_equity_snapshots` rows are mixed briefing/test-pollution provenance (pre-2026-08-02); any evidence report over them is unreliable | treat pre-2026-08-02 rows as non-evidence; decide retention at epoch start |
 | AP-4 | P3 | Doc staleness cluster: `validate.py` figure 479→490 (grew in `7f431b6`); characterization-suite docstring still says "2,040 lines"; STATUS "corrects" a 1,450 figure the plan never contained; GR-1D/1E exist only in SESSION_HANDOFF, absent from plan and status docs; ML status doc has 3 internally stale paragraphs (spec library "not built" vs delivered; "calibration emitted empty" vs wired; ML-FS §2 overstates ML-FS-6) | **Resolved and reviewed 2026-08-03:** reconciled all listed statements, added GR-1D/1E status, and recorded post-PR-#117 state. |
-| AP-6 | P2 | **Broker non-trade activities were never ingested** (found 2026-08-10 tracing epoch-002's stall): Alpaca charges CAT fees on paper accounts as account *activities*, not fills; the journal only ingested fills (`sync_app_fills`), so ledger cash drifted +$0.01 per fee day. By 2026-08-07 the drift ($0.03 = three post-bootstrap fees, verified to the cent against `/v2/account/activities`) exceeded the $0.01 reconciliation tolerance and every nightly `paper-observation` correctly refused to capture evidence — the epoch stalled at 1 session with a critical alert. Dividends/interest arrive on the same stream. This is incorrect durable state / missing recovery (P2), not unsafe execution or broken atomicity (P1). The detector worked; the books were wrong. | **Resolved after independent correction 2026-08-10** at `a8174b9`; see `docs/REVIEW_2026-08-10_EPOCH_ACTIVITY_INGESTION.md`. The review branch is pushed to `origin/codex/review-epoch-activity-ingestion-20260810` at counter-review commit `4355347` (not merged, not deployed). First reviewed `ledger-reconcile` after deployment is expected to self-heal the three fees, but that operational result remains unverified. Widening the tolerance remains rejected. |
+| AP-6 | P2 | **Broker non-trade activities were never ingested** (found 2026-08-10 tracing epoch-002's stall): Alpaca charges CAT fees on paper accounts as account *activities*, not fills; the journal only ingested fills (`sync_app_fills`), so ledger cash drifted +$0.01 per fee day. By 2026-08-07 the drift ($0.03 = three post-bootstrap fees, verified to the cent against `/v2/account/activities`) exceeded the $0.01 reconciliation tolerance and every nightly `paper-observation` correctly refused to capture evidence — the epoch stalled at 1 session with a critical alert. Dividends/interest arrive on the same stream. This is incorrect durable state / missing recovery (P2), not unsafe execution or broken atomicity (P1). The detector worked; the books were wrong. | **Resolved after independent correction 2026-08-10** at `a8174b9`; see `docs/REVIEW_2026-08-10_EPOCH_ACTIVITY_INGESTION.md`. Merged as PR #182 and deployed 2026-08-10. **The self-heal is now verified operational fact:** first post-deployment `ledger-reconcile` inserted the three fees exactly once and returned `matched: true` (ledger 74389.30 = broker); the follow-up operations-cycle replay counted them as 3 idempotent duplicates. Widening the tolerance remains rejected. |
 | AP-5 | P3 | 4 of 5 `REQUIRED_PROMOTION_DRILLS` have no producer (only `backup_restore` does) — structurally unproducible until GR-3/GR-5 | **Resolved and independently reviewed 2026-08-03:** GR-3 adds exact-lineage producers for ambiguous_submission, restart_recovery, and kill_switch; GR-5 adds alert_delivery through its storage-verified self-test. All five drill types now have producers. Do not fake any of them. |
 
 ---
@@ -294,11 +294,10 @@ follow-up adds Interactive-logon host bootstrap and post-start
 ledger bootstrap or any epoch action. No such action follows without the
 owner's specific direction.
 
-**Phase 5 — operational deployment + epoch start (RE-OPENED FOR EPOCH SWAP;
-initial `paper-epoch-001` shakedown closed; `paper-epoch-002` is active in
-storage but operationally stalled since 2026-08-07 on the separate frozen
-computer at `9a91498`; see
-`docs/SESSION_HANDOFF.md` for the current lineage block):**
+**Phase 5 — operational deployment + epoch start (COMPLETE AGAIN after the
+2026-08-10 AP-6 swap; `paper-epoch-001` and `paper-epoch-002` closed;
+`paper-epoch-003` active on the epoch host at `ef05dc1`; see
+`docs/SESSION_HANDOFF.md` §0 for the executed sequence):**
 merge the independently reviewed approved mandate → pin the model-2
 operational checkout → elevated scheduler window under the owner's account →
 install + verify the 4 operational tasks (`-WhatIf` first) → install the
@@ -311,15 +310,13 @@ un-deployed under model-2 discipline. Note: the owner's informal paper trading
 does not substitute for formal epoch evidence. **Owner ops/UI hygiene
 (2026-08-05 → 2026-08-06):** policy-path resolution, task self-heal,
 singleton, and UI chrome are merged (PRs #157–#159). **Epoch re-bind
-executed 2026-08-06:** `paper-epoch-001` closed; `paper-epoch-002` active on
-frozen commit `9a91498` bound to `my_policy.json`, but now stalled at one
-captured session and accumulating no mandate evidence. **Required AP-6 swap
-sequence:** disable all four scheduled tasks → close epoch-002 while its
-frozen runtime is still present → deploy the reviewed merged AP-6 tree → run
-`ledger-reconcile` and require a matched result → run readiness → start
-epoch-003 → run all five drills → re-enable and verify the tasks. Deployment
-does not itself close an epoch, and epoch-003 must not start on unreconciled
-books. **Full-project sweep
+executed 2026-08-06:** `paper-epoch-001` closed; `paper-epoch-002` ran on
+frozen commit `9a91498` bound to `my_policy.json`, later stalled at one
+captured session by AP-6. **AP-6 swap EXECUTED 2026-08-10 in exactly the
+required order** (disable tasks → close epoch-002 on its frozen runtime →
+deploy merged `ef05dc1` → `ledger-reconcile` matched → readiness → start
+epoch-003 → all five drills recorded → tasks re-enabled and a manual
+operations-cycle verified green, 0 open alerts). **Full-project sweep
 (2026-08-06, PR #160 / `87593f8`):** independently accepted after correction
 — FPS-001/004 evidence-integrity fixes confirmed; residual
 `tax_ledger_with_coverage` share conversion closed (GFPS-001); FPS-003
@@ -502,11 +499,11 @@ ML/LLM, or execution-authority behavior changed.
 Sequencing after UI Phase 2: UI-2d is complete after independent correction.
 Automatic expiry remains a separately approved optional milestone and physical
 purge remains deferred. Phase 5 operational deployment and epoch start are
-re-opened for the explicitly authorized AP-6 epoch swap above. The four
-original owner decisions were made on 2026-08-04 and the mandate approval and
-its independent review are merged. The operational-only verifier scope also
-merged in PR #148. Do not push, merge, deploy, disable tasks, close/start an
-epoch, or mutate the operator database automatically.
+closed again: the AP-6 epoch swap was owner-authorized and executed
+2026-08-10. The four original owner decisions were made on 2026-08-04 and the
+mandate approval and its independent review are merged. The operational-only
+verifier scope also merged in PR #148. Future epoch actions, deployments, and
+task changes still require explicit owner direction each time.
 
 **Phase 7 — data purchases, whenever decided (independent of code):**
 membership vendor decision → Databento statistics/reference captures →

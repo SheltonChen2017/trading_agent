@@ -1,11 +1,10 @@
 # Development session handoff
 
-Prepared: 2026-08-10, after Codex independently reviewed and corrected
-Claude's broker-activity ingestion fix for the stalled paper evidence epoch,
-and Claude counter-reviewed the correction. **Counter-review outcome:
-accepted in full — all seven findings confirmed, none a false alarm, no
-correction to the correction required.** See section 5a and the review
-report's §6 for the live-endpoint evidence and reverse-mutation record.
+Prepared: 2026-08-10, updated the same day after the owner merged the
+accepted review (PR #182) and authorized the epoch swap, which Claude then
+executed end to end — see section 0. The review round (Codex correction,
+Claude counter-review accepted in full) is section 0.1 and below; the
+counter-review record is in the review report's §6.
 
 Audience: Codex, Claude Code, and the repository owner after a computer,
 model, or session change. This file completely replaces the previous session
@@ -13,7 +12,64 @@ handoff. Durable owner decisions and machine-local facts live in
 `docs/OPERATIONAL_FACTS.md`; sequencing authority lives in
 `docs/ACTION_PLAN_2026-08-02.md`.
 
-## 0. Read this first — exact current state
+## 0. Epoch swap EXECUTED (2026-08-10, owner-authorized)
+
+After the counter-review, the owner merged the review branch as **PR #182**
+(`origin/main` = `ef05dc1`, tree-identical to review tip `5ebc9e5` —
+content verified by diff) and explicitly authorized the epoch swap. Claude
+executed the full runbook sequence the same day on the epoch host
+(`redmond\sheltonchen`), in order, with each step verified before the next:
+
+1. **Tasks disabled** — all four `TradingAgent-Paper-*` tasks stopped and
+   disabled via the elevated swap script (owner approved the UAC prompt);
+   result JSON confirmed `Disabled` ×4. No python process held the
+   database (the 8/6-dated lock files were stale).
+2. **`paper-epoch-002` closed** at `2026-08-10T19:25:50Z` using the
+   still-frozen `9a91498` checkout's own code. Its single-observation
+   record is retained.
+3. **Deployed** — operational checkout fast-forwarded to `ef05dc1`
+   (merged main), clean tree; `requirements.txt` unchanged across
+   `9a91498..ef05dc1`, so no dependency install.
+4. **`ledger-reconcile` → `matched: true`, `mismatch_count: 0`** on the
+   first run with the new activity sync. The three post-bootstrap CAT fees
+   posted exactly once (`journal_transactions` 9 → 12; each keyed on its
+   broker activity id at its true `created_at`); ledger cash 74389.30 =
+   broker cash. The self-heal expectation is now **verified operational
+   fact**.
+5. **Readiness** — `readiness`: `ready: true` (broker ACTIVE, paper=True).
+   `platform-readiness`: execution_integrity and data_integrity `ready`;
+   operational/evidence/strategy dimensions were `blocked` mid-swap as
+   expected (no active epoch, no drills yet, cadence paused).
+6. **`paper-epoch-003` started** at `2026-08-10T19:27:21Z` — lineage:
+   `code_commit ef05dc1…`, same mandate fingerprint (`693799c0…`), same
+   policy fingerprint (`4a942cbc…`, `my_policy.json`), strategy
+   `owner-directed-paper-policy 1.0.0`, model `no-ml-model`, same broker
+   account `15f1e8ef…`. `lineage_consistent: true`.
+7. **All five drills passed and recorded under epoch-003** at `ef05dc1`
+   with evidence hashes: ambiguous_submission, kill_switch,
+   restart_recovery (GR-3 fault matrix, report SHA-256 `3ebde6c4…`),
+   alert_delivery (real Windows-toast self-test, storage-verified), and
+   backup_restore (restore + integrity + table-count match). Epoch-002
+   had 0 of 5; epoch-003 starts at 5 of 5.
+8. **Tasks re-enabled** (second UAC approval; `Ready`/enabled ×4) and the
+   scheduled path verified by one manual `operations-cycle` from the
+   deployed tree: activity sync saw 11 activities (3 fee duplicates —
+   idempotent replay proven in production, 8 trade activities skipped),
+   reconciliation matched, backup fresh, health `healthy: true`, exit 0.
+9. **Alert hygiene** — all seven open alerts (the two stall-era criticals,
+   the last old-code mismatch alert, and four transient broker-outage /
+   freshness rows) were acknowledged after their causes were verified
+   resolved. **0 open alerts.**
+
+Current operational truth: **`paper-epoch-003` is active and healthy at
+`ef05dc1`; sessions 0, orders 0, drills 5/5; the 60-session / 30-order
+clock restarts with the first post-close capture** (next NYSE session
+close after the swap). CR-W2 stands: a future paper-cash top-up (`JNLC`)
+or an AEP dividend will fail closed until a reviewed handler exists —
+that is by design, and the operations-cycle now completes its backup and
+health work even when that happens.
+
+## 0.1 Prior context — review-round state (superseded above where they differ)
 
 - Repository: `C:\git\customizedAgent\trading_agent` on this development
   computer.

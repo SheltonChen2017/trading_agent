@@ -60,26 +60,30 @@ for separating a tech style bet from selection — never as the record.
 
 Not derivable from the repository, and expensive to rediscover.
 
-### `paper-epoch-002` is active in storage but stalled (measured 2026-08-10)
+### `paper-epoch-003` is active; the AP-6 swap was executed (2026-08-10)
 
-On the epoch host, `paper-epoch-002` remains the active durable epoch at
-frozen commit `9a91498`, but it is **not accumulating mandate evidence**. It
-has one captured session (2026-08-06), zero epoch orders, and zero of five
-required drills. Every scheduled post-close observation since 2026-08-07 has
-failed closed because three post-bootstrap Alpaca CAT fees are absent from the
-journal, producing the exact $0.03 cash mismatch. A critical
-`scheduled-paper-observation-failure` alert is open. This measured state
-supersedes earlier wording that the epoch was simply "accumulating evidence."
+The AP-6 stall (three uningested post-bootstrap CAT fees, $0.03 cash
+mismatch, every capture since 2026-08-07 refused) was repaired by the
+owner-authorized epoch swap on 2026-08-10, executed in the required order:
+tasks disabled (elevated script, UAC-approved) → `paper-epoch-002` closed at
+19:25:50Z on its frozen `9a91498` runtime (single-observation record
+retained) → operational checkout fast-forwarded to merged `ef05dc1`
+(PR #182) → `ledger-reconcile` **matched on its first run** (the three fees
+posted exactly once at their true `created_at` times; ledger cash
+74389.30 = broker) → readiness green → `paper-epoch-003` started at
+19:27:21Z with identical mandate/policy/strategy/model lineage → **all five
+required drills passed and recorded under epoch-003** → tasks re-enabled and
+verified by a manual green operations-cycle (3 fee duplicates on idempotent
+replay, healthy, exit 0). All seven stale alerts were acknowledged after
+their causes were verified resolved; **0 open alerts**.
 
-The independently corrected ingestion fix (`a8174b9`, counter-review
-accepted at `4355347`) is pushed to
-`origin/codex/review-epoch-activity-ingestion-20260810`; it is not merged or
-deployed. Do not claim the $0.03 has self-healed until an owner-authorized
-deployment runs `ledger-reconcile` against the operational database and
-returns matched. The required swap order is: disable tasks, close epoch-002
-on its frozen runtime, deploy the reviewed merge, reconcile to matched books,
-run readiness, start epoch-003, run all five drills, then re-enable and verify
-the tasks.
+Standing watch (from the counter-review): a post-bootstrap `JNLC` paper-cash
+top-up or an AEP dividend will **fail closed by design** until a reviewed
+handler exists. When that happens the operations-cycle still completes its
+backup/health work before failing; the fix is a small, separately reviewed
+handler (dividends → `record_dividend`, transfers → `record_cash_transfer`),
+never a manual compensating entry (the sync re-reads broker rows and would
+keep refusing) and never a widened tolerance.
 
 ### There are TWO machines, and only one may run the cadence (2026-08-06; re-verified 2026-08-09)
 
@@ -93,8 +97,8 @@ machine-local claim re-verified on the second host rather than copied.
 Everything in this section is host-specific; re-measure rather than assume
 which one you are on. `whoami` distinguishes them.
 
-- **Epoch host** (`REDMOND\sheltonchen`) — retains the active-but-stalled
-  `paper-epoch-002`. The four
+- **Epoch host** (`REDMOND\sheltonchen`) — runs the active
+  `paper-epoch-003` (at `ef05dc1` since 2026-08-10). The four
   `TradingAgent-Paper-*` tasks are installed and ENABLED here. This is the
   only host that may run the operational cadence. The bullets below this
   section (launch script, epoch-swap script, lock files, backups) describe
@@ -111,7 +115,7 @@ which one you are on. `whoami` distinguishes them.
 **Why they are disabled, and why it matters.** Both hosts read the same
 `APCA_API_KEY_ID`/`APCA_API_SECRET_KEY` from their own user registry, and
 those credentials point at the **same Alpaca paper account** — the one bound
-to active-but-stalled `paper-epoch-002`. Two hosts running
+to the active `paper-epoch-003`. Two hosts running
 `monitor-orders`/`operations-cycle`/`watchdog` against one account means
 duplicate reconciliation and competing cancellation against live epoch
 evidence. The second host was therefore deliberately left with **no ledger

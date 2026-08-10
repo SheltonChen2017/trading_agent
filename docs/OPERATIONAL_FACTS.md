@@ -60,6 +60,27 @@ for separating a tech style bet from selection — never as the record.
 
 Not derivable from the repository, and expensive to rediscover.
 
+### `paper-epoch-002` is active in storage but stalled (measured 2026-08-10)
+
+On the epoch host, `paper-epoch-002` remains the active durable epoch at
+frozen commit `9a91498`, but it is **not accumulating mandate evidence**. It
+has one captured session (2026-08-06), zero epoch orders, and zero of five
+required drills. Every scheduled post-close observation since 2026-08-07 has
+failed closed because three post-bootstrap Alpaca CAT fees are absent from the
+journal, producing the exact $0.03 cash mismatch. A critical
+`scheduled-paper-observation-failure` alert is open. This measured state
+supersedes earlier wording that the epoch was simply "accumulating evidence."
+
+The independently corrected ingestion fix (`a8174b9`, counter-review
+accepted at `4355347`) is pushed to
+`origin/codex/review-epoch-activity-ingestion-20260810`; it is not merged or
+deployed. Do not claim the $0.03 has self-healed until an owner-authorized
+deployment runs `ledger-reconcile` against the operational database and
+returns matched. The required swap order is: disable tasks, close epoch-002
+on its frozen runtime, deploy the reviewed merge, reconcile to matched books,
+run readiness, start epoch-003, run all five drills, then re-enable and verify
+the tasks.
+
 ### There are TWO machines, and only one may run the cadence (2026-08-06; re-verified 2026-08-09)
 
 Recorded 2026-08-06 on the branch
@@ -72,7 +93,8 @@ machine-local claim re-verified on the second host rather than copied.
 Everything in this section is host-specific; re-measure rather than assume
 which one you are on. `whoami` distinguishes them.
 
-- **Epoch host** (`REDMOND\sheltonchen`) — runs `paper-epoch-002`. The four
+- **Epoch host** (`REDMOND\sheltonchen`) — retains the active-but-stalled
+  `paper-epoch-002`. The four
   `TradingAgent-Paper-*` tasks are installed and ENABLED here. This is the
   only host that may run the operational cadence. The bullets below this
   section (launch script, epoch-swap script, lock files, backups) describe
@@ -88,8 +110,8 @@ which one you are on. `whoami` distinguishes them.
 
 **Why they are disabled, and why it matters.** Both hosts read the same
 `APCA_API_KEY_ID`/`APCA_API_SECRET_KEY` from their own user registry, and
-those credentials point at the **same Alpaca paper account** — the one
-`paper-epoch-002` is accumulating evidence on. Two hosts running
+those credentials point at the **same Alpaca paper account** — the one bound
+to active-but-stalled `paper-epoch-002`. Two hosts running
 `monitor-orders`/`operations-cycle`/`watchdog` against one account means
 duplicate reconciliation and competing cancellation against live epoch
 evidence. The second host was therefore deliberately left with **no ledger

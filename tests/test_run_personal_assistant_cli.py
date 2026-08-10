@@ -451,3 +451,198 @@ if __name__ == "__main__":
     test_command_risk_check_rejects_benchmark_without_move_pct()
     test_command_risk_check_rejects_move_pct_without_benchmark()
     print("All run_personal_assistant CLI tests passed.")
+
+
+# --- broker-activity ingestion ordering (2026-08-10): CAT fees arrive as
+# non-trade account activities, which nothing ingested, so the nightly
+# reconciliation drifted 1 cent per fee day and failed forever. These
+# tests pin the repaired pipeline order: broker orders reconcile, app
+# fills sync, broker activities sync, and only THEN is the snapshot
+# reconciled -- so the reconciliation judges books that already contain
+# every fee the broker deducted.
+
+
+def test_ledger_reconcile_syncs_fills_and_activities_before_reconciling(
+    monkeypatch, capsys
+):
+    calls = []
+    store = object()
+    args = SimpleNamespace(no_sync=False)
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_app_fills",
+        lambda actual_store: calls.append(("fills", actual_store)),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "_sync_broker_activities_from_alpaca",
+        lambda actual_store: calls.append(("activities", actual_store)),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "build_portfolio_snapshot_from_alpaca",
+        lambda: calls.append(("snapshot", None)) or "snapshot",
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "reconcile_snapshot",
+        lambda actual_store, snapshot: (
+            calls.append(("reconcile", actual_store)),
+            {"matched": True},
+        )[1],
+    )
+
+    personal_assistant_cli.command_ledger_reconcile(args, store)
+
+    assert calls == [
+        ("fills", store),
+        ("activities", store),
+        ("snapshot", None),
+        ("reconcile", store),
+    ]
+
+
+def test_ledger_reconcile_no_sync_skips_both_syncs(monkeypatch, capsys):
+    calls = []
+    args = SimpleNamespace(no_sync=True)
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_app_fills",
+        lambda actual_store: calls.append("fills"),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "_sync_broker_activities_from_alpaca",
+        lambda actual_store: calls.append("activities"),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "build_portfolio_snapshot_from_alpaca",
+        lambda: "snapshot",
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "reconcile_snapshot",
+        lambda actual_store, snapshot: {"matched": True},
+    )
+
+    personal_assistant_cli.command_ledger_reconcile(args, object())
+
+    assert calls == []
+
+
+def test_sync_broker_activities_from_alpaca_windows_the_fetch(monkeypatch):
+    # Alpaca documents `after` as an exclusive created-after filter. Start
+    # exactly at bootstrap so pre-bootstrap dividends and transfers cannot
+    # block the first reconciliation even though opening cash contains them.
+    captured = {}
+
+    class FakeStore:
+        def get_system_state(self, key, default=None):
+            assert key == "ledger_bootstrap"
+            return {"bootstrapped_at": "2026-08-05T18:22:58+00:00"}
+
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "list_account_activities",
+        lambda *, after=None: captured.setdefault("after", after) and []
+        or [],
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_broker_activities",
+        lambda store, activities, *, created_after=None: {
+            "inserted": 0,
+            "activities": activities,
+            "created_after": created_after,
+        },
+    )
+
+    result = personal_assistant_cli._sync_broker_activities_from_alpaca(
+        FakeStore()
+    )
+    assert captured["after"] == "2026-08-05T18:22:58+00:00"
+    assert result["inserted"] == 0
+    assert result["created_after"].isoformat() == captured["after"]
+
+
+def test_operations_cycle_preserves_backup_and_health_after_activity_failure(
+    monkeypatch, tmp_path
+):
+    calls = []
+    activity_error = RuntimeError("unsupported DIV activity")
+
+    class FakeStore:
+        def upsert_operational_alert(self, **kwargs):
+            calls.append("alert")
+            return kwargs
+
+    args = SimpleNamespace(
+        cancel_stale=False,
+        backup_directory=tmp_path / "backups",
+        backup_max_age_hours=24,
+        alerts_jsonl=None,
+        policy=None,
+    )
+    policy = SimpleNamespace(max_order_age_minutes=60)
+    monkeypatch.setattr(personal_assistant_cli.config, "PAPER_TRADING", True)
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(personal_assistant_cli, "load_policy", lambda path: policy)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "reconcile_nonterminal_orders",
+        lambda *args, **kwargs: calls.append("orders") or {},
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_app_fills",
+        lambda store: calls.append("fills") or {},
+    )
+
+    def fail_activity_sync(store):
+        calls.append("activities")
+        raise activity_error
+
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "_sync_broker_activities_from_alpaca",
+        fail_activity_sync,
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "build_portfolio_snapshot_from_alpaca",
+        lambda: calls.append("snapshot") or object(),
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "reconcile_snapshot",
+        lambda *args: calls.append("reconcile") or {"matched": False},
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "ensure_recent_database_backup",
+        lambda *args, **kwargs: calls.append("backup") or {},
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "run_operational_check",
+        lambda *args, **kwargs: calls.append("health")
+        or {"healthy": False, "alerts": []},
+    )
+
+    with pytest.raises(RuntimeError, match="unsupported DIV") as raised:
+        personal_assistant_cli.command_operations_cycle(args, FakeStore())
+
+    assert raised.value is activity_error
+    assert calls == [
+        "orders",
+        "fills",
+        "activities",
+        "snapshot",
+        "reconcile",
+        "backup",
+        "health",
+        "alert",
+    ]

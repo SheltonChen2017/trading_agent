@@ -658,3 +658,77 @@ def test_the_decimal_nan_comparison_trap_is_what_this_guards():
     unguarded = Decimal(str(float("nan")))  # what the code used to do
     with pytest.raises(InvalidOperation):
         unguarded > 0
+
+
+# --- list_account_activities() (broker-activity ingestion, 2026-08-10) ---
+# The pinned alpaca-py has no account-activities endpoint, so this is a
+# direct REST read. Tests monkeypatch the single HTTP seam
+# (_http_get_json) -- no network, no alpaca import.
+
+
+def test_list_account_activities_raises_when_not_configured():
+    _clear_alpaca_env()
+    with pytest.raises(broker.AlpacaNotConfigured):
+        broker.list_account_activities()
+
+
+def _fake_pages(monkeypatch, pages):
+    """Serve canned pages and capture each requested URL."""
+    urls = []
+
+    def fake_get(url):
+        urls.append(url)
+        return pages[len(urls) - 1]
+
+    monkeypatch.setattr(broker, "_http_get_json", fake_get)
+    return urls
+
+
+def test_list_account_activities_paginates_with_the_last_row_id(monkeypatch):
+    rows = [{"id": f"row-{i}", "activity_type": "FEE"} for i in range(5)]
+    urls = _fake_pages(monkeypatch, [rows[0:2], rows[2:4], rows[4:5]])
+    result = broker.list_account_activities(after="2026-08-01T00:00:00Z", page_size=2)
+    assert result == rows
+    assert len(urls) == 3
+    assert "after=2026-08-01" in urls[0]
+    assert "page_token" not in urls[0]
+    assert "page_token=row-1" in urls[1]
+    assert "page_token=row-3" in urls[2]
+
+
+def test_list_account_activities_short_final_page_stops_cleanly(monkeypatch):
+    urls = _fake_pages(monkeypatch, [[]])
+    assert broker.list_account_activities(page_size=2) == []
+    assert len(urls) == 1
+
+
+def test_list_account_activities_refuses_a_stuck_cursor(monkeypatch):
+    page = [{"id": "same"}, {"id": "same"}]
+    _fake_pages(monkeypatch, [page, page, page])
+    with pytest.raises(RuntimeError, match="did not advance"):
+        broker.list_account_activities(page_size=2)
+
+
+def test_list_account_activities_refuses_rows_without_ids(monkeypatch):
+    _fake_pages(monkeypatch, [[{"activity_type": "FEE"}]])
+    with pytest.raises(RuntimeError, match="missing its id"):
+        broker.list_account_activities()
+
+
+def test_list_account_activities_refuses_a_non_list_response(monkeypatch):
+    _fake_pages(monkeypatch, [{"message": "forbidden"}])
+    with pytest.raises(RuntimeError, match="unexpected account-activities response"):
+        broker.list_account_activities()
+
+
+def test_list_account_activities_rejects_out_of_range_page_size():
+    with pytest.raises(ValueError, match="page_size"):
+        broker.list_account_activities(page_size=0)
+    with pytest.raises(ValueError, match="page_size"):
+        broker.list_account_activities(page_size=101)
+
+
+@pytest.mark.parametrize("page_size", [True, 1.5, "2"])
+def test_list_account_activities_requires_a_real_integer_page_size(page_size):
+    with pytest.raises((TypeError, ValueError), match="page_size"):
+        broker.list_account_activities(page_size=page_size)

@@ -777,8 +777,12 @@ python scripts/run_personal_assistant.py ledger-reconcile
 
 The opening snapshot is explicit because this app's broker-event history does
 not include positions acquired before the app existed. After bootstrap,
-`ledger-sync` records app fills exactly once and `ledger-reconcile` compares
-cash and shares independently with Alpaca. The journal is permanently bound
+`ledger-sync` records app fills exactly once. Before comparing cash and shares,
+`ledger-reconcile` also fetches Alpaca account activities created after the
+bootstrap and journals supported USD fees exactly once. Unsupported
+post-bootstrap activities such as dividends or interest fail closed until a
+reviewed handler exists; they cannot be cleared merely by entering a separate
+manual journal row. The journal is permanently bound
 to the Alpaca account ID captured at bootstrap; reconciliation refuses a
 different or unidentified account. Transfers use signed amounts (positive
 deposit, negative withdrawal), while fees use positive amounts. Tax lots

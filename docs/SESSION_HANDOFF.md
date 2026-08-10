@@ -1,123 +1,158 @@
 # Development session handoff
 
-Prepared: 2026-08-09, after independent review and correction of
-three-sleeve M2 threshold notifications (section 0). The M1/revision-2
-review is merged (PR #178). The original GR-7d target-rebalance shape
-remains superseded, not completed.
+Prepared: 2026-08-09, after independent browser-equipped review and
+correction of Claude's AUI-001..005 follow-up (section 0). Three-sleeve M2
+remains complete after review; M3 remains absent and unauthorized. The
+original GR-7d target-rebalance shape remains superseded, not completed.
 
 Audience: Codex, Claude Code, Grok, and the repository owner after a
 computer, model, or session change. This is the canonical current-state
 handoff. Durable standing rules and operational facts remain in their linked
 authority documents so rewriting this state summary does not erase them.
 
-> **Current development state:** `main` / `origin/main` is `02484bb` (PR
-> #178), containing the accepted M1/revision-2 review. Claude's pushed M2
-> branch is `user/claude/engine-m2-notifications-20260809` at `5ff39ed`
-> (implementation `8f5acb7`). The independent review branch is
-> `codex/review-gr7d-m2-notifications-20260809`; correction `c314245` plus
-> review/handoff commit `bc1c603` are the durable resume points. The branch
-> is pushed at `origin/codex/review-gr7d-m2-notifications-20260809`; another
-> computer can fetch the complete review history.
+> **Current development state:** `main` / `origin/main` is `aaf7497` (PR
+> #180), containing Claude's merged AUI correction branch. The independent
+> review branch is `codex/review-aui-fixes-20260809`, created from that exact
+> merge. Review correction `45cae5b` fixes the three confirmed rendered-DOM
+> misses, and review/handoff commit `803f477` documents it. Claude's
+> counter-review then added code correction `523c28b`, documentation
+> `52c2c03`, hash sync `954b4a7`, and watch item `a00865a`. The owner
+> authorized the push on 2026-08-09: the branch is **on the remote** at
+> `origin/codex/review-aui-fixes-20260809`, verified tip-equal to local `HEAD`
+> with identical trees and all six commits present, so another computer can
+> fetch the complete review history. No pull request was opened.
 >
-> **Newest state:** both M2 commits have explicit dispositions in
-> `docs/REVIEW_2026-08-09_GR7D_M2_NOTIFICATIONS.md`. Independent review
-> found and fixed five P2 issues and one P3 documentation-state issue. Final
-> state: **0 P0, 0 P1, 0 P2, and 0 P3 open**. M2 is accepted after
-> correction; M3 earmarks/proposals remain absent and M4 remains deferred.
+> **Newest state:** every PR #180 commit has an explicit disposition in
+> `docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md`: implementation `00ba5a0` and
+> merge `aaf7497` are accepted after correction; validation follow-up
+> `054a8f4` is accepted. Independent review found and fixed three P2 issues
+> and closed one tentative P3 as a reviewer false alarm. Final state:
+> **0 P0, 0 P1, 0 P2, and 0 P3 open**. The AUI presentation milestone is
+> complete after review.
 >
-> **Validation:** final exact-tree suite **3289 passed, 0 failed, 0 skipped**,
-> 27 warnings in 366.38 seconds on Python 3.12.13; 141 focused M2/sleeve/
-> data-integrity/alert-delivery tests; compileall and `git diff --check`
-> clean. Pre-fix regressions reproduced the unsafe directions before the
-> smallest corrections were applied.
+> **Validation:** final exact-tree suite **3308 passed, 0 failed, 0 skipped**,
+> 25 dependency warnings in 592.35 seconds on Python 3.13.14 / Streamlit
+> 1.60.0. Theme/chrome 20 passed, ten-page smoke 10 passed, and broader UI
+> behavior 89 passed. Each confirmed finding reproduced red before the
+> smallest fix; compileall and `git diff --check` are clean. Browser evidence
+> measured live warning contrast at 5.517:1 light / 13.176:1 dark and
+> confirmed the visible controls, warning type, and five Settings panels.
+> After the documentation edits, the active-document consistency suite also
+> passed 8/8.
+>
+> **Counter-review validation (final tree):** full suite **3310 passed,
+> 0 failed, 0 skipped**, 25 warnings in 653.81 seconds on Python 3.13.14 /
+> Streamlit 1.60.0 — Codex's 3308 plus the two new counter-review guards, with
+> no pre-existing test changing its result. `compileall` clean across every
+> workflow-named package; `git diff --check` clean. Nine reverse mutations in
+> total: three proving Codex's corrected selectors load-bearing, three proving
+> the previously-unpinned indicator colours now fail when reverted to white,
+> and three proving the installed-Streamlit hook guard fires (dead hook
+> restored, invented hook added, allowlist emptied). Both touched files were
+> restored byte-exact by SHA-256 after every mutation.
 >
 > **Operational boundary:** `paper-epoch-002` remains active on the other
 > computer at frozen commit `9a91498`. This review made no broker call,
 > deployment, scheduler, policy, epoch, ML/LLM-authority, or execution change.
 >
-> **Recommended next step:** stop for the owner's review. M3 dividend-earmark
-> accounting and APPROVE-gated reinvest proposals are the next planned
-> engine shape but are **not authorized to start** without an explicit owner
-> request. Do not deploy development changes to the frozen epoch.
+> **Recommended next step:** owner reviews this accepted AUI result. A push is
+> required before a computer switch can retrieve it, but pushing still needs
+> explicit owner authorization. Do not deploy development changes to the
+> frozen epoch. M3 dividend-earmark accounting and APPROVE-gated reinvest
+> proposals remain the next planned engine shape but are **not authorized to
+> start** without an explicit owner request.
+
+> **Counter-review (same day):** Claude verified all four AUIR findings by
+> pre-fix reproduction in the RENDERED browser against `00ba5a0`'s rules, not
+> from source. All three P2s are **confirmed**: the Allow-new-positions tick
+> and the selected nav dot both computed `rgb(255,255,255)` on brand yellow
+> before `45cae5b` and `rgb(16,16,16)` after; alert text moved from Segoe UI
+> 15px to Cascadia Mono 12.75px; `stVerticalBlockBorderWrapper` occurs zero
+> times in the pinned 1.60.0 bundle. AUIR-004 is correctly closed as a false
+> alarm. The risk that AUIR-003's broader selector might card every block was
+> specifically tested and **cleared** — 12 of 20 layout wrappers match it on
+> Briefing and all 12 are natively bordered containers. Three P3 residuals
+> were corrected: **AUICR-001** — AUI-001's painted colours were unpinned
+> (mutating the tick white, the dot white, or dropping the ink half of the
+> dual focus ring each left the suite green, because the only colour
+> assertions live in the legacy BaseWeb block that Streamlit 1.60 never
+> matches); **AUICR-002** — three further dead selectors (`stCodeBlock`, and
+> the two `data-baseweb` tab hooks; 1.60 emits no `data-baseweb` at all),
+> retargeted against a rendered probe rather than guessed, impact genuinely
+> low since the app makes zero `st.code`/`st.tabs` calls; **AUICR-003** — no
+> guard tied the stylesheet to the installed Streamlit, so the whole class
+> was invisible to CI. Appendix §6 in
+> `docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md`.
 
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
 > machine-local operational knowledge, and engineering watch items live
 > there because this file is rewritten every round. Do not copy them back
 > into this file; link to them.
 
-> **Counter-review (same day):** Claude verified all six M2REV findings by
-> pre-fix reproduction against `5ff39ed`, re-mutated all five code fixes
-> independently (every one caught), and corrected two residuals:
-> **M2CR-001 (P2)** — M2REV-001's partial-as-blindness rule fired a false
-> coverage-lost alert on journal-PROVEN disposals in partially covered
-> positions (the exact shape the owner's AVGO/MSFT become after buying
-> through the app); vanished lots named by a realized component are now
-> disposals under any coverage. **M2CR-002 (P3)** — a double-encoded
-> em-dash introduced into the engine plan by the PREVIOUS review's
-> correction (`f8dde7a`) and missed by the previous counter-review;
-> repaired byte-exactly, tree-wide scan clean. Full suite on the corrected
-> tree: **3290 passed, 0 failed, 0 skipped** (their 3289 + 1 new guard).
-> Appendix in `docs/REVIEW_2026-08-09_GR7D_M2_NOTIFICATIONS.md`.
-
 ## 0. Latest round — AUI-001..005 theme corrections (2026-08-09)
 
-Owner authorized the last open queue item. Branch
-`user/claude/aui-fixes-20260809` from `main` `8858c03`. All five findings
-from `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_ALPACA_UI_THEME.md` are
-corrected; that document's ledger now carries per-finding fix records (§5)
-and an honest not-covered section (§6).
+Claude implemented the original AUI-001..005 correction on
+`user/claude/aui-fixes-20260809` from base `8858c03`: implementation
+`00ba5a0`, validation follow-up `054a8f4`, merged as PR #180 at `aaf7497`.
+Codex created `codex/review-aui-fixes-20260809` from that exact merged tree,
+reviewed all three commits, reproduced three material browser-DOM misses,
+and committed the smallest code/test correction as `45cae5b`.
 
-- **AUI-001**: tick/radio dot repainted in ink on brand yellow (~9.7:1 both
-  modes, both baseweb mark implementations covered via stable
-  testid/baseweb/ARIA selectors); focus is a DUAL ring (ink + brand) so
-  each mode gets its ≥3:1 from one of the rings, mode-agnostically.
-- **AUI-002**: the entire alert container speaks mono — a plain
-  `st.warning` with no bold fragment is now typographically distinct from
-  body and titles.
-- **AUI-003**: nineteen sections wrapped in `st.container(border=True)`
-  (Settings & Features ×5, Operations ×5, Briefing ×9) via a
-  safety-checked transformer (anchored first lines, triple-quote scan,
-  dedent verification). Pages whose sections are already carded elements
-  were deliberately left; recorded in the review doc.
-- **AUI-004**: root cause — light warning `#926C05` caps at ~4.50:1 on pure
-  white, so backgrounds could never give margin. Alert text darkens 12%
-  toward black per severity via `color-mix` on the markdown CHILD
-  (container placement would collapse severity hues). Worst cases: light
-  5.51, dark 5.09. The demanded reproducible measurement is now a
-  deterministic test parsing the live config/stylesheet.
-- **AUI-005**: `headingFontWeights` → `[700, 600, 600]`; fine weights stay
-  CSS-only.
+Commit dispositions:
 
-New coverage: `tests/test_ui_pages_smoke.py` renders ALL TEN navigation
-pages end-to-end in AppTest with no exception, deterministically (env
-cleared, provider fetches stubbed to the degraded path, temp store) — the
-behavioral guard for the 19-section re-indentation. `tests/test_ui_theme.py`
-grew 6 AUI guards (12 total). One pre-existing guard was REFINED, not
-weakened: the no-remote-font scan tripped on the mandatory
-`xmlns='http://www.w3.org/2000/svg'` inside AUI-001's self-contained ink
-data URI; it now strips data: URI bodies and additionally forbids ANY
-non-data `url()` — stricter than before, and an injected real remote URL
-was verified caught.
+| Commit | Disposition |
+|---|---|
+| `00ba5a0` | **Accepted after correction** — sound design and structural work, with AUIR-001..003 fixed in `45cae5b`. |
+| `054a8f4` | **Accepted** — accurately records Claude's exact-tree validation and discloses that rendered verification remained pending. |
+| `aaf7497` | **Accepted after correction** — merge result equals `054a8f4` byte-for-byte; no conflict delta. |
 
-Mutation note, disclosed: the first mutation sweep reported the AUI-002
-mutation surviving; isolated re-runs showed the test catches it, and a
-write-visibility assert added to the harness made all seven mutations
-report load-bearing. Harness artifact, not a weak test.
+Final review ledger:
 
-Not covered (stated plainly): pytest cannot render CSS. The repainted
-marks, dual focus ring, mono alerts, and darkened text are pinned as
-constructs and arithmetic; browser-side confirmation (computed styles,
-console warnings for AUI-005) needs the next browser-equipped review pass.
+- **AUIR-001 (P2, closed):** the first AUI-001 selectors reached a legacy
+  BaseWeb label, a hidden input wrapper, or the radio row—not Streamlit
+  1.60's visible React-Aria checkbox box, radio dot, or focus surface.
+  `45cae5b` targets `data-selected` / `data-focus-visible` from stable
+  Streamlit test ids and retains the legacy fallbacks. The focused test was
+  red before the fix; browser computed brand yellow with an ink check/dot
+  and the dual visible focus ring after it.
+- **AUIR-002 (P2, closed):** Streamlit's visible markdown root explicitly
+  reapplied the body face, so mono on the alert container did not inherit.
+  The correction repeats the warning voice on `stMarkdownContainer`.
+  Browser output changed from Segoe UI 15px to the Cascadia Mono stack at
+  12.75px.
+- **AUIR-003 (P2, closed):** the nineteen semantic wrappers existed, but
+  `stVerticalBlockBorderWrapper` does not exist in Streamlit 1.60's DOM, so
+  the custom panel rule never applied. The stable current selector is now
+  `stLayoutWrapper > stVerticalBlock`, alongside the legacy fallback.
+  All five Settings cards render with the AUI 14px radius, hairline, lift,
+  and padding.
+- **AUIR-004 (P3, closed false alarm):** Codex initially inferred that
+  `--ta-lift` was an rgba color and `background-image` was invalid. It is a
+  linear-gradient token; the browser proved the original declaration valid.
+  The tentative change and test were reverted before commit. No false fix
+  was retained.
 
-Validation on the exact AUI-fixes tree (commit `00ba5a0`, branch
-`user/claude/aui-fixes-20260809`, base `main` `8858c03`): **3306 passed,
-0 failed, 0 skipped**, 25 warnings, 272.02s, Python 3.14.6 (baseline 3290 +
-6 theme guards + 10 page smokes); `compileall` and `git diff --check`
-clean; seven reverse mutations all load-bearing after the harness gained
-its write-visibility assert; the refined no-remote-font guard verified to
-catch an injected real remote url(). Awaiting independent browser-equipped
-review; every engine milestone through M2 and every review round before
-this one is merged.
+Browser acceptance used isolated localhost port 8517, a review-only SQLite
+file, and cleared Alpaca/Anthropic/Finnhub/Databento credentials. No external
+provider or broker mutation was requested. Warning contrast measured
+**5.517:1 light** and **13.176:1 dark** against the actual lift surface.
+No heading-weight/theme-option warning appeared. WebSocket/health messages
+were caused only by deliberate review-server restarts. The server, browser
+tabs, review database, and logs were removed afterward.
+
+Final validation on `45cae5b`: three correction regressions passed;
+theme/chrome **20 passed**; ten-page smoke **10 passed**; broader UI behavior
+**89 passed**; full repository **3308 passed, 0 failed, 0 skipped, 25
+warnings** in 592.35s under Python 3.13.14 / Streamlit 1.60.0. `compileall`
+and `git diff --check` are clean; the later handoff/plan edits passed all
+**8 active-document consistency tests**. Full evidence and the honest
+**7/10** assessment are in `docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md`.
+
+Definition of done: **met after correction**. There are 0 P0 / 0 P1 / 0 P2
+/ 0 P3 open. The change is presentation-only; it did not alter schema,
+policy, proposals, orders, scheduler state, ML/LLM authority, or the frozen
+epoch. The review branch is local-only; do not claim cross-computer readiness
+until an owner-authorized push is verified.
 
 ## 0.05 Prior round — independent review of three-sleeve M2 notifications (2026-08-09)
 
@@ -697,20 +732,20 @@ not that the codebase is clean.
 
 ## 5. What is next
 
-1. The owner reviews the accepted M2 implementation `8f5acb7` / validation
-   `5ff39ed`, Codex correction `c314245`, and
-   `docs/REVIEW_2026-08-09_GR7D_M2_NOTIFICATIONS.md` on
-   `codex/review-gr7d-m2-notifications-20260809`.
-2. If the owner explicitly authorizes more implementation, M3 dividend
+1. The owner reviews PR #180 plus Codex correction `45cae5b` and
+   `docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md`. The accepted rating is 7/10;
+   all three confirmed P2 findings are fixed.
+2. The review branch is **local-only**. If the owner wants this work available
+   on another computer, explicitly authorize a push of
+   `codex/review-aui-fixes-20260809`, then verify the remote resolves both the
+   correction and handoff commits. Do not call the transfer ready beforehand.
+3. If the owner explicitly authorizes more implementation, M3 dividend
    earmark accounting and APPROVE-gated reinvest proposals are the next
-   three-sleeve milestone. Start it on a new branch; do not fold it into the
-   reviewed M2 branch. M4 remains deferred.
-3. `paper-epoch-002` continues daily on its separate stable machine at frozen
-   `9a91498`. Monitor it operationally and read-only; do not deploy the review
-   branch or later development commits into that checkout.
-4. ML remains disabled. Existing owner decisions and machine facts remain in
-   `docs/OPERATIONAL_FACTS.md`; the action plan remains the sequencing
-   authority.
+   three-sleeve milestone. Start it on a new branch; do not fold it into this
+   AUI review branch. M4 remains deferred.
+4. `paper-epoch-002` continues daily on its separate stable machine at frozen
+   `9a91498`. Monitor it operationally and read-only; do not deploy this or
+   later development commits into that checkout. ML remains disabled.
 
 ### Historical next steps from the preceding sweep (superseded)
 
@@ -757,3 +792,45 @@ not that the codebase is clean.
   proposal** (FCS-001).
 - **A metric's denominator must be the observations it actually scored**
   (FPS-004, FCS-002).
+
+## 7. Required reading order on resume
+
+1. `CLAUDE.md` and `AGENTS.md` — repository-wide safety, Git, validation,
+   and handoff rules.
+2. `docs/OPERATIONAL_FACTS.md` — owner decisions and machine-local facts;
+   do not rewrite secret values into this handoff.
+3. `docs/ACTION_PLAN_2026-08-02.md` — the owner-adopted sequencing authority.
+4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` and
+   `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` — binding review flow.
+5. `docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md` — latest exact commit
+   dispositions, P0-P3 ledger, rendered evidence, and validation.
+6. `docs/REVIEW_2026-08-08_CODEX_REVIEW_OF_ALPACA_UI_THEME.md` — original
+   findings, Claude's correction record, and the counter-review pointer.
+7. `docs/FEATURE_MILESTONE_RECORD.md` — completed-function record.
+
+Before editing, run `git status --short --branch` and `git log -8 --oneline
+--decorate`. The expected branch is
+`codex/review-aui-fixes-20260809`, containing `aaf7497` then correction
+`45cae5b` then the documentation/handoff commit. If the branch is absent on a
+different computer, that means the local-only warning above has not yet been
+resolved by an authorized push; do not reconstruct work from conversation
+memory.
+
+## 8. Copyable resume prompt for Codex or Claude
+
+```text
+Read CLAUDE.md, AGENTS.md, docs/OPERATIONAL_FACTS.md,
+docs/ACTION_PLAN_2026-08-02.md, docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md,
+docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
+docs/SESSION_HANDOFF.md completely. Confirm the current branch and remote
+state before acting. The latest completed work is the independent AUI
+counter-review on codex/review-aui-fixes-20260809: PR #180 merged at aaf7497,
+and correction 45cae5b fixed three P2 rendered-DOM misses. Read
+docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md for every commit disposition and
+evidence. The branch is local-only unless Git proves otherwise; do not claim
+another computer can fetch it and do not push without explicit owner
+authorization. paper-epoch-002 remains frozen on another computer at 9a91498;
+never deploy development commits into it mid-epoch. M3 remains unauthorized.
+Ask the owner whether they want the accepted review pushed or a separately
+authorized next milestone.
+```

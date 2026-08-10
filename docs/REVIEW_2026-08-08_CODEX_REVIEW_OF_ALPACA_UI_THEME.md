@@ -2,7 +2,9 @@
 
 Date: 2026-08-08
 
-Status: **corrections delivered 2026-08-09 — 0 P0, 0 P1, 0 P2, 0 P3 open; see §5** (was: changes requested, 4 P2 / 1 P3)
+Status: **corrections independently accepted after correction 2026-08-09 —
+0 P0, 0 P1, 0 P2, 0 P3 open; see §5 and §7** (was: changes requested,
+4 P2 / 1 P3)
 
 Reviewer: Codex
 
@@ -196,3 +198,23 @@ showed the test DOES catch it, and a write-visibility assert added to the
 harness made all seven mutations report load-bearing — the initial report
 was a harness artifact, not a weak test, and is disclosed here rather than
 silently rerun.
+
+## 7. Independent browser-equipped counter-review — 2026-08-09
+
+Codex reviewed every commit in PR #180 (`00ba5a0`, `054a8f4`, and merge
+`aaf7497`) from exact base `8858c03`. The counter-review confirmed AUI-004's
+contrast correction and AUI-005's valid configuration, but found three P2
+rendered-DOM misses in the delivered fixes: the AUI-001 selectors did not
+reach Streamlit 1.60's visible React-Aria checkbox/radio/focus nodes; the
+visible alert markdown root overrode AUI-002's inherited mono type; and
+AUI-003's custom panel selector named a test id absent from Streamlit 1.60.
+All three were reproduced red, corrected in `45cae5b`, and verified in the
+live local app. A tentative claim that the lift gradient was invalid was
+disproved in-browser and reverted before commit.
+
+The definitive ledger, per-commit dispositions, rendered computed styles,
+honest 7/10 assessment, and final **3308 passed** validation are in
+`docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md`. The completed correction is
+accepted with **0 P0 / 0 P1 / 0 P2 / 0 P3 open**. This review changed only
+presentation CSS and regression tests; it made no trading-authority or epoch
+change.

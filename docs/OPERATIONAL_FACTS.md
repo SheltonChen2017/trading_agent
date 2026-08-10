@@ -365,6 +365,29 @@ it for that specific endpoint with the observed body recorded.
   `test_one_year_exactly_is_still_short_term` and moved on. When a test names
   a boundary, check that its inputs actually straddle it in every dimension
   the implementation reads (here: time-of-day, not just date).
+- **A stylesheet guard that greps the stylesheet cannot fail when the
+  framework moves.** 2026-08-09 (AUI-001/002/003, then AUICR-001/003). Three
+  theme corrections shipped with green tests and did nothing in the browser:
+  two styled nodes that never receive the rendered mark, and one styled
+  `stVerticalBlockBorderWrapper`, a test id Streamlit 1.60 does not emit. The
+  declared backstop was "caught by the next review pass"; it missed twice.
+  Two rules follow. **First, a rendered measurement is the only evidence that
+  a selector works** — reproduce the defect by restoring the old CSS in the
+  live page and re-measuring the same node, because a screenshot of the fixed
+  state cannot tell you the fix is what changed it. **Second, pin the painted
+  VALUE, not the selector shape.** Reverse mutation found the checkbox tick,
+  radio dot, and ink focus ring could each revert to white with the whole
+  suite green: the shape was asserted, the colour was not, and the only
+  colour assertions sat in a legacy `data-baseweb` block that the pinned
+  Streamlit never matches (1.60 emits no `data-baseweb` attribute at all).
+  `tests/test_ui_theme.py::test_every_theme_test_id_is_emitted_by_the_installed_streamlit`
+  now compares the stylesheet against the installed distribution so a version
+  bump fails on its own commit; keep its `LEGACY_ONLY_TEST_IDS` allowlist
+  shrinking, since an undeclared dead selector is the original defect.
+  Related: run the app for review on an isolated port with a scratch
+  `TRADING_ASSISTANT_DB` and cleared credentials — never the operational
+  launcher — and do not toggle a policy control to test its styling, because
+  that writes `my_policy.json`.
 - **FPS-003**, the intermittent `test_app_title_is_trading_assistant`
   failure, remains open. Severity looks overstated at P2 — it has passed
   every full run since. **Do not close it on a green suite**; capture the

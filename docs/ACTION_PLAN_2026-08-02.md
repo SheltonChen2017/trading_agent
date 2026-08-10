@@ -124,6 +124,15 @@ from calling their providers. Implementation merge: `4c8e959`; accepted after
 review correction `a6d5254`; the full review chain (correction, handoff,
 third-round confirmation) merged as PR #117 at `661a7d4`.
 
+The later owner-requested Alpaca-inspired AUI restyle is also **complete and
+independently accepted after correction 2026-08-09**. PR #180 merged the
+implementation at `aaf7497`; browser-equipped review corrected Streamlit
+1.60 selectors for visible checked/focus marks, the alert markdown typeface,
+and bordered-container panels at `45cae5b`. All ten pages smoke-test, rendered
+warning contrast clears AA with margin, and no authority path changed. See
+`docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md`. This presentation milestone does
+not reorder the roadmap or authorize M3.
+
 ### 2.6 Exploratory candidate-signal software (2026-08-03)
 
 PR #121 added causal residual momentum/reversal, volatility-scaled momentum,

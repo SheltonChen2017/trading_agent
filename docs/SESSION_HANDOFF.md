@@ -1,8 +1,12 @@
 # Development session handoff
 
-Prepared: 2026-08-09, after independent browser-equipped review and
-correction of Claude's AUI-001..005 follow-up (section 0). Three-sleeve M2
-remains complete after review; M3 remains absent and unauthorized. The
+Prepared: 2026-08-10, after Claude diagnosed why `paper-epoch-002` stalled
+(broker CAT fees were never ingested; nightly reconciliation correctly
+refused evidence capture) and built the fix on
+`user/claude/broker-activity-ingestion-20260810` — implementation `f10b47d`,
+**awaiting independent review; not deployed** (section 0). The prior
+AUI-001..005 round remains complete after review (section 0.02). Three-sleeve
+M2 remains complete after review; M3 remains absent and unauthorized. The
 original GR-7d target-rebalance shape remains superseded, not completed.
 
 Audience: Codex, Claude Code, Grok, and the repository owner after a
@@ -89,7 +93,110 @@ authority documents so rewriting this state summary does not erase them.
 > there because this file is rewritten every round. Do not copy them back
 > into this file; link to them.
 
-## 0. Latest round — AUI-001..005 theme corrections (2026-08-09)
+## 0. Latest round — broker-activity ingestion fix for the stalled epoch (2026-08-10)
+
+### Why the epoch stalled (diagnosed to the cent, read-only)
+
+`paper-epoch-002` (frozen commit `9a91498`, operational computer) has exactly
+**1 recorded session (2026-08-06), 0 orders, 0 of 5 drills**. Every nightly
+`paper-observation` since 2026-08-07 fails with `Ledger reconciliation
+failed; refusing to capture paper NAV` — a critical alert with fingerprint
+`scheduled-paper-observation-failure` is open in the operational
+`alerts.jsonl`. Root cause, traced read-only against the operational database
+and Alpaca's `/v2/account/activities`:
+
+- Alpaca charges **CAT (Consolidated Audit Trail) fees on paper accounts** as
+  non-trade account *activities* (−$0.01 per trading day with executions),
+  not as fills. Nothing in the codebase read that stream; the journal
+  ingested fills only (`sync_app_fills`).
+- The journal bootstrapped at `2026-08-05T18:22:58Z`. Two fees POSTED before
+  that instant are inside opening cash; the three fees posted after
+  (created_at 08-06/08-07/08-08 00:06Z, dated 08-05/08-06/08-07) are absent
+  from the journal — **3 × $0.01 = the exact $0.03 mismatch** (ledger
+  74389.33 vs broker 74389.30). All 16 broker fills were verified matched;
+  the fee stream is the entire discrepancy.
+- Key subtlety: an activity's `date` label is NOT when its cash moved — the
+  08-05-dated fee posted 08-06T00:06Z, after bootstrap. Cutoff logic must use
+  `created_at`, or it both misses that fee and double-posts the earlier ones.
+- The detector behaved correctly (fail-closed reconciliation refusing to
+  write immutable evidence on unverified books); the books were wrong.
+  Widening the $0.01 tolerance was rejected — it silences the detector.
+- Left alone, the gap grows a cent per fee day (permanent nightly failure),
+  and dividends/interest arrive on the same uningested stream — the account
+  holds AEP, so a dollars-scale dividend miss was coming.
+
+### The fix (implemented, tested, NOT yet reviewed or deployed)
+
+Branch `user/claude/broker-activity-ingestion-20260810` off `main`
+(`e871f2f`), implementation commit `f10b47d`:
+
+- `execution/alpaca_broker.py` — `list_account_activities()`: paginated raw
+  HTTPS REST read of `/v2/account/activities` via stdlib `urllib` (the
+  pinned alpaca-py exposes no activities endpoint; no new dependency).
+  Bounded page count, cursor-advance check, id-presence check; amounts stay
+  broker decimal strings.
+- `assistant/portfolio_ledger.py` — `sync_broker_activities(store,
+  activities)`: journals FEE activities through the existing idempotent
+  `record_fee` keyed on the broker activity id; skips activities whose
+  `created_at` ≤ ledger bootstrap (already inside opening cash — the
+  double-posting trap); skips FILLs (the app's own fill records + share
+  reconciliation own that stream); **fails closed** on any other type
+  (dividends, interest), any non-executed status, any non-negative FEE
+  amount, and any missing/unparseable id, `created_at`, or `net_amount` —
+  raising with the exact unhandled rows so the observation refuses and the
+  operator sees a durable, explanatory alert instead of a slow drift.
+  Activities are passed in as data, so the ledger module gains no broker
+  import.
+- `scripts/run_personal_assistant.py` — `_sync_broker_activities_from_alpaca`
+  wired after `sync_app_fills` and before `reconcile_snapshot` in
+  `paper-observation`, `operations-cycle`, and `ledger-reconcile`
+  (`--no-sync` still skips all syncing). The fetch window starts 30 days
+  before bootstrap because Alpaca's server-side `after` filter semantics are
+  undocumented; the local `created_at` cutoff is the correctness boundary
+  and idempotent posting makes the overlap free. Both scheduled-command JSON
+  outputs gained an `activity_sync` block.
+- No schema or migration changes; no contract changes; `DecisionPacket`
+  untouched; ML/LLM boundary untouched. No new CLI commands — three existing
+  commands gained a step.
+
+### Validation (exact final code tree, before doc-only edits)
+
+- Full suite: **3327 passed, 0 failed, 25 warnings** in 671s (the 3310
+  baseline plus 17 new tests: 7 ledger, 7 broker, 3 CLI).
+- Mutation checks, each restored and re-verified green afterwards:
+  disabling the pre-bootstrap cutoff fails
+  `test_sync_broker_activities_skips_fees_already_in_opening_cash`;
+  disabling the fail-closed raise fails the unknown-type and malformed-fee
+  tests; removing the CLI wiring fails the ordering test.
+- `compileall` clean over every workflow package; `git diff --check` clean.
+  Doc-reading consistency suites re-run after the ACTION_PLAN edit: 40
+  passed.
+- NOT tested: no live end-to-end run against the operational database (that
+  requires deploying, which closes the epoch), and Alpaca's real `after`
+  filter semantics remain unverified — mitigated by the 30-day window plus
+  local cutoff.
+
+### Deployment decision (owner's, deliberately not taken)
+
+Building this changed nothing operationally. **Deploying it to the
+operational checkout changes `code_commit` and closes `paper-epoch-002`**,
+resetting sessions/orders/drills for epoch-003 (currently 1 session, 0
+orders, 0 drills — little to lose; the stalled epoch has no viable future).
+Positions, cash, journal, tax lots, and order history are untouched by an
+epoch close. On its first run the sync self-heals today's $0.03 by posting
+the three missing fees. Sequence after review: merge → owner deploys to the
+operational checkout → `paper-epoch-close` / `paper-epoch-start` per the
+epoch-002 swap procedure → nightly capture resumes.
+
+### AP-6
+
+The defect, its trace, and the fix branch are recorded in
+`docs/ACTION_PLAN_2026-08-02.md` §6 (AP-6, P1) and §3; §1's epoch paragraph
+now states the stall instead of claiming the minimums are accumulating.
+`docs/FEATURE_MILESTONE_RECORD.md` deliberately NOT updated — this work has
+not had its independent review.
+
+## 0.02 Prior round — AUI-001..005 theme corrections (2026-08-09)
 
 Claude implemented the original AUI-001..005 correction on
 `user/claude/aui-fixes-20260809` from base `8858c03`: implementation

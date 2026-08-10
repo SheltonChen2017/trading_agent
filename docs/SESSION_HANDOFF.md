@@ -36,6 +36,17 @@ authority documents so rewriting this state summary does not erase them.
 > After the documentation edits, the active-document consistency suite also
 > passed 8/8.
 >
+> **Counter-review validation (final tree):** full suite **3310 passed,
+> 0 failed, 0 skipped**, 25 warnings in 653.81 seconds on Python 3.13.14 /
+> Streamlit 1.60.0 — Codex's 3308 plus the two new counter-review guards, with
+> no pre-existing test changing its result. `compileall` clean across every
+> workflow-named package; `git diff --check` clean. Nine reverse mutations in
+> total: three proving Codex's corrected selectors load-bearing, three proving
+> the previously-unpinned indicator colours now fail when reverted to white,
+> and three proving the installed-Streamlit hook guard fires (dead hook
+> restored, invented hook added, allowlist emptied). Both touched files were
+> restored byte-exact by SHA-256 after every mutation.
+>
 > **Operational boundary:** `paper-epoch-002` remains active on the other
 > computer at frozen commit `9a91498`. This review made no broker call,
 > deployment, scheduler, policy, epoch, ML/LLM-authority, or execution change.
@@ -46,6 +57,28 @@ authority documents so rewriting this state summary does not erase them.
 > frozen epoch. M3 dividend-earmark accounting and APPROVE-gated reinvest
 > proposals remain the next planned engine shape but are **not authorized to
 > start** without an explicit owner request.
+
+> **Counter-review (same day):** Claude verified all four AUIR findings by
+> pre-fix reproduction in the RENDERED browser against `00ba5a0`'s rules, not
+> from source. All three P2s are **confirmed**: the Allow-new-positions tick
+> and the selected nav dot both computed `rgb(255,255,255)` on brand yellow
+> before `45cae5b` and `rgb(16,16,16)` after; alert text moved from Segoe UI
+> 15px to Cascadia Mono 12.75px; `stVerticalBlockBorderWrapper` occurs zero
+> times in the pinned 1.60.0 bundle. AUIR-004 is correctly closed as a false
+> alarm. The risk that AUIR-003's broader selector might card every block was
+> specifically tested and **cleared** — 12 of 20 layout wrappers match it on
+> Briefing and all 12 are natively bordered containers. Three P3 residuals
+> were corrected: **AUICR-001** — AUI-001's painted colours were unpinned
+> (mutating the tick white, the dot white, or dropping the ink half of the
+> dual focus ring each left the suite green, because the only colour
+> assertions live in the legacy BaseWeb block that Streamlit 1.60 never
+> matches); **AUICR-002** — three further dead selectors (`stCodeBlock`, and
+> the two `data-baseweb` tab hooks; 1.60 emits no `data-baseweb` at all),
+> retargeted against a rendered probe rather than guessed, impact genuinely
+> low since the app makes zero `st.code`/`st.tabs` calls; **AUICR-003** — no
+> guard tied the stylesheet to the installed Streamlit, so the whole class
+> was invisible to CI. Appendix §6 in
+> `docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md`.
 
 > **Read `docs/OPERATIONAL_FACTS.md` first.** Standing owner decisions,
 > machine-local operational knowledge, and engineering watch items live

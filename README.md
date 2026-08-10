@@ -779,10 +779,12 @@ The opening snapshot is explicit because this app's broker-event history does
 not include positions acquired before the app existed. After bootstrap,
 `ledger-sync` records app fills exactly once. Before comparing cash and shares,
 `ledger-reconcile` also fetches Alpaca account activities created after the
-bootstrap and journals supported USD fees exactly once. Unsupported
-post-bootstrap activities such as dividends or interest fail closed until a
-reviewed handler exists; they cannot be cleared merely by entering a separate
-manual journal row. The journal is permanently bound
+bootstrap. It journals supported USD fees, plain cash dividends, and explicit
+cash deposits/withdrawals exactly once. Dividend tax classification remains
+`unknown`; non-cash/substitute-payment dividend subtypes, generic `JNLC` cash
+journals, interest, and other unsupported activities fail closed rather than
+being guessed. They cannot be cleared merely by entering a separate manual
+journal row. The journal is permanently bound
 to the Alpaca account ID captured at bootstrap; reconciliation refuses a
 different or unidentified account. Transfers use signed amounts (positive
 deposit, negative withdrawal), while fees use positive amounts. Tax lots
@@ -1184,7 +1186,9 @@ network access.
   cash-transfer entries. Risk-reducing sell proposals already display an
   advisory FIFO/LIFO/HIFO lot comparison when complete app-derived lot
   coverage exists, and missing coverage never blocks a sell. Automatic
-  broker corporate-action/fee/transfer ingestion, broker-side specific-lot
+  broker ingestion is deliberately narrow (fees, plain cash dividends, and
+  explicit deposits/withdrawals); other corporate actions and generic cash
+  journals fail closed. Broker-side specific-lot
   election, wash-sale basis adjustment, and actual tax-liability calculation
   remain unimplemented.
 - Order monitoring and an operations watchdog are implemented, with durable

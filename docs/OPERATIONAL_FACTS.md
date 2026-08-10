@@ -75,7 +75,8 @@ posted exactly once at their true `created_at` times; ledger cash
 required drills passed and recorded under epoch-003** → tasks re-enabled and
 verified by a manual green operations-cycle (3 fee duplicates on idempotent
 replay, healthy, exit 0). All seven stale alerts were acknowledged after
-their causes were verified resolved; **0 open alerts**.
+their causes were verified resolved; there were **0 open alerts at swap
+completion**.
 
 Independent read-only review on the epoch host confirmed epoch-003's start
 row and all five drill rows bind exact commit `ef05dc1`. It also confirmed
@@ -97,21 +98,34 @@ They contain only per-task state/results, no account or credential fields.
 They are preserved locally and covered by the narrow
 `data/swap_*_result_*.json` ignore rule; do not commit their contents.
 
-Update 2026-08-10 (development only, NOT deployed): the CR-W2 handler for
-`DIV`/`JNLC`/`CSD`/`CSW` is implemented on
-`user/claude/broker-dividend-handler-20260810`, awaiting independent review.
-Until it is reviewed, merged, and deployed via an owner-triggered epoch roll
-(epoch-004), the watch below remains the OPERATIONAL truth for the running
-epoch — the deployed `ef05dc1` still fails closed on those types. Deadline:
-the AEP dividend pays 2026-09-09.
+Update 2026-08-10 (development only, NOT deployed): Claude's CR-W2 handler at
+`25a2e7b` was independently accepted after correction on
+`codex/review-broker-dividend-handler-20260810`. The reviewed scope is USD
+plain/explicit-CDIV cash dividends plus explicit CSD deposits and CSW
+withdrawals. Generic JNLC cash journals remain fail-closed because the type
+does not prove contributed-capital treatment. Stock/substitute dividend
+subtypes, interest, withholding, return-of-capital, capital-gain
+distributions, and other unknowns also remain fail-closed. Until the branch is
+merged and deployed through an owner-triggered epoch-004 roll, deployed
+`ef05dc1` still refuses even the newly supported types. Official AEP schedule:
+record/ex-date 2026-08-10, payable **2026-09-10**, $0.95 per eligible share.
 
-Standing watch (from the counter-review): a post-bootstrap `JNLC` paper-cash
-top-up or an AEP dividend will **fail closed by design** until a reviewed
-handler exists. When that happens the operations-cycle still completes its
-backup/health work before failing; the fix is a small, separately reviewed
-handler (dividends → `record_dividend`, transfers → `record_cash_transfer`),
-never a manual compensating entry (the sync re-reads broker rows and would
-keep refusing) and never a widened tolerance.
+Read-only re-measurement at 15:21 Pacific found epoch-003 still active at
+`ef05dc1`, 0 observations, 5/5 drills, and a current healthy operations
+heartbeat with the latest reconciliation matched at zero mismatches. There is
+**one open critical `portfolio_accounting` alert** whose message itself
+records a matched, zero-mismatch reconciliation; it is a retained/reopened
+operational alert record, not evidence of a current book mismatch. Codex did
+not acknowledge or otherwise mutate it. The first scheduled epoch-003
+PaperObservation remained due at 16:30 Pacific.
+
+Standing watch until epoch-004 deployment: the AEP cash dividend and every
+post-bootstrap JNLC/CSD/CSW activity still fail closed on deployed `ef05dc1`.
+After deployment, plain cash dividends and explicit CSD/CSW movements are
+handled; JNLC continues to require operator review and a more specific
+accounting fact. The operations-cycle still completes backup/health work
+before returning an activity failure. Never use a manual compensating entry
+(the sync re-reads the broker row) and never widen reconciliation tolerance.
 
 ### There are TWO machines, and only one may run the cadence (2026-08-06; re-verified 2026-08-09)
 

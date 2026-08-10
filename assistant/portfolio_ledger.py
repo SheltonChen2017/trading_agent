@@ -745,15 +745,16 @@ def record_fee(
 # Everything else fails closed: the sync raises, the calling observation
 # refuses to capture evidence, and the operator gets the exact unhandled
 # rows instead of a slowly drifting cash mismatch.
-# FEE -> record_fee, DIV -> record_dividend, and the three cash-movement
-# journals -> record_cash_transfer. Deliberately NOT handled, so they keep
+# FEE -> record_fee, DIV -> record_dividend, and explicit deposits/withdrawals
+# -> record_cash_transfer. Deliberately NOT handled, so they keep
 # failing closed: INT (never observed on this paper account; no
 # INCOME:INTEREST account or agreed treatment exists yet), every DIV*
 # variant (DIVNRA/DIVROC/DIVCGL/...: withholding, return-of-capital, and
 # capital-gain distributions each need their own reviewed tax treatment),
+# JNLC (a generic cash journal does not prove contributed-capital treatment),
 # and JNLS (a securities journal moves shares, not cash).
-_HANDLED_ACTIVITY_TYPES = frozenset({"FEE", "DIV", "JNLC", "CSD", "CSW"})
-_CASH_TRANSFER_ACTIVITY_TYPES = frozenset({"JNLC", "CSD", "CSW"})
+_HANDLED_ACTIVITY_TYPES = frozenset({"FEE", "DIV", "CSD", "CSW"})
+_CASH_TRANSFER_ACTIVITY_TYPES = frozenset({"CSD", "CSW"})
 # Trade activities are deliberately NOT ingested here: fills enter the
 # journal through the app's own fill records (sync_app_fills), and a fill
 # the app never saw surfaces as a share-quantity mismatch in
@@ -788,6 +789,73 @@ def _activity_posted_at(
     )
 
 
+def _activity_occurred_at(
+    activity: dict[str, Any], *, activity_type: str, posted_at: datetime
+) -> datetime:
+    """Return the economic date for income/cash flow attribution.
+
+    ``created_at`` (or its bootstrap-bound surrogate) proves that the row
+    belongs after the opening snapshot. It is not necessarily the date on
+    which a dividend or external cash flow belongs in accounting/performance
+    reports. Alpaca's published NTA ``date`` is the activity/settlement date;
+    prefer it for DIV/CSD/CSW while retaining creation time for fees. When
+    neither economic date nor a real creation timestamp exists, refuse these
+    financial types rather than assigning every future event to bootstrap.
+    """
+    if activity_type == "FEE":
+        return posted_at
+    raw_date = activity.get("date")
+    if raw_date not in (None, ""):
+        normalized = _corporate_date(str(raw_date), "activity date")
+        try:
+            activity_date = date.fromisoformat(normalized)
+        except ValueError:
+            return _parse_at(normalized, "activity date")
+        return datetime.combine(activity_date, datetime.min.time(), timezone.utc)
+    if activity.get("created_at") not in (None, ""):
+        return posted_at
+    raise LedgerError(
+        f"{activity_type} requires an activity date or real created_at; "
+        "the bootstrap-bound timestamp surrogate is not an economic date"
+    )
+
+
+def _broker_activity_subtype(activity: dict[str, Any]) -> str:
+    """Normalize legacy/current subtype spellings and reject disagreement."""
+    values = {
+        str(activity.get(field) or "").strip().upper()
+        for field in ("activity_sub_type", "activity_subtype")
+        if str(activity.get(field) or "").strip()
+    }
+    if len(values) > 1:
+        raise LedgerError("activity carries conflicting subtype fields")
+    return next(iter(values), "")
+
+
+def _assert_broker_activity_id_not_retyped(
+    store: AssistantStore, *, activity_type: str, activity_id: str
+) -> None:
+    """One immutable broker activity ID may map to one accounting event."""
+    expected_prefix = {
+        "FEE": "fee:",
+        "DIV": "dividend:",
+        "CSD": "cash_transfer:",
+        "CSW": "cash_transfer:",
+    }[activity_type]
+    for existing_type, prefix in (
+        ("FEE", "fee:"),
+        ("DIV", "dividend:"),
+        ("cash transfer", "cash_transfer:"),
+    ):
+        if prefix == expected_prefix:
+            continue
+        if store.get_journal_transaction_by_external_id(prefix + activity_id):
+            raise LedgerError(
+                f"broker activity id {activity_id!r} is already journaled as "
+                f"{existing_type}; refusing to reinterpret it as {activity_type}"
+            )
+
+
 def _post_broker_activity(
     store: AssistantStore,
     *,
@@ -806,8 +874,18 @@ def _post_broker_activity(
     operator sees every problem row in one error.
     """
     description = str(activity.get("description") or "").strip()
-    sub_type = str(activity.get("activity_sub_type") or "").strip()
-    occurred_at = posted_at.isoformat()
+    sub_type = _broker_activity_subtype(activity)
+    raw_currency = str(activity.get("currency") or "").strip().upper()
+    if raw_currency and raw_currency != USD:
+        raise LedgerError(
+            f"{activity_type} currency is {raw_currency}, not supported {USD}"
+        )
+    _assert_broker_activity_id_not_retyped(
+        store, activity_type=activity_type, activity_id=activity_id
+    )
+    occurred_at = _activity_occurred_at(
+        activity, activity_type=activity_type, posted_at=posted_at
+    ).isoformat()
     if activity_type == "FEE":
         if net_amount >= 0:
             # A fee credit/reversal is a shape this sync has never seen;
@@ -821,8 +899,11 @@ def _post_broker_activity(
             description=description or f"Broker {sub_type or 'FEE'} fee",
         )
     if activity_type == "DIV":
-        # Plain cash dividend only. A negative amount here would be a
-        # correction or a withholding variant mislabeled as DIV -- refuse.
+        # Plain legacy cash dividend or explicit CDIV only. Current Alpaca
+        # activity contracts also use DIV for SDIV (stock) and SPD
+        # (substitute payment), which require different accounting/tax paths.
+        if sub_type not in ("", "CDIV"):
+            raise LedgerError(f"unsupported DIV subtype {sub_type}")
         if net_amount <= 0:
             raise LedgerError(f"DIV with non-positive net_amount {net_amount}")
         symbol = str(activity.get("symbol") or "").strip().upper()
@@ -837,9 +918,6 @@ def _post_broker_activity(
         raw_qty = activity.get("qty")
         if raw_qty not in (None, ""):
             extras["shares_entitled"] = _decimal(raw_qty, "DIV qty")
-        raw_date = activity.get("date")
-        if raw_date not in (None, ""):
-            extras["pay_date"] = str(raw_date)
         # tax_classification stays "unknown": the broker feed does not say
         # qualified vs ordinary, and inventing a tax fact here would flow
         # straight into the annual tax report.
@@ -879,7 +957,7 @@ def sync_broker_activities(
     """Journal broker non-trade activities idempotently.
 
     Handled: FEE, plain DIV (cash dividend, tax classification recorded as
-    unknown), and the JNLC/CSD/CSW cash movements. Everything else fails
+    unknown), and explicit CSD/CSW cash movements. Everything else fails
     closed -- see _HANDLED_ACTIVITY_TYPES for what is deliberately excluded
     and why.
 
@@ -914,6 +992,20 @@ def sync_broker_activities(
             raise LedgerError(
                 "activity created-after bound must match the ledger bootstrap"
             )
+    activity_rows = list(activities)
+    types_by_id: dict[str, str] = {}
+    for activity in activity_rows:
+        if not isinstance(activity, dict) or not activity.get("id"):
+            continue
+        activity_id = str(activity["id"])
+        activity_type = str(activity.get("activity_type") or "").upper()
+        previous_type = types_by_id.setdefault(activity_id, activity_type)
+        if previous_type != activity_type:
+            raise LedgerError(
+                f"broker activity id {activity_id!r} appears with conflicting "
+                f"activity types {previous_type or '(missing)'} and "
+                f"{activity_type or '(missing)'}"
+            )
     inserted = 0
     duplicates = 0
     skipped_pre_bootstrap = 0
@@ -933,7 +1025,7 @@ def sync_broker_activities(
             }
         )
 
-    for activity in activities:
+    for activity in activity_rows:
         if not isinstance(activity, dict):
             _refuse(activity, f"activity is not an object: {type(activity).__name__}")
             continue

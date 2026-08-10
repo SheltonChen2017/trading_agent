@@ -33,6 +33,8 @@ RUNTIME_ARTIFACT_PATHS = [
     "artifacts/experiments/volatility-v1/report.json",
     "artifacts/reviews/spec-review-attestation.json",
     "artifacts/databento/manifest.json",
+    "data/swap_disable_result_20260810.json",
+    "data/swap_enable_result_20260810.json",
 ]
 
 

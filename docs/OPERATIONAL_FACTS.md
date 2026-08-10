@@ -77,6 +77,26 @@ verified by a manual green operations-cycle (3 fee duplicates on idempotent
 replay, healthy, exit 0). All seven stale alerts were acknowledged after
 their causes were verified resolved; **0 open alerts**.
 
+Independent read-only review on the epoch host confirmed epoch-003's start
+row and all five drill rows bind exact commit `ef05dc1`. It also confirmed
+**0 epoch-003 observations** at review time. Therefore the application
+summary's `lineage_consistent: true` is not observation evidence yet (the
+empty observation set satisfies that check vacuously). The first successful
+scheduled post-close observation is still required to prove the deployed
+cadence and observation lineage and to start the 60-session / 30-order clock.
+The PaperObservation task was enabled and Ready, with its next scheduled run
+at 16:30 Pacific on 2026-08-10; its previous recorded result belonged to the
+pre-swap stalled epoch.
+
+The elevated swap helper left two machine-local evidence files in the
+development checkout: `data/swap_disable_result_20260810.json` (695 bytes,
+SHA-256 `91E06EA25D18882C36CBF0E1FBA338E1D926AC63392FB4CA18C3E38FB5E24321`)
+and `data/swap_enable_result_20260810.json` (679 bytes, SHA-256
+`E8E6B09631C781ED11A8B5419FD8D20D66DCABD1808583CA114181712E32B5BE`).
+They contain only per-task state/results, no account or credential fields.
+They are preserved locally and covered by the narrow
+`data/swap_*_result_*.json` ignore rule; do not commit their contents.
+
 Standing watch (from the counter-review): a post-bootstrap `JNLC` paper-cash
 top-up or an AEP dividend will **fail closed by design** until a reviewed
 handler exists. When that happens the operations-cycle still completes its
@@ -121,7 +141,8 @@ duplicate reconciliation and competing cancellation against live epoch
 evidence. The second host was therefore deliberately left with **no ledger
 bootstrap and no epoch**; `paper-evidence-status` there correctly reports
 "Paper evidence epoch not found". Do not bootstrap or start an epoch on the
-second host while `paper-epoch-002` is active on the first.
+second host while any epoch-host evidence epoch is active (currently
+`paper-epoch-003`).
 
 The non-elevated `Disable` gotcha (below, epoch host) reproduced exactly on
 the second host: `Stop-ScheduledTask` succeeded unelevated while
@@ -254,9 +275,9 @@ which QuantConnect documents as returning `success` — so a clean
 that matter.
 
 Dormant until someone deliberately points the client at QuantConnect: the
-module has no UI wiring, nothing calls it automatically, and it is not in
-the frozen operational checkout. It cannot affect the app or the running
-epoch.
+module is present in deployed `ef05dc1`, but has no UI wiring and nothing
+calls it automatically. Without a deliberate caller and configured
+credentials it cannot affect the app or the running epoch.
 
 Do not loosen it speculatively. Confirm the real response shape, then relax
 it for that specific endpoint with the observed body recorded.

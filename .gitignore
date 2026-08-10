@@ -16,6 +16,9 @@ data/backups/
 data/drill_evidence/
 data/research_reports/
 data/locks/
+# Elevated epoch-swap helper output. These files are machine-local evidence;
+# preserve them on the host, but never let them dirty the frozen checkout.
+data/swap_*_result_*.json
 
 # Machine-local runtime artifacts (AP-2, ACTION_PLAN 2026-08-02). The
 # documented operational commands write inside the repository -- the

@@ -15,11 +15,12 @@ authority documents so rewriting this state summary does not erase them.
 > review branch is `codex/review-aui-fixes-20260809`, created from that exact
 > merge. Review correction `45cae5b` fixes the three confirmed rendered-DOM
 > misses, and review/handoff commit `803f477` documents it. Claude's
-> counter-review then added code correction `523c28b` and documentation
-> `52c2c03`; this synchronizing commit is the durable resume point. The whole
-> branch is **local-only and not pushed**. Another computer cannot fetch this
-> completed review until the owner explicitly authorizes a push and the remote
-> branch is verified.
+> counter-review then added code correction `523c28b`, documentation
+> `52c2c03`, hash sync `954b4a7`, and watch item `a00865a`. The owner
+> authorized the push on 2026-08-09: the branch is **on the remote** at
+> `origin/codex/review-aui-fixes-20260809`, verified tip-equal to local `HEAD`
+> with identical trees and all six commits present, so another computer can
+> fetch the complete review history. No pull request was opened.
 >
 > **Newest state:** every PR #180 commit has an explicit disposition in
 > `docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md`: implementation `00ba5a0` and

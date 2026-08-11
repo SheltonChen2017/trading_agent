@@ -1417,7 +1417,18 @@ def _sync_broker_activities_from_alpaca(store: AssistantStore) -> dict:
     fetch exactly from the ledger bootstrap instant. The ledger repeats the
     cutoff locally as a defensive boundary, but a broad overlap must not
     pull already-capitalized dividends or transfers into fail-closed review.
+
+    Counter-review BAACR-001: the account-binding guard belongs HERE, at the
+    single choke point where broker activities become journal entries, not
+    only on the two standalone review/acknowledge commands. `ledger-reconcile`,
+    `paper-observation`, and `operations-cycle` all call this BEFORE
+    `reconcile_snapshot`, which is where the binding was previously first
+    checked -- so mismatched credentials would have written another account's
+    fees, dividends, and transfers into this immutable journal, and only then
+    been refused. The two scheduled callers run unattended every 10 minutes
+    and nightly, which makes this the higher-traffic path, not the edge case.
     """
+    _require_activity_account_binding(store)
     after = None
     bootstrap = store.get_system_state("ledger_bootstrap")
     if isinstance(bootstrap, dict) and bootstrap.get("bootstrapped_at"):

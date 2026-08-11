@@ -550,6 +550,14 @@ def test_sync_broker_activities_from_alpaca_windows_the_fetch(monkeypatch):
             assert key == "ledger_bootstrap"
             return {"bootstrapped_at": "2026-08-05T18:22:58+00:00"}
 
+    # Counter-review BAACR-001 moved the account-binding guard into this
+    # helper. This test pins the FETCH WINDOW, so stub the guard rather than
+    # re-testing it here; `test_scheduled_activity_sync_requires_account_binding`
+    # covers the guard itself on every write path.
+    monkeypatch.setattr(
+        personal_assistant_cli, "_require_activity_account_binding",
+        lambda store: None,
+    )
     monkeypatch.setattr(
         personal_assistant_cli,
         "list_account_activities",
@@ -825,3 +833,63 @@ def test_activity_acknowledge_records_but_does_not_post(
     assert payload["inserted"] is True
     assert store.get_broker_activity_acknowledgement("interest-1") is not None
     assert store.list_journal_postings() == []
+
+
+def test_scheduled_activity_sync_requires_account_binding(monkeypatch):
+    """BAACR-001: the guard belongs at the choke point, not only on the
+    two standalone commands.
+
+    `ledger-reconcile`, `paper-observation`, and `operations-cycle` all call
+    `_sync_broker_activities_from_alpaca` BEFORE `reconcile_snapshot`, which
+    was where the account binding was first checked. Mismatched credentials
+    would therefore have written another account's fees, dividends, and
+    transfers into this append-only journal and only then been refused --
+    and the two scheduled callers run unattended every 10 minutes and
+    nightly, so this is the higher-traffic path.
+
+    The broker must not even be asked for activities once the binding fails.
+    """
+    fetched = []
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "list_account_activities",
+        lambda *, after=None: fetched.append(after) or [],
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "sync_broker_activities",
+        lambda *a, **k: pytest.fail("must not journal on a binding failure"),
+    )
+
+    def refuse(store):
+        raise SystemExit("Current Alpaca account does not match the ledger")
+
+    monkeypatch.setattr(
+        personal_assistant_cli, "_require_activity_account_binding", refuse
+    )
+    with pytest.raises(SystemExit, match="does not match the ledger"):
+        personal_assistant_cli._sync_broker_activities_from_alpaca(object())
+    assert fetched == [], "the activity endpoint was called despite a mismatch"
+
+
+def test_the_binding_guard_runs_before_the_activity_fetch_on_every_write_path():
+    """Source-level: each caller that journals activities must be covered.
+
+    A behavioural test only covers the callers it names. This fails if a NEW
+    path calls the sync helper, or if the guard is moved back out of it.
+    """
+    source = (
+        Path(__file__).resolve().parent.parent
+        / "scripts"
+        / "run_personal_assistant.py"
+    ).read_text(encoding="utf-8")
+    helper_start = source.index("def _sync_broker_activities_from_alpaca")
+    helper_end = source.index("def command_ledger_bootstrap")
+    helper_body = source[helper_start:helper_end]
+    assert "_require_activity_account_binding(store)" in helper_body, (
+        "the account-binding guard must run inside the single helper that "
+        "turns broker activities into journal entries"
+    )
+    assert helper_body.index("_require_activity_account_binding") < helper_body.index(
+        "list_account_activities"
+    ), "the guard must run BEFORE the activity fetch"

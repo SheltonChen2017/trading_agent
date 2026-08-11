@@ -107,3 +107,108 @@ The active `paper-epoch-003` remains frozen on deployed `ef05dc1`; this review
 did not remeasure or mutate it. Neither PR #188 nor the correction may be
 patched into that epoch. Deployment belongs in one separately authorized,
 complete epoch-004 transition following `docs/OPERATIONS_RUNBOOK.md`.
+
+---
+
+## Counter-review (Claude, 2026-08-11) — accepted in full; one missed write path closed
+
+Counter-review of `74376e4`, `f7742bd`, and `373f51f`. All three commits:
+**accepted**. All eight findings are **confirmed** — every one of them
+red-baselined. One gap in the correction was found and fixed here.
+
+### Red baseline
+
+The merged tree (`24de4f5`) was restored in place and the review's
+regressions run against it: **14 failed, 98 passed**, then the real tree was
+restored and re-verified green. Every BAA finding is a genuine, reproducible
+defect in my implementation. The 6/10 is fair.
+
+The one I want on the record as the worst: **BAA-003 — my
+`ledger-activity-review` was not read-only.** I named it "review",
+documented it "Read-only: what the activity sync would refuse, and why", and
+then had it call the real sync, which writes journal entries. It is the same
+class of defect this project already closed once in GR-7b ("CLI/UI
+provider-fetch writes on a claimed read-only surface"), and I reintroduced
+it while writing the safety-critical command. Codex's replacement — run the
+exact sync against a verified temporary snapshot via a new `snapshot_to()`
+that does not touch `last_database_backup` — is the right shape, because it
+keeps validation, conflict detection, and acknowledgement handling identical
+to a real sync instead of reimplementing a "what would happen" predicate
+that could drift.
+
+The other seven are equally real: an acknowledgement could override
+settlement status and currency (BAA-001), reuse a broker id already
+journaled under another type (BAA-002), skip the account-binding check
+(BAA-004), reclassify an already-supported row and immediately batch-post
+(BAA-005), silently accept a different operator's conflicting rationale over
+a non-atomic select-then-insert (BAA-006), store a naive timestamp
+(BAA-007), and under-count `activities_seen` (BAA-008).
+
+### Verified and NOT findings
+
+- `preview_broker_activities` was exercised against a real store on this
+  Windows host: the temporary snapshot is created, used, and cleaned up with
+  no lingering SQLite handle, live postings are unchanged, and
+  `last_database_backup` stays `None`. The Windows temp-cleanup hazard I
+  suspected does not occur, because `AssistantStore` opens connections per
+  operation rather than holding one.
+- The bare `assert amount is not None and amount != 0` in
+  `_apply_acknowledged_treatment` is stripped under `python -O`, but it
+  guards an invariant `_validate_acknowledged_activity` has already enforced,
+  and bare asserts for unreachable postconditions are existing repository
+  convention (`platform_readiness.py`, `stock_lookup.py`). Consistent, not a
+  defect.
+
+### BAACR-001 (P2, fixed here) — the binding guard covered the commands, not the write path
+
+BAA-004 added `_require_activity_account_binding` to the two **new**
+standalone commands. But the function that actually turns broker activities
+into journal entries — `_sync_broker_activities_from_alpaca` — had no guard,
+and it has three other callers:
+
+| Caller | activity sync | binding first checked |
+|---|---|---|
+| `ledger-reconcile` | line 1464 | `reconcile_snapshot`, line 1466 |
+| `paper-observation` | line 1948 | `reconcile_snapshot`, line 1950 |
+| `operations-cycle` | line 2046 | `reconcile_snapshot`, line 2058 |
+
+In every one, activities are **journaled before** the account binding is
+checked. With credentials pointing at a different Alpaca account, another
+account's fees, dividends, and transfers land in this append-only journal;
+`reconcile_snapshot` then correctly refuses, but the immutable rows are
+already written. This is not hypothetical plumbing: the launcher re-reads
+credentials from the user registry at every launch, the owner rotated keys
+on 2026-08-05, and this is a deliberate two-machine setup. It is also the
+*higher*-traffic path — those two scheduled callers run unattended every ten
+minutes and nightly, while the guarded commands are typed by hand.
+
+**Correction:** the guard now runs inside
+`_sync_broker_activities_from_alpaca`, the single choke point, before the
+fetch — so every present and future caller is covered rather than the three
+that exist today. Two regressions added: a behavioural one asserting the
+activity endpoint is never even called once binding fails and that nothing
+is journaled, and a source-level one asserting the guard sits inside that
+helper and precedes the fetch.
+
+One existing test (`test_sync_broker_activities_from_alpaca_windows_the_fetch`,
+mine, from the AP-6 round) needed updating: it pins the fetch window and now
+has to satisfy the new precondition, so it stubs the guard and defers guard
+coverage to the new tests. The invariant it pins is unchanged.
+
+### Mutation evidence (all restored and re-verified green)
+
+| Mutation | Result |
+|---|---|
+| Remove the guard from the choke point | both BAACR-001 regressions red |
+| Replace the snapshot preview with the real sync | BAA-003 read-only regression red |
+| Disable the acknowledged status guard | BAA-001 settlement regression red |
+| Drop operator/rationale from the idempotency comparison | BAA-006 regression red |
+
+### Counter-review validation
+
+Import-boundary, operations, and schema-verification suites green (33
+passed); ledger and CLI suites 114 passed; `compileall` and
+`git diff --check` clean. Full-suite count is recorded in the session
+handoff. No broker call, no operator-database mutation, and no scheduler,
+epoch, or deployment action. Nothing deployed; epoch-003 continues on
+`ef05dc1`.

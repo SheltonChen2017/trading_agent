@@ -1,5 +1,68 @@
 # Session handoff — reviewed broker activity acknowledgement
 
+Prepared: 2026-08-11, then extended the same day by Claude's counter-review
+(section 0c), which **accepted all eight findings** — every one
+red-baselined — and closed one missed write path.
+
+## 0c. Counter-review (Claude, same day) — accepted in full; BAACR-001 fixed
+
+The merged tree was restored in place and the review's regressions run
+against it: **14 failed, 98 passed**. Every BAA finding is real and
+reproducible; the 6/10 is fair. The worst is worth naming plainly:
+**BAA-003 — my `ledger-activity-review` was not read-only.** I named it
+"review", documented it read-only, and had it call the real sync, which
+writes journal entries. That is the same defect class GR-7b already closed
+once, reintroduced by me in the safety-critical command. Codex's replacement
+(run the *exact* sync against a verified temporary snapshot, via a new
+`snapshot_to()` that leaves `last_database_backup` untouched) is the right
+shape, because it keeps validation and conflict detection identical to a
+real sync instead of a "what would happen" predicate that could drift.
+
+**BAACR-001 (P2, fixed here) — the guard covered the commands, not the write
+path.** BAA-004 added `_require_activity_account_binding` to the two new
+standalone commands, but `_sync_broker_activities_from_alpaca` — the function
+that actually journals activities — had no guard, and three other callers
+use it:
+
+| Caller | activity sync | binding first checked |
+|---|---|---|
+| `ledger-reconcile` | 1464 | `reconcile_snapshot`, 1466 |
+| `paper-observation` | 1948 | `reconcile_snapshot`, 1950 |
+| `operations-cycle` | 2046 | `reconcile_snapshot`, 2058 |
+
+Each journals **before** the binding is checked. With credentials pointing
+at a different Alpaca account, that account's fees, dividends, and transfers
+land in this append-only journal; reconciliation then refuses, but the
+immutable rows are already written. Reachable, not theoretical: the launcher
+re-reads credentials from the user registry every launch, keys were rotated
+on 2026-08-05, and this is a deliberate two-machine setup. It is also the
+higher-traffic path — those two scheduled callers run unattended every ten
+minutes and nightly. The guard now runs inside the single choke point,
+before the fetch, so every present and future caller is covered. Two
+regressions added (behavioural: the endpoint is never called and nothing is
+journaled; source-level: the guard sits in the helper and precedes the
+fetch). One existing fetch-window test of mine was updated to satisfy the
+new precondition; its invariant is unchanged.
+
+**Checked and NOT findings:** the temporary-snapshot preview was exercised
+against a real store on this Windows host — no lingering SQLite handle, live
+postings unchanged, `last_database_backup` still `None`. The bare `assert`
+in `_apply_acknowledged_treatment` guards an already-enforced invariant and
+matches existing repository convention.
+
+**Counter-review validation (final tree).** Single uninterrupted full-suite
+run: **3,407 passed, 0 failed, 25 warnings** in 637.28s. Ledger + CLI suites
+114 passed; import-boundary, operations, and schema-verification 33 passed;
+`compileall` and `git diff --check` clean. The suite ran after the last code
+change; only documents changed afterwards, and the document-reading suites
+were re-run (14 passed).
+
+Four mutations verified, each restored: removing the choke-point guard,
+replacing the snapshot preview with the real sync, disabling the
+acknowledged status guard, and dropping operator/rationale from the
+idempotency comparison. Full evidence in
+`docs/REVIEW_2026-08-11_BROKER_ACTIVITY_ACKNOWLEDGEMENT.md` §Counter-review.
+
 Prepared: 2026-08-11
 
 Audience: Codex, Claude, and the repository owner on either development

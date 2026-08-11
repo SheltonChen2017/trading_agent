@@ -350,6 +350,33 @@ toward any epoch, and it did not start one.
   credentials from the **user-scope registry** at every launch. A long-lived
   shell otherwise hands the app a revoked key — observed after the
   2026-08-05 rotation.
+- **Restart the Streamlit app after ANY deploy.** A long-running app
+  process keeps already-imported modules in memory. Streamlit re-runs the
+  *script* on every interaction, so it picks up the new
+  `personal_assistant_ui.py` from disk — but Python does not re-import
+  `assistant.*` modules that are already loaded. New UI code then runs
+  against the old classes.
+
+  Observed 2026-08-11, immediately after the epoch-004 deploy: the app
+  process had started 10:08 Pacific, the deploy landed 15:15, and clicking
+  "Run suggestions" raised
+  `AttributeError: 'RecommendedTicker' object has no attribute
+  'price_direction'` — the render code was new, the dataclass in memory was
+  old. Nothing was wrong with the deployed tree. Relaunching fixed it.
+
+  Two aggravating details worth knowing. A second app instance does **not**
+  help: the stale process keeps port 8501, so the browser stays connected to
+  it — kill every Streamlit process, then launch once. And
+  `@st.cache_data` (TTL 900s on `_load_recommended_tickers`) can return
+  objects built by the old classes even after a rerun, because Streamlit
+  hashes the decorated function's own code, not the dataclasses it returns.
+
+  **Do not deploy a code change to fix this.** Deploying closes the active
+  evidence epoch. A restart costs seconds; a roll costs the accumulated run.
+  The loud `AttributeError` is also the more useful failure here — it names
+  the problem, where a defensive `getattr` would silently render every row as
+  "direction unavailable" and look like a data fault.
+
 - **`C:\git\epoch_swap_tasks_elevated.ps1`** (machine-local, elevated)
   disables and re-enables the four `TradingAgent-Paper-*` tasks around a
   deploy. On this host a non-elevated `Stop-ScheduledTask` **succeeds**

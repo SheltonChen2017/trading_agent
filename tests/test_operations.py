@@ -141,7 +141,7 @@ def test_readiness_reconciliation_freshness_is_bounded_below():
     source = (
         Path(__file__).resolve().parent.parent / "assistant" / "readiness.py"
     ).read_text(encoding="utf-8")
-    assert "timedelta(0)\n        <= now - reconciled_at" in source, (
+    assert "timedelta(0)\n        <= reconciliation_age" in source, (
         "readiness.py's reconciliation freshness must reject a future "
         "timestamp (FCS-017)"
     )
@@ -220,3 +220,59 @@ def test_health_freshness_uses_a_clock_captured_after_each_state_read(
     ):
         assert future_by_name[name]["ok"] is False
         assert "age_seconds=-1.000000" in future_by_name[name]["detail"]
+
+
+def test_readiness_freshness_uses_a_clock_captured_after_the_state_read(
+    tmp_path, monkeypatch
+):
+    """AP-7, second instance (counter-review): same race, wider window.
+
+    `assistant/operations.py` was corrected to compare each stored fact
+    against a clock captured after reading it, but `transaction_readiness`
+    kept its entry clock -- and it is the MORE exposed site: the deployed
+    `monitor-orders` task rewrites `last_order_reconciliation` every 30
+    seconds, while the window between this function's entry clock and that
+    read contains a full SQLite integrity check and several proposal
+    queries. A valid concurrent write therefore looked future-dated and
+    failed the `timedelta(0) <=` guard, and because `operational_health`
+    reports `healthy = all(check["ok"])`, a *warning*-severity readiness
+    check still made the scheduled operations cycle exit nonzero.
+    """
+    import assistant.readiness as readiness_module
+    from assistant.readiness import transaction_readiness
+
+    store = AssistantStore(tmp_path / "assistant.db")
+    policy = load_policy()
+    started_at = datetime(2026, 8, 10, 21, 52, 21, tzinfo=timezone.utc)
+    committed_at = started_at + timedelta(seconds=1)
+
+    store.set_system_state(
+        "last_order_reconciliation",
+        {"at": committed_at.isoformat(), "checked": 0, "updated": 0, "error_count": 0},
+    )
+
+    class AdvancingDateTime(datetime):
+        calls = 0
+
+        @classmethod
+        def now(cls, tz=None):
+            cls.calls += 1
+            value = started_at if cls.calls == 1 else started_at + timedelta(seconds=2)
+            return value if tz is None else value.astimezone(tz)
+
+    monkeypatch.setattr(readiness_module, "datetime", AdvancingDateTime)
+    report = transaction_readiness(store, policy, check_broker=False)
+    freshness = {c["name"]: c for c in report["checks"]}["reconciliation_freshness"]
+    assert freshness["ok"] is True, freshness
+    assert "age_seconds=" in freshness["detail"]
+
+    # An explicit as-of clock stays frozen: the row is genuinely future-dated
+    # relative to it and must still refuse (FCS-017 unchanged).
+    frozen = transaction_readiness(
+        store, policy, check_broker=False, now=started_at
+    )
+    frozen_freshness = {
+        c["name"]: c for c in frozen["checks"]
+    }["reconciliation_freshness"]
+    assert frozen_freshness["ok"] is False
+    assert "age_seconds=-1.000000" in frozen_freshness["detail"]

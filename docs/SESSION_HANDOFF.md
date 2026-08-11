@@ -16,10 +16,12 @@ active checkout is `codex/review-dividend-counterreview-20260810`, with AP-7
 correction `89ebcc2` followed by the review/handoff commit containing this
 file.
 
-**REMOTE WARNING:** This review branch exists only in the current checkout.
-The owner has not authorized publication. Another computer will not receive
-the AP-7 correction or this refreshed handoff from an ordinary fetch until the
-branch is published. Do not recreate them from memory.
+**REMOTE STATE (updated after counter-review):** the review branch is
+**published** and tip-verified equal to local `HEAD`, so another computer
+receives the AP-7 corrections (both sites) and this handoff from an ordinary
+fetch. Pushed under the owner's standing git-management grant. It is **not
+merged and not deployed** — merge and any epoch action remain explicit owner
+decisions.
 
 The worktree is expected clean after the final documentation commit. Two
 ignored machine-local swap-result JSON files remain preserved; do not stage,
@@ -51,6 +53,54 @@ Final issue state: **0 P0, 0 P1, 0 P2, and 0 P3 open**.
 
 Full evidence is in
 `docs/REVIEW_2026-08-10_DIVIDEND_COUNTERREVIEW_AND_AP7.md`.
+
+## 1a. Counter-review (Claude, same day) — accepted; two gaps closed
+
+All four findings **confirmed**; none overstated. DCCR-002 verified against
+the actual commit (`f852a69`'s handoff still named `c36b615` as the base
+after PR #184 had merged), and DCCR-004's point about the unsupported
+"known timezone artifact" attribution is correct — that was a causal claim
+I never measured. Two gaps in the corrections were found and fixed:
+
+- **DCCR-CR-002 (P2)** — the AP-7 fix stopped at `assistant/operations.py`
+  and missed the structurally identical check in `assistant/readiness.py`
+  (`reconciliation_freshness`), reached from the *same*
+  `operational_health()` call. It is the more exposed site: the deployed
+  `monitor-orders` task rewrites `last_order_reconciliation` every 30
+  seconds, and the window between that function's entry clock and the read
+  contains a full SQLite `integrity_check` plus several proposal queries.
+  Because `healthy = all(check["ok"])`, that warning-severity check still
+  forced a nonzero `operations-cycle` exit — AP-7's own consequence. Fixed
+  with the identical post-read-clock pattern; the caller-supplied as-of
+  clock stays frozen, so genuine future-dated rows still refuse.
+- **DCCR-CR-001 (P3)** — the balance rule was applied to the handoff only,
+  while the same absolute figure remained in the action plan's AP-6 row and
+  in `OPERATIONAL_FACTS.md`, the file that is never rewritten. Swept both,
+  extended the guard to every current-state document, and recorded the rule
+  in `OPERATIONAL_FACTS.md` §1: a *difference* can be load-bearing evidence
+  and stays; an *absolute balance* proves nothing `matched` plus a mismatch
+  count does not, so it never belongs in a committed document.
+
+- **DCCR-CR-003 (P3)** — one new guard banned the literal "It is not merged
+  and not deployed", which contradicts the test module's own rule that a
+  banned literal must be a claim that can never be true again. Every future
+  review branch is legitimately unmerged and undeployed, so the guard would
+  have forced contorted phrasing or its own weakening. Replaced with a
+  positive assertion that the handoff records the merge (`PR #184` /
+  `0ee3a22`) — stronger, because it cannot be dodged by rewording.
+
+A generalized sweep of the entry-clock race family is tabulated in the
+review report. One deliberate non-change is recorded there and in
+`OPERATIONAL_FACTS.md`: `risk/execution_gate.py` keeps its
+future-timestamp *tolerance* because that timestamp is external, whereas
+the operations/readiness rows are locally written and the post-read clock
+removes the negative age outright. Do not unify them — a tolerance on the
+local checks would weaken FCS-017 for no benefit.
+
+Four mutations, each restored and re-verified: reverting either file to its
+entry clock turns the corresponding race test red, removing `explicit_now`
+breaks the frozen as-of guarantee, and reinstating the balance in
+`OPERATIONAL_FACTS.md` fails the extended guard.
 
 ## 2. Accepted dividend-handler behavior
 
@@ -125,11 +175,26 @@ Environment: Windows, repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
 
 No test used live broker credentials or mutated the operator database.
 
+**Counter-review validation (final tree).** Single uninterrupted full-suite
+run: **3,368 passed, 0 failed, 25 warnings** in 685.56s — Codex's 3,367 plus
+the readiness race regression. A first full run had already passed at 3,368
+before the DCCR-CR-003 guard correction; because that change touched a test
+file, the suite was **re-run end to end afterwards** rather than relying on
+the earlier run plus targeted re-runs. `compileall` clean; `git diff --check`
+clean; document-consistency 13 passed; operations 10 passed. Six mutations
+in total, each restored and re-verified: reverting either freshness site to
+its entry clock, removing `explicit_now` (proving the frozen as-of behaviour
+is pinned rather than incidental), reinstating the balance in
+`OPERATIONAL_FACTS.md`, removing the handoff's merge record, and
+reintroducing the stale base claim.
+
 ## 6. Exact next step
 
-1. Commit the review report and this handoff separately from correction
-   `89ebcc2`.
-2. Stop. Push and merge require explicit owner authorization.
+1. ~~Commit the review report and this handoff separately from correction
+   `89ebcc2`.~~ **Done** (`ad6e037`), followed by the counter-review commit;
+   the branch is pushed under the owner's standing git-management grant.
+2. **Owner decision: merge.** Both undeployed fixes now ride together —
+   CR-W2 (dividends) and AP-7 (both freshness sites).
 3. If the owner later authorizes deployment, follow the complete runbook:
    disable tasks, close epoch-003 on its frozen runtime, deploy the reviewed
    merge, reconcile matched, run readiness, start epoch-004, record all five

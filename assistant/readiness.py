@@ -66,6 +66,7 @@ def transaction_readiness(
     check_broker: bool = True,
 ) -> dict[str, Any]:
     """Return a machine-readable, fail-closed readiness report."""
+    explicit_now = now
     now = now or datetime.now(timezone.utc)
     checks: list[dict[str, Any]] = []
 
@@ -183,14 +184,29 @@ def transaction_readiness(
     )
 
     last_reconciliation = store.get_system_state("last_order_reconciliation")
+    # AP-7 (second instance, found by counter-review): compare against a clock
+    # captured AFTER reading the row, exactly as assistant/operations.py does.
+    # `monitor-orders` rewrites this key every poll (30s in the deployed task)
+    # while this function's entry clock is already minutes old -- the window
+    # here contains a full SQLite integrity_check and several proposal
+    # queries, so it is WIDER than the operations.py window. Reusing the entry
+    # clock made a valid concurrent write look future-dated, failing the
+    # `timedelta(0) <=` guard and turning a healthy reconciliation into a
+    # readiness failure. An explicitly supplied clock stays frozen, so
+    # deterministic/as-of evaluation and genuine future-date refusal are
+    # unchanged.
+    reconciliation_checked_at = explicit_now or datetime.now(timezone.utc)
     reconciled_at = _parse_timestamp(
         last_reconciliation.get("at") if isinstance(last_reconciliation, dict) else None
+    )
+    reconciliation_age = (
+        None if reconciled_at is None else reconciliation_checked_at - reconciled_at
     )
     reconciliation_fresh = (
         reconciled_at is not None
         # FCS-017: a future-dated reconciliation must not read as fresh.
         and timedelta(0)
-        <= now - reconciled_at
+        <= reconciliation_age
         <= timedelta(minutes=max_reconciliation_age_minutes)
         and int(last_reconciliation.get("error_count", 0)) == 0
     )
@@ -202,6 +218,7 @@ def transaction_readiness(
                 "never completed"
                 if reconciled_at is None
                 else f"last completed at {reconciled_at.isoformat()}, "
+                f"age_seconds={reconciliation_age.total_seconds():.6f}, "
                 f"errors={last_reconciliation.get('error_count', 0)}"
             ),
         )

@@ -46,6 +46,25 @@ hand, then reversed once the evidence consequence was explicit.
 accumulating 60 sessions whose own lineage named a policy
 (`allow_new_positions=False`) that forbade the buys they contained.
 
+### Differences are evidence; absolute balances are not (2026-08-10)
+
+Established after DCCR-003 was raised against one document while the same
+value sat in two others. The rule, so later rounds apply it consistently
+instead of re-litigating it:
+
+- A **difference** may be load-bearing and stays. AP-6's diagnosis is only
+  checkable because the record says the ledger was **$0.03** above the
+  broker; deleting that would gut the evidence.
+- An **absolute balance** (cash, total equity, buying power) proves nothing
+  that `matched: true` plus a mismatch count does not already prove, so it
+  never belongs in a committed document. This repository is public.
+- Counts, dates, session totals, lineage hashes, and mismatch counts are
+  not balances and are fine.
+
+Enforced by `test_current_documents_do_not_publish_exact_account_balances`
+across every current-state document, not just the one where an instance was
+last found.
+
 ### Benchmark is SPY (2026-08-06)
 
 `paper_evidence` binds `benchmark_ticker` into every observation, defaulting
@@ -69,8 +88,8 @@ tasks disabled (elevated script, UAC-approved) → `paper-epoch-002` closed at
 19:25:50Z on its frozen `9a91498` runtime (single-observation record
 retained) → operational checkout fast-forwarded to merged `ef05dc1`
 (PR #182) → `ledger-reconcile` **matched on its first run** (the three fees
-posted exactly once at their true `created_at` times; ledger cash
-74389.30 = broker) → readiness green → `paper-epoch-003` started at
+posted exactly once at their true `created_at` times; ledger cash equal to
+broker cash, zero mismatches) → readiness green → `paper-epoch-003` started at
 19:27:21Z with identical mandate/policy/strategy/model lineage → **all five
 required drills passed and recorded under epoch-003** → tasks re-enabled and
 verified by a manual green operations-cycle (3 fee duplicates on idempotent
@@ -157,6 +176,34 @@ is **not deployed**; epoch-003 continues on `ef05dc1`, and the existing open
 alert was not acknowledged or mutated. Read-only remeasurement at 16:56
 Pacific found the latest operations heartbeat healthy and the recent
 reconciliations matched with zero mismatches.
+
+**Second instance, found by counter-review and fixed the same day.** The
+correction covered the three checks in `assistant/operations.py` but not the
+structurally identical one in `assistant/readiness.py`
+(`reconciliation_freshness`), which is reached from the *same*
+`operational_health()` call. That site is the more exposed of the two: the
+deployed `monitor-orders` task rewrites `last_order_reconciliation` every 30
+seconds, and the window between `transaction_readiness`'s entry clock and
+that read contains a full SQLite `integrity_check` plus several proposal
+queries. Because `operational_health` computes `healthy = all(check["ok"])`,
+a *warning*-severity readiness check still drove the scheduled cycle to a
+nonzero exit. Fixed with the same post-read-clock pattern and the same
+frozen as-of behaviour.
+
+**Do not "unify" this with the execution gate.** `risk/execution_gate.py`
+deliberately tolerates a small negative quote age
+(`_FUTURE_TIMESTAMP_TOLERANCE_MINUTES`) because that timestamp comes from an
+**external** source where clock skew is real. The operations/readiness rows
+are written **locally**, so capturing the clock after the read removes the
+negative age entirely and no tolerance is needed. Adding a tolerance to the
+local checks would weaken FCS-017 for no benefit. Two deliberate strategies,
+matched to where the timestamp comes from.
+
+Also examined and **not** implicated: `readiness.py`'s stranded-claim age
+(a concurrent write makes a claim look *younger*, so it is not falsely
+flagged stale), `ml/evidence_operations.py` (a pure function evaluating a
+caller-supplied snapshot), and `order_reconciler.py`'s order-age checks
+(caller-supplied clock, fail-safe direction).
 
 Counter-review (Claude, same day) accepted all six review findings and
 corrected two residual defects in the correction itself: economic dates are

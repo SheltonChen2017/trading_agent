@@ -470,6 +470,33 @@ def test_most_active_lane_records_direction_and_shows_the_change(monkeypatch):
     assert "-4.89%" in by_ticker["DOWN"].detail
 
 
+def test_most_active_lane_joins_provider_details_by_normalized_symbol(monkeypatch):
+    """Verification uppercases symbols; provider details must follow that key."""
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch(
+        "assistant.recommended_stocks.fetch_most_active_tickers",
+        return_value=[
+            {
+                "ticker": "mixed",
+                "name": "Mixed Case Co",
+                "volume": 1234,
+                "change_percent": 1.25,
+            }
+        ],
+    ), patch(
+        "assistant.recommended_stocks.suggest_similar_tickers", return_value=None
+    ), patch(
+        "assistant.recommended_stocks.verify_tickers",
+        return_value=([_verified("MIXED", longName="Mixed Case Co")], []),
+    ):
+        recommended, _ = recommended_stocks.build_recommended_tickers()
+
+    row = next(r for r in recommended if r.reason_category == "most_active")
+    assert row.price_direction == "advancing"
+    assert "trading volume today: 1,234" in row.detail
+    assert "price change today: +1.25%" in row.detail
+
+
 def test_most_active_lane_says_not_reported_when_the_change_is_missing(monkeypatch):
     """A missing change must be visible as unknown, not folded into a column."""
     monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
@@ -541,6 +568,73 @@ def test_ui_never_labels_the_direction_split_as_order_flow():
             "symmetric and no feed reports order flow"
         )
     assert "not a buy/sell split" in block
+
+
+def test_ipo_lane_identity_guard_survives_a_case_only_symbol_difference(monkeypatch):
+    """Counter-review MADCR-001: the same join bug, but it fails OPEN.
+
+    `verify_tickers()` returns stripped uppercase symbols while the IPO
+    lane keyed provider metadata on the raw Finnhub symbol. On a case-only
+    difference the join yields {}, so `claimed_date` is "" and
+    `_is_ipo_identity_mismatch()` returns False for missing data -- the
+    reused/renamed-symbol guard that an earlier review added specifically
+    to catch a stale ticker masquerading as a fresh listing silently passes.
+    Here NEWCO's real first bar is from 2020 while the provider claims a
+    2026 IPO, which MUST be rejected.
+    """
+    monkeypatch.setenv("FINNHUB_API_KEY", "test-key")
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[]),          patch("assistant.recommended_stocks.suggest_similar_tickers", return_value=None),          patch("assistant.recommended_stocks.fetch_recent_ipos") as mock_ipos,          patch("assistant.recommended_stocks.verify_tickers") as mock_verify:
+        mock_ipos.return_value = [
+            {"ticker": "newco", "name": "New Co", "date": "2026-07-20", "status": "priced"}
+        ]
+        mock_verify.return_value = (
+            [_verified("NEWCO", longName="New Co", first_session_date="2020-01-01")],
+            [],
+        )
+        recommended, dropped = recommended_stocks.build_recommended_tickers()
+    assert not any(r.reason_category == "recent_ipo" for r in recommended), (
+        "a symbol whose real history predates the claimed IPO by years was "
+        "recommended as a recent IPO; the identity guard failed open"
+    )
+    assert "NEWCO" in dropped
+
+
+def test_ipo_lane_keeps_provider_dates_across_a_case_only_difference(monkeypatch):
+    """The same join, in the direction that must still succeed."""
+    monkeypatch.setenv("FINNHUB_API_KEY", "test-key")
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[]),          patch("assistant.recommended_stocks.suggest_similar_tickers", return_value=None),          patch("assistant.recommended_stocks.fetch_recent_ipos") as mock_ipos,          patch("assistant.recommended_stocks.verify_tickers") as mock_verify:
+        mock_ipos.return_value = [
+            {"ticker": " newco ", "name": "New Co", "date": "2026-07-20", "status": "priced"}
+        ]
+        mock_verify.return_value = (
+            [_verified("NEWCO", longName="New Co", first_session_date="2026-07-21")],
+            [],
+        )
+        recommended, _ = recommended_stocks.build_recommended_tickers()
+    ipo_rows = [r for r in recommended if r.reason_category == "recent_ipo"]
+    assert len(ipo_rows) == 1
+    assert "2026-07-20" in ipo_rows[0].detail
+    assert "unknown" not in ipo_rows[0].detail
+
+
+def test_every_provider_detail_join_normalizes_its_key():
+    """Source-level: verify_tickers' contract is uppercase; joins must agree.
+
+    A behavioural test only covers the lanes it names. This fails when a
+    NEW lane joins provider metadata on a raw symbol, which is how the
+    most-active and IPO lanes diverged from the AI lane in the first place.
+    """
+    source = (
+        Path(__file__).resolve().parent.parent / "assistant" / "recommended_stocks.py"
+    ).read_text(encoding="utf-8")
+    start = source.index("def build_recommended_tickers")
+    body = source[start:]
+    for raw_join in ('{c["ticker"]: c for c', "{c['ticker']: c for c"):
+        assert raw_join not in body, (
+            f"a provider-detail join keys on the raw symbol ({raw_join!r}); "
+            "verify_tickers() returns stripped uppercase symbols, so the "
+            "join must normalize or it silently loses provider facts"
+        )
 
 
 def test_recommended_ticker_never_reuses_signal_evidence_status():

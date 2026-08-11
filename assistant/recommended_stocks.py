@@ -41,10 +41,10 @@ def classify_price_direction(change_percent: object) -> PriceDirection | None:
 
     Deliberately NOT a buy/sell classification. Volume is symmetric -- every
     share traded was bought by someone and sold by someone else -- so a
-    "most bought" column cannot be derived from any retail-accessible feed
-    (see fetch_most_active_tickers). Direction of the price move is a real,
-    exactly-reported fact, and it is what separates heavy volume pushing a
-    name up from heavy volume pushing it down.
+    "most bought" column cannot be derived from this screener's volume field
+    (see fetch_most_active_tickers). Direction of the price move is a separate,
+    provider-reported fact; it lets the UI distinguish heavily traded names
+    whose prices rose from heavily traded names whose prices fell.
 
     NaN is rejected explicitly: every ordered comparison against NaN is
     False, so an unguarded `> 0 ... < 0 ... else unchanged` chain would
@@ -83,9 +83,19 @@ def fetch_most_active_tickers(count: int = 10) -> list[dict]:
     """Wraps yf.screen("most_actives", count=count) -- confirmed working live
     with the currently-installed yfinance, zero new dependencies. Returns []
     on any failure. Honest framing only: this is TRADING VOLUME and price
-    movement, NOT buy-vs-sell order flow -- no legitimate retail-accessible
-    data source provides true order imbalance. Never label this "most
-    bought" anywhere in code, comments, or UI copy."""
+    movement, NOT buy-vs-sell order flow -- this yfinance screen does not
+    provide classified order flow. Never label this "most bought" anywhere
+    in code, comments, or UI copy.
+
+    And this is not a swap-the-screener fix (counter-review MADCR-002, kept
+    narrow deliberately): classifying a trade as buyer- or seller-initiated
+    needs trade prints matched against the prevailing quote (Lee-Ready and
+    similar), i.e. consolidated trade-and-quote data. The market feed this
+    project actually has is Alpaca's free IEX tier -- a small share of
+    consolidated volume, measured on 2026-08-10 quoting a large-cap at a
+    ~6% spread while the consolidated market was penny-wide. Estimating
+    direction from that would produce confident-looking noise, which is
+    worse than declining to report it."""
     try:
         import yfinance as yf
 
@@ -205,9 +215,14 @@ def build_recommended_tickers(
             [c["ticker"] for c in most_active_candidates]
         )
         dropped.extend(batch_dropped)
-        detail_by_ticker = {c["ticker"]: c for c in most_active_candidates}
+        # verify_tickers() strips and uppercases every symbol. Join provider
+        # metadata on the same canonical key or a harmless case difference
+        # makes a valid price change and volume look unreported.
+        detail_by_ticker = {
+            str(c["ticker"]).strip().upper(): c for c in most_active_candidates
+        }
         for v in verified:
-            c = detail_by_ticker.get(v["ticker"], {})
+            c = detail_by_ticker.get(str(v["ticker"]).strip().upper(), {})
             volume = c.get("volume")
             direction = classify_price_direction(c.get("change_percent"))
             name = v.get("longName") or c.get("name") or v["ticker"]
@@ -241,9 +256,18 @@ def build_recommended_tickers(
             policy=RECENT_IPO_ELIGIBILITY_POLICY,
         )
         dropped.extend(batch_dropped)
-        ipo_detail_by_ticker = {c["ticker"]: c for c in ipo_candidates}
+        # Same normalization the most-active lane needs (MAD-001), and here
+        # the consequence is worse than a cosmetic "not reported": a failed
+        # join makes claimed_date empty, and _is_ipo_identity_mismatch()
+        # returns False for missing data -- so the reused/renamed-symbol
+        # guard below would silently pass a candidate it exists to catch.
+        # Note the held-set filter above already upper()s the provider
+        # symbol; this join must agree with it.
+        ipo_detail_by_ticker = {
+            str(c["ticker"]).strip().upper(): c for c in ipo_candidates
+        }
         for v in verified:
-            c = ipo_detail_by_ticker.get(v["ticker"], {})
+            c = ipo_detail_by_ticker.get(str(v["ticker"]).strip().upper(), {})
             claimed_date = c.get("date", "")
             if _is_ipo_identity_mismatch(v.get("first_session_date"), claimed_date):
                 dropped.append(v["ticker"])

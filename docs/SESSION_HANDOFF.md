@@ -1,14 +1,75 @@
-# Session handoff — reviewed most-active price-direction view
+# Session handoff — operator acknowledgement path
 
-Prepared: 2026-08-11 after independent review and correction, then Claude's
-counter-review (section 0a), which **accepted all three findings** and fixed
-one missed generalized instance that is more severe than anything in the
-original ledger.
+Prepared: 2026-08-11. Section 0z is the newest round (the operator
+acknowledgement path, awaiting review). Sections 0a onward record the
+preceding most-active review round, whose counter-review **accepted all
+three findings** and fixed one missed generalized instance.
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
 
 Repository: `SheltonChen2017/trading_agent`
+
+## 0z. Newest round — operator acknowledgement path (awaiting review)
+
+Owner-authorized 2026-08-11, and it is the milestone that makes the
+epoch-004 roll worth spending. **Problem it closes:** an unsupported broker
+activity blocked evidence capture until someone *deployed code* — and
+deploying closes the epoch — so one surprise activity type cost the entire
+accumulated run. That is why CR-W3 (an unverified DIV subtype arriving with
+the AEP dividend around 2026-09-10) was a genuine threat rather than an
+inconvenience. After this, a surprise costs one human decision.
+
+Branch `user/claude/broker-activity-acknowledgement-20260811`, based on the
+**counter-reviewed** most-active tree (`72fecf1`) rather than `main`, because
+PR #186 merged only the implementation — see the merge-gap note in section 0.
+
+**What it does.** New `broker_activity_acknowledgements` table,
+`acknowledge_broker_activity()`, and two CLI commands:
+`ledger-activity-review` (read-only: what refused and why, plus every
+decision on record) and `ledger-activity-acknowledge` (record one decision).
+
+**The safety properties, which are the point of the design:**
+
+- **Nothing is classified automatically.** The operator picks a treatment
+  from a frozen set (`fee`, `dividend`, `cash_transfer`, `no_cash_effect`)
+  and must supply a name and a written rationale; both are stored.
+- **The operator chooses the treatment, never the amount.** Every figure
+  comes from the broker row, so an acknowledgement cannot introduce money
+  the broker never reported. A test asserts no amount is ever stored in the
+  decision.
+- **`no_cash_effect` cannot wave money away.** It is rejected unless the
+  broker itself reports zero or absent cash — it asserts there is nothing
+  to journal.
+- **Bound to exact content.** The decision stores a SHA-256 fingerprint of
+  the activity; if the provider edits that row, or reuses the id, the sync
+  refuses again instead of inheriting a judgement made about something else.
+- **The bootstrap cutoff outranks it.** An acknowledgement is consulted only
+  after the pre-bootstrap skip, so opening-balance activity can never be
+  resurrected and double-counted.
+- **Recording journals nothing.** `sync_broker_activities` remains the single
+  posting path, so application is idempotent and replayable after a restore.
+
+**Migration.** A brand-new table, so `CREATE TABLE IF NOT EXISTS` covers a
+fresh and a pre-existing database identically with no `ALTER`. Tested both
+ways, including that re-opening a database whose table was dropped recreates
+it without disturbing existing journal rows, and that a third open is a
+no-op.
+
+**Validation.** `tests/test_portfolio_ledger.py` 74 passed (11 new). Three
+mutations each turned exactly the intended test red and were restored:
+letting `no_cash_effect` swallow a non-zero amount, ignoring the content
+fingerprint, and consulting acknowledgements before the bootstrap cutoff.
+Import-boundary, CLI, and schema-verification suites green (48 passed);
+`compileall` and `git diff --check` clean. Single uninterrupted full-suite
+run on the final code tree: **3,392 passed, 0 failed, 25 warnings** in
+659.32s. Only documents changed after that run, and the document-reading
+suites were re-run afterwards (14 passed).
+
+**Boundaries.** No proposal, order, approval, policy, scheduler, epoch,
+ML/LLM-authority, or execution path changed. Nothing deployed; epoch-003
+continues on `ef05dc1`, where a refused activity still stalls capture until
+this ships with the epoch-004 roll.
 
 ## 0a. Counter-review (Claude, same day) — accepted; one P2 fail-open closed
 
@@ -53,7 +114,27 @@ Full evidence, including the mutation table, is in
 
 ## 0. Current repository and remote state
 
-Merged `main` / `origin/main` is **`2c886c1`** (PR #185). It contains the
+> **MERGE GAP — read before branching.** PR #186 merged the most-active
+> **implementation** branch (`3be6326`) into `main` (`9c517c6`), *not* the
+> review branch. So `main` does **not** contain Codex's MAD-001/002/003
+> corrections, its review records, or Claude's counter-review — including
+> the **P2 IPO identity-guard fail-open fix**. Those remain on
+> `origin/codex/review-most-active-direction-split-20260811`, which is
+> pushed and unmerged. The acknowledgement branch is based on that tree, not
+> on `main`, so the P2 fix is not lost. Merge the review branch before or
+> alongside it.
+>
+> **Branch hygiene (2026-08-11):** every merged branch was deleted, local and
+> remote, on the owner's instruction — 28 local, 41 remote. Deliberately
+> kept: `codex/review-most-active-direction-split-20260811` (unmerged, holds
+> the P2 fix), `origin/user/claude/gr-7d-rebalance-targets-20260806`
+> (unmerged, GR-7d blocked on an owner decision), and `origin/Funny`
+> (unmerged, not this workstream's). An untracked file `ernkgjserng` in the
+> repository root is captured `git branch` output from an accidental shell
+> redirect; it is harmless and was left alone.
+
+Merged `main` / `origin/main` was **`2c886c1`** (PR #185) when the
+most-active review began; it is now `9c517c6` (PR #186). It contains the
 reviewed CR-W2 dividend handler and both AP-7 freshness corrections, but those
 changes are not deployed into the active evidence epoch.
 

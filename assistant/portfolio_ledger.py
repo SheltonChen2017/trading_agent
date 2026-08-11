@@ -980,6 +980,186 @@ def _post_broker_activity(
     raise LedgerError(f"no journal mapping for activity type {activity_type}")
 
 
+ACKNOWLEDGEMENT_TREATMENTS = frozenset(
+    {"fee", "dividend", "cash_transfer", "no_cash_effect"}
+)
+
+
+def broker_activity_fingerprint(activity: Any) -> str:
+    """Content identity of one broker activity row.
+
+    Binds an operator decision to the exact row it was made about. If the
+    provider later edits the row -- or reuses the id for something else --
+    the fingerprint changes and the decision stops applying, which is the
+    fail-closed direction.
+    """
+    if not isinstance(activity, dict):
+        raise LedgerError("broker activity must be an object to fingerprint")
+    canonical = json.dumps(activity, sort_keys=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _acknowledged_amount(activity: dict[str, Any]) -> Decimal | None:
+    raw = activity.get("net_amount")
+    if raw is None or str(raw).strip() == "":
+        return None
+    return _decimal(raw, "activity net_amount")
+
+
+def acknowledge_broker_activity(
+    store: AssistantStore,
+    activity: Any,
+    *,
+    treatment: str,
+    operator: str,
+    rationale: str,
+    ticker: str | None = None,
+    now: datetime | None = None,
+) -> dict[str, Any]:
+    """Record an operator's accounting decision about one refused activity.
+
+    This is the ONLY way an unsupported broker activity stops blocking
+    evidence capture without a code change. It deliberately does not
+    journal anything itself: `sync_broker_activities` remains the single
+    posting path, so the decision is applied idempotently on the next run
+    and can be re-applied after a restore.
+
+    The operator chooses the TREATMENT, never the AMOUNT. Every figure is
+    taken from the broker row, so an acknowledgement cannot introduce money
+    the broker never reported. `no_cash_effect` is therefore restricted to
+    rows the broker itself reports as zero or absent -- it is an assertion
+    that there is nothing to journal, not a way to wave money away.
+    """
+    normalized_treatment = str(treatment).strip().lower()
+    if normalized_treatment not in ACKNOWLEDGEMENT_TREATMENTS:
+        raise LedgerError(
+            f"unsupported treatment {treatment!r}; choose one of "
+            + ", ".join(sorted(ACKNOWLEDGEMENT_TREATMENTS))
+        )
+    operator_name = str(operator).strip()
+    reason_text = str(rationale).strip()
+    if not operator_name:
+        raise LedgerError("an acknowledgement requires the operator's name")
+    if not reason_text:
+        raise LedgerError("an acknowledgement requires a written rationale")
+    if not isinstance(activity, dict) or not activity.get("id"):
+        raise LedgerError("broker activity must be an object carrying its id")
+
+    amount = _acknowledged_amount(activity)
+    details: dict[str, Any] = {}
+    if normalized_treatment == "no_cash_effect":
+        if amount is not None and amount != 0:
+            raise LedgerError(
+                "no_cash_effect is only valid when the broker reports no cash "
+                f"movement; this row reports {_decimal_text(amount)}"
+            )
+    else:
+        if amount is None or amount == 0:
+            raise LedgerError(
+                f"treatment {normalized_treatment!r} needs a non-zero broker "
+                "net_amount to journal"
+            )
+        if normalized_treatment == "fee" and amount > 0:
+            raise LedgerError("a fee must have a negative broker net_amount")
+        if normalized_treatment == "dividend":
+            if amount < 0:
+                raise LedgerError(
+                    "a dividend must have a positive broker net_amount"
+                )
+            if not str(ticker or "").strip():
+                raise LedgerError("a dividend acknowledgement requires --ticker")
+            details["ticker"] = _security_account(str(ticker))[
+                len(SECURITY_ACCOUNT_PREFIX) :
+            ]
+    acknowledged_at = (now or datetime.now(timezone.utc)).isoformat()
+    fingerprint = broker_activity_fingerprint(activity)
+    inserted = store.record_broker_activity_acknowledgement(
+        activity_id=str(activity["id"]),
+        activity_fingerprint=fingerprint,
+        treatment=normalized_treatment,
+        operator=operator_name,
+        rationale=reason_text,
+        acknowledged_at=acknowledged_at,
+        details=details,
+    )
+    return {
+        "activity_id": str(activity["id"]),
+        "treatment": normalized_treatment,
+        "activity_fingerprint": fingerprint,
+        "inserted": inserted,
+        "operator": operator_name,
+    }
+
+
+def _apply_acknowledged_treatment(
+    store: AssistantStore,
+    activity: dict[str, Any],
+    *,
+    activity_id: str,
+    posted_at: datetime,
+) -> tuple[str, bool] | None:
+    """Apply a stored operator decision, or None when there is no usable one.
+
+    Raises LedgerError when a decision exists but no longer matches the
+    broker row, so a changed provider payload refuses instead of inheriting
+    a judgement made about different content.
+    """
+    acknowledgement = store.get_broker_activity_acknowledgement(activity_id)
+    if acknowledgement is None:
+        return None
+    if acknowledgement["activity_fingerprint"] != broker_activity_fingerprint(
+        activity
+    ):
+        raise LedgerError(
+            f"broker activity {activity_id!r} changed since it was "
+            "acknowledged; re-review it rather than applying the old decision"
+        )
+    treatment = acknowledgement["treatment"]
+    if treatment == "no_cash_effect":
+        return ("no_cash_effect", False)
+
+    amount = _acknowledged_amount(activity)
+    if amount is None or amount == 0:
+        raise LedgerError(
+            f"acknowledged activity {activity_id!r} no longer reports a "
+            "journalable amount"
+        )
+    description = str(activity.get("description") or "").strip() or (
+        f"Operator-acknowledged {treatment}"
+    )
+    occurred_at = _activity_occurred_at(
+        activity,
+        activity_type=str(activity.get("activity_type") or "").upper(),
+        posted_at=posted_at,
+    ).isoformat()
+    if treatment == "fee":
+        return ("fee", record_fee(
+            store,
+            external_id=activity_id,
+            amount=-amount,
+            occurred_at=occurred_at,
+            description=description,
+        ))
+    if treatment == "dividend":
+        return ("dividend", record_dividend(
+            store,
+            external_id=activity_id,
+            ticker=acknowledgement["details"]["ticker"],
+            gross_amount=amount,
+            occurred_at=occurred_at,
+            tax_classification="unknown",
+        ))
+    if treatment == "cash_transfer":
+        return ("cash_transfer", record_cash_transfer(
+            store,
+            external_id=activity_id,
+            amount=amount,
+            occurred_at=occurred_at,
+            description=description,
+        ))
+    raise LedgerError(f"stored treatment {treatment!r} has no journal mapping")
+
+
 def sync_broker_activities(
     store: AssistantStore,
     activities: Any,
@@ -1043,6 +1223,8 @@ def sync_broker_activities(
     skipped_pre_bootstrap = 0
     trade_activities_skipped = 0
     by_type: dict[str, dict[str, int]] = {}
+    by_treatment: dict[str, dict[str, int]] = {}
+    acknowledged_no_cash_effect: list[str] = []
     unhandled: list[dict[str, Any]] = []
 
     def _refuse(activity: Any, reason: str) -> None:
@@ -1082,8 +1264,42 @@ def sync_broker_activities(
             # how to journal after bootstrap.
             skipped_pre_bootstrap += 1
             continue
+        # An operator decision, if one exists for this exact row, is what
+        # lets an unsupported type stop blocking evidence capture without a
+        # code deploy. It is consulted only AFTER the pre-bootstrap cutoff,
+        # so an acknowledgement can never resurrect opening-balance activity.
+        def _try_acknowledged(refusal_reason: str) -> None:
+            nonlocal inserted, duplicates
+            try:
+                applied = _apply_acknowledged_treatment(
+                    store,
+                    activity,
+                    activity_id=str(activity_id),
+                    posted_at=posted_at,
+                )
+            except LedgerError as ack_error:
+                _refuse(activity, str(ack_error))
+                return
+            if applied is None:
+                _refuse(activity, refusal_reason)
+                return
+            treatment, newly = applied
+            counts = by_treatment.setdefault(
+                treatment, {"inserted": 0, "duplicates": 0}
+            )
+            if treatment == "no_cash_effect":
+                acknowledged_no_cash_effect.append(str(activity_id))
+            elif newly:
+                inserted += 1
+                counts["inserted"] += 1
+            else:
+                duplicates += 1
+                counts["duplicates"] += 1
+
         if activity_type not in _HANDLED_ACTIVITY_TYPES:
-            _refuse(activity, f"unhandled activity type {activity_type or '(missing)'}")
+            _try_acknowledged(
+                f"unhandled activity type {activity_type or '(missing)'}"
+            )
             continue
         raw_status = activity.get("status")
         status = str(raw_status or "").lower()
@@ -1105,7 +1321,11 @@ def sync_broker_activities(
                 posted_at=posted_at,
             )
         except LedgerError as exc:
-            _refuse(activity, str(exc))
+            # A handled type can still be refused on its own terms (an
+            # unsupported DIV subtype, a wrong sign). An operator decision
+            # covers that case too -- CR-W3's first real dividend is exactly
+            # this shape.
+            _try_acknowledged(str(exc))
             continue
         type_counts = by_type.setdefault(
             activity_type, {"inserted": 0, "duplicates": 0}
@@ -1129,6 +1349,8 @@ def sync_broker_activities(
         "inserted": inserted,
         "duplicates": duplicates,
         "by_type": by_type,
+        "by_acknowledged_treatment": by_treatment,
+        "acknowledged_no_cash_effect": sorted(acknowledged_no_cash_effect),
         "skipped_pre_bootstrap": skipped_pre_bootstrap,
         "trade_activities_skipped": trade_activities_skipped,
         "activities_seen": inserted

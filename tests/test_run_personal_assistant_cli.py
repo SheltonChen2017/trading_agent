@@ -9,6 +9,7 @@ _print_briefing()'s user-facing evidence display (GPT review, 2026-07-30).
 
 Run with: python -m pytest tests/test_run_personal_assistant_cli.py
 """
+import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
@@ -43,6 +44,11 @@ def test_top_level_help_renders_without_percent_format_errors():
     assert "paper-observation" in help_text
     assert "promotion-status" in help_text
     assert "--database" in help_text
+
+
+def test_activity_review_opens_the_operator_database_read_only():
+    args = build_parser().parse_args(["ledger-activity-review"])
+    assert args.read_only_store is True
 
 
 def test_recover_stale_accepts_a_positive_stale_after_seconds():
@@ -646,3 +652,176 @@ def test_operations_cycle_preserves_backup_and_health_after_activity_failure(
         "health",
         "alert",
     ]
+
+
+# --- broker-activity acknowledgement review (2026-08-11) -----------------
+
+
+def _acknowledgement_cli_store(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.set_system_state(
+        "ledger_bootstrap",
+        {
+            "source": "alpaca",
+            "account_id": "paper-account-1",
+            "bootstrapped_at": "2026-08-05T18:22:58+00:00",
+        },
+    )
+    return store
+
+
+def _cli_activity(activity_id, activity_type, net_amount, **overrides):
+    activity = {
+        "id": activity_id,
+        "activity_type": activity_type,
+        "created_at": "2026-08-05T19:00:00+00:00",
+        "date": "2026-08-05",
+        "net_amount": net_amount,
+        "status": "executed",
+        "currency": "USD",
+    }
+    activity.update(overrides)
+    return activity
+
+
+def _patch_matching_broker(monkeypatch, activities):
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "get_account",
+        lambda: {"account_id": "paper-account-1"},
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "list_account_activities",
+        lambda *, after=None: list(activities),
+    )
+
+
+def test_activity_review_is_read_only_and_lists_exact_refusals(
+    tmp_path, monkeypatch, capsys
+):
+    store = _acknowledgement_cli_store(tmp_path)
+    fee = _cli_activity("fee-1", "FEE", "-0.01", description="CAT fee")
+    refused = _cli_activity("interest-1", "INT", "1.25")
+    _patch_matching_broker(monkeypatch, [fee, refused])
+    before = store.list_journal_postings()
+    backup_state_before = store.get_system_state("last_database_backup")
+
+    personal_assistant_cli.command_ledger_activity_review(SimpleNamespace(), store)
+
+    payload = json.loads(capsys.readouterr().out)
+    assert store.list_journal_postings() == before
+    assert store.get_system_state("last_database_backup") == backup_state_before
+    assert payload["refused_count"] == 1
+    assert payload["refused"] == [
+        {
+            "activity_type": "INT",
+            "date": "2026-08-05",
+            "id": "interest-1",
+            "net_amount": "1.25",
+            "reason": "unhandled activity type INT",
+        }
+    ]
+
+
+def test_activity_commands_refuse_a_different_broker_account_before_fetch(
+    tmp_path, monkeypatch
+):
+    store = _acknowledgement_cli_store(tmp_path)
+    calls = []
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "get_account",
+        lambda: {"account_id": "other-account"},
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "list_account_activities",
+        lambda *, after=None: calls.append(after) or [],
+    )
+
+    with pytest.raises(SystemExit, match="does not match the ledger"):
+        personal_assistant_cli.command_ledger_activity_review(
+            SimpleNamespace(), store
+        )
+    assert calls == []
+
+
+@pytest.mark.parametrize(
+    "bootstrap",
+    [
+        None,
+        {
+            "source": "manual",
+            "bootstrapped_at": "2026-08-05T18:22:58+00:00",
+        },
+    ],
+)
+def test_activity_commands_require_an_alpaca_bootstrap_before_broker_fetch(
+    tmp_path, monkeypatch, bootstrap
+):
+    store = AssistantStore(tmp_path / "assistant.db")
+    if bootstrap is not None:
+        store.set_system_state("ledger_bootstrap", bootstrap)
+    calls = []
+    monkeypatch.setattr(personal_assistant_cli, "is_configured", lambda: True)
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "get_account",
+        lambda: calls.append("account") or {"account_id": "paper-account-1"},
+    )
+    monkeypatch.setattr(
+        personal_assistant_cli,
+        "list_account_activities",
+        lambda *, after=None: calls.append("activities") or [],
+    )
+
+    with pytest.raises(SystemExit, match="Alpaca-bootstrapped"):
+        personal_assistant_cli.command_ledger_activity_review(
+            SimpleNamespace(), store
+        )
+    assert calls == []
+
+
+def test_activity_acknowledge_only_accepts_a_currently_refused_row(
+    tmp_path, monkeypatch
+):
+    store = _acknowledgement_cli_store(tmp_path)
+    handled_fee = _cli_activity("fee-1", "FEE", "-0.01")
+    _patch_matching_broker(monkeypatch, [handled_fee])
+    args = SimpleNamespace(
+        activity_id="fee-1",
+        treatment="cash_transfer",
+        operator="op",
+        rationale="incorrect override",
+        ticker=None,
+    )
+
+    with pytest.raises(SystemExit, match="not currently refused"):
+        personal_assistant_cli.command_ledger_activity_acknowledge(args, store)
+    assert store.list_broker_activity_acknowledgements() == []
+    assert store.list_journal_postings() == []
+
+
+def test_activity_acknowledge_records_but_does_not_post(
+    tmp_path, monkeypatch, capsys
+):
+    store = _acknowledgement_cli_store(tmp_path)
+    refused = _cli_activity("interest-1", "INT", "1.25")
+    _patch_matching_broker(monkeypatch, [refused])
+    args = SimpleNamespace(
+        activity_id="interest-1",
+        treatment="cash_transfer",
+        operator="op",
+        rationale="confirmed cash interest; temporary treatment",
+        ticker=None,
+    )
+
+    personal_assistant_cli.command_ledger_activity_acknowledge(args, store)
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["inserted"] is True
+    assert store.get_broker_activity_acknowledgement("interest-1") is not None
+    assert store.list_journal_postings() == []

@@ -1583,6 +1583,7 @@ def test_no_cash_effect_cannot_be_used_to_wave_money_away(tmp_path):
     report = sync_broker_activities(store, [informational])
     assert report["acknowledged_no_cash_effect"] == ["nc::name-change"]
     assert report["inserted"] == 0
+    assert report["activities_seen"] == 1
     assert ledger_balances(store)["cash"] == Decimal("1000")
 
 
@@ -1726,3 +1727,99 @@ def test_acknowledgement_table_migrates_onto_a_pre_migration_database(tmp_path):
     # And opening a third time is a no-op rather than an error.
     again = AssistantStore(path)
     assert again.list_broker_activity_acknowledgements() == []
+
+
+@pytest.mark.parametrize(
+    ("overrides", "message"),
+    [
+        ({"status": "pending"}, "not executed"),
+        ({"currency": "EUR"}, "currency is EUR"),
+    ],
+)
+def test_acknowledgement_cannot_bypass_settlement_or_currency_guards(
+    tmp_path, overrides, message
+):
+    """Human classification cannot turn an unsettled/non-USD row into USD cash."""
+    store, _ = _bootstrapped_store(tmp_path)
+    with pytest.raises(LedgerError, match=message):
+        acknowledge_broker_activity(
+            store,
+            _unsupported_activity(**overrides),
+            treatment="cash_transfer",
+            operator="op",
+            rationale="reviewed",
+        )
+    assert store.list_broker_activity_acknowledgements() == []
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_no_cash_effect_requires_an_explicit_zero_amount(tmp_path):
+    """Missing is unknown, not broker evidence of a zero cash effect."""
+    store, _ = _bootstrapped_store(tmp_path)
+    activity = _unsupported_activity()
+    activity.pop("net_amount")
+    with pytest.raises(LedgerError, match="explicit zero"):
+        acknowledge_broker_activity(
+            store,
+            activity,
+            treatment="no_cash_effect",
+            operator="op",
+            rationale="reviewed",
+        )
+
+
+def test_acknowledgement_cannot_retype_an_already_journaled_activity_id(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    shared_id = "shared::broker-activity"
+    sync_broker_activities(store, [_fee_activity(activity_id=shared_id)])
+    changed = _unsupported_activity(id=shared_id, net_amount="5.00")
+    with pytest.raises(LedgerError, match="already journaled as FEE"):
+        acknowledge_broker_activity(
+            store,
+            changed,
+            treatment="cash_transfer",
+            operator="op",
+            rationale="broker changed the row type",
+        )
+    assert store.list_broker_activity_acknowledgements() == []
+    assert ledger_balances(store)["cash"] == Decimal("999.99")
+
+
+def test_idempotent_acknowledgement_includes_operator_and_rationale(tmp_path):
+    """A different human or rationale is a different durable decision."""
+    store, _ = _bootstrapped_store(tmp_path)
+    activity = _unsupported_activity()
+    acknowledge_broker_activity(
+        store,
+        activity,
+        treatment="dividend",
+        operator="first operator",
+        rationale="first reason",
+        ticker="AEP",
+    )
+    with pytest.raises(BrokerActivityAcknowledgementConflictError):
+        acknowledge_broker_activity(
+            store,
+            activity,
+            treatment="dividend",
+            operator="second operator",
+            rationale="second reason",
+            ticker="AEP",
+        )
+    stored = store.get_broker_activity_acknowledgement(activity["id"])
+    assert stored["operator"] == "first operator"
+    assert stored["rationale"] == "first reason"
+
+
+def test_acknowledgement_timestamp_must_be_timezone_aware(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    with pytest.raises(LedgerError, match="timezone"):
+        acknowledge_broker_activity(
+            store,
+            _unsupported_activity(),
+            treatment="dividend",
+            operator="op",
+            rationale="reviewed",
+            ticker="AEP",
+            now=datetime(2026, 8, 11, 12, 0),
+        )

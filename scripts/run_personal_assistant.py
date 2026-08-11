@@ -83,7 +83,9 @@ from assistant.portfolio_ledger import (
     reconcile_snapshot,
     sync_app_fills,
     sync_broker_activities,
+    preview_broker_activities,
     acknowledge_broker_activity,
+    alpaca_account_binding_block_reason,
     ACKNOWLEDGEMENT_TREATMENTS,
     LedgerError,
 )
@@ -1601,20 +1603,65 @@ def _fetch_activity_by_id(store: AssistantStore, activity_id: str) -> dict:
     return matches[0]
 
 
+def _require_activity_account_binding(store: AssistantStore) -> None:
+    """Refuse before activity fetch when credentials target another account."""
+    bootstrap = store.get_system_state("ledger_bootstrap")
+    if not isinstance(bootstrap, dict) or bootstrap.get("source") != "alpaca":
+        raise SystemExit(
+            "Broker activity review requires an Alpaca-bootstrapped portfolio "
+            "journal; refusing to mix broker activity into another ledger."
+        )
+    if not str(bootstrap.get("account_id") or "").strip():
+        raise SystemExit(
+            "The Alpaca journal is not bound to an account ID; run "
+            "ledger-bind-account after verifying the connected account."
+        )
+    # Only account identity is needed here. Pulling positions and open orders
+    # would add unrelated outage modes to an accounting-safety check.
+    account = get_account()
+    identity = argparse.Namespace(
+        source="alpaca", account_id=account.get("account_id")
+    )
+    block = alpaca_account_binding_block_reason(store, identity)
+    if block == "account_mismatch":
+        raise SystemExit(
+            "Current Alpaca account does not match the ledger's bound Alpaca "
+            "account; refusing to review or acknowledge its activities."
+        )
+    if block is not None:
+        raise SystemExit(
+            f"Ledger account binding is not usable ({block}); refusing to "
+            "review or acknowledge broker activities."
+        )
+
+
+def _activity_created_after(store: AssistantStore) -> datetime | None:
+    bootstrap = store.get_system_state("ledger_bootstrap")
+    if not isinstance(bootstrap, dict) or not bootstrap.get("bootstrapped_at"):
+        return None
+    return datetime.fromisoformat(
+        str(bootstrap["bootstrapped_at"]).replace("Z", "+00:00")
+    )
+
+
+def _fetch_activities_for_review(store: AssistantStore) -> tuple[list[dict], datetime | None]:
+    created_after = _activity_created_after(store)
+    after = created_after.isoformat() if created_after is not None else None
+    return list(list_account_activities(after=after)), created_after
+
+
 def command_ledger_activity_review(args, store: AssistantStore) -> None:
     """Read-only: what the activity sync would refuse, and why."""
     if not is_configured():
         raise SystemExit(
             "Alpaca paper credentials are required to review broker activities."
         )
-    report: dict = {"refused": [], "acknowledged": []}
-    try:
-        _sync_broker_activities_from_alpaca(store)
-        report["refused_count"] = 0
-        report["note"] = "Every post-bootstrap activity is handled or acknowledged."
-    except LedgerError as exc:
-        report["refused_count"] = None
-        report["note"] = str(exc)
+    _require_activity_account_binding(store)
+    activities, created_after = _fetch_activities_for_review(store)
+    report = preview_broker_activities(
+        store, activities, created_after=created_after
+    )
+    report["acknowledged"] = []
     for record in store.list_broker_activity_acknowledgements():
         report["acknowledged"].append(
             {
@@ -1633,7 +1680,22 @@ def command_ledger_activity_acknowledge(args, store: AssistantStore) -> None:
         raise SystemExit(
             "Alpaca paper credentials are required to acknowledge an activity."
         )
+    _require_activity_account_binding(store)
     activity = _fetch_activity_by_id(store, args.activity_id)
+    existing = store.get_broker_activity_acknowledgement(args.activity_id)
+    if existing is None:
+        created_after = _activity_created_after(store)
+        preview = preview_broker_activities(
+            store, [activity], created_after=created_after
+        )
+        if not any(
+            str(row.get("id")) == args.activity_id
+            for row in preview["refused"]
+        ):
+            raise SystemExit(
+                f"Broker activity {args.activity_id!r} is not currently "
+                "refused; no acknowledgement is needed or allowed."
+            )
     result = acknowledge_broker_activity(
         store,
         activity,
@@ -1642,9 +1704,8 @@ def command_ledger_activity_acknowledge(args, store: AssistantStore) -> None:
         rationale=args.rationale,
         ticker=args.ticker,
     )
-    # The decision is recorded, not posted: sync_broker_activities remains the
-    # single journaling path, so the entry is idempotent and replayable.
-    result["applied"] = _sync_broker_activities_from_alpaca(store)
+    # The decision is recorded, not posted: the next ordinary sync remains the
+    # single journaling path, so application is idempotent and replayable.
     print(json.dumps(result, indent=2, sort_keys=True))
 
 
@@ -2605,7 +2666,9 @@ def build_parser() -> argparse.ArgumentParser:
             "and every operator decision already on record."
         ),
     )
-    activity_review.set_defaults(handler=command_ledger_activity_review)
+    activity_review.set_defaults(
+        handler=command_ledger_activity_review, read_only_store=True
+    )
 
     activity_ack = commands.add_parser(
         "ledger-activity-acknowledge",

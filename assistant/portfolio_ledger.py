@@ -14,6 +14,8 @@ import json
 import uuid
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any
 
 from assistant.schemas import PortfolioSnapshot
@@ -57,6 +59,17 @@ SECURITY_ACCOUNT_PREFIX = "ASSET:SECURITY:"
 
 class LedgerError(ValueError):
     """Malformed, unbalanced, incomplete, or contradictory ledger input."""
+
+
+class BrokerActivityReviewRequiredError(LedgerError):
+    """Structured refused rows from one otherwise valid activity sync."""
+
+    def __init__(self, activities: list[dict[str, Any]]):
+        self.activities = tuple(dict(activity) for activity in activities)
+        super().__init__(
+            "broker activities require manual review before evidence "
+            f"capture can proceed: {json.dumps(activities, sort_keys=True)}"
+        )
 
 
 def _decimal(value: Any, field: str) -> Decimal:
@@ -1006,6 +1019,74 @@ def _acknowledged_amount(activity: dict[str, Any]) -> Decimal | None:
     return _decimal(raw, "activity net_amount")
 
 
+def _validate_acknowledged_activity(
+    activity: dict[str, Any], treatment: str
+) -> Decimal | None:
+    """Validate facts an operator is never allowed to override."""
+    raw_status = activity.get("status")
+    status = str(raw_status or "").strip().lower()
+    if raw_status is not None and status != "executed":
+        raise LedgerError(
+            f"activity status is {status or '(empty)'}, not executed"
+        )
+    amount = _acknowledged_amount(activity)
+    if treatment == "no_cash_effect":
+        if amount is None:
+            raise LedgerError(
+                "no_cash_effect requires an explicit zero broker net_amount; "
+                "a missing amount is unknown"
+            )
+        if amount != 0:
+            raise LedgerError(
+                "no_cash_effect is only valid when the broker reports no cash "
+                f"movement; this row reports {_decimal_text(amount)}"
+            )
+        return amount
+
+    raw_currency = str(activity.get("currency") or "").strip().upper()
+    if raw_currency and raw_currency != USD:
+        raise LedgerError(
+            f"acknowledged activity currency is {raw_currency}, not supported {USD}"
+        )
+    if amount is None or amount == 0:
+        raise LedgerError(
+            f"treatment {treatment!r} needs a non-zero broker net_amount to journal"
+        )
+    if treatment == "fee" and amount > 0:
+        raise LedgerError("a fee must have a negative broker net_amount")
+    if treatment == "dividend" and amount < 0:
+        raise LedgerError("a dividend must have a positive broker net_amount")
+    return amount
+
+
+_ACKNOWLEDGED_TREATMENT_ACTIVITY_TYPES = {
+    "fee": "FEE",
+    "dividend": "DIV",
+    "cash_transfer": "CSD",
+}
+
+
+def _assert_acknowledged_activity_id_not_retyped(
+    store: AssistantStore, *, treatment: str, activity_id: str
+) -> None:
+    mapped_type = _ACKNOWLEDGED_TREATMENT_ACTIVITY_TYPES.get(treatment)
+    if mapped_type is not None:
+        _assert_broker_activity_id_not_retyped(
+            store, activity_type=mapped_type, activity_id=activity_id
+        )
+        return
+    for existing_type, prefix in (
+        ("FEE", "fee:"),
+        ("DIV", "dividend:"),
+        ("cash transfer", "cash_transfer:"),
+    ):
+        if store.get_journal_transaction_by_external_id(prefix + activity_id):
+            raise LedgerError(
+                f"broker activity id {activity_id!r} is already journaled as "
+                f"{existing_type}; refusing to mark it no_cash_effect"
+            )
+
+
 def acknowledge_broker_activity(
     store: AssistantStore,
     activity: Any,
@@ -1027,7 +1108,7 @@ def acknowledge_broker_activity(
     The operator chooses the TREATMENT, never the AMOUNT. Every figure is
     taken from the broker row, so an acknowledgement cannot introduce money
     the broker never reported. `no_cash_effect` is therefore restricted to
-    rows the broker itself reports as zero or absent -- it is an assertion
+    rows where the broker explicitly reports zero -- it is an assertion
     that there is nothing to journal, not a way to wave money away.
     """
     normalized_treatment = str(treatment).strip().lower()
@@ -1045,33 +1126,25 @@ def acknowledge_broker_activity(
     if not isinstance(activity, dict) or not activity.get("id"):
         raise LedgerError("broker activity must be an object carrying its id")
 
-    amount = _acknowledged_amount(activity)
+    amount = _validate_acknowledged_activity(activity, normalized_treatment)
+    _assert_acknowledged_activity_id_not_retyped(
+        store,
+        treatment=normalized_treatment,
+        activity_id=str(activity["id"]),
+    )
     details: dict[str, Any] = {}
     if normalized_treatment == "no_cash_effect":
-        if amount is not None and amount != 0:
-            raise LedgerError(
-                "no_cash_effect is only valid when the broker reports no cash "
-                f"movement; this row reports {_decimal_text(amount)}"
-            )
+        pass
     else:
-        if amount is None or amount == 0:
-            raise LedgerError(
-                f"treatment {normalized_treatment!r} needs a non-zero broker "
-                "net_amount to journal"
-            )
-        if normalized_treatment == "fee" and amount > 0:
-            raise LedgerError("a fee must have a negative broker net_amount")
         if normalized_treatment == "dividend":
-            if amount < 0:
-                raise LedgerError(
-                    "a dividend must have a positive broker net_amount"
-                )
             if not str(ticker or "").strip():
                 raise LedgerError("a dividend acknowledgement requires --ticker")
             details["ticker"] = _security_account(str(ticker))[
                 len(SECURITY_ACCOUNT_PREFIX) :
             ]
-    acknowledged_at = (now or datetime.now(timezone.utc)).isoformat()
+    acknowledged_at = _parse_at(
+        now or datetime.now(timezone.utc), "acknowledged_at"
+    ).isoformat()
     fingerprint = broker_activity_fingerprint(activity)
     inserted = store.record_broker_activity_acknowledgement(
         activity_id=str(activity["id"]),
@@ -1115,15 +1188,14 @@ def _apply_acknowledged_treatment(
             "acknowledged; re-review it rather than applying the old decision"
         )
     treatment = acknowledgement["treatment"]
+    amount = _validate_acknowledged_activity(activity, treatment)
+    _assert_acknowledged_activity_id_not_retyped(
+        store, treatment=treatment, activity_id=activity_id
+    )
     if treatment == "no_cash_effect":
         return ("no_cash_effect", False)
 
-    amount = _acknowledged_amount(activity)
-    if amount is None or amount == 0:
-        raise LedgerError(
-            f"acknowledged activity {activity_id!r} no longer reports a "
-            "journalable amount"
-        )
+    assert amount is not None and amount != 0
     description = str(activity.get("description") or "").strip() or (
         f"Operator-acknowledged {treatment}"
     )
@@ -1341,10 +1413,7 @@ def sync_broker_activities(
         # Recognized fees above are already journaled (each idempotently),
         # so raising here loses no work; it blocks evidence capture until
         # support for the listed activity types is deliberately added.
-        raise LedgerError(
-            "broker activities require manual review before evidence "
-            f"capture can proceed: {json.dumps(unhandled, sort_keys=True)}"
-        )
+        raise BrokerActivityReviewRequiredError(unhandled)
     return {
         "inserted": inserted,
         "duplicates": duplicates,
@@ -1353,11 +1422,39 @@ def sync_broker_activities(
         "acknowledged_no_cash_effect": sorted(acknowledged_no_cash_effect),
         "skipped_pre_bootstrap": skipped_pre_bootstrap,
         "trade_activities_skipped": trade_activities_skipped,
-        "activities_seen": inserted
-        + duplicates
-        + skipped_pre_bootstrap
-        + trade_activities_skipped,
+        # A successful report has classified every input row. In particular,
+        # a no-cash-effect acknowledgement is still an activity that was
+        # examined even though it intentionally creates no posting.
+        "activities_seen": len(activity_rows),
     }
+
+
+def preview_broker_activities(
+    store: AssistantStore,
+    activities: Any,
+    *,
+    created_after: datetime | None = None,
+) -> dict[str, Any]:
+    """Run the exact sync against a disposable snapshot of ``store``.
+
+    This is the read-only review path: validation, existing-journal conflicts,
+    and stored acknowledgements are identical to a real sync, while every
+    prospective posting lands only in a temporary verified SQLite copy.
+    """
+    activity_rows = list(activities)
+    with TemporaryDirectory(prefix="broker-activity-review-") as directory:
+        snapshot_path = store.snapshot_to(Path(directory) / "review.db")
+        shadow = AssistantStore(snapshot_path)
+        try:
+            report = sync_broker_activities(
+                shadow, activity_rows, created_after=created_after
+            )
+        except BrokerActivityReviewRequiredError as exc:
+            return {
+                "refused": [dict(activity) for activity in exc.activities],
+                "refused_count": len(exc.activities),
+            }
+    return {"refused": [], "refused_count": 0, "would_apply": report}
 
 
 def alpaca_account_binding_block_reason(

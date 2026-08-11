@@ -4,6 +4,15 @@ Prepared: 2026-08-11, then extended the same day by Claude's counter-review
 (section 0c), which **accepted all eight findings** — every one
 red-baselined — and closed one missed write path.
 
+Audience: Codex, Claude, and the repository owner on either development
+computer
+
+Repository: `SheltonChen2017/trading_agent`
+
+This file completely replaces the prior handoff. Read
+`docs/OPERATIONAL_FACTS.md` for long-lived machine and owner facts that must
+not be copied from memory.
+
 ## 0c. Counter-review (Claude, same day) — accepted in full; BAACR-001 fixed
 
 The merged tree was restored in place and the review's regressions run
@@ -63,18 +72,6 @@ acknowledged status guard, and dropping operator/rationale from the
 idempotency comparison. Full evidence in
 `docs/REVIEW_2026-08-11_BROKER_ACTIVITY_ACKNOWLEDGEMENT.md` §Counter-review.
 
-Prepared: 2026-08-11
-
-Audience: Codex, Claude, and the repository owner on either development
-computer
-
-Repository: `SheltonChen2017/trading_agent`
-
-This file completely replaces the prior handoff. The newest durable state is
-the independent review and correction of Claude's broker activity
-acknowledgement feature. Read `docs/OPERATIONAL_FACTS.md` for long-lived
-machine and owner facts that must not be copied from memory.
-
 ## 0. Outcome at a glance
 
 **Accepted after correction.** Claude's implementation is a valuable design:
@@ -117,12 +114,14 @@ Active review branch:
    milestone record; and
 3. the separate handoff commit containing this file.
 
-**REMOTE WARNING:** the active review branch has no configured upstream or
-verified remote-tracking ref when this handoff is being prepared. The commits
-listed immediately above exist in this local HEAD, but no push was authorized.
-Another computer cannot retrieve the branch with `git fetch` until the owner
-explicitly authorizes publication and the remote tip is verified. Do not
-deploy `main`'s PR #188 implementation without the correction.
+**REMOTE STATE (updated after counter-review):** the review branch is
+**published** at `origin/codex/review-broker-activity-acknowledgement-20260811`,
+carrying the correction, the review records, the counter-review, and this
+handoff, so another computer receives them from an ordinary fetch. Pushed
+under the owner's standing git-management grant. It is **not merged**; merge
+remains an explicit owner decision. Do not deploy `main`'s PR #188
+implementation without this correction — the merged tree still contains the
+non-read-only review command and the unguarded write path.
 
 The preceding most-active direction implementation and full review chain are
 now merged in main through PR #187 (`3b396f8`); the old merge-gap warning is

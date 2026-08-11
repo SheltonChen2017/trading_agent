@@ -5,6 +5,11 @@ counter-review (section 0a), which **accepted all three findings** and fixed
 one missed generalized instance that is more severe than anything in the
 original ledger.
 
+Audience: Codex, Claude, and the repository owner on either development
+computer
+
+Repository: `SheltonChen2017/trading_agent`
+
 ## 0a. Counter-review (Claude, same day) — accepted; one P2 fail-open closed
 
 All three MAD findings confirmed; MAD-001 and MAD-002 were **red-baselined**
@@ -46,11 +51,6 @@ restored and re-verified.
 Full evidence, including the mutation table, is in
 `docs/REVIEW_2026-08-11_MOST_ACTIVE_DIRECTION_SPLIT.md` §Counter-review.
 
-Audience: Codex, Claude, and the repository owner on either development
-computer
-
-Repository: `SheltonChen2017/trading_agent`
-
 ## 0. Current repository and remote state
 
 Merged `main` / `origin/main` is **`2c886c1`** (PR #185). It contains the
@@ -70,11 +70,12 @@ The active review branch is
    record; and
 3. the separate handoff commit containing this file.
 
-**LOCAL-ONLY WARNING:** the Codex review branch, correction, review records,
-and this replacement handoff have not been pushed or merged. Another computer
-cannot retrieve them with `git fetch` until the owner explicitly authorizes a
-push. The implementation commit alone is already remote. Do not report the
-review as cross-computer synchronized yet.
+**REMOTE STATE (updated after counter-review):** the review branch is
+**published** at `origin/codex/review-most-active-direction-split-20260811`,
+carrying the correction, the review records, the counter-review, and this
+handoff, so another computer receives them from an ordinary fetch. Pushed
+under the owner's standing git-management grant. It is **not merged and not
+deployed**; merge remains an explicit owner decision.
 
 The worktree should be clean after the handoff commit. Two ignored
 machine-local swap-result JSON files known from prior sessions remain outside

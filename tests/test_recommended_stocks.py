@@ -35,10 +35,30 @@ def test_fetch_most_active_tickers_parses_real_shape():
     }
     with patch("yfinance.screen", return_value=fake_result):
         result = recommended_stocks.fetch_most_active_tickers(count=2)
+    # Contract update 2026-08-10: the row now also carries the provider's
+    # price change so the same list can be split by direction. These fixture
+    # quotes omit the field, which must surface as None -- "not reported",
+    # never a fabricated flat move.
     assert result == [
-        {"ticker": "INTC", "name": "Intel Corporation", "volume": 148828659},
-        {"ticker": "NVDA", "name": "NVIDIA Corporation", "volume": 125138253},
+        {"ticker": "INTC", "name": "Intel Corporation", "volume": 148828659, "change_percent": None},
+        {"ticker": "NVDA", "name": "NVIDIA Corporation", "volume": 125138253, "change_percent": None},
     ]
+
+
+def test_fetch_most_active_tickers_carries_the_price_change_when_present():
+    fake_result = {
+        "quotes": [
+            {
+                "symbol": "PLUG",
+                "regularMarketVolume": 108062784,
+                "shortName": "Plug Power",
+                "regularMarketChangePercent": 4.7393436,
+            }
+        ]
+    }
+    with patch("yfinance.screen", return_value=fake_result):
+        result = recommended_stocks.fetch_most_active_tickers(count=1)
+    assert result[0]["change_percent"] == 4.7393436
 
 
 def test_fetch_recent_ipos_returns_empty_when_finnhub_key_unset(monkeypatch):
@@ -397,6 +417,130 @@ def test_is_ipo_identity_mismatch_false_for_close_dates():
 def test_is_ipo_identity_mismatch_false_when_data_missing():
     assert recommended_stocks._is_ipo_identity_mismatch(None, "2026-07-20") is False
     assert recommended_stocks._is_ipo_identity_mismatch("2026-07-20", "") is False
+
+
+# --- Advancing/declining split of the most-actives lane (2026-08-10) ------
+# The owner asked for "most actively bought" vs "most actively sold" columns.
+# That split does not exist: volume is symmetric, so no retail-accessible
+# feed decomposes it into order flow. What ships instead is a split by the
+# provider's reported price direction. These tests pin BOTH halves of that:
+# the direction is classified exactly, and nothing anywhere calls it a buy.
+
+
+def test_classify_price_direction_maps_sign_to_direction():
+    assert recommended_stocks.classify_price_direction(4.73) == "advancing"
+    assert recommended_stocks.classify_price_direction(-0.07) == "declining"
+    assert recommended_stocks.classify_price_direction(0) == "unchanged"
+    assert recommended_stocks.classify_price_direction("1.5") == "advancing"
+
+
+def test_classify_price_direction_refuses_unusable_values():
+    """NaN is the dangerous one: every ordered comparison against it is
+    False, so an unguarded sign chain would silently report a corrupt value
+    as "unchanged" -- inventing a fact the provider never supplied."""
+    assert recommended_stocks.classify_price_direction(float("nan")) is None
+    assert recommended_stocks.classify_price_direction(float("inf")) is None
+    assert recommended_stocks.classify_price_direction(float("-inf")) is None
+    assert recommended_stocks.classify_price_direction(None) is None
+    assert recommended_stocks.classify_price_direction("") is None
+    assert recommended_stocks.classify_price_direction("n/a") is None
+    # bool is an int subclass; True must not read as "advancing".
+    assert recommended_stocks.classify_price_direction(True) is None
+
+
+def test_most_active_lane_records_direction_and_shows_the_change(monkeypatch):
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers") as mock_active,          patch("assistant.recommended_stocks.suggest_similar_tickers", return_value=None),          patch("assistant.recommended_stocks.verify_tickers") as mock_verify:
+        mock_active.return_value = [
+            {"ticker": "UP", "name": "Up Co", "volume": 1000, "change_percent": 4.7393436},
+            {"ticker": "DOWN", "name": "Down Co", "volume": 2000, "change_percent": -4.894},
+        ]
+        mock_verify.return_value = (
+            [_verified("UP", longName="Up Co"), _verified("DOWN", longName="Down Co")],
+            [],
+        )
+        recommended, _ = recommended_stocks.build_recommended_tickers()
+    # verify_tickers is patched for every lane, so select this lane explicitly.
+    by_ticker = {
+        r.ticker: r for r in recommended if r.reason_category == "most_active"
+    }
+    assert by_ticker["UP"].price_direction == "advancing"
+    assert by_ticker["DOWN"].price_direction == "declining"
+    assert "+4.74%" in by_ticker["UP"].detail
+    assert "-4.89%" in by_ticker["DOWN"].detail
+
+
+def test_most_active_lane_says_not_reported_when_the_change_is_missing(monkeypatch):
+    """A missing change must be visible as unknown, not folded into a column."""
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers") as mock_active,          patch("assistant.recommended_stocks.suggest_similar_tickers", return_value=None),          patch("assistant.recommended_stocks.verify_tickers") as mock_verify:
+        mock_active.return_value = [
+            {"ticker": "QUIET", "name": "Quiet Co", "volume": 10, "change_percent": None}
+        ]
+        mock_verify.return_value = ([_verified("QUIET", longName="Quiet Co")], [])
+        recommended, _ = recommended_stocks.build_recommended_tickers()
+    row = recommended[0]
+    assert row.price_direction is None
+    assert "not reported" in row.detail
+
+
+def test_direction_split_is_never_described_as_buying_or_selling(monkeypatch):
+    """The standing rule in fetch_most_active_tickers, enforced end to end."""
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers") as mock_active,          patch("assistant.recommended_stocks.suggest_similar_tickers", return_value=None),          patch("assistant.recommended_stocks.verify_tickers") as mock_verify:
+        mock_active.return_value = [
+            {"ticker": "UP", "name": "Up Co", "volume": 1000, "change_percent": 2.0}
+        ]
+        mock_verify.return_value = ([_verified("UP", longName="Up Co")], [])
+        recommended, _ = recommended_stocks.build_recommended_tickers()
+    for r in recommended:
+        lowered = r.detail.lower()
+        for forbidden in ("most bought", "most sold", "actively bought", "actively sold", "order flow", "buy pressure"):
+            assert forbidden not in lowered
+
+
+def test_ui_separates_a_flat_close_from_an_unreported_change():
+    """Live check on 2026-08-11 surfaced EA at exactly +0.00%.
+
+    "closed flat" and "no change reported" are different facts. Folding a
+    real 0.00% print into the "not reported" caption would understate what
+    the provider actually supplied, so the UI keeps two captions and the
+    classifier keeps two values ("unchanged" vs None).
+    """
+    assert recommended_stocks.classify_price_direction(0.0) == "unchanged"
+    assert recommended_stocks.classify_price_direction(None) is None
+
+    source = (
+        Path(__file__).resolve().parent.parent / "scripts" / "personal_assistant_ui.py"
+    ).read_text(encoding="utf-8")
+    start = source.index("def _render_most_active_by_direction")
+    block = source[start : start + 4000]
+    assert "closed exactly flat" in block
+    # Wrapped across a string-concatenation boundary in the source, so match
+    # the contiguous fragment rather than the rendered sentence.
+    assert "reported no usable price" in block
+    # The two buckets must be derived separately, not from one catch-all.
+    assert 'r.price_direction == "unchanged"' in block
+    assert "r.price_direction is None" in block
+
+
+def test_ui_never_labels_the_direction_split_as_order_flow():
+    """Source-level: the UI copy is where a "bought/sold" label would land."""
+    source = (
+        Path(__file__).resolve().parent.parent / "scripts" / "personal_assistant_ui.py"
+    ).read_text(encoding="utf-8")
+    start = source.index("def _render_most_active_by_direction")
+    # Skip the helper's own docstring: it quotes the forbidden phrasing in
+    # order to record why that split is not built. The invariant is about
+    # user-visible copy, so scan the body after the docstring closes.
+    body_start = source.index('"""', source.index('"""', start) + 3) + 3
+    block = source[body_start : body_start + 4000].lower()
+    for forbidden in ("most actively bought", "most actively sold", "most bought", "most sold"):
+        assert forbidden not in block, (
+            f"the most-actives UI describes volume as {forbidden!r}; volume is "
+            "symmetric and no feed reports order flow"
+        )
+    assert "not a buy/sell split" in block
 
 
 def test_recommended_ticker_never_reuses_signal_evidence_status():

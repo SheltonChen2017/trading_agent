@@ -1,11 +1,71 @@
 # Session handoff — dividend counter-review and AP-7 correction
 
-Prepared: 2026-08-10 after post-merge independent review
+Prepared: 2026-08-10 after post-merge independent review; extended
+2026-08-11 with an owner-requested UI change (section 0b).
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
 
 Repository: `SheltonChen2017/trading_agent`
+
+## 0b. Newest round — most-actives split by price direction (awaiting review)
+
+Owner request, 2026-08-11: on the Ticker Suggestions tab, make the
+most-active screen render two columns — "most actively bought" and "most
+actively sold" — to support a short-term momentum read.
+
+**The requested split was not built, and should not be.** It does not exist
+in market data: volume is symmetric, so the same share count is
+simultaneously bought and sold, and no retail-accessible feed decomposes it
+into order flow. The real technique (Lee-Ready tick classification against
+quotes) requires consolidated trade-and-quote data; this project has
+Alpaca's free IEX feed — a few percent of consolidated volume, whose top of
+book was measured the same day quoting LOW at a ~6% spread while the real
+market was penny-wide. Classifying on that would yield confident-looking
+noise. A standing rule to this effect already existed in
+`assistant/recommended_stocks.fetch_most_active_tickers` ("never label this
+'most bought' anywhere in code, comments, or UI copy"); this round honours
+it rather than overriding it. The owner accepted the substitute before
+implementation.
+
+**What shipped** on `user/claude/most-active-direction-split-20260810` (off
+merged `main` `2c886c1`): the same most-active list split by the provider's
+exactly reported price direction — heavy volume with price up, heavy volume
+with price down.
+
+- `fetch_most_active_tickers()` now also returns `change_percent`.
+- `classify_price_direction()` maps sign → advancing/declining/unchanged and
+  **refuses NaN, ±infinity, bools, and unparseable values**. NaN is the
+  dangerous case: every ordered comparison against it is False, so an
+  unguarded sign chain would silently report a corrupt value as "unchanged".
+- `RecommendedTicker` gains an optional `price_direction`; it is `None` for
+  the IPO and AI lanes and for any row without a usable change. Additive and
+  defaulted — the dataclass is in-memory only, not persisted.
+- The UI renders two columns plus **two separate captions**: a genuine
+  0.00% close ("closed exactly flat") is distinguished from a change the
+  provider never reported ("reported no usable price change"). Live data on
+  2026-08-11 produced exactly this case (EA at +0.00%), which is how the
+  conflation was caught.
+- UI copy states that this is not a buy/sell split and not a signal.
+
+**Validation.** Full suite **3,376 passed, 0 failed, 25 warnings** (3,368
+plus 8 new tests); `tests/test_recommended_stocks.py` 35 passed, plus the
+ten-page UI smoke and theme suites. `compileall` and `git diff --check`
+clean. The suite ran after the last code change; only documents changed
+afterwards, and all four document-reading suites were re-run (45 passed). Four mutations each turned the
+intended test red and were restored: dropping the finiteness guard, folding
+a missing change into "unchanged", putting a forbidden "most actively
+bought" label in UI copy, and re-merging the flat/unknown captions. End-to-
+end run against the live screener produced 4 advancing / 3 declining / 1
+flat from 8 verified names. Two of my own test defects were found and fixed
+during the round (a mock leaking across lanes, and a guard matching its own
+explanatory docstring).
+
+**Boundaries.** Presentation only. No proposal, order, policy, scheduler,
+epoch, ML/LLM-authority, or execution path changed; nothing deployed;
+epoch-003 untouched on `ef05dc1`. This does not reorder the roadmap — the
+recommended next step remains the operator-acknowledgement path, then one
+epoch-004 roll before 2026-09-10.
 
 ## 0. Current repository and remote state
 

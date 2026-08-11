@@ -146,6 +146,34 @@ warning contrast clears AA with margin, and no authority path changed. See
 `docs/REVIEW_2026-08-09_AUI_CORRECTIONS.md`. This presentation milestone does
 not reorder the roadmap or authorize M3.
 
+**Most-actives split by price direction (owner request, 2026-08-10;
+`user/claude/most-active-direction-split-20260810`, awaiting review).** The
+Ticker Suggestions tab's most-active screen now renders two columns instead
+of one list. The owner asked for "most actively bought" and "most actively
+sold"; **that split was deliberately NOT built, because it does not exist in
+any retail-accessible data.** Volume is symmetric — every share traded was
+bought by one party and sold by another — so a single volume number cannot
+be decomposed into order flow. The real technique (Lee-Ready tick
+classification against quotes) needs consolidated trade-and-quote data; this
+project has Alpaca's free IEX feed, a few percent of volume, whose top of
+book was measured the same day quoting LOW with a ~6% spread against a
+penny-wide real market. Classifying on that would produce confident-looking
+noise. This preserves the standing rule already stated in
+`assistant/recommended_stocks.fetch_most_active_tickers`: never label volume
+"most bought" in code, comments, or UI copy.
+
+What ships instead is the same most-active list split by the provider's
+**exactly reported price direction** — heavy volume with price up versus
+heavy volume with price down — which is the operational read the request
+wanted. `classify_price_direction()` rejects NaN/infinity explicitly (every
+ordered comparison against NaN is False, so an unguarded sign chain would
+report a corrupt value as "unchanged"), and distinguishes a genuine 0.00%
+close from a change the provider never reported; the two are surfaced in
+separate captions rather than folded together. UI copy states plainly that
+this is not a buy/sell split and not a signal. Observation and presentation
+only: no proposal, order, policy, epoch, or authority path changed, and the
+project still has **zero confirmed predictive signals**.
+
 ### 2.6 Exploratory candidate-signal software (2026-08-03)
 
 PR #121 added causal residual momentum/reversal, volatility-scaled momentum,

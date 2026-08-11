@@ -17,6 +17,7 @@ data-provider entry deserves no less scrutiny than a hallucinated ticker.
 from __future__ import annotations
 
 import dataclasses
+import math
 import os
 from datetime import date, datetime, timedelta, timezone
 from typing import Literal
@@ -32,12 +33,50 @@ _IPO_ACCEPTED_STATUSES = {"priced", "listed"}
 _MAX_IPO_DATE_GAP_DAYS = 10  # if the first real trading bar is this far from the provider's claimed IPO date, the identity likely doesn't match (e.g. a reused/renamed ticker)
 
 
+PriceDirection = Literal["advancing", "declining", "unchanged"]
+
+
+def classify_price_direction(change_percent: object) -> PriceDirection | None:
+    """Today's price direction, or None when the provider did not give one.
+
+    Deliberately NOT a buy/sell classification. Volume is symmetric -- every
+    share traded was bought by someone and sold by someone else -- so a
+    "most bought" column cannot be derived from any retail-accessible feed
+    (see fetch_most_active_tickers). Direction of the price move is a real,
+    exactly-reported fact, and it is what separates heavy volume pushing a
+    name up from heavy volume pushing it down.
+
+    NaN is rejected explicitly: every ordered comparison against NaN is
+    False, so an unguarded `> 0 ... < 0 ... else unchanged` chain would
+    silently report a corrupt value as "unchanged" -- inventing a fact the
+    provider never supplied.
+    """
+    if change_percent is None or isinstance(change_percent, bool):
+        return None
+    try:
+        value = float(change_percent)
+    except (TypeError, ValueError):
+        return None
+    if not math.isfinite(value):
+        return None
+    if value > 0:
+        return "advancing"
+    if value < 0:
+        return "declining"
+    return "unchanged"
+
+
 @dataclasses.dataclass(frozen=True)
 class RecommendedTicker:
     ticker: str
     reason_category: Literal["most_active", "recent_ipo", "ai_suggested"]
     detail: str
     fetched_at: str
+    # Populated for the most_active lane only; None everywhere else and
+    # whenever the provider omitted or corrupted the change value. Consumers
+    # must treat None as "unknown", never as a direction. Defaulted so the
+    # other two lanes construct unchanged.
+    price_direction: PriceDirection | None = None
 
 
 def fetch_most_active_tickers(count: int = 10) -> list[dict]:
@@ -57,6 +96,9 @@ def fetch_most_active_tickers(count: int = 10) -> list[dict]:
                 "ticker": q.get("symbol"),
                 "name": q.get("shortName", ""),
                 "volume": q.get("regularMarketVolume"),
+                # Today's price move, used ONLY to split the same volume list
+                # into advancing/declining. Still not order flow.
+                "change_percent": q.get("regularMarketChangePercent"),
             }
             for q in quotes
             if q.get("symbol")
@@ -167,18 +209,26 @@ def build_recommended_tickers(
         for v in verified:
             c = detail_by_ticker.get(v["ticker"], {})
             volume = c.get("volume")
-            detail = (
-                f"{v.get('longName') or c.get('name') or v['ticker']} -- "
-                f"trading volume today: {volume:,}"
-                if volume
-                else f"{v.get('longName') or v['ticker']}"
-            )
+            direction = classify_price_direction(c.get("change_percent"))
+            name = v.get("longName") or c.get("name") or v["ticker"]
+            parts = [str(name)]
+            if volume:
+                parts.append(f"trading volume today: {volume:,}")
+            if direction is None:
+                # Say so rather than implying a flat move; the reader must be
+                # able to tell "no direction reported" from "did not move".
+                parts.append("price change today: not reported")
+            else:
+                parts.append(
+                    f"price change today: {float(c['change_percent']):+.2f}%"
+                )
             recommended.append(
                 RecommendedTicker(
                     ticker=v["ticker"],
                     reason_category="most_active",
-                    detail=detail,
+                    detail=" -- ".join(parts),
                     fetched_at=now,
+                    price_direction=direction,
                 )
             )
 

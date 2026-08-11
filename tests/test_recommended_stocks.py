@@ -470,6 +470,33 @@ def test_most_active_lane_records_direction_and_shows_the_change(monkeypatch):
     assert "-4.89%" in by_ticker["DOWN"].detail
 
 
+def test_most_active_lane_joins_provider_details_by_normalized_symbol(monkeypatch):
+    """Verification uppercases symbols; provider details must follow that key."""
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch(
+        "assistant.recommended_stocks.fetch_most_active_tickers",
+        return_value=[
+            {
+                "ticker": "mixed",
+                "name": "Mixed Case Co",
+                "volume": 1234,
+                "change_percent": 1.25,
+            }
+        ],
+    ), patch(
+        "assistant.recommended_stocks.suggest_similar_tickers", return_value=None
+    ), patch(
+        "assistant.recommended_stocks.verify_tickers",
+        return_value=([_verified("MIXED", longName="Mixed Case Co")], []),
+    ):
+        recommended, _ = recommended_stocks.build_recommended_tickers()
+
+    row = next(r for r in recommended if r.reason_category == "most_active")
+    assert row.price_direction == "advancing"
+    assert "trading volume today: 1,234" in row.detail
+    assert "price change today: +1.25%" in row.detail
+
+
 def test_most_active_lane_says_not_reported_when_the_change_is_missing(monkeypatch):
     """A missing change must be visible as unknown, not folded into a column."""
     monkeypatch.delenv("FINNHUB_API_KEY", raising=False)

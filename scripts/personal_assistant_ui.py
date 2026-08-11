@@ -3080,16 +3080,16 @@ if page == "Ticker Suggestions":
         """Split one most-actives list into advancing / declining columns.
 
         Owner request (2026-08-10) was two columns, "most actively bought"
-        and "most actively sold". That split does not exist in market data
+        and "most actively sold". That split is not present in this source
         and is NOT built here: every share traded was bought by someone and
-        sold by someone else, so volume is one symmetric number and no
-        retail-accessible feed decomposes it into order flow. (The rule is
+        sold by someone else, so volume is one symmetric number and this
+        screener does not decompose it into classified order flow. (The rule is
         stated at assistant/recommended_stocks.fetch_most_active_tickers:
         never label this "most bought" in code, comments, or UI copy.)
 
-        What IS reported exactly is the direction the price moved, which is
-        what separates heavy volume pushing a name up from heavy volume
-        pushing it down -- the same operational read the request wanted.
+        What IS reported separately is the direction the price moved, which
+        distinguishes heavily traded names whose prices rose from heavily
+        traded names whose prices fell.
         Candidates whose provider row carried no usable change value are
         listed separately instead of being folded into either column.
         """
@@ -3103,7 +3103,7 @@ if page == "Ticker Suggestions":
         unknown = [r for r in rows if r.price_direction is None]
         st.caption(
             "Not a buy/sell split -- every share traded was both bought and "
-            "sold, and no retail-accessible feed reports order flow. These "
+            "sold, and this source does not report classified order flow. These "
             "are the same most-active names separated by today's price "
             "direction. It describes what already happened and is not a "
             "signal: no strategy in this project has confirmed predictive "
@@ -3111,8 +3111,8 @@ if page == "Ticker Suggestions":
         )
         left, right = st.columns(2)
         for column, subset, heading in (
-            (left, advancing, "Most active — price UP today"),
-            (right, declining, "Most active — price DOWN today"),
+            (left, advancing, "Most active — price up today"),
+            (right, declining, "Most active — price down today"),
         ):
             with column:
                 st.markdown(f"**{heading}** ({len(subset)})")
@@ -3232,8 +3232,27 @@ if page == "Ticker Suggestions":
 
     suggestions_result = st.session_state.get("ticker_suggestions_result")
     if suggestions_result:
+        row_fetch_times = sorted(
+            {
+                str(getattr(row, "fetched_at", "")).strip()
+                for row in suggestions_result["rows"]
+                if str(getattr(row, "fetched_at", "")).strip()
+            }
+        )
+        if len(row_fetch_times) == 1:
+            source_time = f"Source data fetched at {row_fetch_times[0]}. "
+        elif row_fetch_times:
+            source_time = (
+                "Source rows were fetched between "
+                f"{row_fetch_times[0]} and {row_fetch_times[-1]}. "
+            )
+        else:
+            source_time = "No verified row carries a source fetch time. "
         st.caption(
-            f"Fetched at {suggestions_result['ran_at']} UTC. Verification: every ticker "
+            source_time
+            + f"Displayed at {suggestions_result['ran_at']}. The source loader may "
+            f"return results cached for up to {_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS // 60} minutes. "
+            "Verification: every ticker "
             "shown resolved against real market data; "
             f"{len(suggestions_result['dropped'])} candidate(s) failed verification and "
             "were omitted."

@@ -147,32 +147,33 @@ warning contrast clears AA with margin, and no authority path changed. See
 not reorder the roadmap or authorize M3.
 
 **Most-actives split by price direction (owner request, 2026-08-10;
-`user/claude/most-active-direction-split-20260810`, awaiting review).** The
+completed and independently accepted after correction 2026-08-11).** The
 Ticker Suggestions tab's most-active screen now renders two columns instead
 of one list. The owner asked for "most actively bought" and "most actively
-sold"; **that split was deliberately NOT built, because it does not exist in
-any retail-accessible data.** Volume is symmetric — every share traded was
-bought by one party and sold by another — so a single volume number cannot
-be decomposed into order flow. The real technique (Lee-Ready tick
-classification against quotes) needs consolidated trade-and-quote data; this
-project has Alpaca's free IEX feed, a few percent of volume, whose top of
-book was measured the same day quoting LOW with a ~6% spread against a
-penny-wide real market. Classifying on that would produce confident-looking
-noise. This preserves the standing rule already stated in
+sold"; **that split was deliberately NOT built because the yfinance
+most-actives source does not provide classified order flow.** Volume is
+symmetric — every share traded was bought by one party and sold by another —
+so its single volume number cannot be decomposed into bought-versus-sold
+shares. This preserves the standing rule already stated in
 `assistant/recommended_stocks.fetch_most_active_tickers`: never label volume
 "most bought" in code, comments, or UI copy.
 
-What ships instead is the same most-active list split by the provider's
-**exactly reported price direction** — heavy volume with price up versus
-heavy volume with price down — which is the operational read the request
-wanted. `classify_price_direction()` rejects NaN/infinity explicitly (every
+What ships instead is the same most-active list split by the provider-reported
+price direction — heavily traded names whose prices rose versus heavily
+traded names whose prices fell. `classify_price_direction()` rejects
+NaN/infinity explicitly (every
 ordered comparison against NaN is False, so an unguarded sign chain would
 report a corrupt value as "unchanged"), and distinguishes a genuine 0.00%
 close from a change the provider never reported; the two are surfaced in
 separate captions rather than folded together. UI copy states plainly that
 this is not a buy/sell split and not a signal. Observation and presentation
 only: no proposal, order, policy, epoch, or authority path changed, and the
-project still has **zero confirmed predictive signals**.
+project still has **zero confirmed predictive signals**. Implementation
+`3be6326` was accepted after correction `3b72242`; review fixed the
+case-normalized provider-detail join, separated cached source time from display
+time, narrowed unsupported data-availability/causality claims, and added real
+Streamlit behavioral coverage. Final validation passed 3,378 tests. See
+`docs/REVIEW_2026-08-11_MOST_ACTIVE_DIRECTION_SPLIT.md`.
 
 ### 2.6 Exploratory candidate-signal software (2026-08-03)
 
@@ -239,7 +240,7 @@ already-merged work does not reorder the adopted next step.
 | AP-3 | P3 | 118 `portfolio_equity_snapshots` rows are mixed briefing/test-pollution provenance (pre-2026-08-02); any evidence report over them is unreliable | treat pre-2026-08-02 rows as non-evidence; decide retention at epoch start |
 | AP-4 | P3 | Doc staleness cluster: `validate.py` figure 479→490 (grew in `7f431b6`); characterization-suite docstring still says "2,040 lines"; STATUS "corrects" a 1,450 figure the plan never contained; GR-1D/1E exist only in SESSION_HANDOFF, absent from plan and status docs; ML status doc has 3 internally stale paragraphs (spec library "not built" vs delivered; "calibration emitted empty" vs wired; ML-FS §2 overstates ML-FS-6) | **Resolved and reviewed 2026-08-03:** reconciled all listed statements, added GR-1D/1E status, and recorded post-PR-#117 state. |
 | AP-6 | P2 | **Broker non-trade activities were never ingested** (found 2026-08-10 tracing epoch-002's stall): Alpaca charges CAT fees on paper accounts as account *activities*, not fills; the journal only ingested fills (`sync_app_fills`), so ledger cash drifted +$0.01 per fee day. By 2026-08-07 the drift ($0.03 = three post-bootstrap fees, verified to the cent against `/v2/account/activities`) exceeded the $0.01 reconciliation tolerance and every nightly `paper-observation` correctly refused to capture evidence — the epoch stalled at 1 session with a critical alert. Dividends/interest arrive on the same stream. This is incorrect durable state / missing recovery (P2), not unsafe execution or broken atomicity (P1). The detector worked; the books were wrong. | **Resolved after independent correction 2026-08-10** at `a8174b9`; see `docs/REVIEW_2026-08-10_EPOCH_ACTIVITY_INGESTION.md`. Merged as PR #182 and deployed 2026-08-10. **The self-heal is now verified operational fact:** first post-deployment `ledger-reconcile` inserted the three fees exactly once and returned `matched: true` with zero mismatches; the follow-up operations-cycle replay counted them as 3 idempotent duplicates. Widening the tolerance remains rejected. |
-| AP-7 | P2 | **False-positive critical alert from a negative-age race** (measured read-only 2026-08-10 on the epoch host). `operational_health()` captured `now` before readiness/broker work, while overlapping scheduled processes could commit a reconciliation, backup, or restore drill just afterward. The correct future-date lower bound then treated that valid newly read fact as future-dated. The observed critical alert said matched with zero mismatches but still blocked the operations cycle and promotion gate. This is material fail-closed operational behavior, not a minor documentation issue. | **Corrected and independently reviewed in development at `89ebcc2`, not deployed.** Each freshness check now captures its clock immediately after reading its fact, reports signed `age_seconds`, and still uses a frozen caller-supplied as-of clock so genuine future rows refuse. The submitted race test failed red; the corrected operational suite passed. The open deployed alert was not acknowledged. **Counter-review found and fixed a SECOND instance the correction missed:** `assistant/readiness.py`'s `reconciliation_freshness`, reached from the same `operational_health()` call and more exposed — the deployed `monitor-orders` task rewrites `last_order_reconciliation` every 30s while the window between that function's entry clock and the read contains a full SQLite `integrity_check`. Because `healthy = all(check["ok"])`, that warning-severity check still forced a nonzero cycle exit. Same post-read-clock pattern, same frozen as-of behaviour, mutation-verified. Deliberately NOT unified with `risk/execution_gate.py`'s future-timestamp tolerance: that timestamp is external (broker clock skew is real), these are locally written, so a tolerance there would weaken FCS-017 for no benefit. Merge with the review branch, then include this fix with CR-W2 in one owner-authorized epoch-004 roll. |
+| AP-7 | P2 | **False-positive critical alert from a negative-age race** (measured read-only 2026-08-10 on the epoch host). `operational_health()` captured `now` before readiness/broker work, while overlapping scheduled processes could commit a reconciliation, backup, or restore drill just afterward. The correct future-date lower bound then treated that valid newly read fact as future-dated. The observed critical alert said matched with zero mismatches but still blocked the operations cycle and promotion gate. This is material fail-closed operational behavior, not a minor documentation issue. | **Corrected, independently reviewed, counter-reviewed, and merged as PR #185 at `2c886c1`; not deployed.** Each freshness check now captures its clock immediately after reading its fact, reports signed `age_seconds`, and still uses a frozen caller-supplied as-of clock so genuine future rows refuse. The open deployed alert was not acknowledged. Counter-review found and fixed the second instance in `assistant/readiness.py::reconciliation_freshness`, reached from the same `operational_health()` call. Deliberately NOT unified with `risk/execution_gate.py`'s future-timestamp tolerance: that timestamp is external (broker clock skew is real), these are locally written, so a tolerance there would weaken FCS-017 for no benefit. Include this already-merged fix with CR-W2 in one owner-authorized epoch-004 roll. |
 | AP-5 | P3 | 4 of 5 `REQUIRED_PROMOTION_DRILLS` have no producer (only `backup_restore` does) — structurally unproducible until GR-3/GR-5 | **Resolved and independently reviewed 2026-08-03:** GR-3 adds exact-lineage producers for ambiguous_submission, restart_recovery, and kill_switch; GR-5 adds alert_delivery through its storage-verified self-test. All five drill types now have producers. Do not fake any of them. |
 
 ---

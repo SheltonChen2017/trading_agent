@@ -3076,6 +3076,75 @@ if page == "Ticker Suggestions":
         sorted({p.ticker.upper() for p in suggestions_packet.portfolio.positions})
     )
 
+    def _render_most_active_by_direction(rows: list) -> None:
+        """Split one most-actives list into advancing / declining columns.
+
+        Owner request (2026-08-10) was two columns, "most actively bought"
+        and "most actively sold". That split does not exist in market data
+        and is NOT built here: every share traded was bought by someone and
+        sold by someone else, so volume is one symmetric number and no
+        retail-accessible feed decomposes it into order flow. (The rule is
+        stated at assistant/recommended_stocks.fetch_most_active_tickers:
+        never label this "most bought" in code, comments, or UI copy.)
+
+        What IS reported exactly is the direction the price moved, which is
+        what separates heavy volume pushing a name up from heavy volume
+        pushing it down -- the same operational read the request wanted.
+        Candidates whose provider row carried no usable change value are
+        listed separately instead of being folded into either column.
+        """
+        advancing = [r for r in rows if r.price_direction == "advancing"]
+        declining = [r for r in rows if r.price_direction == "declining"]
+        # "flat" and "unknown" are different facts and must not share a
+        # caption: a name that printed exactly 0.00% DID report a change, it
+        # just did not move. Folding it into "not reported" would understate
+        # what the provider actually gave us.
+        flat = [r for r in rows if r.price_direction == "unchanged"]
+        unknown = [r for r in rows if r.price_direction is None]
+        st.caption(
+            "Not a buy/sell split -- every share traded was both bought and "
+            "sold, and no retail-accessible feed reports order flow. These "
+            "are the same most-active names separated by today's price "
+            "direction. It describes what already happened and is not a "
+            "signal: no strategy in this project has confirmed predictive "
+            "evidence."
+        )
+        left, right = st.columns(2)
+        for column, subset, heading in (
+            (left, advancing, "Most active — price UP today"),
+            (right, declining, "Most active — price DOWN today"),
+        ):
+            with column:
+                st.markdown(f"**{heading}** ({len(subset)})")
+                if subset:
+                    st.dataframe(
+                        [
+                            {
+                                "Ticker": r.ticker,
+                                "Detail (volume and price change)": r.detail,
+                            }
+                            for r in subset
+                        ],
+                        width="stretch",
+                        hide_index=True,
+                    )
+                else:
+                    st.caption("None on this run.")
+        if flat:
+            st.caption(
+                f"{len(flat)} verified candidate(s) closed exactly flat and are "
+                "in neither column: "
+                + ", ".join(sorted(r.ticker for r in flat))
+                + "."
+            )
+        if unknown:
+            st.caption(
+                f"{len(unknown)} verified candidate(s) reported no usable price "
+                "change and are in neither column: "
+                + ", ".join(sorted(r.ticker for r in unknown))
+                + "."
+            )
+
     st.subheader("Sources")
     # Defaults are seeded into session state ONCE (before widget creation),
     # then the widgets own their keys -- passing value= and key= together
@@ -3170,7 +3239,10 @@ if page == "Ticker Suggestions":
             "were omitted."
         )
         source_labels = {
-            "most_active": "Most actively traded (source: yfinance screen)",
+            "most_active": (
+                "Most actively traded, split by today's price direction "
+                "(source: yfinance screen — volume and price move, not order flow)"
+            ),
             "recent_ipo": "Recent IPOs (source: Finnhub calendar)",
             "ai_suggested": "Claude suggestions with measured comparison (source: LLM, verified)",
         }
@@ -3181,7 +3253,9 @@ if page == "Ticker Suggestions":
                 r for r in suggestions_result["rows"] if r.reason_category == category
             ]
             with st.expander(f"{label} ({len(items)})", expanded=bool(items)):
-                if items:
+                if category == "most_active":
+                    _render_most_active_by_direction(items)
+                elif items:
                     st.dataframe(
                         [
                             {

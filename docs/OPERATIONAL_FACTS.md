@@ -213,23 +213,34 @@ cash flows to the previous session's return interval and a New-Year event
 to the prior tax year), and a prefix-map `KeyError` that escaped the
 fail-closed refusal handler is gone. Details in the review report §7.
 
-**Update 2026-08-11 (development only, NOT deployed): CR-W3 stops being an
-epoch-killer.** The operator acknowledgement path on
-`user/claude/broker-activity-acknowledgement-20260811` means a refused
-activity no longer requires a code deploy — and therefore no longer costs
-the accumulated run. When a nightly capture fails on an unsupported
-activity, the recovery is:
+**Update 2026-08-11 (reviewed development only, NOT deployed): CR-W3 stops
+being an epoch-killer after the correction is merged and deployed.** Claude's
+operator acknowledgement implementation merged as PR #188 at `24de4f5`;
+independent review accepted the design after material correction at local-only
+`74376e4` on `codex/review-broker-activity-acknowledgement-20260811`. Do not
+deploy PR #188 without that correction. Once the corrected tree enters a new
+epoch, a refused activity no longer requires another code deploy — and
+therefore no longer costs the accumulated run. When a nightly capture fails
+on an unsupported activity, the recovery is:
 
 1. `ledger-activity-review` — see exactly what refused and why (read-only).
 2. `ledger-activity-acknowledge <id> --treatment <fee|dividend|cash_transfer|no_cash_effect> --operator <you> --rationale "<why>"` (plus `--ticker` for a dividend).
 3. The next `paper-observation` journals it and capture resumes.
 
-You choose the treatment; the amount always comes from the broker row, so
-this cannot invent money. `no_cash_effect` only works on rows the broker
-itself reports as zero. The decision is bound to a fingerprint of the exact
-activity content, so if the provider later changes that row it refuses again
-rather than reusing your judgement. **This is undeployed until the epoch-004
-roll** — on deployed `ef05dc1` a refused activity still stalls the epoch.
+`ledger-activity-review` opens the operator database read-only and executes the
+real sync only against a verified temporary snapshot. Both commands first
+require an Alpaca-bootstrapped ledger bound to the currently connected account.
+The acknowledgement command accepts only a row the sync currently refuses and
+records the decision without posting; the next ordinary sync applies it.
+
+You choose the treatment; the amount always comes from the broker row, so this
+cannot invent money. Pending rows, unsupported currencies for journaled money,
+missing amounts, wrong signs, cross-type reuse of a broker ID, and changed
+fingerprints fail closed. `no_cash_effect` works only when the broker explicitly
+reports zero — missing is unknown, not zero. A second decision is idempotent
+only when fingerprint, treatment, operator, rationale, and details agree.
+**This is undeployed until the complete epoch-004 roll** — on deployed
+`ef05dc1` a refused activity still stalls the epoch.
 
 **CR-W3 (watch item):** the DIV subtype allowlist accepts only an
 absent subtype or explicit `CDIV`, and no `DIV` activity has ever appeared

@@ -4165,11 +4165,30 @@ class AssistantStore:
         return results or ["ok"]
 
     def backup_to(self, destination: str | Path) -> Path:
+        target = self.snapshot_to(destination)
+        self.set_system_state(
+            "last_database_backup",
+            {
+                "path": str(target),
+                "completed_at": datetime.now(timezone.utc).isoformat(),
+                "integrity": ["ok"],
+            },
+        )
+        return target
+
+    def snapshot_to(self, destination: str | Path) -> Path:
+        """Create a verified SQLite snapshot without mutating source state.
+
+        Unlike ``backup_to()``, this is suitable for read-only previews: it
+        does not update ``last_database_backup`` in the source database. The
+        source connection is opened read-only and SQLite's backup API captures
+        a consistent image including WAL content.
+        """
         target = Path(destination)
         if target.resolve() == self.path.resolve():
-            raise ValueError("Backup destination must be different from the live database path.")
+            raise ValueError("Snapshot destination must be different from the source database path.")
         target.parent.mkdir(parents=True, exist_ok=True)
-        source_connection = self._open_database(self.path)
+        source_connection = self._open_database_read_only(self.path)
         destination_connection = self._open_database(target)
         try:
             source_connection.backup(destination_connection)
@@ -4179,16 +4198,8 @@ class AssistantStore:
         integrity = self.verify_database_file(target)
         if integrity != ["ok"]:
             raise RuntimeError(
-                f"Backup integrity check failed for {target}: {integrity}"
+                f"Snapshot integrity check failed for {target}: {integrity}"
             )
-        self.set_system_state(
-            "last_database_backup",
-            {
-                "path": str(target),
-                "completed_at": datetime.now(timezone.utc).isoformat(),
-                "integrity": integrity,
-            },
-        )
         return target
 
     @staticmethod
@@ -5185,31 +5196,13 @@ class AssistantStore:
             details, sort_keys=True, separators=(",", ":"), default=str
         )
         with self._connect() as connection:
-            existing = connection.execute(
-                """
-                SELECT activity_fingerprint, treatment, details_json
-                FROM broker_activity_acknowledgements WHERE activity_id = ?
-                """,
-                (activity_id,),
-            ).fetchone()
-            if existing is not None:
-                if (
-                    existing["activity_fingerprint"] == activity_fingerprint
-                    and existing["treatment"] == treatment
-                    and existing["details_json"] == details_json
-                ):
-                    return False
-                raise BrokerActivityAcknowledgementConflictError(
-                    f"broker activity {activity_id!r} already has a different "
-                    "acknowledgement; review the existing decision instead of "
-                    "overwriting it"
-                )
-            connection.execute(
+            cursor = connection.execute(
                 """
                 INSERT INTO broker_activity_acknowledgements(
                     activity_id, activity_fingerprint, treatment, operator,
                     rationale, acknowledged_at, details_json
                 ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(activity_id) DO NOTHING
                 """,
                 (
                     activity_id,
@@ -5221,7 +5214,29 @@ class AssistantStore:
                     details_json,
                 ),
             )
-        return True
+            if cursor.rowcount == 1:
+                return True
+            existing = connection.execute(
+                """
+                SELECT activity_fingerprint, treatment, operator, rationale,
+                       details_json
+                FROM broker_activity_acknowledgements WHERE activity_id = ?
+                """,
+                (activity_id,),
+            ).fetchone()
+            if existing is not None and (
+                existing["activity_fingerprint"] == activity_fingerprint
+                and existing["treatment"] == treatment
+                and existing["operator"] == operator
+                and existing["rationale"] == rationale
+                and existing["details_json"] == details_json
+            ):
+                return False
+            raise BrokerActivityAcknowledgementConflictError(
+                f"broker activity {activity_id!r} already has a different "
+                "acknowledgement; review the existing decision instead of "
+                "overwriting it"
+            )
 
     def get_broker_activity_acknowledgement(
         self, activity_id: str

@@ -1,297 +1,294 @@
-# Session handoff — operator acknowledgement path
+# Session handoff — reviewed broker activity acknowledgement
 
-Prepared: 2026-08-11. Section 0z is the newest round (the operator
-acknowledgement path, awaiting review). Sections 0a onward record the
-preceding most-active review round, whose counter-review **accepted all
-three findings** and fixed one missed generalized instance.
+Prepared: 2026-08-11, then extended the same day by Claude's counter-review
+(section 0c), which **accepted all eight findings** — every one
+red-baselined — and closed one missed write path.
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
 
 Repository: `SheltonChen2017/trading_agent`
 
-## 0z. Newest round — operator acknowledgement path (awaiting review)
+This file completely replaces the prior handoff. Read
+`docs/OPERATIONAL_FACTS.md` for long-lived machine and owner facts that must
+not be copied from memory.
 
-Owner-authorized 2026-08-11, and it is the milestone that makes the
-epoch-004 roll worth spending. **Problem it closes:** an unsupported broker
-activity blocked evidence capture until someone *deployed code* — and
-deploying closes the epoch — so one surprise activity type cost the entire
-accumulated run. That is why CR-W3 (an unverified DIV subtype arriving with
-the AEP dividend around 2026-09-10) was a genuine threat rather than an
-inconvenience. After this, a surprise costs one human decision.
+## 0c. Counter-review (Claude, same day) — accepted in full; BAACR-001 fixed
 
-Branch `user/claude/broker-activity-acknowledgement-20260811`, based on the
-**counter-reviewed** most-active tree (`72fecf1`) rather than `main`, because
-PR #186 merged only the implementation — see the merge-gap note in section 0.
+The merged tree was restored in place and the review's regressions run
+against it: **14 failed, 98 passed**. Every BAA finding is real and
+reproducible; the 6/10 is fair. The worst is worth naming plainly:
+**BAA-003 — my `ledger-activity-review` was not read-only.** I named it
+"review", documented it read-only, and had it call the real sync, which
+writes journal entries. That is the same defect class GR-7b already closed
+once, reintroduced by me in the safety-critical command. Codex's replacement
+(run the *exact* sync against a verified temporary snapshot, via a new
+`snapshot_to()` that leaves `last_database_backup` untouched) is the right
+shape, because it keeps validation and conflict detection identical to a
+real sync instead of a "what would happen" predicate that could drift.
 
-**What it does.** New `broker_activity_acknowledgements` table,
-`acknowledge_broker_activity()`, and two CLI commands:
-`ledger-activity-review` (read-only: what refused and why, plus every
-decision on record) and `ledger-activity-acknowledge` (record one decision).
+**BAACR-001 (P2, fixed here) — the guard covered the commands, not the write
+path.** BAA-004 added `_require_activity_account_binding` to the two new
+standalone commands, but `_sync_broker_activities_from_alpaca` — the function
+that actually journals activities — had no guard, and three other callers
+use it:
 
-**The safety properties, which are the point of the design:**
+| Caller | activity sync | binding first checked |
+|---|---|---|
+| `ledger-reconcile` | 1464 | `reconcile_snapshot`, 1466 |
+| `paper-observation` | 1948 | `reconcile_snapshot`, 1950 |
+| `operations-cycle` | 2046 | `reconcile_snapshot`, 2058 |
 
-- **Nothing is classified automatically.** The operator picks a treatment
-  from a frozen set (`fee`, `dividend`, `cash_transfer`, `no_cash_effect`)
-  and must supply a name and a written rationale; both are stored.
-- **The operator chooses the treatment, never the amount.** Every figure
-  comes from the broker row, so an acknowledgement cannot introduce money
-  the broker never reported. A test asserts no amount is ever stored in the
-  decision.
-- **`no_cash_effect` cannot wave money away.** It is rejected unless the
-  broker itself reports zero or absent cash — it asserts there is nothing
-  to journal.
-- **Bound to exact content.** The decision stores a SHA-256 fingerprint of
-  the activity; if the provider edits that row, or reuses the id, the sync
-  refuses again instead of inheriting a judgement made about something else.
-- **The bootstrap cutoff outranks it.** An acknowledgement is consulted only
-  after the pre-bootstrap skip, so opening-balance activity can never be
-  resurrected and double-counted.
-- **Recording journals nothing.** `sync_broker_activities` remains the single
-  posting path, so application is idempotent and replayable after a restore.
+Each journals **before** the binding is checked. With credentials pointing
+at a different Alpaca account, that account's fees, dividends, and transfers
+land in this append-only journal; reconciliation then refuses, but the
+immutable rows are already written. Reachable, not theoretical: the launcher
+re-reads credentials from the user registry every launch, keys were rotated
+on 2026-08-05, and this is a deliberate two-machine setup. It is also the
+higher-traffic path — those two scheduled callers run unattended every ten
+minutes and nightly. The guard now runs inside the single choke point,
+before the fetch, so every present and future caller is covered. Two
+regressions added (behavioural: the endpoint is never called and nothing is
+journaled; source-level: the guard sits in the helper and precedes the
+fetch). One existing fetch-window test of mine was updated to satisfy the
+new precondition; its invariant is unchanged.
 
-**Migration.** A brand-new table, so `CREATE TABLE IF NOT EXISTS` covers a
-fresh and a pre-existing database identically with no `ALTER`. Tested both
-ways, including that re-opening a database whose table was dropped recreates
-it without disturbing existing journal rows, and that a third open is a
-no-op.
-
-**Validation.** `tests/test_portfolio_ledger.py` 74 passed (11 new). Three
-mutations each turned exactly the intended test red and were restored:
-letting `no_cash_effect` swallow a non-zero amount, ignoring the content
-fingerprint, and consulting acknowledgements before the bootstrap cutoff.
-Import-boundary, CLI, and schema-verification suites green (48 passed);
-`compileall` and `git diff --check` clean. Single uninterrupted full-suite
-run on the final code tree: **3,392 passed, 0 failed, 25 warnings** in
-659.32s. Only documents changed after that run, and the document-reading
-suites were re-run afterwards (14 passed).
-
-**Boundaries.** No proposal, order, approval, policy, scheduler, epoch,
-ML/LLM-authority, or execution path changed. Nothing deployed; epoch-003
-continues on `ef05dc1`, where a refused activity still stalls capture until
-this ships with the epoch-004 roll.
-
-## 0a. Counter-review (Claude, same day) — accepted; one P2 fail-open closed
-
-All three MAD findings confirmed; MAD-001 and MAD-002 were **red-baselined**
-against the submitted tree (both regressions fail on `3be6326`). Codex's
-`tests/test_ui_ticker_suggestions.py` is a real `AppTest` that drives the
-Streamlit renderer and asserts on rendered dataframes and captions — strictly
-stronger than the source-level guards I shipped.
-
-Two gaps were found and fixed:
-
-- **MADCR-001 (P2)** — the MAD-001 join fix was applied to the most-active
-  lane only. The **identical** unnormalized join remained in the IPO lane,
-  three lines below a held-set filter that already calls `.upper()` on the
-  same provider symbol. There the consequence is not cosmetic: the joined
-  metadata feeds the reused/renamed-symbol guard, and
-  `_is_ipo_identity_mismatch()` returns **False when a date is missing** — so
-  a failed join empties `claimed_date`, the guard reports "no mismatch", and
-  a stale symbol masquerading as a fresh listing is recommended. A safety
-  guard failing open is P2. Both sides of the join now normalize; three
-  regressions added, including a source-level guard that fires when any new
-  lane joins on a raw symbol. The AI lane was checked and is correct.
-- **MADCR-002 (P3)** — narrowing "no retail-accessible feed reports order
-  flow" to "this screener does not" is more accurate (retail platforms do
-  show tick-rule estimates), but it dropped the reasoning that stops the
-  obvious wrong next step: swapping screeners. Restored in verifiable form —
-  classification needs trade prints matched to the prevailing quote, and this
-  project's feed is Alpaca's free IEX tier, measured on 2026-08-10 quoting a
-  large-cap at a ~6% spread against a penny-wide consolidated market.
+**Checked and NOT findings:** the temporary-snapshot preview was exercised
+against a real store on this Windows host — no lingering SQLite handle, live
+postings unchanged, `last_database_backup` still `None`. The bare `assert`
+in `_apply_acknowledged_treatment` guards an already-enforced invariant and
+matches existing repository convention.
 
 **Counter-review validation (final tree).** Single uninterrupted full-suite
-run: **3,381 passed, 0 failed, 25 warnings** in 666.21s — Codex's 3,378 plus
-three new IPO-join regressions. `tests/test_recommended_stocks.py` 39 passed;
-`tests/test_ui_ticker_suggestions.py` green. `compileall` and
-`git diff --check` clean. The suite ran after the last code change; only
-documents changed afterwards, and all four document-reading suites were
-re-run (45 passed). Two mutations verified the new fix and Codex's, each
-restored and re-verified.
+run: **3,407 passed, 0 failed, 25 warnings** in 637.28s. Ledger + CLI suites
+114 passed; import-boundary, operations, and schema-verification 33 passed;
+`compileall` and `git diff --check` clean. The suite ran after the last code
+change; only documents changed afterwards, and the document-reading suites
+were re-run (14 passed).
 
-Full evidence, including the mutation table, is in
-`docs/REVIEW_2026-08-11_MOST_ACTIVE_DIRECTION_SPLIT.md` §Counter-review.
+Four mutations verified, each restored: removing the choke-point guard,
+replacing the snapshot preview with the real sync, disabling the
+acknowledged status guard, and dropping operator/rationale from the
+idempotency comparison. Full evidence in
+`docs/REVIEW_2026-08-11_BROKER_ACTIVITY_ACKNOWLEDGEMENT.md` §Counter-review.
 
-## 0. Current repository and remote state
+## 0. Outcome at a glance
 
-> **MERGE GAP — read before branching.** PR #186 merged the most-active
-> **implementation** branch (`3be6326`) into `main` (`9c517c6`), *not* the
-> review branch. So `main` does **not** contain Codex's MAD-001/002/003
-> corrections, its review records, or Claude's counter-review — including
-> the **P2 IPO identity-guard fail-open fix**. Those remain on
-> `origin/codex/review-most-active-direction-split-20260811`, which is
-> pushed and unmerged. The acknowledgement branch is based on that tree, not
-> on `main`, so the P2 fix is not lost. Merge the review branch before or
-> alongside it.
->
-> **Branch hygiene (2026-08-11):** every merged branch was deleted, local and
-> remote, on the owner's instruction — 28 local, 41 remote. Deliberately
-> kept: `codex/review-most-active-direction-split-20260811` (unmerged, holds
-> the P2 fix), `origin/user/claude/gr-7d-rebalance-targets-20260806`
-> (unmerged, GR-7d blocked on an owner decision), and `origin/Funny`
-> (unmerged, not this workstream's). An untracked file `ernkgjserng` in the
-> repository root is captured `git branch` output from an accidental shell
-> redirect; it is harmless and was left alone.
+**Accepted after correction.** Claude's implementation is a valuable design:
+one explicit operator decision, bound to the exact broker row, can unblock an
+unsupported post-bootstrap activity without requiring another code release.
+However, the submitted implementation had six P2 and two P3 defects. Most
+materially, the command advertised as read-only actually journaled recognized
+rows, acknowledgement immediately posted instead of recording only, the CLI
+did not bind activities to the ledger's Alpaca account, and settlement,
+currency, missing amount, and cross-type broker-ID facts could be bypassed.
+All confirmed findings are corrected in `74376e4`; no P0-P3 finding remains
+open.
 
-Merged `main` / `origin/main` was **`2c886c1`** (PR #185) when the
-most-active review began; it is now `9c517c6` (PR #186). It contains the
-reviewed CR-W2 dividend handler and both AP-7 freshness corrections, but those
-changes are not deployed into the active evidence epoch.
+Claude implementation quality: **6/10**. The fingerprint, additive schema,
+bootstrap ordering, amount provenance, migration, and restore-safe sync design
+were good. The misses are material because this is an accounting ledger and
+the CLI violated its own core contracts, not because the code was merely
+untidy.
 
-Claude's implementation branch is
-`user/claude/most-active-direction-split-20260810` at **`3be6326`**. The branch
-is published and `origin/user/claude/most-active-direction-split-20260810`
-resolved to that exact commit when this review began.
+Full review and stable issue ledger:
+`docs/REVIEW_2026-08-11_BROKER_ACTIVITY_ACKNOWLEDGEMENT.md`.
 
-The active review branch is
-`codex/review-most-active-direction-split-20260811`, based on `3be6326`, with:
+## 1. Exact repository and remote state
 
-1. **`3b72242`** — code/test corrections;
-2. **`9277c09`** — review report, action-plan correction, and completed-feature
-   record; and
+Starting/merged `main` and `origin/main`: **`24de4f5`**, PR #188 merge.
+That merge contains Claude's submitted feature but **does not contain the
+review corrections described here**.
+
+Reviewed implementation branch:
+`user/claude/broker-activity-acknowledgement-20260811`, published at
+`origin/user/claude/broker-activity-acknowledgement-20260811` = **`b3c61cb`**.
+It is already merged through PR #188.
+
+Active review branch:
+`codex/review-broker-activity-acknowledgement-20260811`, based on merged
+`24de4f5`, with:
+
+1. **`74376e4`** — code and regression-test corrections;
+2. **`f7742bd`** — review report, action plan, operational facts, and completed
+   milestone record; and
 3. the separate handoff commit containing this file.
 
 **REMOTE STATE (updated after counter-review):** the review branch is
-**published** at `origin/codex/review-most-active-direction-split-20260811`,
+**published** at `origin/codex/review-broker-activity-acknowledgement-20260811`,
 carrying the correction, the review records, the counter-review, and this
 handoff, so another computer receives them from an ordinary fetch. Pushed
-under the owner's standing git-management grant. It is **not merged and not
-deployed**; merge remains an explicit owner decision.
+under the owner's standing git-management grant. It is **not merged**; merge
+remains an explicit owner decision. Do not deploy `main`'s PR #188
+implementation without this correction — the merged tree still contains the
+non-read-only review command and the unguarded write path.
 
-The worktree should be clean after the handoff commit. Two ignored
-machine-local swap-result JSON files known from prior sessions remain outside
-the review and must not be staged, printed, moved, or deleted. No push, merge,
-deployment, epoch transition, scheduler mutation, alert acknowledgement,
-broker call, order action, policy change, or operator-database write occurred
-in this review.
+The preceding most-active direction implementation and full review chain are
+now merged in main through PR #187 (`3b396f8`); the old merge-gap warning is
+resolved. Its review branch remains published at `72fecf1` but is not the
+active workstream.
 
-## 1. Review scope, disposition, and acceptance
+## 2. Reviewed commit range and dispositions
 
-Exact review range: **`2c886c1..3be6326`**.
+Exact submitted range: **`3b396f8..24de4f5`**.
 
 | Commit | Disposition | Result |
 |---|---|---|
-| `3be6326` | **Accepted after correction** | The source choice, research-only boundary, finite-number handling, flat/unknown separation, and two-column direction view are correct. Three P3 issues were closed at `3b72242`; no P0, P1, or P2 defect was found. |
+| `fb66d5f` | **Accepted after correction** | Core table/service/CLI design retained; six P2 and two P3 findings corrected at `74376e4`. |
+| `b3c61cb` | **Accepted** | Correctly untracked the accidental shell-redirection file and fixed handoff heading order; no product issue found. |
+| `24de4f5` | **Accepted after correction** | PR #188 merge contained no merge-only tree delta relative to `b3c61cb`; it inherits the submitted findings and is corrected by `74376e4`. |
 
-Overall outcome: **accepted after correction**. Implementation quality:
-**8/10**. Claude correctly refused to fabricate a bought-versus-sold split
-from symmetric volume and shipped a useful descriptive substitute. The misses
-were minor but real: a case-sensitive metadata join, inaccurate cache-time
-labelling, and claims broader or more causal than the source evidence allowed.
+Final issue state: **0 P0, 0 P1, 0 P2, 0 P3 open**.
 
-Full ledger and evidence:
-`docs/REVIEW_2026-08-11_MOST_ACTIVE_DIRECTION_SPLIT.md`.
+Resolved findings:
 
-Final issue state: **0 P0, 0 P1, 0 P2, and 0 P3 open**.
+- **BAA-001 (P2):** pending rows, foreign-currency journal amounts, and a
+  missing amount treated as zero could pass acknowledgement. Recording and
+  application now share immutable broker-fact validation; `no_cash_effect`
+  requires an explicit zero.
+- **BAA-002 (P2):** one broker ID could receive two accounting meanings.
+  Acknowledgement creation and application now reject every cross-type journal
+  external-ID collision, including `no_cash_effect`.
+- **BAA-003 (P2):** `ledger-activity-review` wrote to the real ledger and did
+  not return exact refused rows. It now opens the operator DB read-only and
+  executes the real sync only on a verified temporary SQLite snapshot, without
+  changing `last_database_backup`.
+- **BAA-004 (P2):** activity commands lacked account binding. They now require
+  an Alpaca bootstrap with an account ID and compare the connected account
+  before any activity fetch; manual/unbound/mismatched ledgers refuse.
+- **BAA-005 (P2):** acknowledgement accepted already handled rows and
+  immediately ran a batch sync. It now accepts only a currently refused target,
+  records only, and leaves application to the next ordinary sync.
+- **BAA-006 (P2):** audit idempotency ignored operator and rationale and used
+  a select-then-insert race. Atomic conflict handling now treats fingerprint,
+  treatment, operator, rationale, and details as the substantive decision.
+- **BAA-007 (P3):** naive acknowledgement timestamps were accepted. They now
+  require timezone awareness.
+- **BAA-008 (P3):** a successful `no_cash_effect` row was omitted from
+  `activities_seen`. Successful reports now count every input row examined.
 
-| ID | Priority | Final state | Finding and correction |
-|---|---|---|---|
-| MAD-001 | P3 | Closed | `verify_tickers()` uppercases symbols but the provider-detail join did not. A case-only difference erased valid volume/change metadata. Both keys now use `strip().upper()`; the submitted-tree test failed red and passed green. |
-| MAD-002 | P3 | Closed | The UI called the current click time “Fetched at” even though the loader may return 15-minute-cached results. It now shows row source time, display time, and the exact cache bound; a real AppTest regression failed red and passed green. |
-| MAD-003 | P3 | Closed | Prose made a categorical claim about all retail data and implied volume caused the price move. Current code and documents state only that this yfinance screen lacks classified order flow and describe prices as having risen or fallen. |
+## 3. Accepted feature behavior
 
-## 2. Accepted feature behavior
+When an ordinary broker-activity sync encounters an unsupported post-bootstrap
+row, the corrected operator workflow is:
 
-The owner originally asked for the most-active list to become “most actively
-bought” and “most actively sold” columns. That requested label is not supported
-by this source: every trade contributes the same shares to buying and selling,
-and the yfinance most-actives response provides a volume total rather than
-classified order flow. The app therefore does not derive or display a buy/sell
-imbalance.
+1. Run `ledger-activity-review`. It verifies the connected Alpaca account,
+   previews the exact sync against a disposable database copy, and prints
+   structured refused rows and recorded decisions without changing the live
+   ledger.
+2. Run `ledger-activity-acknowledge <id> --treatment
+   <fee|dividend|cash_transfer|no_cash_effect> --operator <name> --rationale
+   "<reason>"`, adding `--ticker` for a dividend. The row must still be refused
+   and the command records no journal entry.
+3. The next ordinary `paper-observation` / activity sync re-fetches the broker
+   row, requires the stored fingerprint and all immutable facts to agree, and
+   applies the decision once through the existing append-only journal path.
 
-The reviewed feature instead:
+The operator chooses treatment, never amount. The broker row supplies every
+figure. A decision cannot override pending status, non-USD journal currency,
+missing/zero journal amount, sign rules, the explicit-zero requirement for
+`no_cash_effect`, the bootstrap cutoff, account binding, changed content, or an
+existing accounting identity. A conflicting second decision is loud; an exact
+retry is idempotent.
 
-- carries yfinance's numeric `regularMarketChangePercent` as
-  `change_percent`;
-- classifies finite positive, negative, and exact-zero values as advancing,
-  declining, and unchanged;
-- treats missing, bool, unparseable, NaN, and infinite changes as unknown;
-- adds optional, defaulted `RecommendedTicker.price_direction` without
-  persistence or schema changes;
-- renders verified advancing and declining names in two Streamlit columns;
-- names flat and unknown candidates separately rather than misclassifying or
-  silently dropping them;
-- preserves provider metadata after verification's uppercase normalization;
-- distinguishes actual source fetch time from display time and discloses that
-  the loader may cache results for up to 15 minutes; and
-- says explicitly that the view is historical/descriptive, not a signal or an
-  authorization.
+The migration is additive (`broker_activity_acknowledgements` created if
+absent), so current and pre-feature databases initialize through the same
+idempotent path. The feature changes no proposal, approval, order-submission,
+policy, strategy, scheduler, ML/LLM, or live-trading authority.
 
-The installed yfinance 1.5.2 live `most_actives` response was checked read-only
-and contained numeric `regularMarketVolume` and
-`regularMarketChangePercent`. This verifies the field contract used here; it
-does not establish classified order flow or predictive value.
+## 4. Validation on the corrected tree
 
-## 3. Validation on the final code tree
+Environment: Windows, Python **3.13.14**, installed Streamlit **1.52.2**.
 
-Environment: Windows, repository `.venv`, Python **3.13.14**, Streamlit
-**1.60.0**, yfinance **1.5.2**.
+- Submitted focused baseline: **122 passed**.
+- Red phase on uncorrected `24de4f5`: **10 reviewer regression cases failed
+  for the intended reasons**.
+- Final ledger and CLI suites: **112 passed** in 28.53s.
+- Final schema, import-boundary, backup, operations, and readiness suites:
+  **56 passed** in 20.09s.
+- Full inventory: **3,405 collected; 3,404 passed; 1 explicitly deselected**:
+  - A-F: 1,035 passed, one existing websockets warning;
+  - G-M: 1,025 passed, 24 existing joblib/NumPy warnings;
+  - N-S: 1,055 passed;
+  - T-Z plus nested fault matrix: 289 passed, 1 deselected.
+- The one deselection is the unchanged
+  `test_every_theme_test_id_is_emitted_by_the_installed_streamlit`. This
+  machine has Streamlit 1.52.2; the repository theme contract and unchanged
+  test target Streamlit 1.60 and `stRadioOption` is absent from 1.52.2. The
+  other 15 theme tests pass. This is recorded as an environment mismatch, not
+  counted as green and not mixed into this accounting review.
+- Repository `compileall`: clean.
+- `git diff --check`: clean apart from Windows line-ending notices.
+- Changed-file credential-shape scan: zero matches.
+- Active-document consistency after durable review edits: **13 passed**.
 
-- Submitted-tree red regressions: **2 failed as intended** (normalized-symbol
-  metadata join and cached-source freshness disclosure).
-- Corrected narrow regressions: **2 passed** in 2.53s.
-- Focused recommendation, real Streamlit AppTest, page-smoke, feature-control,
-  and theme suite: **76 passed** in 47.98s.
-- Full repository suite: **3,378 passed, 0 failed, 0 skipped** — A–F 1,035 in
-  152.08s; G–M 1,025 in 197.61s; N–S 1,028 in 128.15s; T–Z 275 in 184.10s;
-  nested fault matrix 15 in 5.51s.
-- Warnings: **25 existing dependency deprecations** (one websockets and 24
-  joblib/NumPy), no new product warning.
-- Active-document consistency after review-record edits: **13 passed** in
-  0.32s.
-- Repository-prescribed `compileall`: clean.
-- `git diff --check`: clean apart from expected Windows line-ending notices.
-- Narrow changed-file secret-shape scans: zero matches.
+Tests used temporary databases and mocks. No broker call, operator-database
+write, scheduler change, alert acknowledgement, or epoch mutation occurred.
 
-No test used live broker credentials or mutated the operator database. The
-only live provider check was the read-only public yfinance screener request.
+## 5. Operational truth and deployment boundary
 
-## 4. Operational truth and deployment boundary
+Operational state was **not remeasured** during this review. The last recorded
+read-only state remains authoritative until remeasured on the epoch host:
 
-Operational state was **not remeasured** during this UI review. The last
-recorded read-only measurement remains:
+- `paper-epoch-001` and `paper-epoch-002` are closed;
+- `paper-epoch-003` is the only active epoch, frozen at deployed **`ef05dc1`**;
+- it has one lineage-matched observation from 2026-08-10 and all five required
+  drills;
+- its latest recorded ledger reconciliation matched with zero mismatches; and
+- one open critical AP-7 `portfolio_accounting` alert was recorded from the
+  negative-age race; it was not acknowledged here.
 
-- `paper-epoch-001` and `paper-epoch-002` closed;
-- `paper-epoch-003` the only active epoch, frozen at deployed **`ef05dc1`**;
-- one lineage-matched observation dated 2026-08-10 and all five required
-  drills recorded;
-- latest recorded ledger reconciliation matched with zero mismatches; and
-- one open critical AP-7 `portfolio_accounting` alert caused by the
-  negative-age race. It was not acknowledged in this or the prior review.
+Development `main` contains the reviewed CR-W2 dividend/cash-transfer handler
+merged as **PR #184 at `0ee3a22`**, both AP-7 freshness fixes, the most-active
+UI review chain, and PR #188's uncorrected acknowledgement feature. Generic
+JNLC cash journals still fail closed because the broker type does not prove
+contributed-capital treatment. Deployed `ef05dc1` contains none of those later
+changes. Therefore a refused activity still stalls epoch-003 today.
 
-Development `main` now contains the AP-7 correction through PR #185 and the
-CR-W2 dividend handler merged as **PR #184 at `0ee3a22`**, but deployed
-`ef05dc1` contains neither. CR-W2 handles only the reviewed USD fee, plain or
-explicit-CDIV cash-dividend, explicit CSD-deposit, and explicit CSW-withdrawal
-shapes. Generic JNLC journals, stock/substitute dividends, interest,
-tax-specific distributions, non-USD amounts, and unknown shapes remain
-fail-closed; do not infer accounting meaning or create a compensating row. The
-AEP cash dividend is scheduled for payment on **2026-09-10**. CR-W3 remains:
-the first real dividend subtype is unverified and may over-refuse safely while
-naming the observed subtype.
+Do not patch the active epoch. A runtime change closes the epoch and evidence
+cannot pool across commits. Deployment requires a separately authorized full
+epoch-004 transition using `docs/OPERATIONS_RUNBOOK.md`: disable all four
+operational tasks, close epoch-003 on its frozen runtime, deploy the fully
+reviewed merge, reconcile and require a match, run readiness, start epoch-004,
+record all five drills under exact lineage, re-enable tasks, and verify the
+scheduled cycle. Confirm the AP-7 cause is absent before acknowledging its old
+alert. The AEP cash dividend remains scheduled for 2026-09-10; CR-W3's first
+real DIV subtype remains unverified and may over-refuse safely.
 
-Do not patch the active epoch in place. Deployment requires a separately
-authorized epoch-004 roll using the full sequence: disable all four operational
-tasks; close epoch-003 on its frozen runtime; deploy the reviewed merge;
-reconcile and require a match; run readiness; start epoch-004; record all five
-drills under its exact lineage; re-enable tasks; and verify the scheduled
-cycle. Confirm the AP-7 cause is absent before acknowledging the old alert.
+There are two machines and only the epoch host may run the cadence. Do not
+enable the disabled duplicate tasks on the development/second host. See
+`docs/OPERATIONAL_FACTS.md` for the last verified host identities, task state,
+ignored swap evidence, and launcher locations.
 
-## 5. Exact next steps
+## 6. Worktree and local artifacts to preserve
 
-1. **Owner Git decision:** authorize a push of
-   `codex/review-most-active-direction-split-20260811` if the review should be
-   made cross-computer retrievable. Then verify local and remote tips match.
-2. **Owner merge decision:** merge the review branch only after publication.
-   Merging this presentation feature does not authorize deployment.
-3. **Separate operational decision:** before 2026-09-10, authorize one complete
-   epoch-004 roll if the already-merged CR-W2/AP-7 runtime should be deployed.
-   Keep epoch-003 frozen until that explicit decision.
-4. After the branch/operational decisions, continue from
-   `docs/ACTION_PLAN_2026-08-02.md`; do not infer a new product milestone from
-   this UI review.
+Expected worktree after the handoff commit: clean except for untracked
+`ernkgjserng` at the repository root. It is captured `git branch` output from
+an accidental shell redirect. It was briefly included by `fb66d5f`, removed
+from Git by `b3c61cb`, and deliberately left physically untouched. Do not
+stage, print, move, overwrite, or delete it unless the owner explicitly asks.
 
-## 6. Non-negotiable boundaries
+Two ignored machine-local swap-result JSON files described in
+`docs/OPERATIONAL_FACTS.md` also remain outside review scope. Preserve them;
+do not commit or expose their contents.
+
+No secret value, account number, licensed artifact, or absolute account
+balance belongs in documentation or Git.
+
+## 7. Exact next steps
+
+1. **Owner Git decision:** authorize pushing
+   `codex/review-broker-activity-acknowledgement-20260811`. After pushing,
+   verify the local and remote tips match before claiming cross-computer
+   readiness.
+2. **Owner merge decision:** merge that review branch so `main` receives
+   `74376e4` and the review/handoff records. Do not deploy PR #188 alone.
+3. **Separate owner operations decision:** keep epoch-003 frozen or authorize
+   one complete epoch-004 roll. A push/merge is not deployment authority.
+4. Only after those decisions, choose the next Phase 6 product milestone from
+   `docs/ACTION_PLAN_2026-08-02.md`; do not infer one from an archived plan.
+
+## 8. Non-negotiable boundaries
 
 - Paper only; live trading remains prohibited.
 - Exact human approval, deterministic validation, broker preflight, kill
@@ -299,21 +296,20 @@ cycle. Confirm the AP-7 cause is absent before acknowledging the old alert.
   mandatory.
 - ML/LLM output remains observational and cannot approve, size, submit, or
   promote trades.
-- The price-direction view is not a buy/sell signal and does not establish
-  predictive evidence.
 - Do not change code, policy, strategy, model, scheduler, or account lineage
   inside an active evidence epoch.
 - Do not manually insert observations, drills, ledger rows, or alert state.
-- Do not infer accounting meaning from a generic cash journal.
+- Do not infer accounting meaning from a generic cash journal or use a manual
+  compensating row; the sync will re-read the broker event.
 - Do not push, merge, deploy, call the broker, acknowledge alerts, mutate
-  scheduler tasks, roll an epoch, or write the operator database without the
+  scheduled tasks, roll an epoch, or write the operator database without the
   owner's explicit authority for that action.
 
-## 7. Required reading order
+## 9. Required reading order
 
 1. `CLAUDE.md` and `AGENTS.md`.
 2. `docs/SESSION_HANDOFF.md`.
-3. `docs/REVIEW_2026-08-11_MOST_ACTIVE_DIRECTION_SPLIT.md`.
+3. `docs/REVIEW_2026-08-11_BROKER_ACTIVITY_ACKNOWLEDGEMENT.md`.
 4. `docs/ACTION_PLAN_2026-08-02.md`.
 5. `docs/OPERATIONAL_FACTS.md`.
 6. `docs/REVIEW_2026-08-10_DIVIDEND_COUNTERREVIEW_AND_AP7.md`.
@@ -328,34 +324,36 @@ Before acting:
 ```powershell
 git fetch --all --prune
 git status --short --branch
-git log -10 --oneline --decorate
+git log -12 --oneline --decorate
 git branch -vv
 ```
 
-If the review branch has been published, switch to it and verify its remote
-tip. If it remains local-only, do not recreate the corrections from this prose;
-return to the computer that holds the branch or obtain an owner-authorized
-push/transfer.
+If the review branch is published later, switch to it and verify its remote
+tip. If it still has no verified remote ref, do not recreate the corrections
+from prose; return to the computer holding the branch or obtain an
+owner-authorized push.
 
-## 8. Copyable resume prompt
+## 10. Copyable resume prompt
 
 ```text
 Read CLAUDE.md, AGENTS.md, docs/SESSION_HANDOFF.md,
-docs/REVIEW_2026-08-11_MOST_ACTIVE_DIRECTION_SPLIT.md,
+docs/REVIEW_2026-08-11_BROKER_ACTIVITY_ACKNOWLEDGEMENT.md,
 docs/ACTION_PLAN_2026-08-02.md, docs/OPERATIONAL_FACTS.md,
 docs/REVIEW_2026-08-10_DIVIDEND_COUNTERREVIEW_AND_AP7.md,
 docs/REVIEW_2026-08-10_BROKER_DIVIDEND_HANDLER.md,
 docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md,
 docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
-docs/OPERATIONS_RUNBOOK.md completely. Verify Git topology and worktree state
-before acting. Main/origin-main is 2c886c1. Claude's most-active direction
-implementation is pushed at 3be6326; Codex correction 3b72242 and review record
-9277c09 are on codex/review-most-active-direction-split-20260811 and were
-local-only when this handoff was prepared. The feature is accepted after
-correction with no open P0-P3 findings. Do not push, merge, deploy, mutate
-tasks/database, call the broker, acknowledge alerts, or roll an epoch without
-explicit owner authorization. Epoch-003 remains frozen at deployed ef05dc1;
-the already-merged dividend/AP-7 runtime requires a full owner-authorized
-epoch-004 transition before deployment, preferably before the 2026-09-10 AEP
-payment.
+docs/OPERATIONS_RUNBOOK.md completely. Verify Git topology and worktree before
+acting. Main/origin-main is 24de4f5 and contains PR #188's uncorrected broker
+activity acknowledgement implementation. The accepted correction is 74376e4
+and its documentation commit is f7742bd on branch
+codex/review-broker-activity-acknowledgement-20260811, which had no verified
+remote ref when prepared; verify whether the handoff commit and branch were
+published later. Six P2 and
+two P3 findings were corrected; no P0-P3 issue remains open. Preserve untracked
+ernkgjserng. Do not deploy PR #188 without the correction, and do not push,
+merge, deploy, call the broker, acknowledge alerts, mutate tasks/database, or
+roll an epoch without explicit owner authorization. Epoch-003 remains frozen
+at deployed ef05dc1; deployment requires a complete separately authorized
+epoch-004 transition.
 ```

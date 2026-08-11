@@ -79,7 +79,43 @@ for separating a tech style bet from selection — never as the record.
 
 Not derivable from the repository, and expensive to rediscover.
 
-### `paper-epoch-003` is active; the AP-6 swap was executed (2026-08-10)
+### `paper-epoch-004` is active; the epoch-004 roll was executed (2026-08-11)
+
+Owner-authorized and executed in runbook order: tasks disabled →
+`paper-epoch-003` closed at 22:14:52Z on its frozen `ef05dc1` runtime (1
+observation, 0 orders, 5/5 drills — that session is discarded, the known cost
+of rolling) → deployed `ef05dc1` → **`b837374`** (PR #189; `requirements.txt`
+unchanged) → `ledger-reconcile` **matched, 0 mismatches**, 15 positions →
+readiness `ready: true` → **`paper-epoch-004` started 22:15:53Z** with
+unchanged mandate/policy/strategy/model lineage → **5/5 drills recorded** →
+tasks re-enabled and the scheduled path proven by a manual `operations-cycle`
+(20 activities seen, 3 fee duplicates on idempotent replay, matched, healthy).
+
+**AP-7 is confirmed fixed in production.** Both freshness alerts were last
+seen BEFORE the deploy and did not reopen across two `operations-cycle` runs
+on the new code; both were acknowledged and **0 alerts remain open**. The two
+were the critical `portfolio_accounting` alert (1,888 occurrences — the
+`operations.py` site) and the warning `reconciliation_freshness` alert (7
+occurrences — the `readiness.py` site that the review missed and
+counter-review DCCR-CR-002 added). That second one had been firing in
+production, so the finding was not hypothetical.
+
+What this deployment closed: CR-W2 dividend/cash-movement ingestion, both
+AP-7 freshness sites, the MADCR-001 IPO identity-guard fail-open, and the
+operator acknowledgement path.
+
+**CR-W3 is no longer an epoch-killer.** The AEP dividend is payable
+**2026-09-10**. If it arrives with a subtype outside the `""`/`CDIV`
+allowlist, that night's capture fails closed and names the subtype; recovery
+is `ledger-activity-review`, then `ledger-activity-acknowledge <id>
+--treatment dividend --operator <you> --rationale "<why>" --ticker AEP`, then
+the next capture proceeds. **No deploy, no epoch roll.** Generic `JNLC` cash
+journals still fail closed by design and are handled the same way.
+
+### `paper-epoch-003` ran here; the AP-6 swap was executed (2026-08-10)
+
+*(Superseded 2026-08-11: epoch-003 was closed by the epoch-004 roll above.
+Retained because the AP-6 diagnosis and swap procedure remain the reference.)*
 
 The AP-6 stall (three uningested post-bootstrap CAT fees, $0.03 cash
 mismatch, every capture since 2026-08-07 refused) was repaired by the

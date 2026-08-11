@@ -55,8 +55,9 @@ through GR-7c are also complete. What remains incomplete is GR-6, GR-7d, the
 allocation service, every AI *product* plan beyond the committee (strategy
 authoring, debate, and MCP), and — most importantly — enough **elapsed frozen-
 epoch evidence**: `paper-epoch-001` and `paper-epoch-002` are closed, and
-`paper-epoch-003` is active since 2026-08-10 on the epoch host at deployed
-commit `ef05dc1`, bound to `my_policy.json`.
+`paper-epoch-003` is closed, and **`paper-epoch-004` is active since
+2026-08-11** on the epoch host at deployed commit `b837374`, bound to
+`my_policy.json`.
 Development changes in this checkout are not deployed into that epoch.
 **Update 2026-08-10 (executed):** epoch-002 stalled at 1 session on
 uningested broker CAT fees (defect AP-6 below). The fix was independently
@@ -64,7 +65,7 @@ corrected (`a8174b9`), counter-reviewed and accepted in full, merged as
 **PR #182** (`ef05dc1`), and the owner-authorized epoch swap was executed
 the same day: epoch-002 **closed**, the merged tree **deployed**,
 `ledger-reconcile` **matched on the first run** (the three CAT fees posted
-exactly once), and **`paper-epoch-003` is active** at `ef05dc1` with the
+exactly once), and **`paper-epoch-003` was started** at `ef05dc1` with the
 same mandate/policy/strategy/model lineage, **all five required drills
 passed and recorded**, tasks re-enabled, a manual operations-cycle green,
 and zero open alerts at swap completion. The first scheduled post-close
@@ -74,6 +75,20 @@ zero, and the scheduler returned success. The 60-session / 30-order minimums
 are now accumulating from that first post-swap capture. The scarcest
 resource on the critical path is not engineering — it is elapsed calendar time on that
 frozen runtime, plus a small number of owner decisions and data purchases.
+
+**Epoch-004 roll EXECUTED 2026-08-11 (owner-authorized).** epoch-003 closed
+at 22:14:52Z on its frozen runtime with 1 discarded observation; merged
+`b837374` (PR #189) deployed; `ledger-reconcile` matched with 0 mismatches;
+readiness green; `paper-epoch-004` started 22:15:53Z with unchanged lineage;
+**5/5 drills recorded**; tasks re-enabled and a manual operations-cycle
+verified green. This single roll deployed CR-W2 dividend ingestion, both
+AP-7 freshness sites, the MADCR-001 IPO fail-open fix, and the operator
+acknowledgement path. **AP-7 confirmed fixed in production:** both alerts
+stopped re-raising across two cycles on the new code and were acknowledged —
+**0 open alerts**. The 60-session / 30-order clock restarts at the first
+post-swap capture. With the acknowledgement path live, an unsupported broker
+activity now costs one explicit operator decision instead of the accumulated
+run, so **CR-W3 is a watch item rather than an epoch-killer**.
 
 ---
 
@@ -337,7 +352,7 @@ owner's specific direction.
 
 **Phase 5 — operational deployment + epoch start (COMPLETE AGAIN after the
 2026-08-10 AP-6 swap; `paper-epoch-001` and `paper-epoch-002` closed;
-`paper-epoch-003` active on the epoch host at `ef05dc1`; see
+`paper-epoch-003` started on the epoch host at `ef05dc1` (since closed by the 2026-08-11 roll); see
 `docs/SESSION_HANDOFF.md` §0 for the executed sequence):**
 merge the independently reviewed approved mandate → pin the model-2
 operational checkout → elevated scheduler window under the owner's account →

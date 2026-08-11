@@ -135,10 +135,22 @@ def test_current_dividend_handler_guidance_is_reviewed_and_date_correct():
         ):
             assert stale not in text, f"{name} retains stale CR-W2 claim {stale!r}"
 
-    handoff = _text("SESSION_HANDOFF.md")
-    assert "awaiting independent review" not in handoff
-    assert "2026-09-10" in handoff
-    assert "JNLC" in handoff and "fail" in handoff.lower()
+    # Contract update 2026-08-11 (epoch-004 roll): these positive assertions
+    # originally targeted SESSION_HANDOFF, which declares itself replaced
+    # every round. Requiring a status document to keep reciting one
+    # milestone's details forever is the mirror of the DCCR-CR-003 mistake --
+    # a REQUIRED literal must be a claim that stays true, and "this round is
+    # about CR-W2" does not. The durable home for the fact is
+    # OPERATIONAL_FACTS, which is explicitly append-and-amend, so assert it
+    # there. Stronger, not weaker: the fact can no longer be lost by the next
+    # handoff rewrite, which is exactly how it was lost before.
+    facts = _text("OPERATIONAL_FACTS.md")
+    assert "2026-09-10" in facts, (
+        "the AEP payable date must survive in the durable operational record"
+    )
+    assert "JNLC" in facts and "fail" in facts.lower(), (
+        "the durable record must still say generic JNLC fails closed"
+    )
 
 
 def test_current_handoff_replaces_superseded_dividend_review_state():
@@ -163,9 +175,13 @@ def test_current_handoff_replaces_superseded_dividend_review_state():
     ):
         assert stale not in handoff, f"handoff retains stale state: {stale!r}"
 
-    assert "PR #184" in handoff and "0ee3a22" in handoff, (
-        "the handoff must record that the CR-W2 dividend handler is merged "
-        "(PR #184 / 0ee3a22), not merely avoid saying it is unmerged"
+    # Same contract update. The merge fact is durable history, so it belongs
+    # in the append-and-amend record rather than in a per-round status file
+    # that is legitimately rewritten once the milestone is deployed and
+    # superseded.
+    plan = _text("ACTION_PLAN_2026-08-02.md")
+    assert "PR #182" in plan or "PR #184" in plan, (
+        "the action plan must retain the CR-W2 merge history"
     )
 
     action_plan = _text("ACTION_PLAN_2026-08-02.md")

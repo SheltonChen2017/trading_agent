@@ -47,6 +47,10 @@ class JournalTransactionConflictError(ValueError):
 class LedgerBootstrapConflictError(ValueError):
     """The portfolio journal cannot accept another opening bootstrap."""
 
+
+class BrokerActivityAcknowledgementConflictError(ValueError):
+    """One broker activity already carries a different operator decision."""
+
 # ML-LR-6 plan 12.2's minimum lineage. Every one of these can change WITHOUT
 # any code change -- a re-fit model, a new report, a swapped provider, an
 # edited config -- and each silently invalidates comparison against earlier
@@ -697,6 +701,22 @@ class AssistantStore:
                     code_commit TEXT NOT NULL,
                     evidence_json TEXT NOT NULL,
                     evidence_hash TEXT NOT NULL
+                );
+                -- CR-W2 follow-up: an operator's explicit accounting decision
+                -- about ONE broker activity the automatic sync refuses. New
+                -- table, so `CREATE TABLE IF NOT EXISTS` migrates a fresh and
+                -- a pre-existing database identically with no ALTER.
+                -- activity_fingerprint binds the decision to the exact broker
+                -- content it was made about: if the provider later changes the
+                -- row, or reuses the id, the decision must not silently apply.
+                CREATE TABLE IF NOT EXISTS broker_activity_acknowledgements (
+                    activity_id TEXT PRIMARY KEY,
+                    activity_fingerprint TEXT NOT NULL,
+                    treatment TEXT NOT NULL,
+                    operator TEXT NOT NULL,
+                    rationale TEXT NOT NULL,
+                    acknowledged_at TEXT NOT NULL,
+                    details_json TEXT NOT NULL
                 );
                 CREATE TABLE IF NOT EXISTS sleeve_watch_states (
                     watch_key TEXT NOT NULL,
@@ -5141,6 +5161,102 @@ class AssistantStore:
             "evidence": evidence,
             "evidence_hash": evidence_hash,
         }
+
+    def record_broker_activity_acknowledgement(
+        self,
+        *,
+        activity_id: str,
+        activity_fingerprint: str,
+        treatment: str,
+        operator: str,
+        rationale: str,
+        acknowledged_at: str,
+        details: dict[str, Any],
+    ) -> bool:
+        """Store one operator accounting decision. True when newly stored.
+
+        Re-recording the identical decision is a no-op (True->False), so a
+        retried command is safe. Re-recording a DIFFERENT decision, or the
+        same decision against changed broker content, raises: an
+        acknowledgement is a durable human judgement about a specific row,
+        not a mutable setting.
+        """
+        details_json = json.dumps(
+            details, sort_keys=True, separators=(",", ":"), default=str
+        )
+        with self._connect() as connection:
+            existing = connection.execute(
+                """
+                SELECT activity_fingerprint, treatment, details_json
+                FROM broker_activity_acknowledgements WHERE activity_id = ?
+                """,
+                (activity_id,),
+            ).fetchone()
+            if existing is not None:
+                if (
+                    existing["activity_fingerprint"] == activity_fingerprint
+                    and existing["treatment"] == treatment
+                    and existing["details_json"] == details_json
+                ):
+                    return False
+                raise BrokerActivityAcknowledgementConflictError(
+                    f"broker activity {activity_id!r} already has a different "
+                    "acknowledgement; review the existing decision instead of "
+                    "overwriting it"
+                )
+            connection.execute(
+                """
+                INSERT INTO broker_activity_acknowledgements(
+                    activity_id, activity_fingerprint, treatment, operator,
+                    rationale, acknowledged_at, details_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    activity_id,
+                    activity_fingerprint,
+                    treatment,
+                    operator,
+                    rationale,
+                    acknowledged_at,
+                    details_json,
+                ),
+            )
+        return True
+
+    def get_broker_activity_acknowledgement(
+        self, activity_id: str
+    ) -> dict[str, Any] | None:
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT activity_id, activity_fingerprint, treatment, operator,
+                       rationale, acknowledged_at, details_json
+                FROM broker_activity_acknowledgements WHERE activity_id = ?
+                """,
+                (activity_id,),
+            ).fetchone()
+        if row is None:
+            return None
+        record = dict(row)
+        record["details"] = json.loads(record.pop("details_json"))
+        return record
+
+    def list_broker_activity_acknowledgements(self) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT activity_id, activity_fingerprint, treatment, operator,
+                       rationale, acknowledged_at, details_json
+                FROM broker_activity_acknowledgements
+                ORDER BY acknowledged_at, activity_id
+                """
+            ).fetchall()
+        records = []
+        for row in rows:
+            record = dict(row)
+            record["details"] = json.loads(record.pop("details_json"))
+            records.append(record)
+        return records
 
     def list_operational_drills(
         self,

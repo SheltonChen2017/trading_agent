@@ -213,7 +213,25 @@ cash flows to the previous session's return interval and a New-Year event
 to the prior tax year), and a prefix-map `KeyError` that escaped the
 fail-closed refusal handler is gone. Details in the review report §7.
 
-**CR-W3 (new watch item):** the DIV subtype allowlist accepts only an
+**Update 2026-08-11 (development only, NOT deployed): CR-W3 stops being an
+epoch-killer.** The operator acknowledgement path on
+`user/claude/broker-activity-acknowledgement-20260811` means a refused
+activity no longer requires a code deploy — and therefore no longer costs
+the accumulated run. When a nightly capture fails on an unsupported
+activity, the recovery is:
+
+1. `ledger-activity-review` — see exactly what refused and why (read-only).
+2. `ledger-activity-acknowledge <id> --treatment <fee|dividend|cash_transfer|no_cash_effect> --operator <you> --rationale "<why>"` (plus `--ticker` for a dividend).
+3. The next `paper-observation` journals it and capture resumes.
+
+You choose the treatment; the amount always comes from the broker row, so
+this cannot invent money. `no_cash_effect` only works on rows the broker
+itself reports as zero. The decision is bound to a fingerprint of the exact
+activity content, so if the provider later changes that row it refuses again
+rather than reusing your judgement. **This is undeployed until the epoch-004
+roll** — on deployed `ef05dc1` a refused activity still stalls the epoch.
+
+**CR-W3 (watch item):** the DIV subtype allowlist accepts only an
 absent subtype or explicit `CDIV`, and no `DIV` activity has ever appeared
 on this account, so the subtype the real AEP payment carries is unverified.
 If it differs, that night's observation fails closed and names the subtype

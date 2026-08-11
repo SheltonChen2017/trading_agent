@@ -83,6 +83,9 @@ from assistant.portfolio_ledger import (
     reconcile_snapshot,
     sync_app_fills,
     sync_broker_activities,
+    acknowledge_broker_activity,
+    ACKNOWLEDGEMENT_TREATMENTS,
+    LedgerError,
 )
 from assistant.macro_context import build_descriptive_macro_context
 from assistant.portfolio_history import (
@@ -1569,6 +1572,82 @@ def command_ledger_transfer(args, store: AssistantStore) -> None:
     )
 
 
+def _fetch_activity_by_id(store: AssistantStore, activity_id: str) -> dict:
+    """The exact broker row for one activity id, or refuse.
+
+    Fetched live rather than typed by the operator: the acknowledgement is
+    bound to the provider's own content, so a typo cannot invent a row and
+    the stored fingerprint always describes what the broker actually sent.
+    """
+    after = None
+    bootstrap = store.get_system_state("ledger_bootstrap")
+    if isinstance(bootstrap, dict) and bootstrap.get("bootstrapped_at"):
+        after = str(bootstrap["bootstrapped_at"])
+    matches = [
+        activity
+        for activity in list_account_activities(after=after)
+        if isinstance(activity, dict) and str(activity.get("id")) == activity_id
+    ]
+    if not matches:
+        raise SystemExit(
+            f"No post-bootstrap broker activity has id {activity_id!r}. "
+            "Run ledger-activity-review to list the exact ids."
+        )
+    if len(matches) > 1:
+        raise SystemExit(
+            f"Broker returned {len(matches)} activities sharing id "
+            f"{activity_id!r}; refusing to acknowledge an ambiguous row."
+        )
+    return matches[0]
+
+
+def command_ledger_activity_review(args, store: AssistantStore) -> None:
+    """Read-only: what the activity sync would refuse, and why."""
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required to review broker activities."
+        )
+    report: dict = {"refused": [], "acknowledged": []}
+    try:
+        _sync_broker_activities_from_alpaca(store)
+        report["refused_count"] = 0
+        report["note"] = "Every post-bootstrap activity is handled or acknowledged."
+    except LedgerError as exc:
+        report["refused_count"] = None
+        report["note"] = str(exc)
+    for record in store.list_broker_activity_acknowledgements():
+        report["acknowledged"].append(
+            {
+                "activity_id": record["activity_id"],
+                "treatment": record["treatment"],
+                "operator": record["operator"],
+                "acknowledged_at": record["acknowledged_at"],
+                "rationale": record["rationale"],
+            }
+        )
+    print(json.dumps(report, indent=2, sort_keys=True))
+
+
+def command_ledger_activity_acknowledge(args, store: AssistantStore) -> None:
+    if not is_configured():
+        raise SystemExit(
+            "Alpaca paper credentials are required to acknowledge an activity."
+        )
+    activity = _fetch_activity_by_id(store, args.activity_id)
+    result = acknowledge_broker_activity(
+        store,
+        activity,
+        treatment=args.treatment,
+        operator=args.operator,
+        rationale=args.rationale,
+        ticker=args.ticker,
+    )
+    # The decision is recorded, not posted: sync_broker_activities remains the
+    # single journaling path, so the entry is idempotent and replayable.
+    result["applied"] = _sync_broker_activities_from_alpaca(store)
+    print(json.dumps(result, indent=2, sort_keys=True))
+
+
 def command_ledger_fee(args, store: AssistantStore) -> None:
     inserted = record_fee(
         store,
@@ -2518,6 +2597,40 @@ def build_parser() -> argparse.ArgumentParser:
     )
     ledger_transfer.add_argument("--description", required=True)
     ledger_transfer.set_defaults(handler=command_ledger_transfer)
+
+    activity_review = commands.add_parser(
+        "ledger-activity-review",
+        help=(
+            "Read-only: show which broker activities the sync still refuses "
+            "and every operator decision already on record."
+        ),
+    )
+    activity_review.set_defaults(handler=command_ledger_activity_review)
+
+    activity_ack = commands.add_parser(
+        "ledger-activity-acknowledge",
+        help=(
+            "Record an explicit accounting decision for ONE refused broker "
+            "activity so evidence capture can proceed without a code change. "
+            "You choose the treatment; every amount comes from the broker."
+        ),
+    )
+    activity_ack.add_argument("activity_id")
+    activity_ack.add_argument(
+        "--treatment",
+        required=True,
+        choices=sorted(ACKNOWLEDGEMENT_TREATMENTS),
+    )
+    activity_ack.add_argument("--operator", required=True)
+    activity_ack.add_argument(
+        "--rationale",
+        required=True,
+        help="Why this treatment is correct; stored as durable evidence.",
+    )
+    activity_ack.add_argument(
+        "--ticker", help="Required for --treatment dividend."
+    )
+    activity_ack.set_defaults(handler=command_ledger_activity_acknowledge)
 
     ledger_fee = commands.add_parser(
         "ledger-fee",

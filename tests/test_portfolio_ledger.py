@@ -35,7 +35,9 @@ from assistant.portfolio_ledger import (
     record_split,
     sync_app_fills,
     sync_broker_activities,
+    acknowledge_broker_activity,
 )
+from assistant.storage import BrokerActivityAcknowledgementConflictError
 from assistant.schemas import PortfolioPosition, PortfolioSnapshot
 from assistant.storage import AssistantStore
 
@@ -1495,3 +1497,232 @@ def test_an_undeclared_handled_type_refuses_cleanly_instead_of_crashing(tmp_path
         _assert_broker_activity_id_not_retyped(
             store, activity_type="INT", activity_id="probe"
         )
+
+
+# --- Operator acknowledgement path (CR-W2 follow-up, 2026-08-11) ---------
+# Before this, an unsupported broker activity blocked evidence capture until
+# someone DEPLOYED new code -- and deploying closes the epoch, so one surprise
+# activity type cost the entire accumulated run. This converts that into a
+# single explicit human decision. Nothing is classified automatically: the
+# operator picks the treatment, and every amount still comes from the broker.
+
+
+def _unsupported_activity(**overrides):
+    activity = {
+        "id": "20260910000000000::div-variant",
+        "activity_type": "DIVNRA",
+        "created_at": "2026-07-29T11:30:00Z",
+        "date": "2026-07-29",
+        "net_amount": "31.50",
+        "symbol": "AEP",
+        "description": "Dividend net of withholding",
+    }
+    activity.update(overrides)
+    return activity
+
+
+def test_an_unsupported_activity_still_refuses_without_an_acknowledgement(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    with pytest.raises(LedgerError, match="unhandled activity type DIVNRA"):
+        sync_broker_activities(store, [_unsupported_activity()])
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_acknowledging_an_activity_lets_the_sync_journal_it(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    activity = _unsupported_activity()
+    result = acknowledge_broker_activity(
+        store,
+        activity,
+        treatment="dividend",
+        operator="sheltonchen",
+        rationale="withholding variant; net cash is the dividend received",
+        ticker="AEP",
+    )
+    assert result["inserted"] is True
+    # Recording the decision must NOT journal anything by itself.
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+    report = sync_broker_activities(store, [activity])
+    assert report["inserted"] == 1
+    assert report["by_acknowledged_treatment"] == {
+        "dividend": {"inserted": 1, "duplicates": 0}
+    }
+    assert ledger_balances(store)["cash"] == Decimal("1031.50")
+    replay = sync_broker_activities(store, [activity])
+    assert replay["duplicates"] == 1
+    assert ledger_balances(store)["cash"] == Decimal("1031.50")
+
+
+def test_an_acknowledgement_does_not_apply_after_the_broker_row_changes(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    acknowledge_broker_activity(
+        store, _unsupported_activity(), treatment="dividend", operator="op",
+        rationale="reviewed", ticker="AEP",
+    )
+    changed = _unsupported_activity(net_amount="9999.00")
+    with pytest.raises(LedgerError, match="changed since it was"):
+        sync_broker_activities(store, [changed])
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_no_cash_effect_cannot_be_used_to_wave_money_away(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    with pytest.raises(LedgerError, match="only valid when the broker reports no cash"):
+        acknowledge_broker_activity(
+            store, _unsupported_activity(), treatment="no_cash_effect",
+            operator="op", rationale="ignore it",
+        )
+    informational = _unsupported_activity(
+        activity_type="NC", net_amount="0", id="nc::name-change"
+    )
+    acknowledge_broker_activity(
+        store, informational, treatment="no_cash_effect",
+        operator="op", rationale="name change, no cash movement",
+    )
+    report = sync_broker_activities(store, [informational])
+    assert report["acknowledged_no_cash_effect"] == ["nc::name-change"]
+    assert report["inserted"] == 0
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_the_operator_chooses_the_treatment_but_never_the_amount(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    activity = _unsupported_activity(net_amount="31.50")
+    acknowledge_broker_activity(
+        store, activity, treatment="dividend", operator="op",
+        rationale="reviewed", ticker="AEP",
+    )
+    stored = store.get_broker_activity_acknowledgement(activity["id"])
+    assert "amount" not in stored["details"]
+    assert "net_amount" not in stored["details"]
+    sync_broker_activities(store, [activity])
+    assert ledger_balances(store)["cash"] == Decimal("1031.50")
+
+
+def test_acknowledgement_treatments_are_sign_checked_against_the_broker_row(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    with pytest.raises(LedgerError, match="negative broker net_amount"):
+        acknowledge_broker_activity(
+            store, _unsupported_activity(), treatment="fee",
+            operator="op", rationale="reviewed",
+        )
+    with pytest.raises(LedgerError, match="requires --ticker"):
+        acknowledge_broker_activity(
+            store, _unsupported_activity(), treatment="dividend",
+            operator="op", rationale="reviewed",
+        )
+    with pytest.raises(LedgerError, match="positive broker net_amount"):
+        acknowledge_broker_activity(
+            store, _unsupported_activity(net_amount="-5"), treatment="dividend",
+            operator="op", rationale="reviewed", ticker="AEP",
+        )
+
+
+def test_an_acknowledgement_requires_an_operator_and_a_rationale(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    with pytest.raises(LedgerError, match="operator"):
+        acknowledge_broker_activity(
+            store, _unsupported_activity(), treatment="cash_transfer",
+            operator="   ", rationale="reviewed",
+        )
+    with pytest.raises(LedgerError, match="written rationale"):
+        acknowledge_broker_activity(
+            store, _unsupported_activity(), treatment="cash_transfer",
+            operator="op", rationale="",
+        )
+    with pytest.raises(LedgerError, match="unsupported treatment"):
+        acknowledge_broker_activity(
+            store, _unsupported_activity(), treatment="ignore",
+            operator="op", rationale="reviewed",
+        )
+
+
+def test_an_acknowledgement_cannot_resurrect_pre_bootstrap_activity(tmp_path):
+    """The bootstrap cutoff outranks an operator decision.
+
+    A pre-bootstrap row is already inside opening cash; journaling it again
+    would double-count. The acknowledgement is consulted only after that
+    cutoff, so this must stay a skip, not an insert.
+    """
+    store, _ = _bootstrapped_store(tmp_path)
+    old = _unsupported_activity(
+        id="old::pre-bootstrap", created_at="2026-07-29T09:00:00Z"
+    )
+    acknowledge_broker_activity(
+        store, old, treatment="dividend", operator="op",
+        rationale="reviewed", ticker="AEP",
+    )
+    report = sync_broker_activities(store, [old])
+    assert report["skipped_pre_bootstrap"] == 1
+    assert report["inserted"] == 0
+    assert ledger_balances(store)["cash"] == Decimal("1000")
+
+
+def test_a_conflicting_second_acknowledgement_is_refused(tmp_path):
+    store, _ = _bootstrapped_store(tmp_path)
+    activity = _unsupported_activity()
+    acknowledge_broker_activity(
+        store, activity, treatment="dividend", operator="op",
+        rationale="reviewed", ticker="AEP",
+    )
+    again = acknowledge_broker_activity(
+        store, activity, treatment="dividend", operator="op",
+        rationale="reviewed", ticker="AEP",
+    )
+    assert again["inserted"] is False
+    with pytest.raises(BrokerActivityAcknowledgementConflictError):
+        acknowledge_broker_activity(
+            store, activity, treatment="cash_transfer", operator="op",
+            rationale="changed my mind",
+        )
+
+
+def test_acknowledged_activity_restores_reconciliation(tmp_path):
+    """The whole point: the epoch resumes without a deploy."""
+    store, _ = _bootstrapped_store(tmp_path, cash=1000.0)
+    activity = _unsupported_activity(net_amount="31.50")
+    broker_now = _snapshot(cash=1031.50)
+    assert reconcile_snapshot(store, broker_now)["matched"] is False
+    acknowledge_broker_activity(
+        store, activity, treatment="dividend", operator="op",
+        rationale="reviewed", ticker="AEP",
+    )
+    sync_broker_activities(store, [activity])
+    assert reconcile_snapshot(store, broker_now)["matched"] is True
+
+
+def test_acknowledgement_table_migrates_onto_a_pre_migration_database(tmp_path):
+    """CLAUDE.md 7: migrations must be idempotent and backward-compatible.
+
+    Simulates a database created before this feature by dropping the table
+    and re-opening with current code. Re-opening must recreate it WITHOUT
+    disturbing existing rows -- the operator database is the live epoch's,
+    so a migration that rebuilt anything would be unacceptable.
+    """
+    path = tmp_path / "assistant.db"
+    store, _ = _bootstrapped_store(tmp_path)
+    balances_before = ledger_balances(store)["cash"]
+
+    with store._connect() as connection:
+        connection.execute("DROP TABLE broker_activity_acknowledgements")
+        remaining = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND "
+            "name='broker_activity_acknowledgements'"
+        ).fetchone()
+    assert remaining is None, "precondition: the table is absent"
+
+    reopened = AssistantStore(path)
+    with reopened._connect() as connection:
+        recreated = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type='table' AND "
+            "name='broker_activity_acknowledgements'"
+        ).fetchone()
+    assert recreated is not None, "re-opening must recreate the table"
+    # Pre-existing journal rows are untouched by the migration.
+    assert ledger_balances(reopened)["cash"] == balances_before
+    assert reopened.list_broker_activity_acknowledgements() == []
+
+    # And opening a third time is a no-op rather than an error.
+    again = AssistantStore(path)
+    assert again.list_broker_activity_acknowledgements() == []

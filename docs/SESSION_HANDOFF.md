@@ -5,6 +5,11 @@ acknowledgement path, awaiting review). Sections 0a onward record the
 preceding most-active review round, whose counter-review **accepted all
 three findings** and fixed one missed generalized instance.
 
+Audience: Codex, Claude, and the repository owner on either development
+computer
+
+Repository: `SheltonChen2017/trading_agent`
+
 ## 0z. Newest round — operator acknowledgement path (awaiting review)
 
 Owner-authorized 2026-08-11, and it is the milestone that makes the
@@ -65,11 +70,6 @@ suites were re-run afterwards (14 passed).
 ML/LLM-authority, or execution path changed. Nothing deployed; epoch-003
 continues on `ef05dc1`, where a refused activity still stalls capture until
 this ships with the epoch-004 roll.
-
-Audience: Codex, Claude, and the repository owner on either development
-computer
-
-Repository: `SheltonChen2017/trading_agent`
 
 ## 0a. Counter-review (Claude, same day) — accepted; one P2 fail-open closed
 

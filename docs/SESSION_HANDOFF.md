@@ -1,6 +1,50 @@
 # Session handoff — reviewed most-active price-direction view
 
-Prepared: 2026-08-11 after independent review and correction
+Prepared: 2026-08-11 after independent review and correction, then Claude's
+counter-review (section 0a), which **accepted all three findings** and fixed
+one missed generalized instance that is more severe than anything in the
+original ledger.
+
+## 0a. Counter-review (Claude, same day) — accepted; one P2 fail-open closed
+
+All three MAD findings confirmed; MAD-001 and MAD-002 were **red-baselined**
+against the submitted tree (both regressions fail on `3be6326`). Codex's
+`tests/test_ui_ticker_suggestions.py` is a real `AppTest` that drives the
+Streamlit renderer and asserts on rendered dataframes and captions — strictly
+stronger than the source-level guards I shipped.
+
+Two gaps were found and fixed:
+
+- **MADCR-001 (P2)** — the MAD-001 join fix was applied to the most-active
+  lane only. The **identical** unnormalized join remained in the IPO lane,
+  three lines below a held-set filter that already calls `.upper()` on the
+  same provider symbol. There the consequence is not cosmetic: the joined
+  metadata feeds the reused/renamed-symbol guard, and
+  `_is_ipo_identity_mismatch()` returns **False when a date is missing** — so
+  a failed join empties `claimed_date`, the guard reports "no mismatch", and
+  a stale symbol masquerading as a fresh listing is recommended. A safety
+  guard failing open is P2. Both sides of the join now normalize; three
+  regressions added, including a source-level guard that fires when any new
+  lane joins on a raw symbol. The AI lane was checked and is correct.
+- **MADCR-002 (P3)** — narrowing "no retail-accessible feed reports order
+  flow" to "this screener does not" is more accurate (retail platforms do
+  show tick-rule estimates), but it dropped the reasoning that stops the
+  obvious wrong next step: swapping screeners. Restored in verifiable form —
+  classification needs trade prints matched to the prevailing quote, and this
+  project's feed is Alpaca's free IEX tier, measured on 2026-08-10 quoting a
+  large-cap at a ~6% spread against a penny-wide consolidated market.
+
+**Counter-review validation (final tree).** Single uninterrupted full-suite
+run: **3,381 passed, 0 failed, 25 warnings** in 666.21s — Codex's 3,378 plus
+three new IPO-join regressions. `tests/test_recommended_stocks.py` 39 passed;
+`tests/test_ui_ticker_suggestions.py` green. `compileall` and
+`git diff --check` clean. The suite ran after the last code change; only
+documents changed afterwards, and all four document-reading suites were
+re-run (45 passed). Two mutations verified the new fix and Codex's, each
+restored and re-verified.
+
+Full evidence, including the mutation table, is in
+`docs/REVIEW_2026-08-11_MOST_ACTIVE_DIRECTION_SPLIT.md` §Counter-review.
 
 Audience: Codex, Claude, and the repository owner on either development
 computer

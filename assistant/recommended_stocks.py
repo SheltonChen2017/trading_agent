@@ -85,7 +85,17 @@ def fetch_most_active_tickers(count: int = 10) -> list[dict]:
     on any failure. Honest framing only: this is TRADING VOLUME and price
     movement, NOT buy-vs-sell order flow -- this yfinance screen does not
     provide classified order flow. Never label this "most bought" anywhere
-    in code, comments, or UI copy."""
+    in code, comments, or UI copy.
+
+    And this is not a swap-the-screener fix (counter-review MADCR-002, kept
+    narrow deliberately): classifying a trade as buyer- or seller-initiated
+    needs trade prints matched against the prevailing quote (Lee-Ready and
+    similar), i.e. consolidated trade-and-quote data. The market feed this
+    project actually has is Alpaca's free IEX tier -- a small share of
+    consolidated volume, measured on 2026-08-10 quoting a large-cap at a
+    ~6% spread while the consolidated market was penny-wide. Estimating
+    direction from that would produce confident-looking noise, which is
+    worse than declining to report it."""
     try:
         import yfinance as yf
 
@@ -246,9 +256,18 @@ def build_recommended_tickers(
             policy=RECENT_IPO_ELIGIBILITY_POLICY,
         )
         dropped.extend(batch_dropped)
-        ipo_detail_by_ticker = {c["ticker"]: c for c in ipo_candidates}
+        # Same normalization the most-active lane needs (MAD-001), and here
+        # the consequence is worse than a cosmetic "not reported": a failed
+        # join makes claimed_date empty, and _is_ipo_identity_mismatch()
+        # returns False for missing data -- so the reused/renamed-symbol
+        # guard below would silently pass a candidate it exists to catch.
+        # Note the held-set filter above already upper()s the provider
+        # symbol; this join must agree with it.
+        ipo_detail_by_ticker = {
+            str(c["ticker"]).strip().upper(): c for c in ipo_candidates
+        }
         for v in verified:
-            c = ipo_detail_by_ticker.get(v["ticker"], {})
+            c = ipo_detail_by_ticker.get(str(v["ticker"]).strip().upper(), {})
             claimed_date = c.get("date", "")
             if _is_ipo_identity_mismatch(v.get("first_session_date"), claimed_date):
                 dropped.append(v["ticker"])

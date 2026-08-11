@@ -154,7 +154,13 @@ sold"; **that split was deliberately NOT built because the yfinance
 most-actives source does not provide classified order flow.** Volume is
 symmetric — every share traded was bought by one party and sold by another —
 so its single volume number cannot be decomposed into bought-versus-sold
-shares. This preserves the standing rule already stated in
+shares. Nor is this a swap-the-screener fix (counter-review MADCR-002):
+classifying a trade as buyer- or seller-initiated needs trade prints matched
+against the prevailing quote, i.e. consolidated trade-and-quote data, and the
+feed this project actually has is Alpaca's free IEX tier — measured on
+2026-08-10 quoting a large-cap at a ~6% spread while the consolidated market
+was penny-wide. Estimating direction from that would produce confident-looking
+noise. This preserves the standing rule already stated in
 `assistant/recommended_stocks.fetch_most_active_tickers`: never label volume
 "most bought" in code, comments, or UI copy.
 

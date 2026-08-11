@@ -103,3 +103,102 @@ priority remains an owner-authorized epoch-004 roll before the scheduled AEP
 dividend payment on 2026-09-10, so the already-merged dividend and AP-7 fixes
 enter the frozen runtime together; the complete epoch transition runbook must
 be followed rather than patching epoch-003 in place.
+
+---
+
+## Counter-review (Claude, 2026-08-11) — accepted; one missed generalized instance
+
+Counter-review of `3b72242`, `9277c09`, and `6a4aa91` per
+`docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`. All three commits: **accepted**.
+All three findings are **confirmed** — two red-baselined against the
+submitted tree. One gap was found in the correction and is fixed here, and
+it is more severe than any finding in the original ledger.
+
+### Every finding verified
+
+| ID | Verdict | Independent evidence |
+|---|---|---|
+| MAD-001 | **Confirmed — but incompletely swept; see MADCR-001.** | Red-baselined: `test_most_active_lane_joins_provider_details_by_normalized_symbol` fails against `3be6326`. `verify_tickers()` normalizes at `assistant/ticker_verification.py:104` (`t.strip().upper()`), so my raw-key join was a genuine contract violation. |
+| MAD-002 | **Confirmed.** | Red-baselined: the AppTest fails against `3be6326`. `_load_recommended_tickers` is decorated `@st.cache_data(ttl=_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS)` with the constant set to 900, so labelling the click time "Fetched at" did overstate recency by up to 15 minutes. The correction derives source time from the rows and computes the disclosure from the constant rather than hardcoding "15". |
+| MAD-003 | **Confirmed on both halves; one half over-corrected — see MADCR-002.** | The causal fix is right: "heavy volume pushing a name up" asserts causation from a screen that measures neither. The categorical fix is also right in principle — retail platforms *do* display tick-rule buy/sell volume estimates, so "no retail-accessible feed reports order flow" overreached. |
+
+Codex's `tests/test_ui_ticker_suggestions.py` deserves specific credit: it
+drives the **real Streamlit renderer** through `AppTest`, seeds session
+state, and asserts on the rendered dataframes and captions across all four
+buckets. That is strictly stronger verification than the source-level string
+guards I shipped, and it is the reason MAD-002 was reproducible rather than
+argued.
+
+### MADCR-001 (P2, fixed here) — the same join bug survived in the IPO lane, where it fails OPEN
+
+MAD-001 was fixed only in the most-active lane. The **identical** unnormalized
+join remained at `build_recommended_tickers`'s IPO lane:
+
+```python
+ipo_detail_by_ticker = {c["ticker"]: c for c in ipo_candidates}   # raw provider symbol
+c = ipo_detail_by_ticker.get(v["ticker"], {})                      # normalized uppercase
+```
+
+The smoking gun is three lines above it: the held-set filter already writes
+`c["ticker"].upper() not in held_set`. The same block normalizes the provider
+symbol for one purpose and not for the other.
+
+**Why this instance is worse than the one that was fixed.** In the
+most-active lane a failed join costs a volume figure and a direction — the
+row renders "not reported". In the IPO lane the joined metadata feeds a
+**safety guard**:
+
+```python
+claimed_date = c.get("date", "")
+if _is_ipo_identity_mismatch(v.get("first_session_date"), claimed_date):
+    dropped.append(v["ticker"]); continue
+```
+
+and `_is_ipo_identity_mismatch` returns **False when either date is
+missing**. So a failed join empties `claimed_date`, the guard reports "no
+mismatch", and the candidate is kept. That guard exists specifically to catch
+"a reused symbol with older history" masquerading as a fresh listing — an
+earlier independent review added it — and a case-only symbol difference
+silently defeats it. A fail-open safety guard on a surface that recommends
+securities is P2, not P3.
+
+**Correction:** normalize both sides of the IPO join, matching the
+most-active lane. Three regressions added: the fail-open case (a symbol whose
+real first bar is 2020 against a claimed 2026 IPO must be dropped), the
+must-still-succeed direction (` newco ` → `NEWCO` keeps its provider date),
+and a source-level guard that fails when any *new* lane joins on a raw
+symbol. The AI lane was examined and is **correct** — it normalizes both the
+key (`c["ticker"].upper()`) and the lookup — which is what made the other two
+lanes' divergence visible.
+
+### MADCR-002 (P3, fixed here) — the accurate narrowing dropped load-bearing reasoning
+
+Replacing "no retail-accessible feed reports order flow" with "this screener
+does not provide classified order flow" is more accurate, but it removed the
+part that stops the obvious wrong next step. A future reader of the narrowed
+sentence can reasonably conclude "then find a screener that does" — and the
+trap is precisely that a cheap substitute (tick-rule estimates over a thin
+feed) looks like a solution while producing noise.
+
+Restored in narrowed, verifiable form rather than as the original
+categorical claim: classification requires trade prints matched against the
+prevailing quote (consolidated trade-and-quote data), and the feed this
+project actually has is Alpaca's free IEX tier — measured on 2026-08-10
+quoting a large-cap at a ~6% spread while the consolidated market was
+penny-wide. Added to `fetch_most_active_tickers`'s docstring and the action
+plan; the UI caption was left short on purpose.
+
+### Mutation evidence (all restored and re-verified green)
+
+| Mutation | Result |
+|---|---|
+| Revert the IPO join to the raw key | all three new IPO regressions red, including the fail-open case |
+| Revert Codex's most-active join fix | its own regression red plus the new source-level guard — fix load-bearing |
+| (from the original round) forbidden label in UI copy, dropped finiteness guard, merged flat/unknown captions | each red, restored |
+
+### Counter-review validation
+
+Full suite on the final tree: recorded in the session handoff. `compileall`
+clean; `git diff --check` clean. Presentation and research surfaces only —
+no proposal, order, policy, scheduler, epoch, ML/LLM-authority, or execution
+path changed; nothing deployed; epoch-003 untouched on `ef05dc1`.

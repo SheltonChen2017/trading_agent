@@ -85,6 +85,13 @@ before the 24-hour health limit. It exits nonzero on a ledger mismatch or
 unhealthy result. Exceptions create a deduplicated critical SQLite alert and,
 when configured, append it to the JSONL delivery boundary.
 
+Freshness checks compare each reconciliation, backup, or restore-drill record
+with a clock captured immediately after that record is read. This prevents an
+overlapping scheduler process from making a valid new row look future-dated.
+Caller-supplied as-of clocks remain frozen, genuine future timestamps still
+fail closed, and health details include signed `age_seconds` so the failed
+freshness conjunct is visible.
+
 The reviewed broker-activity mapping is intentionally narrow: USD fees,
 plain legacy or explicit `CDIV` cash dividends, CSD deposits, and CSW
 withdrawals. Dividend classification is stored as unknown, and dividend/cash

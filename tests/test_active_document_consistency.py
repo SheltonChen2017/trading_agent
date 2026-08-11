@@ -141,6 +141,75 @@ def test_current_dividend_handler_guidance_is_reviewed_and_date_correct():
     assert "JNLC" in handoff and "fail" in handoff.lower()
 
 
+def test_current_handoff_replaces_superseded_dividend_review_state():
+    """The merged counter-review and first observation must replace old state.
+
+    Counter-review correction (DCCR-CR-003, 2026-08-10): this guard
+    originally also banned the literal "It is **not merged and not
+    deployed**". That violates this module's own rule at the top of the
+    file -- a banned literal must be "a phrase that should never be true
+    again", and *every* future review branch is legitimately not merged and
+    not deployed. Banning it would force later authors to either describe a
+    normal state in contorted language or weaken this guard.
+
+    Replaced with a POSITIVE assertion, which is strictly stronger: the
+    handoff must actually record that the dividend handler merged. A
+    positive claim cannot be dodged by rephrasing the negative one.
+    """
+    handoff = _text("SESSION_HANDOFF.md")
+    for stale in (
+        "main` / `origin/main` at `c36b615",
+        "do not alter it or claim evidence is accumulating until its scheduled observation",
+    ):
+        assert stale not in handoff, f"handoff retains stale state: {stale!r}"
+
+    assert "PR #184" in handoff and "0ee3a22" in handoff, (
+        "the handoff must record that the CR-W2 dividend handler is merged "
+        "(PR #184 / 0ee3a22), not merely avoid saying it is unmerged"
+    )
+
+    action_plan = _text("ACTION_PLAN_2026-08-02.md")
+    for stale in (
+        "epoch-003 still had **zero observations**",
+        "epoch-003 had zero observations",
+    ):
+        assert stale not in action_plan, (
+            f"action plan retains superseded evidence state: {stale!r}"
+        )
+
+
+def test_current_documents_do_not_publish_exact_account_balances():
+    """Account cash/equity are sensitive machine-local facts, not document data.
+
+    Counter-review extension (DCCR-CR-001, 2026-08-10): the original guard
+    scanned only the handoff, which is where that round's instance happened
+    to be -- but the same absolute balance was still sitting in the action
+    plan's AP-6 row and, worse, in `OPERATIONAL_FACTS.md`, the file that is
+    explicitly never rewritten. Scan the whole class of current documents.
+
+    The rule this pins (see OPERATIONAL_FACTS §1): a *difference* can be
+    load-bearing evidence and stays -- the AP-6 diagnosis needs its $0.03 --
+    but an absolute balance proves nothing that `matched` plus a mismatch
+    count does not already prove, so it never belongs in a committed
+    document.
+    """
+    patterns = (
+        r"\bcash\s+`?\d[\d,]*\.\d+`?",
+        r"\btotal equity\s+`?\d[\d,]*\.\d+`?",
+    )
+    for name in (
+        "SESSION_HANDOFF.md",
+        "ACTION_PLAN_2026-08-02.md",
+        "OPERATIONAL_FACTS.md",
+        "OPERATIONS_RUNBOOK.md",
+    ):
+        text = _text(name)
+        for pattern in patterns:
+            assert re.search(pattern, text, flags=re.IGNORECASE) is None, (
+                f"{name} publishes an exact account balance matching {pattern!r}"
+            )
+
+
 def test_current_documents_do_not_publish_account_identifiers():
     """Even shortened broker account identifiers are machine-local facts.
 

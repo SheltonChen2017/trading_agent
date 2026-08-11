@@ -1,13 +1,15 @@
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pytest
 
+import assistant.operations as operations_module
 from assistant.operations import (
     ensure_recent_database_backup,
+    operational_health,
     run_backup_restore_drill,
     run_operational_check,
 )
@@ -112,14 +114,14 @@ def test_a_future_dated_control_is_not_fresh():
 
 
 @pytest.mark.parametrize(
-    "expression",
+    "age_name",
     [
-        "now - reconciliation_at",
-        "now - backup_at",
-        "now - drill_at",
+        "reconciliation_age",
+        "backup_age",
+        "drill_age",
     ],
 )
-def test_every_operational_freshness_check_is_bounded_below(expression):
+def test_every_operational_freshness_check_is_bounded_below(age_name):
     """Source-level: the invariant is 'no site may omit the lower bound'.
 
     A behavioural test can only cover the sites it happens to name; this
@@ -129,21 +131,148 @@ def test_every_operational_freshness_check_is_bounded_below(expression):
     source = (
         Path(__file__).resolve().parent.parent / "assistant" / "operations.py"
     ).read_text(encoding="utf-8")
-    assert expression in source, f"{expression} no longer exists; update this test"
-    for line_number, line in enumerate(source.splitlines(), 1):
-        if expression in line and "timedelta" in line:
-            assert "timedelta(0)" in line, (
-                f"assistant/operations.py:{line_number} compares {expression} "
-                "against an upper bound only; a future-dated timestamp reads "
-                "as fresh (FCS-017)"
-            )
+    assert f"timedelta(0) <= {age_name}" in source, (
+        f"{age_name} lacks the lower-bound freshness guard; a future-dated "
+        "timestamp would read as fresh (FCS-017)"
+    )
 
 
 def test_readiness_reconciliation_freshness_is_bounded_below():
     source = (
         Path(__file__).resolve().parent.parent / "assistant" / "readiness.py"
     ).read_text(encoding="utf-8")
-    assert "timedelta(0)\n        <= now - reconciled_at" in source, (
+    assert "timedelta(0)\n        <= reconciliation_age" in source, (
         "readiness.py's reconciliation freshness must reject a future "
         "timestamp (FCS-017)"
     )
+
+
+def test_health_freshness_uses_a_clock_captured_after_each_state_read(
+    tmp_path, monkeypatch
+):
+    """AP-7: a concurrent valid write must not look future-dated.
+
+    The production check used one ``now`` captured before readiness/broker
+    work. A concurrent process could then commit a reconciliation, backup, or
+    drill a second later; the correct lower-bound guard treated that newly
+    read row as future-dated and raised a false critical/warning alert. Keep
+    rejecting genuine clock-skewed future rows, but compare each stored fact
+    with a clock captured immediately after reading that fact.
+    """
+    store = AssistantStore(tmp_path / "assistant.db")
+    policy = load_policy()
+    started_at = datetime(2026, 8, 10, 21, 52, 21, tzinfo=timezone.utc)
+    committed_at = started_at + timedelta(seconds=1)
+
+    store.record_ledger_reconciliation(
+        "concurrent-reconciliation",
+        "alpaca",
+        {
+            "reconciliation_id": "concurrent-reconciliation",
+            "reconciled_at": committed_at.isoformat(),
+            "matched": True,
+            "mismatch_count": 0,
+        },
+    )
+    backup_path = store.backup_to(tmp_path / "backup.db")
+    store.set_system_state(
+        "last_database_backup",
+        {"completed_at": committed_at.isoformat(), "path": str(backup_path)},
+    )
+    store.set_system_state(
+        "last_backup_restore_drill",
+        {"completed_at": committed_at.isoformat(), "passed": True},
+    )
+
+    class AdvancingDateTime(datetime):
+        calls = 0
+
+        @classmethod
+        def now(cls, tz=None):
+            cls.calls += 1
+            value = started_at if cls.calls == 1 else started_at + timedelta(seconds=2)
+            return value if tz is None else value.astimezone(tz)
+
+    monkeypatch.setattr(operations_module, "datetime", AdvancingDateTime)
+    report = operational_health(store, policy, check_broker=False)
+    by_name = {check["name"]: check for check in report["checks"]}
+
+    for name in (
+        "portfolio_ledger_reconciliation",
+        "database_backup",
+        "backup_restore_drill",
+    ):
+        assert by_name[name]["ok"] is True, by_name[name]
+        assert "age_seconds=" in by_name[name]["detail"]
+
+    # An explicit historical/as-of clock is intentionally frozen. The same
+    # rows are genuinely future-dated relative to it and must still refuse.
+    future_report = operational_health(
+        store, policy, check_broker=False, now=started_at
+    )
+    future_by_name = {
+        check["name"]: check for check in future_report["checks"]
+    }
+    for name in (
+        "portfolio_ledger_reconciliation",
+        "database_backup",
+        "backup_restore_drill",
+    ):
+        assert future_by_name[name]["ok"] is False
+        assert "age_seconds=-1.000000" in future_by_name[name]["detail"]
+
+
+def test_readiness_freshness_uses_a_clock_captured_after_the_state_read(
+    tmp_path, monkeypatch
+):
+    """AP-7, second instance (counter-review): same race, wider window.
+
+    `assistant/operations.py` was corrected to compare each stored fact
+    against a clock captured after reading it, but `transaction_readiness`
+    kept its entry clock -- and it is the MORE exposed site: the deployed
+    `monitor-orders` task rewrites `last_order_reconciliation` every 30
+    seconds, while the window between this function's entry clock and that
+    read contains a full SQLite integrity check and several proposal
+    queries. A valid concurrent write therefore looked future-dated and
+    failed the `timedelta(0) <=` guard, and because `operational_health`
+    reports `healthy = all(check["ok"])`, a *warning*-severity readiness
+    check still made the scheduled operations cycle exit nonzero.
+    """
+    import assistant.readiness as readiness_module
+    from assistant.readiness import transaction_readiness
+
+    store = AssistantStore(tmp_path / "assistant.db")
+    policy = load_policy()
+    started_at = datetime(2026, 8, 10, 21, 52, 21, tzinfo=timezone.utc)
+    committed_at = started_at + timedelta(seconds=1)
+
+    store.set_system_state(
+        "last_order_reconciliation",
+        {"at": committed_at.isoformat(), "checked": 0, "updated": 0, "error_count": 0},
+    )
+
+    class AdvancingDateTime(datetime):
+        calls = 0
+
+        @classmethod
+        def now(cls, tz=None):
+            cls.calls += 1
+            value = started_at if cls.calls == 1 else started_at + timedelta(seconds=2)
+            return value if tz is None else value.astimezone(tz)
+
+    monkeypatch.setattr(readiness_module, "datetime", AdvancingDateTime)
+    report = transaction_readiness(store, policy, check_broker=False)
+    freshness = {c["name"]: c for c in report["checks"]}["reconciliation_freshness"]
+    assert freshness["ok"] is True, freshness
+    assert "age_seconds=" in freshness["detail"]
+
+    # An explicit as-of clock stays frozen: the row is genuinely future-dated
+    # relative to it and must still refuse (FCS-017 unchanged).
+    frozen = transaction_readiness(
+        store, policy, check_broker=False, now=started_at
+    )
+    frozen_freshness = {
+        c["name"]: c for c in frozen["checks"]
+    }["reconciliation_freshness"]
+    assert frozen_freshness["ok"] is False
+    assert "age_seconds=-1.000000" in frozen_freshness["detail"]

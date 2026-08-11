@@ -148,6 +148,16 @@ check, which is why evidence capture was unaffected. Do not acknowledge it
 as "resolved" without fixing the cause — it will re-raise on the next
 overlap.
 
+Post-merge independent correction `89ebcc2` fixes AP-7 in the development
+tree without weakening FCS-017: reconciliation, backup, and restore-drill
+freshness now use a clock captured immediately after the corresponding state
+read, while an explicit as-of clock stays frozen and still rejects genuine
+future timestamps. Details now include signed `age_seconds`. This correction
+is **not deployed**; epoch-003 continues on `ef05dc1`, and the existing open
+alert was not acknowledged or mutated. Read-only remeasurement at 16:56
+Pacific found the latest operations heartbeat healthy and the recent
+reconciliations matched with zero mismatches.
+
 Counter-review (Claude, same day) accepted all six review findings and
 corrected two residual defects in the correction itself: economic dates are
 now stamped at **market-local** midnight rather than UTC midnight (UTC

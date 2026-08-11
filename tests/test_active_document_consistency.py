@@ -141,6 +141,40 @@ def test_current_dividend_handler_guidance_is_reviewed_and_date_correct():
     assert "JNLC" in handoff and "fail" in handoff.lower()
 
 
+def test_current_handoff_replaces_superseded_dividend_review_state():
+    """The merged counter-review and first observation must replace old state."""
+    handoff = _text("SESSION_HANDOFF.md")
+    for stale in (
+        "main` / `origin/main` at `c36b615",
+        "It is **not merged and not deployed**",
+        "The review branch has not been published or deployed",
+        "do not alter it or claim evidence is accumulating until its scheduled observation",
+    ):
+        assert stale not in handoff, f"handoff retains stale state: {stale!r}"
+
+    action_plan = _text("ACTION_PLAN_2026-08-02.md")
+    for stale in (
+        "epoch-003 still had **zero observations**",
+        "epoch-003 had zero observations",
+    ):
+        assert stale not in action_plan, (
+            f"action plan retains superseded evidence state: {stale!r}"
+        )
+
+
+def test_current_handoff_does_not_publish_exact_account_balances():
+    """Account cash/equity are sensitive machine-local facts, not handoff data."""
+    handoff = _text("SESSION_HANDOFF.md")
+    patterns = (
+        r"\bcash\s+`?\d[\d,]*\.\d+`?",
+        r"\btotal equity\s+`?\d[\d,]*\.\d+`?",
+    )
+    for pattern in patterns:
+        assert re.search(pattern, handoff, flags=re.IGNORECASE) is None, (
+            f"handoff publishes an exact account balance matching {pattern!r}"
+        )
+
+
 def test_current_documents_do_not_publish_account_identifiers():
     """Even shortened broker account identifiers are machine-local facts.
 

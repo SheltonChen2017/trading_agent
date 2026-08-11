@@ -17,6 +17,12 @@ Review branch: `codex/review-broker-dividend-handler-20260810`
 > refusal handler). Both are fixed and mutation-verified in §7; the
 > "0 open" line above refers to this section's own ledger.
 
+> **Post-merge review:** Codex independently reviewed the counter-review, PR
+> #184 merge, first epoch-003 observation record, and AP-7 diagnosis in
+> `docs/REVIEW_2026-08-10_DIVIDEND_COUNTERREVIEW_AND_AP7.md`. Both Claude code
+> corrections were accepted. The follow-up closes one P2 operational race,
+> two P2 handoff/confidentiality defects, and one P3 document cluster.
+
 ## 1. Exact scope and commit disposition
 
 The review branch was created from Claude's exact pushed head `25a2e7b`. The
@@ -137,7 +143,7 @@ restored from a byte copy afterwards and re-verified green.
 | DHREV-003 | **Confirmed.** | The generic-`JNLC` case failed red. My submitted code did guess contributed-capital treatment from a generic cash-journal code, which silently removes broker adjustments from investment return. Refusing is right, and it is the safe direction even though it means a future paper-cash top-up still stalls the epoch. |
 | DHREV-004 | **Confirmed.** | Both non-USD cases failed red, each increasing USD cash from a foreign-currency amount. |
 | DHREV-005 | **Confirmed.** | Both ID-reuse cases failed red, and the same-batch case demonstrably left the first row durably written before failing on the second. Type-specific external-id prefixes did allow one immutable broker event to produce two accounting events. |
-| DHREV-006 | **Confirmed, with decisive independent evidence.** | **2026-08-09 is a Sunday** — it cannot be an ex-dividend date, which settles the question without relying on either party's source. My submitted dates came from `yfinance`'s `calendar` field, which was one day early on both dates (a known timezone artifact). Codex's issuer dates are both business days (Monday 2026-08-10 record/ex, Thursday 2026-09-10 payable) and match AEP's historical mid-month cadence. |
+| DHREV-006 | **Confirmed.** | **2026-08-09 is a Sunday** and cannot be an exchange ex-dividend date. More importantly, AEP's official issuer schedule directly lists Monday 2026-08-10 as the record/ex-date and Thursday 2026-09-10 as payable. The submitted dates came from a yfinance calendar response, but no durable claim is made here about why that secondary response differed. |
 
 ### DHCR-001 (P2, fixed here) — the economic date was stamped at UTC midnight
 

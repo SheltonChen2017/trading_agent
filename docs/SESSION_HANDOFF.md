@@ -1,304 +1,188 @@
-# Session handoff — reviewed broker dividend handler
+# Session handoff — dividend counter-review and AP-7 correction
 
-Prepared: 2026-08-10, after independent review and correction, then
-Claude's counter-review (section 1a), which **accepted all six findings**
-and **corrected two residual defects inside the correction itself**.
+Prepared: 2026-08-10 after post-merge independent review
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
 
 Repository: `SheltonChen2017/trading_agent`
 
-## 0. Resume state and remote warning
+## 0. Current repository and remote state
 
-The canonical base is merged `main` / `origin/main` at `c36b615`. Claude's
-implementation branch `user/claude/broker-dividend-handler-20260810` is
-published at exact commit `25a2e7b`. The active checkout is the review branch
-`codex/review-broker-dividend-handler-20260810`, with correction commit
-`a6770f7` followed by the documentation/handoff commit containing this file.
+Merged `main` / `origin/main` is `0ee3a22` (PR #184), containing the complete
+CR-W2 chain through Claude's counter-review. Claude's pushed follow-up branch
+`user/claude/epoch-003-first-observation-20260810` ends at `f852a69`. The
+active checkout is `codex/review-dividend-counterreview-20260810`, with AP-7
+correction `89ebcc2` followed by the review/handoff commit containing this
+file.
 
-**REMOTE STATE (updated after counter-review):** the review branch is now
-**published** at `origin/codex/review-broker-dividend-handler-20260810`,
-tip-verified equal to local `HEAD` at counter-review commit `cf9cdc2`
-(hash-compared), so another computer receives the review *and* counter-review
-history from an ordinary fetch. Pushed under the owner's standing
-git-management grant. It is **not merged and not deployed**; merge and any
-epoch action remain explicit owner decisions.
+**REMOTE WARNING:** This review branch exists only in the current checkout.
+The owner has not authorized publication. Another computer will not receive
+the AP-7 correction or this refreshed handoff from an ordinary fetch until the
+branch is published. Do not recreate them from memory.
 
-No merge, pull request, deployment, scheduler change, broker call,
-order submission, operator-database mutation, policy change, alert
-acknowledgement, or epoch transition was authorized or performed by Codex in
-this review. The two ignored local swap-result JSON files remain machine-local
-and must not be staged, printed, or deleted.
+The worktree is expected clean after the final documentation commit. Two
+ignored machine-local swap-result JSON files remain preserved; do not stage,
+print, move, or delete them. No push, merge, deployment, epoch transition,
+scheduler mutation, alert acknowledgement, broker call, order action, policy
+change, or operator-database write was performed in this review.
 
-## 1. Review outcome
+## 1. Exact review scope and outcome
 
-Review range: `c36b615..25a2e7b` (one commit).
+Review range: `a36d75d..f852a69`.
 
 | Commit | Disposition | Result |
 |---|---|---|
-| `25a2e7b` | **Accepted after correction** | Sound primitive reuse and idempotency foundation, but five P2 accounting defects and one P3 date/documentation defect required correction in `a6770f7`. |
+| `cf9cdc2` | **Accepted after correction** | Claude's market-timezone and clean-prefix-refusal code fixes are correct. Current documentation now synchronizes both milestone audiences and removes an unsupported yfinance-cause claim. |
+| `b8f20bb` | **Accepted** | Correct publication state at that historical point; its merge-next instruction is now superseded. |
+| `0ee3a22` | **Accepted** | PR #184 merge has no merge-only tree difference from reviewed parent `b8f20bb`. |
+| `f852a69` | **Accepted after correction** | First-observation/AP-7 measurements are sound, but AP-7 was under-ranked/unfixed and the appended handoff retained stale topology/evidence instructions plus exact private balances. |
+
+Correction: `89ebcc2` (`Fix concurrent operational freshness checks`).
 
 Final issue state: **0 P0, 0 P1, 0 P2, and 0 P3 open**.
 
 | ID | Priority | Final state | Finding |
 |---|---|---|---|
-| DHREV-001 | P2 | Closed | Dividend/cash-flow events used creation/bootstrap timestamps rather than economic activity dates, corrupting tax-year or return-interval attribution. |
-| DHREV-002 | P2 | Closed | Every `DIV` subtype was treated as cash; `SDIV` stock and `SPD` substitute payments now refuse. |
-| DHREV-003 | P2 | Closed | Generic JNLC was guessed to be contributed capital; it now remains fail-closed. |
-| DHREV-004 | P2 | Closed | Optional non-USD amounts were posted to USD accounts; they now refuse. |
-| DHREV-005 | P2 | Closed | One raw broker ID could be reinterpreted across activity types, including a partial same-batch write; preflight and stored-ID checks now prevent it. |
-| DHREV-006 | P3 | Closed | AEP's dates were one day early in tests and current documents. |
+| DCCR-001 | P2 | Closed | AP-7 reused an entry clock after concurrent state writes, causing false critical/warning freshness failures; the safe post-read-clock fix is now implemented without relaxing true future-date refusal. |
+| DCCR-002 | P2 | Closed | The canonical handoff retained obsolete base, branch, merge, publication, and zero-evidence instructions. |
+| DCCR-003 | P2 | Closed | The handoff published exact private account cash and equity balances. |
+| DCCR-004 | P3 | Closed | Action-plan evidence/merge state and the milestone's two audience paragraphs disagreed; one provider-cause claim was unsupported. |
 
-Full evidence and corrections are in
-`docs/REVIEW_2026-08-10_BROKER_DIVIDEND_HANDLER.md`.
+Full evidence is in
+`docs/REVIEW_2026-08-10_DIVIDEND_COUNTERREVIEW_AND_AP7.md`.
 
-## 1a. Counter-review (Claude, same day) — accepted, two residuals fixed
+## 2. Accepted dividend-handler behavior
 
-Claude restored the submitted `25a2e7b` ledger in place and ran the
-review's regressions against it: **all eleven intended cases failed red**,
-so every finding is independently confirmed. The real tree was restored
-from a byte copy and re-verified green. `DHREV-006` was settled decisively
-and without relying on either party's source: **2026-08-09 is a Sunday**,
-so it cannot be an ex-dividend date — Claude's submitted dates came from
-`yfinance`'s `calendar` field, which was one day early on both dates, and
-the issuer dates (Monday 2026-08-10 record/ex, Thursday 2026-09-10
-payable) are correct.
+Merged PR #184 supports only USD fees, legacy plain or explicit-CDIV cash
+dividends, explicit CSD deposits, and explicit CSW withdrawals. Dividend tax
+classification remains `unknown`. Bare activity dates use New York
+market-local midnight so return intervals and tax years agree. Currency,
+subtype, signs, arithmetic, and broker-event identity fail closed.
 
-Two residual defects were then found **inside the correction** and fixed
-in the counter-review commit:
+JNLC generic cash journals, SDIV stock dividends, SPD substitute payments,
+interest, tax-specific distribution variants, non-USD amounts, and unknown
+shapes remain unsupported and loud. Do not create a compensating row or widen
+reconciliation tolerance. CR-W3 remains a watch item: the first real account
+dividend may carry a subtype other than absent/CDIV and over-refuse while
+naming it. That is safer than guessing.
 
-- **DHCR-001 (P2)** — the correction rightly replaced fetch timestamps
-  with the provider's activity date, but stamped that bare date at **UTC**
-  midnight, which is the previous evening in New York. Every consumer
-  buckets in market-local time, so it lands on the wrong side of two
-  boundaries, both reproduced rather than reasoned about: (1) under US
-  **standard time** the 16:30 Pacific capture falls at `00:30Z` the next
-  day, so a flow dated `D` stamped `D 00:00Z` is counted in the
-  **previous session's** return interval by
-  `paper_evidence._net_external_flow` — the deposit-as-return hazard GR-7c
-  already closed once; (2) `tax_year_of(2027-01-01T00:00:00+00:00)`
-  returns **2026**, exactly the failure `tax_reporting.py`'s own docstring
-  warns about. Fixed by stamping market-local midnight using
-  `MARKET_TIMEZONE` imported from `assistant.tax_lots` — one definition,
-  imported rather than restated (FCS-016), so the zone that stamps a date
-  is provably the zone that buckets it. New coverage: DST-parametrized
-  stamping (EDT/EST), plus behavioral tests through the real
-  `_net_external_flow` and `tax_year_of` consumers.
-- **DHCR-002 (P3)** — `_assert_broker_activity_id_not_retyped` indexed a
-  hand-maintained literal dict by activity type, which had to stay in sync
-  with a separate handled-types literal. A future type added without a
-  prefix raises `KeyError`, which is **not** a `LedgerError` and so
-  escapes the per-row refusal handler as an unhandled crash instead of a
-  clean fail-closed refusal. Fixed by deriving `_HANDLED_ACTIVITY_TYPES`
-  from `_ACTIVITY_EXTERNAL_ID_PREFIXES` (drift now structurally
-  impossible) and refusing with a `LedgerError`.
+The handler is merged but **not deployed**. The operational host remains on
+`ef05dc1`, which still refuses DIV, JNLC, CSD, and CSW. Any authorized
+epoch-004 deployment should complete before the scheduled **2026-09-10** AEP
+payment while preserving the full transition sequence.
 
-Four mutations, each restored and re-verified: reverting to UTC midnight
-turns 7 tests red including both behavioral consumer tests; restoring the
-hard dict index reproduces the `KeyError`; removing Codex's cross-type ID
-guard and disabling its DIV subtype gate each turn their own tests red,
-proving those guards load-bearing.
+## 3. AP-7 correction
 
-**CR-W3 (new watch item, recorded not fixed):** the DIV subtype allowlist
-accepts only an absent subtype or explicit `CDIV`. No `DIV` activity has
-ever appeared on this account, so the subtype the real AEP payment will
-carry is unverified. If it carries anything else, that night's observation
-fails closed and **names the subtype in the refusal**, and the fix is a
-small reviewed allowlist addition. Over-refusing is the correct failure
-direction, but expect it as a possibility around 2026-09-10 rather than
-be surprised by it.
+The deployed health check can intermittently read a reconciliation committed
+after its entry-time clock, making a matched zero-mismatch row look
+future-dated. The same generalized race exists for backup and restore-drill
+facts. This produces conservative false failures, can make OperationsCycle
+nonzero, and counts an open critical alert against promotion.
 
-## 2. Completed behavior and deliberate limitations
+Development correction `89ebcc2` captures the comparison clock immediately
+after each stored fact is read and includes signed `age_seconds` in health
+details. A caller-supplied as-of clock stays frozen, so genuine future rows
+still fail closed. No grace period or negative-age clamp was introduced.
+This is not deployed and does not alter epoch-003.
 
-`sync_broker_activities()` now supports exactly these USD mappings:
+## 4. Operational truth remeasured read-only
 
-- FEE → the existing idempotent fee journal path;
-- legacy plain DIV or explicit CDIV → `record_dividend()`, with tax
-  classification recorded as `unknown`; and
-- explicit CSD deposit / CSW withdrawal → `record_cash_transfer()`, with
-  direction and sign checked.
+At approximately 16:56 Pacific:
 
-Dividend and external-flow accounting use the broker activity/settlement
-date. `created_at` remains the inclusion boundary after ledger bootstrap and
-is only a fallback economic timestamp when the activity date is absent and a
-real creation timestamp exists. Optional currency must be USD. Both subtype
-field spellings are supported; conflicts refuse. Conflicting reuse of a raw
-broker ID is detected before a response can partially post.
+- `paper-epoch-001` and `paper-epoch-002` were closed;
+- `paper-epoch-003` was the only active epoch at deployed `ef05dc1`, with one
+  observation for 2026-08-10 and five required drills;
+- the observation's capture-time lineage matched the epoch and its ledger
+  mismatch count was zero;
+- the five latest reconciliations were matched with zero mismatches;
+- PaperObservation and OperationsCycle last returned success; OrderMonitor and
+  Watchdog were running under their singleton schedule; and
+- one open critical `portfolio_accounting` AP-7 alert remained. The latest
+  operations heartbeat was healthy with zero failed checks and zero new
+  alerts. The alert was not acknowledged or otherwise mutated.
 
-Deliberately unsupported and loud: JNLC generic cash journals, SDIV stock
-dividends, SPD substitute payments, interest, withholding, return of capital,
-capital-gain distributions, non-USD amounts, and unknown activity shapes.
-JNLC does not prove owner contribution/withdrawal treatment. Never clear one
-with a manual compensating row or wider reconciliation tolerance.
+The evidence clock has genuinely started at one session. No exact account
+identifier, balance, equity, or private payload belongs in this handoff.
 
-AEP's official schedule is record/ex-date **2026-08-10**, payable
-**2026-09-10**, **$0.95/share**. For 39 eligible shares the arithmetic would
-be $37.05, but this development review did not call Alpaca and does not assert
-account entitlement or payment receipt.
-
-## 3. Operational truth measured read-only
-
-At 2026-08-10 15:21 Pacific, the separate operational checkout was clean on
-`main` at exact deployed commit `ef05dc1`. It remains the Epoch 3 runtime and
-does **not** contain the dividend-handler branch.
-
-- `paper-epoch-001` and `paper-epoch-002` are closed.
-- `paper-epoch-003` is the only active epoch, with 5/5 required drills and 0
-  observations at measurement time.
-- Latest reconciliation was matched with zero mismatches; the operations
-  heartbeat was healthy.
-- One open critical `portfolio_accounting` alert remained. Its stored message
-  itself says matched with zero mismatches, so it is a retained/reopened alert
-  record rather than evidence of a current mismatch. Codex did not acknowledge
-  or mutate it.
-- OperationsCycle, PaperObservation, and Watchdog were enabled/Ready or
-  running as expected. OrderMonitor was running. The first scheduled
-  epoch-003 PaperObservation was due at 16:30 Pacific; do not claim evidence
-  accumulation until its successful row and lineage are checked read-only.
-
-Do not deploy into epoch-003. A future deployment of this reviewed handler
-requires explicit owner authorization and the full runbook sequence for an
-epoch-004 transition. Until then, deployed `ef05dc1` still refuses DIV,
-JNLC, CSD, and CSW. After deployment, JNLC will continue to refuse by design.
-
-## 3a. First epoch-003 observation VERIFIED (read-only, 16:40 Pacific)
-
-The evidence clock has started. Measured, not assumed:
-
-- **Scheduler:** `TradingAgent-Paper-PaperObservation` last ran
-  `2026-08-10 16:30:00` Pacific with `LastTaskResult 0`, 0 missed runs,
-  next run 2026-08-11 16:30. `OperationsCycle` last result 0.
-  `OrderMonitor`/`Watchdog` report `0x800710E0` (a new instance refused
-  because one is already running) — the expected steady state for the two
-  singleton-guarded long-runners, not a failure.
-- **Evidence:** `paper_sessions: 1` (2026-08-10), `missing_sessions: []`,
-  `paper_orders: 0`, drills 5/5, epoch active at `ef05dc1`.
-- **Lineage is genuinely bound, not vacuous.** The observation's
-  `payload_json` carries `lineage_hash`
-  `54b083d25246cc6b…` stamped **at capture**, equal to epoch-003's own
-  lineage hash. This closes E3R-003's caveat: `lineage_consistent: true`
-  now compares a real stored value rather than ranging over an empty set.
-- **Books at capture:** observation records `ledger_mismatch_count: 0`,
-  `ledger_reconciled_at 2026-08-10T23:30:05Z`, cash `74389.30`,
-  total equity `100018.2148`, benchmark SPY, `net_external_flow 0`.
-  The five most recent reconciliation runs are all matched / 0 mismatches.
-- **Deployed code is what is executing.** Both long-runners started
-  `2026-08-10 12:31:01` Pacific — after the 12:26 deploy — from
-  `C:\git\trading_agent_operational` at `ef05dc1`. (The `data/locks/*`
-  file mtimes still read 2026-08-06; that is a stale *file* mtime on
-  re-acquisition, not a stale process. Verify process start time, not lock
-  mtime.)
-- **AP-7 found:** the one open critical alert is a false positive from a
-  negative-age race, not a book problem. Full analysis in
-  `docs/OPERATIONAL_FACTS.md` and action-plan defect **AP-7**. It is
-  deployed code inside the active epoch, so it was **not** fixed; the
-  recommendation is to bundle a reviewed fix with the CR-W2 handler so one
-  epoch-004 roll covers both. Do not acknowledge the alert as resolved
-  first — it re-raises on the next scheduler overlap.
-
-Nothing was mutated: no observation, drill, ledger row, alert
-acknowledgement, scheduler change, or broker order. Reads used the
-operational checkout's own code and `sqlite3` read-only URI mode.
-
-## 4. Validation
+## 5. Validation
 
 Environment: Windows, repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
 
-- Claude's submitted affected set: 125 passed in 13.57s.
-- Submitted-tree review regressions reproduced all eleven intended defect
-  cases after two review-fixture argument names were corrected.
-- Corrected broker-activity group: 30 passed, 26 deselected in 8.19s.
-- Corrected affected ledger/CLI/reporting/document batch: 147 passed in
-  19.43s.
-- Active-document consistency after final edits: 11 passed in 0.25s.
-- Full suite: **3,357 passed, 0 failed, 0 skipped** — A–F 1,033 in 138.10s;
-  G–M 1,025 in 223.96s; N–S 1,010 in 146.35s; T–Z 274 in 202.12s; nested
-  fault matrix 15 in 7.66s. The 25 warnings are existing dependency
+- Submitted-tree red regressions: 3 failed as intended (AP-7 race, stale
+  handoff, private balances).
+- Corrected operational suite: 9 passed in 2.84s.
+- Focused counter-review/AP-7 affected suite: 191 passed in 51.62s.
+- Active-document consistency after final edits: 13 passed in 0.18s.
+- Full suite: **3,367 passed, 0 failed, 0 skipped** — A–F 1,035 in 163.08s;
+  G–M 1,025 in 204.90s; N–S 1,018 in 134.38s; T–Z 274 in 199.47s; nested
+  fault matrix 15 in 6.63s. The 25 warnings are existing dependency
   deprecations (one websockets and 24 joblib/NumPy).
 - Repository-prescribed compile check: clean.
-- Diff checks: clean apart from ordinary Windows line-ending notices.
-- Non-printing secret-shape scan of every changed file: zero matches.
+- Diff check: clean apart from expected Windows line-ending notices.
+- Non-printing secret/private-balance shape scan of every changed file: zero
+  matches.
 
-No validation made a live Alpaca request or mutated the operational database.
+No test used live broker credentials or mutated the operator database.
 
-**Counter-review validation (final tree).** Single uninterrupted full-suite
-run: **3,364 passed, 0 failed, 25 warnings** in 698.62s — Codex's 3,357
-plus the seven counter-review regressions. Ledger suite 63 passed.
-Import-boundary and decimal-guard suites re-run because this correction adds
-a package dependency (`assistant.portfolio_ledger` → `assistant.tax_lots`
-for `MARKET_TIMEZONE`): **11 passed**. `compileall` clean; `git diff --check`
-clean. The full-suite run covered the final *code* tree; the documentation
-edits that followed touch only documents, and all four document-reading
-suites were re-run afterwards (**43 passed**), so no assertion is validated
-against a stale tree. Red baseline: the submitted `25a2e7b` ledger was
-restored in place and the review's regressions run against it — 11 failed,
-1 passed (the explicit-CDIV case, which correctly passes on both trees) —
-then restored from a byte copy and re-verified green.
+## 6. Exact next step
 
-## 5. Exact next step
+1. Commit the review report and this handoff separately from correction
+   `89ebcc2`.
+2. Stop. Push and merge require explicit owner authorization.
+3. If the owner later authorizes deployment, follow the complete runbook:
+   disable tasks, close epoch-003 on its frozen runtime, deploy the reviewed
+   merge, reconcile matched, run readiness, start epoch-004, record all five
+   drills, re-enable tasks, and verify. Do not patch epoch-003 in place.
 
-1. ~~Commit the review report, milestone record, regression guard, and
-   handoff separately from correction `a6770f7`.~~ **Done** (`a36d75d`),
-   followed by the counter-review commit `cf9cdc2`; the branch is pushed.
-2. **Owner decision: merge.** Then, separately, authorize the epoch-004
-   roll — the full runbook sequence (disable tasks → close epoch-003 →
-   deploy the merged tree → `ledger-reconcile` matched → readiness → start
-   epoch-004 → five drills → re-enable) — **before 2026-09-10**, ideally
-   while the epoch-003 session count is still low, since rolling discards
-   the sessions accumulated so far. Deployment and epoch transition remain
-   explicit owner instructions.
-3. ~~Verify the first scheduled epoch-003 observation read-only after it
-   runs.~~ **Done — see section 3a. It succeeded; the evidence clock has
-   started.**
-
-## 6. Non-negotiable boundaries
+## 7. Non-negotiable boundaries
 
 - Paper only; live trading remains prohibited.
 - Exact human approval, deterministic validation, broker preflight, kill
-  switch, and account binding remain mandatory.
-- LLM/ML output is observational and cannot approve, size, submit, or promote
-  trades.
-- Do not change policy, strategy, model, code, scheduler, or account lineage
+  switch, account binding, and ambiguous-outcome reconciliation remain
+  mandatory.
+- ML/LLM output remains observational and cannot approve, size, submit, or
+  promote trades.
+- Do not change code, policy, strategy, model, scheduler, or account lineage
   inside an active evidence epoch.
-- Do not insert observations, drills, ledger rows, or alert state manually.
-- Do not infer a generic cash journal's accounting meaning.
+- Do not manually insert observations, drills, ledger rows, or alert state.
+- Do not infer accounting meaning from a generic cash journal.
 
-## 7. Required reading order
+## 8. Required reading order
 
 1. `CLAUDE.md` and `AGENTS.md`.
 2. `docs/SESSION_HANDOFF.md`.
-3. `docs/REVIEW_2026-08-10_BROKER_DIVIDEND_HANDLER.md`.
-4. `docs/OPERATIONAL_FACTS.md`.
-5. `docs/ACTION_PLAN_2026-08-02.md`.
-6. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` and
+3. `docs/REVIEW_2026-08-10_DIVIDEND_COUNTERREVIEW_AND_AP7.md`.
+4. `docs/REVIEW_2026-08-10_BROKER_DIVIDEND_HANDLER.md`.
+5. `docs/OPERATIONAL_FACTS.md`.
+6. `docs/ACTION_PLAN_2026-08-02.md`.
+7. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` and
    `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`.
-7. `docs/OPERATIONS_RUNBOOK.md`.
+8. `docs/OPERATIONS_RUNBOOK.md`.
 
-Before acting, verify:
+Before acting:
 
 ```powershell
 git status --short --branch
-git log -6 --oneline --decorate
+git log -8 --oneline --decorate
 git branch -vv
 ```
 
-## 8. Copyable resume prompt
+## 9. Copyable resume prompt
 
 ```text
 Read CLAUDE.md, AGENTS.md, docs/SESSION_HANDOFF.md,
+docs/REVIEW_2026-08-10_DIVIDEND_COUNTERREVIEW_AND_AP7.md,
 docs/REVIEW_2026-08-10_BROKER_DIVIDEND_HANDLER.md,
 docs/OPERATIONAL_FACTS.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md,
 docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md, and
-docs/OPERATIONS_RUNBOOK.md completely. Verify branch, HEAD, remote
-availability, and worktree state before acting. Claude's dividend-handler
-commit 25a2e7b was accepted after correction a6770f7 on the review branch.
-The supported scope is USD plain/CDIV cash dividends and explicit CSD/CSW;
-JNLC, stock/substitute dividends, non-USD money, and unimplemented tax forms
-remain fail-closed. The review branch has not been published or deployed.
-Epoch-003 remains active on deployed ef05dc1; do not alter it or claim evidence
-is accumulating until its scheduled observation is verified read-only. Do not
-push, merge, deploy, mutate tasks/database/alerts, call the broker, or roll an
-epoch without explicit owner authorization.
+docs/OPERATIONS_RUNBOOK.md completely. Verify Git topology, remote
+availability, and worktree state before acting. PR #184 merged the CR-W2
+dividend handler at 0ee3a22. Claude's counter-review corrections were accepted;
+post-merge correction 89ebcc2 closes the AP-7 concurrent-freshness race and
+remains only on the local Codex review branch. Epoch-003 remains active on
+deployed ef05dc1 with one lineage-matched observation; do not modify it or
+acknowledge its AP-7 alert. Do not push, merge, deploy, mutate tasks/database,
+call the broker, or roll an epoch without explicit owner authorization.
 ```

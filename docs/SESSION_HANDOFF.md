@@ -1,7 +1,7 @@
 # Session handoff — AP-8 reviewed and corrected
 
-Prepared: 2026-08-12, after independent review of the ticker-suggestion
-disclosure policy and before publication of the review branch.
+Prepared: 2026-08-12, after independent review, correction, and authorized
+publication of the ticker-suggestion disclosure policy branch.
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
@@ -34,10 +34,11 @@ machine/epoch record. Do not reconstruct either from chat memory.
 - Corrective code commit: `7c21339`.
 - Review report/action plan/README/milestone/operational-facts commit:
   `f1bbffc`.
-- This separate handoff commit: pending until this file is committed.
-- Publication: owner authorized branch, commits, and push. No PR was requested.
-  At preparation time the review branch is local; cross-computer sync is not
-  complete until its remote tip is verified.
+- Initial separate handoff commit: `0a6b672`.
+- Publication: owner authorized branch, commits, and push. No PR was created.
+  The review branch was pushed and set to track
+  `origin/codex/review-ap8-ticker-disclosure-20260812`; this final
+  publication-state commit follows `0a6b672` on the same remote branch.
 
 Worktree was clean before Claude's submitted review and after each completed
 commit. No unrelated user changes were overwritten.
@@ -153,10 +154,9 @@ account identifiers, the operator database, or licensed data in Git.
 
 ## 6. Next step
 
-Finish the already authorized push of this review branch, verify the remote
-tip, and update this handoff with the exact publication state. Do not create a
-PR. After publication, the owner may request Claude counter-review or later
-authorize merge; neither authorizes deployment.
+Publication is complete and no PR was created, as requested. The owner may
+request Claude counter-review or later authorize merge; neither authorizes
+deployment.
 
 For the roadmap, leave `paper-epoch-004` accumulating. The outstanding GR-6
 off-machine-backup item remains blocked on acceptable external physical media

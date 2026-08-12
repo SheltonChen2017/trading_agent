@@ -374,7 +374,7 @@ def test_suggestion_disclosure_policy_keeps_identity_and_drops_size_screening():
     assert disclosure.minimum_history_sessions == 0
     assert disclosure.minimum_price == 0.0
     assert disclosure.minimum_median_dollar_volume == 0.0
-    assert disclosure.require_company_name is False
+    assert disclosure.require_company_name is True
 
     assert disclosure.allowed_quote_types == ("EQUITY",)
     assert disclosure.allowed_exchanges == strict.allowed_exchanges
@@ -791,3 +791,11 @@ def test_ipo_row_discloses_price_floor_without_repeating_its_session_count(monke
     assert "7 completed trading session(s)" in detail
     assert detail.count("completed trading session(s)") == 1
     assert "last close $3.10" in detail
+
+
+def test_row_discloses_when_liquidity_could_not_be_measured():
+    notes = recommended_stocks._eligibility_disclosure(
+        _verified("NOVOL", median_dollar_volume=None)
+    )
+    assert any("median daily dollar volume unavailable" in note for note in notes)
+    assert any("cannot compare" in note for note in notes)

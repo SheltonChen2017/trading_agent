@@ -25,6 +25,7 @@ the checks that policy declares.
 from __future__ import annotations
 
 import dataclasses
+import math
 
 from data.market_data import fetch_historical
 
@@ -56,6 +57,19 @@ class SecurityEligibilityPolicy:
 
 DEFAULT_ELIGIBILITY_POLICY = SecurityEligibilityPolicy()
 
+# Compatibility only. AP-8 no longer uses this policy in the recent-IPO lane,
+# but it was a public module-level contract before AP-8 and removing the name
+# needlessly breaks imports in downstream tools. Keep its reviewed values
+# frozen; build_recommended_tickers() uses SUGGESTION_DISCLOSURE_POLICY for all
+# three lanes.
+RECENT_IPO_ELIGIBILITY_POLICY = SecurityEligibilityPolicy(
+    allowed_quote_types=("EQUITY",),
+    minimum_history_sessions=3,
+    minimum_price=5.0,
+    minimum_median_dollar_volume=500_000.0,
+    require_company_name=True,
+)
+
 # Owner decision, 2026-08-12. The ticker-suggestion surfaces are DISCLOSURE,
 # not endorsement: they describe what the market did and hold no execution
 # authority whatsoever. The owner asked to see the rows and judge them
@@ -84,7 +98,10 @@ SUGGESTION_DISCLOSURE_POLICY = SecurityEligibilityPolicy(
     minimum_history_sessions=0,
     minimum_price=0.0,
     minimum_median_dollar_volume=0.0,
-    require_company_name=False,
+    # Company identity was never one of the owner-removed size/age/price
+    # judgments. The three-field fallback below fixes NBIS without weakening
+    # the identity floor for LLM-authored symbols.
+    require_company_name=True,
     allowed_exchanges=DEFAULT_ELIGIBILITY_POLICY.allowed_exchanges,
 )
 
@@ -106,10 +123,12 @@ def verify_tickers(
     warrant, preferred share, or fund is REJECTED under the default policy,
     which only allows "EQUITY" -- this is a "recommended STOCKS" feature),
     at least `policy.minimum_history_sessions` real trading sessions exist,
-    the last close is at least `policy.minimum_price`, the trailing median
-    dollar volume (close * volume, a liquidity proxy) is at least
-    `policy.minimum_median_dollar_volume`, and (if `policy.require_company_name`)
-    a real company name is present.
+    the last close is finite, positive, and at least `policy.minimum_price`;
+    when the policy declares a positive liquidity floor, trailing median
+    dollar volume (close * volume, a liquidity proxy) must be available and at
+    least that floor. A zero liquidity floor means "disclose, do not screen,"
+    so an unavailable measurement is preserved as `None`. If
+    `policy.require_company_name`, a non-empty text name must be present.
 
     `dropped` is every candidate that failed fetch_historical, failed any
     eligibility check above, or was beyond `max_checks`. One bad ticker
@@ -144,10 +163,26 @@ def verify_tickers(
             continue
 
         history_sessions = len(hist)
-        last_price = float(hist["close"].iloc[-1])
-        median_dollar_volume = (
-            float((hist["close"] * hist["volume"]).median()) if "volume" in hist.columns else 0.0
-        )
+        try:
+            last_price = float(hist["close"].iloc[-1])
+        except (KeyError, IndexError, OverflowError, TypeError, ValueError):
+            dropped.append(ticker)
+            continue
+        # A zero or non-finite close is malformed market data, not a low-price
+        # security. AP-8 removed the owner's $5 display screen; it did not turn
+        # unusable data into verified identity.
+        if not math.isfinite(last_price) or last_price <= 0:
+            dropped.append(ticker)
+            continue
+
+        median_dollar_volume: float | None = None
+        if "volume" in hist.columns:
+            try:
+                measured_volume = float((hist["close"] * hist["volume"]).median())
+            except (OverflowError, TypeError, ValueError):
+                measured_volume = float("nan")
+            if math.isfinite(measured_volume) and measured_volume >= 0:
+                median_dollar_volume = measured_volume
         quote_type = info.get("quoteType", "")
         # yfinance does not populate longName for every real listing -- NBIS
         # (Nebius Group N.V., Nasdaq NMS, ~$3.6B median daily dollar volume)
@@ -157,8 +192,17 @@ def verify_tickers(
         # reading only one of the three name fields turned a provider metadata
         # gap into a claim about the security. Checked 2026-08-12 against live
         # yfinance after the owner noticed real most-active names missing.
-        company_name = (
-            info.get("longName") or info.get("shortName") or info.get("displayName") or ""
+        company_name = next(
+            (
+                value.strip()
+                for value in (
+                    info.get("longName"),
+                    info.get("shortName"),
+                    info.get("displayName"),
+                )
+                if isinstance(value, str) and value.strip()
+            ),
+            "",
         )
 
         exchange = info.get("exchange", "")
@@ -166,7 +210,13 @@ def verify_tickers(
             quote_type in policy.allowed_quote_types
             and history_sessions >= policy.minimum_history_sessions
             and last_price >= policy.minimum_price
-            and median_dollar_volume >= policy.minimum_median_dollar_volume
+            and (
+                policy.minimum_median_dollar_volume <= 0
+                or (
+                    median_dollar_volume is not None
+                    and median_dollar_volume >= policy.minimum_median_dollar_volume
+                )
+            )
             and (not policy.require_company_name or bool(company_name))
             and (policy.allowed_exchanges is None or exchange in policy.allowed_exchanges)
         )

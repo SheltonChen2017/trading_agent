@@ -7,6 +7,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 import pandas as pd
+import pytest
 
 from assistant import ticker_verification
 from assistant.ticker_verification import SecurityEligibilityPolicy
@@ -302,3 +303,69 @@ def test_disclosure_policy_still_drops_a_symbol_that_does_not_resolve():
         )
     assert verified == []
     assert dropped == ["HALLUCINATED"]
+
+
+def test_disclosure_policy_still_requires_a_company_identity():
+    """AP-8 removed size/age/price judgments, not the company identity floor."""
+    info = {
+        "longName": None,
+        "shortName": None,
+        "displayName": None,
+        "quoteType": "EQUITY",
+        "exchange": "NMS",
+    }
+    with patch("assistant.ticker_verification.fetch_historical") as mock_fetch, \
+         patch("assistant.ticker_verification._safe_ticker_info") as mock_info:
+        mock_fetch.return_value = {"NONAME": _df()}
+        mock_info.return_value = info
+        verified, dropped = ticker_verification.verify_tickers(
+            ["NONAME"], policy=ticker_verification.SUGGESTION_DISCLOSURE_POLICY
+        )
+    assert verified == []
+    assert dropped == ["NONAME"]
+
+
+@pytest.mark.parametrize("bad_close", [0.0, float("inf"), float("-inf")])
+def test_disclosure_policy_rejects_invalid_close_as_not_verified(bad_close):
+    """Removing the $5 screen must not turn invalid market data into identity."""
+    with patch("assistant.ticker_verification.fetch_historical") as mock_fetch, \
+         patch("assistant.ticker_verification._safe_ticker_info") as mock_info:
+        mock_fetch.return_value = {"BAD": _df(close=bad_close)}
+        mock_info.return_value = _ELIGIBLE_INFO
+        verified, dropped = ticker_verification.verify_tickers(
+            ["BAD"], policy=ticker_verification.SUGGESTION_DISCLOSURE_POLICY
+        )
+    assert verified == []
+    assert dropped == ["BAD"]
+
+
+def test_malformed_close_drops_only_that_ticker_instead_of_aborting_batch():
+    frames = {"BAD": _df(close="not-a-price"), "GOOD": _df()}
+    with patch("assistant.ticker_verification.fetch_historical", return_value=frames), \
+         patch("assistant.ticker_verification._safe_ticker_info", return_value=_ELIGIBLE_INFO):
+        verified, dropped = ticker_verification.verify_tickers(
+            ["BAD", "GOOD"], policy=ticker_verification.SUGGESTION_DISCLOSURE_POLICY
+        )
+    assert [row["ticker"] for row in verified] == ["GOOD"]
+    assert dropped == ["BAD"]
+
+
+def test_disclosure_policy_preserves_unavailable_liquidity_as_unavailable():
+    """No volume column is not measured zero-dollar volume."""
+    frame = _df().drop(columns=["volume"])
+    with patch("assistant.ticker_verification.fetch_historical") as mock_fetch, \
+         patch("assistant.ticker_verification._safe_ticker_info") as mock_info:
+        mock_fetch.return_value = {"NOVOL": frame}
+        mock_info.return_value = _ELIGIBLE_INFO
+        verified, dropped = ticker_verification.verify_tickers(
+            ["NOVOL"], policy=ticker_verification.SUGGESTION_DISCLOSURE_POLICY
+        )
+    assert dropped == []
+    assert verified[0]["median_dollar_volume"] is None
+
+
+def test_recent_ipo_policy_import_remains_available_for_compatibility():
+    """AP-8 changes the caller policy; it need not break the prior import."""
+    policy = ticker_verification.RECENT_IPO_ELIGIBILITY_POLICY
+    assert policy.minimum_history_sessions == 3
+    assert policy.require_company_name is True

@@ -111,3 +111,24 @@ def test_no_dropped_candidates_produces_no_omission_sentence(
     assert not app.exception
     captions = "\n".join(element.value for element in app.caption)
     assert "could not be identified" not in captions
+
+
+def test_briefing_always_discloses_the_relaxed_suggestion_screen(
+    _offline_suggestions_environment, monkeypatch
+):
+    """Briefing consumes the same relaxed policy and must name that fact even
+    when every candidate verifies and therefore no omission caption appears.
+    """
+    import assistant.recommended_stocks as recommended_stocks
+
+    monkeypatch.setattr(recommended_stocks, "fetch_most_active_tickers", lambda: [])
+    monkeypatch.setattr(recommended_stocks, "fetch_recent_ipos", lambda: [])
+    monkeypatch.setattr(recommended_stocks, "suggest_similar_tickers", lambda *a, **k: None)
+
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Briefing"
+    app.run()
+
+    assert not app.exception
+    captions = "\n".join(element.value for element in app.caption)
+    assert "NOT screened on size, age, price, or liquidity" in captions

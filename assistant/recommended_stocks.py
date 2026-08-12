@@ -115,10 +115,16 @@ def _eligibility_disclosure(verified: dict, *, include_history: bool = True) -> 
 
     dollar_volume = verified.get("median_dollar_volume")
     if (
-        isinstance(dollar_volume, (int, float))
-        and math.isfinite(float(dollar_volume))
-        and float(dollar_volume) < policy.minimum_median_dollar_volume
+        not isinstance(dollar_volume, (int, float))
+        or isinstance(dollar_volume, bool)
+        or not math.isfinite(float(dollar_volume))
     ):
+        notes.append(
+            "median daily dollar volume unavailable -- cannot compare this row "
+            f"with the usual ${policy.minimum_median_dollar_volume:,.0f} "
+            "liquidity floor"
+        )
+    elif float(dollar_volume) < policy.minimum_median_dollar_volume:
         notes.append(
             f"median daily dollar volume ${float(dollar_volume):,.0f} -- below "
             f"the usual ${policy.minimum_median_dollar_volume:,.0f} liquidity "

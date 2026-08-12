@@ -1820,6 +1820,12 @@ if page == "Briefing":
             "\"Most actively traded\" reflects trading VOLUME and price movement, NOT buy-vs-sell order flow -- "
             "no legitimate retail-accessible data source provides true order imbalance."
         )
+        st.caption(
+            "Verification: every ticker shown resolved against real market data "
+            "as a named US-listed equity. Rows are NOT screened on size, age, "
+            "price, or liquidity (owner decision, 2026-08-12); unavailable or "
+            "below-usual measurements are disclosed on the row instead."
+        )
         if st.button("Refresh recommended stocks", key="refresh_recommended"):
             _load_recommended_tickers.clear()
         held_tickers_tuple = tuple(sorted({p.ticker.upper() for p in packet.portfolio.positions}))
@@ -1836,8 +1842,8 @@ if page == "Briefing":
             # SUGGESTION_DISCLOSURE_POLICY), so a drop is now a real failure
             # to identify the symbol, not a judgment about its size.
             st.caption(
-                f"{len(dropped_candidates)} candidate ticker(s) omitted -- did not "
-                "resolve to real market data as a US-listed equity: "
+                f"{len(dropped_candidates)} candidate ticker(s) omitted -- could "
+                "not be verified at this time as a named US-listed equity: "
                 + ", ".join(sorted(set(dropped_candidates)))
                 + "."
             )
@@ -1861,7 +1867,7 @@ if page == "Briefing":
             with st.expander(f"{label} ({len(items)})"):
                 st.dataframe(
                     [{"Ticker": r.ticker, "Detail": r.detail} for r in items],
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                 )
 
@@ -3311,7 +3317,7 @@ if page == "Ticker Suggestions":
                             }
                             for r in items
                         ],
-                        use_container_width=True,
+                        width="stretch",
                         hide_index=True,
                     )
                 else:

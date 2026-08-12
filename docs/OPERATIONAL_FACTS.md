@@ -365,6 +365,25 @@ deployment requires a separately authorized epoch roll. See
 `docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md` for the full ledger and
 validation.
 
+### AP-8 is reviewed development code, not epoch-004 runtime (2026-08-12)
+
+Claude's ticker-suggestion disclosure implementation `d326a74` was accepted
+after independent correction `7c21339` on
+`codex/review-ap8-ticker-disclosure-20260812`. All three discovery lanes now
+show named US-listed equities without applying the project's usual age, $5
+price, or liquidity floors; below-usual or unavailable measurements are
+visible per row. Review restored company-name identity, finite-positive close
+validation, per-ticker failure isolation, unavailable-liquidity honesty,
+Briefing disclosure, and the prior IPO-policy import. The strict Buying/
+Watchlist policy is unchanged. This remains research presentation only and
+cannot propose, approve, or place an order.
+
+This branch is not the deployed lineage. `paper-epoch-004` remains active on
+`b837374`; do not deploy AP-8 merely to change a research screen. Any future
+deployment requires a separately authorized epoch roll. See
+`docs/REVIEW_2026-08-12_AP8_TICKER_SUGGESTION_DISCLOSURE.md` for the complete
+issue ledger and validation.
+
 - **Launch the app only via `C:\git\launch_trading_app.ps1`.** It pins the
   operational checkout, sets `TRADING_ASSISTANT_DB`, and re-reads Alpaca
   credentials from the **user-scope registry** at every launch. A long-lived

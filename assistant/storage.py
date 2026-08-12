@@ -51,6 +51,10 @@ class LedgerBootstrapConflictError(ValueError):
 class BrokerActivityAcknowledgementConflictError(ValueError):
     """One broker activity already carries a different operator decision."""
 
+
+class ResearchLookConflictError(ValueError):
+    """One research-look fingerprint was reused for different content."""
+
 # ML-LR-6 plan 12.2's minimum lineage. Every one of these can change WITHOUT
 # any code change -- a re-fit model, a new report, a swapped provider, an
 # edited config -- and each silently invalidates comparison against earlier
@@ -706,18 +710,19 @@ class AssistantStore:
                 -- multiplicity correction has an honest denominator. New
                 -- table, so `CREATE TABLE IF NOT EXISTS` migrates a fresh and
                 -- a pre-existing database identically with no ALTER.
-                -- look_fingerprint is the content identity of the
-                -- configuration examined; re-running the SAME configuration
-                -- is not a new statistical test (it is deterministic and
-                -- returns the same answer), so it increments repeat_count
-                -- rather than the look count. Changing any parameter is a
-                -- new look and a new row.
+                -- look_fingerprint binds configuration, exact dated data,
+                -- runtime code, and hypothesis count. Only an exact replay is
+                -- deterministic and increments repeat_count; changed data or
+                -- code is a new look even when widget labels are unchanged.
                 CREATE TABLE IF NOT EXISTS research_looks (
                     look_fingerprint TEXT PRIMARY KEY,
                     surface TEXT NOT NULL,
                     signal_key TEXT NOT NULL,
                     configuration_json TEXT NOT NULL,
                     data_source TEXT NOT NULL,
+                    data_fingerprint TEXT NOT NULL,
+                    code_commit TEXT NOT NULL,
+                    hypothesis_count INTEGER NOT NULL,
                     first_seen_at TEXT NOT NULL,
                     last_seen_at TEXT NOT NULL,
                     repeat_count INTEGER NOT NULL
@@ -917,6 +922,31 @@ class AssistantStore:
             self._migrate_execution_reservation_money(connection)
             self._migrate_paper_observation_money(connection)
             self._migrate_ml_prediction_maturity(connection)
+            self._migrate_research_look_lineage(connection)
+
+    def _migrate_research_look_lineage(
+        self, connection: sqlite3.Connection
+    ) -> None:
+        """Add exact input/code identity to databases opened after QC-2 v1.
+
+        Legacy rows remain part of the conservative historical count but carry
+        NULL lineage because their exact data and runtime cannot be recovered.
+        Every new write requires both fields at the service/storage boundary.
+        """
+        columns = {
+            row["name"]
+            for row in connection.execute("PRAGMA table_info(research_looks)")
+        }
+        for column in ("data_fingerprint", "code_commit"):
+            if column not in columns:
+                connection.execute(
+                    f"ALTER TABLE research_looks ADD COLUMN {column} TEXT"
+                )
+        if "hypothesis_count" not in columns:
+            connection.execute(
+                "ALTER TABLE research_looks ADD COLUMN hypothesis_count "
+                "INTEGER NOT NULL DEFAULT 1"
+            )
 
     def _migrate_ml_prediction_maturity(self, connection: sqlite3.Connection) -> None:
         """Add immutable target availability to databases created by ML-6's
@@ -5201,6 +5231,9 @@ class AssistantStore:
         signal_key: str,
         configuration: dict[str, Any],
         data_source: str,
+        data_fingerprint: str,
+        code_commit: str,
+        hypothesis_count: int,
         seen_at: str,
     ) -> dict[str, Any]:
         """Record one research look. Returns the row as stored.
@@ -5211,19 +5244,55 @@ class AssistantStore:
         update of the configuration -- a look that happened cannot be
         un-looked, which is the entire point of counting them.
         """
-        configuration_json = json.dumps(
-            configuration, sort_keys=True, separators=(",", ":"), default=str
-        )
+        if not isinstance(configuration, dict):
+            raise ValueError("research-look configuration must be an object")
+        try:
+            configuration_json = json.dumps(
+                configuration,
+                sort_keys=True,
+                separators=(",", ":"),
+                allow_nan=False,
+            )
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                "research-look configuration must be canonical finite JSON"
+            ) from exc
+        if json.loads(configuration_json) != configuration:
+            raise ValueError(
+                "research-look configuration must round-trip as canonical JSON"
+            )
+        _require_sha256(look_fingerprint, "look_fingerprint")
+        _require_sha256(data_fingerprint, "data_fingerprint")
+        if _COMMIT_HASH.fullmatch(code_commit) is None:
+            raise ValueError(
+                "research-look code_commit must be a lowercase 40- or "
+                "64-character git hash"
+            )
+        if (
+            isinstance(hypothesis_count, bool)
+            or not isinstance(hypothesis_count, int)
+            or hypothesis_count <= 0
+        ):
+            raise ValueError("research-look hypothesis_count must be positive")
+        for value, field in (
+            (surface, "surface"),
+            (signal_key, "signal_key"),
+            (data_source, "data_source"),
+        ):
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"research-look {field} must be non-empty")
+        canonical_seen_at = _parse_aware_timestamp(
+            seen_at, "research-look seen_at"
+        ).astimezone(timezone.utc).isoformat()
         with self._connect() as connection:
-            connection.execute(
+            cursor = connection.execute(
                 """
                 INSERT INTO research_looks(
                     look_fingerprint, surface, signal_key, configuration_json,
-                    data_source, first_seen_at, last_seen_at, repeat_count
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, 1)
-                ON CONFLICT(look_fingerprint) DO UPDATE SET
-                    last_seen_at = excluded.last_seen_at,
-                    repeat_count = repeat_count + 1
+                    data_source, data_fingerprint, code_commit,
+                    hypothesis_count, first_seen_at, last_seen_at, repeat_count
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
+                ON CONFLICT(look_fingerprint) DO NOTHING
                 """,
                 (
                     look_fingerprint,
@@ -5231,14 +5300,66 @@ class AssistantStore:
                     signal_key,
                     configuration_json,
                     data_source,
-                    seen_at,
-                    seen_at,
+                    data_fingerprint,
+                    code_commit,
+                    hypothesis_count,
+                    canonical_seen_at,
+                    canonical_seen_at,
                 ),
             )
+            if cursor.rowcount != 1:
+                existing = connection.execute(
+                    """
+                    SELECT surface, signal_key, configuration_json,
+                           data_source, data_fingerprint, code_commit,
+                           hypothesis_count, last_seen_at
+                    FROM research_looks WHERE look_fingerprint = ?
+                    """,
+                    (look_fingerprint,),
+                ).fetchone()
+                expected = (
+                    surface,
+                    signal_key,
+                    configuration_json,
+                    data_source,
+                    data_fingerprint,
+                    code_commit,
+                    hypothesis_count,
+                )
+                actual = (
+                    existing["surface"],
+                    existing["signal_key"],
+                    existing["configuration_json"],
+                    existing["data_source"],
+                    existing["data_fingerprint"],
+                    existing["code_commit"],
+                    existing["hypothesis_count"],
+                )
+                if actual != expected:
+                    raise ResearchLookConflictError(
+                        f"fingerprint {look_fingerprint!r} already identifies "
+                        "a different research look"
+                    )
+                existing_seen_at = _parse_aware_timestamp(
+                    existing["last_seen_at"], "stored research-look last_seen_at"
+                ).astimezone(timezone.utc)
+                latest_seen_at = max(
+                    existing_seen_at,
+                    datetime.fromisoformat(canonical_seen_at),
+                ).isoformat()
+                connection.execute(
+                    """
+                    UPDATE research_looks
+                    SET last_seen_at = ?, repeat_count = repeat_count + 1
+                    WHERE look_fingerprint = ?
+                    """,
+                    (latest_seen_at, look_fingerprint),
+                )
             row = connection.execute(
                 """
                 SELECT look_fingerprint, surface, signal_key,
-                       configuration_json, data_source, first_seen_at,
+                       configuration_json, data_source, data_fingerprint,
+                       code_commit, hypothesis_count, first_seen_at,
                        last_seen_at, repeat_count
                 FROM research_looks WHERE look_fingerprint = ?
                 """,
@@ -5248,12 +5369,28 @@ class AssistantStore:
         record["configuration"] = json.loads(record.pop("configuration_json"))
         return record
 
-    def count_research_looks(self) -> int:
-        """Distinct configurations examined -- the multiplicity denominator."""
+    def count_research_looks(
+        self,
+        *,
+        surface: str | None = None,
+        data_source: str | None = None,
+    ) -> int:
+        """Total hypotheses examined -- the multiplicity denominator."""
+        clauses: list[str] = []
+        params: list[str] = []
+        for column, value in (("surface", surface), ("data_source", data_source)):
+            if value is not None:
+                if not isinstance(value, str) or not value.strip():
+                    raise ValueError(f"research-look {column} filter must be non-empty")
+                clauses.append(f"{column} = ?")
+                params.append(value)
+        where = " WHERE " + " AND ".join(clauses) if clauses else ""
         with self._connect() as connection:
             return int(
                 connection.execute(
-                    "SELECT COUNT(*) FROM research_looks"
+                    "SELECT COALESCE(SUM(hypothesis_count), 0) "
+                    "FROM research_looks" + where,
+                    params,
                 ).fetchone()[0]
             )
 
@@ -5262,7 +5399,8 @@ class AssistantStore:
             rows = connection.execute(
                 """
                 SELECT look_fingerprint, surface, signal_key,
-                       configuration_json, data_source, first_seen_at,
+                       configuration_json, data_source, data_fingerprint,
+                       code_commit, hypothesis_count, first_seen_at,
                        last_seen_at, repeat_count
                 FROM research_looks
                 ORDER BY first_seen_at DESC, look_fingerprint

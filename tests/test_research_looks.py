@@ -11,8 +11,10 @@ from __future__ import annotations
 
 import sys
 from datetime import datetime, timezone
+from decimal import Decimal
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -25,6 +27,7 @@ from assistant.research_looks import (
 )
 from assistant.storage import AssistantStore
 from backtest.engine import bonferroni_threshold
+import assistant.research_looks as research_looks_module
 
 
 def _config(**overrides):
@@ -46,6 +49,9 @@ def _record(store, **overrides):
         "signal_key": "dips_and_ups",
         "configuration": _config(),
         "data_source": "real",
+        "data_fingerprint": "d" * 64,
+        "code_commit": "c" * 40,
+        "hypothesis_count": 1,
     }
     kwargs.update(overrides)
     return record_research_look(store, **kwargs)
@@ -127,16 +133,22 @@ def test_the_fingerprint_ignores_key_order_but_not_values():
         surface="ui_backtest", signal_key="momentum",
         configuration={"lookback_days": 126, "skip_days": 21},
         data_source="real",
+        data_fingerprint="d" * 64,
+        code_commit="c" * 40,
     )
     b = look_fingerprint(
         surface="ui_backtest", signal_key="momentum",
         configuration={"skip_days": 21, "lookback_days": 126},
         data_source="real",
+        data_fingerprint="d" * 64,
+        code_commit="c" * 40,
     )
     c = look_fingerprint(
         surface="ui_backtest", signal_key="momentum",
         configuration={"lookback_days": 126, "skip_days": 22},
         data_source="real",
+        data_fingerprint="d" * 64,
+        code_commit="c" * 40,
     )
     assert a == b
     assert a != c
@@ -179,6 +191,20 @@ def test_the_registry_table_migrates_onto_a_pre_migration_database(tmp_path):
     _record(store)
     with store._connect() as connection:
         connection.execute("DROP TABLE research_looks")
+        connection.execute(
+            """
+            CREATE TABLE research_looks (
+                look_fingerprint TEXT PRIMARY KEY,
+                surface TEXT NOT NULL,
+                signal_key TEXT NOT NULL,
+                configuration_json TEXT NOT NULL,
+                data_source TEXT NOT NULL,
+                first_seen_at TEXT NOT NULL,
+                last_seen_at TEXT NOT NULL,
+                repeat_count INTEGER NOT NULL
+            )
+            """
+        )
     reopened = AssistantStore(path)
     with reopened._connect() as connection:
         recreated = connection.execute(
@@ -186,6 +212,12 @@ def test_the_registry_table_migrates_onto_a_pre_migration_database(tmp_path):
             "name='research_looks'"
         ).fetchone()
     assert recreated is not None
+    with reopened._connect() as connection:
+        columns = {
+            row["name"]
+            for row in connection.execute("PRAGMA table_info(research_looks)")
+        }
+    assert {"data_fingerprint", "code_commit"} <= columns
     assert reopened.count_research_looks() == 0
     assert AssistantStore(path).count_research_looks() == 0
 
@@ -219,7 +251,145 @@ def test_the_registry_never_blocks_research():
         / "personal_assistant_ui.py"
     ).read_text(encoding="utf-8")
     start = source.index("record_research_look(")
-    window = source[start - 400 : start + 900]
+    window = source[start - 400 : start + 1_600]
     assert "except Exception" in window and "look_error" in window, (
         "a research-look registry failure must not block the backtest"
     )
+
+
+# --- Independent-review regressions (QC2REV, 2026-08-11) ------------
+
+
+def _research_frame(*, start="2026-01-02", close_shift=0.0):
+    index = pd.date_range(start, periods=3, freq="B")
+    close = [100.0 + close_shift, 101.0 + close_shift, 102.0 + close_shift]
+    return pd.DataFrame(
+        {
+            "open": [99.0, 100.0, 101.0],
+            "high": [101.0, 102.0, 103.0],
+            "low": [98.0, 99.0, 100.0],
+            "close": close,
+            "volume": [1000, 1100, 1200],
+        },
+        index=index,
+    )
+
+
+def test_research_data_identity_changes_with_values_dates_or_tickers():
+    """A repeat means the complete engine input is identical, not merely
+    that the widgets still show the same labels."""
+    fingerprint = research_looks_module.research_data_fingerprint
+    original = fingerprint({"AAA": _research_frame()})
+    assert fingerprint({"AAA": _research_frame()}) == original
+    assert fingerprint({"AAA": _research_frame(close_shift=0.01)}) != original
+    assert fingerprint({"AAA": _research_frame(start="2026-01-05")}) != original
+    assert fingerprint({"BBB": _research_frame()}) != original
+
+
+def test_same_settings_on_changed_data_or_code_are_distinct_looks(tmp_path):
+    store = AssistantStore(tmp_path / "assistant.db")
+    common = {
+        "surface": "ui_backtest",
+        "signal_key": "dips_and_ups",
+        "configuration": _config(),
+        "data_source": "real",
+    }
+    first_data = research_looks_module.research_data_fingerprint(
+        {"AAA": _research_frame()}
+    )
+    second_data = research_looks_module.research_data_fingerprint(
+        {"AAA": _research_frame(close_shift=0.01)}
+    )
+    record_research_look(
+        store, **common, data_fingerprint=first_data, code_commit="a" * 40
+    )
+    record_research_look(
+        store, **common, data_fingerprint=second_data, code_commit="a" * 40
+    )
+    record_research_look(
+        store, **common, data_fingerprint=second_data, code_commit="b" * 40
+    )
+    assert store.count_research_looks() == 3
+
+
+@pytest.mark.parametrize(
+    "bad_value",
+    [float("nan"), float("inf"), Decimal("1.25")],
+)
+def test_configuration_must_be_finite_canonical_json(tmp_path, bad_value):
+    """`default=str` lets different Python values collapse to one identity
+    and lets NaN/Infinity enter a supposedly canonical evidence record."""
+    store = AssistantStore(tmp_path / "assistant.db")
+    with pytest.raises(ResearchLookError, match="configuration"):
+        _record(store, configuration={"parameter": bad_value})
+    assert store.count_research_looks() == 0
+
+
+def test_storage_refuses_same_fingerprint_with_different_content(tmp_path):
+    """The primary key is content identity, so a conflicting row cannot be
+    counted as an ordinary repeat merely because a caller supplied its hash."""
+    store = AssistantStore(tmp_path / "assistant.db")
+    kwargs = {
+        "look_fingerprint": "a" * 64,
+        "surface": "ui_backtest",
+        "signal_key": "dips_and_ups",
+        "data_source": "real",
+        "data_fingerprint": "d" * 64,
+        "code_commit": "c" * 40,
+        "hypothesis_count": 1,
+        "seen_at": "2026-08-11T12:00:00+00:00",
+    }
+    store.record_research_look(configuration={"x": 1}, **kwargs)
+    with pytest.raises(ValueError, match="different research look"):
+        store.record_research_look(configuration={"x": 2}, **kwargs)
+    assert store.list_research_looks()[0]["repeat_count"] == 1
+
+
+def test_real_market_denominator_excludes_synthetic_plumbing(tmp_path):
+    """Synthetic fixtures test software, not market hypotheses, and must not
+    make the displayed real-market significance threshold stricter."""
+    store = AssistantStore(tmp_path / "assistant.db")
+    _record(store, data_source="synthetic")
+    _record(store, data_source="synthetic", configuration=_config(lookback_days=252))
+    _record(store, data_source="real")
+    summary = research_look_summary(
+        store, surface="ui_backtest", data_source="real"
+    )
+    assert summary["total_looks"] == 1
+    assert summary["corrected_alpha_threshold"] == 0.05
+    assert summary["family"] == {
+        "surface": "ui_backtest",
+        "data_source": "real",
+    }
+
+
+def test_multi_horizon_sweep_counts_each_horizon_direction_cell(tmp_path):
+    """One UI click scans horizon x direction cells. Bonferroni's
+    denominator is the number of cells tested, not the number of clicks."""
+    store = AssistantStore(tmp_path / "assistant.db")
+    _record(
+        store,
+        configuration=_config(hold_days_options=[1, 5, 10]),
+        hypothesis_count=6,
+    )
+    assert store.count_research_looks() == 6
+    assert research_look_summary(store)["corrected_alpha_threshold"] == pytest.approx(
+        0.05 / 6
+    )
+
+
+def test_ui_binds_exact_data_and_code_before_the_engine_result():
+    source = (
+        Path(__file__).resolve().parent.parent
+        / "scripts"
+        / "personal_assistant_ui.py"
+    ).read_text(encoding="utf-8")
+    start = source.index('if st.button("Run backtest"')
+    load_at = source.index("bt_data, data_coverage =", start)
+    record_at = source.index("record_research_look(", start)
+    run_at = source.index("results_by_horizon = run_interactive_backtest(", start)
+    assert load_at < record_at < run_at
+    window = source[load_at:run_at]
+    assert "research_data_fingerprint(bt_data)" in window
+    assert "current_commit(require_clean=True)" in window
+    assert "len(INTERACTIVE_DIRECTION_CELLS)" in window

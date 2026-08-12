@@ -82,7 +82,12 @@ from assistant.news_summary import (
 )
 from assistant.macro_context import build_descriptive_macro_context
 from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calendar_configured
-from assistant.research_looks import record_research_look, research_look_summary
+from assistant.research_looks import (
+    record_research_look,
+    research_data_fingerprint,
+    research_look_summary,
+)
+from assistant.runtime_identity import current_commit
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.ticker_verification import partition_by_universe, verify_tickers
 from assistant.policy import (
@@ -173,6 +178,7 @@ from backtest.engine import summarize_multi_horizon
 from backtest.interactive import (
     CHART_CAPTION,
     EXPLORATORY_CAVEATS,
+    INTERACTIVE_DIRECTION_CELLS,
     SIGNAL_INVENTORY,
     SYNTHETIC_CAVEAT,
     cumulative_return_frame,
@@ -3300,9 +3306,10 @@ if page == "Ticker Suggestions":
 # Backtest -- UI-3's read-only research surface. Composes the SAME
 # backtest/engine.py walk-forward the CLI research scripts use, through the
 # frozen inventory in backtest/interactive.py. It has no path to proposals,
-# approvals, orders, policy, or the research registry, and it must never
-# grow one: a good-looking chart leads nowhere. Confirmatory significance
-# deliberately does NOT run here (see EXPLORATORY_CAVEATS).
+# approvals, orders, or policy. QC-2 adds an audit-only research-look write;
+# it cannot gate the run or lead toward action. A good-looking chart still
+# leads nowhere. Confirmatory significance deliberately does NOT run here
+# (see EXPLORATORY_CAVEATS).
 # ---------------------------------------------------------------------------
 
 _WHOLE_UNIVERSE_SCOPE = f"Entire universe ({len(UNIVERSE)} tickers)"
@@ -3446,11 +3453,17 @@ if page == "Backtest":
                     if use_real_data
                     else "Running the walk-forward backtest..."
                 ):
-                    # QC-2: record the look BEFORE the result is known, so a
-                    # configuration cannot be quietly dropped from the
-                    # multiplicity denominator once its answer disappoints.
-                    # Recording never gates the backtest: a registry failure
-                    # is surfaced and the research still runs.
+                    bt_data, data_coverage = (
+                        _load_backtest_real_data(bt_tickers, int(bt_lookback))
+                        if use_real_data
+                        else _load_backtest_synthetic_data(
+                            bt_tickers, int(bt_lookback)
+                        )
+                    )
+                    # Fetch first so identity binds the exact dated bars, then
+                    # record BEFORE the engine reveals a result. Widget labels
+                    # alone are not a repeat: real history grows/corrects and
+                    # synthetic dates move. Recording never gates research.
                     try:
                         look_record = record_research_look(
                             _store(),
@@ -3465,17 +3478,16 @@ if page == "Backtest":
                                 "slippage_pct": SLIPPAGE_PCT,
                             },
                             data_source="real" if use_real_data else "synthetic",
+                            data_fingerprint=research_data_fingerprint(bt_data),
+                            code_commit=current_commit(require_clean=True),
+                            hypothesis_count=(
+                                len(bt_horizons)
+                                * len(INTERACTIVE_DIRECTION_CELLS)
+                            ),
                         )
                         look_error = None
                     except Exception as exc:  # research must not be blocked
                         look_record, look_error = None, str(exc)
-                    bt_data, data_coverage = (
-                        _load_backtest_real_data(bt_tickers, int(bt_lookback))
-                        if use_real_data
-                        else _load_backtest_synthetic_data(
-                            bt_tickers, int(bt_lookback)
-                        )
-                    )
                     results_by_horizon = run_interactive_backtest(
                         bt_data,
                         signal_key=bt_signal.key,
@@ -3515,14 +3527,23 @@ if page == "Backtest":
             st.warning(
                 "This run was NOT recorded in the research-look registry "
                 f"({completed_run['look_error']}). The multiplicity count "
-                "below therefore understates how many configurations have "
-                "been examined."
+                "below therefore understates how many hypotheses have been "
+                "examined."
             )
-        try:
-            look_summary = research_look_summary(_store())
-        except Exception as exc:
+        if completed_run.get("source") == "real":
+            try:
+                look_summary = research_look_summary(
+                    _store(), surface="ui_backtest", data_source="real"
+                )
+            except Exception as exc:
+                look_summary = None
+                st.warning(f"Research-look registry unavailable: {exc}")
+        else:
             look_summary = None
-            st.warning(f"Research-look registry unavailable: {exc}")
+            st.caption(
+                "Synthetic plumbing runs are logged for audit but excluded "
+                "from the real-market hypothesis denominator."
+            )
         if look_summary is not None:
             repeat_note = ""
             record = completed_run.get("look_record")

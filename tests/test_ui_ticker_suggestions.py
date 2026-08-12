@@ -67,3 +67,47 @@ def test_direction_view_renders_every_bucket_and_discloses_cached_data_time(
     assert "UNKNOWN" in captions and "reported no usable price change" in captions
     assert fetched_at in captions
     assert "cached for up to 15 minutes" in captions
+
+
+def test_dropped_candidates_are_named_not_just_counted(
+    _offline_suggestions_environment,
+):
+    """A bare count could not distinguish "we filtered out junk" from "we
+    filtered out the day's second most-traded stock" -- which is exactly how
+    the SPCX omission stayed invisible until the owner diffed this list
+    against yfinance by hand on 2026-08-12."""
+    fetched_at = "2026-08-12T16:00:00+00:00"
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Ticker Suggestions"
+    app.session_state["ticker_suggestions_result"] = {
+        "rows": [RecommendedTicker("UP", "most_active", "Up detail", fetched_at, "advancing")],
+        "dropped": ["BOGUS", "FGN"],
+        "ran_at": "2026-08-12T16:14:00+00:00",
+        "sources": {"most_active": True, "recent_ipo": False, "ai_suggested": False},
+    }
+    app.run()
+
+    assert not app.exception
+    captions = "\n".join(element.value for element in app.caption)
+    assert "BOGUS" in captions and "FGN" in captions
+    # And the caption must say what screening does and does not do now.
+    assert "NOT screened on size, age, price, or liquidity" in captions
+
+
+def test_no_dropped_candidates_produces_no_omission_sentence(
+    _offline_suggestions_environment,
+):
+    fetched_at = "2026-08-12T16:00:00+00:00"
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Ticker Suggestions"
+    app.session_state["ticker_suggestions_result"] = {
+        "rows": [RecommendedTicker("UP", "most_active", "Up detail", fetched_at, "advancing")],
+        "dropped": [],
+        "ran_at": "2026-08-12T16:14:00+00:00",
+        "sources": {"most_active": True, "recent_ipo": False, "ai_suggested": False},
+    }
+    app.run()
+
+    assert not app.exception
+    captions = "\n".join(element.value for element in app.caption)
+    assert "could not be identified" not in captions

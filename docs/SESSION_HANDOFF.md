@@ -1,7 +1,8 @@
-# Session handoff — QC-2 reviewed and corrected
+# Session handoff — ticker-suggestion disclosure policy (AP-8)
 
-Prepared: 2026-08-11, after independent review, correction, and authorized
-publication of the QC-2 interactive research-look registry branch.
+Prepared: 2026-08-12, after the owner compared the Ticker Suggestions module
+against yfinance by hand, found real top-of-market names missing, and directed
+that the size/age/price screen be removed from that surface.
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
@@ -13,166 +14,183 @@ Repository: `SheltonChen2017/trading_agent`
 Read, in order:
 
 1. `CLAUDE.md`
-2. `docs/ACTION_PLAN_2026-08-02.md`
+2. `docs/ACTION_PLAN_2026-08-02.md` (§3 disclosure-policy row, §6 AP-8)
 3. `docs/OPERATIONAL_FACTS.md`
 4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
 5. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-6. `docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md`
 
 The action plan is the sequencing authority. Operational facts are the durable
 machine/epoch record. Do not recreate either from conversation memory.
 
 ## 1. Repository and branch topology
 
-- Starting `main` / `origin/main`: `62c8270` (PR #192 merge).
-- Submitted base: `5e6b0bb` (PR #191 merge).
+- Base `main` / `origin/main`: `cea6640` (PR #193 merge, QC-2 review record).
 - Claude implementation branch:
-  `user/claude/qc2-look-counting-registry-20260811`.
-- Claude implementation commit: `f09682f`; pushed and merged through PR #192
-  as `62c8270`.
-- Codex review branch:
-  `codex/review-qc2-look-counting-registry-20260811`.
-- Corrective code commit: `7fc9db8`.
-- Durable review/action/milestone/operational-facts commit: `3e5cba7`.
-- Initial separate handoff commit: `b52015a`.
-- Publication: owner authorized branch + commit + push, with **no PR**. The
-  review branch was pushed and set to track
-  `origin/codex/review-qc2-look-counting-registry-20260811`; this final
-  publication-state update follows `b52015a` and is part of the same pushed
-  branch. Cross-computer continuation uses that remote branch, not a local
-  copy of this file.
+  `user/claude/ticker-suggestion-disclosure-20260812`, branched from `cea6640`.
+- Not merged, not deployed, no PR opened yet.
+- No other branch is outstanding. Every prior-round branch, including the
+  doc-only `restart-app-after-deploy-fact` commit `605916f`, is reachable from
+  `origin/main`; an earlier draft of this file claimed otherwise from
+  conversation memory and `test_no_document_calls_a_merged_commit_unreachable`
+  caught it.
 
-The submitted range was exactly `5e6b0bb..62c8270`, in order:
+## 2. What prompted this
 
-1. `f09682f` — Add QC-2: research-look registry.
-2. `62c8270` — merge PR #192.
+The owner listed the Ticker Suggestions surface next to yfinance's own
+most-actives screen and asked why SPCX was absent. Measured live on
+2026-08-12: the module fetched all ten of the day's most-active names and then
+dropped three of them, showing only the sentence
+`3 candidate ticker(s) could not be verified`.
 
-The merge has no merge-only tree delta relative to `f09682f`.
+- **SPCX** — 41 completed sessions against `DEFAULT_ELIGIBILITY_POLICY`'s
+  60-session floor. It failed that check and no other: Nasdaq NMS, `EQUITY`,
+  ~$145, ~$10.7B median daily dollar volume, ~$1.9T market cap.
+- **PLUG** — $2.28 against the $5.00 floor.
+- **NBIS** — rejected as having no company name. This one was a real defect,
+  not a policy effect: `verify_tickers()` read only `info["longName"]`, which
+  yfinance returns as `None` for Nebius Group N.V. across repeated fetches
+  while populating `shortName` and `displayName`. A provider metadata gap was
+  being reported as a fact about the security.
 
-## 2. Review outcome
+The bare count is what let this stay invisible. It could not distinguish
+"we filtered out junk" from "we filtered out the day's second most-traded
+stock", so nothing surfaced until an external comparison.
 
-**Accepted after correction. Quality: 6/10.** The implementation had a sound
-core idea—pre-result durable recording, exact-repeat accounting, no deletion,
-and non-gating failure—but its displayed number was not yet an honest
-multiplicity denominator. Four material defects were reproduced red against
-the submitted tree and fixed:
+## 3. What changed
 
-- **QC2REV-001 — P2, closed:** identical widget choices over new/corrected
-  market data or changed code were called repeats. Look identity now binds a
-  SHA-256 of the exact dated DataFrames and a clean Git commit.
-- **QC2REV-002 — P2, closed:** one click counted as one test although the
-  engine scans every selected horizon in both dip and up directions. Each row
-  now carries and the denominator sums `horizons × 2` hypothesis cells.
-- **QC2REV-003 — P2, closed:** synthetic plumbing runs polluted the displayed
-  real-market family. Synthetic runs remain auditable, but only real Backtest
-  cells feed the real-market threshold.
-- **QC2REV-004 — P2, closed:** `default=str`, non-finite floats, and trusting a
-  caller hash admitted ambiguous/colliding durable identity. Configuration is
-  now strict finite JSON; storage validates all identity fields and raises a
-  conflict rather than modifying different immutable content under one hash.
+**Owner decision, 2026-08-12.** The ticker-suggestion surface is disclosure the
+reader judges, not a shortlist the project vouches for, and it carries no
+execution authority — so it no longer screens real securities on size, age, or
+price. New `SUGGESTION_DISCLOSURE_POLICY` in `assistant/ticker_verification.py`
+is used by all three lanes of `build_recommended_tickers()`.
 
-No P0, P1, P3, or unresolved finding remains. Full evidence, locations,
-red/green proofs, reasons, and both commit dispositions are in
-`docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md`.
+**Identity screening is deliberately retained.** A symbol must still resolve to
+real market data, be an `EQUITY`, and be listed on a US venue. That floor is not
+a size opinion — it is what stops a hallucinated or mistyped symbol from being
+rendered as a suggestion, and the `ai_suggested` lane is LLM-authored. Do not
+relax it without a separate explicit owner decision.
 
-Commit dispositions:
+**Every removed threshold is re-emitted as a visible per-row fact** by
+`assistant.recommended_stocks._eligibility_disclosure()`. Removing the filter
+silently would have been a downgrade rather than a disclosure: a 41-session
+listing and a decade-old blue chip would have rendered identically, and the
+reader could no longer tell which rows the project's own thresholds would have
+excluded. A row that clears every floor gets no notes, so the notes carry
+information rather than reading as boilerplate.
 
-- `f09682f`: **accepted after correction** (`7fc9db8`).
-- `62c8270`: **accepted after correction**; no merge-only delta, inherits the
-  same findings/correction.
+Also changed:
 
-## 3. Final QC-2 behavior
+- `verify_tickers()` now resolves the company name from `longName`,
+  `shortName`, or `displayName`. This applies to every caller, including the
+  strict policy; it is a defect fix, not part of the owner decision. Dropping
+  when all three are absent is still enforced and tested.
+- Both suggestion captions now name every omitted symbol and state what
+  screening does and does not do.
+- `RECENT_IPO_ELIGIBILITY_POLICY` was removed. It existed solely to spare the
+  IPO lane the 60-session floor; with the floor gone from this surface it had
+  no remaining caller.
 
-The Backtest page fetches its data, derives exact data/code identity, and
-records the tested family **before** the engine returns a result. A new family
-is created when the signal, configuration, exact data, source class, clean
-code commit, surface, or hypothesis-cell count changes. Only an exact replay
-increments `repeat_count`; `last_seen_at` never regresses. There is no delete
-or rewrite API.
+**Scope is deliberately narrow.** The Watchlist similar-stocks surface still
+uses `DEFAULT_ELIGIBILITY_POLICY`, whose thresholds are unchanged and are now
+pinned by test so this change cannot loosen them as a side effect.
 
-The displayed Bonferroni threshold applies to the real-data interactive
-Backtest family. A synthetic run is still recorded for audit but explicitly
-does not display or enlarge that real-market denominator. Registry failure is
-loud and leaves the count conservative, but it never blocks the backtest.
+Nothing here proposes, sizes, approves, or authorizes any order. No proposal,
+execution, policy, scheduler, ML/LLM-authority, or live-trading boundary
+changed.
 
-This is research bookkeeping only. Passing the threshold is necessary, never
-sufficient: it is not evidence of a market edge, a stock recommendation, or
-permission to propose, approve, or place an order. No proposal, execution,
-policy, scheduler, ML/LLM-authority, or live-trading boundary changed. QC-2
-does not yet count QuantConnect cloud-client research runs.
+## 4. Validation
 
-## 4. Final validation
+Repository `.venv`, Python 3.13.14, Streamlit 1.60.0, on the final tree.
 
-Final corrected tree used the repository `.venv`:
+- Full repository suite on the final tree: **3,445 passed, 0 failed, 0 skipped,
+  25 dependency warnings** in 729.71s, Python 3.13.14 / Streamlit 1.60.0.
+- An earlier full run of an intermediate tree showed one failure,
+  `test_ui_feature_controls.py::test_every_page_is_reachable_through_the_sidebar[Briefing-...]`.
+  It was a 60-second `AppTest` timeout inside `require_widgets_deltas`, not an
+  assertion failure; that test has no offline fixture, so the Briefing page
+  makes live provider calls while the rest of the suite loads the machine. It
+  passed in isolation and did not recur on the final run. Recorded here rather
+  than dropped, because a timing-sensitive UI test with live network access is
+  a standing fragility this change did not introduce and did not fix.
+- Focused: `tests/test_recommended_stocks.py` 46 passed,
+  `tests/test_ticker_verification.py` 22 passed,
+  `tests/test_ui_ticker_suggestions.py` 3 passed.
+- `compileall` clean; `git diff --check` clean apart from expected Windows
+  LF→CRLF notices.
+- New coverage: 15 tests, plus one obsolete test replaced by a stronger one
+  (it asserted the IPO lane avoided the strict policy; the replacement pins the
+  policy for all three lanes and forbids the strict policy anywhere on this
+  surface).
+- Mutations, each restored in a `finally` block, each turning exactly the
+  intended tests red: reverting the name lookup to `longName` only; restoring
+  the strict policy on the most-active lane; reducing the caption to a bare
+  count; and deleting the disclosure notes from each of the three lanes
+  separately.
+- Live post-fix run of the most-active lane: 10 of 10 shown, 0 dropped, SPCX
+  and PLUG carrying their disclosure notes, NBIS named "Nebius Group N.V."
+  from `shortName`.
 
-- Python 3.13.14.
-- Streamlit 1.60.0.
-- Focused final selection: **81 passed** in 92.03s.
-- Full repository suite in deterministic batches: **3,429 passed, 0 failed,
-  0 skipped, 25 dependency warnings**:
-  - A–F: 1,035 passed in 178.18s, 1 warning.
-  - G–M: 1,025 passed in 210.82s, 24 warnings.
-  - N–S: 1,079 passed in 163.56s.
-  - T–Z plus nested fault tests: 290 passed in 211.24s.
-- Collection: 3,429 tests in 12.40s.
-- `compileall`: clean.
-- `git diff --check`: clean except expected Windows LF→CRLF notices.
-- Changed-content credential-shape scan: zero matches.
-- Active-document consistency after durable doc edits: 13 passed.
+**Defect found in this session's own tests, and fixed.** The first version of
+the new lane tests patched `verify_tickers` with a single `return_value`. That
+function is called once per lane, so every lane received the same rows and a
+lane whose provider had returned nothing still emitted one — meaning the IPO
+and AI assertions were actually reading the most-active lane's output. It
+surfaced only because the per-lane mutation run reddened all three tests when
+just the most-active lane was broken. Fixed with a lane-aware side effect that
+returns nothing for an empty candidate list, plus per-lane row selection;
+re-running the mutations now reddens exactly the matching lane's test. Anyone
+adding a lane test here should copy `_lane_aware_verify`, not `return_value`.
 
-The full run includes the nine reviewer regression cases that failed for the
-intended reasons on the uncorrected submitted tree.
+Untested: the Finnhub IPO lane end to end (no API key on this host, so it
+returns empty by design); the `ai_suggested` lane against a live Claude call;
+and the Briefing-tab caption text, which is exercised only by the whole-page
+reachability test and has no assertion on its wording — the dedicated Ticker
+Suggestions caption does have one.
 
 ## 5. Operational truth — do not disturb the epoch
 
-No operator state was mutated or re-measured in this review. Preserve the
-last verified durable facts:
+No operator state was read, mutated, or re-measured in this session. Preserve
+the last verified durable facts:
 
 - `paper-epoch-004` is the only active evidence epoch.
 - Its deployed code commit is `b837374`, not this development branch.
-- At the last recorded measurement it had 0 sessions, 0 epoch orders, all
-  5/5 required drills, and 0 open alerts.
-- The first qualifying post-roll observation begins its 60-session / 30-order
-  evidence clock; do not manufacture observations.
-- QC-2 is **not deployed**. Do not close a healthy evidence epoch merely to
-  add research bookkeeping. Any future deployment requires a separate,
-  explicit owner-authorized epoch roll.
+- This change is **not deployed**. Do not close a healthy evidence epoch to
+  ship a research-surface presentation change. It should ride whatever roll
+  happens next for an independent reason.
+- After any authorized deploy, restart every Streamlit process and launch once
+  through `C:\git\launch_trading_app.ps1`; a rerun does not reload already
+  imported `assistant.*` classes.
 
-After any authorized deploy, restart every Streamlit process and launch once
-through `C:\git\launch_trading_app.ps1`; a rerun does not reload already
-imported `assistant.*` classes. Operational scheduled commands load code on
-each invocation. The epoch swap itself requires the elevated machine-local
-`C:\git\epoch_swap_tasks_elevated.ps1` procedure described in operational
-facts.
-
-The second computer must not bootstrap or run paper schedulers against the
-same Alpaca paper account while the epoch host is active. Do not copy secrets,
+The second computer must not bootstrap or run paper schedulers against the same
+Alpaca paper account while the epoch host is active. Do not copy secrets,
 account identifiers, the operator database, or licensed data into Git or this
 handoff.
 
 ## 6. Next step
 
-Publication is complete and no PR was created, as requested. The owner may
-ask Claude for a counter-review or later authorize merge; neither action
-authorizes deployment.
+Independent review of `user/claude/ticker-suggestion-disclosure-20260812`.
+Review should press hardest on whether the retained identity floor is actually
+sufficient for the LLM-authored lane, and on whether the per-row disclosure
+notes are complete with respect to what the policy stopped enforcing.
 
-For the roadmap, **leave epoch-004 accumulating**. QC-2 is complete for the
-local interactive Backtest surface. Remaining work includes GR-6 portability
-residuals, GR-7d (blocked on an owner target-portfolio decision), and live
-QuantConnect authentication/cloud-run look accounting; none should displace
-epoch observation without an owner decision.
+The one owner decision still outstanding from prior rounds is unchanged: three
+months of irreplaceable evidence are backed up to the same physical disk they
+live on. This is a corporate-managed host where uploads are not permitted, so
+external physical media is the only available off-machine option. GR-6's
+off-machine backup item stays blocked until that is resolved.
 
 ## 7. Resume prompt
 
 ```text
 Fetch origin and switch to
-codex/review-qc2-look-counting-registry-20260811. Read CLAUDE.md,
-docs/SESSION_HANDOFF.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/OPERATIONAL_FACTS.md, and
-docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md completely. Verify the
-branch tip and a clean worktree before acting. QC-2 was accepted only after
-the corrections in 7fc9db8; do not revert its data/code lineage,
-horizon-by-direction count, real/synthetic family separation, or strict
-durable identity. Do not deploy or roll paper-epoch-004 without a new explicit
-owner authorization.
+user/claude/ticker-suggestion-disclosure-20260812. Read CLAUDE.md,
+docs/SESSION_HANDOFF.md, docs/ACTION_PLAN_2026-08-02.md (§3 disclosure-policy
+row and §6 AP-8), and docs/OPERATIONAL_FACTS.md completely. Verify the branch
+tip and a clean worktree before acting. The size/age/price screen was removed
+from build_recommended_tickers() by explicit owner decision on 2026-08-12; the
+identity screen (resolves to real market data, EQUITY, US venue) was
+deliberately kept and must not be relaxed without a new owner decision, and
+_eligibility_disclosure() must keep re-emitting every unenforced threshold as a
+visible per-row fact. Do not deploy or roll paper-epoch-004 without a new
+explicit owner authorization.
 ```

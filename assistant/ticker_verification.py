@@ -14,6 +14,13 @@ carry no real identifying info -- either case is dropped rather than
 shown, per this project's standing "never trust a new ticker without
 checking it" discipline (config.DEFENSIVE_CARRY_TICKERS is the existing
 precedent for holding a ticker list that isn't itself an authorization).
+
+Two policies, and the difference is deliberate. DEFAULT_ELIGIBILITY_POLICY
+screens on identity AND size/age/price. SUGGESTION_DISCLOSURE_POLICY screens
+on identity only, for surfaces whose job is to show the reader what the market
+did rather than to hand them a vouched-for shortlist. Neither policy is an
+authorization to trade anything: passing one only means the symbol survived
+the checks that policy declares.
 """
 from __future__ import annotations
 
@@ -49,21 +56,36 @@ class SecurityEligibilityPolicy:
 
 DEFAULT_ELIGIBILITY_POLICY = SecurityEligibilityPolicy()
 
-# A genuine IPO from the last _IPO_LOOKBACK_DAYS (see recommended_stocks.py's
-# fetch_recent_ipos) calendar days has at most ~20-22 TRADING sessions --
-# DEFAULT_ELIGIBILITY_POLICY's minimum_history_sessions=60 would reject
-# every real recent IPO by construction, not just conservatively (independent
-# review: "this does not merely make the filter conservative, it makes
-# every genuine result in the lane ineligible by definition"). This lane
-# gets its own, deliberately looser policy -- still real checks (equity
-# type, a real company name, SOME minimum liquidity/price), just not ones
-# that assume months of trading history that cannot exist yet.
-RECENT_IPO_ELIGIBILITY_POLICY = SecurityEligibilityPolicy(
+# Owner decision, 2026-08-12. The ticker-suggestion surfaces are DISCLOSURE,
+# not endorsement: they describe what the market did and hold no execution
+# authority whatsoever. The owner asked to see the rows and judge them
+# personally after DEFAULT_ELIGIBILITY_POLICY silently removed three of the
+# day's ten most-active names -- SPCX (41 sessions < 60, though $1.9T market
+# cap and ~$10.7B median daily dollar volume), PLUG ($2.27 < $5.00), and NBIS
+# (the longName gap fixed above).
+#
+# What this policy REMOVES is the size/age/price screen: those were judgments
+# about whether a real security is worth showing, and that judgment now
+# belongs to the reader. Every removed gate is re-emitted as a visible fact on
+# the row (assistant.recommended_stocks._eligibility_disclosure), so the
+# information is disclosed rather than discarded -- a row that clears nothing
+# must not be indistinguishable from a blue chip.
+#
+# What this policy KEEPS is identity: the symbol must still resolve to real
+# market data, be an EQUITY, and be listed on a US venue. Those are not size
+# opinions, they are what stops a hallucinated or mistyped symbol from being
+# rendered as a suggestion, and the ai_suggested lane is LLM-authored. Do not
+# relax them without a separate explicit owner decision.
+#
+# Scope is deliberately narrow: build_recommended_tickers() only. The
+# Watchlist similar-stocks surface still uses DEFAULT_ELIGIBILITY_POLICY.
+SUGGESTION_DISCLOSURE_POLICY = SecurityEligibilityPolicy(
     allowed_quote_types=("EQUITY",),
-    minimum_history_sessions=3,
-    minimum_price=5.0,
-    minimum_median_dollar_volume=500_000.0,
-    require_company_name=True,
+    minimum_history_sessions=0,
+    minimum_price=0.0,
+    minimum_median_dollar_volume=0.0,
+    require_company_name=False,
+    allowed_exchanges=DEFAULT_ELIGIBILITY_POLICY.allowed_exchanges,
 )
 
 _FETCH_LOOKBACK_DAYS = 90  # a MAXIMUM request, not a requirement -- a ticker with less real
@@ -127,7 +149,17 @@ def verify_tickers(
             float((hist["close"] * hist["volume"]).median()) if "volume" in hist.columns else 0.0
         )
         quote_type = info.get("quoteType", "")
-        company_name = info.get("longName", "")
+        # yfinance does not populate longName for every real listing -- NBIS
+        # (Nebius Group N.V., Nasdaq NMS, ~$3.6B median daily dollar volume)
+        # returns longName=None while carrying shortName='Nebius Group N.V.'
+        # and displayName='Nebius', persistently across repeated fetches.
+        # require_company_name exists to reject a symbol with NO identity, so
+        # reading only one of the three name fields turned a provider metadata
+        # gap into a claim about the security. Checked 2026-08-12 against live
+        # yfinance after the owner noticed real most-active names missing.
+        company_name = (
+            info.get("longName") or info.get("shortName") or info.get("displayName") or ""
+        )
 
         exchange = info.get("exchange", "")
         eligible = (

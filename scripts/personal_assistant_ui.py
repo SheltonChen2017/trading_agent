@@ -1828,9 +1828,18 @@ if page == "Briefing":
             held_tickers_tuple, briefing_ai_on
         )
         if dropped_candidates:
+            # Name them. A bare count could not distinguish "we filtered out
+            # junk" from "we filtered out the day's second most-traded stock"
+            # -- which is exactly how the 2026-08-12 SPCX omission stayed
+            # invisible until the owner diffed this list against yfinance by
+            # hand. Screening here is identity only (see
+            # SUGGESTION_DISCLOSURE_POLICY), so a drop is now a real failure
+            # to identify the symbol, not a judgment about its size.
             st.caption(
-                f"{len(dropped_candidates)} candidate ticker(s) could not be verified against real market data "
-                "and were omitted."
+                f"{len(dropped_candidates)} candidate ticker(s) omitted -- did not "
+                "resolve to real market data as a US-listed equity: "
+                + ", ".join(sorted(set(dropped_candidates)))
+                + "."
             )
         for category, label in [
             ("most_active", "Most actively traded today"),
@@ -3259,10 +3268,20 @@ if page == "Ticker Suggestions":
             source_time
             + f"Displayed at {suggestions_result['ran_at']}. The source loader may "
             f"return results cached for up to {_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS // 60} minutes. "
-            "Verification: every ticker "
-            "shown resolved against real market data; "
-            f"{len(suggestions_result['dropped'])} candidate(s) failed verification and "
-            "were omitted."
+            "Verification: every ticker shown resolved against real market "
+            "data as a US-listed equity. Rows are NOT screened on size, age, "
+            "price, or liquidity (owner decision, 2026-08-12) -- where a row "
+            "falls below this project's usual floors, the row says so instead "
+            "of being hidden. Judgment is yours; nothing here is a "
+            "recommendation, and no listing carries any execution authority."
+            + (
+                f" {len(suggestions_result['dropped'])} candidate(s) could not be "
+                "identified and were omitted: "
+                + ", ".join(sorted(set(suggestions_result["dropped"])))
+                + "."
+                if suggestions_result["dropped"]
+                else ""
+            )
         )
         source_labels = {
             "most_active": (

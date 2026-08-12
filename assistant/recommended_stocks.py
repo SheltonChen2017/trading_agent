@@ -10,9 +10,19 @@ allocation authorization or a proposal -- same precedent as
 config.DEFENSIVE_CARRY_TICKERS.
 
 Every candidate ticker (most-active, IPO-calendar, or AI-suggested) goes
-through the SAME assistant.ticker_verification.verify_tickers() discipline
-before becoming a RecommendedTicker -- a screener glitch or a stale/incorrect
-data-provider entry deserves no less scrutiny than a hallucinated ticker.
+through the SAME assistant.ticker_verification.verify_tickers() identity
+discipline before becoming a RecommendedTicker -- a screener glitch or a
+stale/incorrect data-provider entry deserves no less scrutiny than a
+hallucinated ticker.
+
+All three lanes run under SUGGESTION_DISCLOSURE_POLICY (owner decision,
+2026-08-12), not DEFAULT_ELIGIBILITY_POLICY: identity is still enforced
+(resolves to real market data, EQUITY, US venue) but size/age/price screening
+is not, because this surface is disclosure the reader judges rather than a
+shortlist this project vouches for. The thresholds that are no longer enforced
+are re-emitted per row by _eligibility_disclosure(). The Watchlist
+similar-stocks surface is deliberately NOT included and still screens on
+DEFAULT_ELIGIBILITY_POLICY.
 """
 from __future__ import annotations
 
@@ -25,7 +35,11 @@ from typing import Literal
 from assistant.ai_advisor import suggest_similar_tickers
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.storage import AssistantStore
-from assistant.ticker_verification import RECENT_IPO_ELIGIBILITY_POLICY, verify_tickers
+from assistant.ticker_verification import (
+    DEFAULT_ELIGIBILITY_POLICY,
+    SUGGESTION_DISCLOSURE_POLICY,
+    verify_tickers,
+)
 
 _FINNHUB_IPO_CALENDAR_URL = "https://finnhub.io/api/v1/calendar/ipo"
 _IPO_LOOKBACK_DAYS = 30
@@ -64,6 +78,54 @@ def classify_price_direction(change_percent: object) -> PriceDirection | None:
     if value < 0:
         return "declining"
     return "unchanged"
+
+
+def _eligibility_disclosure(verified: dict, *, include_history: bool = True) -> list[str]:
+    """Restate, as plain visible facts, every screen SUGGESTION_DISCLOSURE_POLICY
+    stopped enforcing (owner decision, 2026-08-12).
+
+    Removing a filter and saying nothing would be a downgrade, not a
+    disclosure: a 41-session listing and a decade-old blue chip would render
+    identically, and the reader could no longer tell which rows the project's
+    own thresholds would have excluded. So each removed gate becomes a note
+    measured from the SAME verified record the gate used to read, compared
+    against DEFAULT_ELIGIBILITY_POLICY's still-declared thresholds. A row that
+    clears every threshold gets no notes at all.
+
+    These are descriptions of thinness, not predictions and not advice.
+    Nothing here proposes, sizes, approves, or authorizes any order.
+    """
+    notes: list[str] = []
+    policy = DEFAULT_ELIGIBILITY_POLICY
+
+    sessions = verified.get("history_sessions")
+    if include_history and isinstance(sessions, int) and sessions < policy.minimum_history_sessions:
+        notes.append(
+            f"only {sessions} completed trading session(s) -- below this "
+            f"project's usual {policy.minimum_history_sessions}-session floor, "
+            "so volatility and trend estimates are not yet reliable"
+        )
+
+    last_price = verified.get("last_price")
+    if isinstance(last_price, (int, float)) and math.isfinite(float(last_price)) and float(last_price) < policy.minimum_price:
+        notes.append(
+            f"last close ${float(last_price):,.2f} -- below the usual "
+            f"${policy.minimum_price:,.2f} price floor"
+        )
+
+    dollar_volume = verified.get("median_dollar_volume")
+    if (
+        isinstance(dollar_volume, (int, float))
+        and math.isfinite(float(dollar_volume))
+        and float(dollar_volume) < policy.minimum_median_dollar_volume
+    ):
+        notes.append(
+            f"median daily dollar volume ${float(dollar_volume):,.0f} -- below "
+            f"the usual ${policy.minimum_median_dollar_volume:,.0f} liquidity "
+            "floor, so it may be hard to trade at a fair price"
+        )
+
+    return notes
 
 
 @dataclasses.dataclass(frozen=True)
@@ -178,10 +240,12 @@ def build_recommended_tickers(
     include_ai_suggestions: bool = True,
 ) -> tuple[list[RecommendedTicker], list[str]]:
     """Composes most-actives + IPO calendar + assistant.ai_advisor.suggest_similar_tickers()
-    through the SAME two-tier partition + verify_tickers() pipeline as the
-    Watchlist's similar-stocks feature -- most-actives and IPO-calendar
+    through one verify_tickers() pipeline -- most-actives and IPO-calendar
     results get identical scrutiny to AI suggestions. Returns (recommended,
-    dropped_labels) for one combined "N could not be verified" caption.
+    dropped_labels) for one combined "could not be verified" caption; a drop
+    now means the symbol failed IDENTITY (did not resolve to real market data,
+    is not an equity, or is not on a US venue), never that it was judged too
+    small, too young, or too cheap -- see SUGGESTION_DISCLOSURE_POLICY.
 
     `held_tickers` -- the account's ACTUAL current positions -- is used two
     ways: (1) every lane excludes them, so "not held" in the UI is an
@@ -212,7 +276,8 @@ def build_recommended_tickers(
             if c["ticker"].upper() not in held_set
         ]
         verified, batch_dropped = verify_tickers(
-            [c["ticker"] for c in most_active_candidates]
+            [c["ticker"] for c in most_active_candidates],
+            policy=SUGGESTION_DISCLOSURE_POLICY,
         )
         dropped.extend(batch_dropped)
         # verify_tickers() strips and uppercases every symbol. Join provider
@@ -237,6 +302,7 @@ def build_recommended_tickers(
                 parts.append(
                     f"price change today: {float(c['change_percent']):+.2f}%"
                 )
+            parts.extend(_eligibility_disclosure(v))
             recommended.append(
                 RecommendedTicker(
                     ticker=v["ticker"],
@@ -253,7 +319,7 @@ def build_recommended_tickers(
         ]
         verified, batch_dropped = verify_tickers(
             [c["ticker"] for c in ipo_candidates],
-            policy=RECENT_IPO_ELIGIBILITY_POLICY,
+            policy=SUGGESTION_DISCLOSURE_POLICY,
         )
         dropped.extend(batch_dropped)
         # Same normalization the most-active lane needs (MAD-001), and here
@@ -278,6 +344,12 @@ def build_recommended_tickers(
                 f"({v['history_sessions']} completed trading session(s) -- "
                 "volatility/trend estimates are not yet reliable this early)"
             )
+            # include_history=False: this lane's own detail string already
+            # states the session count and the same unreliability caveat, and
+            # a second copy would read as two separate problems.
+            notes = _eligibility_disclosure(v, include_history=False)
+            if notes:
+                detail = " -- ".join([detail, *notes])
             recommended.append(
                 RecommendedTicker(
                     ticker=v["ticker"],
@@ -301,13 +373,22 @@ def build_recommended_tickers(
             # gone stale since being added; universe membership answers
             # "where did this come from," never "is this eligible today").
             candidate_tickers = list(dict.fromkeys(c["ticker"].upper() for c in raw_suggestions))
-            verified, batch_dropped = verify_tickers(candidate_tickers)
+            verified, batch_dropped = verify_tickers(
+                candidate_tickers, policy=SUGGESTION_DISCLOSURE_POLICY
+            )
             dropped.extend(batch_dropped)
             for v in verified:
                 recommended.append(
                     RecommendedTicker(
                         ticker=v["ticker"], reason_category="ai_suggested",
-                        detail=_similarity_detail(held_list, v["ticker"], reason_by_ticker.get(v["ticker"], "")),
+                        detail=" -- ".join(
+                            [
+                                _similarity_detail(
+                                    held_list, v["ticker"], reason_by_ticker.get(v["ticker"], "")
+                                ),
+                                *_eligibility_disclosure(v),
+                            ]
+                        ),
                         fetched_at=now,
                     )
                 )

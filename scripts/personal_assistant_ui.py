@@ -82,6 +82,7 @@ from assistant.news_summary import (
 )
 from assistant.macro_context import build_descriptive_macro_context
 from assistant.recommended_stocks import build_recommended_tickers, is_ipo_calendar_configured
+from assistant.research_looks import record_research_look, research_look_summary
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.ticker_verification import partition_by_universe, verify_tickers
 from assistant.policy import (
@@ -3445,6 +3446,29 @@ if page == "Backtest":
                     if use_real_data
                     else "Running the walk-forward backtest..."
                 ):
+                    # QC-2: record the look BEFORE the result is known, so a
+                    # configuration cannot be quietly dropped from the
+                    # multiplicity denominator once its answer disappoints.
+                    # Recording never gates the backtest: a registry failure
+                    # is surfaced and the research still runs.
+                    try:
+                        look_record = record_research_look(
+                            _store(),
+                            surface="ui_backtest",
+                            signal_key=bt_signal.key,
+                            configuration={
+                                "params": dict(param_values),
+                                "scope": scope_choice,
+                                "lookback_days": int(bt_lookback),
+                                "hold_days_options": sorted(bt_horizons),
+                                "entry_timing": "next_open",
+                                "slippage_pct": SLIPPAGE_PCT,
+                            },
+                            data_source="real" if use_real_data else "synthetic",
+                        )
+                        look_error = None
+                    except Exception as exc:  # research must not be blocked
+                        look_record, look_error = None, str(exc)
                     bt_data, data_coverage = (
                         _load_backtest_real_data(bt_tickers, int(bt_lookback))
                         if use_real_data
@@ -3473,6 +3497,8 @@ if page == "Backtest":
                     "slippage_pct": SLIPPAGE_PCT,
                     "results_by_horizon": results_by_horizon,
                     "ran_at": datetime.now(timezone.utc).isoformat(),
+                    "look_record": look_record,
+                    "look_error": look_error,
                 }
             except Exception as exc:
                 st.error(f"Backtest failed: {exc}")
@@ -3482,6 +3508,34 @@ if page == "Backtest":
         st.info("Configure a signal above and click Run backtest.")
     else:
         st.subheader(f"Results -- {completed_run['signal_label']}")
+        # QC-2: show the multiplicity denominator next to the result, so a
+        # good-looking p-value is read in the context of how many
+        # configurations were tried to find it.
+        if completed_run.get("look_error"):
+            st.warning(
+                "This run was NOT recorded in the research-look registry "
+                f"({completed_run['look_error']}). The multiplicity count "
+                "below therefore understates how many configurations have "
+                "been examined."
+            )
+        try:
+            look_summary = research_look_summary(_store())
+        except Exception as exc:
+            look_summary = None
+            st.warning(f"Research-look registry unavailable: {exc}")
+        if look_summary is not None:
+            repeat_note = ""
+            record = completed_run.get("look_record")
+            if record is not None and not record.get("is_new_look", True):
+                repeat_note = (
+                    f" This exact configuration had already been examined "
+                    f"{record['repeat_count'] - 1} time(s), so it did not add "
+                    "a new test."
+                )
+            st.caption(
+                f"**Multiplicity:** {look_summary['interpretation']}"
+                + repeat_note
+            )
         run_params = ", ".join(
             f"{name}={value}"
             for name, value in sorted(completed_run["param_values"].items())

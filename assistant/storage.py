@@ -702,6 +702,26 @@ class AssistantStore:
                     evidence_json TEXT NOT NULL,
                     evidence_hash TEXT NOT NULL
                 );
+                -- QC-2: one row per DISTINCT research look, so the
+                -- multiplicity correction has an honest denominator. New
+                -- table, so `CREATE TABLE IF NOT EXISTS` migrates a fresh and
+                -- a pre-existing database identically with no ALTER.
+                -- look_fingerprint is the content identity of the
+                -- configuration examined; re-running the SAME configuration
+                -- is not a new statistical test (it is deterministic and
+                -- returns the same answer), so it increments repeat_count
+                -- rather than the look count. Changing any parameter is a
+                -- new look and a new row.
+                CREATE TABLE IF NOT EXISTS research_looks (
+                    look_fingerprint TEXT PRIMARY KEY,
+                    surface TEXT NOT NULL,
+                    signal_key TEXT NOT NULL,
+                    configuration_json TEXT NOT NULL,
+                    data_source TEXT NOT NULL,
+                    first_seen_at TEXT NOT NULL,
+                    last_seen_at TEXT NOT NULL,
+                    repeat_count INTEGER NOT NULL
+                );
                 -- CR-W2 follow-up: an operator's explicit accounting decision
                 -- about ONE broker activity the automatic sync refuses. New
                 -- table, so `CREATE TABLE IF NOT EXISTS` migrates a fresh and
@@ -5172,6 +5192,90 @@ class AssistantStore:
             "evidence": evidence,
             "evidence_hash": evidence_hash,
         }
+
+    def record_research_look(
+        self,
+        *,
+        look_fingerprint: str,
+        surface: str,
+        signal_key: str,
+        configuration: dict[str, Any],
+        data_source: str,
+        seen_at: str,
+    ) -> dict[str, Any]:
+        """Record one research look. Returns the row as stored.
+
+        Atomic upsert: a first sight inserts, a repeat of the SAME
+        configuration bumps `repeat_count` and `last_seen_at` without
+        creating a second look. There is deliberately no delete and no
+        update of the configuration -- a look that happened cannot be
+        un-looked, which is the entire point of counting them.
+        """
+        configuration_json = json.dumps(
+            configuration, sort_keys=True, separators=(",", ":"), default=str
+        )
+        with self._connect() as connection:
+            connection.execute(
+                """
+                INSERT INTO research_looks(
+                    look_fingerprint, surface, signal_key, configuration_json,
+                    data_source, first_seen_at, last_seen_at, repeat_count
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, 1)
+                ON CONFLICT(look_fingerprint) DO UPDATE SET
+                    last_seen_at = excluded.last_seen_at,
+                    repeat_count = repeat_count + 1
+                """,
+                (
+                    look_fingerprint,
+                    surface,
+                    signal_key,
+                    configuration_json,
+                    data_source,
+                    seen_at,
+                    seen_at,
+                ),
+            )
+            row = connection.execute(
+                """
+                SELECT look_fingerprint, surface, signal_key,
+                       configuration_json, data_source, first_seen_at,
+                       last_seen_at, repeat_count
+                FROM research_looks WHERE look_fingerprint = ?
+                """,
+                (look_fingerprint,),
+            ).fetchone()
+        record = dict(row)
+        record["configuration"] = json.loads(record.pop("configuration_json"))
+        return record
+
+    def count_research_looks(self) -> int:
+        """Distinct configurations examined -- the multiplicity denominator."""
+        with self._connect() as connection:
+            return int(
+                connection.execute(
+                    "SELECT COUNT(*) FROM research_looks"
+                ).fetchone()[0]
+            )
+
+    def list_research_looks(self, limit: int = 200) -> list[dict[str, Any]]:
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT look_fingerprint, surface, signal_key,
+                       configuration_json, data_source, first_seen_at,
+                       last_seen_at, repeat_count
+                FROM research_looks
+                ORDER BY first_seen_at DESC, look_fingerprint
+                LIMIT ?
+                """,
+                (int(limit),),
+            ).fetchall()
+        records = []
+        for row in rows:
+            record = dict(row)
+            record["configuration"] = json.loads(record.pop("configuration_json"))
+            records.append(record)
+        return records
 
     def record_broker_activity_acknowledgement(
         self,

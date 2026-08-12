@@ -10,6 +10,71 @@ Repository: `SheltonChen2017/trading_agent`
 Read `docs/OPERATIONAL_FACTS.md` for long-lived machine and owner facts that
 must not be copied from memory.
 
+## 0z. Newest round — QC-2 research-look registry (awaiting review)
+
+Owner-selected 2026-08-11, immediately relevant because the owner has begun
+using the interactive Backtest tab. Every configuration examined is a
+statistical test; testing many and reporting the best inflates false
+discovery, and until now **nothing counted them**. `ml/experiments.py` counts
+looks declared inside one frozen spec; the interactive surface — the one a
+person clicks repeatedly — counted nothing.
+
+**Scope was undefined before this round.** The only prior trace of "QC-2" was
+one sentence in the QC-1 action-plan row ("Look-counting registry is the next
+QC milestone") plus the phrase carried forward in handoffs. There was no
+definition of done anywhere, so per CLAUDE.md §3 the scope was proposed
+explicitly and owner-approved rather than resumed from a status note. That is
+recorded because a future reader will otherwise assume a plan existed.
+
+Branch `user/claude/qc2-look-counting-registry-20260811` off `main`.
+
+**What it does.** New `research_looks` table and
+`assistant/research_looks.py`. The Backtest page records a look, then shows
+the Bonferroni-corrected threshold beside the result.
+
+**The properties that make the count honest** (each mutation-verified):
+
+- **Recorded BEFORE the engine runs**, so a configuration cannot be quietly
+  dropped once its answer disappoints. A source-level test pins the ordering,
+  because it cannot be observed at runtime.
+- **A repeat is not a new test.** The engine is deterministic, so re-running
+  an identical configuration returns the identical answer; counting it twice
+  would inflate the denominator and make the threshold unfairly strict. It
+  bumps `repeat_count` instead.
+- **Changing anything is a new look** — any parameter, and switching
+  synthetic↔real data, since those are not the same experiment.
+- **No delete, no configuration rewrite.** Discarding disappointing looks is
+  exactly the behaviour the correction exists to price in. A test asserts the
+  store exposes no removal method.
+- **Never gates research.** A registry failure surfaces a warning and the
+  backtest still runs; it holds no execution, proposal, or policy authority.
+
+**Architecture note.** `bonferroni_threshold` already lives in
+`backtest/engine.py` (`ml/experiments.py` imports it from there), so no
+correction arithmetic was duplicated. The registry lives in `assistant/`
+because `backtest/interactive.py` is forbidden by AST test from importing
+storage; that module is untouched and its boundary still holds.
+
+**Honesty of the number.** Bonferroni over the whole registry is deliberately
+conservative and crude. The summary text states that clearing the threshold
+is *necessary, not sufficient* — a claim still needs out-of-sample,
+confirmation-only, by-date and by-block significance.
+
+**Validation.** 13 new tests; 3 mutations each turned exactly the intended
+test red (dropping `data_source` from the fingerprint, letting a repeat
+rewrite the stored look, moving recording after the engine call). UI smoke,
+`backtest.interactive` boundary, import-boundary and schema suites green;
+migration tested on fresh and pre-migration databases. Single uninterrupted
+full-suite run on the final code tree: **3,420 passed, 0 failed, 25
+warnings** in 613.13s (3,407 plus the 13 new). `compileall` and
+`git diff --check` clean; only documents changed after that run and the
+document-reading suites were re-run (14 passed).
+
+**Boundaries.** Research and presentation only. No proposal, order, policy,
+scheduler, epoch, or ML/LLM-authority path changed. **Nothing deployed** —
+`paper-epoch-004` continues undisturbed on `b837374`; deploying this would
+close it, and it is not worth an epoch roll.
+
 ## 0. Epoch-004 swap EXECUTED (2026-08-11, owner-authorized)
 
 The owner merged PR #189 (`origin/main` = **`b837374`**) and authorized the

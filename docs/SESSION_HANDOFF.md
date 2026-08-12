@@ -1,190 +1,176 @@
-# Session handoff — epoch-004 swap executed
+# Session handoff — QC-2 reviewed and corrected
 
-Prepared: 2026-08-11, after the owner-authorized epoch-004 roll.
+Prepared: 2026-08-11, after independent review of the QC-2 interactive
+research-look registry and before publication of the review branch.
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
 
 Repository: `SheltonChen2017/trading_agent`
 
-Read `docs/OPERATIONAL_FACTS.md` for long-lived machine and owner facts that
-must not be copied from memory.
+## 0. Read this first
 
-## 0z. Newest round — QC-2 research-look registry (awaiting review)
+Read, in order:
 
-Owner-selected 2026-08-11, immediately relevant because the owner has begun
-using the interactive Backtest tab. Every configuration examined is a
-statistical test; testing many and reporting the best inflates false
-discovery, and until now **nothing counted them**. `ml/experiments.py` counts
-looks declared inside one frozen spec; the interactive surface — the one a
-person clicks repeatedly — counted nothing.
+1. `CLAUDE.md`
+2. `docs/ACTION_PLAN_2026-08-02.md`
+3. `docs/OPERATIONAL_FACTS.md`
+4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+5. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+6. `docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md`
 
-**Scope was undefined before this round.** The only prior trace of "QC-2" was
-one sentence in the QC-1 action-plan row ("Look-counting registry is the next
-QC milestone") plus the phrase carried forward in handoffs. There was no
-definition of done anywhere, so per CLAUDE.md §3 the scope was proposed
-explicitly and owner-approved rather than resumed from a status note. That is
-recorded because a future reader will otherwise assume a plan existed.
+The action plan is the sequencing authority. Operational facts are the durable
+machine/epoch record. Do not recreate either from conversation memory.
 
-Branch `user/claude/qc2-look-counting-registry-20260811` off `main`.
+## 1. Repository and branch topology
 
-**What it does.** New `research_looks` table and
-`assistant/research_looks.py`. The Backtest page records a look, then shows
-the Bonferroni-corrected threshold beside the result.
+- Starting `main` / `origin/main`: `62c8270` (PR #192 merge).
+- Submitted base: `5e6b0bb` (PR #191 merge).
+- Claude implementation branch:
+  `user/claude/qc2-look-counting-registry-20260811`.
+- Claude implementation commit: `f09682f`; pushed and merged through PR #192
+  as `62c8270`.
+- Codex review branch:
+  `codex/review-qc2-look-counting-registry-20260811`.
+- Corrective code commit: `7fc9db8`.
+- Durable review/action/milestone/operational-facts commit: `3e5cba7`.
+- This handoff commit: pending until this file is committed separately.
+- Publication: owner authorized branch + commit + push, with **no PR**. At
+  preparation time the review branch is still local; do not call the
+  cross-computer handoff complete until its remote tip is verified.
 
-**The properties that make the count honest** (each mutation-verified):
+The submitted range was exactly `5e6b0bb..62c8270`, in order:
 
-- **Recorded BEFORE the engine runs**, so a configuration cannot be quietly
-  dropped once its answer disappoints. A source-level test pins the ordering,
-  because it cannot be observed at runtime.
-- **A repeat is not a new test.** The engine is deterministic, so re-running
-  an identical configuration returns the identical answer; counting it twice
-  would inflate the denominator and make the threshold unfairly strict. It
-  bumps `repeat_count` instead.
-- **Changing anything is a new look** — any parameter, and switching
-  synthetic↔real data, since those are not the same experiment.
-- **No delete, no configuration rewrite.** Discarding disappointing looks is
-  exactly the behaviour the correction exists to price in. A test asserts the
-  store exposes no removal method.
-- **Never gates research.** A registry failure surfaces a warning and the
-  backtest still runs; it holds no execution, proposal, or policy authority.
+1. `f09682f` — Add QC-2: research-look registry.
+2. `62c8270` — merge PR #192.
 
-**Architecture note.** `bonferroni_threshold` already lives in
-`backtest/engine.py` (`ml/experiments.py` imports it from there), so no
-correction arithmetic was duplicated. The registry lives in `assistant/`
-because `backtest/interactive.py` is forbidden by AST test from importing
-storage; that module is untouched and its boundary still holds.
+The merge has no merge-only tree delta relative to `f09682f`.
 
-**Honesty of the number.** Bonferroni over the whole registry is deliberately
-conservative and crude. The summary text states that clearing the threshold
-is *necessary, not sufficient* — a claim still needs out-of-sample,
-confirmation-only, by-date and by-block significance.
+## 2. Review outcome
 
-**Validation.** 13 new tests; 3 mutations each turned exactly the intended
-test red (dropping `data_source` from the fingerprint, letting a repeat
-rewrite the stored look, moving recording after the engine call). UI smoke,
-`backtest.interactive` boundary, import-boundary and schema suites green;
-migration tested on fresh and pre-migration databases. Single uninterrupted
-full-suite run on the final code tree: **3,420 passed, 0 failed, 25
-warnings** in 613.13s (3,407 plus the 13 new). `compileall` and
-`git diff --check` clean; only documents changed after that run and the
-document-reading suites were re-run (14 passed).
+**Accepted after correction. Quality: 6/10.** The implementation had a sound
+core idea—pre-result durable recording, exact-repeat accounting, no deletion,
+and non-gating failure—but its displayed number was not yet an honest
+multiplicity denominator. Four material defects were reproduced red against
+the submitted tree and fixed:
 
-**Boundaries.** Research and presentation only. No proposal, order, policy,
-scheduler, epoch, or ML/LLM-authority path changed. **Nothing deployed** —
-`paper-epoch-004` continues undisturbed on `b837374`; deploying this would
-close it, and it is not worth an epoch roll.
+- **QC2REV-001 — P2, closed:** identical widget choices over new/corrected
+  market data or changed code were called repeats. Look identity now binds a
+  SHA-256 of the exact dated DataFrames and a clean Git commit.
+- **QC2REV-002 — P2, closed:** one click counted as one test although the
+  engine scans every selected horizon in both dip and up directions. Each row
+  now carries and the denominator sums `horizons × 2` hypothesis cells.
+- **QC2REV-003 — P2, closed:** synthetic plumbing runs polluted the displayed
+  real-market family. Synthetic runs remain auditable, but only real Backtest
+  cells feed the real-market threshold.
+- **QC2REV-004 — P2, closed:** `default=str`, non-finite floats, and trusting a
+  caller hash admitted ambiguous/colliding durable identity. Configuration is
+  now strict finite JSON; storage validates all identity fields and raises a
+  conflict rather than modifying different immutable content under one hash.
 
-## 0. Epoch-004 swap EXECUTED (2026-08-11, owner-authorized)
+No P0, P1, P3, or unresolved finding remains. Full evidence, locations,
+red/green proofs, reasons, and both commit dispositions are in
+`docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md`.
 
-The owner merged PR #189 (`origin/main` = **`b837374`**) and authorized the
-roll. Executed in the runbook order, each step verified before the next:
+Commit dispositions:
 
-1. **Tasks disabled** — all four `TradingAgent-Paper-*` stopped and disabled
-   via the elevated swap script (owner approved the UAC prompt).
-2. **`paper-epoch-003` closed** at `2026-08-11T22:14:52Z` using its still
-   frozen `ef05dc1` runtime. It ends with 1 observation (2026-08-10),
-   0 epoch orders, 5/5 drills. That single session is discarded evidence —
-   the deliberate, known cost of rolling.
-3. **Deployed** — operational checkout fast-forwarded `ef05dc1` → **`b837374`**,
-   clean tree; `requirements.txt` unchanged across the range, so no install.
-4. **`ledger-reconcile` → `matched: true`, 0 mismatches**, 15 positions.
-5. **Readiness** — `ready: true`, 0 failed checks.
-6. **`paper-epoch-004` started** at `2026-08-11T22:15:53Z`. Lineage:
-   `code_commit b837374…`, unchanged mandate (`693799c0…`), policy
-   (`4a942cbc…`, `my_policy.json`), strategy `owner-directed-paper-policy
-   1.0.0`, model `no-ml-model`, same broker account.
-7. **All five drills passed and recorded under epoch-004** — fault matrix
-   (ambiguous_submission, kill_switch, restart_recovery, no unmapped tests),
-   alert_delivery (storage-verified toast), backup_restore (integrity ok both
-   sides, table counts match).
-8. **Tasks re-enabled** (second UAC approval, all four `Ready`), then the
-   scheduled path proven by a manual `operations-cycle`: activity sync saw 20
-   activities (3 fee duplicates — idempotent replay on the new code, 17 trade
-   activities skipped), reconciliation matched, `healthy: true`, 0 alerts.
+- `f09682f`: **accepted after correction** (`7fc9db8`).
+- `62c8270`: **accepted after correction**; no merge-only delta, inherits the
+  same findings/correction.
 
-## 0a. AP-7 is confirmed fixed in production, not just in tests
+## 3. Final QC-2 behavior
 
-Both freshness alerts were stale on arrival — last seen 19:42Z and 16:59Z,
-before the 22:15Z deploy — and **two consecutive `operations-cycle` runs on
-the new code reported `healthy: true` with zero alerts**. Both were then
-acknowledged and did **not** reopen.
+The Backtest page fetches its data, derives exact data/code identity, and
+records the tested family **before** the engine returns a result. A new family
+is created when the signal, configuration, exact data, source class, clean
+code commit, surface, or hypothesis-cell count changes. Only an exact replay
+increments `repeat_count`; `last_seen_at` never regresses. There is no delete
+or rewrite API.
 
-Worth recording which two they were, because it closes the loop on the
-counter-review:
+The displayed Bonferroni threshold applies to the real-data interactive
+Backtest family. A synthetic run is still recorded for audit but explicitly
+does not display or enlarge that real-market denominator. Registry failure is
+loud and leaves the count conservative, but it never blocks the backtest.
 
-- the **critical `portfolio_accounting`** alert (1,888 occurrences) — the
-  `operations.py` instance Codex corrected; and
-- the **warning `reconciliation_freshness`** alert (7 occurrences) — the
-  `readiness.py` instance Codex's correction missed and counter-review
-  DCCR-CR-002 added. It had been firing in production, so that finding was
-  not hypothetical.
+This is research bookkeeping only. Passing the threshold is necessary, never
+sufficient: it is not evidence of a market edge, a stock recommendation, or
+permission to propose, approve, or place an order. No proposal, execution,
+policy, scheduler, ML/LLM-authority, or live-trading boundary changed. QC-2
+does not yet count QuantConnect cloud-client research runs.
 
-**Open alerts: 0.**
+## 4. Final validation
 
-## 1. Current operational truth
+Final corrected tree used the repository `.venv`:
 
-- `paper-epoch-001`, `-002`, `-003` are closed. **`paper-epoch-004` is the
-  only active epoch**, at deployed commit `b837374`.
-- Sessions 0, epoch orders 0, drills 5/5. The 60-session / 30-order clock
-  starts at the first post-close capture (16:30 Pacific, weekdays).
-- Positions, cash, journal, tax lots, and order history are untouched by the
-  roll; only epoch-scoped evidence counters reset.
+- Python 3.13.14.
+- Streamlit 1.60.0.
+- Focused final selection: **81 passed** in 92.03s.
+- Full repository suite in deterministic batches: **3,429 passed, 0 failed,
+  0 skipped, 25 dependency warnings**:
+  - A–F: 1,035 passed in 178.18s, 1 warning.
+  - G–M: 1,025 passed in 210.82s, 24 warnings.
+  - N–S: 1,079 passed in 163.56s.
+  - T–Z plus nested fault tests: 290 passed in 211.24s.
+- Collection: 3,429 tests in 12.40s.
+- `compileall`: clean.
+- `git diff --check`: clean except expected Windows LF→CRLF notices.
+- Changed-content credential-shape scan: zero matches.
+- Active-document consistency after durable doc edits: 13 passed.
 
-## 2. What this deployment closed
+The full run includes the nine reviewer regression cases that failed for the
+intended reasons on the uncorrected submitted tree.
 
-Everything that could previously stall the epoch is now live:
+## 5. Operational truth — do not disturb the epoch
 
-- **CR-W2** — plain/CDIV cash dividends and explicit CSD/CSW cash movements
-  are journaled automatically. The AEP dividend payable **2026-09-10** is the
-  motivating case.
-- **AP-7 (both sites)** — freshness checks compare against a clock captured
-  after each state read, so a concurrent scheduled write no longer looks
-  future-dated.
-- **MADCR-001** — the IPO identity guard no longer fails open on a
-  case-only symbol difference.
-- **The operator acknowledgement path** — an unsupported broker activity now
-  costs one explicit human decision instead of a code deploy, and a deploy
-  costs the accumulated run. This is what makes CR-W3 survivable.
+No operator state was mutated or re-measured in this review. Preserve the
+last verified durable facts:
 
-**CR-W3 remains a watch item but is no longer an epoch-killer.** If the real
-AEP dividend arrives with a subtype outside the `""`/`CDIV` allowlist, that
-night's capture fails closed and names the subtype; recovery is
-`ledger-activity-review`, then `ledger-activity-acknowledge <id> --treatment
-dividend --operator <you> --rationale "<why>" --ticker AEP`, then the next
-capture proceeds. No deploy, no epoch roll.
+- `paper-epoch-004` is the only active evidence epoch.
+- Its deployed code commit is `b837374`, not this development branch.
+- At the last recorded measurement it had 0 sessions, 0 epoch orders, all
+  5/5 required drills, and 0 open alerts.
+- The first qualifying post-roll observation begins its 60-session / 30-order
+  evidence clock; do not manufacture observations.
+- QC-2 is **not deployed**. Do not close a healthy evidence epoch merely to
+  add research bookkeeping. Any future deployment requires a separate,
+  explicit owner-authorized epoch roll.
 
-## 2a. Validation on the final tree
+After any authorized deploy, restart every Streamlit process and launch once
+through `C:\git\launch_trading_app.ps1`; a rerun does not reload already
+imported `assistant.*` classes. Operational scheduled commands load code on
+each invocation. The epoch swap itself requires the elevated machine-local
+`C:\git\epoch_swap_tasks_elevated.ps1` procedure described in operational
+facts.
 
-Full suite **3,407 passed, 0 failed, 25 warnings** in 609.15s; `compileall`
-clean; `git diff --check` clean; document-consistency and consumer suites 45
-passed.
+The second computer must not bootstrap or run paper schedulers against the
+same Alpaca paper account while the epoch host is active. Do not copy secrets,
+account identifiers, the operator database, or licensed data into Git or this
+handoff.
 
-Two active-document guards were retargeted in this round, and the reason is
-worth keeping: they asserted that `SESSION_HANDOFF.md` must contain PR #184,
-`0ee3a22`, the AEP date, and the JNLC rule. But this file declares itself
-replaced every round, so requiring it to keep reciting one milestone's
-details forever is the mirror of the DCCR-CR-003 mistake — a REQUIRED literal
-must be a claim that stays true, and "this round is about CR-W2" stops being
-true. Those facts now assert against `OPERATIONAL_FACTS.md` and
-`ACTION_PLAN_2026-08-02.md`, which are append-and-amend. That is stronger,
-not weaker: the facts can no longer be lost by a handoff rewrite, which is
-precisely how seven durable facts were lost twice in 2026-08.
+## 6. Next step
 
-## 3. Boundaries unchanged
+Finish the already authorized publication of this review branch, verify the
+remote tip, and update this handoff with that exact reachability. No PR was
+requested. After publication, the owner may ask Claude for a counter-review
+or later authorize merge; neither action authorizes deployment.
 
-Paper only. Exact human approval, deterministic validation, broker preflight,
-kill switch, and account binding remain mandatory. ML/LLM output stays
-observational. No proposal, order, policy, or strategy behaviour changed in
-this roll — it deployed already-reviewed accounting and operational fixes.
+For the roadmap, **leave epoch-004 accumulating**. QC-2 is complete for the
+local interactive Backtest surface. Remaining work includes GR-6 portability
+residuals, GR-7d (blocked on an owner target-portfolio decision), and live
+QuantConnect authentication/cloud-run look accounting; none should displace
+epoch observation without an owner decision.
 
-## 4. Next step
+## 7. Resume prompt
 
-Nothing is queued. The correct action is to **leave epoch-004 alone** and let
-it accumulate. Verify the first post-swap observation read-only after 16:30
-Pacific; do not create evidence manually.
-
-Deferred work, none of it urgent: QC-2 look-counting registry, GR-6 residuals
-(secrets-audit test, key-rotation doc, portable scheduler), GR-7d (blocked on
-an owner target-portfolio decision), and the QuantConnect client, which is
-still dormant with `authenticate()` unproven (CQC-001).
+```text
+Fetch origin and switch to
+codex/review-qc2-look-counting-registry-20260811. Read CLAUDE.md,
+docs/SESSION_HANDOFF.md, docs/ACTION_PLAN_2026-08-02.md,
+docs/OPERATIONAL_FACTS.md, and
+docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md completely. Verify the
+branch tip and a clean worktree before acting. QC-2 was accepted only after
+the corrections in 7fc9db8; do not revert its data/code lineage,
+horizon-by-direction count, real/synthetic family separation, or strict
+durable identity. Do not deploy or roll paper-epoch-004 without a new explicit
+owner authorization.
+```

@@ -369,3 +369,34 @@ def test_recent_ipo_policy_import_remains_available_for_compatibility():
     policy = ticker_verification.RECENT_IPO_ELIGIBILITY_POLICY
     assert policy.minimum_history_sessions == 3
     assert policy.require_company_name is True
+
+
+def test_unusable_index_drops_only_that_ticker_instead_of_aborting_batch():
+    """Counter-review AP8CR-002. The review restored batch isolation for a
+    malformed close, but first_session_date was still derived unguarded, so a
+    frame with an unexpected index raised out of the loop and took every good
+    ticker in the batch with it."""
+    odd = pd.DataFrame({"close": [100.0] * 70, "volume": [50_000_000] * 70})  # no datetime index
+    with patch("assistant.ticker_verification.fetch_historical") as mock_fetch, \
+         patch("assistant.ticker_verification._safe_ticker_info") as mock_info:
+        mock_fetch.return_value = {"ODD": odd, "AAPL": _df()}
+        mock_info.return_value = _ELIGIBLE_INFO
+        verified, dropped = ticker_verification.verify_tickers(
+            ["ODD", "AAPL"], policy=ticker_verification.SUGGESTION_DISCLOSURE_POLICY
+        )
+    assert [v["ticker"] for v in verified] == ["AAPL"]
+    assert dropped == ["ODD"]
+
+
+def test_verified_first_session_date_is_the_frames_first_bar():
+    """The drop path above must not be reachable for ordinary frames, and the
+    value must still be the real first bar -- _is_ipo_identity_mismatch()
+    treats a missing date as 'no mismatch', so a silent '' would disarm the
+    reused/renamed-symbol guard rather than trip it."""
+    with patch("assistant.ticker_verification.fetch_historical") as mock_fetch, \
+         patch("assistant.ticker_verification._safe_ticker_info") as mock_info:
+        mock_fetch.return_value = {"AAPL": _df()}
+        mock_info.return_value = _ELIGIBLE_INFO
+        verified, dropped = ticker_verification.verify_tickers(["AAPL"])
+    assert dropped == []
+    assert verified[0]["first_session_date"] == "2026-01-01"

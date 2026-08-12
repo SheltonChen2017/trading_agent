@@ -1,4 +1,4 @@
-# Session handoff — AP-8 reviewed and corrected
+# Session handoff — AP-8 reviewed, corrected, and counter-reviewed
 
 Prepared: 2026-08-12, after independent review, correction, and authorized
 publication of the ticker-suggestion disclosure policy branch.
@@ -35,6 +35,9 @@ machine/epoch record. Do not reconstruct either from chat memory.
 - Review report/action plan/README/milestone/operational-facts commit:
   `f1bbffc`.
 - Initial separate handoff commit: `0a6b672`.
+- Publication-state commit: `b9458b8`.
+- Claude counter-review correction commit: see the tip of this branch; it
+  follows `b9458b8` on the same remote branch.
 - Publication: owner authorized branch, commits, and push. No PR was created.
   The review branch was pushed and set to track
   `origin/codex/review-ap8-ticker-disclosure-20260812`; this final
@@ -80,6 +83,42 @@ report.
 Commit disposition:
 
 - `d326a74`: **accepted after correction** by `7c21339` (four P2, one P3).
+- `7c21339`: **accepted after counter-review correction** (two P2, one P3; see
+  below).
+
+## 2b. Counter-review outcome (Claude, 2026-08-12)
+
+All five review findings were verified against the submitted tree and
+accepted; each correction was then mutated to prove it load-bearing. One
+qualification: **AP8REV-004 is partially correct.** Its reasoning holds, but
+at `d326a74` nothing in this repository still imported
+`RECENT_IPO_ELIGIBILITY_POLICY`, so no import could have broken. The restored
+constant is accepted as harmless, and the hypothetical nature of the impact is
+recorded so a later reader does not infer a real breakage.
+
+Two further defects were found and fixed:
+
+- **AP8CR-001 — P2, closed:** AP8REV-003's two corrections (identity now says
+  "named US-listed equity"; omission copy must not assert the security is
+  invalid, because a provider outage is indistinguishable from an
+  unidentifiable symbol) were applied to Briefing only. The dedicated Ticker
+  Suggestions page — the surface AP-8 is about — still carried both original
+  phrasings, while §3 below already described the corrected behavior as
+  present on both. A second-order defect came with it: a test asserting the
+  absence of the now-obsolete literal could only pass, so it had stopped
+  testing anything. Both fixed and pinned.
+- **AP8CR-002 — P2, closed:** AP8REV-002 restored batch isolation for a
+  malformed close, but `first_session_date` was still derived unguarded in the
+  same loop, so a frame with a non-datetime index raised out of
+  `verify_tickers()` and destroyed the batch including already-validated
+  tickers. The candidate is now dropped rather than given an empty date, since
+  `_is_ipo_identity_mismatch()` reads a missing date as "no mismatch" and would
+  silently disarm the reused-symbol guard.
+- **AP8CR-003 — P3, closed:** a block of standing host rules in
+  `docs/OPERATIONAL_FACTS.md` had no heading, so each appended milestone note
+  adopted it (QC-2 on 2026-08-11, AP-8 on 2026-08-12). Pre-existing, not
+  introduced by this review. Given its own heading and an instruction to append
+  future notes above it.
 
 ## 3. Final AP-8 behavior
 
@@ -97,9 +136,12 @@ The default strict policy and Buying/Watchlist similar-stock path are
 unchanged.
 
 Both Briefing and Ticker Suggestions state that these rows are not screened on
-size, age, price, or liquidity. Omitted symbols are named, but the UI says
-they could not be verified “at this time” because a provider outage and an
-invalid identity are not distinguishable from the current result shape.
+size, age, price, or liquidity, and both describe the identity floor as a
+*named* US-listed equity. Omitted symbols are named, but both pages say they
+could not be verified “at this time” because a provider outage and an invalid
+identity are not distinguishable from the current result shape. (This
+paragraph described the dedicated page inaccurately until AP8CR-001; the copy
+now matches it.)
 
 This remains research presentation only. It cannot generate a proposal,
 approve or submit an order, change policy, alter the scheduler, grant ML/LLM
@@ -125,8 +167,28 @@ Final corrected code tree used the repository `.venv`:
 - After documentation-only edits, active-document/README consumers:
   114 passed in 1.16s; active-document guard alone: 13 passed.
 
-The full run is on the exact final code tree. Only documentation changed after
-it; the relevant document consumers were rerun afterward.
+The full run above is the reviewer's, on the tree at `7c21339`.
+
+Counter-review validation on the final tree (after AP8CR-001..003):
+
+- Full repository suite: **3,456 passed, 0 failed, 0 skipped, 25 dependency warnings** in 839.89s, Python 3.13.14 / Streamlit 1.60.0
+
+  An earlier counter-review run of the same tree showed one failure,
+  `test_ml_evidence_operations.py::test_windows_verifier_accepts_a_freshly_installed_never_run_task`.
+  It was a 30-second `subprocess.run` timeout spawning `powershell.exe`, not an
+  assertion failure, and it happened because that run was competing with
+  concurrently executing mutation suites and took 1:31:51 against the usual
+  ~13 minutes. It passes in isolation in 8.35s and did not recur on the
+  unloaded rerun recorded above. Recorded rather than dropped: together with
+  the Briefing `AppTest` timeout seen during implementation, it marks a
+  standing fragility in the tests that shell out or drive Streamlit under a
+  30-60s deadline. Neither is caused by AP-8, and neither is fixed by it.
+- Focused: `tests/test_ticker_verification.py` + `tests/test_recommended_stocks.py`
+  78 passed; `tests/test_ui_ticker_suggestions.py` 4 passed.
+- `compileall` clean; `git diff --check` clean apart from expected Windows
+  LF→CRLF notices.
+- Each counter-review correction mutated and confirmed to redden exactly its
+  own test, restored in a `finally` block.
 
 ## 5. Operational truth — do not disturb the epoch
 
@@ -154,9 +216,8 @@ account identifiers, the operator database, or licensed data in Git.
 
 ## 6. Next step
 
-Publication is complete and no PR was created, as requested. The owner may
-request Claude counter-review or later authorize merge; neither authorizes
-deployment.
+Counter-review is complete. The branch is ready for the owner's merge
+decision; merging does not authorize deployment.
 
 For the roadmap, leave `paper-epoch-004` accumulating. The outstanding GR-6
 off-machine-backup item remains blocked on acceptable external physical media
@@ -171,8 +232,10 @@ CLAUDE.md, docs/SESSION_HANDOFF.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/OPERATIONAL_FACTS.md, and
 docs/REVIEW_2026-08-12_AP8_TICKER_SUGGESTION_DISCLOSURE.md completely. Verify
 the branch tip and a clean worktree before acting. AP-8 was accepted only
-after 7c21339: do not remove company-name identity, finite-positive close
-validation, per-row unavailable-liquidity disclosure, batch isolation, the
-Briefing policy caption, or the compatibility import. Do not deploy or roll
+after 7c21339 and the counter-review corrections that follow it: do not remove
+company-name identity, finite-positive close validation, per-row
+unavailable-liquidity disclosure, batch isolation (including the guarded
+first-session date), either page's policy caption, or the compatibility
+import. Do not deploy or roll
 paper-epoch-004 without a new explicit owner authorization.
 ```

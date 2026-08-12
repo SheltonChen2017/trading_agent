@@ -3274,15 +3274,22 @@ if page == "Ticker Suggestions":
             source_time
             + f"Displayed at {suggestions_result['ran_at']}. The source loader may "
             f"return results cached for up to {_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS // 60} minutes. "
+            # Counter-review AP8CR-001: review corrected the Briefing copy on
+            # two points -- identity now includes a company name, and a
+            # provider outage is observationally identical to an unidentifiable
+            # symbol, so omission copy must not assert the security itself is
+            # invalid. Both corrections apply verbatim here, on the page AP-8
+            # is actually about; they were fixed on one consumer only.
             "Verification: every ticker shown resolved against real market "
-            "data as a US-listed equity. Rows are NOT screened on size, age, "
-            "price, or liquidity (owner decision, 2026-08-12) -- where a row "
-            "falls below this project's usual floors, the row says so instead "
-            "of being hidden. Judgment is yours; nothing here is a "
-            "recommendation, and no listing carries any execution authority."
+            "data as a named US-listed equity. Rows are NOT screened on size, "
+            "age, price, or liquidity (owner decision, 2026-08-12) -- where a "
+            "row falls below this project's usual floors, or a measurement is "
+            "unavailable, the row says so instead of being hidden. Judgment is "
+            "yours; nothing here is a recommendation, and no listing carries "
+            "any execution authority."
             + (
                 f" {len(suggestions_result['dropped'])} candidate(s) could not be "
-                "identified and were omitted: "
+                "verified at this time and were omitted: "
                 + ", ".join(sorted(set(suggestions_result["dropped"])))
                 + "."
                 if suggestions_result["dropped"]

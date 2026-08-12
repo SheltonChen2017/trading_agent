@@ -75,3 +75,99 @@ active `paper-epoch-004`.
 
 AP-8 is complete on the reviewed branch. It should not cause an epoch roll by
 itself; it can ride a later owner-authorized deployment boundary.
+
+---
+
+## Counter-review (Claude, 2026-08-12)
+
+Outcome: **all five review findings accepted; two further defects found and
+fixed on this branch.**
+
+Each review finding was verified against the submitted tree before being
+accepted, and each correction was then mutated to prove it is load-bearing
+rather than decorative:
+
+| Finding | Verified as | Mutation proof that the correction carries weight |
+|---|---|---|
+| AP8REV-001 | Confirmed. `require_company_name=False` contradicted the policy's own comment, which claimed identity was retained. The submission was internally inconsistent, not merely permissive. | Reverting to `False` reddens `test_disclosure_policy_still_requires_a_company_identity` and `test_suggestion_disclosure_policy_keeps_identity_and_drops_size_screening`. |
+| AP8REV-002 | Confirmed on all three parts. A zero or `+inf` close became "verified"; a malformed close aborted the batch; absent volume was published as a measured `$0`, which is an invented fact rather than a missing one. | Deleting the finite/positive close check reddens both `test_disclosure_policy_rejects_invalid_close_as_not_verified` cases; restoring `0.0` as the liquidity default reddens `test_disclosure_policy_preserves_unavailable_liquidity_as_unavailable`. |
+| AP8REV-003 | Confirmed. Briefing consumed the relaxed policy under a "Recommended stocks" heading while saying nothing about it. | Covered by the reviewer's offline Briefing AppTest. |
+| AP8REV-004 | **Partially correct.** The reasoning is sound but the stated impact is hypothetical: at `d326a74` no module, script, or test still imported `RECENT_IPO_ELIGIBILITY_POLICY`, so no import could have broken. Accepted anyway — restoring an immutable constant costs nothing and the compatibility argument holds for tooling outside this repository. Recorded honestly so a future reader does not infer that a real breakage occurred. | n/a — inert constant. |
+| AP8REV-005 | Confirmed and correctly scoped to the two AP-8 blocks. | n/a — deprecation removal. |
+
+### AP8CR-001 — P2, closed. The disclosure fix was applied to one consumer of two.
+
+AP8REV-003 corrected the Briefing copy on two distinct points: identity now
+includes a company name ("named US-listed equity"), and omission copy must not
+assert that the security itself is invalid, because a provider outage and an
+unidentifiable symbol are indistinguishable from the result shape. Both points
+apply verbatim to the dedicated Ticker Suggestions page — the surface AP-8 is
+actually about — which still read "as a US-listed equity" and "could not be
+identified and were omitted".
+
+The review's own handoff already described the corrected behavior as present
+on both pages ("Both Briefing and Ticker Suggestions ... the UI says they could
+not be verified 'at this time'"), which was not true of the second page. That
+makes this a missed generalized instance rather than a difference of taste.
+
+Fixed by applying the same two corrections to the dedicated page.
+`test_dropped_candidates_are_named_not_just_counted` now pins both phrases;
+reverting either reddens it.
+
+A second-order defect came with it: `test_no_dropped_candidates_produces_no_
+omission_sentence` asserted the absence of the literal "could not be
+identified". Once the other consumer's wording changed, that assertion could
+only pass — it had stopped testing anything. It now tracks the live wording.
+
+### AP8CR-002 — P2, closed. Batch isolation was restored one line short.
+
+AP8REV-002 established that one malformed candidate must not hide unrelated
+rows, and guarded the close. `first_session_date` was still derived unguarded
+further down the same loop, so a frame whose index is not datetime-like raised
+`AttributeError: 'int' object has no attribute 'date'` out of `verify_tickers()`
+and destroyed the whole batch, including every already-validated ticker.
+
+Reproduced directly: a batch of one odd frame plus one good frame aborted
+entirely instead of returning the good ticker. Reachability is the same as the
+malformed-close case the review did fix — `fetch_historical` normally yields a
+`DatetimeIndex`, so both are defensive — which is precisely why the same
+reasoning applies to both.
+
+The candidate is dropped rather than given an empty date.
+`_is_ipo_identity_mismatch()` treats a missing first-session date as "no
+mismatch", so substituting `""` would silently disarm the reused/renamed-symbol
+guard that exists to catch malformed identity. Removing the guard reddens
+`test_unusable_index_drops_only_that_ticker_instead_of_aborting_batch`.
+
+### AP8CR-003 — P3, closed. Orphaned host rules in the operational record.
+
+`docs/OPERATIONAL_FACTS.md` had a block of standing host rules (launch script,
+restart-after-deploy, elevated task helper, process singleton, backup location,
+console-loss behavior) with no heading of its own. Each newly appended
+milestone note therefore adopted it: the QC-2 note on 2026-08-11, and the AP-8
+note on 2026-08-12. A reader following "AP-8 is reviewed development code"
+would have found app-launch rules underneath it.
+
+Pre-existing rather than introduced by this review, and recorded as such. Given
+its own heading, with an explicit instruction to append future milestone notes
+above it.
+
+### Counter-review validation
+
+- Full repository suite on the final tree: **3,456 passed, 0 failed, 0 skipped, 25 dependency warnings** in 839.89s, Python 3.13.14 / Streamlit 1.60.0
+
+  An earlier counter-review run of the same tree showed one failure,
+  `test_ml_evidence_operations.py::test_windows_verifier_accepts_a_freshly_installed_never_run_task`.
+  It was a 30-second `subprocess.run` timeout spawning `powershell.exe`, not an
+  assertion failure, and it happened because that run was competing with
+  concurrently executing mutation suites and took 1:31:51 against the usual
+  ~13 minutes. It passes in isolation in 8.35s and did not recur on the
+  unloaded rerun recorded above. Recorded rather than dropped: together with
+  the Briefing `AppTest` timeout seen during implementation, it marks a
+  standing fragility in the tests that shell out or drive Streamlit under a
+  30-60s deadline. Neither is caused by AP-8, and neither is fixed by it.
+- Focused: `tests/test_ticker_verification.py` + `tests/test_recommended_stocks.py`
+  78 passed; `tests/test_ui_ticker_suggestions.py` 4 passed.
+- Every correction above mutated and confirmed to redden exactly its own test.
+- No operator state read or changed. Still not deployed;
+  `paper-epoch-004` remains on `b837374`.

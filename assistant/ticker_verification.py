@@ -163,6 +163,22 @@ def verify_tickers(
             continue
 
         history_sessions = len(hist)
+        # Counter-review AP8CR-002: review restored the batch-isolation
+        # contract for a malformed close, but the first-session date was
+        # still derived unguarded further down, so one frame with an
+        # unexpected index aborted the whole batch and took every good
+        # ticker with it. Same function, same contract, same fix.
+        #
+        # Drop rather than substitute "": _is_ipo_identity_mismatch() treats a
+        # missing first-session date as "no mismatch", so an empty string
+        # would silently disarm the reused/renamed-symbol guard that exists to
+        # catch exactly this kind of malformed identity.
+        try:
+            first_session_date = str(hist.index[0].date())
+        except (AttributeError, IndexError, TypeError, ValueError):
+            dropped.append(ticker)
+            continue
+
         try:
             last_price = float(hist["close"].iloc[-1])
         except (KeyError, IndexError, OverflowError, TypeError, ValueError):
@@ -234,7 +250,7 @@ def verify_tickers(
                 "history_sessions": history_sessions,
                 "last_price": last_price,
                 "median_dollar_volume": median_dollar_volume,
-                "first_session_date": str(hist.index[0].date()),
+                "first_session_date": first_session_date,
             }
         )
 

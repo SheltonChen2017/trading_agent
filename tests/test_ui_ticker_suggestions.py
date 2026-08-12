@@ -92,6 +92,15 @@ def test_dropped_candidates_are_named_not_just_counted(
     assert "BOGUS" in captions and "FGN" in captions
     # And the caption must say what screening does and does not do now.
     assert "NOT screened on size, age, price, or liquidity" in captions
+    # Counter-review AP8CR-001: a provider outage and an unidentifiable symbol
+    # are observationally identical here, so the copy must not assert the
+    # security itself is invalid.
+    assert "could not be verified at this time" in captions
+    assert "did not resolve" not in captions
+    # The retained identity floor includes a company name (review restored
+    # require_company_name=True), so the user-facing statement of that floor
+    # must say so rather than drifting back to the pre-review wording.
+    assert "named US-listed equity" in captions
 
 
 def test_no_dropped_candidates_produces_no_omission_sentence(
@@ -110,7 +119,12 @@ def test_no_dropped_candidates_produces_no_omission_sentence(
 
     assert not app.exception
     captions = "\n".join(element.value for element in app.caption)
-    assert "could not be identified" not in captions
+    # Track the LIVE wording. Asserting an obsolete phrase's absence passes
+    # vacuously and silently stops testing anything -- which is exactly what
+    # happened to this line when review rewrote the omission copy on the other
+    # consumer (counter-review AP8CR-001).
+    assert "could not be verified at this time" not in captions
+    assert "and were omitted" not in captions
 
 
 def test_briefing_always_discloses_the_relaxed_suggestion_screen(

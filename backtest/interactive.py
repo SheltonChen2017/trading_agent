@@ -135,6 +135,12 @@ def _vol_scaled_history(params: dict[str, float | int]) -> int:
 # THE frozen inventory of interactively runnable signals. Order is display
 # order. Adding, removing, or re-parameterizing an entry is a reviewed
 # change (tests pin names, defaults-vs-signature agreement, and bounds).
+# Every scanner in this inventory evaluates both direction cells. QC-2 uses
+# this frozen family size so a multi-horizon click counts horizons x directions,
+# matching backtest.engine.bonferroni_threshold()'s documented denominator.
+INTERACTIVE_DIRECTION_CELLS: tuple[str, ...] = ("dip", "up")
+
+
 SIGNAL_INVENTORY: tuple[InteractiveSignal, ...] = (
     InteractiveSignal(
         key="dips_and_ups",

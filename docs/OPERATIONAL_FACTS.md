@@ -323,14 +323,14 @@ which one you are on. `whoami` distinguishes them.
 **Why they are disabled, and why it matters.** Both hosts read the same
 `APCA_API_KEY_ID`/`APCA_API_SECRET_KEY` from their own user registry, and
 those credentials point at the **same Alpaca paper account** — the one bound
-to the active `paper-epoch-003`. Two hosts running
+to the active `paper-epoch-004`. Two hosts running
 `monitor-orders`/`operations-cycle`/`watchdog` against one account means
 duplicate reconciliation and competing cancellation against live epoch
 evidence. The second host was therefore deliberately left with **no ledger
 bootstrap and no epoch**; `paper-evidence-status` there correctly reports
 "Paper evidence epoch not found". Do not bootstrap or start an epoch on the
 second host while any epoch-host evidence epoch is active (currently
-`paper-epoch-003`).
+`paper-epoch-004`).
 
 The non-elevated `Disable` gotcha (below, epoch host) reproduced exactly on
 the second host: `Stop-ScheduledTask` succeeded unelevated while
@@ -344,6 +344,26 @@ The 2026-08-06 standup is real evidence toward **GR-6**'s "second-machine
 stand-up proven once" marker (pinned checkout, dedicated interpreter, full
 suite, installer preview and verifier round-tripped). It is not evidence
 toward any epoch, and it did not start one.
+
+### QC-2 is reviewed development code, not epoch-004 runtime (2026-08-11)
+
+Claude's QC-2 implementation `f09682f` was merged as PR #192 at `62c8270`;
+Codex accepted it after four P2 corrections in `7fc9db8` on
+`codex/review-qc2-look-counting-registry-20260811`. The Backtest UI now
+records an exact configuration + dated-data fingerprint + clean code commit
+before revealing results, and counts the selected horizons times the two
+dip/up direction cells. Exact repeats only increment a replay counter.
+Synthetic runs remain audited but are excluded from the displayed real-market
+family. Storage refuses non-canonical identity or conflicting immutable
+content. Recording remains non-gating and has no proposal, order, policy,
+scheduler, ML/LLM-authority, or live-trading reach.
+
+This review branch is not the deployed epoch lineage. **Do not deploy QC-2
+merely to add research bookkeeping:** `paper-epoch-004` remains active on
+`b837374`, and a deployment would close its accumulated evidence. Any later
+deployment requires a separately authorized epoch roll. See
+`docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md` for the full ledger and
+validation.
 
 - **Launch the app only via `C:\git\launch_trading_app.ps1`.** It pins the
   operational checkout, sets `TRADING_ASSISTANT_DB`, and re-reads Alpaca

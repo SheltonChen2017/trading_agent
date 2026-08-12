@@ -1,7 +1,7 @@
 # Session handoff — QC-2 reviewed and corrected
 
-Prepared: 2026-08-11, after independent review of the QC-2 interactive
-research-look registry and before publication of the review branch.
+Prepared: 2026-08-11, after independent review, correction, and authorized
+publication of the QC-2 interactive research-look registry branch.
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
@@ -34,10 +34,13 @@ machine/epoch record. Do not recreate either from conversation memory.
   `codex/review-qc2-look-counting-registry-20260811`.
 - Corrective code commit: `7fc9db8`.
 - Durable review/action/milestone/operational-facts commit: `3e5cba7`.
-- This handoff commit: pending until this file is committed separately.
-- Publication: owner authorized branch + commit + push, with **no PR**. At
-  preparation time the review branch is still local; do not call the
-  cross-computer handoff complete until its remote tip is verified.
+- Initial separate handoff commit: `b52015a`.
+- Publication: owner authorized branch + commit + push, with **no PR**. The
+  review branch was pushed and set to track
+  `origin/codex/review-qc2-look-counting-registry-20260811`; this final
+  publication-state update follows `b52015a` and is part of the same pushed
+  branch. Cross-computer continuation uses that remote branch, not a local
+  copy of this file.
 
 The submitted range was exactly `5e6b0bb..62c8270`, in order:
 
@@ -149,10 +152,9 @@ handoff.
 
 ## 6. Next step
 
-Finish the already authorized publication of this review branch, verify the
-remote tip, and update this handoff with that exact reachability. No PR was
-requested. After publication, the owner may ask Claude for a counter-review
-or later authorize merge; neither action authorizes deployment.
+Publication is complete and no PR was created, as requested. The owner may
+ask Claude for a counter-review or later authorize merge; neither action
+authorizes deployment.
 
 For the roadmap, **leave epoch-004 accumulating**. QC-2 is complete for the
 local interactive Backtest surface. Remaining work includes GR-6 portability

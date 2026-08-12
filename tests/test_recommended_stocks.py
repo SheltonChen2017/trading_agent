@@ -7,7 +7,7 @@ from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from assistant import recommended_stocks, similarity_evidence
+from assistant import recommended_stocks, similarity_evidence, ticker_verification
 from assistant.schemas import EvidenceStatus
 
 
@@ -318,30 +318,74 @@ def test_similarity_detail_pairs_llm_reason_with_measured_evidence(monkeypatch):
     assert "90%" in amd.detail
 
 
-# --- Lane-specific IPO eligibility (independent review: a genuine IPO from
-# the last 30 calendar days has at most ~20 trading sessions, but the
-# DEFAULT_ELIGIBILITY_POLICY used everywhere else requires 60 -- every real
-# recent IPO was rejected by construction, not just conservatively.)
+# --- Lane eligibility policy.
+#
+# Supersedes test_build_recommended_tickers_ipo_lane_uses_the_lenient_ipo_policy,
+# which asserted only that the IPO lane avoided DEFAULT_ELIGIBILITY_POLICY's
+# 60-session floor (that floor had made every genuine recent IPO ineligible by
+# construction). The owner decision of 2026-08-12 generalized the same finding:
+# the floor was also removing real most-active names -- SPCX at 41 sessions
+# despite ~$10.7B median daily dollar volume -- so NO lane on this surface
+# screens on size, age, or price any more. The replacement is strictly
+# stronger: it pins the policy for all three lanes instead of one, and forbids
+# DEFAULT_ELIGIBILITY_POLICY anywhere in build_recommended_tickers.
 
-def test_build_recommended_tickers_ipo_lane_uses_the_lenient_ipo_policy(monkeypatch):
+def test_build_recommended_tickers_every_lane_uses_the_disclosure_policy(monkeypatch):
     monkeypatch.setenv("FINNHUB_API_KEY", "test-key")
-    verified_newco = _verified("NEWCO", history_sessions=7, first_session_date="2026-07-21")
 
     def _side_effect(tickers, *args, **kwargs):
         if tickers == ["NEWCO"]:
-            return ([verified_newco], [])
-        return ([], [])
+            return ([_verified("NEWCO", history_sessions=7, first_session_date="2026-07-21")], [])
+        return ([_verified(t) for t in tickers], [])
 
-    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[]), \
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers") as mock_active, \
          patch("assistant.recommended_stocks.fetch_recent_ipos") as mock_ipos, \
-         patch("assistant.recommended_stocks.suggest_similar_tickers", return_value=None), \
+         patch("assistant.recommended_stocks.suggest_similar_tickers") as mock_similar, \
          patch("assistant.recommended_stocks.verify_tickers", side_effect=_side_effect) as mock_verify:
-        mock_ipos.return_value = [{"ticker": "NEWCO", "name": "New Co", "date": "2026-07-20", "status": "priced"}]
-        recommended, _ = recommended_stocks.build_recommended_tickers()
-    # verify_tickers must be called with the lenient IPO policy for this lane, not the default.
-    ipo_call = next(c for c in mock_verify.call_args_list if c.args and c.args[0] == ["NEWCO"])
-    assert ipo_call.kwargs["policy"] is recommended_stocks.RECENT_IPO_ELIGIBILITY_POLICY
-    assert any(r.ticker == "NEWCO" and r.reason_category == "recent_ipo" for r in recommended)
+        mock_active.return_value = [
+            {"ticker": "SPCX", "name": "Space Exploration Technologies Corp.",
+             "volume": 100322655, "change_percent": 8.75}
+        ]
+        mock_ipos.return_value = [
+            {"ticker": "NEWCO", "name": "New Co", "date": "2026-07-20", "status": "priced"}
+        ]
+        mock_similar.return_value = [{"ticker": "TSLA", "reason": "similar"}]
+        recommended, _ = recommended_stocks.build_recommended_tickers(["AAPL"])
+
+    policies = [c.kwargs.get("policy") for c in mock_verify.call_args_list]
+    assert len(policies) == 3, "expected one verify_tickers call per lane"
+    assert all(p is ticker_verification.SUGGESTION_DISCLOSURE_POLICY for p in policies)
+    # The strict policy must not survive anywhere on this surface.
+    assert ticker_verification.DEFAULT_ELIGIBILITY_POLICY not in policies
+    assert {r.reason_category for r in recommended} == {"most_active", "recent_ipo", "ai_suggested"}
+
+
+def test_suggestion_disclosure_policy_keeps_identity_and_drops_size_screening():
+    """The removed gates and the kept gates are both load-bearing, so pin both.
+
+    Dropping the size/age/price screen is what the owner asked for. Dropping
+    the identity screen was NOT: the ai_suggested lane is LLM-authored, and
+    without EQUITY + US-venue enforcement a hallucinated symbol that happened
+    to resolve to some obscure listing would render as a suggestion.
+    """
+    disclosure = ticker_verification.SUGGESTION_DISCLOSURE_POLICY
+    strict = ticker_verification.DEFAULT_ELIGIBILITY_POLICY
+
+    assert disclosure.minimum_history_sessions == 0
+    assert disclosure.minimum_price == 0.0
+    assert disclosure.minimum_median_dollar_volume == 0.0
+    assert disclosure.require_company_name is True
+
+    assert disclosure.allowed_quote_types == ("EQUITY",)
+    assert disclosure.allowed_exchanges == strict.allowed_exchanges
+    assert disclosure.allowed_exchanges is not None
+
+    # The strict policy is still the strict policy -- this change must not
+    # have loosened the Watchlist similar-stocks surface as a side effect.
+    assert strict.minimum_history_sessions == 60
+    assert strict.minimum_price == 5.0
+    assert strict.minimum_median_dollar_volume == 1_000_000.0
+    assert strict.require_company_name is True
 
 
 def test_build_recommended_tickers_ipo_detail_discloses_limited_history(monkeypatch):
@@ -651,3 +695,107 @@ if __name__ == "__main__":
     test_is_ipo_identity_mismatch_false_when_data_missing()
     test_recommended_ticker_never_reuses_signal_evidence_status()
     print("Run via pytest for the monkeypatch-fixture tests: python -m pytest tests/test_recommended_stocks.py")
+
+
+# --- Disclosure of the screens SUGGESTION_DISCLOSURE_POLICY stopped enforcing.
+#
+# Removing a filter silently would be a downgrade, not a disclosure: a
+# 41-session listing and a decade-old blue chip would render identically and
+# the reader could no longer tell which rows the project's own thresholds
+# would have excluded. Each removed gate must therefore reappear as a fact on
+# the row.
+
+def _lane_aware_verify(rows):
+    """verify_tickers is patched once but called once PER LANE, so a plain
+    return_value hands the same rows to every lane -- a lane whose provider
+    returned nothing still emits a row, and a per-lane assertion can end up
+    reading a different lane's output. (Caught 2026-08-12 by mutating only the
+    most-active lane and watching the IPO and AI tests go red with it.) Return
+    nothing for an empty candidate list, which is what the real function does.
+    """
+    def _side_effect(tickers, *args, **kwargs):
+        return ([], []) if not tickers else (rows, [])
+
+    return _side_effect
+
+
+def _most_active_detail(verified_overrides, *, ticker="SPCX"):
+    candidate = {"ticker": ticker, "name": f"{ticker} Corp.", "volume": 100_322_655, "change_percent": 8.75}
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[candidate]), \
+         patch("assistant.recommended_stocks.fetch_recent_ipos", return_value=[]), \
+         patch("assistant.recommended_stocks.suggest_similar_tickers", return_value=None), \
+         patch("assistant.recommended_stocks.verify_tickers",
+               side_effect=_lane_aware_verify([_verified(ticker, **verified_overrides)])):
+        recommended, _ = recommended_stocks.build_recommended_tickers()
+    rows = [r for r in recommended if r.reason_category == "most_active"]
+    assert [r.ticker for r in rows] == [ticker], "the most-active lane must be the only source here"
+    return rows[0].detail
+
+
+def test_most_active_row_discloses_thin_history():
+    detail = _most_active_detail({"history_sessions": 41})
+    assert "only 41 completed trading session(s)" in detail
+    assert "60-session floor" in detail
+    assert "not yet reliable" in detail
+
+
+def test_most_active_row_discloses_low_price():
+    detail = _most_active_detail({"last_price": 2.27}, ticker="PLUG")
+    assert "last close $2.27" in detail
+    assert "$5.00 price floor" in detail
+
+
+def test_most_active_row_discloses_thin_liquidity():
+    detail = _most_active_detail({"median_dollar_volume": 165_353.0}, ticker="THIN")
+    assert "median daily dollar volume $165,353" in detail
+    assert "hard to trade at a fair price" in detail
+
+
+def test_most_active_row_that_clears_every_floor_carries_no_disclosure():
+    """The notes must be attributable to the specific row, not boilerplate
+    stapled to every row -- otherwise they carry no information."""
+    detail = _most_active_detail({}, ticker="NVDA")
+    assert "below the usual" not in detail
+    assert "completed trading session(s)" not in detail
+
+
+def test_ai_suggested_row_discloses_thin_history():
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[]), \
+         patch("assistant.recommended_stocks.fetch_recent_ipos", return_value=[]), \
+         patch("assistant.recommended_stocks.suggest_similar_tickers",
+               return_value=[{"ticker": "NEWC", "reason": "similar business"}]), \
+         patch("assistant.recommended_stocks.verify_tickers",
+               side_effect=_lane_aware_verify([_verified("NEWC", history_sessions=12)])):
+        recommended, _ = recommended_stocks.build_recommended_tickers(["AAPL"])
+    rows = [r for r in recommended if r.reason_category == "ai_suggested"]
+    assert [r.ticker for r in rows] == ["NEWC"]
+    assert "only 12 completed trading session(s)" in rows[0].detail
+
+
+def test_ipo_row_discloses_price_floor_without_repeating_its_session_count(monkeypatch):
+    """The IPO lane's own detail already states the session count and the same
+    unreliability caveat; a second copy would read as two separate problems."""
+    monkeypatch.setenv("FINNHUB_API_KEY", "test-key")
+    with patch("assistant.recommended_stocks.fetch_most_active_tickers", return_value=[]), \
+         patch("assistant.recommended_stocks.suggest_similar_tickers", return_value=None), \
+         patch("assistant.recommended_stocks.fetch_recent_ipos",
+               return_value=[{"ticker": "NEWCO", "name": "New Co", "date": "2026-07-20", "status": "priced"}]), \
+         patch("assistant.recommended_stocks.verify_tickers",
+               side_effect=_lane_aware_verify([_verified("NEWCO", history_sessions=7,
+                                                         last_price=3.10,
+                                                         first_session_date="2026-07-21")])):
+        recommended, _ = recommended_stocks.build_recommended_tickers()
+    rows = [r for r in recommended if r.reason_category == "recent_ipo"]
+    assert [r.ticker for r in rows] == ["NEWCO"]
+    detail = rows[0].detail
+    assert "7 completed trading session(s)" in detail
+    assert detail.count("completed trading session(s)") == 1
+    assert "last close $3.10" in detail
+
+
+def test_row_discloses_when_liquidity_could_not_be_measured():
+    notes = recommended_stocks._eligibility_disclosure(
+        _verified("NOVOL", median_dollar_volume=None)
+    )
+    assert any("median daily dollar volume unavailable" in note for note in notes)
+    assert any("cannot compare" in note for note in notes)

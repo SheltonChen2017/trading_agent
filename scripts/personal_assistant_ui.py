@@ -1820,6 +1820,12 @@ if page == "Briefing":
             "\"Most actively traded\" reflects trading VOLUME and price movement, NOT buy-vs-sell order flow -- "
             "no legitimate retail-accessible data source provides true order imbalance."
         )
+        st.caption(
+            "Verification: every ticker shown resolved against real market data "
+            "as a named US-listed equity. Rows are NOT screened on size, age, "
+            "price, or liquidity (owner decision, 2026-08-12); unavailable or "
+            "below-usual measurements are disclosed on the row instead."
+        )
         if st.button("Refresh recommended stocks", key="refresh_recommended"):
             _load_recommended_tickers.clear()
         held_tickers_tuple = tuple(sorted({p.ticker.upper() for p in packet.portfolio.positions}))
@@ -1828,9 +1834,18 @@ if page == "Briefing":
             held_tickers_tuple, briefing_ai_on
         )
         if dropped_candidates:
+            # Name them. A bare count could not distinguish "we filtered out
+            # junk" from "we filtered out the day's second most-traded stock"
+            # -- which is exactly how the 2026-08-12 SPCX omission stayed
+            # invisible until the owner diffed this list against yfinance by
+            # hand. Screening here is identity only (see
+            # SUGGESTION_DISCLOSURE_POLICY), so a drop is now a real failure
+            # to identify the symbol, not a judgment about its size.
             st.caption(
-                f"{len(dropped_candidates)} candidate ticker(s) could not be verified against real market data "
-                "and were omitted."
+                f"{len(dropped_candidates)} candidate ticker(s) omitted -- could "
+                "not be verified at this time as a named US-listed equity: "
+                + ", ".join(sorted(set(dropped_candidates)))
+                + "."
             )
         for category, label in [
             ("most_active", "Most actively traded today"),
@@ -1852,7 +1867,7 @@ if page == "Briefing":
             with st.expander(f"{label} ({len(items)})"):
                 st.dataframe(
                     [{"Ticker": r.ticker, "Detail": r.detail} for r in items],
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                 )
 
@@ -3259,10 +3274,27 @@ if page == "Ticker Suggestions":
             source_time
             + f"Displayed at {suggestions_result['ran_at']}. The source loader may "
             f"return results cached for up to {_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS // 60} minutes. "
-            "Verification: every ticker "
-            "shown resolved against real market data; "
-            f"{len(suggestions_result['dropped'])} candidate(s) failed verification and "
-            "were omitted."
+            # Counter-review AP8CR-001: review corrected the Briefing copy on
+            # two points -- identity now includes a company name, and a
+            # provider outage is observationally identical to an unidentifiable
+            # symbol, so omission copy must not assert the security itself is
+            # invalid. Both corrections apply verbatim here, on the page AP-8
+            # is actually about; they were fixed on one consumer only.
+            "Verification: every ticker shown resolved against real market "
+            "data as a named US-listed equity. Rows are NOT screened on size, "
+            "age, price, or liquidity (owner decision, 2026-08-12) -- where a "
+            "row falls below this project's usual floors, or a measurement is "
+            "unavailable, the row says so instead of being hidden. Judgment is "
+            "yours; nothing here is a recommendation, and no listing carries "
+            "any execution authority."
+            + (
+                f" {len(suggestions_result['dropped'])} candidate(s) could not be "
+                "verified at this time and were omitted: "
+                + ", ".join(sorted(set(suggestions_result["dropped"])))
+                + "."
+                if suggestions_result["dropped"]
+                else ""
+            )
         )
         source_labels = {
             "most_active": (
@@ -3292,7 +3324,7 @@ if page == "Ticker Suggestions":
                             }
                             for r in items
                         ],
-                        use_container_width=True,
+                        width="stretch",
                         hide_index=True,
                     )
                 else:

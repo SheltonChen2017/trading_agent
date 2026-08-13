@@ -5,6 +5,8 @@ import sys
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant import recommended_stocks, similarity_evidence, ticker_verification
@@ -553,6 +555,60 @@ def test_most_active_lane_says_not_reported_when_the_change_is_missing(monkeypat
     row = recommended[0]
     assert row.price_direction is None
     assert "not reported" in row.detail
+
+
+@pytest.mark.parametrize(
+    "bad_volume",
+    ["malformed", True, float("nan"), float("inf"), -1, 12.5, None],
+)
+def test_most_active_lane_degrades_an_unusable_volume_without_hiding_rows(
+    monkeypatch, bad_volume
+):
+    """Optional provider metadata cannot suppress the verified batch.
+
+    Before the correction, a truthy string reached ``f"{volume:,}"`` and
+    raised ``ValueError``; NaN and negative values were rendered as if they
+    were measured share counts.  Keep a second valid row in the batch so the
+    regression pins both isolation and the positive path.
+    """
+    monkeypatch.delenv("FINNHUB_API_KEY", raising=False)
+    with patch(
+        "assistant.recommended_stocks.fetch_most_active_tickers",
+        return_value=[
+            {
+                "ticker": "ODD",
+                "name": "Odd Volume Co",
+                "volume": bad_volume,
+                "change_percent": 1.0,
+            },
+            {
+                "ticker": "GOOD",
+                "name": "Good Volume Co",
+                "volume": 1234,
+                "change_percent": -1.0,
+            },
+        ],
+    ), patch(
+        "assistant.recommended_stocks.suggest_similar_tickers", return_value=None
+    ), patch(
+        "assistant.recommended_stocks.verify_tickers",
+        return_value=(
+            [
+                _verified("ODD", longName="Odd Volume Co"),
+                _verified("GOOD", longName="Good Volume Co"),
+            ],
+            [],
+        ),
+    ):
+        recommended, _ = recommended_stocks.build_recommended_tickers(
+            include_recent_ipos=False,
+            include_ai_suggestions=False,
+        )
+
+    rows = {row.ticker: row for row in recommended}
+    assert set(rows) == {"ODD", "GOOD"}
+    assert "trading volume today: not reported" in rows["ODD"].detail
+    assert "trading volume today: 1,234" in rows["GOOD"].detail
 
 
 def test_direction_split_is_never_described_as_buying_or_selling(monkeypatch):

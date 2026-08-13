@@ -264,15 +264,13 @@ cash flows to the previous session's return interval and a New-Year event
 to the prior tax year), and a prefix-map `KeyError` that escaped the
 fail-closed refusal handler is gone. Details in the review report §7.
 
-**Update 2026-08-11 (reviewed development only, NOT deployed): CR-W3 stops
-being an epoch-killer after the correction is merged and deployed.** Claude's
-operator acknowledgement implementation merged as PR #188 at `24de4f5`;
-independent review accepted the design after material correction at local-only
-`74376e4` on `codex/review-broker-activity-acknowledgement-20260811`. Do not
-deploy PR #188 without that correction. Once the corrected tree enters a new
-epoch, a refused activity no longer requires another code deploy — and
-therefore no longer costs the accumulated run. When a nightly capture fails
-on an unsupported activity, the recovery is:
+**Update 2026-08-11 (deployed in `paper-epoch-004`): CR-W3 no longer requires
+an epoch-ending code deploy.** Claude's operator acknowledgement implementation
+merged as PR #188 at `24de4f5`; independent correction `74376e4` and the
+counter-review choke-point fix entered `main` through PR #189 at `b837374`,
+the frozen epoch-004 runtime. A refused activity can therefore be handled by
+an explicit operator decision without changing the deployed code. When a
+nightly capture fails on an unsupported activity, the recovery is:
 
 1. `ledger-activity-review` — see exactly what refused and why (read-only).
 2. `ledger-activity-acknowledge <id> --treatment <fee|dividend|cash_transfer|no_cash_effect> --operator <you> --rationale "<why>"` (plus `--ticker` for a dividend).
@@ -290,8 +288,8 @@ missing amounts, wrong signs, cross-type reuse of a broker ID, and changed
 fingerprints fail closed. `no_cash_effect` works only when the broker explicitly
 reports zero — missing is unknown, not zero. A second decision is idempotent
 only when fingerprint, treatment, operator, rationale, and details agree.
-**This is undeployed until the complete epoch-004 roll** — on deployed
-`ef05dc1` a refused activity still stalls the epoch.
+This path is deployed on `b837374`; it remains fail-closed until an operator
+records a valid acknowledgement for the exact refused broker row.
 
 **CR-W3 (watch item):** the DIV subtype allowlist accepts only an
 absent subtype or explicit `CDIV`, and no `DIV` activity has ever appeared
@@ -300,13 +298,13 @@ If it differs, that night's observation fails closed and names the subtype
 in the refusal message; the fix is a small reviewed allowlist addition.
 Expect this as a possibility around 2026-09-10.
 
-Standing watch until epoch-004 deployment: the AEP cash dividend and every
-post-bootstrap JNLC/CSD/CSW activity still fail closed on deployed `ef05dc1`.
-After deployment, plain cash dividends and explicit CSD/CSW movements are
-handled; JNLC continues to require operator review and a more specific
-accounting fact. The operations-cycle still completes backup/health work
-before returning an activity failure. Never use a manual compensating entry
-(the sync re-reads the broker row) and never widen reconciliation tolerance.
+Standing watch after epoch-004 deployment: plain cash dividends and explicit
+CSD/CSW movements are handled on `b837374`; JNLC continues to require operator
+review and a more specific accounting fact. The first real AEP dividend
+subtype remains unverified and may over-refuse safely once around 2026-09-10.
+The operations-cycle still completes backup/health work before returning an
+activity failure. Never use a manual compensating entry (the sync re-reads the
+broker row) and never widen reconciliation tolerance.
 
 ### There are TWO machines, and only one may run the cadence (2026-08-06; re-verified 2026-08-09)
 
@@ -321,7 +319,7 @@ Everything in this section is host-specific; re-measure rather than assume
 which one you are on. `whoami` distinguishes them.
 
 - **Epoch host** (`REDMOND\sheltonchen`) — runs the active
-  `paper-epoch-003` (at `ef05dc1` since 2026-08-10). The four
+  `paper-epoch-004` (at `b837374` since 2026-08-11). The four
   `TradingAgent-Paper-*` tasks are installed and ENABLED here. This is the
   only host that may run the operational cadence. The bullets below this
   section (launch script, epoch-swap script, lock files, backups) describe

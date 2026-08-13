@@ -252,11 +252,13 @@ restart themselves if they are not running.
 | **Watchdog** | every 60 s | health heartbeat; raises alerts as Windows notifications |
 | **PaperObservation** | daily, after the close | records the immutable session snapshot — **this is what makes a day count** |
 
-**The one recurring obligation:** the observation fires at 16:30 local. If
-you shut the machine down before then, that day does not count toward the
-60 — so either leave it running past 16:30, or ask Claude to capture the
-observation after the close (it takes seconds). Running on battery is
-fine; the tasks used to skip on battery power and no longer do.
+**The one recurring obligation:** the observation fires at 16:30 Eastern,
+converted by the installer to the host's local clock with the applicable
+daylight-saving rules. If you shut the machine down before that local time,
+that day does not count toward the 60 — so either leave it running through
+the converted time, or ask Claude to capture the observation after the close
+(it takes seconds). Running on battery is fine; the tasks used to skip on
+battery power and no longer do.
 
 The evidence epoch itself is a database record: it survives reboots and
 never needs re-activating. The frozen checkout must not be updated until

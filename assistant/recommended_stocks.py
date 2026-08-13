@@ -33,6 +33,7 @@ from datetime import date, datetime, timedelta, timezone
 from typing import Literal
 
 from assistant.ai_advisor import suggest_similar_tickers
+from assistant.money import to_decimal
 from assistant.similarity_evidence import compute_similarity_evidence, format_evidence_summary
 from assistant.storage import AssistantStore
 from assistant.ticker_verification import (
@@ -78,6 +79,24 @@ def classify_price_direction(change_percent: object) -> PriceDirection | None:
     if value < 0:
         return "declining"
     return "unchanged"
+
+
+def _trading_volume_detail(volume: object) -> str:
+    """A provider volume fact, or an explicit unavailable disclosure.
+
+    yfinance normally returns an integer share count, but this is an optional
+    presentation field rather than an identity requirement.  One malformed
+    value must therefore degrade its own row instead of aborting the complete
+    recommendation batch.  Fractional, negative, boolean, and non-finite
+    values are not valid share-volume facts and must not be rounded into one.
+    """
+    try:
+        parsed = to_decimal(volume, name="most-active trading volume")
+    except ValueError:
+        return "trading volume today: not reported"
+    if parsed < 0 or parsed != parsed.to_integral_value():
+        return "trading volume today: not reported"
+    return f"trading volume today: {int(parsed):,}"
 
 
 def _eligibility_disclosure(verified: dict, *, include_history: bool = True) -> list[str]:
@@ -298,8 +317,7 @@ def build_recommended_tickers(
             direction = classify_price_direction(c.get("change_percent"))
             name = v.get("longName") or c.get("name") or v["ticker"]
             parts = [str(name)]
-            if volume:
-                parts.append(f"trading volume today: {volume:,}")
+            parts.append(_trading_volume_detail(volume))
             if direction is None:
                 # Say so rather than implying a flat move; the reader must be
                 # able to tell "no direction reported" from "did not move".

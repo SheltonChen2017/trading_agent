@@ -34,6 +34,10 @@ def _text(name: str) -> str:
     return " ".join((ROOT / "docs" / name).read_text(encoding="utf-8").split())
 
 
+def _root_text(name: str) -> str:
+    return " ".join((ROOT / name).read_text(encoding="utf-8").split())
+
+
 def _active_epochs(text: str) -> set[str]:
     """Epoch ids the document asserts are currently ACTIVE."""
     return set(
@@ -87,6 +91,82 @@ def test_exactly_one_epoch_is_described_as_active_across_current_documents():
     assert len(claimed) <= 1, (
         f"current documents disagree about the active epoch: {active}"
     )
+
+
+def test_epoch_host_bullet_agrees_with_the_current_active_epoch():
+    """A historical host section must be amended when the epoch rolls.
+
+    The top of OPERATIONAL_FACTS correctly named epoch-004 while the standing
+    two-machine section still told operators that the epoch host ran
+    epoch-003.  Compare relationships so this survives the next roll without
+    pinning today's identifier in the test.
+    """
+    plan_active = _active_epochs(_text("ACTION_PLAN_2026-08-02.md"))
+    facts = _text("OPERATIONAL_FACTS.md")
+    match = re.search(
+        r"\*\*Epoch host\*\*.*?runs the active `(paper-epoch-\d+)`",
+        facts,
+        flags=re.IGNORECASE,
+    )
+    assert match, "OPERATIONAL_FACTS has no standing epoch-host status bullet"
+    assert {match.group(1)} == plan_active, (
+        "the standing epoch-host bullet disagrees with the action plan: "
+        f"{match.group(1)!r} vs {sorted(plan_active)}"
+    )
+
+
+def test_completed_epoch_004_roll_replaced_its_predeployment_queue():
+    """Known pre-roll instructions cannot remain current after deployment."""
+    documents = {
+        "ACTION_PLAN_2026-08-02.md": _text("ACTION_PLAN_2026-08-02.md"),
+        "SESSION_HANDOFF.md": _text("SESSION_HANDOFF.md"),
+        "OPERATIONAL_FACTS.md": _text("OPERATIONAL_FACTS.md"),
+        "FEATURE_MILESTONE_RECORD.md": _text("FEATURE_MILESTONE_RECORD.md"),
+    }
+    stale = (
+        "CR-W2 cash-dividend / explicit cash-transfer handler** — **COMPLETE, MERGED, NOT DEPLOYED",
+        "Include this already-merged fix with CR-W2 in one owner-authorized epoch-004 roll",
+        "CR-W2/AP-7 are already queued for the same roll",
+        "This is undeployed until the complete epoch-004 roll",
+        "Standing watch until epoch-004 deployment",
+        "This feature is not deployed into the active epoch",
+        "will not help the currently running epoch until the corrected branch is merged",
+    )
+    hits = [
+        f"{name}: {phrase}"
+        for name, text in documents.items()
+        for phrase in stale
+        if phrase in text
+    ]
+    assert not hits, "superseded epoch-004 deployment state remains: " + "; ".join(hits)
+
+    action_plan_raw = (
+        ROOT / "docs" / "ACTION_PLAN_2026-08-02.md"
+    ).read_text(encoding="utf-8")
+    ap7_rows = [line for line in action_plan_raw.splitlines() if line.startswith("| AP-7 |")]
+    assert len(ap7_rows) == 1, "the action plan must contain exactly one AP-7 row"
+    assert "deployed" in ap7_rows[0].lower() and "b837374" in ap7_rows[0], (
+        "the AP-7 ledger row must record its epoch-004 deployment"
+    )
+
+
+def test_current_review_documents_have_no_validation_placeholders():
+    """A validation claim must contain a measured result, never a token."""
+    placeholders = re.compile(r"\b(?:FULL_SUITE|COUNTER_REVIEW_SUITE)_RESULT\b")
+    names = (
+        "SESSION_HANDOFF.md",
+        "FEATURE_MILESTONE_RECORD.md",
+        "REVIEW_2026-08-12_AP9_ALLOCATION_REVIEW_VISIBILITY.md",
+    )
+    hits = [name for name in names if placeholders.search(_text(name))]
+    assert not hits, f"unresolved validation placeholders remain in {hits}"
+
+
+def test_operator_guide_uses_the_eastern_paper_observation_clock():
+    """The installer converts 16:30 Eastern to the host's local timezone."""
+    guide = _root_text("HOW_TO_USE.md")
+    assert "observation fires at 16:30 local" not in guide
+    assert "16:30 Eastern" in guide
 
 
 def test_current_documents_do_not_call_completed_work_unstarted():

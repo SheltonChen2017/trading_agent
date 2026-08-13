@@ -60,3 +60,47 @@ state, and human versus JSON output—rather than the basic routing algorithm.
 M3 is accepted after correction `b6685b5`. The branch is local-only, unmerged,
 and undeployed. Optional M4 remains deferred; merge, push, deployment, and any
 epoch roll require separate owner authorization.
+
+---
+
+## Counter-review (Claude, 2026-08-13)
+
+Owner-requested verification of this review, performed in the review worktree
+at `55b4518`.
+
+### Every finding verified
+
+All six findings are **confirmed genuine**, each independently re-established
+by reverting the correction and observing exactly the intended regression
+redden, then restoring:
+
+| ID | Independent verification |
+|---|---|
+| M3REV-001 | **Confirmed, and the severity is right.** The repository's own authority states it: `storage.py::list_recorded_fills`' docstring says the trade-update STREAM delivers incremental `fill_qty` while POLL reconciliation "only ever sees the broker's cumulative `filled_qty`". My `_has_fill_evidence` read only `fill_qty`, so a poll-only partial fill followed by cancellation presented as zero fill evidence and released spent dollars. Mutation: narrowing the field tuple back to `("fill_qty",)` reddens the poll-shaped regression. |
+| M3REV-002 | **Confirmed.** I scoped fill evidence to `canceled`/`broker_expired` only, so a fill followed by `broker_rejected` released the whole earmark. Mutation: deleting the `if fill_evidence: return "consume"` precedence reddens. The generalized form review chose (evidence outranks every label, known or not) is strictly better than enumerating more statuses. |
+| M3REV-003 | **Confirmed, and my original docstring's defense was wrong.** I argued a caller-supplied income total is safe because the append-only journal can only grow. That reasoning covers staleness but not the actual threat: the parameter let any caller *assert* funding, so a direct call could persist a funded proposal against an empty journal. A durable financial fence must not accept a caller's claim about available money. Mutation: pointing the in-transaction income query at a nonexistent source reddens four regressions. |
+| M3REV-004 | **Confirmed at both sites.** Mutations: restoring `status IN ('active','consumed')` in the fence, and collapsing the read model's `elif` so an unknown durable status passes through as its own effective disposition, each redden. |
+| M3REV-005 | **Confirmed.** Mutation: disabling the nonpositive-amount refusal reddens. |
+| M3REV-006 | **Confirmed.** Mutation: printing transition lines unconditionally reddens the JSON-parse regression. A documented `--json` surface breaking only in a *valid* lifecycle state is exactly the kind of defect that survives casual testing. |
+
+No finding was overstated, and no correction weakened an existing test: the
+review's only deletions from `tests/test_sleeve_reinvest.py` are the two
+`confirmed_income_text=` argument lines the M3REV-003 signature change made
+invalid.
+
+### Counter-review findings
+
+| ID | Priority | Status | Finding |
+|---|---|---|---|
+| M3CR-001 | P2 | **Resolved in this counter-review** | The disposition table had no exhaustiveness contract, and `override_available` is the sharp edge: `execution_kernel/errors.py` documents that an overridable refusal is left in that status *precisely* so a human can re-invoke with `override_policy_violations=True` — its dollars are still spendable. It reads like a stopped validation, so it is exactly the status a future author would add to the release list, and it holds today only through the function's default branch with nothing pinning it. (`blocked` is correctly in the release set: the same file documents it as terminal.) Added two guards stated as relationships over the canonical vocabulary rather than copied lists — every `IN_FLIGHT_INTENT_STATUSES` member plus `proposed`/`override_available` must hold, and no status may release once fill evidence exists — so a future lifecycle addition inherits the rule instead of escaping it. Mutation-verified: moving `override_available` into the release set reddens. |
+| M3CR-002 | P2 | **Resolved in this counter-review** | M3REV-003 correctly stopped the fence trusting its caller, but `assistant/storage.py` cannot import `assistant/portfolio_ledger` (that module imports storage — a cycle), so the fence now repeats the account name as the SQL literal `'INCOME:DIVIDENDS'` while `sleeve_reinvest` reads `ACCOUNT_DIVIDEND_INCOME`. One authoritative rule, two implementations, nothing pinning their agreement — and the drift direction is the unsafe one and silent: rename the constant and the status surface reports `0` available while the fence keeps funding proposals from the old rows. Pinned behaviorally at the exact boundary (the fence must refuse one cent beyond, and fund exactly, what the module measures) so it also catches a filter or JOIN divergence, not merely a renamed string. Mutation-verified: changing the SQL literal reddens. |
+| M3CR-003 | P3 | **Recorded, deliberately not fixed here** | The same two-column duality M3REV-001 found exists in `storage.py::get_execution_budget_usage`, whose `filled_notional` reads only `fill_qty`/`fill_price` and therefore under-reports a poll-only order's fills. It is pre-existing, outside M3's scope, and NOT a safety defect: the daily budget caps are enforced on `submitted_notional` from `execution_reservations` (the docstring calls them gross submission counters), so only an operator-facing report number is affected. Recorded here rather than fixed so the scope stays one milestone, and so it is not rediscovered as new. |
+
+### Counter-review validation
+
+- Full M3 suite after both counter-review guards: **72 passed**.
+- Six review-finding mutations: each reddened exactly its intended
+  regression and passed restored (seven mutation runs — M3REV-004 was
+  verified separately at both of its sites).
+- Two counter-review guard mutations: both reddened and passed restored.
+- Exact counter-review tree: **3,567 passed, 0 failed, 0 skipped, 25 known dependency warnings** in 705.61 s under the repository venv (Python 3.13.14 / Streamlit 1.60.0).

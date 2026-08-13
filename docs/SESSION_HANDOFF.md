@@ -1,8 +1,8 @@
-# Session handoff — three-sleeve M3 accepted after independent correction
+# Session handoff — three-sleeve M3 reviewed, counter-reviewed, and pushed
 
-Prepared: 2026-08-13, after Codex independently reviewed Claude's M3 branch,
-reproduced six findings, committed corrections, and synchronized the active
-project documentation.
+Prepared: 2026-08-13, after Codex independently reviewed Claude's M3 branch
+and committed corrections, and Claude then counter-reviewed that review,
+confirmed all six findings by mutation, and closed two further findings.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -24,8 +24,12 @@ action.
 - Codex independent review branch:
   `codex/review-three-sleeve-m3-20260813`, correction `b6685b5`, followed by
   this documentation-only handoff commit.
-- **The Codex review branch and its correction are local-only and have not
-  been pushed. Another computer cannot retrieve them with `git fetch`.**
+- Claude's counter-review commit follows the review's handoff commit on the
+  same review branch, carrying the counter-review section, two new guards,
+  and this handoff revision.
+- **The review branch is pushed after the counter-review**, deliberately
+  superseding the pre-push local-only statement rather than leaving it to go
+  stale. Merging its PR is the owner's action.
 - The shared Claude branch was not switched, edited, rebased, or force-pushed.
   No unrelated worktree changes were adopted.
 
@@ -92,6 +96,16 @@ structured JSON.
 - Review was local and deterministic. No broker request, order, policy write,
   scheduler mutation, operational-database access, or epoch mutation occurred.
 
+Counter-review (Claude) validation:
+
+- All six review findings independently re-established by mutation (seven
+  runs; M3REV-004 verified separately at both of its sites), each reddening
+  exactly its intended regression and passing restored.
+- Two counter-review guards added (M3CR-001 executable-status exhaustiveness,
+  M3CR-002 fence/module pool agreement), both mutation-verified.
+- M3 suite after the counter-review guards: **72 passed**.
+- Exact counter-review tree: **3,567 passed, 0 failed, 0 skipped, 25 known dependency warnings** in 705.61 s under the repository venv (Python 3.13.14 / Streamlit 1.60.0).
+
 ## 5. Operational truth
 
 - `paper-epoch-004` remains the only active evidence epoch, frozen at
@@ -104,20 +118,29 @@ structured JSON.
 
 ## 6. Next step
 
-The standing collaboration loop's safe next step is Claude counter-review of
-`b6685b5` and this handoff, or an owner-directed merge after that verification.
-Do not push, merge, deploy, roll the epoch, or begin M4 without a new owner
-instruction. Other unchanged owner decisions are epoch-roll timing, the
-physical-media off-machine backup, and the unidentified `origin/Funny` branch.
+The M3 review loop is complete: implemented, independently reviewed,
+counter-reviewed, and pushed. The remaining action is the owner's merge of
+the review branch's PR.
+
+Separately, the owner requested (2026-08-13, same session) a new Selling-tab
+capability: today the Selling page proposes sells only when deterministic
+policy breaches demand them, and the owner asked to be able to sell an
+individual currently-held position directly. That is a new milestone on its
+own branch, `user/claude/user-directed-sell-20260813`, started after this
+counter-review and NOT part of M3.
+
+Do not deploy, roll the epoch, or begin M4 without a new owner instruction.
+Other unchanged owner decisions are epoch-roll timing, the physical-media
+off-machine backup, and the unidentified `origin/Funny` branch.
 
 ## 7. Resume prompt
 
 ```text
-Verify the exact branch and clean worktree. Read CLAUDE.md,
-docs/ACTION_PLAN_2026-08-02.md,
-docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md, and
-docs/SESSION_HANDOFF.md. Independently counter-review correction b6685b5
-against submitted commit 7ee4786. Do not push, merge, deploy, touch the
-operational database, roll paper-epoch-004, or begin M4 without a new owner
-instruction.
+Verify the exact branch and a clean worktree. Read CLAUDE.md,
+docs/ACTION_PLAN_2026-08-02.md, docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md
+including its counter-review section, and docs/SESSION_HANDOFF.md. M3 is
+reviewed, counter-reviewed, and pushed; the owner's merge is the remaining
+action. Active work continues on the separate Selling-tab milestone branch
+user/claude/user-directed-sell-20260813. Do not deploy, touch the operator
+database, roll paper-epoch-004, or begin M4 without a new owner instruction.
 ```

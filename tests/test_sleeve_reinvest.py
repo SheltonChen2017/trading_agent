@@ -41,6 +41,8 @@ from assistant.proposal_status import (
 from assistant.schemas import DecisionPacket, MarketRegime
 from assistant.sleeve_notifications import DECLINE_REVIEW, GAIN_REVIEW, REENTRY_DECLINE
 from assistant.sleeve_reinvest import (
+    EARMARK_FILL_DEPENDENT_STATUSES,
+    EARMARK_RELEASE_STATUSES,
     EVIDENCE_STATUS_DECLINE_ADD,
     EVIDENCE_STATUS_REINVEST,
     ROUTE_DECLINE_ADD,
@@ -212,6 +214,59 @@ def test_a_fill_consumes():
     assert earmark_disposition(FILLED, fill_evidence=False) == "consume"
 
 
+def test_every_still_executable_status_holds_its_earmark():
+    """Counter-review M3CR-001: the sharpest case is `override_available`.
+
+    `PolicyOverridableBlockError` leaves a proposal in that status
+    PRECISELY so a human can re-invoke with override_policy_violations=True
+    -- its dollars are still spendable. It reads like a stopped validation,
+    so it is exactly the status a future author might add to the release
+    list. It holds today only through the function's default branch, with
+    nothing pinning it; releasing it would let the same dividend dollars
+    fund a second proposal while the first one still executes.
+
+    Stated as a RELATIONSHIP over the canonical status vocabulary rather
+    than a copied list, so a new lifecycle status inherits the rule instead
+    of silently escaping it. `blocked` is deliberately absent: the kernel
+    documents it as terminal (execution_kernel/errors.py -- an overridable
+    refusal goes to override_available, never blocked), so releasing there
+    is correct.
+    """
+    from assistant.proposal_status import (
+        IN_FLIGHT_INTENT_STATUSES,
+        POLICY_OVERRIDE_AVAILABLE,
+        PROPOSED,
+    )
+
+    still_executable = set(IN_FLIGHT_INTENT_STATUSES) | {
+        PROPOSED,
+        POLICY_OVERRIDE_AVAILABLE,
+    }
+    for status in sorted(still_executable):
+        assert earmark_disposition(status, fill_evidence=False) == "hold", (
+            f"{status!r} can still reach the broker; its earmark must hold"
+        )
+
+
+def test_no_status_releases_once_fill_evidence_exists():
+    """The whole canonical vocabulary, not a sample: recorded spending
+    outranks every label, including ones that do not exist yet."""
+    from assistant.proposal_status import STATUSES
+
+    releasing = [
+        status
+        for status in STATUSES
+        if earmark_disposition(status, fill_evidence=True) == "release"
+    ]
+    assert not releasing, releasing
+    # And without evidence, exactly the reviewed sets release -- no more.
+    assert {
+        status
+        for status in STATUSES
+        if earmark_disposition(status, fill_evidence=False) == "release"
+    } == set(EARMARK_RELEASE_STATUSES) | set(EARMARK_FILL_DEPENDENT_STATUSES)
+
+
 @pytest.mark.parametrize("status", [CANCELED, BROKER_EXPIRED])
 def test_cancellation_is_fill_dependent(status):
     assert earmark_disposition(status, fill_evidence=False) == "release"
@@ -336,6 +391,55 @@ def test_the_storage_transaction_itself_enforces_the_pool(tmp_path):
     assert len(store.list_dividend_earmarks()) == 1
     assert store.get_proposal("tp_direct_2") is None, (
         "a pool refusal must not leave a proposal row behind"
+    )
+
+
+def test_the_fence_and_the_module_measure_the_same_dividend_pool(tmp_path):
+    """Counter-review M3CR-002: two implementations of one authoritative rule.
+
+    Review correctly stopped the fence from trusting a caller-supplied
+    income total, but `assistant/storage.py` cannot import
+    `assistant/portfolio_ledger` (that module imports storage -- a cycle),
+    so the fence repeats the account name as the SQL literal
+    'INCOME:DIVIDENDS' while `sleeve_reinvest` reads
+    ACCOUNT_DIVIDEND_INCOME. Nothing pinned that the two agree.
+
+    The drift direction is the unsafe one and it is silent: rename the
+    constant and the status surface reports 0 available while the fence
+    keeps funding proposals from the old rows -- money the UI says is not
+    there. Pinned behaviorally at the exact boundary rather than by
+    grepping the SQL, so it also catches a filter/JOIN divergence, not
+    just a renamed string.
+    """
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="500")
+
+    def _proposal(pid):
+        return {
+            "proposal_id": pid,
+            "created_at": _NOW.isoformat(),
+            "expires_at": (_NOW + timedelta(minutes=15)).isoformat(),
+            "status": "proposed",
+            "idempotency_key": f"{pid}-2026-08-13",
+        }
+
+    measured = confirmed_dividend_income_text(store.list_journal_postings())
+    assert measured == "500"
+
+    over = store.create_dividend_earmark_with_proposal(
+        _proposal("tp_boundary_over"), amount_text="500.01",
+        route=ROUTE_REINVEST, ticker="NVDL", now=_NOW.isoformat(),
+    )
+    assert over["created"] is False, (
+        "the fence must not fund a cent beyond what the module measures"
+    )
+    exact = store.create_dividend_earmark_with_proposal(
+        _proposal("tp_boundary_exact"), amount_text=measured,
+        route=ROUTE_REINVEST, ticker="NVDL", now=_NOW.isoformat(),
+    )
+    assert exact["created"] is True, (
+        "the fence must fund the full measured pool -- refusing less would "
+        "strand confirmed dividend income the status surface advertises"
     )
 
 

@@ -72,7 +72,7 @@ from assistant.explanations import explain_ticker
 from assistant.ai_advisor import (
     curate_recommended_tickers,
     is_ai_advisor_configured,
-    review_allocation_plan,
+    review_allocation_outcome,
     suggest_similar_tickers,
 )
 from assistant.news_summary import (
@@ -2149,13 +2149,27 @@ if page == "Buying":
 
         if check_cart_clicked and want_allocation_review:
             baskets_by_ticker = {t: [name for name, tickers in BASKETS.items() if t in tickers] for t in weights}
-            st.session_state["watchlist_ai_review"] = review_allocation_plan(
+            st.session_state["watchlist_ai_review_outcome"] = review_allocation_outcome(
                 list(weights.keys()), weights, vols, baskets_by_ticker, store=store
             )
         elif not want_allocation_review:
-            st.session_state["watchlist_ai_review"] = None
+            st.session_state["watchlist_ai_review_outcome"] = None
 
-        ai_review = st.session_state.get("watchlist_ai_review")
+        outcome = st.session_state.get("watchlist_ai_review_outcome")
+        # Owner-reported 2026-08-12: this used to render NOTHING when the
+        # review came back rejected -- identical to never having asked. Two
+        # real reviews were discarded that afternoon (554- and 670-character
+        # summaries against an undocumented 500-character cap, since removed)
+        # and the page stayed blank both times, so the feature was
+        # indistinguishable from one that was switched off. Say what happened.
+        if outcome is not None and outcome.review is None:
+            st.warning(
+                "Claude's review of this split was requested but is not being "
+                f"shown. {outcome.rejection_reason} The split above is "
+                "unaffected -- it is computed by this project's own code and "
+                "never depended on the AI review."
+            )
+        ai_review = outcome.review if outcome is not None else None
         if ai_review:
             with st.expander("AI review of this split (Claude)", expanded=False):
                 st.write(ai_review.summary)

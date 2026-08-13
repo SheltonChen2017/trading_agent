@@ -1,7 +1,8 @@
-# Session handoff — QC-2 reviewed and corrected
+# Session handoff — AP-9 allocation-review visibility
 
-Prepared: 2026-08-11, after independent review, correction, and authorized
-publication of the QC-2 interactive research-look registry branch.
+Prepared: 2026-08-12, after the owner enabled the AI features, found no Claude
+review under the Buying page's purchase split, and directed that the length
+limit be removed and the output shown in full.
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
@@ -13,166 +14,160 @@ Repository: `SheltonChen2017/trading_agent`
 Read, in order:
 
 1. `CLAUDE.md`
-2. `docs/ACTION_PLAN_2026-08-02.md`
+2. `docs/ACTION_PLAN_2026-08-02.md` (§6 AP-9)
 3. `docs/OPERATIONAL_FACTS.md`
 4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
 5. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-6. `docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md`
 
 The action plan is the sequencing authority. Operational facts are the durable
-machine/epoch record. Do not recreate either from conversation memory.
+machine/epoch record. Do not reconstruct either from chat memory.
 
 ## 1. Repository and branch topology
 
-- Starting `main` / `origin/main`: `62c8270` (PR #192 merge).
-- Submitted base: `5e6b0bb` (PR #191 merge).
-- Claude implementation branch:
-  `user/claude/qc2-look-counting-registry-20260811`.
-- Claude implementation commit: `f09682f`; pushed and merged through PR #192
-  as `62c8270`.
-- Codex review branch:
-  `codex/review-qc2-look-counting-registry-20260811`.
-- Corrective code commit: `7fc9db8`.
-- Durable review/action/milestone/operational-facts commit: `3e5cba7`.
-- Initial separate handoff commit: `b52015a`.
-- Publication: owner authorized branch + commit + push, with **no PR**. The
-  review branch was pushed and set to track
-  `origin/codex/review-qc2-look-counting-registry-20260811`; this final
-  publication-state update follows `b52015a` and is part of the same pushed
-  branch. Cross-computer continuation uses that remote branch, not a local
-  copy of this file.
+- Base `main` / `origin/main`: `cea6640` (PR #193 merge).
+- This branch: `user/claude/allocation-review-visibility-20260812`, branched
+  from `cea6640`.
+- **Also outstanding and unmerged:**
+  `codex/review-ap8-ticker-disclosure-20260812` at `00d24b5` (AP-8, reviewed
+  and counter-reviewed). This branch was deliberately taken from `main`, not
+  from the AP-8 tip: the two are independent, and they touch different regions
+  of `scripts/personal_assistant_ui.py` (AP-8 the Briefing and Ticker
+  Suggestions captions, AP-9 the Buying page's review block). Merge order does
+  not matter.
 
-The submitted range was exactly `5e6b0bb..62c8270`, in order:
+## 2. What prompted this
 
-1. `f09682f` — Add QC-2: research-look registry.
-2. `62c8270` — merge PR #192.
+The owner enabled the optional AI features and reported that no Claude review
+appeared beneath the inverse-volatility purchase split. It was not a
+configuration mistake. Read-only inspection of the operator `ai_runs` audit log
+showed the call had fired **twice that afternoon**, ~9 seconds each, and both
+results were thrown away with `failed post-hoc validation`.
 
-The merge has no merge-only tree delta relative to `f09682f`.
+The cause was `_MAX_SUMMARY_LENGTH = 500`:
 
-## 2. Review outcome
+| Run | Summary length | Outcome |
+|---|---|---|
+| 2026-08-07 | 480 | shown |
+| 2026-08-07 | 441 | shown |
+| 2026-08-12 | 554 | discarded |
+| 2026-08-12 | 670 | discarded |
 
-**Accepted after correction. Quality: 6/10.** The implementation had a sound
-core idea—pre-result durable recording, exact-repeat accounting, no deletion,
-and non-gating failure—but its displayed number was not yet an honest
-multiplicity denominator. Four material defects were reproduced red against
-the submitted tree and fixed:
+Nothing was wrong with either rejected response. Every observation in both was
+re-run through all four content checks — number matching, per-ticker
+attribution, unknown tickers, advice language — and every one passes. The
+reviews were binned for prose length alone, and the prompt never stated the
+budget it was being judged against while `max_tokens=800` permitted roughly six
+times it. Whether the feature worked was luck.
 
-- **QC2REV-001 — P2, closed:** identical widget choices over new/corrected
-  market data or changed code were called repeats. Look identity now binds a
-  SHA-256 of the exact dated DataFrames and a clean Git commit.
-- **QC2REV-002 — P2, closed:** one click counted as one test although the
-  engine scans every selected horizon in both dip and up directions. Each row
-  now carries and the denominator sums `horizons × 2` hypothesis cells.
-- **QC2REV-003 — P2, closed:** synthetic plumbing runs polluted the displayed
-  real-market family. Synthetic runs remain auditable, but only real Backtest
-  cells feed the real-market threshold.
-- **QC2REV-004 — P2, closed:** `default=str`, non-finite floats, and trusting a
-  caller hash admitted ambiguous/colliding durable identity. Configuration is
-  now strict finite JSON; storage validates all identity fields and raises a
-  conflict rather than modifying different immutable content under one hash.
+Compounding it, the page rendered **nothing at all** on failure. A rejected
+review, a failed API call, and a checkbox the user never ticked were visually
+identical, which is why this took an operator database query to explain rather
+than a glance at the screen.
 
-No P0, P1, P3, or unresolved finding remains. Full evidence, locations,
-red/green proofs, reasons, and both commit dispositions are in
-`docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md`.
+## 3. What changed
 
-Commit dispositions:
+**Owner decision, 2026-08-12: no length limit.** Both `_MAX_SUMMARY_LENGTH` and
+`_MAX_CLAIM_LENGTH` are gone as rejection reasons. Length never protected
+anything here — the checks that carry the safety read the whole string, so a
+longer response receives more scrutiny, not less. The real bound is `max_tokens`
+on the call itself. The claim cap was worse in kind than the summary cap: an
+over-long claim was dropped silently, and if it was the only one, the
+all-observations-failed rule then rejected the entire review.
 
-- `f09682f`: **accepted after correction** (`7fc9db8`).
-- `62c8270`: **accepted after correction**; no merge-only delta, inherits the
-  same findings/correction.
+**Every content check is retained**, and a new test feeds each violation
+(percentage, dollar figure, out-of-cart ticker, advice language) at a length the
+old cap would have rejected anyway — so the relaxation cannot be mistaken for a
+weakening.
 
-## 3. Final QC-2 behavior
+**Failures are now reported, not swallowed.** New `AllocationReviewOutcome`
+carries either the review or a plain-language reason;
+`review_allocation_outcome()` returns it, and the Buying page renders that
+reason in a warning that also states the split itself is unaffected, because
+the split is computed by this project's own deterministic code and never
+depended on the AI.
 
-The Backtest page fetches its data, derives exact data/code identity, and
-records the tested family **before** the engine returns a result. A new family
-is created when the signal, configuration, exact data, source class, clean
-code commit, surface, or hypothesis-cell count changes. Only an exact replay
-increments `repeat_count`; `last_seen_at` never regresses. There is no delete
-or rewrite API.
+`review_allocation_plan()` keeps its exact previous signature and delegates, so
+all 28 existing direct validator call sites and 140 existing tests stand
+unchanged. `_validate_allocation_review()` gained an optional `rejection_out`
+collector rather than a changed return type, for the same reason — and so the
+rule that decides a rejection stays in exactly one place.
 
-The displayed Bonferroni threshold applies to the real-data interactive
-Backtest family. A synthetic run is still recorded for audit but explicitly
-does not display or enlarge that real-market denominator. Registry failure is
-loud and leaves the count conservative, but it never blocks the backtest.
+The exception path reports the exception **type only**: the reason string is
+rendered straight into the page and an exception message can carry request
+context.
 
-This is research bookkeeping only. Passing the threshold is necessary, never
-sufficient: it is not evidence of a market edge, a stock recommendation, or
-permission to propose, approve, or place an order. No proposal, execution,
-policy, scheduler, ML/LLM-authority, or live-trading boundary changed. QC-2
-does not yet count QuantConnect cloud-client research runs.
+This is advisory commentary on an already-computed split. It cannot create,
+approve, size, submit, or alter any order, policy, proposal, or schedule.
 
-## 4. Final validation
+## 4. Validation
 
-Final corrected tree used the repository `.venv`:
+Repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
 
-- Python 3.13.14.
-- Streamlit 1.60.0.
-- Focused final selection: **81 passed** in 92.03s.
-- Full repository suite in deterministic batches: **3,429 passed, 0 failed,
-  0 skipped, 25 dependency warnings**:
-  - A–F: 1,035 passed in 178.18s, 1 warning.
-  - G–M: 1,025 passed in 210.82s, 24 warnings.
-  - N–S: 1,079 passed in 163.56s.
-  - T–Z plus nested fault tests: 290 passed in 211.24s.
-- Collection: 3,429 tests in 12.40s.
-- `compileall`: clean.
-- `git diff --check`: clean except expected Windows LF→CRLF notices.
-- Changed-content credential-shape scan: zero matches.
-- Active-document consistency after durable doc edits: 13 passed.
+- Full repository suite on the final tree: **3,440 passed, 0 failed, 0
+  skipped, 25 dependency warnings** in 721.59s.
+- `compileall` clean; `git diff --check` clean apart from expected Windows
+  LF→CRLF notices; active-document guards 13 passed.
+- Focused: `tests/test_ai_advisor.py` 148 passed (140 pre-existing, unchanged);
+  `tests/test_ui_allocation_review.py` 3 passed.
+- Four mutations, each restored in a `finally` block, each reddening exactly the
+  intended test: restoring the 500-character summary cap; restoring the
+  300-character claim cap; dropping the rejection reason; silencing the UI
+  warning.
+- Diagnosis itself was read-only: the operator database was queried through
+  `sqlite3` in `mode=ro` URI form, never through the development checkout's
+  `AssistantStore`, so no migration ran against the frozen-epoch database.
 
-The full run includes the nine reviewer regression cases that failed for the
-intended reasons on the uncorrected submitted tree.
+**A defect in this session's own tests, found and fixed.** The first version of
+the UI tests seeded `watchlist_ai_review_outcome` and ran the app once. The page
+clears that state whenever the checkbox is unticked, so the first run wiped the
+fixture and the assertions ran against a page that never entered the branch —
+two of the three passed for that reason. The harness now runs once to create the
+widgets, ticks the box, seeds the outcome, and runs again; every test also
+asserts the split section actually rendered, so an absence assertion can no
+longer pass vacuously.
+
+Untested: the live Anthropic call itself (all tests mock the client), and
+whether a real long summary displays acceptably in the browser, which needs a
+deployed build.
 
 ## 5. Operational truth — do not disturb the epoch
 
-No operator state was mutated or re-measured in this review. Preserve the
-last verified durable facts:
+- `paper-epoch-004` is the only active evidence epoch, deployed at `b837374`.
+- **Merging to `main` does not affect the epoch.** Verified this session: all
+  four `TradingAgent-Paper-*` scheduled tasks run with working directory
+  `C:\git\trading_agent_operational`, which is pinned at `b837374`. The epoch's
+  lineage binds the deployed commit, and deployment is a separate deliberate
+  update of that checkout. CR-W2, AP-7, the acknowledgement path and QC-2 are
+  all already merged and undeployed while epoch-004 runs normally.
+- AP-9 is **not deployed**. It should ride a later owner-authorized roll.
 
-- `paper-epoch-004` is the only active evidence epoch.
-- Its deployed code commit is `b837374`, not this development branch.
-- At the last recorded measurement it had 0 sessions, 0 epoch orders, all
-  5/5 required drills, and 0 open alerts.
-- The first qualifying post-roll observation begins its 60-session / 30-order
-  evidence clock; do not manufacture observations.
-- QC-2 is **not deployed**. Do not close a healthy evidence epoch merely to
-  add research bookkeeping. Any future deployment requires a separate,
-  explicit owner-authorized epoch roll.
-
-After any authorized deploy, restart every Streamlit process and launch once
-through `C:\git\launch_trading_app.ps1`; a rerun does not reload already
-imported `assistant.*` classes. Operational scheduled commands load code on
-each invocation. The epoch swap itself requires the elevated machine-local
-`C:\git\epoch_swap_tasks_elevated.ps1` procedure described in operational
-facts.
-
-The second computer must not bootstrap or run paper schedulers against the
-same Alpaca paper account while the epoch host is active. Do not copy secrets,
-account identifiers, the operator database, or licensed data into Git or this
-handoff.
+Machine-local observation, recorded because it is easy to misread as an
+accounting failure: at 2026-08-12T22:57Z the epoch had 1 observation, 0 orders,
+5/5 drills, and **5 open alerts, 3 of them critical**. All five trace to
+intermittent DNS/connection failures reaching `paper-api.alpaca.markets` earlier
+that day (three cycle gaps: 613, 80 and 80 minutes). The books were never wrong
+— 64 reconciliation runs that day, every one matched with 0 mismatches. The
+critical `portfolio_accounting` alert says so in its own message and fails only
+on a 30-minute freshness bound. This is neither AP-6 (a real cash mismatch) nor
+AP-7 (a negative age); it is a positive, genuinely stale age caused by a network
+outage, reported correctly.
 
 ## 6. Next step
 
-Publication is complete and no PR was created, as requested. The owner may
-ask Claude for a counter-review or later authorize merge; neither action
-authorizes deployment.
-
-For the roadmap, **leave epoch-004 accumulating**. QC-2 is complete for the
-local interactive Backtest surface. Remaining work includes GR-6 portability
-residuals, GR-7d (blocked on an owner target-portfolio decision), and live
-QuantConnect authentication/cloud-run look accounting; none should displace
-epoch observation without an owner decision.
+Independent review of `user/claude/allocation-review-visibility-20260812`.
+Review should press on whether removing both length caps leaves any real attack
+surface the content checks do not already cover, and on whether the rejection
+reasons are honest and leak nothing.
 
 ## 7. Resume prompt
 
 ```text
-Fetch origin and switch to
-codex/review-qc2-look-counting-registry-20260811. Read CLAUDE.md,
-docs/SESSION_HANDOFF.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/OPERATIONAL_FACTS.md, and
-docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md completely. Verify the
-branch tip and a clean worktree before acting. QC-2 was accepted only after
-the corrections in 7fc9db8; do not revert its data/code lineage,
-horizon-by-direction count, real/synthetic family separation, or strict
-durable identity. Do not deploy or roll paper-epoch-004 without a new explicit
-owner authorization.
+Fetch origin and switch to user/claude/allocation-review-visibility-20260812.
+Read CLAUDE.md, docs/SESSION_HANDOFF.md, docs/ACTION_PLAN_2026-08-02.md (§6
+AP-9), and docs/OPERATIONAL_FACTS.md completely. Verify the branch tip and a
+clean worktree before acting. The summary/claim length caps were removed by
+explicit owner decision on 2026-08-12 and must not be reinstated; every content
+check must stay; and a rejected review must keep reporting its reason on screen
+rather than rendering nothing. Do not deploy or roll paper-epoch-004 without a
+new explicit owner authorization.
 ```

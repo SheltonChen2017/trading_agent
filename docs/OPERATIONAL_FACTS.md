@@ -380,6 +380,39 @@ deployment requires a separately authorized epoch roll. See
 `docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md` for the full ledger and
 validation.
 
+### AP-8 is reviewed development code, not epoch-004 runtime (2026-08-12)
+
+Claude's ticker-suggestion disclosure implementation `d326a74` was accepted
+after independent correction `7c21339` on
+`codex/review-ap8-ticker-disclosure-20260812`. All three discovery lanes now
+show named US-listed equities without applying the project's usual age, $5
+price, or liquidity floors; below-usual or unavailable measurements are
+visible per row. Review restored company-name identity, finite-positive close
+validation, per-ticker failure isolation, unavailable-liquidity honesty,
+Briefing disclosure, and the prior IPO-policy import. The strict Buying/
+Watchlist policy is unchanged. This remains research presentation only and
+cannot propose, approve, or place an order.
+
+This branch is not the deployed lineage. `paper-epoch-004` remains active on
+`b837374`; do not deploy AP-8 merely to change a research screen. Any future
+deployment requires a separately authorized epoch roll. See
+`docs/REVIEW_2026-08-12_AP8_TICKER_SUGGESTION_DISCLOSURE.md` for the complete
+issue ledger and validation.
+
+Claude's counter-review accepted all five review findings and closed two more
+P2 defects on the same branch: the relaxed-screen and omission-wording
+corrections had reached only the Briefing consumer, and batch isolation was
+still broken by an unguarded first-session date. It also qualified the
+restored `RECENT_IPO_ELIGIBILITY_POLICY` as a hypothetical rather than actual
+compatibility fix, since nothing in this repository still imported it.
+
+### Running this machine: launch, restart, tasks, locks, backups
+
+These are standing host rules, not facts about any one milestone. They lost
+their own heading at some point and have since been read as a continuation of
+whichever milestone note happened to be appended last — QC-2 on 2026-08-11,
+AP-8 on 2026-08-12. Append new milestone notes ABOVE this heading.
+
 - **Launch the app only via `C:\git\launch_trading_app.ps1`.** It pins the
   operational checkout, sets `TRADING_ASSISTANT_DB`, and re-reads Alpaca
   credentials from the **user-scope registry** at every launch. A long-lived

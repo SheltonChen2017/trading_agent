@@ -67,3 +67,82 @@ def test_direction_view_renders_every_bucket_and_discloses_cached_data_time(
     assert "UNKNOWN" in captions and "reported no usable price change" in captions
     assert fetched_at in captions
     assert "cached for up to 15 minutes" in captions
+
+
+def test_dropped_candidates_are_named_not_just_counted(
+    _offline_suggestions_environment,
+):
+    """A bare count could not distinguish "we filtered out junk" from "we
+    filtered out the day's second most-traded stock" -- which is exactly how
+    the SPCX omission stayed invisible until the owner diffed this list
+    against yfinance by hand on 2026-08-12."""
+    fetched_at = "2026-08-12T16:00:00+00:00"
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Ticker Suggestions"
+    app.session_state["ticker_suggestions_result"] = {
+        "rows": [RecommendedTicker("UP", "most_active", "Up detail", fetched_at, "advancing")],
+        "dropped": ["BOGUS", "FGN"],
+        "ran_at": "2026-08-12T16:14:00+00:00",
+        "sources": {"most_active": True, "recent_ipo": False, "ai_suggested": False},
+    }
+    app.run()
+
+    assert not app.exception
+    captions = "\n".join(element.value for element in app.caption)
+    assert "BOGUS" in captions and "FGN" in captions
+    # And the caption must say what screening does and does not do now.
+    assert "NOT screened on size, age, price, or liquidity" in captions
+    # Counter-review AP8CR-001: a provider outage and an unidentifiable symbol
+    # are observationally identical here, so the copy must not assert the
+    # security itself is invalid.
+    assert "could not be verified at this time" in captions
+    assert "did not resolve" not in captions
+    # The retained identity floor includes a company name (review restored
+    # require_company_name=True), so the user-facing statement of that floor
+    # must say so rather than drifting back to the pre-review wording.
+    assert "named US-listed equity" in captions
+
+
+def test_no_dropped_candidates_produces_no_omission_sentence(
+    _offline_suggestions_environment,
+):
+    fetched_at = "2026-08-12T16:00:00+00:00"
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Ticker Suggestions"
+    app.session_state["ticker_suggestions_result"] = {
+        "rows": [RecommendedTicker("UP", "most_active", "Up detail", fetched_at, "advancing")],
+        "dropped": [],
+        "ran_at": "2026-08-12T16:14:00+00:00",
+        "sources": {"most_active": True, "recent_ipo": False, "ai_suggested": False},
+    }
+    app.run()
+
+    assert not app.exception
+    captions = "\n".join(element.value for element in app.caption)
+    # Track the LIVE wording. Asserting an obsolete phrase's absence passes
+    # vacuously and silently stops testing anything -- which is exactly what
+    # happened to this line when review rewrote the omission copy on the other
+    # consumer (counter-review AP8CR-001).
+    assert "could not be verified at this time" not in captions
+    assert "and were omitted" not in captions
+
+
+def test_briefing_always_discloses_the_relaxed_suggestion_screen(
+    _offline_suggestions_environment, monkeypatch
+):
+    """Briefing consumes the same relaxed policy and must name that fact even
+    when every candidate verifies and therefore no omission caption appears.
+    """
+    import assistant.recommended_stocks as recommended_stocks
+
+    monkeypatch.setattr(recommended_stocks, "fetch_most_active_tickers", lambda: [])
+    monkeypatch.setattr(recommended_stocks, "fetch_recent_ipos", lambda: [])
+    monkeypatch.setattr(recommended_stocks, "suggest_similar_tickers", lambda *a, **k: None)
+
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Briefing"
+    app.run()
+
+    assert not app.exception
+    captions = "\n".join(element.value for element in app.caption)
+    assert "NOT screened on size, age, price, or liquidity" in captions

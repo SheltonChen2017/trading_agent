@@ -14,10 +14,18 @@ carry no real identifying info -- either case is dropped rather than
 shown, per this project's standing "never trust a new ticker without
 checking it" discipline (config.DEFENSIVE_CARRY_TICKERS is the existing
 precedent for holding a ticker list that isn't itself an authorization).
+
+Two policies, and the difference is deliberate. DEFAULT_ELIGIBILITY_POLICY
+screens on identity AND size/age/price. SUGGESTION_DISCLOSURE_POLICY screens
+on identity only, for surfaces whose job is to show the reader what the market
+did rather than to hand them a vouched-for shortlist. Neither policy is an
+authorization to trade anything: passing one only means the symbol survived
+the checks that policy declares.
 """
 from __future__ import annotations
 
 import dataclasses
+import math
 
 from data.market_data import fetch_historical
 
@@ -49,21 +57,52 @@ class SecurityEligibilityPolicy:
 
 DEFAULT_ELIGIBILITY_POLICY = SecurityEligibilityPolicy()
 
-# A genuine IPO from the last _IPO_LOOKBACK_DAYS (see recommended_stocks.py's
-# fetch_recent_ipos) calendar days has at most ~20-22 TRADING sessions --
-# DEFAULT_ELIGIBILITY_POLICY's minimum_history_sessions=60 would reject
-# every real recent IPO by construction, not just conservatively (independent
-# review: "this does not merely make the filter conservative, it makes
-# every genuine result in the lane ineligible by definition"). This lane
-# gets its own, deliberately looser policy -- still real checks (equity
-# type, a real company name, SOME minimum liquidity/price), just not ones
-# that assume months of trading history that cannot exist yet.
+# Compatibility only. AP-8 no longer uses this policy in the recent-IPO lane,
+# but it was a public module-level contract before AP-8 and removing the name
+# needlessly breaks imports in downstream tools. Keep its reviewed values
+# frozen; build_recommended_tickers() uses SUGGESTION_DISCLOSURE_POLICY for all
+# three lanes.
 RECENT_IPO_ELIGIBILITY_POLICY = SecurityEligibilityPolicy(
     allowed_quote_types=("EQUITY",),
     minimum_history_sessions=3,
     minimum_price=5.0,
     minimum_median_dollar_volume=500_000.0,
     require_company_name=True,
+)
+
+# Owner decision, 2026-08-12. The ticker-suggestion surfaces are DISCLOSURE,
+# not endorsement: they describe what the market did and hold no execution
+# authority whatsoever. The owner asked to see the rows and judge them
+# personally after DEFAULT_ELIGIBILITY_POLICY silently removed three of the
+# day's ten most-active names -- SPCX (41 sessions < 60, though $1.9T market
+# cap and ~$10.7B median daily dollar volume), PLUG ($2.27 < $5.00), and NBIS
+# (the longName gap fixed above).
+#
+# What this policy REMOVES is the size/age/price screen: those were judgments
+# about whether a real security is worth showing, and that judgment now
+# belongs to the reader. Every removed gate is re-emitted as a visible fact on
+# the row (assistant.recommended_stocks._eligibility_disclosure), so the
+# information is disclosed rather than discarded -- a row that clears nothing
+# must not be indistinguishable from a blue chip.
+#
+# What this policy KEEPS is identity: the symbol must still resolve to real
+# market data, be an EQUITY, and be listed on a US venue. Those are not size
+# opinions, they are what stops a hallucinated or mistyped symbol from being
+# rendered as a suggestion, and the ai_suggested lane is LLM-authored. Do not
+# relax them without a separate explicit owner decision.
+#
+# Scope is deliberately narrow: build_recommended_tickers() only. The
+# Watchlist similar-stocks surface still uses DEFAULT_ELIGIBILITY_POLICY.
+SUGGESTION_DISCLOSURE_POLICY = SecurityEligibilityPolicy(
+    allowed_quote_types=("EQUITY",),
+    minimum_history_sessions=0,
+    minimum_price=0.0,
+    minimum_median_dollar_volume=0.0,
+    # Company identity was never one of the owner-removed size/age/price
+    # judgments. The three-field fallback below fixes NBIS without weakening
+    # the identity floor for LLM-authored symbols.
+    require_company_name=True,
+    allowed_exchanges=DEFAULT_ELIGIBILITY_POLICY.allowed_exchanges,
 )
 
 _FETCH_LOOKBACK_DAYS = 90  # a MAXIMUM request, not a requirement -- a ticker with less real
@@ -84,10 +123,12 @@ def verify_tickers(
     warrant, preferred share, or fund is REJECTED under the default policy,
     which only allows "EQUITY" -- this is a "recommended STOCKS" feature),
     at least `policy.minimum_history_sessions` real trading sessions exist,
-    the last close is at least `policy.minimum_price`, the trailing median
-    dollar volume (close * volume, a liquidity proxy) is at least
-    `policy.minimum_median_dollar_volume`, and (if `policy.require_company_name`)
-    a real company name is present.
+    the last close is finite, positive, and at least `policy.minimum_price`;
+    when the policy declares a positive liquidity floor, trailing median
+    dollar volume (close * volume, a liquidity proxy) must be available and at
+    least that floor. A zero liquidity floor means "disclose, do not screen,"
+    so an unavailable measurement is preserved as `None`. If
+    `policy.require_company_name`, a non-empty text name must be present.
 
     `dropped` is every candidate that failed fetch_historical, failed any
     eligibility check above, or was beyond `max_checks`. One bad ticker
@@ -122,19 +163,76 @@ def verify_tickers(
             continue
 
         history_sessions = len(hist)
-        last_price = float(hist["close"].iloc[-1])
-        median_dollar_volume = (
-            float((hist["close"] * hist["volume"]).median()) if "volume" in hist.columns else 0.0
-        )
+        # Counter-review AP8CR-002: review restored the batch-isolation
+        # contract for a malformed close, but the first-session date was
+        # still derived unguarded further down, so one frame with an
+        # unexpected index aborted the whole batch and took every good
+        # ticker with it. Same function, same contract, same fix.
+        #
+        # Drop rather than substitute "": _is_ipo_identity_mismatch() treats a
+        # missing first-session date as "no mismatch", so an empty string
+        # would silently disarm the reused/renamed-symbol guard that exists to
+        # catch exactly this kind of malformed identity.
+        try:
+            first_session_date = str(hist.index[0].date())
+        except (AttributeError, IndexError, TypeError, ValueError):
+            dropped.append(ticker)
+            continue
+
+        try:
+            last_price = float(hist["close"].iloc[-1])
+        except (KeyError, IndexError, OverflowError, TypeError, ValueError):
+            dropped.append(ticker)
+            continue
+        # A zero or non-finite close is malformed market data, not a low-price
+        # security. AP-8 removed the owner's $5 display screen; it did not turn
+        # unusable data into verified identity.
+        if not math.isfinite(last_price) or last_price <= 0:
+            dropped.append(ticker)
+            continue
+
+        median_dollar_volume: float | None = None
+        if "volume" in hist.columns:
+            try:
+                measured_volume = float((hist["close"] * hist["volume"]).median())
+            except (OverflowError, TypeError, ValueError):
+                measured_volume = float("nan")
+            if math.isfinite(measured_volume) and measured_volume >= 0:
+                median_dollar_volume = measured_volume
         quote_type = info.get("quoteType", "")
-        company_name = info.get("longName", "")
+        # yfinance does not populate longName for every real listing -- NBIS
+        # (Nebius Group N.V., Nasdaq NMS, ~$3.6B median daily dollar volume)
+        # returns longName=None while carrying shortName='Nebius Group N.V.'
+        # and displayName='Nebius', persistently across repeated fetches.
+        # require_company_name exists to reject a symbol with NO identity, so
+        # reading only one of the three name fields turned a provider metadata
+        # gap into a claim about the security. Checked 2026-08-12 against live
+        # yfinance after the owner noticed real most-active names missing.
+        company_name = next(
+            (
+                value.strip()
+                for value in (
+                    info.get("longName"),
+                    info.get("shortName"),
+                    info.get("displayName"),
+                )
+                if isinstance(value, str) and value.strip()
+            ),
+            "",
+        )
 
         exchange = info.get("exchange", "")
         eligible = (
             quote_type in policy.allowed_quote_types
             and history_sessions >= policy.minimum_history_sessions
             and last_price >= policy.minimum_price
-            and median_dollar_volume >= policy.minimum_median_dollar_volume
+            and (
+                policy.minimum_median_dollar_volume <= 0
+                or (
+                    median_dollar_volume is not None
+                    and median_dollar_volume >= policy.minimum_median_dollar_volume
+                )
+            )
             and (not policy.require_company_name or bool(company_name))
             and (policy.allowed_exchanges is None or exchange in policy.allowed_exchanges)
         )
@@ -152,7 +250,7 @@ def verify_tickers(
                 "history_sessions": history_sessions,
                 "last_price": last_price,
                 "median_dollar_volume": median_dollar_volume,
-                "first_session_date": str(hist.index[0].date()),
+                "first_session_date": first_session_date,
             }
         )
 

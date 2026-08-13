@@ -920,8 +920,12 @@ write path merely by living in the same UI:
   mutation requires the preview hash and
   `--confirm-dismiss unused-paper-proposals`).
 - **Ticker Suggestions** -- research-only candidate tickers from
-  most-active/IPO/AI sources, each independently verified before display;
-  acting on one still requires the normal Buying-cart workflow.
+  most-active/IPO/AI sources. Each shown ticker must resolve with usable
+  history as a named US-listed equity, but this disclosure surface does not
+  hide it merely for being young, below $5, or below the project's usual
+  liquidity floor; below-usual or unavailable measurements are shown on its
+  row. Acting on one still requires the normal Buying-cart workflow, whose
+  stricter eligibility checks are unchanged.
 - **Backtest** -- read-only research surface: pick one of the project's
   price-only signal scanners, tune its parameters, choose synthetic
   (default, seconds) or real yfinance data, universe or basket scope, and

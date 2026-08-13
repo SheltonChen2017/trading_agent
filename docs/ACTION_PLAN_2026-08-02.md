@@ -51,9 +51,11 @@ ML research/shadow stack is software-complete through monitoring and dossier;
 the LLM committee foundation is built and gated; the execution-kernel split
 (GR-1) is complete after the independently reviewed 2026-08-03 GR-1E
 assessment; GR-2 through GR-5 are complete and independently reviewed. GR-7a
-through GR-7c are also complete. What remains incomplete is GR-6, GR-7d, the
-allocation service, every AI *product* plan beyond the committee (strategy
-authoring, debate, and MCP), and — most importantly — enough **elapsed frozen-
+through GR-7c are also complete, and the adopted three-sleeve replacement for
+GR-7d is complete through independently reviewed M3; optional M4 remains
+deferred. What remains incomplete is GR-6, the allocation service, every AI
+*product* plan beyond the committee (strategy authoring, debate, and MCP), and
+— most importantly — enough **elapsed frozen-
 epoch evidence**: `paper-epoch-001` and `paper-epoch-002` are closed, and
 `paper-epoch-003` is closed, and **`paper-epoch-004` is active since
 2026-08-11** on the epoch host at deployed commit `b837374`, bound to
@@ -462,7 +464,7 @@ item's definition of done.
 | GR-7a | **Annual tax reporting export** — realized gains by lot, short/long-term split, wash-sale flags, accountant-readable CSV/JSON, coverage honesty | **COMPLETE AFTER INDEPENDENT REVIEW 2026-08-05.** Pure reporting layer over `assistant/tax_lots.py`; only live `source="alpaca"` snapshots may verify coverage; sample/manual portfolios stay unverified. |
 | GR-7b | **Idle-cash / mandate reporting** — cash position measured against the approved mandate | **COMPLETE AFTER INDEPENDENT REVIEW 2026-08-06.** Pure `assistant/cash_reporting.py`; CLI `idle-cash` and Reports panel use Alpaca/sample snapshots only (no provider-fetch writes); mandate bridge is descriptive required invested volatility; refuses unusable measured vol. |
 | GR-7c | **Performance attribution** — decompose return into allocation/selection/timing/cost/tax rather than the aggregate `performance.py` already reports | **COMPLETE AFTER INDEPENDENT REVIEW 2026-08-06; follow-ups reviewed after correction 2026-08-07.** `assistant/attribution.py` + CLI `attribution`. Single SPY bucket; sector allocation undefined without mandate weights; selection is a labelled residual; cost/tax already-inside, never re-deducted; session-based sufficiency; session-equalized BoP weight; post-flow snapshot equity mapped correctly into TWR. |
-| GR-7d | **Rebalance-to-target proposals** (+ the `docs/reference/ALLOCATION_SERVICE_DESIGN.md` fold-in) | **SUPERSEDED, NOT COMPLETED.** The owner adopted the three-sleeve engine instead. M1 plus revision 2 are complete after review at merged `02484bb`. M2 durable batched notifications are **complete after independent review 2026-08-09** at implementation `8f5acb7` / validation `5ff39ed` plus correction `c314245`; see `docs/REVIEW_2026-08-09_GR7D_M2_NOTIFICATIONS.md`. The original target-weight shape is not scheduled. M3 remains absent and requires explicit owner authorization. |
+| GR-7d | **Rebalance-to-target proposals** (+ the `docs/reference/ALLOCATION_SERVICE_DESIGN.md` fold-in) | **SUPERSEDED; ADOPTED THREE-SLEEVE REPLACEMENT COMPLETE THROUGH M3 AFTER INDEPENDENT CORRECTION 2026-08-13.** M1 plus revision 2 are complete after review at merged `02484bb`; M2 durable batched notifications are complete at implementation `8f5acb7` / validation `5ff39ed` plus correction `c314245`. M3 dividend-funded, APPROVE-gated proposals and exact earmark accounting are accepted at Claude implementation `7ee4786` plus Codex correction `b6685b5`; review closed 2 P1 and 4 P2 findings involving fill evidence, the authoritative journal-backed pool fence, corrupt/future earmark state, and JSON output. Integration and deployment require a separate owner action. Optional M4 prepared trims remain deferred and unauthorized. See `docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md`. |
 
 **Why GR-7d is blocked.** The archived plan says "the mandate already
 defines targets; propose the deterministic trades that restore them." It
@@ -493,8 +495,10 @@ research, and every milestone of it stays notification- or APPROVE-gated.
 M1 is complete after independent review and merged at `02484bb`. M2 durable
 batched notifications are complete after independent review at `8f5acb7` /
 `5ff39ed` plus `c314245`. M3 dividend-earmark accounting and APPROVE-gated
-reinvestment proposals are the next planned shape, but remain absent and are
-not authorized to start without an explicit owner request.
+reinvestment proposals are complete after independent correction at
+implementation `7ee4786` plus correction `b6685b5`. Integration and deployment
+require a separate owner action. Optional M4 prepared trims remain deferred and
+require a separate owner authorization.
 
 **UI-3 — interactive Backtest page (owner-requested 2026-08-04, inserted
 into this phase ahead of UI-2d at the owner's direction):**

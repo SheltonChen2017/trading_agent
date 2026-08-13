@@ -306,3 +306,25 @@ two clicks. Revisit only on explicit owner request.
   plus watch-state publication, treated partial lot coverage as blindness,
   excluded broker-held tickers from flat re-entry, rejected stale closes,
   and carried exact-text unrealized money in gain/awaiting notifications.
+- 2026-08-13 (M3 COMPLETE AFTER INDEPENDENT CORRECTION) — the owner
+  authorized M3 in-session ("start"). Implemented per §5 M3 as revised by
+  §1.1 on `user/claude/three-sleeve-m3-earmarks-20260813`:
+  `sleeve_dividend_earmarks` table (exact-text money, no float twin),
+  `assistant/sleeve_reinvest.py`, CLI `sleeve-reinvest` (read-only status
+  with derived effective dispositions) and `sleeve-reinvest-propose`
+  (GR-4 recorded-close price, refuses without a fresh close), a Buying-page
+  expander, and a briefing reconcile hook with M2-style failure isolation.
+  Key semantics: the pool counts broker-confirmed corporate-action
+  dividends only; the earmark is the proposal-time notional (floor
+  remainder stays in the pool); pending `decline_review` AND
+  `reentry_decline` watches both outrank leveraged reinvestment; ambiguous
+  proposal outcomes HOLD their earmark; any credible incremental or cumulative
+  fill evidence consumes the whole earmark regardless of the final lifecycle
+  label. Independent review accepted implementation `7ee4786` after correction
+  `b6685b5`, closing two P1 and four P2 findings: poll-only cumulative fills and
+  partial-fill rejection labels could release spent dollars; storage trusted a
+  caller-asserted pool instead of re-reading the journal in its transaction;
+  future/corrupt statuses and nonpositive stored money failed open; and a
+  reconcile line broke `--json`. The transaction now derives confirmed income
+  and every non-released reservation from durable rows under `BEGIN IMMEDIATE`.
+  M3 remains unmerged and undeployed; optional M4 remains deferred.

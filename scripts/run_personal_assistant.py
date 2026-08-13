@@ -357,6 +357,23 @@ def command_briefing(args, store: AssistantStore) -> None:
             print(f"  Sleeve watch NEW: {activation['message']}")
         for note in sleeve_cycle["notes"]:
             print(f"  Sleeve watch note: {note}")
+    # Three-sleeve M3: durably release/consume earmarks whose proposals have
+    # terminated, so dividend dollars from expired or rejected proposals
+    # return to the pool without waiting for the next propose action. Same
+    # isolation contract as the M2 cycle above.
+    try:
+        from assistant.sleeve_reinvest import reconcile_dividend_earmarks
+
+        for transition in reconcile_dividend_earmarks(store):
+            print(
+                f"  Dividend earmark {transition['proposal_id']}: "
+                f"{transition['action']} ({transition['reason']})"
+            )
+    except Exception as exc:
+        print(
+            f"  Dividend earmark reconcile unavailable "
+            f"({type(exc).__name__}: {exc}) -- briefing unaffected."
+        )
     history_note = None
     try:
         captured = capture_briefing_equity_snapshot(
@@ -1262,6 +1279,118 @@ def command_sleeve_report(args, store: AssistantStore) -> None:
             f"  ! single-issuer overlap on {overlap['issuer']}: "
             + "; ".join(overlap["routes"])
         )
+
+
+def _print_reinvest_status(status: dict) -> None:
+    print(
+        f"Dividend pool: {status['available_total']} available of "
+        f"{status['confirmed_income_total']} confirmed "
+        f"(unavailable {status['unavailable_total']}: consumed "
+        f"{status['consumed_total']})"
+    )
+    print(f"Route: {status['route']} -- {status['note']}")
+    print(f"Eligible tickers: {', '.join(status['eligible_tickers']) or 'none'}")
+    for pending in status["pending_decline_reviews"]:
+        print(f"  pending dip-add: {pending['ticker']} ({pending['kind']})")
+    for earmark in status["earmarks"]:
+        effective = earmark["effective_disposition"]
+        drift = (
+            ""
+            if effective == earmark["status"]
+            else f" (effective: {effective}, awaiting reconcile)"
+        )
+        print(
+            f"  earmark {earmark['proposal_id']}: {earmark['amount_text']} "
+            f"{earmark['route']} {earmark['ticker']} -- {earmark['status']}{drift}"
+        )
+
+
+def command_sleeve_reinvest(args, store: AssistantStore) -> None:
+    """Three-sleeve M3 dividend-pool status. Read-only.
+
+    Active earmarks whose proposals have already terminated display their
+    EFFECTIVE disposition; the durable rows advance on the next write path
+    (sleeve-reinvest-propose or the briefing), never during this report.
+    """
+    from assistant.sleeve_reinvest import SleeveReinvestError, dividend_reinvest_status
+
+    try:
+        status = dividend_reinvest_status(store)
+    except SleeveReinvestError as exc:
+        raise SystemExit(f"Cannot measure the dividend pool: {exc}") from exc
+    if args.json:
+        print(json.dumps(status, indent=2, sort_keys=True))
+        return
+    _print_reinvest_status(status)
+
+
+def command_sleeve_reinvest_propose(args, store: AssistantStore) -> None:
+    """Three-sleeve M3: one APPROVE-gated, dividend-funded buy proposal.
+
+    Never submits anything. The reference price comes from the GR-4
+    lineage-recorded close path with the same freshness check M2 uses; an
+    unavailable or stale price refuses rather than proposing blind.
+    """
+    from assistant.sleeve_notifications import _recorded_close_fetcher
+    from assistant.sleeve_reinvest import (
+        SleeveReinvestError,
+        generate_dividend_reinvest_proposal,
+        reconcile_dividend_earmarks,
+    )
+
+    policy = load_policy(_cli_policy_path(args))
+    packet = _packet(include_events=False, store=store)
+    try:
+        transitions = reconcile_dividend_earmarks(store)
+    except SleeveReinvestError as exc:
+        raise SystemExit(f"Cannot reconcile dividend earmarks: {exc}") from exc
+    if not args.json:
+        for transition in transitions:
+            print(
+                f"  earmark {transition['proposal_id']}: {transition['action']} "
+                f"({transition['reason']})"
+            )
+
+    ticker = args.ticker.strip().upper()
+    prices = _recorded_close_fetcher(store)([ticker])
+    price = prices.get(ticker)
+    if price is None:
+        raise SystemExit(
+            f"Cannot propose: no fresh recorded close is available for {ticker}."
+        )
+
+    try:
+        result = generate_dividend_reinvest_proposal(
+            packet, policy, store, ticker=ticker, amount=args.amount, price=price
+        )
+    except SleeveReinvestError as exc:
+        raise SystemExit(f"Cannot propose: {exc}") from exc
+    if not result["created"]:
+        raise SystemExit(f"Refused: {result['reason']}")
+
+    proposal = result["proposal"]
+    if args.json:
+        payload = proposal.to_dict()
+        payload["route"] = result["route"]
+        payload["earmark_amount_text"] = result["earmark_amount_text"]
+        payload["earmark_transitions"] = transitions
+        print(json.dumps(payload, indent=2, sort_keys=True))
+        return
+    intent = proposal.intent
+    print(
+        f"{proposal.proposal_id} [{proposal.evidence_status}]: "
+        f"{intent.side.upper()} {intent.shares} {intent.ticker} at reference "
+        f"${proposal.reference_price:,.2f}"
+    )
+    for reason in proposal.reasons:
+        print(f"  - {reason}")
+    print(
+        f"  Earmarked {result['earmark_amount_text']}; pool available after: "
+        f"{result['pool_available_after_text']}"
+    )
+    for uncertainty in proposal.uncertainties:
+        print(f"  ? {uncertainty}")
+    print(f"  Approve with: approve {proposal.proposal_id} --confirm approve")
 
 
 def command_tax_report(args, store: AssistantStore) -> None:
@@ -2439,6 +2568,39 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sleeve.add_argument("--json", action="store_true")
     sleeve.set_defaults(handler=command_sleeve_report, read_only_store=True)
+
+    sleeve_reinvest = commands.add_parser(
+        "sleeve-reinvest",
+        help=(
+            "Three-sleeve M3 dividend-pool status: confirmed income, "
+            "earmarks, available total, and whether pending decline-review "
+            "adds outrank leveraged reinvestment. Read-only."
+        ),
+    )
+    sleeve_reinvest.add_argument("--json", action="store_true")
+    sleeve_reinvest.set_defaults(
+        handler=command_sleeve_reinvest, read_only_store=True
+    )
+
+    sleeve_reinvest_propose = commands.add_parser(
+        "sleeve-reinvest-propose",
+        help=(
+            "Three-sleeve M3: create ONE approve-gated, dividend-funded buy "
+            "proposal for an eligible ticker, earmarking its notional from "
+            "the confirmed dividend pool. Never submits an order."
+        ),
+    )
+    sleeve_reinvest_propose.add_argument(
+        "--ticker", required=True,
+        help="Eligible ticker (a pending decline-review name, or a "
+        "DIVIDEND_REINVEST_TICKERS member when nothing is pending).",
+    )
+    sleeve_reinvest_propose.add_argument(
+        "--amount", required=True,
+        help="Dollar amount to draw from the dividend pool (exact decimal).",
+    )
+    sleeve_reinvest_propose.add_argument("--json", action="store_true")
+    sleeve_reinvest_propose.set_defaults(handler=command_sleeve_reinvest_propose)
 
     attribution = commands.add_parser(
         "attribution",

@@ -2027,6 +2027,10 @@ if page == "Buying":
                     t: format_evidence_summary(compute_similarity_evidence(cart, t)) for t in all_candidate_tickers
                 }
                 st.session_state["watchlist_ai_suggestions"] = {
+                    # The exact cart these suggestions and their measured
+                    # evidence were computed against (counter-review
+                    # AP9CR-002) -- compared on every rerun below.
+                    "cart": sorted({t.upper() for t in cart}),
                     "from_universe": from_universe,
                     "verified": wildcard,
                     "dropped": dropped,
@@ -2041,6 +2045,21 @@ if page == "Buying":
     watchlist_results = st.session_state.get("watchlist_results", {})
 
     ai_suggestions = st.session_state.get("watchlist_ai_suggestions")
+    # Counter-review AP9CR-002 -- the same stale-state defect AP9R-001 fixed
+    # one block below, in the block directly above it: these suggestions and
+    # their measured-evidence columns were computed against the cart at
+    # Check-cart time, but the expander header interpolates the CURRENT cart.
+    # Edit the cart without re-clicking and old evidence renders under a
+    # header naming tickers it was never measured against. A stored state
+    # with no cart key (legacy) fails safe as stale.
+    if ai_suggestions and ai_suggestions.get("cart") != sorted({t.upper() for t in cart}):
+        st.warning(
+            "The cart changed since Claude suggested these tickers. The old "
+            "suggestions are hidden because their measured comparisons were "
+            "computed against the previous cart. Click **Check cart** to "
+            "request fresh suggestions."
+        )
+        ai_suggestions = None
     if ai_suggestions:
         with st.expander(f"Claude's own suggestions related to {', '.join(cart)} (with measured comparison)", expanded=False):
             reason_by_ticker = ai_suggestions["reason_by_ticker"]

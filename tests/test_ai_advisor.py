@@ -1452,3 +1452,45 @@ def test_outcome_distinguishes_no_input_from_missing_credentials(monkeypatch):
 
     assert outcome.review is None
     assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_NO_INPUT
+
+
+@pytest.mark.parametrize("bad_observations", [None, 7, "none"])
+def test_outcome_reports_malformed_observations_field_as_unparseable(
+    monkeypatch, bad_observations
+):
+    """Counter-review AP9CR-001, the field-level generalization of AP9R-003:
+    a well-typed JSON root carrying `observations` as null or a number raised
+    TypeError inside the validator, was caught by the broad except, and was
+    reported as "The call to Claude did not complete (TypeError)" -- but the
+    call completed; the response shape was wrong. A string is included because
+    iterating it silently produced the all-observations-failed reason, which
+    talks about mismatched numbers that never existed."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = json.dumps(
+        {"summary": "This split leans on one industry.", "observations": bad_observations}
+    )
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA"], {"NVDA": 100.0}, {"NVDA": 2.0}, {}
+        )
+    assert outcome.review is None
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_UNPARSEABLE
+
+
+def test_absent_observations_key_still_yields_a_summary_only_review(monkeypatch):
+    """The shape guard must not over-reject: a missing key defaults to [] and
+    a summary-only review remains valid."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = json.dumps({"summary": "This split leans on one industry."})
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA"], {"NVDA": 100.0}, {"NVDA": 2.0}, {}
+        )
+    assert outcome.review is not None
+    assert outcome.review.observations == ()

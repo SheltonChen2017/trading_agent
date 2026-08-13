@@ -474,6 +474,17 @@ def _validate_allocation_review(
         return None
 
     raw_observations = raw.get("observations", [])
+    # Counter-review AP9CR-001: AP9R-003 guarded the JSON *root* shape, but a
+    # well-typed root carrying a malformed field walked straight past it --
+    # `observations: null` or a number raised TypeError at the loop below,
+    # the caller's broad except caught it, and the user was told "The call to
+    # Claude did not complete (TypeError)". Same dishonesty, one level down:
+    # the call completed fine; the response shape was wrong. An absent key
+    # still defaults to [] (a summary-only review is valid).
+    if not isinstance(raw_observations, list):
+        if rejection_out is not None:
+            rejection_out.append(REVIEW_REJECTED_UNPARSEABLE)
+        return None
     kept_observations = []
     seen = set()
     for obs in raw_observations:

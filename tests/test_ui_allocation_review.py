@@ -194,3 +194,59 @@ def test_review_is_not_displayed_against_a_changed_split(
     warnings = "\n".join(element.value for element in app.warning)
     assert "split changed since Claude reviewed it" in warnings
     assert summary not in [element.value for element in app.markdown]
+
+
+def test_similar_suggestions_are_not_displayed_against_a_changed_cart(
+    _offline_buying_environment,
+):
+    """Counter-review AP9CR-002 -- the generalized instance of AP9R-001 one
+    block above it: suggestions and their measured-evidence columns computed
+    for one cart rendered under an expander header naming whatever the cart
+    says NOW."""
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Buying"
+    app.session_state["watchlist_typed"] = "NVDA, AMD"
+    app.session_state["watchlist_ai_suggestions"] = {
+        "cart": ["AMD", "NVDA"],
+        "from_universe": [],
+        "verified": [{"ticker": "TSM", "longName": "TSMC"}],
+        "dropped": [],
+        "reason_by_ticker": {"TSM": "similar business"},
+        "evidence_by_ticker": {"TSM": "correlation vs old cart"},
+    }
+    app.run()
+    assert not app.exception
+    warnings = "\n".join(element.value for element in app.warning)
+    assert "cart changed since Claude suggested" not in warnings, (
+        "matching cart must not be reported stale"
+    )
+
+    # The user edits the cart without clicking Check cart.
+    app.session_state["watchlist_typed"] = "NVDA, AMD, TSLA"
+    app.run()
+    assert not app.exception
+    warnings = "\n".join(element.value for element in app.warning)
+    assert "cart changed since Claude suggested" in warnings
+    expanders = [e.label for e in app.expander]
+    assert not any("Claude's own suggestions" in label for label in expanders), (
+        "stale suggestions must be hidden, not just captioned"
+    )
+
+
+def test_legacy_suggestions_without_a_cart_key_fail_safe_as_stale(
+    _offline_buying_environment,
+):
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Buying"
+    app.session_state["watchlist_typed"] = "NVDA, AMD"
+    app.session_state["watchlist_ai_suggestions"] = {
+        "from_universe": [],
+        "verified": [{"ticker": "TSM", "longName": "TSMC"}],
+        "dropped": [],
+        "reason_by_ticker": {"TSM": "similar business"},
+        "evidence_by_ticker": {"TSM": "correlation vs unknown cart"},
+    }
+    app.run()
+    assert not app.exception
+    warnings = "\n".join(element.value for element in app.warning)
+    assert "cart changed since Claude suggested" in warnings

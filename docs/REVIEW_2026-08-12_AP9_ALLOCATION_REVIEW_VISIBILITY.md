@@ -94,3 +94,75 @@ execution, modify scheduled tasks, or change live-trading authority. It is not
 deployed into `paper-epoch-004`, whose frozen runtime remains `b837374`.
 Merging development code does not authorize an epoch roll; any deployment or
 new epoch still requires a separate explicit owner instruction.
+
+---
+
+## Counter-review (Claude, 2026-08-12)
+
+Outcome: **all five review findings accepted; two further defects found and
+fixed on this branch, each a generalization of a review finding.**
+
+Each finding was re-established by mutation rather than taken on trust:
+reverting each correction reddens exactly the reviewer's regression test.
+
+| Finding | Verified as | Mutation proof |
+|---|---|---|
+| AP9R-001 | Confirmed, and the strongest finding of the round. The submitted UI kept the outcome in session state and rendered it on any rerun, so commentary validated against one split sat under a different one after a single slider move — the page's own "every number checked" caption became false. | Unbinding the hash comparison reddens `test_review_is_not_displayed_against_a_changed_split`. |
+| AP9R-002 | Confirmed. The submitted dataclass docstring promised an invariant the constructor did not enforce. | Disabling `__post_init__` reddens both contradictory-state cases. |
+| AP9R-003 | Confirmed. A JSON array parsed fine, raised `AttributeError` in the validator, and was blamed on transport. | Disabling the root-shape guard reddens `test_outcome_reports_non_object_json_as_unparseable`. |
+| AP9R-004 | Confirmed. An empty cart with a configured key claimed no credential existed. | Collapsing the branch reddens `test_outcome_distinguishes_no_input_from_missing_credentials`. |
+| AP9R-005 | Confirmed on both parts. The stale "(6) caps string lengths" docstring claim was mine, in a docstring I had edited that day; the two `use_container_width` calls were the same deprecation class I had corrected on the AP-8 surfaces that morning and missed here. | n/a — documentation and deprecation. |
+
+### AP9CR-001 — P3, closed. AP9R-003 was fixed at the root and re-entered through the fields.
+
+The corrected code rejects a non-object JSON root honestly, but a well-typed
+root carrying a malformed field walked straight past that guard:
+`observations: null` or a number raised `TypeError` at the iteration inside
+`_validate_allocation_review()`, the caller's broad `except` caught it, and the
+user was told "The call to Claude did not complete (TypeError)" — the exact
+dishonesty AP9R-003 named, one level down. A string `observations` was subtler:
+iterating it character-by-character silently produced the
+all-observations-failed reason, which speaks of mismatched numbers that never
+existed.
+
+Reproduced live for all three shapes with a mocked client. Fixed inside the
+validator (keeping the single-source-of-rejection principle): a non-list
+`observations` is a response-shape failure and reports as unparseable. An
+absent key still defaults to `[]`, so a summary-only review remains valid —
+pinned by its own test so the guard cannot over-reject. Removing the guard
+reddens all three parameterized cases.
+
+One probe artifact worth recording so it is not rediscovered as a bug: a test
+summary of "A calm split." is rejected by the hallucinated-ticker guard because
+the standalone word "A" is ticker-shaped. That is the guard's long-standing,
+deliberately conservative design, not an AP-9 regression; with AP-9's
+visibility fix the user now at least sees that reason instead of nothing.
+
+### AP9CR-002 — P3, closed. The generalized instance of AP9R-001, one block above it.
+
+`watchlist_ai_suggestions` stored no cart identity, and the suggestions
+expander header interpolates the *current* cart. Editing the cart without
+re-clicking Check cart rendered old suggestions — including their
+measured-evidence columns, which are real numbers computed against the old
+cart — under a header naming tickers they were never measured against. This is
+the same defect class as AP9R-001 (numeric commentary presented against inputs
+it was not checked against), found by the mandated search for generalized
+instances.
+
+Fixed with the same pattern: the stored state now carries the normalized cart
+it was computed for; a mismatch on rerun hides the suggestions and says why; a
+legacy state with no cart key fails safe as stale. Disabling the comparison
+reddens both new AppTests.
+
+### Counter-review validation
+
+- Full repository suite on the final integrated tree: COUNTER_REVIEW_SUITE_RESULT
+- Focused: `tests/test_ai_advisor.py` 156 passed;
+  `tests/test_ui_allocation_review.py` 6 passed.
+- Every correction — the reviewer's four code corrections and both
+  counter-review fixes — mutated and confirmed to redden exactly its own test,
+  restored in a `finally` block.
+- Integration with `origin/main` at `27fa872` (AP-8, PR #194) performed on this
+  branch as the review's §1 required; conflicts were documentation-only.
+- No operator state read or changed. Still not deployed; `paper-epoch-004`
+  remains on `b837374`.

@@ -74,3 +74,41 @@ requires separate owner authorization.
 
 This review is not a new product milestone, so no feature-milestone entry was
 added. The action plan remains the sequencing authority.
+
+---
+
+## Counter-review (Claude, 2026-08-13)
+
+Owner-requested verification of this review's changes, performed in the
+review worktree at `d29f5e7` before any push.
+
+### Commit dispositions (`4ae77f2..d29f5e7`)
+
+| Commit | Disposition |
+|---|---|
+| `8b12bee` | **Accepted.** CODCR-001 is confirmed: at the review base, both `docs/ACTION_PLAN_2026-08-02.md` (epoch-roll narrative and AP-7 ledger row) and `docs/OPERATIONAL_FACTS.md` still asserted "AP-7 (is) confirmed fixed in production", an inference AP-11's live negative-age alert disproved. The corrections were checked line by line against the AP-11 evidence: they preserve the two-green-cycles observation as point-in-time fact, retract only the end-to-end inference, and correctly state that site-level AP-7 code is deployed while the AP-11 orchestration repair is merged at `72b6278` and not deployed. The new guard was mutation-verified in BOTH halves independently: reintroducing the stale full-fix sentence into OPERATIONAL_FACTS reddened it, and stripping the AP-11 disclosure from the AP-7 ledger row reddened it; each restoration passed and the worktree was returned to byte-exact clean state. The guard's positive assertions ("AP-11" + "not deployed") will deliberately redden at the next epoch roll, forcing the records to move with the deployment — examined and accepted as the same tripwire pattern the epoch-004 queue guard already uses. The focused 92-test result was reproduced exactly. |
+| `d29f5e7` | **Accepted.** The handoff's topology claims were verified true at review time: the branch existed only locally (no `origin/codex/review-claude-post-ipr-20260813`), and the stated range, merge-tree equalities, and record inventory match `git log`/`git diff` on the actual repository. The push that publishes this branch happens after this counter-review and is recorded in the final handoff revision, so the local-only statement is superseded deliberately rather than left to go stale (the IPRCR-001 class). |
+
+### Counter-review findings
+
+None. A generalized-instance sweep for the CODCR-001 class ("confirmed fixed
+in production" and equivalent full-fix claims) across `docs/`, `HOW_TO_USE.md`,
+and `README.md` on this tree found no remaining instance outside frozen
+historical review reports, which keep their as-written text by standing
+convention. The corresponding stale inference in Claude's session memory
+(outside the repository) was corrected in the same pass.
+
+### Counter-review validation
+
+- Focused suites (`operations`, transaction readiness, readiness budget,
+  platform readiness, module hygiene, active-document consistency):
+  **92 passed** — reproduces the review's number exactly.
+- CODCR-001 guard mutations: stale-sentence reintroduction **1 failed red**,
+  ledger-row AP-11 removal **1 failed red**; both restorations **1 passed**.
+- Exact review tree (`d29f5e7`): **3,494 passed, 0 failed, 0 skipped,
+  25 known dependency warnings** in 665.55 s under the repository venv —
+  independently reproduces the review's corrected-tree result. The
+  counter-review commit after `d29f5e7` changes only this report's appended
+  section, the handoff, and the placeholder guard's scan list; the
+  doc-consistency and hygiene suites were rerun green on that final text.
+- Worktree confirmed byte-clean after every mutation restoration.

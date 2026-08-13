@@ -159,6 +159,7 @@ def test_current_review_documents_have_no_validation_placeholders():
         "SESSION_HANDOFF.md",
         "FEATURE_MILESTONE_RECORD.md",
         "REVIEW_2026-08-12_AP9_ALLOCATION_REVIEW_VISIBILITY.md",
+        "REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md",
     )
     hits = [name for name in names if placeholders.search(_text(name))]
     assert not hits, f"unresolved validation placeholders remain in {hits}"

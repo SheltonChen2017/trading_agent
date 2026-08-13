@@ -35,12 +35,17 @@ authorizes M3, deployment, an epoch roll, live trading, or any funded action.
   `artifacts/codex-review-claude-post-ipr`.
 - Review correction: `8b12bee`. It adds the review report, closes CODCR-001
   in the action plan and durable operational facts, and adds its regression
-  guard. This handoff is the separate commit immediately after that
-  correction.
-- Remote availability: the review branch is **local-only, not pushed or
-  merged**.
-- Another computer cannot retrieve this review with `git fetch` until the
-  owner separately authorizes a push.
+  guard.
+- Claude's counter-review (2026-08-13) then verified this range in the same
+  worktree: CODCR-001 confirmed and its guard mutation-verified in both
+  halves, the 92-test focused result reproduced, no new finding. Its
+  dispositions are appended to
+  `docs/REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md`, and it extended
+  the placeholder guard to scan that report. The counter-review commit
+  follows `d29f5e7` on this branch and includes this handoff revision.
+- Remote availability: the branch is **pushed after the counter-review**
+  (superseding the pre-push local-only statement deliberately); merge awaits
+  the owner's PR action.
 - Before staging or committing anything else, re-check `HEAD` and
   `git status`.
 
@@ -205,22 +210,24 @@ Independent Codex review validation (repository venv):
 
 ## 5. Next step
 
-Claude should independently verify the local review range `4ae77f2..HEAD`,
-beginning with correction `8b12bee` and including this separate handoff
-commit. Do not push, merge, deploy, touch the operator database, or roll the
-epoch without a new owner instruction. Open owner decisions are unchanged:
-epoch-roll timing for merged-but-undeployed work (before the ~2026-09-10 AEP
-dividend window if CR-W3 slack is desired), the physical-media-only
-off-machine backup, and the GR-7d target portfolio.
+Claude's counter-review of `4ae77f2..HEAD` is complete (owner-requested,
+2026-08-13): CODCR-001 confirmed, its guard mutation-verified in both halves,
+no new finding; dispositions are in the review report's counter-review
+section. The branch is pushed; merging its PR is the owner's action. Do not
+deploy, touch the operator database, or roll the epoch without a new owner
+instruction. Open owner decisions are unchanged: epoch-roll timing for
+merged-but-undeployed work (before the ~2026-09-10 AEP dividend window if
+CR-W3 slack is desired), the physical-media-only off-machine backup, and the
+GR-7d target portfolio.
 
 ## 6. Resume prompt
 
 ```text
-On the review host, switch to codex/review-claude-post-ipr-20260813 and verify
-a clean worktree. Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
+Verify a clean worktree on main and confirm origin/main == main (the
+codex/review-claude-post-ipr-20260813 PR should be merged; if not, ask the
+owner). Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/OPERATIONAL_FACTS.md, docs/SESSION_HANDOFF.md, and
-docs/REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md. Independently review
-4ae77f2..HEAD commit by commit, including CODCR-001's red/green guard. Do not
-push, merge, deploy, touch the operator database, or roll paper-epoch-004
-without a new owner instruction.
+docs/REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md including its
+counter-review section. Do not deploy, touch the operator database, or roll
+paper-epoch-004 without a new owner instruction.
 ```

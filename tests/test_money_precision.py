@@ -143,6 +143,37 @@ def test_pending_exposure_sum_does_not_cross_exact_percentage_boundary():
     assert result.approved, result.violations
 
 
+def test_sell_exceeds_held_uses_exact_broker_quantity_not_rounded_float():
+    portfolio = build_portfolio_snapshot(
+        [
+            {
+                "ticker": "ABC",
+                "shares": "10.999999999999999999",
+                "entry_price": "1",
+                "current_price": "1",
+            }
+        ],
+        cash="1",
+    )
+    assert portfolio.positions[0].shares == 11.0  # lossy display field
+    assert portfolio.positions[0].shares_exact == "10.999999999999999999"
+
+    result = validate_trade_intent(
+        TradeIntent(ticker="ABC", side="sell", shares=11),
+        portfolio,
+        reference_price=1,
+        max_order_value=5_000,
+        max_position_pct=1.0,
+        max_total_exposure_pct=1.0,
+        max_basket_pct=100.0,
+        max_leveraged_etf_pct=100.0,
+        min_cash_reserve_pct=0.0,
+    )
+
+    assert not result.approved
+    assert "sell_exceeds_held" in result.violation_codes
+
+
 def test_snapshot_aggregates_decimal_broker_strings_before_display_rounding():
     snapshot = build_portfolio_snapshot(
         [

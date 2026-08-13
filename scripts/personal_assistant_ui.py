@@ -134,8 +134,10 @@ from assistant.proposal_status import (
 from assistant.proposals import generate_risk_reduction_proposals
 from assistant.user_directed_sell import (
     generate_user_directed_sell_proposal,
+    remaining_shares_after_sale as _remaining_shares_after_sale,
     sellable_whole_shares as _sellable_whole_shares,
 )
+from assistant.money import decimal_text as _decimal_text
 from assistant.tax_reporting import (
     TaxReportError,
     build_annual_tax_report,
@@ -2786,9 +2788,15 @@ if page == "Selling":
             "you approve by typing the phrase, and your policy limits are "
             "re-checked at that moment."
         )
-        _sellable = {
-            p.ticker: _sellable_whole_shares(p.shares)
+        _held_quantity = {
+            p.ticker: (
+                p.shares_exact if p.shares_exact is not None else p.shares
+            )
             for p in packet.portfolio.positions
+        }
+        _sellable = {
+            ticker: _sellable_whole_shares(quantity)
+            for ticker, quantity in _held_quantity.items()
         }
         _sellable_tickers = [t for t, n in _sellable.items() if n > 0]
         if not _sellable_tickers:
@@ -2807,10 +2815,13 @@ if page == "Selling":
                 min_value=1, max_value=int(_ud_max), value=1, step=1,
                 key="user_sell_shares",
             )
+            _ud_remaining = _remaining_shares_after_sale(
+                _held_quantity[_ud_ticker], int(_ud_shares)
+            )
             st.caption(
-                f"Selling all {_ud_max} whole share(s) closes the position."
-                if _ud_shares == _ud_max
-                else f"{_ud_max - int(_ud_shares)} share(s) would remain."
+                "Selling this quantity closes the position."
+                if _ud_remaining == 0
+                else f"{_decimal_text(_ud_remaining)} share(s) would remain."
             )
             if st.button(
                 f"Create sell proposal for {_ud_ticker}", key="user_sell_create"
@@ -2837,12 +2848,16 @@ if page == "Selling":
                 # A proposal for a different ticker rendering under the
                 # current selection would be the stale-state defect AP-9
                 # closed on the Buying page.
-                if _ud_proposal["intent"]["ticker"] != _ud_ticker:
+                if (
+                    _ud_proposal["intent"]["ticker"] != _ud_ticker
+                    or _ud_proposal["intent"]["shares"] != int(_ud_shares)
+                ):
                     st.info(
-                        f"A sell proposal for "
-                        f"{_ud_proposal['intent']['ticker']} is waiting on the "
-                        "Propose & Approve page. Create one for "
-                        f"{_ud_ticker} to see it here."
+                        f"A sell proposal for {_ud_proposal['intent']['shares']} "
+                        f"share(s) of {_ud_proposal['intent']['ticker']} is "
+                        "waiting on the Propose & Approve page. It does not "
+                        f"match the current {int(_ud_shares)}-share selection "
+                        f"for {_ud_ticker}; create a new proposal to see it here."
                     )
                 else:
                     _render_proposal_approval(

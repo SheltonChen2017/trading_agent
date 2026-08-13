@@ -58,7 +58,7 @@ from zoneinfo import ZoneInfo
 import pandas_market_calendars as mcal
 
 from config import BASKETS, LEVERAGED_ETF_TICKERS, MAX_POSITION_PCT, MAX_TOTAL_EXPOSURE_PCT
-from assistant.money import MoneyInput, decimal_or_none, to_decimal
+from assistant.money import MoneyInput, decimal_or_none, decimal_text, to_decimal
 from assistant.schemas import PortfolioSnapshot
 
 _EASTERN = ZoneInfo("America/New_York")
@@ -567,6 +567,7 @@ class _GateContext:
         self.position_money: list[
             tuple[Decimal | None, Decimal | None, Decimal | None]
         ] = []
+        self.position_shares: list[Decimal | None] = []
         self.shares_valid: bool = False
         self.safe_shares: int = 0
         self.reference_price_decimal: Decimal | None = None
@@ -636,14 +637,21 @@ def _check_portfolio_numeric_integrity(ctx: _GateContext) -> None:
 
 def _check_position_data_integrity(ctx: _GateContext) -> None:
     for position in ctx.portfolio.positions:
+        raw_shares = (
+            position.shares_exact
+            if position.shares_exact is not None
+            else position.shares
+        )
+        shares = decimal_or_none(raw_shares)
         entry_price = decimal_or_none(position.entry_price)
         current_price = decimal_or_none(position.current_price)
         market_value = decimal_or_none(position.market_value)
+        ctx.position_shares.append(shares)
         ctx.position_money.append((entry_price, current_price, market_value))
         bad_fields = [
             (name, value)
             for name, value, converted in (
-                ("shares", position.shares, decimal_or_none(position.shares)),
+                ("shares", raw_shares, shares),
                 ("entry_price", position.entry_price, entry_price),
                 ("current_price", position.current_price, current_price),
                 ("market_value", position.market_value, market_value),
@@ -658,10 +666,10 @@ def _check_position_data_integrity(ctx: _GateContext) -> None:
                 "exposure with corrupted position data.",
             )
             continue
-        if position.shares < 0:
+        if shares is not None and shares < 0:
             ctx.violate(
                 ViolationCode.INVALID_POSITION_DATA,
-                f"Position {position.ticker} has negative shares ({position.shares}) -- this project "
+                f"Position {position.ticker} has negative shares ({raw_shares}) -- this project "
                 "does not model short positions.",
             )
         if market_value is not None and market_value < 0:
@@ -977,14 +985,18 @@ def _check_leveraged_etf_concentration(ctx: _GateContext) -> None:
 
 def _check_sell_exceeds_held(ctx: _GateContext) -> None:
     held_shares = sum(
-        p.shares
-        for p in ctx.portfolio.positions
-        if p.ticker.upper() == ctx.intent.ticker.upper()
+        (
+            shares
+            for p, shares in zip(ctx.portfolio.positions, ctx.position_shares)
+            if p.ticker.upper() == ctx.intent.ticker.upper() and shares is not None
+        ),
+        Decimal("0"),
     )
     if ctx.safe_shares > held_shares:
         ctx.violate(
             ViolationCode.SELL_EXCEEDS_HELD,
-            f"Sell quantity {ctx.intent.shares!r} exceeds the {held_shares:g} shares currently held.",
+            f"Sell quantity {ctx.intent.shares!r} exceeds the "
+            f"{decimal_text(held_shares)} shares currently held.",
         )
 
 

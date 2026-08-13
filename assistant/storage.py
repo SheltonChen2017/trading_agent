@@ -754,6 +754,27 @@ class AssistantStore:
                     details_json TEXT NOT NULL,
                     PRIMARY KEY (watch_key, kind)
                 );
+                -- Three-sleeve M3: one earmark per dividend-funded proposal,
+                -- making each confirmed dividend dollar spendable exactly
+                -- once. New table, so `CREATE TABLE IF NOT EXISTS` migrates a
+                -- fresh and a pre-existing database identically with no
+                -- ALTER. amount_text is the exact-decimal money path (no
+                -- float twin -- same convention as
+                -- portfolio_position_snapshots). status is 'active',
+                -- 'released' (terminal proposal, provably nothing spent), or
+                -- 'consumed' (a fill spent it); transitions happen only
+                -- through the conditional status fence in
+                -- resolve_dividend_earmark_if_active(), never by overwrite.
+                CREATE TABLE IF NOT EXISTS sleeve_dividend_earmarks (
+                    proposal_id TEXT PRIMARY KEY,
+                    amount_text TEXT NOT NULL,
+                    route TEXT NOT NULL,
+                    ticker TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    created_at TEXT NOT NULL,
+                    resolved_at TEXT,
+                    resolved_reason TEXT
+                );
                 CREATE INDEX IF NOT EXISTS idx_proposals_status
                     ON trade_proposals(status, created_at);
                 CREATE INDEX IF NOT EXISTS idx_broker_events_order_at
@@ -4590,6 +4611,166 @@ class AssistantStore:
                 """
             ).fetchone()
         return None if row is None else json.loads(row["payload_json"])
+
+    def list_dividend_earmarks(self) -> list[dict[str, Any]]:
+        """Three-sleeve M3 earmark rows, deterministic order."""
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT proposal_id, amount_text, route, ticker, status,
+                       created_at, resolved_at, resolved_reason
+                FROM sleeve_dividend_earmarks
+                ORDER BY created_at, proposal_id
+                """
+            ).fetchall()
+        return [dict(row) for row in rows]
+
+    def create_dividend_earmark_with_proposal(
+        self,
+        proposal: dict[str, Any],
+        *,
+        amount_text: str,
+        route: str,
+        ticker: str,
+        confirmed_income_text: str,
+        now: str,
+    ) -> dict[str, Any]:
+        """Atomically earmark dividend dollars and persist their proposal.
+
+        One BEGIN IMMEDIATE transaction re-derives the earmarked total from
+        the table itself and refuses when `amount_text` exceeds
+        confirmed income minus (active + consumed) earmarks -- released
+        earmarks return their dollars to the pool by not counting. The
+        proposal insert and the earmark insert commit together or neither
+        does, so an earmark can never exist without its proposal and a
+        dividend-funded proposal can never exist without its earmark.
+
+        `confirmed_income_text` is the caller-measured confirmed dividend
+        total. The journal is append-only, so a concurrent dividend append
+        can only GROW the true pool -- checking against a slightly stale
+        income total refuses conservatively, never over-spends. Concurrent
+        earmark creation is what actually races, and BEGIN IMMEDIATE
+        serializes it against this same re-derivation.
+
+        Returns {"created": True, "available_text": ...} on success, or
+        {"created": False, "reason": ...} -- never a partial write.
+        """
+        amount = to_decimal(amount_text, name="earmark amount")
+        if amount <= 0:
+            return {"created": False, "reason": "earmark amount must be positive"}
+        confirmed_income = to_decimal(
+            confirmed_income_text, name="confirmed dividend income"
+        )
+        payload = json.dumps(proposal, sort_keys=True)
+        connection = self._open_database(self.path)
+        try:
+            connection.execute("BEGIN IMMEDIATE")
+            rows = connection.execute(
+                """
+                SELECT amount_text FROM sleeve_dividend_earmarks
+                WHERE status IN ('active', 'consumed')
+                """
+            ).fetchall()
+            earmarked = sum(
+                (
+                    to_decimal(row["amount_text"], name="stored earmark amount")
+                    for row in rows
+                ),
+                Decimal(0),
+            )
+            available = confirmed_income - earmarked
+            if amount > available:
+                connection.rollback()
+                return {
+                    "created": False,
+                    "reason": (
+                        f"earmark of {decimal_text(amount)} exceeds the available "
+                        f"dividend pool of {decimal_text(available)} "
+                        f"(confirmed {decimal_text(confirmed_income)} minus "
+                        f"{decimal_text(earmarked)} already earmarked or consumed)"
+                    ),
+                }
+            inserted = connection.execute(
+                """
+                INSERT INTO trade_proposals(
+                    proposal_id, created_at, expires_at, status,
+                    idempotency_key, payload_json, updated_at
+                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                ON CONFLICT(proposal_id) DO NOTHING
+                """,
+                (
+                    proposal["proposal_id"],
+                    proposal["created_at"],
+                    proposal["expires_at"],
+                    proposal["status"],
+                    proposal["idempotency_key"],
+                    payload,
+                    now,
+                ),
+            )
+            if inserted.rowcount != 1:
+                # An existing row means an identically-parameterized proposal
+                # already exists; silently earmarking again would double-spend.
+                connection.rollback()
+                return {
+                    "created": False,
+                    "reason": f"proposal {proposal['proposal_id']} already exists",
+                }
+            connection.execute(
+                """
+                INSERT INTO sleeve_dividend_earmarks(
+                    proposal_id, amount_text, route, ticker, status,
+                    created_at, resolved_at, resolved_reason
+                ) VALUES (?, ?, ?, ?, 'active', ?, NULL, NULL)
+                """,
+                (
+                    proposal["proposal_id"],
+                    decimal_text(amount),
+                    route,
+                    ticker.upper(),
+                    now,
+                ),
+            )
+            connection.commit()
+            return {
+                "created": True,
+                "available_text": decimal_text(available - amount),
+            }
+        except Exception:
+            connection.rollback()
+            raise
+        finally:
+            connection.close()
+
+    def resolve_dividend_earmark_if_active(
+        self,
+        proposal_id: str,
+        *,
+        new_status: str,
+        resolved_reason: str,
+        now: str,
+    ) -> bool:
+        """Move one ACTIVE earmark to 'released' or 'consumed', exactly once.
+
+        The status fence in the WHERE clause is the exactly-once mechanism
+        (same discipline as release_execution_reservation's rowcount check):
+        a second caller, a retry, or a crash-restart replay finds no active
+        row and returns False without touching the resolved record.
+        """
+        if new_status not in ("released", "consumed"):
+            raise ValueError(
+                f"earmark resolution must be 'released' or 'consumed', got {new_status!r}"
+            )
+        with self._connect() as connection:
+            cursor = connection.execute(
+                """
+                UPDATE sleeve_dividend_earmarks
+                SET status = ?, resolved_at = ?, resolved_reason = ?
+                WHERE proposal_id = ? AND status = 'active'
+                """,
+                (new_status, now, resolved_reason, proposal_id),
+            )
+        return cursor.rowcount == 1
 
     def list_sleeve_watch_states(self) -> list[dict[str, Any]]:
         """Durable three-sleeve notification state (M2), one row per

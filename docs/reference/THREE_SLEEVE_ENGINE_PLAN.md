@@ -306,3 +306,21 @@ two clicks. Revisit only on explicit owner request.
   plus watch-state publication, treated partial lot coverage as blindness,
   excluded broker-held tickers from flat re-entry, rejected stale closes,
   and carried exact-text unrealized money in gain/awaiting notifications.
+- 2026-08-13 (M3 implemented, PENDING INDEPENDENT REVIEW) — the owner
+  authorized M3 in-session ("start"). Implemented per §5 M3 as revised by
+  §1.1 on `user/claude/three-sleeve-m3-earmarks-20260813`:
+  `sleeve_dividend_earmarks` table (exact-text money, no float twin),
+  `assistant/sleeve_reinvest.py`, CLI `sleeve-reinvest` (read-only status
+  with derived effective dispositions) and `sleeve-reinvest-propose`
+  (GR-4 recorded-close price, refuses without a fresh close), a Buying-page
+  expander, and a briefing reconcile hook with M2-style failure isolation.
+  Key semantics: the pool counts broker-confirmed corporate-action
+  dividends only; the earmark is the proposal-time notional (floor
+  remainder stays in the pool); pending `decline_review` AND
+  `reentry_decline` watches both outrank leveraged reinvestment; ambiguous
+  proposal outcomes HOLD their earmark; a canceled/broker-expired proposal
+  releases only with zero recorded fill quantity, any fill consumes the
+  whole earmark (partial-fill dollars never return to the pool); the
+  in-transaction pool fence was mutation-verified after the module-level
+  pre-check was found to shadow it. M3 is not complete until independently
+  reviewed; nothing is deployed.

@@ -2586,6 +2586,141 @@ if page == "Buying":
                             st.warning(e["dataset_warning"])
             st.caption(explanation["note"])
 
+    # --- Three-sleeve M3: dividend-funded reinvestment (earmarked) ----------
+    # Rendering is READ-ONLY (derived dispositions only); durable earmark
+    # transitions and the proposal write happen exclusively inside the
+    # button handler. Every proposal still goes through the identical
+    # approve-gated pipeline -- this section never submits anything.
+    with st.expander("Dividend reinvestment (three-sleeve M3)"):
+        from assistant.sleeve_reinvest import (
+            SleeveReinvestError as _SleeveReinvestError,
+        )
+        from assistant.sleeve_reinvest import (
+            dividend_reinvest_status as _dividend_reinvest_status,
+        )
+        from assistant.sleeve_reinvest import (
+            generate_dividend_reinvest_proposal as _generate_reinvest_proposal,
+        )
+        from assistant.sleeve_reinvest import (
+            reconcile_dividend_earmarks as _reconcile_dividend_earmarks,
+        )
+
+        st.caption(
+            "Confirmed dividend income can fund one approve-gated purchase "
+            "proposal at a time: pending decline-review adds first, an "
+            "owner-chosen leveraged reinvest candidate only when nothing is "
+            "pending (plan section 1.1). Owner preference, not research. "
+            "Nothing is bought until you approve the proposal yourself."
+        )
+        _reinvest_status = None
+        try:
+            _reinvest_status = _dividend_reinvest_status(store)
+        except _SleeveReinvestError as _reinvest_exc:
+            st.warning(f"Dividend pool unavailable: {_reinvest_exc}")
+        except Exception as _reinvest_exc:
+            st.warning(
+                "Dividend pool unavailable "
+                f"({type(_reinvest_exc).__name__})."
+            )
+        if _reinvest_status is not None:
+            _col_a, _col_b, _col_c = st.columns(3)
+            _col_a.metric("Available", f"${_reinvest_status['available_total']}")
+            _col_b.metric(
+                "Confirmed income", f"${_reinvest_status['confirmed_income_total']}"
+            )
+            _col_c.metric("Route", _reinvest_status["route"])
+            st.caption(_reinvest_status["note"])
+            for _pending in _reinvest_status["pending_decline_reviews"]:
+                st.write(
+                    f"- Pending dip-add: **{_pending['ticker']}** "
+                    f"({_pending['kind']})"
+                )
+            for _earmark in _reinvest_status["earmarks"]:
+                _drift = (
+                    ""
+                    if _earmark["effective_disposition"] == _earmark["status"]
+                    else (
+                        f" -- effective: {_earmark['effective_disposition']} "
+                        "(awaiting reconcile)"
+                    )
+                )
+                st.caption(
+                    f"Earmark {_earmark['proposal_id']}: "
+                    f"${_earmark['amount_text']} {_earmark['route']} "
+                    f"{_earmark['ticker']} -- {_earmark['status']}{_drift}"
+                )
+
+            _eligible = _reinvest_status["eligible_tickers"]
+            _available_float = float(_reinvest_status["available_total"])
+            if not _eligible:
+                st.info("No eligible ticker right now.")
+            elif _available_float <= 0:
+                st.info("The dividend pool has no available dollars right now.")
+            else:
+                _reinvest_ticker = st.selectbox(
+                    "Eligible ticker", _eligible, key="sleeve_reinvest_ticker"
+                )
+                _reinvest_amount = st.number_input(
+                    "Amount from the dividend pool ($)",
+                    min_value=0.0,
+                    max_value=_available_float,
+                    value=0.0,
+                    step=1.0,
+                    key="sleeve_reinvest_amount",
+                )
+                if st.button(
+                    "Create dividend-funded purchase proposal",
+                    disabled=_reinvest_amount <= 0,
+                    key="sleeve_reinvest_create",
+                ):
+                    from assistant.sleeve_notifications import (
+                        _recorded_close_fetcher as _sleeve_close_fetcher,
+                    )
+
+                    try:
+                        for _transition in _reconcile_dividend_earmarks(store):
+                            st.caption(
+                                f"Earmark {_transition['proposal_id']}: "
+                                f"{_transition['action']} ({_transition['reason']})"
+                            )
+                        _close_by_ticker = _sleeve_close_fetcher(store)(
+                            [_reinvest_ticker]
+                        )
+                        _reinvest_price = _close_by_ticker.get(_reinvest_ticker)
+                        if _reinvest_price is None:
+                            st.error(
+                                "No fresh recorded close is available for "
+                                f"{_reinvest_ticker}; not proposing blind."
+                            )
+                        else:
+                            _reinvest_policy, _reinvest_packet = _load_packet(
+                                policy_path, include_events=False
+                            )
+                            _reinvest_result = _generate_reinvest_proposal(
+                                _reinvest_packet, _reinvest_policy,
+                                store, ticker=_reinvest_ticker,
+                                amount=str(_reinvest_amount),
+                                price=_reinvest_price,
+                            )
+                            if _reinvest_result["created"]:
+                                _created = _reinvest_result["proposal"]
+                                st.success(
+                                    f"Proposed {_created.intent.shares} shares of "
+                                    f"{_created.intent.ticker} "
+                                    f"(${_reinvest_result['earmark_amount_text']} "
+                                    "earmarked). Approve it on the Propose & "
+                                    "Approve page -- nothing has been bought."
+                                )
+                            else:
+                                st.error(f"Refused: {_reinvest_result['reason']}")
+                    except _SleeveReinvestError as _reinvest_exc:
+                        st.error(f"Refused: {_reinvest_exc}")
+                    except Exception as _reinvest_exc:
+                        st.error(
+                            "Proposal creation failed "
+                            f"({type(_reinvest_exc).__name__})."
+                        )
+
 if page == "Selling":
     st.caption(
         "\"Recommended to sell\" here means one thing specifically: this position currently "

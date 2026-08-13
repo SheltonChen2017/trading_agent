@@ -132,6 +132,10 @@ from assistant.proposal_status import (
     statuses_for_outcome_groups,
 )
 from assistant.proposals import generate_risk_reduction_proposals
+from assistant.user_directed_sell import (
+    generate_user_directed_sell_proposal,
+    sellable_whole_shares as _sellable_whole_shares,
+)
 from assistant.tax_reporting import (
     TaxReportError,
     build_annual_tax_report,
@@ -2632,6 +2636,85 @@ if page == "Selling":
             hide_index=True,
         )
 
+        # --- Owner-directed sell of one held position (2026-08-13) --------
+        # Deliberately ABOVE the policy-breach section and visually separate:
+        # these two answer different questions ("what do I want to sell?" vs
+        # "what does my policy require me to sell?"), and blending them would
+        # let an owner-directed sale inherit the credibility of a computed
+        # breach. Nothing here submits an order.
+        st.subheader("Sell a specific holding (your own decision)")
+        st.caption(
+            "Sell any number of shares you currently hold, for your own "
+            "reasons. This project is NOT recommending it and does not "
+            "predict price declines -- it has confirmed zero signals as real "
+            "edge for that. The sale still becomes an ordinary proposal that "
+            "you approve by typing the phrase, and your policy limits are "
+            "re-checked at that moment."
+        )
+        _sellable = {
+            p.ticker: _sellable_whole_shares(p.shares)
+            for p in packet.portfolio.positions
+        }
+        _sellable_tickers = [t for t, n in _sellable.items() if n > 0]
+        if not _sellable_tickers:
+            st.info(
+                "No held position currently has a whole share available to "
+                "sell."
+            )
+        else:
+            _ud_col1, _ud_col2 = st.columns([2, 1])
+            _ud_ticker = _ud_col1.selectbox(
+                "Holding to sell", _sellable_tickers, key="user_sell_ticker"
+            )
+            _ud_max = _sellable[_ud_ticker]
+            _ud_shares = _ud_col2.number_input(
+                f"Shares to sell (you hold {_ud_max})",
+                min_value=1, max_value=int(_ud_max), value=1, step=1,
+                key="user_sell_shares",
+            )
+            st.caption(
+                f"Selling all {_ud_max} whole share(s) closes the position."
+                if _ud_shares == _ud_max
+                else f"{_ud_max - int(_ud_shares)} share(s) would remain."
+            )
+            if st.button(
+                f"Create sell proposal for {_ud_ticker}", key="user_sell_create"
+            ):
+                _ud_ledger, _ud_coverage = tax_ledger_with_coverage(
+                    store, packet.portfolio
+                )
+                _ud_result = generate_user_directed_sell_proposal(
+                    packet, policy, ticker=_ud_ticker, shares=int(_ud_shares),
+                    tax_lot_ledger=_ud_ledger, tax_lot_coverage=_ud_coverage,
+                )
+                if _ud_result["created"]:
+                    store.save_proposal(_ud_result["proposal"].to_dict())
+                    st.session_state["user_sell_proposal"] = _ud_result[
+                        "proposal"
+                    ].to_dict()
+                else:
+                    st.session_state.pop("user_sell_proposal", None)
+                    st.error(_ud_result["reason"])
+
+            _ud_proposal = st.session_state.get("user_sell_proposal")
+            if _ud_proposal:
+                # Bind the stored proposal to the holding it was computed for.
+                # A proposal for a different ticker rendering under the
+                # current selection would be the stale-state defect AP-9
+                # closed on the Buying page.
+                if _ud_proposal["intent"]["ticker"] != _ud_ticker:
+                    st.info(
+                        f"A sell proposal for "
+                        f"{_ud_proposal['intent']['ticker']} is waiting on the "
+                        "Propose & Approve page. Create one for "
+                        f"{_ud_ticker} to see it here."
+                    )
+                else:
+                    _render_proposal_approval(
+                        _ud_proposal, store, policy_path, packet.portfolio, packet
+                    )
+
+        st.divider()
         st.subheader("Recommended sells (policy-breach based)")
         if st.button("Check for recommended sells", type="primary"):
             tax_ledger, tax_coverage = tax_ledger_with_coverage(

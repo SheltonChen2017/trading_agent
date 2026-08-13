@@ -1264,6 +1264,64 @@ def command_sleeve_report(args, store: AssistantStore) -> None:
         )
 
 
+def command_sell_holding(args, store: AssistantStore) -> None:
+    """Owner-directed sale of one currently-held position.
+
+    Creates ONE approve-gated proposal and stops. It never submits an order,
+    and it makes no claim that selling is a good idea -- that judgement is
+    the owner's, and this project has confirmed zero signals as real edge for
+    predicting declines.
+    """
+    from assistant.user_directed_sell import generate_user_directed_sell_proposal
+
+    policy = load_policy(_cli_policy_path(args))
+    packet = _packet(include_events=False, store=store)
+    store.save_decision_packet(packet)
+    tax_ledger, tax_coverage = tax_ledger_with_coverage(store, packet.portfolio)
+    result = generate_user_directed_sell_proposal(
+        packet,
+        policy,
+        ticker=args.ticker,
+        shares=args.shares,
+        tax_lot_ledger=tax_ledger,
+        tax_lot_coverage=tax_coverage,
+    )
+    if not result["created"]:
+        raise SystemExit(f"Refused: {result['reason']}")
+
+    proposal = result["proposal"]
+    store.save_proposal(proposal.to_dict())
+    if args.json:
+        print(json.dumps(proposal.to_dict(), indent=2, sort_keys=True))
+        return
+    intent = proposal.intent
+    print(
+        f"{proposal.proposal_id} [{proposal.evidence_status}]: "
+        f"{intent.side.upper()} {intent.shares} {intent.ticker} at reference "
+        f"${proposal.reference_price:,.2f}"
+    )
+    for reason in proposal.reasons:
+        print(f"  - {reason}")
+    tax_advisory = proposal.expected_impact.get("tax_lot_advisory", {})
+    if tax_advisory.get("available"):
+        for method, detail in tax_advisory["methods"].items():
+            if "error" not in detail:
+                print(
+                    f"  Tax ({method.upper()}): "
+                    f"{detail['realized_pnl']:+,.2f} realized "
+                    f"(short {detail['short_term_pnl']:+,.2f}, "
+                    f"long {detail['long_term_pnl']:+,.2f})"
+                )
+    else:
+        print(
+            "  Tax: advisory unavailable -- "
+            + str(tax_advisory.get("reason", "unknown reason"))
+        )
+    for uncertainty in proposal.uncertainties:
+        print(f"  ? {uncertainty}")
+    print(f'  Approve with: approve {proposal.proposal_id} --confirm approve')
+
+
 def command_tax_report(args, store: AssistantStore) -> None:
     """GR-7a: realized gains for one tax year, from confirmed records.
 
@@ -2439,6 +2497,22 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sleeve.add_argument("--json", action="store_true")
     sleeve.set_defaults(handler=command_sleeve_report, read_only_store=True)
+
+    sell_holding = commands.add_parser(
+        "sell-holding",
+        help=(
+            "Owner-directed sale of one currently-held position: creates ONE "
+            "approve-gated sell proposal for the shares you name. Not a "
+            "recommendation and never submits an order."
+        ),
+    )
+    sell_holding.add_argument("--ticker", required=True)
+    sell_holding.add_argument(
+        "--shares", required=True, type=int,
+        help="Whole shares to sell; must not exceed the shares you hold.",
+    )
+    sell_holding.add_argument("--json", action="store_true")
+    sell_holding.set_defaults(handler=command_sell_holding)
 
     attribution = commands.add_parser(
         "attribution",

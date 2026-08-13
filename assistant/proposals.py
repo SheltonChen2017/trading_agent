@@ -37,6 +37,85 @@ class TradeProposal:
         return result
 
 
+def attach_tax_lot_advisory(
+    expected_impact: dict,
+    uncertainties: list[str],
+    *,
+    ticker: str,
+    shares: int,
+    price: float,
+    when: datetime,
+    tax_lot_ledger: LotLedger | None,
+    tax_lot_coverage: dict | None = None,
+) -> None:
+    """Attach the advisory FIFO/LIFO/HIFO comparison for one sell, or an
+    explicit unavailability reason, mutating `expected_impact` and
+    `uncertainties` in place.
+
+    Extracted so the policy-breach generator below and the user-directed
+    sell generator (assistant/user_directed_sell.py) cannot drift: this is
+    the tax-consequence disclosure rule, and a second hand-copied version
+    is exactly how a disclosure quietly stops matching on one surface.
+
+    Advisory only, in both directions. It never gates, sizes, or delays a
+    sell -- an unavailable advisory must still leave the sell possible,
+    because a risk-reducing order must never wait on bookkeeping.
+    """
+    if tax_lot_ledger is not None:
+        try:
+            tax_advisory = compare_sale_bases(
+                tax_lot_ledger, ticker, qty=shares, price=price, when=when
+            )
+            # Do NOT force available=True here. compare_sale_bases() sets
+            # it from whether any method actually produced figures; a
+            # ticker the lot ledger has never seen (there is still no
+            # importer for fills predating this app) errors on every
+            # method, and stamping it available made the CLI print nothing
+            # at all -- skipping the "advisory unavailable" branch, so
+            # missing lot history looked exactly like "no tax implications"
+            # (found 2026-07-30 reviewing this feature).
+            tax_advisory.setdefault("available", False)
+            tax_advisory["advisory_only"] = True
+            expected_impact["tax_lot_advisory"] = tax_advisory
+            if tax_advisory["available"]:
+                uncertainties.append(
+                    "Tax-lot figures are advisory bookkeeping, never an "
+                    "execution gate; broker records and Form 1099-B remain "
+                    "authoritative."
+                )
+            else:
+                uncertainties.append(
+                    "Tax-lot advice is unavailable for this sale "
+                    f"({tax_advisory.get('reason', 'unknown reason')}); "
+                    "that never delays a risk-reducing order."
+                )
+        except TaxLotError as exc:
+            expected_impact["tax_lot_advisory"] = {
+                "available": False,
+                "reason": str(exc),
+                "advisory_only": True,
+            }
+            uncertainties.append(
+                "Tax-lot advice is unavailable for this sale, but that "
+                "must never delay a risk-reducing order."
+            )
+    else:
+        reason = (
+            (tax_lot_coverage or {}).get("reason")
+            or "complete lot history is unavailable"
+        )
+        expected_impact["tax_lot_advisory"] = {
+            "available": False,
+            "reason": reason,
+            "coverage": tax_lot_coverage or {},
+            "advisory_only": True,
+        }
+        uncertainties.append(
+            "Tax-lot advice is unavailable because complete lot coverage "
+            "could not be verified; this never blocks a risk-reducing sell."
+        )
+
+
 def _stable_id(packet: DecisionPacket, policy: TradingPolicy, intent: TradeIntent) -> str:
     # packet.generated_at (a full timestamp, not just portfolio.as_of's
     # date) so a regenerated proposal for the SAME intent later the same
@@ -254,63 +333,16 @@ def generate_risk_reduction_proposals(
         uncertainties = [
             "Market orders can fill away from the displayed reference price.",
         ]
-        if tax_lot_ledger is not None:
-            try:
-                tax_advisory = compare_sale_bases(
-                    tax_lot_ledger,
-                    ticker,
-                    qty=shares,
-                    price=position.current_price,
-                    when=now,
-                )
-                # Do NOT force available=True here. compare_sale_bases() sets
-                # it from whether any method actually produced figures; a
-                # ticker the lot ledger has never seen (there is still no
-                # importer for fills predating this app) errors on every
-                # method, and stamping it available made the CLI print nothing
-                # at all -- skipping the "advisory unavailable" branch, so
-                # missing lot history looked exactly like "no tax implications"
-                # (found 2026-07-30 reviewing this feature).
-                tax_advisory.setdefault("available", False)
-                tax_advisory["advisory_only"] = True
-                expected_impact["tax_lot_advisory"] = tax_advisory
-                if tax_advisory["available"]:
-                    uncertainties.append(
-                        "Tax-lot figures are advisory bookkeeping, never an "
-                        "execution gate; broker records and Form 1099-B remain "
-                        "authoritative."
-                    )
-                else:
-                    uncertainties.append(
-                        "Tax-lot advice is unavailable for this sale "
-                        f"({tax_advisory.get('reason', 'unknown reason')}); "
-                        "that never delays a risk-reducing order."
-                    )
-            except TaxLotError as exc:
-                expected_impact["tax_lot_advisory"] = {
-                    "available": False,
-                    "reason": str(exc),
-                    "advisory_only": True,
-                }
-                uncertainties.append(
-                    "Tax-lot advice is unavailable for this sale, but that "
-                    "must never delay a risk-reducing order."
-                )
-        else:
-            reason = (
-                (tax_lot_coverage or {}).get("reason")
-                or "complete lot history is unavailable"
-            )
-            expected_impact["tax_lot_advisory"] = {
-                "available": False,
-                "reason": reason,
-                "coverage": tax_lot_coverage or {},
-                "advisory_only": True,
-            }
-            uncertainties.append(
-                "Tax-lot advice is unavailable because complete lot coverage "
-                "could not be verified; this never blocks a risk-reducing sell."
-            )
+        attach_tax_lot_advisory(
+            expected_impact,
+            uncertainties,
+            ticker=ticker,
+            shares=shares,
+            price=position.current_price,
+            when=now,
+            tax_lot_ledger=tax_lot_ledger,
+            tax_lot_coverage=tax_lot_coverage,
+        )
         proposals.append(
             TradeProposal(
                 proposal_id=proposal_id,

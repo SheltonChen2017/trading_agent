@@ -154,7 +154,7 @@ def test_current_review_documents_have_no_validation_placeholders():
     """A validation claim must contain a measured result, never a token."""
     placeholders = re.compile(
         r"\b(?:FULL_SUITE|COUNTER_REVIEW_SUITE|FINAL_TREE|FINAL_STATIC"
-        r"|COUNTER_REVIEW_TREE|SELL_TREE)_RESULT\b"
+        r"|COUNTER_REVIEW_TREE|SELL_TREE|INTEGRATION_SUITE)_RESULT\b"
     )
     names = (
         "SESSION_HANDOFF.md",

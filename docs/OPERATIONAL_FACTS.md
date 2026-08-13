@@ -112,6 +112,21 @@ is `ledger-activity-review`, then `ledger-activity-acknowledge <id>
 the next capture proceeds. **No deploy, no epoch roll.** Generic `JNLC` cash
 journals still fail closed by design and are handled the same way.
 
+### Read-only epoch-004 observation during AP-9 diagnosis (2026-08-12)
+
+Claude measured the following read-only at 2026-08-12T22:57Z while diagnosing
+AP-9; the independent Codex review preserved this observation but did not
+query or mutate the operator database itself. `paper-epoch-004` had 1
+observation, 0 orders, and 5/5 drills. Five alerts were open, three critical,
+all tracing to intermittent DNS/connection failures reaching
+`paper-api.alpaca.markets` earlier that day and three resulting cycle gaps
+(613, 80, and 80 minutes). The accounting freshness alert was therefore a
+genuinely stale positive age, not AP-7's negative-age race and not an AP-6
+cash mismatch. Sixty-four reconciliation runs that day all matched with zero
+mismatches. These counts are an attributed point-in-time observation, not a
+claim about the state after 2026-08-12T22:57Z; re-measure read-only before any
+operational decision.
+
 ### `paper-epoch-003` ran here; the AP-6 swap was executed (2026-08-10)
 
 *(Superseded 2026-08-11: epoch-003 was closed by the epoch-004 roll above.

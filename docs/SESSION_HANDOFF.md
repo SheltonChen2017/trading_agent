@@ -1,147 +1,123 @@
-# Session handoff — three-sleeve M3 implemented, pending independent review
+# Session handoff — three-sleeve M3 accepted after independent correction
 
-Prepared: 2026-08-13, after the owner authorized M3 of the three-sleeve
-engine ("start") and its implementation completed on a milestone branch.
+Prepared: 2026-08-13, after Codex independently reviewed Claude's M3 branch,
+reproduced six findings, committed corrections, and synchronized the active
+project documentation.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 ## 0. Read this first
 
-Read, in order:
-
-1. `CLAUDE.md`
-2. `docs/ACTION_PLAN_2026-08-02.md`
-3. `docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` (sections 1.1, 5 M3, and
-   the 2026-08-13 change-control entry)
-4. `docs/OPERATIONAL_FACTS.md`
-5. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-6. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-
+Read `CLAUDE.md`, `docs/ACTION_PLAN_2026-08-02.md`,
+`docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md`, and
+`docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` §1.1 / §5 M3 before acting.
 The action plan remains the sequencing authority. Nothing in this session
-authorizes M4, deployment, an epoch roll, live trading, or any funded
+authorizes a push, merge, deployment, epoch roll, M4, live trading, or a funded
 action.
 
-## 1. Repository topology
+## 1. Repository topology and reachability
 
-- `main` / `origin/main`: `60ed001` (PR #200 merge). Earlier today the
-  owner merged PR #197 (counter-review), #198 (AP-11), #199 (post-merge
-  records), and #200 (AP-11 review counter-review), and every merged
-  branch was deleted locally and on the remote.
-- Unmerged remote branches deliberately kept: `origin/Funny`
-  (unidentified, owner to decide) and
-  `origin/user/claude/gr-7d-rebalance-targets-20260806` (the superseded
-  2026-08-06 equal-weight GR-7d slice, kept as the archived record per the
-  three-sleeve plan's prior-decision disclosure).
-- This session's milestone branch:
-  `user/claude/three-sleeve-m3-earmarks-20260813`, created from `60ed001`.
-  One milestone only (M3), stopped for independent review per the plan's
-  own milestone rule.
+- `main` / `origin/main`: `60ed001` (PR #200 merge), the exact review base.
+- Claude's submitted remote branch:
+  `user/claude/three-sleeve-m3-earmarks-20260813`, sole reviewed commit and
+  head `7ee4786`.
+- Codex independent review branch:
+  `codex/review-three-sleeve-m3-20260813`, correction `b6685b5`, followed by
+  this documentation-only handoff commit.
+- **The Codex review branch and its correction are local-only and have not
+  been pushed. Another computer cannot retrieve them with `git fetch`.**
+- The shared Claude branch was not switched, edited, rebased, or force-pushed.
+  No unrelated worktree changes were adopted.
 
-## 2. M3 — what was implemented
+## 2. Review outcome
 
-Definition: `docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` §5 M3 as revised
-by §1.1 (dividend income funds pending decline-review adds first; earmark
-records make each dividend dollar spendable exactly once; never
-auto-submitted). The change-control entry dated 2026-08-13 records the
-implemented semantics; the review-relevant decisions:
+Status: **complete; submitted commit accepted after correction.**
 
-- **Pool population**: broker-confirmed corporate-action dividends only
-  (`source == "corporate_action"` against `INCOME:DIVIDENDS`) — narrower
-  than the M1 report's income display, disclosed in the payload. A
-  positive income posting refuses the measurement rather than netting.
-- **Earmark lifecycle**: created atomically WITH the proposal in one
-  `BEGIN IMMEDIATE` transaction (`create_dividend_earmark_with_proposal`)
-  whose in-transaction pool fence is the concurrency authority; released
-  or consumed exactly once through a status-fenced conditional UPDATE
-  (`resolve_dividend_earmark_if_active`, rowcount discipline mirroring
-  `release_execution_reservation`).
-- **Disposition rule**: provably-unspent terminals release (blocked,
-  validation_failed, submission_failed, broker_rejected, expired,
-  dismissed); `filled` consumes; `canceled`/`broker_expired` release only
-  with zero recorded fill quantity and consume otherwise (partial-fill
-  dollars never return to the pool); everything else — including
-  `submission_unknown`, `reconciling`, legacy `executed`, unknown future
-  statuses, and an earmark whose proposal row is missing — HOLDS.
-- **Routing**: active `decline_review` and `reentry_decline` watches (M2
-  state) both outrank leveraged reinvestment; the reinvest route is
-  refused with the pending tickers named. Eligible reinvest candidates
-  come from `config.DIVIDEND_REINVEST_TICKERS`; `max_leveraged_etf_pct`
-  stays the untouched execution-time backstop.
-- **Surfaces**: CLI `sleeve-reinvest` (read-only status; active earmarks
-  of terminal proposals display their derived effective disposition
-  without writing) and `sleeve-reinvest-propose` (reconciles durably,
-  prices through the GR-4 recorded-close path with M2's freshness check,
-  refuses without a fresh close); a Buying-page expander (read-only
-  render, writes only in the button handler); a briefing reconcile hook
-  with M2-style failure isolation.
-- **Files**: `assistant/sleeve_reinvest.py` (new),
-  `assistant/storage.py` (new table + three methods),
-  `scripts/run_personal_assistant.py` (two commands + briefing hook),
-  `scripts/personal_assistant_ui.py` (Buying expander),
-  `tests/test_sleeve_reinvest.py` (62 tests),
-  `tests/test_ui_sleeve_reinvest.py` (1 AppTest), plan + action-plan
-  documentation.
+| Commit | Disposition | Reason |
+|---|---|---|
+| `7ee4786` | Accepted after correction | Core M3 routing, proposal gating, exact-text earmarks, recorded-close pricing, atomic proposal/earmark creation, and exactly-once resolution are sound. Correction `b6685b5` closes M3REV-001 through M3REV-006. |
 
-Deliberately NOT implemented: M4 prepared trim proposals (deferred by
-default), auto-submission of anything, changes to policy caps, any
-notification additions beyond the reconcile lines in the briefing, any
-deployment.
+Issue summary: **2 P1 fixed, 4 P2 fixed; 0 P0/P1/P2/P3 open.** The complete
+ledger and red/green evidence are in
+`docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md`.
 
-## 3. Validation (repository venv, Python 3.13.14 / Streamlit 1.60.0)
+- **M3REV-001 (P1):** poll-only cumulative `filled_qty` was ignored, so a
+  partially filled cancellation could release spent dividend dollars.
+- **M3REV-002 (P1):** fill evidence did not override release-class terminal
+  labels, although the lifecycle permits rejection after partial fill.
+- **M3REV-003 (P2):** the authoritative transaction trusted caller-asserted
+  confirmed income instead of deriving the pool from durable journal rows.
+- **M3REV-004 (P2):** unknown/future earmark statuses were omitted from the
+  unavailable total and could release money fail-open.
+- **M3REV-005 (P2):** nonpositive stored earmarks could enlarge the pool.
+- **M3REV-006 (P2):** a human reconcile line made valid `--json` output
+  unparsable.
 
-- `tests/test_sleeve_reinvest.py`: **62 passed** — includes the exact
-  disposition table, atomic-create refusal paths, exactly-once resolve,
-  reconcile idempotency, partial-fill consumption, read-only status
-  proof, write-allowlist proof (only `trade_proposals` +
-  `sleeve_dividend_earmarks`), payload lexical guard, and CLI handlers.
-- Mutation evidence (each restored and re-verified green): disabling the
-  IN-TRANSACTION pool fence initially stayed green because the
-  module-level pre-check shadowed it — a direct storage-level test was
-  added and now reddens on that mutation; dropping the resolve status
-  fence, ignoring fill evidence on cancellation, and releasing unknown
-  statuses each reddened their tests.
-- Focused: sleeve report + notifications + import boundary — **146
-  passed**; UI smoke — **1 passed**.
-- Penultimate tree: **3,556 passed, 1 failed, 25 known dependency
-  warnings** in 748.15 s — the single failure was the extended placeholder
-  guard correctly rejecting this section's own then-unfilled tokens.
-- Exact final tree differs from that run only by this validation text;
-  the doc-consistency suite (the only tests reading this file) was rerun
-  green on the final text: **19 passed**.
-- Repository-prescribed `compileall` (venv) and `git diff --check`: clean
-  (only the expected LF→CRLF working-copy notice).
+Correction `b6685b5` reads both broker fill representations and lets any
+credible fill consume regardless of label; derives journal income and every
+non-released earmark within one `BEGIN IMMEDIATE`; holds unknown statuses;
+refuses invalid/nonpositive stored money; and returns reconcile transitions as
+structured JSON.
 
-## 4. Operational truth — do not disturb the epoch
+## 3. Completed M3 behavior
 
-- `paper-epoch-004` is the only active evidence epoch, frozen at `b837374`
-  in `C:\git\trading_agent_operational`. M3 does not touch it.
-- AP-8, AP-9, QC-2, AP-10, AP-11, and (once reviewed and merged) M3 are
-  development code riding the next owner-authorized epoch roll.
-- CR-W3 watch unchanged (first real AEP dividend subtype ~2026-09-10;
-  JNLC still requires operator judgement; never widen reconciliation
-  tolerance or use a manual compensating entry).
-- Note for the roll that deploys M3: the dividend pool starts from the
-  operator ledger's confirmed corporate-action dividends, which already
-  exist in the operator database — the pool will be non-zero on first
-  deploy, and nothing spends it without an explicit owner-approved
-  proposal.
+- The spendable pool contains broker-confirmed corporate-action postings to
+  `INCOME:DIVIDENDS`; the proposal transaction independently re-derives that
+  population from the journal rather than trusting its caller.
+- Active `decline_review` and `reentry_decline` watches outrank leveraged
+  reinvestment. With none pending, the owner may choose from
+  `DIVIDEND_REINVEST_TICKERS`.
+- Proposal creation and proposal-time-notional earmarking commit together.
+  Only an explicit `released` earmark returns money to the pool; consumed,
+  active, unknown, or corrupt/future statuses reserve it.
+- Any credible incremental or cumulative fill evidence consumes the whole
+  earmark. Ambiguous proposal outcomes hold. Resolution remains an idempotent,
+  status-fenced conditional update.
+- CLI and Buying-page creation remain proposal-only. The owner must type the
+  existing approval phrase; policy validation, execution gates, kill switches,
+  quote checks, and `max_leveraged_etf_pct` remain authoritative.
+- M4 prepared trims remain deferred and were not implemented.
 
-## 5. Next step
+## 4. Validation
 
-Independent review of `user/claude/three-sleeve-m3-earmarks-20260813`
-(the standing loop's next move), then owner-directed merge. No
-`FEATURE_MILESTONE_RECORD` entry until the milestone completes review.
-Open owner decisions, unchanged: epoch-roll timing, the
-physical-media-only off-machine backup, the `origin/Funny` branch, and
-M4 (deferred by default).
+- Submitted-tree baseline at exact `7ee4786`: **3,557 passed**, 25 known
+  dependency warnings, 707.79 seconds.
+- Red reproduction before correction: **7 intended failures** covering all
+  six findings.
+- Corrected M3 + UI suites: **70 passed** in 17.02 seconds.
+- Final repository suite: **3,564 passed, 0 failed/skipped**, 25 known
+  dependency warnings, in 662.62 seconds.
+- Repository-prescribed compileall passed; active-document consistency passed
+  **19/19**; `git diff --check` is clean.
+- Review was local and deterministic. No broker request, order, policy write,
+  scheduler mutation, operational-database access, or epoch mutation occurred.
 
-## 6. Resume prompt
+## 5. Operational truth
+
+- `paper-epoch-004` remains the only active evidence epoch, frozen at
+  `b837374` in the separate operational checkout. M3 is not deployed there.
+- The first deployment of M3 would see pre-existing confirmed dividend rows,
+  so its displayed pool may be nonzero immediately. Nothing spends that pool
+  without a newly created and explicitly approved proposal.
+- The CR-W3 dividend-subtype watch remains unchanged. Do not widen accounting
+  tolerance or create a manual compensating entry.
+
+## 6. Next step
+
+The standing collaboration loop's safe next step is Claude counter-review of
+`b6685b5` and this handoff, or an owner-directed merge after that verification.
+Do not push, merge, deploy, roll the epoch, or begin M4 without a new owner
+instruction. Other unchanged owner decisions are epoch-roll timing, the
+physical-media off-machine backup, and the unidentified `origin/Funny` branch.
+
+## 7. Resume prompt
 
 ```text
-Verify a clean worktree. Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/reference/THREE_SLEEVE_ENGINE_PLAN.md (1.1, 5 M3, 2026-08-13 entry),
-and docs/SESSION_HANDOFF.md. Review the branch
-user/claude/three-sleeve-m3-earmarks-20260813 against main commit by
-commit. Do not merge, deploy, touch the operator database, or roll
-paper-epoch-004 without a new owner instruction.
+Verify the exact branch and clean worktree. Read CLAUDE.md,
+docs/ACTION_PLAN_2026-08-02.md,
+docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md, and
+docs/SESSION_HANDOFF.md. Independently counter-review correction b6685b5
+against submitted commit 7ee4786. Do not push, merge, deploy, touch the
+operational database, roll paper-epoch-004, or begin M4 without a new owner
+instruction.
 ```

@@ -1248,3 +1248,249 @@ def test_audit_log_failure_is_non_fatal_but_never_silent():
 
     messages = [str(w.message) for w in caught]
     assert any("unaudited" in m and "unit_test_probe" in m for m in messages), messages
+
+
+# --- Length is not a rejection reason (owner decision, 2026-08-12).
+#
+# Field failure that afternoon: two complete, valid reviews were discarded by
+# an undocumented, untested 500-character summary cap (actual lengths 554 and
+# 670), and the UI rendered nothing at all, so the feature looked switched off.
+# Every observation in both responses passed every content check. The content
+# checks are what carry the safety here and they read the whole string, so a
+# longer response gets MORE scrutiny, not less.
+
+def _long_summary(target_chars: int) -> str:
+    sentence = "The split spreads capital across several names of differing character. "
+    text = sentence * (target_chars // len(sentence) + 2)
+    return text[:target_chars]
+
+
+def test_long_summary_is_no_longer_rejected(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    summary = _long_summary(700)
+    assert len(summary) > 500, "fixture must exceed the cap that used to exist"
+    payload = _allocation_payload(
+        summary,
+        [{"type": "concentration", "severity": "high", "claim": "Both are semiconductor names.", "tickers": ["NVDA", "AMD"]}],
+    )
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_cls.return_value = mock_client
+        result = ai_advisor.review_allocation_plan(
+            ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {}
+        )
+    assert result is not None
+    assert result.summary == summary
+
+
+def test_long_claim_is_no_longer_dropped(monkeypatch):
+    """Worse than the summary case: a single over-long claim was dropped
+    silently, and if it was the only one, the all-observations-failed rule
+    rejected the entire review."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    claim = "Both of these are semiconductor names and move together. " * 8
+    assert len(claim) > 300, "fixture must exceed the cap that used to exist"
+    payload = _allocation_payload(
+        "This split is concentrated in one industry.",
+        [{"type": "concentration", "severity": "high", "claim": claim, "tickers": ["NVDA", "AMD"]}],
+    )
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_cls.return_value = mock_client
+        result = ai_advisor.review_allocation_plan(
+            ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {}
+        )
+    assert result is not None
+    assert len(result.observations) == 1
+
+
+def test_length_relaxation_did_not_weaken_the_content_checks(monkeypatch):
+    """The point of removing the cap was to stop discarding VALID reviews. A
+    long response that actually breaks a rule must still be rejected -- proven
+    at a length the old cap would have rejected for the wrong reason."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    padding = _long_summary(600)
+    for bad_summary in (
+        padding + " NVDA is 60% of the book.",
+        padding + " Total exposure is $10,000.",
+        padding + " RDDT would round this out.",
+        padding + " You should buy more NVDA.",
+    ):
+        assert len(bad_summary) > 500
+        payload = _allocation_payload(bad_summary, [])
+        with patch("anthropic.Anthropic") as mock_cls:
+            mock_client = MagicMock()
+            mock_client.messages.create.return_value = _fake_response(payload)
+            mock_cls.return_value = mock_client
+            result = ai_advisor.review_allocation_plan(
+                ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {}
+            )
+        assert result is None, f"a content check stopped rejecting: {bad_summary[-40:]!r}"
+
+
+# --- A rejection must be reportable, never a blank screen.
+
+def test_outcome_reports_why_a_summary_was_rejected(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload("NVDA is 60% of the book.", [])
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {}
+        )
+    assert outcome.review is None
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_SUMMARY
+
+
+def test_outcome_reports_when_every_observation_failed(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload(
+        "This split leans on one industry.",
+        [{"type": "concentration", "severity": "high", "claim": "NVDA is 12.5% here.", "tickers": ["NVDA"]}],
+    )
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {}
+        )
+    assert outcome.review is None
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_ALL_OBSERVATIONS
+
+
+def test_outcome_reports_a_failed_call_by_type_without_leaking_its_message(monkeypatch):
+    """The reason string is rendered straight into the page, and an exception
+    message can carry request context."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.side_effect = RuntimeError("secret-bearing detail")
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {}
+        )
+    assert outcome.review is None
+    assert "RuntimeError" in outcome.rejection_reason
+    assert "secret-bearing detail" not in outcome.rejection_reason
+
+
+def test_outcome_reports_unparseable_and_unconfigured(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response("not json at all")
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {}
+        )
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_UNPARSEABLE
+
+    monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    outcome = ai_advisor.review_allocation_outcome(["NVDA"], {"NVDA": 100.0}, {}, {})
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_UNCONFIGURED
+
+
+def test_a_successful_outcome_carries_no_rejection_reason(monkeypatch):
+    """review is None exactly when rejection_reason is set -- the invariant the
+    outcome type exists to hold."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = _allocation_payload("This split leans on one industry.", [])
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA", "AMD"], {"NVDA": 60.0, "AMD": 40.0}, {}, {}
+        )
+    assert outcome.review is not None
+    assert outcome.rejection_reason is None
+
+
+@pytest.mark.parametrize(
+    ("review", "reason"),
+    [
+        (None, None),
+        (
+            ai_advisor.AllocationReview(
+                summary="This split leans on one industry.", observations=()
+            ),
+            ai_advisor.REVIEW_REJECTED_UNPARSEABLE,
+        ),
+    ],
+)
+def test_outcome_rejects_contradictory_states(review, reason):
+    """The public outcome type must enforce the invariant its docstring
+    promises, rather than merely asking every caller to remember it."""
+    with pytest.raises(ValueError):
+        ai_advisor.AllocationReviewOutcome(review, reason, "test-input")
+
+
+def test_outcome_reports_non_object_json_as_unparseable(monkeypatch):
+    """Valid JSON with the wrong root shape is a response-format failure,
+    not an Anthropic call failure attributed to an internal AttributeError."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(json.dumps([]))
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA"], {"NVDA": 100.0}, {"NVDA": 2.0}, {}
+        )
+
+    assert outcome.review is None
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_UNPARSEABLE
+
+
+def test_outcome_distinguishes_no_input_from_missing_credentials(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    outcome = ai_advisor.review_allocation_outcome([], {}, {}, {})
+
+    assert outcome.review is None
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_NO_INPUT
+
+
+@pytest.mark.parametrize("bad_observations", [None, 7, "none"])
+def test_outcome_reports_malformed_observations_field_as_unparseable(
+    monkeypatch, bad_observations
+):
+    """Counter-review AP9CR-001, the field-level generalization of AP9R-003:
+    a well-typed JSON root carrying `observations` as null or a number raised
+    TypeError inside the validator, was caught by the broad except, and was
+    reported as "The call to Claude did not complete (TypeError)" -- but the
+    call completed; the response shape was wrong. A string is included because
+    iterating it silently produced the all-observations-failed reason, which
+    talks about mismatched numbers that never existed."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = json.dumps(
+        {"summary": "This split leans on one industry.", "observations": bad_observations}
+    )
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA"], {"NVDA": 100.0}, {"NVDA": 2.0}, {}
+        )
+    assert outcome.review is None
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_UNPARSEABLE
+
+
+def test_absent_observations_key_still_yields_a_summary_only_review(monkeypatch):
+    """The shape guard must not over-reject: a missing key defaults to [] and
+    a summary-only review remains valid."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    payload = json.dumps({"summary": "This split leans on one industry."})
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(payload)
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA"], {"NVDA": 100.0}, {"NVDA": 2.0}, {}
+        )
+    assert outcome.review is not None
+    assert outcome.review.observations == ()

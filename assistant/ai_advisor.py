@@ -216,8 +216,30 @@ def _ticker_directed_action_detected(text: str, allowed_tickers: set[str]) -> bo
         if _find_scoped_ticker_mention(window, allowed_tickers):
             return True
     return False
-_MAX_SUMMARY_LENGTH = 500
-_MAX_CLAIM_LENGTH = 300
+# Owner decision 2026-08-12: the former _MAX_SUMMARY_LENGTH / _MAX_CLAIM_LENGTH
+# caps are gone. See _validate_allocation_review for why length was never a
+# safety property here.
+
+# Why a review was not shown, in the user's words rather than the code's. The
+# UI renders exactly one of these instead of leaving the screen blank, because
+# "Claude reviewed this and had nothing to say", "the call failed", and "you
+# never asked" are three different facts that used to look identical.
+REVIEW_REJECTED_SUMMARY = (
+    "Claude's opening summary failed its own checks -- it may not contain a "
+    "percentage, a dollar figure, a ticker outside your cart, or advice "
+    "language."
+)
+REVIEW_REJECTED_ALL_OBSERVATIONS = (
+    "Every individual point Claude made failed a check -- most often a number "
+    "that does not match your actual split, or a number attributed to the "
+    "wrong ticker. The summary alone was withheld because on its own it would "
+    "have read as 'reviewed, nothing to flag'."
+)
+REVIEW_REJECTED_UNPARSEABLE = "Claude's response could not be read as a valid review."
+REVIEW_REJECTED_NO_TEXT = "Claude's response arrived empty."
+REVIEW_REJECTED_CALL_FAILED = "The call to Claude did not complete ({error_type})."
+REVIEW_REJECTED_UNCONFIGURED = "No Anthropic credential is configured."
+REVIEW_REJECTED_NO_INPUT = "No allocation split was available to review."
 
 ALLOCATION_REVIEW_SCHEMA = {
     "type": "object",
@@ -255,6 +277,28 @@ class AllocationObservation:
 class AllocationReview:
     summary: str
     observations: tuple[AllocationObservation, ...]
+
+
+@dataclasses.dataclass(frozen=True)
+class AllocationReviewOutcome:
+    """A review, or the reason there isn't one -- never just absence.
+
+    `review` is None exactly when `rejection_reason` is set. Both being None
+    would mean "nothing happened and we don't know why", which is the state
+    this type exists to make unrepresentable.
+    """
+
+    review: AllocationReview | None
+    rejection_reason: str | None
+    input_hash: str
+
+    def __post_init__(self) -> None:
+        if (self.review is None) == (self.rejection_reason is None):
+            raise ValueError(
+                "exactly one of review and rejection_reason must be provided"
+            )
+        if not isinstance(self.input_hash, str) or not self.input_hash:
+            raise ValueError("input_hash must be a non-empty string")
 
 
 def _contains_disallowed_number(text: str, allowed_values_pct: list[float]) -> bool:
@@ -362,7 +406,12 @@ def _mentions_unknown_ticker(text: str, allowed_tickers: set[str]) -> bool:
 
 
 def _validate_allocation_review(
-    raw: dict, cart_tickers: list[str], weights_pct: dict[str, float], volatilities: dict[str, float | None] | None = None,
+    raw: dict,
+    cart_tickers: list[str],
+    weights_pct: dict[str, float],
+    volatilities: dict[str, float | None] | None = None,
+    *,
+    rejection_out: list[str] | None = None,
 ) -> AllocationReview | None:
     """Enforces, in code, what the system prompt only asks for in prose.
     Beyond the original type/severity/ticker-field/number checks, this also:
@@ -388,7 +437,8 @@ def _validate_allocation_review(
     claim entirely about ticker A can't cite ticker B's real number just
     because B is also in the observation's ticker list (independent
     review, 2026-07-31); (5) treats volatility values as legitimate restatable numbers
-    too, not just weights; (6) caps string lengths; (7) drops exact-
+    too, not just weights; (6) applies every content check to the complete
+    model text, whose upstream size is bounded by max_tokens; (7) drops exact-
     duplicate observations; (8) refuses to show a false "all clear" -- if
     the model proposed observations but every single one failed
     validation, the whole response is rejected rather than displaying just
@@ -397,17 +447,44 @@ def _validate_allocation_review(
     cart_set = {t.upper() for t in cart_tickers}
 
     summary = raw.get("summary")
+    # Length is deliberately NOT a rejection reason (owner decision,
+    # 2026-08-12). It never protected anything: the checks that do the real
+    # work -- percentages, dollar figures, unknown tickers, advice language,
+    # per-ticker number attribution -- read the whole string regardless of how
+    # long it is, so a longer summary gets more scrutiny, not less. The old
+    # 500-character cap was an undocumented, untested magic number, and it
+    # discarded two complete real reviews on 2026-08-12 at 554 and 670
+    # characters whose every observation passed every content check. The real
+    # bound is max_tokens on the call itself. The UI renders whatever length
+    # arrives.
     if (
         not isinstance(summary, str)
-        or len(summary) > _MAX_SUMMARY_LENGTH
         or _PERCENT_PATTERN.search(summary)
         or _DOLLAR_PATTERN.search(summary)
         or _mentions_unknown_ticker(summary, cart_set)
         or _contains_action_language(summary, cart_set)
     ):
+        # `rejection_out` is an optional out-collector rather than a changed
+        # return type on purpose: 28 existing test call sites depend on this
+        # function returning AllocationReview | None, and the rule that decides
+        # a rejection must stay in exactly one place. A caller that wants the
+        # reason passes a list; every other caller is unaffected.
+        if rejection_out is not None:
+            rejection_out.append(REVIEW_REJECTED_SUMMARY)
         return None
 
     raw_observations = raw.get("observations", [])
+    # Counter-review AP9CR-001: AP9R-003 guarded the JSON *root* shape, but a
+    # well-typed root carrying a malformed field walked straight past it --
+    # `observations: null` or a number raised TypeError at the loop below,
+    # the caller's broad except caught it, and the user was told "The call to
+    # Claude did not complete (TypeError)". Same dishonesty, one level down:
+    # the call completed fine; the response shape was wrong. An absent key
+    # still defaults to [] (a summary-only review is valid).
+    if not isinstance(raw_observations, list):
+        if rejection_out is not None:
+            rejection_out.append(REVIEW_REJECTED_UNPARSEABLE)
+        return None
     kept_observations = []
     seen = set()
     for obs in raw_observations:
@@ -419,7 +496,12 @@ def _validate_allocation_review(
         tickers = obs.get("tickers")
         if obs_type not in _ALLOWED_OBSERVATION_TYPES or severity not in _ALLOWED_SEVERITIES:
             continue
-        if not isinstance(claim, str) or not isinstance(tickers, list) or len(claim) > _MAX_CLAIM_LENGTH:
+        # Same reasoning as the summary above: a long claim is dropped by the
+        # content checks if it earns it, not for its length. Dropping on length
+        # here is worse than on the summary, because a single over-long claim
+        # silently removes one observation, and if it was the only one the
+        # whole review is rejected by the all-observations-failed rule below.
+        if not isinstance(claim, str) or not isinstance(tickers, list):
             continue
         if not tickers or not all(isinstance(t, str) and t.upper() in cart_set for t in tickers):
             continue
@@ -468,6 +550,8 @@ def _validate_allocation_review(
         # Every proposed observation failed validation -- showing just the
         # summary here would read as "reviewed, nothing to flag" when the
         # truth is "the model's actual observations were all rejected."
+        if rejection_out is not None:
+            rejection_out.append(REVIEW_REJECTED_ALL_OBSERVATIONS)
         return None
 
     return AllocationReview(summary=summary, observations=tuple(kept_observations))
@@ -691,6 +775,20 @@ def _input_hash(*parts) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def allocation_review_input_hash(
+    cart_tickers: list[str],
+    weights_pct: dict[str, float],
+    volatilities: dict[str, float | None],
+    baskets_by_ticker: dict[str, list[str]],
+) -> str:
+    """Stable identity for the exact allocation inputs an AI review covers.
+
+    The Buying page compares this identity on every rerun so commentary
+    validated against an old split can never appear beneath a changed one.
+    """
+    return _input_hash(cart_tickers, weights_pct, volatilities, baskets_by_ticker)
+
+
 def _record_run(
     store: AssistantStore | None,
     function_name: str,
@@ -743,6 +841,21 @@ def review_allocation_plan(
     baskets_by_ticker: dict[str, list[str]],
     store: AssistantStore | None = None,
 ) -> AllocationReview | None:
+    """Backwards-compatible wrapper: the review, or None. Callers that need to
+    TELL THE USER why nothing appeared should use review_allocation_outcome()
+    instead -- a blank screen is not an acceptable way to report a failure."""
+    return review_allocation_outcome(
+        cart_tickers, weights_pct, volatilities, baskets_by_ticker, store=store
+    ).review
+
+
+def review_allocation_outcome(
+    cart_tickers: list[str],
+    weights_pct: dict[str, float],
+    volatilities: dict[str, float | None],
+    baskets_by_ticker: dict[str, list[str]],
+    store: AssistantStore | None = None,
+) -> AllocationReviewOutcome:
     """Structured advisory commentary on the ALREADY-COMPUTED weights_pct --
     concentration, basket overlap, volatility character, diversification.
 
@@ -752,11 +865,20 @@ def review_allocation_plan(
     plus every observation's claim is scanned for a number that isn't one
     of the actual input weights (assistant.ai_advisor._validate_allocation_review) --
     a claim or summary that fails this is dropped/rejected rather than
-    trusted and displayed. Returns None (never raises) if unconfigured, the
-    call fails, the response doesn't parse, or the summary itself fails
-    validation."""
-    if not cart_tickers or not is_ai_advisor_configured():
-        return None
+    trusted and displayed. Never raises: every failure path returns an outcome
+    whose `review` is None and whose `rejection_reason` says, in plain words,
+    what happened -- unconfigured, the call failed, the response did not parse,
+    the summary failed validation, or every observation did. The caller is
+    expected to SHOW that reason; rendering nothing at all is what made a
+    real 2026-08-12 rejection indistinguishable from a feature that was
+    switched off."""
+    input_hash = allocation_review_input_hash(
+        cart_tickers, weights_pct, volatilities, baskets_by_ticker
+    )
+    if not cart_tickers:
+        return AllocationReviewOutcome(None, REVIEW_REJECTED_NO_INPUT, input_hash)
+    if not is_ai_advisor_configured():
+        return AllocationReviewOutcome(None, REVIEW_REJECTED_UNCONFIGURED, input_hash)
 
     import anthropic
 
@@ -768,7 +890,6 @@ def review_allocation_plan(
         baskets = ", ".join(baskets_by_ticker.get(ticker, [])) or "none"
         lines.append(f"- {ticker}: weight={weights_pct.get(ticker, 0.0):.1f}%, volatility={vol_str}, baskets=[{baskets}]")
     detail_block = "\n".join(lines)
-    input_hash = _input_hash(cart_tickers, weights_pct, volatilities, baskets_by_ticker)
     start = time.monotonic()
 
     try:
@@ -800,17 +921,49 @@ def review_allocation_plan(
         text = next((block.text for block in response.content if block.type == "text"), None)
         if not text:
             _record_run(store, "review_allocation_plan", _REVIEW_ALLOCATION_PROMPT_VERSION, input_hash, start, error="no text block in response")
-            return None
-        raw = json.loads(text)
-        result = _validate_allocation_review(raw, cart_tickers, weights_pct, volatilities)
+            return AllocationReviewOutcome(None, REVIEW_REJECTED_NO_TEXT, input_hash)
+        try:
+            raw = json.loads(text)
+        except ValueError:
+            _record_run(store, "review_allocation_plan", _REVIEW_ALLOCATION_PROMPT_VERSION, input_hash, start, error="response was not valid JSON")
+            return AllocationReviewOutcome(None, REVIEW_REJECTED_UNPARSEABLE, input_hash)
+        if not isinstance(raw, dict):
+            _record_run(
+                store,
+                "review_allocation_plan",
+                _REVIEW_ALLOCATION_PROMPT_VERSION,
+                input_hash,
+                start,
+                response=raw,
+                error="response JSON root was not an object",
+            )
+            return AllocationReviewOutcome(None, REVIEW_REJECTED_UNPARSEABLE, input_hash)
+        rejections: list[str] = []
+        result = _validate_allocation_review(
+            raw, cart_tickers, weights_pct, volatilities, rejection_out=rejections
+        )
         _record_run(
             store, "review_allocation_plan", _REVIEW_ALLOCATION_PROMPT_VERSION, input_hash, start,
             response=raw, error=None if result is not None else "failed post-hoc validation",
         )
-        return result
+        if result is not None:
+            return AllocationReviewOutcome(result, None, input_hash)
+        # A None result always has a reason; fall back rather than hand the UI
+        # an empty explanation, which would reintroduce the blank screen.
+        return AllocationReviewOutcome(
+            None,
+            rejections[0] if rejections else REVIEW_REJECTED_UNPARSEABLE,
+            input_hash,
+        )
     except Exception as exc:
         _record_run(store, "review_allocation_plan", _REVIEW_ALLOCATION_PROMPT_VERSION, input_hash, start, error=str(exc))
-        return None
+        # The exception TYPE only. Its message can carry request context, and
+        # this string is rendered straight into the page.
+        return AllocationReviewOutcome(
+            None,
+            REVIEW_REJECTED_CALL_FAILED.format(error_type=type(exc).__name__),
+            input_hash,
+        )
 
 
 def suggest_similar_tickers(

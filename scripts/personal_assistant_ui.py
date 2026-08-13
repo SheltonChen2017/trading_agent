@@ -70,9 +70,10 @@ from assistant.order_reconciler import (
 )
 from assistant.explanations import explain_ticker
 from assistant.ai_advisor import (
+    allocation_review_input_hash,
     curate_recommended_tickers,
     is_ai_advisor_configured,
-    review_allocation_plan,
+    review_allocation_outcome,
     suggest_similar_tickers,
 )
 from assistant.news_summary import (
@@ -2041,6 +2042,10 @@ if page == "Buying":
                     t: format_evidence_summary(compute_similarity_evidence(cart, t)) for t in all_candidate_tickers
                 }
                 st.session_state["watchlist_ai_suggestions"] = {
+                    # The exact cart these suggestions and their measured
+                    # evidence were computed against (counter-review
+                    # AP9CR-002) -- compared on every rerun below.
+                    "cart": sorted({t.upper() for t in cart}),
                     "from_universe": from_universe,
                     "verified": wildcard,
                     "dropped": dropped,
@@ -2055,6 +2060,21 @@ if page == "Buying":
     watchlist_results = st.session_state.get("watchlist_results", {})
 
     ai_suggestions = st.session_state.get("watchlist_ai_suggestions")
+    # Counter-review AP9CR-002 -- the same stale-state defect AP9R-001 fixed
+    # one block below, in the block directly above it: these suggestions and
+    # their measured-evidence columns were computed against the cart at
+    # Check-cart time, but the expander header interpolates the CURRENT cart.
+    # Edit the cart without re-clicking and old evidence renders under a
+    # header naming tickers it was never measured against. A stored state
+    # with no cart key (legacy) fails safe as stale.
+    if ai_suggestions and ai_suggestions.get("cart") != sorted({t.upper() for t in cart}):
+        st.warning(
+            "The cart changed since Claude suggested these tickers. The old "
+            "suggestions are hidden because their measured comparisons were "
+            "computed against the previous cart. Click **Check cart** to "
+            "request fresh suggestions."
+        )
+        ai_suggestions = None
     if ai_suggestions:
         with st.expander(f"Claude's own suggestions related to {', '.join(cart)} (with measured comparison)", expanded=False):
             reason_by_ticker = ai_suggestions["reason_by_ticker"]
@@ -2150,7 +2170,7 @@ if page == "Buying":
         st.subheader("Inverse-volatility purchase split")
         st.dataframe(
             [{"Ticker": t, "Suggested %": w} for t, w in sorted(weights.items(), key=lambda kv: -kv[1])],
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
         st.caption(
@@ -2162,15 +2182,45 @@ if page == "Buying":
             "holdings elsewhere in the account)."
         )
 
+        baskets_by_ticker = {
+            t: [name for name, tickers in BASKETS.items() if t in tickers]
+            for t in weights
+        }
+        current_review_input_hash = allocation_review_input_hash(
+            list(weights.keys()), weights, vols, baskets_by_ticker
+        )
         if check_cart_clicked and want_allocation_review:
-            baskets_by_ticker = {t: [name for name, tickers in BASKETS.items() if t in tickers] for t in weights}
-            st.session_state["watchlist_ai_review"] = review_allocation_plan(
+            st.session_state["watchlist_ai_review_outcome"] = review_allocation_outcome(
                 list(weights.keys()), weights, vols, baskets_by_ticker, store=store
             )
         elif not want_allocation_review:
-            st.session_state["watchlist_ai_review"] = None
+            st.session_state["watchlist_ai_review_outcome"] = None
 
-        ai_review = st.session_state.get("watchlist_ai_review")
+        outcome = st.session_state.get("watchlist_ai_review_outcome")
+        # Owner-reported 2026-08-12: this used to render NOTHING when the
+        # review came back rejected -- identical to never having asked. Two
+        # real reviews were discarded that afternoon (554- and 670-character
+        # summaries against an undocumented 500-character cap, since removed)
+        # and the page stayed blank both times, so the feature was
+        # indistinguishable from one that was switched off. Say what happened.
+        outcome_matches_split = (
+            outcome is not None
+            and getattr(outcome, "input_hash", None) == current_review_input_hash
+        )
+        if outcome is not None and not outcome_matches_split:
+            st.warning(
+                "The split changed since Claude reviewed it. The old review is "
+                "hidden because its checked numbers no longer describe the split "
+                "above. Click **Check cart** to request a fresh review."
+            )
+        elif outcome is not None and outcome.review is None:
+            st.warning(
+                "Claude's review of this split was requested but is not being "
+                f"shown. {outcome.rejection_reason} The split above is "
+                "unaffected -- it is computed by this project's own code and "
+                "never depended on the AI review."
+            )
+        ai_review = outcome.review if outcome_matches_split else None
         if ai_review:
             with st.expander("AI review of this split (Claude)", expanded=False):
                 st.write(ai_review.summary)
@@ -2183,7 +2233,7 @@ if page == "Buying":
                             }
                             for o in ai_review.observations
                         ],
-                        use_container_width=True, hide_index=True,
+                        width="stretch", hide_index=True,
                     )
                 st.caption(
                     "Advisory commentary only -- does not change the weights shown above. Every number "

@@ -140,6 +140,25 @@ def _plant_fill_event(store, proposal_id, fill_qty):
         )
 
 
+def _plant_cumulative_fill_event(store, proposal_id, filled_qty):
+    """Plant the shape written by broker polling (no incremental fill_qty)."""
+    with store._connect() as connection:  # test-only: plant broker history
+        connection.execute(
+            "INSERT INTO broker_orders(order_id, proposal_id, submitted_at, status, payload_json) "
+            "VALUES (?, ?, ?, ?, '{}')",
+            (f"order-{proposal_id}", proposal_id, _NOW.isoformat(), "canceled"),
+        )
+        connection.execute(
+            "INSERT INTO broker_order_events(event_id, order_id, proposal_id, event_type, "
+            "event_at, status, filled_qty, filled_avg_price, payload_json) "
+            "VALUES (?, ?, ?, 'poll_reconciliation', ?, 'canceled', ?, 30.0, '{}')",
+            (
+                f"event-{proposal_id}", f"order-{proposal_id}", proposal_id,
+                _NOW.isoformat(), filled_qty,
+            ),
+        )
+
+
 # --- income measurement ----------------------------------------------------
 
 
@@ -305,12 +324,12 @@ def test_the_storage_transaction_itself_enforces_the_pool(tmp_path):
 
     first = store.create_dividend_earmark_with_proposal(
         _proposal("tp_direct_1"), amount_text="300", route=ROUTE_REINVEST,
-        ticker="NVDL", confirmed_income_text="500", now=_NOW.isoformat(),
+        ticker="NVDL", now=_NOW.isoformat(),
     )
     assert first["created"] is True
     second = store.create_dividend_earmark_with_proposal(
         _proposal("tp_direct_2"), amount_text="300", route=ROUTE_REINVEST,
-        ticker="SOXL", confirmed_income_text="500", now=_NOW.isoformat(),
+        ticker="SOXL", now=_NOW.isoformat(),
     )
     assert second["created"] is False
     assert "exceeds the available dividend pool" in second["reason"]
@@ -318,6 +337,97 @@ def test_the_storage_transaction_itself_enforces_the_pool(tmp_path):
     assert store.get_proposal("tp_direct_2") is None, (
         "a pool refusal must not leave a proposal row behind"
     )
+
+
+def test_storage_refuses_to_create_without_journal_income(tmp_path):
+    """The storage fence must derive money from durable books."""
+    store = _store(tmp_path)
+    proposal = {
+        "proposal_id": "tp_invented_pool",
+        "created_at": _NOW.isoformat(),
+        "expires_at": (_NOW + timedelta(minutes=15)).isoformat(),
+        "status": "proposed",
+        "idempotency_key": "tp_invented_pool-2026-08-13",
+    }
+
+    result = store.create_dividend_earmark_with_proposal(
+        proposal, amount_text="300", route=ROUTE_REINVEST,
+        ticker="NVDL", now=_NOW.isoformat(),
+    )
+
+    assert result["created"] is False
+    assert store.list_dividend_earmarks() == []
+    assert store.get_proposal("tp_invented_pool") is None
+
+
+def test_unknown_earmark_status_holds_dollars_in_the_read_view(tmp_path):
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="500")
+    proposal_id = _create(store)["proposal"].proposal_id
+    with store._connect() as connection:  # simulate corrupt/future durable state
+        connection.execute(
+            "UPDATE sleeve_dividend_earmarks SET status = 'future_state' "
+            "WHERE proposal_id = ?", (proposal_id,),
+        )
+
+    status = dividend_reinvest_status(store)
+
+    assert status["available_total"] == "200"
+    assert status["earmarks"][0]["effective_disposition"] == "hold"
+
+
+def test_storage_fence_counts_unknown_earmark_status_as_unavailable(tmp_path):
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="500")
+    proposal_id = _create(store)["proposal"].proposal_id
+    with store._connect() as connection:  # simulate corrupt/future durable state
+        connection.execute(
+            "UPDATE sleeve_dividend_earmarks SET status = 'future_state' "
+            "WHERE proposal_id = ?", (proposal_id,),
+        )
+    proposal = {
+        "proposal_id": "tp_after_unknown_earmark",
+        "created_at": _NOW.isoformat(),
+        "expires_at": (_NOW + timedelta(minutes=15)).isoformat(),
+        "status": "proposed",
+        "idempotency_key": "tp_after_unknown_earmark-2026-08-13",
+    }
+
+    result = store.create_dividend_earmark_with_proposal(
+        proposal, amount_text="300", route=ROUTE_REINVEST,
+        ticker="NVDL", now=_NOW.isoformat(),
+    )
+
+    assert result["created"] is False
+    assert store.get_proposal("tp_after_unknown_earmark") is None
+
+
+def test_nonpositive_stored_earmark_amount_fails_closed(tmp_path):
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="500")
+    proposal_id = _create(store)["proposal"].proposal_id
+    with store._connect() as connection:  # simulate corrupt durable money
+        connection.execute(
+            "UPDATE sleeve_dividend_earmarks SET amount_text = '-300' "
+            "WHERE proposal_id = ?", (proposal_id,),
+        )
+
+    with pytest.raises(SleeveReinvestError):
+        dividend_reinvest_status(store)
+
+    proposal = {
+        "proposal_id": "tp_after_bad_amount",
+        "created_at": _NOW.isoformat(),
+        "expires_at": (_NOW + timedelta(minutes=15)).isoformat(),
+        "status": "proposed",
+        "idempotency_key": "tp_after_bad_amount-2026-08-13",
+    }
+    result = store.create_dividend_earmark_with_proposal(
+        proposal, amount_text="100", route=ROUTE_REINVEST,
+        ticker="NVDL", now=_NOW.isoformat(),
+    )
+    assert result["created"] is False
+    assert store.get_proposal("tp_after_bad_amount") is None
 
 
 def test_resolve_is_exactly_once(tmp_path):
@@ -489,6 +599,25 @@ def test_a_canceled_proposal_with_a_partial_fill_consumes_not_releases(tmp_path)
     assert transitions[0]["action"] == "consumed"
     assert "recorded fill quantity" in transitions[0]["reason"]
     assert dividend_reinvest_status(store)["available_total"] == "200"
+
+
+def test_poll_only_cumulative_fill_consumes_a_canceled_earmark(tmp_path):
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="500")
+    proposal_id = _create(store)["proposal"].proposal_id
+    _plant_cumulative_fill_event(store, proposal_id, filled_qty=2)
+    _force_status(store, proposal_id, CANCELED)
+
+    transitions = reconcile_dividend_earmarks(store, now=_NOW)
+
+    assert transitions[0]["action"] == "consumed"
+    assert dividend_reinvest_status(store)["available_total"] == "200"
+
+
+def test_fill_evidence_overrides_a_nominal_release_status():
+    # The lifecycle transition table permits BROKER_REJECTED after a partial
+    # fill. Once any share filled, the dividend dollars cannot return to pool.
+    assert earmark_disposition(BROKER_REJECTED, fill_evidence=True) == "consume"
 
 
 def test_a_canceled_proposal_with_no_fill_releases(tmp_path):
@@ -711,3 +840,35 @@ def test_cli_propose_creates_the_proposal_and_earmark(
     earmarks = store.list_dividend_earmarks()
     assert len(earmarks) == 1 and earmarks[0]["status"] == "active"
     assert store.get_proposal(earmarks[0]["proposal_id"])["status"] == PROPOSED
+
+
+def test_cli_propose_json_stays_valid_when_reconcile_emits_a_transition(
+    tmp_path, monkeypatch, capsys
+):
+    import argparse
+    import json
+    from decimal import Decimal
+
+    import scripts.run_personal_assistant as cli
+    import assistant.sleeve_notifications as sleeve_notifications
+
+    store = _store(tmp_path)
+    _seed_dividend(store, amount="800")
+    old_id = _create(store, ticker="SOXL")["proposal"].proposal_id
+    _force_status(store, old_id, EXPIRED)
+    monkeypatch.setattr(cli, "load_policy", lambda *_args, **_kw: _policy())
+    monkeypatch.setattr(cli, "_packet", lambda **_kw: _packet())
+    monkeypatch.setattr(
+        sleeve_notifications,
+        "_recorded_close_fetcher",
+        lambda _store, **_kw: (lambda _tickers: {"NVDL": Decimal("30")}),
+    )
+
+    cli.command_sleeve_reinvest_propose(
+        argparse.Namespace(ticker="NVDL", amount="300", json=True, policy=None),
+        store,
+    )
+
+    payload = json.loads(capsys.readouterr().out)
+    assert payload["earmark_transitions"][0]["proposal_id"] == old_id
+    assert payload["earmark_transitions"][0]["action"] == "released"

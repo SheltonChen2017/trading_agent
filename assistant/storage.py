@@ -4632,25 +4632,21 @@ class AssistantStore:
         amount_text: str,
         route: str,
         ticker: str,
-        confirmed_income_text: str,
         now: str,
     ) -> dict[str, Any]:
         """Atomically earmark dividend dollars and persist their proposal.
 
-        One BEGIN IMMEDIATE transaction re-derives the earmarked total from
-        the table itself and refuses when `amount_text` exceeds
-        confirmed income minus (active + consumed) earmarks -- released
-        earmarks return their dollars to the pool by not counting. The
+        One BEGIN IMMEDIATE transaction re-derives BOTH confirmed corporate-
+        action dividend income from the durable journal and the earmarked
+        total from the earmark table. It refuses when `amount_text` exceeds
+        confirmed income minus every earmark not explicitly released --
+        unknown durable states hold money fail-closed. Released earmarks
+        return their dollars to the pool by not counting. The
         proposal insert and the earmark insert commit together or neither
         does, so an earmark can never exist without its proposal and a
-        dividend-funded proposal can never exist without its earmark.
-
-        `confirmed_income_text` is the caller-measured confirmed dividend
-        total. The journal is append-only, so a concurrent dividend append
-        can only GROW the true pool -- checking against a slightly stale
-        income total refuses conservatively, never over-spends. Concurrent
-        earmark creation is what actually races, and BEGIN IMMEDIATE
-        serializes it against this same re-derivation.
+        dividend-funded proposal can never exist without its earmark. The
+        storage fence does not accept a caller assertion about available
+        money.
 
         Returns {"created": True, "available_text": ...} on success, or
         {"created": False, "reason": ...} -- never a partial write.
@@ -4658,26 +4654,57 @@ class AssistantStore:
         amount = to_decimal(amount_text, name="earmark amount")
         if amount <= 0:
             return {"created": False, "reason": "earmark amount must be positive"}
-        confirmed_income = to_decimal(
-            confirmed_income_text, name="confirmed dividend income"
-        )
         payload = json.dumps(proposal, sort_keys=True)
         connection = self._open_database(self.path)
         try:
             connection.execute("BEGIN IMMEDIATE")
+            income_rows = connection.execute(
+                """
+                SELECT p.amount, t.transaction_id
+                FROM journal_transactions t
+                JOIN journal_postings p
+                  ON p.transaction_id = t.transaction_id
+                WHERE t.source = 'corporate_action'
+                  AND p.account = 'INCOME:DIVIDENDS'
+                """
+            ).fetchall()
+            confirmed_income = Decimal(0)
+            for row in income_rows:
+                income = -to_decimal(
+                    row["amount"], name="stored dividend posting amount"
+                )
+                if income < 0:
+                    connection.rollback()
+                    return {
+                        "created": False,
+                        "reason": (
+                            "a positive INCOME:DIVIDENDS posting exists "
+                            f"(transaction {row['transaction_id']!r}); refusing "
+                            "to create a dividend-funded proposal"
+                        ),
+                    }
+                confirmed_income += income
             rows = connection.execute(
                 """
                 SELECT amount_text FROM sleeve_dividend_earmarks
-                WHERE status IN ('active', 'consumed')
+                WHERE status != 'released'
                 """
             ).fetchall()
-            earmarked = sum(
-                (
-                    to_decimal(row["amount_text"], name="stored earmark amount")
-                    for row in rows
-                ),
-                Decimal(0),
-            )
+            earmarked = Decimal(0)
+            for row in rows:
+                stored_amount = to_decimal(
+                    row["amount_text"], name="stored earmark amount"
+                )
+                if stored_amount <= 0:
+                    connection.rollback()
+                    return {
+                        "created": False,
+                        "reason": (
+                            "a nonpositive stored dividend earmark exists; "
+                            "refusing to create another dividend-funded proposal"
+                        ),
+                    }
+                earmarked += stored_amount
             available = confirmed_income - earmarked
             if amount > available:
                 connection.rollback()

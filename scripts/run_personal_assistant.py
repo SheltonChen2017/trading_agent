@@ -1344,11 +1344,12 @@ def command_sleeve_reinvest_propose(args, store: AssistantStore) -> None:
         transitions = reconcile_dividend_earmarks(store)
     except SleeveReinvestError as exc:
         raise SystemExit(f"Cannot reconcile dividend earmarks: {exc}") from exc
-    for transition in transitions:
-        print(
-            f"  earmark {transition['proposal_id']}: {transition['action']} "
-            f"({transition['reason']})"
-        )
+    if not args.json:
+        for transition in transitions:
+            print(
+                f"  earmark {transition['proposal_id']}: {transition['action']} "
+                f"({transition['reason']})"
+            )
 
     ticker = args.ticker.strip().upper()
     prices = _recorded_close_fetcher(store)([ticker])
@@ -1372,6 +1373,7 @@ def command_sleeve_reinvest_propose(args, store: AssistantStore) -> None:
         payload = proposal.to_dict()
         payload["route"] = result["route"]
         payload["earmark_amount_text"] = result["earmark_amount_text"]
+        payload["earmark_transitions"] = transitions
         print(json.dumps(payload, indent=2, sort_keys=True))
         return
     intent = proposal.intent

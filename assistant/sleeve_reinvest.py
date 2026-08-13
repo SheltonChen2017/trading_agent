@@ -28,14 +28,16 @@ once:
   executed, unknown or missing rows) -- ambiguity reserves more and
   permits less, never the reverse.
 
-A canceled or broker-expired proposal releases only when the broker order
-history shows ZERO fill quantity; any recorded fill consumes the whole
-earmark instead, because partially-spent dividend dollars returning to the
-pool would be the double-spend this table exists to prevent. The earmark is
-the proposal-time notional (shares x reference price); a market-order fill
-can deviate from it, and the account's cash remains the authority for what
-was actually paid -- the earmark bounds proposal creation, it does not
-restate broker accounting.
+Any recorded fill evidence overrides the proposal's terminal label and
+consumes the whole earmark. This covers poll-only cumulative fills and even
+a nominal rejection after a partial-fill state; partially-spent dividend
+dollars returning to the pool would be the double-spend this table exists
+to prevent. A canceled or broker-expired proposal releases only when the
+broker order history shows zero fill quantity. The earmark is the proposal-
+time notional (shares x reference price); a market-order fill can deviate
+from it, and the account's cash remains the authority for what was actually
+paid -- the earmark bounds proposal creation, it does not restate broker
+accounting.
 
 Status reporting derives each active earmark's EFFECTIVE disposition from
 the proposal's current status without writing, so the read-only status
@@ -82,11 +84,11 @@ EVIDENCE_STATUS_DECLINE_ADD = "sleeve_decline_review_add"
 ROUTE_REINVEST = "reinvest"
 ROUTE_DECLINE_ADD = "decline_review_add"
 
-# Terminal proposal statuses that PROVE no dividend dollar was spent: policy
-# refusal, validation failure, confirmed non-submission, broker rejection,
-# expiry before approval, and dismissal. `canceled`/`broker_expired` are
-# deliberately absent -- they are terminal but fill-dependent (a partial fill
-# before cancellation spent real dollars) and are classified per proposal in
+# Terminal proposal statuses that ordinarily demonstrate no dividend dollar
+# was spent: policy refusal, validation failure, confirmed non-submission,
+# broker rejection, expiry before approval, and dismissal. Recorded fill
+# evidence still overrides every label. `canceled`/`broker_expired` are
+# explicitly fill-dependent and are classified per proposal in
 # earmark_disposition().
 EARMARK_RELEASE_STATUSES: tuple[str, ...] = (
     BLOCKED,
@@ -103,11 +105,17 @@ EARMARK_FILL_DEPENDENT_STATUSES: tuple[str, ...] = (CANCELED, BROKER_EXPIRED)
 def earmark_disposition(proposal_status: object, *, fill_evidence: bool) -> str:
     """'release', 'consume', or 'hold' for one earmark's proposal status.
 
-    Fail-closed direction: every status this function has never seen -- a
-    future lifecycle addition, None, a non-string -- HOLDS the earmark. A
-    held dollar is recoverable by reconciliation; a wrongly released dollar
-    is a double-spend.
+    Fail-closed direction: fill evidence always consumes. Without such
+    evidence, every status this function has never seen -- a future lifecycle
+    addition, None, a non-string -- HOLDS the earmark. A held dollar is
+    recoverable by reconciliation; a wrongly released dollar is a double-spend.
     """
+    # Fill evidence outranks the lifecycle label. Polling can observe a
+    # cumulative partial fill on the same update that reports cancellation,
+    # expiry, or rejection; returning those dollars to the pool would spend
+    # them twice. This also fails closed for a future terminal status.
+    if fill_evidence:
+        return "consume"
     if not isinstance(proposal_status, str):
         return "hold"
     if proposal_status in EARMARK_CONSUME_STATUSES:
@@ -120,20 +128,23 @@ def earmark_disposition(proposal_status: object, *, fill_evidence: bool) -> str:
 
 
 def _has_fill_evidence(store: AssistantStore, proposal_id: str) -> bool:
-    """True when any broker order event recorded a positive fill quantity.
+    """True when any broker event records credible fill evidence.
 
-    Unreadable fill quantities count as evidence (hold/consume direction):
-    corrupt fill data must not release dividend dollars.
+    Stream events carry incremental ``fill_qty`` while poll reconciliation
+    carries cumulative ``filled_qty``. Either non-zero value proves spending.
+    Unreadable or negative quantities also count as evidence (consume
+    direction): corrupt fill data must never release dividend dollars.
     """
     for event in store.list_broker_order_events(proposal_id=proposal_id):
-        fill_qty = event.get("fill_qty")
-        if fill_qty in (None, "", 0):
-            continue
-        try:
-            if to_decimal(fill_qty, name="fill quantity") > 0:
+        for field in ("fill_qty", "filled_qty"):
+            quantity = event.get(field)
+            if quantity in (None, ""):
+                continue
+            try:
+                if to_decimal(quantity, name=f"broker event {field}") != 0:
+                    return True
+            except ValueError:
                 return True
-        except ValueError:
-            return True
     return False
 
 
@@ -216,11 +227,7 @@ def reconcile_dividend_earmarks(
             )
             continue
         status = proposal.get("status")
-        fill_evidence = (
-            _has_fill_evidence(store, proposal_id)
-            if status in EARMARK_FILL_DEPENDENT_STATUSES
-            else False
-        )
+        fill_evidence = _has_fill_evidence(store, proposal_id)
         disposition = earmark_disposition(status, fill_evidence=fill_evidence)
         if disposition == "hold":
             continue
@@ -256,7 +263,19 @@ def dividend_reinvest_status(store: AssistantStore) -> dict:
     consumed_total = Decimal(0)
     released_total = Decimal(0)
     for row in store.list_dividend_earmarks():
-        amount = to_decimal(row["amount_text"], name="stored earmark amount")
+        try:
+            amount = to_decimal(row["amount_text"], name="stored earmark amount")
+        except ValueError as exc:
+            raise SleeveReinvestError(
+                f"earmark {row.get('proposal_id')!r} has an invalid amount; "
+                "refusing to measure the dividend pool"
+            ) from exc
+        if amount <= 0:
+            raise SleeveReinvestError(
+                f"earmark {row.get('proposal_id')!r} has nonpositive amount "
+                f"{row.get('amount_text')!r}; refusing to measure the "
+                "dividend pool"
+            )
         if row["status"] == "active":
             proposal = store.get_proposal(row["proposal_id"])
             if proposal is None:
@@ -264,16 +283,18 @@ def dividend_reinvest_status(store: AssistantStore) -> dict:
                 proposal_status = None
             else:
                 proposal_status = proposal.get("status")
-                fill_evidence = (
-                    _has_fill_evidence(store, row["proposal_id"])
-                    if proposal_status in EARMARK_FILL_DEPENDENT_STATUSES
-                    else False
-                )
+                fill_evidence = _has_fill_evidence(store, row["proposal_id"])
                 effective = earmark_disposition(
                     proposal_status, fill_evidence=fill_evidence
                 )
-        else:
+        elif row["status"] in ("released", "consumed"):
             effective = row["status"]
+            proposal_status = None
+        else:
+            # A future or corrupt durable status cannot make money available.
+            # It remains visibly distinct in `status` while its effective
+            # disposition fails closed to hold.
+            effective = "hold"
             proposal_status = None
         if effective in ("hold", "consume", "consumed"):
             unavailable_total += amount
@@ -504,7 +525,6 @@ def generate_dividend_reinvest_proposal(
         amount_text=decimal_text(earmark_amount),
         route=route,
         ticker=ticker_upper,
-        confirmed_income_text=status["confirmed_income_total"],
         now=at.isoformat(),
     )
     if not result.get("created"):

@@ -18,7 +18,9 @@ from assistant.ai_advisor import (
     AllocationReview,
     AllocationReviewOutcome,
     REVIEW_REJECTED_ALL_OBSERVATIONS,
+    allocation_review_input_hash,
 )
+from config import BASKETS
 
 
 _APP_PATH = Path(__file__).resolve().parents[1] / "scripts" / "personal_assistant_ui.py"
@@ -72,6 +74,20 @@ def _result_row(vol: float, price: float) -> dict:
 _REVIEW_CHECKBOX = "Get an AI review of the purchase split with Claude"
 
 
+def _bound_outcome(review=None, rejection_reason=None) -> AllocationReviewOutcome:
+    weights = {"NVDA": 66.7, "AMD": 33.3}
+    vols = {"NVDA": 2.0, "AMD": 4.0}
+    baskets = {
+        ticker: [name for name, members in BASKETS.items() if ticker in members]
+        for ticker in weights
+    }
+    return AllocationReviewOutcome(
+        review,
+        rejection_reason,
+        allocation_review_input_hash(list(weights), weights, vols, baskets),
+    )
+
+
 def _buying_app(outcome, *, want_review: bool = True) -> AppTest:
     """Drive the page the way a user reaches this state.
 
@@ -104,7 +120,7 @@ def _buying_app(outcome, *, want_review: bool = True) -> AppTest:
 def test_rejected_review_explains_itself_instead_of_rendering_nothing(
     _offline_buying_environment,
 ):
-    app = _buying_app(AllocationReviewOutcome(None, REVIEW_REJECTED_ALL_OBSERVATIONS))
+    app = _buying_app(_bound_outcome(None, REVIEW_REJECTED_ALL_OBSERVATIONS))
 
     assert not app.exception
     # Prove the branch under test actually rendered. Without this, every
@@ -132,7 +148,7 @@ def test_successful_review_renders_and_warns_about_nothing(
             ),
         ),
     )
-    app = _buying_app(AllocationReviewOutcome(review, None))
+    app = _buying_app(_bound_outcome(review, None))
 
     assert not app.exception
     # Prove the branch under test actually rendered. Without this, every
@@ -156,3 +172,25 @@ def test_never_asking_produces_neither_a_review_nor_a_warning(
     assert "Inverse-volatility purchase split" in [s.value for s in app.subheader]
     warnings = "\n".join(element.value for element in app.warning)
     assert "is not being shown" not in warnings
+
+
+def test_review_is_not_displayed_against_a_changed_split(
+    _offline_buying_environment,
+):
+    """An AI claim that was checked against one split must never remain under
+    a different split after a slider rerun."""
+    summary = "This is the review of the original split."
+    review = AllocationReview(summary=summary, observations=())
+    app = _buying_app(_bound_outcome(review, None))
+    assert summary in [element.value for element in app.markdown]
+
+    slider = next(
+        s for s in app.slider if s.label == "Max weight per ticker in the split (%)"
+    )
+    slider.set_value(50.0)
+    app.run()
+
+    assert not app.exception
+    warnings = "\n".join(element.value for element in app.warning)
+    assert "split changed since Claude reviewed it" in warnings
+    assert summary not in [element.value for element in app.markdown]

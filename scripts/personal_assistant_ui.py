@@ -70,6 +70,7 @@ from assistant.order_reconciler import (
 )
 from assistant.explanations import explain_ticker
 from assistant.ai_advisor import (
+    allocation_review_input_hash,
     curate_recommended_tickers,
     is_ai_advisor_configured,
     review_allocation_outcome,
@@ -2135,7 +2136,7 @@ if page == "Buying":
         st.subheader("Inverse-volatility purchase split")
         st.dataframe(
             [{"Ticker": t, "Suggested %": w} for t, w in sorted(weights.items(), key=lambda kv: -kv[1])],
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
         st.caption(
@@ -2147,8 +2148,14 @@ if page == "Buying":
             "holdings elsewhere in the account)."
         )
 
+        baskets_by_ticker = {
+            t: [name for name, tickers in BASKETS.items() if t in tickers]
+            for t in weights
+        }
+        current_review_input_hash = allocation_review_input_hash(
+            list(weights.keys()), weights, vols, baskets_by_ticker
+        )
         if check_cart_clicked and want_allocation_review:
-            baskets_by_ticker = {t: [name for name, tickers in BASKETS.items() if t in tickers] for t in weights}
             st.session_state["watchlist_ai_review_outcome"] = review_allocation_outcome(
                 list(weights.keys()), weights, vols, baskets_by_ticker, store=store
             )
@@ -2162,14 +2169,24 @@ if page == "Buying":
         # summaries against an undocumented 500-character cap, since removed)
         # and the page stayed blank both times, so the feature was
         # indistinguishable from one that was switched off. Say what happened.
-        if outcome is not None and outcome.review is None:
+        outcome_matches_split = (
+            outcome is not None
+            and getattr(outcome, "input_hash", None) == current_review_input_hash
+        )
+        if outcome is not None and not outcome_matches_split:
+            st.warning(
+                "The split changed since Claude reviewed it. The old review is "
+                "hidden because its checked numbers no longer describe the split "
+                "above. Click **Check cart** to request a fresh review."
+            )
+        elif outcome is not None and outcome.review is None:
             st.warning(
                 "Claude's review of this split was requested but is not being "
                 f"shown. {outcome.rejection_reason} The split above is "
                 "unaffected -- it is computed by this project's own code and "
                 "never depended on the AI review."
             )
-        ai_review = outcome.review if outcome is not None else None
+        ai_review = outcome.review if outcome_matches_split else None
         if ai_review:
             with st.expander("AI review of this split (Claude)", expanded=False):
                 st.write(ai_review.summary)
@@ -2182,7 +2199,7 @@ if page == "Buying":
                             }
                             for o in ai_review.observations
                         ],
-                        use_container_width=True, hide_index=True,
+                        width="stretch", hide_index=True,
                     )
                 st.caption(
                     "Advisory commentary only -- does not change the weights shown above. Every number "

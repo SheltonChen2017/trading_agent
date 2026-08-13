@@ -239,6 +239,7 @@ REVIEW_REJECTED_UNPARSEABLE = "Claude's response could not be read as a valid re
 REVIEW_REJECTED_NO_TEXT = "Claude's response arrived empty."
 REVIEW_REJECTED_CALL_FAILED = "The call to Claude did not complete ({error_type})."
 REVIEW_REJECTED_UNCONFIGURED = "No Anthropic credential is configured."
+REVIEW_REJECTED_NO_INPUT = "No allocation split was available to review."
 
 ALLOCATION_REVIEW_SCHEMA = {
     "type": "object",
@@ -288,7 +289,16 @@ class AllocationReviewOutcome:
     """
 
     review: AllocationReview | None
-    rejection_reason: str | None = None
+    rejection_reason: str | None
+    input_hash: str
+
+    def __post_init__(self) -> None:
+        if (self.review is None) == (self.rejection_reason is None):
+            raise ValueError(
+                "exactly one of review and rejection_reason must be provided"
+            )
+        if not isinstance(self.input_hash, str) or not self.input_hash:
+            raise ValueError("input_hash must be a non-empty string")
 
 
 def _contains_disallowed_number(text: str, allowed_values_pct: list[float]) -> bool:
@@ -427,7 +437,8 @@ def _validate_allocation_review(
     claim entirely about ticker A can't cite ticker B's real number just
     because B is also in the observation's ticker list (independent
     review, 2026-07-31); (5) treats volatility values as legitimate restatable numbers
-    too, not just weights; (6) caps string lengths; (7) drops exact-
+    too, not just weights; (6) applies every content check to the complete
+    model text, whose upstream size is bounded by max_tokens; (7) drops exact-
     duplicate observations; (8) refuses to show a false "all clear" -- if
     the model proposed observations but every single one failed
     validation, the whole response is rejected rather than displaying just
@@ -753,6 +764,20 @@ def _input_hash(*parts) -> str:
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
 
 
+def allocation_review_input_hash(
+    cart_tickers: list[str],
+    weights_pct: dict[str, float],
+    volatilities: dict[str, float | None],
+    baskets_by_ticker: dict[str, list[str]],
+) -> str:
+    """Stable identity for the exact allocation inputs an AI review covers.
+
+    The Buying page compares this identity on every rerun so commentary
+    validated against an old split can never appear beneath a changed one.
+    """
+    return _input_hash(cart_tickers, weights_pct, volatilities, baskets_by_ticker)
+
+
 def _record_run(
     store: AssistantStore | None,
     function_name: str,
@@ -836,8 +861,13 @@ def review_allocation_outcome(
     expected to SHOW that reason; rendering nothing at all is what made a
     real 2026-08-12 rejection indistinguishable from a feature that was
     switched off."""
-    if not cart_tickers or not is_ai_advisor_configured():
-        return AllocationReviewOutcome(None, REVIEW_REJECTED_UNCONFIGURED)
+    input_hash = allocation_review_input_hash(
+        cart_tickers, weights_pct, volatilities, baskets_by_ticker
+    )
+    if not cart_tickers:
+        return AllocationReviewOutcome(None, REVIEW_REJECTED_NO_INPUT, input_hash)
+    if not is_ai_advisor_configured():
+        return AllocationReviewOutcome(None, REVIEW_REJECTED_UNCONFIGURED, input_hash)
 
     import anthropic
 
@@ -849,7 +879,6 @@ def review_allocation_outcome(
         baskets = ", ".join(baskets_by_ticker.get(ticker, [])) or "none"
         lines.append(f"- {ticker}: weight={weights_pct.get(ticker, 0.0):.1f}%, volatility={vol_str}, baskets=[{baskets}]")
     detail_block = "\n".join(lines)
-    input_hash = _input_hash(cart_tickers, weights_pct, volatilities, baskets_by_ticker)
     start = time.monotonic()
 
     try:
@@ -881,12 +910,23 @@ def review_allocation_outcome(
         text = next((block.text for block in response.content if block.type == "text"), None)
         if not text:
             _record_run(store, "review_allocation_plan", _REVIEW_ALLOCATION_PROMPT_VERSION, input_hash, start, error="no text block in response")
-            return AllocationReviewOutcome(None, REVIEW_REJECTED_NO_TEXT)
+            return AllocationReviewOutcome(None, REVIEW_REJECTED_NO_TEXT, input_hash)
         try:
             raw = json.loads(text)
         except ValueError:
             _record_run(store, "review_allocation_plan", _REVIEW_ALLOCATION_PROMPT_VERSION, input_hash, start, error="response was not valid JSON")
-            return AllocationReviewOutcome(None, REVIEW_REJECTED_UNPARSEABLE)
+            return AllocationReviewOutcome(None, REVIEW_REJECTED_UNPARSEABLE, input_hash)
+        if not isinstance(raw, dict):
+            _record_run(
+                store,
+                "review_allocation_plan",
+                _REVIEW_ALLOCATION_PROMPT_VERSION,
+                input_hash,
+                start,
+                response=raw,
+                error="response JSON root was not an object",
+            )
+            return AllocationReviewOutcome(None, REVIEW_REJECTED_UNPARSEABLE, input_hash)
         rejections: list[str] = []
         result = _validate_allocation_review(
             raw, cart_tickers, weights_pct, volatilities, rejection_out=rejections
@@ -896,18 +936,22 @@ def review_allocation_outcome(
             response=raw, error=None if result is not None else "failed post-hoc validation",
         )
         if result is not None:
-            return AllocationReviewOutcome(result, None)
+            return AllocationReviewOutcome(result, None, input_hash)
         # A None result always has a reason; fall back rather than hand the UI
         # an empty explanation, which would reintroduce the blank screen.
         return AllocationReviewOutcome(
-            None, rejections[0] if rejections else REVIEW_REJECTED_UNPARSEABLE
+            None,
+            rejections[0] if rejections else REVIEW_REJECTED_UNPARSEABLE,
+            input_hash,
         )
     except Exception as exc:
         _record_run(store, "review_allocation_plan", _REVIEW_ALLOCATION_PROMPT_VERSION, input_hash, start, error=str(exc))
         # The exception TYPE only. Its message can carry request context, and
         # this string is rendered straight into the page.
         return AllocationReviewOutcome(
-            None, REVIEW_REJECTED_CALL_FAILED.format(error_type=type(exc).__name__)
+            None,
+            REVIEW_REJECTED_CALL_FAILED.format(error_type=type(exc).__name__),
+            input_hash,
         )
 
 

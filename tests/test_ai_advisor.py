@@ -1409,3 +1409,46 @@ def test_a_successful_outcome_carries_no_rejection_reason(monkeypatch):
         )
     assert outcome.review is not None
     assert outcome.rejection_reason is None
+
+
+@pytest.mark.parametrize(
+    ("review", "reason"),
+    [
+        (None, None),
+        (
+            ai_advisor.AllocationReview(
+                summary="This split leans on one industry.", observations=()
+            ),
+            ai_advisor.REVIEW_REJECTED_UNPARSEABLE,
+        ),
+    ],
+)
+def test_outcome_rejects_contradictory_states(review, reason):
+    """The public outcome type must enforce the invariant its docstring
+    promises, rather than merely asking every caller to remember it."""
+    with pytest.raises(ValueError):
+        ai_advisor.AllocationReviewOutcome(review, reason, "test-input")
+
+
+def test_outcome_reports_non_object_json_as_unparseable(monkeypatch):
+    """Valid JSON with the wrong root shape is a response-format failure,
+    not an Anthropic call failure attributed to an internal AttributeError."""
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    with patch("anthropic.Anthropic") as mock_cls:
+        mock_client = MagicMock()
+        mock_client.messages.create.return_value = _fake_response(json.dumps([]))
+        mock_cls.return_value = mock_client
+        outcome = ai_advisor.review_allocation_outcome(
+            ["NVDA"], {"NVDA": 100.0}, {"NVDA": 2.0}, {}
+        )
+
+    assert outcome.review is None
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_UNPARSEABLE
+
+
+def test_outcome_distinguishes_no_input_from_missing_credentials(monkeypatch):
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "test-key")
+    outcome = ai_advisor.review_allocation_outcome([], {}, {}, {})
+
+    assert outcome.review is None
+    assert outcome.rejection_reason == ai_advisor.REVIEW_REJECTED_NO_INPUT

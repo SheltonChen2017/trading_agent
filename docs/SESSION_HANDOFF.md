@@ -35,12 +35,12 @@ authorizes M3, deployment, an epoch roll, live trading, or any funded action.
   machine-local `artifacts/`), the AP-10 merge disposition, the counter-review
   section of the independent-review report, two new guard tests, and this
   handoff.
-- Follow-on defect-fix branch: `user/claude/ap11-health-clock-race-20260813`,
-  created from the counter-review branch tip `594decf` (both branches touch
-  this handoff and the action plan, so the fix stacks on the exact reviewed
-  commit rather than manufacturing conflicts with `main`). It carries the
-  AP-11 fix, its two regression tests, the AP-11 ledger row, and this
-  handoff revision. Merge order: counter-review PR first, then AP-11.
+- Both session branches are MERGED to `main` by the owner (2026-08-13):
+  the counter-review branch (`594decf`) via PR #197 at `3aaccf0`, then the
+  stacked AP-11 fix branch (`0100f04`) via PR #198 at `72b6278`. The final
+  merge tree equals the AP-11 branch tip exactly (no merge-only delta).
+  This handoff revision itself rides a small post-merge documentation
+  branch (`user/claude/post-merge-handoff-20260813`).
 - Before staging or committing anything else, re-check `HEAD` and
   `git status`.
 
@@ -160,14 +160,14 @@ AP-11 branch validation (all under the repository venv):
 
 ## 5. Next step
 
-Two branches await owner-directed merge, in order: the counter-review branch
-(`user/claude/counter-review-ipr-20260812`), then the AP-11 fix branch
-stacked on it (`user/claude/ap11-health-clock-race-20260813`). Independent
-review of AP-11 by Codex is the expected next step of the standing loop.
-Open owner decisions, unchanged: epoch-roll timing for the
-merged-but-undeployed work (before the ~2026-09-10 AEP dividend window if
-the owner wants CR-W3 slack; AP-11 joins that queue), the physical-media-only
-off-machine backup, and the GR-7d target portfolio.
+Both session branches are merged; nothing is mid-flight. The AP-11 fix has
+NOT yet had an independent Codex review — it merged on Claude's own
+validation — so a Codex review of the merged range `1a46881..72b6278` is
+the expected next step of the standing loop. Open owner decisions,
+unchanged: epoch-roll timing for the merged-but-undeployed work (before the
+~2026-09-10 AEP dividend window if the owner wants CR-W3 slack; AP-11 joins
+that queue), the physical-media-only off-machine backup, and the GR-7d
+target portfolio.
 
 ## 6. Resume prompt
 

@@ -153,7 +153,8 @@ def test_completed_epoch_004_roll_replaced_its_predeployment_queue():
 def test_current_review_documents_have_no_validation_placeholders():
     """A validation claim must contain a measured result, never a token."""
     placeholders = re.compile(
-        r"\b(?:FULL_SUITE|COUNTER_REVIEW_SUITE|FINAL_TREE|FINAL_STATIC)_RESULT\b"
+        r"\b(?:FULL_SUITE|COUNTER_REVIEW_SUITE|FINAL_TREE|FINAL_STATIC"
+        r"|COUNTER_REVIEW_TREE|SELL_TREE|INTEGRATION_SUITE)_RESULT\b"
     )
     names = (
         "SESSION_HANDOFF.md",

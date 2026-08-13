@@ -291,7 +291,7 @@ def _packet(include_events: bool = True, store: AssistantStore | None = None):
 
 
 def _print_briefing(packet) -> None:
-    print(f"Decision packet {packet.schema_version} — {packet.generated_at}")
+    print(f"Decision packet {packet.schema_version} â€” {packet.generated_at}")
     print(
         f"Portfolio source={packet.portfolio.source} mode={packet.portfolio.account_mode} "
         f"equity=${packet.portfolio.total_equity:,.2f} cash=${packet.portfolio.cash:,.2f}"
@@ -483,7 +483,7 @@ def command_idle_cash(args, store: AssistantStore | None = None) -> None:
     records GR-4 provider-fetch rows. A reporting command must leave the
     operator database unchanged, including evidence tables. Portfolio comes
     from a live Alpaca snapshot when configured, otherwise the sample
-    portfolio — never a decision-packet rebuild that writes.
+    portfolio â€” never a decision-packet rebuild that writes.
     """
     del store  # deliberately unused; this report needs no database
     policy = load_policy(_cli_policy_path(args))
@@ -1031,7 +1031,7 @@ def command_committee_review(args, store: AssistantStore) -> None:
         _committee_unavailable(result.error_code or "unknown", detail)
 
     review = result.review
-    print("Committee review ACCEPTED — advisory only, not a trade instruction.")
+    print("Committee review ACCEPTED â€” advisory only, not a trade instruction.")
     print(
         f"provider={result.provider_id} model={result.model_id} "
         f"prompt_version={result.prompt_version}"
@@ -1139,7 +1139,7 @@ def _write_artifact_atomically(destination: Path, payload: str) -> None:
 
     FCS-013. `Path.write_text` is not atomic: a crash, a full disk, or a
     killed console (this host loses console-hosted processes to 0xC000013A --
-    see docs/OPERATIONAL_FACTS.md §2) leaves a TRUNCATED file. For a tax
+    see docs/OPERATIONAL_FACTS.md Â§2) leaves a TRUNCATED file. For a tax
     export that matters more than usual, because a half-written CSV is still
     a syntactically valid CSV with fewer rows, and the coverage statement the
     report relies on to disclose its own limits can itself be cut off.
@@ -1391,6 +1391,64 @@ def command_sleeve_reinvest_propose(args, store: AssistantStore) -> None:
     for uncertainty in proposal.uncertainties:
         print(f"  ? {uncertainty}")
     print(f"  Approve with: approve {proposal.proposal_id} --confirm approve")
+
+
+def command_sell_holding(args, store: AssistantStore) -> None:
+    """Owner-directed sale of one currently-held position.
+
+    Creates ONE approve-gated proposal and stops. It never submits an order,
+    and it makes no claim that selling is a good idea -- that judgement is
+    the owner's, and this project has confirmed zero signals as real edge for
+    predicting declines.
+    """
+    from assistant.user_directed_sell import generate_user_directed_sell_proposal
+
+    policy = load_policy(_cli_policy_path(args))
+    packet = _packet(include_events=False, store=store)
+    store.save_decision_packet(packet)
+    tax_ledger, tax_coverage = tax_ledger_with_coverage(store, packet.portfolio)
+    result = generate_user_directed_sell_proposal(
+        packet,
+        policy,
+        ticker=args.ticker,
+        shares=args.shares,
+        tax_lot_ledger=tax_ledger,
+        tax_lot_coverage=tax_coverage,
+    )
+    if not result["created"]:
+        raise SystemExit(f"Refused: {result['reason']}")
+
+    proposal = result["proposal"]
+    store.save_proposal(proposal.to_dict())
+    if args.json:
+        print(json.dumps(proposal.to_dict(), indent=2, sort_keys=True))
+        return
+    intent = proposal.intent
+    print(
+        f"{proposal.proposal_id} [{proposal.evidence_status}]: "
+        f"{intent.side.upper()} {intent.shares} {intent.ticker} at reference "
+        f"${proposal.reference_price:,.2f}"
+    )
+    for reason in proposal.reasons:
+        print(f"  - {reason}")
+    tax_advisory = proposal.expected_impact.get("tax_lot_advisory", {})
+    if tax_advisory.get("available"):
+        for method, detail in tax_advisory["methods"].items():
+            if "error" not in detail:
+                print(
+                    f"  Tax ({method.upper()}): "
+                    f"{detail['realized_pnl']:+,.2f} realized "
+                    f"(short {detail['short_term_pnl']:+,.2f}, "
+                    f"long {detail['long_term_pnl']:+,.2f})"
+                )
+    else:
+        print(
+            "  Tax: advisory unavailable -- "
+            + str(tax_advisory.get("reason", "unknown reason"))
+        )
+    for uncertainty in proposal.uncertainties:
+        print(f"  ? {uncertainty}")
+    print(f'  Approve with: approve {proposal.proposal_id} --confirm approve')
 
 
 def command_tax_report(args, store: AssistantStore) -> None:
@@ -2568,6 +2626,22 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sleeve.add_argument("--json", action="store_true")
     sleeve.set_defaults(handler=command_sleeve_report, read_only_store=True)
+
+    sell_holding = commands.add_parser(
+        "sell-holding",
+        help=(
+            "Owner-directed sale of one currently-held position: creates ONE "
+            "approve-gated sell proposal for the shares you name. Not a "
+            "recommendation and never submits an order."
+        ),
+    )
+    sell_holding.add_argument("--ticker", required=True)
+    sell_holding.add_argument(
+        "--shares", required=True, type=int,
+        help="Whole shares to sell; must not exceed the shares you hold.",
+    )
+    sell_holding.add_argument("--json", action="store_true")
+    sell_holding.set_defaults(handler=command_sell_holding)
 
     sleeve_reinvest = commands.add_parser(
         "sleeve-reinvest",

@@ -1,146 +1,153 @@
-# Session handoff — three-sleeve M3 reviewed, counter-reviewed, and pushed
+# Session handoff — owner-directed sell, atop merged M3
 
-Prepared: 2026-08-13, after Codex independently reviewed Claude's M3 branch
-and committed corrections, and Claude then counter-reviewed that review,
-confirmed all six findings by mutation, and closed two further findings.
+Prepared: 2026-08-13, after the owner merged the three-sleeve M3 review
+branch (PR #201) and this Selling-tab milestone was integrated on top of it.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 ## 0. Read this first
 
-Read `CLAUDE.md`, `docs/ACTION_PLAN_2026-08-02.md`,
-`docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md`, and
-`docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` §1.1 / §5 M3 before acting.
-The action plan remains the sequencing authority. Nothing in this session
-authorizes a push, merge, deployment, epoch roll, M4, live trading, or a funded
-action.
+1. `CLAUDE.md`
+2. `docs/ACTION_PLAN_2026-08-02.md` (rows SELL-1, AP-11, GR-7d)
+3. `docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md` including its counter-review
+   section
+4. `docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` §1.1 / §5 M3
+5. `docs/OPERATIONAL_FACTS.md`
+6. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
 
-## 1. Repository topology and reachability
+The action plan remains the sequencing authority. Nothing here authorizes
+deployment, an epoch roll, M4, live trading, or any funded action.
 
-- `main` / `origin/main`: `60ed001` (PR #200 merge), the exact review base.
-- Claude's submitted remote branch:
-  `user/claude/three-sleeve-m3-earmarks-20260813`, sole reviewed commit and
-  head `7ee4786`.
-- Codex independent review branch:
-  `codex/review-three-sleeve-m3-20260813`, correction `b6685b5`, followed by
-  this documentation-only handoff commit.
-- Claude's counter-review commit follows the review's handoff commit on the
-  same review branch, carrying the counter-review section, two new guards,
-  and this handoff revision.
-- **The review branch is pushed after the counter-review**, deliberately
-  superseding the pre-push local-only statement rather than leaving it to go
-  stale. Merging its PR is the owner's action.
-- The shared Claude branch was not switched, edited, rebased, or force-pushed.
-  No unrelated worktree changes were adopted.
+## 1. Repository topology
 
-## 2. Review outcome
+- `main` / `origin/main`: `022c456` — PR #201, which merged
+  `codex/review-three-sleeve-m3-20260813`. That branch carried three-sleeve
+  M3 (`7ee4786`), Codex's correction (`b6685b5`), its review record
+  (`55b4518`), and Claude's counter-review (`a5fc599`). **M3 and its six
+  corrections are therefore on `main`.**
+- This branch: `user/claude/user-directed-sell-20260813` — implementation
+  `918eecd` plus this integration merge of `origin/main`.
+- The now-superseded `user/claude/three-sleeve-m3-earmarks-20260813` holds
+  only the pre-review M3 commit. Everything in it reached `main` through
+  PR #201; it can be deleted whenever convenient. Do NOT merge it — doing so
+  would add nothing and only re-open reviewed history.
 
-Status: **complete; submitted commit accepted after correction.**
+### Integration merge — what was resolved, and why
 
-| Commit | Disposition | Reason |
-|---|---|---|
-| `7ee4786` | Accepted after correction | Core M3 routing, proposal gating, exact-text earmarks, recorded-close pricing, atomic proposal/earmark creation, and exactly-once resolution are sound. Correction `b6685b5` closes M3REV-001 through M3REV-006. |
+The two threads were developed from the same base and both touched the
+Selling/Buying pages and the CLI, so the merge produced three conflicts.
+Recorded because a conflict resolution is exactly where work silently
+disappears:
 
-Issue summary: **2 P1 fixed, 4 P2 fixed; 0 P0/P1/P2/P3 open.** The complete
-ledger and red/green evidence are in
-`docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md`.
+- `scripts/run_personal_assistant.py` — the real one. Git interleaved
+  `command_sell_holding` with M3's `command_sleeve_reinvest_propose`
+  because both handlers end in the same "Approve with:" shape, producing a
+  chimera that would have compiled while mixing two features' output. It was
+  NOT hand-patched: the file was rebuilt from `origin/main`'s version (the
+  authority for M3) with this branch's handler and subparser re-inserted
+  verbatim from `918eecd` at stable anchors. Verified afterwards by AST that
+  all five handlers (`command_sell_holding`, `command_sleeve_reinvest`,
+  `command_sleeve_reinvest_propose`, `_print_reinvest_status`,
+  `command_sleeve_report`) exist exactly once.
+- `tests/test_active_document_consistency.py` — the placeholder-token regex.
+  This branch's version is a strict superset of main's, so it was taken
+  whole; no token stopped being guarded.
+- `docs/SESSION_HANDOFF.md` — rewritten (this file) for the post-merge
+  reality rather than either side being picked, which is the IPRCR-001
+  staleness class this project keeps re-learning.
 
-- **M3REV-001 (P1):** poll-only cumulative `filled_qty` was ignored, so a
-  partially filled cancellation could release spent dividend dollars.
-- **M3REV-002 (P1):** fill evidence did not override release-class terminal
-  labels, although the lifecycle permits rejection after partial fill.
-- **M3REV-003 (P2):** the authoritative transaction trusted caller-asserted
-  confirmed income instead of deriving the pool from durable journal rows.
-- **M3REV-004 (P2):** unknown/future earmark statuses were omitted from the
-  unavailable total and could release money fail-open.
-- **M3REV-005 (P2):** nonpositive stored earmarks could enlarge the pool.
-- **M3REV-006 (P2):** a human reconcile line made valid `--json` output
-  unparsable.
+`scripts/personal_assistant_ui.py` auto-merged: M3's expander lives in the
+Buying page, this milestone's section in the Selling page.
 
-Correction `b6685b5` reads both broker fill representations and lets any
-credible fill consume regardless of label; derives journal income and every
-non-released earmark within one `BEGIN IMMEDIATE`; holds unknown statuses;
-refuses invalid/nonpositive stored money; and returns reconcile transitions as
-structured JSON.
+## 2. This milestone — owner-directed sell (SELL-1)
 
-## 3. Completed M3 behavior
+Owner request: the Selling tab only ever proposed sells when a deterministic
+policy breach demanded one; the owner asked to be able to sell an individual
+currently-held position on their own judgement.
 
-- The spendable pool contains broker-confirmed corporate-action postings to
-  `INCOME:DIVIDENDS`; the proposal transaction independently re-derives that
-  population from the journal rather than trusting its caller.
-- Active `decline_review` and `reentry_decline` watches outrank leveraged
-  reinvestment. With none pending, the owner may choose from
-  `DIVIDEND_REINVEST_TICKERS`.
-- Proposal creation and proposal-time-notional earmarking commit together.
-  Only an explicit `released` earmark returns money to the pool; consumed,
-  active, unknown, or corrupt/future statuses reserve it.
-- Any credible incremental or cumulative fill evidence consumes the whole
-  earmark. Ambiguous proposal outcomes hold. Resolution remains an idempotent,
-  status-fenced conditional update.
-- CLI and Buying-page creation remain proposal-only. The owner must type the
-  existing approval phrase; policy validation, execution gates, kill switches,
-  quote checks, and `max_leveraged_etf_pct` remain authoritative.
-- M4 prepared trims remain deferred and were not implemented.
+- `assistant/user_directed_sell.py`:
+  `generate_user_directed_sell_proposal(...) -> {"created": bool, ...}` and
+  `sellable_whole_shares(...)`. Evidence status `user_directed_sell` — its
+  own module and status, because the policy-breach generator's
+  `deterministic_risk_policy` means the PROJECT computed a breach, and this
+  claims nothing of the sort.
+- Every refusal is a stated sentence, never a silent edit of the owner's
+  instruction: unheld ticker; a share count that is not a real positive
+  `int` (reuses `risk.execution_gate.is_valid_share_quantity`, so bools,
+  whole-valued floats, NaN, and strings are rejected exactly as the broker
+  layer rejects them); more shares than held, with holdings floored to whole
+  shares because rounding up would propose a short; an unusable price; and a
+  notional above `max_order_value`, which names how many shares WOULD fit
+  rather than quietly proposing fewer than asked.
+- The tax-consequence disclosure was consolidated into
+  `assistant.proposals.attach_tax_lot_advisory`, now shared with the
+  policy-breach generator instead of hand-copied; a test pins that both
+  callers use the same object.
+- Surfaces: a Selling-tab section above and visually divided from the
+  policy-breach section, with copy disclaiming any recommendation, plus CLI
+  `sell-holding --ticker --shares [--json]`.
+- Deliberately not implemented: limit orders, scheduled or conditional
+  sells, bulk multi-ticker sells, and any auto-submission. Nothing here
+  weakens `risk/execution_gate.py`, which re-checks everything at approval.
 
-## 4. Validation
+## 3. Validation (repository venv, Python 3.13.14 / Streamlit 1.60.0)
 
-- Submitted-tree baseline at exact `7ee4786`: **3,557 passed**, 25 known
-  dependency warnings, 707.79 seconds.
-- Red reproduction before correction: **7 intended failures** covering all
-  six findings.
-- Corrected M3 + UI suites: **70 passed** in 17.02 seconds.
-- Final repository suite: **3,564 passed, 0 failed/skipped**, 25 known
-  dependency warnings, in 662.62 seconds.
-- Repository-prescribed compileall passed; active-document consistency passed
-  **19/19**; `git diff --check` is clean.
-- Review was local and deterministic. No broker request, order, policy write,
-  scheduler mutation, operational-database access, or epoch mutation occurred.
+Pre-merge, on `918eecd`:
 
-Counter-review (Claude) validation:
+- `tests/test_user_directed_sell.py` **40 passed**;
+  `tests/test_ui_user_directed_sell.py` **3 passed**.
+- Four safety guards mutation-verified (over-sell refusal, share-validity,
+  floor-not-ceil, max-order-value refusal): each reddened exactly its own
+  tests and passed restored.
+- The `assistant/proposals.py` extraction proven behavior-preserving:
+  `tests/test_proposals.py` + `tests/test_tax_lots.py` **105 passed** before
+  and after.
+- Branch tree: **3,537 collected, 0 unexpected failures**.
 
-- All six review findings independently re-established by mutation (seven
-  runs; M3REV-004 verified separately at both of its sites), each reddening
-  exactly its intended regression and passing restored.
-- Two counter-review guards added (M3CR-001 executable-status exhaustiveness,
-  M3CR-002 fence/module pool agreement), both mutation-verified.
-- M3 suite after the counter-review guards: **72 passed**.
-- Exact counter-review tree: **3,567 passed, 0 failed, 0 skipped, 25 known dependency warnings** in 705.61 s under the repository venv (Python 3.13.14 / Streamlit 1.60.0).
+Post-merge, on this integrated tree:
 
-## 5. Operational truth
+- Both feature suites together — `test_user_directed_sell`,
+  `test_ui_user_directed_sell`, `test_sleeve_reinvest`,
+  `test_ui_sleeve_reinvest`, `test_proposals`: **128 passed**.
+- Validating run (everything final except this line): **3,609 passed,
+  1 failed, 25 known dependency warnings** in 679.01 s — the single failure
+  was the placeholder guard correctly rejecting this line's own then-unfilled
+  token. Total collected 3,610 = merged `main`'s 3,567 plus this branch's 43,
+  which is the arithmetic proof that the merge dropped no test from either
+  side.
+- Exact final tree differs only by this validation text; the doc-consistency
+  suite (the only tests reading this file) was rerun green on the final text.
+- `compileall` and `git diff --check`: clean.
 
-- `paper-epoch-004` remains the only active evidence epoch, frozen at
-  `b837374` in the separate operational checkout. M3 is not deployed there.
-- The first deployment of M3 would see pre-existing confirmed dividend rows,
-  so its displayed pool may be nonzero immediately. Nothing spends that pool
-  without a newly created and explicitly approved proposal.
-- The CR-W3 dividend-subtype watch remains unchanged. Do not widen accounting
-  tolerance or create a manual compensating entry.
+## 4. Operational truth — do not disturb the epoch
 
-## 6. Next step
+- `paper-epoch-004` is the only active evidence epoch, frozen at `b837374`
+  in `C:\git\trading_agent_operational`. Nothing here is deployed.
+- AP-8, AP-9, QC-2, AP-10, AP-11, M3 (now on `main`), and SELL-1 (pending)
+  all ride the next owner-authorized epoch roll.
+- CR-W3 watch unchanged: the first real AEP dividend subtype may over-refuse
+  safely around 2026-09-10; JNLC still needs operator accounting judgement;
+  never widen reconciliation tolerance or use a manual compensating entry.
+- When M3 first deploys, the dividend pool will be non-zero immediately
+  (the operator ledger already holds confirmed dividends). Nothing spends it
+  without an explicitly approved proposal.
 
-The M3 review loop is complete: implemented, independently reviewed,
-counter-reviewed, and pushed. The remaining action is the owner's merge of
-the review branch's PR.
+## 5. Next step
 
-Separately, the owner requested (2026-08-13, same session) a new Selling-tab
-capability: today the Selling page proposes sells only when deterministic
-policy breaches demand them, and the owner asked to be able to sell an
-individual currently-held position directly. That is a new milestone on its
-own branch, `user/claude/user-directed-sell-20260813`, started after this
-counter-review and NOT part of M3.
+Independent review of this branch (SELL-1 has had no outside review), then
+the owner's merge. M4 remains deferred by default. Unchanged open owner
+decisions: epoch-roll timing, the physical-media-only off-machine backup,
+the unidentified `origin/Funny` branch, and deletion of the superseded
+`user/claude/three-sleeve-m3-earmarks-20260813`.
 
-Do not deploy, roll the epoch, or begin M4 without a new owner instruction.
-Other unchanged owner decisions are epoch-roll timing, the physical-media
-off-machine backup, and the unidentified `origin/Funny` branch.
-
-## 7. Resume prompt
+## 6. Resume prompt
 
 ```text
-Verify the exact branch and a clean worktree. Read CLAUDE.md,
-docs/ACTION_PLAN_2026-08-02.md, docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md
-including its counter-review section, and docs/SESSION_HANDOFF.md. M3 is
-reviewed, counter-reviewed, and pushed; the owner's merge is the remaining
-action. Active work continues on the separate Selling-tab milestone branch
-user/claude/user-directed-sell-20260813. Do not deploy, touch the operator
-database, roll paper-epoch-004, or begin M4 without a new owner instruction.
+Verify a clean worktree and confirm whether user/claude/user-directed-sell-
+20260813 has merged. Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md
+(SELL-1, AP-11, GR-7d), docs/SESSION_HANDOFF.md, and
+docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md including its counter-review
+section. Pending work is independent review of SELL-1. Do not deploy, touch
+the operator database, roll paper-epoch-004, or begin M4 without a new owner
+instruction.
 ```

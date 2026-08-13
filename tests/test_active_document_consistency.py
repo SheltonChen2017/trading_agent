@@ -159,6 +159,7 @@ def test_current_review_documents_have_no_validation_placeholders():
         "SESSION_HANDOFF.md",
         "FEATURE_MILESTONE_RECORD.md",
         "REVIEW_2026-08-12_AP9_ALLOCATION_REVIEW_VISIBILITY.md",
+        "REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md",
     )
     hits = [name for name in names if placeholders.search(_text(name))]
     assert not hits, f"unresolved validation placeholders remain in {hits}"
@@ -191,6 +192,62 @@ def test_handoff_does_not_describe_the_merged_independent_review_branch_as_stale
     assert not hits, (
         "the handoff still describes the pre-merge PR #196 topology: "
         + "; ".join(hits)
+    )
+
+
+def test_ap11_supersedes_the_full_ap7_production_fix_claim():
+    """CODCR-001: deployed AP-7 code is not a deployed end-to-end fix.
+
+    AP-11 proved from a later live negative-age alert that the outer
+    production call path froze the nested AP-7 clock. Current-state records
+    must preserve the original deployment observation without continuing to
+    call the complete production path fixed while AP-11 is undeployed.
+    """
+    documents = {
+        "ACTION_PLAN_2026-08-02.md": _text("ACTION_PLAN_2026-08-02.md"),
+        "OPERATIONAL_FACTS.md": _text("OPERATIONAL_FACTS.md"),
+    }
+    stale = (
+        "AP-7 confirmed fixed in production",
+        "AP-7 is confirmed fixed in production",
+    )
+    hits = [
+        f"{name}: {phrase}"
+        for name, text in documents.items()
+        for phrase in stale
+        if phrase in text
+    ]
+    assert not hits, (
+        "current records retain the full-fix claim invalidated by AP-11: "
+        + "; ".join(hits)
+    )
+
+    action_plan_raw = (
+        ROOT / "docs" / "ACTION_PLAN_2026-08-02.md"
+    ).read_text(encoding="utf-8")
+    ap7_rows = [
+        line for line in action_plan_raw.splitlines() if line.startswith("| AP-7 |")
+    ]
+    assert len(ap7_rows) == 1, "the action plan must contain exactly one AP-7 row"
+    assert "AP-11" in ap7_rows[0] and "not deployed" in ap7_rows[0].lower(), (
+        "the AP-7 ledger row must disclose the undeployed AP-11 production-path gap"
+    )
+
+    facts_raw = (ROOT / "docs" / "OPERATIONAL_FACTS.md").read_text(
+        encoding="utf-8"
+    )
+    active_epoch = re.search(
+        r"### `paper-epoch-\d+` is active.*?(?=\n### )",
+        facts_raw,
+        flags=re.DOTALL,
+    )
+    assert active_epoch, "OPERATIONAL_FACTS has no active-epoch section"
+    active_epoch_text = active_epoch.group(0)
+    assert (
+        "AP-11" in active_epoch_text
+        and "not deployed" in active_epoch_text.lower()
+    ), (
+        "the durable active-epoch facts must disclose that AP-11 is not deployed"
     )
 
 

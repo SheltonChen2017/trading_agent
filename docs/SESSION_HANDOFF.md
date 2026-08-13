@@ -1,8 +1,8 @@
-# Session handoff — independent review counter-reviewed; AP-11 clock race fixed
+# Session handoff — Claude's counter-review and AP-11 independently accepted
 
-Prepared: 2026-08-13, after Claude's counter-review of the independent
-full-project review (PR #196) and a follow-on production-defect fix (AP-11)
-found by investigating a live negative-age freshness alert.
+Prepared: 2026-08-13, after Codex independently reviewed Claude's merged
+counter-review, pytest-collection correction, AP-11 fix, and post-merge
+records at `4ae77f2`, then closed one P3 current-document defect.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -13,34 +13,39 @@ Read, in order:
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
 3. `docs/OPERATIONAL_FACTS.md`
-4. `docs/REVIEW_2026-08-12_INDEPENDENT_FULL_PROJECT.md` (including its
+4. `docs/REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md`
+5. `docs/REVIEW_2026-08-12_INDEPENDENT_FULL_PROJECT.md` (including its
    counter-review section)
-5. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-6. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+6. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+7. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
 
 The action plan remains the sequencing authority. Nothing in this session
 authorizes M3, deployment, an epoch roll, live trading, or any funded action.
 
 ## 1. Repository topology
 
-- `main` / `origin/main` before this session: `1a46881` — the PR #196 merge
-  of `codex/independent-full-review-20260812` (`67558f5` production
-  correction, `78a69b3` review record, `428bb56` handoff). The owner pushed
-  and merged that branch after its handoff was written; the merge tree equals
-  branch tip `428bb56` exactly.
-- This session's counter-review branch:
-  `user/claude/counter-review-ipr-20260812`, created from `1a46881`.
-  Its commits carry the IPRCR-001 correction (stale post-merge handoff
-  topology), the IPRCR-002 correction (`pytest.ini` collection exclusion for
-  machine-local `artifacts/`), the AP-10 merge disposition, the counter-review
-  section of the independent-review report, two new guard tests, and this
-  handoff.
-- Both session branches are MERGED to `main` by the owner (2026-08-13):
-  the counter-review branch (`594decf`) via PR #197 at `3aaccf0`, then the
-  stacked AP-11 fix branch (`0100f04`) via PR #198 at `72b6278`. The final
-  merge tree equals the AP-11 branch tip exactly (no merge-only delta).
-  This handoff revision itself rides a small post-merge documentation
-  branch (`user/claude/post-merge-handoff-20260813`).
+- Review base and current `main` / `origin/main`: `4ae77f2` (PR #199 merge).
+- Submitted range: `1a46881..4ae77f2`, ordered as `594decf`, `3aaccf0`,
+  `0100f04`, `72b6278`, `18497ac`, `4ae77f2`.
+- Each of PR #197 (`3aaccf0`), PR #198 (`72b6278`), and PR #199 (`4ae77f2`)
+  is merge-only and tree-equal to its submitted branch tip.
+- Independent review branch:
+  `codex/review-claude-post-ipr-20260813`, created from `4ae77f2` in the
+  isolated worktree
+  `artifacts/codex-review-claude-post-ipr`.
+- Review correction: `8b12bee`. It adds the review report, closes CODCR-001
+  in the action plan and durable operational facts, and adds its regression
+  guard.
+- Claude's counter-review (2026-08-13) then verified this range in the same
+  worktree: CODCR-001 confirmed and its guard mutation-verified in both
+  halves, the 92-test focused result reproduced, no new finding. Its
+  dispositions are appended to
+  `docs/REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md`, and it extended
+  the placeholder guard to scan that report. The counter-review commit
+  follows `d29f5e7` on this branch and includes this handoff revision.
+- Remote availability: the branch is **pushed after the counter-review**
+  (superseding the pre-push local-only statement deliberately); merge awaits
+  the owner's PR action.
 - Before staging or committing anything else, re-check `HEAD` and
   `git status`.
 
@@ -102,6 +107,30 @@ both files) and the alert's own timestamps:
   `17852815…a6be`, 9 occurrences since 2026-08-06) can be acknowledged as
   root-caused rather than investigated again.
 
+## 2c. Independent Codex review outcome
+
+Final disposition: **accepted after correction**; implementation quality
+**9/10**. Full details and the required issue ledger are in
+`docs/REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md`.
+
+- `594decf` accepted: IPRCR-001 is accurate, and IPRCR-002's pytest defaults
+  and `artifacts` exclusion were independently verified behaviorally.
+- `3aaccf0` accepted: merge-only, no tree delta from `594decf`.
+- `0100f04` accepted after correction: AP-11 production code and tests are
+  correct and unchanged by review; CODCR-001 corrected incomplete current
+  operational records.
+- `72b6278` accepted after correction in the cumulative tree: merge-only,
+  no tree delta from `0100f04`.
+- `18497ac` accepted after correction: merge topology was correct, but the
+  current records still retained the superseded full-AP-7-fix claim.
+- `4ae77f2` accepted after correction in the cumulative tree: merge-only,
+  no tree delta from `18497ac`.
+- Issue summary: **0 P0, 0 P1, 0 P2, 1 P3; all closed**. CODCR-001 preserved
+  the original two-cycle observation as historical evidence while making
+  clear that AP-11 invalidated the full-fix inference and is not deployed.
+- No feature-milestone entry was added: this is a bug-fix review and status
+  correction, not a newly completed product milestone.
+
 ## 3. Validation
 
 Environment: repository virtual environment, Python 3.13.14, Streamlit 1.60.0.
@@ -145,13 +174,34 @@ AP-11 branch validation (all under the repository venv):
 - Exact AP-11 final tree: **3,493 passed, 0 failed, 0 skipped, 25 known
   dependency warnings** in 674.19 s.
 
+Independent Codex review validation (repository venv):
+
+- Submitted exact `4ae77f2` tree: **3,493 passed, 0 failed, 0 skipped, 25
+  known dependency warnings** in 697.22 s.
+- Operational-health reverse mutation: the submitted test failed on the
+  intended `age_seconds=-1.000000` assertion; restored green.
+- Platform-readiness reverse mutation: the submitted test rejected the
+  manufactured forwarded clock; restored green.
+- Pytest exclusion probe: restored config collected 3,494 real tests and
+  excluded the planted duplicate; removing only `artifacts` collected it and
+  produced one import-file-mismatch collection error; probe and cache removed.
+- CODCR-001 documentation guard: **1 failed red / 1 passed green**.
+- Corrected focused suite: **92 passed** in 16.54 s; final complete
+  active-document suite after report wording: **19 passed**.
+- Exact corrected review tree: **3,494 passed, 0 failed, 0 skipped, 25 known
+  dependency warnings** in 693.96 s.
+- Python 3.13.14 / Streamlit 1.60.0; repository-prescribed `compileall`
+  (including `research`), `git diff --check`, staged-diff checks, and narrow
+  secret-shape scan passed.
+
 ## 4. Operational truth — do not disturb the epoch
 
 - `paper-epoch-004` is the only active evidence epoch. Its frozen deployed
   runtime is `b837374` in `C:\git\trading_agent_operational`.
-- CR-W2, AP-7, MADCR-001, and the broker-activity acknowledgement path are
-  deployed there. AP-8, AP-9, QC-2, AP-10/IPR-001, and this counter-review
-  are merged development code and are **not deployed**; they ride the next
+- CR-W2, the AP-7 site-level code, MADCR-001, and the broker-activity
+  acknowledgement path are deployed there. The AP-11 outer-call-path repair,
+  AP-8, AP-9, QC-2, AP-10/IPR-001, and this counter-review are merged
+  development code and are **not deployed**; they ride the next
   owner-authorized epoch roll.
 - CR-W3 remains a genuine watch: the first real AEP dividend subtype may
   over-refuse safely around 2026-09-10. JNLC still needs explicit operator
@@ -160,21 +210,24 @@ AP-11 branch validation (all under the repository venv):
 
 ## 5. Next step
 
-Both session branches are merged; nothing is mid-flight. The AP-11 fix has
-NOT yet had an independent Codex review — it merged on Claude's own
-validation — so a Codex review of the merged range `1a46881..72b6278` is
-the expected next step of the standing loop. Open owner decisions,
-unchanged: epoch-roll timing for the merged-but-undeployed work (before the
-~2026-09-10 AEP dividend window if the owner wants CR-W3 slack; AP-11 joins
-that queue), the physical-media-only off-machine backup, and the GR-7d
-target portfolio.
+Claude's counter-review of `4ae77f2..HEAD` is complete (owner-requested,
+2026-08-13): CODCR-001 confirmed, its guard mutation-verified in both halves,
+no new finding; dispositions are in the review report's counter-review
+section. The branch is pushed; merging its PR is the owner's action. Do not
+deploy, touch the operator database, or roll the epoch without a new owner
+instruction. Open owner decisions are unchanged: epoch-roll timing for
+merged-but-undeployed work (before the ~2026-09-10 AEP dividend window if
+CR-W3 slack is desired), the physical-media-only off-machine backup, and the
+GR-7d target portfolio.
 
 ## 6. Resume prompt
 
 ```text
-Verify a clean worktree on main and confirm origin/main == main. Read
-CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, docs/OPERATIONAL_FACTS.md,
-docs/SESSION_HANDOFF.md, and the counter-review section of
-docs/REVIEW_2026-08-12_INDEPENDENT_FULL_PROJECT.md. Do not deploy, touch the
-operator database, or roll paper-epoch-004 without a new owner instruction.
+Verify a clean worktree on main and confirm origin/main == main (the
+codex/review-claude-post-ipr-20260813 PR should be merged; if not, ask the
+owner). Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
+docs/OPERATIONAL_FACTS.md, docs/SESSION_HANDOFF.md, and
+docs/REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md including its
+counter-review section. Do not deploy, touch the operator database, or roll
+paper-epoch-004 without a new owner instruction.
 ```

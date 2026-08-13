@@ -156,7 +156,10 @@ reddens both new AppTests.
 
 ### Counter-review validation
 
-- Full repository suite on the final integrated tree: COUNTER_REVIEW_SUITE_RESULT
+- Full repository suite on the final integrated tree: **3,478 passed,
+  0 failed, 0 skipped, 25 known dependency warnings** under Python 3.13.14 /
+  Streamlit 1.60.0. Re-measured on merged `main` at `b356292` during the
+  independent full-project review on 2026-08-12.
 - Focused: `tests/test_ai_advisor.py` 156 passed;
   `tests/test_ui_allocation_review.py` 6 passed.
 - Every correction — the reviewer's four code corrections and both

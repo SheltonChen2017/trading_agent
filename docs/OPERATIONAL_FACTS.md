@@ -325,6 +325,9 @@ carried no trace of it — the second-host session then spent effort
 re-deriving why its own `trading_agent_operational` clone looked "stale"
 and its launch script was "missing". Ported here 2026-08-09 with every
 machine-local claim re-verified on the second host rather than copied.
+(That branch was deleted on 2026-08-13 by owner instruction; this section
+is why its operational content survived the deletion, and why porting
+facts out of a branch rather than citing the branch is the durable habit.)
 
 Everything in this section is host-specific; re-measure rather than assume
 which one you are on. `whoami` distinguishes them.

@@ -89,7 +89,17 @@ def operational_health(
         store,
         policy,
         broker_module=broker_module,
-        now=now,
+        # AP-11: forward the CALLER's clock, never the entry clock
+        # manufactured above. Passing `now=now` handed the nested freshness
+        # checks an "explicit" clock captured before this function's own
+        # integrity/broker work, which froze their post-read AP-7 clocks and
+        # re-armed the concurrent-write race in every production run
+        # (observed live: a healthy reconciliation alerted as future-dated,
+        # age_seconds=-0.117315). `explicit_now` is None on the live
+        # watchdog/cycle path, so readiness captures its clock after the
+        # read; a genuine caller-supplied as-of clock still freezes the
+        # whole chain.
+        now=explicit_now,
         check_broker=check_broker,
     )
     checks = [

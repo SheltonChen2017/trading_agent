@@ -324,6 +324,50 @@ def test_report_covers_every_dimension_and_is_json_serializable(tmp_path):
     assert json.loads(json.dumps(payload)) == payload
 
 
+def test_whole_report_forwards_the_callers_clock_not_a_manufactured_one(
+    tmp_path, monkeypatch
+):
+    """AP-11, second site. `build_platform_readiness` manufactured
+    `now = now or datetime.now(...)` at entry and passed it down as an
+    explicit clock, which froze the nested AP-7 post-read freshness clocks
+    inside `operational_health`/`transaction_readiness` and re-armed the
+    concurrent-write race (behavioral proof lives in
+    tests/test_operations.py's production-call-path test; this pins the
+    forwarding contract at this boundary in both directions). The
+    manufactured clock remains correct for build_data_integrity and this
+    report's own checked_at -- only the pass-down must be the caller's."""
+    import assistant.platform_readiness as platform_readiness_module
+
+    store = AssistantStore(tmp_path / "a.db")
+    real_operational_health = platform_readiness_module.operational_health
+    forwarded_clocks = []
+
+    def _spying_health(*args, **kwargs):
+        forwarded_clocks.append(kwargs.get("now"))
+        return real_operational_health(*args, **kwargs)
+
+    monkeypatch.setattr(
+        platform_readiness_module, "operational_health", _spying_health
+    )
+
+    build_platform_readiness(
+        store, load_policy(), load_mandate(), check_broker=False
+    )
+    assert forwarded_clocks == [None], (
+        "with no caller clock, the live path must let the nested freshness "
+        "checks capture their own post-read clocks; a manufactured entry "
+        f"clock re-arms the AP-7 race: {forwarded_clocks}"
+    )
+
+    forwarded_clocks.clear()
+    build_platform_readiness(
+        store, load_policy(), load_mandate(), now=NOW, check_broker=False
+    )
+    assert forwarded_clocks == [NOW], (
+        "a genuine caller-supplied as-of clock must freeze the whole chain"
+    )
+
+
 def test_whole_report_turns_operational_failure_into_blocked_dimensions(
     tmp_path, monkeypatch
 ):

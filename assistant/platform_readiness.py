@@ -777,6 +777,7 @@ def build_platform_readiness(
     **health_options: Any,
 ) -> PlatformReadinessReport:
     """Read-only readiness across five independent dimensions."""
+    explicit_now = now
     now = now or datetime.now(timezone.utc)
     if now.tzinfo is None:
         raise PlatformReadinessError("now must be timezone-aware")
@@ -788,7 +789,13 @@ def build_platform_readiness(
             store,
             policy,
             broker_module=broker_module,
-            now=now,
+            # AP-11: forward the CALLER's clock, not the entry clock
+            # manufactured above -- a mid-chain "explicit" clock freezes the
+            # nested AP-7 post-read freshness clocks and re-arms the
+            # concurrent-write race. `now` (manufactured) is still correct
+            # for build_data_integrity below, which documents that it wants
+            # one fixed evaluation clock, and for this report's checked_at.
+            now=explicit_now,
             check_broker=check_broker,
             **health_options,
         )

@@ -16,9 +16,13 @@ never merged, so `main` still said "blocked" and neither the owner nor the
 2026-08-09 session remembered it when this engine was adopted. Under the
 instruction hierarchy the later explicit decision governs: **this plan
 supersedes the 2026-08-06 equal-weight decision as well**, surfaced to the
-owner the same day. The branch stays unmerged and undeleted as the archived
-record of that alternative; its two-machines operational facts were ported
-to `docs/OPERATIONAL_FACTS.md` separately because they are true regardless
+owner the same day. **That branch was deleted by owner instruction on
+2026-08-13** during a repository cleanup, so the equal-weight slice
+(`assistant/rebalance.py` plus its 639 test lines) no longer exists anywhere
+and would have to be rewritten if the owner ever revisits that shape. This
+paragraph is now the only record that it was built. Its two-machines
+operational facts survive independently: they were ported to
+`docs/OPERATIONAL_FACTS.md` on 2026-08-09 because they are true regardless
 of which allocation shape governs.
 
 Audience: repository owner, Claude Code, Codex, and future reviewers.

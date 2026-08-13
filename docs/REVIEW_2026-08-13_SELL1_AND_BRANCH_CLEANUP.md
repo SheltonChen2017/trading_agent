@@ -67,3 +67,47 @@ display float. The corrected shared execution gate now prevents either from
 authorizing an exact-share oversell, so this is not an open execution escape;
 consolidating proposal-time whole-share flooring can be handled separately
 without expanding this review into unrelated strategy behavior.
+
+---
+
+## Counter-review (Claude, 2026-08-13)
+
+Owner-requested verification, performed on the review branch at `e3931e0`.
+
+### Every finding verified
+
+| ID | Independent verification |
+|---|---|
+| SELREV-001 | **Confirmed, and P1 is the right severity.** Reproduced directly: `float("10.999999999999999999")` is `11.0`, so my `int(math.floor(float(shares)))` returned 11 against a holding of 10.999999999999999999 — one share that does not exist. My module's stated purpose was that a short is impossible by construction, and a float conversion defeated exactly that. It is also a plain violation of CLAUDE.md §5's ban on binary floating-point in authoritative money paths, which I wrote around rather than followed. |
+| SELREV-002 | **Confirmed.** Reproduced: `3 * 0.10` is `0.30000000000000004`, which exceeds a `0.30` cap, so a valid sale was refused with a false explanation. My own boundary test passed only because I chose binary-friendly numbers (5 × 100 = 500) — a test that gave confidence precisely where it had none. |
+| SELREV-003 | **Confirmed.** With 10.5 held, selling all 10 whole shares reported "closes the entire position" while 0.5 remained — a false statement about the resulting holding, in the sentence the owner would rely on. |
+| SELREV-004 | **Confirmed.** My stale-state binding compared only the ticker, so a stored 3-share card stayed actionable under a 7-share selection; approving it would have sold 3. I had cited AP-9 as the reason for that binding and then implemented half of it. |
+| SELREV-005, BRREV-001 | **Confirmed.** BRREV-001 is a fair correction of my own overstatement: I wrote that the equal-weight slice "no longer exists anywhere" when the deleted tip survives locally as a dangling object until garbage collection. The corrected wording (recovery lead, local-only, pruneable, not authority to restore) is the accurate framing. |
+
+The `max_order_value` unusable-policy refusal that review added was checked
+against `TradingPolicy.validate()`, which requires that field positive and
+finite — so the new branch is unreachable for a validated policy and is
+defense-in-depth for a hand-built one, not an obstruction of risk reduction.
+
+No submitted test was weakened; the review's only deletions are lines its own
+signature changes made invalid.
+
+### Counter-review finding
+
+| ID | Priority | Status | Finding |
+|---|---|---|---|
+| SELCR-001 | P2 | **Resolved in this counter-review** | The gate hardening was only half the fix, and the other half obstructs risk reduction. `risk/execution_gate.py` now refuses a sell of 11 against an exact holding of `10.999999999999999999` — correct. But `assistant/proposals.py` (risk-reduction) and `assistant/strategy_proposals.py` (pair rebalance) still floored the DISPLAY float, where that holding reads `11.0`, so both kept proposing 11. The result is a **legitimate risk-reducing sell that can never be approved**: the position stays over its policy cap with no in-app remedy, which is exactly the exception CLAUDE.md §5 names ("a conservative safeguard must not delay or obstruct a legitimate risk-reducing sell"). The review saw the residue but assessed only the safety direction ("not an open execution escape") and deferred consolidation. **Reproduced end to end** on the corrected tree: the risk-reduction generator emitted `SELL 11 NVDA`, and the hardened gate refused it with `Sell quantity 11 exceeds the 10.999999999999999999 shares currently held`. Fixed by consolidating the exact floor into one authority, `assistant.proposals.sellable_whole_shares` (plus `exact_position_shares`), now used by all three generators; `user_directed_sell` re-exports it rather than keeping a second copy. The regression drives the real generator into the real gate, and mutation-verified: restoring `int(position.shares)` reddens it. |
+
+### Counter-review validation
+
+- Focused suites after consolidation — proposals, strategy proposals (both),
+  user-directed sell, real-UI sell, money precision: **97 passed**.
+- New SELCR-001 regression: mutation-verified (float floor restored →
+  red; exact floor → green).
+- Validating run (everything final except this line): **3,618 passed,
+  1 failed, 25 known dependency warnings** in 610.00 s — the single failure
+  was the extended placeholder guard rejecting this line's own then-unfilled
+  token. 3,619 collected = the review's 3,618 plus the SELCR-001 regression.
+- Exact final tree differs only by this validation text; the doc-consistency
+  suite (the only tests reading this file) was rerun green on it.
+- `compileall` and `git diff --check`: clean.

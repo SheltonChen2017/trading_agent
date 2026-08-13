@@ -1,6 +1,7 @@
-# Session handoff — SELL-1 independently reviewed after merge
+# Session handoff — SELL-1 reviewed, counter-reviewed, and pushed
 
-Prepared: 2026-08-13
+Prepared: 2026-08-13, after Codex's independent SELL-1 review and Claude's
+counter-review of it.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -25,9 +26,12 @@ operator-database mutation, or any funded action.
   mainline SELL-1 merge: `08fde9f`.
 - Review branch: `codex/review-claude-sell1-cleanup-20260813`.
 - Review correction: `3ba3d41`.
-- The review branch and correction are **local-only and unpushed**. Another
-  computer cannot fetch them. The owner must authorize a push before remote
-  review or merge is possible.
+- Claude's counter-review commit follows `e3931e0` on the same review
+  branch, carrying the counter-review section, the SELCR-001 consolidation,
+  its regression, and this handoff revision.
+- **The branch is pushed after the counter-review**, deliberately superseding
+  the pre-push local-only statement rather than leaving it to go stale.
+  Merging its PR is the owner's action.
 - Current fetched refs also show the documentation-cleanup topic ref, but the
   former SELL-1, M3 implementation, and M3 review topic refs are absent. Their
   required work is already merged to `main`; do not recreate or merge them.
@@ -55,6 +59,24 @@ authorized an 11-share sale. `3ba3d41` makes exact broker quantity govern both
 boundaries. The same correction also uses Decimal for `max_order_value`,
 reports fractional remainders truthfully, and hides an old proposal card when
 the selected quantity changes.
+
+## 2b. Counter-review outcome (Claude, 2026-08-13)
+
+All six review findings **confirmed genuine**, each reproduced independently:
+`float("10.999999999999999999")` really is `11.0` (SELREV-001, a P1 in
+Claude's submitted code and a plain violation of CLAUDE.md §5's ban on binary
+floating point in money paths), and `3 * 0.10` really does exceed a `0.30`
+cap in float arithmetic (SELREV-002 — the submitted boundary test passed only
+because it used binary-friendly numbers). No test was weakened.
+
+One further finding, **SELCR-001 (P2), resolved on the review branch**: the
+gate hardening was only half the fix. `risk/execution_gate.py` now refuses a
+sell of 11 against an exact holding of 10.999999999999999999, but both older
+generators still floored the display float and kept proposing 11 — so a
+legitimate RISK-REDUCING sell could never be approved and the position stayed
+over its cap with no in-app remedy, the exception CLAUDE.md §5 names by name.
+Reproduced end to end, then fixed by consolidating the exact floor into
+`assistant.proposals.sellable_whole_shares` for all three generators.
 
 ## 3. Validation
 
@@ -99,9 +121,10 @@ evidence status changed.
 
 ## 6. Next step
 
-The owner's next development action is to inspect this local review branch and
-authorize a push if remote verification/merge is desired. Do not deploy or
-roll `paper-epoch-004` as part of that Git action. M4 remains deferred unless
+The review loop is complete: implemented, independently reviewed,
+counter-reviewed, and pushed. The remaining action is the owner's merge of the
+review branch's PR. Do not deploy or roll `paper-epoch-004` as part of that
+Git action. M4 remains deferred unless
 the owner explicitly schedules it. Open owner decisions remain epoch-roll
 timing, the physical-media-only off-machine backup, and whether to preserve or
 allow pruning of the dangling superseded GR-7d objects.
@@ -110,9 +133,10 @@ allow pruning of the dangling superseded GR-7d objects.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, and
-docs/REVIEW_2026-08-13_SELL1_AND_BRANCH_CLEANUP.md. Confirm whether local
-branch codex/review-claude-sell1-cleanup-20260813 and correction 3ba3d41 were
-pushed or merged; they were local-only at handoff. Do not deploy, touch the
+docs/REVIEW_2026-08-13_SELL1_AND_BRANCH_CLEANUP.md including its
+counter-review section. Confirm whether
+codex/review-claude-sell1-cleanup-20260813 has merged; it was pushed and
+awaiting the owner's merge at handoff. Do not deploy, touch the
 operator database, roll paper-epoch-004, restore deleted branches, or begin M4
 without a new owner instruction.
 ```

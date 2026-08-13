@@ -38,31 +38,17 @@ from decimal import Decimal, ROUND_FLOOR
 from assistant.money import decimal_or_none, decimal_text
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
-from assistant.proposals import TradeProposal, attach_tax_lot_advisory
+from assistant.proposals import (
+    TradeProposal,
+    attach_tax_lot_advisory,
+    exact_position_shares,
+    sellable_whole_shares,
+)
 from assistant.schemas import DecisionPacket
 from assistant.tax_lots import LotLedger
 from risk.execution_gate import TradeIntent, is_valid_share_quantity
 
 EVIDENCE_STATUS = "user_directed_sell"
-
-
-def sellable_whole_shares(position_shares: object) -> int:
-    """Whole shares of a held position that may be sold.
-
-    Floors deliberately: this workflow submits whole-share orders only
-    (risk.execution_gate.is_valid_share_quantity), so a fractional holding
-    of 10.5 offers 10 sellable shares. Rounding UP would propose selling
-    shares the account does not have -- a short position, which this
-    paper-trading project never opens.
-
-    Non-finite or non-positive share counts yield 0 rather than raising, so
-    a corrupt snapshot row refuses this one ticker instead of breaking the
-    page for every other holding.
-    """
-    shares = decimal_or_none(position_shares)
-    if shares is None or shares <= 0:
-        return 0
-    return int(shares.to_integral_value(rounding=ROUND_FLOOR))
 
 
 def remaining_shares_after_sale(

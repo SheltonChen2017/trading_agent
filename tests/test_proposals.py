@@ -312,3 +312,80 @@ def test_a_sell_whose_lots_are_unknown_says_so_instead_of_going_silent():
     assert advisory["advisory_only"] is True
     assert advisory["reason"]
     assert any("unavailable" in u for u in proposals[0].uncertainties)
+
+
+def test_a_fractional_holding_yields_a_risk_reducing_sell_the_gate_accepts():
+    """Counter-review SELCR-001 -- the gate hardening's other half.
+
+    SELREV-001 correctly made risk/execution_gate.py compare EXACT broker
+    share quantities, so a sell of 11 against a held 10.999999999999999999 is
+    now refused. But this generator still floored the DISPLAY float, where
+    that holding reads as 11.0, so it kept proposing 11 -- turning a correct
+    refusal into a risk-reducing sell that can never be approved, leaving the
+    position stuck over its cap with no in-app remedy. CLAUDE.md section 5 is
+    explicit that a conservative safeguard must not obstruct a legitimate
+    risk-reducing sell.
+
+    Reproduced end to end rather than asserted on the arithmetic: generate
+    the real proposal, then put it through the real gate.
+    """
+    from decimal import Decimal
+
+    from assistant.schemas import PortfolioPosition, PortfolioSnapshot
+    from risk.execution_gate import validate_trade_intent
+
+    exact = "10.999999999999999999"
+    assert int(float(exact)) == 11, "fixture must exercise the rounding-up case"
+
+    def _pos(ticker, shares, price, shares_exact=None):
+        return PortfolioPosition(
+            ticker=ticker, shares=shares, entry_price=price, current_price=price,
+            market_value=shares * price, unrealized_pnl_pct=0.0,
+            is_leveraged_etf=False, shares_exact=shares_exact,
+            current_price_exact=f"{price:.2f}",
+        )
+
+    # Two positions so total-exposure remediation demands the WHOLE fractional
+    # position; with only one, the per-position cap sizes below the holding and
+    # the float floor never becomes the binding constraint.
+    snapshot = PortfolioSnapshot(
+        positions=[
+            _pos("NVDA", 10.999999999999999999, 100.0, shares_exact=exact),
+            _pos("AAPL", 50.0, 100.0, shares_exact="50"),
+        ],
+        cash=100.0, total_equity=6200.0, as_of="2026-08-13",
+    )
+    packet = DecisionPacket(
+        generated_at="2026-08-13T15:00:00+00:00", portfolio=snapshot,
+        risk=build_risk_exposure(snapshot),
+        regime=MarketRegime(
+            benchmark_ticker="QQQ", trend="uptrend", volatility_regime="low_vol",
+            trailing_volatility_pct=1.0, as_of="2026-08-12",
+        ),
+        signals=[], upcoming_events=[], warnings=[], policy_version="test",
+    )
+    policy = TradingPolicy(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=0.05, max_total_exposure_pct=0.05, max_basket_pct=0.4,
+        max_leveraged_etf_pct=0.2, min_cash_reserve_pct=0.0,
+        max_order_value=50_000.0,
+    )
+
+    proposals = {p.intent.ticker: p for p in generate_risk_reduction_proposals(packet, policy)}
+    assert "NVDA" in proposals, "the over-cap fractional position must still be remediated"
+    nvda = proposals["NVDA"]
+    assert nvda.intent.shares == 10, (
+        f"proposed {nvda.intent.shares} shares against an exact holding of "
+        f"{exact}; the held side must be floored exactly, not via the float"
+    )
+
+    now = datetime(2026, 8, 13, 14, 0, tzinfo=timezone.utc)
+    result = validate_trade_intent(
+        nvda.intent, snapshot, reference_price=100.0, price_timestamp=now,
+        now=now, max_order_value=50_000.0,
+    )
+    codes = [str(getattr(v, "code", v)) for v in result.violations]
+    assert not any("exceeds" in code.lower() or "SELL_EXCEEDS_HELD" in code for code in codes), (
+        f"the gate must not refuse this risk-reducing sell as an oversell: {codes}"
+    )
+    assert Decimal(nvda.intent.shares) <= Decimal(exact)

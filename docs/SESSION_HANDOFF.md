@@ -1,7 +1,8 @@
-# Session handoff — independent review merged and counter-reviewed
+# Session handoff — independent review counter-reviewed; AP-11 clock race fixed
 
-Prepared: 2026-08-12, after Claude's counter-review of the independent
-full-project review (PR #196), performed on merged `main`.
+Prepared: 2026-08-13, after Claude's counter-review of the independent
+full-project review (PR #196) and a follow-on production-defect fix (AP-11)
+found by investigating a live negative-age freshness alert.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -34,6 +35,12 @@ authorizes M3, deployment, an epoch roll, live trading, or any funded action.
   machine-local `artifacts/`), the AP-10 merge disposition, the counter-review
   section of the independent-review report, two new guard tests, and this
   handoff.
+- Follow-on defect-fix branch: `user/claude/ap11-health-clock-race-20260813`,
+  created from the counter-review branch tip `594decf` (both branches touch
+  this handoff and the action plan, so the fix stacks on the exact reviewed
+  commit rather than manufacturing conflicts with `main`). It carries the
+  AP-11 fix, its two regression tests, the AP-11 ledger row, and this
+  handoff revision. Merge order: counter-review PR first, then AP-11.
 - Before staging or committing anything else, re-check `HEAD` and
   `git status`.
 
@@ -64,6 +71,37 @@ Full dispositions are in the counter-review section of
 - No further instance of the IPR-001 class (raw optional provider field into
   the format mini-language) was found in a repo-wide sweep.
 
+## 2b. AP-11 — the live negative-age warning, root-caused and fixed
+
+The owner asked why `reconciliation_freshness` warned
+`age_seconds=-0.117315, errors=0` at 2026-08-13T05:40:49Z on the deployed
+epoch-004 runtime, where AP-7 was recorded as fixed. Root cause, verified
+against the deployed source at `b837374` (content-identical to `main` for
+both files) and the alert's own timestamps:
+
+- The AP-7/DCCR-CR-002 fixes capture a post-read clock only when `now` is
+  None. `operational_health()` manufactured `now = now or datetime.now(...)`
+  at entry and passed it DOWN as an explicit `now`, so
+  `transaction_readiness()` froze to a clock captured before ~5 s of
+  integrity/broker work. `monitor-orders` commits
+  `last_order_reconciliation` every 30 s; tonight's write landed 0.117 s
+  after the frozen clock and the `timedelta(0) <=` guard flagged a healthy
+  reconciliation as future-dated. `build_platform_readiness()` shared the
+  manufacture-then-pass shape.
+- The AP-7 regression tests stayed green because they call each function
+  directly with `now=None` — a call shape production never uses.
+- Impact is bounded: warning noise plus nonzero operations-cycle exits.
+  No observation, ledger, reconciliation, or money path is affected; the
+  2026-08-12 observation captured cleanly with 0 mismatches.
+- Fix: both sites forward the caller's original clock (`now=explicit_now`).
+  Frozen as-of semantics for genuine caller-supplied clocks are preserved
+  and pinned in both directions. Both fixes reddened their new tests under
+  reverting mutation and passed restored.
+- The running epoch keeps the warning noise until the next authorized roll;
+  the open `reconciliation_freshness` alert row (fingerprint
+  `17852815…a6be`, 9 occurrences since 2026-08-06) can be acknowledged as
+  root-caused rather than investigated again.
+
 ## 3. Validation
 
 Environment: repository virtual environment, Python 3.13.14, Streamlit 1.60.0.
@@ -81,8 +119,9 @@ Environment: repository virtual environment, Python 3.13.14, Streamlit 1.60.0.
   passed, 1 failed, 25 known dependency warnings** in 641.07 s — the single
   failure was the extended placeholder guard correctly rejecting this line's
   own then-unfilled token.
-- Exact final tree: **3,491 passed, 0 failed, 0 skipped, 25 known dependency
-  warnings** under the repository venv, Python 3.13.14 / Streamlit 1.60.0.
+- Exact counter-review branch tip (`594decf`): **3,491 passed, 0 failed,
+  0 skipped, 25 known dependency warnings** under the repository venv,
+  Python 3.13.14 / Streamlit 1.60.0.
 - Environment note (operational, this machine): the PATH `python` is the
   WindowsApps interpreter with Streamlit 1.52.2, which fails the known
   frontend-hook assertion in `tests/test_ui_theme.py`. Prescribed validation
@@ -92,6 +131,19 @@ Environment: repository virtual environment, Python 3.13.14, Streamlit 1.60.0.
   above used the repository venv.
 - Repository-prescribed `compileall` (venv) and `git diff --check`: clean
   (only the expected LF→CRLF working-copy notice).
+
+AP-11 branch validation (all under the repository venv):
+
+- New production-call-path test: **failed red** before the fix (on the
+  concurrent-write assertion), passes after.
+- Both fix sites mutation-verified: reverting each `now=explicit_now` back
+  to `now=now` reddened exactly its own regression test; both restored
+  green.
+- Focused: `tests/test_operations.py`, `tests/test_transaction_readiness.py`,
+  `tests/test_readiness_budget.py`, `tests/test_platform_readiness.py` —
+  **64 passed** before the new platform test, all green after.
+- Exact AP-11 final tree: **3,493 passed, 0 failed, 0 skipped, 25 known
+  dependency warnings** in 674.19 s.
 
 ## 4. Operational truth — do not disturb the epoch
 
@@ -108,11 +160,14 @@ Environment: repository virtual environment, Python 3.13.14, Streamlit 1.60.0.
 
 ## 5. Next step
 
-The counter-review closes the independent-review round. The action plan's
-sequencing decides what happens next; nothing is left mid-flight. Open owner
-decisions, unchanged: epoch-roll timing for the merged-but-undeployed work
-(before the ~2026-09-10 AEP dividend window if the owner wants CR-W3 slack),
-the physical-media-only off-machine backup, and the GR-7d target portfolio.
+Two branches await owner-directed merge, in order: the counter-review branch
+(`user/claude/counter-review-ipr-20260812`), then the AP-11 fix branch
+stacked on it (`user/claude/ap11-health-clock-race-20260813`). Independent
+review of AP-11 by Codex is the expected next step of the standing loop.
+Open owner decisions, unchanged: epoch-roll timing for the
+merged-but-undeployed work (before the ~2026-09-10 AEP dividend window if
+the owner wants CR-W3 slack; AP-11 joins that queue), the physical-media-only
+off-machine backup, and the GR-7d target portfolio.
 
 ## 6. Resume prompt
 

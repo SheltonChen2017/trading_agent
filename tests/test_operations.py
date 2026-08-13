@@ -276,3 +276,72 @@ def test_readiness_freshness_uses_a_clock_captured_after_the_state_read(
     }["reconciliation_freshness"]
     assert frozen_freshness["ok"] is False
     assert "age_seconds=-1.000000" in frozen_freshness["detail"]
+
+
+def test_the_production_call_path_does_not_freeze_the_readiness_clock(
+    tmp_path, monkeypatch
+):
+    """AP-11 (observed in production 2026-08-13T05:40Z on epoch-004).
+
+    Both AP-7 fixes above are correct at their own sites, but the two tests
+    above call each function DIRECTLY with ``now=None`` -- and production
+    never does. The deployed watchdog and operations cycle reach
+    ``transaction_readiness`` only through ``operational_health``, which did
+    ``now = now or datetime.now(...)`` at entry and then passed that
+    manufactured clock DOWN as an explicit ``now``. The inner function
+    cannot distinguish it from a genuine caller-frozen as-of clock, so
+    every production run took the frozen branch, re-arming the exact race:
+    monitor-orders committed ``last_order_reconciliation`` 0.117 s after
+    the entry clock, the read happened ~5 s later behind the integrity and
+    broker checks, and a healthy reconciliation was alerted as future-dated
+    (age_seconds=-0.117315) with ``healthy=False`` failing the cycle.
+
+    The distinction that matters: ``explicit_now`` means THE CALLER of the
+    outermost entry point supplied a clock, so it must be forwarded, not
+    manufactured mid-chain. This test drives the production shape end to
+    end; the direct-call tests above cannot detect the regression.
+    """
+    import assistant.readiness as readiness_module
+
+    store = AssistantStore(tmp_path / "assistant.db")
+    policy = load_policy()
+    started_at = datetime(2026, 8, 13, 5, 40, 44, 639241, tzinfo=timezone.utc)
+    committed_at = started_at + timedelta(seconds=1)
+
+    store.set_system_state(
+        "last_order_reconciliation",
+        {"at": committed_at.isoformat(), "checked": 0, "updated": 0, "error_count": 0},
+    )
+
+    class AdvancingDateTime(datetime):
+        # Shared across BOTH modules deliberately: the first now() anywhere in
+        # the chain is the entry clock, every later one is post-read.
+        calls = 0
+
+        @classmethod
+        def now(cls, tz=None):
+            cls.calls += 1
+            value = started_at if cls.calls == 1 else started_at + timedelta(seconds=5)
+            return value if tz is None else value.astimezone(tz)
+
+    monkeypatch.setattr(operations_module, "datetime", AdvancingDateTime)
+    monkeypatch.setattr(readiness_module, "datetime", AdvancingDateTime)
+
+    report = operational_health(store, policy, check_broker=False)
+    freshness = {c["name"]: c for c in report["checks"]}["reconciliation_freshness"]
+    assert freshness["ok"] is True, (
+        "a reconciliation committed 1 s after operational_health's entry "
+        f"clock is CONCURRENT, not future-dated: {freshness}"
+    )
+
+    # A genuinely caller-supplied as-of clock must stay frozen through the
+    # whole chain: the same row is future-dated relative to it and must
+    # refuse at the nested readiness check too (FCS-017 unchanged).
+    frozen = operational_health(
+        store, policy, check_broker=False, now=started_at
+    )
+    frozen_freshness = {
+        c["name"]: c for c in frozen["checks"]
+    }["reconciliation_freshness"]
+    assert frozen_freshness["ok"] is False
+    assert "age_seconds=-1.000000" in frozen_freshness["detail"]

@@ -149,6 +149,32 @@ def test_a_fractional_holding_caps_at_the_floored_whole_shares():
     assert "would short the position" in over["reason"]
 
 
+def test_exact_fractional_holding_cannot_round_up_into_a_short_sale():
+    """The broker's exact quantity outranks its lossy float display field.
+
+    float("10.999999999999999999") is 11.0.  Reading only that display field
+    would offer and propose 11 shares even though the account owns less.
+    """
+    result = _sell(
+        shares=11,
+        positions=[_position(shares="10.999999999999999999")],
+    )
+    assert result["created"] is False
+    assert "would short the position" in result["reason"]
+    assert "10 whole share(s)" in result["reason"]
+
+
+def test_selling_all_whole_shares_of_a_fractional_holding_does_not_claim_close():
+    result = _sell(shares=10, positions=[_position(shares="10.5")])
+    assert result["created"] is True
+
+    proposal = result["proposal"]
+    text = " ".join([proposal.intent.rationale, *proposal.reasons])
+    assert "closes the whole position" not in text
+    assert "closes the entire" not in text
+    assert "0.5" in text and "remain" in text
+
+
 def _raw_packet(position: PortfolioPosition) -> DecisionPacket:
     """A snapshot built WITHOUT build_portfolio_snapshot's validation.
 
@@ -258,6 +284,16 @@ def test_exactly_at_the_maximum_order_value_is_allowed():
     """Boundary: the gate refuses only when trade value EXCEEDS the cap, so
     proposing at exactly the cap must not be refused here either."""
     result = _sell(shares=5, policy=_policy(max_order_value=500.0))
+    assert result["created"] is True
+
+
+def test_decimal_exact_maximum_order_boundary_is_allowed():
+    """3 * 0.1 is exactly 0.3 in decimal, despite its binary-float value."""
+    result = _sell(
+        shares=3,
+        positions=[_position(shares="3", price="0.1")],
+        policy=_policy(max_order_value=0.3),
+    )
     assert result["created"] is True
 
 

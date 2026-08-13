@@ -85,3 +85,54 @@ def test_the_share_selector_cannot_exceed_the_shares_held(
     held = int(widget.label.split("you hold ")[1].rstrip(")"))
     assert widget.max == held
     assert widget.min == 1
+
+
+def test_fractional_remainder_is_not_described_as_a_closed_position(
+    _offline_selling_environment,
+    monkeypatch,
+):
+    """Whole-share input cannot dispose of a fractional remainder."""
+    import assistant.sample_portfolio as sample_portfolio
+    import scripts.personal_assistant_ui as ui
+
+    fractional_positions = [
+        {
+            "ticker": "NVDA",
+            "shares": "10.5",
+            "entry_price": "100",
+            "current_price": "110",
+        }
+    ]
+    # AppTest executes the file in its own module namespace, while prior UI
+    # tests may already have imported the normal module. Patch both sources.
+    monkeypatch.setattr(sample_portfolio, "SAMPLE_POSITIONS", fractional_positions)
+    monkeypatch.setattr(ui, "SAMPLE_POSITIONS", fractional_positions)
+    # AppTest has its own execution-module wrapper around the same cached
+    # function; clear the shared Streamlit cache, not only the normal import.
+    import streamlit as st
+
+    st.cache_data.clear()
+    ui._load_base_packet.clear()
+
+    app = _selling_app()
+    app.number_input(key="user_sell_shares").set_value(10).run()
+
+    captions = "\n".join(element.value for element in app.caption)
+    assert "closes the position" not in captions
+    assert "0.5 share(s) would remain" in captions
+
+
+def test_changing_share_input_hides_the_stale_actionable_proposal(
+    _offline_selling_environment,
+):
+    app = _selling_app()
+    app.number_input(key="user_sell_shares").set_value(3).run()
+    app.button(key="user_sell_create").click().run()
+    assert "SELL 3 NVDA" in [element.value for element in app.subheader]
+
+    app.number_input(key="user_sell_shares").set_value(4).run()
+
+    assert "SELL 3 NVDA" not in [element.value for element in app.subheader]
+    notices = "\n".join(element.value for element in app.info)
+    assert "3 share(s)" in notices
+    assert "current 4-share selection" in notices

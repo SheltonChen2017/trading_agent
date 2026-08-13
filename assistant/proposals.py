@@ -5,7 +5,9 @@ import dataclasses
 import hashlib
 import math
 from datetime import datetime, timedelta, timezone
+from decimal import ROUND_FLOOR
 
+from assistant.money import decimal_or_none
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
 from assistant.schemas import DecisionPacket, PortfolioPosition
@@ -35,6 +37,38 @@ class TradeProposal:
     def to_dict(self) -> dict:
         result = dataclasses.asdict(self)
         return result
+
+
+def sellable_whole_shares(position_shares: object) -> int:
+    """Whole shares of a held position that may be sold, floored EXACTLY.
+
+    The single authority for "how many whole shares does this position
+    actually have", used by every sell-proposal generator and re-exported by
+    assistant/user_directed_sell.py.
+
+    Exactness is the point, not a nicety. A broker holding of
+    `10.999999999999999999` becomes `11.0` as a float, so `int(shares)`
+    yields 11 -- one more share than exists. Independent review (SELREV-001,
+    2026-08-13) found that this authorized an oversell end to end; the
+    execution gate now compares exact decimals and refuses it. Consolidated
+    here (SELCR-001) because the gate refusing is only half the fix: a
+    generator that keeps proposing 11 turns a correct refusal into a
+    RISK-REDUCING SELL THAT CAN NEVER BE APPROVED, leaving a position stuck
+    over its cap. Prefer `PortfolioPosition.shares_exact` at every call site;
+    the float field is a display value.
+
+    Non-finite, non-positive, and unconvertible quantities yield 0 so one
+    corrupt row refuses its own ticker instead of breaking the batch.
+    """
+    shares = decimal_or_none(position_shares)
+    if shares is None or shares <= 0:
+        return 0
+    return int(shares.to_integral_value(rounding=ROUND_FLOOR))
+
+
+def exact_position_shares(position: PortfolioPosition) -> object:
+    """The exact broker quantity when present, else the display float."""
+    return position.shares_exact if position.shares_exact is not None else position.shares
 
 
 def attach_tax_lot_advisory(
@@ -147,7 +181,14 @@ def _add_reduction(
         or position.current_price <= 0
     ):
         return
-    shares = min(int(position.shares), max(1, int(dollar_reduction / position.current_price)))
+    # SELCR-001: floor the HELD side exactly. `int(position.shares)` rounded a
+    # fractional broker quantity up, and the hardened gate then refused the
+    # resulting proposal -- blocking the very risk reduction this function
+    # exists to produce.
+    shares = min(
+        sellable_whole_shares(exact_position_shares(position)),
+        max(1, int(dollar_reduction / position.current_price)),
+    )
     entry = reductions.setdefault(
         position.ticker,
         {"position": position, "shares": 0, "reasons": []},

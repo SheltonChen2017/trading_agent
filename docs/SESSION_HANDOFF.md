@@ -1,153 +1,142 @@
-# Session handoff — owner-directed sell, atop merged M3
+# Session handoff — SELL-1 reviewed, counter-reviewed, and pushed
 
-Prepared: 2026-08-13, after the owner merged the three-sleeve M3 review
-branch (PR #201) and this Selling-tab milestone was integrated on top of it.
+Prepared: 2026-08-13, after Codex's independent SELL-1 review and Claude's
+counter-review of it.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 ## 0. Read this first
 
 1. `CLAUDE.md`
-2. `docs/ACTION_PLAN_2026-08-02.md` (rows SELL-1, AP-11, GR-7d)
-3. `docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md` including its counter-review
-   section
-4. `docs/reference/THREE_SLEEVE_ENGINE_PLAN.md` §1.1 / §5 M3
-5. `docs/OPERATIONAL_FACTS.md`
-6. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+2. `docs/ACTION_PLAN_2026-08-02.md` (SELL-1, AP-11, GR-7d)
+3. `docs/REVIEW_2026-08-13_SELL1_AND_BRANCH_CLEANUP.md`
+4. `docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md`
+5. `docs/reference/THREE_SLEEVE_ENGINE_PLAN.md`
+6. `docs/OPERATIONAL_FACTS.md`
 
-The action plan remains the sequencing authority. Nothing here authorizes
-deployment, an epoch roll, M4, live trading, or any funded action.
+Nothing here authorizes deployment, an evidence-epoch roll, M4, live trading,
+operator-database mutation, or any funded action.
 
 ## 1. Repository topology
 
-- `main` / `origin/main`: `022c456` — PR #201, which merged
-  `codex/review-three-sleeve-m3-20260813`. That branch carried three-sleeve
-  M3 (`7ee4786`), Codex's correction (`b6685b5`), its review record
-  (`55b4518`), and Claude's counter-review (`a5fc599`). **M3 and its six
-  corrections are therefore on `main`.**
-- This branch: `user/claude/user-directed-sell-20260813` — implementation
-  `918eecd` plus this integration merge of `origin/main`.
-- The now-superseded `user/claude/three-sleeve-m3-earmarks-20260813` holds
-  only the pre-review M3 commit. Everything in it reached `main` through
-  PR #201; it can be deleted whenever convenient. Do NOT merge it — doing so
-  would add nothing and only re-open reviewed history.
+- Review base/head: `c3d10ff`, which is both local `main` and `origin/main`
+  as observed when this review began. It merges PR #203 (SELL-1) and PR #204
+  (branch-cleanup documentation).
+- Implementation: `918eecd`; integration merge with reviewed M3: `dc1233a`;
+  mainline SELL-1 merge: `08fde9f`.
+- Review branch: `codex/review-claude-sell1-cleanup-20260813`.
+- Review correction: `3ba3d41`.
+- Claude's counter-review commit follows `e3931e0` on the same review
+  branch, carrying the counter-review section, the SELCR-001 consolidation,
+  its regression, and this handoff revision.
+- **The branch is pushed after the counter-review**, deliberately superseding
+  the pre-push local-only statement rather than leaving it to go stale.
+  Merging its PR is the owner's action.
+- Current fetched refs also show the documentation-cleanup topic ref, but the
+  former SELL-1, M3 implementation, and M3 review topic refs are absent. Their
+  required work is already merged to `main`; do not recreate or merge them.
 
-### Integration merge — what was resolved, and why
+## 2. Review outcome
 
-The two threads were developed from the same base and both touched the
-Selling/Buying pages and the CLI, so the merge produced three conflicts.
-Recorded because a conflict resolution is exactly where work silently
-disappears:
+Final disposition: **accepted after correction**. Submitted implementation
+quality: **7/10**. Commit dispositions:
 
-- `scripts/run_personal_assistant.py` — the real one. Git interleaved
-  `command_sell_holding` with M3's `command_sleeve_reinvest_propose`
-  because both handlers end in the same "Approve with:" shape, producing a
-  chimera that would have compiled while mixing two features' output. It was
-  NOT hand-patched: the file was rebuilt from `origin/main`'s version (the
-  authority for M3) with this branch's handler and subparser re-inserted
-  verbatim from `918eecd` at stable anchors. Verified afterwards by AST that
-  all five handlers (`command_sell_holding`, `command_sleeve_reinvest`,
-  `command_sleeve_reinvest_propose`, `_print_reinvest_status`,
-  `command_sleeve_report`) exist exactly once.
-- `tests/test_active_document_consistency.py` — the placeholder-token regex.
-  This branch's version is a strict superset of main's, so it was taken
-  whole; no token stopped being guarded.
-- `docs/SESSION_HANDOFF.md` — rewritten (this file) for the post-merge
-  reality rather than either side being picked, which is the IPRCR-001
-  staleness class this project keeps re-learning.
+- `918eecd`: accepted after correction (SELREV-001 through SELREV-004).
+- `dc1233a`: accepted after correction in the cumulative tree; no
+  integration-specific loss found.
+- `08fde9f`: accepted after correction in the cumulative tree; current-state
+  documentation corrected.
+- `cbb38cb`: accepted after correction (BRREV-001 and incomplete topology
+  synchronization).
+- `c3d10ff`: accepted after correction in the cumulative tree; merge-only.
 
-`scripts/personal_assistant_ui.py` auto-merged: M3's expander lives in the
-Buying page, this milestone's section in the Selling page.
+Issue summary: **0 P0, 1 P1, 3 P2, 2 P3; all resolved**. The full ledger and
+red/green evidence are in the review report.
 
-## 2. This milestone — owner-directed sell (SELL-1)
+The P1 mattered: exact broker shares of `10.999999999999999999` became the
+display float `11.0`, and both proposal creation and the shared execution gate
+authorized an 11-share sale. `3ba3d41` makes exact broker quantity govern both
+boundaries. The same correction also uses Decimal for `max_order_value`,
+reports fractional remainders truthfully, and hides an old proposal card when
+the selected quantity changes.
 
-Owner request: the Selling tab only ever proposed sells when a deterministic
-policy breach demanded one; the owner asked to be able to sell an individual
-currently-held position on their own judgement.
+## 2b. Counter-review outcome (Claude, 2026-08-13)
 
-- `assistant/user_directed_sell.py`:
-  `generate_user_directed_sell_proposal(...) -> {"created": bool, ...}` and
-  `sellable_whole_shares(...)`. Evidence status `user_directed_sell` — its
-  own module and status, because the policy-breach generator's
-  `deterministic_risk_policy` means the PROJECT computed a breach, and this
-  claims nothing of the sort.
-- Every refusal is a stated sentence, never a silent edit of the owner's
-  instruction: unheld ticker; a share count that is not a real positive
-  `int` (reuses `risk.execution_gate.is_valid_share_quantity`, so bools,
-  whole-valued floats, NaN, and strings are rejected exactly as the broker
-  layer rejects them); more shares than held, with holdings floored to whole
-  shares because rounding up would propose a short; an unusable price; and a
-  notional above `max_order_value`, which names how many shares WOULD fit
-  rather than quietly proposing fewer than asked.
-- The tax-consequence disclosure was consolidated into
-  `assistant.proposals.attach_tax_lot_advisory`, now shared with the
-  policy-breach generator instead of hand-copied; a test pins that both
-  callers use the same object.
-- Surfaces: a Selling-tab section above and visually divided from the
-  policy-breach section, with copy disclaiming any recommendation, plus CLI
-  `sell-holding --ticker --shares [--json]`.
-- Deliberately not implemented: limit orders, scheduled or conditional
-  sells, bulk multi-ticker sells, and any auto-submission. Nothing here
-  weakens `risk/execution_gate.py`, which re-checks everything at approval.
+All six review findings **confirmed genuine**, each reproduced independently:
+`float("10.999999999999999999")` really is `11.0` (SELREV-001, a P1 in
+Claude's submitted code and a plain violation of CLAUDE.md §5's ban on binary
+floating point in money paths), and `3 * 0.10` really does exceed a `0.30`
+cap in float arithmetic (SELREV-002 — the submitted boundary test passed only
+because it used binary-friendly numbers). No test was weakened.
 
-## 3. Validation (repository venv, Python 3.13.14 / Streamlit 1.60.0)
+One further finding, **SELCR-001 (P2), resolved on the review branch**: the
+gate hardening was only half the fix. `risk/execution_gate.py` now refuses a
+sell of 11 against an exact holding of 10.999999999999999999, but both older
+generators still floored the display float and kept proposing 11 — so a
+legitimate RISK-REDUCING sell could never be approved and the position stayed
+over its cap with no in-app remedy, the exception CLAUDE.md §5 names by name.
+Reproduced end to end, then fixed by consolidating the exact floor into
+`assistant.proposals.sellable_whole_shares` for all three generators.
 
-Pre-merge, on `918eecd`:
+## 3. Validation
 
-- `tests/test_user_directed_sell.py` **40 passed**;
-  `tests/test_ui_user_directed_sell.py` **3 passed**.
-- Four safety guards mutation-verified (over-sell refusal, share-validity,
-  floor-not-ceil, max-order-value refusal): each reddened exactly its own
-  tests and passed restored.
-- The `assistant/proposals.py` extraction proven behavior-preserving:
-  `tests/test_proposals.py` + `tests/test_tax_lots.py` **105 passed** before
-  and after.
-- Branch tree: **3,537 collected, 0 unexpected failures**.
+Environment: repository virtual environment, Python 3.13.14 / Streamlit
+1.60.0.
 
-Post-merge, on this integrated tree:
+- Submitted-tree red proof: **6 failed, 49 passed**, all for the intended
+  findings.
+- Corrected broader focused suite: **391 passed** in 36.40 s.
+- Documentation-complete full suite: **3,618 passed, 0 failed, 0 skipped,
+  25 known dependency warnings** in 669.76 s.
+- After recording the measured result: active-document suite **21 passed**;
+  ML import-boundary tests, compileall including `research`, `git diff
+  --check`, staged checks, narrow secret-shape scan, and final status passed.
 
-- Both feature suites together — `test_user_directed_sell`,
-  `test_ui_user_directed_sell`, `test_sleeve_reinvest`,
-  `test_ui_sleeve_reinvest`, `test_proposals`: **128 passed**.
-- Validating run (everything final except this line): **3,609 passed,
-  1 failed, 25 known dependency warnings** in 679.01 s — the single failure
-  was the placeholder guard correctly rejecting this line's own then-unfilled
-  token. Total collected 3,610 = merged `main`'s 3,567 plus this branch's 43,
-  which is the arithmetic proof that the merge dropped no test from either
-  side.
-- Exact final tree differs only by this validation text; the doc-consistency
-  suite (the only tests reading this file) was rerun green on the final text.
-- `compileall` and `git diff --check`: clean.
+## 4. Operational truth
 
-## 4. Operational truth — do not disturb the epoch
+- `paper-epoch-004` remains the only active evidence epoch, frozen at
+  `b837374` in `C:\git\trading_agent_operational` according to the current
+  verified records. This review did not inspect or mutate that clone or its
+  database.
+- SELL-1, M3, AP-8, AP-9, QC-2, AP-10, and AP-11 remain development changes
+  not deployed into that frozen epoch.
+- CR-W3 remains unchanged: the first real AEP dividend subtype may over-refuse
+  safely around 2026-09-10; JNLC still requires operator judgement. Never
+  widen reconciliation tolerance or use a manual compensating entry.
+- The deleted GR-7d equal-weight branch is not reachable from current refs.
+  This checkout currently retains dangling tip `85a77291...`, but it is
+  local-only, may be pruned, and does not restore the superseded decision.
 
-- `paper-epoch-004` is the only active evidence epoch, frozen at `b837374`
-  in `C:\git\trading_agent_operational`. Nothing here is deployed.
-- AP-8, AP-9, QC-2, AP-10, AP-11, M3 (now on `main`), and SELL-1 (pending)
-  all ride the next owner-authorized epoch roll.
-- CR-W3 watch unchanged: the first real AEP dividend subtype may over-refuse
-  safely around 2026-09-10; JNLC still needs operator accounting judgement;
-  never widen reconciliation tolerance or use a manual compensating entry.
-- When M3 first deploys, the dividend pool will be non-zero immediately
-  (the operator ledger already holds confirmed dividends). Nothing spends it
-  without an explicitly approved proposal.
+## 5. Completed scope and exclusions
 
-## 5. Next step
+SELL-1 now prepares one explicit owner-directed whole-share sell proposal for
+a held ticker through the existing typed-approval and paper-only execution
+pipeline. It remains distinct from policy-breach recommendations and retains
+tax-advisory disclosure.
 
-Independent review of this branch (SELL-1 has had no outside review), then
-the owner's merge. M4 remains deferred by default. Unchanged open owner
-decisions: epoch-roll timing, the physical-media-only off-machine backup,
-the unidentified `origin/Funny` branch, and deletion of the superseded
-`user/claude/three-sleeve-m3-earmarks-20260813`.
+No schema or migration changed. No limit, fractional, conditional, scheduled,
+or multi-ticker sell was added. Nothing auto-submits. No ML/LLM authority,
+policy cap, broker outcome, scheduler, deployment, live-account support, or
+evidence status changed.
 
-## 6. Resume prompt
+## 6. Next step
+
+The review loop is complete: implemented, independently reviewed,
+counter-reviewed, and pushed. The remaining action is the owner's merge of the
+review branch's PR. Do not deploy or roll `paper-epoch-004` as part of that
+Git action. M4 remains deferred unless
+the owner explicitly schedules it. Open owner decisions remain epoch-roll
+timing, the physical-media-only off-machine backup, and whether to preserve or
+allow pruning of the dangling superseded GR-7d objects.
+
+## 7. Resume prompt
 
 ```text
-Verify a clean worktree and confirm whether user/claude/user-directed-sell-
-20260813 has merged. Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md
-(SELL-1, AP-11, GR-7d), docs/SESSION_HANDOFF.md, and
-docs/REVIEW_2026-08-13_THREE_SLEEVE_M3.md including its counter-review
-section. Pending work is independent review of SELL-1. Do not deploy, touch
-the operator database, roll paper-epoch-004, or begin M4 without a new owner
-instruction.
+Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, and
+docs/REVIEW_2026-08-13_SELL1_AND_BRANCH_CLEANUP.md including its
+counter-review section. Confirm whether
+codex/review-claude-sell1-cleanup-20260813 has merged; it was pushed and
+awaiting the owner's merge at handoff. Do not deploy, touch the
+operator database, roll paper-epoch-004, restore deleted branches, or begin M4
+without a new owner instruction.
 ```

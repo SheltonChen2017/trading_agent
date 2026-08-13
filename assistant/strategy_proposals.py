@@ -68,7 +68,11 @@ from market_analytics import classify_trend
 from assistant.context_builder import KNOWN_FINDINGS
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
-from assistant.proposals import TradeProposal
+from assistant.proposals import (
+    TradeProposal,
+    exact_position_shares,
+    sellable_whole_shares,
+)
 from assistant.schemas import DecisionPacket, EvidenceStatus
 from assistant.storage import AssistantStore
 from risk.execution_gate import TradeIntent
@@ -490,8 +494,14 @@ def _generate_leveraged_pair_rebalance_proposals(
         # -- may only partially close the gap in one pass, same as the
         # buy branch already discloses.
         max_order_shares = int(policy.max_order_value / leveraged_position.current_price)
+        # SELCR-001: exact floor on the held side (see
+        # assistant.proposals.sellable_whole_shares) -- a float-rounded
+        # fractional holding produced a proposal the gate must refuse, which
+        # would strand this rebalance sell permanently.
         shares = min(
-            int(leveraged_position.shares), max_order_shares, int(excess_value / leveraged_position.current_price)
+            sellable_whole_shares(exact_position_shares(leveraged_position)),
+            max_order_shares,
+            int(excess_value / leveraged_position.current_price),
         )
         side = "sell"
         reason = (

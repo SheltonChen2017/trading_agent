@@ -32,12 +32,18 @@ share count that would work whenever one exists.
 from __future__ import annotations
 
 import hashlib
-import math
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal, ROUND_FLOOR
 
+from assistant.money import decimal_or_none, decimal_text
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import preview_trade_impact
-from assistant.proposals import TradeProposal, attach_tax_lot_advisory
+from assistant.proposals import (
+    TradeProposal,
+    attach_tax_lot_advisory,
+    exact_position_shares,
+    sellable_whole_shares,
+)
 from assistant.schemas import DecisionPacket
 from assistant.tax_lots import LotLedger
 from risk.execution_gate import TradeIntent, is_valid_share_quantity
@@ -45,26 +51,20 @@ from risk.execution_gate import TradeIntent, is_valid_share_quantity
 EVIDENCE_STATUS = "user_directed_sell"
 
 
-def sellable_whole_shares(position_shares: object) -> int:
-    """Whole shares of a held position that may be sold.
+def remaining_shares_after_sale(
+    position_shares: object, shares_to_sell: object
+) -> Decimal | None:
+    """Exact non-negative remainder for a valid whole-share sale.
 
-    Floors deliberately: this workflow submits whole-share orders only
-    (risk.execution_gate.is_valid_share_quantity), so a fractional holding
-    of 10.5 offers 10 sellable shares. Rounding UP would propose selling
-    shares the account does not have -- a short position, which this
-    paper-trading project never opens.
-
-    Non-finite or non-positive share counts yield 0 rather than raising, so
-    a corrupt snapshot row refuses this one ticker instead of breaking the
-    page for every other holding.
+    ``None`` means either input is unusable or the requested sale exceeds the
+    holding.  This helper keeps the UI's wording and the proposal generator on
+    the same exact-decimal quantity rule.
     """
-    try:
-        shares = float(position_shares)
-    except (TypeError, ValueError):
-        return 0
-    if not math.isfinite(shares) or shares <= 0:
-        return 0
-    return int(math.floor(shares))
+    held = decimal_or_none(position_shares)
+    if held is None or held <= 0 or not is_valid_share_quantity(shares_to_sell):
+        return None
+    remainder = held - Decimal(shares_to_sell)
+    return remainder if remainder >= 0 else None
 
 
 def _stable_id(
@@ -129,7 +129,12 @@ def generate_user_directed_sell_proposal(
             ),
         }
 
-    held_whole = sellable_whole_shares(position.shares)
+    held_input = (
+        position.shares_exact
+        if position.shares_exact is not None
+        else position.shares
+    )
+    held_whole = sellable_whole_shares(held_input)
     if held_whole <= 0:
         return {
             "created": False,
@@ -148,32 +153,40 @@ def generate_user_directed_sell_proposal(
             ),
         }
 
-    price = position.current_price
-    if not math.isfinite(price) or price <= 0:
+    price_input = (
+        position.current_price_exact
+        if position.current_price_exact is not None
+        else position.current_price
+    )
+    price_decimal = decimal_or_none(price_input)
+    if price_decimal is None or price_decimal <= 0:
         return {
             "created": False,
             "reason": (
-                f"{normalized} has no usable current price ({price!r}), so "
+                f"{normalized} has no usable current price ({price_input!r}), so "
                 "this sale cannot be priced or previewed."
             ),
         }
 
-    notional = shares * price
-    max_order_value = policy.max_order_value
-    if (
-        max_order_value is not None
-        and math.isfinite(max_order_value)
-        and max_order_value > 0
-        and notional > max_order_value
-    ):
-        fits = int(math.floor(max_order_value / price))
+    notional = Decimal(shares) * price_decimal
+    max_order_value = decimal_or_none(policy.max_order_value)
+    if max_order_value is None or max_order_value <= 0:
+        return {
+            "created": False,
+            "reason": (
+                "The active policy has no usable positive maximum order value "
+                f"({policy.max_order_value!r})."
+            ),
+        }
+    if notional > max_order_value:
+        fits = int(max_order_value // price_decimal)
         # Stated, never silently applied: quietly shrinking the owner's
         # requested quantity would be an action-shaped edit to their own
         # instruction. The execution gate would refuse this order anyway
         # (MAX_ORDER_VALUE is side-agnostic), so refusing here just makes
         # the refusal legible before a doomed proposal exists.
         remedy = (
-            f" At ${price:,.2f} per share, up to {fits} share(s) fit in one "
+            f" At ${price_decimal:,.2f} per share, up to {fits} share(s) fit in one "
             "order; sell the rest in a second order."
             if fits > 0
             else " Even one share exceeds that limit at the current price."
@@ -188,7 +201,17 @@ def generate_user_directed_sell_proposal(
         }
 
     at = now or datetime.now(timezone.utc)
-    closes_position = shares == held_whole
+    remaining_shares = remaining_shares_after_sale(held_input, shares)
+    # The oversell guard above makes None unreachable for valid state, but
+    # refuse rather than manufacture a close/remaining claim if the exact
+    # quantity changes or becomes unusable between those calculations.
+    if remaining_shares is None:
+        return {
+            "created": False,
+            "reason": f"The exact {normalized} share quantity is unavailable.",
+        }
+    closes_position = remaining_shares == 0
+    price = float(price_decimal)
     intent = TradeIntent(
         ticker=normalized,
         side="sell",
@@ -233,6 +256,14 @@ def generate_user_directed_sell_proposal(
         reasons.append(
             f"This closes the entire {normalized} position as reported by "
             "this snapshot."
+        )
+    elif remaining_shares != Decimal(held_whole - shares):
+        # A fractional remainder is easy to miss because this workflow accepts
+        # whole-share orders only.  Name it explicitly instead of describing
+        # the sale of every whole share as a full close.
+        reasons.append(
+            f"{decimal_text(remaining_shares)} share(s) of {normalized} remain "
+            "after this whole-share sale."
         )
     return {
         "created": True,

@@ -1,10 +1,9 @@
-# Session handoff — independent full-project review complete
+# Session handoff — independent review merged and counter-reviewed
 
-Prepared: 2026-08-12, after an independent review of merged `main` at
-`b356292`, one production correction, and reconciliation of the active project
-records.
+Prepared: 2026-08-12, after Claude's counter-review of the independent
+full-project review (PR #196), performed on merged `main`.
 
-Audience: repository owner, Claude Code, and the next independent verifier.
+Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 ## 0. Read this first
 
@@ -13,118 +12,114 @@ Read, in order:
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
 3. `docs/OPERATIONAL_FACTS.md`
-4. `docs/REVIEW_2026-08-12_INDEPENDENT_FULL_PROJECT.md`
+4. `docs/REVIEW_2026-08-12_INDEPENDENT_FULL_PROJECT.md` (including its
+   counter-review section)
 5. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
 6. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
 
-The action plan remains the sequencing authority. This review does not
-authorize M3, deployment, an epoch roll, live trading, or any funded action.
+The action plan remains the sequencing authority. Nothing in this session
+authorizes M3, deployment, an epoch roll, live trading, or any funded action.
 
 ## 1. Repository topology
 
-- Review base: `main` / `origin/main` at `b356292` (PR #195, AP-9 merge).
-- Review branch: `codex/independent-full-review-20260812`.
-- Production correction: `67558f5` — harden most-active volume disclosure.
-- Review record and active-document reconciliation: `78a69b3`.
-- This handoff is the final separate documentation commit after those two
-  durable changes. The branch is local-only by the owner's instruction;
-  nothing was pushed.
-- The isolated worktree is
-  `C:\git\customizedAgent\trading_agent\artifacts\codex-independent-full-review`;
-  it was used so Claude's concurrent independent review of `main` would not
-  share branch or working-tree state.
+- `main` / `origin/main` before this session: `1a46881` — the PR #196 merge
+  of `codex/independent-full-review-20260812` (`67558f5` production
+  correction, `78a69b3` review record, `428bb56` handoff). The owner pushed
+  and merged that branch after its handoff was written; the merge tree equals
+  branch tip `428bb56` exactly.
+- This session's counter-review branch:
+  `user/claude/counter-review-ipr-20260812`, created from `1a46881`.
+  Its commits carry the IPRCR-001 correction (stale post-merge handoff
+  topology), the IPRCR-002 correction (`pytest.ini` collection exclusion for
+  machine-local `artifacts/`), the AP-10 merge disposition, the counter-review
+  section of the independent-review report, two new guard tests, and this
+  handoff.
+- Before staging or committing anything else, re-check `HEAD` and
+  `git status`.
 
-Before staging or committing anything else, re-check `HEAD` and `git status`.
-Do not infer the state of Claude's separate review from this branch.
+## 2. What the counter-review concluded
 
-## 2. Review outcome
+Full dispositions are in the counter-review section of
+`docs/REVIEW_2026-08-12_INDEPENDENT_FULL_PROJECT.md`.
 
-**Accepted after correction: 0 P0, 0 P1, 1 P2, 3 P3; all closed.**
+- **All four IPR findings confirmed and correctly fixed.** IPR-001 was
+  reproduced from pre-fix source and its 7-case mutation independently
+  re-run; IPR-004 was verified against the installer source (both task
+  installers schedule `Convert-EasternClockToLocal -Hour 16 -Minute 30`);
+  all four new documentation guards were mutation-verified sensitive.
+- **IPRCR-001 (P3), resolved here:** after the owner merged PR #196, the
+  handoff on `main` still called the review branch local-only and directed
+  the next operator to a pre-merge branch and range. The same recurrence
+  class IPR-002 fixed. Corrected with a red-first known-stale-phrase guard;
+  historical review reports keeping their as-written topology are
+  deliberately untouched.
+- **IPRCR-002 (P2), resolved here:** the review's leftover worktree at
+  gitignored `artifacts/codex-independent-full-review` broke the prescribed
+  `python -m pytest -q` on this checkout — 163 "import file mismatch"
+  collection errors, zero tests run, `git status` clean throughout (pytest
+  does not honor `.gitignore`). Fixed with a `pytest.ini` `norecursedirs`
+  exclusion, proven to restore collection with the worktree still present
+  (3,491 collected), then the clean, merged worktree was removed. A
+  mutation-verified hygiene test pins the config.
+- No further instance of the IPR-001 class (raw optional provider field into
+  the format mini-language) was found in a repo-wide sweep.
 
-- **IPR-001 — P2:** raw optional yfinance most-active volume could raise
-  during comma formatting and hide the entire verified recommendation batch;
-  corrupt numeric shapes could also render as measured facts. The new helper
-  accepts only finite, non-negative whole share counts and otherwise displays
-  `not reported`. Seven bad shapes and a valid sibling row are pinned; reverse
-  mutation failed all seven.
-- **IPR-002 — P3:** AP-9 validation placeholders and its pre-merge handoff
-  survived PR #195. All three tokens now carry the measured merged-main result,
-  and this handoff replaces the obsolete merge instruction.
-- **IPR-003 — P3:** current sections still called epoch-004 components
-  undeployed and the epoch host still named epoch-003. The action plan,
-  operational facts, milestone record, and handoff now agree: CR-W2, AP-7,
-  and broker-activity acknowledgement are deployed on `b837374`; AP-8/AP-9
-  are not.
-- **IPR-004 — P3:** HOW_TO_USE incorrectly called PaperObservation 16:30
-  local. The installer authority is 16:30 Eastern converted to local time
-  with date-specific DST rules; the guide and a regression now say so.
-
-No separate `FEATURE_MILESTONE_RECORD` entry was added for the review itself:
-this is a review/correction round, not a newly completed product milestone.
-Existing AP-9 and acknowledgement entries were reconciled in place.
-
-## 3. Scope completed
-
-- All 79 files under `docs/` and all required root guides were read.
-- All 203 production Python modules and 166 test modules were inventoried and
-  structurally scanned; post–2026-08-07 additions and high-risk money,
-  persistence, execution, AI, ML, scheduler, and UI paths received deeper
-  source review.
-- All four PowerShell modules, logic-bearing JSON, pinned dependencies,
-  Streamlit configuration, and CI workflow were checked.
-- The ordered recent range `cea6640..b356292` was dispositioned; the PR #194
-  and #195 merge trees contain no merge-only deltas.
-- No operator database, broker endpoint, scheduler, operational checkout, or
-  live model service was accessed.
-
-## 4. Validation
+## 3. Validation
 
 Environment: repository virtual environment, Python 3.13.14, Streamlit 1.60.0.
 
-- Untouched-main baseline at `b356292`: **3,478 passed, 0 failed, 0 skipped,
-  25 known dependency warnings** in 714.47 seconds.
-- Focused recommendation suite: **54 passed**.
-- IPR-001 reverse mutation: **7 intended failures**; restored regression:
-  **7 passed**.
-- Four new current-document guards all failed red before correction.
-- Corrected active-document suite: **17 passed**.
-- Exact corrected tree: **3,489 passed, 0 failed, 0 skipped, 25 known
-  dependency warnings** in 624.99 seconds.
-- Repository-prescribed `compileall`, all four PowerShell parses,
-  `git diff --check`, and final status/diff inspection: clean (Windows emitted
-  only expected LF→CRLF working-copy notices).
+- New guard `test_handoff_does_not_describe_the_merged_independent_review_branch_as_stale_topology`:
+  **failed red** against the pre-correction handoff, passes after.
+- IPR-001 mutation independently re-run: **7 failed** reverted, **7 passed**
+  restored.
+- Placeholder, epoch-host, and Eastern-clock documentation guards: each
+  **reddened** under targeted regression and passed restored; clean tree
+  confirmed after every restoration.
+- Focused pre-change: `tests/test_active_document_consistency.py` +
+  `tests/test_recommended_stocks.py` — **71 passed**.
+- Penultimate tree (everything final except this validation line): **3,490
+  passed, 1 failed, 25 known dependency warnings** in 641.07 s — the single
+  failure was the extended placeholder guard correctly rejecting this line's
+  own then-unfilled token.
+- Exact final tree: **3,491 passed, 0 failed, 0 skipped, 25 known dependency
+  warnings** under the repository venv, Python 3.13.14 / Streamlit 1.60.0.
+- Environment note (operational, this machine): the PATH `python` is the
+  WindowsApps interpreter with Streamlit 1.52.2, which fails the known
+  frontend-hook assertion in `tests/test_ui_theme.py`. Prescribed validation
+  must use `.venv\Scripts\python.exe`. This session's mutation checks ran
+  under the PATH interpreter (also Python 3.13.14; the checks are
+  content-level and Streamlit-independent); both full-suite measurements
+  above used the repository venv.
+- Repository-prescribed `compileall` (venv) and `git diff --check`: clean
+  (only the expected LF→CRLF working-copy notice).
 
-## 5. Operational truth — do not disturb the epoch
+## 4. Operational truth — do not disturb the epoch
 
 - `paper-epoch-004` is the only active evidence epoch. Its frozen deployed
   runtime is `b837374` in `C:\git\trading_agent_operational`.
-- The epoch-004 roll already deployed CR-W2 dividend/cash-movement ingestion,
-  both AP-7 freshness fixes, the MADCR-001 IPO identity correction, and the
-  broker-activity acknowledgement path. AP-7 was confirmed fixed in
-  production.
-- AP-8, AP-9, QC-2, and IPR-001 are development code and are **not deployed**.
+- CR-W2, AP-7, MADCR-001, and the broker-activity acknowledgement path are
+  deployed there. AP-8, AP-9, QC-2, AP-10/IPR-001, and this counter-review
+  are merged development code and are **not deployed**; they ride the next
+  owner-authorized epoch roll.
 - CR-W3 remains a genuine watch: the first real AEP dividend subtype may
   over-refuse safely around 2026-09-10. JNLC still needs explicit operator
   accounting judgement. Never widen reconciliation tolerance or use a manual
   compensating entry.
 
-## 6. Next step
+## 5. Next step
 
-The owner asked Claude to independently verify these changes. Review the
-ordered range `b356292..HEAD`, beginning with `67558f5` and `78a69b3`,
-reproduce IPR-001 and the four red documentation guards, inspect the cumulative
-tree, and report any corrections on a separate branch. Do not push this branch,
-merge it, or deploy it unless the owner gives a new explicit instruction.
+The counter-review closes the independent-review round. The action plan's
+sequencing decides what happens next; nothing is left mid-flight. Open owner
+decisions, unchanged: epoch-roll timing for the merged-but-undeployed work
+(before the ~2026-09-10 AEP dividend window if the owner wants CR-W3 slack),
+the physical-media-only off-machine backup, and the GR-7d target portfolio.
 
-## 7. Resume prompt
+## 6. Resume prompt
 
 ```text
-Switch to codex/independent-full-review-20260812 and verify a clean worktree.
-Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/OPERATIONAL_FACTS.md, docs/SESSION_HANDOFF.md, and
-docs/REVIEW_2026-08-12_INDEPENDENT_FULL_PROJECT.md completely. Review the
-range b356292..HEAD commit by commit and in the cumulative tree. Reproduce
-IPR-001's malformed-volume failure and the four documentation guards; do not
-assume the review's conclusions. Do not push, merge, deploy, touch the
+Verify a clean worktree on main and confirm origin/main == main. Read
+CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, docs/OPERATIONAL_FACTS.md,
+docs/SESSION_HANDOFF.md, and the counter-review section of
+docs/REVIEW_2026-08-12_INDEPENDENT_FULL_PROJECT.md. Do not deploy, touch the
 operator database, or roll paper-epoch-004 without a new owner instruction.
 ```

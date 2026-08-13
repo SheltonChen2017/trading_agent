@@ -173,6 +173,35 @@ def test_the_public_soxx_soxl_wrapper_still_delegates_to_the_generic_path():
     assert "SOXX_SOXL_PAIR" in body
 
 
+def test_pytest_collection_excludes_machine_local_artifacts():
+    """Counter-review IPRCR-002 (2026-08-12). A review worktree left in the
+    gitignored `artifacts/` directory gave every test module a same-basename
+    twin, and the repository-prescribed `python -m pytest -q` aborted with 163
+    "import file mismatch" collection errors while running zero tests --
+    `git status` stayed clean the whole time because pytest does not honor
+    .gitignore.
+
+    A config check rather than a behavioral one, deliberately: observing the
+    dangerous direction behaviorally means planting a colliding module and
+    re-running full collection in a subprocess (~1 minute), and the invariant
+    is about collection configuration, which the running suite cannot observe
+    about itself. The dangerous direction is still pinned: parse the effective
+    ini value and require `artifacts` alongside every pytest-9.1 default, so
+    neither dropping the addition nor silently narrowing the defaults passes.
+    """
+    ini = (REPO_ROOT / "pytest.ini").read_text(encoding="utf-8")
+    match = re.search(r"^norecursedirs\s*=\s*(.+)$", ini, flags=re.MULTILINE)
+    assert match, "pytest.ini must declare norecursedirs"
+    declared = set(match.group(1).split())
+    required = {"*.egg", ".*", "_darcs", "build", "CVS", "dist",
+                "node_modules", "venv", "{arch}", "artifacts"}
+    missing = sorted(required - declared)
+    assert not missing, (
+        "pytest.ini norecursedirs REPLACES pytest's default list, so it must "
+        f"restate every default plus 'artifacts'; missing: {missing}"
+    )
+
+
 def test_no_unused_imports_in_the_modules_the_audit_cleaned():
     """Pins the five removals so they cannot silently return. Deliberately
     scoped to the audited files rather than the whole repo: a repo-wide unused-
@@ -207,5 +236,6 @@ if __name__ == "__main__":
     test_the_pead_snippet_does_not_call_a_loader_it_never_imported()
     test_the_duplicate_private_soxx_soxl_wrapper_is_gone()
     test_the_public_soxx_soxl_wrapper_still_delegates_to_the_generic_path()
+    test_pytest_collection_excludes_machine_local_artifacts()
     test_no_unused_imports_in_the_modules_the_audit_cleaned()
     print("All module-hygiene tests passed.")

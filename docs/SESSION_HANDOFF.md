@@ -1,173 +1,220 @@
-# Session handoff — AP-9 allocation-review visibility
+# Session handoff — AP-9 reviewed and corrected
 
-Prepared: 2026-08-12, after the owner enabled the AI features, found no Claude
-review under the Buying page's purchase split, and directed that the length
-limit be removed and the output shown in full.
+Prepared: 2026-08-12, after independent Codex review of Claude's AP-9
+allocation-review visibility fix
 
 Audience: Codex, Claude, and the repository owner on either development
 computer
 
 Repository: `SheltonChen2017/trading_agent`
 
-## 0. Read this first
+## 0. Transfer warning — read first
+
+**LOCAL-ONLY WARNING.** No remote ref exists for the current Codex review
+branch. Another computer cannot retrieve the correction, review report, or
+this replacement handoff with `git fetch` until the owner explicitly
+authorizes a push. Do not describe the computer transition as ready before
+that remote ref is verified.
+
+No push, pull request, merge, deployment, scheduled-task change, evidence-
+epoch mutation, or operator-database write was authorized or performed by the
+Codex review.
 
 Read, in order:
 
 1. `CLAUDE.md`
-2. `docs/ACTION_PLAN_2026-08-02.md` (§6 AP-9)
+2. `docs/ACTION_PLAN_2026-08-02.md` (§6 AP-9 and adopted sequencing)
 3. `docs/OPERATIONAL_FACTS.md`
-4. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-5. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+4. `docs/REVIEW_2026-08-12_AP9_ALLOCATION_REVIEW_VISIBILITY.md`
+5. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+6. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
 
-The action plan is the sequencing authority. Operational facts are the durable
-machine/epoch record. Do not reconstruct either from chat memory.
+The action plan is the sequencing authority. Operational facts are the
+append-and-amend machine/epoch record. Do not reconstruct either from chat
+memory.
 
 ## 1. Repository and branch topology
 
-- Base `main` / `origin/main`: `cea6640` (PR #193 merge).
-- This branch: `user/claude/allocation-review-visibility-20260812`, branched
-  from `cea6640`.
-- **Also outstanding and unmerged:**
-  `codex/review-ap8-ticker-disclosure-20260812` at `00d24b5` (AP-8, reviewed
-  and counter-reviewed). This branch was deliberately taken from `main`, not
-  from the AP-8 tip: the two are independent, and they touch different regions
-  of `scripts/personal_assistant_ui.py` (AP-8 the Briefing and Ticker
-  Suggestions captions, AP-9 the Buying page's review block). Merge order does
-  not matter.
+- Latest fetched `origin/main`: `27fa872` (PR #194, merged AP-8 review).
+- Local `main`: `cea6640`; it is seven commits behind the fetched remote and
+  was deliberately not moved during this review.
+- Submitted AP-9 base: `cea6640`.
+- Submitted branch: `user/claude/allocation-review-visibility-20260812`.
+  Its remote ref exists.
+- Submitted implementation: `3f1faf3`.
+- Review branch: `codex/review-ap9-allocation-visibility-20260812`.
+- Review correction: `6295b2f`.
+- Review/action-plan/milestone/operational-facts documentation: `75e8167`.
+- The final handoff is a separate commit after `75e8167`; use `git log -3`
+  to identify the branch tip rather than expecting this file to name its own
+  commit.
 
-## 2. What prompted this
+The AP-9 branch was cut before AP-8 merged. AP-8 and AP-9 change different UI
+regions, but both update current documents. Before AP-9 can merge, integrate
+the fetched current main into this review work through an owner-authorized
+workflow, preserve both milestones' documentation, resolve the replacement
+handoff intentionally, and rerun validation. Do not overwrite AP-8's merged
+records with the older base's versions.
 
-The owner enabled the optional AI features and reported that no Claude review
-appeared beneath the inverse-volatility purchase split. It was not a
-configuration mistake. Read-only inspection of the operator `ai_runs` audit log
-showed the call had fired **twice that afternoon**, ~9 seconds each, and both
-results were thrown away with `failed post-hoc validation`.
+At handoff completion the intended history order is:
 
-The cause was `_MAX_SUMMARY_LENGTH = 500`:
+1. `3f1faf3` — Claude AP-9 implementation;
+2. `6295b2f` — Codex code/test corrections;
+3. `75e8167` — review report and durable project-document updates;
+4. separate session-handoff commit.
 
-| Run | Summary length | Outcome |
+The worktree must be clean before anyone switches branches, integrates main,
+or publishes this branch. Recheck `git status --short --branch`; this is a
+shared checkout and another agent can move `HEAD`.
+
+## 2. What AP-9 fixes
+
+The owner enabled optional AI features and found no Claude commentary beneath
+the Buying page's inverse-volatility split. Claude's read-only query of the
+operator `ai_runs` log showed two calls had completed, but valid summaries of
+554 and 670 characters were discarded by an undocumented 500-character cap.
+The earlier successful summaries happened to be 480 and 441 characters. A
+separate 300-character claim cap could silently remove observations.
+
+The owner decided that these prose-length caps must be removed. This is not a
+relaxation of the safety rules: the existing validator still reads the entire
+response and rejects invented or misattributed percentages, dollar figures,
+out-of-cart tickers, and action/advice language. The provider request remains
+bounded by `max_tokens=800`.
+
+Claude's implementation removes both caps, adds a structured
+`AllocationReviewOutcome`, preserves the old `review_allocation_plan()`
+return facade, and makes the Buying page explain why a requested review was
+withheld instead of rendering a blank area. Exception reasons expose type
+only, not potentially sensitive exception messages.
+
+## 3. Independent review result
+
+Final disposition: **accepted after correction; AP-9 is complete in code and
+not deployed**.
+
+Reviewed range: exactly one submitted commit, `cea6640..3f1faf3`.
+
+Commit disposition:
+
+| Commit | Disposition | Summary |
 |---|---|---|
-| 2026-08-07 | 480 | shown |
-| 2026-08-07 | 441 | shown |
-| 2026-08-12 | 554 | discarded |
-| 2026-08-12 | 670 | discarded |
+| `3f1faf3` | Accepted after correction | Root-cause fix, retained content checks, compatibility facade, sanitized failure reasons, audit behavior, and initial behavioral tests were sound. Review corrected one P2 stale-result defect and four P3 contract/honesty issues. |
 
-Nothing was wrong with either rejected response. Every observation in both was
-re-run through all four content checks — number matching, per-ticker
-attribution, unknown tickers, advice language — and every one passes. The
-reviews were binned for prose length alone, and the prompt never stated the
-budget it was being judged against while `max_tokens=800` permitted roughly six
-times it. Whether the feature worked was luck.
+Resolved findings, highest priority first:
 
-Compounding it, the page rendered **nothing at all** on failure. A rejected
-review, a failed API call, and a checkbox the user never ticked were visually
-identical, which is why this took an operator database query to explain rather
-than a glance at the screen.
+1. **AP9R-001, P2 — stale commentary under a changed split.** A review
+   persisted across Streamlit reruns. Moving the max-weight slider changed the
+   displayed weights while the old AI review remained, so its checked numbers
+   could describe the previous split. Every outcome now carries a SHA-256
+   identity over the ordered cart, weights, volatility values, and basket
+   memberships. The UI compares it on every rerun, hides stale or legacy
+   output, and asks for a fresh review.
+2. **AP9R-002, P3 — unenforced outcome invariant.** The type claimed exactly
+   one of review/rejection reason must exist but allowed both or neither. The
+   frozen dataclass now enforces XOR and a non-empty input identity.
+3. **AP9R-003, P3 — wrong-root JSON misreported as call failure.** A parsed
+   JSON list reached `.get()`, raised `AttributeError`, and told the user the
+   Anthropic call failed. Non-object JSON is now audited and reported as an
+   unreadable review response.
+4. **AP9R-004, P3 — empty input blamed on credentials.** A configured system
+   with no cart said no credential existed. Empty input has its own honest
+   reason.
+5. **AP9R-005, P3 — stale source docs and touched Streamlit API.** The
+   validator still documented deleted length caps, and two touched dataframes
+   emitted the pinned framework's `use_container_width` deprecation. The
+   source now describes complete-text checks and uses `width="stretch"`.
 
-## 3. What changed
+No P0 or P1 finding exists. No AP-9 review issue remains open. Full evidence,
+the prioritized ledger, and the genuine assessment are in
+`docs/REVIEW_2026-08-12_AP9_ALLOCATION_REVIEW_VISIBILITY.md`.
 
-**Owner decision, 2026-08-12: no length limit.** Both `_MAX_SUMMARY_LENGTH` and
-`_MAX_CLAIM_LENGTH` are gone as rejection reasons. Length never protected
-anything here — the checks that carry the safety read the whole string, so a
-longer response receives more scrutiny, not less. The real bound is `max_tokens`
-on the call itself. The claim cap was worse in kind than the summary cap: an
-over-long claim was dropped silently, and if it was the only one, the
-all-observations-failed rule then rejected the entire review.
+Genuine submitted-work assessment: **7.5/10**. Claude diagnosed a subtle real
+failure with good operator evidence, fixed the correct mechanism, preserved
+compatibility, and wrote meaningful real-page tests. The main miss was
+important: persisted AI output was not bound to the state it described, a
+central Streamlit lifecycle concern. The corrected result meets AP-9's
+definition of done.
 
-**Every content check is retained**, and a new test feeds each violation
-(percentage, dollar figure, out-of-cart ticker, advice language) at a length the
-old cap would have rejected anyway — so the relaxation cannot be mistaken for a
-weakening.
+## 4. Validation on the corrected tree
 
-**Failures are now reported, not swallowed.** New `AllocationReviewOutcome`
-carries either the review or a plain-language reason;
-`review_allocation_outcome()` returns it, and the Buying page renders that
-reason in a warning that also states the split itself is unaffected, because
-the split is computed by this project's own deterministic code and never
-depended on the AI.
+Environment: repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
 
-`review_allocation_plan()` keeps its exact previous signature and delegates, so
-all 28 existing direct validator call sites and 140 existing tests stand
-unchanged. `_validate_allocation_review()` gained an optional `rejection_out`
-collector rather than a changed return type, for the same reason — and so the
-rule that decides a rejection stays in exactly one place.
+- Submitted focused baseline: **159 passed** in 10.92s.
+- Reviewer proof on uncorrected `3f1faf3`: **5 failed, 151 passed** in 10.36s.
+  The failures were the expected stale-result, invalid-outcome, wrong-root
+  JSON, and empty-input defects.
+- Corrected focused plus ML import-boundary suite: **164 passed** in 12.30s.
+- Corrected full repository suite: **3,445 passed, 0 failed, 0 skipped, 25
+  known dependency warnings** in 633.40s.
+- Active-document consistency after the durable doc update: **13 passed**.
+- `compileall -q assistant scripts tests`: clean.
+- `git diff --check`: clean apart from informational Windows LF-to-CRLF
+  working-copy notices.
 
-The exception path reports the exception **type only**: the reason string is
-rendered straight into the page and an exception message can carry request
-context.
-
-This is advisory commentary on an already-computed split. It cannot create,
-approve, size, submit, or alter any order, policy, proposal, or schedule.
-
-## 4. Validation
-
-Repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
-
-- Full repository suite on the final tree: **3,440 passed, 0 failed, 0
-  skipped, 25 dependency warnings** in 721.59s.
-- `compileall` clean; `git diff --check` clean apart from expected Windows
-  LF→CRLF notices; active-document guards 13 passed.
-- Focused: `tests/test_ai_advisor.py` 148 passed (140 pre-existing, unchanged);
-  `tests/test_ui_allocation_review.py` 3 passed.
-- Four mutations, each restored in a `finally` block, each reddening exactly the
-  intended test: restoring the 500-character summary cap; restoring the
-  300-character claim cap; dropping the rejection reason; silencing the UI
-  warning.
-- Diagnosis itself was read-only: the operator database was queried through
-  `sqlite3` in `mode=ro` URI form, never through the development checkout's
-  `AssistantStore`, so no migration ran against the frozen-epoch database.
-
-**A defect in this session's own tests, found and fixed.** The first version of
-the UI tests seeded `watchlist_ai_review_outcome` and ran the app once. The page
-clears that state whenever the checkbox is unticked, so the first run wiped the
-fixture and the assertions ran against a page that never entered the branch —
-two of the three passed for that reason. The harness now runs once to create the
-widgets, ticks the box, seeds the outcome, and runs again; every test also
-asserts the split section actually rendered, so an absence assertion can no
-longer pass vacuously.
-
-Untested: the live Anthropic call itself (all tests mock the client), and
-whether a real long summary displays acceptably in the browser, which needs a
-deployed build.
+The live Anthropic service was not called by the review; provider responses
+were mocked. Streamlit's real AppTest runner covered the Buying page,
+successful and rejected reviews, never-requested state, and a slider rerun
+that makes a previously valid review stale.
 
 ## 5. Operational truth — do not disturb the epoch
 
-- `paper-epoch-004` is the only active evidence epoch, deployed at `b837374`.
-- **Merging to `main` does not affect the epoch.** Verified this session: all
-  four `TradingAgent-Paper-*` scheduled tasks run with working directory
-  `C:\git\trading_agent_operational`, which is pinned at `b837374`. The epoch's
-  lineage binds the deployed commit, and deployment is a separate deliberate
-  update of that checkout. CR-W2, AP-7, the acknowledgement path and QC-2 are
-  all already merged and undeployed while epoch-004 runs normally.
-- AP-9 is **not deployed**. It should ride a later owner-authorized roll.
+- `paper-epoch-004` is the only active evidence epoch.
+- Its operational checkout remains pinned at deployed commit `b837374`.
+- AP-9, AP-8, QC-2, and other development work do not affect that frozen
+  checkout merely because they merge to development `main`.
+- AP-9 is not deployed and should wait for a separately authorized future
+  roll. Nothing in this review authorizes a roll, task change, or new epoch.
+- The implementation is advisory commentary over an already-computed split.
+  It cannot change weights, create or approve proposals, write policy, submit
+  or cancel orders, or enable live trading.
 
-Machine-local observation, recorded because it is easy to misread as an
-accounting failure: at 2026-08-12T22:57Z the epoch had 1 observation, 0 orders,
-5/5 drills, and **5 open alerts, 3 of them critical**. All five trace to
-intermittent DNS/connection failures reaching `paper-api.alpaca.markets` earlier
-that day (three cycle gaps: 613, 80 and 80 minutes). The books were never wrong
-— 64 reconciliation runs that day, every one matched with 0 mismatches. The
-critical `portfolio_accounting` alert says so in its own message and fails only
-on a 30-minute freshness bound. This is neither AP-6 (a real cash mismatch) nor
-AP-7 (a negative age); it is a positive, genuinely stale age caused by a network
-outage, reported correctly.
+Claude's attributed read-only observation at 2026-08-12T22:57Z is preserved
+in `docs/OPERATIONAL_FACTS.md`: epoch-004 had 1 observation, 0 orders, 5/5
+drills, and 5 open alerts (3 critical) after intermittent DNS/connection
+failures and three cycle gaps. Sixty-four reconciliations that day all matched
+with zero mismatches. Codex did not independently query or mutate the operator
+database. This is a point-in-time fact; re-measure read-only before making an
+operational decision.
 
-## 6. Next step
+Never commit credentials, account identifiers, or absolute account balances.
+The operator database and the operational checkout are machine-local state,
+not test fixtures. Do not open the operator database through a development
+`AssistantStore` merely to inspect it; that can run migrations.
 
-Independent review of `user/claude/allocation-review-visibility-20260812`.
-Review should press on whether removing both length caps leaves any real attack
-surface the content checks do not already cover, and on whether the rejection
-reasons are honest and leak nothing.
+## 6. Exact next step
+
+The review itself is finished. The immediate next development step is
+publication/integration, and it requires owner authority:
+
+1. If the owner authorizes it, push the current Codex review branch and verify
+   the remote tip; until then another computer cannot resume this work.
+2. Integrate current `origin/main` (`27fa872`) before merging AP-9. Preserve
+   AP-8's merged documentation and the AP-9 review records; the replacement
+   handoff needs deliberate resolution.
+3. After integration, rerun at least the AP-9 focused/import-boundary tests,
+   active-document consistency, compileall, and diff checks. Run the full
+   suite again if conflicts or code changes occur.
+4. Opening a pull request or merging still needs explicit owner authorization.
+5. Do not deploy AP-9 or roll `paper-epoch-004` as part of publication.
+
+No new roadmap feature is implicitly authorized by AP-9 completion. After
+publication, return to `docs/ACTION_PLAN_2026-08-02.md` and obtain an explicit
+owner direction for any new implementation milestone.
 
 ## 7. Resume prompt
 
 ```text
-Fetch origin and switch to user/claude/allocation-review-visibility-20260812.
-Read CLAUDE.md, docs/SESSION_HANDOFF.md, docs/ACTION_PLAN_2026-08-02.md (§6
-AP-9), and docs/OPERATIONAL_FACTS.md completely. Verify the branch tip and a
-clean worktree before acting. The summary/claim length caps were removed by
-explicit owner decision on 2026-08-12 and must not be reinstated; every content
-check must stay; and a rejected review must keep reporting its reason on screen
-rather than rendering nothing. Do not deploy or roll paper-epoch-004 without a
-new explicit owner authorization.
+In C:\git\customizedAgent\trading_agent, fetch all refs and read CLAUDE.md,
+docs/SESSION_HANDOFF.md, docs/ACTION_PLAN_2026-08-02.md,
+docs/OPERATIONAL_FACTS.md, and
+docs/REVIEW_2026-08-12_AP9_ALLOCATION_REVIEW_VISIBILITY.md completely. AP-9
+was independently accepted after correction on
+codex/review-ap9-allocation-visibility-20260812, but that review branch had no
+remote ref at handoff time. Do not assume it is fetchable: verify branch
+topology and git status first. Current fetched origin/main at review time was
+27fa872 and contains merged AP-8, while AP-9 was based on older cea6640.
+Preserve both documentation histories when integrating. Do not push, open a
+PR, merge, deploy, modify scheduled tasks, mutate the operator database, or
+roll paper-epoch-004 without the owner's explicit authorization.
 ```

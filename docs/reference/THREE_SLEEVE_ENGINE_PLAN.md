@@ -17,11 +17,15 @@ never merged, so `main` still said "blocked" and neither the owner nor the
 instruction hierarchy the later explicit decision governs: **this plan
 supersedes the 2026-08-06 equal-weight decision as well**, surfaced to the
 owner the same day. **That branch was deleted by owner instruction on
-2026-08-13** during a repository cleanup, so the equal-weight slice
-(`assistant/rebalance.py` plus its 639 test lines) no longer exists anywhere
-and would have to be rewritten if the owner ever revisits that shape. This
-paragraph is now the only record that it was built. Its two-machines
-operational facts survive independently: they were ported to
+2026-08-13** during a repository cleanup, so the equal-weight slice is no
+longer reachable from any current local or fetched remote branch. Review on
+2026-08-13 found that this checkout still retains the deleted branch tip as
+the dangling Git object `85a77291a3a8de88a82b3670dcf05793b6825c1c`
+(`assistant/rebalance.py` plus its 639 test lines). That object is local-only,
+not fetchable from the approved remote, and may disappear during Git pruning;
+it is a recovery lead, not durable preservation and not authority to restore
+the superseded feature. Its two-machines operational facts survive
+independently: they were ported to
 `docs/OPERATIONAL_FACTS.md` on 2026-08-09 because they are true regardless
 of which allocation shape governs.
 

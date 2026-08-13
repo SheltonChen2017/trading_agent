@@ -535,3 +535,30 @@ def test_no_document_calls_a_merged_commit_unreachable():
             if reachable.returncode == 0:
                 stale.append(f"{name} calls {commit} unreachable, but it is in HEAD")
     assert not stale, "; ".join(stale)
+
+
+def test_sell1_current_records_do_not_reopen_merged_review_work():
+    """SELL-1 reached main before its independent review was requested."""
+    handoff = _text("SESSION_HANDOFF.md")
+    action_plan = _text("ACTION_PLAN_2026-08-02.md")
+    stale = (
+        "PENDING INDEPENDENT REVIEW; not merged",
+        "Independent review of this branch",
+        "confirm whether user/claude/user-directed-sell-",
+    )
+    hits = [
+        f"{name}: {phrase}"
+        for name, text in (("handoff", handoff), ("action plan", action_plan))
+        for phrase in stale
+        if phrase in text
+    ]
+    assert not hits, "merged SELL-1 work was reopened by stale records: " + "; ".join(hits)
+    assert "08fde9f" in action_plan and "3ba3d41" in action_plan
+
+
+def test_deleted_gr7d_ref_is_not_called_irrecoverable_while_object_remains():
+    """Deleting a branch ref is not the same event as pruning its objects."""
+    plan = _text("reference/THREE_SLEEVE_ENGINE_PLAN.md")
+    assert "no longer exists anywhere" not in plan
+    assert "85a77291a3a8de88a82b3670dcf05793b6825c1c" in plan
+    assert "may disappear during Git pruning" in plan

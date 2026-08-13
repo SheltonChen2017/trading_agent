@@ -91,18 +91,29 @@ unchanged mandate/policy/strategy/model lineage → **5/5 drills recorded** →
 tasks re-enabled and the scheduled path proven by a manual `operations-cycle`
 (20 activities seen, 3 fee duplicates on idempotent replay, matched, healthy).
 
-**AP-7 is confirmed fixed in production.** Both freshness alerts were last
-seen BEFORE the deploy and did not reopen across two `operations-cycle` runs
-on the new code; both were acknowledged and **0 alerts remain open**. The two
+Both AP-7 freshness alerts were last seen before the roll and did not reopen
+across the first two `operations-cycle` runs on the new code; both were
+acknowledged and **0 alerts were open at that observation point**. The two
 were the critical `portfolio_accounting` alert (1,888 occurrences — the
 `operations.py` site) and the warning `reconciliation_freshness` alert (7
 occurrences — the `readiness.py` site that the review missed and
 counter-review DCCR-CR-002 added). That second one had been firing in
-production, so the finding was not hypothetical.
+production, so the original finding was not hypothetical.
 
-What this deployment closed: CR-W2 dividend/cash-movement ingestion, both
-AP-7 freshness sites, the MADCR-001 IPO identity-guard fail-open, and the
-operator acknowledgement path.
+**AP-11 supersedes the inference that those two green cycles proved the full
+production path fixed.** A later live `reconciliation_freshness` alert at
+2026-08-13T05:40:49Z reported `age_seconds=-0.117315, errors=0`: the deployed
+outer `operational_health()` still manufactured an entry clock and passed it
+as explicit to the nested readiness check, disabling that site's post-read
+clock on the production path. The AP-11 repair is merged at `72b6278` but is
+**not deployed** to frozen epoch-004; the running runtime can therefore keep
+emitting this conservative warning until an owner-authorized roll. No
+observation, ledger, reconciliation, or money path is affected.
+
+What this deployment added: CR-W2 dividend/cash-movement ingestion, the AP-7
+site-level freshness code (subject to the undeployed AP-11 orchestration
+repair), the MADCR-001 IPO identity-guard fail-open, and the operator
+acknowledgement path.
 
 **CR-W3 is no longer an epoch-killer.** The AEP dividend is payable
 **2026-09-10**. If it arrives with a subtype outside the `""`/`CDIV`

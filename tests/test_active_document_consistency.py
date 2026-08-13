@@ -152,7 +152,9 @@ def test_completed_epoch_004_roll_replaced_its_predeployment_queue():
 
 def test_current_review_documents_have_no_validation_placeholders():
     """A validation claim must contain a measured result, never a token."""
-    placeholders = re.compile(r"\b(?:FULL_SUITE|COUNTER_REVIEW_SUITE)_RESULT\b")
+    placeholders = re.compile(
+        r"\b(?:FULL_SUITE|COUNTER_REVIEW_SUITE|FINAL_TREE)_RESULT\b"
+    )
     names = (
         "SESSION_HANDOFF.md",
         "FEATURE_MILESTONE_RECORD.md",
@@ -167,6 +169,29 @@ def test_operator_guide_uses_the_eastern_paper_observation_clock():
     guide = _root_text("HOW_TO_USE.md")
     assert "observation fires at 16:30 local" not in guide
     assert "16:30 Eastern" in guide
+
+
+def test_handoff_does_not_describe_the_merged_independent_review_branch_as_stale_topology():
+    """Counter-review IPRCR-001 -- the recurrence class IPR-002 itself fixed.
+
+    The independent-review handoff truthfully said its branch was local-only
+    and unpushed WHEN COMMITTED, but the owner then pushed and merged it as
+    PR #196 (`1a46881`) and the handoff on main kept telling the next operator
+    to switch to the branch and verify a pre-merge range. Historical review
+    reports may keep their as-written topology; the CURRENT handoff may not.
+    Each phrase below is a known-stale claim that should never be true again.
+    """
+    handoff = _text("SESSION_HANDOFF.md")
+    stale = (
+        "The branch is local-only by the owner's instruction",
+        "Switch to codex/independent-full-review-20260812",
+        "Review the ordered range `b356292..HEAD`",
+    )
+    hits = [phrase for phrase in stale if phrase in handoff]
+    assert not hits, (
+        "the handoff still describes the pre-merge PR #196 topology: "
+        + "; ".join(hits)
+    )
 
 
 def test_current_documents_do_not_call_completed_work_unstarted():

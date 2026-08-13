@@ -114,3 +114,42 @@ AP-7, and the acknowledgement path are deployed there; AP-8, AP-9, QC-2, and
 this review correction are not. Deployment remains a separate owner decision.
 The owner requested Claude to verify this branch independently next; do not
 push, merge, or deploy as part of that verification unless separately asked.
+
+---
+
+## Counter-review (Claude, 2026-08-12)
+
+Owner-requested verification of this review's changes, performed AFTER the
+owner pushed and merged the review branch as PR #196 (`1a46881`). Verified on
+merged `main`; the merge tree equals branch tip `428bb56` exactly (empty
+`git diff 428bb56 1a46881`), so every result below applies to `main`.
+
+### Commit dispositions (`b356292..1a46881`)
+
+| Commit | Disposition |
+|---|---|
+| `67558f5` | **Accepted.** IPR-001 reproduced from the pre-fix source: the old `if volume: parts.append(f"{volume:,}")` raised `ValueError` on a truthy string and rendered NaN/inf/bool/negative/fractional values as measured share counts. `_trading_volume_detail()` routes through `assistant.money.to_decimal` (verified to reject bool explicitly, non-finite via `is_finite()`, None and junk strings via `InvalidOperation`) and additionally rejects negative and fractional counts. Mutation independently re-run: reverting to the raw formatter failed exactly the seven parameterized cases; restoration passed all seven. `change_percent` on the same row was confirmed already double-guarded through `classify_price_direction()`, and `_eligibility_disclosure()` formats only values `verify_tickers()` already validated. A repo-wide sweep of `:,`-format call sites found no other raw optional-provider-field instance (remaining sites format internally computed or contract-validated values). |
+| `78a69b3` | **Accepted.** IPR-002: all three placeholder tokens verified replaced with the measured 3,478-test merged-main result. IPR-003: reconciled deployment claims verified against the epoch record (CR-W2, AP-7, and the acknowledgement path deployed at `b837374`; AP-8/AP-9 not). IPR-004: verified against the installer source — both `install_windows_operational_tasks.ps1` and `install_windows_ml_shadow_tasks.ps1` schedule via `Convert-EasternClockToLocal -Hour 16 -Minute 30`, so "16:30 Eastern converted to local" is the true contract. All four new documentation guards mutation-verified sensitive: reintroducing a placeholder token, regressing the epoch-host bullet to `paper-epoch-003`, and regressing HOW_TO_USE to "16:30 local" each reddened exactly the intended guard, with the files restored `finally`-safe and a clean tree confirmed after. |
+| `428bb56` | **Accepted as accurate at commit time; superseded by IPRCR-001 below.** The handoff correctly described a local-only branch when committed, but the subsequent owner push/merge made its topology and next-step sections stale on `main`. |
+| `1a46881` | **Accepted.** Merge-only; tree equals `428bb56`. |
+
+### Counter-review findings
+
+| ID | Priority | Status | Finding |
+|---|---|---|---|
+| IPRCR-001 | P3 | **Confirmed; resolved in this counter-review** | Post-merge topology staleness — the recurrence class IPR-002 itself fixed. After PR #196 merged, `docs/SESSION_HANDOFF.md` on `main` still said the review branch "is local-only by the owner's instruction; nothing was pushed", and its §6 next step and §7 resume prompt told the next operator to switch to the branch and review `b356292..HEAD` — a range and Git action that no longer describe reality. The AP-10 action-plan row likewise recorded resolution only "on the branch" with no merge disposition. Corrected: the handoff is rewritten for the merged topology, the AP-10 row records the PR #196 merge, and a new known-stale-phrase guard (`test_handoff_does_not_describe_the_merged_independent_review_branch_as_stale_topology`) failed red against the submitted handoff before the correction and passes after. Historical review reports that state their branch was local-only *when written* are deliberately untouched. |
+| IPRCR-002 | P2 | **Confirmed; resolved in this counter-review** | The review's isolated worktree at gitignored `artifacts/codex-independent-full-review` was left on disk after the merge, and pytest does not honor `.gitignore`: every test module gained a same-basename twin, so the repository-prescribed `python -m pytest -q` on the development checkout aborted with **163 "import file mismatch" collection errors and zero tests run**, while `git status` stayed clean throughout. The review's own recorded suite results are unaffected (they were measured from inside the worktree or before it existed), but the checkout the next verifier inherits could not run its prescribed validation. Corrected: a new `pytest.ini` sets `norecursedirs` to pytest 9.1's full default list plus `artifacts` — verified to restore collection (3,491 tests) **with the worktree still present** before the worktree itself was removed (`git worktree remove`, clean, branch merged and pushed, so nothing was lost). `tests/test_module_hygiene.py::test_pytest_collection_excludes_machine_local_artifacts` pins the config, including that no pytest default is silently dropped; mutation-verified (removing `artifacts` from the list reddens it). |
+
+No other defect was found. The review's disposition table was checked complete
+against `git log cea6640..b356292` (14 commits, all dispositioned).
+
+### Counter-review validation
+
+- New guard: failed red against the pre-correction handoff, passes after.
+- IPR-001 mutation: 7 failed reverted / 7 passed restored (independent re-run).
+- Documentation-guard mutations: placeholder, epoch-host, and Eastern-clock
+  guards each reddened under targeted regression and passed restored.
+- Focused: `tests/test_active_document_consistency.py` +
+  `tests/test_recommended_stocks.py` green before the correction commit; the
+  full suite, `compileall`, and `git diff --check` results for the exact final
+  tree are recorded in `docs/SESSION_HANDOFF.md`.

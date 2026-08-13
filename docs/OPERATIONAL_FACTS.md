@@ -338,6 +338,22 @@ which one you are on. `whoami` distinguishes them.
   only host that may run the operational cadence. The bullets below this
   section (launch script, epoch-swap script, lock files, backups) describe
   THIS host.
+- **The installed PaperObservation trigger is 16:30 LOCAL, not the
+  installer's current rule** (measured 2026-08-13:
+  `StartBoundary = 2026-08-05T16:30:00-07:00`, and every recorded
+  observation confirms it — `captured_at` values are 23:30Z, i.e. 16:30
+  Pacific). `Convert-EasternClockToLocal` entered
+  `install_windows_operational_tasks.ps1` only on 2026-08-08, three days
+  after this task was registered, and an epoch roll RE-ENABLES the existing
+  tasks rather than reinstalling them (runbook step 6), so the older trigger
+  survives every roll. A fresh install would instead schedule 16:30 Eastern
+  → 13:30 Pacific. Both are safely after the 16:00 ET close; the hazard is
+  telling an operator to compute the time from the installer rule, which
+  would have them shut down three hours early and silently lose the session.
+  Read the trigger, never derive it. (Found when the 2026-08-13 IPR-004
+  documentation correction aligned `HOW_TO_USE.md` to the installer SOURCE
+  without re-measuring the INSTALLED task; this file's measured 16:30
+  Pacific record was right the whole time.)
 - **Second host** (`HARRY_MELODY\shelt`) — stood up 2026-08-06 as a
   development machine. It has its own `C:\git\trading_agent_operational`
   (pinned clone — at the epoch-era merge base, NOT tracking `main`; that

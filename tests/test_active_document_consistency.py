@@ -167,11 +167,30 @@ def test_current_review_documents_have_no_validation_placeholders():
     assert not hits, f"unresolved validation placeholders remain in {hits}"
 
 
-def test_operator_guide_uses_the_eastern_paper_observation_clock():
-    """The installer converts 16:30 Eastern to the host's local timezone."""
+def test_operator_guide_tells_the_reader_to_read_the_installed_trigger():
+    """OBSCLK-001: the observation time must be MEASURED, not derived.
+
+    Two true statements disagree on this host. The installer's rule since
+    2026-08-08 is 16:30 Eastern converted to local (13:30 Pacific), but the
+    epoch host's task was registered 2026-08-05 with a literal 16:30 local
+    trigger, and an epoch roll re-enables existing tasks rather than
+    reinstalling them -- so the older trigger persists. An earlier correction
+    aligned this guide to the installer SOURCE without re-measuring the
+    INSTALLED task, which would have had a Pacific operator shut down three
+    hours early and silently lose the session.
+
+    Pinned as a POSITIVE requirement -- the guide must hand the reader the
+    command that reads the real trigger -- because that stays correct after
+    any future reinstall, whereas asserting either clock would go stale the
+    moment the other one applied.
+    """
     guide = _root_text("HOW_TO_USE.md")
-    assert "observation fires at 16:30 local" not in guide
-    assert "16:30 Eastern" in guide
+    assert "Get-ScheduledTask -TaskName 'TradingAgent-Paper-PaperObservation'" in guide, (
+        "the guide must show how to READ the installed trigger"
+    )
+    assert "rather than computing it" in guide or "never derive it" in guide.lower()
+    # And it must still name the real hazard: a machine shut down too early.
+    assert "does not count toward the 60" in guide
 
 
 def test_handoff_does_not_describe_the_merged_independent_review_branch_as_stale_topology():

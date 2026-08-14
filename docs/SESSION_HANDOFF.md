@@ -1,7 +1,8 @@
-# Session handoff — BUY-1 independently reviewed and corrected
+# Session handoff — BUY-1 review merged and counter-reviewed
 
-Prepared: 2026-08-13 by Codex, after independent review of Claude's merged
-BUY-1 most-active suggestion picker.
+Prepared: 2026-08-13 by Claude, after counter-reviewing Codex's BUY-1
+suggestion-picker review (merged as PR #209) and closing one generalized
+finding.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -9,106 +10,94 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
-3. `docs/REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md`
+3. `docs/REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md` (now including the
+   counter-review section)
 4. `docs/REVIEW_2026-08-13_OBSERVATION_CLOCK_AND_EPOCH005_ROLL.md`
 5. `docs/OPERATIONAL_FACTS.md`
 6. `docs/EPOCH_005_ROLL_PLAN.md` (executed historical record, not an
    actionable plan)
 7. `docs/OPERATIONS_RUNBOOK.md`
 
-Nothing here authorizes a push, merge, deployment, evidence-epoch roll, M4,
-live trading, operator-database mutation, funded-account access, or change to
-the installed observation cadence.
+Nothing here authorizes a deployment, evidence-epoch roll, M4, live trading,
+operator-database mutation, funded-account access, or change to the installed
+observation cadence.
 
 ## 1. Repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Review base: `ef17447` (PR #207 merge).
-- The preceding epoch-005 review covered merged implementation `4de784e` and
-  correction `1cb8abf`; PR #207 carried that reviewed chain into this base.
-- BUY-1 implementation: `3f2c741`.
-- Synchronization merge: `e96e903`.
-- Merged feature head: `e0df810` (PR #208), fetched `origin/main` at review
-  start.
-- Review branch: `codex/review-buy1-suggestion-picker-20260813`, created from
-  exact merged head `e0df810`.
-- Review correction: `44a7f85` (`Correct BUY-1 picker state and disclosure`).
-- The separate documentation/handoff commit follows `44a7f85` on the same
-  branch.
-- This review branch and its review commits are **local-only until the owner
-  authorizes a push**. Another computer cannot retrieve them with `git fetch`
-  yet. PR #208 and its submitted feature are already on the approved remote.
-- The shared worktree was clean before review. No unrelated user change was
-  present or incorporated.
+- BUY-1 implementation `3f2c741` merged as PR #208 at `e0df810`.
+- Codex's independent review branch
+  `codex/review-buy1-suggestion-picker-20260813` (correction `44a7f85` +
+  documentation/handoff `d25bd3c`) was **owner-pushed and merged as PR #209 at
+  `df83510`**, which is the current `origin/main`. The preceding epoch-005
+  review chain (implementation head `4de784e`, correction `1cb8abf`) merged
+  earlier through PR #207 at `ef17447`.
+- **This round:** Claude's counter-review branch
+  `user/claude/buy1-counterreview-20260813`, created from merged `main`
+  `df83510`, carries:
+  - `2fe6747` — BUY1CR-001 fix (flat/unavailable-change most-active rows on
+    the dedicated Ticker Suggestions page now render their AP-8 detail
+    tables, not bare ticker names) plus its red-first regression test; and
+  - the following documentation/handoff commit (this file, the action-plan
+    BUY-1 row, and the counter-review section appended to the BUY-1 review
+    report).
+- The shared worktree was clean at `df83510` before this round; no unrelated
+  user change was present or incorporated.
 
-## 2. Review outcome
+## 2. Counter-review outcome
 
-Final disposition: **accepted after correction**. Submitted implementation
-quality: **7/10**.
-
-Commit dispositions:
-
-- `3f2c741`: accepted after correction. The explicit-call, shared-verification,
-  provenance, and no-authority design is sound; stale checked-cart state,
-  incomplete clickability, and freshness disclosure were corrected.
-- `e96e903`: accepted. The synchronization merge retained both workstreams
-  and correctly scoped the SELL-1 stale-record guard to SELL-1.
-- `e0df810`: accepted after current-document correction. It is merge-only
-  with the same tree as `e96e903`; the action plan and handoff required
-  post-merge state updates.
-
-Issue summary: **0 P0, 0 P1, 2 P2, 2 P3; all closed**. The retained BUY1R-001
-through BUY1R-004 ledger, red evidence, reasons, and corrections are in
+Full details in the counter-review section of
 `docs/REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md`.
 
-The correction:
+- **All four Codex findings confirmed** (BUY1R-001 stale checked-cart state,
+  BUY1R-002 incomplete row clickability, BUY1R-003 hidden source freshness,
+  BUY1R-004 stale current records). Each was independently re-established
+  red on the exact submitted tree `e0df810`; each code correction was proven
+  load-bearing by reverse mutation on merged `main` (3/3 caught, tree
+  restored clean).
+- **Commit dispositions:** `44a7f85` accepted with all findings confirmed and
+  no new defect found; `d25bd3c` accepted (its pre-merge topology statement
+  was accurate when written and was overtaken by the owner's merge, not
+  wrong); merge `df83510` accepted (tree identical to `d25bd3c`).
+- **One new finding, closed:** BUY1CR-001 (P3) — a generalized instance of
+  BUY1R-002's direction-as-disclosure-gate defect on the dedicated Ticker
+  Suggestions page, the surface AP-8 is actually about. Fixed at `2fe6747`
+  with a regression test that failed red before the fix. No further instance
+  of the class exists (the Briefing renders one unsplit detail table; the
+  Buying picker was fixed by BUY1R-002 itself).
 
-- binds checked prices, volatility, split inputs, and proposal controls to the
-  exact canonical cart and hides them after any cart edit;
-- gives advancing, declining, unchanged, and unavailable-change rows their
-  own Add control and adjacent AP-8 detail;
-- shows row source-fetch time separately from UTC display time and derives the
-  15-minute cache disclosure from the loader TTL; and
-- closes the merged feature's current action-plan, milestone, review, and
-  cross-computer handoff records.
+## 3. Validation (this counter-review round)
 
-## 3. Validation
+Environment: repository `.venv`, Python 3.13.14 / Streamlit 1.60.0,
+development checkout.
 
-Environment: repository virtual environment, Python 3.13.14 / Streamlit
-1.60.0.
+- Red proofs on submitted tree `e0df810`: 4 failed as intended.
+- Reverse mutations on merged `main`: 3/3 caught.
+- Focused suites: 42 passed (picker/allocation-review/document consistency),
+  then 69 passed (suggestions/recommended-stocks/picker) after the
+  BUY1CR-001 fix.
+- Full repository suite on the code-final tree (`2fe6747`): 3,635 passed,
+  0 failed, 0 skipped, 25 known dependency warnings.
+- Complete active-document suite re-run after the documentation commit:
+  passed in full (see the review report for the exact count).
+- `python -m compileall` clean; `git diff --check` clean.
 
-- Submitted-tree focused baseline: **65 passed**.
-- Submitted-tree red proof: **3 failed as intended** (flat/unknown Add
-  controls, source freshness, stale checked-cart state).
-- Corrected focused Buying/recommendation suite: **123 passed**.
-- Final full repository suite: **3,634 passed, 0 failed, 0 skipped, 25 known
-  dependency warnings** in 646.87 s.
-- Complete active-document suite: **26 passed**.
-- Repository-prescribed compileall: clean. `git diff --check`: clean apart
-  from expected Windows line-ending notices. Narrow changed-file secret-shape
-  scan: zero matches. Staged diff check: clean; staged secret-shape scan: zero
-  matches.
-
-All BUY-1 provider seams in AppTest were monkeypatched. No broker request,
-funded-account action, operator-database mutation, deployment, task change, or
-live order occurred.
+All UI provider seams in the tests are monkeypatched. No broker request,
+funded-account action, operator-database mutation, deployment, task change,
+or live order occurred.
 
 ## 4. Feature and authority truth
 
-- BUY-1 is merged development code at `e0df810`; the independent correction
-  is local on this review branch at `44a7f85`. Neither is deployed to the
-  frozen operational checkout.
-- The Buying page has three cart sources: common-ticker selection, typed
-  ticker input, and explicitly loaded verified most-active rows.
-- The picker makes no network call on page load and never calls the IPO or
-  paid AI lanes. It uses the shared AP-8 disclosure pipeline.
-- Most-active means trading volume, not “most bought” or “most sold.” Price
-  direction describes what happened today and is not a predictive signal.
-- Clicking Add changes benign session state only. Check cart, allocation
-  splitting, proposal creation, typed approval, and fresh paper execution
-  validation remain distinct steps.
-- The exact-cart binding prevents old checked results and proposal controls
-  from appearing to describe a cart that was later edited.
+- BUY-1 plus its review correction are merged development code on `main`;
+  the BUY1CR-001 fix is on `user/claude/buy1-counterreview-20260813`.
+  **None of this is deployed** to the frozen operational checkout.
+- The Buying page's three cart sources, the exact-cart binding on checked
+  results, and the separate check → split → propose → typed-approve →
+  fresh-validation steps are unchanged by this round; BUY1CR-001 touches a
+  display-only research page.
+- Most-active means trading volume, not "most bought"; price direction
+  describes today and is not a signal. This project still has zero confirmed
+  predictive signals.
 - No schema, migration, policy, scheduler, execution kernel, broker adapter,
   ML/LLM authority, kill-switch behavior, or live-account authority changed.
 
@@ -116,65 +105,55 @@ live order occurred.
 
 - `paper-epoch-005` is the only active evidence epoch. It started
   2026-08-13T23:59:07Z on exact deployed commit `752d3b7` in
-  `C:\git\trading_agent_operational`.
-- Epochs 001 through 004 are closed. Epoch-004 retained three observations;
-  those observations do not pool into epoch-005.
-- At the preceding independent review, read-only `paper-evidence-status`
-  reported zero epoch-005 observations, all five required drill types passed,
-  and matching lineage. `lineage_consistent: true` was therefore still
-  vacuous and the 60-session count remained zero.
-- The first scheduled epoch-005 PaperObservation was expected at 16:30 local
-  on 2026-08-14. Verify its capture, manifest, session date, and lineage before
-  saying evidence is accumulating.
-- The installed PaperObservation trigger was measured as
-  `2026-08-05T16:30:00-07:00`. A normal roll preserves the installed task; a
-  future reinstall may change cadence and requires re-measurement.
-- OperationsCycle and PaperObservation were enabled/ready; OrderMonitor and
-  Watchdog were enabled/running. The operational checkout was clean at
-  `752d3b7` at the preceding review.
+  `C:\git\trading_agent_operational` (epoch host `REDMOND\sheltonchen`).
+- Epochs 001 through 004 are closed; epoch-004's three observations do not
+  pool into epoch-005. Epoch-005 had zero observations and 5/5 required
+  drill types passed at the last read-only check; `lineage_consistent: true`
+  remains vacuous until the first observation exists.
+- The first scheduled epoch-005 PaperObservation is expected at 16:30 local
+  on 2026-08-14 (the installed trigger is measured 16:30 Pacific — read the
+  trigger, never derive it from the installer source). Verify its capture,
+  manifest, session date, and lineage before saying evidence is
+  accumulating.
 - Epoch-005 deployed AP-8, AP-9, QC-2, AP-10, AP-11, three-sleeve M3, and
-  SELL-1. BUY-1 and all later review changes are not deployed.
-- At roll completion, all five pre-roll outage alerts had verified-resolved
-  causes and were acknowledged, leaving zero open. That is a dated fact, not
-  a promise about future alerts.
+  SELL-1. BUY-1, `44a7f85`, and `2fe6747` are not deployed.
 - CR-W3 remains a watch: the first real AEP dividend subtype may fail closed
-  around 2026-09-10 and require the reviewed acknowledgement path. JNLC still
-  requires operator accounting judgment. Never widen reconciliation
-  tolerance or post a manual compensating entry.
+  around 2026-09-10 and require the reviewed acknowledgement path. Never
+  widen reconciliation tolerance or post a manual compensating entry.
 
 No account identifier, balance, credential value, private artifact content,
 or secret is recorded here.
 
 ## 6. Next step
 
-Claude should independently verify correction `44a7f85` and the following
-documentation/handoff commit under the standing review process. The owner may
-then decide whether to authorize a push and merge. Review or publication does
-not authorize deployment.
-
-The exact next operational check remains verification of the first scheduled
-epoch-005 observation after 16:30 local on 2026-08-14. If absent or refused,
-use the existing runbook and durable alert/reconciliation evidence; do not
-fake a session or start another epoch merely to clear the counter. Preserve
-the frozen runtime while the 60-session / 30-order evidence window
-accumulates. Optional M4 remains deferred and unauthorized.
+1. Independent review (Codex) of `2fe6747` and this documentation commit on
+   `user/claude/buy1-counterreview-20260813`, then owner decision on merge.
+   The branch is pushed to the approved remote for that purpose.
+2. The exact next operational check remains verification of the first
+   scheduled epoch-005 observation after 16:30 local on 2026-08-14. If
+   absent or refused, use the existing runbook and durable
+   alert/reconciliation evidence; do not fake a session or start another
+   epoch merely to clear the counter. Preserve the frozen runtime while the
+   60-session / 30-order evidence window accumulates. Optional M4 remains
+   deferred and unauthorized.
 
 ## 7. Machine transfer and resume prompt
 
-Until this review branch is pushed, preserve this checkout: `44a7f85` and the
-following documentation/handoff commit are not recoverable from the approved
-remote. No operator database, task, credential, or operational artifact needs
-to be copied merely to review these Git changes.
+Everything in this round is on the approved remote once the branch is
+pushed; switching computers requires only `git fetch`. No operator database,
+task, credential, or operational artifact needs to be copied to review these
+Git changes.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md, and
-docs/SESSION_HANDOFF.md. Review branch
-codex/review-buy1-suggestion-picker-20260813 starts from merged BUY-1 head
-e0df810 and has correction 44a7f85 plus a separate documentation/handoff
-commit. Confirm whether the branch has since been pushed or merged. The
-operational runtime remains frozen at 752d3b7 under paper-epoch-005. Verify
-the first scheduled epoch-005 observation; do not deploy, roll again, begin
-M4, mutate the operator database, or enable live trading without a new
-explicit owner instruction.
+docs/REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md (including its
+counter-review section), and docs/SESSION_HANDOFF.md. Codex's BUY-1 review
+branch codex/review-buy1-suggestion-picker-20260813 (correction 44a7f85) is
+merged as PR #209 at df83510. Claude's counter-review branch
+user/claude/buy1-counterreview-20260813 carries the BUY1CR-001 fix 2fe6747
+plus this handoff; confirm whether it has since been merged. The operational
+runtime remains frozen at 752d3b7 under paper-epoch-005. Verify the first
+scheduled epoch-005 observation; do not deploy, roll again, begin M4, mutate
+the operator database, or enable live trading without a new explicit owner
+instruction.
 ```

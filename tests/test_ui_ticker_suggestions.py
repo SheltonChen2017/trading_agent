@@ -69,6 +69,58 @@ def test_direction_view_renders_every_bucket_and_discloses_cached_data_time(
     assert "cached for up to 15 minutes" in captions
 
 
+def test_flat_and_unknown_rows_disclose_their_detail_like_directional_rows(
+    _offline_suggestions_environment,
+):
+    """Counter-review BUY1CR-001 — direction is a display bucket, never a
+    disclosure gate. BUY1R-002 established that a flat or unreported-change
+    candidate is still a verified most-active row; on this page (the surface
+    AP-8 is actually about) such a row was named by bare ticker only, hiding
+    the volume / price-change / below-usual-floor measurements that
+    advancing and declining rows get. The two buckets must stay separately
+    labeled (a real +0.00% print is not missing data) AND each must render
+    its per-row detail."""
+    fetched_at = "2026-08-13T16:00:00+00:00"
+    rows = [
+        RecommendedTicker("UP", "most_active", "Up detail", fetched_at, "advancing"),
+        RecommendedTicker("FLAT", "most_active", "Flat detail", fetched_at, "unchanged"),
+        RecommendedTicker("UNKNOWN", "most_active", "Unknown detail", fetched_at, None),
+    ]
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Ticker Suggestions"
+    app.session_state["ticker_suggestions_result"] = {
+        "rows": rows,
+        "dropped": [],
+        "ran_at": "2026-08-13T16:14:00+00:00",
+        "sources": {"most_active": True, "recent_ipo": False, "ai_suggested": False},
+    }
+    app.run()
+
+    assert not app.exception
+
+    def _frame_text_containing(ticker: str) -> str:
+        for frame in app.dataframe:
+            value = frame.value
+            if not hasattr(value, "columns") or "Ticker" not in value.columns:
+                continue
+            if ticker in set(value["Ticker"]):
+                return " ".join(
+                    str(cell) for _, row in value.iterrows() for cell in row.tolist()
+                )
+        return ""
+
+    # The measurement detail renders WITH the row, not merely somewhere.
+    assert "Flat detail" in _frame_text_containing("FLAT")
+    assert "Unknown detail" in _frame_text_containing("UNKNOWN")
+    # The two buckets stay distinct facts: a flat row never shares a frame
+    # with an unreported-change row.
+    assert "UNKNOWN" not in _frame_text_containing("FLAT")
+    # And the distinguishing copy survives alongside the new tables.
+    captions = "\n".join(element.value for element in app.caption)
+    assert "closed exactly flat" in captions
+    assert "reported no usable price change" in captions
+
+
 def test_dropped_candidates_are_named_not_just_counted(
     _offline_suggestions_environment,
 ):

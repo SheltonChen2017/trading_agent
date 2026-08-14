@@ -167,3 +167,45 @@ No broker request, funded-account action, operator-database mutation,
 deployment, scheduled-task change, or live order occurred. Frozen epoch-005
 at `752d3b7` is untouched; BUY-1, `44a7f85`, and `2fe6747` remain
 development-only code.
+
+---
+
+## Independent verification of Claude's counter-review (Codex, 2026-08-13)
+
+Final disposition: **accepted without further correction**. Exact review range:
+`df83510..276b3c2` on `user/claude/buy1-counterreview-20260813`, reviewed on
+`codex/review-buy1-counterreview-20260813`. No P0, P1, P2, or P3 issue was
+found. Claude's counter-review quality is **9/10**: it independently reproduced
+the prior findings, found a real generalized disclosure gap, corrected it at
+the presentation boundary, and added a behavioral regression that observes
+the rendered row/detail association rather than merely searching source text.
+
+### Commit dispositions
+
+| Commit | Disposition | Independent result |
+|---|---|---|
+| `2fe6747` | **Accepted** | Flat and unavailable-change rows on the dedicated Ticker Suggestions page retain their distinct factual labels and now render the same AP-8 measurement-detail table as advancing and declining rows. The change is display-only and does not alter the Buying cart, proposal creation, approval, policy, broker, or execution paths. The new AppTest binds each ticker to its own dataframe detail and keeps flat and unavailable-change rows in separate tables. |
+| `276b3c2` | **Accepted** | The action-plan addition, retained counter-review ledger, and replacement handoff accurately record PR #209, the pushed Claude branch, the undeployed status of BUY-1 and later corrections, and the unchanged epoch-005 boundary. The complete submitted range contains exactly these two commits. |
+
+### Independent evidence
+
+- Focused suggestion/recommendation/Buying suite: **69 passed** in 31.00 s.
+- Dangerous-direction reverse mutation: removing only `2fe6747`'s flat and
+  unavailable-change detail tables made
+  `test_flat_and_unknown_rows_disclose_their_detail_like_directional_rows`
+  fail because no dataframe carried FLAT's detail. Restoring the exact commit
+  returned the test green; the worktree was restored byte-clean.
+- Generalized-instance audit: Briefing already renders every most-active row
+  in one unsplit detail table, and Buying renders all four direction buckets
+  through its shared per-row Add/detail renderer. No second disclosure-gate
+  instance remains.
+- Full repository suite with a fresh writable `--basetemp`: **3,635 passed,
+  0 failed, 0 skipped, 27 warnings** in 435.72 s. The warning count is Claude's
+  25 dependency warnings plus one environment-only physical-core warning and
+  one pytest-cache permission warning. An earlier run against pytest's
+  inaccessible user-temp root produced setup errors only and is not counted
+  as validation.
+
+No code correction was necessary. The independent review changes only current
+review and handoff records; it grants no deployment, epoch-roll, M4,
+operator-database, funded-account, or live-trading authority.

@@ -1,9 +1,7 @@
-# Session handoff — SET-1 reviewed, corrected, merged, and counter-reviewed
+# Session handoff — SET-1 counter-review independently verified after correction
 
-Prepared: 2026-08-14 by Claude after counter-reviewing Codex's independent
-SET-1 review, which built the fractional-share order path end to end.
-Supersedes the pre-merge version of this file: PR #217 has since merged the
-correction, so the topology below is the merged one.
+Prepared: 2026-08-14 by Codex after independently verifying Claude's SET-1
+counter-review and PR #218 merge.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -11,12 +9,13 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
-3. `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`
-4. `docs/REVIEW_2026-08-14_SET1_SETTINGS_AND_FRACTIONAL_TRADING.md`
-5. `docs/REVIEW_2026-08-14_TRADE1_DISCRETE_TRADING.md`
-6. `docs/REVIEW_2026-08-13_OBSERVATION_CLOCK_AND_EPOCH005_ROLL.md`
-7. `docs/OPERATIONAL_FACTS.md`
-8. `docs/OPERATIONS_RUNBOOK.md`
+3. `docs/REVIEW_2026-08-14_CODEX_SET1_COUNTERREVIEW.md`
+4. `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`
+5. `docs/REVIEW_2026-08-14_SET1_SETTINGS_AND_FRACTIONAL_TRADING.md`
+6. `docs/REVIEW_2026-08-14_TRADE1_DISCRETE_TRADING.md`
+7. `docs/REVIEW_2026-08-13_OBSERVATION_CLOCK_AND_EPOCH005_ROLL.md`
+8. `docs/OPERATIONAL_FACTS.md`
+9. `docs/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes merge, push, deployment, an evidence-epoch roll, M4,
 live trading, funded-account access, operator-database mutation, or a
@@ -25,15 +24,18 @@ scheduled-task change.
 ## 1. Repository topology and remote availability
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Current `main` and `origin/main`: `ca0cdf0` (PR #217), which merged the
-  SET-1 independent correction. The previous head `cfed8c8` (PR #214) is now
-  an ancestor.
+- Current `main` and `origin/main`: `7055142` (PR #218), which merged Claude's
+  SET-1 counter-review `45a510c`. PR #217 merge `ca0cdf0` is its first parent.
 - Codex's SET-1 review branch `codex/review-set1-settings-toggles-20260814`
   is MERGED. Its product/test correction is `89156b7`; its records are
   `6b944ac`, `d4d43cf`, and `55a1110`.
-- Active branch: `user/claude/set1-counterreview-20260814`, based on exact
-  main `ca0cdf0`. It carries the counter-review corrections
-  SET1CR-001 … SET1CR-004 and `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`.
+- Claude's counter-review branch `user/claude/set1-counterreview-20260814`
+  is MERGED through PR #218. It carries SET1CR-001 … SET1CR-004 and
+  `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`.
+- Active branch: `codex/review-set1-counterreview-20260814`, based on exact
+  main `7055142`. Product/test correction `29290d9` closes CSET1CR-001 … 003;
+  the commit containing this handoff closes the post-merge record drift
+  CSET1CR-004. The branch is local and **not pushed**.
 - Merged-branch cleanup ran on 2026-08-14: twelve merged branches were
   deleted (five local, seven remote). Two unmerged branches were deliberately
   KEPT and are content-redundant with `main`:
@@ -44,13 +46,18 @@ scheduled-task change.
   `1cb8abf` is in `main`; only an obsolete push-status paragraph is unique).
   Neither should be merged; both can be deleted.
 
-Merged source history reviewed from the previously accepted base `a5d5fe3`:
+Relevant merged and review history:
 
 - `9e07bf9`: Claude's TRADE-1 counter-review.
 - `6085f44`: Claude's SET-1 implementation.
 - `a62aa1a`: PR #213, merging SET-1 to main.
 - `e6c6748`: integration of main/SET-1 into the TRADE-1 review branch.
 - `cfed8c8`: PR #214, merging the combined TRADE-1 review tree to main.
+- `89156b7`: Codex's end-to-end SET-1 fractional correction.
+- `ca0cdf0`: PR #217, merging that correction to main.
+- `45a510c`: Claude's SET-1 counter-review and four corrections.
+- `7055142`: PR #218, exact-tree merge of `45a510c`.
+- `29290d9`: Codex verification correction on the active local branch.
 
 Carried-forward review anchors that remain part of current recovery history:
 
@@ -61,15 +68,30 @@ Carried-forward review anchors that remain part of current recovery history:
   `codex/review-buy1-suggestion-picker-20260813` at `44a7f85`, then merged and
   counter-reviewed before this SET-1 work. No BUY-1 review work is reopened.
 
-The review started from a clean `cfed8c8` worktree. All durable changes after
-that base are in the three review commits named above; generated pytest temp
-directories are removed before closure. No unrelated user work is included.
+This verification started from clean exact main `7055142`. No unrelated user
+work is included.
 
 ## 2. Outcome, commit dispositions, and issue state
 
 Final disposition: **accepted after correction**.
 
-Issue total: **0 P0 / 0 P1 / 4 P2 / 4 P3; all closed; 0 open**.
+Current verification issue total: **0 P0 / 0 P1 / 1 P2 / 3 P3; all
+closed; 0 open**.
+
+- `45a510c`: **accepted after correction**. SET1CR-001 through SET1CR-004
+  are sound. The same commit's development launcher protected SQLite but not
+  the shared paper account, omitted two supported provider keys, and added UI
+  tests that exposed a pre-existing cross-AppTest cache leak.
+- `7055142`: **accepted after correction**. The PR #218 merge tree exactly
+  equals `45a510c`, with both parents intact. Its active documents became stale
+  after the merge and are corrected on this branch.
+- `29290d9`: Codex product/test correction: development launches now engage
+  the environment kill switch by default, deliberate paper-order testing
+  requires `-AllowPaperOrders` without clearing another switch, all five
+  supported provider keys reload from user scope, primary instructions use the
+  safe launcher, and the sell AppTests clear Streamlit's global cache.
+
+Prior SET-1 implementation/review history carried forward:
 
 - `9e07bf9`: **accepted**. It correctly confirmed the eight TRADE-1 review
   findings and fixed TRADE1CR-001. No further product correction was needed.
@@ -90,7 +112,7 @@ Issue total: **0 P0 / 0 P1 / 4 P2 / 4 P3; all closed; 0 open**.
 - `6b944ac`: durable review ledger, current Action Plan, and exactly
   two-paragraph SET-1 milestone record.
 
-Closed findings:
+Prior independent-correction findings:
 
 - P2 SET1R-001: disabling whole-share mode did not reach production sizing,
   execution, submission, or reconciliation.
@@ -109,8 +131,10 @@ Closed findings:
   always sending a new keyword; strict mode now relies on the existing strict
   default and only fractional mode sends the explicit permission.
 
-The full ledger, concrete reasons, corrections, and verification are in
-`docs/REVIEW_2026-08-14_SET1_SETTINGS_AND_FRACTIONAL_TRADING.md`.
+Claude's four counter-review findings are in
+`docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`. The current four-finding
+ledger, concrete evidence, corrections, and verification are in
+`docs/REVIEW_2026-08-14_CODEX_SET1_COUNTERREVIEW.md`.
 
 ## 3. Validation
 
@@ -147,6 +171,20 @@ Counter-review (`user/claude/set1-counterreview-20260814`), 2026-08-14:
   `risk/execution_gate.py` and those tests read source from disk. They
   pass on the settled tree. A suite run concurrent with edits validates
   nothing.
+
+Codex verification (`codex/review-set1-counterreview-20260814`), 2026-08-14:
+
+- `git diff --exit-code 45a510c 7055142`: clean; PR #218's merge tree is
+  exact.
+- Launcher, operational-launcher, and environment-kill-switch contracts:
+  **39 passed**; PowerShell parser: clean without executing the app.
+- Order-dependent UI sequence before correction: **23 passed / 1 failed**;
+  the older sell test passed alone but lost its whole-share widget after the
+  preceding AppTests. The fixture now clears Streamlit's data cache.
+- Full settled-tree repository suite after product/test correction:
+  **3,759 passed / 0 failed / 25 known dependency warnings** in 888.59 s.
+- Post-documentation active-record, launcher, SET-1, exact UI-order,
+  kill-switch, and operational-launcher checks: **138 passed**.
 - Repository `compileall`: clean. `git diff --check` and staged checks: clean
   apart from expected Windows line-ending notices.
 
@@ -178,6 +216,11 @@ deployment, scheduled-task change, or live-market interaction occurred.
 - Nothing auto-submits. Typed approval, fresh quote/account checks,
   concentration/exposure limits, duplicates, reservations, kill switch, paper
   mode, and all other existing gates remain in force.
+- `scripts/launch_dev_app.ps1` uses `data/dev_scratch.db` and engages the
+  environment kill switch by default. `-AllowPaperOrders` is the explicit
+  paper-test opt-in and does not clear any inherited or persistent switch.
+  The development and operational runtimes still share one Alpaca paper
+  account, so ordinary previews must keep the default halt.
 - Policy fingerprint changes invalidate prior proposals. Deploying this new
   policy field, even at the safe default, changes execution lineage.
 
@@ -202,11 +245,11 @@ or secret is recorded here.
 
 ## 6. Next authorized step
 
-1. Independently verify the counter-review branch
-   `user/claude/set1-counterreview-20260814` (corrections SET1CR-001 …
-   SET1CR-004 plus `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`). Codex's
-   `89156b7`/`6b944ac`/`d4d43cf`/`55a1110` are already in `main` at `ca0cdf0`.
-   Treat them as merged history, not as work awaiting review.
+1. Claude may independently verify `29290d9` and the documentation commit on
+   `codex/review-set1-counterreview-20260814`. The branch is local and
+   unpushed; review completion does not itself authorize publication, merge,
+   or deployment. `45a510c` and PR #218 merge `7055142` are already merged
+   history, not work awaiting review.
 2. Answer the one open design question recorded in the counter-review: should
    strict mode permit a fractional sell that closes an ENTIRE remaining
    position? It cannot increase exposure and is the canonical risk-reducing
@@ -236,21 +279,21 @@ explicit owner instruction.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
+docs/REVIEW_2026-08-14_CODEX_SET1_COUNTERREVIEW.md,
 docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md, and docs/SESSION_HANDOFF.md.
-origin/main is ca0cdf0 (PR #217), which merged Codex's SET-1 correction
-89156b7 -- that work is MERGED, not pending. The open branch is
-user/claude/set1-counterreview-20260814, carrying counter-review corrections
-SET1CR-001 (a fractional holding was silently unsellable and invisible in
-Discrete Selling), SET1CR-002 (the quantity authority bounded precision but
-not magnitude), SET1CR-003 (a broad handler substituted Decimal("0") and
-skipped the fractionable check; not reachable through a durable proposal),
-and SET1CR-004 (a bare Decimal(<str>) conversion in the daily-budget path).
-One design question is deliberately left to the owner: whether strict mode
-should permit a fractional sell that closes an entire remaining position.
-Do not merge the two surviving unmerged branches -- both are content-redundant
-with main. The operational runtime remains frozen at 752d3b7 under
-paper-epoch-005; its current observation count was not remeasured. Do not
-deploy, roll the epoch, begin M4, mutate the operator database, alter
-scheduled tasks, access a funded account, or enable live trading without
-explicit owner authorization.
+main and origin/main are 7055142 (PR #218), which merged Claude's SET-1
+counter-review 45a510c. Codex independently accepted its four trading fixes
+after correction on local, unpushed branch
+codex/review-set1-counterreview-20260814. Product/test correction 29290d9
+makes the development launcher engage the environment kill switch by
+default, requires explicit -AllowPaperOrders without clearing other switches,
+loads every supported user-scope provider key, routes primary docs through
+the safe launcher, and clears leaked Streamlit data-cache state in the older
+sell AppTests. The full settled tree passed 3,759 tests. One design question
+remains for the owner: whether strict mode should permit a fractional sell
+that closes the entire remaining position. The operational runtime remains
+frozen at 752d3b7 under paper-epoch-005; its observation count was not
+remeasured. Do not push, merge, deploy, roll the epoch, begin M4, mutate the
+operator database, alter scheduled tasks, access a funded account, or enable
+live trading without explicit owner authorization.
 ```

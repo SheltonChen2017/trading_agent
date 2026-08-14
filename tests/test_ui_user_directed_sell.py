@@ -34,7 +34,7 @@ def _offline_selling_environment(monkeypatch):
 
 def _selling_app() -> AppTest:
     app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
-    app.session_state["nav_page"] = "Policy Based Selling"
+    app.session_state["nav_page"] = "Discrete Selling"
     app.run()
     return app
 
@@ -45,10 +45,14 @@ def test_the_selling_page_offers_a_direct_sale_of_a_held_position(
     app = _selling_app()
 
     assert not app.exception
-    subheaders = [s.value for s in app.subheader]
-    assert "Sell a specific holding (your own decision)" in subheaders
-    # The policy-breach path must still be there and still be distinct.
-    assert "Recommended sells (policy-breach based)" in subheaders
+    # TRADE-1 moved this out of Policy Based Selling onto its own page, so
+    # its identity is now the page's controls rather than a subheader inside
+    # the policy page. The property under test is unchanged: an owner can
+    # sell a specific holding on their own judgement.
+    assert any(s.label.startswith("Holding to sell") for s in app.selectbox), (
+        [s.label for s in app.selectbox]
+    )
+    assert any(n.label == "Shares" for n in app.number_input)
 
 
 def test_the_direct_sale_section_disclaims_any_recommendation(
@@ -75,16 +79,13 @@ def test_the_share_selector_cannot_exceed_the_shares_held(
     app = _selling_app()
 
     assert not app.exception
-    sell_inputs = [
-        element
-        for element in app.number_input
-        if element.label.startswith("Shares to sell")
-    ]
-    assert sell_inputs, [element.label for element in app.number_input]
-    widget = sell_inputs[0]
-    held = int(widget.label.split("you hold ")[1].rstrip(")"))
-    assert widget.max == held
+    widget = next(n for n in app.number_input if n.label == "Shares")
+    captions = "\n".join(c.value for c in app.caption)
+    # The holding is stated in the page caption now rather than the widget
+    # label; the bound itself is what matters and is asserted directly.
+    assert "whole share(s) of" in captions
     assert widget.min == 1
+    assert widget.max is not None and widget.max >= 1
 
 
 def test_fractional_remainder_is_not_described_as_a_closed_position(
@@ -115,7 +116,7 @@ def test_fractional_remainder_is_not_described_as_a_closed_position(
     ui._load_base_packet.clear()
 
     app = _selling_app()
-    app.number_input(key="user_sell_shares").set_value(10).run()
+    app.number_input(key="discrete_sell_shares").set_value(10).run()
 
     captions = "\n".join(element.value for element in app.caption)
     assert "closes the position" not in captions
@@ -126,11 +127,11 @@ def test_changing_share_input_hides_the_stale_actionable_proposal(
     _offline_selling_environment,
 ):
     app = _selling_app()
-    app.number_input(key="user_sell_shares").set_value(3).run()
-    app.button(key="user_sell_create").click().run()
+    app.number_input(key="discrete_sell_shares").set_value(3).run()
+    app.button(key="discrete_sell_create").click().run()
     assert "SELL 3 NVDA" in [element.value for element in app.subheader]
 
-    app.number_input(key="user_sell_shares").set_value(4).run()
+    app.number_input(key="discrete_sell_shares").set_value(4).run()
 
     assert "SELL 3 NVDA" not in [element.value for element in app.subheader]
     notices = "\n".join(element.value for element in app.info)

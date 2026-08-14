@@ -3231,7 +3231,8 @@ if page == "Discrete Buying":
                         f"A buy proposal for {_db_proposal['intent']['shares']} "
                         f"share(s) of {_db_proposal['intent']['ticker']} is waiting "
                         "on the Propose & Approve page. It does not match the "
-                        "current selection; create a new proposal to see it here."
+                        f"current {_db_shares or 0}-share selection for "
+                        f"{_db_ticker}; create a new proposal to see it here."
                     )
                 else:
                     _render_proposal_approval(
@@ -3243,10 +3244,12 @@ if page == "Discrete Buying":
 if page == "Discrete Selling":
     st.caption(
         "Sell part or all of one holding, for your own reasons, sized by share "
-        "count or by dollar amount. This is NOT the policy-breach path -- "
-        "nothing here says a rule was broken, and this project does not "
-        "predict price declines. Nothing is sold until you approve the "
-        "proposal by typing the phrase."
+        "count or by dollar amount. This project is NOT recommending it and "
+        "does not predict price declines -- it has confirmed zero signals as "
+        "real edge for that. This is also NOT the policy-breach path: nothing "
+        "here says a rule was broken. The sale becomes an ordinary proposal "
+        "that you approve by typing the phrase, and your policy limits are "
+        "re-checked at that moment."
     )
     _ds_policy, _ds_packet = _load_packet(policy_path, include_events=False)
 
@@ -3281,10 +3284,21 @@ if page == "Discrete Selling":
             if _ds_note:
                 st.markdown(_ds_note)
             if _ds_shares:
+                # SELREV-003: compute the remainder EXACTLY from the broker
+                # quantity, not from the floored whole-share count. Selling
+                # all 10 whole shares of a 10.5-share holding leaves 0.5 --
+                # calling that "closes the position" is a false statement
+                # about the resulting holding.
+                _ds_remaining = _remaining_shares_after_sale(
+                    _ds_position.shares_exact
+                    if _ds_position.shares_exact is not None
+                    else _ds_position.shares,
+                    _ds_shares,
+                )
                 st.caption(
-                    f"{_ds_max - _ds_shares} share(s) would remain."
-                    if _ds_shares < _ds_max
-                    else "This closes the whole position."
+                    "Selling this quantity closes the position."
+                    if _ds_remaining == 0
+                    else f"{_decimal_text(_ds_remaining)} share(s) would remain."
                 )
             if st.button(
                 f"Create sell proposal for {_ds_ticker}",
@@ -3314,11 +3328,14 @@ if page == "Discrete Selling":
                     _ds_proposal["intent"]["ticker"] != _ds_ticker
                     or (_ds_shares and _ds_proposal["intent"]["shares"] != _ds_shares)
                 ):
+                    # SELREV-004: name BOTH quantities. "Does not match" alone
+                    # leaves the reader to work out which number changed.
                     st.info(
                         f"A sell proposal for {_ds_proposal['intent']['shares']} "
                         f"share(s) of {_ds_proposal['intent']['ticker']} is waiting "
                         "on the Propose & Approve page. It does not match the "
-                        "current selection; create a new proposal to see it here."
+                        f"current {_ds_shares or 0}-share selection for "
+                        f"{_ds_ticker}; create a new proposal to see it here."
                     )
                 else:
                     _render_proposal_approval(

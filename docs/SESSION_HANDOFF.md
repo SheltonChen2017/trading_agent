@@ -30,9 +30,10 @@ installed observation cadence.
   exact merged head `4de784e`.
 - Review correction: `1cb8abf` (`Correct epoch-005 roll review records`).
 - The separate handoff commit follows `1cb8abf` on the same branch.
-- The review branch and both review commits are **local-only until the owner
-  authorizes a push**. Another computer cannot retrieve them with `git fetch`
-  yet. The Claude implementation and merge are already on the approved remote.
+- The owner authorized the push after review. The review branch, correction,
+  and handoff commit are available from
+  `origin/codex/review-observation-clock-roll-20260813`; another computer can
+  retrieve them with `git fetch`. The branch is not merged to `main`.
 - The shared worktree was clean before review. No unrelated user change was
   present or incorporated.
 
@@ -153,19 +154,20 @@ mixed-provenance snapshot handling, and whether AI debate is worth building.
 
 ## 7. Machine transfer and resume prompt
 
-Until this review branch is pushed, preserve this checkout: `1cb8abf` and the
-following handoff commit are not recoverable from the approved remote. No
-operator database, task, credential, or operational artifact needs to be
-copied merely to review these Git changes.
+The review branch is pushed and recoverable from the approved remote. A new
+computer can fetch it and switch to
+`origin/codex/review-observation-clock-roll-20260813`. No operator database,
+task, credential, or operational artifact needs to be copied merely to review
+these Git changes.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/REVIEW_2026-08-13_OBSERVATION_CLOCK_AND_EPOCH005_ROLL.md, and
 docs/SESSION_HANDOFF.md. Review branch
 codex/review-observation-clock-roll-20260813 starts from merged Claude head
-4de784e and has correction 1cb8abf plus a separate handoff commit. Confirm
-whether the branch has since been pushed or merged. The operational runtime
-remains frozen at 752d3b7 under paper-epoch-005. Verify the first scheduled
+4de784e and has correction 1cb8abf plus separate handoff/push-status commits.
+The branch is pushed and awaits any separately authorized merge. The
+operational runtime remains frozen at 752d3b7 under paper-epoch-005. Verify the first scheduled
 epoch-005 observation; do not deploy, roll again, begin M4, mutate the
 operator database, or enable live trading without a new explicit owner
 instruction.

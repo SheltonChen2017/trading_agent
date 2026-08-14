@@ -47,9 +47,10 @@ counter-review after correction on
 `codex/review-set1-counterreview-20260814`; product/test correction `29290d9`
 makes the development launcher fail closed toward the shared paper account,
 restores all supported provider credentials, and isolates Streamlit AppTests.
-The review branch is local and unpushed. None of this is deployed: the
-operational runtime remains separately frozen at `752d3b7` in
-`paper-epoch-005`.
+The owner authorized publication on 2026-08-14, and the review branch tracks
+`origin/codex/review-set1-counterreview-20260814`; publication does not
+authorize merge or deployment. None of this is deployed: the operational
+runtime remains separately frozen at `752d3b7` in `paper-epoch-005`.
 
 ---
 

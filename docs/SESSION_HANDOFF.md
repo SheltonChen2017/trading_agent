@@ -17,9 +17,10 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 8. `docs/OPERATIONAL_FACTS.md`
 9. `docs/OPERATIONS_RUNBOOK.md`
 
-Nothing here authorizes merge, push, deployment, an evidence-epoch roll, M4,
-live trading, funded-account access, operator-database mutation, or a
-scheduled-task change.
+Nothing here authorizes merge, deployment, an evidence-epoch roll, M4, live
+trading, funded-account access, operator-database mutation, or a
+scheduled-task change. The owner separately authorized this branch's
+publication on 2026-08-14.
 
 ## 1. Repository topology and remote availability
 
@@ -35,7 +36,9 @@ scheduled-task change.
 - Active branch: `codex/review-set1-counterreview-20260814`, based on exact
   main `7055142`. Product/test correction `29290d9` closes CSET1CR-001 … 003;
   the commit containing this handoff closes the post-merge record drift
-  CSET1CR-004. The branch is local and **not pushed**.
+  CSET1CR-004. The owner authorized publication on 2026-08-14; the branch
+  tracks `origin/codex/review-set1-counterreview-20260814` and the commit
+  containing this publication-state update is remotely retrievable.
 - Merged-branch cleanup ran on 2026-08-14: twelve merged branches were
   deleted (five local, seven remote). Two unmerged branches were deliberately
   KEPT and are content-redundant with `main`:
@@ -245,11 +248,10 @@ or secret is recorded here.
 
 ## 6. Next authorized step
 
-1. Claude may independently verify `29290d9` and the documentation commit on
-   `codex/review-set1-counterreview-20260814`. The branch is local and
-   unpushed; review completion does not itself authorize publication, merge,
-   or deployment. `45a510c` and PR #218 merge `7055142` are already merged
-   history, not work awaiting review.
+1. Claude may independently verify `29290d9` and the documentation commits on
+   `origin/codex/review-set1-counterreview-20260814`. The branch is published;
+   publication does not authorize merge or deployment. `45a510c` and PR #218
+   merge `7055142` are already merged history, not work awaiting review.
 2. Answer the one open design question recorded in the counter-review: should
    strict mode permit a fractional sell that closes an ENTIRE remaining
    position? It cannot increase exposure and is the canonical risk-reducing
@@ -283,8 +285,8 @@ docs/REVIEW_2026-08-14_CODEX_SET1_COUNTERREVIEW.md,
 docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md, and docs/SESSION_HANDOFF.md.
 main and origin/main are 7055142 (PR #218), which merged Claude's SET-1
 counter-review 45a510c. Codex independently accepted its four trading fixes
-after correction on local, unpushed branch
-codex/review-set1-counterreview-20260814. Product/test correction 29290d9
+after correction on published branch
+origin/codex/review-set1-counterreview-20260814. Product/test correction 29290d9
 makes the development launcher engage the environment kill switch by
 default, requires explicit -AllowPaperOrders without clearing other switches,
 loads every supported user-scope provider key, routes primary docs through
@@ -293,7 +295,7 @@ sell AppTests. The full settled tree passed 3,759 tests. One design question
 remains for the owner: whether strict mode should permit a fractional sell
 that closes the entire remaining position. The operational runtime remains
 frozen at 752d3b7 under paper-epoch-005; its observation count was not
-remeasured. Do not push, merge, deploy, roll the epoch, begin M4, mutate the
-operator database, alter scheduled tasks, access a funded account, or enable
-live trading without explicit owner authorization.
+remeasured. Publication is complete; do not merge, deploy, roll the epoch,
+begin M4, mutate the operator database, alter scheduled tasks, access a funded
+account, or enable live trading without explicit owner authorization.
 ```

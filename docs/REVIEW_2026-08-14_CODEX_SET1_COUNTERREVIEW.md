@@ -97,6 +97,7 @@ edited concurrently with it.
 
 This is development code only. `paper-epoch-005` remains recorded as active
 on frozen deployed commit `752d3b7`; this review did not remeasure it. SET-1's
-policy-fingerprint change would close that lineage if later deployed. Merge,
-push, deployment, epoch roll, funded-account access, and live trading require
+policy-fingerprint change would close that lineage if later deployed. The
+owner subsequently authorized publication of the review branch; merge,
+deployment, epoch roll, funded-account access, and live trading still require
 separate owner authorization.

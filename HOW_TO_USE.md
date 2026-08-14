@@ -114,6 +114,23 @@ still separate steps.
 Deliberately absent: any probability-of-profit number. The app will not
 invent one.
 
+### Settings & Features — two switches that change what the app may do
+
+Both live with the authoritative trading policy, not the UI preferences, and
+both require the typed `UPDATE POLICY` confirmation. Changing either produces
+a new policy fingerprint, which deliberately invalidates any pending proposal
+created under the old one.
+
+* **Whole shares only** — ON by default, and the default is enforced
+  independently by the risk gate and the broker adapter, so a code path that
+  forgets to ask still refuses. Turning it OFF permits fractional order
+  quantities. Note the current scope: this milestone delivers the switch and
+  its authority; the order path is not yet fractional end to end.
+* **Enforce a minimum cash reserve** — unchecking writes a reserve of 0%.
+  That removes the *buffer*, not the solvency check: an order that would take
+  your cash balance negative is still refused. There is deliberately no
+  separate on/off field, because 0 already means "no reserve".
+
 ### Module 3 — Policy Based Selling: *reduce risk*
 
 "Check for recommended sells" surfaces **policy breaches** — concentration

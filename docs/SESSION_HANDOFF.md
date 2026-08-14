@@ -259,10 +259,26 @@ or secret is recorded here.
    deliberately independent layers. This is an owner decision. Until it is
    answered, the shipped behaviour is: the floor stands, the stranded
    remainder is disclosed, and turning the setting off is the remedy.
-3. The owner's stated sequencing is to finish every wanted feature first, then
-   perform ONE deployment carrying all of it, then run roughly 60 sessions
-   untouched. Epoch-005 is expendable and its closure by the fingerprint
-   change is expected, not a problem to work around.
+3. **Owner decision, 2026-08-14 (supersedes the earlier "epoch-005 is
+   expendable" sequencing): epoch-005 runs UNCHANGED for 60 days.** Do not
+   deploy, roll, or otherwise disturb it. The practical consequence is that
+   TRADE-1, BUY-1, SET-1, the fractional-share path, and the counter-review
+   corrections stay development-only for the duration; the operational
+   runtime remains `752d3b7`. The owner will exercise new features through
+   the development app from time to time, which is compatible with this
+   decision as long as `scripts/launch_dev_app.ps1` is used WITHOUT
+   `-AllowPaperOrders`: the scratch database and the environment kill switch
+   together keep a development session out of the epoch's record. The
+   `-AllowPaperOrders` switch reaches the SHARED Alpaca paper account and
+   must not be used while this decision stands.
+   Cadence measured 2026-08-14, not assumed: `TradingAgent-Paper-Observation`
+   is `Ready`, last result 0, and its trigger is `DaysOfWeek: 62` (Mon-Fri)
+   at 16:30 local. So 60 calendar days yields roughly 43 observations, not
+   60. Whether the owner means 60 days or 60 observations is unresolved and
+   should be confirmed before the count is treated as complete.
+   Epoch-005 showing 0 observations on 2026-08-14 is CORRECT and not a
+   fault: the epoch opened at 16:59 local on 2026-08-13, after that day's
+   16:30 observation, which belongs to epoch-004.
 4. If the owner later requests deployment, treat the policy-fingerprint change
    as an epoch-closing lineage change and follow the operations runbook; do not
    preserve epoch-005 by pretending the safe default is immaterial.

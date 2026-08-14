@@ -398,6 +398,41 @@ The evidence epoch itself is a database record: it survives reboots and
 never needs re-activating. The frozen checkout must not be updated until
 the epoch is closed.
 
+### Is the epoch still collecting evidence?
+
+```powershell
+python scripts\check_epoch_cadence.py
+```
+
+Run this whenever you think of it, especially during a long epoch. It reads
+the operator database **read-only** — it is safe to run from the development
+folder while an epoch is open, and it cannot write, submit, or change
+anything.
+
+It exists because a stalled epoch is silent. The nightly capture is
+*supposed* to refuse when the books do not reconcile, so a stall looks
+exactly like a healthy evening: the task reports success, nothing crashes,
+and the observation count simply stops going up. That is what happened in
+epoch-002, which sat at one observation until it was traced by hand days
+later. The existing gap check could not see it, because it only looks
+*between* the first and last observation you already have — a run that stops
+has nothing after it to compare against.
+
+The five answers:
+
+| Result | Meaning |
+|---|---|
+| `NOT DUE YET` | Nothing is owed yet. Zero observations is correct, not a fault. |
+| `HEALTHY` | Every session owed so far was captured. |
+| `BEHIND` | Something is missing, but it may be one late run. Re-check after the next session. |
+| `STALLED` | Nothing has been captured for two or more owed sessions. The epoch is open but no longer accumulating. |
+| `NO ACTIVE EPOCH` | Nothing is being collected at all. |
+
+If it says `STALLED`, the two usual causes are the scheduled task not
+running (check it with the command above) and ledger reconciliation
+refusing to capture — which is the machinery working correctly and pointing
+at real books that need explaining, not something to override.
+
 ---
 
 ## 7. When something looks wrong

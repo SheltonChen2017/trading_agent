@@ -162,11 +162,26 @@ def generate_user_directed_sell_proposal(
             if policy.whole_shares_only
             else "share quantity"
         )
+        # SET1CR-001: when a real, positive holding is refused solely because
+        # the whole-share floor took it to zero, the refusal must say so and
+        # name the authorized remedy. Otherwise the owner is told their own
+        # stock is "not usable" with no route to sell it -- a safeguard
+        # obstructing a risk-reducing sell, which this project treats as a
+        # defect rather than caution (CLAUDE.md 5).
+        remedy = (
+            " You hold less than one whole share; turn off Whole shares only"
+            " in Settings & Features to close this position."
+            if policy.whole_shares_only
+            and held_exact is not None
+            and held_exact > 0
+            else ""
+        )
         return {
             "created": False,
             "reason": (
                 f"{normalized} reports {position.shares!r} shares, which is "
                 f"not a usable {quantity_label} to sell under the active policy."
+                + remedy
             ),
         }
     if quantity > sellable:

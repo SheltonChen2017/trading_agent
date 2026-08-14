@@ -410,12 +410,28 @@ def run_proposal_validation(
         )
 
     if not policy.whole_shares_only:
+        # SET1CR-003: an unreadable quantity must REFUSE here, not become
+        # Decimal("0"). Substituting zero made the value integral, which
+        # skipped the fractionable check below and handed the decision to the
+        # gate. The gate does reject it, so nothing unsafe shipped -- but
+        # "substitute a plausible default on error" is the exact shape this
+        # project bans, and it silently disabled a broker-eligibility check
+        # that the reader of this block would assume had run.
         try:
             requested_quantity = deps.to_decimal(
                 intent.shares, name="intent.shares"
             )
-        except Exception:
-            requested_quantity = deps.decimal_factory("0")
+        except (ValueError, TypeError, ArithmeticError) as exc:
+            return deps.outcome_factory(
+                proposal=proposal,
+                intent=intent,
+                validation=None,
+                error=(
+                    f"intent.shares is not an exact usable quantity "
+                    f"({type(exc).__name__}); refusing before submission."
+                ),
+                broker_preflight=broker_preflight,
+            )
         if (
             requested_quantity != requested_quantity.to_integral_value()
             and not broker_preflight.get("asset", {}).get("fractionable", False)

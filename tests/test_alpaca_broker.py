@@ -133,6 +133,65 @@ def test_submit_limit_order_rejects_nan_shares():
         _clear_alpaca_env()
 
 
+def test_fractional_market_order_uses_exact_rest_quantity_text(monkeypatch):
+    monkeypatch.setenv("APCA_API_KEY_ID", "test-key")
+    monkeypatch.setenv("APCA_API_SECRET_KEY", "test-secret")
+    monkeypatch.setattr(broker, "verify_execution_authorization", lambda *_a, **_k: None)
+    monkeypatch.setattr(
+        broker,
+        "assert_account_and_asset_ready",
+        lambda _ticker: {"account": {}, "asset": {"fractionable": True}},
+    )
+    captured = {}
+
+    def fake_post(url, payload):
+        captured.update(url=url, payload=payload)
+        return {
+            "id": "fractional-1",
+            "client_order_id": payload["client_order_id"],
+            "symbol": payload["symbol"],
+            "qty": payload["qty"],
+            "side": payload["side"],
+            "type": payload["type"],
+            "time_in_force": payload["time_in_force"],
+            "status": "accepted",
+        }
+
+    monkeypatch.setattr(broker, "_http_post_json", fake_post)
+    result = broker.submit_market_order(
+        "AAPL",
+        "0.123456789",
+        whole_shares_only=False,
+        idempotency_key="fractional-client-id",
+    )
+    assert captured["payload"]["qty"] == "0.123456789"
+    assert isinstance(captured["payload"]["qty"], str)
+    assert result["shares_decimal"] == "0.123456789"
+
+
+def test_fractional_order_refuses_a_nonfractionable_asset_before_http(monkeypatch):
+    monkeypatch.setenv("APCA_API_KEY_ID", "test-key")
+    monkeypatch.setenv("APCA_API_SECRET_KEY", "test-secret")
+    monkeypatch.setattr(broker, "verify_execution_authorization", lambda *_a, **_k: None)
+    monkeypatch.setattr(
+        broker,
+        "assert_account_and_asset_ready",
+        lambda _ticker: {"account": {}, "asset": {"fractionable": False}},
+    )
+    monkeypatch.setattr(
+        broker,
+        "_http_post_json",
+        lambda *_a, **_k: pytest.fail("nonfractionable order contacted HTTP"),
+    )
+    with pytest.raises(broker.BrokerPreflightError):
+        broker.submit_market_order(
+            "NOFRAC",
+            "0.5",
+            whole_shares_only=False,
+            idempotency_key="fractional-client-id",
+        )
+
+
 def test_submit_market_order_refuses_live_without_confirmation():
     _clear_alpaca_env()
     os.environ["APCA_API_KEY_ID"] = "test-key"

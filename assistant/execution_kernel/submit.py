@@ -98,6 +98,8 @@ def resolve_submission_call(
     store: AssistantStore,
     proposal_id: str,
     intent: TradeIntent,
+    *,
+    whole_shares_only: bool = True,
 ) -> tuple[Callable[..., Any], dict[str, Any]]:
     """Pick the broker call for this order type, or refuse and release.
 
@@ -112,10 +114,21 @@ def resolve_submission_call(
     closed instead, so adding a new order type can never silently degrade
     into a market order (independent review, 2026-07-29).
     """
+    # Preserve compatibility with strict whole-share broker seams that predate
+    # SET-1 (including operator tooling and test doubles): the broker adapter's
+    # own default is strict, so only the newly-authorized fractional direction
+    # needs an explicit keyword. This still fails closed if a future caller
+    # forgets to pass the policy flag here.
+    granularity_kwargs = (
+        {} if whole_shares_only else {"whole_shares_only": False}
+    )
     if intent.order_type == "limit":
-        return broker_module.submit_limit_order, {"limit_price": intent.limit_price}
+        return broker_module.submit_limit_order, {
+            "limit_price": intent.limit_price,
+            **granularity_kwargs,
+        }
     if intent.order_type == "market":
-        return broker_module.submit_market_order, {}
+        return broker_module.submit_market_order, granularity_kwargs
     message = (
         f"No broker submission path implements order_type={intent.order_type!r}; refusing to "
         "submit rather than silently downgrading it to a market order."

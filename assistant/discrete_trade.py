@@ -6,19 +6,17 @@ policy-driven respectively; the owner also wants to buy or sell ONE named
 ticker on their own judgement, sized either by share count or by dollar
 amount.
 
-This module owns exactly one thing: converting a dollar amount into a whole
-share count, and back. It deliberately does not create proposals — those go
+This module owns exactly one thing: converting a dollar amount into the exact
+policy-permitted share quantity, and back. It deliberately does not create proposals — those go
 through the already-reviewed generators (`assistant.allocation_proposals` for
 buys, `assistant.user_directed_sell` for sells) so a discrete trade inherits
 every check those paths already passed rather than growing a parallel one.
 
-**A dollar amount is a BUDGET, not a notional order** (owner decision,
-2026-08-14). $500 at $301.51 buys 1 share and leaves $198.49 unspent, and the
-caller must show that remainder. This project submits whole-share orders only,
-enforced independently by `risk.execution_gate.is_valid_share_quantity`, by
-`execution.alpaca_broker`'s own copy of that check, and by the sell
-generator's floor. True fractional/notional orders would break all three plus
-tax-lot accounting and the never-short guard, and are out of scope.
+**A dollar amount is a BUDGET, not a broker-notional order.** In strict mode,
+$500 at $301.51 buys 1 share and leaves $198.49. In fractional mode the same
+budget is converted down to an exact quantity with at most nine decimal
+places, and only the sub-cent rounding remainder is left. The caller must show
+the resulting quantity and remainder in either mode.
 
 Every calculation here is exact `Decimal`. That is not stylistic: the
 2026-08-13 independent review (SELREV-002) found `shares * price` in binary
@@ -32,6 +30,7 @@ import dataclasses
 from decimal import ROUND_FLOOR, Decimal, DecimalException
 
 from assistant.money import decimal_or_none, decimal_text
+from risk.execution_gate import canonical_order_quantity, order_quantity_decimal
 
 
 # Keep the conversion bounded before Decimal is converted to a Python int.
@@ -46,18 +45,21 @@ _MAX_SIZABLE_SHARES = Decimal(2**63 - 1)
 class DollarSizing:
     """What a dollar budget actually buys, and what it cannot."""
 
-    shares: int
+    shares: int | str
     notional_text: str
     unallocated_text: str
     reference_price_text: str
 
     @property
     def affordable(self) -> bool:
-        return self.shares > 0
+        quantity = order_quantity_decimal(self.shares, whole_shares_only=False)
+        return quantity is not None and quantity > 0
 
 
-def size_by_dollar_amount(dollar_amount: object, price: object) -> dict:
-    """Whole shares a budget affords at `price`, floored, with the remainder.
+def size_by_dollar_amount(
+    dollar_amount: object, price: object, *, whole_shares_only: bool = True
+) -> dict:
+    """Policy-permitted shares a budget affords, floored, with remainder.
 
     Returns ``{"ok": True, "sizing": DollarSizing}`` or
     ``{"ok": False, "reason": str}``. Never raises for ordinary bad input:
@@ -87,30 +89,44 @@ def size_by_dollar_amount(dollar_amount: object, price: object) -> dict:
         }
 
     try:
-        whole_shares = (amount / price_decimal).to_integral_value(
-            rounding=ROUND_FLOOR
+        raw_quantity = amount / price_decimal
+        sized_quantity = (
+            raw_quantity.to_integral_value(rounding=ROUND_FLOOR)
+            if whole_shares_only
+            else raw_quantity.quantize(Decimal("0.000000001"), rounding=ROUND_FLOOR)
         )
     except DecimalException:
         return {
             "ok": False,
-            "reason": "The resulting whole-share quantity is too large to size safely.",
+            "reason": "The resulting share quantity is too large to size safely.",
         }
-    if whole_shares > _MAX_SIZABLE_SHARES:
+    if sized_quantity > _MAX_SIZABLE_SHARES:
         return {
             "ok": False,
-            "reason": "The resulting whole-share quantity is too large to size safely.",
+            "reason": "The resulting share quantity is too large to size safely.",
         }
-    shares = int(whole_shares)
-    if shares <= 0:
+    shares = canonical_order_quantity(
+        int(sized_quantity) if whole_shares_only else sized_quantity,
+        whole_shares_only=whole_shares_only,
+    )
+    if shares is None:
         return {
             "ok": False,
             "reason": (
-                f"{decimal_text(amount)} does not cover one share at "
-                f"{decimal_text(price_decimal)}."
+                (
+                    f"{decimal_text(amount)} does not cover one share at "
+                    f"{decimal_text(price_decimal)}."
+                    if whole_shares_only
+                    else f"{decimal_text(amount)} does not cover the minimum "
+                    f"0.000000001-share quantity at {decimal_text(price_decimal)}."
+                )
             ),
         }
     try:
-        notional = price_decimal * shares
+        quantity_decimal = order_quantity_decimal(
+            shares, whole_shares_only=whole_shares_only
+        )
+        notional = price_decimal * quantity_decimal
         unallocated = amount - notional
     except DecimalException:
         return {
@@ -128,8 +144,10 @@ def size_by_dollar_amount(dollar_amount: object, price: object) -> dict:
     }
 
 
-def notional_for_shares(shares: object, price: object) -> dict:
-    """The exact cost of a whole-share quantity at `price`.
+def notional_for_shares(
+    shares: object, price: object, *, whole_shares_only: bool = True
+) -> dict:
+    """The exact cost of a policy-permitted share quantity at `price`.
 
     The share-mode counterpart of `size_by_dollar_amount`, so both modes of
     both discrete tabs report money the same way instead of one of them
@@ -141,13 +159,20 @@ def notional_for_shares(shares: object, price: object) -> dict:
             "ok": False,
             "reason": f"There is no usable reference price ({price!r}).",
         }
-    if not isinstance(shares, int) or isinstance(shares, bool) or shares <= 0:
+    quantity = order_quantity_decimal(
+        shares, whole_shares_only=whole_shares_only
+    )
+    if quantity is None:
         return {
             "ok": False,
-            "reason": f"Shares must be a whole number greater than zero, got {shares!r}.",
+            "reason": (
+                "Shares must be a whole number greater than zero."
+                if whole_shares_only
+                else "Shares must be a positive exact number with at most 9 decimal places."
+            ),
         }
     return {
         "ok": True,
-        "notional_text": decimal_text(price_decimal * shares),
+        "notional_text": decimal_text(price_decimal * quantity),
         "reference_price_text": decimal_text(price_decimal),
     }

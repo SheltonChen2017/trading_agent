@@ -2,7 +2,7 @@
 
 * `whole_shares_only` — a NEW policy field, default True, which keeps the
   project's whole-share-only ordering. Turning it off permits fractional
-  quantities, for a future automated tool.
+  quantities through the complete proposal-to-broker path.
 * the existing `min_cash_reserve_pct` — already expressible as 0, which the
   Settings toggle writes. No second field is added, because one rule with
   two sources of truth is one refactor away from disagreeing.
@@ -99,6 +99,85 @@ def test_float_stays_rejected_even_in_fractional_mode(value):
     assert is_valid_order_quantity(value, whole_shares_only=False) is False
 
 
+def test_fractional_quantity_is_limited_to_alpacas_nine_decimal_places():
+    assert is_valid_order_quantity("0.123456789", whole_shares_only=False)
+    assert not is_valid_order_quantity("0.1234567891", whole_shares_only=False)
+
+
+def test_the_real_gate_obeys_the_policy_granularity_without_weakening_money_checks():
+    from assistant.context_builder import build_portfolio_snapshot
+    from risk.execution_gate import TradeIntent, validate_trade_intent
+
+    snapshot = build_portfolio_snapshot([], cash=1000.0)
+    intent = TradeIntent(ticker="NVDA", side="buy", shares="0.5")
+    strict = validate_trade_intent(
+        intent,
+        snapshot,
+        reference_price="100",
+        max_position_pct=1.0,
+        max_total_exposure_pct=1.0,
+    )
+    fractional = validate_trade_intent(
+        intent,
+        snapshot,
+        reference_price="100",
+        max_position_pct=1.0,
+        max_total_exposure_pct=1.0,
+        whole_shares_only=False,
+    )
+    assert not strict.approved
+    assert fractional.approved
+
+
+def test_fractional_sell_still_cannot_exceed_the_exact_holding():
+    from assistant.context_builder import build_portfolio_snapshot
+    from risk.execution_gate import TradeIntent, validate_trade_intent
+
+    snapshot = build_portfolio_snapshot(
+        [{"ticker": "NVDA", "shares": "1.25", "entry_price": "90", "current_price": "100"}],
+        cash=100.0,
+    )
+    result = validate_trade_intent(
+        TradeIntent(ticker="NVDA", side="sell", shares="1.250000001"),
+        snapshot,
+        reference_price="100",
+        whole_shares_only=False,
+    )
+    assert not result.approved
+    assert any("exceeds" in violation for violation in result.violations)
+
+
+def test_fractional_quantity_survives_durable_intent_rehydration_as_exact_text():
+    from assistant.execution_kernel.intents import _intent_from_dict
+
+    intent = _intent_from_dict(
+        {"ticker": "NVDA", "side": "buy", "shares": "0.123456789"}
+    )
+    assert intent.shares == "0.123456789"
+    with pytest.raises(ValueError):
+        _intent_from_dict(
+            {"ticker": "NVDA", "side": "buy", "shares": "0.1234567891"}
+        )
+
+
+def test_reconciliation_does_not_tolerate_a_one_nanoshare_identity_mismatch():
+    from assistant.execution_kernel.outcomes import _order_matches_intent
+    from risk.execution_gate import TradeIntent
+
+    order = {
+        "ticker": "NVDA",
+        "side": "buy",
+        "shares": 0.5,
+        "shares_decimal": "0.500000001",
+        "type": "market",
+    }
+    matches, detail = _order_matches_intent(
+        order, TradeIntent(ticker="NVDA", side="buy", shares="0.5")
+    )
+    assert not matches
+    assert "shares" in detail
+
+
 # --- the cash reserve ------------------------------------------------------
 
 
@@ -175,7 +254,7 @@ def _offline(monkeypatch):
 def test_both_toggles_appear_in_settings(_offline):
     app = _settings_app()
     assert not app.exception
-    labels = [c.label for c in app.checkbox]
+    labels = [c.label for c in app.toggle]
     assert "Whole shares only" in labels, labels
     assert "Enforce a minimum cash reserve" in labels, labels
 
@@ -184,8 +263,8 @@ def test_the_toggles_sit_behind_the_typed_policy_confirmation(_offline):
     """These are authoritative policy, not preferences. A change must not be
     appliable without the same typed phrase the existing flags require."""
     app = _settings_app()
-    box = next(c for c in app.checkbox if c.label == "Whole shares only")
-    box.uncheck().run()
+    box = next(c for c in app.toggle if c.label == "Whole shares only")
+    box.set_value(False).run()
 
     assert not app.exception
     warnings = "\n".join(w.value for w in app.warning)
@@ -202,8 +281,8 @@ def test_the_toggles_sit_behind_the_typed_policy_confirmation(_offline):
 def test_disabling_the_reserve_says_solvency_is_still_enforced(_offline):
     """The owner's reason for disabling it depends on that distinction."""
     app = _settings_app()
-    box = next(c for c in app.checkbox if c.label == "Enforce a minimum cash reserve")
-    box.uncheck().run()
+    box = next(c for c in app.toggle if c.label == "Enforce a minimum cash reserve")
+    box.set_value(False).run()
 
     assert not app.exception
     captions = "\n".join(c.value for c in app.caption)

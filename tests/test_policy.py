@@ -179,7 +179,12 @@ def test_daily_order_and_open_order_caps_require_positive_integers():
 
 
 def test_non_boolean_flag_fields_rejected():
-    for field_name in ("require_earnings_data", "allow_new_positions", "enable_strategy_proposals"):
+    for field_name in (
+        "require_earnings_data",
+        "allow_new_positions",
+        "enable_strategy_proposals",
+        "whole_shares_only",
+    ):
         try:
             _valid_policy(**{field_name: "true"}).validate()
             assert False, f"expected a non-boolean {field_name} to be rejected"

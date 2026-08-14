@@ -34,13 +34,14 @@ def _packet(cash=10_000.0, positions=None, open_orders=None):
     )
 
 
-def _policy(max_order_value=50_000.0):
+def _policy(max_order_value=50_000.0, *, whole_shares_only=True):
     return TradingPolicy(
         version="test", name="test", execution_mode="paper",
         max_position_pct=1.0, max_total_exposure_pct=1.0, max_basket_pct=1.0,
         max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0,
         max_order_value=max_order_value,
         allow_new_positions=True,
+        whole_shares_only=whole_shares_only,
     )
 
 
@@ -151,6 +152,34 @@ def test_discrete_buy_refuses_non_exact_share_quantities(shares):
     )
     assert result["created"] is False
     assert "whole number greater than zero" in result["reason"]
+
+
+def test_discrete_buy_accepts_exact_fractional_quantity_only_when_policy_allows_it():
+    permissive = _policy(whole_shares_only=False, max_order_value="100")
+    result = generate_discrete_buy_proposal(
+        _packet(), permissive, ticker="NVDA", shares="0.125", price="80"
+    )
+    assert result["created"] is True
+    assert result["proposal"].intent.shares == "0.125"
+    assert result["proposal"].expected_impact["trade_value"] == 10.0
+
+    strict = generate_discrete_buy_proposal(
+        _packet(), _policy(), ticker="NVDA", shares="0.125", price="80"
+    )
+    assert strict["created"] is False
+
+
+def test_budgeted_buy_uses_fractional_shares_when_policy_allows_them():
+    policy = _policy(whole_shares_only=False)
+    plan = build_allocation_plan(
+        _packet(), policy, {"NVDA": 100.0}, {"NVDA": 300.0}, dollar_amount=100.0
+    )
+    assert plan[0].shares == "0.333333333"
+    assert plan[0].skipped is False
+    proposals = generate_allocation_buy_proposals(
+        _packet(), policy, {"NVDA": 100.0}, {"NVDA": 300.0}, dollar_amount=100.0
+    )
+    assert proposals[0].intent.shares == "0.333333333"
 
 
 def test_plan_matches_proposals_shares_and_skips_exactly():

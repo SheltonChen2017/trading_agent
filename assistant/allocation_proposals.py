@@ -3,7 +3,8 @@ Allocation planning and proposal generation for the Watchlist "Create
 purchase proposals using this split" feature: splits a user-specified
 dollar amount across a user-picked cart of tickers according to
 inverse-volatility weights, and produces one buy TradeProposal per
-ticker that can actually afford at least 1 share.
+ticker that can afford the active policy's minimum quantity (one whole share
+by default, or 0.000000001 share when fractional ordering is enabled).
 
 Distinct from assistant/strategy_proposals.py: this is NOT based on any
 validated research finding. The tickers are entirely user-picked -- this
@@ -42,8 +43,8 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
-import math
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal, ROUND_FLOOR
 
 from assistant.money import decimal_or_none, decimal_text
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
@@ -53,7 +54,12 @@ from assistant.portfolio_analytics import (
 )
 from assistant.proposals import TradeProposal
 from assistant.schemas import DecisionPacket
-from risk.execution_gate import TradeIntent, is_valid_share_quantity
+from risk.execution_gate import (
+    TradeIntent,
+    canonical_order_quantity,
+    is_valid_order_quantity,
+    order_quantity_decimal,
+)
 
 EVIDENCE_STATUS = "user_directed_allocation"
 
@@ -64,7 +70,7 @@ class AllocationPlanEntry:
     weight_pct: float
     target_dollars: float
     reference_price: float
-    shares: int
+    shares: int | str
     planned_notional: float
     unallocated_dollars: float
     existing_market_value: float
@@ -89,7 +95,8 @@ def build_allocation_plan(
 ) -> list[AllocationPlanEntry]:
     """
     Computes, per ticker, EXACTLY what generate_allocation_buy_proposals()
-    will do with it -- whole shares via floor(), same as proposal
+    will do with it -- whole shares or nine-decimal fractional shares under
+    the active policy, same as proposal
     generation -- plus context needed to judge the plan: existing
     holdings, pending buy orders (or an explicit "unknown" flag if a
     pending order's value can't be determined), the projected final
@@ -101,6 +108,9 @@ def build_allocation_plan(
     pending_buy_value_by_ticker = pending_buy_value_by_ticker or {}
     pending_value_unknown_tickers = pending_value_unknown_tickers or set()
     limit_pct = policy.max_position_pct * 100
+    budget_decimal = decimal_or_none(dollar_amount)
+    if budget_decimal is None or budget_decimal <= 0:
+        return []
 
     entries: list[AllocationPlanEntry] = []
     for ticker, weight_pct in weights_pct.items():
@@ -108,18 +118,20 @@ def build_allocation_plan(
         existing_value = held_value_by_ticker.get(ticker_upper, 0.0)
         pending_value = pending_buy_value_by_ticker.get(ticker_upper, 0.0)
         pending_unknown = ticker_upper in pending_value_unknown_tickers
-        target_dollars = dollar_amount * weight_pct / 100
+        weight_decimal = decimal_or_none(weight_pct)
+        target_decimal = (
+            budget_decimal * weight_decimal / Decimal("100")
+            if weight_decimal is not None and weight_decimal > 0
+            else None
+        )
+        target_dollars = float(target_decimal) if target_decimal is not None else 0.0
         price = prices.get(ticker)
+        price_decimal = decimal_or_none(price)
 
-        # math.isfinite, not just `<= 0`: a NaN price passes BOTH `not price`
-        # (NaN is truthy) and `price <= 0` (every ordered comparison against
-        # NaN is False), and then math.floor(target/NaN) raises ValueError,
-        # crashing the whole Watchlist tab. Independent review, 2026-07-29 --
-        # reproduced; every other bad price (0, negative, None, inf) already
-        # degraded gracefully to a skipped entry, only NaN crashed. NaN is
-        # reachable: get_latest_quote() builds `price` from bare
-        # float(bid/ask) without a finiteness filter.
-        if price is None or not math.isfinite(price) or price <= 0:
+        # Guarded Decimal conversion, not just `<= 0`: float NaN passes both
+        # truthiness and ordered-comparison checks, then poisons sizing. This
+        # boundary also rejects infinity, bool, and malformed numeric text.
+        if price_decimal is None or price_decimal <= 0:
             projected_value = existing_value + pending_value
             projected_pct = (projected_value / total_equity * 100) if total_equity else 0.0
             entries.append(
@@ -135,12 +147,46 @@ def build_allocation_plan(
             )
             continue
 
-        shares = math.floor(target_dollars / price)
-        planned_notional = shares * price
+        if target_decimal is None:
+            projected_value = existing_value + pending_value
+            projected_pct = (projected_value / total_equity * 100) if total_equity else 0.0
+            entries.append(
+                AllocationPlanEntry(
+                    ticker=ticker, weight_pct=weight_pct, target_dollars=0.0,
+                    reference_price=float(price_decimal), shares=0,
+                    planned_notional=0.0, unallocated_dollars=0.0,
+                    existing_market_value=existing_value, pending_buy_value=pending_value,
+                    pending_value_unknown=pending_unknown, projected_market_value=projected_value,
+                    projected_pct_of_equity=projected_pct, position_limit_pct=limit_pct,
+                    distance_to_limit_pct=limit_pct - projected_pct,
+                    skipped=True, skip_reason="No usable positive allocation weight.",
+                )
+            )
+            continue
+
+        raw_quantity = target_decimal / price_decimal
+        sized_quantity = (
+            raw_quantity.to_integral_value(rounding=ROUND_FLOOR)
+            if policy.whole_shares_only
+            else raw_quantity.quantize(Decimal("0.000000001"), rounding=ROUND_FLOOR)
+        )
+        shares = canonical_order_quantity(
+            int(sized_quantity) if policy.whole_shares_only else sized_quantity,
+            whole_shares_only=policy.whole_shares_only,
+        )
+        quantity_decimal = order_quantity_decimal(
+            shares, whole_shares_only=policy.whole_shares_only
+        ) if shares is not None else Decimal("0")
+        shares = shares if shares is not None else 0
+        planned_notional = float(quantity_decimal * price_decimal)
         unallocated = target_dollars - planned_notional
-        skipped = shares <= 0
+        skipped = quantity_decimal <= 0
         skip_reason = (
-            f"${target_dollars:,.2f} allocation can't buy 1 share at ${price:,.2f}." if skipped else None
+            (
+                f"${target_dollars:,.2f} allocation can't buy "
+                f"{'1 share' if policy.whole_shares_only else '0.000000001 share'} "
+                f"at ${price:,.2f}."
+            ) if skipped else None
         )
 
         projected_value = existing_value + pending_value + planned_notional
@@ -181,8 +227,8 @@ def generate_allocation_buy_proposals(
     pending_value_unknown_tickers: set[str] | None = None,
 ) -> list[TradeProposal]:
     """
-    One buy proposal per ticker in `weights_pct` that can afford at least
-    1 share, generated from build_allocation_plan() -- the SAME plan a
+    One buy proposal per ticker in `weights_pct` that can afford the active
+    policy's minimum order quantity, generated from build_allocation_plan() -- the SAME plan a
     caller should preview before calling this, so what gets proposed
     always exactly matches what was shown.
 
@@ -203,7 +249,9 @@ def generate_allocation_buy_proposals(
     now = datetime.now(timezone.utc)
     proposals = []
     for entry in plan:
-        if entry.skipped or entry.shares <= 0:
+        if entry.skipped or not is_valid_order_quantity(
+            entry.shares, whole_shares_only=policy.whole_shares_only
+        ):
             continue
 
         intent = TradeIntent(
@@ -246,8 +294,8 @@ def generate_allocation_buy_proposals(
                     "has confirmed zero signals as real edge for individual-stock selection.",
                     "The allocation weighting only sizes risk by trailing volatility; it says nothing about "
                     "which stock is more likely to go up.",
-                    "Shares are rounded down, so the actual dollar amount spent per ticker may be somewhat "
-                    "less than its exact allocated share.",
+                    "Share quantity is rounded down to the granularity allowed by your policy, so the actual "
+                    "dollar amount spent per ticker may be less than its exact allocated share.",
                     "Requires allow_new_positions=true in your policy -- off by default, so this will be "
                     "blocked at approval time unless you've explicitly enabled it.",
                     "Market orders can fill away from the displayed reference price.",
@@ -270,19 +318,17 @@ def generate_discrete_buy_proposal(
     ttl_minutes: int = 15,
     now: datetime | None = None,
 ) -> dict:
-    """One buy proposal for an EXACT whole-share quantity of one ticker.
+    """One buy proposal for an exact policy-permitted quantity of one ticker.
 
     The Discrete Buying tab (owner request 2026-08-14) sizes either by share
-    count or by dollar budget, but both arrive here as an exact share count --
+    count or by dollar budget, but both arrive here as an exact share quantity --
     the dollar path converts first, through
     `assistant.discrete_trade.size_by_dollar_amount`, in exact Decimal.
 
-    Deliberately NOT routed through build_allocation_plan(): that planner
-    floors `dollar_amount / price` in binary float, which is correct for a
-    budget split but would be a silent off-by-one for an exact share request
-    (3 shares at $0.10 is 0.30000000000000004 as a float -- the SELREV-002
-    shape found on 2026-08-13). A caller who names a share count must get that
-    share count or a stated refusal, never a quietly smaller order.
+    Deliberately NOT routed through build_allocation_plan(): an explicit share
+    instruction does not need budget allocation or rounding. A caller who
+    names a quantity must get that quantity or a stated refusal, never a
+    quietly smaller order.
 
     Returns ``{"created": True, "proposal": TradeProposal}`` or
     ``{"created": False, "reason": str}``.
@@ -290,13 +336,17 @@ def generate_discrete_buy_proposal(
     normalized = str(ticker).strip().upper()
     if not normalized:
         return {"created": False, "reason": "A ticker is required."}
-    if not is_valid_share_quantity(shares):
+    canonical_shares = canonical_order_quantity(
+        shares, whole_shares_only=policy.whole_shares_only
+    )
+    if canonical_shares is None:
         return {
             "created": False,
             "reason": (
-                f"Shares to buy must be a whole number greater than zero, got {shares!r}."
+                f"Shares to buy must be {'a whole number greater than zero' if policy.whole_shares_only else 'a positive exact number with at most 9 decimal places'}, got {shares!r}."
             ),
         }
+    shares = canonical_shares
     price_decimal = decimal_or_none(price)
     if price_decimal is None or price_decimal <= 0:
         return {
@@ -307,7 +357,10 @@ def generate_discrete_buy_proposal(
             ),
         }
 
-    notional = price_decimal * shares
+    quantity_decimal = order_quantity_decimal(
+        shares, whole_shares_only=policy.whole_shares_only
+    )
+    notional = price_decimal * quantity_decimal
     max_order_value = decimal_or_none(policy.max_order_value)
     if max_order_value is None or max_order_value <= 0:
         return {
@@ -318,11 +371,20 @@ def generate_discrete_buy_proposal(
             ),
         }
     if notional > max_order_value:
-        fits = int(max_order_value // price_decimal)
+        fits_decimal = max_order_value / price_decimal
+        fits_sized = (
+            fits_decimal.to_integral_value(rounding=ROUND_FLOOR)
+            if policy.whole_shares_only
+            else fits_decimal.quantize(Decimal("0.000000001"), rounding=ROUND_FLOOR)
+        )
+        fits = canonical_order_quantity(
+            int(fits_sized) if policy.whole_shares_only else fits_sized,
+            whole_shares_only=policy.whole_shares_only,
+        )
         remedy = (
             f" At ${float(price_decimal):,.2f} per share, up to {fits} share(s) fit "
             "in one order."
-            if fits > 0
+            if fits is not None
             else " Even one share exceeds that limit at the current price."
         )
         return {

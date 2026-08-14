@@ -15,9 +15,11 @@ absence.
 from __future__ import annotations
 
 import math
+from decimal import Decimal
 from datetime import datetime, timedelta, timezone
 
 from assistant.execution_kernel.errors import ProposalExecutionError
+from assistant.money import decimal_or_none
 from assistant.order_lifecycle import (
     CHAIN_ERROR_IDENTITY_MISMATCH,
     journal_broker_order_update,
@@ -81,24 +83,23 @@ def _order_matches_intent(order: dict, intent: TradeIntent) -> tuple[bool, str]:
     explains the first mismatch found, for an audit message -- empty
     string when matches is True.
 
-    Share counts use a numeric (not string) comparison so numerically-
-    equivalent representations (10 vs 10.0) count as equal; a fractional
-    share count is still rejected since this workflow only ever submits
-    whole-share orders.
+    Share counts use exact Decimal comparison so numerically-equivalent
+    representations (10 vs 10.0) count as equal without a tolerance that
+    could accept a one-nanoshare identity mismatch.
     """
     if str(order.get("ticker", "")).upper() != intent.ticker.upper():
         return False, f"ticker: expected {intent.ticker.upper()!r}, got {order.get('ticker')!r}"
     if order.get("side") != intent.side:
         return False, f"side: expected {intent.side!r}, got {order.get('side')!r}"
 
-    order_shares = order.get("shares")
+    order_shares = order.get("shares_decimal", order.get("shares"))
     if order_shares is None:
         return False, "shares: missing from broker response"
-    try:
-        order_shares_value = float(order_shares)
-    except (TypeError, ValueError):
+    order_shares_value = decimal_or_none(order_shares)
+    intent_shares_value = decimal_or_none(intent.shares)
+    if order_shares_value is None or intent_shares_value is None:
         return False, f"shares: not numeric ({order_shares!r})"
-    if not math.isclose(order_shares_value, float(intent.shares), rel_tol=0.0, abs_tol=1e-9):
+    if order_shares_value != intent_shares_value:
         return False, f"shares: expected {intent.shares}, got {order_shares_value}"
 
     order_type = order.get("type")

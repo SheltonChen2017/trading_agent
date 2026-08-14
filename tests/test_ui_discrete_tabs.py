@@ -391,3 +391,65 @@ def test_deselecting_the_sizing_control_asks_for_a_mode_instead_of_assuming_one(
     captions = "\n".join(c.value for c in app.caption)
     assert "Choose how to size" in captions, captions
     assert not [b for b in app.button if b.key == create_key and not b.disabled]
+
+
+def test_fractional_policy_replaces_the_integer_widget_with_exact_text(
+    _offline, monkeypatch
+):
+    import dataclasses
+    from decimal import Decimal
+
+    import assistant.policy as policy_module
+    import assistant.sleeve_notifications as sleeve_notifications
+
+    real_load = policy_module.load_policy
+    fractional_policy = dataclasses.replace(
+        real_load(policy_module.DEFAULT_POLICY_PATH), whole_shares_only=False
+    )
+    monkeypatch.setattr(policy_module, "load_policy", lambda _path: fractional_policy)
+    monkeypatch.setattr(
+        sleeve_notifications,
+        "_recorded_close_fetcher",
+        lambda _s, **_k: (lambda _t: {"NVDA": Decimal("80")}),
+    )
+
+    app = _page("Discrete Buying")
+    app.text_input(key="discrete_buy_ticker").set_value("NVDA").run()
+    shares = app.text_input(key="discrete_buy_fractional_shares")
+    shares.set_value("0.125").run()
+
+    assert not app.exception
+    markdown = " ".join(m.value for m in app.markdown)
+    assert "0.125 share(s)" in markdown
+    assert "$10.00" in markdown
+
+
+def test_fractional_dollar_budget_creates_a_fractional_quantity(
+    _offline, monkeypatch
+):
+    import dataclasses
+    from decimal import Decimal
+
+    import assistant.policy as policy_module
+    import assistant.sleeve_notifications as sleeve_notifications
+
+    real_load = policy_module.load_policy
+    fractional_policy = dataclasses.replace(
+        real_load(policy_module.DEFAULT_POLICY_PATH), whole_shares_only=False
+    )
+    monkeypatch.setattr(policy_module, "load_policy", lambda _path: fractional_policy)
+    monkeypatch.setattr(
+        sleeve_notifications,
+        "_recorded_close_fetcher",
+        lambda _s, **_k: (lambda _t: {"NVDA": Decimal("100")}),
+    )
+
+    app = _page("Discrete Buying")
+    app.text_input(key="discrete_buy_ticker").set_value("NVDA").run()
+    app.segmented_control(key="discrete_buy_mode").set_value("Dollar amount").run()
+    app.number_input(key="discrete_buy_dollars").set_value(50.0).run()
+
+    assert not app.exception
+    markdown = " ".join(m.value for m in app.markdown)
+    assert "0.5 share(s)" in markdown
+    assert "9-decimal quantity limit" in markdown

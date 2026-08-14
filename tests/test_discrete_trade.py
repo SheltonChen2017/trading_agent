@@ -117,3 +117,28 @@ def test_the_two_modes_agree_at_the_same_quantity():
     from_dollars = size_by_dollar_amount("904.53", "301.51")["sizing"]
     from_shares = notional_for_shares(from_dollars.shares, "301.51")
     assert from_dollars.notional_text == from_shares["notional_text"]
+
+
+def test_fractional_dollar_sizing_uses_nine_decimal_places_and_never_overspends():
+    result = size_by_dollar_amount(
+        "10", "3", whole_shares_only=False
+    )
+    assert result["ok"] is True
+    sizing = result["sizing"]
+    assert sizing.shares == "3.333333333"
+    assert sizing.notional_text == "9.999999999"
+    assert sizing.unallocated_text == "0.000000001"
+
+
+def test_fractional_share_mode_accepts_exact_text_but_rejects_binary_float():
+    exact = notional_for_shares(
+        "0.125", "80", whole_shares_only=False
+    )
+    assert exact == {
+        "ok": True,
+        "notional_text": "10",
+        "reference_price_text": "80",
+    }
+    assert not notional_for_shares(
+        0.125, "80", whole_shares_only=False
+    )["ok"]

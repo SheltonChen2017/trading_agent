@@ -210,6 +210,7 @@ class TradingPolicy:
             "require_earnings_data",
             "allow_new_positions",
             "enable_strategy_proposals",
+            "whole_shares_only",
         ):
             value = getattr(self, field_name)
             if not isinstance(value, bool):

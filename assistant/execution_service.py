@@ -658,7 +658,13 @@ def execute_approved_paper_proposal(
     reserve_daily_budget(
         store, proposal_id, intent, reference_price, policy, now_et.date().isoformat()
     )
-    submit, submit_kwargs = resolve_submission_call(broker, store, proposal_id, intent)
+    submit, submit_kwargs = resolve_submission_call(
+        broker,
+        store,
+        proposal_id,
+        intent,
+        whole_shares_only=policy.whole_shares_only,
+    )
     # Telemetry is part of the execution evidence contract, and this CALL
     # stays on the facade on purpose: tests and tooling monkeypatch
     # execution_service.record_submission_started, and resolving it inside

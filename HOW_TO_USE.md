@@ -124,8 +124,10 @@ created under the old one.
 * **Whole shares only** — ON by default, and the default is enforced
   independently by the risk gate and the broker adapter, so a code path that
   forgets to ask still refuses. Turning it OFF permits fractional order
-  quantities. Note the current scope: this milestone delivers the switch and
-  its authority; the order path is not yet fractional end to end.
+  quantities up to 9 decimal places on fractionable assets. Budgeted Buying,
+  Discrete Buying, and Discrete Selling all follow the active setting; exact
+  decimal text is preserved through proposal storage, approval, submission,
+  and reconciliation.
 * **Enforce a minimum cash reserve** — unchecking writes a reserve of 0%.
   That removes the *buffer*, not the solvency check: an order that would take
   your cash balance negative is still refused. There is deliberately no
@@ -150,12 +152,13 @@ Buying, so you can pull a candidate straight from the screen.
 
 Both size a trade **two ways**:
 
-* **Share count** — an exact whole-share quantity.
-* **Dollar amount** — a *budget*, not a fractional order. $250 at $100 buys
-  2 shares and the page tells you the $50 it could not use. This app submits
-  whole-share orders only, enforced independently by the risk gate, the
-  broker adapter, and the sell generator, so a dollar figure is converted
-  once and the remainder is always shown.
+* **Share count** — an exact quantity. With **Whole shares only** ON, enter a
+  whole number; with it OFF, you may enter up to 9 decimal places.
+* **Dollar amount** — a *budget*, not a broker-notional order. With whole-share
+  mode ON, $250 at $100 buys 2 shares and leaves $50. With it OFF, the app
+  calculates a fractional quantity rounded down to 9 decimal places and shows
+  any tiny remainder. The exact quantity, rather than the budget itself, is
+  what enters the proposal and approval path.
 
 On the sell side a dollar amount larger than your holding is **refused, not
 capped** — silently shrinking the number you typed would be the app editing

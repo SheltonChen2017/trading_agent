@@ -595,6 +595,84 @@ def test_approved_proposal_is_revalidated_and_submitted_once():
         restore()
 
 
+def test_fractional_policy_reaches_the_broker_as_exact_text_end_to_end():
+    """SET-1 is executable authority, not a UI-only preference.
+
+    Prove the complete path: policy-aware sizing creates exact decimal text,
+    durable storage rehydrates it, fresh broker preflight confirms the asset,
+    the gate authorizes it, and submission receives both the unchanged text
+    and the explicit permissive flag.
+    """
+    packet = _packet()
+    policy = dataclasses.replace(
+        _policy(), allow_new_positions=True, whole_shares_only=False
+    )
+    proposal = generate_allocation_buy_proposals(
+        packet,
+        policy,
+        weights_pct={"AAPL": 100.0},
+        prices={"AAPL": 50.0},
+        dollar_amount=25.0,
+    )[0]
+    assert proposal.intent.shares == "0.5"
+
+    captured, restore = _mock_execution_dependencies(quote_price=50.0)
+    submitted = []
+
+    def fractional_submit(
+        ticker,
+        shares,
+        side="buy",
+        *,
+        authorization=None,
+        idempotency_key=None,
+        whole_shares_only=True,
+    ):
+        assert authorization is not None
+        submitted.append((ticker, shares, side, whole_shares_only))
+        return {
+            "order_id": "paper-fractional-1",
+            "ticker": ticker,
+            "shares": float(shares),
+            "shares_decimal": shares,
+            "side": side,
+            "type": "market",
+            "status": "accepted",
+        }
+
+    broker.submit_market_order = fractional_submit
+    broker.assert_account_and_asset_ready = lambda ticker: {
+        "account": {
+            "account_id": "test-paper-account",
+            "paper": True,
+            "status": "ACTIVE",
+        },
+        "asset": {
+            "ticker": ticker,
+            "status": "active",
+            "tradable": True,
+            "fractionable": True,
+        },
+    }
+    try:
+        with tempfile.TemporaryDirectory() as temp:
+            store = AssistantStore(Path(temp) / "assistant.db")
+            store.save_proposal(proposal.to_dict())
+            order = execute_approved_paper_proposal(
+                proposal.proposal_id,
+                "approve",
+                packet.portfolio,
+                policy,
+                store,
+                now_et=datetime(2026, 7, 27, 10, 0, tzinfo=timezone.utc),
+            )
+            assert order["order_id"] == "paper-fractional-1"
+            assert submitted == [("AAPL", "0.5", "buy", False)]
+            assert store.get_proposal(proposal.proposal_id)["status"] == "broker_accepted"
+    finally:
+        restore()
+
+
 def test_recovered_pre_broker_claim_fences_a_worker_that_resumes():
     """An old worker must not resurrect its proposal after recovery.
 

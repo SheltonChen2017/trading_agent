@@ -79,7 +79,70 @@ for separating a tech style bet from selection — never as the record.
 
 Not derivable from the repository, and expensive to rediscover.
 
-### `paper-epoch-004` is active; the epoch-004 roll was executed (2026-08-11)
+### `paper-epoch-005` is active; the epoch-005 roll was executed (2026-08-13)
+
+Owner-authorized and executed in runbook order on the epoch host. Timings are
+UTC; the roll ran the evening of 2026-08-13 Pacific, deliberately AFTER that
+day's 16:30-local observation was safely captured and with a full ~24-hour
+runway before the next one.
+
+Tasks disabled (elevated helper, UAC-approved) → **`paper-epoch-004` closed
+23:57:17Z** on its frozen `b837374` runtime, retaining its **3 observations**
+(2026-08-11/12/13 — discarded evidence is the known, accepted cost of
+rolling, and it was deliberately paid while the count was still small) →
+operational checkout fast-forwarded `b837374` → **`752d3b7`** (PR #205) →
+`ledger-reconcile` **matched, 0 mismatches**, 15 positions, on its first run
+under the new code → `readiness` `ready: true` → **`paper-epoch-005` started
+23:59:07Z**, lineage hash `0b7702b2…`, with **unchanged** mandate, policy,
+strategy, and model identifiers; only `code_commit` moved → **5/5 required
+drills recorded under epoch-005** → tasks re-enabled and the recurring path
+proven by a manual `operations-cycle` (matched, 0 mismatches, exit 0).
+
+What this roll deployed: AP-8 ticker-suggestion disclosure, AP-9 allocation
+review visibility, QC-2 look registry, AP-10 volume hardening, AP-11 (the
+health-clock forwarding fix, so the false negative-age freshness warnings
+stop), three-sleeve M3 dividend earmarks, and SELL-1 owner-directed sells —
+each merged and independently reviewed before deployment.
+
+Roll-specific facts worth keeping:
+
+- **`readiness` fails on `reconciliation_freshness` during any roll.**
+  `monitor-orders` is disabled, so the order-reconciliation key ages past its
+  5-minute bound within minutes. A one-shot `sync-orders` refreshes it and
+  readiness returns `ready: true`. Expect this; it is not a defect.
+- **The same alert reopens once after re-enabling** for the same reason, then
+  self-clears as OrderMonitor resumes its 30-second polling. Verified: the key
+  was refreshing at 6-second age with 0 errors before the alert was
+  acknowledged.
+- **The long-runners return via their own 5-minute self-heal trigger**, not
+  instantly. Immediately after Enable, OrderMonitor and Watchdog read `Ready`;
+  a few minutes later they read `Running`, which is the correct steady state
+  (OperationsCycle and PaperObservation stay `Ready` between runs).
+- **The kill-switch drill needed a freshly created proposal.** Every
+  pre-existing `proposed` row had already expired, so approving one would have
+  failed on expiry and proved nothing about the switch. A live proposal was
+  created with the newly deployed `sell-holding` command (SELL 1 ACHR, the
+  lowest-value holding), the typed approval was attempted with the switch
+  active, and it was refused before broker contact; storage then confirmed the
+  proposal terminal at `blocked` with zero broker orders, zero events, and
+  zero reservations. That doubled as production confirmation that SELL-1
+  works on the deployed runtime.
+- **6 drill rows exist under epoch-005, not 5**: the fault-drill harness
+  records `kill_switch` itself, and the manual kill-switch drill was recorded
+  separately. Both passed; the extra row is duplication, not disagreement.
+- All 5 pre-roll alerts (the 2026-08-13 Alpaca connectivity outage, causes
+  verified resolved by this session's successful broker calls) were
+  acknowledged. **0 alerts open at roll completion.**
+
+The 60-session / 30-order clock restarts at the first scheduled
+`paper-observation` under epoch-005, expected 16:30 local on 2026-08-14.
+Until that row exists, epoch-005 has **0 observations** and any
+`lineage_consistent: true` is vacuous.
+
+### `paper-epoch-004` ran here; the epoch-004 roll was executed (2026-08-11)
+
+*(Superseded 2026-08-13 by the epoch-005 roll above. Retained because its
+procedure and AP-7 deployment observations remain the reference.)*
 
 Owner-authorized and executed in runbook order: tasks disabled →
 `paper-epoch-003` closed at 22:14:52Z on its frozen `ef05dc1` runtime (1
@@ -333,7 +396,7 @@ Everything in this section is host-specific; re-measure rather than assume
 which one you are on. `whoami` distinguishes them.
 
 - **Epoch host** (`REDMOND\sheltonchen`) — runs the active
-  `paper-epoch-004` (at `b837374` since 2026-08-11). The four
+  `paper-epoch-005` (at `752d3b7` since 2026-08-13). The four
   `TradingAgent-Paper-*` tasks are installed and ENABLED here. This is the
   only host that may run the operational cadence. The bullets below this
   section (launch script, epoch-swap script, lock files, backups) describe

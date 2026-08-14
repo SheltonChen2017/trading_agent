@@ -217,12 +217,21 @@ def test_handoff_does_not_describe_the_merged_independent_review_branch_as_stale
 
 
 def test_ap11_supersedes_the_full_ap7_production_fix_claim():
-    """CODCR-001: deployed AP-7 code is not a deployed end-to-end fix.
+    """CODCR-001, amended 2026-08-13 when the epoch-005 roll deployed AP-11.
 
-    AP-11 proved from a later live negative-age alert that the outer
-    production call path froze the nested AP-7 clock. Current-state records
-    must preserve the original deployment observation without continuing to
-    call the complete production path fixed while AP-11 is undeployed.
+    The original guard pinned "AP-7's site fix is deployed but AP-11's
+    orchestration repair is NOT" -- true from 2026-08-13 until that roll, and
+    deliberately written as a tripwire that would redden the moment the
+    deployment changed, forcing the records to move with reality instead of
+    drifting behind it. It fired exactly as intended.
+
+    What remains durably true, and is what this now pins: the original
+    two-green-cycles observation must never again be stated as proof that the
+    whole production path was fixed, because AP-11 disproved that inference
+    from a live alert. That claim can never become true retroactively, so it
+    stays banned. The deployment STATE is no longer asserted here -- it moves
+    every roll, and other guards already keep the active-epoch records
+    self-consistent.
     """
     documents = {
         "ACTION_PLAN_2026-08-02.md": _text("ACTION_PLAN_2026-08-02.md"),
@@ -250,27 +259,12 @@ def test_ap11_supersedes_the_full_ap7_production_fix_claim():
         line for line in action_plan_raw.splitlines() if line.startswith("| AP-7 |")
     ]
     assert len(ap7_rows) == 1, "the action plan must contain exactly one AP-7 row"
-    assert "AP-11" in ap7_rows[0] and "not deployed" in ap7_rows[0].lower(), (
-        "the AP-7 ledger row must disclose the undeployed AP-11 production-path gap"
+    # The row must still connect AP-7 to AP-11 -- a reader who finds the AP-7
+    # row alone must not conclude the site fix was ever the whole story.
+    assert "AP-11" in ap7_rows[0], (
+        "the AP-7 ledger row must still reference AP-11, which corrected the "
+        "production call path its own site fix did not reach"
     )
-
-    facts_raw = (ROOT / "docs" / "OPERATIONAL_FACTS.md").read_text(
-        encoding="utf-8"
-    )
-    active_epoch = re.search(
-        r"### `paper-epoch-\d+` is active.*?(?=\n### )",
-        facts_raw,
-        flags=re.DOTALL,
-    )
-    assert active_epoch, "OPERATIONAL_FACTS has no active-epoch section"
-    active_epoch_text = active_epoch.group(0)
-    assert (
-        "AP-11" in active_epoch_text
-        and "not deployed" in active_epoch_text.lower()
-    ), (
-        "the durable active-epoch facts must disclose that AP-11 is not deployed"
-    )
-
 
 def test_current_documents_do_not_call_completed_work_unstarted():
     """Known-stale claims only -- each of these should never be true again."""

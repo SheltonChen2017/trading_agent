@@ -27,7 +27,12 @@ was shown when the override was first offered -- a changed violation set
 instead of silently authorizing against different conditions.
 
 Run with:
-    streamlit run scripts/personal_assistant_ui.py
+    pwsh -NoProfile -File scripts/launch_dev_app.ps1
+
+The launcher pins a disposable database and engages the environment kill
+switch by default. Do not bypass it with a bare Streamlit command: this
+checkout otherwise falls back to the operator database and shares the Alpaca
+paper account with the frozen runtime. See HOW_TO_USE.md.
 """
 from __future__ import annotations
 

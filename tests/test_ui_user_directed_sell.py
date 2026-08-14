@@ -18,6 +18,14 @@ _APP_PATH = Path(__file__).resolve().parents[1] / "scripts" / "personal_assistan
 
 @pytest.fixture()
 def _offline_selling_environment(monkeypatch):
+    # AppTest executes the UI in-process. Earlier page suites can leave
+    # `_load_base_packet` results in Streamlit's global cache, including a
+    # policy granularity that changes this page's widget type. Each test in
+    # this module must start from the policy and portfolio on disk, not from a
+    # prior AppTest run in the same pytest process.
+    import streamlit as st
+
+    st.cache_data.clear()
     monkeypatch.delenv("APCA_API_KEY_ID", raising=False)
     monkeypatch.delenv("APCA_API_SECRET_KEY", raising=False)
 

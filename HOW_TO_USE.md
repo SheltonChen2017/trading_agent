@@ -48,30 +48,38 @@ Then open <http://localhost:8501>. It will look like the real app, with its
 own empty set of proposals and history, and it prints which database it
 opened so you can confirm at a glance. Stop it with `Ctrl+C`.
 
-There is a second boundary this launcher cannot enforce for you. The
-*database* is separate, but the **Alpaca paper account is the same one** the
-operational runtime uses. Browsing, creating proposals, and previewing sizing
-are all safe. Approving and submitting is not: that sends a real order to the
-shared paper account, and it will appear in the active epoch's broker record
-even though this database is separate. Try the screens; do not complete a
-trade here.
+The launcher protects two separate boundaries by default. It opens a scratch
+database instead of the operator database, and it engages the environment
+kill switch so unreleased code cannot submit an order. The **Alpaca paper
+account is still the same one** the operational runtime uses, but an approval
+attempt from this default development session is refused before submission.
+Browsing, creating proposals, and previewing sizing are safe.
+
+If the owner separately authorizes a deliberate paper-order test of
+development code, launch with `-AllowPaperOrders`. That explicit switch only
+removes the launcher's added halt; it does not clear an inherited or
+persistent kill switch. Any submitted order reaches the shared paper account
+and appears in the active epoch's broker record, so do not use this option for
+ordinary feature previewing.
 
 If you prefer to run it by hand, the launcher is doing exactly this:
 
 ```powershell
 $env:TRADING_ASSISTANT_DB = "C:\git\customizedAgent\trading_agent\data\dev_scratch.db"
+$env:TRADING_ASSISTANT_KILL_SWITCH = "1"
 python -m streamlit run scripts\personal_assistant_ui.py
 ```
 
-**Set that first line every time.** This is the one genuinely dangerous
-mistake in this document, and it is silent. The operator database lives at
+**Set both environment lines every time.** Omitting either creates a silent
+safety gap. The operator database lives at
 `data\trading_assistant.db` *inside the development folder*, and that is also
 the default the app falls back to when the variable is unset — so launching
 the development app without it opens the **live operator database**, the one
 holding the active epoch's real paper-trading record. Simply opening it
 applies whatever schema migrations the development code carries, which the
 frozen runtime does not have. Nothing warns you, and the app looks correct
-either way.
+either way. Omitting the kill switch leaves an approved development proposal
+able to reach the shared paper account.
 
 Two habits that make this safe:
 

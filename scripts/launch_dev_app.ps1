@@ -9,6 +9,13 @@
 # operator database and applies whatever migrations this tree carries. There
 # is no warning when that happens, so the safe path is a script that cannot
 # forget.
+param(
+    # Explicit escape hatch for an owner-authorized PAPER-order test. This
+    # does not bypass any persistent or inherited kill switch; it only stops
+    # this launcher from adding its own development-only halt.
+    [switch]$AllowPaperOrders
+)
+
 $ErrorActionPreference = "Stop"
 
 $repositoryRoot = Split-Path -Parent $PSScriptRoot
@@ -21,12 +28,26 @@ if ($developmentDatabase -eq $operatorDatabase) {
 
 $env:TRADING_ASSISTANT_DB = $developmentDatabase
 
-# Alpaca credentials are loaded so quote-driven and position-driven features
-# are actually exercisable. Read-only use is safe. Submitting an order is NOT:
-# the paper ACCOUNT is shared with the operational runtime, so an approved
-# order from development code would appear in the active epoch's broker
-# record even though this database is separate.
-foreach ($credentialName in @("APCA_API_KEY_ID", "APCA_API_SECRET_KEY", "ANTHROPIC_API_KEY")) {
+# A separate database is not enough isolation: the development and
+# operational runtimes still use the same Alpaca paper account. Default to an
+# execution halt so an approval click in unreleased code cannot contaminate
+# the active epoch's broker record. Deliberate paper-order testing requires
+# the explicit switch above and remains subject to every other kill switch.
+if (-not $AllowPaperOrders) {
+    $env:TRADING_ASSISTANT_KILL_SWITCH = "1"
+}
+
+# Reload every provider key the UI supports so a long-lived parent shell
+# cannot hand the app a stale pre-rotation value. This mirrors the reviewed
+# operational launcher contract; values are never printed or persisted.
+$UserScopeCredentialNames = @(
+    "APCA_API_KEY_ID",
+    "APCA_API_SECRET_KEY",
+    "ANTHROPIC_API_KEY",
+    "FINNHUB_API_KEY",
+    "DATABENTO_API_KEY"
+)
+foreach ($credentialName in $UserScopeCredentialNames) {
     $currentValue = [Environment]::GetEnvironmentVariable($credentialName, "User")
     if (-not [string]::IsNullOrWhiteSpace($currentValue)) {
         Set-Item -Path "Env:$credentialName" -Value $currentValue
@@ -38,7 +59,13 @@ Write-Host "DEVELOPMENT app -- not the frozen operational runtime." -ForegroundC
 Write-Host "Checkout:           " (git rev-parse --short HEAD) "|" (git rev-parse --abbrev-ref HEAD)
 Write-Host "Scratch database:   $env:TRADING_ASSISTANT_DB"
 Write-Host "Operator database:  $operatorDatabase (NOT opened)"
-Write-Host "Credentials:        loaded fresh from user scope (values not shown)"
-Write-Host "Do NOT approve/submit orders here: the paper account is shared with the active epoch." -ForegroundColor Yellow
+Write-Host "Credentials:        supported provider keys loaded fresh from user scope (values not shown)"
+if ($AllowPaperOrders) {
+    Write-Host "Order submission:   EXPLICITLY OPTED IN for the shared Alpaca paper account." -ForegroundColor Red
+    Write-Host "                     Existing environment/persistent kill switches still apply." -ForegroundColor Yellow
+} else {
+    Write-Host "Order submission:   BLOCKED by the development environment kill switch." -ForegroundColor Green
+    Write-Host "                     The paper account is shared with the active epoch." -ForegroundColor Yellow
+}
 
 & "$repositoryRoot\.venv\Scripts\python.exe" -m streamlit run scripts\personal_assistant_ui.py

@@ -513,7 +513,13 @@ work:
 5. Or run the Streamlit UI for the same briefing/proposal/approval workflow,
    plus the UI-only Watchlist cart and multi-ticker allocation-split
    features (no CLI equivalent exists for those):
-   `python -m streamlit run scripts/personal_assistant_ui.py`
+   `pwsh -NoProfile -File scripts/launch_dev_app.ps1`
+
+The development launcher uses a disposable database and engages the
+environment kill switch by default. This matters because the development
+checkout otherwise falls back to the operator database and shares the Alpaca
+paper account with the frozen runtime. See `HOW_TO_USE.md` before attempting
+any deliberate paper-order test from unreleased code.
 
 Nothing above places a real order until you type the exact confirmation
 phrase for a specific proposal ID -- generating a briefing or a proposal is
@@ -858,11 +864,15 @@ same functions the CLI above uses -- no separate logic, just a different way
 to view/click through briefing, proposals, and approval instead of typing
 commands. Run it with:
 
-```bash
-python -m streamlit run scripts/personal_assistant_ui.py
+```powershell
+pwsh -NoProfile -File scripts/launch_dev_app.ps1
 ```
 
 then open the local URL it prints (defaults to `http://localhost:8501`).
+The launcher opens a disposable development database and blocks order
+submission by default because the Alpaca paper account is shared with the
+frozen operational runtime. The exact isolation and deliberate opt-in rules
+are documented in `HOW_TO_USE.md`.
 The same safety property as the CLI is preserved: each proposal has a text
 box requiring you to type the exact `approve` phrase before the submit
 button becomes clickable -- there is no one-click "approve" button that

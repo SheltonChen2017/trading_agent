@@ -653,19 +653,6 @@ def valid_session_dates(start: str, end: str) -> list[str]:
     ]
 
 
-def session_market_closes(start: str, end: str) -> dict[str, datetime]:
-    """Session date -> exchange close instant, for the same date range.
-
-    Half days are real (the day after Thanksgiving closes at 13:00 ET), so
-    the close is read from the calendar rather than assumed to be 16:00.
-    """
-    schedule = _NYSE.schedule(start_date=start, end_date=end)
-    return {
-        index.date().isoformat(): row["market_close"].to_pydatetime()
-        for index, row in schedule.iterrows()
-    }
-
-
 # Retained so this module's own long-standing call site keeps reading in
 # local terms; both names are the one calendar.
 _valid_sessions = valid_session_dates

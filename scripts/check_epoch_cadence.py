@@ -6,14 +6,16 @@ Deliberately a standalone script rather than a subcommand of
 checkout's store runs that checkout's migrations against a database the
 frozen runtime is pinned to. This tool exists to be safe to run from the
 development folder against the live operator database while an epoch is
-open, so it uses a read-only SQLite connection and never imports the store.
+open, so it uses an enforced read-only SQLite connection and never constructs
+the store. Its calendar helper transitively loads the storage module, but no
+store instance or migration-capable connection is created.
 
     python scripts/check_epoch_cadence.py
     python scripts/check_epoch_cadence.py --database path/to/trading_assistant.db
 
-Exit status: 0 when healthy, not-due-yet, or no epoch is active; 1 when the
-epoch is behind or stalled, so it can be used from a scheduler if the owner
-later wants that.
+Exit status: 0 when healthy or not-due-yet; 1 when the epoch is behind,
+stalled, or absent, so it can be used from a scheduler if the owner later
+wants that.
 """
 from __future__ import annotations
 
@@ -22,13 +24,17 @@ import json
 import os
 import sqlite3
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, time, timezone, tzinfo
 from pathlib import Path
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.epoch_cadence import (  # noqa: E402
     BEHIND,
+    CadenceReport,
+    DEFAULT_CAPTURE_LOCAL_TIME,
+    DEFAULT_CAPTURE_TIMEZONE,
     HEALTHY,
     NOT_DUE_YET,
     NO_ACTIVE_EPOCH,
@@ -47,7 +53,13 @@ def _read_only_connection(path: Path) -> sqlite3.Connection:
     return sqlite3.connect(f"file:{path.as_posix()}?mode=ro", uri=True)
 
 
-def read_cadence(path: Path, now: datetime) -> object:
+def read_cadence(
+    path: Path,
+    now: datetime,
+    *,
+    capture_local_time: time = DEFAULT_CAPTURE_LOCAL_TIME,
+    capture_timezone: tzinfo = DEFAULT_CAPTURE_TIMEZONE,
+) -> CadenceReport:
     connection = _read_only_connection(path)
     try:
         connection.row_factory = sqlite3.Row
@@ -68,7 +80,13 @@ def read_cadence(path: Path, now: datetime) -> object:
             ]
     finally:
         connection.close()
-    return evaluate_cadence(epoch=epoch, recorded_sessions=recorded, now=now)
+    return evaluate_cadence(
+        epoch=epoch,
+        recorded_sessions=recorded,
+        now=now,
+        capture_local_time=capture_local_time,
+        capture_timezone=capture_timezone,
+    )
 
 
 _LABEL = {
@@ -80,6 +98,20 @@ _LABEL = {
 }
 
 
+def _parse_capture_time(value: str) -> time:
+    try:
+        parsed = time.fromisoformat(value)
+    except ValueError as exc:
+        raise argparse.ArgumentTypeError(
+            "capture time must be HH:MM or HH:MM:SS"
+        ) from exc
+    if parsed.tzinfo is not None:
+        raise argparse.ArgumentTypeError(
+            "capture time must not include an offset; use --capture-timezone"
+        )
+    return parsed
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
@@ -88,9 +120,37 @@ def main(argv: list[str] | None = None) -> int:
         help="operator database to inspect (opened READ-ONLY)",
     )
     parser.add_argument("--json", action="store_true", help="machine-readable output")
+    parser.add_argument(
+        "--capture-time",
+        type=_parse_capture_time,
+        default=DEFAULT_CAPTURE_LOCAL_TIME,
+        help=(
+            "installed PaperObservation trigger clock (default: 16:30 on "
+            "the current epoch host)"
+        ),
+    )
+    parser.add_argument(
+        "--capture-timezone",
+        default=getattr(DEFAULT_CAPTURE_TIMEZONE, "key", "America/Los_Angeles"),
+        help=(
+            "IANA timezone of the installed trigger "
+            "(default: America/Los_Angeles)"
+        ),
+    )
     arguments = parser.parse_args(argv)
 
-    report = read_cadence(Path(arguments.database), datetime.now(timezone.utc))
+    try:
+        capture_timezone = ZoneInfo(arguments.capture_timezone)
+    except ZoneInfoNotFoundError as exc:
+        parser.error(f"unknown capture timezone: {arguments.capture_timezone}")
+        raise AssertionError("argparse.error must exit") from exc
+
+    report = read_cadence(
+        Path(arguments.database),
+        datetime.now(timezone.utc),
+        capture_local_time=arguments.capture_time,
+        capture_timezone=capture_timezone,
+    )
 
     if arguments.json:
         print(json.dumps(dataclasses_asdict(report), indent=2, sort_keys=True))

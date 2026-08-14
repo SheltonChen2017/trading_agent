@@ -1,11 +1,11 @@
 """The epoch stall detector.
 
-The failure this exists to catch is silent by construction: the scheduled
-task reports success, the app behaves exactly as designed, and the
-observation count simply stops going up. Epoch-002 sat at one observation
-while `summarize_paper_epoch()`'s interior-gap check reported nothing wrong,
-because that check computes its window as first-observation ->
-last-observation and therefore cannot see past the last row it has.
+The evidence-summary failure this exists to catch is silent: a refused
+scheduled capture does fail nonzero and create a critical alert, but
+`summarize_paper_epoch()` still reports no trailing gap while the observation
+count stops going up. Epoch-002 sat at one observation because that check
+computes its window as first-observation -> last-observation and therefore
+cannot see past the last row it has.
 
 So the tests that matter here are the ones about the WINDOW and about not
 crying wolf:
@@ -19,9 +19,11 @@ crying wolf:
 """
 from __future__ import annotations
 
+import sqlite3
 import sys
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, time, timedelta, timezone
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 import pytest
 
@@ -85,6 +87,34 @@ def test_weekends_and_holidays_are_not_expected_sessions():
     assert "2026-07-02" in expected
 
 
+def test_an_early_close_does_not_move_the_fixed_task_trigger_earlier():
+    """CODSTALL-001: the installed task runs at 16:30 Pacific even when the
+    market closes early. The Friday after Thanksgiving closes at 13:00 ET;
+    modelling capture as close + 3.5 hours makes it due at 16:30 ET, three
+    hours before the task can run, and can manufacture a missing session.
+    At 00:00Z (16:00 Pacific) neither the trigger nor its grace has elapsed.
+    """
+    expected = expected_capture_sessions(
+        _at("2026-11-25T00:00:00+00:00"),
+        _at("2026-11-28T00:00:00+00:00"),
+    )
+    assert "2026-11-27" not in expected, expected
+
+
+def test_capture_clock_and_timezone_are_explicitly_configurable():
+    """The current host is 16:30 Pacific; a fresh install is 16:30 Eastern.
+    The detector must model either measured trigger without a code edit.
+    """
+    expected = expected_capture_sessions(
+        _at("2026-11-25T00:00:00+00:00"),
+        _at("2026-11-27T23:00:00+00:00"),
+        capture_local_time=time(16, 30),
+        capture_timezone=ZoneInfo("America/New_York"),
+    )
+    # 18:00 ET is before the 16:30 trigger plus the two-hour grace.
+    assert "2026-11-27" not in expected
+
+
 def test_now_before_the_epoch_start_yields_nothing_rather_than_raising():
     assert expected_capture_sessions(
         _at("2026-08-20T00:00:00+00:00"), _at("2026-08-14T00:00:00+00:00")
@@ -135,6 +165,21 @@ def test_not_due_yet_is_reported_as_fine():
     assert "correct state" in report.detail
 
 
+def test_not_due_yet_does_not_claim_zero_after_an_early_capture():
+    """During the grace window an on-time row can already exist even though
+    the session is not overdue. Status stays NOT_DUE_YET, but its detail must
+    describe the row it actually received."""
+    report = evaluate_cadence(
+        epoch=_epoch(),
+        recorded_sessions=["2026-08-14"],
+        now=_at("2026-08-15T00:00:00+00:00"),  # 17:00 Pacific, inside grace
+    )
+    assert report.status == NOT_DUE_YET
+    assert report.recorded_sessions == ("2026-08-14",)
+    assert "Zero observations" not in report.detail
+    assert "1 observation" in report.detail
+
+
 def test_a_fully_captured_epoch_is_healthy():
     now = _at("2026-08-19T23:00:00+00:00")
     expected = expected_capture_sessions(_at(EPOCH_005_START), now)
@@ -161,7 +206,35 @@ def test_no_active_epoch_is_stated_rather_than_implied_healthy():
         epoch=None, recorded_sessions=[], now=_at("2026-08-21T23:00:00+00:00")
     )
     assert report.status == NO_ACTIVE_EPOCH
-    assert report.ok
+    assert not report.ok, (
+        "a scheduler-compatible detector must fail when the promised active "
+        "epoch no longer exists"
+    )
+
+
+def test_stall_threshold_must_be_a_positive_whole_number():
+    """Zero makes even an interior gap satisfy ``tail >= threshold`` and
+    produces the impossible message 'recorded nothing for the last 0'."""
+    for invalid in (0, -1, True, 1.5):
+        with pytest.raises((TypeError, ValueError)):
+            evaluate_cadence(
+                epoch=_epoch(), recorded_sessions=[],
+                now=_at("2026-08-21T23:00:00+00:00"),
+                stall_threshold=invalid,
+            )
+
+
+def test_negative_grace_and_aware_wall_clock_are_refused():
+    with pytest.raises(ValueError, match="grace"):
+        expected_capture_sessions(
+            _at(EPOCH_005_START), _at("2026-08-21T23:00:00+00:00"),
+            grace=timedelta(seconds=-1),
+        )
+    with pytest.raises(ValueError, match="naive"):
+        expected_capture_sessions(
+            _at(EPOCH_005_START), _at("2026-08-21T23:00:00+00:00"),
+            capture_local_time=time(16, 30, tzinfo=timezone.utc),
+        )
 
 
 # --- the messages must be true ---------------------------------------------
@@ -237,10 +310,10 @@ def test_the_reader_opens_the_database_read_only():
     source = path.read_text(encoding="utf-8")
     assert "mode=ro" in source
 
-    # The invariant is what the module IMPORTS, not what its prose mentions:
-    # the docstring deliberately names AssistantStore to explain the choice,
-    # and a substring test would forbid the explanation rather than the
-    # dependency.
+    # This pins the direct composition boundary. It is not, by itself, proof
+    # of read-only behavior: epoch_cadence's shared calendar helper
+    # transitively loads paper_evidence/storage. The behavioral test below is
+    # the enforcement proof and confirms no migration-capable store is built.
     imported: set[str] = set()
     for node in ast.walk(ast.parse(source)):
         if isinstance(node, ast.Import):
@@ -250,6 +323,67 @@ def test_the_reader_opens_the_database_read_only():
             imported.update(alias.name for alias in node.names)
     assert not any("AssistantStore" in name for name in imported), imported
     assert not any(name.startswith("assistant.storage") for name in imported), imported
+
+
+def test_read_only_is_enforced_by_sqlite_and_reader_changes_no_bytes(tmp_path):
+    """A source string saying ``mode=ro`` is not enough; exercise the actual
+    Windows URI and prove both a write attempt and the cadence read."""
+    from scripts.check_epoch_cadence import _read_only_connection, read_cadence
+
+    database = tmp_path / "cadence.db"
+    with sqlite3.connect(database) as connection:
+        connection.executescript(
+            """
+            CREATE TABLE paper_evidence_epochs (
+                evidence_epoch TEXT PRIMARY KEY,
+                started_at TEXT NOT NULL,
+                status TEXT NOT NULL
+            );
+            CREATE TABLE paper_account_observations (
+                evidence_epoch TEXT NOT NULL,
+                session_date TEXT NOT NULL
+            );
+            INSERT INTO paper_evidence_epochs VALUES (
+                'paper-test', '2026-08-13T23:59:07+00:00', 'active'
+            );
+            """
+        )
+    before = database.read_bytes()
+
+    with _read_only_connection(database) as connection:
+        with pytest.raises(sqlite3.OperationalError):
+            connection.execute(
+                "UPDATE paper_evidence_epochs SET status = 'closed'"
+            )
+
+    report = read_cadence(database, _at("2026-08-14T12:00:00+00:00"))
+    assert report.status == NOT_DUE_YET
+    assert database.read_bytes() == before
+    assert not Path(f"{database}-wal").exists()
+    assert not Path(f"{database}-shm").exists()
+
+
+def test_cli_returns_failure_when_no_active_epoch_exists(tmp_path, capsys):
+    from scripts.check_epoch_cadence import main
+
+    database = tmp_path / "no-active.db"
+    with sqlite3.connect(database) as connection:
+        connection.executescript(
+            """
+            CREATE TABLE paper_evidence_epochs (
+                evidence_epoch TEXT PRIMARY KEY,
+                started_at TEXT NOT NULL,
+                status TEXT NOT NULL
+            );
+            CREATE TABLE paper_account_observations (
+                evidence_epoch TEXT NOT NULL,
+                session_date TEXT NOT NULL
+            );
+            """
+        )
+
+    assert main(["--database", str(database), "--json"]) == 1
+    assert '"status": "no_active_epoch"' in capsys.readouterr().out
 
 
 def test_the_report_is_immutable():

@@ -11,10 +11,11 @@ entirely.
 
 That is not hypothetical. Epoch-002 sat at ONE observation while the ledger
 drifted three cents past the reconciliation tolerance and every nightly
-capture correctly refused to record evidence it could not trust. The
-machinery behaved exactly as designed; the count simply stopped going up,
-and the interior-gap check reported nothing wrong because one observation
-has no interior. It was found by tracing it by hand, days later.
+capture correctly refused to record evidence it could not trust. Those runs
+raised a critical alert and failed nonzero, but the evidence summary itself
+still had no direct answer to "is this epoch accumulating?" The count stopped
+going up, and the interior-gap check reported nothing wrong because one
+observation has no interior. It was diagnosed by tracing the incident by hand.
 
 So this module anchors the window to **epoch start -> now** instead of to the
 data, which is the only way a trailing stall becomes visible.
@@ -36,18 +37,19 @@ epoch. See `scripts/check_epoch_cadence.py` for the read-only reader.
 from __future__ import annotations
 
 import dataclasses
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone, tzinfo
+from zoneinfo import ZoneInfo
 
-from assistant.paper_evidence import session_market_closes, valid_session_dates
+from assistant.paper_evidence import valid_session_dates
 
-#: How long after the exchange close the observation is actually captured.
-#: This is a property of the INSTALLED SCHEDULE, not of the market: the
-#: `TradingAgent-Paper-PaperObservation` task fires at 16:30 local time, which
-#: is 19:30 ET, i.e. 3h30m after a normal 16:00 ET close. It matters for
-#: correctness rather than cosmetics -- it decides which epoch a session's
-#: capture belongs to when an epoch is rolled mid-day. Re-derive it if the
-#: installed trigger changes; do not assume this default still matches.
-DEFAULT_CAPTURE_AFTER_CLOSE = timedelta(hours=3, minutes=30)
+#: Measured trigger of the CURRENT epoch host. This is a fixed wall-clock
+#: schedule, not a duration after the exchange close. On early-close sessions
+#: the task still runs at 16:30 Pacific; deriving it from market close would
+#: move the supposed capture three hours early and manufacture a missing row.
+#: A reinstalled task may use a different local time. The CLI exposes both
+#: values so the measured trigger can be supplied without a code change.
+DEFAULT_CAPTURE_LOCAL_TIME = time(hour=16, minute=30)
+DEFAULT_CAPTURE_TIMEZONE = ZoneInfo("America/Los_Angeles")
 
 #: Extra slack before a session that has not appeared is called missing, so a
 #: run a few minutes late is never reported as a failure.
@@ -79,7 +81,10 @@ class CadenceReport:
 
     @property
     def ok(self) -> bool:
-        return self.status in (HEALTHY, NOT_DUE_YET, NO_ACTIVE_EPOCH)
+        # NO_ACTIVE_EPOCH is a distinct, truthful status, but not scheduler
+        # success: when an epoch is promised to be accumulating, its absence
+        # must alert rather than silently look healthy.
+        return self.status in (HEALTHY, NOT_DUE_YET)
 
 
 def _as_utc(value: datetime, name: str) -> datetime:
@@ -92,7 +97,8 @@ def expected_capture_sessions(
     started_at: datetime,
     now: datetime,
     *,
-    capture_after_close: timedelta = DEFAULT_CAPTURE_AFTER_CLOSE,
+    capture_local_time: time = DEFAULT_CAPTURE_LOCAL_TIME,
+    capture_timezone: tzinfo = DEFAULT_CAPTURE_TIMEZONE,
     grace: timedelta = DEFAULT_GRACE,
 ) -> list[str]:
     """Sessions this epoch should already have captured, oldest first.
@@ -106,6 +112,16 @@ def expected_capture_sessions(
     """
     started = _as_utc(started_at, "started_at")
     current = _as_utc(now, "now")
+    if not isinstance(capture_local_time, time):
+        raise TypeError("capture_local_time must be a datetime.time")
+    if capture_local_time.tzinfo is not None:
+        raise ValueError("capture_local_time must be naive; pass capture_timezone separately")
+    if not isinstance(capture_timezone, tzinfo):
+        raise TypeError("capture_timezone must be timezone-aware")
+    if not isinstance(grace, timedelta):
+        raise TypeError("grace must be a timedelta")
+    if grace < timedelta(0):
+        raise ValueError("grace must be non-negative")
     if current < started:
         return []
 
@@ -114,13 +130,11 @@ def expected_capture_sessions(
     start_date = (started - timedelta(days=1)).date().isoformat()
     end_date = (current + timedelta(days=1)).date().isoformat()
 
-    closes = session_market_closes(start_date, end_date)
     expected: list[str] = []
     for session in valid_session_dates(start_date, end_date):
-        close = closes.get(session)
-        if close is None:
-            continue
-        captured_at = _as_utc(close, "market_close") + capture_after_close
+        captured_at = datetime.combine(
+            date.fromisoformat(session), capture_local_time, tzinfo=capture_timezone
+        ).astimezone(timezone.utc)
         if captured_at <= started:
             continue  # captured before this epoch existed
         if captured_at + grace > current:
@@ -134,11 +148,16 @@ def evaluate_cadence(
     epoch: dict | None,
     recorded_sessions: object,
     now: datetime,
-    capture_after_close: timedelta = DEFAULT_CAPTURE_AFTER_CLOSE,
+    capture_local_time: time = DEFAULT_CAPTURE_LOCAL_TIME,
+    capture_timezone: tzinfo = DEFAULT_CAPTURE_TIMEZONE,
     grace: timedelta = DEFAULT_GRACE,
     stall_threshold: int = DEFAULT_STALL_THRESHOLD,
 ) -> CadenceReport:
     """Compare what should have been captured against what was."""
+    if isinstance(stall_threshold, bool) or not isinstance(stall_threshold, int):
+        raise TypeError("stall_threshold must be a positive whole number")
+    if stall_threshold <= 0:
+        raise ValueError("stall_threshold must be a positive whole number")
     if not epoch:
         return CadenceReport(
             evidence_epoch=None, epoch_started_at=None, status=NO_ACTIVE_EPOCH,
@@ -158,7 +177,9 @@ def evaluate_cadence(
     expected = tuple(
         expected_capture_sessions(
             started_at, now,
-            capture_after_close=capture_after_close, grace=grace,
+            capture_local_time=capture_local_time,
+            capture_timezone=capture_timezone,
+            grace=grace,
         )
     )
     missing = tuple(s for s in expected if s not in set(recorded))
@@ -174,16 +195,24 @@ def evaluate_cadence(
         tail += 1
 
     if not expected:
+        if recorded:
+            not_due_detail = (
+                f"{name} opened {started_raw} and no observation is overdue yet. "
+                f"{len(recorded)} observation(s) already recorded; the current "
+                "grace window has not elapsed."
+            )
+        else:
+            not_due_detail = (
+                f"{name} opened {started_raw} and no observation is due yet. "
+                "Zero observations is the correct state, not a stall."
+            )
         return CadenceReport(
             evidence_epoch=name, epoch_started_at=started_raw,
             status=NOT_DUE_YET, expected_sessions=expected,
             recorded_sessions=recorded, missing_sessions=(),
             last_recorded_session=last_recorded,
             consecutive_missing_at_tail=0,
-            detail=(
-                f"{name} opened {started_raw} and no observation is due yet. "
-                "Zero observations is the correct state, not a stall."
-            ),
+            detail=not_due_detail,
         )
 
     if not missing:

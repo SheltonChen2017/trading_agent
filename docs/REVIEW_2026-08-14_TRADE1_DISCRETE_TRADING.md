@@ -134,3 +134,69 @@ independent verification of `93953ef`, `7ad7f7d`, and the documentation /
 handoff commits, then owner authorization before any merge. Nothing in this
 review authorizes deployment, another epoch roll, M4, operator-database
 mutation, funded trading, or a scheduler change.
+
+---
+
+## Counter-review (Claude, 2026-08-14)
+
+Owner-requested verification of this review, performed on the review branch
+at `f693c4d` while the owner was away.
+
+### Every finding verified
+
+All eight findings are **confirmed genuine**, each re-established by
+reverting the correction and observing the intended regression redden, then
+restoring. Several are defects in code I wrote and are worth stating plainly:
+
+| ID | Independent verification |
+|---|---|
+| TRADE1R-001 | **Confirmed, and the severity is right.** The picker assigned `discrete_buy_ticker` after the text input owning that key had been instantiated — which Streamlit forbids, so the feature's *primary* interaction could raise rather than fill the field. My own tests never clicked a suggestion button; I built click-to-select and only tested that the expander existed. Mutation: removing `on_click=_select_discrete_buy_ticker` reddens. |
+| TRADE1R-002 | **Confirmed, with a mutation caveat worth recording.** Deleting the added `or _db_shares is None` clause does NOT reproduce the defect, because the following `!= _db_shares` already catches `None` — a naive mutation here reports a false "test doesn't work". The faithful mutation restores the original truthy short-circuit `or (_db_shares and ... != _db_shares)`, and that reddens on both pages. The clause is redundant to the comparison but load-bearing for the explanatory copy. |
+| TRADE1R-003 | **Confirmed.** Sell dollar sizing used the rounded display `current_price` while I had carefully used `shares_exact` two lines above — exactly the SELREV-001 lesson applied to one field and not its neighbour. Mutation reddens. |
+| TRADE1R-004 | **Confirmed**; this was my own `c638bc7` follow-up, and review preserved and strengthened the retargeted tests rather than accepting them as-is. |
+| TRADE1R-005 | **Confirmed.** An open session sitting on `Buying`/`Selling` silently reset to Briefing after the rename. Mutation of the legacy-label map reddens two parametrized tests. |
+| TRADE1R-006 | **Confirmed.** I copied BUY-1's picker mechanism but dropped its fetch time, 15-minute cache disclosure, and dropped-candidate names — violating, in my own next feature, the "the disclosure travels with the ticker" principle I had argued for when building BUY-1. Verified restored on both pages. |
+| TRADE1R-007 | **Confirmed.** `1e999999999 / 1e-999999999` raised `decimal.Overflow` out of a helper whose docstring promises it "never raises for ordinary bad input". Mutation of the `except DecimalException` guard reddens. |
+| TRADE1R-008 | **Confirmed.** The new buy generator had only indirect UI coverage; 21 deprecated `use_container_width` calls remained (now 0). |
+
+**No test was weakened or deleted.** The one renamed test
+(`test_discrete_selling_is_the_only_owner_directed_sell_surface`) is
+strictly stronger than mine: it additionally pins that the policy-breach
+section is ABSENT from the discrete page, i.e. the separation itself.
+
+**Topology note:** my follow-up `c638bc7` is *not* an ancestor of this review
+head — its fixes were reimplemented in `7ad7f7d` rather than merged. Content
+was verified equivalent for both files it touched; the only differences are
+the deprecated-width removals and the UI pass. If both branches are merged,
+expect a textual conflict rather than a lost fix.
+
+### Counter-review finding
+
+| ID | Priority | Status | Finding |
+|---|---|---|---|
+| TRADE1CR-001 | P3 | **Resolved in this counter-review** | The Alpaca-style pass replaced `st.radio` with `st.segmented_control` for the sizing selector. Unlike radio, that widget lets the user **deselect** the active option, so its value can be `None` — a state the previous control could not produce. Unhandled, `_render_discrete_sizing` fell through to its dollar branch and rendered the "Dollar amount ($)" input while the selector showed nothing selected: the page behaving as one mode while claiming none. Reproduced on both discrete pages by deselecting and re-running. Not unsafe on its own — dollar sizing still floors, refuses zero, and caps a sell at the holding — but a control that does not describe what the page will do is the class AP-9 and the stale-card work closed. Fixed by treating `None` as "no mode chosen": size nothing, offer nothing to create, and ask for a mode. Red-first on both pages, and mutation-verified. |
+
+| TRADE1CR-002 | P3 | **Recorded, deliberately not fixed here** | The repository-prescribed validation (`python -m pytest -q`) cannot pass between roughly 00:00 and 09:30 Eastern, and could not on any day this week. `tests/test_strategy_proposals_generic.py:50` builds its bars with `pd.bdate_range(end=pd.Timestamp.today().normalize(), ...)`. After local midnight that end date is the NEW session — later than the latest completed one, and not yet an in-progress NYSE session — so `evaluate_bar_freshness` correctly reports the bars stale and `generate_leveraged_pair_rebalance_proposals` refuses. The production guard is right; the FIXTURE is wrong to anchor on "today". Consequence for this project's own discipline: every "full suite green" recorded today (including 3,674 and 3,680) was measured before midnight, and CLAUDE.md's completed-milestone requirement is unsatisfiable overnight. Same class as the two already-recorded fragilities (machine load, the WindowsApps interpreter). Not fixed here because it touches shared strategy tests unrelated to TRADE-1 and belongs on its own branch; the fix is to anchor fixtures to the latest completed session instead of `today`. |
+
+### Counter-review validation
+
+- Focused TRADE-1 suites (discrete trade, discrete tabs, owner-directed
+  sell, allocation proposals, UI chrome): **83 passed** before the fix,
+  **17 passed** in the discrete-tab suite after adding the two new cases.
+- Eight review-finding mutations plus one faithful re-mutation: each
+  reddened its intended regression and passed restored; worktree confirmed
+  byte-clean afterwards.
+- Generalized-instance sweep: no other post-widget session-state write
+  (`watchlist_from_suggestions` is not a widget key), and the remaining
+  `current_price` uses are display-only.
+- Exact counter-review tree: **3,681 passed, 12 failed** in 736.43 s. The
+  12 are accounted for exactly and NONE is caused by this change:
+  - **11** are the pre-existing time-dependent strategy-proposal family
+    described in TRADE1CR-002 below. Proven environmental by running the
+    same tests on an untouched `origin/main` worktree at `a5d5fe3`, where
+    they fail identically (11 failed, 19 passed), every one raising
+    `StaleMarketDataError`.
+  - **1** was the placeholder guard correctly rejecting this line's own
+    then-unfilled token.
+  Reporting this as "green" would have required either measuring before
+  midnight or quietly excluding the family; both were rejected.

@@ -3095,6 +3095,16 @@ def _render_discrete_sizing(mode_key: str, amount_key: str, price, *, max_shares
         key=mode_key,
         width="stretch",
     )
+    if mode is None:
+        # Counter-review TRADE1CR-001: st.segmented_control lets the user
+        # DESELECT the active option, so this can be None -- a state the
+        # st.radio it replaced could not produce. Falling through would
+        # render the dollar input while the control showed nothing selected,
+        # i.e. the page behaving as one mode while claiming none. Size
+        # nothing until a mode is chosen.
+        st.caption("Choose how to size this trade to continue.")
+        return None, None
+
     if mode == "Share count":
         shares = int(
             st.number_input(

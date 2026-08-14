@@ -170,6 +170,38 @@ kill-switch behavior, ML/LLM authority, or live-account authority changed.
 No account identifier, balance, credential value, private artifact content, or
 secret is recorded here.
 
+## Claude counter-review of the TRADE-1 review (2026-08-14)
+
+All eight review findings **confirmed genuine** and each re-established by
+mutation. Three were real defects in the submitted implementation worth
+remembering: the suggestion picker wrote to a widget key after that widget
+existed (Streamlit forbids it, so the feature's primary click could raise,
+and the submitted tests never clicked it); sell dollar sizing used the
+rounded display price while the exact broker quantity was used two lines
+above; and the copied picker dropped BUY-1's freshness and omission
+disclosure. No test was weakened — the one renamed test is strictly stronger.
+
+Topology: the implementation's follow-up `c638bc7` is NOT an ancestor of this
+review branch; its fixes were reimplemented in `7ad7f7d`. Content verified
+equivalent for both touched files, so nothing was lost, but merging both
+branches will conflict textually rather than drop a fix.
+
+Two counter-review findings:
+
+- **TRADE1CR-001 (P3, fixed here):** the Alpaca-style pass swapped
+  `st.radio` for `st.segmented_control`, which permits DESELECTION. Its
+  `None` value was unhandled, so the page rendered dollar sizing while the
+  selector showed nothing selected. Reproduced on both discrete pages,
+  fixed to ask for a mode, red-first and mutation-verified.
+- **TRADE1CR-002 (P3, recorded not fixed):** the prescribed full suite
+  cannot pass between ~00:00 and 09:30 Eastern because a strategy-proposal
+  fixture anchors its bars on `pd.Timestamp.today()`. Proven on untouched
+  `origin/main`. Every "green suite" recorded on 2026-08-13 was measured
+  before midnight. Fix belongs on its own branch.
+
+Counter-review tree: **3,681 passed, 12 failed** — 11 the environmental
+family above, 1 the placeholder guard on its own then-unfilled token.
+
 ## 6. Next step
 
 1. Have Claude independently verify `93953ef`, `7ad7f7d`, `4ba7284`, and the

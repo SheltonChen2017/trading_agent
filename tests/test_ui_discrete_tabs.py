@@ -330,3 +330,64 @@ def test_discrete_sell_dollar_sizing_uses_the_exact_recorded_price(
 
     warnings = "\n".join(w.value for w in app.warning)
     assert "does not cover one share" in warnings
+
+
+@pytest.mark.parametrize(
+    "page, mode_key, create_key",
+    [
+        ("Discrete Buying", "discrete_buy_mode", "discrete_buy_create"),
+        ("Discrete Selling", "discrete_sell_mode", "discrete_sell_create"),
+    ],
+)
+def test_deselecting_the_sizing_control_asks_for_a_mode_instead_of_assuming_one(
+    _offline, monkeypatch, page, mode_key, create_key
+):
+    """Counter-review TRADE1CR-001.
+
+    The Alpaca-style UI pass replaced st.radio with st.segmented_control.
+    Unlike radio, that widget lets the user DESELECT the active option, so
+    its value can be None -- a state the previous control could not produce.
+    Unhandled, the helper fell through to its dollar branch, rendering the
+    "Dollar amount ($)" input while the selector showed nothing selected: the
+    page silently behaved as one mode while claiming none.
+
+    Not unsafe on its own -- dollar sizing still floors, still refuses zero,
+    and still caps a sell at the holding -- but a control that does not
+    describe what the page will do is the same class of defect AP-9 and the
+    stale-card work closed. Fail closed instead: ask for a mode, size
+    nothing, and offer nothing to create.
+    """
+    if page == "Discrete Buying":
+        # The buying page only reaches the sizing control once the ticker
+        # prices; without this it stops at the "no fresh close" refusal.
+        from decimal import Decimal
+
+        import assistant.sleeve_notifications as sleeve_notifications
+
+        monkeypatch.setattr(
+            sleeve_notifications,
+            "_recorded_close_fetcher",
+            lambda _s, **_k: (lambda _t: {"NVDA": Decimal("100")}),
+        )
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = page
+    app.run()
+    if page == "Discrete Buying":
+        app.text_input(key="discrete_buy_ticker").set_value("NVDA").run()
+    elif not app.selectbox:
+        pytest.skip("no holdings in this environment")
+
+    app.session_state[mode_key] = None
+    app.run()
+
+    assert not app.exception
+    labels = [n.label for n in app.number_input]
+    assert "Dollar amount ($)" not in labels, (
+        f"deselected control still rendered dollar sizing: {labels}"
+    )
+    assert "Shares" not in labels, (
+        f"deselected control still rendered share sizing: {labels}"
+    )
+    captions = "\n".join(c.value for c in app.caption)
+    assert "Choose how to size" in captions, captions
+    assert not [b for b in app.button if b.key == create_key and not b.disabled]

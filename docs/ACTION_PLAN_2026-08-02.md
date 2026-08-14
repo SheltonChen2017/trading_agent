@@ -44,9 +44,11 @@ Current development topology (2026-08-14): `origin/main` is `cfed8c8` after
 PR #213 merged SET-1 and PR #214 merged the reviewed TRADE-1/counter-review
 tree. The review branch `codex/review-set1-settings-toggles-20260814`
 contains independent correction `89156b7`; `main` does not yet contain that
-review commit, and no remote-tracking ref exists for the branch. The
-operational runtime remains separately frozen at `752d3b7` in
-`paper-epoch-005`.
+review commit. The branch now tracks
+`origin/codex/review-set1-settings-toggles-20260814` after the owner's explicit
+2026-08-14 publication instruction, so the review is remotely retrievable;
+publication does not authorize merge or deployment. The operational runtime
+remains separately frozen at `752d3b7` in `paper-epoch-005`.
 
 ---
 

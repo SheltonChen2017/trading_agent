@@ -29,11 +29,14 @@ scheduled-task change.
   `cfed8c8`.
 - Product/test correction: `89156b7`.
 - Review report, Action Plan, and milestone record: `6b944ac`.
-- This handoff is the separate commit containing this file.
-- No remote-tracking ref exists for the active review branch. A different
-  computer has no approved remote ref from which to obtain `89156b7`,
-  `6b944ac`, or this handoff yet. Preserve this checkout until the owner
-  explicitly authorizes publication.
+- Reconstructed handoff: `d4d43cf`.
+- Publication-state update: the commit containing this version of the file.
+- **PUSHED AND REMOTELY RETRIEVABLE:** the active branch tracks
+  `origin/codex/review-set1-settings-toggles-20260814`. The owner explicitly
+  authorized publication on 2026-08-14; the remote ref resolved to `d4d43cf`
+  before this publication-state update. Another computer can retrieve the
+  complete review with `git fetch`. Publication does not authorize merge or
+  deployment.
 
 Merged source history reviewed from the previously accepted base `a5d5fe3`:
 
@@ -179,8 +182,9 @@ or secret is recorded here.
 
 1. Independently verify `89156b7`, `6b944ac`, and the handoff commit containing
    this file on a separate verification branch.
-2. If accepted, obtain explicit owner authorization before publishing or
-   merging the review branch. Acceptance does not authorize deployment.
+2. The branch is published. If verification is accepted, obtain explicit
+   owner authorization before merging it. Publication and acceptance do not
+   authorize deployment.
 3. If the owner later requests deployment, treat the policy-fingerprint change
    as an epoch-closing lineage change and follow the operations runbook; do not
    preserve epoch-005 by pretending the safe default is immaterial.
@@ -198,11 +202,12 @@ Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/REVIEW_2026-08-14_SET1_SETTINGS_AND_FRACTIONAL_TRADING.md, and
 docs/SESSION_HANDOFF.md. origin/main is cfed8c8. Review branch
 codex/review-set1-settings-toggles-20260814 contains product correction
-89156b7, review records 6b944ac, and the separate handoff commit. No
-remote-tracking ref exists for this branch yet. Independently verify those
-commits before any owner-authorized publication or merge. The operational
-runtime remains frozen at 752d3b7 under paper-epoch-005; its current
-observation count was not remeasured. Do not deploy, roll the epoch, begin M4,
-mutate the operator database, alter scheduled tasks, access a funded account,
-or enable live trading without explicit owner authorization.
+89156b7, review records 6b944ac, reconstructed handoff d4d43cf, and the
+publication-state commit containing this version. The branch is pushed and
+tracks origin/codex/review-set1-settings-toggles-20260814. Independently verify
+those commits before any owner-authorized merge. The operational runtime
+remains frozen at 752d3b7 under paper-epoch-005; its current observation count
+was not remeasured. Do not deploy, roll the epoch, begin M4, mutate the operator
+database, alter scheduled tasks, access a funded account, or enable live
+trading without explicit owner authorization.
 ```

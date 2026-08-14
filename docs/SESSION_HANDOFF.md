@@ -30,12 +30,16 @@ operator-database mutation, funded-account access, or a scheduled-task change.
 - Review base: `a5d5fe3`.
 - Claude implementation branch:
   `user/claude/discrete-trading-tabs-20260814`; exact submitted and remotely
-  available head `c1dec52`.
+  available current head `c638bc7` (`c1dec52` initial implementation plus
+  follow-up).
 - Codex review branch: `codex/review-trade1-discrete-tabs-20260814`, created
-  from the exact submitted head.
-- Product/test correction: `93953ef`.
-- Review report, Action Plan, and milestone record: `af8821e`.
-- The handoff is the commit containing this file and follows `af8821e`.
+  from the initial submitted head; when Claude's branch advanced during the
+  review, `c638bc7` was added to scope before closure.
+- Product/test corrections: `93953ef`, then moving-head reconciliation
+  `7ad7f7d`.
+- Review report, Action Plan, and milestone record: `af8821e`, updated for the
+  moving head at `4ba7284`.
+- The handoff is the commit containing this file and follows `4ba7284`.
 
 **LOCAL-ONLY / NOT PUSHED:** The Codex review branch has no remote ref. Another
 computer cannot retrieve its review commits with `git fetch`. The owner must
@@ -48,7 +52,7 @@ was outside the repository. No unrelated user change was incorporated.
 ## 2. Outcome, commit disposition, and issue state
 
 Final disposition: **accepted after correction**. Claude implementation
-quality: **6.5/10**. Review issue total: **0 P0 / 0 P1 / 4 P2 / 4 P3; all
+quality: **7/10** after its follow-up. Review issue total: **0 P0 / 0 P1 / 4 P2 / 4 P3; all
 closed**, leaving **0 open findings**.
 
 - `c1dec52`: **accepted after correction**. The four-page split, one
@@ -56,10 +60,18 @@ closed**, leaving **0 open findings**.
   reuse, and approval/authority separation are sound. Corrections were needed
   at interaction, stale-state, exact-value, disclosure, compatibility, and
   regression-suite boundaries.
+- `c638bc7`: **accepted after correction**. It correctly restored exact
+  fractional-remainder wording, retargeted the five SELL-1 tests, and
+  strengthened disclosure and valid-mismatch copy. It retained the truthy-only
+  stale guard, so an invalid/zero size could still leave an old card visible.
 - `93953ef`: reviewer correction. It closes TRADE1R-001 through TRADE1R-008 and
   adds the owner-requested consistent Alpaca-inspired route shell.
+- `7ad7f7d`: reconciliation retains Claude's stronger follow-up copy while
+  preserving the stricter invalid-size stale-card refusal.
 - `af8821e`: current review report, completed Action Plan row, and exactly
   two-paragraph feature milestone record.
+- `4ba7284`: expands the durable disposition to the moving implementation head
+  and records the final-tree validation caveat.
 
 Closed findings:
 
@@ -91,6 +103,13 @@ Environment: repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
 - Corrected full repository suite, using a dedicated writable base temp:
   **3,691 passed, 0 failed, 0 skipped, 25 known dependency warnings** in
   731.00 s.
+- The post-midnight full rerun on the copy-only reconciliation finished **3,676
+  passed / 15 failed / 25 warnings**. Four ML failures were Windows MAX_PATH
+  artifacts from the longer diagnostic base and passed **9/9** under short
+  base `.t`. Eleven strategy failures were a pre-market Aug-14 fixture rollover:
+  the tests generated Aug-14 bars before that NYSE session was in progress,
+  and production correctly refused the future session. No freshness check was
+  weakened. The exact final TRADE-1/proposal/chrome suite passed **83/83**.
 - Active-document consistency suite after the Action Plan and milestone edit:
   **26 passed**.
 - Repository-prescribed `compileall`: clean. `git diff --check`: clean apart
@@ -150,9 +169,9 @@ secret is recorded here.
 
 ## 6. Next step
 
-1. Have Claude independently verify `93953ef` and `af8821e` plus the handoff
-   commit containing this file. Any correction should be a new commit on a
-   separate verification branch.
+1. Have Claude independently verify `93953ef`, `7ad7f7d`, `4ba7284`, and the
+   handoff commit containing this file. Any correction should be a new commit
+   on a separate verification branch.
 2. If verification is accepted, obtain explicit owner authorization before
    pushing or merging the Codex review branch. Review acceptance does not
    authorize deployment.
@@ -166,12 +185,13 @@ secret is recorded here.
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/REVIEW_2026-08-14_TRADE1_DISCRETE_TRADING.md, and
-docs/SESSION_HANDOFF.md. Claude's TRADE-1 implementation is c1dec52. Codex's
-independent correction is 93953ef and the review/action-plan/milestone record
-is af8821e on codex/review-trade1-discrete-tabs-20260814. No remote review ref
+docs/SESSION_HANDOFF.md. Claude's TRADE-1 range is c1dec52..c638bc7. Codex's
+independent corrections are 93953ef and 7ad7f7d; the final moving-head record
+is 4ba7284 on codex/review-trade1-discrete-tabs-20260814. No remote review ref
 existed when this handoff was written; verify whether that changed before
-relying on remote availability. Independently verify the corrections and
-handoff. The operational runtime remains frozen at 752d3b7 under
+relying on remote availability. Independently verify both Claude commits, the
+corrections, and the handoff. The operational runtime remains frozen at
+752d3b7 under
 paper-epoch-005. Do not deploy, roll the
 epoch, begin M4, mutate the operator database, change scheduled tasks, or enable
 live trading without explicit owner authorization.

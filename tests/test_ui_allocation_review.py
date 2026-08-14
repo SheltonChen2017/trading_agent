@@ -107,6 +107,8 @@ def _buying_app(outcome, *, want_review: bool = True) -> AppTest:
         "NVDA": _result_row(2.0, 100.0),
         "AMD": _result_row(4.0, 50.0),
     }
+    app.session_state["watchlist_results_cart"] = ["AMD", "NVDA"]
+    app.session_state["watchlist_typed"] = "NVDA, AMD"
     app.run()
 
     if want_review:

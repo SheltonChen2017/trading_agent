@@ -163,6 +163,7 @@ def test_current_review_documents_have_no_validation_placeholders():
         "REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md",
         "REVIEW_2026-08-13_SELL1_AND_BRANCH_CLEANUP.md",
         "REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md",
+        "REVIEW_2026-08-14_TRADE1_DISCRETE_TRADING.md",
     )
     hits = [name for name in names if placeholders.search(_text(name))]
     assert not hits, f"unresolved validation placeholders remain in {hits}"

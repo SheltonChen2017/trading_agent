@@ -25,8 +25,10 @@ _APP_PATH = Path(__file__).resolve().parents[1] / "scripts" / "personal_assistan
 
 _PAGES = (
     "Briefing",
-    "Buying",
-    "Selling",
+    "Budgeted Buying",
+    "Discrete Buying",
+    "Policy Based Selling",
+    "Discrete Selling",
     "Propose & Approve",
     "History",
     "Ticker Suggestions",

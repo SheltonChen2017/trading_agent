@@ -3,13 +3,17 @@
 import sys
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.allocation_proposals import (
+    DISCRETE_EVIDENCE_STATUS,
     EVIDENCE_STATUS,
     build_allocation_plan,
     estimate_pending_buy_value_by_ticker,
     generate_allocation_buy_proposals,
+    generate_discrete_buy_proposal,
 )
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
 from assistant.policy import TradingPolicy
@@ -30,11 +34,12 @@ def _packet(cash=10_000.0, positions=None, open_orders=None):
     )
 
 
-def _policy():
+def _policy(max_order_value=50_000.0):
     return TradingPolicy(
         version="test", name="test", execution_mode="paper",
         max_position_pct=1.0, max_total_exposure_pct=1.0, max_basket_pct=1.0,
-        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0, max_order_value=50_000.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0,
+        max_order_value=max_order_value,
         allow_new_positions=True,
     )
 
@@ -109,6 +114,43 @@ def test_evidence_status_is_user_directed_never_confirmed():
     for p in proposals:
         assert p.evidence_status == EVIDENCE_STATUS == "user_directed_allocation"
         assert p.evidence_status not in ("confirmed", "promising_unconfirmed")
+
+
+def test_discrete_buy_preserves_an_exact_share_request_at_the_policy_boundary():
+    """Three shares at ten cents is exactly thirty cents; the generator must
+    not reproduce the binary-float off-by-one that motivated TRADE-1."""
+    policy = _policy(max_order_value="0.30")
+    result = generate_discrete_buy_proposal(
+        _packet(), policy, ticker="nvda", shares=3, price="0.10"
+    )
+
+    assert result["created"] is True
+    proposal = result["proposal"]
+    assert proposal.intent.ticker == "NVDA"
+    assert proposal.intent.shares == 3
+    assert proposal.intent.side == "buy"
+    assert proposal.status == "proposed"
+    assert proposal.evidence_status == DISCRETE_EVIDENCE_STATUS
+
+
+def test_discrete_buy_refuses_to_edit_an_order_down_to_the_policy_cap():
+    policy = _policy(max_order_value="29.99")
+    result = generate_discrete_buy_proposal(
+        _packet(), policy, ticker="NVDA", shares=3, price="10"
+    )
+
+    assert result["created"] is False
+    assert "above your policy" in result["reason"]
+    assert "up to 2 share(s) fit" in result["reason"]
+
+
+@pytest.mark.parametrize("shares", [True, 1.5, "2", 0, -1, float("nan")])
+def test_discrete_buy_refuses_non_exact_share_quantities(shares):
+    result = generate_discrete_buy_proposal(
+        _packet(), _policy(), ticker="NVDA", shares=shares, price="100"
+    )
+    assert result["created"] is False
+    assert "whole number greater than zero" in result["reason"]
 
 
 def test_plan_matches_proposals_shares_and_skips_exactly():

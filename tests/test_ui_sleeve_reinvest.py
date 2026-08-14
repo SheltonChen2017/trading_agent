@@ -37,7 +37,7 @@ def test_buying_page_renders_the_reinvest_section_read_only(
     _offline_buying_environment,
 ):
     app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
-    app.session_state["nav_page"] = "Buying"
+    app.session_state["nav_page"] = "Budgeted Buying"
     app.run()
 
     assert not app.exception

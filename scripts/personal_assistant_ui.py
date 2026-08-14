@@ -3624,19 +3624,35 @@ if page == "Ticker Suggestions":
                     )
                 else:
                     st.caption("None on this run.")
-        if flat:
+        # Counter-review BUY1CR-001: direction decides where a row is
+        # displayed, never how much of its AP-8 disclosure the reader gets.
+        # A flat or unreported-change candidate is still a verified
+        # most-active row, so its measurement detail renders like the
+        # directional columns' -- while the two buckets keep their separate
+        # captions, because a real +0.00% print is not missing data.
+        for subset, sentence in (
+            (flat, "closed exactly flat"),
+            (unknown, "reported no usable price change"),
+        ):
+            if not subset:
+                continue
             st.caption(
-                f"{len(flat)} verified candidate(s) closed exactly flat and are "
-                "in neither column: "
-                + ", ".join(sorted(r.ticker for r in flat))
+                f"{len(subset)} verified candidate(s) "
+                + sentence
+                + " and are in neither column: "
+                + ", ".join(sorted(r.ticker for r in subset))
                 + "."
             )
-        if unknown:
-            st.caption(
-                f"{len(unknown)} verified candidate(s) reported no usable price "
-                "change and are in neither column: "
-                + ", ".join(sorted(r.ticker for r in unknown))
-                + "."
+            st.dataframe(
+                [
+                    {
+                        "Ticker": r.ticker,
+                        "Detail (volume and price change)": r.detail,
+                    }
+                    for r in subset
+                ],
+                width="stretch",
+                hide_index=True,
             )
 
     st.subheader("Sources")

@@ -128,8 +128,9 @@ amount. Most-active suggestions describe volume and same-day direction, not a
 predictive edge. This project still has zero confirmed individual-stock
 selection signal, and neither discrete page changes that.
 
-The next step is independent verification of `93953ef`, `7ad7f7d`, and the
-documentation / handoff commits that follow them, then owner authorization
-before any push or merge. Nothing in this review authorizes deployment,
-another epoch roll, M4, operator-database mutation, funded trading, or a
-scheduler change.
+The review branch is published at
+`origin/codex/review-trade1-discrete-tabs-20260814`. The next step is
+independent verification of `93953ef`, `7ad7f7d`, and the documentation /
+handoff commits, then owner authorization before any merge. Nothing in this
+review authorizes deployment, another epoch roll, M4, operator-database
+mutation, funded trading, or a scheduler change.

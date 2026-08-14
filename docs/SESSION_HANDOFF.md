@@ -39,11 +39,14 @@ operator-database mutation, funded-account access, or a scheduled-task change.
   `7ad7f7d`.
 - Review report, Action Plan, and milestone record: `af8821e`, updated for the
   moving head at `4ba7284`.
-- The handoff is the commit containing this file and follows `4ba7284`.
+- Initial handoff `f693c4d` followed `4ba7284`; the publication update is the
+  commit containing this version of the file.
 
-**LOCAL-ONLY / NOT PUSHED:** The Codex review branch has no remote ref. Another
-computer cannot retrieve its review commits with `git fetch`. The owner must
-explicitly authorize a push or transfer before changing computers.
+**PUSHED AND REMOTELY RETRIEVABLE:** The Codex review branch tracks
+`origin/codex/review-trade1-discrete-tabs-20260814`. The first push resolved
+the same local and remote head at `f693c4d`; this publication update is pushed
+immediately afterward. Another computer can retrieve the complete review with
+`git fetch`.
 
 The worktree was clean at the submitted head before review. The correction and
 record commits contain only the reviewed files. The dedicated pytest base-temp
@@ -173,7 +176,7 @@ secret is recorded here.
    handoff commit containing this file. Any correction should be a new commit
    on a separate verification branch.
 2. If verification is accepted, obtain explicit owner authorization before
-   pushing or merging the Codex review branch. Review acceptance does not
+   merging the Codex review branch. Publication and review acceptance do not
    authorize deployment.
 3. Separately, perform the already-planned read-only verification of the first
    epoch-005 scheduled observation. Do not deploy TRADE-1, roll the epoch, begin
@@ -187,11 +190,10 @@ Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/REVIEW_2026-08-14_TRADE1_DISCRETE_TRADING.md, and
 docs/SESSION_HANDOFF.md. Claude's TRADE-1 range is c1dec52..c638bc7. Codex's
 independent corrections are 93953ef and 7ad7f7d; the final moving-head record
-is 4ba7284 on codex/review-trade1-discrete-tabs-20260814. No remote review ref
-existed when this handoff was written; verify whether that changed before
-relying on remote availability. Independently verify both Claude commits, the
-corrections, and the handoff. The operational runtime remains frozen at
-752d3b7 under
+is 4ba7284 on codex/review-trade1-discrete-tabs-20260814. The review branch is
+pushed to origin and remotely retrievable. Independently verify both Claude
+commits, the corrections, and the handoff before any merge. The operational
+runtime remains frozen at 752d3b7 under
 paper-epoch-005. Do not deploy, roll the
 epoch, begin M4, mutate the operator database, change scheduled tasks, or enable
 live trading without explicit owner authorization.

@@ -91,7 +91,11 @@ def _sign(payload: str) -> str:
 class TradeIntent:
     ticker: str
     side: Literal["buy", "sell"]
-    shares: int
+    # Whole quantities remain integers for backward-compatible proposal JSON.
+    # Fractional quantities are canonical decimal strings (never float), so
+    # persistence, fingerprints, and authorization proofs retain the exact
+    # owner-entered quantity across restarts.
+    shares: int | str
     order_type: Literal["market", "limit", "stop"] = "market"
     limit_price: float | None = None
     rationale: str = ""
@@ -104,9 +108,9 @@ def is_valid_share_quantity(value: object) -> bool:
     behave as 1/0 share(s)), not any `float` (whole-valued, fractional,
     NaN, or +/-infinity), and not a string or any other type.
 
-    This project's execution workflow only ever submits whole-share
-    orders, so this is deliberately strict rather than "numeric and
-    positive": `intent.shares <= 0` alone does NOT reject NaN (every
+    This remains the deliberately strict helper and the default execution
+    policy. It is stricter than "numeric and positive":
+    `intent.shares <= 0` alone does NOT reject NaN (every
     ordered comparison against NaN is False in Python), so a NaN share
     quantity used to sail through validate_trade_intent() approved, with
     trade_value = NaN silently defeating every downstream dollar-value
@@ -143,18 +147,55 @@ def is_valid_order_quantity(value: object, *, whole_shares_only: bool = True) ->
     that class of defect twice in one day. Fractional callers must present an
     exact `Decimal` or its string form.
     """
+    return order_quantity_decimal(
+        value, whole_shares_only=whole_shares_only
+    ) is not None
+
+
+def order_quantity_decimal(
+    value: object, *, whole_shares_only: bool = True
+) -> Decimal | None:
+    """Return an exact valid order quantity, else ``None``.
+
+    Alpaca accepts at most nine decimal places for fractional quantities.
+    Enforcing that at every local boundary prevents a proposal that the app
+    can approve but the broker must reject. Binary ``float`` remains invalid
+    in both modes; fractional values travel as ``Decimal`` or decimal text.
+    """
     if whole_shares_only:
-        return is_valid_share_quantity(value)
-    if isinstance(value, bool):
-        return False
-    if isinstance(value, int):
-        return value > 0
-    if isinstance(value, float):
-        return False
-    if isinstance(value, (str, Decimal)):
-        quantity = decimal_or_none(value)
-        return quantity is not None and quantity > 0
-    return False
+        return Decimal(value) if is_valid_share_quantity(value) else None
+    if isinstance(value, bool) or isinstance(value, float):
+        return None
+    if not isinstance(value, (int, str, Decimal)):
+        return None
+    quantity = decimal_or_none(value)
+    if quantity is None or quantity <= 0:
+        return None
+    normalized = quantity.normalize()
+    decimal_places = max(0, -normalized.as_tuple().exponent)
+    if decimal_places > 9:
+        return None
+    return quantity
+
+
+def canonical_order_quantity(
+    value: object, *, whole_shares_only: bool = True
+) -> int | str | None:
+    """JSON-safe canonical quantity for a new ``TradeIntent``."""
+    quantity = order_quantity_decimal(value, whole_shares_only=whole_shares_only)
+    if quantity is None:
+        return None
+    if whole_shares_only:
+        return int(quantity)
+    if quantity == quantity.to_integral_value():
+        return int(quantity)
+    return decimal_text(quantity)
+
+
+def is_fractional_order_quantity(value: object) -> bool:
+    """Whether a usable exact quantity contains a fractional share."""
+    quantity = order_quantity_decimal(value, whole_shares_only=False)
+    return quantity is not None and quantity != quantity.to_integral_value()
 
 
 class ViolationCode(str, enum.Enum):
@@ -605,7 +646,7 @@ class _GateContext:
         ] = []
         self.position_shares: list[Decimal | None] = []
         self.shares_valid: bool = False
-        self.safe_shares: int = 0
+        self.safe_shares: Decimal = Decimal("0")
         self.reference_price_decimal: Decimal | None = None
         self.trade_value: Decimal = Decimal("0")
         self.pending_by_ticker: dict[str, Decimal] = {}
@@ -732,13 +773,21 @@ def _check_share_quantity(ctx: _GateContext) -> None:
     # False in Python), so a NaN quantity used to pass this check, make
     # trade_value NaN, and silently defeat every downstream dollar-value
     # comparison in this function too (GPT review, 2026-07-29).
-    ctx.shares_valid = is_valid_share_quantity(ctx.intent.shares)
+    quantity = order_quantity_decimal(
+        ctx.intent.shares, whole_shares_only=ctx.whole_shares_only
+    )
+    ctx.shares_valid = quantity is not None
     if not ctx.shares_valid:
+        requirement = (
+            "a positive whole number (int)"
+            if ctx.whole_shares_only
+            else "a positive exact quantity with no more than 9 decimal places"
+        )
         ctx.violate(
             ViolationCode.INVALID_SHARES,
-            f"shares must be a positive whole number (int), got {ctx.intent.shares!r} "
-            f"({type(ctx.intent.shares).__name__}) -- NaN, infinity, fractional, boolean, "
-            "and non-numeric values are never valid share quantities.",
+            f"shares must be {requirement}, got {ctx.intent.shares!r} "
+            f"({type(ctx.intent.shares).__name__}) -- NaN, infinity, binary float, "
+            "boolean, and non-numeric values are never valid share quantities.",
         )
     # A rejected/invalid shares value must not be allowed to poison every
     # dollar-value comparison below (NaN propagates through arithmetic,
@@ -747,7 +796,7 @@ def _check_share_quantity(ctx: _GateContext) -> None:
     # already guaranteed False from the violation just recorded above, so
     # this substitution can never mask the rejection, only keep the rest
     # of the checks running instead of crashing.
-    ctx.safe_shares = ctx.intent.shares if ctx.shares_valid else 0
+    ctx.safe_shares = quantity if quantity is not None else Decimal("0")
 
 
 def _check_intent_side(ctx: _GateContext) -> None:
@@ -780,7 +829,7 @@ def _check_reference_price_and_order_value(ctx: _GateContext) -> None:
         fill_price = worst_case_fill_price_decimal(ctx.intent, arithmetic_reference_price)
     except ValueError:
         fill_price = arithmetic_reference_price
-    ctx.trade_value = Decimal(ctx.safe_shares) * fill_price
+    ctx.trade_value = ctx.safe_shares * fill_price
     max_order_value_decimal = (
         decimal_or_none(ctx.max_order_value)
         if ctx.max_order_value is not None
@@ -1344,6 +1393,7 @@ def validate_trade_intent(
     pending_buy_value_by_ticker: dict[str, float] | None = None,
     available_cash_override: float | None = None,
     available_buying_power_override: float | None = None,
+    whole_shares_only: bool = True,
 ) -> ValidationResult:
     """
     Validates one TradeIntent against every configured limit. Returns
@@ -1432,6 +1482,7 @@ def validate_trade_intent(
         pending_buy_value_by_ticker=pending_buy_value_by_ticker,
         available_cash_override=available_cash_override,
         available_buying_power_override=available_buying_power_override,
+        whole_shares_only=whole_shares_only,
     )
     # GR-2: the gate RUNS THE REGISTRY -- there is no hand-written check
     # sequence left to drift from the inventory. A terminal check (only the

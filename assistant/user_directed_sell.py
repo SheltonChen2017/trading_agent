@@ -46,24 +46,34 @@ from assistant.proposals import (
 )
 from assistant.schemas import DecisionPacket
 from assistant.tax_lots import LotLedger
-from risk.execution_gate import TradeIntent, is_valid_share_quantity
+from risk.execution_gate import (
+    TradeIntent,
+    canonical_order_quantity,
+    order_quantity_decimal,
+)
 
 EVIDENCE_STATUS = "user_directed_sell"
 
 
 def remaining_shares_after_sale(
-    position_shares: object, shares_to_sell: object
+    position_shares: object,
+    shares_to_sell: object,
+    *,
+    whole_shares_only: bool = True,
 ) -> Decimal | None:
-    """Exact non-negative remainder for a valid whole-share sale.
+    """Exact non-negative remainder for a policy-permitted sale.
 
     ``None`` means either input is unusable or the requested sale exceeds the
     holding.  This helper keeps the UI's wording and the proposal generator on
     the same exact-decimal quantity rule.
     """
     held = decimal_or_none(position_shares)
-    if held is None or held <= 0 or not is_valid_share_quantity(shares_to_sell):
+    sold = order_quantity_decimal(
+        shares_to_sell, whole_shares_only=whole_shares_only
+    )
+    if held is None or held <= 0 or sold is None:
         return None
-    remainder = held - Decimal(shares_to_sell)
+    remainder = held - sold
     return remainder if remainder >= 0 else None
 
 
@@ -116,38 +126,59 @@ def generate_user_directed_sell_proposal(
             ),
         }
 
-    # The project-wide share-quantity authority, reused rather than
-    # re-implemented: it rejects bools, floats (including whole-valued ones,
-    # NaN, and infinity), strings, zero, and negatives. A NaN share count in
-    # particular defeats every ordered comparison below it.
-    if not is_valid_share_quantity(shares):
+    canonical_shares = canonical_order_quantity(
+        shares, whole_shares_only=policy.whole_shares_only
+    )
+    if canonical_shares is None:
         return {
             "created": False,
             "reason": (
-                f"Shares to sell must be a whole number greater than zero, "
+                "Shares to sell must be "
+                + (
+                    "a whole number greater than zero"
+                    if policy.whole_shares_only
+                    else "a positive exact number with at most 9 decimal places"
+                )
+                + ", "
                 f"got {shares!r}."
             ),
         }
+    shares = canonical_shares
+    quantity = order_quantity_decimal(
+        shares, whole_shares_only=policy.whole_shares_only
+    )
 
     held_input = (
         position.shares_exact
         if position.shares_exact is not None
         else position.shares
     )
+    held_exact = decimal_or_none(held_input)
     held_whole = sellable_whole_shares(held_input)
-    if held_whole <= 0:
+    sellable = Decimal(held_whole) if policy.whole_shares_only else held_exact
+    if sellable is None or sellable <= 0:
+        quantity_label = (
+            "whole-share quantity"
+            if policy.whole_shares_only
+            else "share quantity"
+        )
         return {
             "created": False,
             "reason": (
                 f"{normalized} reports {position.shares!r} shares, which is "
-                "not a usable whole-share quantity to sell."
+                f"not a usable {quantity_label} to sell under the active policy."
             ),
         }
-    if shares > held_whole:
+    if quantity > sellable:
+        holding_label = (
+            f"{held_whole} whole share(s)"
+            if policy.whole_shares_only
+            else f"{decimal_text(sellable)} sellable share(s)"
+        )
         return {
             "created": False,
             "reason": (
-                f"You hold {held_whole} whole share(s) of {normalized}; "
+                f"You hold {holding_label} of {normalized}; "
                 f"selling {shares} would short the position, which this app "
                 "never does."
             ),
@@ -168,7 +199,7 @@ def generate_user_directed_sell_proposal(
             ),
         }
 
-    notional = Decimal(shares) * price_decimal
+    notional = quantity * price_decimal
     max_order_value = decimal_or_none(policy.max_order_value)
     if max_order_value is None or max_order_value <= 0:
         return {
@@ -179,7 +210,16 @@ def generate_user_directed_sell_proposal(
             ),
         }
     if notional > max_order_value:
-        fits = int(max_order_value // price_decimal)
+        fits_raw = max_order_value / price_decimal
+        fits_sized = (
+            fits_raw.to_integral_value(rounding=ROUND_FLOOR)
+            if policy.whole_shares_only
+            else fits_raw.quantize(Decimal("0.000000001"), rounding=ROUND_FLOOR)
+        )
+        fits = canonical_order_quantity(
+            int(fits_sized) if policy.whole_shares_only else fits_sized,
+            whole_shares_only=policy.whole_shares_only,
+        )
         # Stated, never silently applied: quietly shrinking the owner's
         # requested quantity would be an action-shaped edit to their own
         # instruction. The execution gate would refuse this order anyway
@@ -188,7 +228,7 @@ def generate_user_directed_sell_proposal(
         remedy = (
             f" At ${price_decimal:,.2f} per share, up to {fits} share(s) fit in one "
             "order; sell the rest in a second order."
-            if fits > 0
+            if fits is not None
             else " Even one share exceeds that limit at the current price."
         )
         return {
@@ -201,7 +241,9 @@ def generate_user_directed_sell_proposal(
         }
 
     at = now or datetime.now(timezone.utc)
-    remaining_shares = remaining_shares_after_sale(held_input, shares)
+    remaining_shares = remaining_shares_after_sale(
+        held_input, shares, whole_shares_only=policy.whole_shares_only
+    )
     # The oversell guard above makes None unreachable for valid state, but
     # refuse rather than manufacture a close/remaining claim if the exact
     # quantity changes or becomes unusable between those calculations.
@@ -237,7 +279,9 @@ def generate_user_directed_sell_proposal(
         expected_impact,
         uncertainties,
         ticker=normalized,
-        shares=shares,
+        # Tax-lot advice is presentation-only and its legacy model is float;
+        # execution identity and every safety calculation retain exact text.
+        shares=float(quantity),
         price=price,
         when=at,
         tax_lot_ledger=tax_lot_ledger,
@@ -246,7 +290,7 @@ def generate_user_directed_sell_proposal(
 
     proposal_id = _stable_id(packet, policy, intent)
     reasons = [
-        f"You chose to sell {shares} of your {held_whole} whole share(s) of "
+        f"You chose to sell {shares} of your {decimal_text(sellable)} sellable share(s) of "
         f"{normalized}.",
         "This is your own instruction, not a project recommendation: nothing "
         "here predicts a price decline, and this project has confirmed zero "
@@ -257,13 +301,16 @@ def generate_user_directed_sell_proposal(
             f"This closes the entire {normalized} position as reported by "
             "this snapshot."
         )
-    elif remaining_shares != Decimal(held_whole - shares):
-        # A fractional remainder is easy to miss because this workflow accepts
-        # whole-share orders only.  Name it explicitly instead of describing
-        # the sale of every whole share as a full close.
+    elif (
+        not policy.whole_shares_only
+        or remaining_shares != Decimal(held_whole) - quantity
+    ):
+        # A fractional remainder is easy to miss, especially in whole-share
+        # mode. Name it explicitly instead of describing the sale of every
+        # whole share as a full close.
         reasons.append(
             f"{decimal_text(remaining_shares)} share(s) of {normalized} remain "
-            "after this whole-share sale."
+            "after this sale."
         )
     return {
         "created": True,

@@ -137,6 +137,7 @@ from assistant.user_directed_sell import (
     remaining_shares_after_sale as _remaining_shares_after_sale,
     sellable_whole_shares as _sellable_whole_shares,
 )
+from assistant.money import decimal_or_none as _decimal_or_none
 from assistant.money import decimal_text as _decimal_text
 from assistant.tax_reporting import (
     TaxReportError,
@@ -2544,20 +2545,25 @@ if page == "Budgeted Buying":
             else []
         )
         planned_spend = sum(e.planned_notional for e in plan)
+        allocation_granularity = (
+            "whole-share" if alloc_policy.whole_shares_only
+            else "fractional-share (up to 9 decimals)"
+        )
 
         with balance_col:
             st.metric("Remaining balance after this purchase", f"${available_cash - planned_spend:,.2f}")
             st.caption(
-                "Reflects the actual whole-share plan below (rounding down, and any tickers skipped for "
-                "not affording 1 share, both leave a bit more cash than a raw percentage split would)."
+                f"Reflects the actual {allocation_granularity} plan below. Quantity rounding and any "
+                "ticker whose allocation cannot buy the minimum quantity can leave more cash than a "
+                "raw percentage split would."
             )
 
         if plan:
             unallocated = dollar_amount - planned_spend
             st.write(
                 f"Requested: **${dollar_amount:,.2f}** -- Planned spend: **${planned_spend:,.2f}** -- "
-                f"Unallocated: **${unallocated:,.2f}** (cap headroom, and/or share-rounding, and/or "
-                "tickers too expensive to buy even 1 share of at this amount)."
+                f"Unallocated: **${unallocated:,.2f}** (cap headroom, quantity rounding, and/or a "
+                "ticker allocation below the minimum permitted quantity)."
             )
             plan_rows = [
                 {
@@ -2574,10 +2580,10 @@ if page == "Budgeted Buying":
                 for e in plan
             ]
             st.write(
-                "**Projected final weight if you approve this split** (matches the ACTUAL whole-share plan "
+                f"**Projected final weight if you approve this split** (matches the ACTUAL {allocation_granularity} plan "
                 "that would be proposed -- includes existing holdings and known pending buy orders; this is "
-                "where you'd catch adding to an already-large position, or a price too high to get even 1 "
-                "share at this amount):"
+                "where you'd catch adding to an already-large position, or an allocation too small to buy "
+                "the minimum permitted quantity):"
             )
             st.dataframe(plan_rows, width="stretch", hide_index=True)
 
@@ -2607,8 +2613,13 @@ if page == "Budgeted Buying":
             st.session_state["allocation_proposals"] = [p.to_dict() for p in alloc_proposals]
             st.session_state["allocation_proposals_signature"] = current_signature
             if not alloc_proposals:
+                minimum_label = (
+                    "1 whole share"
+                    if alloc_policy.whole_shares_only
+                    else "the 0.000000001-share minimum"
+                )
                 st.warning(
-                    "No proposals generated -- the amount may be too small to buy at least 1 share of any "
+                    f"No proposals generated -- the amount may be too small to buy {minimum_label} of any "
                     "cart ticker at its current price."
                 )
 
@@ -3042,14 +3053,11 @@ if page == "Policy Based Selling":
 # SEPARATE pages rather than sections of those, so an owner-directed order
 # never inherits the framing of a budget split or a computed breach.
 #
-# Both offer the same two sizing modes:
-#   * shares  -- an exact whole-share count;
-#   * dollars -- a BUDGET, floored to whole shares at the reference price,
-#                with the unspent remainder always stated.
-# The dollar mode is not a notional/fractional order. This project submits
-# whole-share orders only (enforced independently by the risk gate, the
-# broker adapter, and the sell generator), so a dollar amount is converted
-# once, in exact Decimal, by assistant.discrete_trade.
+# Both offer the same two sizing modes. The active policy determines whether
+# the exact share quantity must be whole or may have up to nine decimal places.
+# Dollar mode remains a BUDGET, not a broker-notional order: it is converted
+# once, in exact Decimal, by assistant.discrete_trade, rounded down at the
+# active granularity, and any unspent remainder is stated.
 #
 # Neither page submits anything: each creates one ordinary proposal that
 # still needs the typed approval phrase and a fresh execution-gate pass.
@@ -3089,13 +3097,21 @@ def _select_discrete_buy_ticker(ticker: str) -> None:
     st.session_state["discrete_buy_ticker"] = ticker
 
 
-def _render_discrete_sizing(mode_key: str, amount_key: str, price, *, max_shares=None):
+def _render_discrete_sizing(
+    mode_key: str,
+    amount_key: str,
+    price,
+    *,
+    max_shares=None,
+    whole_shares_only: bool = True,
+):
     """Shared shares/dollars control pair. Returns (shares, note) or (None, None).
 
     One helper for both pages so the two tabs cannot drift into describing
     the same arithmetic differently.
     """
     from assistant.discrete_trade import notional_for_shares, size_by_dollar_amount
+    from risk.execution_gate import canonical_order_quantity, order_quantity_decimal
 
     mode = st.segmented_control(
         "Size this trade by",
@@ -3115,17 +3131,44 @@ def _render_discrete_sizing(mode_key: str, amount_key: str, price, *, max_shares
         return None, None
 
     if mode == "Share count":
-        shares = int(
-            st.number_input(
+        if whole_shares_only:
+            shares = int(st.number_input(
                 "Shares",
                 min_value=1,
                 max_value=int(max_shares) if max_shares else None,
                 value=1,
                 step=1,
                 key=amount_key + "_shares",
+            ))
+        else:
+            raw_shares = st.text_input(
+                "Shares",
+                value="1",
+                key=amount_key + "_fractional_shares",
+                help="Enter an exact quantity with at most 9 decimal places.",
             )
+            shares = canonical_order_quantity(
+                raw_shares, whole_shares_only=False
+            )
+            if shares is None:
+                st.error(
+                    "Enter a positive share quantity with at most 9 decimal places."
+                )
+                return None, None
+            if max_shares is not None:
+                requested = order_quantity_decimal(
+                    shares, whole_shares_only=False
+                )
+                held = _decimal_or_none(max_shares)
+                if held is None or requested > held:
+                    st.warning(
+                        f"You hold {_decimal_text(held or 0)} share(s). "
+                        "Nothing is proposed because the requested quantity would short the position."
+                    )
+                    return None, None
+        priced = notional_for_shares(
+            shares, price, whole_shares_only=whole_shares_only
         )
-        priced = notional_for_shares(shares, price)
         if not priced["ok"]:
             st.error(priced["reason"])
             return None, None
@@ -3139,25 +3182,37 @@ def _render_discrete_sizing(mode_key: str, amount_key: str, price, *, max_shares
     )
     if dollars <= 0:
         return None, None
-    sized = size_by_dollar_amount(str(dollars), price)
+    sized = size_by_dollar_amount(
+        str(dollars), price, whole_shares_only=whole_shares_only
+    )
     if not sized["ok"]:
         st.warning(sized["reason"])
         return None, None
     sizing = sized["sizing"]
-    if max_shares is not None and sizing.shares > int(max_shares):
+    sized_quantity = order_quantity_decimal(
+        sizing.shares, whole_shares_only=whole_shares_only
+    )
+    held_quantity = _decimal_or_none(max_shares) if max_shares is not None else None
+    if max_shares is not None and (
+        held_quantity is None or sized_quantity > held_quantity
+    ):
         st.warning(
-            f"${dollars:,.2f} is more than you hold. Capping at {int(max_shares)} "
-            "whole share(s) would change the amount you asked for, so nothing is "
+            f"${dollars:,.2f} is more than you hold. Capping at {_decimal_text(held_quantity or 0)} "
+            "share(s) would change the amount you asked for, so nothing is "
             "proposed -- lower the amount or switch to share count."
         )
         return None, None
+    granularity = "whole share(s)" if whole_shares_only else "share(s)"
     note = (
-        f"${dollars:,.2f} buys **{sizing.shares} whole share(s)** at "
+        f"${dollars:,.2f} buys **{sizing.shares} {granularity}** at "
         f"${float(sizing.reference_price_text):,.2f} = "
         f"${float(sizing.notional_text):,.2f}. "
-        f"**${float(sizing.unallocated_text):,.2f} is left over** -- this app "
-        "trades whole shares only, so a dollar amount is a budget, not a "
-        "fractional order."
+        f"**${float(sizing.unallocated_text):,.2f} is left over**. "
+        + (
+            "Whole-share mode rounds down, so a dollar amount is a budget, not a broker-notional order."
+            if whole_shares_only
+            else "Fractional mode rounds down to Alpaca's 9-decimal quantity limit; this remains a quantity order, not a broker-notional order."
+        )
     )
     return sizing.shares, note
 
@@ -3298,7 +3353,8 @@ if page == "Discrete Buying":
                 "(latest recorded close, freshness-checked)."
             )
             _db_shares, _db_note = _render_discrete_sizing(
-                "discrete_buy_mode", "discrete_buy", _db_price
+                "discrete_buy_mode", "discrete_buy", _db_price,
+                whole_shares_only=_db_policy.whole_shares_only,
             )
             if _db_note:
                 st.markdown(_db_note)
@@ -3376,12 +3432,18 @@ if page == "Discrete Selling":
             for p in _ds_packet.portfolio.positions
         }
         _ds_sellable = {
-            ticker: _sellable_whole_shares(quantity)
+            ticker: (
+                _sellable_whole_shares(quantity)
+                if _ds_policy.whole_shares_only
+                else _decimal_or_none(quantity)
+            )
             for ticker, quantity in _ds_held_quantity.items()
         }
-        _ds_options = [t for t, n in _ds_sellable.items() if n > 0]
+        _ds_options = [
+            t for t, n in _ds_sellable.items() if n is not None and n > 0
+        ]
         if not _ds_options:
-            st.info("No holding currently has a whole share available to sell.")
+            st.info("No holding currently has a policy-permitted share quantity available to sell.")
         else:
             _ds_ticker = st.selectbox(
                 "Holding to sell", _ds_options, key="discrete_sell_ticker"
@@ -3390,8 +3452,13 @@ if page == "Discrete Selling":
             _ds_position = next(
                 p for p in _ds_packet.portfolio.positions if p.ticker == _ds_ticker
             )
+            _ds_quantity_label = (
+                f"{_ds_max} whole share(s)"
+                if _ds_policy.whole_shares_only
+                else f"{_decimal_text(_ds_max)} sellable share(s)"
+            )
             st.caption(
-                f"You hold {_ds_max} whole share(s) of {_ds_ticker} at a current "
+                f"You hold {_ds_quantity_label} of {_ds_ticker} at a current "
                 f"price of ${float(_ds_position.current_price):,.2f}."
             )
             _ds_price = (
@@ -3402,12 +3469,14 @@ if page == "Discrete Selling":
             _ds_shares, _ds_note = _render_discrete_sizing(
                 "discrete_sell_mode", "discrete_sell",
                 _ds_price, max_shares=_ds_max,
+                whole_shares_only=_ds_policy.whole_shares_only,
             )
             if _ds_note:
                 st.markdown(_ds_note)
             if _ds_shares:
                 _ds_remaining = _remaining_shares_after_sale(
-                    _ds_held_quantity[_ds_ticker], _ds_shares
+                    _ds_held_quantity[_ds_ticker], _ds_shares,
+                    whole_shares_only=_ds_policy.whole_shares_only,
                 )
                 st.caption(
                     "Selling this quantity closes the position."
@@ -5213,18 +5282,19 @@ if page == "Settings & Features":
                 "production-authoritative evidence -- enabling only allows the "
                 "deterministic generator to be checked; it approves nothing.",
             )
-            proposed_whole_shares = st.checkbox(
+            proposed_whole_shares = st.toggle(
                 "Whole shares only",
                 key="policy_edit_whole_shares_only",
                 help="Authoritative policy, on by default. While ON, every order "
                 "quantity must be a whole number of shares -- enforced independently "
                 "by the risk gate and by the broker adapter, so a code path that "
                 "forgets to ask still refuses. Turning it OFF permits fractional "
-                "quantities for a future automated tool; it does not relax any "
+                "quantities up to 9 decimal places on broker-marked fractionable "
+                "assets; it does not relax any "
                 "position, exposure, cash, freshness, duplicate-order, kill-switch, "
                 "or approval control.",
             )
-            proposed_enforce_reserve = st.checkbox(
+            proposed_enforce_reserve = st.toggle(
                 "Enforce a minimum cash reserve",
                 key="policy_edit_enforce_cash_reserve",
                 help="Unchecking writes a reserve of 0%. That removes the BUFFER, "

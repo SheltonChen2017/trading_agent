@@ -409,6 +409,28 @@ def run_proposal_validation(
             failure_class=deps.failure_infrastructure,
         )
 
+    if not policy.whole_shares_only:
+        try:
+            requested_quantity = deps.to_decimal(
+                intent.shares, name="intent.shares"
+            )
+        except Exception:
+            requested_quantity = deps.decimal_factory("0")
+        if (
+            requested_quantity != requested_quantity.to_integral_value()
+            and not broker_preflight.get("asset", {}).get("fractionable", False)
+        ):
+            return deps.outcome_factory(
+                proposal=proposal,
+                intent=intent,
+                validation=None,
+                error=(
+                    f"{intent.ticker.upper()} is not marked fractionable by the "
+                    "broker; refusing the fractional order before submission."
+                ),
+                broker_preflight=broker_preflight,
+            )
+
     try:
         recent_intents = [deps.intent_from_dict(raw) for raw in store.recent_executed_intents()]
     except Exception as exc:
@@ -528,6 +550,7 @@ def run_proposal_validation(
         pending_buy_value_by_ticker=pending_buy_value_by_ticker,
         available_cash_override=available_cash_override,
         available_buying_power_override=available_buying_power_override,
+        whole_shares_only=policy.whole_shares_only,
     )
     return deps.outcome_factory(
         proposal=proposal,

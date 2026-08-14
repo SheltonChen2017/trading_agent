@@ -23,8 +23,11 @@ on purpose.
 from __future__ import annotations
 
 import inspect
+import json
 import math
 import os
+import urllib.request
+from collections.abc import Mapping
 from decimal import Decimal, InvalidOperation
 from threading import Event, Thread
 from typing import Any, Callable
@@ -33,22 +36,36 @@ from config import PAPER_TRADING
 from risk.execution_gate import (
     ExecutionAuthorization,
     TradeIntent,
-    is_valid_share_quantity,
+    canonical_order_quantity,
+    is_fractional_order_quantity,
+    is_valid_order_quantity,
     verify_execution_authorization,
 )
 
 
-def _require_valid_shares(shares: object) -> None:
+def _require_valid_shares(
+    shares: object, *, whole_shares_only: bool = True
+) -> int | str:
     """Defense in depth (GPT review, 2026-07-29): this module is the last
     line of defense before a real broker call, and must not rely solely
     on validate_trade_intent() having already run correctly -- a plain
     `shares <= 0` check does not reject NaN (every ordered comparison
     against NaN is False in Python), so a NaN share count previously
     reached client.submit_order() with zero protection here."""
-    if not is_valid_share_quantity(shares):
-        raise ValueError(
-            f"shares must be a positive whole number (int), got {shares!r} ({type(shares).__name__})."
+    quantity = canonical_order_quantity(
+        shares, whole_shares_only=whole_shares_only
+    )
+    if quantity is None:
+        requirement = (
+            "a positive whole number (int)"
+            if whole_shares_only
+            else "a positive exact quantity with at most 9 decimal places"
         )
+        raise ValueError(
+            f"shares must be {requirement}, got {shares!r} "
+            f"({type(shares).__name__})."
+        )
+    return quantity
 
 
 class AlpacaNotConfigured(RuntimeError):
@@ -139,24 +156,27 @@ def _optional_iso(value: Any) -> str | None:
 
 def _normalize_order(order: Any) -> dict:
     """Convert every broker order source into one lifecycle-complete shape."""
+    def field(name: str, default=None):
+        return order.get(name, default) if isinstance(order, Mapping) else getattr(order, name, default)
+
     return {
-        "order_id": str(order.id),
-        "client_order_id": getattr(order, "client_order_id", None),
-        "ticker": order.symbol,
-        "shares": _optional_float(getattr(order, "qty", None)),
-        "shares_decimal": _optional_decimal_text(getattr(order, "qty", None)),
-        "side": str(_enum_value(getattr(order, "side", "unknown"))),
-        "type": str(_enum_value(getattr(order, "type", "unknown"))),
-        "limit_price": _optional_float(getattr(order, "limit_price", None)),
-        "limit_price_decimal": _optional_decimal_text(getattr(order, "limit_price", None)),
-        "notional": _optional_float(getattr(order, "notional", None)),
-        "notional_decimal": _optional_decimal_text(getattr(order, "notional", None)),
+        "order_id": str(field("id")),
+        "client_order_id": field("client_order_id"),
+        "ticker": field("symbol"),
+        "shares": _optional_float(field("qty")),
+        "shares_decimal": _optional_decimal_text(field("qty")),
+        "side": str(_enum_value(field("side", "unknown"))),
+        "type": str(_enum_value(field("type", "unknown"))),
+        "limit_price": _optional_float(field("limit_price")),
+        "limit_price_decimal": _optional_decimal_text(field("limit_price")),
+        "notional": _optional_float(field("notional")),
+        "notional_decimal": _optional_decimal_text(field("notional")),
         "time_in_force": (
-            str(_enum_value(order.time_in_force))
-            if getattr(order, "time_in_force", None) is not None
+            str(_enum_value(field("time_in_force")))
+            if field("time_in_force") is not None
             else None
         ),
-        "status": str(_enum_value(getattr(order, "status", "unknown"))),
+        "status": str(_enum_value(field("status", "unknown"))),
         # Replacement-chain identity. Alpaca exposes these on the order schema
         # and in trade-update events; dropping them meant a replacement order
         # could not be traced back to the proposal it superseded, so the
@@ -164,26 +184,24 @@ def _normalize_order(order: Any) -> dict:
         # (GPT review, 2026-07-29). `replaces` is what
         # order_reconciler._proposal_for_update() follows.
         "replaced_by": (
-            str(getattr(order, "replaced_by", None))
-            if getattr(order, "replaced_by", None) is not None else None
+            str(field("replaced_by")) if field("replaced_by") is not None else None
         ),
         "replaces": (
-            str(getattr(order, "replaces", None))
-            if getattr(order, "replaces", None) is not None else None
+            str(field("replaces")) if field("replaces") is not None else None
         ),
-        "replaced_at": _optional_iso(getattr(order, "replaced_at", None)),
-        "filled_qty": _optional_float(getattr(order, "filled_qty", None)),
-        "filled_qty_decimal": _optional_decimal_text(getattr(order, "filled_qty", None)),
-        "filled_avg_price": _optional_float(getattr(order, "filled_avg_price", None)),
+        "replaced_at": _optional_iso(field("replaced_at")),
+        "filled_qty": _optional_float(field("filled_qty")),
+        "filled_qty_decimal": _optional_decimal_text(field("filled_qty")),
+        "filled_avg_price": _optional_float(field("filled_avg_price")),
         "filled_avg_price_decimal": _optional_decimal_text(
-            getattr(order, "filled_avg_price", None)
+            field("filled_avg_price")
         ),
-        "submitted_at": _optional_iso(getattr(order, "submitted_at", None)),
-        "updated_at": _optional_iso(getattr(order, "updated_at", None)),
-        "filled_at": _optional_iso(getattr(order, "filled_at", None)),
-        "canceled_at": _optional_iso(getattr(order, "canceled_at", None)),
-        "expired_at": _optional_iso(getattr(order, "expired_at", None)),
-        "failed_at": _optional_iso(getattr(order, "failed_at", None)),
+        "submitted_at": _optional_iso(field("submitted_at")),
+        "updated_at": _optional_iso(field("updated_at")),
+        "filled_at": _optional_iso(field("filled_at")),
+        "canceled_at": _optional_iso(field("canceled_at")),
+        "expired_at": _optional_iso(field("expired_at")),
+        "failed_at": _optional_iso(field("failed_at")),
     }
 
 
@@ -426,6 +444,66 @@ def _http_get_json(url: str) -> Any:
         return json.loads(response.read())
 
 
+def _http_post_json(url: str, payload: dict[str, Any]) -> Any:
+    """Authenticated JSON POST preserving exact decimal strings.
+
+    The pinned Alpaca SDK coerces ``qty`` to binary ``float``. Fractional
+    quantities therefore use the documented REST representation directly,
+    while whole-share submissions retain the long-tested SDK path.
+    """
+    if not is_configured():
+        raise AlpacaNotConfigured(
+            "APCA_API_KEY_ID / APCA_API_SECRET_KEY are not set; cannot submit an order."
+        )
+    request = urllib.request.Request(
+        url,
+        data=json.dumps(payload, separators=(",", ":")).encode("utf-8"),
+        headers={
+            "APCA-API-KEY-ID": os.environ["APCA_API_KEY_ID"],
+            "APCA-API-SECRET-KEY": os.environ["APCA_API_SECRET_KEY"],
+            "Content-Type": "application/json",
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        return json.loads(response.read())
+
+
+def _orders_base_url() -> str:
+    return (
+        "https://paper-api.alpaca.markets"
+        if PAPER_TRADING
+        else "https://api.alpaca.markets"
+    )
+
+
+def _submit_fractional_order(
+    *,
+    ticker: str,
+    quantity: str,
+    side: str,
+    order_type: str,
+    idempotency_key: str,
+    limit_price: float | None = None,
+) -> dict:
+    payload: dict[str, Any] = {
+        "symbol": ticker,
+        "qty": quantity,
+        "side": side,
+        "type": order_type,
+        "time_in_force": "day",
+        "client_order_id": idempotency_key,
+    }
+    if order_type == "limit":
+        payload["limit_price"] = limit_price
+    response = _http_post_json(f"{_orders_base_url()}/v2/orders", payload)
+    if not isinstance(response, Mapping):
+        raise RuntimeError(
+            f"unexpected order response shape: {type(response).__name__}"
+        )
+    return _normalize_order(response)
+
+
 def list_account_activities(
     *, after: str | None = None, page_size: int = 100
 ) -> list[dict]:
@@ -538,11 +616,12 @@ def run_trade_update_stream(
 
 def submit_market_order(
     ticker: str,
-    shares: int,
+    shares: int | str,
     side: str = "buy",
     *,
     authorization: ExecutionAuthorization | None = None,
     idempotency_key: str,
+    whole_shares_only: bool = True,
 ) -> dict:
     """Submit a day market order. Refuses to run against a live (non-paper)
     account unless CONFIRM_LIVE_TRADING=I_UNDERSTAND is set — flipping
@@ -564,7 +643,9 @@ def submit_market_order(
             "is not set to 'I_UNDERSTAND'. Refusing to submit a live order as a "
             "safety check — set that env var only once you truly mean to trade live."
         )
-    _require_valid_shares(shares)
+    quantity = _require_valid_shares(
+        shares, whole_shares_only=whole_shares_only
+    )
     if side not in ("buy", "sell"):
         raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
     # order_type is stated explicitly rather than relying on TradeIntent's
@@ -572,9 +653,22 @@ def submit_market_order(
     # check below silently depends on it. An implicit default is the wrong
     # thing to lean on in the last-mile authorization reconstruction --
     # see submit_limit_order()'s docstring for why the two are kept apart.
-    intent = TradeIntent(ticker=ticker, shares=shares, side=side, order_type="market")
+    intent = TradeIntent(ticker=ticker, shares=quantity, side=side, order_type="market")
     verify_execution_authorization(intent, authorization)
-    assert_account_and_asset_ready(ticker)
+    readiness = assert_account_and_asset_ready(ticker)
+    if is_fractional_order_quantity(quantity) and not readiness["asset"]["fractionable"]:
+        raise BrokerPreflightError(
+            f"{ticker.upper()} is not marked fractionable by the broker."
+        )
+
+    if is_fractional_order_quantity(quantity):
+        return _submit_fractional_order(
+            ticker=ticker,
+            quantity=str(quantity),
+            side=side,
+            order_type="market",
+            idempotency_key=idempotency_key,
+        )
 
     client = _get_client()
     from alpaca.trading.enums import OrderSide, TimeInForce
@@ -583,7 +677,7 @@ def submit_market_order(
     order = client.submit_order(
         MarketOrderRequest(
             symbol=ticker,
-            qty=shares,
+            qty=quantity,
             side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
             time_in_force=TimeInForce.DAY,
             client_order_id=idempotency_key,
@@ -594,12 +688,13 @@ def submit_market_order(
 
 def submit_limit_order(
     ticker: str,
-    shares: int,
+    shares: int | str,
     limit_price: float,
     side: str = "buy",
     *,
     authorization: ExecutionAuthorization | None = None,
     idempotency_key: str,
+    whole_shares_only: bool = True,
 ) -> dict:
     """Submit a day limit order. Same live-trading confirmation gate and
     authorization check as submit_market_order -- kept as a separate
@@ -617,12 +712,28 @@ def submit_limit_order(
             "is not set to 'I_UNDERSTAND'. Refusing to submit a live order as a "
             "safety check — set that env var only once you truly mean to trade live."
         )
-    _require_valid_shares(shares)
+    quantity = _require_valid_shares(
+        shares, whole_shares_only=whole_shares_only
+    )
     if side not in ("buy", "sell"):
         raise ValueError(f"side must be 'buy' or 'sell', got {side!r}")
-    intent = TradeIntent(ticker=ticker, shares=shares, side=side, order_type="limit", limit_price=limit_price)
+    intent = TradeIntent(ticker=ticker, shares=quantity, side=side, order_type="limit", limit_price=limit_price)
     verify_execution_authorization(intent, authorization)
-    assert_account_and_asset_ready(ticker)
+    readiness = assert_account_and_asset_ready(ticker)
+    if is_fractional_order_quantity(quantity) and not readiness["asset"]["fractionable"]:
+        raise BrokerPreflightError(
+            f"{ticker.upper()} is not marked fractionable by the broker."
+        )
+
+    if is_fractional_order_quantity(quantity):
+        return _submit_fractional_order(
+            ticker=ticker,
+            quantity=str(quantity),
+            side=side,
+            order_type="limit",
+            idempotency_key=idempotency_key,
+            limit_price=limit_price,
+        )
 
     client = _get_client()
     from alpaca.trading.enums import OrderSide, TimeInForce
@@ -631,7 +742,7 @@ def submit_limit_order(
     order = client.submit_order(
         LimitOrderRequest(
             symbol=ticker,
-            qty=shares,
+            qty=quantity,
             side=OrderSide.BUY if side == "buy" else OrderSide.SELL,
             time_in_force=TimeInForce.DAY,
             limit_price=limit_price,

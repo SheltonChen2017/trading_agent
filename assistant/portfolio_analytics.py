@@ -147,11 +147,13 @@ def preview_trade_impact(
     snapshot: PortfolioSnapshot,
     ticker: str,
     side: str,
-    shares: int,
+    shares: int | str,
     reference_price: float,
 ) -> dict:
     ticker_upper = ticker.upper()
-    trade_value = shares * reference_price
+    quantity = to_decimal(shares, name="trade quantity")
+    price_decimal = to_decimal(reference_price, name="reference price")
+    trade_value = float(quantity * price_decimal)
     held_value = sum(
         p.market_value for p in snapshot.positions if p.ticker.upper() == ticker_upper
     )

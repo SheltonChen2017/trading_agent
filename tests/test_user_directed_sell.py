@@ -60,12 +60,13 @@ def _position(ticker="NVDA", shares=10, price=100.0, entry=90.0):
     }
 
 
-def _policy(max_order_value=50_000.0):
+def _policy(max_order_value=50_000.0, *, whole_shares_only=True):
     return TradingPolicy(
         version="test", name="test", execution_mode="paper",
         max_position_pct=1.0, max_total_exposure_pct=1.0, max_basket_pct=1.0,
         max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0,
         max_order_value=max_order_value, allow_new_positions=False,
+        whole_shares_only=whole_shares_only,
     )
 
 
@@ -228,6 +229,28 @@ def test_only_a_real_positive_integer_share_count_is_accepted(shares):
     result = _sell(shares=shares)
     assert result["created"] is False
     assert "whole number greater than zero" in result["reason"]
+
+
+def test_fractional_policy_can_sell_an_exact_fraction_without_shorting():
+    result = _sell(
+        shares="0.125",
+        policy=_policy(whole_shares_only=False),
+        positions=[_position(shares="1.25")],
+    )
+    assert result["created"] is True
+    proposal = result["proposal"]
+    assert proposal.intent.shares == "0.125"
+    assert any("1.125 share(s)" in reason for reason in proposal.reasons)
+
+
+def test_fractional_policy_refuses_one_nano_share_more_than_held():
+    result = _sell(
+        shares="1.250000001",
+        policy=_policy(whole_shares_only=False),
+        positions=[_position(shares="1.25")],
+    )
+    assert result["created"] is False
+    assert "would short" in result["reason"]
 
 
 # --- pricing ---------------------------------------------------------------

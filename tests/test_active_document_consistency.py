@@ -238,6 +238,21 @@ def test_epoch005_deployment_status_is_consistent_in_the_action_plan():
         )
 
 
+def test_current_handoff_records_the_epoch005_roll_and_reviewable_head():
+    """OBR-004: durable state changes require a replaced current handoff."""
+    handoff = _text("SESSION_HANDOFF.md")
+    for stale in (
+        "paper-epoch-004 remains the only active evidence epoch",
+        "remain development changes not deployed into that frozen epoch",
+        "Do not deploy or roll `paper-epoch-004`",
+        "awaiting the owner's merge at handoff",
+    ):
+        assert stale not in handoff, f"current handoff retains pre-roll state: {stale!r}"
+    assert "paper-epoch-005" in handoff
+    assert "4de784e" in handoff
+    assert "1cb8abf" in handoff
+
+
 def test_roll_freshness_guidance_is_conditional_not_universal():
     """OBR-005: freshness expires only after the configured age window."""
     facts = (ROOT / "docs" / "OPERATIONAL_FACTS.md").read_text(encoding="utf-8")

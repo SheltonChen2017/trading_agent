@@ -37,10 +37,12 @@ operator-database mutation, funded-account access, or a scheduled-task change.
   `codex/review-buy1-counterreview-20260813`, created from exact submitted head
   `276b3c2`. Review-record commit `2a0abe4` accepts both submitted commits
   without further product correction.
-- The separate handoff commit follows `2a0abe4` on this branch.
-- The Codex review branch and its commits are **local-only** until the owner
-  explicitly authorizes a push. Do not describe cross-computer Git transfer
-  as complete before that happens.
+- Handoff commit `9b23a7d` follows `2a0abe4` on this branch.
+- The owner explicitly authorized export after the configured destination was
+  identified as `https://github.com/SheltonChen2017/trading_agent`. The Codex
+  review branch is pushed to
+  `origin/codex/review-buy1-counterreview-20260813`; another computer can
+  retrieve the complete review with `git fetch`.
 
 The worktree was clean before review. The deliberate reverse mutation was
 restored byte-for-byte, and the temporary pytest base directory was removed.
@@ -130,9 +132,9 @@ or secret is recorded here.
 
 ## 6. Next step
 
-1. Owner decision whether to authorize pushing and merging
-   `codex/review-buy1-counterreview-20260813` (`2a0abe4` plus this handoff).
-   Review acceptance does not authorize deployment.
+1. Owner decision whether to merge the pushed branch
+   `codex/review-buy1-counterreview-20260813`. Review acceptance and branch
+   publication do not authorize deployment.
 2. Operationally, verify the first scheduled epoch-005 observation after
    16:30 Pacific on 2026-08-14. If absent or refused, use the existing runbook
    and durable alerts; do not manufacture a session or start another epoch to
@@ -147,8 +149,8 @@ docs/REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md (including both appended
 verification sections), and docs/SESSION_HANDOFF.md. Claude's counter-review
 branch user/claude/buy1-counterreview-20260813 was reviewed at exact head
 276b3c2. Codex branch codex/review-buy1-counterreview-20260813 carries review
-record 2a0abe4 plus a separate handoff commit; confirm whether it has since
-been pushed or merged. The operational runtime remains frozen at 752d3b7
+record 2a0abe4 and handoff 9b23a7d, and is pushed to origin; confirm whether it
+has since been merged. The operational runtime remains frozen at 752d3b7
 under paper-epoch-005. Verify the first scheduled epoch-005 observation; do
 not deploy, roll again, begin M4, mutate the operator database, or enable live
 trading without a new explicit owner instruction.

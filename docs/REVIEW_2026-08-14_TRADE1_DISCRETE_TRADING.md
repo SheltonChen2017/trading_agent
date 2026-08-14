@@ -5,11 +5,11 @@ Prepared: 2026-08-14 by Codex
 Review base: `a5d5fe3`
 
 Implementation branch/head: `user/claude/discrete-trading-tabs-20260814` at
-`c1dec52`
+`c638bc7` (`c1dec52` initial implementation plus follow-up)
 
 Review branch: `codex/review-trade1-discrete-tabs-20260814`
 
-Correction commit: `93953ef`
+Correction commits: `93953ef`, then moving-head reconciliation `7ad7f7d`
 
 ## Outcome
 
@@ -20,6 +20,12 @@ converted once with Decimal and floored to whole shares, and both new pages
 still create ordinary proposals behind typed approval and fresh execution-gate
 validation. No live authority, automatic submission, policy bypass, schema, or
 broker-adapter change was introduced.
+
+Claude's follow-up independently restored the moved SELL-1 exact-remainder
+logic, retargeted its five tests, strengthened the sell disclaimer, and named
+both sides of a valid stale-selection mismatch. The review reconciliation
+retains those improvements while also handling the invalid-size case that the
+follow-up still allowed to render as current.
 
 The submitted tree was not complete at its interaction and exact-state
 boundaries. The suggestion picker used a forbidden post-widget session-state
@@ -32,16 +38,20 @@ header and description, uses a segmented sizing control, retains the existing
 safe light/dark palette and severity colors, and removes deprecated width API
 calls. Submitted implementation quality: **6.5/10** — good decomposition and
 safety intent, but several material integration defects escaped the focused
-test selection.
+test selection. The follow-up raised the final assessment to **7/10** by
+catching and correcting two of the initial integration regressions before this
+review closed.
 
 ## Exact snapshot and commit disposition
 
-The complete ordered review range was `a5d5fe3..c1dec52` and contained one
-commit.
+The complete ordered implementation range was `a5d5fe3..c638bc7` and contained
+two commits. The branch advanced during review; `c638bc7` was added to scope
+before closure rather than leaving the earlier snapshot as the reported head.
 
 | Commit | Disposition | Review result |
 |---|---|---|
 | `c1dec52` | **Accepted after correction** | The four-page split, whole-share dollar-budget decision, proposal reuse, approval separation, and documentation direction are sound. TRADE1R-001 through TRADE1R-008 correct interaction, stale-state, exact-number, regression-suite, disclosure, compatibility, overflow, and direct-test gaps. |
+| `c638bc7` | **Accepted after correction** | Correctly restores exact fractional-remainder copy, retargets the five moved SELL-1 tests, and strengthens disclosure and valid-mismatch copy. It retained the truthy-only stale guard, so a zero/invalid size could still leave an old card actionable; `93953ef` plus `7ad7f7d` preserve its improvements and close that remaining direction. |
 
 ## Prioritized issue ledger
 
@@ -51,8 +61,8 @@ Final state: **0 P0, 0 P1, 0 P2, and 0 P3 open**.
 |---|---|---|---|---|---|---|---|---|---|
 | TRADE1R-001 | P2 | Closed | `c1dec52` | `scripts/personal_assistant_ui.py`, Discrete Buying picker | A suggestion button assigned `discrete_buy_ticker` after the text input with that key had already been instantiated. Streamlit forbids that mutation, so the requested click-to-select mechanism could raise instead of filling the ticker. | Source-order audit showed the text input rendered before every button handler; AppTest now drives the real picker callback and asserts the field changes with exactly one explicit provider call. | A primary requested interaction must work and must not turn a benign suggestion click into a page exception. | Move the assignment into a button callback, which Streamlit runs before rebuilding widgets. | Picker AppTest passes, fills NVDA, and confirms zero provider calls before the explicit button and one after it. |
 | TRADE1R-002 | P2 | Closed | `c1dec52` | Discrete buy/sell stored proposal rendering | The stale-card guard compared size only when the current share value was truthy. Switching to dollar mode with a zero/invalid amount returned `None`, bypassed the mismatch, and left an old approve-gated card looking synchronized with controls that described no trade. | Red AppTest: a stored BUY 1 NVDA card remained after switching to the default zero-dollar input. The sell path had the identical condition. | An actionable proposal card must be bound to a valid current ticker and quantity; invalid controls cannot be treated as a match. | Treat `None` as stale and require exact ticker and share equality on both pages; explain why the prior card is hidden. | Green AppTests hide both stored buy and sell cards when dollar input is zero and retain the cards only for exact matches. |
-| TRADE1R-003 | P2 | Closed | `c1dec52` | Discrete Selling price/remainder presentation | Dollar sizing used rounded `current_price` instead of `current_price_exact`, and close-position copy compared the sale only with floored whole shares. A $100 budget at an exact $100.000000000000000001 price incorrectly sized one share, while selling 10 of 10.5 shares could be called a full close. | Red exact-price AppTest produced a one-share sizing instead of refusal. The moved SELL-1 regression exposed the missing 0.5-share remainder when pointed at the new page. | Exact broker evidence outranks a lossy display float, and fractional holdings must never be described as gone. | Size from exact price text when available and compute remaining quantity with SELL-1's reviewed exact helper. | Green tests refuse the exact over-$100 boundary and display `0.5 share(s) would remain`. |
-| TRADE1R-004 | P2 | Closed | `c1dec52` | `tests/test_ui_user_directed_sell.py` | Five existing SELL-1 UI regressions still navigated to Policy Based Selling and old widget keys after the feature moved, making the repository full suite fail and removing effective regression coverage from the new owner-directed page. | Broader focused run: 5 failed, 103 passed; failures showed the direct-sell section and old widgets absent from the policy page. | A milestone is not done when the required full suite fails, and moved safety coverage must follow the production behavior rather than be abandoned. | Retarget the SELL-1 AppTests to Discrete Selling and its new controls while preserving never-short, disclaimer, exact remainder, and stale-card assertions. | Corrected adjacent suite: 108 passed; final full suite: 3,691 passed. |
+| TRADE1R-003 | P2 | Closed | `c1dec52`, `c638bc7` | Discrete Selling price/remainder presentation | Dollar sizing used rounded `current_price` instead of `current_price_exact`, and the initial close-position copy compared the sale only with floored whole shares. A $100 budget at an exact $100.000000000000000001 price incorrectly sized one share, while selling 10 of 10.5 shares could be called a full close. | Red exact-price AppTest produced a one-share sizing instead of refusal. The moved SELL-1 regression exposed the missing 0.5-share remainder when pointed at the new page. | Exact broker evidence outranks a lossy display float, and fractional holdings must never be described as gone. | `c638bc7` restored exact remaining-quantity copy; review additionally sizes from exact price text and retains that wording through `7ad7f7d`. | Green tests refuse the exact over-$100 boundary and display `0.5 share(s) would remain`. |
+| TRADE1R-004 | P2 | Closed | `c1dec52`, `c638bc7` | `tests/test_ui_user_directed_sell.py` | Five existing SELL-1 UI regressions still navigated to Policy Based Selling and old widget keys after the initial move, making the repository full suite fail and removing effective regression coverage from the new owner-directed page. | Broader focused run: 5 failed, 103 passed; failures showed the direct-sell section and old widgets absent from the policy page. | A milestone is not done when the required full suite fails, and moved safety coverage must follow the production behavior rather than be abandoned. | Claude's `c638bc7` retargeted the five tests; review preserves and strengthens their separation/disclaimer assertions. | Corrected adjacent suite and final full suite pass; reconciled buy/sell UI suite: 20 passed. |
 | TRADE1R-005 | P3 | Closed | `c1dec52` | Sidebar page-label migration | An already-open session whose radio value was `Buying` or `Selling` silently reset to Briefing after deployment because the value no longer existed. | Red parametrized AppTests expected the corresponding renamed page and observed Briefing for both legacy values. | Renaming a page should not discard the user's current location. | Map the two legacy values before the navigation widget is instantiated. | Green parametrized AppTests retain Budgeted Buying and Policy Based Selling respectively. |
 | TRADE1R-006 | P3 | Closed | `c1dec52` | Discrete Buying suggestion disclosure | The copied picker omitted BUY-1's source fetch time, cache-age disclosure, and names of candidates that could not be verified. | Diff against the reviewed Budgeted Buying mechanism showed the dropped list was ignored and only row detail was stored. | “Same suggestion mechanism” includes its freshness and omission honesty, not only the ticker buttons. | Store/display source time, UTC display time, 15-minute cache bound, adjacent ticker detail, and dropped candidate names. | AppTest asserts source timestamp, cache bound, BOGUS omission, row detail, explicit-call count, and successful selection. |
 | TRADE1R-007 | P3 | Closed | `c1dec52` | `assistant/discrete_trade.py` | Finite Decimal exponent inputs could overflow during division or attempt an enormous integer conversion, contradicting the helper's refusal contract and taking down a page. | Red unit test with `1e999999999 / 1e-999999999` raised `decimal.Overflow`. | Input validation should fail closed with a usable message rather than crash the UI. | Catch Decimal arithmetic exceptions and bound share conversion before creating a Python integer. | Red overflow reproduced; green test returns a stated “too large” refusal. |
@@ -94,6 +104,16 @@ Environment: Windows repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
 - Corrected full repository suite with a dedicated writable base temp:
   **3,691 passed, 0 failed, 0 skipped, 25 known dependency warnings** in
   731.00 s.
+- After the moving-head copy/test reconciliation, a second full attempt crossed
+  local midnight and finished **3,676 passed / 15 failed / 25 warnings**. The
+  failures were isolated as environment/test-fixture effects outside TRADE-1:
+  four ML immutable-store tests exceeded Windows MAX_PATH only under the
+  overly long base-temp path and immediately passed **9/9** with `.t`; eleven
+  strategy tests generated Aug-14 weekday bars before the Aug-14 NYSE session
+  was in progress, which the production freshness gate correctly refused. No
+  freshness logic was weakened. The exact final TRADE-1/proposal/chrome suite
+  then passed **83/83**, including the reconciled disclosure and stale-card
+  paths.
 - Repository-prescribed `compileall`: clean. `git diff --check`: clean apart
   from expected Windows line-ending notices. Narrow changed-file secret-shape
   scan: no values found; matches were environment-variable names only.
@@ -108,7 +128,8 @@ amount. Most-active suggestions describe volume and same-day direction, not a
 predictive edge. This project still has zero confirmed individual-stock
 selection signal, and neither discrete page changes that.
 
-The next step is independent verification of `93953ef` and the documentation /
-handoff commit that follows it, then owner authorization before any push or
-merge. Nothing in this review authorizes deployment, another epoch roll, M4,
-operator-database mutation, funded trading, or a scheduler change.
+The next step is independent verification of `93953ef`, `7ad7f7d`, and the
+documentation / handoff commits that follow them, then owner authorization
+before any push or merge. Nothing in this review authorizes deployment,
+another epoch roll, M4, operator-database mutation, funded trading, or a
+scheduler change.

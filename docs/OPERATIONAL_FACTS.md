@@ -106,14 +106,16 @@ each merged and independently reviewed before deployment.
 
 Roll-specific facts worth keeping:
 
-- **`readiness` fails on `reconciliation_freshness` during any roll.**
-  `monitor-orders` is disabled, so the order-reconciliation key ages past its
-  5-minute bound within minutes. A one-shot `sync-orders` refreshes it and
-  readiness returns `ready: true`. Expect this; it is not a defect.
-- **The same alert reopens once after re-enabling** for the same reason, then
-  self-clears as OrderMonitor resumes its 30-second polling. Verified: the key
-  was refreshing at 6-second age with 0 errors before the alert was
-  acknowledged.
+- **`readiness` can fail on `reconciliation_freshness` during a roll if the
+  disabled interval exceeds the configured freshness window.** In this roll,
+  `monitor-orders` was disabled long enough for the order-reconciliation key
+  to age past its 5-minute bound. A one-shot `sync-orders` refreshed it and
+  readiness returned `ready: true`. The recovery is expected; a short roll
+  need not encounter the failure at all.
+- **In this roll, the same alert reopened once after re-enabling** for the same
+  reason, then self-cleared as OrderMonitor resumed its 30-second polling.
+  Verified: the key was refreshing at 6-second age with 0 errors before the
+  alert was acknowledged.
 - **The long-runners return via their own 5-minute self-heal trigger**, not
   instantly. Immediately after Enable, OrderMonitor and Watchdog read `Ready`;
   a few minutes later they read `Running`, which is the correct steady state
@@ -168,10 +170,12 @@ production path fixed.** A later live `reconciliation_freshness` alert at
 2026-08-13T05:40:49Z reported `age_seconds=-0.117315, errors=0`: the deployed
 outer `operational_health()` still manufactured an entry clock and passed it
 as explicit to the nested readiness check, disabling that site's post-read
-clock on the production path. The AP-11 repair is merged at `72b6278` but is
-**not deployed** to frozen epoch-004; the running runtime can therefore keep
-emitting this conservative warning until an owner-authorized roll. No
-observation, ledger, reconciliation, or money path is affected.
+clock on the production path. The AP-11 repair was merged at `72b6278` but
+was **not deployed** to frozen epoch-004, so that runtime could keep emitting
+the conservative warning. It subsequently deployed in epoch-005 at
+`752d3b7`; this paragraph records the epoch-004 observation, not current
+deployment state. No observation, ledger, reconciliation, or money path was
+affected.
 
 What this deployment added: CR-W2 dividend/cash-movement ingestion, the AP-7
 site-level freshness code (subject to the undeployed AP-11 orchestration
@@ -451,7 +455,7 @@ stand-up proven once" marker (pinned checkout, dedicated interpreter, full
 suite, installer preview and verifier round-tripped). It is not evidence
 toward any epoch, and it did not start one.
 
-### QC-2 is reviewed development code, not epoch-004 runtime (2026-08-11)
+### QC-2 was reviewed development code outside epoch-004 (2026-08-11)
 
 Claude's QC-2 implementation `f09682f` was merged as PR #192 at `62c8270`;
 Codex accepted it after four P2 corrections in `7fc9db8` on
@@ -464,14 +468,13 @@ family. Storage refuses non-canonical identity or conflicting immutable
 content. Recording remains non-gating and has no proposal, order, policy,
 scheduler, ML/LLM-authority, or live-trading reach.
 
-This review branch is not the deployed epoch lineage. **Do not deploy QC-2
-merely to add research bookkeeping:** `paper-epoch-004` remains active on
-`b837374`, and a deployment would close its accumulated evidence. Any later
-deployment requires a separately authorized epoch roll. See
+At that time, the review branch was not the deployed epoch lineage and QC-2
+was deliberately kept outside `paper-epoch-004`. It subsequently deployed in
+the owner-authorized epoch-005 roll at `752d3b7`. See
 `docs/REVIEW_2026-08-11_QC2_LOOK_COUNTING_REGISTRY.md` for the full ledger and
 validation.
 
-### AP-8 is reviewed development code, not epoch-004 runtime (2026-08-12)
+### AP-8 was reviewed development code outside epoch-004 (2026-08-12)
 
 Claude's ticker-suggestion disclosure implementation `d326a74` was accepted
 after independent correction `7c21339` on
@@ -484,9 +487,9 @@ Briefing disclosure, and the prior IPO-policy import. The strict Buying/
 Watchlist policy is unchanged. This remains research presentation only and
 cannot propose, approve, or place an order.
 
-This branch is not the deployed lineage. `paper-epoch-004` remains active on
-`b837374`; do not deploy AP-8 merely to change a research screen. Any future
-deployment requires a separately authorized epoch roll. See
+At that time, the branch was not the deployed lineage and AP-8 was
+deliberately kept outside `paper-epoch-004`. It subsequently deployed in the
+owner-authorized epoch-005 roll at `752d3b7`. See
 `docs/REVIEW_2026-08-12_AP8_TICKER_SUGGESTION_DISCLOSURE.md` for the complete
 issue ledger and validation.
 

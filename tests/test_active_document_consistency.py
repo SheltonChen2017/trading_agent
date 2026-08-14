@@ -193,6 +193,58 @@ def test_operator_guide_tells_the_reader_to_read_the_installed_trigger():
     assert "does not count toward the 60" in guide
 
 
+def test_epoch005_roll_record_replaces_its_unexecuted_plan():
+    """OBR-001/002: an executed roll cannot remain an actionable draft.
+
+    The submitted tree updated the action-plan summary and operational facts,
+    but left the dedicated roll document saying it was unauthorized and had
+    not executed.  It also named ``paper-epoch-status``, which is not a CLI
+    command.  The retained record must be unmistakably historical and use the
+    real read-only status command.
+    """
+    record = _text("EPOCH_005_ROLL_PLAN.md")
+    for stale in (
+        "NOT YET AUTHORIZED",
+        "Nothing in this document has been executed",
+        "If the roll is authorized",
+        "paper-epoch-status",
+        'The argument against rolling is only ever "we lose accrued evidence"',
+    ):
+        assert stale not in record, f"epoch-005 record retains stale plan text: {stale!r}"
+    assert "executed 2026-08-13" in record.lower()
+    assert "paper-evidence-status" in record
+
+
+def test_epoch005_deployment_status_is_consistent_in_the_action_plan():
+    """OBR-003: detail rows must agree with the epoch-005 roll summary."""
+    raw = (ROOT / "docs" / "ACTION_PLAN_2026-08-02.md").read_text(
+        encoding="utf-8"
+    )
+    prefixes = (
+        "| **Ticker-suggestion disclosure policy (AP-8b)**",
+        "| QC-2 research-look registry |",
+        "| GR-7d |",
+        "| AP-8 |",
+        "| AP-9 |",
+        "| AP-10 |",
+        "| AP-11 |",
+        "| SELL-1 |",
+    )
+    for prefix in prefixes:
+        rows = [line for line in raw.splitlines() if line.startswith(prefix)]
+        assert len(rows) == 1, f"expected exactly one current row starting {prefix!r}"
+        assert "DEPLOYED 2026-08-13" in rows[0], (
+            f"{prefix!r} does not agree with the recorded epoch-005 deployment"
+        )
+
+
+def test_roll_freshness_guidance_is_conditional_not_universal():
+    """OBR-005: freshness expires only after the configured age window."""
+    facts = (ROOT / "docs" / "OPERATIONAL_FACTS.md").read_text(encoding="utf-8")
+    assert "`readiness` fails on `reconciliation_freshness` during any roll" not in facts
+    assert "can fail" in facts.lower() and "reconciliation_freshness" in facts
+
+
 def test_handoff_does_not_describe_the_merged_independent_review_branch_as_stale_topology():
     """Counter-review IPRCR-001 -- the recurrence class IPR-002 itself fixed.
 

@@ -105,3 +105,65 @@ push or merge. Operationally, frozen epoch-005 remains at `752d3b7`; verify
 its first scheduled observation after 16:30 local on 2026-08-14. Nothing in
 this review authorizes deployment, another epoch roll, M4, operator-database
 mutation, funded trading, or a scheduler change.
+
+---
+
+## Counter-review (Claude, 2026-08-13)
+
+Performed after the owner pushed and merged this review branch as **PR #209
+(`df83510`)**, so the verification ran against merged `main` rather than a
+pre-merge branch; any finding therefore becomes a follow-up fix, not a
+pre-merge correction. Commits verified: `44a7f85` (code correction),
+`d25bd3c` (documentation/handoff), `df83510` (merge).
+
+### Commit dispositions
+
+| Commit | Disposition | Counter-review result |
+|---|---|---|
+| `44a7f85` | **Accepted — all findings confirmed** | All three code findings independently re-established red on the exact submitted tree `e0df810` and each correction proven load-bearing by reverse mutation (below). The correction introduces no new defect: every `watchlist_results` consumer (volatility/price/split maps, the proposal controls, and the per-ticker result cards) sits below the new exact-cart guard; the guard warns once and clears, so a rerun cannot loop the warning; and the cart identity is normalized identically (`sorted({t.upper()})`) at store and compare time. `_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS` (900 s) is the same constant the shared loader's `st.cache_data(ttl=...)` uses, so the disclosed cache bound cannot drift from the enforced one. |
+| `d25bd3c` | **Accepted** | The action-plan BUY-1 row, milestone record (two paragraphs per template), and new `test_buy1_current_records_close_the_merged_review` guard are accurate. The handoff's "local-only until the owner authorizes a push" was true when written and was obsoleted by the owner's PR #209 merge, not by an error in the commit; the follow-up handoff in this counter-review round records the merged topology. |
+| `df83510` | **Accepted** | Merge-only; same tree as `d25bd3c` (verified by tree comparison). |
+
+### Per-finding verification
+
+| ID | Verdict | Independent evidence |
+|---|---|---|
+| BUY1R-001 (P2, stale checked-cart state) | **Confirmed** | Red reproduced on `e0df810`: after seeding a checked NVDA result and adding UPUP via the picker, no "cart changed" warning rendered and the stale result stayed active (the only warnings on the page were the policy and sample-portfolio banners). Mutation: forcing the guard condition false on merged `main` reddened `test_adding_a_suggestion_hides_results_checked_for_the_old_cart`; restoring passed. The fail-closed direction (legacy identity-less state also clears) is correct. |
+| BUY1R-002 (P2, flat/unknown rows not clickable) | **Confirmed** | Red reproduced on `e0df810` (`Add FLAT` lookup fails). Mutation: removing the flat/unknown render loop on merged `main` reddened `test_every_verified_row_is_clickable_including_flat_candidates`; restoring passed. One generalized instance found — BUY1CR-001 below. |
+| BUY1R-003 (P3, click time hid source freshness) | **Confirmed** | Red reproduced on `e0df810` (no "Source data fetched at" caption). Mutation: restoring the old "Loaded at" caption on merged `main` reddened `test_picker_distinguishes_source_fetch_time_from_display_time`; restoring passed. `fetched_at` is one ISO-UTC string per loader batch, so the string-sorted min/max range is well-ordered. |
+| BUY1R-004 (P3, stale current records) | **Confirmed** | Red reproduced on `e0df810` + pre-correction docs: `test_buy1_current_records_close_the_merged_review` failed on both stale phrases. Green on merged `main`. |
+
+### Counter-review finding
+
+| ID | Priority | Status | Location | Issue | Correction |
+|---|---|---|---|---|---|
+| BUY1CR-001 | P3 | **Closed at `2fe6747`** | `scripts/personal_assistant_ui.py`, `_render_most_active_by_direction` (dedicated Ticker Suggestions page) | Generalized instance of BUY1R-002's principle, on the page AP-8 is actually about: flat and unavailable-change most-active rows were named by bare ticker in a caption while their `detail` — the AP-8 volume / price-change / below-usual-floor measurements — rendered only for advancing and declining rows. Direction was acting as a disclosure gate. Same "fixed on one consumer only" class as AP8CR-001. Display-only page, no authority impact: P3. | Both buckets keep their separate captions (a real +0.00% print is not missing data) and each now renders the same per-row detail table the directional columns use. Regression `test_flat_and_unknown_rows_disclose_their_detail_like_directional_rows` failed red before the fix (no dataframe carried FLAT) and passes after; the existing source-level copy guards in `test_recommended_stocks.py` pass unchanged. |
+
+No further instance of the class was found: the Briefing renders all
+most-active rows in one detail table without a direction split, and the
+Buying picker was corrected by BUY1R-002 itself.
+
+### Validation
+
+Environment: repository `.venv`, Python 3.13.14 / Streamlit 1.60.0, this
+development checkout.
+
+- Red proofs on submitted tree `e0df810`: **4 failed as intended** (three UI
+  regressions + the current-records guard).
+- Reverse mutations on merged `main`: **3/3 caught**, tree restored clean
+  after each.
+- Focused suites after BUY1CR-001 fix: **69 passed** across
+  `test_ui_ticker_suggestions.py`, `test_recommended_stocks.py`,
+  `test_ui_buying_suggestion_picker.py`; **42 passed** across
+  `test_ui_buying_suggestion_picker.py`, `test_ui_allocation_review.py`,
+  `test_active_document_consistency.py` before the fix.
+- Full repository suite on the code-final tree (`2fe6747`): **3,635 passed,
+  0 failed, 0 skipped, 25 known dependency warnings**.
+- Complete active-document suite re-run on the final tree after the
+  documentation commit: **26 passed**.
+- `python -m compileall` clean; `git diff --check` clean.
+
+No broker request, funded-account action, operator-database mutation,
+deployment, scheduled-task change, or live order occurred. Frozen epoch-005
+at `752d3b7` is untouched; BUY-1, `44a7f85`, and `2fe6747` remain
+development-only code.

@@ -3442,6 +3442,30 @@ if page == "Discrete Selling":
         _ds_options = [
             t for t, n in _ds_sellable.items() if n is not None and n > 0
         ]
+        # SET1CR-001: under "Whole shares only" the sellable quantity is
+        # FLOORED, so a holding of 0.5 shares floors to 0 and disappears from
+        # this page entirely -- no row, no warning, no way to sell it. Stock
+        # you own must never silently vanish from the one page that sells it.
+        # The remedy is authorized and already exists (turn the setting off),
+        # so the honest thing is to name both the holding and the remedy.
+        _ds_hidden = [
+            (ticker, _decimal_or_none(quantity))
+            for ticker, quantity in _ds_held_quantity.items()
+            if ticker not in _ds_options
+            and _decimal_or_none(quantity) is not None
+            and _decimal_or_none(quantity) > 0
+        ]
+        if _ds_hidden:
+            st.warning(
+                "Held below one whole share and therefore not sellable while "
+                "**Whole shares only** is on: "
+                + ", ".join(
+                    f"{ticker} ({_decimal_text(quantity)})"
+                    for ticker, quantity in _ds_hidden
+                )
+                + ". Turn that setting off in Settings & Features to close "
+                "these positions."
+            )
         if not _ds_options:
             st.info("No holding currently has a policy-permitted share quantity available to sell.")
         else:
@@ -3461,6 +3485,25 @@ if page == "Discrete Selling":
                 f"You hold {_ds_quantity_label} of {_ds_ticker} at a current "
                 f"price of ${float(_ds_position.current_price):,.2f}."
             )
+            # SET1CR-001: the same floor, one level down. With 10.5 held the
+            # line above says "10 whole share(s)", which is not what the owner
+            # holds. Selling all 10 then reports "closes the position" while
+            # 0.5 remains. State the remainder and how to release it.
+            _ds_exact_held = _decimal_or_none(_ds_held_quantity[_ds_ticker])
+            _ds_stranded = (
+                _ds_exact_held - _ds_max
+                if _ds_policy.whole_shares_only
+                and _ds_exact_held is not None
+                and _ds_exact_held > _ds_max
+                else None
+            )
+            if _ds_stranded:
+                st.caption(
+                    f"A further {_decimal_text(_ds_stranded)} share(s) are "
+                    "held but cannot be sold while **Whole shares only** is "
+                    "on. Turn that setting off in Settings & Features to "
+                    "close the position completely."
+                )
             _ds_price = (
                 _ds_position.current_price_exact
                 if _ds_position.current_price_exact is not None

@@ -33,12 +33,57 @@ guarantees all three:
    app (a long-lived terminal otherwise hands the app the old, revoked
    key and Alpaca answers `unauthorized`).
 
-**Development preview** (a throwaway view of unreleased code — never for
-real paper trading, because it is not the frozen runtime):
+### Running the development version to try new features
+
+Use this when you want to see a feature that has been built but not yet
+deployed. It runs your development folder, which changes daily, so it is for
+*trying things* — never for real paper trading, because it is not the frozen
+runtime the evidence epoch is pinned to.
 
 ```powershell
+pwsh -NoProfile -File C:\git\customizedAgent\trading_agent\scripts\launch_dev_app.ps1
+```
+
+Then open <http://localhost:8501>. It will look like the real app, with its
+own empty set of proposals and history, and it prints which database it
+opened so you can confirm at a glance. Stop it with `Ctrl+C`.
+
+There is a second boundary this launcher cannot enforce for you. The
+*database* is separate, but the **Alpaca paper account is the same one** the
+operational runtime uses. Browsing, creating proposals, and previewing sizing
+are all safe. Approving and submitting is not: that sends a real order to the
+shared paper account, and it will appear in the active epoch's broker record
+even though this database is separate. Try the screens; do not complete a
+trade here.
+
+If you prefer to run it by hand, the launcher is doing exactly this:
+
+```powershell
+$env:TRADING_ASSISTANT_DB = "C:\git\customizedAgent\trading_agent\data\dev_scratch.db"
 python -m streamlit run scripts\personal_assistant_ui.py
 ```
+
+**Set that first line every time.** This is the one genuinely dangerous
+mistake in this document, and it is silent. The operator database lives at
+`data\trading_assistant.db` *inside the development folder*, and that is also
+the default the app falls back to when the variable is unset — so launching
+the development app without it opens the **live operator database**, the one
+holding the active epoch's real paper-trading record. Simply opening it
+applies whatever schema migrations the development code carries, which the
+frozen runtime does not have. Nothing warns you, and the app looks correct
+either way.
+
+Two habits that make this safe:
+
+* the variable is set **per terminal**, so a fresh window has forgotten it —
+  set it again rather than assuming;
+* `dev_scratch.db` is disposable. If it gets confusing, close the app and
+  delete the file; a new empty one is created on the next launch. Never
+  delete or "clean up" `trading_assistant.db`.
+
+The operational launcher is unaffected — it sets the operator path itself on
+every run, so `launch_trading_app.ps1` always reaches the right database no
+matter what your terminal has in it.
 
 **Setting this up on another computer:** run
 `pwsh -NoProfile -File scripts\setup_operational_host.ps1` once. It creates
@@ -128,6 +173,17 @@ created under the old one.
   Discrete Buying, and Discrete Selling all follow the active setting; exact
   decimal text is preserved through proposal storage, approval, submission,
   and reconciliation.
+
+  One consequence worth knowing before you turn it back ON. The setting
+  applies to selling as well as buying, so any fraction you already hold —
+  whether you bought it here, or it arrived from a dividend reinvestment or a
+  corporate action — cannot be sold while it is ON. If you hold 10.5 shares,
+  Discrete Selling offers 10 and tells you the remaining 0.5 is held but not
+  sellable; if you hold less than one whole share, the page warns you the
+  holding exists rather than hiding it. In both cases the way to close the
+  position completely is to turn this setting off first. Nothing is stuck
+  permanently, but the app will not quietly floor your holding and let you
+  believe you sold all of it.
 * **Enforce a minimum cash reserve** — unchecking writes a reserve of 0%.
   That removes the *buffer*, not the solvency check: an order that would take
   your cash balance negative is still refused. There is deliberately no

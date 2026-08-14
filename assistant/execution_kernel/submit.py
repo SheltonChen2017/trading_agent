@@ -27,7 +27,7 @@ from assistant.execution_kernel.errors import (
     ProposalClaimLostError,
     ProposalExecutionError,
 )
-from assistant.money import MoneyInput
+from assistant.money import MoneyInput, to_decimal
 from assistant.order_lifecycle import (
     journal_broker_order_update,
     proposal_status_for_order,
@@ -53,7 +53,15 @@ def _execution_budget_notional(
     remains at the reference price so a risk-reducing order is not blocked
     merely because its limit is above the quote.
     """
-    return Decimal(intent.shares) * worst_case_fill_price_decimal(
+    # SET1CR-004: `intent.shares` became `int | str` when fractional
+    # quantities started travelling as canonical decimal text. Bare
+    # `Decimal(<str>)` accepts "NaN"/"Infinity" and raises InvalidOperation --
+    # an ArithmeticError, not a ValueError -- on malformed text, so it escapes
+    # the ValueError handlers around this call. A NaN here would poison the
+    # daily-budget reservation, which is precisely the FPS-001/CFPS-001 class
+    # of defect this repository has already paid for three times. The intent
+    # is validated before this runs; this is the defense-in-depth copy.
+    return to_decimal(intent.shares, name="intent.shares") * worst_case_fill_price_decimal(
         intent, reference_price
     )
 

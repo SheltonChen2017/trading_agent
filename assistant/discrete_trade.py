@@ -30,7 +30,11 @@ import dataclasses
 from decimal import ROUND_FLOOR, Decimal, DecimalException
 
 from assistant.money import decimal_or_none, decimal_text
-from risk.execution_gate import canonical_order_quantity, order_quantity_decimal
+from risk.execution_gate import (
+    MAX_ORDER_QUANTITY,
+    canonical_order_quantity,
+    order_quantity_decimal,
+)
 
 
 # Keep the conversion bounded before Decimal is converted to a Python int.
@@ -38,7 +42,13 @@ from risk.execution_gate import canonical_order_quantity, order_quantity_decimal
 # otherwise overflow during division or attempt an enormous integer
 # allocation. This is far beyond a broker-representable whole-share order;
 # the UI must refuse it as input, not lose the entire page.
-_MAX_SIZABLE_SHARES = Decimal(2**63 - 1)
+#
+# SET1CR-002: the bound itself now lives with the quantity authority in
+# `risk.execution_gate`, because sizing something the gate would then refuse
+# (or vice versa) is exactly the drift this project consolidates away. The
+# alias is kept so this module's existing call sites and their tests keep
+# reading in local terms.
+_MAX_SIZABLE_SHARES = MAX_ORDER_QUANTITY
 
 
 @dataclasses.dataclass(frozen=True)

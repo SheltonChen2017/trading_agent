@@ -152,6 +152,13 @@ def is_valid_order_quantity(value: object, *, whole_shares_only: bool = True) ->
     ) is not None
 
 
+#: Upper bound on any order quantity, whole or fractional. This is the single
+#: definition of the rule -- `assistant/discrete_trade.py` imports it rather
+#: than keeping the second copy it used to own, so dollar-sizing and the gate
+#: cannot drift apart about what "too large to be real" means.
+MAX_ORDER_QUANTITY = Decimal(2**63 - 1)
+
+
 def order_quantity_decimal(
     value: object, *, whole_shares_only: bool = True
 ) -> Decimal | None:
@@ -163,7 +170,13 @@ def order_quantity_decimal(
     in both modes; fractional values travel as ``Decimal`` or decimal text.
     """
     if whole_shares_only:
-        return Decimal(value) if is_valid_share_quantity(value) else None
+        if not is_valid_share_quantity(value):
+            return None
+        # SET1CR-002: a plain `int` reaches this branch unbounded, so the
+        # magnitude rule has to be applied on BOTH sides or strict mode --
+        # the default, and the stricter one -- would be the permissive one.
+        whole = Decimal(value)
+        return whole if whole <= MAX_ORDER_QUANTITY else None
     if isinstance(value, bool) or isinstance(value, float):
         return None
     if not isinstance(value, (int, str, Decimal)):
@@ -174,6 +187,15 @@ def order_quantity_decimal(
     normalized = quantity.normalize()
     decimal_places = max(0, -normalized.as_tuple().exponent)
     if decimal_places > 9:
+        return None
+    # SET1CR-002: bound the MAGNITUDE here, not only the precision. Without
+    # this, `1E+1000` satisfied both tests above (it is positive and has zero
+    # decimal places) and became a 1001-digit integer in canonical proposal
+    # JSON. Nothing downstream was unsafe -- the max-order-value check refuses
+    # it on notional -- but a quantity authority that answers "valid" for a
+    # quantity no broker could ever accept is the wrong boundary to trust, and
+    # the durable artifact is written before that downstream refusal.
+    if quantity > MAX_ORDER_QUANTITY:
         return None
     return quantity
 

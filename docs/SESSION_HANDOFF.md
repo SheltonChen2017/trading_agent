@@ -1,8 +1,9 @@
-# Session handoff — SET-1 independently reviewed and corrected
+# Session handoff — SET-1 reviewed, corrected, merged, and counter-reviewed
 
-Prepared: 2026-08-14 by Codex after reviewing Claude's TRADE-1
-counter-review integration and owner-configurable whole-share/cash-reserve
-settings.
+Prepared: 2026-08-14 by Claude after counter-reviewing Codex's independent
+SET-1 review, which built the fractional-share order path end to end.
+Supersedes the pre-merge version of this file: PR #217 has since merged the
+correction, so the topology below is the merged one.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -10,11 +11,12 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
-3. `docs/REVIEW_2026-08-14_SET1_SETTINGS_AND_FRACTIONAL_TRADING.md`
-4. `docs/REVIEW_2026-08-14_TRADE1_DISCRETE_TRADING.md`
-5. `docs/REVIEW_2026-08-13_OBSERVATION_CLOCK_AND_EPOCH005_ROLL.md`
-6. `docs/OPERATIONAL_FACTS.md`
-7. `docs/OPERATIONS_RUNBOOK.md`
+3. `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`
+4. `docs/REVIEW_2026-08-14_SET1_SETTINGS_AND_FRACTIONAL_TRADING.md`
+5. `docs/REVIEW_2026-08-14_TRADE1_DISCRETE_TRADING.md`
+6. `docs/REVIEW_2026-08-13_OBSERVATION_CLOCK_AND_EPOCH005_ROLL.md`
+7. `docs/OPERATIONAL_FACTS.md`
+8. `docs/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes merge, push, deployment, an evidence-epoch roll, M4,
 live trading, funded-account access, operator-database mutation, or a
@@ -23,20 +25,24 @@ scheduled-task change.
 ## 1. Repository topology and remote availability
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Current `main` and `origin/main`: `cfed8c8` (PR #214).
-- Active review branch:
-  `codex/review-set1-settings-toggles-20260814`, based on exact main
-  `cfed8c8`.
-- Product/test correction: `89156b7`.
-- Review report, Action Plan, and milestone record: `6b944ac`.
-- Reconstructed handoff: `d4d43cf`.
-- Publication-state update: the commit containing this version of the file.
-- **PUSHED AND REMOTELY RETRIEVABLE:** the active branch tracks
-  `origin/codex/review-set1-settings-toggles-20260814`. The owner explicitly
-  authorized publication on 2026-08-14; the remote ref resolved to `d4d43cf`
-  before this publication-state update. Another computer can retrieve the
-  complete review with `git fetch`. Publication does not authorize merge or
-  deployment.
+- Current `main` and `origin/main`: `ca0cdf0` (PR #217), which merged the
+  SET-1 independent correction. The previous head `cfed8c8` (PR #214) is now
+  an ancestor.
+- Codex's SET-1 review branch `codex/review-set1-settings-toggles-20260814`
+  is MERGED. Its product/test correction is `89156b7`; its records are
+  `6b944ac`, `d4d43cf`, and `55a1110`.
+- Active branch: `user/claude/set1-counterreview-20260814`, based on exact
+  main `ca0cdf0`. It carries the counter-review corrections
+  SET1CR-001 … SET1CR-004 and `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`.
+- Merged-branch cleanup ran on 2026-08-14: twelve merged branches were
+  deleted (five local, seven remote). Two unmerged branches were deliberately
+  KEPT and are content-redundant with `main`:
+  `user/claude/discrete-trading-tabs-20260814` (its three fixes exist in
+  `main` in Codex's better form, which additionally handles the
+  no-valid-selection case) and
+  `codex/review-observation-clock-roll-20260813` (its substantive commit
+  `1cb8abf` is in `main`; only an obsolete push-status paragraph is unique).
+  Neither should be merged; both can be deleted.
 
 Merged source history reviewed from the previously accepted base `a5d5fe3`:
 
@@ -125,6 +131,22 @@ Environment: repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
   epoch-roll anchors `4de784e` / `1cb8abf` and the completed BUY-1 review
   branch/hash. No production, policy, broker, execution, or UI test failed.
 - Post-correction active-document suite: **26 passed**.
+
+Counter-review (`user/claude/set1-counterreview-20260814`), 2026-08-14:
+
+- New suite `tests/test_set1_counterreview.py`: **15 passed**.
+- Mutation testing: **5 of 5** corrections detected; each fix reverted
+  individually, the intended test confirmed to fail, original bytes
+  restored in a `finally`, restoration verified with `git diff`.
+- Full repository suite: **3,752 passed / 1 failed** in 848.07 s; the
+  failure was this session's own handoff wording tripping the
+  merged-commit-reachability guard, since reworded.
+- Affected suites re-run after documentation edits: **196 passed**.
+- An earlier full run reported 2 failures in
+  `tests/test_risk_check_registry.py`; that run overlapped edits to
+  `risk/execution_gate.py` and those tests read source from disk. They
+  pass on the settled tree. A suite run concurrent with edits validates
+  nothing.
 - Repository `compileall`: clean. `git diff --check` and staged checks: clean
   apart from expected Windows line-ending notices.
 
@@ -180,16 +202,31 @@ or secret is recorded here.
 
 ## 6. Next authorized step
 
-1. Independently verify `89156b7`, `6b944ac`, and the handoff commit containing
-   this file on a separate verification branch.
-2. The branch is published. If verification is accepted, obtain explicit
-   owner authorization before merging it. Publication and acceptance do not
-   authorize deployment.
-3. If the owner later requests deployment, treat the policy-fingerprint change
+1. Independently verify the counter-review branch
+   `user/claude/set1-counterreview-20260814` (corrections SET1CR-001 …
+   SET1CR-004 plus `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`). Codex's
+   `89156b7`/`6b944ac`/`d4d43cf`/`55a1110` are already in `main` at `ca0cdf0`.
+   Treat them as merged history, not as work awaiting review.
+2. Answer the one open design question recorded in the counter-review: should
+   strict mode permit a fractional sell that closes an ENTIRE remaining
+   position? It cannot increase exposure and is the canonical risk-reducing
+   action, but it would widen what "Whole shares only" permits across four
+   deliberately independent layers. This is an owner decision. Until it is
+   answered, the shipped behaviour is: the floor stands, the stranded
+   remainder is disclosed, and turning the setting off is the remedy.
+3. The owner's stated sequencing is to finish every wanted feature first, then
+   perform ONE deployment carrying all of it, then run roughly 60 sessions
+   untouched. Epoch-005 is expendable and its closure by the fingerprint
+   change is expected, not a problem to work around.
+4. If the owner later requests deployment, treat the policy-fingerprint change
    as an epoch-closing lineage change and follow the operations runbook; do not
    preserve epoch-005 by pretending the safe default is immaterial.
-4. Separately, when requested, perform read-only verification of the scheduled
+5. Separately, when requested, perform read-only verification of the scheduled
    epoch-005 observation. Do not infer it from this development review.
+6. Still open from TRADE-1: `TRADE1CR-002`, the date-dependent fixtures in
+   `tests/test_strategy_proposals_generic.py` that make the full suite
+   unpassable between roughly 00:00 and 09:30 ET. It belongs on its own
+   branch and is unrelated to SET-1.
 
 Do not begin M4, mutate the operator database, alter scheduled tasks, access a
 funded account, enable live trading, deploy, or roll an epoch without a new
@@ -199,15 +236,21 @@ explicit owner instruction.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/REVIEW_2026-08-14_SET1_SETTINGS_AND_FRACTIONAL_TRADING.md, and
-docs/SESSION_HANDOFF.md. origin/main is cfed8c8. Review branch
-codex/review-set1-settings-toggles-20260814 contains product correction
-89156b7, review records 6b944ac, reconstructed handoff d4d43cf, and the
-publication-state commit containing this version. The branch is pushed and
-tracks origin/codex/review-set1-settings-toggles-20260814. Independently verify
-those commits before any owner-authorized merge. The operational runtime
-remains frozen at 752d3b7 under paper-epoch-005; its current observation count
-was not remeasured. Do not deploy, roll the epoch, begin M4, mutate the operator
-database, alter scheduled tasks, access a funded account, or enable live
-trading without explicit owner authorization.
+docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md, and docs/SESSION_HANDOFF.md.
+origin/main is ca0cdf0 (PR #217), which merged Codex's SET-1 correction
+89156b7 -- that work is MERGED, not pending. The open branch is
+user/claude/set1-counterreview-20260814, carrying counter-review corrections
+SET1CR-001 (a fractional holding was silently unsellable and invisible in
+Discrete Selling), SET1CR-002 (the quantity authority bounded precision but
+not magnitude), SET1CR-003 (a broad handler substituted Decimal("0") and
+skipped the fractionable check; not reachable through a durable proposal),
+and SET1CR-004 (a bare Decimal(<str>) conversion in the daily-budget path).
+One design question is deliberately left to the owner: whether strict mode
+should permit a fractional sell that closes an entire remaining position.
+Do not merge the two surviving unmerged branches -- both are content-redundant
+with main. The operational runtime remains frozen at 752d3b7 under
+paper-epoch-005; its current observation count was not remeasured. Do not
+deploy, roll the epoch, begin M4, mutate the operator database, alter
+scheduled tasks, access a funded account, or enable live trading without
+explicit owner authorization.
 ```

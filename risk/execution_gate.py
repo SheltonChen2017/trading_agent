@@ -121,6 +121,42 @@ def is_valid_share_quantity(value: object) -> bool:
     return isinstance(value, int) and not isinstance(value, bool) and value > 0
 
 
+def is_valid_order_quantity(value: object, *, whole_shares_only: bool = True) -> bool:
+    """True iff `value` is a submittable order quantity under the policy.
+
+    `whole_shares_only=True` (the DEFAULT, and the project's behavior since
+    inception) delegates unchanged to `is_valid_share_quantity`.
+
+    `False` additionally accepts a positive finite fractional quantity,
+    expressed as `Decimal` or a decimal string. Owner request 2026-08-14,
+    gated on `TradingPolicy.whole_shares_only`.
+
+    The default is strict on purpose and is repeated at every call site
+    rather than centralised in one mutable place: a caller that forgets to
+    thread the policy flag through gets a refusal, never a fractional order.
+    That is the same reason `execution/alpaca_broker.py` keeps its own copy
+    of the whole-share check instead of trusting the gate to have run.
+
+    `float` stays rejected in BOTH modes. Allowing fractions is not a licence
+    to reintroduce binary floating point into an order quantity: `0.1 + 0.2`
+    is not `0.3`, and the 2026-08-13 review (SELREV-001/002) found exactly
+    that class of defect twice in one day. Fractional callers must present an
+    exact `Decimal` or its string form.
+    """
+    if whole_shares_only:
+        return is_valid_share_quantity(value)
+    if isinstance(value, bool):
+        return False
+    if isinstance(value, int):
+        return value > 0
+    if isinstance(value, float):
+        return False
+    if isinstance(value, (str, Decimal)):
+        quantity = decimal_or_none(value)
+        return quantity is not None and quantity > 0
+    return False
+
+
 class ViolationCode(str, enum.Enum):
     """Stable, machine-checkable identity for each violation type -- the
     security-relevant data authorize_overridden_trade_intent() below

@@ -107,6 +107,21 @@ class TradingPolicy:
     allowed_order_types: tuple[str, ...] = ("market", "limit")
     allow_new_positions: bool = False
     enable_strategy_proposals: bool = False
+    # Owner request 2026-08-14. True keeps this project's long-standing
+    # whole-share-only ordering; False permits fractional quantities.
+    #
+    # This lives in the POLICY, not in UI preferences, because it decides
+    # what the system may execute. That makes it part of the fingerprint
+    # bound into every evidence epoch, so the record shows which share
+    # granularity was in force -- evidence gathered under fractional
+    # ordering must never silently pool with evidence gathered without it.
+    # Adding the field changes the fingerprint even at its safe default, so
+    # DEPLOYING it closes the active epoch; that is correct, not a defect.
+    #
+    # Default True, and every enforcement point defaults the same way
+    # independently, so a call site that forgets to pass it refuses rather
+    # than admitting a fractional order.
+    whole_shares_only: bool = True
     notes: str = ""
 
     SUPPORTED_SIDES = ("buy", "sell")
@@ -254,9 +269,17 @@ def policy_with_updated_flags(
     *,
     allow_new_positions: bool | None = None,
     enable_strategy_proposals: bool | None = None,
+    whole_shares_only: bool | None = None,
+    min_cash_reserve_pct: float | None = None,
 ) -> TradingPolicy:
-    """Return a NEW validated policy with the requested boolean policy flags
+    """Return a NEW validated policy with the requested policy fields
     changed and the version bumped.
+
+    `whole_shares_only` and `min_cash_reserve_pct` were added 2026-08-14 for
+    the Settings toggles. The cash reserve deliberately reuses the EXISTING
+    numeric field rather than gaining a companion boolean: 0 already means
+    "no reserve", and a number plus a flag that both encode one rule is one
+    refactor away from disagreeing.
 
     Exists for the UI's protected policy-update workflow
     (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md section 3.1): these two
@@ -270,7 +293,7 @@ def policy_with_updated_flags(
     that still bumped the version would invalidate every pending proposal
     for no behavioral reason.
     """
-    changes: dict[str, bool] = {}
+    changes: dict[str, object] = {}
     if allow_new_positions is not None and allow_new_positions != policy.allow_new_positions:
         changes["allow_new_positions"] = allow_new_positions
     if (
@@ -278,6 +301,15 @@ def policy_with_updated_flags(
         and enable_strategy_proposals != policy.enable_strategy_proposals
     ):
         changes["enable_strategy_proposals"] = enable_strategy_proposals
+    if whole_shares_only is not None and whole_shares_only != policy.whole_shares_only:
+        changes["whole_shares_only"] = whole_shares_only
+    if (
+        min_cash_reserve_pct is not None
+        and float(min_cash_reserve_pct) != float(policy.min_cash_reserve_pct)
+    ):
+        # validate() enforces the 0..1 bound; an out-of-range value must
+        # raise there rather than be silently clamped here.
+        changes["min_cash_reserve_pct"] = float(min_cash_reserve_pct)
     if not changes:
         raise ValueError(
             "No policy change requested: the proposed values match the active policy."

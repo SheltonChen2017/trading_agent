@@ -100,6 +100,17 @@ own evidence-labelled findings), then either propose them individually or
 size a whole inverse-volatility split and submit it as one preflighted,
 resumable batch.
 
+Three ways to fill the cart: pick from common tickers, type any ticker, or
+open **"Or pick from ticker suggestions"** and click a name from the
+most-active screen. That third source runs only when you press its button —
+never on page load — and shows the same rows as the Ticker Suggestions tab,
+split by today's price direction. Read each row's detail before adding it:
+that screen deliberately applies **none** of the project's usual size, age,
+price, or liquidity floors, which is why a very new or very cheap listing
+can appear there. The cart repeats which tickers arrived that way. Adding
+one buys nothing — the split, the proposal, and the typed approval are all
+still separate steps.
+
 Deliberately absent: any probability-of-profit number. The app will not
 invent one.
 

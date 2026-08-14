@@ -552,22 +552,50 @@ def test_no_document_calls_a_merged_commit_unreachable():
 
 
 def test_sell1_current_records_do_not_reopen_merged_review_work():
-    """SELL-1 reached main before its independent review was requested."""
+    """SELL-1 reached main before its independent review was requested.
+
+    Scoped to SELL-1's own ledger row (amended 2026-08-13 when BUY-1 was
+    added). The first version banned the literal "PENDING INDEPENDENT REVIEW;
+    not merged" across the WHOLE action plan -- but that sentence is exactly
+    what every new, genuinely unreviewed feature row has to say, so the guard
+    reddened on the very next feature and the obvious "fix" would have been to
+    weaken it. That is the rule stated at the top of this module: a banned
+    literal must be a claim that can never be true again, never one that must
+    stay true. The intent -- SELL-1's record must not describe itself as
+    unmerged -- survives, expressed against the row it is actually about.
+    """
     handoff = _text("SESSION_HANDOFF.md")
-    action_plan = _text("ACTION_PLAN_2026-08-02.md")
-    stale = (
-        "PENDING INDEPENDENT REVIEW; not merged",
-        "Independent review of this branch",
-        "confirm whether user/claude/user-directed-sell-",
-    )
-    hits = [
-        f"{name}: {phrase}"
-        for name, text in (("handoff", handoff), ("action plan", action_plan))
-        for phrase in stale
-        if phrase in text
+    action_plan_raw = (
+        ROOT / "docs" / "ACTION_PLAN_2026-08-02.md"
+    ).read_text(encoding="utf-8")
+    sell1_rows = [
+        line for line in action_plan_raw.splitlines() if line.startswith("| SELL-1 |")
     ]
-    assert not hits, "merged SELL-1 work was reopened by stale records: " + "; ".join(hits)
-    assert "08fde9f" in action_plan and "3ba3d41" in action_plan
+    assert len(sell1_rows) == 1, "the action plan must contain exactly one SELL-1 row"
+    sell1_row = sell1_rows[0]
+
+    row_hits = [
+        phrase
+        for phrase in ("PENDING INDEPENDENT REVIEW; not merged", "not merged, not deployed")
+        if phrase in sell1_row
+    ]
+    assert not row_hits, (
+        "the SELL-1 ledger row still describes merged work as unmerged: "
+        + "; ".join(row_hits)
+    )
+
+    handoff_hits = [
+        phrase
+        for phrase in (
+            "Independent review of this branch",
+            "confirm whether user/claude/user-directed-sell-",
+        )
+        if phrase in handoff
+    ]
+    assert not handoff_hits, (
+        "the handoff reopens merged SELL-1 work: " + "; ".join(handoff_hits)
+    )
+    assert "08fde9f" in action_plan_raw and "3ba3d41" in action_plan_raw
 
 
 def test_deleted_gr7d_ref_is_not_called_irrecoverable_while_object_remains():

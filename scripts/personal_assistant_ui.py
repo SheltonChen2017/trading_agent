@@ -408,6 +408,11 @@ def _sync_pref_from_widget(pref_key: str) -> None:
 _PERSISTENT_PAGE_WIDGET_KEYS = (
     "watchlist_picked",
     "watchlist_typed",
+    # Tickers added by clicking a most-active suggestion row. Benign page
+    # input, exactly like the multiselect and the text box it sits beside:
+    # it names candidates to research and buys nothing. The split, the
+    # proposal, and the typed approval all remain separate explicit acts.
+    "watchlist_from_suggestions",
     "allocation_max_weight_pct",
     "allocation_dollar_amount",
     "strategy_proposals_enabled",
@@ -1906,10 +1911,146 @@ if page == "Buying":
         "Or type any other ticker(s), comma-separated (e.g. NVDL, QQQM)", key="watchlist_typed"
     )
     typed_tickers = [t.strip().upper() for t in typed.split(",") if t.strip()]
-    cart = list(dict.fromkeys(picked + typed_tickers))
+
+    # --- Third cart source: pick from the most-active screen ---------------
+    # Owner request 2026-08-13. The same verified most-active rows the Ticker
+    # Suggestions tab shows, made clickable here so a candidate can go
+    # straight into the cart.
+    #
+    # Two properties this section must keep, because it moves a DISCLOSURE
+    # surface into a buying flow:
+    #
+    # 1. Network calls happen only on an explicit click, never on page load —
+    #    the same rule the Ticker Suggestions tab states for itself. The
+    #    shared cached loader is reused, so a run just made on that tab costs
+    #    nothing here.
+    # 2. Every row's `detail` is rendered NEXT TO its own Add button. That
+    #    text carries the AP-8 eligibility disclosures (below the usual
+    #    60-session, $5.00, or $1M median-dollar-volume floors) which exist
+    #    precisely because the owner asked to see these names rather than
+    #    have them screened out. Hiding them at the moment of choosing would
+    #    quietly convert "here is what the market did" into "here is what to
+    #    buy", which is the one thing this surface must never become.
+    _suggestion_picks = list(st.session_state.get("watchlist_from_suggestions", []))
+    with st.expander("Or pick from ticker suggestions (most-active screen)"):
+        st.caption(
+            "The same verified most-active rows as the Ticker Suggestions "
+            "tab, split by today's price direction. Adding one puts it in "
+            "your cart to research -- it buys nothing, and this project is "
+            "not recommending it. Volume is not a buy/sell split: every share "
+            "traded was bought by someone and sold by someone else, and no "
+            "strategy here has confirmed predictive evidence."
+        )
+        if st.button(
+            "Show most-active suggestions",
+            key="watchlist_suggestions_run",
+            help="Runs the market screen and verification pass. Network calls "
+            "happen only when you click this -- never on page load.",
+        ):
+            try:
+                # This page has no module-level `packet` -- that name belongs
+                # to the Briefing block, which does not execute when Buying is
+                # the selected page. Load it here, the same way the rest of
+                # this page does.
+                _, _sug_packet = _load_packet(policy_path, include_events=False)
+                _sug_rows, _sug_dropped, _ = _load_recommended_tickers(
+                    tuple(
+                        sorted(
+                            {p.ticker.upper() for p in _sug_packet.portfolio.positions}
+                        )
+                    ),
+                    include_ai=False,
+                    include_most_active=True,
+                    include_recent_ipos=False,
+                    include_ai_curation=False,
+                )
+                st.session_state["watchlist_suggestion_rows"] = [
+                    r for r in _sug_rows if r.reason_category == "most_active"
+                ]
+                st.session_state["watchlist_suggestion_dropped"] = list(_sug_dropped)
+                st.session_state["watchlist_suggestion_ran_at"] = datetime.now().strftime(
+                    "%H:%M:%S"
+                )
+            except Exception as _sug_exc:
+                st.session_state["watchlist_suggestion_rows"] = None
+                st.error(
+                    "Could not load suggestions "
+                    f"({type(_sug_exc).__name__}). Nothing was added to your cart."
+                )
+
+        _sug_rows_state = st.session_state.get("watchlist_suggestion_rows")
+        if _sug_rows_state is None:
+            st.caption('Click "Show most-active suggestions" to load them.')
+        elif not _sug_rows_state:
+            st.caption("No most-active candidate passed verification on that run.")
+        else:
+            st.caption(
+                f"Loaded at {st.session_state.get('watchlist_suggestion_ran_at')} "
+                "-- provider data is cached for up to 15 minutes, so prices and "
+                "volumes may lag the live market."
+            )
+            _up = [r for r in _sug_rows_state if r.price_direction == "advancing"]
+            _down = [r for r in _sug_rows_state if r.price_direction == "declining"]
+            _other = [
+                r for r in _sug_rows_state if r.price_direction not in ("advancing", "declining")
+            ]
+            _left, _right = st.columns(2)
+            for _col, _subset, _heading in (
+                (_left, _up, "Most active — price up today"),
+                (_right, _down, "Most active — price down today"),
+            ):
+                with _col:
+                    st.markdown(f"**{_heading}** ({len(_subset)})")
+                    if not _subset:
+                        st.caption("None on this run.")
+                    for _row in _subset:
+                        _in_cart = _row.ticker in _suggestion_picks
+                        if st.button(
+                            f"Add {_row.ticker}" if not _in_cart else f"{_row.ticker} in cart",
+                            key=f"watchlist_sug_add_{_row.ticker}",
+                            disabled=_in_cart,
+                        ):
+                            _suggestion_picks.append(_row.ticker)
+                            st.session_state["watchlist_from_suggestions"] = list(
+                                dict.fromkeys(_suggestion_picks)
+                            )
+                            st.rerun()
+                        st.caption(_row.detail)
+            if _other:
+                st.caption(
+                    f"{len(_other)} verified candidate(s) reported no usable or no "
+                    "non-zero price change and are in neither column: "
+                    + ", ".join(sorted(r.ticker for r in _other))
+                    + "."
+                )
+            _dropped = st.session_state.get("watchlist_suggestion_dropped") or []
+            if _dropped:
+                st.caption(
+                    f"{len(_dropped)} candidate(s) could not be verified at this "
+                    "time and are not shown: " + ", ".join(sorted(_dropped)) + "."
+                )
+
+    cart = list(dict.fromkeys(picked + typed_tickers + _suggestion_picks))
 
     if cart:
         st.write(f"**Cart:** {', '.join(cart)}")
+        if _suggestion_picks:
+            # Name the provenance in the cart itself. Once a ticker is a bare
+            # symbol in a list it is indistinguishable from one the owner
+            # chose deliberately, and these arrived from a screen that
+            # deliberately does NOT apply the project's usual size, age, and
+            # liquidity floors.
+            st.caption(
+                "From the most-active screen: "
+                + ", ".join(_suggestion_picks)
+                + " -- that screen is not filtered on size, age, price, or "
+                "liquidity, so re-read each row's detail above before buying."
+            )
+            if st.button(
+                "Clear suggestion picks", key="watchlist_suggestions_clear"
+            ):
+                st.session_state["watchlist_from_suggestions"] = []
+                st.rerun()
 
     ai_news_available = is_ai_summary_configured() and _ai_feature_enabled(
         "ai_pref_news_summaries"

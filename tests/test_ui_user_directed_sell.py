@@ -34,7 +34,7 @@ def _offline_selling_environment(monkeypatch):
 
 def _selling_app() -> AppTest:
     app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
-    app.session_state["nav_page"] = "Selling"
+    app.session_state["nav_page"] = "Policy Based Selling"
     app.run()
     return app
 

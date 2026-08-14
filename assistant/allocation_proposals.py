@@ -45,6 +45,7 @@ import hashlib
 import math
 from datetime import datetime, timedelta, timezone
 
+from assistant.money import decimal_or_none, decimal_text
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
 from assistant.portfolio_analytics import (
     estimate_pending_buy_value_by_ticker,  # noqa: F401 -- re-exported, scripts/personal_assistant_ui.py imports it from here
@@ -52,7 +53,7 @@ from assistant.portfolio_analytics import (
 )
 from assistant.proposals import TradeProposal
 from assistant.schemas import DecisionPacket
-from risk.execution_gate import TradeIntent
+from risk.execution_gate import TradeIntent, is_valid_share_quantity
 
 EVIDENCE_STATUS = "user_directed_allocation"
 
@@ -254,3 +255,136 @@ def generate_allocation_buy_proposals(
             )
         )
     return proposals
+
+
+DISCRETE_EVIDENCE_STATUS = "user_directed_discrete_buy"
+
+
+def generate_discrete_buy_proposal(
+    packet: DecisionPacket,
+    policy: TradingPolicy,
+    *,
+    ticker: str,
+    shares: object,
+    price: object,
+    ttl_minutes: int = 15,
+    now: datetime | None = None,
+) -> dict:
+    """One buy proposal for an EXACT whole-share quantity of one ticker.
+
+    The Discrete Buying tab (owner request 2026-08-14) sizes either by share
+    count or by dollar budget, but both arrive here as an exact share count --
+    the dollar path converts first, through
+    `assistant.discrete_trade.size_by_dollar_amount`, in exact Decimal.
+
+    Deliberately NOT routed through build_allocation_plan(): that planner
+    floors `dollar_amount / price` in binary float, which is correct for a
+    budget split but would be a silent off-by-one for an exact share request
+    (3 shares at $0.10 is 0.30000000000000004 as a float -- the SELREV-002
+    shape found on 2026-08-13). A caller who names a share count must get that
+    share count or a stated refusal, never a quietly smaller order.
+
+    Returns ``{"created": True, "proposal": TradeProposal}`` or
+    ``{"created": False, "reason": str}``.
+    """
+    normalized = str(ticker).strip().upper()
+    if not normalized:
+        return {"created": False, "reason": "A ticker is required."}
+    if not is_valid_share_quantity(shares):
+        return {
+            "created": False,
+            "reason": (
+                f"Shares to buy must be a whole number greater than zero, got {shares!r}."
+            ),
+        }
+    price_decimal = decimal_or_none(price)
+    if price_decimal is None or price_decimal <= 0:
+        return {
+            "created": False,
+            "reason": (
+                f"{normalized} has no usable reference price ({price!r}), so this "
+                "purchase cannot be priced or previewed."
+            ),
+        }
+
+    notional = price_decimal * shares
+    max_order_value = decimal_or_none(policy.max_order_value)
+    if max_order_value is None or max_order_value <= 0:
+        return {
+            "created": False,
+            "reason": (
+                "The active policy has no usable positive maximum order value "
+                f"({policy.max_order_value!r})."
+            ),
+        }
+    if notional > max_order_value:
+        fits = int(max_order_value // price_decimal)
+        remedy = (
+            f" At ${float(price_decimal):,.2f} per share, up to {fits} share(s) fit "
+            "in one order."
+            if fits > 0
+            else " Even one share exceeds that limit at the current price."
+        )
+        return {
+            "created": False,
+            "reason": (
+                f"Buying {shares} share(s) of {normalized} is "
+                f"${float(notional):,.2f}, above your policy's "
+                f"${float(max_order_value):,.2f} maximum order value.{remedy}"
+            ),
+        }
+
+    at = now or datetime.now(timezone.utc)
+    reference_price = float(price_decimal)
+    intent = TradeIntent(
+        ticker=normalized,
+        side="buy",
+        shares=shares,
+        order_type="market",
+        rationale=(
+            f"Owner-directed purchase of {shares} share(s) of {normalized} at "
+            f"~${reference_price:,.2f}."
+        ),
+    )
+    proposal_id = _stable_id(packet, policy, intent, salt=f"discrete|{decimal_text(notional)}")
+    return {
+        "created": True,
+        "proposal": TradeProposal(
+            proposal_id=proposal_id,
+            created_at=at.isoformat(),
+            expires_at=(at + timedelta(minutes=ttl_minutes)).isoformat(),
+            status="proposed",
+            idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
+            policy_version=policy.version,
+            policy_fingerprint=compute_policy_fingerprint(policy),
+            intent=intent,
+            reference_price=reference_price,
+            price_timestamp=at.isoformat(),
+            reasons=[
+                f"You chose to buy {shares} share(s) of {normalized}, about "
+                f"${float(notional):,.2f} at the reference price.",
+                "This is your own instruction, not a project recommendation: this "
+                "project has confirmed zero signals as real edge for "
+                "individual-stock selection.",
+            ],
+            evidence_status=DISCRETE_EVIDENCE_STATUS,
+            expected_impact=preview_trade_impact(
+                packet.portfolio, normalized, "buy", shares, reference_price
+            ),
+            alternatives=[
+                "Take no action -- nothing is bought until you type the approval "
+                "phrase for this proposal.",
+                "Buy a different number of shares, or size it by dollar amount "
+                "instead.",
+            ],
+            uncertainties=[
+                "Market orders can fill away from the displayed reference price.",
+                "Policy limits are re-checked independently at approval time; this "
+                "proposal is not a promise that the order will pass that check.",
+                "Requires allow_new_positions=true in your policy -- off by default, "
+                "so this will be blocked at approval time unless you enabled it.",
+                "If another proposal for this ticker and side is already in flight, "
+                "approval is refused until that one resolves.",
+            ],
+        ),
+    }

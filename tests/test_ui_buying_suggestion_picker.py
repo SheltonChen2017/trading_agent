@@ -98,7 +98,7 @@ def _offline(monkeypatch):
 
 def _buying_app() -> AppTest:
     app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
-    app.session_state["nav_page"] = "Buying"
+    app.session_state["nav_page"] = "Budgeted Buying"
     app.run()
     return app
 
@@ -197,7 +197,7 @@ def test_picker_distinguishes_source_fetch_time_from_display_time(_offline):
 def test_adding_a_suggestion_hides_results_checked_for_the_old_cart(_offline):
     """A newly added ticker must not sit above analysis/proposals for an old cart."""
     app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
-    app.session_state["nav_page"] = "Buying"
+    app.session_state["nav_page"] = "Budgeted Buying"
     app.session_state["watchlist_typed"] = "NVDA"
     app.session_state["watchlist_results"] = {"NVDA": _checked_result_row()}
     app.session_state["watchlist_results_cart"] = ["NVDA"]

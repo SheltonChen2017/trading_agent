@@ -202,7 +202,7 @@ def test_outcome_filter_survives_navigating_away_and_back(seeded_history):
     app.multiselect(key="proposal_outcome_filter").set_value(["Filled"]).run()
     assert _seeded_ids(_proposal_rows(app)) == {"ui2b-filled"}
 
-    app.radio(key="nav_page").set_value("Buying").run()
+    app.radio(key="nav_page").set_value("Budgeted Buying").run()
     assert not app.exception
     app.radio(key="nav_page").set_value("History").run()
     assert not app.exception

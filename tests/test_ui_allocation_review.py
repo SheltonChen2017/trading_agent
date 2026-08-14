@@ -100,7 +100,7 @@ def _buying_app(outcome, *, want_review: bool = True) -> AppTest:
     branch did.
     """
     app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
-    app.session_state["nav_page"] = "Buying"
+    app.session_state["nav_page"] = "Budgeted Buying"
     app.session_state["ai_pref_master"] = True
     app.session_state["ai_pref_allocation_commentary"] = True
     app.session_state["watchlist_results"] = {
@@ -206,7 +206,7 @@ def test_similar_suggestions_are_not_displayed_against_a_changed_cart(
     for one cart rendered under an expander header naming whatever the cart
     says NOW."""
     app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
-    app.session_state["nav_page"] = "Buying"
+    app.session_state["nav_page"] = "Budgeted Buying"
     app.session_state["watchlist_typed"] = "NVDA, AMD"
     app.session_state["watchlist_ai_suggestions"] = {
         "cart": ["AMD", "NVDA"],
@@ -239,7 +239,7 @@ def test_legacy_suggestions_without_a_cart_key_fail_safe_as_stale(
     _offline_buying_environment,
 ):
     app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
-    app.session_state["nav_page"] = "Buying"
+    app.session_state["nav_page"] = "Budgeted Buying"
     app.session_state["watchlist_typed"] = "NVDA, AMD"
     app.session_state["watchlist_ai_suggestions"] = {
         "from_universe": [],

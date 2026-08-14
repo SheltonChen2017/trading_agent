@@ -444,7 +444,8 @@ def test_aui_003_flagged_pages_wrap_their_sections_in_bordered_containers():
         next_pages = [
             rest.index(f'\nif page == "{other}"')
             for other in (
-                "Briefing", "Buying", "Selling", "Propose & Approve",
+                "Briefing", "Budgeted Buying", "Discrete Buying",
+                "Policy Based Selling", "Discrete Selling", "Propose & Approve",
                 "History", "Ticker Suggestions", "Backtest", "Reports",
                 "Operations", "Settings & Features",
             )

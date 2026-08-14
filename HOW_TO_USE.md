@@ -92,7 +92,7 @@ numbers shown are old, not wrong-but-fresh. Turn on *Fetch live earnings
 events* in the sidebar to populate the events section — with it off, the
 app honestly says "unavailable" rather than implying there are no events.
 
-### Module 2 — Buying: *put money to work*
+### Module 2 — Budgeted Buying: *put a budget to work*
 
 Add tickers to a cart, check each one (trend, volatility, analyst targets,
 news, a real historical best/worst hold-period range, and this project's
@@ -114,7 +114,7 @@ still separate steps.
 Deliberately absent: any probability-of-profit number. The app will not
 invent one.
 
-### Module 3 — Selling: *reduce risk*
+### Module 3 — Policy Based Selling: *reduce risk*
 
 "Check for recommended sells" surfaces **policy breaches** — concentration
 over the cap, leveraged-ETF exposure, and so on. A recommendation here
@@ -123,6 +123,28 @@ that is the correct answer, not a failure.
 
 The preview shows the tax-lot consequences of a candidate sale, so you can
 see the realized-gain cost before approving.
+
+### Modules 2b / 3b — Discrete Buying and Discrete Selling: *your own calls*
+
+The two pages above are driven by a budget and by policy. These two are
+driven by you: pick one ticker and buy or sell it because you decided to.
+Discrete Buying carries the same most-active suggestion picker as Budgeted
+Buying, so you can pull a candidate straight from the screen.
+
+Both size a trade **two ways**:
+
+* **Share count** — an exact whole-share quantity.
+* **Dollar amount** — a *budget*, not a fractional order. $250 at $100 buys
+  2 shares and the page tells you the $50 it could not use. This app submits
+  whole-share orders only, enforced independently by the risk gate, the
+  broker adapter, and the sell generator, so a dollar figure is converted
+  once and the remainder is always shown.
+
+On the sell side a dollar amount larger than your holding is **refused, not
+capped** — silently shrinking the number you typed would be the app editing
+your own instruction. Neither page sells short, and neither submits
+anything: each creates one ordinary proposal that still needs the typed
+approval phrase and a fresh execution-gate pass.
 
 ### Module 4 — Propose & Approve: *the gate every order passes through*
 

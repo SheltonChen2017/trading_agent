@@ -103,8 +103,8 @@ _APP_PATH = Path(__file__).resolve().parents[1] / "scripts" / "personal_assistan
 # it raised no exception.
 _ALL_PAGES = (
     ("Briefing", "Refresh briefing"),
-    ("Buying", "Check cart"),
-    ("Selling", "Check for recommended sells"),
+    ("Budgeted Buying", "Check cart"),
+    ("Policy Based Selling", "Check for recommended sells"),
     ("Propose & Approve", "Check for proposals"),
     ("History", "Activate kill switch and cancel all open orders"),
     ("Ticker Suggestions", "Run suggestions"),
@@ -161,7 +161,7 @@ def test_ai_preferences_survive_navigating_away_from_settings():
 def test_buying_cart_survives_navigating_to_another_page():
     """A navigation control must not erase the in-progress Buying cart."""
     app = AppTest.from_file(str(_APP_PATH), default_timeout=40)
-    app.session_state["nav_page"] = "Buying"
+    app.session_state["nav_page"] = "Budgeted Buying"
     app.run()
     assert not app.exception
 
@@ -171,6 +171,6 @@ def test_buying_cart_survives_navigating_to_another_page():
 
     app.radio(key="nav_page").set_value("History").run()
     assert not app.exception
-    app.radio(key="nav_page").set_value("Buying").run()
+    app.radio(key="nav_page").set_value("Budgeted Buying").run()
     assert not app.exception
     assert _one(app.multiselect, "Pick from common tickers").value == ["AAPL"]

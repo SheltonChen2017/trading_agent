@@ -535,10 +535,19 @@ def _sync_policy_editor_state(session_state, policy_path: str, policy) -> bool:
         # checkboxes silently render their False defaults.
         and "policy_edit_allow_new_positions" in session_state
         and "policy_edit_enable_strategy" in session_state
+        and "policy_edit_whole_shares_only" in session_state
+        and "policy_edit_enforce_cash_reserve" in session_state
+        and "policy_edit_cash_reserve_pct" in session_state
     ):
         return False
     session_state["policy_edit_allow_new_positions"] = policy.allow_new_positions
     session_state["policy_edit_enable_strategy"] = policy.enable_strategy_proposals
+    session_state["policy_edit_whole_shares_only"] = policy.whole_shares_only
+    # One authoritative number drives both controls: 0 means "no reserve".
+    session_state["policy_edit_enforce_cash_reserve"] = policy.min_cash_reserve_pct > 0
+    session_state["policy_edit_cash_reserve_pct"] = float(
+        policy.min_cash_reserve_pct * 100 if policy.min_cash_reserve_pct > 0 else 10.0
+    )
     session_state.pop("policy_edit_confirm_phrase", None)
     session_state[_POLICY_EDITOR_SOURCE_KEY] = source
     return True
@@ -4829,9 +4838,44 @@ if page == "Settings & Features":
                 "production-authoritative evidence -- enabling only allows the "
                 "deterministic generator to be checked; it approves nothing.",
             )
+            proposed_whole_shares = st.checkbox(
+                "Whole shares only",
+                key="policy_edit_whole_shares_only",
+                help="Authoritative policy, on by default. While ON, every order "
+                "quantity must be a whole number of shares -- enforced independently "
+                "by the risk gate and by the broker adapter, so a code path that "
+                "forgets to ask still refuses. Turning it OFF permits fractional "
+                "quantities for a future automated tool; it does not relax any "
+                "position, exposure, cash, freshness, duplicate-order, kill-switch, "
+                "or approval control.",
+            )
+            proposed_enforce_reserve = st.checkbox(
+                "Enforce a minimum cash reserve",
+                key="policy_edit_enforce_cash_reserve",
+                help="Unchecking writes a reserve of 0%. That removes the BUFFER, "
+                "not the solvency check: an order that would take your cash negative "
+                "is still refused. There is deliberately no separate on/off field -- "
+                "0 already means 'no reserve', and one rule with two sources of truth "
+                "eventually disagrees with itself.",
+            )
+            if proposed_enforce_reserve:
+                proposed_reserve_pct = st.number_input(
+                    "Minimum cash reserve (% of equity)",
+                    min_value=0.0, max_value=100.0, step=1.0,
+                    key="policy_edit_cash_reserve_pct",
+                )
+                proposed_reserve_fraction = float(proposed_reserve_pct) / 100
+            else:
+                proposed_reserve_fraction = 0.0
+                st.caption(
+                    "No cash reserve will be required. Orders still cannot take your "
+                    "cash balance negative."
+                )
             pending_policy_change = (
                 proposed_allow_new != settings_policy.allow_new_positions
                 or proposed_enable_strategy != settings_policy.enable_strategy_proposals
+                or proposed_whole_shares != settings_policy.whole_shares_only
+                or proposed_reserve_fraction != float(settings_policy.min_cash_reserve_pct)
             )
             if pending_policy_change:
                 st.warning(
@@ -4856,6 +4900,8 @@ if page == "Settings & Features":
                             settings_policy,
                             allow_new_positions=proposed_allow_new,
                             enable_strategy_proposals=proposed_enable_strategy,
+                            whole_shares_only=proposed_whole_shares,
+                            min_cash_reserve_pct=proposed_reserve_fraction,
                         )
                         save_policy(
                             updated_policy,

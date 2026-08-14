@@ -1968,9 +1968,9 @@ if page == "Buying":
                     r for r in _sug_rows if r.reason_category == "most_active"
                 ]
                 st.session_state["watchlist_suggestion_dropped"] = list(_sug_dropped)
-                st.session_state["watchlist_suggestion_ran_at"] = datetime.now().strftime(
-                    "%H:%M:%S"
-                )
+                st.session_state["watchlist_suggestion_ran_at"] = datetime.now(
+                    timezone.utc
+                ).isoformat(timespec="seconds")
             except Exception as _sug_exc:
                 st.session_state["watchlist_suggestion_rows"] = None
                 st.error(
@@ -1984,16 +1984,49 @@ if page == "Buying":
         elif not _sug_rows_state:
             st.caption("No most-active candidate passed verification on that run.")
         else:
+            _row_fetch_times = sorted(
+                {
+                    str(getattr(_row, "fetched_at", "")).strip()
+                    for _row in _sug_rows_state
+                    if str(getattr(_row, "fetched_at", "")).strip()
+                }
+            )
+            if len(_row_fetch_times) == 1:
+                _source_time = f"Source data fetched at {_row_fetch_times[0]}. "
+            elif _row_fetch_times:
+                _source_time = (
+                    "Source rows were fetched between "
+                    f"{_row_fetch_times[0]} and {_row_fetch_times[-1]}. "
+                )
+            else:
+                _source_time = "No verified row carries a source fetch time. "
             st.caption(
-                f"Loaded at {st.session_state.get('watchlist_suggestion_ran_at')} "
-                "-- provider data is cached for up to 15 minutes, so prices and "
-                "volumes may lag the live market."
+                _source_time
+                + f"Displayed at {st.session_state.get('watchlist_suggestion_ran_at')}. "
+                "Provider data may be cached for up to "
+                f"{_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS // 60} minutes, so prices "
+                "and volumes may lag the live market."
             )
             _up = [r for r in _sug_rows_state if r.price_direction == "advancing"]
             _down = [r for r in _sug_rows_state if r.price_direction == "declining"]
-            _other = [
-                r for r in _sug_rows_state if r.price_direction not in ("advancing", "declining")
-            ]
+            _flat = [r for r in _sug_rows_state if r.price_direction == "unchanged"]
+            _unknown = [r for r in _sug_rows_state if r.price_direction is None]
+
+            def _render_suggestion_add_row(_row) -> None:
+                """Keep disclosure and the corresponding cart control together."""
+                _in_cart = _row.ticker in _suggestion_picks
+                if st.button(
+                    f"Add {_row.ticker}" if not _in_cart else f"{_row.ticker} in cart",
+                    key=f"watchlist_sug_add_{_row.ticker}",
+                    disabled=_in_cart,
+                ):
+                    _suggestion_picks.append(_row.ticker)
+                    st.session_state["watchlist_from_suggestions"] = list(
+                        dict.fromkeys(_suggestion_picks)
+                    )
+                    st.rerun()
+                st.caption(f"{_row.ticker}: {_row.detail}")
+
             _left, _right = st.columns(2)
             for _col, _subset, _heading in (
                 (_left, _up, "Most active — price up today"),
@@ -2004,25 +2037,15 @@ if page == "Buying":
                     if not _subset:
                         st.caption("None on this run.")
                     for _row in _subset:
-                        _in_cart = _row.ticker in _suggestion_picks
-                        if st.button(
-                            f"Add {_row.ticker}" if not _in_cart else f"{_row.ticker} in cart",
-                            key=f"watchlist_sug_add_{_row.ticker}",
-                            disabled=_in_cart,
-                        ):
-                            _suggestion_picks.append(_row.ticker)
-                            st.session_state["watchlist_from_suggestions"] = list(
-                                dict.fromkeys(_suggestion_picks)
-                            )
-                            st.rerun()
-                        st.caption(_row.detail)
-            if _other:
-                st.caption(
-                    f"{len(_other)} verified candidate(s) reported no usable or no "
-                    "non-zero price change and are in neither column: "
-                    + ", ".join(sorted(r.ticker for r in _other))
-                    + "."
-                )
+                        _render_suggestion_add_row(_row)
+            for _subset, _heading in (
+                (_flat, "Most active — price unchanged today"),
+                (_unknown, "Most active — price change unavailable"),
+            ):
+                if _subset:
+                    st.markdown(f"**{_heading}** ({len(_subset)})")
+                    for _row in _subset:
+                        _render_suggestion_add_row(_row)
             _dropped = st.session_state.get("watchlist_suggestion_dropped") or []
             if _dropped:
                 st.caption(
@@ -2162,6 +2185,13 @@ if page == "Buying":
             except Exception as exc:
                 results[ticker] = {"error": str(exc)}
         st.session_state["watchlist_results"] = results
+        # Bind every deterministic result, split, and proposal input below to
+        # the exact cart that was checked.  The cart can change on any rerun
+        # (including an Add button in the suggestion picker), while the
+        # expensive result dict otherwise persists in session state.
+        st.session_state["watchlist_results_cart"] = sorted(
+            {ticker.upper() for ticker in cart}
+        )
 
         if want_similar_suggestions:
             raw_suggestions = suggest_similar_tickers(cart, store=store)
@@ -2205,6 +2235,24 @@ if page == "Buying":
             st.session_state["watchlist_ai_suggestions"] = None
 
     watchlist_results = st.session_state.get("watchlist_results", {})
+    _current_cart_identity = sorted({ticker.upper() for ticker in cart})
+    if (
+        watchlist_results
+        and st.session_state.get("watchlist_results_cart")
+        != _current_cart_identity
+    ):
+        # Fail closed for legacy state with no identity as well as an ordinary
+        # cart edit.  Otherwise old prices/volatilities can keep producing a
+        # split and approve-gated proposals for a ticker the current cart no
+        # longer contains, or omit a ticker the cart now claims to analyze.
+        st.warning(
+            "The cart changed since you checked it. The old analysis, split, "
+            "and proposal controls are hidden because they describe the "
+            "previous cart. Click **Check cart** to refresh them."
+        )
+        st.session_state["watchlist_results"] = {}
+        st.session_state["watchlist_results_cart"] = None
+        watchlist_results = {}
 
     ai_suggestions = st.session_state.get("watchlist_ai_suggestions")
     # Counter-review AP9CR-002 -- the same stale-state defect AP9R-001 fixed

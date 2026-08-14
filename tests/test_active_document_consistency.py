@@ -162,6 +162,7 @@ def test_current_review_documents_have_no_validation_placeholders():
         "REVIEW_2026-08-12_AP9_ALLOCATION_REVIEW_VISIBILITY.md",
         "REVIEW_2026-08-13_CLAUDE_COUNTERREVIEW_AND_AP11.md",
         "REVIEW_2026-08-13_SELL1_AND_BRANCH_CLEANUP.md",
+        "REVIEW_2026-08-13_BUY1_SUGGESTION_PICKER.md",
     )
     hits = [name for name in names if placeholders.search(_text(name))]
     assert not hits, f"unresolved validation placeholders remain in {hits}"
@@ -663,6 +664,29 @@ def test_sell1_current_records_do_not_reopen_merged_review_work():
         "the handoff reopens merged SELL-1 work: " + "; ".join(handoff_hits)
     )
     assert "08fde9f" in action_plan_raw and "3ba3d41" in action_plan_raw
+
+
+def test_buy1_current_records_close_the_merged_review():
+    """BUY-1 is merged and independently corrected; current records stay so."""
+    action_plan_raw = (
+        ROOT / "docs" / "ACTION_PLAN_2026-08-02.md"
+    ).read_text(encoding="utf-8")
+    buy1_rows = [
+        line for line in action_plan_raw.splitlines() if line.startswith("| BUY-1 |")
+    ]
+    assert len(buy1_rows) == 1, "the action plan must contain exactly one BUY-1 row"
+    buy1_row = buy1_rows[0]
+    stale = (
+        "PENDING INDEPENDENT REVIEW",
+        "not merged, not deployed",
+    )
+    hits = [phrase for phrase in stale if phrase in buy1_row]
+    assert not hits, "the BUY-1 row still describes merged work as pending: " + "; ".join(hits)
+    assert "e0df810" in buy1_row and "44a7f85" in buy1_row
+
+    handoff = _text("SESSION_HANDOFF.md")
+    assert "codex/review-buy1-suggestion-picker-20260813" in handoff
+    assert "44a7f85" in handoff
 
 
 def test_deleted_gr7d_ref_is_not_called_irrecoverable_while_object_remains():

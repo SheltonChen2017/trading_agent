@@ -3,13 +3,16 @@
 Owner request 2026-08-13 — a third cart source alongside "pick from common
 tickers" and "type any other ticker".
 
-This moves a DISCLOSURE surface into a buying flow, so the tests pin the two
+This moves a DISCLOSURE surface into a buying flow, so the tests pin the
 properties that keep that honest:
 
 * no network call on page load (the screen runs only on an explicit click);
 * each row's AP-8 eligibility disclosure travels with its own Add button and
   is named again in the cart, because once a ticker is a bare symbol in a
-  list it is indistinguishable from one the owner picked deliberately.
+  list it is indistinguishable from one the owner picked deliberately;
+* cached source time stays distinct from the time the result was displayed;
+* changing the cart hides analysis and proposal controls computed for the
+  previous cart.
 
 Plus the mechanical one that a draft got wrong: the Buying page has no
 module-level `packet` (that name belongs to the Briefing block), so the
@@ -46,6 +49,11 @@ def _rows():
             "FLAT", "most_active",
             "Flat Co -- trading volume today: 10 -- price change today: +0.00%",
             _FETCHED_AT, "unchanged",
+        ),
+        RecommendedTicker(
+            "UNKNOWN", "most_active",
+            "Unknown Co -- trading volume today: 20 -- price change today: not reported",
+            _FETCHED_AT, None,
         ),
     ]
 
@@ -99,6 +107,28 @@ def _button(app, startswith):
     return next(b for b in app.button if b.label.startswith(startswith))
 
 
+def _checked_result_row() -> dict:
+    return {
+        "own_trend": "flat",
+        "own_vol": 2.0,
+        "current_price": 100.0,
+        "price_as_of": "2026-08-13",
+        "price_history": None,
+        "explanation": {
+            "currently_held": None,
+            "triggered_today": False,
+            "historical_evidence": [],
+            "note": "",
+        },
+        "price_targets": [],
+        "hold_range": None,
+        "news": [],
+        "news_summary": None,
+        "news_summary_reason": None,
+        "earnings": {"available": False},
+    }
+
+
 def test_the_picker_exists_and_runs_no_network_call_on_page_load(_offline):
     app = _buying_app()
 
@@ -125,6 +155,68 @@ def test_clicking_show_loads_rows_and_splits_them_by_direction(_offline):
     assert "FLAT" in captions
     # Unverifiable candidates are named rather than silently omitted.
     assert "BOGUS" in captions
+
+
+def test_every_verified_row_is_clickable_including_flat_candidates(_offline):
+    """BUY-1 promises one Add control per verified most-active row.
+
+    A flat price move is still a verified most-active candidate.  Direction
+    only decides where it is displayed; it must not silently decide whether
+    the owner may put the ticker in the research cart.
+    """
+    app = _buying_app()
+    _button(app, "Show most-active suggestions").click()
+    app.run()
+
+    flat_add = _button(app, "Add FLAT")
+    _button(app, "Add UNKNOWN")
+    captions = "\n".join(c.value for c in app.caption)
+    assert "Flat Co -- trading volume today: 10" in captions
+    assert "Unknown Co -- trading volume today: 20" in captions
+
+    flat_add.click()
+    app.run()
+
+    assert not app.exception
+    assert app.session_state["watchlist_from_suggestions"] == ["FLAT"]
+    assert any("**Cart:** FLAT" in m.value for m in app.markdown)
+
+
+def test_picker_distinguishes_source_fetch_time_from_display_time(_offline):
+    """The cached loader's row time, not the button click, is data freshness."""
+    app = _buying_app()
+    _button(app, "Show most-active suggestions").click()
+    app.run()
+
+    captions = "\n".join(c.value for c in app.caption)
+    assert f"Source data fetched at {_FETCHED_AT}" in captions
+    assert "Displayed at" in captions
+    assert "cached for up to 15 minutes" in captions
+
+
+def test_adding_a_suggestion_hides_results_checked_for_the_old_cart(_offline):
+    """A newly added ticker must not sit above analysis/proposals for an old cart."""
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = "Buying"
+    app.session_state["watchlist_typed"] = "NVDA"
+    app.session_state["watchlist_results"] = {"NVDA": _checked_result_row()}
+    app.session_state["watchlist_results_cart"] = ["NVDA"]
+    app.run()
+    assert "NVDA" in [s.value for s in app.subheader]
+
+    _button(app, "Show most-active suggestions").click()
+    app.run()
+    _button(app, "Add UPUP").click()
+    app.run()
+
+    assert not app.exception
+    warnings = "\n".join(w.value for w in app.warning)
+    assert "cart changed since you checked it" in warnings
+    assert app.session_state["watchlist_results"] == {}
+    assert "NVDA" not in [s.value for s in app.subheader]
+    assert "Create purchase proposals using this split" not in [
+        s.value for s in app.subheader
+    ]
 
 
 def test_adding_a_suggestion_puts_it_in_the_cart(_offline):

@@ -59,9 +59,12 @@ def test_the_direct_sale_section_disclaims_any_recommendation(
 
     assert not app.exception
     captions = "\n".join(element.value for element in app.caption)
+    assert "This project is NOT recommending it" in captions
     assert "NOT the policy-breach path" in captions
     assert "does not predict price declines" in captions
-    assert "approve the proposal by typing the phrase" in captions
+    assert "zero signals as real edge" in captions
+    assert "approve by typing the phrase" in captions
+    assert "policy limits are re-checked" in captions
 
 
 def test_the_share_selector_cannot_exceed_the_shares_held(

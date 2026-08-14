@@ -236,7 +236,7 @@ def test_a_zero_dollar_input_hides_a_stored_buy_card(_offline, monkeypatch):
 
     assert "BUY 1 NVDA" not in [s.value for s in app.subheader]
     notices = "\n".join(i.value for i in app.info)
-    assert "does not match the current selection" in notices
+    assert "controls do not describe a valid trade" in notices
 
 
 # --- discrete selling ------------------------------------------------------

@@ -3315,11 +3315,20 @@ if page == "Discrete Buying":
                     or _db_shares is None
                     or _db_proposal["intent"]["shares"] != _db_shares
                 ):
+                    _db_current_selection = (
+                        "the current controls do not describe a valid trade"
+                        if _db_shares is None
+                        else (
+                            f"the current {_db_shares}-share selection for "
+                            f"{_db_ticker}"
+                        )
+                    )
                     st.info(
                         f"A buy proposal for {_db_proposal['intent']['shares']} "
                         f"share(s) of {_db_proposal['intent']['ticker']} is waiting "
-                        "on the Propose & Approve page. It does not match the "
-                        "current selection; create a new proposal to see it here."
+                        "on the Propose & Approve page. It does not match "
+                        f"{_db_current_selection}; create a new proposal to see "
+                        "it here."
                     )
                 else:
                     _render_proposal_approval(
@@ -3331,10 +3340,12 @@ if page == "Discrete Buying":
 if page == "Discrete Selling":
     st.caption(
         "Sell part or all of one holding, for your own reasons, sized by share "
-        "count or by dollar amount. This is NOT the policy-breach path -- "
-        "nothing here says a rule was broken, and this project does not "
-        "predict price declines. Nothing is sold until you approve the "
-        "proposal by typing the phrase."
+        "count or by dollar amount. This project is NOT recommending it and "
+        "does not predict price declines -- it has confirmed zero signals as "
+        "real edge for that. This is also NOT the policy-breach path: nothing "
+        "here says a rule was broken. The sale becomes an ordinary proposal "
+        "that you approve by typing the phrase, and your policy limits are "
+        "re-checked at that moment."
     )
     _ds_policy, _ds_packet = _load_packet(policy_path, include_events=False)
 
@@ -3380,7 +3391,7 @@ if page == "Discrete Selling":
                     _ds_held_quantity[_ds_ticker], _ds_shares
                 )
                 st.caption(
-                    "This closes the whole position."
+                    "Selling this quantity closes the position."
                     if _ds_remaining == 0
                     else f"{_decimal_text(_ds_remaining)} share(s) would remain."
                 )

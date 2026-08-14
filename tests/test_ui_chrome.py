@@ -38,6 +38,25 @@ def test_app_title_is_trading_assistant():
     assert "Personal Trading Assistant" not in titles
 
 
+def test_every_route_uses_the_same_active_page_header():
+    """The global shell should identify the active route with one consistent
+    hierarchy instead of making each module invent its own page treatment."""
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=60)
+    app.session_state["nav_page"] = "Discrete Buying"
+    app.run()
+
+    assert not app.exception
+    assert "Discrete Buying" in [element.value for element in app.header]
+    captions = " ".join(str(element.value) for element in app.caption)
+    assert "TRADING WORKSPACE" in captions
+    assert "owner-directed buy proposal" in captions
+
+
+def test_ui_source_uses_current_streamlit_width_controls():
+    source = _APP_PATH.read_text(encoding="utf-8")
+    assert "use_container_width" not in source
+
+
 def test_no_surface_still_says_personal_trading_assistant():
     """The rename has to reach every rendered surface, not just st.title —
     a stale heading elsewhere would read as a different app."""

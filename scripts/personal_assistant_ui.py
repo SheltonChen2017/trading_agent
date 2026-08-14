@@ -1189,7 +1189,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
                         for method, detail in tax_advisory["methods"].items()
                         if "error" not in detail
                     ],
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                 )
                 st.caption(
@@ -1409,9 +1409,8 @@ title_col, badge_col = st.columns([4, 1])
 with title_col:
     st.title("Trading Assistant")
     st.caption(
-        "Click-around front end over the same deterministic code the CLI uses. "
-        "Nothing here computes financial numbers itself -- it only displays what "
-        "assistant/*.py already computed."
+        "Deterministic portfolio research, proposal review, and paper-trading "
+        "controls in one workspace."
     )
 with badge_col:
     live_confirmed = os.environ.get("CONFIRM_LIVE_TRADING") == "I_UNDERSTAND"
@@ -1422,9 +1421,8 @@ with badge_col:
     else:
         st.error("LIVE mode, unconfirmed")
     st.caption(
-        "Read-only status. Switching to live trading can't be done from this app -- "
-        "it requires editing config.py and setting CONFIRM_LIVE_TRADING yourself, outside the UI, "
-        "on purpose: no single click here can ever enable real-money trading."
+        "Mode is read-only here. Live trading still requires an intentional "
+        "configuration change outside the app."
     )
 
 # Sidebar navigation (UI-2c) with the Watchlist tab renamed to "Buying"
@@ -1447,6 +1445,19 @@ _PAGE_LABELS = (
     "Operations",
     "Settings & Features",
 )
+
+# Preserve the page an already-open browser was showing across the two label
+# changes in TRADE-1. Streamlit otherwise replaces an option that no longer
+# exists with the first radio item (Briefing), which makes a harmless deploy
+# look as though the user's workflow disappeared. This runs before the widget
+# is instantiated, so it is a safe session-state migration rather than a
+# forbidden post-widget mutation.
+_LEGACY_PAGE_LABELS = {
+    "Buying": "Budgeted Buying",
+    "Selling": "Policy Based Selling",
+}
+if st.session_state.get("nav_page") in _LEGACY_PAGE_LABELS:
+    st.session_state["nav_page"] = _LEGACY_PAGE_LABELS[st.session_state["nav_page"]]
 
 _preserve_page_widget_state(st.session_state)
 
@@ -1498,6 +1509,28 @@ with st.sidebar:
         st.warning("Alpaca not configured -- using sample portfolio")
 
 store = _store()
+
+# One compact, native page header keeps the visual hierarchy identical on
+# every route. Detailed safety and evidence language remains in each page's
+# own caption below; this layer only answers "where am I and what lives here?"
+_PAGE_DESCRIPTIONS = {
+    "Briefing": "Portfolio status, risk checks, evidence, and operational warnings.",
+    "Budgeted Buying": "Research a ticker cart and split one budget by inverse volatility.",
+    "Discrete Buying": "Create one owner-directed buy proposal by shares or dollar budget.",
+    "Policy Based Selling": "Review sell proposals created only by policy breaches.",
+    "Discrete Selling": "Create one owner-directed sell proposal by shares or dollar amount.",
+    "Propose & Approve": "Review deterministic proposals and apply the typed approval gate.",
+    "History": "Inspect proposal and order outcomes without changing them.",
+    "Ticker Suggestions": "Explore verified market-screen candidates with source disclosures.",
+    "Backtest": "Run exploratory historical tests with explicit evidence limits.",
+    "Reports": "Review portfolio, tax, and evidence reports.",
+    "Operations": "Inspect reconciliation, readiness, and recovery state.",
+    "Settings & Features": "Manage preferences and protected policy controls.",
+}
+with st.container(border=True):
+    st.caption("TRADING WORKSPACE")
+    st.header(page)
+    st.caption(_PAGE_DESCRIPTIONS[page])
 
 if page == "Briefing":
     if st.button("Refresh briefing", key="refresh_briefing"):
@@ -1598,7 +1631,7 @@ if page == "Briefing":
             st.write("Basket exposure (overlapping, doesn't sum to 100%):")
             st.dataframe(
                 [{"Basket": b, "% of equity": pct} for b, pct in sorted(packet.risk.basket_exposure_pct.items(), key=lambda kv: -kv[1])],
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
         else:
@@ -1675,7 +1708,7 @@ if page == "Briefing":
                 )
                 st.dataframe(
                     decomposition["contributions"],
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                 )
                 for cluster in decomposition["correlated_clusters"]:
@@ -1702,7 +1735,7 @@ if page == "Briefing":
                     f"${stress_result['total_estimated_impact']:,.2f}",
                 )
             if stress_result["position_impacts"]:
-                st.dataframe(stress_result["position_impacts"], use_container_width=True, hide_index=True)
+                st.dataframe(stress_result["position_impacts"], width="stretch", hide_index=True)
 
     # GR-4 definition of done: stale data must render as a VISIBLE
     # degradation banner, never as confident numbers. The packet builder
@@ -1734,7 +1767,7 @@ if page == "Briefing":
                     }
                     for p in packet.portfolio.positions
                 ],
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
             st.caption(f"Unrealized P&L: ${packet.analytics['unrealized_pnl']:,.2f}")
@@ -1784,7 +1817,7 @@ if page == "Briefing":
     if packet.portfolio.open_orders:
         with st.container(border=True):
             st.subheader("Open orders")
-            st.dataframe(packet.portfolio.open_orders, use_container_width=True, hide_index=True)
+            st.dataframe(packet.portfolio.open_orders, width="stretch", hide_index=True)
 
     if packet.upcoming_events:
         with st.container(border=True):
@@ -2286,7 +2319,7 @@ if page == "Budgeted Buying":
                         }
                         for v in ai_suggestions["from_universe"]
                     ],
-                    use_container_width=True, hide_index=True,
+                    width="stretch", hide_index=True,
                 )
             if ai_suggestions["verified"]:
                 st.write("**Other suggestions (verified against real market data):**")
@@ -2298,7 +2331,7 @@ if page == "Budgeted Buying":
                         }
                         for v in ai_suggestions["verified"]
                     ],
-                    use_container_width=True, hide_index=True,
+                    width="stretch", hide_index=True,
                 )
                 st.caption(
                     "\"Measured similarity\" is computed from real price history and sector/industry "
@@ -2537,7 +2570,7 @@ if page == "Budgeted Buying":
                 "where you'd catch adding to an already-large position, or a price too high to get even 1 "
                 "share at this amount):"
             )
-            st.dataframe(plan_rows, use_container_width=True, hide_index=True)
+            st.dataframe(plan_rows, width="stretch", hide_index=True)
 
         current_signature = _allocation_input_signature(
             weights, dollar_amount, prices, price_as_of_by_ticker, max_weight_pct, alloc_policy, alloc_packet,
@@ -2663,7 +2696,7 @@ if page == "Budgeted Buying":
                         "Order ID": (leg.get("order") or {}).get("order_id", ""),
                         "Detail": leg.get("error") or "",
                     })
-                st.dataframe(leg_rows, use_container_width=True, hide_index=True)
+                st.dataframe(leg_rows, width="stretch", hide_index=True)
 
         for proposal in st.session_state.get("allocation_proposals", []):
             _render_proposal_approval(proposal, store, policy_path, alloc_packet.portfolio, alloc_packet)
@@ -2693,7 +2726,7 @@ if page == "Budgeted Buying":
 
             price_history = result.get("price_history")
             if price_history is not None and not price_history.empty:
-                st.line_chart(price_history, height=220, use_container_width=True)
+                st.line_chart(price_history, height=220, width="stretch")
                 st.caption(f"Close price, last {len(price_history)} trading days ({price_history.index[0].date()} to {price_history.index[-1].date()}).")
 
             explanation = result["explanation"]
@@ -2709,7 +2742,7 @@ if page == "Budgeted Buying":
                     if current_price:
                         row["vs. current"] = f"{(p['price_target'] / current_price - 1) * 100:+.1f}%"
                     rows.append(row)
-                st.dataframe(rows, use_container_width=True, hide_index=True)
+                st.dataframe(rows, width="stretch", hide_index=True)
                 if not current_price:
                     st.caption("Current price unavailable -- can't compute vs.-current comparison.")
             else:
@@ -2960,7 +2993,7 @@ if page == "Policy Based Selling":
                 }
                 for p in packet.portfolio.positions
             ],
-            use_container_width=True,
+            width="stretch",
             hide_index=True,
         )
 
@@ -3036,6 +3069,17 @@ def _discrete_reference_price(store, ticker: str):
     return price, None
 
 
+def _select_discrete_buy_ticker(ticker: str) -> None:
+    """Fill the ticker widget from a suggestion before Streamlit reruns.
+
+    A normal ``if st.button(): session_state[widget_key] = ...`` handler runs
+    after the text input with that key has already been created and Streamlit
+    rejects the mutation. Button callbacks run first, which makes the picker
+    reliable while preserving the ordinary editable text input.
+    """
+    st.session_state["discrete_buy_ticker"] = ticker
+
+
 def _render_discrete_sizing(mode_key: str, amount_key: str, price, *, max_shares=None):
     """Shared shares/dollars control pair. Returns (shares, note) or (None, None).
 
@@ -3044,11 +3088,12 @@ def _render_discrete_sizing(mode_key: str, amount_key: str, price, *, max_shares
     """
     from assistant.discrete_trade import notional_for_shares, size_by_dollar_amount
 
-    mode = st.radio(
+    mode = st.segmented_control(
         "Size this trade by",
         ("Share count", "Dollar amount"),
-        horizontal=True,
+        default="Share count",
         key=mode_key,
+        width="stretch",
     )
     if mode == "Share count":
         shares = int(
@@ -3139,6 +3184,12 @@ if page == "Discrete Buying":
                 st.session_state["discrete_buy_suggestions"] = [
                     r for r in _db_rows if r.reason_category == "most_active"
                 ]
+                st.session_state["discrete_buy_suggestion_dropped"] = list(
+                    _db_dropped
+                )
+                st.session_state["discrete_buy_suggestion_ran_at"] = datetime.now(
+                    timezone.utc
+                ).isoformat(timespec="seconds")
             except Exception as _db_exc:
                 st.session_state["discrete_buy_suggestions"] = None
                 st.error(
@@ -3151,6 +3202,30 @@ if page == "Discrete Buying":
         elif not _db_sugs:
             st.caption("No most-active candidate passed verification on that run.")
         else:
+            _db_fetch_times = sorted(
+                {
+                    str(getattr(_row, "fetched_at", "")).strip()
+                    for _row in _db_sugs
+                    if str(getattr(_row, "fetched_at", "")).strip()
+                }
+            )
+            if len(_db_fetch_times) == 1:
+                _db_source_time = f"Source data fetched at {_db_fetch_times[0]}. "
+            elif _db_fetch_times:
+                _db_source_time = (
+                    "Source rows were fetched between "
+                    f"{_db_fetch_times[0]} and {_db_fetch_times[-1]}. "
+                )
+            else:
+                _db_source_time = "No verified row carries a source fetch time. "
+            st.caption(
+                _db_source_time
+                + "Displayed at "
+                f"{st.session_state.get('discrete_buy_suggestion_ran_at')}. "
+                "Provider data may be cached for up to "
+                f"{_RECOMMENDED_STOCKS_CACHE_TTL_SECONDS // 60} minutes, so "
+                "prices and volumes may lag the live market."
+            )
             _db_up = [r for r in _db_sugs if r.price_direction == "advancing"]
             _db_down = [r for r in _db_sugs if r.price_direction == "declining"]
             _db_other = [
@@ -3166,19 +3241,31 @@ if page == "Discrete Buying":
                     if not _dbsubset:
                         st.caption("None on this run.")
                     for _dbrow in _dbsubset:
-                        if st.button(
-                            f"Use {_dbrow.ticker}", key=f"discrete_buy_pick_{_dbrow.ticker}"
-                        ):
-                            st.session_state["discrete_buy_ticker"] = _dbrow.ticker
-                            st.rerun()
-                        st.caption(_dbrow.detail)
+                        st.button(
+                            f"Use {_dbrow.ticker}",
+                            key=f"discrete_buy_pick_{_dbrow.ticker}",
+                            on_click=_select_discrete_buy_ticker,
+                            args=(_dbrow.ticker,),
+                        )
+                        st.caption(f"{_dbrow.ticker}: {_dbrow.detail}")
             for _dbrow in _db_other:
-                if st.button(
-                    f"Use {_dbrow.ticker}", key=f"discrete_buy_pick_{_dbrow.ticker}"
-                ):
-                    st.session_state["discrete_buy_ticker"] = _dbrow.ticker
-                    st.rerun()
-                st.caption(_dbrow.detail)
+                st.button(
+                    f"Use {_dbrow.ticker}",
+                    key=f"discrete_buy_pick_{_dbrow.ticker}",
+                    on_click=_select_discrete_buy_ticker,
+                    args=(_dbrow.ticker,),
+                )
+                st.caption(f"{_dbrow.ticker}: {_dbrow.detail}")
+            _db_dropped = st.session_state.get(
+                "discrete_buy_suggestion_dropped"
+            ) or []
+            if _db_dropped:
+                st.caption(
+                    f"{len(_db_dropped)} candidate(s) could not be verified at "
+                    "this time and are not shown: "
+                    + ", ".join(sorted(_db_dropped))
+                    + "."
+                )
 
     if not _db_ticker:
         st.info("Enter a ticker above, or pick one from the suggestions.")
@@ -3225,7 +3312,8 @@ if page == "Discrete Buying":
                 # represent.
                 if (
                     _db_proposal["intent"]["ticker"] != _db_ticker
-                    or (_db_shares and _db_proposal["intent"]["shares"] != _db_shares)
+                    or _db_shares is None
+                    or _db_proposal["intent"]["shares"] != _db_shares
                 ):
                     st.info(
                         f"A buy proposal for {_db_proposal['intent']['shares']} "
@@ -3253,11 +3341,13 @@ if page == "Discrete Selling":
     if not _ds_packet.portfolio.positions:
         st.info("No positions held -- there is nothing to sell.")
     else:
-        _ds_sellable = {
-            p.ticker: _sellable_whole_shares(
-                p.shares_exact if p.shares_exact is not None else p.shares
-            )
+        _ds_held_quantity = {
+            p.ticker: p.shares_exact if p.shares_exact is not None else p.shares
             for p in _ds_packet.portfolio.positions
+        }
+        _ds_sellable = {
+            ticker: _sellable_whole_shares(quantity)
+            for ticker, quantity in _ds_held_quantity.items()
         }
         _ds_options = [t for t, n in _ds_sellable.items() if n > 0]
         if not _ds_options:
@@ -3274,17 +3364,25 @@ if page == "Discrete Selling":
                 f"You hold {_ds_max} whole share(s) of {_ds_ticker} at a current "
                 f"price of ${float(_ds_position.current_price):,.2f}."
             )
+            _ds_price = (
+                _ds_position.current_price_exact
+                if _ds_position.current_price_exact is not None
+                else _ds_position.current_price
+            )
             _ds_shares, _ds_note = _render_discrete_sizing(
                 "discrete_sell_mode", "discrete_sell",
-                _ds_position.current_price, max_shares=_ds_max,
+                _ds_price, max_shares=_ds_max,
             )
             if _ds_note:
                 st.markdown(_ds_note)
             if _ds_shares:
+                _ds_remaining = _remaining_shares_after_sale(
+                    _ds_held_quantity[_ds_ticker], _ds_shares
+                )
                 st.caption(
-                    f"{_ds_max - _ds_shares} share(s) would remain."
-                    if _ds_shares < _ds_max
-                    else "This closes the whole position."
+                    "This closes the whole position."
+                    if _ds_remaining == 0
+                    else f"{_decimal_text(_ds_remaining)} share(s) would remain."
                 )
             if st.button(
                 f"Create sell proposal for {_ds_ticker}",
@@ -3312,13 +3410,23 @@ if page == "Discrete Selling":
             if _ds_proposal:
                 if (
                     _ds_proposal["intent"]["ticker"] != _ds_ticker
-                    or (_ds_shares and _ds_proposal["intent"]["shares"] != _ds_shares)
+                    or _ds_shares is None
+                    or _ds_proposal["intent"]["shares"] != _ds_shares
                 ):
+                    _ds_current_selection = (
+                        "the current controls do not describe a valid trade"
+                        if _ds_shares is None
+                        else (
+                            f"the current {_ds_shares}-share selection for "
+                            f"{_ds_ticker}"
+                        )
+                    )
                     st.info(
                         f"A sell proposal for {_ds_proposal['intent']['shares']} "
                         f"share(s) of {_ds_proposal['intent']['ticker']} is waiting "
-                        "on the Propose & Approve page. It does not match the "
-                        "current selection; create a new proposal to see it here."
+                        "on the Propose & Approve page. It does not match "
+                        f"{_ds_current_selection}; create a new proposal to see "
+                        "it here."
                     )
                 else:
                     _render_proposal_approval(
@@ -3565,7 +3673,7 @@ if page == "History":
                     }
                     for p in stored
                 ],
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
 
@@ -3643,7 +3751,7 @@ if page == "History":
                                 }
                                 for row in selection_preview.rows
                             ],
-                            use_container_width=True,
+                            width="stretch",
                             hide_index=True,
                         )
                         dismiss_reason = st.text_input(
@@ -3790,7 +3898,7 @@ if page == "History":
                     }
                     for o in orders
                 ],
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
 
@@ -4386,7 +4494,7 @@ if page == "Backtest":
                 "nothing to score."
             )
         else:
-            st.dataframe(summary, use_container_width=True, hide_index=True)
+            st.dataframe(summary, width="stretch", hide_index=True)
 
             horizons_with_rows = [
                 horizon
@@ -4530,7 +4638,7 @@ if page == "Reports":
                         ("Total", _tax_report.total),
                     )
                 ],
-                use_container_width=True,
+                width="stretch",
                 hide_index=True,
             )
             st.caption(
@@ -4542,7 +4650,7 @@ if page == "Reports":
             if _tax_report.rows:
                 st.dataframe(
                     [row.to_dict() for row in _tax_report.rows],
-                    use_container_width=True,
+                    width="stretch",
                     hide_index=True,
                 )
             else:
@@ -5205,7 +5313,7 @@ if page == "Settings & Features":
                 "Notes": "Optional advisory features only (ANTHROPIC_API_KEY). No proposal authority.",
             },
         ]
-        st.dataframe(provider_rows, use_container_width=True, hide_index=True)
+        st.dataframe(provider_rows, width="stretch", hide_index=True)
 
     with st.container(border=True):
         st.subheader("Safety status (read-only — sourced from the enforcing code, not re-computed here)")
@@ -5257,7 +5365,7 @@ if page == "Settings & Features":
                 "order-specific phrase. No batch or autonomous approval exists.",
             },
         ]
-        st.dataframe(safety_rows, use_container_width=True, hide_index=True)
+        st.dataframe(safety_rows, width="stretch", hide_index=True)
         if (env_kill or persistent_kill.get("active")):
             st.error(
                 "A kill switch is ENGAGED — execution will refuse orders until it is "

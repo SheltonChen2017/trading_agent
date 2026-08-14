@@ -29,9 +29,17 @@ through `assistant.money`.
 from __future__ import annotations
 
 import dataclasses
-from decimal import ROUND_FLOOR, Decimal
+from decimal import ROUND_FLOOR, Decimal, DecimalException
 
 from assistant.money import decimal_or_none, decimal_text
+
+
+# Keep the conversion bounded before Decimal is converted to a Python int.
+# A finite value such as ``1e999999999`` is valid Decimal syntax but would
+# otherwise overflow during division or attempt an enormous integer
+# allocation. This is far beyond a broker-representable whole-share order;
+# the UI must refuse it as input, not lose the entire page.
+_MAX_SIZABLE_SHARES = Decimal(2**63 - 1)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -78,7 +86,21 @@ def size_by_dollar_amount(dollar_amount: object, price: object) -> dict:
             ),
         }
 
-    shares = int((amount / price_decimal).to_integral_value(rounding=ROUND_FLOOR))
+    try:
+        whole_shares = (amount / price_decimal).to_integral_value(
+            rounding=ROUND_FLOOR
+        )
+    except DecimalException:
+        return {
+            "ok": False,
+            "reason": "The resulting whole-share quantity is too large to size safely.",
+        }
+    if whole_shares > _MAX_SIZABLE_SHARES:
+        return {
+            "ok": False,
+            "reason": "The resulting whole-share quantity is too large to size safely.",
+        }
+    shares = int(whole_shares)
     if shares <= 0:
         return {
             "ok": False,
@@ -87,13 +109,20 @@ def size_by_dollar_amount(dollar_amount: object, price: object) -> dict:
                 f"{decimal_text(price_decimal)}."
             ),
         }
-    notional = price_decimal * shares
+    try:
+        notional = price_decimal * shares
+        unallocated = amount - notional
+    except DecimalException:
+        return {
+            "ok": False,
+            "reason": "The resulting dollar calculation is too large to size safely.",
+        }
     return {
         "ok": True,
         "sizing": DollarSizing(
             shares=shares,
             notional_text=decimal_text(notional),
-            unallocated_text=decimal_text(amount - notional),
+            unallocated_text=decimal_text(unallocated),
             reference_price_text=decimal_text(price_decimal),
         ),
     }

@@ -20,6 +20,8 @@ from pathlib import Path
 import pytest
 from streamlit.testing.v1 import AppTest
 
+from assistant.recommended_stocks import RecommendedTicker
+
 _APP_PATH = Path(__file__).resolve().parents[1] / "scripts" / "personal_assistant_ui.py"
 
 
@@ -66,6 +68,23 @@ def test_all_four_trading_pages_exist_under_their_new_names(_offline):
     assert "Buying" not in labels and "Selling" not in labels
 
 
+@pytest.mark.parametrize(
+    ("legacy_name", "new_name"),
+    (("Buying", "Budgeted Buying"), ("Selling", "Policy Based Selling")),
+)
+def test_an_open_session_on_a_renamed_page_is_migrated(
+    _offline, legacy_name, new_name
+):
+    """A deploy must not strand an already-open browser session on a value
+    that is no longer one of the radio options."""
+    app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
+    app.session_state["nav_page"] = legacy_name
+    app.run()
+
+    assert not app.exception
+    assert app.radio(key="nav_page").value == new_name
+
+
 def test_policy_based_selling_no_longer_hosts_the_owner_directed_sell(_offline):
     """It moved to Discrete Selling. Two paths to one action is where the
     stale-state bugs live, so exactly one must exist."""
@@ -92,6 +111,46 @@ def test_discrete_buying_asks_for_a_ticker_and_disclaims_recommendation(_offline
     assert any("pick from ticker suggestions" in e.label for e in app.expander)
 
 
+def test_clicking_a_discrete_suggestion_safely_fills_the_ticker(
+    _offline, monkeypatch
+):
+    """Streamlit forbids changing a widget key after that widget has been
+    instantiated in the same run. The picker must update through a callback,
+    before the rerun builds the ticker input."""
+    import assistant.recommended_stocks as recommended_stocks
+
+    row = RecommendedTicker(
+        "NVDA",
+        "most_active",
+        "NVIDIA -- trading volume today: 1,000,000",
+        "2026-08-14T16:00:00+00:00",
+        "advancing",
+    )
+    calls = {"count": 0}
+
+    def _fake_build(*_args, **_kwargs):
+        calls["count"] += 1
+        return [row], ["BOGUS"]
+
+    monkeypatch.setattr(
+        recommended_stocks,
+        "build_recommended_tickers",
+        _fake_build,
+    )
+    app = _page("Discrete Buying")
+    assert calls["count"] == 0
+    app.button(key="discrete_buy_suggestions_run").click().run()
+    assert calls["count"] == 1
+    captions = "\n".join(c.value for c in app.caption)
+    assert "Source data fetched at 2026-08-14T16:00:00+00:00" in captions
+    assert "cached for up to 15 minutes" in captions
+    assert "BOGUS" in captions and "could not be verified" in captions
+    app.button(key="discrete_buy_pick_NVDA").click().run()
+
+    assert not app.exception
+    assert app.text_input(key="discrete_buy_ticker").value == "NVDA"
+
+
 def test_discrete_buying_prices_the_ticker_and_offers_both_sizing_modes(
     _offline, monkeypatch
 ):
@@ -108,8 +167,12 @@ def test_discrete_buying_prices_the_ticker_and_offers_both_sizing_modes(
     app.text_input(key="discrete_buy_ticker").set_value("NVDA").run()
 
     assert not app.exception
-    modes = [r for r in app.radio if r.label.startswith("Size this trade by")]
-    assert modes, [r.label for r in app.radio]
+    modes = [
+        r
+        for r in app.segmented_control
+        if r.label.startswith("Size this trade by")
+    ]
+    assert modes, [r.label for r in app.segmented_control]
     assert set(modes[0].options) == {"Share count", "Dollar amount"}
 
 
@@ -127,7 +190,7 @@ def test_a_dollar_budget_states_the_unspent_remainder(_offline, monkeypatch):
     )
     app = _page("Discrete Buying")
     app.text_input(key="discrete_buy_ticker").set_value("NVDA").run()
-    app.radio(key="discrete_buy_mode").set_value("Dollar amount").run()
+    app.segmented_control(key="discrete_buy_mode").set_value("Dollar amount").run()
     app.number_input(key="discrete_buy_dollars").set_value(250.0).run()
 
     assert not app.exception
@@ -152,6 +215,30 @@ def test_an_unpriceable_ticker_refuses_instead_of_guessing(_offline, monkeypatch
     assert "Nothing was proposed" in errors
 
 
+def test_a_zero_dollar_input_hides_a_stored_buy_card(_offline, monkeypatch):
+    """A stored proposal cannot remain actionable when the current controls
+    no longer express any valid trade size."""
+    from decimal import Decimal
+
+    import assistant.sleeve_notifications as sleeve_notifications
+
+    monkeypatch.setattr(
+        sleeve_notifications,
+        "_recorded_close_fetcher",
+        lambda _s, **_k: (lambda _t: {"NVDA": Decimal("100")}),
+    )
+    app = _page("Discrete Buying")
+    app.text_input(key="discrete_buy_ticker").set_value("NVDA").run()
+    app.button(key="discrete_buy_create").click().run()
+    assert "BUY 1 NVDA" in [s.value for s in app.subheader]
+
+    app.segmented_control(key="discrete_buy_mode").set_value("Dollar amount").run()
+
+    assert "BUY 1 NVDA" not in [s.value for s in app.subheader]
+    notices = "\n".join(i.value for i in app.info)
+    assert "does not match the current selection" in notices
+
+
 # --- discrete selling ------------------------------------------------------
 
 
@@ -161,7 +248,11 @@ def test_discrete_selling_lists_holdings_and_offers_both_modes(_offline):
     # Either there are holdings (a selectbox) or an explicit empty statement.
     if app.selectbox:
         assert any(s.label.startswith("Holding to sell") for s in app.selectbox)
-        modes = [r for r in app.radio if r.label.startswith("Size this trade by")]
+        modes = [
+            r
+            for r in app.segmented_control
+            if r.label.startswith("Size this trade by")
+        ]
         assert modes and set(modes[0].options) == {"Share count", "Dollar amount"}
     else:
         infos = "\n".join(i.value for i in app.info)
@@ -187,10 +278,55 @@ def test_a_dollar_amount_above_the_holding_refuses_rather_than_capping(_offline)
     app = _page("Discrete Selling")
     if not app.selectbox:
         pytest.skip("no holdings in this environment")
-    app.radio(key="discrete_sell_mode").set_value("Dollar amount").run()
+    app.segmented_control(key="discrete_sell_mode").set_value("Dollar amount").run()
     app.number_input(key="discrete_sell_dollars").set_value(10_000_000.0).run()
 
     assert not app.exception
     warnings = "\n".join(w.value for w in app.warning)
     assert "more than you hold" in warnings
     assert "nothing is proposed" in warnings
+
+
+def test_a_zero_dollar_input_hides_a_stored_sell_card(_offline):
+    app = _page("Discrete Selling")
+    if not app.selectbox:
+        pytest.skip("no holdings in this environment")
+    ticker = app.selectbox(key="discrete_sell_ticker").value
+    app.button(key="discrete_sell_create").click().run()
+    assert f"SELL 1 {ticker}" in [s.value for s in app.subheader]
+
+    app.segmented_control(key="discrete_sell_mode").set_value("Dollar amount").run()
+
+    assert f"SELL 1 {ticker}" not in [s.value for s in app.subheader]
+    notices = "\n".join(i.value for i in app.info)
+    assert "controls do not describe a valid trade" in notices
+
+
+def test_discrete_sell_dollar_sizing_uses_the_exact_recorded_price(
+    _offline, monkeypatch
+):
+    """At an exact price just over $100, a $100 budget cannot buy one share.
+    The rounded display float must not change that boundary."""
+    import streamlit as st
+    import assistant.sample_portfolio as sample_portfolio
+    import scripts.personal_assistant_ui as ui
+
+    positions = [
+        {
+            "ticker": "NVDA",
+            "shares": "10",
+            "entry_price": "90",
+            "current_price": "100.000000000000000001",
+        }
+    ]
+    monkeypatch.setattr(sample_portfolio, "SAMPLE_POSITIONS", positions)
+    monkeypatch.setattr(ui, "SAMPLE_POSITIONS", positions)
+    st.cache_data.clear()
+    ui._load_base_packet.clear()
+
+    app = _page("Discrete Selling")
+    app.segmented_control(key="discrete_sell_mode").set_value("Dollar amount").run()
+    app.number_input(key="discrete_sell_dollars").set_value(100.0).run()
+
+    warnings = "\n".join(w.value for w in app.warning)
+    assert "does not cover one share" in warnings

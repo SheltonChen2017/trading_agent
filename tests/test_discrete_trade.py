@@ -80,6 +80,15 @@ def test_a_fractional_result_is_never_returned():
     assert sizing.notional_text == "904.53"
 
 
+def test_extreme_finite_inputs_refuse_instead_of_crashing():
+    """Decimal accepts exponent values much larger than its arithmetic
+    context. They are finite inputs, but converting their ratio to shares can
+    overflow and must remain a user-facing refusal."""
+    result = size_by_dollar_amount("1e999999999", "1e-999999999")
+    assert result["ok"] is False
+    assert "too large" in result["reason"]
+
+
 # --- share mode ------------------------------------------------------------
 
 

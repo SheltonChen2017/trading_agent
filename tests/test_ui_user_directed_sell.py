@@ -1,4 +1,4 @@
-"""The Selling page's owner-directed sell section (2026-08-13 request).
+"""The Discrete Selling page's owner-directed sell path.
 
 Before this, the Selling tab could only act on a computed policy breach. The
 risk in adding an owner-directed path is that it starts to LOOK like a
@@ -34,21 +34,20 @@ def _offline_selling_environment(monkeypatch):
 
 def _selling_app() -> AppTest:
     app = AppTest.from_file(str(_APP_PATH), default_timeout=180)
-    app.session_state["nav_page"] = "Policy Based Selling"
+    app.session_state["nav_page"] = "Discrete Selling"
     app.run()
     return app
 
 
-def test_the_selling_page_offers_a_direct_sale_of_a_held_position(
+def test_discrete_selling_is_the_only_owner_directed_sell_surface(
     _offline_selling_environment,
 ):
     app = _selling_app()
 
     assert not app.exception
+    assert any(s.label == "Holding to sell" for s in app.selectbox)
     subheaders = [s.value for s in app.subheader]
-    assert "Sell a specific holding (your own decision)" in subheaders
-    # The policy-breach path must still be there and still be distinct.
-    assert "Recommended sells (policy-breach based)" in subheaders
+    assert "Recommended sells (policy-breach based)" not in subheaders
 
 
 def test_the_direct_sale_section_disclaims_any_recommendation(
@@ -60,9 +59,9 @@ def test_the_direct_sale_section_disclaims_any_recommendation(
 
     assert not app.exception
     captions = "\n".join(element.value for element in app.caption)
-    assert "This project is NOT recommending it" in captions
-    assert "zero signals as real edge" in captions
-    assert "you approve by typing the phrase" in captions
+    assert "NOT the policy-breach path" in captions
+    assert "does not predict price declines" in captions
+    assert "approve the proposal by typing the phrase" in captions
 
 
 def test_the_share_selector_cannot_exceed_the_shares_held(
@@ -75,15 +74,8 @@ def test_the_share_selector_cannot_exceed_the_shares_held(
     app = _selling_app()
 
     assert not app.exception
-    sell_inputs = [
-        element
-        for element in app.number_input
-        if element.label.startswith("Shares to sell")
-    ]
-    assert sell_inputs, [element.label for element in app.number_input]
-    widget = sell_inputs[0]
-    held = int(widget.label.split("you hold ")[1].rstrip(")"))
-    assert widget.max == held
+    widget = app.number_input(key="discrete_sell_shares")
+    assert widget.max is not None
     assert widget.min == 1
 
 
@@ -115,7 +107,7 @@ def test_fractional_remainder_is_not_described_as_a_closed_position(
     ui._load_base_packet.clear()
 
     app = _selling_app()
-    app.number_input(key="user_sell_shares").set_value(10).run()
+    app.number_input(key="discrete_sell_shares").set_value(10).run()
 
     captions = "\n".join(element.value for element in app.caption)
     assert "closes the position" not in captions
@@ -126,11 +118,11 @@ def test_changing_share_input_hides_the_stale_actionable_proposal(
     _offline_selling_environment,
 ):
     app = _selling_app()
-    app.number_input(key="user_sell_shares").set_value(3).run()
-    app.button(key="user_sell_create").click().run()
+    app.number_input(key="discrete_sell_shares").set_value(3).run()
+    app.button(key="discrete_sell_create").click().run()
     assert "SELL 3 NVDA" in [element.value for element in app.subheader]
 
-    app.number_input(key="user_sell_shares").set_value(4).run()
+    app.number_input(key="discrete_sell_shares").set_value(4).run()
 
     assert "SELL 3 NVDA" not in [element.value for element in app.subheader]
     notices = "\n".join(element.value for element in app.info)

@@ -167,11 +167,30 @@ def test_current_review_documents_have_no_validation_placeholders():
     assert not hits, f"unresolved validation placeholders remain in {hits}"
 
 
-def test_operator_guide_uses_the_eastern_paper_observation_clock():
-    """The installer converts 16:30 Eastern to the host's local timezone."""
+def test_operator_guide_tells_the_reader_to_read_the_installed_trigger():
+    """OBSCLK-001: the observation time must be MEASURED, not derived.
+
+    Two true statements disagree on this host. The installer's rule since
+    2026-08-08 is 16:30 Eastern converted to local (13:30 Pacific), but the
+    epoch host's task was registered 2026-08-05 with a literal 16:30 local
+    trigger, and an epoch roll re-enables existing tasks rather than
+    reinstalling them -- so the older trigger persists. An earlier correction
+    aligned this guide to the installer SOURCE without re-measuring the
+    INSTALLED task, which would have had a Pacific operator shut down three
+    hours early and silently lose the session.
+
+    Pinned as a POSITIVE requirement -- the guide must hand the reader the
+    command that reads the real trigger -- because that stays correct after
+    any future reinstall, whereas asserting either clock would go stale the
+    moment the other one applied.
+    """
     guide = _root_text("HOW_TO_USE.md")
-    assert "observation fires at 16:30 local" not in guide
-    assert "16:30 Eastern" in guide
+    assert "Get-ScheduledTask -TaskName 'TradingAgent-Paper-PaperObservation'" in guide, (
+        "the guide must show how to READ the installed trigger"
+    )
+    assert "rather than computing it" in guide or "never derive it" in guide.lower()
+    # And it must still name the real hazard: a machine shut down too early.
+    assert "does not count toward the 60" in guide
 
 
 def test_handoff_does_not_describe_the_merged_independent_review_branch_as_stale_topology():
@@ -198,12 +217,21 @@ def test_handoff_does_not_describe_the_merged_independent_review_branch_as_stale
 
 
 def test_ap11_supersedes_the_full_ap7_production_fix_claim():
-    """CODCR-001: deployed AP-7 code is not a deployed end-to-end fix.
+    """CODCR-001, amended 2026-08-13 when the epoch-005 roll deployed AP-11.
 
-    AP-11 proved from a later live negative-age alert that the outer
-    production call path froze the nested AP-7 clock. Current-state records
-    must preserve the original deployment observation without continuing to
-    call the complete production path fixed while AP-11 is undeployed.
+    The original guard pinned "AP-7's site fix is deployed but AP-11's
+    orchestration repair is NOT" -- true from 2026-08-13 until that roll, and
+    deliberately written as a tripwire that would redden the moment the
+    deployment changed, forcing the records to move with reality instead of
+    drifting behind it. It fired exactly as intended.
+
+    What remains durably true, and is what this now pins: the original
+    two-green-cycles observation must never again be stated as proof that the
+    whole production path was fixed, because AP-11 disproved that inference
+    from a live alert. That claim can never become true retroactively, so it
+    stays banned. The deployment STATE is no longer asserted here -- it moves
+    every roll, and other guards already keep the active-epoch records
+    self-consistent.
     """
     documents = {
         "ACTION_PLAN_2026-08-02.md": _text("ACTION_PLAN_2026-08-02.md"),
@@ -231,27 +259,12 @@ def test_ap11_supersedes_the_full_ap7_production_fix_claim():
         line for line in action_plan_raw.splitlines() if line.startswith("| AP-7 |")
     ]
     assert len(ap7_rows) == 1, "the action plan must contain exactly one AP-7 row"
-    assert "AP-11" in ap7_rows[0] and "not deployed" in ap7_rows[0].lower(), (
-        "the AP-7 ledger row must disclose the undeployed AP-11 production-path gap"
+    # The row must still connect AP-7 to AP-11 -- a reader who finds the AP-7
+    # row alone must not conclude the site fix was ever the whole story.
+    assert "AP-11" in ap7_rows[0], (
+        "the AP-7 ledger row must still reference AP-11, which corrected the "
+        "production call path its own site fix did not reach"
     )
-
-    facts_raw = (ROOT / "docs" / "OPERATIONAL_FACTS.md").read_text(
-        encoding="utf-8"
-    )
-    active_epoch = re.search(
-        r"### `paper-epoch-\d+` is active.*?(?=\n### )",
-        facts_raw,
-        flags=re.DOTALL,
-    )
-    assert active_epoch, "OPERATIONAL_FACTS has no active-epoch section"
-    active_epoch_text = active_epoch.group(0)
-    assert (
-        "AP-11" in active_epoch_text
-        and "not deployed" in active_epoch_text.lower()
-    ), (
-        "the durable active-epoch facts must disclose that AP-11 is not deployed"
-    )
-
 
 def test_current_documents_do_not_call_completed_work_unstarted():
     """Known-stale claims only -- each of these should never be true again."""

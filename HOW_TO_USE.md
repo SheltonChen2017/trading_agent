@@ -252,13 +252,30 @@ restart themselves if they are not running.
 | **Watchdog** | every 60 s | health heartbeat; raises alerts as Windows notifications |
 | **PaperObservation** | daily, after the close | records the immutable session snapshot — **this is what makes a day count** |
 
-**The one recurring obligation:** the observation fires at 16:30 Eastern,
-converted by the installer to the host's local clock with the applicable
-daylight-saving rules. If you shut the machine down before that local time,
-that day does not count toward the 60 — so either leave it running through
-the converted time, or ask Claude to capture the observation after the close
-(it takes seconds). Running on battery is fine; the tasks used to skip on
-battery power and no longer do.
+**The one recurring obligation:** if you shut the machine down before the
+observation fires, that day does not count toward the 60 — so either leave it
+running past that time, or ask Claude to capture the observation after the
+close (it takes seconds). Running on battery is fine; the tasks used to skip
+on battery power and no longer do.
+
+**Check the actual fire time rather than computing it — they can differ:**
+
+```powershell
+(Get-ScheduledTask -TaskName 'TradingAgent-Paper-PaperObservation').Triggers.StartBoundary
+```
+
+On the current epoch host that prints `2026-08-05T16:30:00-07:00`: **16:30
+local**. The installer's rule since 2026-08-08 is different — 16:30 *Eastern*
+converted to local, which on a Pacific host would be 13:30 local — but this
+host's task was installed on 2026-08-05, before that logic existed, and a
+normal epoch roll re-enables the existing tasks rather than reinstalling
+them, so the older trigger persists. Both times are safely after the 16:00 ET
+close; the hazard is only in guessing. Computing 13:30 from the rule and
+shutting down at 14:00 would silently cost you the session (found 2026-08-13
+by reading the installed trigger instead of the installer source).
+
+If the installer is ever re-run on this host, expect the observation to move
+to 13:30 local — verify with the command above afterward.
 
 The evidence epoch itself is a database record: it survives reboots and
 never needs re-activating. The frozen checkout must not be updated until

@@ -61,6 +61,10 @@ from assistant.allocation_proposals import (
     estimate_pending_buy_value_by_ticker,
     generate_allocation_buy_proposals,
 )
+from assistant.hedge_sleeve import (
+    evaluate_hedge_sleeve,
+    generate_hedge_buy_proposals,
+)
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca, get_upcoming_events
 from assistant.schemas import EvidenceStatus, UpcomingEvent
 from assistant.corporate_actions import tax_ledger_with_coverage
@@ -179,6 +183,7 @@ from assistant.strategy_proposals import (
 )
 from config import (
     BASKETS,
+    HEDGE_SLEEVE_TICKERS,
     HORIZON_LABELS,
     HORIZON_SWEEP_DAYS,
     LEVERAGED_ETF_TICKERS,
@@ -1452,6 +1457,7 @@ _PAGE_LABELS = (
     "Discrete Buying",
     "Policy Based Selling",
     "Discrete Selling",
+    "Hedging",
     "Propose & Approve",
     "History",
     "Ticker Suggestions",
@@ -1534,6 +1540,7 @@ _PAGE_DESCRIPTIONS = {
     "Discrete Buying": "Create one owner-directed buy proposal by shares or dollar budget.",
     "Policy Based Selling": "Review sell proposals created only by policy breaches.",
     "Discrete Selling": "Create one owner-directed sell proposal by shares or dollar amount.",
+    "Hedging": "Size a defensive ETF allocation toward a hedge target you set.",
     "Propose & Approve": "Review deterministic proposals and apply the typed approval gate.",
     "History": "Inspect proposal and order outcomes without changing them.",
     "Ticker Suggestions": "Explore verified market-screen candidates with source disclosures.",
@@ -3580,6 +3587,210 @@ if page == "Discrete Selling":
                         _ds_proposal, store, policy_path,
                         _ds_packet.portfolio, _ds_packet,
                     )
+
+
+def _hedge_reference_prices(store, tickers):
+    """Fresh recorded closes for the hedge basket, plus what is missing.
+
+    Returns ``(prices, unavailable)``. A missing close is DISCLOSED and its
+    instrument dropped from the split, never guessed at -- an unpriced leg
+    silently sized would put real money into a number the app could not read.
+    """
+    from assistant.sleeve_notifications import _recorded_close_fetcher
+
+    names = list(tickers)
+    if not names:
+        return {}, []
+    try:
+        fetched = _recorded_close_fetcher(store)(names)
+    except Exception as exc:  # provider/network failure must not crash the page
+        return {}, [f"{name} ({type(exc).__name__})" for name in names]
+    prices = {}
+    unavailable = []
+    for name in names:
+        price = fetched.get(name)
+        if price is None:
+            unavailable.append(name)
+        else:
+            prices[name] = float(price)
+    return prices, unavailable
+
+
+if page == "Hedging":
+    st.caption(
+        "Size a DEFENSIVE allocation toward a hedge target you set, using "
+        "long-only ETFs your broker already supports. This project has NOT "
+        "confirmed that this basket reduces drawdown, and a hedge that is "
+        "held costs money whether or not a decline arrives. Nothing is bought "
+        "until you approve each proposal by typing the phrase, and your "
+        "policy limits are re-checked at that moment."
+    )
+    _hd_policy, _hd_packet = _load_packet(policy_path, include_events=False)
+
+    _hd_selected = st.multiselect(
+        "Hedge instruments",
+        options=list(HEDGE_SLEEVE_TICKERS),
+        default=list(HEDGE_SLEEVE_TICKERS),
+        key="hedge_instruments",
+        help=(
+            "Long-only ETFs. Membership is a recorded preference, not a "
+            "validated finding."
+        ),
+    )
+    _hd_target = st.number_input(
+        "Hedge target (% of total equity)",
+        min_value=0.0, max_value=100.0, value=0.0, step=0.5,
+        key="hedge_target_pct",
+        help=(
+            "The share of total equity you want held in the selected "
+            "instruments. Leave at 0 to only read the current position."
+        ),
+    )
+
+    # A zero on the number input means "no target set yet", which is the
+    # page's own default state -- report-only, not an invalid entry. Passing
+    # 0 through as a target would greet every first visit with a red error.
+    _hd_target_or_none = _hd_target if _hd_target > 0 else None
+    _hd_report = evaluate_hedge_sleeve(
+        _hd_packet.portfolio,
+        target_pct=_hd_target_or_none,
+        tickers=_hd_selected,
+    )
+    for _hd_disclosure in _hd_report.disclosures:
+        st.warning(_hd_disclosure)
+
+    if _hd_report.rows:
+        st.subheader("Current defensive position")
+        st.dataframe(
+            [
+                {
+                    "Instrument": _row.ticker,
+                    "Held": "yes" if _row.held else "no",
+                    "Shares": (
+                        _row.shares_exact if _row.value_available else "unreadable"
+                    ),
+                    "Market value": (
+                        f"${float(_row.market_value_exact):,.2f}"
+                        if _row.value_available
+                        else "unreadable"
+                    ),
+                    "% of equity": (
+                        f"{_row.pct_of_equity:.2f}%"
+                        if _row.value_available
+                        else "--"
+                    ),
+                    "Daily reset": "yes" if _row.daily_reset else "no",
+                }
+                for _row in _hd_report.rows
+            ],
+            hide_index=True,
+            width="stretch",
+        )
+
+    if _hd_report.refusals:
+        for _hd_refusal in _hd_report.refusals:
+            st.error(_hd_refusal)
+        st.info(
+            "No hedge purchase is sized while any of the above is unresolved. "
+            "An unreadable holding makes the current hedge look smaller than "
+            "it is, which would oversize the purchase."
+        )
+    else:
+        st.metric(
+            "Hedge sleeve",
+            f"{_hd_report.current_pct:.2f}% of equity",
+            delta=f"target {_hd_report.target_pct:.2f}%",
+            delta_color="off",
+        )
+        if _hd_report.has_shortfall:
+            _hd_shortfall = float(_hd_report.shortfall_dollars_exact)
+            st.caption(
+                f"Shortfall to target: ${_hd_shortfall:,.2f}, split equally "
+                "across the instruments with a usable price. Equal weight is "
+                "deliberate: inverse-volatility weighting would put the most "
+                "money in whichever defensive name moves least."
+            )
+            _hd_prices, _hd_missing = _hedge_reference_prices(
+                store, _hd_report.tickers
+            )
+            if _hd_missing:
+                st.warning(
+                    "No fresh recorded close for "
+                    + ", ".join(sorted(_hd_missing))
+                    + ". Those instruments are excluded from this split "
+                    "rather than priced by guess."
+                )
+            _hd_signature = (
+                f"{sorted(_hd_report.tickers)}|{_hd_report.target_pct}|"
+                f"{_hd_report.shortfall_dollars_exact}|"
+                f"{_hd_packet.portfolio.as_of}"
+            )
+            if st.button(
+                "Create hedge buy proposals",
+                type="primary",
+                disabled=not _hd_prices,
+                key="hedge_create",
+            ):
+                _hd_result = generate_hedge_buy_proposals(
+                    _hd_packet, _hd_policy, _hd_prices,
+                    target_pct=_hd_target_or_none,
+                    tickers=_hd_report.tickers,
+                )
+                if _hd_result["created"]:
+                    for _hd_proposal in _hd_result["proposals"]:
+                        store.save_proposal(_hd_proposal.to_dict())
+                    st.session_state["hedge_proposals"] = [
+                        _hd_proposal.to_dict()
+                        for _hd_proposal in _hd_result["proposals"]
+                    ]
+                    st.session_state["hedge_proposals_signature"] = _hd_signature
+                else:
+                    st.session_state.pop("hedge_proposals", None)
+                    st.session_state.pop("hedge_proposals_signature", None)
+                    st.error(_hd_result["reason"])
+
+            _hd_stored = st.session_state.get("hedge_proposals")
+            if _hd_stored:
+                # Same stale-binding rule as every other proposal surface: an
+                # actionable card must never look synchronized with inputs it
+                # does not represent.
+                if (
+                    st.session_state.get("hedge_proposals_signature")
+                    != _hd_signature
+                ):
+                    st.info(
+                        f"{len(_hd_stored)} hedge proposal(s) are waiting on "
+                        "the Propose & Approve page, but they do not match the "
+                        "current instruments, target, and shortfall. Create "
+                        "new proposals to act here."
+                    )
+                else:
+                    st.subheader("Approve each leg separately")
+                    st.caption(
+                        "Each instrument is approved on its own, one typed "
+                        "phrase at a time. There is deliberately no "
+                        "submit-all button here: a partly-filled hedge is a "
+                        "different position from the one you sized, and it "
+                        "should be a decision you make leg by leg."
+                    )
+                    for _hd_proposal in _hd_stored:
+                        _render_proposal_approval(
+                            _hd_proposal, store, policy_path,
+                            _hd_packet.portfolio, _hd_packet,
+                        )
+        elif _hd_report.target_pct > 0:
+            st.success(
+                f"The hedge sleeve is at {_hd_report.current_pct:.2f}% against "
+                f"your {_hd_report.target_pct:.2f}% target, "
+                f"${float(_hd_report.surplus_dollars_exact):,.2f} above it. "
+                "Nothing to buy. This page never sells to rebalance a hedge "
+                "down -- use Discrete Selling for that, deliberately."
+            )
+        else:
+            st.info(
+                "Set a hedge target above 0% to size a purchase. At 0% this "
+                "page only reports what you already hold."
+            )
 
 
 if page == "Propose & Approve":

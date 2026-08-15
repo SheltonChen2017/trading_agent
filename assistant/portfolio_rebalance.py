@@ -89,6 +89,11 @@ class SleeveRow:
     #: distance, not an instruction: no side, no quantity, no ordering.
     gap_to_target_exact: str
     status: str
+    #: Why this sleeve's TARGET cannot be reached under the active policy,
+    #: or "" when it can. Deliberately separate from `status`: feasibility
+    #: of the target and distance from the target are independent facts,
+    #: and a sleeve can be both infeasible and badly drifted at once.
+    policy_conflict_reason: str
     tickers: tuple[str, ...]
 
 
@@ -402,6 +407,7 @@ def evaluate_portfolio_rebalance(
                     pending_value_exact=decimal_text(pending_value),
                     gap_to_target_exact="0",
                     status=STATUS_DATA_UNAVAILABLE,
+                    policy_conflict_reason="",
                     tickers=tuple(sleeve_tickers[sleeve]),
                 )
             )
@@ -413,10 +419,15 @@ def evaluate_portfolio_rebalance(
         projected = (value + pending_value) / equity * Decimal("100")
         gap = equity * target / Decimal("100") - (value + pending_value)
 
+        # REBAL1CR-001: a policy conflict is a property of the TARGET, not
+        # a drift state, so it no longer occupies `status`. Letting it do so
+        # hid the band state on every conflicted sleeve: against the owner's
+        # approved profile and active policy the page reported ONE breached
+        # band while six sleeves were outside theirs, understating drift on
+        # the page's most prominent number. The conflict is carried in its
+        # own field and still disclosed; the two facts are independent.
         if sleeve in unknown_sleeves:
             status = STATUS_PENDING_UNKNOWN
-        elif sleeve in conflicts:
-            status = STATUS_POLICY_CONFLICT
         elif sleeve == SLEEVE_OTHER and sleeve_tickers[sleeve]:
             # The residual always reads as unassigned when it holds anything,
             # so a reader is never invited to treat it as a tidy sleeve that
@@ -440,6 +451,7 @@ def evaluate_portfolio_rebalance(
                 pending_value_exact=decimal_text(pending_value),
                 gap_to_target_exact=decimal_text(gap),
                 status=status,
+                policy_conflict_reason=conflicts.get(sleeve, ""),
                 tickers=tuple(sleeve_tickers[sleeve]),
             )
         )

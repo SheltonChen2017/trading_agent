@@ -217,3 +217,44 @@ def test_nothing_is_retained_in_session_state_between_reruns(_offline):
         if str(key).startswith("_rb") or "rebalance" in str(key).lower()
     ]
     assert not retained, retained
+
+
+def test_an_infeasible_target_is_its_own_column_not_the_status(_offline):
+    """REBAL1CR-001. Against the owner's approved profile and active policy
+    every invested sleeve has an unreachable target. If that occupied the
+    Status column it would hide the drift the page exists to show, so
+    feasibility gets its own column and Status keeps the band state."""
+    app = _rebalancing()
+    assert not app.exception, app.exception
+    table = app.dataframe[0].value
+    columns = list(table[0].keys()) if isinstance(table, list) else list(table)
+    assert "Target reachable" in columns, columns
+    assert "Status" in columns, columns
+
+
+def test_the_breach_headline_counts_every_band_breach(_offline):
+    """The metric a reader trusts at a glance must not be quietly reduced by
+    sleeves whose targets are also infeasible."""
+    from assistant.policy import load_policy
+    from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
+    from assistant.rebalance_profile import OWNER_APPROVED_PROFILE
+
+    app = _rebalancing()
+    metrics = {m.label: m.value for m in app.metric}
+    assert "Bands breached" in metrics
+
+    import assistant.context_builder as context_builder
+
+    report = evaluate_portfolio_rebalance(
+        context_builder.build_portfolio_snapshot([], cash=10_000.0),
+        OWNER_APPROVED_PROFILE,
+        policy=load_policy(),
+    )
+    outside = sum(
+        1 for r in report.rows
+        if not (r.lower_edge_pct <= r.projected_pct <= r.upper_edge_pct)
+    )
+    assert report.breached_count == outside, (
+        report.breached_count, outside,
+        [(r.sleeve, r.status, r.projected_pct) for r in report.rows],
+    )

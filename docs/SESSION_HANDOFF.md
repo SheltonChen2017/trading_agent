@@ -1,7 +1,7 @@
-# Session handoff — REBAL-1 Stage 3 reviewed and counter-reviewed
+# Session handoff — REBAL-1 Stage 3 covered end to end
 
-Prepared: 2026-08-15 by Claude, after counter-reviewing Codex's independent
-review and correction of Stage 3.
+Prepared: 2026-08-15 by Claude, after counter-reviewing Stage 3 and then
+adding the end-to-end coverage the owner asked for.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -239,6 +239,46 @@ real store with real fills. Both defects were interface-shape mistakes that
 only a test driving the real producer would have caught, and the tests here
 still monkeypatch `tax_ledger_with_coverage` at the execution seam rather
 than seeding `broker_order_events`.
+
+## 7c. End-to-end coverage against real fills (this round)
+
+Branch `user/claude/rebal1-e2e-real-fills-20260815`, based on `c48861e`. It
+is the single branch carrying every unmerged commit: Stage 3 (`bedeea2`),
+Codex's review (`0c91aa4`), the counter-review (`c48861e`), and this work.
+Disposition in `docs/REVIEW_2026-08-15_REBAL1_STAGE3_END_TO_END.md`.
+
+`tests/test_rebalance_trim_end_to_end.py` invents no shapes. Fills are
+journaled through `journal_broker_order_update`, the ledger and coverage come
+from the real providers, the proposal is persisted through
+`AssistantStore.save_proposal` and reloaded, and approval runs the real
+validation path.
+
+**Writing it immediately found a fourth instance of the same defect, in my
+own previous fix.** `tax_ledger_with_coverage` returns
+`(ledger if complete else None, ...)` — it withholds the ledger ENTIRELY when
+any holding is unreconciled. My ST3CCR-001 fix scoped only the caller's
+`matched` check and was verified against a hand-built dict pairing a real
+ledger with `complete: False`, a combination the real provider never emits.
+Against the real provider there was no ledger at all, so Stage 3 was still
+unusable on any book with a pre-app holding — which is the owner's book.
+
+Fixed with a new sibling `ticker_tax_ledger_with_coverage(store, portfolio,
+ticker)` rather than by loosening the shared function. The portfolio-wide
+provider answers "can this whole book be taxed accurately?" and is correct to
+withhold on partial history; the scoped one answers "can THIS ticker's lots
+be accounted for?", which is what a trim of one ticker actually depends on.
+The scoped coverage keeps the same shape, with `complete` scoped to the
+ticker and `portfolio_complete` carrying the book-wide answer for disclosure.
+An uncovered ticker still receives no ledger. All three call sites use it:
+`plan_trim`, the execution-time revalidation, and the Stage 3 UI.
+
+Validation: **4,041 passed / 0 failed**; 10 new end-to-end tests; 3 mutations
+against the new provider, all detected.
+
+**The gap that remains, recorded so it is not rediscovered:** no test clicks
+the Streamlit trim button through to a saved proposal. The UI tests assert
+control state and page text only. That is the same family of gap as the four
+defects above and is the next one to close.
 
 ## 8. What is next
 

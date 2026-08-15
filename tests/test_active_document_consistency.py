@@ -573,13 +573,34 @@ def test_a_finding_ledger_does_not_claim_everything_is_open_while_listing_fixes(
         )
 
 
+def _mainline_ref() -> str | None:
+    """The ref that "merged" actually means, preferring the published one."""
+    for ref in ("origin/main", "main"):
+        probe = subprocess.run(
+            ["git", "rev-parse", "--verify", "--quiet", f"{ref}^{{commit}}"],
+            cwd=ROOT, capture_output=True,
+        )
+        if probe.returncode == 0:
+            return ref
+    return None
+
+
 def _repository_commits_claimed_unreachable(text: str) -> list[str]:
     """Commit hashes a document asserts are local-only / unpushed / unmerged.
 
     Matches a short hash in backticks within one clause of an unreachability
     claim, in either order ("`abc1234` is local-only", "local-only: `abc1234`").
+
+    STALLCR-004: the original alternation had `unmerged` as one word only, so
+    the phrasing that actually shipped -- "not merged or deployed" -- slipped
+    straight through the guard written to catch it, and the STALL-1 row was
+    merged by PR #221 still saying it was not merged. Multi-word forms of the
+    same claim are now matched too.
     """
-    claim = r"(?:local[- ]only|not pushed|unpushed|unmerged|cannot fetch)"
+    claim = (
+        r"(?:local[- ]only|not (?:yet )?(?:been )?(?:pushed|merged|published)"
+        r"|unpushed|unmerged|unpublished|cannot fetch)"
+    )
     near = rf"(?:`([0-9a-f]{{7,40}})`[^.]{{0,80}}?{claim}|{claim}[^.]{{0,80}}?`([0-9a-f]{{7,40}})`)"
     return [a or b for a, b in re.findall(near, text, flags=re.IGNORECASE)]
 
@@ -598,26 +619,91 @@ def test_no_document_calls_a_merged_commit_unreachable():
     careful -- it needs a check that runs after the merge, which is this one.
 
     Skips when git is unavailable so the suite stays runnable from an export.
+
+    STALLCR-004: the base is the MAINLINE, not `HEAD`. "Merged" means merged
+    to `main`; measuring against `HEAD` makes every commit on the branch you
+    are working on look merged, so a row that correctly says "not merged yet"
+    while the work is still under review would fail on its own branch and the
+    obvious fix would be to delete the true sentence.
     """
-    try:
-        subprocess.run(
-            ["git", "rev-parse", "--verify", "HEAD"],
-            cwd=ROOT, capture_output=True, check=True,
-        )
-    except (OSError, subprocess.CalledProcessError):  # pragma: no cover
-        pytest.skip("not a git checkout")
+    mainline = _mainline_ref()
+    if mainline is None:  # pragma: no cover - export or detached checkout
+        pytest.skip("no mainline ref available")
 
     stale: list[str] = []
     for name in ("SESSION_HANDOFF.md", "ACTION_PLAN_2026-08-02.md"):
         text = _text(name)
         for commit in _repository_commits_claimed_unreachable(text):
             reachable = subprocess.run(
-                ["git", "merge-base", "--is-ancestor", commit, "HEAD"],
+                ["git", "merge-base", "--is-ancestor", commit, mainline],
                 cwd=ROOT, capture_output=True,
             )
             if reachable.returncode == 0:
-                stale.append(f"{name} calls {commit} unreachable, but it is in HEAD")
+                stale.append(
+                    f"{name} calls {commit} unreachable, but it is in {mainline}"
+                )
     assert not stale, "; ".join(stale)
+
+
+def test_no_action_plan_row_calls_its_own_merged_commits_unmerged():
+    """STALLCR-004. The sentence-scoped guard above cannot see the shape this
+    actually took: the STALL-1 ledger row put "not merged or deployed" in its
+    status sentence and the commit hashes in the NEXT sentence, so no claim
+    and hash ever shared a clause, and PR #221 merged the row still saying it
+    was not merged.
+
+    The durable unit for a ledger is the ROW, not the sentence: one table row
+    is one status claim about one named set of commits. Checked against the
+    mainline, so a row that truthfully says "not merged" while its work is
+    still under review stays green on its own branch.
+    """
+    mainline = _mainline_ref()
+    if mainline is None:  # pragma: no cover - export or detached checkout
+        pytest.skip("no mainline ref available")
+
+    claim = re.compile(
+        r"not (?:yet )?(?:been )?(?:merged|pushed|published)|unmerged|local[- ]only",
+        flags=re.IGNORECASE,
+    )
+    raw = (ROOT / "docs" / "ACTION_PLAN_2026-08-02.md").read_text(encoding="utf-8")
+    stale: list[str] = []
+    for line in raw.splitlines():
+        if not line.lstrip().startswith("|") or not claim.search(line):
+            continue
+        # Claim sentence plus the one after it. A ledger row also names the
+        # DEPLOYED operational commit several sentences later, which is
+        # merged and not what the claim is about, so whole-row scope would
+        # red on a correct row and teach the reader to delete true text.
+        sentences = line.split(".")
+        suspect: set[str] = set()
+        for index, sentence in enumerate(sentences):
+            if claim.search(sentence):
+                window = " ".join(sentences[index : index + 2])
+                suspect.update(re.findall(r"`([0-9a-f]{7,40})`", window))
+        for commit in sorted(suspect):
+            reachable = subprocess.run(
+                ["git", "merge-base", "--is-ancestor", commit, mainline],
+                cwd=ROOT, capture_output=True,
+            )
+            if reachable.returncode == 0:
+                stale.append(f"row claims unmerged but {commit} is in {mainline}")
+    assert not stale, "; ".join(sorted(set(stale)))
+
+
+def test_the_unreachability_parser_recognizes_multi_word_claims():
+    """Pins the parser directly, not through today's documents: a document
+    fix alone would leave the guard just as blind to the next phrasing."""
+    for phrasing in (
+        "`6aa7069`: not merged or deployed",
+        "`6aa7069` has not been published",
+        "`6aa7069` is not yet pushed",
+        "unmerged: `6aa7069`",
+        "`6aa7069` is local-only",
+    ):
+        assert _repository_commits_claimed_unreachable(phrasing) == ["6aa7069"], (
+            phrasing
+        )
+    assert _repository_commits_claimed_unreachable("`6aa7069` merged in PR #221") == []
 
 
 def test_sell1_current_records_do_not_reopen_merged_review_work():

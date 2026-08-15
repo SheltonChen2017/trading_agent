@@ -61,6 +61,11 @@ from assistant.allocation_proposals import (
     estimate_pending_buy_value_by_ticker,
     generate_allocation_buy_proposals,
 )
+from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
+from assistant.rebalance_profile import (
+    OWNER_APPROVED_PROFILE,
+    SLEEVE_LABELS,
+)
 from assistant.hedge_sleeve import (
     evaluate_hedge_sleeve,
     generate_hedge_buy_proposals,
@@ -1458,6 +1463,7 @@ _PAGE_LABELS = (
     "Policy Based Selling",
     "Discrete Selling",
     "Hedging",
+    "Portfolio Rebalancing",
     "Propose & Approve",
     "History",
     "Ticker Suggestions",
@@ -1541,6 +1547,7 @@ _PAGE_DESCRIPTIONS = {
     "Policy Based Selling": "Review sell proposals created only by policy breaches.",
     "Discrete Selling": "Create one owner-directed sell proposal by shares or dollar amount.",
     "Hedging": "Size a defensive ETF allocation toward a hedge target you set.",
+    "Portfolio Rebalancing": "Read-only sleeve drift against the targets you approved.",
     "Propose & Approve": "Review deterministic proposals and apply the typed approval gate.",
     "History": "Inspect proposal and order outcomes without changing them.",
     "Ticker Suggestions": "Explore verified market-screen candidates with source disclosures.",
@@ -3799,6 +3806,116 @@ if page == "Hedging":
                 "Set a hedge target above 0% to size a purchase. At 0% this "
                 "page only reports what you already hold."
             )
+
+
+if page == "Portfolio Rebalancing":
+    st.caption(
+        "Read-only. This page reports what your portfolio IS against the "
+        "sleeve targets you approved -- it proposes nothing, sizes nothing, "
+        "and names no buy or sell. Targets and band width are your stated "
+        "preference, not a research result."
+    )
+    _rb_policy, _rb_packet = _load_packet(policy_path, include_events=False)
+    _rb_report = evaluate_portfolio_rebalance(
+        _rb_packet.portfolio, OWNER_APPROVED_PROFILE, policy=_rb_policy
+    )
+
+    # Stage 1 has no stored analysis: the report is recomputed from the
+    # current snapshot on every rerun and nothing is written to session
+    # state. A stale card cannot survive a profile or snapshot change if no
+    # card is ever retained, which is the simplest form of the staleness
+    # rule the later proposal stages will need to implement explicitly.
+    st.caption(
+        f"Profile `{_rb_report.profile_version}` "
+        f"(`{_rb_report.profile_fingerprint[:12]}`), "
+        f"band +/-{_rb_report.band_fraction:.0%} relative, "
+        f"snapshot {_rb_report.as_of}. Recomputed on every rerun; nothing "
+        "here is retained between views."
+    )
+
+    for _rb_disclosure in _rb_report.disclosures:
+        st.warning(_rb_disclosure)
+
+    if _rb_report.refusals:
+        for _rb_refusal in _rb_report.refusals:
+            st.error(_rb_refusal)
+        st.info(
+            "No sleeve percentage is shown while any of the above is "
+            "unresolved. Sleeve weights share one equity denominator, so a "
+            "single unusable value moves every sleeve's percentage -- "
+            "including sleeves whose own holdings read fine."
+        )
+    else:
+        _rb_a, _rb_b, _rb_c, _rb_d = st.columns(4)
+        _rb_a.metric(
+            "Total equity", f"${float(_rb_report.total_equity_exact):,.2f}"
+        )
+        _rb_b.metric("Invested", f"{_rb_report.invested_pct:.2f}%")
+        _rb_c.metric("Cash", f"{_rb_report.cash_pct:.2f}%")
+        _rb_d.metric("Bands breached", f"{_rb_report.breached_count}")
+
+        with st.container(border=True):
+            st.caption("SLEEVE ALLOCATION")
+            st.bar_chart(
+                {
+                    "Current %": {
+                        SLEEVE_LABELS[r.sleeve]: r.current_pct
+                        for r in _rb_report.rows
+                    },
+                    "Target %": {
+                        SLEEVE_LABELS[r.sleeve]: r.target_pct
+                        for r in _rb_report.rows
+                    },
+                },
+                height=260,
+            )
+
+        _rb_status_labels = {
+            "inside_band": "Inside band",
+            "underweight": "Underweight",
+            "overweight": "Overweight",
+            "unassigned_holdings": "Unassigned holdings",
+            "pending_value_unknown": "Pending value unknown",
+            "data_unavailable": "Data unavailable",
+            "policy_conflict": "Policy conflict",
+        }
+        st.dataframe(
+            [
+                {
+                    "Sleeve": SLEEVE_LABELS[_row.sleeve],
+                    "Target": f"{_row.target_pct:.2f}%",
+                    "Band": (
+                        f"{_row.lower_edge_pct:.2f}% - "
+                        f"{_row.upper_edge_pct:.2f}%"
+                    ),
+                    "Current": f"{_row.current_pct:.2f}%",
+                    "Pending": f"${float(_row.pending_value_exact):,.2f}",
+                    "Projected": f"{_row.projected_pct:.2f}%",
+                    "Gap to target": (
+                        f"${float(_row.gap_to_target_exact):,.2f}"
+                    ),
+                    "Status": _rb_status_labels.get(_row.status, _row.status),
+                }
+                for _row in _rb_report.rows
+            ],
+            hide_index=True,
+            width="stretch",
+        )
+        st.caption(
+            "Gap to target is a distance, not an instruction: it names how "
+            "far a sleeve sits from its target in dollars, with no share "
+            "count, no side, and no ordering of what to act on."
+        )
+
+        if _rb_report.unassigned_tickers:
+            with st.container(border=True):
+                st.caption("HELD OUTSIDE EVERY SLEEVE")
+                st.write(", ".join(_rb_report.unassigned_tickers))
+                st.caption(
+                    "These are shown because the allocation profile does not "
+                    "cover them. That is a gap in the profile, not a verdict "
+                    "on the holding, and it is not a reason to sell."
+                )
 
 
 if page == "Propose & Approve":

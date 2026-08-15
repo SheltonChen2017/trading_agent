@@ -1,8 +1,8 @@
-# Session handoff — REBAL-1 Stage 2 accepted after correction
+# Session handoff — REBAL-1 Stage 2 reviewed and counter-reviewed
 
-Prepared: 2026-08-15 by Codex after reviewing Claude's single pushed Stage 2
-snapshot. Audience: repository owner, Claude Code, Codex, and the next
-verifier.
+Prepared: 2026-08-15 by Claude, after counter-reviewing Codex's independent
+review and correction of Stage 2. Audience: repository owner, Claude Code,
+Codex, and the next verifier.
 
 ## 0. Read first
 
@@ -167,10 +167,60 @@ broker or operator database.
 - No account identifier, balance, credential value, secret, or private
   artifact content is recorded here.
 
+## 6b. Counter-review of the Stage 2 correction (Claude, 2026-08-15)
+
+Branch `user/claude/rebal1-stage2-counterreview-20260815`, based on Codex's
+review tip `c14acfc`. Ledger in
+`docs/REVIEW_2026-08-15_REBAL1_STAGE2_COUNTERREVIEW.md`.
+
+All six of Codex's findings were re-derived on a worktree at the submitted
+tree `7420a99` and all six are real. **REBAL2CR-001 is the one that matters:**
+every Stage 2 proposal carried a `Decimal` in `reference_price`,
+`save_proposal()` JSON-encodes, so the feature's only action path raised
+`TypeError` before an approval card could exist. I had seen the type
+discrepancy and written a comment rationalising it rather than asking what
+downstream required — documenting a smell is not chasing it. The tests missed
+it because they inspected in-memory proposal fields and never drove the
+button; the action path had no end-to-end coverage at all.
+
+**The execution-path change was audited separately** and accepted. The
+context validator is injected at call time through the frozen
+`ProposalValidationDeps` contract rather than imported by the kernel, runs
+before `import_broker()`, has exactly one construction site so no other caller
+breaks, keys on `evidence_status` so every other proposal family passes
+through untouched, uses the same failure class as its six sibling pre-broker
+refusals, and reaches `rebalance_profile` through a deferred import that adds
+no path toward `ml`.
+
+**One P3 closed (REBAL2CCR-001):** the context check's missing-fingerprint arm
+was unpinned. An earlier reading of mine called this a fail-closed gap and
+that was wrong — `None != current` refuses the proposal either way. What was
+actually lost is the refusal saying *missing* rather than *does not match*,
+which would send the owner looking for a profile edit that never happened.
+Two regressions now cover it and the untouched-families case.
+
+**Recorded for whoever adds multi-profile support:**
+`_validate_proposal_context` compares against the module constant
+`OWNER_APPROVED_PROFILE` while `generate_steering_proposals` accepts any
+profile. They agree today because the UI passes only the constant. When Stage
+0 grows editable or multiple profiles, this must resolve the *active* profile
+or every proposal made against a non-constant profile becomes permanently
+unexecutable. Fail-closed, so it is a trap for a future change rather than a
+present defect, and it is deliberately not fixed here.
+
+Validation on this tree: **3,977 passed / 0 failed** in the pinned `.venv`;
+32 steering tests. Eight mutations against Codex's corrections, seven
+detected plus the one that became REBAL2CCR-001. The staleness fingerprint
+result is worth stating precisely: its payload carries both the portfolio
+snapshot and the report, and the report already holds per-sleeve market
+values, so removing either alone leaves the property defended by the other.
+The test reddens once both are removed — discriminating, not vacuous.
+
 ## 7. What is next
 
-No further REBAL implementation is authorized by this review. The owner may
-merge the pushed Codex branch through a PR.
+No further REBAL implementation is authorized. The owner may merge
+`user/claude/rebal1-stage2-counterreview-20260815`, which carries Codex's
+review commits and this counter-review on top, through a single PR.
 
 If the owner wants to continue REBAL-1, Stage 3 is the next defined stage but
 requires a new explicit instruction naming it. It is the first rebalancing

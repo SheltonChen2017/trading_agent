@@ -640,11 +640,22 @@ def record_operational_drill(
     )
 
 
-def _valid_sessions(start: str, end: str) -> list[str]:
+def valid_session_dates(start: str, end: str) -> list[str]:
+    """NYSE session dates in ``[start, end]``, holiday-aware.
+
+    Public because `assistant.epoch_cadence` needs the SAME calendar
+    authority: two modules answering "was this a trading day?" from two
+    calendar objects is precisely the drift this project consolidates away.
+    """
     return [
         stamp.date().isoformat()
         for stamp in _NYSE.valid_days(start_date=start, end_date=end)
     ]
+
+
+# Retained so this module's own long-standing call site keeps reading in
+# local terms; both names are the one calendar.
+_valid_sessions = valid_session_dates
 
 
 def _paper_order_summary(

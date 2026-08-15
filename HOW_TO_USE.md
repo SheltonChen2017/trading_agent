@@ -398,6 +398,52 @@ The evidence epoch itself is a database record: it survives reboots and
 never needs re-activating. The frozen checkout must not be updated until
 the epoch is closed.
 
+### Is the epoch still collecting evidence?
+
+```powershell
+python scripts\check_epoch_cadence.py
+```
+
+Run this whenever you think of it, especially during a long epoch. It reads
+the operator database **read-only** — it is safe to run from the development
+folder while an epoch is open, and it cannot write, submit, or change
+anything.
+
+It exists because the evidence summary is blind to a trailing stall. A
+nightly capture that cannot reconcile correctly exits nonzero and creates a
+critical alert; this tool does not replace those controls. It answers the
+separate direct question: has the active epoch actually kept accumulating?
+Epoch-002 sat at one observation until the incident was traced by hand. The
+existing gap check could not see it because it only looks *between* the first
+and last observation already present — a run that stops has nothing after it
+to compare against.
+
+The default trigger is the **measured current epoch-host schedule: 16:30
+Pacific**, with a two-hour late-run grace. A task's trigger is a fixed local
+clock, not "market close plus a duration"; that distinction prevents a false
+missing session after a 13:00 Eastern early close. If the task is reinstalled
+or moved, first read its real `StartBoundary` as described above, then supply
+the host-local clock and IANA timezone explicitly, for example:
+
+```powershell
+python scripts\check_epoch_cadence.py --capture-time 13:30 --capture-timezone America/Los_Angeles
+```
+
+The five answers:
+
+| Result | Meaning |
+|---|---|
+| `NOT DUE YET` | Nothing is owed yet. Zero observations is correct, not a fault. |
+| `HEALTHY` | Every session owed so far was captured. |
+| `BEHIND` | Something is missing, but it may be one late run. Re-check after the next session. |
+| `STALLED` | Nothing has been captured for two or more owed sessions. The epoch is open but no longer accumulating. |
+| `NO ACTIVE EPOCH` | Nothing is being collected at all. This is distinct from a stall and returns failure so a scheduled check cannot silently accept a missing promised epoch. |
+
+If it says `STALLED`, the two usual causes are the scheduled task not
+running (check it with the command above) and ledger reconciliation
+refusing to capture — which is the machinery working correctly and pointing
+at real books that need explaining, not something to override.
+
 ---
 
 ## 7. When something looks wrong

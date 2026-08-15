@@ -1,7 +1,7 @@
-# Session handoff — SET-1 counter-review independently verified after correction
+# Session handoff — epoch stall detector independently reviewed
 
-Prepared: 2026-08-14 by Codex after independently verifying Claude's SET-1
-counter-review and PR #218 merge.
+Prepared: 2026-08-14 by Codex after reviewing Claude's read-only epoch stall
+detector and correcting the active project records.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -9,285 +9,182 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
-3. `docs/REVIEW_2026-08-14_CODEX_SET1_COUNTERREVIEW.md`
-4. `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`
-5. `docs/REVIEW_2026-08-14_SET1_SETTINGS_AND_FRACTIONAL_TRADING.md`
-6. `docs/REVIEW_2026-08-14_TRADE1_DISCRETE_TRADING.md`
-7. `docs/REVIEW_2026-08-13_OBSERVATION_CLOCK_AND_EPOCH005_ROLL.md`
-8. `docs/OPERATIONAL_FACTS.md`
-9. `docs/OPERATIONS_RUNBOOK.md`
+3. `docs/REVIEW_2026-08-14_EPOCH_STALL_DETECTOR.md`
+4. `docs/REVIEW_2026-08-14_CODEX_SET1_COUNTERREVIEW.md`
+5. `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`
+6. `docs/REVIEW_2026-08-13_OBSERVATION_CLOCK_AND_EPOCH005_ROLL.md`
+7. `docs/OPERATIONAL_FACTS.md`
+8. `docs/OPERATIONS_RUNBOOK.md`
 
-Nothing here authorizes merge, deployment, an evidence-epoch roll, M4, live
-trading, funded-account access, operator-database mutation, or a
-scheduled-task change. The owner separately authorized this branch's
-publication on 2026-08-14.
+Nothing here authorizes push, merge, deployment, evidence repair, an epoch
+roll, M4, funded-account access, live trading, operator-database mutation, or
+a scheduled-task change.
 
-## 1. Repository topology and remote availability
+## 1. Repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Current `main` and `origin/main`: `7055142` (PR #218), which merged Claude's
-  SET-1 counter-review `45a510c`. PR #217 merge `ca0cdf0` is its first parent.
-- Codex's SET-1 review branch `codex/review-set1-settings-toggles-20260814`
-  is MERGED. Its product/test correction is `89156b7`; its records are
-  `6b944ac`, `d4d43cf`, and `55a1110`.
-- Claude's counter-review branch `user/claude/set1-counterreview-20260814`
-  is MERGED through PR #218. It carries SET1CR-001 … SET1CR-004 and
-  `docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`.
-- Active branch: `codex/review-set1-counterreview-20260814`, based on exact
-  main `7055142`. Product/test correction `29290d9` closes CSET1CR-001 … 003;
-  the commit containing this handoff closes the post-merge record drift
-  CSET1CR-004. The owner authorized publication on 2026-08-14; the branch
-  tracks `origin/codex/review-set1-counterreview-20260814` and the commit
-  containing this publication-state update is remotely retrievable.
-- Merged-branch cleanup ran on 2026-08-14: twelve merged branches were
-  deleted (five local, seven remote). Two unmerged branches were deliberately
-  KEPT and are content-redundant with `main`:
-  `user/claude/discrete-trading-tabs-20260814` (its three fixes exist in
-  `main` in Codex's better form, which additionally handles the
-  no-valid-selection case) and
-  `codex/review-observation-clock-roll-20260813` (its substantive commit
-  `1cb8abf` is in `main`; only an obsolete push-status paragraph is unique).
-  Neither should be merged; both can be deleted.
+- Current `main` and `origin/main`: `60027af` (PR #220). Its first parent is
+  PR #219, which merged Codex's verified SET-1 counter-review correction; its
+  second current-state change records the owner's 60-day epoch-005 hold.
+- Claude feature branch: `user/claude/epoch-stall-detector-20260814`, available
+  remotely at submitted commit `6aa7069`.
+- Active review branch: `codex/review-epoch-stall-detector-20260814`, created
+  from exact submitted commit `6aa7069`.
+- Product/test correction: `4273de6`.
+- The branch has not been pushed. The documentation commit that contains this
+  handoff follows the product correction as a separate commit.
+- The operational checkout remains separate at frozen commit `752d3b7`; no
+  development commit in this review was copied there.
 
-Relevant merged and review history:
+Relevant current review history:
 
-- `9e07bf9`: Claude's TRADE-1 counter-review.
-- `6085f44`: Claude's SET-1 implementation.
-- `a62aa1a`: PR #213, merging SET-1 to main.
-- `e6c6748`: integration of main/SET-1 into the TRADE-1 review branch.
-- `cfed8c8`: PR #214, merging the combined TRADE-1 review tree to main.
-- `89156b7`: Codex's end-to-end SET-1 fractional correction.
-- `ca0cdf0`: PR #217, merging that correction to main.
-- `45a510c`: Claude's SET-1 counter-review and four corrections.
-- `7055142`: PR #218, exact-tree merge of `45a510c`.
-- `29290d9`: Codex verification correction on the active local branch.
+- `4de784e`: Claude's epoch-005 observation-clock and roll implementation
+  chain began here.
+- `1cb8abf`: Codex's independent correction of that roll chain.
+- `c048a94`: owner decision to keep epoch-005 unchanged for 60 days.
+- `60027af`: PR #220, current main after that decision.
+- `6aa7069`: Claude's read-only stall-detector implementation.
+- `4273de6`: Codex's product/test correction.
+- The completed BUY-1 review branch remains
+  `codex/review-buy1-suggestion-picker-20260813`, correction `44a7f85`; it is
+  historical recovery context, not reopened work.
 
-Carried-forward review anchors that remain part of current recovery history:
+The review began from a clean worktree and exact submitted commit. No
+unrelated user work is included.
 
-- The epoch-005 roll/review chain began at `4de784e` and was independently
-  corrected at `1cb8abf`; its full evidence remains in
-  `docs/REVIEW_2026-08-13_OBSERVATION_CLOCK_AND_EPOCH005_ROLL.md`.
-- BUY-1 was independently corrected on
-  `codex/review-buy1-suggestion-picker-20260813` at `44a7f85`, then merged and
-  counter-reviewed before this SET-1 work. No BUY-1 review work is reopened.
-
-This verification started from clean exact main `7055142`. No unrelated user
-work is included.
-
-## 2. Outcome, commit dispositions, and issue state
+## 2. Outcome and commit dispositions
 
 Final disposition: **accepted after correction**.
 
-Current verification issue total: **0 P0 / 0 P1 / 1 P2 / 3 P3; all
-closed; 0 open**.
+Issue total: **0 P0 / 0 P1 / 2 P2 / 5 P3; all closed; 0 open**.
 
-- `45a510c`: **accepted after correction**. SET1CR-001 through SET1CR-004
-  are sound. The same commit's development launcher protected SQLite but not
-  the shared paper account, omitted two supported provider keys, and added UI
-  tests that exposed a pre-existing cross-AppTest cache leak.
-- `7055142`: **accepted after correction**. The PR #218 merge tree exactly
-  equals `45a510c`, with both parents intact. Its active documents became stale
-  after the merge and are corrected on this branch.
-- `29290d9`: Codex product/test correction: development launches now engage
-  the environment kill switch by default, deliberate paper-order testing
-  requires `-AllowPaperOrders` without clearing another switch, all five
-  supported provider keys reload from user scope, primary instructions use the
-  safe launcher, and the sell AppTests clear Streamlit's global cache.
+- `6aa7069`: **accepted after correction**. The classifier/adapter split,
+  active-epoch anchoring, trailing-miss definition, five statuses, and
+  read-only intent were retained. The scheduler model and unhealthy-exit
+  semantics were not safe to accept unchanged.
+- `4273de6`: Codex product/test correction. Expected capture sessions now use
+  a configurable fixed wall-clock trigger; defaults match the measured
+  installed task. No active epoch exits nonzero. Public inputs fail closed,
+  real SQLite behavior proves read-only access, and all operator messages
+  describe actual state and failure behavior.
 
-Prior SET-1 implementation/review history carried forward:
+Closed findings:
 
-- `9e07bf9`: **accepted**. It correctly confirmed the eight TRADE-1 review
-  findings and fixed TRADE1CR-001. No further product correction was needed.
-- `6085f44`: **accepted after correction**. Its protected controls, strict
-  default, fingerprint binding, float refusal, and reserve/solvency split were
-  sound. The fractional setting was only dormant authority, not the requested
-  working feature; boolean validation, precision/eligibility boundaries, and
-  toggle semantics also needed correction.
-- `a62aa1a`: **accepted after correction**. The merge had no conflict defect,
-  but brought the incomplete feature to main before independent acceptance and
-  left current records saying it had not merged.
-- `e6c6748`: **accepted after correction**. Product trees combined correctly;
-  current state documents were not reconciled with the new topology.
-- `cfed8c8`: **accepted after correction**. The final combined tree retained
-  the SET-1 findings and a handoff whose requested next step had already
-  happened.
-- `89156b7`: reviewer correction completing and hardening the feature.
-- `6b944ac`: durable review ledger, current Action Plan, and exactly
-  two-paragraph SET-1 milestone record.
+- P2 CODSTALL-001: market close plus 3.5 hours moved the fixed Windows trigger
+  on early-close sessions and could manufacture a stall. Corrected to fixed
+  wall clock with explicit time/timezone options.
+- P2 CODSTALL-002: `NO_ACTIVE_EPOCH` returned success. It now exits 1.
+- P3 CODSTALL-003: invalid thresholds, negative grace, and naive clocks were
+  accepted. They now refuse.
+- P3 CODSTALL-004: source-text searching did not prove SQLite read-only
+  behavior. Temporary-file tests now prove write refusal, byte stability, and
+  absence of WAL/SHM side files.
+- P3 CODSTALL-005: submitted prose falsely said a refused observation task
+  reports success. It now reflects the real nonzero exit and critical alert.
+- P3 CODSTALL-006: required milestone/current records were absent and the
+  Action Plan/handoff still named old main `7055142`. Current records now
+  identify `60027af` and this review.
+- P3 CODSTALL-007: `NOT_DUE_YET` always claimed zero observations, even when a
+  capture already existed inside the grace window. Detail is now data-aware.
 
-Prior independent-correction findings:
+The full evidence and red-before-green record are in
+`docs/REVIEW_2026-08-14_EPOCH_STALL_DETECTOR.md`.
 
-- P2 SET1R-001: disabling whole-share mode did not reach production sizing,
-  execution, submission, or reconciliation.
-- P2 SET1R-002: the authority-changing policy field accepted non-boolean
-  durable values.
-- P2 SET1R-003: no nine-decimal, fractionable-asset, or exact last-mile broker
-  boundary existed.
-- P2 SET1R-004: float-tolerant reconciliation could accept a one-nanoshare
-  order-identity mismatch.
-- P3 SET1R-005: the requested settings toggles were checkbox widgets.
-- P3 SET1R-006: Action Plan, usage text, and handoff contradicted merged Git
-  history and the implemented scope.
-- P3 SET1R-007: the first correction draft violated the repository's guarded
-  Decimal conversion rule; the complete suite caught all four sites.
-- P3 SET1R-008: the first correction draft broke older strict broker seams by
-  always sending a new keyword; strict mode now relies on the existing strict
-  default and only fractional mode sends the explicit permission.
+## 3. Final feature behavior
 
-Claude's four counter-review findings are in
-`docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md`. The current four-finding
-ledger, concrete evidence, corrections, and verification are in
-`docs/REVIEW_2026-08-14_CODEX_SET1_COUNTERREVIEW.md`.
+- `assistant/epoch_cadence.py` is a pure classifier. It does not open a
+  database or perform an operational action.
+- `scripts/check_epoch_cadence.py` opens the supplied SQLite path through
+  `mode=ro`, reads the single active epoch and its observation session dates,
+  and prints either human text or JSON.
+- Expected sessions begin at the epoch's actual `started_at` and become due
+  only after the installed task's fixed wall-clock time plus grace.
+- Defaults are the currently measured 16:30 Pacific task time. Operators must
+  read the installed task and pass `--capture-time` / `--capture-timezone` if
+  that task is reinstalled or changed; never derive it from market close.
+- `NOT_DUE_YET`: no session is overdue. This is exit 0 whether the new epoch
+  is still empty or an observation already arrived inside the grace window.
+- `HEALTHY`: every due session is present; exit 0.
+- `BEHIND`: at least one session is missing, but the consecutive missing tail
+  is below the stall threshold; exit 1.
+- `STALLED`: the consecutive missing tail meets the threshold; exit 1.
+- `NO_ACTIVE_EPOCH`: nothing is collecting evidence; exit 1.
+- The detector does not write, repair missing rows, restart a task, create an
+  alert, change a schedule, roll an epoch, deploy code, or enter any trading
+  path. A monitor may use its nonzero exit, but no monitor/task was installed
+  by this review.
 
-## 3. Validation
+## 4. Validation
 
-Environment: repository `.venv`, Python 3.13.14, Streamlit 1.60.0.
+Authoritative environment: repository `.venv`, Python 3.13.14, Streamlit
+1.60.0, Windows.
 
-- Focused policy/sizing/proposal/gate/broker/reconciliation/UI suite:
-  **344 passed**.
-- Adjacent execution/batch/replacement/UI suite initially:
-  **255 passed / 1 failed**; the failure exposed SET1R-008 and passes after
-  correction.
-- First complete repository run: **3,737 passed / 1 failed / 25 warnings** in
-  973.49 s; the sole failure exposed SET1R-007.
-- Guard and directly affected rerun after correction: **34 passed**.
-- Active-document consistency suite: **26 passed**.
-- Complete code + review-record + draft-handoff run: **3,736 passed / 2
-  failed / 25 warnings** in 969.03 s. Both failures were current-document
-  continuity guards: this reconstructed handoff had omitted the required
-  epoch-roll anchors `4de784e` / `1cb8abf` and the completed BUY-1 review
-  branch/hash. No production, policy, broker, execution, or UI test failed.
-- Post-correction active-document suite: **26 passed**.
+- Submitted detector suite: **17 passed**.
+- Red regression evidence: **4 failed / 16 passed** before correction,
+  covering the wrong early-close schedule, absent configurable trigger,
+  successful no-active-epoch status, and invalid threshold acceptance.
+- Corrected detector module after the final message test: **24 passed**.
+- Detector plus adjacent paper-evidence/schema/import boundaries: **59 passed**
+  before the final message test; all are included in the complete run.
+- Previously failing UI files under the correct pinned environment:
+  **40 passed**.
+- Full settled product tree in `.venv`: **3,783 passed / 0 failed / 25 known
+  dependency warnings** in 900.86 seconds.
+- Repository `compileall`: clean. `git diff --check`: clean.
 
-Counter-review (`user/claude/set1-counterreview-20260814`), 2026-08-14:
+One non-authoritative full run used the user Python by mistake. That runtime
+has Streamlit 1.52.2, while the repository pins 1.60.0, so 14 UI tests failed
+because `AppTest.segmented_control` is unavailable. A pip replacement failed
+on a malformed shared-package record and rolled back; the user installation
+remains 1.52.2. The authoritative `.venv` run above is green and the running
+development app was not stopped or changed.
 
-- New suite `tests/test_set1_counterreview.py`: **15 passed**.
-- Mutation testing: **5 of 5** corrections detected; each fix reverted
-  individually, the intended test confirmed to fail, original bytes
-  restored in a `finally`, restoration verified with `git diff`.
-- Full repository suite: **3,752 passed / 1 failed** in 848.07 s; the
-  failure was this session's own handoff wording tripping the
-  merged-commit-reachability guard, since reworded.
-- Affected suites re-run after documentation edits: **196 passed**.
-- An earlier full run reported 2 failures in
-  `tests/test_risk_check_registry.py`; that run overlapped edits to
-  `risk/execution_gate.py` and those tests read source from disk. They
-  pass on the settled tree. A suite run concurrent with edits validates
-  nothing.
+No source or documentation was edited concurrently with the authoritative
+full run. Test broker/provider seams were fakes or monkeypatches.
 
-Codex verification (`codex/review-set1-counterreview-20260814`), 2026-08-14:
+## 5. Operational truth and owner decision
 
-- `git diff --exit-code 45a510c 7055142`: clean; PR #218's merge tree is
-  exact.
-- Launcher, operational-launcher, and environment-kill-switch contracts:
-  **39 passed**; PowerShell parser: clean without executing the app.
-- Order-dependent UI sequence before correction: **23 passed / 1 failed**;
-  the older sell test passed alone but lost its whole-share widget after the
-  preceding AppTests. The fixture now clears Streamlit's data cache.
-- Full settled-tree repository suite after product/test correction:
-  **3,759 passed / 0 failed / 25 known dependency warnings** in 888.59 s.
-- Post-documentation active-record, launcher, SET-1, exact UI-order,
-  kill-switch, and operational-launcher checks: **138 passed**.
-- Repository `compileall`: clean. `git diff --check` and staged checks: clean
-  apart from expected Windows line-ending notices.
-
-All provider/broker seams in tests were local fakes or monkeypatches. No real
-broker request, order, funded-account action, operator-database write,
-deployment, scheduled-task change, or live-market interaction occurred.
-
-## 4. Completed feature and authority truth
-
-- Settings & Features contains native Streamlit toggles for **Whole shares
-  only** and **Enforce a minimum cash reserve**. Both remain inside the typed
-  `UPDATE POLICY`, atomic expected-fingerprint workflow.
-- `whole_shares_only` defaults to `True`, is validated as an actual boolean,
-  and remains strict whenever a caller omits the flag.
-- With the setting on, existing whole-share behavior is unchanged and broker
-  submission retains the established Alpaca SDK path.
-- With the setting off, Budgeted Buying, Discrete Buying, and Discrete Selling
-  create exact quantities with at most nine decimal places. Dollar inputs are
-  budgets converted to quantities, not broker-notional orders.
-- Fractional quantities persist as canonical decimal text in proposals and
-  authorization identity. Binary floats are still invalid order input.
-- Fresh execution preflight and last-mile submission both require Alpaca's
-  asset result to say `fractionable`. Fractional day orders use exact REST
-  quantity text and the existing idempotent client order ID.
-- Reconciliation prefers the broker's exact decimal quantity and requires
-  exact equality; there is no share-count tolerance.
-- Turning the reserve control off stores `min_cash_reserve_pct = 0`. It removes
-  only the buffer: a buy that would take cash negative still refuses.
-- Nothing auto-submits. Typed approval, fresh quote/account checks,
-  concentration/exposure limits, duplicates, reservations, kill switch, paper
-  mode, and all other existing gates remain in force.
-- `scripts/launch_dev_app.ps1` uses `data/dev_scratch.db` and engages the
-  environment kill switch by default. `-AllowPaperOrders` is the explicit
-  paper-test opt-in and does not clear any inherited or persistent switch.
-  The development and operational runtimes still share one Alpaca paper
-  account, so ordinary previews must keep the default halt.
-- Policy fingerprint changes invalidate prior proposals. Deploying this new
-  policy field, even at the safe default, changes execution lineage.
-
-## 5. Operational truth carried forward, not remeasured here
-
-- `paper-epoch-005` remains the only active evidence epoch recorded by the
-  durable operational documents.
-- Its frozen deployed code is `752d3b7` in
-  `C:\git\trading_agent_operational`; this development review did not touch
-  that checkout.
-- Epochs 001 through 004 are closed and cannot pool into epoch-005.
-- The last reliable record expected the first scheduled epoch-005 observation
-  after 16:30 Pacific on 2026-08-14. This review did not inspect the operator
-  database or scheduler, so it makes no new claim about observation count,
-  task result, manifest, lineage, or open alerts.
-- CR-W3 remains: the first real AEP dividend subtype may fail closed around
-  2026-09-10 and require the reviewed acknowledgement path. Do not widen
-  reconciliation tolerance or post a manual compensating entry.
+- `paper-epoch-005` is active on the epoch host at frozen deployed commit
+  `752d3b7`. Epochs 001 through 004 are closed and cannot pool evidence into
+  it.
+- Owner decision, 2026-08-14: epoch-005 runs unchanged for 60 days. Do not
+  deploy, roll, or otherwise disturb it. TRADE-1, BUY-1, SET-1, the fractional
+  path, SET-1 counter-review corrections, and STALL-1 remain development-only.
+- The measured installed `TradingAgent-Paper-PaperObservation` trigger is
+  Monday-Friday at 16:30 Pacific/local. Fresh installer source may express a
+  different timezone; the installed task is the authority.
+- Sixty calendar days produces roughly 43 weekday observations, not 60
+  sessions. Whether the owner's target means days or observations remains an
+  owner clarification before completion is claimed.
+- The one live detector invocation used SQLite read-only mode and reported
+  epoch-005 `NOT_DUE_YET` at that moment. This point-in-time read neither
+  changed the database nor establishes future cadence.
+- The owner may exercise development UI features with
+  `scripts/launch_dev_app.ps1`; its default scratch database and environment
+  kill switch prevent submission. `-AllowPaperOrders` reaches the shared
+  Alpaca paper account and must not be used while the 60-day hold stands.
+- CR-W3 remains a watch item: the first real AEP dividend subtype may fail
+  closed around 2026-09-10 and require the reviewed acknowledgement path. Do
+  not widen reconciliation tolerance or post a manual compensating entry.
 
 No account identifier, balance, credential value, private artifact content,
 or secret is recorded here.
 
 ## 6. Next authorized step
 
-1. Claude may independently verify `29290d9` and the documentation commits on
-   `origin/codex/review-set1-counterreview-20260814`. The branch is published;
-   publication does not authorize merge or deployment. `45a510c` and PR #218
-   merge `7055142` are already merged history, not work awaiting review.
-2. Answer the one open design question recorded in the counter-review: should
-   strict mode permit a fractional sell that closes an ENTIRE remaining
-   position? It cannot increase exposure and is the canonical risk-reducing
-   action, but it would widen what "Whole shares only" permits across four
-   deliberately independent layers. This is an owner decision. Until it is
-   answered, the shipped behaviour is: the floor stands, the stranded
-   remainder is disclosed, and turning the setting off is the remedy.
-3. **Owner decision, 2026-08-14 (supersedes the earlier "epoch-005 is
-   expendable" sequencing): epoch-005 runs UNCHANGED for 60 days.** Do not
-   deploy, roll, or otherwise disturb it. The practical consequence is that
-   TRADE-1, BUY-1, SET-1, the fractional-share path, and the counter-review
-   corrections stay development-only for the duration; the operational
-   runtime remains `752d3b7`. The owner will exercise new features through
-   the development app from time to time, which is compatible with this
-   decision as long as `scripts/launch_dev_app.ps1` is used WITHOUT
-   `-AllowPaperOrders`: the scratch database and the environment kill switch
-   together keep a development session out of the epoch's record. The
-   `-AllowPaperOrders` switch reaches the SHARED Alpaca paper account and
-   must not be used while this decision stands.
-   Cadence measured 2026-08-14, not assumed: `TradingAgent-Paper-Observation`
-   is `Ready`, last result 0, and its trigger is `DaysOfWeek: 62` (Mon-Fri)
-   at 16:30 local. So 60 calendar days yields roughly 43 observations, not
-   60. Whether the owner means 60 days or 60 observations is unresolved and
-   should be confirmed before the count is treated as complete.
-   Epoch-005 showing 0 observations on 2026-08-14 is CORRECT and not a
-   fault: the epoch opened at 16:59 local on 2026-08-13, after that day's
-   16:30 observation, which belongs to epoch-004.
-4. If the owner later requests deployment, treat the policy-fingerprint change
-   as an epoch-closing lineage change and follow the operations runbook; do not
-   preserve epoch-005 by pretending the safe default is immaterial.
-5. Separately, when requested, perform read-only verification of the scheduled
-   epoch-005 observation. Do not infer it from this development review.
-6. Still open from TRADE-1: `TRADE1CR-002`, the date-dependent fixtures in
-   `tests/test_strategy_proposals_generic.py` that make the full suite
-   unpassable between roughly 00:00 and 09:30 ET. It belongs on its own
-   branch and is unrelated to SET-1.
+1. Claude may independently verify `4273de6` and the documentation commit on
+   `codex/review-epoch-stall-detector-20260814`. The branch must be pushed only
+   if the owner asks. Verification does not authorize merge or deployment.
+2. If the owner accepts the review later, merge through the normal PR process.
+   Keep STALL-1 unscheduled and undeployed during the 60-day epoch hold unless
+   the owner explicitly changes that decision.
+3. If the installed observation task changes, remeasure its trigger with the
+   command in `HOW_TO_USE.md` and pass matching CLI time/timezone options.
+4. Separately answer whether the 60-day decision means calendar days or 60
+   captured market sessions before declaring the evidence target complete.
+5. The earlier SET-1 design question also remains open: whether strict
+   whole-share mode should permit a fractional sell only when it closes the
+   entire position.
 
 Do not begin M4, mutate the operator database, alter scheduled tasks, access a
 funded account, enable live trading, deploy, or roll an epoch without a new
@@ -297,21 +194,16 @@ explicit owner instruction.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/REVIEW_2026-08-14_CODEX_SET1_COUNTERREVIEW.md,
-docs/REVIEW_2026-08-14_SET1_COUNTERREVIEW.md, and docs/SESSION_HANDOFF.md.
-main and origin/main are 7055142 (PR #218), which merged Claude's SET-1
-counter-review 45a510c. Codex independently accepted its four trading fixes
-after correction on published branch
-origin/codex/review-set1-counterreview-20260814. Product/test correction 29290d9
-makes the development launcher engage the environment kill switch by
-default, requires explicit -AllowPaperOrders without clearing other switches,
-loads every supported user-scope provider key, routes primary docs through
-the safe launcher, and clears leaked Streamlit data-cache state in the older
-sell AppTests. The full settled tree passed 3,759 tests. One design question
-remains for the owner: whether strict mode should permit a fractional sell
-that closes the entire remaining position. The operational runtime remains
-frozen at 752d3b7 under paper-epoch-005; its observation count was not
-remeasured. Publication is complete; do not merge, deploy, roll the epoch,
-begin M4, mutate the operator database, alter scheduled tasks, access a funded
-account, or enable live trading without explicit owner authorization.
+docs/REVIEW_2026-08-14_EPOCH_STALL_DETECTOR.md, and
+docs/SESSION_HANDOFF.md. main and origin/main are 60027af (PR #220). Claude's
+STALL-1 implementation is 6aa7069. Codex accepted it after correction on
+codex/review-epoch-stall-detector-20260814; product/test correction 4273de6
+uses the measured fixed scheduler wall clock, makes NO_ACTIVE_EPOCH unhealthy,
+hardens inputs, proves real SQLite read-only behavior, and corrects operator
+messages. The full pinned-environment tree passed 3,783 tests. The review
+branch has not been pushed. The operational runtime remains frozen at 752d3b7
+under active paper-epoch-005 and the owner's 60-day unchanged hold. Do not
+push, merge, deploy, schedule the detector, roll the epoch, mutate the operator
+database, begin M4, access a funded account, or enable live trading without
+explicit owner authorization.
 ```

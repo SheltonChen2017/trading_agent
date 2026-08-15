@@ -2,8 +2,8 @@
 
 Author: Codex (plan), relayed and recorded by Claude
 Adopted: 2026-08-15
-Status: **Stage 1 implemented, pending independent review. Stages 2 and 3
-not started.**
+Status: **Stage 1 complete after independent correction. Stages 2 and 3 not
+started.**
 
 This file records the owner-adopted staging so the sequencing survives the
 conversation it was written in. It is the authority for what REBAL-1's
@@ -55,7 +55,8 @@ mandate nor the policy contains an allocation.
 
 ## Stage 1 — Read-only Portfolio Rebalancing page
 
-**Implemented.** Total equity, invested %, cash %, breached-band count, a
+**Complete after independent correction at `5519a69`.** Total equity,
+invested %, cash %, breached-band count, a
 sleeve allocation chart, and a drift table carrying sleeve, target, band,
 current, pending, projected, dollar gap to target, and status.
 
@@ -63,10 +64,13 @@ Statuses: `inside_band`, `underweight`, `overweight`, `unassigned_holdings`,
 `pending_value_unknown`, `data_unavailable`, `policy_conflict`.
 
 Calculation rules: exact broker values and Decimal arithmetic; measurable
-pending buys and sells included; projection refused when open-order data is
+pending buys and sells move both their asset sleeve and cash, and status plus
+gap use that conserved projection; projection refused when open-order data is
 unavailable; inclusive band boundaries; duplicate position rows aggregated;
-every holding surfaced; malformed, non-finite, negative, or otherwise
-unusable authoritative values refused.
+every current or pending exposure surfaced; malformed, non-finite, negative,
+or otherwise unusable authoritative values refused. Targets that cannot fit
+the active total-exposure, per-position, leveraged, or cash-reserve policy
+limits are disclosed as conflicts rather than presented as reachable.
 
 Stage 1 emits no shares, sides, proposals, approvals, or action-shaped
 recommendations.

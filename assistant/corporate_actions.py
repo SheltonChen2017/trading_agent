@@ -190,6 +190,59 @@ def fills_with_confirmed_splits(store: AssistantStore) -> list[LotEvent]:
     )
 
 
+def ticker_tax_ledger_with_coverage(
+    store: AssistantStore, portfolio: Any, ticker: str
+) -> tuple[Any | None, dict[str, Any]]:
+    """Build a ledger when app events cover ONE ticker's current shares.
+
+    A deliberate sibling of `tax_ledger_with_coverage` rather than a
+    loosening of it. That function answers "can this whole book be taxed
+    accurately?" and correctly withholds the ledger entirely when any
+    holding is unreconciled, because a portfolio-wide tax report built from
+    partial history would understate reality.
+
+    REBAL-1 Stage 3 asks a narrower question: a trim sells ONE ticker, and
+    its realized gain depends on that ticker's lots and nothing else. Under
+    the portfolio-wide rule the feature could never propose anything, because
+    `AssistantStore.list_fills` documents that positions "bought before the
+    app existed, or through the Alpaca UI, produce no events and therefore no
+    lots" -- so one pre-app holding anywhere withheld the ledger forever. A
+    gate that always refuses is indistinguishable from a careful safeguard,
+    which is how that defect stayed hidden through two review rounds.
+
+    The returned coverage keeps the same shape as its sibling so callers can
+    read it identically, with `complete` scoped to the requested ticker and
+    `portfolio_complete` reporting the book-wide answer for disclosure.
+    """
+    name = str(ticker).strip().upper()
+    if not name:
+        return None, {"complete": False, "reason": "no ticker", "tickers": {}}
+
+    ledger, coverage = tax_ledger_with_coverage(store, portfolio)
+    details = coverage.get("tickers") or {}
+    matched = bool((details.get(name) or {}).get("matched"))
+    scoped = {
+        "complete": matched,
+        "portfolio_complete": coverage.get("complete") is True,
+        "reason": (
+            None if matched
+            else (details.get(name) or {}).get("reason")
+            or f"app fill history does not cover the current {name} position"
+        ),
+        "tickers": details,
+    }
+    if not matched:
+        return None, scoped
+    if ledger is not None:
+        return ledger, scoped
+    # The sibling withheld the ledger because some OTHER holding is
+    # unreconciled. Rebuild it here: the same fills, read for one ticker
+    # whose own shares do reconcile.
+    try:
+        return build_ledger(fills_with_confirmed_splits(store)), scoped
+    except (TaxLotError, ValueError, KeyError) as exc:
+        return None, {**scoped, "complete": False, "reason": str(exc)}
+
 def tax_ledger_with_coverage(
     store: AssistantStore, portfolio: Any
 ) -> tuple[Any | None, dict[str, Any]]:

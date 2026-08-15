@@ -42,6 +42,8 @@ hit that bug class repeatedly -- see risk/execution_gate.py's notes).
 from __future__ import annotations
 
 import dataclasses
+import hashlib
+import json
 import math
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal
@@ -217,6 +219,7 @@ class LotLedger:
             return 0.0
         return _decimal_sum(lot.cost_basis for lot in lots) / shares
 
+
     def realized_pnl(self, ticker: str | None = None, *, long_term: bool | None = None) -> float:
         rows = self.realized
         if ticker is not None:
@@ -224,6 +227,33 @@ class LotLedger:
         if long_term is not None:
             rows = tuple(r for r in rows if r.long_term is long_term)
         return _decimal_sum(r.realized_pnl for r in rows)
+
+
+def open_lot_fingerprint(ledger: LotLedger, ticker: str) -> str:
+    """Stable identity of every currently open lot for one ticker.
+
+    A tax-aware proposal may be approved later than it was generated.  The
+    proposal binds this digest so a reconciled fill, split, or consumed lot
+    forces a fresh consequence calculation instead of leaving a card that
+    names stale basis information.  The ledger remains advisory to the broker;
+    this fingerprint only proves the advisory shown at approval still came
+    from the current app journal.
+    """
+    rows = [
+        {
+            "lot_id": lot.lot_id,
+            "ticker": lot.ticker,
+            "qty": repr(lot.qty),
+            "cost_per_share": repr(lot.cost_per_share),
+            "acquired_at": lot.acquired_at.isoformat(),
+        }
+        for lot in sorted(
+            ledger.open_for(ticker),
+            key=lambda item: (item.acquired_at, item.lot_id),
+        )
+    ]
+    raw = json.dumps(rows, sort_keys=True, separators=(",", ":"))
+    return hashlib.sha256(raw.encode("utf-8")).hexdigest()
 
 
 def _market_date(value: datetime) -> date:
@@ -325,6 +355,8 @@ def select_lots(
     if method == SPECIFIC:
         if not lot_ids:
             raise TaxLotError("method='specific' requires lot_ids")
+        if len(lot_ids) != len(set(lot_ids)):
+            raise TaxLotError("method='specific' received a duplicate lot id")
         by_id = {lot.lot_id: lot for lot in open_lots}
         missing = [lid for lid in lot_ids if lid not in by_id]
         if missing:
@@ -617,11 +649,17 @@ def compare_sale_bases(
     return result
 
 
-def unrealized_by_lot(ledger: LotLedger, ticker: str, price: float) -> list[dict]:
+def unrealized_by_lot(
+    ledger: LotLedger,
+    ticker: str,
+    price: float,
+    *,
+    now: datetime | None = None,
+) -> list[dict]:
     """Per-lot unrealized P&L -- what average cost averages away."""
     if not math.isfinite(price) or price <= 0:
         raise TaxLotError(f"price must be positive and finite, got {price!r}")
-    now = datetime.now(timezone.utc)
+    now = now or datetime.now(timezone.utc)
     return [
         {
             "lot_id": lot.lot_id,

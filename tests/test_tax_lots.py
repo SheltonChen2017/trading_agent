@@ -179,6 +179,17 @@ def test_specific_method_requires_and_validates_lot_ids():
         select_lots(lots, 2, method=SPECIFIC, lot_ids=["nope"])
 
 
+def test_specific_method_rejects_duplicate_lot_ids():
+    """Naming one lot twice must not double its available shares.  Stage 3
+    exposes named-lot planning, so accepting duplicates can otherwise show a
+    sale as fully covered while charging the same basis twice."""
+    lots = build_ledger([
+        Fill("AAPL", "buy", 1, 100.0, DAY1, fill_id="f1"),
+    ]).open_for("AAPL")
+    with pytest.raises(TaxLotError, match="duplicate lot id"):
+        select_lots(lots, 2, method=SPECIFIC, lot_ids=["f1", "f1"])
+
+
 def test_an_unknown_selection_method_is_rejected():
     lots = list(build_ledger(_scenario()).open_for("AAPL"))
     with pytest.raises(TaxLotError, match="method must be one of"):

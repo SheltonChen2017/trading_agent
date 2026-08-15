@@ -424,7 +424,7 @@ def test_gr1c_every_injected_seam_resolves_from_the_facade_at_call_time(
         patch.setattr(
             execution_service,
             "_validate_proposal_context",
-            lambda proposal: "SENTINEL-context",
+            lambda proposal, current_portfolio, store: "SENTINEL-context",
         )
         outcome = validate_proposal_for_execution(
             "p-context", _held_portfolio(), load_policy(), store, now_et=NOW_ET

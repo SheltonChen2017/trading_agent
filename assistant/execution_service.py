@@ -327,16 +327,34 @@ def _import_execution_broker():
     return broker
 
 
-def _validate_proposal_context(proposal: dict) -> str | None:
+#: Proposal families whose validity depends on the allocation profile as
+#: well as the trading policy. Keyed by evidence status so every other family
+#: returns from the context check immediately and keeps its prior behavior.
+_PROFILE_BOUND_EVIDENCE_STATUSES = frozenset(
+    {"user_directed_rebalance_buy", "user_directed_rebalance_trim"}
+)
+
+
+def _validate_proposal_context(
+    proposal: dict,
+    current_portfolio: PortfolioSnapshot | None = None,
+    store: AssistantStore | None = None,
+) -> str | None:
     """Fail closed when a context-bound proposal outlives that context.
 
     Most proposal families are fully bound by the trading-policy fingerprint.
-    REBAL-1 steering also depends on the owner's allocation profile, which is
-    a separate preference document and therefore needs its own execution-time
-    check. The deferred import keeps the generic execution kernel independent
-    of the rebalancing feature.
+    REBAL-1 steering and trimming also depend on the owner's allocation
+    profile, which is a separate preference document and therefore needs its
+    own execution-time check. The deferred import keeps the generic execution
+    kernel independent of the rebalancing feature.
+
+    Stage 3 trims are bound for a stronger reason than Stage 2 buys. A stale
+    buy spends money toward a target the owner has since moved; a stale trim
+    SELLS toward one, realizing gains for a shape that is no longer the
+    stated intent, and no later edit can un-realize them.
     """
-    if proposal.get("evidence_status") != "user_directed_rebalance_buy":
+    evidence_status = proposal.get("evidence_status")
+    if evidence_status not in _PROFILE_BOUND_EVIDENCE_STATUSES:
         return None
     expected_impact = proposal.get("expected_impact")
     expected = (
@@ -360,6 +378,53 @@ def _validate_proposal_context(proposal: dict) -> str | None:
             "Proposal's allocation profile does not match the active owner "
             "profile. Regenerate it from Portfolio Rebalancing."
         )
+    if evidence_status == "user_directed_rebalance_trim":
+        expected_tax = expected_impact.get("rebalance_tax_lot_fingerprint")
+        if not expected_tax:
+            return (
+                "Rebalancing trim is missing its tax-lot fingerprint. "
+                "Regenerate it from Portfolio Rebalancing."
+            )
+        if current_portfolio is None or store is None:
+            return (
+                "Rebalancing trim tax lots could not be revalidated. "
+                "Regenerate it from Portfolio Rebalancing."
+            )
+        intent = proposal.get("intent")
+        ticker = (
+            str(intent.get("ticker") or "").strip().upper()
+            if isinstance(intent, dict)
+            else ""
+        )
+        if not ticker:
+            return (
+                "Rebalancing trim has no usable ticker for tax-lot "
+                "revalidation. Regenerate it from Portfolio Rebalancing."
+            )
+        from assistant.corporate_actions import (
+            ticker_tax_ledger_with_coverage,
+        )
+        from assistant.tax_lots import open_lot_fingerprint
+
+        ledger, coverage = ticker_tax_ledger_with_coverage(
+            store, current_portfolio, ticker
+        )
+        ticker_coverage = (coverage.get("tickers", {}) or {}).get(ticker, {})
+        # ST3CCR-001: scoped to the TRIMMED ticker for the same reason the
+        # creation side is. Requiring global completeness here would refuse
+        # every trim on any book holding a single pre-app position, which is
+        # the documented normal case -- an approval gate that always fires
+        # protects nothing and hides that the feature never worked.
+        if ledger is None or coverage.get("complete") is not True:
+            return (
+                "Rebalancing trim tax-lot coverage for this holding is no "
+                "longer complete. Regenerate it from Portfolio Rebalancing."
+            )
+        if expected_tax != open_lot_fingerprint(ledger, ticker):
+            return (
+                "Rebalancing trim tax lots changed after proposal creation. "
+                "Regenerate it from Portfolio Rebalancing."
+            )
     return None
 
 

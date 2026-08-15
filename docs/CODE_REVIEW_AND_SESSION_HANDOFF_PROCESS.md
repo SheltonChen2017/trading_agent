@@ -29,6 +29,13 @@ a machine change, session reset, or context compaction.
 > Every completed independent code review must update
 > `docs/SESSION_HANDOFF.md` before the review is handed back to the owner.
 
+An implementation review starts only after the implementer has pushed a
+committed branch. The reviewer must fetch and branch from the exact
+`origin/<branch>` head; a merely local branch, uncommitted work, or shared
+worktree state is never sufficient. This is the standing default even when
+both agents share one checkout. An owner may explicitly request an in-progress
+look, but that is advisory feedback, not the repository's independent review.
+
 The update must describe the final reviewed tree, not the implementer's
 original claims. If the review changes code, tests, documentation, milestone
 status, branch topology, or the recommended next step, the handoff must record
@@ -93,16 +100,20 @@ Confirm:
 - whether the worktree is clean; and
 - whether another process is still editing or testing the shared worktree.
 
-Do not review a moving, dirty implementation unless the owner explicitly asks
-for an in-progress review. Wait for a stable commit when the implementer is
-still working.
+The implementation branch must be pushed. Resolve and record the full remote
+head (for example, `git rev-parse origin/<branch>`) and use that object as the
+review head. Do not begin an independent review from a local-only branch, a
+moving or dirty implementation, or uncommitted shared-worktree changes. If the
+owner explicitly asks for an in-progress look, label it advisory and wait for
+the pushed snapshot before starting the formal review. If the remote head
+moves later, stop and re-establish the exact ordered commit range.
 
 ### Step 2 — isolate the review
 
 Create a dedicated review branch from the exact implementation commit:
 
 ```powershell
-git switch -c codex/review-<milestone>-<date> <implementation-commit>
+git switch -c codex/review-<milestone>-<date> origin/<implementation-branch>
 ```
 
 Use the appropriate agent prefix if the reviewer is not Codex. Do not mix an

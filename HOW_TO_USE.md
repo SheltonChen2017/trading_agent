@@ -426,8 +426,16 @@ or moved, first read its real `StartBoundary` as described above, then supply
 the host-local clock and IANA timezone explicitly, for example:
 
 ```powershell
-python scripts\check_epoch_cadence.py --capture-time 13:30 --capture-timezone America/Los_Angeles
+python scripts\check_epoch_cadence.py --capture-time 17:00 --capture-timezone America/New_York
 ```
+
+One constraint on that pair: the capture command files an observation under
+the **Eastern** date of the moment it runs, while this tool models a session
+as captured on its own date at the trigger clock. They agree for any trigger
+whose local date matches its Eastern date — 16:30 Pacific is 19:30 Eastern
+the same evening — but a trigger late enough to roll past Eastern midnight
+would make this tool expect a session the capture files under the next one.
+Keep the trigger in a US market timezone and the two stay aligned.
 
 The five answers:
 

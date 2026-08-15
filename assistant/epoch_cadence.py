@@ -109,6 +109,16 @@ def expected_capture_sessions(
     capture had already run and been recorded against epoch-004. Counting
     2026-08-13 as owed by epoch-005 would report a permanent phantom miss on
     day one.
+
+    This models session ``D`` as captured on ``D`` at the trigger clock, but
+    the enforcing side does not: `paper_evidence.paper_session_schedule()`
+    derives the session from the EASTERN date of the capture instant. The two
+    agree only while the trigger's local date equals the Eastern date of that
+    same instant -- true for the installed 16:30 Pacific trigger (19:30 ET,
+    same day) and pinned by a test, but NOT a property of every clock and
+    timezone an operator can pass. A trigger whose local date differs from
+    its Eastern date would make this function expect a session the capture
+    command files under a different one.
     """
     started = _as_utc(started_at, "started_at")
     current = _as_utc(now, "now")

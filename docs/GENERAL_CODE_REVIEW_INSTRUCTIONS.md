@@ -18,6 +18,14 @@ git log --all -20 --oneline --decorate
 git branch --all --verbose
 ```
 
+**Review begins only from a pushed remote branch and its exact fetched remote
+head.** A local branch, local commit, dirty worktree, or uncommitted shared-
+checkout state is not a review snapshot. Fetch first, resolve and record the
+full object name of `origin/<implementation-branch>`, and create the review
+branch from that object. If the remote head changes after review begins, stop,
+record the new range, and deliberately restart or extend scope; never drift
+silently onto a merely local or moving implementation.
+
 Identify the base commit, review head, and complete ordered commit range. List
 the commits explicitly, for example with:
 

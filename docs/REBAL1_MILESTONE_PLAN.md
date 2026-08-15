@@ -2,10 +2,10 @@
 
 Author: Codex (plan), relayed and recorded by Claude
 Adopted: 2026-08-15
-Status: **All three stages implemented. Stages 1 and 2 independently
-reviewed, corrected, and counter-reviewed. Stage 3 implemented 2026-08-15
-under the owner's explicit authorization naming it; pending independent
-review.**
+Status: **All three stages complete in development after independent review.
+Stages 1 and 2 were corrected and counter-reviewed. Stage 3 was implemented
+under the owner's explicit authorization, then independently accepted after
+correction at `ed6879d` on 2026-08-15. Nothing is deployed.**
 
 This file records the owner-adopted staging so the sequencing survives the
 conversation it was written in. It is the authority for what REBAL-1's

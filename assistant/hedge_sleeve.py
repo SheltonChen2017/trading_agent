@@ -222,6 +222,7 @@ def evaluate_hedge_sleeve(
         pending_buy_value_by_ticker = pending_buy_value_by_ticker or {}
         pending_value_unknown_tickers = pending_value_unknown_tickers or set()
 
+    disclosures_pending: list[str] = []
     selected_set = set(selected)
     unknown_pending = {
         str(name).strip().upper()
@@ -229,11 +230,27 @@ def evaluate_hedge_sleeve(
         if str(name).strip().upper() in selected_set
     }
     if unknown_pending:
-        refusals.append(
-            "Pending hedge-buy value is unavailable for "
-            f"{', '.join(sorted(unknown_pending))}; refusing to size another "
-            "purchase against an unknown working order."
-        )
+        # HEDGE1CR-002: a refusal only when something is actually being
+        # sized. The open-order-availability check above is already gated on
+        # `report_only` for exactly this reason and this one was not, so the
+        # page's DEFAULT state -- no target typed yet -- greeted the owner
+        # with a red error claiming it was "refusing to size another
+        # purchase" when nothing had been asked for. In report-only mode the
+        # same fact is a disclosure: it explains why the projected weight
+        # below is incomplete.
+        names = ", ".join(sorted(unknown_pending))
+        if report_only:
+            disclosures_pending.append(
+                f"A working buy order for {names} has no determinable value, "
+                "so the projected sleeve below understates it. Set a target "
+                "to size a purchase and this becomes a refusal."
+            )
+        else:
+            refusals.append(
+                f"Pending hedge-buy value is unavailable for {names}; "
+                "refusing to size another purchase against an unknown "
+                "working order."
+            )
 
     pending_hedge_value = Decimal("0")
     for raw_ticker, raw_value in pending_buy_value_by_ticker.items():
@@ -285,12 +302,36 @@ def evaluate_hedge_sleeve(
             else position.shares
         )
         shares = decimal_or_none(shares_input)
+        # HEDGE1CR-003: a row reporting zero shares AND zero value is a
+        # position that is not held, which is the `position is None` case
+        # above -- `build_portfolio_snapshot` constructs exactly such a row
+        # through its documented API. Refusing it bricked the whole page,
+        # including the read-only view of the current weight, and called a
+        # value "unreadable" that was read perfectly well and was zero. A
+        # zero value against a POSITIVE quantity is still the impossible
+        # state HEDGER-002 identified, and still refuses.
+        if shares is not None and shares == 0 and value == 0:
+            rows.append(
+                HedgeSleeveRow(
+                    ticker=name, held=False, shares_exact="0",
+                    market_value_exact="0", pct_of_equity=0.0,
+                    value_available=True, daily_reset=daily_reset,
+                )
+            )
+            continue
         if value is None or value <= 0 or shares is None or shares <= 0:
             values_readable = False
+            unreadable = value is None or shares is None
             refusals.append(
                 f"{name} is held but its exact quantity or market value is "
-                "unreadable. Refusing to size a hedge from an understated "
-                "current weight."
+                + (
+                    "unreadable."
+                    if unreadable
+                    else f"impossible ({decimal_text(shares)} share(s) worth "
+                         f"{decimal_text(value)})."
+                )
+                + " Refusing to size a hedge from an understated current "
+                "weight."
             )
             rows.append(
                 HedgeSleeveRow(
@@ -317,6 +358,7 @@ def evaluate_hedge_sleeve(
     for row in rows:
         if row.daily_reset:
             disclosures.append(DAILY_RESET_DISCLOSURE.format(ticker=row.ticker))
+    disclosures.extend(disclosures_pending)
 
     shortfall = Decimal("0")
     surplus = Decimal("0")
@@ -464,7 +506,9 @@ def generate_hedge_buy_proposals(
             "reason": (
                 "Every selected hedge instrument needs a usable current "
                 "price before the chosen basket can be sized. Missing: "
-                f"{', '.join(missing_prices)}."
+                f"{', '.join(missing_prices)}. Deselect "
+                f"{'them' if len(missing_prices) > 1 else 'it'} to hedge with "
+                "the rest, or try again once a fresh close is recorded."
             ),
         }
 
@@ -498,8 +542,10 @@ def generate_hedge_buy_proposals(
             "report": report,
             "reason": (
                 "The selected hedge basket cannot be created completely at "
-                "the active minimum order quantity. "
-                f"{details}"
+                f"the active minimum order quantity. {details.rstrip(chr(46))}. Raise "
+                "the "
+                "target, deselect that instrument, or enable fractional "
+                "shares in Settings & Features."
             ),
         }
 

@@ -556,3 +556,106 @@ def test_the_module_never_produces_a_sell_or_submits_anything():
     assert 'side="sell"' not in source
     for forbidden in ("submit_order", "execute_approved", "approve_proposal"):
         assert forbidden not in source, forbidden
+
+
+# --- counter-review of the independent correction --------------------------
+
+
+def test_report_only_discloses_an_unknown_pending_order_instead_of_refusing():
+    """HEDGE1CR-002. The open-order-availability refusal was correctly gated
+    on report-only mode and this one was not, so the page's DEFAULT state --
+    no target typed yet -- showed a red error saying it was "refusing to size
+    another purchase" when nothing had been asked for. Report-only exists
+    precisely so the first visit is not a refusal.
+    """
+    snapshot = _snapshot()
+    snapshot = __import__("dataclasses").replace(
+        snapshot,
+        open_orders=[{"ticker": "SH", "side": "buy", "status": "new"}],
+    )
+
+    report = evaluate_hedge_sleeve(snapshot, target_pct=None)
+    assert report.usable, report.refusals
+    assert any("no determinable value" in d for d in report.disclosures), (
+        "an unknown working order must still be DISCLOSED in report-only mode"
+    )
+
+    # The same state refuses the moment a target asks for sizing.
+    sized = evaluate_hedge_sleeve(snapshot, target_pct=10)
+    assert not sized.usable
+    assert any("Pending hedge-buy value" in r for r in sized.refusals)
+
+
+def test_a_zero_share_row_reads_as_not_held_rather_than_bricking_the_page():
+    """HEDGE1CR-003. `build_portfolio_snapshot` constructs a zero-share,
+    zero-value row through its documented API. Refusing it blocked even the
+    read-only view of the current weight, and called a value "unreadable"
+    that was read perfectly well and was zero. Zero shares means not held.
+    """
+    snapshot = _snapshot([_held("TLT", 0, 100.0)])
+    report = evaluate_hedge_sleeve(snapshot, target_pct=10)
+
+    assert report.usable, report.refusals
+    assert not next(row for row in report.rows if row.ticker == "TLT").held
+    assert Decimal(report.shortfall_dollars_exact) == Decimal("1000")
+
+
+def test_a_positive_quantity_worth_nothing_still_refuses_as_impossible():
+    """The other side of HEDGE1CR-003: HEDGER-002b's real defect must stay
+    closed, and the refusal must not call an impossible value unreadable."""
+    snapshot = _snapshot([_held("TLT", 2, 100.0)], cash=9_800.0)
+    positions = [
+        __import__("dataclasses").replace(
+            p, market_value=0.0, market_value_exact="0"
+        )
+        for p in snapshot.positions
+    ]
+    snapshot = __import__("dataclasses").replace(snapshot, positions=positions)
+    report = evaluate_hedge_sleeve(snapshot, target_pct=10)
+
+    assert not report.usable
+    joined = " ".join(report.refusals)
+    assert "impossible" in joined, joined
+    assert "unreadable" not in joined, joined
+
+
+def test_an_all_or_nothing_refusal_names_the_authorized_remedy():
+    """HEDGE1CR-004. The complete-basket rule turned a silent degradation
+    into a hard block, so the way out has to be stated. Same rule this
+    project already applied to the whole-share sell refusal (SET1CR-001):
+    a refusal that names no remedy reads as a dead end.
+    """
+    unpriced = generate_hedge_buy_proposals(
+        _packet(), _policy(), _prices(BTAL=float("nan")), target_pct=10
+    )
+    assert not unpriced["created"]
+    assert "Deselect" in unpriced["reason"], unpriced["reason"]
+
+    unaffordable = generate_hedge_buy_proposals(
+        _packet(), _policy(), _prices(BTAL=1_000.0), target_pct=10
+    )
+    assert not unaffordable["created"]
+    assert "deselect" in unaffordable["reason"].lower(), unaffordable["reason"]
+    assert ".." not in unaffordable["reason"], "doubled sentence punctuation"
+
+
+def test_the_equal_weight_split_stays_exact_decimal():
+    """HEDGER-005 removed float weights from the sizing path, but nothing
+    pinned it: reverting the fix left all fifty tests green, because the
+    representation error (~7e-14 dollars) is far below the share-flooring
+    threshold that could make it observable at runtime. `CLAUDE.md` allows a
+    source-level test exactly when the invariant cannot be observed
+    behaviorally, which is the case here.
+    """
+    source = (
+        Path(__file__).resolve().parent.parent / "assistant" / "hedge_sleeve.py"
+    ).read_text(encoding="utf-8")
+    weight_lines = [
+        line.strip() for line in source.splitlines()
+        if line.strip().startswith("weight = ")
+    ]
+    assert weight_lines, "the equal-weight split moved; re-pin this guard"
+    for line in weight_lines:
+        assert "Decimal(" in line, (
+            f"the equal-weight split reintroduced binary float: {line}"
+        )

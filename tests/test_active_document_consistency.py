@@ -585,25 +585,45 @@ def _mainline_ref() -> str | None:
     return None
 
 
-def test_current_topology_hashes_match_the_published_mainline():
-    """A just-merged feature must not leave both current-state records one
-    commit behind while claiming that old hash is main/origin-main."""
+_TOPOLOGY_PATTERNS = {
+    "ACTION_PLAN_2026-08-02.md": r"Current development topology.*?`([0-9a-f]{7,40})`",
+    "SESSION_HANDOFF.md": r"(?:Current )?`main` and `origin/main`:\s*`([0-9a-f]{7,40})`",
+}
+
+
+def test_a_declared_current_mainline_hash_is_really_on_the_mainline():
+    """HEDGE1CR-001. The declared hash must be REACHABLE from the mainline,
+    not equal to its tip.
+
+    The first version of this guard asserted equality with `origin/main`.
+    That cannot stay green, and the failure is structural rather than
+    careless: merging the very branch that updates the records creates a new
+    merge commit, so the hash the records name is one behind the instant it
+    lands. A records-only follow-up merges as another commit and is stale
+    again -- no state satisfies the equality assertion for longer than one
+    merge, and `main` itself would carry the red test.
+
+    Reachability is the durable part, and it still catches what HEDGER-007
+    was really about: a declared hash that is fiction, a typo, or a commit
+    that only ever existed on a feature branch. Recency cannot be asserted
+    from inside the commit being merged -- the same "false by construction"
+    rule this module's docstring already states, and the reason its sibling
+    guards test relationships instead of today's values.
+    """
     mainline = _mainline_ref()
     if mainline is None:  # pragma: no cover - export or detached checkout
         pytest.skip("no mainline ref available")
-    expected = subprocess.run(
-        ["git", "rev-parse", "--short", mainline],
-        cwd=ROOT, capture_output=True, text=True, check=True,
-    ).stdout.strip()
-    patterns = {
-        "ACTION_PLAN_2026-08-02.md": r"Current development topology.*?`([0-9a-f]{7,40})`",
-        "SESSION_HANDOFF.md": r"(?:Current )?`main` and `origin/main`:\s*`([0-9a-f]{7,40})`",
-    }
-    for name, pattern in patterns.items():
+    for name, pattern in _TOPOLOGY_PATTERNS.items():
         match = re.search(pattern, _text(name), flags=re.IGNORECASE)
         assert match, f"{name} has no parseable current-main declaration"
-        assert match.group(1).startswith(expected), (
-            f"{name} calls {match.group(1)} current main; {mainline} is {expected}"
+        declared = match.group(1)
+        reachable = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", declared, mainline],
+            cwd=ROOT, capture_output=True,
+        )
+        assert reachable.returncode == 0, (
+            f"{name} calls {declared} current main, but it is not reachable "
+            f"from {mainline} at all"
         )
 
 

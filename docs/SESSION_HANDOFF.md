@@ -1,7 +1,7 @@
-# Session handoff — HEDGE-1 independently reviewed and corrected
+# Session handoff — HEDGE-1 reviewed, corrected, and counter-reviewed
 
-Prepared: 2026-08-14 by Codex after reviewing Claude's merged HEDGE-1
-defensive-sleeve feature.
+Prepared: 2026-08-15 by Claude, after counter-reviewing Codex's independent
+review and correction of the merged HEDGE-1 defensive-sleeve feature.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -9,10 +9,11 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
-3. `docs/REVIEW_2026-08-14_HEDGE1_DEFENSIVE_SLEEVE.md`
-4. `docs/MANDATE.md` (§2, §4, §6)
-5. `docs/OPERATIONAL_FACTS.md`
-6. `docs/OPERATIONS_RUNBOOK.md`
+3. `docs/REVIEW_2026-08-15_HEDGE1_COUNTERREVIEW.md`
+4. `docs/REVIEW_2026-08-14_HEDGE1_DEFENSIVE_SLEEVE.md`
+5. `docs/MANDATE.md` (§2, §4, §6)
+6. `docs/OPERATIONAL_FACTS.md`
+7. `docs/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes a push, deployment, evidence repair, epoch roll, M4,
 funded-account access, live trading, operator-database mutation, or scheduled-
@@ -28,7 +29,10 @@ task change.
 - Current review branch:
   `codex/review-hedge1-defensive-sleeve-20260814`, based on exact merged main
   `17be33b`.
-- Product/test correction: `46e1248`.
+- Product/test correction: `46e1248`; review records: `b37aa44`.
+- Claude counter-review branch:
+  `user/claude/hedge1-counterreview-20260815`, based on the review tip
+  `b37aa44`. It contains the counter-review corrections and this handoff.
 - The review branch, correction, and this final review/documentation state are
   **local-only and not recoverable on another computer by fetch** until the
   owner explicitly authorizes a push.
@@ -47,7 +51,8 @@ Commit dispositions:
 | `1f60ebf` | accepted after correction | Sound feature direction; five P2 and three P3 defects required correction. |
 | `0e5dadb` | accepted after correction | Merge conflicts were documentation-only; inherited stale/incorrect records were corrected. |
 | `17be33b` | accepted after correction | Merge tree equals `0e5dadb`; inherited findings closed on the review branch. |
-| `46e1248` | accepted | Product and regression-test correction. |
+| `46e1248` | accepted after correction | Product and regression-test correction. Seven of eight findings reproduce exactly on the submitted tree; two of the corrections introduced new defects, one a P2. |
+| `b37aa44` | accepted after correction | Records are accurate; the topology guard they rely on could not stay green past its own merge. |
 
 ## 2. Completed HEDGE-1 behavior
 
@@ -90,9 +95,46 @@ The durable issue ledger is in
 - Red-before-green proof comprised nine failures in the first combined run,
   one separate unaffordable-leg failure, and one separate zero-held-value
   failure.
-- A generic active-document guard now compares the declared current mainline
-  hash with the repository's actual mainline, preventing the exact stale-
-  topology recurrence left by PR #223.
+- A generic active-document guard checks the declared current mainline hash
+  against the repository's actual mainline, addressing the stale-topology
+  recurrence left by PR #223. Its first form asserted EQUALITY with the tip
+  and is corrected below.
+
+### Counter-review findings (Claude, 2026-08-15)
+
+The durable ledger is in `docs/REVIEW_2026-08-15_HEDGE1_COUNTERREVIEW.md`.
+Every one of Codex's eight findings was re-derived on a throwaway worktree at
+the submitted tree `17be33b` rather than accepted on the report's word. Seven
+reproduced exactly. HEDGER-005 is partially correct: the direction and fix are
+right and retained, but its stated `100/3` float arithmetic does not reproduce
+(`100.0/3*3 == 100.0` exactly); the excess appears one step later in the
+summed target dollars at ~7e-14 dollars.
+
+- **0 P0 / 0 P1 / 2 P2 / 3 P3**, all closed.
+- **HEDGE1CR-001 (P2)** — the new topology guard asserted equality with the
+  current `origin/main` tip. That cannot stay green: merging the branch that
+  updates the records creates a merge commit, so the declared hash is one
+  behind the instant it lands, and a records-only follow-up merges as another
+  commit and is stale again. `main` itself would carry the red test. Proven by
+  pointing `origin/main` at a synthetic merge commit (restored and verified by
+  SHA). Replaced with a REACHABILITY assertion, which still catches a
+  fictional, mistyped, or branch-only hash.
+- **HEDGE1CR-002 (P2)** — the `open_orders_available` refusal is gated on
+  report-only mode and its sibling `unknown_pending` refusal was not, so any
+  plain market buy on a sleeve ticker turned the page's default state into a
+  red error saying it was "refusing to size another purchase" when nothing had
+  been asked for. It is now a disclosure in report-only and still a refusal
+  once a target is supplied.
+- **HEDGE1CR-003 (P3)** — the new `shares <= 0` refusal treated a zero-share,
+  zero-value row (constructible through `build_portfolio_snapshot`'s
+  documented API) as unreadable, blocking even the read-only weight. Zero
+  quantity now reads as not held; a positive quantity worth zero still refuses
+  and is named "impossible" rather than "unreadable".
+- **HEDGE1CR-004 (P3)** — the new all-or-nothing refusals named no remedy,
+  the same defect class as SET1CR-001. Both now name them.
+- **HEDGE1CR-005 (P3)** — HEDGER-005's Decimal fix was unpinned; reverting it
+  left all 50 tests green. Now source-guarded, which `CLAUDE.md` §9 permits
+  when the invariant is not runtime-observable.
 
 ## 4. Validation
 
@@ -109,6 +151,22 @@ shared environment has the same pinned versions.
   warnings** in 729.21 seconds (12:09).
 - Final active-record, mandate, and HEDGE suite: **94 passed** in 8.41
   seconds.
+
+Counter-review environment (Claude, 2026-08-15): repository `.venv`, Python
+3.13.14, Streamlit 1.60.0, Windows. The repository `.venv` launched normally
+here and is the environment for every number below.
+
+- `tests/test_hedge_sleeve.py`: **55 passed** (50 before).
+- `tests/test_active_document_consistency.py`: **30 passed**.
+- Focused adjacent set (hedge module, hedge UI, document consistency,
+  allocation proposals, ML import boundary): **130 passed**.
+- Mutation verification: **9 against Codex's corrections** (8 detected; the
+  9th was the unpinnable Decimal fix, closed as HEDGE1CR-005) and **7 against
+  the counter-review's own** (5 module mutations plus both directions of the
+  rewritten topology guard), each detected by exactly the intended test.
+- Full settled tree in the repository `.venv`: **3,858 passed / 0 failed / 25
+  known dependency warnings** in 683.29 seconds. That is Codex's 3,853 plus
+  this counter-review's 5 new tests.
 - Final repository compilation: clean.
 - Final diff checks: clean. At handoff commit the branch contains the product
   correction followed by the documentation/handoff commit and has no
@@ -153,9 +211,12 @@ market sessions; that interpretation remains an owner question.
 
 ## 7. Next authorized step
 
-1. Owner decides whether to push the local review branch and open/merge a PR.
-2. A later agent may independently counter-review `46e1248` after it is
-   pushed; do not call Codex's own correction independently reviewed.
+1. Owner decides whether to merge `user/claude/hedge1-counterreview-20260815`,
+   which contains Codex's review commits and this counter-review on top.
+2. Codex may independently verify the counter-review corrections. Suggested
+   focus: whether the reachability topology guard still detects everything
+   HEDGER-007 was about, and whether the report-only/refusal split now holds
+   for every pending-order state.
 3. Keep epoch-005 frozen under the 60-day instruction and clarify whether the
    target means calendar days or captured market sessions.
 4. The SET-1 design question remains open: whether strict whole-share mode

@@ -1,7 +1,7 @@
-# Session handoff — HEDGE-1 reviewed, corrected, and counter-reviewed
+# Session handoff — REBAL-1 Stage 1 implemented
 
-Prepared: 2026-08-15 by Claude, after counter-reviewing Codex's independent
-review and correction of the merged HEDGE-1 defensive-sleeve feature.
+Prepared: 2026-08-15 by Claude, after counter-reviewing HEDGE-1 and then
+implementing Stage 1 of Codex's REBAL-1 milestone plan.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -9,11 +9,12 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
-3. `docs/REVIEW_2026-08-15_HEDGE1_COUNTERREVIEW.md`
-4. `docs/REVIEW_2026-08-14_HEDGE1_DEFENSIVE_SLEEVE.md`
-5. `docs/MANDATE.md` (§2, §4, §6)
-6. `docs/OPERATIONAL_FACTS.md`
-7. `docs/OPERATIONS_RUNBOOK.md`
+3. `docs/REBAL1_MILESTONE_PLAN.md`
+4. `docs/REVIEW_2026-08-15_HEDGE1_COUNTERREVIEW.md`
+5. `docs/REVIEW_2026-08-14_HEDGE1_DEFENSIVE_SLEEVE.md`
+6. `docs/MANDATE.md` (§2, §4, §6)
+7. `docs/OPERATIONAL_FACTS.md`
+8. `docs/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes a push, deployment, evidence repair, epoch roll, M4,
 funded-account access, live trading, operator-database mutation, or scheduled-
@@ -209,14 +210,67 @@ market sessions; that interpretation remains an owner question.
 - No account number, credential value, balance, or private artifact content is
   recorded here.
 
+## 6b. REBAL-1 Stage 1 (this session's product work)
+
+Branch `user/claude/rebal1-stage1-20260815`, product commit `6fcdd35`, based
+on `e067ad8` (PR #225). Not pushed pending owner authorization, per the
+plan's workflow clause.
+
+Codex authored the milestone plan; it is recorded at
+`docs/REBAL1_MILESTONE_PLAN.md` so the staging survives the conversation it
+was written in. Stage 1 only is implemented: a read-only Portfolio
+Rebalancing page over a versioned, fingerprinted sleeve allocation profile.
+Stages 2 and 3 are not started.
+
+**The owner approved the profile numbers on 2026-08-15** -- cash 10,
+dividend 15, growth 40, leveraged 15, hedge 10, other 10, band +/-25%
+relative -- after being shown that the configured sleeves cover about a
+fifth of the current book and ten holdings are unassigned. They are a stated
+preference, not a derived or researched allocation. A cap is not a target.
+
+**Codex's correction to Claude's framing is load-bearing and is carried in
+code:** the confirmed ~89% wide-band result has `relevant_tickers`
+`["SOXX","SOXL"]` and came from the vol-targeting comparison. It is a reason
+to prefer the mechanism, not evidence about this portfolio's shape. The
+module, the profile notes, the page, and a UI test all say so.
+
+Points a reviewer should press on:
+
+- one unusable authoritative value refuses the WHOLE report, because sleeve
+  weights share an equity denominator and dropping the bad row can
+  manufacture a phantom breach on a sleeve that reads fine;
+- a ticker listed in two sleeves refuses rather than being assigned;
+- unassigned holdings are always surfaced, and the residual reads as
+  unassigned even inside its band, so it is never taken for a tidy sleeve;
+- pending buys add and sells subtract into the projected column only, an
+  undeterminable order marks the sleeve, and unavailable open-order data
+  refuses the projection; and
+- Stage 1 staleness is structural -- nothing is stored in session state, so
+  no card can outlive a profile or snapshot change. Stage 2 will need this
+  made explicit.
+
+`assistant/rebalance_bands.py` from the exploratory commit merged by PR #225
+is REMOVED here: it measured per-ticker targets, which Stage 0 supersedes
+with sleeves, and two drift implementations would be the parallel-rule drift
+`CLAUDE.md` warns against.
+
+Validation on the exact tree: **3,916 passed / 0 failed** in the pinned
+`.venv`; 50 module tests, 8 UI tests; 9 mutations, 9 detected by exactly the
+intended test. Three of those only after a first attempt survived and
+exposed real gaps -- the inclusive-boundary test pinned only the upper edge,
+the duplicate-aggregation test never reached this module because
+`build_portfolio_snapshot` aggregates first, and one mutation had targeted
+the wrong line.
+
 ## 7. Next authorized step
 
-1. Owner decides whether to merge `user/claude/hedge1-counterreview-20260815`,
-   which contains Codex's review commits and this counter-review on top.
-2. Codex may independently verify the counter-review corrections. Suggested
-   focus: whether the reachability topology guard still detects everything
-   HEDGER-007 was about, and whether the report-only/refusal split now holds
-   for every pending-order state.
+1. Owner authorizes (or declines) pushing
+   `user/claude/rebal1-stage1-20260815`.
+2. Independent review of REBAL-1 Stage 1, then a decision on whether Stage 2
+   (buy-only cash steering) begins. Stage 3 needs its own explicit
+   authorization, because it is where rebalancing first sells on the app's
+   own initiative rather than on a computed breach or the owner's
+   instruction.
 3. Keep epoch-005 frozen under the 60-day instruction and clarify whether the
    target means calendar days or captured market sessions.
 4. The SET-1 design question remains open: whether strict whole-share mode

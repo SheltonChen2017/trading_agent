@@ -476,3 +476,67 @@ def test_the_module_never_sells_and_never_submits():
         assert forbidden not in called, forbidden
     assert 'side="sell"' not in source
     assert "'sell'" not in source.replace('"buy"', "")
+
+
+def test_execution_refuses_a_rebalance_proposal_with_no_profile_fingerprint(
+    tmp_path,
+):
+    """REBAL2CCR-001. A missing fingerprint must be refused with a message
+    that says it is MISSING.
+
+    Safety was never at risk here and the first version of this note said
+    otherwise: with the missing-value branch deleted, `None != current` still
+    refuses the proposal, so it fails closed either way. What was unpinned is
+    the accuracy of the reason -- without the branch the owner is told the
+    profile "does not match" when there is nothing to match, which sends them
+    looking for a profile edit that never happened.
+
+    The missing case is the reachable one: any steering proposal saved before
+    the execution-time binding existed carries no fingerprint at all.
+    """
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_steering_proposals(
+        packet, OWNER_APPROVED_PROFILE, policy,
+        budget=2_000, selections=ALL_SELECTIONS, prices=PRICES,
+    )["proposals"][0]
+
+    stored = proposal.to_dict()
+    stored["expected_impact"] = {
+        k: v for k, v in stored["expected_impact"].items()
+        if k != "allocation_profile_fingerprint"
+    }
+    assert "allocation_profile_fingerprint" not in stored["expected_impact"]
+
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(stored)
+
+    outcome = validate_proposal_for_execution(
+        proposal.proposal_id, packet.portfolio, policy, store,
+        now_et=datetime(2026, 8, 15, 12, 0, tzinfo=timezone.utc),
+    )
+    assert not outcome.approved
+    error = str(outcome.error).lower()
+    assert "missing its allocation profile" in error, error
+    assert "does not match" not in error, (
+        "a proposal with no fingerprint is not a mismatched one"
+    )
+
+
+def test_a_non_rebalance_proposal_is_unaffected_by_the_context_check(tmp_path):
+    """The guard keys on `evidence_status`, so every other proposal family
+    must reach its ordinary validation untouched -- including families whose
+    `expected_impact` has no fingerprint at all, which is all of them."""
+    from assistant.execution_service import _validate_proposal_context
+
+    for status in (
+        "deterministic_risk_policy",
+        "user_directed_allocation",
+        "user_directed_hedge",
+        "user_directed_discrete_buy",
+    ):
+        assert _validate_proposal_context(
+            {"evidence_status": status, "expected_impact": {}}
+        ) is None, status
+    # and a row with no evidence_status at all
+    assert _validate_proposal_context({"expected_impact": {}}) is None

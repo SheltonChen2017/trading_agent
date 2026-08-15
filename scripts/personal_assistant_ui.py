@@ -84,7 +84,10 @@ from assistant.hedge_sleeve import (
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca, get_upcoming_events
 from assistant.schemas import EvidenceStatus, UpcomingEvent
 from risk.execution_gate import canonical_order_quantity
-from assistant.corporate_actions import tax_ledger_with_coverage
+from assistant.corporate_actions import (
+    tax_ledger_with_coverage,
+    ticker_tax_ledger_with_coverage,
+)
 from assistant.execution_service import (
     PolicyOverridableBlockError,
     execute_approved_paper_proposal,
@@ -4152,8 +4155,12 @@ if page == "Portfolio Rebalancing":
                 disabled=not _rb_ready,
                 key="rb_trim_check",
             ):
-                _rb_ledger, _rb_coverage = tax_ledger_with_coverage(
-                    store, _rb_packet.portfolio
+                # Stage 3 sells ONE ticker, so it asks the per-ticker
+                # question. The portfolio-wide provider withholds the
+                # ledger entirely when any other holding is unreconciled,
+                # which made every trim impossible on a real book.
+                _rb_ledger, _rb_coverage = ticker_tax_ledger_with_coverage(
+                    store, _rb_packet.portfolio, _rb_trim_ticker
                 )
                 _rb_trim_result = generate_trim_proposal(
                     _rb_packet, OWNER_APPROVED_PROFILE, _rb_policy,

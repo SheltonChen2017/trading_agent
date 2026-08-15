@@ -377,7 +377,12 @@ def plan_trim(
     # ST3R-001 hid.
     coverage = tax_lot_coverage or {}
     ticker_coverage = (coverage.get("tickers", {}) or {}).get(name, {})
-    covered = ticker_coverage.get("matched") is True
+    # `ticker_tax_ledger_with_coverage` scopes `complete` to this ticker;
+    # `matched` is still honoured so a portfolio-wide coverage dict works too.
+    covered = (
+        coverage.get("complete") is True
+        or ticker_coverage.get("matched") is True
+    )
     if tax_lot_ledger is None or not covered:
         reason = (
             (coverage.get("tickers", {}) or {}).get(name, {}).get("reason")
@@ -433,7 +438,7 @@ def plan_trim(
             )
         )
 
-    if coverage.get("complete") is not True:
+    if coverage.get("portfolio_complete") is False:
         # Stated rather than enforced: the rest of the book being uncovered
         # says nothing about THIS sale's tax consequence, but the owner
         # should know the ledger is not a complete account history.

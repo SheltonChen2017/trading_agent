@@ -594,9 +594,14 @@ def test_the_owner_choices_are_restated_in_the_proposal():
 
 
 PARTIAL_BOOK_COVERAGE = {
-    # Exactly what `tax_ledger_with_coverage` emits for a book holding one
-    # app-bought position and one bought before the app existed.
-    "complete": False,
+    # The shape `ticker_tax_ledger_with_coverage(store, portfolio, "MSFT")`
+    # emits for a book holding one app-bought position and one bought before
+    # the app existed: `complete` is scoped to MSFT, `portfolio_complete`
+    # reports the book-wide answer for disclosure. Verified against the real
+    # provider in tests/test_rebalance_trim_end_to_end.py rather than
+    # asserted here -- a fixture cannot prove its own shape is real.
+    "complete": True,
+    "portfolio_complete": False,
     "tickers": {
         "MSFT": {"matched": True, "broker_shares": 900, "ledger_shares": 900},
         "AAPL": {"matched": False, "broker_shares": 10, "ledger_shares": 0},
@@ -649,8 +654,10 @@ def test_the_uncovered_remainder_of_the_book_is_disclosed_not_hidden():
 
 def test_the_trimmed_tickers_own_coverage_is_still_required():
     """The scoping must not become a licence to trim an unmatched holding."""
+    # Scoped shape: `complete` false means THIS ticker is not covered.
     coverage = {
-        "complete": True,
+        "complete": False,
+        "portfolio_complete": False,
         "tickers": {"MSFT": {"matched": False,
                              "broker_shares": 900, "ledger_shares": 0}},
     }

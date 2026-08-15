@@ -588,3 +588,136 @@ def test_the_owner_choices_are_restated_in_the_proposal():
     assert "You chose MSFT" in reasons
     assert "HIFO" in reasons
     assert "This app selects none of those" in reasons
+
+
+# --- counter-review of the independent correction ---------------------------
+
+
+PARTIAL_BOOK_COVERAGE = {
+    # Exactly what `tax_ledger_with_coverage` emits for a book holding one
+    # app-bought position and one bought before the app existed.
+    "complete": False,
+    "tickers": {
+        "MSFT": {"matched": True, "broker_shares": 900, "ledger_shares": 900},
+        "AAPL": {"matched": False, "broker_shares": 10, "ledger_shares": 0},
+    },
+}
+
+
+def _mixed_book_packet():
+    return _packet([
+        {"ticker": "MSFT", "shares": 900,
+         "entry_price": 8.0, "current_price": 10.0},
+        {"ticker": "AAPL", "shares": 10,
+         "entry_price": 100.0, "current_price": 100.0},
+    ], cash=1_000.0)
+
+
+def test_an_unrelated_uncovered_holding_does_not_block_a_covered_trim():
+    """ST3CCR-001. The gate belongs on the TRIMMED ticker, not the book.
+
+    This sale realizes gains from MSFT's lots and nothing else, so MSFT's
+    own `matched` flag is necessary and sufficient. Requiring the global
+    `complete` flag meant a single pre-app holding anywhere refused every
+    trim forever -- and `AssistantStore.list_fills` documents that positions
+    "bought before the app existed, or through the Alpaca UI, produce no
+    events and therefore no lots", so that is the normal case rather than an
+    edge one.
+
+    A refusal that always fires is indistinguishable from a careful
+    safeguard, which is exactly how ST3R-001 stayed hidden.
+    """
+    plan = _plan(
+        packet=_mixed_book_packet(), shares=100,
+        coverage=PARTIAL_BOOK_COVERAGE,
+    )
+    assert plan.usable, plan.refusals
+    assert Decimal(plan.realized_gain_exact) > 0
+
+
+def test_the_uncovered_remainder_of_the_book_is_disclosed_not_hidden():
+    """Not blocking is not the same as not mentioning: the owner should know
+    the ledger is not a complete account history."""
+    plan = _plan(
+        packet=_mixed_book_packet(), shares=100,
+        coverage=PARTIAL_BOOK_COVERAGE,
+    )
+    assert any(
+        "not a complete account history" in d for d in plan.disclosures
+    ), plan.disclosures
+
+
+def test_the_trimmed_tickers_own_coverage_is_still_required():
+    """The scoping must not become a licence to trim an unmatched holding."""
+    coverage = {
+        "complete": True,
+        "tickers": {"MSFT": {"matched": False,
+                             "broker_shares": 900, "ledger_shares": 0}},
+    }
+    plan = _plan(shares=100, coverage=coverage)
+    assert not plan.usable
+    assert any("incomplete" in r for r in plan.refusals)
+
+
+def test_execution_revalidation_fails_closed_without_a_store(tmp_path):
+    """The approval-time tax-lot branch is reached only once the profile
+    fingerprint matches, so this uses the REAL one -- an earlier version
+    passed a placeholder and never got past the profile check.
+
+    Without a store or portfolio the trim cannot be revalidated, and the
+    refusal must say that rather than passing silently.
+    """
+    from assistant.execution_service import _validate_proposal_context
+    from assistant.rebalance_profile import compute_profile_fingerprint
+
+    proposal = {
+        "evidence_status": "user_directed_rebalance_trim",
+        "intent": {"ticker": "MSFT"},
+        "expected_impact": {
+            "allocation_profile_fingerprint": compute_profile_fingerprint(
+                OWNER_APPROVED_PROFILE
+            ),
+            "rebalance_tax_lot_fingerprint": "whatever",
+        },
+    }
+    error = _validate_proposal_context(proposal)
+    assert error is not None
+    assert "could not be revalidated" in error, error
+
+
+
+def test_execution_allows_a_covered_trim_on_a_partially_covered_book(
+    tmp_path, monkeypatch
+):
+    """ST3CCR-001, approval side. The creation gate and the approval gate
+    must agree on scope: an approval check that refuses every trim because
+    some unrelated holding predates the app protects nothing, and would hide
+    that the feature never worked -- the same way ST3R-001 hid.
+    """
+    from assistant import corporate_actions
+    from assistant.execution_service import validate_proposal_for_execution
+    from assistant.storage import AssistantStore
+
+    packet, policy = _packet(), _policy()
+    result = generate_trim_proposal(
+        packet, OWNER_APPROVED_PROFILE, policy,
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200,
+        lot_strategy="fifo", tax_lot_ledger=_ledger(),
+        tax_lot_coverage=COVERAGE, now=datetime.now(timezone.utc),
+    )
+    assert result["created"], result.get("reason")
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(result["proposal"].to_dict())
+
+    # Same ledger, but the book now reports an unrelated pre-app holding.
+    monkeypatch.setattr(
+        corporate_actions, "tax_ledger_with_coverage",
+        lambda _store, _portfolio: (_ledger(), PARTIAL_BOOK_COVERAGE),
+    )
+    outcome = validate_proposal_for_execution(
+        result["proposal"].proposal_id, packet.portfolio, policy, store,
+        now_et=datetime(2026, 8, 15, 12, tzinfo=timezone.utc),
+    )
+    assert "tax-lot coverage" not in str(outcome.error or "").lower(), (
+        outcome.error
+    )

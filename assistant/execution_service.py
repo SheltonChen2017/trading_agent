@@ -406,14 +406,15 @@ def _validate_proposal_context(
 
         ledger, coverage = tax_ledger_with_coverage(store, current_portfolio)
         ticker_coverage = (coverage.get("tickers", {}) or {}).get(ticker, {})
-        if (
-            ledger is None
-            or coverage.get("complete") is not True
-            or ticker_coverage.get("matched") is not True
-        ):
+        # ST3CCR-001: scoped to the TRIMMED ticker for the same reason the
+        # creation side is. Requiring global completeness here would refuse
+        # every trim on any book holding a single pre-app position, which is
+        # the documented normal case -- an approval gate that always fires
+        # protects nothing and hides that the feature never worked.
+        if ledger is None or ticker_coverage.get("matched") is not True:
             return (
-                "Rebalancing trim tax-lot coverage is no longer complete. "
-                "Regenerate it from Portfolio Rebalancing."
+                "Rebalancing trim tax-lot coverage for this holding is no "
+                "longer complete. Regenerate it from Portfolio Rebalancing."
             )
         if expected_tax != open_lot_fingerprint(ledger, ticker):
             return (

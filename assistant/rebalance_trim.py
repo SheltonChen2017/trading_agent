@@ -364,12 +364,20 @@ def plan_trim(
 
     # Realized-gain consequences are REQUIRED by this stage, so an incomplete
     # ledger refuses rather than proposing a sale whose tax effect is unknown.
+    #
+    # ST3CCR-001: scoped to the TRIMMED ticker, not the whole book. This sale
+    # realizes gains from one ticker's lots and nothing else, so that
+    # ticker's `matched` flag is exactly the necessary and sufficient
+    # condition. Requiring the global flag meant one pre-app or
+    # bought-outside-the-app holding anywhere in the portfolio refused every
+    # trim forever -- and `list_fills()` documents that such holdings
+    # "produce no events and therefore no lots", so that is the normal case
+    # rather than an edge one. A refusal that always fires is
+    # indistinguishable from a careful safeguard, which is the same way
+    # ST3R-001 hid.
     coverage = tax_lot_coverage or {}
     ticker_coverage = (coverage.get("tickers", {}) or {}).get(name, {})
-    covered = bool(
-        coverage.get("complete") is True
-        and ticker_coverage.get("matched") is True
-    ) if coverage else False
+    covered = ticker_coverage.get("matched") is True
     if tax_lot_ledger is None or not covered:
         reason = (
             (coverage.get("tickers", {}) or {}).get(name, {}).get("reason")
@@ -425,6 +433,15 @@ def plan_trim(
             )
         )
 
+    if coverage.get("complete") is not True:
+        # Stated rather than enforced: the rest of the book being uncovered
+        # says nothing about THIS sale's tax consequence, but the owner
+        # should know the ledger is not a complete account history.
+        disclosures.append(
+            "Other holdings have no app fill history, so this ledger is not a "
+            f"complete account history -- but {name}'s own lots are complete, "
+            "which is what this sale's realized gain depends on."
+        )
     if short_term > 0:
         disclosures.append(
             f"${float(short_term):,.2f} of this gain is SHORT-TERM and taxed "

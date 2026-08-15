@@ -47,6 +47,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import json
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
@@ -72,6 +73,7 @@ from assistant.tax_lots import (
     LotLedger,
     TaxLotError,
     is_long_term,
+    open_lot_fingerprint,
     select_lots,
     unrealized_by_lot,
 )
@@ -203,6 +205,39 @@ def _position(packet: DecisionPacket, ticker: str):
     )
 
 
+def _working_sell_value(
+    packet: DecisionPacket, sleeve: str, membership: dict[str, str]
+) -> Decimal:
+    """Gross priced sell orders in this sleeve, always as a positive value.
+
+    The rebalance report deliberately stores *signed net* pending exposure so
+    projected weights conserve equity.  That is not the number this field
+    promises the owner: a simultaneous buy must not hide or reverse a working
+    sell.  A usable report has already refused every unpriced/invalid order,
+    so this helper only has to preserve that same exact arithmetic.
+    """
+    total = Decimal("0")
+    for order in packet.portfolio.open_orders or ():
+        if not isinstance(order, dict):
+            continue
+        ticker = str(order.get("ticker") or "").strip().upper()
+        if (
+            str(order.get("side") or "").strip().lower() != "sell"
+            or membership.get(ticker) != sleeve
+        ):
+            continue
+        notional = order.get("notional")
+        value = decimal_or_none(notional) if notional is not None else None
+        if notional is None:
+            quantity = decimal_or_none(order.get("qty") or order.get("shares"))
+            price = decimal_or_none(order.get("limit_price"))
+            if quantity is not None and price is not None:
+                value = quantity * price
+        if value is not None and value > 0:
+            total += value
+    return total
+
+
 def plan_trim(
     packet: DecisionPacket,
     profile: AllocationProfile,
@@ -215,6 +250,7 @@ def plan_trim(
     lot_ids: list[str] | None = None,
     tax_lot_ledger: LotLedger | None,
     tax_lot_coverage: dict | None = None,
+    now: datetime | None = None,
 ) -> TrimPlan:
     """Everything the owner must see before approving a trim. Proposes nothing."""
     report = evaluate_portfolio_rebalance(packet.portfolio, profile, policy=policy)
@@ -329,8 +365,10 @@ def plan_trim(
     # Realized-gain consequences are REQUIRED by this stage, so an incomplete
     # ledger refuses rather than proposing a sale whose tax effect is unknown.
     coverage = tax_lot_coverage or {}
+    ticker_coverage = (coverage.get("tickers", {}) or {}).get(name, {})
     covered = bool(
-        (coverage.get("tickers", {}) or {}).get(name, {}).get("complete")
+        coverage.get("complete") is True
+        and ticker_coverage.get("matched") is True
     ) if coverage else False
     if tax_lot_ledger is None or not covered:
         reason = (
@@ -353,12 +391,17 @@ def plan_trim(
     except TaxLotError as exc:
         return _empty([f"Lot selection refused for {name}: {exc}"])
 
-    sold_at = datetime.now(timezone.utc)
+    sold_at = now or datetime.now(timezone.utc)
     lots: list[TrimLot] = []
     realized = Decimal("0")
     short_term = Decimal("0")
     long_term = Decimal("0")
-    detail_by_id = {d["lot_id"]: d for d in unrealized_by_lot(tax_lot_ledger, name, float(price))}
+    detail_by_id = {
+        d["lot_id"]: d
+        for d in unrealized_by_lot(
+            tax_lot_ledger, name, float(price), now=sold_at
+        )
+    }
     for lot, taken in chosen:
         taken_decimal = decimal_or_none(str(taken)) or Decimal("0")
         basis = decimal_or_none(str(lot.cost_per_share)) or Decimal("0")
@@ -400,7 +443,7 @@ def plan_trim(
             "fractional orders on."
         )
 
-    pending = decimal_or_none(_row(report, sleeve).pending_value_exact) or Decimal("0")
+    pending = _working_sell_value(packet, sleeve, membership)
     return TrimPlan(
         sleeve=sleeve, ticker=name,
         profile_version=report.profile_version,
@@ -446,16 +489,17 @@ def generate_trim_proposal(
     now: datetime | None = None,
 ) -> dict:
     """One APPROVE-gated sell that trims an overweight sleeve."""
+    at = now or datetime.now(timezone.utc)
     plan = plan_trim(
         packet, profile, policy,
         sleeve=sleeve, ticker=ticker, shares=shares,
         lot_strategy=lot_strategy, lot_ids=lot_ids,
         tax_lot_ledger=tax_lot_ledger, tax_lot_coverage=tax_lot_coverage,
+        now=at,
     )
     if not plan.usable:
         return {"created": False, "plan": plan, "reason": " ".join(plan.refusals)}
 
-    at = now or datetime.now(timezone.utc)
     price = plan.reference_price
     intent = TradeIntent(
         ticker=plan.ticker, side="sell", shares=plan.shares,
@@ -477,7 +521,8 @@ def generate_trim_proposal(
         "Market orders can fill away from the displayed reference price, so "
         "the realized gain shown here is an estimate, not a settlement.",
         "Lot selection is advisory to your broker: this app records which "
-        "lots you chose, it does not instruct the broker to use them.",
+        "lots the strategy would consume; it does not instruct the broker "
+        "to use them.",
         "Policy limits are re-checked independently at approval time.",
     ]
     attach_tax_lot_advisory(
@@ -490,12 +535,17 @@ def generate_trim_proposal(
         price=float(price), when=at,
         tax_lot_ledger=tax_lot_ledger, tax_lot_coverage=tax_lot_coverage,
     )
+    durable_lots = [dataclasses.asdict(lot) for lot in plan.lots]
     expected_impact.update({
         "allocation_profile_version": plan.profile_version,
         "allocation_profile_fingerprint": plan.profile_fingerprint,
         "rebalance_realized_gain_exact": plan.realized_gain_exact,
         "rebalance_realized_short_term_exact": plan.realized_short_term_exact,
         "rebalance_lot_strategy": plan.lot_strategy,
+        "rebalance_lots": durable_lots,
+        "rebalance_tax_lot_fingerprint": open_lot_fingerprint(
+            tax_lot_ledger, plan.ticker
+        ),
     })
 
     reasons = [
@@ -512,9 +562,22 @@ def generate_trim_proposal(
     if plan.closes_position:
         reasons.append(f"This closes the entire {plan.ticker} position.")
 
+    tax_decision = json.dumps(
+        {
+            "lots": durable_lots,
+            "gain": plan.realized_gain_exact,
+            "short": plan.realized_short_term_exact,
+            "long": plan.realized_long_term_exact,
+        },
+        sort_keys=True,
+        separators=(",", ":"),
+    )
     proposal_id = _stable_id(
         packet, policy, intent,
-        salt=f"{plan.profile_fingerprint}|{plan.lot_strategy}",
+        salt=(
+            f"{plan.profile_fingerprint}|{plan.lot_strategy}|"
+            f"{hashlib.sha256(tax_decision.encode('utf-8')).hexdigest()}"
+        ),
     )
     return {
         "created": True,

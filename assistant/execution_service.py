@@ -335,7 +335,11 @@ _PROFILE_BOUND_EVIDENCE_STATUSES = frozenset(
 )
 
 
-def _validate_proposal_context(proposal: dict) -> str | None:
+def _validate_proposal_context(
+    proposal: dict,
+    current_portfolio: PortfolioSnapshot | None = None,
+    store: AssistantStore | None = None,
+) -> str | None:
     """Fail closed when a context-bound proposal outlives that context.
 
     Most proposal families are fully bound by the trading-policy fingerprint.
@@ -349,7 +353,8 @@ def _validate_proposal_context(proposal: dict) -> str | None:
     SELLS toward one, realizing gains for a shape that is no longer the
     stated intent, and no later edit can un-realize them.
     """
-    if proposal.get("evidence_status") not in _PROFILE_BOUND_EVIDENCE_STATUSES:
+    evidence_status = proposal.get("evidence_status")
+    if evidence_status not in _PROFILE_BOUND_EVIDENCE_STATUSES:
         return None
     expected_impact = proposal.get("expected_impact")
     expected = (
@@ -373,6 +378,48 @@ def _validate_proposal_context(proposal: dict) -> str | None:
             "Proposal's allocation profile does not match the active owner "
             "profile. Regenerate it from Portfolio Rebalancing."
         )
+    if evidence_status == "user_directed_rebalance_trim":
+        expected_tax = expected_impact.get("rebalance_tax_lot_fingerprint")
+        if not expected_tax:
+            return (
+                "Rebalancing trim is missing its tax-lot fingerprint. "
+                "Regenerate it from Portfolio Rebalancing."
+            )
+        if current_portfolio is None or store is None:
+            return (
+                "Rebalancing trim tax lots could not be revalidated. "
+                "Regenerate it from Portfolio Rebalancing."
+            )
+        intent = proposal.get("intent")
+        ticker = (
+            str(intent.get("ticker") or "").strip().upper()
+            if isinstance(intent, dict)
+            else ""
+        )
+        if not ticker:
+            return (
+                "Rebalancing trim has no usable ticker for tax-lot "
+                "revalidation. Regenerate it from Portfolio Rebalancing."
+            )
+        from assistant.corporate_actions import tax_ledger_with_coverage
+        from assistant.tax_lots import open_lot_fingerprint
+
+        ledger, coverage = tax_ledger_with_coverage(store, current_portfolio)
+        ticker_coverage = (coverage.get("tickers", {}) or {}).get(ticker, {})
+        if (
+            ledger is None
+            or coverage.get("complete") is not True
+            or ticker_coverage.get("matched") is not True
+        ):
+            return (
+                "Rebalancing trim tax-lot coverage is no longer complete. "
+                "Regenerate it from Portfolio Rebalancing."
+            )
+        if expected_tax != open_lot_fingerprint(ledger, ticker):
+            return (
+                "Rebalancing trim tax lots changed after proposal creation. "
+                "Regenerate it from Portfolio Rebalancing."
+            )
     return None
 
 

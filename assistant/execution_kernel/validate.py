@@ -186,7 +186,9 @@ class ProposalValidationDeps:
     to_decimal: Callable[..., Decimal]
     env_kill_switch_active: Callable[[], bool]
     compute_policy_fingerprint: Callable[[TradingPolicy], str]
-    validate_proposal_context: Callable[[dict], str | None]
+    validate_proposal_context: Callable[
+        [dict, PortfolioSnapshot, AssistantStore], str | None
+    ]
     intent_from_dict: Callable[[dict], TradeIntent]
     detect_split_like_share_mismatch: Callable[..., dict[str, Any] | None]
     pending_buy_value_by_ticker: Callable[[list, Any], dict[str, Decimal]]
@@ -263,7 +265,9 @@ def run_proposal_validation(
             ),
         )
 
-    context_error = deps.validate_proposal_context(proposal)
+    context_error = deps.validate_proposal_context(
+        proposal, current_portfolio, store
+    )
     if context_error is not None:
         return deps.outcome_factory(
             proposal=proposal,

@@ -364,7 +364,7 @@ def test_the_trim_section_appears_only_when_a_sleeve_is_overweight(
     assert not [b for b in app.button if b.key == "rb_trim_check"]
 
 
-def test_the_trim_section_never_chooses_ticker_amount_or_lot_strategy(
+def test_the_trim_section_never_chooses_any_owner_decision(
     _offline, monkeypatch
 ):
     import assistant.context_builder as context_builder
@@ -387,6 +387,8 @@ def test_the_trim_section_never_chooses_ticker_amount_or_lot_strategy(
     assert not app.exception, app.exception
 
     keys = {str(s.key): s for s in app.selectbox}
+    assert "rb_trim_sleeve" in keys
+    assert keys["rb_trim_sleeve"].value == "-- choose --"
     assert "rb_trim_ticker" in keys and "rb_trim_strategy" in keys
     assert keys["rb_trim_ticker"].value == "-- choose --"
     assert keys["rb_trim_strategy"].value == "-- choose --"
@@ -394,8 +396,43 @@ def test_the_trim_section_never_chooses_ticker_amount_or_lot_strategy(
     assert shares and shares[0].value == 0.0
     check = [b for b in app.button if b.key == "rb_trim_check"]
     assert check and check[0].disabled, (
-        "nothing may be sized until the owner has chosen all three"
+        "nothing may be sized until the owner has chosen all four"
     )
+
+
+def test_fractional_trim_uses_exact_text_instead_of_binary_float(
+    _offline, monkeypatch
+):
+    import dataclasses
+
+    import assistant.context_builder as context_builder
+    import assistant.policy as policy_module
+
+    real_load = policy_module.load_policy
+    fractional_policy = dataclasses.replace(
+        real_load(policy_module.DEFAULT_POLICY_PATH), whole_shares_only=False
+    )
+    monkeypatch.setattr(policy_module, "load_policy", lambda _path: fractional_policy)
+
+    real_builder = context_builder.build_portfolio_snapshot
+
+    def _overweight_growth(positions, cash, **kwargs):
+        return real_builder(
+            list(positions) + [
+                {"ticker": "MSFT", "shares": 900,
+                 "entry_price": 8.0, "current_price": 10.0}
+            ],
+            cash=1_000.0, **kwargs
+        )
+
+    monkeypatch.setattr(
+        context_builder, "build_portfolio_snapshot", _overweight_growth
+    )
+    app = _rebalancing()
+
+    assert not app.exception, app.exception
+    assert [t for t in app.text_input if t.key == "rb_trim_fractional_shares"]
+    assert not [n for n in app.number_input if n.key == "rb_trim_shares"]
 
 
 def test_the_page_still_offers_no_submit_all_after_stage_three(_offline):

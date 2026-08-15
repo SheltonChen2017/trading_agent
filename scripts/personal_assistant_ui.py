@@ -71,7 +71,6 @@ from assistant.rebalance_steering import (
     eligible_sleeves as _rebalance_eligible_sleeves,
     generate_steering_proposals,
     steering_input_fingerprint as _steering_input_fingerprint,
-    steering_input_fingerprint as _steering_input_fingerprint,
 )
 from assistant.rebalance_profile import (
     OWNER_APPROVED_PROFILE,
@@ -84,6 +83,7 @@ from assistant.hedge_sleeve import (
 )
 from assistant.context_builder import build_decision_packet, build_portfolio_snapshot_from_alpaca, get_upcoming_events
 from assistant.schemas import EvidenceStatus, UpcomingEvent
+from risk.execution_gate import canonical_order_quantity
 from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.execution_service import (
     PolicyOverridableBlockError,
@@ -4069,7 +4069,7 @@ if page == "Portfolio Rebalancing":
             "prepared from the app's own arithmetic. It shows the realized "
             "gain before you approve, refuses to sell past your target, and "
             "refuses entirely when the tax lots are incomplete. You choose "
-            "the ticker, the amount, and the lot strategy."
+            "the sleeve, ticker, amount, and lot strategy."
         )
 
         _rb_over = _rebalance_overweight_sleeves(_rb_report)
@@ -4081,15 +4081,18 @@ if page == "Portfolio Rebalancing":
         else:
             _rb_trim_sleeve = st.selectbox(
                 "Overweight sleeve",
-                options=[SLEEVE_LABELS.get(s, s) for s in _rb_over],
+                options=[
+                    "-- choose --",
+                    *[SLEEVE_LABELS.get(s, s) for s in _rb_over],
+                ],
                 key="rb_trim_sleeve",
             )
             _rb_sleeve_key = next(
-                s for s in _rb_over
-                if SLEEVE_LABELS.get(s, s) == _rb_trim_sleeve
-            )
-            _rb_trim_row = next(
-                r for r in _rb_report.rows if r.sleeve == _rb_sleeve_key
+                (
+                    s for s in _rb_over
+                    if SLEEVE_LABELS.get(s, s) == _rb_trim_sleeve
+                ),
+                None,
             )
             _rb_held = sorted(
                 p.ticker.upper() for p in _rb_packet.portfolio.positions
@@ -4112,16 +4115,36 @@ if page == "Portfolio Rebalancing":
                     "instruct the broker."
                 ),
             )
-            _rb_trim_shares = st.number_input(
-                "Shares to sell",
-                min_value=0.0, value=0.0, step=1.0,
-                key="rb_trim_shares",
-            )
+            if _rb_policy.whole_shares_only:
+                _rb_trim_shares = st.number_input(
+                    "Shares to sell",
+                    min_value=0.0, value=0.0, step=1.0,
+                    key="rb_trim_shares",
+                )
+                _rb_shares_arg = (
+                    int(_rb_trim_shares) if _rb_trim_shares > 0 else None
+                )
+            else:
+                _rb_trim_shares = st.text_input(
+                    "Shares to sell",
+                    value="",
+                    key="rb_trim_fractional_shares",
+                    help="Enter an exact quantity with at most 9 decimal places.",
+                )
+                _rb_shares_arg = canonical_order_quantity(
+                    _rb_trim_shares, whole_shares_only=False
+                )
+                if _rb_trim_shares and _rb_shares_arg is None:
+                    st.error(
+                        "Enter a positive share quantity with at most 9 "
+                        "decimal places."
+                    )
 
             _rb_ready = (
-                _rb_trim_ticker != "-- choose --"
+                _rb_sleeve_key is not None
+                and _rb_trim_ticker != "-- choose --"
                 and _rb_trim_strategy != "-- choose --"
-                and _rb_trim_shares > 0
+                and _rb_shares_arg is not None
             )
             if st.button(
                 "Check what this trim would realize",
@@ -4131,11 +4154,6 @@ if page == "Portfolio Rebalancing":
             ):
                 _rb_ledger, _rb_coverage = tax_ledger_with_coverage(
                     store, _rb_packet.portfolio
-                )
-                _rb_shares_arg = (
-                    int(_rb_trim_shares)
-                    if _rb_policy.whole_shares_only
-                    else _rb_trim_shares
                 )
                 _rb_trim_result = generate_trim_proposal(
                     _rb_packet, OWNER_APPROVED_PROFILE, _rb_policy,
@@ -4153,12 +4171,13 @@ if page == "Portfolio Rebalancing":
                         _steering_input_fingerprint(
                             _rb_packet, _rb_report, _rb_policy,
                             selections={_rb_sleeve_key: _rb_trim_ticker},
-                            budget=_rb_trim_shares,
+                            budget=_rb_shares_arg,
                         ) + f"|{_rb_trim_strategy}"
                     )
                     st.session_state["rb_trim_plan"] = {
                         "excess": _rb_trim_plan.excess_above_band_exact,
                         "restoration": _rb_trim_plan.restoration_to_target_exact,
+                        "pending_sell": _rb_trim_plan.pending_sell_value_exact,
                         "gain": _rb_trim_plan.realized_gain_exact,
                         "short": _rb_trim_plan.realized_short_term_exact,
                         "long": _rb_trim_plan.realized_long_term_exact,
@@ -4188,8 +4207,11 @@ if page == "Portfolio Rebalancing":
                 _rb_trim_now = (
                     _steering_input_fingerprint(
                         _rb_packet, _rb_report, _rb_policy,
-                        selections={_rb_sleeve_key: _rb_trim_ticker},
-                        budget=_rb_trim_shares,
+                        selections=(
+                            {_rb_sleeve_key: _rb_trim_ticker}
+                            if _rb_sleeve_key is not None else {}
+                        ),
+                        budget=_rb_shares_arg,
                     ) + f"|{_rb_trim_strategy}"
                 )
                 if st.session_state.get("rb_trim_signature") != _rb_trim_now:
@@ -4203,7 +4225,7 @@ if page == "Portfolio Rebalancing":
                     _rb_shown = st.session_state.get("rb_trim_plan", {})
                     for _rb_note in _rb_shown.get("disclosures", []):
                         st.warning(_rb_note)
-                    _rb_t1, _rb_t2, _rb_t3 = st.columns(3)
+                    _rb_t1, _rb_t2, _rb_t3, _rb_t4 = st.columns(4)
                     _rb_t1.metric(
                         "Above band",
                         f"${Decimal(_rb_shown.get('excess', '0')):,.2f}",
@@ -4213,6 +4235,10 @@ if page == "Portfolio Rebalancing":
                         f"${Decimal(_rb_shown.get('restoration', '0')):,.2f}",
                     )
                     _rb_t3.metric(
+                        "Working sells",
+                        f"${Decimal(_rb_shown.get('pending_sell', '0')):,.2f}",
+                    )
+                    _rb_t4.metric(
                         "Realized gain",
                         f"${Decimal(_rb_shown.get('gain', '0')):,.2f}",
                         delta=(

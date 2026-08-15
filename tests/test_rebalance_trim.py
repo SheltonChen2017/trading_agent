@@ -27,12 +27,14 @@ import sys
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
+from assistant.corporate_actions import tax_ledger_with_coverage
 from assistant.policy import TradingPolicy
 from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
 from assistant.rebalance_profile import (
@@ -52,7 +54,7 @@ from assistant.rebalance_trim import (
 from assistant.schemas import DecisionPacket, MarketRegime
 from assistant.tax_lots import Fill, build_ledger
 
-COVERAGE = {"complete": True, "tickers": {"MSFT": {"complete": True}}}
+COVERAGE = {"complete": True, "tickers": {"MSFT": {"matched": True}}}
 
 
 def _ledger(*fills):
@@ -114,6 +116,24 @@ def test_only_sleeves_above_their_upper_band_can_be_trimmed():
         _packet().portfolio, OWNER_APPROVED_PROFILE, policy=_policy()
     )
     assert overweight_sleeves(report) == [SLEEVE_GROWTH]
+
+
+def test_an_unusable_rebalance_report_can_never_become_a_trim():
+    """Open-order blindness makes projected weight unknowable.  Report
+    refusals must survive the plan boundary instead of being collected and
+    then accidentally replaced by an empty final refusal tuple."""
+    packet = _packet(open_orders_available=False)
+    plan = _plan(packet=packet)
+    assert not plan.usable
+    assert any("Open-order data is unavailable" in r for r in plan.refusals)
+
+    result = generate_trim_proposal(
+        packet, OWNER_APPROVED_PROFILE, _policy(),
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200,
+        lot_strategy="fifo", tax_lot_ledger=_ledger(),
+        tax_lot_coverage=COVERAGE,
+    )
+    assert not result["created"]
 
 
 def test_a_sleeve_inside_its_band_is_refused():
@@ -198,6 +218,20 @@ def test_a_working_sell_already_counts_against_the_excess():
     # projected growth is $7,000, so the excess and restoration both shrink
     assert Decimal(plan.excess_above_band_exact) == Decimal("2000")
     assert Decimal(plan.restoration_to_target_exact) == Decimal("3000")
+    assert Decimal(plan.pending_sell_value_exact) == Decimal("2000")
+
+
+def test_working_sell_display_is_gross_not_signed_net_pending():
+    """The drift row needs signed net exposure, but the owner-facing field
+    promises the working SELL amount.  A simultaneous buy must not turn that
+    display negative or hide part of the sell."""
+    packet = _packet(open_orders=[
+        {"ticker": "MSFT", "side": "sell", "notional": 2_000.0},
+        {"ticker": "MSFT", "side": "buy", "notional": 500.0},
+    ])
+    plan = _plan(packet=packet, shares=200)
+    assert plan.usable, plan.refusals
+    assert Decimal(plan.pending_sell_value_exact) == Decimal("2000")
 
 
 # --- the tax consequence ----------------------------------------------------
@@ -221,6 +255,30 @@ def test_a_missing_ledger_refuses_even_when_coverage_claims_complete():
         tax_lot_ledger=None, tax_lot_coverage=COVERAGE,
     )
     assert not plan.usable
+
+
+def test_real_tax_coverage_contract_allows_a_complete_trim():
+    """Integration pin: production emits per-ticker ``matched`` plus a
+    global ``complete`` verdict.  A hand-written fixture with a made-up
+    per-ticker ``complete`` field can make every unit test pass while the UI
+    refuses every real trim."""
+    store = SimpleNamespace(
+        list_fills=lambda: [
+            {
+                "ticker": "MSFT", "side": "buy", "qty": 900,
+                "price": 8.0, "fill_id": "real-contract",
+                "at": "2024-01-10T12:00:00+00:00",
+            }
+        ],
+        list_journal_postings=lambda: [],
+    )
+    ledger, coverage = tax_ledger_with_coverage(store, _packet().portfolio)
+    assert coverage["complete"] is True
+    assert coverage["tickers"]["MSFT"]["matched"] is True
+    assert "complete" not in coverage["tickers"]["MSFT"]
+
+    plan = _plan(ledger=ledger, coverage=coverage)
+    assert plan.usable, plan.refusals
 
 
 def test_the_lot_strategy_changes_which_lots_are_realized():
@@ -263,6 +321,28 @@ def test_each_lot_reports_its_holding_period():
         assert lot.term_if_sold_now in ("long", "short")
         assert lot.acquired_at
         assert Decimal(lot.quantity_taken) > 0
+
+
+def test_proposal_time_controls_the_holding_period_everywhere():
+    """A generated-at test clock must also control the plan.  Otherwise a
+    lot on its one-year boundary can be displayed as short-term while the
+    durable proposal advisory classifies the same sale at another instant."""
+    ledger = _ledger(Fill(
+        ticker="MSFT", side="buy", qty=900, price=8.0,
+        fill_id="boundary", at=datetime(2025, 8, 15, 12, tzinfo=timezone.utc),
+    ))
+    result = generate_trim_proposal(
+        _packet(), OWNER_APPROVED_PROFILE, _policy(),
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200,
+        lot_strategy="fifo", tax_lot_ledger=ledger,
+        tax_lot_coverage=COVERAGE,
+        now=datetime(2026, 8, 16, 12, tzinfo=timezone.utc),
+    )
+    assert result["created"]
+    plan = result["plan"]
+    assert Decimal(plan.realized_short_term_exact) == 0
+    assert Decimal(plan.realized_long_term_exact) > 0
+    assert plan.lots[0].term_if_sold_now == "long"
 
 
 # --- the remainder ----------------------------------------------------------
@@ -367,6 +447,77 @@ def test_execution_refuses_a_trim_from_a_non_active_profile(tmp_path):
     assert "allocation profile" in str(outcome.error).lower()
 
 
+def test_execution_refuses_when_the_tax_lot_ledger_changed(
+    tmp_path, monkeypatch
+):
+    """The feature refuses to propose without complete tax consequences, so
+    a later ledger change cannot be allowed to make the approved card describe
+    different lots from the ones execution is about to sell against."""
+    from assistant import corporate_actions
+    from assistant.execution_service import validate_proposal_for_execution
+    from assistant.storage import AssistantStore
+
+    packet, policy = _packet(), _policy()
+    result = generate_trim_proposal(
+        packet, OWNER_APPROVED_PROFILE, policy,
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200,
+        lot_strategy="fifo", tax_lot_ledger=_ledger(),
+        tax_lot_coverage=COVERAGE,
+        now=datetime.now(timezone.utc),
+    )
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(result["proposal"].to_dict())
+    changed = _ledger(Fill(
+        ticker="MSFT", side="buy", qty=900, price=9.0,
+        fill_id="changed", at=datetime(2024, 1, 10, tzinfo=timezone.utc),
+    ))
+    monkeypatch.setattr(
+        corporate_actions,
+        "tax_ledger_with_coverage",
+        lambda _store, _portfolio: (changed, COVERAGE),
+    )
+
+    outcome = validate_proposal_for_execution(
+        result["proposal"].proposal_id, packet.portfolio, policy, store,
+        now_et=datetime(2026, 8, 15, 12, tzinfo=timezone.utc),
+    )
+    assert not outcome.approved
+    assert "tax lots changed" in str(outcome.error).lower()
+
+
+def test_execution_refuses_a_legacy_trim_without_tax_lot_binding(
+    tmp_path, monkeypatch
+):
+    from assistant import corporate_actions
+    from assistant.execution_service import validate_proposal_for_execution
+    from assistant.storage import AssistantStore
+
+    packet, policy = _packet(), _policy()
+    result = generate_trim_proposal(
+        packet, OWNER_APPROVED_PROFILE, policy,
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200,
+        lot_strategy="fifo", tax_lot_ledger=_ledger(),
+        tax_lot_coverage=COVERAGE,
+        now=datetime.now(timezone.utc),
+    )
+    stored = result["proposal"].to_dict()
+    stored["expected_impact"].pop("rebalance_tax_lot_fingerprint", None)
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(stored)
+    monkeypatch.setattr(
+        corporate_actions,
+        "tax_ledger_with_coverage",
+        lambda _store, _portfolio: (_ledger(), COVERAGE),
+    )
+
+    outcome = validate_proposal_for_execution(
+        stored["proposal_id"], packet.portfolio, policy, store,
+        now_et=datetime(2026, 8, 15, 12, tzinfo=timezone.utc),
+    )
+    assert not outcome.approved
+    assert "missing its tax-lot fingerprint" in str(outcome.error).lower()
+
+
 def test_the_lot_strategy_is_part_of_proposal_identity():
     """Two trims of the same size under different strategies realize
     different gains and are different decisions."""
@@ -378,6 +529,29 @@ def test_the_lot_strategy_is_part_of_proposal_identity():
             lot_strategy=strategy,
             tax_lot_ledger=_ledger(), tax_lot_coverage=COVERAGE,
         )["proposal"].proposal_id)
+    assert len(ids) == 2
+
+
+def test_tax_lots_and_consequence_are_part_of_proposal_identity():
+    """Reconciliation can change the complete ledger without changing the
+    portfolio packet.  A regenerated card with a different tax consequence
+    must not collide with the old stored proposal ID."""
+    ids = set()
+    for basis, fill_id in ((8.0, "cheap"), (9.0, "expensive")):
+        ledger = _ledger(Fill(
+            ticker="MSFT", side="buy", qty=900, price=basis,
+            fill_id=fill_id, at=datetime(2024, 1, 10, tzinfo=timezone.utc),
+        ))
+        result = generate_trim_proposal(
+            _packet(), OWNER_APPROVED_PROFILE, _policy(),
+            sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200,
+            lot_strategy="fifo", tax_lot_ledger=ledger,
+            tax_lot_coverage=COVERAGE,
+            now=datetime(2026, 8, 15, 12, tzinfo=timezone.utc),
+        )
+        ids.add(result["proposal"].proposal_id)
+        lots = result["proposal"].expected_impact["rebalance_lots"]
+        assert lots and lots[0]["lot_id"] == fill_id
     assert len(ids) == 2
 
 

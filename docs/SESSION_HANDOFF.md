@@ -1,7 +1,7 @@
-# Session handoff — REBAL-1 Stage 3 independently reviewed
+# Session handoff — REBAL-1 Stage 3 reviewed and counter-reviewed
 
-Prepared: 2026-08-15 by Codex after reviewing Claude's pushed REBAL-1 Stage
-3 branch and correcting the accepted implementation.
+Prepared: 2026-08-15 by Claude, after counter-reviewing Codex's independent
+review and correction of Stage 3.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -189,14 +189,69 @@ deprecations. No warning was introduced as a Stage 3 failure.
 No account identifier, balance, credential value, or private artifact content
 is recorded here.
 
+## 7b. Counter-review of the Stage 3 correction (Claude, 2026-08-15)
+
+Branch `user/claude/rebal1-stage3-counterreview-20260815`, based on Codex's
+review tip `0c91aa4`. Ledger in
+`docs/REVIEW_2026-08-15_REBAL1_STAGE3_COUNTERREVIEW.md`.
+
+All nine of Codex's findings were re-derived on a worktree at the submitted
+tree `bedeea2` and all nine are real.
+
+**ST3R-001 deserves stating plainly rather than as a ledger row: the
+submitted Stage 3 refused every trim, always.** It read
+`coverage["tickers"][name]["complete"]`, a key the real provider never emits
+— the actual per-ticker keys are `broker_shares`, `ledger_shares`, and
+`matched`. The tests passed because the fixture was a shape I invented
+instead of one obtained from the real producer. That is the same root cause
+as Stage 2's REBAL2CR-001 one round earlier, and worse here, because a
+refusal that always fires is indistinguishable from a careful safeguard —
+my own review document listed it as a safety feature.
+
+**One P2 closed (ST3CCR-001), and it is the same failure shape again.**
+Codex's corrected gate still required the GLOBAL `complete` flag alongside
+the trimmed ticker's `matched`. `complete` is the AND across every ticker,
+and `AssistantStore.list_fills` documents that positions bought before the
+app existed "produce no events and therefore no lots" — so one pre-app
+holding anywhere refuses every trim permanently. The owner's real book holds
+roughly fifteen positions, most acquired outside the app, so Stage 3 would
+still have proposed nothing. Both the creation and approval gates are now
+scoped to the trimmed ticker's `matched` flag, which is necessary and
+sufficient because the sale realizes gains from that ticker's lots alone;
+the uncovered remainder of the book is disclosed rather than blocking.
+
+**The execution-path change (ST3R-008) was audited on its own terms and
+accepted.** The two new parameters come from the kernel's own arguments, so
+its zero-module-global boundary holds; the trim branch is nested inside the
+existing evidence-status gate so other families are untouched;
+`open_lot_fingerprint` is deterministic and cannot raise on an unknown
+ticker; and `tax_ledger_with_coverage` catches its own error classes rather
+than raising into validation.
+
+Validation on this tree: **4,031 passed / 0 failed** in the pinned `.venv`;
+48 trim tests. Four mutations against the fix, all detected — restoring the
+global gate on either side, dropping the per-ticker requirement, and
+removing the disclosure.
+
+**The gap I would close next**, recorded because it caused both rounds of
+failure: the feature has still never been exercised end to end against a
+real store with real fills. Both defects were interface-shape mistakes that
+only a test driving the real producer would have caught, and the tests here
+still monkeypatch `tax_ledger_with_coverage` at the execution seam rather
+than seeding `broker_order_events`.
+
 ## 8. What is next
 
-1. The owner may authorize pushing
-   `codex/review-rebal1-stage3-20260815`, then open/merge the PR. No push is
-   authorized by this review itself.
-2. After a push, Claude may counter-review exact remote head and the ordered
-   review commit range. The general rule is now explicit: formal review starts
-   only from a pushed remote snapshot.
+1. The owner may merge `user/claude/rebal1-stage3-counterreview-20260815`,
+   which carries Codex's review commits and the counter-review on top, as a
+   single PR. `codex/review-rebal1-stage3-20260815` needs no separate push;
+   its commits are contained in this branch.
+2. Codex may independently verify the counter-review correction. Note for
+   the record: Codex's new rule that formal review starts only from a pushed
+   remote snapshot was added in `0c91aa4`, and this counter-review was
+   necessarily performed on a LOCAL-only review branch, because that branch
+   was never pushed. Pushing this branch makes the whole range remote and
+   restores the rule going forward.
 3. REBAL-1 has no Stage 4 in the adopted plan. Any new rebalancing feature
    needs a new owner-approved plan and scope.
 4. Resolve whether the 60-day hold means calendar days or 60 captured market

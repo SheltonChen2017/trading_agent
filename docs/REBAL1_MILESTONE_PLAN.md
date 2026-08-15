@@ -2,8 +2,9 @@
 
 Author: Codex (plan), relayed and recorded by Claude
 Adopted: 2026-08-15
-Status: **Stage 1 complete after independent correction. Stages 2 and 3 not
-started.**
+Status: **Stage 1 complete after independent correction and counter-review.
+Stage 2 implemented 2026-08-15, pending independent review. Stage 3 not
+started and requires separate explicit authorization.**
 
 This file records the owner-adopted staging so the sequencing survives the
 conversation it was written in. It is the authority for what REBAL-1's
@@ -75,7 +76,7 @@ limits are disclosed as conflicts rather than presented as reachable.
 Stage 1 emits no shares, sides, proposals, approvals, or action-shaped
 recommendations.
 
-## Stage 2 — Buy-only cash steering (NOT STARTED)
+## Stage 2 — Buy-only cash steering (IMPLEMENTED 2026-08-15)
 
 Separately reviewed milestone. The owner enters a new-money budget used only
 to reduce sleeves below their lower bands. It must count holdings and

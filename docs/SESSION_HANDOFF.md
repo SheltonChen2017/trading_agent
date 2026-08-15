@@ -1,7 +1,7 @@
-# Session handoff — REBAL-1 Stage 1 independently reviewed
+# Session handoff — REBAL-1 Stage 2 implemented
 
-Prepared: 2026-08-15 by Codex after independent review and correction of
-Claude's REBAL-1 Stage 1 implementation.
+Prepared: 2026-08-15 by Claude, after counter-reviewing Stage 1 and then
+implementing Stage 2 of the REBAL-1 plan.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -10,165 +10,182 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
 3. `docs/REBAL1_MILESTONE_PLAN.md`
-4. `docs/REVIEW_2026-08-15_REBAL1_STAGE1.md`
-5. `docs/MANDATE.md` (§2, §4, §6)
-6. `docs/OPERATIONAL_FACTS.md`
-7. `docs/OPERATIONS_RUNBOOK.md`
+4. `docs/REVIEW_2026-08-15_REBAL1_STAGE2.md`
+5. `docs/REVIEW_2026-08-15_REBAL1_STAGE1_COUNTERREVIEW.md`
+6. `docs/REVIEW_2026-08-15_REBAL1_STAGE1.md`
+7. `docs/MANDATE.md` (§2, §4, §6)
+8. `docs/OPERATIONAL_FACTS.md`
+9. `docs/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes deployment, evidence repair, an epoch roll, M4,
-REBAL-1 Stage 2 or 3, funded-account access, live trading, operator-database
-mutation, or scheduled-task change.
+REBAL-1 Stage 3, funded-account access, live trading, operator-database
+mutation, or a scheduled-task change.
 
 ## 1. Repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Submitted base: `01dbed4` (PR #224 merge).
-- Current `main` and `origin/main`: `afa47d9` at review start, PR #226's
-  merge of REBAL-1 Stage 1.
-- Implementation commit: `6fcdd35`; implementation records: `e03a320`;
-  merged implementation head: `afa47d9`.
-- Review branch: `codex/review-rebal1-stage1-20260815`, based on exact merged
-  head `afa47d9`.
-- Product/test correction: `5519a69`.
-- Review report, action plan, milestone record, and this handoff are committed
-  separately after `5519a69`.
-- The owner explicitly authorized pushing this branch. The branch is pushed
-  as part of this handoff; verify with
-  `git fetch origin codex/review-rebal1-stage1-20260815` before resuming on a
-  different computer.
-- Operational checkout remains separately frozen at deployed commit
-  `752d3b7` in active `paper-epoch-005`. No REBAL-1 commit was copied there.
-- Epoch-005 roll lineage remains rooted in Claude's `4de784e` chain and
-  Codex's independent correction `1cb8abf`; this review did not reopen it.
-- The completed BUY-1 review remains recoverable on
-  `codex/review-buy1-suggestion-picker-20260813` at correction `44a7f85`.
-  It is historical context, not current work.
+- `main` and `origin/main`: `f64b668`, PR #228's merge of Claude's Stage 1
+  counter-review on top of PR #227 (Codex's Stage 1 review) and PR #226
+  (Stage 1 itself).
+- **Current branch: `user/claude/rebal1-stage2-buy-steering-20260815`**,
+  branched from `f64b668`. It carries the Stage 1 correction REBAL1CR-002 and
+  all of Stage 2, at the owner's direction to keep both on one branch.
+- The operational checkout remains separate at frozen commit `752d3b7` in
+  active `paper-epoch-005`. No development commit has been copied there.
 
-Commit dispositions:
+Relevant recent history:
 
-| Commit | Disposition | Note |
-|---|---|---|
-| `176f7f8` | rejected | Exploratory per-ticker drift model; superseded and correctly removed by the adopted sleeve design. |
-| `e067ad8` | rejected | Merge tree equals `176f7f8`; rejected for the same architectural reason. |
-| `6fcdd35` | accepted after correction | Sound read-only sleeve architecture; five P2 and three P3 review findings required `5519a69`. |
-| `e03a320` | accepted after correction | Sound plan/evidence framing; stale topology and corrected semantics reconciled in the review records. |
-| `afa47d9` | accepted after correction | Merge tree equals `e03a320`; accepted with `5519a69` and the review records. |
+- `4de784e` / `1cb8abf`: the epoch-005 observation-clock roll chain and
+  Codex's correction of it.
+- `c048a94`: the owner's decision to keep epoch-005 unchanged for 60 days.
+- `6fcdd35` / `e03a320`: REBAL-1 Stage 1 and its records.
+- `5519a69` / `ccb00f4`: Codex's Stage 1 review correction and records.
+- `832ea6a`: Claude's Stage 1 counter-review.
+- The completed BUY-1 review branch remains
+  `codex/review-buy1-suggestion-picker-20260813`, correction `44a7f85`. It is
+  historical recovery context, not reopened work.
 
-## 2. Final REBAL-1 Stage 1 behavior
+## 2. Owner decision, 2026-08-15: raise the policy, not the profile
 
-The Portfolio Rebalancing page reports the portfolio against the owner's
-versioned and fingerprinted sleeve targets: cash 10%, dividend income 15%,
-growth 40%, leveraged reinvestment 15%, hedge 10%, and other/unassigned 10%,
-with a ±25% relative band. Those numbers are owner preference, not a research
-finding. The confirmed wide-band experiment concerns SOXX/SOXL only and does
-not establish that this portfolio shape is profitable, optimal, or protective.
+Stage 1's review established that the owner-approved sleeve profile could not
+be reached under the active policy — 90% invested against a 50%
+total-exposure cap, and growth's 40% target against 30% of capacity at
+`max_position_pct` 5%. The owner chose to raise the policy rather than lower
+the profile, on the basis that this is a small testing and experimentation
+account where the extra concentration is acceptable.
 
-The accepted Stage 1 implementation:
+The DEVELOPMENT `assistant/my_policy.json` now carries
+`max_total_exposure_pct` 0.90 and `max_position_pct` 0.07 (six growth names ×
+7% = 42%, clearing the 40% target), version `0.3.0-personal.1`, with the
+rationale in its own `notes`.
 
-- aggregates exact broker position values and refuses the whole report when
-  one unusable holding corrupts the shared denominator;
-- validates immutable configured sleeve membership and always surfaces
-  current or pending residual exposure;
-- applies measurable working buys/sells to both the asset sleeve and cash,
-  then computes projected status, breach count, and target gap;
-- marks unknown pending values on the affected sleeve and cash, and refuses
-  unidentifiable open-order rows rather than dropping them;
-- discloses targets that cannot fit the active cash floor, leveraged cap,
-  total-exposure cap, or combined configured position-cap capacity; and
-- renders a native, read-only Streamlit report without retained analysis
-  state and without converting exact money through float.
+**The operational checkout was deliberately not touched, and a future agent
+must not "finish the job" by copying it across.** `_active_runtime_lineage()`
+computes `policy_fingerprint` from the live policy file and
+`capture_paper_account_observation()` raises `PaperEvidenceError` when the
+epoch's recorded lineage differs, so editing the operational policy during the
+60-day hold would make every nightly capture refuse — the epoch-002 stall
+exactly. `C:\git\trading_agent_operational` keeps 0.50/0.05 until the owner
+authorizes a deployment, which closes epoch-005 on its own account anyway by
+changing `code_commit`.
 
-Stage 1 emits no shares, trade side, quantity, proposal, approval, or order.
-Stages 2 and 3 are not started. Stage 2 would add separately approved buy-only
-cash steering and needs a new owner decision. Stage 3 would add tax-aware trim
-preparation and requires its own explicit authorization because it introduces
-app-initiated sell preparation.
+`my_policy.json` is untracked, so this change is local and appears in no
+commit. `assistant/default_policy.json` is unchanged: the committed baseline
+stays conservative, and a fresh clone still sees the conflict disclosures.
 
-## 3. Independent review findings
+## 3. What this branch contains
 
-The durable issue ledger and evidence are in
-`docs/REVIEW_2026-08-15_REBAL1_STAGE1.md`.
+**REBAL1CR-002 (Stage 1 correction).** My Stage 1 counter-review fixed
+`policy_conflict` masking the band status but left the identical defect one
+status along: `unassigned_holdings` also occupies `status`, and the headline
+breach count read `status`, so a residual outside its band went uncounted.
+`SleeveRow.band_state` is now computed independently of the display label and
+`breached` derives from it, so which label a row carries can never change how
+many breaches are counted. `band_state` is empty when the band genuinely
+cannot be judged, and those rows contribute no breach either way.
 
-- **0 P0 / 0 P1 / 5 P2 / 3 P3**.
-- All eight findings are closed; zero remain open.
-- Initial red proof: **17 failed / 48 passed** after adding the narrow review
-  regressions to the submitted tree.
-- P2 corrections cover projected cash/status/gaps, policy feasibility,
-  malformed authoritative notional, unidentifiable or hidden pending orders,
-  and invalid-profile public-boundary behavior.
-- P3 corrections freeze nested profile state, reject corrupt classification
-  entries, and retain exact decimal presentation with truthful residual copy.
-- Generalized searches covered every pending/gap field consumer, policy
-  conflict, fingerprint caller, sleeve-membership caller, and UI exact-money
-  conversion in scope.
+**Stage 2 — buy-only cash steering.** `assistant/rebalance_steering.py` plus a
+section on the existing Portfolio Rebalancing page. The owner enters a
+new-money budget and picks one ticker per under-band sleeve; the module
+produces one APPROVE-gated buy proposal per funded sleeve.
+
+Points a reviewer should press on:
+
+- money is sized to the **lower band edge, not the target** — the band's
+  purpose is that being inside it is enough;
+- **cash and the residual can never receive money**, whatever their band says;
+- **an overweight sleeve produces nothing at all**, not even a reduced buy;
+- eligibility is measured on the **projected** weight, so money already
+  working in an unfilled order counts (the HEDGER-004 duplication);
+- an unchosen or unaffordable leg is **named, never silently omitted**; and
+- proposals bind to the **allocation-profile fingerprint**, so a profile edit
+  cannot reuse an order sized against targets the owner has since changed.
+
+The staleness signature covers profile fingerprint, snapshot date, equity,
+ticker choices, budget, and per-sleeve pending values. Stage 1 got staleness
+for free by storing nothing; Stage 2 cannot, so it is explicit.
 
 ## 4. Validation
 
-Environment: repository `.venv`, Python **3.13.14**, Streamlit **1.60.0**,
-Windows.
+Environment: repository `.venv`, Python 3.13.14, Streamlit 1.60.0, Windows.
 
-- Claude's submitted focused suite: **58 passed**.
-- Corrected focused module/UI suite: **75 passed** in 7.17 seconds.
-- Full corrected tree: **3,933 passed / 0 failed / 25 known dependency
-  warnings** in 629.94 seconds.
-- Compilation of `assistant`, `backtest`, `data`, `execution`, `ml`, `risk`,
-  `scripts`, `signals`, `strategies`, `tests`, and root Python modules: clean.
-- Focused and final diff checks: clean.
+- Full settled tree: **3,971 passed / 0 failed / 25 known dependency
+  warnings** in 672.57 seconds, with no concurrent edit.
+- Focused: 26 steering, 71 rebalance, 16 UI tests.
+- Mutation verification: **8 mutations, 8 detected** by exactly the intended
+  test. Two only worked on a second attempt — the first versions left the
+  refusal in place and so changed nothing observable. A mutation that does
+  not create the dangerous behaviour proves nothing about the test.
+- `python -m compileall` and `git diff --check`: clean.
 
-Warnings are the existing `websockets.legacy` deprecation and 24 Joblib /
-NumPy shape deprecations. No real Alpaca request, paper order, funded account,
-live order, operator-database write, or scheduled task was used as evidence.
+Always run the full suite through `.venv\Scripts\python.exe`; a bare
+`python -m pytest` uses the user Python, which still has Streamlit 1.52.2 and
+produces 14 spurious UI failures.
 
-## 5. Operational and machine-local state
+## 5. Operational truth and owner decision
 
-- The operational database and credential values were not opened or changed.
-- Existing app, epoch, and monitor processes were not stopped or modified.
-- `scripts/launch_dev_app.ps1` remains the development entry point. It uses a
-  scratch database and the environment kill switch by default.
-- `-AllowPaperOrders` can still reach the shared Alpaca paper account and is
-  prohibited during the owner's epoch hold absent fresh authorization.
-- Active `paper-epoch-005` remains bound to deployed commit `752d3b7`.
-  Deploying this development branch changes `code_commit` and closes the
-  epoch even though mandate and policy fingerprints are unchanged.
-- Owner instruction from 2026-08-14 remains: leave epoch-005 unchanged for 60
-  days. The unresolved interpretation is whether that means calendar days or
-  captured market sessions.
-- CR-W3 remains a watch item for the first real AEP dividend subtype. Use the
-  reviewed acknowledgement path if it fails closed; do not broaden tolerance
-  or insert compensating evidence manually.
-- The SET-1 design question remains open: whether strict whole-share mode may
-  sell a fraction only when it closes an entire position.
-- `TRADE1CR-002` remains open and unscheduled: date-dependent strategy fixtures
-  can fail between roughly 00:00 and 09:30 Eastern.
+- `paper-epoch-005` is active on the epoch host at frozen deployed commit
+  `752d3b7`. Epochs 001 through 004 are closed and cannot pool evidence into
+  it.
+- Owner decision, 2026-08-14: epoch-005 runs unchanged for 60 days. Do not
+  deploy, roll, or otherwise disturb it. TRADE-1, BUY-1, SET-1, STALL-1,
+  HEDGE-1, and REBAL-1 all remain development-only.
+- Sixty calendar days is roughly 43 weekday observations, not 60 sessions.
+  Whether the owner's target means days or observations is still open.
+- The owner may exercise this work with `scripts/launch_dev_app.ps1`; its
+  scratch database and default environment kill switch prevent submission.
+  `-AllowPaperOrders` reaches the shared Alpaca paper account and must not be
+  used while the 60-day hold stands.
+- CR-W3 remains a watch item: the first real AEP dividend subtype may fail
+  closed around 2026-09-10 and require the reviewed acknowledgement path. Do
+  not widen reconciliation tolerance or post a manual compensating entry.
 
-No account number, credential value, balance, private artifact content, or
+No account identifier, balance, credential value, private artifact content, or
 secret is recorded here.
 
-## 6. Next step
+## 6. Next authorized step
 
-The review branch is ready for the owner's PR and Claude's independent
-counter-review. Do not begin Stage 2 merely because the plan defines it; wait
-for the owner to authorize that milestone after reviewing Stage 1. Stage 3,
-deployment, an epoch roll, M4, scheduler changes, operator-database mutation,
-and funded/live authority each remain separately prohibited without explicit
-owner direction.
+1. Independent review of both pieces here — the Stage 1 correction and
+   Stage 2. Suggested focus: whether the lower-edge sizing rule is right when
+   several sleeves compete for one budget, whether the staleness signature
+   misses any input that changes what a proposal means, and whether
+   `band_state` now covers every status precedence case.
+2. Stage 3 (tax-aware trims) needs its own explicit authorization naming it,
+   because it is where rebalancing first sells on the app's own initiative
+   rather than on a computed breach or the owner's instruction.
+3. Answer whether the 60-day decision means calendar days or 60 captured
+   market sessions.
+4. The SET-1 design question remains open: whether strict whole-share mode
+   should permit a fractional sell only when it closes an entire position.
+5. `TRADE1CR-002` remains open and unscheduled: date-dependent fixtures in
+   `tests/test_strategy_proposals_generic.py` make the full suite unpassable
+   between roughly 00:00 and 09:30 ET.
+
+`docs/FEATURE_MILESTONE_RECORD.md` deliberately has no Stage 2 entry yet;
+that file records work that has completed its definition of done AND its
+required review.
+
+Do not begin M4, mutate the operator database, alter scheduled tasks, access a
+funded account, enable live trading, deploy, or roll an epoch without a new
+explicit owner instruction.
 
 ## 7. Resume prompt
 
 ```text
-Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/REBAL1_MILESTONE_PLAN.md,
-docs/REVIEW_2026-08-15_REBAL1_STAGE1.md, docs/MANDATE.md, and
-docs/SESSION_HANDOFF.md. main/origin-main were afa47d9 after PR #226 merged
-Claude's REBAL-1 Stage 1. Codex reviewed the complete 01dbed4..afa47d9 range
-on codex/review-rebal1-stage1-20260815 and corrected it at 5519a69. The review
-accepted Stage 1 after closing 0 P0 / 0 P1 / 5 P2 / 3 P3 findings involving
-cash-conserving pending projection, projected status/gaps, active-policy
-feasibility, malformed and unidentifiable open orders, invalid profile input,
-profile/config immutability, and exact UI presentation. Final validation was
-75 focused and 3,933 full-suite tests. Stage 1 is read-only; Stages 2 and 3
-are not started or authorized. Operational commit 752d3b7 and active
-paper-epoch-005 remain frozen. Do not deploy, roll the epoch, mutate the
-operator database, begin M4/REBAL Stage 2 or 3, access a funded account, or
-enable live trading without explicit owner authorization.
+Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, docs/REBAL1_MILESTONE_PLAN.md,
+and docs/SESSION_HANDOFF.md. main and origin/main are f64b668 (PR #228).
+Branch user/claude/rebal1-stage2-buy-steering-20260815 carries two things: the
+Stage 1 correction REBAL1CR-002, where unassigned_holdings masked the band
+status exactly as policy_conflict had and the headline breach count
+undercounted a drifted residual; and REBAL-1 Stage 2, buy-only cash steering
+that sizes a new-money budget to the LOWER BAND EDGE of under-band sleeves,
+never sells, never steers into cash or the residual, names rather than omits
+an unchosen or unaffordable leg, and binds proposals to the allocation-profile
+fingerprint. Owner decision 2026-08-15: the policy was raised (dev
+my_policy.json 0.90/0.07) rather than the profile lowered; the OPERATIONAL
+policy was deliberately left at 0.50/0.05 because a policy-fingerprint change
+would stall epoch-005's nightly capture. Full pinned-venv tree: 3,971 passed /
+0 failed. Stage 2 has had NO independent review and Stage 3 is not started.
+Do not deploy, roll the epoch, mutate the operator database, begin M4, access
+a funded account, or enable live trading without explicit owner authorization.
 ```

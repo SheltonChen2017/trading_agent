@@ -688,3 +688,45 @@ def test_every_row_carries_a_conflict_field_even_when_unusable():
     report = _report(snapshot)
     assert not report.usable
     assert all(r.policy_conflict_reason == "" for r in report.rows)
+
+
+def test_the_breach_count_includes_a_drifted_residual():
+    """REBAL1CR-002. Fixing `policy_conflict` masking left the identical
+    defect one status along: `unassigned_holdings` also occupies `status`,
+    and the headline counts only rows whose STATUS is a band breach. A
+    residual at 21.8% against a 7.5-12.5% band is outside its band by any
+    reading, and the owner's most prominent number silently omitted it.
+
+    The band state is now recorded independently of the display status, so
+    which label a row carries can never change how many breaches are counted.
+    """
+    snapshot = _snapshot([_held("AAPL", 218, 10.0)], cash=7_820.0)
+    report = _report(snapshot)
+
+    other = _row(report, SLEEVE_OTHER)
+    assert other.status == STATUS_UNASSIGNED, "the residual keeps its own label"
+    assert other.band_state == STATUS_OVERWEIGHT, "and still records its band"
+
+    truly_outside = [
+        r.sleeve for r in report.rows
+        if not (r.lower_edge_pct <= r.projected_pct <= r.upper_edge_pct)
+    ]
+    assert report.breached_count == len(truly_outside), (
+        report.breached_count, truly_outside,
+    )
+    assert SLEEVE_OTHER in report.breached
+
+
+def test_band_state_is_empty_when_the_band_cannot_be_judged():
+    """An unknown working order makes the projected weight unknowable, so the
+    row records no band state rather than a guessed one -- and contributes no
+    breach either way."""
+    snapshot = _snapshot(
+        [_held("GLD", 100, 10.0)], cash=9_000.0,
+        open_orders=[{"ticker": "SH", "side": "buy"}],
+    )
+    report = _report(snapshot)
+    hedge = _row(report, SLEEVE_HEDGE)
+    assert hedge.status == STATUS_PENDING_UNKNOWN
+    assert hedge.band_state == ""
+    assert SLEEVE_HEDGE not in report.breached

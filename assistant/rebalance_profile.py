@@ -35,6 +35,8 @@ import dataclasses
 import hashlib
 import json
 from decimal import Decimal
+from types import MappingProxyType
+from typing import Mapping
 
 import config
 from assistant.money import decimal_or_none, decimal_text
@@ -90,12 +92,20 @@ class AllocationProfile:
     version: str
     name: str
     #: Sleeve -> exact target percentage of total equity, as decimal text.
-    targets: dict[str, str]
+    targets: Mapping[str, str]
     #: Relative fraction of each target, NOT percentage points. 0.25 means a
     #: 40% target tolerates 30-50% and a 10% target tolerates 7.5-12.5%, so
     #: "wide" keeps its meaning across targets of very different size.
     band_fraction: str
     notes: str = ""
+
+    def __post_init__(self) -> None:
+        # ``frozen=True`` does not freeze a nested dict. Copy before wrapping
+        # so neither the caller nor later code can mutate the profile behind
+        # a report's version/fingerprint.
+        if not isinstance(self.targets, Mapping):
+            raise AllocationProfileError("Profile targets must be a mapping.")
+        object.__setattr__(self, "targets", MappingProxyType(dict(self.targets)))
 
     def to_dict(self) -> dict:
         return {
@@ -128,6 +138,8 @@ def compute_profile_fingerprint(profile: AllocationProfile) -> str:
     profile still invalidates what was shown rather than being silently
     re-interpreted against numbers the reader never saw.
     """
+    if not isinstance(profile, AllocationProfile):
+        raise AllocationProfileError("An AllocationProfile is required.")
     payload = {k: v for k, v in profile.to_dict().items() if k != "notes"}
     serialized = json.dumps(payload, sort_keys=True, default=str)
     return hashlib.sha256(serialized.encode("utf-8")).hexdigest()
@@ -143,10 +155,17 @@ def sleeve_membership() -> dict[str, str]:
     """
     membership: dict[str, str] = {}
     for sleeve, attribute in sorted(_TICKER_SLEEVES.items()):
-        for raw in getattr(config, attribute, ()) or ():
-            ticker = str(raw).strip().upper()
-            if not ticker:
-                continue
+        configured = getattr(config, attribute, ()) or ()
+        if isinstance(configured, (str, bytes)):
+            raise AllocationProfileError(
+                f"{attribute} must be a collection of ticker strings."
+            )
+        for raw in configured:
+            if not isinstance(raw, str) or not raw.strip():
+                raise AllocationProfileError(
+                    f"{attribute} contains an invalid ticker {raw!r}."
+                )
+            ticker = raw.strip().upper()
             existing = membership.get(ticker)
             if existing is not None and existing != sleeve:
                 raise AllocationProfileError(

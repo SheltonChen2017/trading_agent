@@ -159,6 +159,20 @@ def test_editing_only_the_notes_does_not_change_the_fingerprint():
     )
 
 
+def test_profile_copies_and_freezes_caller_owned_targets():
+    targets = dict(OWNER_APPROVED_PROFILE.targets)
+    profile = dataclasses.replace(OWNER_APPROVED_PROFILE, targets=targets)
+    targets[SLEEVE_CASH] = "99"
+    assert profile.targets[SLEEVE_CASH] == "10"
+    with pytest.raises(TypeError):
+        profile.targets[SLEEVE_CASH] = "99"  # type: ignore[index]
+
+
+def test_fingerprint_rejects_the_wrong_object_with_the_domain_error():
+    with pytest.raises(AllocationProfileError):
+        compute_profile_fingerprint(object())  # type: ignore[arg-type]
+
+
 def test_a_ticker_in_two_sleeves_is_refused_rather_than_assigned(monkeypatch):
     """An ambiguous classification moves every other sleeve's weight through
     the shared denominator, so first-wins would be a hidden allocation
@@ -168,6 +182,13 @@ def test_a_ticker_in_two_sleeves_is_refused_rather_than_assigned(monkeypatch):
     with pytest.raises(AllocationProfileError) as caught:
         sleeve_membership()
     assert "SOXL" in str(caught.value)
+
+
+@pytest.mark.parametrize("bad_member", ["", "   ", None, True, 123])
+def test_corrupt_configured_sleeve_members_are_refused(monkeypatch, bad_member):
+    monkeypatch.setattr(config, "GROWTH_ROTATION_TICKERS", [bad_member])
+    with pytest.raises(AllocationProfileError):
+        sleeve_membership()
 
 
 def test_the_configured_sleeves_do_not_currently_overlap():
@@ -362,6 +383,12 @@ def test_a_measurable_pending_buy_moves_the_projected_weight_only():
     assert hedge.current_pct == pytest.approx(5.0)
     assert hedge.projected_pct == pytest.approx(10.0)
     assert Decimal(hedge.pending_value_exact) == Decimal("500")
+    cash = _row(report, SLEEVE_CASH)
+    assert Decimal(cash.pending_value_exact) == Decimal("-500")
+    assert cash.projected_pct == pytest.approx(90.0)
+    assert hedge.status == STATUS_INSIDE
+    assert Decimal(hedge.gap_to_target_exact) == Decimal("0")
+    assert SLEEVE_HEDGE not in report.breached
 
 
 def test_a_measurable_pending_sell_reduces_the_projected_weight():
@@ -374,6 +401,49 @@ def test_a_measurable_pending_sell_reduces_the_projected_weight():
     assert hedge.current_pct == pytest.approx(20.0)
     assert hedge.projected_pct == pytest.approx(15.0)
     assert Decimal(hedge.pending_value_exact) == Decimal("-500")
+    cash = _row(report, SLEEVE_CASH)
+    assert Decimal(cash.pending_value_exact) == Decimal("500")
+    assert cash.projected_pct == pytest.approx(85.0)
+
+
+def test_malformed_authoritative_notional_does_not_fall_back_to_qty_limit():
+    snapshot = _snapshot(
+        cash=10_000.0,
+        open_orders=[{
+            "ticker": "SH", "side": "buy", "notional": "broken",
+            "qty": "10", "limit_price": "100",
+        }],
+    )
+    report = _report(snapshot)
+    assert _row(report, SLEEVE_HEDGE).status == STATUS_PENDING_UNKNOWN
+
+
+def test_unknown_unassigned_pending_order_is_named_and_marks_cash_unknown():
+    snapshot = _snapshot(
+        cash=10_000.0,
+        open_orders=[{"ticker": "AAPL", "side": "buy"}],
+    )
+    report = _report(snapshot)
+    assert "AAPL" in report.unassigned_tickers
+    assert "AAPL" in _row(report, SLEEVE_OTHER).tickers
+    assert _row(report, SLEEVE_CASH).status == STATUS_PENDING_UNKNOWN
+
+
+def test_unknown_pending_value_is_not_hidden_by_a_policy_conflict():
+    snapshot = _snapshot(
+        cash=10_000.0,
+        open_orders=[{"ticker": "MSFT", "side": "buy"}],
+    )
+    report = _report(snapshot, policy=_policy(max_position_pct=0.05))
+    assert _row(report, SLEEVE_GROWTH).status == STATUS_PENDING_UNKNOWN
+
+
+@pytest.mark.parametrize("order", [None, {}, {"side": "buy", "notional": 100}])
+def test_unidentifiable_open_order_refuses_the_whole_report(order):
+    snapshot = _snapshot(cash=10_000.0, open_orders=[order])
+    report = _report(snapshot)
+    assert not report.usable
+    assert any("order" in reason.lower() for reason in report.refusals)
 
 
 def test_an_unknown_pending_value_marks_the_sleeve_rather_than_assuming_zero():
@@ -438,6 +508,27 @@ def test_a_cash_target_below_the_reserve_floor_is_marked():
     assert _row(report, SLEEVE_CASH).status == STATUS_POLICY_CONFLICT
 
 
+def test_total_invested_target_above_policy_cap_is_disclosed():
+    report = _report(
+        _snapshot(cash=10_000.0),
+        policy=_policy(max_total_exposure_pct=0.50),
+    )
+    assert all(
+        _row(report, sleeve).status == STATUS_POLICY_CONFLICT
+        for sleeve in SLEEVE_ORDER if sleeve != SLEEVE_CASH
+    )
+    assert any("total-exposure" in text for text in report.disclosures)
+
+
+def test_sleeve_target_above_combined_position_capacity_is_disclosed():
+    report = _report(
+        _snapshot(cash=10_000.0),
+        policy=_policy(max_position_pct=0.05),
+    )
+    assert _row(report, SLEEVE_GROWTH).status == STATUS_POLICY_CONFLICT
+    assert any("position-cap capacity" in text for text in report.disclosures)
+
+
 def test_the_owner_approved_profile_conflicts_with_no_default_policy_cap():
     report = _report(_snapshot(cash=10_000.0), policy=_policy())
     assert not any(r.status == STATUS_POLICY_CONFLICT for r in report.rows)
@@ -446,6 +537,14 @@ def test_the_owner_approved_profile_conflicts_with_no_default_policy_cap():
 def test_no_policy_means_no_conflict_check_rather_than_a_guessed_one():
     report = _report(_snapshot(cash=10_000.0), policy=None)
     assert not any(r.status == STATUS_POLICY_CONFLICT for r in report.rows)
+
+
+def test_wrong_profile_type_returns_an_unusable_report_instead_of_crashing():
+    report = evaluate_portfolio_rebalance(
+        _snapshot(cash=10_000.0), object()  # type: ignore[arg-type]
+    )
+    assert not report.usable
+    assert {row.status for row in report.rows} == {STATUS_DATA_UNAVAILABLE}
 
 
 # --- headline figures -------------------------------------------------------

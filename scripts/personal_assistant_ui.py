@@ -43,6 +43,7 @@ import math
 import os
 import sys
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
@@ -3848,7 +3849,7 @@ if page == "Portfolio Rebalancing":
     else:
         _rb_a, _rb_b, _rb_c, _rb_d = st.columns(4)
         _rb_a.metric(
-            "Total equity", f"${float(_rb_report.total_equity_exact):,.2f}"
+            "Total equity", f"${Decimal(_rb_report.total_equity_exact):,.2f}"
         )
         _rb_b.metric("Invested", f"{_rb_report.invested_pct:.2f}%")
         _rb_c.metric("Cash", f"{_rb_report.cash_pct:.2f}%")
@@ -3889,10 +3890,10 @@ if page == "Portfolio Rebalancing":
                         f"{_row.upper_edge_pct:.2f}%"
                     ),
                     "Current": f"{_row.current_pct:.2f}%",
-                    "Pending": f"${float(_row.pending_value_exact):,.2f}",
+                    "Pending": f"${Decimal(_row.pending_value_exact):,.2f}",
                     "Projected": f"{_row.projected_pct:.2f}%",
                     "Gap to target": (
-                        f"${float(_row.gap_to_target_exact):,.2f}"
+                        f"${Decimal(_row.gap_to_target_exact):,.2f}"
                     ),
                     "Status": _rb_status_labels.get(_row.status, _row.status),
                 }
@@ -3902,19 +3903,20 @@ if page == "Portfolio Rebalancing":
             width="stretch",
         )
         st.caption(
-            "Gap to target is a distance, not an instruction: it names how "
-            "far a sleeve sits from its target in dollars, with no share "
-            "count, no side, and no ordering of what to act on."
+            "Gap to target is the projected distance after measurable "
+            "working orders, not an instruction: it names how far a sleeve "
+            "would sit from its target in dollars, with no share count, no "
+            "side, and no ordering of what to act on."
         )
 
         if _rb_report.unassigned_tickers:
             with st.container(border=True):
-                st.caption("HELD OUTSIDE EVERY SLEEVE")
+                st.caption("CURRENT OR PENDING EXPOSURE OUTSIDE EVERY SLEEVE")
                 st.write(", ".join(_rb_report.unassigned_tickers))
                 st.caption(
                     "These are shown because the allocation profile does not "
                     "cover them. That is a gap in the profile, not a verdict "
-                    "on the holding, and it is not a reason to sell."
+                    "on the holding or order, and it is not a reason to sell."
                 )
 
 

@@ -194,6 +194,19 @@ def test_the_page_source_emits_no_shares_or_sides(_offline):
         assert forbidden not in page, forbidden
 
 
+def test_exact_money_is_not_rounded_through_binary_float(_offline):
+    """Broker-preserved exact text must stay decimal through presentation."""
+    source = _APP_PATH.read_text(encoding="utf-8")
+    page = source.split('if page == "Portfolio Rebalancing":', 1)[1].split(
+        'if page == "Propose & Approve":', 1
+    )[0]
+    for field in (
+        "total_equity_exact", "pending_value_exact", "gap_to_target_exact"
+    ):
+        assert f"float(_rb_report.{field})" not in page
+        assert f"float(_row.{field})" not in page
+
+
 def test_nothing_is_retained_in_session_state_between_reruns(_offline):
     """Stage 1's staleness rule is structural: with no stored analysis there
     is no card for a profile or snapshot change to leave standing."""

@@ -585,6 +585,62 @@ def _mainline_ref() -> str | None:
     return None
 
 
+_TOPOLOGY_PATTERNS = {
+    "ACTION_PLAN_2026-08-02.md": r"Current development topology.*?`([0-9a-f]{7,40})`",
+    "SESSION_HANDOFF.md": r"(?:Current )?`main` and `origin/main`:\s*`([0-9a-f]{7,40})`",
+}
+
+
+def test_a_declared_current_mainline_hash_is_really_on_the_mainline():
+    """HEDGE1CR-001. The declared hash must be REACHABLE from the mainline,
+    not equal to its tip.
+
+    The first version of this guard asserted equality with `origin/main`.
+    That cannot stay green, and the failure is structural rather than
+    careless: merging the very branch that updates the records creates a new
+    merge commit, so the hash the records name is one behind the instant it
+    lands. A records-only follow-up merges as another commit and is stale
+    again -- no state satisfies the equality assertion for longer than one
+    merge, and `main` itself would carry the red test.
+
+    Reachability is the durable part, and it still catches what HEDGER-007
+    was really about: a declared hash that is fiction, a typo, or a commit
+    that only ever existed on a feature branch. Recency cannot be asserted
+    from inside the commit being merged -- the same "false by construction"
+    rule this module's docstring already states, and the reason its sibling
+    guards test relationships instead of today's values.
+    """
+    mainline = _mainline_ref()
+    if mainline is None:  # pragma: no cover - export or detached checkout
+        pytest.skip("no mainline ref available")
+    for name, pattern in _TOPOLOGY_PATTERNS.items():
+        match = re.search(pattern, _text(name), flags=re.IGNORECASE)
+        assert match, f"{name} has no parseable current-main declaration"
+        declared = match.group(1)
+        reachable = subprocess.run(
+            ["git", "merge-base", "--is-ancestor", declared, mainline],
+            cwd=ROOT, capture_output=True,
+        )
+        assert reachable.returncode == 0, (
+            f"{name} calls {declared} current main, but it is not reachable "
+            f"from {mainline} at all"
+        )
+
+
+def test_hedge_docs_do_not_exempt_a_runtime_deployment_from_epoch_lineage():
+    """A stable mandate/policy fingerprint does not make a new code commit
+    deployable inside an active evidence epoch."""
+    handoff = _text("SESSION_HANDOFF.md")
+    mandate = _text("MANDATE.md")
+    assert "no deployment-closes-the-epoch consequence" not in handoff.lower()
+    for text in (handoff, mandate):
+        assert not re.search(
+            r"active `paper-epoch-005` is (?:therefore )?unaffected",
+            text,
+            flags=re.IGNORECASE,
+        )
+
+
 def _repository_commits_claimed_unreachable(text: str) -> list[str]:
     """Commit hashes a document asserts are local-only / unpushed / unmerged.
 

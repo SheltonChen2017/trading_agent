@@ -235,8 +235,11 @@ approval phrase and a fresh execution-gate pass.
 Set a **hedge target** as a percentage of total equity and pick which
 defensive ETFs count toward it (SH, BTAL, TLT, GLD by default). The page
 reads what you already hold in those names, works out the dollar shortfall
-to your target, splits it **equally** across the ones with a usable price,
-and creates one ordinary buy proposal per instrument.
+to your target after counting measurable pending buys, splits it **equally**
+across every selected instrument, and creates one ordinary buy proposal per
+instrument. If even one selected leg lacks a usable price or cannot buy the
+minimum quantity, the whole basket is refused instead of silently changing
+your chosen mix.
 
 Read this part before using it. **This project has not confirmed that this
 basket reduces drawdown.** The defensive-carry result behind these names is

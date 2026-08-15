@@ -3592,9 +3592,10 @@ if page == "Discrete Selling":
 def _hedge_reference_prices(store, tickers):
     """Fresh recorded closes for the hedge basket, plus what is missing.
 
-    Returns ``(prices, unavailable)``. A missing close is DISCLOSED and its
-    instrument dropped from the split, never guessed at -- an unpriced leg
-    silently sized would put real money into a number the app could not read.
+    Returns ``(prices, unavailable)``. A missing or malformed close is
+    DISCLOSED and blocks the selected basket, never guessed at -- dropping a
+    leg and redistributing its allocation would silently change the owner's
+    chosen basket.
     """
     from assistant.sleeve_notifications import _recorded_close_fetcher
 
@@ -3608,11 +3609,11 @@ def _hedge_reference_prices(store, tickers):
     prices = {}
     unavailable = []
     for name in names:
-        price = fetched.get(name)
-        if price is None:
+        price = _decimal_or_none(fetched.get(name))
+        if price is None or price <= 0:
             unavailable.append(name)
         else:
-            prices[name] = float(price)
+            prices[name] = price
     return prices, unavailable
 
 
@@ -3699,14 +3700,20 @@ if page == "Hedging":
         st.metric(
             "Hedge sleeve",
             f"{_hd_report.current_pct:.2f}% of equity",
-            delta=f"target {_hd_report.target_pct:.2f}%",
+            delta=(
+                f"projected {_hd_report.projected_pct:.2f}% including pending; "
+                f"target {_hd_report.target_pct:.2f}%"
+                if float(_hd_report.pending_buy_value_exact) > 0
+                else f"target {_hd_report.target_pct:.2f}%"
+            ),
             delta_color="off",
         )
         if _hd_report.has_shortfall:
             _hd_shortfall = float(_hd_report.shortfall_dollars_exact)
             st.caption(
-                f"Shortfall to target: ${_hd_shortfall:,.2f}, split equally "
-                "across the instruments with a usable price. Equal weight is "
+                f"Remaining shortfall to target after pending buys: "
+                f"${_hd_shortfall:,.2f}, split equally across every selected "
+                "instrument. Equal weight is "
                 "deliberate: inverse-volatility weighting would put the most "
                 "money in whichever defensive name moves least."
             )
@@ -3715,20 +3722,21 @@ if page == "Hedging":
             )
             if _hd_missing:
                 st.warning(
-                    "No fresh recorded close for "
+                    "No usable fresh recorded close for "
                     + ", ".join(sorted(_hd_missing))
-                    + ". Those instruments are excluded from this split "
-                    "rather than priced by guess."
+                    + ". The whole selected basket is blocked until every "
+                    "leg has a usable price."
                 )
             _hd_signature = (
                 f"{sorted(_hd_report.tickers)}|{_hd_report.target_pct}|"
                 f"{_hd_report.shortfall_dollars_exact}|"
+                f"{_hd_report.pending_buy_value_exact}|"
                 f"{_hd_packet.portfolio.as_of}"
             )
             if st.button(
                 "Create hedge buy proposals",
                 type="primary",
-                disabled=not _hd_prices,
+                disabled=bool(_hd_missing) or not _hd_prices,
                 key="hedge_create",
             ):
                 _hd_result = generate_hedge_buy_proposals(

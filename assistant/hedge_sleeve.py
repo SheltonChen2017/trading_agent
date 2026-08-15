@@ -33,10 +33,10 @@ unusable value on any selected instrument refuses the whole computation
 instead of skipping that row. Under-hedging is a smaller error than an
 unbounded purchase made on numbers the app could not read.
 
-Nothing here creates, approves, sizes, submits, cancels, or replaces an
-order. `generate_hedge_buy_proposals()` returns `proposed` proposals that
-still require the typed approval phrase and still pass through the execution
-gate independently at approval time.
+This module creates and sizes proposals; it never approves, submits, cancels,
+or replaces an order. `generate_hedge_buy_proposals()` returns `proposed`
+proposals that still require the typed approval phrase and still pass through
+the execution gate independently at approval time.
 """
 from __future__ import annotations
 
@@ -49,7 +49,10 @@ import config
 from assistant.allocation_proposals import build_allocation_plan
 from assistant.money import decimal_or_none, decimal_text
 from assistant.policy import TradingPolicy, compute_policy_fingerprint
-from assistant.portfolio_analytics import preview_trade_impact
+from assistant.portfolio_analytics import (
+    estimate_pending_buy_value_by_ticker,
+    preview_trade_impact,
+)
 from assistant.proposals import TradeProposal
 from assistant.schemas import DecisionPacket, PortfolioSnapshot
 from risk.execution_gate import TradeIntent, is_valid_order_quantity
@@ -95,7 +98,9 @@ class HedgeSleeveReport:
     target_pct: float
     total_equity_exact: str
     hedge_value_exact: str
+    pending_buy_value_exact: str
     current_pct: float
+    projected_pct: float
     shortfall_dollars_exact: str
     surplus_dollars_exact: str
     rows: tuple[HedgeSleeveRow, ...]
@@ -127,13 +132,25 @@ def _selected_tickers(tickers: object) -> tuple[list[str], list[str]]:
         except TypeError:
             return [], ["Hedge instruments must be a list of tickers."]
 
+    allowed = frozenset(name.upper() for name in config.HEDGE_SLEEVE_TICKERS)
     seen: set[str] = set()
     selected: list[str] = []
     refusals: list[str] = []
     for raw in candidates:
-        name = str(raw).strip().upper()
+        if not isinstance(raw, str):
+            refusals.append(
+                f"Hedge instrument names must be text, got {raw!r}."
+            )
+            continue
+        name = raw.strip().upper()
         if not name:
             refusals.append("An empty hedge instrument name was supplied.")
+            continue
+        if name not in allowed:
+            refusals.append(
+                f"{name} is not in the configured hedge sleeve "
+                f"({', '.join(config.HEDGE_SLEEVE_TICKERS)})."
+            )
             continue
         if name in seen:
             continue
@@ -147,10 +164,12 @@ def _selected_tickers(tickers: object) -> tuple[list[str], list[str]]:
 def _position_value(position: object) -> Decimal | None:
     """Exact market value of a position, preferring the exact text field."""
     exact = getattr(position, "market_value_exact", None)
-    value = decimal_or_none(exact) if exact is not None else None
-    if value is None:
-        value = decimal_or_none(getattr(position, "market_value", None))
-    return value
+    if exact is not None:
+        # Presence means the broker-preserved value is authoritative. A
+        # malformed exact field is corrupt input, not permission to fall back
+        # to the rounded display float and hide that corruption.
+        return decimal_or_none(exact)
+    return decimal_or_none(getattr(position, "market_value", None))
 
 
 def evaluate_hedge_sleeve(
@@ -158,6 +177,8 @@ def evaluate_hedge_sleeve(
     *,
     target_pct: object,
     tickers: object = None,
+    pending_buy_value_by_ticker: dict[str, object] | None = None,
+    pending_value_unknown_tickers: set[str] | None = None,
 ) -> HedgeSleeveReport:
     """Current defensive weight, the stated target, and the exact gap.
 
@@ -181,6 +202,69 @@ def evaluate_hedge_sleeve(
             f"got {target_pct!r}."
         )
         target = None
+
+    if not report_only and not snapshot.open_orders_available:
+        refusals.append(
+            "Open-order data is unavailable, so pending hedge exposure cannot "
+            "be measured and a target-sized purchase would risk duplication."
+        )
+
+    if (
+        pending_buy_value_by_ticker is None
+        and pending_value_unknown_tickers is None
+    ):
+        estimated, unknown = estimate_pending_buy_value_by_ticker(
+            snapshot.open_orders
+        )
+        pending_buy_value_by_ticker = estimated
+        pending_value_unknown_tickers = unknown
+    else:
+        pending_buy_value_by_ticker = pending_buy_value_by_ticker or {}
+        pending_value_unknown_tickers = pending_value_unknown_tickers or set()
+
+    disclosures_pending: list[str] = []
+    selected_set = set(selected)
+    unknown_pending = {
+        str(name).strip().upper()
+        for name in pending_value_unknown_tickers
+        if str(name).strip().upper() in selected_set
+    }
+    if unknown_pending:
+        # HEDGE1CR-002: a refusal only when something is actually being
+        # sized. The open-order-availability check above is already gated on
+        # `report_only` for exactly this reason and this one was not, so the
+        # page's DEFAULT state -- no target typed yet -- greeted the owner
+        # with a red error claiming it was "refusing to size another
+        # purchase" when nothing had been asked for. In report-only mode the
+        # same fact is a disclosure: it explains why the projected weight
+        # below is incomplete.
+        names = ", ".join(sorted(unknown_pending))
+        if report_only:
+            disclosures_pending.append(
+                f"A working buy order for {names} has no determinable value, "
+                "so the projected sleeve below understates it. Set a target "
+                "to size a purchase and this becomes a refusal."
+            )
+        else:
+            refusals.append(
+                f"Pending hedge-buy value is unavailable for {names}; "
+                "refusing to size another purchase against an unknown "
+                "working order."
+            )
+
+    pending_hedge_value = Decimal("0")
+    for raw_ticker, raw_value in pending_buy_value_by_ticker.items():
+        name = str(raw_ticker).strip().upper()
+        if name not in selected_set:
+            continue
+        value = decimal_or_none(raw_value)
+        if value is None or value < 0:
+            refusals.append(
+                f"Pending hedge-buy value for {name} is not a usable "
+                f"non-negative amount ({raw_value!r})."
+            )
+            continue
+        pending_hedge_value += value
 
     equity_input = (
         snapshot.total_equity_exact
@@ -212,12 +296,42 @@ def evaluate_hedge_sleeve(
             )
             continue
         value = _position_value(position)
-        if value is None or value < 0:
+        shares_input = (
+            position.shares_exact
+            if position.shares_exact is not None
+            else position.shares
+        )
+        shares = decimal_or_none(shares_input)
+        # HEDGE1CR-003: a row reporting zero shares AND zero value is a
+        # position that is not held, which is the `position is None` case
+        # above -- `build_portfolio_snapshot` constructs exactly such a row
+        # through its documented API. Refusing it bricked the whole page,
+        # including the read-only view of the current weight, and called a
+        # value "unreadable" that was read perfectly well and was zero. A
+        # zero value against a POSITIVE quantity is still the impossible
+        # state HEDGER-002 identified, and still refuses.
+        if shares is not None and shares == 0 and value == 0:
+            rows.append(
+                HedgeSleeveRow(
+                    ticker=name, held=False, shares_exact="0",
+                    market_value_exact="0", pct_of_equity=0.0,
+                    value_available=True, daily_reset=daily_reset,
+                )
+            )
+            continue
+        if value is None or value <= 0 or shares is None or shares <= 0:
             values_readable = False
+            unreadable = value is None or shares is None
             refusals.append(
-                f"{name} is held but its market value is unreadable "
-                f"({getattr(position, 'market_value', None)!r}). Refusing to "
-                "size a hedge from an understated current weight."
+                f"{name} is held but its exact quantity or market value is "
+                + (
+                    "unreadable."
+                    if unreadable
+                    else f"impossible ({decimal_text(shares)} share(s) worth "
+                         f"{decimal_text(value)})."
+                )
+                + " Refusing to size a hedge from an understated current "
+                "weight."
             )
             rows.append(
                 HedgeSleeveRow(
@@ -228,12 +342,6 @@ def evaluate_hedge_sleeve(
             )
             continue
         hedge_value += value
-        shares_input = (
-            position.shares_exact
-            if position.shares_exact is not None
-            else position.shares
-        )
-        shares = decimal_or_none(shares_input)
         rows.append(
             HedgeSleeveRow(
                 ticker=name, held=True,
@@ -250,18 +358,27 @@ def evaluate_hedge_sleeve(
     for row in rows:
         if row.daily_reset:
             disclosures.append(DAILY_RESET_DISCLOSURE.format(ticker=row.ticker))
+    disclosures.extend(disclosures_pending)
 
     shortfall = Decimal("0")
     surplus = Decimal("0")
     current_pct = 0.0
+    projected_pct = 0.0
     # The percentage is reportable without a target; the GAP is not. Both are
     # suppressed while any selected holding is unreadable, because a partial
     # hedge value displayed as the whole one is the reading that oversizes a
     # purchase.
     if equity is not None and values_readable:
         current_pct = float(hedge_value / equity * 100)
+        projected_pct = float(
+            (hedge_value + pending_hedge_value) / equity * 100
+        )
         if target is not None:
-            difference = equity * target / Decimal("100") - hedge_value
+            difference = (
+                equity * target / Decimal("100")
+                - hedge_value
+                - pending_hedge_value
+            )
             if difference > 0:
                 shortfall = difference
             else:
@@ -273,7 +390,9 @@ def evaluate_hedge_sleeve(
         target_pct=float(target) if target is not None else 0.0,
         total_equity_exact=decimal_text(equity) if equity is not None else "0",
         hedge_value_exact=decimal_text(hedge_value),
+        pending_buy_value_exact=decimal_text(pending_hedge_value),
         current_pct=current_pct,
+        projected_pct=projected_pct,
         shortfall_dollars_exact=decimal_text(shortfall),
         surplus_dollars_exact=decimal_text(surplus),
         rows=tuple(rows),
@@ -299,12 +418,12 @@ def _stable_id(
 def generate_hedge_buy_proposals(
     packet: DecisionPacket,
     policy: TradingPolicy,
-    prices: dict[str, float],
+    prices: dict[str, object],
     *,
     target_pct: object,
     tickers: object = None,
     ttl_minutes: int = 15,
-    pending_buy_value_by_ticker: dict[str, float] | None = None,
+    pending_buy_value_by_ticker: dict[str, object] | None = None,
     pending_value_unknown_tickers: set[str] | None = None,
     now: datetime | None = None,
 ) -> dict:
@@ -320,7 +439,11 @@ def generate_hedge_buy_proposals(
     here.
     """
     report = evaluate_hedge_sleeve(
-        packet.portfolio, target_pct=target_pct, tickers=tickers
+        packet.portfolio,
+        target_pct=target_pct,
+        tickers=tickers,
+        pending_buy_value_by_ticker=pending_buy_value_by_ticker,
+        pending_value_unknown_tickers=pending_value_unknown_tickers,
     )
     if not report.usable:
         return {
@@ -342,12 +465,24 @@ def generate_hedge_buy_proposals(
         }
     if not report.has_shortfall:
         surplus = report.surplus_dollars_exact
+        pending = Decimal(report.pending_buy_value_exact)
+        if pending > 0:
+            position = (
+                f"Current holdings are {report.current_pct:.2f}% of equity; "
+                f"${pending:,.2f} of pending hedge buys bring the projected "
+                f"sleeve to {report.projected_pct:.2f}% against the "
+                f"{report.target_pct:.2f}% target"
+            )
+        else:
+            position = (
+                f"The hedge sleeve is already at {report.current_pct:.2f}% of "
+                f"equity against a {report.target_pct:.2f}% target"
+            )
         return {
             "created": False,
             "report": report,
             "reason": (
-                f"The hedge sleeve is already at {report.current_pct:.2f}% of "
-                f"equity against a {report.target_pct:.2f}% target "
+                f"{position} "
                 f"(${float(surplus):,.2f} above it). Nothing to buy. This app "
                 "does not sell to rebalance a hedge down."
             ),
@@ -356,41 +491,66 @@ def generate_hedge_buy_proposals(
     # Guarded Decimal conversion rather than `> 0` on the raw value: a float
     # NaN passes truthiness and every ordered comparison, then poisons the
     # sizing downstream. This also rejects infinity, bool, and bad text.
-    priced = [
-        ticker for ticker in report.tickers
-        if (price := decimal_or_none(prices.get(ticker))) is not None
-        and price > 0
-    ]
-    if not priced:
+    usable_prices: dict[str, Decimal] = {}
+    missing_prices: list[str] = []
+    for ticker in report.tickers:
+        price = decimal_or_none(prices.get(ticker))
+        if price is None or price <= 0:
+            missing_prices.append(ticker)
+        else:
+            usable_prices[ticker] = price
+    if missing_prices:
         return {
             "created": False,
             "report": report,
             "reason": (
-                "None of the selected hedge instruments has a usable current "
-                "price, so no purchase can be sized."
+                "Every selected hedge instrument needs a usable current "
+                "price before the chosen basket can be sized. Missing: "
+                f"{', '.join(missing_prices)}. Deselect "
+                f"{'them' if len(missing_prices) > 1 else 'it'} to hedge with "
+                "the rest, or try again once a fresh close is recorded."
             ),
         }
 
     # Equal weight, computed once and stated. The remainder from an
     # indivisible split is left unallocated rather than being pushed onto an
     # arbitrary instrument, which would silently overweight it.
-    weight = 100.0 / len(priced)
-    weights_pct = {ticker: weight for ticker in priced}
-    shortfall = float(Decimal(report.shortfall_dollars_exact))
+    weight = Decimal("100") / Decimal(len(usable_prices))
+    weights_pct = {ticker: weight for ticker in usable_prices}
+    shortfall = Decimal(report.shortfall_dollars_exact)
 
     plan = build_allocation_plan(
-        packet, policy, weights_pct, prices, shortfall,
+        packet, policy, weights_pct, usable_prices, shortfall,
         pending_buy_value_by_ticker=pending_buy_value_by_ticker,
         pending_value_unknown_tickers=pending_value_unknown_tickers,
     )
 
     at = now or datetime.now(timezone.utc)
-    proposals: list[TradeProposal] = []
-    for entry in plan:
+    invalid_entries = [
+        entry for entry in plan
         if entry.skipped or not is_valid_order_quantity(
             entry.shares, whole_shares_only=policy.whole_shares_only
-        ):
-            continue
+        )
+    ]
+    if invalid_entries:
+        details = "; ".join(
+            f"{entry.ticker}: {entry.skip_reason or 'invalid order quantity'}"
+            for entry in invalid_entries
+        )
+        return {
+            "created": False,
+            "report": report,
+            "reason": (
+                "The selected hedge basket cannot be created completely at "
+                f"the active minimum order quantity. {details.rstrip(chr(46))}. Raise "
+                "the "
+                "target, deselect that instrument, or enable fractional "
+                "shares in Settings & Features."
+            ),
+        }
+
+    proposals: list[TradeProposal] = []
+    for entry in plan:
         intent = TradeIntent(
             ticker=entry.ticker,
             side="buy",
@@ -398,13 +558,18 @@ def generate_hedge_buy_proposals(
             order_type="market",
             rationale=(
                 f"Defensive hedge sleeve: {entry.weight_pct:.1f}% of the "
-                f"${shortfall:,.2f} shortfall to a {report.target_pct:.2f}% "
+                f"${shortfall:,.2f} remaining shortfall to a "
+                f"{report.target_pct:.2f}% "
                 f"target -> {entry.shares} share(s) at "
                 f"~${entry.reference_price:,.2f}."
             ),
         )
         proposal_id = _stable_id(
-            packet, policy, intent, salt=report.shortfall_dollars_exact
+            packet, policy, intent,
+            salt=(
+                f"{report.shortfall_dollars_exact}|"
+                f"{report.pending_buy_value_exact}"
+            ),
         )
         uncertainties = [
             UNMEASURED_PROTECTION_DISCLOSURE,
@@ -438,11 +603,12 @@ def generate_hedge_buy_proposals(
                 price_timestamp=at.isoformat(),
                 reasons=[
                     f"Your hedge sleeve is {report.current_pct:.2f}% of equity "
-                    f"against your {report.target_pct:.2f}% target, a "
-                    f"${shortfall:,.2f} shortfall.",
+                    f"with ${Decimal(report.pending_buy_value_exact):,.2f} of "
+                    f"selected pending buys, leaving a ${shortfall:,.2f} "
+                    f"shortfall to your {report.target_pct:.2f}% target.",
                     f"{entry.ticker} takes {entry.weight_pct:.1f}% of that "
                     f"shortfall under an equal-weight split across "
-                    f"{len(priced)} selected instrument(s).",
+                    f"{len(usable_prices)} selected instrument(s).",
                     "This is your own instruction, not a project "
                     "recommendation: no confirmed evidence says this "
                     "position protects the portfolio.",
@@ -470,8 +636,8 @@ def generate_hedge_buy_proposals(
             "report": report,
             "reason": (
                 f"The ${shortfall:,.2f} shortfall split across "
-                f"{len(priced)} instrument(s) cannot buy the minimum order "
-                "quantity your policy allows for any of them."
+                f"{len(usable_prices)} instrument(s) cannot buy the minimum "
+                "order quantity your policy allows for any of them."
             ),
         }
     return {"created": True, "report": report, "proposals": proposals}

@@ -17,6 +17,7 @@ risks pinned here:
 from __future__ import annotations
 
 import dataclasses
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -154,3 +155,21 @@ def test_an_unreadable_holding_blocks_both_the_percentage_and_the_purchase(
     assert "TLT" in rendered
     assert "oversize the purchase" in rendered
     assert not [b for b in app.button if b.key == "hedge_create"]
+
+
+def test_one_missing_selected_price_disables_proposal_creation(_offline, monkeypatch):
+    """A partial quote set must not redistribute the missing leg's share
+    across the surviving instruments."""
+    import assistant.sleeve_notifications as sleeve_notifications
+
+    monkeypatch.setattr(
+        sleeve_notifications,
+        "_recorded_close_fetcher",
+        lambda _store, **_kwargs: (lambda _tickers: {"SH": Decimal("40")}),
+    )
+    app = _hedging(hedge_target_pct=10.0)
+
+    assert not app.exception, app.exception
+    create = app.button(key="hedge_create")
+    assert create.disabled
+    assert "BTAL" in _text(app)

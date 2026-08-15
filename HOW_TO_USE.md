@@ -230,6 +230,45 @@ your own instruction. Neither page sells short, and neither submits
 anything: each creates one ordinary proposal that still needs the typed
 approval phrase and a fresh execution-gate pass.
 
+### Module 2c — Hedging: *size a defensive position*
+
+Set a **hedge target** as a percentage of total equity and pick which
+defensive ETFs count toward it (SH, BTAL, TLT, GLD by default). The page
+reads what you already hold in those names, works out the dollar shortfall
+to your target, splits it **equally** across the ones with a usable price,
+and creates one ordinary buy proposal per instrument.
+
+Read this part before using it. **This project has not confirmed that this
+basket reduces drawdown.** The defensive-carry result behind these names is
+a single exploratory window, not validated evidence, and a hedge that is
+held costs money whether or not a decline arrives. The page says so on every
+render rather than letting the word "hedge" imply protection nobody measured.
+SH also targets its return over a *single day*, so held longer it compounds
+path-dependently and can lose money even when the index moves the way you
+were positioned for; that warning rides on the SH proposal itself.
+
+Three deliberate omissions:
+
+- **The split is equal weight, not inverse volatility.** Inverse-volatility
+  weighting puts the most money where trailing volatility is lowest, which in
+  a defensive basket means starving the instrument that actually moves.
+- **The page never sells.** It will tell you when you are above target, and
+  it will not rebalance down. Trimming a defensive position is a decision for
+  Discrete Selling, made deliberately.
+- **There is no submit-all button.** Each leg takes its own typed approval,
+  because a partly-filled multi-leg hedge is a different position from the
+  one you sized.
+
+If any selected instrument's value cannot be read, the page shows nothing
+and sizes nothing — not even the percentage. An unreadable holding makes the
+current hedge look smaller than it is, and a shortfall computed from an
+understated weight buys too much. Leaving you under-hedged is the smaller
+mistake.
+
+Everything here is still ETFs. Options, futures, and short selling remain
+out of scope (`docs/MANDATE.md` §4); buying an inverse ETF is a long ETF
+purchase, not a short position.
+
 ### Module 4 — Propose & Approve: *the gate every order passes through*
 
 No order reaches the broker without passing here. A proposal is validated

@@ -324,6 +324,36 @@ YIELD_CURVE_Z_THRESHOLD = 2.0      # proxy = short - long (rises as the curve fl
 # Presence in this list is NOT an allocation authorization.
 DEFENSIVE_CARRY_TICKERS = ["TLT", "IEF", "SHY", "GLD"]
 
+# --- Hedge sleeve (HEDGE-1, owner request 2026-08-14) -----------------
+# Instruments the Hedging page may size a DEFENSIVE allocation across.
+# Same convention as DEFENSIVE_CARRY_TICKERS above: membership is the
+# owner's stated preference recorded as data. It is NOT a validated
+# research finding, NOT an allocation authorization, and NOT a claim that
+# holding these reduces drawdown -- the defensive-carry probe result
+# (docs/MANDATE.md 5) is a single-window exploratory number, and this
+# project has confirmed zero signals as real edge.
+#
+# Verified 2026-08-14 via fetch_historical + yf.Ticker().info: all four
+# resolve with a full 400/400 requested sessions and are real, liquid,
+# US-listed ETFs (SH ProShares Short S&P500, ~$0.93B, ~8.9M avg vol;
+# BTAL AGF U.S. Market Neutral Anti-Beta, ~$0.32B, ~0.69M avg vol;
+# TLT iShares 20+ Year Treasury, ~$41B; GLD SPDR Gold Shares, ~$130B).
+#
+# Deliberately NOT added to LEVERAGED_ETF_TICKERS. SH is -1x and BTAL is
+# market neutral, so neither is leveraged in magnitude; adding them there
+# would silently change max_leveraged_etf_pct ENFORCEMENT, which is a
+# policy behavior change this config must not smuggle in (same reasoning
+# recorded for SINGLE_STOCK_INCOME_ETF_UNDERLYING above). Their real
+# hazard is daily-reset path dependence, which is a DISCLOSURE
+# obligation, handled by DAILY_RESET_HEDGE_ETFS below.
+HEDGE_SLEEVE_TICKERS = ["SH", "BTAL", "TLT", "GLD"]
+
+# Hedge instruments whose stated objective is a DAILY return target, so
+# multi-day holds compound path-dependently and can lose money even when
+# the index moves the "right" way over the same span. Disclosure only --
+# this set changes no limit, cap, or gate.
+DAILY_RESET_HEDGE_ETFS = {"SH"}
+
 # --- Three-sleeve engine (docs/reference/THREE_SLEEVE_ENGINE_PLAN.md,
 # --- owner-adopted 2026-08-09) ---------------------------------------
 # The owner's stated allocation preference, recorded as data. These lists

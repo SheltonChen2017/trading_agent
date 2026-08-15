@@ -41,8 +41,8 @@ explicitly rather than presented as more precise than it is.
 | Recovery-time target | Not yet set | Depends on the time-under-water figure above settling first. |
 | Rebalancing frequency | Event-driven, not calendar-driven | Matches the existing wide-rebalance-band finding (`research_findings.json`: "~89% less tax/turnover for essentially the same performance") — rebalance on band breach, not on a fixed schedule. |
 | Tax sensitivity | High | Every rotation idea tested so far that looked good pre-tax lost some or all of its edge once realistic tax modeling was added (see `strategies/leverage_rotation.py`'s `tax_rate` parameter and the trend+volatility rotation return finding above). Any future proposal must be evaluated after-tax, not before. |
-| Hedge-cost tolerance | Not applicable yet | No hedging instruments (options, futures) are in scope — see §4. |
-| Permitted instrument types | Equities and ETFs only (no shorting, futures, or options) | Matches current broker capability (Alpaca paper, long-only equities/ETFs) — see §4. |
+| Hedge-cost tolerance | Not yet set as a number | HEDGE-1 (2026-08-14) adds an owner-directed DEFENSIVE ETF sleeve, so a hedge can now be held and therefore paid for. Options and futures remain out of scope — see §4. No tolerance figure is set because none has been measured: this project has NOT confirmed that the sleeve reduces drawdown, and setting a cost budget for unmeasured protection would dress a preference as a finding. Measurable via `backtest.risk_metrics` once prospective data exists. |
+| Permitted instrument types | Equities and ETFs only (no shorting, futures, or options) | Matches current broker capability (Alpaca paper, long-only equities/ETFs) — see §4. **Unchanged by HEDGE-1:** its instruments (SH, BTAL, TLT, GLD) are all long-only ETFs, so `permitted_instruments` in `assistant/default_mandate.json` still reads `["equity", "etf"]` and the owner-approved fingerprint is untouched. Buying an inverse ETF is a long ETF purchase, not a short position. |
 
 The same approved fingerprint also binds the non-metric promotion safeguards
 below. They are listed explicitly because they are behavior fields in
@@ -157,3 +157,12 @@ targets in §2 change, so revisions are visible, not silent edits.
   bound `approved_fingerprint`; the evidence epoch will bind that exact
   fingerprint. `allow_autonomous_execution` remains `false` — approval
   changes what evidence counts, never what the machine may do.
+- **2026-08-14** — HEDGE-1: an owner-directed defensive ETF hedge sleeve
+  was added (`assistant/hedge_sleeve.py`, `config.HEDGE_SLEEVE_TICKERS`).
+  §2's hedge-cost row now says a hedge can be held; the permitted-instrument
+  row is annotated but its VALUE is unchanged. **No behavior field in
+  `assistant/default_mandate.json` changed, so `approved_fingerprint` is
+  untouched and active `paper-epoch-005` is unaffected** (verified against
+  `compute_mandate_fingerprint`). §4's shelving of the crisis-response
+  trend-following sleeve also stands: that sleeve needs futures or real
+  shorting, which this milestone deliberately does not add.

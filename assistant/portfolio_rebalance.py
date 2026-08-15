@@ -84,7 +84,7 @@ class SleeveRow:
     projected_pct: float
     market_value_exact: str
     pending_value_exact: str
-    #: Signed exact dollars between the CURRENT value and the target value.
+    #: Signed exact dollars between the PROJECTED value and the target value.
     #: Positive means the sleeve is below target. This is a measurement of
     #: distance, not an instruction: no side, no quantity, no ordering.
     gap_to_target_exact: str
@@ -199,9 +199,17 @@ def _pending_by_ticker(
 
     for order in snapshot.open_orders or ():
         if not isinstance(order, dict):
+            refusals.append(
+                "An open-order row is unreadable, so pending exposure cannot "
+                "be measured."
+            )
             continue
         ticker = str(order.get("ticker") or "").strip().upper()
         if not ticker:
+            refusals.append(
+                "An open order has no ticker, so its pending exposure cannot "
+                "be assigned to a sleeve."
+            )
             continue
         side = str(order.get("side") or "").strip().lower()
         if side not in ("buy", "sell"):
@@ -211,7 +219,9 @@ def _pending_by_ticker(
         limit_price = order.get("limit_price")
         quantity = decimal_or_none(order.get("qty") or order.get("shares"))
         value = decimal_or_none(notional) if notional is not None else None
-        if value is None and quantity is not None and limit_price is not None:
+        # Presence makes broker notional authoritative. A malformed value is
+        # corruption, not permission to substitute a derived estimate.
+        if notional is None and quantity is not None and limit_price is not None:
             price = decimal_or_none(limit_price)
             if price is not None and price > 0 and quantity > 0:
                 value = quantity * price
@@ -238,24 +248,62 @@ def _policy_conflicts(
     if policy is None:
         return {}
     conflicts: dict[str, str] = {}
+
+    def add(sleeve: str, reason: str) -> None:
+        existing = conflicts.get(sleeve)
+        conflicts[sleeve] = f"{existing}; {reason}" if existing else reason
+
     leveraged_cap = decimal_or_none(getattr(policy, "max_leveraged_etf_pct", None))
     if leveraged_cap is not None:
         cap_pct = leveraged_cap * 100
         target = profile.target_decimal("leveraged_reinvestment")
         if target > cap_pct:
-            conflicts["leveraged_reinvestment"] = (
+            add("leveraged_reinvestment", (
                 f"target {decimal_text(target)}% exceeds the policy's "
                 f"{decimal_text(cap_pct)}% leveraged-ETF cap"
-            )
+            ))
     cash_floor = decimal_or_none(getattr(policy, "min_cash_reserve_pct", None))
     if cash_floor is not None:
         floor_pct = cash_floor * 100
         target = profile.target_decimal(SLEEVE_CASH)
         if target < floor_pct:
-            conflicts[SLEEVE_CASH] = (
+            add(SLEEVE_CASH, (
                 f"target {decimal_text(target)}% is below the policy's "
                 f"{decimal_text(floor_pct)}% minimum cash reserve"
+            ))
+
+    total_cap = decimal_or_none(getattr(policy, "max_total_exposure_pct", None))
+    if total_cap is not None:
+        cap_pct = total_cap * 100
+        invested_target = sum(
+            (profile.target_decimal(s) for s in SLEEVE_ORDER if s != SLEEVE_CASH),
+            Decimal("0"),
+        )
+        if invested_target > cap_pct:
+            reason = (
+                f"the {decimal_text(invested_target)}% invested target exceeds "
+                f"the policy's {decimal_text(cap_pct)}% total-exposure cap"
             )
+            for sleeve in SLEEVE_ORDER:
+                if sleeve != SLEEVE_CASH and profile.target_decimal(sleeve) > 0:
+                    add(sleeve, reason)
+
+    position_cap = decimal_or_none(getattr(policy, "max_position_pct", None))
+    if position_cap is not None:
+        membership = sleeve_membership()
+        for sleeve in SLEEVE_ORDER:
+            tickers = {t for t, assigned in membership.items() if assigned == sleeve}
+            if not tickers:
+                continue
+            capacity = position_cap * Decimal(len(tickers)) * 100
+            target = profile.target_decimal(sleeve)
+            if target > capacity:
+                add(
+                    sleeve,
+                    f"target {decimal_text(target)}% exceeds its "
+                    f"{decimal_text(capacity)}% combined position-cap capacity "
+                    f"across {len(tickers)} configured ticker(s)",
+                )
     return conflicts
 
 
@@ -324,8 +372,17 @@ def evaluate_portfolio_rebalance(
             sleeve_tickers[sleeve].append(ticker)
         if sleeve == SLEEVE_OTHER and ticker not in unassigned:
             unassigned.append(ticker)
+        # A working buy consumes cash and a working sell produces it. Keeping
+        # this opposite leg makes projected sleeve weights conserve equity.
+        sleeve_pending[SLEEVE_CASH] -= value
     for ticker in sorted(pending_unknown):
-        unknown_sleeves.add(membership.get(ticker, SLEEVE_OTHER))
+        sleeve = membership.get(ticker, SLEEVE_OTHER)
+        unknown_sleeves.add(sleeve)
+        unknown_sleeves.add(SLEEVE_CASH)
+        if ticker not in sleeve_tickers[sleeve]:
+            sleeve_tickers[sleeve].append(ticker)
+        if sleeve == SLEEVE_OTHER and ticker not in unassigned:
+            unassigned.append(ticker)
 
     if cash is not None:
         sleeve_values[SLEEVE_CASH] = cash
@@ -354,20 +411,20 @@ def evaluate_portfolio_rebalance(
         lower, upper = profile.band_edges(sleeve)
         current = value / equity * Decimal("100")
         projected = (value + pending_value) / equity * Decimal("100")
-        gap = equity * target / Decimal("100") - value
+        gap = equity * target / Decimal("100") - (value + pending_value)
 
-        if sleeve in conflicts:
-            status = STATUS_POLICY_CONFLICT
-        elif sleeve in unknown_sleeves:
+        if sleeve in unknown_sleeves:
             status = STATUS_PENDING_UNKNOWN
+        elif sleeve in conflicts:
+            status = STATUS_POLICY_CONFLICT
         elif sleeve == SLEEVE_OTHER and sleeve_tickers[sleeve]:
             # The residual always reads as unassigned when it holds anything,
             # so a reader is never invited to treat it as a tidy sleeve that
             # merely drifted.
             status = STATUS_UNASSIGNED
-        elif current < lower:
+        elif projected < lower:
             status = STATUS_UNDERWEIGHT
-        elif current > upper:
+        elif projected > upper:
             status = STATUS_OVERWEIGHT
         else:
             status = STATUS_INSIDE
@@ -401,11 +458,14 @@ def evaluate_portfolio_rebalance(
     for sleeve, reason in sorted(conflicts.items()):
         disclosures.append(f"{sleeve}: {reason}.")
 
+    valid_profile = isinstance(profile, AllocationProfile)
     return RebalanceReport(
         as_of=snapshot.as_of,
-        profile_version=profile.version,
-        profile_fingerprint=compute_profile_fingerprint(profile),
-        band_fraction=float(profile.band_decimal()),
+        profile_version=profile.version if valid_profile else "",
+        profile_fingerprint=(
+            compute_profile_fingerprint(profile) if valid_profile else ""
+        ),
+        band_fraction=float(profile.band_decimal()) if valid_profile else 0.0,
         total_equity_exact=decimal_text(equity) if equity is not None else "0",
         invested_pct=invested_pct,
         cash_pct=cash_pct,

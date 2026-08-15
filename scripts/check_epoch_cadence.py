@@ -141,8 +141,13 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         capture_timezone = ZoneInfo(arguments.capture_timezone)
-    except ZoneInfoNotFoundError as exc:
-        parser.error(f"unknown capture timezone: {arguments.capture_timezone}")
+    except (ZoneInfoNotFoundError, ValueError) as exc:
+        # Both are reachable and neither subsumes the other:
+        # ZoneInfoNotFoundError is a KeyError subclass raised for an unknown
+        # key, while an empty or non-normalized key ("", "/America/New_York")
+        # raises ValueError. Catching only the first turned an operator typo
+        # into a raw traceback.
+        parser.error(f"unusable capture timezone: {arguments.capture_timezone!r}")
         raise AssertionError("argparse.error must exit") from exc
 
     report = read_cadence(

@@ -21,7 +21,7 @@ from __future__ import annotations
 
 import sqlite3
 import sys
-from datetime import datetime, time, timedelta, timezone
+from datetime import date, datetime, time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -101,18 +101,69 @@ def test_an_early_close_does_not_move_the_fixed_task_trigger_earlier():
     assert "2026-11-27" not in expected, expected
 
 
-def test_capture_clock_and_timezone_are_explicitly_configurable():
-    """The current host is 16:30 Pacific; a fresh install is 16:30 Eastern.
-    The detector must model either measured trigger without a code edit.
+def test_the_capture_timezone_actually_moves_the_due_instant():
+    """The current host is 16:30 Pacific; a fresh install could be 16:30
+    Eastern. The detector must model either measured trigger without a code
+    edit -- and the assertion has to DISCRIMINATE, which the earlier version
+    of this test did not: it asserted only that a session was absent, which
+    was equally true under the default, so it passed with `capture_timezone`
+    ignored entirely.
+
+    2026-08-14 at 23:00Z is 16:00 Pacific but 19:00 Eastern. An Eastern
+    trigger (16:30 ET + 2h grace = 22:30Z) is therefore already overdue while
+    a Pacific one (16:30 PT + 2h = 01:30Z next day) is not.
     """
-    expected = expected_capture_sessions(
-        _at("2026-11-25T00:00:00+00:00"),
-        _at("2026-11-27T23:00:00+00:00"),
-        capture_local_time=time(16, 30),
+    now = _at("2026-08-14T23:00:00+00:00")
+    pacific = expected_capture_sessions(_at(EPOCH_005_START), now)
+    eastern = expected_capture_sessions(
+        _at(EPOCH_005_START),
+        now,
         capture_timezone=ZoneInfo("America/New_York"),
     )
-    # 18:00 ET is before the 16:30 trigger plus the two-hour grace.
-    assert "2026-11-27" not in expected
+    assert "2026-08-14" not in pacific, pacific
+    assert "2026-08-14" in eastern, eastern
+
+
+def test_the_capture_clock_actually_moves_the_due_instant():
+    """Same discrimination requirement for the wall-clock half: holding the
+    timezone fixed, an earlier trigger must make the session overdue sooner.
+    """
+    now = _at("2026-08-14T23:00:00+00:00")  # 16:00 Pacific
+    default_1630 = expected_capture_sessions(_at(EPOCH_005_START), now)
+    noon = expected_capture_sessions(
+        _at(EPOCH_005_START), now, capture_local_time=time(12, 0)
+    )
+    assert "2026-08-14" not in default_1630, default_1630
+    assert "2026-08-14" in noon, noon
+
+
+def test_the_modelled_capture_instant_files_under_the_session_it_expects():
+    """CLAUDE.md requires a readiness report to use the enforcing function's
+    boundary conditions. This module models session D as captured on D at the
+    trigger clock; `paper_session_schedule()` -- what the capture command
+    actually uses -- derives the session from the EASTERN date of the capture
+    instant. For the installed 16:30 Pacific trigger those must agree on
+    every session, including the half day after Thanksgiving.
+    """
+    from assistant.paper_evidence import paper_session_schedule
+    from assistant.epoch_cadence import (
+        DEFAULT_CAPTURE_LOCAL_TIME,
+        DEFAULT_CAPTURE_TIMEZONE,
+    )
+
+    sessions = expected_capture_sessions(
+        _at("2026-11-01T00:00:00+00:00"), _at("2026-12-31T23:59:00+00:00")
+    )
+    assert "2026-11-27" in sessions, "the early-close session must be covered"
+    for session in sessions:
+        instant = datetime.combine(
+            date.fromisoformat(session),
+            DEFAULT_CAPTURE_LOCAL_TIME,
+            tzinfo=DEFAULT_CAPTURE_TIMEZONE,
+        )
+        filed_under = paper_session_schedule(instant)
+        assert filed_under is not None, session
+        assert filed_under[0] == session, (session, filed_under[0])
 
 
 def test_now_before_the_epoch_start_yields_nothing_rather_than_raising():
@@ -384,6 +435,100 @@ def test_cli_returns_failure_when_no_active_epoch_exists(tmp_path, capsys):
 
     assert main(["--database", str(database), "--json"]) == 1
     assert '"status": "no_active_epoch"' in capsys.readouterr().out
+
+
+def _cadence_fixture_db(tmp_path, name="flags.db"):
+    """An active epoch matching the real epoch-005 start, with no rows."""
+    database = tmp_path / name
+    with sqlite3.connect(database) as connection:
+        connection.executescript(
+            """
+            CREATE TABLE paper_evidence_epochs (
+                evidence_epoch TEXT PRIMARY KEY,
+                started_at TEXT NOT NULL,
+                status TEXT NOT NULL
+            );
+            CREATE TABLE paper_account_observations (
+                evidence_epoch TEXT NOT NULL,
+                session_date TEXT NOT NULL
+            );
+            INSERT INTO paper_evidence_epochs VALUES (
+                'paper-epoch-005', '2026-08-13T23:59:07.901345+00:00', 'active'
+            );
+            """
+        )
+    connection.close()
+    return database
+
+
+def test_cli_capture_flags_actually_reach_the_calculation(tmp_path):
+    """The flags exist so a remeasured trigger can be supplied without a code
+    edit; if they did not reach `expected_capture_sessions` nothing else here
+    would notice. Same discriminating instant as the classifier tests: at
+    23:00Z an Eastern trigger is overdue and a Pacific one is not.
+    """
+    from scripts.check_epoch_cadence import read_cadence
+
+    database = _cadence_fixture_db(tmp_path)
+    now = _at("2026-08-14T23:00:00+00:00")
+
+    default_report = read_cadence(database, now)
+    eastern_report = read_cadence(
+        database, now, capture_timezone=ZoneInfo("America/New_York")
+    )
+    noon_report = read_cadence(database, now, capture_local_time=time(12, 0))
+
+    assert default_report.status == NOT_DUE_YET
+    assert default_report.expected_sessions == ()
+    assert eastern_report.expected_sessions == ("2026-08-14",)
+    assert noon_report.expected_sessions == ("2026-08-14",)
+
+
+def test_cli_argument_parsing_passes_the_flags_through(tmp_path, monkeypatch):
+    """`read_cadence` honouring its keywords does not prove argparse wires
+    them. Capture the call instead of asserting on a status: `main` reads the
+    real clock, so any status assertion here would be a date-dependent test
+    that passes or fails depending on the hour it is run."""
+    import scripts.check_epoch_cadence as cli
+
+    database = _cadence_fixture_db(tmp_path, "argv.db")
+    seen: dict = {}
+
+    def _capture(path, now, *, capture_local_time, capture_timezone):
+        seen.update(
+            path=path, capture_local_time=capture_local_time,
+            capture_timezone=capture_timezone,
+        )
+        return evaluate_cadence(
+            epoch=None, recorded_sessions=[], now=now
+        )
+
+    monkeypatch.setattr(cli, "read_cadence", _capture)
+    cli.main(
+        [
+            "--database", str(database),
+            "--capture-time", "12:00",
+            "--capture-timezone", "America/New_York",
+        ]
+    )
+    assert seen["capture_local_time"] == time(12, 0)
+    assert getattr(seen["capture_timezone"], "key", None) == "America/New_York"
+    assert Path(seen["path"]) == database
+
+
+@pytest.mark.parametrize("value", ["", "/America/New_York", "../etc/passwd"])
+def test_cli_rejects_an_unusable_capture_timezone_without_a_traceback(
+    tmp_path, value
+):
+    """An unknown key raises ZoneInfoNotFoundError (a KeyError subclass) but
+    an empty or non-normalized key raises ValueError. Catching only the first
+    turned an operator typo into a raw traceback instead of a usage error."""
+    from scripts.check_epoch_cadence import main
+
+    database = _cadence_fixture_db(tmp_path, "tz.db")
+    with pytest.raises(SystemExit) as caught:
+        main(["--database", str(database), "--capture-timezone", value])
+    assert caught.value.code == 2
 
 
 def test_the_report_is_immutable():

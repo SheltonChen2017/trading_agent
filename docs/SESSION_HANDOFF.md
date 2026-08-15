@@ -22,12 +22,14 @@ scheduled-task change.
 ## 1. Repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- `main` and `origin/main`: `1babbcf` (PR #221).
-- Counter-review branch, pushed and awaiting the owner's PR:
-  `user/claude/epoch-stall-counterreview-20260814` at `57a75fc`.
+- `main` and `origin/main`: `85338fc`, after PR #222 merged the epoch
+  stall-detector counter-review (`57a75fc`) on top of PR #221 (`1babbcf`).
 - **Current branch: `user/claude/hedge1-defensive-sleeve-20260814`**, branched
-  from `1babbcf`. It does NOT contain the counter-review commit; the two are
-  independent and can merge in either order.
+  from `1babbcf` and then merged forward to `85338fc`. It was deliberately
+  kept independent of the counter-review so the two could be reviewed
+  separately; the price of that independence was a documents-only merge
+  conflict once the counter-review landed. Both conflicts were in records
+  every branch rewrites (`ACTION_PLAN`, this file), not in code.
 - The operational checkout remains separate at frozen commit `752d3b7`. No
   development commit has been copied there.
 
@@ -39,6 +41,7 @@ Relevant recent history:
 - `60027af`: PR #220.
 - `6aa7069` / `4273de6` / `4cb3a0d`: the stall detector, Codex's correction,
   and its records, all merged by PR #221.
+- `57a75fc`: Claude's counter-review of that correction, merged by PR #222.
 - The completed BUY-1 review branch remains
   `codex/review-buy1-suggestion-picker-20260813`, correction `44a7f85`. It is
   historical recovery context, not reopened work.
@@ -120,12 +123,13 @@ dependence, handled as a disclosure through `config.DAILY_RESET_HEDGE_ETFS`.
 Authoritative environment: repository `.venv`, Python 3.13.14, Streamlit
 1.60.0, Windows.
 
-- `.venv\Scripts\python.exe -m pytest -q`: **3,834 passed / 0 failed / 25
-  known dependency warnings** in 625.10 seconds, on the settled tree with no
-  concurrent edit. (An earlier 3,843 run measured this branch while it was
-  still stacked on the counter-review branch; it was rebased onto `1babbcf`
-  to keep the two independently reviewable, and the difference is exactly the
-  counter-review's own 9 tests.)
+- `.venv\Scripts\python.exe -m pytest -q` on the merge result: **3,843 passed / 0
+  failed / 25 known dependency warnings** in 820.25 seconds, on the settled
+  tree with no concurrent edit.
+- Before merging `origin/main` forward, the branch alone measured **3,834
+  passed / 0 failed** in 625.10 seconds. The counter-review contributes 9
+  further tests, which is exactly the difference from the 3,843 measured
+  while this work was briefly stacked on that branch.
 - Focused: hedge module 43, hedge UI 8, plus ML import boundary, document
   consistency, discrete tabs, allocation proposals, and UI chrome — 142 passed.
 - Mutation verification: **12 mutations, 12 detected** by exactly the intended
@@ -187,13 +191,11 @@ secret is recorded here.
    still reaches sizing with a partially-read basket, the report-only
    contract, and whether the Hedging page's stale-signature binding matches
    the AP-9 / SELL-1 rule the other proposal surfaces use.
-2. Merge `user/claude/epoch-stall-counterreview-20260814` (`57a75fc`) if the
-   owner accepts it; it is pushed and independent of this branch.
-3. Answer whether the 60-day decision means calendar days or 60 captured
+2. Answer whether the 60-day decision means calendar days or 60 captured
    market sessions.
-4. The SET-1 design question remains open: whether strict whole-share mode
+3. The SET-1 design question remains open: whether strict whole-share mode
    should permit a fractional sell only when it closes an entire position.
-5. `TRADE1CR-002` remains open and unscheduled: date-dependent fixtures in
+4. `TRADE1CR-002` remains open and unscheduled: date-dependent fixtures in
    `tests/test_strategy_proposals_generic.py` make the full suite unpassable
    between roughly 00:00 and 09:30 ET.
 
@@ -209,11 +211,10 @@ explicit owner instruction.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, docs/MANDATE.md, and
-docs/SESSION_HANDOFF.md. main and origin/main are 1babbcf (PR #221). Two
-Claude branches are open and independent: the epoch stall-detector
-counter-review at 57a75fc on user/claude/epoch-stall-counterreview-20260814
-(pushed, awaiting a PR), and HEDGE-1 on
-user/claude/hedge1-defensive-sleeve-20260814. HEDGE-1 adds an owner-directed
+docs/SESSION_HANDOFF.md. main and origin/main are 85338fc, after PR #222
+merged the epoch stall-detector counter-review. One Claude branch is open:
+HEDGE-1 on user/claude/hedge1-defensive-sleeve-20260814, branched from
+1babbcf and merged forward to 85338fc. HEDGE-1 adds an owner-directed
 defensive ETF hedge sleeve: assistant/hedge_sleeve.py computes the dollar
 shortfall to an owner-set target and delegates share sizing to
 build_allocation_plan; the split is equal weight, an unreadable holding

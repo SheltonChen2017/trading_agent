@@ -66,6 +66,7 @@ from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
 from assistant.rebalance_steering import (
     eligible_sleeves as _rebalance_eligible_sleeves,
     generate_steering_proposals,
+    steering_input_fingerprint as _steering_input_fingerprint,
 )
 from assistant.rebalance_profile import (
     OWNER_APPROVED_PROFILE,
@@ -3976,20 +3977,17 @@ if page == "Portfolio Rebalancing":
                 s: t for s, t in _rb_selections.items() if t != "-- choose --"
             }
 
-            # Every input that could change what a proposal means is in the
-            # signature, so a stored card cannot outlive a profile edit, a new
-            # snapshot, a filled or new working order, a different ticker
-            # choice, or a different budget.
-            _rb_signature = "|".join([
-                _rb_report.profile_fingerprint,
-                _rb_report.as_of,
-                _rb_report.total_equity_exact,
-                str(sorted((s, t) for s, t in _rb_chosen.items())),
-                str(_rb_budget),
-                str(sorted(
-                    (r.sleeve, r.pending_value_exact) for r in _rb_report.rows
-                )),
-            ])
+            # The shared helper covers the complete snapshot plus profile,
+            # policy, ticker choices, and exact budget. In particular, a
+            # same-day price rotation cannot leave an old card standing just
+            # because total equity and pending orders happen to be unchanged.
+            _rb_signature = _steering_input_fingerprint(
+                _rb_packet,
+                _rb_report,
+                _rb_policy,
+                selections=_rb_chosen,
+                budget=_rb_budget,
+            )
 
             if st.button(
                 "Check what this budget would do",

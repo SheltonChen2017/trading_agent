@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import json
 from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
@@ -127,7 +128,7 @@ def eligible_sleeves(report: RebalanceReport) -> list[str]:
 
 
 def _shortfall_to_lower_edge(
-    report: RebalanceReport, sleeve: str
+    report: RebalanceReport, profile: AllocationProfile, sleeve: str
 ) -> Decimal | None:
     """Exact dollars needed to reach the LOWER EDGE, not the target.
 
@@ -139,12 +140,48 @@ def _shortfall_to_lower_edge(
     equity = decimal_or_none(report.total_equity_exact)
     if row is None or equity is None or equity <= 0:
         return None
-    projected = decimal_or_none(str(row.projected_pct))
-    lower = decimal_or_none(str(row.lower_edge_pct))
-    if projected is None or lower is None:
+    market_value = decimal_or_none(row.market_value_exact)
+    pending_value = decimal_or_none(row.pending_value_exact)
+    if market_value is None or pending_value is None:
         return None
-    shortfall = equity * (lower - projected) / Decimal("100")
+    lower, _ = profile.band_edges(sleeve)
+    shortfall = equity * lower / Decimal("100") - market_value - pending_value
     return shortfall if shortfall > 0 else Decimal("0")
+
+
+def steering_input_fingerprint(
+    packet: DecisionPacket,
+    report: RebalanceReport,
+    policy: TradingPolicy,
+    *,
+    selections: dict[str, str] | None,
+    budget: object,
+) -> str:
+    """Fingerprint every input that can change a displayed steering card.
+
+    This is deliberately broader than the values used directly for sizing.
+    A card authorizes a trade against a portfolio snapshot, not just against
+    its date and total equity. Hashing the complete snapshot closes the case
+    where two holdings move in opposite directions on the same day while the
+    old hand-built signature stays unchanged.
+    """
+    budget_decimal = decimal_or_none(budget)
+    payload = {
+        "portfolio": dataclasses.asdict(packet.portfolio),
+        "report": dataclasses.asdict(report),
+        "policy_fingerprint": compute_policy_fingerprint(policy),
+        "selections": sorted(
+            (str(sleeve), str(ticker).strip().upper())
+            for sleeve, ticker in (selections or {}).items()
+        ),
+        "budget_exact": (
+            decimal_text(budget_decimal)
+            if budget_decimal is not None
+            else repr(budget)
+        ),
+    }
+    encoded = json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str)
+    return hashlib.sha256(encoded.encode("utf-8")).hexdigest()
 
 
 def plan_cash_steering(
@@ -222,7 +259,7 @@ def plan_cash_steering(
     # onto another sleeve to make the number come out even.
     shortfalls: dict[str, Decimal] = {}
     for sleeve in chosen:
-        shortfall = _shortfall_to_lower_edge(report, sleeve)
+        shortfall = _shortfall_to_lower_edge(report, profile, sleeve)
         if shortfall is None:
             refusals.append(
                 f"{SLEEVE_LABELS.get(sleeve, sleeve)}'s shortfall could not be "
@@ -393,26 +430,36 @@ def generate_steering_proposals(
                 f"~${leg.reference_price:,.2f}."
             ),
         )
+        proposal_id = _stable_id(
+            packet, policy, intent,
+            # The profile fingerprint is part of the identity, so a
+            # profile edit cannot silently reuse a proposal sized against
+            # targets the owner has since changed.
+            salt=f"{plan.profile_fingerprint}|{plan.budget_exact}",
+        )
+        expected_impact = preview_trade_impact(
+            packet.portfolio, leg.ticker, "buy",
+            leg.shares, leg.reference_price,
+        )
+        expected_impact.update({
+            "allocation_profile_version": plan.profile_version,
+            "allocation_profile_fingerprint": plan.profile_fingerprint,
+        })
         proposals.append(
             TradeProposal(
-                proposal_id=_stable_id(
-                    packet, policy, intent,
-                    # The profile fingerprint is part of the identity, so a
-                    # profile edit cannot silently reuse a proposal sized
-                    # against targets the owner has since changed.
-                    salt=f"{plan.profile_fingerprint}|{plan.budget_exact}",
-                ),
+                proposal_id=proposal_id,
                 created_at=at.isoformat(),
                 expires_at=(at + timedelta(minutes=ttl_minutes)).isoformat(),
                 status="proposed",
-                idempotency_key=(
-                    f"{_stable_id(packet, policy, intent, salt=plan.profile_fingerprint)}"
-                    f"-{packet.portfolio.as_of}"
-                ),
+                idempotency_key=f"{proposal_id}-{packet.portfolio.as_of}",
                 policy_version=policy.version,
                 policy_fingerprint=compute_policy_fingerprint(policy),
                 intent=intent,
-                reference_price=leg.reference_price,
+                # Sizing above stays Decimal-exact. TradeProposal is a JSON
+                # persistence/display boundary whose established schema uses
+                # a float reference price; retaining Decimal here makes
+                # AssistantStore.save_proposal() fail before a card appears.
+                reference_price=float(leg.reference_price),
                 price_timestamp=at.isoformat(),
                 reasons=[
                     f"{SLEEVE_LABELS.get(leg.sleeve, leg.sleeve)} is below its "
@@ -425,10 +472,7 @@ def generate_steering_proposals(
                     "band exists so that being inside it is enough.",
                 ],
                 evidence_status=EVIDENCE_STATUS,
-                expected_impact=preview_trade_impact(
-                    packet.portfolio, leg.ticker, "buy",
-                    leg.shares, leg.reference_price,
-                ),
+                expected_impact=expected_impact,
                 alternatives=[
                     "Take no action -- nothing is bought until you type the "
                     "approval phrase for each proposal.",

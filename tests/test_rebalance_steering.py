@@ -20,7 +20,9 @@ duplicate correction (HEDGER-004).
 from __future__ import annotations
 
 import dataclasses
+import json
 import sys
+from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
 
@@ -29,6 +31,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
+from assistant.execution_service import validate_proposal_for_execution
 from assistant.policy import TradingPolicy
 from assistant.rebalance_profile import (
     OWNER_APPROVED_PROFILE,
@@ -38,6 +41,7 @@ from assistant.rebalance_profile import (
     SLEEVE_HEDGE,
     SLEEVE_LEVERAGED,
     SLEEVE_OTHER,
+    compute_profile_fingerprint,
 )
 from assistant.rebalance_steering import (
     EVIDENCE_STATUS,
@@ -45,9 +49,11 @@ from assistant.rebalance_steering import (
     eligible_sleeves,
     generate_steering_proposals,
     plan_cash_steering,
+    steering_input_fingerprint,
 )
 from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
 from assistant.schemas import DecisionPacket, MarketRegime
+from assistant.storage import AssistantStore
 
 PRICES = {"MSFT": 100.0, "SH": 40.0, "NVDL": 50.0, "JEPQ": 10.0, "GLD": 10.0}
 ALL_SELECTIONS = {
@@ -192,6 +198,21 @@ def test_money_is_sized_to_the_lower_edge_not_the_target():
     assert Decimal(growth.allocated_dollars_exact) <= Decimal("3000")
 
 
+def test_lower_edge_shortfall_stays_exact_on_an_awkward_denominator():
+    """The report's percentages are display floats; reconstructing dollars
+    from them must not contaminate fractional-share sizing."""
+    packet = _packet([_held("MSFT", 1, 1.0)], cash=6.0)
+    plan = _plan(
+        packet=packet,
+        budget=100,
+        prices={**PRICES, "MSFT": Decimal("0.1")},
+        policy=_policy(whole_shares_only=False),
+    )
+    growth = next(leg for leg in plan.legs if leg.sleeve == SLEEVE_GROWTH)
+    # Growth's lower edge is exactly 30%: 30% of $7 minus the $1 holding.
+    assert growth.shortfall_to_lower_edge_exact == "1.1"
+
+
 def test_leftover_money_is_reported_never_pushed_onto_another_sleeve():
     plan = _plan(budget=2_000)
     spent = sum(Decimal(leg.planned_notional_exact) for leg in plan.legs)
@@ -279,6 +300,12 @@ def test_every_proposal_is_a_gated_buy_bound_to_the_profile():
         assert proposal.intent.side == "buy"
         assert proposal.evidence_status == EVIDENCE_STATUS
         assert proposal.policy_fingerprint
+        assert proposal.expected_impact["allocation_profile_fingerprint"] == (
+            compute_profile_fingerprint(OWNER_APPROVED_PROFILE)
+        )
+        # The UI immediately persists this dictionary as JSON. Exact Decimal
+        # arithmetic belongs in sizing, not in the persistence boundary.
+        json.dumps(proposal.to_dict(), sort_keys=True)
 
 
 def test_changing_the_profile_changes_every_proposal_identity():
@@ -313,6 +340,31 @@ def test_a_different_budget_produces_a_different_proposal_identity():
     assert ids[0].isdisjoint(ids[1])
 
 
+def test_budget_change_cannot_reuse_an_idempotency_key_for_the_same_shares():
+    """The database makes idempotency_key unique. Two budgets that round to
+    the same whole-share intent still need distinct keys when their proposal
+    identities differ, or saving the second result raises IntegrityError."""
+    proposals = []
+    for budget in ("2000", "2000.01"):
+        proposals.append({
+            p.intent.ticker: p
+            for p in generate_steering_proposals(
+                _packet(), OWNER_APPROVED_PROFILE, _policy(),
+                budget=budget, selections=ALL_SELECTIONS, prices=PRICES,
+            )["proposals"]
+        })
+    common = set(proposals[0]) & set(proposals[1])
+    same_quantity = [
+        ticker for ticker in common
+        if proposals[0][ticker].intent.shares == proposals[1][ticker].intent.shares
+    ]
+    assert same_quantity, "the regression needs at least one rounded-equal leg"
+    for ticker in same_quantity:
+        before, after = proposals[0][ticker], proposals[1][ticker]
+        assert before.proposal_id != after.proposal_id
+        assert before.idempotency_key != after.idempotency_key
+
+
 def test_proposals_are_stable_for_identical_input():
     runs = [
         {p.proposal_id for p in generate_steering_proposals(
@@ -322,6 +374,68 @@ def test_proposals_are_stable_for_identical_input():
         for _ in range(2)
     ]
     assert runs[0] == runs[1]
+
+
+def test_same_day_market_value_change_invalidates_the_ui_signature():
+    """Two positions can move in opposite directions while total equity,
+    share counts, pending orders, and the snapshot date all stay unchanged.
+    A proposal card sized from the first values must not survive the second."""
+    before_packet = _packet(
+        [_held("MSFT", 10, 100.0), _held("JEPQ", 100, 10.0)],
+        cash=8_000.0,
+    )
+    after_packet = _packet(
+        [_held("MSFT", 10, 120.0), _held("JEPQ", 100, 8.0)],
+        cash=8_000.0,
+    )
+    before = evaluate_portfolio_rebalance(
+        before_packet.portfolio, OWNER_APPROVED_PROFILE, policy=_policy()
+    )
+    after = evaluate_portfolio_rebalance(
+        after_packet.portfolio, OWNER_APPROVED_PROFILE, policy=_policy()
+    )
+    assert before.as_of == after.as_of
+    assert before.total_equity_exact == after.total_equity_exact
+    assert steering_input_fingerprint(
+        before_packet, before, _policy(),
+        selections=ALL_SELECTIONS, budget="2000"
+    ) != steering_input_fingerprint(
+        after_packet, after, _policy(),
+        selections=ALL_SELECTIONS, budget="2000"
+    )
+
+
+def test_execution_refuses_a_proposal_from_a_non_active_profile(tmp_path):
+    """Changing proposal identity is not enough: a stored card is reachable
+    from History after session state is gone, so the execution gate must bind
+    it to the currently active owner profile before broker contact."""
+    moved = dataclasses.replace(
+        OWNER_APPROVED_PROFILE,
+        targets={
+            **dict(OWNER_APPROVED_PROFILE.targets),
+            SLEEVE_GROWTH: "35",
+            SLEEVE_HEDGE: "15",
+        },
+    )
+    packet = _packet()
+    policy = _policy()
+    proposal = generate_steering_proposals(
+        packet, moved, policy,
+        budget=2_000, selections=ALL_SELECTIONS, prices=PRICES,
+    )["proposals"][0]
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(proposal.to_dict())
+
+    outcome = validate_proposal_for_execution(
+        proposal.proposal_id,
+        packet.portfolio,
+        policy,
+        store,
+        now_et=datetime(2026, 8, 15, 12, 0, tzinfo=timezone.utc),
+    )
+
+    assert not outcome.approved
+    assert "allocation profile" in str(outcome.error).lower()
 
 
 def test_a_refused_plan_creates_no_proposal():

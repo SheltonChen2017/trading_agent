@@ -417,6 +417,21 @@ def test_gr1c_every_injected_seam_resolves_from_the_facade_at_call_time(
         )
         assert "policy fingerprint does not match" in str(outcome.error), outcome.error
 
+    # _validate_proposal_context -- feature-specific durable bindings are
+    # checked after the universal policy fingerprint and before broker I/O.
+    store.save_proposal(_proposal("p-context", side="sell"))
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            execution_service,
+            "_validate_proposal_context",
+            lambda proposal: "SENTINEL-context",
+        )
+        outcome = validate_proposal_for_execution(
+            "p-context", _held_portfolio(), load_policy(), store, now_et=NOW_ET
+        )
+        assert outcome.error == "SENTINEL-context"
+        assert outcome.failure_class == execution_service.FAILURE_DATA_INTEGRITY
+
     # _intent_from_dict -- parses the stored intent after the broker checks.
     store.save_proposal(_proposal("p-intent", side="sell"))
     with monkeypatch.context() as patch:

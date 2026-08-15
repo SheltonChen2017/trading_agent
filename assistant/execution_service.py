@@ -327,6 +327,42 @@ def _import_execution_broker():
     return broker
 
 
+def _validate_proposal_context(proposal: dict) -> str | None:
+    """Fail closed when a context-bound proposal outlives that context.
+
+    Most proposal families are fully bound by the trading-policy fingerprint.
+    REBAL-1 steering also depends on the owner's allocation profile, which is
+    a separate preference document and therefore needs its own execution-time
+    check. The deferred import keeps the generic execution kernel independent
+    of the rebalancing feature.
+    """
+    if proposal.get("evidence_status") != "user_directed_rebalance_buy":
+        return None
+    expected_impact = proposal.get("expected_impact")
+    expected = (
+        expected_impact.get("allocation_profile_fingerprint")
+        if isinstance(expected_impact, dict)
+        else None
+    )
+    if not expected:
+        return (
+            "Rebalancing proposal is missing its allocation profile "
+            "fingerprint. Regenerate it from Portfolio Rebalancing."
+        )
+    from assistant.rebalance_profile import (
+        OWNER_APPROVED_PROFILE,
+        compute_profile_fingerprint,
+    )
+
+    current = compute_profile_fingerprint(OWNER_APPROVED_PROFILE)
+    if expected != current:
+        return (
+            "Proposal's allocation profile does not match the active owner "
+            "profile. Regenerate it from Portfolio Rebalancing."
+        )
+    return None
+
+
 def validate_proposal_for_execution(
     proposal_id: str,
     current_portfolio: PortfolioSnapshot,
@@ -402,6 +438,7 @@ def validate_proposal_for_execution(
             to_decimal=to_decimal,
             env_kill_switch_active=env_kill_switch_active,
             compute_policy_fingerprint=compute_policy_fingerprint,
+            validate_proposal_context=_validate_proposal_context,
             intent_from_dict=_intent_from_dict,
             detect_split_like_share_mismatch=detect_split_like_share_mismatch,
             pending_buy_value_by_ticker=_pending_buy_value_by_ticker,

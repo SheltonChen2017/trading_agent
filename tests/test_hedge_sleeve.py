@@ -224,6 +224,44 @@ def test_the_exact_value_field_wins_over_the_float():
     assert Decimal(report.shortfall_dollars_exact) == Decimal("599.995")
 
 
+def test_a_malformed_exact_value_refuses_instead_of_falling_back_to_float():
+    """Once an exact broker value is present it is authoritative. Falling
+    back to the rounded display float hides corrupt durable input and can
+    overstate the remaining hedge shortfall."""
+    snapshot = _snapshot([_held("GLD", 4, 100.0)], cash=9_600.0)
+    positions = [
+        __import__("dataclasses").replace(
+            p, market_value=400.0, market_value_exact="not-a-number"
+        )
+        for p in snapshot.positions
+    ]
+    snapshot = __import__("dataclasses").replace(snapshot, positions=positions)
+
+    report = evaluate_hedge_sleeve(snapshot, target_pct=10)
+
+    assert not report.usable
+    assert any("GLD" in reason for reason in report.refusals)
+
+
+def test_a_held_selected_etf_with_zero_market_value_refuses():
+    """A positive quantity of one of these liquid ETFs cannot authoritatively
+    be worth zero. Accepting zero would erase the holding from the gap and
+    oversize the proposed purchase."""
+    snapshot = _snapshot([_held("TLT", 2, 100.0)], cash=9_800.0)
+    positions = [
+        __import__("dataclasses").replace(
+            p, market_value=0.0, market_value_exact="0"
+        )
+        for p in snapshot.positions
+    ]
+    snapshot = __import__("dataclasses").replace(snapshot, positions=positions)
+
+    report = evaluate_hedge_sleeve(snapshot, target_pct=10)
+
+    assert not report.usable
+    assert any("TLT" in reason for reason in report.refusals)
+
+
 # --- instrument selection --------------------------------------------------
 
 
@@ -246,6 +284,16 @@ def test_a_repeated_instrument_is_not_counted_twice():
 
 def test_an_empty_selection_refuses():
     assert not evaluate_hedge_sleeve(_snapshot(), target_pct=10, tickers=[]).usable
+
+
+def test_an_instrument_outside_the_recorded_hedge_sleeve_is_refused():
+    """The public module must enforce the same recorded instrument set as
+    the UI; otherwise any equity can be relabeled and proposed as a hedge."""
+    report = evaluate_hedge_sleeve(
+        _snapshot(), target_pct=10, tickers=["AAPL"]
+    )
+    assert not report.usable
+    assert "configured hedge sleeve" in " ".join(report.refusals)
 
 
 # --- what the report is allowed to claim -----------------------------------
@@ -321,16 +369,14 @@ def test_sizing_never_lands_above_the_target():
     assert spent <= Decimal("1000")
 
 
-def test_an_unpriced_instrument_is_excluded_and_the_rest_reweighted():
+def test_one_unpriced_selected_instrument_refuses_instead_of_reweighting():
+    """Dropping one selected leg and redistributing its dollars changes the
+    owner's chosen basket and overweights every surviving leg."""
     result = generate_hedge_buy_proposals(
         _packet(), _policy(), _prices(BTAL=float("nan")), target_pct=10
     )
-    tickers = {p.intent.ticker for p in result["proposals"]}
-    assert "BTAL" not in tickers
-    weights = {
-        p.reasons[1].split("takes ")[1].split("%")[0] for p in result["proposals"]
-    }
-    assert weights == {"33.3"}, weights
+    assert not result["created"]
+    assert "BTAL" in result["reason"]
 
 
 def test_no_usable_price_anywhere_refuses_without_proposing():
@@ -341,6 +387,49 @@ def test_no_usable_price_anywhere_refuses_without_proposing():
     )
     assert not result["created"]
     assert "usable current price" in result["reason"]
+
+
+def test_unavailable_open_order_data_refuses_target_sizing():
+    """Without the broker's open orders the sizer cannot know whether a
+    hedge purchase is already working and must not size a duplicate target."""
+    packet = _packet()
+    snapshot = __import__("dataclasses").replace(
+        packet.portfolio, open_orders_available=False
+    )
+    packet = __import__("dataclasses").replace(packet, portfolio=snapshot)
+
+    result = generate_hedge_buy_proposals(
+        packet, _policy(), _prices(), target_pct=10
+    )
+
+    assert not result["created"]
+    assert "open-order" in result["reason"].lower()
+
+
+def test_known_pending_hedge_buys_reduce_the_remaining_shortfall():
+    """The public pending-value seam must affect sizing, not merely a
+    projected-position display field in the shared allocation plan."""
+    result = generate_hedge_buy_proposals(
+        _packet(), _policy(), _prices(), target_pct=10,
+        tickers=["SH"],
+        pending_buy_value_by_ticker={"SH": 400.0},
+    )
+    assert result["created"]
+    spent = sum(
+        Decimal(str(p.intent.shares)) * Decimal(str(p.reference_price))
+        for p in result["proposals"]
+    )
+    assert spent <= Decimal("600")
+    assert any("pending" in reason.lower() for reason in result["proposals"][0].reasons)
+
+
+def test_unknown_pending_hedge_value_refuses_target_sizing():
+    result = generate_hedge_buy_proposals(
+        _packet(), _policy(), _prices(), target_pct=10,
+        pending_value_unknown_tickers={"SH"},
+    )
+    assert not result["created"]
+    assert "pending" in result["reason"].lower()
 
 
 def test_a_sleeve_already_at_target_refuses_and_never_proposes_a_sell():
@@ -379,6 +468,16 @@ def test_a_shortfall_too_small_to_buy_anything_refuses_rather_than_partially_pro
     )
     assert not result["created"]
     assert "minimum order quantity" in result["reason"]
+
+
+def test_one_unaffordable_selected_leg_refuses_the_whole_basket():
+    """Silently returning only the affordable legs produces a different
+    defensive basket from the one the owner selected."""
+    result = generate_hedge_buy_proposals(
+        _packet(), _policy(), _prices(BTAL=1_000.0), target_pct=10
+    )
+    assert not result["created"]
+    assert "BTAL" in result["reason"]
 
 
 def test_the_daily_reset_warning_reaches_the_proposal_that_buys_it():

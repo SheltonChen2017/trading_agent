@@ -585,6 +585,42 @@ def _mainline_ref() -> str | None:
     return None
 
 
+def test_current_topology_hashes_match_the_published_mainline():
+    """A just-merged feature must not leave both current-state records one
+    commit behind while claiming that old hash is main/origin-main."""
+    mainline = _mainline_ref()
+    if mainline is None:  # pragma: no cover - export or detached checkout
+        pytest.skip("no mainline ref available")
+    expected = subprocess.run(
+        ["git", "rev-parse", "--short", mainline],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    patterns = {
+        "ACTION_PLAN_2026-08-02.md": r"Current development topology.*?`([0-9a-f]{7,40})`",
+        "SESSION_HANDOFF.md": r"(?:Current )?`main` and `origin/main`:\s*`([0-9a-f]{7,40})`",
+    }
+    for name, pattern in patterns.items():
+        match = re.search(pattern, _text(name), flags=re.IGNORECASE)
+        assert match, f"{name} has no parseable current-main declaration"
+        assert match.group(1).startswith(expected), (
+            f"{name} calls {match.group(1)} current main; {mainline} is {expected}"
+        )
+
+
+def test_hedge_docs_do_not_exempt_a_runtime_deployment_from_epoch_lineage():
+    """A stable mandate/policy fingerprint does not make a new code commit
+    deployable inside an active evidence epoch."""
+    handoff = _text("SESSION_HANDOFF.md")
+    mandate = _text("MANDATE.md")
+    assert "no deployment-closes-the-epoch consequence" not in handoff.lower()
+    for text in (handoff, mandate):
+        assert not re.search(
+            r"active `paper-epoch-005` is (?:therefore )?unaffected",
+            text,
+            flags=re.IGNORECASE,
+        )
+
+
 def _repository_commits_claimed_unreachable(text: str) -> list[str]:
     """Commit hashes a document asserts are local-only / unpushed / unmerged.
 

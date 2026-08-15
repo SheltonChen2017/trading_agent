@@ -4,7 +4,8 @@ Date: 2026-08-15
 Author: Claude
 Base: `f64b668` (Stage 1 counter-review merged by PR #228)
 Branch: `user/claude/rebal1-stage2-buy-steering-20260815`
-Status: **Implemented; pending independent review.**
+Status: **Implementation report. Independently accepted after correction at
+`bdeb61d`; see `docs/REVIEW_2026-08-15_REBAL1_STAGE2_INDEPENDENT.md`.**
 
 Two pieces on one branch, at the owner's direction.
 
@@ -76,8 +77,8 @@ Against Codex's Stage 2 specification:
 | Separately approved proposals | One `TradeProposal` per sleeve, each through `_render_proposal_approval` |
 | No submit-all | None exists; pinned by a UI test |
 | Never silently omit an unaffordable leg | Named in `disclosures` with the remedy |
-| Bound to the allocation-profile fingerprint | Fingerprint is part of both the proposal id salt and the idempotency key |
-| Stale cards hidden | Signature covers profile fingerprint, snapshot date, equity, ticker choices, budget, and per-sleeve pending values |
+| Bound to the allocation-profile fingerprint | Final reviewed tree stores it with the proposal, includes it in identity, and validates it against the active owner profile before broker I/O |
+| Stale cards hidden | Final reviewed tree fingerprints the complete portfolio snapshot and report plus profile, policy, ticker choices, and exact budget |
 
 Design decisions worth pressing on in review:
 

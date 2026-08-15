@@ -162,7 +162,10 @@ targets in §2 change, so revisions are visible, not silent edits.
   §2's hedge-cost row now says a hedge can be held; the permitted-instrument
   row is annotated but its VALUE is unchanged. **No behavior field in
   `assistant/default_mandate.json` changed, so `approved_fingerprint` is
-  untouched and active `paper-epoch-005` is unaffected** (verified against
-  `compute_mandate_fingerprint`). §4's shelving of the crisis-response
+  untouched** (verified against `compute_mandate_fingerprint`). The active
+  `paper-epoch-005` remains unchanged only because HEDGE-1 is development-only
+  and has not been deployed. Any later deployment changes the epoch's
+  `code_commit` lineage and therefore closes that epoch even though the
+  mandate fingerprint is stable. §4's shelving of the crisis-response
   trend-following sleeve also stands: that sleeve needs futures or real
   shorting, which this milestone deliberately does not add.

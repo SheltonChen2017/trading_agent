@@ -2,9 +2,10 @@
 
 Author: Codex (plan), relayed and recorded by Claude
 Adopted: 2026-08-15
-Status: **Stages 1 and 2 complete after independent correction and review.
-Stage 2 correction: `bdeb61d` (2026-08-15). Stage 3 is not started and
-requires separate explicit authorization.**
+Status: **All three stages implemented. Stages 1 and 2 independently
+reviewed, corrected, and counter-reviewed. Stage 3 implemented 2026-08-15
+under the owner's explicit authorization naming it; pending independent
+review.**
 
 This file records the owner-adopted staging so the sequencing survives the
 conversation it was written in. It is the authority for what REBAL-1's
@@ -96,7 +97,7 @@ choices, and exact budget; and lower-edge dollars are derived directly from
 Decimal values rather than display percentages. Disposition and validation
 are in `docs/REVIEW_2026-08-15_REBAL1_STAGE2_INDEPENDENT.md`.
 
-## Stage 3 — Tax-aware trims (NOT STARTED, requires separate authorization)
+## Stage 3 — Tax-aware trims (IMPLEMENTED 2026-08-15)
 
 An overweight-sleeve workflow showing amount above band, target-restoration
 amount, tax lots, holding period, realized-gain consequences, pending sells,
@@ -105,8 +106,11 @@ strategy. Each sale remains separately approved.
 
 Stage 3 is where rebalancing first sells on the app's own initiative, unlike
 every other sell path in this app, which is either a computed policy breach
-or the owner's explicit instruction. It should not begin without explicit
-authorization naming it.
+or the owner's explicit instruction. **The owner gave the required explicit
+authorization naming it on 2026-08-15**; disposition in
+`docs/REVIEW_2026-08-15_REBAL1_STAGE3.md`. That authorization covers building
+the workflow only -- it does not authorize deployment, an epoch roll, or any
+change to the operational checkout.
 
 ## Code archaeology
 

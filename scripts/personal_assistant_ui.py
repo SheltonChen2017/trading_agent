@@ -63,9 +63,15 @@ from assistant.allocation_proposals import (
     generate_allocation_buy_proposals,
 )
 from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
+from assistant.rebalance_steering import (
+    eligible_sleeves as _rebalance_eligible_sleeves,
+    generate_steering_proposals,
+    steering_input_fingerprint as _steering_input_fingerprint,
+)
 from assistant.rebalance_profile import (
     OWNER_APPROVED_PROFILE,
     SLEEVE_LABELS,
+    sleeve_membership as _rebalance_sleeve_membership,
 )
 from assistant.hedge_sleeve import (
     evaluate_hedge_sleeve,
@@ -3926,6 +3932,132 @@ if page == "Portfolio Rebalancing":
                     "cover them. That is a gap in the profile, not a verdict "
                     "on the holding or order, and it is not a reason to sell."
                 )
+        # --- Stage 2: buy-only cash steering ------------------------------
+        st.divider()
+        st.subheader("Steer new money toward under-band sleeves")
+        st.caption(
+            "Buy only. An overweight sleeve receives nothing here -- not even "
+            "a smaller buy -- because trimming would be this app selling on "
+            "its own initiative. Nothing is bought until you approve each "
+            "proposal by typing the phrase."
+        )
+
+        _rb_eligible = _rebalance_eligible_sleeves(_rb_report)
+        if not _rb_eligible:
+            st.info(
+                "No sleeve is below its lower band, so there is nothing to "
+                "steer new money toward."
+            )
+        else:
+            _rb_membership = _rebalance_sleeve_membership()
+            _rb_budget = st.number_input(
+                "New-money budget ($)",
+                min_value=0.0, value=0.0, step=100.0,
+                key="rb_budget",
+                help=(
+                    "Money you are adding, not money moved between holdings. "
+                    "This page never sells to fund a purchase."
+                ),
+            )
+            _rb_selections = {}
+            for _rb_sleeve in _rb_eligible:
+                _rb_choices = sorted(
+                    t for t, s in _rb_membership.items() if s == _rb_sleeve
+                )
+                _rb_selections[_rb_sleeve] = st.selectbox(
+                    f"Ticker for {SLEEVE_LABELS.get(_rb_sleeve, _rb_sleeve)}",
+                    options=["-- choose --", *_rb_choices],
+                    key=f"rb_pick_{_rb_sleeve}",
+                    help=(
+                        "This app does not pick which name to buy inside a "
+                        "sleeve."
+                    ),
+                )
+            _rb_chosen = {
+                s: t for s, t in _rb_selections.items() if t != "-- choose --"
+            }
+
+            # The shared helper covers the complete snapshot plus profile,
+            # policy, ticker choices, and exact budget. In particular, a
+            # same-day price rotation cannot leave an old card standing just
+            # because total equity and pending orders happen to be unchanged.
+            _rb_signature = _steering_input_fingerprint(
+                _rb_packet,
+                _rb_report,
+                _rb_policy,
+                selections=_rb_chosen,
+                budget=_rb_budget,
+            )
+
+            if st.button(
+                "Check what this budget would do",
+                type="primary",
+                disabled=_rb_budget <= 0 or not _rb_chosen,
+                key="rb_steer",
+            ):
+                _rb_prices, _rb_missing = _hedge_reference_prices(
+                    store, sorted(_rb_chosen.values())
+                )
+                if _rb_missing:
+                    st.warning(
+                        "No usable fresh recorded close for "
+                        + ", ".join(sorted(_rb_missing))
+                        + ". Those sleeves cannot be sized."
+                    )
+                _rb_result = generate_steering_proposals(
+                    _rb_packet, OWNER_APPROVED_PROFILE, _rb_policy,
+                    budget=_rb_budget, selections=_rb_chosen,
+                    prices=_rb_prices,
+                )
+                if _rb_result["created"]:
+                    for _rb_proposal in _rb_result["proposals"]:
+                        store.save_proposal(_rb_proposal.to_dict())
+                    st.session_state["rb_proposals"] = [
+                        _rb_proposal.to_dict()
+                        for _rb_proposal in _rb_result["proposals"]
+                    ]
+                    st.session_state["rb_proposals_signature"] = _rb_signature
+                    st.session_state["rb_plan_unallocated"] = _rb_result[
+                        "plan"
+                    ].unallocated_exact
+                    st.session_state["rb_plan_disclosures"] = list(
+                        _rb_result["plan"].disclosures
+                    )
+                else:
+                    st.session_state.pop("rb_proposals", None)
+                    st.session_state.pop("rb_proposals_signature", None)
+                    st.error(_rb_result["reason"])
+
+            _rb_stored = st.session_state.get("rb_proposals")
+            if _rb_stored:
+                if st.session_state.get("rb_proposals_signature") != _rb_signature:
+                    st.info(
+                        f"{len(_rb_stored)} steering proposal(s) are waiting on "
+                        "the Propose & Approve page, but they no longer match "
+                        "the current profile, snapshot, working orders, ticker "
+                        "choices, or budget. Check again to size new ones."
+                    )
+                else:
+                    for _rb_note in st.session_state.get(
+                        "rb_plan_disclosures", []
+                    ):
+                        st.warning(_rb_note)
+                    st.caption(
+                        "Unallocated and left as cash: $"
+                        f"{Decimal(st.session_state.get('rb_plan_unallocated', '0')):,.2f}"
+                    )
+                    st.caption(
+                        "Approve each sleeve separately. There is deliberately "
+                        "no submit-all: a partly filled multi-sleeve correction "
+                        "is a different portfolio from the one you sized."
+                    )
+                    for _rb_proposal in _rb_stored:
+                        _render_proposal_approval(
+                            _rb_proposal, store, policy_path,
+                            _rb_packet.portfolio, _rb_packet,
+                        )
+
+
 
 
 if page == "Propose & Approve":

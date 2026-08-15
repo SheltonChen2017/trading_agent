@@ -94,6 +94,12 @@ class SleeveRow:
     #: of the target and distance from the target are independent facts,
     #: and a sleeve can be both infeasible and badly drifted at once.
     policy_conflict_reason: str
+    #: Where the sleeve sits relative to its band, recorded independently
+    #: of `status`. REBAL1CR-002: `status` carries a display precedence in
+    #: which `unassigned_holdings` and `pending_value_unknown` outrank the
+    #: band, so deriving the breach count from `status` silently omitted a
+    #: drifted residual. Empty when the band cannot be judged.
+    band_state: str
     tickers: tuple[str, ...]
 
 
@@ -408,6 +414,7 @@ def evaluate_portfolio_rebalance(
                     gap_to_target_exact="0",
                     status=STATUS_DATA_UNAVAILABLE,
                     policy_conflict_reason="",
+                    band_state="",
                     tickers=tuple(sleeve_tickers[sleeve]),
                 )
             )
@@ -426,6 +433,15 @@ def evaluate_portfolio_rebalance(
         # band while six sleeves were outside theirs, understating drift on
         # the page's most prominent number. The conflict is carried in its
         # own field and still disclosed; the two facts are independent.
+        # Judged first and kept whatever label `status` ends up carrying.
+        if sleeve in unknown_sleeves:
+            band_state = ""
+        elif projected < lower:
+            band_state = STATUS_UNDERWEIGHT
+        elif projected > upper:
+            band_state = STATUS_OVERWEIGHT
+        else:
+            band_state = STATUS_INSIDE
         if sleeve in unknown_sleeves:
             status = STATUS_PENDING_UNKNOWN
         elif sleeve == SLEEVE_OTHER and sleeve_tickers[sleeve]:
@@ -439,7 +455,7 @@ def evaluate_portfolio_rebalance(
             status = STATUS_OVERWEIGHT
         else:
             status = STATUS_INSIDE
-        if status in (STATUS_UNDERWEIGHT, STATUS_OVERWEIGHT):
+        if band_state in (STATUS_UNDERWEIGHT, STATUS_OVERWEIGHT):
             breached.append(sleeve)
 
         rows.append(
@@ -452,6 +468,7 @@ def evaluate_portfolio_rebalance(
                 gap_to_target_exact=decimal_text(gap),
                 status=status,
                 policy_conflict_reason=conflicts.get(sleeve, ""),
+                band_state=band_state,
                 tickers=tuple(sleeve_tickers[sleeve]),
             )
         )

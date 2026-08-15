@@ -182,16 +182,42 @@ def test_the_page_offers_no_action_control(_offline):
     assert not approval_inputs, [t.label for t in approval_inputs]
 
 
-def test_the_page_source_emits_no_shares_or_sides(_offline):
+def _page_sections() -> tuple[str, str]:
+    """The Stage 1 report section and the Stage 2 steering section.
+
+    Stage 2 now shares this page, so a single whole-page ban would forbid
+    exactly the machinery Stage 2 is supposed to have. The boundary that
+    still matters is per section: the report half stays read-only, and the
+    steering half only ever buys.
+    """
     source = _APP_PATH.read_text(encoding="utf-8")
     page = source.split('if page == "Portfolio Rebalancing":', 1)[1].split(
         'if page == "Propose & Approve":', 1
     )[0]
+    marker = "# --- Stage 2: buy-only cash steering"
+    assert marker in page, "the Stage 2 section marker moved"
+    report_half, steering_half = page.split(marker, 1)
+    return report_half, steering_half
+
+
+def test_the_stage_one_report_section_emits_no_shares_or_sides(_offline):
+    report_half, _ = _page_sections()
     for forbidden in (
         "generate_", "save_proposal", "_render_proposal_approval",
         "TradeIntent", "shares",
     ):
-        assert forbidden not in page, forbidden
+        assert forbidden not in report_half, forbidden
+
+
+def test_the_steering_section_never_sells_and_has_no_submit_all(_offline):
+    """Stage 2 is buy-only by design. Selling to rebalance is Stage 3 and
+    needs separate authorization; a submit-all would turn a multi-sleeve
+    correction into one click that can partly fill."""
+    _, steering_half = _page_sections()
+    for forbidden in ('"sell"', "'sell'", "submit all", "Submit all",
+                      "generate_user_directed_sell_proposal",
+                      "execute_allocation_batch"):
+        assert forbidden not in steering_half, forbidden
 
 
 def test_exact_money_is_not_rounded_through_binary_float(_offline):
@@ -258,3 +284,45 @@ def test_the_breach_headline_counts_every_band_breach(_offline):
         report.breached_count, outside,
         [(r.sleeve, r.status, r.projected_pct) for r in report.rows],
     )
+
+
+# --- Stage 2 on the same page -----------------------------------------------
+
+
+def test_the_steering_controls_appear_only_when_a_sleeve_is_under_its_band(
+    _offline,
+):
+    """With an empty book several sleeves are under their bands, so the
+    budget control is offered."""
+    app = _rebalancing()
+    assert not app.exception, app.exception
+    assert any(n.label == "New-money budget ($)" for n in app.number_input), (
+        [n.label for n in app.number_input]
+    )
+
+
+def test_no_proposal_is_created_until_the_owner_asks(_offline):
+    """Loading the page must never write a proposal. The budget starts at
+    zero and the check button is disabled until money and a ticker are
+    chosen."""
+    app = _rebalancing()
+    check = [b for b in app.button if b.key == "rb_steer"]
+    assert check, [b.key for b in app.button]
+    assert check[0].disabled, "a zero budget with no ticker cannot be sized"
+
+
+def test_the_owner_must_pick_the_ticker_within_each_sleeve(_offline):
+    """The selectbox defaults to a non-choice, so the app never picks a
+    name inside a sleeve on the owner's behalf."""
+    app = _rebalancing()
+    pickers = [s for s in app.selectbox if str(s.key).startswith("rb_pick_")]
+    assert pickers, [s.key for s in app.selectbox]
+    for picker in pickers:
+        assert picker.value == "-- choose --"
+
+
+def test_the_steering_section_offers_no_submit_all_control(_offline):
+    app = _rebalancing()
+    labels = [str(b.label).lower() for b in app.button]
+    assert not any("submit all" in label for label in labels), labels
+    assert not any("sell" in label for label in labels), labels

@@ -2,8 +2,9 @@
 
 Author: Codex (plan), relayed and recorded by Claude
 Adopted: 2026-08-15
-Status: **Stage 1 complete after independent correction. Stages 2 and 3 not
-started.**
+Status: **Stages 1 and 2 complete after independent correction and review.
+Stage 2 correction: `bdeb61d` (2026-08-15). Stage 3 is not started and
+requires separate explicit authorization.**
 
 This file records the owner-adopted staging so the sequencing survives the
 conversation it was written in. It is the authority for what REBAL-1's
@@ -75,7 +76,7 @@ limits are disclosed as conflicts rather than presented as reachable.
 Stage 1 emits no shares, sides, proposals, approvals, or action-shaped
 recommendations.
 
-## Stage 2 — Buy-only cash steering (NOT STARTED)
+## Stage 2 — Buy-only cash steering (COMPLETE AFTER REVIEW 2026-08-15)
 
 Separately reviewed milestone. The owner enters a new-money budget used only
 to reduce sleeves below their lower bands. It must count holdings and
@@ -85,6 +86,15 @@ separately approved proposals, have no submit-all action, never silently
 omit an unaffordable selected leg, bind proposals to the allocation-profile
 fingerprint, and hide stale cards after any profile, snapshot,
 pending-order, selection, or sizing change.
+
+Independent review at `bdeb61d` closed four P2 and two P3 findings. Proposal
+storage now uses the established JSON-compatible reference-price boundary;
+budget-bound proposal IDs also supply unique idempotency keys; the active
+allocation-profile fingerprint is persisted and checked before broker I/O;
+the UI fingerprint covers the complete portfolio snapshot, report, policy,
+choices, and exact budget; and lower-edge dollars are derived directly from
+Decimal values rather than display percentages. Disposition and validation
+are in `docs/REVIEW_2026-08-15_REBAL1_STAGE2_INDEPENDENT.md`.
 
 ## Stage 3 — Tax-aware trims (NOT STARTED, requires separate authorization)
 

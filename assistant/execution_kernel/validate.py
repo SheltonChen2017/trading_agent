@@ -186,6 +186,7 @@ class ProposalValidationDeps:
     to_decimal: Callable[..., Decimal]
     env_kill_switch_active: Callable[[], bool]
     compute_policy_fingerprint: Callable[[TradingPolicy], str]
+    validate_proposal_context: Callable[[dict], str | None]
     intent_from_dict: Callable[[dict], TradeIntent]
     detect_split_like_share_mismatch: Callable[..., dict[str, Any] | None]
     pending_buy_value_by_ticker: Callable[[list, Any], dict[str, Decimal]]
@@ -260,6 +261,16 @@ def run_proposal_validation(
                 "policy may have been edited without a version bump (or this proposal predates fingerprint "
                 "binding). Regenerate the proposal against the current policy."
             ),
+        )
+
+    context_error = deps.validate_proposal_context(proposal)
+    if context_error is not None:
+        return deps.outcome_factory(
+            proposal=proposal,
+            intent=None,
+            validation=None,
+            error=context_error,
+            failure_class=deps.failure_data_integrity,
         )
 
     broker = deps.import_broker()

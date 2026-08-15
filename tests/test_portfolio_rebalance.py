@@ -497,7 +497,12 @@ def test_a_target_above_a_policy_cap_is_marked_not_silently_measured():
     )
     report = _report(_snapshot(cash=10_000.0), profile=profile,
                      policy=_policy(max_leveraged_etf_pct=0.20))
-    assert _row(report, SLEEVE_LEVERAGED).status == STATUS_POLICY_CONFLICT
+    row = _row(report, SLEEVE_LEVERAGED)
+    assert "leveraged-ETF cap" in row.policy_conflict_reason
+    # REBAL1CR-001: the conflict must not swallow the drift state. Holding
+    # nothing against a 30% target is underweight whether or not that target
+    # is reachable, and the status column is what the owner reads per row.
+    assert row.status == STATUS_UNDERWEIGHT
     assert any("leveraged" in d for d in report.disclosures)
 
 
@@ -505,7 +510,9 @@ def test_a_cash_target_below_the_reserve_floor_is_marked():
     profile = _profile(targets={SLEEVE_CASH: "5", SLEEVE_GROWTH: "45"})
     report = _report(_snapshot(cash=10_000.0), profile=profile,
                      policy=_policy(min_cash_reserve_pct=0.10))
-    assert _row(report, SLEEVE_CASH).status == STATUS_POLICY_CONFLICT
+    row = _row(report, SLEEVE_CASH)
+    assert "minimum cash reserve" in row.policy_conflict_reason
+    assert row.status == STATUS_OVERWEIGHT  # 100% cash against a 5% target
 
 
 def test_total_invested_target_above_policy_cap_is_disclosed():
@@ -514,7 +521,13 @@ def test_total_invested_target_above_policy_cap_is_disclosed():
         policy=_policy(max_total_exposure_pct=0.50),
     )
     assert all(
-        _row(report, sleeve).status == STATUS_POLICY_CONFLICT
+        "total-exposure" in _row(report, sleeve).policy_conflict_reason
+        for sleeve in SLEEVE_ORDER if sleeve != SLEEVE_CASH
+    )
+    # Every invested sleeve is empty here, so each must still read
+    # underweight rather than having its drift hidden by the conflict.
+    assert all(
+        _row(report, sleeve).status == STATUS_UNDERWEIGHT
         for sleeve in SLEEVE_ORDER if sleeve != SLEEVE_CASH
     )
     assert any("total-exposure" in text for text in report.disclosures)
@@ -525,7 +538,9 @@ def test_sleeve_target_above_combined_position_capacity_is_disclosed():
         _snapshot(cash=10_000.0),
         policy=_policy(max_position_pct=0.05),
     )
-    assert _row(report, SLEEVE_GROWTH).status == STATUS_POLICY_CONFLICT
+    growth = _row(report, SLEEVE_GROWTH)
+    assert "position-cap capacity" in growth.policy_conflict_reason
+    assert growth.status == STATUS_UNDERWEIGHT
     assert any("position-cap capacity" in text for text in report.disclosures)
 
 
@@ -618,3 +633,58 @@ def test_stage_one_emits_no_shares_sides_or_proposals():
     }
     for action_shaped in ("shares", "side", "quantity", "order", "proposal"):
         assert not any(action_shaped in f for f in fields), (action_shaped, fields)
+
+
+# --- counter-review of the independent correction ---------------------------
+
+
+def test_a_conflicted_sleeve_still_reports_its_band_state_and_breach():
+    """REBAL1CR-001. Feasibility of a target and distance from it are
+    independent facts. Letting a policy conflict occupy `status` hid the band
+    state on every conflicted sleeve, and the headline breach count only
+    counts band breaches -- so against the owner's approved profile and
+    active policy the page reported ONE breached band while six sleeves were
+    outside theirs. Understating drift on the page's most prominent number is
+    worse than any wording problem it was solving.
+    """
+    report = _report(
+        _snapshot(cash=10_000.0),
+        policy=_policy(max_total_exposure_pct=0.50, max_position_pct=0.05),
+    )
+    invested = [s for s in SLEEVE_ORDER if s != SLEEVE_CASH]
+
+    # every invested sleeve is empty against a positive target
+    assert all(_row(report, s).status == STATUS_UNDERWEIGHT for s in invested)
+    assert all(_row(report, s).policy_conflict_reason for s in invested)
+    assert report.breached_count == len(invested) + 1, (
+        "the headline must count every band breach, conflicted or not"
+    )
+    # and the conflict is still stated rather than lost
+    assert any("total-exposure" in d for d in report.disclosures)
+
+
+def test_the_owner_approved_profile_is_infeasible_under_the_active_policy():
+    """Recorded as a fact the owner needs, not as a passing detail. The
+    approved 90%-invested profile cannot be reached under a 50% total-exposure
+    cap, and growth's 40% target exceeds the 30% capacity of six names each
+    capped at 5%. The page must say so rather than presenting reachable-looking
+    bands.
+    """
+    from assistant.policy import load_policy
+
+    report = _report(_snapshot(cash=10_000.0), policy=load_policy())
+    reasons = " ".join(r.policy_conflict_reason for r in report.rows)
+    assert "total-exposure" in reasons
+    assert "position-cap capacity" in reasons
+    assert _row(report, SLEEVE_GROWTH).policy_conflict_reason
+
+
+def test_every_row_carries_a_conflict_field_even_when_unusable():
+    """The field must exist on the data-unavailable rows too, or a caller
+    that reads it has to special-case the refusal path."""
+    snapshot = dataclasses.replace(
+        _snapshot(cash=10_000.0), total_equity=0.0, total_equity_exact=None
+    )
+    report = _report(snapshot)
+    assert not report.usable
+    assert all(r.policy_conflict_reason == "" for r in report.rows)

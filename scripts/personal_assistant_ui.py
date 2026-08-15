@@ -3896,6 +3896,14 @@ if page == "Portfolio Rebalancing":
                         f"${Decimal(_row.gap_to_target_exact):,.2f}"
                     ),
                     "Status": _rb_status_labels.get(_row.status, _row.status),
+                    # REBAL1CR-001: feasibility is its own column. It used
+                    # to occupy Status and hide the band state, so a page
+                    # measuring drift reported almost none of it.
+                    "Target reachable": (
+                        "no -- " + _row.policy_conflict_reason
+                        if _row.policy_conflict_reason
+                        else "yes"
+                    ),
                 }
                 for _row in _rb_report.rows
             ],

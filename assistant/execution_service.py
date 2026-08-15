@@ -327,16 +327,29 @@ def _import_execution_broker():
     return broker
 
 
+#: Proposal families whose validity depends on the allocation profile as
+#: well as the trading policy. Keyed by evidence status so every other family
+#: returns from the context check immediately and keeps its prior behavior.
+_PROFILE_BOUND_EVIDENCE_STATUSES = frozenset(
+    {"user_directed_rebalance_buy", "user_directed_rebalance_trim"}
+)
+
+
 def _validate_proposal_context(proposal: dict) -> str | None:
     """Fail closed when a context-bound proposal outlives that context.
 
     Most proposal families are fully bound by the trading-policy fingerprint.
-    REBAL-1 steering also depends on the owner's allocation profile, which is
-    a separate preference document and therefore needs its own execution-time
-    check. The deferred import keeps the generic execution kernel independent
-    of the rebalancing feature.
+    REBAL-1 steering and trimming also depend on the owner's allocation
+    profile, which is a separate preference document and therefore needs its
+    own execution-time check. The deferred import keeps the generic execution
+    kernel independent of the rebalancing feature.
+
+    Stage 3 trims are bound for a stronger reason than Stage 2 buys. A stale
+    buy spends money toward a target the owner has since moved; a stale trim
+    SELLS toward one, realizing gains for a shape that is no longer the
+    stated intent, and no later edit can un-realize them.
     """
-    if proposal.get("evidence_status") != "user_directed_rebalance_buy":
+    if proposal.get("evidence_status") not in _PROFILE_BOUND_EVIDENCE_STATUSES:
         return None
     expected_impact = proposal.get("expected_impact")
     expected = (

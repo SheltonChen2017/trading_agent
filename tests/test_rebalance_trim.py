@@ -1,0 +1,416 @@
+"""Tax-aware trims of overweight sleeves (REBAL-1 Stage 3).
+
+Stage 3 is the first path where a rebalancing SELL originates from the app's
+own arithmetic rather than from a computed policy breach or the owner naming
+a holding. The tests here are weighted accordingly: most of them are about
+refusing.
+
+Four properties carry the safety:
+
+* the owner chooses the sleeve, ticker, amount, and lot strategy -- the app
+  chooses none of them;
+* a sale larger than the target-restoration amount is refused, because
+  trimming past target flips the sleeve underweight and hands the next
+  steering pass a shortfall to buy back, paying spread and tax both ways;
+* an incomplete tax ledger refuses the whole trim, because this stage exists
+  to show the realized-gain consequence and a trim whose tax effect is
+  unknown is exactly the pre-tax-looks-good trap this project has been
+  caught by before; and
+* a working sell already counts against the excess, so a second trim is not
+  prepared for a gap the first is already closing.
+"""
+from __future__ import annotations
+
+import dataclasses
+import json
+import sys
+from datetime import datetime, timezone
+from decimal import Decimal
+from pathlib import Path
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from assistant.context_builder import build_portfolio_snapshot, build_risk_exposure
+from assistant.policy import TradingPolicy
+from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
+from assistant.rebalance_profile import (
+    OWNER_APPROVED_PROFILE,
+    SLEEVE_CASH,
+    SLEEVE_GROWTH,
+    SLEEVE_HEDGE,
+    SLEEVE_OTHER,
+)
+from assistant.rebalance_trim import (
+    EVIDENCE_STATUS,
+    UNTRIMMABLE_SLEEVES,
+    generate_trim_proposal,
+    overweight_sleeves,
+    plan_trim,
+)
+from assistant.schemas import DecisionPacket, MarketRegime
+from assistant.tax_lots import Fill, build_ledger
+
+COVERAGE = {"complete": True, "tickers": {"MSFT": {"complete": True}}}
+
+
+def _ledger(*fills):
+    return build_ledger(list(fills) or [
+        Fill(ticker="MSFT", side="buy", qty=500, price=8.0, fill_id="old",
+             at=datetime(2024, 1, 10, tzinfo=timezone.utc)),
+        Fill(ticker="MSFT", side="buy", qty=400, price=9.0, fill_id="new",
+             at=datetime(2026, 7, 1, tzinfo=timezone.utc)),
+    ])
+
+
+def _packet(positions=None, cash=1_000.0, **kwargs):
+    snapshot = build_portfolio_snapshot(
+        positions or [
+            {"ticker": "MSFT", "shares": 900,
+             "entry_price": 8.0, "current_price": 10.0}
+        ],
+        cash=cash, **kwargs
+    )
+    return DecisionPacket(
+        generated_at="2026-08-15T12:00:00+00:00", portfolio=snapshot,
+        risk=build_risk_exposure(snapshot),
+        regime=MarketRegime(
+            benchmark_ticker="SPY", trend="uptrend", volatility_regime="low_vol",
+            trailing_volatility_pct=1.0, as_of="2026-08-14",
+        ),
+        signals=[], upcoming_events=[], warnings=[], policy_version="test",
+    )
+
+
+def _policy(**overrides):
+    fields = dict(
+        version="test", name="test", execution_mode="paper",
+        max_position_pct=1.0, max_total_exposure_pct=1.0, max_basket_pct=1.0,
+        max_leveraged_etf_pct=1.0, min_cash_reserve_pct=0.0,
+        max_order_value=500_000.0, allow_new_positions=True,
+    )
+    fields.update(overrides)
+    return TradingPolicy(**fields)
+
+
+def _plan(packet=None, sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200,
+          lot_strategy="fifo", ledger=None, coverage=COVERAGE, policy=None,
+          **kwargs):
+    return plan_trim(
+        packet or _packet(), OWNER_APPROVED_PROFILE, policy or _policy(),
+        sleeve=sleeve, ticker=ticker, shares=shares,
+        lot_strategy=lot_strategy,
+        tax_lot_ledger=_ledger() if ledger is None else ledger,
+        tax_lot_coverage=coverage, **kwargs
+    )
+
+
+# --- what may be trimmed at all ---------------------------------------------
+
+
+def test_only_sleeves_above_their_upper_band_can_be_trimmed():
+    report = evaluate_portfolio_rebalance(
+        _packet().portfolio, OWNER_APPROVED_PROFILE, policy=_policy()
+    )
+    assert overweight_sleeves(report) == [SLEEVE_GROWTH]
+
+
+def test_a_sleeve_inside_its_band_is_refused():
+    """This workflow never sells a sleeve that is inside or below its band."""
+    plan = _plan(sleeve=SLEEVE_HEDGE, ticker="GLD")
+    assert not plan.usable
+    assert any("not above its upper band" in r for r in plan.refusals)
+
+
+def test_cash_and_the_residual_can_never_be_trimmed():
+    """Cash is not a holding, and absence from the profile is never a reason
+    to sell -- the rule Stage 1 states about the residual."""
+    assert UNTRIMMABLE_SLEEVES == {SLEEVE_CASH, SLEEVE_OTHER}
+    for sleeve in (SLEEVE_CASH, SLEEVE_OTHER):
+        plan = _plan(sleeve=sleeve, ticker="AAPL")
+        assert not plan.usable
+        assert any("not a trimmable sleeve" in r for r in plan.refusals)
+
+
+def test_a_ticker_outside_the_sleeve_is_refused():
+    plan = _plan(ticker="GLD")  # a hedge name against the growth sleeve
+    assert not plan.usable
+    assert any("not a configured member" in r for r in plan.refusals)
+
+
+def test_a_ticker_that_is_not_held_is_refused():
+    plan = _plan(ticker="NVDA")  # in the growth sleeve, but not held
+    assert not plan.usable
+    assert any("not currently held" in r for r in plan.refusals)
+
+
+def test_the_app_never_chooses_the_ticker():
+    plan = _plan(ticker=None)
+    assert not plan.usable
+    assert any("does not choose one" in r for r in plan.refusals)
+
+
+# --- how much may be sold ---------------------------------------------------
+
+
+def test_both_band_landmarks_are_reported():
+    """The spec requires showing the amount above band AND the
+    target-restoration amount, because they are different decisions."""
+    plan = _plan()
+    # growth is $9,000 of a $10,000 book; upper edge 50%, target 40%
+    assert Decimal(plan.excess_above_band_exact) == Decimal("4000")
+    assert Decimal(plan.restoration_to_target_exact) == Decimal("5000")
+
+
+def test_a_sale_beyond_the_target_restoration_amount_is_refused():
+    """Trimming past target does not get ahead: it flips the sleeve
+    underweight and hands the next steering pass a shortfall to buy back."""
+    plan = _plan(shares=600)  # $6,000 against a $5,000 restoration
+    assert not plan.usable
+    assert any("restores" in r and "underweight" in r for r in plan.refusals)
+
+
+def test_a_sale_exactly_at_the_restoration_amount_is_allowed():
+    plan = _plan(shares=500)  # exactly $5,000
+    assert plan.usable, plan.refusals
+
+
+def test_selling_more_than_is_held_is_refused():
+    plan = _plan(shares=2_000)
+    assert not plan.usable
+    assert any("short the position" in r for r in plan.refusals)
+
+
+@pytest.mark.parametrize("shares", [0, -5, 1.5, "abc", None])
+def test_an_unusable_quantity_is_refused(shares):
+    plan = _plan(shares=shares)
+    assert not plan.usable
+
+
+def test_a_working_sell_already_counts_against_the_excess():
+    """Sizing against the current weight while an unfilled sell is
+    outstanding prepares a second trim for a gap the first is closing."""
+    packet = _packet(
+        open_orders=[{"ticker": "MSFT", "side": "sell", "notional": 2_000.0}]
+    )
+    plan = _plan(packet=packet, shares=200)
+    # projected growth is $7,000, so the excess and restoration both shrink
+    assert Decimal(plan.excess_above_band_exact) == Decimal("2000")
+    assert Decimal(plan.restoration_to_target_exact) == Decimal("3000")
+
+
+# --- the tax consequence ----------------------------------------------------
+
+
+def test_an_incomplete_tax_ledger_refuses_the_trim():
+    """This stage exists to show the realized gain. A trim whose tax effect
+    is unknown is the pre-tax-looks-good trap, so it refuses rather than
+    proposing with the consequence omitted."""
+    plan = _plan(coverage={"complete": False, "tickers": {}, "reason": "no fills"})
+    assert not plan.usable
+    assert any("realized" in r and "cannot be shown" in r for r in plan.refusals)
+
+
+def test_a_missing_ledger_refuses_even_when_coverage_claims_complete():
+    plan = _plan(ledger=None, coverage=COVERAGE)
+    assert plan.usable  # sanity: the default ledger works
+    plan = plan_trim(
+        _packet(), OWNER_APPROVED_PROFILE, _policy(),
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200, lot_strategy="fifo",
+        tax_lot_ledger=None, tax_lot_coverage=COVERAGE,
+    )
+    assert not plan.usable
+
+
+def test_the_lot_strategy_changes_which_lots_are_realized():
+    """FIFO takes the old cheap lot; HIFO takes the newer expensive one and
+    realizes less gain. The owner picks; the app never does."""
+    fifo = _plan(lot_strategy="fifo")
+    hifo = _plan(lot_strategy="hifo")
+    assert Decimal(fifo.realized_gain_exact) > Decimal(hifo.realized_gain_exact)
+    assert fifo.lots[0].lot_id != hifo.lots[0].lot_id
+
+
+@pytest.mark.parametrize("strategy", ["", "average", "cheapest", None])
+def test_an_unknown_lot_strategy_is_refused(strategy):
+    plan = _plan(lot_strategy=strategy)
+    assert not plan.usable
+    assert any("Lot strategy must be one of" in r for r in plan.refusals)
+
+
+def test_a_short_term_gain_is_disclosed_prominently():
+    """`config` already encodes the opposite preference for the growth
+    sleeve's scheduled trim, which fires only once a lot is long-term."""
+    plan = _plan(lot_strategy="lifo", shares=200)  # newest lot is 2026
+    assert Decimal(plan.realized_short_term_exact) > 0
+    assert any("SHORT-TERM" in d for d in plan.disclosures)
+
+
+def test_the_realized_split_sums_to_the_total():
+    plan = _plan(shares=500, lot_strategy="fifo")
+    assert (
+        Decimal(plan.realized_short_term_exact)
+        + Decimal(plan.realized_long_term_exact)
+        == Decimal(plan.realized_gain_exact)
+    )
+
+
+def test_each_lot_reports_its_holding_period():
+    plan = _plan()
+    assert plan.lots
+    for lot in plan.lots:
+        assert lot.term_if_sold_now in ("long", "short")
+        assert lot.acquired_at
+        assert Decimal(lot.quantity_taken) > 0
+
+
+# --- the remainder ----------------------------------------------------------
+
+
+#: A sleeve holding one big name and one small one. Both tests below need
+#: the trimmed ticker to be a MINOR holding, because the restoration cap
+#: makes it arithmetically impossible to sell most of a sleeve's only
+#: position: restoring a 40% target from a heavily overweight sleeve always
+#: leaves far more than a sub-one-share remainder. That is correct behaviour
+#: rather than a limitation to work around, and it is why these fixtures
+#: look the way they do.
+def _two_name_growth_sleeve(msft_shares):
+    return _packet([
+        {"ticker": "MSFT", "shares": msft_shares,
+         "entry_price": 8.0, "current_price": 10.0},
+        {"ticker": "AVGO", "shares": 900,
+         "entry_price": 8.0, "current_price": 10.0},
+    ], cash=895.0)
+
+
+def test_a_fractional_remainder_is_disclosed():
+    plan = _plan(packet=_two_name_growth_sleeve(10.5), shares=10)
+    assert plan.usable, plan.refusals
+    assert Decimal(plan.remaining_shares_exact) == Decimal("0.5")
+    assert any("less than one whole share" in d for d in plan.disclosures)
+
+
+def test_closing_the_whole_position_is_stated():
+    plan = _plan(packet=_two_name_growth_sleeve(10), shares=10)
+    assert plan.usable, plan.refusals
+    assert plan.closes_position
+    assert Decimal(plan.remaining_shares_exact) == 0
+
+
+def test_the_restoration_cap_prevents_gutting_a_sleeves_only_holding():
+    """Recorded because it is a consequence worth knowing rather than a bug:
+    with a single position carrying the whole sleeve, no sale that leaves a
+    sub-one-share remainder can ever stay inside the restoration cap."""
+    plan = _plan(shares=899)  # the 900-share single-name fixture
+    assert not plan.usable
+    assert any("restores" in r for r in plan.refusals)
+
+
+# --- proposals --------------------------------------------------------------
+
+
+def test_the_proposal_is_a_gated_sell_that_persists():
+    """REBAL2CR-001's lesson applied: the action path is checked end to end,
+    including JSON serialization, not just the in-memory object."""
+    result = generate_trim_proposal(
+        _packet(), OWNER_APPROVED_PROFILE, _policy(),
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200, lot_strategy="fifo",
+        tax_lot_ledger=_ledger(), tax_lot_coverage=COVERAGE,
+    )
+    assert result["created"]
+    proposal = result["proposal"]
+    assert proposal.status == "proposed"
+    assert proposal.intent.side == "sell"
+    assert proposal.evidence_status == EVIDENCE_STATUS
+    json.dumps(proposal.to_dict())  # must not raise
+
+
+def test_the_proposal_carries_the_profile_fingerprint_for_execution_binding():
+    result = generate_trim_proposal(
+        _packet(), OWNER_APPROVED_PROFILE, _policy(),
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200, lot_strategy="fifo",
+        tax_lot_ledger=_ledger(), tax_lot_coverage=COVERAGE,
+    )
+    impact = result["proposal"].expected_impact
+    assert impact["allocation_profile_fingerprint"]
+    assert impact["rebalance_realized_gain_exact"]
+    assert impact["rebalance_lot_strategy"] == "fifo"
+
+
+def test_execution_refuses_a_trim_from_a_non_active_profile(tmp_path):
+    """A stale trim is worse than a stale buy: it realizes gains toward a
+    shape the owner has since changed, and no later edit un-realizes them."""
+    from assistant.execution_service import validate_proposal_for_execution
+    from assistant.storage import AssistantStore
+
+    moved = dataclasses.replace(
+        OWNER_APPROVED_PROFILE,
+        targets={**dict(OWNER_APPROVED_PROFILE.targets),
+                 SLEEVE_GROWTH: "35", SLEEVE_HEDGE: "15"},
+    )
+    packet, policy = _packet(), _policy()
+    result = generate_trim_proposal(
+        packet, moved, policy,
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200, lot_strategy="fifo",
+        tax_lot_ledger=_ledger(), tax_lot_coverage=COVERAGE,
+    )
+    assert result["created"]
+    store = AssistantStore(tmp_path / "assistant.db")
+    store.save_proposal(result["proposal"].to_dict())
+
+    outcome = validate_proposal_for_execution(
+        result["proposal"].proposal_id, packet.portfolio, policy, store,
+        now_et=datetime(2026, 8, 15, 12, 0, tzinfo=timezone.utc),
+    )
+    assert not outcome.approved
+    assert "allocation profile" in str(outcome.error).lower()
+
+
+def test_the_lot_strategy_is_part_of_proposal_identity():
+    """Two trims of the same size under different strategies realize
+    different gains and are different decisions."""
+    ids = set()
+    for strategy in ("fifo", "hifo"):
+        ids.add(generate_trim_proposal(
+            _packet(), OWNER_APPROVED_PROFILE, _policy(),
+            sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200,
+            lot_strategy=strategy,
+            tax_lot_ledger=_ledger(), tax_lot_coverage=COVERAGE,
+        )["proposal"].proposal_id)
+    assert len(ids) == 2
+
+
+def test_a_refused_plan_creates_no_proposal():
+    result = generate_trim_proposal(
+        _packet(), OWNER_APPROVED_PROFILE, _policy(),
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=600, lot_strategy="fifo",
+        tax_lot_ledger=_ledger(), tax_lot_coverage=COVERAGE,
+    )
+    assert not result["created"]
+    assert "proposal" not in result
+
+
+def test_every_proposal_says_the_shape_is_unproven_and_the_tax_is_real():
+    result = generate_trim_proposal(
+        _packet(), OWNER_APPROVED_PROFILE, _policy(),
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200, lot_strategy="fifo",
+        tax_lot_ledger=_ledger(), tax_lot_coverage=COVERAGE,
+    )
+    proposal = result["proposal"]
+    joined = " ".join(proposal.uncertainties)
+    assert "not a research result" in joined
+    assert "lost some or all of its edge after it" in joined
+    assert any("Let the sleeve run" in a for a in proposal.alternatives)
+
+
+def test_the_owner_choices_are_restated_in_the_proposal():
+    result = generate_trim_proposal(
+        _packet(), OWNER_APPROVED_PROFILE, _policy(),
+        sleeve=SLEEVE_GROWTH, ticker="MSFT", shares=200, lot_strategy="hifo",
+        tax_lot_ledger=_ledger(), tax_lot_coverage=COVERAGE,
+    )
+    reasons = " ".join(result["proposal"].reasons)
+    assert "You chose MSFT" in reasons
+    assert "HIFO" in reasons
+    assert "This app selects none of those" in reasons

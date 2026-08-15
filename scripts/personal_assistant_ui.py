@@ -63,9 +63,14 @@ from assistant.allocation_proposals import (
     generate_allocation_buy_proposals,
 )
 from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
+from assistant.rebalance_trim import (
+    generate_trim_proposal,
+    overweight_sleeves as _rebalance_overweight_sleeves,
+)
 from assistant.rebalance_steering import (
     eligible_sleeves as _rebalance_eligible_sleeves,
     generate_steering_proposals,
+    steering_input_fingerprint as _steering_input_fingerprint,
     steering_input_fingerprint as _steering_input_fingerprint,
 )
 from assistant.rebalance_profile import (
@@ -4056,6 +4061,181 @@ if page == "Portfolio Rebalancing":
                             _rb_proposal, store, policy_path,
                             _rb_packet.portfolio, _rb_packet,
                         )
+        # --- Stage 3: tax-aware trims -------------------------------------
+        st.divider()
+        st.subheader("Trim an overweight sleeve")
+        st.caption(
+            "This is the only place in the app where a rebalancing SELL is "
+            "prepared from the app's own arithmetic. It shows the realized "
+            "gain before you approve, refuses to sell past your target, and "
+            "refuses entirely when the tax lots are incomplete. You choose "
+            "the ticker, the amount, and the lot strategy."
+        )
+
+        _rb_over = _rebalance_overweight_sleeves(_rb_report)
+        if not _rb_over:
+            st.info(
+                "No sleeve is above its upper band, so there is nothing to "
+                "trim."
+            )
+        else:
+            _rb_trim_sleeve = st.selectbox(
+                "Overweight sleeve",
+                options=[SLEEVE_LABELS.get(s, s) for s in _rb_over],
+                key="rb_trim_sleeve",
+            )
+            _rb_sleeve_key = next(
+                s for s in _rb_over
+                if SLEEVE_LABELS.get(s, s) == _rb_trim_sleeve
+            )
+            _rb_trim_row = next(
+                r for r in _rb_report.rows if r.sleeve == _rb_sleeve_key
+            )
+            _rb_held = sorted(
+                p.ticker.upper() for p in _rb_packet.portfolio.positions
+                if _rebalance_sleeve_membership().get(p.ticker.upper())
+                == _rb_sleeve_key
+            )
+            _rb_trim_ticker = st.selectbox(
+                "Ticker to trim",
+                options=["-- choose --", *_rb_held],
+                key="rb_trim_ticker",
+                help="This app does not choose which holding to sell.",
+            )
+            _rb_trim_strategy = st.selectbox(
+                "Lot strategy",
+                options=["-- choose --", "fifo", "lifo", "hifo"],
+                key="rb_trim_strategy",
+                help=(
+                    "HIFO sells the highest-cost lots first and realizes the "
+                    "least gain. This app records your choice; it does not "
+                    "instruct the broker."
+                ),
+            )
+            _rb_trim_shares = st.number_input(
+                "Shares to sell",
+                min_value=0.0, value=0.0, step=1.0,
+                key="rb_trim_shares",
+            )
+
+            _rb_ready = (
+                _rb_trim_ticker != "-- choose --"
+                and _rb_trim_strategy != "-- choose --"
+                and _rb_trim_shares > 0
+            )
+            if st.button(
+                "Check what this trim would realize",
+                type="primary",
+                disabled=not _rb_ready,
+                key="rb_trim_check",
+            ):
+                _rb_ledger, _rb_coverage = tax_ledger_with_coverage(
+                    store, _rb_packet.portfolio
+                )
+                _rb_shares_arg = (
+                    int(_rb_trim_shares)
+                    if _rb_policy.whole_shares_only
+                    else _rb_trim_shares
+                )
+                _rb_trim_result = generate_trim_proposal(
+                    _rb_packet, OWNER_APPROVED_PROFILE, _rb_policy,
+                    sleeve=_rb_sleeve_key, ticker=_rb_trim_ticker,
+                    shares=_rb_shares_arg, lot_strategy=_rb_trim_strategy,
+                    tax_lot_ledger=_rb_ledger, tax_lot_coverage=_rb_coverage,
+                )
+                _rb_trim_plan = _rb_trim_result["plan"]
+                if _rb_trim_result["created"]:
+                    store.save_proposal(_rb_trim_result["proposal"].to_dict())
+                    st.session_state["rb_trim_proposal"] = _rb_trim_result[
+                        "proposal"
+                    ].to_dict()
+                    st.session_state["rb_trim_signature"] = (
+                        _steering_input_fingerprint(
+                            _rb_packet, _rb_report, _rb_policy,
+                            selections={_rb_sleeve_key: _rb_trim_ticker},
+                            budget=_rb_trim_shares,
+                        ) + f"|{_rb_trim_strategy}"
+                    )
+                    st.session_state["rb_trim_plan"] = {
+                        "excess": _rb_trim_plan.excess_above_band_exact,
+                        "restoration": _rb_trim_plan.restoration_to_target_exact,
+                        "gain": _rb_trim_plan.realized_gain_exact,
+                        "short": _rb_trim_plan.realized_short_term_exact,
+                        "long": _rb_trim_plan.realized_long_term_exact,
+                        "remaining": _rb_trim_plan.remaining_shares_exact,
+                        "lots": [
+                            {
+                                "Lot": lot.lot_id,
+                                "Acquired": lot.acquired_at[:10],
+                                "Term": lot.term_if_sold_now,
+                                "Days to long-term": lot.days_to_long_term,
+                                "Shares sold": lot.quantity_taken,
+                                "Cost/share": f"${Decimal(lot.cost_per_share):,.2f}",
+                                "Realized": f"${Decimal(lot.realized_gain_exact):,.2f}",
+                            }
+                            for lot in _rb_trim_plan.lots
+                        ],
+                        "disclosures": list(_rb_trim_plan.disclosures),
+                    }
+                else:
+                    st.session_state.pop("rb_trim_proposal", None)
+                    st.session_state.pop("rb_trim_signature", None)
+                    st.session_state.pop("rb_trim_plan", None)
+                    st.error(_rb_trim_result["reason"])
+
+            _rb_trim_stored = st.session_state.get("rb_trim_proposal")
+            if _rb_trim_stored:
+                _rb_trim_now = (
+                    _steering_input_fingerprint(
+                        _rb_packet, _rb_report, _rb_policy,
+                        selections={_rb_sleeve_key: _rb_trim_ticker},
+                        budget=_rb_trim_shares,
+                    ) + f"|{_rb_trim_strategy}"
+                )
+                if st.session_state.get("rb_trim_signature") != _rb_trim_now:
+                    st.info(
+                        "A trim proposal is waiting on the Propose & Approve "
+                        "page, but it no longer matches the current profile, "
+                        "snapshot, working orders, ticker, amount, or lot "
+                        "strategy. Check again to size a new one."
+                    )
+                else:
+                    _rb_shown = st.session_state.get("rb_trim_plan", {})
+                    for _rb_note in _rb_shown.get("disclosures", []):
+                        st.warning(_rb_note)
+                    _rb_t1, _rb_t2, _rb_t3 = st.columns(3)
+                    _rb_t1.metric(
+                        "Above band",
+                        f"${Decimal(_rb_shown.get('excess', '0')):,.2f}",
+                    )
+                    _rb_t2.metric(
+                        "Restores target",
+                        f"${Decimal(_rb_shown.get('restoration', '0')):,.2f}",
+                    )
+                    _rb_t3.metric(
+                        "Realized gain",
+                        f"${Decimal(_rb_shown.get('gain', '0')):,.2f}",
+                        delta=(
+                            f"${Decimal(_rb_shown.get('short', '0')):,.2f} "
+                            "short-term"
+                        ),
+                        delta_color="inverse",
+                    )
+                    if _rb_shown.get("lots"):
+                        st.caption("LOTS THIS SALE WOULD REALIZE")
+                        st.dataframe(
+                            _rb_shown["lots"], hide_index=True, width="stretch"
+                        )
+                    st.caption(
+                        "Shares remaining after this sale: "
+                        f"{_rb_shown.get('remaining', '0')}"
+                    )
+                    _render_proposal_approval(
+                        _rb_trim_stored, store, policy_path,
+                        _rb_packet.portfolio, _rb_packet,
+                    )
+
+
 
 
 

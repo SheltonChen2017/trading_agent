@@ -326,3 +326,87 @@ def test_the_steering_section_offers_no_submit_all_control(_offline):
     labels = [str(b.label).lower() for b in app.button]
     assert not any("submit all" in label for label in labels), labels
     assert not any("sell" in label for label in labels), labels
+
+
+# --- Stage 3 on the same page -----------------------------------------------
+
+
+def test_the_trim_section_appears_only_when_a_sleeve_is_overweight(
+    _offline, monkeypatch
+):
+    """When nothing trimmable is overweight the app says so and offers no
+    sell control at all.
+
+    The book is FORCED rather than assumed: without Alpaca credentials the
+    app falls back to the sample portfolio, whose growth sleeve sits at 61%
+    and is genuinely overweight. An earlier version of this test assumed an
+    empty book and would have passed for the wrong reason.
+    """
+    import assistant.context_builder as context_builder
+
+    real_builder = context_builder.build_portfolio_snapshot
+
+    def _growth_on_target(positions, cash, **kwargs):
+        # $4,000 of growth in a $10,000 book is exactly the 40% target, so
+        # the only overweight sleeve is cash, which is never trimmable.
+        return real_builder(
+            [{"ticker": "MSFT", "shares": 400,
+              "entry_price": 8.0, "current_price": 10.0}],
+            cash=6_000.0, **kwargs
+        )
+
+    monkeypatch.setattr(
+        context_builder, "build_portfolio_snapshot", _growth_on_target
+    )
+    app = _rebalancing()
+    assert not app.exception, app.exception
+    assert "nothing to trim" in _text(app)
+    assert not [b for b in app.button if b.key == "rb_trim_check"]
+
+
+def test_the_trim_section_never_chooses_ticker_amount_or_lot_strategy(
+    _offline, monkeypatch
+):
+    import assistant.context_builder as context_builder
+
+    real_builder = context_builder.build_portfolio_snapshot
+
+    def _overweight_growth(positions, cash, **kwargs):
+        return real_builder(
+            list(positions) + [
+                {"ticker": "MSFT", "shares": 900,
+                 "entry_price": 8.0, "current_price": 10.0}
+            ],
+            cash=1_000.0, **kwargs
+        )
+
+    monkeypatch.setattr(
+        context_builder, "build_portfolio_snapshot", _overweight_growth
+    )
+    app = _rebalancing()
+    assert not app.exception, app.exception
+
+    keys = {str(s.key): s for s in app.selectbox}
+    assert "rb_trim_ticker" in keys and "rb_trim_strategy" in keys
+    assert keys["rb_trim_ticker"].value == "-- choose --"
+    assert keys["rb_trim_strategy"].value == "-- choose --"
+    shares = [n for n in app.number_input if n.key == "rb_trim_shares"]
+    assert shares and shares[0].value == 0.0
+    check = [b for b in app.button if b.key == "rb_trim_check"]
+    assert check and check[0].disabled, (
+        "nothing may be sized until the owner has chosen all three"
+    )
+
+
+def test_the_page_still_offers_no_submit_all_after_stage_three(_offline):
+    app = _rebalancing()
+    labels = [str(b.label).lower() for b in app.button]
+    assert not any("submit all" in label for label in labels), labels
+
+
+def test_the_trim_section_says_it_is_the_only_app_originated_sell(_offline):
+    """The page must not let a rebalancing sell look like every other sell
+    here, which is either a policy breach or the owner naming a holding."""
+    rendered = _text(_rebalancing())
+    assert "only place in the app where a rebalancing SELL" in rendered
+    assert "realized gain before you approve" in rendered

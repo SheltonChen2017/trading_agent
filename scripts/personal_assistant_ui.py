@@ -66,6 +66,7 @@ from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
 from assistant.rebalance_trim import (
     generate_trim_proposal,
     overweight_sleeves as _rebalance_overweight_sleeves,
+    untrimmable_overweight_sleeves as _rebalance_untrimmable_overweight,
 )
 from assistant.rebalance_steering import (
     eligible_sleeves as _rebalance_eligible_sleeves,
@@ -4107,10 +4108,33 @@ if page == "Portfolio Rebalancing":
 
         _rb_over = _rebalance_overweight_sleeves(_rb_report)
         if not _rb_over:
-            st.info(
-                "No sleeve is above its upper band, so there is nothing to "
-                "trim."
+            # An empty trimmable list has two very different causes,
+            # and reporting the wrong one contradicts the breach count
+            # in the headline above: a reader told "no sleeve is above
+            # its upper band" while the page also reports six breaches
+            # has to conclude one of the two is broken.
+            _rb_over_untrimmable = _rebalance_untrimmable_overweight(
+                _rb_report
             )
+            if _rb_over_untrimmable:
+                _rb_names = ", ".join(
+                    SLEEVE_LABELS.get(s, s) for s in _rb_over_untrimmable
+                )
+                st.info(
+                    f"Nothing here can be trimmed. {_rb_names} "
+                    f"{'is' if len(_rb_over_untrimmable) == 1 else 'are'} "
+                    "above the upper band, but this workflow never trims "
+                    "either one: cash is not a holding, and the residual "
+                    "is the set of positions your profile does not "
+                    "describe -- absence from the profile is never a "
+                    "reason to sell. Every sleeve the profile DOES "
+                    "describe is inside or below its band."
+                )
+            else:
+                st.info(
+                    "No sleeve is above its upper band, so there is "
+                    "nothing to trim."
+                )
         else:
             _rb_trim_sleeve = st.selectbox(
                 "Overweight sleeve",

@@ -60,7 +60,37 @@ def test_the_smoke_test_places_no_orders_by_construction(path):
     )
 
 
+EXEMPTION_MARKER = "NO ALPHA STATISTIC"
+LOOK_MARKER = "counted research look"
+
+
+def _claims_exemption(path: Path) -> bool:
+    return EXEMPTION_MARKER in path.read_text(encoding="utf-8")
+
+
 @pytest.mark.parametrize("path", LEAN_FILES, ids=lambda p: p.name)
+def test_every_lean_file_declares_its_look_status(path):
+    """A file is either exempt or a counted look, and must say which.
+
+    The alpha battery legitimately computes IC and decile spreads, so the
+    blanket "no file may compute a statistic" rule would have to be
+    weakened to admit it. Weakening a guard to fit new code is how guards
+    stop meaning anything, so the rule is restated at the level that
+    actually matters: a file claiming exemption must BE inert, and a file
+    that is not inert must declare that running it costs a look.
+    """
+    text = path.read_text(encoding="utf-8")
+    exempt = EXEMPTION_MARKER in text
+    counted = LOOK_MARKER in text
+    assert exempt != counted, (
+        f"{path.name} must declare exactly one of "
+        f"{EXEMPTION_MARKER!r} (inert) or {LOOK_MARKER!r} (costs a look); "
+        f"exempt={exempt} counted={counted}"
+    )
+
+
+@pytest.mark.parametrize("path", [p for p in LEAN_FILES if _claims_exemption(p)],
+                         ids=lambda p: p.name)
 def test_the_smoke_test_computes_no_alpha_statistic(path):
     """Checked against CODE, not prose.
 

@@ -1,4 +1,6 @@
 {
+  "independent_review_status": "invalidated_2026-08-16_pending_clean_rerun",
+  "independent_review_reason": "bootstrap resolution could not cross the declared threshold; long-short side flips were omitted from turnover",
   "generated_for": "docs/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md",
   "point_in_time_data": false,
   "price_source": "yfinance adjusted closes (exploratory)",

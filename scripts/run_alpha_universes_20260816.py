@@ -26,6 +26,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from backtest.engine import bonferroni_threshold  # noqa: E402
 from data.pit_universe import (  # noqa: E402
+    UNIVERSE_SCHEMA_VERSION,
     usable_price_columns,
     winsorize_by_date,
 )
@@ -36,12 +37,11 @@ from ml.evaluation import (  # noqa: E402
 from scripts.run_alpha_battery_20260815 import (  # noqa: E402
     COST_BPS,
     ENTRY_LAG,
-    alpha_industry_adjusted_reversal,
     alpha_momentum,
     alpha_reversal,
     net_of_costs,
+    one_way_turnover,
     performance,
-    residual_momentum,
     stationary_bootstrap_p,
 )
 
@@ -58,6 +58,11 @@ def load_panels(cache: Path):
     closes = pd.read_parquet(cache / "prices.parquet")
     volumes = pd.read_parquet(cache / "volumes.parquet")
     membership = pd.read_parquet(cache / "membership.parquet")
+    versions = set(membership.get("universe_schema_version", pd.Series(dtype=int)).dropna())
+    if versions != {UNIVERSE_SCHEMA_VERSION}:
+        raise SystemExit(
+            "membership cache predates the reviewed universe schema; rebuild it before running alphas"
+        )
     closes.index = pd.to_datetime(closes.index)
     volumes = volumes.reindex(index=closes.index, columns=closes.columns)
     membership["as_of"] = pd.to_datetime(membership["as_of"])
@@ -173,7 +178,7 @@ def evaluate_universe(
 
 def _portfolio(frame: pd.DataFrame, construction: str, fraction: float):
     returns, turnovers, counts = {}, {}, []
-    previous: set[str] = set()
+    previous: dict[str, float] | None = None
     for date, group in frame.groupby("as_of_session", sort=True):
         ranked = group.sort_values("score", ascending=False)
         cut = max(1, int(round(len(ranked) * fraction)))
@@ -181,16 +186,19 @@ def _portfolio(frame: pd.DataFrame, construction: str, fraction: float):
         if construction == "long_short":
             shorts = ranked.iloc[-cut:]
             value = 0.5 * longs["outcome"].mean() - 0.5 * shorts["outcome"].mean()
-            held = set(longs["ticker"]) | set(shorts["ticker"])
+            weights = {
+                **{str(ticker): 0.5 / len(longs) for ticker in longs["ticker"]},
+                **{str(ticker): -0.5 / len(shorts) for ticker in shorts["ticker"]},
+            }
         else:
             value = longs["outcome"].mean()
-            held = set(longs["ticker"])
+            weights = {str(ticker): 1.0 / len(longs) for ticker in longs["ticker"]}
         if not np.isfinite(value):
             continue
         returns[date] = float(value)
-        turnovers[date] = 1.0 if not previous else len(held - previous) / max(1, len(held))
-        counts.append(len(held))
-        previous = held
+        turnovers[date] = one_way_turnover(previous, weights)
+        counts.append(len(weights))
+        previous = weights
     return pd.Series(returns).sort_index(), pd.Series(turnovers).sort_index(), counts
 
 
@@ -271,8 +279,10 @@ def classify(cells: dict) -> str:
         return "SMALL-CAP DEPENDENT"
     if a < 0.2 <= b and c >= b:
         return "CORE-DEPENDENT"
-    if a > 0 and b > 0 and c > 0:
+    if a >= 0.2 and b >= 0.2 and c >= 0.2 and min(a, b, c) >= 0.5 * max(a, b, c):
         return "ROBUST"
+    if a >= 0.2 and b < max(0.1, 0.5 * a) and c < max(0.1, 0.5 * a):
+        return "LARGE-CAP DEPENDENT"
     return "REJECT"
 
 
@@ -304,6 +314,18 @@ def main(argv: list[str] | None = None) -> int:
     results: dict = {}
     for name, schedule, horizon, min_history, builder in specs:
         print(f"[{name}]", flush=True)
+        if builder is None:
+            reason = (
+                "not run: the submitted panel has no point-in-time industry "
+                "classification; substituting latest size buckets leaks future information"
+            )
+            results[name] = {
+                universe: {"usable": False, "reason": reason}
+                for universe in ("A_large", "B_core", "C_broad")
+            }
+            results[name]["classification"] = "INCOMPLETE"
+            print(f"   {reason}", flush=True)
+            continue
         if builder is not None:
             scores = builder(closes)
         else:
@@ -311,15 +333,7 @@ def main(argv: list[str] | None = None) -> int:
         cells = {}
         for universe in ("A_large", "B_core", "C_broad"):
             mask = membership_mask(membership, universe, closes)
-            if scores is None:
-                sectors = _sector_proxy(membership, universe)
-                if name.startswith("RESIDUAL"):
-                    months = 6 if "_6_" in name else 12
-                    built = residual_momentum(closes, months, sectors)
-                else:
-                    built = alpha_industry_adjusted_reversal(closes, 5, sectors)
-            else:
-                built = scores
+            built = scores
             dates = month_ends if schedule == "monthly" else closes.index[::horizon]
             ppy = 12.0 if schedule == "monthly" else 252.0 / horizon
             cells[universe] = evaluate_universe(
@@ -343,31 +357,22 @@ def main(argv: list[str] | None = None) -> int:
     artifact = {
         "specification": "docs/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md",
         "declared_looks": DECLARED_LOOKS,
+        "actual_looks_after_review_exclusions": 27,
         "bonferroni_threshold": bonferroni_threshold(DECLARED_LOOKS),
         "cumulative_looks": CUMULATIVE_LOOKS,
         "cumulative_threshold": bonferroni_threshold(CUMULATIVE_LOOKS),
-        "point_in_time_membership": True,
+        "point_in_time_membership": False,
         "point_in_time_prices": False,
-        "survivorship_bias": "membership includes only companies with a current ticker; "
-                             "delisted names have no price history",
+        "membership_limitations": (
+            "share counts use SEC filing dates, but historical ticker identity, venue, "
+            "security type, delisted prices and delisting returns are unavailable"
+        ),
         "results": results,
     }
     Path(args.output).write_text(json.dumps(artifact, indent=2, default=str), encoding="utf-8")
     print(f"\nwrote {args.output}")
     _print_table(results)
     return 0
-
-
-def _sector_proxy(membership: pd.DataFrame, universe: str) -> dict[str, str]:
-    """Size bucket as the grouping for residualisation.
-
-    An honest downgrade: EDGAR SIC codes were not ingested in this pass, so
-    the "industry" leg groups by size bucket instead. Named plainly here
-    rather than left to look like a sector model.
-    """
-    subset = membership[membership["universe"] == universe]
-    latest = subset.sort_values("as_of").drop_duplicates("ticker", keep="last")
-    return dict(zip(latest["ticker"], latest["size_bucket"].fillna("unknown")))
 
 
 def _capacity_for(scores, closes, membership, mask, dates, horizon, history, min_history):

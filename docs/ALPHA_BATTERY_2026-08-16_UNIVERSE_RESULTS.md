@@ -3,8 +3,17 @@
 Date: 2026-08-16
 Specification: `docs/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md`
 (frozen before the run; deviations recorded in its section 6)
-Status: **Exploratory. Nothing confirmed. No trade, allocation or policy
-change is authorized by anything here.**
+Status: **INVALIDATED BY INDEPENDENT REVIEW (2026-08-16).** The submitted
+universe was not point-in-time: it multiplied split-adjusted prices by
+unadjusted share counts for market cap, guessed availability as period end +
+90 days instead of using the SEC filing date, used today's ticker map, and
+called an unpriced-filer join gap “survivorship loss” before those filers had
+passed the price/cap/liquidity screens. The residual and industry-adjusted
+signals also used each ticker's latest size bucket throughout history, leaking
+future classification. The p-value and long/short turnover defects from the
+first runner apply here too. Every numerical conclusion below is retained only
+as the original audit record and requires a clean rerun. No trade, allocation
+or policy change is authorized by anything here.
 
 Panel: 4,329 sessions x 3,793 tickers after the data-quality screen
 dropped 725 corrupt series. Universe medians per rebalance: **A 409,

@@ -125,3 +125,14 @@ missing, and no result here has prospective out-of-sample evidence.
 
 Nothing in this battery authorizes any trade, proposal, allocation change,
 policy change, deployment, or epoch action.
+
+---
+
+## Independent-review addendum (2026-08-16; not part of the frozen spec)
+
+The pre-registration was committed before results and its conservative
+105-look threshold is retained. The submitted runner did not implement all 35
+primary looks and, more importantly, its 2,000-draw bootstrap could not produce
+a p-value below the frozen 0.000476 gate. Its set-based turnover also missed
+long/short side flips. The resulting artifact is invalidated pending a clean
+rerun with the reviewed code; this addendum does not rewrite the frozen plan.

@@ -17,20 +17,18 @@ What this module gets right
 ---------------------------
 * `cik` is the primary key, never the ticker. A ticker change does not
   create a new company here, which is what the specification asks for.
-* Shares outstanding come from the filing that reported them, so market
-  cap at T uses the share count a market participant could have known.
-* A publication lag is applied. A period-end value is NOT treated as
-  knowable on the period-end date; see `PUBLICATION_LAG_DAYS`.
+* Shares outstanding become usable on the SEC frame's actual `filed` date,
+  never from the fact's period end or a guessed publication date.
 * Foreign issuers are excluded by filer location, which is the closest
   available proxy for the specification's ADR exclusion.
 
 What this module CANNOT do, and callers must not pretend otherwise
 ------------------------------------------------------------------
-* **Prices for delisted securities are unavailable.** EDGAR supplies
-  membership for dead companies; the price provider does not supply their
-  bars. `UniverseSnapshot.missing_price_ciks` reports exactly how many
-  eligible companies were lost this way on every date, so the survivorship
-  gap is measured on each rebalance rather than assumed away.
+* **Prices for delisted securities are unavailable.** EDGAR supplies facts
+  for dead companies; the current ticker map and price provider do not
+  supply their bars. The resulting coverage gap is measured, but it is not
+  an estimate of survivorship loss because the unpriced filers cannot pass
+  the price, market-cap, liquidity, venue, or security-type screens.
 * No delisting returns, so a company that leaves the universe leaves
   without a final return. This biases results upward and the size of the
   bias is not knowable from this data.
@@ -61,14 +59,8 @@ EDGAR_FRAME = (
 USER_AGENT = "trading_agent research (trunkunala.xc@gmail.com)"
 REQUEST_INTERVAL_SECONDS = 0.15
 
-#: A period-end value is not public on the period-end date. Domestic
-#: filers have 40-45 days for a 10-Q and 60-90 for a 10-K, so 90 calendar
-#: days is the conservative choice: it can only ever make the universe
-#: know LESS than a real participant did, never more. Erring the other way
-#: would put unpublished share counts into historical market caps.
-PUBLICATION_LAG_DAYS = 90
-
 SHARES_TAG = ("dei", "EntityCommonStockSharesOutstanding", "shares")
+UNIVERSE_SCHEMA_VERSION = 2
 
 # Universe definitions, exactly as specified. Kept as data so a caller
 # cannot quietly invent a fourth universe with more favourable screens.
@@ -93,10 +85,10 @@ class UniverseError(RuntimeError):
 class UniverseSnapshot:
     """Membership on one rebalance date, with its own audit trail.
 
-    `missing_price_ciks` is not a diagnostic afterthought. It is the
-    measured size of the survivorship gap on this date: companies that
-    passed every point-in-time screen and were dropped only because no
-    price series exists for them today.
+    The two coverage fields describe the join from historical SEC filers to
+    today's ticker/price coverage. They deliberately do not call the gap
+    survivorship loss: without historical prices the missing filers cannot
+    be tested against the universe's remaining screens.
     """
 
     as_of: pd.Timestamp
@@ -105,13 +97,13 @@ class UniverseSnapshot:
     ciks: tuple[int, ...]
     market_caps: Mapping[str, float]
     adv20: Mapping[str, float]
-    eligible_before_price_join: int
-    missing_price_ciks: int
+    candidate_filers_before_price_join: int
+    missing_current_ticker_or_price: int
 
     @property
-    def survivorship_loss_fraction(self) -> float:
-        total = self.eligible_before_price_join
-        return 0.0 if total <= 0 else self.missing_price_ciks / total
+    def price_coverage_gap_fraction(self) -> float:
+        total = self.candidate_filers_before_price_join
+        return 0.0 if total <= 0 else self.missing_current_ticker_or_price / total
 
 
 # --- EDGAR access ----------------------------------------------------------
@@ -120,9 +112,9 @@ class UniverseSnapshot:
 def _get_json(url: str, cache_dir: Path, *, cache_key: str) -> dict:
     """Fetch with an on-disk cache.
 
-    The cache exists because these responses are IMMUTABLE history: a
-    completed quarter's frame does not change, so re-downloading it on
-    every run would be pure waste and extra load on a public service.
+    The cache freezes the exact provider response used by a run. Completed
+    quarterly frames are historical inputs; the current ticker map is not
+    point-in-time and the caller must disclose that limitation.
     """
     cache_dir.mkdir(parents=True, exist_ok=True)
     path = cache_dir / f"{cache_key}.json"
@@ -150,10 +142,9 @@ def fetch_shares_outstanding(
 ) -> pd.DataFrame:
     """Every company's reported share count, per quarter, with its filing.
 
-    Returns columns: cik, entity, loc, period_end, known_from, shares.
-    `known_from` is the date the value becomes usable, i.e. period end
-    plus the publication lag. Nothing downstream may read `period_end`
-    directly.
+    Returns columns: cik, entity, loc, period_end, known_from, accession,
+    shares. `known_from` is the SEC filing date. Facts without a verifiable
+    filing date are excluded rather than assigned a guessed availability.
     """
     taxonomy, tag, unit = SHARES_TAG
     rows: list[dict] = []
@@ -168,24 +159,32 @@ def fetch_shares_outstanding(
         for record in payload.get("data", []):
             end = record.get("end")
             value = record.get("val")
-            if not end or not value or value <= 0:
+            filed = record.get("filed")
+            if not end or not filed or not value or value <= 0:
+                continue
+            period_end = pd.to_datetime(end, errors="coerce")
+            known_from = pd.to_datetime(filed, errors="coerce")
+            if pd.isna(period_end) or pd.isna(known_from) or known_from < period_end:
                 continue
             rows.append({
                 "cik": int(record["cik"]),
                 "entity": record.get("entityName", ""),
                 "loc": record.get("loc", ""),
-                "period_end": pd.Timestamp(end),
+                "period_end": period_end,
+                "known_from": known_from,
+                "accession": str(record.get("accn", "")),
                 "shares": float(value),
             })
     if not rows:
         raise UniverseError("EDGAR returned no shares-outstanding facts")
     frame = pd.DataFrame(rows)
-    frame["known_from"] = frame["period_end"] + pd.Timedelta(days=PUBLICATION_LAG_DAYS)
-    # Same company and period can appear via amended filings; keep the
-    # first knowable value rather than the latest revision, because a
-    # later revision was NOT available at the earlier date.
-    frame = (frame.sort_values(["cik", "period_end", "shares"])
-                  .drop_duplicates(["cik", "period_end"], keep="first"))
+    # Preserve later amendments: `shares_as_of` may use them only after
+    # their own filing date. Remove exact frame duplicates deterministically.
+    frame = (frame.sort_values(["cik", "known_from", "accession", "shares"])
+                  .drop_duplicates(
+                      ["cik", "period_end", "known_from", "accession", "shares"],
+                      keep="first",
+                  ))
     return frame.sort_values(["cik", "known_from"]).reset_index(drop=True)
 
 
@@ -229,7 +228,8 @@ def shares_as_of(shares: pd.DataFrame, as_of: pd.Timestamp) -> pd.Series:
     usable = shares[shares["known_from"] <= as_of]
     if usable.empty:
         return pd.Series(dtype=float)
-    latest = usable.sort_values("known_from").drop_duplicates("cik", keep="last")
+    latest = (usable.sort_values(["known_from", "period_end", "accession"])
+                    .drop_duplicates("cik", keep="last"))
     return latest.set_index("cik")["shares"]
 
 
@@ -240,6 +240,7 @@ def build_snapshot(
     shares: pd.DataFrame,
     ticker_map: pd.DataFrame,
     closes: pd.DataFrame,
+    screen_closes: pd.DataFrame,
     dollar_volume_20: pd.DataFrame,
     min_history_days: int,
     history_counts: pd.Series | None = None,
@@ -255,16 +256,22 @@ def build_snapshot(
         raise UniverseError(f"unknown universe {universe!r}")
     if as_of not in closes.index:
         raise UniverseError(f"{as_of.date()} is not a session in the price panel")
+    if as_of not in screen_closes.index:
+        raise UniverseError(f"{as_of.date()} is not a session in the screening-price panel")
 
     known_shares = shares_as_of(shares, as_of)
     if known_shares.empty:
         return UniverseSnapshot(as_of, universe, (), (), {}, {}, 0, 0)
 
     cik_to_ticker = ticker_map.set_index("cik")["ticker"]
-    price_row = closes.loc[as_of]
+    # Adjusted closes are appropriate for return calculations, but not for
+    # market capitalisation. Historical share counts must be multiplied by
+    # the contemporaneous unadjusted close, otherwise a later split changes
+    # an earlier company's apparent size.
+    price_row = screen_closes.loc[as_of]
     adv_row = dollar_volume_20.loc[as_of]
 
-    eligible = 0
+    candidates = 0
     missing_price = 0
     tickers: list[str] = []
     ciks: list[int] = []
@@ -273,18 +280,18 @@ def build_snapshot(
     for cik, share_count in known_shares.items():
         ticker = cik_to_ticker.get(cik)
         if ticker is None or ticker not in closes.columns:
-            # Eligible on EDGAR, unpriceable today. This is the
-            # survivorship gap, counted rather than skipped quietly.
-            eligible += 1
+            # Historical SEC filer without today's ticker/price coverage.
+            # Count the join gap without calling it universe eligibility.
+            candidates += 1
             missing_price += 1
             continue
         price = price_row.get(ticker)
         adv = adv_row.get(ticker)
         if price is None or not pd.notna(price) or not pd.notna(adv):
-            eligible += 1
+            candidates += 1
             missing_price += 1
             continue
-        eligible += 1
+        candidates += 1
         market_cap = float(price) * float(share_count)
         if float(price) < spec["min_price"]:
             continue
@@ -307,8 +314,8 @@ def build_snapshot(
         ciks=tuple(ciks[i] for i in order),
         market_caps=dict(caps),
         adv20=dict(advs),
-        eligible_before_price_join=eligible,
-        missing_price_ciks=missing_price,
+        candidate_filers_before_price_join=candidates,
+        missing_current_ticker_or_price=missing_price,
     )
 
 

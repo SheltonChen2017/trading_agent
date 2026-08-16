@@ -1,4 +1,10 @@
 {
+  "_review_status": {
+    "status": "INVALIDATED",
+    "reviewed_on": "2026-08-16",
+    "correction_commit": "e8eb558",
+    "reason": "Result-changing return-normalization, entry timing, delisting, residual-regression, turnover, and multiplicity defects; fresh QuantConnect rerun required."
+  },
   "declared_looks": 135,
   "bonferroni_threshold": 0.0003703703703703704,
   "bootstrap_draws": 20000,

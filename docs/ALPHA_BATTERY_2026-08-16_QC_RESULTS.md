@@ -1,11 +1,23 @@
 # QuantConnect alpha battery — results
 
+> **INVALIDATED BY INDEPENDENT REVIEW (2026-08-16).** The statistics and
+> conclusions below were produced by code that used raw, split-affected bars
+> for returns; entered on the scoring close instead of the next session;
+> counted non-session `OnData` calls as short holding days; omitted terminal
+> delisting outcomes; implemented residual momentum differently from Method
+> V2; reused long-short turnover for long-only portfolios; and omitted IC
+> from the multiplicity family. The benchmark was neither date- nor
+> cost-matched. These artifacts remain only as audit history. **Do not cite
+> any pass, null, profitability, benchmark, or survivorship conclusion from
+> this document.** Correction `e8eb558` requires a fresh independent
+> QuantConnect rerun; no corrected cloud result exists yet.
+
 Date: 2026-08-16
 Author: Claude
 Specification: `docs/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
 (frozen and committed before any result was observed)
 Governing method: `docs/ALPHA_BATTERY_METHOD_V2.md`
-Status: **Exploratory. One specification clears the pre-declared threshold
+Historical submitted status (now void): **Exploratory. One specification clears the pre-declared threshold
 and is described below with the reasons to doubt it. Nothing here
 authorizes a trade, allocation, policy change, deployment, or epoch
 action.**

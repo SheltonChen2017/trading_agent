@@ -1,5 +1,12 @@
 # QuantConnect smoke tests — findings
 
+> **PROVENANCE LIMIT (independent review, 2026-08-16):** This historical
+> report did not commit the QuantConnect project/backtest IDs or hashes of the
+> retrieved logs. Its qualitative observations are retained, but another
+> reviewer cannot link them to exact cloud snapshots from Git alone. Future
+> result analysis now refuses to run without exact backtest IDs and records
+> every input log hash (`e8eb558`).
+
 Date: 2026-08-16
 Author: Claude
 Method: `docs/ALPHA_BATTERY_METHOD_V2.md` step 4

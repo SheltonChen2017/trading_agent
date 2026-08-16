@@ -1,4 +1,10 @@
 {
+  "_review_status": {
+    "status": "INVALIDATED",
+    "reviewed_on": "2026-08-16",
+    "correction_commit": "e8eb558",
+    "reason": "Benchmark used raw returns, same-close entry, no terminal delisting arithmetic, no turnover costs, and a mismatched observation window."
+  },
   "A_large": {
     "periods": 155,
     "performance": {

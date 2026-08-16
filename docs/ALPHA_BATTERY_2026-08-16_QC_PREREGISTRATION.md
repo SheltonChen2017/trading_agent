@@ -1,5 +1,14 @@
 # QuantConnect alpha battery — pre-registration
 
+> **POST-RUN AUDIT NOTE (2026-08-16):** This file is preserved as the frozen
+> historical declaration, not edited into a claim that the submitted run
+> followed it. Independent review found that the implementation violated its
+> entry-lag, delisting, residual-regression, construction, turnover, and
+> return-normalization rules. Section 4 also counted 135 portfolio tests but
+> omitted the IC hypothesis used for the headline gate; the actual declared
+> family is 15 specifications × 3 universes × 4 tested outcomes = **180**.
+> All submitted results are invalid pending a corrected cloud rerun.
+
 Date: 2026-08-16
 Author: Claude
 Governing method: `docs/ALPHA_BATTERY_METHOD_V2.md`

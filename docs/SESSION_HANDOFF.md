@@ -1,8 +1,9 @@
-# Session handoff — REBAL-1 target feasibility made visible
+# Session handoff — REBAL-1 Stage 3 refusal accuracy
 
 Prepared: 2026-08-15 by Claude, after the owner exercised the Portfolio
-Rebalancing page in the development app and found that the column stating
-whether the sleeve targets are reachable was itself unreachable.
+Rebalancing page in the development app across two rounds: the first made
+target feasibility legible, the second corrected a refusal that stated a
+reason which was not true.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -33,9 +34,12 @@ operator-database mutation, or scheduled-task change.
   remote.** Before this round `main` was the only branch in either place.
   Nothing was lost: each deleted branch was verified merged into `84e73af`
   by content, not only by `git cherry` patch-id.
-- **Current branch: `user/claude/rebal-feasibility-visible-20260815`**,
-  branched from `84e73af`. One branch for the whole round, per the owner's
-  2026-08-15 workflow rule.
+- **Current branch: `user/claude/rebal-trim-refusal-accuracy-20260815`**,
+  branched from `a0a657b`, which is the head of the pushed
+  `user/claude/rebal-feasibility-visible-20260815`. **This branch therefore
+  carries BOTH rounds**; merging it alone brings everything since `84e73af`
+  and makes the feasibility branch redundant. Verified with
+  `git merge-base --is-ancestor`, not assumed.
 - The operational checkout remains separate and frozen at `752d3b7` in
   active `paper-epoch-005`. No development commit has been copied there.
 
@@ -341,17 +345,80 @@ Validation for this round, on the settled tree in the repository `.venv`
 
 See `docs/REVIEW_2026-08-15_REBAL1_FEASIBILITY_VISIBILITY.md`.
 
+## 7e. The trim refusal stated a reason that was not true (this round)
+
+The owner opened the Stage 3 trim section on a real book and got "No sleeve
+is above its upper band, so there is nothing to trim." The same page, three
+subheadings higher, reported **Bands breached: 6**. Both cannot be true.
+
+`overweight_sleeves()` filters on two independent conditions in one pass --
+above the upper band AND trimmable -- and returns one list, so an empty
+result cannot say which condition failed. The UI reported only one of them.
+Reproduced deterministically with one unsleeved position plus cash: `cash`
+and `other_unassigned` both sit at 50% against a 7.50-12.50 band while
+`overweight_sleeves()` returns `[]`.
+
+**The refusal was correct; only its stated reason was false.** Cash is not a
+holding, and the residual is the set of positions the profile does not
+describe, so trimming there is exactly the reading Stage 1 forbids. Which
+sleeves may be trimmed has not changed.
+
+That distinction is the point. A refusal that misreports why it fired is
+indistinguishable from a broken feature, and this workflow already lost two
+rounds to that shape: ST3R-001 and ST3CCR-001 both refused every trim while
+reading like careful safeguards. This is the same family seen from the
+reader's side rather than the code's.
+
+`untrimmable_overweight_sleeves()` now answers the second question on its
+own, and the page either names the over-band-but-untrimmable sleeves with
+the reason each is excluded, or keeps the original sentence when nothing is
+over the band at all.
+
+**Two mistakes of mine that this round exposed.**
+
+1. `test_the_trim_section_appears_only_when_a_sleeve_is_overweight` PINNED
+   the false message. It forced a book where cash is the only overweight
+   sleeve -- exactly the reported situation -- and asserted the false
+   sentence appears. Its docstring congratulates itself for forcing the book
+   rather than assuming it. The setup was right and the expectation was
+   wrong, so the defect was tested IN.
+2. The first fix could have MOVED the lie rather than removed it. A mutation
+   reporting the untrimmable reason for every empty case survived, and would
+   have told an owner whose book is exactly on target that cash and the
+   residual are above their bands. An on-target book is now pinned too.
+
+Validation for this round, repository `.venv`, Python 3.13.14, Streamlit
+1.60.0, Windows:
+
+- `tests/test_rebalance_trim.py` and `tests/test_ui_portfolio_rebalance.py`:
+  **76 passed** (74 before).
+- Mutation verification: **4 mutations, 4 detected.**
+- Full pinned-venv tree: **4,048 passed / 0 failed / 25 known dependency warnings in 733.50 seconds**.
+- `compileall` and `git diff --check` clean. `assistant/rebalance_trim.py`
+  had eighteen bare-LF lines from scripted editing and was normalized to
+  CRLF before the recorded runs.
+
+See `docs/REVIEW_2026-08-15_REBAL1_TRIM_REFUSAL_ACCURACY.md`.
+
+**Operational note for whoever exercises Stage 3 next.** On a book whose
+profiled sleeves are all inside or below their bands, Stage 3 correctly has
+nothing to offer; only the two untrimmable sleeves are over. Exercising the
+trim path needs a profiled sleeve genuinely overweight.
+
 ## 8. What is next
 
-1. Independent review of this round. It is presentation-only, so the useful
-   focus is whether the positive confirmation could ever be shown while a
-   conflict exists, and whether the shortened column still reads correctly
-   for a sleeve that is both infeasible and badly drifted.
-2. The owner is mid-way through exercising the development app and has
-   completed step 1 (the Stage 1 drift table). Steps 2 (Stage 2 steering
-   with a non-zero budget) and 3 (Stage 3 against a COPY of the operator
-   database) are still to do. The dev app must be restarted to pick up this
-   round's change.
+1. Independent review of both rounds on this single branch. Suggested
+   focus for the second: whether `untrimmable_overweight_sleeves` should
+   live beside `overweight_sleeves` at all, or whether the two-condition
+   filter should be replaced by one function returning both lists so a
+   future caller cannot repeat the conflation.
+2. The owner has completed steps 1 and 2 of the dev-app walkthrough; Stage 2
+   steering is confirmed working. Step 3 is in progress against a COPY of
+   the development database at
+   `data/dev_scratch_withfills.db` with the kill switch engaged. That copy
+   carries 108 proposals and 72 broker order events across 17 tickers, all
+   buys, so real journaled lots exist for JEPI, JEPQ, NVDY, AVGO, MSFT and
+   NVDL. The dev app must be restarted to pick up these rounds.
 3. **The remaining test gap is unchanged:** no test clicks the Streamlit
    trim button through to a saved proposal. Everything below that seam is
    now covered end to end against real journaled fills.
@@ -394,24 +461,23 @@ or roll an epoch without a new explicit owner instruction.
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, docs/REBAL1_MILESTONE_PLAN.md
 and docs/SESSION_HANDOFF.md. main and origin/main are 84e73af (PR #230),
-which merged the entire REBAL-1 Stage 3 chain; all earlier feature branches
-were deleted after verifying their content is contained in that commit.
-Branch user/claude/rebal-feasibility-visible-20260815 is a presentation-only
-round: the owner exercising the dev app could not reach the "Target
-reachable" column, which was ninth of nine in a table with no horizontal
-scrollbar, so target feasibility is now stated in full BELOW the table --
-sleeve and exact conflict reason when unreachable, and an explicit positive
-confirmation when every target is reachable, which the page previously left
-to be inferred from an absent warning. No computation, refusal, threshold,
-count, or contract changed. The owner also reported "Bands breached: 6",
-which is CORRECT; a predicted 5 was stale, from before REBAL1CR-002 stopped
-a display status masking a real breach. 24 UI tests; 3 mutations, 3
-detected, one only after strengthening a test that asserted a message
-appeared rather than that it named its sleeve. Full pinned-venv tree:
-4,044 passed / 0 failed / 25 known dependency warnings in 739.33 seconds. Remaining gap: no test drives the Streamlit trim button
-through to a saved proposal. paper-epoch-005 runs unchanged for 60 days;
-the operational my_policy.json stays 0.50/0.05. Do not push to main, deploy,
-roll the epoch, mutate the operator database, submit orders, access funded
-accounts, begin M4, or enable live trading without explicit owner
-authorization.
+which merged the entire REBAL-1 Stage 3 chain. Branch
+user/claude/rebal-trim-refusal-accuracy-20260815 stacks on a0a657b and so
+carries BOTH owner-reported rounds from exercising the dev app: REBAL-3V
+made target feasibility legible (the "Target reachable" column was ninth of
+nine with no horizontal scrollbar, and the reachable case was never stated
+at all), and REBAL-3W corrected a refusal that stated a reason which was not
+true (the page said "No sleeve is above its upper band" while its own
+headline reported six breaches; cash and the residual WERE over, they are
+simply never trimmable). Neither round changed which sleeves may be trimmed,
+any threshold, or any refusal -- REBAL-3V is presentation-only and REBAL-3W
+changes only the stated reason. Two of my own tests were wrong and are
+recorded as such: one asserted a message appeared without asserting it named
+its sleeve, and one PINNED the false refusal message on exactly the book
+that reproduced the bug. Full pinned-venv tree: 4,048 passed / 0 failed / 25 known dependency warnings in 733.50 seconds. Remaining
+gap: no test drives the Streamlit trim button through to a saved proposal.
+paper-epoch-005 runs unchanged for 60 days and the operational
+my_policy.json stays 0.50/0.05. Do not push to main, deploy, roll the epoch,
+mutate the operator database, submit orders, access funded accounts, begin
+M4, or enable live trading without explicit owner authorization.
 ```

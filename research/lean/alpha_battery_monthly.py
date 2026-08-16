@@ -391,8 +391,16 @@ class AlphaBatteryMonthly(QCAlgorithm):
         if stock is None or len(stock) < 60:
             return None
         peers = industry_returns.get(symbol)
-        if peers is None or len(peers) != len(stock):
+        # The peer series is built over `count` sessions (260) while `stock`
+        # spans 21*months (126 or 252), so a strict equality check can NEVER
+        # hold and this returned None for every name on every date. The
+        # corrected monthly run refused to emit at all, correctly, reporting
+        # INCOMPLETE|missing_specs=MULTI_ALPHA_COMPOSITE|RESIDUAL_MOM_12_1|
+        # RESIDUAL_MOM_6_1. Peers are sliced exactly as the market leg two
+        # lines below already is.
+        if peers is None or len(peers) < len(stock):
             return None
+        peers = peers[-len(stock):]
         mkt = market[-len(stock):] if len(market) >= len(stock) else None
         if mkt is None:
             return None

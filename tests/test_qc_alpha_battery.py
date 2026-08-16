@@ -148,3 +148,42 @@ def test_benchmark_parser_requires_construction_turnover(tmp_path: Path):
     log.write_text("DATES|1\nBROW|202001|0.01|0.25|100", encoding="utf-8")
     frame = parse_benchmark(log)
     assert frame.loc["202001", "turnover"] == pytest.approx(0.25)
+
+
+def test_residual_momentum_peer_series_is_sliced_not_length_matched():
+    """Counter-review of QCAR-004's correction.
+
+    The corrected `_industry_returns` builds leave-one-out peer series over
+    `count` sessions (260), while `_returns(symbol, span)` yields 21*months
+    entries (126 or 252). The correction rejected on `len(peers) !=
+    len(stock)`, an equality that can never hold, so residual momentum
+    returned None for every name on every date.
+
+    The consequence was visible in the cloud run rather than in any test:
+    the monthly battery refused to emit, reporting
+    `INCOMPLETE|missing_specs=MULTI_ALPHA_COMPOSITE|RESIDUAL_MOM_12_1|
+    RESIDUAL_MOM_6_1`. The completeness guard did its job; nothing else
+    caught it. This pins the arithmetic so a future edit cannot restore
+    the impossible comparison.
+    """
+    source = (
+        Path(__file__).resolve().parents[1]
+        / "research" / "lean" / "alpha_battery_monthly.py"
+    ).read_text(encoding="utf-8")
+
+    assert "len(peers) != len(stock)" not in source, (
+        "strict length equality between the 260-session peer series and the "
+        "21*months stock window can never hold"
+    )
+    assert "peers = peers[-len(stock):]" in source, (
+        "the peer series must be sliced to the stock window, exactly as the "
+        "market series already is"
+    )
+
+    # The arithmetic that makes equality impossible, asserted directly.
+    peer_sessions = 260
+    for months in (6, 12):
+        assert 21 * months != peer_sessions, (
+            f"{months}-month span coincidentally equals the peer window; "
+            "this test would stop protecting anything"
+        )

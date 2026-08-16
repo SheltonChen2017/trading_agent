@@ -25,12 +25,25 @@ SHORT_SPECS = (
 def _load_pure_function(path: Path, name: str):
     """Load one top-level pure helper without importing AlgorithmImports."""
     tree = ast.parse(path.read_text(encoding="utf-8"))
+    dependencies = []
+    if name == "_residual_momentum_total":
+        dependencies.append(next(
+            item for item in tree.body
+            if isinstance(item, ast.FunctionDef) and item.name == "_joint_residual_total"
+        ))
     node = next(
         item for item in tree.body
         if isinstance(item, ast.FunctionDef) and item.name == name
     )
-    namespace = {"math": math}
-    exec(compile(ast.Module(body=[node], type_ignores=[]), str(path), "exec"), namespace)
+    namespace = {
+        "math": math,
+        "RESIDUAL_ESTIMATION_SESSIONS": 252,
+        "MOMENTUM_SKIP_SESSIONS": 21,
+    }
+    exec(
+        compile(ast.Module(body=[*dependencies, node], type_ignores=[]), str(path), "exec"),
+        namespace,
+    )
     return namespace[name]
 
 
@@ -150,40 +163,37 @@ def test_benchmark_parser_requires_construction_turnover(tmp_path: Path):
     assert frame.loc["202001", "turnover"] == pytest.approx(0.25)
 
 
-def test_residual_momentum_peer_series_is_sliced_not_length_matched():
-    """Counter-review of QCAR-004's correction.
+@pytest.mark.parametrize("months", (6, 12))
+def test_residual_momentum_measures_months_minus_one_and_skips_latest_month(months):
+    """The score must not relabel the skipped month as the signal window."""
+    residual_momentum = _load_pure_function(MONTHLY, "_residual_momentum_total")
+    estimation = 252
+    measurement = 21 * (months - 1)
+    skipped = 21
+    length = estimation + measurement + skipped
+    market = [((index % 7) - 3) / 100 for index in range(length)]
+    industry = [((index * index % 11) - 5) / 120 for index in range(length)]
+    stock = [0.002 + 1.7 * m - 0.6 * i for m, i in zip(market, industry)]
 
-    The corrected `_industry_returns` builds leave-one-out peer series over
-    `count` sessions (260), while `_returns(symbol, span)` yields 21*months
-    entries (126 or 252). The correction rejected on `len(peers) !=
-    len(stock)`, an equality that can never hold, so residual momentum
-    returned None for every name on every date.
+    for index in range(estimation, estimation + measurement):
+        stock[index] += 0.01
+    for index in range(estimation + measurement, length):
+        stock[index] += 1.0  # deliberately huge; this is the skipped month
 
-    The consequence was visible in the cloud run rather than in any test:
-    the monthly battery refused to emit, reporting
-    `INCOMPLETE|missing_specs=MULTI_ALPHA_COMPOSITE|RESIDUAL_MOM_12_1|
-    RESIDUAL_MOM_6_1`. The completeness guard did its job; nothing else
-    caught it. This pins the arithmetic so a future edit cannot restore
-    the impossible comparison.
-    """
-    source = (
-        Path(__file__).resolve().parents[1]
-        / "research" / "lean" / "alpha_battery_monthly.py"
-    ).read_text(encoding="utf-8")
-
-    assert "len(peers) != len(stock)" not in source, (
-        "strict length equality between the 260-session peer series and the "
-        "21*months stock window can never hold"
+    observed = residual_momentum(
+        stock,
+        market,
+        industry,
+        months,
+        estimation_sessions=estimation,
+        skip_sessions=skipped,
     )
-    assert "peers = peers[-len(stock):]" in source, (
-        "the peer series must be sliced to the stock window, exactly as the "
-        "market series already is"
-    )
+    assert observed == pytest.approx(0.01 * measurement)
 
-    # The arithmetic that makes equality impossible, asserted directly.
-    peer_sessions = 260
-    for months in (6, 12):
-        assert 21 * months != peer_sessions, (
-            f"{months}-month span coincidentally equals the peer window; "
-            "this test would stop protecting anything"
-        )
+
+def test_residual_momentum_refuses_short_or_misaligned_factor_history():
+    residual_momentum = _load_pure_function(MONTHLY, "_residual_momentum_total")
+    required = 252 + 21 * 11 + 21
+    full = [0.0] * required
+    assert residual_momentum(full[:-1], full[:-1], full[:-1], 12) is None
+    assert residual_momentum(full, full[:-1], full, 12) is None

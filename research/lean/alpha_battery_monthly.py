@@ -45,10 +45,15 @@ UNIVERSES = {
     "C_broad": {"min_price": 3.0, "min_cap": 100_000_000.0, "min_adv": 1_000_000.0},
 }
 
-LOOKBACK = 300          # sessions retained per name; 12m momentum needs 253
+LOOKBACK = 520          # 252-session residual fit + 12-1 measure + 1m skip
 MIN_NAMES = 30          # a cross-section below this is not a ranking
 DECILE = 0.10
 QUINTILE = 0.20
+RESIDUAL_ESTIMATION_SESSIONS = 252
+MOMENTUM_SKIP_SESSIONS = 21
+RESIDUAL_MAX_RETURNS = (
+    RESIDUAL_ESTIMATION_SESSIONS + 21 * (12 - 1) + MOMENTUM_SKIP_SESSIONS
+)
 SPECIFICATIONS = (
     "GROSS_PROFITABILITY", "MOM_12_1", "MOM_3_1", "MOM_6_1", "MOM_9_1",
     "MULTI_ALPHA_COMPOSITE", "QUALITY_COMPOSITE", "QUALITY_MOMENTUM",
@@ -138,6 +143,37 @@ def _joint_residual_total(stock, market, industry, measurement_sessions=21):
     return sum(
         y_t - alpha - beta_m * m_t - beta_i * i_t
         for y_t, m_t, i_t in zip(stock[split:], market[split:], industry[split:])
+    )
+
+
+def _residual_momentum_total(
+    stock,
+    market,
+    industry,
+    months,
+    estimation_sessions=RESIDUAL_ESTIMATION_SESSIONS,
+    skip_sessions=MOMENTUM_SKIP_SESSIONS,
+):
+    """Return a true ``months-1`` residual-momentum score.
+
+    The joint factor fit uses a fixed window ending before the formation
+    period opens.  The formation period then runs from ``t-21*months``
+    through ``t-21``; the most recent month is excluded rather than being
+    mistaken for the measurement window.
+    """
+    measurement_sessions = 21 * (months - 1)
+    required = estimation_sessions + measurement_sessions + skip_sessions
+    if months <= 1 or estimation_sessions < 40 or skip_sessions < 0:
+        return None
+    if not (len(stock) == len(market) == len(industry)) or len(stock) < required:
+        return None
+    measurement_end = len(stock) - skip_sessions
+    estimation_start = measurement_end - measurement_sessions - estimation_sessions
+    return _joint_residual_total(
+        stock[estimation_start:measurement_end],
+        market[estimation_start:measurement_end],
+        industry[estimation_start:measurement_end],
+        measurement_sessions=measurement_sessions,
     )
 
 
@@ -383,36 +419,31 @@ class AlphaBatteryMonthly(QCAlgorithm):
     def _residual_momentum(self, symbol, months, market, industry_returns):
         """Joint market+industry regression (Method V2 section 1.7).
 
-        Estimated on the window that ENDS where the measurement window
-        begins, so no part of the estimation sees the period being scored.
+        A fixed 252-session fit ends where the months-minus-one formation
+        window begins.  The most recent 21 sessions are then skipped, just
+        as they are for the raw 6-1 and 12-1 momentum specifications.
         """
-        span = 21 * months
-        stock = self._returns(symbol, span)
-        if stock is None or len(stock) < 60:
+        stock = self._returns(symbol, RESIDUAL_MAX_RETURNS)
+        if stock is None:
             return None
         peers = industry_returns.get(symbol)
-        # The peer series is built over `count` sessions (260) while `stock`
-        # spans 21*months (126 or 252), so a strict equality check can NEVER
-        # hold and this returned None for every name on every date. The
-        # corrected monthly run refused to emit at all, correctly, reporting
-        # INCOMPLETE|missing_specs=MULTI_ALPHA_COMPOSITE|RESIDUAL_MOM_12_1|
-        # RESIDUAL_MOM_6_1. Peers are sliced exactly as the market leg two
-        # lines below already is.
-        if peers is None or len(peers) < len(stock):
+        if peers is None or len(peers) != len(stock) or len(market) != len(stock):
             return None
-        peers = peers[-len(stock):]
-        mkt = market[-len(stock):] if len(market) >= len(stock) else None
-        if mkt is None:
-            return None
-        return _joint_residual_total(stock, mkt, peers, measurement_sessions=21)
+        return _residual_momentum_total(stock, market, peers, months)
 
     def _form_scores(self):
         names = [s for s in self.selected if len(self.closes.get(s, ())) >= 260]
         if len(names) < MIN_NAMES:
             return
 
-        market = self._index_returns(names, 260)
-        industry_returns = self._industry_returns(names, 260)
+        residual_names = [
+            symbol for symbol in names
+            if len(self.closes.get(symbol, ())) >= RESIDUAL_MAX_RETURNS + 1
+        ]
+        market = self._index_returns(residual_names, RESIDUAL_MAX_RETURNS)
+        industry_returns = self._industry_returns(
+            residual_names, RESIDUAL_MAX_RETURNS
+        )
 
         raw = {}
         for months in (3, 6, 9, 12):

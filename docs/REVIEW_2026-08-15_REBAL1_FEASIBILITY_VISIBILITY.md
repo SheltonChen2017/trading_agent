@@ -4,7 +4,7 @@ Date: 2026-08-15
 Author: Claude
 Base: `84e73af` (PR #230, the combined Stage 3 chain)
 Branch: `user/claude/rebal-feasibility-visible-20260815`
-Status: **Implemented; pending independent review.**
+Status: **Accepted after independent correction `3a506ae`; not deployed.**
 
 ## Why this round exists
 
@@ -80,6 +80,22 @@ tell which sleeve each belongs to. The test now pins `**Growth**`, which also
 distinguishes this block from the raw-key disclosure warning (`growth: ...`)
 the report already emits. A test that asserts a message appeared is not the
 same as a test that asserts the message is useful.
+
+## Independent review addendum
+
+Codex reviewed every commit in the owner-named range
+`84e73af..006a9d5`, not only the merged tip. The presentation behavior is
+accepted, but the submitted tests contained one collected function with no
+executable body and one assertion that accepted either the positive or the
+negative feasibility branch while claiming to prove the positive case. The
+correction removes the no-op, forces a known permissive policy for the
+positive case, and drives all four implemented conflict rules through the
+real report and Streamlit UI, including the per-row `Reachable` value.
+
+The complete dispositions and P0-P3 ledger are in
+`docs/REVIEW_2026-08-15_REBAL3V_REBAL3W_INDEPENDENT.md`. No feasibility
+calculation, policy limit, band state, breach count, refusal, proposal, or
+execution path changed in review.
 
 ## Untested and out of scope
 

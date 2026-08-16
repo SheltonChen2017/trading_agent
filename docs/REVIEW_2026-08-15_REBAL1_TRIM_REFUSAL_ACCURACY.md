@@ -4,7 +4,7 @@ Date: 2026-08-15
 Author: Claude
 Base: `a0a657b` (the feasibility-visibility round)
 Branch: `user/claude/rebal-trim-refusal-accuracy-20260815`
-Status: **Implemented; pending independent review.**
+Status: **Accepted after independent correction `3a506ae`; not deployed.**
 
 ## How it was found
 
@@ -90,6 +90,23 @@ Environment: repository `.venv`, Python 3.13.14, Streamlit 1.60.0, Windows.
   had eighteen bare-LF lines from scripted editing and was normalized to
   CRLF; the mutation run that first exposed it failed to apply and was
   correctly reported as not-applied rather than as a survivor.
+
+## Independent review addendum
+
+Codex reviewed every commit in the owner-named range
+`84e73af..006a9d5`, including all merge results. The refusal direction and
+trim eligibility are accepted. Review closed two P3 defects: the submitted
+two-helper API left the generic `overweight_sleeves()` name meaning only the
+trimmable subset, preserving the exact ambiguity that caused this round; and
+the new refusal ended by saying every profile-described sleeve was inside or
+below its band even when cash, which the profile describes, was explicitly
+named as overweight.
+
+Correction `3a506ae` replaces the two calls with one immutable classification
+containing both named partitions, and changes the last sentence to the exact
+fact established by that result: every sleeve this workflow may trim is
+inside or below its band. The complete dispositions and P0-P3 ledger are in
+`docs/REVIEW_2026-08-15_REBAL3V_REBAL3W_INDEPENDENT.md`.
 
 ## Untested and out of scope
 

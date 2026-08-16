@@ -1,9 +1,8 @@
-# Session handoff — REBAL-1 Stage 3 refusal accuracy
+# Session handoff — both dev-app rounds merged, neither reviewed
 
 Prepared: 2026-08-15 by Claude, after the owner exercised the Portfolio
-Rebalancing page in the development app across two rounds: the first made
-target feasibility legible, the second corrected a refusal that stated a
-reason which was not true.
+Rebalancing page in the development app across two rounds and then merged
+both of them into `main` directly.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -26,22 +25,20 @@ operator-database mutation, or scheduled-task change.
 ## 1. Exact repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- `main` and `origin/main`:
-  `84e73af` — PR #230, which merged the whole REBAL-1 Stage 3 chain: the
-  stage, Codex's correction, Claude's counter-review, and the end-to-end
-  coverage against real journaled fills.
-- **Every earlier feature branch has been deleted, locally and on the
-  remote.** Before this round `main` was the only branch in either place.
-  Nothing was lost: each deleted branch was verified merged into `84e73af`
-  by content, not only by `git cherry` patch-id.
-- **Current branch: `user/claude/rebal-trim-refusal-accuracy-20260815`**,
-  branched from `a0a657b`, which is the head of the pushed
-  `user/claude/rebal-feasibility-visible-20260815`. **This branch therefore
-  carries BOTH rounds**; merging it alone brings everything since `84e73af`
-  and makes the feasibility branch redundant. Verified with
-  `git merge-base --is-ancestor`, not assumed.
+- `main` and `origin/main`: `18a3ee5`, after PR #231 and PR #232 merged
+  both owner-reported rounds from exercising the development app.
+- **Both rounds were merged WITHOUT independent review.** REBAL-3V
+  (feasibility legibility) and REBAL-3W (refusal accuracy) are in `main`
+  and neither has been reviewed by Codex. That is a deliberate owner
+  decision to record, not an oversight to correct silently, but a reviewer
+  picking this up should start there.
+- **Every feature branch has been deleted, locally and on the remote**,
+  each after confirming with `git merge-base --is-ancestor` that its
+  commits are reachable from the surviving ref. `7e9d005`, `a0a657b`,
+  `bead8ac` and `43b29df` are all in `main`.
+- **Current branch: `user/claude/post-merge-232-records-20260815`**,
+  branched from `18a3ee5`. It corrects records only.
 - The operational checkout remains separate and frozen at `752d3b7` in
-  active `paper-epoch-005`. No development commit has been copied there.
 
 Earlier history that remains load-bearing for anyone resuming:
 
@@ -53,6 +50,7 @@ Earlier history that remains load-bearing for anyone resuming:
 - BUY-1 is merged and independently corrected: review branch
   `codex/review-buy1-suggestion-picker-20260813`, correction `44a7f85`,
   on top of `e0df810`. It is closed history, not reopened work.
+  active `paper-epoch-005`. No development commit has been copied there.
 
 Sections 2 through 7c below describe the Stage 3 chain that is now merged
 into `main`. They are retained as the record of how that work was reviewed;
@@ -405,13 +403,38 @@ profiled sleeves are all inside or below their bands, Stage 3 correctly has
 nothing to offer; only the two untrimmable sleeves are over. Exercising the
 trim path needs a profiled sleeve genuinely overweight.
 
+## 7f. Records corrected after the merge (this round)
+
+PR #231 and PR #232 merged both rounds into `main`, and the document
+guards went red on `main` within minutes:
+
+```
+FAILED test_no_action_plan_row_calls_its_own_merged_commits_unmerged
+assert not ['row claims unmerged but a0a657b is in origin/main']
+```
+
+This is the trap `tests/test_active_document_consistency.py` documents in
+its own docstring: **any statement about push or merge state, written in
+the commit that is being merged, is false by construction the moment it
+lands.** It cannot be prevented by being more careful when writing the row;
+it can only be caught afterwards, which is what happened. This is the
+second time in one day, and both times the guard found it rather than a
+human.
+
+The REBAL-3V and REBAL-3W rows now record their merges, and the topology
+paragraphs record `18a3ee5`. Records only -- no product code is touched by
+this round.
+
+**Recorded plainly because it is easy to lose:** neither round has had
+independent review. They went from implementation straight into `main`.
+
 ## 8. What is next
 
-1. Independent review of both rounds on this single branch. Suggested
-   focus for the second: whether `untrimmable_overweight_sleeves` should
-   live beside `overweight_sleeves` at all, or whether the two-condition
-   filter should be replaced by one function returning both lists so a
-   future caller cannot repeat the conflation.
+1. **Independent review of REBAL-3V and REBAL-3W, both already in `main`.**
+   Suggested focus: whether `untrimmable_overweight_sleeves` should live
+   beside `overweight_sleeves` at all, or whether the two-condition filter
+   should be replaced by one function returning both lists so a future
+   caller cannot repeat the conflation that caused REBAL-3W.
 2. The owner has completed steps 1 and 2 of the dev-app walkthrough; Stage 2
    steering is confirmed working. Step 3 is in progress against a COPY of
    the development database at

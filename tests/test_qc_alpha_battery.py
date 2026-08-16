@@ -57,6 +57,14 @@ def test_joint_residual_momentum_fits_both_factors_before_measurement():
     assert residual_total(stock, market, industry, 21) == pytest.approx(0.21)
 
 
+def test_price_tail_requires_exact_market_session_alignment():
+    aligned_tail = _load_pure_function(MONTHLY, "_aligned_price_tail")
+    market_sessions = [1, 2, 3, 4]
+    assert aligned_tail([10, 11, 12], [2, 3, 4], market_sessions, 2) == [10, 11, 12]
+    assert aligned_tail([10, 11, 12], [1, 3, 4], market_sessions, 2) is None
+    assert aligned_tail([10, 11, 12], [3, 4, 4], market_sessions, 2) is None
+
+
 def test_drift_turnover_charges_the_rebalance_after_weight_drift():
     turnover = _load_pure_function(MONTHLY, "_drift_turnover")
     previous = {name: 0.25 for name in "ABCD"}

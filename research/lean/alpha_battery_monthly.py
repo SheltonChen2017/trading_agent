@@ -86,6 +86,24 @@ def _apply_z(value, stats):
     return (clipped - stats["mean"]) / stats["sd"]
 
 
+def _aligned_price_tail(values, value_sessions, market_sessions, count):
+    """Return ``count + 1`` prices only when every market date matches.
+
+    Universe exits, halts and missing bars must not turn two non-adjacent
+    observations into a one-session return merely because they are adjacent
+    in a deque.
+    """
+    required = count + 1
+    if count < 0 or required > len(values) or required > len(value_sessions):
+        return None
+    if required > len(market_sessions):
+        return None
+    sessions = list(value_sessions)[-required:]
+    if sessions != list(market_sessions)[-required:]:
+        return None
+    return list(values)[-required:]
+
+
 def _spearman(pairs):
     """Rank correlation of (score, outcome). Ranks, so outlier-immune."""
     if len(pairs) < MIN_NAMES:
@@ -213,6 +231,8 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.AddUniverse(self._coarse, self._fine)
 
         self.closes = {}            # Symbol -> deque of daily closes
+        self.close_sessions = {}    # Symbol -> matching exchange sessions
+        self.sessions = deque(maxlen=LOOKBACK)
         self.fundamentals = {}      # Symbol -> dict of latest known values
         self.industry = {}          # Symbol -> Morningstar industry code
         self.selected = []          # this month's eligible symbols
@@ -315,17 +335,20 @@ class AlphaBatteryMonthly(QCAlgorithm):
             except (TypeError, ValueError):
                 self.terminal_prices[symbol] = 0.0
 
+        session = self.Time.date()
+        if not data.Bars or session == self.last_session:
+            return
+        self.last_session = session
+        self.sessions.append(session)
+
         for symbol in list(data.Bars.Keys):
             window = self.closes.get(symbol)
             if window is None:
                 window = deque(maxlen=LOOKBACK)
                 self.closes[symbol] = window
+                self.close_sessions[symbol] = deque(maxlen=LOOKBACK)
             window.append(float(data.Bars[symbol].Close))
-
-        session = self.Time.date()
-        if not data.Bars or session == self.last_session:
-            return
-        self.last_session = session
+            self.close_sessions[symbol].append(session)
 
         if self.staged is not None and session > self.staged["score_session"]:
             self._bind_staged_entry()
@@ -397,9 +420,11 @@ class AlphaBatteryMonthly(QCAlgorithm):
 
     def _price(self, symbol, ago):
         window = self.closes.get(symbol)
-        if window is None or len(window) <= ago:
+        dates = self.close_sessions.get(symbol)
+        if window is None or dates is None:
             return None
-        return window[len(window) - 1 - ago]
+        aligned = _aligned_price_tail(window, dates, self.sessions, ago)
+        return None if aligned is None else aligned[0]
 
     def _momentum(self, symbol, months):
         recent = self._price(symbol, 21)
@@ -410,11 +435,14 @@ class AlphaBatteryMonthly(QCAlgorithm):
 
     def _returns(self, symbol, count):
         window = self.closes.get(symbol)
-        if window is None or len(window) < count + 1:
+        dates = self.close_sessions.get(symbol)
+        if window is None or dates is None:
             return None
-        values = list(window)[-(count + 1):]
+        values = _aligned_price_tail(window, dates, self.sessions, count)
+        if values is None or any(value <= 0 for value in values):
+            return None
         return [values[i + 1] / values[i] - 1.0
-                for i in range(len(values) - 1) if values[i] > 0]
+                for i in range(len(values) - 1)]
 
     def _residual_momentum(self, symbol, months, market, industry_returns):
         """Joint market+industry regression (Method V2 section 1.7).
@@ -438,7 +466,7 @@ class AlphaBatteryMonthly(QCAlgorithm):
 
         residual_names = [
             symbol for symbol in names
-            if len(self.closes.get(symbol, ())) >= RESIDUAL_MAX_RETURNS + 1
+            if self._returns(symbol, RESIDUAL_MAX_RETURNS) is not None
         ]
         market = self._index_returns(residual_names, RESIDUAL_MAX_RETURNS)
         industry_returns = self._industry_returns(

@@ -1,0 +1,4992 @@
+{
+  "point_in_time_data": true,
+  "point_in_time_caveat": "Membership and market cap are point-in-time from EDGAR filings with a 90-day publication lag. PRICES are yfinance adjusted closes and are NOT point-in-time, and delisted securities have no price history at all.",
+  "survivorship_bias": "present; per-date magnitude measured in `by_date`",
+  "universes": {
+    "A_large": {
+      "min_price": 5.0,
+      "min_market_cap": 10000000000.0,
+      "min_adv20": 25000000.0
+    },
+    "B_core": {
+      "min_price": 5.0,
+      "min_market_cap": 500000000.0,
+      "min_adv20": 5000000.0
+    },
+    "C_broad": {
+      "min_price": 3.0,
+      "min_market_cap": 100000000.0,
+      "min_adv20": 1000000.0
+    }
+  },
+  "by_date": [
+    {
+      "as_of": "2009-06-30",
+      "universe": "A_large",
+      "members": 0,
+      "eligible_before_price_join": 17,
+      "missing_price_ciks": 8,
+      "survivorship_loss_fraction": 0.47058823529411764
+    },
+    {
+      "as_of": "2009-06-30",
+      "universe": "B_core",
+      "members": 0,
+      "eligible_before_price_join": 17,
+      "missing_price_ciks": 8,
+      "survivorship_loss_fraction": 0.47058823529411764
+    },
+    {
+      "as_of": "2009-06-30",
+      "universe": "C_broad",
+      "members": 0,
+      "eligible_before_price_join": 17,
+      "missing_price_ciks": 8,
+      "survivorship_loss_fraction": 0.47058823529411764
+    },
+    {
+      "as_of": "2009-07-31",
+      "universe": "A_large",
+      "members": 0,
+      "eligible_before_price_join": 27,
+      "missing_price_ciks": 10,
+      "survivorship_loss_fraction": 0.37037037037037035
+    },
+    {
+      "as_of": "2009-07-31",
+      "universe": "B_core",
+      "members": 0,
+      "eligible_before_price_join": 27,
+      "missing_price_ciks": 10,
+      "survivorship_loss_fraction": 0.37037037037037035
+    },
+    {
+      "as_of": "2009-07-31",
+      "universe": "C_broad",
+      "members": 0,
+      "eligible_before_price_join": 27,
+      "missing_price_ciks": 10,
+      "survivorship_loss_fraction": 0.37037037037037035
+    },
+    {
+      "as_of": "2009-08-31",
+      "universe": "A_large",
+      "members": 3,
+      "eligible_before_price_join": 27,
+      "missing_price_ciks": 10,
+      "survivorship_loss_fraction": 0.37037037037037035
+    },
+    {
+      "as_of": "2009-08-31",
+      "universe": "B_core",
+      "members": 13,
+      "eligible_before_price_join": 27,
+      "missing_price_ciks": 10,
+      "survivorship_loss_fraction": 0.37037037037037035
+    },
+    {
+      "as_of": "2009-08-31",
+      "universe": "C_broad",
+      "members": 16,
+      "eligible_before_price_join": 27,
+      "missing_price_ciks": 10,
+      "survivorship_loss_fraction": 0.37037037037037035
+    },
+    {
+      "as_of": "2009-09-30",
+      "universe": "A_large",
+      "members": 31,
+      "eligible_before_price_join": 130,
+      "missing_price_ciks": 46,
+      "survivorship_loss_fraction": 0.35384615384615387
+    },
+    {
+      "as_of": "2009-09-30",
+      "universe": "B_core",
+      "members": 76,
+      "eligible_before_price_join": 130,
+      "missing_price_ciks": 46,
+      "survivorship_loss_fraction": 0.35384615384615387
+    },
+    {
+      "as_of": "2009-09-30",
+      "universe": "C_broad",
+      "members": 80,
+      "eligible_before_price_join": 130,
+      "missing_price_ciks": 46,
+      "survivorship_loss_fraction": 0.35384615384615387
+    },
+    {
+      "as_of": "2009-10-30",
+      "universe": "A_large",
+      "members": 75,
+      "eligible_before_price_join": 313,
+      "missing_price_ciks": 111,
+      "survivorship_loss_fraction": 0.3546325878594249
+    },
+    {
+      "as_of": "2009-10-30",
+      "universe": "B_core",
+      "members": 187,
+      "eligible_before_price_join": 313,
+      "missing_price_ciks": 111,
+      "survivorship_loss_fraction": 0.3546325878594249
+    },
+    {
+      "as_of": "2009-10-30",
+      "universe": "C_broad",
+      "members": 195,
+      "eligible_before_price_join": 313,
+      "missing_price_ciks": 111,
+      "survivorship_loss_fraction": 0.3546325878594249
+    },
+    {
+      "as_of": "2009-11-30",
+      "universe": "A_large",
+      "members": 91,
+      "eligible_before_price_join": 379,
+      "missing_price_ciks": 140,
+      "survivorship_loss_fraction": 0.36939313984168864
+    },
+    {
+      "as_of": "2009-11-30",
+      "universe": "B_core",
+      "members": 222,
+      "eligible_before_price_join": 379,
+      "missing_price_ciks": 140,
+      "survivorship_loss_fraction": 0.36939313984168864
+    },
+    {
+      "as_of": "2009-11-30",
+      "universe": "C_broad",
+      "members": 233,
+      "eligible_before_price_join": 379,
+      "missing_price_ciks": 140,
+      "survivorship_loss_fraction": 0.36939313984168864
+    },
+    {
+      "as_of": "2009-12-31",
+      "universe": "A_large",
+      "members": 101,
+      "eligible_before_price_join": 406,
+      "missing_price_ciks": 148,
+      "survivorship_loss_fraction": 0.3645320197044335
+    },
+    {
+      "as_of": "2009-12-31",
+      "universe": "B_core",
+      "members": 242,
+      "eligible_before_price_join": 406,
+      "missing_price_ciks": 148,
+      "survivorship_loss_fraction": 0.3645320197044335
+    },
+    {
+      "as_of": "2009-12-31",
+      "universe": "C_broad",
+      "members": 252,
+      "eligible_before_price_join": 406,
+      "missing_price_ciks": 148,
+      "survivorship_loss_fraction": 0.3645320197044335
+    },
+    {
+      "as_of": "2010-01-29",
+      "universe": "A_large",
+      "members": 105,
+      "eligible_before_price_join": 430,
+      "missing_price_ciks": 155,
+      "survivorship_loss_fraction": 0.36046511627906974
+    },
+    {
+      "as_of": "2010-01-29",
+      "universe": "B_core",
+      "members": 258,
+      "eligible_before_price_join": 430,
+      "missing_price_ciks": 155,
+      "survivorship_loss_fraction": 0.36046511627906974
+    },
+    {
+      "as_of": "2010-01-29",
+      "universe": "C_broad",
+      "members": 267,
+      "eligible_before_price_join": 430,
+      "missing_price_ciks": 155,
+      "survivorship_loss_fraction": 0.36046511627906974
+    },
+    {
+      "as_of": "2010-02-26",
+      "universe": "A_large",
+      "members": 107,
+      "eligible_before_price_join": 435,
+      "missing_price_ciks": 156,
+      "survivorship_loss_fraction": 0.3586206896551724
+    },
+    {
+      "as_of": "2010-02-26",
+      "universe": "B_core",
+      "members": 262,
+      "eligible_before_price_join": 435,
+      "missing_price_ciks": 156,
+      "survivorship_loss_fraction": 0.3586206896551724
+    },
+    {
+      "as_of": "2010-02-26",
+      "universe": "C_broad",
+      "members": 271,
+      "eligible_before_price_join": 435,
+      "missing_price_ciks": 156,
+      "survivorship_loss_fraction": 0.3586206896551724
+    },
+    {
+      "as_of": "2010-03-31",
+      "universe": "A_large",
+      "members": 108,
+      "eligible_before_price_join": 442,
+      "missing_price_ciks": 159,
+      "survivorship_loss_fraction": 0.3597285067873303
+    },
+    {
+      "as_of": "2010-03-31",
+      "universe": "B_core",
+      "members": 265,
+      "eligible_before_price_join": 442,
+      "missing_price_ciks": 159,
+      "survivorship_loss_fraction": 0.3597285067873303
+    },
+    {
+      "as_of": "2010-03-31",
+      "universe": "C_broad",
+      "members": 275,
+      "eligible_before_price_join": 442,
+      "missing_price_ciks": 159,
+      "survivorship_loss_fraction": 0.3597285067873303
+    },
+    {
+      "as_of": "2010-04-30",
+      "universe": "A_large",
+      "members": 113,
+      "eligible_before_price_join": 445,
+      "missing_price_ciks": 161,
+      "survivorship_loss_fraction": 0.36179775280898874
+    },
+    {
+      "as_of": "2010-04-30",
+      "universe": "B_core",
+      "members": 267,
+      "eligible_before_price_join": 445,
+      "missing_price_ciks": 161,
+      "survivorship_loss_fraction": 0.36179775280898874
+    },
+    {
+      "as_of": "2010-04-30",
+      "universe": "C_broad",
+      "members": 276,
+      "eligible_before_price_join": 445,
+      "missing_price_ciks": 161,
+      "survivorship_loss_fraction": 0.36179775280898874
+    },
+    {
+      "as_of": "2010-05-28",
+      "universe": "A_large",
+      "members": 105,
+      "eligible_before_price_join": 451,
+      "missing_price_ciks": 163,
+      "survivorship_loss_fraction": 0.3614190687361419
+    },
+    {
+      "as_of": "2010-05-28",
+      "universe": "B_core",
+      "members": 267,
+      "eligible_before_price_join": 451,
+      "missing_price_ciks": 163,
+      "survivorship_loss_fraction": 0.3614190687361419
+    },
+    {
+      "as_of": "2010-05-28",
+      "universe": "C_broad",
+      "members": 280,
+      "eligible_before_price_join": 451,
+      "missing_price_ciks": 163,
+      "survivorship_loss_fraction": 0.3614190687361419
+    },
+    {
+      "as_of": "2010-06-30",
+      "universe": "A_large",
+      "members": 99,
+      "eligible_before_price_join": 459,
+      "missing_price_ciks": 169,
+      "survivorship_loss_fraction": 0.3681917211328976
+    },
+    {
+      "as_of": "2010-06-30",
+      "universe": "B_core",
+      "members": 267,
+      "eligible_before_price_join": 459,
+      "missing_price_ciks": 169,
+      "survivorship_loss_fraction": 0.3681917211328976
+    },
+    {
+      "as_of": "2010-06-30",
+      "universe": "C_broad",
+      "members": 281,
+      "eligible_before_price_join": 459,
+      "missing_price_ciks": 169,
+      "survivorship_loss_fraction": 0.3681917211328976
+    },
+    {
+      "as_of": "2010-07-30",
+      "universe": "A_large",
+      "members": 108,
+      "eligible_before_price_join": 477,
+      "missing_price_ciks": 175,
+      "survivorship_loss_fraction": 0.3668763102725367
+    },
+    {
+      "as_of": "2010-07-30",
+      "universe": "B_core",
+      "members": 277,
+      "eligible_before_price_join": 477,
+      "missing_price_ciks": 175,
+      "survivorship_loss_fraction": 0.3668763102725367
+    },
+    {
+      "as_of": "2010-07-30",
+      "universe": "C_broad",
+      "members": 295,
+      "eligible_before_price_join": 477,
+      "missing_price_ciks": 175,
+      "survivorship_loss_fraction": 0.3668763102725367
+    },
+    {
+      "as_of": "2010-08-31",
+      "universe": "A_large",
+      "members": 106,
+      "eligible_before_price_join": 485,
+      "missing_price_ciks": 180,
+      "survivorship_loss_fraction": 0.3711340206185567
+    },
+    {
+      "as_of": "2010-08-31",
+      "universe": "B_core",
+      "members": 276,
+      "eligible_before_price_join": 485,
+      "missing_price_ciks": 180,
+      "survivorship_loss_fraction": 0.3711340206185567
+    },
+    {
+      "as_of": "2010-08-31",
+      "universe": "C_broad",
+      "members": 298,
+      "eligible_before_price_join": 485,
+      "missing_price_ciks": 180,
+      "survivorship_loss_fraction": 0.3711340206185567
+    },
+    {
+      "as_of": "2010-09-30",
+      "universe": "A_large",
+      "members": 111,
+      "eligible_before_price_join": 591,
+      "missing_price_ciks": 229,
+      "survivorship_loss_fraction": 0.38747884940778343
+    },
+    {
+      "as_of": "2010-09-30",
+      "universe": "B_core",
+      "members": 315,
+      "eligible_before_price_join": 591,
+      "missing_price_ciks": 229,
+      "survivorship_loss_fraction": 0.38747884940778343
+    },
+    {
+      "as_of": "2010-09-30",
+      "universe": "C_broad",
+      "members": 354,
+      "eligible_before_price_join": 591,
+      "missing_price_ciks": 229,
+      "survivorship_loss_fraction": 0.38747884940778343
+    },
+    {
+      "as_of": "2010-10-29",
+      "universe": "A_large",
+      "members": 115,
+      "eligible_before_price_join": 1024,
+      "missing_price_ciks": 456,
+      "survivorship_loss_fraction": 0.4453125
+    },
+    {
+      "as_of": "2010-10-29",
+      "universe": "B_core",
+      "members": 465,
+      "eligible_before_price_join": 1024,
+      "missing_price_ciks": 456,
+      "survivorship_loss_fraction": 0.4453125
+    },
+    {
+      "as_of": "2010-10-29",
+      "universe": "C_broad",
+      "members": 555,
+      "eligible_before_price_join": 1024,
+      "missing_price_ciks": 456,
+      "survivorship_loss_fraction": 0.4453125
+    },
+    {
+      "as_of": "2010-11-30",
+      "universe": "A_large",
+      "members": 121,
+      "eligible_before_price_join": 1250,
+      "missing_price_ciks": 581,
+      "survivorship_loss_fraction": 0.4648
+    },
+    {
+      "as_of": "2010-11-30",
+      "universe": "B_core",
+      "members": 531,
+      "eligible_before_price_join": 1250,
+      "missing_price_ciks": 581,
+      "survivorship_loss_fraction": 0.4648
+    },
+    {
+      "as_of": "2010-11-30",
+      "universe": "C_broad",
+      "members": 652,
+      "eligible_before_price_join": 1250,
+      "missing_price_ciks": 581,
+      "survivorship_loss_fraction": 0.4648
+    },
+    {
+      "as_of": "2010-12-31",
+      "universe": "A_large",
+      "members": 132,
+      "eligible_before_price_join": 1287,
+      "missing_price_ciks": 598,
+      "survivorship_loss_fraction": 0.46464646464646464
+    },
+    {
+      "as_of": "2010-12-31",
+      "universe": "B_core",
+      "members": 566,
+      "eligible_before_price_join": 1287,
+      "missing_price_ciks": 598,
+      "survivorship_loss_fraction": 0.46464646464646464
+    },
+    {
+      "as_of": "2010-12-31",
+      "universe": "C_broad",
+      "members": 674,
+      "eligible_before_price_join": 1287,
+      "missing_price_ciks": 598,
+      "survivorship_loss_fraction": 0.46464646464646464
+    },
+    {
+      "as_of": "2011-01-31",
+      "universe": "A_large",
+      "members": 133,
+      "eligible_before_price_join": 1333,
+      "missing_price_ciks": 622,
+      "survivorship_loss_fraction": 0.46661665416354087
+    },
+    {
+      "as_of": "2011-01-31",
+      "universe": "B_core",
+      "members": 585,
+      "eligible_before_price_join": 1333,
+      "missing_price_ciks": 622,
+      "survivorship_loss_fraction": 0.46661665416354087
+    },
+    {
+      "as_of": "2011-01-31",
+      "universe": "C_broad",
+      "members": 696,
+      "eligible_before_price_join": 1333,
+      "missing_price_ciks": 622,
+      "survivorship_loss_fraction": 0.46661665416354087
+    },
+    {
+      "as_of": "2011-02-28",
+      "universe": "A_large",
+      "members": 138,
+      "eligible_before_price_join": 1349,
+      "missing_price_ciks": 631,
+      "survivorship_loss_fraction": 0.46775389177168275
+    },
+    {
+      "as_of": "2011-02-28",
+      "universe": "B_core",
+      "members": 593,
+      "eligible_before_price_join": 1349,
+      "missing_price_ciks": 631,
+      "survivorship_loss_fraction": 0.46775389177168275
+    },
+    {
+      "as_of": "2011-02-28",
+      "universe": "C_broad",
+      "members": 702,
+      "eligible_before_price_join": 1349,
+      "missing_price_ciks": 631,
+      "survivorship_loss_fraction": 0.46775389177168275
+    },
+    {
+      "as_of": "2011-03-31",
+      "universe": "A_large",
+      "members": 143,
+      "eligible_before_price_join": 1367,
+      "missing_price_ciks": 639,
+      "survivorship_loss_fraction": 0.46744696415508413
+    },
+    {
+      "as_of": "2011-03-31",
+      "universe": "B_core",
+      "members": 604,
+      "eligible_before_price_join": 1367,
+      "missing_price_ciks": 639,
+      "survivorship_loss_fraction": 0.46744696415508413
+    },
+    {
+      "as_of": "2011-03-31",
+      "universe": "C_broad",
+      "members": 708,
+      "eligible_before_price_join": 1367,
+      "missing_price_ciks": 639,
+      "survivorship_loss_fraction": 0.46744696415508413
+    },
+    {
+      "as_of": "2011-04-29",
+      "universe": "A_large",
+      "members": 148,
+      "eligible_before_price_join": 1379,
+      "missing_price_ciks": 644,
+      "survivorship_loss_fraction": 0.467005076142132
+    },
+    {
+      "as_of": "2011-04-29",
+      "universe": "B_core",
+      "members": 598,
+      "eligible_before_price_join": 1379,
+      "missing_price_ciks": 644,
+      "survivorship_loss_fraction": 0.467005076142132
+    },
+    {
+      "as_of": "2011-04-29",
+      "universe": "C_broad",
+      "members": 709,
+      "eligible_before_price_join": 1379,
+      "missing_price_ciks": 644,
+      "survivorship_loss_fraction": 0.467005076142132
+    },
+    {
+      "as_of": "2011-05-31",
+      "universe": "A_large",
+      "members": 146,
+      "eligible_before_price_join": 1424,
+      "missing_price_ciks": 673,
+      "survivorship_loss_fraction": 0.4726123595505618
+    },
+    {
+      "as_of": "2011-05-31",
+      "universe": "B_core",
+      "members": 607,
+      "eligible_before_price_join": 1424,
+      "missing_price_ciks": 673,
+      "survivorship_loss_fraction": 0.4726123595505618
+    },
+    {
+      "as_of": "2011-05-31",
+      "universe": "C_broad",
+      "members": 718,
+      "eligible_before_price_join": 1424,
+      "missing_price_ciks": 673,
+      "survivorship_loss_fraction": 0.4726123595505618
+    },
+    {
+      "as_of": "2011-06-30",
+      "universe": "A_large",
+      "members": 143,
+      "eligible_before_price_join": 1476,
+      "missing_price_ciks": 717,
+      "survivorship_loss_fraction": 0.48577235772357724
+    },
+    {
+      "as_of": "2011-06-30",
+      "universe": "B_core",
+      "members": 614,
+      "eligible_before_price_join": 1476,
+      "missing_price_ciks": 717,
+      "survivorship_loss_fraction": 0.48577235772357724
+    },
+    {
+      "as_of": "2011-06-30",
+      "universe": "C_broad",
+      "members": 719,
+      "eligible_before_price_join": 1476,
+      "missing_price_ciks": 717,
+      "survivorship_loss_fraction": 0.48577235772357724
+    },
+    {
+      "as_of": "2011-07-29",
+      "universe": "A_large",
+      "members": 139,
+      "eligible_before_price_join": 1566,
+      "missing_price_ciks": 771,
+      "survivorship_loss_fraction": 0.49233716475095785
+    },
+    {
+      "as_of": "2011-07-29",
+      "universe": "B_core",
+      "members": 610,
+      "eligible_before_price_join": 1566,
+      "missing_price_ciks": 771,
+      "survivorship_loss_fraction": 0.49233716475095785
+    },
+    {
+      "as_of": "2011-07-29",
+      "universe": "C_broad",
+      "members": 749,
+      "eligible_before_price_join": 1566,
+      "missing_price_ciks": 771,
+      "survivorship_loss_fraction": 0.49233716475095785
+    },
+    {
+      "as_of": "2011-08-31",
+      "universe": "A_large",
+      "members": 137,
+      "eligible_before_price_join": 1671,
+      "missing_price_ciks": 854,
+      "survivorship_loss_fraction": 0.5110712148414124
+    },
+    {
+      "as_of": "2011-08-31",
+      "universe": "B_core",
+      "members": 650,
+      "eligible_before_price_join": 1671,
+      "missing_price_ciks": 854,
+      "survivorship_loss_fraction": 0.5110712148414124
+    },
+    {
+      "as_of": "2011-08-31",
+      "universe": "C_broad",
+      "members": 759,
+      "eligible_before_price_join": 1671,
+      "missing_price_ciks": 854,
+      "survivorship_loss_fraction": 0.5110712148414124
+    },
+    {
+      "as_of": "2011-09-30",
+      "universe": "A_large",
+      "members": 126,
+      "eligible_before_price_join": 2167,
+      "missing_price_ciks": 1257,
+      "survivorship_loss_fraction": 0.5800646054453161
+    },
+    {
+      "as_of": "2011-09-30",
+      "universe": "B_core",
+      "members": 621,
+      "eligible_before_price_join": 2167,
+      "missing_price_ciks": 1257,
+      "survivorship_loss_fraction": 0.5800646054453161
+    },
+    {
+      "as_of": "2011-09-30",
+      "universe": "C_broad",
+      "members": 778,
+      "eligible_before_price_join": 2167,
+      "missing_price_ciks": 1257,
+      "survivorship_loss_fraction": 0.5800646054453161
+    },
+    {
+      "as_of": "2011-10-31",
+      "universe": "A_large",
+      "members": 139,
+      "eligible_before_price_join": 3673,
+      "missing_price_ciks": 2337,
+      "survivorship_loss_fraction": 0.6362646338143207
+    },
+    {
+      "as_of": "2011-10-31",
+      "universe": "B_core",
+      "members": 697,
+      "eligible_before_price_join": 3673,
+      "missing_price_ciks": 2337,
+      "survivorship_loss_fraction": 0.6362646338143207
+    },
+    {
+      "as_of": "2011-10-31",
+      "universe": "C_broad",
+      "members": 965,
+      "eligible_before_price_join": 3673,
+      "missing_price_ciks": 2337,
+      "survivorship_loss_fraction": 0.6362646338143207
+    },
+    {
+      "as_of": "2011-11-30",
+      "universe": "A_large",
+      "members": 142,
+      "eligible_before_price_join": 5618,
+      "missing_price_ciks": 3899,
+      "survivorship_loss_fraction": 0.6940192239231043
+    },
+    {
+      "as_of": "2011-11-30",
+      "universe": "B_core",
+      "members": 685,
+      "eligible_before_price_join": 5618,
+      "missing_price_ciks": 3899,
+      "survivorship_loss_fraction": 0.6940192239231043
+    },
+    {
+      "as_of": "2011-11-30",
+      "universe": "C_broad",
+      "members": 1035,
+      "eligible_before_price_join": 5618,
+      "missing_price_ciks": 3899,
+      "survivorship_loss_fraction": 0.6940192239231043
+    },
+    {
+      "as_of": "2011-12-30",
+      "universe": "A_large",
+      "members": 137,
+      "eligible_before_price_join": 5917,
+      "missing_price_ciks": 4147,
+      "survivorship_loss_fraction": 0.7008619232719283
+    },
+    {
+      "as_of": "2011-12-30",
+      "universe": "B_core",
+      "members": 694,
+      "eligible_before_price_join": 5917,
+      "missing_price_ciks": 4147,
+      "survivorship_loss_fraction": 0.7008619232719283
+    },
+    {
+      "as_of": "2011-12-30",
+      "universe": "C_broad",
+      "members": 1031,
+      "eligible_before_price_join": 5917,
+      "missing_price_ciks": 4147,
+      "survivorship_loss_fraction": 0.7008619232719283
+    },
+    {
+      "as_of": "2012-01-31",
+      "universe": "A_large",
+      "members": 144,
+      "eligible_before_price_join": 6169,
+      "missing_price_ciks": 4348,
+      "survivorship_loss_fraction": 0.7048143945534122
+    },
+    {
+      "as_of": "2012-01-31",
+      "universe": "B_core",
+      "members": 709,
+      "eligible_before_price_join": 6169,
+      "missing_price_ciks": 4348,
+      "survivorship_loss_fraction": 0.7048143945534122
+    },
+    {
+      "as_of": "2012-01-31",
+      "universe": "C_broad",
+      "members": 1051,
+      "eligible_before_price_join": 6169,
+      "missing_price_ciks": 4348,
+      "survivorship_loss_fraction": 0.7048143945534122
+    },
+    {
+      "as_of": "2012-02-29",
+      "universe": "A_large",
+      "members": 146,
+      "eligible_before_price_join": 6629,
+      "missing_price_ciks": 4738,
+      "survivorship_loss_fraction": 0.7147382712324635
+    },
+    {
+      "as_of": "2012-02-29",
+      "universe": "B_core",
+      "members": 739,
+      "eligible_before_price_join": 6629,
+      "missing_price_ciks": 4738,
+      "survivorship_loss_fraction": 0.7147382712324635
+    },
+    {
+      "as_of": "2012-02-29",
+      "universe": "C_broad",
+      "members": 1078,
+      "eligible_before_price_join": 6629,
+      "missing_price_ciks": 4738,
+      "survivorship_loss_fraction": 0.7147382712324635
+    },
+    {
+      "as_of": "2012-03-30",
+      "universe": "A_large",
+      "members": 152,
+      "eligible_before_price_join": 6758,
+      "missing_price_ciks": 4839,
+      "survivorship_loss_fraction": 0.7160402485942586
+    },
+    {
+      "as_of": "2012-03-30",
+      "universe": "B_core",
+      "members": 735,
+      "eligible_before_price_join": 6758,
+      "missing_price_ciks": 4839,
+      "survivorship_loss_fraction": 0.7160402485942586
+    },
+    {
+      "as_of": "2012-03-30",
+      "universe": "C_broad",
+      "members": 1089,
+      "eligible_before_price_join": 6758,
+      "missing_price_ciks": 4839,
+      "survivorship_loss_fraction": 0.7160402485942586
+    },
+    {
+      "as_of": "2012-04-30",
+      "universe": "A_large",
+      "members": 155,
+      "eligible_before_price_join": 6832,
+      "missing_price_ciks": 4895,
+      "survivorship_loss_fraction": 0.7164812646370023
+    },
+    {
+      "as_of": "2012-04-30",
+      "universe": "B_core",
+      "members": 726,
+      "eligible_before_price_join": 6832,
+      "missing_price_ciks": 4895,
+      "survivorship_loss_fraction": 0.7164812646370023
+    },
+    {
+      "as_of": "2012-04-30",
+      "universe": "C_broad",
+      "members": 1066,
+      "eligible_before_price_join": 6832,
+      "missing_price_ciks": 4895,
+      "survivorship_loss_fraction": 0.7164812646370023
+    },
+    {
+      "as_of": "2012-05-31",
+      "universe": "A_large",
+      "members": 146,
+      "eligible_before_price_join": 6875,
+      "missing_price_ciks": 4929,
+      "survivorship_loss_fraction": 0.7169454545454546
+    },
+    {
+      "as_of": "2012-05-31",
+      "universe": "B_core",
+      "members": 721,
+      "eligible_before_price_join": 6875,
+      "missing_price_ciks": 4929,
+      "survivorship_loss_fraction": 0.7169454545454546
+    },
+    {
+      "as_of": "2012-05-31",
+      "universe": "C_broad",
+      "members": 1072,
+      "eligible_before_price_join": 6875,
+      "missing_price_ciks": 4929,
+      "survivorship_loss_fraction": 0.7169454545454546
+    },
+    {
+      "as_of": "2012-06-29",
+      "universe": "A_large",
+      "members": 150,
+      "eligible_before_price_join": 6952,
+      "missing_price_ciks": 4995,
+      "survivorship_loss_fraction": 0.7184982738780207
+    },
+    {
+      "as_of": "2012-06-29",
+      "universe": "B_core",
+      "members": 733,
+      "eligible_before_price_join": 6952,
+      "missing_price_ciks": 4995,
+      "survivorship_loss_fraction": 0.7184982738780207
+    },
+    {
+      "as_of": "2012-06-29",
+      "universe": "C_broad",
+      "members": 1094,
+      "eligible_before_price_join": 6952,
+      "missing_price_ciks": 4995,
+      "survivorship_loss_fraction": 0.7184982738780207
+    },
+    {
+      "as_of": "2012-07-31",
+      "universe": "A_large",
+      "members": 148,
+      "eligible_before_price_join": 7031,
+      "missing_price_ciks": 5064,
+      "survivorship_loss_fraction": 0.7202389418290428
+    },
+    {
+      "as_of": "2012-07-31",
+      "universe": "B_core",
+      "members": 716,
+      "eligible_before_price_join": 7031,
+      "missing_price_ciks": 5064,
+      "survivorship_loss_fraction": 0.7202389418290428
+    },
+    {
+      "as_of": "2012-07-31",
+      "universe": "C_broad",
+      "members": 1053,
+      "eligible_before_price_join": 7031,
+      "missing_price_ciks": 5064,
+      "survivorship_loss_fraction": 0.7202389418290428
+    },
+    {
+      "as_of": "2012-08-31",
+      "universe": "A_large",
+      "members": 150,
+      "eligible_before_price_join": 7116,
+      "missing_price_ciks": 5133,
+      "survivorship_loss_fraction": 0.7213322091062394
+    },
+    {
+      "as_of": "2012-08-31",
+      "universe": "B_core",
+      "members": 689,
+      "eligible_before_price_join": 7116,
+      "missing_price_ciks": 5133,
+      "survivorship_loss_fraction": 0.7213322091062394
+    },
+    {
+      "as_of": "2012-08-31",
+      "universe": "C_broad",
+      "members": 1049,
+      "eligible_before_price_join": 7116,
+      "missing_price_ciks": 5133,
+      "survivorship_loss_fraction": 0.7213322091062394
+    },
+    {
+      "as_of": "2012-09-28",
+      "universe": "A_large",
+      "members": 156,
+      "eligible_before_price_join": 7151,
+      "missing_price_ciks": 5160,
+      "survivorship_loss_fraction": 0.7215774017619914
+    },
+    {
+      "as_of": "2012-09-28",
+      "universe": "B_core",
+      "members": 749,
+      "eligible_before_price_join": 7151,
+      "missing_price_ciks": 5160,
+      "survivorship_loss_fraction": 0.7215774017619914
+    },
+    {
+      "as_of": "2012-09-28",
+      "universe": "C_broad",
+      "members": 1094,
+      "eligible_before_price_join": 7151,
+      "missing_price_ciks": 5160,
+      "survivorship_loss_fraction": 0.7215774017619914
+    },
+    {
+      "as_of": "2012-10-31",
+      "universe": "A_large",
+      "members": 153,
+      "eligible_before_price_join": 7181,
+      "missing_price_ciks": 5172,
+      "survivorship_loss_fraction": 0.7202339507032447
+    },
+    {
+      "as_of": "2012-10-31",
+      "universe": "B_core",
+      "members": 722,
+      "eligible_before_price_join": 7181,
+      "missing_price_ciks": 5172,
+      "survivorship_loss_fraction": 0.7202339507032447
+    },
+    {
+      "as_of": "2012-10-31",
+      "universe": "C_broad",
+      "members": 1061,
+      "eligible_before_price_join": 7181,
+      "missing_price_ciks": 5172,
+      "survivorship_loss_fraction": 0.7202339507032447
+    },
+    {
+      "as_of": "2012-11-30",
+      "universe": "A_large",
+      "members": 150,
+      "eligible_before_price_join": 7224,
+      "missing_price_ciks": 5207,
+      "survivorship_loss_fraction": 0.7207918050941307
+    },
+    {
+      "as_of": "2012-11-30",
+      "universe": "B_core",
+      "members": 725,
+      "eligible_before_price_join": 7224,
+      "missing_price_ciks": 5207,
+      "survivorship_loss_fraction": 0.7207918050941307
+    },
+    {
+      "as_of": "2012-11-30",
+      "universe": "C_broad",
+      "members": 1086,
+      "eligible_before_price_join": 7224,
+      "missing_price_ciks": 5207,
+      "survivorship_loss_fraction": 0.7207918050941307
+    },
+    {
+      "as_of": "2012-12-31",
+      "universe": "A_large",
+      "members": 152,
+      "eligible_before_price_join": 7261,
+      "missing_price_ciks": 5241,
+      "survivorship_loss_fraction": 0.7218014047651838
+    },
+    {
+      "as_of": "2012-12-31",
+      "universe": "B_core",
+      "members": 757,
+      "eligible_before_price_join": 7261,
+      "missing_price_ciks": 5241,
+      "survivorship_loss_fraction": 0.7218014047651838
+    },
+    {
+      "as_of": "2012-12-31",
+      "universe": "C_broad",
+      "members": 1103,
+      "eligible_before_price_join": 7261,
+      "missing_price_ciks": 5241,
+      "survivorship_loss_fraction": 0.7218014047651838
+    },
+    {
+      "as_of": "2013-01-31",
+      "universe": "A_large",
+      "members": 167,
+      "eligible_before_price_join": 7297,
+      "missing_price_ciks": 5266,
+      "survivorship_loss_fraction": 0.7216664382622996
+    },
+    {
+      "as_of": "2013-01-31",
+      "universe": "B_core",
+      "members": 774,
+      "eligible_before_price_join": 7297,
+      "missing_price_ciks": 5266,
+      "survivorship_loss_fraction": 0.7216664382622996
+    },
+    {
+      "as_of": "2013-01-31",
+      "universe": "C_broad",
+      "members": 1115,
+      "eligible_before_price_join": 7297,
+      "missing_price_ciks": 5266,
+      "survivorship_loss_fraction": 0.7216664382622996
+    },
+    {
+      "as_of": "2013-02-28",
+      "universe": "A_large",
+      "members": 167,
+      "eligible_before_price_join": 7337,
+      "missing_price_ciks": 5292,
+      "survivorship_loss_fraction": 0.7212757257734769
+    },
+    {
+      "as_of": "2013-02-28",
+      "universe": "B_core",
+      "members": 801,
+      "eligible_before_price_join": 7337,
+      "missing_price_ciks": 5292,
+      "survivorship_loss_fraction": 0.7212757257734769
+    },
+    {
+      "as_of": "2013-02-28",
+      "universe": "C_broad",
+      "members": 1135,
+      "eligible_before_price_join": 7337,
+      "missing_price_ciks": 5292,
+      "survivorship_loss_fraction": 0.7212757257734769
+    },
+    {
+      "as_of": "2013-03-28",
+      "universe": "A_large",
+      "members": 177,
+      "eligible_before_price_join": 7356,
+      "missing_price_ciks": 5306,
+      "survivorship_loss_fraction": 0.7213159325720501
+    },
+    {
+      "as_of": "2013-03-28",
+      "universe": "B_core",
+      "members": 816,
+      "eligible_before_price_join": 7356,
+      "missing_price_ciks": 5306,
+      "survivorship_loss_fraction": 0.7213159325720501
+    },
+    {
+      "as_of": "2013-03-28",
+      "universe": "C_broad",
+      "members": 1142,
+      "eligible_before_price_join": 7356,
+      "missing_price_ciks": 5306,
+      "survivorship_loss_fraction": 0.7213159325720501
+    },
+    {
+      "as_of": "2013-04-30",
+      "universe": "A_large",
+      "members": 183,
+      "eligible_before_price_join": 7383,
+      "missing_price_ciks": 5327,
+      "survivorship_loss_fraction": 0.7215224163619125
+    },
+    {
+      "as_of": "2013-04-30",
+      "universe": "B_core",
+      "members": 806,
+      "eligible_before_price_join": 7383,
+      "missing_price_ciks": 5327,
+      "survivorship_loss_fraction": 0.7215224163619125
+    },
+    {
+      "as_of": "2013-04-30",
+      "universe": "C_broad",
+      "members": 1139,
+      "eligible_before_price_join": 7383,
+      "missing_price_ciks": 5327,
+      "survivorship_loss_fraction": 0.7215224163619125
+    },
+    {
+      "as_of": "2013-05-31",
+      "universe": "A_large",
+      "members": 180,
+      "eligible_before_price_join": 7416,
+      "missing_price_ciks": 5354,
+      "survivorship_loss_fraction": 0.7219525350593312
+    },
+    {
+      "as_of": "2013-05-31",
+      "universe": "B_core",
+      "members": 813,
+      "eligible_before_price_join": 7416,
+      "missing_price_ciks": 5354,
+      "survivorship_loss_fraction": 0.7219525350593312
+    },
+    {
+      "as_of": "2013-05-31",
+      "universe": "C_broad",
+      "members": 1155,
+      "eligible_before_price_join": 7416,
+      "missing_price_ciks": 5354,
+      "survivorship_loss_fraction": 0.7219525350593312
+    },
+    {
+      "as_of": "2013-06-28",
+      "universe": "A_large",
+      "members": 181,
+      "eligible_before_price_join": 7442,
+      "missing_price_ciks": 5370,
+      "survivorship_loss_fraction": 0.721580220370868
+    },
+    {
+      "as_of": "2013-06-28",
+      "universe": "B_core",
+      "members": 836,
+      "eligible_before_price_join": 7442,
+      "missing_price_ciks": 5370,
+      "survivorship_loss_fraction": 0.721580220370868
+    },
+    {
+      "as_of": "2013-06-28",
+      "universe": "C_broad",
+      "members": 1200,
+      "eligible_before_price_join": 7442,
+      "missing_price_ciks": 5370,
+      "survivorship_loss_fraction": 0.721580220370868
+    },
+    {
+      "as_of": "2013-07-31",
+      "universe": "A_large",
+      "members": 194,
+      "eligible_before_price_join": 7513,
+      "missing_price_ciks": 5435,
+      "survivorship_loss_fraction": 0.7234127512311993
+    },
+    {
+      "as_of": "2013-07-31",
+      "universe": "B_core",
+      "members": 827,
+      "eligible_before_price_join": 7513,
+      "missing_price_ciks": 5435,
+      "survivorship_loss_fraction": 0.7234127512311993
+    },
+    {
+      "as_of": "2013-07-31",
+      "universe": "C_broad",
+      "members": 1182,
+      "eligible_before_price_join": 7513,
+      "missing_price_ciks": 5435,
+      "survivorship_loss_fraction": 0.7234127512311993
+    },
+    {
+      "as_of": "2013-08-30",
+      "universe": "A_large",
+      "members": 188,
+      "eligible_before_price_join": 7576,
+      "missing_price_ciks": 5481,
+      "survivorship_loss_fraction": 0.7234688489968321
+    },
+    {
+      "as_of": "2013-08-30",
+      "universe": "B_core",
+      "members": 792,
+      "eligible_before_price_join": 7576,
+      "missing_price_ciks": 5481,
+      "survivorship_loss_fraction": 0.7234688489968321
+    },
+    {
+      "as_of": "2013-08-30",
+      "universe": "C_broad",
+      "members": 1177,
+      "eligible_before_price_join": 7576,
+      "missing_price_ciks": 5481,
+      "survivorship_loss_fraction": 0.7234688489968321
+    },
+    {
+      "as_of": "2013-09-30",
+      "universe": "A_large",
+      "members": 199,
+      "eligible_before_price_join": 7614,
+      "missing_price_ciks": 5511,
+      "survivorship_loss_fraction": 0.7237982663514578
+    },
+    {
+      "as_of": "2013-09-30",
+      "universe": "B_core",
+      "members": 834,
+      "eligible_before_price_join": 7614,
+      "missing_price_ciks": 5511,
+      "survivorship_loss_fraction": 0.7237982663514578
+    },
+    {
+      "as_of": "2013-09-30",
+      "universe": "C_broad",
+      "members": 1215,
+      "eligible_before_price_join": 7614,
+      "missing_price_ciks": 5511,
+      "survivorship_loss_fraction": 0.7237982663514578
+    },
+    {
+      "as_of": "2013-10-31",
+      "universe": "A_large",
+      "members": 204,
+      "eligible_before_price_join": 7645,
+      "missing_price_ciks": 5538,
+      "survivorship_loss_fraction": 0.7243950294310006
+    },
+    {
+      "as_of": "2013-10-31",
+      "universe": "B_core",
+      "members": 856,
+      "eligible_before_price_join": 7645,
+      "missing_price_ciks": 5538,
+      "survivorship_loss_fraction": 0.7243950294310006
+    },
+    {
+      "as_of": "2013-10-31",
+      "universe": "C_broad",
+      "members": 1219,
+      "eligible_before_price_join": 7645,
+      "missing_price_ciks": 5538,
+      "survivorship_loss_fraction": 0.7243950294310006
+    },
+    {
+      "as_of": "2013-11-29",
+      "universe": "A_large",
+      "members": 209,
+      "eligible_before_price_join": 7682,
+      "missing_price_ciks": 5566,
+      "survivorship_loss_fraction": 0.7245508982035929
+    },
+    {
+      "as_of": "2013-11-29",
+      "universe": "B_core",
+      "members": 859,
+      "eligible_before_price_join": 7682,
+      "missing_price_ciks": 5566,
+      "survivorship_loss_fraction": 0.7245508982035929
+    },
+    {
+      "as_of": "2013-11-29",
+      "universe": "C_broad",
+      "members": 1224,
+      "eligible_before_price_join": 7682,
+      "missing_price_ciks": 5566,
+      "survivorship_loss_fraction": 0.7245508982035929
+    },
+    {
+      "as_of": "2013-12-31",
+      "universe": "A_large",
+      "members": 212,
+      "eligible_before_price_join": 7713,
+      "missing_price_ciks": 5590,
+      "survivorship_loss_fraction": 0.724750421366524
+    },
+    {
+      "as_of": "2013-12-31",
+      "universe": "B_core",
+      "members": 895,
+      "eligible_before_price_join": 7713,
+      "missing_price_ciks": 5590,
+      "survivorship_loss_fraction": 0.724750421366524
+    },
+    {
+      "as_of": "2013-12-31",
+      "universe": "C_broad",
+      "members": 1264,
+      "eligible_before_price_join": 7713,
+      "missing_price_ciks": 5590,
+      "survivorship_loss_fraction": 0.724750421366524
+    },
+    {
+      "as_of": "2014-01-31",
+      "universe": "A_large",
+      "members": 214,
+      "eligible_before_price_join": 7753,
+      "missing_price_ciks": 5626,
+      "survivorship_loss_fraction": 0.7256545853218109
+    },
+    {
+      "as_of": "2014-01-31",
+      "universe": "B_core",
+      "members": 915,
+      "eligible_before_price_join": 7753,
+      "missing_price_ciks": 5626,
+      "survivorship_loss_fraction": 0.7256545853218109
+    },
+    {
+      "as_of": "2014-01-31",
+      "universe": "C_broad",
+      "members": 1284,
+      "eligible_before_price_join": 7753,
+      "missing_price_ciks": 5626,
+      "survivorship_loss_fraction": 0.7256545853218109
+    },
+    {
+      "as_of": "2014-02-28",
+      "universe": "A_large",
+      "members": 225,
+      "eligible_before_price_join": 7822,
+      "missing_price_ciks": 5676,
+      "survivorship_loss_fraction": 0.7256456149322424
+    },
+    {
+      "as_of": "2014-02-28",
+      "universe": "B_core",
+      "members": 937,
+      "eligible_before_price_join": 7822,
+      "missing_price_ciks": 5676,
+      "survivorship_loss_fraction": 0.7256456149322424
+    },
+    {
+      "as_of": "2014-02-28",
+      "universe": "C_broad",
+      "members": 1293,
+      "eligible_before_price_join": 7822,
+      "missing_price_ciks": 5676,
+      "survivorship_loss_fraction": 0.7256456149322424
+    },
+    {
+      "as_of": "2014-03-31",
+      "universe": "A_large",
+      "members": 223,
+      "eligible_before_price_join": 7857,
+      "missing_price_ciks": 5701,
+      "survivorship_loss_fraction": 0.7255950108183785
+    },
+    {
+      "as_of": "2014-03-31",
+      "universe": "B_core",
+      "members": 949,
+      "eligible_before_price_join": 7857,
+      "missing_price_ciks": 5701,
+      "survivorship_loss_fraction": 0.7255950108183785
+    },
+    {
+      "as_of": "2014-03-31",
+      "universe": "C_broad",
+      "members": 1313,
+      "eligible_before_price_join": 7857,
+      "missing_price_ciks": 5701,
+      "survivorship_loss_fraction": 0.7255950108183785
+    },
+    {
+      "as_of": "2014-04-30",
+      "universe": "A_large",
+      "members": 219,
+      "eligible_before_price_join": 7867,
+      "missing_price_ciks": 5705,
+      "survivorship_loss_fraction": 0.7251811363925258
+    },
+    {
+      "as_of": "2014-04-30",
+      "universe": "B_core",
+      "members": 917,
+      "eligible_before_price_join": 7867,
+      "missing_price_ciks": 5705,
+      "survivorship_loss_fraction": 0.7251811363925258
+    },
+    {
+      "as_of": "2014-04-30",
+      "universe": "C_broad",
+      "members": 1276,
+      "eligible_before_price_join": 7867,
+      "missing_price_ciks": 5705,
+      "survivorship_loss_fraction": 0.7251811363925258
+    },
+    {
+      "as_of": "2014-05-30",
+      "universe": "A_large",
+      "members": 220,
+      "eligible_before_price_join": 7885,
+      "missing_price_ciks": 5718,
+      "survivorship_loss_fraction": 0.7251743817374762
+    },
+    {
+      "as_of": "2014-05-30",
+      "universe": "B_core",
+      "members": 910,
+      "eligible_before_price_join": 7885,
+      "missing_price_ciks": 5718,
+      "survivorship_loss_fraction": 0.7251743817374762
+    },
+    {
+      "as_of": "2014-05-30",
+      "universe": "C_broad",
+      "members": 1283,
+      "eligible_before_price_join": 7885,
+      "missing_price_ciks": 5718,
+      "survivorship_loss_fraction": 0.7251743817374762
+    },
+    {
+      "as_of": "2014-06-30",
+      "universe": "A_large",
+      "members": 227,
+      "eligible_before_price_join": 7925,
+      "missing_price_ciks": 5750,
+      "survivorship_loss_fraction": 0.7255520504731862
+    },
+    {
+      "as_of": "2014-06-30",
+      "universe": "B_core",
+      "members": 934,
+      "eligible_before_price_join": 7925,
+      "missing_price_ciks": 5750,
+      "survivorship_loss_fraction": 0.7255520504731862
+    },
+    {
+      "as_of": "2014-06-30",
+      "universe": "C_broad",
+      "members": 1314,
+      "eligible_before_price_join": 7925,
+      "missing_price_ciks": 5750,
+      "survivorship_loss_fraction": 0.7255520504731862
+    },
+    {
+      "as_of": "2014-07-31",
+      "universe": "A_large",
+      "members": 223,
+      "eligible_before_price_join": 7992,
+      "missing_price_ciks": 5794,
+      "survivorship_loss_fraction": 0.724974974974975
+    },
+    {
+      "as_of": "2014-07-31",
+      "universe": "B_core",
+      "members": 906,
+      "eligible_before_price_join": 7992,
+      "missing_price_ciks": 5794,
+      "survivorship_loss_fraction": 0.724974974974975
+    },
+    {
+      "as_of": "2014-07-31",
+      "universe": "C_broad",
+      "members": 1277,
+      "eligible_before_price_join": 7992,
+      "missing_price_ciks": 5794,
+      "survivorship_loss_fraction": 0.724974974974975
+    },
+    {
+      "as_of": "2014-08-29",
+      "universe": "A_large",
+      "members": 237,
+      "eligible_before_price_join": 8083,
+      "missing_price_ciks": 5860,
+      "survivorship_loss_fraction": 0.7249783496226648
+    },
+    {
+      "as_of": "2014-08-29",
+      "universe": "B_core",
+      "members": 898,
+      "eligible_before_price_join": 8083,
+      "missing_price_ciks": 5860,
+      "survivorship_loss_fraction": 0.7249783496226648
+    },
+    {
+      "as_of": "2014-08-29",
+      "universe": "C_broad",
+      "members": 1274,
+      "eligible_before_price_join": 8083,
+      "missing_price_ciks": 5860,
+      "survivorship_loss_fraction": 0.7249783496226648
+    },
+    {
+      "as_of": "2014-09-30",
+      "universe": "A_large",
+      "members": 228,
+      "eligible_before_price_join": 8133,
+      "missing_price_ciks": 5897,
+      "survivorship_loss_fraction": 0.7250706996188369
+    },
+    {
+      "as_of": "2014-09-30",
+      "universe": "B_core",
+      "members": 920,
+      "eligible_before_price_join": 8133,
+      "missing_price_ciks": 5897,
+      "survivorship_loss_fraction": 0.7250706996188369
+    },
+    {
+      "as_of": "2014-09-30",
+      "universe": "C_broad",
+      "members": 1299,
+      "eligible_before_price_join": 8133,
+      "missing_price_ciks": 5897,
+      "survivorship_loss_fraction": 0.7250706996188369
+    },
+    {
+      "as_of": "2014-10-31",
+      "universe": "A_large",
+      "members": 238,
+      "eligible_before_price_join": 8185,
+      "missing_price_ciks": 5930,
+      "survivorship_loss_fraction": 0.7244960293219304
+    },
+    {
+      "as_of": "2014-10-31",
+      "universe": "B_core",
+      "members": 952,
+      "eligible_before_price_join": 8185,
+      "missing_price_ciks": 5930,
+      "survivorship_loss_fraction": 0.7244960293219304
+    },
+    {
+      "as_of": "2014-10-31",
+      "universe": "C_broad",
+      "members": 1314,
+      "eligible_before_price_join": 8185,
+      "missing_price_ciks": 5930,
+      "survivorship_loss_fraction": 0.7244960293219304
+    },
+    {
+      "as_of": "2014-11-28",
+      "universe": "A_large",
+      "members": 241,
+      "eligible_before_price_join": 8260,
+      "missing_price_ciks": 5982,
+      "survivorship_loss_fraction": 0.7242130750605327
+    },
+    {
+      "as_of": "2014-11-28",
+      "universe": "B_core",
+      "members": 940,
+      "eligible_before_price_join": 8260,
+      "missing_price_ciks": 5982,
+      "survivorship_loss_fraction": 0.7242130750605327
+    },
+    {
+      "as_of": "2014-11-28",
+      "universe": "C_broad",
+      "members": 1297,
+      "eligible_before_price_join": 8260,
+      "missing_price_ciks": 5982,
+      "survivorship_loss_fraction": 0.7242130750605327
+    },
+    {
+      "as_of": "2014-12-31",
+      "universe": "A_large",
+      "members": 240,
+      "eligible_before_price_join": 8303,
+      "missing_price_ciks": 6014,
+      "survivorship_loss_fraction": 0.7243165121040588
+    },
+    {
+      "as_of": "2014-12-31",
+      "universe": "B_core",
+      "members": 971,
+      "eligible_before_price_join": 8303,
+      "missing_price_ciks": 6014,
+      "survivorship_loss_fraction": 0.7243165121040588
+    },
+    {
+      "as_of": "2014-12-31",
+      "universe": "C_broad",
+      "members": 1333,
+      "eligible_before_price_join": 8303,
+      "missing_price_ciks": 6014,
+      "survivorship_loss_fraction": 0.7243165121040588
+    },
+    {
+      "as_of": "2015-01-30",
+      "universe": "A_large",
+      "members": 237,
+      "eligible_before_price_join": 8334,
+      "missing_price_ciks": 6034,
+      "survivorship_loss_fraction": 0.7240220782337413
+    },
+    {
+      "as_of": "2015-01-30",
+      "universe": "B_core",
+      "members": 965,
+      "eligible_before_price_join": 8334,
+      "missing_price_ciks": 6034,
+      "survivorship_loss_fraction": 0.7240220782337413
+    },
+    {
+      "as_of": "2015-01-30",
+      "universe": "C_broad",
+      "members": 1315,
+      "eligible_before_price_join": 8334,
+      "missing_price_ciks": 6034,
+      "survivorship_loss_fraction": 0.7240220782337413
+    },
+    {
+      "as_of": "2015-02-27",
+      "universe": "A_large",
+      "members": 247,
+      "eligible_before_price_join": 8387,
+      "missing_price_ciks": 6071,
+      "survivorship_loss_fraction": 0.7238583522117563
+    },
+    {
+      "as_of": "2015-02-27",
+      "universe": "B_core",
+      "members": 973,
+      "eligible_before_price_join": 8387,
+      "missing_price_ciks": 6071,
+      "survivorship_loss_fraction": 0.7238583522117563
+    },
+    {
+      "as_of": "2015-02-27",
+      "universe": "C_broad",
+      "members": 1336,
+      "eligible_before_price_join": 8387,
+      "missing_price_ciks": 6071,
+      "survivorship_loss_fraction": 0.7238583522117563
+    },
+    {
+      "as_of": "2015-03-31",
+      "universe": "A_large",
+      "members": 245,
+      "eligible_before_price_join": 8426,
+      "missing_price_ciks": 6097,
+      "survivorship_loss_fraction": 0.7235936387372419
+    },
+    {
+      "as_of": "2015-03-31",
+      "universe": "B_core",
+      "members": 997,
+      "eligible_before_price_join": 8426,
+      "missing_price_ciks": 6097,
+      "survivorship_loss_fraction": 0.7235936387372419
+    },
+    {
+      "as_of": "2015-03-31",
+      "universe": "C_broad",
+      "members": 1343,
+      "eligible_before_price_join": 8426,
+      "missing_price_ciks": 6097,
+      "survivorship_loss_fraction": 0.7235936387372419
+    },
+    {
+      "as_of": "2015-04-30",
+      "universe": "A_large",
+      "members": 245,
+      "eligible_before_price_join": 8433,
+      "missing_price_ciks": 6103,
+      "survivorship_loss_fraction": 0.7237044942487846
+    },
+    {
+      "as_of": "2015-04-30",
+      "universe": "B_core",
+      "members": 977,
+      "eligible_before_price_join": 8433,
+      "missing_price_ciks": 6103,
+      "survivorship_loss_fraction": 0.7237044942487846
+    },
+    {
+      "as_of": "2015-04-30",
+      "universe": "C_broad",
+      "members": 1352,
+      "eligible_before_price_join": 8433,
+      "missing_price_ciks": 6103,
+      "survivorship_loss_fraction": 0.7237044942487846
+    },
+    {
+      "as_of": "2015-05-29",
+      "universe": "A_large",
+      "members": 246,
+      "eligible_before_price_join": 8454,
+      "missing_price_ciks": 6118,
+      "survivorship_loss_fraction": 0.7236810977052283
+    },
+    {
+      "as_of": "2015-05-29",
+      "universe": "B_core",
+      "members": 991,
+      "eligible_before_price_join": 8454,
+      "missing_price_ciks": 6118,
+      "survivorship_loss_fraction": 0.7236810977052283
+    },
+    {
+      "as_of": "2015-05-29",
+      "universe": "C_broad",
+      "members": 1354,
+      "eligible_before_price_join": 8454,
+      "missing_price_ciks": 6118,
+      "survivorship_loss_fraction": 0.7236810977052283
+    },
+    {
+      "as_of": "2015-06-30",
+      "universe": "A_large",
+      "members": 247,
+      "eligible_before_price_join": 8490,
+      "missing_price_ciks": 6147,
+      "survivorship_loss_fraction": 0.7240282685512367
+    },
+    {
+      "as_of": "2015-06-30",
+      "universe": "B_core",
+      "members": 1013,
+      "eligible_before_price_join": 8490,
+      "missing_price_ciks": 6147,
+      "survivorship_loss_fraction": 0.7240282685512367
+    },
+    {
+      "as_of": "2015-06-30",
+      "universe": "C_broad",
+      "members": 1394,
+      "eligible_before_price_join": 8490,
+      "missing_price_ciks": 6147,
+      "survivorship_loss_fraction": 0.7240282685512367
+    },
+    {
+      "as_of": "2015-07-31",
+      "universe": "A_large",
+      "members": 251,
+      "eligible_before_price_join": 8537,
+      "missing_price_ciks": 6187,
+      "survivorship_loss_fraction": 0.7247276560852759
+    },
+    {
+      "as_of": "2015-07-31",
+      "universe": "B_core",
+      "members": 1000,
+      "eligible_before_price_join": 8537,
+      "missing_price_ciks": 6187,
+      "survivorship_loss_fraction": 0.7247276560852759
+    },
+    {
+      "as_of": "2015-07-31",
+      "universe": "C_broad",
+      "members": 1371,
+      "eligible_before_price_join": 8537,
+      "missing_price_ciks": 6187,
+      "survivorship_loss_fraction": 0.7247276560852759
+    },
+    {
+      "as_of": "2015-08-31",
+      "universe": "A_large",
+      "members": 241,
+      "eligible_before_price_join": 8597,
+      "missing_price_ciks": 6234,
+      "survivorship_loss_fraction": 0.7251366755845062
+    },
+    {
+      "as_of": "2015-08-31",
+      "universe": "B_core",
+      "members": 1002,
+      "eligible_before_price_join": 8597,
+      "missing_price_ciks": 6234,
+      "survivorship_loss_fraction": 0.7251366755845062
+    },
+    {
+      "as_of": "2015-08-31",
+      "universe": "C_broad",
+      "members": 1376,
+      "eligible_before_price_join": 8597,
+      "missing_price_ciks": 6234,
+      "survivorship_loss_fraction": 0.7251366755845062
+    },
+    {
+      "as_of": "2015-09-30",
+      "universe": "A_large",
+      "members": 237,
+      "eligible_before_price_join": 8633,
+      "missing_price_ciks": 6259,
+      "survivorship_loss_fraction": 0.7250086875941156
+    },
+    {
+      "as_of": "2015-09-30",
+      "universe": "B_core",
+      "members": 973,
+      "eligible_before_price_join": 8633,
+      "missing_price_ciks": 6259,
+      "survivorship_loss_fraction": 0.7250086875941156
+    },
+    {
+      "as_of": "2015-09-30",
+      "universe": "C_broad",
+      "members": 1366,
+      "eligible_before_price_join": 8633,
+      "missing_price_ciks": 6259,
+      "survivorship_loss_fraction": 0.7250086875941156
+    },
+    {
+      "as_of": "2015-10-30",
+      "universe": "A_large",
+      "members": 246,
+      "eligible_before_price_join": 8664,
+      "missing_price_ciks": 6283,
+      "survivorship_loss_fraction": 0.7251846722068329
+    },
+    {
+      "as_of": "2015-10-30",
+      "universe": "B_core",
+      "members": 991,
+      "eligible_before_price_join": 8664,
+      "missing_price_ciks": 6283,
+      "survivorship_loss_fraction": 0.7251846722068329
+    },
+    {
+      "as_of": "2015-10-30",
+      "universe": "C_broad",
+      "members": 1358,
+      "eligible_before_price_join": 8664,
+      "missing_price_ciks": 6283,
+      "survivorship_loss_fraction": 0.7251846722068329
+    },
+    {
+      "as_of": "2015-11-30",
+      "universe": "A_large",
+      "members": 248,
+      "eligible_before_price_join": 8716,
+      "missing_price_ciks": 6320,
+      "survivorship_loss_fraction": 0.7251032583754016
+    },
+    {
+      "as_of": "2015-11-30",
+      "universe": "B_core",
+      "members": 994,
+      "eligible_before_price_join": 8716,
+      "missing_price_ciks": 6320,
+      "survivorship_loss_fraction": 0.7251032583754016
+    },
+    {
+      "as_of": "2015-11-30",
+      "universe": "C_broad",
+      "members": 1373,
+      "eligible_before_price_join": 8716,
+      "missing_price_ciks": 6320,
+      "survivorship_loss_fraction": 0.7251032583754016
+    },
+    {
+      "as_of": "2015-12-31",
+      "universe": "A_large",
+      "members": 242,
+      "eligible_before_price_join": 8739,
+      "missing_price_ciks": 6335,
+      "survivorship_loss_fraction": 0.7249113170843345
+    },
+    {
+      "as_of": "2015-12-31",
+      "universe": "B_core",
+      "members": 1010,
+      "eligible_before_price_join": 8739,
+      "missing_price_ciks": 6335,
+      "survivorship_loss_fraction": 0.7249113170843345
+    },
+    {
+      "as_of": "2015-12-31",
+      "universe": "C_broad",
+      "members": 1389,
+      "eligible_before_price_join": 8739,
+      "missing_price_ciks": 6335,
+      "survivorship_loss_fraction": 0.7249113170843345
+    },
+    {
+      "as_of": "2016-01-29",
+      "universe": "A_large",
+      "members": 230,
+      "eligible_before_price_join": 8755,
+      "missing_price_ciks": 6344,
+      "survivorship_loss_fraction": 0.7246145059965734
+    },
+    {
+      "as_of": "2016-01-29",
+      "universe": "B_core",
+      "members": 996,
+      "eligible_before_price_join": 8755,
+      "missing_price_ciks": 6344,
+      "survivorship_loss_fraction": 0.7246145059965734
+    },
+    {
+      "as_of": "2016-01-29",
+      "universe": "C_broad",
+      "members": 1375,
+      "eligible_before_price_join": 8755,
+      "missing_price_ciks": 6344,
+      "survivorship_loss_fraction": 0.7246145059965734
+    },
+    {
+      "as_of": "2016-02-29",
+      "universe": "A_large",
+      "members": 231,
+      "eligible_before_price_join": 8799,
+      "missing_price_ciks": 6376,
+      "survivorship_loss_fraction": 0.7246277986134788
+    },
+    {
+      "as_of": "2016-02-29",
+      "universe": "B_core",
+      "members": 963,
+      "eligible_before_price_join": 8799,
+      "missing_price_ciks": 6376,
+      "survivorship_loss_fraction": 0.7246277986134788
+    },
+    {
+      "as_of": "2016-02-29",
+      "universe": "C_broad",
+      "members": 1355,
+      "eligible_before_price_join": 8799,
+      "missing_price_ciks": 6376,
+      "survivorship_loss_fraction": 0.7246277986134788
+    },
+    {
+      "as_of": "2016-03-31",
+      "universe": "A_large",
+      "members": 241,
+      "eligible_before_price_join": 8820,
+      "missing_price_ciks": 6385,
+      "survivorship_loss_fraction": 0.7239229024943311
+    },
+    {
+      "as_of": "2016-03-31",
+      "universe": "B_core",
+      "members": 991,
+      "eligible_before_price_join": 8820,
+      "missing_price_ciks": 6385,
+      "survivorship_loss_fraction": 0.7239229024943311
+    },
+    {
+      "as_of": "2016-03-31",
+      "universe": "C_broad",
+      "members": 1367,
+      "eligible_before_price_join": 8820,
+      "missing_price_ciks": 6385,
+      "survivorship_loss_fraction": 0.7239229024943311
+    },
+    {
+      "as_of": "2016-04-29",
+      "universe": "A_large",
+      "members": 244,
+      "eligible_before_price_join": 8823,
+      "missing_price_ciks": 6384,
+      "survivorship_loss_fraction": 0.7235634138048282
+    },
+    {
+      "as_of": "2016-04-29",
+      "universe": "B_core",
+      "members": 984,
+      "eligible_before_price_join": 8823,
+      "missing_price_ciks": 6384,
+      "survivorship_loss_fraction": 0.7235634138048282
+    },
+    {
+      "as_of": "2016-04-29",
+      "universe": "C_broad",
+      "members": 1359,
+      "eligible_before_price_join": 8823,
+      "missing_price_ciks": 6384,
+      "survivorship_loss_fraction": 0.7235634138048282
+    },
+    {
+      "as_of": "2016-05-31",
+      "universe": "A_large",
+      "members": 249,
+      "eligible_before_price_join": 8832,
+      "missing_price_ciks": 6392,
+      "survivorship_loss_fraction": 0.7237318840579711
+    },
+    {
+      "as_of": "2016-05-31",
+      "universe": "B_core",
+      "members": 995,
+      "eligible_before_price_join": 8832,
+      "missing_price_ciks": 6392,
+      "survivorship_loss_fraction": 0.7237318840579711
+    },
+    {
+      "as_of": "2016-05-31",
+      "universe": "C_broad",
+      "members": 1385,
+      "eligible_before_price_join": 8832,
+      "missing_price_ciks": 6392,
+      "survivorship_loss_fraction": 0.7237318840579711
+    },
+    {
+      "as_of": "2016-06-30",
+      "universe": "A_large",
+      "members": 244,
+      "eligible_before_price_join": 8855,
+      "missing_price_ciks": 6412,
+      "survivorship_loss_fraction": 0.7241106719367589
+    },
+    {
+      "as_of": "2016-06-30",
+      "universe": "B_core",
+      "members": 1029,
+      "eligible_before_price_join": 8855,
+      "missing_price_ciks": 6412,
+      "survivorship_loss_fraction": 0.7241106719367589
+    },
+    {
+      "as_of": "2016-06-30",
+      "universe": "C_broad",
+      "members": 1429,
+      "eligible_before_price_join": 8855,
+      "missing_price_ciks": 6412,
+      "survivorship_loss_fraction": 0.7241106719367589
+    },
+    {
+      "as_of": "2016-07-29",
+      "universe": "A_large",
+      "members": 256,
+      "eligible_before_price_join": 8868,
+      "missing_price_ciks": 6418,
+      "survivorship_loss_fraction": 0.7237257555254849
+    },
+    {
+      "as_of": "2016-07-29",
+      "universe": "B_core",
+      "members": 998,
+      "eligible_before_price_join": 8868,
+      "missing_price_ciks": 6418,
+      "survivorship_loss_fraction": 0.7237257555254849
+    },
+    {
+      "as_of": "2016-07-29",
+      "universe": "C_broad",
+      "members": 1382,
+      "eligible_before_price_join": 8868,
+      "missing_price_ciks": 6418,
+      "survivorship_loss_fraction": 0.7237257555254849
+    },
+    {
+      "as_of": "2016-08-31",
+      "universe": "A_large",
+      "members": 254,
+      "eligible_before_price_join": 8902,
+      "missing_price_ciks": 6438,
+      "survivorship_loss_fraction": 0.7232082678049876
+    },
+    {
+      "as_of": "2016-08-31",
+      "universe": "B_core",
+      "members": 1010,
+      "eligible_before_price_join": 8902,
+      "missing_price_ciks": 6438,
+      "survivorship_loss_fraction": 0.7232082678049876
+    },
+    {
+      "as_of": "2016-08-31",
+      "universe": "C_broad",
+      "members": 1404,
+      "eligible_before_price_join": 8902,
+      "missing_price_ciks": 6438,
+      "survivorship_loss_fraction": 0.7232082678049876
+    },
+    {
+      "as_of": "2016-09-30",
+      "universe": "A_large",
+      "members": 255,
+      "eligible_before_price_join": 8922,
+      "missing_price_ciks": 6451,
+      "survivorship_loss_fraction": 0.7230441605021296
+    },
+    {
+      "as_of": "2016-09-30",
+      "universe": "B_core",
+      "members": 1029,
+      "eligible_before_price_join": 8922,
+      "missing_price_ciks": 6451,
+      "survivorship_loss_fraction": 0.7230441605021296
+    },
+    {
+      "as_of": "2016-09-30",
+      "universe": "C_broad",
+      "members": 1431,
+      "eligible_before_price_join": 8922,
+      "missing_price_ciks": 6451,
+      "survivorship_loss_fraction": 0.7230441605021296
+    },
+    {
+      "as_of": "2016-10-31",
+      "universe": "A_large",
+      "members": 247,
+      "eligible_before_price_join": 8942,
+      "missing_price_ciks": 6461,
+      "survivorship_loss_fraction": 0.7225452918810109
+    },
+    {
+      "as_of": "2016-10-31",
+      "universe": "B_core",
+      "members": 992,
+      "eligible_before_price_join": 8942,
+      "missing_price_ciks": 6461,
+      "survivorship_loss_fraction": 0.7225452918810109
+    },
+    {
+      "as_of": "2016-10-31",
+      "universe": "C_broad",
+      "members": 1377,
+      "eligible_before_price_join": 8942,
+      "missing_price_ciks": 6461,
+      "survivorship_loss_fraction": 0.7225452918810109
+    },
+    {
+      "as_of": "2016-11-30",
+      "universe": "A_large",
+      "members": 264,
+      "eligible_before_price_join": 8970,
+      "missing_price_ciks": 6480,
+      "survivorship_loss_fraction": 0.7224080267558528
+    },
+    {
+      "as_of": "2016-11-30",
+      "universe": "B_core",
+      "members": 1090,
+      "eligible_before_price_join": 8970,
+      "missing_price_ciks": 6480,
+      "survivorship_loss_fraction": 0.7224080267558528
+    },
+    {
+      "as_of": "2016-11-30",
+      "universe": "C_broad",
+      "members": 1460,
+      "eligible_before_price_join": 8970,
+      "missing_price_ciks": 6480,
+      "survivorship_loss_fraction": 0.7224080267558528
+    },
+    {
+      "as_of": "2016-12-30",
+      "universe": "A_large",
+      "members": 267,
+      "eligible_before_price_join": 8987,
+      "missing_price_ciks": 6489,
+      "survivorship_loss_fraction": 0.7220429509291199
+    },
+    {
+      "as_of": "2016-12-30",
+      "universe": "B_core",
+      "members": 1099,
+      "eligible_before_price_join": 8987,
+      "missing_price_ciks": 6489,
+      "survivorship_loss_fraction": 0.7220429509291199
+    },
+    {
+      "as_of": "2016-12-30",
+      "universe": "C_broad",
+      "members": 1490,
+      "eligible_before_price_join": 8987,
+      "missing_price_ciks": 6489,
+      "survivorship_loss_fraction": 0.7220429509291199
+    },
+    {
+      "as_of": "2017-01-31",
+      "universe": "A_large",
+      "members": 274,
+      "eligible_before_price_join": 9005,
+      "missing_price_ciks": 6498,
+      "survivorship_loss_fraction": 0.7215991116046641
+    },
+    {
+      "as_of": "2017-01-31",
+      "universe": "B_core",
+      "members": 1068,
+      "eligible_before_price_join": 9005,
+      "missing_price_ciks": 6498,
+      "survivorship_loss_fraction": 0.7215991116046641
+    },
+    {
+      "as_of": "2017-01-31",
+      "universe": "C_broad",
+      "members": 1464,
+      "eligible_before_price_join": 9005,
+      "missing_price_ciks": 6498,
+      "survivorship_loss_fraction": 0.7215991116046641
+    },
+    {
+      "as_of": "2017-02-28",
+      "universe": "A_large",
+      "members": 285,
+      "eligible_before_price_join": 9050,
+      "missing_price_ciks": 6525,
+      "survivorship_loss_fraction": 0.7209944751381215
+    },
+    {
+      "as_of": "2017-02-28",
+      "universe": "B_core",
+      "members": 1089,
+      "eligible_before_price_join": 9050,
+      "missing_price_ciks": 6525,
+      "survivorship_loss_fraction": 0.7209944751381215
+    },
+    {
+      "as_of": "2017-02-28",
+      "universe": "C_broad",
+      "members": 1472,
+      "eligible_before_price_join": 9050,
+      "missing_price_ciks": 6525,
+      "survivorship_loss_fraction": 0.7209944751381215
+    },
+    {
+      "as_of": "2017-03-31",
+      "universe": "A_large",
+      "members": 282,
+      "eligible_before_price_join": 9068,
+      "missing_price_ciks": 6536,
+      "survivorship_loss_fraction": 0.7207763564181738
+    },
+    {
+      "as_of": "2017-03-31",
+      "universe": "B_core",
+      "members": 1089,
+      "eligible_before_price_join": 9068,
+      "missing_price_ciks": 6536,
+      "survivorship_loss_fraction": 0.7207763564181738
+    },
+    {
+      "as_of": "2017-03-31",
+      "universe": "C_broad",
+      "members": 1508,
+      "eligible_before_price_join": 9068,
+      "missing_price_ciks": 6536,
+      "survivorship_loss_fraction": 0.7207763564181738
+    },
+    {
+      "as_of": "2017-04-28",
+      "universe": "A_large",
+      "members": 283,
+      "eligible_before_price_join": 9071,
+      "missing_price_ciks": 6536,
+      "survivorship_loss_fraction": 0.7205379781721971
+    },
+    {
+      "as_of": "2017-04-28",
+      "universe": "B_core",
+      "members": 1080,
+      "eligible_before_price_join": 9071,
+      "missing_price_ciks": 6536,
+      "survivorship_loss_fraction": 0.7205379781721971
+    },
+    {
+      "as_of": "2017-04-28",
+      "universe": "C_broad",
+      "members": 1485,
+      "eligible_before_price_join": 9071,
+      "missing_price_ciks": 6536,
+      "survivorship_loss_fraction": 0.7205379781721971
+    },
+    {
+      "as_of": "2017-05-31",
+      "universe": "A_large",
+      "members": 283,
+      "eligible_before_price_join": 9088,
+      "missing_price_ciks": 6547,
+      "survivorship_loss_fraction": 0.7204005281690141
+    },
+    {
+      "as_of": "2017-05-31",
+      "universe": "B_core",
+      "members": 1087,
+      "eligible_before_price_join": 9088,
+      "missing_price_ciks": 6547,
+      "survivorship_loss_fraction": 0.7204005281690141
+    },
+    {
+      "as_of": "2017-05-31",
+      "universe": "C_broad",
+      "members": 1477,
+      "eligible_before_price_join": 9088,
+      "missing_price_ciks": 6547,
+      "survivorship_loss_fraction": 0.7204005281690141
+    },
+    {
+      "as_of": "2017-06-30",
+      "universe": "A_large",
+      "members": 289,
+      "eligible_before_price_join": 9115,
+      "missing_price_ciks": 6568,
+      "survivorship_loss_fraction": 0.7205704882062535
+    },
+    {
+      "as_of": "2017-06-30",
+      "universe": "B_core",
+      "members": 1108,
+      "eligible_before_price_join": 9115,
+      "missing_price_ciks": 6568,
+      "survivorship_loss_fraction": 0.7205704882062535
+    },
+    {
+      "as_of": "2017-06-30",
+      "universe": "C_broad",
+      "members": 1536,
+      "eligible_before_price_join": 9115,
+      "missing_price_ciks": 6568,
+      "survivorship_loss_fraction": 0.7205704882062535
+    },
+    {
+      "as_of": "2017-07-31",
+      "universe": "A_large",
+      "members": 286,
+      "eligible_before_price_join": 9142,
+      "missing_price_ciks": 6583,
+      "survivorship_loss_fraction": 0.7200831327936994
+    },
+    {
+      "as_of": "2017-07-31",
+      "universe": "B_core",
+      "members": 1076,
+      "eligible_before_price_join": 9142,
+      "missing_price_ciks": 6583,
+      "survivorship_loss_fraction": 0.7200831327936994
+    },
+    {
+      "as_of": "2017-07-31",
+      "universe": "C_broad",
+      "members": 1474,
+      "eligible_before_price_join": 9142,
+      "missing_price_ciks": 6583,
+      "survivorship_loss_fraction": 0.7200831327936994
+    },
+    {
+      "as_of": "2017-08-31",
+      "universe": "A_large",
+      "members": 285,
+      "eligible_before_price_join": 9185,
+      "missing_price_ciks": 6606,
+      "survivorship_loss_fraction": 0.7192161132280893
+    },
+    {
+      "as_of": "2017-08-31",
+      "universe": "B_core",
+      "members": 1079,
+      "eligible_before_price_join": 9185,
+      "missing_price_ciks": 6606,
+      "survivorship_loss_fraction": 0.7192161132280893
+    },
+    {
+      "as_of": "2017-08-31",
+      "universe": "C_broad",
+      "members": 1478,
+      "eligible_before_price_join": 9185,
+      "missing_price_ciks": 6606,
+      "survivorship_loss_fraction": 0.7192161132280893
+    },
+    {
+      "as_of": "2017-09-29",
+      "universe": "A_large",
+      "members": 299,
+      "eligible_before_price_join": 9204,
+      "missing_price_ciks": 6616,
+      "survivorship_loss_fraction": 0.7188179052585832
+    },
+    {
+      "as_of": "2017-09-29",
+      "universe": "B_core",
+      "members": 1124,
+      "eligible_before_price_join": 9204,
+      "missing_price_ciks": 6616,
+      "survivorship_loss_fraction": 0.7188179052585832
+    },
+    {
+      "as_of": "2017-09-29",
+      "universe": "C_broad",
+      "members": 1535,
+      "eligible_before_price_join": 9204,
+      "missing_price_ciks": 6616,
+      "survivorship_loss_fraction": 0.7188179052585832
+    },
+    {
+      "as_of": "2017-10-31",
+      "universe": "A_large",
+      "members": 311,
+      "eligible_before_price_join": 9226,
+      "missing_price_ciks": 6627,
+      "survivorship_loss_fraction": 0.7182961196618253
+    },
+    {
+      "as_of": "2017-10-31",
+      "universe": "B_core",
+      "members": 1125,
+      "eligible_before_price_join": 9226,
+      "missing_price_ciks": 6627,
+      "survivorship_loss_fraction": 0.7182961196618253
+    },
+    {
+      "as_of": "2017-10-31",
+      "universe": "C_broad",
+      "members": 1520,
+      "eligible_before_price_join": 9226,
+      "missing_price_ciks": 6627,
+      "survivorship_loss_fraction": 0.7182961196618253
+    },
+    {
+      "as_of": "2017-11-30",
+      "universe": "A_large",
+      "members": 321,
+      "eligible_before_price_join": 9263,
+      "missing_price_ciks": 6648,
+      "survivorship_loss_fraction": 0.7176940516031524
+    },
+    {
+      "as_of": "2017-11-30",
+      "universe": "B_core",
+      "members": 1147,
+      "eligible_before_price_join": 9263,
+      "missing_price_ciks": 6648,
+      "survivorship_loss_fraction": 0.7176940516031524
+    },
+    {
+      "as_of": "2017-11-30",
+      "universe": "C_broad",
+      "members": 1543,
+      "eligible_before_price_join": 9263,
+      "missing_price_ciks": 6648,
+      "survivorship_loss_fraction": 0.7176940516031524
+    },
+    {
+      "as_of": "2017-12-29",
+      "universe": "A_large",
+      "members": 324,
+      "eligible_before_price_join": 9276,
+      "missing_price_ciks": 6658,
+      "survivorship_loss_fraction": 0.7177662785683484
+    },
+    {
+      "as_of": "2017-12-29",
+      "universe": "B_core",
+      "members": 1158,
+      "eligible_before_price_join": 9276,
+      "missing_price_ciks": 6658,
+      "survivorship_loss_fraction": 0.7177662785683484
+    },
+    {
+      "as_of": "2017-12-29",
+      "universe": "C_broad",
+      "members": 1569,
+      "eligible_before_price_join": 9276,
+      "missing_price_ciks": 6658,
+      "survivorship_loss_fraction": 0.7177662785683484
+    },
+    {
+      "as_of": "2018-01-31",
+      "universe": "A_large",
+      "members": 337,
+      "eligible_before_price_join": 9295,
+      "missing_price_ciks": 6671,
+      "survivorship_loss_fraction": 0.7176976869284561
+    },
+    {
+      "as_of": "2018-01-31",
+      "universe": "B_core",
+      "members": 1163,
+      "eligible_before_price_join": 9295,
+      "missing_price_ciks": 6671,
+      "survivorship_loss_fraction": 0.7176976869284561
+    },
+    {
+      "as_of": "2018-01-31",
+      "universe": "C_broad",
+      "members": 1579,
+      "eligible_before_price_join": 9295,
+      "missing_price_ciks": 6671,
+      "survivorship_loss_fraction": 0.7176976869284561
+    },
+    {
+      "as_of": "2018-02-28",
+      "universe": "A_large",
+      "members": 331,
+      "eligible_before_price_join": 9329,
+      "missing_price_ciks": 6692,
+      "survivorship_loss_fraction": 0.717333047486333
+    },
+    {
+      "as_of": "2018-02-28",
+      "universe": "B_core",
+      "members": 1187,
+      "eligible_before_price_join": 9329,
+      "missing_price_ciks": 6692,
+      "survivorship_loss_fraction": 0.717333047486333
+    },
+    {
+      "as_of": "2018-02-28",
+      "universe": "C_broad",
+      "members": 1564,
+      "eligible_before_price_join": 9329,
+      "missing_price_ciks": 6692,
+      "survivorship_loss_fraction": 0.717333047486333
+    },
+    {
+      "as_of": "2018-03-29",
+      "universe": "A_large",
+      "members": 326,
+      "eligible_before_price_join": 9338,
+      "missing_price_ciks": 6689,
+      "survivorship_loss_fraction": 0.71632041122296
+    },
+    {
+      "as_of": "2018-03-29",
+      "universe": "B_core",
+      "members": 1205,
+      "eligible_before_price_join": 9338,
+      "missing_price_ciks": 6689,
+      "survivorship_loss_fraction": 0.71632041122296
+    },
+    {
+      "as_of": "2018-03-29",
+      "universe": "C_broad",
+      "members": 1589,
+      "eligible_before_price_join": 9338,
+      "missing_price_ciks": 6689,
+      "survivorship_loss_fraction": 0.71632041122296
+    },
+    {
+      "as_of": "2018-04-30",
+      "universe": "A_large",
+      "members": 319,
+      "eligible_before_price_join": 9370,
+      "missing_price_ciks": 6700,
+      "survivorship_loss_fraction": 0.7150480256136607
+    },
+    {
+      "as_of": "2018-04-30",
+      "universe": "B_core",
+      "members": 1166,
+      "eligible_before_price_join": 9370,
+      "missing_price_ciks": 6700,
+      "survivorship_loss_fraction": 0.7150480256136607
+    },
+    {
+      "as_of": "2018-04-30",
+      "universe": "C_broad",
+      "members": 1556,
+      "eligible_before_price_join": 9370,
+      "missing_price_ciks": 6700,
+      "survivorship_loss_fraction": 0.7150480256136607
+    },
+    {
+      "as_of": "2018-05-31",
+      "universe": "A_large",
+      "members": 327,
+      "eligible_before_price_join": 9380,
+      "missing_price_ciks": 6701,
+      "survivorship_loss_fraction": 0.7143923240938166
+    },
+    {
+      "as_of": "2018-05-31",
+      "universe": "B_core",
+      "members": 1203,
+      "eligible_before_price_join": 9380,
+      "missing_price_ciks": 6701,
+      "survivorship_loss_fraction": 0.7143923240938166
+    },
+    {
+      "as_of": "2018-05-31",
+      "universe": "C_broad",
+      "members": 1583,
+      "eligible_before_price_join": 9380,
+      "missing_price_ciks": 6701,
+      "survivorship_loss_fraction": 0.7143923240938166
+    },
+    {
+      "as_of": "2018-06-29",
+      "universe": "A_large",
+      "members": 333,
+      "eligible_before_price_join": 9406,
+      "missing_price_ciks": 6713,
+      "survivorship_loss_fraction": 0.7136933871996598
+    },
+    {
+      "as_of": "2018-06-29",
+      "universe": "B_core",
+      "members": 1236,
+      "eligible_before_price_join": 9406,
+      "missing_price_ciks": 6713,
+      "survivorship_loss_fraction": 0.7136933871996598
+    },
+    {
+      "as_of": "2018-06-29",
+      "universe": "C_broad",
+      "members": 1658,
+      "eligible_before_price_join": 9406,
+      "missing_price_ciks": 6713,
+      "survivorship_loss_fraction": 0.7136933871996598
+    },
+    {
+      "as_of": "2018-07-31",
+      "universe": "A_large",
+      "members": 337,
+      "eligible_before_price_join": 9436,
+      "missing_price_ciks": 6727,
+      "survivorship_loss_fraction": 0.7129080118694362
+    },
+    {
+      "as_of": "2018-07-31",
+      "universe": "B_core",
+      "members": 1191,
+      "eligible_before_price_join": 9436,
+      "missing_price_ciks": 6727,
+      "survivorship_loss_fraction": 0.7129080118694362
+    },
+    {
+      "as_of": "2018-07-31",
+      "universe": "C_broad",
+      "members": 1595,
+      "eligible_before_price_join": 9436,
+      "missing_price_ciks": 6727,
+      "survivorship_loss_fraction": 0.7129080118694362
+    },
+    {
+      "as_of": "2018-08-31",
+      "universe": "A_large",
+      "members": 341,
+      "eligible_before_price_join": 9481,
+      "missing_price_ciks": 6754,
+      "survivorship_loss_fraction": 0.7123721126463454
+    },
+    {
+      "as_of": "2018-08-31",
+      "universe": "B_core",
+      "members": 1200,
+      "eligible_before_price_join": 9481,
+      "missing_price_ciks": 6754,
+      "survivorship_loss_fraction": 0.7123721126463454
+    },
+    {
+      "as_of": "2018-08-31",
+      "universe": "C_broad",
+      "members": 1580,
+      "eligible_before_price_join": 9481,
+      "missing_price_ciks": 6754,
+      "survivorship_loss_fraction": 0.7123721126463454
+    },
+    {
+      "as_of": "2018-09-28",
+      "universe": "A_large",
+      "members": 340,
+      "eligible_before_price_join": 9499,
+      "missing_price_ciks": 6764,
+      "survivorship_loss_fraction": 0.7120749552584482
+    },
+    {
+      "as_of": "2018-09-28",
+      "universe": "B_core",
+      "members": 1222,
+      "eligible_before_price_join": 9499,
+      "missing_price_ciks": 6764,
+      "survivorship_loss_fraction": 0.7120749552584482
+    },
+    {
+      "as_of": "2018-09-28",
+      "universe": "C_broad",
+      "members": 1622,
+      "eligible_before_price_join": 9499,
+      "missing_price_ciks": 6764,
+      "survivorship_loss_fraction": 0.7120749552584482
+    },
+    {
+      "as_of": "2018-10-31",
+      "universe": "A_large",
+      "members": 321,
+      "eligible_before_price_join": 9522,
+      "missing_price_ciks": 6778,
+      "survivorship_loss_fraction": 0.7118252467968914
+    },
+    {
+      "as_of": "2018-10-31",
+      "universe": "B_core",
+      "members": 1211,
+      "eligible_before_price_join": 9522,
+      "missing_price_ciks": 6778,
+      "survivorship_loss_fraction": 0.7118252467968914
+    },
+    {
+      "as_of": "2018-10-31",
+      "universe": "C_broad",
+      "members": 1603,
+      "eligible_before_price_join": 9522,
+      "missing_price_ciks": 6778,
+      "survivorship_loss_fraction": 0.7118252467968914
+    },
+    {
+      "as_of": "2018-11-30",
+      "universe": "A_large",
+      "members": 321,
+      "eligible_before_price_join": 9563,
+      "missing_price_ciks": 6801,
+      "survivorship_loss_fraction": 0.7111785004705636
+    },
+    {
+      "as_of": "2018-11-30",
+      "universe": "B_core",
+      "members": 1211,
+      "eligible_before_price_join": 9563,
+      "missing_price_ciks": 6801,
+      "survivorship_loss_fraction": 0.7111785004705636
+    },
+    {
+      "as_of": "2018-11-30",
+      "universe": "C_broad",
+      "members": 1590,
+      "eligible_before_price_join": 9563,
+      "missing_price_ciks": 6801,
+      "survivorship_loss_fraction": 0.7111785004705636
+    },
+    {
+      "as_of": "2018-12-31",
+      "universe": "A_large",
+      "members": 301,
+      "eligible_before_price_join": 9575,
+      "missing_price_ciks": 6807,
+      "survivorship_loss_fraction": 0.7109138381201044
+    },
+    {
+      "as_of": "2018-12-31",
+      "universe": "B_core",
+      "members": 1222,
+      "eligible_before_price_join": 9575,
+      "missing_price_ciks": 6807,
+      "survivorship_loss_fraction": 0.7109138381201044
+    },
+    {
+      "as_of": "2018-12-31",
+      "universe": "C_broad",
+      "members": 1613,
+      "eligible_before_price_join": 9575,
+      "missing_price_ciks": 6807,
+      "survivorship_loss_fraction": 0.7109138381201044
+    },
+    {
+      "as_of": "2019-01-31",
+      "universe": "A_large",
+      "members": 322,
+      "eligible_before_price_join": 9603,
+      "missing_price_ciks": 6822,
+      "survivorship_loss_fraction": 0.7104029990627929
+    },
+    {
+      "as_of": "2019-01-31",
+      "universe": "B_core",
+      "members": 1203,
+      "eligible_before_price_join": 9603,
+      "missing_price_ciks": 6822,
+      "survivorship_loss_fraction": 0.7104029990627929
+    },
+    {
+      "as_of": "2019-01-31",
+      "universe": "C_broad",
+      "members": 1611,
+      "eligible_before_price_join": 9603,
+      "missing_price_ciks": 6822,
+      "survivorship_loss_fraction": 0.7104029990627929
+    },
+    {
+      "as_of": "2019-02-28",
+      "universe": "A_large",
+      "members": 333,
+      "eligible_before_price_join": 9638,
+      "missing_price_ciks": 6844,
+      "survivorship_loss_fraction": 0.7101058310852874
+    },
+    {
+      "as_of": "2019-02-28",
+      "universe": "B_core",
+      "members": 1231,
+      "eligible_before_price_join": 9638,
+      "missing_price_ciks": 6844,
+      "survivorship_loss_fraction": 0.7101058310852874
+    },
+    {
+      "as_of": "2019-02-28",
+      "universe": "C_broad",
+      "members": 1616,
+      "eligible_before_price_join": 9638,
+      "missing_price_ciks": 6844,
+      "survivorship_loss_fraction": 0.7101058310852874
+    },
+    {
+      "as_of": "2019-03-29",
+      "universe": "A_large",
+      "members": 336,
+      "eligible_before_price_join": 9645,
+      "missing_price_ciks": 6845,
+      "survivorship_loss_fraction": 0.709694142042509
+    },
+    {
+      "as_of": "2019-03-29",
+      "universe": "B_core",
+      "members": 1249,
+      "eligible_before_price_join": 9645,
+      "missing_price_ciks": 6845,
+      "survivorship_loss_fraction": 0.709694142042509
+    },
+    {
+      "as_of": "2019-03-29",
+      "universe": "C_broad",
+      "members": 1666,
+      "eligible_before_price_join": 9645,
+      "missing_price_ciks": 6845,
+      "survivorship_loss_fraction": 0.709694142042509
+    },
+    {
+      "as_of": "2019-04-30",
+      "universe": "A_large",
+      "members": 346,
+      "eligible_before_price_join": 9660,
+      "missing_price_ciks": 6852,
+      "survivorship_loss_fraction": 0.7093167701863354
+    },
+    {
+      "as_of": "2019-04-30",
+      "universe": "B_core",
+      "members": 1209,
+      "eligible_before_price_join": 9660,
+      "missing_price_ciks": 6852,
+      "survivorship_loss_fraction": 0.7093167701863354
+    },
+    {
+      "as_of": "2019-04-30",
+      "universe": "C_broad",
+      "members": 1628,
+      "eligible_before_price_join": 9660,
+      "missing_price_ciks": 6852,
+      "survivorship_loss_fraction": 0.7093167701863354
+    },
+    {
+      "as_of": "2019-05-31",
+      "universe": "A_large",
+      "members": 332,
+      "eligible_before_price_join": 9672,
+      "missing_price_ciks": 6858,
+      "survivorship_loss_fraction": 0.7090570719602978
+    },
+    {
+      "as_of": "2019-05-31",
+      "universe": "B_core",
+      "members": 1213,
+      "eligible_before_price_join": 9672,
+      "missing_price_ciks": 6858,
+      "survivorship_loss_fraction": 0.7090570719602978
+    },
+    {
+      "as_of": "2019-05-31",
+      "universe": "C_broad",
+      "members": 1629,
+      "eligible_before_price_join": 9672,
+      "missing_price_ciks": 6858,
+      "survivorship_loss_fraction": 0.7090570719602978
+    },
+    {
+      "as_of": "2019-06-28",
+      "universe": "A_large",
+      "members": 346,
+      "eligible_before_price_join": 9690,
+      "missing_price_ciks": 6863,
+      "survivorship_loss_fraction": 0.7082559339525284
+    },
+    {
+      "as_of": "2019-06-28",
+      "universe": "B_core",
+      "members": 1238,
+      "eligible_before_price_join": 9690,
+      "missing_price_ciks": 6863,
+      "survivorship_loss_fraction": 0.7082559339525284
+    },
+    {
+      "as_of": "2019-06-28",
+      "universe": "C_broad",
+      "members": 1699,
+      "eligible_before_price_join": 9690,
+      "missing_price_ciks": 6863,
+      "survivorship_loss_fraction": 0.7082559339525284
+    },
+    {
+      "as_of": "2019-07-31",
+      "universe": "A_large",
+      "members": 345,
+      "eligible_before_price_join": 9716,
+      "missing_price_ciks": 6880,
+      "survivorship_loss_fraction": 0.7081103334705641
+    },
+    {
+      "as_of": "2019-07-31",
+      "universe": "B_core",
+      "members": 1224,
+      "eligible_before_price_join": 9716,
+      "missing_price_ciks": 6880,
+      "survivorship_loss_fraction": 0.7081103334705641
+    },
+    {
+      "as_of": "2019-07-31",
+      "universe": "C_broad",
+      "members": 1634,
+      "eligible_before_price_join": 9716,
+      "missing_price_ciks": 6880,
+      "survivorship_loss_fraction": 0.7081103334705641
+    },
+    {
+      "as_of": "2019-08-30",
+      "universe": "A_large",
+      "members": 346,
+      "eligible_before_price_join": 9758,
+      "missing_price_ciks": 6904,
+      "survivorship_loss_fraction": 0.7075220332035254
+    },
+    {
+      "as_of": "2019-08-30",
+      "universe": "B_core",
+      "members": 1229,
+      "eligible_before_price_join": 9758,
+      "missing_price_ciks": 6904,
+      "survivorship_loss_fraction": 0.7075220332035254
+    },
+    {
+      "as_of": "2019-08-30",
+      "universe": "C_broad",
+      "members": 1622,
+      "eligible_before_price_join": 9758,
+      "missing_price_ciks": 6904,
+      "survivorship_loss_fraction": 0.7075220332035254
+    },
+    {
+      "as_of": "2019-09-30",
+      "universe": "A_large",
+      "members": 351,
+      "eligible_before_price_join": 9776,
+      "missing_price_ciks": 6910,
+      "survivorship_loss_fraction": 0.7068330605564648
+    },
+    {
+      "as_of": "2019-09-30",
+      "universe": "B_core",
+      "members": 1255,
+      "eligible_before_price_join": 9776,
+      "missing_price_ciks": 6910,
+      "survivorship_loss_fraction": 0.7068330605564648
+    },
+    {
+      "as_of": "2019-09-30",
+      "universe": "C_broad",
+      "members": 1660,
+      "eligible_before_price_join": 9776,
+      "missing_price_ciks": 6910,
+      "survivorship_loss_fraction": 0.7068330605564648
+    },
+    {
+      "as_of": "2019-10-31",
+      "universe": "A_large",
+      "members": 357,
+      "eligible_before_price_join": 9794,
+      "missing_price_ciks": 6919,
+      "survivorship_loss_fraction": 0.7064529303655299
+    },
+    {
+      "as_of": "2019-10-31",
+      "universe": "B_core",
+      "members": 1219,
+      "eligible_before_price_join": 9794,
+      "missing_price_ciks": 6919,
+      "survivorship_loss_fraction": 0.7064529303655299
+    },
+    {
+      "as_of": "2019-10-31",
+      "universe": "C_broad",
+      "members": 1629,
+      "eligible_before_price_join": 9794,
+      "missing_price_ciks": 6919,
+      "survivorship_loss_fraction": 0.7064529303655299
+    },
+    {
+      "as_of": "2019-11-29",
+      "universe": "A_large",
+      "members": 380,
+      "eligible_before_price_join": 9825,
+      "missing_price_ciks": 6934,
+      "survivorship_loss_fraction": 0.7057506361323155
+    },
+    {
+      "as_of": "2019-11-29",
+      "universe": "B_core",
+      "members": 1252,
+      "eligible_before_price_join": 9825,
+      "missing_price_ciks": 6934,
+      "survivorship_loss_fraction": 0.7057506361323155
+    },
+    {
+      "as_of": "2019-11-29",
+      "universe": "C_broad",
+      "members": 1662,
+      "eligible_before_price_join": 9825,
+      "missing_price_ciks": 6934,
+      "survivorship_loss_fraction": 0.7057506361323155
+    },
+    {
+      "as_of": "2019-12-31",
+      "universe": "A_large",
+      "members": 378,
+      "eligible_before_price_join": 9835,
+      "missing_price_ciks": 6939,
+      "survivorship_loss_fraction": 0.7055414336553126
+    },
+    {
+      "as_of": "2019-12-31",
+      "universe": "B_core",
+      "members": 1317,
+      "eligible_before_price_join": 9835,
+      "missing_price_ciks": 6939,
+      "survivorship_loss_fraction": 0.7055414336553126
+    },
+    {
+      "as_of": "2019-12-31",
+      "universe": "C_broad",
+      "members": 1729,
+      "eligible_before_price_join": 9835,
+      "missing_price_ciks": 6939,
+      "survivorship_loss_fraction": 0.7055414336553126
+    },
+    {
+      "as_of": "2020-01-31",
+      "universe": "A_large",
+      "members": 378,
+      "eligible_before_price_join": 9849,
+      "missing_price_ciks": 6944,
+      "survivorship_loss_fraction": 0.7050461975835111
+    },
+    {
+      "as_of": "2020-01-31",
+      "universe": "B_core",
+      "members": 1286,
+      "eligible_before_price_join": 9849,
+      "missing_price_ciks": 6944,
+      "survivorship_loss_fraction": 0.7050461975835111
+    },
+    {
+      "as_of": "2020-01-31",
+      "universe": "C_broad",
+      "members": 1735,
+      "eligible_before_price_join": 9849,
+      "missing_price_ciks": 6944,
+      "survivorship_loss_fraction": 0.7050461975835111
+    },
+    {
+      "as_of": "2020-02-28",
+      "universe": "A_large",
+      "members": 356,
+      "eligible_before_price_join": 9881,
+      "missing_price_ciks": 6958,
+      "survivorship_loss_fraction": 0.7041797388928246
+    },
+    {
+      "as_of": "2020-02-28",
+      "universe": "B_core",
+      "members": 1292,
+      "eligible_before_price_join": 9881,
+      "missing_price_ciks": 6958,
+      "survivorship_loss_fraction": 0.7041797388928246
+    },
+    {
+      "as_of": "2020-02-28",
+      "universe": "C_broad",
+      "members": 1727,
+      "eligible_before_price_join": 9881,
+      "missing_price_ciks": 6958,
+      "survivorship_loss_fraction": 0.7041797388928246
+    },
+    {
+      "as_of": "2020-03-31",
+      "universe": "A_large",
+      "members": 303,
+      "eligible_before_price_join": 9904,
+      "missing_price_ciks": 6971,
+      "survivorship_loss_fraction": 0.7038570274636511
+    },
+    {
+      "as_of": "2020-03-31",
+      "universe": "B_core",
+      "members": 1238,
+      "eligible_before_price_join": 9904,
+      "missing_price_ciks": 6971,
+      "survivorship_loss_fraction": 0.7038570274636511
+    },
+    {
+      "as_of": "2020-03-31",
+      "universe": "C_broad",
+      "members": 1701,
+      "eligible_before_price_join": 9904,
+      "missing_price_ciks": 6971,
+      "survivorship_loss_fraction": 0.7038570274636511
+    },
+    {
+      "as_of": "2020-04-30",
+      "universe": "A_large",
+      "members": 330,
+      "eligible_before_price_join": 9910,
+      "missing_price_ciks": 6974,
+      "survivorship_loss_fraction": 0.7037336024217962
+    },
+    {
+      "as_of": "2020-04-30",
+      "universe": "B_core",
+      "members": 1239,
+      "eligible_before_price_join": 9910,
+      "missing_price_ciks": 6974,
+      "survivorship_loss_fraction": 0.7037336024217962
+    },
+    {
+      "as_of": "2020-04-30",
+      "universe": "C_broad",
+      "members": 1716,
+      "eligible_before_price_join": 9910,
+      "missing_price_ciks": 6974,
+      "survivorship_loss_fraction": 0.7037336024217962
+    },
+    {
+      "as_of": "2020-05-29",
+      "universe": "A_large",
+      "members": 352,
+      "eligible_before_price_join": 9916,
+      "missing_price_ciks": 6975,
+      "survivorship_loss_fraction": 0.7034086325131101
+    },
+    {
+      "as_of": "2020-05-29",
+      "universe": "B_core",
+      "members": 1282,
+      "eligible_before_price_join": 9916,
+      "missing_price_ciks": 6975,
+      "survivorship_loss_fraction": 0.7034086325131101
+    },
+    {
+      "as_of": "2020-05-29",
+      "universe": "C_broad",
+      "members": 1768,
+      "eligible_before_price_join": 9916,
+      "missing_price_ciks": 6975,
+      "survivorship_loss_fraction": 0.7034086325131101
+    },
+    {
+      "as_of": "2020-06-30",
+      "universe": "A_large",
+      "members": 360,
+      "eligible_before_price_join": 9938,
+      "missing_price_ciks": 6987,
+      "survivorship_loss_fraction": 0.7030589655866372
+    },
+    {
+      "as_of": "2020-06-30",
+      "universe": "B_core",
+      "members": 1353,
+      "eligible_before_price_join": 9938,
+      "missing_price_ciks": 6987,
+      "survivorship_loss_fraction": 0.7030589655866372
+    },
+    {
+      "as_of": "2020-06-30",
+      "universe": "C_broad",
+      "members": 1881,
+      "eligible_before_price_join": 9938,
+      "missing_price_ciks": 6987,
+      "survivorship_loss_fraction": 0.7030589655866372
+    },
+    {
+      "as_of": "2020-07-31",
+      "universe": "A_large",
+      "members": 382,
+      "eligible_before_price_join": 9960,
+      "missing_price_ciks": 6990,
+      "survivorship_loss_fraction": 0.7018072289156626
+    },
+    {
+      "as_of": "2020-07-31",
+      "universe": "B_core",
+      "members": 1290,
+      "eligible_before_price_join": 9960,
+      "missing_price_ciks": 6990,
+      "survivorship_loss_fraction": 0.7018072289156626
+    },
+    {
+      "as_of": "2020-07-31",
+      "universe": "C_broad",
+      "members": 1829,
+      "eligible_before_price_join": 9960,
+      "missing_price_ciks": 6990,
+      "survivorship_loss_fraction": 0.7018072289156626
+    },
+    {
+      "as_of": "2020-08-31",
+      "universe": "A_large",
+      "members": 378,
+      "eligible_before_price_join": 9977,
+      "missing_price_ciks": 6998,
+      "survivorship_loss_fraction": 0.701413250476095
+    },
+    {
+      "as_of": "2020-08-31",
+      "universe": "B_core",
+      "members": 1302,
+      "eligible_before_price_join": 9977,
+      "missing_price_ciks": 6998,
+      "survivorship_loss_fraction": 0.701413250476095
+    },
+    {
+      "as_of": "2020-08-31",
+      "universe": "C_broad",
+      "members": 1863,
+      "eligible_before_price_join": 9977,
+      "missing_price_ciks": 6998,
+      "survivorship_loss_fraction": 0.701413250476095
+    },
+    {
+      "as_of": "2020-09-30",
+      "universe": "A_large",
+      "members": 375,
+      "eligible_before_price_join": 9985,
+      "missing_price_ciks": 7002,
+      "survivorship_loss_fraction": 0.701251877816725
+    },
+    {
+      "as_of": "2020-09-30",
+      "universe": "B_core",
+      "members": 1306,
+      "eligible_before_price_join": 9985,
+      "missing_price_ciks": 7002,
+      "survivorship_loss_fraction": 0.701251877816725
+    },
+    {
+      "as_of": "2020-09-30",
+      "universe": "C_broad",
+      "members": 1815,
+      "eligible_before_price_join": 9985,
+      "missing_price_ciks": 7002,
+      "survivorship_loss_fraction": 0.701251877816725
+    },
+    {
+      "as_of": "2020-10-30",
+      "universe": "A_large",
+      "members": 372,
+      "eligible_before_price_join": 10004,
+      "missing_price_ciks": 7014,
+      "survivorship_loss_fraction": 0.7011195521791284
+    },
+    {
+      "as_of": "2020-10-30",
+      "universe": "B_core",
+      "members": 1276,
+      "eligible_before_price_join": 10004,
+      "missing_price_ciks": 7014,
+      "survivorship_loss_fraction": 0.7011195521791284
+    },
+    {
+      "as_of": "2020-10-30",
+      "universe": "C_broad",
+      "members": 1779,
+      "eligible_before_price_join": 10004,
+      "missing_price_ciks": 7014,
+      "survivorship_loss_fraction": 0.7011195521791284
+    },
+    {
+      "as_of": "2020-11-30",
+      "universe": "A_large",
+      "members": 427,
+      "eligible_before_price_join": 10042,
+      "missing_price_ciks": 7025,
+      "survivorship_loss_fraction": 0.6995618402708623
+    },
+    {
+      "as_of": "2020-11-30",
+      "universe": "B_core",
+      "members": 1386,
+      "eligible_before_price_join": 10042,
+      "missing_price_ciks": 7025,
+      "survivorship_loss_fraction": 0.6995618402708623
+    },
+    {
+      "as_of": "2020-11-30",
+      "universe": "C_broad",
+      "members": 1872,
+      "eligible_before_price_join": 10042,
+      "missing_price_ciks": 7025,
+      "survivorship_loss_fraction": 0.6995618402708623
+    },
+    {
+      "as_of": "2020-12-31",
+      "universe": "A_large",
+      "members": 446,
+      "eligible_before_price_join": 10053,
+      "missing_price_ciks": 7033,
+      "survivorship_loss_fraction": 0.6995921615438178
+    },
+    {
+      "as_of": "2020-12-31",
+      "universe": "B_core",
+      "members": 1463,
+      "eligible_before_price_join": 10053,
+      "missing_price_ciks": 7033,
+      "survivorship_loss_fraction": 0.6995921615438178
+    },
+    {
+      "as_of": "2020-12-31",
+      "universe": "C_broad",
+      "members": 1984,
+      "eligible_before_price_join": 10053,
+      "missing_price_ciks": 7033,
+      "survivorship_loss_fraction": 0.6995921615438178
+    },
+    {
+      "as_of": "2021-01-29",
+      "universe": "A_large",
+      "members": 464,
+      "eligible_before_price_join": 10075,
+      "missing_price_ciks": 7039,
+      "survivorship_loss_fraction": 0.6986600496277916
+    },
+    {
+      "as_of": "2021-01-29",
+      "universe": "B_core",
+      "members": 1537,
+      "eligible_before_price_join": 10075,
+      "missing_price_ciks": 7039,
+      "survivorship_loss_fraction": 0.6986600496277916
+    },
+    {
+      "as_of": "2021-01-29",
+      "universe": "C_broad",
+      "members": 2064,
+      "eligible_before_price_join": 10075,
+      "missing_price_ciks": 7039,
+      "survivorship_loss_fraction": 0.6986600496277916
+    },
+    {
+      "as_of": "2021-02-26",
+      "universe": "A_large",
+      "members": 482,
+      "eligible_before_price_join": 10130,
+      "missing_price_ciks": 7034,
+      "survivorship_loss_fraction": 0.6943731490621915
+    },
+    {
+      "as_of": "2021-02-26",
+      "universe": "B_core",
+      "members": 1626,
+      "eligible_before_price_join": 10130,
+      "missing_price_ciks": 7034,
+      "survivorship_loss_fraction": 0.6943731490621915
+    },
+    {
+      "as_of": "2021-02-26",
+      "universe": "C_broad",
+      "members": 2150,
+      "eligible_before_price_join": 10130,
+      "missing_price_ciks": 7034,
+      "survivorship_loss_fraction": 0.6943731490621915
+    },
+    {
+      "as_of": "2021-03-31",
+      "universe": "A_large",
+      "members": 479,
+      "eligible_before_price_join": 10158,
+      "missing_price_ciks": 7043,
+      "survivorship_loss_fraction": 0.6933451466824178
+    },
+    {
+      "as_of": "2021-03-31",
+      "universe": "B_core",
+      "members": 1642,
+      "eligible_before_price_join": 10158,
+      "missing_price_ciks": 7043,
+      "survivorship_loss_fraction": 0.6933451466824178
+    },
+    {
+      "as_of": "2021-03-31",
+      "universe": "C_broad",
+      "members": 2177,
+      "eligible_before_price_join": 10158,
+      "missing_price_ciks": 7043,
+      "survivorship_loss_fraction": 0.6933451466824178
+    },
+    {
+      "as_of": "2021-04-30",
+      "universe": "A_large",
+      "members": 487,
+      "eligible_before_price_join": 10163,
+      "missing_price_ciks": 7045,
+      "survivorship_loss_fraction": 0.6932008265276001
+    },
+    {
+      "as_of": "2021-04-30",
+      "universe": "B_core",
+      "members": 1507,
+      "eligible_before_price_join": 10163,
+      "missing_price_ciks": 7045,
+      "survivorship_loss_fraction": 0.6932008265276001
+    },
+    {
+      "as_of": "2021-04-30",
+      "universe": "C_broad",
+      "members": 2079,
+      "eligible_before_price_join": 10163,
+      "missing_price_ciks": 7045,
+      "survivorship_loss_fraction": 0.6932008265276001
+    },
+    {
+      "as_of": "2021-05-28",
+      "universe": "A_large",
+      "members": 489,
+      "eligible_before_price_join": 10174,
+      "missing_price_ciks": 7045,
+      "survivorship_loss_fraction": 0.6924513465696874
+    },
+    {
+      "as_of": "2021-05-28",
+      "universe": "B_core",
+      "members": 1551,
+      "eligible_before_price_join": 10174,
+      "missing_price_ciks": 7045,
+      "survivorship_loss_fraction": 0.6924513465696874
+    },
+    {
+      "as_of": "2021-05-28",
+      "universe": "C_broad",
+      "members": 2090,
+      "eligible_before_price_join": 10174,
+      "missing_price_ciks": 7045,
+      "survivorship_loss_fraction": 0.6924513465696874
+    },
+    {
+      "as_of": "2021-06-30",
+      "universe": "A_large",
+      "members": 499,
+      "eligible_before_price_join": 10226,
+      "missing_price_ciks": 7070,
+      "survivorship_loss_fraction": 0.6913749266575396
+    },
+    {
+      "as_of": "2021-06-30",
+      "universe": "B_core",
+      "members": 1632,
+      "eligible_before_price_join": 10226,
+      "missing_price_ciks": 7070,
+      "survivorship_loss_fraction": 0.6913749266575396
+    },
+    {
+      "as_of": "2021-06-30",
+      "universe": "C_broad",
+      "members": 2228,
+      "eligible_before_price_join": 10226,
+      "missing_price_ciks": 7070,
+      "survivorship_loss_fraction": 0.6913749266575396
+    },
+    {
+      "as_of": "2021-07-30",
+      "universe": "A_large",
+      "members": 500,
+      "eligible_before_price_join": 10272,
+      "missing_price_ciks": 7090,
+      "survivorship_loss_fraction": 0.6902258566978193
+    },
+    {
+      "as_of": "2021-07-30",
+      "universe": "B_core",
+      "members": 1507,
+      "eligible_before_price_join": 10272,
+      "missing_price_ciks": 7090,
+      "survivorship_loss_fraction": 0.6902258566978193
+    },
+    {
+      "as_of": "2021-07-30",
+      "universe": "C_broad",
+      "members": 2092,
+      "eligible_before_price_join": 10272,
+      "missing_price_ciks": 7090,
+      "survivorship_loss_fraction": 0.6902258566978193
+    },
+    {
+      "as_of": "2021-08-31",
+      "universe": "A_large",
+      "members": 504,
+      "eligible_before_price_join": 10354,
+      "missing_price_ciks": 7128,
+      "survivorship_loss_fraction": 0.6884295924280471
+    },
+    {
+      "as_of": "2021-08-31",
+      "universe": "B_core",
+      "members": 1518,
+      "eligible_before_price_join": 10354,
+      "missing_price_ciks": 7128,
+      "survivorship_loss_fraction": 0.6884295924280471
+    },
+    {
+      "as_of": "2021-08-31",
+      "universe": "C_broad",
+      "members": 2097,
+      "eligible_before_price_join": 10354,
+      "missing_price_ciks": 7128,
+      "survivorship_loss_fraction": 0.6884295924280471
+    },
+    {
+      "as_of": "2021-09-30",
+      "universe": "A_large",
+      "members": 499,
+      "eligible_before_price_join": 10385,
+      "missing_price_ciks": 7140,
+      "survivorship_loss_fraction": 0.6875300914780934
+    },
+    {
+      "as_of": "2021-09-30",
+      "universe": "B_core",
+      "members": 1581,
+      "eligible_before_price_join": 10385,
+      "missing_price_ciks": 7140,
+      "survivorship_loss_fraction": 0.6875300914780934
+    },
+    {
+      "as_of": "2021-09-30",
+      "universe": "C_broad",
+      "members": 2141,
+      "eligible_before_price_join": 10385,
+      "missing_price_ciks": 7140,
+      "survivorship_loss_fraction": 0.6875300914780934
+    },
+    {
+      "as_of": "2021-10-29",
+      "universe": "A_large",
+      "members": 517,
+      "eligible_before_price_join": 10416,
+      "missing_price_ciks": 7154,
+      "survivorship_loss_fraction": 0.6868279569892473
+    },
+    {
+      "as_of": "2021-10-29",
+      "universe": "B_core",
+      "members": 1524,
+      "eligible_before_price_join": 10416,
+      "missing_price_ciks": 7154,
+      "survivorship_loss_fraction": 0.6868279569892473
+    },
+    {
+      "as_of": "2021-10-29",
+      "universe": "C_broad",
+      "members": 2102,
+      "eligible_before_price_join": 10416,
+      "missing_price_ciks": 7154,
+      "survivorship_loss_fraction": 0.6868279569892473
+    },
+    {
+      "as_of": "2021-11-30",
+      "universe": "A_large",
+      "members": 510,
+      "eligible_before_price_join": 10510,
+      "missing_price_ciks": 7194,
+      "survivorship_loss_fraction": 0.6844909609895338
+    },
+    {
+      "as_of": "2021-11-30",
+      "universe": "B_core",
+      "members": 1601,
+      "eligible_before_price_join": 10510,
+      "missing_price_ciks": 7194,
+      "survivorship_loss_fraction": 0.6844909609895338
+    },
+    {
+      "as_of": "2021-11-30",
+      "universe": "C_broad",
+      "members": 2193,
+      "eligible_before_price_join": 10510,
+      "missing_price_ciks": 7194,
+      "survivorship_loss_fraction": 0.6844909609895338
+    },
+    {
+      "as_of": "2021-12-31",
+      "universe": "A_large",
+      "members": 517,
+      "eligible_before_price_join": 10554,
+      "missing_price_ciks": 7207,
+      "survivorship_loss_fraction": 0.6828690543869623
+    },
+    {
+      "as_of": "2021-12-31",
+      "universe": "B_core",
+      "members": 1624,
+      "eligible_before_price_join": 10554,
+      "missing_price_ciks": 7207,
+      "survivorship_loss_fraction": 0.6828690543869623
+    },
+    {
+      "as_of": "2021-12-31",
+      "universe": "C_broad",
+      "members": 2173,
+      "eligible_before_price_join": 10554,
+      "missing_price_ciks": 7207,
+      "survivorship_loss_fraction": 0.6828690543869623
+    },
+    {
+      "as_of": "2022-01-31",
+      "universe": "A_large",
+      "members": 485,
+      "eligible_before_price_join": 10584,
+      "missing_price_ciks": 7219,
+      "survivorship_loss_fraction": 0.6820672713529856
+    },
+    {
+      "as_of": "2022-01-31",
+      "universe": "B_core",
+      "members": 1570,
+      "eligible_before_price_join": 10584,
+      "missing_price_ciks": 7219,
+      "survivorship_loss_fraction": 0.6820672713529856
+    },
+    {
+      "as_of": "2022-01-31",
+      "universe": "C_broad",
+      "members": 2127,
+      "eligible_before_price_join": 10584,
+      "missing_price_ciks": 7219,
+      "survivorship_loss_fraction": 0.6820672713529856
+    },
+    {
+      "as_of": "2022-02-28",
+      "universe": "A_large",
+      "members": 488,
+      "eligible_before_price_join": 10688,
+      "missing_price_ciks": 7261,
+      "survivorship_loss_fraction": 0.6793600299401198
+    },
+    {
+      "as_of": "2022-02-28",
+      "universe": "B_core",
+      "members": 1573,
+      "eligible_before_price_join": 10688,
+      "missing_price_ciks": 7261,
+      "survivorship_loss_fraction": 0.6793600299401198
+    },
+    {
+      "as_of": "2022-02-28",
+      "universe": "C_broad",
+      "members": 2122,
+      "eligible_before_price_join": 10688,
+      "missing_price_ciks": 7261,
+      "survivorship_loss_fraction": 0.6793600299401198
+    },
+    {
+      "as_of": "2022-03-31",
+      "universe": "A_large",
+      "members": 494,
+      "eligible_before_price_join": 10749,
+      "missing_price_ciks": 7279,
+      "survivorship_loss_fraction": 0.6771792724904643
+    },
+    {
+      "as_of": "2022-03-31",
+      "universe": "B_core",
+      "members": 1615,
+      "eligible_before_price_join": 10749,
+      "missing_price_ciks": 7279,
+      "survivorship_loss_fraction": 0.6771792724904643
+    },
+    {
+      "as_of": "2022-03-31",
+      "universe": "C_broad",
+      "members": 2172,
+      "eligible_before_price_join": 10749,
+      "missing_price_ciks": 7279,
+      "survivorship_loss_fraction": 0.6771792724904643
+    },
+    {
+      "as_of": "2022-04-29",
+      "universe": "A_large",
+      "members": 474,
+      "eligible_before_price_join": 10756,
+      "missing_price_ciks": 7282,
+      "survivorship_loss_fraction": 0.6770174786165861
+    },
+    {
+      "as_of": "2022-04-29",
+      "universe": "B_core",
+      "members": 1557,
+      "eligible_before_price_join": 10756,
+      "missing_price_ciks": 7282,
+      "survivorship_loss_fraction": 0.6770174786165861
+    },
+    {
+      "as_of": "2022-04-29",
+      "universe": "C_broad",
+      "members": 2108,
+      "eligible_before_price_join": 10756,
+      "missing_price_ciks": 7282,
+      "survivorship_loss_fraction": 0.6770174786165861
+    },
+    {
+      "as_of": "2022-05-31",
+      "universe": "A_large",
+      "members": 475,
+      "eligible_before_price_join": 10776,
+      "missing_price_ciks": 7288,
+      "survivorship_loss_fraction": 0.676317743132888
+    },
+    {
+      "as_of": "2022-05-31",
+      "universe": "B_core",
+      "members": 1565,
+      "eligible_before_price_join": 10776,
+      "missing_price_ciks": 7288,
+      "survivorship_loss_fraction": 0.676317743132888
+    },
+    {
+      "as_of": "2022-05-31",
+      "universe": "C_broad",
+      "members": 2105,
+      "eligible_before_price_join": 10776,
+      "missing_price_ciks": 7288,
+      "survivorship_loss_fraction": 0.676317743132888
+    },
+    {
+      "as_of": "2022-06-30",
+      "universe": "A_large",
+      "members": 446,
+      "eligible_before_price_join": 10852,
+      "missing_price_ciks": 7325,
+      "survivorship_loss_fraction": 0.6749907851087357
+    },
+    {
+      "as_of": "2022-06-30",
+      "universe": "B_core",
+      "members": 1552,
+      "eligible_before_price_join": 10852,
+      "missing_price_ciks": 7325,
+      "survivorship_loss_fraction": 0.6749907851087357
+    },
+    {
+      "as_of": "2022-06-30",
+      "universe": "C_broad",
+      "members": 2152,
+      "eligible_before_price_join": 10852,
+      "missing_price_ciks": 7325,
+      "survivorship_loss_fraction": 0.6749907851087357
+    },
+    {
+      "as_of": "2022-07-29",
+      "universe": "A_large",
+      "members": 468,
+      "eligible_before_price_join": 10875,
+      "missing_price_ciks": 7335,
+      "survivorship_loss_fraction": 0.6744827586206896
+    },
+    {
+      "as_of": "2022-07-29",
+      "universe": "B_core",
+      "members": 1485,
+      "eligible_before_price_join": 10875,
+      "missing_price_ciks": 7335,
+      "survivorship_loss_fraction": 0.6744827586206896
+    },
+    {
+      "as_of": "2022-07-29",
+      "universe": "C_broad",
+      "members": 2025,
+      "eligible_before_price_join": 10875,
+      "missing_price_ciks": 7335,
+      "survivorship_loss_fraction": 0.6744827586206896
+    },
+    {
+      "as_of": "2022-08-31",
+      "universe": "A_large",
+      "members": 471,
+      "eligible_before_price_join": 10921,
+      "missing_price_ciks": 7359,
+      "survivorship_loss_fraction": 0.6738393919970699
+    },
+    {
+      "as_of": "2022-08-31",
+      "universe": "B_core",
+      "members": 1536,
+      "eligible_before_price_join": 10921,
+      "missing_price_ciks": 7359,
+      "survivorship_loss_fraction": 0.6738393919970699
+    },
+    {
+      "as_of": "2022-08-31",
+      "universe": "C_broad",
+      "members": 2082,
+      "eligible_before_price_join": 10921,
+      "missing_price_ciks": 7359,
+      "survivorship_loss_fraction": 0.6738393919970699
+    },
+    {
+      "as_of": "2022-09-30",
+      "universe": "A_large",
+      "members": 438,
+      "eligible_before_price_join": 10937,
+      "missing_price_ciks": 7366,
+      "survivorship_loss_fraction": 0.6734936454237908
+    },
+    {
+      "as_of": "2022-09-30",
+      "universe": "B_core",
+      "members": 1516,
+      "eligible_before_price_join": 10937,
+      "missing_price_ciks": 7366,
+      "survivorship_loss_fraction": 0.6734936454237908
+    },
+    {
+      "as_of": "2022-09-30",
+      "universe": "C_broad",
+      "members": 2035,
+      "eligible_before_price_join": 10937,
+      "missing_price_ciks": 7366,
+      "survivorship_loss_fraction": 0.6734936454237908
+    },
+    {
+      "as_of": "2022-10-31",
+      "universe": "A_large",
+      "members": 453,
+      "eligible_before_price_join": 10953,
+      "missing_price_ciks": 7370,
+      "survivorship_loss_fraction": 0.6728750114123985
+    },
+    {
+      "as_of": "2022-10-31",
+      "universe": "B_core",
+      "members": 1498,
+      "eligible_before_price_join": 10953,
+      "missing_price_ciks": 7370,
+      "survivorship_loss_fraction": 0.6728750114123985
+    },
+    {
+      "as_of": "2022-10-31",
+      "universe": "C_broad",
+      "members": 1994,
+      "eligible_before_price_join": 10953,
+      "missing_price_ciks": 7370,
+      "survivorship_loss_fraction": 0.6728750114123985
+    },
+    {
+      "as_of": "2022-11-30",
+      "universe": "A_large",
+      "members": 474,
+      "eligible_before_price_join": 11001,
+      "missing_price_ciks": 7385,
+      "survivorship_loss_fraction": 0.6713026088537406
+    },
+    {
+      "as_of": "2022-11-30",
+      "universe": "B_core",
+      "members": 1511,
+      "eligible_before_price_join": 11001,
+      "missing_price_ciks": 7385,
+      "survivorship_loss_fraction": 0.6713026088537406
+    },
+    {
+      "as_of": "2022-11-30",
+      "universe": "C_broad",
+      "members": 2024,
+      "eligible_before_price_join": 11001,
+      "missing_price_ciks": 7385,
+      "survivorship_loss_fraction": 0.6713026088537406
+    },
+    {
+      "as_of": "2022-12-30",
+      "universe": "A_large",
+      "members": 457,
+      "eligible_before_price_join": 11017,
+      "missing_price_ciks": 7392,
+      "survivorship_loss_fraction": 0.6709630570935826
+    },
+    {
+      "as_of": "2022-12-30",
+      "universe": "B_core",
+      "members": 1528,
+      "eligible_before_price_join": 11017,
+      "missing_price_ciks": 7392,
+      "survivorship_loss_fraction": 0.6709630570935826
+    },
+    {
+      "as_of": "2022-12-30",
+      "universe": "C_broad",
+      "members": 2046,
+      "eligible_before_price_join": 11017,
+      "missing_price_ciks": 7392,
+      "survivorship_loss_fraction": 0.6709630570935826
+    },
+    {
+      "as_of": "2023-01-31",
+      "universe": "A_large",
+      "members": 488,
+      "eligible_before_price_join": 11036,
+      "missing_price_ciks": 7397,
+      "survivorship_loss_fraction": 0.6702609641174339
+    },
+    {
+      "as_of": "2023-01-31",
+      "universe": "B_core",
+      "members": 1523,
+      "eligible_before_price_join": 11036,
+      "missing_price_ciks": 7397,
+      "survivorship_loss_fraction": 0.6702609641174339
+    },
+    {
+      "as_of": "2023-01-31",
+      "universe": "C_broad",
+      "members": 2082,
+      "eligible_before_price_join": 11036,
+      "missing_price_ciks": 7397,
+      "survivorship_loss_fraction": 0.6702609641174339
+    },
+    {
+      "as_of": "2023-02-28",
+      "universe": "A_large",
+      "members": 470,
+      "eligible_before_price_join": 11091,
+      "missing_price_ciks": 7421,
+      "survivorship_loss_fraction": 0.669101072942025
+    },
+    {
+      "as_of": "2023-02-28",
+      "universe": "B_core",
+      "members": 1546,
+      "eligible_before_price_join": 11091,
+      "missing_price_ciks": 7421,
+      "survivorship_loss_fraction": 0.669101072942025
+    },
+    {
+      "as_of": "2023-02-28",
+      "universe": "C_broad",
+      "members": 2100,
+      "eligible_before_price_join": 11091,
+      "missing_price_ciks": 7421,
+      "survivorship_loss_fraction": 0.669101072942025
+    },
+    {
+      "as_of": "2023-03-31",
+      "universe": "A_large",
+      "members": 471,
+      "eligible_before_price_join": 11110,
+      "missing_price_ciks": 7427,
+      "survivorship_loss_fraction": 0.6684968496849685
+    },
+    {
+      "as_of": "2023-03-31",
+      "universe": "B_core",
+      "members": 1560,
+      "eligible_before_price_join": 11110,
+      "missing_price_ciks": 7427,
+      "survivorship_loss_fraction": 0.6684968496849685
+    },
+    {
+      "as_of": "2023-03-31",
+      "universe": "C_broad",
+      "members": 2098,
+      "eligible_before_price_join": 11110,
+      "missing_price_ciks": 7427,
+      "survivorship_loss_fraction": 0.6684968496849685
+    },
+    {
+      "as_of": "2023-04-28",
+      "universe": "A_large",
+      "members": 462,
+      "eligible_before_price_join": 11110,
+      "missing_price_ciks": 7424,
+      "survivorship_loss_fraction": 0.6682268226822682
+    },
+    {
+      "as_of": "2023-04-28",
+      "universe": "B_core",
+      "members": 1504,
+      "eligible_before_price_join": 11110,
+      "missing_price_ciks": 7424,
+      "survivorship_loss_fraction": 0.6682268226822682
+    },
+    {
+      "as_of": "2023-04-28",
+      "universe": "C_broad",
+      "members": 2055,
+      "eligible_before_price_join": 11110,
+      "missing_price_ciks": 7424,
+      "survivorship_loss_fraction": 0.6682268226822682
+    },
+    {
+      "as_of": "2023-05-31",
+      "universe": "A_large",
+      "members": 449,
+      "eligible_before_price_join": 11134,
+      "missing_price_ciks": 7434,
+      "survivorship_loss_fraction": 0.6676845697862404
+    },
+    {
+      "as_of": "2023-05-31",
+      "universe": "B_core",
+      "members": 1524,
+      "eligible_before_price_join": 11134,
+      "missing_price_ciks": 7434,
+      "survivorship_loss_fraction": 0.6676845697862404
+    },
+    {
+      "as_of": "2023-05-31",
+      "universe": "C_broad",
+      "members": 2062,
+      "eligible_before_price_join": 11134,
+      "missing_price_ciks": 7434,
+      "survivorship_loss_fraction": 0.6676845697862404
+    },
+    {
+      "as_of": "2023-06-30",
+      "universe": "A_large",
+      "members": 484,
+      "eligible_before_price_join": 11218,
+      "missing_price_ciks": 7487,
+      "survivorship_loss_fraction": 0.667409520413621
+    },
+    {
+      "as_of": "2023-06-30",
+      "universe": "B_core",
+      "members": 1575,
+      "eligible_before_price_join": 11218,
+      "missing_price_ciks": 7487,
+      "survivorship_loss_fraction": 0.667409520413621
+    },
+    {
+      "as_of": "2023-06-30",
+      "universe": "C_broad",
+      "members": 2190,
+      "eligible_before_price_join": 11218,
+      "missing_price_ciks": 7487,
+      "survivorship_loss_fraction": 0.667409520413621
+    },
+    {
+      "as_of": "2023-07-31",
+      "universe": "A_large",
+      "members": 494,
+      "eligible_before_price_join": 11227,
+      "missing_price_ciks": 7492,
+      "survivorship_loss_fraction": 0.6673198539235771
+    },
+    {
+      "as_of": "2023-07-31",
+      "universe": "B_core",
+      "members": 1531,
+      "eligible_before_price_join": 11227,
+      "missing_price_ciks": 7492,
+      "survivorship_loss_fraction": 0.6673198539235771
+    },
+    {
+      "as_of": "2023-07-31",
+      "universe": "C_broad",
+      "members": 2075,
+      "eligible_before_price_join": 11227,
+      "missing_price_ciks": 7492,
+      "survivorship_loss_fraction": 0.6673198539235771
+    },
+    {
+      "as_of": "2023-08-31",
+      "universe": "A_large",
+      "members": 479,
+      "eligible_before_price_join": 11272,
+      "missing_price_ciks": 7517,
+      "survivorship_loss_fraction": 0.6668736692689851
+    },
+    {
+      "as_of": "2023-08-31",
+      "universe": "B_core",
+      "members": 1511,
+      "eligible_before_price_join": 11272,
+      "missing_price_ciks": 7517,
+      "survivorship_loss_fraction": 0.6668736692689851
+    },
+    {
+      "as_of": "2023-08-31",
+      "universe": "C_broad",
+      "members": 2053,
+      "eligible_before_price_join": 11272,
+      "missing_price_ciks": 7517,
+      "survivorship_loss_fraction": 0.6668736692689851
+    },
+    {
+      "as_of": "2023-09-29",
+      "universe": "A_large",
+      "members": 463,
+      "eligible_before_price_join": 11284,
+      "missing_price_ciks": 7521,
+      "survivorship_loss_fraction": 0.6665189649060617
+    },
+    {
+      "as_of": "2023-09-29",
+      "universe": "B_core",
+      "members": 1536,
+      "eligible_before_price_join": 11284,
+      "missing_price_ciks": 7521,
+      "survivorship_loss_fraction": 0.6665189649060617
+    },
+    {
+      "as_of": "2023-09-29",
+      "universe": "C_broad",
+      "members": 2042,
+      "eligible_before_price_join": 11284,
+      "missing_price_ciks": 7521,
+      "survivorship_loss_fraction": 0.6665189649060617
+    },
+    {
+      "as_of": "2023-10-31",
+      "universe": "A_large",
+      "members": 440,
+      "eligible_before_price_join": 11293,
+      "missing_price_ciks": 7521,
+      "survivorship_loss_fraction": 0.6659877800407332
+    },
+    {
+      "as_of": "2023-10-31",
+      "universe": "B_core",
+      "members": 1468,
+      "eligible_before_price_join": 11293,
+      "missing_price_ciks": 7521,
+      "survivorship_loss_fraction": 0.6659877800407332
+    },
+    {
+      "as_of": "2023-10-31",
+      "universe": "C_broad",
+      "members": 1989,
+      "eligible_before_price_join": 11293,
+      "missing_price_ciks": 7521,
+      "survivorship_loss_fraction": 0.6659877800407332
+    },
+    {
+      "as_of": "2023-11-30",
+      "universe": "A_large",
+      "members": 469,
+      "eligible_before_price_join": 11331,
+      "missing_price_ciks": 7535,
+      "survivorship_loss_fraction": 0.664989850851646
+    },
+    {
+      "as_of": "2023-11-30",
+      "universe": "B_core",
+      "members": 1520,
+      "eligible_before_price_join": 11331,
+      "missing_price_ciks": 7535,
+      "survivorship_loss_fraction": 0.664989850851646
+    },
+    {
+      "as_of": "2023-11-30",
+      "universe": "C_broad",
+      "members": 2048,
+      "eligible_before_price_join": 11331,
+      "missing_price_ciks": 7535,
+      "survivorship_loss_fraction": 0.664989850851646
+    },
+    {
+      "as_of": "2023-12-29",
+      "universe": "A_large",
+      "members": 497,
+      "eligible_before_price_join": 11344,
+      "missing_price_ciks": 7537,
+      "survivorship_loss_fraction": 0.6644040902679831
+    },
+    {
+      "as_of": "2023-12-29",
+      "universe": "B_core",
+      "members": 1626,
+      "eligible_before_price_join": 11344,
+      "missing_price_ciks": 7537,
+      "survivorship_loss_fraction": 0.6644040902679831
+    },
+    {
+      "as_of": "2023-12-29",
+      "universe": "C_broad",
+      "members": 2174,
+      "eligible_before_price_join": 11344,
+      "missing_price_ciks": 7537,
+      "survivorship_loss_fraction": 0.6644040902679831
+    },
+    {
+      "as_of": "2024-01-31",
+      "universe": "A_large",
+      "members": 488,
+      "eligible_before_price_join": 11359,
+      "missing_price_ciks": 7540,
+      "survivorship_loss_fraction": 0.6637908266572762
+    },
+    {
+      "as_of": "2024-01-31",
+      "universe": "B_core",
+      "members": 1557,
+      "eligible_before_price_join": 11359,
+      "missing_price_ciks": 7540,
+      "survivorship_loss_fraction": 0.6637908266572762
+    },
+    {
+      "as_of": "2024-01-31",
+      "universe": "C_broad",
+      "members": 2123,
+      "eligible_before_price_join": 11359,
+      "missing_price_ciks": 7540,
+      "survivorship_loss_fraction": 0.6637908266572762
+    },
+    {
+      "as_of": "2024-02-29",
+      "universe": "A_large",
+      "members": 510,
+      "eligible_before_price_join": 11406,
+      "missing_price_ciks": 7560,
+      "survivorship_loss_fraction": 0.6628090478695423
+    },
+    {
+      "as_of": "2024-02-29",
+      "universe": "B_core",
+      "members": 1613,
+      "eligible_before_price_join": 11406,
+      "missing_price_ciks": 7560,
+      "survivorship_loss_fraction": 0.6628090478695423
+    },
+    {
+      "as_of": "2024-02-29",
+      "universe": "C_broad",
+      "members": 2158,
+      "eligible_before_price_join": 11406,
+      "missing_price_ciks": 7560,
+      "survivorship_loss_fraction": 0.6628090478695423
+    },
+    {
+      "as_of": "2024-03-28",
+      "universe": "A_large",
+      "members": 526,
+      "eligible_before_price_join": 11418,
+      "missing_price_ciks": 7559,
+      "survivorship_loss_fraction": 0.662024873007532
+    },
+    {
+      "as_of": "2024-03-28",
+      "universe": "B_core",
+      "members": 1627,
+      "eligible_before_price_join": 11418,
+      "missing_price_ciks": 7559,
+      "survivorship_loss_fraction": 0.662024873007532
+    },
+    {
+      "as_of": "2024-03-28",
+      "universe": "C_broad",
+      "members": 2201,
+      "eligible_before_price_join": 11418,
+      "missing_price_ciks": 7559,
+      "survivorship_loss_fraction": 0.662024873007532
+    },
+    {
+      "as_of": "2024-04-30",
+      "universe": "A_large",
+      "members": 498,
+      "eligible_before_price_join": 11434,
+      "missing_price_ciks": 7558,
+      "survivorship_loss_fraction": 0.6610110197656114
+    },
+    {
+      "as_of": "2024-04-30",
+      "universe": "B_core",
+      "members": 1562,
+      "eligible_before_price_join": 11434,
+      "missing_price_ciks": 7558,
+      "survivorship_loss_fraction": 0.6610110197656114
+    },
+    {
+      "as_of": "2024-04-30",
+      "universe": "C_broad",
+      "members": 2157,
+      "eligible_before_price_join": 11434,
+      "missing_price_ciks": 7558,
+      "survivorship_loss_fraction": 0.6610110197656114
+    },
+    {
+      "as_of": "2024-05-31",
+      "universe": "A_large",
+      "members": 514,
+      "eligible_before_price_join": 11443,
+      "missing_price_ciks": 7557,
+      "survivorship_loss_fraction": 0.6604037402778992
+    },
+    {
+      "as_of": "2024-05-31",
+      "universe": "B_core",
+      "members": 1600,
+      "eligible_before_price_join": 11443,
+      "missing_price_ciks": 7557,
+      "survivorship_loss_fraction": 0.6604037402778992
+    },
+    {
+      "as_of": "2024-05-31",
+      "universe": "C_broad",
+      "members": 2199,
+      "eligible_before_price_join": 11443,
+      "missing_price_ciks": 7557,
+      "survivorship_loss_fraction": 0.6604037402778992
+    },
+    {
+      "as_of": "2024-06-28",
+      "universe": "A_large",
+      "members": 515,
+      "eligible_before_price_join": 11470,
+      "missing_price_ciks": 7562,
+      "survivorship_loss_fraction": 0.6592850915431561
+    },
+    {
+      "as_of": "2024-06-28",
+      "universe": "B_core",
+      "members": 1638,
+      "eligible_before_price_join": 11470,
+      "missing_price_ciks": 7562,
+      "survivorship_loss_fraction": 0.6592850915431561
+    },
+    {
+      "as_of": "2024-06-28",
+      "universe": "C_broad",
+      "members": 2240,
+      "eligible_before_price_join": 11470,
+      "missing_price_ciks": 7562,
+      "survivorship_loss_fraction": 0.6592850915431561
+    },
+    {
+      "as_of": "2024-07-31",
+      "universe": "A_large",
+      "members": 537,
+      "eligible_before_price_join": 11507,
+      "missing_price_ciks": 7574,
+      "survivorship_loss_fraction": 0.6582080472755714
+    },
+    {
+      "as_of": "2024-07-31",
+      "universe": "B_core",
+      "members": 1674,
+      "eligible_before_price_join": 11507,
+      "missing_price_ciks": 7574,
+      "survivorship_loss_fraction": 0.6582080472755714
+    },
+    {
+      "as_of": "2024-07-31",
+      "universe": "C_broad",
+      "members": 2232,
+      "eligible_before_price_join": 11507,
+      "missing_price_ciks": 7574,
+      "survivorship_loss_fraction": 0.6582080472755714
+    },
+    {
+      "as_of": "2024-08-30",
+      "universe": "A_large",
+      "members": 534,
+      "eligible_before_price_join": 11537,
+      "missing_price_ciks": 7579,
+      "survivorship_loss_fraction": 0.6569298777845194
+    },
+    {
+      "as_of": "2024-08-30",
+      "universe": "B_core",
+      "members": 1623,
+      "eligible_before_price_join": 11537,
+      "missing_price_ciks": 7579,
+      "survivorship_loss_fraction": 0.6569298777845194
+    },
+    {
+      "as_of": "2024-08-30",
+      "universe": "C_broad",
+      "members": 2208,
+      "eligible_before_price_join": 11537,
+      "missing_price_ciks": 7579,
+      "survivorship_loss_fraction": 0.6569298777845194
+    },
+    {
+      "as_of": "2024-09-30",
+      "universe": "A_large",
+      "members": 540,
+      "eligible_before_price_join": 11552,
+      "missing_price_ciks": 7577,
+      "survivorship_loss_fraction": 0.6559037396121884
+    },
+    {
+      "as_of": "2024-09-30",
+      "universe": "B_core",
+      "members": 1658,
+      "eligible_before_price_join": 11552,
+      "missing_price_ciks": 7577,
+      "survivorship_loss_fraction": 0.6559037396121884
+    },
+    {
+      "as_of": "2024-09-30",
+      "universe": "C_broad",
+      "members": 2244,
+      "eligible_before_price_join": 11552,
+      "missing_price_ciks": 7577,
+      "survivorship_loss_fraction": 0.6559037396121884
+    },
+    {
+      "as_of": "2024-10-31",
+      "universe": "A_large",
+      "members": 530,
+      "eligible_before_price_join": 11560,
+      "missing_price_ciks": 7571,
+      "survivorship_loss_fraction": 0.6549307958477508
+    },
+    {
+      "as_of": "2024-10-31",
+      "universe": "B_core",
+      "members": 1629,
+      "eligible_before_price_join": 11560,
+      "missing_price_ciks": 7571,
+      "survivorship_loss_fraction": 0.6549307958477508
+    },
+    {
+      "as_of": "2024-10-31",
+      "universe": "C_broad",
+      "members": 2221,
+      "eligible_before_price_join": 11560,
+      "missing_price_ciks": 7571,
+      "survivorship_loss_fraction": 0.6549307958477508
+    },
+    {
+      "as_of": "2024-11-29",
+      "universe": "A_large",
+      "members": 567,
+      "eligible_before_price_join": 11589,
+      "missing_price_ciks": 7581,
+      "survivorship_loss_fraction": 0.6541548019673828
+    },
+    {
+      "as_of": "2024-11-29",
+      "universe": "B_core",
+      "members": 1745,
+      "eligible_before_price_join": 11589,
+      "missing_price_ciks": 7581,
+      "survivorship_loss_fraction": 0.6541548019673828
+    },
+    {
+      "as_of": "2024-11-29",
+      "universe": "C_broad",
+      "members": 2339,
+      "eligible_before_price_join": 11589,
+      "missing_price_ciks": 7581,
+      "survivorship_loss_fraction": 0.6541548019673828
+    },
+    {
+      "as_of": "2024-12-31",
+      "universe": "A_large",
+      "members": 537,
+      "eligible_before_price_join": 11599,
+      "missing_price_ciks": 7582,
+      "survivorship_loss_fraction": 0.6536770411242349
+    },
+    {
+      "as_of": "2024-12-31",
+      "universe": "B_core",
+      "members": 1718,
+      "eligible_before_price_join": 11599,
+      "missing_price_ciks": 7582,
+      "survivorship_loss_fraction": 0.6536770411242349
+    },
+    {
+      "as_of": "2024-12-31",
+      "universe": "C_broad",
+      "members": 2346,
+      "eligible_before_price_join": 11599,
+      "missing_price_ciks": 7582,
+      "survivorship_loss_fraction": 0.6536770411242349
+    },
+    {
+      "as_of": "2025-01-31",
+      "universe": "A_large",
+      "members": 559,
+      "eligible_before_price_join": 11611,
+      "missing_price_ciks": 7582,
+      "survivorship_loss_fraction": 0.6530014641288433
+    },
+    {
+      "as_of": "2025-01-31",
+      "universe": "B_core",
+      "members": 1707,
+      "eligible_before_price_join": 11611,
+      "missing_price_ciks": 7582,
+      "survivorship_loss_fraction": 0.6530014641288433
+    },
+    {
+      "as_of": "2025-01-31",
+      "universe": "C_broad",
+      "members": 2336,
+      "eligible_before_price_join": 11611,
+      "missing_price_ciks": 7582,
+      "survivorship_loss_fraction": 0.6530014641288433
+    },
+    {
+      "as_of": "2025-02-28",
+      "universe": "A_large",
+      "members": 551,
+      "eligible_before_price_join": 11653,
+      "missing_price_ciks": 7587,
+      "survivorship_loss_fraction": 0.651076975886038
+    },
+    {
+      "as_of": "2025-02-28",
+      "universe": "B_core",
+      "members": 1704,
+      "eligible_before_price_join": 11653,
+      "missing_price_ciks": 7587,
+      "survivorship_loss_fraction": 0.651076975886038
+    },
+    {
+      "as_of": "2025-02-28",
+      "universe": "C_broad",
+      "members": 2286,
+      "eligible_before_price_join": 11653,
+      "missing_price_ciks": 7587,
+      "survivorship_loss_fraction": 0.651076975886038
+    },
+    {
+      "as_of": "2025-03-31",
+      "universe": "A_large",
+      "members": 533,
+      "eligible_before_price_join": 11671,
+      "missing_price_ciks": 7585,
+      "survivorship_loss_fraction": 0.6499014651700797
+    },
+    {
+      "as_of": "2025-03-31",
+      "universe": "B_core",
+      "members": 1690,
+      "eligible_before_price_join": 11671,
+      "missing_price_ciks": 7585,
+      "survivorship_loss_fraction": 0.6499014651700797
+    },
+    {
+      "as_of": "2025-03-31",
+      "universe": "C_broad",
+      "members": 2255,
+      "eligible_before_price_join": 11671,
+      "missing_price_ciks": 7585,
+      "survivorship_loss_fraction": 0.6499014651700797
+    },
+    {
+      "as_of": "2025-04-30",
+      "universe": "A_large",
+      "members": 527,
+      "eligible_before_price_join": 11673,
+      "missing_price_ciks": 7585,
+      "survivorship_loss_fraction": 0.6497901139381479
+    },
+    {
+      "as_of": "2025-04-30",
+      "universe": "B_core",
+      "members": 1692,
+      "eligible_before_price_join": 11673,
+      "missing_price_ciks": 7585,
+      "survivorship_loss_fraction": 0.6497901139381479
+    },
+    {
+      "as_of": "2025-04-30",
+      "universe": "C_broad",
+      "members": 2235,
+      "eligible_before_price_join": 11673,
+      "missing_price_ciks": 7585,
+      "survivorship_loss_fraction": 0.6497901139381479
+    },
+    {
+      "as_of": "2025-05-30",
+      "universe": "A_large",
+      "members": 543,
+      "eligible_before_price_join": 11679,
+      "missing_price_ciks": 7586,
+      "survivorship_loss_fraction": 0.649541912835003
+    },
+    {
+      "as_of": "2025-05-30",
+      "universe": "B_core",
+      "members": 1690,
+      "eligible_before_price_join": 11679,
+      "missing_price_ciks": 7586,
+      "survivorship_loss_fraction": 0.649541912835003
+    },
+    {
+      "as_of": "2025-05-30",
+      "universe": "C_broad",
+      "members": 2253,
+      "eligible_before_price_join": 11679,
+      "missing_price_ciks": 7586,
+      "survivorship_loss_fraction": 0.649541912835003
+    },
+    {
+      "as_of": "2025-06-30",
+      "universe": "A_large",
+      "members": 550,
+      "eligible_before_price_join": 11711,
+      "missing_price_ciks": 7591,
+      "survivorship_loss_fraction": 0.648194005635727
+    },
+    {
+      "as_of": "2025-06-30",
+      "universe": "B_core",
+      "members": 1736,
+      "eligible_before_price_join": 11711,
+      "missing_price_ciks": 7591,
+      "survivorship_loss_fraction": 0.648194005635727
+    },
+    {
+      "as_of": "2025-06-30",
+      "universe": "C_broad",
+      "members": 2386,
+      "eligible_before_price_join": 11711,
+      "missing_price_ciks": 7591,
+      "survivorship_loss_fraction": 0.648194005635727
+    },
+    {
+      "as_of": "2025-07-31",
+      "universe": "A_large",
+      "members": 561,
+      "eligible_before_price_join": 11727,
+      "missing_price_ciks": 7589,
+      "survivorship_loss_fraction": 0.647139080753816
+    },
+    {
+      "as_of": "2025-07-31",
+      "universe": "B_core",
+      "members": 1739,
+      "eligible_before_price_join": 11727,
+      "missing_price_ciks": 7589,
+      "survivorship_loss_fraction": 0.647139080753816
+    },
+    {
+      "as_of": "2025-07-31",
+      "universe": "C_broad",
+      "members": 2354,
+      "eligible_before_price_join": 11727,
+      "missing_price_ciks": 7589,
+      "survivorship_loss_fraction": 0.647139080753816
+    },
+    {
+      "as_of": "2025-08-29",
+      "universe": "A_large",
+      "members": 570,
+      "eligible_before_price_join": 11757,
+      "missing_price_ciks": 7603,
+      "survivorship_loss_fraction": 0.6466785744662754
+    },
+    {
+      "as_of": "2025-08-29",
+      "universe": "B_core",
+      "members": 1758,
+      "eligible_before_price_join": 11757,
+      "missing_price_ciks": 7603,
+      "survivorship_loss_fraction": 0.6466785744662754
+    },
+    {
+      "as_of": "2025-08-29",
+      "universe": "C_broad",
+      "members": 2353,
+      "eligible_before_price_join": 11757,
+      "missing_price_ciks": 7603,
+      "survivorship_loss_fraction": 0.6466785744662754
+    },
+    {
+      "as_of": "2025-09-30",
+      "universe": "A_large",
+      "members": 572,
+      "eligible_before_price_join": 11775,
+      "missing_price_ciks": 7610,
+      "survivorship_loss_fraction": 0.6462845010615711
+    },
+    {
+      "as_of": "2025-09-30",
+      "universe": "B_core",
+      "members": 1823,
+      "eligible_before_price_join": 11775,
+      "missing_price_ciks": 7610,
+      "survivorship_loss_fraction": 0.6462845010615711
+    },
+    {
+      "as_of": "2025-09-30",
+      "universe": "C_broad",
+      "members": 2414,
+      "eligible_before_price_join": 11775,
+      "missing_price_ciks": 7610,
+      "survivorship_loss_fraction": 0.6462845010615711
+    },
+    {
+      "as_of": "2025-10-31",
+      "universe": "A_large",
+      "members": 572,
+      "eligible_before_price_join": 11785,
+      "missing_price_ciks": 7612,
+      "survivorship_loss_fraction": 0.6459058124734832
+    },
+    {
+      "as_of": "2025-10-31",
+      "universe": "B_core",
+      "members": 1806,
+      "eligible_before_price_join": 11785,
+      "missing_price_ciks": 7612,
+      "survivorship_loss_fraction": 0.6459058124734832
+    },
+    {
+      "as_of": "2025-10-31",
+      "universe": "C_broad",
+      "members": 2438,
+      "eligible_before_price_join": 11785,
+      "missing_price_ciks": 7612,
+      "survivorship_loss_fraction": 0.6459058124734832
+    },
+    {
+      "as_of": "2025-11-28",
+      "universe": "A_large",
+      "members": 582,
+      "eligible_before_price_join": 11811,
+      "missing_price_ciks": 7618,
+      "survivorship_loss_fraction": 0.64499195665058
+    },
+    {
+      "as_of": "2025-11-28",
+      "universe": "B_core",
+      "members": 1830,
+      "eligible_before_price_join": 11811,
+      "missing_price_ciks": 7618,
+      "survivorship_loss_fraction": 0.64499195665058
+    },
+    {
+      "as_of": "2025-11-28",
+      "universe": "C_broad",
+      "members": 2431,
+      "eligible_before_price_join": 11811,
+      "missing_price_ciks": 7618,
+      "survivorship_loss_fraction": 0.64499195665058
+    },
+    {
+      "as_of": "2025-12-31",
+      "universe": "A_large",
+      "members": 581,
+      "eligible_before_price_join": 11828,
+      "missing_price_ciks": 7621,
+      "survivorship_loss_fraction": 0.644318566114305
+    },
+    {
+      "as_of": "2025-12-31",
+      "universe": "B_core",
+      "members": 1855,
+      "eligible_before_price_join": 11828,
+      "missing_price_ciks": 7621,
+      "survivorship_loss_fraction": 0.644318566114305
+    },
+    {
+      "as_of": "2025-12-31",
+      "universe": "C_broad",
+      "members": 2444,
+      "eligible_before_price_join": 11828,
+      "missing_price_ciks": 7621,
+      "survivorship_loss_fraction": 0.644318566114305
+    },
+    {
+      "as_of": "2026-01-30",
+      "universe": "A_large",
+      "members": 588,
+      "eligible_before_price_join": 11839,
+      "missing_price_ciks": 7622,
+      "survivorship_loss_fraction": 0.6438043753695414
+    },
+    {
+      "as_of": "2026-01-30",
+      "universe": "B_core",
+      "members": 1870,
+      "eligible_before_price_join": 11839,
+      "missing_price_ciks": 7622,
+      "survivorship_loss_fraction": 0.6438043753695414
+    },
+    {
+      "as_of": "2026-01-30",
+      "universe": "C_broad",
+      "members": 2442,
+      "eligible_before_price_join": 11839,
+      "missing_price_ciks": 7622,
+      "survivorship_loss_fraction": 0.6438043753695414
+    },
+    {
+      "as_of": "2026-02-27",
+      "universe": "A_large",
+      "members": 603,
+      "eligible_before_price_join": 11880,
+      "missing_price_ciks": 7632,
+      "survivorship_loss_fraction": 0.6424242424242425
+    },
+    {
+      "as_of": "2026-02-27",
+      "universe": "B_core",
+      "members": 1887,
+      "eligible_before_price_join": 11880,
+      "missing_price_ciks": 7632,
+      "survivorship_loss_fraction": 0.6424242424242425
+    },
+    {
+      "as_of": "2026-02-27",
+      "universe": "C_broad",
+      "members": 2443,
+      "eligible_before_price_join": 11880,
+      "missing_price_ciks": 7632,
+      "survivorship_loss_fraction": 0.6424242424242425
+    },
+    {
+      "as_of": "2026-03-31",
+      "universe": "A_large",
+      "members": 577,
+      "eligible_before_price_join": 11914,
+      "missing_price_ciks": 7641,
+      "survivorship_loss_fraction": 0.6413463152593587
+    },
+    {
+      "as_of": "2026-03-31",
+      "universe": "B_core",
+      "members": 1872,
+      "eligible_before_price_join": 11914,
+      "missing_price_ciks": 7641,
+      "survivorship_loss_fraction": 0.6413463152593587
+    },
+    {
+      "as_of": "2026-03-31",
+      "universe": "C_broad",
+      "members": 2462,
+      "eligible_before_price_join": 11914,
+      "missing_price_ciks": 7641,
+      "survivorship_loss_fraction": 0.6413463152593587
+    },
+    {
+      "as_of": "2026-04-30",
+      "universe": "A_large",
+      "members": 613,
+      "eligible_before_price_join": 11922,
+      "missing_price_ciks": 7642,
+      "survivorship_loss_fraction": 0.6409998322429122
+    },
+    {
+      "as_of": "2026-04-30",
+      "universe": "B_core",
+      "members": 1888,
+      "eligible_before_price_join": 11922,
+      "missing_price_ciks": 7642,
+      "survivorship_loss_fraction": 0.6409998322429122
+    },
+    {
+      "as_of": "2026-04-30",
+      "universe": "C_broad",
+      "members": 2480,
+      "eligible_before_price_join": 11922,
+      "missing_price_ciks": 7642,
+      "survivorship_loss_fraction": 0.6409998322429122
+    },
+    {
+      "as_of": "2026-05-29",
+      "universe": "A_large",
+      "members": 625,
+      "eligible_before_price_join": 11938,
+      "missing_price_ciks": 7644,
+      "survivorship_loss_fraction": 0.640308259339923
+    },
+    {
+      "as_of": "2026-05-29",
+      "universe": "B_core",
+      "members": 1926,
+      "eligible_before_price_join": 11938,
+      "missing_price_ciks": 7644,
+      "survivorship_loss_fraction": 0.640308259339923
+    },
+    {
+      "as_of": "2026-05-29",
+      "universe": "C_broad",
+      "members": 2525,
+      "eligible_before_price_join": 11938,
+      "missing_price_ciks": 7644,
+      "survivorship_loss_fraction": 0.640308259339923
+    },
+    {
+      "as_of": "2026-06-30",
+      "universe": "A_large",
+      "members": 632,
+      "eligible_before_price_join": 11985,
+      "missing_price_ciks": 7649,
+      "survivorship_loss_fraction": 0.6382144347100542
+    },
+    {
+      "as_of": "2026-06-30",
+      "universe": "B_core",
+      "members": 1992,
+      "eligible_before_price_join": 11985,
+      "missing_price_ciks": 7649,
+      "survivorship_loss_fraction": 0.6382144347100542
+    },
+    {
+      "as_of": "2026-06-30",
+      "universe": "C_broad",
+      "members": 2573,
+      "eligible_before_price_join": 11985,
+      "missing_price_ciks": 7649,
+      "survivorship_loss_fraction": 0.6382144347100542
+    },
+    {
+      "as_of": "2026-07-31",
+      "universe": "A_large",
+      "members": 620,
+      "eligible_before_price_join": 12009,
+      "missing_price_ciks": 7948,
+      "survivorship_loss_fraction": 0.6618369556166208
+    },
+    {
+      "as_of": "2026-07-31",
+      "universe": "B_core",
+      "members": 1932,
+      "eligible_before_price_join": 12009,
+      "missing_price_ciks": 7948,
+      "survivorship_loss_fraction": 0.6618369556166208
+    },
+    {
+      "as_of": "2026-07-31",
+      "universe": "C_broad",
+      "members": 2485,
+      "eligible_before_price_join": 12009,
+      "missing_price_ciks": 7948,
+      "survivorship_loss_fraction": 0.6618369556166208
+    },
+    {
+      "as_of": "2026-08-14",
+      "universe": "A_large",
+      "members": 571,
+      "eligible_before_price_join": 12038,
+      "missing_price_ciks": 9373,
+      "survivorship_loss_fraction": 0.7786177105831533
+    },
+    {
+      "as_of": "2026-08-14",
+      "universe": "B_core",
+      "members": 1476,
+      "eligible_before_price_join": 12038,
+      "missing_price_ciks": 9373,
+      "survivorship_loss_fraction": 0.7786177105831533
+    },
+    {
+      "as_of": "2026-08-14",
+      "universe": "C_broad",
+      "members": 1802,
+      "eligible_before_price_join": 12038,
+      "missing_price_ciks": 9373,
+      "survivorship_loss_fraction": 0.7786177105831533
+    }
+  ]
+}

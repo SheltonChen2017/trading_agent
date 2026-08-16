@@ -265,15 +265,31 @@ class AlphaBatteryShort(QCAlgorithm):
                  f"cap_missing={self.cap_missing}")
         order = sorted(self.results)
         index_of = {spec: i for i, spec in enumerate(order)}
+        # SCALED INTEGERS. QuantConnect's log cap is about 100KB, measured:
+        # a 283-char-per-row layout truncated at 359 of 1,311 dates, while
+        # the monthly battery's 76KB survived intact. Decimal text is the
+        # expensive part, so IC is emitted in units of 1e-4 and returns in
+        # 1e-5 -- both far finer than the quantities they carry. Turnover
+        # moves to a per-spec average because it is applied as a mean in
+        # the cost model anyway.
         by_date = {}
         for spec, rows in self.results.items():
             for date, ic, lr, sr, l20, turn, n in rows:
-                by_date.setdefault(date, []).append(
-                    f"{index_of[spec]}~{'' if ic is None else round(ic, 5)}~"
-                    f"{round(lr, 6)}~{round(sr, 6)}~{round(l20, 6)}~"
-                    f"{round(turn, 4)}~{n}")
+                by_date.setdefault(date, {})[index_of[spec]] = (
+                    f"{'' if ic is None else int(round(ic * 10000))},"
+                    f"{int(round(lr * 100000))},{int(round(sr * 100000))}"
+                )
         self.Log(f"SPECS|{'|'.join(order)}")
+        self.Log("SCALE|ic=1e-4|ret=1e-5")
         self.Log(f"DATES|{len(by_date)}")
+        for spec in order:
+            rows = self.results[spec]
+            turns = [r[5] for r in rows]
+            names = sorted(r[6] for r in rows)
+            self.Log(f"SPECMETA|{spec}|turnover={round(sum(turns)/len(turns), 4)}"
+                     f"|median_names={names[len(names)//2]}|periods={len(rows)}")
         for date in sorted(by_date):
-            self.Log(f"ROW|{date.replace('-', '')}|" + "|".join(by_date[date]))
+            cells = by_date[date]
+            packed = "|".join(f"{i}~{cells[i]}" for i in sorted(cells))
+            self.Log(f"ROW|{date.replace('-', '')}|{packed}")
         self.Log(f"orders placed: {self.Transactions.OrdersCount}")

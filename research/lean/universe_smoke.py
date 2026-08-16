@@ -47,6 +47,15 @@ UNIVERSES = {
 # run's purpose single and its log readable.
 ACTIVE_UNIVERSE = "B_core"
 
+# The window, declared HERE rather than patched into the source at upload
+# time. Run 3 of 2026-08-16 was produced by the driver rewriting the dates
+# in flight, which left the committed file saying 2013-2016 while the run
+# that produced the "11 delistings" number used 2022-2023 -- reproducible,
+# but not self-documenting, and a reader comparing the doc to the file
+# would have found a mismatch with no way to tell which was right.
+START = (2013, 1, 1)
+END = (2016, 12, 31)
+
 
 class UniverseSmokeTest(QCAlgorithm):
     """Counts and field checks only. Places no orders, ever."""
@@ -56,8 +65,8 @@ class UniverseSmokeTest(QCAlgorithm):
         # dataset lost 65.5% of its filers, and SVB/SBNY/FRC all failed in
         # March 2023, so a later run over 2022-2024 should show delistings
         # if the Security Master is doing its job.
-        self.SetStartDate(2013, 1, 1)
-        self.SetEndDate(2016, 12, 31)
+        self.SetStartDate(*START)
+        self.SetEndDate(*END)
         self.SetCash(100_000)
 
         self.UniverseSettings.Resolution = Resolution.Daily

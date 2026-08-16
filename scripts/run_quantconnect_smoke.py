@@ -79,9 +79,18 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--project-id", type=int, default=None,
                         help="reuse an existing project instead of creating one")
     parser.add_argument("--output", default=None)
+    parser.add_argument("--start", default=None,
+                        help="YYYY-MM-DD; overrides the algorithm's declared START")
+    parser.add_argument("--end", default=None,
+                        help="YYYY-MM-DD; overrides the algorithm's declared END")
     args = parser.parse_args(argv)
 
     source = ALGORITHM.read_text(encoding="utf-8")
+    if args.start or args.end:
+        # Rewrite the DECLARED constants only. The earlier version patched
+        # SetStartDate/SetEndDate calls directly, which left the committed
+        # file disagreeing with the run it produced.
+        source = _retarget_window(source, args.start, args.end)
     client = QuantConnectClient()
 
     print("authenticating...", flush=True)
@@ -139,6 +148,29 @@ def main(argv: list[str] | None = None) -> int:
     print("\n=== SMOKE TEST SUMMARY (no alpha statistic) ===")
     print(text)
     return 0
+
+
+def _retarget_window(source: str, start: str | None, end: str | None) -> str:
+    """Replace the algorithm's declared START/END tuples.
+
+    Refuses rather than silently running the wrong window: if the constant
+    is not found, the algorithm is not the one this driver understands.
+    """
+    import re
+
+    for name, value in (("START", start), ("END", end)):
+        if not value:
+            continue
+        year, month, day = (int(part) for part in value.split("-"))
+        pattern = rf"^{name} = \(\d+, \d+, \d+\)$"
+        replacement = f"{name} = ({year}, {month}, {day})"
+        source, count = re.subn(pattern, replacement, source, count=1, flags=re.M)
+        if count != 1:
+            raise SystemExit(
+                f"could not find a `{name} = (y, m, d)` constant to retarget; "
+                "refusing to run an algorithm whose window is unknown"
+            )
+    return source
 
 
 def _smoke_lines(backtest: dict) -> list[str]:

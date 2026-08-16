@@ -127,3 +127,39 @@ def test_delistings_are_observed_rather_than_assumed():
     looks at Delistings, a cloud run proves nothing the local run did not."""
     text = SOURCE.read_text(encoding="utf-8")
     assert "Delistings" in text and "DelistingType.Delisted" in text
+
+
+def test_the_declared_window_is_retargeted_not_patched():
+    """Provenance. Run 3 of 2026-08-16 was produced by rewriting
+    SetStartDate/SetEndDate at upload time, so the committed file said
+    2013-2016 while the run that produced the "11 delistings" number used
+    2022-2023. A reader comparing the document to the file would have found
+    a mismatch with no way to tell which was right.
+
+    The window is now a declared constant, and the driver rewrites THAT.
+    """
+    from scripts.run_quantconnect_smoke import _retarget_window
+
+    source = (LEAN_DIR / "universe_smoke.py").read_text(encoding="utf-8")
+    assert "START = (" in source and "END = (" in source
+    assert "SetStartDate(*START)" in source, "the algorithm must consume the constant"
+
+    out = _retarget_window(source, "2022-06-01", "2023-12-31")
+    assert "START = (2022, 6, 1)" in out
+    assert "END = (2023, 12, 31)" in out
+    # And it must not have touched anything else.
+    assert out.replace("START = (2022, 6, 1)", "START = (2013, 1, 1)").replace(
+        "END = (2023, 12, 31)", "END = (2016, 12, 31)"
+    ) == source
+
+
+def test_retargeting_refuses_rather_than_running_an_unknown_window():
+    """Failing closed matters more than convenience here: a driver that
+    silently ran the algorithm's own dates after a failed substitution
+    would produce a result labelled with the window the caller asked for
+    and computed over a different one."""
+    from scripts.run_quantconnect_smoke import _retarget_window
+
+    with pytest.raises(SystemExit) as excinfo:
+        _retarget_window("class Foo:\n    pass\n", "2022-06-01", None)
+    assert "refusing" in str(excinfo.value)

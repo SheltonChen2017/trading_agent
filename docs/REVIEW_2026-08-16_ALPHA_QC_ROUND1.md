@@ -89,9 +89,20 @@ between QuantConnect history and later Alpaca Paper forward/execution testing.
 
 ## Validation
 
-Validation results are recorded on the final corrected tree before the review
-branch is pushed. The final handoff names the exact counts, Python version,
-compile result, branch identity, ordered commits, and remote head.
+Final corrected tree, Python 3.13.14 on Windows:
+
+- focused QuantConnect battery suite: **13 passed in 2.48 seconds**;
+- active-document consistency suite: **30 passed in 0.57 seconds**;
+- full repository suite: **4,122 passed, 0 failed, 25 known dependency
+  warnings in 795.85 seconds**;
+- repository compilation including `research/`: clean;
+- `git diff --check`: clean.
+
+One pre-final full-suite attempt stopped at the active-document topology guard
+because the handoff said only `origin/main` rather than the required parseable
+`main and origin/main` declaration. The handoff was corrected, the focused
+document suite passed, and the complete suite above was rerun from the final
+tree. This was a documentation-format failure, not a product-test failure.
 
 ## Required counter-review and rerun
 

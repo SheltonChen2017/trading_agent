@@ -3913,8 +3913,8 @@ if page == "Portfolio Rebalancing":
                     # REBAL1CR-001: feasibility is its own column. It used
                     # to occupy Status and hide the band state, so a page
                     # measuring drift reported almost none of it.
-                    "Target reachable": (
-                        "no -- " + _row.policy_conflict_reason
+                    "Reachable": (
+                        "no"
                         if _row.policy_conflict_reason
                         else "yes"
                     ),
@@ -3930,6 +3930,36 @@ if page == "Portfolio Rebalancing":
             "would sit from its target in dollars, with no share count, no "
             "side, and no ordering of what to act on."
         )
+
+        # REBAL1CR-001 follow-up: feasibility used to be the LAST column of
+        # a nine-column table, which on a normal window is cut off with no
+        # horizontal scrollbar -- so the one fact telling the owner whether
+        # the targets are reachable at all was unreadable. It is now stated
+        # in full below the table, where width cannot hide it.
+        _rb_conflicts = [
+            _row for _row in _rb_report.rows if _row.policy_conflict_reason
+        ]
+        if _rb_conflicts:
+            with st.container(border=True):
+                st.caption("TARGETS NOT REACHABLE UNDER THE ACTIVE POLICY")
+                for _rb_conflict in _rb_conflicts:
+                    _rb_name = SLEEVE_LABELS.get(
+                        _rb_conflict.sleeve, _rb_conflict.sleeve
+                    )
+                    st.write(
+                        f"**{_rb_name}**: "
+                        f"{_rb_conflict.policy_conflict_reason}."
+                    )
+                st.caption(
+                    "A cap is not a target, but a target above a cap cannot "
+                    "be reached, so the band around it is fiction until "
+                    "either the profile or the policy moves."
+                )
+        else:
+            st.caption(
+                "Every sleeve target is reachable under the active policy "
+                f"(`{Path(policy_path).name}`)."
+            )
 
         if _rb_report.unassigned_tickers:
             with st.container(border=True):

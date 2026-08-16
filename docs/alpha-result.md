@@ -16,9 +16,24 @@ stage.
 | VALID | Ran on reviewed code, complete output, statistics usable |
 | INVALIDATED | Ran, but a defect found afterwards makes the numbers unusable |
 | REFUSED | The algorithm declined to emit results; no statistics exist |
+| UNANALYSED | Complete raw output exists, but controlled analysis has not been run |
+| PENDING_REVIEW | Output came from code that had not completed the review gate; unusable |
+| PROVENANCE_INCOMPLETE | Run identity cannot be tied completely to reviewed source and artifacts |
 | INCONCLUSIVE | Complete output, but the design cannot answer the question |
 | STALE | Superseded by a later run on corrected code |
 | UNAVAILABLE | Could not be run |
+
+## Cumulative look accounting
+
+Method V2 section 1.10 counts every real-market cloud execution, even when it
+refuses, is never locally analysed, or ran accidentally. At this ledger's
+opening there are **five additional run-level looks**: R-001, both R-002
+runs, R-003, and R-004. The emitted alpha-cell exposure is **80**: 40 short-
+horizon cells across A/B plus 40 monthly cells from the accidental A run.
+R-001 emitted zero cells but still consumed a run; R-004 is a benchmark run,
+not an alpha cell. Together with the prior 348 declared cells, the conservative
+lifetime alpha-cell exposure floor is **428**. These counts do not make any
+result valid and do not authorize analysis outside the reviewed workflow.
 
 ---
 
@@ -28,7 +43,7 @@ stage.
 |---|---|
 | **Alpha / specification** | Monthly battery: MOM_3/6/9/12_1, RESIDUAL_MOM_6/12_1, GROSS_PROFITABILITY, QUALITY_COMPOSITE, QUALITY_MOMENTUM, MULTI_ALPHA_COMPOSITE |
 | **Replication or new** | Exact replication of the frozen 2026-08-16 pre-registration, on corrected code |
-| **Research look** | Not counted — no statistic was produced |
+| **Research look** | Counted real-market run; zero emitted alpha cells |
 | **Multiplicity family** | QC alpha battery 2026-08-16 (declared 135; Codex QCAR-006 corrects the family to 180) |
 | **Source commit** | `e8eb558` (Codex correction), merged via `f4c81dd` |
 | **QC project ID** | `35244708` (`tg-rr-mon-B`) |
@@ -38,10 +53,11 @@ stage.
 | **Data period** | 2012-01-01 to 2024-12-31 |
 | **Universe** | B_core: price ≥ $5, market cap ≥ $500M, ADV20 ≥ $5M; point-in-time Morningstar fundamentals; `MarketCap == 0` treated as missing with shares-outstanding fallback |
 | **Costs / turnover / benchmark** | n/a — no series emitted |
-| **Artifact** | `rr_mon_B.txt`, 6 lines, no ROW records |
+| **Artifact** | `docs/qc_rr_mon_B_20260816.log`, 7 lines, sha256:`516fe20b04ec940007bce8d9a97c2ed363f422655ebcd61b84fef2aa8525e868` |
 | **Primary statistics** | **none** |
 | **Gate outcome** | n/a |
 | **Validity** | **REFUSED** |
+| **Provenance** | **PROVENANCE_INCOMPLETE** — compile ID absent |
 
 ### What happened
 
@@ -64,25 +80,21 @@ expensive, mostly retained delisted subscriptions and adjusted bars).
 
 ### Root cause, found by counter-review
 
-`_industry_returns` builds leave-one-out peer series over `count` = 260
-sessions. `_residual_momentum` then rejects on
-`len(peers) != len(stock)`, where `stock` holds `21 * months` = 126 or 252
-returns. **That equality can never hold**, so residual momentum returned
-`None` for every name on every date, and `MULTI_ALPHA_COMPOSITE` fell with
-it because `RESIDUAL_MOM_12_1` is one of its four legs.
-
-The market leg two lines below is sliced correctly
-(`mkt = market[-len(stock):]`); the peer leg was not. Fixed by slicing
-peers the same way, with a regression test pinning the arithmetic and one
-mutation confirming the test detects a restored equality check.
+The submitted peer-length equality did make every residual score unavailable,
+so the refusal correctly exposed a real defect. Independent review then found
+a deeper issue in the proposed slice fix: the helper summed the most-recent
+21 sessions, which are the month a 6-1/12-1 signal must skip. The reviewed
+correction uses a fixed 252-session joint market/leave-one-out-industry fit,
+then sums residuals over `t-126..t-21` or `t-252..t-21`. All monthly output
+from the slice-only implementation is stale pending Claude's counter-review
+and a new QC run.
 
 ### Limitations and review status
 
 - No statistic exists. Nothing about any alpha can be inferred from this
   entry.
-- The fix is **awaiting Codex review**; it has not been run on
-  QuantConnect. Per the workflow, reviewed-then-counter-reviewed code is
-  the only code that runs on the cloud.
+- The slice-only fix was reviewed and corrected again; it must not be run or
+  cited. Claude must counter-review the Codex head before a fresh QC run.
 - Compile ID was not captured. Later entries record it.
 
 ---
@@ -93,13 +105,15 @@ mutation confirming the test detects a restored equality check.
 |---|---|
 | **Alpha / specification** | REVERSAL_5D, INDUSTRY_ADJ_REVERSAL_5D, ABNORMAL_VOLUME_REVERSAL, MAX_20, MAX_X_REVERSAL |
 | **Replication or new** | Exact replication of the frozen pre-registration, on corrected code |
-| **Research look** | Not yet counted — no statistic has been computed from these logs |
+| **Research look** | Two counted real-market runs; 40 emitted alpha cells total |
 | **Source commit** | `e8eb558` (Codex correction), merged via `f4c81dd` |
-| **QC project / backtest** | B_core `a364f6872f6b0827b8adfb22ac20337e`; A_large `6dec09106141c24fbf884738db84c36a` |
+| **QC project / compile IDs** | not recorded |
+| **Backtest IDs** | B_core `a364f6872f6b0827b8adfb22ac20337e`; A_large `6dec09106141c24fbf884738db84c36a` |
 | **Data period** | 2012-01-01 to 2024-12-31 |
 | **Output** | 534 declared dates, 54 base64 blocks each, layout `b64block_date_u32_i32x4_u16x3` |
-| **Artifact** | `docs/qc_rr_sht_B_20260816.log` sha256:a4237e06c00bf6b0; `docs/qc_rr_sht_A_20260816.log` sha256:f96b076d79729e89 |
+| **Artifact** | `docs/qc_rr_sht_B_20260816.log` sha256:`a4237e06c00bf6b07fff192a1a4fbd6ab42efe9b6dab0c9b3f6b660a2f8c7f58`; `docs/qc_rr_sht_A_20260816.log` sha256:`f96b076d79729e8906e940f2711cc22b65091ea6d14698cc8b23d8b90e3816b1` |
 | **Validity** | **UNANALYSED** — complete output, statistics not yet computed |
+| **Provenance** | **PROVENANCE_INCOMPLETE** — project and compile IDs absent |
 
 ### The timing correction is confirmed by arithmetic
 
@@ -115,31 +129,36 @@ substance, not merely in intent.**
 
 ### Why it is UNANALYSED rather than VALID
 
-No statistics have been computed. The analyser understands the decimal and
-scaled-integer layouts but not the new base64 block layout, so reading
-these logs requires a decoder that does not yet exist. That work has not
-been reviewed and no number is quoted from these runs.
+No statistics have been computed. Contrary to the submitted note,
+`scripts/analyse_qc_alpha_battery.py` already contains a reviewed base64-block
+decoder and `tests/test_qc_alpha_battery.py` round-trips the exact layout.
+Codex deliberately did not run it: analysis belongs after the current code
+correction and Claude counter-review so look accounting and result identity
+are recorded before any statistic is observed.
 
 A separate process failure was recorded here rather than hidden: my run
 queue reported these two runs as `TRUNCATED` because it counts `ROW|`
-lines and the corrected short battery emits `BLOCK|` lines. The logs are
+lines and the corrected short battery emits `B64BLOCK|` lines. The logs are
 complete; the checker was wrong. A completeness check that does not
 understand the format it is checking gives false alarms in one direction
 and would give false assurance in the other.
 
 ---
 
-## R-003 — Monthly battery, A_large (PENDING REVIEW, not usable)
+## R-003 — Monthly battery, A_large (PENDING_REVIEW, not usable)
 
 | Field | Value |
 |---|---|
 | **Alpha / specification** | Monthly battery, 10 specifications |
+| **Research look** | Counted real-market run; 40 emitted alpha cells |
 | **Source commit** | `f4c81dd` **plus an uncommitted, unreviewed local fix** to `_residual_momentum` |
-| **QC project / backtest** | `df324dbbca4070ac0f45f270406e673a` |
+| **QC project / compile IDs** | not recorded |
+| **Backtest ID** | `df324dbbca4070ac0f45f270406e673a` |
 | **Data period** | 2012-01-01 to 2024-12-31 |
 | **Output** | 142 dates, complete, no INCOMPLETE marker |
-| **Artifact** | `docs/qc_rr_mon_A_20260816.log` sha256:7e161182fb2c0baf |
-| **Validity** | **PENDING REVIEW — must not be used for any conclusion** |
+| **Artifact** | `docs/qc_rr_mon_A_20260816.log` sha256:`7e161182fb2c0baf711d1b90ebc784301edd80b0edab17fcb5152553c2ca8639` |
+| **Validity** | **PENDING_REVIEW — must not be used for any conclusion** |
+| **Provenance** | **PROVENANCE_INCOMPLETE** — project and compile IDs absent |
 
 ### Why this entry exists at all
 
@@ -167,12 +186,15 @@ superseded by a reviewed rerun rather than promoted.
 | Field | Value |
 |---|---|
 | **Specification** | Equal-weight benchmark of the point-in-time B_core universe |
+| **Research look** | Counted real-market benchmark run; not an alpha cell |
 | **Source commit** | `e8eb558`, merged via `f4c81dd` |
-| **QC backtest** | `e3c2ff22333f1c923502b3d1c399fcbb` |
+| **QC project / compile IDs** | not recorded |
+| **Backtest ID** | `e3c2ff22333f1c923502b3d1c399fcbb` |
 | **Data period** | 2012-01-01 to 2024-12-31 |
 | **Output** | 155 declared dates, 155 rows, complete |
-| **Artifact** | `docs/qc_rr_ben_B_20260816.log` sha256:ec623810fb53df10 |
+| **Artifact** | `docs/qc_rr_ben_B_20260816.log` sha256:`ec623810fb53df1021d357a15874595b161ba000fb8614eea49fec3e23021489` |
 | **Validity** | **UNANALYSED** — complete, statistics not computed |
+| **Provenance** | **PROVENANCE_INCOMPLETE** — project and compile IDs absent |
 
 The corrected benchmark now carries its own delisting arithmetic and cost
 treatment (QCAR-008), so it is not comparable to the invalidated

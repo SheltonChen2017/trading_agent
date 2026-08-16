@@ -116,8 +116,12 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.industry = {}          # Symbol -> Morningstar industry code
         self.selected = []          # this month's eligible symbols
         self.pending = None         # scores awaiting their forward return
-        self.rebalance_due = False
-        self.month = -1
+        # Selection is keyed off the CALENDAR, not off OnData. The first
+        # version gated selection on a flag that only OnData set, and
+        # OnData needs securities, which needs selection: a deadlock that
+        # ran to completion reporting cap_rows=0 rather than failing.
+        self.selection_month = None
+        self.scored_month = None
 
         self.cap_missing = 0
         self.cap_fallback = 0
@@ -128,7 +132,7 @@ class AlphaBatteryMonthly(QCAlgorithm):
     # --- universe ------------------------------------------------------
 
     def _coarse(self, coarse):
-        if not self.rebalance_due:
+        if self.selection_month == (self.Time.year, self.Time.month):
             return Universe.Unchanged
         return [c.Symbol for c in coarse
                 if c.HasFundamentalData
@@ -136,8 +140,9 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 and c.DollarVolume >= self.screen["min_adv"]]
 
     def _fine(self, fine):
-        if not self.rebalance_due:
+        if self.selection_month == (self.Time.year, self.Time.month):
             return Universe.Unchanged
+        self.selection_month = (self.Time.year, self.Time.month)
         chosen = []
         for f in fine:
             self.cap_rows += 1
@@ -189,16 +194,15 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 self.closes[symbol] = window
             window.append(float(data.Bars[symbol].Close))
 
-        if self.Time.month != self.month:
-            self.month = self.Time.month
-            # Score LAST month's ranking against the return that followed,
-            # then form this month's ranking. Entry lag is one session by
-            # construction: scores use closes through yesterday.
+        # Score once per month, after the day's bars have been recorded.
+        # Settling first, then forming, gives a full month between a score
+        # and the return it is judged against.
+        month = (self.Time.year, self.Time.month)
+        if self.scored_month != month and self.selection_month == month:
+            self.scored_month = month
             if self.pending is not None:
                 self._settle()
-            self.rebalance_due = True
-            self.Schedule.On(self.DateRules.Today, self.TimeRules.BeforeMarketClose("SPY", 5),
-                             self._form_scores)
+            self._form_scores()
 
     def _price(self, symbol, ago):
         window = self.closes.get(symbol)
@@ -258,7 +262,6 @@ class AlphaBatteryMonthly(QCAlgorithm):
         return total
 
     def _form_scores(self):
-        self.rebalance_due = False
         names = [s for s in self.selected if len(self.closes.get(s, ())) >= 260]
         if len(names) < MIN_NAMES:
             return
@@ -406,15 +409,32 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.Log(f"=== ALPHA BATTERY MONTHLY | universe={ACTIVE_UNIVERSE} ===")
         self.Log(f"cap_rows={self.cap_rows} cap_fallback={self.cap_fallback} "
                  f"cap_missing={self.cap_missing}")
-        for spec in sorted(self.results):
-            for row in self.results[spec]:
-                date, ic, lr, sr, l20, turn, n = row
-                self.Log(
-                    f"RESULT|{spec}|{date}|"
-                    f"{'' if ic is None else round(ic, 6)}|"
-                    f"{round(lr, 8)}|{round(sr, 8)}|{round(l20, 8)}|"
-                    f"{round(turn, 6)}|{n}"
+
+        # ONE LINE PER DATE, not per (spec, date). QuantConnect truncates
+        # cloud backtest logs at roughly a thousand lines, and the first
+        # run of this algorithm lost three of ten specifications to that
+        # limit -- it would have been reported as "residual momentum
+        # produced no data" when the data existed and the log ran out.
+        # Packing by date makes the volume independent of spec count.
+        # Spec INDEX rather than name, and five decimals rather than
+        # eight. The limit is on total log volume, so shortening each line
+        # is what buys back the lost dates: the packed-by-date version
+        # still lost 7 of 142, which DATES| made visible.
+        order = sorted(self.results)
+        index_of = {spec: i for i, spec in enumerate(order)}
+        by_date = {}
+        for spec, rows in self.results.items():
+            for date, ic, lr, sr, l20, turn, n in rows:
+                by_date.setdefault(date, []).append(
+                    f"{index_of[spec]}~{'' if ic is None else round(ic, 5)}~"
+                    f"{round(lr, 6)}~{round(sr, 6)}~{round(l20, 6)}~"
+                    f"{round(turn, 4)}~{n}"
                 )
+        self.Log(f"SPECS|{'|'.join(order)}")
+        self.Log(f"DATES|{len(by_date)}")
+        for date in sorted(by_date):
+            # Date compressed to YYYYMM; the cadence is monthly.
+            self.Log(f"ROW|{date.replace('-', '')[:6]}|" + "|".join(by_date[date]))
         self.Log(f"orders placed: {self.Transactions.OrdersCount}")
 
 

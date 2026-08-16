@@ -64,8 +64,20 @@ EXEMPTION_MARKER = "NO ALPHA STATISTIC"
 LOOK_MARKER = "counted research look"
 
 
+def _flat(path: Path) -> str:
+    """Source with runs of whitespace collapsed.
+
+    A declaration must not depend on where a docstring happens to wrap.
+    The first version matched raw text, so `alpha_battery_short.py` failed
+    its own declaration purely because "counted research look" straddled a
+    line break -- and `alpha_battery_monthly.py` passed only by the luck of
+    wrapping differently.
+    """
+    return " ".join(path.read_text(encoding="utf-8").split())
+
+
 def _claims_exemption(path: Path) -> bool:
-    return EXEMPTION_MARKER in path.read_text(encoding="utf-8")
+    return EXEMPTION_MARKER in _flat(path)
 
 
 @pytest.mark.parametrize("path", LEAN_FILES, ids=lambda p: p.name)
@@ -79,7 +91,7 @@ def test_every_lean_file_declares_its_look_status(path):
     actually matters: a file claiming exemption must BE inert, and a file
     that is not inert must declare that running it costs a look.
     """
-    text = path.read_text(encoding="utf-8")
+    text = _flat(path)
     exempt = EXEMPTION_MARKER in text
     counted = LOOK_MARKER in text
     assert exempt != counted, (

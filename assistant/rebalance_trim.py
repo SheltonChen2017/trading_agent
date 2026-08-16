@@ -148,36 +148,39 @@ class TrimPlan:
         return not self.refusals
 
 
-def overweight_sleeves(report: RebalanceReport) -> list[str]:
-    """Sleeves above their upper band edge that may be trimmed.
+@dataclasses.dataclass(frozen=True)
+class OverweightSleeveClassification:
+    """The complete overweight set, partitioned by trim eligibility."""
 
-    Reads `band_state`, not `status`, for the same reason Stage 2 does: a
-    sleeve can be genuinely over its band while displaying another label.
+    trimmable: tuple[str, ...]
+    untrimmable: tuple[str, ...]
+
+
+def classify_overweight_sleeves(
+    report: RebalanceReport,
+) -> OverweightSleeveClassification:
+    """Return every over-band sleeve without conflating trim eligibility.
+
+    Reads ``band_state``, not ``status``, because a sleeve can be genuinely
+    over its band while displaying another label. Returning both groups from
+    one pass prevents an empty trimmable result from being misreported as no
+    overweight sleeve at all when cash or the residual is actually over.
     """
-    return [
-        row.sleeve
-        for row in report.rows
-        if row.sleeve not in UNTRIMMABLE_SLEEVES
-        and row.band_state == STATUS_OVERWEIGHT
-    ]
-
-
-def untrimmable_overweight_sleeves(report: RebalanceReport) -> list[str]:
-    """Sleeves above their upper band edge that this workflow never trims.
-
-    `overweight_sleeves` filters on TWO independent conditions at once --
-    above the band, and trimmable -- so an empty result cannot tell a reader
-    which of them failed. Reporting that as "no sleeve is above its upper
-    band" is false whenever cash or the residual is the sleeve that is over,
-    and it contradicts the breach count on the same page. The two questions
-    are separated here so the refusal can state the true reason.
-    """
-    return [
-        row.sleeve
-        for row in report.rows
-        if row.sleeve in UNTRIMMABLE_SLEEVES
-        and row.band_state == STATUS_OVERWEIGHT
-    ]
+    trimmable: list[str] = []
+    untrimmable: list[str] = []
+    for row in report.rows:
+        if row.band_state != STATUS_OVERWEIGHT:
+            continue
+        destination = (
+            untrimmable
+            if row.sleeve in UNTRIMMABLE_SLEEVES
+            else trimmable
+        )
+        destination.append(row.sleeve)
+    return OverweightSleeveClassification(
+        trimmable=tuple(trimmable),
+        untrimmable=tuple(untrimmable),
+    )
 
 
 def _row(report: RebalanceReport, sleeve: str):
@@ -298,7 +301,10 @@ def plan_trim(
             "the residual is the set of positions your profile does not "
             "describe -- absence from the profile is never a reason to sell."
         ])
-    if report.usable and sleeve not in overweight_sleeves(report):
+    if (
+        report.usable
+        and sleeve not in classify_overweight_sleeves(report).trimmable
+    ):
         return _empty([
             f"{label} is not above its upper band, so there is nothing to "
             "trim. This workflow never sells a sleeve that is inside or "

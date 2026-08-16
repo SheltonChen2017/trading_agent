@@ -47,8 +47,8 @@ from assistant.rebalance_profile import (
 from assistant.rebalance_trim import (
     EVIDENCE_STATUS,
     UNTRIMMABLE_SLEEVES,
+    classify_overweight_sleeves,
     generate_trim_proposal,
-    overweight_sleeves,
     plan_trim,
 )
 from assistant.schemas import DecisionPacket, MarketRegime
@@ -115,7 +115,25 @@ def test_only_sleeves_above_their_upper_band_can_be_trimmed():
     report = evaluate_portfolio_rebalance(
         _packet().portfolio, OWNER_APPROVED_PROFILE, policy=_policy()
     )
-    assert overweight_sleeves(report) == [SLEEVE_GROWTH]
+    groups = classify_overweight_sleeves(report)
+    assert groups.trimmable == (SLEEVE_GROWTH,)
+    assert groups.untrimmable == ()
+
+
+def test_overweight_classification_returns_both_groups_together():
+    snapshot = build_portfolio_snapshot(
+        [{
+            "ticker": "MSFT", "shares": 600,
+            "entry_price": 10.0, "current_price": 10.0,
+        }],
+        cash=4_000.0,
+    )
+    report = evaluate_portfolio_rebalance(
+        snapshot, OWNER_APPROVED_PROFILE, policy=_policy()
+    )
+    groups = classify_overweight_sleeves(report)
+    assert groups.trimmable == (SLEEVE_GROWTH,)
+    assert groups.untrimmable == (SLEEVE_CASH,)
 
 
 def test_an_unusable_rebalance_report_can_never_become_a_trim():
@@ -730,9 +748,9 @@ def test_execution_allows_a_covered_trim_on_a_partially_covered_book(
     )
 
 def test_an_untrimmable_overweight_sleeve_is_reported_separately():
-    """REBAL3V-001. `overweight_sleeves` filters on two independent
-    conditions -- above the band AND trimmable -- so an empty result cannot
-    say which one failed. The owner hit this on a real book: the page
+    """REBAL3V-001. The old generic helper filtered on two independent
+    conditions -- above the band AND trimmable -- so an empty result could
+    not say which one failed. The owner hit this on a real book: the page
     reported six breached bands in its headline and, three sections lower,
     "No sleeve is above its upper band". Both statements cannot be true.
     """
@@ -741,8 +759,7 @@ def test_an_untrimmable_overweight_sleeve_is_reported_separately():
     from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
     from assistant.rebalance_profile import OWNER_APPROVED_PROFILE
     from assistant.rebalance_trim import (
-        overweight_sleeves,
-        untrimmable_overweight_sleeves,
+        classify_overweight_sleeves,
     )
 
     # AAPL belongs to no sleeve, so it lands in the residual.
@@ -760,11 +777,10 @@ def test_an_untrimmable_overweight_sleeve_is_reported_separately():
     over = [r.sleeve for r in report.rows if r.band_state == "overweight"]
     assert over == ["cash", "other_unassigned"], over
     # Nothing is trimmable, which is correct and must not change...
-    assert overweight_sleeves(report) == []
-    # ...but the reason is retrievable rather than lost.
-    assert untrimmable_overweight_sleeves(report) == [
-        "cash", "other_unassigned",
-    ]
+    groups = classify_overweight_sleeves(report)
+    assert groups.trimmable == ()
+    # ...but the reason is returned in the same classification, not lost.
+    assert groups.untrimmable == ("cash", "other_unassigned")
 
 
 def test_nothing_overweight_at_all_stays_distinguishable():
@@ -775,13 +791,13 @@ def test_nothing_overweight_at_all_stays_distinguishable():
     from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
     from assistant.rebalance_profile import OWNER_APPROVED_PROFILE
     from assistant.rebalance_trim import (
-        overweight_sleeves,
-        untrimmable_overweight_sleeves,
+        classify_overweight_sleeves,
     )
 
     snapshot = context_builder.build_portfolio_snapshot([], cash=0.0)
     report = evaluate_portfolio_rebalance(
         snapshot, OWNER_APPROVED_PROFILE, policy=load_policy()
     )
-    assert overweight_sleeves(report) == []
-    assert untrimmable_overweight_sleeves(report) == []
+    groups = classify_overweight_sleeves(report)
+    assert groups.trimmable == ()
+    assert groups.untrimmable == ()

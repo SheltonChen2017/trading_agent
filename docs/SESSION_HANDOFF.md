@@ -1,8 +1,8 @@
-# Session handoff — both dev-app rounds merged, neither reviewed
+# Session handoff — REBAL-3V and REBAL-3W independently reviewed
 
-Prepared: 2026-08-15 by Claude, after the owner exercised the Portfolio
-Rebalancing page in the development app across two rounds and then merged
-both of them into `main` directly.
+Prepared: 2026-08-15 by Claude after both owner-reported rounds merged;
+updated 2026-08-16 by Codex after independent commit-by-commit review and
+product/test correction.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -25,20 +25,27 @@ operator-database mutation, or scheduled-task change.
 ## 1. Exact repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- `main` and `origin/main`: `18a3ee5`, after PR #231 and PR #232 merged
-  both owner-reported rounds from exercising the development app.
-- **Both rounds were merged WITHOUT independent review.** REBAL-3V
-  (feasibility legibility) and REBAL-3W (refusal accuracy) are in `main`
-  and neither has been reviewed by Codex. That is a deliberate owner
-  decision to record, not an oversight to correct silently, but a reviewer
-  picking this up should start there.
+- `main` and `origin/main`: `006a9d5a887f6fc6da8a4978e1ac2680e941c783`,
+  after PRs #231 through #233
+  merged both owner-reported rounds and their post-merge records.
+- Reviewed literal range: base
+  `84e73afafbdff62fb7a06c1b587b6a1b258bc253` through exact submitted head
+  `006a9d5`; all eight commits received an explicit disposition.
+- Review branch: `codex/review-rebal3v3w-20260815`, created from the fetched
+  remote head. Product/test correction:
+  `3a506ae39f7186fc065d04cd60beedeb4c4e2fbb`.
+- **Both rounds are accepted after correction. The review branch and its
+  correction are local-only, not pushed or merged.** Another computer cannot
+  retrieve them until the owner separately authorizes a push.
 - **Every feature branch has been deleted, locally and on the remote**,
   each after confirming with `git merge-base --is-ancestor` that its
   commits are reachable from the surviving ref. `7e9d005`, `a0a657b`,
   `bead8ac` and `43b29df` are all in `main`.
-- **Current branch: `user/claude/post-merge-232-records-20260815`**,
-  branched from `18a3ee5`. It corrects records only.
+- The product correction is followed by the separate documentation commit
+  containing this handoff, as required by the review process. Recheck the
+  review worktree's `HEAD` and status before resuming.
 - The operational checkout remains separate and frozen at `752d3b7` in
+  active `paper-epoch-005`. No development commit has been copied there.
 
 Earlier history that remains load-bearing for anyone resuming:
 
@@ -50,11 +57,11 @@ Earlier history that remains load-bearing for anyone resuming:
 - BUY-1 is merged and independently corrected: review branch
   `codex/review-buy1-suggestion-picker-20260813`, correction `44a7f85`,
   on top of `e0df810`. It is closed history, not reopened work.
-  active `paper-epoch-005`. No development commit has been copied there.
 
 Sections 2 through 7c below describe the Stage 3 chain that is now merged
 into `main`. They are retained as the record of how that work was reviewed;
-section 7d is this round.
+sections 7d through 7f describe the two owner-reported rounds and their merge;
+section 7g records the completed independent review.
 
 ## 2. Review outcome and commit dispositions
 
@@ -425,16 +432,74 @@ The REBAL-3V and REBAL-3W rows now record their merges, and the topology
 paragraphs record `18a3ee5`. Records only -- no product code is touched by
 this round.
 
-**Recorded plainly because it is easy to lose:** neither round has had
-independent review. They went from implementation straight into `main`.
+**State at submitted head `006a9d5`:** neither round had independent review;
+they went from implementation straight into `main`. Section 7g records the
+review that followed.
+
+## 7g. Independent review of both owner-reported rounds (Codex, 2026-08-16)
+
+The owner directed review of the exact main range `84e73af..006a9d5`, with
+an explicit disposition for every commit rather than a tip-only or combined
+diff review. Codex fetched `origin/main`, locked exact head `006a9d5`, and
+created `codex/review-rebal3v3w-20260815` from that remote object. The literal
+range contains eight commits, including three merges.
+
+| Commit | Disposition |
+|---|---|
+| `7e9d005` | Accepted after correction `3a506ae`: the presentation is correct; one no-op test and one branch-agnostic assertion were replaced with deterministic positive and four-rule negative coverage. |
+| `a0a657b` | Accepted after documentation correction: its behavior narrative is sound, but its test-sensitivity claim inherited the weak coverage above. |
+| `8ee5f39` | Accepted after correction: the PR #231 merge tree equals its second parent and contains no conflict-resolution change; it inherits the feasibility test finding. |
+| `bead8ac` | Accepted after correction `3a506ae`: eligibility/refusal direction is correct; the ambiguous two-helper API and one false concluding sentence were corrected. |
+| `43b29df` | Accepted after documentation correction: its historical defect narrative is accurate; the final records now describe the reviewed classifier and evidence. |
+| `18a3ee5` | Accepted after correction: the PR #232 merge tree equals its second parent and contains no conflict-resolution change; it inherits the two product P3s. |
+| `bacc66f` | Accepted after documentation correction: records only; its topology rewrite split the operational-runtime sentence and attached half to BUY-1. |
+| `006a9d5` | Accepted after documentation correction: the PR #233 merge tree equals its second parent and contains no conflict-resolution change; the final tree's `18a3ee5` topology and pending-review claims were stale. |
+
+Outcome: **accepted after correction; 0 P0, 0 P1, 0 P2, 5 closed P3,
+0 open.** The complete evidence/reason/correction/verification ledger is in
+`docs/REVIEW_2026-08-15_REBAL3V_REBAL3W_INDEPENDENT.md`.
+
+Product/test correction `3a506ae` does four things. It replaces the generic
+two-helper overweight API with one immutable classification returning both
+trimmable and untrimmable groups; fixes the refusal's final sentence so it no
+longer calls overweight cash inside its band; removes a collected test with
+no body; and makes feasibility tests deterministic across computers while
+covering all four implemented policy-conflict rules through the real report
+and Streamlit UI. No threshold, refusal direction, sizing, tax-lot, proposal,
+approval, execution, broker, schema, policy, epoch, or deployment contract
+changed.
+
+Validation in the repository `.venv` (Python 3.13.14, Streamlit 1.60.0,
+Windows): submitted baseline **106 passed**; confirmed copy regression red
+then green; classifier import regression red then green; corrected REBAL-1
+focused set **192 passed**; corrected trim/UI set **79 passed**; final full
+suite **4,051 passed / 0 failed / 25 known dependency warnings in 719.51
+seconds**. Final active-document guards: **30 passed**. Compilation and
+`git diff --check` are clean.
+
+**Availability:** correction `3a506ae` and the documentation commit containing
+this handoff are local-only. They have not been pushed, merged, deployed, or
+made fetchable from another computer. No push is authorized by the review
+request.
+
+**Shared-checkout collision:** while the review was running, another process
+switched and repeatedly advanced the primary checkout on local branch
+`user/claude/alpha-battery-20260815`. Codex did not inspect or review that
+work. The review therefore finished in temporary registered worktree
+`.codex_worktrees/rebal3v3w`, which was removed after the commits were made.
+At close, the primary Claude checkout still reported the same four product/
+test paths corrected by `3a506ae` as modified. Codex did not restore, stage,
+or commit them there because that branch is outside this review and another
+process controls it. Before Claude's branch is committed or pushed, compare
+those paths deliberately with `3a506ae`; do not accidentally mix duplicate
+review edits into unrelated alpha-battery work.
 
 ## 8. What is next
 
-1. **Independent review of REBAL-3V and REBAL-3W, both already in `main`.**
-   Suggested focus: whether `untrimmable_overweight_sleeves` should live
-   beside `overweight_sleeves` at all, or whether the two-condition filter
-   should be replaced by one function returning both lists so a future
-   caller cannot repeat the conflation that caused REBAL-3W.
+1. The owner may inspect local review branch
+   `codex/review-rebal3v3w-20260815` and separately authorize a push. Until
+   then, `3a506ae` and the records commit are not available by fetch and must
+   not be described as merged.
 2. The owner has completed steps 1 and 2 of the dev-app walkthrough; Stage 2
    steering is confirmed working. Step 3 is in progress against a COPY of
    the development database at
@@ -483,24 +548,23 @@ or roll an epoch without a new explicit owner instruction.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, docs/REBAL1_MILESTONE_PLAN.md
-and docs/SESSION_HANDOFF.md. main and origin/main are 84e73af (PR #230),
-which merged the entire REBAL-1 Stage 3 chain. Branch
-user/claude/rebal-trim-refusal-accuracy-20260815 stacks on a0a657b and so
-carries BOTH owner-reported rounds from exercising the dev app: REBAL-3V
-made target feasibility legible (the "Target reachable" column was ninth of
-nine with no horizontal scrollbar, and the reachable case was never stated
-at all), and REBAL-3W corrected a refusal that stated a reason which was not
-true (the page said "No sleeve is above its upper band" while its own
-headline reported six breaches; cash and the residual WERE over, they are
-simply never trimmable). Neither round changed which sleeves may be trimmed,
-any threshold, or any refusal -- REBAL-3V is presentation-only and REBAL-3W
-changes only the stated reason. Two of my own tests were wrong and are
-recorded as such: one asserted a message appeared without asserting it named
-its sleeve, and one PINNED the false refusal message on exactly the book
-that reproduced the bug. Full pinned-venv tree: 4,048 passed / 0 failed / 25 known dependency warnings in 733.50 seconds. Remaining
-gap: no test drives the Streamlit trim button through to a saved proposal.
-paper-epoch-005 runs unchanged for 60 days and the operational
-my_policy.json stays 0.50/0.05. Do not push to main, deploy, roll the epoch,
-mutate the operator database, submit orders, access funded accounts, begin
-M4, or enable live trading without explicit owner authorization.
+and docs/SESSION_HANDOFF.md. Codex independently reviewed every commit in
+84e73af..006a9d5 from fetched origin/main, including merge commits, and
+accepted REBAL-3V and REBAL-3W after correction. Review branch
+codex/review-rebal3v3w-20260815 is LOCAL ONLY. Product/test correction
+3a506ae replaces the ambiguous two-helper overweight API with one result
+containing both groups, fixes a false sentence about overweight cash, removes
+one no-op pytest, and deterministically covers the positive feasibility case
+plus all four real conflict rules. No threshold, sizing, tax-lot, refusal
+direction, proposal, approval, execution, broker, policy, schema, epoch, or
+deployment contract changed. All eight dispositions and five closed P3s are
+in docs/REVIEW_2026-08-15_REBAL3V_REBAL3W_INDEPENDENT.md. Corrected focused:
+192 passed; final full suite: 4,051 passed with 25 known warnings; compile,
+document, and diff checks are clean. The primary shared checkout moved to an
+unreviewed local Claude alpha-battery branch; do not treat its accidental
+.codex_worktrees/rebal3v3w Git link as product content. paper-epoch-005 runs
+unchanged for 60 days and the operational my_policy.json stays 0.50/0.05.
+Do not push, merge, deploy, roll the epoch, mutate the operator database,
+submit orders, access funded accounts, begin M4, or enable live trading
+without explicit owner authorization.
 ```

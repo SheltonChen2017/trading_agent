@@ -1,8 +1,8 @@
-# Session handoff — QuantConnect alpha results independently invalidated
+# Session handoff — staged QuantConnect alpha round 1 reviewed
 
-Prepared: 2026-08-16 by Codex after independent commit-by-commit review of
-Claude's pushed QuantConnect smoke and alpha-battery branch, product/test
-correction, result invalidation, and handoff synchronization.
+Prepared: 2026-08-16 by Codex after independent review of Claude's first
+staged alpha/QC result-ledger push, correction of residual-momentum timing,
+and creation of the owner-requested alpha implementation plan.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -10,18 +10,19 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
-3. `docs/REBAL1_MILESTONE_PLAN.md`
-4. `docs/REVIEW_2026-08-15_REBAL1_STAGE3.md`
-5. `docs/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
-6. `docs/ALPHA_BATTERY_METHOD_V2.md`
-7. `docs/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
-8. `docs/ALPHA_BATTERY_2026-08-16_QC_RESULTS.md` (invalid audit history)
-9. `docs/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
-10. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-11. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-12. `docs/MANDATE.md` (§2, §4, §6)
-13. `docs/OPERATIONAL_FACTS.md`
-14. `docs/OPERATIONS_RUNBOOK.md`
+3. `docs/Alpha_Test_Implementation_Plan.md`
+4. `docs/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
+5. `docs/alpha-result.md`
+6. `docs/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
+7. `docs/ALPHA_BATTERY_METHOD_V2.md`
+8. `docs/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
+9. `docs/ALPHA_BATTERY_2026-08-16_QC_RESULTS.md` (invalid audit history)
+10. `docs/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
+11. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+12. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+13. `docs/MANDATE.md` (§2, §4, §6)
+14. `docs/OPERATIONAL_FACTS.md`
+15. `docs/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -30,24 +31,31 @@ operator-database mutation, or scheduled-task change.
 ## 1. Exact repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- `main` and `origin/main`: `dbadb1293dff617a70ce3a36da49326564c5157b`
-  at review start (through PR #238).
-- Claude's exact pushed implementation remote is
-  `origin/user/claude/quantconnect-smoke-20260816` at
-  `667cbf409aae669b6d514e295d4d29f905a9e505`; merge base is `dbadb12`.
-- The monitor baseline was `b9efc41`; the qualifying push added
-  `3a3132e`, `e3e8a23`, `f0cd4fc`, `6707a97`, `a83703e`, and `667cbf4`.
-  The full reviewed branch range `dbadb12..667cbf4` also includes the three
-  baseline smoke commits `361038e`, `d3211c9`, and `b9efc41`; all nine have
-  explicit dispositions in the current review report.
-- Current review branch: `codex/review-quantconnect-alpha-20260816`, created
-  from exact fetched Claude head `667cbf4`. Product/test correction is
-  `e8eb558e79bbdc468f531e9b92de4c175d7a3957`; the separate documentation
-  commit follows it on the same branch. The owner authorized exactly one
-  final push of this branch after all validation, with no intermediate push.
-- All submitted QuantConnect result Markdown/JSON is **invalidated**. No
-  corrected cloud statistic exists. Claude's later counter-review must start
-  from the final pushed Codex head and supply exact backtest IDs/log hashes.
+- `main` and `origin/main`: `a795ea322de8a50830abc680fd82d49967c5ddd6`
+  when the current long-lived alpha branch was created.
+- Claude's exact reviewed remote is
+  `origin/user/claude/alpha-qc-round-20260816` at
+  `ad6475d552c5f9b4da338570cd52ea99c3b63524`; exact base/merge-base is
+  `a795ea322de8a50830abc680fd82d49967c5ddd6`. The ordered range
+  `a795ea3..ad6475d` contains one commit and it has an explicit disposition.
+- Current review branch: `codex/review-alpha-qc-round1-20260816`, created in
+  an isolated worktree from exact pushed Claude head `ad6475d`. Product/test
+  correction is `8bf8a82`; plan/review/result/action-plan documentation is
+  `e1aedc7`; exact-session product correction is `56bc86d`; the review-record
+  follow-up is `175ab1e`; final validation record is `82ab65f`; this handoff
+  is the separate final local commit.
+- The owner authorized exactly one final push of this Codex branch after all
+  validation, with no checkpoint push. Claude must counter-review that exact
+  final remote head before any new QuantConnect run.
+- Five new real-market cloud executions are preserved in Git. None is usable
+  alpha evidence: one refused, two remain deliberately unanalysed, one ran
+  unreviewed code, and the benchmark is unanalysed; four entries also lack
+  project/compile provenance. They count as five run-level looks and expose
+  80 repeated alpha cells. The conservative lifetime cell floor is 428.
+- `docs/Alpha_Test_Implementation_Plan.md` is now the current staged research
+  contract. It freezes corrected-battery completion, two prior-signal
+  replications, point-in-time PEAD, hierarchical sector momentum, and optional
+  overnight persistence, with Alpaca Paper reserved for later forward testing.
 - PR #234 first merged the prior Codex REBAL-3V/3W review through
   `f63fe2cb30aa904dec131962a133e1058185427c`; correction `3a506ae` and records
   `dae34d0` are therefore pushed, fetchable, and in `main`.
@@ -83,7 +91,8 @@ into `main`. They are retained as the record of how that work was reviewed;
 sections 7d through 7f describe the two owner-reported rounds and their merge;
 section 7g records their completed independent review; section 7h records the
 prior local alpha review; section 7i records the current QuantConnect review
-and supersedes every earlier current-state statement.
+of the original battery; section 7j records the current staged alpha review
+and supersedes every earlier alpha current-state statement.
 
 ## 2. Review outcome and commit dispositions
 
@@ -598,20 +607,65 @@ warnings in 771.31 seconds**. Repository-wide compilation, all three edited
 JSON parses, and `git diff --check` are clean. Final branch/commit/remote
 identity is verified around the one authorized push and reported to the owner.
 
+## 7j. Staged alpha QC round 1 review (Codex, 2026-08-16)
+
+The monitor fired only after exact remote
+`origin/user/claude/alpha-qc-round-20260816` appeared at pushed head
+`ad6475d552c5f9b4da338570cd52ea99c3b63524`, beyond base
+`a795ea322de8a50830abc680fd82d49967c5ddd6`. The shared checkout remained on
+Claude's branch and was not switched, edited, staged, or committed by Codex.
+The review branch and all corrections were made in an isolated worktree.
+
+Commit disposition:
+
+| Commit | Disposition |
+|---|---|
+| `ad6475d` | **Accepted after product/test and documentation correction.** Preserving all five cloud runs, opening a permanent ledger, refusing partial monthly output, and identifying the impossible peer equality were sound. The slice-only correction measured the skipped latest month instead of true 6-1/12-1 residual momentum; its source-string test could not detect the mistake; and the ledger undercounted looks and misstated decoder/provenance facts. |
+
+Product/test correction `8bf8a82` retains enough history for a 252-session
+joint market/leave-one-out-industry regression before the formation window,
+sums 105 or 231 formation residuals, and excludes the most-recent 21 sessions.
+Follow-up `56bc86d` binds every price to the exact global exchange session and
+refuses missing, duplicate, or universe-gap histories rather than treating
+adjacent deque values as adjacent daily returns. Behavioral tests cover both
+horizons, short/misaligned factor history, and exact/missing/duplicate dates.
+Four P2 and one P3 findings are closed; none remains open. Full detail is in
+`docs/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`.
+
+Documentation commit `e1aedc7` creates
+`docs/Alpha_Test_Implementation_Plan.md`, corrects `docs/alpha-result.md`, and
+updates the Action Plan. The ledger now counts five run-level looks and 80
+emitted repeated-look cells, giving a conservative lifetime alpha-cell floor
+of 428. It records exact log hashes/backtest IDs while marking absent compile
+and project identities. The committed base64 decoder already existed, so no
+statistics were computed merely to prove it. No result was promoted to
+`assistant/research_findings.json` or `docs/FEATURE_MILESTONE_RECORD.md`.
+
+No QuantConnect API/authentication/upload/compile/backtest/result-read, broker
+access, order, deployment, database mutation, scheduler change, or epoch
+change occurred during this review. Final local validation on Python 3.13.14:
+focused QC suite **13 passed in 2.48 seconds**; active-document suite **30
+passed in 0.57 seconds**; full suite **4,122 passed / 0 failed / 25 known
+dependency warnings in 795.85 seconds**; repository compilation including
+`research/` and `git diff --check` are clean. One earlier final-suite attempt
+stopped at a handoff topology-format guard; the declaration was corrected and
+the complete green suite was rerun. Final pushed remote identity is reported
+to the owner after the single authorized push.
+
 ## 8. What is next
 
-1. Publish `codex/review-quantconnect-alpha-20260816` with the already
-   authorized **single final push only after** final local validation and the
-   separate documentation commit. Do not push main or Claude's branch.
-2. Claude must counter-review `e8eb558` from the final pushed Codex head,
-   then run the corrected full-period monthly, short, and monthly-benchmark
-   algorithms once per A/B/C universe. Record exact backtest IDs, log hashes,
-   source head, commands, windows, and research-look accounting. Do not split
-   the short calendar; the packed format preserves full-period state.
-3. Do not treat any existing QuantConnect result artifact as evidence. Create
-   newly dated corrected artifacts after the rerun; never overwrite or
-   rehabilitate the invalidated historical files. Do not make short-horizon
-   benchmark claims without a separately frozen cadence-matched benchmark.
+1. Publish `codex/review-alpha-qc-round1-20260816` with the already authorized
+   **single final push only after** final local validation. Do not push main or
+   Claude's branch and do not make a second push this cycle.
+2. Claude must counter-review final Codex head, especially `8bf8a82` and the
+   corrected look ledger. Only then rerun Stage 0 monthly, short, and matching
+   benchmark algorithms once per A/B/C universe. Record project, compile,
+   backtest, exact source, log/result hashes, windows, and before/after look
+   counts. Do not split the stateful short calendar.
+3. Append new entries to `docs/alpha-result.md`; never overwrite the five
+   current logs or rehabilitate historical invalid artifacts. Then implement
+   Stage 1 from `docs/Alpha_Test_Implementation_Plan.md`, commit, and push the
+   same long-lived Claude branch before any QC run so Codex can review it.
 4. The owner has completed steps 1 and 2 of the dev-app walkthrough; Stage 2
    steering is confirmed working. Step 3 is in progress against a COPY of
    the development database at
@@ -660,25 +714,28 @@ or roll an epoch without a new explicit owner instruction.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md and
-docs/SESSION_HANDOFF.md. Main/origin/main were exact `dbadb12` at review
-start. Claude pushed `origin/user/claude/quantconnect-smoke-20260816` at
-`667cbf4`; Codex reviewed all nine commits in `dbadb12..667cbf4` on the
-single branch `codex/review-quantconnect-alpha-20260816`. Product/test
-correction `e8eb558` closes ten P2 and one P3 findings. ALL submitted
-QuantConnect statistics and conclusions are INVALIDATED: returns used raw
-split-affected bars, entry timing and the short clock were wrong, delisting
-and fixed basket arithmetic were absent, residual momentum violated Method
-V2, turnover/costs and the 135 count were wrong, split-log parsing failed
-open, the benchmark was mismatched, and cloud run identity was not saved.
-Corrected code requires adjusted returns/raw screens, next-session entry,
-distinct sessions, terminal outcomes, fixed baskets, joint residual OLS,
-construction turnover, 180 hypotheses, full-period packed short output, and
-exact run IDs/log hashes. No corrected cloud result exists. Verify the final
-Codex remote head, counter-review it, then rerun QuantConnect exactly as the
-review report specifies and create new dated artifacts. Never overwrite the
-invalidated files. paper-epoch-005 remains unchanged at `752d3b7` for 60
-days; operational `my_policy.json` stays 0.50/0.05. Do not merge, deploy,
-roll the epoch, mutate the operator database, submit orders, access funded
-accounts, begin M4, or enable live trading without explicit owner authority.
+docs/Alpha_Test_Implementation_Plan.md,
+docs/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md, docs/alpha-result.md and
+docs/SESSION_HANDOFF.md. Claude pushed exact remote
+origin/user/claude/alpha-qc-round-20260816 at ad6475d from base a795ea3.
+Codex reviewed its one commit on isolated branch
+codex/review-alpha-qc-round1-20260816 without switching the shared checkout.
+Product correction 8bf8a82 fixes a second residual-momentum defect: the
+slice-only version measured the skipped latest month, while true 6-1/12-1
+requires a prior 252-session joint fit, 105/231 formation residuals and a
+21-session skip. Product correction 56bc86d also refuses price histories whose
+stored dates do not exactly match market sessions. Documentation commit
+e1aedc7 creates the staged alpha plan and corrects the result ledger. Five
+real-market cloud runs count; 80 emitted
+cells lift the conservative lifetime floor to 428. None of those artifacts is
+usable alpha evidence and four lack complete project/compile provenance. No
+QC access or statistic calculation occurred in review. Verify the final
+pushed Codex head, counter-review it, then rerun Stage 0 exactly once per
+algorithm/universe with full project/compile/backtest/source/hash identity.
+Append rather than overwrite ledger entries. Implement Stage 1 and push the
+same long-lived Claude branch before QC so Codex can review first.
+paper-epoch-005 remains unchanged at 752d3b7 for 60 days; operational
+my_policy.json stays 0.50/0.05. Do not merge, deploy, roll the epoch, mutate
+the operator database, submit orders, access funded accounts, begin M4, or
+enable live trading without explicit owner authority.
 ```

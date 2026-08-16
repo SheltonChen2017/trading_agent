@@ -132,3 +132,43 @@ def test_universe_runner_refuses_a_pre_correction_membership_cache(
 
     with pytest.raises(SystemExit, match="predates the reviewed universe schema"):
         universes.load_panels(tmp_path)
+
+
+def test_turnover_charges_for_drift_back_to_target_weights() -> None:
+    """ABR-002, drift half.
+
+    Codex's correction closed the long/short side-flip half of this
+    finding and left the drift half open: comparing last period's TARGET
+    weights to this period's targets charges nothing for restoring equal
+    weight, even though restoring it is real trading that costs real
+    money. Four equal-weight names where one doubles drift to 40/20/20/20,
+    and returning them to 25 each is 15% of the book -- previously counted
+    as zero, so every net-of-cost number was optimistic.
+    """
+    from scripts.run_alpha_battery_20260815 import drift_weights, one_way_turnover
+
+    targets = {"A": 0.25, "B": 0.25, "C": 0.25, "D": 0.25}
+    flat_returns = {"A": 0.0, "B": 0.0, "C": 0.0, "D": 0.0}
+    doubled = {"A": 1.0, "B": 0.0, "C": 0.0, "D": 0.0}
+
+    # No drift: holding the same targets through flat returns is free.
+    assert one_way_turnover(drift_weights(targets, flat_returns), targets) == 0.0
+
+    drifted = drift_weights(targets, doubled)
+    assert drifted["A"] == pytest.approx(0.40)
+    assert drifted["B"] == pytest.approx(0.20)
+    assert one_way_turnover(drifted, targets) == pytest.approx(0.15)
+
+    # And the side-flip half stays closed.
+    long_then_short = one_way_turnover({"A": 0.5}, {"A": -0.5})
+    assert long_then_short == pytest.approx(0.5)
+
+
+def test_drift_weights_survives_a_total_wipeout_without_dividing_by_zero() -> None:
+    """A book whose gross exposure goes to zero must not produce NaN
+    turnover, which would silently drop the period from the cost series
+    and flatter the strategy."""
+    from scripts.run_alpha_battery_20260815 import drift_weights
+
+    result = drift_weights({"A": 0.5, "B": 0.5}, {"A": -1.0, "B": -1.0})
+    assert result == {"A": 0.5, "B": 0.5}

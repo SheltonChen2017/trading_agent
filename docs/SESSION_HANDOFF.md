@@ -1,7 +1,8 @@
-# Session handoff — REBAL-1 Stage 3 covered end to end
+# Session handoff — REBAL-1 target feasibility made visible
 
-Prepared: 2026-08-15 by Claude, after counter-reviewing Stage 3 and then
-adding the end-to-end coverage the owner asked for.
+Prepared: 2026-08-15 by Claude, after the owner exercised the Portfolio
+Rebalancing page in the development app and found that the column stating
+whether the sleeve targets are reachable was itself unreachable.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -24,44 +25,40 @@ operator-database mutation, or scheduled-task change.
 ## 1. Exact repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- `main` and `origin/main`: `45faf1c8259b622a70a805f5b2c679cd6a0be53f`
-  (PR #229, Stage 2 counter-review merge).
-- Pushed implementation branch:
-  `origin/user/claude/rebal1-stage3-tax-aware-trims-20260815`.
-- Pushed implementation head:
-  `bedeea2bd6a5c6639bff071ac18c8714cda1b8c3`.
-- Exact ordered reviewed range from base `45faf1c`:
-  1. `0490d9d95dabc0eee190c84e766ca5203a0ccc1e` — product/tests.
-  2. `bedeea2bd6a5c6639bff071ac18c8714cda1b8c3` — records.
-- Review branch: `codex/review-rebal1-stage3-20260815`.
-- Product/test correction:
-  `ed6879d5c56ecfa5435b5b73dc661f038add11d5`.
-- The documentation commit is the commit containing this handoff, created
-  after `ed6879d` as the required separate records commit.
-- **The review branch and both review commits are local-only. They have not
-  been pushed, merged, or opened as a PR. Another computer cannot fetch them
-  until the owner authorizes and performs a push.**
-- The worktree must be clean after the documentation commit. Recheck `HEAD`
-  and `git status` before any further action because this checkout is shared.
+- `main` and `origin/main`:
+  `84e73af` — PR #230, which merged the whole REBAL-1 Stage 3 chain: the
+  stage, Codex's correction, Claude's counter-review, and the end-to-end
+  coverage against real journaled fills.
+- **Every earlier feature branch has been deleted, locally and on the
+  remote.** Before this round `main` was the only branch in either place.
+  Nothing was lost: each deleted branch was verified merged into `84e73af`
+  by content, not only by `git cherry` patch-id.
+- **Current branch: `user/claude/rebal-feasibility-visible-20260815`**,
+  branched from `84e73af`. One branch for the whole round, per the owner's
+  2026-08-15 workflow rule.
+- The operational checkout remains separate and frozen at `752d3b7` in
+  active `paper-epoch-005`. No development commit has been copied there.
 
-Required historical anchors retained for recovery and topology checks:
+Earlier history that remains load-bearing for anyone resuming:
 
-- `4de784e` / `1cb8abf` are the epoch-005 observation-clock roll chain and
-  its independent correction; `c048a94` records the later owner decision to
-  leave that epoch unchanged for 60 days.
-- The completed BUY-1 review branch
-  `codex/review-buy1-suggestion-picker-20260813` and correction `44a7f85`
-  remain historical recovery context. BUY-1 is merged; this is not an
-  instruction to reopen or switch to that branch.
+- `4de784e` / `1cb8abf`: the epoch-005 observation-clock roll chain and
+  Codex's correction of it. `paper-epoch-005` has been the only active
+  evidence epoch since 2026-08-13; epochs 001 through 004 are closed and
+  cannot pool evidence into it.
+- `c048a94`: the owner's decision to hold epoch-005 unchanged for 60 days.
+- BUY-1 is merged and independently corrected: review branch
+  `codex/review-buy1-suggestion-picker-20260813`, correction `44a7f85`,
+  on top of `e0df810`. It is closed history, not reopened work.
 
-The formal review followed the new standing rule: it began only after the
-implementation was committed and pushed, then branched from the exact fetched
-remote head. Local or uncommitted Claude work was not reviewed.
+Sections 2 through 7c below describe the Stage 3 chain that is now merged
+into `main`. They are retained as the record of how that work was reviewed;
+section 7d is this round.
 
 ## 2. Review outcome and commit dispositions
 
-**Accepted after correction.** REBAL-1 Stage 3 now meets its development
-definition of done. It remains unmerged and undeployed.
+**Accepted after correction.** REBAL-1 Stage 3 met its development
+definition of done and is now merged into `main` by PR #230. It is still
+UNDEPLOYED: the operational runtime remains frozen at `752d3b7`.
 
 | Commit | Disposition |
 |---|---|
@@ -242,9 +239,11 @@ than seeding `broker_order_events`.
 
 ## 7c. End-to-end coverage against real fills (this round)
 
-Branch `user/claude/rebal1-e2e-real-fills-20260815`, based on `c48861e`. It
-is the single branch carrying every unmerged commit: Stage 3 (`bedeea2`),
-Codex's review (`0c91aa4`), the counter-review (`c48861e`), and this work.
+Branch `user/claude/rebal1-e2e-real-fills-20260815`, based on `c48861e`,
+combined the whole chain -- Stage 3 (`bedeea2`), Codex's review
+(`0c91aa4`), the counter-review (`c48861e`), and this work -- and PR #230
+merged all of it into `main` at `84e73af`. The branch has since been
+deleted; its content is contained in that merge.
 Disposition in `docs/REVIEW_2026-08-15_REBAL1_STAGE3_END_TO_END.md`.
 
 `tests/test_rebalance_trim_end_to_end.py` invents no shapes. Fills are
@@ -280,48 +279,139 @@ the Streamlit trim button through to a saved proposal. The UI tests assert
 control state and page text only. That is the same family of gap as the four
 defects above and is the next one to close.
 
+## 7d. Target feasibility made visible (this round)
+
+The owner reported two things while exercising the development app.
+
+**"Bands breached: 6" was correct and my prediction of 5 was wrong.** My
+number came from a calculation made before REBAL1CR-002, which is the exact
+change that stopped a display status from masking a real band breach. The
+residual sleeve sits far above its band and now correctly reports
+`band_state = overweight` while its `status` stays `unassigned_holdings`.
+The app was right; I was reading a stale number.
+
+**"There is no horizontal roll" was a real defect.** "Target reachable" was
+the ninth and last column of a nine-column table, and Streamlit gave that
+table no horizontal scrollbar at the owner's window width, so the one
+column stating whether the targets can be reached at all was unreadable.
+
+The conflict text was never actually lost — `evaluate_portfolio_rebalance`
+also routes each conflict into `report.disclosures`, which render as
+warnings above the table. **The dangerous direction was the opposite one:**
+when every target IS reachable the page said nothing, so a reader had to
+infer feasibility from the absence of a warning they had never seen fire.
+
+The fix is presentation only. No computation, refusal, threshold, count, or
+contract moved.
+
+- Feasibility is stated in full BELOW the drift table, where width cannot
+  hide it: a bordered block naming each affected sleeve and its exact
+  conflict reason when any target is unreachable, and an explicit positive
+  confirmation naming the active policy file when all of them are.
+- The per-row column survives, shortened to "Reachable" and reduced to
+  yes/no, so the fact stays next to the row it describes.
+- Column ORDER is deliberately unchanged, because the owner is mid-way
+  through testing this page.
+
+**The finding of this round is a mutation that initially survived.** I
+removed the sleeve label from each conflict line, leaving only the reason,
+and every test still passed. Naming the sleeve is load-bearing: the
+total-exposure conflict applies to every funded sleeve at once, so an
+unlabelled list is one sentence repeated with no way to tell which sleeve
+each belongs to. The test now pins `**Growth**`, which also distinguishes
+this block from the raw-key disclosure warning (`growth: ...`) the report
+already emits. A test asserting that a message appeared is not a test that
+the message is useful.
+
+Validation for this round, on the settled tree in the repository `.venv`
+(Python 3.13.14, Streamlit 1.60.0, Windows):
+
+- `tests/test_ui_portfolio_rebalance.py`: **24 passed** (21 before).
+- The conflict branch is driven through the REAL conflict rule: the test
+  replaces the loaded policy with one capping total exposure at 50% — the
+  operational policy's actual value — against the profile's 90% invested
+  target, and asserts on the rendered text.
+- Mutation verification: **3 mutations, 3 detected** (after strengthening
+  the test that let one through).
+- Full pinned-venv tree: **4,044 passed / 0 failed / 25 known dependency warnings in 739.33 seconds**.
+- `python -m compileall` and `git diff --check`: clean. One test file had
+  six bare-LF lines from scripted editing and was normalized to CRLF; the
+  full suite was restarted afterwards so the recorded result validates the
+  final tree.
+
+See `docs/REVIEW_2026-08-15_REBAL1_FEASIBILITY_VISIBILITY.md`.
+
 ## 8. What is next
 
-1. The owner may merge `user/claude/rebal1-stage3-counterreview-20260815`,
-   which carries Codex's review commits and the counter-review on top, as a
-   single PR. `codex/review-rebal1-stage3-20260815` needs no separate push;
-   its commits are contained in this branch.
-2. Codex may independently verify the counter-review correction. Note for
-   the record: Codex's new rule that formal review starts only from a pushed
-   remote snapshot was added in `0c91aa4`, and this counter-review was
-   necessarily performed on a LOCAL-only review branch, because that branch
-   was never pushed. Pushing this branch makes the whole range remote and
-   restores the rule going forward.
-3. REBAL-1 has no Stage 4 in the adopted plan. Any new rebalancing feature
+1. Independent review of this round. It is presentation-only, so the useful
+   focus is whether the positive confirmation could ever be shown while a
+   conflict exists, and whether the shortened column still reads correctly
+   for a sleeve that is both infeasible and badly drifted.
+2. The owner is mid-way through exercising the development app and has
+   completed step 1 (the Stage 1 drift table). Steps 2 (Stage 2 steering
+   with a non-zero budget) and 3 (Stage 3 against a COPY of the operator
+   database) are still to do. The dev app must be restarted to pick up this
+   round's change.
+3. **The remaining test gap is unchanged:** no test clicks the Streamlit
+   trim button through to a saved proposal. Everything below that seam is
+   now covered end to end against real journaled fills.
+4. REBAL-1 has no Stage 4 in the adopted plan. Any new rebalancing feature
    needs a new owner-approved plan and scope.
-4. Resolve whether the 60-day hold means calendar days or 60 captured market
-   sessions before any operational transition.
-5. The SET-1 design question remains open: whether strict whole-share mode
+5. Resolve whether the 60-day epoch-005 hold means calendar days (roughly
+   43 weekday observations) or 60 captured market sessions.
+6. The SET-1 design question remains open: whether strict whole-share mode
    should allow a fractional sell only when it closes an entire position.
-6. `TRADE1CR-002` remains open and unscheduled: date-dependent fixtures in
-   `tests/test_strategy_proposals_generic.py` can fail between roughly 00:00
-   and 09:30 ET.
+7. `TRADE1CR-002` remains open and unscheduled: date-dependent fixtures in
+   `tests/test_strategy_proposals_generic.py` can fail between roughly
+   00:00 and 09:30 ET.
 
-Do not begin M4, deploy, mutate the operator database, alter scheduled tasks,
-access a funded account, enable live trading, submit a paper order, or roll an
-epoch without a new explicit owner instruction.
+Standing operational constraints, unchanged by this round:
+
+- `paper-epoch-005` runs UNCHANGED for 60 days (owner decision 2026-08-14).
+  Do not deploy, roll, or disturb it. `-AllowPaperOrders` must not be used
+  while that hold stands.
+- **The operational checkout's `my_policy.json` stays at 0.50/0.05.** The
+  development copy carries 0.90/0.07 so the approved profile is reachable,
+  and it is untracked so no commit contains it. Copying it across would
+  change the policy fingerprint and stall epoch-005 exactly as epoch-002
+  stalled. A later agent must not "finish the job" by syncing them.
+- Never open the operator database with the development checkout's
+  `AssistantStore`; that would run migrations against a frozen-epoch
+  database. Read it through a `sqlite3` read-only URI, or work on a copy.
+- CR-W3 remains a watch item: the first real AEP dividend subtype may fail
+  closed around 2026-09-10. Do not widen reconciliation tolerance or post a
+  manual compensating entry.
+
+No account identifier, balance, credential value, private artifact content,
+or secret is recorded here.
+
+Do not begin M4, deploy, mutate the operator database, alter scheduled
+tasks, access a funded account, enable live trading, submit a paper order,
+or roll an epoch without a new explicit owner instruction.
 
 ## 9. Resume prompt
 
 ```text
-Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/REBAL1_MILESTONE_PLAN.md, docs/REVIEW_2026-08-15_REBAL1_STAGE3.md,
-and docs/SESSION_HANDOFF.md. main/origin/main are 45faf1c. Claude's pushed
-REBAL-1 Stage 3 head is bedeea2 (0490d9d product, bedeea2 records). Codex
-reviewed that exact remote range on codex/review-rebal1-stage3-20260815 and
-accepted it after product/test correction ed6879d plus the separate records
-commit containing this handoff. The review branch is LOCAL ONLY: do not claim
-cross-computer availability until the owner authorizes a push and origin is
-verified. Eight P2 and one P3 findings are closed; none remain open. Final
-validation is 243 focused and 4,026 full-suite tests, 25 known warnings, clean
-compile/diff. All three REBAL-1 stages are complete in development but not
-deployed. Formal reviews now begin only from a pushed remote branch and exact
-remote head. Do not push, merge, deploy, roll epoch-005, mutate operational
-state, submit orders, access funded accounts, begin M4, or enable live trading
-without explicit owner authorization.
+Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, docs/REBAL1_MILESTONE_PLAN.md
+and docs/SESSION_HANDOFF.md. main and origin/main are 84e73af (PR #230),
+which merged the entire REBAL-1 Stage 3 chain; all earlier feature branches
+were deleted after verifying their content is contained in that commit.
+Branch user/claude/rebal-feasibility-visible-20260815 is a presentation-only
+round: the owner exercising the dev app could not reach the "Target
+reachable" column, which was ninth of nine in a table with no horizontal
+scrollbar, so target feasibility is now stated in full BELOW the table --
+sleeve and exact conflict reason when unreachable, and an explicit positive
+confirmation when every target is reachable, which the page previously left
+to be inferred from an absent warning. No computation, refusal, threshold,
+count, or contract changed. The owner also reported "Bands breached: 6",
+which is CORRECT; a predicted 5 was stale, from before REBAL1CR-002 stopped
+a display status masking a real breach. 24 UI tests; 3 mutations, 3
+detected, one only after strengthening a test that asserted a message
+appeared rather than that it named its sleeve. Full pinned-venv tree:
+4,044 passed / 0 failed / 25 known dependency warnings in 739.33 seconds. Remaining gap: no test drives the Streamlit trim button
+through to a saved proposal. paper-epoch-005 runs unchanged for 60 days;
+the operational my_policy.json stays 0.50/0.05. Do not push to main, deploy,
+roll the epoch, mutate the operator database, submit orders, access funded
+accounts, begin M4, or enable live trading without explicit owner
+authorization.
 ```

@@ -1,4 +1,4 @@
-# Session handoff — both dev-app rounds merged, neither reviewed
+# Session handoff — REBAL-3V and REBAL-3W await independent review
 
 Prepared: 2026-08-15 by Claude, after the owner exercised the Portfolio
 Rebalancing page in the development app across two rounds and then merged
@@ -25,19 +25,17 @@ operator-database mutation, or scheduled-task change.
 ## 1. Exact repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- `main` and `origin/main`: `18a3ee5`, after PR #231 and PR #232 merged
-  both owner-reported rounds from exercising the development app.
-- **Both rounds were merged WITHOUT independent review.** REBAL-3V
-  (feasibility legibility) and REBAL-3W (refusal accuracy) are in `main`
-  and neither has been reviewed by Codex. That is a deliberate owner
-  decision to record, not an oversight to correct silently, but a reviewer
-  picking this up should start there.
-- **Every feature branch has been deleted, locally and on the remote**,
-  each after confirming with `git merge-base --is-ancestor` that its
-  commits are reachable from the surviving ref. `7e9d005`, `a0a657b`,
-  `bead8ac` and `43b29df` are all in `main`.
-- **Current branch: `user/claude/post-merge-232-records-20260815`**,
-  branched from `18a3ee5`. It corrects records only.
+- `main` and `origin/main`: `006a9d5` when this was written, after PRs
+  #231, #232 and #233. `main` may have advanced since; check it rather
+  than trusting this line.
+- **Both product rounds were merged WITHOUT independent review.**
+  REBAL-3V (feasibility legibility) and REBAL-3W (refusal accuracy) are in
+  `main` and neither has been reviewed. That is what this handoff exists to
+  hand over.
+- **No feature branch is open.** Every branch created for REBAL-1 and its
+  follow-ups has been deleted, locally and on the remote, each after
+  confirming with `git merge-base --is-ancestor` that its commits are
+  reachable from `main`. Nothing is stranded on a deleted ref.
 - The operational checkout remains separate and frozen at `752d3b7` in
 
 Earlier history that remains load-bearing for anyone resuming:
@@ -428,6 +426,60 @@ this round.
 **Recorded plainly because it is easy to lose:** neither round has had
 independent review. They went from implementation straight into `main`.
 
+## 7g. Review scope handed to the independent reviewer
+
+Both rounds are already in `main`, so this is a post-merge review. The
+exact ordered range, base `84e73af` (PR #230):
+
+| Commit | Round | Content |
+|---|---|---|
+| `7e9d005` | REBAL-3V | product: feasibility stated below the drift table |
+| `a0a657b` | REBAL-3V | records, plus stale merge-claim corrections |
+| `bead8ac` | REBAL-3W | product: trim refusal states the true reason |
+| `43b29df` | REBAL-3W | records |
+| `bacc66f` | post-merge | records only, after PRs #231/#232 |
+
+Per `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` every commit needs an
+explicit disposition; reviewing only the tip or a combined diff is not
+sufficient.
+
+### Where I would look first, stated against my own interest
+
+1. **`untrimmable_overweight_sleeves` may be the wrong shape.** It sits
+   beside `overweight_sleeves`, which still filters on two independent
+   conditions at once. I removed the consequence at the one call site that
+   had it; I did not remove the ability for the next caller to repeat it. A
+   single function returning both lists may be the correct consolidation
+   under `CLAUDE.md` section 8.
+2. **Two of my tests were wrong this session, in the same direction.** One
+   asserted a message appeared without asserting it named its sleeve. The
+   other, `test_the_trim_section_appears_only_when_a_sleeve_is_overweight`,
+   deliberately forced the exact book that reproduces REBAL-3W and then
+   asserted the FALSE sentence appears -- it tested the defect in, and its
+   docstring congratulates itself for forcing the book. Assume more tests
+   in `tests/test_ui_portfolio_rebalance.py` assert presence of a string
+   rather than correctness of a claim.
+3. **The UI branch for infeasible targets is exercised by exactly one
+   test**, which drives the real conflict rule by capping total exposure at
+   50%. Any other conflict shape (leveraged cap, cash floor, position-cap
+   capacity) is unexercised through the UI.
+4. **`Path(policy_path).name` is rendered to the owner.** It is a file name
+   rather than a path, but it is worth confirming no deployment layout
+   makes that name disclose something it should not.
+5. **Neither round has a `docs/FEATURE_MILESTONE_RECORD.md` entry**, which
+   is correct: that file records work that has completed its definition of
+   done AND its required review. Adding entries is part of closing this
+   review, not part of the rounds themselves.
+
+### What these rounds did NOT change
+
+Verify this rather than taking it from me: no threshold, refusal, band
+edge, sizing rule, proposal contract, execution gate, or eligibility rule
+moved. REBAL-3V is presentation-only. REBAL-3W changed the stated reason
+for a refusal that was already firing correctly, plus one new pure
+function. `git diff 84e73af..006a9d5 -- assistant/ risk/ execution/` should
+show only `assistant/rebalance_trim.py`, and only the added helper.
+
 ## 8. What is next
 
 1. **Independent review of REBAL-3V and REBAL-3W, both already in `main`.**
@@ -482,25 +534,28 @@ or roll an epoch without a new explicit owner instruction.
 ## 9. Resume prompt
 
 ```text
-Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, docs/REBAL1_MILESTONE_PLAN.md
-and docs/SESSION_HANDOFF.md. main and origin/main are 84e73af (PR #230),
-which merged the entire REBAL-1 Stage 3 chain. Branch
-user/claude/rebal-trim-refusal-accuracy-20260815 stacks on a0a657b and so
-carries BOTH owner-reported rounds from exercising the dev app: REBAL-3V
-made target feasibility legible (the "Target reachable" column was ninth of
-nine with no horizontal scrollbar, and the reachable case was never stated
-at all), and REBAL-3W corrected a refusal that stated a reason which was not
-true (the page said "No sleeve is above its upper band" while its own
-headline reported six breaches; cash and the residual WERE over, they are
-simply never trimmable). Neither round changed which sleeves may be trimmed,
-any threshold, or any refusal -- REBAL-3V is presentation-only and REBAL-3W
-changes only the stated reason. Two of my own tests were wrong and are
-recorded as such: one asserted a message appeared without asserting it named
-its sleeve, and one PINNED the false refusal message on exactly the book
-that reproduced the bug. Full pinned-venv tree: 4,048 passed / 0 failed / 25 known dependency warnings in 733.50 seconds. Remaining
-gap: no test drives the Streamlit trim button through to a saved proposal.
-paper-epoch-005 runs unchanged for 60 days and the operational
-my_policy.json stays 0.50/0.05. Do not push to main, deploy, roll the epoch,
-mutate the operator database, submit orders, access funded accounts, begin
-M4, or enable live trading without explicit owner authorization.
+Read CLAUDE.md, docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md,
+docs/ACTION_PLAN_2026-08-02.md and docs/SESSION_HANDOFF.md. main is at or
+ahead of 006a9d5; check it rather than assuming. Two owner-reported rounds
+from exercising the development app are ALREADY MERGED INTO main WITHOUT
+independent review, and reviewing them is the task: REBAL-3V (7e9d005,
+a0a657b) made sleeve target feasibility legible -- the "Target reachable"
+column was ninth of nine with no horizontal scrollbar, and the reachable
+case was never stated at all -- and REBAL-3W (bead8ac, 43b29df) corrected a
+refusal that stated a reason which was not true: the page said "No sleeve
+is above its upper band" while its own headline reported six breaches,
+because overweight_sleeves() filters on two independent conditions at once.
+bacc66f is records only. Base the range at 84e73af and give every commit an
+explicit disposition. Neither round changed any threshold, refusal, band
+edge, sizing rule, proposal contract, or execution gate -- verify that
+rather than accepting it. Two of my own tests were wrong this session in
+the same direction, and one PINNED the false message on exactly the book
+that reproduced the bug, so treat tests/test_ui_portfolio_rebalance.py as
+suspect for asserting presence of a string rather than correctness of a
+claim. Full pinned-venv tree at the time of writing: 4,048 passed / 0
+failed. Remaining known gap: no test drives the Streamlit trim button
+through to a saved proposal. paper-epoch-005 runs unchanged for 60 days and
+the operational my_policy.json stays 0.50/0.05. Do not deploy, roll the
+epoch, mutate the operator database, submit orders, access funded accounts,
+begin M4, or enable live trading without explicit owner authorization.
 ```

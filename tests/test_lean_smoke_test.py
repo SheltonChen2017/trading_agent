@@ -1,10 +1,16 @@
-"""The LEAN smoke test must stay INCAPABLE of reporting an alpha result.
+"""Every LEAN algorithm in `research/lean/` must stay INCAPABLE of
+reporting an alpha result.
 
 Method V2 section 1.9 exempts a smoke test from the research look count
 only if it cannot report an alpha statistic -- not if it merely happens not
 to today. That is a property of the source, so it is checked against the
-source: the file cannot be imported here because `AlgorithmImports` only
-exists inside LEAN.
+source: these files cannot be imported here because `AlgorithmImports`
+exists only inside LEAN.
+
+The guard iterates the DIRECTORY rather than naming one file. The first
+version named `universe_smoke.py` explicitly, which left the delisting
+probe unguarded the moment it was added -- exactly the gap that lets an
+un-exempt run be reported as an exempt one.
 """
 from __future__ import annotations
 
@@ -13,10 +19,11 @@ from pathlib import Path
 
 import pytest
 
-# NOT named `*_test.py`: pytest collects that pattern, and this file
-# imports `AlgorithmImports`, which exists only inside LEAN. The first
-# name broke collection for the WHOLE suite, not just itself.
-SOURCE = Path(__file__).resolve().parents[1] / "research" / "lean" / "universe_smoke.py"
+LEAN_DIR = Path(__file__).resolve().parents[1] / "research" / "lean"
+# NOT named `*_test.py`: pytest collects that pattern, and these files
+# import `AlgorithmImports`. The first name broke collection for the WHOLE
+# suite, not just itself.
+LEAN_FILES = sorted(p for p in LEAN_DIR.glob("*.py") if p.name != "__init__.py")
 
 #: Every LEAN call that can open, close or size a position.
 ORDERING_CALLS = frozenset({
@@ -26,14 +33,24 @@ ORDERING_CALLS = frozenset({
 })
 
 
-def _tree() -> ast.AST:
-    return ast.parse(SOURCE.read_text(encoding="utf-8"))
+def test_the_lean_directory_is_not_empty():
+    """A glob that silently matches nothing would make every test below
+    vacuously green."""
+    assert LEAN_FILES, f"no LEAN algorithms found under {LEAN_DIR}"
 
 
-def test_the_smoke_test_places_no_orders_by_construction():
+SOURCE = LEAN_DIR / "universe_smoke.py"
+
+
+def _tree(path: Path) -> ast.AST:
+    return ast.parse(path.read_text(encoding="utf-8"))
+
+
+@pytest.mark.parametrize("path", LEAN_FILES, ids=lambda p: p.name)
+def test_the_smoke_test_places_no_orders_by_construction(path):
     called = {
         node.func.attr
-        for node in ast.walk(_tree())
+        for node in ast.walk(_tree(path))
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
     }
     offenders = sorted(called & ORDERING_CALLS)
@@ -43,7 +60,8 @@ def test_the_smoke_test_places_no_orders_by_construction():
     )
 
 
-def test_the_smoke_test_computes_no_alpha_statistic():
+@pytest.mark.parametrize("path", LEAN_FILES, ids=lambda p: p.name)
+def test_the_smoke_test_computes_no_alpha_statistic(path):
     """Checked against CODE, not prose.
 
     The first version of this test scanned the raw text and failed on the
@@ -53,7 +71,7 @@ def test_the_smoke_test_computes_no_alpha_statistic():
     metric, so identifiers and attributes are inspected and comments and
     docstrings are ignored.
     """
-    tree = _tree()
+    tree = _tree(path)
     docstrings = set()
     for node in ast.walk(tree):
         if isinstance(node, (ast.Module, ast.ClassDef, ast.FunctionDef)):
@@ -87,7 +105,7 @@ def test_the_universe_screens_match_the_owner_specification():
     make a cloud run incomparable to the local one it is meant to replicate.
     """
     namespace: dict = {}
-    for node in _tree().body:
+    for node in _tree(SOURCE).body:
         if isinstance(node, ast.Assign) and getattr(node.targets[0], "id", "") == "UNIVERSES":
             namespace = ast.literal_eval(node.value)
     assert namespace == {

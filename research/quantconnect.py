@@ -3,8 +3,15 @@
 Why this exists. The binding constraint on this project's research is not
 statistics, it is breadth: a hand-written 104-ticker universe with a
 measured minimum detectable effect of 2-4%, against real equity edges that
-live well under 1%. QuantConnect supplies a survivorship-bias-free,
-point-in-time-corrected US universe of thousands of names. This module is
+live well under 1%. QuantConnect's US equity datasets CAN supply
+survivorship-bias-free, point-in-time-corrected history over thousands of
+names -- but only when the algorithm actually uses the dynamic universe,
+the Security Master, historical fundamentals, the right normalization
+mode, and real delisting handling. Method V2 section 2.1 withdraws the
+categorical claim this file used to make: a LEAN algorithm reintroduces
+survivorship bias the moment it hardcodes a symbol list, so the
+protections must be DEMONSTRATED by the algorithm rather than inherited
+from the platform's reputation. This module is
 how the project can drive backtests there and bring the RESULTS home.
 
 **Two hard boundaries, both load-bearing.**
@@ -278,12 +285,14 @@ class QuantConnectClient:
             ) from exc
         if not isinstance(decoded, dict):
             raise QuantConnectError(f"{path} returned {type(decoded).__name__}, expected an object")
-        # CQC-001, OPEN AND UNVERIFIED (2026-08-07). Requiring `success is
+        # CQC-001 remains open as a future-endpoint compatibility watch.
+        # The 2026-08-16 smoke round verified `success is True` on every
+        # endpoint it actually used (authenticate, project/file, compile,
+        # and backtest create/read). Requiring `success is
         # True` is fail-closed and deliberate: QuantConnect signals failure
         # in-band with HTTP 200, so a missing field must not read as success.
-        # BUT no live call has ever been made from this project, so whether
-        # every endpoint actually sets `success` is an ASSUMPTION, not a
-        # verified contract.
+        # True` on an endpoint not yet exercised remains an assumption, not
+        # a documented universal contract.
         #
         # If a real call fails here with "no reason given" on an otherwise
         # sensible HTTP 200 body, suspect this line before suspecting the
@@ -306,10 +315,95 @@ class QuantConnectClient:
         """Cheapest possible credential check."""
         return self.request("authenticate")
 
+    def create_project(self, name: str, language: str = "Py") -> dict[str, Any]:
+        """Create a cloud project. Returns QuantConnect's project record."""
+        if not isinstance(name, str) or not name.strip():
+            raise QuantConnectError(f"name must be a non-empty string, got {name!r}")
+        if language not in {"Py", "C#"}:
+            raise QuantConnectError(f"language must be 'Py' or 'C#', got {language!r}")
+        return self.request(
+            "projects/create", {"name": name.strip(), "language": language}
+        )
+
+    def create_file(self, project_id: int, name: str, content: str) -> dict[str, Any]:
+        """Upload one algorithm file into a project."""
+        self._require_project_id(project_id)
+        if not isinstance(name, str) or not name.strip():
+            raise QuantConnectError(f"name must be a non-empty string, got {name!r}")
+        if not isinstance(content, str):
+            raise QuantConnectError("content must be a string")
+        return self.request(
+            "files/create",
+            {"projectId": project_id, "name": name.strip(), "content": content},
+        )
+
+    def update_file(self, project_id: int, name: str, content: str) -> dict[str, Any]:
+        """Replace one algorithm file's contents."""
+        self._require_project_id(project_id)
+        if not isinstance(name, str) or not name.strip():
+            raise QuantConnectError(f"name must be a non-empty string, got {name!r}")
+        if not isinstance(content, str):
+            raise QuantConnectError("content must be a string")
+        return self.request(
+            "files/update",
+            {"projectId": project_id, "name": name.strip(), "content": content},
+        )
+
+    def compile_project(self, project_id: int) -> dict[str, Any]:
+        """Start a compile. Returns the compile id to poll."""
+        self._require_project_id(project_id)
+        return self.request("compile/create", {"projectId": project_id})
+
+    def read_compile(self, project_id: int, compile_id: str) -> dict[str, Any]:
+        """Compile state and any build errors."""
+        self._require_project_id(project_id)
+        if not isinstance(compile_id, str) or not compile_id.strip():
+            raise QuantConnectError(
+                f"compile_id must be a non-empty string, got {compile_id!r}"
+            )
+        return self.request(
+            "compile/read",
+            {"projectId": project_id, "compileId": compile_id.strip()},
+        )
+
+    def create_backtest(
+        self, project_id: int, compile_id: str, name: str
+    ) -> dict[str, Any]:
+        """Launch one cloud backtest.
+
+        **Every call is a research look.** Method V2 section 1.9 counts
+        cloud runs exactly as it counts local ones, so a caller that loops
+        over parameters here is inflating the search whether or not it
+        records the fact. The look-counting milestone will read
+        `list_backtests`, which makes the true count auditable rather than
+        self-reported.
+        """
+        self._require_project_id(project_id)
+        if not isinstance(compile_id, str) or not compile_id.strip():
+            raise QuantConnectError(
+                f"compile_id must be a non-empty string, got {compile_id!r}"
+            )
+        if not isinstance(name, str) or not name.strip():
+            raise QuantConnectError(f"name must be a non-empty string, got {name!r}")
+        return self.request(
+            "backtests/create",
+            {
+                "projectId": project_id,
+                "compileId": compile_id.strip(),
+                "backtestName": name.strip(),
+            },
+        )
+
+    @staticmethod
+    def _require_project_id(project_id: int) -> None:
+        # bool is an int subclass and True would silently become project 1.
+        if (not isinstance(project_id, int) or isinstance(project_id, bool)
+                or project_id <= 0):
+            raise QuantConnectError(f"project_id must be a positive int, got {project_id!r}")
+
     def read_backtest(self, project_id: int, backtest_id: str) -> dict[str, Any]:
         """Statistics and metadata for one backtest -- results, not data."""
-        if not isinstance(project_id, int) or isinstance(project_id, bool):
-            raise QuantConnectError(f"project_id must be an int, got {project_id!r}")
+        self._require_project_id(project_id)
         if not isinstance(backtest_id, str) or not backtest_id.strip():
             raise QuantConnectError(
                 f"backtest_id must be a non-empty string, got {backtest_id!r}"
@@ -326,6 +420,5 @@ class QuantConnectClient:
         number of runs against a project IS the search count that
         `backtest/interactive` currently admits it cannot measure.
         """
-        if not isinstance(project_id, int) or isinstance(project_id, bool):
-            raise QuantConnectError(f"project_id must be an int, got {project_id!r}")
+        self._require_project_id(project_id)
         return self.request("backtests/list", {"projectId": project_id})

@@ -207,6 +207,32 @@ def test_request_sends_auth_headers_and_the_expected_url():
     assert json.loads(sent["data"]) == {"projectId": 7, "backtestId": "bt-1"}
 
 
+@pytest.mark.parametrize(
+    ("call", "path", "payload"),
+    [
+        (lambda client: client.create_project(" demo "), "projects/create",
+         {"name": "demo", "language": "Py"}),
+        (lambda client: client.create_file(7, " main.py ", "x=1"), "files/create",
+         {"projectId": 7, "name": "main.py", "content": "x=1"}),
+        (lambda client: client.update_file(7, " main.py ", "x=2"), "files/update",
+         {"projectId": 7, "name": "main.py", "content": "x=2"}),
+        (lambda client: client.compile_project(7), "compile/create", {"projectId": 7}),
+        (lambda client: client.read_compile(7, " c-1 "), "compile/read",
+         {"projectId": 7, "compileId": "c-1"}),
+        (lambda client: client.create_backtest(7, " c-1 ", " run "), "backtests/create",
+         {"projectId": 7, "compileId": "c-1", "backtestName": "run"}),
+    ],
+)
+def test_cloud_mutation_helpers_send_the_exact_endpoint_contract(call, path, payload):
+    capture: list[dict] = []
+    client = QuantConnectClient(
+        _CREDS, transport=_fake_transport(capture=capture), clock=lambda: 1
+    )
+    call(client)
+    assert capture[0]["url"].endswith("/" + path)
+    assert json.loads(capture[0]["data"]) == payload
+
+
 def test_authenticate_posts_empty_json_object():
     """QuantConnect documents every call as POST, including authenticate.
 
@@ -264,7 +290,7 @@ def test_default_transport_uses_post_even_without_payload():
     assert seen[0].data == b"{}"
 
 
-@pytest.mark.parametrize("bad", [True, "7", 7.5, None])
+@pytest.mark.parametrize("bad", [True, "7", 7.5, None, 0, -1])
 def test_read_backtest_rejects_non_int_project_id(bad):
     client = QuantConnectClient(_CREDS, transport=_fake_transport(), clock=lambda: 1)
     with pytest.raises(QuantConnectError, match="project_id"):

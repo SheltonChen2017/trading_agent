@@ -285,12 +285,14 @@ class QuantConnectClient:
             ) from exc
         if not isinstance(decoded, dict):
             raise QuantConnectError(f"{path} returned {type(decoded).__name__}, expected an object")
-        # CQC-001, OPEN AND UNVERIFIED (2026-08-07). Requiring `success is
+        # CQC-001 remains open as a future-endpoint compatibility watch.
+        # The 2026-08-16 smoke round verified `success is True` on every
+        # endpoint it actually used (authenticate, project/file, compile,
+        # and backtest create/read). Requiring `success is
         # True` is fail-closed and deliberate: QuantConnect signals failure
         # in-band with HTTP 200, so a missing field must not read as success.
-        # BUT no live call has ever been made from this project, so whether
-        # every endpoint actually sets `success` is an ASSUMPTION, not a
-        # verified contract.
+        # True` on an endpoint not yet exercised remains an assumption, not
+        # a documented universal contract.
         #
         # If a real call fails here with "no reason given" on an otherwise
         # sensible HTTP 200 body, suspect this line before suspecting the
@@ -395,13 +397,13 @@ class QuantConnectClient:
     @staticmethod
     def _require_project_id(project_id: int) -> None:
         # bool is an int subclass and True would silently become project 1.
-        if not isinstance(project_id, int) or isinstance(project_id, bool):
-            raise QuantConnectError(f"project_id must be an int, got {project_id!r}")
+        if (not isinstance(project_id, int) or isinstance(project_id, bool)
+                or project_id <= 0):
+            raise QuantConnectError(f"project_id must be a positive int, got {project_id!r}")
 
     def read_backtest(self, project_id: int, backtest_id: str) -> dict[str, Any]:
         """Statistics and metadata for one backtest -- results, not data."""
-        if not isinstance(project_id, int) or isinstance(project_id, bool):
-            raise QuantConnectError(f"project_id must be an int, got {project_id!r}")
+        self._require_project_id(project_id)
         if not isinstance(backtest_id, str) or not backtest_id.strip():
             raise QuantConnectError(
                 f"backtest_id must be a non-empty string, got {backtest_id!r}"
@@ -418,6 +420,5 @@ class QuantConnectClient:
         number of runs against a project IS the search count that
         `backtest/interactive` currently admits it cannot measure.
         """
-        if not isinstance(project_id, int) or isinstance(project_id, bool):
-            raise QuantConnectError(f"project_id must be an int, got {project_id!r}")
+        self._require_project_id(project_id)
         return self.request("backtests/list", {"projectId": project_id})

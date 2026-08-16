@@ -19,8 +19,13 @@ Design decisions that follow directly from the smoke findings:
     Overstock because the ticker was reused.
   * Industry comes from `MorningstarIndustryCode`, which is 100% present.
     The local run's size-bucket proxy leaked future capitalization.
-  * Prices are raw, so a split-adjusted history cannot let a name pass a
-    price screen it never met at the time.
+  * Universe price screens use the raw coarse/fine price fields. Return
+    arithmetic uses adjusted trade bars so stock splits are not mistaken
+    for investment losses.
+  * A score is staged at close t and its entry is bound only on the next
+    distinct daily session, as required by the frozen pre-registration.
+  * A selected name is retained while it is part of a measured portfolio,
+    and a terminal delisting price is used in that portfolio's outcome.
 """
 from AlgorithmImports import *  # noqa: F403
 
@@ -44,6 +49,11 @@ LOOKBACK = 300          # sessions retained per name; 12m momentum needs 253
 MIN_NAMES = 30          # a cross-section below this is not a ranking
 DECILE = 0.10
 QUINTILE = 0.20
+SPECIFICATIONS = (
+    "GROSS_PROFITABILITY", "MOM_12_1", "MOM_3_1", "MOM_6_1", "MOM_9_1",
+    "MULTI_ALPHA_COMPOSITE", "QUALITY_COMPOSITE", "QUALITY_MOMENTUM",
+    "RESIDUAL_MOM_12_1", "RESIDUAL_MOM_6_1",
+)
 
 
 def _zscore(values):
@@ -100,6 +110,61 @@ def _spearman(pairs):
     return num / (dx * dy)
 
 
+def _joint_residual_total(stock, market, industry, measurement_sessions=21):
+    """Cumulate measurement-window residuals from one joint OLS fit.
+
+    The intercept and both loadings are estimated on observations ending
+    strictly before the measurement window.  The small closed-form solve
+    keeps this helper usable inside a single-file LEAN upload.
+    """
+    if not (len(stock) == len(market) == len(industry)):
+        return None
+    split = len(stock) - measurement_sessions
+    if split < 40 or measurement_sessions <= 0:
+        return None
+    y, m, i = stock[:split], market[:split], industry[:split]
+    my, mm, mi = sum(y) / split, sum(m) / split, sum(i) / split
+    var_m = sum((v - mm) ** 2 for v in m)
+    var_i = sum((v - mi) ** 2 for v in i)
+    cov_mi = sum((a - mm) * (b - mi) for a, b in zip(m, i))
+    cov_ym = sum((a - my) * (b - mm) for a, b in zip(y, m))
+    cov_yi = sum((a - my) * (b - mi) for a, b in zip(y, i))
+    determinant = var_m * var_i - cov_mi * cov_mi
+    if abs(determinant) <= 1e-18:
+        return None
+    beta_m = (cov_ym * var_i - cov_yi * cov_mi) / determinant
+    beta_i = (cov_yi * var_m - cov_ym * cov_mi) / determinant
+    alpha = my - beta_m * mm - beta_i * mi
+    return sum(
+        y_t - alpha - beta_m * m_t - beta_i * i_t
+        for y_t, m_t, i_t in zip(stock[split:], market[split:], industry[split:])
+    )
+
+
+def _drift_turnover(previous, target, outcomes):
+    """Method V2 one-way turnover from drifted signed weights."""
+    if not previous:
+        return 0.5 * sum(abs(weight) for weight in target.values())
+    if any(symbol not in outcomes for symbol in previous):
+        return None
+    portfolio_return = sum(
+        weight * outcomes.get(symbol, 0.0)
+        for symbol, weight in previous.items()
+    )
+    denominator = 1.0 + portfolio_return
+    if denominator <= 0.0:
+        return None
+    drifted = {
+        symbol: weight * (1.0 + outcomes.get(symbol, 0.0)) / denominator
+        for symbol, weight in previous.items()
+    }
+    names = set(drifted) | set(target)
+    return 0.5 * sum(
+        abs(target.get(symbol, 0.0) - drifted.get(symbol, 0.0))
+        for symbol in names
+    )
+
+
 class AlphaBatteryMonthly(QCAlgorithm):
 
     def Initialize(self):
@@ -107,7 +172,7 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.SetEndDate(*END)
         self.SetCash(100_000)
         self.UniverseSettings.Resolution = Resolution.Daily
-        self.UniverseSettings.DataNormalizationMode = DataNormalizationMode.Raw
+        self.UniverseSettings.DataNormalizationMode = DataNormalizationMode.Adjusted
         self.screen = UNIVERSES[ACTIVE_UNIVERSE]
         self.AddUniverse(self._coarse, self._fine)
 
@@ -116,18 +181,23 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.industry = {}          # Symbol -> Morningstar industry code
         self.selected = []          # this month's eligible symbols
         self.pending = None         # scores awaiting their forward return
+        self.staged = None          # scores waiting for close t+1 entry
         # Selection is keyed off the CALENDAR, not off OnData. The first
         # version gated selection on a flag that only OnData set, and
         # OnData needs securities, which needs selection: a deadlock that
         # ran to completion reporting cap_rows=0 rather than failing.
         self.selection_month = None
         self.scored_month = None
+        self.last_session = None
+        self.in_universe = set()
+        self.retained = set()
+        self.terminal_prices = {}
 
         self.cap_missing = 0
         self.cap_fallback = 0
         self.cap_rows = 0
-        self.results = {}           # spec -> list of (date, ic, spread, turnover)
-        self.previous_weights = {}  # spec -> {symbol: weight}
+        self.results = {}           # spec -> per-date IC/return/turnover rows
+        self.previous_weights = {}  # (spec, construction) -> signed weights
 
     # --- universe ------------------------------------------------------
 
@@ -181,12 +251,34 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 "cap": cap,
             }
             chosen.append(f.Symbol)
+        current = set(chosen)
+        needed = set()
+        if self.pending is not None:
+            needed.update(self.pending.get("entry", {}))
+        if self.staged is not None:
+            needed.update(self.staged.get("names", ()))
+        for symbol in self.in_universe - current:
+            if symbol in needed and symbol not in self.retained:
+                self.AddSecurity(symbol, Resolution.Daily)
+                self.retained.add(symbol)
+        self.in_universe = current
         self.selected = chosen
         return chosen
 
     # --- data ----------------------------------------------------------
 
     def OnData(self, data):
+        for symbol, delisting in data.Delistings.items():
+            if delisting.Type != DelistingType.Delisted:
+                continue
+            raw_price = getattr(delisting, "Price", None)
+            if raw_price is None:
+                raw_price = getattr(delisting, "Value", 0.0)
+            try:
+                self.terminal_prices[symbol] = max(0.0, float(raw_price))
+            except (TypeError, ValueError):
+                self.terminal_prices[symbol] = 0.0
+
         for symbol in list(data.Bars.Keys):
             window = self.closes.get(symbol)
             if window is None:
@@ -194,15 +286,78 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 self.closes[symbol] = window
             window.append(float(data.Bars[symbol].Close))
 
+        session = self.Time.date()
+        if not data.Bars or session == self.last_session:
+            return
+        self.last_session = session
+
+        if self.staged is not None and session > self.staged["score_session"]:
+            self._bind_staged_entry()
+
         # Score once per month, after the day's bars have been recorded.
         # Settling first, then forming, gives a full month between a score
         # and the return it is judged against.
         month = (self.Time.year, self.Time.month)
         if self.scored_month != month and self.selection_month == month:
             self.scored_month = month
-            if self.pending is not None:
-                self._settle()
             self._form_scores()
+
+    def _bind_staged_entry(self):
+        staged = self.staged
+        self.staged = None
+        prior_outcomes = self._settle() if self.pending is not None else {}
+        entry = {
+            symbol: self._price(symbol, 0)
+            for symbol in staged["names"]
+            if symbol not in self.terminal_prices and self._price(symbol, 0) is not None
+        }
+        if len(entry) < MIN_NAMES:
+            return
+        portfolios = {}
+        for spec, scores in staged["scores"].items():
+            usable = [(value, symbol) for symbol, value in scores.items()
+                      if value is not None and math.isfinite(value) and symbol in entry]
+            if len(usable) < MIN_NAMES:
+                continue
+            ranked = sorted(usable, key=lambda pair: pair[0], reverse=True)
+            cut = max(1, int(round(len(ranked) * DECILE)))
+            quint = max(1, int(round(len(ranked) * QUINTILE)))
+            longs = [symbol for _, symbol in ranked[:cut]]
+            shorts = [symbol for _, symbol in ranked[-cut:]]
+            long20 = [symbol for _, symbol in ranked[:quint]]
+            ls_weights = {symbol: 0.5 / len(longs) for symbol in longs}
+            for symbol in shorts:
+                ls_weights[symbol] = ls_weights.get(symbol, 0.0) - 0.5 / len(shorts)
+            keys = (
+                (spec, "long_short"),
+                (spec, "long_only_10"),
+                (spec, "long_only_20"),
+            )
+            targets = (
+                ls_weights,
+                {symbol: 1.0 / len(longs) for symbol in longs},
+                {symbol: 1.0 / len(long20) for symbol in long20},
+            )
+            turns = tuple(
+                _drift_turnover(self.previous_weights.get(key) or {}, target, prior_outcomes)
+                for key, target in zip(keys, targets)
+            )
+            if any(value is None for value in turns):
+                continue
+            for key, target in zip(keys, targets):
+                self.previous_weights[key] = target
+            portfolios[spec] = {
+                "longs": longs, "shorts": shorts, "long20": long20,
+                "turnovers": turns,
+            }
+        if not portfolios:
+            return
+        self.pending = {
+            "scores": staged["scores"],
+            "entry": entry,
+            "date": staged["date"],
+            "portfolios": portfolios,
+        }
 
     def _price(self, symbol, ago):
         window = self.closes.get(symbol)
@@ -235,31 +390,13 @@ class AlphaBatteryMonthly(QCAlgorithm):
         stock = self._returns(symbol, span)
         if stock is None or len(stock) < 60:
             return None
-        peers = industry_returns.get(self.industry.get(symbol))
+        peers = industry_returns.get(symbol)
         if peers is None or len(peers) != len(stock):
-            peers = None
+            return None
         mkt = market[-len(stock):] if len(market) >= len(stock) else None
         if mkt is None:
             return None
-        # Estimation half, measurement half.
-        split = 21
-        est_stock, est_mkt = stock[:-split], mkt[:-split]
-        if len(est_stock) < 40:
-            return None
-        beta_m = _ols(est_stock, est_mkt)
-        beta_i = 0.0
-        if peers is not None:
-            est_peer = peers[:-split]
-            resid = [s - beta_m * m for s, m in zip(est_stock, est_mkt)]
-            peer_resid = [p - beta_m * m for p, m in zip(est_peer, est_mkt)]
-            beta_i = _ols(resid, peer_resid)
-        total = 0.0
-        for index in range(len(stock) - split):
-            expected = beta_m * mkt[index]
-            if peers is not None:
-                expected += beta_i * (peers[index] - beta_m * mkt[index])
-            total += stock[index] - expected
-        return total
+        return _joint_residual_total(stock, mkt, peers, measurement_sessions=21)
 
     def _form_scores(self):
         names = [s for s in self.selected if len(self.closes.get(s, ())) >= 260]
@@ -322,8 +459,12 @@ class AlphaBatteryMonthly(QCAlgorithm):
             multi[symbol] = None if any(p is None for p in parts) else sum(parts) / len(parts)
         raw["MULTI_ALPHA_COMPOSITE"] = multi
 
-        entry = {s: self._price(s, 0) for s in names}
-        self.pending = {"scores": raw, "entry": entry, "date": str(self.Time.date())}
+        self.staged = {
+            "scores": raw,
+            "names": names,
+            "date": str(self.Time.date()),
+            "score_session": self.Time.date(),
+        }
 
     def _index_returns(self, names, count):
         series = []
@@ -345,7 +486,10 @@ class AlphaBatteryMonthly(QCAlgorithm):
         for code, members in buckets.items():
             if len(members) < 3:
                 continue
-            out[code] = self._index_returns(members, count)
+            for symbol in members:
+                peers = [member for member in members if member != symbol]
+                if len(peers) >= 2:
+                    out[symbol] = self._index_returns(peers, count)
         return out
 
     def _settle(self):
@@ -354,56 +498,44 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.pending = None
         outcomes = {}
         for symbol, entry_price in pending["entry"].items():
-            now = self._price(symbol, 0)
-            if entry_price and now and entry_price > 0:
+            now = self.terminal_prices.get(symbol, self._price(symbol, 0))
+            if entry_price and now is not None and entry_price > 0:
                 outcomes[symbol] = now / entry_price - 1.0
         if len(outcomes) < MIN_NAMES:
-            return
+            self._release_unused_retained()
+            return outcomes
 
-        for spec, scores in pending["scores"].items():
+        for spec, portfolio in pending["portfolios"].items():
+            scores = pending["scores"][spec]
             pairs = [(v, outcomes[s]) for s, v in scores.items()
                      if v is not None and math.isfinite(v) and s in outcomes]
             if len(pairs) < MIN_NAMES:
                 continue
             ic = _spearman(pairs)
-            ranked = sorted(
-                [(v, s) for s, v in scores.items()
-                 if v is not None and math.isfinite(v) and s in outcomes],
-                key=lambda p: p[0], reverse=True)
-            cut = max(1, int(round(len(ranked) * DECILE)))
-            longs = [s for _, s in ranked[:cut]]
-            shorts = [s for _, s in ranked[-cut:]]
-            quint = max(1, int(round(len(ranked) * QUINTILE)))
-            long20 = [s for _, s in ranked[:quint]]
+            longs = portfolio["longs"]
+            shorts = portfolio["shorts"]
+            long20 = portfolio["long20"]
+            if any(symbol not in outcomes for symbol in longs + shorts + long20):
+                continue
 
             long_ret = sum(outcomes[s] for s in longs) / len(longs)
             short_ret = sum(outcomes[s] for s in shorts) / len(shorts)
             long20_ret = sum(outcomes[s] for s in long20) / len(long20)
 
-            weights = {s: 0.5 / len(longs) for s in longs}
-            for s in shorts:
-                weights[s] = weights.get(s, 0.0) - 0.5 / len(shorts)
-            turnover = self._turnover(spec, weights, outcomes)
-
             self.results.setdefault(spec, []).append(
-                (pending["date"], ic, long_ret, short_ret, long20_ret, turnover, len(pairs))
+                (pending["date"], ic, long_ret, short_ret, long20_ret,
+                 portfolio["turnovers"][0], portfolio["turnovers"][1],
+                 portfolio["turnovers"][2], len(pairs))
             )
+        self._release_unused_retained()
+        return outcomes
 
-    def _turnover(self, spec, weights, outcomes):
-        """Drift-aware one-way turnover (Method V2 section 1.2)."""
-        previous = self.previous_weights.get(spec) or {}
-        self.previous_weights[spec] = weights
-        if not previous:
-            return 1.0
-        grown = {}
-        for symbol, weight in previous.items():
-            grown[symbol] = weight * (1.0 + outcomes.get(symbol, 0.0))
-        gross = sum(abs(v) for v in grown.values())
-        target_gross = sum(abs(v) for v in previous.values()) or 1.0
-        if gross > 0:
-            grown = {s: v / gross * target_gross for s, v in grown.items()}
-        names = set(grown) | set(weights)
-        return 0.5 * sum(abs(weights.get(n, 0.0) - grown.get(n, 0.0)) for n in names)
+    def _release_unused_retained(self):
+        needed = set(self.pending.get("entry", {})) if self.pending else set()
+        for symbol in list(self.retained):
+            if symbol not in needed and symbol not in self.in_universe:
+                self.RemoveSecurity(symbol)
+                self.retained.remove(symbol)
 
     def OnEndOfAlgorithm(self):
         self.Log(f"=== ALPHA BATTERY MONTHLY | universe={ACTIVE_UNIVERSE} ===")
@@ -420,15 +552,20 @@ class AlphaBatteryMonthly(QCAlgorithm):
         # eight. The limit is on total log volume, so shortening each line
         # is what buys back the lost dates: the packed-by-date version
         # still lost 7 of 142, which DATES| made visible.
-        order = sorted(self.results)
+        order = list(SPECIFICATIONS)
+        missing = [spec for spec in order if spec not in self.results]
+        if missing:
+            self.Error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
+            return
         index_of = {spec: i for i, spec in enumerate(order)}
         by_date = {}
         for spec, rows in self.results.items():
-            for date, ic, lr, sr, l20, turn, n in rows:
+            for date, ic, lr, sr, l20, turn_ls, turn_l10, turn_l20, n in rows:
                 by_date.setdefault(date, []).append(
                     f"{index_of[spec]}~{'' if ic is None else round(ic, 5)}~"
                     f"{round(lr, 6)}~{round(sr, 6)}~{round(l20, 6)}~"
-                    f"{round(turn, 4)}~{n}"
+                    f"{round(turn_ls, 4)}~{round(turn_l10, 4)}~"
+                    f"{round(turn_l20, 4)}~{n}"
                 )
         self.Log(f"SPECS|{'|'.join(order)}")
         self.Log(f"DATES|{len(by_date)}")
@@ -436,15 +573,3 @@ class AlphaBatteryMonthly(QCAlgorithm):
             # Date compressed to YYYYMM; the cadence is monthly.
             self.Log(f"ROW|{date.replace('-', '')[:6]}|" + "|".join(by_date[date]))
         self.Log(f"orders placed: {self.Transactions.OrdersCount}")
-
-
-def _ols(y, x):
-    """Slope of y on x through the origin-adjusted means."""
-    n = len(x)
-    if n < 5:
-        return 0.0
-    mx = sum(x) / n
-    my = sum(y) / n
-    num = sum((a - mx) * (b - my) for a, b in zip(x, y))
-    den = sum((a - mx) ** 2 for a in x)
-    return 0.0 if den <= 0 else num / den

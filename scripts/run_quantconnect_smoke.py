@@ -108,11 +108,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  project id {project_id}", flush=True)
 
     print(f"uploading {ENTRY_FILE}...", flush=True)
-    try:
-        client.update_file(project_id, ENTRY_FILE, source)
-    except QuantConnectError:
-        # A fresh project may not have the file yet; create then.
-        client.create_file(project_id, ENTRY_FILE, source)
+    # projects/create supplies main.py. Do not reinterpret an arbitrary
+    # authentication, network, or service error from update as "file absent"
+    # and issue a second mutation with a different meaning.
+    client.update_file(project_id, ENTRY_FILE, source)
 
     print("compiling...", flush=True)
     compile_record = client.compile_project(project_id)
@@ -156,12 +155,17 @@ def _retarget_window(source: str, start: str | None, end: str | None) -> str:
     Refuses rather than silently running the wrong window: if the constant
     is not found, the algorithm is not the one this driver understands.
     """
+    import datetime
     import re
 
     for name, value in (("START", start), ("END", end)):
         if not value:
             continue
-        year, month, day = (int(part) for part in value.split("-"))
+        try:
+            parsed = datetime.date.fromisoformat(value)
+        except (TypeError, ValueError) as exc:
+            raise SystemExit(f"{name.lower()} must be a real YYYY-MM-DD date") from exc
+        year, month, day = parsed.year, parsed.month, parsed.day
         pattern = rf"^{name} = \(\d+, \d+, \d+\)$"
         replacement = f"{name} = ({year}, {month}, {day})"
         source, count = re.subn(pattern, replacement, source, count=1, flags=re.M)
@@ -170,6 +174,14 @@ def _retarget_window(source: str, start: str | None, end: str | None) -> str:
                 f"could not find a `{name} = (y, m, d)` constant to retarget; "
                 "refusing to run an algorithm whose window is unknown"
             )
+    declared = {}
+    for name in ("START", "END"):
+        match = re.search(rf"^{name} = \((\d+), (\d+), (\d+)\)$", source, flags=re.M)
+        if not match:
+            raise SystemExit(f"could not verify the declared {name} window")
+        declared[name] = datetime.date(*(int(part) for part in match.groups()))
+    if declared["START"] > declared["END"]:
+        raise SystemExit("start must be on or before end")
     return source
 
 

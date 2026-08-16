@@ -24,6 +24,11 @@ LEAN_DIR = Path(__file__).resolve().parents[1] / "research" / "lean"
 # import `AlgorithmImports`. The first name broke collection for the WHOLE
 # suite, not just itself.
 LEAN_FILES = sorted(p for p in LEAN_DIR.glob("*.py") if p.name != "__init__.py")
+RESULT_ALGORITHMS = [
+    LEAN_DIR / "alpha_battery_monthly.py",
+    LEAN_DIR / "alpha_battery_short.py",
+    LEAN_DIR / "universe_benchmark.py",
+]
 
 #: Every LEAN call that can open, close or size a position.
 ORDERING_CALLS = frozenset({
@@ -164,11 +169,38 @@ def test_prices_are_raw_not_split_adjusted():
     assert "DataNormalizationMode.Raw" in text
 
 
+@pytest.mark.parametrize("path", RESULT_ALGORITHMS, ids=lambda p: p.name)
+def test_result_returns_use_split_adjusted_trade_bars(path):
+    """Raw closes belong in the screen, not in return arithmetic."""
+    text = path.read_text(encoding="utf-8")
+    assert "DataNormalizationMode.Adjusted" in text
+    assert "c.Price" in text and "f.Price" in text
+
+
 def test_delistings_are_observed_rather_than_assumed():
     """The entire reason for using QuantConnect. If the algorithm never
     looks at Delistings, a cloud run proves nothing the local run did not."""
     text = SOURCE.read_text(encoding="utf-8")
     assert "Delistings" in text and "DelistingType.Delisted" in text
+
+
+@pytest.mark.parametrize("path", RESULT_ALGORITHMS, ids=lambda p: p.name)
+def test_result_algorithms_use_delisting_outcomes(path):
+    """Smoke coverage is not evidence that result-producing files use deaths."""
+    text = path.read_text(encoding="utf-8")
+    assert "data.Delistings" in text
+    assert "DelistingType.Delisted" in text
+    assert "terminal_prices" in text
+    assert "AddSecurity(symbol, Resolution.Daily)" in text
+
+
+@pytest.mark.parametrize("path", RESULT_ALGORITHMS, ids=lambda p: p.name)
+def test_result_algorithms_stage_the_next_session_entry(path):
+    text = path.read_text(encoding="utf-8")
+    assert "self.staged" in text
+    assert "score_session" in text
+    assert "self.last_session" in text
+    assert "_bind_staged_entry" in text
 
 
 def test_the_declared_window_is_retargeted_not_patched():
@@ -205,3 +237,16 @@ def test_retargeting_refuses_rather_than_running_an_unknown_window():
     with pytest.raises(SystemExit) as excinfo:
         _retarget_window("class Foo:\n    pass\n", "2022-06-01", None)
     assert "refusing" in str(excinfo.value)
+
+
+@pytest.mark.parametrize(
+    ("start", "end", "message"),
+    [("2022-02-30", None, "real YYYY-MM-DD"),
+     ("2024-01-01", "2023-01-01", "on or before")],
+)
+def test_retargeting_refuses_invalid_or_reversed_dates(start, end, message):
+    from scripts.run_quantconnect_smoke import _retarget_window
+
+    source = (LEAN_DIR / "universe_smoke.py").read_text(encoding="utf-8")
+    with pytest.raises(SystemExit, match=message):
+        _retarget_window(source, start, end)

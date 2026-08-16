@@ -42,7 +42,8 @@ class UniverseBenchmark(QCAlgorithm):
         self.selection_month = None
         self.scored_month = None
         self.selected = []
-        self.last_price = {}
+        self.closes = {}
+        self.entry = {}
         self.rows = []
 
     def _coarse(self, coarse):
@@ -76,18 +77,31 @@ class UniverseBenchmark(QCAlgorithm):
         return chosen
 
     def OnData(self, data):
-        prices = {s: float(data.Bars[s].Close) for s in data.Bars.Keys}
+        # Mirrors the battery's proven structure: prices accumulate in a
+        # window, and a month's return is measured against the entry price
+        # recorded at the previous scoring. The first version kept a bare
+        # `last_price` dict updated inside the monthly branch, and produced
+        # DATES|0 on a run that processed 31.9 million data points -- a
+        # silent empty result rather than an error. Reusing the code path
+        # that is known to work is cheaper than debugging a second one.
+        for symbol in list(data.Bars.Keys):
+            self.closes[symbol] = float(data.Bars[symbol].Close)
+
         month = (self.Time.year, self.Time.month)
-        if self.scored_month != month and self.selection_month == month:
-            self.scored_month = month
-            names = [s for s in self.selected if s in prices and s in self.last_price]
-            if len(names) >= MIN_NAMES:
-                rets = [prices[s] / self.last_price[s] - 1.0
-                        for s in names if self.last_price[s] > 0]
-                if rets:
-                    self.rows.append(
-                        (str(self.Time.date()), sum(rets) / len(rets), len(rets)))
-            self.last_price = dict(prices)
+        if self.scored_month == month or self.selection_month != month:
+            return
+        self.scored_month = month
+
+        if self.entry:
+            rets = []
+            for symbol, entry_price in self.entry.items():
+                now = self.closes.get(symbol)
+                if now and entry_price and entry_price > 0:
+                    rets.append(now / entry_price - 1.0)
+            if len(rets) >= MIN_NAMES:
+                self.rows.append(
+                    (str(self.Time.date()), sum(rets) / len(rets), len(rets)))
+        self.entry = {s: self.closes[s] for s in self.selected if s in self.closes}
 
     def OnEndOfAlgorithm(self):
         self.Log(f"=== UNIVERSE BENCHMARK | universe={ACTIVE_UNIVERSE} ===")

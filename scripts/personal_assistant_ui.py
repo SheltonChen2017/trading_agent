@@ -64,9 +64,8 @@ from assistant.allocation_proposals import (
 )
 from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
 from assistant.rebalance_trim import (
+    classify_overweight_sleeves as _classify_rebalance_overweight,
     generate_trim_proposal,
-    overweight_sleeves as _rebalance_overweight_sleeves,
-    untrimmable_overweight_sleeves as _rebalance_untrimmable_overweight,
 )
 from assistant.rebalance_steering import (
     eligible_sleeves as _rebalance_eligible_sleeves,
@@ -4106,16 +4105,15 @@ if page == "Portfolio Rebalancing":
             "the sleeve, ticker, amount, and lot strategy."
         )
 
-        _rb_over = _rebalance_overweight_sleeves(_rb_report)
+        _rb_over_groups = _classify_rebalance_overweight(_rb_report)
+        _rb_over = _rb_over_groups.trimmable
         if not _rb_over:
             # An empty trimmable list has two very different causes,
             # and reporting the wrong one contradicts the breach count
             # in the headline above: a reader told "no sleeve is above
             # its upper band" while the page also reports six breaches
             # has to conclude one of the two is broken.
-            _rb_over_untrimmable = _rebalance_untrimmable_overweight(
-                _rb_report
-            )
+            _rb_over_untrimmable = _rb_over_groups.untrimmable
             if _rb_over_untrimmable:
                 _rb_names = ", ".join(
                     SLEEVE_LABELS.get(s, s) for s in _rb_over_untrimmable
@@ -4127,8 +4125,8 @@ if page == "Portfolio Rebalancing":
                     "either one: cash is not a holding, and the residual "
                     "is the set of positions your profile does not "
                     "describe -- absence from the profile is never a "
-                    "reason to sell. Every sleeve the profile DOES "
-                    "describe is inside or below its band."
+                    "reason to sell. Every sleeve this workflow is allowed "
+                    "to trim is inside or below its band."
                 )
             else:
                 st.info(

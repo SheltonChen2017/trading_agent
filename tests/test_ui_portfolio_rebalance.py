@@ -245,18 +245,6 @@ def test_nothing_is_retained_in_session_state_between_reruns(_offline):
     assert not retained, retained
 
 
-def test_feasibility_is_separate_from_status_and_readable_without_scrolling():
-    """REBAL1CR-001 and its follow-up.
-
-    Feasibility must not occupy Status, or it hides the drift the page
-    exists to show. It must also not depend on the reader reaching the last
-    of nine columns: the owner reported the column simply was not reachable,
-    with no horizontal scrollbar, so the one fact saying whether the targets
-    can be met at all was unreadable in the real app. It is now stated in
-    full below the table, where width cannot hide it.
-    """
-
-
 def test_the_drift_table_keeps_status_and_a_reachable_column(_offline):
     app = _rebalancing()
     assert not app.exception, app.exception
@@ -266,26 +254,50 @@ def test_the_drift_table_keeps_status_and_a_reachable_column(_offline):
     assert "Reachable" in columns, columns
 
 
-def test_feasibility_is_stated_below_the_table_whatever_the_width(_offline):
-    """The width-independent statement, which is what the owner actually
-    reads. With the approved profile and the active policy every target is
-    reachable, so the page must say so positively rather than leaving the
-    reader to infer it from an absent warning."""
-    rendered = _text(_rebalancing())
-    assert (
-        "Every sleeve target is reachable under the active policy" in rendered
-        or "TARGETS NOT REACHABLE UNDER THE ACTIVE POLICY" in rendered
-    ), rendered[-600:]
-
-def test_an_unreachable_target_is_named_in_full_below_the_table(
+def test_reachable_targets_are_stated_below_the_table_whatever_the_width(
     _offline, monkeypatch
 ):
-    """The conflict branch, driven through the real conflict rule.
+    """The width-independent statement, which is what the owner actually
+    reads. Force a known permissive policy so this test proves the positive
+    branch on every computer, independent of an ignored personal policy."""
+    import dataclasses
+    import assistant.policy as policy_module
 
-    The operational policy caps total exposure at 50%, against a profile
-    whose invested target is 90%. Under that policy the targets are not
-    reachable, and the page must SAY SO in full text -- sleeve and reason --
-    rather than only in a table column that a narrow window truncates.
+    _real = policy_module.load_policy
+
+    def _permissive(*args, **kwargs):
+        return dataclasses.replace(
+            _real(*args, **kwargs),
+            max_total_exposure_pct=1.0,
+            max_position_pct=1.0,
+            max_leveraged_etf_pct=1.0,
+            min_cash_reserve_pct=0.0,
+        )
+
+    monkeypatch.setattr(policy_module, "load_policy", _permissive)
+    rendered = _text(_rebalancing())
+    assert "Every sleeve target is reachable under the active policy" in rendered
+    assert "TARGETS NOT REACHABLE UNDER THE ACTIVE POLICY" not in rendered
+
+@pytest.mark.parametrize(
+    ("policy_field", "policy_value", "reason", "sleeve_label"),
+    [
+        ("max_total_exposure_pct", 0.50, "total-exposure cap", "Growth"),
+        (
+            "max_leveraged_etf_pct", 0.10, "leveraged-ETF cap",
+            "Leveraged reinvestment",
+        ),
+        ("min_cash_reserve_pct", 0.15, "minimum cash reserve", "Cash"),
+        ("max_position_pct", 0.01, "position-cap capacity", "Growth"),
+    ],
+)
+def test_each_unreachable_target_reason_is_named_below_the_table(
+    _offline, monkeypatch, policy_field, policy_value, reason, sleeve_label
+):
+    """Drive all four conflict rules through the real report and UI.
+
+    Each case starts from a permissive policy, then tightens one constraint,
+    so the named reason cannot come from a machine-local personal policy.
     """
     import dataclasses
     import assistant.policy as policy_module
@@ -293,23 +305,36 @@ def test_an_unreachable_target_is_named_in_full_below_the_table(
     _real = policy_module.load_policy
 
     def _tight(*args, **kwargs):
+        replacements = {
+            "max_total_exposure_pct": 1.0,
+            "max_position_pct": 1.0,
+            "max_leveraged_etf_pct": 1.0,
+            "min_cash_reserve_pct": 0.0,
+        }
+        replacements[policy_field] = policy_value
         return dataclasses.replace(
-            _real(*args, **kwargs), max_total_exposure_pct=0.50
+            _real(*args, **kwargs), **replacements,
         )
 
     monkeypatch.setattr(policy_module, "load_policy", _tight)
-    rendered = _text(_rebalancing())
+    app = _rebalancing()
+    rendered = _text(app)
     assert "TARGETS NOT REACHABLE UNDER THE ACTIVE POLICY" in rendered
-    assert "total-exposure cap" in rendered, rendered[-800:]
+    assert reason in rendered, rendered[-800:]
     # Naming the sleeve is load-bearing: the total-exposure conflict
     # applies to EVERY funded sleeve, so an unlabelled list is the same
     # sentence repeated with no way to tell which sleeve it is about.
-    # "**Growth**" also distinguishes this block from the raw-key
-    # disclosure warning ("growth: ...") the report already emits.
-    assert "**Growth**" in rendered, rendered[-800:]
+    # Markdown emphasis also distinguishes this block from the raw-key
+    # disclosure warning (for example, "growth: ...") already emitted.
+    assert f"**{sleeve_label}**" in rendered, rendered[-800:]
     assert (
         "Every sleeve target is reachable" not in rendered
     ), "the positive statement must not appear alongside a conflict"
+
+    table = app.dataframe[0].value
+    records = table.to_dict("records") if hasattr(table, "to_dict") else table
+    row = next(record for record in records if record["Sleeve"] == sleeve_label)
+    assert row["Reachable"] == "no"
 
 
 def test_the_breach_headline_counts_every_band_breach(_offline):
@@ -530,8 +555,7 @@ def test_the_trim_refusal_never_contradicts_the_breach_headline(
     """
     import assistant.context_builder as context_builder
     from assistant.rebalance_trim import (
-        overweight_sleeves,
-        untrimmable_overweight_sleeves,
+        classify_overweight_sleeves,
     )
 
     real_builder = context_builder.build_portfolio_snapshot
@@ -561,16 +585,22 @@ def test_the_trim_refusal_never_contradicts_the_breach_headline(
     )
     # Guard against a vacuous pass: the book must really be over its bands
     # in exactly the untrimmable places.
-    assert not overweight_sleeves(report)
-    assert untrimmable_overweight_sleeves(report) == [
+    groups = classify_overweight_sleeves(report)
+    assert groups.trimmable == ()
+    assert groups.untrimmable == (
         "cash", "other_unassigned",
-    ], untrimmable_overweight_sleeves(report)
+    ), groups.untrimmable
 
     assert "No sleeve is above its upper band" not in rendered, (
         "the page denies a breach it reports in its own headline"
     )
     assert "Nothing here can be trimmed" in rendered, rendered[-900:]
     assert "absence from the profile is never a reason to sell" in rendered
+    assert "Every sleeve the profile DOES describe" not in rendered
+    assert (
+        "Every sleeve this workflow is allowed to trim is inside or below "
+        "its band" in rendered
+    )
     assert not [b for b in app.button if b.key == "rb_trim_check"]
 
 
@@ -589,8 +619,7 @@ def test_a_book_with_nothing_overweight_still_says_exactly_that(
     """
     import assistant.context_builder as context_builder
     from assistant.rebalance_trim import (
-        overweight_sleeves,
-        untrimmable_overweight_sleeves,
+        classify_overweight_sleeves,
     )
 
     real_builder = context_builder.build_portfolio_snapshot
@@ -627,10 +656,10 @@ def test_a_book_with_nothing_overweight_still_says_exactly_that(
     report = evaluate_portfolio_rebalance(
         _on_target([], 0.0), OWNER_APPROVED_PROFILE, policy=load_policy()
     )
-    assert not overweight_sleeves(report)
-    assert not untrimmable_overweight_sleeves(report), (
-        "fixture is no longer on target: "
-        + str(untrimmable_overweight_sleeves(report))
+    groups = classify_overweight_sleeves(report)
+    assert groups.trimmable == ()
+    assert groups.untrimmable == (), (
+        "fixture is no longer on target: " + str(groups.untrimmable)
     )
 
     assert "No sleeve is above its upper band" in rendered, rendered[-900:]

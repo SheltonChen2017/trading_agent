@@ -5,8 +5,15 @@ Author: Claude
 Specification: `docs/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md` (frozen
 and committed as `db0045a` before the run)
 Runner: `scripts/run_alpha_battery_20260815.py`
-Status: **Exploratory. No finding is confirmed. Nothing here authorizes
-any trade, allocation, or policy change.**
+Status: **INVALIDATED BY INDEPENDENT REVIEW (2026-08-16).** The submitted
+bootstrap used 2,000 draws, whose smallest attainable p-value is 1/2,001 =
+0.000500 -- above the declared 0.000476 threshold. The test therefore could
+not possibly clear its own gate. Long-short turnover also compared only the
+set of held names, so a name moving directly from long to short registered no
+trade and cost was understated. Point estimates remain a preserved record of
+the original exploratory run, but its significance and net-cost conclusions
+must not be used. A clean rerun is required. Nothing here authorizes any trade,
+allocation, or policy change.
 
 ## Headline
 

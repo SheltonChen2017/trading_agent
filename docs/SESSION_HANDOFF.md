@@ -1,8 +1,8 @@
-# Session handoff — REBAL-3V and REBAL-3W independently reviewed
+# Session handoff — alpha battery independently reviewed and invalidated
 
-Prepared: 2026-08-15 by Claude after both owner-reported rounds merged;
-updated 2026-08-16 by Codex after independent commit-by-commit review and
-product/test correction.
+Prepared: 2026-08-16 by Codex after independent commit-by-commit review of
+Claude's merged alpha-battery and three-universe research rounds, product/test
+correction, and a full semantic repair of this handoff.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -12,11 +12,14 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 2. `docs/ACTION_PLAN_2026-08-02.md`
 3. `docs/REBAL1_MILESTONE_PLAN.md`
 4. `docs/REVIEW_2026-08-15_REBAL1_STAGE3.md`
-5. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-6. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-7. `docs/MANDATE.md` (§2, §4, §6)
-8. `docs/OPERATIONAL_FACTS.md`
-9. `docs/OPERATIONS_RUNBOOK.md`
+5. `docs/REVIEW_2026-08-16_ALPHA_BATTERY.md`
+6. `docs/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md`
+7. `docs/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md`
+8. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+9. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+10. `docs/MANDATE.md` (§2, §4, §6)
+11. `docs/OPERATIONAL_FACTS.md`
+12. `docs/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -25,25 +28,24 @@ operator-database mutation, or scheduled-task change.
 ## 1. Exact repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- `main` and `origin/main`: `006a9d5a887f6fc6da8a4978e1ac2680e941c783`,
-  after PRs #231 through #233
-  merged both owner-reported rounds and their post-merge records.
-- Reviewed literal range: base
-  `84e73afafbdff62fb7a06c1b587b6a1b258bc253` through exact submitted head
-  `006a9d5`; all eight commits received an explicit disposition.
-- Review branch: `codex/review-rebal3v3w-20260815`, created from the fetched
-  remote head. Product/test correction:
-  `3a506ae39f7186fc065d04cd60beedeb4c4e2fbb`.
-- **Both rounds are accepted after correction. The review branch and its
-  correction are local-only, not pushed or merged.** Another computer cannot
-  retrieve them until the owner separately authorizes a push.
-- **Every feature branch has been deleted, locally and on the remote**,
-  each after confirming with `git merge-base --is-ancestor` that its
-  commits are reachable from the surviving ref. `7e9d005`, `a0a657b`,
-  `bead8ac` and `43b29df` are all in `main`.
-- The product correction is followed by the separate documentation commit
-  containing this handoff, as required by the review process. Recheck the
-  review worktree's `HEAD` and status before resuming.
+- `main` and `origin/main`: `3d58f6b097610cb5df1f088e8fe0308ffcbf8161`
+  at review start (PR #236).
+- PR #234 first merged the prior Codex REBAL-3V/3W review through
+  `f63fe2cb30aa904dec131962a133e1058185427c`; correction `3a506ae` and records
+  `dae34d0` are therefore pushed, fetchable, and in `main`.
+- Claude's pushed branch `origin/user/claude/alpha-battery-20260815` is exact
+  head `046afc3ee39c0fff9c916e88657c43a1b5f4e5f1`; PR #236 merged it at
+  `3d58f6b`.
+- Current reviewed literal range: `f63fe2c..3d58f6b`. It contains, in order,
+  `db0045a`, `4de88d0`, `046afc3`, and merge `3d58f6b`; all four have an
+  explicit disposition in `docs/REVIEW_2026-08-16_ALPHA_BATTERY.md`.
+- Current review branch: `codex/review-alpha-battery-20260816`, created from
+  exact fetched `origin/main`. Product/test correction:
+  `124192ff3e29c3fc62f0c9e8bf95b9aadf216915`; its separate records commit
+  follows. **This review branch is local-only and unpushed.**
+- The submitted alpha result and audit artifacts are **invalidated pending a
+  clean rerun**. They are preserved with invalidation banners, not promoted to
+  the research registry or Feature Milestone Record.
 - The operational checkout remains separate and frozen at `752d3b7` in
   active `paper-epoch-005`. No development commit has been copied there.
 
@@ -61,7 +63,8 @@ Earlier history that remains load-bearing for anyone resuming:
 Sections 2 through 7c below describe the Stage 3 chain that is now merged
 into `main`. They are retained as the record of how that work was reviewed;
 sections 7d through 7f describe the two owner-reported rounds and their merge;
-section 7g records the completed independent review.
+section 7g records their completed independent review; section 7h records the
+current alpha review and supersedes every earlier current-state statement.
 
 ## 2. Review outcome and commit dispositions
 
@@ -477,46 +480,78 @@ suite **4,051 passed / 0 failed / 25 known dependency warnings in 719.51
 seconds**. Final active-document guards: **30 passed**. Compilation and
 `git diff --check` are clean.
 
-**Availability:** correction `3a506ae` and the documentation commit containing
-this handoff are local-only. They have not been pushed, merged, deployed, or
-made fetchable from another computer. No push is authorized by the review
-request.
+**Post-merge availability correction (2026-08-16):** correction `3a506ae` and
+records `dae34d0` were pushed and merged by PR #234 at `f63fe2c`. The earlier
+local-only/shared-checkout warning is closed history. Claude's alpha branch was
+subsequently pushed and merged by PR #236 and is the subject of §7h.
 
-**Shared-checkout collision:** while the review was running, another process
-switched and repeatedly advanced the primary checkout on local branch
-`user/claude/alpha-battery-20260815`. Codex did not inspect or review that
-work. The review therefore finished in temporary registered worktree
-`.codex_worktrees/rebal3v3w`, which was removed after the commits were made.
-At close, the primary Claude checkout still reported the same four product/
-test paths corrected by `3a506ae` as modified. Codex did not restore, stage,
-or commit them there because that branch is outside this review and another
-process controls it. Before Claude's branch is committed or pushed, compare
-those paths deliberately with `3a506ae`; do not accidentally mix duplicate
-review edits into unrelated alpha-battery work.
+## 7h. Independent review of the alpha battery (Codex, 2026-08-16)
+
+The review started only after fetching exact pushed `origin/main` head
+`3d58f6b`. Every commit in `f63fe2c..3d58f6b` was reviewed separately:
+
+| Commit | Disposition |
+|---|---|
+| `db0045a` | Accepted after documentation correction. The preregistration genuinely preceded results and retains its conservative denominator, but the implemented bootstrap later could not resolve its gate. |
+| `4de88d0` | Accepted only as an invalidated exploratory record after correction `124192f`. The p-value floor made rejection impossible and set-only turnover understated long/short costs. |
+| `046afc3` | Accepted only as an invalidated exploratory record after correction `124192f`. The claimed point-in-time universe, measured survivorship, residual/industry results, and automatic robustness labels were not valid. |
+| `3d58f6b` | Accepted after product/documentation correction. The merge adds no hidden product resolution, but it left this canonical handoff semantically stale. |
+
+Outcome: **0 P0, 0 P1, 5 closed P2, 2 closed P3, 0 open code
+issue.** Full evidence, reasons, corrections, and verification are in
+`docs/REVIEW_2026-08-16_ALPHA_BATTERY.md`.
+
+Correction `124192f` makes a future run honest: 10,000-draw stationary
+bootstrap resolution can cross the declared threshold; signed-weight turnover
+counts long/short flips; actual SEC filing dates control fact availability;
+unadjusted closes drive price, ADV, and market-cap screens while adjusted
+closes remain return inputs; membership schema 2 prevents reuse of the bad
+cache; candidate-filer coverage is not called survivorship loss; unavailable
+point-in-time industry inputs refuse instead of using each ticker's final size;
+and near-zero broad results cannot be labelled robust.
+
+The historical Markdown/JSON results are not silently recalculated. They carry
+explicit invalidation banners and remain audit history. A new result requires a
+clean schema-2 universe rebuild and a preregistered rerun. Even then the current
+ticker map, yfinance history, absent delisted returns, absent historical venue/
+security type, and absent point-in-time industry classification keep the work
+exploratory and non-point-in-time. No result was added to
+`assistant/research_findings.json` or `docs/FEATURE_MILESTONE_RECORD.md`.
+
+Validation in the repository `.venv` (Python 3.13.14, Windows): five focused
+regressions failed red on the submitted implementation; corrected research/
+backtest/cross-sectional set **112 passed**; reviewer file **10 passed**;
+active-document guards **30 passed**; final full suite **4,061 passed / 0
+failed / 25 known dependency warnings in 717.98 seconds**. Full compilation,
+all three edited JSON artifact parses, and `git diff --check` are clean.
 
 ## 8. What is next
 
 1. The owner may inspect local review branch
-   `codex/review-rebal3v3w-20260815` and separately authorize a push. Until
-   then, `3a506ae` and the records commit are not available by fetch and must
-   not be described as merged.
-2. The owner has completed steps 1 and 2 of the dev-app walkthrough; Stage 2
+   `codex/review-alpha-battery-20260816` and separately authorize a push.
+   Until then, `124192f` and this records commit are not fetchable elsewhere
+   and must not be described as merged.
+2. Do not treat either committed alpha artifact as evidence. If the owner
+   chooses to continue this line, delete/rebuild the external cache outside
+   Git under membership schema 2, freeze the rerun spec, and produce a new
+   artifact; do not overwrite or rehabilitate the invalidated historical run.
+3. The owner has completed steps 1 and 2 of the dev-app walkthrough; Stage 2
    steering is confirmed working. Step 3 is in progress against a COPY of
    the development database at
    `data/dev_scratch_withfills.db` with the kill switch engaged. That copy
    carries 108 proposals and 72 broker order events across 17 tickers, all
    buys, so real journaled lots exist for JEPI, JEPQ, NVDY, AVGO, MSFT and
    NVDL. The dev app must be restarted to pick up these rounds.
-3. **The remaining test gap is unchanged:** no test clicks the Streamlit
+4. **The remaining REBAL test gap is unchanged:** no test clicks the Streamlit
    trim button through to a saved proposal. Everything below that seam is
    now covered end to end against real journaled fills.
-4. REBAL-1 has no Stage 4 in the adopted plan. Any new rebalancing feature
+5. REBAL-1 has no Stage 4 in the adopted plan. Any new rebalancing feature
    needs a new owner-approved plan and scope.
-5. Resolve whether the 60-day epoch-005 hold means calendar days (roughly
+6. Resolve whether the 60-day epoch-005 hold means calendar days (roughly
    43 weekday observations) or 60 captured market sessions.
-6. The SET-1 design question remains open: whether strict whole-share mode
+7. The SET-1 design question remains open: whether strict whole-share mode
    should allow a fractional sell only when it closes an entire position.
-7. `TRADE1CR-002` remains open and unscheduled: date-dependent fixtures in
+8. `TRADE1CR-002` remains open and unscheduled: date-dependent fixtures in
    `tests/test_strategy_proposals_generic.py` can fail between roughly
    00:00 and 09:30 ET.
 
@@ -547,24 +582,24 @@ or roll an epoch without a new explicit owner instruction.
 ## 9. Resume prompt
 
 ```text
-Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md, docs/REBAL1_MILESTONE_PLAN.md
-and docs/SESSION_HANDOFF.md. Codex independently reviewed every commit in
-84e73af..006a9d5 from fetched origin/main, including merge commits, and
-accepted REBAL-3V and REBAL-3W after correction. Review branch
-codex/review-rebal3v3w-20260815 is LOCAL ONLY. Product/test correction
-3a506ae replaces the ambiguous two-helper overweight API with one result
-containing both groups, fixes a false sentence about overweight cash, removes
-one no-op pytest, and deterministically covers the positive feasibility case
-plus all four real conflict rules. No threshold, sizing, tax-lot, refusal
-direction, proposal, approval, execution, broker, policy, schema, epoch, or
-deployment contract changed. All eight dispositions and five closed P3s are
-in docs/REVIEW_2026-08-15_REBAL3V_REBAL3W_INDEPENDENT.md. Corrected focused:
-192 passed; final full suite: 4,051 passed with 25 known warnings; compile,
-document, and diff checks are clean. The primary shared checkout moved to an
-unreviewed local Claude alpha-battery branch; do not treat its accidental
-.codex_worktrees/rebal3v3w Git link as product content. paper-epoch-005 runs
-unchanged for 60 days and the operational my_policy.json stays 0.50/0.05.
-Do not push, merge, deploy, roll the epoch, mutate the operator database,
-submit orders, access funded accounts, begin M4, or enable live trading
-without explicit owner authorization.
+Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
+docs/REVIEW_2026-08-16_ALPHA_BATTERY.md and docs/SESSION_HANDOFF.md. Main and
+origin/main were exact `3d58f6b` at review start. PR #234 already merged the
+prior REBAL-3V/3W correction; PR #236 merged Claude's alpha work. Codex
+reviewed every commit in `f63fe2c..3d58f6b`, including the merge, on LOCAL
+ONLY branch `codex/review-alpha-battery-20260816`. Correction `124192f` closes
+five P2 and two P3 findings. The submitted alpha and universe results are
+INVALIDATED pending a clean rerun: the bootstrap could not cross its own
+threshold, long/short flips recorded no turnover, market caps mixed adjusted
+prices with raw shares, SEC availability was guessed, the coverage gap was
+miscalled survivorship loss, latest size leaked into historical industry
+scores, and near-zero results were called robust. Corrected code uses schema 2,
+actual filing dates, raw screening prices, signed-weight turnover, sufficient
+bootstrap resolution, and refuses missing point-in-time industry inputs and
+old caches. No result is confirmed or promoted. The review branch and records
+commit are unpushed. paper-epoch-005 runs unchanged at `752d3b7` for 60 days;
+operational `my_policy.json` stays 0.50/0.05. Do not push, merge, deploy, roll
+the epoch, mutate the operator database, submit orders, access funded
+accounts, begin M4, or enable live trading without explicit owner
+authorization.
 ```

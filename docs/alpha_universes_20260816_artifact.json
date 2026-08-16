@@ -1,10 +1,12 @@
 {
+  "independent_review_status": "invalidated_2026-08-16_pending_clean_rerun",
+  "independent_review_reason": "non-point-in-time and internally inconsistent universe construction, future-derived size proxy, insufficient bootstrap resolution, and understated long-short turnover",
   "specification": "docs/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md",
   "declared_looks": 63,
   "bonferroni_threshold": 0.0007936507936507937,
   "cumulative_looks": 168,
   "cumulative_threshold": 0.00029761904761904765,
-  "point_in_time_membership": true,
+  "point_in_time_membership": false,
   "point_in_time_prices": false,
   "survivorship_bias": "membership includes only companies with a current ticker; delisted names have no price history",
   "results": {

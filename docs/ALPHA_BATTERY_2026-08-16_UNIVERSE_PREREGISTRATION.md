@@ -165,3 +165,19 @@ corrupted adjustment poisons every window that spans it. Portfolio
 outcomes are additionally winsorised within each date; **rank IC is
 deliberately computed on raw outcomes**, since winsorising before ranking
 would misstate the ordering the signal actually produced.
+
+---
+
+## 7. Independent-review addendum (2026-08-16; not part of the frozen spec)
+
+The implementation did not satisfy the document's “point-in-time universe”
+claim. SEC facts were made available on a guessed date instead of their actual
+filing date; adjusted prices were incompatible with raw share counts for
+market-cap screens; current ticker identity remained; and the reported 70.2%
+number was a current-ticker/price coverage gap among candidate filers, not the
+fraction of otherwise-eligible securities lost to survivorship. In addition,
+the latest size bucket was applied to all history for the residual and
+industry-adjusted signals. The committed results and audit artifacts are
+invalidated. Reviewed code now refuses the industry-dependent specifications
+until point-in-time industry data exists and labels the broader panel
+non-point-in-time; all results require a clean rerun.

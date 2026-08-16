@@ -144,24 +144,136 @@ Point 5 is the one I would attack first. **A quality factor evaluated on a
 universe that structurally excludes the companies whose fundamentals
 collapsed is measuring quality among survivors of a fundamentals screen.**
 
-## 6. Not run
+## 6. Short-horizon family: statistically real, commercially dead
 
-- **ALPHA 007 and 008 (PEAD)**, which need an event study keyed to
-  announcement dates rather than a cross-sectional panel. Declared in the
-  pre-registration as not-run; recorded here again so it is not mistaken
-  for a null.
-- Short-horizon specifications (003, 004, 005, 006) and the equal-weight
-  benchmarks were still queued when this section was written; they appear
-  in section 7 once complete.
+Six runs (three universes x two date windows, merged), **1,221-1,299
+five-day observations** against the monthly family's 142. The extra power
+changes the picture completely.
 
-## 7. Long-only, and the benchmark that decides whether it means anything
+| Spec | A IC p | B IC p | C IC p | Clears gate |
+|---|---|---|---|---|
+| INDUSTRY_ADJ_REVERSAL_5D | 0.00015 | 0.00015 | 0.00005 | **all three** |
+| MAX_X_REVERSAL | 0.00005 | 0.00010 | 0.00035 | **all three** |
+| REVERSAL_5D | 0.00035 | 0.00105 | 0.00045 | A only |
+| MAX_20 | 0.181 | 0.0066 | 0.00010 | C only |
+| ABNORMAL_VOLUME_REVERSAL | 0.176 | 0.850 | 0.0217 | none |
 
-Long-only top-decile Sharpe, net of 10bps, ranges 0.65-0.89 across all
-specifications and universes — a range so narrow across signals as strong
-and as null that it suggests they are all measuring the same market
-exposure.
+**And every one of them loses money after costs**, in every universe:
 
-**This cannot be interpreted without the equal-weight universe return**,
-and that comparison is the single most valuable correction the local work
-produced: it turned a 35% CAGR into market beta. The benchmark runs are
-recorded in section 8 when complete.
+| Spec | Turnover | A gross | B gross | C gross | A net10 | B net10 | C net10 |
+|---|---|---|---|---|---|---|---|
+| INDUSTRY_ADJ_REVERSAL_5D | 0.60 | 0.70 | 0.72 | **0.87** | −0.58 | −0.47 | −0.27 |
+| MAX_X_REVERSAL | 0.57 | 0.55 | 0.53 | 0.57 | −0.25 | −0.28 | −0.22 |
+| REVERSAL_5D | 0.61 | 0.48 | 0.48 | 0.48 | −0.35 | −0.34 | −0.34 |
+| ABNORMAL_VOLUME_REVERSAL | 0.77 | −0.12 | 0.05 | 0.36 | −1.58 | −1.60 | −1.39 |
+
+`INDUSTRY_ADJ_REVERSAL_5D` is the cleanest example of the whole battery:
+it clears a multiplicity-corrected gate in **all three universes** on
+~1,250 observations, and it is unprofitable at 10bps everywhere. Its gross
+Sharpe also RISES as the universe broadens (0.70 → 0.72 → 0.87), which is
+the specification's small-cap-dependence warning pattern and is flagged
+as such.
+
+`ABNORMAL_VOLUME_REVERSAL` changes IC sign across universes (−0.0035,
++0.0004, +0.0036): **UNSTABLE**, rejected.
+
+### The MAX effect corrects a local finding
+
+On the local survivor-selected universe, `MAX_20` came out **inverted**
+versus the published effect (Sharpe −0.79, implying lottery stocks
+outperformed), and the local results document argued this was survivorship
+— the high-volatility names that blew up were missing from a universe of
+companies that survived to 2026.
+
+On data that prices delisted companies, `MAX_20` shows **positive IC**
+(+0.006 / +0.011 / +0.016), meaning low-lottery stocks outperform, which
+is the documented direction. **The hypothesis was confirmed by better
+data rather than by argument**, and it is the clearest single demonstration
+in this project that the local universe was distorting results rather than
+merely limiting them.
+
+## 7. The benchmark, and the conclusion it forces
+
+Equal-weight buy-and-hold of the same point-in-time universes, monthly
+rebalance, no costs:
+
+| Universe | CAGR | Sharpe | Max DD |
+|---|---|---|---|
+| A_large | 12.88% | **0.87** | −25.4% |
+| B_core | 16.25% | **0.92** | −30.0% |
+| C_broad | 17.20% | **0.94** | −31.2% |
+
+Best long-only top-decile constructions, net of 10bps:
+
+| | Best spec | Sharpe | CAGR |
+|---|---|---|---|
+| A_large | QUALITY_COMPOSITE / GROSS_PROFITABILITY | 0.79 | ~13% |
+| B_core | QUALITY_COMPOSITE | 0.82 | 13.3% |
+| Short-horizon family (B) | MAX_20 | 0.29 | 2.3% |
+
+**Not one construction beats holding the universe — on either axis.** The
+best long-only Sharpe in the entire battery (0.82) loses to the B_core
+benchmark (0.92), and its CAGR of 13.3% loses to 16.25%. The broadest
+universe has the best benchmark (0.94 Sharpe, 17.20% CAGR), so the
+comparison gets harder, not easier, as the universe widens.
+
+This is the same conclusion the local work reached, now on data that
+prices delisted companies and carries point-in-time fundamentals. The
+local version could be dismissed as an artifact of a survivor-selected
+universe. This one cannot.
+
+The benchmark series covers 155 months against the battery's 142, because
+the battery discards the first year to accumulate the history its
+momentum specifications need. The gap is not large enough to reverse a
+0.10 Sharpe difference, but the comparison is not exactly like-for-like
+and is stated rather than smoothed over.
+
+## 8. What this battery actually established
+
+1. **Several specifications clear a pre-declared, multiplicity-corrected
+   significance gate.** `QUALITY_COMPOSITE` monthly in Universe A;
+   `INDUSTRY_ADJ_REVERSAL_5D` and `MAX_X_REVERSAL` short-horizon in all
+   three universes. This is the first time anything in this project has
+   done that.
+2. **None of them is profitable.** Every long-short construction is
+   negative after costs. Every long-only construction loses to
+   equal-weight buy-and-hold.
+3. **Statistical significance and economic value came apart cleanly**, and
+   the battery is only able to say so because it measured both. Reporting
+   IC alone would have produced a triumphant and false result.
+4. **The momentum family is null on honest data**, correcting a local
+   result that survived costs only because the universe was
+   survivor-selected.
+5. **The MAX effect returns to its published direction**, confirming that
+   the local inversion was survivorship.
+
+**Nothing here is a tradable edge, and nothing here authorizes a trade,
+allocation, policy change, deployment, or epoch action.**
+
+## 9. Not run, and the reasons to doubt what was
+
+**ALPHA 007 and 008 (PEAD) were not run.** They need an event study keyed
+to announcement dates rather than a cross-sectional panel. Declared in the
+pre-registration as not-run; repeated here so it is not mistaken for a
+null result.
+
+Reasons to doubt the significant findings, in the order I would attack
+them:
+
+1. **The fundamentals survivorship hole.** SIVB carried no fundamental
+   data and FRC/SBNY carried `MarketCap == 0` on every appearance, so the
+   three most famous failures of the period were absent from every
+   universe. **A quality factor is precisely the signal that would have
+   ranked them badly, and they are missing.** This is the strongest
+   objection to the `QUALITY_COMPOSITE` result.
+2. **Delisting returns are still not in the portfolio arithmetic**, and
+   the retention probe showed screens eject failing companies before they
+   die. The residual bias flatters every result.
+3. **The p-values are censored at the bootstrap floor** (0.00005 with
+   20,000 draws). Several results sit exactly there.
+4. **Third look at the same hypotheses** (105 + 63 + 135 declared looks).
+   Against the cumulative 303-look threshold (0.000165) the leading
+   results still clear, but a third-look pass deserves discounting.
+5. **Costs are assumptions.** No spread or market-impact data was used;
+   10bps per side is a modelling choice, and the reversal family's
+   verdict is sensitive to it in a way the monthly family's is not.

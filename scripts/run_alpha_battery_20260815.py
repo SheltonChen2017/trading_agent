@@ -13,10 +13,10 @@ ADJUSTED closes, so every artifact is stamped `point_in_time_data=false`.
 Reuses rather than reimplements, per CLAUDE.md section 8:
 
   * per-date Spearman IC and quantile spreads -> ml/evaluation.py
-  * block-bootstrap significance and Bonferroni -> backtest/engine.py
+  * Bonferroni threshold -> backtest/engine.py
 
-Freshly written significance code is exactly what this project's standing
-rule says to distrust, so none is written here.
+The stationary bootstrap below is local research code and is covered by
+focused regression tests. It is not a production evidence primitive.
 """
 from __future__ import annotations
 
@@ -242,7 +242,7 @@ def long_short_returns(
     """
     returns: dict[pd.Timestamp, float] = {}
     turnovers: dict[pd.Timestamp, float] = {}
-    previous: set[str] = set()
+    previous: dict[str, float] | None = None
     for date in dates:
         if date not in scores.index or date not in forwards.index:
             continue
@@ -259,22 +259,39 @@ def long_short_returns(
         if construction == "long_short":
             short_leg = float(fwd[shorts].mean())
             gross = 0.5 * long_leg - 0.5 * short_leg
-            held = set(longs) | set(shorts)
+            weights = {
+                **{ticker: 0.5 / len(longs) for ticker in longs},
+                **{ticker: -0.5 / len(shorts) for ticker in shorts},
+            }
         else:
             gross = long_leg
-            held = set(longs)
+            weights = {ticker: 1.0 / len(longs) for ticker in longs}
         if not math.isfinite(gross):
             continue
-        churn = 1.0 if not previous else len(held - previous) / max(1, len(held))
+        churn = one_way_turnover(previous, weights)
         returns[date] = gross
         turnovers[date] = float(churn)
-        previous = held
+        previous = weights
     return pd.Series(returns).sort_index(), pd.Series(turnovers).sort_index()
 
 
 def net_of_costs(gross: pd.Series, turnover: pd.Series, bps: float) -> pd.Series:
     """Charge both sides of the replaced fraction at each rebalance."""
     return gross - turnover.reindex(gross.index).fillna(1.0) * 2.0 * bps / 10_000.0
+
+
+def one_way_turnover(
+    previous: dict[str, float] | None, current: dict[str, float]
+) -> float:
+    """Half the absolute portfolio-weight change.
+
+    Signed weights preserve long/short side changes. A set comparison would
+    incorrectly report zero turnover when a name flips directly from the
+    long leg to the short leg.
+    """
+    old = previous or {}
+    names = set(old) | set(current)
+    return 0.5 * sum(abs(current.get(name, 0.0) - old.get(name, 0.0)) for name in names)
 
 
 def performance(returns: pd.Series, periods_per_year: float) -> dict[str, float | None]:
@@ -310,7 +327,7 @@ def performance(returns: pd.Series, periods_per_year: float) -> dict[str, float 
     }
 
 
-def stationary_bootstrap_p(returns: pd.Series, draws: int = 2000, seed: int = 20260815) -> float | None:
+def stationary_bootstrap_p(returns: pd.Series, draws: int = 10_000, seed: int = 20260815) -> float | None:
     """Two-sided p-value for a zero mean under a stationary block bootstrap.
 
     Blocks, not i.i.d. draws: overlapping holding periods make adjacent
@@ -318,6 +335,8 @@ def stationary_bootstrap_p(returns: pd.Series, draws: int = 2000, seed: int = 20
     standard error exactly where it matters.
     """
     clean = pd.to_numeric(returns, errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+    if isinstance(draws, bool) or not isinstance(draws, int) or draws < 1:
+        raise BatteryError("draws must be a positive integer")
     n = len(clean)
     if n < 24:
         return None
@@ -325,15 +344,26 @@ def stationary_bootstrap_p(returns: pd.Series, draws: int = 2000, seed: int = 20
     centred = values - values.mean()
     rng = np.random.default_rng(seed)
     block = max(2, int(round(n ** (1 / 3))))
+    restart_probability = 1.0 / block
     observed = abs(values.mean())
     count = 0
-    for _ in range(draws):
-        picks = rng.integers(0, n, size=int(np.ceil(n / block)))
-        sample = np.concatenate([
-            np.take(centred, range(start, start + block), mode="wrap") for start in picks
-        ])[:n]
-        if abs(sample.mean()) >= observed:
-            count += 1
+    # Vectorise across a bounded batch of draws. Materialising all 10,000 x
+    # 4,000-session indices at once is unnecessarily large; looping over every
+    # observation of every draw in Python is unnecessarily slow.
+    completed = 0
+    while completed < draws:
+        batch = min(256, draws - completed)
+        indices = np.empty((batch, n), dtype=np.int32)
+        indices[:, 0] = rng.integers(0, n, size=batch)
+        for position in range(1, n):
+            restart = rng.random(batch) < restart_probability
+            fresh = rng.integers(0, n, size=batch)
+            indices[:, position] = np.where(
+                restart, fresh, (indices[:, position - 1] + 1) % n
+            )
+        sample_means = centred[indices].mean(axis=1)
+        count += int(np.count_nonzero(np.abs(sample_means) >= observed))
+        completed += batch
     return (count + 1) / (draws + 1)
 
 

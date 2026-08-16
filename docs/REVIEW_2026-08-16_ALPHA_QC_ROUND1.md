@@ -27,7 +27,9 @@ slice-only correction was not sufficient: it made residual scores run, but
 the helper labeled the skipped latest month as the 6-1/12-1 measurement
 window. Product correction `8bf8a82` implements the actual formation windows
 with a fixed prior 252-session joint factor fit and replaces the source-text
-guard with behavioral tests.
+guard with behavioral tests. Follow-up correction `56bc86d` also binds every
+deque price to the exact exchange session so a temporary universe exit,
+missing bar, or duplicate slice cannot become a fictitious daily return.
 
 None of the committed cloud artifacts is accepted as usable alpha evidence.
 They remain audit inputs with explicit refusal, unanalysed, unreviewed-code,
@@ -48,8 +50,9 @@ new statistic during this review.
 | AQR1-002 | P2 | Closed in documentation | `docs/alpha-result.md` | R-001/R-002 said runs did not count until a statistic was computed. Method V2 section 1.10 says every real-market run counts. This understated repeated-look exposure and could make later significance gates too permissive. | Five exact committed cloud logs; two short universes expose 40 cells and the accidental monthly A run exposes 40. | Record five run-level looks, 80 emitted cells, and a conservative 428-cell lifetime exposure floor; keep run and cell ledgers separate. | Ledger and implementation-plan consistency review. |
 | AQR1-003 | P2 | Closed in documentation | `docs/alpha-result.md`, committed logs, `scripts/analyse_qc_alpha_battery.py` | The ledger said no base64 decoder existed, named the monthly-B artifact incorrectly, omitted full hashes/statuses, and implied run identity was closed despite absent compile/project IDs. That could cause duplicate decoder work and overstate reproducibility. | The analyser already parses `B64BLOCK`; its round-trip test passes. Actual artifacts/hashes and embedded backtest IDs were independently matched; project/compile IDs remain absent for four entries. | Correct decoder statement, artifact names/line counts/hashes, status vocabulary, exact backtest fields, and `PROVENANCE_INCOMPLETE` labels. | Source/log/hash cross-check without analysing market statistics. |
 | AQR1-004 | P3 | Closed in `8bf8a82` | `tests/test_qc_alpha_battery.py` | The new test asserted source substrings and arithmetic inequality only. It passed while the implementation measured the wrong period. | Reverse reasoning: any implementation containing the two strings passed regardless of output. | Replace it with behavioral 6-1/12-1 tests and fail-closed history/alignment coverage. | The synthetic skipped-month shock would change the old implementation by roughly 21.0 but must contribute zero. |
+| AQR1-005 | P2 | Closed in `56bc86d` | monthly `OnData`, `_price`, `_returns`, and factor-universe construction | Price deques contained values but no dates. A security leaving and later re-entering the universe, missing one bar, or receiving a second same-session slice could make non-adjacent closes look like consecutive daily observations and misalign its stock return from market/industry factors. | Direct state trace: the old code appended before its same-session guard, retained deques after removal, and indexed all names by relative deque offset. | Store matching per-symbol sessions and one distinct global session calendar; append only once per date; return a tail only when every date exactly matches; build the residual factor universe from fully aligned histories. | Behavioral exact/missing/duplicate-session test; focused suite green. |
 
-Priority summary: **0 P0, 0 P1, 3 closed P2, 1 closed P3, 0 open
+Priority summary: **0 P0, 0 P1, 4 closed P2, 1 closed P3, 0 open
 findings.** The corrected monthly algorithm must be counter-reviewed and rerun;
 that external evidence task is not an open code finding.
 
@@ -93,7 +96,8 @@ compile result, branch identity, ordered commits, and remote head.
 ## Required counter-review and rerun
 
 Claude must counter-review the final pushed Codex head, especially AQR1-001's
-252 + formation + 21-session slicing and the look-accounting correction. Only
+252 + formation + 21-session slicing, AQR1-005's exact-session binding, and
+the look-accounting correction. Only
 then may Claude rerun Stage 0 in QC. All A/B/C monthly, short, and matching
 benchmark runs require exact project, compile, backtest, source and artifact
 identity. The pre-existing logs must not be overwritten. The next Claude push

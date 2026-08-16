@@ -728,3 +728,60 @@ def test_execution_allows_a_covered_trim_on_a_partially_covered_book(
     assert "tax-lot coverage" not in str(outcome.error or "").lower(), (
         outcome.error
     )
+
+def test_an_untrimmable_overweight_sleeve_is_reported_separately():
+    """REBAL3V-001. `overweight_sleeves` filters on two independent
+    conditions -- above the band AND trimmable -- so an empty result cannot
+    say which one failed. The owner hit this on a real book: the page
+    reported six breached bands in its headline and, three sections lower,
+    "No sleeve is above its upper band". Both statements cannot be true.
+    """
+    import assistant.context_builder as context_builder
+    from assistant.policy import load_policy
+    from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
+    from assistant.rebalance_profile import OWNER_APPROVED_PROFILE
+    from assistant.rebalance_trim import (
+        overweight_sleeves,
+        untrimmable_overweight_sleeves,
+    )
+
+    # AAPL belongs to no sleeve, so it lands in the residual.
+    snapshot = context_builder.build_portfolio_snapshot(
+        [{
+            "ticker": "AAPL", "shares": 100,
+            "entry_price": 150.0, "current_price": 200.0,
+        }],
+        cash=20_000.0,
+    )
+    report = evaluate_portfolio_rebalance(
+        snapshot, OWNER_APPROVED_PROFILE, policy=load_policy()
+    )
+
+    over = [r.sleeve for r in report.rows if r.band_state == "overweight"]
+    assert over == ["cash", "other_unassigned"], over
+    # Nothing is trimmable, which is correct and must not change...
+    assert overweight_sleeves(report) == []
+    # ...but the reason is retrievable rather than lost.
+    assert untrimmable_overweight_sleeves(report) == [
+        "cash", "other_unassigned",
+    ]
+
+
+def test_nothing_overweight_at_all_stays_distinguishable():
+    """The other cause of an empty trimmable list must stay distinct, or the
+    fix would simply move the false statement to the other case."""
+    import assistant.context_builder as context_builder
+    from assistant.policy import load_policy
+    from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
+    from assistant.rebalance_profile import OWNER_APPROVED_PROFILE
+    from assistant.rebalance_trim import (
+        overweight_sleeves,
+        untrimmable_overweight_sleeves,
+    )
+
+    snapshot = context_builder.build_portfolio_snapshot([], cash=0.0)
+    report = evaluate_portfolio_rebalance(
+        snapshot, OWNER_APPROVED_PROFILE, policy=load_policy()
+    )
+    assert overweight_sleeves(report) == []
+    assert untrimmable_overweight_sleeves(report) == []

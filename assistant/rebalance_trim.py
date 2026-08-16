@@ -162,6 +162,24 @@ def overweight_sleeves(report: RebalanceReport) -> list[str]:
     ]
 
 
+def untrimmable_overweight_sleeves(report: RebalanceReport) -> list[str]:
+    """Sleeves above their upper band edge that this workflow never trims.
+
+    `overweight_sleeves` filters on TWO independent conditions at once --
+    above the band, and trimmable -- so an empty result cannot tell a reader
+    which of them failed. Reporting that as "no sleeve is above its upper
+    band" is false whenever cash or the residual is the sleeve that is over,
+    and it contradicts the breach count on the same page. The two questions
+    are separated here so the refusal can state the true reason.
+    """
+    return [
+        row.sleeve
+        for row in report.rows
+        if row.sleeve in UNTRIMMABLE_SLEEVES
+        and row.band_state == STATUS_OVERWEIGHT
+    ]
+
+
 def _row(report: RebalanceReport, sleeve: str):
     return next((r for r in report.rows if r.sleeve == sleeve), None)
 

@@ -414,7 +414,15 @@ def test_the_trim_section_appears_only_when_a_sleeve_is_overweight(
     )
     app = _rebalancing()
     assert not app.exception, app.exception
-    assert "nothing to trim" in _text(app)
+    rendered = _text(app)
+    # REBAL3V-001: this assertion used to read `"nothing to trim" in
+    # rendered`, which the page satisfied with the sentence "No sleeve
+    # is above its upper band" -- false here, since cash IS above its
+    # band and is merely untrimmable. The test pinned the false
+    # message rather than the true refusal.
+    assert "No sleeve is above its upper band" not in rendered
+    assert "Nothing here can be trimmed" in rendered, rendered[-900:]
+    assert "Cash" in rendered
     assert not [b for b in app.button if b.key == "rb_trim_check"]
 
 
@@ -501,3 +509,130 @@ def test_the_trim_section_says_it_is_the_only_app_originated_sell(_offline):
     rendered = _text(_rebalancing())
     assert "only place in the app where a rebalancing SELL" in rendered
     assert "realized gain before you approve" in rendered
+
+
+def test_the_trim_refusal_never_contradicts_the_breach_headline(
+    _offline, monkeypatch
+):
+    """REBAL3V-001, reported by the owner exercising the development app.
+
+    The page showed "Bands breached: 6" in its headline and, three sections
+    lower, "No sleeve is above its upper band". The second statement was
+    false: cash and the residual WERE above their upper bands, they are
+    simply never trimmable. A reader who notices the contradiction has to
+    decide which half of the page to distrust, and one who does not notice
+    learns something untrue about their own portfolio.
+
+    The book is FORCED to the reported shape -- a residual holding and
+    surplus cash, with every profiled sleeve empty -- rather than assumed,
+    because the sample portfolio's growth sleeve IS trimmably overweight
+    and would make this pass for the wrong reason.
+    """
+    import assistant.context_builder as context_builder
+    from assistant.rebalance_trim import (
+        overweight_sleeves,
+        untrimmable_overweight_sleeves,
+    )
+
+    real_builder = context_builder.build_portfolio_snapshot
+
+    def _residual_only(positions, cash, **kwargs):
+        # AAPL belongs to no sleeve, so it lands in the residual. Both it
+        # and cash sit far above their bands; nothing profiled is over.
+        return real_builder(
+            [{"ticker": "AAPL", "shares": 100,
+              "entry_price": 150.0, "current_price": 200.0}],
+            cash=20_000.0, **kwargs
+        )
+
+    monkeypatch.setattr(
+        context_builder, "build_portfolio_snapshot", _residual_only
+    )
+    app = _rebalancing()
+    assert not app.exception, app.exception
+    rendered = _text(app)
+
+    from assistant.policy import load_policy
+    from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
+    from assistant.rebalance_profile import OWNER_APPROVED_PROFILE
+
+    report = evaluate_portfolio_rebalance(
+        _residual_only([], 0.0), OWNER_APPROVED_PROFILE, policy=load_policy()
+    )
+    # Guard against a vacuous pass: the book must really be over its bands
+    # in exactly the untrimmable places.
+    assert not overweight_sleeves(report)
+    assert untrimmable_overweight_sleeves(report) == [
+        "cash", "other_unassigned",
+    ], untrimmable_overweight_sleeves(report)
+
+    assert "No sleeve is above its upper band" not in rendered, (
+        "the page denies a breach it reports in its own headline"
+    )
+    assert "Nothing here can be trimmed" in rendered, rendered[-900:]
+    assert "absence from the profile is never a reason to sell" in rendered
+    assert not [b for b in app.button if b.key == "rb_trim_check"]
+
+
+
+def test_a_book_with_nothing_overweight_still_says_exactly_that(
+    _offline, monkeypatch
+):
+    """The OTHER cause of an empty trimmable list.
+
+    Separating the two causes is only worth anything if each one keeps its
+    own message. A mutation that reported the untrimmable-sleeve reason for
+    every empty case survived the first version of these tests: it would
+    have told an owner whose book is perfectly on target that cash and the
+    residual are above their bands. That merely moves the false statement
+    from one case to the other.
+    """
+    import assistant.context_builder as context_builder
+    from assistant.rebalance_trim import (
+        overweight_sleeves,
+        untrimmable_overweight_sleeves,
+    )
+
+    real_builder = context_builder.build_portfolio_snapshot
+
+    def _on_target(positions, cash, **kwargs):
+        # Exactly the approved profile: 10/15/40/15/10/10 of a $10,000 book.
+        return real_builder(
+            [
+                {"ticker": "JEPI", "shares": 150, "entry_price": 10.0,
+                 "current_price": 10.0},
+                {"ticker": "MSFT", "shares": 400, "entry_price": 10.0,
+                 "current_price": 10.0},
+                {"ticker": "NVDL", "shares": 150, "entry_price": 10.0,
+                 "current_price": 10.0},
+                {"ticker": "GLD", "shares": 100, "entry_price": 10.0,
+                 "current_price": 10.0},
+                {"ticker": "AAPL", "shares": 100, "entry_price": 10.0,
+                 "current_price": 10.0},
+            ],
+            cash=1_000.0, **kwargs
+        )
+
+    monkeypatch.setattr(
+        context_builder, "build_portfolio_snapshot", _on_target
+    )
+    app = _rebalancing()
+    assert not app.exception, app.exception
+    rendered = _text(app)
+
+    from assistant.policy import load_policy
+    from assistant.portfolio_rebalance import evaluate_portfolio_rebalance
+    from assistant.rebalance_profile import OWNER_APPROVED_PROFILE
+
+    report = evaluate_portfolio_rebalance(
+        _on_target([], 0.0), OWNER_APPROVED_PROFILE, policy=load_policy()
+    )
+    assert not overweight_sleeves(report)
+    assert not untrimmable_overweight_sleeves(report), (
+        "fixture is no longer on target: "
+        + str(untrimmable_overweight_sleeves(report))
+    )
+
+    assert "No sleeve is above its upper band" in rendered, rendered[-900:]
+    assert "Nothing here can be trimmed" not in rendered
+    assert not [b for b in app.button if b.key == "rb_trim_check"]

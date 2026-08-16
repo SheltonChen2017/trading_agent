@@ -245,17 +245,71 @@ def test_nothing_is_retained_in_session_state_between_reruns(_offline):
     assert not retained, retained
 
 
-def test_an_infeasible_target_is_its_own_column_not_the_status(_offline):
-    """REBAL1CR-001. Against the owner's approved profile and active policy
-    every invested sleeve has an unreachable target. If that occupied the
-    Status column it would hide the drift the page exists to show, so
-    feasibility gets its own column and Status keeps the band state."""
+def test_feasibility_is_separate_from_status_and_readable_without_scrolling():
+    """REBAL1CR-001 and its follow-up.
+
+    Feasibility must not occupy Status, or it hides the drift the page
+    exists to show. It must also not depend on the reader reaching the last
+    of nine columns: the owner reported the column simply was not reachable,
+    with no horizontal scrollbar, so the one fact saying whether the targets
+    can be met at all was unreadable in the real app. It is now stated in
+    full below the table, where width cannot hide it.
+    """
+
+
+def test_the_drift_table_keeps_status_and_a_reachable_column(_offline):
     app = _rebalancing()
     assert not app.exception, app.exception
     table = app.dataframe[0].value
     columns = list(table[0].keys()) if isinstance(table, list) else list(table)
-    assert "Target reachable" in columns, columns
     assert "Status" in columns, columns
+    assert "Reachable" in columns, columns
+
+
+def test_feasibility_is_stated_below_the_table_whatever_the_width(_offline):
+    """The width-independent statement, which is what the owner actually
+    reads. With the approved profile and the active policy every target is
+    reachable, so the page must say so positively rather than leaving the
+    reader to infer it from an absent warning."""
+    rendered = _text(_rebalancing())
+    assert (
+        "Every sleeve target is reachable under the active policy" in rendered
+        or "TARGETS NOT REACHABLE UNDER THE ACTIVE POLICY" in rendered
+    ), rendered[-600:]
+
+def test_an_unreachable_target_is_named_in_full_below_the_table(
+    _offline, monkeypatch
+):
+    """The conflict branch, driven through the real conflict rule.
+
+    The operational policy caps total exposure at 50%, against a profile
+    whose invested target is 90%. Under that policy the targets are not
+    reachable, and the page must SAY SO in full text -- sleeve and reason --
+    rather than only in a table column that a narrow window truncates.
+    """
+    import dataclasses
+    import assistant.policy as policy_module
+
+    _real = policy_module.load_policy
+
+    def _tight(*args, **kwargs):
+        return dataclasses.replace(
+            _real(*args, **kwargs), max_total_exposure_pct=0.50
+        )
+
+    monkeypatch.setattr(policy_module, "load_policy", _tight)
+    rendered = _text(_rebalancing())
+    assert "TARGETS NOT REACHABLE UNDER THE ACTIVE POLICY" in rendered
+    assert "total-exposure cap" in rendered, rendered[-800:]
+    # Naming the sleeve is load-bearing: the total-exposure conflict
+    # applies to EVERY funded sleeve, so an unlabelled list is the same
+    # sentence repeated with no way to tell which sleeve it is about.
+    # "**Growth**" also distinguishes this block from the raw-key
+    # disclosure warning ("growth: ...") the report already emits.
+    assert "**Growth**" in rendered, rendered[-800:]
+    assert (
+        "Every sleeve target is reachable" not in rendered
+    ), "the positive statement must not appear alongside a conflict"
 
 
 def test_the_breach_headline_counts_every_band_breach(_offline):

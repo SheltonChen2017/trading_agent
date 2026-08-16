@@ -26,7 +26,7 @@ import math
 import sys
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Iterable, Sequence
+from typing import Callable, Iterable, Mapping, Sequence
 
 import numpy as np
 import pandas as pd
@@ -268,7 +268,10 @@ def long_short_returns(
             weights = {ticker: 1.0 / len(longs) for ticker in longs}
         if not math.isfinite(gross):
             continue
-        churn = one_way_turnover(previous, weights)
+        # ABR-002 (drift half): charge against where the book actually
+        # sat, not against last period's targets.
+        realised = {name: float(fwd.get(name, 0.0)) for name in (previous or {})}
+        churn = one_way_turnover(drift_weights(previous, realised), weights)
         returns[date] = gross
         turnovers[date] = float(churn)
         previous = weights
@@ -280,6 +283,33 @@ def net_of_costs(gross: pd.Series, turnover: pd.Series, bps: float) -> pd.Series
     return gross - turnover.reindex(gross.index).fillna(1.0) * 2.0 * bps / 10_000.0
 
 
+def drift_weights(
+    previous: dict[str, float] | None, returns: Mapping[str, float]
+) -> dict[str, float]:
+    """Carry last rebalance's target weights forward through their returns.
+
+    A book is not sitting on its target weights when the next rebalance
+    arrives: the winners have grown and the losers have shrunk. Comparing
+    target-to-target therefore charges NOTHING for restoring equal weight,
+    even though restoring it is real trading. Demonstrated: four
+    equal-weight names where one doubles drift to 40/20/20/20, and
+    returning them to 25 each is 15% of the book -- previously counted as
+    zero.
+    """
+    old = previous or {}
+    if not old:
+        return {}
+    grown = {name: weight * (1.0 + float(returns.get(name, 0.0)))
+             for name, weight in old.items()}
+    # Normalise by the portfolio's own growth. Gross exposure is the
+    # denominator so a long/short book stays comparable to its own target.
+    total = sum(abs(value) for value in grown.values())
+    if total <= 0 or not math.isfinite(total):
+        return dict(old)
+    scale = sum(abs(w) for w in old.values()) or 1.0
+    return {name: value / total * scale for name, value in grown.items()}
+
+
 def one_way_turnover(
     previous: dict[str, float] | None, current: dict[str, float]
 ) -> float:
@@ -288,6 +318,10 @@ def one_way_turnover(
     Signed weights preserve long/short side changes. A set comparison would
     incorrectly report zero turnover when a name flips directly from the
     long leg to the short leg.
+
+    Callers must pass DRIFTED previous weights (see `drift_weights`), not
+    the previous targets: ABR-002 was closed for the side-flip half and
+    left open for the drift half, and each understates cost on its own.
     """
     old = previous or {}
     names = set(old) | set(current)

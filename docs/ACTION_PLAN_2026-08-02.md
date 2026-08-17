@@ -41,18 +41,20 @@ model promotion, autonomous execution, and every ML/LLM boundary in
 `CLAUDE.md` and `docs/SESSION_HANDOFF.md` remain exactly as constrained.
 
 Current development topology (2026-08-17): `origin/main` is
-`f937bfb11fe82f45fd0f4715a98217a3aa957c92` after PR #242 merged the Codex
-counter-review integration branch (its merge tree is byte-identical to head
-`5730f7b`, which remains reachable as `refs/pull/242/head`); PR #241 at
-`d8a3260` had merged the full Codex alpha/QC audit before it. The retained
-counter-review commit `031b5a7` is tree-identical to Claude's submitted
-`ad3b3a8`. A final independent Claude counter-review of the complete
-correction chain ran on
-`user/claude/alpha-qc-full-counterreview-20260817` (created from exact head
-`5730f7b`): all ten commits accepted, sixteen mutations run, four new P3
-test/documentation gaps (CCR3-A..D) closed with mutation-verified tests and
-a ledger hash-convention note; see
-`docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md`.
+`4151b3f0c4ee2cf365d578e70ab10bd5eb93d324` after PR #243 merged Fable's
+final counter-review head `6bd962f`; PR #242 at `f937bfb` had merged the
+Codex counter-review integration branch, and PR #241 at `d8a3260` had merged
+the full Codex alpha/QC audit before it. Fable's three commits were reviewed
+individually and their added tests are useful, but the conclusion that the
+tree contained no product defect did not survive verification. Codex review
+branch `codex/review-alpha-qc-fable-counterreview-20260817` contains product/
+test correction `ac96d47`: the Stage 0 short battery now charges the entry and
+later re-entry around its cash/staging session, MAX(20) refuses anything
+other than 21 finite positive closes, missing Morningstar industries cannot
+become a fictitious peer group, and the analyser infers 12 observations/year
+for monthly families versus 42 for the non-overlapping six-session short
+cycle. See
+`docs/Review/REVIEW_2026-08-17_ALPHA_QC_FABLE_COUNTERREVIEW.md`.
 Product/test corrections `855941a` and `1e2b631`
 repair the current LEAN Python API, framework
 member collisions, point-in-time and exact-session factors, Stage 1 cadence,
@@ -65,10 +67,11 @@ direction, invalid generated result narratives, JSON artifacts, and raw logs
 were removed from active docs only after `docs/alpha-result.md` preserved
 their run identities, statuses, hashes, and look accounting. The frozen
 historical contracts remain under `docs/research/`; no result was promoted and
-no alpha feature milestone completed. The counter-review gate is satisfied
-twice over (`ad3b3a8`, then the 2026-08-17 final counter-review); the owner
-must still choose the next frozen QC stage — Stage 0 battery completion or
-Stage 1 — before any new cloud run. None of this is deployed: the
+no alpha feature milestone completed. **The QC launch gate is closed again:**
+`ac96d47` changes Stage 0 result methodology and must be independently
+counter-reviewed from the exact pushed Codex head before any new cloud run.
+The owner must then still choose the next frozen QC stage — Stage 0 battery
+completion or Stage 1. None of this is deployed: the
 operational runtime remains frozen at `752d3b7` in active `paper-epoch-005`.
 Any deployment would close that epoch by changing its `code_commit`.
 
@@ -344,6 +347,7 @@ already-merged work does not reorder the adopted next step.
 | ALPHA-QC-ROUND1-20260816 | research | **First staged Claude push on `origin/user/claude/alpha-qc-round-20260816` at exact head `ad6475d`: five preserved QC artifacts, result-ledger opening, and residual peer-length fix.** | **ACCEPTED AFTER CORRECTION; COUNTER-REVIEW AND NEW QC RERUN PENDING.** Independent review closed four P2 and one P3 findings. The peer equality was a real refusal cause, but the slice-only fix measured the skipped latest month instead of the 6-1/12-1 formation window. Product correction `8bf8a82` now uses a fixed 252-session joint market/leave-one-out-industry fit, measures 105/231 formation sessions, skips the latest 21, and has behavioral tests. Follow-up `56bc86d` binds every deque close to its exact exchange session and refuses missing, duplicated, or post-universe-gap history instead of manufacturing adjacent returns. The ledger now counts all five cloud executions, records 80 emitted repeated-look cells and a conservative lifetime floor of 428, acknowledges the existing base64 decoder, uses exact artifact hashes/backtest IDs, and marks missing compile/project identities. No saved market output was analysed and no QC access occurred. `docs/Alpha_Test_Implementation_Plan.md` freezes the staged replication/new-hypothesis program and reserves Alpaca Paper for later forward/execution testing. See `docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`. |
 | ALPHA-QC-STAGE1-20260817 | research | **Claude's REP-H52 / REP-IDV Stage 1 implementation at exact pushed head `dc63eec`.** | **ACCEPTED AFTER CORRECTION; CLAUDE COUNTER-REVIEW AND QC EXECUTION PENDING.** Independent review closed two P1 and two P2 findings in `b143c60`. Submitted scoring happened at the first monthly session and settlement at the next month's entry, not the frozen month-end/next-close/exact-21 experiment; REP-IDV applied the score-date universe backward across 111 factor days and filled unavailable factor returns with zero; and no cadence-matched benchmark or Stage 1 analyser existed. Corrected code freezes the immediately preceding month-end, enters next close, tracks overlapping exact-21-session cohorts, records PIT daily equal-weight factor returns with exact-session refusal, adds a matching benchmark, and requires full alpha/benchmark run identity plus 24-cell and 452-cell gates. No QC access or run occurred and the lifetime floor remains 428. See `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`. |
 | ALPHA-QC-FULL-AUDIT-20260817 | research quality | **Owner-directed clean-slate review of all research/QC code and today's documentation.** | **CORRECTED, VALIDATED, MERGED BY PR #241 AT `d8a3260`, COUNTER-REVIEWED BY CLAUDE AT `ad3b3a8`, INDEPENDENTLY ACCEPTED BY CODEX AFTER A P3 RECORD CORRECTION, MERGED BY PR #242 AT `f937bfb`, AND FINALLY COUNTER-REVIEWED AGAIN BY AN INDEPENDENT CLAUDE SESSION ON 2026-08-17 (ALL TEN COMMITS ACCEPTED; FOUR P3 GAPS CCR3-A..D CLOSED); QC RERUN IS THE ONLY REMAINING RESEARCH STEP, PENDING THE OWNER'S STAGE-ORDER CALL.** Claude's counter-review verified the head with seven independent mutations: four detected, three surviving mutations became findings CR2-001..003 (all P3 test gaps over correct behaviour — the Stage 1 score-cutoff call site, the market-factor recorder's refusal, and Stage 1's own turnover copy were unpinned) and were closed with mutation-verified tests in the counter-review commit. Codex retained all three tests and corrected stale main/branch/worktree claims as CR2IR-001 on `codex/review-alpha-qc-counterreview-20260817`; see both counter-review records under `docs/Review/`. Corrections `855941a` and `1e2b631` repair the full LEAN/analyzer/runner surface and the older local turnover/NAV/peer/regression methodology. Every commit from `db0045a` through `a37e73b` has an explicit disposition. Invalid active artifacts were removed while the permanent ledger preserved identities and look counts; the docs tree was organized; a plain-language alpha glossary was added. Final pinned-environment validation after integrating the counter-review tests: 4,192 passed, 0 failed, 25 known warnings. No valid result or milestone exists, no QC access occurred, and the lifetime floor remains 428. The 2026-08-17 final counter-review re-verified the whole chain with sixteen mutations and closed four further P3 gaps (unpinned 24/428 multiplicity gates, the untested poll-deadline path, the incomplete LEAN legacy-name blocklist, and the ledger's undocumented CRLF hash convention). See `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md` and `docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md`. |
+| ALPHA-QC-FABLE-VERIFY-20260817 | research quality | **Owner request: verify Fable's merged final counter-review before starting QC.** | **CORRECTED LOCALLY; QC GATE CLOSED PENDING INDEPENDENT COUNTER-REVIEW.** Fable's exact three-commit range `5816f6f..6bd962f` was reviewed commit by commit after PR #243 merged it at `4151b3f`. Its tests are accepted, but its no-product-defect conclusion missed two P2 and two P3 Stage 0 defects. Correction `ac96d47` assigns each short holding its own entry plus exit turnover, infers the frozen 12/monthly and 42/short annualization cadence per family, requires an exact finite-positive MAX(20) window, and prevents missing industries from becoming a fake peer bucket. No QC access or look occurred; the cell/run ledgers remain 428/five. See `docs/Review/REVIEW_2026-08-17_ALPHA_QC_FABLE_COUNTERREVIEW.md`. |
 
 ## 7. The critical-path insight that should drive sequencing
 

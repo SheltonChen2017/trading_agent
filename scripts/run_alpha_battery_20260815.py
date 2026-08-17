@@ -1,7 +1,7 @@
 """Alpha battery — cross-sectional signal research (EXPLORATORY ONLY).
 
 Runs the specifications frozen in
-`docs/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md`. Read that document
+`docs/research/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md`. Read that document
 first: it records the declared look count, the Bonferroni threshold, and
 the three alphas that CANNOT be tested honestly here because this project
 has no point-in-time fundamentals.
@@ -130,21 +130,37 @@ def alpha_industry_adjusted_reversal(
 ) -> pd.DataFrame:
     """Reversal of the part of the move that is not the industry's move."""
     raw = closes / closes.shift(days) - 1.0
-    industry_mean = pd.DataFrame(index=raw.index, columns=raw.columns, dtype=float)
+    industry_mean = _leave_one_out_group_means(raw, sectors)
+    return -(raw - industry_mean)
+
+
+def _leave_one_out_group_means(
+    values: pd.DataFrame, groups_by_name: dict[str, str]
+) -> pd.DataFrame:
+    """Return each name's equal-weight mean of its *other* valid peers.
+
+    Including the stock in the factor mechanically shrinks its own residual
+    and is especially distorting in small groups. Rows with no other valid
+    peer remain unavailable rather than becoming zero.
+    """
+    result = pd.DataFrame(index=values.index, columns=values.columns, dtype=float)
     groups: dict[str, list[str]] = {}
-    for ticker in raw.columns:
-        groups.setdefault(sectors.get(ticker, "_unclassified"), []).append(ticker)
+    for name in values.columns:
+        groups.setdefault(groups_by_name.get(name, "_unclassified"), []).append(name)
     for members in groups.values():
-        # Equal-weighted peer mean. A single-member industry has no peer
-        # group, so its "idiosyncratic" move would be identically zero;
-        # those cells are left NaN rather than scored as a perfect zero.
         if len(members) < 2:
             continue
-        peer_mean = raw[members].mean(axis=1, skipna=True)
-        industry_mean.loc[:, members] = np.repeat(
-            peer_mean.to_numpy()[:, None], len(members), axis=1
-        )
-    return -(raw - industry_mean)
+        group_values = values[members]
+        group_sum = group_values.sum(axis=1, skipna=True)
+        group_count = group_values.notna().sum(axis=1)
+        for name in members:
+            own_valid = group_values[name].notna().astype(int)
+            peer_count = group_count - own_valid
+            peer_sum = group_sum - group_values[name].fillna(0.0)
+            result[name] = (peer_sum / peer_count.replace(0, np.nan)).where(
+                peer_count > 0
+            )
+    return result
 
 
 def volume_zscore(volumes: pd.DataFrame, window: int = 60) -> pd.DataFrame:
@@ -168,43 +184,83 @@ def residual_momentum(
     rolling window that ENDS at the start of the measurement window, so no
     part of the estimation uses returns from the period being measured.
     """
-    returns = closes.pct_change()
-    market = returns.mean(axis=1, skipna=True)
-    industry = pd.DataFrame(index=returns.index, columns=returns.columns, dtype=float)
-    groups: dict[str, list[str]] = {}
-    for ticker in returns.columns:
-        groups.setdefault(sectors.get(ticker, "_unclassified"), []).append(ticker)
-    for members in groups.values():
-        if len(members) < 2:
-            continue
-        peer_mean = returns[members].mean(axis=1, skipna=True)
-        industry.loc[:, members] = np.repeat(
-            peer_mean.to_numpy()[:, None], len(members), axis=1
-        )
+    if isinstance(months, bool) or not isinstance(months, int) or months <= 1:
+        raise BatteryError("residual momentum months must be an integer above 1")
+    if isinstance(window, bool) or not isinstance(window, int) or window < 3:
+        raise BatteryError("residual momentum fit window must be at least 3 sessions")
 
+    returns = closes.pct_change(fill_method=None)
+    market = returns.mean(axis=1, skipna=True)
+    industry = _leave_one_out_group_means(returns, sectors)
     skip, look = 21, 21 * months
+    measurement_length = look - skip
     out = pd.DataFrame(index=returns.index, columns=returns.columns, dtype=float)
-    market_var = market.rolling(window).var()
+
+    # This signal is monthly. Calculate only the score dates that evaluation
+    # can consume; doing a separate 3-factor fit for every daily row would
+    # multiply work without changing a single tested observation.
+    score_dates = rebalance_dates(returns.index, "monthly")
+    positions = pd.Series(np.arange(len(returns)), index=returns.index)
     for ticker in returns.columns:
         stock = returns[ticker]
-        # Rolling market beta, then residualise against the industry leg on
-        # what the market does not explain. Two univariate regressions rather
-        # than one joint fit: the industry series is itself heavily loaded on
-        # the market, and a joint rolling fit on 252 daily points is badly
-        # conditioned when the two regressors are near-collinear.
-        cov = stock.rolling(window).cov(market)
-        beta_m = cov / market_var.replace(0.0, np.nan)
-        resid_m = stock - beta_m.shift(skip) * market
         peer = industry[ticker]
-        if peer.notna().any():
-            peer_resid = peer - beta_m.shift(skip) * market
-            peer_var = peer_resid.rolling(window).var()
-            beta_s = resid_m.rolling(window).cov(peer_resid) / peer_var.replace(0.0, np.nan)
-            resid = resid_m - beta_s.shift(skip) * peer_resid
-        else:
-            resid = resid_m
-        cumulative = np.log1p(resid.clip(-0.9, None)).rolling(look - skip).sum()
-        out[ticker] = cumulative.shift(skip)
+        for score_date in score_dates:
+            score_position = int(positions.loc[score_date])
+            fit_start = score_position - look - window + 1
+            fit_stop = score_position - look + 1
+            measurement_start = score_position - look + 1
+            measurement_stop = score_position - skip + 1
+            if fit_start < 1:
+                continue
+
+            fit = pd.DataFrame(
+                {
+                    "stock": stock.iloc[fit_start:fit_stop],
+                    "market": market.iloc[fit_start:fit_stop],
+                    "industry": peer.iloc[fit_start:fit_stop],
+                }
+            )
+            measurement = pd.DataFrame(
+                {
+                    "stock": stock.iloc[measurement_start:measurement_stop],
+                    "market": market.iloc[measurement_start:measurement_stop],
+                    "industry": peer.iloc[measurement_start:measurement_stop],
+                }
+            )
+            if len(fit) != window or len(measurement) != measurement_length:
+                continue
+            if not np.isfinite(fit.to_numpy(dtype=float)).all():
+                continue
+            if not np.isfinite(measurement.to_numpy(dtype=float)).all():
+                continue
+
+            design = np.column_stack(
+                [
+                    np.ones(window),
+                    fit["market"].to_numpy(dtype=float),
+                    fit["industry"].to_numpy(dtype=float),
+                ]
+            )
+            coefficients, _residuals, rank, _singular = np.linalg.lstsq(
+                design, fit["stock"].to_numpy(dtype=float), rcond=None
+            )
+            if rank != 3 or not np.isfinite(coefficients).all():
+                continue
+            measurement_design = np.column_stack(
+                [
+                    np.ones(measurement_length),
+                    measurement["market"].to_numpy(dtype=float),
+                    measurement["industry"].to_numpy(dtype=float),
+                ]
+            )
+            residual = measurement["stock"].to_numpy(dtype=float) - (
+                measurement_design @ coefficients
+            )
+            if not np.isfinite(residual).all():
+                continue
+            out.at[score_date, ticker] = float(
+                np.log1p(np.clip(residual, -0.9, None)).sum()
+            )
     return out
 
 
@@ -616,7 +672,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     buckets = volume_bucket_report(closes, volumes)
 
     artifact = {
-        "generated_for": "docs/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md",
+        "generated_for": "docs/research/ALPHA_BATTERY_2026-08-15_PREREGISTRATION.md",
         "point_in_time_data": False,
         "price_source": "yfinance adjusted closes (exploratory)",
         "survivorship_bias": "present and material; universe has no historical constituents",

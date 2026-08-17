@@ -26,7 +26,7 @@ def _series(values: list[float]) -> pd.Series:
 
 
 # --- max_drawdown_pct: same canonical implementation everywhere
-# (docs/ARCHITECTURE_DEBT.md: this used to be two independently drifting
+# (docs/architecture/ARCHITECTURE_DEBT.md: this used to be two independently drifting
 # copies -- backtest/portfolio_simulator.py's private _max_drawdown_pct
 # and strategies/leverage_rotation.py's public max_drawdown_pct).
 

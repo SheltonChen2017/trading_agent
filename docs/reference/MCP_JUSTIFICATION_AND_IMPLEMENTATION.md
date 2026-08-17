@@ -132,7 +132,7 @@ Otherwise, close this document.
 MCP exists to give models tools. This project's central architectural
 commitment is that the model has none: enforced today by
 `tests/test_ml_import_boundary.py`, the committee's forbidden-import guard,
-`docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md`, the exact-approval phrase, and
+`docs/architecture/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md`, the exact-approval phrase, and
 `risk/execution_gate.py`.
 
 An MCP server that can write is not an incremental risk. It converts the
@@ -207,7 +207,7 @@ import failure whose cause is genuinely hard to see.
 
 ### 5.2 Resources versus tools
 
-- **Resources** for enumerable, stable documents: `docs/MANDATE.md`, the
+- **Resources** for enumerable, stable documents: `docs/operations/MANDATE.md`, the
   current `research_findings.json`, the latest research report, the active
   evidence epoch summary. These are naturally read-only.
 - **Read-only tools** for parameterized queries, because a resource URI

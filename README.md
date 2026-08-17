@@ -161,7 +161,7 @@ Important guarantees:
 
 ## Current research status
 
-See `docs/MANDATE.md` for this project's numeric risk/return targets and
+See `docs/operations/MANDATE.md` for this project's numeric risk/return targets and
 sleeve-scope decisions (which research directions are in-flight vs.
 explicitly shelved).
 
@@ -323,7 +323,7 @@ The current dependency set is:
 - pandas / numpy
 - yfinance
 - Databento (cost-capped, immutable real-data ML ingestion; see
-  `docs/DATABENTO_DATA_SOURCE.md`)
+  `docs/operations/DATABENTO_DATA_SOURCE.md`)
 - alpaca-py
 - lxml
 - pandas_market_calendars (real NYSE trading-hours/holiday calendar)
@@ -406,7 +406,7 @@ failure in-band with HTTP 200 — but no live call has ever been made from
 this project, so it is an unverified assumption. If a call fails with
 `failed (HTTP 200): no reason given` on a body that looks fine, suspect that
 check rather than your credentials, and see
-`docs/OPERATIONAL_FACTS.md`. A clean `authenticate()` does not prove it
+`docs/operations/OPERATIONAL_FACTS.md`. A clean `authenticate()` does not prove it
 holds for `read_backtest` / `list_backtests`.
 
 The token is never transmitted: authentication sends
@@ -768,7 +768,7 @@ recomputes the behavior fingerprint and refuses a mismatched approval.
 Approval satisfies only one review gate: passing mandate metrics and every
 other evidence check can make a run eligible for human review, but never
 changes paper mode or authorizes live trading. See
-`docs/LIVE_PROMOTION_CHECKLIST.md`.
+`docs/operations/LIVE_PROMOTION_CHECKLIST.md`.
 
 After reviewing the connected paper account, initialize the accounting
 journal exactly once and reconcile it:
@@ -833,7 +833,7 @@ snapshot and removes journaled cash transfers from period returns.
 `operations-cycle` is a scheduler-friendly
 order/ledger/reconciliation/backup/health pass. A Windows Task Scheduler
 installer and the drill/evidence procedures are in
-`docs/OPERATIONS_RUNBOOK.md`.
+`docs/operations/OPERATIONS_RUNBOOK.md`.
 
 ### Recovering a stranded reconciliation
 
@@ -1098,9 +1098,9 @@ proposal. `market_analytics.py` and `backtest/risk_metrics.py` are the
 two intentional exceptions: generic, network-free computation (trend
 classification, forward-return baselines, drawdown/tail-risk metrics)
 that both sides depend on, not signal logic itself. See
-`docs/ARCHITECTURE_DEBT.md` for known gaps in that boundary
+`docs/architecture/ARCHITECTURE_DEBT.md` for known gaps in that boundary
 (risk-check logic still scattered across a few production files) and
-`docs/MANDATE.md` for which research directions are in-flight vs. shelved.
+`docs/operations/MANDATE.md` for which research directions are in-flight vs. shelved.
 
 ## Research workflow
 
@@ -1190,7 +1190,7 @@ network access.
 
 ## Remaining limitations
 
-- See `docs/ARCHITECTURE_DEBT.md` for known structural gaps (the execution
+- See `docs/architecture/ARCHITECTURE_DEBT.md` for known structural gaps (the execution
   kernel's mixed concerns, risk-check scatter across several files) that
   have been consciously deferred rather than fixed, and why.
 - There is a CLI and a browser UI (Streamlit), but no conversational API.

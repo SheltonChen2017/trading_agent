@@ -241,6 +241,7 @@ def test_documented_yfinance_config_example_matches_the_runtime_contract():
     path = (
         Path(__file__).resolve().parent.parent
         / "docs"
+        / "operations"
         / "ml_shadow_volatility_config.example.json"
     )
     config, payload = load_shadow_config(path)

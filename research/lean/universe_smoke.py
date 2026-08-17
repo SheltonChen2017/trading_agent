@@ -36,7 +36,7 @@ from AlgorithmImports import *  # noqa: F403  (LEAN's documented entry point)
 
 
 # The owner's 2026-08-16 specification, unchanged. Kept as data so a reader
-# can diff these against docs/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md
+# can diff these against docs/research/ALPHA_BATTERY_2026-08-16_UNIVERSE_PREREGISTRATION.md
 UNIVERSES = {
     "A_large": {"min_price": 5.0, "min_cap": 10_000_000_000.0, "min_adv": 25_000_000.0},
     "B_core": {"min_price": 5.0, "min_cap": 500_000_000.0, "min_adv": 5_000_000.0},

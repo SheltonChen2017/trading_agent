@@ -5,14 +5,14 @@ benchmark. Deliberately separate from backtest/engine.py's rigor toolkit
 (out_of_sample_significance_by_block(), bootstrap_edge_significance(),
 etc.), which answers "is this average return edge statistically real";
 this module answers "what does the risk SHAPE of a return stream look
-like," an orthogonal question (docs/MANDATE.md, 2026-07-28: reframes how
+like," an orthogonal question (docs/operations/MANDATE.md, 2026-07-28: reframes how
 this project evaluates backtests/paper-trading away from leading with
 CAGR/Sharpe).
 
 max_drawdown_pct() is the canonical implementation for what used to be
 two independent, drifting copies: backtest/portfolio_simulator.py's
 private _max_drawdown_pct() and strategies/leverage_rotation.py's public
-max_drawdown_pct() -- both now delegate here (docs/ARCHITECTURE_DEBT.md).
+max_drawdown_pct() -- both now delegate here (docs/architecture/ARCHITECTURE_DEBT.md).
 """
 from __future__ import annotations
 

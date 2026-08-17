@@ -30,12 +30,39 @@ import pytest
 ROOT = Path(__file__).resolve().parents[1]
 
 
+def _doc_path(name: str) -> Path:
+    """Find one active document after the 2026-08-17 docs reorganization."""
+    candidates = [ROOT / "docs" / name]
+    candidates.extend(
+        ROOT / "docs" / folder / name
+        for folder in ("Review", "research", "process", "operations", "architecture")
+    )
+    found = [path for path in candidates if path.is_file()]
+    assert len(found) == 1, f"expected one active document named {name!r}, found {found}"
+    return found[0]
+
+
 def _text(name: str) -> str:
-    return " ".join((ROOT / "docs" / name).read_text(encoding="utf-8").split())
+    return " ".join(_doc_path(name).read_text(encoding="utf-8").split())
 
 
 def _root_text(name: str) -> str:
     return " ".join((ROOT / name).read_text(encoding="utf-8").split())
+
+
+def test_docs_root_contains_only_canonical_milestone_and_alpha_records() -> None:
+    allowed = {
+        "ACTION_PLAN_2026-08-02.md",
+        "SESSION_HANDOFF.md",
+        "Alpha_Test_Implementation_Plan.md",
+        "alpha-result.md",
+        "FEATURE_MILESTONE_RECORD.md",
+        "EPOCH_005_ROLL_PLAN.md",
+        "REBAL1_MILESTONE_PLAN.md",
+    }
+    actual = {path.name for path in (ROOT / "docs").iterdir() if path.is_file()}
+    assert actual == allowed
+    assert not list((ROOT / "docs").glob("REVIEW_*.md"))
 
 
 def _active_epochs(text: str) -> set[str]:
@@ -257,7 +284,7 @@ def test_current_handoff_records_the_epoch005_roll_and_reviewable_head():
 
 def test_roll_freshness_guidance_is_conditional_not_universal():
     """OBR-005: freshness expires only after the configured age window."""
-    facts = (ROOT / "docs" / "OPERATIONAL_FACTS.md").read_text(encoding="utf-8")
+    facts = _doc_path("OPERATIONAL_FACTS.md").read_text(encoding="utf-8")
     assert "`readiness` fails on `reconciliation_freshness` during any roll" not in facts
     assert "can fail" in facts.lower() and "reconciliation_freshness" in facts
 
@@ -520,7 +547,7 @@ def test_the_sweep_record_carries_one_finding_count_and_status():
 
 def _finding_statuses(name: str) -> dict[str, str]:
     """Every `| ID | Pri | Status |` row in a finding ledger."""
-    raw = (ROOT / "docs" / name).read_text(encoding="utf-8")
+    raw = _doc_path(name).read_text(encoding="utf-8")
     return {
         match.group(1): match.group(2)
         for match in re.finditer(r"^\| ((?:CXL|FCS|CCX)-\d+) \| \*{0,2}P\d\*{0,2} \| \*{0,2}(\w+)\*{0,2} \|", raw, re.M)
@@ -542,7 +569,7 @@ def test_no_finding_is_open_in_one_ledger_and_fixed_in_another():
     Fixed in another.
     """
     review = _finding_statuses("REVIEW_2026-08-07_CODEX_LINE_BY_LINE.md")
-    combined = (ROOT / "docs" / "REVIEW_2026-08-08_COMBINED_SCAN_FIX_LEDGER.md").read_text(
+    combined = _doc_path("REVIEW_2026-08-08_COMBINED_SCAN_FIX_LEDGER.md").read_text(
         encoding="utf-8"
     )
     assert review, "no finding rows parsed; the ledger format changed"
@@ -587,7 +614,7 @@ def _mainline_ref() -> str | None:
 
 _TOPOLOGY_PATTERNS = {
     "ACTION_PLAN_2026-08-02.md": r"Current development topology.*?`([0-9a-f]{7,40})`",
-    "SESSION_HANDOFF.md": r"(?:Current )?`main` and `origin/main`:\s*`([0-9a-f]{7,40})`",
+    "SESSION_HANDOFF.md": r"Published `origin/main` at audit time:\s*`([0-9a-f]{7,40})`",
 }
 
 

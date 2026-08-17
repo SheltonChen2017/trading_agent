@@ -7,10 +7,10 @@ Prepared: 2026-07-31
 Companion documents:
 
 - `docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md` — the model/research track
-- `docs/LIVE_PROMOTION_CHECKLIST.md` — the evidence **gate** for live capital
-- `docs/OPERATIONS_RUNBOOK.md` — how to **operate** what already exists
-- `docs/ARCHITECTURE_DEBT.md` — the structural debt this plan pays down
-- `docs/MANDATE.md` — the risk contract every milestone answers to
+- `docs/operations/LIVE_PROMOTION_CHECKLIST.md` — the evidence **gate** for live capital
+- `docs/operations/OPERATIONS_RUNBOOK.md` — how to **operate** what already exists
+- `docs/architecture/ARCHITECTURE_DEBT.md` — the structural debt this plan pays down
+- `docs/operations/MANDATE.md` — the risk contract every milestone answers to
 
 ## 1. What this document is, and is not
 
@@ -149,7 +149,7 @@ evidence commands already report. No dimension is fabricated.
 
 ### 6.1 Purpose
 
-`docs/ARCHITECTURE_DEBT.md` item 1 has been deliberately deferred for months.
+`docs/architecture/ARCHITECTURE_DEBT.md` item 1 has been deliberately deferred for months.
 It is now the single highest-leverage engineering item, because
 `assistant/execution_service.py` has accumulated claiming, expiry,
 revalidation, submission, reconciliation coupling, and error mapping in one

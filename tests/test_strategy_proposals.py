@@ -34,6 +34,7 @@ from assistant.strategy_proposals import (
     generate_soxx_soxl_rebalance_proposals,
 )
 from market_analytics import classify_trend
+from data.price_source import expected_latest_completed_session
 from signals.regime import compute_trailing_market_volatility
 from strategies.vol_target_rotation import compute_target_leveraged_weight
 
@@ -42,7 +43,9 @@ def _price_history(days: int = 260, seed: int = 0, drift: float = 0.001, vol: fl
     rng = np.random.default_rng(seed)
     returns = rng.normal(loc=drift, scale=vol, size=days)
     close = 50 * np.cumprod(1 + returns)
-    dates = pd.bdate_range(end=pd.Timestamp.today().normalize(), periods=days)
+    dates = pd.bdate_range(
+        end=pd.Timestamp(expected_latest_completed_session()), periods=days
+    )
     return pd.DataFrame(
         {"open": close, "high": close * 1.001, "low": close * 0.999, "close": close, "volume": np.full(days, 1_000_000.0)},
         index=dates,

@@ -1,5 +1,5 @@
 """LEAN monthly alpha battery. Specifications frozen in
-`docs/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`.
+`docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`.
 
 This algorithm REPORTS ALPHA STATISTICS, so unlike the smoke probes it is
 NOT exempt: every run is a counted research look.

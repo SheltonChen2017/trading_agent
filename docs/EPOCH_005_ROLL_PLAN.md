@@ -2,9 +2,9 @@
 
 Status: **owner-authorized and executed 2026-08-13. Do not execute this plan
 again.** This file retains the preparation facts and records their outcome;
-`docs/OPERATIONAL_FACTS.md` is the current host-state authority.
+`docs/operations/OPERATIONAL_FACTS.md` is the current host-state authority.
 
-Authority: `docs/OPERATIONS_RUNBOOK.md` owns the canonical order and drill
+Authority: `docs/operations/OPERATIONS_RUNBOOK.md` owns the canonical order and drill
 list. This plan does not restate it loosely — it records the host-specific
 values, the preconditions to check first, and the judgement calls.
 
@@ -119,4 +119,4 @@ checkout moved to `752d3b7`; reconciliation matched with zero mismatches;
 `paper-epoch-005` started at 23:59:07Z; all five required drill types passed;
 the tasks were re-enabled; and a manual operations cycle was green. The
 lineage hash and detailed drill/alert observations remain in
-`docs/OPERATIONAL_FACTS.md`. This record does not authorize another roll.
+`docs/operations/OPERATIONAL_FACTS.md`. This record does not authorize another roll.

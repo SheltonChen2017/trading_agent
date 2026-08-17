@@ -168,7 +168,7 @@ def buy_and_hold(
 
 def max_drawdown_pct(series: pd.Series) -> float:
     """Delegates to backtest.risk_metrics.max_drawdown_pct() -- the
-    canonical implementation (docs/ARCHITECTURE_DEBT.md) -- kept as a
+    canonical implementation (docs/architecture/ARCHITECTURE_DEBT.md) -- kept as a
     thin re-export here so the ~15 dependent scripts/strategies that
     import this name don't need any changes."""
     return _canonical_max_drawdown_pct(series)

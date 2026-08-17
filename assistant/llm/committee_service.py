@@ -2,7 +2,7 @@
 
 Deliberately outside committee.py: that module's tested contract is a pure
 (input, provider, timeout) -> CommitteeResult call with no I/O side effects,
-and it's governed by docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md plus its own
+and it's governed by docs/architecture/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md plus its own
 test suite (tests/test_committee_foundation.py) -- adding a `store` param
 there would mix concerns into a narrower-scoped module for no reason. This
 wrapper adds the audit-log row required by the committee ADR via the existing

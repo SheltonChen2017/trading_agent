@@ -52,7 +52,7 @@ inspect:
 - `docs/ACTION_PLAN_2026-08-02.md` for what is done, what is next, and why;
 - the implementation plan named by the user (or the archived plan in
   `docs/reference/` covering the scheduled milestone);
-- `docs/ML_IMPLEMENTATION_STATUS.md` for current ML state when working under
+- `docs/operations/ML_IMPLEMENTATION_STATUS.md` for current ML state when working under
   `ml/` or on ML scripts;
 - `docs/reference/GENERAL_READINESS_IMPLEMENTATION_PLAN.md` for general
   live-readiness milestone definitions; and
@@ -293,7 +293,7 @@ categories include:
 - read-only commands leaving registry and execution tables unchanged; and
 - risk-reducing sells remaining possible.
 
-For a code review, follow `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+For a code review, follow `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
 (owner-mandated, 2026-08-02): give every commit in the review range an
 explicit disposition — never review only the tip or a combined diff — and
 maintain a P0–P3 issue ledger in the review report, with a concrete reason
@@ -388,6 +388,6 @@ Two standing owner-mandated records (2026-08-02) accompany every handoff:
   merges, milestone status, validation results, operational observations, or
   owner decisions — update and commit `docs/SESSION_HANDOFF.md` so that
   switching computers requires only `git pull`, never copying session files.
-  Follow `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` for its required
+  Follow `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` for its required
   contents; verify machine-local observations rather than copying them
   forward.

@@ -1,6 +1,6 @@
 """The ADR's frozen committee replay/adversarial corpus and its harness.
 
-docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md makes ">= 50 frozen replay cases
+docs/architecture/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md makes ">= 50 frozen replay cases
 plus injection and memory-poisoning adversarial cases" a release gate for
 daily model-backed committee use. This file is that gate's enforcement:
 

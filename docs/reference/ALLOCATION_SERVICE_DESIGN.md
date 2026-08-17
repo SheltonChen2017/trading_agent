@@ -88,7 +88,7 @@ generator and this future service), rather than inventing a second
 cadence-tracking scheme.
 
 Explicitly **CLI/manual-trigger only** in this design — no literal OS
-scheduler (cron/systemd) is proposed. This matches `docs/MANDATE.md`'s
+scheduler (cron/systemd) is proposed. This matches `docs/operations/MANDATE.md`'s
 already-stated "event-driven, not calendar-driven" rebalancing stance
 (§2, Rebalancing frequency row). A future scheduler, if ever wanted, would
 call the same CLI/proposal-generation entry point this design specifies

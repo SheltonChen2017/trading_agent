@@ -9,7 +9,7 @@ previously described itself as "extending risk/manager.py" and as also
 handling "stop-loss pricing" — that module was part of an earlier,
 disconnected ML/signal-sizing research path with no import relationship
 to this one and no stop-loss pricing logic ever lived in this module; the
-old code was removed 2026-07-28, see docs/ARCHITECTURE_DEBT.md.)
+old code was removed 2026-07-28, see docs/architecture/ARCHITECTURE_DEBT.md.)
 
 A TradeIntent is a typed, frozen data structure — not free-form text.
 validate_trade_intent() is pure validation: it never submits an order
@@ -18,7 +18,7 @@ to a network. Every check here is a plain deterministic calculation on
 numbers already provided by the caller — no LLM involved.
 
 This module IS the deterministic risk governor referenced in
-docs/MANDATE.md (2026-07-28) -- the single place validate_trade_intent()'s
+docs/operations/MANDATE.md (2026-07-28) -- the single place validate_trade_intent()'s
 rule set (kill switch, per-position/total-exposure/basket/leveraged-ETF
 concentration caps, price-staleness and overnight-gap checks, NYSE
 calendar/trading-session checks, duplicate-order detection, earnings
@@ -27,7 +27,7 @@ an HMAC-signed proof/anti-forgery layer wrapped around its output so a
 caller can't hand-construct or mutate a passing result.
 
 Known scatter points (architectural debt, not yet consolidated here --
-see docs/ARCHITECTURE_DEBT.md for the full reasoning on why a
+see docs/architecture/ARCHITECTURE_DEBT.md for the full reasoning on why a
 consolidation wasn't attempted alongside this labeling pass):
   - assistant/execution_service.py's _pending_buy_value_by_ticker() --
     pending-order exposure estimation, computed independently of this
@@ -1401,7 +1401,7 @@ def validate_trade_intent(
     # that today (verified by mutation), but nothing catches it at the
     # signature, and GR-2 deliberately created `checks_for_phase("proposal")`
     # as a future second caller. If you consolidate the scatter points named
-    # in docs/ARCHITECTURE_DEBT.md §2, normalise these to one unit first.
+    # in docs/architecture/ARCHITECTURE_DEBT.md §2, normalise these to one unit first.
     max_position_pct: float = MAX_POSITION_PCT,  # fraction
     max_total_exposure_pct: float = MAX_TOTAL_EXPOSURE_PCT,  # fraction
     max_basket_pct: float = 40.0,  # PERCENT

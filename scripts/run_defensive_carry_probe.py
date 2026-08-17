@@ -1,5 +1,5 @@
 """
-Defensive-carry research probe (docs/MANDATE.md, item 5 -- "test a
+Defensive-carry research probe (docs/operations/MANDATE.md, item 5 -- "test a
 defensive-carry expansion cheaply, using existing infrastructure").
 
 EXPLORATORY ONLY -- a single lookback window, no walk-forward, no

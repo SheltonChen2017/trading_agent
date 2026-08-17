@@ -219,7 +219,7 @@ def generate_risk_reduction_proposals(
     risk/execution_gate.py's validate_trade_intent() (which decides what
     to *permit* at submission time and is the real risk governor -- see
     that module's "Known scatter points" note and
-    docs/ARCHITECTURE_DEBT.md). By design: any proposal generated here
+    docs/architecture/ARCHITECTURE_DEBT.md). By design: any proposal generated here
     still passes through the real gate before it can ever execute, so this
     duplication can under- or over-suggest relative to what the gate would
     actually allow without being unsafe -- but it is a second source of

@@ -3,7 +3,7 @@
 Status: execution plan for the next implementation sequence
 Prepared: 2026-07-31
 Applies after: `docs/ML_IMPLEMENTATION_STRATEGY.md` ML-1 through ML-8
-Current-state companion: `docs/ML_IMPLEMENTATION_STATUS.md`
+Current-state companion: `docs/operations/ML_IMPLEMENTATION_STATUS.md`
 
 ## 1. Objective
 
@@ -99,7 +99,7 @@ At the end of each milestone:
 2. list all schema and contract changes;
 3. identify any behavior that can affect the live assistant;
 4. run focused tests, full tests, compilation, and `git diff --check`;
-5. update `docs/ML_IMPLEMENTATION_STATUS.md` conservatively;
+5. update `docs/operations/ML_IMPLEMENTATION_STATUS.md` conservatively;
 6. do not call a milestone complete when only its primitives exist; and
 7. stop and request review before starting the next milestone.
 

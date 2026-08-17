@@ -249,7 +249,7 @@ def preflight_allocation_batch(
 
     This cross-leg reservation math is risk-adjacent but intentionally NOT
     in risk/execution_gate.py -- see that module's "Known scatter points"
-    note and docs/ARCHITECTURE_DEBT.md.
+    note and docs/architecture/ARCHITECTURE_DEBT.md.
 
     Accounting invariant (GPT review, 2026-07-29 follow-up -- a second
     bug in the FIRST fix for the above): each existing position, real

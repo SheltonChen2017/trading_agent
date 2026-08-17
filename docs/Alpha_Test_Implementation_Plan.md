@@ -1,7 +1,9 @@
 # QuantConnect alpha test implementation plan
 
-Status: owner-directed staged research program; implementation may begin only
-after independent review of the preceding pushed stage
+Status: owner-directed staged research program; all affected implementation
+was re-audited 2026-08-17. No historical alpha result is valid. The next QC
+run may begin only after Claude counter-reviews the final pushed Codex audit
+head.
 
 Prepared: 2026-08-16
 
@@ -140,8 +142,15 @@ month-end at the next distinct close, settles overlapping cohorts after
 exactly 21 distinct sessions, records the equal-weight market return from the
 membership actually known on each historical date, and refuses a missing
 factor date. A cadence-matched benchmark algorithm and strict Stage 1 analyser
-were added. **No Stage 1 QC run is authorized until Claude counter-reviews the
-final pushed Codex head.**
+were added. Full audit correction `855941a` then standardized the entire LEAN
+tree on current Python API names, removed framework-member shadowing, hardened
+exact-session/provenance/refusal contracts, and bounded cloud polling. **No
+Stage 1 QC run is authorized until Claude counter-reviews the final pushed
+Codex head.**
+
+The invalid generated result Markdown, JSON, and raw logs were removed from
+the active docs tree at the owner's direction. This does not reset look counts:
+`docs/alpha-result.md` permanently preserves every run, status, ID and hash.
 
 Implement these in one monthly algorithm because their score and holding
 cadences match. Each specification has 3 universes x 4 tested outcomes = 12

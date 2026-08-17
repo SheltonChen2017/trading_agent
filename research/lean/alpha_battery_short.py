@@ -1,6 +1,6 @@
 """LEAN short-horizon alpha battery (reversal family), 5-day holding.
 Specifications frozen in
-`docs/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`.
+`docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`.
 
 This algorithm REPORTS ALPHA STATISTICS, so every run is a counted
 research look. It is not exempt.

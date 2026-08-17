@@ -23,5 +23,5 @@
     "etf"
   ],
   "allow_autonomous_execution": false,
-  "notes": "Owner-approved 2026-08-04 with targets unchanged from the proposed defaults derived from docs/MANDATE.md. The approved_fingerprint binds this approval to the exact behavior fields; any change to them requires a new reviewed approval."
+  "notes": "Owner-approved 2026-08-04 with targets unchanged from the proposed defaults derived from docs/operations/MANDATE.md. The approved_fingerprint binds this approval to the exact behavior fields; any change to them requires a new reviewed approval."
 }

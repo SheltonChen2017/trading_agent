@@ -13,11 +13,11 @@ Applies after:
 Companion documents:
 
 - `docs/ML_IMPLEMENTATION_STRATEGY.md` - ML research and architecture
-- `docs/ML_IMPLEMENTATION_STATUS.md` - current ML implementation state
-- `docs/LIVE_PROMOTION_CHECKLIST.md` - evidence gate for live capital
-- `docs/OPERATIONS_RUNBOOK.md` - operational procedures
-- `docs/MANDATE.md` - portfolio and risk constraints
-- `docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md` - authority boundary
+- `docs/operations/ML_IMPLEMENTATION_STATUS.md` - current ML implementation state
+- `docs/operations/LIVE_PROMOTION_CHECKLIST.md` - evidence gate for live capital
+- `docs/operations/OPERATIONS_RUNBOOK.md` - operational procedures
+- `docs/operations/MANDATE.md` - portfolio and risk constraints
+- `docs/architecture/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md` - authority boundary
 
 ## 1. Objective
 

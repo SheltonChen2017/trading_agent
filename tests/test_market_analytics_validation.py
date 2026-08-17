@@ -1,6 +1,6 @@
 """CCX-003: the two validation candidates Codex deferred without naming them.
 
-`docs/REVIEW_2026-08-07_CODEX_LINE_BY_LINE.md` §5 marks the root Python
+`docs/Review/REVIEW_2026-08-07_CODEX_LINE_BY_LINE.md` §5 marks the root Python
 modules "Complete" while recording "two low-risk validation candidates
 deferred pending caller/test cross-check". The candidates were never
 described, so nobody could pick them up, and "Complete" overstated closure.

@@ -1139,7 +1139,7 @@ def _write_artifact_atomically(destination: Path, payload: str) -> None:
 
     FCS-013. `Path.write_text` is not atomic: a crash, a full disk, or a
     killed console (this host loses console-hosted processes to 0xC000013A --
-    see docs/OPERATIONAL_FACTS.md Â§2) leaves a TRUNCATED file. For a tax
+    see docs/operations/OPERATIONAL_FACTS.md Â§2) leaves a TRUNCATED file. For a tax
     export that matters more than usual, because a half-written CSV is still
     a syntactically valid CSV with fewer rows, and the coverage statement the
     report relies on to disclose its own limits can itself be cut off.

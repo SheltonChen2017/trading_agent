@@ -5,6 +5,14 @@ invalidated, stale and unavailable results are kept here permanently. An
 unfavourable result is never deleted and never silently replaced by a
 rerun; a rerun is a new entry that references the one it supersedes.
 
+**2026-08-17 audit status:** every local and QuantConnect alpha result listed
+below is invalid, refused, unanalysed, pending review, or provenance
+incomplete. None is usable evidence of an edge. At the owner's direction,
+invalid raw logs, generated JSON artifacts, and superseded result narratives
+were removed from the active `docs/` tree after their exact Git history,
+run identity, status, and SHA-256 values were preserved in this ledger. Their
+removal is housekeeping, not deletion of an inconvenient research outcome.
+
 Nothing in this file is trading authorization. QuantConnect is historical
 replication only; Alpaca Paper is a later, separate forward-validation
 stage.
@@ -35,11 +43,12 @@ not an alpha cell. Together with the prior 348 declared cells, the conservative
 lifetime alpha-cell exposure floor is **428**. These counts do not make any
 result valid and do not authorize analysis outside the reviewed workflow.
 
-**Stage 1 pre-run gate (2026-08-17):** no REP-H52 or REP-IDV cloud run has
-been recorded. The implementation pushed at `dc63eec` failed independent
-review's frozen timing and point-in-time factor checks and was corrected at
-`b143c60`. A future run belongs in a new `R-005`-or-later entry only after
-Claude counter-reviews the final pushed Codex head. If any Stage 1 run was
+**Current pre-run gate (2026-08-17):** no REP-H52 or REP-IDV cloud run has
+been recorded. The Stage 1 implementation at `dc63eec` and all earlier alpha
+research/QC code were re-audited. The current local correction is `855941a`;
+the final documentation head will be recorded in the handoff after validation.
+No fresh run is allowed until Claude counter-reviews the final pushed Codex
+head. A future run belongs in a new `R-005`-or-later entry. If any run was
 launched before that gate, it must be added here as `PENDING_REVIEW` and
 counted; it must not be silently treated as the reviewed run.
 
@@ -61,7 +70,7 @@ counted; it must not be silently treated as the reviewed run.
 | **Data period** | 2012-01-01 to 2024-12-31 |
 | **Universe** | B_core: price ≥ $5, market cap ≥ $500M, ADV20 ≥ $5M; point-in-time Morningstar fundamentals; `MarketCap == 0` treated as missing with shares-outstanding fallback |
 | **Costs / turnover / benchmark** | n/a — no series emitted |
-| **Artifact** | `docs/qc_rr_mon_B_20260816.log`, 7 lines, sha256:`516fe20b04ec940007bce8d9a97c2ed363f422655ebcd61b84fef2aa8525e868` |
+| **Removed raw artifact identity** | `qc_rr_mon_B_20260816.log`, 7 lines, sha256:`516fe20b04ec940007bce8d9a97c2ed363f422655ebcd61b84fef2aa8525e868`; removed from active docs on 2026-08-17, recoverable from Git history |
 | **Primary statistics** | **none** |
 | **Gate outcome** | n/a |
 | **Validity** | **REFUSED** |
@@ -119,7 +128,7 @@ and a new QC run.
 | **Backtest IDs** | B_core `a364f6872f6b0827b8adfb22ac20337e`; A_large `6dec09106141c24fbf884738db84c36a` |
 | **Data period** | 2012-01-01 to 2024-12-31 |
 | **Output** | 534 declared dates, 54 base64 blocks each, layout `b64block_date_u32_i32x4_u16x3` |
-| **Artifact** | `docs/qc_rr_sht_B_20260816.log` sha256:`a4237e06c00bf6b07fff192a1a4fbd6ab42efe9b6dab0c9b3f6b660a2f8c7f58`; `docs/qc_rr_sht_A_20260816.log` sha256:`f96b076d79729e8906e940f2711cc22b65091ea6d14698cc8b23d8b90e3816b1` |
+| **Removed raw artifact identities** | `qc_rr_sht_B_20260816.log` sha256:`a4237e06c00bf6b07fff192a1a4fbd6ab42efe9b6dab0c9b3f6b660a2f8c7f58`; `qc_rr_sht_A_20260816.log` sha256:`f96b076d79729e8906e940f2711cc22b65091ea6d14698cc8b23d8b90e3816b1`; removed from active docs on 2026-08-17, recoverable from Git history |
 | **Validity** | **UNANALYSED** — complete output, statistics not yet computed |
 | **Provenance** | **PROVENANCE_INCOMPLETE** — project and compile IDs absent |
 
@@ -164,7 +173,7 @@ and would give false assurance in the other.
 | **Backtest ID** | `df324dbbca4070ac0f45f270406e673a` |
 | **Data period** | 2012-01-01 to 2024-12-31 |
 | **Output** | 142 dates, complete, no INCOMPLETE marker |
-| **Artifact** | `docs/qc_rr_mon_A_20260816.log` sha256:`7e161182fb2c0baf711d1b90ebc784301edd80b0edab17fcb5152553c2ca8639` |
+| **Removed raw artifact identity** | `qc_rr_mon_A_20260816.log` sha256:`7e161182fb2c0baf711d1b90ebc784301edd80b0edab17fcb5152553c2ca8639`; removed from active docs on 2026-08-17, recoverable from Git history |
 | **Validity** | **PENDING_REVIEW — must not be used for any conclusion** |
 | **Provenance** | **PROVENANCE_INCOMPLETE** — project and compile IDs absent |
 
@@ -200,7 +209,7 @@ superseded by a reviewed rerun rather than promoted.
 | **Backtest ID** | `e3c2ff22333f1c923502b3d1c399fcbb` |
 | **Data period** | 2012-01-01 to 2024-12-31 |
 | **Output** | 155 declared dates, 155 rows, complete |
-| **Artifact** | `docs/qc_rr_ben_B_20260816.log` sha256:`ec623810fb53df1021d357a15874595b161ba000fb8614eea49fec3e23021489` |
+| **Removed raw artifact identity** | `qc_rr_ben_B_20260816.log` sha256:`ec623810fb53df1021d357a15874595b161ba000fb8614eea49fec3e23021489`; removed from active docs on 2026-08-17, recoverable from Git history |
 | **Validity** | **UNANALYSED** — complete, statistics not computed |
 | **Provenance** | **PROVENANCE_INCOMPLETE** — project and compile IDs absent |
 
@@ -230,7 +239,7 @@ this ledger.
 
 ### Why it is invalid
 
-Independent review (`docs/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`)
+Independent review (`docs/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`)
 found ten P2 defects. Three were verified independently before acceptance:
 
 - **QCAR-002, timing.** 1,283 claimed non-overlapping five-session
@@ -249,10 +258,48 @@ Every statistic in that run passed through at least one of these paths.
 The passes, the null momentum finding, the MAX-effect interpretation and
 the benchmark verdict are all void.
 
-### Kept deliberately
+### Historical evidence retained without active artifacts
 
-The documents and JSON remain in Git with invalidation banners rather than
-being deleted. Two of these defects were mirror images of errors this
-project had already written up in other people's work (ABR-001's
-unreachable gate, ABR-003's unit mismatch), which is worth more as a
-record than as a deleted embarrassment.
+The owner directed that invalid generated documents and artifacts be removed
+from the active docs tree while this permanent ledger preserves their exact
+disposition. The deleted files remain recoverable from Git history:
+
+| Removed file | SHA-256 |
+|---|---|
+| `ALPHA_BATTERY_2026-08-15_RESULTS.md` | `8c3bcfec76316361f3227386c8815d6a8ab369f6504f93a95688373dde8cd366` |
+| `ALPHA_BATTERY_2026-08-16_UNIVERSE_RESULTS.md` | `d6a502d30ebf76c4b5e93c2d2f99bf01364b5723edb87296d3e2613e39b3f17a` |
+| `ALPHA_BATTERY_2026-08-16_QC_RESULTS.md` | `13945703a5207c46279e0df73d48a21edeccf44d71b76091b178472298c4603a` |
+| `alpha_battery_20260815_artifact.json` | `8f8be4601de9ad6d7303e06cc8519b4f3f7b6de2692a8e8dd784fe281fac6b84` |
+| `alpha_universes_20260816_artifact.json` | `94e0ca1352e414487f57adad720a0e8ccb1f6bd7f2d4a3b40462cb6c057d8423` |
+| `universe_audit_20260816.json` | `e39c74db8ca6bc459cbe9676990f150151ea58f9544c6022d9db6a1177c4365a` |
+| `qc_alpha_monthly_analysis_20260816.json` | `c9967fce543de299b9d57aaca1b3ec531d92e448408b67074a8e70c414d60228` |
+| `qc_alpha_short_analysis_20260816.json` | `82b398e6372bdd3c7a2c65bf8042ee5f9e3112d0ca5c0e7ba6021184a07c8732` |
+| `qc_universe_benchmark_20260816.json` | `3e13e7edfa2f3d11636a9de2876fae14dcc9499db419889f19560fdc1255feb4` |
+
+The raw-log hashes are recorded in R-001 through R-004 above. Two defects
+were mirror images of errors already documented elsewhere (ABR-001's
+unreachable gate and ABR-003's unit mismatch); that lesson remains part of
+the durable audit record even though the invalid generated files are no
+longer presented as active documentation.
+
+## 2026-08-17 full research/QC audit disposition
+
+- Correction `855941a` standardizes every LEAN algorithm on QuantConnect's
+  current Python API, prevents framework-member shadowing, repairs
+  point-in-time factor/session handling, and hardens provenance and refusal
+  behavior.
+- The older local battery now calculates rebalance turnover from the prior
+  portfolio after its prior outcome, uses the correct post-return NAV
+  denominator, and refuses missing, non-finite, or wiped-out drift states.
+  The universe retest uses the same drift-aware method.
+- Follow-up `1e2b631` removes each stock from its own peer average and replaces
+  the old sequential residual calculation with the frozen joint
+  intercept/market/industry fit. This does not rehabilitate the old result;
+  its static classifications and survivor-selected data remain invalid.
+- The smoke runner records source/compile identity and has bounded total and
+  no-progress waits, including when QuantConnect returns no numeric progress.
+- No QuantConnect API was accessed and no new research look was consumed in
+  this audit.
+- Every historical conclusion remains unusable. A clean rerun begins only
+  from the final independently counter-reviewed pushed head and is appended
+  as R-005 or later; no old statistic may be copied forward.

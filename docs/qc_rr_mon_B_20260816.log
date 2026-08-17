@@ -1,7 +1,0 @@
-2012-01-01 00:00:00 Launching analysis for e3132ae2e9f37235893a77437cc7bb87 with LEAN Engine v2.5.0.0.18004
-2012-01-01 00:00:00 Warning: AddUniverse(coarseSelector, fineSelector) is obsolete, please use AddUniverse(Func<IEnumerable<Fundamental>, IEnumerable<Symbol>> selector) instead.
-2025-01-01 00:00:00 INCOMPLETE|missing_specs=MULTI_ALPHA_COMPOSITE|RESIDUAL_MOM_12_1|RESIDUAL_MOM_6_1
-2025-01-01 00:00:00 === ALPHA BATTERY MONTHLY | universe=B_core ===
-2025-01-01 00:00:00 cap_rows=312696 cap_fallback=35268 cap_missing=7291
-2025-01-01 00:00:00 Algorithm Id:(e3132ae2e9f37235893a77437cc7bb87) completed in 4819.76 seconds at 7k data points per second. Processing total of 31,958,444 data points.
-2025-01-01 00:00:00 Due to numerical precision issues in the factor file, data for the following symbols was adjust to a later starting date: [SBT, 12/30/2050], [SJR, 4/11/2022], [BCE, 6/12/2022], [CVE, 6/12/2022], [CPG, 6/12/2022], [RCI, 6/7/2022], [CNI, 6/6/2022], [TAC, 5/26/2022], [MIM, 3/28/2022], [TCK, 6/12/2022]...

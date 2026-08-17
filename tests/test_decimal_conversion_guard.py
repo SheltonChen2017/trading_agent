@@ -1,6 +1,6 @@
 """FCS-005: ban bare ``Decimal(str(...))`` outside the money helpers.
 
-`docs/OPERATIONAL_FACTS.md` §3 records that three consecutive review passes
+`docs/operations/OPERATIONAL_FACTS.md` §3 records that three consecutive review passes
 each found another one of these (FPS-001 -> GFPS-001 -> CFPS-001) and states
 the rule explicitly: *"If a fourth appears, the answer is a lint or AST guard
 banning bare ``Decimal(str(...))`` outside ``assistant/money.py`` -- not

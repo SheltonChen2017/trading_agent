@@ -1,7 +1,9 @@
 # QuantConnect alpha test implementation plan
 
-Status: owner-directed staged research program; implementation may begin only
-after independent review of the preceding pushed stage
+Status: owner-directed staged research program; all affected implementation
+was re-audited 2026-08-17. No historical alpha result is valid. The next QC
+run may begin only after Claude counter-reviews the final pushed Codex audit
+head.
 
 Prepared: 2026-08-16
 
@@ -129,6 +131,27 @@ and an updated ledger. No historical result is rehabilitated.
 
 ## 6. Stage 1 — two already-tested method replications (24 cells)
 
+Implementation status (2026-08-17): Claude's exact pushed Stage 1 head
+`dc63eec` was independently reviewed before any QC run. The submitted code
+formed on the first session of each month and settled at the next month's
+entry, so neither the frozen month-end feature cutoff nor the exact 21-session
+outcome existed. It also reconstructed all 111 historical market-factor
+returns from the current score-date universe and substituted zero on an empty
+factor day. Review correction `b143c60` now scores the immediately preceding
+month-end at the next distinct close, settles overlapping cohorts after
+exactly 21 distinct sessions, records the equal-weight market return from the
+membership actually known on each historical date, and refuses a missing
+factor date. A cadence-matched benchmark algorithm and strict Stage 1 analyser
+were added. Full audit correction `855941a` then standardized the entire LEAN
+tree on current Python API names, removed framework-member shadowing, hardened
+exact-session/provenance/refusal contracts, and bounded cloud polling. **No
+Stage 1 QC run is authorized until Claude counter-reviews the final pushed
+Codex head.**
+
+The invalid generated result Markdown, JSON, and raw logs were removed from
+the active docs tree at the owner's direction. This does not reset look counts:
+`docs/alpha-result.md` permanently preserves every run, status, ID and hash.
+
 Implement these in one monthly algorithm because their score and holding
 cadences match. Each specification has 3 universes x 4 tested outcomes = 12
 cells; total stage family = 24.
@@ -160,6 +183,14 @@ cells; total stage family = 24.
 Use separate cadence-matched equal-weight benchmarks. Definition of done:
 three complete universe runs, one matching benchmark per universe, all 24
 cells analyzed, and result-ledger entries whether favorable or not.
+
+The reviewed execution contract uses `research/lean/alpha_stage1_benchmark.py`
+for those three benchmark series and `scripts/analyse_qc_alpha_stage1.py` for
+analysis. The analyser requires project, compile, backtest and uploaded-source
+SHA-256 identity for both alpha and benchmark runs; accepts only `REP_H52` and
+`REP_IDV`; requires every alpha date to exist in its same-universe benchmark;
+and reports both the 24-cell stage gate and the 452-cell lifetime gate
+(`428 + 24`).
 
 ## 7. Stage 2 — point-in-time PEAD (24 cells)
 

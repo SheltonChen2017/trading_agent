@@ -269,7 +269,7 @@ understated weight buys too much. Leaving you under-hedged is the smaller
 mistake.
 
 Everything here is still ETFs. Options, futures, and short selling remain
-out of scope (`docs/MANDATE.md` §4); buying an inverse ETF is a long ETF
+out of scope (`docs/operations/MANDATE.md` §4); buying an inverse ETF is a long ETF
 purchase, not a short position.
 
 ### Module 4 — Propose & Approve: *the gate every order passes through*

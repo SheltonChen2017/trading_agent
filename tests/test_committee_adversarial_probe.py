@@ -1,6 +1,6 @@
 """A handful of adversarial guard tests for the committee pipeline -- an
 explicit SEED, not the ADR's full >=50-case frozen replay/adversarial
-corpus (docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md's own stated "release
+corpus (docs/architecture/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md's own stated "release
 gate for daily model-backed use"). Follows the measured-corpus style of
 tests/test_committee_action_language_probe.py: no real API calls, exercise
 the deterministic guard directly or via a scripted _FakeProvider response.

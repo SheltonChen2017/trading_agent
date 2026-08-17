@@ -98,7 +98,7 @@ def validate_committee_review(
     output surface would reduce that residual ambiguity further.
 
     What actually contains the risk is architectural, per
-    docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md: the committee is read-only,
+    docs/architecture/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md: the committee is read-only,
     cannot create or modify a proposal, cannot reach a broker, and every
     execution path still requires human approval plus revalidation.  Do not
     treat a clean pass here as evidence the prose carries no advice.

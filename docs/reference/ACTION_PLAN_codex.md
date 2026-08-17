@@ -30,8 +30,8 @@ The status terms in this plan are deliberately distinct:
 | **Prohibited** | Must not be implemented under the current architecture or authority. |
 
 Where documents conflict, current code and reviewed status take precedence;
-the active factual sources are `docs/GENERAL_READINESS_STATUS.md`,
-`docs/ML_IMPLEMENTATION_STATUS.md`, and `docs/SESSION_HANDOFF.md`. The
+the active factual sources are `docs/operations/GENERAL_READINESS_STATUS.md`,
+`docs/operations/ML_IMPLEMENTATION_STATUS.md`, and `docs/SESSION_HANDOFF.md`. The
 implementation plans still control milestone definitions and safety gates.
 
 ## 2. Document inventory and authority

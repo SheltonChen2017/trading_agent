@@ -6,7 +6,7 @@ failure this report exists to prevent.
 
 Three deviations from docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md
 section 5, all because the plan predates code that now exists. They are
-deliberate; see docs/GENERAL_READINESS_STATUS.md.
+deliberate; see docs/operations/GENERAL_READINESS_STATUS.md.
 
 1.  The plan says to reuse ``assistant/readiness.py``'s ``_check()``
     shape. Three incompatible shapes now exist (readiness, operations,

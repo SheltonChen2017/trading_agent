@@ -1,5 +1,5 @@
 """LEAN monthly alpha battery. Specifications frozen in
-`docs/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`.
+`docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`.
 
 This algorithm REPORTS ALPHA STATISTICS, so unlike the smoke probes it is
 NOT exempt: every run is a counted research look.
@@ -102,6 +102,30 @@ def _aligned_price_tail(values, value_sessions, market_sessions, count):
     if sessions != list(market_sessions)[-required:]:
         return None
     return list(values)[-required:]
+
+
+def _aligned_observation_tail(values, value_sessions, market_sessions, count):
+    """Return exactly ``count`` observations on the last market sessions."""
+    if count <= 0 or count > len(values) or count > len(value_sessions):
+        return None
+    if count > len(market_sessions):
+        return None
+    sessions = list(value_sessions)[-count:]
+    if sessions != list(market_sessions)[-count:]:
+        return None
+    return list(values)[-count:]
+
+
+def _leave_one_out_peer_return(symbol, stock_return, membership, aggregates):
+    """Compute one PIT industry factor observation or refuse it."""
+    code = membership.get(symbol)
+    aggregate = aggregates.get(code)
+    if code is None or aggregate is None:
+        return None
+    total, size = aggregate
+    if size < 3:
+        return None
+    return (total - stock_return) / (size - 1)
 
 
 def _spearman(pairs):
@@ -221,19 +245,24 @@ def _drift_turnover(previous, target, outcomes):
 
 class AlphaBatteryMonthly(QCAlgorithm):
 
-    def Initialize(self):
-        self.SetStartDate(*START)
-        self.SetEndDate(*END)
-        self.SetCash(100_000)
-        self.UniverseSettings.Resolution = Resolution.Daily
-        self.UniverseSettings.DataNormalizationMode = DataNormalizationMode.Adjusted
+    def initialize(self):
+        self.set_start_date(*START)
+        self.set_end_date(*END)
+        self.set_cash(100_000)
+        self.universe_settings.resolution = Resolution.DAILY
+        self.universe_settings.data_normalization_mode = DataNormalizationMode.ADJUSTED
         self.screen = UNIVERSES[ACTIVE_UNIVERSE]
-        self.AddUniverse(self._coarse, self._fine)
+        self.add_universe(self._coarse, self._fine)
 
         self.closes = {}            # Symbol -> deque of daily closes
         self.close_sessions = {}    # Symbol -> matching exchange sessions
         self.sessions = deque(maxlen=LOOKBACK)
-        self.fundamentals = {}      # Symbol -> dict of latest known values
+        self.factor_sessions = deque(maxlen=LOOKBACK)
+        self.market_returns = deque(maxlen=LOOKBACK)
+        self.industry_aggregates = deque(maxlen=LOOKBACK)
+        self.industry_membership = {}
+        # Avoid shadowing QCAlgorithm.fundamentals, a framework member.
+        self.fundamental_cache = {} # Symbol -> latest point-in-time values
         self.industry = {}          # Symbol -> Morningstar industry code
         self.selected = []          # this month's eligible symbols
         self.pending = None         # scores awaiting their forward return
@@ -258,31 +287,32 @@ class AlphaBatteryMonthly(QCAlgorithm):
     # --- universe ------------------------------------------------------
 
     def _coarse(self, coarse):
-        if self.selection_month == (self.Time.year, self.Time.month):
-            return Universe.Unchanged
-        return [c.Symbol for c in coarse
-                if c.HasFundamentalData
-                and c.Price >= self.screen["min_price"]
-                and c.DollarVolume >= self.screen["min_adv"]]
+        if self.selection_month == (self.time.year, self.time.month):
+            return Universe.UNCHANGED
+        return [c.symbol for c in coarse
+                if c.has_fundamental_data
+                and c.price >= self.screen["min_price"]
+                and c.dollar_volume >= self.screen["min_adv"]]
 
     def _fine(self, fine):
-        if self.selection_month == (self.Time.year, self.Time.month):
-            return Universe.Unchanged
-        self.selection_month = (self.Time.year, self.Time.month)
+        if self.selection_month == (self.time.year, self.time.month):
+            return Universe.UNCHANGED
+        self.selection_month = (self.time.year, self.time.month)
         chosen = []
+        month_membership = {}
         for f in fine:
             self.cap_rows += 1
-            cap = float(f.MarketCap or 0.0)
+            cap = float(f.market_cap or 0.0)
             if cap <= 0.0:
                 # MarketCap == 0 is MISSING, not small. Reconstruct where
                 # possible; count both outcomes so the excluded set is
                 # never invisible.
                 shares = 0.0
                 try:
-                    shares = float(f.CompanyProfile.SharesOutstanding or 0.0)
+                    shares = float(f.company_profile.shares_outstanding or 0.0)
                 except Exception:  # noqa: BLE001
                     shares = 0.0
-                price = float(f.Price or 0.0)
+                price = float(f.price or 0.0)
                 if shares > 0.0 and price > 0.0:
                     cap = shares * price
                     self.cap_fallback += 1
@@ -291,22 +321,23 @@ class AlphaBatteryMonthly(QCAlgorithm):
                     continue
             if cap < self.screen["min_cap"]:
                 continue
-            self.industry[f.Symbol] = int(
-                f.AssetClassification.MorningstarIndustryCode or 0
+            self.industry[f.symbol] = int(
+                f.asset_classification.morningstar_industry_code or 0
             )
-            self.fundamentals[f.Symbol] = {
+            month_membership[f.symbol] = self.industry[f.symbol]
+            self.fundamental_cache[f.symbol] = {
                 "gross_profit": float(
-                    f.FinancialStatements.IncomeStatement.GrossProfit.Value or 0.0),
+                    f.financial_statements.income_statement.gross_profit.value or 0.0),
                 "assets": float(
-                    f.FinancialStatements.BalanceSheet.TotalAssets.Value or 0.0),
+                    f.financial_statements.balance_sheet.total_assets.value or 0.0),
                 "debt": float(
-                    f.FinancialStatements.BalanceSheet.TotalDebt.Value or 0.0),
+                    f.financial_statements.balance_sheet.total_debt.value or 0.0),
                 "fcf": float(
-                    f.FinancialStatements.CashFlowStatement.FreeCashFlow.Value or 0.0),
-                "roe": float(f.OperationRatios.ROE.Value or 0.0),
+                    f.financial_statements.cash_flow_statement.free_cash_flow.value or 0.0),
+                "roe": float(f.operation_ratios.roe.value or 0.0),
                 "cap": cap,
             }
-            chosen.append(f.Symbol)
+            chosen.append(f.symbol)
         current = set(chosen)
         needed = set()
         if self.pending is not None:
@@ -315,40 +346,54 @@ class AlphaBatteryMonthly(QCAlgorithm):
             needed.update(self.staged.get("names", ()))
         for symbol in self.in_universe - current:
             if symbol in needed and symbol not in self.retained:
-                self.AddSecurity(symbol, Resolution.Daily)
+                self.add_security(symbol, Resolution.DAILY)
                 self.retained.add(symbol)
         self.in_universe = current
         self.selected = chosen
+        self.industry_membership[self.selection_month] = month_membership
+        # The longest factor window is under two years. Keep a buffer while
+        # bounding state in long cloud runs.
+        for month in sorted(self.industry_membership)[:-30]:
+            self.industry_membership.pop(month, None)
         return chosen
 
     # --- data ----------------------------------------------------------
 
-    def OnData(self, data):
-        for symbol, delisting in data.Delistings.items():
-            if delisting.Type != DelistingType.Delisted:
+    def on_data(self, data):
+        for symbol, delisting in data.delistings.items():
+            if delisting.type != DelistingType.DELISTED:
                 continue
-            raw_price = getattr(delisting, "Price", None)
+            raw_price = getattr(delisting, "price", None)
             if raw_price is None:
-                raw_price = getattr(delisting, "Value", 0.0)
+                raw_price = getattr(delisting, "value", 0.0)
             try:
                 self.terminal_prices[symbol] = max(0.0, float(raw_price))
             except (TypeError, ValueError):
                 self.terminal_prices[symbol] = 0.0
 
-        session = self.Time.date()
-        if not data.Bars or session == self.last_session:
+        session = self.time.date()
+        if not data.bars or session == self.last_session:
             return
+        previous_session = self.last_session
         self.last_session = session
         self.sessions.append(session)
 
-        for symbol in list(data.Bars.Keys):
+        daily_returns = {}
+        for symbol in list(data.bars.keys()):
             window = self.closes.get(symbol)
             if window is None:
                 window = deque(maxlen=LOOKBACK)
                 self.closes[symbol] = window
                 self.close_sessions[symbol] = deque(maxlen=LOOKBACK)
-            window.append(float(data.Bars[symbol].Close))
+            close = float(data.bars[symbol].close)
+            dates = self.close_sessions[symbol]
+            if (previous_session is not None and window and dates
+                    and dates[-1] == previous_session and window[-1] > 0):
+                daily_returns[symbol] = close / window[-1] - 1.0
+            window.append(close)
             self.close_sessions[symbol].append(session)
+
+        self._record_factor_returns(session, daily_returns)
 
         if self.staged is not None and session > self.staged["score_session"]:
             self._bind_staged_entry()
@@ -356,7 +401,7 @@ class AlphaBatteryMonthly(QCAlgorithm):
         # Score once per month, after the day's bars have been recorded.
         # Settling first, then forming, gives a full month between a score
         # and the return it is judged against.
-        month = (self.Time.year, self.Time.month)
+        month = (self.time.year, self.time.month)
         if self.scored_month != month and self.selection_month == month:
             self.scored_month = month
             self._form_scores()
@@ -444,7 +489,59 @@ class AlphaBatteryMonthly(QCAlgorithm):
         return [values[i + 1] / values[i] - 1.0
                 for i in range(len(values) - 1)]
 
-    def _residual_momentum(self, symbol, months, market, industry_returns):
+    def _record_factor_returns(self, session, daily_returns):
+        """Record one point-in-time market/industry factor observation.
+
+        The previous implementation rebuilt two years of factor history at
+        every rebalance using today's membership and industry label. That
+        both leaked classifications backward and repeated an O(N^2) peer
+        calculation. This prospective record is O(N) per session.
+        """
+        membership = self.industry_membership.get(
+            (session.year, session.month), {}
+        )
+        returns = {
+            symbol: daily_returns[symbol]
+            for symbol in self.selected
+            if symbol in membership and symbol in daily_returns
+        }
+        if len(returns) < MIN_NAMES:
+            return
+        buckets = {}
+        for symbol, value in returns.items():
+            code = membership[symbol]
+            total, size = buckets.get(code, (0.0, 0))
+            buckets[code] = (total + value, size + 1)
+        self.factor_sessions.append(session)
+        self.market_returns.append(sum(returns.values()) / len(returns))
+        self.industry_aggregates.append(buckets)
+
+    def _factor_returns(self, symbol, count):
+        """Return aligned PIT market and leave-one-out industry factors."""
+        stock = self._returns(symbol, count)
+        market = _aligned_observation_tail(
+            self.market_returns, self.factor_sessions, self.sessions, count
+        )
+        aggregates = _aligned_observation_tail(
+            self.industry_aggregates, self.factor_sessions, self.sessions, count
+        )
+        if stock is None or market is None or aggregates is None:
+            return None
+        factor_sessions = list(self.factor_sessions)[-count:]
+        industry = []
+        for value, session, daily in zip(stock, factor_sessions, aggregates):
+            membership = self.industry_membership.get(
+                (session.year, session.month), {}
+            )
+            peer_return = _leave_one_out_peer_return(
+                symbol, value, membership, daily
+            )
+            if peer_return is None:
+                return None
+            industry.append(peer_return)
+        return market, industry
+
+    def _residual_momentum(self, symbol, months):
         """Joint market+industry regression (Method V2 section 1.7).
 
         A fixed 252-session fit ends where the months-minus-one formation
@@ -452,10 +549,11 @@ class AlphaBatteryMonthly(QCAlgorithm):
         as they are for the raw 6-1 and 12-1 momentum specifications.
         """
         stock = self._returns(symbol, RESIDUAL_MAX_RETURNS)
-        if stock is None:
+        factors = self._factor_returns(symbol, RESIDUAL_MAX_RETURNS)
+        if stock is None or factors is None:
             return None
-        peers = industry_returns.get(symbol)
-        if peers is None or len(peers) != len(stock) or len(market) != len(stock):
+        market, peers = factors
+        if len(peers) != len(stock) or len(market) != len(stock):
             return None
         return _residual_momentum_total(stock, market, peers, months)
 
@@ -464,27 +562,18 @@ class AlphaBatteryMonthly(QCAlgorithm):
         if len(names) < MIN_NAMES:
             return
 
-        residual_names = [
-            symbol for symbol in names
-            if self._returns(symbol, RESIDUAL_MAX_RETURNS) is not None
-        ]
-        market = self._index_returns(residual_names, RESIDUAL_MAX_RETURNS)
-        industry_returns = self._industry_returns(
-            residual_names, RESIDUAL_MAX_RETURNS
-        )
-
         raw = {}
         for months in (3, 6, 9, 12):
             raw[f"MOM_{months}_1"] = {s: self._momentum(s, months) for s in names}
         for months in (6, 12):
             raw[f"RESIDUAL_MOM_{months}_1"] = {
-                s: self._residual_momentum(s, months, market, industry_returns)
+                s: self._residual_momentum(s, months)
                 for s in names
             }
         gp = {}
         quality = {}
         for symbol in names:
-            f = self.fundamentals.get(symbol)
+            f = self.fundamental_cache.get(symbol)
             if not f or f["assets"] <= 0:
                 gp[symbol] = None
                 quality[symbol] = None
@@ -529,35 +618,9 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.staged = {
             "scores": raw,
             "names": names,
-            "date": str(self.Time.date()),
-            "score_session": self.Time.date(),
+            "date": str(self.time.date()),
+            "score_session": self.time.date(),
         }
-
-    def _index_returns(self, names, count):
-        series = []
-        for index in range(count):
-            values = []
-            for symbol in names:
-                a = self._price(symbol, count - index)
-                b = self._price(symbol, count - index - 1)
-                if a and b and a > 0:
-                    values.append(b / a - 1.0)
-            series.append(sum(values) / len(values) if values else 0.0)
-        return series
-
-    def _industry_returns(self, names, count):
-        buckets = {}
-        for symbol in names:
-            buckets.setdefault(self.industry.get(symbol), []).append(symbol)
-        out = {}
-        for code, members in buckets.items():
-            if len(members) < 3:
-                continue
-            for symbol in members:
-                peers = [member for member in members if member != symbol]
-                if len(peers) >= 2:
-                    out[symbol] = self._index_returns(peers, count)
-        return out
 
     def _settle(self):
         """Score last month's ranking against the realised return."""
@@ -601,12 +664,12 @@ class AlphaBatteryMonthly(QCAlgorithm):
         needed = set(self.pending.get("entry", {})) if self.pending else set()
         for symbol in list(self.retained):
             if symbol not in needed and symbol not in self.in_universe:
-                self.RemoveSecurity(symbol)
+                self.remove_security(symbol)
                 self.retained.remove(symbol)
 
-    def OnEndOfAlgorithm(self):
-        self.Log(f"=== ALPHA BATTERY MONTHLY | universe={ACTIVE_UNIVERSE} ===")
-        self.Log(f"cap_rows={self.cap_rows} cap_fallback={self.cap_fallback} "
+    def on_end_of_algorithm(self):
+        self.log(f"=== ALPHA BATTERY MONTHLY | universe={ACTIVE_UNIVERSE} ===")
+        self.log(f"cap_rows={self.cap_rows} cap_fallback={self.cap_fallback} "
                  f"cap_missing={self.cap_missing}")
 
         # ONE LINE PER DATE, not per (spec, date). QuantConnect truncates
@@ -622,7 +685,7 @@ class AlphaBatteryMonthly(QCAlgorithm):
         order = list(SPECIFICATIONS)
         missing = [spec for spec in order if spec not in self.results]
         if missing:
-            self.Error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
+            self.error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
             return
         index_of = {spec: i for i, spec in enumerate(order)}
         by_date = {}
@@ -634,9 +697,9 @@ class AlphaBatteryMonthly(QCAlgorithm):
                     f"{round(turn_ls, 4)}~{round(turn_l10, 4)}~"
                     f"{round(turn_l20, 4)}~{n}"
                 )
-        self.Log(f"SPECS|{'|'.join(order)}")
-        self.Log(f"DATES|{len(by_date)}")
+        self.log(f"SPECS|{'|'.join(order)}")
+        self.log(f"DATES|{len(by_date)}")
         for date in sorted(by_date):
             # Date compressed to YYYYMM; the cadence is monthly.
-            self.Log(f"ROW|{date.replace('-', '')[:6]}|" + "|".join(by_date[date]))
-        self.Log(f"orders placed: {self.Transactions.OrdersCount}")
+            self.log(f"ROW|{date.replace('-', '')[:6]}|" + "|".join(by_date[date]))
+        self.log(f"orders placed: {self.transactions.orders_count}")

@@ -34,15 +34,15 @@ SCREEN = {"min_price": 5.0, "min_cap": 500_000_000.0, "min_adv": 5_000_000.0}
 class RetentionProbe(QCAlgorithm):
     """Universe with retained subscriptions. Places no orders."""
 
-    def Initialize(self):
+    def initialize(self):
         # The window containing three large, fast bank failures.
-        self.SetStartDate(2022, 6, 1)
-        self.SetEndDate(2023, 12, 31)
-        self.SetCash(100_000)
-        self.UniverseSettings.Resolution = Resolution.Daily
-        self.UniverseSettings.DataNormalizationMode = DataNormalizationMode.Raw
+        self.set_start_date(2022, 6, 1)
+        self.set_end_date(2023, 12, 31)
+        self.set_cash(100_000)
+        self.universe_settings.resolution = Resolution.DAILY
+        self.universe_settings.data_normalization_mode = DataNormalizationMode.RAW
 
-        self.AddUniverse(self._coarse, self._fine)
+        self.add_universe(self._coarse, self._fine)
 
         self._retained = {}          # Symbol -> date it left the universe
         self._delistings = []        # every delisting seen, retained or not
@@ -52,55 +52,55 @@ class RetentionProbe(QCAlgorithm):
 
     def _coarse(self, coarse):
         return [
-            c.Symbol for c in coarse
-            if c.HasFundamentalData
-            and c.Price >= SCREEN["min_price"]
-            and c.DollarVolume >= SCREEN["min_adv"]
+            c.symbol for c in coarse
+            if c.has_fundamental_data
+            and c.price >= SCREEN["min_price"]
+            and c.dollar_volume >= SCREEN["min_adv"]
         ]
 
     def _fine(self, fine):
         self._selections += 1
-        selected = [f.Symbol for f in fine
-                    if f.MarketCap and f.MarketCap >= SCREEN["min_cap"]]
+        selected = [f.symbol for f in fine
+                    if f.market_cap and f.market_cap >= SCREEN["min_cap"]]
         current = set(selected)
 
         # The retention step. A name that just left the universe keeps its
         # subscription so its delisting can still be observed.
         for symbol in self._in_universe - current:
             if symbol not in self._retained:
-                self._retained[symbol] = self.Time.date()
+                self._retained[symbol] = self.time.date()
                 # Re-add BY SYMBOL. A ticker string would resolve against
                 # today's map and could return a different company.
-                self.AddSecurity(symbol, Resolution.Daily)
+                self.add_security(symbol, Resolution.DAILY)
 
         self._in_universe = current
         return selected
 
-    def OnData(self, data):
-        for symbol, delisting in data.Delistings.items():
-            if delisting.Type != DelistingType.Delisted:
+    def on_data(self, data):
+        for symbol, delisting in data.delistings.items():
+            if delisting.type != DelistingType.DELISTED:
                 continue
             left_on = self._retained.get(symbol)
-            self._delistings.append(symbol.Value)
+            self._delistings.append(symbol.value)
             if left_on is not None:
-                self._delisted_after_exit.append((symbol.Value, str(left_on)))
-                self.Log(
-                    f"[retained-delisting] {self.Time.date()} {symbol.Value} "
+                self._delisted_after_exit.append((symbol.value, str(left_on)))
+                self.log(
+                    f"[retained-delisting] {self.time.date()} {symbol.value} "
                     f"left_universe={left_on}"
                 )
             else:
-                self.Log(f"[in-universe-delisting] {self.Time.date()} {symbol.Value}")
+                self.log(f"[in-universe-delisting] {self.time.date()} {symbol.value}")
 
-    def OnEndOfAlgorithm(self):
-        self.Log("=== RETENTION PROBE - NO ALPHA STATISTIC REPORTED ===")
-        self.Log(f"fine selections            : {self._selections}")
-        self.Log(f"securities retained on exit: {len(self._retained)}")
-        self.Log(f"TOTAL DELISTINGS OBSERVED  : {len(self._delistings)}")
-        self.Log(f"  of which AFTER exiting   : {len(self._delisted_after_exit)}")
+    def on_end_of_algorithm(self):
+        self.log("=== RETENTION PROBE - NO ALPHA STATISTIC REPORTED ===")
+        self.log(f"fine selections            : {self._selections}")
+        self.log(f"securities retained on exit: {len(self._retained)}")
+        self.log(f"TOTAL DELISTINGS OBSERVED  : {len(self._delistings)}")
+        self.log(f"  of which AFTER exiting   : {len(self._delisted_after_exit)}")
         # The three the screened run missed. Naming them makes the check
         # falsifiable rather than a count the reader must interpret.
         for wanted in ("SIVB", "SBNY", "FRC"):
-            self.Log(f"  {wanted} observed: {wanted in self._delistings}")
-        self.Log(f"orders placed              : {self.Transactions.OrdersCount}")
-        if self.Transactions.OrdersCount:
-            self.Error("PROBE PLACED ORDERS - no longer exempt from the look count")
+            self.log(f"  {wanted} observed: {wanted in self._delistings}")
+        self.log(f"orders placed              : {self.transactions.orders_count}")
+        if self.transactions.orders_count:
+            self.error("PROBE PLACED ORDERS - no longer exempt from the look count")

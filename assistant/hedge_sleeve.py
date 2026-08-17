@@ -11,7 +11,7 @@ Scope, stated plainly because the word "hedge" invites bigger claims than
 this milestone supports:
 
 * the instruments are long-only ETFs the broker already supports. No
-  options, no futures, no shorting -- see `docs/MANDATE.md` 4, amended for
+  options, no futures, no shorting -- see `docs/operations/MANDATE.md` 4, amended for
   this milestone;
 * **this project has NOT confirmed that this basket reduces drawdown.** The
   defensive-carry probe behind `config.DEFENSIVE_CARRY_TICKERS` is a

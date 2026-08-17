@@ -21,6 +21,7 @@ import binascii
 import hashlib
 import json
 import math
+import re
 import struct
 import sys
 from pathlib import Path
@@ -41,6 +42,7 @@ DRAWS = 20_000
 # IC was the headline gate, understating the family from 135 to 180.
 DECLARED_LOOKS = 180
 COST_BPS = (0.0, 5.0, 10.0, 25.0)
+SHA256 = re.compile(r"^[0-9a-f]{64}$")
 EXPECTED_SPEC_SETS = {
     frozenset({
         "GROSS_PROFITABILITY", "MOM_12_1", "MOM_3_1", "MOM_6_1", "MOM_9_1",
@@ -62,7 +64,10 @@ class InvalidLog(RuntimeError):
     """The log cannot establish one complete, internally consistent run."""
 
 
-def parse_log(path: Path) -> tuple[list[str], pd.DataFrame, dict]:
+def parse_log(
+    path: Path,
+    expected_spec_sets: set[frozenset[str]] | None = None,
+) -> tuple[list[str], pd.DataFrame, dict]:
     specs: list[str] = []
     declared = None
     meta: dict = {}
@@ -79,9 +84,15 @@ def parse_log(path: Path) -> tuple[list[str], pd.DataFrame, dict]:
                 raise InvalidLog(f"{path.name}: conflicting SPECS declarations")
             specs = found
         elif "SCALE|" in line:
-            scale_declaration = line.split("SCALE|", 1)[1]
+            found = line.split("SCALE|", 1)[1]
+            if scale_declaration is not None and found != scale_declaration:
+                raise InvalidLog(f"{path.name}: conflicting SCALE declarations")
+            scale_declaration = found
         elif "DATES|" in line:
-            declared = int(line.split("DATES|", 1)[1])
+            found = int(line.split("DATES|", 1)[1])
+            if declared is not None and found != declared:
+                raise InvalidLog(f"{path.name}: conflicting DATES declarations")
+            declared = found
         elif "cap_rows=" in line:
             for part in line.split():
                 if "=" in part and part.split("=")[0] in {
@@ -182,7 +193,10 @@ def parse_log(path: Path) -> tuple[list[str], pd.DataFrame, dict]:
                     )
     if not specs or declared is None:
         raise InvalidLog(f"{path.name}: missing SPECS or DATES declaration")
-    if frozenset(specs) not in EXPECTED_SPEC_SETS or len(specs) != len(set(specs)):
+    if declared <= 0 or not date_indices:
+        raise InvalidLog(f"{path.name}: result log contains no dated observations")
+    allowed = EXPECTED_SPEC_SETS if expected_spec_sets is None else expected_spec_sets
+    if frozenset(specs) not in allowed or len(specs) != len(set(specs)):
         raise InvalidLog(f"{path.name}: incomplete or unknown frozen spec inventory")
     expected_indices = set(range(len(specs)))
     incomplete = [date for date, indices in date_indices.items()
@@ -204,18 +218,41 @@ def parse_log(path: Path) -> tuple[list[str], pd.DataFrame, dict]:
             f"{path.name}: {observed} distinct dates but DATES declared {declared}"
         )
     for spec, periods in spec_periods.items():
+        if spec not in specs:
+            raise InvalidLog(f"{path.name}: SPECMETA names unknown spec {spec!r}")
         observed_periods = int((frame["spec"] == spec).sum())
         if periods != observed_periods:
             raise TruncatedLog(
                 f"{path.name}: {spec} has {observed_periods} rows, {periods} declared"
             )
+    numeric_columns = (
+        "long", "short", "long20", "turnover_ls", "turnover_l10",
+        "turnover_l20",
+    )
+    for column in numeric_columns:
+        numeric = pd.to_numeric(frame[column], errors="coerce")
+        if numeric.isna().any() or not numeric.map(math.isfinite).all():
+            raise InvalidLog(f"{path.name}: {column} contains non-finite values")
+    for column in ("turnover_ls", "turnover_l10", "turnover_l20"):
+        if (frame[column] < 0).any():
+            raise InvalidLog(f"{path.name}: {column} contains negative turnover")
+    finite_ic = pd.to_numeric(frame["ic"].dropna(), errors="coerce")
+    if (finite_ic.isna().any() or not finite_ic.map(math.isfinite).all()
+            or (finite_ic.abs() > 1.0).any()):
+        raise InvalidLog(f"{path.name}: IC must be finite and within [-1, 1]")
+    finite_names = pd.to_numeric(frame["names"].dropna(), errors="coerce")
+    if finite_names.isna().any() or (finite_names <= 0).any():
+        raise InvalidLog(f"{path.name}: usable-name counts must be positive")
     meta["dates"] = observed
     meta["first_date"] = min(date_indices)
     meta["last_date"] = max(date_indices)
     return specs, frame, meta
 
 
-def merge_logs(paths: list[Path]) -> tuple[list[str], pd.DataFrame, dict]:
+def merge_logs(
+    paths: list[Path],
+    expected_spec_sets: set[frozenset[str]] | None = None,
+) -> tuple[list[str], pd.DataFrame, dict]:
     """Merge chronological split windows, rejecting overlap or mismatch."""
     if not paths:
         raise InvalidLog("at least one log path is required")
@@ -224,7 +261,7 @@ def merge_logs(paths: list[Path]) -> tuple[list[str], pd.DataFrame, dict]:
     merged_meta: dict = {}
     last_date: str | None = None
     for path in paths:
-        specs, frame, meta = parse_log(path)
+        specs, frame, meta = parse_log(path, expected_spec_sets=expected_spec_sets)
         if expected_specs is None:
             expected_specs = specs
         elif specs != expected_specs:
@@ -259,14 +296,32 @@ def merge_logs(paths: list[Path]) -> tuple[list[str], pd.DataFrame, dict]:
     return expected_specs or [], combined, merged_meta
 
 
-def _mapping(items: list[str], option: str) -> dict[str, list[str]]:
-    mapped: dict[str, list[str]] = {}
+def _run_identities(items: list[str]) -> dict[str, list[dict[str, str]]]:
+    """Parse complete run provenance for one or more chronological logs."""
+    mapped: dict[str, list[dict[str, str]]] = {}
     for item in items:
         label, separator, values = item.partition("=")
-        entries = [value.strip() for value in values.split(",") if value.strip()]
+        entries = [value.strip() for value in values.split(";") if value.strip()]
         if not separator or not label or not entries or label in mapped:
-            raise SystemExit(f"{option}: expected one unique label=value[,value] entry")
-        mapped[label] = entries
+            raise SystemExit(
+                "--run-id: expected one unique "
+                "label=project,compile,backtest,source_sha256[;...] entry"
+            )
+        records = []
+        for entry in entries:
+            parts = [part.strip() for part in entry.split(",")]
+            if (len(parts) != 4 or not parts[0].isdigit()
+                    or int(parts[0]) <= 0 or not parts[1] or not parts[2]
+                    or not SHA256.fullmatch(parts[3])):
+                raise SystemExit(
+                    "--run-id: each run must be "
+                    "project,compile,backtest,source_sha256"
+                )
+            records.append(dict(zip(
+                ("project_id", "compile_id", "backtest_id", "source_sha256"),
+                parts,
+            )))
+        mapped[label] = records
     return mapped
 
 
@@ -318,11 +373,14 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--periods-per-year", type=float, default=12.0)
     parser.add_argument(
         "--run-id", action="append", required=True,
-        help="label=QuantConnect-backtest-id[,id], one id per input log",
+        help=("label=project,compile,backtest,source_sha256[;...], "
+              "one complete identity per input log"),
     )
     parser.add_argument("--output", required=True)
     args = parser.parse_args(argv)
-    run_ids = _mapping(args.run_id, "--run-id")
+    if not math.isfinite(args.periods_per_year) or args.periods_per_year <= 0:
+        raise SystemExit("--periods-per-year must be a positive finite number")
+    run_ids = _run_identities(args.run_id)
 
     threshold = bonferroni_threshold(DECLARED_LOOKS)
     smallest = 1.0 / (DRAWS + 1)
@@ -340,8 +398,12 @@ def main(argv: list[str] | None = None) -> int:
         "smallest_attainable_p": smallest,
         "universes": {},
     }
+    seen_labels = set()
     for item in args.log:
-        label, _, paths = item.partition("=")
+        label, separator, paths = item.partition("=")
+        if not separator or not label or not paths or label in seen_labels:
+            raise SystemExit("--log expects one unique label=path[,path...] entry")
+        seen_labels.add(label)
         # A label may name SEVERAL logs. The short-horizon battery is split
         # into date windows because its full series exceeds the ~100KB log
         # cap; merging here keeps the analysis on one continuous series
@@ -354,7 +416,7 @@ def main(argv: list[str] | None = None) -> int:
             )
         specs, frame, meta = merge_logs(log_paths)
         report["universes"][label] = {
-            "quantconnect_backtest_ids": run_ids[label],
+            "quantconnect_runs": run_ids[label],
             "meta": meta,
             "specs": analyse(frame, args.periods_per_year),
         }

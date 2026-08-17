@@ -95,7 +95,7 @@ allocation-profile fingerprint is persisted and checked before broker I/O;
 the UI fingerprint covers the complete portfolio snapshot, report, policy,
 choices, and exact budget; and lower-edge dollars are derived directly from
 Decimal values rather than display percentages. Disposition and validation
-are in `docs/REVIEW_2026-08-15_REBAL1_STAGE2_INDEPENDENT.md`.
+are in `docs/Review/REVIEW_2026-08-15_REBAL1_STAGE2_INDEPENDENT.md`.
 
 ## Stage 3 — Tax-aware trims (IMPLEMENTED 2026-08-15)
 
@@ -108,7 +108,7 @@ Stage 3 is where rebalancing first sells on the app's own initiative, unlike
 every other sell path in this app, which is either a computed policy breach
 or the owner's explicit instruction. **The owner gave the required explicit
 authorization naming it on 2026-08-15**; disposition in
-`docs/REVIEW_2026-08-15_REBAL1_STAGE3.md`. That authorization covers building
+`docs/Review/REVIEW_2026-08-15_REBAL1_STAGE3.md`. That authorization covers building
 the workflow only -- it does not authorize deployment, an epoch roll, or any
 change to the operational checkout.
 

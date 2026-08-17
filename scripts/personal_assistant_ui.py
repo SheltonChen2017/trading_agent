@@ -1102,7 +1102,7 @@ def _render_proposal_approval(proposal: dict, store: AssistantStore, policy_path
 
         # Independent review, 2026-07-31: assistant/llm/ (the "investment
         # committee" AI reviewer) was fully built, tested, and governed by
-        # docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md, but had zero real usage
+        # docs/architecture/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md, but had zero real usage
         # anywhere -- no provider adapter, no persistence, no UI surface.
         # The committee is architecturally restricted (both by the ADR and
         # by project_committee_input()'s own hard checks) to exactly this

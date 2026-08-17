@@ -71,7 +71,7 @@ Implement one milestone per branch and review. At each milestone:
 4. keep paper and live identities explicitly separate;
 5. test cash-only, missing-data, corruption, retry, and epoch-change cases;
 6. run focused tests, the full suite, compilation, and `git diff --check`;
-7. update `docs/ML_IMPLEMENTATION_STATUS.md` and the operations runbook; and
+7. update `docs/operations/ML_IMPLEMENTATION_STATUS.md` and the operations runbook; and
 8. state which remaining gates require elapsed evidence or owner authority.
 
 No milestone may automatically edit `assistant/research_findings.json`, promote
@@ -105,7 +105,7 @@ order data exist; ML-FS-2 only records deterministic telemetry.
 
 - Record this overlay plan and the audited baseline above.
 - Reconcile stale or contradictory statements in
-  `docs/ML_IMPLEMENTATION_STATUS.md` as milestones land.
+  `docs/operations/ML_IMPLEMENTATION_STATUS.md` as milestones land.
 - Keep the existing ML import-boundary test green.
 
 ### Definition of done

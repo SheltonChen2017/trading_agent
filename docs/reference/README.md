@@ -30,12 +30,14 @@ deliberately does not restate per-milestone internals.
 | `UI_FEATURE_CONTROLS_DESIGN.md` | Settings/AI-toggle/policy-workflow/suggestions design |
 | `ACTION_PLAN_codex.md` | Codex's independent audit draft (merged into the adopted plan) |
 
-Documents that did NOT move remain live in `docs/`: status ledgers
-(`GENERAL_READINESS_STATUS.md`, `ML_IMPLEMENTATION_STATUS.md`), process
-documents, `SESSION_HANDOFF.md`, `MANDATE.md`, `ARCHITECTURE_DEBT.md`,
-`OPERATIONS_RUNBOOK.md`, `LIVE_PROMOTION_CHECKLIST.md`,
-`DATABENTO_DATA_SOURCE.md`, the committee ADR, and historical review
-records.
+The active documentation layout was simplified on 2026-08-17. The `docs/`
+root contains only canonical Action Plan/Session Handoff records, milestone
+documents, the staged alpha plan, and the permanent alpha result ledger.
+Historical review reports are in `docs/Review/`; research methods,
+preregistrations and the plain-language glossary are in `docs/research/`;
+standing workflow rules are in `docs/process/`; operational records are in
+`docs/operations/`; architecture records are in `docs/architecture/`; and
+archived cross-session handoffs are in `docs/reference/handoffs/`.
 
 Code comments written before the archive may still cite `docs/<name>.md`
 paths for these files; those citations refer here.

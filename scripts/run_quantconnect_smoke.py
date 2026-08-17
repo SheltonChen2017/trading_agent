@@ -21,6 +21,7 @@ unreachable regardless of what this script asks for.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import sys
 import time
@@ -39,6 +40,7 @@ ALGORITHM = Path(__file__).resolve().parents[1] / "research" / "lean" / "univers
 ENTRY_FILE = "main.py"
 POLL_SECONDS = 10
 MAX_WAIT_SECONDS = 1800
+STALL_WAIT_SECONDS = 900
 
 
 def _wait_for_compile(client: QuantConnectClient, project_id: int, compile_id: str) -> dict:
@@ -57,8 +59,17 @@ def _wait_for_compile(client: QuantConnectClient, project_id: int, compile_id: s
     raise QuantConnectError("compile did not finish within 300s")
 
 
-def _wait_for_backtest(client: QuantConnectClient, project_id: int, backtest_id: str) -> dict:
-    deadline = time.monotonic() + MAX_WAIT_SECONDS
+def _wait_for_backtest(
+    client: QuantConnectClient,
+    project_id: int,
+    backtest_id: str,
+    max_wait_seconds: float = MAX_WAIT_SECONDS,
+    stall_seconds: float = STALL_WAIT_SECONDS,
+) -> dict:
+    started = time.monotonic()
+    deadline = started + max_wait_seconds
+    last_progress = object()
+    last_progress_at = started
     while time.monotonic() < deadline:
         result = client.read_backtest(project_id, backtest_id)
         backtest = result.get("backtest") or result
@@ -67,9 +78,31 @@ def _wait_for_backtest(client: QuantConnectClient, project_id: int, backtest_id:
         if backtest.get("error"):
             raise QuantConnectError(f"backtest error: {backtest['error']}")
         progress = backtest.get("progress")
+        # Some failed cloud runs never publish a numeric progress value at
+        # all. Treat the whole observable state as the heartbeat so a
+        # permanently ``None`` progress cannot bypass the stall detector.
+        marker = (
+            str(progress),
+            str(backtest.get("status") or backtest.get("state") or ""),
+        )
+        now = time.monotonic()
+        if marker != last_progress:
+            last_progress = marker
+            last_progress_at = now
+        elif now - last_progress_at >= stall_seconds:
+            raise QuantConnectError(
+                "backtest reported no progress for "
+                f"{stall_seconds:g}s; project={project_id} "
+                f"backtest={backtest_id} progress={progress!r}. The cloud run "
+                "may still exist; inspect it before launching another look."
+            )
         print(f"  ... running, progress={progress}", flush=True)
         time.sleep(POLL_SECONDS)
-    raise QuantConnectError(f"backtest did not finish within {MAX_WAIT_SECONDS}s")
+    raise QuantConnectError(
+        f"backtest did not finish within {max_wait_seconds:g}s; "
+        f"project={project_id} backtest={backtest_id}. The cloud run may "
+        "still exist; inspect it before launching another look."
+    )
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -79,11 +112,17 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--project-id", type=int, default=None,
                         help="reuse an existing project instead of creating one")
     parser.add_argument("--output", default=None)
+    parser.add_argument("--max-wait-seconds", type=float, default=MAX_WAIT_SECONDS)
+    parser.add_argument("--stall-seconds", type=float, default=STALL_WAIT_SECONDS)
     parser.add_argument("--start", default=None,
                         help="YYYY-MM-DD; overrides the algorithm's declared START")
     parser.add_argument("--end", default=None,
                         help="YYYY-MM-DD; overrides the algorithm's declared END")
     args = parser.parse_args(argv)
+    if args.max_wait_seconds <= 0 or args.stall_seconds <= 0:
+        raise SystemExit("wait and stall durations must be positive")
+    if args.stall_seconds > args.max_wait_seconds:
+        raise SystemExit("--stall-seconds cannot exceed --max-wait-seconds")
 
     source = ALGORITHM.read_text(encoding="utf-8")
     if args.start or args.end:
@@ -129,11 +168,19 @@ def main(argv: list[str] | None = None) -> int:
         raise QuantConnectError(f"backtests/create returned no backtestId: {launched}")
     print(f"  backtest id {backtest_id}", flush=True)
 
-    finished = _wait_for_backtest(client, project_id, backtest_id)
+    finished = _wait_for_backtest(
+        client,
+        project_id,
+        backtest_id,
+        max_wait_seconds=args.max_wait_seconds,
+        stall_seconds=args.stall_seconds,
+    )
 
     summary = {
         "project_id": project_id,
+        "compile_id": compile_id,
         "backtest_id": backtest_id,
+        "source_sha256": hashlib.sha256(source.encode("utf-8")).hexdigest(),
         "completed": finished.get("completed"),
         # Deliberately NOT the performance statistics. This run has no
         # signal, so quoting its Sharpe would invite a reading the

@@ -44,15 +44,15 @@ CONTROL_TICKER = "MSFT"
 class DelistingProbe(QCAlgorithm):
     """Direct subscription to known-dead tickers. Places no orders."""
 
-    def Initialize(self):
-        self.SetStartDate(2022, 6, 1)
-        self.SetEndDate(2023, 12, 31)
-        self.SetCash(100_000)
-        self.UniverseSettings.Resolution = Resolution.Daily
+    def initialize(self):
+        self.set_start_date(2022, 6, 1)
+        self.set_end_date(2023, 12, 31)
+        self.set_cash(100_000)
+        self.universe_settings.resolution = Resolution.DAILY
         # Raw: a delisted name's adjusted history is exactly where
         # back-adjustment artifacts live, and the local run had to discard
         # 725 series for that reason.
-        self.UniverseSettings.DataNormalizationMode = DataNormalizationMode.Raw
+        self.universe_settings.data_normalization_mode = DataNormalizationMode.RAW
 
         self._bars = {}
         self._delisted = {}
@@ -61,46 +61,46 @@ class DelistingProbe(QCAlgorithm):
 
         for ticker in list(DEAD_TICKERS) + [CONTROL_TICKER]:
             try:
-                equity = self.AddEquity(ticker, Resolution.Daily)
-                symbol = equity.Symbol
-                self._resolved[ticker] = str(symbol.ID)
+                equity = self.add_equity(ticker, Resolution.DAILY)
+                symbol = equity.symbol
+                self._resolved[ticker] = str(symbol.id)
                 self._bars[ticker] = 0
-                self.Log(f"[resolved] {ticker} -> {symbol.ID}")
+                self.log(f"[resolved] {ticker} -> {symbol.id}")
             except Exception as exc:  # noqa: BLE001 - recorded, never hidden
                 self._resolved[ticker] = f"UNRESOLVED: {type(exc).__name__}"
-                self.Log(f"[unresolved] {ticker}: {exc}")
+                self.log(f"[unresolved] {ticker}: {exc}")
 
-    def OnData(self, data):
+    def on_data(self, data):
         for ticker in self._bars:
             symbol_key = None
-            for symbol in data.Bars.Keys:
-                if symbol.Value == ticker:
+            for symbol in data.bars.keys():
+                if symbol.value == ticker:
                     symbol_key = symbol
                     break
             if symbol_key is not None:
                 self._bars[ticker] += 1
-                self._last_price[ticker] = float(data.Bars[symbol_key].Close)
+                self._last_price[ticker] = float(data.bars[symbol_key].close)
 
-        for symbol, delisting in data.Delistings.items():
-            name = symbol.Value
+        for symbol, delisting in data.delistings.items():
+            name = symbol.value
             self._delisted.setdefault(name, []).append(
-                f"{self.Time.date()}:{delisting.Type}"
+                f"{self.time.date()}:{delisting.type}"
             )
-            self.Log(f"[delisting] {self.Time.date()} {name} type={delisting.Type}")
+            self.log(f"[delisting] {self.time.date()} {name} type={delisting.type}")
 
-    def OnEndOfAlgorithm(self):
-        self.Log("=== DELISTING PROBE — NO ALPHA STATISTIC REPORTED ===")
+    def on_end_of_algorithm(self):
+        self.log("=== DELISTING PROBE — NO ALPHA STATISTIC REPORTED ===")
         for ticker, note in DEAD_TICKERS.items():
-            self.Log(
+            self.log(
                 f"[dead] {ticker:6s} bars={self._bars.get(ticker, 0):5d} "
                 f"last={self._last_price.get(ticker, 'none')} "
                 f"delisting={self._delisted.get(ticker, 'NONE')} "
                 f"id={self._resolved.get(ticker)}  ({note})"
             )
-        self.Log(
+        self.log(
             f"[control] {CONTROL_TICKER} bars={self._bars.get(CONTROL_TICKER, 0)} "
             f"-- if this is 0 the probe is broken and the rest proves nothing"
         )
-        self.Log(f"orders placed: {self.Transactions.OrdersCount}")
-        if self.Transactions.OrdersCount:
-            self.Error("PROBE PLACED ORDERS — no longer exempt from the look count")
+        self.log(f"orders placed: {self.transactions.orders_count}")
+        if self.transactions.orders_count:
+            self.error("PROBE PLACED ORDERS — no longer exempt from the look count")

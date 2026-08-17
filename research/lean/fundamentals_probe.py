@@ -19,21 +19,22 @@ END = (2016, 12, 31)
 
 
 class FundamentalsProbe(QCAlgorithm):
-    def Initialize(self):
-        self.SetStartDate(*START)
-        self.SetEndDate(*END)
-        self.SetCash(100_000)
-        self.UniverseSettings.Resolution = Resolution.Daily
-        self.UniverseSettings.DataNormalizationMode = DataNormalizationMode.Raw
-        self.AddUniverse(self._coarse, self._fine)
+    def initialize(self):
+        self.set_start_date(*START)
+        self.set_end_date(*END)
+        self.set_cash(100_000)
+        self.universe_settings.resolution = Resolution.DAILY
+        self.universe_settings.data_normalization_mode = DataNormalizationMode.RAW
+        self.add_universe(self._coarse, self._fine)
         self._rows = 0
         self._present = {}
         self._zero = {}
         self._selections = 0
 
     def _coarse(self, coarse):
-        return [c.Symbol for c in coarse
-                if c.HasFundamentalData and c.Price >= 5 and c.DollarVolume >= 5_000_000][:900]
+        return [c.symbol for c in coarse
+                if c.has_fundamental_data and c.price >= 5
+                and c.dollar_volume >= 5_000_000][:900]
 
     def _fine(self, fine):
         self._selections += 1
@@ -42,18 +43,18 @@ class FundamentalsProbe(QCAlgorithm):
         for f in fine:
             self._rows += 1
             probes = {
-                "MarketCap": f.MarketCap,
-                "GrossProfit": f.FinancialStatements.IncomeStatement.GrossProfit.Value,
-                "TotalAssets": f.FinancialStatements.BalanceSheet.TotalAssets.Value,
-                "TotalDebt": f.FinancialStatements.BalanceSheet.TotalDebt.Value,
-                "NetIncome": f.FinancialStatements.IncomeStatement.NetIncome.Value,
-                "FreeCashFlow": f.FinancialStatements.CashFlowStatement.FreeCashFlow.Value,
-                "ROE": f.OperationRatios.ROE.Value,
-                "ROA": f.OperationRatios.ROA.Value,
-                "GrossMargin": f.OperationRatios.GrossMargin.Value,
-                "TotalEquity": f.FinancialStatements.BalanceSheet.TotalEquityGrossMinorityInterest.Value,
-                "IndustryCode": f.AssetClassification.MorningstarIndustryCode,
-                "SectorCode": f.AssetClassification.MorningstarSectorCode,
+                "MarketCap": f.market_cap,
+                "GrossProfit": f.financial_statements.income_statement.gross_profit.value,
+                "TotalAssets": f.financial_statements.balance_sheet.total_assets.value,
+                "TotalDebt": f.financial_statements.balance_sheet.total_debt.value,
+                "NetIncome": f.financial_statements.income_statement.net_income.value,
+                "FreeCashFlow": f.financial_statements.cash_flow_statement.free_cash_flow.value,
+                "ROE": f.operation_ratios.roe.value,
+                "ROA": f.operation_ratios.roa.value,
+                "GrossMargin": f.operation_ratios.gross_margin.value,
+                "TotalEquity": f.financial_statements.balance_sheet.total_equity_gross_minority_interest.value,
+                "IndustryCode": f.asset_classification.morningstar_industry_code,
+                "SectorCode": f.asset_classification.morningstar_sector_code,
             }
             for name, value in probes.items():
                 try:
@@ -65,15 +66,15 @@ class FundamentalsProbe(QCAlgorithm):
                     self._zero[name] = self._zero.get(name, 0) + 1
         return []
 
-    def OnEndOfAlgorithm(self):
-        self.Log("=== FUNDAMENTALS PROBE - NO ALPHA STATISTIC REPORTED ===")
-        self.Log(f"rows sampled: {self._rows}")
+    def on_end_of_algorithm(self):
+        self.log("=== FUNDAMENTALS PROBE - NO ALPHA STATISTIC REPORTED ===")
+        self.log(f"rows sampled: {self._rows}")
         for name in sorted(self._present):
             present = self._present[name]
             zero = self._zero.get(name, 0)
-            self.Log(
+            self.log(
                 f"  {name:22s} present={present:6d} "
                 f"({100.0 * present / max(1, self._rows):5.1f}%)  "
                 f"zero={zero:6d} ({100.0 * zero / max(1, present):5.1f}% of present)"
             )
-        self.Log(f"orders placed: {self.Transactions.OrdersCount}")
+        self.log(f"orders placed: {self.transactions.orders_count}")

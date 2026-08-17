@@ -362,7 +362,7 @@ def test_the_unverified_success_assumption_is_documented_where_it_will_bite():
     for relative in (
         "research/quantconnect.py",
         "README.md",
-        "docs/OPERATIONAL_FACTS.md",
+        "docs/operations/OPERATIONAL_FACTS.md",
     ):
         text = (root / relative).read_text(encoding="utf-8")
         assert "CQC-001" in text, f"{relative} must record the open assumption"

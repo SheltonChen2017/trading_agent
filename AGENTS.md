@@ -26,9 +26,9 @@ letting the plan drift stale.
 
 ## Standing workflow references
 
-- `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` — commit-by-commit review
+- `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md` — commit-by-commit review
   dispositions and the P0-P3 issue ledger (owner-mandated, binding).
-- `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` — the review/handoff
+- `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md` — the review/handoff
   sequence both agents follow.
 - `docs/FEATURE_MILESTONE_RECORD.md` — two-paragraph entry (technical +
   plain-language) for every genuinely completed milestone.

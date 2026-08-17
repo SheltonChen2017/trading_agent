@@ -6,7 +6,7 @@ changes until this design is accepted.
 
 > **Relationship to the shipped committee (added 2026-07-30).** A different,
 > narrower surface shipped since this was written: `assistant/llm/`, governed
-> by `docs/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md`. It is **one** reviewer
+> by `docs/architecture/ADR_INVESTMENT_COMMITTEE_BOUNDARY.md`. It is **one** reviewer
 > examining **one** deterministically-generated risk-reducing candidate, and
 > it does have a `verdict` field. That does not contradict §6/§7 below. The
 > "no verdict field" constraint here is about refusing to *adjudicate between

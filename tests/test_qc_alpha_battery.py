@@ -11,11 +11,13 @@ import pandas as pd
 import pytest
 
 from scripts import analyse_qc_alpha_battery as analyser
+from scripts import analyse_qc_benchmark as benchmark_analyser
 from scripts.analyse_qc_benchmark import parse_benchmark
 
 
 ROOT = Path(__file__).resolve().parents[1]
 MONTHLY = ROOT / "research" / "lean" / "alpha_battery_monthly.py"
+SHORT = ROOT / "research" / "lean" / "alpha_battery_short.py"
 SHORT_SPECS = (
     "ABNORMAL_VOLUME_REVERSAL", "INDUSTRY_ADJ_REVERSAL_5D", "MAX_20",
     "MAX_X_REVERSAL", "REVERSAL_5D",
@@ -65,6 +67,63 @@ def test_price_tail_requires_exact_market_session_alignment():
     assert aligned_tail([10, 11, 12], [3, 4, 4], market_sessions, 2) is None
 
 
+@pytest.mark.parametrize("path", (MONTHLY, SHORT))
+def test_observation_tail_refuses_missing_or_duplicate_sessions(path: Path):
+    aligned = _load_pure_function(path, "_aligned_observation_tail")
+    market_sessions = [1, 2, 3, 4]
+    assert aligned([10, 11, 12], [2, 3, 4], market_sessions, 3) == [10, 11, 12]
+    assert aligned([10, 11, 12], [1, 3, 4], market_sessions, 3) is None
+    assert aligned([10, 11, 12], [2, 4, 4], market_sessions, 3) is None
+
+
+def test_industry_factor_uses_that_sessions_point_in_time_membership():
+    peer_return = _load_pure_function(MONTHLY, "_leave_one_out_peer_return")
+    symbol = "A"
+    # The same stock changes industry. Each observation must use the mapping
+    # known on that session, not today's classification projected backward.
+    old_membership = {symbol: 10}
+    new_membership = {symbol: 20}
+    aggregates = {10: (0.12, 3), 20: (-0.06, 3)}
+    assert peer_return(symbol, 0.02, old_membership, aggregates) == pytest.approx(0.05)
+    assert peer_return(symbol, 0.02, new_membership, aggregates) == pytest.approx(-0.04)
+    assert peer_return(symbol, 0.02, {}, aggregates) is None
+    assert peer_return(symbol, 0.02, old_membership, {10: (0.12, 2)}) is None
+
+
+def test_monthly_factor_path_is_prospective_and_not_quadratic():
+    text = MONTHLY.read_text(encoding="utf-8")
+    tree = ast.parse(text)
+    function_names = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+    assert "_record_factor_returns" in function_names
+    assert "_factor_returns" in function_names
+    assert "_index_returns" not in function_names
+    assert "_industry_returns" not in function_names
+    recorder = next(
+        node for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "_record_factor_returns"
+    )
+    called_attributes = {
+        node.func.attr for node in ast.walk(recorder)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+    }
+    assert "_returns" not in called_attributes
+
+
+@pytest.mark.parametrize(
+    "path",
+    (
+        ROOT / "research" / "lean" / "universe_benchmark.py",
+        ROOT / "research" / "lean" / "alpha_stage1_benchmark.py",
+    ),
+)
+def test_benchmarks_refuse_stale_closes(path: Path):
+    text = path.read_text(encoding="utf-8")
+    assert "self.close_sessions" in text
+    assert "self.close_sessions.get(symbol) == self.last_session" in text
+
+
 def test_drift_turnover_charges_the_rebalance_after_weight_drift():
     turnover = _load_pure_function(MONTHLY, "_drift_turnover")
     previous = {name: 0.25 for name in "ABCD"}
@@ -97,6 +156,51 @@ def test_parser_requires_every_spec_on_every_declared_row(tmp_path: Path):
         encoding="utf-8",
     )
     with pytest.raises(analyser.TruncatedLog, match="every declared spec"):
+        analyser.parse_log(log)
+
+
+def test_parser_refuses_conflicting_date_declarations(tmp_path: Path):
+    log = tmp_path / "conflict.log"
+    log.write_text(
+        _spec_header() + "\nDATES|1\nDATES|2\n" + _full_row(),
+        encoding="utf-8",
+    )
+    with pytest.raises(analyser.InvalidLog, match="conflicting DATES"):
+        analyser.parse_log(log)
+
+
+def test_benchmark_parser_refuses_conflicting_date_declarations(tmp_path: Path):
+    log = tmp_path / "benchmark-conflict.log"
+    log.write_text(
+        "DATES|1\nDATES|2\nBROW|202001|0.01|0.25|100", encoding="utf-8"
+    )
+    with pytest.raises(SystemExit, match="conflicting DATES"):
+        parse_benchmark(log)
+
+
+def test_parsers_refuse_empty_declared_runs(tmp_path: Path):
+    alpha = tmp_path / "empty-alpha.log"
+    alpha.write_text(_spec_header() + "\nDATES|0", encoding="utf-8")
+    with pytest.raises(analyser.InvalidLog, match="no dated observations"):
+        analyser.parse_log(alpha)
+    benchmark = tmp_path / "empty-benchmark.log"
+    benchmark.write_text("DATES|0", encoding="utf-8")
+    with pytest.raises(SystemExit, match="no dated observations"):
+        parse_benchmark(benchmark)
+
+
+@pytest.mark.parametrize(
+    ("replacement", "message"),
+    (("0~0.01~nan~-0.01~0.015~0.1", "non-finite"),
+     ("0~0.01~0.02~-0.01~0.015~-0.1", "negative")),
+)
+def test_parser_refuses_non_finite_results_or_negative_turnover(
+    tmp_path: Path, replacement: str, message: str
+):
+    log = tmp_path / "invalid-number.log"
+    row = _full_row().replace("0~0.01~0.02~-0.01~0.015~0.1", replacement, 1)
+    log.write_text(_spec_header() + "\nDATES|1\n" + row, encoding="utf-8")
+    with pytest.raises(analyser.InvalidLog, match=message):
         analyser.parse_log(log)
 
 
@@ -164,11 +268,54 @@ def test_declared_family_counts_ic_and_all_three_constructions():
     assert 1.0 / (analyser.DRAWS + 1) < 0.05 / analyser.DECLARED_LOOKS
 
 
+def test_general_analyser_requires_complete_run_identity():
+    source_hash = "a" * 64
+    observed = analyser._run_identities([
+        f"B=123,compile-1,backtest-1,{source_hash};"
+        f"124,compile-2,backtest-2,{source_hash}"
+    ])
+    assert observed["B"][0]["project_id"] == "123"
+    assert observed["B"][1]["backtest_id"] == "backtest-2"
+    with pytest.raises(SystemExit, match="project,compile,backtest"):
+        analyser._run_identities(["B=backtest-only"])
+    with pytest.raises(SystemExit, match="project,compile,backtest"):
+        analyser._run_identities(["B=123,compile,backtest,not-a-hash"])
+
+
+def test_benchmark_analyser_records_complete_run_identity(tmp_path: Path):
+    log = tmp_path / "benchmark.log"
+    output = tmp_path / "benchmark.json"
+    log.write_text("DATES|1\nBROW|202001|0.01|0.25|100", encoding="utf-8")
+    source_hash = "a" * 64
+    assert benchmark_analyser.main([
+        "--log", f"B={log}",
+        "--run-id", f"B=123,compile-1,backtest-1,{source_hash}",
+        "--output", str(output),
+    ]) == 0
+    payload = __import__("json").loads(output.read_text(encoding="utf-8"))
+    assert payload["B"]["quantconnect_run"] == {
+        "project_id": "123", "compile_id": "compile-1",
+        "backtest_id": "backtest-1", "source_sha256": source_hash,
+    }
+
+
 def test_benchmark_parser_requires_construction_turnover(tmp_path: Path):
     log = tmp_path / "benchmark.log"
     log.write_text("DATES|1\nBROW|202001|0.01|0.25|100", encoding="utf-8")
     frame = parse_benchmark(log)
     assert frame.loc["202001", "turnover"] == pytest.approx(0.25)
+
+
+@pytest.mark.parametrize(
+    "row",
+    ("BROW|202001|inf|0.25|100", "BROW|202001|0.01|-0.25|100",
+     "BROW|202001|0.01|0.25|0"),
+)
+def test_benchmark_parser_refuses_invalid_numbers(tmp_path: Path, row: str):
+    log = tmp_path / "benchmark-invalid.log"
+    log.write_text(f"DATES|1\n{row}", encoding="utf-8")
+    with pytest.raises(SystemExit):
+        parse_benchmark(log)
 
 
 @pytest.mark.parametrize("months", (6, 12))

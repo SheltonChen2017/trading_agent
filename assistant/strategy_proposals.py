@@ -114,7 +114,7 @@ class LeveragedPairConfig:
     (see SOXX_SOXL_PAIR's docstring-level discussion in this module's
     header) and its OWN grid-searched production_params -- never assume
     another pair's frozen numbers transfer, even if the mechanism is the
-    same (docs/ARCHITECTURE_DEBT.md-style discipline: don't overclaim)."""
+    same (docs/architecture/ARCHITECTURE_DEBT.md-style discipline: don't overclaim)."""
 
     stable_ticker: str
     leveraged_ticker: str

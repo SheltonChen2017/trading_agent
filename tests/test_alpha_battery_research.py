@@ -43,7 +43,76 @@ def test_long_short_turnover_counts_a_long_short_side_flip() -> None:
         scores, forwards, dates, "long_short", horizon=1
     )
 
-    assert turnover.iloc[1] == 1.0
+    # The complete side flip costs 1.0, plus 0.005 to restore gross
+    # exposure after both long and short notionals grew by 1% while NAV
+    # stayed flat.
+    assert turnover.iloc[1] == pytest.approx(1.005)
+
+
+def test_industry_adjustment_excludes_the_stock_from_its_own_peer_mean() -> None:
+    dates = pd.to_datetime(["2025-01-02", "2025-01-03"])
+    closes = pd.DataFrame(
+        {"A": [100.0, 110.0], "B": [100.0, 100.0]}, index=dates
+    )
+
+    scores = battery.alpha_industry_adjusted_reversal(
+        closes, 1, {"A": "same", "B": "same"}
+    )
+
+    assert scores.loc[dates[1], "A"] == pytest.approx(-0.10)
+    assert scores.loc[dates[1], "B"] == pytest.approx(0.10)
+
+
+def test_residual_momentum_matches_one_frozen_joint_regression() -> None:
+    rng = np.random.default_rng(20260817)
+    dates = pd.bdate_range("2023-01-02", periods=430)
+    market_driver = rng.normal(0.0002, 0.008, len(dates) - 1)
+    industry_driver = rng.normal(0.0001, 0.006, len(dates) - 1)
+    idiosyncratic = rng.normal(0.0003, 0.003, len(dates) - 1)
+    returns = pd.DataFrame(
+        {
+            "A": 0.4 * market_driver + 0.9 * industry_driver + idiosyncratic,
+            "B": 1.1 * market_driver + 0.7 * industry_driver,
+            "C": 0.8 * market_driver - 0.4 * industry_driver,
+        },
+        index=dates[1:],
+    )
+    closes = pd.concat(
+        [
+            pd.DataFrame([[100.0, 100.0, 100.0]], index=dates[:1], columns=returns.columns),
+            100.0 * (1.0 + returns).cumprod(),
+        ]
+    )
+    sectors = {"A": "same", "B": "same", "C": "other"}
+
+    scores = battery.residual_momentum(closes, 6, sectors, window=252)
+    score_date = scores["A"].last_valid_index()
+    assert score_date is not None
+    score_position = closes.index.get_loc(score_date)
+    daily = closes.pct_change(fill_method=None)
+    market = daily.mean(axis=1)
+    peer = daily["B"]
+    fit = slice(score_position - 126 - 252 + 1, score_position - 126 + 1)
+    measurement = slice(score_position - 126 + 1, score_position - 21 + 1)
+    design = np.column_stack(
+        [np.ones(252), market.iloc[fit].to_numpy(), peer.iloc[fit].to_numpy()]
+    )
+    coefficients = np.linalg.lstsq(
+        design, daily["A"].iloc[fit].to_numpy(), rcond=None
+    )[0]
+    measurement_design = np.column_stack(
+        [
+            np.ones(105),
+            market.iloc[measurement].to_numpy(),
+            peer.iloc[measurement].to_numpy(),
+        ]
+    )
+    expected_residual = daily["A"].iloc[measurement].to_numpy() - (
+        measurement_design @ coefficients
+    )
+    expected = np.log1p(np.clip(expected_residual, -0.9, None)).sum()
+
+    assert scores.at[score_date, "A"] == pytest.approx(expected)
 
 
 def test_edgar_fact_is_not_usable_before_its_actual_filing_date(
@@ -171,4 +240,43 @@ def test_drift_weights_survives_a_total_wipeout_without_dividing_by_zero() -> No
     from scripts.run_alpha_battery_20260815 import drift_weights
 
     result = drift_weights({"A": 0.5, "B": 0.5}, {"A": -1.0, "B": -1.0})
-    assert result == {"A": 0.5, "B": 0.5}
+    assert result is None
+
+
+def test_turnover_uses_previous_period_outcomes_without_lookahead() -> None:
+    dates = pd.to_datetime(["2025-01-02", "2025-01-03"])
+    names = [f"S{i:02d}" for i in range(20)]
+    scores = pd.DataFrame(
+        [np.arange(20, dtype=float), np.arange(20, dtype=float)],
+        index=dates,
+        columns=names,
+    )
+    forwards = pd.DataFrame(0.0, index=dates, columns=names)
+    # The first period's highest-ranked name doubles. At the second
+    # rebalance, restoring four equal long-only weights costs 15% turnover.
+    forwards.loc[dates[0], "S19"] = 1.0
+
+    _, turnover = battery.long_short_returns(
+        scores, forwards, dates, "long_only_20", horizon=1
+    )
+
+    assert turnover.iloc[1] == pytest.approx(0.15)
+
+
+def test_universe_portfolio_charges_drift_not_target_to_target_turnover() -> None:
+    dates = pd.to_datetime(["2025-01-02", "2025-01-03"])
+    names = [f"S{i:02d}" for i in range(20)]
+    rows = []
+    for date in dates:
+        for index, name in enumerate(names):
+            rows.append({
+                "as_of_session": date,
+                "ticker": name,
+                "score": float(index),
+                "outcome": 1.0 if date == dates[0] and name == "S19" else 0.0,
+            })
+    _, turnover, _ = universes._portfolio(
+        pd.DataFrame(rows), "long_only_20", 0.20
+    )
+
+    assert turnover.iloc[1] == pytest.approx(0.15)

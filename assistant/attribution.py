@@ -5,7 +5,7 @@ Reporting only. Nothing here creates, sizes, ranks, or approves a trade.
 **Why one bucket.** Classic Brinson attribution splits active return into
 allocation (were you in the right categories?) and selection (did you pick
 well inside them?). Both are comparisons against a benchmark with STATED
-WEIGHTS. `docs/MANDATE.md` states a volatility band, not target weights, so
+WEIGHTS. `docs/operations/MANDATE.md` states a volatility band, not target weights, so
 there is nothing to be over- or under-weight against at a sector level and
 sector allocation is undefined rather than merely hard.
 

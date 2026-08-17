@@ -308,7 +308,7 @@ YIELD_CURVE_SHORT_TICKER = "^IRX"
 YIELD_CURVE_LONG_TICKER = "^TNX"
 YIELD_CURVE_Z_THRESHOLD = 2.0      # proxy = short - long (rises as the curve flattens/inverts further)
 
-# --- Defensive-carry research probe (docs/MANDATE.md, 2026-07-28) ------
+# --- Defensive-carry research probe (docs/operations/MANDATE.md, 2026-07-28) ------
 # Candidate holdings for a defensive-carry sleeve. Deliberately NOT part
 # of UNIVERSE/BASKETS -- the dip/up z-score scanner's mean-reversion/
 # momentum hypothesis doesn't map onto bond/gold ETF behavior the way it
@@ -330,7 +330,7 @@ DEFENSIVE_CARRY_TICKERS = ["TLT", "IEF", "SHY", "GLD"]
 # owner's stated preference recorded as data. It is NOT a validated
 # research finding, NOT an allocation authorization, and NOT a claim that
 # holding these reduces drawdown -- the defensive-carry probe result
-# (docs/MANDATE.md 5) is a single-window exploratory number, and this
+# (docs/operations/MANDATE.md 5) is a single-window exploratory number, and this
 # project has confirmed zero signals as real edge.
 #
 # Verified 2026-08-14 via fetch_historical + yf.Ticker().info: all four

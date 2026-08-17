@@ -26,7 +26,7 @@ not fetchable from the approved remote, and may disappear during Git pruning;
 it is a recovery lead, not durable preservation and not authority to restore
 the superseded feature. Its two-machines operational facts survive
 independently: they were ported to
-`docs/OPERATIONAL_FACTS.md` on 2026-08-09 because they are true regardless
+`docs/operations/OPERATIONAL_FACTS.md` on 2026-08-09 because they are true regardless
 of which allocation shape governs.
 
 Audience: repository owner, Claude Code, Codex, and future reviewers.

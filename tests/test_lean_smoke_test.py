@@ -27,6 +27,8 @@ LEAN_FILES = sorted(p for p in LEAN_DIR.glob("*.py") if p.name != "__init__.py")
 RESULT_ALGORITHMS = [
     LEAN_DIR / "alpha_battery_monthly.py",
     LEAN_DIR / "alpha_battery_short.py",
+    LEAN_DIR / "alpha_stage1_replications.py",
+    LEAN_DIR / "alpha_stage1_benchmark.py",
     LEAN_DIR / "universe_benchmark.py",
 ]
 
@@ -35,6 +37,9 @@ ORDERING_CALLS = frozenset({
     "SetHoldings", "MarketOrder", "LimitOrder", "StopMarketOrder",
     "StopLimitOrder", "MarketOnOpenOrder", "MarketOnCloseOrder",
     "Buy", "Sell", "Liquidate", "SetLeverage", "Order",
+    "set_holdings", "market_order", "limit_order", "stop_market_order",
+    "stop_limit_order", "market_on_open_order", "market_on_close_order",
+    "buy", "sell", "liquidate", "set_leverage", "order",
 })
 
 
@@ -49,6 +54,70 @@ SOURCE = LEAN_DIR / "universe_smoke.py"
 
 def _tree(path: Path) -> ast.AST:
     return ast.parse(path.read_text(encoding="utf-8"))
+
+
+LEGACY_CALLBACKS = {"Initialize", "OnData", "OnEndOfAlgorithm"}
+LEGACY_ATTRIBUTES = {
+    "SetStartDate", "SetEndDate", "SetCash", "AddUniverse", "AddSecurity",
+    "RemoveSecurity", "AddEquity", "Log", "Error", "UniverseSettings",
+    "Transactions", "OrdersCount", "Bars", "Delistings", "Keys", "Close",
+    "Volume", "Symbol", "Value", "Time", "HasFundamentalData",
+    "DollarVolume", "MarketCap", "CompanyProfile", "SharesOutstanding",
+    "AssetClassification", "MorningstarIndustryCode", "FinancialStatements",
+    "IncomeStatement", "BalanceSheet", "CashFlowStatement", "OperationRatios",
+}
+
+
+@pytest.mark.parametrize("path", LEAN_FILES, ids=lambda p: p.name)
+def test_lean_sources_use_one_current_python_api_dialect(path):
+    """Mixed C#/Python member names compile too permissively in LEAN.
+
+    QuantConnect's wrapper currently aliases many legacy names, but the
+    cloud editor, stubs and documentation use snake_case.  A mixed file let
+    several missed conversions survive the first fix, so executable AST
+    names are checked rather than comments or prose.
+    """
+    tree = _tree(path)
+    callbacks = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+    attributes = {
+        node.attr for node in ast.walk(tree) if isinstance(node, ast.Attribute)
+    }
+    offenders = sorted((callbacks & LEGACY_CALLBACKS) | (attributes & LEGACY_ATTRIBUTES))
+    assert not offenders, f"{path.name} still uses legacy LEAN names: {offenders}"
+    algorithms = [
+        node for node in tree.body
+        if isinstance(node, ast.ClassDef)
+        and any(isinstance(base, ast.Name) and base.id == "QCAlgorithm"
+                for base in node.bases)
+    ]
+    assert len(algorithms) == 1, f"{path.name} must define one QCAlgorithm"
+    methods = {
+        node.name for node in algorithms[0].body if isinstance(node, ast.FunctionDef)
+    }
+    assert {"initialize", "on_end_of_algorithm"} <= methods
+
+
+@pytest.mark.parametrize("path", LEAN_FILES, ids=lambda p: p.name)
+def test_lean_algorithms_do_not_shadow_qcalgorithm_members(path):
+    reserved = {
+        "fundamentals", "securities", "portfolio", "transactions", "settings",
+        "universe_settings", "time", "history", "benchmark", "schedule",
+        "notify", "insights", "universe", "algorithm_mode", "live_mode",
+    }
+    offenders = []
+    for node in ast.walk(_tree(path)):
+        targets = []
+        if isinstance(node, (ast.Assign, ast.AnnAssign)):
+            targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+        for target in targets:
+            if (isinstance(target, ast.Attribute)
+                    and isinstance(target.value, ast.Name)
+                    and target.value.id == "self"
+                    and target.attr in reserved):
+                offenders.append(f"line {node.lineno}: self.{target.attr}")
+    assert not offenders, f"{path.name} shadows QCAlgorithm members: {offenders}"
 
 
 @pytest.mark.parametrize("path", LEAN_FILES, ids=lambda p: p.name)
@@ -166,46 +235,50 @@ def test_prices_are_raw_not_split_adjusted():
     """ABR-003's cloud counterpart. A split-adjusted price lets a stock pass
     a $5 screen it never met at the time, which changes membership."""
     text = SOURCE.read_text(encoding="utf-8")
-    assert "DataNormalizationMode.Raw" in text
+    assert "DataNormalizationMode.RAW" in text
 
 
 @pytest.mark.parametrize("path", RESULT_ALGORITHMS, ids=lambda p: p.name)
 def test_result_returns_use_split_adjusted_trade_bars(path):
     """Raw closes belong in the screen, not in return arithmetic."""
     text = path.read_text(encoding="utf-8")
-    assert "DataNormalizationMode.Adjusted" in text
-    assert "c.Price" in text and "f.Price" in text
+    assert "DataNormalizationMode.ADJUSTED" in text
+    assert "c.price" in text and "f.price" in text
 
 
 def test_delistings_are_observed_rather_than_assumed():
     """The entire reason for using QuantConnect. If the algorithm never
     looks at Delistings, a cloud run proves nothing the local run did not."""
     text = SOURCE.read_text(encoding="utf-8")
-    assert "Delistings" in text and "DelistingType.Delisted" in text
+    assert "data.delistings" in text and "DelistingType.DELISTED" in text
 
 
 @pytest.mark.parametrize("path", RESULT_ALGORITHMS, ids=lambda p: p.name)
 def test_result_algorithms_use_delisting_outcomes(path):
     """Smoke coverage is not evidence that result-producing files use deaths."""
     text = path.read_text(encoding="utf-8")
-    assert "data.Delistings" in text
-    assert "DelistingType.Delisted" in text
+    assert "data.delistings" in text
+    assert "DelistingType.DELISTED" in text
     assert "terminal_prices" in text
-    assert "AddSecurity(symbol, Resolution.Daily)" in text
+    assert "add_security(symbol, Resolution.DAILY)" in text
 
 
 @pytest.mark.parametrize("path", RESULT_ALGORITHMS, ids=lambda p: p.name)
 def test_result_algorithms_stage_the_next_session_entry(path):
     text = path.read_text(encoding="utf-8")
-    assert "self.staged" in text
-    assert "score_session" in text
     assert "self.last_session" in text
-    assert "_bind_staged_entry" in text
+    staged_entry = all(token in text for token in (
+        "self.staged", "score_session", "_bind_staged_entry"
+    ))
+    month_end_entry = all(token in text for token in (
+        "previous_session", "_is_new_calendar_month", "score_session"
+    ))
+    assert staged_entry or month_end_entry
 
 
 def test_the_declared_window_is_retargeted_not_patched():
     """Provenance. Run 3 of 2026-08-16 was produced by rewriting
-    SetStartDate/SetEndDate at upload time, so the committed file said
+    set_start_date/set_end_date at upload time, so the committed file said
     2013-2016 while the run that produced the "11 delistings" number used
     2022-2023. A reader comparing the document to the file would have found
     a mismatch with no way to tell which was right.
@@ -216,7 +289,7 @@ def test_the_declared_window_is_retargeted_not_patched():
 
     source = (LEAN_DIR / "universe_smoke.py").read_text(encoding="utf-8")
     assert "START = (" in source and "END = (" in source
-    assert "SetStartDate(*START)" in source, "the algorithm must consume the constant"
+    assert "set_start_date(*START)" in source, "the algorithm must consume the constant"
 
     out = _retarget_window(source, "2022-06-01", "2023-12-31")
     assert "START = (2022, 6, 1)" in out
@@ -250,3 +323,42 @@ def test_retargeting_refuses_invalid_or_reversed_dates(start, end, message):
     source = (LEAN_DIR / "universe_smoke.py").read_text(encoding="utf-8")
     with pytest.raises(SystemExit, match=message):
         _retarget_window(source, start, end)
+
+
+def test_backtest_waiter_reports_a_stalled_run_without_relaunching(monkeypatch):
+    from research.quantconnect import QuantConnectError
+    from scripts import run_quantconnect_smoke as runner
+
+    class Client:
+        calls = 0
+
+        def read_backtest(self, project_id, backtest_id):
+            self.calls += 1
+            return {"backtest": {"completed": False, "progress": 0.865}}
+
+    clock = iter((0.0, 0.0, 0.0, 10.0, 10.0))
+    monkeypatch.setattr(runner.time, "monotonic", lambda: next(clock))
+    monkeypatch.setattr(runner.time, "sleep", lambda _: None)
+    client = Client()
+    with pytest.raises(QuantConnectError, match="no progress.*inspect"):
+        runner._wait_for_backtest(
+            client, 123, "backtest", max_wait_seconds=100, stall_seconds=10
+        )
+    assert client.calls == 2
+
+
+def test_backtest_waiter_stalls_even_when_progress_is_never_published(monkeypatch):
+    from research.quantconnect import QuantConnectError
+    from scripts import run_quantconnect_smoke as runner
+
+    class Client:
+        def read_backtest(self, project_id, backtest_id):
+            return {"backtest": {"completed": False, "progress": None}}
+
+    moments = iter((0.0, 0.0, 0.0, 11.0, 11.0))
+    monkeypatch.setattr(runner.time, "monotonic", lambda: next(moments))
+    monkeypatch.setattr(runner.time, "sleep", lambda _seconds: None)
+    with pytest.raises(QuantConnectError, match="no progress.*progress=None.*inspect"):
+        runner._wait_for_backtest(
+            Client(), 123, "backtest", max_wait_seconds=100, stall_seconds=10
+        )

@@ -133,7 +133,7 @@ def _pending_buy_value_by_ticker(
     positions and are blind to money already committed by a pending order
     (Codex review, 2026-07-27). Risk-adjacent but intentionally NOT in
     risk/execution_gate.py -- see that module's "Known scatter points"
-    note and docs/ARCHITECTURE_DEBT.md. Prefers exact values already on the order
+    note and docs/architecture/ARCHITECTURE_DEBT.md. Prefers exact values already on the order
     (notional, or shares * limit_price for a limit order); for a plain
     market buy order (no price on the order itself) falls back to one
     live quote per such order.

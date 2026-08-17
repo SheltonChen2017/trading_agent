@@ -108,6 +108,34 @@ def _drift_turnover(previous, target, outcomes):
     )
 
 
+def _round_trip_turnover(target, outcomes):
+    """One-way entry plus exit turnover for one five-session holding."""
+    entry_turnover = _drift_turnover({}, target, {})
+    exit_turnover = _drift_turnover(target, {}, outcomes)
+    if exit_turnover is None:
+        return None
+    return exit_turnover + entry_turnover
+
+
+def _max_daily_return(values):
+    """Return MAX(20) only from exactly 21 finite, positive closes."""
+    if len(values) != 21:
+        return None
+    if any(not math.isfinite(value) or value <= 0.0 for value in values):
+        return None
+    return max(values[index + 1] / values[index] - 1.0
+               for index in range(20))
+
+
+def _valid_industry_code(value):
+    """Return a real Morningstar industry code; missing/invalid stays missing."""
+    try:
+        code = int(value or 0)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return code if code > 0 else None
+
+
 class AlphaBatteryShort(QCAlgorithm):
 
     def initialize(self):
@@ -132,13 +160,11 @@ class AlphaBatteryShort(QCAlgorithm):
         self.pending = None
         self.staged = None
         self.days_held = 0
-        self.prior_outcomes = {}
         self.last_session = None
         self.in_universe = set()
         self.retained = set()
         self.terminal_prices = {}
         self.results = {}
-        self.previous_weights = {}
         self.cap_rows = self.cap_fallback = self.cap_missing = 0
 
     def _coarse(self, coarse):
@@ -171,8 +197,12 @@ class AlphaBatteryShort(QCAlgorithm):
                     continue
             if cap < self.screen["min_cap"]:
                 continue
-            self.industry[f.symbol] = int(
-                f.asset_classification.morningstar_industry_code or 0)
+            code = _valid_industry_code(
+                f.asset_classification.morningstar_industry_code)
+            if code is None:
+                self.industry.pop(f.symbol, None)
+            else:
+                self.industry[f.symbol] = code
             chosen.append(f.symbol)
         current = set(chosen)
         needed = set()
@@ -225,7 +255,7 @@ class AlphaBatteryShort(QCAlgorithm):
         if self.pending is not None and not entered_today:
             self.days_held += 1
             if self.days_held >= HOLD_DAYS:
-                self.prior_outcomes = self._settle()
+                self._settle()
         if self.pending is None and self.staged is None and self.selected:
             self._form_scores()
 
@@ -254,28 +284,14 @@ class AlphaBatteryShort(QCAlgorithm):
             ls_weights = {symbol: 0.5 / len(longs) for symbol in longs}
             for symbol in shorts:
                 ls_weights[symbol] = ls_weights.get(symbol, 0.0) - 0.5 / len(shorts)
-            keys = (
-                (spec, "long_short"),
-                (spec, "long_only_10"),
-                (spec, "long_only_20"),
-            )
             targets = (
                 ls_weights,
                 {symbol: 1.0 / len(longs) for symbol in longs},
                 {symbol: 1.0 / len(long20) for symbol in long20},
             )
-            turns = tuple(
-                _drift_turnover(self.previous_weights.get(key) or {}, target,
-                                self.prior_outcomes)
-                for key, target in zip(keys, targets)
-            )
-            if any(value is None for value in turns):
-                continue
-            for key, target in zip(keys, targets):
-                self.previous_weights[key] = target
             portfolios[spec] = {
                 "longs": longs, "shorts": shorts, "long20": long20,
-                "turnovers": turns,
+                "weights": targets,
             }
         if not portfolios:
             return False
@@ -285,7 +301,6 @@ class AlphaBatteryShort(QCAlgorithm):
             "date": staged["date"],
             "portfolios": portfolios,
         }
-        self.prior_outcomes = {}
         self.days_held = 0
         return True
 
@@ -320,8 +335,9 @@ class AlphaBatteryShort(QCAlgorithm):
         industry_peers = {}
         buckets = {}
         for symbol in names:
-            if ret5.get(symbol) is not None:
-                buckets.setdefault(self.industry.get(symbol), []).append(ret5[symbol])
+            code = self.industry.get(symbol)
+            if code is not None and ret5.get(symbol) is not None:
+                buckets.setdefault(code, []).append(ret5[symbol])
         for code, values in buckets.items():
             if len(values) >= 3:
                 total = sum(values)
@@ -358,10 +374,9 @@ class AlphaBatteryShort(QCAlgorithm):
             )
             if values is None:
                 continue
-            daily = [values[i + 1] / values[i] - 1.0
-                     for i in range(len(values) - 1) if values[i] > 0]
-            if daily:
-                max20[symbol] = max(daily)
+            maximum = _max_daily_return(values)
+            if maximum is not None:
+                max20[symbol] = maximum
 
         ranked_max = sorted([s for s in max20], key=lambda s: max20[s])
         max_rank = {}
@@ -426,13 +441,18 @@ class AlphaBatteryShort(QCAlgorithm):
             long20 = portfolio["long20"]
             if any(symbol not in outcomes for symbol in longs + shorts + long20):
                 continue
+            turnovers = tuple(
+                _round_trip_turnover(target, outcomes)
+                for target in portfolio["weights"]
+            )
+            if any(value is None for value in turnovers):
+                continue
             long_ret = sum(outcomes[s] for s in longs) / len(longs)
             short_ret = sum(outcomes[s] for s in shorts) / len(shorts)
             long20_ret = sum(outcomes[s] for s in long20) / len(long20)
             self.results.setdefault(spec, []).append(
                 (pending["date"], ic, long_ret, short_ret, long20_ret,
-                 portfolio["turnovers"][0], portfolio["turnovers"][1],
-                 portfolio["turnovers"][2], len(usable)))
+                 turnovers[0], turnovers[1], turnovers[2], len(usable)))
         self._release_unused_retained()
         return outcomes
 

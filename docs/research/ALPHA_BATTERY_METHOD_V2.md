@@ -88,6 +88,15 @@ understate cost independently, so closing one does not close the finding.
 `drift_weights()` and two regression tests close the remainder; one
 mutation, detected.
 
+**2026-08-17 pre-rerun clarification:** that formula describes a direct
+rebalance only. The frozen short-horizon implementation settles its
+five-session outcome, liquidates, forms the next score, and enters on the
+following session. Because it spends the staging interval in cash, its
+realized turnover is the drifted **exit plus the later entry**; overlapping
+names do not cancel across cash. The prior implementation incorrectly treated
+those two trades as a direct rebalance and is corrected at `ac96d47` before
+any valid QC rerun.
+
 ### 1.3 Market cap must not mix adjusted and unadjusted units
 
 V1 multiplied a **split-adjusted** historical close by an **unadjusted**
@@ -176,6 +185,15 @@ pass is for.
 Cloud backtests are counted the same as local runs. A smoke test that
 reports no alpha statistic is exempt and must be **incapable** of reporting
 one, not merely silent about it.
+
+### 1.11 Annualization follows the observation cadence
+
+Monthly battery observations use 12 periods/year. The non-overlapping short
+battery uses one score/next-session-entry/five-session-hold cycle every six
+exchange sessions, so it uses `252/6 = 42` periods/year. The analyser infers
+this from the frozen spec family and records it; a conflicting operator
+override refuses. This contract was made explicit at `ac96d47` before the
+next valid QC run after the old global 12-period default was found.
 
 ## 2. QuantConnect: replication backend, not data download
 

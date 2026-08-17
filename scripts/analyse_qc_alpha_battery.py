@@ -54,6 +54,11 @@ EXPECTED_SPEC_SETS = {
         "MAX_X_REVERSAL", "REVERSAL_5D",
     }),
 }
+MONTHLY_PERIODS_PER_YEAR = 12.0
+# The short algorithm owns a non-overlapping six-session cycle: one
+# next-session entry plus five later holding sessions.  Annualising it as a
+# monthly series (the old global CLI default) materially understated Sharpe.
+SHORT_PERIODS_PER_YEAR = 252.0 / 6.0
 
 
 class TruncatedLog(RuntimeError):
@@ -62,6 +67,16 @@ class TruncatedLog(RuntimeError):
 
 class InvalidLog(RuntimeError):
     """The log cannot establish one complete, internally consistent run."""
+
+
+def periods_per_year_for_specs(specs) -> float:
+    """Return the frozen cadence for one recognised Stage 0 spec family."""
+    family = frozenset(specs)
+    for expected in EXPECTED_SPEC_SETS:
+        if family == expected:
+            return (MONTHLY_PERIODS_PER_YEAR if len(expected) == 10
+                    else SHORT_PERIODS_PER_YEAR)
+    raise InvalidLog("unknown spec family has no frozen annualisation cadence")
 
 
 def parse_log(
@@ -370,7 +385,11 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--log", action="append", required=True,
                         help="label=path, repeatable")
-    parser.add_argument("--periods-per-year", type=float, default=12.0)
+    parser.add_argument(
+        "--periods-per-year", type=float, default=None,
+        help=("optional assertion of the frozen family cadence; monthly=12, "
+              "short=42. The analyser always infers cadence per input log."),
+    )
     parser.add_argument(
         "--run-id", action="append", required=True,
         help=("label=project,compile,backtest,source_sha256[;...], "
@@ -378,7 +397,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser.add_argument("--output", required=True)
     args = parser.parse_args(argv)
-    if not math.isfinite(args.periods_per_year) or args.periods_per_year <= 0:
+    if (args.periods_per_year is not None
+            and (not math.isfinite(args.periods_per_year)
+                 or args.periods_per_year <= 0)):
         raise SystemExit("--periods-per-year must be a positive finite number")
     run_ids = _run_identities(args.run_id)
 
@@ -415,10 +436,19 @@ def main(argv: list[str] | None = None) -> int:
                 f"{label}: --run-id count must match the {len(log_paths)} input logs"
             )
         specs, frame, meta = merge_logs(log_paths)
+        periods_per_year = periods_per_year_for_specs(specs)
+        if (args.periods_per_year is not None
+                and not math.isclose(args.periods_per_year, periods_per_year,
+                                     rel_tol=0.0, abs_tol=1e-12)):
+            raise SystemExit(
+                f"{label}: --periods-per-year={args.periods_per_year:g} "
+                f"conflicts with the frozen {periods_per_year:g} cadence"
+            )
         report["universes"][label] = {
             "quantconnect_runs": run_ids[label],
             "meta": meta,
-            "specs": analyse(frame, args.periods_per_year),
+            "periods_per_year": periods_per_year,
+            "specs": analyse(frame, periods_per_year),
         }
         print(f"{label}: {len(specs)} specs, {meta.get('dates')} dates", flush=True)
 

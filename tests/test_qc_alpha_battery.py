@@ -33,6 +33,11 @@ def _load_pure_function(path: Path, name: str):
             item for item in tree.body
             if isinstance(item, ast.FunctionDef) and item.name == "_joint_residual_total"
         ))
+    if name == "_round_trip_turnover":
+        dependencies.append(next(
+            item for item in tree.body
+            if isinstance(item, ast.FunctionDef) and item.name == "_drift_turnover"
+        ))
     node = next(
         item for item in tree.body
         if isinstance(item, ast.FunctionDef) and item.name == name
@@ -132,6 +137,83 @@ def test_drift_turnover_charges_the_rebalance_after_weight_drift():
     assert turnover(previous, target, outcomes) == pytest.approx(0.15)
     assert turnover({}, target, {}) == pytest.approx(0.5)
     assert turnover(previous, target, {"A": 1.0}) is None
+
+
+def test_short_holding_period_charges_its_own_entry_and_exit():
+    turnover = _load_pure_function(SHORT, "_round_trip_turnover")
+    target = {name: 0.25 for name in "ABCD"}
+    flat = {name: 0.0 for name in target}
+    assert turnover(target, flat) == pytest.approx(1.0)
+    assert turnover(target, {"A": 0.0}) is None
+
+
+def test_short_round_trip_exit_leg_liquidates_the_drifted_book():
+    """FCR-001: the exit leg's DRIFT was unpinned.
+
+    On a long-only book the drifted weights renormalise to gross 1.0, so the
+    flat-outcome case cannot tell a drifted exit from an undrifted one — a
+    mutation replacing the exit leg with a second copy of the entry leg
+    survived the suite. The distinction is load-bearing exactly where signed
+    weights matter: a long/short book whose both legs win shrinks to gross
+    0.909 of NAV before liquidation, so the true round trip is 0.9545, not
+    1.0; a book whose both legs lose grows to gross 1.111 and costs 1.0556.
+    """
+    turnover = _load_pure_function(SHORT, "_round_trip_turnover")
+    book = {"A": 0.5, "B": -0.5}
+    both_win = {"A": 0.10, "B": -0.10}   # NAV 1.1, drifted gross 10/11
+    assert turnover(book, both_win) == pytest.approx(0.5 + 0.5 * (10.0 / 11.0))
+    both_lose = {"A": -0.10, "B": 0.10}  # NAV 0.9, drifted gross 10/9
+    assert turnover(book, both_lose) == pytest.approx(0.5 + 0.5 * (10.0 / 9.0))
+    # A wiped-out book refuses instead of pricing a liquidation of nothing.
+    assert turnover(book, {"A": -1.0, "B": 1.0}) is None
+
+
+def test_short_algorithm_assigns_round_trip_turnover_to_the_settled_period():
+    tree = ast.parse(SHORT.read_text(encoding="utf-8"))
+    binder = next(node for node in ast.walk(tree)
+                  if isinstance(node, ast.FunctionDef)
+                  and node.name == "_bind_staged_entry")
+    settler = next(node for node in ast.walk(tree)
+                  if isinstance(node, ast.FunctionDef)
+                  and node.name == "_settle")
+    scorer = next(node for node in ast.walk(tree)
+                  if isinstance(node, ast.FunctionDef)
+                  and node.name == "_form_scores")
+    binder_calls = {node.func.id for node in ast.walk(binder)
+                    if isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Name)}
+    settler_calls = {node.func.id for node in ast.walk(settler)
+                     if isinstance(node, ast.Call)
+                     and isinstance(node.func, ast.Name)}
+    scorer_calls = {node.func.id for node in ast.walk(scorer)
+                    if isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Name)}
+    assert "_round_trip_turnover" not in binder_calls
+    assert "_drift_turnover" not in binder_calls
+    assert "_round_trip_turnover" in settler_calls
+    assert "_max_daily_return" in scorer_calls
+
+
+def test_max20_requires_exactly_twenty_valid_daily_returns():
+    max_daily = _load_pure_function(SHORT, "_max_daily_return")
+    values = [100.0 + index for index in range(21)]
+    assert max_daily(values) == pytest.approx(1.0 / 100.0)
+    assert max_daily(values[:-1]) is None
+    for invalid in (0.0, -1.0, math.nan, math.inf):
+        broken = list(values)
+        broken[5] = invalid
+        assert max_daily(broken) is None
+
+
+@pytest.mark.parametrize(
+    "path",
+    (MONTHLY, SHORT, ROOT / "research" / "lean" / "alpha_stage1_replications.py"),
+)
+def test_missing_industry_is_not_turned_into_a_fake_peer_group(path: Path):
+    valid_code = _load_pure_function(path, "_valid_industry_code")
+    assert valid_code(123) == 123
+    for invalid in (None, 0, -1, "", "not-a-code", math.inf):
+        assert valid_code(invalid) is None
 
 
 def _full_cell(index: int, turn_ls=0.1, turn_l10=0.2, turn_l20=0.3) -> str:
@@ -261,6 +343,40 @@ def test_each_construction_uses_its_own_realised_turnover():
     assert result["long_only_10"]["net"]["10bps"]["mean_period_return"] == pytest.approx(0.01)
     assert result["long_only_20"]["net"]["10bps"]["mean_period_return"] == pytest.approx(0.0095)
     assert result["long_short"]["net"]["10bps"]["mean_period_return"] == pytest.approx(0.009)
+
+
+def test_analysis_cadence_is_inferred_from_each_frozen_spec_family():
+    monthly = next(specs for specs in analyser.EXPECTED_SPEC_SETS if len(specs) == 10)
+    short = next(specs for specs in analyser.EXPECTED_SPEC_SETS if len(specs) == 5)
+    assert analyser.periods_per_year_for_specs(monthly) == pytest.approx(12.0)
+    assert analyser.periods_per_year_for_specs(short) == pytest.approx(42.0)
+    with pytest.raises(analyser.InvalidLog, match="unknown spec family"):
+        analyser.periods_per_year_for_specs({"UNKNOWN"})
+
+
+def test_cli_uses_short_family_cadence_and_rejects_monthly_override(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+):
+    frame = pd.DataFrame([{"date": "20200102", "spec": SHORT_SPECS[0]}])
+    monkeypatch.setattr(
+        analyser, "merge_logs",
+        lambda paths: (list(SHORT_SPECS), frame, {"dates": 1}),
+    )
+    observed = []
+    monkeypatch.setattr(
+        analyser, "analyse",
+        lambda passed_frame, periods: observed.append(periods) or {},
+    )
+    source_hash = "a" * 64
+    common = [
+        "--log", "B=ignored.log",
+        "--run-id", f"B=123,compile,backtest,{source_hash}",
+        "--output", str(tmp_path / "report.json"),
+    ]
+    assert analyser.main(common) == 0
+    assert observed == [42.0]
+    with pytest.raises(SystemExit, match="conflicts with the frozen 42 cadence"):
+        analyser.main([*common, "--periods-per-year", "12"])
 
 
 def test_declared_family_counts_ic_and_all_three_constructions():

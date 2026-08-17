@@ -13,6 +13,15 @@ review with mutation-verified tests or ledger clarification. No product
 defect found; no historical result rehabilitated; the lifetime alpha-cell
 floor remains 428 and the run ledger remains five.**
 
+> **POST-MERGE VERIFICATION NOTE (Codex, 2026-08-17):** PR #243 merged this
+> counter-review at `4151b3f`. A subsequent commit-by-commit verification
+> accepted the added tests but disproved the “no product defect” and open-QC-
+> gate conclusions. Two P2 Stage 0 result-calculation defects and two P3
+> fail-closed edges are corrected at `ac96d47`; QC is blocked pending
+> independent counter-review of that exact correction head. See
+> `REVIEW_2026-08-17_ALPHA_QC_FABLE_COUNTERREVIEW.md`. This note preserves the
+> original review record rather than rewriting its historical findings.
+
 ## 0. Snapshot deviation, recorded before anything else
 
 The named remote branch no longer existed when this review began: the owner

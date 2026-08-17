@@ -1,9 +1,10 @@
 # QuantConnect alpha test implementation plan
 
 Status: owner-directed staged research program; all affected implementation
-was re-audited 2026-08-17. No historical alpha result is valid. The next QC
-run may begin only after Claude counter-reviews the final pushed Codex audit
-head.
+was re-audited again after Fable's final counter-review merged on 2026-08-17.
+No historical alpha result is valid. The next QC run may begin only after an
+independent counter-review accepts Codex correction `ac96d47` from its exact
+pushed review head.
 
 Prepared: 2026-08-16
 
@@ -123,8 +124,25 @@ Before any rerun, the residual scores must implement exactly:
    through `t-21` for 12-1; and
 3. no contribution from the skipped most-recent 21 sessions.
 
+The 2026-08-17 post-counter-review verification also freezes four contracts
+that the prior review missed:
+
+1. the five-session short portfolio is liquidated when its outcome settles
+   and the next portfolio enters one session later, so turnover is exit plus
+   re-entry, not a direct old-target-to-new-target rebalance;
+2. the non-overlapping short observations use 42 periods/year (252 divided by
+   the six-session score/entry/hold cycle), while monthly observations use 12;
+3. MAX(20) requires exactly 21 finite, positive closes and never drops an
+   invalid denominator to manufacture a shorter window; and
+4. a missing/invalid Morningstar industry code remains missing and cannot be
+   pooled with other unknowns as a synthetic peer industry.
+
+These corrections change potential Stage 0 costs, net returns, annualized
+statistics, and eligible industry/MAX observations. They do not change any
+historical ledger count because no cloud run was made during review.
+
 Run A_large, B_core, and C_broad exactly once per monthly, short, and matching
-benchmark algorithm after review. Never split a stateful calendar. Compare
+benchmark algorithm **only after `ac96d47` is counter-reviewed**. Never split a stateful calendar. Compare
 only identical realized dates. Completion requires all nine exact run
 identities, complete artifacts, reviewed parsing, 180-cell and lifetime gates,
 and an updated ledger. No historical result is rehabilitated.

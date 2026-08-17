@@ -243,6 +243,15 @@ def _drift_turnover(previous, target, outcomes):
     )
 
 
+def _valid_industry_code(value):
+    """Return a real Morningstar industry code; missing/invalid stays missing."""
+    try:
+        code = int(value or 0)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return code if code > 0 else None
+
+
 class AlphaBatteryMonthly(QCAlgorithm):
 
     def initialize(self):
@@ -321,10 +330,13 @@ class AlphaBatteryMonthly(QCAlgorithm):
                     continue
             if cap < self.screen["min_cap"]:
                 continue
-            self.industry[f.symbol] = int(
-                f.asset_classification.morningstar_industry_code or 0
-            )
-            month_membership[f.symbol] = self.industry[f.symbol]
+            code = _valid_industry_code(
+                f.asset_classification.morningstar_industry_code)
+            if code is None:
+                self.industry.pop(f.symbol, None)
+            else:
+                self.industry[f.symbol] = code
+                month_membership[f.symbol] = code
             self.fundamental_cache[f.symbol] = {
                 "gross_profit": float(
                     f.financial_statements.income_statement.gross_profit.value or 0.0),
@@ -503,12 +515,14 @@ class AlphaBatteryMonthly(QCAlgorithm):
         returns = {
             symbol: daily_returns[symbol]
             for symbol in self.selected
-            if symbol in membership and symbol in daily_returns
+            if symbol in daily_returns
         }
         if len(returns) < MIN_NAMES:
             return
         buckets = {}
         for symbol, value in returns.items():
+            if symbol not in membership:
+                continue
             code = membership[symbol]
             total, size = buckets.get(code, (0.0, 0))
             buckets[code] = (total + value, size + 1)

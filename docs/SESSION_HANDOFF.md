@@ -6,9 +6,10 @@ of the local measurement path, and a validity/organization audit of the
 documentation. This section and section 7l supersede earlier alpha current-
 state language while retaining the earlier sections as historical review.
 Updated later on 2026-08-17 by Claude's FINAL counter-review of the complete
-correction chain (section 7o), performed after PR #242 merged the
-integration branch; section 7o and the updated topology/next-steps text are
-the current state.
+correction chain (section 7o), then by Codex's verification after that review
+merged as PR #243 (section 7p), then by Claude's counter-review of Codex's
+Stage 0 correction (section 7q). Section 7q and the updated
+topology/next-steps text are the current state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -17,21 +18,22 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
 3. `docs/Alpha_Test_Implementation_Plan.md`
-4. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`
-5. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW_INDEPENDENT.md`
-6. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md`
-7. `docs/alpha-result.md`
-8. `docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
-9. `docs/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
-10. `docs/research/ALPHA_BATTERY_METHOD_V2.md`
-11. `docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
-12. `docs/research/Alpha explanation.md`
-13. `docs/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
-14. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-15. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-16. `docs/operations/MANDATE.md` (§2, §4, §6)
-17. `docs/operations/OPERATIONAL_FACTS.md`
-18. `docs/operations/OPERATIONS_RUNBOOK.md`
+4. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_FABLE_COUNTERREVIEW.md`
+5. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`
+6. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW_INDEPENDENT.md`
+7. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md`
+8. `docs/alpha-result.md`
+9. `docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
+10. `docs/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
+11. `docs/research/ALPHA_BATTERY_METHOD_V2.md`
+12. `docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
+13. `docs/research/Alpha explanation.md`
+14. `docs/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
+15. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+16. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+17. `docs/operations/MANDATE.md` (§2, §4, §6)
+18. `docs/operations/OPERATIONAL_FACTS.md`
+19. `docs/operations/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -41,17 +43,27 @@ operator-database mutation, or scheduled-task change.
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
 - Published `origin/main` at audit time:
-  `f937bfb11fe82f45fd0f4715a98217a3aa957c92`. PR #242 merged the
-  counter-review integration branch, and its merge tree is byte-identical to
-  branch head `5730f7b` (still reachable as `refs/pull/242/head`; the branch
-  itself was deleted after the merge). PR #241 at
+  `4151b3f0c4ee2cf365d578e70ab10bd5eb93d324`. PR #243 merged Fable's exact
+  counter-review head `6bd962f`. PR #242 at `f937bfb` had merged the
+  counter-review integration branch, whose merge tree is byte-identical to
+  branch head `5730f7b` (still reachable as `refs/pull/242/head`). PR #241 at
   `d8a32604d32e0d85fb9920b0839445eab13ad5f8` had merged the full alpha/QC
   audit before it. The long-lived alpha branch was originally created from
   `a795ea3`.
-- The 2026-08-17 FINAL counter-review (section 7o) ran on
+- The 2026-08-17 Fable counter-review (section 7o) ran on
   `user/claude/alpha-qc-full-counterreview-20260817`, created from the exact
-  object `5730f7b`; its record is
+  object `5730f7b`, ended at `6bd962f`, and was merged by PR #243; its record is
   `docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md`.
+- Codex correction branch:
+  `codex/review-alpha-qc-fable-counterreview-20260817`, based on exact Fable
+  head `6bd962f`. Product/test correction `ac96d47` closes the four Stage 0
+  findings in section 7p; records commit `dd664f9` updates the review report,
+  Action Plan, alpha plan/result ledger, frozen methodology, and the superseded
+  Fable report; `9e45803` is its handoff. Claude pushed the branch unchanged
+  at exact head `9e45803` to freeze the review snapshot, then accepted it in
+  the section 7q counter-review on
+  `user/claude/alpha-qc-fable-cr-verify-20260817`, which adds the FCR-001/002
+  closures.
 - Claude's last submitted remote audited in this cycle was
   `origin/user/claude/alpha-qc-round-20260816` at
   `a37e73b`; the full 2026-08-16/17 chain from `db0045a` through `a37e73b`
@@ -59,7 +71,7 @@ operator-database mutation, or scheduled-task change.
   2026-08-17 Claude fast-forwarded that branch onto counter-reviewed Codex
   head `b4e9ee0` and added the counter-review commit (section 7m); the
   exact pushed head is `ad3b3a8`.
-- Current integration/review branch:
+- Prior integration/review branch:
   `codex/review-alpha-qc-counterreview-20260817`, based on `origin/main` at
   `d8a3260`. Commit `031b5a7` retains Claude's three mutation-verified tests
   and counter-review record from `ad3b3a8`; documentation/review correction
@@ -68,7 +80,8 @@ operator-database mutation, or scheduled-task change.
 - The prior `codex/review-alpha-qc-round2-20260817` branch was merged by PR
   #241 and then deleted locally and remotely with the other merged topic
   branches. Its commits remain reachable from `main`. Claude's counter-review
-  gate is satisfied; no new QC run has occurred.
+  gate was satisfied at that point; no new QC run occurred, and section 7p
+  closes it again for the result-changing Stage 0 correction.
 - Five real-market cloud executions remain preserved in the permanent ledger.
   None is usable
   alpha evidence: one refused, two remain deliberately unanalysed, one ran
@@ -875,18 +888,99 @@ No QuantConnect access of any kind, no research look, no broker, database,
 scheduler, policy, or epoch change. No historical result was rehabilitated;
 the lifetime floor remains 428 and the run ledger remains five.
 
+## 7p. Codex verification of Fable's final counter-review (2026-08-17)
+
+Fable's exact pushed range `5816f6f..6bd962f` was merged by PR #243 at
+`4151b3f` and then independently verified commit by commit on
+`codex/review-alpha-qc-fable-counterreview-20260817`. All three commits are
+accepted after follow-up correction: the Stage 1 gate/deadline/dialect tests
+are useful, and the CRLF artifact-hash note is reproducible, but the submitted
+“no product defect” and “QC gate satisfied” conclusions did not survive.
+
+Correction `ac96d47` closes four Stage 0 findings:
+
+1. **FQCV-001 (P2):** the short battery exited after its five-session result,
+   waited through score staging, and re-entered next session, but charged a
+   direct rebalance. It now charges drifted liquidation plus reconstruction;
+   identical flat gross-1 books correctly cost 1.0 rather than 0.0.
+2. **FQCV-002 (P2):** one CLI default annualized both monthly and short
+   families at 12 periods/year. The analyser now infers 12 for monthly and 42
+   for the short battery's non-overlapping six-session cycle, records it, and
+   rejects a conflicting override.
+3. **FQCV-003 (P3):** MAX(20) silently dropped a return with a bad denominator.
+   It now requires exactly 21 finite positive closes.
+4. **FQCV-004 (P3):** missing industry codes were pooled as code zero. They
+   now remain missing and cannot manufacture an industry peer group.
+
+FQCV-005 (P3 documentation) updates the stale `origin/main`, merge, and gate
+status. No QC access or new result occurred; no historical status changed;
+the lifetime cell floor stays 428 and the run ledger stays five. Focused
+validation is 36 QC-battery and 222 broader research/QC tests. The complete
+tree passed **4,203 tests / 0 failures / 25 known warnings in 867.87 seconds**;
+repository-wide compilation including `research/` was clean. Full review and explicit
+commit dispositions:
+`docs/Review/REVIEW_2026-08-17_ALPHA_QC_FABLE_COUNTERREVIEW.md`.
+
+**Current launch status: BLOCKED.** Publish the completed Codex branch only
+after final validation, then obtain an independent counter-review of its exact
+remote head. Do not launch QC from PR #243 or `6bd962f`; that tree has the
+known staged-turnover and annualization defects.
+
+*(Superseded by section 7q: the branch was pushed and the counter-review is
+complete and accepting.)*
+
+## 7q. Counter-review of the Stage 0 correction (Claude, 2026-08-17)
+
+The required independent counter-review of section 7p's correction ran on
+`user/claude/alpha-qc-fable-cr-verify-20260817`. Because Codex's branch was
+still local-only, Claude first pushed it unchanged to
+`origin/codex/review-alpha-qc-fable-counterreview-20260817` at exact head
+`9e45803` to freeze the snapshot, then branched from that object. Full
+record:
+`docs/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_CORRECTION_COUNTERREVIEW.md`.
+
+All three commits (`ac96d47`, `dd664f9`, `9e45803`) are **accepted**. All
+four FQCV code findings were reproduced red on the pre-correction tree
+`6bd962f` — including the 0.0-versus-1.0 per-period turnover and the
+19-return MAX window with a fabricated −100% move — and Claude records
+plainly that its own prior "no product defect" conclusion was wrong, with
+FQCV-001's edge having been visible in its notes as a misjudged "minor
+observation". Seven mutations were run against the corrected head (the
+requested FQCV-001/002 mutations included). One survived and became
+**FCR-001 (P3, closed)**: the exit leg's drift was unpinned — a long-only
+flat-outcome test cannot distinguish drifted from undrifted liquidation, so
+a mutation mispricing long/short exits passed; a behavioural test now pins
+both asymmetric L/S cases and the wiped-out refusal. The generalized-
+instance sweep found one surviving FQCV-004 pattern: **FCR-002 (P3,
+closed)** — Stage 1's dead copied ingestion still stored `int(code or 0)`;
+it now mirrors the corrected monthly pattern and the directory-wide
+missing-industry regression covers the Stage 1 file. Both closures were
+verified red under their exact mutations and green restored.
+
+Validation on the final tree: corrected QC battery file **38 passed**;
+focused research/QC/LEAN/document gate **176 passed**; full suite **4,205
+passed / 0 failed / 25 known dependency warnings in 906.90 seconds**;
+compilation including `research/`, the 128-file Markdown link check,
+docs/mandate JSON parses, and `git diff --check` clean. No QC access, no
+research look, no broker/database/scheduler/epoch change; the lifetime floor
+remains 428 and the run ledger remains five.
+
+**Gate status: the independent counter-review Codex required is satisfied
+and accepting.** Remaining before launch: a lightweight Codex
+acknowledgement of FCR-001/002 (or an owner waiver — the product delta is
+one dead-state ingestion guard plus two tests), then the owner's stage-order
+choice, then execution from the exact merged reviewed head.
+
 ## 8. What is next
 
-1. ~~Publish and merge `codex/review-alpha-qc-counterreview-20260817`~~ —
-   DONE: PR #242 merged it at `f937bfb` and the branch was deleted. The
-   2026-08-17 final counter-review (section 7o) then re-verified the whole
-   chain; its branch
-   `user/claude/alpha-qc-full-counterreview-20260817` carries the four
-   CCR3 closures and awaits owner review/merge. Do not merge the stale
-   long-lived Claude branch separately.
-2. **The counter-review gate for the next QC runs is satisfied — twice.**
-   Before
-   launching, the owner must confirm stage ORDER: the round-2 rerun
+1. PR #242 merged the prior Codex integration at `f937bfb`; PR #243 then
+   merged Fable's final counter-review at `4151b3f`. Codex's correction
+   branch is pushed at `9e45803` and counter-reviewed (section 7q); Claude's
+   counter-review branch `user/claude/alpha-qc-fable-cr-verify-20260817`
+   carries the FCR-001/002 closures and awaits owner review/merge.
+2. **The counter-review gate for `ac96d47` is satisfied.** Remaining:
+   Codex acknowledges FCR-001/002 (or the owner waives it), and
+   the owner must confirm stage ORDER: the round-2 rerun
    contract centres on Stage 1 (REP-H52/REP-IDV plus cadence-matched
    benchmarks), while plan §5 still requires Stage 0 battery completion.
    Codex's original contract items remain binding, including `855941a`, the
@@ -949,9 +1043,10 @@ or roll an epoch without a new explicit owner instruction.
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/Alpha_Test_Implementation_Plan.md,
 docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md, docs/alpha-result.md and
-docs/SESSION_HANDOFF.md. origin/main is f937bfb after PR #242 merged the
-counter-review integration branch (PR #241 at d8a3260 merged the full audit
-before it). Corrections 855941a and 1e2b631 repair current LEAN Python
+docs/SESSION_HANDOFF.md. origin/main is 4151b3f after PR #243 merged Fable's
+final counter-review (PR #242 at f937bfb merged the counter-review integration
+branch; PR #241 at d8a3260 merged the full audit before it). Corrections
+855941a and 1e2b631 repair current LEAN Python
 syntax, point-in-time/exact-session factors, Stage 1 cadence and benchmark,
 strict analyzer provenance, bounded QC polling, old local turnover/NAV,
 leave-one-out peers and joint residual regression. Invalid generated result
@@ -965,10 +1060,22 @@ CR2-001..003), Codex independently accepted ad3b3a8 after a topology
 correction (section 7n), and a final independent Claude counter-review of the
 whole ten-commit chain from exact head 5730f7b (section 7o and
 docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md) accepted every
-commit, ran sixteen mutations, and closed four more P3 gaps (CCR3-A..D) on
-branch user/claude/alpha-qc-full-counterreview-20260817. The gate for the
-next QC runs is satisfied; before launching, confirm
-with the owner whether Stage 0 battery completion or Stage 1 runs first.
+commit, ran sixteen mutations, and closed four P3 gaps (CCR3-A..D) on branch
+user/claude/alpha-qc-full-counterreview-20260817. Codex then reviewed Fable's
+exact three-commit range after PR #243 and found two P2 Stage 0 methodology
+defects plus two P3 input/refusal defects. Correction ac96d47 fixes same-period
+entry/exit turnover, per-family 12/42 annualization, strict MAX(20), and
+missing-industry grouping; see section 7p and the Fable-counterreview report.
+Claude then pushed that branch unchanged at exact head 9e45803 and
+counter-reviewed it (section 7q and
+docs/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_CORRECTION_COUNTERREVIEW.md):
+all three commits accepted, all four findings reproduced red pre-correction,
+seven mutations run, and two follow-up P3 closures (FCR-001 exit-drift pin,
+FCR-002 Stage 1 dead-state industry port) on branch
+user/claude/alpha-qc-fable-cr-verify-20260817. The ac96d47 gate is satisfied;
+before launch, Codex acknowledges FCR-001/002 (or the owner waives it) and
+the owner confirms whether Stage 0 battery completion or Stage 1 runs first.
+No run occurred and the 428-cell/five-run counts are unchanged.
 Append every run rather than overwrite ledger entries; a premature run is
 PENDING_REVIEW and still counts.
 paper-epoch-005 remains unchanged at 752d3b7 for 60 days; operational

@@ -187,6 +187,15 @@ def _idio_vol_score(stock, market, estimation_sessions, formation_sessions):
     return -math.sqrt(variance)
 
 
+def _valid_industry_code(value):
+    """Return a real Morningstar industry code; missing/invalid stays missing."""
+    try:
+        code = int(value or 0)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return code if code > 0 else None
+
+
 def _drift_turnover(previous, target, outcomes):
     """Method V2 one-way turnover from drifted signed weights."""
     if not previous:
@@ -287,9 +296,15 @@ class AlphaStage1Replications(QCAlgorithm):
                     continue
             if cap < self.screen["min_cap"]:
                 continue
-            self.industry[f.symbol] = int(
-                f.asset_classification.morningstar_industry_code or 0
-            )
+            # Stage 1 computes no industry factor; this mirrors the corrected
+            # monthly ingestion (FQCV-004) so the retained machinery cannot
+            # hand a future variant a fictitious code-0 industry bucket.
+            code = _valid_industry_code(
+                f.asset_classification.morningstar_industry_code)
+            if code is None:
+                self.industry.pop(f.symbol, None)
+            else:
+                self.industry[f.symbol] = code
             self.fundamental_cache[f.symbol] = {
                 "gross_profit": float(
                     f.financial_statements.income_statement.gross_profit.value or 0.0),

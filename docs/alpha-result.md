@@ -55,13 +55,22 @@ lifetime alpha-cell exposure floor is **428**. These counts do not make any
 result valid and do not authorize analysis outside the reviewed workflow.
 
 **Current pre-run gate (2026-08-17):** no REP-H52 or REP-IDV cloud run has
-been recorded. The Stage 1 implementation at `dc63eec` and all earlier alpha
-research/QC code were re-audited. The current local correction is `855941a`;
-the final documentation head will be recorded in the handoff after validation.
-No fresh run is allowed until Claude counter-reviews the final pushed Codex
-head. A future run belongs in a new `R-005`-or-later entry. If any run was
-launched before that gate, it must be added here as `PENDING_REVIEW` and
-counted; it must not be silently treated as the reviewed run.
+been recorded. Fable's final counter-review was merged as PR #243, but Codex's
+verification found four surviving Stage 0 methodology defects and corrected
+them at `ac96d47`. The corrections affect holding-period turnover, short-family
+annualization, MAX(20) input refusal, and missing-industry peer construction.
+No historical result changes status, no cloud run occurred, the lifetime
+alpha-cell floor remains 428, and the run-level count remains five. Claude's
+independent counter-review accepted the exact pushed correction head
+`9e45803` on 2026-08-17, confirming all four findings and closing two
+follow-up P3 gaps (FCR-001 exit-drift pin; FCR-002 Stage 1 dead-state
+industry-code port). **Before a fresh run:** a lightweight Codex
+acknowledgement of FCR-001/002 (or an owner waiver), the owner's stage-order
+choice, and execution from the exact merged reviewed head. A future run
+belongs in a new `R-005`-or-later entry. If
+any run was launched before that gate, it must be added here as
+`PENDING_REVIEW` and counted; it must not be silently treated as the reviewed
+run.
 
 ---
 

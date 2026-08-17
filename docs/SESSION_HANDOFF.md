@@ -1022,17 +1022,56 @@ owner must choose Stage 0 or Stage 1, then the selected frozen run must use
 the reviewed PR #244 algorithm source and be recorded as R-005 or later with
 the complete evidence contract.
 
+## 7s. Stage 0 launch round: two refusals, root cause found and fixed (Claude, 2026-08-17)
+
+The owner authorized QC testing (Stage 0 first, at most two concurrent
+sessions, project naming per the new `docs/process/QC_RUN_CONVENTIONS.md`).
+Round branch: `user/claude/qc-stage0-run-20260817` (pushed). Facts:
+
+- The org's backtest-node pool allowed only ONE concurrent backtest (a
+  second `backtests/create` refused with "no spare nodes"); the two-session
+  subscription limit is a live-coding-session resource. Runs proceed
+  strictly serially; nothing from the prior day was stuck.
+- **R-005** `1. MONTHLY_BATTERY_A_LARGE - 20260817` (project 35285587) and
+  **R-006** `2. MONTHLY_BATTERY_B_CORE - 20260817` (project 35285594) both
+  completed and REFUSED identically:
+  `INCOMPLETE|missing_specs=MULTI_ALPHA_COMPOSITE|RESIDUAL_MOM_12_1|RESIDUAL_MOM_6_1`.
+  Full identities, source hashes, and log hashes are in the permanent
+  ledger. Run-level look count is now SEVEN; zero cells emitted; the
+  428-cell floor is unchanged.
+- Per the pre-declared stop rule, Stage 0 halted at two of nine runs. A
+  local LEAN-stub simulation (`tests/test_alpha_battery_monthly_sim.py`)
+  reproduced the exact signature under LEAN's real event timing and found
+  the root cause: daily bars are labeled with the NEXT calendar day, so a
+  month ending on a Friday delivers its last bar labeled
+  Saturday-the-1st — before that month's selection exists — and
+  `_record_factor_returns`, keying membership by the label's month,
+  recorded such days with empty industry buckets, poisoning every
+  504-session residual window. Fix `0f0611c` binds each factor day to the
+  membership in force at record time and reuses that recorded key at score
+  time; the simulation reddens under the reverted fix. Stage 1, the short
+  battery, and both benchmarks hold no month-keyed membership history and
+  are unaffected.
+- Also this round: the QC log endpoint requires a literal `query`
+  parameter, and the run driver now persists a completion verdict before
+  attempting log retrieval.
+
+**Launch gate: Stage 0 reruns are BLOCKED until `0f0611c` is independently
+reviewed and counter-reviewed per the standing workflow.** Reruns get new
+R-numbers; R-005/R-006 remain counted.
+
 ## 8. What is next
 
-1. PR #244 merged Claude's Stage 0 correction counter-review at `b6f577e`;
+1. **Codex must review `0f0611c` (and this round's driver/convention
+   commits) on `user/claude/qc-stage0-run-20260817`**; after acceptance and
+   counter-review, rerun Stage 0 from run 1 under the same naming/serial
+   conventions: monthly A/B/C, short A/B/C, benchmark A/B/C, one at a time.
+2. PR #244 merged Claude's Stage 0 correction counter-review at `b6f577e`;
    the merge tree is byte-identical to exact reviewed head `9a7e9fc`.
    Codex independently accepts that range in section 7r. Its only correction
-   is a test-only P3 call-site guard on local branch
-   `codex/review-alpha-qc-fable-cr2-20260817`.
-2. **The code-review and counter-review gates are satisfied.** The owner must
-   now confirm stage ORDER: the round-2 rerun
-   contract centres on Stage 1 (REP-H52/REP-IDV plus cadence-matched
-   benchmarks), while plan §5 still requires Stage 0 battery completion.
+   is a test-only P3 call-site guard merged via PR #245 at `1457169`.
+   Superseded for sequencing by section 7s: the owner chose Stage 0 first,
+   and the launch round then found the residual-factor event-timing defect.
    Codex's original contract items remain binding, including `855941a`, the
    follow-up local formula correction, Stage 1 timing/factor alignment,
    turnover/NAV behavior, current LEAN syntax, benchmark/analyser refusals,

@@ -350,6 +350,57 @@ Also recorded: LEAN logged a deprecation warning for the
 `add_universe(coarse, fine)` overload (non-fatal), and adjusted start dates
 for six factor-file symbols (BCE, CVE, RCI, CNI, SJR, TCK).
 
+## R-006 — Stage 0 monthly battery, B_core, reviewed code (REFUSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (same family as R-005) |
+| **Replication or new** | Stage 0 execution on the same counter-reviewed source as R-005 |
+| **Research look** | Counted real-market run (run-level count 6 → 7); zero emitted alpha cells |
+| **Multiplicity family** | QC alpha battery 2026-08-16, 180 cells (repeated look; lifetime floor stays 428) |
+| **Source commit** | `423a818` (LEAN sources byte-identical to reviewed `main`) |
+| **Uploaded source SHA-256** | recorded in `run2_monthly_B.json`; `ACTIVE_UNIVERSE="B_core"` rewrite of the same file as R-005 |
+| **QC project** | `35285594` — `2. MONTHLY_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `86b7cd76c8b0063c3444a288d49111d8-10dea6d5c90b29a72b09c4aa1958b967` |
+| **Backtest ID** | `896f7f2c72b5acdb03859d79497973c3` |
+| **Completed** | 190.01 s engine time, 31,944,196 points, 168k/s |
+| **Data period / universe** | 2012-01-01..2024-12-31; B_core; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` (identical to R-001's universe numbers) |
+| **Raw log** | `artifacts/qc_stage0_20260817/run2_monthly_B.log`, 7 lines, sha256:`8858e6f63b2f4cdfb3bed388fad89a4db14f90d0ad82baf1ff8a6391b1bc395b` |
+| **Primary statistics** | **none** |
+| **Validity** | **REFUSED** — identical `INCOMPLETE\|missing_specs=MULTI_ALPHA_COMPOSITE\|RESIDUAL_MOM_12_1\|RESIDUAL_MOM_6_1` |
+
+### The hypothesis test this run was declared to be
+
+R-005's thin-industry hypothesis is **falsified**: B_core's broad
+cross-section refused identically, and the run was ~25× faster than R-001's
+corrected-code run — the expensive residual path is clearly never receiving
+usable factor input. Per the pre-declared decision rule, this is now treated
+as a **suspected defect in the corrected point-in-time factor machinery**
+(`_record_factor_returns` / `_factor_returns`, first cloud-executed in this
+pair of runs). **Stage 0 is STOPPED at two of nine runs**; runs 3–9 are not
+launched. The diagnosis moves to a local LEAN-stub integration harness — no
+cloud compute may be used to debug unreviewed hypotheses — and any fix goes
+back through the review loop before a rerun. Both refusals remain counted,
+permanent ledger entries.
+
+**Root cause CONFIRMED locally the same day (no further cloud access).** A
+LEAN-stub simulation reproduced the exact refusal signature once it modeled
+LEAN's real event timing: daily bars are labeled with the NEXT calendar day,
+so the last bar of a month ending on a Friday arrives labeled
+Saturday-the-1st — before the new month's universe selection exists. The
+factor recorder keyed membership by the label's month, recorded those days
+with empty industry buckets, and one poisoned day refused every 504-session
+residual window spanning it; months end on Fridays roughly one in four, so
+every window was poisoned and both residual specifications refused totally
+while all non-membership specifications emitted. Fix `0f0611c` binds each
+factor day to the membership actually in force at record time and makes
+score-time lookups reuse exactly that recorded month key;
+`tests/test_alpha_battery_monthly_sim.py` drives the real algorithm class
+through the weekend-boundary event model and reddens under the reverted fix.
+The Stage 1, short-battery, and benchmark algorithms hold no month-keyed
+membership history and are unaffected. The fix awaits independent review
+before any rerun; reruns will be new R-numbers.
+
 ## 2026-08-17 full research/QC audit disposition
 
 - Correction `855941a` standardizes every LEAN algorithm on QuantConnect's

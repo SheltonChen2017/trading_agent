@@ -1,8 +1,8 @@
-# Session handoff — staged QuantConnect alpha round 1 reviewed
+# Session handoff — QuantConnect alpha Stage 1 independently corrected
 
-Prepared: 2026-08-16 by Codex after independent review of Claude's first
-staged alpha/QC result-ledger push, correction of residual-momentum timing,
-and creation of the owner-requested alpha implementation plan.
+Prepared: 2026-08-17 by Codex after independent review of Claude's pushed
+REP-H52 / REP-IDV Stage 1 implementation and correction of its timing,
+point-in-time factor, benchmark, analysis and test contracts.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -11,18 +11,20 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-02.md`
 3. `docs/Alpha_Test_Implementation_Plan.md`
-4. `docs/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
+4. `docs/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`
 5. `docs/alpha-result.md`
-6. `docs/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
-7. `docs/ALPHA_BATTERY_METHOD_V2.md`
-8. `docs/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
-9. `docs/ALPHA_BATTERY_2026-08-16_QC_RESULTS.md` (invalid audit history)
-10. `docs/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
-11. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-12. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-13. `docs/MANDATE.md` (§2, §4, §6)
-14. `docs/OPERATIONAL_FACTS.md`
-15. `docs/OPERATIONS_RUNBOOK.md`
+6. `docs/REVIEW_2026-08-16_ALPHA_QC_ROUND1_COUNTERREVIEW.md`
+7. `docs/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
+8. `docs/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
+9. `docs/ALPHA_BATTERY_METHOD_V2.md`
+10. `docs/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
+11. `docs/ALPHA_BATTERY_2026-08-16_QC_RESULTS.md` (invalid audit history)
+12. `docs/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
+13. `docs/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+14. `docs/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+15. `docs/MANDATE.md` (§2, §4, §6)
+16. `docs/OPERATIONAL_FACTS.md`
+17. `docs/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -33,20 +35,20 @@ operator-database mutation, or scheduled-task change.
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
 - `main` and `origin/main`: `a795ea322de8a50830abc680fd82d49967c5ddd6`
   when the current long-lived alpha branch was created.
-- Claude's exact reviewed remote is
+- Claude's exact current reviewed remote is
   `origin/user/claude/alpha-qc-round-20260816` at
-  `ad6475d552c5f9b4da338570cd52ea99c3b63524`; exact base/merge-base is
-  `a795ea322de8a50830abc680fd82d49967c5ddd6`. The ordered range
-  `a795ea3..ad6475d` contains one commit and it has an explicit disposition.
-- Current review branch: `codex/review-alpha-qc-round1-20260816`, created in
-  an isolated worktree from exact pushed Claude head `ad6475d`. Product/test
-  correction is `8bf8a82`; plan/review/result/action-plan documentation is
-  `e1aedc7`; exact-session product correction is `56bc86d`; the review-record
-  follow-up is `175ab1e`; final validation record is `82ab65f`; this handoff
-  is the separate final local commit.
+  `dc63eecc9160071ef1590650085d2afe48e42c45`; this cycle's exact prior
+  reviewed base/merge-base is `ad6475d552c5f9b4da338570cd52ea99c3b63524`.
+  The complete ordered range `ad6475d..dc63eec` contains six carried-forward
+  Codex commits, Claude counter-review `af045ee`, and Stage 1 `dc63eec`; all
+  eight have explicit dispositions in the round-2 report.
+- Current review branch: `codex/review-alpha-qc-round2-20260817`, created in
+  an isolated worktree from exact pushed Claude head `dc63eec`. Product/test
+  correction is `b143c60`; review/plan/result/action/handoff documentation is
+  committed separately after final validation.
 - The owner authorized exactly one final push of this Codex branch after all
   validation, with no checkpoint push. Claude must counter-review that exact
-  final remote head before any new QuantConnect run.
+  final remote head before any Stage 1 QuantConnect run.
 - Five new real-market cloud executions are preserved in Git. None is usable
   alpha evidence: one refused, two remain deliberately unanalysed, one ran
   unreviewed code, and the benchmark is unanalysed; four entries also lack
@@ -92,7 +94,8 @@ sections 7d through 7f describe the two owner-reported rounds and their merge;
 section 7g records their completed independent review; section 7h records the
 prior local alpha review; section 7i records the current QuantConnect review
 of the original battery; section 7j records the current staged alpha review
-and supersedes every earlier alpha current-state statement.
+and section 7k records Stage 1. Section 7k supersedes every earlier alpha
+current-state statement.
 
 ## 2. Review outcome and commit dispositions
 
@@ -652,20 +655,72 @@ stopped at a handoff topology-format guard; the declaration was corrected and
 the complete green suite was rerun. Final pushed remote identity is reported
 to the owner after the single authorized push.
 
+## 7k. Alpha QC Stage 1 review (Codex, 2026-08-17)
+
+The monitor fired only after exact remote
+`origin/user/claude/alpha-qc-round-20260816` advanced from last-reviewed
+`ad6475d552c5f9b4da338570cd52ea99c3b63524` to pushed head
+`dc63eecc9160071ef1590650085d2afe48e42c45`. The shared checkout began and
+ended the review on branch `user/claude/alpha-qc-round-20260816` at
+`dc63eec`; Codex did not switch, edit, stage or commit there. All durable work
+was performed on isolated branch `codex/review-alpha-qc-round2-20260817`.
+
+The ordered range and explicit dispositions are in
+`docs/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`. Six round-1 Codex commits are
+accepted carried-forward history, not relabeled as a fresh review. Claude's
+`af045ee` counter-review is accepted without correction. Stage 1 commit
+`dc63eec` is accepted only after `b143c60`.
+
+The submitted pure H52 and IDV score helpers were directionally correct, but
+the end-to-end experiment was not the frozen one. It scored on the first
+session of a calendar month and settled when the next month's entry arrived;
+the plan requires prior month-end close, next distinct close entry, and an
+exact 21-session outcome. It also rebuilt REP-IDV's 111 historical market
+returns from the score-date survivor set and substituted zero for an empty
+factor day. Finally, no exact-cadence benchmark or analyser capable of
+accepting the Stage 1 spec inventory and 24-cell gate existed.
+
+Correction `b143c60` now:
+
+- freezes the immediately preceding month-end and enters at the current
+  first-of-month close without relying on close-callback ordering;
+- keeps overlapping cohorts and settles each exactly 21 distinct sessions
+  after entry;
+- records each day's point-in-time equal-weight universe factor with its
+  exchange session and refuses any missing 90+21 factor date;
+- preserves separate drift turnover at monthly rebalance while the primary
+  outcome remains the fixed 21-session cohort;
+- adds `research/lean/alpha_stage1_benchmark.py` with identical timing and
+  delisting behavior; and
+- adds `scripts/analyse_qc_alpha_stage1.py`, requiring alpha and benchmark
+  project/compile/backtest/source hashes, same-date comparison, the 24-cell
+  stage gate and the 452-cell lifetime gate.
+
+Two P1 and two P2 findings are closed; none remains open. Focused Stage
+1/QC/LEAN safety validation is **74 passed**. A deliberate 20-session mutation
+failed the exact-hold regression as intended and was restored. Full final-tree
+validation is recorded in the round-2 report and final documentation commit.
+
+No QuantConnect authentication, upload, compile, backtest, result read or
+market statistic occurred. No broker, order, deployment, database, scheduler,
+policy, mandate, registry or epoch state changed. The alpha-cell exposure
+floor therefore remains 428. `docs/alpha-result.md` contains no Stage 1 run;
+any run launched before Claude counter-review must be appended as
+`PENDING_REVIEW` and counted rather than reused.
+
 ## 8. What is next
 
-1. Publish `codex/review-alpha-qc-round1-20260816` with the already authorized
+1. Publish `codex/review-alpha-qc-round2-20260817` with the owner-authorized
    **single final push only after** final local validation. Do not push main or
    Claude's branch and do not make a second push this cycle.
-2. Claude must counter-review final Codex head, especially `8bf8a82` and the
-   corrected look ledger. Only then rerun Stage 0 monthly, short, and matching
-   benchmark algorithms once per A/B/C universe. Record project, compile,
-   backtest, exact source, log/result hashes, windows, and before/after look
-   counts. Do not split the stateful short calendar.
-3. Append new entries to `docs/alpha-result.md`; never overwrite the five
-   current logs or rehabilitate historical invalid artifacts. Then implement
-   Stage 1 from `docs/Alpha_Test_Implementation_Plan.md`, commit, and push the
-   same long-lived Claude branch before any QC run so Codex can review it.
+2. Claude must counter-review final Codex head, especially `b143c60` timing,
+   factor membership/alignment, turnover/cohort separation, benchmark and
+   analyser refusal paths. Only then run Stage 1 alpha and benchmark once per
+   A/B/C universe. Record project, compile, backtest, exact source, log/result
+   hashes, windows, and before/after look counts.
+3. Append every execution to `docs/alpha-result.md`; never overwrite the five
+   current logs or rehabilitate historical invalid artifacts. A premature run
+   is `PENDING_REVIEW`, still counted, and must be rerun from reviewed source.
 4. The owner has completed steps 1 and 2 of the dev-app walkthrough; Stage 2
    steering is confirmed working. Step 3 is in progress against a COPY of
    the development database at
@@ -715,25 +770,23 @@ or roll an epoch without a new explicit owner instruction.
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/Alpha_Test_Implementation_Plan.md,
-docs/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md, docs/alpha-result.md and
+docs/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md, docs/alpha-result.md and
 docs/SESSION_HANDOFF.md. Claude pushed exact remote
-origin/user/claude/alpha-qc-round-20260816 at ad6475d from base a795ea3.
-Codex reviewed its one commit on isolated branch
-codex/review-alpha-qc-round1-20260816 without switching the shared checkout.
-Product correction 8bf8a82 fixes a second residual-momentum defect: the
-slice-only version measured the skipped latest month, while true 6-1/12-1
-requires a prior 252-session joint fit, 105/231 formation residuals and a
-21-session skip. Product correction 56bc86d also refuses price histories whose
-stored dates do not exactly match market sessions. Documentation commit
-e1aedc7 creates the staged alpha plan and corrects the result ledger. Five
-real-market cloud runs count; 80 emitted
-cells lift the conservative lifetime floor to 428. None of those artifacts is
-usable alpha evidence and four lack complete project/compile provenance. No
-QC access or statistic calculation occurred in review. Verify the final
-pushed Codex head, counter-review it, then rerun Stage 0 exactly once per
-algorithm/universe with full project/compile/backtest/source/hash identity.
-Append rather than overwrite ledger entries. Implement Stage 1 and push the
-same long-lived Claude branch before QC so Codex can review first.
+origin/user/claude/alpha-qc-round-20260816 at dc63eec from last-reviewed
+ad6475d. Codex reviewed all eight commits explicitly on isolated branch
+codex/review-alpha-qc-round2-20260817 without switching the shared checkout.
+Claude counter-review af045ee is accepted. Stage 1 dc63eec is accepted only
+after product/test correction b143c60: the submitted algorithm scored and
+settled by calendar-month callbacks rather than prior month-end/next-close/
+exact-21 sessions, applied score-date membership backward to the historical
+IDV market factor, filled unavailable factor returns with zero, and lacked a
+matching benchmark/analyser. Corrected code uses PIT daily factor membership,
+exact session alignment/refusal, overlapping 21-session cohorts, a cadence-
+matched benchmark, and strict alpha/benchmark run identity with 24-cell and
+452-cell gates. No Stage 1 QC run or statistic occurred; the lifetime floor
+remains 428. Verify the final pushed Codex head and counter-review it before
+running A/B/C alpha and benchmark jobs. Append every run rather than overwrite
+ledger entries; a premature run is PENDING_REVIEW and still counts.
 paper-epoch-005 remains unchanged at 752d3b7 for 60 days; operational
 my_policy.json stays 0.50/0.05. Do not merge, deploy, roll the epoch, mutate
 the operator database, submit orders, access funded accounts, begin M4, or

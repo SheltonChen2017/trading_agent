@@ -205,3 +205,15 @@ def test_prior_day_bar_keeps_prior_membership_when_new_month_selects_first(
     assert algorithm.factor_membership_months[-1] == (2012, 1)
     assert set(algorithm.industry_aggregates[-1]) == {100, 101, 102, 103}
     assert {size for _total, size in algorithm.industry_aggregates[-1].values()} == {10}
+
+    # QCS0CR-001: the boundary exception must not become the rule. A
+    # mutation that ALWAYS used the previous month's snapshot — month-stale
+    # membership on every ordinary day — passed this test as written. The
+    # next session is a plain February day (no selection change in its
+    # slice), so it must record under the ACTIVE February selection,
+    # including February's new industry codes.
+    algorithm.time = dt.datetime(2012, 2, 2)
+    algorithm.on_data(_Slice({name: _Bar(102.0)
+                              for name in set(names) | set(new_names)}))
+    assert algorithm.factor_membership_months[-1] == (2012, 2)
+    assert set(algorithm.industry_aggregates[-1]) == {200, 201, 202, 203}

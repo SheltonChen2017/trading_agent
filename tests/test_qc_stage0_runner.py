@@ -107,6 +107,31 @@ def test_log_fetch_refuses_a_run_that_never_ends(monkeypatch):
         runner._fetch_full_log(Endless(), 1, "bt")
 
 
+def test_launch_commit_check_requires_a_clean_tree(monkeypatch, tmp_path):
+    """QCS0CR-002: dropping ``require_clean=True`` survived the suite.
+
+    The evidence contract binds an uploaded source to a commit; a dirty-tree
+    launch would record a commit that does not contain the uploaded bytes.
+    The spy executes the real wrapper and pins the kwarg the guard rides on.
+    """
+    calls = {}
+
+    def spy(require_clean=False, repository=None):
+        calls["require_clean"] = require_clean
+        return "a" * 40
+
+    monkeypatch.setattr(runner, "current_commit", spy)
+    assert runner._git_commit_of(tmp_path / "algo.py") == "a" * 40
+    assert calls["require_clean"] is True
+
+    def refusing(require_clean=False, repository=None):
+        raise runner.RuntimeIdentityError("worktree is dirty")
+
+    monkeypatch.setattr(runner, "current_commit", refusing)
+    with pytest.raises(SystemExit, match="not attributable to a clean commit"):
+        runner._git_commit_of(tmp_path / "algo.py")
+
+
 def test_log_artifact_hash_is_the_exact_bytes_on_disk(tmp_path):
     path = tmp_path / "run.log"
     count, digest = runner._write_log_artifact(path, ["one", "two"])

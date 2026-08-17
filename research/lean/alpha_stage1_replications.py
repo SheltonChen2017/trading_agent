@@ -12,7 +12,8 @@ behaviourally. Rewriting it for a new pair of scores is how the previous
 round reintroduced defects that had just been fixed, so only
 `_form_scores` and the spec list differ.
 
-Two specifications, both monthly-formed and held 21 sessions:
+Two specifications, both formed at the last close of each calendar month,
+entered at the next distinct close, and held for exactly 21 sessions:
 
 REP-H52 -- 52-week-high proximity. Score is `close_t / max(close[t-251:t])`
 using adjusted closes, requiring 252 aligned sessions with no imputation.
@@ -64,7 +65,7 @@ IDV_FORMATION_SESSIONS = 21     # volatility measured over this month
 SPECIFICATIONS = ("REP_H52", "REP_IDV")
 
 
-def _aligned_price_tail(values, value_sessions, market_sessions, count):
+def _aligned_price_tail(values, value_sessions, market_sessions, count, end_ago=0):
     """Return ``count + 1`` prices only when every market date matches.
 
     Universe exits, halts and missing bars must not turn two non-adjacent
@@ -72,14 +73,48 @@ def _aligned_price_tail(values, value_sessions, market_sessions, count):
     in a deque.
     """
     required = count + 1
-    if count < 0 or required > len(values) or required > len(value_sessions):
+    if count < 0 or end_ago < 0:
         return None
-    if required > len(market_sessions):
+    value_end = len(values) - end_ago
+    market_end = len(market_sessions) - end_ago
+    if value_end < required or market_end < required:
         return None
-    sessions = list(value_sessions)[-required:]
-    if sessions != list(market_sessions)[-required:]:
+    value_start = value_end - required
+    market_start = market_end - required
+    sessions = list(value_sessions)[value_start:value_end]
+    if sessions != list(market_sessions)[market_start:market_end]:
         return None
-    return list(values)[-required:]
+    return list(values)[value_start:value_end]
+
+
+def _aligned_observation_tail(values, value_sessions, market_sessions, count, end_ago=0):
+    """Return exactly ``count`` observations ending ``end_ago`` sessions back."""
+    if count <= 0 or end_ago < 0:
+        return None
+    value_end = len(values) - end_ago
+    market_end = len(market_sessions) - end_ago
+    if value_end < count or market_end < count:
+        return None
+    value_start = value_end - count
+    market_start = market_end - count
+    sessions = list(value_sessions)[value_start:value_end]
+    if sessions != list(market_sessions)[market_start:market_end]:
+        return None
+    return list(values)[value_start:value_end]
+
+
+def _is_new_calendar_month(previous_session, current_session):
+    """True only on the first distinct exchange session of a new month."""
+    if previous_session is None or current_session <= previous_session:
+        return False
+    return (previous_session.year, previous_session.month) != (
+        current_session.year, current_session.month
+    )
+
+
+def _holding_period_complete(entry_index, current_index, hold_sessions=21):
+    """A close-to-close cohort exits after exactly ``hold_sessions`` gaps."""
+    return current_index - entry_index >= hold_sessions
 
 
 def _spearman(pairs):
@@ -193,24 +228,27 @@ class AlphaStage1Replications(QCAlgorithm):
         self.fundamentals = {}      # Symbol -> dict of latest known values
         self.industry = {}          # Symbol -> Morningstar industry code
         self.selected = []          # this month's eligible symbols
-        self.pending = None         # scores awaiting their forward return
-        self.staged = None          # scores waiting for close t+1 entry
+        self.selection_history = {} # (year, month) -> PIT selected symbols
+        self.cohorts = []           # independently settled 21-session cohorts
         # Selection is keyed off the CALENDAR, not off OnData. The first
         # version gated selection on a flag that only OnData set, and
         # OnData needs securities, which needs selection: a deadlock that
         # ran to completion reporting cap_rows=0 rather than failing.
         self.selection_month = None
-        self.scored_month = None
         self.last_session = None
+        self.session_index = -1
         self.in_universe = set()
         self.retained = set()
         self.terminal_prices = {}
+        self.market_returns = deque(maxlen=LOOKBACK)
+        self.market_return_sessions = deque(maxlen=LOOKBACK)
 
         self.cap_missing = 0
         self.cap_fallback = 0
         self.cap_rows = 0
         self.results = {}           # spec -> per-date IC/return/turnover rows
         self.previous_weights = {}  # (spec, construction) -> signed weights
+        self.previous_entries = {}  # matching prices at prior rebalance
 
     # --- universe ------------------------------------------------------
 
@@ -265,17 +303,25 @@ class AlphaStage1Replications(QCAlgorithm):
             }
             chosen.append(f.Symbol)
         current = set(chosen)
-        needed = set()
-        if self.pending is not None:
-            needed.update(self.pending.get("entry", {}))
-        if self.staged is not None:
-            needed.update(self.staged.get("names", ()))
+        # The prior month's members are still needed for the month-end score
+        # and next-session entry that occur in this very slice. Open cohorts
+        # and prior rebalance weights must also survive universe removal.
+        needed = set(self.selected)
+        for cohort in self.cohorts:
+            needed.update(cohort.get("entry", {}))
+        for weights in self.previous_weights.values():
+            needed.update(weights)
         for symbol in self.in_universe - current:
             if symbol in needed and symbol not in self.retained:
                 self.AddSecurity(symbol, Resolution.Daily)
                 self.retained.add(symbol)
         self.in_universe = current
         self.selected = chosen
+        self.selection_history[self.selection_month] = tuple(chosen)
+        if len(self.selection_history) > 3:
+            oldest = sorted(self.selection_history)[:-3]
+            for key in oldest:
+                self.selection_history.pop(key, None)
         return chosen
 
     # --- data ----------------------------------------------------------
@@ -295,7 +341,9 @@ class AlphaStage1Replications(QCAlgorithm):
         session = self.Time.date()
         if not data.Bars or session == self.last_session:
             return
+        previous_session = self.last_session
         self.last_session = session
+        self.session_index += 1
         self.sessions.append(session)
 
         for symbol in list(data.Bars.Keys):
@@ -307,31 +355,46 @@ class AlphaStage1Replications(QCAlgorithm):
             window.append(float(data.Bars[symbol].Close))
             self.close_sessions[symbol].append(session)
 
-        if self.staged is not None and session > self.staged["score_session"]:
-            self._bind_staged_entry()
+        self._record_market_return()
+        self._settle_due_cohorts()
 
-        # Score once per month, after the day's bars have been recorded.
-        # Settling first, then forming, gives a full month between a score
-        # and the return it is judged against.
-        month = (self.Time.year, self.Time.month)
-        if self.scored_month != month and self.selection_month == month:
-            self.scored_month = month
-            self._form_scores()
+        # On the first session of a new month, the immediately preceding
+        # exchange close is the prior month-end. Score strictly as of that
+        # close (end_ago=1) and bind entry to today's close. This avoids
+        # depending on LEAN callback ordering at the closing bell.
+        if _is_new_calendar_month(previous_session, session):
+            prior_month = (previous_session.year, previous_session.month)
+            names = self.selection_history.get(prior_month, ())
+            self._form_and_bind(names, previous_session)
+        self._release_unused_retained()
 
-    def _bind_staged_entry(self):
-        staged = self.staged
-        self.staged = None
-        prior_outcomes = self._settle() if self.pending is not None else {}
+    def _record_market_return(self):
+        """Record the PIT equal-weight universe return for this session."""
+        values = []
+        for symbol in self.selected:
+            returns = self._returns(symbol, 1)
+            if returns is not None:
+                values.append(returns[0])
+        # Do not insert a plausible zero when the factor is unavailable.
+        # A missing date makes the later aligned factor window refuse.
+        if len(values) >= MIN_NAMES:
+            self.market_returns.append(sum(values) / len(values))
+            self.market_return_sessions.append(self.last_session)
+
+    def _form_and_bind(self, names, score_session):
+        scores = self._form_scores(names, end_ago=1)
+        if scores is None:
+            return
         entry = {
             symbol: self._price(symbol, 0)
-            for symbol in staged["names"]
+            for symbol in names
             if symbol not in self.terminal_prices and self._price(symbol, 0) is not None
         }
         if len(entry) < MIN_NAMES:
             return
         portfolios = {}
-        for spec, scores in staged["scores"].items():
-            usable = [(value, symbol) for symbol, value in scores.items()
+        for spec, spec_scores in scores.items():
+            usable = [(value, symbol) for symbol, value in spec_scores.items()
                       if value is not None and math.isfinite(value) and symbol in entry]
             if len(usable) < MIN_NAMES:
                 continue
@@ -354,107 +417,126 @@ class AlphaStage1Replications(QCAlgorithm):
                 {symbol: 1.0 / len(longs) for symbol in longs},
                 {symbol: 1.0 / len(long20) for symbol in long20},
             )
-            turns = tuple(
-                _drift_turnover(self.previous_weights.get(key) or {}, target, prior_outcomes)
-                for key, target in zip(keys, targets)
-            )
+            turns = tuple(self._rebalance_turnover(key, target)
+                          for key, target in zip(keys, targets))
             if any(value is None for value in turns):
                 continue
             for key, target in zip(keys, targets):
                 self.previous_weights[key] = target
+                self.previous_entries[key] = {
+                    symbol: entry[symbol] for symbol in target
+                }
             portfolios[spec] = {
                 "longs": longs, "shorts": shorts, "long20": long20,
                 "turnovers": turns,
             }
         if not portfolios:
             return
-        self.pending = {
-            "scores": staged["scores"],
+        self.cohorts.append({
+            "scores": scores,
             "entry": entry,
-            "date": staged["date"],
+            "date": str(score_session),
             "portfolios": portfolios,
-        }
+            "entry_index": self.session_index,
+        })
+
+    def _rebalance_turnover(self, key, target):
+        previous = self.previous_weights.get(key) or {}
+        if not previous:
+            return _drift_turnover({}, target, {})
+        prior_entries = self.previous_entries.get(key) or {}
+        outcomes = {}
+        for symbol in previous:
+            entry_price = prior_entries.get(symbol)
+            now = self.terminal_prices.get(symbol, self._price(symbol, 0))
+            if entry_price is None or entry_price <= 0 or now is None:
+                return None
+            outcomes[symbol] = now / entry_price - 1.0
+        return _drift_turnover(previous, target, outcomes)
 
     def _price(self, symbol, ago):
         window = self.closes.get(symbol)
         dates = self.close_sessions.get(symbol)
         if window is None or dates is None:
             return None
-        aligned = _aligned_price_tail(window, dates, self.sessions, ago)
+        aligned = _aligned_price_tail(window, dates, self.sessions, 0, end_ago=ago)
         return None if aligned is None else aligned[0]
 
-    def _returns(self, symbol, count):
+    def _returns(self, symbol, count, end_ago=0):
         window = self.closes.get(symbol)
         dates = self.close_sessions.get(symbol)
         if window is None or dates is None:
             return None
-        values = _aligned_price_tail(window, dates, self.sessions, count)
+        values = _aligned_price_tail(window, dates, self.sessions, count, end_ago=end_ago)
         if values is None or any(value <= 0 for value in values):
             return None
         return [values[i + 1] / values[i] - 1.0
                 for i in range(len(values) - 1)]
 
-    def _h52_proximity(self, symbol):
+    def _h52_proximity(self, symbol, end_ago=0):
         """Aligned 52-week window, then the module-level pure score."""
         window = self.closes.get(symbol)
         dates = self.close_sessions.get(symbol)
         if window is None or dates is None or len(window) < H52_SESSIONS:
             return None
-        prices = _aligned_price_tail(window, dates, self.sessions, H52_SESSIONS - 1)
+        prices = _aligned_price_tail(
+            window, dates, self.sessions, H52_SESSIONS - 1, end_ago=end_ago
+        )
         if prices is None or any(value <= 0 for value in prices):
             return None
         return _h52_score(prices)
 
-    def _idio_vol(self, symbol, market):
+    def _idio_vol(self, symbol, market, end_ago=0):
         """Delegates to the module-level pure function."""
         span = IDV_ESTIMATION_SESSIONS + IDV_FORMATION_SESSIONS
-        stock = self._returns(symbol, span)
+        stock = self._returns(symbol, span, end_ago=end_ago)
         if stock is None:
             return None
         return _idio_vol_score(stock, market,
                                IDV_ESTIMATION_SESSIONS, IDV_FORMATION_SESSIONS)
 
-    def _form_scores(self):
-        names = [symbol for symbol in self.selected
+    def _form_scores(self, selected_names, end_ago=0):
+        names = [symbol for symbol in selected_names
                  if len(self.closes.get(symbol, ())) >= H52_SESSIONS]
         if len(names) < MIN_NAMES:
-            return
-        market = self._index_returns(
-            names, IDV_ESTIMATION_SESSIONS + IDV_FORMATION_SESSIONS)
-        scores = {
-            "REP_H52": {symbol: self._h52_proximity(symbol) for symbol in names},
-            "REP_IDV": {symbol: self._idio_vol(symbol, market) for symbol in names},
-        }
-        self.staged = {
-            "scores": scores,
-            "names": names,
-            "score_session": self.Time.date(),
-            "date": str(self.Time.date()),
+            return None
+        market = _aligned_observation_tail(
+            self.market_returns,
+            self.market_return_sessions,
+            self.sessions,
+            IDV_ESTIMATION_SESSIONS + IDV_FORMATION_SESSIONS,
+            end_ago=end_ago,
+        )
+        if market is None:
+            return None
+        return {
+            "REP_H52": {
+                symbol: self._h52_proximity(symbol, end_ago=end_ago)
+                for symbol in names
+            },
+            "REP_IDV": {
+                symbol: self._idio_vol(symbol, market, end_ago=end_ago)
+                for symbol in names
+            },
         }
 
-    def _index_returns(self, names, count):
-        series = []
-        for index in range(count):
-            values = []
-            for symbol in names:
-                a = self._price(symbol, count - index)
-                b = self._price(symbol, count - index - 1)
-                if a and b and a > 0:
-                    values.append(b / a - 1.0)
-            series.append(sum(values) / len(values) if values else 0.0)
-        return series
+    def _settle_due_cohorts(self):
+        remaining = []
+        for cohort in self.cohorts:
+            if _holding_period_complete(cohort["entry_index"], self.session_index):
+                self._settle_cohort(cohort)
+            else:
+                remaining.append(cohort)
+        self.cohorts = remaining
 
-    def _settle(self):
-        """Score last month's ranking against the realised return."""
-        pending = self.pending
-        self.pending = None
+    def _settle_cohort(self, pending):
+        """Score one cohort at its exact 21-session close."""
         outcomes = {}
         for symbol, entry_price in pending["entry"].items():
             now = self.terminal_prices.get(symbol, self._price(symbol, 0))
             if entry_price and now is not None and entry_price > 0:
                 outcomes[symbol] = now / entry_price - 1.0
         if len(outcomes) < MIN_NAMES:
-            self._release_unused_retained()
             return outcomes
 
         for spec, portfolio in pending["portfolios"].items():
@@ -479,11 +561,14 @@ class AlphaStage1Replications(QCAlgorithm):
                  portfolio["turnovers"][0], portfolio["turnovers"][1],
                  portfolio["turnovers"][2], len(pairs))
             )
-        self._release_unused_retained()
         return outcomes
 
     def _release_unused_retained(self):
-        needed = set(self.pending.get("entry", {})) if self.pending else set()
+        needed = set()
+        for cohort in self.cohorts:
+            needed.update(cohort.get("entry", {}))
+        for weights in self.previous_weights.values():
+            needed.update(weights)
         for symbol in list(self.retained):
             if symbol not in needed and symbol not in self.in_universe:
                 self.RemoveSecurity(symbol)

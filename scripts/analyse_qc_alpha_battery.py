@@ -62,7 +62,10 @@ class InvalidLog(RuntimeError):
     """The log cannot establish one complete, internally consistent run."""
 
 
-def parse_log(path: Path) -> tuple[list[str], pd.DataFrame, dict]:
+def parse_log(
+    path: Path,
+    expected_spec_sets: set[frozenset[str]] | None = None,
+) -> tuple[list[str], pd.DataFrame, dict]:
     specs: list[str] = []
     declared = None
     meta: dict = {}
@@ -182,7 +185,8 @@ def parse_log(path: Path) -> tuple[list[str], pd.DataFrame, dict]:
                     )
     if not specs or declared is None:
         raise InvalidLog(f"{path.name}: missing SPECS or DATES declaration")
-    if frozenset(specs) not in EXPECTED_SPEC_SETS or len(specs) != len(set(specs)):
+    allowed = EXPECTED_SPEC_SETS if expected_spec_sets is None else expected_spec_sets
+    if frozenset(specs) not in allowed or len(specs) != len(set(specs)):
         raise InvalidLog(f"{path.name}: incomplete or unknown frozen spec inventory")
     expected_indices = set(range(len(specs)))
     incomplete = [date for date, indices in date_indices.items()
@@ -215,7 +219,10 @@ def parse_log(path: Path) -> tuple[list[str], pd.DataFrame, dict]:
     return specs, frame, meta
 
 
-def merge_logs(paths: list[Path]) -> tuple[list[str], pd.DataFrame, dict]:
+def merge_logs(
+    paths: list[Path],
+    expected_spec_sets: set[frozenset[str]] | None = None,
+) -> tuple[list[str], pd.DataFrame, dict]:
     """Merge chronological split windows, rejecting overlap or mismatch."""
     if not paths:
         raise InvalidLog("at least one log path is required")
@@ -224,7 +231,7 @@ def merge_logs(paths: list[Path]) -> tuple[list[str], pd.DataFrame, dict]:
     merged_meta: dict = {}
     last_date: str | None = None
     for path in paths:
-        specs, frame, meta = parse_log(path)
+        specs, frame, meta = parse_log(path, expected_spec_sets=expected_spec_sets)
         if expected_specs is None:
             expected_specs = specs
         elif specs != expected_specs:

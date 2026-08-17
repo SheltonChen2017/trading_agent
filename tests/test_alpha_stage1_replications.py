@@ -9,16 +9,22 @@ checks the number.
 from __future__ import annotations
 
 import ast
+import datetime as dt
 import math
 import random
 from pathlib import Path
 
 import pytest
 
+from scripts import analyse_qc_alpha_battery as battery_analyser
+from scripts import analyse_qc_alpha_stage1 as stage1_analyser
+from scripts.analyse_qc_benchmark import parse_benchmark
+
 SOURCE = (
     Path(__file__).resolve().parents[1]
     / "research" / "lean" / "alpha_stage1_replications.py"
 )
+BENCHMARK_SOURCE = SOURCE.with_name("alpha_stage1_benchmark.py")
 
 
 def _real():
@@ -41,6 +47,9 @@ def _real():
 _H52 = _real()["_h52_score"]
 _IDV = _real()["_idio_vol_score"]
 _TAIL = _real()["_aligned_price_tail"]
+_OBSERVATIONS = _real()["_aligned_observation_tail"]
+_NEW_MONTH = _real()["_is_new_calendar_month"]
+_HOLD_COMPLETE = _real()["_holding_period_complete"]
 
 
 def _h52(prices):
@@ -73,6 +82,37 @@ def test_h52_requires_a_full_aligned_year_and_refuses_otherwise():
     # A stock that missed a session: its dates no longer match the market.
     gapped = sessions[:100] + sessions[101:] + [252]
     assert tail(prices, gapped, sessions, 251) is None
+
+
+def test_month_end_score_uses_prior_close_and_next_session_entry():
+    """The first February session identifies January's actual last close."""
+    jan_29 = dt.date(2026, 1, 29)
+    jan_30 = dt.date(2026, 1, 30)
+    feb_2 = dt.date(2026, 2, 2)
+    assert not _NEW_MONTH(jan_29, jan_30)
+    assert _NEW_MONTH(jan_30, feb_2)
+
+    sessions = [jan_29, jan_30, feb_2]
+    prices = [90.0, 100.0, 80.0]
+    # end_ago=1 freezes the feature at Jan 30; the Feb 2 entry bar cannot
+    # leak into the score window.
+    assert _TAIL(prices, sessions, sessions, 0, end_ago=1) == [100.0]
+
+
+def test_holding_period_is_exactly_21_distinct_session_gaps():
+    assert not _HOLD_COMPLETE(100, 120)
+    assert _HOLD_COMPLETE(100, 121)
+    assert _HOLD_COMPLETE(100, 122)
+
+
+def test_market_factor_refuses_a_missing_point_in_time_session():
+    sessions = list(range(112))
+    values = [0.001] * 111
+    factor_sessions = sessions[:50] + sessions[51:]
+    # Even with 111 numeric values, one missing exchange session means the
+    # 90+21 factor window is not the frozen daily window.
+    assert _OBSERVATIONS(values, factor_sessions, sessions, 111) is None
+    assert _OBSERVATIONS([0.001] * 112, sessions, sessions, 111, end_ago=1) == [0.001] * 111
 
 
 def test_idv_scores_a_pure_beta_stock_near_zero():
@@ -134,3 +174,38 @@ def test_the_algorithm_declares_itself_a_counted_look():
     flat = " ".join(SOURCE.read_text(encoding="utf-8").split())
     assert "counted research look" in flat
     assert "NO ALPHA STATISTIC" not in flat
+
+
+def test_stage1_parser_accepts_only_the_two_frozen_specs(tmp_path: Path):
+    log = tmp_path / "stage1.log"
+    log.write_text(
+        "SPECS|REP_H52|REP_IDV\nDATES|1\n"
+        "ROW|202001|0~0.01~0.02~-0.01~0.015~0.1~0.2~0.3~100|"
+        "1~-0.01~0.01~-0.02~0.005~0.2~0.3~0.4~100\n",
+        encoding="utf-8",
+    )
+    specs, frame, meta = battery_analyser.parse_log(
+        log, expected_spec_sets={stage1_analyser.STAGE_SPECS}
+    )
+    assert specs == ["REP_H52", "REP_IDV"]
+    assert len(frame) == 2
+    assert meta["dates"] == 1
+
+
+def test_stage1_has_a_separate_exact_cadence_benchmark(tmp_path: Path):
+    text = BENCHMARK_SOURCE.read_text(encoding="utf-8")
+    assert "HOLD_SESSIONS = 21" in text
+    assert "_is_new_calendar_month(previous_session, session)" in text
+
+    log = tmp_path / "benchmark.log"
+    log.write_text("DATES|1\nBROW|202001|0.02|0.5|100\n", encoding="utf-8")
+    frame = parse_benchmark(log)
+    assert list(frame.index) == ["202001"]
+    assert frame.loc["202001", "ret"] == pytest.approx(0.02)
+
+
+def test_stage1_run_identity_refuses_missing_compile_or_bad_source_hash():
+    with pytest.raises(SystemExit, match="project_id,compile_id"):
+        stage1_analyser._run_identity(["A=project,,backtest," + "a" * 64], "--run")
+    with pytest.raises(SystemExit, match="project_id,compile_id"):
+        stage1_analyser._run_identity(["A=project,compile,backtest,not-a-hash"], "--run")

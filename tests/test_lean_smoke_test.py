@@ -27,6 +27,8 @@ LEAN_FILES = sorted(p for p in LEAN_DIR.glob("*.py") if p.name != "__init__.py")
 RESULT_ALGORITHMS = [
     LEAN_DIR / "alpha_battery_monthly.py",
     LEAN_DIR / "alpha_battery_short.py",
+    LEAN_DIR / "alpha_stage1_replications.py",
+    LEAN_DIR / "alpha_stage1_benchmark.py",
     LEAN_DIR / "universe_benchmark.py",
 ]
 
@@ -197,10 +199,14 @@ def test_result_algorithms_use_delisting_outcomes(path):
 @pytest.mark.parametrize("path", RESULT_ALGORITHMS, ids=lambda p: p.name)
 def test_result_algorithms_stage_the_next_session_entry(path):
     text = path.read_text(encoding="utf-8")
-    assert "self.staged" in text
-    assert "score_session" in text
     assert "self.last_session" in text
-    assert "_bind_staged_entry" in text
+    staged_entry = all(token in text for token in (
+        "self.staged", "score_session", "_bind_staged_entry"
+    ))
+    month_end_entry = all(token in text for token in (
+        "previous_session", "_is_new_calendar_month", "score_session"
+    ))
+    assert staged_entry or month_end_entry
 
 
 def test_the_declared_window_is_retargeted_not_patched():

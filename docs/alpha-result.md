@@ -64,9 +64,11 @@ alpha-cell floor remains 428, and the run-level count remains five. Claude's
 independent counter-review accepted the exact pushed correction head
 `9e45803` on 2026-08-17, confirming all four findings and closing two
 follow-up P3 gaps (FCR-001 exit-drift pin; FCR-002 Stage 1 dead-state
-industry-code port). **Before a fresh run:** a lightweight Codex
-acknowledgement of FCR-001/002 (or an owner waiver), the owner's stage-order
-choice, and execution from the exact merged reviewed head. A future run
+industry-code port). Codex independently accepted those closures at exact
+head `9a7e9fc`, merged by PR #244 at `b6f577e`; its only correction was a P3
+call-site regression guard with no algorithm behavior change. **Before a
+fresh run:** the owner's stage-order choice and execution from the exact
+merged reviewed source under the frozen evidence contract. A future run
 belongs in a new `R-005`-or-later entry. If
 any run was launched before that gate, it must be added here as
 `PENDING_REVIEW` and counted; it must not be silently treated as the reviewed

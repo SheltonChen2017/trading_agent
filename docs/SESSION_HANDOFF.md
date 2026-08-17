@@ -14,19 +14,20 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 2. `docs/ACTION_PLAN_2026-08-02.md`
 3. `docs/Alpha_Test_Implementation_Plan.md`
 4. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`
-5. `docs/alpha-result.md`
-6. `docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1_COUNTERREVIEW.md`
-7. `docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
-8. `docs/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
-9. `docs/research/ALPHA_BATTERY_METHOD_V2.md`
-10. `docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
-11. `docs/research/Alpha explanation.md`
-12. `docs/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
-13. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-14. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-15. `docs/operations/MANDATE.md` (§2, §4, §6)
-16. `docs/operations/OPERATIONAL_FACTS.md`
-17. `docs/operations/OPERATIONS_RUNBOOK.md`
+5. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW_INDEPENDENT.md`
+6. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md`
+7. `docs/alpha-result.md`
+8. `docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
+9. `docs/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
+10. `docs/research/ALPHA_BATTERY_METHOD_V2.md`
+11. `docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
+12. `docs/research/Alpha explanation.md`
+13. `docs/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
+14. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+15. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+16. `docs/operations/MANDATE.md` (§2, §4, §6)
+17. `docs/operations/OPERATIONAL_FACTS.md`
+18. `docs/operations/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -36,26 +37,26 @@ operator-database mutation, or scheduled-task change.
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
 - Published `origin/main` at audit time:
-  `f0071bcf60cb1e31fbac3022ce16f3ef8a5b9062`. The shared checkout's local
-  `main` remains older because this isolated review did not switch or update
-  it. The long-lived alpha branch was originally created from `a795ea3`.
+  `d8a32604d32e0d85fb9920b0839445eab13ad5f8` (PR #241, full alpha/QC audit).
+  The current integration branch was created from that exact commit. The
+  long-lived alpha branch was originally created from `a795ea3`.
 - Claude's last submitted remote audited in this cycle was
   `origin/user/claude/alpha-qc-round-20260816` at
   `a37e73b`; the full 2026-08-16/17 chain from `db0045a` through `a37e73b`
   receives an explicit per-commit disposition in the round-2 report. On
   2026-08-17 Claude fast-forwarded that branch onto counter-reviewed Codex
   head `b4e9ee0` and added the counter-review commit (section 7m); the
-  exact final pushed head is recorded with the push.
-- Current review branch: `codex/review-alpha-qc-round2-20260817`, created in
-  an isolated worktree and extended through exact Claude head `a37e73b`.
-  Product/test
-  correction `855941a` covers the entire research/QC tree; `1e2b631` corrects
-  local joint regression and leave-one-out peers; the documentation commit is
-  recorded in the final ordered commit list after validation.
-- The owner authorized exactly one final push of this Codex branch after all
-  validation, with no checkpoint push. That push landed at `b4e9ee0`, and
-  Claude counter-reviewed that exact head on 2026-08-17 (section 7m), so the
-  review gate for the next QuantConnect runs is satisfied.
+  exact pushed head is `ad3b3a8`.
+- Current integration/review branch:
+  `codex/review-alpha-qc-counterreview-20260817`, based on `origin/main` at
+  `d8a3260`. Commit `031b5a7` retains Claude's three mutation-verified tests
+  and counter-review record from `ad3b3a8`; the following documentation commit
+  corrects the stale branch, worktree, and main-head claims found during
+  Codex's independent review.
+- The prior `codex/review-alpha-qc-round2-20260817` branch was merged by PR
+  #241 and then deleted locally and remotely with the other merged topic
+  branches. Its commits remain reachable from `main`. Claude's counter-review
+  gate is satisfied; no new QC run has occurred.
 - Five real-market cloud executions remain preserved in the permanent ledger.
   None is usable
   alpha evidence: one refused, two remain deliberately unanalysed, one ran
@@ -798,11 +799,32 @@ on the restored tree. All seven Codex commits are accepted; all thirteen
 audit findings are confirmed; no product defect was found in the head. No
 QuantConnect, broker, database, scheduler, or epoch access occurred.
 
+## 7n. Independent review of Claude's counter-review (Codex, 2026-08-17)
+
+Codex reviewed exact pushed Claude commit `ad3b3a8`, whose only product-tree
+change is three regression tests. All three tests are worth retaining and the
+commit is **accepted after documentation correction**. Focused validation on
+the exact submitted commit passed 48 tests. The independent record is
+`docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW_INDEPENDENT.md`.
+
+One P3 documentation finding, CR2IR-001, was closed: the submitted handoff
+inherited pre-merge topology and still described `f0071bc`, an older shared
+`main`, an isolated current worktree, and the deleted round-2 Codex branch as
+current. The integration branch now records `origin/main` at `d8a3260`, the
+submitted Claude head `ad3b3a8`, and the current Codex branch. No production
+or QC algorithm changed, no historical result was rehabilitated, and no QC,
+broker, database, scheduler, deployment, or epoch access occurred.
+
+Final validation in the repository `.venv` with Python 3.13.14: focused gate
+**48 passed**; full suite **4,192 passed, 0 failed, 25 known dependency
+warnings in 968.31 seconds**; compilation including `research/` and final
+document/diff/status checks were clean.
+
 ## 8. What is next
 
-1. ~~Publish `codex/review-alpha-qc-round2-20260817`~~ — done; pushed head
-   `b4e9ee0` was counter-reviewed and fast-forwarded into Claude's branch
-   (section 7m).
+1. Publish and merge `codex/review-alpha-qc-counterreview-20260817`, which
+   retains Claude's accepted regression tests and corrects the canonical
+   topology. Do not merge the stale long-lived Claude branch separately.
 2. **The counter-review gate for the next QC runs is satisfied.** Before
    launching, the owner must confirm stage ORDER: the round-2 rerun
    contract centres on Stage 1 (REP-H52/REP-IDV plus cadence-matched
@@ -867,7 +889,8 @@ or roll an epoch without a new explicit owner instruction.
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/Alpha_Test_Implementation_Plan.md,
 docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md, docs/alpha-result.md and
-docs/SESSION_HANDOFF.md. Codex independently reviewed the full alpha history
+docs/SESSION_HANDOFF.md. origin/main is d8a3260 after PR #241. Codex
+independently reviewed the full alpha history
 from db0045a through Claude head a37e73b on isolated branch
 codex/review-alpha-qc-round2-20260817 without switching the shared checkout.
 Correction 855941a plus its same-branch follow-up repairs current LEAN Python
@@ -880,7 +903,10 @@ is unusable, the lifetime floor remains 428, and no alpha milestone completed.
 Claude counter-reviewed exact head b4e9ee0 on 2026-08-17 (section 7m and
 docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md): all seven
 commits accepted, three P3 test gaps found and closed with mutation-verified
-tests. The gate for the next QC runs is satisfied; before launching, confirm
+tests. Codex then independently accepted pushed Claude commit ad3b3a8 after
+correcting its stale topology on
+codex/review-alpha-qc-counterreview-20260817 (section 7n). The gate for the
+next QC runs is satisfied after that integration branch is merged; before launching, confirm
 with the owner whether Stage 0 battery completion or Stage 1 runs first.
 Append every run rather than overwrite ledger entries; a premature run is
 PENDING_REVIEW and still counts.

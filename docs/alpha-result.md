@@ -380,6 +380,22 @@ red on the pre-fix tree in both directions. **Stage 0 remains halted
 pending independent review of these fixes; monthly A and B rerun after
 acceptance as new R-numbers.**
 
+## R-009 — Stage 0 monthly battery, A_large, spiral/parser fixes (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-007) |
+| **Research look** | Counted real-market run (run-level count 9 → 10); 40 repeated cells emitted |
+| **Source commit** | `05929a5` (contains Claude fixes `49e8160`, not yet independently reviewed — hence PENDING_REVIEW at the owner's explicit direction to continue) |
+| **Uploaded source SHA-256** | recorded in `run5_monthly_A_r009.json` |
+| **QC project** | `35289732` — `5. MONTHLY_BATTERY_A_LARGE - 20260817` |
+| **Compile ID** | `57ba8b55f5f8359f537e88e6ced39eb8-684591190549d64f684d2fcf8440733b` |
+| **Backtest ID** | `7ebe7a44eef6bf8ff34e3a06205edaca` |
+| **Completed** | 207.93 s engine time; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` |
+| **Output** | COMPLETE: all ten specs, `DATES\|142` = 142 rows, 10 SPECMETA lines; the raw cloud log **round-trips through the frozen parser** (619 spec-rows; per-spec periods disclosed, e.g. GROSS 142, MOM_3 107, RESIDUAL 65, MOM_12/QUALITY 35, MULTI 23). Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run5_monthly_A_r009.log`, 161 lines, exact-file sha256:`7581a59c2bd8add5f61e10f03d3f3ff1c160704fcd78a04a43ff561245c61b9e` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160` passes independent review; rerun required only if that review finds a result-changing defect |
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

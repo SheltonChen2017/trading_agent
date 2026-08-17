@@ -1,5 +1,11 @@
 # Counter-review — Codex's Stage 0 methodology correction (FQCV-001..005)
 
+> **Post-merge verification (2026-08-17):** Codex independently accepted this
+> three-commit counter-review after adding one P3 call-site regression guard;
+> no result-changing defect was found. PR #244 merged exact head `9a7e9fc` at
+> `b6f577e`. Current gate and topology are recorded in
+> `REVIEW_2026-08-17_ALPHA_QC_STAGE0_COUNTERREVIEW_VERIFICATION.md`.
+
 Date: 2026-08-17
 Counter-reviewer: Claude (the session whose review FQCV disproved in part)
 Reviewed branch: `codex/review-alpha-qc-fable-counterreview-20260817`

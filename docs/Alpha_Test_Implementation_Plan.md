@@ -2,9 +2,11 @@
 
 Status: owner-directed staged research program; all affected implementation
 was re-audited again after Fable's final counter-review merged on 2026-08-17.
-No historical alpha result is valid. The next QC run may begin only after an
-independent counter-review accepts Codex correction `ac96d47` from its exact
-pushed review head.
+No historical alpha result is valid. Claude accepted Codex correction
+`ac96d47` from exact pushed head `9e45803`; Codex then accepted Claude's
+FCR-001/002 closures at exact head `9a7e9fc`, merged by PR #244 at `b6f577e`.
+The code-review gate is complete. The owner must now choose whether frozen
+Stage 0 or frozen Stage 1 runs first.
 
 Prepared: 2026-08-16
 
@@ -142,8 +144,8 @@ statistics, and eligible industry/MAX observations. They do not change any
 historical ledger count because no cloud run was made during review.
 
 Run A_large, B_core, and C_broad exactly once per monthly, short, and matching
-benchmark algorithm **only after `ac96d47` is counter-reviewed**. Never split a stateful calendar. Compare
-only identical realized dates. Completion requires all nine exact run
+benchmark algorithm from the PR #244 reviewed source. Never split a stateful
+calendar. Compare only identical realized dates. Completion requires all nine exact run
 identities, complete artifacts, reviewed parsing, 180-cell and lifetime gates,
 and an updated ledger. No historical result is rehabilitated.
 
@@ -163,8 +165,9 @@ factor date. A cadence-matched benchmark algorithm and strict Stage 1 analyser
 were added. Full audit correction `855941a` then standardized the entire LEAN
 tree on current Python API names, removed framework-member shadowing, hardened
 exact-session/provenance/refusal contracts, and bounded cloud polling. **No
-Stage 1 QC run is authorized until Claude counter-reviews the final pushed
-Codex head.**
+Stage 1 QC run was authorized until Claude counter-reviewed the final pushed
+Codex head; that review gate and Codex's follow-up verification are now
+complete.**
 
 The invalid generated result Markdown, JSON, and raw logs were removed from
 the active docs tree at the owner's direction. This does not reset look counts:

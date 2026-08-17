@@ -1106,12 +1106,39 @@ a research look; no operational trading state changed.
 execution is R-007 or later, serial, with a new immutable evidence path.
 R-005/R-006 must never be overwritten or renumbered.
 
+## 7u. Counter-review of the launch-round review (Claude, 2026-08-17)
+
+Claude pushed Codex's local branch unchanged to freeze exact head `81db126`,
+then counter-reviewed it on `user/claude/qc-stage0-review-verify-20260817`.
+Full record:
+`docs/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_COUNTERREVIEW.md`.
+
+All three commits accepted; all six QCS0R findings confirmed, including the
+P1 in Claude's own boundary fix (new-month selection leaking backward onto
+the prior day's bar when both share a slice) — reproduced red on Claude's
+exact head — and the CRLF log-hash trap Claude itself had documented as
+CCR3-D the same morning. Every hash claim was re-derived independently and
+matches. Seven mutations ran: five detected, two survivors closed as
+**QCS0CR-001** (the previous-month snapshot could become the RULE —
+month-stale membership on ordinary days was unpinned) and **QCS0CR-002**
+(`require_clean=True` at the launch commit check was unpinned), both with
+mutation-verified tests. Validation on the final tree: focused sim/runner
+gate 15 passed; full suite **4,223 passed / 0 failed / 25 known dependency
+warnings in 796.73 seconds** (one net new test: QCS0CR-001 strengthens an
+existing test in place); compilation, links, JSON, and diff checks clean.
+
+**The Stage 0 rerun gate is satisfied.** The rerun uploads product bytes
+from the accepted `81db126` tree (the counter-review adds tests only), runs
+serially from **R-007** with new immutable evidence paths and new project
+numbers, and the cloud defect is not declared closed until the corrected
+monthly run passes its completeness guard in the cloud.
+
 ## 8. What is next
 
-1. **Claude must counter-review Codex correction branch
-   `codex/review-qc-stage0-run-20260817`.** Only after acceptance may Stage 0
-   resume serially at R-007: corrected monthly A/B/C, short A/B/C, and
-   benchmark A/B/C, one at a time, each with a new evidence identity.
+1. ~~Claude must counter-review `codex/review-qc-stage0-run-20260817`~~ —
+   DONE and accepting (section 7u). **Stage 0 resumes serially at R-007**:
+   corrected monthly A/B/C, short A/B/C, and benchmark A/B/C, one at a
+   time, each with a new evidence identity and project number.
 2. PR #244 merged Claude's Stage 0 correction counter-review at `b6f577e`;
    the merge tree is byte-identical to exact reviewed head `9a7e9fc`.
    Codex independently accepts that range in section 7r. Its only correction

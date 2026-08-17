@@ -147,6 +147,27 @@ def test_short_holding_period_charges_its_own_entry_and_exit():
     assert turnover(target, {"A": 0.0}) is None
 
 
+def test_short_round_trip_exit_leg_liquidates_the_drifted_book():
+    """FCR-001: the exit leg's DRIFT was unpinned.
+
+    On a long-only book the drifted weights renormalise to gross 1.0, so the
+    flat-outcome case cannot tell a drifted exit from an undrifted one — a
+    mutation replacing the exit leg with a second copy of the entry leg
+    survived the suite. The distinction is load-bearing exactly where signed
+    weights matter: a long/short book whose both legs win shrinks to gross
+    0.909 of NAV before liquidation, so the true round trip is 0.9545, not
+    1.0; a book whose both legs lose grows to gross 1.111 and costs 1.0556.
+    """
+    turnover = _load_pure_function(SHORT, "_round_trip_turnover")
+    book = {"A": 0.5, "B": -0.5}
+    both_win = {"A": 0.10, "B": -0.10}   # NAV 1.1, drifted gross 10/11
+    assert turnover(book, both_win) == pytest.approx(0.5 + 0.5 * (10.0 / 11.0))
+    both_lose = {"A": -0.10, "B": 0.10}  # NAV 0.9, drifted gross 10/9
+    assert turnover(book, both_lose) == pytest.approx(0.5 + 0.5 * (10.0 / 9.0))
+    # A wiped-out book refuses instead of pricing a liquidation of nothing.
+    assert turnover(book, {"A": -1.0, "B": 1.0}) is None
+
+
 def test_short_algorithm_assigns_round_trip_turnover_to_the_settled_period():
     tree = ast.parse(SHORT.read_text(encoding="utf-8"))
     binder = next(node for node in ast.walk(tree)
@@ -184,7 +205,10 @@ def test_max20_requires_exactly_twenty_valid_daily_returns():
         assert max_daily(broken) is None
 
 
-@pytest.mark.parametrize("path", (MONTHLY, SHORT))
+@pytest.mark.parametrize(
+    "path",
+    (MONTHLY, SHORT, ROOT / "research" / "lean" / "alpha_stage1_replications.py"),
+)
 def test_missing_industry_is_not_turned_into_a_fake_peer_group(path: Path):
     valid_code = _load_pure_function(path, "_valid_industry_code")
     assert valid_code(123) == 123

@@ -1133,12 +1133,50 @@ serially from **R-007** with new immutable evidence paths and new project
 numbers, and the cloud defect is not declared closed until the corrected
 monthly run passes its completeness guard in the cloud.
 
+## 7v. Rerun round: R-007 complete-but-unparseable, R-008 die-off; both root causes fixed (Claude, 2026-08-17)
+
+After section 7u opened the gate, the rerun round on
+`user/claude/qc-stage0-review-verify-20260817` produced two more counted
+runs and exposed two more defects:
+
+- **R-007** (`3. MONTHLY_BATTERY_A_LARGE`, project 35289096) COMPLETED with
+  all ten specifications and 142 dates — the weekend-label defect is closed
+  in the cloud. But its rows carry per-date spec subsets (specifications
+  legitimately skip months independently), which the frozen parser refused
+  as truncation: the algorithm's emission contract and the parser's
+  completeness contract were never consistent, and this was the first
+  monthly run ever to reach the parser. Status: **STALE**, superseded by a
+  rerun that emits SPECMETA per-spec counts.
+- **R-008** (`4. MONTHLY_BATTERY_B_CORE`, project 35289185) completed with
+  `DATES|48` — continuous 2013-02..2017-01, then an eight-year die-off. Root
+  cause: an unrecoverable refusal spiral (one all-specs-skip month left the
+  settle-coupled `prior_outcomes` empty forever against stale weights).
+  Status: **INVALIDATED**.
+
+Both fixes are implemented and committed: drift outcomes now come from each
+book's stored entry prices (the Stage-1/benchmark pattern) so refusals
+retry and recover, stale-book names survive universe removal, the monthly
+battery emits SPECMETA per-spec counts, and the parser accepts ragged dates
+only when a complete SPECMETA inventory verifies every per-spec count
+(refusing as before otherwise). The extended simulation drives a forced
+all-skip month AND pipes the algorithm's own emitted log through the real
+parser — red on the pre-fix tree in both directions, green after. Run-level
+look count is now NINE; the 428-cell floor is unchanged; focused gate 164
+passed.
+
+**Launch gate: Stage 0 remains HALTED pending independent review of these
+fixes.** After acceptance: rerun monthly A/B (new R-numbers), then C, the
+short battery A/B/C (unaffected by both defects — no cross-period state,
+full rows guaranteed by its packed format), and the benchmarks A/B/C.
+
 ## 8. What is next
 
-1. ~~Claude must counter-review `codex/review-qc-stage0-run-20260817`~~ —
-   DONE and accepting (section 7u). **Stage 0 resumes serially at R-007**:
-   corrected monthly A/B/C, short A/B/C, and benchmark A/B/C, one at a
-   time, each with a new evidence identity and project number.
+1. **Codex must review the rerun-round fixes** (`_rebalance_turnover`
+   recovery, SPECMETA emission, SPECMETA-verified parser) on
+   `user/claude/qc-stage0-review-verify-20260817`; after acceptance and
+   counter-review, resume the serial rerun per section 7v.
+2. ~~Claude must counter-review `codex/review-qc-stage0-run-20260817`~~ —
+   DONE and accepting (section 7u); superseded by section 7v's halt.
 2. PR #244 merged Claude's Stage 0 correction counter-review at `b6f577e`;
    the merge tree is byte-identical to exact reviewed head `9a7e9fc`.
    Codex independently accepts that range in section 7r. Its only correction

@@ -335,6 +335,51 @@ simulation: the completeness guard that refused R-005/R-006 passed on the
 corrected code, and residual momentum emitted alongside every other
 specification. No statistic has been observed or computed from this output.
 
+**Status corrected to STALE the same day.** Post-run inspection found the
+run's rows carry per-date SPEC SUBSETS (specifications legitimately skip
+months independently), which the frozen parser refused as truncation — the
+algorithm's emission contract and the parser's completeness contract had
+never been consistent for the monthly battery, and this was the first run
+to reach the parser. The log also predates the SPECMETA per-spec count
+declaration that resolves it. R-007 is therefore unanalysable as recorded
+and is superseded by a rerun on corrected code; its identity, hashes, and
+look remain counted. Its only missing month is the benign 2024-12 tail
+cohort (settles beyond the window end).
+
+## R-008 — Stage 0 monthly battery, B_core, corrected code (INVALIDATED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-006's family) |
+| **Research look** | Counted real-market run (run-level count 8 → 9); 40 repeated cells emitted |
+| **Source commit** | `100bd0f` (product tree identical to accepted review head `81db126`) |
+| **Uploaded source SHA-256** | recorded in `run4_monthly_B_r008.json` (`ACTIVE_UNIVERSE="B_core"` rewrite) |
+| **QC project** | `35289185` — requested `4. MONTHLY_BATTERY_B_CORE - 20260817`, returned `4 MONTHLY_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `9184cf4829b55603eb1cb891e53d57cc-25c0bda49c1cafc56bdf0136f834980a` |
+| **Backtest ID** | `1329770d81d3c84573afc2638835111d` |
+| **Completed** | 563.28 s engine time, 31,945,614 points; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` |
+| **Output** | `DATES\|48` with 48 rows — continuous 2013-02..2017-01, then NOTHING for eight years |
+| **Raw log** | `artifacts/qc_stage0_20260817/run4_monthly_B_r008.log`, 57 lines, exact-file sha256:`c14bdc627830b43227175777f841158d2bf0bb5f17a78fdbb7edeb2efb51167a` |
+| **Validity** | **INVALIDATED** — a state-machine defect, not honest refusals, truncated coverage after 2017-01 |
+
+### The die-off and its root cause
+
+The clean truncation signature exposed an unrecoverable refusal spiral: one
+month in which every specification skipped left the settling-cohort
+`prior_outcomes` empty forever against non-empty stale weights, so every
+later bind refused. R-007 (A_large) simply never hit an all-skip month.
+Fix (same-day, local): drift outcomes now come from each book's own stored
+entry prices against current/terminal prices — the self-contained pattern
+Stage 1 and both benchmarks already used — so a refused month retries and
+recovers; stale-book names also survive universe removal so their prices
+stay observable. Together with the SPECMETA emission and the parser's
+SPECMETA-verified ragged-date acceptance (the R-007 defect), both fixes are
+pinned by `tests/test_alpha_battery_monthly_sim.py`'s forced-skip-month
+drive, which feeds the algorithm's own emitted log into the real parser —
+red on the pre-fix tree in both directions. **Stage 0 remains halted
+pending independent review of these fixes; monthly A and B rerun after
+acceptance as new R-numbers.**
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

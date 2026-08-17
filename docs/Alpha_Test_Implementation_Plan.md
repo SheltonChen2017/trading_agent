@@ -5,8 +5,12 @@ was re-audited again after Fable's final counter-review merged on 2026-08-17.
 No historical alpha result is valid. Claude accepted Codex correction
 `ac96d47` from exact pushed head `9e45803`; Codex then accepted Claude's
 FCR-001/002 closures at exact head `9a7e9fc`, merged by PR #244 at `b6f577e`.
-The code-review gate is complete. The owner must now choose whether frozen
-Stage 0 or frozen Stage 1 runs first.
+The owner chose Stage 0 first. Its first two runs, R-005/R-006, both refused
+with zero cells and exposed a monthly factor-timing defect. Claude's first
+fix was independently reviewed and required a further point-in-time boundary
+correction on `codex/review-qc-stage0-run-20260817`. Stage 0 remains halted
+until that exact Codex head is counter-reviewed; reruns begin at R-007 and
+must not overwrite either refusal.
 
 Prepared: 2026-08-16
 

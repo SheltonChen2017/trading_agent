@@ -319,7 +319,7 @@ longer presented as active documentation.
 | **Backtest ID** | `b141aeae803521352a74760573ffcda0` |
 | **Launched / completed (UTC)** | 2026-08-17T21:02:23 / ~21:04 (64.22 s engine time, 27,299,669 points, 425k/s) |
 | **Data period / universe** | 2012-01-01..2024-12-31; A_large: price ≥ $5, cap ≥ $10B, ADV20 ≥ $25M; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` |
-| **Raw log** | `artifacts/qc_stage0_20260817/run1_monthly_A.log`, 7 lines, sha256:`23fc9e859485b43bb68e541f1ccb50b02d78d75586bbd9f4f3f6493e50a1e2ed` (local, git-ignored; hash is authoritative) |
+| **Raw log** | `artifacts/qc_stage0_20260817/run1_monthly_A.log`, 7 lines. Actual Windows-file SHA-256: `56cdb97757ac56ce2d215142177bb6801652c5582ad809995786f034024b8674`. Original driver/evidence JSON recorded LF-normalized SHA-256 `23fc9e859485b43bb68e541f1ccb50b02d78d75586bbd9f4f3f6493e50a1e2ed`; both are retained because QCS0R-003 found that the driver hashed text before Windows newline translation. |
 | **Orders / holdings** | Volume $0.00, Holdings $0.00 — inert as designed |
 | **Primary statistics** | **none** |
 | **Validity** | **REFUSED** — `INCOMPLETE\|missing_specs=MULTI_ALPHA_COMPOSITE\|RESIDUAL_MOM_12_1\|RESIDUAL_MOM_6_1` |
@@ -358,14 +358,14 @@ for six factor-file symbols (BCE, CVE, RCI, CNI, SJR, TCK).
 | **Replication or new** | Stage 0 execution on the same counter-reviewed source as R-005 |
 | **Research look** | Counted real-market run (run-level count 6 → 7); zero emitted alpha cells |
 | **Multiplicity family** | QC alpha battery 2026-08-16, 180 cells (repeated look; lifetime floor stays 428) |
-| **Source commit** | `423a818` (LEAN sources byte-identical to reviewed `main`) |
-| **Uploaded source SHA-256** | recorded in `run2_monthly_B.json`; `ACTIVE_UNIVERSE="B_core"` rewrite of the same file as R-005 |
+| **Source commit** | `bfc9b8b` (the driver/log-evidence follow-up; uploaded LEAN bytes still derive from the reviewed PR #245 algorithm) |
+| **Uploaded source SHA-256** | `428ef88bd9d39b1ca060ee82ef49dc5ede8802e6e900e83c1c1df0e7e823fa40` (`alpha_battery_monthly.py`, `ACTIVE_UNIVERSE="B_core"` rewrite) |
 | **QC project** | `35285594` — `2. MONTHLY_BATTERY_B_CORE - 20260817` |
 | **Compile ID** | `86b7cd76c8b0063c3444a288d49111d8-10dea6d5c90b29a72b09c4aa1958b967` |
 | **Backtest ID** | `896f7f2c72b5acdb03859d79497973c3` |
-| **Completed** | 190.01 s engine time, 31,944,196 points, 168k/s |
+| **Launched / completed (UTC)** | 2026-08-17T21:07:50.028845+00:00 / 2026-08-17T21:11:06.918222+00:00 (190.01 s engine time, 31,944,196 points, 168k/s) |
 | **Data period / universe** | 2012-01-01..2024-12-31; B_core; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` (identical to R-001's universe numbers) |
-| **Raw log** | `artifacts/qc_stage0_20260817/run2_monthly_B.log`, 7 lines, sha256:`8858e6f63b2f4cdfb3bed388fad89a4db14f90d0ad82baf1ff8a6391b1bc395b` |
+| **Raw log** | `artifacts/qc_stage0_20260817/run2_monthly_B.log`, 7 lines. Actual Windows-file SHA-256: `e2a038564d4254f41a773ee6103d910b862eb564305de3963dc446664203941a`. Original driver/evidence JSON recorded LF-normalized SHA-256 `8858e6f63b2f4cdfb3bed388fad89a4db14f90d0ad82baf1ff8a6391b1bc395b`; both are retained because QCS0R-003 found that the driver hashed text before Windows newline translation. |
 | **Primary statistics** | **none** |
 | **Validity** | **REFUSED** — identical `INCOMPLETE\|missing_specs=MULTI_ALPHA_COMPOSITE\|RESIDUAL_MOM_12_1\|RESIDUAL_MOM_6_1` |
 

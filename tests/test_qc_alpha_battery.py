@@ -25,12 +25,25 @@ SHORT_SPECS = (
 def _load_pure_function(path: Path, name: str):
     """Load one top-level pure helper without importing AlgorithmImports."""
     tree = ast.parse(path.read_text(encoding="utf-8"))
+    dependencies = []
+    if name == "_residual_momentum_total":
+        dependencies.append(next(
+            item for item in tree.body
+            if isinstance(item, ast.FunctionDef) and item.name == "_joint_residual_total"
+        ))
     node = next(
         item for item in tree.body
         if isinstance(item, ast.FunctionDef) and item.name == name
     )
-    namespace = {"math": math}
-    exec(compile(ast.Module(body=[node], type_ignores=[]), str(path), "exec"), namespace)
+    namespace = {
+        "math": math,
+        "RESIDUAL_ESTIMATION_SESSIONS": 252,
+        "MOMENTUM_SKIP_SESSIONS": 21,
+    }
+    exec(
+        compile(ast.Module(body=[*dependencies, node], type_ignores=[]), str(path), "exec"),
+        namespace,
+    )
     return namespace[name]
 
 
@@ -42,6 +55,14 @@ def test_joint_residual_momentum_fits_both_factors_before_measurement():
     for index in range(59, 80):
         stock[index] += 0.01
     assert residual_total(stock, market, industry, 21) == pytest.approx(0.21)
+
+
+def test_price_tail_requires_exact_market_session_alignment():
+    aligned_tail = _load_pure_function(MONTHLY, "_aligned_price_tail")
+    market_sessions = [1, 2, 3, 4]
+    assert aligned_tail([10, 11, 12], [2, 3, 4], market_sessions, 2) == [10, 11, 12]
+    assert aligned_tail([10, 11, 12], [1, 3, 4], market_sessions, 2) is None
+    assert aligned_tail([10, 11, 12], [3, 4, 4], market_sessions, 2) is None
 
 
 def test_drift_turnover_charges_the_rebalance_after_weight_drift():
@@ -148,3 +169,39 @@ def test_benchmark_parser_requires_construction_turnover(tmp_path: Path):
     log.write_text("DATES|1\nBROW|202001|0.01|0.25|100", encoding="utf-8")
     frame = parse_benchmark(log)
     assert frame.loc["202001", "turnover"] == pytest.approx(0.25)
+
+
+@pytest.mark.parametrize("months", (6, 12))
+def test_residual_momentum_measures_months_minus_one_and_skips_latest_month(months):
+    """The score must not relabel the skipped month as the signal window."""
+    residual_momentum = _load_pure_function(MONTHLY, "_residual_momentum_total")
+    estimation = 252
+    measurement = 21 * (months - 1)
+    skipped = 21
+    length = estimation + measurement + skipped
+    market = [((index % 7) - 3) / 100 for index in range(length)]
+    industry = [((index * index % 11) - 5) / 120 for index in range(length)]
+    stock = [0.002 + 1.7 * m - 0.6 * i for m, i in zip(market, industry)]
+
+    for index in range(estimation, estimation + measurement):
+        stock[index] += 0.01
+    for index in range(estimation + measurement, length):
+        stock[index] += 1.0  # deliberately huge; this is the skipped month
+
+    observed = residual_momentum(
+        stock,
+        market,
+        industry,
+        months,
+        estimation_sessions=estimation,
+        skip_sessions=skipped,
+    )
+    assert observed == pytest.approx(0.01 * measurement)
+
+
+def test_residual_momentum_refuses_short_or_misaligned_factor_history():
+    residual_momentum = _load_pure_function(MONTHLY, "_residual_momentum_total")
+    required = 252 + 21 * 11 + 21
+    full = [0.0] * required
+    assert residual_momentum(full[:-1], full[:-1], full[:-1], 12) is None
+    assert residual_momentum(full, full[:-1], full, 12) is None

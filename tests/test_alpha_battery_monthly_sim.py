@@ -166,6 +166,95 @@ def test_residual_momentum_survives_weekend_month_boundaries(
     assert len(algorithm.results.get("GROSS_PROFITABILITY", [])) >= 20
 
 
+def test_recovers_from_a_skipped_month_and_emits_a_parseable_log(
+    monthly_algorithm_class, tmp_path,
+):
+    """R-008's die-off and R-007's unparseable log, in one drive.
+
+    Two defects escaped every prior test because no test ran the WHOLE
+    pipeline: (1) one month in which every specification skipped left
+    `prior_outcomes` empty against stale non-empty weights, refusing every
+    later month forever — B_core emitted nothing after 2017-01; and (2) the
+    algorithm legitimately emits per-spec subsets per date, which the frozen
+    parser refused as truncation, so even A_large's complete run was
+    unanalysable. This drives the real class through a forced skip month and
+    then feeds its own emitted log into the REAL parser.
+    """
+    from scripts import analyse_qc_alpha_battery as analyser
+
+    namespace = monthly_algorithm_class
+    algorithm = namespace["AlphaBatteryMonthly"]()
+    algorithm.initialize()
+
+    rng = random.Random(11)
+    names = [f"SYM{i:02d}" for i in range(40)]
+    industry_of = {name: 100 + (i % 4) for i, name in enumerate(names)}
+    seed_of = {name: (i % 7) * 0.03 for i, name in enumerate(names)}
+    prices = {name: 100.0 for name in names}
+
+    sessions_run = 0
+    selection_label_month = None
+    last_trading_day = None
+    starve_month = (2013, 9)          # after warm-up, starve one bind day
+    starved = False
+    calendar_day = dt.date(2012, 1, 2)
+    while sessions_run < 52 * 21:
+        day = calendar_day
+        algorithm.time = dt.datetime(day.year, day.month, day.day)
+        if day.weekday() < 5:
+            month = (day.year, day.month)
+            if month != selection_label_month:
+                selection_label_month = month
+                fine = [_Fine(n, industry_of[n], prices[n], seed_of[n])
+                        for n in names]
+                algorithm._coarse(fine)
+                algorithm._fine(fine)
+        if (last_trading_day is not None
+                and day == last_trading_day + dt.timedelta(days=1)):
+            for name in names:
+                prices[name] *= 1.0 + rng.gauss(0.0004, 0.015)
+            bars = {n: _Bar(prices[n]) for n in names}
+            if ((day.year, day.month) == starve_month
+                    and algorithm.staged is not None and not starved):
+                # The bind day sees too few priced names: entry < MIN_NAMES,
+                # every specification skips, and the OLD code then refused
+                # every later month.
+                starved = True
+                bars = {n: bars[n] for n in names[:25]}
+            algorithm.on_data(_Slice(bars))
+            sessions_run += 1
+        if day.weekday() < 5:
+            last_trading_day = day
+        calendar_day += dt.timedelta(days=1)
+
+    assert starved, "the starvation month never armed; the fixture is broken"
+    mom_dates = [row[0] for row in algorithm.results.get("MOM_12_1", [])]
+    # The 15 starved names need ~253 sessions to re-align, so recovery is
+    # expected about a year after the gap, not the next month.
+    assert any(date > "2014-12" for date in mom_dates), (
+        "no month after the skipped one ever emitted — the R-008 refusal "
+        "spiral has returned"
+    )
+
+    algorithm.on_end_of_algorithm()
+    log_lines = [line for line in algorithm.log_lines
+                 if not line.startswith("ERROR:")]
+    assert not any("INCOMPLETE" in line for line in algorithm.log_lines), (
+        algorithm.log_lines[-3:]
+    )
+    log_path = tmp_path / "monthly_sim.log"
+    log_path.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
+    specs, frame, meta = analyser.parse_log(log_path)
+    assert specs == list(namespace["SPECIFICATIONS"])
+    assert meta["dates"] == len({row for row in frame["date"]})
+    # The starve poisons the 504-session residual factor tail for ~2 years,
+    # so only the pre-starve months and the final recovered stretch emit
+    # residual rows in a 52-month simulation; presence, not count, is the
+    # invariant here (the first test pins the undisturbed count).
+    assert (frame["spec"] == "RESIDUAL_MOM_6_1").sum() >= 3
+    assert (frame["spec"] == "MOM_12_1").sum() >= 20
+
+
 def test_prior_day_bar_keeps_prior_membership_when_new_month_selects_first(
     monthly_algorithm_class,
 ):

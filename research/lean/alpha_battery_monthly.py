@@ -305,6 +305,15 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.cap_rows = 0
         self.results = {}           # spec -> per-date IC/return/turnover rows
         self.previous_weights = {}  # (spec, construction) -> signed weights
+        # Entry prices recorded at each key's last successful rebalance.
+        # Drift outcomes are computed from THESE against current/terminal
+        # prices, never from the settling cohort's outcome dictionary: the
+        # old pending-settle coupling meant that one month in which every
+        # specification skipped left `prior_outcomes` permanently empty
+        # against non-empty stale weights — an unrecoverable refusal spiral
+        # that truncated R-008 (B_core) at 2017-01 while R-007 (A_large)
+        # merely never happened to trigger it.
+        self.previous_entries = {}  # (spec, construction) -> entry prices
 
     # --- universe ------------------------------------------------------
 
@@ -370,6 +379,10 @@ class AlphaBatteryMonthly(QCAlgorithm):
             needed.update(self.pending.get("entry", {}))
         if self.staged is not None:
             needed.update(self.staged.get("names", ()))
+        # A stale book awaiting a recoverable turnover retry still needs
+        # prices, so its names must survive universe removal.
+        for weights in self.previous_weights.values():
+            needed.update(weights)
         for symbol in self.in_universe - current:
             if symbol in needed and symbol not in self.retained:
                 self.add_security(symbol, Resolution.DAILY)
@@ -440,7 +453,8 @@ class AlphaBatteryMonthly(QCAlgorithm):
     def _bind_staged_entry(self):
         staged = self.staged
         self.staged = None
-        prior_outcomes = self._settle() if self.pending is not None else {}
+        if self.pending is not None:
+            self._settle()
         entry = {
             symbol: self._price(symbol, 0)
             for symbol in staged["names"]
@@ -473,14 +487,18 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 {symbol: 1.0 / len(longs) for symbol in longs},
                 {symbol: 1.0 / len(long20) for symbol in long20},
             )
-            turns = tuple(
-                _drift_turnover(self.previous_weights.get(key) or {}, target, prior_outcomes)
-                for key, target in zip(keys, targets)
-            )
+            turns = tuple(self._rebalance_turnover(key, target)
+                          for key, target in zip(keys, targets))
             if any(value is None for value in turns):
+                # A refusal is RECOVERABLE: the stale book and its stored
+                # entry prices are kept, so the next month re-measures drift
+                # over the whole elapsed interval instead of refusing forever.
                 continue
             for key, target in zip(keys, targets):
                 self.previous_weights[key] = target
+                self.previous_entries[key] = {
+                    symbol: entry[symbol] for symbol in target
+                }
             portfolios[spec] = {
                 "longs": longs, "shorts": shorts, "long20": long20,
                 "turnovers": turns,
@@ -493,6 +511,28 @@ class AlphaBatteryMonthly(QCAlgorithm):
             "date": staged["date"],
             "portfolios": portfolios,
         }
+
+    def _rebalance_turnover(self, key, target):
+        """Method V2 drift turnover from stored entry prices.
+
+        Outcomes for the stale book come from its own recorded entry prices
+        against current or terminal prices — the same self-contained pattern
+        the Stage 1 replications and both benchmarks already use — so a
+        month whose turnover refuses simply retries next month instead of
+        poisoning all later months.
+        """
+        previous = self.previous_weights.get(key) or {}
+        if not previous:
+            return _drift_turnover({}, target, {})
+        prior_entries = self.previous_entries.get(key) or {}
+        outcomes = {}
+        for symbol in previous:
+            entry_price = prior_entries.get(symbol)
+            now = self.terminal_prices.get(symbol, self._price(symbol, 0))
+            if entry_price is None or entry_price <= 0 or now is None:
+                return None
+            outcomes[symbol] = now / entry_price - 1.0
+        return _drift_turnover(previous, target, outcomes)
 
     def _price(self, symbol, ago):
         window = self.closes.get(symbol)
@@ -719,6 +759,8 @@ class AlphaBatteryMonthly(QCAlgorithm):
 
     def _release_unused_retained(self):
         needed = set(self.pending.get("entry", {})) if self.pending else set()
+        for weights in self.previous_weights.values():
+            needed.update(weights)
         for symbol in list(self.retained):
             if symbol not in needed and symbol not in self.in_universe:
                 self.remove_security(symbol)
@@ -756,6 +798,17 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 )
         self.log(f"SPECS|{'|'.join(order)}")
         self.log(f"DATES|{len(by_date)}")
+        # Specifications legitimately skip months independently (turnover
+        # retries, residual warm-up, missing basket outcomes), so a date's
+        # ROW may carry a subset of specifications. SPECMETA declares each
+        # specification's exact emitted period count, which is what lets the
+        # parser tell honest per-spec raggedness from log truncation —
+        # R-007's complete run was unparseable without it.
+        for spec in order:
+            rows = self.results[spec]
+            names = sorted(row[8] for row in rows)
+            self.log(f"SPECMETA|{spec}|median_names={names[len(names) // 2]}"
+                     f"|periods={len(rows)}")
         for date in sorted(by_date):
             # Date compressed to YYYYMM; the cadence is monthly.
             self.log(f"ROW|{date.replace('-', '')[:6]}|" + "|".join(by_date[date]))

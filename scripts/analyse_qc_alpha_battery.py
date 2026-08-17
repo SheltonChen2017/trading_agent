@@ -213,13 +213,24 @@ def parse_log(
     allowed = EXPECTED_SPEC_SETS if expected_spec_sets is None else expected_spec_sets
     if frozenset(specs) not in allowed or len(specs) != len(set(specs)):
         raise InvalidLog(f"{path.name}: incomplete or unknown frozen spec inventory")
-    expected_indices = set(range(len(specs)))
-    incomplete = [date for date, indices in date_indices.items()
-                  if indices != expected_indices]
-    if incomplete:
-        raise TruncatedLog(
-            f"{path.name}: {len(incomplete)} ROW lines do not contain every declared spec"
-        )
+    if set(spec_periods) == set(specs):
+        # Every specification declares its exact emitted period count, so
+        # honest per-spec month raggedness (turnover retries, residual
+        # warm-up, missing basket outcomes) is distinguishable from
+        # truncation by the per-spec count verification below. R-007 was a
+        # complete cloud run that this parser wrongly refused because its
+        # dates carried legitimate spec subsets.
+        pass
+    else:
+        expected_indices = set(range(len(specs)))
+        incomplete = [date for date, indices in date_indices.items()
+                      if indices != expected_indices]
+        if incomplete:
+            raise TruncatedLog(
+                f"{path.name}: {len(incomplete)} ROW lines do not contain "
+                "every declared spec and no complete SPECMETA inventory "
+                "declares the per-spec counts"
+            )
     frame = pd.DataFrame(rows)
     observed = frame["date"].nunique() if not frame.empty else 0
     if declared is not None and observed < declared:

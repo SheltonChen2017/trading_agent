@@ -1169,12 +1169,50 @@ fixes.** After acceptance: rerun monthly A/B (new R-numbers), then C, the
 short battery A/B/C (unaffected by both defects — no cross-period state,
 full rows guaranteed by its packed format), and the benchmarks A/B/C.
 
+## 7w. Owner-directed continuation: R-009 parses end to end, R-010 exposes zombie names (Claude, 2026-08-17)
+
+The owner explicitly directed "continue to test. 1 at a time" on the fixed
+but not-yet-reviewed tree, so the serial rerun resumed with every entry
+ledgered **PENDING_REVIEW**:
+
+- **R-009** (`5. MONTHLY_BATTERY_A_LARGE`, project 35289732, source
+  `05929a5`) COMPLETED: all ten specifications, `DATES|142`, ten SPECMETA
+  lines, and — for the first time ever — the raw cloud log **round-trips
+  through the frozen parser** (619 spec-rows). Parsing only; no statistic
+  observed. Both 7v fixes are now cloud-confirmed on A_large.
+- **R-010** (`6. MONTHLY_BATTERY_B_CORE`, project 35289860, source
+  `8957e32`) is **INVALIDATED** by a second, distinct state-machine defect:
+  `DATES|54` (2013-02..2018-11) with PROGRESSIVE per-spec collapse
+  (SPECMETA periods 3..42 instead of ~140). Root cause: **zombie names** —
+  a name whose data ends without a delisting event stays in the stale bound
+  book at an unpriceable entry, its per-key drift turnover refuses forever,
+  and the turnover-gated bind killed each specification the first time its
+  book trapped one. A_large never traps one; B_core does readily.
+
+Fix `d305ea0` removes the class, not the instance: **turnover never gates a
+result row.** The bind always proceeds; an unpriceable month emits an empty
+turnover field; the frozen analyser accepts it as declared unavailability,
+charges the conservative full 1.0 one-way (the local `net_of_costs`
+convention), and disclosures `unavailable_turnover_periods`. The same
+defect class in the local battery (`long_short_returns` dropped a month's
+RETURN on a refused drift) is fixed identically. Pinned by a zombie-name
+LEAN-stub simulation (real parser + real analyser round-trip) and a local
+wiped-out-book return-retention test; four reverse mutations (bind gate,
+local gate, parser strictness, analyser refusal) all redden. Run-level look
+count is now **ELEVEN**; the 428-cell floor is unchanged.
+
+Serial rerun continues per the owner's direction: monthly B_core next
+(project #7), then monthly C, short A/B/C, benchmarks A/B/C — every entry
+PENDING_REVIEW until Codex reviews `49e8160`..`d305ea0`.
+
 ## 8. What is next
 
 1. **Codex must review the rerun-round fixes** (`_rebalance_turnover`
-   recovery, SPECMETA emission, SPECMETA-verified parser) on
-   `user/claude/qc-stage0-review-verify-20260817`; after acceptance and
-   counter-review, resume the serial rerun per section 7v.
+   recovery, SPECMETA emission, SPECMETA-verified parser, and `d305ea0`'s
+   turnover-never-gates-results contract) on
+   `user/claude/qc-stage0-review-verify-20260817`; the serial rerun
+   continues meanwhile at the owner's explicit direction with every run
+   ledgered PENDING_REVIEW (sections 7v–7w).
 2. ~~Claude must counter-review `codex/review-qc-stage0-run-20260817`~~ —
    DONE and accepting (section 7u); superseded by section 7v's halt.
 2. PR #244 merged Claude's Stage 0 correction counter-review at `b6f577e`;

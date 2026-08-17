@@ -396,6 +396,51 @@ acceptance as new R-numbers.**
 | **Raw log** | `artifacts/qc_stage0_20260817/run5_monthly_A_r009.log`, 161 lines, exact-file sha256:`7581a59c2bd8add5f61e10f03d3f3ff1c160704fcd78a04a43ff561245c61b9e` |
 | **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160` passes independent review; rerun required only if that review finds a result-changing defect |
 
+## R-010 — Stage 0 monthly battery, B_core, spiral/parser fixes (INVALIDATED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-008) |
+| **Research look** | Counted real-market run (run-level count 10 → 11); 40 repeated cells emitted |
+| **Source commit** | `8957e32` (contains Claude fixes `49e8160`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `6592a89f9c03ca253379447732264748069c735d3b5afa77d732c5654224a415` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run6_monthly_B_r010.json`) |
+| **QC project** | `35289860` — requested `6. MONTHLY_BATTERY_B_CORE - 20260817`, returned `6 MONTHLY_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `24a386fbc64902dfd35456469070aae7-6ec3cc5fd0c91952f5785a9e5eb8b104` |
+| **Backtest ID** | `bb7d45db1fefda2f1e58aadd4e9c7621` |
+| **Launched / completed (UTC)** | 2026-08-17T23:37:07.782077+00:00 / 2026-08-17T23:46:24.398662+00:00 (543.61 s engine time); `cap_rows=312696 cap_fallback=35268 cap_missing=7291` |
+| **Output** | `DATES\|54`, rows 2013-02..2018-11 with PROGRESSIVE per-spec collapse (SPECMETA periods: GROSS 8, MOM_3 8, MOM_6 3, QUALITY_COMPOSITE 3, MOM_12/MOM_9/QUALITY_MOMENTUM 35, RESIDUAL_6 42) — each specification dies at a different date and never returns |
+| **Raw log** | `artifacts/qc_stage0_20260817/run6_monthly_B_r010.log`, 73 lines, exact-file sha256:`a0149c5dd9c03b66a0a1b095451f563d364233eaf7bd5ed2ae6b8c07bd8fb9aa` |
+| **Validity** | **INVALIDATED** — a second, distinct state-machine defect truncated coverage per specification; not honest refusals |
+
+### Zombie names: the root cause behind the per-spec die-off
+
+The R-008 spiral fix worked exactly as designed — rows recover past 2017-01
+and per-spec retries are visible — but a deeper defect surfaced once binds
+could retry: a name whose market data simply ENDS without any delisting
+event (common in B_core's broad cross-section) stays trapped in the last
+bound book at an entry price that can never be marked again. The per-key
+drift turnover for that book therefore refused every later month, and
+because the bind gated on turnover, each specification died permanently the
+first time its own long/short book trapped such a "zombie" name — hence the
+staggered per-spec death dates instead of R-008's single cliff. A_large
+(R-009) never trapped one; B_core traps them readily.
+
+Fix `d305ea0` removes the entire class rather than patching the instance:
+**turnover is a cost input and never gates a result row.** The bind always
+proceeds; a month whose prior book cannot be priced emits an EMPTY turnover
+field (declared unavailability), and the frozen analyser accepts it,
+charges the conservative full 1.0 one-way turnover for that month — the
+same convention the local battery's `net_of_costs` has always used — and
+disclosures `unavailable_turnover_periods` per construction. The same
+class existed in the local battery (`long_short_returns` dropped the
+month's RETURN when a drift refused — selective-sample contamination) and
+is fixed identically. Pinned by a zombie-name LEAN-stub simulation that
+round-trips the algorithm's own log through the real parser and analyser,
+plus a local wiped-out-book return-retention test; four reverse mutations
+(bind gate, local gate, parser strictness, analyser refusal) all redden.
+**PENDING independent review together with `49e8160`; B_core reruns after
+as a new R-number.**
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

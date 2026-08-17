@@ -1,0 +1,311 @@
+"""Launch and supervise the frozen Stage 0 QuantConnect battery runs.
+
+Owner conventions (docs/process/QC_RUN_CONVENTIONS.md):
+
+  * project names are ``[number]. [FAMILY]_[UNIVERSE] - [YYYYMMDD]``;
+  * AT MOST TWO cloud sessions run concurrently — the caller launches a
+    round of one or two runs and must ``wait`` for both to finish (logs
+    retrieved) before launching the next round.
+
+Every launch is a counted real-market research look the moment the cloud
+executes reviewed result-producing source, whether or not it succeeds.
+This driver records the evidence the ledger needs — exact source SHA-256
+of the uploaded (universe-rewritten) file, project ID and name, compile
+ID, backtest ID, UTC times, and the raw log with its SHA-256 — into one
+JSON evidence file per run under the git-ignored ``artifacts/`` tree.
+
+It uploads only files from ``research/lean/`` at the current HEAD; it
+refuses a dirty source file so the recorded Git commit genuinely
+identifies the uploaded bytes.
+"""
+from __future__ import annotations
+
+import argparse
+import datetime as _dt
+import hashlib
+import json
+import re
+import subprocess
+import sys
+import time
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from research.quantconnect import (  # noqa: E402
+    QuantConnectClient,
+    QuantConnectError,
+)
+
+ROOT = Path(__file__).resolve().parents[1]
+LEAN = ROOT / "research" / "lean"
+ENTRY_FILE = "main.py"
+POLL_SECONDS = 30
+MAX_WAIT_SECONDS = 16_200      # 4.5 hours; the prior monthly run took ~80 min
+STALL_WAIT_SECONDS = 2_400     # 40 min without any observable state change
+LOG_PAGE_LINES = 200           # backtests/read/log paginates by line numbers
+MAX_LOG_PAGES = 1_000
+
+FAMILIES = {
+    "monthly": ("MONTHLY_BATTERY", LEAN / "alpha_battery_monthly.py"),
+    "short": ("SHORT_BATTERY", LEAN / "alpha_battery_short.py"),
+    "benchmark": ("UNIVERSE_BENCHMARK", LEAN / "universe_benchmark.py"),
+}
+UNIVERSES = ("A_large", "B_core", "C_broad")
+
+
+def _utc_now() -> str:
+    return _dt.datetime.now(_dt.timezone.utc).isoformat()
+
+
+def _git_commit_of(path: Path) -> str:
+    """Exact HEAD commit, refusing a dirty source file.
+
+    The evidence contract binds the run to a Git commit; uploading locally
+    modified bytes would make that binding a lie.
+    """
+    dirty = subprocess.run(
+        ["git", "status", "--porcelain", "--", str(path)],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+    if dirty:
+        raise SystemExit(f"{path} has uncommitted changes; refusing to launch")
+    return subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=ROOT, capture_output=True, text=True, check=True,
+    ).stdout.strip()
+
+
+def _retarget_universe(source: str, universe: str) -> str:
+    """Rewrite the declared ACTIVE_UNIVERSE constant, refusing ambiguity."""
+    if universe not in UNIVERSES:
+        raise SystemExit(f"unknown universe {universe!r}")
+    pattern = r'^ACTIVE_UNIVERSE = "(?:A_large|B_core|C_broad)"$'
+    replacement = f'ACTIVE_UNIVERSE = "{universe}"'
+    rewritten, count = re.subn(pattern, replacement, source, count=2, flags=re.M)
+    if count != 1:
+        raise SystemExit(
+            f"expected exactly one ACTIVE_UNIVERSE constant, found {count}; "
+            "refusing to run an algorithm whose screen is unknown"
+        )
+    return rewritten
+
+
+def _project_name(number: int, family_label: str, universe: str, date: str) -> str:
+    """docs/process/QC_RUN_CONVENTIONS.md section 1."""
+    return f"{number}. {family_label}_{universe.upper()} - {date}"
+
+
+def _wait_for_compile(client: QuantConnectClient, project_id: int,
+                      compile_id: str) -> None:
+    deadline = time.monotonic() + 300
+    while time.monotonic() < deadline:
+        state = client.read_compile(project_id, compile_id)
+        status = str(state.get("state", "")).lower()
+        if status in {"buildsuccess", "success"}:
+            return
+        if status in {"builderror", "error"}:
+            errors = state.get("logs") or state.get("errors") or []
+            raise QuantConnectError(
+                "compile failed: " + "; ".join(str(e) for e in errors)[:2000]
+            )
+        time.sleep(10)
+    raise QuantConnectError("compile did not finish within 300s")
+
+
+def launch(args: argparse.Namespace) -> int:
+    family_label, source_path = FAMILIES[args.family]
+    commit = _git_commit_of(source_path)
+    source = _retarget_universe(
+        source_path.read_text(encoding="utf-8"), args.universe
+    )
+    source_sha = hashlib.sha256(source.encode("utf-8")).hexdigest()
+    date = args.date or _dt.date.today().strftime("%Y%m%d")
+    name = _project_name(args.number, family_label, args.universe, date)
+
+    client = QuantConnectClient()
+    print(f"authenticating for {name!r}...", flush=True)
+    client.authenticate()
+    created = client.create_project(name)
+    projects = created.get("projects") or []
+    if not projects:
+        raise QuantConnectError(f"projects/create returned no project: {created}")
+    project_id = int(projects[0]["projectId"])
+    print(f"  project {project_id}: {name}", flush=True)
+
+    client.update_file(project_id, ENTRY_FILE, source)
+    compile_record = client.compile_project(project_id)
+    compile_id = str(compile_record.get("compileId") or "")
+    if not compile_id:
+        raise QuantConnectError(f"compile/create returned no compileId: {compile_record}")
+    _wait_for_compile(client, project_id, compile_id)
+    print(f"  compile ok: {compile_id}", flush=True)
+
+    backtest_name = name
+    launched = client.create_backtest(project_id, compile_id, backtest_name)
+    backtest = launched.get("backtest") or launched
+    backtest_id = str(backtest.get("backtestId") or "")
+    if not backtest_id:
+        raise QuantConnectError(f"backtests/create returned no backtestId: {launched}")
+    print(f"  backtest launched: {backtest_id}", flush=True)
+
+    evidence = {
+        "number": args.number,
+        "family": args.family,
+        "family_label": family_label,
+        "universe": args.universe,
+        "project_name": name,
+        "project_id": project_id,
+        "compile_id": compile_id,
+        "backtest_id": backtest_id,
+        "backtest_name": backtest_name,
+        "source_file": str(source_path.relative_to(ROOT)),
+        "source_commit": commit,
+        "source_sha256": source_sha,
+        "launched_at_utc": _utc_now(),
+        "status": "launched",
+    }
+    out = Path(args.evidence)
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+    print(f"evidence written: {out}", flush=True)
+    return 0
+
+
+def _fetch_full_log(client: QuantConnectClient, project_id: int,
+                    backtest_id: str) -> list[str]:
+    """Page through backtests/read/log; start/end are line numbers."""
+    lines: list[str] = []
+    start = 0
+    for _page in range(MAX_LOG_PAGES):
+        response = client.request(
+            "backtests/read/log",
+            {
+                "projectId": project_id,
+                "backtestId": backtest_id,
+                "start": start,
+                "end": start + LOG_PAGE_LINES,
+            },
+        )
+        chunk = response.get("logs") or response.get("log") or []
+        if isinstance(chunk, str):
+            chunk = chunk.splitlines()
+        if not chunk:
+            break
+        lines.extend(str(line) for line in chunk)
+        if len(chunk) < LOG_PAGE_LINES:
+            break
+        start += len(chunk)
+    else:
+        raise QuantConnectError(
+            f"log for backtest {backtest_id} exceeded {MAX_LOG_PAGES} pages; "
+            "refusing to record a possibly truncated artifact as complete"
+        )
+    return lines
+
+
+def _watch_one(client: QuantConnectClient, evidence: dict) -> dict:
+    project_id = int(evidence["project_id"])
+    backtest_id = str(evidence["backtest_id"])
+    started = time.monotonic()
+    deadline = started + MAX_WAIT_SECONDS
+    marker: object = object()
+    marker_at = started
+    while time.monotonic() < deadline:
+        result = client.read_backtest(project_id, backtest_id)
+        backtest = result.get("backtest") or result
+        if backtest.get("error"):
+            evidence["status"] = "error"
+            evidence["error"] = str(backtest["error"])[:2000]
+            return evidence
+        if backtest.get("completed") is True:
+            evidence["status"] = "completed"
+            evidence["completed_at_utc"] = _utc_now()
+            statistics = backtest.get("runtimeStatistics") or {}
+            evidence["runtime_statistics"] = {
+                key: str(value) for key, value in list(statistics.items())[:20]
+            }
+            return evidence
+        progress = backtest.get("progress")
+        state = (str(progress),
+                 str(backtest.get("status") or backtest.get("state") or ""))
+        now = time.monotonic()
+        if state != marker:
+            marker = state
+            marker_at = now
+        elif now - marker_at >= STALL_WAIT_SECONDS:
+            raise QuantConnectError(
+                f"backtest {backtest_id} reported no progress for "
+                f"{STALL_WAIT_SECONDS:g}s (progress={progress!r}). The cloud "
+                "run may still exist; inspect it before launching another look."
+            )
+        print(f"  [{evidence['project_name']}] progress={progress}", flush=True)
+        time.sleep(POLL_SECONDS)
+    raise QuantConnectError(
+        f"backtest {backtest_id} did not finish within {MAX_WAIT_SECONDS:g}s. "
+        "The cloud run may still exist; inspect it before launching another look."
+    )
+
+
+def wait(args: argparse.Namespace) -> int:
+    paths = [Path(item) for item in args.evidence]
+    if not 1 <= len(paths) <= 2:
+        raise SystemExit("wait supervises one or two runs (the concurrency cap)")
+    client = QuantConnectClient()
+    client.authenticate()
+    exit_code = 0
+    for path in paths:
+        evidence = json.loads(path.read_text(encoding="utf-8"))
+        try:
+            evidence = _watch_one(client, evidence)
+        except QuantConnectError as exc:
+            evidence["status"] = "unresolved"
+            evidence["unresolved_reason"] = str(exc)
+            path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+            print(f"UNRESOLVED: {path}: {exc}", flush=True)
+            exit_code = 2
+            continue
+        lines = _fetch_full_log(client, int(evidence["project_id"]),
+                                str(evidence["backtest_id"]))
+        log_path = path.with_suffix(".log")
+        log_text = "\n".join(lines) + ("\n" if lines else "")
+        log_path.write_text(log_text, encoding="utf-8")
+        evidence["log_path"] = str(log_path)
+        evidence["log_line_count"] = len(lines)
+        evidence["log_sha256"] = hashlib.sha256(
+            log_text.encode("utf-8")
+        ).hexdigest()
+        path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+        print(
+            f"DONE: {evidence['project_name']} status={evidence['status']} "
+            f"lines={len(lines)} log={log_path}",
+            flush=True,
+        )
+    return exit_code
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    sub = parser.add_subparsers(dest="command", required=True)
+
+    launch_parser = sub.add_parser("launch", help="create+upload+compile+start one run")
+    launch_parser.add_argument("--family", choices=sorted(FAMILIES), required=True)
+    launch_parser.add_argument("--universe", choices=UNIVERSES, required=True)
+    launch_parser.add_argument("--number", type=int, required=True,
+                               help="sequential project number for the naming rule")
+    launch_parser.add_argument("--date", default=None, help="YYYYMMDD; default today")
+    launch_parser.add_argument("--evidence", required=True,
+                               help="path for the run's JSON evidence file")
+    launch_parser.set_defaults(handler=launch)
+
+    wait_parser = sub.add_parser("wait", help="supervise 1-2 launched runs to completion")
+    wait_parser.add_argument("--evidence", action="append", required=True,
+                             help="evidence JSON from launch; repeat once at most")
+    wait_parser.set_defaults(handler=wait)
+
+    args = parser.parse_args(argv)
+    return args.handler(args)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

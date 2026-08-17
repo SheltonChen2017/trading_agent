@@ -24,6 +24,7 @@ import datetime as dt
 import random
 import sys
 import types
+from collections import deque
 from pathlib import Path
 
 import pytest
@@ -163,3 +164,44 @@ def test_residual_momentum_survives_weekend_month_boundaries(
     # And the ordinary specifications keep emitting alongside them.
     assert len(algorithm.results.get("MOM_12_1", [])) >= 20
     assert len(algorithm.results.get("GROSS_PROFITABILITY", [])) >= 20
+
+
+def test_prior_day_bar_keeps_prior_membership_when_new_month_selects_first(
+    monthly_algorithm_class,
+):
+    """The new month's point-in-time selection cannot label yesterday's return."""
+    namespace = monthly_algorithm_class
+    algorithm = namespace["AlphaBatteryMonthly"]()
+    algorithm.initialize()
+    names = [f"SYM{i:02d}" for i in range(40)]
+
+    algorithm.time = dt.datetime(2012, 1, 31)
+    january = [_Fine(name, 100 + (index % 4), 100.0, 0.01)
+               for index, name in enumerate(names)]
+    algorithm._coarse(january)
+    algorithm._fine(january)
+
+    prior_session = dt.date(2012, 1, 31)
+    algorithm.last_session = prior_session
+    algorithm.sessions.append(prior_session)
+    for name in names:
+        algorithm.closes[name] = deque([100.0], maxlen=namespace["LOOKBACK"])
+        algorithm.close_sessions[name] = deque(
+            [prior_session], maxlen=namespace["LOOKBACK"]
+        )
+
+    # LEAN may run the February universe selection before delivering the
+    # Jan-31 daily bar at the Feb-1 timestamp. The return and industry
+    # classification still belong to the January membership snapshot.
+    algorithm.time = dt.datetime(2012, 2, 1)
+    new_names = names[:35] + [f"NEW{i:02d}" for i in range(5)]
+    february = [_Fine(name, 200 + (index % 4), 101.0, 0.02)
+                for index, name in enumerate(new_names)]
+    algorithm._coarse(february)
+    algorithm._fine(february)
+    algorithm.on_data(_Slice({name: _Bar(101.0)
+                              for name in set(names) | set(new_names)}))
+
+    assert algorithm.factor_membership_months[-1] == (2012, 1)
+    assert set(algorithm.industry_aggregates[-1]) == {100, 101, 102, 103}
+    assert {size for _total, size in algorithm.industry_aggregates[-1].values()} == {10}

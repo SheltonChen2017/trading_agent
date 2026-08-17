@@ -25,7 +25,6 @@ import datetime as _dt
 import hashlib
 import json
 import re
-import subprocess
 import sys
 import time
 from pathlib import Path
@@ -35,6 +34,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from research.quantconnect import (  # noqa: E402
     QuantConnectClient,
     QuantConnectError,
+)
+from assistant.runtime_identity import (  # noqa: E402
+    RuntimeIdentityError,
+    current_commit,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -59,21 +62,15 @@ def _utc_now() -> str:
 
 
 def _git_commit_of(path: Path) -> str:
-    """Exact HEAD commit, refusing a dirty source file.
+    """Exact shared runtime identity, refusing any uncommitted source.
 
     The evidence contract binds the run to a Git commit; uploading locally
     modified bytes would make that binding a lie.
     """
-    dirty = subprocess.run(
-        ["git", "status", "--porcelain", "--", str(path)],
-        cwd=ROOT, capture_output=True, text=True, check=True,
-    ).stdout.strip()
-    if dirty:
-        raise SystemExit(f"{path} has uncommitted changes; refusing to launch")
-    return subprocess.run(
-        ["git", "rev-parse", "HEAD"],
-        cwd=ROOT, capture_output=True, text=True, check=True,
-    ).stdout.strip()
+    try:
+        return current_commit(require_clean=True, repository=ROOT)
+    except RuntimeIdentityError as exc:
+        raise SystemExit(f"{path} is not attributable to a clean commit: {exc}") from exc
 
 
 def _retarget_universe(source: str, universe: str) -> str:
@@ -93,7 +90,41 @@ def _retarget_universe(source: str, universe: str) -> str:
 
 def _project_name(number: int, family_label: str, universe: str, date: str) -> str:
     """docs/process/QC_RUN_CONVENTIONS.md section 1."""
+    if number < 1:
+        raise SystemExit("project number must be a positive integer")
+    try:
+        _dt.datetime.strptime(date, "%Y%m%d")
+    except (TypeError, ValueError):
+        raise SystemExit("project date must use YYYYMMDD")
     return f"{number}. {family_label}_{universe.upper()} - {date}"
+
+
+def _new_evidence_path(raw_path: str) -> Path:
+    """Return a new immutable JSON path inside the ignored artifacts tree."""
+    path = Path(raw_path).resolve()
+    artifacts = (ROOT / "artifacts").resolve()
+    if path.suffix.lower() != ".json" or not path.is_relative_to(artifacts):
+        raise SystemExit("evidence must be a .json file under artifacts/")
+    if path.exists() or path.with_suffix(".log").exists():
+        raise SystemExit(f"evidence already exists; refusing to overwrite {path}")
+    return path
+
+
+def _project_record(response: dict, project_id: int | None = None) -> dict:
+    """Extract one exact project identity, refusing absent or ambiguous data."""
+    projects = response.get("projects") or []
+    if project_id is not None:
+        matching = []
+        for item in projects:
+            try:
+                if int(item.get("projectId", 0)) == project_id:
+                    matching.append(item)
+            except (TypeError, ValueError):
+                continue
+        projects = matching
+    if len(projects) != 1 or not str(projects[0].get("name") or "").strip():
+        raise QuantConnectError("project response lacks one exact id/name record")
+    return projects[0]
 
 
 def _wait_for_compile(client: QuantConnectClient, project_id: int,
@@ -114,6 +145,7 @@ def _wait_for_compile(client: QuantConnectClient, project_id: int,
 
 
 def launch(args: argparse.Namespace) -> int:
+    out = _new_evidence_path(args.evidence)
     family_label, source_path = FAMILIES[args.family]
     commit = _git_commit_of(source_path)
     source = _retarget_universe(
@@ -131,14 +163,15 @@ def launch(args: argparse.Namespace) -> int:
         # step (for example a node-capacity refusal). The source is
         # re-uploaded and re-compiled so the recorded identity stays exact.
         project_id = int(args.project_id)
-        print(f"  reusing project {project_id}: {name}", flush=True)
+        project = _project_record(
+            client.request("projects/read", {"projectId": project_id}), project_id
+        )
+        print(f"  reusing project {project_id}: {project['name']}", flush=True)
     else:
         created = client.create_project(name)
-        projects = created.get("projects") or []
-        if not projects:
-            raise QuantConnectError(f"projects/create returned no project: {created}")
-        project_id = int(projects[0]["projectId"])
-        print(f"  project {project_id}: {name}", flush=True)
+        project = _project_record(created)
+        project_id = int(project["projectId"])
+        print(f"  project {project_id}: {project['name']}", flush=True)
 
     client.update_file(project_id, ENTRY_FILE, source)
     compile_record = client.compile_project(project_id)
@@ -161,7 +194,8 @@ def launch(args: argparse.Namespace) -> int:
         "family": args.family,
         "family_label": family_label,
         "universe": args.universe,
-        "project_name": name,
+        "requested_project_name": name,
+        "project_name": str(project["name"]),
         "project_id": project_id,
         "compile_id": compile_id,
         "backtest_id": backtest_id,
@@ -172,7 +206,6 @@ def launch(args: argparse.Namespace) -> int:
         "launched_at_utc": _utc_now(),
         "status": "launched",
     }
-    out = Path(args.evidence)
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
     print(f"evidence written: {out}", flush=True)
@@ -213,6 +246,16 @@ def _fetch_full_log(client: QuantConnectClient, project_id: int,
             "refusing to record a possibly truncated artifact as complete"
         )
     return lines
+
+
+def _write_log_artifact(path: Path, lines: list[str]) -> tuple[int, str]:
+    """Write and hash the exact UTF-8 bytes; never hash pre-translation text."""
+    if path.exists():
+        raise QuantConnectError(f"log artifact already exists: {path}")
+    text = "\n".join(lines) + ("\n" if lines else "")
+    payload = text.encode("utf-8")
+    path.write_bytes(payload)
+    return len(lines), hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def _watch_one(client: QuantConnectClient, evidence: dict) -> dict:
@@ -290,17 +333,14 @@ def wait(args: argparse.Namespace) -> int:
             exit_code = 2
             continue
         log_path = path.with_suffix(".log")
-        log_text = "\n".join(lines) + ("\n" if lines else "")
-        log_path.write_text(log_text, encoding="utf-8")
+        log_line_count, log_sha256 = _write_log_artifact(log_path, lines)
         evidence["log_path"] = str(log_path)
-        evidence["log_line_count"] = len(lines)
-        evidence["log_sha256"] = hashlib.sha256(
-            log_text.encode("utf-8")
-        ).hexdigest()
+        evidence["log_line_count"] = log_line_count
+        evidence["log_sha256"] = log_sha256
         path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
         print(
             f"DONE: {evidence['project_name']} status={evidence['status']} "
-            f"lines={len(lines)} log={log_path}",
+            f"lines={log_line_count} log={log_path}",
             flush=True,
         )
     return exit_code

@@ -280,6 +280,7 @@ class AlphaBatteryMonthly(QCAlgorithm):
         # in force, and score-time lookups reuse exactly that key.
         self.factor_membership_months = deque(maxlen=LOOKBACK)
         self.industry_membership = {}
+        self.selection_membership = {}
         # Avoid shadowing QCAlgorithm.fundamentals, a framework member.
         self.fundamental_cache = {} # Symbol -> latest point-in-time values
         self.industry = {}          # Symbol -> Morningstar industry code
@@ -291,6 +292,8 @@ class AlphaBatteryMonthly(QCAlgorithm):
         # OnData needs securities, which needs selection: a deadlock that
         # ran to completion reporting cap_rows=0 rather than failing.
         self.selection_month = None
+        self.previous_selection_month = None
+        self.selection_changed_session = None
         self.scored_month = None
         self.last_session = None
         self.in_universe = set()
@@ -314,9 +317,10 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 and c.dollar_volume >= self.screen["min_adv"]]
 
     def _fine(self, fine):
-        if self.selection_month == (self.time.year, self.time.month):
+        new_month = (self.time.year, self.time.month)
+        if self.selection_month == new_month:
             return Universe.UNCHANGED
-        self.selection_month = (self.time.year, self.time.month)
+        previous_month = self.selection_month
         chosen = []
         month_membership = {}
         for f in fine:
@@ -372,11 +376,16 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 self.retained.add(symbol)
         self.in_universe = current
         self.selected = chosen
-        self.industry_membership[self.selection_month] = month_membership
+        self.previous_selection_month = previous_month
+        self.selection_month = new_month
+        self.selection_changed_session = self.time.date()
+        self.industry_membership[new_month] = month_membership
+        self.selection_membership[new_month] = tuple(chosen)
         # The longest factor window is under two years. Keep a buffer while
         # bounding state in long cloud runs.
         for month in sorted(self.industry_membership)[:-30]:
             self.industry_membership.pop(month, None)
+            self.selection_membership.pop(month, None)
         return chosen
 
     # --- data ----------------------------------------------------------
@@ -521,14 +530,21 @@ class AlphaBatteryMonthly(QCAlgorithm):
         """
         if self.selection_month is None:
             return
-        # The ACTIVE selection's map — the membership in force on this
-        # session — never a lookup keyed by the session label's calendar
-        # month, which does not exist yet when a month-end bar arrives
-        # labeled with the new month's first weekend day.
-        membership = self.industry_membership.get(self.selection_month, {})
+        # A daily bar belongs to the preceding trading session. On an ordinary
+        # first trading day LEAN may select the new universe before delivering
+        # that prior-day bar at the same timestamp. In that ordering, keep the
+        # previous snapshot for both the eligible names and their industries;
+        # otherwise the new selection would leak backward into yesterday's
+        # market/industry factor return.
+        membership_month = self.selection_month
+        if (self.selection_changed_session == session
+                and self.previous_selection_month is not None):
+            membership_month = self.previous_selection_month
+        membership = self.industry_membership.get(membership_month, {})
+        selected = self.selection_membership.get(membership_month, ())
         returns = {
             symbol: daily_returns[symbol]
-            for symbol in self.selected
+            for symbol in selected
             if symbol in daily_returns
         }
         if len(returns) < MIN_NAMES:
@@ -543,7 +559,7 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.factor_sessions.append(session)
         self.market_returns.append(sum(returns.values()) / len(returns))
         self.industry_aggregates.append(buckets)
-        self.factor_membership_months.append(self.selection_month)
+        self.factor_membership_months.append(membership_month)
 
     def _factor_returns(self, symbol, count):
         """Return aligned PIT market and leave-one-out industry factors.

@@ -9,7 +9,9 @@ Updated later on 2026-08-17 by Claude's FINAL counter-review of the complete
 correction chain (section 7o), then by Codex's verification after that review
 merged as PR #243 (section 7p), then by Claude's counter-review of Codex's
 Stage 0 correction (section 7q), and finally by Codex's independent
-verification of that counter-review after PR #244 (section 7r). Section 7r
+verification of that counter-review after PR #244 (section 7r), Claude's
+two-run Stage 0 launch (section 7s), and Codex's correction review (section
+7t). Section 7t
 and the updated topology/next-steps text are the current state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
@@ -21,21 +23,22 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 3. `docs/Alpha_Test_Implementation_Plan.md`
 4. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_FABLE_COUNTERREVIEW.md`
 5. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_COUNTERREVIEW_VERIFICATION.md`
-6. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`
-7. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW_INDEPENDENT.md`
-8. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md`
-9. `docs/alpha-result.md`
-10. `docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
-11. `docs/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
-12. `docs/research/ALPHA_BATTERY_METHOD_V2.md`
-13. `docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
-14. `docs/research/Alpha explanation.md`
-15. `docs/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
-16. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-17. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-18. `docs/operations/MANDATE.md` (§2, §4, §6)
-19. `docs/operations/OPERATIONAL_FACTS.md`
-20. `docs/operations/OPERATIONS_RUNBOOK.md`
+6. `docs/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_ROUND.md`
+7. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`
+8. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW_INDEPENDENT.md`
+9. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md`
+10. `docs/alpha-result.md`
+11. `docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
+12. `docs/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
+13. `docs/research/ALPHA_BATTERY_METHOD_V2.md`
+14. `docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
+15. `docs/research/Alpha explanation.md`
+16. `docs/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
+17. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+18. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+19. `docs/operations/MANDATE.md` (§2, §4, §6)
+20. `docs/operations/OPERATIONAL_FACTS.md`
+21. `docs/operations/OPERATIONS_RUNBOOK.md`
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -45,7 +48,8 @@ operator-database mutation, or scheduled-task change.
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
 - Published `origin/main` at audit time:
-  `b6f577e078750634c6599d1b8987f0cb35d9de6c`. PR #244 merged Claude's exact
+  `1457169ba10f6aac0f1fb98b60b92a4607f8331c`. PR #245 merged Codex's prior
+  verification branch; PR #244 at `b6f577e` merged Claude's exact
   Stage 0 counter-review head `9a7e9fc`; both have tree
   `0fe65449a58aaca1363fc9d4783ee89ccf1cfbcc`. PR #243 merged Fable's exact
   counter-review head `6bd962f`. PR #242 at `f937bfb` had merged the
@@ -1060,12 +1064,54 @@ Round branch: `user/claude/qc-stage0-run-20260817` (pushed). Facts:
 reviewed and counter-reviewed per the standing workflow.** Reruns get new
 R-numbers; R-005/R-006 remain counted.
 
+## 7t. Codex review of the Stage 0 launch round (2026-08-17)
+
+Codex reviewed the exact pushed range `423a818..eee4368` from remote branch
+`origin/user/claude/qc-stage0-run-20260817`, based on `1457169`. Full record:
+`docs/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_ROUND.md`.
+
+The two refusals, the stop decision, seven run-level looks, zero new cells,
+and unchanged 428-cell floor are accepted. All five commits are accepted
+after correction, but Stage 0 remains blocked pending counter-review of the
+Codex head. Findings closed:
+
+- **QCS0R-001 (P1):** `0f0611c` fixed weekend empty buckets but still used a
+  new month's selected names and industries for the prior day's return when
+  first-of-month selection ran before bar delivery. Correction `2219643`
+  snapshots both and retains the prior snapshot at that transition. The real
+  class reproduced February labeling red and January's four exact ten-name
+  buckets green after correction.
+- **QCS0R-002 (P2):** R-006's ledger named source commit `423a818`; its saved
+  evidence proves `bfc9b8b` and uploaded hash `428ef88b...3fa40`. The ledger
+  now records the exact identity and UTC timestamps.
+- **QCS0R-003 (P2):** the driver hashed LF memory while Windows wrote CRLF,
+  so neither “raw log” hash matched its file. Both actual and historical
+  normalized hashes are preserved; future logs use exact byte writes/hashes.
+- **QCS0R-004 (P2):** launch could overwrite a prior evidence JSON/log. New
+  runs require a fresh JSON under `artifacts/` and refuse existing identities.
+- **QCS0R-005 (P3):** positive run numbers, real YYYYMMDD dates, and the exact
+  cloud-returned project id/name are now enforced and recorded.
+- **QCS0R-006 (P3):** the runner's duplicate Git identity implementation
+  failed the full-suite guard. It now uses the canonical strict
+  `assistant.runtime_identity.current_commit()` contract.
+
+Focused validation is **165 passed**; the final runtime-identity/focused gate
+is **143 passed**. Full validation is **4,222 passed / 0 failed / 25 known
+dependency warnings**; compilation including `research/` is clean; 134
+Markdown files have zero broken relative links and all 5 tracked JSON files
+parse. Codex did not access QuantConnect or consume
+a research look; no operational trading state changed.
+
+**Gate: BLOCKED pending Claude counter-review.** After acceptance, the next
+execution is R-007 or later, serial, with a new immutable evidence path.
+R-005/R-006 must never be overwritten or renumbered.
+
 ## 8. What is next
 
-1. **Codex must review `0f0611c` (and this round's driver/convention
-   commits) on `user/claude/qc-stage0-run-20260817`**; after acceptance and
-   counter-review, rerun Stage 0 from run 1 under the same naming/serial
-   conventions: monthly A/B/C, short A/B/C, benchmark A/B/C, one at a time.
+1. **Claude must counter-review Codex correction branch
+   `codex/review-qc-stage0-run-20260817`.** Only after acceptance may Stage 0
+   resume serially at R-007: corrected monthly A/B/C, short A/B/C, and
+   benchmark A/B/C, one at a time, each with a new evidence identity.
 2. PR #244 merged Claude's Stage 0 correction counter-review at `b6f577e`;
    the merge tree is byte-identical to exact reviewed head `9a7e9fc`.
    Codex independently accepts that range in section 7r. Its only correction

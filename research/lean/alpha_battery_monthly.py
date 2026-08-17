@@ -487,13 +487,17 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 {symbol: 1.0 / len(longs) for symbol in longs},
                 {symbol: 1.0 / len(long20) for symbol in long20},
             )
+            # Turnover is a COST input, never a gate on the alpha result.
+            # R-010 showed why: a stale book holding a name whose data ends
+            # without a delisting event can never be priced again, so a
+            # turnover-gated bind silently killed each specification the
+            # first time its long/short book trapped such a name (B_core
+            # collapsed to 54 ragged months). A month whose old book cannot
+            # be priced records its turnover as UNAVAILABLE — the analyser
+            # charges the conservative full 1.0 one-way for it — and the
+            # chain continues from the newly bound book.
             turns = tuple(self._rebalance_turnover(key, target)
                           for key, target in zip(keys, targets))
-            if any(value is None for value in turns):
-                # A refusal is RECOVERABLE: the stale book and its stored
-                # entry prices are kept, so the next month re-measures drift
-                # over the whole elapsed interval instead of refusing forever.
-                continue
             for key, target in zip(keys, targets):
                 self.previous_weights[key] = target
                 self.previous_entries[key] = {
@@ -787,14 +791,20 @@ class AlphaBatteryMonthly(QCAlgorithm):
             self.error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
             return
         index_of = {spec: i for i, spec in enumerate(order)}
+
+        def _turn(value):
+            # An unpriceable prior book records an UNAVAILABLE turnover; the
+            # analyser charges the conservative full 1.0 for such months.
+            return "" if value is None else round(value, 4)
+
         by_date = {}
         for spec, rows in self.results.items():
             for date, ic, lr, sr, l20, turn_ls, turn_l10, turn_l20, n in rows:
                 by_date.setdefault(date, []).append(
                     f"{index_of[spec]}~{'' if ic is None else round(ic, 5)}~"
                     f"{round(lr, 6)}~{round(sr, 6)}~{round(l20, 6)}~"
-                    f"{round(turn_ls, 4)}~{round(turn_l10, 4)}~"
-                    f"{round(turn_l20, 4)}~{n}"
+                    f"{_turn(turn_ls)}~{_turn(turn_l10)}~"
+                    f"{_turn(turn_l20)}~{n}"
                 )
         self.log(f"SPECS|{'|'.join(order)}")
         self.log(f"DATES|{len(by_date)}")

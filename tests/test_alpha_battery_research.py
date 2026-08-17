@@ -49,6 +49,41 @@ def test_long_short_turnover_counts_a_long_short_side_flip() -> None:
     assert turnover.iloc[1] == pytest.approx(1.005)
 
 
+def test_unpriceable_prior_book_never_drops_the_months_return() -> None:
+    """R-010's class, local instance: turnover is a cost, never a gate.
+
+    When the previous book cannot be drifted (here: a wiped-out NAV, the
+    same refusal `drift_weights` returns for any unpriceable prior book),
+    the old code silently dropped the month's RETURN row — selective-sample
+    contamination in the alpha series itself. The contract is: the return
+    stays, the turnover for that month is simply absent, and
+    `net_of_costs` charges the conservative full 1.0 for the missing month.
+    """
+    dates = pd.to_datetime(["2025-01-02", "2025-01-03"])
+    names = [f"S{i:02d}" for i in range(20)]
+    first = np.arange(20, dtype=float)
+    scores = pd.DataFrame([first, first], index=dates, columns=names)
+    forwards = pd.DataFrame(0.01, index=dates, columns=names)
+    # The first book is longs {S19, S18} / shorts {S00, S01}. Longs lose
+    # everything while shorts double: NAV hits exactly zero, so the drift
+    # to the second rebalance is refused as insolvent.
+    forwards.loc[dates[0], ["S19", "S18"]] = -1.0
+    forwards.loc[dates[0], ["S00", "S01"]] = 1.0
+
+    returns, turnover = battery.long_short_returns(
+        scores, forwards, dates, "long_short", horizon=1
+    )
+
+    assert list(returns.index) == list(dates), (
+        "the month after an unpriceable book lost its RETURN row — the "
+        "R-010 turnover-gates-the-result class has returned locally"
+    )
+    assert dates[0] in turnover.index and dates[1] not in turnover.index
+    net = battery.net_of_costs(returns, turnover, bps=10.0)
+    charged = returns.loc[dates[1]] - net.loc[dates[1]]
+    assert charged == pytest.approx(1.0 * 2.0 * 10.0 / 10_000.0)
+
+
 def test_industry_adjustment_excludes_the_stock_from_its_own_peer_mean() -> None:
     dates = pd.to_datetime(["2025-01-02", "2025-01-03"])
     closes = pd.DataFrame(

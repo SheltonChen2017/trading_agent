@@ -255,6 +255,96 @@ def test_recovers_from_a_skipped_month_and_emits_a_parseable_log(
     assert (frame["spec"] == "MOM_12_1").sum() >= 20
 
 
+def test_zombie_name_keeps_result_rows_with_unavailable_turnover(
+    monthly_algorithm_class, tmp_path, monkeypatch,
+):
+    """R-010's progressive collapse: a stale book must never gate results.
+
+    A name whose data simply ENDS — no delisting event ever arrives — stays
+    in the previously bound book at an unpriceable entry, so its per-key
+    turnover can never be computed again. The old code refused the bind for
+    that key forever: each specification died permanently the first time its
+    book trapped such a name, and B_core collapsed to 54 ragged months of
+    progressively fewer specifications. The contract now is: turnover is a
+    cost input, never a gate — the month emits with an UNAVAILABLE turnover
+    field, the analyser charges the conservative full 1.0 for it, and the
+    chain continues from the freshly bound book.
+    """
+    from scripts import analyse_qc_alpha_battery as analyser
+
+    namespace = monthly_algorithm_class
+    algorithm = namespace["AlphaBatteryMonthly"]()
+    algorithm.initialize()
+
+    rng = random.Random(23)
+    names = [f"SYM{i:02d}" for i in range(40)]
+    industry_of = {name: 100 + (i % 4) for i, name in enumerate(names)}
+    seed_of = {name: (i % 7) * 0.03 for i, name in enumerate(names)}
+    prices = {name: 100.0 for name in names}
+    zombie = "SYM00"
+
+    sessions_run = 0
+    selection_label_month = None
+    last_trading_day = None
+    zombie_from = (2013, 9)      # well after every book has formed
+    calendar_day = dt.date(2012, 1, 2)
+    while sessions_run < 40 * 21:
+        day = calendar_day
+        algorithm.time = dt.datetime(day.year, day.month, day.day)
+        dead = (day.year, day.month) >= zombie_from
+        if day.weekday() < 5:
+            month = (day.year, day.month)
+            if month != selection_label_month:
+                selection_label_month = month
+                fine = [_Fine(n, industry_of[n], prices[n], seed_of[n])
+                        for n in names if not (dead and n == zombie)]
+                algorithm._coarse(fine)
+                algorithm._fine(fine)
+        if (last_trading_day is not None
+                and day == last_trading_day + dt.timedelta(days=1)):
+            for name in names:
+                prices[name] *= 1.0 + rng.gauss(0.0004, 0.015)
+            # The zombie's bars stop for good and NO delisting event ever
+            # arrives — the exact gap LEAN leaves when coverage just ends.
+            algorithm.on_data(_Slice({n: _Bar(prices[n]) for n in names
+                                      if not (dead and n == zombie)}))
+            sessions_run += 1
+        if day.weekday() < 5:
+            last_trading_day = day
+        calendar_day += dt.timedelta(days=1)
+
+    mom_dates = [row[0] for row in algorithm.results.get("MOM_12_1", [])]
+    assert any(date >= "2014-01" for date in mom_dates), (
+        "no month emitted after the zombie name trapped the book — the "
+        "R-010 per-spec die-off has returned"
+    )
+    unavailable = [row for rows in algorithm.results.values() for row in rows
+                   if row[5] is None or row[6] is None or row[7] is None]
+    assert unavailable, (
+        "the zombie month never produced an unavailable turnover; the "
+        "fixture no longer exercises the unpriceable-book path"
+    )
+
+    algorithm.on_end_of_algorithm()
+    log_lines = [line for line in algorithm.log_lines
+                 if not line.startswith("ERROR:")]
+    log_path = tmp_path / "monthly_zombie_sim.log"
+    log_path.write_text("\n".join(log_lines) + "\n", encoding="utf-8")
+    specs, frame, meta = analyser.parse_log(log_path)
+    assert frame["turnover_ls"].isna().any() or \
+        frame["turnover_l10"].isna().any() or frame["turnover_l20"].isna().any()
+    # The frozen analyser must accept declared unavailability, charge the
+    # conservative 1.0, and disclose the count — not refuse the whole run.
+    monkeypatch.setattr(analyser, "DRAWS", 50)
+    report = analyser.analyse(frame, periods_per_year=12.0)
+    disclosed = sum(
+        entry[label]["unavailable_turnover_periods"]
+        for entry in report.values()
+        for label in ("long_short", "long_only_10", "long_only_20")
+    )
+    assert disclosed >= 1
+
+
 def test_prior_day_bar_keeps_prior_membership_when_new_month_selects_first(
     monthly_algorithm_class,
 ):

@@ -126,12 +126,19 @@ def launch(args: argparse.Namespace) -> int:
     client = QuantConnectClient()
     print(f"authenticating for {name!r}...", flush=True)
     client.authenticate()
-    created = client.create_project(name)
-    projects = created.get("projects") or []
-    if not projects:
-        raise QuantConnectError(f"projects/create returned no project: {created}")
-    project_id = int(projects[0]["projectId"])
-    print(f"  project {project_id}: {name}", flush=True)
+    if args.project_id is not None:
+        # Reuse a project whose earlier launch was refused at the backtest
+        # step (for example a node-capacity refusal). The source is
+        # re-uploaded and re-compiled so the recorded identity stays exact.
+        project_id = int(args.project_id)
+        print(f"  reusing project {project_id}: {name}", flush=True)
+    else:
+        created = client.create_project(name)
+        projects = created.get("projects") or []
+        if not projects:
+            raise QuantConnectError(f"projects/create returned no project: {created}")
+        project_id = int(projects[0]["projectId"])
+        print(f"  project {project_id}: {name}", flush=True)
 
     client.update_file(project_id, ENTRY_FILE, source)
     compile_record = client.compile_project(project_id)
@@ -294,6 +301,8 @@ def main(argv: list[str] | None = None) -> int:
     launch_parser.add_argument("--number", type=int, required=True,
                                help="sequential project number for the naming rule")
     launch_parser.add_argument("--date", default=None, help="YYYYMMDD; default today")
+    launch_parser.add_argument("--project-id", type=int, default=None,
+                               help="reuse an existing project after a refused launch")
     launch_parser.add_argument("--evidence", required=True,
                                help="path for the run's JSON evidence file")
     launch_parser.set_defaults(handler=launch)

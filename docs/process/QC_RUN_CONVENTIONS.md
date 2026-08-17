@@ -33,6 +33,12 @@ sessions. Queueing more than two at once has previously left runs stuck.
 Therefore:
 
 - launch **no more than two** cloud sessions per round;
+- measured 2026-08-17: the organization's BACKTEST node pool allowed only
+  ONE concurrent backtest (`backtests/create` refused a second launch with
+  "no spare nodes available" while one battery ran; the two-session
+  subscription limit applies to live coding sessions, which are a different
+  resource). Until the node pool changes, launch backtests strictly one at a
+  time and treat a node refusal as "wait", never as "retry immediately";
 - wait for both to reach a terminal state (completed, refused, errored, or
   timed out) **and** retrieve their logs before launching the next round;
 - never leave a round's runs unresolved while starting new ones; and

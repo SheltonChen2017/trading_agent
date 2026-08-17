@@ -216,6 +216,35 @@ def test_missing_industry_is_not_turned_into_a_fake_peer_group(path: Path):
         assert valid_code(invalid) is None
 
 
+@pytest.mark.parametrize(
+    "path",
+    (MONTHLY, SHORT, ROOT / "research" / "lean" / "alpha_stage1_replications.py"),
+)
+def test_fine_ingestion_routes_industry_codes_through_the_strict_guard(path: Path):
+    """FCRV-001: pin the live call site, not only the pure guard helper."""
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    fine = next(node for node in ast.walk(tree)
+                if isinstance(node, ast.FunctionDef) and node.name == "_fine")
+    named_calls = {
+        node.func.id for node in ast.walk(fine)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    attribute_calls = {
+        node.func.attr for node in ast.walk(fine)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+    }
+    direct_industry_int = any(
+        isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "int"
+        and "morningstar_industry_code" in ast.unparse(node)
+        for node in ast.walk(fine)
+    )
+    assert "_valid_industry_code" in named_calls
+    assert not direct_industry_int
+    assert "pop" in attribute_calls
+
+
 def _full_cell(index: int, turn_ls=0.1, turn_l10=0.2, turn_l20=0.3) -> str:
     return (
         f"{index}~0.01~0.02~-0.01~0.015~"

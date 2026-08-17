@@ -39,10 +39,13 @@ operator-database mutation, or scheduled-task change.
   `f0071bcf60cb1e31fbac3022ce16f3ef8a5b9062`. The shared checkout's local
   `main` remains older because this isolated review did not switch or update
   it. The long-lived alpha branch was originally created from `a795ea3`.
-- Claude's last submitted remote audited in this cycle is
+- Claude's last submitted remote audited in this cycle was
   `origin/user/claude/alpha-qc-round-20260816` at
   `a37e73b`; the full 2026-08-16/17 chain from `db0045a` through `a37e73b`
-  receives an explicit per-commit disposition in the round-2 report.
+  receives an explicit per-commit disposition in the round-2 report. On
+  2026-08-17 Claude fast-forwarded that branch onto counter-reviewed Codex
+  head `b4e9ee0` and added the counter-review commit (section 7m); the
+  exact final pushed head is recorded with the push.
 - Current review branch: `codex/review-alpha-qc-round2-20260817`, created in
   an isolated worktree and extended through exact Claude head `a37e73b`.
   Product/test
@@ -50,8 +53,9 @@ operator-database mutation, or scheduled-task change.
   local joint regression and leave-one-out peers; the documentation commit is
   recorded in the final ordered commit list after validation.
 - The owner authorized exactly one final push of this Codex branch after all
-  validation, with no checkpoint push. Claude must counter-review that exact
-  final remote head before any Stage 1 QuantConnect run.
+  validation, with no checkpoint push. That push landed at `b4e9ee0`, and
+  Claude counter-reviewed that exact head on 2026-08-17 (section 7m), so the
+  review gate for the next QuantConnect runs is satisfied.
 - Five real-market cloud executions remain preserved in the permanent ledger.
   None is usable
   alpha evidence: one refused, two remain deliberately unanalysed, one ran
@@ -766,12 +770,44 @@ strategy/config regression group **31 passed**; full suite **4,189 passed,
 including `research/`, all 124 Markdown relative links, remaining docs JSON,
 active-document layout, and diff checks are clean after the final rerun.
 
+## 7m. Counter-review of the round-2 audit (Claude, 2026-08-17)
+
+Claude counter-reviewed exact pushed head `b4e9ee0` of
+`codex/review-alpha-qc-round2-20260817` and fast-forwarded it into
+`user/claude/alpha-qc-round-20260816`. Full record:
+`docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md`.
+
+Verification was by seven independent mutations against the Codex head,
+deliberately different from the mutations the review reported using. Four
+were detected (API-dialect/shadowing guards, leave-one-out peers,
+fit/measurement separation, turnover lookahead). Three survived, which is
+the counter-review's finding set — all the same shape, AQR1-004 one seam
+higher: the pure helpers are behaviourally tested but the algorithm's USE
+of them was not.
+
+- **CR2-001 (P3, closed):** scoring at the entry close (`end_ago=0`)
+  survived the suite; the call site is now pinned.
+- **CR2-002 (P3, closed):** a fabricated `0.0` market-factor day survived;
+  the recorder's refusal is now behaviourally tested against a stub.
+- **CR2-003 (P3, closed):** Stage 1's own `_drift_turnover` copy was
+  outside every test loader; it is now executed directly with the Method
+  V2 §1.2 cases.
+
+Each closing test was verified to redden under its exact mutation and pass
+on the restored tree. All seven Codex commits are accepted; all thirteen
+audit findings are confirmed; no product defect was found in the head. No
+QuantConnect, broker, database, scheduler, or epoch access occurred.
+
 ## 8. What is next
 
-1. Publish `codex/review-alpha-qc-round2-20260817` with the owner-authorized
-   **single final push only after** final local validation. Do not push main or
-   Claude's branch and do not make a second push this cycle.
-2. Claude must counter-review the final Codex head, including `855941a`, the
+1. ~~Publish `codex/review-alpha-qc-round2-20260817`~~ — done; pushed head
+   `b4e9ee0` was counter-reviewed and fast-forwarded into Claude's branch
+   (section 7m).
+2. **The counter-review gate for the next QC runs is satisfied.** Before
+   launching, the owner must confirm stage ORDER: the round-2 rerun
+   contract centres on Stage 1 (REP-H52/REP-IDV plus cadence-matched
+   benchmarks), while plan §5 still requires Stage 0 battery completion.
+   Codex's original contract items remain binding, including `855941a`, the
    follow-up local formula correction, Stage 1 timing/factor alignment,
    turnover/NAV behavior, current LEAN syntax, benchmark/analyser refusals,
    and evidence provenance. Only then run the frozen next QC stage. Record
@@ -841,7 +877,11 @@ leave-one-out peers and joint residual regression. Invalid generated result
 files were removed only after docs/alpha-result.md preserved their exact
 hashes and dispositions. No QC access or new result occurred; every old result
 is unusable, the lifetime floor remains 428, and no alpha milestone completed.
-Verify and counter-review the final pushed Codex head before any fresh QC run.
+Claude counter-reviewed exact head b4e9ee0 on 2026-08-17 (section 7m and
+docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md): all seven
+commits accepted, three P3 test gaps found and closed with mutation-verified
+tests. The gate for the next QC runs is satisfied; before launching, confirm
+with the owner whether Stage 0 battery completion or Stage 1 runs first.
 Append every run rather than overwrite ledger entries; a premature run is
 PENDING_REVIEW and still counts.
 paper-epoch-005 remains unchanged at 752d3b7 for 60 days; operational

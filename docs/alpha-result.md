@@ -304,6 +304,15 @@ unreachable gate and ABR-003's unit mismatch); that lesson remains part of
 the durable audit record even though the invalid generated files are no
 longer presented as active documentation.
 
+**Stage 0 rerun gate (2026-08-17, after R-005/R-006):** Codex's launch-round
+correction head `81db126` was counter-reviewed and accepted the same day
+(`docs/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_COUNTERREVIEW.md`); the
+counter-review added tests only. Stage 0 resumes serially at **R-007** from
+the accepted product tree, one backtest at a time, with new immutable
+evidence paths and new project numbers. The weekend-label factor defect is
+not declared closed until the corrected monthly run passes its completeness
+guard in the cloud.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

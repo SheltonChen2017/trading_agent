@@ -190,6 +190,10 @@ def _fetch_full_log(client: QuantConnectClient, project_id: int,
             {
                 "projectId": project_id,
                 "backtestId": backtest_id,
+                # The endpoint literally requires a parameter named `query`
+                # (an empty filter returns every line); omitting it fails
+                # with "Required parameter query is missing".
+                "query": "",
                 "start": start,
                 "end": start + LOG_PAGE_LINES,
             },
@@ -272,8 +276,19 @@ def wait(args: argparse.Namespace) -> int:
             print(f"UNRESOLVED: {path}: {exc}", flush=True)
             exit_code = 2
             continue
-        lines = _fetch_full_log(client, int(evidence["project_id"]),
-                                str(evidence["backtest_id"]))
+        # Persist the completion verdict BEFORE fetching logs: a log-endpoint
+        # failure must not lose the fact that the run finished (learned the
+        # hard way when the missing `query` parameter erased run 1's status).
+        path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+        try:
+            lines = _fetch_full_log(client, int(evidence["project_id"]),
+                                    str(evidence["backtest_id"]))
+        except QuantConnectError as exc:
+            evidence["log_fetch_error"] = str(exc)
+            path.write_text(json.dumps(evidence, indent=2), encoding="utf-8")
+            print(f"LOG FETCH FAILED: {path}: {exc}", flush=True)
+            exit_code = 2
+            continue
         log_path = path.with_suffix(".log")
         log_text = "\n".join(lines) + ("\n" if lines else "")
         log_path.write_text(log_text, encoding="utf-8")

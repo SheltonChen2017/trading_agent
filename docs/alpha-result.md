@@ -304,6 +304,52 @@ unreachable gate and ABR-003's unit mismatch); that lesson remains part of
 the durable audit record even though the invalid generated files are no
 longer presented as active documentation.
 
+## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery: MOM_3/6/9/12_1, RESIDUAL_MOM_6/12_1, GROSS_PROFITABILITY, QUALITY_COMPOSITE, QUALITY_MOMENTUM, MULTI_ALPHA_COMPOSITE |
+| **Replication or new** | First Stage 0 execution on fully counter-reviewed code (post-`ac96d47`/FCR closures) |
+| **Research look** | Counted real-market run (run-level count 5 → 6); zero emitted alpha cells |
+| **Multiplicity family** | QC alpha battery 2026-08-16, 180 cells (repeated look; lifetime floor stays 428) |
+| **Source commit** | `423a818` (contains merged `1457169` = PR #245 product tree; LEAN sources byte-identical to reviewed `main`) |
+| **Uploaded source SHA-256** | `e15d800bd5fc444ab943164514819d3d10dd871b16ef3838bce2c60af0ec4982` (`alpha_battery_monthly.py`, `ACTIVE_UNIVERSE="A_large"` rewrite) |
+| **QC project** | `35285587` — `1. MONTHLY_BATTERY_A_LARGE - 20260817` (QC displays the name without the dot) |
+| **Compile ID** | `536ba0397b5aaee05599c4f894a04aa6-b781d55b4f49dfabcb81ae12f6998bab` |
+| **Backtest ID** | `b141aeae803521352a74760573ffcda0` |
+| **Launched / completed (UTC)** | 2026-08-17T21:02:23 / ~21:04 (64.22 s engine time, 27,299,669 points, 425k/s) |
+| **Data period / universe** | 2012-01-01..2024-12-31; A_large: price ≥ $5, cap ≥ $10B, ADV20 ≥ $25M; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` |
+| **Raw log** | `artifacts/qc_stage0_20260817/run1_monthly_A.log`, 7 lines, sha256:`23fc9e859485b43bb68e541f1ccb50b02d78d75586bbd9f4f3f6493e50a1e2ed` (local, git-ignored; hash is authoritative) |
+| **Orders / holdings** | Volume $0.00, Holdings $0.00 — inert as designed |
+| **Primary statistics** | **none** |
+| **Validity** | **REFUSED** — `INCOMPLETE\|missing_specs=MULTI_ALPHA_COMPOSITE\|RESIDUAL_MOM_12_1\|RESIDUAL_MOM_6_1` |
+
+### What happened and the open diagnosis
+
+Both residual-momentum specifications produced zero usable rows across the
+entire window, so `MULTI_ALPHA_COMPOSITE` (which consumes one of them) also
+emitted nothing and the completeness guard withheld the whole run, including
+the seven specifications that did produce data. This is the first cloud
+execution of the corrected point-in-time factor machinery.
+
+Working hypothesis, decided BEFORE the next run so it is falsifiable: the
+corrected leave-one-out industry factor refuses a stock's whole 504-session
+factor window if the stock's point-in-time Morningstar industry bucket has
+fewer than three members with returns on ANY session in the window. Among
+A_large's ~mega-cap cross-section most industries hold one or two members,
+so the residual cross-section falls below `MIN_NAMES=30` on every score date
+— a data-driven structural refusal, not a code fault. The alternative — a
+factor-recording/selection-timing defect that starves the residual factor on
+every universe — is distinguished by run 2 (B_core, required by the frozen
+plan anyway): if B_core also refuses identically, treat it as a suspected
+code defect, STOP Stage 0, and take the diagnosis back through review; if
+B_core completes, the A_large refusal stands as this cell family's honest
+result.
+
+Also recorded: LEAN logged a deprecation warning for the
+`add_universe(coarse, fine)` overload (non-fatal), and adjusted start dates
+for six factor-file symbols (BCE, CVE, RCI, CNI, SJR, TCK).
+
 ## 2026-08-17 full research/QC audit disposition
 
 - Correction `855941a` standardizes every LEAN algorithm on QuantConnect's

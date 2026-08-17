@@ -329,6 +329,68 @@ def test_market_recorder_refuses_rather_than_fabricating_a_zero_return():
     assert algo.market_return_sessions == [dt.date(2026, 1, 5)]
 
 
+# --- Final counter-review closures (CCR3-A, 2026-08-17) ------------------
+
+
+def test_stage1_look_accounting_constants_match_the_permanent_ledger():
+    """CCR3-A: the frozen multiplicity gates were unpinned constants.
+
+    Lowering ``LIFETIME_CELLS_BEFORE_STAGE`` from 428 to 24 — loosening the
+    lifetime Bonferroni gate by an order of magnitude — survived the whole
+    suite. The 428 floor comes from `docs/alpha-result.md` (348 declared
+    cells + 80 emitted cells) and the 24-cell stage family from the frozen
+    plan §6 (2 specs × 3 universes × 4 outcomes). Changing either is a
+    research-contract change that must be made loudly, with the ledger.
+    """
+    assert stage1_analyser.STAGE_FAMILY_CELLS == 24
+    assert stage1_analyser.LIFETIME_CELLS_BEFORE_STAGE == 428
+    assert stage1_analyser.DRAWS == 20_000
+
+
+def _stage1_args(tmp_path, benchmark_date: str = "202001") -> list[str]:
+    alpha = tmp_path / "alpha.log"
+    alpha.write_text(
+        "SPECS|REP_H52|REP_IDV\nDATES|1\n"
+        "ROW|202001|0~0.01~0.02~-0.01~0.015~0.1~0.2~0.3~100|"
+        "1~-0.01~0.01~-0.02~0.005~0.2~0.3~0.4~100\n",
+        encoding="utf-8",
+    )
+    benchmark = tmp_path / "benchmark.log"
+    benchmark.write_text(
+        f"DATES|1\nBROW|{benchmark_date}|0.02|0.5|100\n", encoding="utf-8"
+    )
+    identity = "123,compile-1,backtest-1," + "a" * 64
+    return [
+        "--alpha-log", f"B={alpha}",
+        "--benchmark-log", f"B={benchmark}",
+        "--alpha-run", f"B={identity}",
+        "--benchmark-run", f"B={identity}",
+        "--output", str(tmp_path / "report.json"),
+    ]
+
+
+def test_stage1_report_carries_both_frozen_gates(tmp_path):
+    """The emitted report must state the exact 24-cell and 452-cell gates."""
+    import json
+
+    assert stage1_analyser.main(_stage1_args(tmp_path)) == 0
+    report = json.loads((tmp_path / "report.json").read_text(encoding="utf-8"))
+    assert report["stage_family_cells"] == 24
+    assert report["lifetime_cells_before"] == 428
+    assert report["lifetime_cells_after"] == 452
+    assert report["stage_bonferroni_threshold"] == pytest.approx(0.05 / 24)
+    assert report["lifetime_bonferroni_threshold"] == pytest.approx(0.05 / 452)
+    universe = report["universes"]["B"]
+    assert universe["alpha_run"]["project_id"] == "123"
+    assert universe["benchmark_same_dates"]["periods"] == 1
+
+
+def test_stage1_refuses_a_benchmark_missing_an_alpha_date(tmp_path):
+    """Same-date comparison is the gate; a hole must refuse, not narrow."""
+    with pytest.raises(SystemExit, match="benchmark lacks"):
+        stage1_analyser.main(_stage1_args(tmp_path, benchmark_date="202002"))
+
+
 def test_stage1_own_drift_turnover_charges_drift_like_the_reviewed_battery():
     """CR2-003: only the monthly battery's copy was tested.
 

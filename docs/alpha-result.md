@@ -13,6 +13,17 @@ were removed from the active `docs/` tree after their exact Git history,
 run identity, status, and SHA-256 values were preserved in this ledger. Their
 removal is housekeeping, not deletion of an inconvenient research outcome.
 
+**Hash-verification convention (recorded 2026-08-17, CCR3-D):** every SHA-256
+in this ledger was computed over the checked-out Windows working-tree bytes,
+which use CRLF line endings under this repository's `core.autocrlf=true`
+setting. Git blobs store LF, so recovering a deleted file with `git show
+b4e9ee0^:docs/<name>` and hashing it directly yields a DIFFERENT digest.
+To verify, convert LF to CRLF first (for example
+`git show b4e9ee0^:docs/<name> | unix2dos | sha256sum`). All fourteen removed
+artifacts were re-verified this way during the 2026-08-17 final counter-review
+and every ledger hash matched; a bare-blob hash mismatch is the line-ending
+convention, not evidence of tampering.
+
 Nothing in this file is trading authorization. QuantConnect is historical
 replication only; Alpaca Paper is a later, separate forward-validation
 stage.

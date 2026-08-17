@@ -5,6 +5,10 @@ QuantConnect module changed during the 2026-08-16/17 alpha work, correction
 of the local measurement path, and a validity/organization audit of the
 documentation. This section and section 7l supersede earlier alpha current-
 state language while retaining the earlier sections as historical review.
+Updated later on 2026-08-17 by Claude's FINAL counter-review of the complete
+correction chain (section 7o), performed after PR #242 merged the
+integration branch; section 7o and the updated topology/next-steps text are
+the current state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -37,9 +41,17 @@ operator-database mutation, or scheduled-task change.
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
 - Published `origin/main` at audit time:
-  `d8a32604d32e0d85fb9920b0839445eab13ad5f8` (PR #241, full alpha/QC audit).
-  The current integration branch was created from that exact commit. The
-  long-lived alpha branch was originally created from `a795ea3`.
+  `f937bfb11fe82f45fd0f4715a98217a3aa957c92`. PR #242 merged the
+  counter-review integration branch, and its merge tree is byte-identical to
+  branch head `5730f7b` (still reachable as `refs/pull/242/head`; the branch
+  itself was deleted after the merge). PR #241 at
+  `d8a32604d32e0d85fb9920b0839445eab13ad5f8` had merged the full alpha/QC
+  audit before it. The long-lived alpha branch was originally created from
+  `a795ea3`.
+- The 2026-08-17 FINAL counter-review (section 7o) ran on
+  `user/claude/alpha-qc-full-counterreview-20260817`, created from the exact
+  object `5730f7b`; its record is
+  `docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md`.
 - Claude's last submitted remote audited in this cycle was
   `origin/user/claude/alpha-qc-round-20260816` at
   `a37e73b`; the full 2026-08-16/17 chain from `db0045a` through `a37e73b`
@@ -820,12 +832,60 @@ Final validation in the repository `.venv` with Python 3.13.14: focused gate
 warnings in 968.31 seconds**; compilation including `research/` and final
 document/diff/status checks were clean.
 
+## 7o. Final counter-review of the whole correction chain (Claude, 2026-08-17)
+
+After the owner merged the integration branch as PR #242 (`f937bfb`), a
+fresh Claude session — independent of the 7m/7n cycle — counter-reviewed the
+complete ten-commit chain `b143c60 .. 5730f7b` from the exact object
+`5730f7b` on branch `user/claude/alpha-qc-full-counterreview-20260817`. The
+named remote branch had already been merged and deleted; the head was
+verified via `refs/pull/242/head` and the merge tree proven byte-identical
+to `5730f7b`. Full record:
+`docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md`.
+
+All ten commits are accepted (the PR #242 merge as topology). Sixteen
+mutations were run: the three CR2 closures each reddened under their exact
+defect plus two fresh variants, five fresh mutations against Stage 1 timing/
+turnover and three against the local/LEAN residual methodology all reddened,
+and three survived — the finding set, all P3 test gaps over correct
+behaviour, plus one documentation finding:
+
+- **CCR3-A (closed):** the 24-cell stage family and 428-cell lifetime floor
+  in `scripts/analyse_qc_alpha_stage1.py` were unpinned; lowering 428 to 24
+  survived the suite. Constants and the emitted report gates are now pinned,
+  and the analyser's same-date benchmark refusal is tested end to end.
+- **CCR3-B (closed):** the QC poll loop's OUTER deadline was untested; a
+  mutation returning a fake result at timeout survived. A behavioural test
+  with advancing progress now pins the raise.
+- **CCR3-C (closed):** the LEAN legacy-name blocklist missed the leaf
+  members these files use (`GrossProfit` alone survived) and legacy enum
+  members (`Resolution.Daily`); sixteen names were added and both mutations
+  now redden.
+- **CCR3-D (closed):** every permanent-ledger SHA-256 is a CRLF
+  working-tree hash; hashing the bare Git blobs mismatches on all fourteen
+  artifacts, inviting a false tampering conclusion. All fourteen were
+  re-verified under LF→CRLF conversion and the convention is now recorded in
+  `docs/alpha-result.md`.
+
+Validation on the final tree: focused research/QC/document gate **167
+passed**; full suite **4,196 passed / 0 failed / 25 known dependency
+warnings in 737.53 seconds**; compilation including `research/`, the 126-file Markdown
+relative-link check, docs/mandate JSON parses, and `git diff --check` clean.
+No QuantConnect access of any kind, no research look, no broker, database,
+scheduler, policy, or epoch change. No historical result was rehabilitated;
+the lifetime floor remains 428 and the run ledger remains five.
+
 ## 8. What is next
 
-1. Publish and merge `codex/review-alpha-qc-counterreview-20260817`, which
-   retains Claude's accepted regression tests and corrects the canonical
-   topology. Do not merge the stale long-lived Claude branch separately.
-2. **The counter-review gate for the next QC runs is satisfied.** Before
+1. ~~Publish and merge `codex/review-alpha-qc-counterreview-20260817`~~ —
+   DONE: PR #242 merged it at `f937bfb` and the branch was deleted. The
+   2026-08-17 final counter-review (section 7o) then re-verified the whole
+   chain; its branch
+   `user/claude/alpha-qc-full-counterreview-20260817` carries the four
+   CCR3 closures and awaits owner review/merge. Do not merge the stale
+   long-lived Claude branch separately.
+2. **The counter-review gate for the next QC runs is satisfied — twice.**
+   Before
    launching, the owner must confirm stage ORDER: the round-2 rerun
    contract centres on Stage 1 (REP-H52/REP-IDV plus cadence-matched
    benchmarks), while plan §5 still requires Stage 0 battery completion.
@@ -889,24 +949,25 @@ or roll an epoch without a new explicit owner instruction.
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
 docs/Alpha_Test_Implementation_Plan.md,
 docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md, docs/alpha-result.md and
-docs/SESSION_HANDOFF.md. origin/main is d8a3260 after PR #241. Codex
-independently reviewed the full alpha history
-from db0045a through Claude head a37e73b on isolated branch
-codex/review-alpha-qc-round2-20260817 without switching the shared checkout.
-Correction 855941a plus its same-branch follow-up repairs current LEAN Python
+docs/SESSION_HANDOFF.md. origin/main is f937bfb after PR #242 merged the
+counter-review integration branch (PR #241 at d8a3260 merged the full audit
+before it). Corrections 855941a and 1e2b631 repair current LEAN Python
 syntax, point-in-time/exact-session factors, Stage 1 cadence and benchmark,
 strict analyzer provenance, bounded QC polling, old local turnover/NAV,
 leave-one-out peers and joint residual regression. Invalid generated result
 files were removed only after docs/alpha-result.md preserved their exact
-hashes and dispositions. No QC access or new result occurred; every old result
+hashes and dispositions (ledger hashes are CRLF working-tree hashes — see
+the ledger's verification-convention note). No QC access or new result
+occurred; every old result
 is unusable, the lifetime floor remains 428, and no alpha milestone completed.
-Claude counter-reviewed exact head b4e9ee0 on 2026-08-17 (section 7m and
-docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md): all seven
-commits accepted, three P3 test gaps found and closed with mutation-verified
-tests. Codex then independently accepted pushed Claude commit ad3b3a8 after
-correcting its stale topology on
-codex/review-alpha-qc-counterreview-20260817 (section 7n). The gate for the
-next QC runs is satisfied after that integration branch is merged; before launching, confirm
+Claude counter-reviewed exact head b4e9ee0 (section 7m, three P3 closures
+CR2-001..003), Codex independently accepted ad3b3a8 after a topology
+correction (section 7n), and a final independent Claude counter-review of the
+whole ten-commit chain from exact head 5730f7b (section 7o and
+docs/Review/REVIEW_2026-08-17_ALPHA_QC_FINAL_COUNTERREVIEW.md) accepted every
+commit, ran sixteen mutations, and closed four more P3 gaps (CCR3-A..D) on
+branch user/claude/alpha-qc-full-counterreview-20260817. The gate for the
+next QC runs is satisfied; before launching, confirm
 with the owner whether Stage 0 battery completion or Stage 1 runs first.
 Append every run rather than overwrite ledger entries; a premature run is
 PENDING_REVIEW and still counts.

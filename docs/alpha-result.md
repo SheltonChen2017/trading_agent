@@ -35,6 +35,14 @@ not an alpha cell. Together with the prior 348 declared cells, the conservative
 lifetime alpha-cell exposure floor is **428**. These counts do not make any
 result valid and do not authorize analysis outside the reviewed workflow.
 
+**Stage 1 pre-run gate (2026-08-17):** no REP-H52 or REP-IDV cloud run has
+been recorded. The implementation pushed at `dc63eec` failed independent
+review's frozen timing and point-in-time factor checks and was corrected at
+`b143c60`. A future run belongs in a new `R-005`-or-later entry only after
+Claude counter-reviews the final pushed Codex head. If any Stage 1 run was
+launched before that gate, it must be added here as `PENDING_REVIEW` and
+counted; it must not be silently treated as the reviewed run.
+
 ---
 
 ## R-001 — Monthly battery, Universe B_core, corrected code (REFUSED)

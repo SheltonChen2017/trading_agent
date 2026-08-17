@@ -226,3 +226,132 @@ def test_stage1_run_identity_refuses_missing_compile_or_bad_source_hash():
         stage1_analyser._run_identity(
             ["A=not-numeric,compile,backtest," + "a" * 64], "--run"
         )
+
+
+# --- Counter-review closures (CR2-001..003, 2026-08-17) -----------------
+#
+# Three mutations survived the suite during Claude's counter-review of the
+# round-2 audit: scoring on the entry close (`end_ago=0`), fabricating a
+# 0.0 market return for a thin session, and removing drift from Stage 1's
+# own `_drift_turnover` copy. Each test below was written to redden under
+# exactly one of those mutations and was verified to do so.
+
+
+def test_score_binding_freezes_features_at_the_prior_close_call_site():
+    """CR2-001: the helper honoured ``end_ago=1`` but nothing pinned the CALL.
+
+    The behavioural tests above prove `_aligned_price_tail` excludes the
+    entry bar when asked; this pins that `_form_and_bind` actually asks.
+    LEAN cannot be imported locally, so the wiring is an AST invariant —
+    the arithmetic itself stays behaviourally tested, which is the split
+    AQR1-004 demands.
+    """
+    tree = ast.parse(SOURCE.read_text(encoding="utf-8"))
+    form = next(
+        node for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "_form_and_bind"
+    )
+    calls = [
+        node for node in ast.walk(form)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Attribute)
+        and node.func.attr == "_form_scores"
+    ]
+    assert calls, "_form_and_bind no longer calls _form_scores"
+    for call in calls:
+        keywords = {kw.arg: kw.value for kw in call.keywords}
+        assert "end_ago" in keywords, "score call lost its feature cutoff"
+        value = keywords["end_ago"]
+        assert isinstance(value, ast.Constant) and value.value == 1, (
+            "scores must be formed as of the close BEFORE the entry session"
+        )
+
+
+def _min_names_constant() -> int:
+    tree = ast.parse(SOURCE.read_text(encoding="utf-8"))
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Name) and target.id == "MIN_NAMES":
+                    return int(node.value.value)
+    raise AssertionError("MIN_NAMES constant not found")
+
+
+def _extracted_method(name: str):
+    text = SOURCE.read_text(encoding="utf-8")
+    tree = ast.parse(text)
+    cls = next(node for node in ast.walk(tree) if isinstance(node, ast.ClassDef))
+    fn = next(
+        node for node in cls.body
+        if isinstance(node, ast.FunctionDef) and node.name == name
+    )
+    segment = ast.get_source_segment(text, fn)
+    lines = segment.splitlines()
+    indent = len(lines[0]) - len(lines[0].lstrip())
+    source = "\n".join(line[indent:] for line in lines)
+    namespace: dict = {"MIN_NAMES": _min_names_constant()}
+    exec(compile(source, str(SOURCE), "exec"), namespace)  # noqa: S102
+    return namespace[name]
+
+
+def test_market_recorder_refuses_rather_than_fabricating_a_zero_return():
+    """CR2-002: a fabricated 0.0 factor day survived every existing test.
+
+    The recorder must skip a session with too few point-in-time names so
+    the aligned factor window later REFUSES; appending 0.0 with the session
+    recorded would instead feed an invented return into every beta fit.
+    This executes the algorithm's own method against a stub.
+    """
+    recorder = _extracted_method("_record_market_return")
+    min_names = _min_names_constant()
+
+    class Stub:
+        pass
+
+    algo = Stub()
+    algo.selected = [f"S{i}" for i in range(min_names)]
+    algo.market_returns = []
+    algo.market_return_sessions = []
+    algo.last_session = dt.date(2026, 1, 5)
+
+    recorder(algo, {})
+    assert algo.market_returns == []
+    assert algo.market_return_sessions == []
+
+    thin = {f"S{i}": 0.01 for i in range(min_names - 1)}
+    recorder(algo, thin)
+    assert algo.market_returns == []
+    assert algo.market_return_sessions == []
+
+    full = {f"S{i}": 0.01 for i in range(min_names)}
+    recorder(algo, full)
+    assert algo.market_returns == [pytest.approx(0.01)]
+    assert algo.market_return_sessions == [dt.date(2026, 1, 5)]
+
+
+def test_stage1_own_drift_turnover_charges_drift_like_the_reviewed_battery():
+    """CR2-003: only the monthly battery's copy was tested.
+
+    The `_real()` loader stops BEFORE ``def _drift_turnover``, so removing
+    drift from Stage 1's own copy reddened nothing. This executes Stage 1's
+    copy directly with the Method V2 §1.2 cases.
+    """
+    text = SOURCE.read_text(encoding="utf-8")
+    start = text.index("def _drift_turnover")
+    end = text.index("class AlphaStage1Replications")
+    namespace: dict = {}
+    exec(compile(text[start:end], str(SOURCE), "exec"), namespace)  # noqa: S102
+    turnover = namespace["_drift_turnover"]
+
+    targets = {"A": 0.25, "B": 0.25, "C": 0.25, "D": 0.25}
+    doubled = {"A": 1.0, "B": 0.0, "C": 0.0, "D": 0.0}
+    # One name doubles: the book drifts to 40/20/20/20 and restoring equal
+    # weight trades 15% one-way. Counting it as zero was ABR-002's defect.
+    assert turnover(targets, targets, doubled) == pytest.approx(0.15)
+    # Flat returns: re-entering the same book is free.
+    flat = {name: 0.0 for name in targets}
+    assert turnover(targets, targets, flat) == pytest.approx(0.0)
+    # A held name with no outcome refuses instead of assuming zero drift.
+    assert turnover(targets, targets, {"A": 0.0}) is None
+    # An empty previous book charges half the gross target weight.
+    assert turnover({}, targets, {}) == pytest.approx(0.5)

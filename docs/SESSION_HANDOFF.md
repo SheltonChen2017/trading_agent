@@ -50,9 +50,9 @@ operator-database mutation, or scheduled-task change.
 - Current integration/review branch:
   `codex/review-alpha-qc-counterreview-20260817`, based on `origin/main` at
   `d8a3260`. Commit `031b5a7` retains Claude's three mutation-verified tests
-  and counter-review record from `ad3b3a8`; the following documentation commit
-  corrects the stale branch, worktree, and main-head claims found during
-  Codex's independent review.
+  and counter-review record from `ad3b3a8`; documentation/review correction
+  `46ebe04` corrects the stale branch, worktree, and main-head claims found
+  during Codex's independent review.
 - The prior `codex/review-alpha-qc-round2-20260817` branch was merged by PR
   #241 and then deleted locally and remotely with the other merged topic
   branches. Its commits remain reachable from `main`. Claude's counter-review
@@ -810,10 +810,10 @@ the exact submitted commit passed 48 tests. The independent record is
 One P3 documentation finding, CR2IR-001, was closed: the submitted handoff
 inherited pre-merge topology and still described `f0071bc`, an older shared
 `main`, an isolated current worktree, and the deleted round-2 Codex branch as
-current. The integration branch now records `origin/main` at `d8a3260`, the
-submitted Claude head `ad3b3a8`, and the current Codex branch. No production
-or QC algorithm changed, no historical result was rehabilitated, and no QC,
-broker, database, scheduler, deployment, or epoch access occurred.
+current. Correction `46ebe04` records `origin/main` at `d8a3260`, the submitted
+Claude head `ad3b3a8`, and the current Codex branch. No production or QC
+algorithm changed, no historical result was rehabilitated, and no QC, broker,
+database, scheduler, deployment, or epoch access occurred.
 
 Final validation in the repository `.venv` with Python 3.13.14: focused gate
 **48 passed**; full suite **4,192 passed, 0 failed, 25 known dependency

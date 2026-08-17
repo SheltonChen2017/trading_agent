@@ -269,6 +269,16 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.factor_sessions = deque(maxlen=LOOKBACK)
         self.market_returns = deque(maxlen=LOOKBACK)
         self.industry_aggregates = deque(maxlen=LOOKBACK)
+        # The membership month each factor day was RECORDED under. LEAN
+        # labels a daily bar with the NEXT calendar day, so the last bar of
+        # a month that ends on a Friday arrives labeled Saturday-the-1st —
+        # before the new month's selection exists. Keying membership by the
+        # label's month therefore recorded those days with EMPTY industry
+        # buckets, and one poisoned day refused every 504-session residual
+        # window that spanned it (R-005/R-006: total residual refusal on
+        # every universe). Each day now stores the selection month actually
+        # in force, and score-time lookups reuse exactly that key.
+        self.factor_membership_months = deque(maxlen=LOOKBACK)
         self.industry_membership = {}
         # Avoid shadowing QCAlgorithm.fundamentals, a framework member.
         self.fundamental_cache = {} # Symbol -> latest point-in-time values
@@ -509,9 +519,13 @@ class AlphaBatteryMonthly(QCAlgorithm):
         both leaked classifications backward and repeated an O(N^2) peer
         calculation. This prospective record is O(N) per session.
         """
-        membership = self.industry_membership.get(
-            (session.year, session.month), {}
-        )
+        if self.selection_month is None:
+            return
+        # The ACTIVE selection's map — the membership in force on this
+        # session — never a lookup keyed by the session label's calendar
+        # month, which does not exist yet when a month-end bar arrives
+        # labeled with the new month's first weekend day.
+        membership = self.industry_membership.get(self.selection_month, {})
         returns = {
             symbol: daily_returns[symbol]
             for symbol in self.selected
@@ -529,9 +543,18 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.factor_sessions.append(session)
         self.market_returns.append(sum(returns.values()) / len(returns))
         self.industry_aggregates.append(buckets)
+        self.factor_membership_months.append(self.selection_month)
 
     def _factor_returns(self, symbol, count):
-        """Return aligned PIT market and leave-one-out industry factors."""
+        """Return aligned PIT market and leave-one-out industry factors.
+
+        Each historical day's peer lookup uses the membership month RECORDED
+        when that day's buckets were built, so the leave-one-out subtraction
+        provably subtracts from a total its stock was inside. Deriving the
+        month from the session label instead applied a membership the bucket
+        was never built with (and, at weekend month boundaries, one that did
+        not exist).
+        """
         stock = self._returns(symbol, count)
         market = _aligned_observation_tail(
             self.market_returns, self.factor_sessions, self.sessions, count
@@ -539,14 +562,18 @@ class AlphaBatteryMonthly(QCAlgorithm):
         aggregates = _aligned_observation_tail(
             self.industry_aggregates, self.factor_sessions, self.sessions, count
         )
-        if stock is None or market is None or aggregates is None:
+        membership_months = _aligned_observation_tail(
+            self.factor_membership_months, self.factor_sessions,
+            self.sessions, count
+        )
+        if (stock is None or market is None or aggregates is None
+                or membership_months is None):
             return None
-        factor_sessions = list(self.factor_sessions)[-count:]
         industry = []
-        for value, session, daily in zip(stock, factor_sessions, aggregates):
-            membership = self.industry_membership.get(
-                (session.year, session.month), {}
-            )
+        for value, month, daily in zip(stock, membership_months, aggregates):
+            membership = self.industry_membership.get(month)
+            if membership is None:
+                return None
             peer_return = _leave_one_out_peer_return(
                 symbol, value, membership, daily
             )

@@ -1,0 +1,165 @@
+"""LEAN-stub integration simulation of the monthly battery.
+
+R-005/R-006 (2026-08-17): both Stage 0 monthly cloud runs refused with every
+residual-momentum specification empty, while every unit test in this
+repository was green. The defect was only visible at the EVENT-MODEL level:
+LEAN labels a daily bar with the next calendar day, so the last bar of a
+month that ends on a Friday arrives labeled Saturday-the-1st — before the
+new month's universe selection exists — and the factor recorder, which keyed
+membership by the label's month, recorded that day with empty industry
+buckets. One poisoned day refused every 504-session residual window that
+spanned it; months end on Fridays about one in four, so every window was
+poisoned and residual momentum refused everywhere, on every universe.
+
+This test drives the REAL algorithm class through that exact event model
+(coarse selection at trading-day midnight, bars labeled the following
+calendar day, weekend labels included) and asserts the residual
+specifications actually emit. It is the missing integration seam: pure
+helpers were behaviourally tested, but the composition never executed under
+LEAN's timestamp semantics.
+"""
+from __future__ import annotations
+
+import datetime as dt
+import random
+import sys
+import types
+from pathlib import Path
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[1]
+MONTHLY = ROOT / "research" / "lean" / "alpha_battery_monthly.py"
+
+
+class _Transactions:
+    orders_count = 0
+
+
+class _StubQCAlgorithm:
+    def __init__(self):
+        self.universe_settings = types.SimpleNamespace()
+        self.transactions = _Transactions()
+        self.time = dt.datetime(2012, 1, 3)
+        self.log_lines: list[str] = []
+
+    def set_start_date(self, *args): pass
+    def set_end_date(self, *args): pass
+    def set_cash(self, *args): pass
+    def add_universe(self, *args): pass
+    def add_security(self, symbol, resolution=None): pass
+    def remove_security(self, symbol): pass
+    def log(self, message): self.log_lines.append(str(message))
+    def error(self, message): self.log_lines.append("ERROR: " + str(message))
+
+
+@pytest.fixture()
+def monthly_algorithm_class():
+    fake = types.ModuleType("AlgorithmImports")
+    fake.QCAlgorithm = _StubQCAlgorithm
+    fake.Resolution = types.SimpleNamespace(DAILY="daily")
+    fake.DataNormalizationMode = types.SimpleNamespace(ADJUSTED="adjusted",
+                                                       RAW="raw")
+    fake.Universe = types.SimpleNamespace(UNCHANGED="unchanged")
+    fake.DelistingType = types.SimpleNamespace(DELISTED="delisted",
+                                               WARNING="warning")
+    previous = sys.modules.get("AlgorithmImports")
+    sys.modules["AlgorithmImports"] = fake
+    try:
+        namespace: dict = {"__name__": "alpha_battery_monthly_sim"}
+        exec(compile(MONTHLY.read_text(encoding="utf-8"),
+                     str(MONTHLY), "exec"), namespace)
+        yield namespace
+    finally:
+        if previous is None:
+            sys.modules.pop("AlgorithmImports", None)
+        else:
+            sys.modules["AlgorithmImports"] = previous
+
+
+class _Value:
+    def __init__(self, value): self.value = value
+
+
+class _Fine:
+    def __init__(self, symbol, industry, price, seed):
+        self.symbol = symbol
+        self.has_fundamental_data = True
+        self.dollar_volume = 1e9
+        self.market_cap = 1e12
+        self.price = price
+        self.company_profile = types.SimpleNamespace(shares_outstanding=1e9)
+        self.asset_classification = types.SimpleNamespace(
+            morningstar_industry_code=industry)
+        self.financial_statements = types.SimpleNamespace(
+            income_statement=types.SimpleNamespace(
+                gross_profit=_Value(5e9 * (1.0 + seed))),
+            balance_sheet=types.SimpleNamespace(
+                total_assets=_Value(5e10),
+                total_debt=_Value(1e10 * (1.0 + 2.0 * seed))),
+            cash_flow_statement=types.SimpleNamespace(
+                free_cash_flow=_Value(3e9 * (1.0 - seed))),
+        )
+        self.operation_ratios = types.SimpleNamespace(roe=_Value(0.1 + seed))
+
+
+class _Bar:
+    def __init__(self, close): self.close = close
+
+
+class _Slice:
+    def __init__(self, bars): self.bars = bars; self.delistings = {}
+
+
+def test_residual_momentum_survives_weekend_month_boundaries(
+    monthly_algorithm_class,
+):
+    namespace = monthly_algorithm_class
+    algorithm = namespace["AlphaBatteryMonthly"]()
+    algorithm.initialize()
+
+    rng = random.Random(7)
+    names = [f"SYM{i:02d}" for i in range(40)]
+    industry_of = {name: 100 + (i % 4) for i, name in enumerate(names)}
+    seed_of = {name: (i % 7) * 0.03 for i, name in enumerate(names)}
+    prices = {name: 100.0 for name in names}
+
+    sessions_run = 0
+    selection_label_month = None
+    last_trading_day = None
+    calendar_day = dt.date(2012, 1, 2)
+    while sessions_run < 40 * 21:
+        day = calendar_day
+        algorithm.time = dt.datetime(day.year, day.month, day.day)
+        if day.weekday() < 5:
+            # Coarse/fine slice fires at the TRADING day's midnight.
+            month = (day.year, day.month)
+            if month != selection_label_month:
+                selection_label_month = month
+                fine = [_Fine(n, industry_of[n], prices[n], seed_of[n])
+                        for n in names]
+                algorithm._coarse(fine)
+                algorithm._fine(fine)
+        if (last_trading_day is not None
+                and day == last_trading_day + dt.timedelta(days=1)):
+            # The previous trading day's bar arrives labeled TODAY — which
+            # is Saturday whenever a month ends on a Friday. That label is
+            # the whole defect.
+            for name in names:
+                prices[name] *= 1.0 + rng.gauss(0.0004, 0.015)
+            algorithm.on_data(_Slice({n: _Bar(prices[n]) for n in names}))
+            sessions_run += 1
+        if day.weekday() < 5:
+            last_trading_day = day
+        calendar_day += dt.timedelta(days=1)
+
+    residual_6 = algorithm.results.get("RESIDUAL_MOM_6_1", [])
+    residual_12 = algorithm.results.get("RESIDUAL_MOM_12_1", [])
+    assert len(residual_6) >= 10, (
+        "residual momentum emitted no rows under LEAN's weekend bar labels — "
+        "the R-005/R-006 refusal has returned"
+    )
+    assert len(residual_12) >= 10
+    # And the ordinary specifications keep emitting alongside them.
+    assert len(algorithm.results.get("MOM_12_1", [])) >= 20
+    assert len(algorithm.results.get("GROSS_PROFITABILITY", [])) >= 20

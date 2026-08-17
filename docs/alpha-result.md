@@ -313,6 +313,28 @@ evidence paths and new project numbers. The weekend-label factor defect is
 not declared closed until the corrected monthly run passes its completeness
 guard in the cloud.
 
+## R-007 — Stage 0 monthly battery, A_large, corrected code (UNANALYSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-005's family) |
+| **Research look** | Counted real-market run (run-level count 7 → 8); 40 repeated cells emitted (10 specs × 4 outcomes) |
+| **Multiplicity family** | QC alpha battery 2026-08-16, 180 cells; lifetime floor stays 428 |
+| **Source commit** | `75ad8dc` (product tree identical to accepted review head `81db126`) |
+| **Uploaded source SHA-256** | recorded in `run3_monthly_A_r007.json` (`ACTIVE_UNIVERSE="A_large"` rewrite) |
+| **QC project** | `35289096` — requested `3. MONTHLY_BATTERY_A_LARGE - 20260817`, returned `3 MONTHLY_BATTERY_A_LARGE - 20260817` |
+| **Compile ID** | `cd95739866906027d85df5c14e4652d3-6df45b581037ee1efc8de43eda2c77cc` |
+| **Backtest ID** | `8ea519e2754a5bf0280fa3148dad46a8` |
+| **Completed** | 130.16 s engine time, 27,299,669 points; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` (identical universe numbers to R-005) |
+| **Output** | **COMPLETE**: no `INCOMPLETE` marker; all ten specs declared; `DATES\|142` with 142 ROW lines |
+| **Raw log** | `artifacts/qc_stage0_20260817/run3_monthly_A_r007.log`, 151 lines, exact-file sha256:`a4c1669d600b52de87f9019ddaf992a9cfd56de2af0ec9888330c83cbf66035d` (bytes-exact write) |
+| **Validity** | **UNANALYSED** — complete raw output; statistics deferred to the frozen analyser after all nine Stage 0 runs, with full run identities |
+
+The weekend-label factor defect is now closed in the cloud, not only in
+simulation: the completeness guard that refused R-005/R-006 passed on the
+corrected code, and residual momentum emitted alongside every other
+specification. No statistic has been observed or computed from this output.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

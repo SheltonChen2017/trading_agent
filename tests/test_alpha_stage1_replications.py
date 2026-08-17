@@ -115,6 +115,19 @@ def test_market_factor_refuses_a_missing_point_in_time_session():
     assert _OBSERVATIONS([0.001] * 112, sessions, sessions, 111, end_ago=1) == [0.001] * 111
 
 
+def test_daily_factor_recorder_does_not_rebuild_full_price_histories():
+    tree = ast.parse(SOURCE.read_text(encoding="utf-8"))
+    recorder = next(
+        node for node in ast.walk(tree)
+        if isinstance(node, ast.FunctionDef) and node.name == "_record_market_return"
+    )
+    called_attributes = {
+        node.func.attr for node in ast.walk(recorder)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+    }
+    assert "_returns" not in called_attributes
+
+
 def test_idv_scores_a_pure_beta_stock_near_zero():
     """Idiosyncratic volatility is what the market does NOT explain."""
     rng = random.Random(11)
@@ -209,3 +222,7 @@ def test_stage1_run_identity_refuses_missing_compile_or_bad_source_hash():
         stage1_analyser._run_identity(["A=project,,backtest," + "a" * 64], "--run")
     with pytest.raises(SystemExit, match="project_id,compile_id"):
         stage1_analyser._run_identity(["A=project,compile,backtest,not-a-hash"], "--run")
+    with pytest.raises(SystemExit, match="project_id,compile_id"):
+        stage1_analyser._run_identity(
+            ["A=not-numeric,compile,backtest," + "a" * 64], "--run"
+        )

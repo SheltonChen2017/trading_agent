@@ -213,19 +213,20 @@ def _drift_turnover(previous, target, outcomes):
 
 class AlphaStage1Replications(QCAlgorithm):
 
-    def Initialize(self):
-        self.SetStartDate(*START)
-        self.SetEndDate(*END)
-        self.SetCash(100_000)
-        self.UniverseSettings.Resolution = Resolution.Daily
-        self.UniverseSettings.DataNormalizationMode = DataNormalizationMode.Adjusted
+    def initialize(self):
+        self.set_start_date(*START)
+        self.set_end_date(*END)
+        self.set_cash(100_000)
+        self.universe_settings.resolution = Resolution.DAILY
+        self.universe_settings.data_normalization_mode = DataNormalizationMode.ADJUSTED
         self.screen = UNIVERSES[ACTIVE_UNIVERSE]
-        self.AddUniverse(self._coarse, self._fine)
+        self.add_universe(self._coarse, self._fine)
 
         self.closes = {}            # Symbol -> deque of daily closes
         self.close_sessions = {}    # Symbol -> matching exchange sessions
         self.sessions = deque(maxlen=LOOKBACK)
-        self.fundamentals = {}      # Symbol -> dict of latest known values
+        # Avoid shadowing QCAlgorithm.fundamentals, a framework member.
+        self.fundamental_cache = {} # Symbol -> latest point-in-time values
         self.industry = {}          # Symbol -> Morningstar industry code
         self.selected = []          # this month's eligible symbols
         self.selection_history = {} # (year, month) -> PIT selected symbols
@@ -253,31 +254,31 @@ class AlphaStage1Replications(QCAlgorithm):
     # --- universe ------------------------------------------------------
 
     def _coarse(self, coarse):
-        if self.selection_month == (self.Time.year, self.Time.month):
-            return Universe.Unchanged
-        return [c.Symbol for c in coarse
-                if c.HasFundamentalData
-                and c.Price >= self.screen["min_price"]
-                and c.DollarVolume >= self.screen["min_adv"]]
+        if self.selection_month == (self.time.year, self.time.month):
+            return Universe.UNCHANGED
+        return [c.symbol for c in coarse
+                if c.has_fundamental_data
+                and c.price >= self.screen["min_price"]
+                and c.dollar_volume >= self.screen["min_adv"]]
 
     def _fine(self, fine):
-        if self.selection_month == (self.Time.year, self.Time.month):
-            return Universe.Unchanged
-        self.selection_month = (self.Time.year, self.Time.month)
+        if self.selection_month == (self.time.year, self.time.month):
+            return Universe.UNCHANGED
+        self.selection_month = (self.time.year, self.time.month)
         chosen = []
         for f in fine:
             self.cap_rows += 1
-            cap = float(f.MarketCap or 0.0)
+            cap = float(f.market_cap or 0.0)
             if cap <= 0.0:
                 # MarketCap == 0 is MISSING, not small. Reconstruct where
                 # possible; count both outcomes so the excluded set is
                 # never invisible.
                 shares = 0.0
                 try:
-                    shares = float(f.CompanyProfile.SharesOutstanding or 0.0)
+                    shares = float(f.company_profile.shares_outstanding or 0.0)
                 except Exception:  # noqa: BLE001
                     shares = 0.0
-                price = float(f.Price or 0.0)
+                price = float(f.price or 0.0)
                 if shares > 0.0 and price > 0.0:
                     cap = shares * price
                     self.cap_fallback += 1
@@ -286,22 +287,22 @@ class AlphaStage1Replications(QCAlgorithm):
                     continue
             if cap < self.screen["min_cap"]:
                 continue
-            self.industry[f.Symbol] = int(
-                f.AssetClassification.MorningstarIndustryCode or 0
+            self.industry[f.symbol] = int(
+                f.asset_classification.morningstar_industry_code or 0
             )
-            self.fundamentals[f.Symbol] = {
+            self.fundamental_cache[f.symbol] = {
                 "gross_profit": float(
-                    f.FinancialStatements.IncomeStatement.GrossProfit.Value or 0.0),
+                    f.financial_statements.income_statement.gross_profit.value or 0.0),
                 "assets": float(
-                    f.FinancialStatements.BalanceSheet.TotalAssets.Value or 0.0),
+                    f.financial_statements.balance_sheet.total_assets.value or 0.0),
                 "debt": float(
-                    f.FinancialStatements.BalanceSheet.TotalDebt.Value or 0.0),
+                    f.financial_statements.balance_sheet.total_debt.value or 0.0),
                 "fcf": float(
-                    f.FinancialStatements.CashFlowStatement.FreeCashFlow.Value or 0.0),
-                "roe": float(f.OperationRatios.ROE.Value or 0.0),
+                    f.financial_statements.cash_flow_statement.free_cash_flow.value or 0.0),
+                "roe": float(f.operation_ratios.roe.value or 0.0),
                 "cap": cap,
             }
-            chosen.append(f.Symbol)
+            chosen.append(f.symbol)
         current = set(chosen)
         # The prior month's members are still needed for the month-end score
         # and next-session entry that occur in this very slice. Open cohorts
@@ -313,7 +314,7 @@ class AlphaStage1Replications(QCAlgorithm):
             needed.update(weights)
         for symbol in self.in_universe - current:
             if symbol in needed and symbol not in self.retained:
-                self.AddSecurity(symbol, Resolution.Daily)
+                self.add_security(symbol, Resolution.DAILY)
                 self.retained.add(symbol)
         self.in_universe = current
         self.selected = chosen
@@ -326,36 +327,42 @@ class AlphaStage1Replications(QCAlgorithm):
 
     # --- data ----------------------------------------------------------
 
-    def OnData(self, data):
-        for symbol, delisting in data.Delistings.items():
-            if delisting.Type != DelistingType.Delisted:
+    def on_data(self, data):
+        for symbol, delisting in data.delistings.items():
+            if delisting.type != DelistingType.DELISTED:
                 continue
-            raw_price = getattr(delisting, "Price", None)
+            raw_price = getattr(delisting, "price", None)
             if raw_price is None:
-                raw_price = getattr(delisting, "Value", 0.0)
+                raw_price = getattr(delisting, "value", 0.0)
             try:
                 self.terminal_prices[symbol] = max(0.0, float(raw_price))
             except (TypeError, ValueError):
                 self.terminal_prices[symbol] = 0.0
 
-        session = self.Time.date()
-        if not data.Bars or session == self.last_session:
+        session = self.time.date()
+        if not data.bars or session == self.last_session:
             return
         previous_session = self.last_session
         self.last_session = session
         self.session_index += 1
         self.sessions.append(session)
 
-        for symbol in list(data.Bars.Keys):
+        daily_returns = {}
+        for symbol in list(data.bars.keys()):
             window = self.closes.get(symbol)
             if window is None:
                 window = deque(maxlen=LOOKBACK)
                 self.closes[symbol] = window
                 self.close_sessions[symbol] = deque(maxlen=LOOKBACK)
-            window.append(float(data.Bars[symbol].Close))
+            close = float(data.bars[symbol].close)
+            dates = self.close_sessions[symbol]
+            if (previous_session is not None and window and dates
+                    and dates[-1] == previous_session and window[-1] > 0):
+                daily_returns[symbol] = close / window[-1] - 1.0
+            window.append(close)
             self.close_sessions[symbol].append(session)
 
-        self._record_market_return()
+        self._record_market_return(daily_returns)
         self._settle_due_cohorts()
 
         # On the first session of a new month, the immediately preceding
@@ -368,13 +375,13 @@ class AlphaStage1Replications(QCAlgorithm):
             self._form_and_bind(names, previous_session)
         self._release_unused_retained()
 
-    def _record_market_return(self):
+    def _record_market_return(self, daily_returns):
         """Record the PIT equal-weight universe return for this session."""
-        values = []
-        for symbol in self.selected:
-            returns = self._returns(symbol, 1)
-            if returns is not None:
-                values.append(returns[0])
+        values = [
+            daily_returns[symbol]
+            for symbol in self.selected
+            if symbol in daily_returns
+        ]
         # Do not insert a plausible zero when the factor is unavailable.
         # A missing date makes the later aligned factor window refuse.
         if len(values) >= MIN_NAMES:
@@ -571,12 +578,12 @@ class AlphaStage1Replications(QCAlgorithm):
             needed.update(weights)
         for symbol in list(self.retained):
             if symbol not in needed and symbol not in self.in_universe:
-                self.RemoveSecurity(symbol)
+                self.remove_security(symbol)
                 self.retained.remove(symbol)
 
-    def OnEndOfAlgorithm(self):
-        self.Log(f"=== ALPHA STAGE1 REPLICATIONS | universe={ACTIVE_UNIVERSE} ===")
-        self.Log(f"cap_rows={self.cap_rows} cap_fallback={self.cap_fallback} "
+    def on_end_of_algorithm(self):
+        self.log(f"=== ALPHA STAGE1 REPLICATIONS | universe={ACTIVE_UNIVERSE} ===")
+        self.log(f"cap_rows={self.cap_rows} cap_fallback={self.cap_fallback} "
                  f"cap_missing={self.cap_missing}")
 
         # ONE LINE PER DATE, not per (spec, date). QuantConnect truncates
@@ -592,7 +599,7 @@ class AlphaStage1Replications(QCAlgorithm):
         order = list(SPECIFICATIONS)
         missing = [spec for spec in order if spec not in self.results]
         if missing:
-            self.Error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
+            self.error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
             return
         index_of = {spec: i for i, spec in enumerate(order)}
         by_date = {}
@@ -604,9 +611,9 @@ class AlphaStage1Replications(QCAlgorithm):
                     f"{round(turn_ls, 4)}~{round(turn_l10, 4)}~"
                     f"{round(turn_l20, 4)}~{n}"
                 )
-        self.Log(f"SPECS|{'|'.join(order)}")
-        self.Log(f"DATES|{len(by_date)}")
+        self.log(f"SPECS|{'|'.join(order)}")
+        self.log(f"DATES|{len(by_date)}")
         for date in sorted(by_date):
             # Date compressed to YYYYMM; the cadence is monthly.
-            self.Log(f"ROW|{date.replace('-', '')[:6]}|" + "|".join(by_date[date]))
-        self.Log(f"orders placed: {self.Transactions.OrdersCount}")
+            self.log(f"ROW|{date.replace('-', '')[:6]}|" + "|".join(by_date[date]))
+        self.log(f"orders placed: {self.transactions.orders_count}")

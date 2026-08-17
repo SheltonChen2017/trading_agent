@@ -43,7 +43,10 @@ def test_long_short_turnover_counts_a_long_short_side_flip() -> None:
         scores, forwards, dates, "long_short", horizon=1
     )
 
-    assert turnover.iloc[1] == 1.0
+    # The complete side flip costs 1.0, plus 0.005 to restore gross
+    # exposure after both long and short notionals grew by 1% while NAV
+    # stayed flat.
+    assert turnover.iloc[1] == pytest.approx(1.005)
 
 
 def test_edgar_fact_is_not_usable_before_its_actual_filing_date(
@@ -171,4 +174,43 @@ def test_drift_weights_survives_a_total_wipeout_without_dividing_by_zero() -> No
     from scripts.run_alpha_battery_20260815 import drift_weights
 
     result = drift_weights({"A": 0.5, "B": 0.5}, {"A": -1.0, "B": -1.0})
-    assert result == {"A": 0.5, "B": 0.5}
+    assert result is None
+
+
+def test_turnover_uses_previous_period_outcomes_without_lookahead() -> None:
+    dates = pd.to_datetime(["2025-01-02", "2025-01-03"])
+    names = [f"S{i:02d}" for i in range(20)]
+    scores = pd.DataFrame(
+        [np.arange(20, dtype=float), np.arange(20, dtype=float)],
+        index=dates,
+        columns=names,
+    )
+    forwards = pd.DataFrame(0.0, index=dates, columns=names)
+    # The first period's highest-ranked name doubles. At the second
+    # rebalance, restoring four equal long-only weights costs 15% turnover.
+    forwards.loc[dates[0], "S19"] = 1.0
+
+    _, turnover = battery.long_short_returns(
+        scores, forwards, dates, "long_only_20", horizon=1
+    )
+
+    assert turnover.iloc[1] == pytest.approx(0.15)
+
+
+def test_universe_portfolio_charges_drift_not_target_to_target_turnover() -> None:
+    dates = pd.to_datetime(["2025-01-02", "2025-01-03"])
+    names = [f"S{i:02d}" for i in range(20)]
+    rows = []
+    for date in dates:
+        for index, name in enumerate(names):
+            rows.append({
+                "as_of_session": date,
+                "ticker": name,
+                "score": float(index),
+                "outcome": 1.0 if date == dates[0] and name == "S19" else 0.0,
+            })
+    _, turnover, _ = universes._portfolio(
+        pd.DataFrame(rows), "long_only_20", 0.20
+    )
+
+    assert turnover.iloc[1] == pytest.approx(0.15)

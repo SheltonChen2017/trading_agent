@@ -43,7 +43,8 @@ def _run_identity(items: list[str], option: str) -> dict[str, dict[str, str]]:
     out: dict[str, dict[str, str]] = {}
     for label, value in mapped.items():
         parts = value.split(",")
-        if len(parts) != 4 or not all(parts[:3]) or not SHA256.fullmatch(parts[3]):
+        if (len(parts) != 4 or not parts[0].isdigit() or int(parts[0]) <= 0
+                or not parts[1] or not parts[2] or not SHA256.fullmatch(parts[3])):
             raise SystemExit(
                 f"{option}: {label} must be project_id,compile_id,backtest_id,source_sha256"
             )

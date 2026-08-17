@@ -53,18 +53,19 @@ def _drift_turnover(previous, target, outcomes):
 
 class UniverseBenchmark(QCAlgorithm):
 
-    def Initialize(self):
-        self.SetStartDate(*START)
-        self.SetEndDate(*END)
-        self.SetCash(100_000)
-        self.UniverseSettings.Resolution = Resolution.Daily
-        self.UniverseSettings.DataNormalizationMode = DataNormalizationMode.Adjusted
+    def initialize(self):
+        self.set_start_date(*START)
+        self.set_end_date(*END)
+        self.set_cash(100_000)
+        self.universe_settings.resolution = Resolution.DAILY
+        self.universe_settings.data_normalization_mode = DataNormalizationMode.ADJUSTED
         self.screen = UNIVERSES[ACTIVE_UNIVERSE]
-        self.AddUniverse(self._coarse, self._fine)
+        self.add_universe(self._coarse, self._fine)
         self.selection_month = None
         self.scored_month = None
         self.selected = []
         self.closes = {}
+        self.close_sessions = {}
         self.pending = None
         self.staged = None
         self.previous_weights = {}
@@ -75,43 +76,43 @@ class UniverseBenchmark(QCAlgorithm):
         self.rows = []
 
     def _coarse(self, coarse):
-        if self.selection_month == (self.Time.year, self.Time.month):
-            return Universe.Unchanged
-        return [c.Symbol for c in coarse
-                if c.HasFundamentalData
-                and c.Price >= self.screen["min_price"]
-                and c.DollarVolume >= self.screen["min_adv"]]
+        if self.selection_month == (self.time.year, self.time.month):
+            return Universe.UNCHANGED
+        return [c.symbol for c in coarse
+                if c.has_fundamental_data
+                and c.price >= self.screen["min_price"]
+                and c.dollar_volume >= self.screen["min_adv"]]
 
     def _fine(self, fine):
-        if self.selection_month == (self.Time.year, self.Time.month):
-            return Universe.Unchanged
-        self.selection_month = (self.Time.year, self.Time.month)
+        if self.selection_month == (self.time.year, self.time.month):
+            return Universe.UNCHANGED
+        self.selection_month = (self.time.year, self.time.month)
         chosen = []
         for f in fine:
-            cap = float(f.MarketCap or 0.0)
+            cap = float(f.market_cap or 0.0)
             if cap <= 0.0:
                 try:
-                    shares = float(f.CompanyProfile.SharesOutstanding or 0.0)
+                    shares = float(f.company_profile.shares_outstanding or 0.0)
                 except Exception:  # noqa: BLE001
                     shares = 0.0
-                price = float(f.Price or 0.0)
+                price = float(f.price or 0.0)
                 if shares > 0.0 and price > 0.0:
                     cap = shares * price
                 else:
                     continue
             if cap >= self.screen["min_cap"]:
-                chosen.append(f.Symbol)
+                chosen.append(f.symbol)
         current = set(chosen)
         needed = set(self.pending.get("entry", {})) if self.pending else set()
         for symbol in self.in_universe - current:
             if symbol in needed and symbol not in self.retained:
-                self.AddSecurity(symbol, Resolution.Daily)
+                self.add_security(symbol, Resolution.DAILY)
                 self.retained.add(symbol)
         self.in_universe = current
         self.selected = chosen
         return chosen
 
-    def OnData(self, data):
+    def on_data(self, data):
         # Mirrors the battery's proven structure: prices accumulate in a
         # window, and a month's return is measured against the entry price
         # recorded at the previous scoring. The first version kept a bare
@@ -119,39 +120,43 @@ class UniverseBenchmark(QCAlgorithm):
         # DATES|0 on a run that processed 31.9 million data points -- a
         # silent empty result rather than an error. Reusing the code path
         # that is known to work is cheaper than debugging a second one.
-        for symbol, delisting in data.Delistings.items():
-            if delisting.Type != DelistingType.Delisted:
+        for symbol, delisting in data.delistings.items():
+            if delisting.type != DelistingType.DELISTED:
                 continue
-            raw_price = getattr(delisting, "Price", None)
+            raw_price = getattr(delisting, "price", None)
             if raw_price is None:
-                raw_price = getattr(delisting, "Value", 0.0)
+                raw_price = getattr(delisting, "value", 0.0)
             try:
                 self.terminal_prices[symbol] = max(0.0, float(raw_price))
             except (TypeError, ValueError):
                 self.terminal_prices[symbol] = 0.0
 
-        for symbol in list(data.Bars.Keys):
-            self.closes[symbol] = float(data.Bars[symbol].Close)
-
-        session = self.Time.date()
-        if not data.Bars or session == self.last_session:
+        session = self.time.date()
+        if not data.bars or session == self.last_session:
             return
         self.last_session = session
+
+        for symbol in list(data.bars.keys()):
+            self.closes[symbol] = float(data.bars[symbol].close)
+            self.close_sessions[symbol] = session
 
         if self.staged is not None and session > self.staged["score_session"]:
             self._bind_staged_entry()
 
-        month = (self.Time.year, self.Time.month)
+        month = (self.time.year, self.time.month)
         if self.scored_month == month or self.selection_month != month:
             return
         self.scored_month = month
 
-        names = [symbol for symbol in self.selected if symbol in self.closes]
+        names = [
+            symbol for symbol in self.selected
+            if self.close_sessions.get(symbol) == session
+        ]
         if len(names) >= MIN_NAMES:
             self.staged = {
                 "names": names,
-                "date": str(self.Time.date()),
-                "score_session": self.Time.date(),
+                "date": str(self.time.date()),
+                "score_session": self.time.date(),
             }
 
     def _bind_staged_entry(self):
@@ -161,7 +166,8 @@ class UniverseBenchmark(QCAlgorithm):
         entry = {
             symbol: self.closes[symbol]
             for symbol in staged["names"]
-            if symbol in self.closes and symbol not in self.terminal_prices
+            if self.close_sessions.get(symbol) == self.last_session
+            and symbol not in self.terminal_prices
         }
         if len(entry) < MIN_NAMES:
             return
@@ -181,7 +187,12 @@ class UniverseBenchmark(QCAlgorithm):
         self.pending = None
         outcomes = {}
         for symbol, entry_price in pending["entry"].items():
-            now = self.terminal_prices.get(symbol, self.closes.get(symbol))
+            if symbol in self.terminal_prices:
+                now = self.terminal_prices[symbol]
+            elif self.close_sessions.get(symbol) == self.last_session:
+                now = self.closes.get(symbol)
+            else:
+                now = None
             if entry_price > 0 and now is not None:
                 outcomes[symbol] = now / entry_price - 1.0
         if len(outcomes) == len(pending["entry"]) and len(outcomes) >= MIN_NAMES:
@@ -198,15 +209,15 @@ class UniverseBenchmark(QCAlgorithm):
         needed = set(self.pending.get("entry", {})) if self.pending else set()
         for symbol in list(self.retained):
             if symbol not in needed and symbol not in self.in_universe:
-                self.RemoveSecurity(symbol)
+                self.remove_security(symbol)
                 self.retained.remove(symbol)
 
-    def OnEndOfAlgorithm(self):
-        self.Log(f"=== UNIVERSE BENCHMARK | universe={ACTIVE_UNIVERSE} ===")
-        self.Log(f"DATES|{len(self.rows)}")
+    def on_end_of_algorithm(self):
+        self.log(f"=== UNIVERSE BENCHMARK | universe={ACTIVE_UNIVERSE} ===")
+        self.log(f"DATES|{len(self.rows)}")
         for date, ret, turnover, n in self.rows:
-            self.Log(
+            self.log(
                 f"BROW|{date.replace('-', '')[:6]}|{round(ret, 6)}|"
                 f"{round(turnover, 4)}|{n}"
             )
-        self.Log(f"orders placed: {self.Transactions.OrdersCount}")
+        self.log(f"orders placed: {self.transactions.orders_count}")

@@ -46,6 +46,18 @@ SPECIFICATIONS = (
 )
 
 
+def _aligned_observation_tail(values, value_sessions, market_sessions, count):
+    """Return ``count`` observations only on consecutive market sessions."""
+    if count <= 0 or count > len(values) or count > len(value_sessions):
+        return None
+    if count > len(market_sessions):
+        return None
+    sessions = list(value_sessions)[-count:]
+    if sessions != list(market_sessions)[-count:]:
+        return None
+    return list(values)[-count:]
+
+
 def _spearman(pairs):
     if len(pairs) < MIN_NAMES:
         return None
@@ -98,19 +110,22 @@ def _drift_turnover(previous, target, outcomes):
 
 class AlphaBatteryShort(QCAlgorithm):
 
-    def Initialize(self):
-        self.SetStartDate(*START)
-        self.SetEndDate(*END)
-        self.SetCash(100_000)
-        self.UniverseSettings.Resolution = Resolution.Daily
+    def initialize(self):
+        self.set_start_date(*START)
+        self.set_end_date(*END)
+        self.set_cash(100_000)
+        self.universe_settings.resolution = Resolution.DAILY
         # Raw coarse/fine fields drive the screens; adjusted bars drive all
         # return arithmetic so stock splits cannot become fictitious alpha.
-        self.UniverseSettings.DataNormalizationMode = DataNormalizationMode.Adjusted
+        self.universe_settings.data_normalization_mode = DataNormalizationMode.ADJUSTED
         self.screen = UNIVERSES[ACTIVE_UNIVERSE]
-        self.AddUniverse(self._coarse, self._fine)
+        self.add_universe(self._coarse, self._fine)
 
         self.closes = {}
+        self.close_sessions = {}
         self.volumes = {}
+        self.volume_sessions = {}
+        self.sessions = deque(maxlen=LOOKBACK)
         self.industry = {}
         self.selected = []
         self.selection_month = None
@@ -127,27 +142,27 @@ class AlphaBatteryShort(QCAlgorithm):
         self.cap_rows = self.cap_fallback = self.cap_missing = 0
 
     def _coarse(self, coarse):
-        if self.selection_month == (self.Time.year, self.Time.month):
-            return Universe.Unchanged
-        return [c.Symbol for c in coarse
-                if c.HasFundamentalData
-                and c.Price >= self.screen["min_price"]
-                and c.DollarVolume >= self.screen["min_adv"]]
+        if self.selection_month == (self.time.year, self.time.month):
+            return Universe.UNCHANGED
+        return [c.symbol for c in coarse
+                if c.has_fundamental_data
+                and c.price >= self.screen["min_price"]
+                and c.dollar_volume >= self.screen["min_adv"]]
 
     def _fine(self, fine):
-        if self.selection_month == (self.Time.year, self.Time.month):
-            return Universe.Unchanged
-        self.selection_month = (self.Time.year, self.Time.month)
+        if self.selection_month == (self.time.year, self.time.month):
+            return Universe.UNCHANGED
+        self.selection_month = (self.time.year, self.time.month)
         chosen = []
         for f in fine:
             self.cap_rows += 1
-            cap = float(f.MarketCap or 0.0)
+            cap = float(f.market_cap or 0.0)
             if cap <= 0.0:
                 try:
-                    shares = float(f.CompanyProfile.SharesOutstanding or 0.0)
+                    shares = float(f.company_profile.shares_outstanding or 0.0)
                 except Exception:  # noqa: BLE001
                     shares = 0.0
-                price = float(f.Price or 0.0)
+                price = float(f.price or 0.0)
                 if shares > 0.0 and price > 0.0:
                     cap = shares * price
                     self.cap_fallback += 1
@@ -156,9 +171,9 @@ class AlphaBatteryShort(QCAlgorithm):
                     continue
             if cap < self.screen["min_cap"]:
                 continue
-            self.industry[f.Symbol] = int(
-                f.AssetClassification.MorningstarIndustryCode or 0)
-            chosen.append(f.Symbol)
+            self.industry[f.symbol] = int(
+                f.asset_classification.morningstar_industry_code or 0)
+            chosen.append(f.symbol)
         current = set(chosen)
         needed = set()
         if self.pending is not None:
@@ -167,33 +182,41 @@ class AlphaBatteryShort(QCAlgorithm):
             needed.update(self.staged.get("names", ()))
         for symbol in self.in_universe - current:
             if symbol in needed and symbol not in self.retained:
-                self.AddSecurity(symbol, Resolution.Daily)
+                self.add_security(symbol, Resolution.DAILY)
                 self.retained.add(symbol)
         self.in_universe = current
         self.selected = chosen
         return chosen
 
-    def OnData(self, data):
-        for symbol, delisting in data.Delistings.items():
-            if delisting.Type != DelistingType.Delisted:
+    def on_data(self, data):
+        for symbol, delisting in data.delistings.items():
+            if delisting.type != DelistingType.DELISTED:
                 continue
-            raw_price = getattr(delisting, "Price", None)
+            raw_price = getattr(delisting, "price", None)
             if raw_price is None:
-                raw_price = getattr(delisting, "Value", 0.0)
+                raw_price = getattr(delisting, "value", 0.0)
             try:
                 self.terminal_prices[symbol] = max(0.0, float(raw_price))
             except (TypeError, ValueError):
                 self.terminal_prices[symbol] = 0.0
 
-        for symbol in list(data.Bars.Keys):
-            bar = data.Bars[symbol]
-            self.closes.setdefault(symbol, deque(maxlen=LOOKBACK)).append(float(bar.Close))
-            self.volumes.setdefault(symbol, deque(maxlen=LOOKBACK)).append(float(bar.Volume))
-
-        session = self.Time.date()
-        if not data.Bars or session == self.last_session:
+        session = self.time.date()
+        if not data.bars or session == self.last_session:
             return
         self.last_session = session
+        self.sessions.append(session)
+
+        for symbol in list(data.bars.keys()):
+            bar = data.bars[symbol]
+            if symbol not in self.closes:
+                self.closes[symbol] = deque(maxlen=LOOKBACK)
+                self.close_sessions[symbol] = deque(maxlen=LOOKBACK)
+                self.volumes[symbol] = deque(maxlen=LOOKBACK)
+                self.volume_sessions[symbol] = deque(maxlen=LOOKBACK)
+            self.closes[symbol].append(float(bar.close))
+            self.close_sessions[symbol].append(session)
+            self.volumes[symbol].append(float(bar.volume))
+            self.volume_sessions[symbol].append(session)
 
         entered_today = False
         if self.staged is not None and session > self.staged["score_session"]:
@@ -268,12 +291,24 @@ class AlphaBatteryShort(QCAlgorithm):
 
     def _price(self, symbol, ago):
         window = self.closes.get(symbol)
-        if window is None or len(window) <= ago:
+        sessions = self.close_sessions.get(symbol)
+        if window is None or sessions is None:
             return None
-        return window[len(window) - 1 - ago]
+        values = _aligned_observation_tail(
+            window, sessions, self.sessions, ago + 1
+        )
+        return None if values is None else values[0]
 
     def _form_scores(self):
-        names = [s for s in self.selected if len(self.closes.get(s, ())) >= 65]
+        names = [
+            symbol for symbol in self.selected
+            if _aligned_observation_tail(
+                self.closes.get(symbol, ()),
+                self.close_sessions.get(symbol, ()),
+                self.sessions,
+                65,
+            ) is not None
+        ]
         if len(names) < MIN_NAMES:
             return
 
@@ -298,9 +333,14 @@ class AlphaBatteryShort(QCAlgorithm):
         volume_z = {}
         for symbol in names:
             window = self.volumes.get(symbol)
-            if window is None or len(window) < 60:
+            sessions = self.volume_sessions.get(symbol)
+            if window is None or sessions is None:
                 continue
-            recent = list(window)[-60:]
+            recent = _aligned_observation_tail(
+                window, sessions, self.sessions, 60
+            )
+            if recent is None:
+                continue
             mean = sum(recent) / len(recent)
             var = sum((v - mean) ** 2 for v in recent) / max(1, len(recent) - 1)
             sd = math.sqrt(var)
@@ -310,9 +350,14 @@ class AlphaBatteryShort(QCAlgorithm):
         max20 = {}
         for symbol in names:
             window = self.closes.get(symbol)
-            if window is None or len(window) < 21:
+            sessions = self.close_sessions.get(symbol)
+            if window is None or sessions is None:
                 continue
-            values = list(window)[-21:]
+            values = _aligned_observation_tail(
+                window, sessions, self.sessions, 21
+            )
+            if values is None:
+                continue
             daily = [values[i + 1] / values[i] - 1.0
                      for i in range(len(values) - 1) if values[i] > 0]
             if daily:
@@ -354,8 +399,8 @@ class AlphaBatteryShort(QCAlgorithm):
         self.staged = {
             "scores": scores,
             "names": names,
-            "date": str(self.Time.date()),
-            "score_session": self.Time.date(),
+            "date": str(self.time.date()),
+            "score_session": self.time.date(),
         }
 
     def _settle(self):
@@ -395,17 +440,17 @@ class AlphaBatteryShort(QCAlgorithm):
         needed = set(self.pending.get("entry", {})) if self.pending else set()
         for symbol in list(self.retained):
             if symbol not in needed and symbol not in self.in_universe:
-                self.RemoveSecurity(symbol)
+                self.remove_security(symbol)
                 self.retained.remove(symbol)
 
-    def OnEndOfAlgorithm(self):
-        self.Log(f"=== ALPHA BATTERY SHORT | universe={ACTIVE_UNIVERSE} ===")
-        self.Log(f"cap_rows={self.cap_rows} cap_fallback={self.cap_fallback} "
+    def on_end_of_algorithm(self):
+        self.log(f"=== ALPHA BATTERY SHORT | universe={ACTIVE_UNIVERSE} ===")
+        self.log(f"cap_rows={self.cap_rows} cap_fallback={self.cap_fallback} "
                  f"cap_missing={self.cap_missing}")
         order = list(SPECIFICATIONS)
         missing = [spec for spec in order if spec not in self.results]
         if missing:
-            self.Error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
+            self.error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
             return
         index_of = {spec: i for i, spec in enumerate(order)}
         # PACKED SCALED INTEGERS. QuantConnect's log cap is about 100KB,
@@ -425,7 +470,7 @@ class AlphaBatteryShort(QCAlgorithm):
                 turns = tuple(int(round(value * 10000))
                               for value in (turn_ls, turn_l10, turn_l20))
                 if any(value < 0 or value > 65535 for value in turns):
-                    self.Error(f"INCOMPLETE|turnover_out_of_range|{spec}|{date}")
+                    self.error(f"INCOMPLETE|turnover_out_of_range|{spec}|{date}")
                     return
                 by_date.setdefault(date, {})[index_of[spec]] = (
                     -2147483648 if ic is None else int(round(ic * 100000)),
@@ -434,19 +479,19 @@ class AlphaBatteryShort(QCAlgorithm):
                     int(round(l20 * 1000000)),
                     turns[0], turns[1], turns[2],
                 )
-        self.Log(f"SPECS|{'|'.join(order)}")
-        self.Log("SCALE|layout=b64block_date_u32_i32x4_u16x3|ic=1e-5|ret=1e-6|turnover=1e-4")
-        self.Log(f"DATES|{len(by_date)}")
+        self.log(f"SPECS|{'|'.join(order)}")
+        self.log("SCALE|layout=b64block_date_u32_i32x4_u16x3|ic=1e-5|ret=1e-6|turnover=1e-4")
+        self.log(f"DATES|{len(by_date)}")
         for spec in order:
             rows = self.results[spec]
             names = sorted(r[8] for r in rows)
-            self.Log(f"SPECMETA|{spec}|median_names={names[len(names)//2]}"
+            self.log(f"SPECMETA|{spec}|median_names={names[len(names)//2]}"
                      f"|periods={len(rows)}")
         records = []
         for date in sorted(by_date):
             cells = by_date[date]
             if set(cells) != set(range(len(order))):
-                self.Error(f"INCOMPLETE|missing_date_specs|{date}")
+                self.error(f"INCOMPLETE|missing_date_specs|{date}")
                 return
             payload = struct.pack(">I", int(date.replace('-', '')))
             payload += b"".join(struct.pack(">iiiiHHH", *cells[index])
@@ -455,5 +500,5 @@ class AlphaBatteryShort(QCAlgorithm):
         for start in range(0, len(records), 10):
             block = records[start:start + 10]
             encoded = base64.b64encode(b"".join(block)).decode("ascii")
-            self.Log(f"B64BLOCK|{len(block)}|{encoded}")
-        self.Log(f"orders placed: {self.Transactions.OrdersCount}")
+            self.log(f"B64BLOCK|{len(block)}|{encoded}")
+        self.log(f"orders placed: {self.transactions.orders_count}")

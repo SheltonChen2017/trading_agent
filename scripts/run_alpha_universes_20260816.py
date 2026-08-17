@@ -39,6 +39,7 @@ from scripts.run_alpha_battery_20260815 import (  # noqa: E402
     ENTRY_LAG,
     alpha_momentum,
     alpha_reversal,
+    drift_weights,
     net_of_costs,
     one_way_turnover,
     performance,
@@ -179,6 +180,7 @@ def evaluate_universe(
 def _portfolio(frame: pd.DataFrame, construction: str, fraction: float):
     returns, turnovers, counts = {}, {}, []
     previous: dict[str, float] | None = None
+    previous_outcomes: dict[str, float] | None = None
     for date, group in frame.groupby("as_of_session", sort=True):
         ranked = group.sort_values("score", ascending=False)
         cut = max(1, int(round(len(ranked) * fraction)))
@@ -196,9 +198,17 @@ def _portfolio(frame: pd.DataFrame, construction: str, fraction: float):
         if not np.isfinite(value):
             continue
         returns[date] = float(value)
-        turnovers[date] = one_way_turnover(previous, weights)
+        drifted = drift_weights(previous, previous_outcomes or {})
+        if drifted is None:
+            continue
+        turnovers[date] = one_way_turnover(drifted, weights)
         counts.append(len(weights))
         previous = weights
+        previous_outcomes = {
+            str(ticker): float(outcome)
+            for ticker, outcome in zip(group["ticker"], group["outcome"])
+            if str(ticker) in weights and np.isfinite(outcome)
+        }
     return pd.Series(returns).sort_index(), pd.Series(turnovers).sort_index(), counts
 
 

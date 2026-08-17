@@ -65,6 +65,15 @@ LEGACY_ATTRIBUTES = {
     "DollarVolume", "MarketCap", "CompanyProfile", "SharesOutstanding",
     "AssetClassification", "MorningstarIndustryCode", "FinancialStatements",
     "IncomeStatement", "BalanceSheet", "CashFlowStatement", "OperationRatios",
+    # CCR3-C: every remaining PascalCase counterpart of a member these files
+    # actually access. A LONE legacy leaf (`.GrossProfit.value`) survived the
+    # guard because only chain roots and `.Value` were listed — the same
+    # incomplete-inventory shape as CR2-001, one level down. Enum members are
+    # included because `Resolution.Daily` is legacy exactly like `SetCash`.
+    "Price", "AdjustedPrice", "GrossProfit", "TotalAssets", "TotalDebt",
+    "NetIncome", "FreeCashFlow", "ROE", "ROA", "GrossMargin",
+    "MorningstarSectorCode", "TotalEquityGrossMinorityInterest",
+    "Daily", "Adjusted", "Raw", "Delisted",
 }
 
 
@@ -361,4 +370,33 @@ def test_backtest_waiter_stalls_even_when_progress_is_never_published(monkeypatc
     with pytest.raises(QuantConnectError, match="no progress.*progress=None.*inspect"):
         runner._wait_for_backtest(
             Client(), 123, "backtest", max_wait_seconds=100, stall_seconds=10
+        )
+
+
+def test_backtest_waiter_raises_on_the_overall_deadline_instead_of_returning(monkeypatch):
+    """CCR3-B: the OUTER deadline path was untested.
+
+    Both stall tests hold progress constant, so a mutation making the final
+    timeout RETURN a fake result survived the suite — and a returned dict
+    flows straight into the provenance summary as if the run completed. A
+    run whose progress keeps advancing must still raise once the total wait
+    is exhausted, never hand back an incomplete backtest as a result.
+    """
+    from research.quantconnect import QuantConnectError
+    from scripts import run_quantconnect_smoke as runner
+
+    class Client:
+        calls = 0
+
+        def read_backtest(self, project_id, backtest_id):
+            self.calls += 1
+            # Progress ADVANCES on every poll: the stall detector never fires.
+            return {"backtest": {"completed": False, "progress": self.calls / 100.0}}
+
+    moments = iter((0.0, 0.0, 0.0, 4.0, 4.0, 8.0, 8.0, 12.0))
+    monkeypatch.setattr(runner.time, "monotonic", lambda: next(moments))
+    monkeypatch.setattr(runner.time, "sleep", lambda _seconds: None)
+    with pytest.raises(QuantConnectError, match="did not finish within.*inspect"):
+        runner._wait_for_backtest(
+            Client(), 123, "backtest", max_wait_seconds=10, stall_seconds=10
         )

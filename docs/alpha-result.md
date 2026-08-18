@@ -441,6 +441,29 @@ plus a local wiped-out-book return-retention test; four reverse mutations
 **PENDING independent review together with `49e8160`; B_core reruns after
 as a new R-number.**
 
+## R-011 — Stage 0 monthly battery, B_core, zombie-name fix (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-010) |
+| **Research look** | Counted real-market run (run-level count 11 → 12); 40 repeated cells emitted |
+| **Source commit** | `e2ed7eb` (contains Claude fixes `49e8160` and `d305ea0`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `f571e516a6fa8e55689030150e505d30af5ac97226051493770a24ab159f2330` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run7_monthly_B_r011.json`) |
+| **QC project** | `35290755` — requested `7. MONTHLY_BATTERY_B_CORE - 20260817`, returned `7 MONTHLY_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `d681949544dcd20d117dd6fee048eb10-1a9ee502e4a13d70722065662d8df838` |
+| **Backtest ID** | `a6d44d74ba1f9497fd87cd588c0dca6c` |
+| **Launched / completed (UTC)** | 2026-08-18T00:11:51.703542+00:00 / 2026-08-18T00:20:06.844904+00:00; 32,054,443 data points; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` (identical universe numbers to R-006/R-008/R-010) |
+| **Output** | COMPLETE: all ten specs, `DATES\|142` = 142 rows (2013-02..2024-11, same depth as A_large's R-009), 10 SPECMETA lines with per-spec periods 116..133 (vs R-010's collapsed 3..42). The raw cloud log **round-trips through the frozen parser** (1,233 spec-rows). Unavailable-turnover fields present as designed: 89/54/94 rows (long_short/long_only_10/long_only_20) spread across ALL ten specifications (8–18 dates each) — every spec chain survived a trapped zombie name and retried instead of dying. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run7_monthly_B_r011.log`, 161 lines, exact-file sha256:`351665870750f3505bd5bfec48a85220faad9dcbd27f746f378c7e1dfefb70f9` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`d305ea0` pass independent review; the ~7% of months with unavailable turnover are each charged the conservative full 1.0 one-way at analysis, with counts disclosed per construction |
+
+The zombie-name defect is now closed in the cloud, not only in simulation:
+B_core — the universe that killed R-006 (weekend labels), R-008 (refusal
+spiral), and R-010 (zombie names) — has produced its first complete,
+parseable monthly-battery output at full 142-date depth. Monthly coverage
+of Stage 0 now has both A_large (R-009) and B_core (R-011) awaiting review;
+C_broad is next.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

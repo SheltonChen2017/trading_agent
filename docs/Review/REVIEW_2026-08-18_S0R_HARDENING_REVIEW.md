@@ -290,7 +290,8 @@ python -m pytest -q tests/test_alpha_stage1_hardening.py tests/test_qc_alpha_bat
     tests/test_alpha_battery_short_emitter.py
     -> 102 passed in 5.86s
 python -m pytest -q
-    -> FULL_SUITE_PLACEHOLDER
+    -> 4246 passed, 25 warnings in 946.23s (0 failed) — independently
+       reproduces the exact figure fba1c0b records
 python -m compileall -q assistant backtest data execution ml risk scripts signals
     strategies tests baskets.py config.py market_analytics.py
     -> clean (exit 0)

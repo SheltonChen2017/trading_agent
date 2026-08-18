@@ -79,7 +79,13 @@ def _optional_finite(token: str, path_name: str, date: str, field: str):
     """
     if not token:
         return None
-    value = float(token)
+    try:
+        value = float(token)
+    except ValueError as exc:
+        # SHR-001: a malformed token refused via a typed error rather than
+        # a bare ValueError traceback. Same fail-closed direction either
+        # way; this makes the refusal diagnosable as log corruption.
+        raise InvalidLog(f"{path_name}: malformed {field} on {date}") from exc
     if not math.isfinite(value):
         raise InvalidLog(f"{path_name}: non-finite {field} on {date}")
     return value

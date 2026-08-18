@@ -380,7 +380,7 @@ red on the pre-fix tree in both directions. **Stage 0 remains halted
 pending independent review of these fixes; monthly A and B rerun after
 acceptance as new R-numbers.**
 
-## R-009 — Stage 0 monthly battery, A_large, spiral/parser fixes (PENDING_REVIEW)
+## R-009 — Stage 0 monthly battery, A_large, spiral/parser fixes (VALID)
 
 | Field | Value |
 |---|---|
@@ -441,7 +441,7 @@ plus a local wiped-out-book return-retention test; four reverse mutations
 **PENDING independent review together with `49e8160`; B_core reruns after
 as a new R-number.**
 
-## R-011 — Stage 0 monthly battery, B_core, zombie-name fix (PENDING_REVIEW)
+## R-011 — Stage 0 monthly battery, B_core, zombie-name fix (VALID)
 
 | Field | Value |
 |---|---|
@@ -464,7 +464,7 @@ parseable monthly-battery output at full 142-date depth. Monthly coverage
 of Stage 0 now has both A_large (R-009) and B_core (R-011) awaiting review;
 C_broad is next.
 
-## R-012 — Stage 0 monthly battery, C_broad, zombie-name fix (PENDING_REVIEW)
+## R-012 — Stage 0 monthly battery, C_broad, zombie-name fix (VALID)
 
 | Field | Value |
 |---|---|
@@ -521,7 +521,7 @@ that turnover is a COST input, never a gate. Fix round follows: an absence-
 aware packed layout plus turnover-unavailability sentinel, with the v1
 decoder retained so R-002's historical logs stay readable.
 
-## R-014 — Stage 0 short battery, A_large, absence-aware format (PENDING_REVIEW)
+## R-014 — Stage 0 short battery, A_large, absence-aware format (VALID)
 
 | Field | Value |
 |---|---|
@@ -545,7 +545,7 @@ role of R-002's A_large leg for Stage 0 purposes; R-002 remains in the
 ledger untouched and its v1 logs remain decodable. Next in the serial plan:
 short B_core, short C_broad, then the three benchmarks.
 
-## R-015 — Stage 0 short battery, B_core, absence-aware format (PENDING_REVIEW)
+## R-015 — Stage 0 short battery, B_core, absence-aware format (VALID)
 
 | Field | Value |
 |---|---|
@@ -567,7 +567,7 @@ specs) are the honest cost of a mid-cap universe with more disappearing
 names; every absence is declared per date by the presence mask and per spec
 by SPECMETA. Next: short C_broad, then the three benchmarks.
 
-## R-016 — Stage 0 short battery, C_broad, absence-aware format (PENDING_REVIEW)
+## R-016 — Stage 0 short battery, C_broad, absence-aware format (VALID)
 
 | Field | Value |
 |---|---|
@@ -587,6 +587,11 @@ Both alpha families are now complete in the cloud on the fixed code across
 all three universes: monthly (R-009, R-011, R-012) and short (R-014, R-015,
 R-016), all PENDING_REVIEW on the same review range. Only the three
 equal-weight benchmark runs remain; they are not alpha cells.
+
+*Current-status note (2026-08-18, closes review finding S0R2-001): the
+paragraph above described the state at battery time and is superseded —
+all nine runs were upgraded to VALID on owner acceptance (`2be903f`) and
+the single analyser pass has since run (entry A-001 below).*
 
 ## R-017 — Stage 0 universe benchmark, A_large, silent die-off (INVALIDATED)
 
@@ -678,7 +683,7 @@ which penalises rather than flatters alpha claims measured against it —
 conservative in the correct direction for a baseline. All three benchmark
 universes will be rerun on the extended contract for uniformity.
 
-## R-020 — Stage 0 universe benchmark, B_core, underfill-recording (PENDING_REVIEW)
+## R-020 — Stage 0 universe benchmark, B_core, underfill-recording (VALID)
 
 | Field | Value |
 |---|---|
@@ -699,7 +704,7 @@ spans the full period with every underfilled month recorded rather than
 dropped. C_broad and the A_large rerun (for five-field uniformity across
 all three universes) remain.
 
-## R-021 — Stage 0 universe benchmark, C_broad, underfill-recording (PENDING_REVIEW)
+## R-021 — Stage 0 universe benchmark, C_broad, underfill-recording (VALID)
 
 | Field | Value |
 |---|---|
@@ -718,7 +723,7 @@ all three universes) remain.
 Only the A_large benchmark rerun remains (five-field uniformity across all
 three universes; its R-018 log predates the underfill-recording contract).
 
-## R-022 — Stage 0 universe benchmark, A_large, underfill-recording (PENDING_REVIEW)
+## R-022 — Stage 0 universe benchmark, A_large, underfill-recording (VALID)
 
 | Field | Value |
 |---|---|
@@ -742,6 +747,12 @@ R-015 (B_core), R-016 (C_broad). Benchmark: R-022 (A_large), R-020
 frozen analysers run once, with full run identities, only after the review
 gate — so look accounting and result identity are recorded before any
 statistic exists, exactly as the R-002 precedent required.
+
+*Current-status note (2026-08-18, closes review finding S0R2-001): the
+paragraph above was written before the review gate cleared and is
+superseded — the review pair was owner-accepted, the nine runs are
+VALID (`2be903f`), and the single frozen-analyser observation exists as
+entry A-001 immediately below.*
 
 ## A-001 — Stage 0 single frozen-analyser pass (OBSERVED, 2026-08-18)
 

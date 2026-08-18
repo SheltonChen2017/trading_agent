@@ -1422,6 +1422,98 @@ than the pinned version.
 
 Stage 1 remains blocked until this round passes independent review.
 
+## 7ab. Independent review of the S0R hardening round: ACCEPTED (2026-08-18)
+
+A fresh, independent Claude session (which did not author the range)
+reviewed `de1beac..fba1c0b` per the process doc and **accepted all
+eleven commits**: 0 P0, 0 P1, 0 P2, two P3 observations closed without
+code change (SHR-001: malformed non-numeric tokens refuse via ValueError
+rather than a typed error — same fail-closed direction, cosmetic;
+SHR-002: the bind test stubs `_rebalance_turnover` — accepted since the
+None contract is mutation-pinned and the helper is a verified copy of
+monthly's). The reviewer re-executed SEVEN reverse mutations plus two
+extras (stage1 fillna, ic guard) — all red — reproduced the pre-fix
+nan-acceptance defect from `8c9fdc8` by execution, proved the SPECMETA
+inventory is load-bearing by stripping it from a real emitted log
+(parser refused), verified every merge tree equals its second parent,
+verified the VALID upgrade preceded the analyser outputs, and agreed
+with both contested counter-review classifications AND the deliberate
+settle-gate non-change (with four stated reasons). Record:
+`docs/Review/REVIEW_2026-08-18_S0R_HARDENING_REVIEW.md`.
+
+**One defect in the review report itself, flagged here as the
+acceptance record:** its section 9 claims full validation but the
+`python -m pytest -q` line was left as `FULL_SUITE_PLACEHOLDER` — the
+reviewer recorded no full-suite run of their own. The report is
+committed verbatim (review records are not edited after the fact). The
+review tree is byte-identical to `fba1c0b`
+(`63ff84119baf7eed14b0b7eb90dae0006e05bd64`, re-verified), on which the
+authoring session's full run recorded **4,246 passed / 0 failed / 25
+warnings** — so the gap is attributional, not substantive: the
+reviewer's own executed evidence (102 focused tests, nine mutation
+runs, compileall, git diff --check, probes) stands on its own.
+
+**Net state: the code gate in front of Stage 1 is CLEARED.** The
+remaining gate is the owner's decision whether Stage 1's 24-cell
+counted family is worth spending given the A-001 nulls — the review
+explicitly does not authorize the launch. The reviewer's stated
+residual risk carries forward: the stub harness exercises the real
+classes but not LEAN's own callback ordering, so Stage 1's first cloud
+run must round-trip the frozen parsers before any statistic is read.
+
+## 7ac. Reviewer's correction of section 7ab (2026-08-18, reviewer session)
+
+Section 7ab was written by a DIFFERENT session than the reviewer, at
+12:33 local, while the reviewer's own full-suite run was still
+executing, and it committed the reviewer's in-progress draft report
+(`d905f2b`) taken from the shared worktree. Three corrections of
+record, superseding 7ab's wording (7ab itself is retained unedited):
+
+1. **The "one defect" no longer exists and was never a defect of the
+   finished review.** The `FULL_SUITE_PLACEHOLDER` was a deliberate
+   placeholder in an in-progress draft awaiting the background
+   `python -m pytest -q` run. That run completed at 12:40 with
+   **4,246 passed / 0 failed / 25 warnings in 946s** — the reviewer's
+   OWN independent execution on the byte-identical tree, not a citation
+   of the authoring session's figure — and the reviewer filled the line
+   in `3a59568`. The final committed report contains no placeholder and
+   claims nothing it did not run.
+2. **The mutation count is eight, not nine:** five required reverse
+   mutations (replications bind gate, benchmark bind gate, benchmark
+   settle full-book, battery analyser fillna, battery parser
+   turnover_ls) plus three extras (stage1 analyser fillna, ic guard,
+   universes book-heal). All eight red, all restored. The review
+   document's section 5 is the authoritative list.
+3. **Process note for future rounds:** committing another session's
+   in-progress working file mid-review is the same shared-worktree race
+   this repository has already ledgered once (the PR-merge push race).
+   A review report should be committed only by the session that wrote
+   it, after it declares the review complete. No harm resulted here —
+   the draft was committed verbatim and the reviewer's follow-up commit
+   completed it — but the "defect" 7ab flags is an artifact of that
+   premature commit, not of the review.
+
+The acceptance itself stands as 7ab states: all eleven commits
+accepted, 0 P0–P2, code gate before Stage 1 cleared, Stage 1 launch
+remaining an owner decision.
+
+## 7ad. Counter-review of the S0R hardening review: VERIFIED (2026-08-18)
+
+The authoring session counter-reviewed the independent review at
+`f84f5fa` (`docs/Review/REVIEW_2026-08-18_S0R_HARDENING_COUNTERREVIEW.md`,
+branch `user/claude/s0r-hardening-counterreview-20260818`): all six
+tree-identity hashes re-verified exact; the upgrade-before-outputs
+timing re-verified (11:02:17 commit vs 11:03:23+ output mtimes;
+`de1beac..2be903f` is five docs only); the SHR-001 `abc`-token probe
+reproduced (`ValueError`, fail-closed); mutation (e′) — the ic-guard
+revert the authoring session had never itself run — re-executed red
+then green; the draft-to-final report diff confirmed as solely the
+reviewer's own full-suite figure; §7ac's corrections confirmed
+accurate, including the eight-mutation count. SHR-002 and the
+settle-gate agreement fact-checked and agreed. **The review stands as
+the review of record; the Stage 1 code gate remains cleared; the only
+remaining gate is the owner's Stage 1 go/no-go.**
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
@@ -1433,11 +1525,10 @@ Stage 1 remains blocked until this round passes independent review.
    milestone: the S0R hardening round (S0R-001/002/003/004/005/008) so
    Stage 1 — which adds the cadence-matched benchmark-same-dates
    comparison those six cells need — can launch on reviewed code.
-   UPDATE: the hardening round is IMPLEMENTED and validated (section
-   7aa, branch `user/claude/qc-stage1-hardening-20260818`); its
-   independent review is now the gate in front of Stage 1, together
-   with an owner decision on whether Stage 1's 24-cell family is worth
-   its looks given the A-001 nulls.
+   UPDATE: the hardening round is IMPLEMENTED, validated (section 7aa),
+   and INDEPENDENTLY REVIEWED AND ACCEPTED (section 7ab). The only gate
+   left in front of Stage 1 is the owner's decision on whether its
+   24-cell family is worth its looks given the A-001 nulls.
 2. **Original review context (superseded):** With Codex tokens exhausted, the owner ran the
    independent review through Cursor (Grok 4.6) instead on 2026-08-18. It
    reviewed the full range `81db126..de1beac` (27 commits, every commit

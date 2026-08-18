@@ -821,7 +821,7 @@ identity check with no directional or performance content and is not
 analyser output; the R-022 text stands unedited per the append-only
 rule, with this entry as the clarification of record.
 
-## R-023 — Stage 1 replications, A_large, reviewed code (UNANALYSED)
+## R-023 — Stage 1 replications, A_large, reviewed code (VALID)
 
 First Stage 1 cloud run, on fully reviewed code (`602dc0b` chain:
 author + fresh-Claude + two Cursor rounds), launched under the owner GO
@@ -840,9 +840,9 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Launched / completed (UTC)** | 2026-08-18T21:31:01.441083+00:00 / 2026-08-18T21:32:10.519438+00:00 |
 | **Output** | STRUCTURALLY COMPLETE: both specs declared and parsed; DATES 142; 281 spec-date rows (REP_H52 140, REP_IDV 141 — per-spec raggedness round-tripped through the SPECMETA inventory, the first cloud proof of the S0R-001/R-007 hardening); coverage 2013-01..2024-10 (300-session warm-up head, 21-session settle tail); 4 declared-unavailable turnovers (all long-only-20), charged 1.0 at analysis; 0 INCOMPLETE lines; `cap_rows=178769 cap_fallback=16826 cap_missing=3206`. Orders/holdings $0.00 — inert as designed. Structural inspection only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage1_20260818/run19_stage1_A.log`, 153 lines, exact-file sha256:`85aa8e0aecd0775758abd8624c487a7d9e9b9d94cc758a441a96b242bbea0668` |
-| **Validity** | **UNANALYSED** — complete output on reviewed code; the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+| **Validity** | **VALID** — reviewed code, complete output, analysed once in A-002 |
 
-## R-024 — Stage 1 replications, B_core, reviewed code (UNANALYSED)
+## R-024 — Stage 1 replications, B_core, reviewed code (VALID)
 
 | Field | Value |
 |---|---|
@@ -857,9 +857,9 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Launched / completed (UTC)** | 2026-08-18T21:33:38.416479+00:00 / 2026-08-18T21:37:24.099760+00:00 |
 | **Output** | STRUCTURALLY COMPLETE: both specs; DATES 128; 248 spec-date rows (REP_H52 123, REP_IDV 125), coverage 2013-01..2024-09/10. Lower date coverage than A_large's 142 is the disclosed settle-side contract on the zombie-heavier universe (a spec-date needs every book name priced at settlement; drops are visible via SPECMETA periods), NOT a series die-off — the bind-side channel worked as designed, with 74 declared-unavailable turnover cells across the six constructions charged 1.0 at analysis. 0 INCOMPLETE lines; `cap_rows=312696 cap_fallback=35268 cap_missing=7291`. Inert. Structural inspection only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage1_20260818/run20_stage1_B.log`, 139 lines, exact-file sha256:`6c7a05e07efb5329a7310ffc46ba84145f798c8f37c050b40e7dc24936f28963` |
-| **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+| **Validity** | **VALID** — reviewed code, complete output, analysed once in A-002 |
 
-## R-025 — Stage 1 replications, C_broad, reviewed code (UNANALYSED)
+## R-025 — Stage 1 replications, C_broad, reviewed code (VALID)
 
 | Field | Value |
 |---|---|
@@ -874,9 +874,9 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Launched / completed (UTC)** | 2026-08-18T21:38:17.939566+00:00 / 2026-08-18T21:43:37.841048+00:00 |
 | **Output** | STRUCTURALLY COMPLETE: both specs; DATES 117; 219 spec-date rows (REP_H52 110, REP_IDV 109), coverage 2013-01..2024-09/10. The coverage gradient across universes (A_large 142 → B_core 128 → C_broad 117 dates) tracks zombie density monotonically under the disclosed settle contract; 134 declared-unavailable turnover cells across the six constructions, charged 1.0 at analysis; 0 INCOMPLETE lines; `cap_rows=429848 cap_fallback=52239 cap_missing=12771`. Inert. Structural inspection only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage1_20260818/run21_stage1_C.log`, 128 lines, exact-file sha256:`76de5389e176297568eb25384d61edb8f10ee20376c2949d56ba37a21aaaf313` |
-| **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+| **Validity** | **VALID** — reviewed code, complete output, analysed once in A-002 |
 
-## R-026 — Stage 1 benchmark, A_large, reviewed code (UNANALYSED)
+## R-026 — Stage 1 benchmark, A_large, reviewed code (VALID)
 
 | Field | Value |
 |---|---|
@@ -890,9 +890,9 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Launched / completed (UTC)** | 2026-08-18T21:44:26.806992+00:00 / 2026-08-18T21:45:07.053844+00:00 |
 | **Output** | STRUCTURALLY COMPLETE: **154 gapless months** (2012-01..2024-10 — no warm-up head, 21-session settle tail), a strict superset of R-023's alpha dates, so the analyser's benchmark-same-dates matching cannot refuse. 5 declared-unavailable turnovers and 6 underfilled months disclosed (five-field BROW — first cloud proof of the S0R-002 port); 0 INCOMPLETE lines. Inert. Structural inspection only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage1_20260818/run22_s1bench_A.log`, 161 lines, exact-file sha256:`6cded4c9ebe3fb752b7f51f1bb4fd244f256ab67691c2e275e6e77987f050547` |
-| **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+| **Validity** | **VALID** — reviewed code, complete output, analysed once in A-002 |
 
-## R-027 — Stage 1 benchmark, B_core, reviewed code (UNANALYSED)
+## R-027 — Stage 1 benchmark, B_core, reviewed code (VALID)
 
 | Field | Value |
 |---|---|
@@ -906,9 +906,9 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Launched / completed (UTC)** | 2026-08-18T21:45:55.836023+00:00 / 2026-08-18T21:48:38.753072+00:00 |
 | **Output** | STRUCTURALLY COMPLETE: 154 gapless months (2012-01..2024-10); R-024's alpha dates verified a subset of the benchmark months. 33 declared-unavailable turnovers and 29 underfilled months disclosed; 0 INCOMPLETE lines. Inert. Structural inspection only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage1_20260818/run23_s1bench_B.log`, 161 lines, exact-file sha256:`39d04138eabb9e17856a4d1ef146d99e271d086fdfa4f380fd61a84e7f0d3c1b` |
-| **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+| **Validity** | **VALID** — reviewed code, complete output, analysed once in A-002 |
 
-## R-028 — Stage 1 benchmark, C_broad, reviewed code (UNANALYSED)
+## R-028 — Stage 1 benchmark, C_broad, reviewed code (VALID)
 
 | Field | Value |
 |---|---|
@@ -922,7 +922,7 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Launched / completed (UTC)** | 2026-08-18T21:49:35.177290+00:00 / 2026-08-18T21:52:52.494640+00:00 |
 | **Output** | STRUCTURALLY COMPLETE: 154 gapless months (2012-01..2024-10); R-025's alpha dates verified a subset. 53 declared-unavailable turnovers and 55 underfilled months disclosed — the heaviest disclosure of the three, consistent with the broadest universe; 0 INCOMPLETE lines. Inert. Structural inspection only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage1_20260818/run24_s1bench_C.log`, 161 lines, exact-file sha256:`79162d8b9fecc291346a5c1cd81c07fac580c8f17b841dc40d2dae09bea24fbf` |
-| **Validity** | **UNANALYSED** — superseded by the single analyser pass recorded below this battery's entries |
+| **Validity** | **VALID** — reviewed code, complete output, analysed once in A-002 |
 
 **The six-run Stage 1 battery is complete on reviewed code, first attempt,
 zero refusals.** Replications: R-023 (A_large), R-024 (B_core), R-025
@@ -932,6 +932,56 @@ is covered by its benchmark. Per the owner GO and recorded sequence
 (handoff 7af/7ag), the frozen Stage 1 analyser now runs ONCE — the only
 step at which any Stage 1 statistic is observed. Stage gate 0.05/24;
 lifetime cell floor 428 → 452 at this observation.
+
+## A-002 — Stage 1 single frozen-analyser pass (OBSERVED, 2026-08-18) — NULL; the program closes
+
+The one preregistered observation of the Stage 1 24-cell family, run
+after all six runs completed structurally (R-023..R-028, upgraded to
+VALID in this same commit via the proper UNANALYSED→VALID rung).
+
+| Field | Value |
+|---|---|
+| **What** | `scripts/analyse_qc_alpha_stage1.py` run ONCE over the three alpha logs and three cadence-matched benchmark logs with full run identities. |
+| **Invocation note** | The first invocation (`python scripts/analyse_qc_alpha_stage1.py`) crashed at import — the script lacks the `sys.path` bootstrap its two sibling analysers carry, so script-mode cannot resolve the `scripts` package. It touched no data and observed nothing. The successful pass used `python -m scripts.analyse_qc_alpha_stage1` from the repo root: identical frozen bytes, no code change. The missing bootstrap is a P3 for the next hardening round. |
+| **Code identity** | Analyser tree at `875d003` (merged main; the `602dc0b` chain independently reviewed by fresh-Claude and two Cursor rounds). |
+| **Output** | `artifacts/qc_stage1_20260818/analysis_stage1_20260818.json`, 73,283 bytes, sha256 `02c5cbd988ce38a2db3735eb236723efdca4675ba45935b1a33d6a16d65700d4` (machine-local; hash recorded here). |
+| **Multiplicity** | Stage family 24 cells, gate 0.05/24 = 2.083e-3; **lifetime cell floor 428 → 452**, lifetime gate 0.05/452 = 1.106e-4; 20,000 draws, smallest attainable p 5.0e-5 < both gates. First and only observation of the family. |
+
+**Results against the frozen gates:**
+
+- **IC (the signal test): 0 of 6 cells pass either gate.** Best:
+  REP_IDV/C_broad ic_p = 3.20e-3, above the 2.08e-3 stage gate; the
+  other five range 0.026–0.493.
+- **Long-short (self-financing, beta-free): 0 of 6 cells pass.** All
+  p ≥ 0.129, and three of the six gross Sharpes are NEGATIVE
+  (REP_H52/B_core −0.13, REP_IDV/B_core −0.42, REP_IDV/C_broad −0.28).
+- **Long-only: 10 of 12 cells pass the stage gate** (4 of those also
+  under the lifetime gate) on the frozen gross-mean-vs-zero test — and
+  the cadence-matched benchmark now shows directly what Stage 0 could
+  only argue: the passing cells' gross Sharpes (0.84–1.01) sit on top
+  of their own universes' same-dates equal-weight benchmarks (A_large
+  0.80, B_core 0.83, C_broad 0.78). The long-only clears are the
+  market, not selection; the constructions that isolate selection (IC,
+  long-short) are null everywhere.
+- **Benchmarks (same dates as each alpha):** A_large n=142 CAGR 12.3%
+  Sharpe 0.80 maxDD −23.3%; B_core n=128 15.0%/0.83/−31.9%; C_broad
+  n=117 14.1%/0.78/−33.3%. Disclosure: unavailable-turnover months
+  5/32/45 and underfilled months 6/15/30 respectively, all charged or
+  recorded per the reviewed contracts.
+
+**Verdict: NULL.** No cell of either Stage 1 specification shows
+selection edge on any universe. This is the second full family
+(Stage 0's 180 cells, Stage 1's 24) with zero beta-free passes, on top
+of eleven earlier local signals — all consistent with the measured
+power ceiling of this universe/data combination.
+
+**Preregistered consequence (owner GO of 2026-08-18, handoff 7af):
+the cross-sectional alpha program on this universe is CLOSED.** No
+further signal variants, threshold tweaks, or family repeats. Research
+effort redirects to the workstreams with surviving evidence (portfolio
+construction, risk, paper-observation infrastructure). Any future
+reopening requires a new owner decision, a new universe or data source,
+and a fresh preregistration — never a rehabilitation of these results.
 
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 

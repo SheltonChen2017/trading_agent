@@ -1576,6 +1576,35 @@ ordering, so the first run's round-trip is the real integration test;
 structurally — the only step at which any Stage 1 statistic is
 observed (stage gate 0.05/24; lifetime gate 0.05/452).
 
+## 7ah. Stage 1 complete: NULL on every beta-free cell; the alpha program closes (2026-08-18)
+
+The six serial cloud runs (R-023..R-028, projects 19–24) all completed
+structurally on the FIRST attempt with zero refusals — the S0R-hardened
+contracts (SPECMETA raggedness, declared-unavailable turnover,
+underfill recording, five-field BROW) all proved themselves in the
+cloud. The frozen Stage 1 analyser then ran ONCE (ledger entry A-002;
+run-level looks ended at 29; lifetime cell floor 428 → 452).
+
+**Result: NULL.** IC 0/6 (best 3.2e-3 vs gate 2.08e-3); long-short 0/6
+with three negative Sharpes; the 10/12 long-only stage-gate clears sit
+directly on top of their own same-dates equal-weight benchmarks
+(cell Sharpes 0.84–1.01 vs benchmark 0.78–0.83) — the matched-benchmark
+design did exactly what it was built for, showing the long-only passes
+are market beta, not selection.
+
+**The preregistered consequence executed: the cross-sectional alpha
+program on this universe is CLOSED** (A-002; owner GO protocol,
+section 7af). Two full families (180 + 24 cells) with zero beta-free
+passes, after eleven null local signals, against a measured 2–4% MDE
+power ceiling. Effort redirects to portfolio construction, risk, and
+paper-observation infrastructure.
+
+One operational defect found at the analysis step: the Stage 1 analyser
+lacks the `sys.path` bootstrap of its siblings, so script-mode
+invocation crashes at import (module-mode `python -m` was used; frozen
+bytes unchanged; no data touched by the failed attempt). P3, backlog
+for the next hardening round alongside SHR-001.
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

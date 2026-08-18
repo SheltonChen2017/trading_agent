@@ -859,6 +859,23 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Raw log** | `artifacts/qc_stage1_20260818/run20_stage1_B.log`, 139 lines, exact-file sha256:`6c7a05e07efb5329a7310ffc46ba84145f798c8f37c050b40e7dc24936f28963` |
 | **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
 
+## R-025 — Stage 1 replications, C_broad, reviewed code (UNANALYSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Stage 1 replications: REP_H52, REP_IDV (as R-023) |
+| **Multiplicity family** | Stage 1 replications 2026-08-18, 24 cells (as R-023) |
+| **Research look** | Counted real-market run (run-level count 25 → 26); no statistic observed |
+| **Source commit** | `875d003` |
+| **Uploaded source SHA-256** | `fa109519f1cf3a1c62abf04b38d94579edeba61b84fd7332d2e4bf379d2ee236` (`ACTIVE_UNIVERSE="C_broad"` rewrite; recorded in `run21_stage1_C.json`) |
+| **QC project** | `35332045` — `21. STAGE1_REPLICATIONS_C_BROAD - 20260818` |
+| **Compile ID** | `93678192cb74d1a8329dfb112838a4aa-507b4beaa16db59a5e99152af844ad13` |
+| **Backtest ID** | `17e298a2d4f7b756c32f3520224a675b` |
+| **Launched / completed (UTC)** | 2026-08-18T21:38:17.939566+00:00 / 2026-08-18T21:43:37.841048+00:00 |
+| **Output** | STRUCTURALLY COMPLETE: both specs; DATES 117; 219 spec-date rows (REP_H52 110, REP_IDV 109), coverage 2013-01..2024-09/10. The coverage gradient across universes (A_large 142 → B_core 128 → C_broad 117 dates) tracks zombie density monotonically under the disclosed settle contract; 134 declared-unavailable turnover cells across the six constructions, charged 1.0 at analysis; 0 INCOMPLETE lines; `cap_rows=429848 cap_fallback=52239 cap_missing=12771`. Inert. Structural inspection only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage1_20260818/run21_stage1_C.log`, 128 lines, exact-file sha256:`76de5389e176297568eb25384d61edb8f10ee20376c2949d56ba37a21aaaf313` |
+| **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

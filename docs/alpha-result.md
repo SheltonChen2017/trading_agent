@@ -304,6 +304,240 @@ unreachable gate and ABR-003's unit mismatch); that lesson remains part of
 the durable audit record even though the invalid generated files are no
 longer presented as active documentation.
 
+**Stage 0 rerun gate (2026-08-17, after R-005/R-006):** Codex's launch-round
+correction head `81db126` was counter-reviewed and accepted the same day
+(`docs/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_COUNTERREVIEW.md`); the
+counter-review added tests only. Stage 0 resumes serially at **R-007** from
+the accepted product tree, one backtest at a time, with new immutable
+evidence paths and new project numbers. The weekend-label factor defect is
+not declared closed until the corrected monthly run passes its completeness
+guard in the cloud.
+
+## R-007 — Stage 0 monthly battery, A_large, corrected code (UNANALYSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-005's family) |
+| **Research look** | Counted real-market run (run-level count 7 → 8); 40 repeated cells emitted (10 specs × 4 outcomes) |
+| **Multiplicity family** | QC alpha battery 2026-08-16, 180 cells; lifetime floor stays 428 |
+| **Source commit** | `75ad8dc` (product tree identical to accepted review head `81db126`) |
+| **Uploaded source SHA-256** | recorded in `run3_monthly_A_r007.json` (`ACTIVE_UNIVERSE="A_large"` rewrite) |
+| **QC project** | `35289096` — requested `3. MONTHLY_BATTERY_A_LARGE - 20260817`, returned `3 MONTHLY_BATTERY_A_LARGE - 20260817` |
+| **Compile ID** | `cd95739866906027d85df5c14e4652d3-6df45b581037ee1efc8de43eda2c77cc` |
+| **Backtest ID** | `8ea519e2754a5bf0280fa3148dad46a8` |
+| **Completed** | 130.16 s engine time, 27,299,669 points; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` (identical universe numbers to R-005) |
+| **Output** | **COMPLETE**: no `INCOMPLETE` marker; all ten specs declared; `DATES\|142` with 142 ROW lines |
+| **Raw log** | `artifacts/qc_stage0_20260817/run3_monthly_A_r007.log`, 151 lines, exact-file sha256:`a4c1669d600b52de87f9019ddaf992a9cfd56de2af0ec9888330c83cbf66035d` (bytes-exact write) |
+| **Validity** | **UNANALYSED** — complete raw output; statistics deferred to the frozen analyser after all nine Stage 0 runs, with full run identities |
+
+The weekend-label factor defect is now closed in the cloud, not only in
+simulation: the completeness guard that refused R-005/R-006 passed on the
+corrected code, and residual momentum emitted alongside every other
+specification. No statistic has been observed or computed from this output.
+
+**Status corrected to STALE the same day.** Post-run inspection found the
+run's rows carry per-date SPEC SUBSETS (specifications legitimately skip
+months independently), which the frozen parser refused as truncation — the
+algorithm's emission contract and the parser's completeness contract had
+never been consistent for the monthly battery, and this was the first run
+to reach the parser. The log also predates the SPECMETA per-spec count
+declaration that resolves it. R-007 is therefore unanalysable as recorded
+and is superseded by a rerun on corrected code; its identity, hashes, and
+look remain counted. Its only missing month is the benign 2024-12 tail
+cohort (settles beyond the window end).
+
+## R-008 — Stage 0 monthly battery, B_core, corrected code (INVALIDATED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-006's family) |
+| **Research look** | Counted real-market run (run-level count 8 → 9); 40 repeated cells emitted |
+| **Source commit** | `100bd0f` (product tree identical to accepted review head `81db126`) |
+| **Uploaded source SHA-256** | recorded in `run4_monthly_B_r008.json` (`ACTIVE_UNIVERSE="B_core"` rewrite) |
+| **QC project** | `35289185` — requested `4. MONTHLY_BATTERY_B_CORE - 20260817`, returned `4 MONTHLY_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `9184cf4829b55603eb1cb891e53d57cc-25c0bda49c1cafc56bdf0136f834980a` |
+| **Backtest ID** | `1329770d81d3c84573afc2638835111d` |
+| **Completed** | 563.28 s engine time, 31,945,614 points; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` |
+| **Output** | `DATES\|48` with 48 rows — continuous 2013-02..2017-01, then NOTHING for eight years |
+| **Raw log** | `artifacts/qc_stage0_20260817/run4_monthly_B_r008.log`, 57 lines, exact-file sha256:`c14bdc627830b43227175777f841158d2bf0bb5f17a78fdbb7edeb2efb51167a` |
+| **Validity** | **INVALIDATED** — a state-machine defect, not honest refusals, truncated coverage after 2017-01 |
+
+### The die-off and its root cause
+
+The clean truncation signature exposed an unrecoverable refusal spiral: one
+month in which every specification skipped left the settling-cohort
+`prior_outcomes` empty forever against non-empty stale weights, so every
+later bind refused. R-007 (A_large) simply never hit an all-skip month.
+Fix (same-day, local): drift outcomes now come from each book's own stored
+entry prices against current/terminal prices — the self-contained pattern
+Stage 1 and both benchmarks already used — so a refused month retries and
+recovers; stale-book names also survive universe removal so their prices
+stay observable. Together with the SPECMETA emission and the parser's
+SPECMETA-verified ragged-date acceptance (the R-007 defect), both fixes are
+pinned by `tests/test_alpha_battery_monthly_sim.py`'s forced-skip-month
+drive, which feeds the algorithm's own emitted log into the real parser —
+red on the pre-fix tree in both directions. **Stage 0 remains halted
+pending independent review of these fixes; monthly A and B rerun after
+acceptance as new R-numbers.**
+
+## R-009 — Stage 0 monthly battery, A_large, spiral/parser fixes (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-007) |
+| **Research look** | Counted real-market run (run-level count 9 → 10); 40 repeated cells emitted |
+| **Source commit** | `05929a5` (contains Claude fixes `49e8160`, not yet independently reviewed — hence PENDING_REVIEW at the owner's explicit direction to continue) |
+| **Uploaded source SHA-256** | recorded in `run5_monthly_A_r009.json` |
+| **QC project** | `35289732` — `5. MONTHLY_BATTERY_A_LARGE - 20260817` |
+| **Compile ID** | `57ba8b55f5f8359f537e88e6ced39eb8-684591190549d64f684d2fcf8440733b` |
+| **Backtest ID** | `7ebe7a44eef6bf8ff34e3a06205edaca` |
+| **Completed** | 207.93 s engine time; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` |
+| **Output** | COMPLETE: all ten specs, `DATES\|142` = 142 rows, 10 SPECMETA lines; the raw cloud log **round-trips through the frozen parser** (619 spec-rows; per-spec periods disclosed, e.g. GROSS 142, MOM_3 107, RESIDUAL 65, MOM_12/QUALITY 35, MULTI 23). Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run5_monthly_A_r009.log`, 161 lines, exact-file sha256:`7581a59c2bd8add5f61e10f03d3f3ff1c160704fcd78a04a43ff561245c61b9e` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160` passes independent review; rerun required only if that review finds a result-changing defect |
+
+## R-010 — Stage 0 monthly battery, B_core, spiral/parser fixes (INVALIDATED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-008) |
+| **Research look** | Counted real-market run (run-level count 10 → 11); 40 repeated cells emitted |
+| **Source commit** | `8957e32` (contains Claude fixes `49e8160`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `6592a89f9c03ca253379447732264748069c735d3b5afa77d732c5654224a415` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run6_monthly_B_r010.json`) |
+| **QC project** | `35289860` — requested `6. MONTHLY_BATTERY_B_CORE - 20260817`, returned `6 MONTHLY_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `24a386fbc64902dfd35456469070aae7-6ec3cc5fd0c91952f5785a9e5eb8b104` |
+| **Backtest ID** | `bb7d45db1fefda2f1e58aadd4e9c7621` |
+| **Launched / completed (UTC)** | 2026-08-17T23:37:07.782077+00:00 / 2026-08-17T23:46:24.398662+00:00 (543.61 s engine time); `cap_rows=312696 cap_fallback=35268 cap_missing=7291` |
+| **Output** | `DATES\|54`, rows 2013-02..2018-11 with PROGRESSIVE per-spec collapse (SPECMETA periods: GROSS 8, MOM_3 8, MOM_6 3, QUALITY_COMPOSITE 3, MOM_12/MOM_9/QUALITY_MOMENTUM 35, RESIDUAL_6 42) — each specification dies at a different date and never returns |
+| **Raw log** | `artifacts/qc_stage0_20260817/run6_monthly_B_r010.log`, 73 lines, exact-file sha256:`a0149c5dd9c03b66a0a1b095451f563d364233eaf7bd5ed2ae6b8c07bd8fb9aa` |
+| **Validity** | **INVALIDATED** — a second, distinct state-machine defect truncated coverage per specification; not honest refusals |
+
+### Zombie names: the root cause behind the per-spec die-off
+
+The R-008 spiral fix worked exactly as designed — rows recover past 2017-01
+and per-spec retries are visible — but a deeper defect surfaced once binds
+could retry: a name whose market data simply ENDS without any delisting
+event (common in B_core's broad cross-section) stays trapped in the last
+bound book at an entry price that can never be marked again. The per-key
+drift turnover for that book therefore refused every later month, and
+because the bind gated on turnover, each specification died permanently the
+first time its own long/short book trapped such a "zombie" name — hence the
+staggered per-spec death dates instead of R-008's single cliff. A_large
+(R-009) never trapped one; B_core traps them readily.
+
+Fix `d305ea0` removes the entire class rather than patching the instance:
+**turnover is a cost input and never gates a result row.** The bind always
+proceeds; a month whose prior book cannot be priced emits an EMPTY turnover
+field (declared unavailability), and the frozen analyser accepts it,
+charges the conservative full 1.0 one-way turnover for that month — the
+same convention the local battery's `net_of_costs` has always used — and
+disclosures `unavailable_turnover_periods` per construction. The same
+class existed in the local battery (`long_short_returns` dropped the
+month's RETURN when a drift refused — selective-sample contamination) and
+is fixed identically. Pinned by a zombie-name LEAN-stub simulation that
+round-trips the algorithm's own log through the real parser and analyser,
+plus a local wiped-out-book return-retention test; four reverse mutations
+(bind gate, local gate, parser strictness, analyser refusal) all redden.
+**PENDING independent review together with `49e8160`; B_core reruns after
+as a new R-number.**
+
+## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery: MOM_3/6/9/12_1, RESIDUAL_MOM_6/12_1, GROSS_PROFITABILITY, QUALITY_COMPOSITE, QUALITY_MOMENTUM, MULTI_ALPHA_COMPOSITE |
+| **Replication or new** | First Stage 0 execution on fully counter-reviewed code (post-`ac96d47`/FCR closures) |
+| **Research look** | Counted real-market run (run-level count 5 → 6); zero emitted alpha cells |
+| **Multiplicity family** | QC alpha battery 2026-08-16, 180 cells (repeated look; lifetime floor stays 428) |
+| **Source commit** | `423a818` (contains merged `1457169` = PR #245 product tree; LEAN sources byte-identical to reviewed `main`) |
+| **Uploaded source SHA-256** | `e15d800bd5fc444ab943164514819d3d10dd871b16ef3838bce2c60af0ec4982` (`alpha_battery_monthly.py`, `ACTIVE_UNIVERSE="A_large"` rewrite) |
+| **QC project** | `35285587` — `1. MONTHLY_BATTERY_A_LARGE - 20260817` (QC displays the name without the dot) |
+| **Compile ID** | `536ba0397b5aaee05599c4f894a04aa6-b781d55b4f49dfabcb81ae12f6998bab` |
+| **Backtest ID** | `b141aeae803521352a74760573ffcda0` |
+| **Launched / completed (UTC)** | 2026-08-17T21:02:23 / ~21:04 (64.22 s engine time, 27,299,669 points, 425k/s) |
+| **Data period / universe** | 2012-01-01..2024-12-31; A_large: price ≥ $5, cap ≥ $10B, ADV20 ≥ $25M; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` |
+| **Raw log** | `artifacts/qc_stage0_20260817/run1_monthly_A.log`, 7 lines. Actual Windows-file SHA-256: `56cdb97757ac56ce2d215142177bb6801652c5582ad809995786f034024b8674`. Original driver/evidence JSON recorded LF-normalized SHA-256 `23fc9e859485b43bb68e541f1ccb50b02d78d75586bbd9f4f3f6493e50a1e2ed`; both are retained because QCS0R-003 found that the driver hashed text before Windows newline translation. |
+| **Orders / holdings** | Volume $0.00, Holdings $0.00 — inert as designed |
+| **Primary statistics** | **none** |
+| **Validity** | **REFUSED** — `INCOMPLETE\|missing_specs=MULTI_ALPHA_COMPOSITE\|RESIDUAL_MOM_12_1\|RESIDUAL_MOM_6_1` |
+
+### What happened and the open diagnosis
+
+Both residual-momentum specifications produced zero usable rows across the
+entire window, so `MULTI_ALPHA_COMPOSITE` (which consumes one of them) also
+emitted nothing and the completeness guard withheld the whole run, including
+the seven specifications that did produce data. This is the first cloud
+execution of the corrected point-in-time factor machinery.
+
+Working hypothesis, decided BEFORE the next run so it is falsifiable: the
+corrected leave-one-out industry factor refuses a stock's whole 504-session
+factor window if the stock's point-in-time Morningstar industry bucket has
+fewer than three members with returns on ANY session in the window. Among
+A_large's ~mega-cap cross-section most industries hold one or two members,
+so the residual cross-section falls below `MIN_NAMES=30` on every score date
+— a data-driven structural refusal, not a code fault. The alternative — a
+factor-recording/selection-timing defect that starves the residual factor on
+every universe — is distinguished by run 2 (B_core, required by the frozen
+plan anyway): if B_core also refuses identically, treat it as a suspected
+code defect, STOP Stage 0, and take the diagnosis back through review; if
+B_core completes, the A_large refusal stands as this cell family's honest
+result.
+
+Also recorded: LEAN logged a deprecation warning for the
+`add_universe(coarse, fine)` overload (non-fatal), and adjusted start dates
+for six factor-file symbols (BCE, CVE, RCI, CNI, SJR, TCK).
+
+## R-006 — Stage 0 monthly battery, B_core, reviewed code (REFUSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (same family as R-005) |
+| **Replication or new** | Stage 0 execution on the same counter-reviewed source as R-005 |
+| **Research look** | Counted real-market run (run-level count 6 → 7); zero emitted alpha cells |
+| **Multiplicity family** | QC alpha battery 2026-08-16, 180 cells (repeated look; lifetime floor stays 428) |
+| **Source commit** | `bfc9b8b` (the driver/log-evidence follow-up; uploaded LEAN bytes still derive from the reviewed PR #245 algorithm) |
+| **Uploaded source SHA-256** | `428ef88bd9d39b1ca060ee82ef49dc5ede8802e6e900e83c1c1df0e7e823fa40` (`alpha_battery_monthly.py`, `ACTIVE_UNIVERSE="B_core"` rewrite) |
+| **QC project** | `35285594` — `2. MONTHLY_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `86b7cd76c8b0063c3444a288d49111d8-10dea6d5c90b29a72b09c4aa1958b967` |
+| **Backtest ID** | `896f7f2c72b5acdb03859d79497973c3` |
+| **Launched / completed (UTC)** | 2026-08-17T21:07:50.028845+00:00 / 2026-08-17T21:11:06.918222+00:00 (190.01 s engine time, 31,944,196 points, 168k/s) |
+| **Data period / universe** | 2012-01-01..2024-12-31; B_core; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` (identical to R-001's universe numbers) |
+| **Raw log** | `artifacts/qc_stage0_20260817/run2_monthly_B.log`, 7 lines. Actual Windows-file SHA-256: `e2a038564d4254f41a773ee6103d910b862eb564305de3963dc446664203941a`. Original driver/evidence JSON recorded LF-normalized SHA-256 `8858e6f63b2f4cdfb3bed388fad89a4db14f90d0ad82baf1ff8a6391b1bc395b`; both are retained because QCS0R-003 found that the driver hashed text before Windows newline translation. |
+| **Primary statistics** | **none** |
+| **Validity** | **REFUSED** — identical `INCOMPLETE\|missing_specs=MULTI_ALPHA_COMPOSITE\|RESIDUAL_MOM_12_1\|RESIDUAL_MOM_6_1` |
+
+### The hypothesis test this run was declared to be
+
+R-005's thin-industry hypothesis is **falsified**: B_core's broad
+cross-section refused identically, and the run was ~25× faster than R-001's
+corrected-code run — the expensive residual path is clearly never receiving
+usable factor input. Per the pre-declared decision rule, this is now treated
+as a **suspected defect in the corrected point-in-time factor machinery**
+(`_record_factor_returns` / `_factor_returns`, first cloud-executed in this
+pair of runs). **Stage 0 is STOPPED at two of nine runs**; runs 3–9 are not
+launched. The diagnosis moves to a local LEAN-stub integration harness — no
+cloud compute may be used to debug unreviewed hypotheses — and any fix goes
+back through the review loop before a rerun. Both refusals remain counted,
+permanent ledger entries.
+
+**Root cause CONFIRMED locally the same day (no further cloud access).** A
+LEAN-stub simulation reproduced the exact refusal signature once it modeled
+LEAN's real event timing: daily bars are labeled with the NEXT calendar day,
+so the last bar of a month ending on a Friday arrives labeled
+Saturday-the-1st — before the new month's universe selection exists. The
+factor recorder keyed membership by the label's month, recorded those days
+with empty industry buckets, and one poisoned day refused every 504-session
+residual window spanning it; months end on Fridays roughly one in four, so
+every window was poisoned and both residual specifications refused totally
+while all non-membership specifications emitted. Fix `0f0611c` binds each
+factor day to the membership actually in force at record time and makes
+score-time lookups reuse exactly that recorded month key;
+`tests/test_alpha_battery_monthly_sim.py` drives the real algorithm class
+through the weekend-boundary event model and reddens under the reverted fix.
+The Stage 1, short-battery, and benchmark algorithms hold no month-keyed
+membership history and are unaffected. The fix awaits independent review
+before any rerun; reruns will be new R-numbers.
+
 ## 2026-08-17 full research/QC audit disposition
 
 - Correction `855941a` standardizes every LEAN algorithm on QuantConnect's

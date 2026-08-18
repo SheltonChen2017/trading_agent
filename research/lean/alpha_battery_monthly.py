@@ -269,7 +269,18 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.factor_sessions = deque(maxlen=LOOKBACK)
         self.market_returns = deque(maxlen=LOOKBACK)
         self.industry_aggregates = deque(maxlen=LOOKBACK)
+        # The membership month each factor day was RECORDED under. LEAN
+        # labels a daily bar with the NEXT calendar day, so the last bar of
+        # a month that ends on a Friday arrives labeled Saturday-the-1st —
+        # before the new month's selection exists. Keying membership by the
+        # label's month therefore recorded those days with EMPTY industry
+        # buckets, and one poisoned day refused every 504-session residual
+        # window that spanned it (R-005/R-006: total residual refusal on
+        # every universe). Each day now stores the selection month actually
+        # in force, and score-time lookups reuse exactly that key.
+        self.factor_membership_months = deque(maxlen=LOOKBACK)
         self.industry_membership = {}
+        self.selection_membership = {}
         # Avoid shadowing QCAlgorithm.fundamentals, a framework member.
         self.fundamental_cache = {} # Symbol -> latest point-in-time values
         self.industry = {}          # Symbol -> Morningstar industry code
@@ -281,6 +292,8 @@ class AlphaBatteryMonthly(QCAlgorithm):
         # OnData needs securities, which needs selection: a deadlock that
         # ran to completion reporting cap_rows=0 rather than failing.
         self.selection_month = None
+        self.previous_selection_month = None
+        self.selection_changed_session = None
         self.scored_month = None
         self.last_session = None
         self.in_universe = set()
@@ -292,6 +305,15 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.cap_rows = 0
         self.results = {}           # spec -> per-date IC/return/turnover rows
         self.previous_weights = {}  # (spec, construction) -> signed weights
+        # Entry prices recorded at each key's last successful rebalance.
+        # Drift outcomes are computed from THESE against current/terminal
+        # prices, never from the settling cohort's outcome dictionary: the
+        # old pending-settle coupling meant that one month in which every
+        # specification skipped left `prior_outcomes` permanently empty
+        # against non-empty stale weights — an unrecoverable refusal spiral
+        # that truncated R-008 (B_core) at 2017-01 while R-007 (A_large)
+        # merely never happened to trigger it.
+        self.previous_entries = {}  # (spec, construction) -> entry prices
 
     # --- universe ------------------------------------------------------
 
@@ -304,9 +326,10 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 and c.dollar_volume >= self.screen["min_adv"]]
 
     def _fine(self, fine):
-        if self.selection_month == (self.time.year, self.time.month):
+        new_month = (self.time.year, self.time.month)
+        if self.selection_month == new_month:
             return Universe.UNCHANGED
-        self.selection_month = (self.time.year, self.time.month)
+        previous_month = self.selection_month
         chosen = []
         month_membership = {}
         for f in fine:
@@ -356,17 +379,26 @@ class AlphaBatteryMonthly(QCAlgorithm):
             needed.update(self.pending.get("entry", {}))
         if self.staged is not None:
             needed.update(self.staged.get("names", ()))
+        # A stale book awaiting a recoverable turnover retry still needs
+        # prices, so its names must survive universe removal.
+        for weights in self.previous_weights.values():
+            needed.update(weights)
         for symbol in self.in_universe - current:
             if symbol in needed and symbol not in self.retained:
                 self.add_security(symbol, Resolution.DAILY)
                 self.retained.add(symbol)
         self.in_universe = current
         self.selected = chosen
-        self.industry_membership[self.selection_month] = month_membership
+        self.previous_selection_month = previous_month
+        self.selection_month = new_month
+        self.selection_changed_session = self.time.date()
+        self.industry_membership[new_month] = month_membership
+        self.selection_membership[new_month] = tuple(chosen)
         # The longest factor window is under two years. Keep a buffer while
         # bounding state in long cloud runs.
         for month in sorted(self.industry_membership)[:-30]:
             self.industry_membership.pop(month, None)
+            self.selection_membership.pop(month, None)
         return chosen
 
     # --- data ----------------------------------------------------------
@@ -421,7 +453,8 @@ class AlphaBatteryMonthly(QCAlgorithm):
     def _bind_staged_entry(self):
         staged = self.staged
         self.staged = None
-        prior_outcomes = self._settle() if self.pending is not None else {}
+        if self.pending is not None:
+            self._settle()
         entry = {
             symbol: self._price(symbol, 0)
             for symbol in staged["names"]
@@ -454,14 +487,22 @@ class AlphaBatteryMonthly(QCAlgorithm):
                 {symbol: 1.0 / len(longs) for symbol in longs},
                 {symbol: 1.0 / len(long20) for symbol in long20},
             )
-            turns = tuple(
-                _drift_turnover(self.previous_weights.get(key) or {}, target, prior_outcomes)
-                for key, target in zip(keys, targets)
-            )
-            if any(value is None for value in turns):
-                continue
+            # Turnover is a COST input, never a gate on the alpha result.
+            # R-010 showed why: a stale book holding a name whose data ends
+            # without a delisting event can never be priced again, so a
+            # turnover-gated bind silently killed each specification the
+            # first time its long/short book trapped such a name (B_core
+            # collapsed to 54 ragged months). A month whose old book cannot
+            # be priced records its turnover as UNAVAILABLE — the analyser
+            # charges the conservative full 1.0 one-way for it — and the
+            # chain continues from the newly bound book.
+            turns = tuple(self._rebalance_turnover(key, target)
+                          for key, target in zip(keys, targets))
             for key, target in zip(keys, targets):
                 self.previous_weights[key] = target
+                self.previous_entries[key] = {
+                    symbol: entry[symbol] for symbol in target
+                }
             portfolios[spec] = {
                 "longs": longs, "shorts": shorts, "long20": long20,
                 "turnovers": turns,
@@ -474,6 +515,28 @@ class AlphaBatteryMonthly(QCAlgorithm):
             "date": staged["date"],
             "portfolios": portfolios,
         }
+
+    def _rebalance_turnover(self, key, target):
+        """Method V2 drift turnover from stored entry prices.
+
+        Outcomes for the stale book come from its own recorded entry prices
+        against current or terminal prices — the same self-contained pattern
+        the Stage 1 replications and both benchmarks already use — so a
+        month whose turnover refuses simply retries next month instead of
+        poisoning all later months.
+        """
+        previous = self.previous_weights.get(key) or {}
+        if not previous:
+            return _drift_turnover({}, target, {})
+        prior_entries = self.previous_entries.get(key) or {}
+        outcomes = {}
+        for symbol in previous:
+            entry_price = prior_entries.get(symbol)
+            now = self.terminal_prices.get(symbol, self._price(symbol, 0))
+            if entry_price is None or entry_price <= 0 or now is None:
+                return None
+            outcomes[symbol] = now / entry_price - 1.0
+        return _drift_turnover(previous, target, outcomes)
 
     def _price(self, symbol, ago):
         window = self.closes.get(symbol)
@@ -509,12 +572,23 @@ class AlphaBatteryMonthly(QCAlgorithm):
         both leaked classifications backward and repeated an O(N^2) peer
         calculation. This prospective record is O(N) per session.
         """
-        membership = self.industry_membership.get(
-            (session.year, session.month), {}
-        )
+        if self.selection_month is None:
+            return
+        # A daily bar belongs to the preceding trading session. On an ordinary
+        # first trading day LEAN may select the new universe before delivering
+        # that prior-day bar at the same timestamp. In that ordering, keep the
+        # previous snapshot for both the eligible names and their industries;
+        # otherwise the new selection would leak backward into yesterday's
+        # market/industry factor return.
+        membership_month = self.selection_month
+        if (self.selection_changed_session == session
+                and self.previous_selection_month is not None):
+            membership_month = self.previous_selection_month
+        membership = self.industry_membership.get(membership_month, {})
+        selected = self.selection_membership.get(membership_month, ())
         returns = {
             symbol: daily_returns[symbol]
-            for symbol in self.selected
+            for symbol in selected
             if symbol in daily_returns
         }
         if len(returns) < MIN_NAMES:
@@ -529,9 +603,18 @@ class AlphaBatteryMonthly(QCAlgorithm):
         self.factor_sessions.append(session)
         self.market_returns.append(sum(returns.values()) / len(returns))
         self.industry_aggregates.append(buckets)
+        self.factor_membership_months.append(membership_month)
 
     def _factor_returns(self, symbol, count):
-        """Return aligned PIT market and leave-one-out industry factors."""
+        """Return aligned PIT market and leave-one-out industry factors.
+
+        Each historical day's peer lookup uses the membership month RECORDED
+        when that day's buckets were built, so the leave-one-out subtraction
+        provably subtracts from a total its stock was inside. Deriving the
+        month from the session label instead applied a membership the bucket
+        was never built with (and, at weekend month boundaries, one that did
+        not exist).
+        """
         stock = self._returns(symbol, count)
         market = _aligned_observation_tail(
             self.market_returns, self.factor_sessions, self.sessions, count
@@ -539,14 +622,18 @@ class AlphaBatteryMonthly(QCAlgorithm):
         aggregates = _aligned_observation_tail(
             self.industry_aggregates, self.factor_sessions, self.sessions, count
         )
-        if stock is None or market is None or aggregates is None:
+        membership_months = _aligned_observation_tail(
+            self.factor_membership_months, self.factor_sessions,
+            self.sessions, count
+        )
+        if (stock is None or market is None or aggregates is None
+                or membership_months is None):
             return None
-        factor_sessions = list(self.factor_sessions)[-count:]
         industry = []
-        for value, session, daily in zip(stock, factor_sessions, aggregates):
-            membership = self.industry_membership.get(
-                (session.year, session.month), {}
-            )
+        for value, month, daily in zip(stock, membership_months, aggregates):
+            membership = self.industry_membership.get(month)
+            if membership is None:
+                return None
             peer_return = _leave_one_out_peer_return(
                 symbol, value, membership, daily
             )
@@ -676,6 +763,8 @@ class AlphaBatteryMonthly(QCAlgorithm):
 
     def _release_unused_retained(self):
         needed = set(self.pending.get("entry", {})) if self.pending else set()
+        for weights in self.previous_weights.values():
+            needed.update(weights)
         for symbol in list(self.retained):
             if symbol not in needed and symbol not in self.in_universe:
                 self.remove_security(symbol)
@@ -702,17 +791,34 @@ class AlphaBatteryMonthly(QCAlgorithm):
             self.error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
             return
         index_of = {spec: i for i, spec in enumerate(order)}
+
+        def _turn(value):
+            # An unpriceable prior book records an UNAVAILABLE turnover; the
+            # analyser charges the conservative full 1.0 for such months.
+            return "" if value is None else round(value, 4)
+
         by_date = {}
         for spec, rows in self.results.items():
             for date, ic, lr, sr, l20, turn_ls, turn_l10, turn_l20, n in rows:
                 by_date.setdefault(date, []).append(
                     f"{index_of[spec]}~{'' if ic is None else round(ic, 5)}~"
                     f"{round(lr, 6)}~{round(sr, 6)}~{round(l20, 6)}~"
-                    f"{round(turn_ls, 4)}~{round(turn_l10, 4)}~"
-                    f"{round(turn_l20, 4)}~{n}"
+                    f"{_turn(turn_ls)}~{_turn(turn_l10)}~"
+                    f"{_turn(turn_l20)}~{n}"
                 )
         self.log(f"SPECS|{'|'.join(order)}")
         self.log(f"DATES|{len(by_date)}")
+        # Specifications legitimately skip months independently (turnover
+        # retries, residual warm-up, missing basket outcomes), so a date's
+        # ROW may carry a subset of specifications. SPECMETA declares each
+        # specification's exact emitted period count, which is what lets the
+        # parser tell honest per-spec raggedness from log truncation —
+        # R-007's complete run was unparseable without it.
+        for spec in order:
+            rows = self.results[spec]
+            names = sorted(row[8] for row in rows)
+            self.log(f"SPECMETA|{spec}|median_names={names[len(names) // 2]}"
+                     f"|periods={len(rows)}")
         for date in sorted(by_date):
             # Date compressed to YYYYMM; the cadence is monthly.
             self.log(f"ROW|{date.replace('-', '')[:6]}|" + "|".join(by_date[date]))

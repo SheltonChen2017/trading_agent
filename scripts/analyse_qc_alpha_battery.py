@@ -191,15 +191,18 @@ def parse_log(
                 if len(parts) == 8:
                     # Full decimal layout: IC, three returns, the matching
                     # three construction turnovers, and usable-name count.
+                    # An EMPTY turnover field is a declared unavailability
+                    # (the prior book could not be priced that month); the
+                    # analyser charges the conservative full 1.0 for it.
                     ic, lr, sr, l20, turn_ls, turn_l10, turn_l20, n = parts
                     rows.append({
                         "date": date, "spec": spec,
                         "ic": float(ic) if ic else None,
                         "long": float(lr), "short": float(sr),
                         "long20": float(l20),
-                        "turnover_ls": float(turn_ls),
-                        "turnover_l10": float(turn_l10),
-                        "turnover_l20": float(turn_l20),
+                        "turnover_ls": float(turn_ls) if turn_ls else None,
+                        "turnover_l10": float(turn_l10) if turn_l10 else None,
+                        "turnover_l20": float(turn_l20) if turn_l20 else None,
                         "names": int(n),
                     })
                 else:
@@ -213,13 +216,24 @@ def parse_log(
     allowed = EXPECTED_SPEC_SETS if expected_spec_sets is None else expected_spec_sets
     if frozenset(specs) not in allowed or len(specs) != len(set(specs)):
         raise InvalidLog(f"{path.name}: incomplete or unknown frozen spec inventory")
-    expected_indices = set(range(len(specs)))
-    incomplete = [date for date, indices in date_indices.items()
-                  if indices != expected_indices]
-    if incomplete:
-        raise TruncatedLog(
-            f"{path.name}: {len(incomplete)} ROW lines do not contain every declared spec"
-        )
+    if set(spec_periods) == set(specs):
+        # Every specification declares its exact emitted period count, so
+        # honest per-spec month raggedness (turnover retries, residual
+        # warm-up, missing basket outcomes) is distinguishable from
+        # truncation by the per-spec count verification below. R-007 was a
+        # complete cloud run that this parser wrongly refused because its
+        # dates carried legitimate spec subsets.
+        pass
+    else:
+        expected_indices = set(range(len(specs)))
+        incomplete = [date for date, indices in date_indices.items()
+                      if indices != expected_indices]
+        if incomplete:
+            raise TruncatedLog(
+                f"{path.name}: {len(incomplete)} ROW lines do not contain "
+                "every declared spec and no complete SPECMETA inventory "
+                "declares the per-spec counts"
+            )
     frame = pd.DataFrame(rows)
     observed = frame["date"].nunique() if not frame.empty else 0
     if declared is not None and observed < declared:
@@ -240,16 +254,18 @@ def parse_log(
             raise TruncatedLog(
                 f"{path.name}: {spec} has {observed_periods} rows, {periods} declared"
             )
-    numeric_columns = (
-        "long", "short", "long20", "turnover_ls", "turnover_l10",
-        "turnover_l20",
-    )
-    for column in numeric_columns:
+    for column in ("long", "short", "long20"):
         numeric = pd.to_numeric(frame[column], errors="coerce")
         if numeric.isna().any() or not numeric.map(math.isfinite).all():
             raise InvalidLog(f"{path.name}: {column} contains non-finite values")
     for column in ("turnover_ls", "turnover_l10", "turnover_l20"):
-        if (frame[column] < 0).any():
+        # A missing value is a DECLARED unavailability (unpriceable prior
+        # book) handled conservatively at analysis; a present value must
+        # still be finite and non-negative.
+        numeric = pd.to_numeric(frame[column].dropna(), errors="coerce")
+        if numeric.isna().any() or not numeric.map(math.isfinite).all():
+            raise InvalidLog(f"{path.name}: {column} contains non-finite values")
+        if (numeric < 0).any():
             raise InvalidLog(f"{path.name}: {column} contains negative turnover")
     finite_ic = pd.to_numeric(frame["ic"].dropna(), errors="coerce")
     if (finite_ic.isna().any() or not finite_ic.map(math.isfinite).all()
@@ -365,14 +381,23 @@ def analyse(frame: pd.DataFrame, periods_per_year: float) -> dict:
         )
         for label, series, turnover in constructions:
             numeric_turnover = pd.to_numeric(turnover, errors="coerce")
-            if numeric_turnover.isna().any() or not numeric_turnover.map(math.isfinite).all():
-                raise InvalidLog(f"{spec}/{label}: missing or non-finite turnover")
-            entry[label]["mean_turnover"] = float(numeric_turnover.mean())
+            if not numeric_turnover.dropna().map(math.isfinite).all():
+                raise InvalidLog(f"{spec}/{label}: non-finite turnover")
+            unavailable = int(numeric_turnover.isna().sum())
+            # Conservative in the cost direction: a month whose prior book
+            # could not be priced is charged FULL one-way turnover, the same
+            # convention the reviewed local battery's `net_of_costs` uses.
+            charged_turnover = numeric_turnover.fillna(1.0)
+            entry[label]["mean_turnover"] = (
+                float(numeric_turnover.mean())
+                if numeric_turnover.notna().any() else None
+            )
+            entry[label]["unavailable_turnover_periods"] = unavailable
             entry[label]["gross"] = performance(series, periods_per_year)
             entry[label]["p_value"] = stationary_bootstrap_p(series, draws=DRAWS)
             entry[label]["net"] = {
                 f"{bps:g}bps": performance(
-                    series - numeric_turnover.values * 2.0 * bps / 10_000.0,
+                    series - charged_turnover.values * 2.0 * bps / 10_000.0,
                     periods_per_year,
                 )
                 for bps in COST_BPS

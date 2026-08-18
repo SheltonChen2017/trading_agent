@@ -328,12 +328,14 @@ def long_short_returns(
         # Charge against where the PREVIOUS book actually drifted. Using
         # this row's forward returns looks into the period that has not
         # happened at rebalance time and applies the wrong interval.
+        # Turnover is a COST input, never a gate on the result row: when the
+        # previous book cannot be priced (a held name's forward return is
+        # missing), the month's turnover stays unavailable and
+        # `net_of_costs` charges the conservative full 1.0 for it.
         drifted = drift_weights(previous, previous_outcomes or {})
-        if drifted is None:
-            continue
-        churn = one_way_turnover(drifted, weights)
+        if drifted is not None:
+            turnovers[date] = float(one_way_turnover(drifted, weights))
         returns[date] = gross
-        turnovers[date] = float(churn)
         previous = weights
         previous_outcomes = {
             name: float(fwd[name])

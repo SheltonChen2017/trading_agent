@@ -40,7 +40,11 @@ def parse_benchmark(path: Path) -> pd.DataFrame:
             parts = line.split("BROW|", 1)[1].split("|")
             if len(parts) != 4:
                 raise SystemExit(f"{path.name}: unsupported/incomplete BROW payload")
-            rows.append((parts[0], float(parts[1]), float(parts[2]), int(parts[3])))
+            # An EMPTY turnover field is a declared unavailability (the
+            # prior book could not be priced that month, R-017); the
+            # analyser charges the conservative full 1.0 for it.
+            turnover = float(parts[2]) if parts[2] else None
+            rows.append((parts[0], float(parts[1]), turnover, int(parts[3])))
     if declared is None:
         raise SystemExit(f"{path.name}: missing DATES declaration")
     if declared <= 0 or not rows:
@@ -56,12 +60,14 @@ def parse_benchmark(path: Path) -> pd.DataFrame:
         raise SystemExit(f"{path.name}: benchmark dates must use YYYYMM")
     if frame["date"].duplicated().any():
         raise SystemExit(f"{path.name}: duplicate benchmark dates")
-    if frame[["ret", "turnover"]].isna().any().any():
-        raise SystemExit(f"{path.name}: missing return or turnover")
+    if frame["ret"].isna().any():
+        raise SystemExit(f"{path.name}: missing benchmark return")
     if not frame["ret"].map(math.isfinite).all():
         raise SystemExit(f"{path.name}: non-finite benchmark return")
-    if (not frame["turnover"].map(math.isfinite).all()
-            or (frame["turnover"] < 0).any()):
+    present_turnover = pd.to_numeric(frame["turnover"].dropna(), errors="coerce")
+    if (present_turnover.isna().any()
+            or not present_turnover.map(math.isfinite).all()
+            or (present_turnover < 0).any()):
         raise SystemExit(f"{path.name}: invalid benchmark turnover")
     if (frame["names"] <= 0).any():
         raise SystemExit(f"{path.name}: benchmark names must be positive")
@@ -90,6 +96,11 @@ def main(argv: list[str] | None = None) -> int:
         log_path = Path(path)
         frame = parse_benchmark(log_path)
         series = frame["ret"]
+        numeric_turnover = pd.to_numeric(frame["turnover"], errors="coerce")
+        # Conservative in the cost direction: a month whose prior book could
+        # not be priced (R-017) is charged FULL one-way turnover, the same
+        # convention the alpha analysers use.
+        charged_turnover = numeric_turnover.fillna(1.0)
         report[label] = {
             "periods": int(len(frame)),
             "quantconnect_run": run_ids[label][0],
@@ -97,11 +108,13 @@ def main(argv: list[str] | None = None) -> int:
                 "name": log_path.name,
                 "sha256": hashlib.sha256(log_path.read_bytes()).hexdigest(),
             },
-            "mean_turnover": float(frame["turnover"].mean()),
+            "mean_turnover": (float(numeric_turnover.mean())
+                              if numeric_turnover.notna().any() else None),
+            "unavailable_turnover_periods": int(numeric_turnover.isna().sum()),
             "gross": performance(series, 12.0),
             "net": {
                 f"{bps:g}bps": performance(
-                    series - frame["turnover"] * 2.0 * bps / 10_000.0, 12.0
+                    series - charged_turnover * 2.0 * bps / 10_000.0, 12.0
                 )
                 for bps in COST_BPS
             },
@@ -111,7 +124,9 @@ def main(argv: list[str] | None = None) -> int:
             "series": [
                 {
                     "date": str(date), "return": float(row["ret"]),
-                    "turnover": float(row["turnover"]), "names": int(row["names"]),
+                    "turnover": (None if pd.isna(row["turnover"])
+                                 else float(row["turnover"])),
+                    "names": int(row["names"]),
                 }
                 for date, row in frame.iterrows()
             ],

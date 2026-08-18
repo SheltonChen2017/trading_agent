@@ -172,9 +172,14 @@ class UniverseBenchmark(QCAlgorithm):
         if len(entry) < MIN_NAMES:
             return
         weights = {symbol: 1.0 / len(entry) for symbol in entry}
+        # Turnover is a COST input, never a gate on the result (R-010/R-017):
+        # refusing to bind here leaves `previous_weights` holding a stale
+        # book that can never be priced again, so one unpriceable month
+        # would kill every later month — R-017 reported 48 of ~156 months
+        # this exact way. Bind always; an unpriceable rebalance emits a
+        # declared unavailability (empty BROW turnover field) that the
+        # analyser charges at the conservative full 1.0 one-way.
         turnover = _drift_turnover(self.previous_weights, weights, prior_outcomes)
-        if turnover is None:
-            return
         self.previous_weights = weights
         self.pending = {
             "entry": entry,
@@ -216,8 +221,8 @@ class UniverseBenchmark(QCAlgorithm):
         self.log(f"=== UNIVERSE BENCHMARK | universe={ACTIVE_UNIVERSE} ===")
         self.log(f"DATES|{len(self.rows)}")
         for date, ret, turnover, n in self.rows:
+            turn = "" if turnover is None else round(turnover, 4)
             self.log(
-                f"BROW|{date.replace('-', '')[:6]}|{round(ret, 6)}|"
-                f"{round(turnover, 4)}|{n}"
+                f"BROW|{date.replace('-', '')[:6]}|{round(ret, 6)}|{turn}|{n}"
             )
         self.log(f"orders placed: {self.transactions.orders_count}")

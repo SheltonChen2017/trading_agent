@@ -644,6 +644,40 @@ computation now reports thirteen years instead of four, with every
 unpriceable month visible as a disclosed gap rather than a silent
 truncation of everything after it. Benchmarks B_core and C_broad remain.
 
+## R-019 — Stage 0 universe benchmark, B_core, biased month coverage (INCONCLUSIVE)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, B_core — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 19 → 20); zero alpha cells |
+| **Source commit** | `6d3c000` |
+| **Uploaded source SHA-256** | `bc87fd277cddc94ca5c6db5e34d91fddd671949eb51272ab12833ffe28bf9455` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run15_benchmark_B_r019.json`) |
+| **QC project** | `35297590` — requested `15. UNIVERSE_BENCHMARK_B_CORE - 20260817`, returned `15 UNIVERSE_BENCHMARK_B_CORE - 20260817` |
+| **Compile ID** | `d383f3d05eaf2c08c0a3d9a65eb95fec-f697135a16d509fe24abe178ebd9b5a7` |
+| **Backtest ID** | `9e2441dd4332990c207e7d4e737ec183` |
+| **Launched / completed (UTC)** | 2026-08-18T03:59:52.068279+00:00 / 2026-08-18T04:01:33.081260+00:00 |
+| **Output** | Parses cleanly: 94 BROW rows, 2012-01..2024-10, 31 months with declared-unavailable turnover. The R-017 die-off is confirmed fixed (gaps recover instead of cascading). But **62 of 156 months are absent**, clustered in 2018–2024's heavy-delisting stretches. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run15_benchmark_B_r019.log`, 101 lines, exact-file sha256:`b05e5d998c44abd02800073b9d6dc801a59f534227f02f3ce4d3c7944ac0e660` |
+| **Validity** | **INCONCLUSIVE** — every emitted number is correct per its contract, but a baseline missing 40% of months in a systematically zombie-clustered pattern cannot serve as the honest line under long-only results |
+
+### Root cause: all-names-or-nothing settlement cannot scale to broad books
+
+`_settle` emits a month only when EVERY entered name is priceable on the
+exact settlement session (`len(outcomes) == len(pending["entry"])`). A
+~300-name A_large book rarely fails that (R-018 lost 6 mid-period months);
+a ~1,700-name B_core book fails it 40% of the time, and the failures
+cluster exactly in stressed, delisting-heavy periods — a selective sample
+that overstates calm months, which the project methodology explicitly
+forbids for baselines ("include missing baseline rows rather than allowing
+selective samples"; "record refusals and underfill instead of dropping
+them"). Fix round follows: the month's return is computed over the priced
+subset (≥ MIN_NAMES still required) with BOTH counts — priced and entered
+— disclosed in an extended BROW row, so underfill is recorded instead of
+dropped. Excluding mid-month zombies overstates the benchmark in crashes,
+which penalises rather than flatters alpha claims measured against it —
+conservative in the correct direction for a baseline. All three benchmark
+universes will be rerun on the extended contract for uniformity.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

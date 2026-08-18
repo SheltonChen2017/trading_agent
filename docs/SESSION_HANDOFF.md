@@ -1576,6 +1576,24 @@ ordering, so the first run's round-trip is the real integration test;
 structurally — the only step at which any Stage 1 statistic is
 observed (stage gate 0.05/24; lifetime gate 0.05/452).
 
+## 7ag. Driver review accepted; Stage 1 runs begin (2026-08-18)
+
+Cursor/Grok reviewed the launch-driver delta (`08f23a1..f821fb1`) and
+**accepted both commits with zero findings**
+(`docs/Review/REVIEW_2026-08-18_STAGE1_LAUNCH_DRIVER.md`, pushed on
+`user/cursor/review-stage1-launch-driver-20260818`): the diff is the
+two-entry FAMILIES table plus tests only; `require_clean=True` and the
+log-fetch `query` parameter (the two historical launch-plumbing defect
+classes) verified intact and still test-pinned; both reverse mutations
+re-executed red; `universe_smoke.py` confirmed correctly excluded.
+Claude counter-verified the merge-tree and main-state claims (PR #256
+merged the driver; `875d003^{tree}` == `f821fb1^{tree}`). With the
+owner GO (7af) and this review, the six serial cloud runs proceed:
+project numbers 19–24, stage1 A/B/C then stage1-benchmark A/B/C, one
+at a time, each ledgered with full identity and structurally
+parser-round-tripped before the next; the frozen Stage 1 analyser runs
+ONCE afterward.
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

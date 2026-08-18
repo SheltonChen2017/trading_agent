@@ -1461,6 +1461,42 @@ residual risk carries forward: the stub harness exercises the real
 classes but not LEAN's own callback ordering, so Stage 1's first cloud
 run must round-trip the frozen parsers before any statistic is read.
 
+## 7ac. Reviewer's correction of section 7ab (2026-08-18, reviewer session)
+
+Section 7ab was written by a DIFFERENT session than the reviewer, at
+12:33 local, while the reviewer's own full-suite run was still
+executing, and it committed the reviewer's in-progress draft report
+(`d905f2b`) taken from the shared worktree. Three corrections of
+record, superseding 7ab's wording (7ab itself is retained unedited):
+
+1. **The "one defect" no longer exists and was never a defect of the
+   finished review.** The `FULL_SUITE_PLACEHOLDER` was a deliberate
+   placeholder in an in-progress draft awaiting the background
+   `python -m pytest -q` run. That run completed at 12:40 with
+   **4,246 passed / 0 failed / 25 warnings in 946s** — the reviewer's
+   OWN independent execution on the byte-identical tree, not a citation
+   of the authoring session's figure — and the reviewer filled the line
+   in `3a59568`. The final committed report contains no placeholder and
+   claims nothing it did not run.
+2. **The mutation count is eight, not nine:** five required reverse
+   mutations (replications bind gate, benchmark bind gate, benchmark
+   settle full-book, battery analyser fillna, battery parser
+   turnover_ls) plus three extras (stage1 analyser fillna, ic guard,
+   universes book-heal). All eight red, all restored. The review
+   document's section 5 is the authoritative list.
+3. **Process note for future rounds:** committing another session's
+   in-progress working file mid-review is the same shared-worktree race
+   this repository has already ledgered once (the PR-merge push race).
+   A review report should be committed only by the session that wrote
+   it, after it declares the review complete. No harm resulted here —
+   the draft was committed verbatim and the reviewer's follow-up commit
+   completed it — but the "defect" 7ab flags is an artifact of that
+   premature commit, not of the review.
+
+The acceptance itself stands as 7ab states: all eleven commits
+accepted, 0 P0–P2, code gate before Stage 1 cleared, Stage 1 launch
+remaining an owner decision.
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

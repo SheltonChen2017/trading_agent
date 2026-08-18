@@ -1,4 +1,4 @@
-"""Launch and supervise the frozen Stage 0 QuantConnect battery runs.
+"""Launch and supervise the frozen Stage 0 and Stage 1 QuantConnect runs.
 
 Owner conventions (docs/process/QC_RUN_CONVENTIONS.md):
 
@@ -53,6 +53,12 @@ FAMILIES = {
     "monthly": ("MONTHLY_BATTERY", LEAN / "alpha_battery_monthly.py"),
     "short": ("SHORT_BATTERY", LEAN / "alpha_battery_short.py"),
     "benchmark": ("UNIVERSE_BENCHMARK", LEAN / "universe_benchmark.py"),
+    # Stage 1 (owner go 2026-08-18): the two frozen replication specs and
+    # their cadence-matched benchmark. Same counted-look, serial-run, and
+    # evidence rules as Stage 0; the 24-cell family gates live in
+    # scripts/analyse_qc_alpha_stage1.py, never here.
+    "stage1": ("STAGE1_REPLICATIONS", LEAN / "alpha_stage1_replications.py"),
+    "stage1-benchmark": ("STAGE1_BENCHMARK", LEAN / "alpha_stage1_benchmark.py"),
 }
 UNIVERSES = ("A_large", "B_core", "C_broad")
 

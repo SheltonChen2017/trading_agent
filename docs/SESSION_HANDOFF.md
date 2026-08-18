@@ -1714,7 +1714,41 @@ IntegrityError leak). Import-boundary suite green.
 Next milestone in the design: SHW-2 (the register/observe/mature/status
 runner CLI), after this round's review.
 
+## 7al. Independent review of post-closure `main` (2026-08-18)
+
+Cursor Grok 4.6 reviewed `66e2723..origin/main` at exact head
+`f40c2c1e9bac9f91788605d0274008131a27a932` (PRs #259 and #260 on top of
+Stage 1 closure). Report:
+`docs/Review/REVIEW_2026-08-18_POST_CLOSURE_MAIN.md`.
+
+**Accepted.** Every commit dispositioned. Focused tests 22 passed on an
+isolated worktree. Two reverse mutations red then restored (stage1
+script-mode bootstrap; overlay conflict silent-keep). No analyser rerun.
+No operator DB open. No product correction in the review.
+
+Five P3, no P0–P2:
+
+- POST-001: storage persists raw dicts, so incomplete `available=True`
+  observations that `OverlayObservation` would refuse can still be
+  written. Close before SHW-2.
+- POST-002: design/handoff overclaim import-boundary coverage and
+  “pure computation” in `overlay_shadow.py`.
+- POST-003: unused `field` import.
+- POST-004: allocation-policy plan is on `main` but ACTION_PLAN does
+  not schedule or defer APQ-1, so APQ-0 is incomplete.
+- POST-005: SHR-001 typed malformed turnover only; long/short and BROW
+  return/count tokens remain bare `ValueError`.
+
+Do not start SHW-2 until POST-001 is decided. Do not start APQ-1 until
+the owner writes the ACTION_PLAN line. Keep `paper-epoch-005` on
+`752d3b7`; this tree's first `AssistantStore` open would add empty
+`overlay_*` tables.
+
 ## 8. What is next
+
+**Current (2026-08-18, section 7al):** SHW-2 is blocked on POST-001.
+APQ-1 is not scheduled. `paper-epoch-005` stays on `752d3b7`. Do not
+open the operator DB from a post-`f40c2c1` tree.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

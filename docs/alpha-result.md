@@ -486,6 +486,41 @@ output on the same fixed code, all awaiting the same independent review.
 Next in the serial plan: the short battery (A_large, then B_core, then
 C_broad), then the three benchmarks.
 
+## R-013 — Stage 0 short battery, A_large, packed-format refusal (REFUSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Short battery, 5 specifications, universe A_large |
+| **Research look** | Counted real-market run (run-level count 13 → 14); **zero cells emitted** — the algorithm refused |
+| **Source commit** | `f470ee6` (short battery file itself last changed at `ac96d47`; the R-010 zombie fix `d305ea0` touched the monthly battery only) |
+| **Uploaded source SHA-256** | `b99c7dda8f1adab2ce0b572c6f163b926cc0b2df2f0f14cfb3f5888aa5b481c3` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run9_short_A_r013.json`) |
+| **QC project** | `35295425` — requested `9. SHORT_BATTERY_A_LARGE - 20260817`, returned `9 SHORT_BATTERY_A_LARGE - 20260817` |
+| **Compile ID** | `7bb84f7834dcb4c9d1f2598a0c53eead-27e0bb70576f053089ad7d4b1c47be75` |
+| **Backtest ID** | `8c549f41169f85ffd6bc4819fe0090b3` |
+| **Launched / completed (UTC)** | 2026-08-18T02:52:20.743710+00:00 / 2026-08-18T02:54:01.612704+00:00; 27,300,655 data points; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` |
+| **Output** | `INCOMPLETE\|missing_date_specs\|2016-01-29` and **no B64BLOCK payload at all**. `DATES\|533` declared; SPECMETA shows MAX_20 at periods=532 while the other four specs are at 533 — MAX_20 is missing exactly one date, and the packed emitter's all-or-nothing rule (every date must carry all five specs) refused the entire output. Fail-closed worked: nothing partial or corrupt was emitted, and no statistic was or could be observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run9_short_A_r013.log`, 15 lines, exact-file sha256:`dffe320d0b1823096de06d3d4ced1dcdffaad5071a7ade9159523291dc250bd0` |
+| **Validity** | **REFUSED** — no results exist; a rerun on fixed code will be a new R-number |
+
+### Root cause: the packed format cannot say "this spec is absent today"
+
+Per-spec ragged dates are ordinary and honest: the monthly battery's ROW
+format discloses them via SPECMETA (R-011's per-spec periods were 116..133
+out of 142), and the short battery computes its rows the same way — `_settle`
+legitimately skips a spec-date when usable names fall below MIN_NAMES, when
+a held name has no outcome, or when exit turnover is unpriceable (the
+zombie-name mechanism of R-010, to which MAX_20's extreme-volatility book is
+especially exposed; which of the three gates fired on 2016-01-29 is not
+observable from the refused log). But the packed `b64block_date_u32_i32x4_u16x3`
+layout has no absence channel, so its emitter demands every date × every
+spec and refuses everything otherwise. R-002 passed with 534/534 full dates
+by luck; this run hit one ragged spec-date and the refusal withheld 2,664
+honest spec-date cells because one was absent. The short battery also still
+gates result rows on turnover (`_settle`), contradicting the R-010 contract
+that turnover is a COST input, never a gate. Fix round follows: an absence-
+aware packed layout plus turnover-unavailability sentinel, with the v1
+decoder retained so R-002's historical logs stay readable.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

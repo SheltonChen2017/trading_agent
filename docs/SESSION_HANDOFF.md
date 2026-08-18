@@ -1514,6 +1514,30 @@ settle-gate agreement fact-checked and agreed. **The review stands as
 the review of record; the Stage 1 code gate remains cleared; the only
 remaining gate is the owner's Stage 1 go/no-go.**
 
+## 7ae. Cursor/Grok follow-up review of de1beac..07bb819: accepted, S0R2-001 fixed (2026-08-18)
+
+The owner ran a second Cursor/Grok round over everything since the
+previous Cursor head (`de1beac..07bb819`, 20 commits) — a genuine
+independent re-verification, not a rubber stamp: it re-read `602dc0b`
+claim by claim, ran its own two reverse mutations (both red, restored),
+verified all nine owner merge trees, and accepted every commit with 0
+P0/P1/P2. It raised two P3s: **S0R2-001** (the nine run headings and
+two summary paragraphs in `docs/alpha-result.md` still said
+PENDING_REVIEW / "no statistic observed" above A-001 — confirmed and
+FIXED this round: headings retitled VALID, dated superseding notes
+appended, originals retained) and **S0R2-002** (the `2be903f` upgrade
+used VALID where the frozen vocabulary's honest intermediate was
+UNANALYSED — closed without change on the final tree; the vocabulary
+rung PENDING_REVIEW → UNANALYSED → VALID is recorded for future
+rounds). Claude's counter-review executed the review's own §10
+checklist in full and verified its checkable claims 100%
+(`docs/Review/REVIEW_2026-08-18_S0R_FOLLOWUP.md` and
+`…_FOLLOWUP_COUNTERREVIEW.md`). **The `602dc0b` review chain now has
+cross-vendor diversity: author + fresh Claude + Cursor/Grok, seventeen
+mutation executions across three sessions, all red.** The Stage 1 code
+gate remains cleared; the owner's Stage 1 go/no-go remains the only
+gate.
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

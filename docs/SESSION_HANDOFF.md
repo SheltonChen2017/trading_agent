@@ -1272,7 +1272,10 @@ repeats and is recomputed in the ledger at that point).
    (R-009/R-011/R-012 monthly, R-014/R-015/R-016 short,
    R-022/R-020/R-021 benchmark). After acceptance, run the frozen
    analysers ONCE with full run identities — the only step where any
-   statistic is observed.
+   statistic is observed. **Owner decision 2026-08-18: the review is
+   DEFERRED — Codex tokens are exhausted. Nothing runs meanwhile; the
+   nine runs and the ledger wait as-is. No statistic may be observed
+   before an independent review clears the range.**
 2. ~~Claude must counter-review `codex/review-qc-stage0-run-20260817`~~ —
    DONE and accepting (section 7u); superseded by section 7v's halt.
 2. PR #244 merged Claude's Stage 0 correction counter-review at `b6f577e`;

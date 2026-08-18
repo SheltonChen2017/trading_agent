@@ -1497,6 +1497,23 @@ The acceptance itself stands as 7ab states: all eleven commits
 accepted, 0 P0–P2, code gate before Stage 1 cleared, Stage 1 launch
 remaining an owner decision.
 
+## 7ad. Counter-review of the S0R hardening review: VERIFIED (2026-08-18)
+
+The authoring session counter-reviewed the independent review at
+`f84f5fa` (`docs/Review/REVIEW_2026-08-18_S0R_HARDENING_COUNTERREVIEW.md`,
+branch `user/claude/s0r-hardening-counterreview-20260818`): all six
+tree-identity hashes re-verified exact; the upgrade-before-outputs
+timing re-verified (11:02:17 commit vs 11:03:23+ output mtimes;
+`de1beac..2be903f` is five docs only); the SHR-001 `abc`-token probe
+reproduced (`ValueError`, fail-closed); mutation (e′) — the ic-guard
+revert the authoring session had never itself run — re-executed red
+then green; the draft-to-final report diff confirmed as solely the
+reviewer's own full-suite figure; §7ac's corrections confirmed
+accurate, including the eight-mutation count. SHR-002 and the
+settle-gate agreement fact-checked and agreed. **The review stands as
+the review of record; the Stage 1 code gate remains cleared; the only
+remaining gate is the owner's Stage 1 go/no-go.**
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

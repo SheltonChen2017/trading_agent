@@ -1681,6 +1681,39 @@ Next in the adopted sequence: owner review of the two drafts (and the
 hygiene round's independent review); then SHW-1 begins as its own
 milestone.
 
+## 7ak. SHW-1 implemented after a design correction (2026-08-18)
+
+**Discovery first:** pre-implementation reconnaissance found the project
+already HAS a reviewed shadow infrastructure — ML-LR-6
+(`ml/shadow_runtime.py`, `scripts/run_ml_shadow.py`
+register/predict/mature/monitor, the `ml_*` tables, scheduler
+installers) — and that its docstring records the anti-generic-adapter
+principle the first SHADOW_OBSERVATION_DESIGN draft violated. The
+design was REVISED before any code: no generic framework; each observed
+task gets a task-specific runtime following the ML-LR-6 pattern, with
+the defensive-carry overlay as the first (and only planned) new stream.
+
+**SHW-1 (branch `user/claude/shw1-overlay-shadow-20260818`):**
+`assistant/overlay_shadow.py` — frozen registration / observation /
+outcome contracts with the task's own invariants (available ⇒ complete
+finite levels and no refusal reasons; refused ⇒ named reasons and NO
+levels — partial imputation is unrepresentable; canonical dashed
+sessions, aware timestamps, sha256/commit formats, authority-free
+status vocabulary). `assistant/storage.py` — three `overlay_*` tables
+mirroring the `ml_*` conventions: canonical JSON + sha256 identity,
+idempotent exact retries, loud OverlayShadowConflictError on reused
+identities with different content, FK-enforced registration so
+unregistered or cross-epoch writes are refused, outcomes refused for
+missing or refused cycles. Migration is CREATE-IF-NOT-EXISTS idempotent
+and tested against a simulated pre-migration database; a full shadow
+round trip is proven to leave every non-overlay table byte-identical.
+12 new tests; FOUR reverse mutations red then restored (silent-keep on
+conflict, settling refused cycles, partial imputation, raw
+IntegrityError leak). Import-boundary suite green.
+
+Next milestone in the design: SHW-2 (the register/observe/mature/status
+runner CLI), after this round's review.
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

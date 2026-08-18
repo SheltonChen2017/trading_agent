@@ -842,6 +842,23 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Raw log** | `artifacts/qc_stage1_20260818/run19_stage1_A.log`, 153 lines, exact-file sha256:`85aa8e0aecd0775758abd8624c487a7d9e9b9d94cc758a441a96b242bbea0668` |
 | **Validity** | **UNANALYSED** — complete output on reviewed code; the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
 
+## R-024 — Stage 1 replications, B_core, reviewed code (UNANALYSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Stage 1 replications: REP_H52, REP_IDV (as R-023) |
+| **Multiplicity family** | Stage 1 replications 2026-08-18, 24 cells (as R-023) |
+| **Research look** | Counted real-market run (run-level count 24 → 25); no statistic observed |
+| **Source commit** | `875d003` |
+| **Uploaded source SHA-256** | `9227d81a2605da86f93635dbc0fafc53232030065526b6f136a2420440f5c68c` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run20_stage1_B.json`) |
+| **QC project** | `35331896` — `20. STAGE1_REPLICATIONS_B_CORE - 20260818` |
+| **Compile ID** | `928c4cda9df1bb798f90848eef872b96-56aa99aed02fb6d09afc6e891ab7bc35` |
+| **Backtest ID** | `99c98809508f74f917b07036afd9d13d` |
+| **Launched / completed (UTC)** | 2026-08-18T21:33:38.416479+00:00 / 2026-08-18T21:37:24.099760+00:00 |
+| **Output** | STRUCTURALLY COMPLETE: both specs; DATES 128; 248 spec-date rows (REP_H52 123, REP_IDV 125), coverage 2013-01..2024-09/10. Lower date coverage than A_large's 142 is the disclosed settle-side contract on the zombie-heavier universe (a spec-date needs every book name priced at settlement; drops are visible via SPECMETA periods), NOT a series die-off — the bind-side channel worked as designed, with 74 declared-unavailable turnover cells across the six constructions charged 1.0 at analysis. 0 INCOMPLETE lines; `cap_rows=312696 cap_fallback=35268 cap_missing=7291`. Inert. Structural inspection only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage1_20260818/run20_stage1_B.log`, 139 lines, exact-file sha256:`6c7a05e07efb5329a7310ffc46ba84145f798c8f37c050b40e7dc24936f28963` |
+| **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

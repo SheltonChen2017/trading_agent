@@ -1399,7 +1399,15 @@ machine-environment failures, not this round's: the installed Streamlit
 is 1.52.2 while `requirements.txt` pins 1.60.0. `compileall` clean;
 `git diff --check` clean.
 
-**Machine-local operational observation (owner action needed):** this
+**RESOLVED 2026-08-18 (same day):** the owner enabled Windows long
+paths (`LongPathsEnabled=1`, elevated registry change); the pinned
+`streamlit==1.60.0` then installed cleanly, all 14 UI tests pass, and
+the FULL suite on the exact hardening tree (`602dc0b` product code) is
+**4,246 passed, 0 failed, 25 warnings** — the validation record for
+this round is now fully green with zero environmental exclusions. The
+paragraph below is retained as the record of the original observation.
+
+**Machine-local operational observation (original, now resolved):** this
 machine cannot install the pinned `streamlit==1.60.0`: the wheel
 contains a file whose absolute path under the Store-Python
 site-packages is exactly 260 characters, and `LongPathsEnabled=0`, so

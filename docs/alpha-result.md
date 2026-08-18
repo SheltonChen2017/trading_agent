@@ -892,6 +892,22 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Raw log** | `artifacts/qc_stage1_20260818/run22_s1bench_A.log`, 161 lines, exact-file sha256:`6cded4c9ebe3fb752b7f51f1bb4fd244f256ab67691c2e275e6e77987f050547` |
 | **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
 
+## R-027 — Stage 1 benchmark, B_core, reviewed code (UNANALYSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Stage 1 cadence-matched equal-weight benchmark — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 27 → 28); zero alpha cells; no statistic observed |
+| **Source commit** | `875d003` |
+| **Uploaded source SHA-256** | `58781194e493fcb4dc72bdffd173574ff3f510b8cc7e1445561694848e57e5a4` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run23_s1bench_B.json`) |
+| **QC project** | `35332245` — `23. STAGE1_BENCHMARK_B_CORE - 20260818` |
+| **Compile ID** | `647ffba8445641ba4cc2a1ababfa2c93-99139ae1b7f8bc41b0c3cedc8caae45c` |
+| **Backtest ID** | `68d539d90a2db12a1e6e6743b1ed77ee` |
+| **Launched / completed (UTC)** | 2026-08-18T21:45:55.836023+00:00 / 2026-08-18T21:48:38.753072+00:00 |
+| **Output** | STRUCTURALLY COMPLETE: 154 gapless months (2012-01..2024-10); R-024's alpha dates verified a subset of the benchmark months. 33 declared-unavailable turnovers and 29 underfilled months disclosed; 0 INCOMPLETE lines. Inert. Structural inspection only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage1_20260818/run23_s1bench_B.log`, 161 lines, exact-file sha256:`39d04138eabb9e17856a4d1ef146d99e271d086fdfa4f380fd61a84e7f0d3c1b` |
+| **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

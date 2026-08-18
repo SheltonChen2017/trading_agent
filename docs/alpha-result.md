@@ -821,6 +821,27 @@ identity check with no directional or performance content and is not
 analyser output; the R-022 text stands unedited per the append-only
 rule, with this entry as the clarification of record.
 
+## R-023 — Stage 1 replications, A_large, reviewed code (UNANALYSED)
+
+First Stage 1 cloud run, on fully reviewed code (`602dc0b` chain:
+author + fresh-Claude + two Cursor rounds), launched under the owner GO
+of 2026-08-18 (handoff 7af/7ag).
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Stage 1 replications: REP_H52 (52-week-high proximity), REP_IDV (idiosyncratic-volatility proxy); monthly formation, 21-session holds |
+| **Multiplicity family** | Stage 1 replications 2026-08-18, 24 cells, gates frozen in `scripts/analyse_qc_alpha_stage1.py` (stage 0.05/24; lifetime floor 428 → 452 at the family's single observation) |
+| **Research look** | Counted real-market run (run-level count 23 → 24); no statistic observed |
+| **Source commit** | `875d003` (merged main; driver delta independently reviewed the same day) |
+| **Uploaded source SHA-256** | `d425add463d211f64c695cce97e8962387099c1f2df1bd510723a16f6165a9c0` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run19_stage1_A.json`) |
+| **QC project** | `35331806` — requested `19. STAGE1_REPLICATIONS_A_LARGE - 20260818`, returned `19 STAGE1_REPLICATIONS_A_LARGE - 20260818` |
+| **Compile ID** | `65204785eed2028b98dcd360683eb375-0ada5e2487422ef21bcfd7d78261ea95` |
+| **Backtest ID** | `79013bc214c12d5ab9463857fef6e363` |
+| **Launched / completed (UTC)** | 2026-08-18T21:31:01.441083+00:00 / 2026-08-18T21:32:10.519438+00:00 |
+| **Output** | STRUCTURALLY COMPLETE: both specs declared and parsed; DATES 142; 281 spec-date rows (REP_H52 140, REP_IDV 141 — per-spec raggedness round-tripped through the SPECMETA inventory, the first cloud proof of the S0R-001/R-007 hardening); coverage 2013-01..2024-10 (300-session warm-up head, 21-session settle tail); 4 declared-unavailable turnovers (all long-only-20), charged 1.0 at analysis; 0 INCOMPLETE lines; `cap_rows=178769 cap_fallback=16826 cap_missing=3206`. Orders/holdings $0.00 — inert as designed. Structural inspection only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage1_20260818/run19_stage1_A.log`, 153 lines, exact-file sha256:`85aa8e0aecd0775758abd8624c487a7d9e9b9d94cc758a441a96b242bbea0668` |
+| **Validity** | **UNANALYSED** — complete output on reviewed code; the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

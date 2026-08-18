@@ -140,3 +140,39 @@ def test_log_artifact_hash_is_the_exact_bytes_on_disk(tmp_path):
     assert digest == hashlib.sha256(path.read_bytes()).hexdigest()
     with pytest.raises(runner.QuantConnectError, match="already exists"):
         runner._write_log_artifact(path, ["replacement"])
+
+
+def test_stage1_families_map_to_the_frozen_replication_sources():
+    """Owner go 2026-08-18: the driver launches Stage 1 from exactly the
+    reviewed replication and cadence-matched benchmark files."""
+    assert runner.FAMILIES["stage1"] == (
+        "STAGE1_REPLICATIONS", runner.LEAN / "alpha_stage1_replications.py"
+    )
+    assert runner.FAMILIES["stage1-benchmark"] == (
+        "STAGE1_BENCHMARK", runner.LEAN / "alpha_stage1_benchmark.py"
+    )
+
+
+def test_every_family_file_retargets_each_universe_by_one_line():
+    """Launch precondition against the REAL files: every family source
+    must contain exactly one rewritable ACTIVE_UNIVERSE constant, and the
+    rewrite must change that line and nothing else. A second constant or
+    a reformatted declaration would otherwise surface only as a refused
+    cloud launch -- a counted look."""
+    for family, (label, path) in runner.FAMILIES.items():
+        source = path.read_text(encoding="utf-8")
+        for universe in runner.UNIVERSES:
+            rewritten = runner._retarget_universe(source, universe)
+            changed = [
+                (before, after)
+                for before, after in zip(source.splitlines(),
+                                         rewritten.splitlines())
+                if before != after
+            ]
+            assert len(rewritten.splitlines()) == len(source.splitlines())
+            assert len(changed) <= 1, (family, universe, changed)
+            expected = f'ACTIVE_UNIVERSE = "{universe}"'
+            if changed:
+                assert changed[0][1] == expected, (family, universe)
+            else:
+                assert expected in source, (family, universe)

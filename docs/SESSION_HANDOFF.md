@@ -1538,6 +1538,44 @@ mutation executions across three sessions, all red.** The Stage 1 code
 gate remains cleared; the owner's Stage 1 go/no-go remains the only
 gate.
 
+## 7af. Owner GO for Stage 1; launch driver extended (2026-08-18)
+
+**Owner decision 2026-08-18: "go stage 1. proceed with the launch
+driver."** The go was given against the recommendation on record: run
+the preregistered Stage 1 (REP-H52 + REP-IDV with the cadence-matched
+benchmark, 24-cell family, gates frozen in
+`scripts/analyse_qc_alpha_stage1.py`), with the stated protocol that a
+null result ENDS the cross-sectional alpha program on this universe —
+no variant mining afterward — and effort redirects to where wins have
+actually appeared (portfolio construction, risk, paper-observation
+infrastructure). A null is the expected outcome and is treated as a
+finding, not a failure.
+
+This round (branch `user/claude/stage1-launch-driver-20260818`, from
+`08f23a1`): `scripts/run_qc_stage0.py` gains the two Stage 1 families —
+`stage1` → STAGE1_REPLICATIONS (`alpha_stage1_replications.py`) and
+`stage1-benchmark` → STAGE1_BENCHMARK (`alpha_stage1_benchmark.py`) —
+a two-entry FAMILIES addition; everything else (clean-commit binding,
+universe retargeting, naming, evidence JSON, log hashing, serial wait)
+is the reviewed Stage 0 machinery unchanged. New regression tests pin
+the exact family→file mapping and, against the REAL files, that every
+family source retargets each universe by exactly one changed line (the
+launch precondition whose failure would otherwise cost a counted look).
+Both reverse mutations red then green (dropped entries; a duplicated
+ACTIVE_UNIVERSE constant in a real family file).
+
+**Launch sequence from here:** (1) this driver round gets its quick
+independent review — launch plumbing is where this project's sneaky
+bugs have lived; (2) then six serial cloud runs (2 families × 3
+universes, project numbers continuing from 18), one at a time, each
+ledgered at launch with full identity, each structurally round-tripped
+through the frozen parsers before the next — per the standing
+residual-risk note, the stub harness does not test LEAN's callback
+ordering, so the first run's round-trip is the real integration test;
+(3) the frozen Stage 1 analyser runs ONCE after all six complete
+structurally — the only step at which any Stage 1 statistic is
+observed (stage gate 0.05/24; lifetime gate 0.05/452).
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

@@ -521,6 +521,30 @@ that turnover is a COST input, never a gate. Fix round follows: an absence-
 aware packed layout plus turnover-unavailability sentinel, with the v1
 decoder retained so R-002's historical logs stay readable.
 
+## R-014 — Stage 0 short battery, A_large, absence-aware format (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Short battery, 5 specifications, universe A_large (rerun of R-013) |
+| **Research look** | Counted real-market run (run-level count 14 → 15); 20 repeated cells emitted |
+| **Source commit** | `075e982` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `08598e849a9546142a010b6fd9be491438a878146a35c1922d8f612a53c57771` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run10_short_A_r014.json`) |
+| **QC project** | `35296236` — requested `10. SHORT_BATTERY_A_LARGE - 20260817`, returned `10 SHORT_BATTERY_A_LARGE - 20260817` |
+| **Compile ID** | `4dfba63bcc3f5e4f6e04ef6422b3b4a1-99fb9a7542762222e8ba20bb7a31a6e6` |
+| **Backtest ID** | `0c51fbeb49fa4291f53242f888646e14` |
+| **Launched / completed (UTC)** | 2026-08-18T03:18:21.954651+00:00 / 2026-08-18T03:19:33.127045+00:00; 27,300,655 data points; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` — identical universe numbers to R-013, confirming the same computation now reports instead of refusing |
+| **Output** | COMPLETE: `DATES\|533`, layout `b64block_date_u32_mask_u8_i32x4_u16x3` (the R-013 fix), SPECMETA per-spec periods 533/533/532/533/533. The raw cloud log **round-trips through the frozen parser**: 2,664 spec-rows, 2012-04-04..2024-12-19. MAX_20's single absent date is exactly R-013's `2016-01-29`, now disclosed by the presence mask instead of refusing the run. Zero unavailable-turnover cells (the sentinel path was not needed on this universe). Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run10_short_A_r014.log`, 69 lines, exact-file sha256:`5a6224cd2c9d43f023a159e018d5bbc4ada70adb0cbfa4679a13f5711a760cbd` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`075e982` pass independent review |
+
+The R-013 defect is closed in the cloud: the identical A_large computation
+that refused on 2026-08-18 (same cap statistics, same 27.3M data points,
+same 533 dates, same single ragged MAX_20 date) now emits all 2,664 honest
+spec-date cells with the one absence declared. Note this run supersedes the
+role of R-002's A_large leg for Stage 0 purposes; R-002 remains in the
+ledger untouched and its v1 logs remain decodable. Next in the serial plan:
+short B_core, short C_broad, then the three benchmarks.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

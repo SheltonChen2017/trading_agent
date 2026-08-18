@@ -135,6 +135,12 @@ Must:
 - Misaligned policy dates → refuse.
 - Script-mode import of the analyser module succeeds (bootstrap).
 
+**Decision fixed at APQ-2 review (counter-review note, 2026-08-18):**
+whether the optional excess-mean test family is reported AT ALL is
+decided by the reviewed APQ-2 JSON schema — before any run exists —
+never after seeing the descriptive table. Leaving it open past APQ-2
+would create a peek-then-decide channel.
+
 **Definition of done:** tests green; no QC.
 
 ### APQ-3 — Launch driver hook + tests (no QC)

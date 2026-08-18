@@ -55,14 +55,17 @@ are therefore explicit in this design:
 
 ## 2. Components (mirroring ML-LR-6's layout, not importing it)
 
-- `assistant/overlay_shadow.py` — frozen contracts + pure computation
-  for THIS task: registration record (stream name, evidence epoch,
-  preregistration doc path and SHA-256, code commit, schedule
-  key/version, universe members, carry basket, weight, band fraction),
-  observation record (cycle session, tz-aware generation time, input
-  identity, index levels, availability + refusal reasons), outcome
-  record. No `ml` imports, no execution imports; the import-boundary
-  tests extend to prove both directions.
+- `assistant/overlay_shadow.py` — frozen contracts for THIS task
+  (SHW-1; the cycle COMPUTATION arrives with the SHW-2 runner):
+  registration record (stream name, evidence epoch, preregistration doc
+  path and SHA-256, code commit, schedule key/version, universe members,
+  carry basket, weight, band fraction), observation record (cycle
+  session, tz-aware generation time, input identity, index levels,
+  availability + refusal reasons), outcome record. Storage re-validates
+  every payload through these contracts before persisting (POST-001).
+  No `ml` imports, no execution imports —
+  `tests/test_overlay_import_boundary.py` pins both directions
+  (direct imports only, like the ml boundary test).
 - `assistant/storage.py` — three new tables following the `ml_*`
   precedent: `overlay_stream_registrations` (UNIQUE stream+epoch),
   `overlay_observations` (UNIQUE stream+epoch+cycle; refusal rows

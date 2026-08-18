@@ -1315,10 +1315,48 @@ the Stage 0 execution path; S0R-003's nan channel is unexercised by the
 nine logs). Owner acceptance of the review pair is the remaining gate
 before the ledger upgrade and the single frozen-analyser pass.
 
+## 7z. Owner acceptance, ledger upgrade, and the single frozen-analyser pass (2026-08-18)
+
+The owner accepted the review pair and authorized steps 2 and 3. Executed
+in the safe order on branch `user/claude/qc-stage0-analysis-20260818`
+(from merged main `c066b1e`, which contains PR #250's review records):
+
+1. **Upgrade first, observe second.** The nine PENDING_REVIEW entries
+   were upgraded to VALID and committed (`2be903f`) BEFORE any statistic
+   was computed. All nine input-log hashes were re-verified against the
+   ledger (9/9 exact matches, including the benchmark analyser's own
+   independently computed input hashes).
+2. **The single analyser pass** ran once: monthly family, short family,
+   benchmark family. Outputs and their SHA-256s are recorded in ledger
+   entry **A-001** (`docs/alpha-result.md`).
+3. **Headline result:** on the preregistered Bonferroni gate (0.05/180 =
+   2.78e-4, 20,000 draws): **IC 0/44 pass; long-short 0/44 pass;
+   long-only 6/88 pass; short battery 0/60.** MULTI_ALPHA_COMPOSITE on
+   A_large is disclosed insufficient (23 months < the frozen 24
+   minimum). Benchmarks: equal-weight CAGR 12.6–14.2%, Sharpe 0.73–0.85.
+   The six long-only passes are NOT evidence of stock-selection edge:
+   the frozen test is gross-mean-vs-zero, which for long-only carries
+   full market beta that the benchmarks themselves would clear, and the
+   cells are not observation-matched to the benchmark months. The
+   beta-free reads (IC, long-short) fail everywhere. A-001 states these
+   limits alongside the result and closes S0R-007 with a clarifying
+   amendment to R-022's wording.
+4. This was the family's first and only observation; run-level looks
+   stay 23; the lifetime cell floor stays 428 under the repeated-look
+   convention.
+
 ## 8. What is next
 
-1. **The Stage 0 review happened (section 7y) — owner acceptance is the
-   remaining gate.** With Codex tokens exhausted, the owner ran the
+1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
+   remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18
+   and the single frozen-analyser pass has run (section 7z, ledger entry
+   A-001). Stage 0 is CLOSED as evidence-complete: no IC or long-short
+   cell cleared the gate; six long-only cells cleared a beta-carrying
+   gross-vs-zero test that the benchmark itself would clear. Next
+   milestone: the S0R hardening round (S0R-001/002/003/004/005/008) so
+   Stage 1 — which adds the cadence-matched benchmark-same-dates
+   comparison those six cells need — can launch on reviewed code.
+2. **Original review context (superseded):** With Codex tokens exhausted, the owner ran the
    independent review through Cursor (Grok 4.6) instead on 2026-08-18. It
    reviewed the full range `81db126..de1beac` (27 commits, every commit
    dispositioned), accepted all seven product/test commits and all twenty

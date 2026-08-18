@@ -743,6 +743,73 @@ frozen analysers run once, with full run identities, only after the review
 gate — so look accounting and result identity are recorded before any
 statistic exists, exactly as the R-002 precedent required.
 
+## A-001 — Stage 0 single frozen-analyser pass (OBSERVED, 2026-08-18)
+
+The one preregistered observation of the Stage 0 battery. Owner accepted
+the review pair and authorized this pass on 2026-08-18; the nine VALID
+runs' entries were upgraded and committed (`2be903f`) BEFORE any
+statistic was computed, so acceptance is recorded ahead of results.
+
+| Field | Value |
+|---|---|
+| **What** | `scripts/analyse_qc_alpha_battery.py` run once over the monthly family (R-009/R-011/R-012) and once over the short family (R-014/R-015/R-016); `scripts/analyse_qc_benchmark.py` run once over R-022/R-020/R-021. No other statistic source exists for these runs. |
+| **Code identity** | Analyser scripts byte-identical to independently reviewed head `de1beac` (the post-acceptance commits `c066b1e`/`2be903f` changed documents only). Executed on branch `user/claude/qc-stage0-analysis-20260818` at `2be903f`. |
+| **Inputs** | The nine ledgered raw logs. The benchmark analyser's independently computed input hashes and a fresh SHA-256 of all six battery logs match this ledger's recorded hashes exactly (9/9). |
+| **Outputs** | `artifacts/qc_stage0_20260817/analysis_monthly_20260818.json` (301,532 bytes, sha256 `a3ddf7ee84b595160d8ebb24c999a112c6e05ed78f9cbcab33b24e7a8f469963`), `analysis_short_20260818.json` (153,264 bytes, `f38ca4ade3bb5dc6417051a3cfec9447943af6b6c319cd3fbddf68a454fa3007`), `analysis_benchmark_20260818.json` (82,750 bytes, `211ec24a9953f6de1203e30ac4352afec517aee359809f0711089790a4067126`); machine-local, hashes recorded here. |
+| **Multiplicity** | Family: QC alpha battery 2026-08-16, 180 cells. Bonferroni gate 0.05/180 = 2.7778e-4. Stationary block bootstrap, 20,000 draws, smallest attainable p 4.99975e-5 < gate (reachable, per the ABR-001 guard). This is the FIRST AND ONLY observation of the family; run-level look count stays 23; lifetime cell floor stays 428 under the repeated-look convention. |
+| **Observation units** | Monthly family: calendar months (102–142 independent months per cell, varying by spec lookback and universe history). Short family: non-overlapping six-session cycles (~530 per cell). Benchmark: calendar months (155). The frozen bootstrap requires n ≥ 24; every cell meets it except one (below). |
+
+**Results against the frozen gate:**
+
+- **IC (the headline signal test): 0 of 44 defined cells pass.** Minimum
+  ic_p = 2.70e-3 (QUALITY_COMPOSITE, A_large) — an order of magnitude
+  above the gate.
+- **Long-short (self-financing, beta-free): 0 of 44 defined cells pass.**
+  Minimum p = 3.20e-3 (QUALITY_MOMENTUM, A_large, gross Sharpe 1.56).
+- **Long-only: 6 of 88 defined cells pass** (2 of 44 LO10, 4 of 44
+  LO20) on the frozen two-sided
+  gross-mean-vs-zero test: A_large GROSS_PROFITABILITY LO20 (p=1.0e-4,
+  142 mo, gross/net-25bps CAGR 15.7%/15.3%, Sharpe 0.97/0.94); B_core
+  MOM_12_1 LO20 (p=2.5e-4, 124 mo, 18.5%/16.1%, 1.00/0.89); B_core
+  QUALITY_MOMENTUM LO10 (p=1.5e-4, 130 mo, 17.3%/15.4%, 0.96/0.87) and
+  LO20 (p=1.5e-4, 130 mo, 16.2%/14.5%, 0.96/0.87); C_broad MOM_6_1 LO10
+  (p=1.5e-4, 102 mo, 22.6%/18.6%, 1.27/1.08) and LO20 (p=5.0e-5, 102 mo,
+  20.7%/16.9%, 1.29/1.08).
+- **Short battery: 0 of its 60 cells pass** on any hypothesis (closest:
+  MAX_20 long-only p ≈ 4.0e-4–9.5e-4 across universes, still above the
+  gate).
+- **Insufficiency (disclosed, not dropped):** MULTI_ALPHA_COMPOSITE on
+  A_large emitted only 23 months (its components' joint availability on
+  the megacap universe), below the frozen bootstrap minimum of 24 —
+  ic/long-short/long-only p-values are undefined for that spec-universe.
+  Required count: 24; observed: 23; sufficiency: NOT MET.
+- **Benchmarks (equal-weight, 155 months, not alpha cells):** A_large
+  CAGR 12.8%, Sharpe 0.85, maxDD −27.6% (6 unavailable-turnover, 6
+  underfilled months); B_core 12.6%, 0.73, −33.9% (60/61); C_broad
+  14.2%, 0.76, −34.7% (85/86).
+
+**Interpretation limits (stated with the result, not a post-hoc gate
+change):** the frozen per-cell test is gross-mean-vs-zero. For long-only
+constructions that series carries full market beta, and the equal-weight
+benchmarks themselves (Sharpe 0.73–0.85 over the same 2012–2024 era)
+would pass the same test — so the six passing long-only cells are NOT
+evidence of stock-selection edge beyond the market. The beta-free reads
+(IC and long-short) fail everywhere. The passing cells are also not
+observation-matched to the benchmark (102–142 months vs 155; e.g.
+C_broad MOM_6_1's maxDD of −10.3% over its 102 covered months against
+the benchmark's −34.7% over 155 partly reflects the differing window,
+not only selection). A cadence-matched benchmark-same-dates comparison
+is exactly what the Stage 1 design adds; any claim beyond "these six
+cells cleared the preregistered Stage 0 gate" requires it.
+
+**Amendment to R-022 (closes review finding S0R-007):** R-022's phrase
+"Parsing only; no statistic observed" was imprecise — the max-absolute-
+difference replication check against R-018 was a numeric comparison of
+raw return values performed outside the frozen analyser. It was an
+identity check with no directional or performance content and is not
+analyser output; the R-022 text stands unedited per the append-only
+rule, with this entry as the clarification of record.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

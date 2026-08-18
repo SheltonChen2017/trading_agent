@@ -588,6 +588,41 @@ all three universes: monthly (R-009, R-011, R-012) and short (R-014, R-015,
 R-016), all PENDING_REVIEW on the same review range. Only the three
 equal-weight benchmark runs remain; they are not alpha cells.
 
+## R-017 — Stage 0 universe benchmark, A_large, silent die-off (INVALIDATED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, A_large — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 17 → 18); zero alpha cells |
+| **Source commit** | `966d12f` (`research/lean/universe_benchmark.py` untouched by any of the R-006..R-013 fixes) |
+| **Uploaded source SHA-256** | `f91e1bb1bb9aebe8f1c1cade36d60e73bce0ed6a3e13c04419cbbc299a8097c6` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run13_benchmark_A_r017.json`) |
+| **QC project** | `35296819` — requested `13. UNIVERSE_BENCHMARK_A_LARGE - 20260817`, returned `13 UNIVERSE_BENCHMARK_A_LARGE - 20260817` |
+| **Compile ID** | `ef808bfb0af7fee3170d53dda38d49a0-ba19fc5003330f64153fb8c7aa6f9d0e` |
+| **Backtest ID** | `22328e264fae96c5d9f1742819e3cdc4` |
+| **Launched / completed (UTC)** | 2026-08-18T03:38:04.891513+00:00 / 2026-08-18T03:39:29.140044+00:00; 27,298,298 data points |
+| **Output** | `DATES\|48` with 48 BROW rows, 2012-01..**2015-12 only** — the algorithm processed thirteen years of data and silently reported four. The log is internally consistent (declared count matches rows, parser accepts it); only the expected-coverage arithmetic (≈156 months for 2012–2024) exposes the loss. No statistic was computed from the series. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run13_benchmark_A_r017.log`, 55 lines, exact-file sha256:`6d12a14da5f0dd8eb6210d4e053f9a5709f062f3cda8582dd24fb7b14d37c75e` |
+| **Validity** | **INVALIDATED** — a 2012–2015 series is unusable as the 2012–2024 benchmark; rerun on fixed code will be a new R-number |
+
+### Root cause: the R-010 zombie die-off, third instance, in the one file no fix touched
+
+`_bind_staged_entry` gates the monthly bind on turnover: when
+`_drift_turnover` returns None (a held name with no outcome — the zombie
+pattern that stalls in January 2016 on every battery), the bind returns
+early and `previous_weights` keeps the stale book. The zombie never prices
+again, so every later month's turnover is None, every later bind refuses,
+and the series dies permanently while the run "completes" normally. This
+is exactly R-010's defect; `d305ea0` fixed it in the monthly battery and
+`46221db` fixed its format-level cousin in the short battery, but the
+benchmark kept its own private copy of the gated bind. Unlike R-013's
+fail-closed refusal, this failure is **fail-silent**: the output passes
+every internal consistency check and would have quietly become the
+denominator under every long-only result. Fix round follows: bind always;
+unpriceable turnover becomes a declared-unavailability empty field charged
+at the conservative full 1.0 by the analyser; a genuinely unpriceable
+month's return stays absent (visible as a month gap) but can no longer
+poison its successors.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

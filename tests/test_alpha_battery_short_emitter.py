@@ -190,6 +190,10 @@ def test_settle_emits_the_row_when_exit_turnover_is_unpriceable(
     algorithm.in_universe = set(names)
     algorithm._settle()
 
+    # Every specification must have emitted its row: an empty results dict
+    # is exactly what the reinstated turnover gate produces, so this
+    # assertion is what makes the mutation detectable.
+    assert set(algorithm.results) == set(namespace["SPECIFICATIONS"])
     for spec, rows in algorithm.results.items():
         assert len(rows) == 1, spec
         row = rows[0]

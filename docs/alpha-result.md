@@ -394,7 +394,7 @@ acceptance as new R-numbers.**
 | **Completed** | 207.93 s engine time; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` |
 | **Output** | COMPLETE: all ten specs, `DATES\|142` = 142 rows, 10 SPECMETA lines; the raw cloud log **round-trips through the frozen parser** (619 spec-rows; per-spec periods disclosed, e.g. GROSS 142, MOM_3 107, RESIDUAL 65, MOM_12/QUALITY 35, MULTI 23). Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run5_monthly_A_r009.log`, 161 lines, exact-file sha256:`7581a59c2bd8add5f61e10f03d3f3ff1c160704fcd78a04a43ff561245c61b9e` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160` passes independent review; rerun required only if that review finds a result-changing defect |
+| **Validity** | **VALID** — accepted 2026-08-18: independent review (Cursor/Grok 4.6) and Claude counter-review of `81db126..de1beac` both accepted the generating code with no result-changing defect, and the owner accepted the review pair the same day (see `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md` and `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`); no rerun required |
 
 ## R-010 — Stage 0 monthly battery, B_core, spiral/parser fixes (INVALIDATED)
 
@@ -455,7 +455,7 @@ as a new R-number.**
 | **Launched / completed (UTC)** | 2026-08-18T00:11:51.703542+00:00 / 2026-08-18T00:20:06.844904+00:00; 32,054,443 data points; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` (identical universe numbers to R-006/R-008/R-010) |
 | **Output** | COMPLETE: all ten specs, `DATES\|142` = 142 rows (2013-02..2024-11, same depth as A_large's R-009), 10 SPECMETA lines with per-spec periods 116..133 (vs R-010's collapsed 3..42). The raw cloud log **round-trips through the frozen parser** (1,233 spec-rows). Unavailable-turnover fields present as designed: 89/54/94 rows (long_short/long_only_10/long_only_20) spread across ALL ten specifications (8–18 dates each) — every spec chain survived a trapped zombie name and retried instead of dying. Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run7_monthly_B_r011.log`, 161 lines, exact-file sha256:`351665870750f3505bd5bfec48a85220faad9dcbd27f746f378c7e1dfefb70f9` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`d305ea0` pass independent review; the ~7% of months with unavailable turnover are each charged the conservative full 1.0 one-way at analysis, with counts disclosed per construction |
+| **Validity** | **VALID** — accepted 2026-08-18: independent review (Cursor/Grok 4.6) and Claude counter-review of `81db126..de1beac` both accepted the generating code with no result-changing defect, and the owner accepted the review pair the same day (see `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md` and `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`); the ~7% of months with unavailable turnover are each charged the conservative full 1.0 one-way at analysis, with counts disclosed per construction |
 
 The zombie-name defect is now closed in the cloud, not only in simulation:
 B_core — the universe that killed R-006 (weekend labels), R-008 (refusal
@@ -478,7 +478,7 @@ C_broad is next.
 | **Launched / completed (UTC)** | 2026-08-18T00:21:33.564735+00:00 / 2026-08-18T02:50:30.284162+00:00; 34,641,380 data points; `cap_rows=429848 cap_fallback=52239 cap_missing=12771`. The first `wait` attempt dropped at ~72% on a transient local DNS failure (`getaddrinfo failed`) and was re-attached; the cloud run was unaffected. The evidence JSON retains the stale `unresolved_reason` field beside `status=completed` as an honest record of that interruption. |
 | **Output** | COMPLETE: all ten specs, `DATES\|140` = 140 rows (2013-02..2024-11), 10 SPECMETA lines with per-spec periods 98..126 and median names 1,664–2,392 (broad universe as designed). The raw cloud log **round-trips through the frozen parser** (1,089 spec-rows). Unavailable-turnover fields present as designed: 164/121/186 rows (long_short/long_only_10/long_only_20) spread across ALL ten specifications (7–22 dates each) — more than B_core's 89/54/94, consistent with a broader universe holding more zombie names. Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run8_monthly_C_r012.log`, 159 lines, exact-file sha256:`98ce6c4f02b43f2a547a494f521ec507919aeea7d149da4c8bbac649580f33e8` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`d305ea0` pass independent review; the ~12–17% of months with unavailable turnover are each charged the conservative full 1.0 one-way at analysis, with counts disclosed per construction |
+| **Validity** | **VALID** — accepted 2026-08-18: independent review (Cursor/Grok 4.6) and Claude counter-review of `81db126..de1beac` both accepted the generating code with no result-changing defect, and the owner accepted the review pair the same day (see `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md` and `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`); the ~12–17% of months with unavailable turnover are each charged the conservative full 1.0 one-way at analysis, with counts disclosed per construction |
 
 The monthly leg of Stage 0 is now complete in the cloud: A_large (R-009),
 B_core (R-011), and C_broad (R-012) all produced full-depth, parseable
@@ -535,7 +535,7 @@ decoder retained so R-002's historical logs stay readable.
 | **Launched / completed (UTC)** | 2026-08-18T03:18:21.954651+00:00 / 2026-08-18T03:19:33.127045+00:00; 27,300,655 data points; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` — identical universe numbers to R-013, confirming the same computation now reports instead of refusing |
 | **Output** | COMPLETE: `DATES\|533`, layout `b64block_date_u32_mask_u8_i32x4_u16x3` (the R-013 fix), SPECMETA per-spec periods 533/533/532/533/533. The raw cloud log **round-trips through the frozen parser**: 2,664 spec-rows, 2012-04-04..2024-12-19. MAX_20's single absent date is exactly R-013's `2016-01-29`, now disclosed by the presence mask instead of refusing the run. Zero unavailable-turnover cells (the sentinel path was not needed on this universe). Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run10_short_A_r014.log`, 69 lines, exact-file sha256:`5a6224cd2c9d43f023a159e018d5bbc4ada70adb0cbfa4679a13f5711a760cbd` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`075e982` pass independent review |
+| **Validity** | **VALID** — accepted 2026-08-18: independent review (Cursor/Grok 4.6) and Claude counter-review of `81db126..de1beac` both accepted the generating code with no result-changing defect, and the owner accepted the review pair the same day (see `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md` and `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`) |
 
 The R-013 defect is closed in the cloud: the identical A_large computation
 that refused on 2026-08-18 (same cap statistics, same 27.3M data points,
@@ -559,7 +559,7 @@ short B_core, short C_broad, then the three benchmarks.
 | **Launched / completed (UTC)** | 2026-08-18T03:20:35.785136+00:00 / 2026-08-18T03:26:20.703864+00:00; 31,956,942 data points; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` (the same B_core universe numbers as the monthly runs) |
 | **Output** | COMPLETE: `DATES\|533`, masked layout, per-spec periods 531/521/508/527/528 — far more ragged than A_large's 532..533, so **this run would have been refused outright by the v1 all-or-nothing format**; the R-013 fix is what makes B_core's short battery reportable at all. The raw cloud log **round-trips through the frozen parser**: 2,615 spec-rows, 2012-04-04..2024-12-19. Zero unavailable-turnover cells. Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run11_short_B_r015.log`, 69 lines, exact-file sha256:`cc8bd06b71c3d9be412721c1432c3fe2777cf42781bb75a9a9a62993af2f88bb` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`075e982` pass independent review |
+| **Validity** | **VALID** — accepted 2026-08-18: independent review (Cursor/Grok 4.6) and Claude counter-review of `81db126..de1beac` both accepted the generating code with no result-changing defect, and the owner accepted the review pair the same day (see `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md` and `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`) |
 
 Short-battery coverage now: A_large (R-014) and B_core (R-015) complete
 awaiting review. B_core's 25 absent MAX_20 dates (and 5–12 for the other
@@ -581,7 +581,7 @@ by SPECMETA. Next: short C_broad, then the three benchmarks.
 | **Launched / completed (UTC)** | 2026-08-18T03:27:17.192922+00:00 / 2026-08-18T03:37:09.078093+00:00; 34,541,299 data points; `cap_rows=429848 cap_fallback=52239 cap_missing=12771` (the same C_broad universe numbers as monthly R-012) |
 | **Output** | COMPLETE: `DATES\|532`, masked layout, per-spec periods 523/513/496/519/519 — the most ragged of the three universes, again unreportable under the v1 all-or-nothing format. The raw cloud log **round-trips through the frozen parser**: 2,570 spec-rows, 2012-04-04..2024-12-19. Zero unavailable-turnover cells. Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run12_short_C_r016.log`, 69 lines, exact-file sha256:`da0ac76705706c0763992cc60ed88b45929338eb47d6706b48782b63d29c0044` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`075e982` pass independent review |
+| **Validity** | **VALID** — accepted 2026-08-18: independent review (Cursor/Grok 4.6) and Claude counter-review of `81db126..de1beac` both accepted the generating code with no result-changing defect, and the owner accepted the review pair the same day (see `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md` and `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`) |
 
 Both alpha families are now complete in the cloud on the fixed code across
 all three universes: monthly (R-009, R-011, R-012) and short (R-014, R-015,
@@ -692,7 +692,7 @@ universes will be rerun on the extended contract for uniformity.
 | **Launched / completed (UTC)** | 2026-08-18T04:18:47.345291+00:00 / 2026-08-18T04:20:57.961762+00:00 |
 | **Output** | COMPLETE: **155 of 156 months** (only the 2024-12 end boundary absent, matching the batteries' 2024-11 endpoint), versus R-019's 94. The raw cloud log **round-trips through the frozen benchmark parser** (five-field rows). 61 months carry disclosed underfill — worst coverage 99.83% priced, i.e. the old all-names gate was discarding whole months over 1–3 unpriceable names out of ~1,700. 60 months carry declared-unavailable turnover, each charged the conservative full 1.0 at analysis with counts disclosed. Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run16_benchmark_B_r020.log`, 162 lines, exact-file sha256:`dbf6ad69c3720e0453318d58449b01dcab532aa4773a000c3f5b2b5e04ecffda` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`39b3b89` pass independent review |
+| **Validity** | **VALID** — accepted 2026-08-18: independent review (Cursor/Grok 4.6) and Claude counter-review of `81db126..de1beac` both accepted the generating code with no result-changing defect, and the owner accepted the review pair the same day (see `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md` and `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`) |
 
 The R-019 coverage collapse is closed in the cloud: B_core's baseline now
 spans the full period with every underfilled month recorded rather than
@@ -713,7 +713,7 @@ all three universes) remain.
 | **Launched / completed (UTC)** | 2026-08-18T04:21:52.870250+00:00 / 2026-08-18T04:25:10.381972+00:00 |
 | **Output** | COMPLETE: **155 of 156 months** (only the 2024-12 end boundary absent). The raw cloud log **round-trips through the frozen benchmark parser** (five-field rows). 86 months carry disclosed underfill — worst coverage 99.72% priced — and 85 months carry declared-unavailable turnover, each charged the conservative full 1.0 at analysis with counts disclosed. The broadest universe shows the most zombie churn, exactly as R-012/R-016 predicted. Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run17_benchmark_C_r021.log`, 162 lines, exact-file sha256:`aa8a09872e8eab1640d79ecc2eb4f4ed80fd2ba91dfb067dd4f6d757e7c777dc` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`39b3b89` pass independent review |
+| **Validity** | **VALID** — accepted 2026-08-18: independent review (Cursor/Grok 4.6) and Claude counter-review of `81db126..de1beac` both accepted the generating code with no result-changing defect, and the owner accepted the review pair the same day (see `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md` and `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`) |
 
 Only the A_large benchmark rerun remains (five-field uniformity across all
 three universes; its R-018 log predates the underfill-recording contract).
@@ -732,7 +732,7 @@ three universes; its R-018 log predates the underfill-recording contract).
 | **Launched / completed (UTC)** | 2026-08-18T04:25:56.576347+00:00 / 2026-08-18T04:27:06.095429+00:00 |
 | **Output** | COMPLETE: **155 of 156 months** (only the 2024-12 end boundary absent). The raw cloud log **round-trips through the frozen benchmark parser** (five-field rows). 6 months carry disclosed underfill and 6 declared-unavailable turnover. **Replication check against R-018:** the 149 months both runs emitted have max absolute return difference **0.0** — the underfill contract changed nothing on full months and only recovered the six R-018 had dropped. Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run18_benchmark_A_r022.log`, 162 lines, exact-file sha256:`b8ace1727a06f4d022e7c7130c0bd88d01fe0ccd90ad73668189f11160e94149` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`39b3b89` pass independent review |
+| **Validity** | **VALID** — accepted 2026-08-18: independent review (Cursor/Grok 4.6) and Claude counter-review of `81db126..de1beac` both accepted the generating code with no result-changing defect, and the owner accepted the review pair the same day (see `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md` and `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`) |
 
 **The nine-run Stage 0 battery is complete on the fixed code.** Monthly:
 R-009 (A_large), R-011 (B_core), R-012 (C_broad). Short: R-014 (A_large),

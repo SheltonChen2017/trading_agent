@@ -908,6 +908,31 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Raw log** | `artifacts/qc_stage1_20260818/run23_s1bench_B.log`, 161 lines, exact-file sha256:`39d04138eabb9e17856a4d1ef146d99e271d086fdfa4f380fd61a84e7f0d3c1b` |
 | **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
 
+## R-028 — Stage 1 benchmark, C_broad, reviewed code (UNANALYSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Stage 1 cadence-matched equal-weight benchmark — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 28 → 29); zero alpha cells; no statistic observed |
+| **Source commit** | `875d003` |
+| **Uploaded source SHA-256** | `40cfbe9125d8c59710209705e9b99d6d4558d3cd30d52744efac461245d5812d` (`ACTIVE_UNIVERSE="C_broad"` rewrite; recorded in `run24_s1bench_C.json`) |
+| **QC project** | `35332356` — `24. STAGE1_BENCHMARK_C_BROAD - 20260818` |
+| **Compile ID** | `609f5c9677443641e553f6b4fc94f07a-1528a369f417fd388572a85c27e68b00` |
+| **Backtest ID** | `d94bc57211a5c1f10343a5e870fa8e51` |
+| **Launched / completed (UTC)** | 2026-08-18T21:49:35.177290+00:00 / 2026-08-18T21:52:52.494640+00:00 |
+| **Output** | STRUCTURALLY COMPLETE: 154 gapless months (2012-01..2024-10); R-025's alpha dates verified a subset. 53 declared-unavailable turnovers and 55 underfilled months disclosed — the heaviest disclosure of the three, consistent with the broadest universe; 0 INCOMPLETE lines. Inert. Structural inspection only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage1_20260818/run24_s1bench_C.log`, 161 lines, exact-file sha256:`79162d8b9fecc291346a5c1cd81c07fac580c8f17b841dc40d2dae09bea24fbf` |
+| **Validity** | **UNANALYSED** — superseded by the single analyser pass recorded below this battery's entries |
+
+**The six-run Stage 1 battery is complete on reviewed code, first attempt,
+zero refusals.** Replications: R-023 (A_large), R-024 (B_core), R-025
+(C_broad). Benchmarks: R-026 (A_large), R-027 (B_core), R-028 (C_broad).
+Every log round-tripped the frozen parsers structurally; every alpha date
+is covered by its benchmark. Per the owner GO and recorded sequence
+(handoff 7af/7ag), the frozen Stage 1 analyser now runs ONCE — the only
+step at which any Stage 1 statistic is observed. Stage gate 0.05/24;
+lifetime cell floor 428 → 452 at this observation.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

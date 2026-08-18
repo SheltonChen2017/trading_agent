@@ -49,7 +49,13 @@ def parse_benchmark(path: Path) -> pd.DataFrame:
             # value must be finite: a literal ``nan`` token would otherwise
             # be dropped before the finite validation and silently
             # relabelled as declared unavailability (S0R-003).
-            turnover = float(parts[2]) if parts[2] else None
+            try:
+                turnover = float(parts[2]) if parts[2] else None
+            except ValueError as exc:
+                # SHR-001: typed refusal for a malformed token.
+                raise SystemExit(
+                    f"{path.name}: invalid benchmark turnover"
+                ) from exc
             if turnover is not None and not math.isfinite(turnover):
                 raise SystemExit(f"{path.name}: invalid benchmark turnover")
             priced = int(parts[3])

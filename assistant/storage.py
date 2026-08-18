@@ -55,6 +55,10 @@ class BrokerActivityAcknowledgementConflictError(ValueError):
 class ResearchLookConflictError(ValueError):
     """One research-look fingerprint was reused for different content."""
 
+
+class OverlayShadowConflictError(ValueError):
+    """One overlay shadow identity was reused for different content."""
+
 # ML-LR-6 plan 12.2's minimum lineage. Every one of these can change WITHOUT
 # any code change -- a re-fit model, a new report, a swapped provider, an
 # edited config -- and each silently invalidates comparison against earlier
@@ -695,6 +699,39 @@ class AssistantStore:
                     outcome_hash TEXT NOT NULL,
                     FOREIGN KEY(prediction_id)
                         REFERENCES ml_predictions(prediction_id)
+                );
+                CREATE TABLE IF NOT EXISTS overlay_stream_registrations (
+                    stream_name TEXT NOT NULL,
+                    evidence_epoch TEXT NOT NULL,
+                    registered_at TEXT NOT NULL,
+                    registration_json TEXT NOT NULL,
+                    registration_hash TEXT NOT NULL,
+                    status TEXT NOT NULL,
+                    PRIMARY KEY (stream_name, evidence_epoch)
+                );
+                CREATE TABLE IF NOT EXISTS overlay_observations (
+                    stream_name TEXT NOT NULL,
+                    evidence_epoch TEXT NOT NULL,
+                    cycle_session TEXT NOT NULL,
+                    generated_at TEXT NOT NULL,
+                    available INTEGER NOT NULL,
+                    observation_json TEXT NOT NULL,
+                    observation_hash TEXT NOT NULL,
+                    PRIMARY KEY (stream_name, evidence_epoch, cycle_session),
+                    FOREIGN KEY (stream_name, evidence_epoch)
+                        REFERENCES overlay_stream_registrations(stream_name, evidence_epoch)
+                );
+                CREATE TABLE IF NOT EXISTS overlay_outcomes (
+                    stream_name TEXT NOT NULL,
+                    evidence_epoch TEXT NOT NULL,
+                    cycle_session TEXT NOT NULL,
+                    matured_at TEXT NOT NULL,
+                    available INTEGER NOT NULL,
+                    outcome_json TEXT NOT NULL,
+                    outcome_hash TEXT NOT NULL,
+                    PRIMARY KEY (stream_name, evidence_epoch, cycle_session),
+                    FOREIGN KEY (stream_name, evidence_epoch, cycle_session)
+                        REFERENCES overlay_observations(stream_name, evidence_epoch, cycle_session)
                 );
                 CREATE TABLE IF NOT EXISTS operational_drill_runs (
                     drill_id TEXT PRIMARY KEY,
@@ -2203,6 +2240,194 @@ class AssistantStore:
         with self._connect() as connection:
             rows = connection.execute(query, tuple(params)).fetchall()
         return [self._ml_shadow_run_row_to_dict(row) for row in rows]
+
+    # ------------------------------------------------------------------
+    # Overlay shadow stream (SHW-1). Observation-only tables mirroring the
+    # ml_* precedent: canonical JSON + sha256 identity, idempotent exact
+    # retries, loud refusal of conflicting content for a reused identity,
+    # and no vocabulary for authority.
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _overlay_identity(payload: dict[str, Any], keys: tuple[str, ...],
+                          name: str) -> tuple[str, ...]:
+        values = []
+        for key in keys:
+            value = payload.get(key)
+            if not isinstance(value, str) or not value.strip():
+                raise ValueError(f"{name} requires non-empty {key}")
+            values.append(value)
+        return tuple(values)
+
+    def _overlay_upsert(
+        self, *, table: str, identity_columns: tuple[str, ...],
+        identity: tuple[str, ...], extra_columns: dict[str, Any],
+        payload_json: str, payload_hash: str, json_column: str,
+        hash_column: str, conflict_label: str,
+    ) -> dict[str, Any]:
+        """Insert one append-only row; exact retries return the original.
+
+        A reused identity with DIFFERENT content raises
+        OverlayShadowConflictError instead of silently keeping either
+        version — the same rule the journal and research-look tables
+        enforce.
+        """
+        placeholders = ", ".join("?" for _ in (*identity, *extra_columns, payload_json, payload_hash))
+        columns = (*identity_columns, *extra_columns.keys(), json_column, hash_column)
+        where = " AND ".join(f"{column} = ?" for column in identity_columns)
+        with self._connect() as connection:
+            existing = connection.execute(
+                f"SELECT * FROM {table} WHERE {where}", identity
+            ).fetchone()
+            if existing is not None:
+                if existing[hash_column] != payload_hash:
+                    raise OverlayShadowConflictError(
+                        f"{conflict_label} {identity} already recorded with "
+                        "different content; append-only evidence is never "
+                        "rewritten"
+                    )
+                return dict(existing)
+            connection.execute(
+                f"INSERT INTO {table} ({', '.join(columns)}) VALUES ({placeholders})",
+                (*identity, *extra_columns.values(), payload_json, payload_hash),
+            )
+            row = connection.execute(
+                f"SELECT * FROM {table} WHERE {where}", identity
+            ).fetchone()
+            return dict(row)
+
+    def register_overlay_stream(self, registration: dict[str, Any]) -> dict[str, Any]:
+        """Register one overlay stream+epoch for shadow observation.
+
+        The status vocabulary ('shadow'/'closed') deliberately cannot
+        express authority; promotion is a separate owner decision that no
+        method here can grant.
+        """
+        if not isinstance(registration, dict) or not registration:
+            raise ValueError("registration must be a non-empty dictionary")
+        if registration.get("status") not in ("shadow", "closed"):
+            raise ValueError(
+                "overlay stream status must be 'shadow' or 'closed'; "
+                "authority cannot be expressed by this table"
+            )
+        identity = self._overlay_identity(
+            registration, ("stream_name", "evidence_epoch"), "registration"
+        )
+        payload_json = _canonical_ml_json(registration, "registration")
+        payload_hash = _hash_payload(payload_json)
+        registered_at = datetime.now(timezone.utc).isoformat()
+        return self._overlay_upsert(
+            table="overlay_stream_registrations",
+            identity_columns=("stream_name", "evidence_epoch"),
+            identity=identity,
+            extra_columns={
+                "registered_at": registered_at,
+                "status": registration["status"],
+            },
+            payload_json=payload_json,
+            payload_hash=payload_hash,
+            json_column="registration_json",
+            hash_column="registration_hash",
+            conflict_label="overlay stream",
+        )
+
+    def record_overlay_observation(self, observation: dict[str, Any]) -> dict[str, Any]:
+        """Append one cycle observation (or its refusal row), idempotently."""
+        if not isinstance(observation, dict) or not observation:
+            raise ValueError("observation must be a non-empty dictionary")
+        identity = self._overlay_identity(
+            observation, ("stream_name", "evidence_epoch", "cycle_session"),
+            "observation",
+        )
+        generated_at = observation.get("generated_at")
+        _parse_aware_timestamp(generated_at, "generated_at")
+        available = observation.get("available")
+        if not isinstance(available, bool):
+            raise ValueError("observation requires a boolean 'available'")
+        payload_json = _canonical_ml_json(observation, "observation")
+        payload_hash = _hash_payload(payload_json)
+        try:
+            return self._overlay_upsert(
+                table="overlay_observations",
+                identity_columns=("stream_name", "evidence_epoch", "cycle_session"),
+                identity=identity,
+                extra_columns={
+                    "generated_at": generated_at,
+                    "available": 1 if available else 0,
+                },
+                payload_json=payload_json,
+                payload_hash=payload_hash,
+                json_column="observation_json",
+                hash_column="observation_hash",
+                conflict_label="overlay observation",
+            )
+        except sqlite3.IntegrityError as exc:
+            raise ValueError(
+                "observation refused: its stream+epoch is not registered "
+                "(cross-epoch or unregistered writes are never accepted)"
+            ) from exc
+
+    def record_overlay_outcome(self, outcome: dict[str, Any]) -> dict[str, Any]:
+        """Attach one matured outcome to an AVAILABLE observation."""
+        if not isinstance(outcome, dict) or not outcome:
+            raise ValueError("outcome must be a non-empty dictionary")
+        identity = self._overlay_identity(
+            outcome, ("stream_name", "evidence_epoch", "cycle_session"),
+            "outcome",
+        )
+        matured_at = outcome.get("matured_at")
+        _parse_aware_timestamp(matured_at, "matured_at")
+        available = outcome.get("available")
+        if not isinstance(available, bool):
+            raise ValueError("outcome requires a boolean 'available'")
+        with self._connect() as connection:
+            observation = connection.execute(
+                """
+                SELECT available FROM overlay_observations
+                WHERE stream_name = ? AND evidence_epoch = ? AND cycle_session = ?
+                """,
+                identity,
+            ).fetchone()
+        if observation is None:
+            raise ValueError(
+                "outcome refused: no observation exists for this cycle"
+            )
+        if not observation["available"]:
+            raise ValueError(
+                "outcome refused: the cycle's observation was a refusal, so "
+                "no hypothetical position existed to settle"
+            )
+        payload_json = _canonical_ml_json(outcome, "outcome")
+        payload_hash = _hash_payload(payload_json)
+        return self._overlay_upsert(
+            table="overlay_outcomes",
+            identity_columns=("stream_name", "evidence_epoch", "cycle_session"),
+            identity=identity,
+            extra_columns={
+                "matured_at": matured_at,
+                "available": 1 if available else 0,
+            },
+            payload_json=payload_json,
+            payload_hash=payload_hash,
+            json_column="outcome_json",
+            hash_column="outcome_hash",
+            conflict_label="overlay outcome",
+        )
+
+    def get_overlay_observations(
+        self, stream_name: str, evidence_epoch: str
+    ) -> list[dict[str, Any]]:
+        """Read one stream+epoch's observations in cycle order."""
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT * FROM overlay_observations
+                WHERE stream_name = ? AND evidence_epoch = ?
+                ORDER BY cycle_session
+                """,
+                (stream_name, evidence_epoch),
+            ).fetchall()
+        return [dict(row) for row in rows]
 
     def record_ml_prediction(self, prediction: dict[str, Any]) -> dict[str, Any]:
         """Append one shadow prediction, idempotently (doc 10.2).

@@ -1642,6 +1642,78 @@ checklist in full and verified every checkable claim
 consistent everywhere: the cross-sectional alpha program on this
 universe is CLOSED, and no document any longer suggests otherwise.
 
+## 7aj. Post-closure program: owner adopted 1-2-4-3; hygiene round done; two drafts authored (2026-08-18)
+
+**Owner decision 2026-08-18: adopted the recommended sequence "1-2-4-3"**
+— (1) hygiene tail, (2) shadow-observation infrastructure, (4)
+wide-band deployment check, (3) defensive-carry preregistration.
+Executed this round (branch `user/claude/analyser-hygiene-20260818`):
+
+- **Step 1 DONE (code):** S1R-001 closed — `analyse_qc_alpha_stage1.py`
+  gains the sys.path bootstrap its siblings carry, pinned by a
+  subprocess test that invokes the real script in script mode; SHR-001
+  closed — malformed non-numeric tokens now refuse via typed
+  `InvalidLog`/`SystemExit` in both Stage 0 parsers instead of a bare
+  ValueError traceback. Three reverse mutations red then restored
+  green. No analyser was re-invoked on any QC log. Awaiting the usual
+  quick independent review.
+- **Step 4 DONE (finding, no work needed):** the wide rebalance band is
+  ALREADY DEPLOYED — `assistant/rebalance_profile.py` carries the
+  owner-approved (2026-08-15) profile with `band_fraction="0.25"`,
+  citing the confirmed wide-band research result as mechanism while
+  correctly not overclaiming it as evidence for the exact
+  configuration. Nothing to change.
+- **Step 2 DRAFT:** `docs/reference/SHADOW_OBSERVATION_DESIGN.md` —
+  strategy-agnostic shadow-stream design (frozen-epoch registration,
+  append-only observations, declared-unavailable outcomes, §6
+  sufficiency reports, SHW-1..4 milestones, hard no-order/no-promotion
+  boundaries). Needs owner review/adoption before any implementation.
+- **Step 3 DRAFT:** `docs/research/DEFENSIVE_CARRY_2026-08-18_PREREGISTRATION.md`
+  — counts the 2026-07-31 probe as discovery look #1; one primary cell
+  (20% carry weight) with a composite tail-risk gate, secondary weights
+  descriptive only; retrospective walk-forward + block-bootstrap leg
+  plus a prospective shadow leg (SHW-4); every threshold marked
+  [TO FREEZE] and binding only when the owner adopts and freezes them
+  BEFORE any confirmation result. Explicitly not a reopening of the
+  closed alpha program (no selection, no ranking).
+
+Next in the adopted sequence: owner review of the two drafts (and the
+hygiene round's independent review); then SHW-1 begins as its own
+milestone.
+
+## 7ak. SHW-1 implemented after a design correction (2026-08-18)
+
+**Discovery first:** pre-implementation reconnaissance found the project
+already HAS a reviewed shadow infrastructure — ML-LR-6
+(`ml/shadow_runtime.py`, `scripts/run_ml_shadow.py`
+register/predict/mature/monitor, the `ml_*` tables, scheduler
+installers) — and that its docstring records the anti-generic-adapter
+principle the first SHADOW_OBSERVATION_DESIGN draft violated. The
+design was REVISED before any code: no generic framework; each observed
+task gets a task-specific runtime following the ML-LR-6 pattern, with
+the defensive-carry overlay as the first (and only planned) new stream.
+
+**SHW-1 (branch `user/claude/shw1-overlay-shadow-20260818`):**
+`assistant/overlay_shadow.py` — frozen registration / observation /
+outcome contracts with the task's own invariants (available ⇒ complete
+finite levels and no refusal reasons; refused ⇒ named reasons and NO
+levels — partial imputation is unrepresentable; canonical dashed
+sessions, aware timestamps, sha256/commit formats, authority-free
+status vocabulary). `assistant/storage.py` — three `overlay_*` tables
+mirroring the `ml_*` conventions: canonical JSON + sha256 identity,
+idempotent exact retries, loud OverlayShadowConflictError on reused
+identities with different content, FK-enforced registration so
+unregistered or cross-epoch writes are refused, outcomes refused for
+missing or refused cycles. Migration is CREATE-IF-NOT-EXISTS idempotent
+and tested against a simulated pre-migration database; a full shadow
+round trip is proven to leave every non-overlay table byte-identical.
+12 new tests; FOUR reverse mutations red then restored (silent-keep on
+conflict, settling refused cycles, partial imputation, raw
+IntegrityError leak). Import-boundary suite green.
+
+Next milestone in the design: SHW-2 (the register/observe/mature/status
+runner CLI), after this round's review.
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

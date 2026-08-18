@@ -717,3 +717,39 @@ def test_alpha_analyser_charges_full_turnover_for_unavailable_months(
     assert other["unavailable_turnover_periods"] == 0
     assert (other["gross"]["mean_period_return"]
             - other["net"]["10bps"]["mean_period_return"]) == pytest.approx(0.0)
+
+
+def test_stage1_analyser_is_invocable_in_script_mode():
+    """S1R-001: `python scripts/analyse_qc_alpha_stage1.py` must not crash
+    at import. The A-002 pass had to fall back to module mode because the
+    script lacked the sys.path bootstrap its two sibling analysers carry."""
+    import subprocess
+    import sys as _sys
+    result = subprocess.run(
+        [_sys.executable, str(ROOT / "scripts" / "analyse_qc_alpha_stage1.py"),
+         "--help"],
+        capture_output=True, text=True, timeout=120, cwd=str(ROOT / "scripts"),
+    )
+    assert result.returncode == 0, result.stderr
+    assert "ModuleNotFoundError" not in result.stderr
+
+
+def test_parsers_refuse_malformed_tokens_with_typed_errors(tmp_path: Path):
+    """SHR-001: a non-numeric token refuses via InvalidLog/SystemExit, not
+    a bare ValueError traceback. Fail-closed either way; typed is
+    diagnosable as log corruption."""
+    log = tmp_path / "malformed-turnover.log"
+    log.write_text(
+        _spec_header() + "\nDATES|1\nROW|202001|" + "|".join(
+            _full_cell(i, turn_ls=("abc" if i == 0 else 0.1))
+            for i in range(5)
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(analyser.InvalidLog, match="malformed turnover_ls"):
+        analyser.parse_log(log)
+
+    bench = tmp_path / "malformed-bench.log"
+    bench.write_text("DATES|1\nBROW|202001|0.01|abc|100", encoding="utf-8")
+    with pytest.raises(SystemExit, match="invalid benchmark turnover"):
+        parse_benchmark(bench)

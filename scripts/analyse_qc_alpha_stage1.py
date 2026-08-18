@@ -10,18 +10,24 @@ import argparse
 import hashlib
 import json
 import re
+import sys
 from pathlib import Path
 
-import pandas as pd
+# Script-mode bootstrap, matching the two sibling analysers (S1R-001):
+# without it `python scripts/analyse_qc_alpha_stage1.py` crashes at import
+# because the repository root is not on sys.path in script mode.
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from scripts.analyse_qc_alpha_battery import (
+import pandas as pd  # noqa: E402
+
+from scripts.analyse_qc_alpha_battery import (  # noqa: E402
     DRAWS,
     analyse,
     bonferroni_threshold,
     merge_logs,
 )
-from scripts.analyse_qc_benchmark import COST_BPS, parse_benchmark
-from scripts.run_alpha_battery_20260815 import performance
+from scripts.analyse_qc_benchmark import COST_BPS, parse_benchmark  # noqa: E402
+from scripts.run_alpha_battery_20260815 import performance  # noqa: E402
 
 
 STAGE_SPECS = frozenset({"REP_H52", "REP_IDV"})

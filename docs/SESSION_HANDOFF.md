@@ -1205,14 +1205,74 @@ Serial rerun continues per the owner's direction: monthly B_core next
 (project #7), then monthly C, short A/B/C, benchmarks A/B/C — every entry
 PENDING_REVIEW until Codex reviews `49e8160`..`d305ea0`.
 
+## 7x. Stage 0 battery COMPLETE: nine runs, two more defect classes fixed (Claude, 2026-08-18)
+
+The serial rerun ran to completion overnight. Fourteen cloud runs this
+continuation (R-009..R-022, run-level look count now **TWENTY-THREE**),
+producing all nine Stage 0 cells on the same fixed tree, every one
+ledgered in `docs/alpha-result.md` with full identity and structural
+round-trip through the frozen parsers, **no statistic observed anywhere**:
+
+- **Monthly battery:** R-009 (A_large, 619 spec-rows), R-011 (B_core,
+  1,233 spec-rows), R-012 (C_broad, 1,089 spec-rows — its first `wait`
+  dropped on a transient local DNS failure at 72% and re-attached
+  cleanly; the cloud run was unaffected).
+- **Short battery:** R-013 (A_large) REFUSED — the packed v1 log layout
+  had no way to declare an absent spec-date, so one honest missing MAX_20
+  date (2016-01-29) withheld all 2,664 cells. Fix `46221db`: per-date u8
+  spec-presence mask (layout `b64block_date_u32_mask_u8_i32x4_u16x3`),
+  u16 65535 reserved as the turnover-unavailability sentinel, turnover
+  never gates a `_settle` row; the parser decodes both layouts so R-002's
+  v1 logs stay readable. R-014 (A_large rerun): identical computation now
+  emits all 2,664 cells with the one absence declared. R-015 (B_core,
+  periods 508–531 — unreportable under v1) and R-016 (C_broad, periods
+  496–523) complete the family.
+- **Benchmark:** R-017 (A_large) INVALIDATED — third instance of the
+  R-010 zombie defect, in `universe_benchmark.py` which no earlier fix
+  touched: the turnover-gated bind died silently at 2015-12 and reported
+  48 of ~156 months while "completing" normally (fail-silent, worse than
+  R-013's fail-closed). Fix `5b5184a`: bind always proceeds; empty BROW
+  turnover field = declared unavailability charged 1.0. R-019 (B_core)
+  INCONCLUSIVE then exposed the second-order flaw: requiring EVERY
+  entered name to price on the settlement session collapsed coverage to
+  94/156 months clustered in delisting-heavy stretches — a selectively
+  calm baseline sample that §6's "include missing baseline rows" rule
+  forbids. Fix `39b3b89`: months emit over the priced subset
+  (≥ MIN_NAMES) with priced AND entered counts in five-field BROW rows;
+  the analyser discloses `underfilled_months`. R-020 (B_core, 155/156
+  months, worst underfill 99.83% priced), R-021 (C_broad, 155/156), and
+  R-022 (A_large, 155/156; its 149 months shared with the superseded
+  R-018 match to 0.0) complete the family. R-018 is marked STALE.
+
+Every fix followed the full discipline: ledger the failure first,
+regression tests that drive the REAL algorithm through the REAL parser
+(`tests/test_alpha_battery_short_emitter.py`,
+`tests/test_universe_benchmark_sim.py`), reverse-mutation verification
+(seven mutations across the two rounds, all reddened and restored — one
+caught a vacuously-passing test, hardened in `075e982`), and the full
+battery on the exact final tree (last run: 4,239 passed / 25 warnings,
+compileall clean, `git diff --check` clean).
+
+**Review debt is now the sole blocker.** The product range for Codex is
+`49e8160`, `d305ea0`, `46221db` (+ test hardening `075e982`), `5b5184a`,
+`39b3b89` on `user/claude/qc-stage0-review-verify-20260817`; records
+commits interleave. Upon acceptance the nine PENDING_REVIEW runs upgrade,
+and only then do the frozen analysers run ONCE with full run identities —
+the single step at which statistics are observed (Bonferroni over the
+180-cell family; conservative lifetime cell floor grows with this round's
+repeats and is recomputed in the ledger at that point).
+
 ## 8. What is next
 
-1. **Codex must review the rerun-round fixes** (`_rebalance_turnover`
-   recovery, SPECMETA emission, SPECMETA-verified parser, and `d305ea0`'s
-   turnover-never-gates-results contract) on
-   `user/claude/qc-stage0-review-verify-20260817`; the serial rerun
-   continues meanwhile at the owner's explicit direction with every run
-   ledgered PENDING_REVIEW (sections 7v–7w).
+1. **Codex must review the five product fixes of the rerun round**
+   (`49e8160`, `d305ea0`, `46221db`+`075e982`, `5b5184a`, `39b3b89`) on
+   `user/claude/qc-stage0-review-verify-20260817`. The Stage 0 battery is
+   COMPLETE (section 7x): all nine cells ran to structural completion on
+   that tree and sit PENDING_REVIEW in `docs/alpha-result.md`
+   (R-009/R-011/R-012 monthly, R-014/R-015/R-016 short,
+   R-022/R-020/R-021 benchmark). After acceptance, run the frozen
+   analysers ONCE with full run identities — the only step where any
+   statistic is observed.
 2. ~~Claude must counter-review `codex/review-qc-stage0-run-20260817`~~ —
    DONE and accepting (section 7u); superseded by section 7v's halt.
 2. PR #244 merged Claude's Stage 0 correction counter-review at `b6f577e`;

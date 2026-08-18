@@ -549,6 +549,61 @@ def test_benchmark_parser_requires_construction_turnover(tmp_path: Path):
     assert frame.loc["202001", "turnover"] == pytest.approx(0.25)
 
 
+def test_benchmark_parser_accepts_declared_unavailable_turnover(tmp_path: Path):
+    # R-017: an EMPTY turnover field declares an unpriceable prior book;
+    # the month's return survives and the analyser charges the full 1.0.
+    log = tmp_path / "benchmark-unavailable.log"
+    log.write_text("DATES|2\nBROW|202001|0.01||100\nBROW|202002|0.02|0.25|100",
+                   encoding="utf-8")
+    frame = parse_benchmark(log)
+    assert math.isnan(float(frame.loc["202001", "turnover"]))
+    assert frame.loc["202002", "turnover"] == pytest.approx(0.25)
+    assert frame.loc["202001", "ret"] == pytest.approx(0.01)
+
+
+def test_benchmark_analyser_charges_full_turnover_for_unavailable_months(
+    tmp_path: Path,
+):
+    log = tmp_path / "benchmark-charge.log"
+    output = tmp_path / "benchmark-charge.json"
+    # Thirteen months (performance() needs at least twelve). All present
+    # turnovers are 0.0, so any 10bps-vs-0bps difference can come only from
+    # the month whose turnover is declared unavailable.
+    rows = [f"BROW|20200{m}|0.01|0.0|100" for m in range(1, 10)]
+    rows += ["BROW|202010|0.01||100", "BROW|202011|0.01|0.0|100",
+             "BROW|202012|0.01|0.0|100", "BROW|202101|0.01|0.0|100"]
+    log.write_text("DATES|13\n" + "\n".join(rows), encoding="utf-8")
+    assert benchmark_analyser.main([
+        "--log", f"B={log}",
+        "--run-id", f"B=123,compile-1,backtest-1,{'a' * 64}",
+        "--output", str(output),
+    ]) == 0
+    payload = __import__("json").loads(output.read_text(encoding="utf-8"))
+    entry = payload["B"]
+    assert entry["unavailable_turnover_periods"] == 1
+    assert entry["mean_turnover"] == pytest.approx(0.0)
+    unavailable_rows = [row for row in entry["series"] if row["turnover"] is None]
+    assert [row["date"] for row in unavailable_rows] == ["202010"]
+    assert entry["net"]["10bps"]["cagr"] < entry["net"]["0bps"]["cagr"]
+    assert entry["underfilled_months"] == 0
+
+
+def test_benchmark_parser_records_underfill_and_refuses_impossible_counts(
+    tmp_path: Path,
+):
+    # R-019: a five-field row discloses priced AND entered counts.
+    log = tmp_path / "benchmark-underfill.log"
+    log.write_text("DATES|2\nBROW|202001|0.01|0.25|97|100\n"
+                   "BROW|202002|0.02|0.25|100|100", encoding="utf-8")
+    frame = parse_benchmark(log)
+    assert int(frame.loc["202001", "names"]) == 97
+    assert int(frame.loc["202001", "names_entered"]) == 100
+    bad = tmp_path / "benchmark-impossible.log"
+    bad.write_text("DATES|1\nBROW|202001|0.01|0.25|100|97", encoding="utf-8")
+    with pytest.raises(SystemExit, match="entered-name count"):
+        parse_benchmark(bad)
+
+
 @pytest.mark.parametrize(
     "row",
     ("BROW|202001|inf|0.25|100", "BROW|202001|0.01|-0.25|100",

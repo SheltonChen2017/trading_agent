@@ -521,6 +521,228 @@ that turnover is a COST input, never a gate. Fix round follows: an absence-
 aware packed layout plus turnover-unavailability sentinel, with the v1
 decoder retained so R-002's historical logs stay readable.
 
+## R-014 — Stage 0 short battery, A_large, absence-aware format (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Short battery, 5 specifications, universe A_large (rerun of R-013) |
+| **Research look** | Counted real-market run (run-level count 14 → 15); 20 repeated cells emitted |
+| **Source commit** | `075e982` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `08598e849a9546142a010b6fd9be491438a878146a35c1922d8f612a53c57771` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run10_short_A_r014.json`) |
+| **QC project** | `35296236` — requested `10. SHORT_BATTERY_A_LARGE - 20260817`, returned `10 SHORT_BATTERY_A_LARGE - 20260817` |
+| **Compile ID** | `4dfba63bcc3f5e4f6e04ef6422b3b4a1-99fb9a7542762222e8ba20bb7a31a6e6` |
+| **Backtest ID** | `0c51fbeb49fa4291f53242f888646e14` |
+| **Launched / completed (UTC)** | 2026-08-18T03:18:21.954651+00:00 / 2026-08-18T03:19:33.127045+00:00; 27,300,655 data points; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` — identical universe numbers to R-013, confirming the same computation now reports instead of refusing |
+| **Output** | COMPLETE: `DATES\|533`, layout `b64block_date_u32_mask_u8_i32x4_u16x3` (the R-013 fix), SPECMETA per-spec periods 533/533/532/533/533. The raw cloud log **round-trips through the frozen parser**: 2,664 spec-rows, 2012-04-04..2024-12-19. MAX_20's single absent date is exactly R-013's `2016-01-29`, now disclosed by the presence mask instead of refusing the run. Zero unavailable-turnover cells (the sentinel path was not needed on this universe). Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run10_short_A_r014.log`, 69 lines, exact-file sha256:`5a6224cd2c9d43f023a159e018d5bbc4ada70adb0cbfa4679a13f5711a760cbd` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`075e982` pass independent review |
+
+The R-013 defect is closed in the cloud: the identical A_large computation
+that refused on 2026-08-18 (same cap statistics, same 27.3M data points,
+same 533 dates, same single ragged MAX_20 date) now emits all 2,664 honest
+spec-date cells with the one absence declared. Note this run supersedes the
+role of R-002's A_large leg for Stage 0 purposes; R-002 remains in the
+ledger untouched and its v1 logs remain decodable. Next in the serial plan:
+short B_core, short C_broad, then the three benchmarks.
+
+## R-015 — Stage 0 short battery, B_core, absence-aware format (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Short battery, 5 specifications, universe B_core |
+| **Research look** | Counted real-market run (run-level count 15 → 16); 20 cells emitted (repeat of R-002's B_core leg on corrected methodology) |
+| **Source commit** | `c9d8a4f` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `6b8927bc54244364528ce4b88d5e68d77264ab4a4a674297cf6af17741eb527f` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run11_short_B_r015.json`) |
+| **QC project** | `35296313` — requested `11. SHORT_BATTERY_B_CORE - 20260817`, returned `11 SHORT_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `cb0e2c3cc08ac6458900486f61e66301-9018086f5a085488628cbc7150b284da` |
+| **Backtest ID** | `a6d824d8ff110932609d44f327e57b1d` |
+| **Launched / completed (UTC)** | 2026-08-18T03:20:35.785136+00:00 / 2026-08-18T03:26:20.703864+00:00; 31,956,942 data points; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` (the same B_core universe numbers as the monthly runs) |
+| **Output** | COMPLETE: `DATES\|533`, masked layout, per-spec periods 531/521/508/527/528 — far more ragged than A_large's 532..533, so **this run would have been refused outright by the v1 all-or-nothing format**; the R-013 fix is what makes B_core's short battery reportable at all. The raw cloud log **round-trips through the frozen parser**: 2,615 spec-rows, 2012-04-04..2024-12-19. Zero unavailable-turnover cells. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run11_short_B_r015.log`, 69 lines, exact-file sha256:`cc8bd06b71c3d9be412721c1432c3fe2777cf42781bb75a9a9a62993af2f88bb` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`075e982` pass independent review |
+
+Short-battery coverage now: A_large (R-014) and B_core (R-015) complete
+awaiting review. B_core's 25 absent MAX_20 dates (and 5–12 for the other
+specs) are the honest cost of a mid-cap universe with more disappearing
+names; every absence is declared per date by the presence mask and per spec
+by SPECMETA. Next: short C_broad, then the three benchmarks.
+
+## R-016 — Stage 0 short battery, C_broad, absence-aware format (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Short battery, 5 specifications, universe C_broad (first C_broad short attempt of the campaign) |
+| **Research look** | Counted real-market run (run-level count 16 → 17); 20 new cells emitted |
+| **Source commit** | `802c436` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `1284a5b3b2100ac8042cf6cc104fea496a818e0645969e343e8af5d24bec0ebe` (`ACTIVE_UNIVERSE="C_broad"` rewrite; recorded in `run12_short_C_r016.json`) |
+| **QC project** | `35296502` — requested `12. SHORT_BATTERY_C_BROAD - 20260817`, returned `12 SHORT_BATTERY_C_BROAD - 20260817` |
+| **Compile ID** | `aa27f65f4bae9cdd25d83c375fb96eb8-b1278e0eec0128aa551d53ba3ab8646d` |
+| **Backtest ID** | `8d5cf84c274b74bf9141c1a37aba3c2e` |
+| **Launched / completed (UTC)** | 2026-08-18T03:27:17.192922+00:00 / 2026-08-18T03:37:09.078093+00:00; 34,541,299 data points; `cap_rows=429848 cap_fallback=52239 cap_missing=12771` (the same C_broad universe numbers as monthly R-012) |
+| **Output** | COMPLETE: `DATES\|532`, masked layout, per-spec periods 523/513/496/519/519 — the most ragged of the three universes, again unreportable under the v1 all-or-nothing format. The raw cloud log **round-trips through the frozen parser**: 2,570 spec-rows, 2012-04-04..2024-12-19. Zero unavailable-turnover cells. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run12_short_C_r016.log`, 69 lines, exact-file sha256:`da0ac76705706c0763992cc60ed88b45929338eb47d6706b48782b63d29c0044` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`075e982` pass independent review |
+
+Both alpha families are now complete in the cloud on the fixed code across
+all three universes: monthly (R-009, R-011, R-012) and short (R-014, R-015,
+R-016), all PENDING_REVIEW on the same review range. Only the three
+equal-weight benchmark runs remain; they are not alpha cells.
+
+## R-017 — Stage 0 universe benchmark, A_large, silent die-off (INVALIDATED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, A_large — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 17 → 18); zero alpha cells |
+| **Source commit** | `966d12f` (`research/lean/universe_benchmark.py` untouched by any of the R-006..R-013 fixes) |
+| **Uploaded source SHA-256** | `f91e1bb1bb9aebe8f1c1cade36d60e73bce0ed6a3e13c04419cbbc299a8097c6` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run13_benchmark_A_r017.json`) |
+| **QC project** | `35296819` — requested `13. UNIVERSE_BENCHMARK_A_LARGE - 20260817`, returned `13 UNIVERSE_BENCHMARK_A_LARGE - 20260817` |
+| **Compile ID** | `ef808bfb0af7fee3170d53dda38d49a0-ba19fc5003330f64153fb8c7aa6f9d0e` |
+| **Backtest ID** | `22328e264fae96c5d9f1742819e3cdc4` |
+| **Launched / completed (UTC)** | 2026-08-18T03:38:04.891513+00:00 / 2026-08-18T03:39:29.140044+00:00; 27,298,298 data points |
+| **Output** | `DATES\|48` with 48 BROW rows, 2012-01..**2015-12 only** — the algorithm processed thirteen years of data and silently reported four. The log is internally consistent (declared count matches rows, parser accepts it); only the expected-coverage arithmetic (≈156 months for 2012–2024) exposes the loss. No statistic was computed from the series. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run13_benchmark_A_r017.log`, 55 lines, exact-file sha256:`6d12a14da5f0dd8eb6210d4e053f9a5709f062f3cda8582dd24fb7b14d37c75e` |
+| **Validity** | **INVALIDATED** — a 2012–2015 series is unusable as the 2012–2024 benchmark; rerun on fixed code will be a new R-number |
+
+### Root cause: the R-010 zombie die-off, third instance, in the one file no fix touched
+
+`_bind_staged_entry` gates the monthly bind on turnover: when
+`_drift_turnover` returns None (a held name with no outcome — the zombie
+pattern that stalls in January 2016 on every battery), the bind returns
+early and `previous_weights` keeps the stale book. The zombie never prices
+again, so every later month's turnover is None, every later bind refuses,
+and the series dies permanently while the run "completes" normally. This
+is exactly R-010's defect; `d305ea0` fixed it in the monthly battery and
+`46221db` fixed its format-level cousin in the short battery, but the
+benchmark kept its own private copy of the gated bind. Unlike R-013's
+fail-closed refusal, this failure is **fail-silent**: the output passes
+every internal consistency check and would have quietly become the
+denominator under every long-only result. Fix round follows: bind always;
+unpriceable turnover becomes a declared-unavailability empty field charged
+at the conservative full 1.0 by the analyser; a genuinely unpriceable
+month's return stays absent (visible as a month gap) but can no longer
+poison its successors.
+
+## R-018 — Stage 0 universe benchmark, A_large, fixed bind (STALE)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, A_large (rerun of R-017) — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 18 → 19); zero alpha cells |
+| **Source commit** | `5b5184a` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, `5b5184a`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `a45120e895a1b83ae94862b75dd8181fd9ab0750952d39803bd98e554f5803b6` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run14_benchmark_A_r018.json`) |
+| **QC project** | `35297525` — requested `14. UNIVERSE_BENCHMARK_A_LARGE - 20260817`, returned `14 UNIVERSE_BENCHMARK_A_LARGE - 20260817` |
+| **Compile ID** | `e9b0641659d9efa86f73a20d8f9b8fd0-9f71c2f6d2cf0891266b7ded064a062a` |
+| **Backtest ID** | `9be317244e6260b8855785dde71df2e1` |
+| **Launched / completed (UTC)** | 2026-08-18T03:58:20.313086+00:00 / 2026-08-18T03:58:58.699318+00:00 |
+| **Output** | COMPLETE: 149 BROW rows, 2012-01..2024-11 — versus R-017's 48 rows dead at 2015-12 on the same universe. The raw cloud log **round-trips through the frozen benchmark parser**. Seven months absent from the full 156-month grid: 2016-01 (the zombie month that killed R-017, now honestly absent instead of fatal), 2019-07, 2022-01, 2022-02, 2022-09, 2023-09 (other unpriceable books), and 2024-12 (end boundary — the final book settles after END, matching the batteries' 2024-11 endpoint). Five months carry declared-unavailable turnover (the recovery rebalances after unpriceable books), each to be charged the conservative full 1.0 at analysis. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run14_benchmark_A_r018.log`, 156 lines, exact-file sha256:`0a391739a89910b78980c7689b924aceb0881c55b719532f7d90daea2a9165ff` |
+| **Validity** | **STALE** — superseded by R-022, the same computation on the underfill-recording contract (`39b3b89`); R-022's 149 shared months match this run's returns exactly |
+
+The R-017 die-off is closed in the cloud: the same A_large benchmark
+computation now reports thirteen years instead of four, with every
+unpriceable month visible as a disclosed gap rather than a silent
+truncation of everything after it.
+
+## R-019 — Stage 0 universe benchmark, B_core, biased month coverage (INCONCLUSIVE)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, B_core — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 19 → 20); zero alpha cells |
+| **Source commit** | `6d3c000` |
+| **Uploaded source SHA-256** | `bc87fd277cddc94ca5c6db5e34d91fddd671949eb51272ab12833ffe28bf9455` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run15_benchmark_B_r019.json`) |
+| **QC project** | `35297590` — requested `15. UNIVERSE_BENCHMARK_B_CORE - 20260817`, returned `15 UNIVERSE_BENCHMARK_B_CORE - 20260817` |
+| **Compile ID** | `d383f3d05eaf2c08c0a3d9a65eb95fec-f697135a16d509fe24abe178ebd9b5a7` |
+| **Backtest ID** | `9e2441dd4332990c207e7d4e737ec183` |
+| **Launched / completed (UTC)** | 2026-08-18T03:59:52.068279+00:00 / 2026-08-18T04:01:33.081260+00:00 |
+| **Output** | Parses cleanly: 94 BROW rows, 2012-01..2024-10, 31 months with declared-unavailable turnover. The R-017 die-off is confirmed fixed (gaps recover instead of cascading). But **62 of 156 months are absent**, clustered in 2018–2024's heavy-delisting stretches. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run15_benchmark_B_r019.log`, 101 lines, exact-file sha256:`b05e5d998c44abd02800073b9d6dc801a59f534227f02f3ce4d3c7944ac0e660` |
+| **Validity** | **INCONCLUSIVE** — every emitted number is correct per its contract, but a baseline missing 40% of months in a systematically zombie-clustered pattern cannot serve as the honest line under long-only results |
+
+### Root cause: all-names-or-nothing settlement cannot scale to broad books
+
+`_settle` emits a month only when EVERY entered name is priceable on the
+exact settlement session (`len(outcomes) == len(pending["entry"])`). A
+~300-name A_large book rarely fails that (R-018 lost 6 mid-period months);
+a ~1,700-name B_core book fails it 40% of the time, and the failures
+cluster exactly in stressed, delisting-heavy periods — a selective sample
+that overstates calm months, which the project methodology explicitly
+forbids for baselines ("include missing baseline rows rather than allowing
+selective samples"; "record refusals and underfill instead of dropping
+them"). Fix round follows: the month's return is computed over the priced
+subset (≥ MIN_NAMES still required) with BOTH counts — priced and entered
+— disclosed in an extended BROW row, so underfill is recorded instead of
+dropped. Excluding mid-month zombies overstates the benchmark in crashes,
+which penalises rather than flatters alpha claims measured against it —
+conservative in the correct direction for a baseline. All three benchmark
+universes will be rerun on the extended contract for uniformity.
+
+## R-020 — Stage 0 universe benchmark, B_core, underfill-recording (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, B_core (rerun of R-019) — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 20 → 21); zero alpha cells |
+| **Source commit** | `39b3b89` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, `5b5184a`, `39b3b89`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `b080124852f142727c3b2e8d4cb1e1dd818f3cf73129c4e5cb87efa369ca7b5f` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run16_benchmark_B_r020.json`) |
+| **QC project** | `35298290` — requested `16. UNIVERSE_BENCHMARK_B_CORE - 20260817`, returned `16 UNIVERSE_BENCHMARK_B_CORE - 20260817` |
+| **Compile ID** | `975958cef0be3ab42d6154ee3f24f28e-7caa049758ef091ccc7bd92dd1b64bc8` |
+| **Backtest ID** | `03cbf3fbcda0190b408f156f876781f6` |
+| **Launched / completed (UTC)** | 2026-08-18T04:18:47.345291+00:00 / 2026-08-18T04:20:57.961762+00:00 |
+| **Output** | COMPLETE: **155 of 156 months** (only the 2024-12 end boundary absent, matching the batteries' 2024-11 endpoint), versus R-019's 94. The raw cloud log **round-trips through the frozen benchmark parser** (five-field rows). 61 months carry disclosed underfill — worst coverage 99.83% priced, i.e. the old all-names gate was discarding whole months over 1–3 unpriceable names out of ~1,700. 60 months carry declared-unavailable turnover, each charged the conservative full 1.0 at analysis with counts disclosed. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run16_benchmark_B_r020.log`, 162 lines, exact-file sha256:`dbf6ad69c3720e0453318d58449b01dcab532aa4773a000c3f5b2b5e04ecffda` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`39b3b89` pass independent review |
+
+The R-019 coverage collapse is closed in the cloud: B_core's baseline now
+spans the full period with every underfilled month recorded rather than
+dropped. C_broad and the A_large rerun (for five-field uniformity across
+all three universes) remain.
+
+## R-021 — Stage 0 universe benchmark, C_broad, underfill-recording (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, C_broad — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 21 → 22); zero alpha cells |
+| **Source commit** | `cd21495` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, `5b5184a`, `39b3b89`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `1711a5eb6779ee6c9730231b806d6f3c6155812aae067defab2e725d1d5af116` (`ACTIVE_UNIVERSE="C_broad"` rewrite; recorded in `run17_benchmark_C_r021.json`) |
+| **QC project** | `35298403` — requested `17. UNIVERSE_BENCHMARK_C_BROAD - 20260817`, returned `17 UNIVERSE_BENCHMARK_C_BROAD - 20260817` |
+| **Compile ID** | `328ba81c396811cb5f76379174f4527c-d5ee65c509d8b4876977a9b235eb3d1e` |
+| **Backtest ID** | `8ba1f192438bec65313dcd2133c124b1` |
+| **Launched / completed (UTC)** | 2026-08-18T04:21:52.870250+00:00 / 2026-08-18T04:25:10.381972+00:00 |
+| **Output** | COMPLETE: **155 of 156 months** (only the 2024-12 end boundary absent). The raw cloud log **round-trips through the frozen benchmark parser** (five-field rows). 86 months carry disclosed underfill — worst coverage 99.72% priced — and 85 months carry declared-unavailable turnover, each charged the conservative full 1.0 at analysis with counts disclosed. The broadest universe shows the most zombie churn, exactly as R-012/R-016 predicted. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run17_benchmark_C_r021.log`, 162 lines, exact-file sha256:`aa8a09872e8eab1640d79ecc2eb4f4ed80fd2ba91dfb067dd4f6d757e7c777dc` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`39b3b89` pass independent review |
+
+Only the A_large benchmark rerun remains (five-field uniformity across all
+three universes; its R-018 log predates the underfill-recording contract).
+
+## R-022 — Stage 0 universe benchmark, A_large, underfill-recording (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, A_large (supersedes R-018 for five-field uniformity) — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 22 → 23); zero alpha cells |
+| **Source commit** | `01ce8f1` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, `5b5184a`, `39b3b89`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `f2c6e240e6e83f6d7f4411d5eba8f074536ec2a688022a6050dad768214601c4` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run18_benchmark_A_r022.json`) |
+| **QC project** | `35298527` — requested `18. UNIVERSE_BENCHMARK_A_LARGE - 20260817`, returned `18 UNIVERSE_BENCHMARK_A_LARGE - 20260817` |
+| **Compile ID** | `7dcffef48e4926fc953db6d9ac164774-dc838b3c9896aa50a9e1a2ecd7d93dfa` |
+| **Backtest ID** | `022b32d7e7414bf945a73254a63eaea9` |
+| **Launched / completed (UTC)** | 2026-08-18T04:25:56.576347+00:00 / 2026-08-18T04:27:06.095429+00:00 |
+| **Output** | COMPLETE: **155 of 156 months** (only the 2024-12 end boundary absent). The raw cloud log **round-trips through the frozen benchmark parser** (five-field rows). 6 months carry disclosed underfill and 6 declared-unavailable turnover. **Replication check against R-018:** the 149 months both runs emitted have max absolute return difference **0.0** — the underfill contract changed nothing on full months and only recovered the six R-018 had dropped. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run18_benchmark_A_r022.log`, 162 lines, exact-file sha256:`b8ace1727a06f4d022e7c7130c0bd88d01fe0ccd90ad73668189f11160e94149` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`39b3b89` pass independent review |
+
+**The nine-run Stage 0 battery is complete on the fixed code.** Monthly:
+R-009 (A_large), R-011 (B_core), R-012 (C_broad). Short: R-014 (A_large),
+R-015 (B_core), R-016 (C_broad). Benchmark: R-022 (A_large), R-020
+(B_core), R-021 (C_broad). All nine are PENDING_REVIEW on the same range
+`49e8160`..`39b3b89`. No statistic has been observed from any of them; the
+frozen analysers run once, with full run identities, only after the review
+gate — so look accounting and result identity are recorded before any
+statistic exists, exactly as the R-002 precedent required.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

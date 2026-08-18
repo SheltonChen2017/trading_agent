@@ -198,10 +198,14 @@ def _portfolio(frame: pd.DataFrame, construction: str, fraction: float):
         if not np.isfinite(value):
             continue
         returns[date] = float(value)
+        # An unpriceable prior book (wiped-out NAV) records the month's
+        # return with NO turnover for that month, and still replaces the
+        # book (S0R-004): skipping the book update would freeze `previous`
+        # forever, silently dropping every later month's turnover. Matches
+        # the reviewed 20260815 runner's `long_short_returns` contract.
         drifted = drift_weights(previous, previous_outcomes or {})
-        if drifted is None:
-            continue
-        turnovers[date] = one_way_turnover(drifted, weights)
+        if drifted is not None:
+            turnovers[date] = one_way_turnover(drifted, weights)
         counts.append(len(weights))
         previous = weights
         previous_outcomes = {

@@ -12,6 +12,8 @@ import json
 import re
 from pathlib import Path
 
+import pandas as pd
+
 from scripts.analyse_qc_alpha_battery import (
     DRAWS,
     analyse,
@@ -116,6 +118,12 @@ def main(argv: list[str] | None = None) -> int:
             )
         matched = benchmark.loc[alpha_dates]
         series = matched["ret"]
+        # A month whose prior book could not be priced declares an
+        # unavailable turnover (empty BROW field). Conservative in the
+        # cost direction: such months are charged FULL one-way turnover,
+        # the same convention the Stage 0 analysers use (S0R-002).
+        numeric_turnover = pd.to_numeric(matched["turnover"], errors="coerce")
+        charged_turnover = numeric_turnover.fillna(1.0)
         report["universes"][label] = {
             "alpha_run": alpha_runs[label],
             "benchmark_run": benchmark_runs[label],
@@ -126,11 +134,18 @@ def main(argv: list[str] | None = None) -> int:
             "specs": analyse(frame, 12.0),
             "benchmark_same_dates": {
                 "periods": int(len(matched)),
-                "mean_turnover": float(matched["turnover"].mean()),
+                "mean_turnover": (
+                    float(numeric_turnover.mean())
+                    if numeric_turnover.notna().any() else None
+                ),
+                "unavailable_turnover_periods": int(numeric_turnover.isna().sum()),
+                "underfilled_months": int(
+                    (matched["names_entered"] > matched["names"]).sum()
+                ),
                 "gross": performance(series, 12.0),
                 "net": {
                     f"{bps:g}bps": performance(
-                        series - matched["turnover"] * 2.0 * bps / 10_000.0,
+                        series - charged_turnover.values * 2.0 * bps / 10_000.0,
                         12.0,
                     )
                     for bps in COST_BPS

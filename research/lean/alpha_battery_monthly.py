@@ -519,11 +519,12 @@ class AlphaBatteryMonthly(QCAlgorithm):
     def _rebalance_turnover(self, key, target):
         """Method V2 drift turnover from stored entry prices.
 
-        Outcomes for the stale book come from its own recorded entry prices
-        against current or terminal prices — the same self-contained pattern
-        the Stage 1 replications and both benchmarks already use — so a
-        month whose turnover refuses simply retries next month instead of
-        poisoning all later months.
+        Outcomes for the prior book come from its own recorded entry
+        prices against current or terminal prices. Returning None here
+        means the prior book is unpriceable; the bind NEVER gates on it
+        (R-010) — it records the month with a declared-unavailable
+        turnover, replaces the book, and the analyser charges the
+        conservative full 1.0 one-way for that month.
         """
         previous = self.previous_weights.get(key) or {}
         if not previous:

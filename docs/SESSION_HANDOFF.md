@@ -1345,6 +1345,75 @@ in the safe order on branch `user/claude/qc-stage0-analysis-20260818`
    stay 23; the lifetime cell floor stays 428 under the repeated-look
    convention.
 
+## 7aa. S0R hardening round: Stage 1 siblings closed (2026-08-18)
+
+Branch `user/claude/qc-stage1-hardening-20260818` (from `8c9fdc8`).
+Implements the owner-authorized step 3: every open S0R finding is closed
+with a regression test, and every fix was reverse-mutation verified
+(defect reinstated → new test red → fix restored → green; eight
+mutations total, all red).
+
+- **S0R-001** — `alpha_stage1_replications.py` bind no longer gates on
+  unavailable turnover; the emitter writes declared-empty turnover
+  fields and a SPECMETA inventory (without which one honest ragged date
+  would refuse the whole run — the R-007 class, found as a generalized
+  instance during this round).
+- **S0R-002** — `alpha_stage1_benchmark.py`: bind never gates
+  (unpriceable prior names are simply absent from outcomes; the drift
+  turnover declares None), settle records underfill over the priced
+  subset with BOTH counts (five-field BROW), and
+  `analyse_qc_alpha_stage1.py` charges `fillna(1.0)` with
+  `unavailable_turnover_periods` and `underfilled_months` disclosure.
+- **S0R-003** — both Stage 0 parsers refuse a PRESENT non-finite
+  turnover token (`nan` was silently relabelled as declared
+  unavailability); the same guard was generalized to the `ic` token,
+  which had the identical dropna-before-finite pattern.
+- **S0R-004** — `run_alpha_universes_20260816.py` records a wiped-out
+  month's return, omits its turnover (charged 1.0 downstream by
+  `net_of_costs`), and heals the book.
+- **S0R-005** — the monthly `_rebalance_turnover` docstring now teaches
+  the never-gate contract (it described the removed retry contract and
+  cited the then-defective Stage 1 files as its exemplar).
+- **S0R-008** — charge-magnitude pins: exact net-vs-gross
+  `mean_period_return` deltas for the battery analyser and the Stage 1
+  benchmark block. Verified need: `fillna(1.0)→fillna(0.0)` in the
+  battery analyser previously survived ALL 57 alpha-analyser tests.
+
+New tests: `tests/test_alpha_stage1_hardening.py` (4 tests, stub-loaded
+real algorithm classes + real analyser CLI end to end), plus 2 in
+`tests/test_qc_alpha_battery.py` and 1 in
+`tests/test_alpha_battery_research.py`.
+
+Deliberately NOT changed: the settle-side `any(symbol not in outcomes)
+→ continue` in the replications/monthly settle is the reviewed, frozen
+Stage 0 contract (a fixed portfolio's return is undefined without every
+name's outcome; the drop is visible via SPECMETA periods), not a
+sibling of the bind defect.
+
+**Validation on the exact final tree:** focused suites green (102);
+full `python -m pytest -q`: **4,232 passed, 14 failed, 25 warnings**.
+All 14 failures are UI tests (`test_ui_discrete_tabs`, `test_ui_theme`,
+`test_ui_user_directed_sell`) and reproduce IDENTICALLY at the
+pre-hardening commit `8c9fdc8` in a clean worktree — they are
+machine-environment failures, not this round's: the installed Streamlit
+is 1.52.2 while `requirements.txt` pins 1.60.0. `compileall` clean;
+`git diff --check` clean.
+
+**Machine-local operational observation (owner action needed):** this
+machine cannot install the pinned `streamlit==1.60.0`: the wheel
+contains a file whose absolute path under the Store-Python
+site-packages is exactly 260 characters, and `LongPathsEnabled=0`, so
+pip fails with `[Errno 2]` and rolls back to 1.52.2 (verified; the
+rollback is clean and the UI still runs on 1.52.2). Yesterday's green
+full runs imply the downgrade happened between the battery session and
+today — plausibly during the Cursor review session's environment
+activity. Options: enable Windows long paths (admin registry change),
+or a Python install at a shorter prefix. Until then the 14 UI tests
+fail on THIS machine only, and the operator UI runs on 1.52.2 rather
+than the pinned version.
+
+Stage 1 remains blocked until this round passes independent review.
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
@@ -1356,6 +1425,11 @@ in the safe order on branch `user/claude/qc-stage0-analysis-20260818`
    milestone: the S0R hardening round (S0R-001/002/003/004/005/008) so
    Stage 1 — which adds the cadence-matched benchmark-same-dates
    comparison those six cells need — can launch on reviewed code.
+   UPDATE: the hardening round is IMPLEMENTED and validated (section
+   7aa, branch `user/claude/qc-stage1-hardening-20260818`); its
+   independent review is now the gate in front of Stage 1, together
+   with an owner decision on whether Stage 1's 24-cell family is worth
+   its looks given the A-001 nulls.
 2. **Original review context (superseded):** With Codex tokens exhausted, the owner ran the
    independent review through Cursor (Grok 4.6) instead on 2026-08-18. It
    reviewed the full range `81db126..de1beac` (27 commits, every commit

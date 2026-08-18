@@ -45,8 +45,13 @@ def parse_benchmark(path: Path) -> pd.DataFrame:
                 raise SystemExit(f"{path.name}: unsupported/incomplete BROW payload")
             # An EMPTY turnover field is a declared unavailability (the
             # prior book could not be priced that month, R-017); the
-            # analyser charges the conservative full 1.0 for it.
+            # analyser charges the conservative full 1.0 for it. A PRESENT
+            # value must be finite: a literal ``nan`` token would otherwise
+            # be dropped before the finite validation and silently
+            # relabelled as declared unavailability (S0R-003).
             turnover = float(parts[2]) if parts[2] else None
+            if turnover is not None and not math.isfinite(turnover):
+                raise SystemExit(f"{path.name}: invalid benchmark turnover")
             priced = int(parts[3])
             entered = int(parts[4]) if len(parts) == 5 else priced
             rows.append((parts[0], float(parts[1]), turnover, priced, entered))

@@ -69,6 +69,22 @@ class InvalidLog(RuntimeError):
     """The log cannot establish one complete, internally consistent run."""
 
 
+def _optional_finite(token: str, path_name: str, date: str, field: str):
+    """Empty token = declared unavailability; a PRESENT value must be finite.
+
+    Without this check a literal ``nan`` token is silently relabelled as
+    declared unavailability (S0R-003): pandas drops NaN before the later
+    finite validation, so log corruption would masquerade as the
+    conservative 1.0-charged channel instead of refusing the run.
+    """
+    if not token:
+        return None
+    value = float(token)
+    if not math.isfinite(value):
+        raise InvalidLog(f"{path_name}: non-finite {field} on {date}")
+    return value
+
+
 def periods_per_year_for_specs(specs) -> float:
     """Return the frozen cadence for one recognised Stage 0 spec family."""
     family = frozenset(specs)
@@ -227,12 +243,15 @@ def parse_log(
                     ic, lr, sr, l20, turn_ls, turn_l10, turn_l20, n = parts
                     rows.append({
                         "date": date, "spec": spec,
-                        "ic": float(ic) if ic else None,
+                        "ic": _optional_finite(ic, path.name, date, "ic"),
                         "long": float(lr), "short": float(sr),
                         "long20": float(l20),
-                        "turnover_ls": float(turn_ls) if turn_ls else None,
-                        "turnover_l10": float(turn_l10) if turn_l10 else None,
-                        "turnover_l20": float(turn_l20) if turn_l20 else None,
+                        "turnover_ls": _optional_finite(
+                            turn_ls, path.name, date, "turnover_ls"),
+                        "turnover_l10": _optional_finite(
+                            turn_l10, path.name, date, "turnover_l10"),
+                        "turnover_l20": _optional_finite(
+                            turn_l20, path.name, date, "turnover_l20"),
                         "names": int(n),
                     })
                 else:

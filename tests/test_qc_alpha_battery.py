@@ -650,3 +650,70 @@ def test_residual_momentum_refuses_short_or_misaligned_factor_history():
     full = [0.0] * required
     assert residual_momentum(full[:-1], full[:-1], full[:-1], 12) is None
     assert residual_momentum(full, full[:-1], full, 12) is None
+
+
+def test_parsers_refuse_present_nonfinite_turnover_or_ic_tokens(tmp_path: Path):
+    """S0R-003: a literal ``nan`` token must refuse the log, not be
+    silently relabelled as the declared-unavailability channel."""
+    log = tmp_path / "nan-turnover.log"
+    log.write_text(
+        _spec_header() + "\nDATES|1\nROW|202001|" + "|".join(
+            _full_cell(i, turn_ls=("nan" if i == 0 else 0.1))
+            for i in range(5)
+        ),
+        encoding="utf-8",
+    )
+    with pytest.raises(analyser.InvalidLog, match="non-finite turnover_ls"):
+        analyser.parse_log(log)
+
+    ic_log = tmp_path / "nan-ic.log"
+    cells = ["0~nan~0.02~-0.01~0.015~0.1~0.2~0.3~100"]
+    cells += [_full_cell(i) for i in range(1, 5)]
+    ic_log.write_text(
+        _spec_header() + "\nDATES|1\nROW|202001|" + "|".join(cells),
+        encoding="utf-8",
+    )
+    with pytest.raises(analyser.InvalidLog, match="non-finite ic"):
+        analyser.parse_log(ic_log)
+
+    bench = tmp_path / "nan-bench.log"
+    bench.write_text("DATES|1\nBROW|202001|0.01|nan|100", encoding="utf-8")
+    with pytest.raises(SystemExit, match="invalid benchmark turnover"):
+        parse_benchmark(bench)
+
+
+def test_alpha_analyser_charges_full_turnover_for_unavailable_months(
+    tmp_path: Path,
+):
+    """S0R-008: pin the MAGNITUDE of the conservative charge. The
+    count-only disclosure assertions pass under fillna(0.0); the exact
+    net-vs-gross mean delta does not."""
+    months = [f"20{15 + i // 12:02d}{i % 12 + 1:02d}" for i in range(13)]
+    lines = [_spec_header(), f"DATES|{len(months)}"]
+    for index, month in enumerate(months):
+        cells = []
+        for spec_index in range(5):
+            turn_ls = "" if index == 3 and spec_index == 0 else "0.0"
+            cells.append(
+                f"{spec_index}~0.01~0.02~-0.01~0.015~{turn_ls}~0.0~0.0~100"
+            )
+        lines.append(f"ROW|{month}|" + "|".join(cells))
+    log = tmp_path / "charge.log"
+    log.write_text("\n".join(lines), encoding="utf-8")
+
+    specs, frame, meta = analyser.parse_log(log)
+    report = analyser.analyse(frame, periods_per_year=12.0)
+
+    block = report[SHORT_SPECS[0]]["long_short"]
+    assert block["unavailable_turnover_periods"] == 1
+    gross_mean = block["gross"]["mean_period_return"]
+    net10_mean = block["net"]["10bps"]["mean_period_return"]
+    # All present turnovers are 0.0, so the whole 10bps drag comes from
+    # the single unavailable month charged at the full 1.0 one-way.
+    assert gross_mean - net10_mean == pytest.approx(
+        1.0 * 2.0 * 10.0 / 10_000.0 / len(months)
+    )
+    other = report[SHORT_SPECS[1]]["long_short"]
+    assert other["unavailable_turnover_periods"] == 0
+    assert (other["gross"]["mean_period_return"]
+            - other["net"]["10bps"]["mean_period_return"]) == pytest.approx(0.0)

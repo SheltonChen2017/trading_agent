@@ -545,6 +545,28 @@ role of R-002's A_large leg for Stage 0 purposes; R-002 remains in the
 ledger untouched and its v1 logs remain decodable. Next in the serial plan:
 short B_core, short C_broad, then the three benchmarks.
 
+## R-015 — Stage 0 short battery, B_core, absence-aware format (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Short battery, 5 specifications, universe B_core |
+| **Research look** | Counted real-market run (run-level count 15 → 16); 20 cells emitted (repeat of R-002's B_core leg on corrected methodology) |
+| **Source commit** | `c9d8a4f` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `6b8927bc54244364528ce4b88d5e68d77264ab4a4a674297cf6af17741eb527f` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run11_short_B_r015.json`) |
+| **QC project** | `35296313` — requested `11. SHORT_BATTERY_B_CORE - 20260817`, returned `11 SHORT_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `cb0e2c3cc08ac6458900486f61e66301-9018086f5a085488628cbc7150b284da` |
+| **Backtest ID** | `a6d824d8ff110932609d44f327e57b1d` |
+| **Launched / completed (UTC)** | 2026-08-18T03:20:35.785136+00:00 / 2026-08-18T03:26:20.703864+00:00; 31,956,942 data points; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` (the same B_core universe numbers as the monthly runs) |
+| **Output** | COMPLETE: `DATES\|533`, masked layout, per-spec periods 531/521/508/527/528 — far more ragged than A_large's 532..533, so **this run would have been refused outright by the v1 all-or-nothing format**; the R-013 fix is what makes B_core's short battery reportable at all. The raw cloud log **round-trips through the frozen parser**: 2,615 spec-rows, 2012-04-04..2024-12-19. Zero unavailable-turnover cells. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run11_short_B_r015.log`, 69 lines, exact-file sha256:`cc8bd06b71c3d9be412721c1432c3fe2777cf42781bb75a9a9a62993af2f88bb` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`075e982` pass independent review |
+
+Short-battery coverage now: A_large (R-014) and B_core (R-015) complete
+awaiting review. B_core's 25 absent MAX_20 dates (and 5–12 for the other
+specs) are the honest cost of a mid-cap universe with more disappearing
+names; every absence is declared per date by the presence mask and per spec
+by SPECMETA. Next: short C_broad, then the three benchmarks.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

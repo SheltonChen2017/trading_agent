@@ -127,12 +127,20 @@ def parse_log(
         elif "B64BLOCK|" in line:
             body = line.split("B64BLOCK|", 1)[1]
             count_text, separator, encoded = body.partition("|")
-            expected_scale = (
+            # Layout 1 (R-002 era) has no absence channel: every date carries
+            # every spec and all turnover values are real. Layout 2 (R-013
+            # fix) prefixes each date with a u8 spec-presence mask and
+            # reserves u16 65535 as the declared-unavailability turnover
+            # sentinel (unpriceable exit book).
+            scale_layouts = {
                 "layout=b64block_date_u32_i32x4_u16x3|"
-                "ic=1e-5|ret=1e-6|turnover=1e-4"
-            )
+                "ic=1e-5|ret=1e-6|turnover=1e-4": 1,
+                "layout=b64block_date_u32_mask_u8_i32x4_u16x3|"
+                "ic=1e-5|ret=1e-6|turnover=1e-4": 2,
+            }
+            layout = scale_layouts.get(scale_declaration or "")
             if (not separator or not count_text.isdigit() or not specs
-                    or scale_declaration != expected_scale):
+                    or layout is None):
                 raise InvalidLog(f"{path.name}: B64BLOCK lacks its exact schema")
             count = int(count_text)
             if count < 1 or count > 10:
@@ -142,31 +150,53 @@ def parse_log(
             except (ValueError, binascii.Error) as exc:
                 raise InvalidLog(f"{path.name}: invalid base64 block") from exc
             cell_width = struct.calcsize(">iiiiHHH")
-            row_width = 4 + cell_width * len(specs)
-            if len(payload) != row_width * count:
-                raise TruncatedLog(f"{path.name}: incomplete packed block")
-            for row_index in range(count):
-                offset = row_index * row_width
-                date = str(struct.unpack_from(">I", payload, offset)[0])
+            if layout == 1:
+                row_width = 4 + cell_width * len(specs)
+                if len(payload) != row_width * count:
+                    raise TruncatedLog(f"{path.name}: incomplete packed block")
+            offset = 0
+            for _ in range(count):
+                header_width = 4 if layout == 1 else 5
+                if offset + header_width > len(payload):
+                    raise TruncatedLog(f"{path.name}: incomplete packed block")
+                if layout == 1:
+                    date = str(struct.unpack_from(">I", payload, offset)[0])
+                    present = list(range(len(specs)))
+                else:
+                    date_int, mask = struct.unpack_from(">IB", payload, offset)
+                    date = str(date_int)
+                    if mask == 0 or mask >> len(specs):
+                        raise InvalidLog(
+                            f"{path.name}: invalid spec mask {mask} on {date}")
+                    present = [index for index in range(len(specs))
+                               if mask & (1 << index)]
+                offset += header_width
                 if date in date_indices:
                     raise InvalidLog(f"{path.name}: duplicate ROW date {date}")
                 indices = date_indices.setdefault(date, set())
-                offset += 4
-                for numeric_index, spec in enumerate(specs):
-                    values = struct.unpack_from(">iiiiHHH", payload,
-                                                offset + numeric_index * cell_width)
+                if offset + cell_width * len(present) > len(payload):
+                    raise TruncatedLog(f"{path.name}: incomplete packed block")
+                for numeric_index in present:
+                    values = struct.unpack_from(">iiiiHHH", payload, offset)
+                    offset += cell_width
                     ic, lr, sr, l20, turn_ls, turn_l10, turn_l20 = values
                     indices.add(numeric_index)
+                    spec = specs[numeric_index]
                     rows.append({
                         "date": date, "spec": spec,
                         "ic": None if ic == -2147483648 else ic * 1e-5,
                         "long": lr * 1e-6, "short": sr * 1e-6,
                         "long20": l20 * 1e-6,
-                        "turnover_ls": turn_ls * 1e-4,
-                        "turnover_l10": turn_l10 * 1e-4,
-                        "turnover_l20": turn_l20 * 1e-4,
+                        "turnover_ls": (None if layout == 2 and turn_ls == 65535
+                                        else turn_ls * 1e-4),
+                        "turnover_l10": (None if layout == 2 and turn_l10 == 65535
+                                         else turn_l10 * 1e-4),
+                        "turnover_l20": (None if layout == 2 and turn_l20 == 65535
+                                         else turn_l20 * 1e-4),
                         "names": spec_names.get(spec),
                     })
+            if offset != len(payload):
+                raise InvalidLog(f"{path.name}: packed block has trailing bytes")
         elif "ROW|" in line:
             body = line.split("ROW|", 1)[1]
             fields = body.split("|")

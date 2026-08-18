@@ -441,6 +441,86 @@ plus a local wiped-out-book return-retention test; four reverse mutations
 **PENDING independent review together with `49e8160`; B_core reruns after
 as a new R-number.**
 
+## R-011 — Stage 0 monthly battery, B_core, zombie-name fix (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications (rerun of R-010) |
+| **Research look** | Counted real-market run (run-level count 11 → 12); 40 repeated cells emitted |
+| **Source commit** | `e2ed7eb` (contains Claude fixes `49e8160` and `d305ea0`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `f571e516a6fa8e55689030150e505d30af5ac97226051493770a24ab159f2330` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run7_monthly_B_r011.json`) |
+| **QC project** | `35290755` — requested `7. MONTHLY_BATTERY_B_CORE - 20260817`, returned `7 MONTHLY_BATTERY_B_CORE - 20260817` |
+| **Compile ID** | `d681949544dcd20d117dd6fee048eb10-1a9ee502e4a13d70722065662d8df838` |
+| **Backtest ID** | `a6d44d74ba1f9497fd87cd588c0dca6c` |
+| **Launched / completed (UTC)** | 2026-08-18T00:11:51.703542+00:00 / 2026-08-18T00:20:06.844904+00:00; 32,054,443 data points; `cap_rows=312696 cap_fallback=35268 cap_missing=7291` (identical universe numbers to R-006/R-008/R-010) |
+| **Output** | COMPLETE: all ten specs, `DATES\|142` = 142 rows (2013-02..2024-11, same depth as A_large's R-009), 10 SPECMETA lines with per-spec periods 116..133 (vs R-010's collapsed 3..42). The raw cloud log **round-trips through the frozen parser** (1,233 spec-rows). Unavailable-turnover fields present as designed: 89/54/94 rows (long_short/long_only_10/long_only_20) spread across ALL ten specifications (8–18 dates each) — every spec chain survived a trapped zombie name and retried instead of dying. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run7_monthly_B_r011.log`, 161 lines, exact-file sha256:`351665870750f3505bd5bfec48a85220faad9dcbd27f746f378c7e1dfefb70f9` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`d305ea0` pass independent review; the ~7% of months with unavailable turnover are each charged the conservative full 1.0 one-way at analysis, with counts disclosed per construction |
+
+The zombie-name defect is now closed in the cloud, not only in simulation:
+B_core — the universe that killed R-006 (weekend labels), R-008 (refusal
+spiral), and R-010 (zombie names) — has produced its first complete,
+parseable monthly-battery output at full 142-date depth. Monthly coverage
+of Stage 0 now has both A_large (R-009) and B_core (R-011) awaiting review;
+C_broad is next.
+
+## R-012 — Stage 0 monthly battery, C_broad, zombie-name fix (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Monthly battery, 10 specifications, universe C_broad (first C_broad monthly attempt of the campaign) |
+| **Research look** | Counted real-market run (run-level count 12 → 13); 40 new cells emitted |
+| **Source commit** | `7b588d4` (contains Claude fixes `49e8160` and `d305ea0`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `9b455f64c120022983bb15fddbbe5f16f77605d6eb31053bf683b9e9420c3d25` (`ACTIVE_UNIVERSE="C_broad"` rewrite; recorded in `run8_monthly_C_r012.json`) |
+| **QC project** | `35291038` — requested `8. MONTHLY_BATTERY_C_BROAD - 20260817`, returned `8 MONTHLY_BATTERY_C_BROAD - 20260817` |
+| **Compile ID** | `f3266e1163ce99faba8534d99b4cd159-082843e364531931bf059215337c6f82` |
+| **Backtest ID** | `6af91e4542fec9cc4d7a4324d03f0a00` |
+| **Launched / completed (UTC)** | 2026-08-18T00:21:33.564735+00:00 / 2026-08-18T02:50:30.284162+00:00; 34,641,380 data points; `cap_rows=429848 cap_fallback=52239 cap_missing=12771`. The first `wait` attempt dropped at ~72% on a transient local DNS failure (`getaddrinfo failed`) and was re-attached; the cloud run was unaffected. The evidence JSON retains the stale `unresolved_reason` field beside `status=completed` as an honest record of that interruption. |
+| **Output** | COMPLETE: all ten specs, `DATES\|140` = 140 rows (2013-02..2024-11), 10 SPECMETA lines with per-spec periods 98..126 and median names 1,664–2,392 (broad universe as designed). The raw cloud log **round-trips through the frozen parser** (1,089 spec-rows). Unavailable-turnover fields present as designed: 164/121/186 rows (long_short/long_only_10/long_only_20) spread across ALL ten specifications (7–22 dates each) — more than B_core's 89/54/94, consistent with a broader universe holding more zombie names. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run8_monthly_C_r012.log`, 159 lines, exact-file sha256:`98ce6c4f02b43f2a547a494f521ec507919aeea7d149da4c8bbac649580f33e8` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`d305ea0` pass independent review; the ~12–17% of months with unavailable turnover are each charged the conservative full 1.0 one-way at analysis, with counts disclosed per construction |
+
+The monthly leg of Stage 0 is now complete in the cloud: A_large (R-009),
+B_core (R-011), and C_broad (R-012) all produced full-depth, parseable
+output on the same fixed code, all awaiting the same independent review.
+Next in the serial plan: the short battery (A_large, then B_core, then
+C_broad), then the three benchmarks.
+
+## R-013 — Stage 0 short battery, A_large, packed-format refusal (REFUSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Short battery, 5 specifications, universe A_large |
+| **Research look** | Counted real-market run (run-level count 13 → 14); **zero cells emitted** — the algorithm refused |
+| **Source commit** | `f470ee6` (short battery file itself last changed at `ac96d47`; the R-010 zombie fix `d305ea0` touched the monthly battery only) |
+| **Uploaded source SHA-256** | `b99c7dda8f1adab2ce0b572c6f163b926cc0b2df2f0f14cfb3f5888aa5b481c3` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run9_short_A_r013.json`) |
+| **QC project** | `35295425` — requested `9. SHORT_BATTERY_A_LARGE - 20260817`, returned `9 SHORT_BATTERY_A_LARGE - 20260817` |
+| **Compile ID** | `7bb84f7834dcb4c9d1f2598a0c53eead-27e0bb70576f053089ad7d4b1c47be75` |
+| **Backtest ID** | `8c549f41169f85ffd6bc4819fe0090b3` |
+| **Launched / completed (UTC)** | 2026-08-18T02:52:20.743710+00:00 / 2026-08-18T02:54:01.612704+00:00; 27,300,655 data points; `cap_rows=178769 cap_fallback=16826 cap_missing=3206` |
+| **Output** | `INCOMPLETE\|missing_date_specs\|2016-01-29` and **no B64BLOCK payload at all**. `DATES\|533` declared; SPECMETA shows MAX_20 at periods=532 while the other four specs are at 533 — MAX_20 is missing exactly one date, and the packed emitter's all-or-nothing rule (every date must carry all five specs) refused the entire output. Fail-closed worked: nothing partial or corrupt was emitted, and no statistic was or could be observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run9_short_A_r013.log`, 15 lines, exact-file sha256:`dffe320d0b1823096de06d3d4ced1dcdffaad5071a7ade9159523291dc250bd0` |
+| **Validity** | **REFUSED** — no results exist; a rerun on fixed code will be a new R-number |
+
+### Root cause: the packed format cannot say "this spec is absent today"
+
+Per-spec ragged dates are ordinary and honest: the monthly battery's ROW
+format discloses them via SPECMETA (R-011's per-spec periods were 116..133
+out of 142), and the short battery computes its rows the same way — `_settle`
+legitimately skips a spec-date when usable names fall below MIN_NAMES, when
+a held name has no outcome, or when exit turnover is unpriceable (the
+zombie-name mechanism of R-010, to which MAX_20's extreme-volatility book is
+especially exposed; which of the three gates fired on 2016-01-29 is not
+observable from the refused log). But the packed `b64block_date_u32_i32x4_u16x3`
+layout has no absence channel, so its emitter demands every date × every
+spec and refuses everything otherwise. R-002 passed with 534/534 full dates
+by luck; this run hit one ragged spec-date and the refusal withheld 2,664
+honest spec-date cells because one was absent. The short battery also still
+gates result rows on turnover (`_settle`), contradicting the R-010 contract
+that turnover is a COST input, never a gate. Fix round follows: an absence-
+aware packed layout plus turnover-unavailability sentinel, with the v1
+decoder retained so R-002's historical logs stay readable.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

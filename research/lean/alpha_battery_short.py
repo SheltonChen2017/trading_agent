@@ -441,12 +441,14 @@ class AlphaBatteryShort(QCAlgorithm):
             long20 = portfolio["long20"]
             if any(symbol not in outcomes for symbol in longs + shorts + long20):
                 continue
+            # Turnover is a COST input, never a gate on the alpha result
+            # (R-010/R-013). An unpriceable exit book emits None, which the
+            # packed layout carries as a declared-unavailability sentinel and
+            # the analyser charges at the conservative full 1.0 one-way.
             turnovers = tuple(
                 _round_trip_turnover(target, outcomes)
                 for target in portfolio["weights"]
             )
-            if any(value is None for value in turnovers):
-                continue
             long_ret = sum(outcomes[s] for s in longs) / len(longs)
             short_ret = sum(outcomes[s] for s in shorts) / len(shorts)
             long20_ret = sum(outcomes[s] for s in long20) / len(long20)
@@ -484,14 +486,27 @@ class AlphaBatteryShort(QCAlgorithm):
         # the cap. This preserves full-period
         # state in one run; splitting the calendar would reset warm-up,
         # holding cadence, and drift-aware turnover at the boundary.
+        if len(order) > 8:
+            # The u8 presence mask below carries at most eight specs.
+            self.error(f"INCOMPLETE|too_many_specs_for_mask|{len(order)}")
+            return
         by_date = {}
         for spec, rows in self.results.items():
             for date, ic, lr, sr, l20, turn_ls, turn_l10, turn_l20, n in rows:
-                turns = tuple(int(round(value * 10000))
-                              for value in (turn_ls, turn_l10, turn_l20))
-                if any(value < 0 or value > 65535 for value in turns):
-                    self.error(f"INCOMPLETE|turnover_out_of_range|{spec}|{date}")
-                    return
+                turns = []
+                for value in (turn_ls, turn_l10, turn_l20):
+                    if value is None:
+                        # 65535 is reserved as the declared-unavailability
+                        # sentinel (unpriceable exit book, R-013); a real
+                        # turnover too large to represent is refused below.
+                        turns.append(65535)
+                        continue
+                    scaled = int(round(value * 10000))
+                    if scaled < 0 or scaled > 65534:
+                        self.error(
+                            f"INCOMPLETE|turnover_out_of_range|{spec}|{date}")
+                        return
+                    turns.append(scaled)
                 by_date.setdefault(date, {})[index_of[spec]] = (
                     -2147483648 if ic is None else int(round(ic * 100000)),
                     int(round(lr * 1000000)),
@@ -500,7 +515,8 @@ class AlphaBatteryShort(QCAlgorithm):
                     turns[0], turns[1], turns[2],
                 )
         self.log(f"SPECS|{'|'.join(order)}")
-        self.log("SCALE|layout=b64block_date_u32_i32x4_u16x3|ic=1e-5|ret=1e-6|turnover=1e-4")
+        self.log("SCALE|layout=b64block_date_u32_mask_u8_i32x4_u16x3"
+                 "|ic=1e-5|ret=1e-6|turnover=1e-4")
         self.log(f"DATES|{len(by_date)}")
         for spec in order:
             rows = self.results[spec]
@@ -510,12 +526,18 @@ class AlphaBatteryShort(QCAlgorithm):
         records = []
         for date in sorted(by_date):
             cells = by_date[date]
-            if set(cells) != set(range(len(order))):
-                self.error(f"INCOMPLETE|missing_date_specs|{date}")
-                return
-            payload = struct.pack(">I", int(date.replace('-', '')))
+            # A date may honestly lack some specs (below MIN_NAMES usable
+            # names, a held name with no outcome). The presence mask declares
+            # exactly which specs emitted, so ordinary per-spec raggedness —
+            # already the norm in the monthly battery — never forces refusing
+            # the entire run (R-013: one absent MAX_20 date withheld 2,664
+            # honest spec-date cells).
+            mask = 0
+            for index in cells:
+                mask |= 1 << index
+            payload = struct.pack(">IB", int(date.replace('-', '')), mask)
             payload += b"".join(struct.pack(">iiiiHHH", *cells[index])
-                                for index in range(len(order)))
+                                for index in sorted(cells))
             records.append(payload)
         for start in range(0, len(records), 10):
             block = records[start:start + 10]

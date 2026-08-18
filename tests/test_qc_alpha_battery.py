@@ -347,6 +347,104 @@ def test_parser_round_trips_the_full_period_binary_layout(tmp_path: Path):
     assert frame.iloc[0]["turnover_l20"] == pytest.approx(0.3)
 
 
+_MASKED_SCALE = ("SCALE|layout=b64block_date_u32_mask_u8_i32x4_u16x3"
+                 "|ic=1e-5|ret=1e-6|turnover=1e-4")
+
+
+def _masked_record(date: int, present: list[int],
+                   turnovers=(1000, 2000, 3000)) -> bytes:
+    mask = 0
+    for index in present:
+        mask |= 1 << index
+    payload = struct.pack(">IB", date, mask)
+    payload += b"".join(
+        struct.pack(">iiiiHHH", 1000, 20000, -10000, 15000, *turnovers)
+        for _ in present
+    )
+    return payload
+
+
+def _masked_log(tmp_path: Path, records: list[bytes],
+                periods: dict[str, int]) -> Path:
+    log = tmp_path / "masked.log"
+    log.write_text(
+        _spec_header() + "\n" + _MASKED_SCALE
+        + f"\nDATES|{len(records)}\n"
+        + "\n".join(f"SPECMETA|{spec}|median_names=100|periods={periods[spec]}"
+                    for spec in SHORT_SPECS)
+        + f"\nB64BLOCK|{len(records)}|"
+        + base64.b64encode(b"".join(records)).decode("ascii"),
+        encoding="utf-8",
+    )
+    return log
+
+
+def test_masked_layout_round_trips_absent_specs_and_turnover_sentinel(
+    tmp_path: Path,
+):
+    # R-013: date 20160129 honestly lacks MAX_20 (spec index 2); one cell on
+    # the other date declares its long-only-10 turnover unavailable (65535).
+    records = [
+        _masked_record(20160122, [0, 1, 2, 3, 4],
+                       turnovers=(1000, 65535, 3000)),
+        _masked_record(20160129, [0, 1, 3, 4]),
+    ]
+    periods = {spec: (1 if spec == "MAX_20" else 2) for spec in SHORT_SPECS}
+    specs, frame, meta = analyser.parse_log(_masked_log(tmp_path, records, periods))
+    assert specs == list(SHORT_SPECS)
+    assert meta["dates"] == 2
+    assert len(frame) == 9
+    assert frame[(frame["spec"] == "MAX_20")
+                 & (frame["date"] == "20160129")].empty
+    first = frame[frame["date"] == "20160122"].iloc[0]
+    assert math.isnan(float(first["turnover_l10"]))
+    assert first["turnover_ls"] == pytest.approx(0.1)
+    assert first["turnover_l20"] == pytest.approx(0.3)
+
+
+def test_v1_layout_keeps_65535_as_a_real_turnover_value(tmp_path: Path):
+    # R-002's historical logs predate the sentinel: 65535 stays 6.5535.
+    values = (1000, 20000, -10000, 15000, 1000, 65535, 3000)
+    payload = struct.pack(">I", 20200102)
+    payload += b"".join(struct.pack(">iiiiHHH", *values) for _ in SHORT_SPECS)
+    log = tmp_path / "packed-v1.log"
+    log.write_text(
+        _spec_header()
+        + "\nSCALE|layout=b64block_date_u32_i32x4_u16x3|ic=1e-5|ret=1e-6|turnover=1e-4"
+        + "\nDATES|1\n"
+        + "\n".join(f"SPECMETA|{spec}|median_names=100|periods=1"
+                    for spec in SHORT_SPECS)
+        + "\nB64BLOCK|1|" + base64.b64encode(payload).decode("ascii"),
+        encoding="utf-8",
+    )
+    _, frame, _ = analyser.parse_log(log)
+    assert frame.iloc[0]["turnover_l10"] == pytest.approx(6.5535)
+
+
+@pytest.mark.parametrize("mask_bits", ([], [5]))
+def test_masked_layout_refuses_empty_or_out_of_range_masks(
+    tmp_path: Path, mask_bits: list[int]
+):
+    records = [_masked_record(20160122, mask_bits)]
+    periods = {spec: 0 for spec in SHORT_SPECS}
+    with pytest.raises(analyser.InvalidLog, match="invalid spec mask"):
+        analyser.parse_log(_masked_log(tmp_path, records, periods))
+
+
+def test_masked_layout_refuses_trailing_bytes(tmp_path: Path):
+    records = [_masked_record(20160122, [0, 1, 2, 3, 4]) + b"\x00"]
+    periods = {spec: 1 for spec in SHORT_SPECS}
+    with pytest.raises(analyser.InvalidLog, match="trailing bytes"):
+        analyser.parse_log(_masked_log(tmp_path, records, periods))
+
+
+def test_masked_layout_refuses_truncated_cells(tmp_path: Path):
+    records = [_masked_record(20160122, [0, 1, 2, 3, 4])[:-4]]
+    periods = {spec: 1 for spec in SHORT_SPECS}
+    with pytest.raises(analyser.TruncatedLog, match="incomplete packed block"):
+        analyser.parse_log(_masked_log(tmp_path, records, periods))
+
+
 def test_split_log_merge_refuses_overlapping_windows(tmp_path: Path):
     paths = []
     for number in range(2):

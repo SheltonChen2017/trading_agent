@@ -1594,6 +1594,54 @@ at a time, each ledgered with full identity and structurally
 parser-round-tripped before the next; the frozen Stage 1 analyser runs
 ONCE afterward.
 
+## 7ah. Stage 1 complete: NULL on every beta-free cell; the alpha program closes (2026-08-18)
+
+The six serial cloud runs (R-023..R-028, projects 19–24) all completed
+structurally on the FIRST attempt with zero refusals — the S0R-hardened
+contracts (SPECMETA raggedness, declared-unavailable turnover,
+underfill recording, five-field BROW) all proved themselves in the
+cloud. The frozen Stage 1 analyser then ran ONCE (ledger entry A-002;
+run-level looks ended at 29; lifetime cell floor 428 → 452).
+
+**Result: NULL.** IC 0/6 (best 3.2e-3 vs gate 2.08e-3); long-short 0/6
+with three negative Sharpes; the 10/12 long-only stage-gate clears sit
+directly on top of their own same-dates equal-weight benchmarks
+(cell Sharpes 0.84–1.01 vs benchmark 0.78–0.83) — the matched-benchmark
+design did exactly what it was built for, showing the long-only passes
+are market beta, not selection.
+
+**The preregistered consequence executed: the cross-sectional alpha
+program on this universe is CLOSED** (A-002; owner GO protocol,
+section 7af). Two full families (180 + 24 cells) with zero beta-free
+passes, after eleven null local signals, against a measured 2–4% MDE
+power ceiling. Effort redirects to portfolio construction, risk, and
+paper-observation infrastructure.
+
+One operational defect found at the analysis step: the Stage 1 analyser
+lacks the `sys.path` bootstrap of its siblings, so script-mode
+invocation crashes at import (module-mode `python -m` was used; frozen
+bytes unchanged; no data touched by the failed attempt). P3, backlog
+for the next hardening round alongside SHR-001.
+
+## 7ai. Stage 1 run-ledger review accepted; S1R-002/003 fixed (2026-08-18)
+
+Cursor/Grok reviewed the runs round (`875d003..dec0a8a`, 7 commits) and
+**accepted all seven** as a ledger/process round: 0 P0/P1/P2; sequencing
+judged correct and better than Stage 0 (UNANALYSED per run, VALID only
+in the A-002 commit, headings and rows together); all six append
+commits verified free of analyser output; family arithmetic and both
+gates re-checked. Three P3s: S1R-001 (the already-disclosed stage1
+analyser sys.path gap — OPEN in the hardening backlog with SHR-001;
+its fix must not re-invoke the analyser), S1R-002 and S1R-003 (stale
+"Stage 1 still pending" text in handoff §8 and the action plan's
+STAGE1 row) — both confirmed and FIXED in this commit with the
+originals retained. Claude's counter-review executed the review's
+checklist in full and verified every checkable claim
+(`docs/Review/REVIEW_2026-08-18_STAGE1_RUNS.md` and
+`…_RUNS_COUNTERREVIEW.md`). The closure record is now internally
+consistent everywhere: the cross-sectional alpha program on this
+universe is CLOSED, and no document any longer suggests otherwise.
+
 ## 8. What is next
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
@@ -1606,9 +1654,11 @@ ONCE afterward.
    Stage 1 — which adds the cadence-matched benchmark-same-dates
    comparison those six cells need — can launch on reviewed code.
    UPDATE: the hardening round is IMPLEMENTED, validated (section 7aa),
-   and INDEPENDENTLY REVIEWED AND ACCEPTED (section 7ab). The only gate
-   left in front of Stage 1 is the owner's decision on whether its
-   24-cell family is worth its looks given the A-001 nulls.
+   and INDEPENDENTLY REVIEWED AND ACCEPTED (section 7ab).
+   FINAL UPDATE (closes review finding S1R-002): the owner gave the GO,
+   Stage 1 RAN AND CLOSED NULL the same day (sections 7af–7ah, ledger
+   A-002). Nothing about Stage 1 is launchable any more; the
+   cross-sectional alpha program on this universe is CLOSED.
 2. **Original review context (superseded):** With Codex tokens exhausted, the owner ran the
    independent review through Cursor (Grok 4.6) instead on 2026-08-18. It
    reviewed the full range `81db126..de1beac` (27 commits, every commit

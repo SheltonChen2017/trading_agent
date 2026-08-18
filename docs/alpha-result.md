@@ -623,7 +623,7 @@ at the conservative full 1.0 by the analyser; a genuinely unpriceable
 month's return stays absent (visible as a month gap) but can no longer
 poison its successors.
 
-## R-018 — Stage 0 universe benchmark, A_large, fixed bind (PENDING_REVIEW)
+## R-018 — Stage 0 universe benchmark, A_large, fixed bind (STALE)
 
 | Field | Value |
 |---|---|
@@ -637,12 +637,12 @@ poison its successors.
 | **Launched / completed (UTC)** | 2026-08-18T03:58:20.313086+00:00 / 2026-08-18T03:58:58.699318+00:00 |
 | **Output** | COMPLETE: 149 BROW rows, 2012-01..2024-11 — versus R-017's 48 rows dead at 2015-12 on the same universe. The raw cloud log **round-trips through the frozen benchmark parser**. Seven months absent from the full 156-month grid: 2016-01 (the zombie month that killed R-017, now honestly absent instead of fatal), 2019-07, 2022-01, 2022-02, 2022-09, 2023-09 (other unpriceable books), and 2024-12 (end boundary — the final book settles after END, matching the batteries' 2024-11 endpoint). Five months carry declared-unavailable turnover (the recovery rebalances after unpriceable books), each to be charged the conservative full 1.0 at analysis. Parsing only; no statistic observed. |
 | **Raw log** | `artifacts/qc_stage0_20260817/run14_benchmark_A_r018.log`, 156 lines, exact-file sha256:`0a391739a89910b78980c7689b924aceb0881c55b719532f7d90daea2a9165ff` |
-| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`5b5184a` pass independent review |
+| **Validity** | **STALE** — superseded by R-022, the same computation on the underfill-recording contract (`39b3b89`); R-022's 149 shared months match this run's returns exactly |
 
 The R-017 die-off is closed in the cloud: the same A_large benchmark
 computation now reports thirteen years instead of four, with every
 unpriceable month visible as a disclosed gap rather than a silent
-truncation of everything after it. Benchmarks B_core and C_broad remain.
+truncation of everything after it.
 
 ## R-019 — Stage 0 universe benchmark, B_core, biased month coverage (INCONCLUSIVE)
 
@@ -717,6 +717,31 @@ all three universes) remain.
 
 Only the A_large benchmark rerun remains (five-field uniformity across all
 three universes; its R-018 log predates the underfill-recording contract).
+
+## R-022 — Stage 0 universe benchmark, A_large, underfill-recording (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, A_large (supersedes R-018 for five-field uniformity) — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 22 → 23); zero alpha cells |
+| **Source commit** | `01ce8f1` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, `5b5184a`, `39b3b89`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `f2c6e240e6e83f6d7f4411d5eba8f074536ec2a688022a6050dad768214601c4` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run18_benchmark_A_r022.json`) |
+| **QC project** | `35298527` — requested `18. UNIVERSE_BENCHMARK_A_LARGE - 20260817`, returned `18 UNIVERSE_BENCHMARK_A_LARGE - 20260817` |
+| **Compile ID** | `7dcffef48e4926fc953db6d9ac164774-dc838b3c9896aa50a9e1a2ecd7d93dfa` |
+| **Backtest ID** | `022b32d7e7414bf945a73254a63eaea9` |
+| **Launched / completed (UTC)** | 2026-08-18T04:25:56.576347+00:00 / 2026-08-18T04:27:06.095429+00:00 |
+| **Output** | COMPLETE: **155 of 156 months** (only the 2024-12 end boundary absent). The raw cloud log **round-trips through the frozen benchmark parser** (five-field rows). 6 months carry disclosed underfill and 6 declared-unavailable turnover. **Replication check against R-018:** the 149 months both runs emitted have max absolute return difference **0.0** — the underfill contract changed nothing on full months and only recovered the six R-018 had dropped. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run18_benchmark_A_r022.log`, 162 lines, exact-file sha256:`b8ace1727a06f4d022e7c7130c0bd88d01fe0ccd90ad73668189f11160e94149` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`39b3b89` pass independent review |
+
+**The nine-run Stage 0 battery is complete on the fixed code.** Monthly:
+R-009 (A_large), R-011 (B_core), R-012 (C_broad). Short: R-014 (A_large),
+R-015 (B_core), R-016 (C_broad). Benchmark: R-022 (A_large), R-020
+(B_core), R-021 (C_broad). All nine are PENDING_REVIEW on the same range
+`49e8160`..`39b3b89`. No statistic has been observed from any of them; the
+frozen analysers run once, with full run identities, only after the review
+gate — so look accounting and result identity are recorded before any
+statistic exists, exactly as the R-002 precedent required.
 
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 

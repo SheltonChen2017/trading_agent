@@ -699,6 +699,25 @@ spans the full period with every underfilled month recorded rather than
 dropped. C_broad and the A_large rerun (for five-field uniformity across
 all three universes) remain.
 
+## R-021 — Stage 0 universe benchmark, C_broad, underfill-recording (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, C_broad — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 21 → 22); zero alpha cells |
+| **Source commit** | `cd21495` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, `5b5184a`, `39b3b89`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `1711a5eb6779ee6c9730231b806d6f3c6155812aae067defab2e725d1d5af116` (`ACTIVE_UNIVERSE="C_broad"` rewrite; recorded in `run17_benchmark_C_r021.json`) |
+| **QC project** | `35298403` — requested `17. UNIVERSE_BENCHMARK_C_BROAD - 20260817`, returned `17 UNIVERSE_BENCHMARK_C_BROAD - 20260817` |
+| **Compile ID** | `328ba81c396811cb5f76379174f4527c-d5ee65c509d8b4876977a9b235eb3d1e` |
+| **Backtest ID** | `8ba1f192438bec65313dcd2133c124b1` |
+| **Launched / completed (UTC)** | 2026-08-18T04:21:52.870250+00:00 / 2026-08-18T04:25:10.381972+00:00 |
+| **Output** | COMPLETE: **155 of 156 months** (only the 2024-12 end boundary absent). The raw cloud log **round-trips through the frozen benchmark parser** (five-field rows). 86 months carry disclosed underfill — worst coverage 99.72% priced — and 85 months carry declared-unavailable turnover, each charged the conservative full 1.0 at analysis with counts disclosed. The broadest universe shows the most zombie churn, exactly as R-012/R-016 predicted. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run17_benchmark_C_r021.log`, 162 lines, exact-file sha256:`aa8a09872e8eab1640d79ecc2eb4f4ed80fd2ba91dfb067dd4f6d757e7c777dc` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`39b3b89` pass independent review |
+
+Only the A_large benchmark rerun remains (five-field uniformity across all
+three universes; its R-018 log predates the underfill-recording contract).
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

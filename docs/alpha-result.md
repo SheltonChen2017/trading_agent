@@ -567,6 +567,27 @@ specs) are the honest cost of a mid-cap universe with more disappearing
 names; every absence is declared per date by the presence mask and per spec
 by SPECMETA. Next: short C_broad, then the three benchmarks.
 
+## R-016 — Stage 0 short battery, C_broad, absence-aware format (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Short battery, 5 specifications, universe C_broad (first C_broad short attempt of the campaign) |
+| **Research look** | Counted real-market run (run-level count 16 → 17); 20 new cells emitted |
+| **Source commit** | `802c436` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `1284a5b3b2100ac8042cf6cc104fea496a818e0645969e343e8af5d24bec0ebe` (`ACTIVE_UNIVERSE="C_broad"` rewrite; recorded in `run12_short_C_r016.json`) |
+| **QC project** | `35296502` — requested `12. SHORT_BATTERY_C_BROAD - 20260817`, returned `12 SHORT_BATTERY_C_BROAD - 20260817` |
+| **Compile ID** | `aa27f65f4bae9cdd25d83c375fb96eb8-b1278e0eec0128aa551d53ba3ab8646d` |
+| **Backtest ID** | `8d5cf84c274b74bf9141c1a37aba3c2e` |
+| **Launched / completed (UTC)** | 2026-08-18T03:27:17.192922+00:00 / 2026-08-18T03:37:09.078093+00:00; 34,541,299 data points; `cap_rows=429848 cap_fallback=52239 cap_missing=12771` (the same C_broad universe numbers as monthly R-012) |
+| **Output** | COMPLETE: `DATES\|532`, masked layout, per-spec periods 523/513/496/519/519 — the most ragged of the three universes, again unreportable under the v1 all-or-nothing format. The raw cloud log **round-trips through the frozen parser**: 2,570 spec-rows, 2012-04-04..2024-12-19. Zero unavailable-turnover cells. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run12_short_C_r016.log`, 69 lines, exact-file sha256:`da0ac76705706c0763992cc60ed88b45929338eb47d6706b48782b63d29c0044` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`075e982` pass independent review |
+
+Both alpha families are now complete in the cloud on the fixed code across
+all three universes: monthly (R-009, R-011, R-012) and short (R-014, R-015,
+R-016), all PENDING_REVIEW on the same review range. Only the three
+equal-weight benchmark runs remain; they are not alpha cells.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

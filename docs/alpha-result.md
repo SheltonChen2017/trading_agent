@@ -876,6 +876,22 @@ of 2026-08-18 (handoff 7af/7ag).
 | **Raw log** | `artifacts/qc_stage1_20260818/run21_stage1_C.log`, 128 lines, exact-file sha256:`76de5389e176297568eb25384d61edb8f10ee20376c2949d56ba37a21aaaf313` |
 | **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
 
+## R-026 — Stage 1 benchmark, A_large, reviewed code (UNANALYSED)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Stage 1 cadence-matched equal-weight benchmark (21-session cohorts) — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 26 → 27); zero alpha cells; no statistic observed |
+| **Source commit** | `875d003` |
+| **Uploaded source SHA-256** | `7da083775ff2dde2c175891b0e443e76f506a6852d4ab88fce2d3e6a735e8d05` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run22_s1bench_A.json`) |
+| **QC project** | `35332210` — `22. STAGE1_BENCHMARK_A_LARGE - 20260818` |
+| **Compile ID** | `63cf8fb63e44fc5c8c3891a9ab9f20c2-cc4d3af41150c1d6925b088de9d2a729` |
+| **Backtest ID** | `b7b4e3b5b7a19581ca6739cd8c0e2d16` |
+| **Launched / completed (UTC)** | 2026-08-18T21:44:26.806992+00:00 / 2026-08-18T21:45:07.053844+00:00 |
+| **Output** | STRUCTURALLY COMPLETE: **154 gapless months** (2012-01..2024-10 — no warm-up head, 21-session settle tail), a strict superset of R-023's alpha dates, so the analyser's benchmark-same-dates matching cannot refuse. 5 declared-unavailable turnovers and 6 underfilled months disclosed (five-field BROW — first cloud proof of the S0R-002 port); 0 INCOMPLETE lines. Inert. Structural inspection only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage1_20260818/run22_s1bench_A.log`, 161 lines, exact-file sha256:`6cded4c9ebe3fb752b7f51f1bb4fd244f256ab67691c2e275e6e77987f050547` |
+| **Validity** | **UNANALYSED** — the frozen Stage 1 analyser runs once after all six Stage 1 runs complete structurally |
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

@@ -678,6 +678,27 @@ which penalises rather than flatters alpha claims measured against it —
 conservative in the correct direction for a baseline. All three benchmark
 universes will be rerun on the extended contract for uniformity.
 
+## R-020 — Stage 0 universe benchmark, B_core, underfill-recording (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, B_core (rerun of R-019) — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 20 → 21); zero alpha cells |
+| **Source commit** | `39b3b89` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, `5b5184a`, `39b3b89`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `b080124852f142727c3b2e8d4cb1e1dd818f3cf73129c4e5cb87efa369ca7b5f` (`ACTIVE_UNIVERSE="B_core"` rewrite; recorded in `run16_benchmark_B_r020.json`) |
+| **QC project** | `35298290` — requested `16. UNIVERSE_BENCHMARK_B_CORE - 20260817`, returned `16 UNIVERSE_BENCHMARK_B_CORE - 20260817` |
+| **Compile ID** | `975958cef0be3ab42d6154ee3f24f28e-7caa049758ef091ccc7bd92dd1b64bc8` |
+| **Backtest ID** | `03cbf3fbcda0190b408f156f876781f6` |
+| **Launched / completed (UTC)** | 2026-08-18T04:18:47.345291+00:00 / 2026-08-18T04:20:57.961762+00:00 |
+| **Output** | COMPLETE: **155 of 156 months** (only the 2024-12 end boundary absent, matching the batteries' 2024-11 endpoint), versus R-019's 94. The raw cloud log **round-trips through the frozen benchmark parser** (five-field rows). 61 months carry disclosed underfill — worst coverage 99.83% priced, i.e. the old all-names gate was discarding whole months over 1–3 unpriceable names out of ~1,700. 60 months carry declared-unavailable turnover, each charged the conservative full 1.0 at analysis with counts disclosed. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run16_benchmark_B_r020.log`, 162 lines, exact-file sha256:`dbf6ad69c3720e0453318d58449b01dcab532aa4773a000c3f5b2b5e04ecffda` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`39b3b89` pass independent review |
+
+The R-019 coverage collapse is closed in the cloud: B_core's baseline now
+spans the full period with every underfilled month recorded rather than
+dropped. C_broad and the A_large rerun (for five-field uniformity across
+all three universes) remain.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

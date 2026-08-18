@@ -170,12 +170,16 @@ class AlphaStage1Benchmark(QCAlgorithm):
                 now = self.closes.get(symbol)
             else:
                 now = None
-            if start is None or start <= 0 or now is None:
-                return
-            prior_outcomes[symbol] = now / start - 1.0
+            if start is not None and start > 0 and now is not None:
+                prior_outcomes[symbol] = now / start - 1.0
+        # Turnover is a COST input, never a gate on the result
+        # (R-017/S0R-002): returning here leaves previous_weights holding
+        # a book that can never be priced again, so one zombie name would
+        # silently kill every later month of the series. Bind always;
+        # _drift_turnover returns None for an unpriceable prior book and
+        # the emitter declares it as an empty BROW field, which the
+        # analyser charges at the conservative full 1.0 one-way.
         turnover = _drift_turnover(self.previous_weights, target, prior_outcomes)
-        if turnover is None:
-            return
         self.previous_weights = target
         self.previous_entries = {symbol: entry[symbol] for symbol in target}
         self.cohorts.append({
@@ -201,12 +205,19 @@ class AlphaStage1Benchmark(QCAlgorithm):
                     now = None
                 if start > 0 and now is not None:
                     outcomes[symbol] = now / start - 1.0
-            if len(outcomes) == len(cohort["entry"]) and len(outcomes) >= MIN_NAMES:
+            # Underfill is RECORDED, never dropped (R-019/S0R-002):
+            # requiring every entered name to price on the settlement
+            # session discards whole months over a handful of zombie
+            # names, clustered in delisting-heavy stretches — a
+            # selectively calm baseline sample. The month emits over the
+            # priced subset with BOTH counts disclosed.
+            if len(outcomes) >= MIN_NAMES:
                 self.rows.append((
                     cohort["date"],
                     sum(outcomes.values()) / len(outcomes),
                     cohort["turnover"],
                     len(outcomes),
+                    len(cohort["entry"]),
                 ))
         self.cohorts = remaining
 
@@ -225,9 +236,10 @@ class AlphaStage1Benchmark(QCAlgorithm):
             self.error("INCOMPLETE|missing_benchmark_rows")
             return
         self.log(f"DATES|{len(self.rows)}")
-        for date, ret, turnover, names in self.rows:
+        for date, ret, turnover, priced, entered in self.rows:
+            turn = "" if turnover is None else round(turnover, 4)
             self.log(
-                f"BROW|{date.replace('-', '')[:6]}|{round(ret, 6)}|"
-                f"{round(turnover, 4)}|{names}"
+                f"BROW|{date.replace('-', '')[:6]}|{round(ret, 6)}|{turn}|"
+                f"{priced}|{entered}"
             )
         self.log(f"orders placed: {self.transactions.orders_count}")

@@ -315,3 +315,40 @@ def test_universe_portfolio_charges_drift_not_target_to_target_turnover() -> Non
     )
 
     assert turnover.iloc[1] == pytest.approx(0.15)
+
+
+def test_universe_portfolio_heals_after_an_unpriceable_book() -> None:
+    """S0R-004: a wiped-out book records the month's return with NO
+    turnover for that month, and the NEXT month's turnover exists again.
+    Freezing `previous` would silently drop every later month's turnover."""
+    dates = pd.to_datetime(["2025-01-02", "2025-01-03", "2025-01-06"])
+    names = [f"S{i:02d}" for i in range(20)]
+    rows = []
+    for date in dates:
+        for index, name in enumerate(names):
+            outcome = 0.0
+            if date == dates[0]:
+                if index >= 16:      # the longs are wiped out
+                    outcome = -1.0
+                elif index < 4:      # the shorts quadruple: NAV <= 0
+                    outcome = 4.0
+            rows.append({
+                "as_of_session": date,
+                "ticker": name,
+                "score": float(index),
+                "outcome": outcome,
+            })
+
+    returns, turnover, _ = universes._portfolio(
+        pd.DataFrame(rows), "long_short", 0.20
+    )
+
+    assert list(returns.index) == list(dates)
+    assert dates[1] not in turnover.index, (
+        "the wiped-out month declares turnover unavailable (charged 1.0 "
+        "downstream), it does not invent a number"
+    )
+    assert dates[2] in turnover.index, (
+        "the book must heal after the unpriceable month or every later "
+        "month loses its turnover silently"
+    )

@@ -439,10 +439,15 @@ class AlphaStage1Replications(QCAlgorithm):
                 {symbol: 1.0 / len(longs) for symbol in longs},
                 {symbol: 1.0 / len(long20) for symbol in long20},
             )
+            # Turnover is a COST input, never a gate on the result row
+            # (R-010/S0R-001): refusing to bind on an unpriceable prior
+            # book leaves previous_weights holding a book that can never
+            # be priced again, so one zombie name would silently kill
+            # every later cohort of this construction. Bind always; an
+            # unavailable turnover is emitted as a declared-empty field
+            # the analyser charges at the conservative full 1.0 one-way.
             turns = tuple(self._rebalance_turnover(key, target)
                           for key, target in zip(keys, targets))
-            if any(value is None for value in turns):
-                continue
             for key, target in zip(keys, targets):
                 self.previous_weights[key] = target
                 self.previous_entries[key] = {
@@ -617,17 +622,33 @@ class AlphaStage1Replications(QCAlgorithm):
             self.error(f"INCOMPLETE|missing_specs={'|'.join(missing)}")
             return
         index_of = {spec: i for i, spec in enumerate(order)}
+
+        def _turn(value):
+            # An unpriceable prior book records an UNAVAILABLE turnover; the
+            # analyser charges the conservative full 1.0 for such months.
+            return "" if value is None else round(value, 4)
+
         by_date = {}
         for spec, rows in self.results.items():
             for date, ic, lr, sr, l20, turn_ls, turn_l10, turn_l20, n in rows:
                 by_date.setdefault(date, []).append(
                     f"{index_of[spec]}~{'' if ic is None else round(ic, 5)}~"
                     f"{round(lr, 6)}~{round(sr, 6)}~{round(l20, 6)}~"
-                    f"{round(turn_ls, 4)}~{round(turn_l10, 4)}~"
-                    f"{round(turn_l20, 4)}~{n}"
+                    f"{_turn(turn_ls)}~{_turn(turn_l10)}~"
+                    f"{_turn(turn_l20)}~{n}"
                 )
         self.log(f"SPECS|{'|'.join(order)}")
         self.log(f"DATES|{len(by_date)}")
+        # Specifications legitimately skip months independently (settlement
+        # coverage, missing outcomes), so a date's ROW may be ragged. The
+        # parser accepts raggedness only against a complete SPECMETA
+        # inventory (R-007): without these lines one honest per-spec gap
+        # would refuse the entire run.
+        for spec in order:
+            rows = self.results[spec]
+            names = sorted(row[8] for row in rows)
+            self.log(f"SPECMETA|{spec}|median_names={names[len(names) // 2]}"
+                     f"|periods={len(rows)}")
         for date in sorted(by_date):
             # Date compressed to YYYYMM; the cadence is monthly.
             self.log(f"ROW|{date.replace('-', '')[:6]}|" + "|".join(by_date[date]))

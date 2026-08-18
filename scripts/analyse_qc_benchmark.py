@@ -38,13 +38,18 @@ def parse_benchmark(path: Path) -> pd.DataFrame:
             declared = found
         elif "BROW|" in line:
             parts = line.split("BROW|", 1)[1].split("|")
-            if len(parts) != 4:
+            # Legacy rows carry one name count (every emitted month was a
+            # full book by construction); R-019 rows carry priced AND
+            # entered counts so underfill is recorded instead of dropped.
+            if len(parts) not in (4, 5):
                 raise SystemExit(f"{path.name}: unsupported/incomplete BROW payload")
             # An EMPTY turnover field is a declared unavailability (the
             # prior book could not be priced that month, R-017); the
             # analyser charges the conservative full 1.0 for it.
             turnover = float(parts[2]) if parts[2] else None
-            rows.append((parts[0], float(parts[1]), turnover, int(parts[3])))
+            priced = int(parts[3])
+            entered = int(parts[4]) if len(parts) == 5 else priced
+            rows.append((parts[0], float(parts[1]), turnover, priced, entered))
     if declared is None:
         raise SystemExit(f"{path.name}: missing DATES declaration")
     if declared <= 0 or not rows:
@@ -54,7 +59,7 @@ def parse_benchmark(path: Path) -> pd.DataFrame:
             f"{path.name}: {len(rows)} rows, {declared} declared -- truncated"
         )
     frame = pd.DataFrame(
-        rows, columns=["date", "ret", "turnover", "names"]
+        rows, columns=["date", "ret", "turnover", "names", "names_entered"]
     ).sort_values("date")
     if not frame["date"].map(lambda value: bool(re.fullmatch(r"\d{6}", value))).all():
         raise SystemExit(f"{path.name}: benchmark dates must use YYYYMM")
@@ -71,6 +76,10 @@ def parse_benchmark(path: Path) -> pd.DataFrame:
         raise SystemExit(f"{path.name}: invalid benchmark turnover")
     if (frame["names"] <= 0).any():
         raise SystemExit(f"{path.name}: benchmark names must be positive")
+    if (frame["names_entered"] < frame["names"]).any():
+        raise SystemExit(
+            f"{path.name}: entered-name count below priced-name count"
+        )
     return frame.set_index("date")
 
 
@@ -111,6 +120,9 @@ def main(argv: list[str] | None = None) -> int:
             "mean_turnover": (float(numeric_turnover.mean())
                               if numeric_turnover.notna().any() else None),
             "unavailable_turnover_periods": int(numeric_turnover.isna().sum()),
+            "underfilled_months": int(
+                (frame["names"] < frame["names_entered"]).sum()
+            ),
             "gross": performance(series, 12.0),
             "net": {
                 f"{bps:g}bps": performance(
@@ -127,6 +139,7 @@ def main(argv: list[str] | None = None) -> int:
                     "turnover": (None if pd.isna(row["turnover"])
                                  else float(row["turnover"])),
                     "names": int(row["names"]),
+                    "names_entered": int(row["names_entered"]),
                 }
                 for date, row in frame.iterrows()
             ],

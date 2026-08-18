@@ -585,6 +585,23 @@ def test_benchmark_analyser_charges_full_turnover_for_unavailable_months(
     unavailable_rows = [row for row in entry["series"] if row["turnover"] is None]
     assert [row["date"] for row in unavailable_rows] == ["202010"]
     assert entry["net"]["10bps"]["cagr"] < entry["net"]["0bps"]["cagr"]
+    assert entry["underfilled_months"] == 0
+
+
+def test_benchmark_parser_records_underfill_and_refuses_impossible_counts(
+    tmp_path: Path,
+):
+    # R-019: a five-field row discloses priced AND entered counts.
+    log = tmp_path / "benchmark-underfill.log"
+    log.write_text("DATES|2\nBROW|202001|0.01|0.25|97|100\n"
+                   "BROW|202002|0.02|0.25|100|100", encoding="utf-8")
+    frame = parse_benchmark(log)
+    assert int(frame.loc["202001", "names"]) == 97
+    assert int(frame.loc["202001", "names_entered"]) == 100
+    bad = tmp_path / "benchmark-impossible.log"
+    bad.write_text("DATES|1\nBROW|202001|0.01|0.25|100|97", encoding="utf-8")
+    with pytest.raises(SystemExit, match="entered-name count"):
+        parse_benchmark(bad)
 
 
 @pytest.mark.parametrize(

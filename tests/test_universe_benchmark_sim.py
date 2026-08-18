@@ -104,10 +104,17 @@ def test_zombie_month_cannot_kill_the_benchmark_series(
     algorithm.staged = {"names": names[1:], "date": str(date2),
                        "score_session": date2}
     algorithm._bind_staged_entry()
-    # December's return is honestly absent (its book cannot be priced), but
-    # the bind MUST survive with a declared-unavailable turnover — the old
-    # turnover-gated bind returned early here and the series never recovered.
-    assert algorithm.rows == []
+    # December EMITS over the priced subset with the underfill recorded
+    # (R-019: dropping the month made coverage collapse to a selectively
+    # calm sample), and the bind MUST survive with a declared-unavailable
+    # turnover — the old turnover-gated bind returned early here and the
+    # series never recovered (R-017).
+    assert len(algorithm.rows) == 1
+    row_date, ret, turnover, priced, entered = algorithm.rows[0]
+    assert row_date == str(date1)
+    assert ret == pytest.approx(0.1)
+    assert priced == min_names
+    assert entered == min_names + 1
     assert algorithm.pending is not None
     assert algorithm.pending["turnover"] is None
     assert zombie not in algorithm.pending["entry"]
@@ -120,18 +127,21 @@ def test_zombie_month_cannot_kill_the_benchmark_series(
     algorithm.staged = {"names": names[1:], "date": str(date3),
                        "score_session": date3}
     algorithm._bind_staged_entry()
-    assert len(algorithm.rows) == 1
-    row_date, ret, turnover, n = algorithm.rows[0]
+    assert len(algorithm.rows) == 2
+    row_date, ret, turnover, priced, entered = algorithm.rows[1]
     assert row_date == str(date2)
     assert ret == pytest.approx(0.1)
     assert turnover is None
-    assert n == min_names
+    assert priced == entered == min_names
 
     algorithm.on_end_of_algorithm()
     log = tmp_path / "benchmark_zombie.log"
     log.write_text("\n".join(algorithm.log_lines) + "\n", encoding="utf-8")
     frame = parse_benchmark(log)
-    assert len(frame) == 1
-    assert frame.iloc[0]["ret"] == pytest.approx(0.1)
-    assert pd.isna(frame.iloc[0]["turnover"])
-    assert int(frame.iloc[0]["names"]) == min_names
+    assert len(frame) == 2
+    first, second = frame.iloc[0], frame.iloc[1]
+    assert first["ret"] == pytest.approx(0.1)
+    assert int(first["names"]) == min_names
+    assert int(first["names_entered"]) == min_names + 1
+    assert pd.isna(second["turnover"])
+    assert int(second["names"]) == int(second["names_entered"]) == min_names

@@ -200,12 +200,20 @@ class UniverseBenchmark(QCAlgorithm):
                 now = None
             if entry_price > 0 and now is not None:
                 outcomes[symbol] = now / entry_price - 1.0
-        if len(outcomes) == len(pending["entry"]) and len(outcomes) >= MIN_NAMES:
+        # Underfill is RECORDED, never dropped (R-019): requiring every
+        # entered name to price on the exact settlement session collapsed
+        # B_core's coverage to 94/156 months, clustered in delisting-heavy
+        # stretches — a selectively calm baseline sample. The month emits
+        # over the priced subset with BOTH counts disclosed; excluding
+        # mid-month zombies overstates the benchmark in crashes, which
+        # penalises rather than flatters alpha measured against it.
+        if len(outcomes) >= MIN_NAMES:
             self.rows.append((
                 pending["date"],
                 sum(outcomes.values()) / len(outcomes),
                 pending["turnover"],
                 len(outcomes),
+                len(pending["entry"]),
             ))
         self._release_unused_retained()
         return outcomes
@@ -220,9 +228,10 @@ class UniverseBenchmark(QCAlgorithm):
     def on_end_of_algorithm(self):
         self.log(f"=== UNIVERSE BENCHMARK | universe={ACTIVE_UNIVERSE} ===")
         self.log(f"DATES|{len(self.rows)}")
-        for date, ret, turnover, n in self.rows:
+        for date, ret, turnover, priced, entered in self.rows:
             turn = "" if turnover is None else round(turnover, 4)
             self.log(
-                f"BROW|{date.replace('-', '')[:6]}|{round(ret, 6)}|{turn}|{n}"
+                f"BROW|{date.replace('-', '')[:6]}|{round(ret, 6)}|{turn}|"
+                f"{priced}|{entered}"
             )
         self.log(f"orders placed: {self.transactions.orders_count}")

@@ -623,6 +623,27 @@ at the conservative full 1.0 by the analyser; a genuinely unpriceable
 month's return stays absent (visible as a month gap) but can no longer
 poison its successors.
 
+## R-018 — Stage 0 universe benchmark, A_large, fixed bind (PENDING_REVIEW)
+
+| Field | Value |
+|---|---|
+| **Alpha / specification** | Equal-weight universe benchmark, A_large (rerun of R-017) — not an alpha cell |
+| **Research look** | Counted real-market run (run-level count 18 → 19); zero alpha cells |
+| **Source commit** | `5b5184a` (contains Claude fixes `49e8160`, `d305ea0`, `46221db`, `5b5184a`, not yet independently reviewed) |
+| **Uploaded source SHA-256** | `a45120e895a1b83ae94862b75dd8181fd9ab0750952d39803bd98e554f5803b6` (`ACTIVE_UNIVERSE="A_large"` rewrite; recorded in `run14_benchmark_A_r018.json`) |
+| **QC project** | `35297525` — requested `14. UNIVERSE_BENCHMARK_A_LARGE - 20260817`, returned `14 UNIVERSE_BENCHMARK_A_LARGE - 20260817` |
+| **Compile ID** | `e9b0641659d9efa86f73a20d8f9b8fd0-9f71c2f6d2cf0891266b7ded064a062a` |
+| **Backtest ID** | `9be317244e6260b8855785dde71df2e1` |
+| **Launched / completed (UTC)** | 2026-08-18T03:58:20.313086+00:00 / 2026-08-18T03:58:58.699318+00:00 |
+| **Output** | COMPLETE: 149 BROW rows, 2012-01..2024-11 — versus R-017's 48 rows dead at 2015-12 on the same universe. The raw cloud log **round-trips through the frozen benchmark parser**. Seven months absent from the full 156-month grid: 2016-01 (the zombie month that killed R-017, now honestly absent instead of fatal), 2019-07, 2022-01, 2022-02, 2022-09, 2023-09 (other unpriceable books), and 2024-12 (end boundary — the final book settles after END, matching the batteries' 2024-11 endpoint). Five months carry declared-unavailable turnover (the recovery rebalances after unpriceable books), each to be charged the conservative full 1.0 at analysis. Parsing only; no statistic observed. |
+| **Raw log** | `artifacts/qc_stage0_20260817/run14_benchmark_A_r018.log`, 156 lines, exact-file sha256:`0a391739a89910b78980c7689b924aceb0881c55b719532f7d90daea2a9165ff` |
+| **Validity** | **PENDING_REVIEW** — upgradeable once `49e8160`..`5b5184a` pass independent review |
+
+The R-017 die-off is closed in the cloud: the same A_large benchmark
+computation now reports thirteen years instead of four, with every
+unpriceable month visible as a disclosed gap rather than a silent
+truncation of everything after it. Benchmarks B_core and C_broad remain.
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

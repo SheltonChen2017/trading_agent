@@ -1262,20 +1262,84 @@ the single step at which statistics are observed (Bonferroni over the
 180-cell family; conservative lifetime cell floor grows with this round's
 repeats and is recomputed in the ledger at that point).
 
+## 7y. Independent review of the Stage 0 battery range (Cursor/Grok) and Claude's counter-review (2026-08-18)
+
+With Codex tokens exhausted (the section 8 deferral), the owner ran the
+independent review through Cursor using Grok 4.6 on 2026-08-18. The
+review covered `81db126..de1beac` — the exact 27-commit range Claude
+listed, from the last counter-reviewed launch-round head to the battery
+tip — and followed the project review process: every commit received an
+explicit disposition, focused synthetic-fixture tests were run on
+`de1beac` (108 passed), and no frozen analyser touched the nine
+PENDING_REVIEW logs. Verdict: all seven product/test commits and all
+twenty record commits **accepted**; conditionally cleared for the Stage 0
+analyser pass; **Stage 1 blocked** by two P2 findings. Full record:
+`docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md`.
+
+Claude counter-reviewed all eight findings the same day
+(`docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`,
+branch `user/claude/qc-stage0-counterreview-20260818`):
+
+- **S0R-001 (P2, confirmed):** `alpha_stage1_replications.py:444` still
+  gates bind on `None` turnover — the R-010 zombie die-off, alive in
+  Stage 1. No Stage 1 test covers it.
+- **S0R-002 (P2, confirmed):** `alpha_stage1_benchmark.py` retains the
+  R-017 bind gate, the R-019 full-book settle gate, and a four-field
+  BROW emit; `analyse_qc_alpha_stage1.py` averages turnover with no
+  `fillna(1.0)`. Four copies, all confirmed by source.
+- **S0R-003 (P3, partially correct):** verified by execution — a literal
+  `nan` turnover token is accepted by both battery and benchmark parsers
+  and silently relabelled as declared unavailability; the `inf` half of
+  the claim is a false alarm (both parsers refuse infinities).
+- **S0R-004 (P3, confirmed):** `run_alpha_universes_20260816.py:202`
+  never heals `previous` after an unpriceable month.
+- **S0R-005 (P3, confirmed):** stale `_rebalance_turnover` docstring in
+  the monthly battery still teaches the removed retry contract and cites
+  the defective Stage 1 pattern as its exemplar.
+- **S0R-006 (P3, resolved):** true at the review snapshot (`28e4c02`);
+  PR #249 has since merged `de1beac` into main.
+- **S0R-007 (P3, confirmed as wording):** R-022's replication identity
+  check computes a numeric comparison over raw returns outside the
+  frozen analyser; "no statistic observed" is imprecise. Append-only
+  ledger, so the fix is a clarifying amendment later, not an edit.
+- **S0R-008 (P3, confirmed and strengthened):** mutation
+  `fillna(1.0)→fillna(0.0)` in the battery analyser survives **all 57**
+  alpha-analyser tests (reviewer claimed only the two cited). Real code
+  restored and re-verified green. Production charge is correct; the gap
+  is test coverage only.
+
+Claude's re-run of the generalized-instance grep matched the reviewer's
+sibling map exactly; no new copy found. Nothing in the eight findings
+invalidates the nine PENDING_REVIEW logs (S0R-001/002/004 are outside
+the Stage 0 execution path; S0R-003's nan channel is unexercised by the
+nine logs). Owner acceptance of the review pair is the remaining gate
+before the ledger upgrade and the single frozen-analyser pass.
+
 ## 8. What is next
 
-1. **Codex must review the five product fixes of the rerun round**
-   (`49e8160`, `d305ea0`, `46221db`+`075e982`, `5b5184a`, `39b3b89`) on
-   `user/claude/qc-stage0-review-verify-20260817`. The Stage 0 battery is
-   COMPLETE (section 7x): all nine cells ran to structural completion on
-   that tree and sit PENDING_REVIEW in `docs/alpha-result.md`
-   (R-009/R-011/R-012 monthly, R-014/R-015/R-016 short,
-   R-022/R-020/R-021 benchmark). After acceptance, run the frozen
-   analysers ONCE with full run identities — the only step where any
-   statistic is observed. **Owner decision 2026-08-18: the review is
-   DEFERRED — Codex tokens are exhausted. Nothing runs meanwhile; the
-   nine runs and the ledger wait as-is. No statistic may be observed
-   before an independent review clears the range.**
+1. **The Stage 0 review happened (section 7y) — owner acceptance is the
+   remaining gate.** With Codex tokens exhausted, the owner ran the
+   independent review through Cursor (Grok 4.6) instead on 2026-08-18. It
+   reviewed the full range `81db126..de1beac` (27 commits, every commit
+   dispositioned), accepted all seven product/test commits and all twenty
+   record commits, and raised eight findings (S0R-001..008: two P2
+   blocking Stage 1 only, six P3). Claude counter-reviewed every finding
+   the same day: five confirmed, one confirmed-and-strengthened by
+   mutation (S0R-008 — `fillna(1.0)→fillna(0.0)` survives ALL 57
+   alpha-analyser tests, not just the two cited), one partially correct
+   (S0R-003 — the `nan` half verified by execution, the `inf` half a
+   false alarm), one resolved by topology (S0R-006 — PR #249 merged
+   `de1beac` into main after the review snapshot). Records:
+   `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COMPLETION.md`
+   (Cursor) and
+   `docs/Review/REVIEW_2026-08-18_QC_STAGE0_BATTERY_COUNTERREVIEW.md`
+   (Claude). None of the eight findings invalidates the nine
+   PENDING_REVIEW logs. **Next: the owner accepts or rejects the review
+   pair. On acceptance, upgrade the nine ledger entries and run the
+   frozen analysers ONCE with full run identities — the only step where
+   any statistic is observed. Stage 1 stays blocked until S0R-001 and
+   S0R-002 are ported with regression tests (S0R-003/004/005/008 belong
+   in the same hardening round).**
 2. ~~Claude must counter-review `codex/review-qc-stage0-run-20260817`~~ —
    DONE and accepting (section 7u); superseded by section 7v's halt.
 2. PR #244 merged Claude's Stage 0 correction counter-review at `b6f577e`;

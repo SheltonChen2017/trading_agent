@@ -2302,6 +2302,23 @@ net returns charge at 1.0.
 
 This review does not start APQ-3 or authorize a cloud run.
 
+## 7az. APQ-2 review counter-reviewed; schema ratified (2026-08-19)
+
+Cursor/Grok accepted APQ-2
+(`docs/Review/REVIEW_2026-08-19_APQ2_ANALYSER.md`) and — the round's
+real event — **ratified the reporting decision before any run exists**:
+the excess-mean family is IN the schema (3 cells, 0.05/3, both labels);
+striking it later would be a new schema, never a post-result choice.
+Counter-review (`…_APQ2_COUNTERREVIEW.md`): the fillna mutation re-run
+red/green; **APQ2-001 reproduced** (skipna `mean_turnover` reports 0.0
+where the net blocks charge a 0.25 mean) and closed as documented at
+the plan's APQ-5 section per the reviewer's guidance; APQ2-002 (stale
+§8, third occurrence — note to self recorded: touch §8 in the same
+commit as any new 7-series section) reviewer-fixed and verified.
+
+**APQ-3 (launch-driver hook) is next**; APQ-4's single cloud run stays
+owner-gated behind the APQ-1..3 review chain.
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7az):** APQ-2 independently **accepted**;

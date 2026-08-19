@@ -194,6 +194,15 @@ no statistic.
 
 ### APQ-5 — One analyser pass, then stop
 
+**`mean_turnover` semantics (APQ2-001, counter-review note 2026-08-19):**
+the descriptive `mean_turnover` averages AVAILABLE months only (pandas
+skipna); declared-unavailable months are charged 1.0 in the NET blocks
+but excluded from this mean, so it understates costed activity whenever
+the empty-field path fired. Read it beside
+`unavailable_turnover_periods`, never alone. Substituting the charged
+series' mean is a schema change for a later, separately reviewed
+version — not a post-hoc edit.
+
 1. `python -m scripts.analyse_qc_allocation_policy` once, full identity.
 2. Append **A-nnn** (or a named allocation observation). Upgrade that
    run UNANALYSED → VALID in the **same** commit.

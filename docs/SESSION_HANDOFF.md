@@ -1933,12 +1933,32 @@ live (SHW-4): this round's review, the owner's freeze of the
 defensive-carry [TO FREEZE] gates, registration binding the frozen
 document, and the scheduler installation deferred to SHW-4.
 
+## 7aq. Independent review of SHW-3 (2026-08-19)
+
+Cursor Grok 4.6 reviewed `553da76..a384be7` at exact head
+`a384be7b3c332dc40f9996fd2706ab4c01fd0d3d`
+(`origin/user/claude/shw3-sufficiency-20260819`). Report:
+`docs/Review/REVIEW_2026-08-19_SHW3_SUFFICIENCY.md`. Written from an
+isolated worktree so the shared checkout could stay on Claude's
+gate-freeze branch.
+
+**Accepted.** Both commits dispositioned. Focused tests 38 passed. Two
+reverse mutations red then restored (`>=` to `>` at the MET boundary;
+requirement read from live config). No operator DB. No product
+correction.
+
+Two P3s, no P0–P2: SHW3-001 (closed epoch cannot run sufficiency);
+SHW3-002 (example `24` is not an owner freeze of the draft prereg).
+
+SHW-4 remains blocked on the owner's `[TO FREEZE]` freeze, then
+registration + scheduler. Keep `paper-epoch-005` on `752d3b7`.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7ao):** SHW-2 P2s verified closed. SHW-3
-may be scheduled; do not start it automatically. APQ-1 is not scheduled.
-`paper-epoch-005` stays on `752d3b7`. Do not open the operator DB from
-a post-`f40c2c1` tree.
+**Current (2026-08-19, section 7aq):** SHW-3 independently accepted
+with two P3s. SHW-4 waits on the defensive-carry gate freeze. APQ-1 is
+not scheduled. `paper-epoch-005` stays on `752d3b7`. Do not open the
+operator DB from a post-`f40c2c1` tree.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

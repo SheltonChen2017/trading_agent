@@ -59,8 +59,15 @@ FAMILIES = {
     # scripts/analyse_qc_alpha_stage1.py, never here.
     "stage1": ("STAGE1_REPLICATIONS", LEAN / "alpha_stage1_replications.py"),
     "stage1-benchmark": ("STAGE1_BENCHMARK", LEAN / "alpha_stage1_benchmark.py"),
+    # APQ-3 (owner-scheduled allocation-policy family): fixed instruments,
+    # no universe screen, and deliberately NO ACTIVE_UNIVERSE constant —
+    # the retargeter must never run on this file; its bytes upload
+    # unchanged (still hashed, still require_clean).
+    "allocation": ("ALLOCATION_POLICY", LEAN / "allocation_policy.py"),
 }
 UNIVERSES = ("A_large", "B_core", "C_broad")
+#: Families whose source has no ACTIVE_UNIVERSE and takes no --universe.
+UNIVERSE_FREE_FAMILIES = frozenset({"allocation"})
 
 
 def _utc_now() -> str:
@@ -94,15 +101,36 @@ def _retarget_universe(source: str, universe: str) -> str:
     return rewritten
 
 
-def _project_name(number: int, family_label: str, universe: str, date: str) -> str:
-    """docs/process/QC_RUN_CONVENTIONS.md section 1."""
+def _resolve_universe(family: str, universe: str | None) -> str | None:
+    """APQ-3: a universe-free family takes no --universe and is never
+    retargeted; every other family requires exactly one universe. Both
+    mismatches refuse — a silently ignored flag would misdescribe the run.
+    """
+    if family in UNIVERSE_FREE_FAMILIES:
+        if universe is not None:
+            raise SystemExit(
+                f"family {family!r} is universe-free; --universe must not "
+                "be given"
+            )
+        return None
+    if universe is None:
+        raise SystemExit(f"family {family!r} requires --universe")
+    return universe
+
+
+def _project_name(
+    number: int, family_label: str, universe: str | None, date: str
+) -> str:
+    """docs/process/QC_RUN_CONVENTIONS.md section 1; universe-free
+    families (APQ-3) carry no universe segment."""
     if number < 1:
         raise SystemExit("project number must be a positive integer")
     try:
         _dt.datetime.strptime(date, "%Y%m%d")
     except (TypeError, ValueError):
         raise SystemExit("project date must use YYYYMMDD")
-    return f"{number}. {family_label}_{universe.upper()} - {date}"
+    segment = f"_{universe.upper()}" if universe else ""
+    return f"{number}. {family_label}{segment} - {date}"
 
 
 def _new_evidence_path(raw_path: str) -> Path:
@@ -153,13 +181,24 @@ def _wait_for_compile(client: QuantConnectClient, project_id: int,
 def launch(args: argparse.Namespace) -> int:
     out = _new_evidence_path(args.evidence)
     family_label, source_path = FAMILIES[args.family]
+    universe = _resolve_universe(args.family, args.universe)
     commit = _git_commit_of(source_path)
-    source = _retarget_universe(
-        source_path.read_text(encoding="utf-8"), args.universe
-    )
+    raw_source = source_path.read_text(encoding="utf-8")
+    if universe is None:
+        # APQ-3: upload the reviewed bytes unchanged. Refuse if the file
+        # unexpectedly declares a universe screen — that would mean the
+        # family is misclassified, not that retargeting should happen.
+        if re.search(r"^ACTIVE_UNIVERSE\b", raw_source, flags=re.M):
+            raise SystemExit(
+                f"{source_path.name} declares ACTIVE_UNIVERSE but family "
+                f"{args.family!r} is universe-free; refusing"
+            )
+        source = raw_source
+    else:
+        source = _retarget_universe(raw_source, universe)
     source_sha = hashlib.sha256(source.encode("utf-8")).hexdigest()
     date = args.date or _dt.date.today().strftime("%Y%m%d")
-    name = _project_name(args.number, family_label, args.universe, date)
+    name = _project_name(args.number, family_label, universe, date)
 
     client = QuantConnectClient()
     print(f"authenticating for {name!r}...", flush=True)
@@ -199,7 +238,7 @@ def launch(args: argparse.Namespace) -> int:
         "number": args.number,
         "family": args.family,
         "family_label": family_label,
-        "universe": args.universe,
+        "universe": universe,
         "requested_project_name": name,
         "project_name": str(project["name"]),
         "project_id": project_id,
@@ -358,7 +397,11 @@ def main(argv: list[str] | None = None) -> int:
 
     launch_parser = sub.add_parser("launch", help="create+upload+compile+start one run")
     launch_parser.add_argument("--family", choices=sorted(FAMILIES), required=True)
-    launch_parser.add_argument("--universe", choices=UNIVERSES, required=True)
+    launch_parser.add_argument(
+        "--universe", choices=UNIVERSES, default=None,
+        help="required for universe-screened families; forbidden for "
+             "universe-free families (e.g. allocation)",
+    )
     launch_parser.add_argument("--number", type=int, required=True,
                                help="sequential project number for the naming rule")
     launch_parser.add_argument("--date", default=None, help="YYYYMMDD; default today")

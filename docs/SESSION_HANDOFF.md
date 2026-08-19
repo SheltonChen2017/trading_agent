@@ -2319,13 +2319,69 @@ commit as any new 7-series section) reviewer-fixed and verified.
 **APQ-3 (launch-driver hook) is next**; APQ-4's single cloud run stays
 owner-gated behind the APQ-1..3 review chain.
 
+## 7ba. APQ-3 implemented: the launch-driver allocation hook (2026-08-19)
+
+Owner merged the APQ-2 review (PR #272) and said "proceed to APQ3".
+Branch `user/claude/apq3-driver-hook-20260819` off `95a7210`. No QC.
+
+Changes to `scripts/run_qc_stage0.py` per the plan's APQ-3 section:
+
+- `FAMILIES["allocation"] = ("ALLOCATION_POLICY", LEAN /
+  "allocation_policy.py")` and `UNIVERSE_FREE_FAMILIES =
+  frozenset({"allocation"})`.
+- New `_resolve_universe(family, universe)`: a universe-free family
+  REFUSES a supplied `--universe` (a silently ignored flag would
+  misdescribe the run); every other family refuses a missing one.
+  `--universe` is now optional at argparse level; enforcement moved to
+  this validator.
+- `launch()` uploads a universe-free family's reviewed bytes UNCHANGED
+  (still sha256-hashed, still `require_clean=True`), guarded by an
+  anchored `^ACTIVE_UNIVERSE\b` refusal in case the file is ever
+  misclassified; screened families retarget exactly as before.
+- `_project_name` drops the universe segment when universe is None:
+  `{n}. ALLOCATION_POLICY - {YYYYMMDD}`.
+
+Tests (`tests/test_qc_stage0_runner.py`, 18 passed): the
+every-family retarget test now skips `UNIVERSE_FREE_FAMILIES`; new
+tests pin the allocation mapping + no-ACTIVE_UNIVERSE-declaration (the
+frozen file's docstring MENTIONS the constant, so the pin uses the same
+anchored regex as the launch guard, not a substring), retargeter
+refusal on the real file, both `_resolve_universe` refusal directions,
+and the universe-free project name. Both plan-required reverse
+mutations run separately, red, restored green: (A) removing
+`allocation` from `UNIVERSE_FREE_FAMILIES` → 3 failures including the
+launch-precondition retarget test; (B) dropping `require_clean=True` →
+the QCS0CR-002 pin fails.
+
+APQ-3 does NOT authorize a run: APQ-4's single cloud launch remains
+owner-gated behind independent review of APQ-1..3.
+
+## 7bb. Overlay tasks never fired: S4U logon dead on the host (2026-08-19)
+
+Same-day check of the overlay tasks' first scheduled firing found the
+14:45/14:55 occurrences silently skipped (no run attempt, no error,
+NextRun rolled to tomorrow). Root cause: the overlay installer
+registered with **LogonType=S4U**, which Credential Guard blocks on
+this domain-joined host — the exact known failure mode in
+`tests/test_setup_operational_host.py` that already forced every
+working paper task to Interactive. Installer default fixed to
+Interactive this round; the live repair needs ONE elevated owner
+command (recorded in `docs/operations/OPERATIONAL_FACTS.md`). Science
+impact none: the runner is idempotent and monthly-cadence, and today's
+firings would have been `up to date` no-ops.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7az):** APQ-2 independently **accepted**;
-the excess-mean reporting decision is frozen in the schema. **Next
-milestone is APQ-3** (launch-driver hook + tests, still no QC). Do not
-launch QuantConnect. SHW-4 is complete (section 7av); paper-epoch-006
-is the live paper epoch.
+**Current (2026-08-19, section 7ba):** APQ-3 (launch-driver allocation
+hook) IMPLEMENTED on `user/claude/apq3-driver-hook-20260819`, pending
+independent review. **Next: the owner runs the APQ-3 review; after the
+APQ-1..3 chain is accepted, APQ-4 is the owner-executed single cloud
+run, then APQ-5's one analyser pass.** Do not launch QuantConnect
+before that owner GO. SHW-4 is complete (section 7av); paper-epoch-006
+is the live paper epoch. Same-day operational checks: the overlay
+tasks' first firing was SKIPPED (S4U dead on this host — section 7bb;
+one elevated owner command repairs it); the first epoch-006 paper
+observation binding `c9d0740` lineage is still due at 16:30 local.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

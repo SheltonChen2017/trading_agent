@@ -2249,6 +2249,31 @@ class AssistantStore:
     # ------------------------------------------------------------------
 
     @staticmethod
+    def _overlay_contract(contract_type, payload: dict[str, Any], name: str):
+        """Re-validate a caller payload through the frozen contract (POST-001).
+
+        Storage previously persisted raw dicts, so a runner could write an
+        available=True observation the dataclass would refuse (partial
+        imputation) or a registration missing its lineage fields. Every
+        write now round-trips the contract, and unknown or action-shaped
+        extra fields are refused rather than silently stored.
+        """
+        from assistant.overlay_shadow import OverlayContractError
+
+        if not isinstance(payload, dict) or not payload:
+            raise ValueError(f"{name} must be a non-empty dictionary")
+        import dataclasses as _dataclasses
+
+        allowed = {item.name for item in _dataclasses.fields(contract_type)}
+        unknown = sorted(set(payload) - allowed)
+        if unknown:
+            raise ValueError(f"{name} contains unsupported fields: {unknown}")
+        try:
+            return contract_type(**payload)
+        except (OverlayContractError, TypeError) as exc:
+            raise ValueError(f"{name} refused: {exc}") from exc
+
+    @staticmethod
     def _overlay_identity(payload: dict[str, Any], keys: tuple[str, ...],
                           name: str) -> tuple[str, ...]:
         values = []
@@ -2303,13 +2328,12 @@ class AssistantStore:
         express authority; promotion is a separate owner decision that no
         method here can grant.
         """
-        if not isinstance(registration, dict) or not registration:
-            raise ValueError("registration must be a non-empty dictionary")
-        if registration.get("status") not in ("shadow", "closed"):
-            raise ValueError(
-                "overlay stream status must be 'shadow' or 'closed'; "
-                "authority cannot be expressed by this table"
-            )
+        from assistant.overlay_shadow import OverlayStreamRegistration
+
+        contract = self._overlay_contract(
+            OverlayStreamRegistration, registration, "registration"
+        )
+        registration = contract.to_payload()
         identity = self._overlay_identity(
             registration, ("stream_name", "evidence_epoch"), "registration"
         )
@@ -2333,17 +2357,18 @@ class AssistantStore:
 
     def record_overlay_observation(self, observation: dict[str, Any]) -> dict[str, Any]:
         """Append one cycle observation (or its refusal row), idempotently."""
-        if not isinstance(observation, dict) or not observation:
-            raise ValueError("observation must be a non-empty dictionary")
+        from assistant.overlay_shadow import OverlayObservation
+
+        contract = self._overlay_contract(
+            OverlayObservation, observation, "observation"
+        )
+        observation = contract.to_payload()
         identity = self._overlay_identity(
             observation, ("stream_name", "evidence_epoch", "cycle_session"),
             "observation",
         )
-        generated_at = observation.get("generated_at")
-        _parse_aware_timestamp(generated_at, "generated_at")
-        available = observation.get("available")
-        if not isinstance(available, bool):
-            raise ValueError("observation requires a boolean 'available'")
+        generated_at = observation["generated_at"]
+        available = observation["available"]
         payload_json = _canonical_ml_json(observation, "observation")
         payload_hash = _hash_payload(payload_json)
         try:
@@ -2369,17 +2394,16 @@ class AssistantStore:
 
     def record_overlay_outcome(self, outcome: dict[str, Any]) -> dict[str, Any]:
         """Attach one matured outcome to an AVAILABLE observation."""
-        if not isinstance(outcome, dict) or not outcome:
-            raise ValueError("outcome must be a non-empty dictionary")
+        from assistant.overlay_shadow import OverlayOutcome
+
+        contract = self._overlay_contract(OverlayOutcome, outcome, "outcome")
+        outcome = contract.to_payload()
         identity = self._overlay_identity(
             outcome, ("stream_name", "evidence_epoch", "cycle_session"),
             "outcome",
         )
-        matured_at = outcome.get("matured_at")
-        _parse_aware_timestamp(matured_at, "matured_at")
-        available = outcome.get("available")
-        if not isinstance(available, bool):
-            raise ValueError("outcome requires a boolean 'available'")
+        matured_at = outcome["matured_at"]
+        available = outcome["available"]
         with self._connect() as connection:
             observation = connection.execute(
                 """

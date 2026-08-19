@@ -5,7 +5,10 @@ Status: **Frozen in this commit, before any allocation-policy algorithm,
 cloud run, or statistic.** Not an alpha family. Does not reopen the
 closed cross-sectional program (A-002).
 
-Governing plan: `docs/ALLOCATION_POLICY_QC_PLAN.md`
+Governing plan: `docs/reference/ALLOCATION_POLICY_QC_PLAN.md`
+(moved from the docs root 2026-08-18 by the counter-review to satisfy
+the canonical docs-root test; a path pointer only — no frozen weight,
+window, or gate was touched)
 
 This file is the specification. If implementation drifts, the run is
 invalid until the spec is followed or a **new** named preregistration

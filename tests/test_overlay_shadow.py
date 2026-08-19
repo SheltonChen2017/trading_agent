@@ -271,3 +271,28 @@ def test_overlay_writes_touch_no_execution_or_registry_tables(store: AssistantSt
     store.record_overlay_observation(_observation().to_payload())
     store.record_overlay_outcome(_outcome().to_payload())
     assert snapshot() == before
+
+
+def test_storage_revalidates_contracts_and_refuses_raw_bypass(store: AssistantStore):
+    """POST-001: storage must re-apply the frozen contract invariants.
+
+    Before the fix, a raw dict with incomplete index levels persisted as
+    available=1 — the partial imputation the dataclass exists to make
+    unrepresentable — and a registration missing its lineage fields was
+    accepted."""
+    with pytest.raises(ValueError, match="refused"):
+        store.register_overlay_stream({
+            "stream_name": "s", "evidence_epoch": "e1", "status": "shadow",
+            "preregistration_sha256": SHA,
+        })
+    store.register_overlay_stream(_registration().to_payload())
+    bad = _observation().to_payload()
+    bad["index_levels"] = {"universe": 100.0}
+    with pytest.raises(ValueError, match="refused"):
+        store.record_overlay_observation(bad)
+    with pytest.raises(ValueError, match="unsupported fields"):
+        store.record_overlay_observation(
+            {**_observation().to_payload(), "submit_order": True}
+        )
+    rows = store.get_overlay_observations("defensive-carry", "overlay-epoch-001")
+    assert rows == []

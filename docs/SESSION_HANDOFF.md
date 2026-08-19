@@ -2100,16 +2100,46 @@ Epoch-005 cost note for the record: closing it discards its accrued
 paper evidence (epoch started 2026-08-13; the roll plan's rule — the
 cost only grows — argues for executing promptly after review).
 
+## 7au. Independent review of SHW-4 stream start: ACCEPTED AFTER CORRECTION (2026-08-19)
+
+Cursor Grok 4.6 reviewed `a384be7..a6a690c` (12 commits; the request
+said 11) at exact head `a6a690c29b5eefef7d227d8fde5b4990cad6da19` from
+isolated worktree `trading_agent-review-shw4`. Report:
+`docs/Review/REVIEW_2026-08-19_SHW4_STREAM_START.md`.
+
+**Accepted after correction.** SHW3-001 independently mutation-verified
+(strict gate restored in `command_sufficiency` → closed-epoch
+sufficiency test red; restored green). Stream config matches
+`sorted(config.UNIVERSE)` (104) + sorted carry basket, no overlap,
+0.20/0.25/24. Freeze has zero `[TO FREEZE]` and precedes registration.
+Shadow DB read-only: registration hash `39fca6264e29…`, prereg
+working-tree SHA `5479d6b6459a…`, baseline `2026-07-31` available,
+observation hash `56bfcd3cf351b02d…`. Installer `-WhatIf` only; Store
+alias rejected; no Overlay-Shadow task created. Paper installer
+WorkingDirectory pinning claim confirmed.
+
+**P2 SHW4-001 closed here:** merge `039e5cf` dropped action-plan row
+`STAGE2-PEAD-CLOSED-20260819`; restored. **P3 SHW4-002 closed here:**
+ALLOCATION-POLICY row still said UNSCHEDULED; aligned with APQ-1
+SCHEDULED. Open P3: SHW4-003 (prereg SHA is CRLF checkout bytes, not
+the git blob) and SHW4-004 (`-TaskPrefix` unconstrained).
+
+`origin/main` already contains PR #267 at `f63ba89` (tree identical to
+`a6a690c`). This review is the independent disposition of that tree. It
+does **not** run the epoch roll or install the overlay tasks.
+
 ## 8. What is next
 
-**Current (2026-08-19, sections 7ar/7as):** SHW-1..3 implemented and
-reviewed (SHW3-001 fixed; SHW3-002 discharged by the freeze). The
-defensive-carry preregistration is FROZEN; APQ-1 is SCHEDULED; Stage 2
-PEAD is CLOSED; the SHW-4 host is decided (dedicated
-`data/shadow_overlay.db`, operational clone after an owner-approved
-release advance). **SHW-4 is the next milestone**, then APQ-1.
-`paper-epoch-005` stays on `752d3b7`; do not open the operator DB from
-a newer tree.
+**Current (2026-08-19, section 7au):** SHW-4 range `a384be7..a6a690c`
+independently **accepted after correction**. The defensive-carry stream
+is live in `shadow_overlay.db`. `origin/main` is `f63ba89` (PR #267,
+tree == `a6a690c`). **Next owner-present operations (not started by
+this review):** epoch roll per `docs/EPOCH_005_ROLL_PLAN.md` (close
+paper-epoch-005 → deploy reviewed main → start paper-epoch-006 →
+drills), then elevated overlay-scheduler install (`-WhatIf` first).
+Keep `paper-epoch-005` on `752d3b7` until that roll. Do not open the
+operator DB from a newer tree until the roll's close step. APQ-1
+remains scheduled after SHW-4 automation.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

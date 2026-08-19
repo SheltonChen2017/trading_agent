@@ -102,6 +102,12 @@ def _registration_contract(config: dict) -> OverlayStreamRegistration:
         raise OverlayRunnerError(
             f"preregistration document not found: {config['preregistration_path']}"
         )
+    # SHW4-003: this hashes the CHECKOUT bytes (CRLF on this Windows
+    # host), not the git blob (LF). The live overlay-epoch-001 binding is
+    # internally consistent here, but a cross-platform verifier using
+    # `git show | sha256sum` will not match; any verification must hash
+    # the same on-disk bytes. Normalizing to LF is only permitted in a
+    # NEW named preregistration/epoch — never by re-registering a live one.
     prereg_sha = hashlib.sha256(prereg.read_bytes()).hexdigest()
     try:
         commit = current_commit(require_clean=True, repository=ROOT)

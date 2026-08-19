@@ -98,6 +98,20 @@ function Convert-EasternClockToLocal {
     return [TimeZoneInfo]::ConvertTimeToUtc($easternClock, $eastern).ToLocalTime()
 }
 
+# SHW4-004: -TaskPrefix with -Force could otherwise replace the paper or
+# ML shadow cadence tasks. The "never touches them" guarantee is enforced
+# here, not left as convention.
+$forbiddenPrefixes = @("TradingAgent-Paper", "TradingAgent-ML-Shadow")
+foreach ($forbidden in $forbiddenPrefixes) {
+    if ($TaskPrefix -like "$forbidden*") {
+        throw (
+            "TaskPrefix '$TaskPrefix' collides with the protected " +
+            "'$forbidden*' task family. This installer refuses to build " +
+            "names that could replace the paper or ML shadow cadences."
+    )
+    }
+}
+
 if (-not $RepositoryPath) {
     $RepositoryPath = Split-Path -Parent $PSScriptRoot
 }

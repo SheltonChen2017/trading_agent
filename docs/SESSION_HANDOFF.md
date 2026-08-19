@@ -2128,6 +2128,28 @@ the git blob) and SHW4-004 (`-TaskPrefix` unconstrained).
 `a6a690c`). This review is the independent disposition of that tree. It
 does **not** run the epoch roll or install the overlay tasks.
 
+## 7au. SHW-4 review counter-reviewed; all findings closed (2026-08-19)
+
+Cursor/Grok reviewed `a384be7..a6a690c` (12 commits — correcting my
+11-count) and accepted after correction
+(`docs/Review/REVIEW_2026-08-19_SHW4_STREAM_START.md`): its P2 was a
+real defect in MY conflict resolution — merge `039e5cf` silently
+dropped the owner's STAGE2-PEAD-CLOSED action-plan row while the
+handoff narrative kept it; the reviewer restored it (SHW4-001) and
+aligned the contradictory ALLOCATION-POLICY row (SHW4-002). The
+counter-review (`…_SHW4_COUNTERREVIEW.md`) verified both fixes,
+reproduced the SHW4-003 hash split by independent recomputation
+(checkout CRLF `5479d6…` = the live binding vs git blob LF `96fc51…`)
+and closed it as documented at the hash site, and closed SHW4-004 with
+ENFORCEMENT: the installer now refuses any TaskPrefix colliding with
+`TradingAgent-Paper*` / `TradingAgent-ML-Shadow*` (throw verified by
+execution; default preview unaffected). Lesson recorded: verifying a
+conflict resolution means grepping for every row of BOTH parents.
+
+**The roll plan's reviewed-mainline precondition is met.** Remaining:
+the owner-present epoch roll (close 005 → deploy → start 006 → drills)
+and the elevated overlay task install, then this round closes.
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7au):** SHW-4 range `a384be7..a6a690c`

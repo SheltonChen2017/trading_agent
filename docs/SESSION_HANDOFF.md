@@ -2254,6 +2254,37 @@ later — finiteness guards belong at every boundary, both directions.
 **APQ-2 is unblocked** (analyser + tests, no QC; the excess-mean
 reporting decision is fixed at its review).
 
+## 7ay. APQ-2 implemented: the allocation-policy analyser (2026-08-19)
+
+Owner go ("start APQ-2"). Branch `user/claude/apq2-analyser-20260819`:
+`scripts/analyse_qc_allocation_policy.py` — a strict PROW parser that
+refuses, typed: unknown policies, duplicate (date, policy) rows,
+non-finite returns, PRESENT non-finite turnover tokens (empty stays the
+declared-unavailability channel, charged fillna(1.0)),
+`priced != targeted` as corruption (the APQ1-003 semantics), truncated
+DATES, policy date sets differing from P0's, and anything under the
+frozen 24-month floor. Reports per-policy gross/net at 0/5/10/25 bps
+(reviewed `performance()` + `time_under_water`), mean/unavailable
+turnover, and the descriptive `versus_p0` block.
+
+**Reporting decision, proposed for ratification at this round's
+review (the pre-run deadline the plan set):** the optional excess-mean
+test family IS reported — three cells, two-sided stationary bootstrap
+20,000 draws, its own frozen 0.05/3 gate, carrying BOTH required
+labels (family identity; explicit this-family-only scope, NOT added to
+the closed alpha program's floor). Rationale: a descriptive table
+alone invites eyeballing differences with no calibration; the test is
+the guard against over-reading it, and a fail is the expected outcome
+that ends the family either way. The reviewer may strike the test
+from the schema; that is exactly the decision this review fixes.
+
+Gate reachability guarded (draws must resolve 0.05/3 — the ABR-001
+class); script-mode bootstrap included (S1R-001); the alpha battery's
+`analyse()` is not called (AST-pinned). Nine tests; THREE reverse
+mutations red then restored (fillna unpinned, nan-turnover guard
+dropped, alignment check dropped). Next: this round's review fixes the
+reporting decision, then APQ-3 (the launch-driver hook).
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7ax):** APQ-1 independently **accepted

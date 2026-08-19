@@ -2432,19 +2432,38 @@ profits", "hedging") — they will need frozen preregistrations and
 family scoping at counter-review; the A-002 closure is not reopenable
 through them.
 
+## 7bf. APQ-5 OBSERVED: NULL on the gate; the family is CLOSED (2026-08-19)
+
+Owner merged APQ-4 (PR #274, main `c4fd16d`) and gave the GO ("go APQ5
+now"). Branch `user/claude/apq5-analyser-pass-20260819`. The log hash
+was re-verified against the ledger, then the frozen analyser ran ONCE
+with full run identity — the family's only statistic observation.
+
+**Result: 0 of 3 cells pass the 0.05/3 gate** (P1 p=0.080, P2 p=0.121,
+P3 p=0.214); every candidate's monthly excess vs P0 is NEGATIVE.
+Descriptively P1/P3 bought much smaller drawdowns (−7% to −8% vs P0's
+−20%) at ~40% of the return — a risk-preference trade, not an edge;
+Sharpe/drawdown differences are descriptive fields with no frozen
+test, and none is claimed. Ledgered as **A-003**; **R-029 upgraded
+UNANALYSED → VALID in the same commit** per the plan's rung. The
+allocation-policy QC family is **CLOSED**: one cloud run and one
+analyser pass, both spent; no reruns or tweaks. Paper/live use of any
+weights is a separate owner decision on the Alpaca/REBAL stack.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7be):** APQ-4 complete; R-029 is
-UNANALYSED in the ledger. **APQ-5 is the final step of the family and
-needs its own owner GO: run
-`python -m scripts.analyse_qc_allocation_policy` ONCE with full run
-identity, append the A-observation, and upgrade R-029 → VALID in the
-same commit — the only moment any allocation-policy statistic is
-observed. Then the family closes.** Paper/live use of any policy
-weights would be a separate owner decision on the Alpaca/REBAL stack,
-not a QC follow-up. Outstanding operational verifications: the overlay
-tasks' first automatic firing (2026-08-20 14:45 local) and the first
-epoch-006 paper-observation lineage check. SHW-4 complete;
+**Current (2026-08-19, section 7bf):** the allocation-policy family is
+COMPLETE AND CLOSED (A-003, NULL on the gate). No QC access remains
+authorized anywhere. Next tracks, all owner-gated: (1) Codex's
+thorough two-day audit tonight (suggested range now spans through the
+APQ-5 merge; the epoch-006 `policy_fingerprint` change remains flagged
+for it); (2) counter-review of Cursor's two incoming plan proposals
+("max profits", "hedging") — each needs a frozen preregistration and
+family scoping; the A-002 closure is not reopenable through them;
+(3) optional separate owner decision on using P1/P3-style weights on
+the Alpaca/REBAL stack. Outstanding operational verifications: the
+overlay tasks' first automatic firing (2026-08-20 14:45 local) and the
+first epoch-006 paper-observation lineage check. SHW-4 complete;
 paper-epoch-006 is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

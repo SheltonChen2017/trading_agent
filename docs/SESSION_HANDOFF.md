@@ -1777,6 +1777,45 @@ was counter-reviewed on
 review. The operational host stays on its pinned release commit (the
 overlay-table CREATE caution).
 
+## 7am. SHW-2 implemented: the overlay shadow runner (2026-08-18)
+
+Owner directed SHW-2 to proceed. (Process note, recorded honestly: the
+owner had announced a further Cursor review of the counter-review round,
+but no artifact ever appeared — no branch, no document, no worktree; if
+it lands later it gets counter-reviewed then. The prior gate, POST-001's
+fix, was merged in PR #263.)
+
+Branch `user/claude/shw2-overlay-runner-20260818`:
+`scripts/run_overlay_shadow.py` — register / observe / mature / status,
+mirroring the ML shadow adapter split (pure cycle math in
+`assistant/overlay_shadow.py`: completed month-end derivation,
+whole-sleeve returns that refuse on ANY bad member, wide-band
+`advance_overlay`). Task semantics implemented exactly as designed:
+PROSPECTIVE baseline at the latest completed month-end (history never
+backfilled), gap month-ends occupy their cycle slots as refusal rows,
+each advance uses ONE fetch for boundary consistency (adjusted-close
+revision safety), the band state persists via the new
+`combined_carry_weight` contract field (restart-safe, auditable;
+required when available, forbidden on refusals), idempotent reruns,
+closed epochs refuse observations, registration binds the
+preregistration document's sha256 plus a clean commit, and every
+command failure records a durable `shadow_overlay` operational alert.
+`status` prints counts only — sufficiency is SHW-3.
+
+Tests: 12 new runner tests (hand-computed band math both sides of the
+band, gap spanning, refusal naming, alert-on-failure, idempotency) plus
+a contract test for the weight invariants; SHW-1's helpers updated for
+the new field. FIVE reverse mutations red then restored: band gate
+removed, baseline backfilled, gap rows skipped, partial imputation,
+alert dropped. Example config at
+`docs/reference/overlay_shadow_config.example.json`.
+
+Deliberately NOT included: Windows scheduler installation (deferred to
+SHW-4 stream start — there is no stream to schedule yet) and any
+performance/sufficiency output (SHW-3). SHW-4 registration still
+requires the owner to freeze the defensive-carry preregistration's
+[TO FREEZE] gates first.
+
 ## 8. What is next
 
 **Current (2026-08-18, section 7al):** SHW-2 is blocked on POST-001.

@@ -2216,18 +2216,32 @@ review — the reporting decision (optional excess-mean test family in or
 out of the JSON schema) is fixed at that review per the plan's
 counter-review note.
 
+## 7ax. Independent review of APQ-1: ACCEPTED AFTER CORRECTION (2026-08-19)
+
+Cursor Grok 4.6 reviewed `01508b1..e2c4a2b` (both commits on
+`origin/user/claude/apq1-allocation-policy-20260819`) from isolated
+worktree `trading_agent-review-apq1`. Report:
+`docs/Review/REVIEW_2026-08-19_APQ1_ALLOCATION_POLICY.md`. No QC.
+
+**Accepted after APQ1-001.** Weights, window, union refusal, bind-time
+turnover, 24-month floor, and no `ACTIVE_UNIVERSE` match the frozen
+preregistration. `FAMILIES` was not extended (APQ-3). Submitted tree:
+6 tests passed. Inf closes emitted `PROW` `inf` rows; NaN TypeError'd —
+prereg §3 requires non-finite refusal. Fix: `_usable_close` uses
+`math.isfinite`; new test red without the guard, green with it (7
+passed). Open P3: stale §8 at `e2c4a2b` (this section replaces it);
+`priced`/`targeted` log the policy size, not the five-name union.
+
+`origin/main` already contains PR #270 at `46feb1e`. This review does
+not start APQ-2.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7au):** SHW-4 range `a384be7..a6a690c`
-independently **accepted after correction**. The defensive-carry stream
-is live in `shadow_overlay.db`. `origin/main` is `f63ba89` (PR #267,
-tree == `a6a690c`). **Next owner-present operations (not started by
-this review):** epoch roll per `docs/EPOCH_005_ROLL_PLAN.md` (close
-paper-epoch-005 → deploy reviewed main → start paper-epoch-006 →
-drills), then elevated overlay-scheduler install (`-WhatIf` first).
-Keep `paper-epoch-005` on `752d3b7` until that roll. Do not open the
-operator DB from a newer tree until the roll's close step. APQ-1
-remains scheduled after SHW-4 automation.
+**Current (2026-08-19, section 7ax):** APQ-1 independently **accepted
+after correction**. **Next milestone is APQ-2** (analyser + tests, still
+no QC). The optional excess-mean test family is decided at that review
+by the JSON schema, before any run. Do not launch QuantConnect. SHW-4
+is complete (section 7av); paper-epoch-006 is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

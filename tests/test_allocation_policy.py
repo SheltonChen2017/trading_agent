@@ -215,6 +215,23 @@ def test_month_after_a_gap_declares_turnover_unavailable(namespace):
         assert row[3] == ""          # declared unavailability, all four
 
 
+def test_nonfinite_close_refuses_the_boundary_for_all_four_policies(namespace):
+    """Preregistration section 3: a non-finite close is unpriceable.
+    Positivity alone is not enough — NaN <= 0 is False."""
+    namespace["MIN_MONTHS"] = 1
+    for poison in (float("nan"), float("inf"), float("-inf")):
+        algorithm = namespace["AllocationPolicy"]()
+        algorithm.initialize()
+        flat = {t: 100.0 for t in namespace["TICKERS"]}
+        _drive(algorithm, JAN31, flat)
+        _drive(algorithm, FEB01, flat)
+        _drive(algorithm, FEB28, dict(flat, SPY=poison))
+        _drive(algorithm, MAR01, flat)
+        algorithm.on_end_of_algorithm()
+        assert _prows(algorithm) == [], poison
+        assert not any("PROW|" in line for line in algorithm.log_lines)
+
+
 def test_incomplete_run_emits_no_rows_at_the_frozen_floor(namespace):
     """Fail-closed: two measured months < MIN_MONTHS=24 refuses the whole
     run — INCOMPLETE and not a single PROW."""

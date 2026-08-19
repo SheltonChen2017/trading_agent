@@ -2254,13 +2254,78 @@ later — finiteness guards belong at every boundary, both directions.
 **APQ-2 is unblocked** (analyser + tests, no QC; the excess-mean
 reporting decision is fixed at its review).
 
+## 7ay. APQ-2 implemented: the allocation-policy analyser (2026-08-19)
+
+Owner go ("start APQ-2"). Branch `user/claude/apq2-analyser-20260819`:
+`scripts/analyse_qc_allocation_policy.py` — a strict PROW parser that
+refuses, typed: unknown policies, duplicate (date, policy) rows,
+non-finite returns, PRESENT non-finite turnover tokens (empty stays the
+declared-unavailability channel, charged fillna(1.0)),
+`priced != targeted` as corruption (the APQ1-003 semantics), truncated
+DATES, policy date sets differing from P0's, and anything under the
+frozen 24-month floor. Reports per-policy gross/net at 0/5/10/25 bps
+(reviewed `performance()` + `time_under_water`), mean/unavailable
+turnover, and the descriptive `versus_p0` block.
+
+**Reporting decision, proposed for ratification at this round's
+review (the pre-run deadline the plan set):** the optional excess-mean
+test family IS reported — three cells, two-sided stationary bootstrap
+20,000 draws, its own frozen 0.05/3 gate, carrying BOTH required
+labels (family identity; explicit this-family-only scope, NOT added to
+the closed alpha program's floor). Rationale: a descriptive table
+alone invites eyeballing differences with no calibration; the test is
+the guard against over-reading it, and a fail is the expected outcome
+that ends the family either way. The reviewer may strike the test
+from the schema; that is exactly the decision this review fixes.
+
+Gate reachability guarded (draws must resolve 0.05/3 — the ABR-001
+class); script-mode bootstrap included (S1R-001); the alpha battery's
+`analyse()` is not called (AST-pinned). Nine tests; THREE reverse
+mutations red then restored (fillna unpinned, nan-turnover guard
+dropped, alignment check dropped). Next: this round's review fixes the
+reporting decision, then APQ-3 (the launch-driver hook).
+
+## 7az. Independent review of APQ-2: ACCEPTED (2026-08-19)
+
+Cursor Grok 4.6 reviewed `92a0077..5364ae6` (both commits on
+`origin/user/claude/apq2-analyser-20260819`) from isolated worktree
+`trading_agent-review-apq2`. Report:
+`docs/Review/REVIEW_2026-08-19_APQ2_ANALYSER.md`. No QC.
+
+**Accepted.** Nine tests passed. `fillna(1.0)→0.0` mutation red on the
+S0R-008 magnitude pin, restored green. Parser refusals and APQ1-003
+count semantics hold. **Reporting decision RATIFIED:** the optional
+excess-mean family stays in the schema (3 cells, 20,000-draw two-sided
+stationary bootstrap, 0.05/3, both labels). Striking it now would be a
+new schema. Open P3 APQ2-001: `mean_turnover` skipna omits months that
+net returns charge at 1.0.
+
+This review does not start APQ-3 or authorize a cloud run.
+
+## 7az. APQ-2 review counter-reviewed; schema ratified (2026-08-19)
+
+Cursor/Grok accepted APQ-2
+(`docs/Review/REVIEW_2026-08-19_APQ2_ANALYSER.md`) and — the round's
+real event — **ratified the reporting decision before any run exists**:
+the excess-mean family is IN the schema (3 cells, 0.05/3, both labels);
+striking it later would be a new schema, never a post-result choice.
+Counter-review (`…_APQ2_COUNTERREVIEW.md`): the fillna mutation re-run
+red/green; **APQ2-001 reproduced** (skipna `mean_turnover` reports 0.0
+where the net blocks charge a 0.25 mean) and closed as documented at
+the plan's APQ-5 section per the reviewer's guidance; APQ2-002 (stale
+§8, third occurrence — note to self recorded: touch §8 in the same
+commit as any new 7-series section) reviewer-fixed and verified.
+
+**APQ-3 (launch-driver hook) is next**; APQ-4's single cloud run stays
+owner-gated behind the APQ-1..3 review chain.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7ax):** APQ-1 independently **accepted
-after correction**. **Next milestone is APQ-2** (analyser + tests, still
-no QC). The optional excess-mean test family is decided at that review
-by the JSON schema, before any run. Do not launch QuantConnect. SHW-4
-is complete (section 7av); paper-epoch-006 is the live paper epoch.
+**Current (2026-08-19, section 7az):** APQ-2 independently **accepted**;
+the excess-mean reporting decision is frozen in the schema. **Next
+milestone is APQ-3** (launch-driver hook + tests, still no QC). Do not
+launch QuantConnect. SHW-4 is complete (section 7av); paper-epoch-006
+is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

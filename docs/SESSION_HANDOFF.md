@@ -2407,17 +2407,45 @@ mock updated; a mutation-verified scan test
 (`test_every_task_logon_type_default_is_interactive`) keeps the class
 closed. APQ3-003 acknowledged, no split of pushed history.
 
+## 7be. APQ-4 EXECUTED: the single allocation-policy cloud run (2026-08-19)
+
+Owner merged the APQ-3 counter-review (PR #273, main `5694975`) and
+gave the GO ("go APQ-4"). Branch
+`user/claude/apq4-cloud-run-20260819` off that merge. The one
+authorized backtest ran: project `35377356`
+(`25. ALLOCATION_POLICY - 20260819`), compile
+`929dd05d…`, backtest `b9696f67…`, source uploaded UNCHANGED at
+`5694975` (sha `86fb7a3f…`), launched 22:59:13Z, completed 22:59:27Z.
+
+Frozen-parser round-trip: **STRUCTURALLY COMPLETE, first attempt** —
+54 months (202202..202607, the full expected window), all four
+policies on one shared date set, 216 rows, 0 declared-unavailable
+turnovers, 0 refusals; 54 ≥ the 24-month floor. **No statistic
+observed** (`parse_log` only; the algorithm holds no QC positions, so
+QC's runtime stats are untouched-account boilerplate). Ledgered as
+**R-029 UNANALYSED** in `docs/alpha-result.md`; run-level look
+29 → 30. Raw log stays machine-local under `artifacts/` (hash in the
+ledger); QC market data is never committed.
+
+Owner is separately having Cursor draft two new plan proposals ("max
+profits", "hedging") — they will need frozen preregistrations and
+family scoping at counter-review; the A-002 closure is not reopenable
+through them.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7bd):** APQ-1..3 implemented, reviewed,
-and counter-reviewed. **APQ-4 is the next owner-gated step:** one cloud
-backtest via the reviewed driver, then APQ-5's single analyser pass.
-Do not launch QuantConnect without that owner GO. Overlay tasks are
-repaired (Interactive) and proven runnable; their first automatic
-firing (2026-08-20 14:45 local) and the first epoch-006
-paper-observation lineage check are the outstanding operational
-verifications. SHW-4 complete; paper-epoch-006 is the live paper
-epoch.
+**Current (2026-08-19, section 7be):** APQ-4 complete; R-029 is
+UNANALYSED in the ledger. **APQ-5 is the final step of the family and
+needs its own owner GO: run
+`python -m scripts.analyse_qc_allocation_policy` ONCE with full run
+identity, append the A-observation, and upgrade R-029 → VALID in the
+same commit — the only moment any allocation-policy statistic is
+observed. Then the family closes.** Paper/live use of any policy
+weights would be a separate owner decision on the Alpaca/REBAL stack,
+not a QC follow-up. Outstanding operational verifications: the overlay
+tasks' first automatic firing (2026-08-20 14:45 local) and the first
+epoch-006 paper-observation lineage check. SHW-4 complete;
+paper-epoch-006 is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

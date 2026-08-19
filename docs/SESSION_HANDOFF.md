@@ -1840,6 +1840,35 @@ correction in the review.
 Do not start SHW-3 or register a live overlay epoch until SHW2-001 and
 SHW2-002 are fixed. Keep `paper-epoch-005` on `752d3b7`.
 
+## 7an. SHW-2 review counter-reviewed; both P2 blockers fixed (2026-08-19)
+
+Cursor/Grok reviewed SHW-2 (`d4c04c4..354a233`) and accepted the range
+with two P2 blockers and three P3s
+(`docs/Review/REVIEW_2026-08-19_SHW2_OVERLAY_RUNNER.md`, on
+`user/cursor/review-shw2-overlay-runner-20260819`). Claude's
+counter-review (`…_SHW2_COUNTERREVIEW.md`, same branch) reproduced both
+P2 probes exactly and fixed everything fixable:
+
+- **SHW2-001 (P2, fixed):** the prospective baseline now refuses unless
+  every member is priced on the target session — the reviewer caught a
+  t0 partial imputation that would have killed the series permanently
+  (every later boundary unpriceable); the stream heals at the next
+  month-end. Mutation-verified.
+- **SHW2-002 (P2, fixed):** `mature` settles only row-adjacent AND
+  calendar-adjacent available pairs; a multi-month gap span can never
+  persist as `monthly_returns`. Mutation-verified.
+- **SHW2-003/004 (P3, fixed):** closed-epoch gate now tested; scheduler
+  wiring formally moved to SHW-4 in the design.
+- **SHW2-005 (P3, split):** observations now carry a structural
+  `point_in_time_data=false` that no caller can override
+  (mutation-verified); the Decimal-band-math half is DECLINED with
+  recorded rationale (observation analytics on float closes, not an
+  authoritative money path; the frozen config already stores Decimal
+  strings; any future financial authority must revisit).
+
+SHW-3 unblocks once this fix round passes review. SHW-4 still requires
+the owner's defensive-carry gate freeze.
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7an):** SHW-2 reviewed; SHW-3 and live

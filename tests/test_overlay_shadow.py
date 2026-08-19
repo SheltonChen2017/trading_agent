@@ -52,6 +52,7 @@ def _observation(**overrides):
         inputs_sha256=SHA,
         available=True,
         index_levels={"universe": 100.0, "carry": 100.0, "combined": 100.0},
+        combined_carry_weight=0.20,
     )
     values.update(overrides)
     return OverlayObservation(**values)
@@ -113,16 +114,19 @@ def test_refused_observation_names_reasons_and_carries_no_levels():
         available=False,
         refusal_reasons=("stale close: TLT",),
         index_levels=None,
+        combined_carry_weight=None,
     )
     assert refusal.index_levels is None
     with pytest.raises(OverlayContractError, match="at least one reason"):
-        _observation(available=False, refusal_reasons=(), index_levels=None)
+        _observation(available=False, refusal_reasons=(), index_levels=None,
+                     combined_carry_weight=None)
     # Partial imputation is the exact failure this contract refuses.
     with pytest.raises(OverlayContractError, match="partial imputation"):
         _observation(
             available=False,
             refusal_reasons=("stale close: TLT",),
             index_levels={"universe": 100.0, "carry": 100.0, "combined": 100.0},
+            combined_carry_weight=None,
         )
 
 
@@ -213,6 +217,7 @@ def test_outcomes_cannot_settle_missing_or_refused_cycles(store: AssistantStore)
             available=False,
             refusal_reasons=("stale close: TLT",),
             index_levels=None,
+            combined_carry_weight=None,
         ).to_payload()
     )
     with pytest.raises(ValueError, match="observation was a refusal"):
@@ -296,3 +301,19 @@ def test_storage_revalidates_contracts_and_refuses_raw_bypass(store: AssistantSt
         )
     rows = store.get_overlay_observations("defensive-carry", "overlay-epoch-001")
     assert rows == []
+
+
+def test_available_observation_requires_a_valid_carry_weight():
+    """SHW-2 contract extension: the band state must persist with the
+    observation, and a refusal must not carry it."""
+    with pytest.raises(OverlayContractError, match="combined_carry_weight"):
+        _observation(combined_carry_weight=None)
+    with pytest.raises(OverlayContractError, match="fraction"):
+        _observation(combined_carry_weight=1.5)
+    with pytest.raises(OverlayContractError, match="carry weight"):
+        _observation(
+            available=False,
+            refusal_reasons=("stale close: TLT",),
+            index_levels=None,
+            combined_carry_weight=0.2,
+        )

@@ -2438,6 +2438,35 @@ class AssistantStore:
             conflict_label="overlay outcome",
         )
 
+    def get_overlay_stream_registration(
+        self, stream_name: str, evidence_epoch: str
+    ) -> dict[str, Any] | None:
+        """Read one stream+epoch registration row, or None."""
+        with self._connect() as connection:
+            row = connection.execute(
+                """
+                SELECT * FROM overlay_stream_registrations
+                WHERE stream_name = ? AND evidence_epoch = ?
+                """,
+                (stream_name, evidence_epoch),
+            ).fetchone()
+        return None if row is None else dict(row)
+
+    def get_overlay_outcomes(
+        self, stream_name: str, evidence_epoch: str
+    ) -> list[dict[str, Any]]:
+        """Read one stream+epoch's matured outcomes in cycle order."""
+        with self._connect() as connection:
+            rows = connection.execute(
+                """
+                SELECT * FROM overlay_outcomes
+                WHERE stream_name = ? AND evidence_epoch = ?
+                ORDER BY cycle_session
+                """,
+                (stream_name, evidence_epoch),
+            ).fetchall()
+        return [dict(row) for row in rows]
+
     def get_overlay_observations(
         self, stream_name: str, evidence_epoch: str
     ) -> list[dict[str, Any]]:

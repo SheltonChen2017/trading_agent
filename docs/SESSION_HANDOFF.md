@@ -1777,11 +1777,143 @@ was counter-reviewed on
 review. The operational host stays on its pinned release commit (the
 overlay-table CREATE caution).
 
+## 7am. SHW-2 implemented: the overlay shadow runner (2026-08-18)
+
+Owner directed SHW-2 to proceed. (Process note, recorded honestly: the
+owner had announced a further Cursor review of the counter-review round,
+but no artifact ever appeared — no branch, no document, no worktree; if
+it lands later it gets counter-reviewed then. The prior gate, POST-001's
+fix, was merged in PR #263.)
+
+Branch `user/claude/shw2-overlay-runner-20260818`:
+`scripts/run_overlay_shadow.py` — register / observe / mature / status,
+mirroring the ML shadow adapter split (pure cycle math in
+`assistant/overlay_shadow.py`: completed month-end derivation,
+whole-sleeve returns that refuse on ANY bad member, wide-band
+`advance_overlay`). Task semantics implemented exactly as designed:
+PROSPECTIVE baseline at the latest completed month-end (history never
+backfilled), gap month-ends occupy their cycle slots as refusal rows,
+each advance uses ONE fetch for boundary consistency (adjusted-close
+revision safety), the band state persists via the new
+`combined_carry_weight` contract field (restart-safe, auditable;
+required when available, forbidden on refusals), idempotent reruns,
+closed epochs refuse observations, registration binds the
+preregistration document's sha256 plus a clean commit, and every
+command failure records a durable `shadow_overlay` operational alert.
+`status` prints counts only — sufficiency is SHW-3.
+
+Tests: 12 new runner tests (hand-computed band math both sides of the
+band, gap spanning, refusal naming, alert-on-failure, idempotency) plus
+a contract test for the weight invariants; SHW-1's helpers updated for
+the new field. FIVE reverse mutations red then restored: band gate
+removed, baseline backfilled, gap rows skipped, partial imputation,
+alert dropped. Example config at
+`docs/reference/overlay_shadow_config.example.json`.
+
+Deliberately NOT included: Windows scheduler installation (deferred to
+SHW-4 stream start — there is no stream to schedule yet) and any
+performance/sufficiency output (SHW-3). SHW-4 registration still
+requires the owner to freeze the defensive-carry preregistration's
+[TO FREEZE] gates first.
+
+## 7an. Independent review of SHW-2 (2026-08-19)
+
+Cursor Grok 4.6 reviewed `d4c04c4..354a233` at exact head
+`354a233243d676aae05b1dc3bf53b29d6b96c2b3`
+(`origin/user/claude/shw2-overlay-runner-20260818`). Report:
+`docs/Review/REVIEW_2026-08-19_SHW2_OVERLAY_RUNNER.md`.
+
+**Accepted with P2 blockers.** All three commits dispositioned. Focused
+tests 28 passed. One reverse mutation red then restored (baseline
+target = first completed month-end). No operator DB. No product
+correction in the review.
+
+- **SHW2-001 P2:** first `observe` writes an available baseline at 100.0
+  even when a member has no close on that session (probed: DDD missing
+  on 2026-02-27).
+- **SHW2-002 P2:** `mature` stores a multi-month span in
+  `monthly_returns` (probed: Feb→May gap, universe return 1.0 on
+  cycle 2026-02-27).
+- SHW2-003/004/005 P3: closed-stream test incomplete; design still
+  lists SHW-2 scheduler wiring; float band math / non-PIT Yahoo.
+
+Do not start SHW-3 or register a live overlay epoch until SHW2-001 and
+SHW2-002 are fixed. Keep `paper-epoch-005` on `752d3b7`.
+
+## 7an. SHW-2 review counter-reviewed; both P2 blockers fixed (2026-08-19)
+
+Cursor/Grok reviewed SHW-2 (`d4c04c4..354a233`) and accepted the range
+with two P2 blockers and three P3s
+(`docs/Review/REVIEW_2026-08-19_SHW2_OVERLAY_RUNNER.md`, on
+`user/cursor/review-shw2-overlay-runner-20260819`). Claude's
+counter-review (`…_SHW2_COUNTERREVIEW.md`, same branch) reproduced both
+P2 probes exactly and fixed everything fixable:
+
+- **SHW2-001 (P2, fixed):** the prospective baseline now refuses unless
+  every member is priced on the target session — the reviewer caught a
+  t0 partial imputation that would have killed the series permanently
+  (every later boundary unpriceable); the stream heals at the next
+  month-end. Mutation-verified.
+- **SHW2-002 (P2, fixed):** `mature` settles only row-adjacent AND
+  calendar-adjacent available pairs; a multi-month gap span can never
+  persist as `monthly_returns`. Mutation-verified.
+- **SHW2-003/004 (P3, fixed):** closed-epoch gate now tested; scheduler
+  wiring formally moved to SHW-4 in the design.
+- **SHW2-005 (P3, split):** observations now carry a structural
+  `point_in_time_data=false` that no caller can override
+  (mutation-verified); the Decimal-band-math half is DECLINED with
+  recorded rationale (observation analytics on float closes, not an
+  authoritative money path; the frozen config already stores Decimal
+  strings; any future financial authority must revisit).
+
+SHW-3 unblocks once this fix round passes review. SHW-4 still requires
+the owner's defensive-carry gate freeze.
+
+## 7ao. SHW-2 fix round independently verified (2026-08-19)
+
+Cursor Grok 4.6 verified `78258af..128aac8` at exact head
+`128aac8b57e643b4eb8cfa098dc164ea31fb8a52`. Report:
+`docs/Review/REVIEW_2026-08-19_SHW2_FIX_VERIFICATION.md`.
+
+**Both P2s closed.** `27cb6dc` and `128aac8` accepted. Focused tests 32
+passed. Reverse mutations: baseline price-check drop red; available-only
+mature zip (original SHW2-002 bug) red; calendar-only drop still green
+(row adjacency carries the fixture). Restored; tree left clean.
+
+Leftover P3s: SHW2-006 (calendar belt unpinned) and SHW2-007 (stale
+`or_closed` test name). Neither reopens a P2.
+
+SHW-3 is unblocked for these findings and still needs its own scheduled
+milestone. SHW-4, gate freeze, scheduler, live epoch, and any order
+remain unauthorized. `paper-epoch-005` stays on `752d3b7`.
+
+## 7ao. SHW-2 fix verification accepted; SHW2-006/007 closed (2026-08-19)
+
+Cursor independently verified the counter-review fixes
+(`docs/Review/REVIEW_2026-08-19_SHW2_FIX_VERIFICATION.md`): both P2s
+confirmed closed with its own reverse mutations, the Decimal
+declination accepted — and its mutation (c) caught an overclaim in the
+counter-review: deleting ONLY the calendar maturity guard stayed green,
+because the gap-span fixture's refusal rows already break row
+adjacency. The calendar belt was real code but unpinned. Corrections
+made this round: **SHW2-006 closed** — a new fixture inserts two
+available observations in non-adjacent months with NO intervening row
+(bypassing observe, targeting `mature` directly) and pins that nothing
+settles; the calendar-only mutation now reds exactly that test
+(re-executed, restored green). **SHW2-007 closed** — the stale
+`…_or_closed_stream` test name renamed to match its actual coverage.
+Lesson recorded: a compound mutation proves the pair, not each guard —
+pin belts separately.
+
+SHW-3 remains unblocked for findings and awaits the owner scheduling
+it; SHW-4 awaits the gate freeze.
+
 ## 8. What is next
 
-**Current (2026-08-18, section 7al):** SHW-2 is blocked on POST-001.
-APQ-1 is not scheduled. `paper-epoch-005` stays on `752d3b7`. Do not
-open the operator DB from a post-`f40c2c1` tree.
+**Current (2026-08-19, section 7ao):** SHW-2 P2s verified closed. SHW-3
+may be scheduled; do not start it automatically. APQ-1 is not scheduled.
+`paper-epoch-005` stays on `752d3b7`. Do not open the operator DB from
+a post-`f40c2c1` tree.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

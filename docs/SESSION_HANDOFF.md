@@ -2048,15 +2048,30 @@ cycles against it now, and the operational scheduler points at the same
 file after the release advance. This avoids the two-checkouts /
 two-databases split.
 
-**Remaining SHW-4 sub-steps, paused for the owner:** (2) the
-operational release advance — BEFORE advancing, verify whether the
-paper-epoch-005 cadence tasks pin their own commit independently of the
-clone's checkout (if they run from the moving checkout, advancing is a
-runtime change to the paper epoch's lineage and needs its own
-decision); (3) the monthly scheduler install after the advance;
-(4) round review. Until the scheduler exists, the monthly cycle is run
-manually (observe + mature + sufficiency after each month's first
-sessions) — the next cycle is due after 2026-08-31's month-end settles.
+**Remaining SHW-4 sub-steps, paused for the owner — and the pinning
+check is DONE with a material finding:**
+`scripts/install_windows_operational_tasks.ps1` runs every paper task
+with `WorkingDirectory` = the clone and NO commit pin — the checkout IS
+the pin. **Advancing the operational clone therefore changes the code
+the paper-epoch-005 cadence executes: a lineage change that closes the
+epoch.** Owner options for sub-step 2:
+
+- **(a) RECOMMENDED — defer the advance**: run the shadow cycle
+  manually each month from the dev checkout against the same canonical
+  DB (one command after the month's first sessions; next due after
+  2026-08-31 settles). Zero risk to epoch-005; install the scheduler at
+  the next NATURAL release advance / epoch roll.
+- **(b) Advance now with a planned epoch roll** to paper-epoch-006,
+  following the established roll process (close the epoch BEFORE
+  deploying — the epoch-003 lesson). Epoch-005 is only ~6 days old, so
+  the lost accumulation is small; this buys full automation
+  immediately.
+- **(c) A third, shadow-only pinned checkout** for the scheduler —
+  no paper-epoch interaction, at the cost of another checkout to
+  manage; would amend decision 5's mechanics.
+
+Sub-steps (3) scheduler install and (4) round review follow whichever
+option is chosen.
 
 ## 8. What is next
 

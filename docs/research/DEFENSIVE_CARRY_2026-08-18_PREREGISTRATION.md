@@ -1,8 +1,12 @@
-# Defensive-Carry Overlay — Preregistration (DRAFT, gates not yet frozen)
+# Defensive-Carry Overlay — Preregistration (FROZEN 2026-08-19)
 
-Status: DRAFT 2026-08-18. This document becomes a preregistration only
-when the owner adopts it AND its gates are frozen BEFORE any
-confirmation result is observed. Until then it binds nothing.
+Status: **FROZEN in this commit, 2026-08-19, by owner adoption**
+("yes accept as is") — before any confirmation computation, any shadow
+stream registration, and any statistic. Every draft placeholder is
+frozen at its proposed value. Changing any frozen weight, window,
+threshold, or count after this commit requires a NEW named
+preregistration; the SHW-4 registration binds this document's SHA-256
+as of this commit.
 
 ## 1. Honest look accounting (why this is confirmation, not discovery)
 
@@ -30,11 +34,11 @@ reduces tail risk at an acceptable upside cost, specifically:
   before confirmation, to avoid weight-shopping).
 - PRIMARY METRIC (composite, all three must hold in confirmation):
   1. maximum drawdown improves vs the UNIVERSE-only blend by at least
-     [TO FREEZE: proposed ≥ 15% relative reduction];
+     **15% relative reduction** (FROZEN 2026-08-19);
   2. 95% expected shortfall (monthly) improves by at least
-     [TO FREEZE: proposed ≥ 10% relative]; and
+     **10% relative** (FROZEN 2026-08-19); and
   3. upside capture vs SPY stays at or above
-     [TO FREEZE: proposed ≥ 80% of the UNIVERSE-only blend's].
+     **80% of the UNIVERSE-only blend's** (FROZEN 2026-08-19).
 - SECONDARY (descriptive only, no gate): 10% and 30% weights, Sortino,
   time-under-water, downside capture. Reported, never promoted.
 
@@ -51,26 +55,28 @@ its looks there when executed.
   members sliced at decision cutoffs; survivorship caveat of UNIVERSE
   (documented in the ledger) restated in the report.
 - Structure: calendar-year walk-forward folds across the full common
-  history [TO FREEZE: expected ≥ 8 folds]; the overlay is static, so
+  history, **at least 8 folds** (FROZEN 2026-08-19; fewer available
+  folds refuse the study as underpowered rather than running short);
+  the overlay is static, so
   folds test regime robustness, not parameter fitting. Rebalancing to
   target weights uses the operational wide-band mechanism (25% band)
   so the tested object matches what deployment would actually do.
 - Significance: downside-metric deltas evaluated with the project's
   block bootstrap (`out_of_sample_significance_by_block`, block lengths
   5/10/15 days) — never pooled row-level tests; fold-level sign
-  consistency reported ([TO FREEZE: proposed gate — improvement in at
-  least 2/3 of folds AND block-bootstrap p < 0.05 on the ES delta]).
+  consistency reported (**gate, FROZEN 2026-08-19: improvement in at
+  least 2/3 of folds AND block-bootstrap p < 0.05 on the ES delta**).
 - Refusals and data gaps recorded, never dropped.
 
 ## 4. Prospective leg (the decisive one)
 
 On adoption, the overlay registers as a shadow stream (SHW-4): monthly
 observation of the hypothetical blend vs the UNIVERSE-only blend,
-[TO FREEZE: required independent months — proposed 24 minimum, with the
-explicit statement that 24 monthly observations resolve only large
-tail-risk differences; the retrospective leg carries the statistical
-weight and the prospective leg tests operational reality and
-calibration]. Sufficiency reporting per the §6 fields; no gate is
+**24 required independent months minimum (FROZEN 2026-08-19;
+`required_observation_count=24` at SHW-4 registration)** — stated
+plainly: 24 monthly observations resolve only large tail-risk
+differences; the retrospective leg carries the statistical weight and
+the prospective leg tests operational reality and calibration. Sufficiency reporting per the §6 fields; no gate is
 evaluated before the required count exists.
 
 ## 5. What success and failure mean (bound in advance)
@@ -85,10 +91,13 @@ evaluated before the required count exists.
   prohibited; any variant is a new preregistration with its look
   counted.
 
-## 6. To freeze at adoption (owner + one independent review)
+## 6. Freeze record (2026-08-19)
 
-Every value marked [TO FREEZE] above; the exact data window; the fold
-boundaries; and the required prospective count. The freezing commit
-must precede the first confirmation computation, and the study's
-analysis script must refuse to run unless this document's SHA-256
-matches the one recorded at registration.
+Every draft placeholder is frozen above at its proposed value, by
+owner adoption ("yes accept as is"), in this commit — which precedes
+the first confirmation computation, the shadow stream registration,
+and every statistic. Remaining to fix mechanically at study start: the
+exact retrospective window end-date and the fold boundaries derived
+from it (calendar consequences, not tunables). The study's analysis
+script must refuse to run unless this document's SHA-256 matches the
+one recorded at registration.

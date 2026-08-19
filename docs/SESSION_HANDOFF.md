@@ -1972,12 +1972,59 @@ all five owner decisions recorded, **SHW-4 is the next milestone**:
 registration + first baseline + owner-approved operational release
 advance + scheduler install, dedicated `data/shadow_overlay.db`.
 
+## 7as. Owner decision batch: gates frozen, APQ-1 scheduled, Stage 2 closed (2026-08-19)
+
+(Recorded on the gate-freeze branch while sections 7aq/7ar were being
+written on the review branch; renumbered 7as at merge. Decisions 2-5
+chronologically preceded 7ar's counter-review, which already cites
+the freeze commit `d0912e0`.)
+
+Four owner decisions recorded on
+`user/claude/dc-gate-freeze-20260819` (docs-only round):
+
+1. **SHW-3 review**: already running (owner-initiated); this round does
+   not touch the SHW-3 branch.
+2. **Defensive-carry gates FROZEN as proposed** ("yes accept as is"):
+   `docs/research/DEFENSIVE_CARRY_2026-08-18_PREREGISTRATION.md` now
+   carries zero draft placeholders — composite gate 15% relative maxDD
+   reduction / 10% relative ES improvement / 80% upside-capture floor;
+   ≥8 calendar-year folds (fewer refuses the study as underpowered);
+   retrospective gate 2/3-fold consistency AND block-bootstrap p<0.05
+   on the ES delta; 24 required prospective months
+   (`required_observation_count=24` at SHW-4 registration). The freeze
+   commit precedes every confirmation computation, registration, and
+   statistic; changes now require a new named preregistration. SHW-4
+   binds this document's SHA-256 as of this commit.
+3. **APQ-1 SCHEDULED** — APQ-0 complete; the allocation-policy LEAN
+   algorithm + local tests begin serially after the SHW-3 review
+   settles (one milestone per branch, review between).
+4. **Stage 2 PEAD CLOSED** without implementation (inside the A-002
+   closure; QC point-in-time consensus data almost certainly
+   unavailable; poor prior). Action-plan row records the reasons and
+   the reopening bar.
+
+5. **Host DECIDED 2026-08-19 ("i'll follow your recommendation"):**
+   a DEDICATED shadow database file (`--database
+   data/shadow_overlay.db`) — the frozen paper-epoch-005 operator DB is
+   never opened by a newer tree (the standing overlay-table CREATE
+   caution stays satisfied) — with the scheduled task running from the
+   OPERATIONAL CLONE once its release advances to a commit containing
+   SHW-1..3. The release advance is itself an owner-approved deploy
+   step at SHW-4 time. Until then the stream does not run on a
+   schedule; a manual first registration/baseline from a reviewed
+   commit remains possible if the owner wants the clock started before
+   the release advance.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7aq):** SHW-3 independently accepted
-with two P3s. SHW-4 waits on the defensive-carry gate freeze. APQ-1 is
-not scheduled. `paper-epoch-005` stays on `752d3b7`. Do not open the
-operator DB from a post-`f40c2c1` tree.
+**Current (2026-08-19, sections 7ar/7as):** SHW-1..3 implemented and
+reviewed (SHW3-001 fixed; SHW3-002 discharged by the freeze). The
+defensive-carry preregistration is FROZEN; APQ-1 is SCHEDULED; Stage 2
+PEAD is CLOSED; the SHW-4 host is decided (dedicated
+`data/shadow_overlay.db`, operational clone after an owner-approved
+release advance). **SHW-4 is the next milestone**, then APQ-1.
+`paper-epoch-005` stays on `752d3b7`; do not open the operator DB from
+a newer tree.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

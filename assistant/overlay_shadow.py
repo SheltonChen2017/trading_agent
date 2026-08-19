@@ -216,7 +216,13 @@ class OverlayStreamRegistration:
 
 @dataclass(frozen=True)
 class OverlayObservation:
-    """One cycle's observation — or its refusal, occupying the cycle slot."""
+    """One cycle's observation — or its refusal, occupying the cycle slot.
+
+    ``combined_carry_weight`` is the combined sleeve's carry weight AFTER
+    this cycle's band decision — the state the next cycle advances from.
+    Persisting it makes the band mechanism restart-safe and auditable
+    instead of an in-memory secret.
+    """
 
     stream_name: str
     evidence_epoch: str
@@ -227,6 +233,7 @@ class OverlayObservation:
     available: bool
     refusal_reasons: tuple[str, ...] = ()
     index_levels: Mapping[str, float] | None = None
+    combined_carry_weight: float | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "stream_name", _non_empty_text(self.stream_name, "stream_name"))
@@ -248,6 +255,18 @@ class OverlayObservation:
                     "an available observation must carry index levels"
                 )
             object.__setattr__(self, "index_levels", _finite_positive_levels(self.index_levels, "index_levels"))
+            weight = self.combined_carry_weight
+            if isinstance(weight, bool) or not isinstance(weight, (int, float)):
+                raise OverlayContractError(
+                    "an available observation must carry a numeric "
+                    "combined_carry_weight"
+                )
+            weight = float(weight)
+            if not math.isfinite(weight) or not 0.0 < weight < 1.0:
+                raise OverlayContractError(
+                    "combined_carry_weight must be a finite fraction in (0, 1)"
+                )
+            object.__setattr__(self, "combined_carry_weight", weight)
         else:
             if not self.refusal_reasons:
                 raise OverlayContractError(
@@ -257,6 +276,10 @@ class OverlayObservation:
                 raise OverlayContractError(
                     "a refused observation must not carry index levels; "
                     "partial imputation is exactly the failure this refuses"
+                )
+            if self.combined_carry_weight is not None:
+                raise OverlayContractError(
+                    "a refused observation must not carry a carry weight"
                 )
 
     def to_payload(self) -> dict[str, Any]:
@@ -272,6 +295,7 @@ class OverlayObservation:
             "index_levels": (
                 None if self.index_levels is None else dict(self.index_levels)
             ),
+            "combined_carry_weight": self.combined_carry_weight,
         }
 
 
@@ -327,3 +351,102 @@ class OverlayOutcome:
                 None if self.monthly_returns is None else dict(self.monthly_returns)
             ),
         }
+
+
+# ---------------------------------------------------------------------------
+# Pure cycle computation (SHW-2). No I/O, no persistence, no clock: the
+# scripts/run_overlay_shadow.py adapter owns fetching and storage, mirroring
+# the ml/shadow_runtime.py / run_ml_shadow.py split.
+# ---------------------------------------------------------------------------
+
+
+def completed_month_end_sessions(sessions: Sequence[date]) -> tuple[date, ...]:
+    """Last session of every month that has a session in a LATER month.
+
+    The in-progress month is deliberately absent: its "month end" is not
+    known until a later month's session proves the month closed. Sessions
+    must be strictly ascending; duplicates or disorder refuse loudly.
+    """
+    ordered = list(sessions)
+    if any(not isinstance(item, date) for item in ordered):
+        raise OverlayContractError("sessions must be date objects")
+    if any(b <= a for a, b in zip(ordered, ordered[1:])):
+        raise OverlayContractError("sessions must be strictly ascending")
+    ends: list[date] = []
+    for current, following in zip(ordered, ordered[1:]):
+        if (current.year, current.month) != (following.year, following.month):
+            ends.append(current)
+    return tuple(ends)
+
+
+def sleeve_return(
+    previous_closes: Mapping[str, float],
+    current_closes: Mapping[str, float],
+    members: Sequence[str],
+) -> tuple[float | None, tuple[str, ...]]:
+    """Equal-weight mean return of the sleeve, or None plus the tickers
+    that made it uncomputable. A single bad member refuses the WHOLE
+    sleeve — per-ticker imputation is the contract's forbidden failure."""
+    missing: list[str] = []
+    returns: list[float] = []
+    for ticker in members:
+        before = previous_closes.get(ticker)
+        after = current_closes.get(ticker)
+        usable = (
+            isinstance(before, (int, float)) and not isinstance(before, bool)
+            and isinstance(after, (int, float)) and not isinstance(after, bool)
+            and math.isfinite(float(before)) and math.isfinite(float(after))
+            and float(before) > 0.0 and float(after) > 0.0
+        )
+        if not usable:
+            missing.append(ticker)
+            continue
+        returns.append(float(after) / float(before) - 1.0)
+    if missing:
+        return None, tuple(sorted(missing))
+    return sum(returns) / len(returns), ()
+
+
+def advance_overlay(
+    *,
+    level: float,
+    carry_weight: float,
+    universe_return: float,
+    carry_return: float,
+    carry_target: float,
+    band_fraction: float,
+) -> tuple[float, float, bool]:
+    """One band-rebalance step of the combined sleeve.
+
+    Grow both sleeves by their returns, then rebalance the carry weight
+    to target ONLY if drift pushed it outside the relative band
+    (target * (1 +/- band)) — the operational wide-band mechanism. Returns
+    (new_level, new_carry_weight, rebalanced).
+    """
+    for name, value in (("level", level), ("carry_weight", carry_weight),
+                        ("universe_return", universe_return),
+                        ("carry_return", carry_return),
+                        ("carry_target", carry_target),
+                        ("band_fraction", band_fraction)):
+        if isinstance(value, bool) or not isinstance(value, (int, float)) \
+                or not math.isfinite(float(value)):
+            raise OverlayContractError(f"{name} must be a finite number")
+    if not 0.0 < carry_weight < 1.0 or not 0.0 < carry_target < 1.0:
+        raise OverlayContractError("carry weights must be fractions in (0, 1)")
+    if level <= 0.0:
+        raise OverlayContractError("level must be positive")
+    carry_part = carry_weight * (1.0 + carry_return)
+    universe_part = (1.0 - carry_weight) * (1.0 + universe_return)
+    total = carry_part + universe_part
+    if total <= 0.0:
+        raise OverlayContractError(
+            "combined sleeve NAV would be non-positive; refusing to price a "
+            "wiped-out book"
+        )
+    new_level = level * total
+    drifted = carry_part / total
+    low = carry_target * (1.0 - band_fraction)
+    high = carry_target * (1.0 + band_fraction)
+    if drifted < low or drifted > high:
+        return new_level, carry_target, True
+    return new_level, drifted, False

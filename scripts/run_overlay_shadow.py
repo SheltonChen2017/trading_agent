@@ -1,0 +1,395 @@
+"""Defensive-carry overlay shadow runner (SHW-2).
+
+The persistence/operations adapter for the overlay shadow stream,
+mirroring ``scripts/run_ml_shadow.py``'s split: pure computation and
+frozen contracts live in ``assistant/overlay_shadow.py``; this script
+owns fetching, storage, and durable operational alerts.
+
+Subcommands: ``register`` / ``observe`` / ``mature`` / ``status``.
+Observation only — nothing here can create, approve, size, submit,
+cancel, or replace an order, or change any registry status toward
+authority.
+
+Cycle semantics (task-specific, deliberately explicit):
+
+* The stream is PROSPECTIVE. The first ``observe`` records a baseline
+  (all series at 100.0) at the latest COMPLETED month-end session; no
+  history is backfilled.
+* Each later ``observe`` advances the series from the last AVAILABLE
+  observation to the latest completed month-end, using member returns
+  from ONE fetch (internally consistent adjusted closes). Month-ends
+  between those two cycles — missed while the runner was not running,
+  or refused earlier — receive refusal rows so the gap occupies its
+  cycle slot instead of disappearing.
+* A member close that is missing, non-finite, or non-positive at either
+  boundary refuses the WHOLE cycle with the tickers named. No partial
+  imputation; the contract makes it unrepresentable and storage
+  re-validates.
+* ``mature`` settles each available observation whose NEXT available
+  observation exists: the outcome is the per-series level ratio minus
+  one. Refused cycles never settle.
+* Any command failure records a durable operational alert before the
+  non-zero exit.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import sys
+import traceback
+from datetime import date, datetime, timezone
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+
+from assistant.overlay_shadow import (  # noqa: E402
+    OverlayObservation,
+    OverlayOutcome,
+    OverlayStreamRegistration,
+    SERIES_KEYS,
+    advance_overlay,
+    completed_month_end_sessions,
+    sleeve_return,
+)
+from assistant.runtime_identity import (  # noqa: E402
+    RuntimeIdentityError,
+    current_commit,
+)
+from assistant.storage import AssistantStore  # noqa: E402
+from data.market_data import fetch_historical  # noqa: E402
+
+ROOT = Path(__file__).resolve().parents[1]
+PROVIDER = "yfinance-daily-adjusted"
+#: Enough sessions to always cover the previous available cycle plus the
+#: latest completed month, with margin for long gaps.
+LOOKBACK_SESSIONS = 400
+_CONFIG_KEYS = frozenset({
+    "stream_name", "evidence_epoch", "preregistration_path",
+    "schedule_key", "schedule_version", "universe_members",
+    "carry_members", "carry_weight", "band_fraction",
+})
+
+
+class OverlayRunnerError(RuntimeError):
+    """The runner cannot proceed safely; a durable alert is recorded."""
+
+
+def _load_config(path: str) -> dict:
+    payload = json.loads(Path(path).read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        raise OverlayRunnerError("config must be a JSON object")
+    unknown = sorted(set(payload) - _CONFIG_KEYS)
+    missing = sorted(_CONFIG_KEYS - set(payload))
+    if unknown or missing:
+        raise OverlayRunnerError(
+            f"config field mismatch: missing={missing} unknown={unknown}"
+        )
+    return payload
+
+
+def _registration_contract(config: dict) -> OverlayStreamRegistration:
+    prereg = ROOT / config["preregistration_path"]
+    if not prereg.is_file():
+        raise OverlayRunnerError(
+            f"preregistration document not found: {config['preregistration_path']}"
+        )
+    prereg_sha = hashlib.sha256(prereg.read_bytes()).hexdigest()
+    try:
+        commit = current_commit(require_clean=True, repository=ROOT)
+    except RuntimeIdentityError as exc:
+        raise OverlayRunnerError(
+            f"registration refused: {exc} (the epoch must bind clean bytes)"
+        ) from exc
+    return OverlayStreamRegistration(
+        stream_name=config["stream_name"],
+        evidence_epoch=config["evidence_epoch"],
+        preregistration_path=config["preregistration_path"],
+        preregistration_sha256=prereg_sha,
+        code_commit=commit,
+        schedule_key=config["schedule_key"],
+        schedule_version=config["schedule_version"],
+        universe_members=config["universe_members"],
+        carry_members=config["carry_members"],
+        carry_weight=config["carry_weight"],
+        band_fraction=config["band_fraction"],
+    )
+
+
+def _now() -> str:
+    return datetime.now(timezone.utc).isoformat()
+
+
+def _fetch_closes(members: list[str]) -> dict[str, dict[date, float]]:
+    """One consistent fetch: ticker -> {session date -> adjusted close}."""
+    frames = fetch_historical(members, lookback_days=LOOKBACK_SESSIONS)
+    closes: dict[str, dict[date, float]] = {}
+    for ticker in members:
+        frame = frames.get(ticker)
+        mapping: dict[date, float] = {}
+        if frame is not None and len(frame):
+            for index, value in frame["close"].items():
+                session = index.date() if hasattr(index, "date") else index
+                mapping[session] = float(value)
+        closes[ticker] = mapping
+    return closes
+
+
+def _inputs_sha256(closes: dict[str, dict[date, float]]) -> str:
+    canonical = json.dumps(
+        {
+            ticker: {session.isoformat(): value for session, value in sorted(values.items())}
+            for ticker, values in sorted(closes.items())
+        },
+        sort_keys=True, separators=(",", ":"), allow_nan=False,
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+def _registration_or_refuse(store: AssistantStore, config: dict) -> dict:
+    row = store.get_overlay_stream_registration(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    if row is None:
+        raise OverlayRunnerError(
+            "stream+epoch is not registered; run `register` first"
+        )
+    if row["status"] != "shadow":
+        raise OverlayRunnerError(
+            f"stream+epoch status is {row['status']!r}; a closed epoch never "
+            "accepts new observations"
+        )
+    return json.loads(row["registration_json"])
+
+
+def command_register(args: argparse.Namespace) -> int:
+    config = _load_config(args.config)
+    store = AssistantStore(args.database)
+    contract = _registration_contract(config)
+    row = store.register_overlay_stream(contract.to_payload())
+    print(
+        f"registered {contract.stream_name}/{contract.evidence_epoch} "
+        f"prereg={contract.preregistration_sha256[:12]} "
+        f"commit={contract.code_commit[:12]} hash={row['registration_hash'][:12]}"
+    )
+    return 0
+
+
+def command_observe(args: argparse.Namespace) -> int:
+    config = _load_config(args.config)
+    store = AssistantStore(args.database)
+    registration = _registration_or_refuse(store, config)
+    universe = list(registration["universe_members"])
+    carry = list(registration["carry_members"])
+    carry_target = float(registration["carry_weight"])
+    band = float(registration["band_fraction"])
+
+    closes = _fetch_closes(universe + carry)
+    inputs_sha = _inputs_sha256(closes)
+    all_sessions = sorted({s for values in closes.values() for s in values})
+    if not all_sessions:
+        raise OverlayRunnerError("provider returned no sessions at all")
+    month_ends = completed_month_end_sessions(all_sessions)
+    if not month_ends:
+        raise OverlayRunnerError("no completed month-end session in the window")
+    target = month_ends[-1]
+    target_key = target.isoformat()
+
+    rows = store.get_overlay_observations(
+        registration["stream_name"], registration["evidence_epoch"]
+    )
+    if any(row["cycle_session"] == target_key for row in rows):
+        print(f"up to date: cycle {target_key} already recorded")
+        return 0
+
+    available_rows = [row for row in rows if row["available"]]
+    base = dict(
+        stream_name=registration["stream_name"],
+        evidence_epoch=registration["evidence_epoch"],
+        generated_at=_now(),
+        provider=PROVIDER,
+        inputs_sha256=inputs_sha,
+    )
+
+    if not available_rows:
+        # Prospective baseline: the stream starts NOW, at the latest
+        # completed month-end. History is never backfilled.
+        observation = OverlayObservation(
+            cycle_session=target_key, available=True,
+            index_levels={key: 100.0 for key in SERIES_KEYS},
+            combined_carry_weight=carry_target, **base,
+        )
+        store.record_overlay_observation(observation.to_payload())
+        print(f"baseline recorded at {target_key} (levels 100.0)")
+        return 0
+
+    previous_payload = json.loads(available_rows[-1]["observation_json"])
+    previous_session = date.fromisoformat(previous_payload["cycle_session"])
+    if previous_session not in set(all_sessions):
+        raise OverlayRunnerError(
+            f"provider window no longer covers the last available cycle "
+            f"{previous_session}; refusing to bridge an unpriced gap"
+        )
+
+    # Month-ends strictly between the last available cycle and the target
+    # were missed or previously refused: give each a refusal row so the
+    # gap is visible in its own cycle slot. Exact retries are idempotent.
+    for gap in [m for m in month_ends if previous_session < m < target]:
+        gap_key = gap.isoformat()
+        if any(row["cycle_session"] == gap_key for row in rows):
+            continue
+        refusal = OverlayObservation(
+            cycle_session=gap_key, available=False,
+            refusal_reasons=(
+                "missed cycle: not computed at its time; levels advance at "
+                "the next observed cycle",
+            ),
+            **base,
+        )
+        store.record_overlay_observation(refusal.to_payload())
+        print(f"gap recorded at {gap_key}")
+
+    previous_closes = {t: closes[t].get(previous_session) for t in universe + carry}
+    current_closes = {t: closes[t].get(target) for t in universe + carry}
+    universe_return, universe_missing = sleeve_return(
+        previous_closes, current_closes, universe
+    )
+    carry_return, carry_missing = sleeve_return(
+        previous_closes, current_closes, carry
+    )
+    missing = tuple(sorted({*universe_missing, *carry_missing}))
+    if missing:
+        refusal = OverlayObservation(
+            cycle_session=target_key, available=False,
+            refusal_reasons=tuple(
+                f"unpriceable member at a cycle boundary: {ticker}"
+                for ticker in missing
+            ),
+            **base,
+        )
+        store.record_overlay_observation(refusal.to_payload())
+        print(f"REFUSED cycle {target_key}: {', '.join(missing)}")
+        return 0
+
+    levels = previous_payload["index_levels"]
+    weight = float(previous_payload["combined_carry_weight"])
+    combined_level, new_weight, rebalanced = advance_overlay(
+        level=float(levels["combined"]), carry_weight=weight,
+        universe_return=universe_return, carry_return=carry_return,
+        carry_target=carry_target, band_fraction=band,
+    )
+    observation = OverlayObservation(
+        cycle_session=target_key, available=True,
+        index_levels={
+            "universe": float(levels["universe"]) * (1.0 + universe_return),
+            "carry": float(levels["carry"]) * (1.0 + carry_return),
+            "combined": combined_level,
+        },
+        combined_carry_weight=new_weight, **base,
+    )
+    store.record_overlay_observation(observation.to_payload())
+    print(
+        f"observed {target_key} (from {previous_session}) "
+        f"rebalanced={rebalanced} carry_weight={new_weight:.4f}"
+    )
+    return 0
+
+
+def command_mature(args: argparse.Namespace) -> int:
+    config = _load_config(args.config)
+    store = AssistantStore(args.database)
+    registration = _registration_or_refuse(store, config)
+    rows = store.get_overlay_observations(
+        registration["stream_name"], registration["evidence_epoch"]
+    )
+    available = [json.loads(r["observation_json"]) for r in rows if r["available"]]
+    outcomes = {
+        row["cycle_session"]
+        for row in store.get_overlay_outcomes(
+            registration["stream_name"], registration["evidence_epoch"]
+        )
+    }
+    matured = 0
+    for earlier, later in zip(available, available[1:]):
+        cycle = earlier["cycle_session"]
+        if cycle in outcomes:
+            continue
+        returns = {
+            key: float(later["index_levels"][key])
+            / float(earlier["index_levels"][key]) - 1.0
+            for key in SERIES_KEYS
+        }
+        outcome = OverlayOutcome(
+            stream_name=registration["stream_name"],
+            evidence_epoch=registration["evidence_epoch"],
+            cycle_session=cycle, matured_at=_now(),
+            available=True, monthly_returns=returns,
+        )
+        store.record_overlay_outcome(outcome.to_payload())
+        matured += 1
+        print(f"matured {cycle}")
+    print(f"matured {matured} cycle(s)")
+    return 0
+
+
+def command_status(args: argparse.Namespace) -> int:
+    config = _load_config(args.config)
+    store = AssistantStore(args.database)
+    row = store.get_overlay_stream_registration(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    if row is None:
+        print("stream+epoch: NOT REGISTERED")
+        return 0
+    observations = store.get_overlay_observations(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    outcomes = store.get_overlay_outcomes(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    available = [o for o in observations if o["available"]]
+    refused = [o for o in observations if not o["available"]]
+    print(f"stream+epoch: {config['stream_name']}/{config['evidence_epoch']}")
+    print(f"status: {row['status']}  registered_at: {row['registered_at']}")
+    print(f"cycles: {len(observations)}  available: {len(available)}  "
+          f"refused: {len(refused)}  matured: {len(outcomes)}")
+    if observations:
+        print(f"first cycle: {observations[0]['cycle_session']}  "
+              f"last cycle: {observations[-1]['cycle_session']}")
+    # Counts only. Performance and sufficiency reporting is SHW-3; no
+    # statistic is computed or printed here.
+    return 0
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--database", required=True)
+    parser.add_argument("--config", required=True)
+    sub = parser.add_subparsers(dest="command", required=True)
+    for name, handler in (
+        ("register", command_register), ("observe", command_observe),
+        ("mature", command_mature), ("status", command_status),
+    ):
+        command = sub.add_parser(name)
+        command.set_defaults(handler=handler, command_name=name)
+    args = parser.parse_args(argv)
+    try:
+        return args.handler(args)
+    except Exception as exc:  # noqa: BLE001 -- converted to a durable alert
+        try:
+            config_name = Path(args.config).stem
+            AssistantStore(args.database).upsert_operational_alert(
+                fingerprint=f"overlay_shadow_{args.command_name}_{config_name}",
+                severity="critical",
+                category="shadow_overlay",
+                message=f"overlay shadow {args.command_name} failed: {exc}",
+                details={"traceback": traceback.format_exc()[-2000:]},
+            )
+        except Exception:  # noqa: BLE001 -- alerting must not mask the cause
+            print("ALERT RECORDING FAILED", file=sys.stderr)
+        print(f"FAILED: {exc}", file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

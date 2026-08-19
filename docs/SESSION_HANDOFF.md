@@ -1908,6 +1908,31 @@ pin belts separately.
 SHW-3 remains unblocked for findings and awaits the owner scheduling
 it; SHW-4 awaits the gate freeze.
 
+## 7ap. SHW-3 implemented: sufficiency reporting (2026-08-19)
+
+Branch `user/claude/shw3-sufficiency-20260819` (from merged main
+`553da76`). The `sufficiency` subcommand emits the section-6 fields —
+observation unit (adjacent-month matured outcomes, non-overlapping),
+the preregistered required count, the independent matured count, a
+MET/NOT_MET verdict, and concrete insufficiency reasons — and NOTHING
+else: no statistic at any count, with the report itself recording that
+gate evaluation is a separate owner-authorized single pass. The
+required count became a REGISTRATION contract field
+(`required_observation_count`, positive integer, no default — every
+stream preregisters its own; CLAUDE.md §6's no-universal-threshold
+rule made structural). The report is anchored to the FROZEN
+registration value; a drifted config requirement refuses loudly with a
+durable alert. Read-only against the database (byte-identical snapshot
+pinned by test). Five new tests; THREE reverse mutations red then
+restored (boundary >= flipped to >, requirement re-anchored to the
+live config, a statistic key planted in the report). CLI/file only per
+open decision 3's default — no UI surface.
+
+SHW-1..3 are now all implemented. Remaining before the stream goes
+live (SHW-4): this round's review, the owner's freeze of the
+defensive-carry [TO FREEZE] gates, registration binding the frozen
+document, and the scheduler installation deferred to SHW-4.
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7ao):** SHW-2 P2s verified closed. SHW-3

@@ -1887,6 +1887,27 @@ SHW-3 is unblocked for these findings and still needs its own scheduled
 milestone. SHW-4, gate freeze, scheduler, live epoch, and any order
 remain unauthorized. `paper-epoch-005` stays on `752d3b7`.
 
+## 7ao. SHW-2 fix verification accepted; SHW2-006/007 closed (2026-08-19)
+
+Cursor independently verified the counter-review fixes
+(`docs/Review/REVIEW_2026-08-19_SHW2_FIX_VERIFICATION.md`): both P2s
+confirmed closed with its own reverse mutations, the Decimal
+declination accepted — and its mutation (c) caught an overclaim in the
+counter-review: deleting ONLY the calendar maturity guard stayed green,
+because the gap-span fixture's refusal rows already break row
+adjacency. The calendar belt was real code but unpinned. Corrections
+made this round: **SHW2-006 closed** — a new fixture inserts two
+available observations in non-adjacent months with NO intervening row
+(bypassing observe, targeting `mature` directly) and pins that nothing
+settles; the calendar-only mutation now reds exactly that test
+(re-executed, restored green). **SHW2-007 closed** — the stale
+`…_or_closed_stream` test name renamed to match its actual coverage.
+Lesson recorded: a compound mutation proves the pair, not each guard —
+pin belts separately.
+
+SHW-3 remains unblocked for findings and awaits the owner scheduling
+it; SHW-4 awaits the gate freeze.
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7ao):** SHW-2 P2s verified closed. SHW-3

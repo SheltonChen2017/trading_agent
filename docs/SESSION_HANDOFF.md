@@ -2415,10 +2415,12 @@ runs on `main`. Branch
 `5694975`, isolated worktree `trading_agent-plans-mpp-hpg`. No LEAN,
 no driver change, no QC from this lane.
 
-- **MPQ (max profit = growth tilt, not leverage):** G0 100% SPY; G1
-  100% QQQ; G2 70% QQQ / 30% SPY; G3 50% QQQ / 30% SPY / 20% SMH.
-  Primary: higher net 10 bps CAGR vs G0; worse maxDD is disclosed, not
-  an auto-fail; Sharpe may not be more than 0.10 worse than G0.
+- **MPQ (max profit = frozen 3x ETFs, owner-revised 2026-08-19 before
+  any run):** G0 100% SPY; G1 100% TQQQ; G2 70% TQQQ / 30% SPY; G3
+  50% TQQQ / 30% SPY / 20% SOXL (cap). Daily-reset decay disclosed.
+  Primary: higher net 10 bps CAGR vs G0; terminal wealth vs G0
+  reported; worse maxDD and worse Sharpe are disclosed, not auto-fails.
+  No options/margin/4x.
 - **HPQ (static overlay, not HEDGE-1 UI):** H0 100% SPY; H1 90/10
   SPY/SH; H2 80/20 SPY/SH (SH cap 20%); H3 90/10 SPY/BTAL. Primary:
   ≥10% relative maxDD improvement vs H0 and ≥75% upside capture (when

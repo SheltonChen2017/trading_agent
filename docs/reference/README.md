@@ -30,7 +30,7 @@ deliberately does not restate per-milestone internals.
 | `UI_FEATURE_CONTROLS_DESIGN.md` | Settings/AI-toggle/policy-workflow/suggestions design |
 | `ACTION_PLAN_codex.md` | Codex's independent audit draft (merged into the adopted plan) |
 | `ALLOCATION_POLICY_QC_PLAN.md` | APQ-0..5: long-only defensive ETF mix vs 100% SPY (scheduled family; sequencing still in the action plan) |
-| `MAX_PROFIT_POLICY_QC_PLAN.md` | MPQ-0..5: long-only growth tilt (QQQ/SMH) vs 100% SPY — **proposed**, not scheduled |
+| `MAX_PROFIT_POLICY_QC_PLAN.md` | MPQ-0..5: long-only 3x growth (TQQQ/SOXL) vs 100% SPY — **proposed**, not scheduled |
 | `HEDGE_POLICY_QC_PLAN.md` | HPQ-0..5: static SH/BTAL overlay vs 100% SPY — **proposed**, not scheduled; distinct from HEDGE-1 UI |
 
 The active documentation layout was simplified on 2026-08-17. The `docs/`

@@ -983,6 +983,29 @@ construction, risk, paper-observation infrastructure). Any future
 reopening requires a new owner decision, a new universe or data source,
 and a fresh preregistration — never a rehabilitation of these results.
 
+## R-029 — Allocation-policy QC family, single authorized run (UNANALYSED)
+
+The APQ-4 cloud run of the frozen allocation-policy family
+(`docs/reference/ALLOCATION_POLICY_QC_PLAN.md`; preregistration
+`docs/research/ALLOCATION_POLICY_2026-08-18_PREREGISTRATION.md`). This
+is an allocation-policy observation, NOT an alpha cell: it carries its
+own 3-cell family and 0.05/3 gate and adds nothing to the closed
+cross-sectional program's lifetime floor (A-002 untouched).
+
+| Field | Value |
+|---|---|
+| **Specification** | Four frozen ETF mixes P0 (100% SPY), P1 (40/60 SPY/BIL), P2 (40/20/20/20 +XLP/XLV), P3 (35/55/10 +XLE); monthly close settlement; bind-time drift turnover; window 2022-01-01 → run date |
+| **Research look** | Counted real-market run (run-level count 29 → 30); the plan's single authorized backtest; no statistic observed |
+| **Source commit** | `5694975` (merged main; APQ-1..3 review chain complete at this merge) |
+| **Uploaded source SHA-256** | `86fb7a3f252f8c9848b91abd07ef9607930dec48d15dc6ace1cae0b93c4f8938` (bytes uploaded UNCHANGED — universe-free family, no rewrite) |
+| **QC project** | `35377356` — `25. ALLOCATION_POLICY - 20260819` (QC stored the name without the dot) |
+| **Compile ID** | `929dd05d66d5c97c6155d25a06c42af2-ca76e88335036c8337d128e6fb01c8c2` |
+| **Backtest ID** | `b9696f67a957075103ce848b39d8cc08` |
+| **Launched / completed (UTC)** | 2026-08-19T22:59:13.294928+00:00 / 2026-08-19T22:59:27.953234+00:00 |
+| **Output** | STRUCTURALLY COMPLETE, first attempt: frozen parser round-trip accepted 54 months (202202..202607, the full expected window — January 2022 is consumed by boundary settlement, August 2026 is incomplete), all four policies on one shared date set, 216 rows, 0 declared-unavailable turnovers, 0 refusals. 54 ≥ the frozen 24-month floor. The algorithm holds no QC positions (synthetic policy accounting only), so QC's runtime statistics are the untouched-account boilerplate and reveal nothing. Structural inspection only; no statistic observed. |
+| **Raw log** | `artifacts/qc_apq4_allocation_20260819.log`, 222 lines, exact-file sha256:`898ac2ed4ce67d1f8a6b7b9de25611c79101ca88e737da46e3dafb9d1e36b4e7` (machine-local; hash recorded here) |
+| **Validity** | **UNANALYSED** — reviewed code, structurally complete output, awaiting the single APQ-5 analyser pass (upgrade to VALID in that same commit) |
+
 ## R-005 — Stage 0 monthly battery, A_large, reviewed code (REFUSED)
 
 | Field | Value |

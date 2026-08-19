@@ -2285,13 +2285,30 @@ mutations red then restored (fillna unpinned, nan-turnover guard
 dropped, alignment check dropped). Next: this round's review fixes the
 reporting decision, then APQ-3 (the launch-driver hook).
 
+## 7az. Independent review of APQ-2: ACCEPTED (2026-08-19)
+
+Cursor Grok 4.6 reviewed `92a0077..5364ae6` (both commits on
+`origin/user/claude/apq2-analyser-20260819`) from isolated worktree
+`trading_agent-review-apq2`. Report:
+`docs/Review/REVIEW_2026-08-19_APQ2_ANALYSER.md`. No QC.
+
+**Accepted.** Nine tests passed. `fillna(1.0)→0.0` mutation red on the
+S0R-008 magnitude pin, restored green. Parser refusals and APQ1-003
+count semantics hold. **Reporting decision RATIFIED:** the optional
+excess-mean family stays in the schema (3 cells, 20,000-draw two-sided
+stationary bootstrap, 0.05/3, both labels). Striking it now would be a
+new schema. Open P3 APQ2-001: `mean_turnover` skipna omits months that
+net returns charge at 1.0.
+
+This review does not start APQ-3 or authorize a cloud run.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7ax):** APQ-1 independently **accepted
-after correction**. **Next milestone is APQ-2** (analyser + tests, still
-no QC). The optional excess-mean test family is decided at that review
-by the JSON schema, before any run. Do not launch QuantConnect. SHW-4
-is complete (section 7av); paper-epoch-006 is the live paper epoch.
+**Current (2026-08-19, section 7az):** APQ-2 independently **accepted**;
+the excess-mean reporting decision is frozen in the schema. **Next
+milestone is APQ-3** (launch-driver hook + tests, still no QC). Do not
+launch QuantConnect. SHW-4 is complete (section 7av); paper-epoch-006
+is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

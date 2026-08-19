@@ -418,7 +418,18 @@ def command_sufficiency(args: argparse.Namespace) -> int:
     """
     config = _load_config(args.config)
     store = AssistantStore(args.database)
-    registration = _registration_or_refuse(store, config)
+    # SHW3-001: sufficiency is a READ. A closed epoch never accepts new
+    # observations (observe/mature keep the strict gate), but its record
+    # must stay reportable forever — closing a stream must not make its
+    # evidence unreadable.
+    row = store.get_overlay_stream_registration(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    if row is None:
+        raise OverlayRunnerError(
+            "stream+epoch is not registered; run `register` first"
+        )
+    registration = json.loads(row["registration_json"])
     required = int(registration["required_observation_count"])
     if int(config["required_observation_count"]) != required:
         raise OverlayRunnerError(
@@ -458,9 +469,8 @@ def command_sufficiency(args: argparse.Namespace) -> int:
     report = {
         "stream_name": registration["stream_name"],
         "evidence_epoch": registration["evidence_epoch"],
-        "registration_hash": store.get_overlay_stream_registration(
-            registration["stream_name"], registration["evidence_epoch"]
-        )["registration_hash"],
+        "stream_status": row["status"],
+        "registration_hash": row["registration_hash"],
         "generated_at": _now(),
         "observation_unit": OBSERVATION_UNIT,
         "preregistered_required_count": required,

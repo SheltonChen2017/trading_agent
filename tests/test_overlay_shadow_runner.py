@@ -554,3 +554,34 @@ def test_sufficiency_is_read_only_against_the_database(harness, tmp_path):
     out = tmp_path / "ro_report.json"
     assert runner.main([*argv, "sufficiency", "--output", str(out)]) == 0
     assert snapshot() == before
+
+
+def test_sufficiency_still_reports_a_closed_epoch(harness, tmp_path):
+    """SHW3-001: closing a stream must not make its evidence unreadable.
+    observe keeps refusing; sufficiency reads."""
+    fetch, argv, database, config = harness
+    store = AssistantStore(database)
+    from assistant.overlay_shadow import OverlayStreamRegistration
+    store.register_overlay_stream(OverlayStreamRegistration(
+        stream_name=config["stream_name"],
+        evidence_epoch=config["evidence_epoch"],
+        preregistration_path=config["preregistration_path"],
+        preregistration_sha256="a" * 64,
+        code_commit=COMMIT,
+        schedule_key=config["schedule_key"],
+        schedule_version=config["schedule_version"],
+        universe_members=config["universe_members"],
+        carry_members=config["carry_members"],
+        carry_weight=config["carry_weight"],
+        band_fraction=config["band_fraction"],
+        required_observation_count=config["required_observation_count"],
+        status="closed",
+    ).to_payload())
+    out = tmp_path / "closed_report.json"
+    assert runner.main([*argv, "sufficiency", "--output", str(out)]) == 0
+    report = json.loads(out.read_text(encoding="utf-8"))
+    assert report["stream_status"] == "closed"
+    assert report["sufficiency"] == "NOT_MET"
+    # The write gate is untouched: observe still refuses the closed epoch.
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
+    assert runner.main([*argv, "observe"]) == 1

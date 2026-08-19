@@ -91,7 +91,7 @@ independent verification accepts FCR-001/002 and closes the acknowledgement
 residue. The only research choice before launch is the owner's stage order —
 Stage 0 battery completion or Stage 1 — followed by execution under the
 frozen evidence contract. None of this is deployed: the
-operational runtime remains frozen at `752d3b7` in active `paper-epoch-005`.
+operational runtime is frozen at `c9d0740` in active `paper-epoch-006` (epoch-006 roll, 2026-08-19; see `docs/operations/OPERATIONAL_FACTS.md`).
 Any deployment would close that epoch by changing its `code_commit`.
 
 ---
@@ -112,7 +112,7 @@ deferred. What remains incomplete is GR-6, the allocation service, every AI
 — most importantly — enough **elapsed frozen-
 epoch evidence**: `paper-epoch-001` and `paper-epoch-002` are closed, and
 `paper-epoch-003` and `paper-epoch-004` are closed, and
-**`paper-epoch-005` is active since 2026-08-13** on the epoch host at
+**`paper-epoch-006` is active since 2026-08-19** at `c9d0740` (the epoch-006 roll closed 005 with 3 observations). Historical: `paper-epoch-005` was active 2026-08-13..19 on the epoch host at
 deployed commit `752d3b7`, bound to `my_policy.json`.
 Development changes in this checkout are not deployed into that epoch.
 **Update 2026-08-13 (executed): the epoch-005 roll.** Owner-authorized and
@@ -457,7 +457,7 @@ owner's specific direction.
 
 **Phase 5 — operational deployment + epoch collection (COMPLETE AGAIN after
 the 2026-08-13 epoch-005 roll; epochs 001 through 004 are closed;
-`paper-epoch-005` is active on the epoch host at `752d3b7`; see
+`paper-epoch-006` is active on the epoch host at `c9d0740` (epoch-006 roll, 2026-08-19); see
 `docs/operations/OPERATIONAL_FACTS.md` for the executed sequence):**
 merge the independently reviewed approved mandate → pin the model-2
 operational checkout → elevated scheduler window under the owner's account →

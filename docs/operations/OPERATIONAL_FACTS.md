@@ -174,6 +174,26 @@ July baseline exists and August is incomplete, so the missed daily
 firings were no-ops. The scheduled-execution proof moves to the first
 post-repair firing.
 
+REPAIRED same day: the owner ran the corrected elevated install
+(APQ3-001's completed command). All three tasks re-registered
+Interactive and, on manual start, **actually ran (exit 0)** as "up to
+date" no-ops with `shadow_overlay.db` unchanged (1 registration /
+1 baseline observation / 0 outcomes). Remaining proof: the first
+AUTOMATIC firing, next occurrence 2026-08-20 14:45 local.
+
+### epoch-006's first observation VERIFIED (2026-08-19)
+
+The first scheduled `paper-observation` under `paper-epoch-006` fired
+at exactly 16:30:00 local (task exit 0) and wrote exactly one
+observation row: session 2026-08-19, captured 23:30:06Z, benchmark
+SPY, payload hash `52347796…`. The epoch row's lineage carries
+`code_commit = c9d0740` with lineage hash `9cbca809…` — the roll's
+values — so `lineage_consistent` is no longer vacuous and the
+60-session / 30-order clock is genuinely counting under the deployed
+code. The `policy_fingerprint` in the live epoch row reads
+`4086365c…`, corroborating the flagged-for-audit change. Verified
+read-only (`mode=ro`); no balances read into any record.
+
 ### `paper-epoch-005` is CLOSED (2026-08-19); its roll record follows (2026-08-13)
 
 Owner-authorized and executed in runbook order on the epoch host. Timings are

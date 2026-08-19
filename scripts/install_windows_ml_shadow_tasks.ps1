@@ -21,8 +21,13 @@ param(
 
     [string]$RunAsUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name,
 
+    # Interactive: Credential Guard on domain-joined Windows 11 blocks S4U
+    # task logons SILENTLY (occurrence consumed, no run attempt, no error;
+    # proven live 2026-08-19 by the overlay tasks). The setup wrapper always
+    # passed Interactive explicitly; the default must not be a trap for a
+    # direct invocation.
     [ValidateSet("Interactive", "S4U")]
-    [string]$TaskLogonType = "S4U",
+    [string]$TaskLogonType = "Interactive",
 
     [ValidateRange(5, 60)]
     [int]$SupervisorIntervalMinutes = 15,

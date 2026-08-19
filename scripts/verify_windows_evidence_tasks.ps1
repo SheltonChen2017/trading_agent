@@ -23,8 +23,12 @@ param(
 
     [string]$MlTaskPrefix = "TradingAgent-ML-Shadow",
 
+    # Interactive is the only logon type that actually runs on this host
+    # (Credential Guard silently kills S4U); a defaults-run verification
+    # must therefore expect Interactive, or it would fail correctly
+    # registered tasks and pass S4U misregistrations.
     [ValidateSet("Interactive", "S4U")]
-    [string]$ExpectedTaskLogonType = "S4U",
+    [string]$ExpectedTaskLogonType = "Interactive",
 
     # Installation verification may accept a correctly registered task that
     # has not run yet. Post-start verification must not: Credential Guard can

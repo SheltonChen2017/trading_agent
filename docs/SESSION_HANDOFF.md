@@ -2387,15 +2387,37 @@ overlay ops record share one branch.
 
 This review does not execute APQ-4 or the elevated overlay reinstall.
 
+## 7bd. APQ-3 review counter-reviewed; S4U class closed repo-wide (2026-08-19)
+
+Counter-review (`docs/Review/REVIEW_2026-08-19_APQ3_COUNTERREVIEW.md`)
+VERIFIED the review. APQ3-001's closure was confirmed live twice over:
+the owner hit the missing-parameter prompts in real time, and the
+completed command re-registered all three overlay tasks — which now
+show `LogonType=Interactive` and, decisively, **actually ran (exit 0)
+on manual start**, as the expected no-ops (`shadow_overlay.db`
+unchanged at 1 registration / 1 baseline observation / 0 outcomes;
+sufficiency artifact rewritten 15:45 local). The first AUTOMATIC
+firing (2026-08-20 14:45 local) is the remaining trigger proof.
+
+APQ3-002 was confirmed and GENERALIZED: the sibling sweep found THREE
+S4U defaults (paper installer, ML-shadow installer, and the verifier's
+`ExpectedTaskLogonType` — the last would fail correct tasks and pass
+misregistrations). All three now default Interactive; the dependent
+mock updated; a mutation-verified scan test
+(`test_every_task_logon_type_default_is_interactive`) keeps the class
+closed. APQ3-003 acknowledged, no split of pushed history.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7bc):** APQ-1..3 independently reviewed
-(APQ-3 accepted after the repair-command correction). **APQ-4 is the
-next owner-gated step:** one cloud backtest via the reviewed driver,
-then APQ-5's single analyser pass. Do not launch QuantConnect without
-that owner GO. Overlay live repair remains one elevated install with
-the three required path parameters (section 7bb / OPERATIONAL_FACTS).
-SHW-4 complete; paper-epoch-006 is the live paper epoch.
+**Current (2026-08-19, section 7bd):** APQ-1..3 implemented, reviewed,
+and counter-reviewed. **APQ-4 is the next owner-gated step:** one cloud
+backtest via the reviewed driver, then APQ-5's single analyser pass.
+Do not launch QuantConnect without that owner GO. Overlay tasks are
+repaired (Interactive) and proven runnable; their first automatic
+firing (2026-08-20 14:45 local) and the first epoch-006
+paper-observation lineage check are the outstanding operational
+verifications. SHW-4 complete; paper-epoch-006 is the live paper
+epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

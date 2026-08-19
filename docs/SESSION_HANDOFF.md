@@ -1934,14 +1934,17 @@ Four owner decisions recorded on
    unavailable; poor prior). Action-plan row records the reasons and
    the reopening bar.
 
-Host recommendation for SHW-4 (decision 5, still open): a DEDICATED
-shadow database file (`--database data/shadow_overlay.db`) so the
-frozen paper-epoch-005 operator DB is never opened by a newer tree
-(the standing overlay-table CREATE caution), with the scheduled task
-running from the operational clone once its release advances past
-SHW-1..3 — or, if the owner wants the stream started sooner, from this
-checkout at the exact reviewed commit (registration binds the commit
-and refuses dirty trees either way).
+5. **Host DECIDED 2026-08-19 ("i'll follow your recommendation"):**
+   a DEDICATED shadow database file (`--database
+   data/shadow_overlay.db`) — the frozen paper-epoch-005 operator DB is
+   never opened by a newer tree (the standing overlay-table CREATE
+   caution stays satisfied) — with the scheduled task running from the
+   OPERATIONAL CLONE once its release advances to a commit containing
+   SHW-1..3. The release advance is itself an owner-approved deploy
+   step at SHW-4 time. Until then the stream does not run on a
+   schedule; a manual first registration/baseline from a reviewed
+   commit remains possible if the owner wants the clock started before
+   the release advance.
 
 ## 8. What is next
 

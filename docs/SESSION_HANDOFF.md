@@ -2015,6 +2015,49 @@ Four owner decisions recorded on
    commit remains possible if the owner wants the clock started before
    the release advance.
 
+## 7at. SHW-4 sub-step 1 EXECUTED: the defensive-carry stream is LIVE (2026-08-19)
+
+Owner go ("go SHW-4"). On branch
+`user/claude/shw4-stream-start-20260819`:
+
+- **Committed stream config**
+  (`docs/operations/overlay_shadow_defensive_carry_config.json`,
+  commit `3c9105d`): generated programmatically from `config.UNIVERSE`
+  (104 members, verified no overlap with the carry basket and no
+  duplicates) + TLT/IEF/SHY/GLD, carry weight 0.20, band 0.25,
+  `required_observation_count=24` — all per the FROZEN preregistration.
+- **Registered** `defensive-carry/overlay-epoch-001` into the canonical
+  shadow database `C:/git/trading_agent_operational/data/shadow_overlay.db`
+  (dedicated file beside the operational backups; the operator DB was
+  never opened): preregistration sha256 `5479d6b6459a…`, code commit
+  `3c9105d`, registration hash `39fca6264e29…`.
+- **First baseline observation recorded, AVAILABLE, at 2026-07-31**
+  (levels 100.0 for universe/carry/combined; carry weight 0.20) — all
+  108 members priced on July's final session; the SHW2-001 completeness
+  gate passed on real market data. Observation hash
+  `56bfcd3cf351b02d…`. **The 24-month prospective clock is running.**
+- First sufficiency report: NOT_MET, 0/24 matured months (correct — a
+  matured month needs the next adjacent month's observation; August
+  matures at the first September session's observe).
+
+**Canonical shadow DB path decision (records the host decision's
+mechanics):** one physical file,
+`C:/git/trading_agent_operational/data/shadow_overlay.db`, regardless
+of which checkout invokes the runner — the dev checkout can run manual
+cycles against it now, and the operational scheduler points at the same
+file after the release advance. This avoids the two-checkouts /
+two-databases split.
+
+**Remaining SHW-4 sub-steps, paused for the owner:** (2) the
+operational release advance — BEFORE advancing, verify whether the
+paper-epoch-005 cadence tasks pin their own commit independently of the
+clone's checkout (if they run from the moving checkout, advancing is a
+runtime change to the paper epoch's lineage and needs its own
+decision); (3) the monthly scheduler install after the advance;
+(4) round review. Until the scheduler exists, the monthly cycle is run
+manually (observe + mature + sufficiency after each month's first
+sessions) — the next cycle is due after 2026-08-31's month-end settles.
+
 ## 8. What is next
 
 **Current (2026-08-19, sections 7ar/7as):** SHW-1..3 implemented and

@@ -2461,9 +2461,10 @@ for it); (2) counter-review of Cursor's two incoming plan proposals
 ("max profits", "hedging") — each needs a frozen preregistration and
 family scoping; the A-002 closure is not reopenable through them;
 (3) optional separate owner decision on using P1/P3-style weights on
-the Alpaca/REBAL stack. Outstanding operational verifications: the
-overlay tasks' first automatic firing (2026-08-20 14:45 local) and the
-first epoch-006 paper-observation lineage check. SHW-4 complete;
+the Alpaca/REBAL stack. Operational: the epoch-006 first observation
+is VERIFIED (16:30:00 local, one row, lineage binds `c9d0740` — see
+OPERATIONAL_FACTS); the one remaining check is the overlay tasks'
+first AUTOMATIC firing (2026-08-20 14:45 local). SHW-4 complete;
 paper-epoch-006 is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

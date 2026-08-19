@@ -2070,8 +2070,35 @@ epoch.** Owner options for sub-step 2:
   no paper-epoch interaction, at the cost of another checkout to
   manage; would amend decision 5's mechanics.
 
-Sub-steps (3) scheduler install and (4) round review follow whichever
-option is chosen.
+**Owner chose (b) 2026-08-19.** Execution order per
+`docs/EPOCH_005_ROLL_PLAN.md`'s preconditions and the runbook:
+
+1. THIS branch completes with the scheduler installer
+   (`scripts/install_windows_overlay_shadow_task.ps1`, ML-installer
+   pattern: elevation + store-alias preconditions, WhatIf preview,
+   exact-name verification; daily weekday triggers at 17:45/17:55/18:05
+   ET — after the paper 16:30 window and the ML shadow chain — with the
+   monthly cadence enforced by the runner's idempotency; it never
+   touches the Paper-* or ML-Shadow-* tasks).
+2. **Round review, then owner merge** — the roll plan's precondition 4
+   requires a REVIEWED mainline deploy target.
+3. Execute the roll (owner present, not near the 16:30 local
+   observation window): disable the four Paper tasks → close
+   paper-epoch-005 on the still-current commit → deploy the reviewed
+   main tip into the operational clone → `ledger-reconcile` matched →
+   `readiness` → start paper-epoch-006 on the exact deployed commit →
+   all five drills → re-enable tasks → verify the first SCHEDULED
+   paper observation binds the new lineage.
+4. Install the overlay shadow tasks (elevated) pointing at the
+   canonical shadow DB and the committed config; verify the first
+   scheduled no-op run.
+
+The stream itself is already live and unaffected by the roll timing —
+manual cycles cover any gap.
+
+Epoch-005 cost note for the record: closing it discards its accrued
+paper evidence (epoch started 2026-08-13; the roll plan's rule — the
+cost only grows — argues for executing promptly after review).
 
 ## 8. What is next
 

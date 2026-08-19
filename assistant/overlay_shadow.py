@@ -172,6 +172,11 @@ class OverlayStreamRegistration:
     carry_members: tuple[str, ...]
     carry_weight: str
     band_fraction: str
+    #: Preregistered independent-observation requirement for THIS stream
+    #: (matured adjacent-month outcomes). Frozen at registration; the
+    #: sufficiency report reads it from here, never from a live config,
+    #: and no default exists on purpose (CLAUDE.md section 6).
+    required_observation_count: int
     status: str = "shadow"
 
     def __post_init__(self) -> None:
@@ -191,6 +196,12 @@ class OverlayStreamRegistration:
             )
         object.__setattr__(self, "carry_weight", _bounded_fraction(self.carry_weight, "carry_weight", _MIN_WEIGHT, _MAX_WEIGHT))
         object.__setattr__(self, "band_fraction", _bounded_fraction(self.band_fraction, "band_fraction", _MIN_BAND, _MAX_BAND))
+        count = self.required_observation_count
+        if isinstance(count, bool) or not isinstance(count, int) or count < 1:
+            raise OverlayContractError(
+                "required_observation_count must be a positive integer "
+                "preregistered for this stream; there is no universal default"
+            )
         if self.status not in STREAM_STATUSES:
             raise OverlayContractError(
                 "stream status must be one of "
@@ -210,6 +221,7 @@ class OverlayStreamRegistration:
             "carry_members": list(self.carry_members),
             "carry_weight": self.carry_weight,
             "band_fraction": self.band_fraction,
+            "required_observation_count": self.required_observation_count,
             "status": self.status,
         }
 

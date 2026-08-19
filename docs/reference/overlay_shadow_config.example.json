@@ -4,8 +4,17 @@
   "preregistration_path": "docs/research/DEFENSIVE_CARRY_2026-08-18_PREREGISTRATION.md",
   "schedule_key": "overlay-monthly",
   "schedule_version": "1",
-  "universe_members": ["EXAMPLE_TICKER_A", "EXAMPLE_TICKER_B"],
-  "carry_members": ["GLD", "IEF", "SHY", "TLT"],
+  "universe_members": [
+    "EXAMPLE_TICKER_A",
+    "EXAMPLE_TICKER_B"
+  ],
+  "carry_members": [
+    "GLD",
+    "IEF",
+    "SHY",
+    "TLT"
+  ],
   "carry_weight": "0.20",
-  "band_fraction": "0.25"
+  "band_fraction": "0.25",
+  "required_observation_count": 24
 }

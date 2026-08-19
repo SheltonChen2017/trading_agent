@@ -68,7 +68,15 @@ _CONFIG_KEYS = frozenset({
     "stream_name", "evidence_epoch", "preregistration_path",
     "schedule_key", "schedule_version", "universe_members",
     "carry_members", "carry_weight", "band_fraction",
+    "required_observation_count",
 })
+#: The observation unit the sufficiency report declares. Matured
+#: outcomes are ADJACENT-month returns (SHW2-002), so they do not
+#: overlap and each is one independent observation.
+OBSERVATION_UNIT = (
+    "calendar month settled on exchange sessions "
+    "(adjacent-month matured outcomes; non-overlapping)"
+)
 
 
 class OverlayRunnerError(RuntimeError):
@@ -113,6 +121,7 @@ def _registration_contract(config: dict) -> OverlayStreamRegistration:
         carry_members=config["carry_members"],
         carry_weight=config["carry_weight"],
         band_fraction=config["band_fraction"],
+        required_observation_count=config["required_observation_count"],
     )
 
 
@@ -398,6 +407,105 @@ def command_status(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_sufficiency(args: argparse.Namespace) -> int:
+    """SHW-3: the section-6 sufficiency report. Counts only, no statistic.
+
+    The required count is read from the FROZEN registration row, never
+    from the live config; a drifted config refuses loudly rather than
+    silently reporting against a different requirement. Gate evaluation
+    is NOT performed here at any count — it is a separate,
+    owner-authorized single pass, exactly like the QC analysers.
+    """
+    config = _load_config(args.config)
+    store = AssistantStore(args.database)
+    # SHW3-001: sufficiency is a READ. A closed epoch never accepts new
+    # observations (observe/mature keep the strict gate), but its record
+    # must stay reportable forever — closing a stream must not make its
+    # evidence unreadable.
+    row = store.get_overlay_stream_registration(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    if row is None:
+        raise OverlayRunnerError(
+            "stream+epoch is not registered; run `register` first"
+        )
+    registration = json.loads(row["registration_json"])
+    required = int(registration["required_observation_count"])
+    if int(config["required_observation_count"]) != required:
+        raise OverlayRunnerError(
+            "config drift: required_observation_count "
+            f"{config['required_observation_count']} does not match the "
+            f"frozen registration value {required}; the registration is "
+            "the authority"
+        )
+    observations = store.get_overlay_observations(
+        registration["stream_name"], registration["evidence_epoch"]
+    )
+    outcomes = store.get_overlay_outcomes(
+        registration["stream_name"], registration["evidence_epoch"]
+    )
+    available = [o for o in observations if o["available"]]
+    refused = [o for o in observations if not o["available"]]
+    matured = len(outcomes)
+    sufficient = matured >= required
+    reasons: list[str] = []
+    if not sufficient:
+        reasons.append(
+            f"{matured} matured independent month(s) of the preregistered "
+            f"{required} required"
+        )
+        if refused:
+            reasons.append(
+                f"{len(refused)} cycle(s) refused or missed, first "
+                f"{refused[0]['cycle_session']}"
+            )
+        if not observations:
+            reasons.append("the stream has no observations yet")
+        elif available:
+            reasons.append(
+                f"stream baseline {available[0]['cycle_session']}; a matured "
+                "month requires the NEXT adjacent month's observation"
+            )
+    report = {
+        "stream_name": registration["stream_name"],
+        "evidence_epoch": registration["evidence_epoch"],
+        "stream_status": row["status"],
+        "registration_hash": row["registration_hash"],
+        "generated_at": _now(),
+        "observation_unit": OBSERVATION_UNIT,
+        "preregistered_required_count": required,
+        "independent_observation_count": matured,
+        "sufficiency": "MET" if sufficient else "NOT_MET",
+        "insufficiency_reasons": reasons,
+        "counts": {
+            "cycles": len(observations),
+            "available_observations": len(available),
+            "refused_or_missed_cycles": len(refused),
+            "matured_outcomes": matured,
+        },
+        "first_cycle": observations[0]["cycle_session"] if observations else None,
+        "last_cycle": observations[-1]["cycle_session"] if observations else None,
+        "gate_evaluation": (
+            "NOT PERFORMED HERE AT ANY COUNT: evaluating the preregistered "
+            "gates is a separate, owner-authorized single pass"
+        ),
+        "point_in_time_data": False,
+    }
+    payload = json.dumps(report, indent=2, sort_keys=True)
+    if args.output:
+        out = Path(args.output)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        out.write_text(payload, encoding="utf-8")
+        print(f"wrote {out}")
+    print(
+        f"sufficiency: {report['sufficiency']} "
+        f"({matured}/{required} matured months)"
+    )
+    for reason in reasons:
+        print(f"  - {reason}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--database", required=True)
@@ -406,8 +514,12 @@ def main(argv: list[str] | None = None) -> int:
     for name, handler in (
         ("register", command_register), ("observe", command_observe),
         ("mature", command_mature), ("status", command_status),
+        ("sufficiency", command_sufficiency),
     ):
         command = sub.add_parser(name)
+        if name == "sufficiency":
+            command.add_argument("--output", default=None,
+                                 help="optional JSON report path")
         command.set_defaults(handler=handler, command_name=name)
     args = parser.parse_args(argv)
     try:

@@ -37,6 +37,7 @@ def _registration(**overrides):
         carry_members=("GLD", "IEF", "SHY", "TLT"),
         carry_weight="0.20",
         band_fraction="0.25",
+        required_observation_count=24,
     )
     values.update(overrides)
     return OverlayStreamRegistration(**values)

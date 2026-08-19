@@ -314,7 +314,8 @@ def test_observe_failure_records_a_durable_alert(harness, monkeypatch):
     assert any("provider exploded" in a["message"] for a in alerts)
 
 
-def test_observe_refuses_an_unregistered_or_closed_stream(harness):
+def test_observe_refuses_an_unregistered_stream(harness):
+    """SHW2-007: the closed-epoch half lives in its own test below."""
     fetch, argv, database, config = harness
     _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
     assert runner.main([*argv, "observe"]) == 1   # not registered
@@ -419,3 +420,29 @@ def test_observation_cannot_assert_point_in_time_data(harness):
         config["stream_name"], config["evidence_epoch"]
     )
     assert json.loads(rows[0]["observation_json"])["point_in_time_data"] is False
+
+
+def test_mature_calendar_guard_holds_even_without_intervening_rows(harness):
+    """SHW2-006: two available rows in non-adjacent months with NO gap
+    row between them (inserted directly, bypassing observe) must still
+    not settle — the calendar guard is load-bearing on its own, not just
+    a shadow of row adjacency."""
+    fetch, argv, database, config = harness
+    runner.main([*argv, "register"])
+    store = AssistantStore(database)
+    from assistant.overlay_shadow import OverlayObservation
+    for cycle, level in ((FEB27, 100.0), (MAY29, 180.0)):
+        store.record_overlay_observation(OverlayObservation(
+            stream_name=config["stream_name"],
+            evidence_epoch=config["evidence_epoch"],
+            cycle_session=cycle.isoformat(),
+            generated_at="2026-06-01T21:00:00+00:00",
+            provider="test", inputs_sha256="a" * 64, available=True,
+            index_levels={"universe": level, "carry": 100.0,
+                          "combined": level},
+            combined_carry_weight=0.20,
+        ).to_payload())
+    assert runner.main([*argv, "mature"]) == 0
+    assert store.get_overlay_outcomes(
+        config["stream_name"], config["evidence_epoch"]
+    ) == []

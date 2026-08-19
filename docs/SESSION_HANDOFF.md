@@ -1816,11 +1816,36 @@ performance/sufficiency output (SHW-3). SHW-4 registration still
 requires the owner to freeze the defensive-carry preregistration's
 [TO FREEZE] gates first.
 
+## 7an. Independent review of SHW-2 (2026-08-19)
+
+Cursor Grok 4.6 reviewed `d4c04c4..354a233` at exact head
+`354a233243d676aae05b1dc3bf53b29d6b96c2b3`
+(`origin/user/claude/shw2-overlay-runner-20260818`). Report:
+`docs/Review/REVIEW_2026-08-19_SHW2_OVERLAY_RUNNER.md`.
+
+**Accepted with P2 blockers.** All three commits dispositioned. Focused
+tests 28 passed. One reverse mutation red then restored (baseline
+target = first completed month-end). No operator DB. No product
+correction in the review.
+
+- **SHW2-001 P2:** first `observe` writes an available baseline at 100.0
+  even when a member has no close on that session (probed: DDD missing
+  on 2026-02-27).
+- **SHW2-002 P2:** `mature` stores a multi-month span in
+  `monthly_returns` (probed: Feb→May gap, universe return 1.0 on
+  cycle 2026-02-27).
+- SHW2-003/004/005 P3: closed-stream test incomplete; design still
+  lists SHW-2 scheduler wiring; float band math / non-PIT Yahoo.
+
+Do not start SHW-3 or register a live overlay epoch until SHW2-001 and
+SHW2-002 are fixed. Keep `paper-epoch-005` on `752d3b7`.
+
 ## 8. What is next
 
-**Current (2026-08-18, section 7al):** SHW-2 is blocked on POST-001.
-APQ-1 is not scheduled. `paper-epoch-005` stays on `752d3b7`. Do not
-open the operator DB from a post-`f40c2c1` tree.
+**Current (2026-08-19, section 7an):** SHW-2 reviewed; SHW-3 and live
+epoch registration blocked on SHW2-001/002. APQ-1 is not scheduled.
+`paper-epoch-005` stays on `752d3b7`. Do not open the operator DB from
+a post-`f40c2c1` tree.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

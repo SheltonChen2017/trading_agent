@@ -2015,6 +2015,91 @@ Four owner decisions recorded on
    commit remains possible if the owner wants the clock started before
    the release advance.
 
+## 7at. SHW-4 sub-step 1 EXECUTED: the defensive-carry stream is LIVE (2026-08-19)
+
+Owner go ("go SHW-4"). On branch
+`user/claude/shw4-stream-start-20260819`:
+
+- **Committed stream config**
+  (`docs/operations/overlay_shadow_defensive_carry_config.json`,
+  commit `3c9105d`): generated programmatically from `config.UNIVERSE`
+  (104 members, verified no overlap with the carry basket and no
+  duplicates) + TLT/IEF/SHY/GLD, carry weight 0.20, band 0.25,
+  `required_observation_count=24` — all per the FROZEN preregistration.
+- **Registered** `defensive-carry/overlay-epoch-001` into the canonical
+  shadow database `C:/git/trading_agent_operational/data/shadow_overlay.db`
+  (dedicated file beside the operational backups; the operator DB was
+  never opened): preregistration sha256 `5479d6b6459a…`, code commit
+  `3c9105d`, registration hash `39fca6264e29…`.
+- **First baseline observation recorded, AVAILABLE, at 2026-07-31**
+  (levels 100.0 for universe/carry/combined; carry weight 0.20) — all
+  108 members priced on July's final session; the SHW2-001 completeness
+  gate passed on real market data. Observation hash
+  `56bfcd3cf351b02d…`. **The 24-month prospective clock is running.**
+- First sufficiency report: NOT_MET, 0/24 matured months (correct — a
+  matured month needs the next adjacent month's observation; August
+  matures at the first September session's observe).
+
+**Canonical shadow DB path decision (records the host decision's
+mechanics):** one physical file,
+`C:/git/trading_agent_operational/data/shadow_overlay.db`, regardless
+of which checkout invokes the runner — the dev checkout can run manual
+cycles against it now, and the operational scheduler points at the same
+file after the release advance. This avoids the two-checkouts /
+two-databases split.
+
+**Remaining SHW-4 sub-steps, paused for the owner — and the pinning
+check is DONE with a material finding:**
+`scripts/install_windows_operational_tasks.ps1` runs every paper task
+with `WorkingDirectory` = the clone and NO commit pin — the checkout IS
+the pin. **Advancing the operational clone therefore changes the code
+the paper-epoch-005 cadence executes: a lineage change that closes the
+epoch.** Owner options for sub-step 2:
+
+- **(a) RECOMMENDED — defer the advance**: run the shadow cycle
+  manually each month from the dev checkout against the same canonical
+  DB (one command after the month's first sessions; next due after
+  2026-08-31 settles). Zero risk to epoch-005; install the scheduler at
+  the next NATURAL release advance / epoch roll.
+- **(b) Advance now with a planned epoch roll** to paper-epoch-006,
+  following the established roll process (close the epoch BEFORE
+  deploying — the epoch-003 lesson). Epoch-005 is only ~6 days old, so
+  the lost accumulation is small; this buys full automation
+  immediately.
+- **(c) A third, shadow-only pinned checkout** for the scheduler —
+  no paper-epoch interaction, at the cost of another checkout to
+  manage; would amend decision 5's mechanics.
+
+**Owner chose (b) 2026-08-19.** Execution order per
+`docs/EPOCH_005_ROLL_PLAN.md`'s preconditions and the runbook:
+
+1. THIS branch completes with the scheduler installer
+   (`scripts/install_windows_overlay_shadow_task.ps1`, ML-installer
+   pattern: elevation + store-alias preconditions, WhatIf preview,
+   exact-name verification; daily weekday triggers at 17:45/17:55/18:05
+   ET — after the paper 16:30 window and the ML shadow chain — with the
+   monthly cadence enforced by the runner's idempotency; it never
+   touches the Paper-* or ML-Shadow-* tasks).
+2. **Round review, then owner merge** — the roll plan's precondition 4
+   requires a REVIEWED mainline deploy target.
+3. Execute the roll (owner present, not near the 16:30 local
+   observation window): disable the four Paper tasks → close
+   paper-epoch-005 on the still-current commit → deploy the reviewed
+   main tip into the operational clone → `ledger-reconcile` matched →
+   `readiness` → start paper-epoch-006 on the exact deployed commit →
+   all five drills → re-enable tasks → verify the first SCHEDULED
+   paper observation binds the new lineage.
+4. Install the overlay shadow tasks (elevated) pointing at the
+   canonical shadow DB and the committed config; verify the first
+   scheduled no-op run.
+
+The stream itself is already live and unaffected by the roll timing —
+manual cycles cover any gap.
+
+Epoch-005 cost note for the record: closing it discards its accrued
+paper evidence (epoch started 2026-08-13; the roll plan's rule — the
+cost only grows — argues for executing promptly after review).
+
 ## 8. What is next
 
 **Current (2026-08-19, sections 7ar/7as):** SHW-1..3 implemented and

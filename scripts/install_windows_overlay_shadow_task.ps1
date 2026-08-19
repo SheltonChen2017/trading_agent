@@ -17,8 +17,13 @@ param(
 
     [string]$RunAsUser = [Security.Principal.WindowsIdentity]::GetCurrent().Name,
 
+    # Interactive matches the working paper/ML tasks on the operational
+    # host. S4U silently never starts there (2026-08-19: the corporate
+    # policy denies the batch-logon token, the scheduler consumes each
+    # occurrence with no run attempt and no error, and even
+    # `schtasks /run` reports SUCCESS while the task stays never-run).
     [ValidateSet("Interactive", "S4U")]
-    [string]$TaskLogonType = "S4U",
+    [string]$TaskLogonType = "Interactive",
 
     [datetime]$ObserveLocalTime = [datetime]::MinValue,
 

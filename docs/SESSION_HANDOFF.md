@@ -2319,13 +2319,105 @@ commit as any new 7-series section) reviewer-fixed and verified.
 **APQ-3 (launch-driver hook) is next**; APQ-4's single cloud run stays
 owner-gated behind the APQ-1..3 review chain.
 
+## 7ba. APQ-3 implemented: the launch-driver allocation hook (2026-08-19)
+
+Owner merged the APQ-2 review (PR #272) and said "proceed to APQ3".
+Branch `user/claude/apq3-driver-hook-20260819` off `95a7210`. No QC.
+
+Changes to `scripts/run_qc_stage0.py` per the plan's APQ-3 section:
+
+- `FAMILIES["allocation"] = ("ALLOCATION_POLICY", LEAN /
+  "allocation_policy.py")` and `UNIVERSE_FREE_FAMILIES =
+  frozenset({"allocation"})`.
+- New `_resolve_universe(family, universe)`: a universe-free family
+  REFUSES a supplied `--universe` (a silently ignored flag would
+  misdescribe the run); every other family refuses a missing one.
+  `--universe` is now optional at argparse level; enforcement moved to
+  this validator.
+- `launch()` uploads a universe-free family's reviewed bytes UNCHANGED
+  (still sha256-hashed, still `require_clean=True`), guarded by an
+  anchored `^ACTIVE_UNIVERSE\b` refusal in case the file is ever
+  misclassified; screened families retarget exactly as before.
+- `_project_name` drops the universe segment when universe is None:
+  `{n}. ALLOCATION_POLICY - {YYYYMMDD}`.
+
+Tests (`tests/test_qc_stage0_runner.py`, 18 passed): the
+every-family retarget test now skips `UNIVERSE_FREE_FAMILIES`; new
+tests pin the allocation mapping + no-ACTIVE_UNIVERSE-declaration (the
+frozen file's docstring MENTIONS the constant, so the pin uses the same
+anchored regex as the launch guard, not a substring), retargeter
+refusal on the real file, both `_resolve_universe` refusal directions,
+and the universe-free project name. Both plan-required reverse
+mutations run separately, red, restored green: (A) removing
+`allocation` from `UNIVERSE_FREE_FAMILIES` → 3 failures including the
+launch-precondition retarget test; (B) dropping `require_clean=True` →
+the QCS0CR-002 pin fails.
+
+APQ-3 does NOT authorize a run: APQ-4's single cloud launch remains
+owner-gated behind independent review of APQ-1..3.
+
+## 7bb. Overlay tasks never fired: S4U logon dead on the host (2026-08-19)
+
+Same-day check of the overlay tasks' first scheduled firing found the
+14:45/14:55 occurrences silently skipped (no run attempt, no error,
+NextRun rolled to tomorrow). Root cause: the overlay installer
+registered with **LogonType=S4U**, which Credential Guard blocks on
+this domain-joined host — the exact known failure mode in
+`tests/test_setup_operational_host.py` that already forced every
+working paper task to Interactive. Installer default fixed to
+Interactive this round; the live repair needs ONE elevated owner
+command (recorded in `docs/operations/OPERATIONAL_FACTS.md`). Science
+impact none: the runner is idempotent and monthly-cadence, and today's
+firings would have been `up to date` no-ops.
+
+## 7bc. Independent review of APQ-3: ACCEPTED AFTER CORRECTION (2026-08-19)
+
+Cursor Grok 4.6 reviewed `95a7210..1a63c8c` (both commits) from
+isolated worktree `trading_agent-review-apq3`. Report:
+`docs/Review/REVIEW_2026-08-19_APQ3_DRIVER_HOOK.md`. No QC.
+
+**Accepted after APQ3-001.** Driver tests 18 passed. Plan mutations
+reproduced: empty `UNIVERSE_FREE_FAMILIES` reds 3 tests; dropping
+`require_clean=True` reds QCS0CR-002. Allocation bytes stay unretargeted
+and hashed. Overlay installer default Interactive is correct for this
+host. **P2 closed here:** the facts repair one-liner omitted mandatory
+`-PythonPath`/`-DatabasePath`/`-ConfigPath` and would not re-register.
+Open P3: paper installer source still defaults S4U; APQ-3 and the
+overlay ops record share one branch.
+
+This review does not execute APQ-4 or the elevated overlay reinstall.
+
+## 7bd. APQ-3 review counter-reviewed; S4U class closed repo-wide (2026-08-19)
+
+Counter-review (`docs/Review/REVIEW_2026-08-19_APQ3_COUNTERREVIEW.md`)
+VERIFIED the review. APQ3-001's closure was confirmed live twice over:
+the owner hit the missing-parameter prompts in real time, and the
+completed command re-registered all three overlay tasks — which now
+show `LogonType=Interactive` and, decisively, **actually ran (exit 0)
+on manual start**, as the expected no-ops (`shadow_overlay.db`
+unchanged at 1 registration / 1 baseline observation / 0 outcomes;
+sufficiency artifact rewritten 15:45 local). The first AUTOMATIC
+firing (2026-08-20 14:45 local) is the remaining trigger proof.
+
+APQ3-002 was confirmed and GENERALIZED: the sibling sweep found THREE
+S4U defaults (paper installer, ML-shadow installer, and the verifier's
+`ExpectedTaskLogonType` — the last would fail correct tasks and pass
+misregistrations). All three now default Interactive; the dependent
+mock updated; a mutation-verified scan test
+(`test_every_task_logon_type_default_is_interactive`) keeps the class
+closed. APQ3-003 acknowledged, no split of pushed history.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7az):** APQ-2 independently **accepted**;
-the excess-mean reporting decision is frozen in the schema. **Next
-milestone is APQ-3** (launch-driver hook + tests, still no QC). Do not
-launch QuantConnect. SHW-4 is complete (section 7av); paper-epoch-006
-is the live paper epoch.
+**Current (2026-08-19, section 7bd):** APQ-1..3 implemented, reviewed,
+and counter-reviewed. **APQ-4 is the next owner-gated step:** one cloud
+backtest via the reviewed driver, then APQ-5's single analyser pass.
+Do not launch QuantConnect without that owner GO. Overlay tasks are
+repaired (Interactive) and proven runnable; their first automatic
+firing (2026-08-20 14:45 local) and the first epoch-006
+paper-observation lineage check are the outstanding operational
+verifications. SHW-4 complete; paper-epoch-006 is the live paper
+epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

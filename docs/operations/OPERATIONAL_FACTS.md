@@ -142,6 +142,38 @@ exists, epoch-006 has **0 observations** and any
 (14:45 local) should print `up to date` — the July baseline exists and
 August is incomplete; that no-op IS the scheduled-execution proof.
 
+### The overlay tasks' first firing was SKIPPED: S4U logon is dead on this host (2026-08-19)
+
+The 14:45/14:55 local occurrences never started: the scheduler consumed
+each occurrence with **no run attempt and no error** (LastTaskResult
+stayed 267011 "never run", NextRunTime rolled to tomorrow) despite
+State=Ready, Enabled, AC power, StartWhenAvailable, and the user logged
+on. Even `schtasks /run` reported SUCCESS while the task stayed
+never-run, and unelevated `Set-ScheduledTask`/`Start-ScheduledTask`
+cannot repair or exercise them (Access is denied).
+
+Root cause: the overlay installer registered its tasks with
+**LogonType=S4U**, but Credential Guard on this domain-joined Windows 11
+host blocks S4U task logons — the exact failure mode already documented
+in `tests/test_setup_operational_host.py`, which is why every working
+`TradingAgent-Paper-*` task uses **Interactive**. The overlay installer
+repeated the S4U mistake; its default is now Interactive (fixed
+2026-08-19 with the APQ-3 round).
+
+Repair requires one elevated owner command (same elevation as the
+original install; use the operational clone's copy). The installer
+still requires `-PythonPath`, `-DatabasePath`, and `-ConfigPath`;
+`-TaskLogonType Interactive` alone will fail parameter validation:
+
+```text
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\git\trading_agent_operational\scripts\install_windows_overlay_shadow_task.ps1 -PythonPath <real python.exe, not a Store alias> -DatabasePath C:\git\trading_agent_operational\data\shadow_overlay.db -ConfigPath C:\git\trading_agent_operational\docs\operations\overlay_shadow_defensive_carry_config.json -TaskLogonType Interactive
+```
+
+Science impact: none. The runner is idempotent and monthly-cadence; the
+July baseline exists and August is incomplete, so the missed daily
+firings were no-ops. The scheduled-execution proof moves to the first
+post-repair firing.
+
 ### `paper-epoch-005` is CLOSED (2026-08-19); its roll record follows (2026-08-13)
 
 Owner-authorized and executed in runbook order on the epoch host. Timings are

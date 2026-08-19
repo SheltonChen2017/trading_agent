@@ -119,3 +119,26 @@ def test_incident_rationale_is_recorded_beside_the_code():
     deciding they look redundant and removing them."""
     assert "0xC000013A" in _SCRIPT
     assert "RestartCount does not cover" in _SCRIPT
+
+
+def test_every_task_logon_type_default_is_interactive():
+    """Incident 2026-08-19: the overlay installer defaulted to S4U, which
+    Credential Guard blocks SILENTLY on this domain-joined host -- the
+    scheduler consumed each occurrence with no run attempt and no error,
+    and even `schtasks /run` reported SUCCESS while the task stayed
+    never-run. The setup wrapper always passed Interactive explicitly, so
+    only defaults-run direct invocations were exposed; this scan keeps any
+    future installer or verifier from reintroducing the trap."""
+    scripts_dir = Path(__file__).resolve().parent.parent / "scripts"
+    defaults = []
+    for script in sorted(scripts_dir.glob("*.ps1")):
+        text = script.read_text(encoding="utf-8")
+        for match in re.finditer(
+            r"\[string\]\$(?:Expected)?TaskLogonType\s*=\s*\"(\w+)\"", text
+        ):
+            defaults.append((script.name, match.group(1)))
+    assert defaults, "expected at least one TaskLogonType default to scan"
+    wrong = [(name, value) for name, value in defaults if value != "Interactive"]
+    assert not wrong, (
+        f"S4U task logons die silently under Credential Guard: {wrong}"
+    )

@@ -413,7 +413,7 @@ def test_windows_verifier_accepts_a_freshly_installed_never_run_task(tmp_path):
                 "        Principal = [PSCustomObject]@{",
                 f"            UserId = {ps_quote(short_user)}",
                 "            RunLevel = 'Limited'",
-                "            LogonType = 'S4U'",
+                "            LogonType = 'Interactive'",
                 "        }",
                 "        Actions = @([PSCustomObject]@{",
                 f"            Execute = {ps_quote(sys.executable)}",

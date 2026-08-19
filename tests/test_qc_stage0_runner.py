@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import hashlib
+import re
 
 import pytest
 
@@ -158,8 +159,11 @@ def test_every_family_file_retargets_each_universe_by_one_line():
     must contain exactly one rewritable ACTIVE_UNIVERSE constant, and the
     rewrite must change that line and nothing else. A second constant or
     a reformatted declaration would otherwise surface only as a refused
-    cloud launch -- a counted look."""
+    cloud launch -- a counted look. Universe-free families (APQ-3) are
+    exempt here and covered by their own no-retarget test below."""
     for family, (label, path) in runner.FAMILIES.items():
+        if family in runner.UNIVERSE_FREE_FAMILIES:
+            continue
         source = path.read_text(encoding="utf-8")
         for universe in runner.UNIVERSES:
             rewritten = runner._retarget_universe(source, universe)
@@ -176,3 +180,39 @@ def test_every_family_file_retargets_each_universe_by_one_line():
                 assert changed[0][1] == expected, (family, universe)
             else:
                 assert expected in source, (family, universe)
+
+
+def test_allocation_family_is_not_universe_retargeted():
+    """APQ-3: the allocation family is universe-free. Its reviewed source
+    must contain NO ACTIVE_UNIVERSE declaration, so routing it through
+    the retargeter refuses (found 0) instead of silently uploading a
+    file whose screen is unknown -- the dangerous direction is a future
+    edit that reintroduces a universe screen without reclassifying the
+    family."""
+    assert "allocation" in runner.UNIVERSE_FREE_FAMILIES
+    assert runner.FAMILIES["allocation"] == (
+        "ALLOCATION_POLICY", runner.LEAN / "allocation_policy.py"
+    )
+    source = runner.FAMILIES["allocation"][1].read_text(encoding="utf-8")
+    # Same anchored pattern the launch guard uses: no line may DECLARE the
+    # constant (the frozen file's docstring mentioning it is fine).
+    assert not re.search(r"^ACTIVE_UNIVERSE\b", source, flags=re.M)
+    with pytest.raises(SystemExit, match="refusing"):
+        runner._retarget_universe(source, "A_large")
+
+
+def test_resolve_universe_enforces_the_family_pairing():
+    """Both mismatch directions refuse: a --universe on a universe-free
+    family would misdescribe the run; a missing one on a screened family
+    would launch an unknown screen."""
+    assert runner._resolve_universe("allocation", None) is None
+    with pytest.raises(SystemExit, match="universe-free"):
+        runner._resolve_universe("allocation", "A_large")
+    assert runner._resolve_universe("monthly", "B_core") == "B_core"
+    with pytest.raises(SystemExit, match="requires --universe"):
+        runner._resolve_universe("monthly", None)
+
+
+def test_allocation_project_name_has_no_universe_segment():
+    assert (runner._project_name(25, "ALLOCATION_POLICY", None, "20260819")
+            == "25. ALLOCATION_POLICY - 20260819")

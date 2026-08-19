@@ -318,3 +318,104 @@ def test_observe_refuses_an_unregistered_or_closed_stream(harness):
     fetch, argv, database, config = harness
     _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
     assert runner.main([*argv, "observe"]) == 1   # not registered
+
+
+def test_baseline_refuses_when_any_member_is_unpriced(harness):
+    """SHW2-001: an available t0 with an unpriced member would poison
+    every later cycle boundary; the baseline must refuse and retry at
+    the next month-end instead."""
+    fetch, argv, database, config = harness
+    runner.main([*argv, "register"])
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0},
+             tickers=("AAA", "BBB", "CCC"))
+    fetch.data["DDD"] = {MAR02: 100.0}          # no FEB27 close
+    assert runner.main([*argv, "observe"]) == 0
+    store = AssistantStore(database)
+    rows = store.get_overlay_observations(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    assert len(rows) == 1 and rows[0]["available"] == 0
+    refusal = json.loads(rows[0]["observation_json"])
+    assert any("DDD" in reason for reason in refusal["refusal_reasons"])
+    # The stream HEALS: DDD priced at the next month-end -> baseline there.
+    _set_all(fetch, {MAR31: 100.0, APR01: 100.0})
+    assert runner.main([*argv, "observe"]) == 0
+    rows = store.get_overlay_observations(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    assert rows[-1]["cycle_session"] == MAR31.isoformat()
+    assert rows[-1]["available"] == 1
+
+
+def test_mature_never_settles_a_multi_month_span_as_monthly(harness):
+    """SHW2-002: a pair of available observations separated by gap or
+    refusal cycles spans several months; `monthly_returns` must not
+    settle it. Only calendar-adjacent available pairs mature."""
+    fetch, argv, database, config = harness
+    runner.main([*argv, "register"])
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
+    runner.main([*argv, "observe"])                       # baseline FEB27
+    _set_all(fetch, {MAR31: 150.0, APR30: 180.0, MAY29: 200.0, JUN01: 201.0},
+             tickers=UNIVERSE)
+    _set_all(fetch, {MAR31: 100.0, APR30: 100.0, MAY29: 100.0, JUN01: 100.0},
+             tickers=CARRY)
+    runner.main([*argv, "observe"])       # gaps at MAR31/APR30, obs at MAY29
+    assert runner.main([*argv, "mature"]) == 0
+    store = AssistantStore(database)
+    assert store.get_overlay_outcomes(
+        config["stream_name"], config["evidence_epoch"]
+    ) == []
+
+
+def test_observe_refuses_a_closed_epoch_with_an_alert(harness):
+    """SHW2-003: the closed-stream gate, actually exercised."""
+    fetch, argv, database, config = harness
+    store = AssistantStore(database)
+    from assistant.overlay_shadow import OverlayStreamRegistration
+    registration = OverlayStreamRegistration(
+        stream_name=config["stream_name"],
+        evidence_epoch=config["evidence_epoch"],
+        preregistration_path=config["preregistration_path"],
+        preregistration_sha256="a" * 64,
+        code_commit=COMMIT,
+        schedule_key=config["schedule_key"],
+        schedule_version=config["schedule_version"],
+        universe_members=config["universe_members"],
+        carry_members=config["carry_members"],
+        carry_weight=config["carry_weight"],
+        band_fraction=config["band_fraction"],
+        status="closed",
+    )
+    store.register_overlay_stream(registration.to_payload())
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
+    assert runner.main([*argv, "observe"]) == 1
+    with store._connect() as connection:
+        alerts = connection.execute(
+            "SELECT message FROM operational_alerts "
+            "WHERE category = 'shadow_overlay'"
+        ).fetchall()
+    assert any("closed" in a["message"] for a in alerts)
+
+
+def test_observation_cannot_assert_point_in_time_data(harness):
+    """SHW2-005: adjusted provider history stays explicitly non-PIT and
+    no caller can claim otherwise; every payload carries the flag."""
+    from assistant.overlay_shadow import (
+        OverlayContractError, OverlayObservation,
+    )
+    with pytest.raises(OverlayContractError, match="point_in_time"):
+        OverlayObservation(
+            stream_name="s", evidence_epoch="e", cycle_session="2026-02-27",
+            generated_at="2026-02-27T21:00:00+00:00", provider="p",
+            inputs_sha256="a" * 64, available=False,
+            refusal_reasons=("x",), point_in_time_data=True,
+        )
+    fetch, argv, database, config = harness
+    runner.main([*argv, "register"])
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
+    runner.main([*argv, "observe"])
+    store = AssistantStore(database)
+    rows = store.get_overlay_observations(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    assert json.loads(rows[0]["observation_json"])["point_in_time_data"] is False

@@ -97,8 +97,9 @@ pool.
 - **SHW-1 (this round): contracts + storage** for the overlay task,
   with fresh/pre-migration, idempotency, conflict, cross-epoch, and
   read-only-guarantee tests.
-- **SHW-2: the runner CLI** (register/observe/mature/status) and
-  scheduler wiring.
+- **SHW-2: the runner CLI** (register/observe/mature/status).
+  (Scheduler installation moved to SHW-4, where a registered stream
+  exists to schedule — SHW2-004.)
 - **SHW-3: sufficiency reporting** (CLI/file first; UI tab only if the
   owner wants it).
 - **SHW-4: stream start** — requires the preregistration's [TO FREEZE]

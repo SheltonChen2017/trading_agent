@@ -213,7 +213,28 @@ def command_observe(args: argparse.Namespace) -> int:
 
     if not available_rows:
         # Prospective baseline: the stream starts NOW, at the latest
-        # completed month-end. History is never backfilled.
+        # completed month-end. History is never backfilled. The baseline
+        # requires EVERY member priced on the target session (SHW2-001):
+        # an available t0 with an unpriced member is the same partial
+        # imputation POST-001 closed, and it would poison every later
+        # cycle's previous boundary — the series could never advance.
+        target_closes = {t: closes[t].get(target) for t in universe + carry}
+        _, baseline_missing = sleeve_return(
+            target_closes, target_closes, universe + carry
+        )
+        if baseline_missing:
+            refusal = OverlayObservation(
+                cycle_session=target_key, available=False,
+                refusal_reasons=tuple(
+                    f"unpriceable member at the baseline session: {ticker}"
+                    for ticker in baseline_missing
+                ),
+                **base,
+            )
+            store.record_overlay_observation(refusal.to_payload())
+            print(f"REFUSED baseline {target_key}: "
+                  f"{', '.join(baseline_missing)}")
+            return 0
         observation = OverlayObservation(
             cycle_session=target_key, available=True,
             index_levels={key: 100.0 for key in SERIES_KEYS},
@@ -302,7 +323,6 @@ def command_mature(args: argparse.Namespace) -> int:
     rows = store.get_overlay_observations(
         registration["stream_name"], registration["evidence_epoch"]
     )
-    available = [json.loads(r["observation_json"]) for r in rows if r["available"]]
     outcomes = {
         row["cycle_session"]
         for row in store.get_overlay_outcomes(
@@ -310,9 +330,26 @@ def command_mature(args: argparse.Namespace) -> int:
         )
     }
     matured = 0
-    for earlier, later in zip(available, available[1:]):
+    # ADJACENT cycles only (SHW2-002): a refused or missed month-end
+    # occupies its cycle slot, so any pair with a row between them spans
+    # more than one month. `monthly_returns` must never carry a
+    # multi-month span — SHW-3 would count it as one month's evidence.
+    for earlier_row, later_row in zip(rows, rows[1:]):
+        if not (earlier_row["available"] and later_row["available"]):
+            continue
+        earlier = json.loads(earlier_row["observation_json"])
+        later = json.loads(later_row["observation_json"])
         cycle = earlier["cycle_session"]
         if cycle in outcomes:
+            continue
+        # Belt and braces: row adjacency AND calendar adjacency. Even if
+        # a gap slot were ever missing its refusal row, a span longer
+        # than one calendar month must not settle as a monthly return.
+        first = date.fromisoformat(cycle)
+        second = date.fromisoformat(later["cycle_session"])
+        following = (first.year + (first.month == 12),
+                     1 if first.month == 12 else first.month + 1)
+        if (second.year, second.month) != following:
             continue
         returns = {
             key: float(later["index_levels"][key])

@@ -234,6 +234,7 @@ class OverlayObservation:
     refusal_reasons: tuple[str, ...] = ()
     index_levels: Mapping[str, float] | None = None
     combined_carry_weight: float | None = None
+    point_in_time_data: bool = False
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "stream_name", _non_empty_text(self.stream_name, "stream_name"))
@@ -244,6 +245,15 @@ class OverlayObservation:
         object.__setattr__(self, "inputs_sha256", _sha256_text(self.inputs_sha256, "inputs_sha256"))
         if not isinstance(self.available, bool):
             raise OverlayContractError("available must be a bool")
+        # SHW2-005: adjusted provider history is not point-in-time, and a
+        # point-in-time claim must derive from verifiable availability
+        # evidence — never from a caller's assertion. This stream has no
+        # such evidence, so the only representable value is False.
+        if self.point_in_time_data is not False:
+            raise OverlayContractError(
+                "point_in_time_data cannot be asserted by a caller; this "
+                "stream's provider history is explicitly non-point-in-time"
+            )
         object.__setattr__(self, "refusal_reasons", _refusal_tuple(self.refusal_reasons, "refusal_reasons"))
         if self.available:
             if self.refusal_reasons:
@@ -296,6 +306,7 @@ class OverlayObservation:
                 None if self.index_levels is None else dict(self.index_levels)
             ),
             "combined_carry_weight": self.combined_carry_weight,
+            "point_in_time_data": self.point_in_time_data,
         }
 
 

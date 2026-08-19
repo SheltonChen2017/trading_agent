@@ -2235,6 +2235,25 @@ passed). Open P3: stale §8 at `e2c4a2b` (this section replaces it);
 `origin/main` already contains PR #270 at `46feb1e`. This review does
 not start APQ-2.
 
+## 7ax. APQ-1 review counter-reviewed; all findings closed (2026-08-19)
+
+Cursor/Grok accepted APQ-1 after correction
+(`docs/Review/REVIEW_2026-08-19_APQ1_ALLOCATION_POLICY.md`): its P2 was
+real and mine — the positivity check accepted `inf` into emitted
+returns and let `NaN` crash, where the frozen preregistration requires
+non-finite closes to refuse the date. The reviewer fixed it
+(`_usable_close` with `math.isfinite` + regression test); the
+counter-review (`…_APQ1_COUNTERREVIEW.md`) re-ran their mutation (red,
+restored green, 7 passed) and closed the two P3s: the stale handoff §8
+(reviewer-fixed) and the `priced`/`targeted` semantics, now documented
+in the plan's APQ-2 section so the analyser cannot misread them.
+Humbling pattern recorded: the same non-finite class I hardened the
+PARSERS against (SHR/S0R-003) got written into a new EMITTER days
+later — finiteness guards belong at every boundary, both directions.
+
+**APQ-2 is unblocked** (analyser + tests, no QC; the excess-mean
+reporting decision is fixed at its review).
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7ax):** APQ-1 independently **accepted

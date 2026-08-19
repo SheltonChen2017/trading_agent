@@ -117,6 +117,7 @@ def harness(tmp_path: Path, monkeypatch):
         "carry_members": list(CARRY),
         "carry_weight": "0.20",
         "band_fraction": "0.25",
+        "required_observation_count": 24,
     }
     config_path = tmp_path / "stream.json"
     config_path.write_text(json.dumps(config), encoding="utf-8")
@@ -385,6 +386,7 @@ def test_observe_refuses_a_closed_epoch_with_an_alert(harness):
         carry_members=config["carry_members"],
         carry_weight=config["carry_weight"],
         band_fraction=config["band_fraction"],
+        required_observation_count=config["required_observation_count"],
         status="closed",
     )
     store.register_overlay_stream(registration.to_payload())
@@ -446,3 +448,140 @@ def test_mature_calendar_guard_holds_even_without_intervening_rows(harness):
     assert store.get_overlay_outcomes(
         config["stream_name"], config["evidence_epoch"]
     ) == []
+
+
+def test_registration_requires_a_positive_preregistered_count():
+    """SHW-3: no universal default sample threshold; every stream must
+    preregister its own positive requirement."""
+    from assistant.overlay_shadow import (
+        OverlayContractError,
+    )
+    from tests.test_overlay_shadow import _registration
+    for bad in (0, -1, True, "24", None):
+        with pytest.raises((OverlayContractError, TypeError)):
+            _registration(required_observation_count=bad)
+
+
+_FORBIDDEN_REPORT_TERMS = ("sharpe", "cagr", "mean_return", "p_value",
+                           "index_levels", "monthly_returns")
+
+
+def test_sufficiency_reports_counts_and_reasons_without_statistics(harness):
+    """SHW-3: the section-6 fields, and NOT ONE statistic — the report
+    must be safe to read without spending a look."""
+    fetch, argv, database, config = harness
+    runner.main([*argv, "register"])
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
+    runner.main([*argv, "observe"])                       # baseline only
+    out = Path(argv[1]).parent / "sufficiency.json"
+    assert runner.main([*argv, "sufficiency", "--output", str(out)]) == 0
+    report = json.loads(out.read_text(encoding="utf-8"))
+    assert report["sufficiency"] == "NOT_MET"
+    assert report["preregistered_required_count"] == 24
+    assert report["independent_observation_count"] == 0
+    assert any("0 matured" in reason
+               for reason in report["insufficiency_reasons"])
+    assert report["counts"]["available_observations"] == 1
+    assert report["point_in_time_data"] is False
+    assert "separate, owner-authorized" in report["gate_evaluation"]
+    text = out.read_text(encoding="utf-8").lower()
+    for term in _FORBIDDEN_REPORT_TERMS:
+        assert term not in text, term
+
+
+def test_sufficiency_met_exactly_at_the_preregistered_boundary(
+    harness, tmp_path
+):
+    fetch, argv, database, config = harness
+    config["required_observation_count"] = 1
+    config_path = tmp_path / "boundary.json"
+    config_path.write_text(json.dumps(config), encoding="utf-8")
+    argv = ["--database", argv[1], "--config", str(config_path)]
+    runner.main([*argv, "register"])
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
+    runner.main([*argv, "observe"])
+    _set_all(fetch, {MAR31: 110.0, APR01: 111.0}, tickers=UNIVERSE)
+    _set_all(fetch, {MAR31: 100.0, APR01: 100.0}, tickers=CARRY)
+    runner.main([*argv, "observe"])
+    runner.main([*argv, "mature"])
+    out = tmp_path / "boundary_report.json"
+    assert runner.main([*argv, "sufficiency", "--output", str(out)]) == 0
+    report = json.loads(out.read_text(encoding="utf-8"))
+    assert report["sufficiency"] == "MET"
+    assert report["independent_observation_count"] == 1
+    assert report["insufficiency_reasons"] == []
+    # MET still evaluates no gate and prints no statistic.
+    assert "separate, owner-authorized" in report["gate_evaluation"]
+
+
+def test_sufficiency_refuses_a_drifted_config_count(harness, tmp_path):
+    """The registration is the authority; a config with a different
+    requirement must refuse loudly, not silently re-anchor the report."""
+    fetch, argv, database, config = harness
+    runner.main([*argv, "register"])
+    drifted = dict(config, required_observation_count=6)
+    drifted_path = tmp_path / "drifted.json"
+    drifted_path.write_text(json.dumps(drifted), encoding="utf-8")
+    assert runner.main(
+        ["--database", argv[1], "--config", str(drifted_path), "sufficiency"]
+    ) == 1
+    store = AssistantStore(database)
+    with store._connect() as connection:
+        alerts = connection.execute(
+            "SELECT message FROM operational_alerts "
+            "WHERE category = 'shadow_overlay'"
+        ).fetchall()
+    assert any("config drift" in a["message"] for a in alerts)
+
+
+def test_sufficiency_is_read_only_against_the_database(harness, tmp_path):
+    import sqlite3 as _sqlite3
+    fetch, argv, database, config = harness
+    runner.main([*argv, "register"])
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
+    runner.main([*argv, "observe"])
+
+    def snapshot():
+        with _sqlite3.connect(database) as connection:
+            connection.row_factory = _sqlite3.Row
+            tables = [r["name"] for r in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'")
+                if not r["name"].startswith("sqlite_")]
+            return {t: [tuple(row) for row in connection.execute(
+                f"SELECT * FROM {t}")] for t in tables}
+
+    before = snapshot()
+    out = tmp_path / "ro_report.json"
+    assert runner.main([*argv, "sufficiency", "--output", str(out)]) == 0
+    assert snapshot() == before
+
+
+def test_sufficiency_still_reports_a_closed_epoch(harness, tmp_path):
+    """SHW3-001: closing a stream must not make its evidence unreadable.
+    observe keeps refusing; sufficiency reads."""
+    fetch, argv, database, config = harness
+    store = AssistantStore(database)
+    from assistant.overlay_shadow import OverlayStreamRegistration
+    store.register_overlay_stream(OverlayStreamRegistration(
+        stream_name=config["stream_name"],
+        evidence_epoch=config["evidence_epoch"],
+        preregistration_path=config["preregistration_path"],
+        preregistration_sha256="a" * 64,
+        code_commit=COMMIT,
+        schedule_key=config["schedule_key"],
+        schedule_version=config["schedule_version"],
+        universe_members=config["universe_members"],
+        carry_members=config["carry_members"],
+        carry_weight=config["carry_weight"],
+        band_fraction=config["band_fraction"],
+        required_observation_count=config["required_observation_count"],
+        status="closed",
+    ).to_payload())
+    out = tmp_path / "closed_report.json"
+    assert runner.main([*argv, "sufficiency", "--output", str(out)]) == 0
+    report = json.loads(out.read_text(encoding="utf-8"))
+    assert report["stream_status"] == "closed"
+    assert report["sufficiency"] == "NOT_MET"
+    # The write gate is untouched: observe still refuses the closed epoch.
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
+    assert runner.main([*argv, "observe"]) == 1

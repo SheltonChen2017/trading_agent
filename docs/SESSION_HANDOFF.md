@@ -1908,7 +1908,76 @@ pin belts separately.
 SHW-3 remains unblocked for findings and awaits the owner scheduling
 it; SHW-4 awaits the gate freeze.
 
-## 7aq. Owner decision batch: gates frozen, APQ-1 scheduled, Stage 2 closed (2026-08-19)
+## 7ap. SHW-3 implemented: sufficiency reporting (2026-08-19)
+
+Branch `user/claude/shw3-sufficiency-20260819` (from merged main
+`553da76`). The `sufficiency` subcommand emits the section-6 fields —
+observation unit (adjacent-month matured outcomes, non-overlapping),
+the preregistered required count, the independent matured count, a
+MET/NOT_MET verdict, and concrete insufficiency reasons — and NOTHING
+else: no statistic at any count, with the report itself recording that
+gate evaluation is a separate owner-authorized single pass. The
+required count became a REGISTRATION contract field
+(`required_observation_count`, positive integer, no default — every
+stream preregisters its own; CLAUDE.md §6's no-universal-threshold
+rule made structural). The report is anchored to the FROZEN
+registration value; a drifted config requirement refuses loudly with a
+durable alert. Read-only against the database (byte-identical snapshot
+pinned by test). Five new tests; THREE reverse mutations red then
+restored (boundary >= flipped to >, requirement re-anchored to the
+live config, a statistic key planted in the report). CLI/file only per
+open decision 3's default — no UI surface.
+
+SHW-1..3 are now all implemented. Remaining before the stream goes
+live (SHW-4): this round's review, the owner's freeze of the
+defensive-carry [TO FREEZE] gates, registration binding the frozen
+document, and the scheduler installation deferred to SHW-4.
+
+## 7aq. Independent review of SHW-3 (2026-08-19)
+
+Cursor Grok 4.6 reviewed `553da76..a384be7` at exact head
+`a384be7b3c332dc40f9996fd2706ab4c01fd0d3d`
+(`origin/user/claude/shw3-sufficiency-20260819`). Report:
+`docs/Review/REVIEW_2026-08-19_SHW3_SUFFICIENCY.md`. Written from an
+isolated worktree so the shared checkout could stay on Claude's
+gate-freeze branch.
+
+**Accepted.** Both commits dispositioned. Focused tests 38 passed. Two
+reverse mutations red then restored (`>=` to `>` at the MET boundary;
+requirement read from live config). No operator DB. No product
+correction.
+
+Two P3s, no P0–P2: SHW3-001 (closed epoch cannot run sufficiency);
+SHW3-002 (example `24` is not an owner freeze of the draft prereg).
+
+SHW-4 remains blocked on the owner's `[TO FREEZE]` freeze, then
+registration + scheduler. Keep `paper-epoch-005` on `752d3b7`.
+
+## 7ar. SHW-3 review counter-reviewed; SHW3-001 fixed (2026-08-19)
+
+Cursor/Grok accepted SHW-3 (`553da76..a384be7`) with two P3s, working
+in an isolated sibling worktree
+(`docs/Review/REVIEW_2026-08-19_SHW3_SUFFICIENCY.md`). Counter-review
+(`…_SHW3_COUNTERREVIEW.md`, on the review branch): **SHW3-001
+reproduced and FIXED** — sufficiency now reads closed epochs (a closed
+stream's evidence stays reportable forever; the report carries
+`stream_status`) while observe/mature keep the strict write gate, both
+pinned in one test with the fix mutation-verified. **SHW3-002 was
+correct at its snapshot and is discharged by events**: the owner's gate
+freeze (`d0912e0`) postdates the review, no registration against any
+draft ever occurred, and SHW-4 binds the frozen document's SHA-256.
+
+With SHW-1..3 implemented and reviewed, the preregistration frozen, and
+all five owner decisions recorded, **SHW-4 is the next milestone**:
+registration + first baseline + owner-approved operational release
+advance + scheduler install, dedicated `data/shadow_overlay.db`.
+
+## 7as. Owner decision batch: gates frozen, APQ-1 scheduled, Stage 2 closed (2026-08-19)
+
+(Recorded on the gate-freeze branch while sections 7aq/7ar were being
+written on the review branch; renumbered 7as at merge. Decisions 2-5
+chronologically preceded 7ar's counter-review, which already cites
+the freeze commit `d0912e0`.)
 
 Four owner decisions recorded on
 `user/claude/dc-gate-freeze-20260819` (docs-only round):
@@ -1948,10 +2017,14 @@ Four owner decisions recorded on
 
 ## 8. What is next
 
-**Current (2026-08-19, section 7ao):** SHW-2 P2s verified closed. SHW-3
-may be scheduled; do not start it automatically. APQ-1 is not scheduled.
-`paper-epoch-005` stays on `752d3b7`. Do not open the operator DB from
-a post-`f40c2c1` tree.
+**Current (2026-08-19, sections 7ar/7as):** SHW-1..3 implemented and
+reviewed (SHW3-001 fixed; SHW3-002 discharged by the freeze). The
+defensive-carry preregistration is FROZEN; APQ-1 is SCHEDULED; Stage 2
+PEAD is CLOSED; the SHW-4 host is decided (dedicated
+`data/shadow_overlay.db`, operational clone after an owner-approved
+release advance). **SHW-4 is the next milestone**, then APQ-1.
+`paper-epoch-005` stays on `752d3b7`; do not open the operator DB from
+a newer tree.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

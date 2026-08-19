@@ -1869,10 +1869,28 @@ P2 probes exactly and fixed everything fixable:
 SHW-3 unblocks once this fix round passes review. SHW-4 still requires
 the owner's defensive-carry gate freeze.
 
+## 7ao. SHW-2 fix round independently verified (2026-08-19)
+
+Cursor Grok 4.6 verified `78258af..128aac8` at exact head
+`128aac8b57e643b4eb8cfa098dc164ea31fb8a52`. Report:
+`docs/Review/REVIEW_2026-08-19_SHW2_FIX_VERIFICATION.md`.
+
+**Both P2s closed.** `27cb6dc` and `128aac8` accepted. Focused tests 32
+passed. Reverse mutations: baseline price-check drop red; available-only
+mature zip (original SHW2-002 bug) red; calendar-only drop still green
+(row adjacency carries the fixture). Restored; tree left clean.
+
+Leftover P3s: SHW2-006 (calendar belt unpinned) and SHW2-007 (stale
+`or_closed` test name). Neither reopens a P2.
+
+SHW-3 is unblocked for these findings and still needs its own scheduled
+milestone. SHW-4, gate freeze, scheduler, live epoch, and any order
+remain unauthorized. `paper-epoch-005` stays on `752d3b7`.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7an):** SHW-2 reviewed; SHW-3 and live
-epoch registration blocked on SHW2-001/002. APQ-1 is not scheduled.
+**Current (2026-08-19, section 7ao):** SHW-2 P2s verified closed. SHW-3
+may be scheduled; do not start it automatically. APQ-1 is not scheduled.
 `paper-epoch-005` stays on `752d3b7`. Do not open the operator DB from
 a post-`f40c2c1` tree.
 

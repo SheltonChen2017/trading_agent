@@ -2184,6 +2184,38 @@ campaign, post-closure pivot, SHW-1..4, the allocation-policy docs, the
 gate freeze, and this roll. All review records live in `docs/Review/`;
 the per-round handoff sections 7z–7av are the narrative index.
 
+## 7aw. APQ-1 implemented: the allocation-policy LEAN algorithm (2026-08-19)
+
+Owner go ("start APQ"). Branch
+`user/claude/apq1-allocation-policy-20260819`:
+`research/lean/allocation_policy.py` implements the FROZEN
+preregistration exactly — four policies (P0 100 SPY; P1 40/60 SPY/BIL;
+P2 40/20/20/20 SPY/BIL/XLP/XLV; P3 35/55/10 SPY/BIL/XLE) on fixed
+instruments with no universe screen and deliberately NO ACTIVE_UNIVERSE
+assignment (pinned by regex test so the Stage 0 retargeter has nothing
+to rewrite); monthly month-end cadence with target-weight returns from
+adjusted closes (BIL never modeled as Lean cash); bind-time drift
+turnover per the reviewed `_drift_turnover` definition (true 0.5 entry
+cost on the first measured month; DECLARED-unavailable empty field
+after any gap); UNION-wide ALIGNED refusal — one unpriceable ticker
+drops the boundary for all four policies, keeping the series on one
+date set; INCOMPLETE with zero rows below the frozen 24-month floor.
+Emits `POLICIES|` / `DATES|` / six-field `PROW` rows. NOT added to the
+launch driver (APQ-3).
+
+Two real defects caught by the tests during implementation: closes were
+ingested before the boundary settled (every boundary looked unpriced),
+and turnover was initially charged with the row's own month's outcomes
+instead of the prior month's drift (the bind-time convention). Six
+tests with hand-computed month math; THREE reverse mutations red then
+restored (refusal skipped, completeness floor removed, wrong-month
+turnover). `compileall` clean.
+
+Next: APQ-2 (the analyser + tests, still no QC) after this round's
+review — the reporting decision (optional excess-mean test family in or
+out of the JSON schema) is fixed at that review per the plan's
+counter-review note.
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7au):** SHW-4 range `a384be7..a6a690c`

@@ -2370,18 +2370,32 @@ command (recorded in `docs/operations/OPERATIONAL_FACTS.md`). Science
 impact none: the runner is idempotent and monthly-cadence, and today's
 firings would have been `up to date` no-ops.
 
+## 7bc. Independent review of APQ-3: ACCEPTED AFTER CORRECTION (2026-08-19)
+
+Cursor Grok 4.6 reviewed `95a7210..1a63c8c` (both commits) from
+isolated worktree `trading_agent-review-apq3`. Report:
+`docs/Review/REVIEW_2026-08-19_APQ3_DRIVER_HOOK.md`. No QC.
+
+**Accepted after APQ3-001.** Driver tests 18 passed. Plan mutations
+reproduced: empty `UNIVERSE_FREE_FAMILIES` reds 3 tests; dropping
+`require_clean=True` reds QCS0CR-002. Allocation bytes stay unretargeted
+and hashed. Overlay installer default Interactive is correct for this
+host. **P2 closed here:** the facts repair one-liner omitted mandatory
+`-PythonPath`/`-DatabasePath`/`-ConfigPath` and would not re-register.
+Open P3: paper installer source still defaults S4U; APQ-3 and the
+overlay ops record share one branch.
+
+This review does not execute APQ-4 or the elevated overlay reinstall.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7ba):** APQ-3 (launch-driver allocation
-hook) IMPLEMENTED on `user/claude/apq3-driver-hook-20260819`, pending
-independent review. **Next: the owner runs the APQ-3 review; after the
-APQ-1..3 chain is accepted, APQ-4 is the owner-executed single cloud
-run, then APQ-5's one analyser pass.** Do not launch QuantConnect
-before that owner GO. SHW-4 is complete (section 7av); paper-epoch-006
-is the live paper epoch. Same-day operational checks: the overlay
-tasks' first firing was SKIPPED (S4U dead on this host — section 7bb;
-one elevated owner command repairs it); the first epoch-006 paper
-observation binding `c9d0740` lineage is still due at 16:30 local.
+**Current (2026-08-19, section 7bc):** APQ-1..3 independently reviewed
+(APQ-3 accepted after the repair-command correction). **APQ-4 is the
+next owner-gated step:** one cloud backtest via the reviewed driver,
+then APQ-5's single analyser pass. Do not launch QuantConnect without
+that owner GO. Overlay live repair remains one elevated install with
+the three required path parameters (section 7bb / OPERATIONAL_FACTS).
+SHW-4 complete; paper-epoch-006 is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

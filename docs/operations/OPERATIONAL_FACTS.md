@@ -161,11 +161,12 @@ repeated the S4U mistake; its default is now Interactive (fixed
 2026-08-19 with the APQ-3 round).
 
 Repair requires one elevated owner command (same elevation as the
-original install; use the operational clone's copy, which already
-accepts the parameter):
+original install; use the operational clone's copy). The installer
+still requires `-PythonPath`, `-DatabasePath`, and `-ConfigPath`;
+`-TaskLogonType Interactive` alone will fail parameter validation:
 
 ```text
-powershell -NoProfile -ExecutionPolicy Bypass -File C:\git\trading_agent_operational\scripts\install_windows_overlay_shadow_task.ps1 -TaskLogonType Interactive
+powershell -NoProfile -ExecutionPolicy Bypass -File C:\git\trading_agent_operational\scripts\install_windows_overlay_shadow_task.ps1 -PythonPath <real python.exe, not a Store alias> -DatabasePath C:\git\trading_agent_operational\data\shadow_overlay.db -ConfigPath C:\git\trading_agent_operational\docs\operations\overlay_shadow_defensive_carry_config.json -TaskLogonType Interactive
 ```
 
 Science impact: none. The runner is idempotent and monthly-cadence; the

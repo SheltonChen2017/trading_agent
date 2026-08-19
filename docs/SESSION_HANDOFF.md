@@ -1908,6 +1908,41 @@ pin belts separately.
 SHW-3 remains unblocked for findings and awaits the owner scheduling
 it; SHW-4 awaits the gate freeze.
 
+## 7aq. Owner decision batch: gates frozen, APQ-1 scheduled, Stage 2 closed (2026-08-19)
+
+Four owner decisions recorded on
+`user/claude/dc-gate-freeze-20260819` (docs-only round):
+
+1. **SHW-3 review**: already running (owner-initiated); this round does
+   not touch the SHW-3 branch.
+2. **Defensive-carry gates FROZEN as proposed** ("yes accept as is"):
+   `docs/research/DEFENSIVE_CARRY_2026-08-18_PREREGISTRATION.md` now
+   carries zero draft placeholders — composite gate 15% relative maxDD
+   reduction / 10% relative ES improvement / 80% upside-capture floor;
+   ≥8 calendar-year folds (fewer refuses the study as underpowered);
+   retrospective gate 2/3-fold consistency AND block-bootstrap p<0.05
+   on the ES delta; 24 required prospective months
+   (`required_observation_count=24` at SHW-4 registration). The freeze
+   commit precedes every confirmation computation, registration, and
+   statistic; changes now require a new named preregistration. SHW-4
+   binds this document's SHA-256 as of this commit.
+3. **APQ-1 SCHEDULED** — APQ-0 complete; the allocation-policy LEAN
+   algorithm + local tests begin serially after the SHW-3 review
+   settles (one milestone per branch, review between).
+4. **Stage 2 PEAD CLOSED** without implementation (inside the A-002
+   closure; QC point-in-time consensus data almost certainly
+   unavailable; poor prior). Action-plan row records the reasons and
+   the reopening bar.
+
+Host recommendation for SHW-4 (decision 5, still open): a DEDICATED
+shadow database file (`--database data/shadow_overlay.db`) so the
+frozen paper-epoch-005 operator DB is never opened by a newer tree
+(the standing overlay-table CREATE caution), with the scheduled task
+running from the operational clone once its release advances past
+SHW-1..3 — or, if the owner wants the stream started sooner, from this
+checkout at the exact reviewed commit (registration binds the commit
+and refuses dirty trees either way).
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7ao):** SHW-2 P2s verified closed. SHW-3

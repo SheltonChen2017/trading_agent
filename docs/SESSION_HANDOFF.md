@@ -2407,17 +2407,38 @@ mock updated; a mutation-verified scan test
 (`test_every_task_logon_type_default_is_interactive`) keeps the class
 closed. APQ3-003 acknowledged, no split of pushed history.
 
+## 7be. Max-profit and hedge QC plans proposed (2026-08-19)
+
+Cursor Grok 4.6 wrote **docs-only** counterparts to APQ while APQ-4
+runs on `main`. Branch
+`user/cursor/max-profit-hedge-plans-20260819` from `origin/main`
+`5694975`, isolated worktree `trading_agent-plans-mpp-hpg`. No LEAN,
+no driver change, no QC from this lane.
+
+- **MPQ (max profit = growth tilt, not leverage):** G0 100% SPY; G1
+  100% QQQ; G2 70% QQQ / 30% SPY; G3 50% QQQ / 30% SPY / 20% SMH.
+  Primary: higher net 10 bps CAGR vs G0; worse maxDD is disclosed, not
+  an auto-fail; Sharpe may not be more than 0.10 worse than G0.
+- **HPQ (static overlay, not HEDGE-1 UI):** H0 100% SPY; H1 90/10
+  SPY/SH; H2 80/20 SPY/SH (SH cap 20%); H3 90/10 SPY/BTAL. Primary:
+  ≥10% relative maxDD improvement vs H0 and ≥75% upside capture (when
+  H0 CAGR is positive), with a 4 pp CAGR sacrifice cap.
+
+Same confirmatory window as APQ (2022-01-01 through last complete
+session ≤ 2026-08-18). Action-plan rows
+`MAX-PROFIT-POLICY-QC-20260819` and `HEDGE-POLICY-QC-20260819` are
+**PROPOSED, OWNER DECISION PENDING**. They do not reorder APQ-4.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7bd):** APQ-1..3 implemented, reviewed,
-and counter-reviewed. **APQ-4 is the next owner-gated step:** one cloud
-backtest via the reviewed driver, then APQ-5's single analyser pass.
-Do not launch QuantConnect without that owner GO. Overlay tasks are
-repaired (Interactive) and proven runnable; their first automatic
-firing (2026-08-20 14:45 local) and the first epoch-006
-paper-observation lineage check are the outstanding operational
-verifications. SHW-4 complete; paper-epoch-006 is the live paper
-epoch.
+**Current (2026-08-19, section 7be):** **APQ-4 remains the QC step in
+flight** (owner-executed cloud run on `main`, then APQ-5). MPQ-1 and
+HPQ-1 are **not** started until the owner freezes those preregs and
+schedules them. Overlay tasks are repaired (Interactive) and proven
+runnable; their first automatic firing (2026-08-20 14:45 local) and
+the first epoch-006 paper-observation lineage check are the outstanding
+operational verifications. SHW-4 complete; paper-epoch-006 is the live
+paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

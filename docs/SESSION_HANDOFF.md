@@ -1953,6 +1953,25 @@ SHW3-002 (example `24` is not an owner freeze of the draft prereg).
 SHW-4 remains blocked on the owner's `[TO FREEZE]` freeze, then
 registration + scheduler. Keep `paper-epoch-005` on `752d3b7`.
 
+## 7ar. SHW-3 review counter-reviewed; SHW3-001 fixed (2026-08-19)
+
+Cursor/Grok accepted SHW-3 (`553da76..a384be7`) with two P3s, working
+in an isolated sibling worktree
+(`docs/Review/REVIEW_2026-08-19_SHW3_SUFFICIENCY.md`). Counter-review
+(`…_SHW3_COUNTERREVIEW.md`, on the review branch): **SHW3-001
+reproduced and FIXED** — sufficiency now reads closed epochs (a closed
+stream's evidence stays reportable forever; the report carries
+`stream_status`) while observe/mature keep the strict write gate, both
+pinned in one test with the fix mutation-verified. **SHW3-002 was
+correct at its snapshot and is discharged by events**: the owner's gate
+freeze (`d0912e0`) postdates the review, no registration against any
+draft ever occurred, and SHW-4 binds the frozen document's SHA-256.
+
+With SHW-1..3 implemented and reviewed, the preregistration frozen, and
+all five owner decisions recorded, **SHW-4 is the next milestone**:
+registration + first baseline + owner-approved operational release
+advance + scheduler install, dedicated `data/shadow_overlay.db`.
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7aq):** SHW-3 independently accepted

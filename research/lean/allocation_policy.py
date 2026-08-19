@@ -28,6 +28,8 @@ Task-specific semantics, stated because they differ from the batteries:
 * Completeness: refuse the whole run (INCOMPLETE, no rows) if fewer than
   MIN_MONTHS months were measured or the four policies' date sets differ.
 """
+import math
+
 from AlgorithmImports import *  # noqa: F403
 
 
@@ -47,6 +49,13 @@ POLICY_WEIGHTS = {
     "P3": {"SPY": 0.35, "BIL": 0.55, "XLE": 0.10},
 }
 POLICY_ORDER = ("P0", "P1", "P2", "P3")
+
+
+def _usable_close(value):
+    """Positive finite close only. NaN/inf must refuse: `NaN <= 0` is
+    False, so a positivity check alone would accept NaN and then crash
+    or emit inf returns (preregistration section 3)."""
+    return isinstance(value, float) and math.isfinite(value) and value > 0.0
 
 
 def _is_new_calendar_month(previous_session, current_session):
@@ -88,10 +97,7 @@ def _member_returns(previous_closes, current_closes):
     for ticker in TICKERS:
         before = previous_closes.get(ticker)
         after = current_closes.get(ticker)
-        usable = (
-            isinstance(before, float) and isinstance(after, float)
-            and before > 0.0 and after > 0.0
-        )
+        usable = _usable_close(before) and _usable_close(after)
         if not usable:
             return None
         outcomes[ticker] = after / before - 1.0
@@ -150,8 +156,7 @@ class AllocationPolicy(QCAlgorithm):
             if self.close_sessions.get(ticker) == boundary_session
         }
         if len(current) != len(TICKERS) or any(
-            not isinstance(value, float) or value <= 0.0
-            for value in current.values()
+            not _usable_close(value) for value in current.values()
         ):
             # Union refusal: one unpriceable ticker refuses the boundary
             # for every policy; both adjacent months become unmeasurable

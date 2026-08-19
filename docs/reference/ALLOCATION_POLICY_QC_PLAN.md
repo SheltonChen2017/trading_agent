@@ -116,6 +116,13 @@ Must:
   repeat S1R-001).
 - Parse `PROW` only; refuse unknown policies, duplicate dates, non-finite
   present turnover, `priced > targeted`, truncated `DATES`.
+- **`priced`/`targeted` semantics (APQ1-003, counter-review note
+  2026-08-19):** both fields count the POLICY'S OWN members (P0 emits
+  `1|1`), while the refusal gate is UNION-wide across all five tickers.
+  `priced == targeted` therefore holds on every emitted row by
+  construction; the analyser must treat these as the policy's member
+  count, never as "names that priced in the union", and may refuse
+  `priced != targeted` as a corruption signal.
 - Join P1/P2/P3 to P0 on **identical** dates; refuse if any date is
   missing from P0.
 - `performance()` from the reviewed local battery helper; costs via

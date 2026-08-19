@@ -1744,6 +1744,39 @@ the owner writes the ACTION_PLAN line. Keep `paper-epoch-005` on
 `752d3b7`; this tree's first `AssistantStore` open would add empty
 `overlay_*` tables.
 
+## 7al. Post-closure review counter-reviewed; POST-001..004 + POST-006 fixed (2026-08-18)
+
+The Cursor/Grok post-closure review (`66e2723..f40c2c1`, accepted, five
+P3s, isolated-worktree mutations — the shared-worktree lesson adopted)
+was counter-reviewed on
+`user/claude/post-closure-counterreview-20260818`
+(`docs/Review/REVIEW_2026-08-18_POST_CLOSURE_COUNTERREVIEW.md`):
+
+- **POST-001 confirmed by execution and understated** (registration also
+  accepted near-empty dicts) — FIXED: storage round-trips every overlay
+  payload through the frozen contracts, refuses unknown/action-shaped
+  fields, persists the canonical shape; mutation-verified.
+- **POST-002 FIXED**: `tests/test_overlay_import_boundary.py` pins both
+  directions (direct imports); design wording corrected;
+  mutation-verified. **POST-003 FIXED** (unused import).
+- **POST-004 addressed to the non-owner limit**: ACTION_PLAN row records
+  the allocation-policy track as PROPOSED/UNSCHEDULED; APQ-0 completes
+  only on the owner's schedule-or-defer decision; the optional-test
+  reporting choice is pinned to APQ-2 review in the plan.
+- **POST-006 (missed by the review, found here): main was RED on the
+  docs-root canonical test** — PR #260 put the plan at the docs root;
+  moved to `docs/reference/` with the prereg pointer updated (placement
+  only; frozen content untouched). Docs-only commits still need the doc
+  suite.
+- Allocation-policy documents accepted as APQ-0 content with two
+  recorded interpretation limits (hindsight-conditioned window;
+  APQ-2-fixed reporting decision).
+
+**Open owner decisions:** (1) schedule APQ-1 or record deferral;
+(2) SHW-2 may start only after this round's POST-001 fix passes its own
+review. The operational host stays on its pinned release commit (the
+overlay-table CREATE caution).
+
 ## 8. What is next
 
 **Current (2026-08-18, section 7al):** SHW-2 is blocked on POST-001.

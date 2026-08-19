@@ -2150,6 +2150,40 @@ conflict resolution means grepping for every row of BOTH parents.
 the owner-present epoch roll (close 005 → deploy → start 006 → drills)
 and the elevated overlay task install, then this round closes.
 
+## 7av. Epoch-006 roll EXECUTED; overlay scheduler installed; SHW-4 complete (2026-08-19)
+
+Owner-present, runbook order, all verifications green — the full record
+lives in `docs/operations/OPERATIONAL_FACTS.md` (the epoch-006 section;
+this handoff intentionally does not restate host facts). Summary:
+preconditions cleared (6 overnight connectivity alerts verified
+recovered and acknowledged, books matched, clean trees, reviewed target
+`c9d0740`), `paper-epoch-005` closed 19:47:49Z with its 3 observations,
+`c9d0740` deployed, reconcile matched on the new runtime (overlay
+migration applied at the sanctioned moment), readiness green,
+**`paper-epoch-006` active 19:48:54Z** bound to `c9d0740`, 5/5 drills,
+tasks re-enabled and proven (manual start → result 0, healthy
+heartbeat), and the three `TradingAgent-Overlay-Shadow-*` tasks
+installed against the dedicated shadow DB.
+
+**SHW-4 is COMPLETE**: stream live (baseline 2026-07-31), scheduler
+installed, roll executed, round reviewed and counter-reviewed. The
+defensive-carry 24-month prospective clock runs unattended from here.
+
+Deferred same-day verifications: (1) the first scheduled
+`paper-observation` under epoch-006 (16:30 local today) must bind the
+deployed lineage before epoch evidence is called accumulating; (2) the
+overlay tasks' first firing (14:45 local) should print `up to date` —
+that no-op is the scheduled-execution proof. One flag for the next
+thorough review: epoch-006's `policy_fingerprint` differs from 005's
+while every other identifier is unchanged (see the facts entry).
+
+**Codex returns tonight for a thorough audit of the last two days.**
+Suggested range: everything since `de1beac` (2026-08-18's Stage 0
+acceptance) through current main — the Stage 0 closure, Stage 1
+campaign, post-closure pivot, SHW-1..4, the allocation-policy docs, the
+gate freeze, and this roll. All review records live in `docs/Review/`;
+the per-round handoff sections 7z–7av are the narrative index.
+
 ## 8. What is next
 
 **Current (2026-08-19, section 7au):** SHW-4 range `a384be7..a6a690c`

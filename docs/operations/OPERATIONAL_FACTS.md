@@ -79,7 +79,70 @@ for separating a tech style bet from selection — never as the record.
 
 Not derivable from the repository, and expensive to rediscover.
 
-### `paper-epoch-005` is active; the epoch-005 roll was executed (2026-08-13)
+### `paper-epoch-006` is active; the epoch-006 roll was executed (2026-08-19)
+
+Owner-authorized (option (b) of handoff §7at) and executed in runbook
+order on the epoch host, starting ~12:43 local — nearly four hours clear
+of the 16:30-local observation window. Timings UTC.
+
+Preconditions: six open alerts (the overnight 2026-08-19 Alpaca
+connectivity blips, last fired 00:42–04:49Z) verified recovered — the
+endpoint answered, a fresh manual `operations-cycle` was healthy with
+`matched: true` — and all six acknowledged, **0 open**; `ledger-reconcile`
+matched with 0 mismatches on the frozen runtime; both worktrees clean;
+deploy target `c9d0740` was merged, reviewed mainline (PR #268; the SHW-4
+review + counter-review) — precondition 4 satisfied; owner present.
+
+Tasks disabled (elevated, owner; `Enabled=False` verified on all four,
+with OrderMonitor/Watchdog processes still draining — the expected
+long-runner behavior) → **`paper-epoch-005` closed 19:47:49Z** on its
+frozen `752d3b7`, retaining its **3 observations** (the accepted cost;
+epoch was 6 days old) → operational checkout fast-forwarded `752d3b7` →
+**`c9d0740`** → `ledger-reconcile` **matched, 0 mismatches** on the
+first run under the new code (this run also applied the reviewed
+`overlay_*` table migration to the operator DB — the sanctioned moment
+for it) → `readiness` `ready: true` (no freshness recovery needed; the
+roll was short) → **`paper-epoch-006` started 19:48:54Z**, lineage hash
+`9cbca809…`, bound to `c9d0740`, with unchanged mandate, strategy, and
+model identifiers → **5/5 required drills recorded under epoch-006** →
+tasks re-enabled → a manually started `TradingAgent-Paper-OperationsCycle`
+returned result 0 with a healthy heartbeat at 19:55:07Z.
+
+What this roll deployed: the overlay shadow stack SHW-1..3 (contracts,
+storage with re-validated writes, runner, sufficiency), the S0R/SHW
+hardening chain, and the SHW-4 stream config/installer — each merged and
+independently reviewed before deployment.
+
+Roll-specific facts worth keeping:
+
+- **`policy_fingerprint` differs from epoch-005's** (`4a942cbc…` →
+  `4086365c…`) while mandate/strategy/model identifiers are unchanged.
+  Not investigated mid-roll; flagged for the next thorough review. A
+  policy-settings change during epoch-005 would produce exactly this.
+- **The `alert_delivery` drill records only with
+  `--record-drill --operator`**; the first (flagless) self-test passed
+  and delivered but wrote no drill row. Re-run with flags; both
+  synthetic alerts verified from storage, none left open.
+- **This host's elevated Windows PowerShell has a Restricted execution
+  policy**: `.ps1` installers need
+  `powershell -NoProfile -ExecutionPolicy Bypass -File …` (process-scoped
+  only). Cmdlets (Enable/Disable-ScheduledTask) are unaffected.
+- **The three `TradingAgent-Overlay-Shadow-*` tasks are installed**
+  (Observe/Mature/Sufficiency; daily weekday triggers 17:45/17:55/18:05
+  ET; monthly cadence enforced by runner idempotency), pointing at the
+  dedicated `C:/git/trading_agent_operational/data/shadow_overlay.db`
+  and the committed defensive-carry config. They never touch the paper
+  or ML-shadow task families (enforced by the installer's denylist).
+
+The 60-session / 30-order clock restarts at the first scheduled
+`paper-observation` under epoch-006, expected 16:30 local on 2026-08-19
+(same day — the roll finished with hours to spare). Until that row
+exists, epoch-006 has **0 observations** and any
+`lineage_consistent: true` is vacuous. The overlay tasks' first firing
+(14:45 local) should print `up to date` — the July baseline exists and
+August is incomplete; that no-op IS the scheduled-execution proof.
+
+### `paper-epoch-005` is CLOSED (2026-08-19); its roll record follows (2026-08-13)
 
 Owner-authorized and executed in runbook order on the epoch host. Timings are
 UTC; the roll ran the evening of 2026-08-13 Pacific, deliberately AFTER that
@@ -400,7 +463,7 @@ Everything in this section is host-specific; re-measure rather than assume
 which one you are on. `whoami` distinguishes them.
 
 - **Epoch host** (`REDMOND\sheltonchen`) — runs the active
-  `paper-epoch-005` (at `752d3b7` since 2026-08-13). The four
+  `paper-epoch-006` (at `c9d0740` since 2026-08-19). The four
   `TradingAgent-Paper-*` tasks are installed and ENABLED here. This is the
   only host that may run the operational cadence. The bullets below this
   section (launch script, epoch-swap script, lock files, backups) describe

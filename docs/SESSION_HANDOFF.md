@@ -2450,21 +2450,56 @@ allocation-policy QC family is **CLOSED**: one cloud run and one
 analyser pass, both spent; no reruns or tweaks. Paper/live use of any
 weights is a separate owner decision on the Alpaca/REBAL stack.
 
+## 7bg. Owner strategy → LEV + SBR preregistration drafts (2026-08-19)
+
+The owner described a three-step strategy (Strong-Buy universe with
+inverse-volatility weights → leveraged ETF of the holding-heaviest
+funds → threshold take-profit) with the goal "beat NASDAQ and SPY".
+Feasibility probe first: **QuantConnect has no point-in-time
+analyst-ratings dataset** (Morningstar = fundamentals only; Benzinga
+on QC = news; the only recommendations set tracks CNBC personalities),
+and today's consensus against old prices is look-ahead — the same wall
+that closed Stage 2 PEAD. The owner adopted the two honest paths
+("I think both B and C are worth testing"):
+
+- **LEV family (Path B)** — the leveraged-ETF engine, testable now:
+  TQQQ take-profit/re-entry state machine (L1..L4: +20%/+40% × next
+  month-end / −10% pullback re-entry), window 2011→run date including
+  the 2022 −80% drawdown, 8 cells at 0.05/8 (vs TQQQ buy-and-hold =
+  the edge test; vs QQQ = the stated goal, with the frozen label that
+  a QQQ-pass without an L0-pass is LEVERAGE, not skill), after-tax
+  37%/20% descriptive column per the SOXL lesson, one run + one pass.
+- **SBR capture stream (Path C)** — monthly snapshots of NASDAQ-100
+  analyst consensus, point-in-time BY CONSTRUCTION (capture time =
+  knowledge time), task-specific runtime per ML-LR-6, Interactive
+  logon + first-firing verification per the S4U incident, and a hard
+  look rule: joining snapshots to subsequent prices is FORBIDDEN until
+  a separate SBR-2 evaluation preregistration freezes after ≥12
+  snapshots.
+
+Both preregistrations were **FROZEN by owner adoption the same day
+("as-is")**, recorded in each document's section 7. Explicitly outside the A-002 closure (fixed
+instruments / new data source + fresh preregistration + owner
+decision). Milestones after adoption: LEV-1 (LEAN algo), LEV-2
+(analyser + driver hook), LEV-3 (one run), LEV-4 (one pass); SBR-1
+(capture script + task). One branch + independent review each.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7bf):** the allocation-policy family is
-COMPLETE AND CLOSED (A-003, NULL on the gate). No QC access remains
-authorized anywhere. Next tracks, all owner-gated: (1) Codex's
-thorough two-day audit tonight (suggested range now spans through the
-APQ-5 merge; the epoch-006 `policy_fingerprint` change remains flagged
-for it); (2) counter-review of Cursor's two incoming plan proposals
-("max profits", "hedging") — each needs a frozen preregistration and
-family scoping; the A-002 closure is not reopenable through them;
-(3) optional separate owner decision on using P1/P3-style weights on
-the Alpaca/REBAL stack. Operational: the epoch-006 first observation
-is VERIFIED (16:30:00 local, one row, lineage binds `c9d0740` — see
-OPERATIONAL_FACTS); the one remaining check is the overlay tasks'
-first AUTOMATIC firing (2026-08-20 14:45 local). SHW-4 complete;
+**Current (2026-08-19, section 7bg):** LEV + SBR preregistrations
+FROZEN by owner adoption ("as-is"); **LEV-1 (LEAN algorithm + local
+tests, no QC) is the next milestone**, then LEV-2 (analyser + driver
+hook); SBR-1 (capture script + task) may run in parallel. The
+allocation-policy family is CLOSED (A-003, NULL on the gate). No QC
+access is currently authorized anywhere. Other owner-gated tracks:
+(1) Codex's thorough two-day audit tonight (range through the APQ-5
+merge; epoch-006 `policy_fingerprint` change flagged); (2)
+counter-review of Cursor's incoming "max profits" and "hedging" plan
+proposals — each needs frozen preregistration and family scoping;
+(3) optional owner decision on P1/P3-style weights on the Alpaca/REBAL
+stack. Operational: epoch-006 first observation VERIFIED (lineage
+binds `c9d0740`); remaining check is the overlay tasks' first
+AUTOMATIC firing (2026-08-20 14:45 local). SHW-4 complete;
 paper-epoch-006 is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

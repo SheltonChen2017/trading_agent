@@ -1,9 +1,9 @@
 # Independent review - Analyst-Consensus ETF Rotation documentation
 
-Review date: 2026-08-20  
-Review branch: `codex/review-acer-docs-20260820`  
-Base: `6f571c2f2366de0b2f6ea9fa6c27c2556791ba4e`  
-Submitted branch/head: `origin/user/claude/acer-replaces-sbp-20260820` at `f3b960d2d15e54842b198bc11a0c82b51a50c364`  
+Review date: 2026-08-20
+Review branch: `codex/review-acer-docs-20260820`
+Base: `6f571c2f2366de0b2f6ea9fa6c27c2556791ba4e`
+Submitted branch/head: `origin/user/claude/acer-replaces-sbp-20260820` at `f3b960d2d15e54842b198bc11a0c82b51a50c364`
 Merged review head: `origin/main` at `6cdb423b67aefc6c62f2dc35cd27cfb33c049772`
 
 ## Scope and disposition
@@ -34,7 +34,11 @@ look budget, result ledger, and no execution authority.
 
 ## Result
 
-Conditional acceptance pending final validation: ACER remains a **DRAFT**.
+Accepted after correction: ACER remains a **DRAFT**. Focused active-document
+validation: 36 passed in 0.69s. The full suite exited 0 on the final review
+tree; a separate collection counted 4,353 tests. A no-bytecode source compile
+validated 427 Python files, and `git diff --check` passed.
+
 Nothing in this review adopts ACER-0, purchases data, queries QuantConnect,
 installs a capture task, creates an order, changes an evidence epoch, or
 creates any result. The next permitted step is the owner's ACER-0 decision;

@@ -9,8 +9,8 @@ functions every CLI research script uses. That single-path property is
 what makes a UI number trustworthy: there is no UI-only backtest logic to
 drift from the tooling the findings registry was built with.
 
-Scope decisions (frozen with the plan in docs/ACTION_PLAN_2026-08-02.md,
-UI-3, 2026-08-04):
+Scope decisions (frozen with the plan now archived at
+docs/reference/ACTION_PLAN_2026-08-02.md, UI-3, 2026-08-04):
 
   - Only price/volume-only scanners are exposed. PEAD and fundamentals
     need an earnings feed; residual momentum/reversal and idio vol refuse

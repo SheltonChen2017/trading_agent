@@ -10,7 +10,7 @@ weights, window, and gates live in
 `docs/research/ALLOCATION_POLICY_2026-08-18_PREREGISTRATION.md` and must
 not be changed in this document after a result exists.
 
-`docs/ACTION_PLAN_2026-08-02.md` remains the sequencing authority and
+`docs/reference/ACTION_PLAN_2026-08-02.md` remains the sequencing authority and
 records this family as closed. The instructions below remain the
 historical frozen contract; they do not authorize another run.
 

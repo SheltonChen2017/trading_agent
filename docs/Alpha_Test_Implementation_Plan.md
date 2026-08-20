@@ -1,16 +1,27 @@
 # QuantConnect alpha test implementation plan
 
-Status: owner-directed staged research program; all affected implementation
-was re-audited again after Fable's final counter-review merged on 2026-08-17.
-No historical alpha result is valid. Claude accepted Codex correction
-`ac96d47` from exact pushed head `9e45803`; Codex then accepted Claude's
-FCR-001/002 closures at exact head `9a7e9fc`, merged by PR #244 at `b6f577e`.
-The owner chose Stage 0 first. Its first two runs, R-005/R-006, both refused
-with zero cells and exposed a monthly factor-timing defect. Claude's first
-fix was independently reviewed and required a further point-in-time boundary
-correction on `codex/review-qc-stage0-run-20260817`. Stage 0 remains halted
-until that exact Codex head is counter-reviewed; reruns begin at R-007 and
-must not overwrite either refusal.
+Status: **CLOSED — historical contract, retained as the record of how the
+staged alpha program was run and how it ended.** Stage 0 completed across nine
+runs and Stage 1 completed the same week; both are **NULL on every beta-free
+cell** (ledger entries `A-001` and `A-002`, 2026-08-18). No IC or long-short
+cell cleared its gate, and the long-only cells that did clear a gross-vs-zero
+test were carrying market beta the benchmark itself clears. The
+cross-sectional alpha program on this universe is closed and is not
+launchable: reopening would require a new universe or data source, a fresh
+preregistration, and a new owner decision.
+
+No historical alpha result in this program is valid; `docs/alpha-result.md`
+remains the permanent, append-only ledger of every run, including the
+refusals. The workflow, evidence rules, and stage definitions below stayed in
+force through that closure and are preserved unchanged; the sequencing
+statements they contain are spent. `docs/ACTION_PLAN_2026-08-20.md` decides
+what happens next.
+
+Historical detail retained: the owner chose Stage 0 first; runs R-005/R-006
+both refused with zero cells and exposed a monthly factor-timing defect;
+Claude's first fix required a further point-in-time boundary correction on
+`codex/review-qc-stage0-run-20260817`; reruns resumed at R-007 without
+overwriting either refusal.
 
 Prepared: 2026-08-16
 

@@ -1,5 +1,12 @@
 # ACTION PLAN — the go-to consolidated done / remaining ledger
 
+**SUPERSEDED 2026-08-20 by `docs/ACTION_PLAN_2026-08-20.md`, which the owner
+directed as the replacement sequencing authority with the Strong-Buy initiative
+first. Archived here rather than deleted: this document is the record of how the
+platform reached its 2026-08-20 state, and its ledger rows remain the detailed
+account behind the successor's closed-history section. It no longer decides what
+happens next.**
+
 Status: **owner-adopted go-to plan** (2026-08-02). After independent audits
 by Claude and Codex converged on the same facts, the owner selected this
 plan as the single sequencing authority for all workstreams. Codex's

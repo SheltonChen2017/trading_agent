@@ -1,7 +1,11 @@
 # General Readiness implementation status
 
-Companion to `docs/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`, recording what
-is built and every deliberate deviation from the plan. Updated 2026-08-02.
+Companion to `docs/reference/GENERAL_READINESS_IMPLEMENTATION_PLAN.md`, recording what
+is built and every deliberate deviation from the plan. Updated 2026-08-02;
+path references refreshed 2026-08-20 for the archived plan layout. The
+milestone content below has NOT been re-verified against the code since its
+own date — `docs/ACTION_PLAN_2026-08-20.md` section 1 carries the measured
+current state.
 
 The plan was written before the ML full-system milestones landed. Each
 milestone therefore needs a gap analysis against the current code *before*

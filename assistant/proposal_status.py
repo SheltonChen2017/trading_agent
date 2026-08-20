@@ -150,7 +150,7 @@ TERMINAL_BROKER_STATUSES: tuple[str, ...] = (
 #
 # The History page's primary filter groups the 19 lifecycle statuses into a
 # small set of outcomes a person can reason about. The grouping rules were
-# frozen in docs/ACTION_PLAN_2026-08-02.md section 8 (UI-2b) BEFORE
+# frozen in docs/reference/ACTION_PLAN_2026-08-02.md section 8 (UI-2b) BEFORE
 # implementation:
 #
 #   - legacy "executed" means only "the broker accepted the request", never a

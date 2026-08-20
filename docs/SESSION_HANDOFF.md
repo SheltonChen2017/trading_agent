@@ -3267,14 +3267,20 @@ a snapshot and refuses hash mismatches and incomplete snapshots at analysis).
   (later of action time and `last_updated`) defers only ~4% of rows.
 - Disclosed data limitations: 2017 rows are ~35% below neighbouring years;
   the distinct-firm count declines 265 → ~120-150 across the history.
-- **Licence NOT confirmed — the round's most important open item.** The
-  Individuals ToS permits personal non-commercial use, but the Market Data
-  ToS read literally is display-only, prohibits derived works naming
-  "investment strategy", and requires deletion on termination. Whether the
-  Benzinga expansion falls under that definition is unresolved; one written
-  sentence from Massive support is required before ACER-0 freezes on this
-  vendor, and the deletion-on-termination clause must be disclosed in any
-  preregistration if it applies.
+- **Licence: alarm raised, then DOWNGRADED after owner challenge, same
+  day.** The first reading (from a summarizing fetch) treated the Market
+  Data ToS as potentially prohibiting personal backtesting. The owner
+  challenged it; re-reading the preserved bytes confirms the challenge — the
+  restrictive clauses target republication, third-party transfer of derived
+  works, and commercial/non-display licensing, while "display use only" is
+  an explicit default overridable by dataset entitlements, and the
+  subscriber basis is "personal, non-business use". What survives:
+  **deletion on termination is unambiguous**, so evidence snapshots may not
+  outlive the subscription and any preregistration must disclose it; and
+  terms amend by posting, which is why the hashed 2026-08-20 copies matter.
+  Written confirmation is now a courtesy item riding the timezone question,
+  not a freeze gate. Both the original and corrected findings are retained
+  in the audit record's section 7.
 
 The three governing ToS pages are preserved raw and hashed under
 `artifacts/benzinga_audit/tos-20260820/` (a gap the owner exposed by asking

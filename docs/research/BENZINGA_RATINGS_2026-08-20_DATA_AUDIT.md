@@ -136,7 +136,37 @@ override. Page hashes verify on read. Duplicate-id count of zero across
 partition boundaries confirms the year partitions neither overlap nor
 truncate.
 
-## 7. Licence — NOT confirmed; written clarification required
+## 7. Licence — risk DOWNGRADED after owner challenge (corrected 2026-08-20)
+
+**Correction:** the first version of this section, written from a summarizing
+fetch, over-read the Market Data ToS as potentially prohibiting personal
+backtesting and local retention. The owner challenged that reading, and
+re-reading the preserved bytes confirms the challenge: the copying clause
+prohibits republication "for publication or distribution or for any business
+or commercial enterprise"; the derived-works clause prohibits transfer "to
+any third party" or "business or commercial purposes"; the non-display clause
+applies "unless you are licensed to do so"; and "display use only" is an
+explicit default "unless otherwise stated in a subsequent agreement",
+with dataset-specific entitlements named as exactly such agreements. Personal
+non-professional research is consistent with the subscriber-classification
+basis ("solely for your personal, non-business use").
+
+What survives, narrower: (1) **deletion on termination is unambiguous** —
+"cease all use of the Market Data and delete all Market Data in your
+possession" — so evidence snapshots may not survive cancellation, and any
+preregistration on this data must disclose that; (2) whether personal
+backtesting is "non-display use" under clause (d) is undefined here
+(exchange convention says non-display means machine consumption at
+commercial scale, supporting the permissive reading); (3) section 10 permits
+amendment by posting, which is why the hashed copies below matter. A written
+vendor confirmation is now a **courtesy item riding the timezone question**,
+not a freeze-blocking gate; the retention-after-termination disclosure is
+the part that must reach the preregistration.
+
+The superseded original text follows, retained per this repository's
+never-delete-findings rule.
+
+### Original section (superseded): Licence — NOT confirmed; written clarification required
 
 The three governing pages were preserved raw on 2026-08-20 under
 `artifacts/benzinga_audit/tos-20260820/` (gitignored, like all licensed
@@ -177,9 +207,11 @@ disclose that.
    interval, then `compare <A> <B>` — diffs by stable `benzinga_id`,
    reporting added/deleted/modified separately. One download cannot measure
    change; A is preserved immutably for this purpose.
-2. **Licence answer in writing** (section 7) — owner action.
-3. **Timezone confirmation in writing** (section 5) — can ride the same
-   support message.
+2. **Retention-after-termination disclosure** carried into any future
+   preregistration; the written licence confirmation is downgraded to a
+   courtesy item (section 7, as corrected).
+3. **Timezone confirmation in writing** (section 5) — the support message
+   this rides on.
 4. **QuantConnect symbol-mapping cross-reference** for the rename/reuse
    hazards in section 4 — a separate, owner-visible step, since it uses QC
    API access.

@@ -143,10 +143,14 @@ per-firm actions from 2011-12 **including full listing-to-delisting history
 for bankrupt and acquired names** (SIVB, FRC, SBNY, TWTR, ATVI and more), and
 per-row `previous_rating` makes historical state reconstructible without a
 current-state consensus endpoint. Remaining vendor gates before an ACER-0
-freeze: a **written licence answer** (the Market Data ToS read literally is
-display-only with deletion on termination; whether the Benzinga expansion
-falls under it is unresolved), written timezone confirmation, the snapshot B
-restatement measurement, and the rename/ticker-reuse hazard (FB vs ANTM
+freeze: written timezone confirmation, the snapshot B restatement
+measurement, and the rename/ticker-reuse hazard. The licence alarm was
+**downgraded after owner challenge**: re-reading the preserved ToS bytes
+shows the restrictions target republication, third-party transfer, and
+commercial/non-display licensing, not personal research; what survives is
+the unambiguous deletion-on-termination clause, which any preregistration
+must disclose because evidence snapshots may not outlive the subscription.
+See the corrected section 7 of the audit record. The hazard (FB vs ANTM
 handled oppositely; BBBY reused), which requires security-master joins rather
 than raw ticker joins.
 

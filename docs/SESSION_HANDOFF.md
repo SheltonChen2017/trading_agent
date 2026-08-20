@@ -3017,8 +3017,9 @@ Validation on the final tree: the full suite ran **4,350 passed / 1 failed /
 unfilled result token in this very sentence — the guard doing exactly its job.
 After substituting these measured numbers, the focused document/contract suite
 (`test_active_document_consistency.py` + `test_proposal_outcome_groups.py`)
-passes 50, including that guard, and a confirming full run is recorded below
-when it completes. Codex's corrected tree was independently reproduced at
+passes 50, including that guard. The confirming full run on the exact pushed
+tree (`1055392`) then passed **4,351 / 0 failed / 25 warnings** in 706.64
+seconds. Codex's corrected tree was independently reproduced at
 **4,351 passed / 25 warnings** in 920.88 seconds before this round's changes.
 Python 3.13.14; `compileall` over the required surface passed; `git diff
 --check` passed. No product behaviour, research result,

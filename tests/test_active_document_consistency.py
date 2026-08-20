@@ -880,8 +880,18 @@ def test_closed_alpha_plan_distinguishes_valid_null_runs_from_invalid_legacy_run
         assert claim not in plan
         assert claim not in action_plan
 
-    assert "VALID but null" in plan
-    assert "VALID but null" in action_plan
+    # SBDCCR-002: assert the RELATIONSHIP, not one blessed phrasing. The
+    # original guard pinned the literal "VALID but null", which this
+    # module's own docstring warns against -- a legitimate rewording
+    # ("valid, and null") would redden it and the obvious fix would be to
+    # delete the assertion. A window regex keeps the same strength: each
+    # document must state that the reviewed runs are valid AND null.
+    validity = re.compile(r"valid[^.]{0,60}null", re.IGNORECASE)
+    for label, text in (("alpha plan", plan), ("action plan", action_plan)):
+        assert validity.search(text), (
+            f"the {label} must state that the reviewed Stage 0/1 runs are "
+            "valid and null, not merely avoid calling them invalid"
+        )
 
 
 def test_strongbuy_primary_comparison_keeps_structural_zero_months():
@@ -898,12 +908,23 @@ def test_strongbuy_amendment_ledger_is_one_contiguous_markdown_table():
         encoding="utf-8"
     )
     lines = plan.splitlines()
-    positions = {
-        amendment: next(
-            i for i, line in enumerate(lines) if line.startswith(f"| {amendment} |")
+    amendments = [f"SBPA-{number:03d}" for number in range(1, 12)]
+    positions: dict[str, int] = {}
+    for amendment in amendments:
+        rows = [
+            index
+            for index, line in enumerate(lines)
+            if line.startswith(f"| {amendment} |")
+        ]
+        # SBDCCR-003: a missing row raised StopIteration -- an error with
+        # no message, rather than a failure naming what vanished.
+        assert len(rows) == 1, (
+            f"expected exactly one {amendment} ledger row, found {len(rows)}"
         )
-        for amendment in (f"SBPA-{number:03d}" for number in range(1, 12))
-    }
+        positions[amendment] = rows[0]
 
-    ordered = [positions[f"SBPA-{number:03d}"] for number in range(1, 12)]
-    assert ordered == list(range(ordered[0], ordered[0] + 11))
+    ordered = [positions[amendment] for amendment in amendments]
+    assert ordered == list(range(ordered[0], ordered[0] + len(amendments))), (
+        "the amendment rows are not one contiguous table: "
+        f"{dict(zip(amendments, ordered))}"
+    )

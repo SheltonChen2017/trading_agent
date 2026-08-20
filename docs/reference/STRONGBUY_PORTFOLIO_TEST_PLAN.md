@@ -254,8 +254,12 @@ is withdrawn. P4 still reports CAGR, drawdown, capture ratios, turnover, and
 look-through exposure beside P3; the separate LEV family addresses threshold
 timing on historical TQQQ data without validating this Strong-Buy strategy.
 
-P0–P2 form the core block. The inferential P3−P2 series uses every date on
-which P2 and P3 are both available. P4 remains descriptive and is compared
+P0–P2 form the core block: P1−P0 uses every date on which P0 and P1 are both
+available, and P2−P1 every date on which P1 and P2 are both available. Each
+paired series is aligned on its own two portfolios and on nothing else, so an
+unavailable portfolio can never delete a month from a comparison it does not
+enter (counter-review clarification, 2026-08-20). The inferential P3−P2 series
+uses every date on which P2 and P3 are both available. P4 remains descriptive and is compared
 with P3 only on dates where both P3 and P4 are available. Missing leveraged-
 fund evidence therefore cannot delete an otherwise valid confirmatory P3−P2
 month.
@@ -450,7 +454,7 @@ does not itself argue for skipping or accelerating a gate.
 | SBPA-008 | **CONFIRMED, PROPOSED (audit 2026-08-20, owner decision pending).** Section 4's stated concentration mitigation did not mitigate the risk it named | A per-issuer cap cannot constrain a cluster of distinct issuers in one industry. Either add a frozen industry-concentration rule with its own named refusal and declared classification source, or disclose the exposure as unmanaged |
 | SBPA-009 | **CONCERN CONFIRMED; EXCLUSION REJECTED AND REPLACED (verification 2026-08-20).** Exactly-10-name months are structural zeros in P2−P1 | The zero is the true realized difference between the two frozen strategies in that state, so those months stay in the primary series. An `n > 10` decomposition may be descriptive only; it cannot filter the confirmatory sample |
 | SBPA-010 | **CONFIRMED AND CORRECTED (verification 2026-08-20).** Descriptive P4 availability must not delete inferential P3−P2 months | P3−P2 aligns on P2/P3 availability. P4 is described against P3 only where P3/P4 are both available |
-| SBPA-011 | **CONFIRMED, PROPOSED (verification 2026-08-20).** Power planning must describe the frozen small-sample estimator | The sensitivity table must simulate the stationary bootstrap at the frozen 24-month horizon, mean block length 3, 20,000 draws, and family threshold rather than relying only on a normal approximation |
+| SBPA-011 | **CONFIRMED, PROPOSED (verification 2026-08-20; extended by counter-review).** Power planning must describe the frozen small-sample estimator | The sensitivity table must simulate the stationary bootstrap at the frozen 24-month horizon, mean block length 3, 20,000 draws, and family threshold rather than relying only on a normal approximation. It must also state the expected frequency of exactly-10-name months: those months are genuine zeros that stay in the primary P2−P1 series, so they dilute the detectable effect and the power statement is incomplete without their rate |
 
 Claude's counter-review accepted the SBPA-001/002/004 rejections and the
 minimum-size, look-through, price-lineage, and bootstrap corrections.

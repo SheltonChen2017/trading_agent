@@ -2968,6 +2968,64 @@ warnings** in 872.04 seconds. Python 3.13.14; required compileall plus
 the 50 focused document/contract tests were rerun on the final prose. The
 branch and `390f3ad` are local-only until the owner authorizes a push.
 
+## 7bu. Counter-review of the documentation-cleanup corrections: ACCEPTED (2026-08-20)
+
+Branch `user/claude/sbp-doc-cleanup-counterreview-20260820`, from Codex's exact
+head `8d16632`. Record:
+`docs/Review/REVIEW_2026-08-20_SBP_DOC_CLEANUP_COUNTERREVIEW.md`.
+
+**Snapshot deviation:** Codex's branch was local-only, so the snapshot was
+frozen by branching from the exact local object and pushing this branch, which
+publishes `390f3ad` and `8d16632` as ancestors.
+
+**Verdict: ACCEPTED.** All six findings confirmed, including the P2, which is a
+real defect in my own round: I carried forward "every historical QuantConnect
+result remains invalid" from the 2026-08-17 audit without re-checking, while
+the ledger marks R-009..R-028 VALID with null observations at A-001/A-002. The
+floor is 452 at A-002, not 428, and the ledger holds 30 run-level looks, not
+five. Calling a null result invalid is not a wording slip — it invites
+re-running a question already answered. SBDC-002 (my "structurally inert" cap
+claim overstated an empirical fact as a contractual one), SBDC-003 (excluding
+exactly-10-name months would change the estimand, and my variance claim was
+wrong — appending a zero to positive values raises variance), SBDC-005 (my
+amendment rows were separated from their table by a blank line and rendered
+outside it) and SBDC-006 are likewise confirmed. Verified independently: both
+PR merge trees are byte-identical to their submitted heads (`9009239`=`a2b69eb`,
+`13355a6`=`a77c6a5`), and the three new guards reproduce 3/3 red on the
+pre-correction documents through a `trap`-protected restore.
+
+Five counter-review items closed (CRV-001..005): the R-029 ledger entry's
+heading said `(UNANALYSED)` while its own Validity row said `VALID` — SBDC-001's
+exact class, missed by both reviews, now corrected without touching the upgrade
+history; two of the new guards pinned must-stay-true literals against this
+module's own documented doctrine and are now relationship regexes, re-verified
+red; the contiguity guard raised `StopIteration` instead of naming the missing
+amendment; SBP plan §6 now states the core block's alignment rule, closing for
+P1−P0/P2−P1 what SBDC-004 closed for P3−P2; and SBPA-011 now also requires the
+expected frequency of exactly-10-name months, since those genuine zeros dilute
+the detectable effect.
+
+One owner-facing consideration is recorded as a **question, not a finding**:
+registered index funds' diversification rules may keep any single issuer far
+below the 36.7% weight SBPA-007's gate needs. This repository holds no evidence
+for that, so SBP-0's existing official-issuer-document check is where it must be
+sourced. No plan text asserts it.
+
+Validation on the final tree: the full suite ran **4,350 passed / 1 failed /
+25 warnings** in 775.01 seconds, and the single failure was
+`test_current_review_documents_have_no_validation_placeholders` firing on the
+unfilled result token in this very sentence — the guard doing exactly its job.
+After substituting these measured numbers, the focused document/contract suite
+(`test_active_document_consistency.py` + `test_proposal_outcome_groups.py`)
+passes 50, including that guard, and a confirming full run is recorded below
+when it completes. Codex's corrected tree was independently reproduced at
+**4,351 passed / 25 warnings** in 920.88 seconds before this round's changes.
+Python 3.13.14; `compileall` over the required surface passed; `git diff
+--check` passed. No product behaviour, research result,
+QuantConnect access, broker access, scheduled task, deployment, epoch action, or
+operational database changed. SBP remains a DRAFT; SBP-0 is still the owner's
+decision.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**

@@ -983,7 +983,7 @@ construction, risk, paper-observation infrastructure). Any future
 reopening requires a new owner decision, a new universe or data source,
 and a fresh preregistration — never a rehabilitation of these results.
 
-## R-029 — Allocation-policy QC family, single authorized run (UNANALYSED)
+## R-029 — Allocation-policy QC family, single authorized run (VALID)
 
 The APQ-4 cloud run of the frozen allocation-policy family
 (`docs/reference/ALLOCATION_POLICY_QC_PLAN.md`; preregistration

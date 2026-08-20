@@ -12,9 +12,9 @@ Stage 0 correction (section 7q), and finally by Codex's independent
 verification of that counter-review after PR #244 (section 7r), Claude's
 two-run Stage 0 launch (section 7s), and Codex's correction review (section
 7t). The SBP rounds in sections 7bm through 7bq then superseded that
-sequencing text, and section 7br records the 2026-08-20 docs-only correction
-of the topology and push-state sentences those rounds left stale. Sections
-7br and 8 are the current state.
+sequencing text, section 7br records the topology refresh, section 7bs records
+Claude's documentation/SBP audit, and section 7bt records Codex's independent
+correction review. Sections 7bt and 8 are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -27,14 +27,15 @@ program is closed (`A-001`, `A-002`) and is no longer the entry point.
 1. `CLAUDE.md`
 2. `docs/ACTION_PLAN_2026-08-20.md` — the go-to plan (Strong-Buy first)
 3. `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` — the draft SBP contract
-   awaiting the owner's SBP-0 freeze, including amendments SBPA-001..010
+   awaiting the owner's SBP-0 freeze, including amendments SBPA-001..011
 4. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
    the frozen capture half
 5. `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
    `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md` and
-   `docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md` — the full SBP review
-   chain, in order
+   `docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md` and
+   `docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md` — the full
+   SBP review chain, in order
 6. `docs/operations/OPERATIONAL_FACTS.md` — machine-local operational truth
 7. `docs/operations/OPERATIONS_RUNBOOK.md`
 8. `docs/operations/MANDATE.md` (§2, §4, §6)
@@ -50,14 +51,21 @@ operator-database mutation, or scheduled-task change.
 ## 1. Exact repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Published `origin/main` at audit time: `c289f95` (2026-08-20). PR #282
-  merged the whole eight-commit SBP chain `5c42bfd..308ac84` — the
+- Published `origin/main` at audit time: `13355a6` (this review's start,
+  2026-08-20).
+  PR #282 at `c289f95` merged the whole eight-commit SBP chain
+  `5c42bfd..308ac84` — the
   amendments, the review correction and record, the counter-review, the
   security-age clarification, the verification record, and their handoff
   updates — onto first parent `5e3708e` (PR #281, the post-Stage-0 audit).
-  Sections 7bn through 7bq are therefore merged history on `main`, not a
-  pending local branch; their own closing topology sentences were written
-  before that merge and are corrected in place below.
+  PR #283 merged Claude's topology refresh; PR #284 at `13355a6` merged its
+  SBP audit, documentation sweep, and replacement Action Plan. Sections 7bn
+  through 7bs are merged history on `main`.
+- Current local review branch:
+  `codex/review-sbp-doc-cleanup-20260820`, based on exact submitted main head
+  `13355a6`. Correction/review commit `390f3ad` is **local-only and not
+  pushed** at handoff time. Another computer cannot fetch it until the owner
+  authorizes a push.
 - Historical, at the 2026-08-17 audit `origin/main` was
   `1457169ba10f6aac0f1fb98b60b92a4607f8331c` (this bullet's original
   "at audit time" wording now belongs to the current head above).
@@ -107,16 +115,15 @@ operator-database mutation, or scheduled-task change.
   branches. Its commits remain reachable from `main`. Claude's counter-review
   gate was satisfied at that point; no new QC run occurred, and section 7p
   closes it again for the result-changing Stage 0 correction.
-- Five real-market cloud executions remain preserved in the permanent ledger.
-  None is usable
-  alpha evidence: one refused, two remain deliberately unanalysed, one ran
-  unreviewed code, and the benchmark is unanalysed; four entries also lack
-  project/compile provenance. They count as five run-level looks and expose
-  80 repeated alpha cells. The conservative lifetime cell floor is 428.
-- `docs/Alpha_Test_Implementation_Plan.md` is now the current staged research
-  contract. It freezes corrected-battery completion, two prior-signal
-  replications, point-in-time PEAD, hierarchical sector momentum, and optional
-  overnight persistence, with Alpaca Paper reserved for later forward testing.
+- The permanent ledger now contains 30 run-level looks through APQ R-029.
+  The reviewed Stage 0/1 runs are VALID but closed null at A-001/A-002; APQ is
+  valid and closed null at A-003. Older legacy rows retain their individual
+  invalid/refused/unanalysed/provenance states. The closed cross-sectional
+  alpha-program floor is 452 cells at A-002; APQ's separate three-cell family
+  does not change it.
+- `docs/Alpha_Test_Implementation_Plan.md` is a **closed historical
+  contract**, not the current work queue. The replacement Action Plan puts the
+  draft Strong-Buy program first.
 - PR #234 first merged the prior Codex REBAL-3V/3W review through
   `f63fe2cb30aa904dec131962a133e1058185427c`; correction `3a506ae` and records
   `dae34d0` are therefore pushed, fetchable, and in `main`.
@@ -2933,18 +2940,50 @@ broker access, market data, scheduled task, deployment, epoch action, or
 operational database mutation occurred, and no plan value was adopted or
 frozen — SBP-0 remains the owner's to decide.
 
+## 7bt. Independent review of the SBP audit and documentation cleanup (2026-08-20)
+
+Codex reviewed the exact merged range `c289f95..13355a6` on
+`codex/review-sbp-doc-cleanup-20260820`, including all five commits and both PR
+merge commits. The merge trees are identical to their submitted second-parent
+trees; neither merge added hidden conflict-resolution edits. Every commit is
+dispositioned in
+`docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md`.
+
+Verdict: **ACCEPTED AFTER CORRECTION**. Correction/review commit `390f3ad`
+closes one P2 evidence-status contradiction and five P3 plan/handoff defects.
+The corrected documents distinguish reviewed **VALID but null** Stage 0/1
+evidence from invalid legacy runs; treat the 15% issuer cap as impossible for
+P3 but a possible rare-tail P4 gate; retain exactly-10-name months as genuine
+zero outcomes in primary P2−P1; align inferential P3−P2 without descriptive
+P4; separate bootstrap power as SBPA-011; and restore one contiguous amendment
+ledger. Three new guards failed on the submitted tree and pass after the
+correction. No application behavior or research result changed.
+
+Validation after the substantive correction: 50 focused tests passed in 2.52
+seconds; the first full suite passed **4,351 / 0 failed / 25 warnings** in
+947.30 seconds. The full suite was then rerun on the completed review tree
+including this handoff content and again passed **4,351 / 0 failed / 25
+warnings** in 872.04 seconds. Python 3.13.14; required compileall plus
+`research/` and `git diff --check` passed. After recording these exact numbers,
+the 50 focused document/contract tests were rerun on the final prose. The
+branch and `390f3ad` are local-only until the owner authorizes a push.
+
 ## 8. What is next
 
-**Current (2026-08-20, superseding the sequencing text below):
-`docs/ACTION_PLAN_2026-08-20.md` is now the go-to plan and puts the Strong-Buy
-initiative first. The SBP contract remains a DRAFT — not adopted, frozen,
-scheduled, or implemented — and the single blocking step is the owner's SBP-0
-freeze, which must settle SBPA-001..010 (SBPA-007 and SBPA-008 are gates that
-do not currently work). Freeze BEFORE installing the SBR capture task, or
-accept that pre-freeze months are calibration-only. No SBP code before that
-freeze. LEV remains separate and cannot validate SBP. The amendment round is
-independently ACCEPTED AFTER CORRECTION (7bo), the counter-review and SBPA-006
-likewise (7bq), and the review itself is audited and SUSTAINED (7bs).**
+**Current (2026-08-20, superseding everything below):**
+`docs/ACTION_PLAN_2026-08-20.md` is the go-to plan and puts the Strong-Buy
+initiative first. SBP remains a DRAFT — not adopted, frozen, scheduled, or
+implemented. The owner must adopt the proposed section-2 values and resolve
+SBPA-007 (rare-tail cap level), SBPA-008 (industry rule or disclosed unmanaged
+exposure), and SBPA-011 (bootstrap power plan). SBPA-009/010 are corrected
+sample-definition rules, not open invitations to choose a favorable sample.
+Freeze before installing SBR-1, or explicitly accept that pre-freeze captures
+are calibration-only. No SBP code, capture install, price join, QC run, or
+paper execution is authorized here. LEV remains separate and cannot validate
+SBP. The full review chain is accepted after correction through section 7bt.**
+
+### Historical superseded checklist (retained for audit only)
+
 Codex reviewed exact pushed range
 `81db126340818fe2c2c9efa16c77af8f1d37568f..3055fecd1caf490c852a446c03da760d2878af5a`
 (143 commits) on
@@ -3084,16 +3123,16 @@ or roll an epoch without a new explicit owner instruction.
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
 docs/SESSION_HANDOFF.md, docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md,
-docs/reference/SHADOW_OBSERVATION_DESIGN.md, docs/alpha-result.md, and
-docs/Review/REVIEW_2026-08-19_POST_STAGE0_THROUGH_SBR1.md. The exact
-independently reviewed pushed range is
-81db126340818fe2c2c9efa16c77af8f1d37568f..3055fecd1caf490c852a446c03da760d2878af5a
-(143 commits). The Codex correction branch is
-codex/review-post-stage0-through-sbr1-20260819. Stage 0/1 and APQ are
-closed null; SHW-4 is live; LEV-1 and SBR-1 are accepted only after the
-review corrections and still require merge/counter-review. Do not run
-QC, install the SBR task, deploy, trade, mutate an operational database,
-or roll paper-epoch-006 without the owner's separate authorization.
+docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md,
+docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md,
+docs/operations/OPERATIONAL_FACTS.md, and docs/alpha-result.md. Published
+origin/main at review start is 13355a6. The local-only Codex correction branch
+is codex/review-sbp-doc-cleanup-20260820 at 390f3ad plus its handoff commit;
+fetch cannot retrieve it until the owner authorizes a push. Stage 0/1 and APQ
+are valid but closed null; SHW-4 is prospective; SBP is still a draft. The
+next owner decision is SBP-0 adoption, including SBPA-007/008/011. Do not run
+QC, install SBR-1, join captures to prices, deploy, trade, mutate an
+operational database, or roll paper-epoch-006 without separate authorization.
 ```
 
 ## 9a. Archived 2026-08-17 resume prompt (historical only)

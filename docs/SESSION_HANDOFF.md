@@ -14,35 +14,38 @@ two-run Stage 0 launch (section 7s), and Codex's correction review (section
 7t). The SBP rounds in sections 7bm through 7bq then superseded that
 sequencing text, section 7br records the topology refresh, section 7bs records
 Claude's documentation/SBP audit, and section 7bt records Codex's independent
-correction review. Sections 7bt and 8 are the current development state.
+correction review. Section 7bv records the later ACER replacement; it and
+section 8 are the current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 ## 0. Read this first
 
-Reordered 2026-08-20 for the Strong-Buy priority. The alpha-program reading
-list that stood here is preserved in section 9a's archived resume prompt; that
+Reordered 2026-08-20 for the ACER priority. The alpha-program reading list
+that stood here is preserved in section 9a's archived resume prompt; that
 program is closed (`A-001`, `A-002`) and is no longer the entry point.
 
 1. `CLAUDE.md`
-2. `docs/ACTION_PLAN_2026-08-20.md` — the go-to plan (Strong-Buy first)
-3. `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` — the draft SBP contract
-   awaiting the owner's SBP-0 freeze, including amendments SBPA-001..011
-4. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
-   the frozen capture half
-5. `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
+2. `docs/ACTION_PLAN_2026-08-20.md` — the go-to plan (ACER first)
+3. `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` — the draft ACER
+   contract awaiting the owner's ACER-0 adoption
+4. `docs/reference/analyst-consensus-etf-strategy.pdf` — the owner-supplied
+   design narrative; the Markdown ACER contract governs where they differ
+5. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
+   the closed historical capture contract
+6. `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
    `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md` and
    `docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md` — the full
    SBP review chain, in order
-6. `docs/operations/OPERATIONAL_FACTS.md` — machine-local operational truth
-7. `docs/operations/OPERATIONS_RUNBOOK.md`
-8. `docs/operations/MANDATE.md` (§2, §4, §6)
-9. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-10. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-11. `docs/alpha-result.md` — the permanent run ledger (append-only)
-12. `docs/Alpha_Test_Implementation_Plan.md` — closed program, historical
+7. `docs/operations/OPERATIONAL_FACTS.md` — machine-local operational truth
+8. `docs/operations/OPERATIONS_RUNBOOK.md`
+9. `docs/operations/MANDATE.md` (§2, §4, §6)
+10. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+11. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+12. `docs/alpha-result.md` — the permanent run ledger (append-only)
+13. `docs/Alpha_Test_Implementation_Plan.md` — closed program, historical
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -51,8 +54,11 @@ operator-database mutation, or scheduled-task change.
 ## 1. Exact repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Published `origin/main` at audit time: `13355a6` (this review's start,
-  2026-08-20).
+- Published `origin/main` at audit time: `6cdb423` (ACER review, 2026-08-20).
+  PR #286 merged Claude's ACER documentation snapshot `f3b960d`; the
+  review branch begins from that exact mainline head.
+  Historical at the prior SBP documentation review start, `origin/main` was
+  `13355a6`.
   PR #282 at `c289f95` merged the whole eight-commit SBP chain
   `5c42bfd..308ac84` — the
   amendments, the review correction and record, the counter-review, the
@@ -3054,14 +3060,15 @@ preregistration, and an owner decision.
   still a draft** — never adopted or frozen, so no capture, evidence, result,
   or operational state changes. Retained in full with SBPA-001..011 and its
   four-round review chain.
-- The frozen SBR capture preregistration is **CLOSED before its first
+- The frozen SBR capture preregistration is **CLOSED before its first verified
   capture**, with the reason recorded in the document itself: ACER's primary
   signal is the per-firm revision, and monthly bucket counts cannot
   reconstruct per-firm actions — a count moving 12 to 13 Buys names no firm,
   no date, and no prior rating, and offsetting actions inside a month are
-  invisible. **The scheduled task was never installed and zero snapshots
-  exist**, so this is the cheapest possible stopping point; the capture code,
-  tests and installer stay in the tree for any future level-based hypothesis.
+  invisible. **No snapshot is committed and the task must not be installed**;
+  the machine-local task and artifact state has not been measured, so neither
+  is a verified absence claim. The capture code, tests and installer stay in
+  the tree for any future level-based hypothesis.
 - LEV is unchanged and still separate; MPQ/HPQ remain on hold; the closed
   families A-001/A-002/A-003 remain closed.
 
@@ -3110,14 +3117,101 @@ passed; `git diff --check` passed. No data was purchased, no QuantConnect run
 occurred, no scheduled task changed, no broker or operational state changed,
 and no ACER value is frozen — ACER-0 remains the owner's decision.
 
+## 7bw. ACER documentation independent review (2026-08-20)
+
+Codex reviewed the owner-supplied nine-page source PDF visually and reviewed
+the exact pushed implementation commit `f3b960d` plus PR #286 merge
+`6cdb423` on `codex/review-acer-docs-20260820`. Both commits are **accepted
+after correction**. Correction commit `e4bef19` fixes four P3 documentation
+findings: the Action Plan and current handoff now lead with ACER rather than
+the superseded SBP decision; the reference index lists ACER and marks SBP as
+historical; claims that the SBR task/snapshots are absent now distinguish no
+committed artifact from unmeasured machine-local state; and topology/resume
+instructions name PR #286 / `6cdb423`. A regression test fails if the index
+again calls superseded SBP "pending owner adoption." The source PDF is
+visually sound and remains a research narrative; the Markdown ACER contract
+governs where the two differ.
+
+Focused active-document validation passed **36 tests in 0.69s**. The full
+suite exited 0 on the corrected review tree; an independent collection counted
+**4,353 tests**. A no-bytecode source compilation validated 427 Python files,
+and `git diff --check` passed. No data purchase, QuantConnect access, broker
+access, scheduler change, deployment, operational database action, epoch
+change, or order occurred. This review does not adopt ACER-0. The current
+review branch is local-only and must not be described as published until the
+owner explicitly authorizes a push.
+
+## 7bw. Counter-review of the ACER documentation review: ACCEPTED (2026-08-20)
+
+Branch `user/claude/acer-review-counterreview-20260820`, from Codex's exact
+head `832b7cf`. Record:
+`docs/Review/REVIEW_2026-08-20_ACER_DOCUMENTATION_COUNTERREVIEW.md`.
+
+**Snapshot deviation:** Codex's branch was local-only in the worktree
+`trading_agent_codex_acer_review`; the snapshot was frozen by branching from
+the exact object and pushing this branch, which publishes `e4bef19`, `73efc11`
+and `832b7cf` as ancestors.
+
+**Verdict: ACCEPTED.** All four findings confirmed against the documents, both
+claimed mutations reproduced, nothing deleted or weakened. Two are defects in
+my own round that re-reading my own text would not have surfaced:
+
+- **ACERDOC-001** — I rewrote the Action Plan for ACER and added section 7bv,
+  but never touched the handoff reading list a new session starts from, which
+  still said "Strong-Buy priority" and sent the reader to SBP-0. The entry
+  point pointed at the superseded program while the plan behind it pointed at
+  ACER.
+- **ACERDOC-002** — the ACER plan asserted "zero snapshots exist and the
+  scheduled task was never installed" while the Action Plan row I wrote in the
+  same commit said that state was never measured. Absence from Git is not
+  absence on the operational host, and I had corrected this exact overclaim in
+  my own draft two rounds earlier before reproducing it.
+
+ACERDOC-003 (the archive index still advertised SBP as "draft pending owner
+adoption" with no ACER row) and ACERDOC-004 (topology stopped at PR #285 while
+PR #286 had merged) are also confirmed. Codex additionally **rendered the
+source PDF visually and read all nine pages**, which is better evidence of
+faithful representation than my own stdlib text extraction, whose garbled
+formulas I had flagged.
+
+**Four counter-review items closed (ACRV-001..004):**
+
+- The new index guard used `next(...)`, so a deleted row raised `StopIteration`
+  with no message — the same defect CRV-003 closed one round earlier and which
+  this guard reproduced. Now asserts exactly one row with a diagnostic
+  message; both mutations re-verified red.
+- **My own overstatement, which the review did not catch:** the plan asserted
+  ETF scores "will be strongly collinear" with no correlation computed — the
+  unsupported-quantity error that sank SBPA-001, reproduced inside the
+  document that cites it as a lesson. Now labelled reasoning rather than
+  measurement, with ACER-3 required to measure realized cross-sectional
+  correlation and report it beside any ranking result.
+- The unmeasured machine-local SBR state was correctly flagged but assigned to
+  nobody. ACER-1 now must measure task presence and snapshot count on the
+  operational host, read-only, and record it in `OPERATIONAL_FACTS.md`.
+- The review reported an exit code and a collection count but no pass/fail
+  counts, which `CLAUDE.md` §10 requires; measured independently below.
+
+Validation on the final tree: the full suite ran **4,352 passed / 1 failed /
+25 warnings** in 953.04 seconds, the single failure being
+`test_current_review_documents_have_no_validation_placeholders` firing on the
+unfilled result token in this sentence. After substitution the focused
+document/contract suite passes 52. The suite total is 4,353 tests, matching
+the collection count Codex reported; this record adds the pass/fail/warning
+numbers that ACRV-004 found missing. Python 3.13.14; `compileall` over the required
+surface passed; `git diff --check` passed. No data purchase, QuantConnect
+access, broker access, scheduled-task change, deployment, epoch action, or
+operational database mutation occurred. ACER remains a DRAFT and ACER-0
+remains the owner's decision.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**
 `docs/ACTION_PLAN_2026-08-20.md` is the go-to plan and, as amended the same
 day, puts the **Analyst-Consensus ETF Rotation program (ACER)** first (section
 7bv). SBP is **SUPERSEDED while still a draft** and SBP-0 will not be run; the
-frozen SBR capture stream is **closed before its first capture** with zero
-snapshots and its task uninstalled. The blocking decision is now **ACER-0
+frozen SBR capture stream is **closed before its first verified capture**;
+no snapshot is committed and its task must not be installed. The blocking decision is now **ACER-0
 adoption** — signal encoding, decay grid, eligibility, control set,
 benchmarks, gates, cell counts and run budget — together with the ratings
 vendor choice and the separate control-set dataset ACER-2 needs. **ACER-2 is
@@ -3269,13 +3363,13 @@ or roll an epoch without a new explicit owner instruction.
 
 ```text
 Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
-docs/SESSION_HANDOFF.md, docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md,
+docs/SESSION_HANDOFF.md, docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md,
 docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md,
 docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md,
 docs/operations/OPERATIONAL_FACTS.md, and docs/alpha-result.md. Published
-origin/main is 6f571c2 after PR #285 merged the documentation-cleanup review
-and its counter-review; every commit named in sections 7bt-7bv is mainline
-history. Stage 0/1 and APQ are valid but closed null; SHW-4 is prospective.
+origin/main is 6cdb423 after PR #286 merged the ACER documentation snapshot;
+the ACER review branch begins at that exact head. Stage 0/1 and APQ are valid
+but closed null; SHW-4 is prospective.
 SBP is SUPERSEDED as of 2026-08-20 by the ACER program
 (docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md); the next owner
 decision is ACER-0 adoption, not SBP-0. Do not run

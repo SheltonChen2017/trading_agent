@@ -966,3 +966,35 @@ def test_a_superseded_program_is_not_also_the_next_owner_decision():
             assert _doc_path(name).is_file(), (
                 f"the action plan blocks on {prefix}-0 but {name} does not exist"
             )
+
+
+def test_reference_index_matches_a_superseded_program_status():
+    """ACERDOC-003: the archive index must not advertise SBP as actionable.
+
+    A plan can remain valuable historical design work after it is superseded,
+    but callers that start from the archive index must be sent to the current
+    program rather than to an owner decision that no longer exists.
+    """
+    sbp = _text("reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
+    index_path = _doc_path("reference/README.md")
+    index = index_path.read_text(encoding="utf-8")
+    if re.search(r"Status: \*\*SUPERSEDED", sbp):
+        # ACRV-001: `next()` raised StopIteration when the row was missing
+        # -- an error with no message, the same defect CRV-003 closed in
+        # the amendment-ledger guard one round earlier. A deleted row is a
+        # legitimate failure mode of this guard and must name itself.
+        sbp_rows = [
+            line
+            for line in index.splitlines()
+            if line.startswith("| `STRONGBUY_PORTFOLIO_TEST_PLAN.md`")
+        ]
+        assert len(sbp_rows) == 1, (
+            "expected exactly one STRONGBUY_PORTFOLIO_TEST_PLAN.md row in "
+            f"the reference index, found {len(sbp_rows)}"
+        )
+        sbp_row = sbp_rows[0]
+        assert "superseded" in sbp_row.lower(), (
+            "the reference index still advertises a superseded plan as actionable"
+        )
+        assert "pending owner adoption" not in sbp_row.lower()
+        assert "ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md" in index

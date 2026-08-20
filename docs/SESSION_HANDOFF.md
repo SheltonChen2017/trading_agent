@@ -14,8 +14,9 @@ two-run Stage 0 launch (section 7s), and Codex's correction review (section
 7t). The SBP rounds in sections 7bm through 7bq then superseded that
 sequencing text, section 7br records the topology refresh, section 7bs records
 Claude's documentation/SBP audit, and section 7bt records Codex's independent
-correction review. Section 7bv records the later ACER replacement; it and
-section 8 are the current development state.
+correction review. Section 7bv records the later ACER replacement, 7bw its
+independent review, and 7bx the counter-review; 7bx and section 8 are the
+current development state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -3141,7 +3142,7 @@ change, or order occurred. This review does not adopt ACER-0. The current
 review branch is local-only and must not be described as published until the
 owner explicitly authorizes a push.
 
-## 7bw. Counter-review of the ACER documentation review: ACCEPTED (2026-08-20)
+## 7bx. Counter-review of the ACER documentation review: ACCEPTED (2026-08-20)
 
 Branch `user/claude/acer-review-counterreview-20260820`, from Codex's exact
 head `832b7cf`. Record:
@@ -3192,13 +3193,33 @@ formulas I had flagged.
 - The review reported an exit code and a collection count but no pass/fail
   counts, which `CLAUDE.md` §10 requires; measured independently below.
 
-Validation on the final tree: the full suite ran **4,352 passed / 1 failed /
+Validation at submission: the full suite ran **4,352 passed / 1 failed /
 25 warnings** in 953.04 seconds, the single failure being
 `test_current_review_documents_have_no_validation_placeholders` firing on the
-unfilled result token in this sentence. After substitution the focused
-document/contract suite passes 52. The suite total is 4,353 tests, matching
-the collection count Codex reported; this record adds the pass/fail/warning
-numbers that ACRV-004 found missing. Python 3.13.14; `compileall` over the required
+then-unfilled result token; after substitution only the focused suites reran.
+
+**Codex follow-up accepted (2026-08-20), two P3s, both mine:** this section
+was numbered 7bw although the reviewed head's own review section already used
+7bw — the MHP-001 numbering-collision class; renumbered to 7bx with
+cross-references updated. And the substitute-then-focused pattern above left
+the final pushed tree without a completely green full-suite run — a
+validation-record gap, not a product defect (Codex independently reran the
+relevant file: 36 passed). Both corrected in the follow-up round below, which
+also changes its ordering so the green run precedes the recorded sentence
+rather than chasing it.
+
+Follow-up round validation (branch `user/claude/acer-cr-followups-20260820`):
+all prose above this paragraph was finalized first, with no placeholder token,
+and the full suite then ran completely green on that tree — **4,353 passed /
+0 failed / 25 warnings** in 709.06 seconds, Python 3.13.14. This paragraph and
+the recorded numbers are the only later change; the focused document/contract
+suites reran on the final prose, `compileall` over the changed surface passed,
+and `git diff --check` passed. That closes the ACRV-004-adjacent gap Codex
+raised: the green run now precedes its own record instead of being displaced
+by it. Codex's disputed vendor figures ($1,500/yr Zacks — owner-reported;
+1995/14,000+ delisted — web-search summaries; 1985 — Codex's own reading) are
+confirmed absent from every committed document and remain chat-level claims
+for the vendor audit. No product behaviour changed. Python 3.13.14; `compileall` over the required
 surface passed; `git diff --check` passed. No data purchase, QuantConnect
 access, broker access, scheduled-task change, deployment, epoch action, or
 operational database mutation occurred. ACER remains a DRAFT and ACER-0

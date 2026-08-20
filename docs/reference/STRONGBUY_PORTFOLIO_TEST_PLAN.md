@@ -45,8 +45,9 @@ adopts this plan before an admissible price-linked evaluation look.
 | Decision | Proposed value |
 |---|---|
 | Candidate stocks | The 102-symbol list already frozen by SBR-1; constituent changes do not rewrite history |
+| Security-age eligibility | Official first trading session must permit 64 completed exchange-session closes by the decision cutoff, determined from frozen listing-date evidence plus the exchange calendar—not provider row count |
 | Strong-Buy eligibility | `total >= 10`; `strongBuy / total >= 0.50`; `(strongBuy + buy) / total >= 0.80`; `(sell + strongSell) / total <= 0.10` |
-| Basket membership | Every candidate meeting all four rules; no discretionary additions, exclusions, or top-N tuning |
+| Basket membership | Every age-eligible candidate meeting all four ratings rules; no discretionary additions, exclusions, or top-N tuning |
 | Minimum basket size | 10 stocks; below 10 is a named monthly refusal, not permission to loosen a rule. This is the mathematical minimum under a 10% stock cap; with exactly 10 names, P1 and P2 are necessarily identical |
 | Volatility window | Exactly 63 close-to-close daily returns from 64 consecutive completed exchange-session adjusted closes, ending before the decision cutoff |
 | Stock-weight formula | `raw_i = 1 / sample_std(daily_return_i)`; normalize raw weights to 100% |
@@ -109,32 +110,34 @@ they never pass the signal rule, while a selected ticker with a broken price
 window has already passed and cannot be deleted without changing the tested
 portfolio.
 
-**Proposed SBPA-006 (counter-review 2026-08-19, owner decision pending) —
-listing history is an ELIGIBILITY precondition, not a post-selection
-deletion.** A candidate whose listing history contains fewer than 64
-completed exchange sessions at the decision cutoff **cannot be eligible**,
-evaluated in the same step and at the same moment as the four ratings rules,
-before any selection exists. This does not reopen SBPA-002: nothing is
-removed after the signal selects it, and a genuinely broken window for an
-ELIGIBLE stock still refuses the whole month exactly as written above.
+**Proposed SBPA-006 (counter-review 2026-08-20, owner decision pending) —
+security age is a candidate-eligibility precondition, not a post-selection
+deletion.** A candidate's official first trading session must be early enough
+to permit 64 completed exchange-session closes at the decision cutoff. The
+check is evaluated before the four ratings rules and before any selection
+exists.
 
-The reason is arithmetic rather than empirical, so it does not depend on any
-probe: a stock that has not traded 64 sessions can never produce the frozen
-63-return window, in that month or in any earlier one. Under whole-month
-refusal alone, a single such candidate passing the ratings rules refuses
-**every** month until it seasons — a permanent stall of a 24-month evidence
-budget caused by a name that was never weightable. Recent index additions are
-the live case: an exploratory check on 2026-08-19 found two current
-candidates below the threshold (46 and 47 sessions). That count is
-exploratory, not evidence, and SBP-0 must re-verify listing history from the
-frozen provenance-bound price source; the rule itself stands regardless of
-how many names are affected.
+The age test must use a frozen security-master/listing-date record plus the
+exchange calendar. It must **not** count rows returned by the price provider,
+because a missing row for an old security is broken data, not evidence of a
+recent listing. Once a candidate passes the age gate and the ratings select
+it, any missing or invalid close in the exact 64-close window still refuses
+the whole month. Nothing is removed after selection.
+
+The reason is arithmetic rather than empirical: a security that has not yet
+completed 64 trading sessions cannot produce 63 close-to-close returns. Under
+whole-month refusal alone, such a selected name would refuse each month until
+it seasons. That is a temporary but avoidable loss of prospective months, not
+a “permanent” stall. No exploratory current-candidate count is part of this
+contract.
 
 The cost is disclosed: this excludes recently listed constituents from the
 tested universe until they season, which is a real universe restriction with
 its own return characteristics. It is declared in advance and applied
 uniformly, and the alternative is not "include them" — they are unweightable
-by construction — but "refuse every month". After inverse-volatility normalization, repeatedly cap
+by construction — but "refuse the month".
+
+After inverse-volatility normalization, repeatedly cap
 weights above 10% and redistribute the remainder among uncapped stocks in
 proportion to their raw inverse-volatility weights.
 
@@ -401,7 +404,7 @@ family closes. The start remains gated on owner adoption, reviewed capture
 code, owner-present installation, and first-firing verification; the timeline
 does not itself argue for skipping or accelerating a gate.
 
-## 11. Amendment log (2026-08-19, pre-adoption)
+## 11. Amendment log (2026-08-19 through 2026-08-20, pre-adoption)
 
 | ID | Amendment | Why |
 |---|---|---|
@@ -410,42 +413,13 @@ does not itself argue for skipping or accelerating a gate.
 | SBPA-003 | **PARTIALLY ACCEPTED, CORRECTED.** P4−P3 descriptive; family has three inferential cells | The beta/claim classification is sound. The unsupported 35–40% assertion is withdrawn and the look-through formula is corrected |
 | SBPA-004 | **REJECTED AS POWER EVIDENCE, REPLACED.** Submitted 0.6%/month statement | It mixed unsupported variance/independence assumptions, test sidedness, and a rejection boundary. A pre-adoption sensitivity table is now required; the null interpretation is retained accurately |
 | SBPA-005 | **CONDITIONALLY ACCEPTED.** SBP-0 may supersede SBR-2 | It becomes true only upon explicit owner adoption and verified stream state. The already frozen SBR capture contract is not edited prospectively |
-| SBPA-006 | **NEW, PROPOSED (counter-review 2026-08-19).** Listing history <64 completed sessions at the cutoff makes a candidate INELIGIBLE, decided with the ratings rules before selection exists | Closes a permanent-stall path left open by the (correct) SBPA-002 rejection: a candidate that has never traded 64 sessions can never be weighted, so under whole-month refusal alone it refuses every month until it seasons. Arithmetic, not empirical; nothing is deleted after selection, and a broken window for an eligible stock still refuses the month |
+| SBPA-006 | **NEW, PROPOSED, ACCEPTED AFTER CLARIFICATION (counter-review 2026-08-20).** Official security age sufficient for 64 completed closes is a pre-rating candidate-eligibility rule | Avoids refusing every month until a newly listed selected security seasons without deleting a selected stock. The gate uses official listing date plus the exchange calendar, never provider row count; broken data for an age-eligible selected stock still refuses the month |
 
-**Counter-review of the 2026-08-19 review (Claude).** The three rejections
-are ACCEPTED as correct, and the record should show why rather than merely
-that they were conceded:
-
-- **SBPA-001 is refuted by re-running my own probe.** Baskets concentrated in
-  high-index-weight names renormalize to overlaps well above 50%, exactly as
-  the review argued; 33.8% was a property of the particular baskets I tested
-  (all-candidates, lowest-vol, highest-vol), never a ceiling. Since the
-  realistic basket is whatever the ratings filter selects — unknown until
-  captures exist — the claim "50% is unreachable" was unsupported. The
-  criticism that the probe shipped without artifact, inputs, or hashes is
-  also correct by this repository's own standards. **10% therefore stands
-  only as a disclosed policy proposal**, and both the earlier feasibility
-  table and this re-check are exploratory context, not evidence.
-- **SBPA-002 is correctly rejected.** Deleting a stock the signal already
-  selected changes the tested portfolio, and the missingness is plausibly
-  outcome-correlated (halts, deal pendency, distress) — the silent-row-drop
-  failure this project forbids. Whole-month refusal is the honest rule;
-  SBPA-006 addresses only the never-weightable case it leaves open.
-- **SBPA-004 is correctly rejected as power evidence.** My 0.6%/month was a
-  rejection boundary computed two-sided against an assumed tracking error,
-  not power against a stated alternative, and the frozen test is one-sided.
-  The required sensitivity table with an 80%-power minimum detectable effect
-  is the stronger contract.
-
-The review's own additions are accepted and two are material: the minimum
-basket size correction to **10** (below the mathematical minimum under a 10%
-cap the constraint is infeasible by construction — my 8 was wrong, and the
-note that P1 and P2 coincide at exactly 10 names is worth keeping), and the
-**leveraged look-through correction** (a leveraged ETF obtains exposure
-through derivatives, so its literal holdings are not a valid issuer
-look-through; the ordinary same-index weights are the right proxy). The
-price-window provenance binding and the one-sided bootstrap with a fixed
-3-month block length are likewise stronger than what they replace.
+Claude's counter-review accepted the SBPA-001/002/004 rejections and the
+minimum-size, look-through, price-lineage, and bootstrap corrections. Detailed
+reasoning remains in
+`docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md`; this plan retains
+only the operative draft contract and concise amendment dispositions.
 
 **Relationship to LEV (unchanged in substance, stated explicitly):** the LEV
 family is SECONDARY to this plan — a frozen historical TQQQ timing experiment

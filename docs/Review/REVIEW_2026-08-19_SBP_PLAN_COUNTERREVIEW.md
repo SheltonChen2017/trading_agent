@@ -1,4 +1,4 @@
-# Counter-review: the SBP plan review (Codex, 2026-08-19)
+# Counter-review: the SBP plan review (Codex, completed 2026-08-20)
 
 Status: **review ACCEPTED IN FULL. All three rejections of my amendments
 are correct — one of them refuted by re-running my own probe. One new
@@ -6,7 +6,8 @@ amendment proposed (SBPA-006) to close a gap the correct rejection leaves
 open.** Author: Claude (author of the rejected amendments), counter-reviewing
 commits `5c3bf45`, `2a26353`, `9d02ee5` on
 `codex/review-sbp-plan-amendments-20260819`. No QC, broker, task, or
-database access; no captured data exists.
+database access. The repository contains no committed snapshot; machine-local
+snapshot state was not verified in this counter-review.
 
 ## 1. The rejections, verified rather than conceded
 
@@ -57,15 +58,16 @@ not any earlier month. If such a name passes the ratings rules, whole-month
 refusal fires every month until it seasons, stalling the 24-month budget on
 a name that was never weightable.
 
-The fix respects the rejection completely: make sufficient listing history an
-**eligibility precondition**, evaluated with the four ratings rules *before
-any selection exists*. Nothing is deleted after selection; a genuinely broken
-window for an eligible stock still refuses the whole month. The argument is
-arithmetic, not empirical, so it does not rest on a probe — though an
-exploratory check on 2026-08-19 did find two current candidates below the
-threshold (46 and 47 sessions), which SBP-0 must re-verify from the
-provenance-bound price source. The cost — recently listed constituents are
-excluded until they season — is disclosed in the plan text.
+The fix respects the rejection only if sufficient official security age is an
+**eligibility precondition** evaluated before the ratings rules and before any
+selection exists. It must use listing date plus the exchange calendar, not
+observed provider-row count; otherwise missing data for an old stock could be
+misclassified as youth and silently excluded. Nothing is deleted after
+selection, and a broken exact window for an age-eligible stock still refuses
+the whole month. The cost — recently listed constituents are excluded until
+they season — is disclosed in the plan text. The submitted exploratory
+46/47-session observation had no committed provenance and is not part of the
+contract.
 
 ## 3. The review's own additions
 
@@ -90,5 +92,5 @@ Accepted; two are materially better than what they replace:
 
 The plan remains **DRAFT pending owner adoption**; SBPA-006 is a proposal for
 the owner's decision alongside the rest of section 2. No code, capture,
-install, or evaluation is authorized by this round, and no snapshot exists to
-evaluate.
+install, or evaluation is authorized by this round. Machine-local snapshot
+state remains an SBP-0 verification item.

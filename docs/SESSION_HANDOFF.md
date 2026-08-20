@@ -2484,9 +2484,52 @@ decision). Milestones after adoption: LEV-1 (LEAN algo), LEV-2
 (analyser + driver hook), LEV-3 (one run), LEV-4 (one pass); SBR-1
 (capture script + task). One branch + independent review each.
 
+## 7bk. SBR-1 implemented: the Strong-Buy capture runtime (2026-08-19)
+
+(Numbered 7bk because the unmerged MPQ/HPQ plans branch already claims
+7bi/7bj — the MHP-001 collision class, avoided at authoring time.)
+Owner priority ("implement the strong buy plans"). Branch
+`user/claude/sbr1-ratings-capture-20260819` off `aa87bf1`. Per the
+frozen capture preregistration:
+
+- `scripts/capture_analyst_ratings.py`: task-specific runtime (ML-LR-6
+  precedent, deliberately not the overlay framework). Monthly snapshot
+  of analyst recommendation counts for the frozen universe; per-ticker
+  failures recorded `available=false` with the error class, never
+  dropped; months labeled in MARKET time (a 00:30Z capture is the
+  previous ET month); canonical JSON lines with pinned LF bytes (a real
+  Windows `\r\n` translation defect was caught by the hash test and
+  fixed); append-only snapshots + sha256 manifest; refusals for orphan
+  snapshots, manifest/file hash mismatch, missing files, naive
+  timestamps, malformed configs. No evaluation imports (AST-pinned):
+  joining snapshots to prices stays forbidden until SBR-2.
+- `docs/operations/strongbuy_ratings_config.json`: frozen 102-ticker
+  NASDAQ-100 universe, deterministically extracted from the Wikipedia
+  constituents wikitext (provenance + retrieval time recorded; a lossy
+  model-extraction first attempt was REJECTED for hallucinated
+  tickers).
+- `scripts/install_windows_strongbuy_capture_task.ps1`: ONE
+  daily-weekday task at 17:15 ET, Interactive logon (covered by the
+  repo-wide S4U scan test automatically), protected-prefix denylist
+  now including the overlay family, Store-alias interpreter guard.
+
+15 tests; 3 reverse mutations red then restored (UTC month labeling,
+orphan-refusal removal — whose first regex attempt was a silent no-op,
+caught and re-run as a real mutation — and bool-count acceptance).
+Remaining for SBR-1 completion: independent review, then the
+owner-present elevated install and a first-firing verification.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7bh):** **LEV-1 IMPLEMENTED** on
+**Current (2026-08-19, section 7bk): SBR-1 IMPLEMENTED** on
+`user/claude/sbr1-ratings-capture-20260819`, pending independent
+review and the owner-present elevated task install (17:15 ET,
+Interactive). The MPQ/HPQ plans are ON HOLD by owner decision
+2026-08-19 (recorded on their branch); the owner's priorities are the
+strong-buy program and app stability — the app ImportError was a stale
+pre-deploy Streamlit process, killed and relaunched clean on `c9d0740`
+(diagnosis in §8's operational note on the plans branch; no code
+change). **LEV-1 IMPLEMENTED** on
 `user/claude/lev1-lean-algorithm-20260819` (based on the frozen-prereg
 commit), pending independent review — `research/lean/
 leveraged_threshold.py` with a daily state machine (next-close

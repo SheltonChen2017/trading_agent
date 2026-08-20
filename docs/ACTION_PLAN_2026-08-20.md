@@ -135,11 +135,20 @@ average variants, raw/coverage-adjusted/breadth-filtered specifications, three
 bearish implementations and a leverage overlay; without a declared family size
 and gate, that is a false-discovery generator over one historical sample.
 
-ACER-0 also settles the ratings vendor, which turns on two questions neither
-vendor page answers: does the candidate carry **dated actions for delisted and
-deregistered tickers, and from when**, and can consensus be retrieved **as of
-a past date** rather than only as current state. A current-state consensus
-endpoint is the same look-ahead that closed Stage 2 PEAD.
+ACER-0 also settles the ratings vendor. **Update 2026-08-20: the owner
+purchased the Benzinga expansion via Massive and authorized a read-only data
+audit** (`docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md`). Snapshot
+A answers the two blocking questions favourably — the feed carries dated
+per-firm actions from 2011-12 **including full listing-to-delisting history
+for bankrupt and acquired names** (SIVB, FRC, SBNY, TWTR, ATVI and more), and
+per-row `previous_rating` makes historical state reconstructible without a
+current-state consensus endpoint. Remaining vendor gates before an ACER-0
+freeze: a **written licence answer** (the Market Data ToS read literally is
+display-only with deletion on termination; whether the Benzinga expansion
+falls under it is unresolved), written timezone confirmation, the snapshot B
+restatement measurement, and the rename/ticker-reuse hazard (FB vs ANTM
+handled oppositely; BBBY reused), which requires security-master joins rather
+than raw ticker joins.
 
 ### ACER-2 is the decisive milestone; scope and price that alone
 

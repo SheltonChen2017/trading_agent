@@ -3225,6 +3225,77 @@ access, broker access, scheduled-task change, deployment, epoch action, or
 operational database mutation occurred. ACER remains a DRAFT and ACER-0
 remains the owner's decision.
 
+## 7by. Benzinga vendor data audit: read-only, snapshot A complete (2026-08-20)
+
+Branch `user/claude/acer1-benzinga-audit-20260820` (stacked on the 7bx
+follow-ups branch, since both touch this file). Owner authorized the
+subscription purchase and a strengthened read-only audit; the key is the
+`MASSIVE_API_KEY` user environment variable (verified set, length only — the
+value appears nowhere). Record:
+`docs/research/BENZINGA_RATINGS_2026-08-20_DATA_AUDIT.md`. Tool:
+`scripts/audit_benzinga_ratings.py` with refusal-direction tests
+(`tests/test_benzinga_ratings_audit.py`, 4 tests, both refusal mutations
+verified red then restored from a committed restore point).
+
+**Snapshot A**: 587,046 rows, 2011-12-08 → 2026-08-20, 596 pages, 399 MB,
+every yearly partition naturally terminated, per-page SHA-256s in the
+manifest, stored under gitignored `artifacts/benzinga_audit/
+benzinga-ratings-20260820T233055Z` (immutable; the tool refuses to overwrite
+a snapshot and refuses hash mismatches and incomplete snapshots at analysis).
+
+**Findings, condensed** (full detail in the audit record):
+
+- **Delisted coverage PASSES** — the decisive question. SIVB (240 rows to
+  2023-03-13), FRC (207 to 2023-04-26), SBNY, TWTR, ATVI, and 15 more
+  acquired/bankrupt names all carry full listing-to-delisting history. OTC
+  `-Q` successors are absent (acceptable; outside any investable universe).
+- **Rename/reuse hazard, the audit's most important defect find:** FB has 0
+  rows (history re-keyed to META) while ANTM kept its history — opposite
+  handling of two renames; BBBY merges the dead retailer with the Beyond
+  Inc. reuse under one symbol; FISV rows begin 2025-12. Ticker-keyed joins
+  are unsafe across renames; ACER must join through a security master with
+  reuse boundaries. QC symbol-mapping cross-reference remains open.
+- `previous_rating` missingness (44%) is structural — 100% of initiations,
+  correctly — and the transitions ACER uses are ~99% complete on upgrades
+  and downgrades. Zero duplicate `benzinga_id`. 46 inconsistent transitions
+  (0.008%) become a named refusal class.
+- `time` looks like US Eastern (pre-market peak 06-09h; a UTC reading would
+  put the peak at 01-04h ET). Written vendor confirmation still required;
+  ambiguous rows defer to next-session eligibility per the owner's rule.
+- `last_updated` is not a migration artifact: 95% same-day, tracks action
+  years, zero negative gaps; the owner's conservative availability rule
+  (later of action time and `last_updated`) defers only ~4% of rows.
+- Disclosed data limitations: 2017 rows are ~35% below neighbouring years;
+  the distinct-firm count declines 265 → ~120-150 across the history.
+- **Licence NOT confirmed — the round's most important open item.** The
+  Individuals ToS permits personal non-commercial use, but the Market Data
+  ToS read literally is display-only, prohibits derived works naming
+  "investment strategy", and requires deletion on termination. Whether the
+  Benzinga expansion falls under that definition is unresolved; one written
+  sentence from Massive support is required before ACER-0 freezes on this
+  vendor, and the deletion-on-termination clause must be disclosed in any
+  preregistration if it applies.
+
+The three governing ToS pages are preserved raw and hashed under
+`artifacts/benzinga_audit/tos-20260820/` (a gap the owner exposed by asking
+where the licence quotes came from: the first citation rested on a
+summarizing fetch, below this project's bar for load-bearing text; every
+quoted clause is now re-verified against the preserved bytes).
+
+Open items: snapshot B restatement diff (compare by stable `benzinga_id`);
+written licence and timezone answers, referencing the preserved 2026-08-20
+ToS copies; QC symbol-mapping cross-reference. No backtest, no price join,
+no research look, no ledger entry: this was a data audit under the owner's
+explicit read-only instruction.
+
+Validation on the final tree: full suite **4,357 passed / 0 failed / 25
+warnings** in 912.13 seconds (4,353 prior tests plus this round's four
+refusal tests), run on the complete code and prose before this validation
+sentence and the ToS-preservation paragraphs were added; the focused
+document/contract suites and the new audit tests reran on the final prose.
+Python 3.13.14; `compileall` over the changed surface passed;
+`git diff --check` passed.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**

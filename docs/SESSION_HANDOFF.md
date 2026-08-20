@@ -2559,9 +2559,30 @@ caught and re-run as a real mutation — and bool-count acceptance).
 Remaining for SBR-1 completion: independent review, then the
 owner-present elevated install and a first-firing verification.
 
+## 7bl. Counter-review of the Codex audit: VERIFIED (2026-08-19)
+
+Counter-review record:
+`docs/Review/REVIEW_2026-08-19_POST_STAGE0_COUNTERREVIEW.md`. All six
+behavioral corrections were independently re-verified red on the
+pre-correction files and green after (including the APQ month-label
+DID-NOT-RAISE); no test was deleted or weakened (SBR fixtures upgraded
+to the stricter frozen shape). Substantive judgments: PTSR-001 is a
+real frozen-spec violation my LEV-1 mutations missed (a composition
+blind spot — sale filling exactly on a month-end vs the boundary
+callback); PTSR-002 is WORSE than stated — the original `isinstance
+(value, int)` would also have rejected the real provider's numpy
+integers, so production's success path was fixture-blind; PTSR-003's
+dirty-tree capture block is the correct fail-closed direction. Doc
+rewrites checked accurate against the ledgers. One gap closed
+(PSCR-001, P3): the dropped app-restart-after-deploy lesson moved to
+its durable home in OPERATIONAL_FACTS. The epoch-006
+`policy_fingerprint` change (4a942cbc… → 4086365c…) is NOT explained
+by this audit and stays flagged.
+
 ## 8. What is next
 
-**Current (2026-08-19): independent audit accepted after correction.**
+**Current (2026-08-19): independent audit accepted after correction,
+and counter-reviewed (section 7bl).**
 Codex reviewed exact pushed range
 `81db126340818fe2c2c9efa16c77af8f1d37568f..3055fecd1caf490c852a446c03da760d2878af5a`
 (143 commits) on

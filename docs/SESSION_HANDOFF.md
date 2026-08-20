@@ -2486,10 +2486,19 @@ decision). Milestones after adoption: LEV-1 (LEAN algo), LEV-2
 
 ## 8. What is next
 
-**Current (2026-08-19, section 7bg):** LEV + SBR preregistrations
-FROZEN by owner adoption ("as-is"); **LEV-1 (LEAN algorithm + local
-tests, no QC) is the next milestone**, then LEV-2 (analyser + driver
-hook); SBR-1 (capture script + task) may run in parallel. The
+**Current (2026-08-19, section 7bh):** **LEV-1 IMPLEMENTED** on
+`user/claude/lev1-lean-algorithm-20260819` (based on the frozen-prereg
+commit), pending independent review — `research/lean/
+leveraged_threshold.py` with a daily state machine (next-close
+execution; month-end re-entry fills AT the month-end close; pullback
+re-entry needs the full −10%), seven aligned monthly series, union
+refusal, roll-forward turnover across refusal gaps (over-charging is
+the accepted direction), LSALE lines for the preregistered after-tax
+descriptive, LEV-specific log markers, and no ACTIVE_UNIVERSE. 10
+tests; 3 reverse mutations red then restored (threshold boundary,
+pullback boundary, accumulator reset). No QC. **LEV-2 (analyser +
+driver hook) is next**; SBR-1 (capture script + task) may run in
+parallel. The
 allocation-policy family is CLOSED (A-003, NULL on the gate). No QC
 access is currently authorized anywhere. Other owner-gated tracks:
 (1) Codex's thorough two-day audit tonight (range through the APQ-5

@@ -2612,9 +2612,11 @@ broker, scheduled-task, deployment, or operational-state change occurred.
 The owner must decide the proposed thresholds, caps, cost assumptions,
 candidate ETF pairs, and minimum evidence floor before SBP-0 can complete.
 
-## 7bn. SBP plan counter-reviewed and AMENDED; recommended primary (2026-08-19)
+## 7bn. SBP plan amendments submitted (2026-08-19; corrected by 7bo)
 
-Counter-review of the section 7bm draft. **Verdict: it should become the
+This is the implementer's submitted account of the section 7bm draft review.
+Its quantitative and authority claims are **superseded by the independent
+review in section 7bo**. Submitted verdict: **it should become the
 primary plan** — it writes the test my SBR preregistration deferred, and
 its P0..P4 decomposition (one decision isolated at a time) is exactly the
 structure that would have prevented Stage 0/1's beta-as-edge readings.
@@ -2661,13 +2663,57 @@ half; not evidence for this strategy). Honest headline recorded in the
 plan's new section 10: this is a **two-year instrument** — first analysis
 pass around **September 2028** — with no admissible historical shortcut.
 
+## 7bo. Independent review of SBP amendments: ACCEPTED AFTER CORRECTION (2026-08-20)
+
+Codex formally reviewed exact pushed branch
+`origin/user/claude/sbp-plan-amendments-20260819`, base `5e3708e`, single
+submitted commit `5c42bfd`, and exact head `5c42bfd`. The one commit is
+**ACCEPTED AFTER CORRECTION**. Review report:
+`docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md`.
+
+Correction `5c3bf45` closes five P2 and two P3 findings. The submitted 33.8%
+value was one unpreserved all-candidate probe, not a hard ceiling over
+renormalized selected subsets; no code, inputs, official holdings identity,
+price window, or hashes made the table reproducible. Its values are rejected
+as evidence. The proposed 10% overlap floor remains visible only as an owner
+policy choice. Ticker-level price exclusion was also rejected because it
+deletes a stock after the signal selects it and changes “every qualifying
+ticker” into a data-availability-selected basket; whole-month refusal is
+restored.
+
+The review also corrected P3/P4 look-through exposure to use 95% of the direct
+core plus the ordinary same-index ETF weights (scaled by stated leverage for
+P4), because literal leveraged-fund holdings can be derivatives rather than
+constituent exposure. Unsupported 35–40%-annual-return and 0.6%-monthly power
+claims were withdrawn. The inferential family is three one-sided cells at
+0.05/3 with a fixed three-month mean stationary-bootstrap block; P4−P3 remains
+descriptive because its main difference is intentional beta. SBP-0 must add an
+80%-power sensitivity table before adoption. Two inherited Codex-draft defects
+were also closed: 8 names cannot sum to 100% under a 10% cap (minimum is now
+10, with P1=P2 disclosed at exactly 10), and 63 returns require 64 consecutive
+closes plus immutable price-input lineage.
+
+The frozen SBR capture preregistration no longer declares itself superseded
+before the owner acts. SBP may replace SBR-2 only upon explicit adoption and
+after machine-local snapshot state is measured. No code, QC access, market
+data, broker access, scheduler mutation, deployment, or operational-state
+change occurred. No milestone entry was added because SBP remains a draft.
+
+Validation on the corrected tree: active-document tests 31 passed; the first
+full run crossed local midnight and produced one synthetic-UI date mismatch
+(4,347 passed / 1 failed / 25 warnings), the exact test then passed alone, and
+the unchanged same-date full rerun passed **4,348 / 0 failed / 25 warnings** in
+665.15 seconds. Python 3.13.14; required compileall plus `research/` passed;
+diff check passed. Review record/Action Plan commit `2a26353`. Branch
+`codex/review-sbp-plan-amendments-20260819` and all Codex commits are
+**local-only, not pushed or merged** at this handoff.
+
 ## 8. What is next
 
-**Current (2026-08-19): the independent audit is accepted after correction
-and counter-reviewed (section 7bl); the complete Strong-Buy successor plan
-is drafted (7bm), counter-reviewed and AMENDED (7bn), and is
-RECOMMENDED AS PRIMARY — pending owner adoption. No SBP code before that
-freeze; LEV is secondary.**
+**Current (2026-08-20): Claude's SBP amendments are independently ACCEPTED
+AFTER CORRECTION (section 7bo). The complete Strong-Buy successor remains a
+DRAFT — not adopted, frozen, scheduled, or implemented. No SBP code before an
+owner-approved SBP-0 freeze. LEV remains separate and cannot validate SBP.**
 Codex reviewed exact pushed range
 `81db126340818fe2c2c9efa16c77af8f1d37568f..3055fecd1caf490c852a446c03da760d2878af5a`
 (143 commits) on
@@ -2687,15 +2733,16 @@ review report dispositions all 143 submitted commits.
 
 **Sequencing:** Stage 0 and Stage 1 are closed null (A-001/A-002).
 APQ is closed null (R-029/A-003). SHW-4 is live and collecting its
-prospective 24-month stream. The review branch has been counter-reviewed but
-is not yet recorded here as merged. The SBR Interactive scheduled-task install
-is owner-present and remains unperformed. Before using SBR as the owner's
-complete portfolio strategy, the owner should accept or revise
-`docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` and freeze SBP-0. No captured
-month may be joined to subsequent prices under the draft; pre-adoption months
-would be calibration-only. LEV-2 may proceed only as the already frozen,
-separate TQQQ timing study, not as proof of the Strong-Buy portfolio. MPQ/HPQ
-remain on hold. Active paper evidence is `paper-epoch-006`;
+prospective 24-month stream. The SBP review branch is local-only. The owner
+should first review the corrected proposed values in
+`docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md`. If accepted, SBP-0 must
+verify official ETF pairs, machine-local snapshot count, the optional
+structural artifact, and power sensitivity before freezing. Until adoption,
+the frozen SBR-2-after-12-captures rule remains the authority; no snapshot may
+be joined to subsequent prices. The SBR Interactive scheduled-task install is
+owner-present and remains unperformed. LEV-2 may proceed only as the separate
+TQQQ timing study, not as SBP evidence. MPQ/HPQ remain on hold. Active paper
+evidence is `paper-epoch-006`;
 the next operational observation is governed by
 `docs/operations/OPERATIONAL_FACTS.md`.
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

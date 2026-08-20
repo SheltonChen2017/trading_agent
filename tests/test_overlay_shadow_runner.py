@@ -241,6 +241,24 @@ def test_unpriceable_member_refuses_the_cycle_and_names_the_ticker(harness):
     assert any("DDD" in reason for reason in refusal["refusal_reasons"])
 
 
+def test_non_finite_provider_close_becomes_a_named_cycle_refusal(harness):
+    """Bad provider data is evidence unavailability, not a JSON crash."""
+    fetch, argv, database, config = harness
+    runner.main([*argv, "register"])
+    _set_all(fetch, {FEB27: 100.0, MAR02: 100.0})
+    runner.main([*argv, "observe"])
+    _set_all(fetch, {MAR31: 110.0, APR01: 111.0})
+    fetch.data["DDD"][MAR31] = float("nan")
+
+    assert runner.main([*argv, "observe"]) == 0
+    rows = AssistantStore(database).get_overlay_observations(
+        config["stream_name"], config["evidence_epoch"]
+    )
+    refusal = json.loads(rows[-1]["observation_json"])
+    assert refusal["available"] is False
+    assert any("DDD" in reason for reason in refusal["refusal_reasons"])
+
+
 def test_gap_cycles_get_refusal_rows_and_the_next_cycle_spans_them(harness):
     fetch, argv, database, config = harness
     runner.main([*argv, "register"])
@@ -512,6 +530,45 @@ def test_sufficiency_met_exactly_at_the_preregistered_boundary(
     assert report["insufficiency_reasons"] == []
     # MET still evaluates no gate and prints no statistic.
     assert "separate, owner-authorized" in report["gate_evaluation"]
+
+
+def test_sufficiency_does_not_count_an_unavailable_outcome(
+    harness, tmp_path
+):
+    from assistant.overlay_shadow import OverlayObservation, OverlayOutcome
+
+    fetch, argv, database, config = harness
+    config["required_observation_count"] = 1
+    config_path = tmp_path / "unavailable-outcome.json"
+    config_path.write_text(json.dumps(config), encoding="utf-8")
+    argv = ["--database", argv[1], "--config", str(config_path)]
+    runner.main([*argv, "register"])
+    store = AssistantStore(database)
+    store.record_overlay_observation(OverlayObservation(
+        stream_name=config["stream_name"],
+        evidence_epoch=config["evidence_epoch"],
+        cycle_session=FEB27.isoformat(),
+        generated_at="2026-03-02T21:00:00+00:00",
+        provider="test", inputs_sha256="a" * 64, available=True,
+        index_levels={"universe": 100.0, "carry": 100.0,
+                      "combined": 100.0},
+        combined_carry_weight=0.20,
+    ).to_payload())
+    store.record_overlay_outcome(OverlayOutcome(
+        stream_name=config["stream_name"],
+        evidence_epoch=config["evidence_epoch"],
+        cycle_session=FEB27.isoformat(),
+        matured_at="2026-04-01T21:00:00+00:00",
+        available=False,
+        refusal_reasons=("next observation could not be priced",),
+    ).to_payload())
+
+    out = tmp_path / "unavailable-outcome-report.json"
+    assert runner.main([*argv, "sufficiency", "--output", str(out)]) == 0
+    report = json.loads(out.read_text(encoding="utf-8"))
+    assert report["sufficiency"] == "NOT_MET"
+    assert report["independent_observation_count"] == 0
+    assert report["counts"]["unavailable_outcomes"] == 1
 
 
 def test_sufficiency_refuses_a_drifted_config_count(harness, tmp_path):

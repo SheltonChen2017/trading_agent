@@ -87,6 +87,7 @@ def new_variant_state(entry_price, entry_session):
         "equity": 1.0,
         "pending": None,
         "sale_fill": None,
+        "sale_session": None,
         "await_month_end": False,
         "month_turnover": 0.0,
         "sales": [],
@@ -108,6 +109,7 @@ def advance_variant(state, spec, close, session):
         state["equity"] = state["equity_at_fill"] * (1.0 + gain)
         state["invested"] = False
         state["sale_fill"] = close
+        state["sale_session"] = session
         state["month_turnover"] += EVENT_TURNOVER
         state["sales"].append((state["entry_session"], session, gain))
         state["await_month_end"] = spec["reentry"] == "month_end"
@@ -117,6 +119,7 @@ def advance_variant(state, spec, close, session):
         state["entry_fill"] = close
         state["entry_session"] = session
         state["equity_at_fill"] = state["equity"]
+        state["sale_session"] = None
         state["month_turnover"] += EVENT_TURNOVER
         state["pending"] = None
     if state["invested"]:
@@ -129,13 +132,19 @@ def advance_variant(state, spec, close, session):
 
 def reenter_at_month_end(state, close, session):
     """L1/L2 fill point: the month-end close itself, no next-close lag."""
-    if state["await_month_end"] and not state["invested"]:
+    # "Next month-end after the sale" is strict.  When a next-close sale
+    # itself fills on a month-end, the boundary callback sees that same
+    # session; re-entering there would erase the intended cash interval.
+    if (state["await_month_end"] and not state["invested"]
+            and state["sale_session"] is not None
+            and session > state["sale_session"]):
         state["invested"] = True
         state["entry_fill"] = close
         state["entry_session"] = session
         state["equity_at_fill"] = state["equity"]
         state["month_turnover"] += EVENT_TURNOVER
         state["await_month_end"] = False
+        state["sale_session"] = None
 
 
 class LeveragedThreshold(QCAlgorithm):

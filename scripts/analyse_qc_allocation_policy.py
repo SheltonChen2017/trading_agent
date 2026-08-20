@@ -86,6 +86,11 @@ def parse_log(path: Path) -> pd.DataFrame:
                     f"{path.name}: malformed PROW payload: {parts!r}"
                 )
             date, policy, ret_token, turn_token, priced, targeted = parts
+            if (not re.fullmatch(r"\d{6}", date)
+                    or not 1 <= int(date[4:]) <= 12):
+                raise AllocationLogError(
+                    f"{path.name}: invalid YYYYMM month label {date!r}"
+                )
             if policy not in POLICY_ORDER:
                 raise AllocationLogError(
                     f"{path.name}: unknown policy {policy!r} on {date}"

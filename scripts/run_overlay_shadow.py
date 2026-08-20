@@ -36,6 +36,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import math
 import sys
 import traceback
 from datetime import date, datetime, timezone
@@ -135,22 +136,38 @@ def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def _fetch_closes(members: list[str]) -> dict[str, dict[date, float]]:
+def _fetch_closes(
+    members: list[str],
+) -> dict[str, dict[date, float | None]]:
     """One consistent fetch: ticker -> {session date -> adjusted close}."""
     frames = fetch_historical(members, lookback_days=LOOKBACK_SESSIONS)
-    closes: dict[str, dict[date, float]] = {}
+    closes: dict[str, dict[date, float | None]] = {}
     for ticker in members:
         frame = frames.get(ticker)
-        mapping: dict[date, float] = {}
+        mapping: dict[date, float | None] = {}
         if frame is not None and len(frame):
             for index, value in frame["close"].items():
                 session = index.date() if hasattr(index, "date") else index
-                mapping[session] = float(value)
+                try:
+                    numeric = float(value)
+                except (TypeError, ValueError, OverflowError):
+                    numeric = None
+                if (numeric is None or not math.isfinite(numeric)
+                        or numeric <= 0.0):
+                    # Preserve the provider's session while representing its
+                    # unusable value as JSON null.  The sleeve boundary then
+                    # records a durable, ticker-named refusal instead of the
+                    # evidence command crashing during input hashing.
+                    mapping[session] = None
+                else:
+                    mapping[session] = numeric
         closes[ticker] = mapping
     return closes
 
 
-def _inputs_sha256(closes: dict[str, dict[date, float]]) -> str:
+def _inputs_sha256(
+    closes: dict[str, dict[date, float | None]],
+) -> str:
     canonical = json.dumps(
         {
             ticker: {session.isoformat(): value for session, value in sorted(values.items())}
@@ -452,7 +469,9 @@ def command_sufficiency(args: argparse.Namespace) -> int:
     )
     available = [o for o in observations if o["available"]]
     refused = [o for o in observations if not o["available"]]
-    matured = len(outcomes)
+    available_outcomes = [outcome for outcome in outcomes if outcome["available"]]
+    unavailable_outcomes = [outcome for outcome in outcomes if not outcome["available"]]
+    matured = len(available_outcomes)
     sufficient = matured >= required
     reasons: list[str] = []
     if not sufficient:
@@ -464,6 +483,11 @@ def command_sufficiency(args: argparse.Namespace) -> int:
             reasons.append(
                 f"{len(refused)} cycle(s) refused or missed, first "
                 f"{refused[0]['cycle_session']}"
+            )
+        if unavailable_outcomes:
+            reasons.append(
+                f"{len(unavailable_outcomes)} matured outcome(s) were "
+                "unavailable and do not count as independent evidence"
             )
         if not observations:
             reasons.append("the stream has no observations yet")
@@ -488,6 +512,7 @@ def command_sufficiency(args: argparse.Namespace) -> int:
             "available_observations": len(available),
             "refused_or_missed_cycles": len(refused),
             "matured_outcomes": matured,
+            "unavailable_outcomes": len(unavailable_outcomes),
         },
         "first_cycle": observations[0]["cycle_session"] if observations else None,
         "last_cycle": observations[-1]["cycle_session"] if observations else None,

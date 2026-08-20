@@ -2503,8 +2503,8 @@ main's). No LEAN, no driver change, no QC from that lane.
   relative maxDD improvement, ≥75% upside capture when H0 CAGR is
   positive, ≤4pp CAGR sacrifice.
 
-Both use APQ's 2022+ window and one-run-one-pass shape. Action-plan
-rows are **PROPOSED, OWNER DECISION PENDING**.
+Both use APQ's 2022+ window and one-run-one-pass shape. Both families
+were subsequently placed **ON HOLD by owner decision 2026-08-19**.
 
 ## 7bj. Counter-review of the MPQ/HPQ plans (2026-08-19)
 
@@ -2523,9 +2523,53 @@ descriptively on a longer window), and a BTAL liquidity note added.
 The handoff/action-plan merge collisions from the stale branch base
 were resolved with every row verified present (SHW4-001 lesson).
 
+## 7bk. SBR-1 implemented: the Strong-Buy capture runtime (2026-08-19)
+
+(Numbered 7bk at authoring time because the then-unmerged MPQ/HPQ
+plans branch already claimed 7bi/7bj — the MHP-001 collision class,
+avoided; this merge interleaves all three cleanly.)
+Owner priority ("implement the strong buy plans"). Branch
+`user/claude/sbr1-ratings-capture-20260819` off `aa87bf1`. Per the
+frozen capture preregistration:
+
+- `scripts/capture_analyst_ratings.py`: task-specific runtime (ML-LR-6
+  precedent, deliberately not the overlay framework). Monthly snapshot
+  of analyst recommendation counts for the frozen universe; per-ticker
+  failures recorded `available=false` with the error class, never
+  dropped; months labeled in MARKET time (a 00:30Z capture is the
+  previous ET month); canonical JSON lines with pinned LF bytes (a real
+  Windows `\r\n` translation defect was caught by the hash test and
+  fixed); append-only snapshots + sha256 manifest; refusals for orphan
+  snapshots, manifest/file hash mismatch, missing files, naive
+  timestamps, malformed configs. No evaluation imports (AST-pinned):
+  joining snapshots to prices stays forbidden until SBR-2.
+- `docs/operations/strongbuy_ratings_config.json`: frozen 102-ticker
+  NASDAQ-100 universe, deterministically extracted from the Wikipedia
+  constituents wikitext (provenance + retrieval time recorded; a lossy
+  model-extraction first attempt was REJECTED for hallucinated
+  tickers).
+- `scripts/install_windows_strongbuy_capture_task.ps1`: ONE
+  daily-weekday task at 17:15 ET, Interactive logon (covered by the
+  repo-wide S4U scan test automatically), protected-prefix denylist
+  now including the overlay family, Store-alias interpreter guard.
+
+15 tests; 3 reverse mutations red then restored (UTC month labeling,
+orphan-refusal removal — whose first regex attempt was a silent no-op,
+caught and re-run as a real mutation — and bool-count acceptance).
+Remaining for SBR-1 completion: independent review, then the
+owner-present elevated install and a first-firing verification.
+
 ## 8. What is next
 
-**Current (2026-08-19, section 7bj):** **LEV-1 IMPLEMENTED** on
+**Current (2026-08-19, section 7bk): SBR-1 IMPLEMENTED** on
+`user/claude/sbr1-ratings-capture-20260819`, pending independent
+review and the owner-present elevated task install (17:15 ET,
+Interactive). The MPQ/HPQ plans are ON HOLD by owner decision
+2026-08-19 (recorded on their branch); the owner's priorities are the
+strong-buy program and app stability — the app ImportError was a stale
+pre-deploy Streamlit process, killed and relaunched clean on `c9d0740`
+(diagnosis in §8's operational note; no code change). **LEV-1
+IMPLEMENTED** on
 `user/claude/lev1-lean-algorithm-20260819` (based on the frozen-prereg
 commit), pending independent review — `research/lean/
 leveraged_threshold.py` with a daily state machine (next-close
@@ -2536,27 +2580,22 @@ the accepted direction), LSALE lines for the preregistered after-tax
 descriptive, LEV-specific log markers, and no ACTIVE_UNIVERSE. 10
 tests; 3 reverse mutations red then restored (threshold boundary,
 pullback boundary, accumulator reset). No QC. **LEV-2 (analyser +
-driver hook) is next**; SBR-1 (capture script + task) may run in
-parallel. **MPQ and HPQ are ON HOLD by owner decision 2026-08-19
-(counter-reviewed, sections 7bi/7bj) — not frozen, not scheduled; the
-owner's stated priority is the LEV/SBR strong-buy program and the app
-restart.** The
+driver hook) is the next code milestone.** MPQ and HPQ are ON HOLD
+(counter-reviewed, sections 7bi/7bj) — not frozen, not scheduled. The
 allocation-policy family is CLOSED (A-003, NULL on the gate). No QC
 access is currently authorized anywhere. Other owner-gated tracks:
-(1) Codex's thorough two-day audit tonight (range through the APQ-5
-merge; epoch-006 `policy_fingerprint` change flagged); (2)
-counter-review of Cursor's incoming "max profits" and "hedging" plan
-proposals — each needs frozen preregistration and family scoping;
-(3) optional owner decision on P1/P3-style weights on the Alpaca/REBAL
-stack. Operational: epoch-006 first observation VERIFIED (lineage
-binds `c9d0740`); remaining check is the overlay tasks' first
-AUTOMATIC firing (2026-08-20 14:45 local). An app ImportError
-(`open_lot_fingerprint`) on 2026-08-19 was diagnosed as a STALE
-pre-deploy Streamlit process holding the old `tax_lots` module across
-the epoch-006 fast-forward — the deployed tree is consistent and a
-fresh import passes; the fix is a full app restart via
-`C:\git\launch_trading_app.ps1` (no code change). SHW-4 complete;
-paper-epoch-006 is the live paper epoch.
+(1) Codex's thorough two-day audit (range now through the SBR-1 merge;
+epoch-006 `policy_fingerprint` change flagged); (2) optional owner
+decision on P1/P3-style weights on the Alpaca/REBAL stack.
+Operational: epoch-006 first observation VERIFIED (lineage binds
+`c9d0740`); remaining check is the overlay tasks' first AUTOMATIC
+firing (2026-08-20 14:45 local). The 2026-08-19 app ImportError
+(`open_lot_fingerprint`) was a STALE pre-deploy Streamlit process
+holding the old `tax_lots` module across the epoch-006 fast-forward —
+the deployed tree is consistent; stale processes killed, app
+relaunched clean on `c9d0740` via `C:\git\launch_trading_app.ps1` (no
+code change; durable rule: restart the app after any operational
+deploy). SHW-4 complete; paper-epoch-006 is the live paper epoch.
 
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the
    remaining gate.~~ DONE: the owner accepted the review pair 2026-08-18

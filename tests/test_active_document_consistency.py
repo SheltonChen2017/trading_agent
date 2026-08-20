@@ -865,3 +865,66 @@ def test_deleted_gr7d_ref_is_not_called_irrecoverable_while_object_remains():
     assert "no longer exists anywhere" not in plan
     assert "85a77291a3a8de88a82b3670dcf05793b6825c1c" in plan
     assert "may disappear during Git pruning" in plan
+
+
+def test_closed_alpha_plan_distinguishes_valid_null_runs_from_invalid_legacy_runs():
+    """A null result is valid evidence of no detected edge, not an invalid run."""
+    plan = _text("Alpha_Test_Implementation_Plan.md")
+    action_plan = _text("ACTION_PLAN_2026-08-20.md")
+
+    stale_claims = (
+        "No historical alpha result in this program is valid",
+        "Every historical QuantConnect result in `docs/alpha-result.md` remains invalid",
+    )
+    for claim in stale_claims:
+        assert claim not in plan
+        assert claim not in action_plan
+
+    # SBDCCR-002: assert the RELATIONSHIP, not one blessed phrasing. The
+    # original guard pinned the literal "VALID but null", which this
+    # module's own docstring warns against -- a legitimate rewording
+    # ("valid, and null") would redden it and the obvious fix would be to
+    # delete the assertion. A window regex keeps the same strength: each
+    # document must state that the reviewed runs are valid AND null.
+    validity = re.compile(r"valid[^.]{0,60}null", re.IGNORECASE)
+    for label, text in (("alpha plan", plan), ("action plan", action_plan)):
+        assert validity.search(text), (
+            f"the {label} must state that the reviewed Stage 0/1 runs are "
+            "valid and null, not merely avoid calling them invalid"
+        )
+
+
+def test_strongbuy_primary_comparison_keeps_structural_zero_months():
+    """Exactly-ten-name months are real strategy months, not missing evidence."""
+    plan = _text("reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
+
+    assert "remain in the primary P2−P1 series" in plan
+    assert "whether those months are excluded" not in plan
+
+
+def test_strongbuy_amendment_ledger_is_one_contiguous_markdown_table():
+    """All amendment rows render under the ledger header instead of as raw pipes."""
+    plan = (ROOT / "docs" / "reference" / "STRONGBUY_PORTFOLIO_TEST_PLAN.md").read_text(
+        encoding="utf-8"
+    )
+    lines = plan.splitlines()
+    amendments = [f"SBPA-{number:03d}" for number in range(1, 12)]
+    positions: dict[str, int] = {}
+    for amendment in amendments:
+        rows = [
+            index
+            for index, line in enumerate(lines)
+            if line.startswith(f"| {amendment} |")
+        ]
+        # SBDCCR-003: a missing row raised StopIteration -- an error with
+        # no message, rather than a failure naming what vanished.
+        assert len(rows) == 1, (
+            f"expected exactly one {amendment} ledger row, found {len(rows)}"
+        )
+        positions[amendment] = rows[0]
+
+    ordered = [positions[amendment] for amendment in amendments]
+    assert ordered == list(range(ordered[0], ordered[0] + len(amendments))), (
+        "the amendment rows are not one contiguous table: "
+        f"{dict(zip(amendments, ordered))}"
+    )

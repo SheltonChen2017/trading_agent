@@ -219,15 +219,19 @@ If any issuer exceeds 15%, the affected overlay variant refuses for that
 month. The system must not silently shrink the sleeve or optimize around the
 cap.
 
-**Pre-adoption audit finding (SBPA-007, 2026-08-20, owner decision pending):**
-at the proposed 5% sleeve and 3x leverage this gate cannot fire. The 15%
-threshold needs a single issuer to be at least 36.7% of the ordinary fund
-(`0.95*0.10 + 0.05*3*w_i >= 0.15`), which no eligible index fund reaches; the
-P3 form would need 110%. As written, the cap and its `look-through cap breach`
-refusal class are inert. The owner must either choose a threshold that can
-bind or state that 15% is a corrupt-data tripwire rather than a live
-constraint. Both the ordinary holdings snapshot and same-index mapping must be valid
-at the decision cutoff.
+**Pre-adoption audit finding (SBPA-007, corrected 2026-08-20, owner decision
+pending):** the 15% cap is mathematically non-binding for P3: even a 100%
+single-issuer ordinary fund would produce at most
+`0.95*0.10 + 0.05*1.00 = 14.5%`. For P4 it is a real tail-concentration gate,
+not a structurally inert one. At the maximum 10% core weight, a 3x proxy
+breaches 15% when the ordinary fund's issuer weight is greater than 36.7%; a
+lower core weight requires an even larger fund weight. The proposed funds may
+not currently approach that level, but this draft freezes no maximum holding
+weight and holdings can change, so “cannot fire” and “corrupt-data tripwire”
+were too strong. The owner must decide whether 15% is the intended rare-tail
+limit or whether a lower, routinely binding limit is wanted. The sleeve or
+leverage must not be enlarged merely to make the gate bind. Both the ordinary
+holdings snapshot and same-index mapping must be valid at the decision cutoff.
 
 ## 6. Portfolios and comparisons
 
@@ -250,10 +254,22 @@ is withdrawn. P4 still reports CAGR, drawdown, capture ratios, turnover, and
 look-through exposure beside P3; the separate LEV family addresses threshold
 timing on historical TQQQ data without validating this Strong-Buy strategy.
 
-P0–P2 form the core block. P2–P4 form the overlay block and use only dates on
-which all three overlay-block portfolios are available. This preserves aligned
-comparisons without discarding valid core observations when ETF evidence is
-missing.
+P0–P2 form the core block: P1−P0 uses every date on which P0 and P1 are both
+available, and P2−P1 every date on which P1 and P2 are both available. Each
+paired series is aligned on its own two portfolios and on nothing else, so an
+unavailable portfolio can never delete a month from a comparison it does not
+enter (counter-review clarification, 2026-08-20). The inferential P3−P2 series
+uses every date on which P2 and P3 are both available. P4 remains descriptive and is compared
+with P3 only on dates where both P3 and P4 are available. Missing leveraged-
+fund evidence therefore cannot delete an otherwise valid confirmatory P3−P2
+month.
+
+Months with exactly 10 eligible names remain in the primary P2−P1 series as
+exact zeros because the frozen strategies genuinely produce identical weights
+in that state. Removing those months would change the estimand from “does P2
+improve on P1 when this strategy runs?” to a conditional question about months
+with more than 10 names. A separately labelled `n > 10` decomposition may be
+reported descriptively, but it cannot replace or filter the primary series.
 
 The current LEV threshold-exit rules are not added to P4 in this test. Doing
 so would change stock selection, weighting, ETF choice, leverage, and exit
@@ -285,9 +301,11 @@ unverified 1.2% tracking error, independence, and a two-sided critical value
 while the proposed test is one-sided; it described an approximate rejection
 boundary, not statistical power. It is withdrawn. Before adoption, SBP-0 must
 record a sensitivity table over declared tracking errors and dependence
-assumptions, including an 80%-power minimum-detectable effect. That table is
-planning context only and cannot turn 24 observations into sufficient
-evidence.
+assumptions, including an 80%-power minimum-detectable effect. It must simulate
+the frozen stationary bootstrap itself at 24 observations, mean block length
+3, 20,000 draws, and the family threshold; a normal-approximation table alone
+does not describe this small-sample test. That table is planning context only
+and cannot turn 24 observations into sufficient evidence.
 
 The interpretation is fixed in advance: **a null result at 24 months means
 the frozen test did not establish an edge; it does not prove that the true
@@ -338,6 +356,9 @@ provenance/hash mismatch.
 ### SBP-0 — adopt and freeze
 
 - Owner decides every row in section 2.
+- Owner resolves the remaining choices in SBPA-007, SBPA-008, and SBPA-011;
+  SBPA-009 and SBPA-010 are already corrected sample-definition rules, not
+  invitations to choose the more favorable sample later.
 - Official-source verification freezes the eligible ETF pair table.
 - A reproducible structural-feasibility artifact, if used, binds its declared
   baskets, exact point-in-time holdings and price inputs, source timestamps,
@@ -429,17 +450,20 @@ does not itself argue for skipping or accelerating a gate.
 | SBPA-004 | **REJECTED AS POWER EVIDENCE, REPLACED.** Submitted 0.6%/month statement | It mixed unsupported variance/independence assumptions, test sidedness, and a rejection boundary. A pre-adoption sensitivity table is now required; the null interpretation is retained accurately |
 | SBPA-005 | **CONDITIONALLY ACCEPTED.** SBP-0 may supersede SBR-2 | It becomes true only upon explicit owner adoption and verified stream state. The already frozen SBR capture contract is not edited prospectively |
 | SBPA-006 | **NEW, PROPOSED, ACCEPTED AFTER CLARIFICATION (counter-review 2026-08-20).** Official security age sufficient for 64 completed closes is a pre-rating candidate-eligibility rule | Avoids refusing every month until a newly listed selected security seasons without deleting a selected stock. The gate uses official listing date plus the exchange calendar, never provider row count; broken data for an age-eligible selected stock still refuses the month |
-
-| SBPA-007 | **NEW, PROPOSED (audit 2026-08-20, owner decision pending).** The 15% look-through issuer cap cannot bind under the frozen 5% sleeve and 3x leverage | With `core_i <= 10%`, exposure `0.95*core_i + 0.05*3*w_i` reaches 15% only if one issuer is `>= 36.7%` of the ordinary fund — unreachable for QQQ, XLK, or SOXX; for P3 it would need 110%. Owner chooses: a cap that can bind (about 11% or below), or 15% relabeled as a corrupt-data tripwire. The sleeve and leverage must not be enlarged to make the cap bind |
-| SBPA-008 | **NEW, PROPOSED (audit 2026-08-20, owner decision pending).** Section 4's concentration mitigation does not mitigate the risk it names | A per-issuer cap cannot constrain a cluster of distinct issuers in one industry, and low-volatility screening inside one index selects correlated names by construction. Either add a frozen industry-concentration rule with its own named refusal and declared classification source, or delete the mitigation claim and disclose the exposure as unmanaged |
-| SBPA-009 | **NEW, PROPOSED (audit 2026-08-20, owner decision pending).** Months with exactly 10 eligible names contribute structural zeros to P2−P1 | The 10% cap forces equal weights at exactly 10 names, so P2 and P1 coincide and the paired excess is identically 0. Declare in advance whether those months are excluded from that cell (still counting for P1−P0 and P3−P2), and record the expected frequency at SBP-0 |
-| SBPA-010 | **NEW, PROPOSED (audit 2026-08-20, owner decision pending).** The overlay-block alignment rule lets descriptive P4 availability delete inferential P3−P2 months | Either align P3−P2 on P2/P3 availability alone and align P4 descriptively where all three exist, or keep the rule and record that P4 evidence gaps consume inferential months. The section 7 sensitivity table should also report the frozen stationary bootstrap's own behavior at mean block length 3 over 24 months (about eight effective blocks), not only tracking-error and dependence assumptions |
+| SBPA-007 | **PARTIALLY CORRECT, CORRECTED (verification 2026-08-20; owner decision pending).** The 15% look-through cap is non-binding for P3 but remains a possible P4 tail gate | P3 cannot breach 15%. P4 breaches only when the ordinary-fund issuer weight is greater than 36.7% at the maximum core weight; that may be unlikely for the proposed funds today, but the contract does not make it impossible. Owner chooses whether 15% is the desired rare-tail limit or a lower limit is wanted; it is not labelled a corrupt-data tripwire |
+| SBPA-008 | **CONFIRMED, PROPOSED (audit 2026-08-20, owner decision pending).** Section 4's stated concentration mitigation did not mitigate the risk it named | A per-issuer cap cannot constrain a cluster of distinct issuers in one industry. Either add a frozen industry-concentration rule with its own named refusal and declared classification source, or disclose the exposure as unmanaged |
+| SBPA-009 | **CONCERN CONFIRMED; EXCLUSION REJECTED AND REPLACED (verification 2026-08-20).** Exactly-10-name months are structural zeros in P2−P1 | The zero is the true realized difference between the two frozen strategies in that state, so those months stay in the primary series. An `n > 10` decomposition may be descriptive only; it cannot filter the confirmatory sample |
+| SBPA-010 | **CONFIRMED AND CORRECTED (verification 2026-08-20).** Descriptive P4 availability must not delete inferential P3−P2 months | P3−P2 aligns on P2/P3 availability. P4 is described against P3 only where P3/P4 are both available |
+| SBPA-011 | **CONFIRMED, PROPOSED (verification 2026-08-20; extended by counter-review).** Power planning must describe the frozen small-sample estimator | The sensitivity table must simulate the stationary bootstrap at the frozen 24-month horizon, mean block length 3, 20,000 draws, and family threshold rather than relying only on a normal approximation. It must also state the expected frequency of exactly-10-name months: those months are genuine zeros that stay in the primary P2−P1 series, so they dilute the detectable effect and the power statement is incomplete without their rate |
 
 Claude's counter-review accepted the SBPA-001/002/004 rejections and the
 minimum-size, look-through, price-lineage, and bootstrap corrections.
-SBPA-007..010 come from the 2026-08-20 audit of that review
+SBPA-007..011 come from the 2026-08-20 audit of that review and this
+independent verification
 (`docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md`), which sustained all
-seven of its findings; they are proposals only and change no value here.
+seven earlier-review findings. SBPA-007/008/011 remain owner choices;
+SBPA-009/010 correct the draft's sample definition. None adopts or freezes a
+section-2 value.
 Detailed reasoning remains in
 `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md`; this plan retains
 only the operative draft contract and concise amendment dispositions.

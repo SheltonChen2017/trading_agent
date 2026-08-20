@@ -10,12 +10,15 @@ cross-sectional alpha program on this universe is closed and is not
 launchable: reopening would require a new universe or data source, a fresh
 preregistration, and a new owner decision.
 
-No historical alpha result in this program is valid; `docs/alpha-result.md`
-remains the permanent, append-only ledger of every run, including the
-refusals. The workflow, evidence rules, and stage definitions below stayed in
-force through that closure and are preserved unchanged; the sequencing
-statements they contain are spent. `docs/ACTION_PLAN_2026-08-20.md` decides
-what happens next.
+The reviewed Stage 0 and Stage 1 QuantConnect runs are **VALID but null**:
+their statistics are usable evidence that the frozen tests did not establish
+a beta-free edge. That is different from the older legacy runs and artifacts
+whose individual ledger entries remain invalid, refused, unanalysed, pending
+review, or provenance-incomplete. `docs/alpha-result.md` is the permanent,
+append-only authority for each run's status, including every refusal. The
+workflow, evidence rules, and stage definitions below stayed in force through
+the closure and are preserved unchanged; their sequencing statements are
+spent. `docs/ACTION_PLAN_2026-08-20.md` decides what happens next.
 
 Historical detail retained: the owner chose Stage 0 first; runs R-005/R-006
 both refused with zero cells and exposed a monthly factor-timing defect;

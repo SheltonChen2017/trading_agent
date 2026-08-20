@@ -1,11 +1,15 @@
 # ML Implementation Status
 
-Companion to `docs/ML_IMPLEMENTATION_STRATEGY.md`, recording what is built,
-what is deliberately not built, and why. Updated 2026-08-03.
+Companion to `docs/reference/ML_IMPLEMENTATION_STRATEGY.md`, recording what is built,
+what is deliberately not built, and why. Updated 2026-08-03; path references
+refreshed 2026-08-20 for the archived plan layout. The milestone content
+below has NOT been re-verified against the code since its own date —
+`docs/ACTION_PLAN_2026-08-20.md` section 1 carries the measured current
+state.
 
 The original readiness sequence is defined in
-`docs/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`; the current end-to-end
-overlay and remaining sequence are in `docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md`.
+`docs/reference/ML_LIVE_TRADING_READINESS_IMPLEMENTATION_PLAN.md`; the current end-to-end
+overlay and remaining sequence are in `docs/reference/ML_FULL_SYSTEM_EXECUTION_PLAN.md`.
 
 ## Built
 
@@ -663,7 +667,7 @@ explicit blocker is added — absence is not a clean result.
 
 ## ML-FS-1 notes
 
-`docs/ML_FULL_SYSTEM_EXECUTION_PLAN.md` layers the remaining collection,
+`docs/reference/ML_FULL_SYSTEM_EXECUTION_PLAN.md` layers the remaining collection,
 research, evidence, and reviewed-assistance work on top of ML-LR. Its first
 milestone closes the production-writer gap in portfolio history.
 

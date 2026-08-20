@@ -20,27 +20,28 @@ Audience: repository owner, Claude Code, Codex, and the next verifier.
 
 ## 0. Read this first
 
+Reordered 2026-08-20 for the Strong-Buy priority. The alpha-program reading
+list that stood here is preserved in section 9a's archived resume prompt; that
+program is closed (`A-001`, `A-002`) and is no longer the entry point.
+
 1. `CLAUDE.md`
-2. `docs/ACTION_PLAN_2026-08-02.md`
-3. `docs/Alpha_Test_Implementation_Plan.md`
-4. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_FABLE_COUNTERREVIEW.md`
-5. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_STAGE0_COUNTERREVIEW_VERIFICATION.md`
-6. `docs/Review/REVIEW_2026-08-17_QC_STAGE0_LAUNCH_ROUND.md`
-7. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2.md`
-8. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW_INDEPENDENT.md`
-9. `docs/Review/REVIEW_2026-08-17_ALPHA_QC_ROUND2_COUNTERREVIEW.md`
-10. `docs/alpha-result.md`
-11. `docs/Review/REVIEW_2026-08-16_ALPHA_QC_ROUND1.md`
-12. `docs/Review/REVIEW_2026-08-16_QUANTCONNECT_ALPHA_BATTERY.md`
-13. `docs/research/ALPHA_BATTERY_METHOD_V2.md`
-14. `docs/research/ALPHA_BATTERY_2026-08-16_QC_PREREGISTRATION.md`
-15. `docs/research/Alpha explanation.md`
-16. `docs/Review/REVIEW_2026-08-16_ALPHA_BATTERY.md` (prior local round)
-17. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
-18. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
-19. `docs/operations/MANDATE.md` (§2, §4, §6)
-20. `docs/operations/OPERATIONAL_FACTS.md`
-21. `docs/operations/OPERATIONS_RUNBOOK.md`
+2. `docs/ACTION_PLAN_2026-08-20.md` — the go-to plan (Strong-Buy first)
+3. `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` — the draft SBP contract
+   awaiting the owner's SBP-0 freeze, including amendments SBPA-001..010
+4. `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` —
+   the frozen capture half
+5. `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` and
+   `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md` and
+   `docs/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md` and
+   `docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md` — the full SBP review
+   chain, in order
+6. `docs/operations/OPERATIONAL_FACTS.md` — machine-local operational truth
+7. `docs/operations/OPERATIONS_RUNBOOK.md`
+8. `docs/operations/MANDATE.md` (§2, §4, §6)
+9. `docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`
+10. `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`
+11. `docs/alpha-result.md` — the permanent run ledger (append-only)
+12. `docs/Alpha_Test_Implementation_Plan.md` — closed program, historical
 
 Nothing here authorizes a push, merge, pull request, deployment, evidence
 repair, epoch roll, M4, funded-account access, live trading, paper order,
@@ -2854,13 +2855,96 @@ Stage 0 and Stage 1 closed null as A-001/A-002; and
 `docs/operations/ML_IMPLEMENTATION_STATUS.md` still cite their companion plans
 at pre-2026-08-17 `docs/` paths that now live under `docs/reference/`.
 
+## 7bs. SBP review audit, documentation sweep, and the new Action Plan (2026-08-20)
+
+Branch `user/claude/sbp-review-audit-20260820`, from `a2b69eb`. Owner
+instructions, in order: audit Codex's SBP amendments review; then compare all
+documentation against what the project actually does; then replace the Action
+Plan with the Strong-Buy initiative first.
+
+**1. Audit of `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md`:
+SUSTAINED** (`docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md`). All seven
+findings verify against the plan text, correction `5c3bf45`, and Git; the
+one-commit range `5e3708e..5c42bfd` is complete; every claimed correction is
+present. Six findings the review did not make are recorded, four of them plan
+defects now proposed as **SBPA-007..010**:
+
+- **SBPA-007 (P2)** — the 15% look-through issuer cap cannot bind at the
+  proposed 5% sleeve and 3x leverage. Binding needs one issuer at 36.7% of the
+  ordinary fund (`0.95*0.10 + 0.05*3*w >= 0.15`); the P3 form needs 110%. The
+  gate and its refusal class are inert as written. This is SBPR-006's class
+  inverted: the review caught a state the rule always refuses and missed a
+  gate that never fires.
+- **SBPA-008 (P2)** — section 4 cites that per-issuer cap as the mitigation
+  for inverse-volatility concentration in "economically related stocks". A
+  per-issuer cap cannot constrain a cluster of distinct issuers in one
+  industry, and no industry limit exists in the plan.
+- **SBPA-009 / SBPA-010 (P3)** — months with exactly 10 eligible names are
+  structural zeros in P2−P1 (the cap forces equal weights, so P2 = P1), and
+  the overlay-block alignment rule lets descriptive P4 availability delete
+  inferential P3−P2 months. Both decide which months count, so both must be
+  settled before the freeze.
+- Two findings need no plan change: the report's Verification column cites a
+  document-consistency suite that is insensitive to the defects it closed, and
+  the required power table should cover the frozen bootstrap's own behaviour
+  at mean block length 3 over 24 months (~8 effective blocks).
+
+**2. Documentation-versus-reality sweep.** Claims were checked against code
+and Git rather than against other documents. Verified accurate: every CLI
+command named in the runbook and handoff exists; policy defaults match the
+mandate (5% position, 50% exposure, 20% leveraged, 10% cash, $5,000 order);
+`assistant/default_mandate.json` is approved with autonomous execution false;
+the SBR config carries exactly 102 tickers; the modules named across the plans
+exist. Corrected: the UI is **14 pages**, not the ten the README described,
+and its page names changed with TRADE-1/HEDGE-1/REBAL-1 (README now lists
+Budgeted/Discrete Buying, Policy Based/Discrete Selling, Hedging, and
+Portfolio Rebalancing, and the stale "Watchlist tab" references are gone);
+`docs/Alpha_Test_Implementation_Plan.md` no longer says Stage 0 is halted with
+reruns beginning at R-007, since Stage 0 and Stage 1 closed null; the two
+`docs/operations/*_STATUS.md` companions had pre-reorganisation `docs/` paths
+and now say plainly that their milestone content is a dated snapshot;
+`docs/reference/README.md` gained the three missing archive rows. Measured
+figures that documents had quoted stale: `platform_readiness.py` 856 lines
+(not 778), `execution_service.py` 1,062 (not 900), `assistant/llm/` 9 modules
+(not 10). The new plan cites paths and behaviour instead of line counts.
+
+**3. `docs/ACTION_PLAN_2026-08-20.md` replaces the 2026-08-02 plan**, which is
+archived at `docs/reference/ACTION_PLAN_2026-08-02.md` with a superseded
+banner. The successor is 317 lines against the predecessor's 769 (785 after
+its banner) and is
+organised by priority: Strong-Buy first (SBP-0 freeze is the only thing
+blocking the path, and it should happen **before** the SBR task install so no
+month is spent as calibration-only), then keeping the running paper and
+overlay evidence honest, then LEV as an explicitly secondary historical study,
+then everything unscheduled. It carries a measured state-of-the-project
+section, the documentation corrections above, the standing safety constraints,
+and a closed-history section that retains verbatim the ledger rows
+`tests/test_active_document_consistency.py` pins (AP-7..AP-11, SELL-1, BUY-1,
+QC-2, GR-7d, AP-8b) so no guard was weakened to fit a new document.
+`CLAUDE.md`, `AGENTS.md`, the handoff's read-first list and live resume
+prompt, and the guard suite's twenty pinned references now name the successor;
+historical citations in code comments and archived plans were repointed to the
+archive path rather than rewritten.
+
+Validation is recorded in section 8. No code behaviour changed anywhere in
+this round: the only non-documentation edits are the guard suite's document
+name and three comment/docstring path corrections. No QuantConnect access,
+broker access, market data, scheduled task, deployment, epoch action, or
+operational database mutation occurred, and no plan value was adopted or
+frozen — SBP-0 remains the owner's to decide.
+
 ## 8. What is next
 
-**Current (2026-08-20): the SBP amendment round is independently ACCEPTED
-AFTER CORRECTION (7bo); Claude's counter-review and proposed SBPA-006 are also
-independently ACCEPTED AFTER CORRECTION (7bq). The complete successor remains a
-DRAFT — not adopted, frozen, scheduled, or implemented. No SBP code before an
-owner-approved SBP-0 freeze. LEV remains separate and cannot validate SBP.**
+**Current (2026-08-20, superseding the sequencing text below):
+`docs/ACTION_PLAN_2026-08-20.md` is now the go-to plan and puts the Strong-Buy
+initiative first. The SBP contract remains a DRAFT — not adopted, frozen,
+scheduled, or implemented — and the single blocking step is the owner's SBP-0
+freeze, which must settle SBPA-001..010 (SBPA-007 and SBPA-008 are gates that
+do not currently work). Freeze BEFORE installing the SBR capture task, or
+accept that pre-freeze months are calibration-only. No SBP code before that
+freeze. LEV remains separate and cannot validate SBP. The amendment round is
+independently ACCEPTED AFTER CORRECTION (7bo), the counter-review and SBPA-006
+likewise (7bq), and the review itself is audited and SUSTAINED (7bs).**
 Codex reviewed exact pushed range
 `81db126340818fe2c2c9efa16c77af8f1d37568f..3055fecd1caf490c852a446c03da760d2878af5a`
 (143 commits) on
@@ -2998,8 +3082,8 @@ or roll an epoch without a new explicit owner instruction.
 ## 9. Resume prompt
 
 ```text
-Read CLAUDE.md, docs/ACTION_PLAN_2026-08-02.md,
-docs/SESSION_HANDOFF.md, docs/reference/ALLOCATION_POLICY_QC_PLAN.md,
+Read CLAUDE.md, docs/ACTION_PLAN_2026-08-20.md,
+docs/SESSION_HANDOFF.md, docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md,
 docs/reference/SHADOW_OBSERVATION_DESIGN.md, docs/alpha-result.md, and
 docs/Review/REVIEW_2026-08-19_POST_STAGE0_THROUGH_SBR1.md. The exact
 independently reviewed pushed range is

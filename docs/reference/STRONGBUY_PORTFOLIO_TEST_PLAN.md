@@ -142,8 +142,14 @@ weights above 10% and redistribute the remainder among uncapped stocks in
 proportion to their raw inverse-volatility weights.
 
 This is a risk allocation rule, not a profit forecast. It can concentrate the
-portfolio in slowly moving but economically related stocks, which is why the
-look-through cap remains mandatory.
+portfolio in slowly moving but economically related stocks.
+
+**Pre-adoption audit finding (SBPA-008, 2026-08-20, owner decision pending):**
+this concentration is NOT controlled by the section 5 look-through cap, which
+is per issuer and cannot constrain a cluster of distinct issuers in one
+industry. No industry limit exists in this plan. Adopting section 4 as written
+means accepting unmanaged industry concentration unless the owner adds such a
+rule at SBP-0.
 
 ## 5. ETF selection and leveraged mapping
 
@@ -211,7 +217,16 @@ are the frozen reference-index proxy. Proposed effective issuer exposure is:
 
 If any issuer exceeds 15%, the affected overlay variant refuses for that
 month. The system must not silently shrink the sleeve or optimize around the
-cap. Both the ordinary holdings snapshot and same-index mapping must be valid
+cap.
+
+**Pre-adoption audit finding (SBPA-007, 2026-08-20, owner decision pending):**
+at the proposed 5% sleeve and 3x leverage this gate cannot fire. The 15%
+threshold needs a single issuer to be at least 36.7% of the ordinary fund
+(`0.95*0.10 + 0.05*3*w_i >= 0.15`), which no eligible index fund reaches; the
+P3 form would need 110%. As written, the cap and its `look-through cap breach`
+refusal class are inert. The owner must either choose a threshold that can
+bind or state that 15% is a corrupt-data tripwire rather than a live
+constraint. Both the ordinary holdings snapshot and same-index mapping must be valid
 at the decision cutoff.
 
 ## 6. Portfolios and comparisons
@@ -415,9 +430,17 @@ does not itself argue for skipping or accelerating a gate.
 | SBPA-005 | **CONDITIONALLY ACCEPTED.** SBP-0 may supersede SBR-2 | It becomes true only upon explicit owner adoption and verified stream state. The already frozen SBR capture contract is not edited prospectively |
 | SBPA-006 | **NEW, PROPOSED, ACCEPTED AFTER CLARIFICATION (counter-review 2026-08-20).** Official security age sufficient for 64 completed closes is a pre-rating candidate-eligibility rule | Avoids refusing every month until a newly listed selected security seasons without deleting a selected stock. The gate uses official listing date plus the exchange calendar, never provider row count; broken data for an age-eligible selected stock still refuses the month |
 
+| SBPA-007 | **NEW, PROPOSED (audit 2026-08-20, owner decision pending).** The 15% look-through issuer cap cannot bind under the frozen 5% sleeve and 3x leverage | With `core_i <= 10%`, exposure `0.95*core_i + 0.05*3*w_i` reaches 15% only if one issuer is `>= 36.7%` of the ordinary fund — unreachable for QQQ, XLK, or SOXX; for P3 it would need 110%. Owner chooses: a cap that can bind (about 11% or below), or 15% relabeled as a corrupt-data tripwire. The sleeve and leverage must not be enlarged to make the cap bind |
+| SBPA-008 | **NEW, PROPOSED (audit 2026-08-20, owner decision pending).** Section 4's concentration mitigation does not mitigate the risk it names | A per-issuer cap cannot constrain a cluster of distinct issuers in one industry, and low-volatility screening inside one index selects correlated names by construction. Either add a frozen industry-concentration rule with its own named refusal and declared classification source, or delete the mitigation claim and disclose the exposure as unmanaged |
+| SBPA-009 | **NEW, PROPOSED (audit 2026-08-20, owner decision pending).** Months with exactly 10 eligible names contribute structural zeros to P2−P1 | The 10% cap forces equal weights at exactly 10 names, so P2 and P1 coincide and the paired excess is identically 0. Declare in advance whether those months are excluded from that cell (still counting for P1−P0 and P3−P2), and record the expected frequency at SBP-0 |
+| SBPA-010 | **NEW, PROPOSED (audit 2026-08-20, owner decision pending).** The overlay-block alignment rule lets descriptive P4 availability delete inferential P3−P2 months | Either align P3−P2 on P2/P3 availability alone and align P4 descriptively where all three exist, or keep the rule and record that P4 evidence gaps consume inferential months. The section 7 sensitivity table should also report the frozen stationary bootstrap's own behavior at mean block length 3 over 24 months (about eight effective blocks), not only tracking-error and dependence assumptions |
+
 Claude's counter-review accepted the SBPA-001/002/004 rejections and the
-minimum-size, look-through, price-lineage, and bootstrap corrections. Detailed
-reasoning remains in
+minimum-size, look-through, price-lineage, and bootstrap corrections.
+SBPA-007..010 come from the 2026-08-20 audit of that review
+(`docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md`), which sustained all
+seven of its findings; they are proposals only and change no value here.
+Detailed reasoning remains in
 `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md`; this plan retains
 only the operative draft contract and concise amendment dispositions.
 

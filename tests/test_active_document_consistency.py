@@ -52,7 +52,7 @@ def _root_text(name: str) -> str:
 
 def test_docs_root_contains_only_canonical_milestone_and_alpha_records() -> None:
     allowed = {
-        "ACTION_PLAN_2026-08-02.md",
+        "ACTION_PLAN_2026-08-20.md",
         "SESSION_HANDOFF.md",
         "Alpha_Test_Implementation_Plan.md",
         "alpha-result.md",
@@ -99,7 +99,7 @@ def test_no_document_calls_the_same_epoch_both_active_and_closed():
     epoch is running.
     """
     for name in (
-        "ACTION_PLAN_2026-08-02.md",
+        "ACTION_PLAN_2026-08-20.md",
         "SESSION_HANDOFF.md",
         "GENERAL_READINESS_STATUS.md",
     ):
@@ -110,7 +110,7 @@ def test_no_document_calls_the_same_epoch_both_active_and_closed():
 
 def test_exactly_one_epoch_is_described_as_active_across_current_documents():
     active: dict[str, set[str]] = {}
-    for name in ("ACTION_PLAN_2026-08-02.md", "SESSION_HANDOFF.md"):
+    for name in ("ACTION_PLAN_2026-08-20.md", "SESSION_HANDOFF.md"):
         found = _active_epochs(_text(name))
         if found:
             active[name] = found
@@ -128,7 +128,7 @@ def test_epoch_host_bullet_agrees_with_the_current_active_epoch():
     epoch-003.  Compare relationships so this survives the next roll without
     pinning today's identifier in the test.
     """
-    plan_active = _active_epochs(_text("ACTION_PLAN_2026-08-02.md"))
+    plan_active = _active_epochs(_text("ACTION_PLAN_2026-08-20.md"))
     facts = _text("OPERATIONAL_FACTS.md")
     match = re.search(
         r"\*\*Epoch host\*\*.*?runs the active `(paper-epoch-\d+)`",
@@ -145,7 +145,7 @@ def test_epoch_host_bullet_agrees_with_the_current_active_epoch():
 def test_completed_epoch_004_roll_replaced_its_predeployment_queue():
     """Known pre-roll instructions cannot remain current after deployment."""
     documents = {
-        "ACTION_PLAN_2026-08-02.md": _text("ACTION_PLAN_2026-08-02.md"),
+        "ACTION_PLAN_2026-08-20.md": _text("ACTION_PLAN_2026-08-20.md"),
         "SESSION_HANDOFF.md": _text("SESSION_HANDOFF.md"),
         "OPERATIONAL_FACTS.md": _text("OPERATIONAL_FACTS.md"),
         "FEATURE_MILESTONE_RECORD.md": _text("FEATURE_MILESTONE_RECORD.md"),
@@ -168,7 +168,7 @@ def test_completed_epoch_004_roll_replaced_its_predeployment_queue():
     assert not hits, "superseded epoch-004 deployment state remains: " + "; ".join(hits)
 
     action_plan_raw = (
-        ROOT / "docs" / "ACTION_PLAN_2026-08-02.md"
+        ROOT / "docs" / "ACTION_PLAN_2026-08-20.md"
     ).read_text(encoding="utf-8")
     ap7_rows = [line for line in action_plan_raw.splitlines() if line.startswith("| AP-7 |")]
     assert len(ap7_rows) == 1, "the action plan must contain exactly one AP-7 row"
@@ -246,7 +246,7 @@ def test_epoch005_roll_record_replaces_its_unexecuted_plan():
 
 def test_epoch005_deployment_status_is_consistent_in_the_action_plan():
     """OBR-003: detail rows must agree with the epoch-005 roll summary."""
-    raw = (ROOT / "docs" / "ACTION_PLAN_2026-08-02.md").read_text(
+    raw = (ROOT / "docs" / "ACTION_PLAN_2026-08-20.md").read_text(
         encoding="utf-8"
     )
     prefixes = (
@@ -330,7 +330,7 @@ def test_ap11_supersedes_the_full_ap7_production_fix_claim():
     self-consistent.
     """
     documents = {
-        "ACTION_PLAN_2026-08-02.md": _text("ACTION_PLAN_2026-08-02.md"),
+        "ACTION_PLAN_2026-08-20.md": _text("ACTION_PLAN_2026-08-20.md"),
         "OPERATIONAL_FACTS.md": _text("OPERATIONAL_FACTS.md"),
     }
     stale = (
@@ -349,7 +349,7 @@ def test_ap11_supersedes_the_full_ap7_production_fix_claim():
     )
 
     action_plan_raw = (
-        ROOT / "docs" / "ACTION_PLAN_2026-08-02.md"
+        ROOT / "docs" / "ACTION_PLAN_2026-08-20.md"
     ).read_text(encoding="utf-8")
     ap7_rows = [
         line for line in action_plan_raw.splitlines() if line.startswith("| AP-7 |")
@@ -364,7 +364,7 @@ def test_ap11_supersedes_the_full_ap7_production_fix_claim():
 
 def test_current_documents_do_not_call_completed_work_unstarted():
     """Known-stale claims only -- each of these should never be true again."""
-    plan = _text("ACTION_PLAN_2026-08-02.md")
+    plan = _text("ACTION_PLAN_2026-08-20.md")
     readiness = _text("GENERAL_READINESS_STATUS.md")
     runbook = _text("OPERATIONS_RUNBOOK.md")
     for document, phrase in (
@@ -396,7 +396,7 @@ def test_current_dividend_handler_guidance_is_reviewed_and_date_correct():
     """CR-W2 review must replace its unsafe submitted accounting guidance."""
     for name in (
         "SESSION_HANDOFF.md",
-        "ACTION_PLAN_2026-08-02.md",
+        "ACTION_PLAN_2026-08-20.md",
         "OPERATIONAL_FACTS.md",
         "OPERATIONS_RUNBOOK.md",
     ):
@@ -452,12 +452,12 @@ def test_current_handoff_replaces_superseded_dividend_review_state():
     # in the append-and-amend record rather than in a per-round status file
     # that is legitimately rewritten once the milestone is deployed and
     # superseded.
-    plan = _text("ACTION_PLAN_2026-08-02.md")
+    plan = _text("ACTION_PLAN_2026-08-20.md")
     assert "PR #182" in plan or "PR #184" in plan, (
         "the action plan must retain the CR-W2 merge history"
     )
 
-    action_plan = _text("ACTION_PLAN_2026-08-02.md")
+    action_plan = _text("ACTION_PLAN_2026-08-20.md")
     for stale in (
         "epoch-003 still had **zero observations**",
         "epoch-003 had zero observations",
@@ -488,7 +488,7 @@ def test_current_documents_do_not_publish_exact_account_balances():
     )
     for name in (
         "SESSION_HANDOFF.md",
-        "ACTION_PLAN_2026-08-02.md",
+        "ACTION_PLAN_2026-08-20.md",
         "OPERATIONAL_FACTS.md",
         "OPERATIONS_RUNBOOK.md",
     ):
@@ -513,7 +513,7 @@ def test_current_documents_do_not_publish_account_identifiers():
     """
     for name in (
         "SESSION_HANDOFF.md",
-        "ACTION_PLAN_2026-08-02.md",
+        "ACTION_PLAN_2026-08-20.md",
         "OPERATIONAL_FACTS.md",
         "OPERATIONS_RUNBOOK.md",
     ):
@@ -613,7 +613,7 @@ def _mainline_ref() -> str | None:
 
 
 _TOPOLOGY_PATTERNS = {
-    "ACTION_PLAN_2026-08-02.md": r"Current development topology.*?`([0-9a-f]{7,40})`",
+    "ACTION_PLAN_2026-08-20.md": r"Current development topology.*?`([0-9a-f]{7,40})`",
     "SESSION_HANDOFF.md": r"Published `origin/main` at audit time:\s*`([0-9a-f]{7,40})`",
 }
 
@@ -714,7 +714,7 @@ def test_no_document_calls_a_merged_commit_unreachable():
         pytest.skip("no mainline ref available")
 
     stale: list[str] = []
-    for name in ("SESSION_HANDOFF.md", "ACTION_PLAN_2026-08-02.md"):
+    for name in ("SESSION_HANDOFF.md", "ACTION_PLAN_2026-08-20.md"):
         text = _text(name)
         for commit in _repository_commits_claimed_unreachable(text):
             reachable = subprocess.run(
@@ -748,7 +748,7 @@ def test_no_action_plan_row_calls_its_own_merged_commits_unmerged():
         r"not (?:yet )?(?:been )?(?:merged|pushed|published)|unmerged|local[- ]only",
         flags=re.IGNORECASE,
     )
-    raw = (ROOT / "docs" / "ACTION_PLAN_2026-08-02.md").read_text(encoding="utf-8")
+    raw = (ROOT / "docs" / "ACTION_PLAN_2026-08-20.md").read_text(encoding="utf-8")
     stale: list[str] = []
     for line in raw.splitlines():
         if not line.lstrip().startswith("|") or not claim.search(line):
@@ -804,7 +804,7 @@ def test_sell1_current_records_do_not_reopen_merged_review_work():
     """
     handoff = _text("SESSION_HANDOFF.md")
     action_plan_raw = (
-        ROOT / "docs" / "ACTION_PLAN_2026-08-02.md"
+        ROOT / "docs" / "ACTION_PLAN_2026-08-20.md"
     ).read_text(encoding="utf-8")
     sell1_rows = [
         line for line in action_plan_raw.splitlines() if line.startswith("| SELL-1 |")
@@ -839,7 +839,7 @@ def test_sell1_current_records_do_not_reopen_merged_review_work():
 def test_buy1_current_records_close_the_merged_review():
     """BUY-1 is merged and independently corrected; current records stay so."""
     action_plan_raw = (
-        ROOT / "docs" / "ACTION_PLAN_2026-08-02.md"
+        ROOT / "docs" / "ACTION_PLAN_2026-08-20.md"
     ).read_text(encoding="utf-8")
     buy1_rows = [
         line for line in action_plan_raw.splitlines() if line.startswith("| BUY-1 |")

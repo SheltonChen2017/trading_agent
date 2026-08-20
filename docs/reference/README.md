@@ -1,7 +1,8 @@
 # Archived implementation plans and designs
 
-Archived 2026-08-02 when the owner adopted `docs/ACTION_PLAN_2026-08-02.md`
-as the single go-to sequencing document (agreed by both Claude and Codex
+Archived 2026-08-02 when the owner adopted the action plan of that date
+(itself archived here on 2026-08-20 and replaced by
+`docs/ACTION_PLAN_2026-08-20.md`) as the single go-to sequencing document (agreed by both Claude and Codex
 after independent audits; see PR #113/#114 for the two source drafts).
 
 These documents are **not deleted and not obsolete**: each remains the
@@ -29,6 +30,9 @@ deliberately does not restate per-milestone internals.
 | `PROPOSAL_HISTORY_CLEANUP_IMPLEMENTATION_PLAN.md` | dismissal/expiry design (purge separately gated) |
 | `UI_FEATURE_CONTROLS_DESIGN.md` | Settings/AI-toggle/policy-workflow/suggestions design |
 | `ACTION_PLAN_codex.md` | Codex's independent audit draft (merged into the adopted plan) |
+| `ACTION_PLAN_2026-08-02.md` | The 2026-08-02 go-to plan, superseded 2026-08-20; the detailed ledger behind the successor's closed-history section |
+| `SHADOW_OBSERVATION_DESIGN.md` | Overlay shadow observation design and the SHW-1..4 record |
+| `THREE_SLEEVE_ENGINE_PLAN.md` | Three-sleeve engine M1..M4 definitions (the adopted GR-7d replacement) |
 | `ALLOCATION_POLICY_QC_PLAN.md` | APQ-0..5: long-only defensive ETF mix vs 100% SPY (scheduled family; sequencing still in the action plan) |
 | `MAX_PROFIT_POLICY_QC_PLAN.md` | MPQ-0..5: long-only 3x growth (TQQQ/SOXL) vs 100% SPY — **proposed**, not scheduled |
 | `HEDGE_POLICY_QC_PLAN.md` | HPQ-0..5: static SH/BTAL overlay vs 100% SPY — **proposed**, not scheduled; distinct from HEDGE-1 UI |

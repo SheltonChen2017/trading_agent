@@ -24,7 +24,7 @@ Sequencing (updated at counter-review 2026-08-19: APQ-4/5 completed
 and the allocation family CLOSED as A-003 the day this plan was
 drafted): do **not** start MPQ-1 until the owner freezes the
 preregistration and schedules it. Sequencing authority remains
-`docs/ACTION_PLAN_2026-08-02.md`.
+`docs/reference/ACTION_PLAN_2026-08-02.md`.
 
 ## 1. Question
 

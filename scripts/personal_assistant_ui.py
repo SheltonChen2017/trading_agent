@@ -383,7 +383,8 @@ def _regime_fields(regime) -> tuple:
 
 # Optional-AI feature preferences (docs/reference/UI_FEATURE_CONTROLS_DESIGN.md
 # section 3.2). Session-state only, all default OFF (owner decision,
-# 2026-08-02, recorded in docs/ACTION_PLAN_2026-08-02.md section 9). These are
+# 2026-08-02, recorded in section 9 of the archived
+# docs/reference/ACTION_PLAN_2026-08-02.md). These are
 # UI preferences, never authority: they decide whether an optional paid LLM
 # surface is OFFERED; every call still requires the per-surface checkbox, its
 # own explicit click, and a configured credential. Deterministic content is

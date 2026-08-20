@@ -8,11 +8,12 @@ before acting; nothing below weakens it.
 
 ## The go-to plan
 
-`docs/ACTION_PLAN_2026-08-02.md` is the owner-adopted, single sequencing
-authority for all workstreams (adopted 2026-08-02 after independent Claude
-and Codex audits converged; the Codex draft is preserved at
-`docs/reference/ACTION_PLAN_codex.md`). Use it to decide what is done, what
-is in progress, what is next, and what is blocked or prohibited.
+`docs/ACTION_PLAN_2026-08-20.md` is the owner-directed, single sequencing
+authority for all workstreams (2026-08-20, replacing the 2026-08-02 plan now
+archived at `docs/reference/ACTION_PLAN_2026-08-02.md`; the older Codex audit
+draft is preserved at `docs/reference/ACTION_PLAN_codex.md`). Use it to
+decide what is done, what is in progress, what is next, and what is blocked
+or prohibited.
 
 The individual implementation plans are archived in `docs/reference/` (see
 its README). They remain authoritative for their own milestone definitions,
@@ -21,7 +22,7 @@ sequencing statements are superseded by the action plan. Never start a
 milestone merely because an archived plan names it next.
 
 When a phase completes or the owner reorders priorities, update
-`docs/ACTION_PLAN_2026-08-02.md` and `docs/SESSION_HANDOFF.md` rather than
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` rather than
 letting the plan drift stale.
 
 ## Standing workflow references

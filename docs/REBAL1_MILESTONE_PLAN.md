@@ -9,7 +9,7 @@ correction at `ed6879d` on 2026-08-15. Nothing is deployed.**
 
 This file records the owner-adopted staging so the sequencing survives the
 conversation it was written in. It is the authority for what REBAL-1's
-stages contain; `docs/ACTION_PLAN_2026-08-02.md` remains the authority for
+stages contain; `docs/reference/ACTION_PLAN_2026-08-02.md` remains the authority for
 whether a stage happens next.
 
 ## The evidence position, stated first

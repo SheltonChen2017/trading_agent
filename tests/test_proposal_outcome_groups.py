@@ -2,8 +2,8 @@
 
 The History page's primary filter groups the 19 lifecycle statuses into
 user-facing outcomes. The grouping was frozen in
-docs/ACTION_PLAN_2026-08-02.md section 8 before implementation; these tests
-pin that contract:
+section 8 of the archived docs/reference/ACTION_PLAN_2026-08-02.md before
+implementation; these tests pin that contract:
 
   - the mapping is exhaustive over STATUSES (a future status added without a
     reviewed regrouping decision fails loudly here);

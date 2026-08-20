@@ -127,7 +127,7 @@ Important guarantees:
   violation (stale price, closed market, a bad quote, a duplicate order, the
   kill switch, insufficient cash, invalid share quantities) can never be
   overridden, even if it co-occurs with an overridable one.
-- Submitting a batch of allocation proposals together (the Watchlist tab's
+- Submitting a batch of allocation proposals together (the Budgeted Buying page's
   "submit all") reserves each earlier leg's planned notional exactly once
   against later legs' cash, buying-power, and exposure/concentration checks
   -- never double-counted and never silently dropped -- and remains fully
@@ -494,7 +494,7 @@ work:
   quick checks or automation.
 - **Browser UI** (`scripts/personal_assistant_ui.py`, Streamlit) -- click-
   around, better for browsing research/news per ticker and for the
-  Watchlist's multi-ticker allocation-split workflow.
+  Budgeted Buying page's multi-ticker allocation-split workflow.
 
 ### Quickstart
 
@@ -511,7 +511,7 @@ work:
    (requires Alpaca paper credentials):
    `python scripts/run_personal_assistant.py approve <proposal_id> --confirm approve`
 5. Or run the Streamlit UI for the same briefing/proposal/approval workflow,
-   plus the UI-only Watchlist cart and multi-ticker allocation-split
+   plus the UI-only Budgeted Buying cart and multi-ticker allocation-split
    features (no CLI equivalent exists for those):
    `pwsh -NoProfile -File scripts/launch_dev_app.ps1`
 
@@ -880,7 +880,7 @@ could submit an order by accident. An override-eligible block adds a second,
 separate text box requiring an exact `OVERRIDE <SIDE> <SHARES> <TICKER>`
 phrase naming that specific order.
 
-Ten pages are selected from a left-sidebar menu, and only the selected
+Fourteen pages are selected from a left-sidebar menu, and only the selected
 page's body executes per rerun. Operational pages share the same SQLite
 store and policy file where applicable; research-only pages do not gain a
 write path merely by living in the same UI:
@@ -890,7 +890,8 @@ write path merely by living in the same UI:
   research, open orders, upcoming earnings, and warnings (including the
   batched GR-5 operational warnings). Click "Refresh briefing" to re-pull
   from Alpaca.
-- **Buying** (formerly Watchlist) -- add tickers to a cart (pick from the
+- **Budgeted Buying** (formerly Watchlist, renamed again by TRADE-1) -- add
+  tickers to a cart (pick from the
   universe or type any other symbol), then "Check cart" for each ticker's
   own trend/volatility, recent analyst price targets, recent news
   (optionally summarized by Claude if `ANTHROPIC_API_KEY` is set), a real
@@ -908,10 +909,26 @@ write path merely by living in the same UI:
   them) but not atomic once started -- some legs can fill while a later one
   is blocked; safe to reload and resume, never resubmits an already-filled
   leg.
-- **Selling** -- current holdings plus a "Check for recommended sells"
-  button; a recommendation here means a policy-limit breach (concentration,
-  leveraged-ETF exposure, etc.), the same deterministic check as `propose`,
-  never a price prediction.
+- **Discrete Buying** -- one owner-directed buy proposal at a time, sized by
+  shares or by a dollar budget. Same validation, policy gate, and typed
+  approval as every other buy path; it exists so a single deliberate purchase
+  does not have to go through the cart-and-split workflow.
+- **Policy Based Selling** (formerly Selling) -- current holdings plus a
+  "Check for recommended sells" button; a recommendation here means a
+  policy-limit breach (concentration, leveraged-ETF exposure, etc.), the same
+  deterministic check as `propose`, never a price prediction.
+- **Discrete Selling** -- one owner-directed sell of a specific holding
+  (SELL-1), by shares or dollar amount, on the owner's own judgement rather
+  than a policy breach. Risk-reducing sells are never blocked by the
+  new-position controls.
+- **Hedging** -- size an owner-directed defensive ETF allocation (HEDGE-1)
+  toward a hedge target you set. The instruments are long-only ETFs, so this
+  is not shorting, and the project has NOT confirmed that the sleeve reduces
+  drawdown.
+- **Portfolio Rebalancing** -- read-only sleeve drift against the targets you
+  approved (REBAL-1), with tax-aware trim proposals that still require the
+  ordinary typed approval; refusals state the real reason rather than
+  silently producing nothing.
 - **Propose & Approve** -- the same risk-reduction (and optionally SOXX/SOXL
   strategy) proposals as the CLI's `propose`/`approve`, in card form.
 - **History** -- proposal and broker-order tables with an outcome-group

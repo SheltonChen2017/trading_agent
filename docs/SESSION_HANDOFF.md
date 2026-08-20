@@ -11,8 +11,10 @@ merged as PR #243 (section 7p), then by Claude's counter-review of Codex's
 Stage 0 correction (section 7q), and finally by Codex's independent
 verification of that counter-review after PR #244 (section 7r), Claude's
 two-run Stage 0 launch (section 7s), and Codex's correction review (section
-7t). Section 7t
-and the updated topology/next-steps text are the current state.
+7t). The SBP rounds in sections 7bm through 7bq then superseded that
+sequencing text, and section 7br records the 2026-08-20 docs-only correction
+of the topology and push-state sentences those rounds left stale. Sections
+7br and 8 are the current state.
 
 Audience: repository owner, Claude Code, Codex, and the next verifier.
 
@@ -47,9 +49,18 @@ operator-database mutation, or scheduled-task change.
 ## 1. Exact repository topology
 
 - Repository: `https://github.com/SheltonChen2017/trading_agent`.
-- Published `origin/main` at audit time:
-  `1457169ba10f6aac0f1fb98b60b92a4607f8331c`. PR #245 merged Codex's prior
-  verification branch; PR #244 at `b6f577e` merged Claude's exact
+- Published `origin/main` at audit time: `c289f95` (2026-08-20). PR #282
+  merged the whole eight-commit SBP chain `5c42bfd..308ac84` — the
+  amendments, the review correction and record, the counter-review, the
+  security-age clarification, the verification record, and their handoff
+  updates — onto first parent `5e3708e` (PR #281, the post-Stage-0 audit).
+  Sections 7bn through 7bq are therefore merged history on `main`, not a
+  pending local branch; their own closing topology sentences were written
+  before that merge and are corrected in place below.
+- Historical, at the 2026-08-17 audit `origin/main` was
+  `1457169ba10f6aac0f1fb98b60b92a4607f8331c` (this bullet's original
+  "at audit time" wording now belongs to the current head above).
+  PR #245 merged Codex's prior verification branch; PR #244 at `b6f577e` merged Claude's exact
   Stage 0 counter-review head `9a7e9fc`; both have tree
   `0fe65449a58aaca1363fc9d4783ee89ccf1cfbcc`. PR #243 merged Fable's exact
   counter-review head `6bd962f`. PR #242 at `f937bfb` had merged the
@@ -124,16 +135,24 @@ operator-database mutation, or scheduled-task change.
   hashes, and dispositions were preserved in `docs/alpha-result.md` and Git
   history. Nothing was promoted to the research registry or Feature Milestone
   Record.
-- The operational checkout remains separate and frozen at `752d3b7` in
-  active `paper-epoch-005`. No development commit has been copied there.
+- The operational checkout remains separate and is frozen at `c9d0740`,
+  where `paper-epoch-006` is active (roll executed 2026-08-19;
+  `paper-epoch-005` was closed the same day, retaining its 3 observations).
+  No development commit has been copied there.
+  `docs/operations/OPERATIONAL_FACTS.md` is the authority for operational
+  state; this bullet only points at it.
 
 Earlier history that remains load-bearing for anyone resuming:
 
 - `4de784e` / `1cb8abf`: the epoch-005 observation-clock roll chain and
-  Codex's correction of it. `paper-epoch-005` has been the only active
-  evidence epoch since 2026-08-13; epochs 001 through 004 are closed and
-  cannot pool evidence into it.
+  Codex's correction of it. `paper-epoch-005` was the only evidence epoch
+  running from 2026-08-13 until the epoch-006 roll closed it on 2026-08-19;
+  epochs 001 through 005 are closed and cannot pool evidence into
+  epoch-006.
 - `c048a94`: the owner's decision to hold epoch-005 unchanged for 60 days.
+  Superseded 2026-08-19, when the owner authorized the epoch-006 roll: it
+  closed epoch-005 at 3 observations and restarted the 60-session /
+  30-order clock on deployed `c9d0740`.
 - BUY-1 is merged and independently corrected: review branch
   `codex/review-buy1-suggestion-picker-20260813`, correction `44a7f85`,
   on top of `e0df810`. It is closed history, not reopened work.
@@ -2705,8 +2724,10 @@ full run crossed local midnight and produced one synthetic-UI date mismatch
 the unchanged same-date full rerun passed **4,348 / 0 failed / 25 warnings** in
 665.15 seconds. Python 3.13.14; required compileall plus `research/` passed;
 diff check passed. Review record/Action Plan commit `2a26353`. Branch
-`codex/review-sbp-plan-amendments-20260819` and all Codex commits are
-**local-only, not pushed or merged** at this handoff.
+`codex/review-sbp-plan-amendments-20260819` was still awaiting the owner's
+push authorization when this section was written. PR #282 (`c289f95`) has
+since merged it, so `5c42bfd`, `5c3bf45`, and `2a26353` are fetchable
+mainline history.
 
 ## 7bp. Counter-review of the SBP review submitted (2026-08-20; clarified by 7bq)
 
@@ -2768,11 +2789,70 @@ the active contract. Action Plan/review-record commit `ae07450`. Validation:
 deployment, or operational-state action occurred. SBP remains a draft and no
 milestone record was added.
 
-Remote topology at this handoff: Claude's submitted counter-review is pushed
-at `origin/codex/review-sbp-plan-amendments-20260819` head `f75e793`. The new
-review branch `codex/review-sbp-counterreview-20260820`, correction `aadb238`,
-record `ae07450`, and this handoff are **local-only until the owner authorizes
-a push**.
+Remote topology, corrected 2026-08-20 after the merge. This section was
+written while both branches still awaited the owner's push authorization; PR
+#282 (`c289f95`) has since merged the whole SBP chain into `main`, so
+Claude's counter-review `f75e793`, correction `aadb238`, record `ae07450`,
+and handoff `308ac84` are all mainline history, reachable with
+`git fetch origin main`. The superseded sentence claimed the opposite: a
+push/merge status written inside the commit being merged is false by
+construction the moment it lands, which is the CCR-005 class
+`test_no_document_calls_a_merged_commit_unreachable` exists to catch — and
+did catch here.
+
+## 7br. Post-merge topology correction (docs only, 2026-08-20)
+
+Branch `user/claude/handoff-topology-refresh-20260820`, from `main` at
+`c289f95`.
+
+`tests/test_active_document_consistency.py::test_no_document_calls_a_merged_commit_unreachable`
+was RED on `main`: section 7bq still described its own correction commit as
+local-only after PR #282 had merged it. That is the CCR-005 class exactly as
+its docstring predicts — a push/merge status written inside the commit being
+merged is false the moment it lands, so only a check that runs after the merge
+can catch it. This round
+is that check being honoured rather than edited.
+
+Corrected, all documentation:
+
+- **Section 1** named `origin/main` as the 2026-08-17 head
+  `1457169…` and the operational checkout as frozen at `752d3b7` in
+  epoch-005. It now declares `c289f95` (PR #282 merged the eight-commit SBP
+  chain `5c42bfd..308ac84` onto first parent `5e3708e`) and the operational
+  checkout as frozen at `c9d0740` under `paper-epoch-006`, pointing at
+  `docs/operations/OPERATIONAL_FACTS.md` as the operational authority. The
+  literal phrase the topology guard parses ("Published `origin/main` at audit
+  time: `<hash>`") was deliberately kept so the guard keeps binding; the
+  superseded head is retained as an explicitly historical bullet.
+- The two load-bearing history bullets no longer imply epoch-005 is running:
+  it was the only epoch from 2026-08-13 until the epoch-006 roll closed it on
+  2026-08-19, and the owner's 60-day hold decision (`c048a94`) is marked
+  superseded by that authorized roll.
+- **Sections 7bo, 7bq, and the section 8 sequencing sentence** stated the
+  branches were local-only or awaiting a push. All three now record the merge.
+  Push/merge claim words are kept out of the same clause as the hashes they
+  describe, because the guard's parser reads a claim within 80 characters of a
+  hash — wording that merely happened to fall outside that window would be
+  luck, not a fix.
+
+Verified: every hash named in sections 7bn–7bq is an ancestor of
+`origin/main` (checked with `git merge-base --is-ancestor`, ten hashes, all
+reachable). Validation: `tests/test_active_document_consistency.py` 31 passed
+(red → green on the guard above, which is the regression evidence — the
+failure existed on `main` before this branch); full suite and `git diff
+--check` recorded in the round's handoff commit message. No code, contract,
+schema, CLI, migration, research result, ledger entry, milestone status, QC
+access, broker access, scheduled task, deployment, or operational database
+changed. No milestone record entry was added: correcting stale prose is not a
+milestone.
+
+Not corrected here (out of the requested scope, still stale, and named so the
+next round can decide): `docs/Alpha_Test_Implementation_Plan.md`'s status
+header still says Stage 0 is halted with reruns beginning at R-007, though
+Stage 0 and Stage 1 closed null as A-001/A-002; and
+`docs/operations/GENERAL_READINESS_STATUS.md` /
+`docs/operations/ML_IMPLEMENTATION_STATUS.md` still cite their companion plans
+at pre-2026-08-17 `docs/` paths that now live under `docs/reference/`.
 
 ## 8. What is next
 
@@ -2800,8 +2880,8 @@ review report dispositions all 143 submitted commits.
 
 **Sequencing:** Stage 0 and Stage 1 are closed null (A-001/A-002).
 APQ is closed null (R-029/A-003). SHW-4 is live and collecting its
-prospective 24-month stream. The current SBP counter-review verification branch
-is local-only. The owner
+prospective 24-month stream. The SBP counter-review and its independent
+verification are merged into `main` by PR #282. The owner
 should first review the corrected proposed values in
 `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md`. If accepted, SBP-0 must
 verify official ETF pairs, machine-local snapshot count, the optional

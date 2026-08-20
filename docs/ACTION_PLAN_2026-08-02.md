@@ -52,6 +52,15 @@ and the owner-present SBR scheduler install remain gated on merge and
 counter-review. No QC run, broker action, deployment, or operational
 mutation is authorized by this audit.
 
+Topology update (2026-08-20): that audit branch merged as PR #281
+(`5e3708e`) and the whole SBP plan chain merged as PR #282, so
+`origin/main` is `c289f95` and every commit named in the SBP sections is
+mainline history. A docs-only correction round then refreshed the handoff's
+stale topology and push-state sentences, which
+`tests/test_active_document_consistency.py` had gone red on; no code,
+milestone status, research result, QC access, or operational state changed
+with it.
+
 Historical development topology (2026-08-17; retained as review context):
 `origin/main` was
 `1457169ba10f6aac0f1fb98b60b92a4607f8331c` after PR #245 merged the Codex

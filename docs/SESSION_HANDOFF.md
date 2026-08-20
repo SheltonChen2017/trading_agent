@@ -2612,11 +2612,62 @@ broker, scheduled-task, deployment, or operational-state change occurred.
 The owner must decide the proposed thresholds, caps, cost assumptions,
 candidate ETF pairs, and minimum evidence floor before SBP-0 can complete.
 
+## 7bn. SBP plan counter-reviewed and AMENDED; recommended primary (2026-08-19)
+
+Counter-review of the section 7bm draft. **Verdict: it should become the
+primary plan** — it writes the test my SBR preregistration deferred, and
+its P0..P4 decomposition (one decision isolated at a time) is exactly the
+structure that would have prevented Stage 0/1's beta-as-edge readings.
+Five pre-adoption amendments are applied in its section 11 (SBPA-001..005),
+made now precisely because no data exists yet:
+
+- **SBPA-001, the load-bearing one:** the 50% minimum ETF overlap was
+  UNREACHABLE, so P3/P4 would have refused every month while the study
+  still read as complete. A **declared structural feasibility check**
+  (basket weights built per sections 4–5 vs a cap-weight proxy for QQQ
+  holdings; **no returns, no benchmark, no performance** — a structural
+  quantity, not a price-linked look) measured overlap of **33.8%** holding
+  every candidate and **7–18%** for realistic 20–30 name baskets:
+  inverse-vol weighting and cap-weighted holdings are structurally
+  opposed (the low-vol names that earn the biggest basket weights carry
+  ~0.5% each in the fund; NVDA/AAPL/GOOGL/MSFT dominate the fund but are
+  mid-to-high vol). Threshold set to **10%** as a degeneracy floor, with
+  the relative "highest overlap wins" rule doing the selection work. The
+  check also exposed a **recorded limitation**: with an NDX-only candidate
+  universe, any broad Nasdaq fund covers 100% of any basket, so the
+  ETF-selection step is partly degenerate and P3/P4 substantially measure
+  "add 5% of a broad fund (or its 3x)". Making that step informative needs
+  a broader candidate universe = a NEW preregistration, never a silent
+  edit to the frozen SBR capture universe.
+- **SBPA-002:** an unusable 63-session price window disqualifies THAT
+  TICKER (matching the ratings-unavailable path) instead of refusing the
+  whole month; the month refuses only below the 8-stock floor. The
+  original rule was inconsistent and would burn irreplaceable months.
+- **SBPA-003:** P4−P3 is DESCRIPTIVE ONLY — it is ≈10% incremental index
+  beta, and clearing a family gate on 24 months would require the index
+  near 35–40%/yr, i.e. measuring the market. Frozen family is **3 cells
+  at 0.05/3**.
+- **SBPA-004:** declared power, frozen in advance — 24 monthly
+  observations detect only ≈**0.6%/month (7–8%/yr)**, so a null means "no
+  edge large enough to see", not "no edge"; extending for power requires
+  a new preregistration rather than bolting months onto a scored family.
+- **SBPA-005:** SBP-0 supersedes the SBR-2 evaluation step (freeze before
+  the first capture rather than after twelve), recorded reciprocally in
+  the capture preregistration. Zero snapshots exist at adoption, so every
+  future outcome is confirmatory.
+
+**LEV becomes SECONDARY** (fast historical read on the leverage/timing
+half; not evidence for this strategy). Honest headline recorded in the
+plan's new section 10: this is a **two-year instrument** — first analysis
+pass around **September 2028** — with no admissible historical shortcut.
+
 ## 8. What is next
 
 **Current (2026-08-19): the independent audit is accepted after correction
-and counter-reviewed (section 7bl); the complete Strong-Buy successor plan is
-now drafted for owner decision (section 7bm).**
+and counter-reviewed (section 7bl); the complete Strong-Buy successor plan
+is drafted (7bm), counter-reviewed and AMENDED (7bn), and is
+RECOMMENDED AS PRIMARY — pending owner adoption. No SBP code before that
+freeze; LEV is secondary.**
 Codex reviewed exact pushed range
 `81db126340818fe2c2c9efa16c77af8f1d37568f..3055fecd1caf490c852a446c03da760d2878af5a`
 (143 commits) on

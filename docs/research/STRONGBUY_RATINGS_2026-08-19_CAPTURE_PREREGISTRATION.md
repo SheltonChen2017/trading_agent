@@ -56,6 +56,15 @@ this stream must not affect reconciliation or any operational task.
   looks: no correlations, no sorting by subsequent returns, no
   "just checking" queries. Each snapshot is data, not a result.
 
+  **SUPERSEDED (2026-08-19) by
+  `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` SBP-0** on that
+  plan's adoption: the evaluation contract is frozen BEFORE the first
+  capture instead of after twelve, which is strictly more conservative
+  (no rule can be chosen from data already in hand). The capture
+  specification in sections 3–4 above is UNCHANGED; only the location
+  and timing of the evaluation freeze move. The section 6 look rule
+  below stands in full.
+
 ## 6. Look discipline
 
 The capture files may be READ for operational integrity (counts,

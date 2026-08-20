@@ -2537,9 +2537,10 @@ descriptive, LEV-specific log markers, and no ACTIVE_UNIVERSE. 10
 tests; 3 reverse mutations red then restored (threshold boundary,
 pullback boundary, accumulator reset). No QC. **LEV-2 (analyser +
 driver hook) is next**; SBR-1 (capture script + task) may run in
-parallel. **MPQ and HPQ are PROPOSED and counter-reviewed (sections
-7bi/7bj) — owner decision pending; MPQ-1/HPQ-1 start only when the
-owner freezes those preregistrations and schedules them.** The
+parallel. **MPQ and HPQ are ON HOLD by owner decision 2026-08-19
+(counter-reviewed, sections 7bi/7bj) — not frozen, not scheduled; the
+owner's stated priority is the LEV/SBR strong-buy program and the app
+restart.** The
 allocation-policy family is CLOSED (A-003, NULL on the gate). No QC
 access is currently authorized anywhere. Other owner-gated tracks:
 (1) Codex's thorough two-day audit tonight (range through the APQ-5

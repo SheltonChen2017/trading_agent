@@ -2708,10 +2708,41 @@ diff check passed. Review record/Action Plan commit `2a26353`. Branch
 `codex/review-sbp-plan-amendments-20260819` and all Codex commits are
 **local-only, not pushed or merged** at this handoff.
 
+## 7bp. Counter-review of the SBP review: ACCEPTED IN FULL (2026-08-20)
+
+Record: `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md`. All three
+rejections of my amendments are correct, and **SBPA-001 was refuted by
+re-running my own probe**: baskets built from the highest index-weight
+candidates renormalize to 51–68% overlap, so 33.8% was a property of the
+particular baskets I tested, never a ceiling — "50% is unreachable" was
+unsupported, and the missing artifact/hashes criticism is correct by this
+repository's own standards. Those re-check numbers carry the same defect, so
+they are used only to withdraw my claim, never to establish one; the 10%
+floor stands purely as a disclosed owner policy proposal. SBPA-002 is
+correctly rejected (deleting a signal-selected stock is the forbidden
+silent-row-drop, and the missingness is plausibly outcome-correlated), as is
+SBPA-004 (my 0.6%/month was a two-sided rejection boundary against an assumed
+tracking error, not power, and the frozen test is one-sided). The review's
+own catches are accepted and two are material: minimum basket 8 → **10** (a
+10% cap cannot sum to 100% below ten names — my 8 was a guaranteed refusal
+path) and the **leveraged look-through correction** (derivative-based funds
+make literal holdings an invalid look-through).
+
+**One new proposal, SBPA-006:** rejecting SBPA-002 leaves a permanent-stall
+path — a candidate with fewer than 64 completed sessions can NEVER produce
+the frozen window, so under whole-month refusal alone it refuses every month
+until it seasons. Fix that respects the rejection entirely: make listing
+history an **eligibility precondition** decided with the ratings rules before
+any selection exists (nothing deleted post-selection; a broken window for an
+eligible stock still refuses the month). The argument is arithmetic, not
+empirical; an exploratory check did find two current candidates at 46 and 47
+sessions, which SBP-0 must re-verify from the provenance-bound source.
+
 ## 8. What is next
 
-**Current (2026-08-20): Claude's SBP amendments are independently ACCEPTED
-AFTER CORRECTION (section 7bo). The complete Strong-Buy successor remains a
+**Current (2026-08-20): the SBP amendment round is independently ACCEPTED
+AFTER CORRECTION (7bo) and counter-reviewed (7bp), with one new proposal
+SBPA-006 for the owner. The complete Strong-Buy successor remains a
 DRAFT — not adopted, frozen, scheduled, or implemented. No SBP code before an
 owner-approved SBP-0 freeze. LEV remains separate and cannot validate SBP.**
 Codex reviewed exact pushed range

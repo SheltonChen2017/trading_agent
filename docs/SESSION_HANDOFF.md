@@ -2579,10 +2579,44 @@ its durable home in OPERATIONAL_FACTS. The epoch-006
 `policy_fingerprint` change (4a942cbc… → 4086365c…) is NOT explained
 by this audit and stays flagged.
 
+## 7bm. Complete Strong-Buy portfolio plan revised (2026-08-19)
+
+At the owner's request, Codex reviewed the proposed Strong-Buy direction and
+drafted the missing complete portfolio contract at
+`docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md`. The draft preserves the
+already frozen SBR-1 capture-only preregistration. It does not rewrite or
+silently expand that authority.
+
+The important correction is conceptual: the frozen LEV family is a generic
+TQQQ take-profit/re-entry experiment. It never consumes analyst ratings,
+builds the inverse-volatility stock basket, reads point-in-time ETF holdings,
+or measures the combined portfolio's look-through concentration. It therefore
+cannot validate the owner's complete strategy. The successor draft instead
+defines P0–P4 so ratings selection, inverse-volatility sizing, ordinary ETF
+overlap, and leverage are tested one at a time. It proposes including every
+stock that passes fixed ratings thresholds, a 63-session inverse-volatility
+window with a 10% direct-stock cap, a weight-based holdings-overlap score, a
+5% leveraged sleeve, and a 15% look-through issuer cap.
+
+The draft also closes the largest evidence risk in the earlier sequence:
+freezing SBR-2 only after viewing twelve captured rating distributions could
+turn those same months into calibration leakage. Under the successor, the full
+rule must freeze before any admissible snapshot is joined to later prices;
+anything captured before adoption is calibration-only and excluded from the
+confirmatory outcomes. Official same-index ETF mappings and point-in-time
+holdings capture are new required gates. Threshold exits remain a later,
+separate hypothesis rather than being mixed into the base overlay test.
+
+Status is **DRAFT — not adopted, not frozen, not scheduled**. No code, QC,
+broker, scheduled-task, deployment, or operational-state change occurred.
+The owner must decide the proposed thresholds, caps, cost assumptions,
+candidate ETF pairs, and minimum evidence floor before SBP-0 can complete.
+
 ## 8. What is next
 
-**Current (2026-08-19): independent audit accepted after correction,
-and counter-reviewed (section 7bl).**
+**Current (2026-08-19): the independent audit is accepted after correction
+and counter-reviewed (section 7bl); the complete Strong-Buy successor plan is
+now drafted for owner decision (section 7bm).**
 Codex reviewed exact pushed range
 `81db126340818fe2c2c9efa16c77af8f1d37568f..3055fecd1caf490c852a446c03da760d2878af5a`
 (143 commits) on
@@ -2602,12 +2636,15 @@ review report dispositions all 143 submitted commits.
 
 **Sequencing:** Stage 0 and Stage 1 are closed null (A-001/A-002).
 APQ is closed null (R-029/A-003). SHW-4 is live and collecting its
-prospective 24-month stream. LEV-1 and SBR-1 may proceed only after this
-review branch is merged and counter-reviewed. LEV-2 is the next code
-milestone after that gate. The SBR Interactive scheduled-task install
-is owner-present and remains unperformed. SBR evaluation remains
-forbidden until SBR-2 is frozen after at least 12 monthly snapshots.
-MPQ/HPQ remain on hold. Active paper evidence is `paper-epoch-006`;
+prospective 24-month stream. The review branch has been counter-reviewed but
+is not yet recorded here as merged. The SBR Interactive scheduled-task install
+is owner-present and remains unperformed. Before using SBR as the owner's
+complete portfolio strategy, the owner should accept or revise
+`docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md` and freeze SBP-0. No captured
+month may be joined to subsequent prices under the draft; pre-adoption months
+would be calibration-only. LEV-2 may proceed only as the already frozen,
+separate TQQQ timing study, not as proof of the Strong-Buy portfolio. MPQ/HPQ
+remain on hold. Active paper evidence is `paper-epoch-006`;
 the next operational observation is governed by
 `docs/operations/OPERATIONAL_FACTS.md`.
 1. ~~The Stage 0 review happened (section 7y) — owner acceptance is the

@@ -1,7 +1,16 @@
 # Strong-Buy portfolio test plan
 
-Status: **DRAFT, independently reviewed and corrected 2026-08-19 — not yet
-adopted or frozen.** Claude's proposed amendments SBPA-001..005 are preserved
+Status: **SUPERSEDED 2026-08-20 as the priority research program**, by owner
+decision, in favour of
+`docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`. This plan was never
+adopted or frozen, so no capture, evidence, result, or operational state is
+affected by the change; SBP-0 will not be run. It is retained in full —
+including amendments SBPA-001..011 and the review chain that produced them —
+as the record of a reviewed design decision, and it remains the authority for
+anything that later revives a consensus-level hypothesis.
+
+Prior status, retained: **DRAFT, independently reviewed and corrected
+2026-08-19 — not yet adopted or frozen.** Claude's proposed amendments SBPA-001..005 are preserved
 in section 11 with their review dispositions. Every value below remains a
 proposal until the owner adopts it; adoption freezes the document as written.
 

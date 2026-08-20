@@ -1,8 +1,9 @@
 # ACTION PLAN — 2026-08-20
 
 Status: **owner-directed replacement for `docs/reference/ACTION_PLAN_2026-08-02.md`**,
-written 2026-08-20 at the owner's instruction, with the Strong-Buy portfolio
-initiative placed first. The predecessor is archived, not deleted: it remains
+written 2026-08-20 at the owner's instruction. **Amended the same day: the
+owner replaced the Strong-Buy portfolio program with the Analyst-Consensus ETF
+Rotation program (ACER), which is now priority 1.** The predecessor is archived, not deleted: it remains
 the record of how everything below became true.
 
 This document decides **what happens next**. It does not restate per-milestone
@@ -60,7 +61,7 @@ documentation changes).
 |---|---|---|
 | Paper evidence | **`paper-epoch-006` is active** since 2026-08-19 on deployed `c9d0740`; first observation verified the same day; 60-session / 30-order clock counting | `docs/operations/OPERATIONAL_FACTS.md` |
 | Overlay shadow | `overlay-epoch-001` (defensive carry) registered with a 2026-07-31 baseline; 24-month sufficiency floor; tasks reinstalled Interactive after the S4U failure | `docs/reference/SHADOW_OBSERVATION_DESIGN.md` |
-| Analyst-ratings capture (SBR-1) | Code and installer merged and reviewed; **no install is recorded and no snapshot is committed here**. The machine-local stream state has not been measured, so "zero snapshots" is an expectation, not a verified fact | `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` |
+| Analyst-ratings capture (SBR-1) | **CLOSED 2026-08-20 before its first capture.** Code, tests and installer merged and reviewed; the task was never installed and no snapshot is committed here. Monthly bucket counts cannot reconstruct the per-firm revisions ACER needs. The machine-local stream state has still not been measured, so "zero snapshots" remains an expectation rather than a verified fact | `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md` |
 
 **Research programs and their verdicts:**
 
@@ -70,7 +71,8 @@ documentation changes).
 | Allocation-policy QC family (APQ) | **CLOSED NULL** (run `R-029`, observation `A-003`). 0 of 3 cells at 0.05/3; every candidate's monthly excess versus 100% SPY negative |
 | Defensive carry (SHW) | Prospective only; no result exists or may be inferred before sufficiency |
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
-| SBP (Strong-Buy portfolio) | **DRAFT** contract; no captured month, no admissible outcome |
+| SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
+| ACER (Analyst-Consensus ETF Rotation) | **DRAFT** contract and new priority 1; no data purchased, no run, no result |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0
@@ -91,79 +93,86 @@ is recorded; the subscription decision is still open in section 7).
 
 ---
 
-## 2. Priority 1 — the Strong-Buy initiative
+## 2. Priority 1 — the Analyst-Consensus ETF Rotation program (ACER)
 
-The owner's strategy: select stocks by analyst Strong-Buy consensus, weight
-them by inverse volatility, add a capped sleeve of the leveraged counterpart
-of whichever ordinary ETF most overlaps the basket. `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md`
-is the draft contract; `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md`
-is the already-frozen capture half.
+**Owner decision, 2026-08-20: ACER replaces the Strong-Buy portfolio program.**
+The strategy converts stock-level analyst *revisions* into ETF-level signals:
+score each ETF as the sum of its point-in-time constituent weights times its
+holdings' decayed revision signals, filter on breadth and analyst coverage,
+rank, and only later express the strongest views through inverse or leveraged
+products under explicit regime rules. The contract is
+`docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md` (ACER-0..7); the
+owner's source specification is versioned beside it as
+`analyst-consensus-etf-strategy.pdf`.
 
-**The honest headline, restated so no later reader is surprised: this is a
-two-year instrument.** QuantConnect has no point-in-time analyst-ratings
-dataset, and today's consensus against old prices is the same look-ahead that
-closed Stage 2 PEAD. Evidence therefore accrues one month at a time from the
-first capture, and the single analysis pass lands around **September 2028**.
-No historical shortcut exists. The work below is what makes those months
-admissible when they arrive.
+This is a different hypothesis from SBP, not a re-plumbing of it: the signal
+moves from consensus *levels* to *revisions*, and the held instrument moves
+from a stock basket to ETFs. `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md`
+is **superseded while still a draft** — never adopted or frozen, so no
+evidence, capture, or operational state is affected — and the frozen SBR
+capture stream is **closed before its first capture** with zero snapshots,
+because monthly bucket counts cannot reconstruct per-firm revisions. Both
+documents are retained in full.
 
-### SBP-0 — owner freeze (the only thing blocking everything else)
+**The honest headline: ACER is testable on history, and that is exactly why it
+needs a look budget.** A purchased ratings-revision history plus
+QuantConnect's point-in-time ETF constituents removes the two-year wait that
+made SBP a 2028 instrument — but it replaces a scarcity of data with an
+abundance of specifications, which is how false discoveries are manufactured.
+The prior is poor: eleven local signals, Stage 0's 180 cells, Stage 1's 24 and
+APQ's 3 all closed null, and post-recommendation drift is among the most
+heavily arbitraged effects in the literature. Aggregating revisions across an
+ETF's holdings also dilutes toward that ETF's common factor, so scores across
+large-cap technology funds will be strongly collinear.
 
-The owner decides every proposed value in the plan's section 2 and the
-remaining owner choices in its section 11. Independent verification corrected
-the audit's new amendments as follows:
+### ACER-0 — owner freeze (the only thing blocking everything else)
 
-- **SBPA-007** — the 15% look-through issuer cap cannot bind for P3. It can
-  bind for P4 if an ordinary-fund issuer weight exceeds 36.7% at the maximum
-  core weight, so it is a rare-tail gate rather than a structurally dead or
-  corrupt-data-only check. Decide whether that rare-tail behavior is intended
-  or a lower cap is wanted.
-- **SBPA-008** — the plan's stated mitigation for inverse-volatility
-  concentration is that same per-issuer cap, which cannot constrain a cluster
-  of distinct issuers in one industry. Add an industry rule or disclose the
-  exposure as unmanaged.
+The owner freezes `docs/reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md`:
+signal encoding, decay grid, eligibility, control set, benchmarks, gates,
+**cell counts, and a run budget**. The last two are not paperwork. The source
+specification asks for multiple encodings, five decay half-lives, sum and
+average variants, raw/coverage-adjusted/breadth-filtered specifications, three
+bearish implementations and a leverage overlay; without a declared family size
+and gate, that is a false-discovery generator over one historical sample.
 
-SBPA-009's structural-zero concern is real, but excluding exactly-10-name
-months was rejected: those zeros are the strategy's true P2−P1 result and
-remain in the primary series. SBPA-010 is corrected so descriptive P4
-availability cannot remove a valid P3−P2 month. SBPA-011 separately requires
-the power table to simulate the frozen small-sample bootstrap. Reasoning and
-the corrected dispositions are in the audit and independent-verification
-reports.
+ACER-0 also settles the ratings vendor, which turns on two questions neither
+vendor page answers: does the candidate carry **dated actions for delisted and
+deregistered tickers, and from when**, and can consensus be retrieved **as of
+a past date** rather than only as current state. A current-state consensus
+endpoint is the same look-ahead that closed Stage 2 PEAD.
 
-SBP-0 also requires, before freezing: official same-index ETF pair
-verification from issuer documents, a measured machine-local snapshot count
-(the repository cannot prove the operational host holds none), an 80%-power
-sensitivity table that includes the frozen bootstrap's own small-sample
-behaviour, and — only if a structural feasibility probe is used at all — a
-reproducible artifact with inputs, code identity, and hashes.
+### ACER-2 is the decisive milestone; scope and price that alone
 
-### SBP-0 comes before the capture install, deliberately
+The ladder runs ACER-0 freeze → ACER-1 data audit → **ACER-2 stock-level
+signal validation** → ACER-3 unlevered ETF aggregation → ACER-4 robustness and
+falsification → ACER-5 bearish variants → ACER-6 leverage overlay → ACER-7
+prospective paper observation. Definitions of done and gates are in the plan.
 
-The frozen capture contract permits installing SBR-1 today. Do not, unless the
-owner wants captures to begin regardless: months captured before adoption are
-**calibration-only and excluded from confirmatory outcomes**. Freezing first
-costs days; installing first costs confirmatory months out of a 24-month
-budget. The exception is a deliberate owner choice to start the operational
-stream early for engineering reasons, which must then be recorded so those
-months are never silently reused as evidence.
+ACER-2 asks the only question that matters first: **do stock-level analyst
+revisions carry incremental out-of-sample information after momentum,
+earnings, size, liquidity, volatility and sector controls?** It needs no ETF
+holdings, no inverse products and no leverage. A null there closes the program
+for the price of one data purchase and a few weeks, instead of after a
+seven-stage build. Everything from ACER-3 onward is contingent and should not
+be scoped or priced yet.
 
-### Sequence after the freeze
+Two costs the source document does not price. ACER-2's control set needs
+earnings dates and standardized surprise, which a ratings subscription does
+not include — that is a second dataset and a second budget line. And a
+QuantConnect cloud dataset **cannot be hashed by this project**, which is a
+real gap against the content-addressing rule; every run record must disclose
+it and compensate with dataset version, project name, compile ID, backtest ID,
+and the uploaded custom-data SHA-256.
 
-| Step | Work | Gate |
-|---|---|---|
-| SBR-1 install | Owner-present elevated install of `scripts/install_windows_strongbuy_capture_task.ps1`, **Interactive logon**, then verify the first real firing — registration alone is never trusted on this host | Owner present; first-firing verification recorded in `OPERATIONAL_FACTS.md` |
-| SBP-1 | Task-specific official ETF-holdings capture stream (append-only, manifest-hashed, no price/evaluation imports) | Independent review and counter-review before installation |
-| SBP-2 | Pure deterministic constructor: selection, caps, overlap scoring, mapping, look-through, bands, turnover, P0–P4 | Reviewed constructor emits reproducible weights or a named refusal from frozen fixtures |
-| SBP-3 | Monthly shadow decisions from the first post-freeze admissible capture; optional Alpaca **paper** pilot only after a separate owner decision | Complete evidence chain per month; no auto-trading authority |
-| SBP-4 | Counts-only sufficiency check, independent review, then **one** frozen analysis pass that closes the family | Owner authorisation; result recorded VALID / INVALID / REFUSED |
+### What happens to the Strong-Buy work
 
-**Standing rule for this family:** joining any snapshot to subsequent prices,
-returns, or rankings is a research look and must be ledgered. Counts-only
-integrity checks are not looks. Until SBP-0 is adopted, the frozen
-SBR-2-after-twelve-captures rule remains the authority.
-
----
+SBP-0 will not be run. The plan, its amendment ledger SBPA-001..011, and the
+four-round review chain that produced them are retained as the record of a
+reviewed design decision. **SBR-1's scheduled task stays uninstalled and its
+frozen capture stream is closed with zero snapshots** — the cheapest possible
+moment to stop, since no evidence is discarded and no epoch is disturbed.
+The capture code, tests and installer remain in the tree; a future
+level-based hypothesis could revive them under a fresh preregistration.
 
 ## 3. Priority 2 — keep the running evidence honest
 
@@ -263,14 +272,19 @@ was true when written and are never retro-edited.
 
 ## 7. Owner decisions required
 
-1. **SBP-0 adoption** — every proposed value and unresolved owner choice in
-   SBPA-007, SBPA-008, and SBPA-011 (section 2); SBPA-009/010 are already
-   corrected as sample-definition rules.
-   This is the only decision blocking the priority-1 path.
-2. **Capture-start ordering** — freeze first (recommended), or install SBR-1
-   now and accept that pre-freeze months are calibration-only.
-3. **Whether LEV-2..4 runs in parallel** with SBP-0/SBP-1 or waits.
-4. Carried forward, unchanged and unblocking: historical-membership vendor
+1. **ACER-0 adoption** — the frozen signal encoding, decay grid, eligibility,
+   control set, benchmarks, gates, **cell counts and run budget**. This is the
+   only decision blocking the priority-1 path.
+2. **Ratings vendor**, decided on the two open questions: dated actions for
+   delisted and deregistered tickers, and whether consensus is retrievable as
+   of a past date rather than only as current state.
+3. **Control-set data for ACER-2** — which estimates/fundamentals source
+   supplies earnings dates and standardized surprise, and its budget. A
+   ratings subscription does not cover it.
+4. **Confirmation that SBR-1 stays uninstalled** and its stream closed, or an
+   explicit decision to run it anyway as a secondary level-based dataset.
+5. **Whether LEV-2..4 runs in parallel** with ACER-0/ACER-1 or waits.
+6. Carried forward, unchanged and unblocking: historical-membership vendor
    selection and funding; the Databento statistics/reference budget; who signs
    the `SpecReviewAttestation` for the volatility discovery spec; the handling
    of the 118 mixed-provenance equity snapshots; whether the experimental

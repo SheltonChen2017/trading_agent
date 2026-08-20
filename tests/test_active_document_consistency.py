@@ -928,3 +928,41 @@ def test_strongbuy_amendment_ledger_is_one_contiguous_markdown_table():
         "the amendment rows are not one contiguous table: "
         f"{dict(zip(amendments, ordered))}"
     )
+
+
+def test_a_superseded_program_is_not_also_the_next_owner_decision():
+    """A replaced program must not still be advertised as the blocking step.
+
+    2026-08-20: the owner replaced the Strong-Buy program (SBP) with the
+    Analyst-Consensus ETF Rotation program. The failure this guards against is
+    PARTIAL replacement -- one document marking a plan superseded while the
+    action plan still tells the reader its freeze is what happens next. Stated
+    as a relationship so it survives the next replacement: whichever plan
+    declares itself superseded must not also own the action plan's blocking
+    decision.
+    """
+    plans = {
+        "SBP": "reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md",
+        "ACER": "reference/ANALYST_CONSENSUS_ETF_ROTATION_PLAN.md",
+    }
+    action_plan = _text("ACTION_PLAN_2026-08-20.md")
+    blocking = re.search(
+        r"\*\*([A-Z]+)-0 adoption\*\*[\s\S]{0,300}?only decision blocking",
+        action_plan,
+    )
+    assert blocking, "the action plan must name one blocking -0 adoption"
+    blocking_prefix = blocking.group(1)
+
+    for prefix, name in plans.items():
+        superseded = _text(name).startswith("# ") and bool(
+            re.search(r"Status: \*\*SUPERSEDED", _text(name))
+        )
+        if superseded:
+            assert prefix != blocking_prefix, (
+                f"{name} declares itself superseded while the action plan still "
+                f"names {prefix}-0 adoption as the blocking decision"
+            )
+        elif prefix == blocking_prefix:
+            assert _doc_path(name).is_file(), (
+                f"the action plan blocks on {prefix}-0 but {name} does not exist"
+            )

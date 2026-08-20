@@ -17,10 +17,12 @@ Strong-Buy initiative is a *sequencing* decision; it does not adopt, freeze, or
 approve any value in the Strong-Buy research contract. That is a separate
 owner act (SBP-0).
 
-Current development topology (2026-08-20): `origin/main` is `c289f95` after
-PR #282 merged the Strong-Buy plan chain. Two documentation branches from
-this session sit above it: `user/claude/handoff-topology-refresh-20260820`
-(`a2b69eb`) and `user/claude/sbp-review-audit-20260820`.
+Current development topology at independent-review start (2026-08-20):
+`origin/main` is `13355a6`. PR #283 merged the handoff-topology refresh and
+PR #284 merged Claude's SBP audit, documentation sweep, and this replacement
+Action Plan. The exact submitted range under review is
+`c289f95..13355a6`; later review commits are recorded in
+`docs/SESSION_HANDOFF.md` rather than described here as already merged.
 
 ---
 
@@ -71,11 +73,15 @@ documentation changes).
 | SBP (Strong-Buy portfolio) | **DRAFT** contract; no captured month, no admissible outcome |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
-The project has **zero confirmed predictive signals**. Every historical
-QuantConnect result in `docs/alpha-result.md` remains invalid, refused,
-unanalysed, or provenance-incomplete; the conservative lifetime alpha-cell
-exposure floor is 428 cells across five run-level looks, plus the Stage 0/1
-and APQ runs ledgered since.
+The project has **zero confirmed predictive signals**. The reviewed Stage 0
+and Stage 1 QuantConnect runs are **VALID but null**, and the reviewed APQ run
+is valid but also closed null. Older legacy entries retain their individual
+invalid, refused, unanalysed, or provenance-incomplete states in
+`docs/alpha-result.md`; validity is never inferred from age or rewritten as a
+group. The closed cross-sectional program's conservative lifetime alpha-cell
+floor is 452 at A-002 (428 legacy/declaration cells plus the 24-cell Stage 1
+family). APQ is a separate three-cell allocation-policy family and does not
+change that alpha-program floor.
 
 **Software complete but not scheduled:** the ML research/shadow stack through
 monitoring and promotion dossier (observation-only, promotion-blocked by
@@ -103,23 +109,27 @@ admissible when they arrive.
 
 ### SBP-0 — owner freeze (the only thing blocking everything else)
 
-The owner decides every proposed value in the plan's section 2 and the ten
-pending amendments in its section 11. Two of them are gates that do not
-currently work and should be settled before adoption:
+The owner decides every proposed value in the plan's section 2 and the
+remaining owner choices in its section 11. Independent verification corrected
+the audit's new amendments as follows:
 
-- **SBPA-007** — the 15% look-through issuer cap cannot bind at the proposed
-  5% sleeve and 3x leverage (it would need one issuer to be 36.7% of the
-  ordinary fund). Choose a cap that can bind, or relabel 15% as a corrupt-data
-  tripwire.
+- **SBPA-007** — the 15% look-through issuer cap cannot bind for P3. It can
+  bind for P4 if an ordinary-fund issuer weight exceeds 36.7% at the maximum
+  core weight, so it is a rare-tail gate rather than a structurally dead or
+  corrupt-data-only check. Decide whether that rare-tail behavior is intended
+  or a lower cap is wanted.
 - **SBPA-008** — the plan's stated mitigation for inverse-volatility
   concentration is that same per-issuer cap, which cannot constrain a cluster
   of distinct issuers in one industry. Add an industry rule or disclose the
   exposure as unmanaged.
 
-SBPA-009 (structural zeros in P2−P1 at exactly 10 names) and SBPA-010
-(descriptive P4 availability deleting inferential P3−P2 months) are smaller
-but must also be settled in advance, because both decide which months count.
-Reasoning: `docs/Review/REVIEW_2026-08-20_SBP_REVIEW_AUDIT.md`.
+SBPA-009's structural-zero concern is real, but excluding exactly-10-name
+months was rejected: those zeros are the strategy's true P2−P1 result and
+remain in the primary series. SBPA-010 is corrected so descriptive P4
+availability cannot remove a valid P3−P2 month. SBPA-011 separately requires
+the power table to simulate the frozen small-sample bootstrap. Reasoning and
+the corrected dispositions are in the audit and independent-verification
+reports.
 
 SBP-0 also requires, before freezing: official same-index ETF pair
 verification from issuer documents, a measured machine-local snapshot count
@@ -253,7 +263,9 @@ was true when written and are never retro-edited.
 
 ## 7. Owner decisions required
 
-1. **SBP-0 adoption** — every proposed value plus SBPA-007..010 (section 2).
+1. **SBP-0 adoption** — every proposed value and unresolved owner choice in
+   SBPA-007, SBPA-008, and SBPA-011 (section 2); SBPA-009/010 are already
+   corrected as sample-definition rules.
    This is the only decision blocking the priority-1 path.
 2. **Capture-start ordering** — freeze first (recommended), or install SBR-1
    now and accept that pre-freeze months are calibration-only.

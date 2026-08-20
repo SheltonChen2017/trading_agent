@@ -1,5 +1,10 @@
 # Audit of the independent SBP amendments review
 
+Status note (independent verification 2026-08-20): the audit's verdict on the
+seven earlier SBPR findings remains sustained, but its new SBPX ledger is
+accepted only after correction. See the verification addendum below and
+`docs/Review/REVIEW_2026-08-20_SBP_DOCUMENTATION_CLEANUP.md`.
+
 - Date: 2026-08-20
 - Reviewer: Claude (owner-requested audit of a completed review)
 - Subject: `docs/Review/REVIEW_2026-08-19_SBP_PLAN_AMENDMENTS.md` (Codex)
@@ -64,6 +69,20 @@ items rather than deleting them, as required.
 No P0 or P1 findings. This audit read documents only. No code, contract,
 schema, migration, research result, QuantConnect access, broker access,
 scheduled task, deployment, or operational database was touched.
+
+## Independent-verification addendum (2026-08-20)
+
+This addendum preserves Claude's submitted findings above while recording the
+later independent dispositions:
+
+| Finding | Disposition | Correction |
+|---|---|---|
+| SBPX-001 | **Partially correct** | P3 is provably unable to breach 15%, but P4 can breach when the ordinary-fund issuer weight exceeds 36.7% at the maximum direct-core weight. The draft contains no contractual maximum fund weight, so current or expected holdings cannot prove the gate can never fire. The plan now describes 15% as a possible rare-tail gate, not a corrupt-data tripwire. |
+| SBPX-002 | **Confirmed** | The misleading mitigation claim is removed. Industry concentration remains an explicit owner choice: add a declared industry rule or accept the exposure as unmanaged. |
+| SBPX-003 | **Concern confirmed; proposed exclusion rejected** | Exactly-10-name months are genuine zero P2−P1 outcomes under the frozen strategies. Keeping them estimates the unconditional strategy difference; deleting them would change the estimand. They remain in the primary series, with an optional `n > 10` decomposition descriptive only. The claim that adding zeros necessarily deflates variance was also too broad. |
+| SBPX-004 | **Confirmed and corrected** | P3−P2 now aligns on P2/P3 availability. Descriptive P4 is aligned with P3 only where P3/P4 are both available. |
+| SBPX-005 | **Confirmed** | The independent review uses arithmetic, source inspection, cross-document checks, and red/green active-document guards rather than citing unrelated green tests as proof of the financial reasoning. |
+| SBPX-006 | **Confirmed and separated** | The bootstrap-power requirement is now its own SBPA-011 rather than being bundled into the unrelated overlay-alignment amendment. |
 
 ## Part 3 — what this audit does not do
 

@@ -865,3 +865,45 @@ def test_deleted_gr7d_ref_is_not_called_irrecoverable_while_object_remains():
     assert "no longer exists anywhere" not in plan
     assert "85a77291a3a8de88a82b3670dcf05793b6825c1c" in plan
     assert "may disappear during Git pruning" in plan
+
+
+def test_closed_alpha_plan_distinguishes_valid_null_runs_from_invalid_legacy_runs():
+    """A null result is valid evidence of no detected edge, not an invalid run."""
+    plan = _text("Alpha_Test_Implementation_Plan.md")
+    action_plan = _text("ACTION_PLAN_2026-08-20.md")
+
+    stale_claims = (
+        "No historical alpha result in this program is valid",
+        "Every historical QuantConnect result in `docs/alpha-result.md` remains invalid",
+    )
+    for claim in stale_claims:
+        assert claim not in plan
+        assert claim not in action_plan
+
+    assert "VALID but null" in plan
+    assert "VALID but null" in action_plan
+
+
+def test_strongbuy_primary_comparison_keeps_structural_zero_months():
+    """Exactly-ten-name months are real strategy months, not missing evidence."""
+    plan = _text("reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md")
+
+    assert "remain in the primary P2−P1 series" in plan
+    assert "whether those months are excluded" not in plan
+
+
+def test_strongbuy_amendment_ledger_is_one_contiguous_markdown_table():
+    """All amendment rows render under the ledger header instead of as raw pipes."""
+    plan = (ROOT / "docs" / "reference" / "STRONGBUY_PORTFOLIO_TEST_PLAN.md").read_text(
+        encoding="utf-8"
+    )
+    lines = plan.splitlines()
+    positions = {
+        amendment: next(
+            i for i, line in enumerate(lines) if line.startswith(f"| {amendment} |")
+        )
+        for amendment in (f"SBPA-{number:03d}" for number in range(1, 12))
+    }
+
+    ordered = [positions[f"SBPA-{number:03d}"] for number in range(1, 12)]
+    assert ordered == list(range(ordered[0], ordered[0] + 11))

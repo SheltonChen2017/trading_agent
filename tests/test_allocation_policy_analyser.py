@@ -141,6 +141,16 @@ def test_nonfinite_return_is_refused(tmp_path: Path):
         analyser.parse_log(_log(tmp_path, mutate=mutate))
 
 
+def test_noncanonical_month_label_is_refused(tmp_path: Path):
+    def mutate(rows):
+        for row in rows:
+            if row[0] == "202202":
+                row[0] = "202213"
+        return rows
+    with pytest.raises(analyser.AllocationLogError, match="month label"):
+        analyser.parse_log(_log(tmp_path, mutate=mutate))
+
+
 def test_analyser_is_invocable_in_script_mode():
     """S1R-001 lesson: the script must run as a script, not only as a
     module."""

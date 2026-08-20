@@ -11,22 +11,44 @@ from __future__ import annotations
 import datetime as dt
 import hashlib
 import json
+import sys
+import types
 from pathlib import Path
 
+import pandas as pd
 import pytest
 
 from scripts.capture_analyst_ratings import (
     RatingsCaptureError,
-    capture,
+    capture as _capture,
+    default_fetch,
     load_config,
 )
 
 UTC = dt.timezone.utc
 NOW = dt.datetime(2026, 8, 19, 21, 15, tzinfo=UTC)   # 17:15 ET
+COMMIT = "c" * 40
 
 
 def _config(universe=("AAA", "BBB")) -> dict:
-    return {"stream_name": "strongbuy-ratings", "universe": list(universe)}
+    return {
+        "stream_name": "strongbuy-ratings",
+        "preregistration": (
+            "docs/research/"
+            "STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md"
+        ),
+        "cadence": "monthly-first-weekday-1715-ET",
+        "fields": ["strongBuy", "buy", "hold", "sell", "strongSell"],
+        "universe_source": {"method": "test fixture"},
+        "universe": list(universe),
+    }
+
+
+def capture(config, output_dir, now_utc, fetch_fn=None):
+    kwargs = {"code_commit": COMMIT}
+    if fetch_fn is not None:
+        kwargs["fetch_fn"] = fetch_fn
+    return _capture(config, output_dir, now_utc, **kwargs)
 
 
 def _fetch_ok(ticker: str) -> dict:
@@ -50,6 +72,9 @@ def test_capture_writes_canonical_rows_and_manifest_hash(tmp_path: Path):
     entry = manifest["snapshots"]["snapshot-2026-08.jsonl"]
     assert entry["sha256"] == hashlib.sha256(body.encode("utf-8")).hexdigest()
     assert entry["tickers"] == 2 and entry["available"] == 2
+    assert entry["code_commit"] == COMMIT
+    assert manifest["stream_identity"]["config_sha256"]
+    assert manifest["stream_identity"]["preregistration_sha256"]
 
 
 def test_failed_ticker_is_recorded_not_dropped(tmp_path: Path):
@@ -83,6 +108,28 @@ def test_invalid_counts_become_per_ticker_failures(tmp_path: Path, bad):
                      .read_text("utf-8").strip())
     assert row["available"] is False
     assert row["error_class"] == "RatingsCaptureError"
+
+
+def test_default_provider_does_not_truncate_fractional_counts(monkeypatch):
+    frame = pd.DataFrame([{
+        "period": "0m", "strongBuy": 1.5, "buy": 2, "hold": 3,
+        "sell": 0, "strongSell": 0,
+    }])
+    fake = types.SimpleNamespace(
+        Ticker=lambda ticker: types.SimpleNamespace(
+            get_recommendations_summary=lambda: frame
+        )
+    )
+    monkeypatch.setitem(sys.modules, "yfinance", fake)
+    assert default_fetch("AAA")["strongBuy"] == 1.5
+
+
+def test_stream_manifest_refuses_frozen_config_drift(tmp_path: Path):
+    capture(_config(("AAA",)), tmp_path, NOW, fetch_fn=_fetch_ok)
+    changed = _config(("AAA", "BBB"))
+    with pytest.raises(RatingsCaptureError, match="stream identity"):
+        capture(changed, tmp_path, NOW + dt.timedelta(days=35),
+                fetch_fn=_fetch_ok)
 
 
 def test_second_capture_in_the_same_month_is_a_noop(tmp_path: Path):
@@ -135,7 +182,7 @@ def test_manifest_entry_with_missing_file_refuses(tmp_path: Path):
 
 
 def test_config_refusals(tmp_path: Path):
-    good = {"stream_name": "s", "universe": ["AAA"]}
+    good = _config(("AAA",))
     path = tmp_path / "config.json"
 
     for broken, message in [
@@ -143,7 +190,9 @@ def test_config_refusals(tmp_path: Path):
         ({**good, "universe": ["AAA", "AAA"]}, "duplicate"),
         ({**good, "universe": ["aaa"]}, "malformed"),
         ({**good, "universe": ["TOOLONG"]}, "malformed"),
-        ({"universe": ["AAA"]}, "stream_name"),
+        ({**good, "stream_name": ""}, "stream_name"),
+        ({**good, "cadence": "monthly"}, "cadence"),
+        ({**good, "fields": ["strongBuy"]}, "fields"),
     ]:
         path.write_text(json.dumps(broken), encoding="utf-8")
         with pytest.raises(RatingsCaptureError, match=message):

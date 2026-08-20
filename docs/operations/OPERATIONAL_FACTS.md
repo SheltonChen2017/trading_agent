@@ -181,6 +181,19 @@ date" no-ops with `shadow_overlay.db` unchanged (1 registration /
 1 baseline observation / 0 outcomes). Remaining proof: the first
 AUTOMATIC firing, next occurrence 2026-08-20 14:45 local.
 
+### Restart the app after any operational deploy (2026-08-19)
+
+A Streamlit server started BEFORE a deploy keeps pre-deploy modules in
+`sys.modules` and mixes them with post-deploy code on the next page
+load. Live instance: a server from 2026-08-18 10:01 crossed the
+epoch-006 fast-forward and threw
+`ImportError: cannot import name 'open_lot_fingerprint'` — the new
+`rebalance_trim` imported against the old in-memory `tax_lots` while
+the on-disk tree was fully consistent (a fresh import passed). Fix is
+never a code change: kill the stale server processes and relaunch via
+`C:\git\launch_trading_app.ps1`. Rule: every roll/fast-forward of the
+operational clone ends with an app restart.
+
 ### epoch-006's first observation VERIFIED (2026-08-19)
 
 The first scheduled `paper-observation` under `paper-epoch-006` fired

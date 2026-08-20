@@ -162,6 +162,23 @@ def test_month_end_reentry_fills_only_when_awaiting(namespace):
     assert state["month_turnover"] == pytest.approx(1.0)  # sale + re-entry
 
 
+def test_month_end_sale_waits_for_the_following_month_end(namespace):
+    """A sale filled on a month-end cannot re-enter at that same close."""
+    state = namespace["new_variant_state"](100.0, D(2022, 1, 3))
+    spec = {"take_profit": 0.20, "reentry": "month_end"}
+    namespace["advance_variant"](state, spec, 120.0, D(2022, 1, 28))
+    namespace["advance_variant"](state, spec, 125.0, D(2022, 1, 31))
+    assert not state["invested"] and state["await_month_end"]
+
+    namespace["reenter_at_month_end"](state, 125.0, D(2022, 1, 31))
+    assert not state["invested"]
+    assert state["month_turnover"] == pytest.approx(0.5)
+
+    namespace["reenter_at_month_end"](state, 110.0, D(2022, 2, 28))
+    assert state["invested"] and state["entry_fill"] == 110.0
+    assert state["month_turnover"] == pytest.approx(1.0)
+
+
 # --------------------------------------------------------- integration
 
 

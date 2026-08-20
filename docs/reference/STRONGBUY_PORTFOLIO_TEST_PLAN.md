@@ -1,10 +1,9 @@
 # Strong-Buy portfolio test plan
 
-Status: **DRAFT, AMENDED 2026-08-19 — ready for owner adoption, not yet
-frozen.** Amendments SBPA-001..005 (section 11) followed a counter-review
-of the original Codex draft and a declared structural feasibility check.
-Every value below is a proposal until the owner adopts it; adoption
-freezes the document as written.
+Status: **DRAFT, independently reviewed and corrected 2026-08-19 — not yet
+adopted or frozen.** Claude's proposed amendments SBPA-001..005 are preserved
+in section 11 with their review dispositions. Every value below remains a
+proposal until the owner adopts it; adoption freezes the document as written.
 
 This is the proposed successor to the frozen SBR capture contract in
 `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md`.
@@ -48,19 +47,20 @@ adopts this plan before an admissible price-linked evaluation look.
 | Candidate stocks | The 102-symbol list already frozen by SBR-1; constituent changes do not rewrite history |
 | Strong-Buy eligibility | `total >= 10`; `strongBuy / total >= 0.50`; `(strongBuy + buy) / total >= 0.80`; `(sell + strongSell) / total <= 0.10` |
 | Basket membership | Every candidate meeting all four rules; no discretionary additions, exclusions, or top-N tuning |
-| Minimum basket size | 8 stocks; below 8 is a named monthly refusal, not permission to loosen a rule |
-| Volatility window | 63 completed trading sessions of adjusted daily closes, ending before the decision cutoff |
+| Minimum basket size | 10 stocks; below 10 is a named monthly refusal, not permission to loosen a rule. This is the mathematical minimum under a 10% stock cap; with exactly 10 names, P1 and P2 are necessarily identical |
+| Volatility window | Exactly 63 close-to-close daily returns from 64 consecutive completed exchange-session adjusted closes, ending before the decision cutoff |
 | Stock-weight formula | `raw_i = 1 / sample_std(daily_return_i)`; normalize raw weights to 100% |
 | Direct-stock cap | 10% per stock, enforced by iterative redistribution; an infeasible cap is a refusal |
 | Rebalance cadence | Monthly; first admissible portfolio enters at the next trading session's close |
 | No-trade band | 25% relative band around each target; positions outside the band move to target, and actual turnover is charged |
 | Leveraged sleeve | 5% of portfolio value; the Strong-Buy stock core receives 95% |
-| Minimum ETF overlap | **10%** of the Strong-Buy core by the weight-based definition in section 5 (amended from 50%: the feasibility check in section 5 measured a hard ceiling of 33.8% and a realistic 7–18%; 50% would have refused the overlay every month forever). The threshold is a floor against a degenerate match, NOT a quality bar — the relative "highest overlap wins" rule does the selection work |
+| Minimum ETF overlap | **10%** of the Strong-Buy core by the weight-based definition in section 5. This is a proposed permissive policy floor against an almost unrelated match, not an empirically established quality threshold; the relative “highest overlap wins” rule does the selection work |
 | Look-through issuer cap | 15%, including direct stock plus leveraged look-through exposure |
 | Ordinary security cost | 10 basis points per traded side |
 | Leveraged ETF cost | 25 basis points per traded side |
 | Primary benchmark | QQQ; SPY remains a secondary descriptive benchmark |
 | Minimum evidence | 24 matured monthly outcomes; 12 captures are an operational checkpoint, not evidence of profitability |
+| Bootstrap contract | One-sided positive-mean stationary bootstrap; 20,000 draws; fixed mean block length 3 months; family threshold `0.05 / 3` |
 
 If one of these choices is changed after any joined price outcome is seen, the
 change is a new hypothesis with new look accounting. It cannot overwrite this
@@ -75,12 +75,16 @@ For each month:
 2. A separate holdings capture records eligible ETF holdings from official
    sponsor material. Each record binds the fund, holdings as-of date,
    retrieval timestamp, source location, exact raw bytes, and SHA-256.
-3. The month refuses if either source arrived after the cutoff, lacks its
+3. The constructor also preserves the exact price-window input used for every
+   selected stock, including provider, retrieval time, exchange-session list,
+   adjustment convention, canonical bytes, and SHA-256. A later vendor query
+   is not allowed to restate the historical weighting input.
+4. The month refuses if any required source arrived after the cutoff, lacks its
    required identity, fails its hash, or uses information not known at the
    cutoff.
-4. Only after the cutoff does the constructor use price history ending before
+5. Only after the cutoff does the constructor use price history ending before
    the cutoff. Orders or shadow fills use the next trading session's close.
-5. The portfolio remains in force until the next admissible monthly decision.
+6. The portfolio remains in force until the next admissible monthly decision.
 
 No same-close trade, backfilled capture, retry on a more favorable day, or
 replacement for a missing selected stock is allowed.
@@ -95,20 +99,15 @@ Every qualifying ticker is included. Ties therefore do not affect selection.
 The output must record every pass/fail component so the result can be rebuilt
 without prose interpretation.
 
-For each selected ticker, compute close-to-close adjusted returns from exactly
-63 completed exchange sessions. **Amended (SBPA-002):** a zero/non-finite
-volatility, a missing session, or insufficient history **disqualifies that
-ticker**, with the reason recorded in the monthly output, exactly as a
-ratings-unavailable ticker is disqualified. No next stock is substituted —
-the basket simply does not contain it — and the MONTH refuses only if the
-surviving basket falls below the 8-stock minimum.
-
-The original rule refused the whole month on any single bad price window.
-With ~102 candidates that fires often, and every refused month is
-permanently lost from a 24-month evidence budget; it also treated two
-identical situations (a ticker whose data is unusable) inconsistently
-depending on which source was missing. Disqualification is recorded, never
-silent, so the selective-sample risk is visible in the record. After inverse-volatility normalization, repeatedly cap
+For each selected ticker, compute exactly 63 close-to-close adjusted returns
+from 64 consecutive completed exchange-session closes. A zero/non-finite
+volatility, a missing session, or insufficient history refuses the entire
+monthly basket; no
+selected Strong-Buy stock is silently removed and no next stock is
+substituted. Ratings-unavailable candidates are different: without a rating
+they never pass the signal rule, while a selected ticker with a broken price
+window has already passed and cannot be deleted without changing the tested
+portfolio. After inverse-volatility normalization, repeatedly cap
 weights above 10% and redistribute the remainder among uncapped stocks in
 proportion to their raw inverse-volatility weights.
 
@@ -147,61 +146,43 @@ calendar days stale at the decision cutoff, the pair lacks verified
 same-index evidence, or the best score is below the frozen **10%** floor, the
 overlay is unavailable for that month. Never improvise a substitute.
 
-### Declared structural feasibility check (2026-08-19, SBPA-001)
+### Pre-adoption structural probe status (2026-08-19 review)
 
-Run BEFORE freezing the threshold, and declared here so it is auditable.
-Scope: basket weights built exactly as sections 4–5 specify, overlapped
-against a **market-cap-weight proxy** for QQQ's holdings (QQQ is a modified
-cap-weighted NDX-100 fund; the frozen contract still requires official
-sponsor material at capture time). **No returns, no benchmark comparison,
-and no portfolio performance were computed** — this is a structural quantity,
-so it is not a price-linked outcome look under section 8. It cannot bias the
-result toward "positive": it only decides whether the overlay can ever be
-available.
+Claude reported an exploratory probe with overlaps from 3.2% to 33.8% and
+used it to propose changing the floor from 50% to 10%. The submitted commit
+contains no executable probe, input artifact, source/as-of/retrieval identity,
+price window, canonical bytes, or hashes. The numbers therefore cannot be
+reproduced and are **not evidence**.
 
-Measured weight overlap `Σ min(core_i, etf_i)`:
+The reported 33.8% for an all-candidate basket is also not a mathematical
+ceiling for a selected subset. Renormalizing a subset of high-index-weight
+stocks can produce a larger overlap. The claim that 50% is unreachable was
+therefore rejected. The proposed 10% remains only an owner-visible policy
+choice: a permissive floor preventing an almost unrelated match. It is not an
+empirically established threshold. Before SBP-0 adoption, a reproducible
+feasibility artifact may report the distribution of overlap across declared
+structural baskets, but it must use official point-in-time holdings, exact
+captured price inputs, a declared basket generator, and complete hashes. It
+must not use analyst outcomes, returns, or performance.
 
-| Basket | n | Overlap | Covered core weight |
-|---|---:|---:|---:|
-| All usable candidates | 100 | **33.8%** | 100% |
-| Lowest-vol 30 | 30 | 11.2% | 100% |
-| Lowest-vol 20 | 20 | 6.9% | 100% |
-| Lowest-vol 12 | 12 | 3.2% | 100% |
-| Highest-vol 20 | 20 | 11.6% | 100% |
-| Mixed 20 (every 5th by vol) | 20 | 18.1% | 100% |
+One limitation is valid without the rejected numbers: because QQQ covers the
+frozen Nasdaq-100 candidate universe, simple name coverage is degenerate.
+Weight overlap can still distinguish the broad fund from sector funds, so the
+selection is not guaranteed to choose QQQ. A broader stock universe would be
+a new preregistration, never a silent edit to SBR-1.
 
-Two findings, both design-relevant:
+The leveraged fund is an overlay, not the whole portfolio. Because a leveraged
+ETF commonly obtains exposure through derivatives, its literal holdings are
+not a valid issuer look-through. The verified ordinary same-index ETF weights
+are the frozen reference-index proxy. Proposed effective issuer exposure is:
 
-1. **The 50% threshold was unreachable.** Even holding every candidate,
-   overlap tops out at 33.8%; a realistic 20–30 name basket scores 7–18%.
-   Inverse-volatility weighting and cap-weighted ETF holdings are
-   structurally opposed — the low-volatility names that earn the largest
-   basket weights (PEP, KDP, MDLZ, ADP, XEL…) carry roughly half a percent
-   each in the fund, while the mega-caps that dominate it (NVDA ~11.6%,
-   AAPL ~10.2%, GOOGL+GOOG ~18.4%, MSFT ~7.9% on the proxy) are mid-to-high
-   volatility and get small basket weights. P3/P4 would have refused every
-   month while the study still "completed".
-2. **Covered core weight cannot be the gate either, and the ETF-selection
-   step is partly degenerate.** Because the candidate universe IS one
-   index's membership, any index fund over that universe covers 100% of the
-   basket by construction. "Which ETF holds the most of my picks" only
-   becomes a real question when the candidate ETFs cover *different subsets*
-   — which is why the candidate table must contain genuine competitors
-   (a broad fund plus sector funds), and why the selection is expected to
-   resolve to the broad fund in most months. **Recorded limitation:** with
-   the frozen NDX-102 candidate universe, P3/P4 substantially measure
-   "add 5% of a broad Nasdaq fund (or its 3x)", not a discovered match.
-   Making the ETF-selection step genuinely informative requires a broader
-   candidate universe, which is a different frozen universe and therefore a
-   NEW preregistration — never a silent edit to the SBR capture contract.
+- P3: `0.95 * core_weight_i + 0.05 * ordinary_etf_weight_i`
+- P4: `0.95 * core_weight_i + 0.05 * stated_daily_leverage * ordinary_etf_weight_i`
 
-The leveraged fund is an overlay, not the whole portfolio. Proposed effective
-issuer exposure is:
-
-`direct_weight_i + leveraged_sleeve_weight * stated_daily_leverage * leveraged_fund_holding_weight_i`
-
-If any issuer exceeds 15%, the leveraged variant refuses for that month. The
-system must not silently shrink the sleeve or optimize around the cap.
+If any issuer exceeds 15%, the affected overlay variant refuses for that
+month. The system must not silently shrink the sleeve or optimize around the
+cap. Both the ordinary holdings snapshot and same-index mapping must be valid
+at the decision cutoff.
 
 ## 6. Portfolios and comparisons
 
@@ -215,18 +196,14 @@ The variants isolate one decision at a time:
 | P3 | 95% P2 + 5% selected ordinary ETF | Whether the overlap-selected fund adds value without leverage |
 | P4 | 95% P2 + 5% verified leveraged counterpart | Whether leverage adds value beyond the same ordinary-fund overlay |
 
-**Amended (SBPA-003):** the frozen paired comparisons are **P1−P0, P2−P1,
-and P3−P2 — three cells**. **P4−P3 is DESCRIPTIVE ONLY**, with no p-value
-and no claim. Reason, decided now while no data exists: P4−P3 differs from
-P3−P2 by a 5% sleeve at 3x versus 5% at 1x, i.e. about 10% incremental index
-exposure. Its excess series is almost entirely market beta, and clearing a
-family-wise threshold on 24 months would require the index to compound at
-roughly 35–40% annually — in which case the cell would be measuring the
-market, not the strategy. Reporting it as a test would invite exactly the
-beta-as-edge misreading that closed Stage 0/1. The leverage question is still
-answered descriptively (P4's CAGR, drawdown, capture ratios, and after-cost
-turnover beside P3's), and the LEV family answers the timing half on real
-historical data.
+The frozen paired comparisons are **P1−P0, P2−P1, and P3−P2 — three
+inferential cells**. **P4−P3 is descriptive only**, with no p-value or edge
+claim. Its principal difference is intentional incremental index beta, so a
+positive mean would not establish a new selection alpha. The earlier
+35–40%-annual-return assertion had no preserved calculation or assumptions and
+is withdrawn. P4 still reports CAGR, drawdown, capture ratios, turnover, and
+look-through exposure beside P3; the separate LEV family addresses threshold
+timing on historical TQQQ data without validating this Strong-Buy strategy.
 
 P0–P2 form the core block. P2–P4 form the overlay block and use only dates on
 which all three overlay-block portfolios are available. This preserves aligned
@@ -251,34 +228,36 @@ water, recovery time, worst month, turnover, beta, and upside/downside capture.
 These are descriptive unless a test is explicitly frozen below.
 
 For the **three** frozen paired monthly excess-return series (P1−P0, P2−P1,
-P3−P2), use a stationary bootstrap with 20,000 draws and family-wise
-threshold **`0.05 / 3 = 0.0167`**. The primary claim requires positive
-after-cost mean excess return at that threshold. A nicer Sharpe, smaller
-drawdown, positive CAGR, or win against SPY alone is not proof of selection
-edge.
+P3−P2), use the one-sided positive-mean stationary bootstrap frozen in section
+2: 20,000 draws, mean block length 3 months, and family-wise threshold
+**`0.05 / 3 = 0.0167`**. The primary claim requires positive after-cost mean
+excess return at that threshold. A nicer Sharpe, smaller drawdown, positive
+CAGR, or win against SPY alone is not proof of selection edge.
 
-**Declared power, frozen before any data (SBPA-004).** Twenty-four monthly
-observations is a floor, not a sufficient sample. For a plausible monthly
-tracking error of about 1.2% on P1−P0, the standard error of the mean is
-roughly 0.25%/month, so clearing the two-sided family threshold requires an
-after-cost edge near **0.6%/month — about 7–8% annually**. Effects smaller
-than that are undetectable here no matter how real they are.
+Twenty-four monthly observations is a minimum horizon, not a promise of
+adequate power. Claude's submitted “0.6%/month” calculation assumed an
+unverified 1.2% tracking error, independence, and a two-sided critical value
+while the proposed test is one-sided; it described an approximate rejection
+boundary, not statistical power. It is withdrawn. Before adoption, SBP-0 must
+record a sensitivity table over declared tracking errors and dependence
+assumptions, including an 80%-power minimum-detectable effect. That table is
+planning context only and cannot turn 24 observations into sufficient
+evidence.
 
-Therefore the interpretation is fixed in advance: **a null result at 24
-months means "no edge large enough to see", NOT "no edge".** It closes this
-frozen family and authorizes no threshold tuning, no extra months bolted on
-to chase significance, and no re-scoring. Continuing collection beyond 24
-months to gain power is legitimate ONLY as a new preregistration that fixes
-its own horizon in advance and does not re-use these months' already-scored
-outcomes. The descriptive decomposition (which step helped, and by how much,
-with what drawdown and turnover) is the durable product of this study and
-does not depend on the gate.
+The interpretation is fixed in advance: **a null result at 24 months means
+the frozen test did not establish an edge; it does not prove that the true
+effect is zero.** It closes this frozen family and authorizes no threshold
+tuning or post-result extension. A longer horizon may be frozen before the
+first outcome look. After outcomes are scored, any extension is a new
+preregistration and cannot present the already-scored months as fresh
+confirmation. Descriptive decomposition remains useful but non-confirmatory.
 
 ## 8. Evidence, refusal, and look accounting
 
 - Freeze this complete contract before using any captured month in a
   price-linked evaluation.
-- **Supersession (SBPA-005):** on adoption, SBP-0 **replaces the SBR-2 step**
+- **Proposed supersession (SBPA-005):** only on explicit owner adoption, SBP-0
+  **replaces the SBR-2 step**
   of `docs/research/STRONGBUY_RATINGS_2026-08-19_CAPTURE_PREREGISTRATION.md`,
   which had deferred the evaluation preregistration until "after ≥12
   snapshots". Freezing the evaluation contract BEFORE the first capture is
@@ -286,9 +265,9 @@ does not depend on the gate.
   data already in hand. The capture contract itself is unchanged; only the
   location and timing of the evaluation freeze move here. Both documents must
   say so, so no future reader finds two contradictory authorities.
-- At adoption there are **zero captured snapshots** (SBR-1 is implemented but
-  not installed), so no month is calibration-contaminated and every future
-  outcome is confirmatory.
+- The repository records SBR-1 as not installed and contains no committed
+  snapshot. SBP-0 must verify the machine-local stream count before adoption;
+  it must not assume that zero snapshots exist merely from repository state.
 - If SBR snapshots predate adoption of this plan, label them calibration-only
   and exclude them from confirmatory outcomes. Do not choose thresholds from
   them and then score those same months.
@@ -315,11 +294,21 @@ provenance/hash mismatch.
 
 - Owner decides every row in section 2.
 - Official-source verification freezes the eligible ETF pair table.
+- A reproducible structural-feasibility artifact, if used, binds its declared
+  baskets, exact point-in-time holdings and price inputs, source timestamps,
+  canonical bytes, code identity, and hashes. Its output cannot silently tune
+  a threshold.
+- Record the power-sensitivity table required by section 7 and decide whether
+  24 months remains the fixed first-and-only analysis horizon.
+- Verify the machine-local SBR stream count and classify every pre-adoption
+  snapshot, if any, before stating that all future months are confirmatory.
 - Independent review confirms this plan was frozen before an admissible
   price-linked look.
 
-Definition of done: adopted status and exact source/config hashes are recorded
-in the Action Plan and Session Handoff. No code or cloud run is part of SBP-0.
+Definition of done: every proposed value and planning assumption is closed;
+adopted status and exact source/config/artifact hashes are recorded in the
+Action Plan and Session Handoff. No cloud run or outcome analysis is part of
+SBP-0.
 
 ### SBP-1 — prospective data capture
 
@@ -362,7 +351,8 @@ the paper account, if used, remains operationally isolated.
   check.
 - Independent review verifies identities, alignment, costs, and look counts
   before the owner authorizes the single analysis pass.
-- Run the frozen analysis once, record all four cells, and close the family.
+- Run the frozen analysis once, record all three inferential cells plus the P4
+  descriptive comparison, and close the family.
 
 Definition of done: every result is VALID, INVALID, or REFUSED with immutable
 provenance; no follow-on tuning is implied.
@@ -380,18 +370,19 @@ no admissible historical shortcut — applying today's ratings to old prices is
 the same look-ahead that closed the Stage 2 PEAD idea. Adopt now → captures
 install within weeks → first admissible monthly decision immediately after →
 24 matured outcomes roughly two years later → one analysis pass, then the
-family closes. That argues for starting at once and for keeping the LEV study
-running as the fast side-channel, not for cutting corners here.
+family closes. The start remains gated on owner adoption, reviewed capture
+code, owner-present installation, and first-firing verification; the timeline
+does not itself argue for skipping or accelerating a gate.
 
 ## 11. Amendment log (2026-08-19, pre-adoption)
 
 | ID | Amendment | Why |
 |---|---|---|
-| SBPA-001 | Minimum ETF overlap 50% → 10%; declared structural feasibility check added to section 5 | Measured ceiling is 33.8% and realistic baskets score 7–18%; the original threshold would have refused the overlay every month while the study still reported as complete. The check also exposed the recorded degeneracy limitation in the ETF-selection step |
-| SBPA-002 | An unusable price window disqualifies THAT TICKER, not the whole month; the month refuses only below the 8-stock floor | The original rule was inconsistent with the ratings-unavailable path and would burn irreplaceable months from a 24-month budget |
-| SBPA-003 | P4−P3 becomes DESCRIPTIVE ONLY; frozen family is three cells at 0.05/3 | The cell is ~10% incremental index beta; a "pass" would require the index to compound near 35–40% annually and would measure the market, not the strategy |
-| SBPA-004 | Declared power arithmetic and the fixed interpretation of a null | 24 months detects only a ~0.6%/month edge; the meaning of a null must be fixed before the data, not argued after it |
-| SBPA-005 | SBP-0 supersedes the SBR-2 evaluation step; zero snapshots exist at adoption | Removes contradictory authorities and records that every future outcome is confirmatory |
+| SBPA-001 | **PARTIALLY ACCEPTED, CORRECTED.** Proposed floor 50% → 10%; structural-probe section added | Scrutinizing the floor was correct, but 33.8% was not a ceiling and none of the probe inputs/code was preserved. The numbers are rejected as evidence; 10% remains a disclosed policy proposal pending owner adoption |
+| SBPA-002 | **REJECTED.** Proposed ticker-level price exclusion | It deletes a stock after the signal selected it, contradicts “every qualifying ticker,” and creates a selective basket. Whole-month refusal is restored |
+| SBPA-003 | **PARTIALLY ACCEPTED, CORRECTED.** P4−P3 descriptive; family has three inferential cells | The beta/claim classification is sound. The unsupported 35–40% assertion is withdrawn and the look-through formula is corrected |
+| SBPA-004 | **REJECTED AS POWER EVIDENCE, REPLACED.** Submitted 0.6%/month statement | It mixed unsupported variance/independence assumptions, test sidedness, and a rejection boundary. A pre-adoption sensitivity table is now required; the null interpretation is retained accurately |
+| SBPA-005 | **CONDITIONALLY ACCEPTED.** SBP-0 may supersede SBR-2 | It becomes true only upon explicit owner adoption and verified stream state. The already frozen SBR capture contract is not edited prospectively |
 
 **Relationship to LEV (unchanged in substance, stated explicitly):** the LEV
 family is SECONDARY to this plan — a frozen historical TQQQ timing experiment
@@ -407,9 +398,9 @@ that basket with a small, pre-approved list of funds and choose the fund whose
 actual holdings overlap the basket the most. Put only a small part of the
 portfolio into the matching leveraged fund.
 
-Then compare each step separately. If the equal-weight stocks cannot beat QQQ,
-the ratings filter did not help. If inverse volatility cannot beat equal
-weight, the sizing rule did not help. If the ordinary ETF cannot improve the
-stock basket, the overlap idea did not help. If the leveraged ETF cannot beat
-the ordinary ETF after extra costs and risk, leverage did not help. This keeps
-one exciting-looking result from hiding which part actually worked.
+Then compare each step separately. A failed frozen test means that step did
+not establish an improvement; it does not prove the true effect is exactly
+zero. The leveraged ETF comparison is descriptive: it shows how much extra
+return, drawdown, and concentration came with extra market exposure, but it
+does not claim a new alpha. This keeps one exciting-looking result from hiding
+which part actually worked.

@@ -2708,7 +2708,7 @@ diff check passed. Review record/Action Plan commit `2a26353`. Branch
 `codex/review-sbp-plan-amendments-20260819` and all Codex commits are
 **local-only, not pushed or merged** at this handoff.
 
-## 7bp. Counter-review of the SBP review: ACCEPTED IN FULL (2026-08-20)
+## 7bp. Counter-review of the SBP review submitted (2026-08-20; clarified by 7bq)
 
 Record: `docs/Review/REVIEW_2026-08-19_SBP_PLAN_COUNTERREVIEW.md`. All three
 rejections of my amendments are correct, and **SBPA-001 was refuted by
@@ -2738,11 +2738,47 @@ eligible stock still refuses the month). The argument is arithmetic, not
 empirical; an exploratory check did find two current candidates at 46 and 47
 sessions, which SBP-0 must re-verify from the provenance-bound source.
 
+## 7bq. Independent verification of SBP counter-review: ACCEPTED AFTER CORRECTION (2026-08-20)
+
+Codex reviewed the one newly pushed commit on
+`origin/codex/review-sbp-plan-amendments-20260819`: prior verified head/base
+`9d02ee5`, submitted commit and exact remote head `f75e793`. Explicit
+disposition: **ACCEPTED AFTER CORRECTION**. Record:
+`docs/Review/REVIEW_2026-08-20_SBP_PLAN_COUNTERREVIEW_VERIFICATION.md`.
+
+Claude's retractions are correct and its new SBPA-006 concept is useful: a
+security too young to supply 64 completed closes may be excluded before
+ratings selection rather than stalling every month until it seasons.
+Correction `aadb238` closes one P2 and two P3 findings. The age gate must use
+frozen official first-trading-date evidence plus the exchange calendar—not
+provider row count. Otherwise missing market data for an old security could
+make it look young and silently exclude it, recreating SBPA-002. Once a
+security passes the age gate and ratings select it, every close in the exact
+64-close window remains mandatory; a missing/invalid close refuses the whole
+month.
+
+The correction removes unproven 46/47-session counts from the operative plan,
+records that machine-local snapshot state was not measured, changes the
+“permanent stall” description to temporary-until-seasoned, fixes the
+counter-review date to 2026-08-20, and moves detailed review narrative out of
+the active contract. Action Plan/review-record commit `ae07450`. Validation:
+31 focused active-document tests passed; full suite **4,348 passed / 0 failed /
+25 warnings** in 879.47 seconds; Python 3.13.14; required compileall plus
+`research/` and diff check passed. No code, QC, broker, market-data, scheduler,
+deployment, or operational-state action occurred. SBP remains a draft and no
+milestone record was added.
+
+Remote topology at this handoff: Claude's submitted counter-review is pushed
+at `origin/codex/review-sbp-plan-amendments-20260819` head `f75e793`. The new
+review branch `codex/review-sbp-counterreview-20260820`, correction `aadb238`,
+record `ae07450`, and this handoff are **local-only until the owner authorizes
+a push**.
+
 ## 8. What is next
 
 **Current (2026-08-20): the SBP amendment round is independently ACCEPTED
-AFTER CORRECTION (7bo) and counter-reviewed (7bp), with one new proposal
-SBPA-006 for the owner. The complete Strong-Buy successor remains a
+AFTER CORRECTION (7bo); Claude's counter-review and proposed SBPA-006 are also
+independently ACCEPTED AFTER CORRECTION (7bq). The complete successor remains a
 DRAFT — not adopted, frozen, scheduled, or implemented. No SBP code before an
 owner-approved SBP-0 freeze. LEV remains separate and cannot validate SBP.**
 Codex reviewed exact pushed range
@@ -2764,7 +2800,8 @@ review report dispositions all 143 submitted commits.
 
 **Sequencing:** Stage 0 and Stage 1 are closed null (A-001/A-002).
 APQ is closed null (R-029/A-003). SHW-4 is live and collecting its
-prospective 24-month stream. The SBP review branch is local-only. The owner
+prospective 24-month stream. The current SBP counter-review verification branch
+is local-only. The owner
 should first review the corrected proposed values in
 `docs/reference/STRONGBUY_PORTFOLIO_TEST_PLAN.md`. If accepted, SBP-0 must
 verify official ETF pairs, machine-local snapshot count, the optional

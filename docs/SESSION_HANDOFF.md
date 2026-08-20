@@ -3141,6 +3141,69 @@ change, or order occurred. This review does not adopt ACER-0. The current
 review branch is local-only and must not be described as published until the
 owner explicitly authorizes a push.
 
+## 7bw. Counter-review of the ACER documentation review: ACCEPTED (2026-08-20)
+
+Branch `user/claude/acer-review-counterreview-20260820`, from Codex's exact
+head `832b7cf`. Record:
+`docs/Review/REVIEW_2026-08-20_ACER_DOCUMENTATION_COUNTERREVIEW.md`.
+
+**Snapshot deviation:** Codex's branch was local-only in the worktree
+`trading_agent_codex_acer_review`; the snapshot was frozen by branching from
+the exact object and pushing this branch, which publishes `e4bef19`, `73efc11`
+and `832b7cf` as ancestors.
+
+**Verdict: ACCEPTED.** All four findings confirmed against the documents, both
+claimed mutations reproduced, nothing deleted or weakened. Two are defects in
+my own round that re-reading my own text would not have surfaced:
+
+- **ACERDOC-001** — I rewrote the Action Plan for ACER and added section 7bv,
+  but never touched the handoff reading list a new session starts from, which
+  still said "Strong-Buy priority" and sent the reader to SBP-0. The entry
+  point pointed at the superseded program while the plan behind it pointed at
+  ACER.
+- **ACERDOC-002** — the ACER plan asserted "zero snapshots exist and the
+  scheduled task was never installed" while the Action Plan row I wrote in the
+  same commit said that state was never measured. Absence from Git is not
+  absence on the operational host, and I had corrected this exact overclaim in
+  my own draft two rounds earlier before reproducing it.
+
+ACERDOC-003 (the archive index still advertised SBP as "draft pending owner
+adoption" with no ACER row) and ACERDOC-004 (topology stopped at PR #285 while
+PR #286 had merged) are also confirmed. Codex additionally **rendered the
+source PDF visually and read all nine pages**, which is better evidence of
+faithful representation than my own stdlib text extraction, whose garbled
+formulas I had flagged.
+
+**Four counter-review items closed (ACRV-001..004):**
+
+- The new index guard used `next(...)`, so a deleted row raised `StopIteration`
+  with no message — the same defect CRV-003 closed one round earlier and which
+  this guard reproduced. Now asserts exactly one row with a diagnostic
+  message; both mutations re-verified red.
+- **My own overstatement, which the review did not catch:** the plan asserted
+  ETF scores "will be strongly collinear" with no correlation computed — the
+  unsupported-quantity error that sank SBPA-001, reproduced inside the
+  document that cites it as a lesson. Now labelled reasoning rather than
+  measurement, with ACER-3 required to measure realized cross-sectional
+  correlation and report it beside any ranking result.
+- The unmeasured machine-local SBR state was correctly flagged but assigned to
+  nobody. ACER-1 now must measure task presence and snapshot count on the
+  operational host, read-only, and record it in `OPERATIONAL_FACTS.md`.
+- The review reported an exit code and a collection count but no pass/fail
+  counts, which `CLAUDE.md` §10 requires; measured independently below.
+
+Validation on the final tree: the full suite ran **4,352 passed / 1 failed /
+25 warnings** in 953.04 seconds, the single failure being
+`test_current_review_documents_have_no_validation_placeholders` firing on the
+unfilled result token in this sentence. After substitution the focused
+document/contract suite passes 52. The suite total is 4,353 tests, matching
+the collection count Codex reported; this record adds the pass/fail/warning
+numbers that ACRV-004 found missing. Python 3.13.14; `compileall` over the required
+surface passed; `git diff --check` passed. No data purchase, QuantConnect
+access, broker access, scheduled-task change, deployment, epoch action, or
+operational database mutation occurred. ACER remains a DRAFT and ACER-0
+remains the owner's decision.
+
 ## 8. What is next
 
 **Current (2026-08-20, superseding everything below):**

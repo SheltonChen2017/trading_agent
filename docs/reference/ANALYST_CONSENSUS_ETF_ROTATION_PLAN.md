@@ -49,14 +49,19 @@ be disclosed in advance, and because the source document does not carry it.
 - Post-recommendation drift is among the most heavily studied and most
   heavily arbitraged anomalies in the published literature. A fresh
   independent edge is not the base case.
-- **Aggregation dilutes the signal it depends on.** Summing weighted
-  stock-level revisions across 50–500 holdings projects mostly onto the ETF's
-  common factor. Scores across large-cap technology ETFs will be strongly
-  collinear because the same mega-caps dominate SMH, VGT, XLK and QQQ alike,
-  so "ranking ETFs" partly re-ranks one factor. If a genuine stock-level edge
-  exists, trading the stocks dominates trading the wrapper: the ETF layer buys
-  diversification, capacity, and access to leveraged/inverse products, and it
-  pays for them in signal strength. That trade must be measured, not assumed.
+- **Aggregation is expected to dilute the signal it depends on.** Summing
+  weighted stock-level revisions across 50–500 holdings should project largely
+  onto the ETF's common factor, and scores across large-cap technology ETFs
+  are expected to be highly correlated because the same mega-caps carry large
+  weights in SMH, VGT, XLK and QQQ alike — so "ranking ETFs" may partly
+  re-rank one factor. **This is reasoning, not a measurement**: no correlation
+  has been computed here, and stating it as established would repeat the
+  unsupported-quantity error that sank amendment SBPA-001. ACER-3 must measure
+  the realized cross-sectional correlation of ETF scores and report it beside
+  any ranking result. If a genuine stock-level edge exists, trading the stocks
+  may dominate trading the wrapper: the ETF layer buys diversification,
+  capacity, and access to leveraged/inverse products, and plausibly pays for
+  them in signal strength. That trade must be measured, not assumed.
 - The failure mode this project has already met twice is a long-only result
   that clears a gross-versus-zero test while sitting on top of its own
   benchmark. Every ACER comparison therefore requires a cadence-matched
@@ -137,7 +142,7 @@ of done. Gates are pass/fail before the next milestone begins.
 | ID | Work | Gate |
 |---|---|---|
 | **ACER-0** | Freeze this contract: signal encoding, decay grid, eligibility, controls, benchmarks, gates, cell count, and the run budget. Choose the ratings vendor from the two open questions in section 4. | Owner adoption. Nothing below may start first. |
-| **ACER-1** | Data audit: verify point-in-time ratings timestamps and standardized histories; verify ETF constituents, weights, and actual availability semantics; build a survivorship-aware universe; quantify missingness and coverage. | Proceed only if the data can support a genuinely point-in-time test. A failure here ends the program cheaply. |
+| **ACER-1** | Data audit: verify point-in-time ratings timestamps and standardized histories; verify ETF constituents, weights, and actual availability semantics; build a survivorship-aware universe; quantify missingness and coverage. **Also measure the machine-local SBR state on the operational host** (task presence and snapshot count) and record it in `docs/operations/OPERATIONAL_FACTS.md`, so the closure in section 3.1 rests on a measurement rather than on absence of repository evidence. | Proceed only if the data can support a genuinely point-in-time test. A failure here ends the program cheaply. The SBR measurement is read-only; finding snapshots would be a material discovery, not a footnote. |
 | **ACER-2** | **Stock-level signal validation — the decisive milestone.** Do revisions carry incremental out-of-sample information after momentum, earnings, size, liquidity, volatility and sector controls? Levels versus revisions; alternative encodings; decay half-lives chosen out-of-sample. | Revisions must show incremental **out-of-sample** information under the frozen gate. In-sample correlation is not a pass. **Null here closes the program.** |
 | **ACER-3** | Unlevered ETF aggregation: raw, coverage-adjusted, breadth-filtered and equal-weighted variants; ETF clustering to prevent duplicated exposure; ranking and threshold portfolios. | The 1x strategy must survive costs, a cadence-matched benchmark on identical dates, and reasonable alternative specifications. |
 | **ACER-4** | Robustness and falsification: walk-forward or nested validation, a reserved untouched test period, regime and sector splits, placebo timestamps, shuffled signals, delayed-signal tests, comparison against ETF momentum and sector rotation, multiplicity correction, parameter sensitivity. | Stability, not one narrow parameter choice or subperiod. |

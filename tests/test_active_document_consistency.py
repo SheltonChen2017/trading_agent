@@ -979,11 +979,20 @@ def test_reference_index_matches_a_superseded_program_status():
     index_path = _doc_path("reference/README.md")
     index = index_path.read_text(encoding="utf-8")
     if re.search(r"Status: \*\*SUPERSEDED", sbp):
-        sbp_row = next(
+        # ACRV-001: `next()` raised StopIteration when the row was missing
+        # -- an error with no message, the same defect CRV-003 closed in
+        # the amendment-ledger guard one round earlier. A deleted row is a
+        # legitimate failure mode of this guard and must name itself.
+        sbp_rows = [
             line
             for line in index.splitlines()
             if line.startswith("| `STRONGBUY_PORTFOLIO_TEST_PLAN.md`")
+        ]
+        assert len(sbp_rows) == 1, (
+            "expected exactly one STRONGBUY_PORTFOLIO_TEST_PLAN.md row in "
+            f"the reference index, found {len(sbp_rows)}"
         )
+        sbp_row = sbp_rows[0]
         assert "superseded" in sbp_row.lower(), (
             "the reference index still advertises a superseded plan as actionable"
         )
